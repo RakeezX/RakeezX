@@ -1,5 +1,5 @@
 ﻿"""
-خادم محلي لتجربة MADAR Z على هذا الجهاز.
+خادم محلي لتجربة RAKEEZ X على هذا الجهاز.
 
     python serve.py            ← يفتح على http://localhost:8777
     python serve.py 9000       ← منفذ آخر
@@ -61,7 +61,7 @@ class Server(socketserver.ThreadingTCPServer):
 
 if __name__ == "__main__":
     with Server(("0.0.0.0", PORT), Handler) as httpd:
-        print(f"\n  MADAR Z يعمل الآن")
+        print(f"\n  RAKEEZ X يعمل الآن")
         print(f"  على هذا الجهاز :  http://localhost:{PORT}")
         ip = lan_ip()
         if ip:

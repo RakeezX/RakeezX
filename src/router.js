@@ -1,4 +1,4 @@
-/** MADAR Z — موجّه على الـ hash، فيعمل من أي مجلد بلا إعداد خادم. */
+/** RAKEEZ X — موجّه على الـ hash، فيعمل من أي مجلد بلا إعداد خادم. */
 
 const ROUTES = [
   { path: '/',                          load: () => import('./views/home.js') },

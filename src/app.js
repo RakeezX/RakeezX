@@ -1,5 +1,5 @@
 /**
- * MADAR Z — غلاف التطبيق: الإقلاع، والهيكل، وتوجيه الشاشات، وإعادة الرسم.
+ * RAKEEZ X — غلاف التطبيق: الإقلاع، والهيكل، وتوجيه الشاشات، وإعادة الرسم.
  */
 
 import { html, render, icon, delegate, toast, openSheet } from './lib/dom.js';
@@ -54,7 +54,7 @@ function shell(path, params) {
   return html`
     <div class="layout">
       <nav class="sidebar">
-        <div class="sidebar__brand">${icon('spark')} <span>MADAR&nbsp;Z</span></div>
+        <div class="sidebar__brand">${icon('spark')} <span>RAKEEZ&nbsp;X</span></div>
         ${NAV.map((it) => navLink(it, path, 'sidebar'))}
         <div class="sidebar__spacer"></div>
         ${inTeaching
@@ -97,7 +97,7 @@ function moreNavSheet() {
 
 function topbar(v, params) {
   const backHref = v.back?.(params);
-  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'MADAR Z';
+  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'RAKEEZ X';
   const sub = v.subtitle?.(params);
   const actions = v.topActions?.(params);
 
@@ -163,7 +163,7 @@ function paint() {
         <div class="page ${view.wide ? 'page--wide' : ''}">${view.render(ctx.params)}</div>`
     );
   } catch (err) {
-    console.error('[madarz] فشل رسم الشاشة', err);
+    console.error('[rakeezx] فشل رسم الشاشة', err);
     render(
       mainEl,
       html`<div class="page">
@@ -199,7 +199,7 @@ async function resolve() {
   try {
     mod = await found.route.load();
   } catch (err) {
-    console.error('[madarz] تعذّر تحميل الشاشة', err);
+    console.error('[rakeezx] تعذّر تحميل الشاشة', err);
     toast('تعذّر فتح هذه الشاشة', 'danger');
     return;
   }
@@ -229,7 +229,7 @@ async function boot() {
   try {
     await store.init();
   } catch (err) {
-    console.error('[madarz] فشل فتح قاعدة البيانات', err);
+    console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
       app,
       html`<div class="page">
@@ -286,8 +286,8 @@ function reportMigration() {
   const r = store.state.migrationReport;
   if (!r) return;
   const n = (r.counts?.students ?? 0) + (r.counts?.scores ?? 0);
-  toast(`رُحّلت بياناتك إلى MADAR Z (${r.counts?.students ?? 0} طالبًا)`);
-  if (r.warnings?.length) console.warn('[madarz] ملاحظات الترحيل:', r.warnings);
+  toast(`رُحّلت بياناتك إلى RAKEEZ X (${r.counts?.students ?? 0} طالبًا)`);
+  if (r.warnings?.length) console.warn('[rakeezx] ملاحظات الترحيل:', r.warnings);
 }
 
 function registerServiceWorker() {
@@ -304,19 +304,19 @@ function registerServiceWorker() {
         const mine = keys.filter((k) => k.startsWith('madarz-'));
         const count = mine.length ? (await (await caches.open(mine[0])).keys()).length : 0;
         if (reg.active && count === 0) {
-          console.warn('[madarz] مخزون العمل دون إنترنت فارغ — يُعاد بناؤه');
+          console.warn('[rakeezx] مخزون العمل دون إنترنت فارغ — يُعاد بناؤه');
           await reg.unregister();
           await navigator.serviceWorker.register('sw.js');
         }
       } catch (err) {
-        console.warn('[madarz] تعذّر فحص المخزون', err);
+        console.warn('[rakeezx] تعذّر فحص المخزون', err);
       }
     })
-    .catch((err) => console.warn('[madarz] لم يُسجَّل عامل الخدمة', err));
+    .catch((err) => console.warn('[rakeezx] لم يُسجَّل عامل الخدمة', err));
 }
 
-addEventListener('error', (e) => console.error('[madarz]', e.error ?? e.message));
-addEventListener('unhandledrejection', (e) => console.error('[madarz] وعد مرفوض', e.reason));
+addEventListener('error', (e) => console.error('[rakeezx]', e.error ?? e.message));
+addEventListener('unhandledrejection', (e) => console.error('[rakeezx] وعد مرفوض', e.reason));
 
 boot();
 

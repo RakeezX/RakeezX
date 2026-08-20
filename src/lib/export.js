@@ -1,4 +1,4 @@
-/** MADAR Z — التصدير: ملفات CSV تفتح في إكسل بالعربية، ونسخة احتياطية JSON كاملة. */
+/** RAKEEZ X — التصدير: ملفات CSV تفتح في إكسل بالعربية، ونسخة احتياطية JSON كاملة. */
 
 import * as db from './db.js';
 import { migrateLegacyData, isLegacyShape } from './migrate.js';
@@ -88,7 +88,7 @@ const MAX_ERRORS = 8;
 /**
  * يفحص ملف النسخة كاملًا **قبل** أن تُمسّ أي بيانات.
  *
- * يقبل مصدرين: نسخة MADAR Z، ونسخة النسخة السابقة من التطبيق — والثانية
+ * يقبل مصدرين: نسخة RAKEEZ X، ونسخة النسخة السابقة من التطبيق — والثانية
  * تُرحَّل إلى الشكل الجديد عند الاستيراد ولا تُكتب أبدًا بشكلها القديم.
  */
 export function validateBackup(payload) {
@@ -104,7 +104,7 @@ export function validateBackup(payload) {
 
   const isLegacyFile = payload.app === LEGACY_APP_ID;
   if (payload.app !== APP_ID && !isLegacyFile) {
-    add('هذا الملف ليس نسخة احتياطية من MADAR Z.');
+    add('هذا الملف ليس نسخة احتياطية من RAKEEZ X.');
   }
   if (!Number.isInteger(payload.version)) add('إصدار النسخة غير معروف.');
   else if (!isLegacyFile && payload.version > BACKUP_VERSION) {

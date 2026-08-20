@@ -253,11 +253,11 @@ export default {
       </div>
 
       <div class="section">
-        <div class="section__head"><div class="section__title">عن MADAR Z</div></div>
+        <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
         <div class="card card--pad t-3 fs-sm stack stack-2">
           <div>سجل معلّم يعمل كاملًا دون إنترنت. كل ما ترصده محفوظ على جهازك وحده.</div>
           <div>لا حسابات، ولا إعلانات، ولا تتبّع، ولا إرسال لأي خادم.</div>
-          <div class="t-3">MADAR Z · النسخة ١٫٠ · الموجة الأولى</div>
+          <div class="t-3">RAKEEZ X · النسخة ١٫٠ · الموجة الأولى</div>
         </div>
       </div>
     `;

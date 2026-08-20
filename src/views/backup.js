@@ -83,7 +83,7 @@ export default {
           ${icon('download')} نزّل نسخة احتياطية
         </button>
         <p class="t-3 fs-sm mt-3">
-          ملف واحد يحوي كل فصولك وطلابك ودرجاتهم وحضورهم. يفتحه MADAR Z وحده.
+          ملف واحد يحوي كل فصولك وطلابك ودرجاتهم وحضورهم. يفتحه RAKEEZ X وحده.
         </p>
       </div>
 
@@ -195,10 +195,10 @@ export default {
         const { written, migration } = await restoreBackup(payload, mode);
         toast(
           migration
-            ? `استُرجع ${written} سجلًا ورُحّل إلى شكل MADAR Z — يُعاد التحميل`
+            ? `استُرجع ${written} سجلًا ورُحّل إلى شكل RAKEEZ X — يُعاد التحميل`
             : `استُرجع ${written} سجلًا — يُعاد التحميل`
         );
-        if (migration?.warnings?.length) console.warn('[madarz] ملاحظات ترحيل النسخة:', migration.warnings);
+        if (migration?.warnings?.length) console.warn('[rakeezx] ملاحظات ترحيل النسخة:', migration.warnings);
         setTimeout(() => location.reload(), 1100);
       } catch (err) {
         console.error(err);

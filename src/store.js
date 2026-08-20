@@ -1,5 +1,5 @@
 /**
- * MADAR Z — المخزن: الحالة في الذاكرة + الحفظ في IndexedDB + الإشعار بالتغيير.
+ * RAKEEZ X — المخزن: الحالة في الذاكرة + الحفظ في IndexedDB + الإشعار بالتغيير.
  *
  * كل تعديل يمر من هنا، فيُحفظ فورًا ويُسجَّل في صندوق الصادر (outbox)
  * ليُرفع لاحقًا عند تفعيل المزامنة السحابية.
@@ -66,11 +66,11 @@ let errorHandler = null;
 export const onWriteError = (fn) => { errorHandler = fn; };
 
 function reportWriteError(err, context) {
-  console.error('[madarz] فشل الحفظ', context, err);
+  console.error('[rakeezx] فشل الحفظ', context, err);
   try {
     errorHandler?.(err, context);
   } catch (e) {
-    console.error('[madarz] فشل معالج الخطأ نفسه', e);
+    console.error('[rakeezx] فشل معالج الخطأ نفسه', e);
   }
 }
 
@@ -84,13 +84,13 @@ function broadcast(changes) {
   try {
     channel.postMessage({ from: TAB_ID, changes });
   } catch (err) {
-    console.warn('[madarz] تعذّر إبلاغ التبويبات الأخرى', err);
+    console.warn('[rakeezx] تعذّر إبلاغ التبويبات الأخرى', err);
   }
 }
 
 channel?.addEventListener('message', (ev) => {
   if (!ev.data || ev.data.from === TAB_ID) return;
-  absorb(ev.data.changes).catch((err) => console.warn('[madarz] تعذّر استقبال تغيير', err));
+  absorb(ev.data.changes).catch((err) => console.warn('[rakeezx] تعذّر استقبال تغيير', err));
 });
 
 async function absorb(changes) {
@@ -126,7 +126,7 @@ const changeList = (storeName, records) => records.map((r) => ({ store: storeNam
 
 /**
  * ترحيل لمرة واحدة من قاعدة النسخة السابقة.
- * تُقرأ القاعدة القديمة، وتُحوَّل بياناتها، وتُكتب في قاعدة MADAR Z **في معاملة
+ * تُقرأ القاعدة القديمة، وتُحوَّل بياناتها، وتُكتب في قاعدة RAKEEZ X **في معاملة
  * واحدة**. القاعدة القديمة لا تُحذف — تبقى شبكة أمان.
  */
 async function importLegacyIfAny() {
@@ -140,7 +140,7 @@ async function importLegacyIfAny() {
 
   const { data, report } = migrateLegacyData(legacy);
   await db.writeAll(data, 'replace');
-  console.info('[madarz] رُحّلت بيانات النسخة السابقة', report.counts);
+  console.info('[rakeezx] رُحّلت بيانات النسخة السابقة', report.counts);
   return { ...report, source: 'legacy-db' };
 }
 
@@ -182,14 +182,14 @@ export async function init() {
   const hadProfile = await db.get('profile', 'profile');
   const hadMeta = await db.get('meta', 'meta');
 
-  // قاعدة MADAR Z فارغة تمامًا؟ جرّب استيراد قاعدة النسخة السابقة.
+  // قاعدة RAKEEZ X فارغة تمامًا؟ جرّب استيراد قاعدة النسخة السابقة.
   if (!hadProfile && !hadMeta) {
     const existing = await db.getAll('students');
     if (!existing.length) {
       try {
         migrationReport = await importLegacyIfAny();
       } catch (err) {
-        console.error('[madarz] تعذّر ترحيل القاعدة السابقة — نبدأ فارغين', err);
+        console.error('[rakeezx] تعذّر ترحيل القاعدة السابقة — نبدأ فارغين', err);
       }
     }
   }

@@ -38,7 +38,7 @@ export default {
       <!-- ترحيب وتاريخ اليوم -->
       <div class="hero">
         <div class="hero__hello">
-          ${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك في MADAR Z'}
+          ${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك في RAKEEZ X'}
         </div>
         <div class="hero__date">
           ${WEEKDAYS[weekday(today)]} · ${fmtDate(today, false)}
