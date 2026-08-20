@@ -1,0 +1,40 @@
+﻿# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build / test output
+dist/
+build/
+coverage/
+
+# Supabase local temporary data
+supabase/.temp/
+
+# Logs / temporary files
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+*~
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
