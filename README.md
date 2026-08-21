@@ -35,7 +35,7 @@
 ## التشغيل
 
 ```bash
-python madarz/serve.py
+python RakeezX/serve.py
 ```
 
 ثم افتح `http://localhost:8777`. ويطبع الأمر عنوان الجهاز على الشبكة، فتفتحه من جوالك
@@ -52,7 +52,7 @@ python madarz/serve.py
 ## هيكل المجلدات
 
 ```
-madarz/
+RakeezX/
 ├── index.html
 ├── manifest.webmanifest        بيان التطبيق (التثبيت)
 ├── sw.js                       عامل الخدمة — العمل دون إنترنت
