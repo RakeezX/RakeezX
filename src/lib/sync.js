@@ -116,18 +116,18 @@ export async function syncProfile() {
         console.log('[rakeezx sync] Local is strictly newer. Local wins.');
         shouldPush = true;
         merged = local;
-      } else {
-        // Includes remoteClientUpdatedAt >= localUpdatedAt and ambiguous/equal cases.
-        // Never arbitrarily overwrite the remote record.
-        console.log('[rakeezx sync] Remote is newer, equal, or ambiguous. Remote wins.');
+      } else if (remoteClientUpdatedAt > localUpdatedAt) {
+        console.log('[rakeezx sync] Remote is strictly newer. Remote wins.');
         shouldUpdateLocal = true;
         merged = {
           teacherName: remote.teacher_name,
           schoolName: remote.school_name,
           phone: remote.phone,
-          updatedAt: remoteClientUpdatedAt,
+          updatedAt: remoteClientUpdatedAt, // Keep remote's timestamp
           deleted: !!remote.deleted_at
         };
+      } else {
+        console.log('[rakeezx sync] Timestamps are exactly equal. Perfect sync, no action.');
       }
     }
     
@@ -364,8 +364,8 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       if (localUpdatedAt > remoteClientUpdatedAt) {
         // Local is strictly newer.
         toPush.push(mapper.toCloud(local));
-      } else {
-        // Remote is newer, equal, or ambiguous.
+      } else if (remoteClientUpdatedAt > localUpdatedAt) {
+        // Remote is strictly newer.
         toUpdateLocal.push(mapper.fromCloud(remote));
       }
     }
