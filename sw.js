@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v2';
+const VERSION = 'rakeezx-v3';
 
 const SHELL = [
   './',
@@ -56,6 +56,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     (async () => {
       const cache = await caches.open(VERSION);
@@ -67,7 +68,6 @@ self.addEventListener('install', (event) => {
           })
         )
       );
-      self.skipWaiting();
     })()
   );
 });
@@ -76,7 +76,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)));
+      // Remove all old caches that don't match the current version
+      await Promise.all(keys.filter((k) => k !== VERSION && k.startsWith('rakeezx-')).map((k) => caches.delete(k)));
       await self.clients.claim();
     })()
   );
@@ -87,19 +88,29 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+  // Do not cache API/Supabase requests or anything cross-origin
   if (url.origin !== self.location.origin) return;
+  // Ignore non-http(s) requests like chrome-extension://
+  if (!url.protocol.startsWith('http')) return;
 
+  // Navigation requests: Network-First
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
-        const cached = await caches.match('./index.html');
-        if (cached) {
-          refresh(request);
-          return cached;
-        }
         try {
-          return await fetch(request);
-        } catch {
+          const res = await fetch(request);
+          if (res && res.ok) {
+            const cache = await caches.open(VERSION);
+            cache.put('./index.html', res.clone());
+          }
+          return res;
+        } catch (err) {
+          try {
+            const cached = await caches.match('./index.html');
+            if (cached) return cached;
+          } catch (e) {
+            console.warn('[sw] Cache match error for index.html', e);
+          }
           return new Response('التطبيق غير متاح دون إنترنت بعد. افتحه مرة وأنت متصل.', {
             status: 503,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
@@ -110,33 +121,38 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Static assets: Stale-While-Revalidate
   event.respondWith(
     (async () => {
-      const cached = await caches.match(request);
-      if (cached) {
-        refresh(request);
-        return cached;
-      }
       try {
+        const cached = await caches.match(request);
+        if (cached) {
+          event.waitUntil(
+            fetch(request)
+              .then(async (res) => {
+                if (res && res.ok) {
+                  const cache = await caches.open(VERSION);
+                  await cache.put(request, res);
+                }
+              })
+              .catch((err) => {
+                // Ignore network errors in background revalidation
+                console.warn('[sw] Background fetch failed', request.url, err);
+              })
+          );
+          return cached;
+        }
+
         const res = await fetch(request);
-        if (res.ok) {
+        if (res && res.ok) {
           const cache = await caches.open(VERSION);
           cache.put(request, res.clone());
         }
         return res;
-      } catch {
+      } catch (err) {
+        console.warn('[sw] Fetch error', request.url, err);
         return new Response('', { status: 504 });
       }
     })()
   );
 });
-
-/** تحديث صامت للنسخة المخزّنة دون تعطيل الاستجابة الحالية. */
-function refresh(request) {
-  fetch(request)
-    .then((res) => {
-      if (!res.ok) return;
-      caches.open(VERSION).then((cache) => cache.put(request, res));
-    })
-    .catch(() => {});
-}
