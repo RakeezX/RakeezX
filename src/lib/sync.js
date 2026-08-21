@@ -303,10 +303,31 @@ function isMeaningfulStructural(storeName, rec) {
 }
 
 /**
+ * Scans local structural data to find parent records (like default years)
+ * that must be pushed because user-created children depend on them.
+ */
+function buildLocalDependencies(state) {
+  const req = { years: new Set() };
+
+  for (const sec of state.sections || []) {
+    if (sec.yearId && isMeaningfulStructural('sections', sec)) {
+      req.years.add(sec.yearId);
+    }
+  }
+  for (const term of state.terms || []) {
+    if (term.yearId && isMeaningfulStructural('terms', term)) {
+      req.years.add(term.yearId);
+    }
+  }
+
+  return req;
+}
+
+/**
  * Generic sync engine for a single collection.
  * Pull → Merge → Push
  */
-async function syncCollection(storeName, tableName) {
+async function syncCollection(storeName, tableName, context = { requiredIds: new Set(), knownRemoteIds: {} }) {
   const mapper = MAPPERS[storeName];
   if (!mapper) throw new Error(`No mapper for ${storeName}`);
 
@@ -327,8 +348,8 @@ async function syncCollection(storeName, tableName) {
 
     if (!remote) {
       // Remote does not exist.
-      // We only push if the local record is meaningful (not an auto-generated boot default).
-      if (isMeaningfulStructural(storeName, local)) {
+      // We push if the local record is meaningful OR if it is explicitly required by a child.
+      if (isMeaningfulStructural(storeName, local) || context.requiredIds.has(local.id)) {
         toPush.push(mapper.toCloud(local));
       }
     } else if (!local) {
@@ -350,6 +371,15 @@ async function syncCollection(storeName, tableName) {
     }
   }
   
+  // Dependency validation before push
+  if (storeName === 'terms' || storeName === 'sections') {
+    for (const p of toPush) {
+      if (p.year_id && !context.knownRemoteIds?.years?.has(p.year_id)) {
+        throw new Error(`${storeName}: missing remote year ${p.year_id}`);
+      }
+    }
+  }
+
   if (toPush.length > 0) {
     await cloud.upsertRecords(tableName, toPush);
   }
@@ -358,7 +388,10 @@ async function syncCollection(storeName, tableName) {
     await store.save({ [storeName]: toUpdateLocal });
   }
 
-  return { pushed: toPush.length, pulled: toUpdateLocal.length };
+  const known = new Set(remoteById.keys());
+  for (const p of toPush) known.add(p.id);
+
+  return { pushed: toPush.length, pulled: toUpdateLocal.length, known };
 }
 
 /**
@@ -375,6 +408,8 @@ export async function syncStructural() {
   console.log('[rakeezx sync] Started structural sync...');
   
   try {
+    const requiredByChildren = buildLocalDependencies(store.state);
+    const knownRemoteIds = {};
     const stats = {};
     const order = [
       { store: 'years', table: 'years' },
@@ -384,8 +419,13 @@ export async function syncStructural() {
     ];
 
     for (const { store: sName, table: tName } of order) {
-      const res = await syncCollection(sName, tName);
-      stats[sName] = res;
+      const context = {
+        requiredIds: requiredByChildren[sName] || new Set(),
+        knownRemoteIds
+      };
+      const res = await syncCollection(sName, tName, context);
+      knownRemoteIds[sName] = res.known;
+      stats[sName] = { pushed: res.pushed, pulled: res.pulled };
     }
 
     const nowStamp = Date.now();
