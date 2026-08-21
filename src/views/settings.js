@@ -274,6 +274,9 @@ export default {
             <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة (Profile)
             </button>
+            <button class="btn btn--quiet btn--block" data-act="sync-structural" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} اختبار المزامنة الهيكلية
+            </button>
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -334,6 +337,16 @@ export default {
         toast('تعذرت المزامنة: ' + sync.state.error, 'danger');
       } else {
         toast('تمت المزامنة بنجاح');
+      }
+    },
+
+    async 'sync-structural'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncStructural();
+      if (sync.state.status === 'error') {
+        toast('تعذرت المزامنة: ' + sync.state.error, 'danger');
+      } else {
+        toast('تمت المزامنة الهيكلية بنجاح');
       }
     },
 

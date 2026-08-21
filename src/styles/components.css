@@ -1,11 +1,11 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    RAKEEZ X — مكوّنات الشاشات
    ========================================================================== */
 
 /* ---------- ترحيب ---------- */
-.welcome { border-color: var(--brand); background: var(--brand-soft); }
+.welcome { border-color: var(--brand); background: var(--brand-soft); display: block; text-align: center; }
 .welcome__title { font-weight: 750; font-size: 17px; color: var(--brand); }
-.welcome__text  { font-size: 14px; color: var(--text-2); margin-block: var(--sp-2) var(--sp-3); line-height: 1.7; }
+.welcome__text  { font-size: 14px; color: var(--text-2); margin-block: var(--sp-2) 0; line-height: 1.7; }
 
 /* ---------- اختيار اللون ---------- */
 .swatch { cursor: pointer; }

@@ -19,7 +19,7 @@ function notify() {
   listeners.forEach((fn) => fn());
 }
 
-async function request(path, options = {}, isAuth = false) {
+export async function request(path, options = {}, isAuth = false) {
   const headers = {
     'apikey': ANON_KEY,
     ...options.headers,
@@ -157,4 +157,34 @@ export async function updateProfile(profileData) {
     body: JSON.stringify(profileData)
   });
   return data?.[0] || null;
+}
+
+export async function upsertRecords(tableName, records) {
+  if (!user) throw new Error('Not authenticated');
+  if (!records || !records.length) return [];
+
+  const payload = records.map(r => ({ ...r, owner_id: user.id }));
+
+  const data = await request(`/${tableName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=representation',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx'
+    },
+    body: JSON.stringify(payload)
+  });
+  return data || [];
+}
+
+export async function fetchRecords(tableName) {
+  if (!user) throw new Error('Not authenticated');
+  const data = await request(`/${tableName}?owner_id=eq.${user.id}&select=*`, {
+    headers: {
+      'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx'
+    }
+  });
+  return data || [];
 }

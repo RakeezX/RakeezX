@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v1';
+const VERSION = 'rakeezx-v2';
 
 const SHELL = [
   './',
@@ -29,6 +29,8 @@ const SHELL = [
   './src/lib/db.js',
   './src/lib/export.js',
   './src/lib/migrate.js',
+  './src/lib/cloud.js',
+  './src/lib/sync.js',
 
   './src/views/home.js',
   './src/views/teachings.js',
