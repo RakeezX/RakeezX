@@ -7,7 +7,8 @@ export const state = {
   lastSyncedAt: null, // will be initialized from store
   results: {
     profile: null,
-    structural: null
+    structural: null,
+    students: null
   }
 };
 
@@ -78,21 +79,21 @@ export async function syncProfile() {
     return;
   }
   if (state.status === 'syncing') return;
-  
+
   setState({ status: 'syncing', results: { ...state.results, profile: null } });
   console.log('[rakeezx sync] Started Profile sync...');
-  
+
   try {
     const remote = await cloud.fetchProfile();
     const local = store.state.profile;
-    
+
     const localUpdatedAt = normalizeTimestamp(local?.updatedAt);
     const remoteClientUpdatedAt = normalizeTimestamp(remote?.client_updated_at);
-    
+
     let shouldPush = false;
     let shouldUpdateLocal = false;
     let merged = null;
-    
+
     if (!remote) {
       if (hasMeaningfulProfile(local)) {
         console.log('[rakeezx sync] No remote profile. Local has meaningful data. Local wins.');
@@ -130,7 +131,7 @@ export async function syncProfile() {
         console.log('[rakeezx sync] Timestamps are exactly equal. Perfect sync, no action.');
       }
     }
-    
+
     if (shouldPush && merged) {
       console.log('[rakeezx sync] Pushing to cloud...');
       const payload = {
@@ -140,14 +141,14 @@ export async function syncProfile() {
         client_updated_at: merged.updatedAt,
         device_id: getDeviceId()
       };
-      
+
       if (!remote) {
         await cloud.insertProfile(payload);
       } else {
         await cloud.updateProfile(payload);
       }
     }
-    
+
     if (shouldUpdateLocal && merged) {
       console.log('[rakeezx sync] Updating local store...');
       await store.patchProfile({
@@ -158,7 +159,7 @@ export async function syncProfile() {
         deleted: merged.deleted
       });
     }
-    
+
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
@@ -170,7 +171,7 @@ export async function syncProfile() {
       }
     });
     console.log('[rakeezx sync] Profile sync complete.');
-    
+
   } catch (err) {
     console.warn('[rakeezx sync] Profile sync failed:', err);
     setState({
@@ -282,6 +283,54 @@ const MAPPERS = {
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
     })
+  },
+  students: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      name: rec.name,
+      note: rec.note,
+      status: rec.status,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      name: rec.name,
+      note: rec.note,
+      status: rec.status,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  enrollments: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      student_id: rec.studentId,
+      section_id: rec.sectionId,
+      roll_no: rec.rollNo,
+      start_date: rec.startDate,
+      end_date: rec.endDate,
+      status: rec.status,
+      transfer_note: rec.transferNote,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      studentId: rec.student_id,
+      sectionId: rec.section_id,
+      rollNo: rec.roll_no,
+      startDate: rec.start_date,
+      endDate: rec.end_date,
+      status: rec.status,
+      transferNote: rec.transfer_note,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
   }
 };
 
@@ -360,7 +409,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       // Both exist. Compare timestamps.
       const remoteClientUpdatedAt = normalizeTimestamp(remote.client_updated_at);
       const localUpdatedAt = normalizeTimestamp(local.updatedAt);
-      
+
       if (localUpdatedAt > remoteClientUpdatedAt) {
         // Local is strictly newer.
         toPush.push(mapper.toCloud(local));
@@ -370,12 +419,22 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       }
     }
   }
-  
+
   // Dependency validation before push
   if (storeName === 'terms' || storeName === 'sections') {
     for (const p of toPush) {
       if (p.year_id && !context.knownRemoteIds?.years?.has(p.year_id)) {
         throw new Error(`${storeName}: missing remote year ${p.year_id}`);
+      }
+    }
+  }
+  if (storeName === 'enrollments') {
+    for (const p of toPush) {
+      if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
+        throw new Error(`${storeName}: missing remote student ${p.student_id}`);
+      }
+      if (p.section_id && !context.knownRemoteIds?.sections?.has(p.section_id)) {
+        throw new Error(`${storeName}: missing remote section ${p.section_id}`);
       }
     }
   }
@@ -403,10 +462,10 @@ export async function syncStructural() {
     return;
   }
   if (state.status === 'syncing') return;
-  
+
   setState({ status: 'syncing', results: { ...state.results, structural: null } });
   console.log('[rakeezx sync] Started structural sync...');
-  
+
   try {
     const requiredByChildren = buildLocalDependencies(store.state);
     const knownRemoteIds = {};
@@ -447,6 +506,76 @@ export async function syncStructural() {
       results: {
         ...state.results,
         structural: { status: 'error', error: err.message, time: Date.now() }
+      }
+    });
+  }
+}
+
+/**
+ * Phase 5C: Sync Students and Enrollments.
+ * Dependency-aware execution: structural sync runs first.
+ */
+export async function syncStudents() {
+  if (!cloud.session || !cloud.user) {
+    console.log('[rakeezx sync] Not signed in, skipping students sync.');
+    return;
+  }
+  if (state.status === 'syncing') return;
+
+  console.log('[rakeezx sync] Enforcing structural sync before students...');
+  await syncStructural();
+
+  if (state.results.structural?.status === 'error') {
+    console.warn('[rakeezx sync] Structural sync failed, aborting students sync.');
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        students: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
+      }
+    });
+    return;
+  }
+
+  setState({ status: 'syncing', results: { ...state.results, students: null } });
+  console.log('[rakeezx sync] Started students sync...');
+
+  try {
+    const knownRemoteIds = {};
+    const stats = {};
+
+    // First, fetch remote sections to validate enrollment foreign keys.
+    const remoteSections = await cloud.fetchRecords('sections');
+    knownRemoteIds.sections = new Set(remoteSections.map(r => r.id));
+
+    // 1. Students
+    const resStudents = await syncCollection('students', 'students', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.students = resStudents.known;
+    stats.students = { pushed: resStudents.pushed, pulled: resStudents.pulled };
+
+    // 2. Enrollments
+    const resEnrollments = await syncCollection('enrollments', 'enrollments', { requiredIds: new Set(), knownRemoteIds });
+    stats.enrollments = { pushed: resEnrollments.pushed, pulled: resEnrollments.pulled };
+
+    const nowStamp = Date.now();
+    await store.patchDevice({ lastSyncAt: nowStamp });
+    setState({
+      status: 'idle',
+      lastSyncedAt: nowStamp,
+      results: {
+        ...state.results,
+        students: { status: 'success', stats, time: nowStamp }
+      }
+    });
+    console.log('[rakeezx sync] Students sync complete.', stats);
+
+  } catch (err) {
+    console.warn('[rakeezx sync] Students sync failed:', err);
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        students: { status: 'error', error: err.message, time: Date.now() }
       }
     });
   }

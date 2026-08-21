@@ -305,6 +305,27 @@ export default {
                 `}
               </div>
             ` : ''}
+
+            <button class="btn btn--quiet btn--block" data-act="sync-students" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} اختبار مزامنة الطلاب والانتساب
+            </button>
+            ${sync.state.results.students ? html`
+              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
+                ${sync.state.results.students.status === 'success' ? html`
+                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
+                  <div>آخر مزامنة: ${new Date(sync.state.results.students.time).toLocaleTimeString('ar-SA')}</div>
+                  <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
+                    ${Object.entries(sync.state.results.students.stats).map(([k, v]) => html`
+                      <span>${k}:</span>
+                      <span>${v.pushed} ↑ / ${v.pulled} ↓</span>
+                    `)}
+                  </div>
+                ` : html`
+                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
+                  <div>الرسالة: ${sync.state.results.students.error}</div>
+                `}
+              </div>
+            ` : ''}
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -375,6 +396,16 @@ export default {
         toast('تعذرت المزامنة الهيكلية', 'danger');
       } else {
         toast('تمت المزامنة الهيكلية بنجاح');
+      }
+    },
+
+    async 'sync-students'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncStudents();
+      if (sync.state.results.students?.status === 'error') {
+        toast('تعذرت مزامنة الطلاب والانتساب', 'danger');
+      } else {
+        toast('تمت مزامنة الطلاب والانتساب بنجاح');
       }
     },
 
