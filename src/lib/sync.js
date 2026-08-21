@@ -355,10 +355,7 @@ async function syncCollection(storeName, tableName) {
   }
 
   if (toUpdateLocal.length > 0) {
-    // Wait for the bulk patch equivalent, actually we can use multiple save() calls or a loop
-    for (const rec of toUpdateLocal) {
-      await store.save(storeName, rec);
-    }
+    await store.save({ [storeName]: toUpdateLocal });
   }
 
   return { pushed: toPush.length, pulled: toUpdateLocal.length };

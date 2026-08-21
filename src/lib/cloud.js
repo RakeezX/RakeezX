@@ -161,25 +161,22 @@ export async function updateProfile(profileData) {
 
 export async function upsertRecords(tableName, records) {
   if (!user) throw new Error('Not authenticated');
-  if (!records || !records.length) return [];
+  if (!records || !records.length) return { success: true };
 
   const payload = records.map(r => ({ ...r, owner_id: user.id }));
 
-  const data = await request(`/${tableName}`, {
+  await request(`/${tableName}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=representation',
+      'Prefer': 'resolution=merge-duplicates',
       'Accept-Profile': 'rakeezx',
       'Content-Profile': 'rakeezx'
     },
     body: JSON.stringify(payload)
   });
-  if (!data) return [];
-  if (!Array.isArray(data)) {
-    throw new Error(`Structural sync failed for ${tableName}: expected array, received ${typeof data}`);
-  }
-  return data;
+  
+  return { success: true };
 }
 
 export async function fetchRecords(tableName) {
