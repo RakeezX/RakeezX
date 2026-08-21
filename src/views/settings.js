@@ -3,6 +3,7 @@
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
+import * as sync from '../lib/sync.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
 
 const THEMES = [
@@ -264,7 +265,13 @@ export default {
                 <button class="btn btn--sm btn--ghost" data-act="cloud-out">تسجيل الخروج</button>
               </div>
             </div>
-            <button class="btn btn--quiet btn--block" data-act="cloud-test">
+
+            <div class="t-3 fs-sm hstack gap-2">
+              <div>الحالة: ${sync.state.status === 'syncing' ? 'جاري المزامنة...' : sync.state.status === 'error' ? 'خطأ' : 'جاهز'}</div>
+              ${sync.state.lastSyncedAt ? html`<div class="push">آخر مزامنة: ${new Date(sync.state.lastSyncedAt).toLocaleTimeString('ar-SA')}</div>` : ''}
+            </div>
+
+            <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة (Profile)
             </button>
           ` : html`
@@ -320,34 +327,13 @@ export default {
       toast('تم تسجيل الخروج');
     },
 
-    async 'cloud-test'(el) {
-      const prev = el.textContent;
-      try {
-        el.textContent = 'جاري الجلب...';
-        el.disabled = true;
-
-        let profile = await cloud.fetchProfile();
-        console.log('[cloud test] Fetched profile:', profile);
-
-        if (profile) {
-          el.textContent = 'جاري التحديث...';
-          const teacherName = store.state.profile?.teacherName || 'مستخدم تجريبي';
-          await cloud.updateProfile({ teacher_name: teacherName });
-
-          el.textContent = 'جاري التحقق...';
-          profile = await cloud.fetchProfile();
-          console.log('[cloud test] Fetched after update:', profile);
-        } else {
-          console.log('[cloud test] No profile found to update.');
-        }
-
-        el.textContent = prev;
-        el.disabled = false;
-        toast('اكتمل اختبار المزامنة بنجاح');
-      } catch (err) {
-        el.textContent = prev;
-        el.disabled = false;
-        toast(err.message, 'danger');
+    async 'sync-now'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncProfile();
+      if (sync.state.status === 'error') {
+        toast('تعذرت المزامنة: ' + sync.state.error, 'danger');
+      } else {
+        toast('تمت المزامنة بنجاح');
       }
     },
 

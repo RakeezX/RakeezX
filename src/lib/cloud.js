@@ -122,6 +122,27 @@ export async function fetchProfile() {
   return data?.[0] || null;
 }
 
+export async function insertProfile(profileData) {
+  if (!user) throw new Error('Not authenticated');
+
+  const payload = {
+    ...profileData,
+    owner_id: user.id
+  };
+
+  const data = await request('/profile', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx'
+    },
+    body: JSON.stringify(payload)
+  });
+  return data?.[0] || null;
+}
+
 export async function updateProfile(profileData) {
   if (!user) throw new Error('Not authenticated');
   
