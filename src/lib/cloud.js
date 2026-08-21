@@ -175,7 +175,11 @@ export async function upsertRecords(tableName, records) {
     },
     body: JSON.stringify(payload)
   });
-  return data || [];
+  if (!data) return [];
+  if (!Array.isArray(data)) {
+    throw new Error(`Structural sync failed for ${tableName}: expected array, received ${typeof data}`);
+  }
+  return data;
 }
 
 export async function fetchRecords(tableName) {
@@ -186,5 +190,9 @@ export async function fetchRecords(tableName) {
       'Accept-Profile': 'rakeezx'
     }
   });
-  return data || [];
+  if (!data) return [];
+  if (!Array.isArray(data)) {
+    throw new Error(`Structural sync failed for ${tableName}: expected array, received ${typeof data}`);
+  }
+  return data;
 }

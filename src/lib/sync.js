@@ -3,9 +3,12 @@ import * as store from '../store.js';
 import { uid } from '../models.js';
 
 export const state = {
-  status: 'idle', // idle, syncing, success, error
-  error: null,
-  lastSyncedAt: null // will be initialized from store
+  status: 'idle', // idle, syncing
+  lastSyncedAt: null, // will be initialized from store
+  results: {
+    profile: null,
+    structural: null
+  }
 };
 
 const listeners = new Set();
@@ -76,8 +79,8 @@ export async function syncProfile() {
   }
   if (state.status === 'syncing') return;
   
-  setState({ status: 'syncing', error: null });
-  console.log('[rakeezx sync] Started profile sync...');
+  setState({ status: 'syncing', results: { ...state.results, profile: null } });
+  console.log('[rakeezx sync] Started Profile sync...');
   
   try {
     const remote = await cloud.fetchProfile();
@@ -158,12 +161,25 @@ export async function syncProfile() {
     
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
-    setState({ status: 'success', lastSyncedAt: nowStamp });
+    setState({
+      status: 'idle',
+      lastSyncedAt: nowStamp,
+      results: {
+        ...state.results,
+        profile: { status: 'success', time: nowStamp }
+      }
+    });
     console.log('[rakeezx sync] Profile sync complete.');
     
   } catch (err) {
     console.warn('[rakeezx sync] Profile sync failed:', err);
-    setState({ status: 'error', error: err.message });
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        profile: { status: 'error', error: err.message, time: Date.now() }
+      }
+    });
   }
 }
 
@@ -358,7 +374,7 @@ export async function syncStructural() {
   }
   if (state.status === 'syncing') return;
   
-  setState({ status: 'syncing', error: null });
+  setState({ status: 'syncing', results: { ...state.results, structural: null } });
   console.log('[rakeezx sync] Started structural sync...');
   
   try {
@@ -377,11 +393,24 @@ export async function syncStructural() {
 
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
-    setState({ status: 'success', lastSyncedAt: nowStamp });
+    setState({
+      status: 'idle',
+      lastSyncedAt: nowStamp,
+      results: {
+        ...state.results,
+        structural: { status: 'success', stats, time: nowStamp }
+      }
+    });
     console.log('[rakeezx sync] Structural sync complete.', stats);
 
   } catch (err) {
     console.warn('[rakeezx sync] Structural sync failed:', err);
-    setState({ status: 'error', error: err.message });
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        structural: { status: 'error', error: err.message, time: Date.now() }
+      }
+    });
   }
 }

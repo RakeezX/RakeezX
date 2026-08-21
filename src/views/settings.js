@@ -267,16 +267,44 @@ export default {
             </div>
 
             <div class="t-3 fs-sm hstack gap-2">
-              <div>الحالة: ${sync.state.status === 'syncing' ? 'جاري المزامنة...' : sync.state.status === 'error' ? 'خطأ' : 'جاهز'}</div>
-              ${sync.state.lastSyncedAt ? html`<div class="push">آخر مزامنة: ${new Date(sync.state.lastSyncedAt).toLocaleTimeString('ar-SA')}</div>` : ''}
+              <div>الحالة: ${sync.state.status === 'syncing' ? 'جاري المزامنة...' : 'جاهز'}</div>
             </div>
 
             <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة (Profile)
             </button>
+            ${sync.state.results.profile ? html`
+              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
+                ${sync.state.results.profile.status === 'success' ? html`
+                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
+                  <div>آخر مزامنة: ${new Date(sync.state.results.profile.time).toLocaleTimeString('ar-SA')}</div>
+                ` : html`
+                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
+                  <div>الرسالة: ${sync.state.results.profile.error}</div>
+                `}
+              </div>
+            ` : ''}
+
             <button class="btn btn--quiet btn--block" data-act="sync-structural" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة الهيكلية
             </button>
+            ${sync.state.results.structural ? html`
+              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
+                ${sync.state.results.structural.status === 'success' ? html`
+                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
+                  <div>آخر مزامنة: ${new Date(sync.state.results.structural.time).toLocaleTimeString('ar-SA')}</div>
+                  <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
+                    ${Object.entries(sync.state.results.structural.stats).map(([k, v]) => html`
+                      <span>${k}:</span>
+                      <span>${v.pushed} ↑ / ${v.pulled} ↓</span>
+                    `)}
+                  </div>
+                ` : html`
+                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
+                  <div>الرسالة: ${sync.state.results.structural.error}</div>
+                `}
+              </div>
+            ` : ''}
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -333,8 +361,8 @@ export default {
     async 'sync-now'(el) {
       if (sync.state.status === 'syncing') return;
       await sync.syncProfile();
-      if (sync.state.status === 'error') {
-        toast('تعذرت المزامنة: ' + sync.state.error, 'danger');
+      if (sync.state.results.profile?.status === 'error') {
+        toast('تعذرت المزامنة', 'danger');
       } else {
         toast('تمت المزامنة بنجاح');
       }
@@ -343,8 +371,8 @@ export default {
     async 'sync-structural'(el) {
       if (sync.state.status === 'syncing') return;
       await sync.syncStructural();
-      if (sync.state.status === 'error') {
-        toast('تعذرت المزامنة: ' + sync.state.error, 'danger');
+      if (sync.state.results.structural?.status === 'error') {
+        toast('تعذرت المزامنة الهيكلية', 'danger');
       } else {
         toast('تمت المزامنة الهيكلية بنجاح');
       }
