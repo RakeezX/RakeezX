@@ -420,6 +420,117 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     }
   }
 
+  // -- RECONCILIATION OF FRESH-DEVICE DEFAULTS --
+  // For years, terms, subjects: if a local record is an unmodified auto-generated default,
+  // we check if a logically equivalent record exists remotely. If yes, we adopt the remote ID
+  // locally to prevent duplicates and scoping bugs on fresh devices.
+  const remappedLocals = new Map(); // oldId -> newId
+
+  // Deterministically sort remote records to always pick the oldest (original) default if duplicates exist
+  const sortedRemotes = [...remoteRecords].sort((a, b) => {
+    const timeA = new Date(a.created_at || a.client_updated_at).getTime();
+    const timeB = new Date(b.created_at || b.client_updated_at).getTime();
+    return timeA - timeB;
+  });
+
+  if (storeName === 'years') {
+    for (const local of localRecords) {
+      if (!isMeaningfulStructural('years', local)) {
+        const equiv = sortedRemotes.find(r => r.hijri_start === local.hijriStart);
+        if (equiv && equiv.id !== local.id) remappedLocals.set(local.id, equiv.id);
+      }
+    }
+  } else if (storeName === 'terms') {
+    for (const local of localRecords) {
+      if (!isMeaningfulStructural('terms', local)) {
+        const equiv = sortedRemotes.find(r => r.year_id === local.yearId && r.index === local.index);
+        if (equiv && equiv.id !== local.id) remappedLocals.set(local.id, equiv.id);
+      }
+    }
+  } else if (storeName === 'subjects') {
+    for (const local of localRecords) {
+      if (!isMeaningfulStructural('subjects', local)) {
+        const equiv = sortedRemotes.find(r => r.slug === local.slug);
+        if (equiv && equiv.id !== local.id) remappedLocals.set(local.id, equiv.id);
+      }
+    }
+  }
+
+  if (remappedLocals.size > 0) {
+    console.log(`[rakeezx sync] Remapping ${storeName} identities:`, remappedLocals);
+
+    // Centralized Reference-Remap Helper to guarantee full coverage without partial hardcoding
+    const buildCascadePatch = (oldId, newId, entityType) => {
+      const p = {};
+      const updateStore = (sName, fkField) => {
+        for (const rec of store.state[sName] || []) {
+          if (rec[fkField] === oldId) {
+            p[sName] ??= [];
+            p[sName].push({ ...rec, [fkField]: newId });
+          }
+        }
+      };
+
+      if (entityType === 'years') {
+        if (store.state.device?.activeYearId === oldId) p.device = { ...store.state.device, activeYearId: newId };
+        updateStore('terms', 'yearId');
+        updateStore('sections', 'yearId');
+        updateStore('calendars', 'yearId');
+      } else if (entityType === 'terms') {
+        if (store.state.device?.activeTermId === oldId) p.device = { ...store.state.device, activeTermId: newId };
+        updateStore('teachings', 'termId');
+      } else if (entityType === 'subjects') {
+        updateStore('teachings', 'subjectId');
+        updateStore('units', 'subjectId');
+      } else if (entityType === 'sections') {
+        // Provided for completeness, though sections are not currently reconciled
+        updateStore('teachings', 'sectionId');
+        updateStore('enrollments', 'sectionId');
+      }
+      return p;
+    };
+
+    const patch = { [storeName]: [] };
+    const devicePatch = {};
+
+    // 1. Rewrite local identities in memory arrays/maps so this sync cycle sees the new IDs
+    for (const [oldId, newId] of remappedLocals.entries()) {
+      const lRec = localById.get(oldId);
+      lRec.id = newId;
+      localById.delete(oldId);
+      localById.set(newId, lRec);
+      allIds.delete(oldId);
+      allIds.add(newId);
+
+      // 2. Cascade changes to dependent local state
+      const cascade = buildCascadePatch(oldId, newId, storeName);
+      if (cascade.device) Object.assign(devicePatch, cascade.device);
+      for (const sName of Object.keys(cascade)) {
+        if (sName === 'device') continue;
+        patch[sName] ??= [];
+        for (const mod of cascade[sName]) {
+          const idx = patch[sName].findIndex(r => r.id === mod.id);
+          if (idx !== -1) patch[sName][idx] = { ...patch[sName][idx], ...mod };
+          else patch[sName].push(mod);
+        }
+      }
+
+      // Mark old as deleted and save new immediately.
+      // Safe to soft-delete now because all references in the cascade have been mapped to the new ID.
+      patch[storeName].push({ id: oldId, deleted: true, deletedAt: new Date().toISOString() });
+      patch[storeName].push(lRec);
+
+      // Prevent it from being pushed under the old ID if it somehow got queued
+      const pushIdx = toPush.findIndex(p => p.id === oldId);
+      if (pushIdx !== -1) toPush.splice(pushIdx, 1);
+    }
+
+    if (Object.keys(devicePatch).length > 0) {
+      await store.patchDevice({ ...store.state.device, ...devicePatch });
+    }
+    await store.save(patch);
+  }
+
   // Dependency validation before push
   if (storeName === 'terms' || storeName === 'sections') {
     for (const p of toPush) {
