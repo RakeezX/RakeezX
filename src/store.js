@@ -6,7 +6,7 @@
  */
 
 import * as db from './lib/db.js';
-import { migrateLegacyData, isLegacyShape } from './lib/migrate.js';
+
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
@@ -34,7 +34,7 @@ export const state = {
   profile: null,
   /** إعدادات هذا الجهاز — لا تغادره */
   device: null,
-  migrationReport: null,
+
   ...Object.fromEntries(COLLECTIONS.map((c) => [c, []])),
 };
 
@@ -77,7 +77,7 @@ function reportWriteError(err, context) {
 /* ---------- التنسيق بين التبويبات ---------- */
 
 const TAB_ID = uid();
-const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('madarz-data') : null;
+const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('rakeezx-data') : null;
 
 function broadcast(changes) {
   if (!channel || !changes.length) return;
@@ -124,25 +124,6 @@ const changeList = (storeName, records) => records.map((r) => ({ store: storeNam
 
 /* ---------- الإقلاع والترحيل ---------- */
 
-/**
- * ترحيل لمرة واحدة من قاعدة النسخة السابقة.
- * تُقرأ القاعدة القديمة، وتُحوَّل بياناتها، وتُكتب في قاعدة RAKEEZ X **في معاملة
- * واحدة**. القاعدة القديمة لا تُحذف — تبقى شبكة أمان.
- */
-async function importLegacyIfAny() {
-  const legacy = await db.readLegacyDB();
-  if (!legacy) return null;
-
-  const hasData = ['classes', 'students', 'scores', 'attendance'].some(
-    (k) => Array.isArray(legacy[k]) && legacy[k].length
-  );
-  if (!hasData) return null;
-
-  const { data, report } = migrateLegacyData(legacy);
-  await db.writeAll(data, 'replace');
-  console.info('[rakeezx] رُحّلت بيانات النسخة السابقة', report.counts);
-  return { ...report, source: 'legacy-db' };
-}
 
 /**
  * ترقية ٣ → ٤: يفصل سجل الإعدادات الواحد إلى ملف معلّم وإعدادات جهاز.
@@ -178,21 +159,8 @@ async function splitMetaIfNeeded() {
 export async function init() {
   await db.openDB();
 
-  let migrationReport = null;
   const hadProfile = await db.get('profile', 'profile');
   const hadMeta = await db.get('meta', 'meta');
-
-  // قاعدة RAKEEZ X فارغة تمامًا؟ جرّب استيراد قاعدة النسخة السابقة.
-  if (!hadProfile && !hadMeta) {
-    const existing = await db.getAll('students');
-    if (!existing.length) {
-      try {
-        migrationReport = await importLegacyIfAny();
-      } catch (err) {
-        console.error('[rakeezx] تعذّر ترحيل القاعدة السابقة — نبدأ فارغين', err);
-      }
-    }
-  }
 
   await splitMetaIfNeeded();
 
@@ -207,7 +175,7 @@ export async function init() {
   COLLECTIONS.forEach((c, i) => {
     state[c] = loaded[i] ?? [];
   });
-  state.migrationReport = migrationReport;
+
 
   await ensureFoundation();
 

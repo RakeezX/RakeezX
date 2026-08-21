@@ -1,14 +1,11 @@
 /** RAKEEZ X — التصدير: ملفات CSV تفتح في إكسل بالعربية، ونسخة احتياطية JSON كاملة. */
 
 import * as db from './db.js';
-import { migrateLegacyData, isLegacyShape } from './migrate.js';
+
 
 /** معرّف المنتج التقني — يُكتب في كل نسخة احتياطية. */
-export const APP_ID = 'madarz';
+export const APP_ID = 'rakeezx';
 export const BACKUP_VERSION = 3;
-
-/** معرّف النسخة السابقة من التطبيق — يُقبل للاستيراد ويُرحَّل، ولا يُكتب أبدًا. */
-const LEGACY_APP_ID = 'rasd';
 
 /**
  * مخازن **لا تدخل النسخة الاحتياطية ولا تُستورد منها إطلاقًا**.
@@ -75,7 +72,7 @@ export async function downloadBackup() {
   const payload = await buildBackup();
   const stamp = payload.exportedAt.slice(0, 10);
   downloadBlob(
-    `madarz-backup-${stamp}.json`,
+    `rakeezx-backup-${stamp}.json`,
     new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
   );
   return payload;
@@ -102,23 +99,21 @@ export function validateBackup(payload) {
     return { ok: false, errors: ['الملف ليس نسخة احتياطية صالحة.'], counts, total: 0, legacy: false };
   }
 
-  const isLegacyFile = payload.app === LEGACY_APP_ID;
-  if (payload.app !== APP_ID && !isLegacyFile) {
+  if (payload.app !== APP_ID) {
     add('هذا الملف ليس نسخة احتياطية من RAKEEZ X.');
   }
   if (!Number.isInteger(payload.version)) add('إصدار النسخة غير معروف.');
-  else if (!isLegacyFile && payload.version > BACKUP_VERSION) {
+  else if (payload.version > BACKUP_VERSION) {
     add('النسخة أحدث من التطبيق. حدّث التطبيق أولًا.');
   }
 
   if (!payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data)) {
     add('الملف لا يحوي بيانات.');
-    return { ok: false, errors, counts, total: 0, legacy: isLegacyFile };
+    return { ok: false, errors, counts, total: 0 };
   }
 
-  // المخازن المسموحة: مخازن اليوم، ومخازن النسخة السابقة إن كان الملف قديمًا
-  const LEGACY_STORES = ['meta', 'terms', 'classes', 'students', 'items', 'scores', 'attendance', 'logs', 'outbox'];
-  const allowed = new Set(isLegacyFile ? LEGACY_STORES : db.STORES);
+  // المخازن المسموحة
+  const allowed = new Set(db.STORES);
 
   let total = 0;
   for (const [storeName, records] of Object.entries(payload.data)) {
@@ -159,7 +154,7 @@ export function validateBackup(payload) {
   }
 
   if (!total) add('الملف لا يحوي أي سجل.');
-  return { ok: errors.length === 0, errors, counts, total, legacy: isLegacyFile };
+  return { ok: errors.length === 0, errors, counts, total };
 }
 
 /**
@@ -183,16 +178,9 @@ export async function restoreBackup(payload, mode = 'merge') {
   }
 
   let source = payload.data;
-  let migration = null;
-
-  if (check.legacy || isLegacyShape(source)) {
-    const { data, report } = migrateLegacyData(source);
-    source = data;
-    migration = report;
-  }
-
   const data = {};
   const skipped = [];
+
   for (const name of db.STORES) {
     if (!Array.isArray(source[name])) continue;
     // إعدادات الجهاز تُتجاهل مهما كان الوضع — الاستبدال يستبدل السجلات لا الجهاز
@@ -206,7 +194,7 @@ export async function restoreBackup(payload, mode = 'merge') {
   const written = await db.writeAll(data, mode === 'replace' ? 'replace' : 'merge', {
     keep: DEVICE_ONLY_STORES,
   });
-  return { written, migration, skipped };
+  return { written, migration: null, skipped };
 }
 
 /** يقرأ ملفًا اختاره المستخدم ويحوّله كائنًا. */

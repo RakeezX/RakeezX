@@ -272,7 +272,6 @@ async function boot() {
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 
   await resolve();
-  reportMigration();
   registerServiceWorker();
 }
 
@@ -281,14 +280,6 @@ const GLOBAL_ACTIONS = {
   'more-nav': () => moreNavSheet(),
 };
 
-/** يخبر المعلّم إن رُحّلت بياناته من النسخة السابقة عند هذا الإقلاع. */
-function reportMigration() {
-  const r = store.state.migrationReport;
-  if (!r) return;
-  const n = (r.counts?.students ?? 0) + (r.counts?.scores ?? 0);
-  toast(`رُحّلت بياناتك إلى RAKEEZ X (${r.counts?.students ?? 0} طالبًا)`);
-  if (r.warnings?.length) console.warn('[rakeezx] ملاحظات الترحيل:', r.warnings);
-}
 
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -301,7 +292,7 @@ function registerServiceWorker() {
       // نفحص المخزون ونعيد تهيئته بدل انتظار تثبيت جديد لن يأتي.
       try {
         const keys = await caches.keys();
-        const mine = keys.filter((k) => k.startsWith('madarz-'));
+        const mine = keys.filter((k) => k.startsWith('rakeezx-'));
         const count = mine.length ? (await (await caches.open(mine[0])).keys()).length : 0;
         if (reg.active && count === 0) {
           console.warn('[rakeezx] مخزون العمل دون إنترنت فارغ — يُعاد بناؤه');

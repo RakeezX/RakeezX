@@ -5,11 +5,9 @@
  * المزامنة السحابية لاحقًا دمجًا سجلًا سجلًا لا استبدالًا للملف كله.
  */
 
-export const DB_NAME = 'madarz';
+export const DB_NAME = 'rakeezx';
 export const DB_VERSION = 2;
 
-/** قاعدة النسخة السابقة من التطبيق — تُقرأ مرة واحدة للترحيل ثم تُترك كما هي. */
-export const LEGACY_DB_NAME = 'rasd';
 
 export const STORES = [
   'profile',       // بيانات المعلّم — تُصدَّر وتُدمج
@@ -301,63 +299,6 @@ function txDone(tx) {
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error ?? new Error('أُلغيت العملية'));
-  });
-}
-
-/* ---------- قراءة قاعدة النسخة السابقة ---------- */
-
-/**
- * يقرأ محتوى قاعدة `rasd` القديمة دون إنشائها إن لم تكن موجودة.
- * لا نحذفها بعد النسخ — تبقى شبكة أمان حتى يطمئن المعلّم.
- */
-export function readLegacyDB() {
-  return new Promise((resolve) => {
-    let existed = true;
-    const r = indexedDB.open(LEGACY_DB_NAME);
-
-    r.onupgradeneeded = () => {
-      // القاعدة غير موجودة أصلًا — لا شيء لترحيله
-      existed = false;
-      r.transaction.abort();
-    };
-
-    r.onsuccess = async () => {
-      const db = r.result;
-      if (!existed || !db.objectStoreNames.length) {
-        db.close();
-        resolve(null);
-        return;
-      }
-      try {
-        const names = Array.from(db.objectStoreNames);
-        const tx = db.transaction(names, 'readonly');
-        const out = {};
-        await Promise.all(
-          names.map(
-            (n) =>
-              new Promise((res) => {
-                const q = tx.objectStore(n).getAll();
-                q.onsuccess = () => {
-                  out[n] = q.result;
-                  res();
-                };
-                q.onerror = () => {
-                  out[n] = [];
-                  res();
-                };
-              })
-          )
-        );
-        db.close();
-        resolve(out);
-      } catch {
-        db.close();
-        resolve(null);
-      }
-    };
-
-    r.onerror = () => resolve(null);
-    r.onblocked = () => resolve(null);
   });
 }
 
