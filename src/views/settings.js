@@ -1,7 +1,8 @@
-﻿/** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
+/** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
 
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
+import * as cloud from '../lib/cloud.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
 
 const THEMES = [
@@ -253,6 +254,36 @@ export default {
       </div>
 
       <div class="section">
+        <div class="section__head"><div class="section__title">المزامنة السحابية (تجريبي)</div></div>
+        <div class="card card--pad stack stack-3">
+          ${cloud.session ? html`
+            <div class="hstack gap-2">
+              <div class="fw-7">متصل بحساب</div>
+              <div class="t-3 fs-sm" style="direction: ltr; text-align: right;">${cloud.user?.email}</div>
+              <div class="push">
+                <button class="btn btn--sm btn--ghost" data-act="cloud-out">تسجيل الخروج</button>
+              </div>
+            </div>
+            <button class="btn btn--quiet btn--block" data-act="cloud-test">
+              ${icon('spark')} اختبار المزامنة (Profile)
+            </button>
+          ` : html`
+            <form id="cloud-login-form" data-act="cloud-in">
+              <label class="field">
+                <span class="field__label">البريد الإلكتروني</span>
+                <input class="input" name="email" type="email" required autocomplete="email" dir="ltr">
+              </label>
+              <label class="field">
+                <span class="field__label">كلمة المرور</span>
+                <input class="input" name="password" type="password" required autocomplete="current-password" dir="ltr">
+              </label>
+              <button class="btn btn--primary btn--block mt-3" type="submit">تسجيل الدخول</button>
+            </form>
+          `}
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
         <div class="card card--pad t-3 fs-sm stack stack-2">
           <div>سجل معلّم يعمل كاملًا دون إنترنت. كل ما ترصده محفوظ على جهازك وحده.</div>
@@ -264,6 +295,62 @@ export default {
   },
 
   actions: {
+    async 'cloud-in'(el, ev) {
+      ev.preventDefault();
+      const fd = new FormData(el);
+      const email = fd.get('email');
+      const pwd = fd.get('password');
+      if (!email || !pwd) return;
+      const btn = el.querySelector('button[type="submit"]');
+      const prev = btn.textContent;
+      try {
+        btn.textContent = 'جارٍ الاتصال...';
+        btn.disabled = true;
+        await cloud.signIn(email, pwd);
+        toast('تم تسجيل الدخول بنجاح');
+      } catch (err) {
+        btn.textContent = prev;
+        btn.disabled = false;
+        toast(err.message, 'danger');
+      }
+    },
+
+    async 'cloud-out'() {
+      await cloud.signOut();
+      toast('تم تسجيل الخروج');
+    },
+
+    async 'cloud-test'(el) {
+      const prev = el.textContent;
+      try {
+        el.textContent = 'جاري الجلب...';
+        el.disabled = true;
+
+        let profile = await cloud.fetchProfile();
+        console.log('[cloud test] Fetched profile:', profile);
+
+        if (profile) {
+          el.textContent = 'جاري التحديث...';
+          const teacherName = store.state.profile?.teacherName || 'مستخدم تجريبي';
+          await cloud.updateProfile({ teacher_name: teacherName });
+
+          el.textContent = 'جاري التحقق...';
+          profile = await cloud.fetchProfile();
+          console.log('[cloud test] Fetched after update:', profile);
+        } else {
+          console.log('[cloud test] No profile found to update.');
+        }
+
+        el.textContent = prev;
+        el.disabled = false;
+        toast('اكتمل اختبار المزامنة بنجاح');
+      } catch (err) {
+        el.textContent = prev;
+        el.disabled = false;
+        toast(err.message, 'danger');
+      }
+    },
+
     async save(el) {
       if (await store.patchProfile({ [el.name]: el.value.trim() })) toast('حُفظ');
     },

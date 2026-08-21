@@ -5,6 +5,7 @@
 import { html, render, icon, delegate, toast, openSheet } from './lib/dom.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
+import * as cloud from './lib/cloud.js';
 import { match, currentPath, onNavigate, go } from './router.js';
 import { setRepaint } from './repaint.js';
 
@@ -228,6 +229,7 @@ async function boot() {
 
   try {
     await store.init();
+    await cloud.init();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
@@ -268,6 +270,7 @@ async function boot() {
   setRepaint(scheduleRender);
   store.onWriteError(() => toast('تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
   store.subscribe(scheduleRender);
+  cloud.subscribe(scheduleRender);
   onNavigate(resolve);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 
