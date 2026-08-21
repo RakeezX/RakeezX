@@ -15,7 +15,7 @@
 | `0001_core_schema.sql` | ١٩ جدولًا · مفاتيح · علاقات · قيود فريدة · قيود تحقق |
 | `0002_indexes_triggers_rls.sql` | فهارس · أختام الخادم · سياسات الوصول · صلاحيات الأدوار |
 
-كل شيء في `schema madarz` لا في `public` — عزلًا عن جداول Supabase الداخلية.
+كل شيء في `schema rakeezx` لا في `public` — عزلًا عن جداول Supabase الداخلية.
 
 ### الجداول
 
@@ -112,7 +112,7 @@ delete : لا سياسة — الحذف الصلب ممنوع على الجمي�
 **الصلاحيات:**
 
 ```sql
-revoke all    on all tables in schema madarz from anon;
+revoke all    on all tables in schema rakeezx from anon;
 grant  select, insert, update on all tables to authenticated;
 revoke delete on all tables from authenticated, anon;
 ```
@@ -296,12 +296,17 @@ outbox { id:'{store}:{recordId}', store, recordId,
 
 | | |
 |---|---|
-| التنفيذ على القاعدة | ✅ **تم تنفيذ 0001 و 0002 بنجاح** (تحت مسمى schema madarz مؤقتاً) |
+| التنفيذ على القاعدة | ✅ **تم تنفيذ 0001 و 0002 بنجاح** (مخطط `rakeezx` الحي) |
 | إحصائيات القاعدة الحيّة | 19 جدول، 19 RLS (enabled & forced)، 57 سياسة، 38 محفز، 69 فهرس |
 | ربط التطبيق محليًا | ❌ **لم يُربط بعد** |
+
+### حالة الترحيل السحابي (Cloud Schema Migration)
+- تم التنفيذ والترحيل الكامل إلى `rakeezx` كالمخطط الحي الوحيد.
+- اجتاز المخطط كافة الفحوصات التشغيلية (RLS / Spoofing) بنجاح عبر مستخدمين معتمدين.
+- تم حذف مخطط `madarz` القديم نهائياً من الخادم.
 
 ### ملاحظات تاريخية هامة (History & Caveats)
 1. **أزمة Deadlock في 0002:** تسببت المعاملة الواحدة DO block بقفل (ACCESS EXCLUSIVE) على 19 جدولاً مما أدى إلى Deadlock. تم الإصلاح عبر تقسيم 0002 إلى 4 معاملات رئيسية وتنفيذ سياسات RLS لكل جدول في معاملة مستقلة. يجب عدم دمج هذه المعاملات مستقبلاً.
 2. **شرط PostgreSQL 15+:** مطلوب لدعم ON DELETE SET NULL (column).
-3. **اختبارات RLS السابقة:** اختبارات RLS (باستخدام مستخدمين) صالحة جزئياً، ولكن اختبارات PATCH لتخطي owner_id (Cross-user spoofing) كانت **غير صالحة** بسبب غياب Content-Profile. يجب إعادتها بعد الربط الفعلي.
-4. **اختبار منع الحذف (DELETE Denial):** ما زال يحتاج إلى تحقق تشغيلي فعلي لضمان أن أوامر الحذف تُرفض كما هو مصمم.
+3. **اختبارات RLS:** تم اجتياز كافة اختبارات RLS (باستخدام مستخدمين) بنجاح، بما فيها اختبارات PATCH لمنع تخطي owner_id.
+4. **اختبار منع الحذف (DELETE Denial):** تم التحقق التشغيلي من منع الحذف (DELETE Denial) بنجاح، وجميع السجلات محمية من الحذف الصلب.

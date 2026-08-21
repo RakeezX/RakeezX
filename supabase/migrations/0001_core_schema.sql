@@ -1,5 +1,5 @@
 ﻿-- ============================================================================
--- MADAR Z — الترحيلة ١: النواة
+-- RAKEEZ X — الترحيلة ١: النواة
 --
 -- تنشئ الجداول الأساسية فقط، بما يطابق النموذج المحلي بعد الموجة الأولى.
 -- لا جداول مستقبلية غير محسومة (الواجبات، التسليمات، الملاحظات).
@@ -19,15 +19,15 @@ begin;
 -- ٠. أدوات مشتركة
 -- ---------------------------------------------------------------------------
 
-create schema if not exists madarz;
+create schema if not exists rakeezx;
 
-comment on schema madarz is 'MADAR Z — سجل المعلّم';
+comment on schema rakeezx is 'RAKEEZ X — سجل المعلّم';
 
 -- ختم الخادم: يُفرض على كل كتابة، فلا يستطيع عميل تزوير ترتيب التعديلات.
 --
 -- `set search_path = ''` مع التأهيل الكامل لكل استدعاء: بدونه يستطيع مخطط
 -- خبيث في مسار البحث أن يظلّل now() أو uid() ويتحكم بالأختام والملكية.
-create or replace function madarz.touch_updated_at()
+create or replace function rakeezx.touch_updated_at()
 returns trigger
 language plpgsql
 security invoker
@@ -43,7 +43,7 @@ end;
 $$;
 
 -- الملكية تُفرض من الخادم لا من العميل: أي قيمة يرسلها العميل تُستبدل.
-create or replace function madarz.force_owner()
+create or replace function rakeezx.force_owner()
 returns trigger
 language plpgsql
 security invoker
@@ -60,7 +60,7 @@ $$;
 --    إعدادات الجهاز (المظهر، الفصل النشط) **لا تُرفع أبدًا** — تبقى محلية.
 -- ---------------------------------------------------------------------------
 
-create table madarz.profile (
+create table rakeezx.profile (
   owner_id            uuid primary key default auth.uid() references auth.users(id) on delete cascade,
   teacher_name        text not null default '',
   school_name         text not null default '',
@@ -76,7 +76,7 @@ create table madarz.profile (
 -- ٢. السنوات الدراسية
 -- ---------------------------------------------------------------------------
 
-create table madarz.years (
+create table rakeezx.years (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   label               text not null,
@@ -98,7 +98,7 @@ create table madarz.years (
 -- ٣. الفصول الدراسية
 -- ---------------------------------------------------------------------------
 
-create table madarz.terms (
+create table rakeezx.terms (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   year_id             text not null,
@@ -114,7 +114,7 @@ create table madarz.terms (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, year_id) references madarz.years(owner_id, id) on delete cascade,
+  foreign key (owner_id, year_id) references rakeezx.years(owner_id, id) on delete cascade,
   -- ترتيب واحد لكل سنة: لا «فصل دراسي أول» مكرر
   constraint terms_index_uniq unique (owner_id, year_id, "index"),
   constraint terms_dates_ck check (start_date is null or end_date is null or start_date <= end_date)
@@ -124,7 +124,7 @@ create table madarz.terms (
 -- ٤. المواد
 -- ---------------------------------------------------------------------------
 
-create table madarz.subjects (
+create table rakeezx.subjects (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name                text not null,
@@ -142,7 +142,7 @@ create table madarz.subjects (
 -- ٥. الشعب  (مجموعة الطلاب — تعيش السنة كاملة)
 -- ---------------------------------------------------------------------------
 
-create table madarz.sections (
+create table rakeezx.sections (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   year_id             text not null,
@@ -157,7 +157,7 @@ create table madarz.sections (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, year_id) references madarz.years(owner_id, id) on delete cascade,
+  foreign key (owner_id, year_id) references rakeezx.years(owner_id, id) on delete cascade,
   -- «٤/أ» واحدة في السنة الواحدة
   constraint sections_natural_uniq unique (owner_id, year_id, grade, label),
   constraint sections_color_ck check (color ~ '^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$')
@@ -167,7 +167,7 @@ create table madarz.sections (
 -- ٦. الإسناد التدريسي  (شعبة × مادة × فصل دراسي)
 -- ---------------------------------------------------------------------------
 
-create table madarz.teachings (
+create table rakeezx.teachings (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   section_id          text not null,
@@ -180,9 +180,9 @@ create table madarz.teachings (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, section_id) references madarz.sections(owner_id, id) on delete cascade,
-  foreign key (owner_id, subject_id) references madarz.subjects(owner_id, id) on delete cascade,
-  foreign key (owner_id, term_id)    references madarz.terms(owner_id, id)    on delete cascade,
+  foreign key (owner_id, section_id) references rakeezx.sections(owner_id, id) on delete cascade,
+  foreign key (owner_id, subject_id) references rakeezx.subjects(owner_id, id) on delete cascade,
+  foreign key (owner_id, term_id)    references rakeezx.terms(owner_id, id)    on delete cascade,
   -- إسناد واحد لنفس (الشعبة، المادة، الفصل الدراسي)
   constraint teachings_natural_uniq unique (owner_id, section_id, subject_id, term_id)
 );
@@ -191,7 +191,7 @@ create table madarz.teachings (
 -- ٧. الطلاب  (هوية مستقلة — بلا انتماء دائم لشعبة)
 -- ---------------------------------------------------------------------------
 
-create table madarz.students (
+create table rakeezx.students (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name                text not null check (length(btrim(name)) >= 2 and length(name) <= 80),
@@ -209,7 +209,7 @@ create table madarz.students (
 -- ٨. الانتساب  (الطالب ↔ الشعبة خلال مدة)
 -- ---------------------------------------------------------------------------
 
-create table madarz.enrollments (
+create table rakeezx.enrollments (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   student_id          text not null,
@@ -226,8 +226,8 @@ create table madarz.enrollments (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, student_id) references madarz.students(owner_id, id) on delete cascade,
-  foreign key (owner_id, section_id) references madarz.sections(owner_id, id) on delete cascade,
+  foreign key (owner_id, student_id) references rakeezx.students(owner_id, id) on delete cascade,
+  foreign key (owner_id, section_id) references rakeezx.sections(owner_id, id) on delete cascade,
   -- انتساب واحد لكل (طالب، شعبة) — يطابق المعرّف المشتق محليًا
   constraint enrollments_natural_uniq unique (owner_id, student_id, section_id),
   constraint enrollments_dates_ck check (start_date is null or end_date is null or start_date <= end_date)
@@ -236,14 +236,14 @@ create table madarz.enrollments (
 -- رقم الكشف فريد بين المنتسبين **النشطين** في الشعبة الواحدة.
 -- فهرس جزئي لا قيد جدول، لأن المنتقل يحتفظ برقمه القديم في سجله التاريخي.
 create unique index enrollments_active_roll_uniq
-  on madarz.enrollments (owner_id, section_id, roll_no)
+  on rakeezx.enrollments (owner_id, section_id, roll_no)
   where status = 'active' and roll_no is not null and deleted_at is null;
 
 -- ---------------------------------------------------------------------------
 -- ٩. المنهج: الوحدات  (مادة + صف + رقم الفصل الدراسي — لا سنة ولا شعبة)
 -- ---------------------------------------------------------------------------
 
-create table madarz.units (
+create table rakeezx.units (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   subject_id          text not null,
@@ -258,14 +258,14 @@ create table madarz.units (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, subject_id) references madarz.subjects(owner_id, id) on delete cascade
+  foreign key (owner_id, subject_id) references rakeezx.subjects(owner_id, id) on delete cascade
 );
 
 -- ---------------------------------------------------------------------------
 -- ١٠. المنهج: الدروس
 -- ---------------------------------------------------------------------------
 
-create table madarz.lessons (
+create table rakeezx.lessons (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   unit_id             text not null,
@@ -278,7 +278,7 @@ create table madarz.lessons (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, unit_id) references madarz.units(owner_id, id) on delete cascade
+  foreign key (owner_id, unit_id) references rakeezx.units(owner_id, id) on delete cascade
 );
 
 -- ---------------------------------------------------------------------------
@@ -286,7 +286,7 @@ create table madarz.lessons (
 --     الربط بالمنهج اختياري: يحوّل «الطالب ٦٢٪» إلى «يحتاج دعمًا في الوحدة X».
 -- ---------------------------------------------------------------------------
 
-create table madarz.items (
+create table rakeezx.items (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   teaching_id         text not null,
@@ -304,9 +304,9 @@ create table madarz.items (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, teaching_id) references madarz.teachings(owner_id, id) on delete cascade,
-  foreign key (owner_id, unit_id)     references madarz.units(owner_id, id)     on delete set null (unit_id),
-  foreign key (owner_id, lesson_id)   references madarz.lessons(owner_id, id)   on delete set null (lesson_id)
+  foreign key (owner_id, teaching_id) references rakeezx.teachings(owner_id, id) on delete cascade,
+  foreign key (owner_id, unit_id)     references rakeezx.units(owner_id, id)     on delete set null (unit_id),
+  foreign key (owner_id, lesson_id)   references rakeezx.lessons(owner_id, id)   on delete set null (lesson_id)
 );
 
 -- ---------------------------------------------------------------------------
@@ -314,7 +314,7 @@ create table madarz.items (
 --     المفتاح الطبيعي (طالب، بند) — وهذا ما يمنع جهازين دون إنترنت من خلق صفَّين.
 -- ---------------------------------------------------------------------------
 
-create table madarz.scores (
+create table rakeezx.scores (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   student_id          text not null,
@@ -326,8 +326,8 @@ create table madarz.scores (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, student_id) references madarz.students(owner_id, id) on delete cascade,
-  foreign key (owner_id, item_id)    references madarz.items(owner_id, id)    on delete cascade,
+  foreign key (owner_id, student_id) references rakeezx.students(owner_id, id) on delete cascade,
+  foreign key (owner_id, item_id)    references rakeezx.items(owner_id, id)    on delete cascade,
   constraint scores_natural_uniq unique (owner_id, student_id, item_id)
 );
 
@@ -336,7 +336,7 @@ create table madarz.scores (
 --     الأوقات مصفوفة JSON: عدد الحصص مرن، والاستثناءات محفوظة بمفتاح رقم اليوم.
 -- ---------------------------------------------------------------------------
 
-create table madarz.time_profiles (
+create table rakeezx.time_profiles (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name                text not null,
@@ -359,7 +359,7 @@ create table madarz.time_profiles (
 -- ١٤. الجدول الأسبوعي  (الخانات المتكررة — بلا أوقات، فالوقت من ملف التوقيت)
 -- ---------------------------------------------------------------------------
 
-create table madarz.slots (
+create table rakeezx.slots (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   teaching_id         text not null,
@@ -371,7 +371,7 @@ create table madarz.slots (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, teaching_id) references madarz.teachings(owner_id, id) on delete cascade,
+  foreign key (owner_id, teaching_id) references rakeezx.teachings(owner_id, id) on delete cascade,
   constraint slots_natural_uniq unique (owner_id, teaching_id, weekday, period)
 );
 
@@ -380,7 +380,7 @@ create table madarz.slots (
 --     تحمل وقتها **مطبوعًا فيها**: تغيير ملف التوقيت لا يعيد كتابة الماضي.
 -- ---------------------------------------------------------------------------
 
-create table madarz.sessions (
+create table rakeezx.sessions (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   teaching_id         text not null,
@@ -405,11 +405,11 @@ create table madarz.sessions (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, teaching_id)     references madarz.teachings(owner_id, id)     on delete cascade,
-  foreign key (owner_id, slot_id)         references madarz.slots(owner_id, id)         on delete set null (slot_id),
-  foreign key (owner_id, time_profile_id) references madarz.time_profiles(owner_id, id) on delete set null (time_profile_id),
-  foreign key (owner_id, lesson_id)       references madarz.lessons(owner_id, id)       on delete set null (lesson_id),
-  foreign key (owner_id, makeup_for_id)   references madarz.sessions(owner_id, id)      on delete set null (makeup_for_id),
+  foreign key (owner_id, teaching_id)     references rakeezx.teachings(owner_id, id)     on delete cascade,
+  foreign key (owner_id, slot_id)         references rakeezx.slots(owner_id, id)         on delete set null (slot_id),
+  foreign key (owner_id, time_profile_id) references rakeezx.time_profiles(owner_id, id) on delete set null (time_profile_id),
+  foreign key (owner_id, lesson_id)       references rakeezx.lessons(owner_id, id)       on delete set null (lesson_id),
+  foreign key (owner_id, makeup_for_id)   references rakeezx.sessions(owner_id, id)      on delete set null (makeup_for_id),
   -- حصة واحدة لكل (إسناد، تاريخ، رقم حصة) — أساس دعم حصتين في يوم واحد
   constraint sessions_natural_uniq unique (owner_id, teaching_id, date, period)
 );
@@ -418,7 +418,7 @@ create table madarz.sessions (
 -- ١٦. الحضور  (مربوط بالحصة لا باليوم)
 -- ---------------------------------------------------------------------------
 
-create table madarz.attendance (
+create table rakeezx.attendance (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   student_id          text not null,
@@ -433,9 +433,9 @@ create table madarz.attendance (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, student_id)  references madarz.students(owner_id, id)  on delete cascade,
-  foreign key (owner_id, session_id)  references madarz.sessions(owner_id, id)  on delete cascade,
-  foreign key (owner_id, teaching_id) references madarz.teachings(owner_id, id) on delete cascade,
+  foreign key (owner_id, student_id)  references rakeezx.students(owner_id, id)  on delete cascade,
+  foreign key (owner_id, session_id)  references rakeezx.sessions(owner_id, id)  on delete cascade,
+  foreign key (owner_id, teaching_id) references rakeezx.teachings(owner_id, id) on delete cascade,
   -- سجل حضور واحد لكل (طالب، حصة)
   constraint attendance_natural_uniq unique (owner_id, student_id, session_id)
 );
@@ -444,7 +444,7 @@ create table madarz.attendance (
 -- ١٧. الرصد السريع  (سجل أحداث — لا مفتاح طبيعي، والتكرار مقصود)
 -- ---------------------------------------------------------------------------
 
-create table madarz.logs (
+create table rakeezx.logs (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   student_id          text not null,
@@ -461,16 +461,16 @@ create table madarz.logs (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, student_id)  references madarz.students(owner_id, id)  on delete cascade,
-  foreign key (owner_id, teaching_id) references madarz.teachings(owner_id, id) on delete cascade,
-  foreign key (owner_id, session_id)  references madarz.sessions(owner_id, id)  on delete set null (session_id)
+  foreign key (owner_id, student_id)  references rakeezx.students(owner_id, id)  on delete cascade,
+  foreign key (owner_id, teaching_id) references rakeezx.teachings(owner_id, id) on delete cascade,
+  foreign key (owner_id, session_id)  references rakeezx.sessions(owner_id, id)  on delete set null (session_id)
 );
 
 -- ---------------------------------------------------------------------------
 -- ١٨. التقويم الدراسي
 -- ---------------------------------------------------------------------------
 
-create table madarz.calendars (
+create table rakeezx.calendars (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   year_id             text not null,
@@ -482,11 +482,11 @@ create table madarz.calendars (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, year_id) references madarz.years(owner_id, id) on delete cascade,
+  foreign key (owner_id, year_id) references rakeezx.years(owner_id, id) on delete cascade,
   constraint calendars_source_uniq unique (owner_id, year_id, source)
 );
 
-create table madarz.calendar_days (
+create table rakeezx.calendar_days (
   id                  text not null,
   owner_id            uuid not null default auth.uid() references auth.users(id) on delete cascade,
   calendar_id         text not null,
@@ -500,13 +500,13 @@ create table madarz.calendar_days (
   device_id           text,
   deleted_at          timestamptz,
   primary key (owner_id, id),
-  foreign key (owner_id, calendar_id) references madarz.calendars(owner_id, id) on delete cascade,
+  foreign key (owner_id, calendar_id) references rakeezx.calendars(owner_id, id) on delete cascade,
   constraint calendar_days_natural_uniq unique (owner_id, calendar_id, date)
 );
 
 -- الآن يمكن ربط الفصل الدراسي بتقويمه (أُجّل لأن calendars تأتي بعد terms)
-alter table madarz.terms
+alter table rakeezx.terms
   add constraint terms_calendar_fk
-  foreign key (owner_id, calendar_id) references madarz.calendars(owner_id, id) on delete set null (calendar_id);
+  foreign key (owner_id, calendar_id) references rakeezx.calendars(owner_id, id) on delete set null (calendar_id);
 
 commit;
