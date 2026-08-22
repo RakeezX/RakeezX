@@ -4,6 +4,7 @@ import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
+import { repaint } from '../repaint.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
 
 const THEMES = [
@@ -421,8 +422,8 @@ export default {
     async 'cloud-diagnostic'(el) {
       if (sync.state.status === 'syncing') return;
       sync.state.status = 'syncing';
-      sync.state.results.diagnostic = { text: 'جاري سحب البيانات...' };
-      store.repaint();
+      sync.state.results.diagnostic = { text: 'جارٍ تحميل التشخيص...' };
+      repaint();
 
       try {
         let out = '--- REMOTE CLOUD DATA ---\n\n';
@@ -461,11 +462,11 @@ export default {
 
         sync.state.status = 'idle';
         sync.state.results.diagnostic = { text: out };
-        store.repaint();
+        repaint();
       } catch (err) {
         sync.state.status = 'idle';
         sync.state.results.diagnostic = { text: 'حدث خطأ أثناء السحب:\n' + err.message };
-        store.repaint();
+        repaint();
       }
     },
 
