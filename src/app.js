@@ -6,7 +6,6 @@ import { html, render, icon, delegate, toast, openSheet } from './lib/dom.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
-import * as sync from './lib/sync.js';
 import { match, currentPath, onNavigate, go } from './router.js';
 import { setRepaint } from './repaint.js';
 
@@ -231,7 +230,14 @@ async function boot() {
   try {
     await store.init();
     await cloud.init();
-    sync.init();
+    // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
+    try {
+      const syncModule = await import('./lib/sync.js');
+      syncModule.init();
+      window.__syncModule = syncModule; // Export for global access if needed
+    } catch (err) {
+      console.error('[rakeezx] Sync module failed to load:', err);
+    }
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
@@ -273,7 +279,9 @@ async function boot() {
   store.onWriteError(() => toast('تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
   store.subscribe(scheduleRender);
   cloud.subscribe(scheduleRender);
-  sync.subscribe(scheduleRender);
+  if (window.__syncModule) {
+    window.__syncModule.subscribe(scheduleRender);
+  }
   onNavigate(resolve);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 

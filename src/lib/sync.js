@@ -594,11 +594,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       }
     }
   }
-      if (p.year_id && !context.knownRemoteIds?.years?.has(p.year_id)) {
-        throw new Error(`${storeName}: missing remote year ${p.year_id}`);
-      }
-    }
-  }
+
   if (storeName === 'enrollments') {
     for (const p of toPush) {
       if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
