@@ -81,7 +81,11 @@ GRAND TOTAL: 44/44 — zero failures — no hung processes
 ## Next Steps (Pending User Guidance)
 1. **Dependency audit** — `npm audit` to check for security vulnerabilities (quick).
 2. **Phase 6** — Once manual acceptance is confirmed, merge `preview/phase-5d` → main.
-3. **Hardening Batch 2** — Expand coverage: students sync, enrollment, scoring modules.
+3. **Hardening Batch 2 Progress**
+   - [x] **Milestone 1**: PWA / Service Worker / offline browser regression. (Added `tests/pwa.e2e.mjs`)
+   - [x] **Milestone 2**: Route crawl + browser console error assertion. (Added `tests/routes.e2e.mjs`. Fixed a crash across 4 views due to missing `sectionLabel` export from `store.js`)
+   - [x] **Milestone 3**: Multi-tab synchronization / BroadcastChannel. (Added `tests/multitab.e2e.mjs`)
+   - [ ] **Milestone 4**: Expand coverage: students sync, enrollment, scoring modules.
 
 ## Notes
 - `store.patchProfile()` (and all `patch()` calls) by default write `updatedAt: now()`. Tests that need specific timestamps without triggering a real sync cycle must write directly via `db.put()`, or use `{ preserveTimestamp: true }` if hydrating.
