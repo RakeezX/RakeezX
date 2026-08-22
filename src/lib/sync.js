@@ -438,8 +438,13 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       // Both exist. Compare timestamps.
       const remoteClientUpdatedAt = normalizeTimestamp(remote.client_updated_at);
       const localUpdatedAt = normalizeTimestamp(local.updatedAt);
+      const isStructural = storeName === 'years' || storeName === 'terms' || storeName === 'subjects';
 
-      if (localUpdatedAt > remoteClientUpdatedAt) {
+      if (isStructural && !isMeaningfulStructural(storeName, local)) {
+        // Local is a generated default, and remote already has this exact ID.
+        // Remote must be authoritative for this sync cycle. Hydrate local.
+        toUpdateLocal.push(mapper.fromCloud(remote));
+      } else if (localUpdatedAt > remoteClientUpdatedAt) {
         // Local is strictly newer.
         toPush.push(mapper.toCloud(local));
       } else if (remoteClientUpdatedAt > localUpdatedAt) {

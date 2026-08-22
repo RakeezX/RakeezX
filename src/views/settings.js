@@ -326,6 +326,15 @@ export default {
                 `}
               </div>
             ` : ''}
+
+            <button class="btn btn--quiet btn--block" data-act="cloud-diagnostic" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} عرض تشخيص بيانات الاختبار
+            </button>
+            ${sync.state.results.diagnostic ? html`
+              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2); max-height: 400px; overflow-y: auto; white-space: pre-wrap; direction: ltr; text-align: left; font-family: monospace;">
+                ${sync.state.results.diagnostic.text}
+              </div>
+            ` : ''}
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -406,6 +415,54 @@ export default {
         toast('تعذرت مزامنة الطلاب والانتساب', 'danger');
       } else {
         toast('تمت مزامنة الطلاب والانتساب بنجاح');
+      }
+    },
+
+    async 'cloud-diagnostic'(el) {
+      if (sync.state.status === 'syncing') return;
+      sync.setState({ status: 'syncing', results: { ...sync.state.results, diagnostic: { text: 'جاري سحب البيانات...' } } });
+      store.repaint();
+
+      try {
+        let out = '--- REMOTE CLOUD DATA ---\n\n';
+        const tables = ['years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments'];
+        for (const t of tables) {
+          const data = await cloud.fetchRecords(t);
+          out += `[${t.toUpperCase()}] (${data.length})\n`;
+          for (const r of data) {
+            let str = `  id: ${r.id}\n`;
+            if (t === 'sections') str += `  year_id: ${r.year_id} | grade: ${r.grade} | label: ${r.label}\n`;
+            if (t === 'teachings') str += `  sec_id: ${r.section_id} | sub_id: ${r.subject_id} | term_id: ${r.term_id}\n`;
+            if (t === 'enrollments') str += `  st_id: ${r.student_id} | sec_id: ${r.section_id}\n`;
+            if (t === 'students') str += `  name: ${r.name}\n`;
+            if (t === 'years') str += `  hijriStart: ${r.hijri_start} | label: ${r.label}\n`;
+            if (t === 'terms') str += `  year_id: ${r.year_id} | index: ${r.index}\n`;
+            if (t === 'subjects') str += `  name: ${r.name} | slug: ${r.slug}\n`;
+            str += `  updated_at: ${r.client_updated_at} | deleted_at: ${r.deleted_at || 'null'}\n\n`;
+            out += str;
+          }
+        }
+
+        out += '--- LOCAL DEVICE DATA ---\n\n';
+        const locals = ['students', 'enrollments', 'sections'];
+        for (const t of locals) {
+          const data = store.state[t] || [];
+          out += `[LOCAL ${t.toUpperCase()}] (${data.length})\n`;
+          for (const r of data) {
+            let str = `  id: ${r.id}\n`;
+            if (t === 'sections') str += `  yearId: ${r.yearId} | grade: ${r.grade} | label: ${r.label}\n`;
+            if (t === 'enrollments') str += `  studentId: ${r.studentId} | sectionId: ${r.sectionId}\n`;
+            if (t === 'students') str += `  name: ${r.name}\n`;
+            str += `  updatedAt: ${new Date(r.updatedAt).toISOString()} | deleted: ${r.deleted}\n\n`;
+            out += str;
+          }
+        }
+
+        sync.setState({ status: 'idle', results: { ...sync.state.results, diagnostic: { text: out } } });
+        store.repaint();
+      } catch (err) {
+        sync.setState({ status: 'idle', results: { ...sync.state.results, diagnostic: { text: 'Error: ' + err.message } } });
+        store.repaint();
       }
     },
 
