@@ -440,9 +440,12 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       const localUpdatedAt = normalizeTimestamp(local.updatedAt);
       const isStructural = storeName === 'years' || storeName === 'terms' || storeName === 'subjects';
 
-      if (isStructural && !isMeaningfulStructural(storeName, local)) {
+      if (localUpdatedAt === remoteClientUpdatedAt) {
+        // Converged, do nothing.
+      } else if (isStructural && !isMeaningfulStructural(storeName, local) && localUpdatedAt > remoteClientUpdatedAt) {
         // Local is a generated default, and remote already has this exact ID.
-        // Remote must be authoritative for this sync cycle. Hydrate local.
+        // Even though local is strictly newer (due to being freshly generated),
+        // remote must be authoritative for this sync cycle. Hydrate local.
         toUpdateLocal.push(mapper.fromCloud(remote));
       } else if (localUpdatedAt > remoteClientUpdatedAt) {
         // Local is strictly newer.

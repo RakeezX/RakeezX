@@ -420,7 +420,8 @@ export default {
 
     async 'cloud-diagnostic'(el) {
       if (sync.state.status === 'syncing') return;
-      sync.setState({ status: 'syncing', results: { ...sync.state.results, diagnostic: { text: 'جاري سحب البيانات...' } } });
+      sync.state.status = 'syncing';
+      sync.state.results.diagnostic = { text: 'جاري سحب البيانات...' };
       store.repaint();
 
       try {
@@ -458,10 +459,12 @@ export default {
           }
         }
 
-        sync.setState({ status: 'idle', results: { ...sync.state.results, diagnostic: { text: out } } });
+        sync.state.status = 'idle';
+        sync.state.results.diagnostic = { text: out };
         store.repaint();
       } catch (err) {
-        sync.setState({ status: 'idle', results: { ...sync.state.results, diagnostic: { text: 'Error: ' + err.message } } });
+        sync.state.status = 'idle';
+        sync.state.results.diagnostic = { text: 'حدث خطأ أثناء السحب:\n' + err.message };
         store.repaint();
       }
     },
