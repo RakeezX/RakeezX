@@ -16,6 +16,8 @@ import {
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
 } from './models.js';
 
+export { sectionLabel };
+
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
 const SCHEMA_VERSION = 4;
 
