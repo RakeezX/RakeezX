@@ -747,8 +747,41 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
         throw new Error(`${storeName}: missing remote timeProfile ${p.time_profile_id}`);
       }
     }
-    // Sort sessions chronologically so parents (e.g. makeupForId target) are pushed before children
+
+    const toPushMap = new Map(toPush.map(p => [p.id, p]));
+    const sorted = [];
+    const visited = new Set();
+    const visiting = new Set();
+
+    function visit(p) {
+      if (visited.has(p.id)) return;
+      if (visiting.has(p.id)) {
+        throw new Error(`sessions: cycle detected in makeup_for_id dependency for ${p.id}`);
+      }
+      visiting.add(p.id);
+
+      if (p.makeup_for_id && !remoteById.has(p.makeup_for_id)) {
+        const parent = toPushMap.get(p.makeup_for_id);
+        if (!parent) {
+          throw new Error(`sessions: missing makeup parent ${p.makeup_for_id}`);
+        }
+        visit(parent);
+      }
+
+      visiting.delete(p.id);
+      visited.add(p.id);
+      sorted.push(p);
+    }
+
+    // Base sort for stable ordering before dependency resolution
     toPush.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.period - b.period));
+
+    for (const p of toPush) {
+      visit(p);
+    }
+
+    toPush.length = 0;
+    toPush.push(...sorted);
   }
 
   if (toPush.length > 0) {
