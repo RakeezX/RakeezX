@@ -1,4 +1,4 @@
-﻿/** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
+/** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
 
 import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
 import * as store from '../store.js';
@@ -8,7 +8,7 @@ export default {
   title: () => 'الحصص',
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);
-    return store.getSection(tch?.sectionId)?.name ?? '';
+    return store.sectionLabel(store.getSection(tch?.sectionId)) ?? '';
   },
   back: (p) => `#/teaching/${p.id}`,
 

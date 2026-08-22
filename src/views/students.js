@@ -353,7 +353,7 @@ export default {
         if (!target?.sectionId) return;
         await store.transferStudent(s.id, target.sectionId, { note: target.note });
         const to = store.getSection(target.sectionId);
-        toast(`نُقل ${s.name} إلى ${to?.name ?? 'الشعبة الجديدة'}`);
+        toast(`نُقل ${s.name} إلى ${to ? store.sectionLabel(to) : 'الشعبة الجديدة'}`);
         return;
       }
 

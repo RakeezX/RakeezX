@@ -73,7 +73,7 @@ export default {
       <div class="printhead">
         <div class="printhead__title">${s.name}</div>
         <div class="printhead__sub">
-          ${section?.name ?? ''} ${section ? '· ' + gradeLabel(section.grade) : ''}
+          ${section ? sectionLabel(section) : ''}
           ${tch ? '· ' + (store.getSubject(tch.subjectId)?.name ?? '') : ''}
           ${tch ? '· ' + (store.getTerm(tch.termId)?.name ?? '') : ''}
           ${store.state.profile?.schoolName ? ` · ${store.state.profile.schoolName}` : ''}

@@ -1,4 +1,4 @@
-﻿/** تقارير الفصل: كشف الدرجات، كشف الحضور، والتصدير للطباعة أو لإكسل. */
+/** تقارير الفصل: كشف الدرجات، كشف الحضور، والتصدير للطباعة أو لإكسل. */
 
 import { html, icon, toast, fmtNum, fmtPct, fmtDate, fmtDateFull } from '../lib/dom.js';
 import * as store from '../store.js';
@@ -38,7 +38,7 @@ export default {
     return html`
       <div class="printhead">
         <div class="printhead__title">
-          ${store.getSection(cls.sectionId)?.name ?? ''} — ${gradeLabel(store.getSection(cls.sectionId)?.grade)}
+          ${store.sectionLabel(store.getSection(cls.sectionId)) ?? ''}
         </div>
         <div class="printhead__sub">
           ${store.getSubject(cls.subjectId)?.name ?? ''}
@@ -78,7 +78,7 @@ export default {
     csv(el, ev, params) {
       const cls = store.getTeaching(params.id);
       const { roster, items, ctx } = store.teachingContext(params.id);
-      const safe = (store.getSection(cls?.sectionId)?.name ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
+      const safe = (store.sectionLabel(store.getSection(cls?.sectionId)) ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
       if (tab === 'attendance') {
         const dates = store.sessionDates(params.id).slice().reverse();
