@@ -78,14 +78,24 @@ GRAND TOTAL: 44/44 — zero failures — no hung processes
 - **Fix**: Added an options parameter to `patch()` and `patchProfile()` allowing `{ preserveTimestamp: true }`. `syncProfile` now explicitly requests timestamp preservation during remote pulls. Normal local edits continue to get a fresh `now()` timestamp.
 - **Verification**: Replaced the previous 3-step convergence test with a strict 2-step test: Pulls remote data -> immediate next sync is a true no-op. Makes real local edit -> next sync pushes to cloud. Immediate next sync is a true no-op. 
 
+### Milestone 4: Structural Sync Validation and Missing Link Completion
+- **Goal:** Ensure `students` and `scoring` tables sync successfully without dropping or generating ghost processes, and properly validate incoming foreign keys during sync.
+- **Status:** **COMPLETED**
+- **Changes:**
+  - Added test suite `tests/sync-students.test.mjs` verifying foreign key safety.
+  - Added test suite `tests/sync-scoring.test.mjs`.
+  - Added `syncScoring` to sync module and Settings UI.
+  - Hardened foreign key checks in `syncCollection` for `items` and `scores`.
+
 ## Next Steps (Pending User Guidance)
-1. **Dependency audit** — `npm audit` to check for security vulnerabilities (quick).
+1. **Dependency audit** — `npm audit` completed, 0 vulnerabilities found.
 2. **Phase 6** — Once manual acceptance is confirmed, merge `preview/phase-5d` → main.
 3. **Hardening Batch 2 Progress**
    - [x] **Milestone 1**: PWA / Service Worker / offline browser regression. (Added `tests/pwa.e2e.mjs`)
    - [x] **Milestone 2**: Route crawl + browser console error assertion. (Added `tests/routes.e2e.mjs`. Fixed a crash across 4 views due to missing `sectionLabel` export from `store.js`)
    - [x] **Milestone 3**: Multi-tab synchronization / BroadcastChannel. (Added `tests/multitab.e2e.mjs`)
-   - [ ] **Milestone 4**: Expand coverage: students sync, enrollment, scoring modules.
+   - [x] **Milestone 4**: Students Sync Completion. (Added tests for fk dropping constraint)
+   - [x] **Milestone 5**: Scoring Sync Completion.
 
 ## Notes
 - `store.patchProfile()` (and all `patch()` calls) by default write `updatedAt: now()`. Tests that need specific timestamps without triggering a real sync cycle must write directly via `db.put()`, or use `{ preserveTimestamp: true }` if hydrating.

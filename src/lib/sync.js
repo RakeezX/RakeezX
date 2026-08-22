@@ -354,6 +354,54 @@ const MAPPERS = {
       deletedAt: rec.deleted_at || undefined
     })
   },
+  items: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      teaching_id: rec.teachingId,
+      name: rec.name,
+      max: rec.max,
+      order: rec.order,
+      auto: rec.auto,
+      per_point: rec.perPoint,
+      penalty: rec.penalty,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      teachingId: rec.teaching_id,
+      name: rec.name,
+      max: rec.max,
+      order: rec.order,
+      auto: rec.auto,
+      perPoint: rec.per_point,
+      penalty: rec.penalty,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  scores: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      student_id: rec.studentId,
+      item_id: rec.itemId,
+      value: rec.value,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      studentId: rec.student_id,
+      itemId: rec.item_id,
+      value: rec.value,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
   timeProfiles: {
     toCloud: (rec) => ({
       id: rec.id,
@@ -761,6 +809,25 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     }
   }
 
+  if (storeName === 'items') {
+    for (const p of toPush) {
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+    }
+  }
+
+  if (storeName === 'scores') {
+    for (const p of toPush) {
+      if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
+        throw new Error(`${storeName}: missing remote student ${p.student_id}`);
+      }
+      if (p.item_id && !context.knownRemoteIds?.items?.has(p.item_id)) {
+        throw new Error(`${storeName}: missing remote item ${p.item_id}`);
+      }
+    }
+  }
+
   if (storeName === 'slots') {
     for (const p of toPush) {
       if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
@@ -1014,6 +1081,77 @@ export async function syncStudents() {
       results: {
         ...state.results,
         students: { status: 'error', error: err.message, time: Date.now() }
+      }
+    });
+  }
+}
+
+export async function syncScoring() {
+  if (!cloud.session || !cloud.user) {
+    console.log('[rakeezx sync] Not signed in, skipping scoring sync.');
+    return;
+  }
+  if (state.status === 'syncing') return;
+
+  console.log('[rakeezx sync] Enforcing structural sync before scoring...');
+  await syncStructural();
+
+  if (state.results.structural?.status === 'error') {
+    console.warn('[rakeezx sync] Structural sync failed, aborting scoring sync.');
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        scoring: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
+      }
+    });
+    return;
+  }
+
+  setState({ status: 'syncing', results: { ...state.results, scoring: null } });
+  console.log('[rakeezx sync] Started scoring sync...');
+
+  try {
+    const knownRemoteIds = {};
+    const stats = {};
+
+    // First, fetch remote teachings and students to validate foreign keys.
+    const remoteTeachings = await cloud.fetchRecords('teachings');
+    knownRemoteIds.teachings = new Set(remoteTeachings.map(r => r.id));
+
+    const remoteStudents = await cloud.fetchRecords('students');
+    knownRemoteIds.students = new Set(remoteStudents.map(r => r.id));
+
+    // 1. items
+    const resItems = await syncCollection('items', 'items', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.items = resItems.known;
+    stats.items = { pushed: resItems.pushed, pulled: resItems.pulled };
+
+    // 2. scores
+    const resScores = await syncCollection('scores', 'scores', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.scores = resScores.known;
+    stats.scores = { pushed: resScores.pushed, pulled: resScores.pulled };
+
+    const nowStamp = Date.now();
+    await store.patchDevice({ lastSyncAt: nowStamp });
+    setState({
+      status: 'idle',
+      lastSyncedAt: nowStamp,
+      results: {
+        ...state.results,
+        scoring: { status: 'success', stats, time: nowStamp }
+      }
+    });
+    console.log('[rakeezx sync] Scoring sync complete.', stats);
+    return stats;
+
+  } catch (err) {
+    console.warn('[rakeezx sync] Scoring sync failed:', err);
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        scoring: { status: 'error', error: err.message, time: Date.now() }
       }
     });
   }

@@ -318,6 +318,11 @@ export default {
             </button>
             ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
 
+            <button class="btn btn--quiet btn--block" data-act="sync-scoring" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} اختبار مزامنة التقييم والدرجات
+            </button>
+            ${renderResultPanel('اختبار مزامنة التقييم والدرجات', sync.state.results.scoring)}
+
             <button class="btn btn--quiet btn--block" data-act="sync-timetable" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار مزامنة الجدول والجلسات
             </button>
@@ -442,6 +447,17 @@ export default {
         toast('تعذرت مزامنة الطلاب والانتساب', 'danger');
       } else {
         toast('تمت مزامنة الطلاب والانتساب بنجاح');
+      }
+      repaint();
+    },
+
+    async 'sync-scoring'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncScoring();
+      if (sync.state.results.scoring?.status === 'error') {
+        toast('تعذرت مزامنة التقييم والدرجات', 'danger');
+      } else {
+        toast('تمت مزامنة التقييم والدرجات بنجاح');
       }
       repaint();
     },
