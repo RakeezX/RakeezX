@@ -72,7 +72,7 @@ export function openDB() {
       // تبويب آخر يطلب ترقية: أغلق اتصالنا فورًا وإلا حُجبت الترقية عنده،
       // ثم أبلغ التطبيق ليعيد التحميل على المخطط الجديد.
       _db.onversionchange = () => {
-        _db.close();
+        if (_db) _db.close();
         _db = null;
         onVersionChange?.();
       };
@@ -292,6 +292,18 @@ export async function clearAll() {
   const tx = db.transaction(STORES, 'readwrite');
   for (const name of STORES) tx.objectStore(name).clear();
   return txDone(tx);
+}
+
+/**
+ * يُغلق اتصال قاعدة البيانات تمامًا.
+ * يُستدعى من بيئة الاختبار فقط بعد انتهاء جميع الاختبارات لمنع تسرّب الموارد
+ * وإبقاء Node.js حيًّا بعد انتهاء مجموعة الاختبارات.
+ */
+export function closeDB() {
+  if (_db) {
+    _db.close();
+    _db = null;
+  }
 }
 
 function txDone(tx) {

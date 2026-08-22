@@ -69,4 +69,11 @@ test("Sync Timestamps Suite", async (t) => {
     assert.equal(stats.years.pushed, 0);
     assert.equal(stats.years.pulled, 0);
   });
+
+  // Cleanup: close open handles so Node test runner exits cleanly.
+  // Without this, BroadcastChannel and IndexedDB keep the event loop alive.
+  t.after(async () => {
+    store.closeChannel();
+    db.closeDB();
+  });
 });

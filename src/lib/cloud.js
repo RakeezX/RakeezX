@@ -120,6 +120,7 @@ export async function signOut() {
 }
 
 export async function fetchProfile() {
+  if (mockBackend) return mockBackend.fetchProfile();
   if (!user) throw new Error('Not authenticated');
   const data = await request(`/profile?owner_id=eq.${user.id}&select=*`, {
     headers: {
@@ -131,6 +132,7 @@ export async function fetchProfile() {
 }
 
 export async function insertProfile(profileData) {
+  if (mockBackend) return mockBackend.insertProfile(profileData);
   if (!user) throw new Error('Not authenticated');
 
   const payload = {
@@ -152,6 +154,7 @@ export async function insertProfile(profileData) {
 }
 
 export async function updateProfile(profileData) {
+  if (mockBackend) return mockBackend.updateProfile(profileData);
   if (!user) throw new Error('Not authenticated');
   
   const data = await request(`/profile?owner_id=eq.${user.id}`, {

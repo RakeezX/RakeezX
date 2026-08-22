@@ -119,4 +119,11 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     const updatedRemote = backend.records["teachings"].find(t => t.id === teachings[0].id);
     assert.equal(updatedRemote.order, 999);
   });
+
+  // Cleanup: close open handles so Node test runner exits cleanly.
+  // Without this, BroadcastChannel and IndexedDB keep the event loop alive.
+  t.after(async () => {
+    store.closeChannel();
+    db.closeDB();
+  });
 });

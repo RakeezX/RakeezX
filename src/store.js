@@ -96,6 +96,15 @@ channel?.addEventListener('message', (ev) => {
   absorb(ev.data.changes).catch((err) => console.warn('[rakeezx] تعذّر استقبال تغيير', err));
 });
 
+/**
+ * يُغلق قناة BroadcastChannel.
+ * يُستدعى من بيئة الاختبار فقط بعد انتهاء جميع الاختبارات لمنع تسرّب الموارد
+ * وإبقاء Node.js حيًّا بعد انتهاء مجموعة الاختبارات.
+ */
+export function closeChannel() {
+  if (channel) channel.close();
+}
+
 async function absorb(changes) {
   const byStore = {};
   for (const c of changes ?? []) (byStore[c.store] ??= new Set()).add(c.id);
