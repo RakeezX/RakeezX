@@ -9,7 +9,7 @@
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
-  GRADES, SECTION_COLORS, gradeLabel, safeColor, todayISO, sectionId as mkSectionId,
+  GRADES, SECTION_COLORS, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
 } from '../models.js';
 import { go } from '../router.js';
 
@@ -105,9 +105,9 @@ function row(tch) {
     <a class="row" href="#/teaching/${tch.id}">
       <span class="class-dot" style="background:${safeColor(sec?.color)}"></span>
       <span class="row__main">
-        <span class="row__title">${sec?.name ?? '—'}</span>
+        <span class="row__title">${sectionLabel(sec) || '—'}</span>
         <span class="row__sub">
-          ${sub?.name ?? ''} · ${gradeLabel(sec?.grade)} ·
+          ${sub?.name ?? ''} ·
           <span class="tabular">${roster.length}</span> طالبًا
           ${weekly ? html` · <span class="tabular">${weekly}</span> حصص أسبوعيًا` : ''}
         </span>
@@ -200,7 +200,7 @@ export default {
       const tch = await store.createTeaching({
         sectionId: section.id, subjectId: data.subjectId, termId: term.id,
       });
-      toast(`أُنشئ ${section.name}`);
+      toast(`أُنشئ ${sectionLabel(section)}`);
       go(`/teaching/${tch.id}/students`);
     },
   },

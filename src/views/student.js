@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ملف الطالب — الهوية، والانتسابات، والدرجات، والحضور.
  *
  * الطالب هوية مستقلة عن الشعبة، فالتقرير يُنطَّق بإسناد محدد ولا يخلط
@@ -8,7 +8,7 @@
 import { html, icon, toast, fmtNum, fmtPct, fmtDate } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
-  itemScore, studentTotal, masteryBand, gradeLabel,
+  itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
   ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS,
 } from '../models.js';
 
@@ -27,7 +27,7 @@ export default {
     if (!s) return '';
     const en = store.activeEnrollment(s.id);
     const sec = en ? store.getSection(en.sectionId) : null;
-    return sec ? `${sec.name} · ${gradeLabel(sec.grade)}` : STUDENT_STATUS[s.status] ?? '';
+    return sec ? sectionLabel(sec) : STUDENT_STATUS[s.status] ?? '';
   },
   back: (p) => (p.teaching ? `#/teaching/${p.teaching}/students` : '#/classes'),
 
@@ -125,7 +125,7 @@ export default {
                     </span>
                     <span class="logrow__main">
                       <span>
-                        ${sec?.name ?? 'شعبة محذوفة'}
+                        ${sectionLabel(sec) || 'شعبة محذوفة'}
                         ${year ? html` · ${year.label}` : ''}
                         <span class="badge ${en.status === 'active' ? 'badge--ok' : ''}">
                           ${ENROLLMENT_STATUS[en.status] ?? en.status}

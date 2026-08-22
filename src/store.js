@@ -13,7 +13,7 @@ import {
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday,
-  sortStudents, sortByOrder, indexScores, groupBy, compareArabic,
+  sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
 } from './models.js';
 
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
@@ -468,12 +468,12 @@ export const teachings = (tmId = activeTerm()?.id) =>
   sortByOrder(live(state.teachings).filter((t) => !tmId || t.termId === tmId));
 export const getTeaching = (id) => state.teachings.find((t) => t.id === id && !t.deleted) ?? null;
 
-/** وصف مقروء للإسناد: «٤/أ · المهارات الرقمية». */
+/** وصف مقروء للإسناد: «الرابع الابتدائي / أ · المهارات الرقمية». */
 export function teachingLabel(tch) {
   if (!tch) return '';
   const sec = getSection(tch.sectionId);
   const sub = getSubject(tch.subjectId);
-  return [sec?.name, sub?.name].filter(Boolean).join(' · ');
+  return [sectionLabel(sec), sub?.name].filter(Boolean).join(' · ');
 }
 
 export const getStudent = (id) => state.students.find((s) => s.id === id && !s.deleted) ?? null;

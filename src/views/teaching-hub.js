@@ -2,7 +2,7 @@
 
 import { html, icon, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { gradeLabel, todayISO, studentTotal, ATTENDANCE, SESSION_STATUS } from '../models.js';
+import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS } from '../models.js';
 import { go } from '../router.js';
 
 const TOOLS = (id) => [
@@ -21,14 +21,14 @@ const TOOLS = (id) => [
 export default {
   title: (p) => {
     const tch = store.getTeaching(p.id);
-    return store.getSection(tch?.sectionId)?.name ?? 'فصل';
+    return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
   },
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);
     if (!tch) return '';
     const sec = store.getSection(tch.sectionId);
     const sub = store.getSubject(tch.subjectId);
-    return [sub?.name, gradeLabel(sec?.grade)].filter(Boolean).join(' · ');
+    return [sub?.name].filter(Boolean).join(' · ');
   },
   back: () => '#/classes',
 
@@ -168,7 +168,7 @@ export default {
       if (!tch) return;
       const sec = store.getSection(tch.sectionId);
       const ok = await confirmSheet({
-        title: `حذف إسناد ${sec?.name ?? ''}؟`,
+        title: `حذف إسناد ${sectionLabel(sec) || ''}؟`,
         desc: 'تُحذف بنود التقييم والدرجات والحصص والحضور. الطلاب وانتسابهم للشعبة يبقون كما هم.',
         confirmLabel: 'احذف الإسناد',
         danger: true,

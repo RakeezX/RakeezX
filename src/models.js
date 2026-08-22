@@ -114,6 +114,8 @@ export const GRADES = [
 
 export const gradeLabel = (v) => GRADES.find((g) => g.v === Number(v))?.label ?? '';
 
+export const sectionLabel = (sec) => sec ? `${gradeLabel(sec.grade)} / ${sec.label}` : '';
+
 export const SECTION_COLORS = ['#0f766e', '#1d4ed8', '#7c3aed', '#be123c', '#b45309', '#0369a1', '#4d7c0f', '#9d174d'];
 
 const HEX_COLOR = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;

@@ -8,7 +8,7 @@
 
 import { html, icon, openSheet, toast, confirmSheet } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, fmtRange } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, fmtRange, sectionLabel } from '../models.js';
 import { repaint } from '../repaint.js';
 
 /**
@@ -190,7 +190,7 @@ export default {
                             <span class="period">${s.period}</span>
                             <span class="slot__main">
                               <span class="slot__time tabular">${t ? fmtRange(t) : '—'}</span>
-                              <span class="slot__name">${sec?.name ?? '—'}</span>
+                              <span class="slot__name">${sectionLabel(sec) || '—'}</span>
                               <span class="slot__sub">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
                             </span>
                             <button class="iconbtn" data-act="remove" data-id="${s.id}" aria-label="حذف">

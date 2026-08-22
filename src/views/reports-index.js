@@ -2,7 +2,7 @@
 
 import { html, icon, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal, gradeLabel } from '../models.js';
+import { studentTotal, sectionLabel } from '../models.js';
 
 export default {
   title: () => 'التقارير',
@@ -36,9 +36,9 @@ export default {
           return html`
             <a class="row" href="#/teaching/${tch.id}/reports">
               <span class="row__main">
-                <span class="row__title">${sec?.name ?? ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}</span>
+                <span class="row__title">${sectionLabel(sec) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}</span>
                 <span class="row__sub">
-                  ${gradeLabel(sec?.grade)} · <span class="tabular">${roster.length}</span> طالبًا
+                  <span class="tabular">${roster.length}</span> طالبًا
                   ${avg !== null ? html` · متوسط <span class="tabular">${fmtPct(avg)}</span>` : ''}
                 </span>
               </span>
