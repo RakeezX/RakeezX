@@ -132,6 +132,38 @@ function termSheet(existing = null, yearId = null) {
   });
 }
 
+function renderResultPanel(title, result) {
+  if (!result) return '';
+  const rawData = encodeURIComponent(JSON.stringify({ title, ...result }));
+
+  return html`
+    <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2); position: relative;">
+      <button class="btn btn--sm btn--ghost" data-act="copy-result" data-payload="${rawData}" style="position: absolute; top: 4px; left: 4px; padding: 2px 6px; font-size: 11px;">
+        نسخ النتيجة
+      </button>
+      ${result.status === 'success' ? html`
+        <div style="color: var(--brand); font-weight: bold; margin-top: 16px;">نجاح</div>
+        <div>آخر مزامنة: ${new Date(result.time).toLocaleTimeString('ar-SA')}</div>
+        ${result.stats ? html`
+          <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
+            ${Object.entries(result.stats).map(([k, v]) => html`
+              <span>${k}:</span>
+              <span>${v.pushed} ↑ / ${v.pulled} ↓</span>
+            `)}
+          </div>
+        ` : ''}
+      ` : result.status === 'error' ? html`
+        <div style="color: var(--danger); font-weight: bold; margin-top: 16px;">خطأ</div>
+        <div>الرسالة: ${result.error}</div>
+      ` : html`
+        <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; direction: ltr; text-align: left; font-family: monospace; margin-top: 24px;">
+          ${result.text}
+        </div>
+      `}
+    </div>
+  `;
+}
+
 export default {
   title: () => 'الإعدادات',
 
@@ -274,68 +306,22 @@ export default {
             <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة (Profile)
             </button>
-            ${sync.state.results.profile ? html`
-              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
-                ${sync.state.results.profile.status === 'success' ? html`
-                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
-                  <div>آخر مزامنة: ${new Date(sync.state.results.profile.time).toLocaleTimeString('ar-SA')}</div>
-                ` : html`
-                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
-                  <div>الرسالة: ${sync.state.results.profile.error}</div>
-                `}
-              </div>
-            ` : ''}
+            ${renderResultPanel('اختبار المزامنة (Profile)', sync.state.results.profile)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-structural" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار المزامنة الهيكلية
             </button>
-            ${sync.state.results.structural ? html`
-              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
-                ${sync.state.results.structural.status === 'success' ? html`
-                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
-                  <div>آخر مزامنة: ${new Date(sync.state.results.structural.time).toLocaleTimeString('ar-SA')}</div>
-                  <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
-                    ${Object.entries(sync.state.results.structural.stats).map(([k, v]) => html`
-                      <span>${k}:</span>
-                      <span>${v.pushed} ↑ / ${v.pulled} ↓</span>
-                    `)}
-                  </div>
-                ` : html`
-                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
-                  <div>الرسالة: ${sync.state.results.structural.error}</div>
-                `}
-              </div>
-            ` : ''}
+            ${renderResultPanel('اختبار المزامنة الهيكلية', sync.state.results.structural)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-students" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار مزامنة الطلاب والانتساب
             </button>
-            ${sync.state.results.students ? html`
-              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2);">
-                ${sync.state.results.students.status === 'success' ? html`
-                  <div style="color: var(--brand); font-weight: bold;">نجاح</div>
-                  <div>آخر مزامنة: ${new Date(sync.state.results.students.time).toLocaleTimeString('ar-SA')}</div>
-                  <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
-                    ${Object.entries(sync.state.results.students.stats).map(([k, v]) => html`
-                      <span>${k}:</span>
-                      <span>${v.pushed} ↑ / ${v.pulled} ↓</span>
-                    `)}
-                  </div>
-                ` : html`
-                  <div style="color: var(--danger); font-weight: bold;">خطأ</div>
-                  <div>الرسالة: ${sync.state.results.students.error}</div>
-                `}
-              </div>
-            ` : ''}
+            ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
 
             <button class="btn btn--quiet btn--block" data-act="cloud-diagnostic" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} عرض تشخيص بيانات الاختبار
             </button>
-            ${sync.state.results.diagnostic ? html`
-              <div class="t-3 fs-sm" style="padding: var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); margin-top: -var(--sp-2); max-height: 400px; overflow-y: auto; white-space: pre-wrap; direction: ltr; text-align: left; font-family: monospace;">
-                ${sync.state.results.diagnostic.text}
-              </div>
-            ` : ''}
+            ${renderResultPanel('عرض تشخيص بيانات الاختبار', sync.state.results.diagnostic)}
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -364,6 +350,44 @@ export default {
   },
 
   actions: {
+    async 'copy-result'(el) {
+      const payload = JSON.parse(decodeURIComponent(el.dataset.payload));
+      let text = `--- ${payload.title} ---\n`;
+      if (payload.status === 'success') {
+        text += `الحالة: نجاح\n`;
+        text += `آخر مزامنة: ${new Date(payload.time).toLocaleTimeString('ar-SA')}\n`;
+        if (payload.stats) {
+          for (const [k, v] of Object.entries(payload.stats)) {
+            text += `${k}: ${v.pushed} ↑ / ${v.pulled} ↓\n`;
+          }
+        }
+      } else if (payload.status === 'error') {
+        text += `الحالة: خطأ\n`;
+        text += `الرسالة: ${payload.error}\n`;
+      } else if (payload.text) {
+        text += payload.text;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+        toast('تم نسخ النتيجة');
+      } catch (err) {
+        toast('تعذر النسخ', 'danger');
+      }
+    },
+
     async 'cloud-in'(el, ev) {
       ev.preventDefault();
       const fd = new FormData(el);
