@@ -157,7 +157,7 @@ export async function syncProfile() {
         phone: merged.phone,
         updatedAt: merged.updatedAt,
         deleted: merged.deleted
-      });
+      }, { preserveTimestamp: true });
     }
 
     const nowStamp = Date.now();

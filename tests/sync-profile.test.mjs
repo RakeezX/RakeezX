@@ -91,34 +91,76 @@ test("Sync Profile Suite", async (t) => {
     assert.equal(sync.state.results.profile?.status, "success");
   });
 
-  await t.test("Sync converges to stable state", async () => {
-    // Behavior note: store.patchProfile() always sets updatedAt = now() (current wall clock).
-    // After a remote pull, local updatedAt may be slightly newer than remote client_updated_at.
-    // That triggers a push-back on the next sync, which updates the remote's client_updated_at.
-    // After that round-trip, both sides are equal → no-op on the next sync.
-    // This test verifies the sync stabilizes (no more changes) within 3 rounds.
-    const now = Date.now();
+  await t.test("Strict convergence and no-op preservation", async () => {
+    const t1 = Date.now();
+    const t2 = t1 + 5000;
+
+    // 1. Initial State: Local at T1, Remote at T2 (T2 > T1)
+    await db.put("profile", {
+      id: "profile",
+      teacherName: "Local Teacher",
+      schoolName: "Local School",
+      phone: "",
+      updatedAt: t1,
+    });
+    await store.init();
+    
     backend.records["profile"] = [
-      { id: "remote1", school_name: "Cloud School", client_updated_at: now }
+      { id: "profile", school_name: "Cloud School", teacher_name: "Cloud Teacher", client_updated_at: t2 }
     ];
 
-    // Round 1: pull from remote
+    let updateCalls = 0;
+    const originalUpdate = backend.updateProfile.bind(backend);
+    backend.updateProfile = async (payload) => {
+      updateCalls++;
+      return originalUpdate(payload);
+    };
+
+    // 2. First Sync: Remote wins. Local receives remote values & preserves T2. No cloud write.
     await sync.syncProfile();
     assert.equal(sync.state.results.profile?.status, "success");
-    const countAfterRound1 = JSON.stringify(backend.records["profile"]);
+    
+    let localProfile = (await db.getAll("profile"))[0];
+    assert.equal(localProfile.schoolName, "Cloud School", "Local should receive remote values");
+    assert.equal(localProfile.updatedAt, t2, "Local updatedAt MUST semantically match remote authoritative timestamp");
+    assert.equal(updateCalls, 0, "No unnecessary cloud write should occur on remote pull");
 
-    // Round 2: may push back (due to local updatedAt = now() > remote's now)
+    // 3. Second immediate sync: Must be a true no-op
+    const remoteStateBefore = JSON.stringify(backend.records["profile"]);
     await sync.syncProfile();
     assert.equal(sync.state.results.profile?.status, "success");
+    
+    const remoteStateAfter = JSON.stringify(backend.records["profile"]);
+    assert.equal(remoteStateAfter, remoteStateBefore, "Zero remote update/insert operations");
+    assert.equal(updateCalls, 0, "Zero remote update operations");
+    
+    localProfile = (await db.getAll("profile"))[0];
+    assert.equal(localProfile.schoolName, "Cloud School", "Profile values unchanged");
+    assert.equal(localProfile.updatedAt, t2, "Local timestamp should not have churned");
 
-    // Round 3: must be a no-op (timestamps now equal)
-    const countAfterRound2 = JSON.stringify(backend.records["profile"]);
+    // 4. Make a REAL local user profile edit
+    // Note: patchProfile will use the wall-clock Date.now(), which will be > t2
+    // We mock Date.now so it's strictly > t2 to avoid flaky fast-execution equal-timestamp issues.
+    const realEditTime = t2 + 5000;
+    const originalNow = Date.now;
+    global.Date.now = () => realEditTime;
+    
+    await store.patchProfile({ schoolName: "Edited Local School" });
+    await store.init();
+    
+    global.Date.now = originalNow;
+
+    // 5. Next sync: Local is newer. Exactly one cloud update occurs.
     await sync.syncProfile();
     assert.equal(sync.state.results.profile?.status, "success");
-    const countAfterRound3 = JSON.stringify(backend.records["profile"]);
+    assert.equal(updateCalls, 1, "Exactly one cloud update should occur");
+    assert.equal(backend.records["profile"][0].school_name, "Edited Local School", "Cloud should receive local edit");
+    assert.equal(backend.records["profile"][0].client_updated_at, realEditTime, "Cloud should receive new local timestamp");
 
-    // After round 3, no further changes should occur — the state is stable
-    assert.equal(countAfterRound3, countAfterRound2, "Profile state should stabilize after 2 sync rounds");
+    // 6. Next immediate sync: true no-op
+    await sync.syncProfile();
+    assert.equal(sync.state.results.profile?.status, "success");
+    assert.equal(updateCalls, 1, "No additional cloud updates should occur");
   });
 
   await t.test("Local newer wins", async () => {

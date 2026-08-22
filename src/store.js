@@ -329,7 +329,7 @@ export async function save(batch) {
  * الأساس يُقرأ من القرص داخل المعاملة، فلا يُكتب إلا الحقول المطلوبة فوق
  * أحدث نسخة موجودة.
  */
-export async function patch(storeName, id, changes, create = null) {
+export async function patch(storeName, id, changes, create = null, options = {}) {
   // profile و device سجلان مفردان لا مصفوفتان — ولا يدخل device في الصادر أبدًا
   const singleton = storeName === 'profile' || storeName === 'device';
   const arr = state[storeName];
@@ -339,7 +339,9 @@ export async function patch(storeName, id, changes, create = null) {
   const base = known ?? create;
   if (!base) return null;
 
-  const optimistic = { ...base, ...changes, id, updatedAt: now() };
+  const preserve = options.preserveTimestamp && changes.updatedAt !== undefined;
+  const newStamp = preserve ? changes.updatedAt : now();
+  const optimistic = { ...base, ...changes, id, updatedAt: newStamp };
   const undo = singleton ? [] : applyToMemory(storeName, [optimistic]);
   const previous = singleton ? state[storeName] : null;
   if (singleton) state[storeName] = optimistic;
@@ -349,7 +351,8 @@ export async function patch(storeName, id, changes, create = null) {
     const [authoritative] = await db.patchMany(
       storeName,
       [{ id, changes, create: create ? { ...create, id } : null }],
-      storeName === 'device' ? null : (rec, fields) => outboxEntry(storeName, rec, fields, 'patch')
+      storeName === 'device' ? null : (rec, fields) => outboxEntry(storeName, rec, fields, 'patch'),
+      newStamp
     );
 
     if (!authoritative) {
@@ -383,7 +386,7 @@ export async function upsert(storeName, rec) {
 export const softDelete = (storeName, id) => patch(storeName, id, { deleted: true });
 
 /** بيانات المعلّم — تُصدَّر في النسخ الاحتياطية وتُدمج. */
-export const patchProfile = (changes) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE });
+export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
 
 /** إعدادات هذا الجهاز — لا تغادره ولا يستوردها ملف نسخة. */
 export const patchDevice = (changes) => patch('device', 'device', changes, { ...DEFAULT_DEVICE });
