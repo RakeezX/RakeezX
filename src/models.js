@@ -359,7 +359,7 @@ export const makeSection = (o = {}) => ({
   yearId: o.yearId,
   grade: Number(o.grade ?? 4),
   label: o.label ?? 'أ',
-  name: o.name ?? `${o.grade ?? 4}/${o.label ?? 'أ'}`,
+  name: o.name ?? sectionLabel({ grade: o.grade ?? 4, label: o.label ?? 'أ' }),
   color: safeColor(o.color),
   order: o.order ?? 0,
   ...o,
