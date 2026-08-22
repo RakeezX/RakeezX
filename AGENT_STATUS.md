@@ -70,8 +70,13 @@ GRAND TOTAL: 44/44 — zero failures — no hung processes
 ```
 
 ## Commit
-`preview/phase-5d` — commit `0e8e5d7`
-`hardening(batch-1): deterministic test isolation, process hygiene, section regression`
+`preview/phase-5d` — commit `b732a10`
+`fix(sync): preserve cloud profile timestamps on hydration`
+
+### Profile Sync Convergence Fix
+- **Root cause**: `syncProfile`'s use of `store.patchProfile` was blindly allowing the store to overwrite the pulled remote `client_updated_at` timestamp with a new local `now()` timestamp. This caused a local-newer state, triggering an unnecessary push back to the cloud on the subsequent sync.
+- **Fix**: Added an options parameter to `patch()` and `patchProfile()` allowing `{ preserveTimestamp: true }`. `syncProfile` now explicitly requests timestamp preservation during remote pulls. Normal local edits continue to get a fresh `now()` timestamp.
+- **Verification**: Replaced the previous 3-step convergence test with a strict 2-step test: Pulls remote data -> immediate next sync is a true no-op. Makes real local edit -> next sync pushes to cloud. Immediate next sync is a true no-op. 
 
 ## Next Steps (Pending User Guidance)
 1. **Dependency audit** — `npm audit` to check for security vulnerabilities (quick).
@@ -79,8 +84,6 @@ GRAND TOTAL: 44/44 — zero failures — no hung processes
 3. **Hardening Batch 2** — Expand coverage: students sync, enrollment, scoring modules.
 
 ## Notes
-- `store.patchProfile()` (and all `patch()` calls) always write `updatedAt: now()`, ignoring
-  any `updatedAt` you pass in `changes`. This is by design; the store always owns its own
-  clock. Tests that need specific timestamps must write directly via `db.put()`.
+- `store.patchProfile()` (and all `patch()` calls) by default write `updatedAt: now()`. Tests that need specific timestamps without triggering a real sync cycle must write directly via `db.put()`, or use `{ preserveTimestamp: true }` if hydrating.
 - Section sync identity format `sec:<yearId>:<grade>:<label>` MUST NOT change across versions.
   Changing it would orphan existing records in remote cloud databases.
