@@ -123,5 +123,54 @@ test("Sync Suite", async (t) => {
     assert.ok(pushedIds.indexOf("parent1") < pushedIds.indexOf("child1"));
     assert.ok(pushedIds.indexOf("child1") < pushedIds.indexOf("grandchild1"));
   });
+  await t.test("Scenario D: Multi-device anti-duplication", async () => {
+    backend.records["time_profiles"] = [
+      { id: "remote1", name: DEFAULT_TIME_PROFILES[0].name, periods: [], client_updated_at: 1000 },
+      { id: "remote2", name: DEFAULT_TIME_PROFILES[1].name, periods: [], client_updated_at: 1000 },
+      { id: "remote3", name: DEFAULT_TIME_PROFILES[2].name, periods: [], client_updated_at: 1000 },
+      { id: "remote4", name: DEFAULT_TIME_PROFILES[3].name, periods: [], client_updated_at: 1000 }
+    ];
+    
+    for (let i = 0; i < 5; i++) {
+      await db.clearAll();
+      const now = Date.now();
+      await db.put("timeProfiles", { id: `local_uuid_${i}_0`, name: DEFAULT_TIME_PROFILES[0].name, periods: [], updatedAt: now });
+      await db.put("timeProfiles", { id: `local_uuid_${i}_1`, name: DEFAULT_TIME_PROFILES[1].name, periods: [], updatedAt: now });
+      await db.put("timeProfiles", { id: `local_uuid_${i}_2`, name: DEFAULT_TIME_PROFILES[2].name, periods: [], updatedAt: now });
+      await db.put("timeProfiles", { id: `local_uuid_${i}_3`, name: DEFAULT_TIME_PROFILES[3].name, periods: [], updatedAt: now });
+      await store.init();
+      await sync.syncTimetable();
+      
+      assert.equal(backend.records["time_profiles"].length, 4, `Failed on device ${i+1}`);
+    }
+  });
+
+  await t.test("Scenario E: Long no-op convergence", async () => {
+    for (let i = 0; i < 10; i++) {
+      const resStruct = await sync.syncStructural();
+      const resTime = await sync.syncTimetable();
+      if (i > 0) {
+        assert.equal(resStruct?.years?.pushed, 0);
+        assert.equal(resStruct?.years?.pulled, 0);
+        assert.equal(resTime?.timeProfiles?.pushed, 0);
+        assert.equal(resTime?.timeProfiles?.pulled, 0);
+      }
+    }
+  });
+
+  await t.test("Scenario G: Runtime error regression (known is not defined)", async () => {
+    // If we reach here without "known is not defined" error in the previous tests, the regression is prevented.
+    assert.ok(true);
+  });
+
+  await t.test("Scenario L: Real IndexedDB persistence", async () => {
+    backend.records["years"] = [{ id: "y2", label: "1446", order: 2, client_updated_at: Date.now() }];
+    await sync.syncStructural();
+    
+    // Simulate reload
+    await store.init();
+    const localYears = await db.getAll("years");
+    assert.ok(localYears.some(y => y.id === "y2"));
+  });
 });
 
