@@ -1,4 +1,4 @@
-﻿/**
+/**
  * المنهج — الوحدات والدروس.
  *
  * المنهج يتبع (مادة + صف + رقم الفصل الدراسي) **لا الشعبة**. فدرس الوحدة
@@ -239,8 +239,8 @@ export default {
       const data = await unitSheet();
       if (!data) return;
       const order = store.unitsFor(subjectId, grade, termIndex).length;
-      await store.save({ units: [makeUnit({ subjectId, grade, termIndex, order, ...data })] });
-      toast('أُضيفت الوحدة');
+      const ok = await store.save({ units: [makeUnit({ subjectId, grade, termIndex, order, ...data })] });
+      if (ok) toast('تمت الإضافة');
     },
 
     async 'edit-unit'(el) {
@@ -256,8 +256,8 @@ export default {
       const data = await lessonSheet();
       if (!data) return;
       const order = store.lessonsOf(el.dataset.id).length;
-      await store.save({ lessons: [makeLesson({ unitId: el.dataset.id, order, ...data })] });
-      toast('أُضيف الدرس');
+      const ok = await store.save({ lessons: [makeLesson({ unitId: el.dataset.id, order, ...data })] });
+      if (ok) toast('تمت الإضافة');
     },
 
     async 'del-lesson'(el) {

@@ -486,9 +486,9 @@ export default {
         toast('هذه السنة موجودة', 'danger');
         return;
       }
-      await store.save({ years: [y] });
-      await store.save({ terms: [makeTerm({ yearId: y.id, index: 1, status: 'active' })] });
-      toast('أُنشئت السنة الدراسية');
+      const ok1 = await store.save({ years: [y] });
+      const ok2 = await store.save({ terms: [makeTerm({ yearId: y.id, index: 1, status: 'active' })] });
+      if (ok1 && ok2) toast('تم إضافة سنة دراسية بنجاح');
     },
 
     async 'edit-year'(el) {
@@ -515,8 +515,8 @@ export default {
         toast('يوجد فصل دراسي بهذا الترتيب', 'danger');
         return;
       }
-      await store.save({ terms: [t] });
-      toast('أُنشئ الفصل الدراسي');
+      const ok = await store.save({ terms: [t] });
+      if (ok) toast('تم إضافة فصل دراسي بنجاح');
     },
 
     async 'edit-term'(el) {

@@ -720,10 +720,12 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       if (newPushIdx !== -1) toPush.splice(newPushIdx, 1);
     }
 
-    if (Object.keys(devicePatch).length > 0) {
-      await store.patchDevice({ ...store.state.device, ...devicePatch });
-    }
-    await store.save(patch);
+      if (Object.keys(devicePatch).length > 0) {
+        const ok = await store.patchDevice({ ...store.state.device, ...devicePatch });
+        if (!ok) throw new Error(`${storeName} defaults: device persistence failed`);
+      }
+      const ok2 = await store.save(patch);
+      if (!ok2) throw new Error(`${storeName} defaults: local persistence failed`);
   }
 
   // Dependency validation before push

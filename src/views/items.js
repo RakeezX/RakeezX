@@ -1,4 +1,4 @@
-﻿/**
+/**
  * بنود التقييم: هنا يطابق المعلّم التطبيق مع نموذج الرصد في مدرسته.
  * القالب الافتراضي مجموعه ١٠٠، لكن لا شيء يفرضه — عدّله كما تشاء.
  */
@@ -184,8 +184,8 @@ export default {
     },
 
     async template(el, ev, params) {
-      await store.save({ items: defaultItemsFor(params.id) });
-      toast('أُضيف القالب الجاهز');
+      const ok = await store.save({ items: defaultItemsFor(params.id) });
+      if (ok) toast('تم تطبيق القالب');
     },
 
     async edit(el, ev, params) {
