@@ -318,10 +318,7 @@ export default {
             </button>
             ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
 
-            <button class="btn btn--quiet btn--block" data-act="cloud-diagnostic" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} عرض تشخيص بيانات الاختبار
-            </button>
-            ${renderResultPanel('عرض تشخيص بيانات الاختبار', sync.state.results.diagnostic)}
+
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
@@ -443,56 +440,6 @@ export default {
       }
     },
 
-    async 'cloud-diagnostic'(el) {
-      if (sync.state.status === 'syncing') return;
-      sync.state.status = 'syncing';
-      sync.state.results.diagnostic = { text: 'جارٍ تحميل التشخيص...' };
-      repaint();
-
-      try {
-        let out = '--- REMOTE CLOUD DATA ---\n\n';
-        const tables = ['years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments'];
-        for (const t of tables) {
-          const data = await cloud.fetchRecords(t);
-          out += `[${t.toUpperCase()}] (${data.length})\n`;
-          for (const r of data) {
-            let str = `  id: ${r.id}\n`;
-            if (t === 'sections') str += `  year_id: ${r.year_id} | grade: ${r.grade} | label: ${r.label}\n`;
-            if (t === 'teachings') str += `  sec_id: ${r.section_id} | sub_id: ${r.subject_id} | term_id: ${r.term_id}\n`;
-            if (t === 'enrollments') str += `  st_id: ${r.student_id} | sec_id: ${r.section_id}\n`;
-            if (t === 'students') str += `  name: ${r.name}\n`;
-            if (t === 'years') str += `  hijriStart: ${r.hijri_start} | label: ${r.label}\n`;
-            if (t === 'terms') str += `  year_id: ${r.year_id} | index: ${r.index}\n`;
-            if (t === 'subjects') str += `  name: ${r.name} | slug: ${r.slug}\n`;
-            str += `  updated_at: ${r.client_updated_at} | deleted_at: ${r.deleted_at || 'null'}\n\n`;
-            out += str;
-          }
-        }
-
-        out += '--- LOCAL DEVICE DATA ---\n\n';
-        const locals = ['students', 'enrollments', 'sections'];
-        for (const t of locals) {
-          const data = store.state[t] || [];
-          out += `[LOCAL ${t.toUpperCase()}] (${data.length})\n`;
-          for (const r of data) {
-            let str = `  id: ${r.id}\n`;
-            if (t === 'sections') str += `  yearId: ${r.yearId} | grade: ${r.grade} | label: ${r.label}\n`;
-            if (t === 'enrollments') str += `  studentId: ${r.studentId} | sectionId: ${r.sectionId}\n`;
-            if (t === 'students') str += `  name: ${r.name}\n`;
-            str += `  updatedAt: ${new Date(r.updatedAt).toISOString()} | deleted: ${r.deleted}\n\n`;
-            out += str;
-          }
-        }
-
-        sync.state.status = 'idle';
-        sync.state.results.diagnostic = { text: out };
-        repaint();
-      } catch (err) {
-        sync.state.status = 'idle';
-        sync.state.results.diagnostic = { text: 'حدث خطأ أثناء السحب:\n' + err.message };
-        repaint();
-      }
-    },
 
     async save(el) {
       if (await store.patchProfile({ [el.name]: el.value.trim() })) toast('حُفظ');

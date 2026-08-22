@@ -331,3 +331,11 @@ outbox { id:'{store}:{recordId}', store, recordId,
 - تطبيق التكرار الآمن التام (Idempotency / Equal-Timestamp No-op): عند تطابق أختام الوقت بين المحلي والسحابة تمامًا، لا يحدث أي رفع أو سحب، مما يمنع حلقات التحديث اللانهائية (Infinite Update Loops).
 - واجهة حالة المزامنة الدائمة (Persistent Sync Result UI) في شاشة الإعدادات، مع عرض إحصاءات السحب والرفع لكل كيان على حدة.
 - تم اجتياز الفحص اليدوي (Manual Verification PASS) وتأكيد الاستقرار.
+
+### المرحلة ٥ج: مزامنة الطلاب والانتساب (Phase 5C)
+- شمول المزامنة لجدولي `students` و `enrollments` مع إضافة `teachings` ضمن المزامنة الهيكلية الأساسية.
+- ترتيب التبعية (Dependency Order): `years` ← `terms` ← `subjects` ← `sections` ← `teachings` ← `students` ← `enrollments`.
+- حل معضلة تزامن البيانات الافتراضية (Generated-Default Convergence): أصبحت السجلات المبدئية التي يولدها النظام تكتسب هويتها (ID) من السحابة إذا وُجدت لمنع ازدواجية السجلات في الأجهزة الجديدة.
+- تحقيق الاستقرار الحتمي في استعادة البيانات (Deterministic Fresh-Device Convergence) دون تضارب أو فقدان للانتساب.
+- تحصين أمان الإقلاع (PWA Service-Worker Reliability): عزل تحميل أداة المزامنة وجعلها اختيارية (Dynamic Import) لمنع انهيار إقلاع التطبيق في حال تعطل ملفات المزامنة.
+- اجتياز اختبار القبول النهائي النظيف (Clean Acceptance Scenario PASS) واستقرار كافة الشاشات مع الاعتماد الحصري على المعرّفات القادمة من السحابة.
