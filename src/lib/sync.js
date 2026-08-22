@@ -727,6 +727,30 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     }
   }
 
+  if (storeName === 'slots') {
+    for (const p of toPush) {
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+    }
+  }
+
+  if (storeName === 'sessions') {
+    for (const p of toPush) {
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+      if (p.slot_id && !context.knownRemoteIds?.slots?.has(p.slot_id)) {
+        throw new Error(`${storeName}: missing remote slot ${p.slot_id}`);
+      }
+      if (p.time_profile_id && !context.knownRemoteIds?.timeProfiles?.has(p.time_profile_id)) {
+        throw new Error(`${storeName}: missing remote timeProfile ${p.time_profile_id}`);
+      }
+    }
+    // Sort sessions chronologically so parents (e.g. makeupForId target) are pushed before children
+    toPush.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.period - b.period));
+  }
+
   if (toPush.length > 0) {
     await cloud.upsertRecords(tableName, toPush);
   }
