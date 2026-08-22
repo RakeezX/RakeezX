@@ -193,7 +193,7 @@ export default {
       if (!section) {
         section = await store.createSection({
           yearId: year.id, grade: data.grade, label: data.label,
-          name: sectionLabel({ grade: data.grade, label: data.label }), color: data.color,
+          name: `${data.grade}/${data.label}`, color: data.color,
         });
       }
 
