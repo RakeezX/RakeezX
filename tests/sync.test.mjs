@@ -172,5 +172,31 @@ test("Sync Suite", async (t) => {
     const localYears = await db.getAll("years");
     assert.ok(localYears.some(y => y.id === "y2"));
   });
+
+  await t.test("Scenario M: Attendance Sync", async () => {
+    const student = { id: "std1", name: "Ahmed", status: "active", updatedAt: Date.now() };
+    const tch = { id: "tch1", sectionId: "sec1", subjectId: "sub1", termId: "t1", updatedAt: Date.now() };
+    const ses = { id: "ses1", teachingId: "tch1", date: "2024-01-01", period: 1, status: "scheduled", updatedAt: Date.now() };
+    const att = { id: "att1", studentId: "std1", sessionId: "ses1", teachingId: "tch1", date: "2024-01-01", status: "present", updatedAt: Date.now() };
+    
+    await db.put("students", student);
+    await db.put("teachings", tch);
+    await db.put("sessions", ses);
+    await db.put("attendance", att);
+    await store.init();
+    
+    // Requires students, teachings, sessions to be remotely present!
+    backend.records["students"] = [{ id: "std1", name: "Ahmed" }];
+    backend.records["teachings"] = [{ id: "tch1" }];
+    
+    const stats = await sync.syncTimetable();
+    
+    assert.equal(stats.sessions.pushed, 1);
+    assert.equal(stats.attendance.pushed, 1);
+    
+    assert.equal(backend.records["attendance"][0].student_id, "std1");
+    assert.equal(backend.records["attendance"][0].session_id, "ses1");
+    assert.equal(backend.records["attendance"][0].status, "present");
+  });
 });
 

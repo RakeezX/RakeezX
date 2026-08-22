@@ -441,6 +441,32 @@ const MAPPERS = {
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
     })
+  },
+  attendance: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      student_id: rec.studentId,
+      session_id: rec.sessionId,
+      teaching_id: rec.teachingId,
+      date: rec.date,
+      status: rec.status,
+      note: rec.note,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      studentId: rec.student_id,
+      sessionId: rec.session_id,
+      teachingId: rec.teaching_id,
+      date: rec.date,
+      status: rec.status,
+      note: rec.note,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
   }
 };
 
@@ -499,6 +525,11 @@ function buildLocalDependencies(state) {
       if (ses.teachingId) req.teachings.add(ses.teachingId);
       if (ses.slotId) req.slots.add(ses.slotId);
       if (ses.timeProfileId) req.timeProfiles.add(ses.timeProfileId);
+    }
+  }
+  for (const att of state.attendance || []) {
+    if (!att.deleted) {
+      if (att.teachingId) req.teachings.add(att.teachingId);
     }
   }
 
@@ -785,6 +816,20 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     toPush.push(...sorted);
   }
 
+  if (storeName === 'attendance') {
+    for (const p of toPush) {
+      if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
+        throw new Error(`${storeName}: missing remote student ${p.student_id}`);
+      }
+      if (p.session_id && !context.knownRemoteIds?.sessions?.has(p.session_id)) {
+        throw new Error(`${storeName}: missing remote session ${p.session_id}`);
+      }
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+    }
+  }
+
   if (toPush.length > 0) {
     await cloud.upsertRecords(tableName, toPush);
   }
@@ -888,6 +933,7 @@ export async function syncStructural() {
       }
     });
     console.log('[rakeezx sync] Structural sync complete.', stats);
+    return stats;
 
   } catch (err) {
     console.warn('[rakeezx sync] Structural sync failed:', err);
@@ -1019,7 +1065,17 @@ export async function syncTimetable() {
 
     // 3. sessions
     const resSessions = await syncCollection('sessions', 'sessions', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.sessions = resSessions.known;
     stats.sessions = { pushed: resSessions.pushed, pulled: resSessions.pulled };
+
+    // Fetch remote students for attendance foreign key validation
+    const remoteStudents = await cloud.fetchRecords('students');
+    knownRemoteIds.students = new Set(remoteStudents.map(r => r.id));
+
+    // 4. attendance
+    const resAttendance = await syncCollection('attendance', 'attendance', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.attendance = resAttendance.known;
+    stats.attendance = { pushed: resAttendance.pushed, pulled: resAttendance.pulled };
 
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
