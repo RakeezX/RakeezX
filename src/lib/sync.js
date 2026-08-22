@@ -1,6 +1,6 @@
 import * as cloud from './cloud.js';
 import * as store from '../store.js';
-import { uid } from '../models.js';
+import { uid, DEFAULT_TIME_PROFILES } from '../models.js';
 
 export const state = {
   status: 'idle', // idle, syncing
@@ -459,7 +459,7 @@ function isMeaningfulStructural(storeName, rec) {
     return !(rec.name === 'المهارات الرقمية' && rec.slug === 'digital-skills');
   }
   if (storeName === 'timeProfiles') {
-    return !['التوقيت الصيفي', 'التوقيت الشتوي', 'توقيت رمضان', 'التوقيت المدمج'].includes(rec.name);
+    return !DEFAULT_TIME_PROFILES.some(p => p.name === rec.name);
   }
   return true; // sections do not have auto-generated defaults
 }
@@ -834,6 +834,8 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
       }
     }
   }
+
+  const known = new Set(remoteById.keys());
   for (const p of toPush) known.add(p.id);
 
   return { pushed: toPush.length, pulled: toUpdateLocal.length, known };
