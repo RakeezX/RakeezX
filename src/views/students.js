@@ -7,7 +7,7 @@
 
 import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO } from '../models.js';
+import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let query = '';
@@ -96,7 +96,7 @@ function transferSheet(student, fromSectionId) {
               (s) => html`
                 <button class="radiocard radiocard--btn" data-pick="${s.id}">
                   <span class="radiocard__body">
-                    <span class="radiocard__title">${s.name}</span>
+                    <span class="radiocard__title">${sectionLabel(s) || ''}</span>
                     <span class="radiocard__hint">
                       <span class="tabular">${store.sectionRoster(s.id).length}</span> طالبًا
                     </span>
@@ -126,7 +126,7 @@ export default {
   title: () => 'الطلاب',
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);
-    return store.getSection(tch?.sectionId)?.name ?? '';
+    return sectionLabel(store.getSection(tch?.sectionId)) || '';
   },
   back: (p) => `#/teaching/${p.id}`,
 
@@ -150,7 +150,7 @@ export default {
       return html`
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
-          <div class="empty__title">لا طلاب في ${section?.name ?? 'الشعبة'}</div>
+          <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الشعبة'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
           <div class="btn-row" style="justify-content:center">
             <button class="btn btn--primary" data-act="import">${icon('upload')} لصق كشف الأسماء</button>
