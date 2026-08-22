@@ -318,6 +318,11 @@ export default {
             </button>
             ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
 
+            <button class="btn btn--quiet btn--block" data-act="sync-timetable" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} اختبار مزامنة الجدول والجلسات
+            </button>
+            ${renderResultPanel('اختبار مزامنة الجدول والجلسات', sync.state.results.timetable)}
+
 
           ` : html`
             <form id="cloud-login-form" data-act="cloud-in">
@@ -438,8 +443,19 @@ export default {
       } else {
         toast('تمت مزامنة الطلاب والانتساب بنجاح');
       }
+      repaint();
     },
 
+    async 'sync-timetable'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncTimetable();
+      if (sync.state.results.timetable?.status === 'error') {
+        toast('تعذرت مزامنة الجدول والجلسات', 'danger');
+      } else {
+        toast('تمت مزامنة الجدول والجلسات بنجاح');
+      }
+      repaint();
+    },
 
     async save(el) {
       if (await store.patchProfile({ [el.name]: el.value.trim() })) toast('حُفظ');

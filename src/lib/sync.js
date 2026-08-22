@@ -353,6 +353,94 @@ const MAPPERS = {
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
     })
+  },
+  timeProfiles: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      name: rec.name,
+      order: rec.order,
+      periods: rec.periods,
+      overrides: rec.overrides,
+      active_from: rec.activeFrom,
+      active_to: rec.activeTo,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      name: rec.name,
+      order: rec.order,
+      periods: rec.periods,
+      overrides: rec.overrides,
+      activeFrom: rec.active_from,
+      activeTo: rec.active_to,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  slots: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      teaching_id: rec.teachingId,
+      weekday: rec.weekday,
+      period: rec.period,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      teachingId: rec.teaching_id,
+      weekday: rec.weekday,
+      period: rec.period,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  sessions: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      teaching_id: rec.teachingId,
+      date: rec.date,
+      period: rec.period,
+      slot_id: rec.slotId,
+      start_time: rec.startTime || null,
+      end_time: rec.endTime || null,
+      time_profile_id: rec.timeProfileId,
+      status: rec.status,
+      reason: rec.reason,
+      makeup_for_id: rec.makeupForId,
+      lesson_id: rec.lessonId,
+      note: rec.note,
+      homework: rec.homework,
+      covered: rec.covered,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      teachingId: rec.teaching_id,
+      date: rec.date,
+      period: rec.period,
+      slotId: rec.slot_id,
+      startTime: rec.start_time || '',
+      endTime: rec.end_time || '',
+      timeProfileId: rec.time_profile_id,
+      status: rec.status,
+      reason: rec.reason,
+      makeupForId: rec.makeup_for_id,
+      lessonId: rec.lesson_id,
+      note: rec.note,
+      homework: rec.homework,
+      covered: rec.covered,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
   }
 };
 
@@ -370,6 +458,9 @@ function isMeaningfulStructural(storeName, rec) {
   if (storeName === 'subjects') {
     return !(rec.name === 'المهارات الرقمية' && rec.slug === 'digital-skills');
   }
+  if (storeName === 'timeProfiles') {
+    return !['صباحي', 'صباحي - طابور ملغى', 'مسائي', 'رمضان'].includes(rec.name);
+  }
   return true; // sections do not have auto-generated defaults
 }
 
@@ -378,7 +469,7 @@ function isMeaningfulStructural(storeName, rec) {
  * that must be pushed because user-created children depend on them.
  */
 function buildLocalDependencies(state) {
-  const req = { years: new Set(), terms: new Set(), subjects: new Set(), sections: new Set() };
+  const req = { years: new Set(), terms: new Set(), subjects: new Set(), sections: new Set(), teachings: new Set(), timeProfiles: new Set(), slots: new Set() };
 
   for (const sec of state.sections || []) {
     if (sec.yearId && isMeaningfulStructural('sections', sec)) {
@@ -395,6 +486,18 @@ function buildLocalDependencies(state) {
       if (tch.sectionId) req.sections.add(tch.sectionId);
       if (tch.subjectId) req.subjects.add(tch.subjectId);
       if (tch.termId) req.terms.add(tch.termId);
+    }
+  }
+  for (const sl of state.slots || []) {
+    if (!sl.deleted) {
+      if (sl.teachingId) req.teachings.add(sl.teachingId);
+    }
+  }
+  for (const ses of state.sessions || []) {
+    if (!ses.deleted) {
+      if (ses.teachingId) req.teachings.add(ses.teachingId);
+      if (ses.slotId) req.slots.add(ses.slotId);
+      if (ses.timeProfileId) req.timeProfiles.add(ses.timeProfileId);
     }
   }
 
@@ -491,6 +594,13 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
         if (equiv && equiv.id !== local.id) remappedLocals.set(local.id, equiv.id);
       }
     }
+  } else if (storeName === 'timeProfiles') {
+    for (const local of localRecords) {
+      if (!isMeaningfulStructural('timeProfiles', local)) {
+        const equiv = sortedRemotes.find(r => r.name === local.name);
+        if (equiv && equiv.id !== local.id) remappedLocals.set(local.id, equiv.id);
+      }
+    }
   }
 
   if (remappedLocals.size > 0) {
@@ -523,6 +633,9 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
         // Provided for completeness, though sections are not currently reconciled
         updateStore('teachings', 'sectionId');
         updateStore('enrollments', 'sectionId');
+      } else if (entityType === 'timeProfiles') {
+        if (store.state.device?.activeTimeProfileId === oldId) p.device = { ...store.state.device, activeTimeProfileId: newId };
+        updateStore('sessions', 'timeProfileId');
       }
       return p;
     };
@@ -752,6 +865,77 @@ export async function syncStudents() {
       results: {
         ...state.results,
         students: { status: 'error', error: err.message, time: Date.now() }
+      }
+    });
+  }
+}
+
+export async function syncTimetable() {
+  if (!cloud.session || !cloud.user) {
+    console.log('[rakeezx sync] Not signed in, skipping timetable sync.');
+    return;
+  }
+  if (state.status === 'syncing') return;
+
+  console.log('[rakeezx sync] Enforcing structural sync before timetable...');
+  await syncStructural();
+
+  if (state.results.structural?.status === 'error') {
+    console.warn('[rakeezx sync] Structural sync failed, aborting timetable sync.');
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        timetable: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
+      }
+    });
+    return;
+  }
+
+  setState({ status: 'syncing', results: { ...state.results, timetable: null } });
+  console.log('[rakeezx sync] Started timetable sync...');
+
+  try {
+    const knownRemoteIds = {};
+    const stats = {};
+
+    // First, fetch remote teachings to validate foreign keys.
+    const remoteTeachings = await cloud.fetchRecords('teachings');
+    knownRemoteIds.teachings = new Set(remoteTeachings.map(r => r.id));
+
+    // 1. timeProfiles
+    const resProfiles = await syncCollection('timeProfiles', 'time_profiles', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.timeProfiles = resProfiles.known;
+    stats.timeProfiles = { pushed: resProfiles.pushed, pulled: resProfiles.pulled };
+
+    // 2. slots
+    const resSlots = await syncCollection('slots', 'slots', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.slots = resSlots.known;
+    stats.slots = { pushed: resSlots.pushed, pulled: resSlots.pulled };
+
+    // 3. sessions
+    const resSessions = await syncCollection('sessions', 'sessions', { requiredIds: new Set(), knownRemoteIds });
+    stats.sessions = { pushed: resSessions.pushed, pulled: resSessions.pulled };
+
+    const nowStamp = Date.now();
+    await store.patchDevice({ lastSyncAt: nowStamp });
+    setState({
+      status: 'idle',
+      lastSyncedAt: nowStamp,
+      results: {
+        ...state.results,
+        timetable: { status: 'success', stats, time: nowStamp }
+      }
+    });
+    console.log('[rakeezx sync] Timetable sync complete.', stats);
+
+  } catch (err) {
+    console.warn('[rakeezx sync] Timetable sync failed:', err);
+    setState({
+      status: 'idle',
+      results: {
+        ...state.results,
+        timetable: { status: 'error', error: err.message, time: Date.now() }
       }
     });
   }
