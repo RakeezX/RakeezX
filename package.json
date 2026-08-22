@@ -1,0 +1,1 @@
+{ "name": "rakeezx", "version": "1.0.0", "type": "module", "scripts": { "test:sync": "node --test tests/sync.test.mjs" }, "devDependencies": { "fake-indexeddb": "^6.0.0" } }

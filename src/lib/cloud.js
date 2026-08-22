@@ -10,6 +10,9 @@ const STORAGE_KEY = 'rakeezx-auth';
 export let session = null;
 export let user = null;
 
+let mockBackend = null;
+export function setMockBackend(adapter) { mockBackend = adapter; }
+
 const listeners = new Set();
 export function subscribe(fn) {
   listeners.add(fn);
@@ -160,6 +163,7 @@ export async function updateProfile(profileData) {
 }
 
 export async function upsertRecords(tableName, records) {
+  if (mockBackend) return mockBackend.upsertRecords(tableName, records);
   if (!user) throw new Error('Not authenticated');
   if (!records || !records.length) return { success: true };
 
@@ -180,6 +184,7 @@ export async function upsertRecords(tableName, records) {
 }
 
 export async function fetchRecords(tableName) {
+  if (mockBackend) return mockBackend.fetchRecords(tableName);
   if (!user) throw new Error('Not authenticated');
   const data = await request(`/${tableName}?owner_id=eq.${user.id}&select=*`, {
     headers: {
