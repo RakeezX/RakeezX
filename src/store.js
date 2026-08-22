@@ -66,11 +66,14 @@ let errorHandler = null;
 export const onWriteError = (fn) => { errorHandler = fn; };
 
 function reportWriteError(err, context) {
-  console.error('[rakeezx] فشل الحفظ', context, err);
+  console.error('[rakeezx] تعذر الحفظ', context, err);
+  console.error('[rakeezx sync db debug] IndexedDB Error Name:', err.name);
+  console.error('[rakeezx sync db debug] IndexedDB Error Message:', err.message);
+  console.error('[rakeezx sync db debug] IndexedDB Context:', JSON.stringify(context, null, 2));
   try {
     errorHandler?.(err, context);
   } catch (e) {
-    console.error('[rakeezx] فشل معالج الخطأ نفسه', e);
+    console.error('[rakeezx] فشل معالج الأخطاء', e);
   }
 }
 

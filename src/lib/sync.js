@@ -459,7 +459,7 @@ function isMeaningfulStructural(storeName, rec) {
     return !(rec.name === 'المهارات الرقمية' && rec.slug === 'digital-skills');
   }
   if (storeName === 'timeProfiles') {
-    return !['صباحي', 'صباحي - طابور ملغى', 'مسائي', 'رمضان'].includes(rec.name);
+    return !['التوقيت الصيفي', 'التوقيت الشتوي', 'توقيت رمضان', 'التوقيت المدمج'].includes(rec.name);
   }
   return true; // sections do not have auto-generated defaults
 }
@@ -789,10 +789,51 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   }
 
   if (toUpdateLocal.length > 0) {
-    await store.save({ [storeName]: toUpdateLocal });
+    const ok = await store.save({ [storeName]: toUpdateLocal });
+    if (!ok) throw new Error(`${storeName}: local persistence failed`);
   }
 
-  const known = new Set(remoteById.keys());
+  if (remappedLocals.size > 0) {
+    const buildCascadePatch = (oldId, newId, entityType) => {
+      const p = {};
+      const updateStore = (sName, fkField) => {
+        for (const rec of store.state[sName] || []) {
+          if (rec[fkField] === oldId) {
+            p[sName] ??= [];
+            p[sName].push({ ...rec, [fkField]: newId });
+          }
+        }
+      };
+
+      if (entityType === 'years') {
+        if (store.state.device?.activeYearId === oldId) p.device = [{ ...store.state.device, activeYearId: newId }];
+        updateStore('terms', 'yearId');
+        updateStore('sections', 'yearId');
+        updateStore('calendars', 'yearId');
+      } else if (entityType === 'terms') {
+        if (store.state.device?.activeTermId === oldId) p.device = [{ ...store.state.device, activeTermId: newId }];
+        updateStore('teachings', 'termId');
+      } else if (entityType === 'subjects') {
+        updateStore('teachings', 'subjectId');
+        updateStore('units', 'subjectId');
+      } else if (entityType === 'sections') {
+        updateStore('teachings', 'sectionId');
+        updateStore('enrollments', 'sectionId');
+      } else if (entityType === 'timeProfiles') {
+        if (store.state.device?.activeTimeProfileId === oldId) p.device = [{ ...store.state.device, activeTimeProfileId: newId }];
+        updateStore('sessions', 'timeProfileId');
+      }
+      return p;
+    };
+
+    for (const [oldId, newId] of remappedLocals) {
+      const patch = buildCascadePatch(oldId, newId, storeName);
+      if (Object.keys(patch).length > 0) {
+        const ok = await store.save(patch);
+        if (!ok) throw new Error(`${storeName} cascade: local persistence failed`);
+      }
+    }
+  }
   for (const p of toPush) known.add(p.id);
 
   return { pushed: toPush.length, pulled: toUpdateLocal.length, known };
