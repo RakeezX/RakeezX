@@ -13,6 +13,11 @@ export let user = null;
 let mockBackend = null;
 export function setMockBackend(adapter) { mockBackend = adapter; }
 
+export function setMockAuth(u, s) {
+  user = u;
+  session = s;
+}
+
 const listeners = new Set();
 export function subscribe(fn) {
   listeners.add(fn);

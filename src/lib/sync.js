@@ -491,6 +491,7 @@ function buildLocalDependencies(state) {
   for (const sl of state.slots || []) {
     if (!sl.deleted) {
       if (sl.teachingId) req.teachings.add(sl.teachingId);
+      if (sl.timeProfileId) req.timeProfiles.add(sl.timeProfileId);
     }
   }
   for (const ses of state.sessions || []) {
@@ -1003,13 +1004,16 @@ export async function syncTimetable() {
     const remoteTeachings = await cloud.fetchRecords('teachings');
     knownRemoteIds.teachings = new Set(remoteTeachings.map(r => r.id));
 
+    const localStoreState = store.state;
+    const context = buildLocalDependencies(localStoreState);
+
     // 1. timeProfiles
-    const resProfiles = await syncCollection('timeProfiles', 'time_profiles', { requiredIds: new Set(), knownRemoteIds });
+    const resProfiles = await syncCollection('timeProfiles', 'time_profiles', { requiredIds: context.timeProfiles, knownRemoteIds });
     knownRemoteIds.timeProfiles = resProfiles.known;
     stats.timeProfiles = { pushed: resProfiles.pushed, pulled: resProfiles.pulled };
 
     // 2. slots
-    const resSlots = await syncCollection('slots', 'slots', { requiredIds: new Set(), knownRemoteIds });
+    const resSlots = await syncCollection('slots', 'slots', { requiredIds: context.slots, knownRemoteIds });
     knownRemoteIds.slots = resSlots.known;
     stats.slots = { pushed: resSlots.pushed, pulled: resSlots.pulled };
 
@@ -1028,6 +1032,7 @@ export async function syncTimetable() {
       }
     });
     console.log('[rakeezx sync] Timetable sync complete.', stats);
+    return stats;
 
   } catch (err) {
     console.warn('[rakeezx sync] Timetable sync failed:', err);
