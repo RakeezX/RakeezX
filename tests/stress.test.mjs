@@ -26,44 +26,47 @@ if (!globalThis.URL) {
   globalThis.URL = { createObjectURL: () => '', revokeObjectURL: () => {} };
 }
 
-test('Performance / Stress Suite: 1000 students, 50,000 scores', async (t) => {
+test('Performance / Stress Suite: ~62k Mixed Dataset', async (t) => {
   try {
     await store.init();
 
-    const numStudents = 1000;
-    const numItems = 5;
-    const scoresPerItem = 10;
-
-    const writes = { students: [], items: [], scores: [] };
+    const writes = { 
+      years: [], terms: [], subjects: [], sections: [], teachings: [],
+      students: [], enrollments: [], items: [], scores: [], 
+      sessions: [], attendance: [] 
+    };
 
     const start = performance.now();
 
+    writes.years.push({ id: 'y1', label: '2025', updatedAt: Date.now() });
+    writes.terms.push({ id: 't1', yearId: 'y1', name: 'Term 1', updatedAt: Date.now() });
+    
+    for (let i = 0; i < 5; i++) writes.subjects.push({ id: `sub-${i}`, name: `Sub ${i}`, updatedAt: Date.now() });
+    for (let i = 0; i < 10; i++) writes.sections.push({ id: `sec-${i}`, yearId: 'y1', name: `Sec ${i}`, updatedAt: Date.now() });
+    for (let i = 0; i < 20; i++) writes.teachings.push({ id: `tch-${i}`, sectionId: `sec-${i%10}`, subjectId: `sub-${i%5}`, termId: 't1', updatedAt: Date.now() });
+
+    const numStudents = 1000;
     for (let i = 0; i < numStudents; i++) {
-      writes.students.push({
-        id: `s-${i}`,
-        name: `Stress Student ${i}`,
-        status: 'active',
-        updatedAt: Date.now()
-      });
+      writes.students.push({ id: `std-${i}`, name: `Student ${i}`, status: 'active', updatedAt: Date.now() });
+      writes.enrollments.push({ id: `enr-${i}`, studentId: `std-${i}`, sectionId: `sec-${i%10}`, updatedAt: Date.now() });
     }
 
-    for (let j = 0; j < numItems; j++) {
-      writes.items.push({
-        id: `i-${j}`,
-        teachingId: 'tch1',
-        name: `Item ${j}`,
-        max: 10,
-        updatedAt: Date.now()
-      });
+    // 100 items (5 per teaching)
+    for (let t = 0; t < 20; t++) {
+      for (let i = 0; i < 5; i++) {
+        writes.items.push({ id: `itm-${t}-${i}`, teachingId: `tch-${t}`, name: `Item ${i}`, max: 10, updatedAt: Date.now() });
+      }
     }
 
+    // 50,000 scores (50 per student across their items)
     for (let i = 0; i < numStudents; i++) {
-      for (let j = 0; j < numItems; j++) {
-        for (let k = 0; k < scoresPerItem; k++) {
+      const tchId = i % 10; // mapped to one teaching logically via section
+      for (let j = 0; j < 5; j++) {
+        for (let k = 0; k < 10; k++) {
           writes.scores.push({
-            id: `s-${i}_i-${j}_k-${k}`,
-            studentId: `s-${i}`,
-            itemId: `i-${j}`,
+            id: `scr-${i}-${j}-${k}`,
+            studentId: `std-${i}`,
+            itemId: `itm-${tchId}-${j}`,
             value: Math.floor(Math.random() * 10),
             updatedAt: Date.now()
           });
@@ -71,14 +74,36 @@ test('Performance / Stress Suite: 1000 students, 50,000 scores', async (t) => {
       }
     }
 
+    // 200 sessions (10 per teaching)
+    for (let t = 0; t < 20; t++) {
+      for (let s = 0; s < 10; s++) {
+        writes.sessions.push({ id: `ses-${t}-${s}`, teachingId: `tch-${t}`, date: `2025-01-0${s+1}`, updatedAt: Date.now() });
+      }
+    }
+
+    // 10,000 attendances (10 per student)
+    for (let i = 0; i < numStudents; i++) {
+      const tchId = i % 10;
+      for (let s = 0; s < 10; s++) {
+        writes.attendance.push({
+          id: `att-${i}-${s}`,
+          studentId: `std-${i}`,
+          sessionId: `ses-${tchId}-${s}`,
+          status: 'present',
+          updatedAt: Date.now()
+        });
+      }
+    }
+
     await store.save(writes);
     const end = performance.now();
+    const totalRecords = Object.values(writes).reduce((acc, arr) => acc + arr.length, 0);
 
-    console.log(`Stress test inserted ${numStudents} students and ${numStudents * numItems * scoresPerItem} scores in ${(end - start).toFixed(2)}ms`);
+    console.log(`Stress test inserted ${totalRecords} mixed records in ${(end - start).toFixed(2)}ms`);
 
     assert.equal(store.state.students.length, numStudents);
-    assert.equal(store.state.scores.length, numStudents * numItems * scoresPerItem);
-    assert.equal(store.state.items.length, numItems);
+    assert.equal(store.state.scores.length, 50000);
+    assert.equal(store.state.attendance.length, 10000);
 
     setTimeout(() => process.exit(0), 100);
   } catch (err) {
