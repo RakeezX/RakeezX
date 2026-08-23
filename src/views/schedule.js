@@ -133,22 +133,34 @@ export default {
 
     const today = weekday(todayISO());
 
-    const profile = store.activeTimeProfile();
+    const todayStr = todayISO();
+    const baseProfile = store.activeTimeProfile();
+    const profile = store.resolveProfile(baseProfile, todayStr);
+    const isAuto = profile?.activeFrom && profile.activeFrom <= todayStr && (!profile.activeTo || profile.activeTo >= todayStr);
+    
+    let recessText = '';
+    const cfg = profile?.overrides?.config;
+    if (cfg?.recess?.enabled) {
+      if (cfg.recess.rules) recessText = 'فسحة خامس/سادس: بعد الحصة ' + cfg.recess.rules.find(r => r.grades.includes(5))?.afterPeriod;
+      else recessText = 'الفسحة: بعد الحصة ' + cfg.recess.afterPeriod;
+    }
 
     return html`
-      <a class="row mb-3" href="#/schedule/times">
-        <span class="row__icon">${icon('clock')}</span>
-        <span class="row__main">
-          <span class="row__title">إعداد أوقات الحصص</span>
-          <span class="row__sub">
-            ${profile
-              ? html`الملف النشط: <b>${profile.name}</b> ·
-                  <span class="tabular">${(profile.periods ?? []).length}</span> حصص`
-              : 'لم يُضبط ملف توقيت بعد'}
-          </span>
-        </span>
-        <span class="row__end">${icon('chev')}</span>
-      </a>
+      <div class="card card--pad mb-3" style="background: var(--surface-1);">
+        <div class="hstack gap-2 mb-2">
+          <div class="fw-7 t-1">التوقيت الحالي: ${profile?.name || 'غير محدد'}</div>
+          ${profile ? html`<div class="badge badge--${isAuto ? 'success' : 'info'} push">${isAuto ? 'تلقائي حسب التاريخ' : 'اختيار يدوي'}</div>` : ''}
+        </div>
+        ${profile ? html`
+          <div class="t-3 fs-sm mb-1">
+            الأولى <span class="tabular fw-7">${profile.periods?.[0]?.start}</span> ·
+            ${cfg?.periodDuration ? html`مدة الحصة <span class="tabular fw-7">${cfg.periodDuration}</span> دقيقة ·` : ''}
+            <span class="tabular fw-7">${(profile.periods ?? []).length}</span> حصص
+          </div>
+          ${recessText ? html`<div class="t-3 fs-sm mb-3">${recessText}</div>` : html`<div class="mb-3"></div>`}
+        ` : ''}
+        <a class="btn btn--sm btn--ghost" href="#/schedule/times">${icon('edit-2')} تعديل التوقيت</a>
+      </div>
 
       ${slots.length
         ? html`
@@ -188,14 +200,15 @@ export default {
                       ${byDay[d].map((s) => {
                         const tch = store.getTeaching(s.teachingId);
                         const sec = store.getSection(tch?.sectionId);
-                        const t = store.timeFor(d, s.period, store.activeTimeProfile(), sec?.grade);
+                        const t = store.timeFor(d, s.period, baseProfile, sec?.grade, todayStr);
                         return html`
                           <div class="slot">
                             <span class="period">${s.period}</span>
                             <span class="slot__main">
-                              <span class="slot__time tabular">${t ? fmtRange(t) : '—'}</span>
-                              <span class="slot__name">${sectionLabel(sec) || '—'}</span>
-                              <span class="slot__sub">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
+                              <span class="slot__name">الحصة ${s.period}</span>
+                              <span class="slot__time tabular t-3 fs-sm mb-1">${t ? fmtRange(t) : '—'}</span>
+                              <span class="slot__sub fw-7">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
+                              <span class="slot__sub">${sectionLabel(sec) || '—'}</span>
                             </span>
                             <button class="iconbtn" data-act="remove" data-id="${s.id}" aria-label="حذف">
                               ${icon('x')}

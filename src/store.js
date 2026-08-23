@@ -604,28 +604,36 @@ export const availablePeriods = (wd = null, profile = activeTimeProfile(), date 
   return periodNumbers(p, wd);
 };
 
-/** يستنتج الملف الفعلي ليوم معين (خاصة لفك التوقيت المدمج). */
+/** يستنتج الملف الفعلي ليوم معين حسب الأولوية: استثناء تقويم، تقويم مدمج، موسمي، ثم الملف النشط. */
 export function resolveProfile(profile, date) {
-  if (!profile || profile.overrides?.config?.type !== 'hybrid' || !date) return profile;
+  if (!profile || !date) return profile;
   
   const activeCal = activeCalendar();
   const day = activeCal ? calendarDaysOf(activeCal.id).find((d) => d.date === date) : null;
   
+  // Priority 1 & 2 & 3: Calendar override (explicit or hybrid-generated remote days)
   if (day?.kind === 'remote') {
     return { 
       ...profile, 
-      periods: profile.overrides?.remote ?? profile.periods, 
+      periods: profile.overrides?.remote ?? profile.periods, // Fallback if hybrid remote isn't explicitly cached
       overrides: {
         config: { type: 'remote', assembly: { enabled: false }, recess: { enabled: false }, gap: 0 }
       } 
     };
   }
   
-  // إذا كان يوم دراسة عادياً، نبحث عن الملف الحضوري الفعّال في هذا التاريخ
+  // If we reach here, it's either an in_person day or a day without an override.
+  // Priority 4: Seasonal timing range for that date
   const physical = timeProfiles().find(
-    (p) => p.id !== profile.id && p.activeFrom <= date && (!p.activeTo || p.activeTo >= date)
+    (p) => p.overrides?.config?.type !== 'hybrid' && p.activeFrom && p.activeFrom <= date && (!p.activeTo || p.activeTo >= date)
   );
-  return physical ?? profile;
+  
+  // Priority 5: Fallback manual active profile
+  const resolved = physical ?? profile;
+  
+  // If the fallback itself is hybrid (but the day is in_person), the hybrid profile has no periods for in_person.
+  // It shouldn't happen usually because seasonal should catch it, but if it does, we return it as is.
+  return resolved;
 }
 
 export const setActiveTimeProfile = (id) => patchDevice({ activeTimeProfileId: id });

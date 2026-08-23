@@ -15,16 +15,15 @@ let overrideDay = null;   // اليوم الذي يُحرَّر استثناؤه
 
 import { TIMING_PRESETS } from '../models.js';
 
-
+/** لوحة توليد سريع: استخدام النماذج المسبقة أو التوليد المخصص. */
 function generateSheet(current = {}) {
   const formatSummary = (p) => {
     if (p === 'custom') return '';
     const conf = TIMING_PRESETS[p];
-    if (p === 'summer') return `الطابور: 6:45 ص | بداية الأولى: 7:00 ص | مدة الحصة: 45 د | الفسحة: 20 د + 5 تفويج | خامس/سادس: بعد الحصة الثالثة | رابع: بعد الحصة الثانية | عدد الحصص: 7`;
-    if (p === 'winter') return `الطابور: 7:15 ص | بداية الأولى: 7:30 ص | مدة الحصة: 45 د | الفسحة: 20 د | خامس/سادس: بعد الحصة الثالثة | رابع: بعد الحصة الثانية | عدد الحصص: 7`;
+    if (p === 'summer') return `الطابور: 6:45 ص | بداية الأولى: 7:00 ص | مدة الحصة: 45 د |\nالفسحة: 20 د + 5 د تفويج |\nفسحة رابع: بعد الحصة الثانية |\nفسحة خامس/سادس: بعد الحصة الثالثة |\nعدد الحصص: 7`;
+    if (p === 'winter') return `الطابور: 7:15 ص | بداية الأولى: 7:30 ص | مدة الحصة: 45 د |\nالفسحة: 20 د + 0 د تفويج |\nفسحة رابع: بعد الحصة الثانية |\nفسحة خامس/سادس: بعد الحصة الثالثة |\nعدد الحصص: 7`;
     if (p === 'ramadan') return `لا يوجد طابور | بداية الأولى: 9:00 ص | مدة الحصة: 35 د | عدد الحصص: 6 | لا توجد فسحة`;
-    if (p === 'remote') return `لا يوجد طابور | بداية الأولى: 7:00 ص | مدة الحصة: 30 د | عدد الحصص: 8 | لا توجد فسحة`;
-    if (p === 'hybrid') return `حضوري: حسب التوقيت النشط | عن بعد: 8 حصص من 7:00 ص بدون فسحة`;
+    if (p === 'hybrid') return `حضوري:\nحسب التوقيت الموسمي النشط للتاريخ\n\nعن بعد:\nالأولى 7:00 ص | 30 دقيقة | 8 حصص\nبدون طابور | بدون فسحة | بدون فاصل بين الحصص`;
     return '';
   };
 
@@ -40,12 +39,11 @@ function generateSheet(current = {}) {
             <option value="winter">التوقيت الشتوي (حسب الدليل)</option>
             <option value="ramadan">توقيت شهر رمضان</option>
             <option value="hybrid">التوقيت المدمج (حضوري / عن بُعد)</option>
-            <option value="remote">توقيت التعليم عن بُعد</option>
             <option value="custom">مخصص</option>
           </select>
         </label>
         
-        <div id="preset-summary" class="t-3 fs-xs mb-4 p-2" style="background: var(--surface-2); border-radius: var(--radius-sm);">
+        <div id="preset-summary" class="t-3 fs-xs mb-4 p-3" style="background: var(--surface-2); border-radius: var(--radius-sm); white-space: pre-wrap; line-height: 1.5;">
           ${formatSummary('summer')}
         </div>
         
@@ -288,6 +286,26 @@ export default {
         )}
       </div>
 
+      <details class="mb-4" style="border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
+        <summary class="fw-7 t-2 p-3" style="background: var(--surface-1); cursor: pointer;">
+          التفعيل التلقائي حسب التاريخ
+        </summary>
+        <div class="p-3" style="background: var(--surface-0); border-top: 1px solid var(--border);">
+          <p class="t-3 fs-xs mb-3">حدد فترات زمنية ليتم تفعيل التوقيت المناسب تلقائياً (مثل التوقيت الصيفي أو الشتوي). إذا لم يتطابق التاريخ سيتم استخدام التوقيت النشط حالياً.</p>
+          ${profiles.filter(p => p.activeFrom).length === 0 ? html`<p class="t-3 fs-sm mb-0">لا توجد توقيتات مفعلة تلقائياً.</p>` : ''}
+          ${profiles.filter(p => p.activeFrom).map(p => html`
+            <div class="card card--pad mb-2 hstack">
+              <div class="flex">
+                <div class="fw-7 mb-1">${p.name}</div>
+                <div class="t-3 fs-sm">من <span class="tabular fw-7">${p.activeFrom}</span> إلى <span class="tabular fw-7">${p.activeTo || 'مستمر'}</span></div>
+              </div>
+              <button class="iconbtn" data-act="rename" data-id="${p.id}" aria-label="تعديل">${icon('edit')}</button>
+            </div>
+          `)}
+          <p class="t-3 fs-xs mt-3 mb-0">لتفعيل أي توقيت تلقائياً، انقر على أيقونة التعديل بجانب اسم الملف، وحدد تواريخ "يسري من".</p>
+        </div>
+      </details>
+
       <div class="card card--pad">
         <div class="hstack gap-2 mb-3">
           <div class="fw-7">${open.name}</div>
@@ -360,10 +378,11 @@ export default {
                           else if (gapMins === tr) text = `${tr} دقائق تفويج`;
                         }
                         chunks.push(html`
-                          <div class="timerow" style="background: var(--surface-2); padding: 0.5rem; border-radius: var(--radius-md); align-items: center; justify-content: center; gap: 1rem;">
+                          <div class="timerow" style="background: var(--surface-2); padding: 0.5rem; border-radius: var(--radius-md); align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                             <div class="fw-7 t-2">فسحة</div>
                             <div class="tabular t-3">${prev.end} – ${t.start}</div>
                             <div class="badge badge--info">${text}</div>
+                            ${cfg?.recess ? html`<button class="iconbtn" data-act="edit-recess" aria-label="تعديل الفسحة">${icon('edit-2')}</button>` : ''}
                           </div>
                         `);
                       }
@@ -430,11 +449,94 @@ export default {
     },
 
     async 'add-profile'() {
-      const data = await nameSheet();
-      if (!data) return;
-      const p = await store.createTimeProfile({ ...data, periods: generateAdvancedPeriods(TIMING_PRESETS.custom) });
+      const config = await generateSheet();
+      if (!config) return;
+      
+      const { generateAdvancedPeriods } = await import('../models.js');
+      const periods = generateAdvancedPeriods(config);
+      
+      const meta = await nameSheet(null);
+      if (!meta) return;
+      
+      const p = await store.createTimeProfile({
+        ...meta,
+        periods,
+        overrides: { config }
+      });
       openId = p.id;
-      toast('أُنشئ ملف التوقيت');
+      overrideDay = null;
+      repaint();
+    },
+
+    'edit-recess'() {
+      const p = store.getTimeProfile(openId);
+      if (!p || !p.overrides?.config) return;
+      const cfg = p.overrides.config;
+      
+      openSheet({
+        title: 'تعديل إعدادات الفسحة',
+        desc: 'ملاحظة: سيتم إعادة حساب أوقات الحصص بناءً على الإعدادات الجديدة.',
+        body: html`
+          <form id="recess-form">
+            <div class="field-row">
+              <label class="field"><span class="field__label">المدة (دقيقة)</span>
+                <input class="input tabular" name="dur" type="number" value="${cfg.recess?.duration || 20}">
+              </label>
+              <label class="field"><span class="field__label">التفويج (دقيقة)</span>
+                <input class="input tabular" name="trans" type="number" value="${cfg.recess?.transition || 0}">
+              </label>
+            </div>
+            <label class="field mt-3">
+              <span class="field__label">تطبيق الفسحة على</span>
+              <select class="select" name="recGrades" id="rec-grades-sel">
+                <option value="all" ${!cfg.recess?.rules ? 'selected' : ''}>جميع الصفوف (نفس الوقت)</option>
+                <option value="official" ${cfg.recess?.rules ? 'selected' : ''}>منفصلة (رابع: بعد الـ 2 / خامس وسادس: بعد الـ 3)</option>
+              </select>
+            </label>
+            <label class="field mt-3" id="rec-after-wrapper" style="display: ${cfg.recess?.rules ? 'none' : 'block'};">
+              <span class="field__label">بعد الحصة رقم</span>
+              <input class="input tabular" name="after" type="number" value="${cfg.recess?.afterPeriod || 3}">
+            </label>
+          </form>
+        `,
+        foot: html`
+          <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+          <button class="btn btn--primary" form="recess-form" type="submit">حفظ وإعادة الحساب</button>
+        `,
+        onMount: (root, done) => {
+          const sel = root.querySelector('#rec-grades-sel');
+          const wrap = root.querySelector('#rec-after-wrapper');
+          sel.addEventListener('change', () => wrap.style.display = sel.value === 'all' ? 'block' : 'none');
+          
+          root.querySelector('#recess-form').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const fd = new FormData(ev.target);
+            const newCfg = JSON.parse(JSON.stringify(cfg));
+            newCfg.recess = newCfg.recess || { enabled: true };
+            newCfg.recess.enabled = true;
+            newCfg.recess.duration = Number(fd.get('dur'));
+            newCfg.recess.transition = Number(fd.get('trans'));
+            
+            if (fd.get('recGrades') === 'official') {
+              newCfg.recess.rules = [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }];
+              delete newCfg.recess.afterPeriod;
+            } else {
+              delete newCfg.recess.rules;
+              newCfg.recess.afterPeriod = Number(fd.get('after'));
+            }
+            
+            const { generateAdvancedPeriods } = await import('../models.js');
+            const newPeriods = generateAdvancedPeriods(newCfg);
+            
+            await store.patch('timeProfiles', p.id, {
+              periods: newPeriods,
+              overrides: { ...p.overrides, config: newCfg }
+            });
+            done();
+            repaint();
+          });
+        }
+      });
     },
 
     async rename(el) {
