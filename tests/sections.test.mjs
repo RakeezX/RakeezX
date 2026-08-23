@@ -1,20 +1,87 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeSection, sectionLabel } from '../src/models.js';
+import "fake-indexeddb/auto";
+global.document = { documentElement: { setAttribute: () => {}, removeAttribute: () => {} }, querySelector: () => ({ setAttribute: () => {} }) };
+global.matchMedia = () => ({ matches: false });
+import { makeSection, sectionLabel, makeStudent, makeEnrollment, makeTeaching, makeSlot, makeSession, makeItem } from '../src/models.js';
+import * as store from '../src/store.js';
 
 test('Section model and UI labels', (t) => {
   const sec = makeSection({ yearId: 'y1', grade: 4, label: 'أ' });
-
-  // 1. Internal representation stays compatible
-  //    name = grade/label (stored as-is for sync identity)
   assert.equal(sec.name, '4/أ');
   assert.equal(sec.grade, 4);
   assert.equal(sec.label, 'أ');
-
-  // 2. User-facing labels render full Arabic
   assert.equal(sectionLabel(sec), 'الرابع الابتدائي / أ');
-
-  // 3. Sync identity is stable — ID format is sec:<uid>
-  //    This MUST remain stable across versions (changing it would break sync identity)
   assert.ok(sec.id.startsWith('sec:'), `Expected ID to start with 'sec:' but got: ${sec.id}`);
+});
+
+test('Section editing preserves relationships and history', async (t) => {
+  try {
+    await store.init();
+    const year = store.activeYear();
+    const term = store.activeTerm();
+
+    // Create section رابع / 1
+    const sec = await store.createSection({ grade: 4, label: '1', yearId: year.id });
+    const tch = await store.createTeaching({ sectionId: sec.id, subjectId: 'sub:math', termId: term.id });
+    
+    // Attach relations
+    const st = makeStudent({ name: 'Test Student' });
+    await store.upsert('students', st);
+    const en = makeEnrollment({ studentId: st.id, sectionId: sec.id, yearId: year.id, rollNo: 1, status: 'active' });
+    await store.upsert('enrollments', en);
+
+    const slot = makeSlot({ teachingId: tch.id, weekday: 1, period: 1 });
+    await store.upsert('slots', slot);
+    
+    const session = makeSession({ teachingId: tch.id, date: '2026-09-01', period: 1 });
+    await store.upsert('sessions', session);
+    
+    const att = { id: `at:${st.id}:${session.id}`, studentId: st.id, sessionId: session.id, status: 'present' };
+    await store.upsert('attendance', att);
+    
+    const item = makeItem({ teachingId: tch.id, name: 'Test Item', maxScore: 10 });
+    await store.upsert('items', item);
+    
+    const score = { id: `sc:${st.id}:${item.id}`, studentId: st.id, itemId: item.id, score: 9 };
+    await store.upsert('scores', score);
+
+    // Edit section to رابع / 5
+    await store.editSection(sec.id, { grade: 4, label: '5' });
+
+    // Assert logical identity preserved
+    const updated = store.getSection(sec.id);
+    assert.equal(updated.name, '4/5');
+    assert.equal(updated.grade, 4);
+    assert.equal(updated.label, '5');
+
+    // Assert no duplicate
+    const allSections = store.sections();
+    assert.equal(allSections.filter(s => s.id === sec.id).length, 1);
+    assert.equal(allSections.filter(s => s.grade === 4 && s.label === '1').length, 0);
+
+    // Assert relationships preserved
+    const roster = store.sectionRoster(sec.id);
+    assert.equal(roster.length, 1);
+    assert.equal(roster[0].id, st.id);
+
+    assert.equal(store.slotsOf(tch.id).length, 1);
+    assert.equal(store.sessionsOf(tch.id).length, 1);
+    assert.equal(store.attendanceOf(st.id).length, 1);
+    assert.equal(store.scoresOf(st.id).length, 1);
+
+    // Assert duplicate edit rejection
+    const sec2 = await store.createSection({ grade: 4, label: '6', yearId: year.id });
+    await assert.rejects(
+      store.editSection(sec.id, { grade: 4, label: '6' }),
+      /موجود مسبقاً/
+    );
+  } catch (err) {
+    console.error("TEST FAILED WITH ERROR:", err);
+    throw err;
+  } finally {
+    store.closeChannel();
+    const db = await import('../src/lib/db.js');
+    db.closeDB();
+  }
 });

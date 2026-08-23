@@ -221,9 +221,9 @@ export default {
       const defSub = subs[0]?.id;
 
       const items = [
-        { grade: 4, label: 'أ' }, { grade: 4, label: 'ب' }, { grade: 4, label: 'ج' },
-        { grade: 5, label: 'أ' }, { grade: 5, label: 'ب' }, { grade: 5, label: 'ج' },
-        { grade: 6, label: 'أ' }, { grade: 6, label: 'ب' }, { grade: 6, label: 'ج' }
+        { grade: 5, label: '1' }, { grade: 5, label: '2' }, { grade: 5, label: '3' }, { grade: 5, label: '4' },
+        { grade: 5, label: '5' }, { grade: 5, label: '6' }, { grade: 5, label: '7' }, { grade: 5, label: '8' },
+        { grade: 6, label: '6' }, { grade: 6, label: '7' }
       ];
 
       const selected = await new Promise(resolve => {

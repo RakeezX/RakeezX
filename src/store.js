@@ -769,7 +769,8 @@ export async function editSection(id, data) {
   if (duplicate) throw new Error(`الفصل ${duplicate.name} موجود مسبقاً.`);
   
   const { makeSection } = await import('./models.js');
-  const updated = makeSection({ ...existing, ...data, id });
+  const name = `${data.grade}/${data.label}`;
+  const updated = makeSection({ ...existing, ...data, name, id });
   await patch('sections', id, { grade: updated.grade, label: updated.label, name: updated.name });
   return updated;
 }
