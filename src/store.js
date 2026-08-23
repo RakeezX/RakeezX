@@ -230,6 +230,17 @@ async function ensureFoundation() {
   // ملفات التوقيت المبدئية — سجلات قابلة للتعديل، لا ثوابت
   if (!live(state.timeProfiles).length) {
     DEFAULT_TIME_PROFILES.forEach((p, i) => push('timeProfiles', makeTimeProfile({ ...p, order: i })));
+  } else {
+    // Auto-upgrade legacy default profiles that lack exact official configs
+    live(state.timeProfiles).forEach((p) => {
+      const defaultProfile = DEFAULT_TIME_PROFILES.find(dp => dp.name === p.name);
+      if (defaultProfile && (!p.overrides || !p.overrides.config)) {
+        p.periods = defaultProfile.periods;
+        p.overrides = defaultProfile.overrides;
+        p.updatedAt = now();
+        (writes.timeProfiles ??= []).push(p);
+      }
+    });
   }
 
   const terms = live(state.terms).filter((t) => t.yearId === year.id)
@@ -601,11 +612,13 @@ export function resolveProfile(profile, date) {
   const day = activeCal ? calendarDaysOf(activeCal.id).find((d) => d.date === date) : null;
   
   if (day?.kind === 'remote') {
-    // التوقيت المدمج يحتوي بيانات عن بُعد في داخله أو كنوع افتراضي، 
-    // ولكن للتسهيل يمكن استخراجها من overrides.remote إذا كانت موجودة،
-    // أو نكتفي بإرجاعه هو إذا كان قد بُرمج ليحتوي أوقات 'عن بُعد'
-    // أو يمكن تجميعها افتراضيًا في overrides['remote']
-    return { ...profile, periods: profile.overrides?.remote ?? profile.periods, overrides: {} };
+    return { 
+      ...profile, 
+      periods: profile.overrides?.remote ?? profile.periods, 
+      overrides: {
+        config: { type: 'remote', assembly: { enabled: false }, recess: { enabled: false }, gap: 0 }
+      } 
+    };
   }
   
   // إذا كان يوم دراسة عادياً، نبحث عن الملف الحضوري الفعّال في هذا التاريخ
@@ -1113,10 +1126,11 @@ export async function generateHybridCalendar(calId, startDate, endDate) {
       continue;
     }
 
-    const isWeekA = weekIndex % 2 === 0;
-    // A: remote on Wed (3), Thu (4)
+    // الأسبوع الأول هو B (الثلاثاء-الخميس عن بُعد)، والثاني A (الأربعاء-الخميس عن بُعد).
+    const isWeekB = weekIndex % 2 === 0;
     // B: remote on Tue (2), Wed (3), Thu (4)
-    const isRemote = isWeekA ? (wd >= 3) : (wd >= 2);
+    // A: remote on Wed (3), Thu (4)
+    const isRemote = isWeekB ? (wd >= 2) : (wd >= 3);
 
     if (isRemote) {
       // لا نستبدل الإجازات أو الأيام المحددة مسبقًا بـ 'remote'

@@ -251,6 +251,8 @@ export function generateAdvancedPeriods(config) {
       cursor = end;
       if (config.recess?.enabled && i === (config.recess.afterPeriod || 3)) {
         cursor += (config.recess.duration || 0) + (config.recess.transition || 0);
+      } else {
+        cursor += (config.gap || 0);
       }
     }
     return periods;
@@ -278,6 +280,8 @@ export function generateAdvancedPeriods(config) {
       cursor = end;
       if (config.recess?.enabled && i === path.afterPeriod) {
         cursor += (config.recess.duration || 0) + (config.recess.transition || 0);
+      } else {
+        cursor += (config.gap || 0);
       }
     }
   }
@@ -325,6 +329,51 @@ export const makeTimeProfile = (o = {}) => ({
   ...o,
 });
 
+export const TIMING_PRESETS = {
+  summer: {
+    type: 'summer', gap: 0,
+    assembly: { enabled: true, start: '06:45', duration: 15 },
+    firstPeriodStart: '07:00', periodDuration: 45, count: 7,
+    recess: {
+      enabled: true, duration: 20, transition: 5,
+      rules: [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }]
+    }
+  },
+  winter: {
+    type: 'winter', gap: 0,
+    assembly: { enabled: true, start: '07:15', duration: 15 },
+    firstPeriodStart: '07:30', periodDuration: 45, count: 7,
+    recess: {
+      enabled: true, duration: 20, transition: 0,
+      rules: [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }]
+    }
+  },
+  ramadan: {
+    type: 'ramadan', gap: 0,
+    assembly: { enabled: false },
+    firstPeriodStart: '09:00', periodDuration: 35, count: 6,
+    recess: { enabled: false }
+  },
+  remote: {
+    type: 'remote', gap: 0,
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 30, count: 8,
+    recess: { enabled: false }
+  },
+  custom: {
+    type: 'custom', gap: 0,
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 40, count: 7,
+    recess: { enabled: false }
+  },
+  hybrid: {
+    type: 'hybrid', gap: 0,
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 30, count: 8,
+    recess: { enabled: false }
+  }
+};
+
 /**
  * الملفات المبدئية — **سجلات قابلة للتعديل والحذف وإعادة التسمية**، لا ثوابت
  * في الشيفرة. تُنشأ مرة واحدة عند أول تشغيل ثم تصير ملك المعلّم.
@@ -332,22 +381,24 @@ export const makeTimeProfile = (o = {}) => ({
 export const DEFAULT_TIME_PROFILES = [
   {
     name: 'التوقيت الصيفي',
-    periods: buildPeriods(7, '06:45', 40, 5),
+    periods: generateAdvancedPeriods(TIMING_PRESETS.summer),
+    overrides: { config: TIMING_PRESETS.summer }
   },
   {
     name: 'التوقيت الشتوي',
-    periods: buildPeriods(7, '07:30', 40, 5),
+    periods: generateAdvancedPeriods(TIMING_PRESETS.winter),
+    overrides: { config: TIMING_PRESETS.winter }
   },
   {
     name: 'توقيت رمضان',
-    periods: buildPeriods(5, '09:00', 30, 5),
+    periods: generateAdvancedPeriods(TIMING_PRESETS.ramadan),
+    overrides: { config: TIMING_PRESETS.ramadan }
   },
   {
     name: 'التوقيت المدمج',
-    periods: buildPeriods(7, '06:45', 40, 5),
-    // مثال جاهز للتعديل: يوم عن بُعد بأوقات مختلفة
-    overrides: { 3: buildPeriods(5, '09:00', 30, 10) },
-  },
+    periods: generateAdvancedPeriods(TIMING_PRESETS.hybrid),
+    overrides: { config: TIMING_PRESETS.hybrid, remote: generateAdvancedPeriods(TIMING_PRESETS.remote) }
+  }
 ];
 
 /** وقت حصة برقمها في يوم معيّن — يقدّم استثناء اليوم على الافتراضي. إذا مُرر الصف الدراسي يُفضل المخصص له. */
