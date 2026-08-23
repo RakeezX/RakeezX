@@ -1,20 +1,14 @@
--- RAKEEZ X Phase 5D Data Cleanup Script
--- Execute this in the Supabase SQL Editor to clean up timetable test data for the test account.
+-- Safe Test Cleanup Script for Phase 5D
+-- Test owner MUST be exactly: 9e3a9858-50bb-470e-91f6-8ea901ffb030
+-- Safely deletes timetable test data ONLY for this specific test user.
+-- Preserves all core structural entities (years, terms, teachings, students, items, scores, profile).
 
-DO  
-DECLARE
-  -- To find the target UUID, you can query:
-  -- SELECT owner_id, teacher_name FROM rakeezx.profile;
-  target_owner uuid := 'REPLACE_WITH_TEST_ACCOUNT_UUID'; 
-BEGIN
-  -- 1. Delete Sessions (attendance deletes cascade automatically)
-  DELETE FROM rakeezx.sessions WHERE owner_id = target_owner;
-  
-  -- 2. Delete Slots
-  DELETE FROM rakeezx.slots WHERE owner_id = target_owner;
-  
-  -- 3. Delete Time Profiles
-  DELETE FROM rakeezx.time_profiles WHERE owner_id = target_owner;
+BEGIN;
 
-  RAISE NOTICE 'Timetable cleanup complete for %', target_owner;
-END ;
+-- Safe FK order deletion for the test user ONLY
+DELETE FROM rakeezx.attendance WHERE owner_id = '9e3a9858-50bb-470e-91f6-8ea901ffb030';
+DELETE FROM rakeezx.sessions WHERE owner_id = '9e3a9858-50bb-470e-91f6-8ea901ffb030';
+DELETE FROM rakeezx.slots WHERE owner_id = '9e3a9858-50bb-470e-91f6-8ea901ffb030';
+DELETE FROM rakeezx.time_profiles WHERE owner_id = '9e3a9858-50bb-470e-91f6-8ea901ffb030';
+
+COMMIT;
