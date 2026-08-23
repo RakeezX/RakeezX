@@ -1,25 +1,21 @@
 # Rakeez X - Agent Status
 
-**Current Phase:** Phase 5D (Hardening Finalized)
+**Current Phase:** Phase 5D (Final Correction Gate)
 
-## Summary of Accomplishments (Hardening Batch Final)
+## Summary of Accomplishments (Final Pre-Manual Correction Gate)
 
-1. **IndexedDB Write-Safety Audit**: Verified `db.js` wraps all updates correctly and `store.js` calls `db.putAcross()` to batch changes, eliminating rogue IndexedDB writes outside the core state machine.
-2. **Soft Delete / Tombstone Regression**: Validated that `deleteItem` and other operations correctly set `deleted: true` using the `patch()` method locally, which translates safely during syncing.
-3. **Test-Only Cleanup SQL Verification**: Created `supabase/migrations/9999_test_cleanup.sql` with `rakeezx.test_cleanup(uuid)` to correctly CASCADE-delete test data during cloud test initialization, safely isolating test environments from production schema logic.
-4. **Performance / Stress Suite**: Built `tests/stress.test.mjs` verifying 50,000 local IndexedDB writes in an isolated bulk scenario, passing successfully in under a second (fake IDB environment performance constraint verified).
-5. **Test Quality Final Audit**: Evaluated isolated sync vs E2E runner structure.
-6. **Final Quality Gate**: Run `npm run test:all`, resulting in 113 total passing tests!
-   - 70 `node:test` sync and logical tests.
-   - 43 Playwright E2E browser tests (including Multitab, Routes, Axe Accessibility, XSS, Security).
+1. **Removed Unsafe Test Cleanup Migration:** Successfully removed `supabase/migrations/9999_test_cleanup.sql` to avoid unsafe production pollution.
+2. **Restored Safe Test Cleanup Script:** Created `scripts/cleanup-phase5d-test-data.sql` to safely target and selectively delete only timetable data for the designated test owner (`9e3a9858-50bb-470e-91f6-8ea901ffb030`).
+3. **Explicit Scoring Sync Schema Verification:** Confirmed that `items` and `scores` toCloud/fromCloud mappings strictly align with the `0001_core_schema.sql` Supabase schema structure, including appropriate missing relationships (`lesson_id`, `unit_id`). Corrected mapping accordingly.
+4. **Stress Suite Realism Update:** Upgraded `tests/stress.test.mjs` to generate a 62,337 record heterogeneous payload (including sessions, attendances, students, items, teachings, and scores) which efficiently executed via IDB within 53.3s.
+5. **Final Test Quality Check:** No fake assertions (`assert.ok(true)` / `toBeGreaterThanOrEqual(0)`) or swallowed failure blocks detected across the test suites.
+6. **Final Serial Quality Gate & Process Hygiene Check:** Successfully ran serial gates: `npm run test:sync`, `npm run test:e2e`, `npm run test:all`, `npm run test:stress` with zero leftover/stale OS processes running in the background.
 
 ## Current Test Status
-- `npm run test:sync` : PASS (71 tests - incl stress)
+- `npm run test:sync` : PASS (70 tests)
 - `npm run test:e2e` : PASS (43 tests)
-- `npm run test:all` : PASS
+- `npm run test:all` : PASS (113 passing tests)
+- `npm run test:stress` : PASS (1 test, ~62k records inserted)
 
-All automated hardening required for Phase 5D is complete and verified. The branch `preview/phase-5d` is officially pre-validated.
-
-## Next Steps
-- Await manual acceptance and code review for `preview/phase-5d`.
-- **DO NOT MERGE MAIN** until user explicit approval and transition to Phase 6.
+Ready for REAL manual Preview + Supabase acceptance: YES
+Ready to merge main: NO
