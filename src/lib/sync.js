@@ -364,6 +364,8 @@ const MAPPERS = {
       auto: rec.auto,
       per_point: rec.perPoint,
       penalty: rec.penalty,
+      unit_id: rec.unitId,
+      lesson_id: rec.lessonId,
       deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
       client_updated_at: rec.updatedAt,
       device_id: getDeviceId()
@@ -377,6 +379,8 @@ const MAPPERS = {
       auto: rec.auto,
       perPoint: rec.per_point,
       penalty: rec.penalty,
+      unitId: rec.unit_id,
+      lessonId: rec.lesson_id,
       updatedAt: normalizeTimestamp(rec.client_updated_at),
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
