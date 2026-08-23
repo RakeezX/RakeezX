@@ -582,12 +582,38 @@ export const activeTimeProfile = () =>
   getTimeProfile(state.device?.activeTimeProfileId) ?? timeProfiles()[0] ?? null;
 
 /** وقت حصة برقمها في يوم — من الملف النشط ما لم يُطلب غيره. */
-export const timeFor = (wd, period, profile = activeTimeProfile()) =>
-  periodTime(profile, wd, period);
+export const timeFor = (wd, period, profile = activeTimeProfile(), grade = null, date = null) => {
+  const p = resolveProfile(profile, date);
+  return periodTime(p, wd, period, grade);
+};
 
 /** أرقام الحصص المتاحة في يوم حسب الملف النشط. */
-export const availablePeriods = (wd = null, profile = activeTimeProfile()) =>
-  periodNumbers(profile, wd);
+export const availablePeriods = (wd = null, profile = activeTimeProfile(), date = null) => {
+  const p = resolveProfile(profile, date);
+  return periodNumbers(p, wd);
+};
+
+/** يستنتج الملف الفعلي ليوم معين (خاصة لفك التوقيت المدمج). */
+export function resolveProfile(profile, date) {
+  if (!profile || profile.overrides?.config?.type !== 'hybrid' || !date) return profile;
+  
+  const activeCal = activeCalendar();
+  const day = activeCal ? calendarDaysOf(activeCal.id).find((d) => d.date === date) : null;
+  
+  if (day?.kind === 'remote') {
+    // التوقيت المدمج يحتوي بيانات عن بُعد في داخله أو كنوع افتراضي، 
+    // ولكن للتسهيل يمكن استخراجها من overrides.remote إذا كانت موجودة،
+    // أو نكتفي بإرجاعه هو إذا كان قد بُرمج ليحتوي أوقات 'عن بُعد'
+    // أو يمكن تجميعها افتراضيًا في overrides['remote']
+    return { ...profile, periods: profile.overrides?.remote ?? profile.periods, overrides: {} };
+  }
+  
+  // إذا كان يوم دراسة عادياً، نبحث عن الملف الحضوري الفعّال في هذا التاريخ
+  const physical = timeProfiles().find(
+    (p) => p.id !== profile.id && p.activeFrom <= date && (!p.activeTo || p.activeTo >= date)
+  );
+  return physical ?? profile;
+}
 
 export const setActiveTimeProfile = (id) => patchDevice({ activeTimeProfileId: id });
 
@@ -975,7 +1001,9 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
 
   // يُطبع وقت الحصة فيها الآن من الملف النشط. تغيير الملف لاحقًا لا يمسّها.
   const profile = activeTimeProfile();
-  const t = timeFor(weekday(date), period, profile);
+  const tch = getTeaching(tchId);
+  const sec = tch ? getSection(tch.sectionId) : null;
+  const t = timeFor(weekday(date), period, profile, sec?.grade, date);
   const slot = live(state.slots).find(
     (s) => s.teachingId === tchId && s.weekday === weekday(date) && s.period === period
   );
@@ -1059,6 +1087,53 @@ export async function setCalendarDay(calId, date, kind, label = '') {
 }
 
 export const removeCalendarDay = (id) => softDelete('calendarDays', id);
+
+/**
+ * يولّد تقويم هجين متناوب أسبوعيًا.
+ * الأسبوع A: الأحد-الثلاثاء (حضوري)، الأربعاء-الخميس (عن بُعد)
+ * الأسبوع B: الأحد-الإثنين (حضوري)، الثلاثاء-الخميس (عن بُعد)
+ * الأيام الحضورية لا تُضاف (لتتبع الافتراضي)، والعن بُعد تُضاف كـ remote.
+ * لا يمس أيام الإجازات الموجودة.
+ */
+export async function generateHybridCalendar(calId, startDate, endDate) {
+  const { shiftDate, weekday, calendarDayId, makeCalendarDay } = await import('./models.js');
+  
+  let current = startDate;
+  let weekIndex = 0;
+  const newDays = [];
+  const existingDays = calendarDaysOf(calId);
+
+  while (current <= endDate) {
+    const wd = weekday(current);
+    
+    // إجازة الأسبوع
+    if (wd === 5 || wd === 6) {
+      if (wd === 6) weekIndex++; // انتهى الأسبوع، نبدّل
+      current = shiftDate(current, 1);
+      continue;
+    }
+
+    const isWeekA = weekIndex % 2 === 0;
+    // A: remote on Wed (3), Thu (4)
+    // B: remote on Tue (2), Wed (3), Thu (4)
+    const isRemote = isWeekA ? (wd >= 3) : (wd >= 2);
+
+    if (isRemote) {
+      // لا نستبدل الإجازات أو الأيام المحددة مسبقًا بـ 'remote'
+      const existing = existingDays.find(d => d.date === current);
+      if (!existing || existing.kind === 'study' || existing.kind === 'remote') {
+        newDays.push(makeCalendarDay({ calendarId: calId, date: current, kind: 'remote', label: 'عن بُعد' }));
+      }
+    }
+    
+    current = shiftDate(current, 1);
+  }
+
+  if (newDays.length) {
+    await save({ calendarDays: newDays });
+  }
+}
+
 
 /* ---------- عمليات: الرصد السريع ---------- */
 

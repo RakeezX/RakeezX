@@ -19,8 +19,10 @@ function slotSheet(defaults = {}) {
   const list = store.teachings();
   const profile = store.activeTimeProfile();
 
-  const timeHint = (wd, period) => {
-    const t = store.timeFor(Number(wd), Number(period), profile);
+  const timeHint = (wd, period, tchId) => {
+    const tch = store.getTeaching(tchId);
+    const sec = store.getSection(tch?.sectionId);
+    const t = store.timeFor(Number(wd), Number(period), profile, sec?.grade);
     return t ? fmtRange(t) : 'لا وقت لهذه الحصة في الملف النشط';
   };
 
@@ -73,6 +75,7 @@ function slotSheet(defaults = {}) {
       const text = root.querySelector('#slot-time-text');
 
       const sync = () => {
+        const tchId = form.querySelector('[name="teachingId"]')?.value;
         // أرقام الحصص قد تختلف في يوم له استثناء
         const nums = store.availablePeriods(Number(day.value), profile);
         const wanted = Number(period.value);
@@ -80,10 +83,11 @@ function slotSheet(defaults = {}) {
           .map((p) => `<option value="${p}"${p === wanted ? ' selected' : ''}>الحصة ${p}</option>`)
           .join('');
         if (!nums.includes(wanted) && nums.length) period.value = String(nums[0]);
-        text.textContent = timeHint(day.value, period.value);
+        text.textContent = timeHint(day.value, period.value, tchId);
       };
       day.addEventListener('change', sync);
       period.addEventListener('change', sync);
+      form.querySelector('[name="teachingId"]')?.addEventListener('change', sync);
       sync();
 
       form.addEventListener('submit', (ev) => {
@@ -184,7 +188,7 @@ export default {
                       ${byDay[d].map((s) => {
                         const tch = store.getTeaching(s.teachingId);
                         const sec = store.getSection(tch?.sectionId);
-                        const t = store.timeFor(d, s.period);
+                        const t = store.timeFor(d, s.period, store.activeTimeProfile(), sec?.grade);
                         return html`
                           <div class="slot">
                             <span class="period">${s.period}</span>
@@ -246,7 +250,9 @@ export default {
         toast('هذه الحصة موجودة في الجدول', 'danger');
         return;
       }
-      const t = store.timeFor(data.weekday, data.period);
+      const tch = store.getTeaching(data.teachingId);
+      const sec = store.getSection(tch?.sectionId);
+      const t = store.timeFor(data.weekday, data.period, store.activeTimeProfile(), sec?.grade);
       toast(t ? `أُضيفت — ${fmtRange(t)}` : 'أُضيفت للجدول');
     },
 

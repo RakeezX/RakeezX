@@ -7,58 +7,129 @@
 
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, buildPeriods, fmtRange, makeTimeProfile } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, fmtRange, makeTimeProfile } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let openId = null;
 let overrideDay = null;   // اليوم الذي يُحرَّر استثناؤه، أو null للافتراضي
 
-/** لوحة توليد سريع: عدد الحصص وبدايتها ومدتها والفاصل. */
+const PRESETS = {
+  summer: {
+    type: 'summer',
+    assembly: { enabled: true, start: '06:45', duration: 15 },
+    firstPeriodStart: '07:00', periodDuration: 45, count: 7,
+    recess: {
+      enabled: true, duration: 20, transition: 5,
+      rules: [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }]
+    }
+  },
+  winter: {
+    type: 'winter',
+    assembly: { enabled: true, start: '07:15', duration: 15 },
+    firstPeriodStart: '07:30', periodDuration: 45, count: 7,
+    recess: {
+      enabled: true, duration: 20, transition: 5,
+      rules: [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }]
+    }
+  },
+  ramadan: {
+    type: 'ramadan',
+    assembly: { enabled: false },
+    firstPeriodStart: '09:00', periodDuration: 35, count: 5,
+    recess: { enabled: true, duration: 10, transition: 0, afterPeriod: 3 }
+  },
+  remote: {
+    type: 'remote',
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 30, count: 7,
+    recess: { enabled: true, duration: 10, transition: 0, afterPeriod: 3 }
+  },
+  custom: {
+    type: 'custom',
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 40, count: 7,
+    recess: { enabled: true, duration: 5, transition: 0, afterPeriod: 3 }
+  },
+  hybrid: {
+    type: 'hybrid',
+    // Hybrid uses the physical profile for in-person days.
+    // For remote days, it uses this remote config.
+    // So the periods array stored will be the remote periods!
+    assembly: { enabled: false },
+    firstPeriodStart: '07:00', periodDuration: 30, count: 7,
+    recess: { enabled: true, duration: 10, transition: 0, afterPeriod: 3 }
+  }
+};
+
+/** لوحة توليد سريع: استخدام النماذج المسبقة أو التوليد المخصص. */
 function generateSheet(current = {}) {
   return openSheet({
     title: 'توليد أوقات الحصص',
-    desc: 'يملأ الجدول دفعة واحدة، وتقدر تعدّل أي حصة بعدها.',
+    desc: 'اختر نموذجاً مسبقاً أو أدخل أوقاتاً مخصصة.',
     body: html`
       <form id="gen-form">
-        <div class="field-row">
-          <label class="field">
-            <span class="field__label">عدد الحصص</span>
-            <input class="input tabular" name="count" type="number" min="1" max="12"
-                   value="${current.count ?? 7}" required>
-          </label>
-          <label class="field">
-            <span class="field__label">بداية الحصة الأولى</span>
-            <input class="input tabular" name="start" type="time" value="${current.start ?? '07:00'}" required>
-          </label>
-        </div>
-        <div class="field-row">
-          <label class="field">
-            <span class="field__label">مدة الحصة (دقيقة)</span>
-            <input class="input tabular" name="minutes" type="number" min="5" max="120"
-                   value="${current.minutes ?? 40}" required>
-          </label>
-          <label class="field">
-            <span class="field__label">الفاصل بين الحصص</span>
-            <input class="input tabular" name="gap" type="number" min="0" max="60"
-                   value="${current.gap ?? 5}" required>
-          </label>
+        <label class="field mb-4">
+          <span class="field__label">نموذج التوقيت</span>
+          <select class="select" name="preset" id="preset-sel">
+            <option value="summer">التوقيت الصيفي (حسب الدليل)</option>
+            <option value="winter">التوقيت الشتوي (حسب الدليل)</option>
+            <option value="ramadan">توقيت شهر رمضان</option>
+            <option value="hybrid">التوقيت المدمج (حضوري / عن بُعد)</option>
+            <option value="remote">توقيت التعليم عن بُعد</option>
+            <option value="custom">مخصص (حصص متساوية)</option>
+          </select>
+        </label>
+        
+        <div id="custom-fields" style="display: none;">
+          <div class="field-row">
+            <label class="field">
+              <span class="field__label">عدد الحصص</span>
+              <input class="input tabular" name="count" type="number" min="1" max="12" value="7">
+            </label>
+            <label class="field">
+              <span class="field__label">بداية الحصة الأولى</span>
+              <input class="input tabular" name="start" type="time" value="07:00">
+            </label>
+          </div>
+          <div class="field-row">
+            <label class="field">
+              <span class="field__label">مدة الحصة (دقيقة)</span>
+              <input class="input tabular" name="minutes" type="number" min="5" max="120" value="40">
+            </label>
+            <label class="field">
+              <span class="field__label">الفاصل بين الحصص</span>
+              <input class="input tabular" name="gap" type="number" min="0" max="60" value="5">
+            </label>
+          </div>
         </div>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="gen-form" type="submit">ولّد</button>
+      <button class="btn btn--primary" form="gen-form" type="submit">ولّد الأوقات</button>
     `,
     onMount: (root, done) => {
+      const sel = root.querySelector('#preset-sel');
+      const cust = root.querySelector('#custom-fields');
+      sel.addEventListener('change', () => {
+        cust.style.display = sel.value === 'custom' ? 'block' : 'none';
+      });
+      
       root.querySelector('#gen-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
-        done({
-          count: Number(fd.get('count')),
-          start: String(fd.get('start')),
-          minutes: Number(fd.get('minutes')),
-          gap: Number(fd.get('gap')),
-        });
+        const type = fd.get('preset');
+        if (type !== 'custom') {
+          done(PRESETS[type]);
+        } else {
+          done({
+            type: 'custom',
+            firstPeriodStart: String(fd.get('start')),
+            periodDuration: Number(fd.get('minutes')),
+            count: Number(fd.get('count')),
+            recess: { enabled: true, duration: Number(fd.get('gap')), transition: 0, afterPeriod: 3 }
+          });
+        }
       });
     },
   });
@@ -195,6 +266,12 @@ export default {
           <div class="fw-7">${open.name}</div>
           <button class="btn btn--sm btn--quiet push" data-act="generate">${icon('spark')} توليد سريع</button>
         </div>
+        ${open.overrides?.config?.assembly?.enabled ? html`
+          <p class="t-3 fs-xs mb-3">
+            الطابور الصباحي: <span class="tabular">${open.overrides.config.assembly.start}</span>
+            (${open.overrides.config.assembly.duration} د)
+          </p>
+        ` : ''}
 
         <div class="field">
           <span class="field__label">الأوقات المعروضة</span>
@@ -278,7 +355,7 @@ export default {
     async 'add-profile'() {
       const data = await nameSheet();
       if (!data) return;
-      const p = await store.createTimeProfile({ ...data, periods: buildPeriods(7, '07:00', 40, 5) });
+      const p = await store.createTimeProfile({ ...data, periods: generateAdvancedPeriods(PRESETS.custom) });
       openId = p.id;
       toast('أُنشئ ملف التوقيت');
     },
@@ -319,7 +396,15 @@ export default {
         start: cur[0]?.start ?? '07:00',
       });
       if (!data) return;
-      await writeList(p, buildPeriods(data.count, data.start, data.minutes, data.gap));
+      
+      const newPeriods = generateAdvancedPeriods(data);
+      await writeList(p, newPeriods);
+      
+      // Save the config to overrides so we know if it's Hybrid
+      const overrides = { ...(p.overrides ?? {}) };
+      overrides.config = data;
+      await store.patch('timeProfiles', p.id, { overrides });
+      
       toast('وُلّدت الأوقات');
     },
 

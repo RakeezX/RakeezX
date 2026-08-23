@@ -174,11 +174,12 @@ export const CALENDAR_KIND = {
   study:    { label: 'يوم دراسة',    teaching: true },
   exam:     { label: 'اختبارات',     teaching: true },
   event:    { label: 'فعالية',       teaching: true },
+  remote:   { label: 'عن بُعد',      teaching: true },
   holiday:  { label: 'إجازة',        teaching: false },
   national: { label: 'اليوم الوطني', teaching: false },
   founding: { label: 'يوم التأسيس',  teaching: false },
 };
-export const CALENDAR_KIND_ORDER = ['study', 'holiday', 'national', 'founding', 'exam', 'event'];
+export const CALENDAR_KIND_ORDER = ['study', 'remote', 'holiday', 'national', 'founding', 'exam', 'event'];
 
 /** هل يوم بهذا التصنيف يُدرَّس فيه؟ */
 export const isTeachingDay = (kind) => CALENDAR_KIND[kind]?.teaching ?? true;
@@ -207,6 +208,110 @@ export function buildPeriods(count, startTime, minutes, breakMinutes) {
     cursor = end + breakMinutes;
     return { period: i + 1, start: fmt(start), end: fmt(end) };
   });
+}
+
+/** 
+ * يولّد حصص بتوقيتات متقدمة (طابور، فُسح مخصصة لصفوف معينة).
+ * config = {
+ *   assembly: { enabled: true, start: '06:45', duration: 15 },
+ *   firstPeriodStart: '07:00',
+ *   periodDuration: 45,
+ *   count: 7,
+ *   recess: {
+ *     enabled: true,
+ *     duration: 20,
+ *     transition: 5,
+ *     rules: [
+ *       { grades: [4], afterPeriod: 2 },
+ *       { grades: [5, 6], afterPeriod: 3 }
+ *     ]
+ *   }
+ * }
+ */
+export function generateAdvancedPeriods(config) {
+  const parseTime = (t) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+  const fmt = (mins) => {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(Math.floor(mins / 60) % 24)}:${pad(mins % 60)}`;
+  };
+
+  const periods = [];
+  const rules = config.recess?.enabled && config.recess?.rules?.length ? config.recess.rules : [];
+  
+  if (!rules.length) {
+    // Basic flat generation, but check if there's a simple global recess
+    let cursor = parseTime(config.firstPeriodStart);
+    for (let i = 1; i <= config.count; i++) {
+      const start = cursor;
+      const end = start + config.periodDuration;
+      periods.push({ period: i, start: fmt(start), end: fmt(end) });
+      cursor = end;
+      if (config.recess?.enabled && i === (config.recess.afterPeriod || 3)) {
+        cursor += (config.recess.duration || 0) + (config.recess.transition || 0);
+      }
+    }
+    return periods;
+  }
+
+  // Complex generation: track each rule group and the default group independently.
+  // The 'default' group is for grades not covered by any rule, but the prompt says 
+  // "all grades converge again at P4", which means they just follow the max time? 
+  // Actually, if we compute each rule path, and a default path:
+  const paths = [
+    ...rules.map(r => ({ grades: r.grades, afterPeriod: r.afterPeriod })),
+    { grades: null, afterPeriod: Math.max(...rules.map(r => r.afterPeriod)) } // Default follows the latest break
+  ];
+
+  for (let path of paths) {
+    let cursor = parseTime(config.firstPeriodStart);
+    for (let i = 1; i <= config.count; i++) {
+      const start = cursor;
+      const end = start + config.periodDuration;
+      
+      const p = { period: i, start: fmt(start), end: fmt(end) };
+      if (path.grades) p.grades = path.grades;
+      periods.push(p);
+      
+      cursor = end;
+      if (config.recess?.enabled && i === path.afterPeriod) {
+        cursor += (config.recess.duration || 0) + (config.recess.transition || 0);
+      }
+    }
+  }
+
+  // Deduplicate identical periods
+  const unique = [];
+  const sig = (p) => `${p.period}|${p.start}|${p.end}`;
+  const grouped = {};
+  for (let p of periods) {
+    const s = sig(p);
+    if (!grouped[s]) grouped[s] = [];
+    if (p.grades) grouped[s].push(...p.grades);
+    else grouped[s].isDefault = true;
+  }
+  
+  for (let s in grouped) {
+    const [periodStr, startStr, endStr] = s.split('|');
+    const p = { period: Number(periodStr), start: startStr, end: endStr };
+    if (!grouped[s].isDefault) {
+      // Only keep unique grades
+      p.grades = Array.from(new Set(grouped[s])).sort((a, b) => a - b);
+    }
+    unique.push(p);
+  }
+  
+  // Sort by period, then by whether it has grades (default last)
+  unique.sort((a, b) => {
+    if (a.period !== b.period) return a.period - b.period;
+    if (a.grades && !b.grades) return -1;
+    if (!a.grades && b.grades) return 1;
+    return 0;
+  });
+
+  return unique;
 }
 
 export const makeTimeProfile = (o = {}) => ({
@@ -245,12 +350,21 @@ export const DEFAULT_TIME_PROFILES = [
   },
 ];
 
-/** وقت حصة برقمها في يوم معيّن — يقدّم استثناء اليوم على الافتراضي. */
-export function periodTime(profile, weekday, period) {
+/** وقت حصة برقمها في يوم معيّن — يقدّم استثناء اليوم على الافتراضي. إذا مُرر الصف الدراسي يُفضل المخصص له. */
+export function periodTime(profile, weekday, period, grade = null) {
   if (!profile) return null;
   const ov = profile.overrides?.[String(weekday)] ?? profile.overrides?.[weekday];
   const list = Array.isArray(ov) && ov.length ? ov : profile.periods;
-  return list?.find((p) => Number(p.period) === Number(period)) ?? null;
+  const matches = list?.filter((p) => Number(p.period) === Number(period)) ?? [];
+  
+  if (!matches.length) return null;
+  
+  if (grade !== null) {
+    const exact = matches.find((p) => Array.isArray(p.grades) && p.grades.includes(Number(grade)));
+    if (exact) return exact;
+  }
+  
+  return matches.find((p) => !p.grades) ?? matches[0];
 }
 
 /** أرقام الحصص المتاحة في ملف توقيت ليوم معيّن. */
@@ -258,7 +372,7 @@ export function periodNumbers(profile, weekday = null) {
   if (!profile) return [1, 2, 3, 4, 5, 6, 7];
   const ov = weekday !== null ? profile.overrides?.[String(weekday)] : null;
   const list = Array.isArray(ov) && ov.length ? ov : profile.periods;
-  return (list ?? []).map((p) => Number(p.period));
+  return Array.from(new Set((list ?? []).map((p) => Number(p.period)))).sort((a, b) => a - b);
 }
 
 export const fmtRange = (t) => (t ? `${t.start} – ${t.end}` : '');

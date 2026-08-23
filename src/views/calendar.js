@@ -147,13 +147,29 @@ export default {
                 أضف الإجازات الرسمية واليوم الوطني ويوم التأسيس وأيام الاختبارات.
                 أي حصة تقع في يوم إجازة تُعلَّم «إجازة رسمية» تلقائيًا.
               </div>
-              <button class="btn btn--primary" data-act="add">${icon('plus')} أضف يومًا</button>
+              <div class="stack stack-2 mt-3">
+                <button class="btn btn--primary" data-act="add">${icon('plus')} أضف يومًا</button>
+                <button class="btn btn--ghost" data-act="generate-hybrid">${icon('spark')} توليد أيام «عن بُعد» (متناوب)</button>
+              </div>
             </div>
           `}
     `;
   },
 
   actions: {
+    async 'generate-hybrid'() {
+      const { todayISO, shiftDate } = await import('../models.js');
+      const start = prompt('تاريخ بداية الفصل؟', todayISO());
+      if (!start) return;
+      const end = prompt('تاريخ نهاية الفصل؟', shiftDate(start, 90));
+      if (!end) return;
+      
+      const cal = await store.ensureCalendar();
+      await store.generateHybridCalendar(cal.id, start, end);
+      const { repaint } = await import('../repaint.js');
+      repaint();
+    },
+
     async add() {
       const data = await daySheet();
       if (!data) return;
