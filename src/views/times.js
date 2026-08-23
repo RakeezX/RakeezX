@@ -273,9 +273,9 @@ function nameSheet(existing = null) {
           const profiles = store.timeProfiles().filter(p => p.id !== existing?.id && p.activeFrom);
           for (const p of profiles) {
             const overlap = (
-              (activeFrom >= p.activeFrom && (!p.activeTo || activeFrom <= p.activeTo)) ||
-              (activeTo && activeTo >= p.activeFrom && (!p.activeTo || activeTo <= p.activeTo)) ||
-              (activeFrom <= p.activeFrom && (!activeTo || activeTo >= p.activeFrom))
+              (activeFrom === p.activeFrom) ||
+              (p.activeTo && activeFrom >= p.activeFrom && activeFrom <= p.activeTo) ||
+              (activeTo && p.activeFrom >= activeFrom && p.activeFrom <= activeTo)
             );
             if (overlap) {
               const rangeStr = p.activeTo ? `من ${p.activeFrom} إلى ${p.activeTo}` : `من ${p.activeFrom} فصاعدًا`;

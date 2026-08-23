@@ -2,15 +2,13 @@
    RAKEEZ X — نظام التصميم
    عربي أولًا، RTL، ومصمم ليُستعمل بإبهام واحد والمعلّم واقف بين طلابه.
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
-
 /* ---------- 1. الرموز (tokens) ---------- */
 :root {
   color-scheme: light dark;
 
   /* الخط */
-  --font: "IBM Plex Sans Arabic", "SF Arabic", "Segoe UI", system-ui, -apple-system, "Noto Sans Arabic", sans-serif;
-  --font-num: "IBM Plex Sans Arabic", "SF Arabic", "Segoe UI", system-ui, sans-serif;
+  --font: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-num: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
 
   /* المقاسات */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;

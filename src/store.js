@@ -753,7 +753,11 @@ export async function createSubject(data) {
 
 export async function createSection(data) {
   const year = activeYear();
-  const existing = sections().find(s => s.grade === Number(data.grade) && s.label === data.label);
+  const existing = sections().find(s => 
+    s.yearId === year?.id && 
+    s.grade === Number(data.grade) && 
+    s.label === data.label
+  );
   if (existing) throw new Error(`الفصل ${existing.name} موجود مسبقاً.`);
   
   const s = makeSection({ yearId: year?.id, order: sections().length, ...data });
@@ -765,7 +769,12 @@ export async function editSection(id, data) {
   const existing = getSection(id);
   if (!existing) throw new Error('الفصل غير موجود.');
   
-  const duplicate = sections().find(s => s.id !== id && s.grade === Number(data.grade) && s.label === data.label);
+  const duplicate = sections().find(s => 
+    s.id !== id && 
+    s.yearId === existing.yearId && 
+    s.grade === Number(data.grade) && 
+    s.label === data.label
+  );
   if (duplicate) throw new Error(`الفصل ${duplicate.name} موجود مسبقاً.`);
   
   const { makeSection } = await import('./models.js');
