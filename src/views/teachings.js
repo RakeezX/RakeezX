@@ -138,14 +138,25 @@ export default {
     const closed = term ? store.isTermClosed(term.id) : false;
 
     if (!list.length) {
+      const yearSecs = store.sections();
       return html`
         <div class="empty">
           <div class="empty__icon">${icon('classes')}</div>
           <div class="empty__title">لا فصول في ${term?.name ?? 'هذا الفصل الدراسي'}</div>
-          <div class="empty__text">
-            أنشئ شعبتك الأولى وأسند إليها مادتك، ويأتي معها نموذج بنود تقييم جاهز.
-          </div>
-          <button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button>
+          
+          ${yearSecs.length === 0 ? html`
+            <div class="card card--pad mt-4 center" style="background: var(--surface-1); border: 1px dashed var(--border);">
+              <div class="fw-7 mb-2">لا توجد فصول بعد في هذا العام</div>
+              <p class="t-3 fs-sm mb-3">هل تريد إضافة فصولك بسرعة؟</p>
+              <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} أضف الفصول الأساسية</button>
+            </div>
+            <div class="mt-4"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button></div>
+          ` : html`
+            <div class="empty__text">
+              أنشئ شعبتك الأولى وأسند إليها مادتك، ويأتي معها نموذج بنود تقييم جاهز.
+            </div>
+            <button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button>
+          `}
         </div>
       `;
     }
@@ -188,8 +199,7 @@ export default {
         return;
       }
 
-      const secId = mkSectionId(year.id, data.grade, data.label);
-      let section = store.getSection(secId);
+      let section = store.sections().find(s => s.grade === Number(data.grade) && s.label === data.label);
       if (!section) {
         section = await store.createSection({
           yearId: year.id, grade: data.grade, label: data.label,
@@ -200,8 +210,76 @@ export default {
       const tch = await store.createTeaching({
         sectionId: section.id, subjectId: data.subjectId, termId: term.id,
       });
-      toast(`أُنشئ ${sectionLabel(section)}`);
-      go(`/teaching/${tch.id}/students`);
+      toast(`أُسندت ${store.getSubject(data.subjectId)?.name ?? ''} لـ ${data.grade}/${data.label}`);
     },
+
+    async 'seed-sections'() {
+      const year = store.activeYear();
+      const term = store.activeTerm();
+      if (!year || !term) return toast('أنشئ سنة وفصلًا أولًا', 'danger');
+      const subs = store.subjects();
+      const defSub = subs[0]?.id;
+
+      const items = [
+        { grade: 4, label: 'أ' }, { grade: 4, label: 'ب' }, { grade: 4, label: 'ج' },
+        { grade: 5, label: 'أ' }, { grade: 5, label: 'ب' }, { grade: 5, label: 'ج' },
+        { grade: 6, label: 'أ' }, { grade: 6, label: 'ب' }, { grade: 6, label: 'ج' }
+      ];
+
+      const selected = await new Promise(resolve => {
+        openSheet({
+          title: 'الفصول الأساسية',
+          desc: 'حدد الفصول التي تُدرّسها لإضافتها بسرعة',
+          body: html`
+            <form id="seed-form">
+              <label class="field mb-3">
+                <span class="field__label">أسند هذه الفصول لمادة:</span>
+                <select class="select" name="subjectId">
+                  ${subs.map(s => html`<option value="${s.id}">${s.name}</option>`)}
+                </select>
+              </label>
+              <div class="grid grid--3">
+                ${items.map((it, i) => html`
+                  <label class="card card--pad center" style="cursor:pointer; user-select:none; padding: 0.75rem;">
+                    <input type="checkbox" name="sec" value="${i}" class="mb-2" style="transform: scale(1.2);">
+                    <div class="fw-7">الصف ${it.grade}</div>
+                    <div class="t-3 fs-sm">شعبة ${it.label}</div>
+                  </label>
+                `)}
+              </div>
+            </form>
+          `,
+          foot: html`
+            <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+            <button class="btn btn--primary" form="seed-form" type="submit">إضافة المحددة</button>
+          `,
+          onMount: (root, done) => {
+            root.querySelector('#seed-form').addEventListener('submit', (ev) => {
+              ev.preventDefault();
+              const fd = new FormData(ev.target);
+              const checked = fd.getAll('sec').map(Number);
+              const sub = String(fd.get('subjectId'));
+              done({ items: checked.map(i => items[i]), subjectId: sub });
+            });
+          }
+        }).then(resolve).catch(() => resolve(null));
+      });
+
+      if (!selected || !selected.items.length) return;
+
+      let added = 0;
+      for (const it of selected.items) {
+        const col = SECTION_COLORS[added % SECTION_COLORS.length];
+        const sec = await store.createSection({
+          yearId: year.id, grade: it.grade, label: it.label,
+          name: `${it.grade}/${it.label}`, color: col
+        });
+        await store.createTeaching({ sectionId: sec.id, subjectId: selected.subjectId, termId: term.id });
+        added++;
+      }
+      
+      toast(`تم إضافة ${added} إسناد بنجاح`);
+      store.repaint();
+    }
   },
 };

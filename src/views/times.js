@@ -19,11 +19,59 @@ import { TIMING_PRESETS } from '../models.js';
 function generateSheet(current = {}) {
   const formatSummary = (p) => {
     if (p === 'custom') return '';
-    const conf = TIMING_PRESETS[p];
-    if (p === 'summer') return `الطابور: 6:45 ص | بداية الأولى: 7:00 ص | مدة الحصة: 45 د |\nالفسحة: 20 د + 5 د تفويج |\nفسحة رابع: بعد الحصة الثانية |\nفسحة خامس/سادس: بعد الحصة الثالثة |\nعدد الحصص: 7`;
-    if (p === 'winter') return `الطابور: 7:15 ص | بداية الأولى: 7:30 ص | مدة الحصة: 45 د |\nالفسحة: 20 د + 0 د تفويج |\nفسحة رابع: بعد الحصة الثانية |\nفسحة خامس/سادس: بعد الحصة الثالثة |\nعدد الحصص: 7`;
-    if (p === 'ramadan') return `لا يوجد طابور | بداية الأولى: 9:00 ص | مدة الحصة: 35 د | عدد الحصص: 6 | لا توجد فسحة`;
-    if (p === 'hybrid') return `حضوري:\nحسب التوقيت الموسمي النشط للتاريخ\n\nعن بعد:\nالأولى 7:00 ص | 30 دقيقة | 8 حصص\nبدون طابور | بدون فسحة | بدون فاصل بين الحصص`;
+    if (p === 'summer') return `
+      <div class="fw-7 mb-2">التوقيت الصيفي <span class="badge">حسب الدليل</span></div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">الطابور</td><td class="tabular">6:45 ص</td></tr>
+        <tr><td style="color: var(--text-2);">الحصة الأولى</td><td class="tabular">7:00 ص</td></tr>
+        <tr><td style="color: var(--text-2);">مدة الحصة</td><td class="tabular">45 دقيقة</td></tr>
+        <tr><td style="color: var(--text-2);">عدد الحصص</td><td class="tabular">7</td></tr>
+      </table>
+      <div class="fw-7 mt-3 mb-1">الفسحة</div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">رابع</td><td class="tabular">بعد الثانية</td></tr>
+        <tr><td style="color: var(--text-2);">خامس/سادس</td><td class="tabular">بعد الثالثة</td></tr>
+        <tr><td style="color: var(--text-2);">المدة</td><td class="tabular">20 دقيقة + 5 تفويج</td></tr>
+      </table>
+    `;
+    if (p === 'winter') return `
+      <div class="fw-7 mb-2">التوقيت الشتوي <span class="badge">حسب الدليل</span></div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">الطابور</td><td class="tabular">7:15 ص</td></tr>
+        <tr><td style="color: var(--text-2);">الحصة الأولى</td><td class="tabular">7:30 ص</td></tr>
+        <tr><td style="color: var(--text-2);">مدة الحصة</td><td class="tabular">45 دقيقة</td></tr>
+        <tr><td style="color: var(--text-2);">عدد الحصص</td><td class="tabular">7</td></tr>
+      </table>
+      <div class="fw-7 mt-3 mb-1">الفسحة</div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">رابع</td><td class="tabular">بعد الثانية</td></tr>
+        <tr><td style="color: var(--text-2);">خامس/سادس</td><td class="tabular">بعد الثالثة</td></tr>
+        <tr><td style="color: var(--text-2);">المدة</td><td class="tabular">20 دقيقة + بدون تفويج</td></tr>
+      </table>
+    `;
+    if (p === 'ramadan') return `
+      <div class="fw-7 mb-2">توقيت رمضان</div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">الطابور</td><td class="tabular">لا يوجد</td></tr>
+        <tr><td style="color: var(--text-2);">الحصة الأولى</td><td class="tabular">9:00 ص</td></tr>
+        <tr><td style="color: var(--text-2);">مدة الحصة</td><td class="tabular">35 دقيقة</td></tr>
+        <tr><td style="color: var(--text-2);">عدد الحصص</td><td class="tabular">6</td></tr>
+        <tr><td style="color: var(--text-2);">الفسحة</td><td class="tabular">لا توجد</td></tr>
+      </table>
+    `;
+    if (p === 'hybrid') return `
+      <div class="fw-7 mb-2">التوقيت المدمج</div>
+      <div class="fw-7 mt-2 mb-1" style="color: var(--text-1);">الأيام الحضورية</div>
+      <div class="t-3 mb-3">حسب التوقيت الموسمي النشط للتاريخ.</div>
+      <div class="fw-7 mb-1" style="color: var(--text-1);">الأيام عن بُعد (منصة مدرستي)</div>
+      <table style="width: 100%; border-spacing: 0; line-height: 1.8;">
+        <tr><td style="color: var(--text-2);">الطابور</td><td class="tabular">لا يوجد</td></tr>
+        <tr><td style="color: var(--text-2);">الحصة الأولى</td><td class="tabular">7:00 ص</td></tr>
+        <tr><td style="color: var(--text-2);">مدة الحصة</td><td class="tabular">30 دقيقة</td></tr>
+        <tr><td style="color: var(--text-2);">عدد الحصص</td><td class="tabular">8</td></tr>
+        <tr><td style="color: var(--text-2);">الفسحة والفاصل</td><td class="tabular">بدون (متصلة)</td></tr>
+      </table>
+    `;
     return '';
   };
 
@@ -43,9 +91,7 @@ function generateSheet(current = {}) {
           </select>
         </label>
         
-        <div id="preset-summary" class="t-3 fs-xs mb-4 p-3" style="background: var(--surface-2); border-radius: var(--radius-sm); white-space: pre-wrap; line-height: 1.5;">
-          ${formatSummary('summer')}
-        </div>
+        <div id="preset-summary" class="t-3 fs-xs mb-4 p-3" style="background: var(--surface-1); border-radius: var(--radius-sm); border: 1px solid var(--border);"></div>
         
         <div id="custom-fields" style="display: none;">
           <div class="field-row">
@@ -110,10 +156,12 @@ function generateSheet(current = {}) {
           cust.style.display = 'block';
         } else {
           sum.style.display = 'block';
-          sum.textContent = formatSummary(p);
+          sum.innerHTML = formatSummary(p);
           cust.style.display = 'none';
         }
       });
+      // Initialize
+      sum.innerHTML = formatSummary(sel.value);
 
       cbAsm.addEventListener('change', () => asmF.style.display = cbAsm.checked ? 'flex' : 'none');
       cbRec.addEventListener('change', () => recF.style.display = cbRec.checked ? 'block' : 'none');
@@ -155,6 +203,29 @@ function generateSheet(current = {}) {
   });
 }
 
+function manageRangesSheet() {
+  return openSheet({
+    title: 'التفعيل التلقائي حسب التاريخ',
+    desc: 'حدد فترات زمنية ليتم تفعيل التوقيت المناسب تلقائياً. إذا لم يتطابق التاريخ سيتم استخدام التوقيت النشط حالياً.',
+    body: html`
+      <div class="stack stack-2">
+        ${store.timeProfiles().filter(p => p.activeFrom).length === 0 ? html`<div class="empty__text">لا توجد توقيتات مفعلة تلقائياً.</div>` : ''}
+        ${store.timeProfiles().filter(p => p.activeFrom).map(p => html`
+          <div class="card card--pad hstack">
+            <div class="flex">
+              <div class="fw-7 mb-1">${p.name}</div>
+              <div class="t-3 fs-sm">من <span class="tabular fw-7">${p.activeFrom}</span> إلى <span class="tabular fw-7">${p.activeTo || 'مستمر'}</span></div>
+            </div>
+            <button class="iconbtn" data-act="rename" data-id="${p.id}" aria-label="تعديل" data-sheet-close>${icon('edit')}</button>
+          </div>
+        `)}
+      </div>
+      <p class="t-3 fs-xs mt-3 mb-0">لتفعيل أي توقيت تلقائياً، انقر على أيقونة التعديل وحدد تواريخ "يسري من".</p>
+    `,
+    foot: html`<button class="btn btn--primary btn--block" data-sheet-close>إغلاق</button>`
+  });
+}
+
 function nameSheet(existing = null) {
   return openSheet({
     title: existing ? 'تعديل اسم الملف' : 'ملف توقيت جديد',
@@ -190,10 +261,34 @@ function nameSheet(existing = null) {
         const fd = new FormData(ev.target);
         const name = String(fd.get('name') ?? '').trim();
         if (!name) return;
+        const activeFrom = String(fd.get('activeFrom') ?? '') || null;
+        const activeTo = String(fd.get('activeTo') ?? '') || null;
+
+        if (activeTo && !activeFrom) {
+          toast('يجب تحديد تاريخ البداية عند تحديد تاريخ النهاية', 'danger');
+          return;
+        }
+
+        if (activeFrom) {
+          const profiles = store.timeProfiles().filter(p => p.id !== existing?.id && p.activeFrom);
+          for (const p of profiles) {
+            const overlap = (
+              (activeFrom >= p.activeFrom && (!p.activeTo || activeFrom <= p.activeTo)) ||
+              (activeTo && activeTo >= p.activeFrom && (!p.activeTo || activeTo <= p.activeTo)) ||
+              (activeFrom <= p.activeFrom && (!activeTo || activeTo >= p.activeFrom))
+            );
+            if (overlap) {
+              const rangeStr = p.activeTo ? `من ${p.activeFrom} إلى ${p.activeTo}` : `من ${p.activeFrom} فصاعدًا`;
+              toast(`هذه الفترة تتداخل مع ${p.name} (${rangeStr})`, 'danger');
+              return;
+            }
+          }
+        }
+
         done({
           name,
-          activeFrom: String(fd.get('activeFrom') ?? '') || null,
-          activeTo: String(fd.get('activeTo') ?? '') || null,
+          activeFrom,
+          activeTo,
         });
       });
     },
@@ -286,25 +381,13 @@ export default {
         )}
       </div>
 
-      <details class="mb-4" style="border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
-        <summary class="fw-7 t-2 p-3" style="background: var(--surface-1); cursor: pointer;">
-          التفعيل التلقائي حسب التاريخ
-        </summary>
-        <div class="p-3" style="background: var(--surface-0); border-top: 1px solid var(--border);">
-          <p class="t-3 fs-xs mb-3">حدد فترات زمنية ليتم تفعيل التوقيت المناسب تلقائياً (مثل التوقيت الصيفي أو الشتوي). إذا لم يتطابق التاريخ سيتم استخدام التوقيت النشط حالياً.</p>
-          ${profiles.filter(p => p.activeFrom).length === 0 ? html`<p class="t-3 fs-sm mb-0">لا توجد توقيتات مفعلة تلقائياً.</p>` : ''}
-          ${profiles.filter(p => p.activeFrom).map(p => html`
-            <div class="card card--pad mb-2 hstack">
-              <div class="flex">
-                <div class="fw-7 mb-1">${p.name}</div>
-                <div class="t-3 fs-sm">من <span class="tabular fw-7">${p.activeFrom}</span> إلى <span class="tabular fw-7">${p.activeTo || 'مستمر'}</span></div>
-              </div>
-              <button class="iconbtn" data-act="rename" data-id="${p.id}" aria-label="تعديل">${icon('edit')}</button>
-            </div>
-          `)}
-          <p class="t-3 fs-xs mt-3 mb-0">لتفعيل أي توقيت تلقائياً، انقر على أيقونة التعديل بجانب اسم الملف، وحدد تواريخ "يسري من".</p>
+      <div class="card card--pad hstack mb-4">
+        <div class="flex">
+          <div class="fw-7 mb-1">التفعيل التلقائي</div>
+          <div class="t-3 fs-sm">تغيير التوقيت تلقائيًا حسب التاريخ</div>
         </div>
-      </details>
+        <button class="btn btn--sm btn--quiet" data-act="manage-ranges">إدارة الفترات</button>
+      </div>
 
       <div class="card card--pad">
         <div class="hstack gap-2 mb-3">
@@ -312,11 +395,19 @@ export default {
           <button class="btn btn--sm btn--quiet push" data-act="generate">${icon('spark')} توليد سريع</button>
         </div>
         ${open.overrides?.config?.assembly?.enabled ? html`
-          <p class="t-3 fs-xs mb-3">
-            الطابور الصباحي: <span class="tabular">${open.overrides.config.assembly.start}</span>
-            (${open.overrides.config.assembly.duration} د)
-          </p>
-        ` : ''}
+          <div class="card card--pad mb-3 hstack" style="background: var(--surface-1); border: 1px solid var(--border);">
+            <div class="flex">
+              <div class="fw-7 mb-1">الطابور الصباحي</div>
+              <div class="t-3 fs-sm"><span class="tabular fw-7">${open.overrides.config.assembly.start}</span> (${open.overrides.config.assembly.duration} دقيقة)</div>
+            </div>
+          </div>
+        ` : (open.overrides?.config && open.overrides?.config?.type !== 'hybrid' ? html`
+          <div class="card card--pad mb-3 hstack" style="background: var(--surface-1); border: 1px dashed var(--border);">
+            <div class="flex">
+              <div class="fw-7 mb-1" style="color: var(--text-2);">لا يوجد طابور صباحي</div>
+            </div>
+          </div>
+        ` : '')}
 
         <div class="field">
           <span class="field__label">الأوقات المعروضة</span>
@@ -370,19 +461,27 @@ export default {
                       const parseTime = (str) => { const [h, m] = str.split(':').map(Number); return h * 60 + m; };
                       const gapMins = parseTime(t.start) - parseTime(prev.end);
                       if (gapMins > 0) {
-                        let text = `${gapMins} دقيقة`;
                         const cfg = open.overrides?.config;
-                        if (cfg?.recess?.enabled) {
-                          const tr = cfg.recess.transition || 0;
-                          if (tr > 0 && gapMins > tr) text = `${gapMins - tr} دقيقة فسحة + ${tr} دقائق تفويج`;
-                          else if (gapMins === tr) text = `${tr} دقائق تفويج`;
+                        let gradesText = '';
+                        if (cfg?.recess?.rules) {
+                          if (cfg.recess.rules.length === 2) gradesText = 'رابع وخامس وسادس (منفصلة)';
+                          else if (cfg.recess.rules[0]?.grades?.includes(4)) gradesText = 'الصف الرابع';
+                          else gradesText = 'خامس وسادس';
+                        } else {
+                          gradesText = 'جميع الصفوف';
                         }
+                        
                         chunks.push(html`
-                          <div class="timerow" style="background: var(--surface-2); padding: 0.5rem; border-radius: var(--radius-md); align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                            <div class="fw-7 t-2">فسحة</div>
-                            <div class="tabular t-3">${prev.end} – ${t.start}</div>
-                            <div class="badge badge--info">${text}</div>
-                            ${cfg?.recess ? html`<button class="iconbtn" data-act="edit-recess" aria-label="تعديل الفسحة">${icon('edit-2')}</button>` : ''}
+                          <div class="timerow" style="background: var(--surface-1); padding: 0.75rem 1rem; border-radius: var(--radius-md); align-items: center; justify-content: space-between; border: 1px solid var(--border);">
+                            <div class="flex">
+                              <div class="fw-7 mb-1">فسحة</div>
+                              <div class="tabular t-2 fs-sm">${prev.end} ص – ${t.start} ص</div>
+                            </div>
+                            <div class="center px-3" style="flex: 1;">
+                              <div class="t-3 fs-xs mb-1">${cfg?.recess?.duration || gapMins} دقيقة · تفويج ${cfg?.recess?.transition || 0} دقائق</div>
+                              <div class="badge badge--info">بعد الحصة ${cfg?.recess?.afterPeriod || prev.period} · ${gradesText}</div>
+                            </div>
+                            ${cfg?.recess ? html`<button class="btn btn--sm btn--quiet" data-act="edit-recess">تعديل</button>` : ''}
                           </div>
                         `);
                       }
@@ -472,41 +571,45 @@ export default {
       const p = store.getTimeProfile(openId);
       if (!p || !p.overrides?.config) return;
       const cfg = p.overrides.config;
+      const isSep = cfg.recess?.rules?.length === 2;
+      const isG4 = cfg.recess?.rules?.length === 1 && cfg.recess.rules[0].grades.includes(4);
+      const isG56 = cfg.recess?.rules?.length === 1 && cfg.recess.rules[0].grades.includes(5);
       
       openSheet({
-        title: 'تعديل إعدادات الفسحة',
-        desc: 'ملاحظة: سيتم إعادة حساب أوقات الحصص بناءً على الإعدادات الجديدة.',
+        title: 'تعديل الفسحة',
         body: html`
           <form id="recess-form">
             <div class="field-row">
-              <label class="field"><span class="field__label">المدة (دقيقة)</span>
+              <label class="field"><span class="field__label">مدة الفسحة (دقيقة)</span>
                 <input class="input tabular" name="dur" type="number" value="${cfg.recess?.duration || 20}">
               </label>
-              <label class="field"><span class="field__label">التفويج (دقيقة)</span>
+              <label class="field"><span class="field__label">مدة التفويج (دقيقة)</span>
                 <input class="input tabular" name="trans" type="number" value="${cfg.recess?.transition || 0}">
               </label>
             </div>
             <label class="field mt-3">
-              <span class="field__label">تطبيق الفسحة على</span>
+              <span class="field__label">تطبيق على</span>
               <select class="select" name="recGrades" id="rec-grades-sel">
-                <option value="all" ${!cfg.recess?.rules ? 'selected' : ''}>جميع الصفوف (نفس الوقت)</option>
-                <option value="official" ${cfg.recess?.rules ? 'selected' : ''}>منفصلة (رابع: بعد الـ 2 / خامس وسادس: بعد الـ 3)</option>
+                <option value="g4" ${isG4 ? 'selected' : ''}>الصف الرابع</option>
+                <option value="g56" ${isG56 ? 'selected' : ''}>الصفان الخامس والسادس</option>
+                <option value="sep" ${isSep ? 'selected' : ''}>منفصلة حسب الصف</option>
+                <option value="all" ${!isSep && !isG4 && !isG56 ? 'selected' : ''}>الجميع</option>
               </select>
             </label>
-            <label class="field mt-3" id="rec-after-wrapper" style="display: ${cfg.recess?.rules ? 'none' : 'block'};">
-              <span class="field__label">بعد الحصة رقم</span>
+            <label class="field mt-3" id="rec-after-wrapper" style="display: ${isSep ? 'none' : 'block'};">
+              <span class="field__label">بعد الحصة</span>
               <input class="input tabular" name="after" type="number" value="${cfg.recess?.afterPeriod || 3}">
             </label>
           </form>
         `,
         foot: html`
           <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" form="recess-form" type="submit">حفظ وإعادة الحساب</button>
+          <button class="btn btn--primary" form="recess-form" type="submit">حفظ التغييرات</button>
         `,
         onMount: (root, done) => {
           const sel = root.querySelector('#rec-grades-sel');
           const wrap = root.querySelector('#rec-after-wrapper');
-          sel.addEventListener('change', () => wrap.style.display = sel.value === 'all' ? 'block' : 'none');
+          sel.addEventListener('change', () => wrap.style.display = sel.value === 'sep' ? 'none' : 'block');
           
           root.querySelector('#recess-form').addEventListener('submit', async (ev) => {
             ev.preventDefault();
@@ -517,12 +620,20 @@ export default {
             newCfg.recess.duration = Number(fd.get('dur'));
             newCfg.recess.transition = Number(fd.get('trans'));
             
-            if (fd.get('recGrades') === 'official') {
+            const rType = fd.get('recGrades');
+            const afterP = Number(fd.get('after'));
+            if (rType === 'sep') {
               newCfg.recess.rules = [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }];
               delete newCfg.recess.afterPeriod;
+            } else if (rType === 'g4') {
+              newCfg.recess.rules = [{ grades: [4], afterPeriod: afterP }];
+              newCfg.recess.afterPeriod = afterP;
+            } else if (rType === 'g56') {
+              newCfg.recess.rules = [{ grades: [5, 6], afterPeriod: afterP }];
+              newCfg.recess.afterPeriod = afterP;
             } else {
               delete newCfg.recess.rules;
-              newCfg.recess.afterPeriod = Number(fd.get('after'));
+              newCfg.recess.afterPeriod = afterP;
             }
             
             const { generateAdvancedPeriods } = await import('../models.js');
@@ -548,6 +659,9 @@ export default {
       toast('حُفظ');
     },
 
+    'manage-ranges'() {
+      manageRangesSheet();
+    },
     async 'del-profile'(el) {
       if (store.timeProfiles().length <= 1) {
         toast('لا يمكن حذف آخر ملف توقيت', 'danger');

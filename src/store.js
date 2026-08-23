@@ -624,9 +624,11 @@ export function resolveProfile(profile, date) {
   
   // If we reach here, it's either an in_person day or a day without an override.
   // Priority 4: Seasonal timing range for that date
-  const physical = timeProfiles().find(
+  const validProfiles = timeProfiles().filter(
     (p) => p.overrides?.config?.type !== 'hybrid' && p.activeFrom && p.activeFrom <= date && (!p.activeTo || p.activeTo >= date)
   );
+  validProfiles.sort((a, b) => b.activeFrom.localeCompare(a.activeFrom));
+  const physical = validProfiles[0];
   
   // Priority 5: Fallback manual active profile
   const resolved = physical ?? profile;
@@ -751,9 +753,25 @@ export async function createSubject(data) {
 
 export async function createSection(data) {
   const year = activeYear();
+  const existing = sections().find(s => s.grade === Number(data.grade) && s.label === data.label);
+  if (existing) throw new Error(`الفصل ${existing.name} موجود مسبقاً.`);
+  
   const s = makeSection({ yearId: year?.id, order: sections().length, ...data });
   await save({ sections: [s] });
   return s;
+}
+
+export async function editSection(id, data) {
+  const existing = getSection(id);
+  if (!existing) throw new Error('الفصل غير موجود.');
+  
+  const duplicate = sections().find(s => s.id !== id && s.grade === Number(data.grade) && s.label === data.label);
+  if (duplicate) throw new Error(`الفصل ${duplicate.name} موجود مسبقاً.`);
+  
+  const { makeSection } = await import('./models.js');
+  const updated = makeSection({ ...existing, ...data, id });
+  await patch('sections', id, { grade: updated.grade, label: updated.label, name: updated.name });
+  return updated;
 }
 
 /** ينشئ إسنادًا تدريسيًا ومعه بنود التقييم الافتراضية. */

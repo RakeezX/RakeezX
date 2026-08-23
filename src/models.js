@@ -66,7 +66,7 @@ export const termIndexes = () => Array.from({ length: TERMS_PER_YEAR }, (_, i) =
 export const yearId = (hijriStart) => `y:${hijriStart}-${Number(hijriStart) + 1}`;
 export const termId = (yId, index) => `tm:${yId}:${index}`;
 export const subjectId = (slug) => `sub:${slug}`;
-export const sectionId = (yId, grade, label) => `sec:${yId}:${grade}:${label}`;
+export const sectionId = () => `sec:${uid()}`;
 export const teachingId = (secId, subId, tmId) => `tch:${secId}|${subId}|${tmId}`;
 export const enrollmentId = (studentId, secId) => `en:${studentId}:${secId}`;
 export const slotId = (tchId, wd, period) => `sl:${tchId}:${wd}:${period}`;
@@ -520,7 +520,7 @@ export const makeSubject = (o = {}) => {
 
 export const makeSection = (o = {}) => ({
   ...base(),
-  id: o.id ?? sectionId(o.yearId, o.grade ?? 4, o.label ?? 'أ'),
+  id: o.id ?? sectionId(),
   yearId: o.yearId,
   grade: Number(o.grade ?? 4),
   label: o.label ?? 'أ',

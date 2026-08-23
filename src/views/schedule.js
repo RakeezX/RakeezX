@@ -146,20 +146,14 @@ export default {
     }
 
     return html`
-      <div class="card card--pad mb-3" style="background: var(--surface-1);">
-        <div class="hstack gap-2 mb-2">
-          <div class="fw-7 t-1">التوقيت الحالي: ${profile?.name || 'غير محدد'}</div>
-          ${profile ? html`<div class="badge badge--${isAuto ? 'success' : 'info'} push">${isAuto ? 'تلقائي حسب التاريخ' : 'اختيار يدوي'}</div>` : ''}
+      <div class="section__head align-center mb-4">
+        <div class="section__title" style="display:flex; align-items:center; gap: 0.5rem;">
+          الجدول الأسبوعي
+          ${profile ? html`<span class="badge badge--${isAuto ? 'success' : 'info'}">${profile.name} (${isAuto ? 'تلقائي' : 'يدوي'})</span>` : ''}
         </div>
-        ${profile ? html`
-          <div class="t-3 fs-sm mb-1">
-            الأولى <span class="tabular fw-7">${profile.periods?.[0]?.start}</span> ·
-            ${cfg?.periodDuration ? html`مدة الحصة <span class="tabular fw-7">${cfg.periodDuration}</span> دقيقة ·` : ''}
-            <span class="tabular fw-7">${(profile.periods ?? []).length}</span> حصص
-          </div>
-          ${recessText ? html`<div class="t-3 fs-sm mb-3">${recessText}</div>` : html`<div class="mb-3"></div>`}
-        ` : ''}
-        <a class="btn btn--sm btn--ghost" href="#/schedule/times">${icon('edit-2')} تعديل التوقيت</a>
+        <a class="btn btn--sm btn--quiet" href="#/schedule/times">
+          ${icon('clock')} التوقيت
+        </a>
       </div>
 
       ${slots.length
@@ -201,11 +195,13 @@ export default {
                         const tch = store.getTeaching(s.teachingId);
                         const sec = store.getSection(tch?.sectionId);
                         const t = store.timeFor(d, s.period, baseProfile, sec?.grade, todayStr);
+                        const ordinals = ['—', 'الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة', 'الحادية عشر', 'الثانية عشر'];
+                        const ord = ordinals[s.period] || String(s.period);
                         return html`
                           <div class="slot">
                             <span class="period">${s.period}</span>
                             <span class="slot__main">
-                              <span class="slot__name">الحصة ${s.period}</span>
+                              <span class="slot__name">الحصة ${ord}</span>
                               <span class="slot__time tabular t-3 fs-sm mb-1">${t ? fmtRange(t) : '—'}</span>
                               <span class="slot__sub fw-7">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
                               <span class="slot__sub">${sectionLabel(sec) || '—'}</span>

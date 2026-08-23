@@ -23,6 +23,9 @@ export default {
     const tch = store.getTeaching(p.id);
     return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
   },
+  topActions: (p) => html`
+    <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل">${icon('edit-2')}</button>
+  `,
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);
     if (!tch) return '';
@@ -178,5 +181,56 @@ export default {
       toast('حُذف الإسناد');
       go('/classes');
     },
+    async 'edit-sec'(el, ev, params) {
+      const tch = store.getTeaching(params.id);
+      if (!tch) return;
+      const sec = store.getSection(tch.sectionId);
+      
+      const data = await new Promise(resolve => {
+        openSheet({
+          title: 'تعديل بيانات الشعبة',
+          body: html`
+            <form id="edit-sec-form">
+              <div class="field-row">
+                <label class="field">
+                  <span class="field__label">الصف</span>
+                  <select class="select" name="grade">
+                    ${[4,5,6].map(g => html`<option value="${g}" ${Number(sec.grade) === g ? 'selected' : ''}>الصف ${g}</option>`)}
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field__label">رمز الشعبة</span>
+                  <input class="input" name="label" value="${sec.label}" required maxlength="8" autocomplete="off">
+                </label>
+              </div>
+            </form>
+          `,
+          foot: html`
+            <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+            <button class="btn btn--primary" form="edit-sec-form" type="submit">حفظ التغييرات</button>
+          `,
+          onMount: (root, done) => {
+            root.querySelector('#edit-sec-form').addEventListener('submit', (ev) => {
+              ev.preventDefault();
+              const fd = new FormData(ev.target);
+              done({
+                grade: Number(fd.get('grade')),
+                label: String(fd.get('label')).trim()
+              });
+            });
+          }
+        }).then(resolve).catch(() => resolve(null));
+      });
+      
+      if (!data) return;
+      try {
+        await store.editSection(sec.id, data);
+        toast('تم تعديل الشعبة بنجاح');
+        // trigger re-render
+        store.repaint();
+      } catch (err) {
+        toast(err.message, 'danger');
+      }
+    }
   },
 };
