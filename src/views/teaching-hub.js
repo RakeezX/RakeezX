@@ -108,6 +108,7 @@ export default {
                       <span class="row__main">
                         <span class="row__title">الحصة ${s.period}</span>
                         <span class="row__sub">
+                          ${s.startTime ? html`<span class="tabular t-3">${s.startTime} – ${s.endTime}</span> · ` : ''}
                           ${m.label}
                           ${s.status === 'held' ? html` · <span class="tabular">${marked}/${roster.length}</span> مرصود` : ''}
                         </span>

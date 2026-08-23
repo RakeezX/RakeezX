@@ -138,12 +138,6 @@ export default {
     const profile = store.resolveProfile(baseProfile, todayStr);
     const isAuto = profile?.activeFrom && profile.activeFrom <= todayStr && (!profile.activeTo || profile.activeTo >= todayStr);
     
-    let recessText = '';
-    const cfg = profile?.overrides?.config;
-    if (cfg?.recess?.enabled) {
-      if (cfg.recess.rules) recessText = 'فسحة خامس/سادس: بعد الحصة ' + cfg.recess.rules.find(r => r.grades.includes(5))?.afterPeriod;
-      else recessText = 'الفسحة: بعد الحصة ' + cfg.recess.afterPeriod;
-    }
 
     return html`
       <div class="section__head align-center mb-4">

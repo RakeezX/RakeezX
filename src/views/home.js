@@ -1,4 +1,4 @@
-﻿/**
+/**
  * الصفحة الرئيسية — لوحة المعلّم.
  *
  * الموجة الأولى: الهيكل فقط. كل منطقة تعرض ما يستطيع النموذج الحالي دعمه،
@@ -75,6 +75,7 @@ export default {
                       <span class="row__main">
                         <span class="row__title">${store.teachingLabel(tch)}</span>
                         <span class="row__sub">
+                          ${s.startTime ? html`<span class="tabular t-3">${s.startTime} – ${s.endTime}</span> · ` : ''}
                           ${meta.label}
                           ${s.status === 'held' && roster
                             ? html` · <span class="tabular">${marked}/${roster}</span> مرصود`

@@ -1,16 +1,16 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    RAKEEZ X — نظام التصميم
    عربي أولًا، RTL، ومصمم ليُستعمل بإبهام واحد والمعلّم واقف بين طلابه.
    ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
 
 /* ---------- 1. الرموز (tokens) ---------- */
 :root {
   color-scheme: light dark;
 
   /* الخط */
-  --font: "SF Arabic", "Segoe UI", system-ui, -apple-system, "Noto Sans Arabic",
-          "Dubai", "Tahoma", sans-serif;
-  --font-num: "SF Arabic", "Segoe UI", system-ui, sans-serif;
+  --font: "IBM Plex Sans Arabic", "SF Arabic", "Segoe UI", system-ui, -apple-system, "Noto Sans Arabic", sans-serif;
+  --font-num: "IBM Plex Sans Arabic", "SF Arabic", "Segoe UI", system-ui, sans-serif;
 
   /* المقاسات */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
@@ -28,35 +28,39 @@
   --ease: cubic-bezier(.2, .8, .3, 1);
 
   /* ألوان — الوضع الفاتح */
-  --bg:        #f6f7f9;
+  --bg:        #f8fafc;
   --bg-elev:   #ffffff;
   --bg-sunk:   #eef0f3;
-  --border:    #e2e5ea;
+  --border:    #e2e8f0;
   --border-strong: #cbd1da;
 
-  --text:      #16191d;
-  --text-2:    #5b6472;
-  --text-3:    #8a94a3;
+  --text:      #15253D;
+  --text-2:    #334155;
+  --text-3:    #64748b;
 
-  --brand:     #0f766e;
+  --brand:     #18A878;
   --brand-ink: #ffffff;
-  --brand-soft:#d9f2ef;
-  --brand-hover: #0b5d57;
+  --brand-soft:#e8f6f1;
+  --brand-hover: #148f66;
+  
+  --x-purple:       #7857E8;
+  --x-purple-hover: #6549c4;
+  --x-purple-soft:  #f2effc;
 
-  --ok:        #15803d;
-  --ok-soft:   #dcfce7;
-  --warn:      #b45309;
+  --ok:        #10b981;
+  --ok-soft:   #d1fae5;
+  --warn:      #f59e0b;
   --warn-soft: #fef3c7;
-  --danger:    #b91c1c;
+  --danger:    #ef4444;
   --danger-soft:#fee2e2;
-  --info:      #1d4ed8;
+  --info:      #3b82f6;
   --info-soft: #dbeafe;
 
   /* حالات الحضور */
-  --present:   #15803d;  --present-soft: #dcfce7;
-  --absent:    #b91c1c;  --absent-soft:  #fee2e2;
-  --late:      #b45309;  --late-soft:    #fef3c7;
-  --excused:   #4f46e5;  --excused-soft: #e0e7ff;
+  --present:   #10b981;  --present-soft: #d1fae5;
+  --absent:    #ef4444;  --absent-soft:  #fee2e2;
+  --late:      #f59e0b;  --late-soft:    #fef3c7;
+  --excused:   #7857E8;  --excused-soft: #f2effc;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,10 +75,14 @@
     --text-2:    #a3adba;
     --text-3:    #6f7a88;
 
-    --brand:     #2dd4bf;
+    --brand:     #18A878;
     --brand-ink: #06231f;
     --brand-soft:#123734;
     --brand-hover: #5eead4;
+    
+    --x-purple:       #8b5cf6;
+    --x-purple-hover: #a78bfa;
+    --x-purple-soft:  #2e1065;
 
     --ok:        #4ade80;  --ok-soft:     #10301c;
     --warn:      #fbbf24;  --warn-soft:   #34250a;
@@ -103,10 +111,14 @@
   --text-2:    #a3adba;
   --text-3:    #6f7a88;
 
-  --brand:     #2dd4bf;
+  --brand:     #18A878;
   --brand-ink: #06231f;
   --brand-soft:#123734;
   --brand-hover: #5eead4;
+  
+  --x-purple:       #8b5cf6;
+  --x-purple-hover: #a78bfa;
+  --x-purple-soft:  #2e1065;
 
   --ok:        #4ade80;  --ok-soft:     #10301c;
   --warn:      #fbbf24;  --warn-soft:   #34250a;
