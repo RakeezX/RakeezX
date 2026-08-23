@@ -200,9 +200,14 @@ export default {
                               <span class="slot__sub fw-7">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
                               <span class="slot__sub">${sectionLabel(sec) || '—'}</span>
                             </span>
-                            <button class="iconbtn" data-act="remove" data-id="${s.id}" aria-label="حذف">
-                              ${icon('x')}
-                            </button>
+                            <div class="flex" style="gap: 0.25rem;">
+                              <button class="iconbtn" data-act="edit" data-id="${s.id}" aria-label="تعديل">
+                                ${icon('edit')}
+                              </button>
+                              <button class="iconbtn" data-act="remove" data-id="${s.id}" aria-label="حذف">
+                                ${icon('x')}
+                              </button>
+                            </div>
                           </div>
                         `;
                       })}
@@ -248,15 +253,36 @@ export default {
     async add(el) {
       const data = await slotSheet({ weekday: el?.dataset?.day });
       if (!data) return;
-      const slot = await store.addSlot(data.teachingId, data.weekday, data.period);
-      if (!slot) {
-        toast('هذه الحصة موجودة في الجدول', 'danger');
-        return;
+      try {
+        const slot = await store.addSlot(data.teachingId, data.weekday, data.period);
+        if (!slot) {
+          toast('هذه الحصة موجودة في الجدول', 'danger');
+          return;
+        }
+        const tch = store.getTeaching(data.teachingId);
+        const sec = store.getSection(tch?.sectionId);
+        const t = store.timeFor(data.weekday, data.period, store.activeTimeProfile(), sec?.grade);
+        toast(t ? `أُضيفت — ${fmtRange(t)}` : 'أُضيفت للجدول');
+      } catch (err) {
+        toast(err.message, 'danger');
       }
-      const tch = store.getTeaching(data.teachingId);
-      const sec = store.getSection(tch?.sectionId);
-      const t = store.timeFor(data.weekday, data.period, store.activeTimeProfile(), sec?.grade);
-      toast(t ? `أُضيفت — ${fmtRange(t)}` : 'أُضيفت للجدول');
+    },
+
+    async edit(el) {
+      const slot = store.getSlot(el.dataset.id);
+      if (!slot) return;
+      const data = await slotSheet({ 
+        weekday: slot.weekday, 
+        period: slot.period,
+        teachingId: slot.teachingId 
+      });
+      if (!data) return;
+      try {
+        await store.editSlot(slot.id, data);
+        toast('تم تعديل الحصة بنجاح');
+      } catch (err) {
+        toast(err.message, 'danger');
+      }
     },
 
     async remove(el) {

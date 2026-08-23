@@ -573,6 +573,8 @@ export const slotsOf = (tchId) =>
   live(state.slots).filter((s) => s.teachingId === tchId)
     .sort((a, b) => a.weekday - b.weekday || a.period - b.period);
 
+export const getSlot = (id) => live(state.slots).find((s) => s.id === id);
+
 export const allSlots = (tmId = activeTerm()?.id) => {
   const ids = new Set(teachings(tmId).map((t) => t.id));
   return live(state.slots).filter((s) => ids.has(s.teachingId))
@@ -1112,10 +1114,37 @@ export async function fillAttendance(sesId, status = 'present') {
 /* ---------- عمليات: الجدول والتقويم ---------- */
 
 export async function addSlot(tchId, weekday, period, times = {}) {
+  const existing = allSlots().find(s => s.weekday === weekday && s.period === period);
+  if (existing) {
+    throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
+  }
+  
   const slot = makeSlot({ teachingId: tchId, weekday, period, ...times });
   if (live(state.slots).some((s) => s.id === slot.id)) return null;
   await save({ slots: [slot] });
   return slot;
+}
+
+export async function editSlot(slotId, data) {
+  const existingSlot = getSlot(slotId);
+  if (!existingSlot) throw new Error('الحصة غير موجودة');
+
+  // Check for conflicts
+  const conflict = allSlots().find(s => s.id !== slotId && s.weekday === Number(data.weekday) && s.period === Number(data.period));
+  if (conflict) {
+    throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
+  }
+
+  const { makeSlot } = await import('./models.js');
+  const updated = makeSlot({ ...existingSlot, ...data, id: slotId });
+  await patch('slots', slotId, { 
+    weekday: updated.weekday, 
+    period: updated.period, 
+    teachingId: updated.teachingId,
+    start: updated.start,
+    end: updated.end
+  });
+  return updated;
 }
 
 export const removeSlot = (slotId) => softDelete('slots', slotId);

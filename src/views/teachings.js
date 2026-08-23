@@ -146,9 +146,9 @@ export default {
           
           ${yearSecs.length === 0 ? html`
             <div class="card card--pad mt-4 center" style="background: var(--surface-1); border: 1px dashed var(--border);">
-              <div class="fw-7 mb-2">لا توجد فصول بعد في هذا العام</div>
-              <p class="t-3 fs-sm mb-3">هل تريد إضافة فصولك بسرعة؟</p>
-              <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} أضف الفصول الأساسية</button>
+              <div class="fw-7 mb-2">إعداد الفصول</div>
+              <p class="t-3 fs-sm mb-3">يمكنك إنشاء الفصول التي تدرّسها الآن دفعة واحدة، ثم تعديلها لاحقًا.</p>
+              <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} إعداد الفصول الآن</button>
             </div>
             <div class="mt-4"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button></div>
           ` : html`
@@ -199,18 +199,14 @@ export default {
         return;
       }
 
-      let section = store.sections().find(s => s.grade === Number(data.grade) && s.label === data.label);
-      if (!section) {
-        section = await store.createSection({
-          yearId: year.id, grade: data.grade, label: data.label,
-          name: `${data.grade}/${data.label}`, color: data.color,
-        });
-      }
-
-      const tch = await store.createTeaching({
-        sectionId: section.id, subjectId: data.subjectId, termId: term.id,
+      const col = SECTION_COLORS[Math.floor(Math.random() * SECTION_COLORS.length)];
+      const sec = await store.createSection({
+        yearId: year.id, grade: data.grade, label: data.label,
+        name: `${data.grade}/${data.label}`, color: col
       });
-      toast(`أُسندت ${store.getSubject(data.subjectId)?.name ?? ''} لـ ${data.grade}/${data.label}`);
+
+      await store.createTeaching({ sectionId: sec.id, subjectId: data.subjectId, termId: term.id });
+      store.repaint();
     },
 
     async 'seed-sections'() {
@@ -218,18 +214,35 @@ export default {
       const term = store.activeTerm();
       if (!year || !term) return toast('أنشئ سنة وفصلًا أولًا', 'danger');
       const subs = store.subjects();
-      const defSub = subs[0]?.id;
 
-      const items = [
+      let items = [
         { grade: 5, label: '1' }, { grade: 5, label: '2' }, { grade: 5, label: '3' }, { grade: 5, label: '4' },
         { grade: 5, label: '5' }, { grade: 5, label: '6' }, { grade: 5, label: '7' }, { grade: 5, label: '8' },
         { grade: 6, label: '6' }, { grade: 6, label: '7' }
       ];
 
       const selected = await new Promise(resolve => {
+        const renderList = () => {
+          return html`
+            <div id="seed-list" class="stack stack-2">
+              ${items.map((it, i) => html`
+                <div class="timerow" style="align-items: center;" data-index="${i}">
+                  <select class="select" style="width: auto;" data-field="grade">
+                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => html`<option value="${g}" ${g == it.grade ? 'selected' : ''}>الصف ${g}</option>`)}
+                  </select>
+                  <span class="mx-2">/</span>
+                  <input class="input tabular" type="text" data-field="label" value="${it.label}" style="width: 4rem;">
+                  <button type="button" class="iconbtn ms-auto" data-action="remove-row" aria-label="حذف">${icon('x')}</button>
+                </div>
+              `)}
+            </div>
+            <button type="button" class="btn btn--sm btn--ghost mt-3" data-action="add-row">${icon('plus')} إضافة فصل</button>
+          `;
+        };
+
         openSheet({
-          title: 'الفصول الأساسية',
-          desc: 'حدد الفصول التي تُدرّسها لإضافتها بسرعة',
+          title: 'إعداد الفصول',
+          desc: 'راجع الفصول وعدلها قبل إنشائها',
           body: html`
             <form id="seed-form">
               <label class="field mb-3">
@@ -238,28 +251,47 @@ export default {
                   ${subs.map(s => html`<option value="${s.id}">${s.name}</option>`)}
                 </select>
               </label>
-              <div class="grid grid--3">
-                ${items.map((it, i) => html`
-                  <label class="card card--pad center" style="cursor:pointer; user-select:none; padding: 0.75rem;">
-                    <input type="checkbox" name="sec" value="${i}" class="mb-2" style="transform: scale(1.2);">
-                    <div class="fw-7">الصف ${it.grade}</div>
-                    <div class="t-3 fs-sm">شعبة ${it.label}</div>
-                  </label>
-                `)}
+              <div id="seed-list-container">
+                ${renderList()}
               </div>
             </form>
           `,
           foot: html`
             <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-            <button class="btn btn--primary" form="seed-form" type="submit">إضافة المحددة</button>
+            <button class="btn btn--primary" form="seed-form" type="submit">حفظ وإنشاء</button>
           `,
           onMount: (root, done) => {
+            const container = root.querySelector('#seed-list-container');
+            
+            const updateState = () => {
+              const rows = container.querySelectorAll('.timerow');
+              items = Array.from(rows).map(row => ({
+                grade: Number(row.querySelector('[data-field="grade"]').value),
+                label: row.querySelector('[data-field="label"]').value
+              }));
+            };
+
+            container.addEventListener('click', (ev) => {
+              const btn = ev.target.closest('button[data-action]');
+              if (!btn) return;
+              
+              if (btn.dataset.action === 'remove-row') {
+                const row = btn.closest('.timerow');
+                row.remove();
+                updateState();
+              } else if (btn.dataset.action === 'add-row') {
+                updateState();
+                items.push({ grade: items.length ? items[items.length - 1].grade : 1, label: '1' });
+                container.innerHTML = renderList();
+              }
+            });
+
             root.querySelector('#seed-form').addEventListener('submit', (ev) => {
               ev.preventDefault();
+              updateState();
               const fd = new FormData(ev.target);
-              const checked = fd.getAll('sec').map(Number);
               const sub = String(fd.get('subjectId'));
-              done({ items: checked.map(i => items[i]), subjectId: sub });
+              done({ items, subjectId: sub });
             });
           }
         }).then(resolve).catch(() => resolve(null));

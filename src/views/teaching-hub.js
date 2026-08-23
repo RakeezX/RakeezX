@@ -1,6 +1,6 @@
 /** لوحة الإسناد: مدخل لكل أدواته، وملخّص حاله اليوم. */
 
-import { html, icon, confirmSheet, toast, fmtPct } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS } from '../models.js';
 import { go } from '../router.js';
@@ -24,7 +24,7 @@ export default {
     return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
   },
   topActions: (p) => html`
-    <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل">${icon('edit-2')}</button>
+    <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل">${icon('edit')}</button>
   `,
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);

@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RAKEEZ X">
+  <rect width="512" height="512" rx="112" fill="#0f766e"/>
+  <g stroke="#ffffff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M132 176h96"/>
+    <path d="M132 256h96"/>
+    <path d="M132 336h96"/>
+    <path d="M286 176l30 30 62-62" opacity=".55"/>
+    <path d="M286 256l30 30 62-62" opacity=".8"/>
+    <path d="M286 336l30 30 62-62"/>
+  </g>
+</svg>
