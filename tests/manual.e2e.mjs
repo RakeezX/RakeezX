@@ -152,7 +152,8 @@ test.describe('Manual Acceptance Requirements', () => {
 
     const snapshot = () => window.store.state.slots
       .filter((slot) => ['tchA', 'tchB', 'tchC'].includes(slot.teachingId))
-      .map(({ id, teachingId, weekday, period }) => ({ id, teachingId, weekday, period }));
+      .map(({ id, teachingId, weekday, period }) => ({ id, teachingId, weekday, period }))
+      .sort((left, right) => left.teachingId.localeCompare(right.teachingId));
     const beforeReload = await page.evaluate(snapshot);
     expect(beforeReload).toEqual([
       { id: firstSlotId, teachingId: 'tchA', weekday: 1, period: 4 },

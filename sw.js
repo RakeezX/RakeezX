@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v3';
+const VERSION = 'rakeezx-v4';
 
 const SHELL = [
   './',

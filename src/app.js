@@ -11,8 +11,9 @@ import { setRepaint } from './repaint.js';
 
 const app = document.getElementById('app');
 
-// Expose for E2E tests ONLY in development
-if (import.meta.env.DEV) {
+// Expose for E2E tests ONLY in Vite development. Static hosting does not
+// provide import.meta.env, so this must remain safe in the raw ESM build.
+if (import.meta.env?.DEV) {
   window.store = { ...store, repaint: () => { if (typeof scheduleRender !== 'undefined') scheduleRender(); } };
 }
 
