@@ -228,7 +228,7 @@ export default {
               ${items.map((it, i) => html`
                 <div class="timerow" style="align-items: center;" data-index="${i}">
                   <select class="select" style="width: auto;" data-field="grade">
-                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => html`<option value="${g}" ${g == it.grade ? 'selected' : ''}>الصف ${g}</option>`)}
+                    ${GRADES.map(g => html`<option value="${g.v}" ${g.v == it.grade ? 'selected' : ''}>${g.label}</option>`)}
                   </select>
                   <span class="mx-2">/</span>
                   <input class="input tabular" type="text" data-field="label" value="${it.label}" style="width: 4rem;">
@@ -282,7 +282,7 @@ export default {
               } else if (btn.dataset.action === 'add-row') {
                 updateState();
                 items.push({ grade: items.length ? items[items.length - 1].grade : 1, label: '1' });
-                container.innerHTML = renderList();
+                container.innerHTML = renderList().value;
               }
             });
 

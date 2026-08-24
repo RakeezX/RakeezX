@@ -12,9 +12,9 @@
 6. **Final Serial Quality Gate & Process Hygiene Check:** Successfully ran serial gates: `npm run test:sync`, `npm run test:e2e`, `npm run test:all`, `npm run test:stress` with zero leftover/stale OS processes running in the background.
 
 ## Current Test Status
-- `npm run test:sync` : PASS (70 tests)
-- `npm run test:e2e` : PASS (43 tests)
-- `npm run test:all` : PASS (113 passing tests)
+- `npm run test:sync` : PASS (73 tests)
+- `npm run test:e2e` : PASS (46 tests)
+- `npm run test:all` : PASS (119 passing tests)
 - `npm run test:stress` : PASS (1 test, ~62k records inserted)
 
 Ready for REAL manual Preview + Supabase acceptance: YES

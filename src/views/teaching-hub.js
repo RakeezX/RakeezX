@@ -2,8 +2,9 @@
 
 import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS } from '../models.js';
+import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES } from '../models.js';
 import { go } from '../router.js';
+import { repaint } from '../repaint.js';
 
 const TOOLS = (id) => [
   { href: `#/teaching/${id}/attendance`, icon: 'attendance', title: 'الحضور',       sub: 'رصد حصة بعينها' },
@@ -24,7 +25,7 @@ export default {
     return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
   },
   topActions: (p) => html`
-    <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل">${icon('edit')}</button>
+    <button class="iconbtn" data-act="edit-sec" aria-label="إعدادات الشعبة">${icon('settings')}</button>
   `,
   subtitle: (p) => {
     const tch = store.getTeaching(p.id);
@@ -196,7 +197,7 @@ export default {
                 <label class="field">
                   <span class="field__label">الصف</span>
                   <select class="select" name="grade">
-                    ${[4,5,6].map(g => html`<option value="${g}" ${Number(sec.grade) === g ? 'selected' : ''}>الصف ${g}</option>`)}
+                    ${GRADES.map(g => html`<option value="${g.v}" ${Number(sec.grade) === g.v ? 'selected' : ''}>${g.label}</option>`)}
                   </select>
                 </label>
                 <label class="field">
@@ -228,7 +229,7 @@ export default {
         await store.editSection(sec.id, data);
         toast('تم تعديل الشعبة بنجاح');
         // trigger re-render
-        store.repaint();
+        repaint();
       } catch (err) {
         toast(err.message, 'danger');
       }

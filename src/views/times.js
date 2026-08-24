@@ -22,13 +22,23 @@ function generateSheet(current = {}) {
     
     const renderGrid = (title, badge, mainRows, recessRows = null) => `
       <div class="fw-7 mb-3">${title} ${badge ? `<span class="badge">${badge}</span>` : ''}</div>
-      <div class="grid grid--2" style="gap: 1rem 0.5rem; line-height: 1.4;">
-        ${mainRows.map(([k, v]) => `<div><div class="t-3 fs-xs mb-1">${k}</div><div class="fw-5 fs-sm tabular">${v}</div></div>`).join('')}
+      <div class="timing-summary-grid">
+        ${mainRows.map(([k, v]) => `
+          <div class="timing-summary-item">
+            <span class="timing-summary-label">${k}</span>
+            <strong class="timing-summary-value">${v}</strong>
+          </div>
+        `).join('')}
       </div>
       ${recessRows ? `
         <div class="fw-7 mt-4 mb-3">الفسحة</div>
-        <div class="grid grid--2" style="gap: 1rem 0.5rem; line-height: 1.4;">
-          ${recessRows.map(([k, v]) => `<div><div class="t-3 fs-xs mb-1">${k}</div><div class="fw-5 fs-sm tabular">${v}</div></div>`).join('')}
+        <div class="timing-summary-grid">
+          ${recessRows.map(([k, v]) => `
+            <div class="timing-summary-item">
+              <span class="timing-summary-label">${k}</span>
+              <strong class="timing-summary-value">${v}</strong>
+            </div>
+          `).join('')}
         </div>
       ` : ''}
     `;
@@ -39,9 +49,10 @@ function generateSheet(current = {}) {
       ['مدة الحصة', '45 دقيقة'],
       ['عدد الحصص', '7']
     ], [
-      ['رابع', 'بعد الثانية'],
-      ['خامس وسادس', 'بعد الثالثة'],
-      ['المدة', '20 دقيقة + 5 تفويج']
+      ['الرابع الابتدائي', 'بعد الحصة الثانية'],
+      ['الخامس والسادس', 'بعد الحصة الثالثة'],
+      ['مدة الفسحة', '20 دقيقة'],
+      ['التفويج', '5 دقائق']
     ]);
 
     if (p === 'winter') return renderGrid('التوقيت الشتوي', 'حسب الدليل', [
@@ -50,9 +61,9 @@ function generateSheet(current = {}) {
       ['مدة الحصة', '45 دقيقة'],
       ['عدد الحصص', '7']
     ], [
-      ['رابع', 'بعد الثانية'],
-      ['خامس وسادس', 'بعد الثالثة'],
-      ['المدة', '20 دقيقة (بدون تفويج)']
+      ['الرابع الابتدائي', 'بعد الحصة الثانية'],
+      ['الخامس والسادس', 'بعد الحصة الثالثة'],
+      ['مدة الفسحة', '20 دقيقة (بدون تفويج)']
     ]);
 
     if (p === 'ramadan') return renderGrid('توقيت رمضان', null, [
@@ -65,20 +76,27 @@ function generateSheet(current = {}) {
 
     if (p === 'hybrid') return `
       <div class="fw-7 mb-3">التوقيت المدمج</div>
-      <div class="grid grid--2" style="gap: 1rem 0.5rem; line-height: 1.4;">
-        <div style="grid-column: 1 / -1;">
-          <div class="t-3 fs-xs mb-1">الأيام الحضورية</div>
-          <div class="fw-5 fs-sm">حسب التوقيت الموسمي النشط للتاريخ</div>
+      <div class="timing-summary-grid" style="margin-bottom: var(--sp-4);">
+        <div class="timing-summary-item" style="grid-column: 1 / -1;">
+          <span class="timing-summary-label">الحضوري</span>
+          <strong class="timing-summary-value">يستخدم التوقيت الموسمي حسب التاريخ</strong>
         </div>
-        <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
-          <div class="fw-7 fs-sm" style="color: var(--text-1);">الأيام عن بُعد (منصة مدرستي)</div>
-        </div>
-        <div><div class="t-3 fs-xs mb-1">الطابور</div><div class="fw-5 fs-sm tabular">لا يوجد</div></div>
-        <div><div class="t-3 fs-xs mb-1">الحصة الأولى</div><div class="fw-5 fs-sm tabular">7:00 ص</div></div>
-        <div><div class="t-3 fs-xs mb-1">مدة الحصة</div><div class="fw-5 fs-sm tabular">30 دقيقة</div></div>
-        <div><div class="t-3 fs-xs mb-1">عدد الحصص</div><div class="fw-5 fs-sm tabular">8</div></div>
-        <div style="grid-column: 1 / -1;"><div class="t-3 fs-xs mb-1">الفسحة والفاصل</div><div class="fw-5 fs-sm tabular">بدون (متصلة)</div></div>
-        <div style="grid-column: 1 / -1;"><div class="t-3 fs-xs mb-1">ملاحظة</div><div class="fw-5 fs-sm tabular">الثلاثاء يتناوب أسبوعيًا</div></div>
+      </div>
+      <div class="fw-7 fs-sm mb-3" style="color: var(--text-1);">عن بعد</div>
+      <div class="timing-summary-grid">
+        <div class="timing-summary-item"><span class="timing-summary-label">الحصة الأولى</span><strong class="timing-summary-value">7:00 ص</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">مدة الحصة</span><strong class="timing-summary-value">30 دقيقة</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">عدد الحصص</span><strong class="timing-summary-value">8</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الطابور</span><strong class="timing-summary-value">لا يوجد</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الفسحة</span><strong class="timing-summary-value">لا توجد</strong></div>
+      </div>
+      <div class="fw-7 fs-sm mt-4 mb-3" style="color: var(--text-1);">نمط الأسبوع</div>
+      <div class="timing-summary-grid">
+        <div class="timing-summary-item"><span class="timing-summary-label">الأحد</span><strong class="timing-summary-value">حضوري</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الاثنين</span><strong class="timing-summary-value">حضوري</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الثلاثاء</span><strong class="timing-summary-value">يتناوب أسبوعيًا</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الأربعاء</span><strong class="timing-summary-value">عن بعد</strong></div>
+        <div class="timing-summary-item"><span class="timing-summary-label">الخميس</span><strong class="timing-summary-value">عن بعد</strong></div>
       </div>
     `;
     return '';
@@ -439,7 +457,6 @@ export default {
           </span>
         </div>
 
-        </div>
 
         ${list.length
           ? (() => {
@@ -481,20 +498,16 @@ export default {
                         }
                         
                         chunks.push(html`
-                          <div class="card card--pad my-2" style="background: var(--surface-1); border: 1px dashed var(--border-strong);">
-                            <div class="flex" style="justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                              <div>
-                                <div class="fw-7 mb-1">فسحة</div>
-                                <div class="tabular t-1 fw-5">${prev.end} ص – ${t.start} ص</div>
+                          <div class="timerow row-recess my-2">
+                            <div class="recess-badge">فسحة</div>
+                            <div class="timerow__in" style="text-align: start; display: flex; flex-direction: column; justify-content: center; min-height: auto;">
+                              <div style="font-size: 14.5px; font-weight: 700; color: var(--recess); margin-bottom: 2px;">
+                                <span style="direction: ltr; unicode-bidi: isolate; display: inline-block;">${prev.end}</span> ص — <span style="direction: ltr; unicode-bidi: isolate; display: inline-block;">${t.start}</span> ص
                               </div>
-                              ${cfg?.recess ? html`<button class="btn btn--sm btn--quiet" data-act="edit-recess">${icon('edit')} تعديل</button>` : ''}
+                              <div class="row__sub">${cfg?.recess?.duration || gapMins} دقيقة · تفويج ${cfg?.recess?.transition || 0} دقائق</div>
+                              <div class="row__sub">${gradesText}</div>
                             </div>
-                            <div class="grid grid--2" style="gap: 0.75rem;">
-                              <div><div class="t-3 fs-xs mb-1">مدة الفسحة</div><div class="fw-5 fs-sm">${cfg?.recess?.duration || gapMins} دقيقة</div></div>
-                              <div><div class="t-3 fs-xs mb-1">التفويج</div><div class="fw-5 fs-sm">${cfg?.recess?.transition || 0} دقائق</div></div>
-                              <div><div class="t-3 fs-xs mb-1">موعدها</div><div class="fw-5 fs-sm">بعد الحصة ${cfg?.recess?.afterPeriod || prev.period}</div></div>
-                              <div><div class="t-3 fs-xs mb-1">تطبق على</div><div class="fw-5 fs-sm">${gradesText}</div></div>
-                            </div>
+                            ${cfg?.recess ? html`<button class="iconbtn ms-auto" data-act="edit-recess" aria-label="تعديل الفسحة" style="color: var(--recess);">${icon('edit')}</button>` : ''}
                           </div>
                         `);
                       }

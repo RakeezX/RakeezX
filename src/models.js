@@ -69,7 +69,7 @@ export const subjectId = (slug) => `sub:${slug}`;
 export const sectionId = () => `sec:${uid()}`;
 export const teachingId = (secId, subId, tmId) => `tch:${secId}|${subId}|${tmId}`;
 export const enrollmentId = (studentId, secId) => `en:${studentId}:${secId}`;
-export const slotId = (tchId, wd, period) => `sl:${tchId}:${wd}:${period}`;
+export const slotId = () => `sl:${uid()}`;
 export const sessionId = (tchId, date, period) => `se:${tchId}:${date}:${period}`;
 export const attendanceId = (studentId, sesId) => `at:${studentId}:${sesId}`;
 export const scoreId = (studentId, itemId) => `sc:${studentId}:${itemId}`;
@@ -585,7 +585,7 @@ export const makeItem = (o = {}) => ({
 /** الخانة في الجدول الأسبوعي — بلا أوقات، فالوقت يأتي من ملف التوقيت. */
 export const makeSlot = (o = {}) => ({
   ...base(),
-  id: o.id ?? slotId(o.teachingId, o.weekday, o.period),
+  id: o.id ?? slotId(),
   teachingId: o.teachingId,
   weekday: Number(o.weekday ?? 0),
   period: Number(o.period ?? 1),

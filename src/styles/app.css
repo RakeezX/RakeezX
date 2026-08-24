@@ -606,3 +606,6 @@ a { color: var(--brand); text-underline-offset: 3px; }
     transition-duration: .01ms !important;
   }
 }
+
+:root { --recess: #d97706; --recess-soft: #fef3c7; }
+:root[data-theme="dark"] { --recess: #b45309; --recess-soft: #451a03; }

@@ -520,3 +520,16 @@
 
   @page { margin: 14mm; }
 }
+
+/* ---------- ملخص التوقيت ---------- */
+.timing-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--sp-3) var(--sp-2); line-height: 1.4; }
+.timing-summary-item { display: flex; flex-direction: column; }
+.timing-summary-label { font-size: 12.5px; color: var(--text-3); margin-bottom: 3px; }
+.timing-summary-value { font-weight: 650; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+
+
+/* ---------- صف الفسحة ---------- */
+.row-recess { border-color: var(--recess); background: var(--recess-soft); padding: var(--sp-2) var(--sp-3); }
+.recess-badge { flex: none; width: auto; padding: 0 var(--sp-2); height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-sm); background: var(--recess); color: #fff; font-size: 13px; font-weight: 800; }
+.row-recess .row__title { font-weight: 700; color: var(--text); }
+.row-recess .row__sub { color: var(--text-2); font-size: 13px; }
