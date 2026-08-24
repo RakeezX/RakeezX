@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert';
 import 'fake-indexeddb/auto';
 import * as store from '../src/store.js';
+import * as db from '../src/lib/db.js';
 
 // Setup mock window environment
 if (!globalThis.window) {
@@ -104,10 +105,11 @@ test('Performance / Stress Suite: ~62k Mixed Dataset', async (t) => {
     assert.equal(store.state.students.length, numStudents);
     assert.equal(store.state.scores.length, 50000);
     assert.equal(store.state.attendance.length, 10000);
-
-    setTimeout(() => process.exit(0), 100);
   } catch (err) {
     console.error("Stress test failed:", err);
     throw err;
+  } finally {
+    store.closeChannel();
+    await db.closeDB();
   }
 });
