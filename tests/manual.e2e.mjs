@@ -44,15 +44,23 @@ test.describe('Manual Acceptance Requirements', () => {
     await expect(page.locator('.topbar__title').first()).toContainText('الرابع الابتدائي / ب');
   });
 
-  test('Schedule duplicate rejection and in-place editing', async ({ page }) => {
+  test('Schedule edit releases the old position without changing slot identity', async ({ page }) => {
     await page.goto('/#/schedule');
     await page.evaluate(async () => {
       await window.store.save({
         years: [{ id: 'y1', name: '2024' }],
         terms: [{ id: 't1', yearId: 'y1', name: 'Term 1' }],
-        subjects: [{ id: 'sub1', name: 'Math' }],
+        subjects: [
+          { id: 'subA', name: 'Math A' },
+          { id: 'subB', name: 'Math B' },
+          { id: 'subC', name: 'Math C' },
+        ],
         sections: [{ id: 'sec1', yearId: 'y1', grade: 4, label: 'أ', name: '4/أ', order: 0 }],
-        teachings: [{ id: 'tch1', sectionId: 'sec1', subjectId: 'sub1', termId: 't1', order: 0 }]
+        teachings: [
+          { id: 'tchA', sectionId: 'sec1', subjectId: 'subA', termId: 't1', order: 0 },
+          { id: 'tchB', sectionId: 'sec1', subjectId: 'subB', termId: 't1', order: 1 },
+          { id: 'tchC', sectionId: 'sec1', subjectId: 'subC', termId: 't1', order: 2 },
+        ],
       });
       await window.store.patchDevice({ activeYearId: 'y1', activeTermId: 't1' });
       window.store.repaint();
@@ -60,72 +68,56 @@ test.describe('Manual Acceptance Requirements', () => {
 
     await expect(page.locator('.topbar__title').first()).toBeVisible({ timeout: 15000 });
 
-    // Add first slot
-    await page.locator('[data-act="add"]').first().click();
-    await expect(page.locator('.sheet')).toBeVisible();
-    await expect(page.locator('select[name="teachingId"]')).toBeVisible({ timeout: 10000 });
-    
-    await page.selectOption('select[name="weekday"]', '0'); // Sunday
-    await page.selectOption('select[name="period"]', '1');  // Period 1
-    await page.click('button[form="slot-form"]');
-    
-    await expect(page.locator('.slot').filter({ hasText: 'الحصة الأولى' })).toBeVisible();
+    const addSlot = async (teachingId, weekday, period) => {
+      await page.locator('[data-act="add"]').first().click();
+      await expect(page.locator('.sheet')).toBeVisible();
+      await page.selectOption('select[name="teachingId"]', teachingId);
+      await page.selectOption('select[name="weekday"]', weekday);
+      await page.selectOption('select[name="period"]', period);
+      await page.click('button[form="slot-form"]');
+    };
 
-    // Try adding duplicate
-    await page.locator('[data-act="add"]').first().click();
-    await expect(page.locator('.sheet')).toBeVisible();
-    await page.selectOption('select[name="weekday"]', '0'); // Sunday
-    await page.selectOption('select[name="period"]', '1');  // Period 1
-    await page.click('button[form="slot-form"]');
-    
-    await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
+    // Teaching A: Sunday / Period 1.
+    await addSlot('tchA', '0', '1');
+    await expect(page.locator('#toast')).toContainText('أُضيفت');
+    const firstSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').getAttribute('data-id');
+    expect(firstSlotId).toBeTruthy();
 
-    // 1. Click edit on the existing Sunday P1 slot
-    const firstSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).getAttribute('id');
+    // Move the same slot to Monday / Period 4.
     await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').click();
     await expect(page.locator('.sheet')).toBeVisible();
-    
-    // 2. Edit the SAME slot to Monday (1) / Period 4
     await page.selectOption('select[name="weekday"]', '1');
     await page.selectOption('select[name="period"]', '4');
     await page.click('button[form="slot-form"]');
-    
-    // 3. Confirm it visibly moved
+    await expect(page.locator('#toast')).toContainText('تم تعديل');
     await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
-    
-    // 4. Now create: Sunday / Period 1 / DIFFERENT Teaching (we only have one teaching in mock, so we'll use same teaching but new slot ID)
-    // Wait, let's just add it to Sunday P1. If old is released, this will succeed.
-    await page.locator('[data-act="add"]').first().click();
-    await expect(page.locator('.sheet')).toBeVisible();
-    await page.selectOption('select[name="weekday"]', '0'); // Sunday
-    await page.selectOption('select[name="period"]', '1');  // Period 1
-    await page.click('button[form="slot-form"]');
-    
-    // Expected SUCCESS, toast shown
+
+    // Teaching B can now use the released Sunday / Period 1 position.
+    await addSlot('tchB', '0', '1');
     await expect(page.locator('#toast')).toContainText('أُضيفت');
-    
-    // 5. Attempt another: Sunday P1
-    await page.locator('[data-act="add"]').first().click();
-    await expect(page.locator('.sheet')).toBeVisible();
-    await page.selectOption('select[name="weekday"]', '0'); // Sunday
-    await page.selectOption('select[name="period"]', '1');  // Period 1
-    await page.click('button[form="slot-form"]');
-    
-    // Expected REJECT
+
+    // Teaching C is rejected because Teaching B occupies Sunday / Period 1.
+    await addSlot('tchC', '0', '1');
     await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
-    await page.keyboard.press('Escape'); // Close modal manually here since it didn't submit
-    
-    // 6. Reload the app
+    await page.keyboard.press('Escape');
+
+    const snapshot = () => window.store.state.slots
+      .filter((slot) => ['tchA', 'tchB', 'tchC'].includes(slot.teachingId))
+      .map(({ id, teachingId, weekday, period }) => ({ id, teachingId, weekday, period }));
+    const beforeReload = await page.evaluate(snapshot);
+    expect(beforeReload).toEqual([
+      { id: firstSlotId, teachingId: 'tchA', weekday: 1, period: 4 },
+      expect.objectContaining({ teachingId: 'tchB', weekday: 0, period: 1 }),
+    ]);
+
     await page.reload();
-    
-    // 7. Check occupancy
     await expect(page.locator('.slot').filter({ hasText: 'الحصة الأولى' })).toBeVisible();
     await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
-    
-    // 8. Verify ID preserved
-    const editedSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الرابعة' }).getAttribute('id');
+    const editedSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الرابعة' }).locator('[data-act="edit"]').getAttribute('data-id');
     expect(editedSlotId).toBe(firstSlotId);
-    
+
+    const afterReload = await page.evaluate(snapshot);
+    expect(afterReload).toEqual(beforeReload);
     expect(errors).toEqual([]);
   });
 });
