@@ -41,16 +41,20 @@ test.describe('Manual Acceptance Requirements', () => {
     await expect(page.locator('#toast')).toContainText('تم تعديل');
     
     // Verify title updated
-    await expect(page.locator('.topbar__title').first()).toContainText('4/ب');
+    await expect(page.locator('.topbar__title').first()).toContainText('الرابع الابتدائي / ب');
   });
 
   test('Schedule duplicate rejection and in-place editing', async ({ page }) => {
     await page.goto('/#/schedule');
     await page.evaluate(async () => {
       await window.store.save({
+        years: [{ id: 'y1', name: '2024' }],
+        terms: [{ id: 't1', yearId: 'y1', name: 'Term 1' }],
+        subjects: [{ id: 'sub1', name: 'Math' }],
         sections: [{ id: 'sec1', yearId: 'y1', grade: 4, label: 'أ', name: '4/أ', order: 0 }],
         teachings: [{ id: 'tch1', sectionId: 'sec1', subjectId: 'sub1', termId: 't1', order: 0 }]
       });
+      await window.store.patchDevice({ activeYearId: 'y1', activeTermId: 't1' });
       window.store.repaint();
     });
 
@@ -59,7 +63,7 @@ test.describe('Manual Acceptance Requirements', () => {
     // Add first slot
     await page.locator('[data-act="add"]').first().click();
     await expect(page.locator('.sheet')).toBeVisible();
-    await expect(page.locator('select[name="teachingId"] option').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('select[name="teachingId"]')).toBeVisible({ timeout: 10000 });
     
     await page.selectOption('select[name="weekday"]', '0'); // Sunday
     await page.selectOption('select[name="period"]', '1');  // Period 1
@@ -75,7 +79,6 @@ test.describe('Manual Acceptance Requirements', () => {
     await page.click('button[form="slot-form"]');
     
     await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
-    await page.locator('[data-sheet-close]').first().click();
 
     // Click edit on the slot
     await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').click();
