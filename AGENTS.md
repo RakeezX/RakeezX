@@ -250,16 +250,17 @@ Recess must render as a compact timeline row, not a giant settings card.
 
 ---
 
+## Approved Decisions
+
+- **D-11 — participation:** a cumulative scored component that starts at 0 for every student and is part of the final grade from the beginning. Teachers increase it over time for participation and effort; it is never a null “not evaluated” state.
+- **D-13 — student notes:** a dated, multi-entry history/log, not one overwriteable note field.
+- **D-17 — data residency:** retain the current Supabase project and region. Revisit only if scale, regulation, or a more suitable region requires a migration.
+- **D-18 — same-field sync conflicts:** field-level Last-Write-Wins. Independently edited fields both survive; routine conflict-choice dialogs are not shown.
+- **D-20 — deletion:** use tombstones so stale devices cannot resurrect deleted records. Automated garbage collection is deferred; a future retention policy may use approximately 12 months or academic-year-based cleanup.
+
 ## Deferred Decisions
 
-Do not resolve unless explicitly instructed:
-
-D-11 participation no-rating
-D-12 assignments
-D-13 notes
-D-17 data residency
-D-18 same-field sync conflict
-D-20 tombstone/hard-delete retention
+- **D-12 — assignments/projects:** may become a dedicated module with teacher-created work, instructions/steps, a student-facing link, execution/submission instructions, and possible submission tracking. Do not implement it yet.
 
 Authentication changes are also deferred.
 

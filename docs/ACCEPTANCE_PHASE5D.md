@@ -39,19 +39,21 @@
 
 - Timing-profile recess row visual refinement. It is intentionally deferred to a later UI/UX pass and is not a Phase 5D release blocker.
 
-## Deferred product decisions
+## Product decisions
 
-D-11 participation no-rating; D-12 assignments; D-13 notes; D-17 data residency; D-18 same-field sync conflict; D-20 tombstone/hard-delete retention; and authentication changes remain deferred.
+- **D-11 — closed:** Participation is cumulative, starts at 0 for every student, and is part of the final grade from the beginning; it is not a null “not evaluated” state.
+- **D-12 — deferred:** Assignments/projects may later become a dedicated module with teacher-created work, instructions and steps, a student-facing link, execution/submission instructions, and possible submission tracking.
+- **D-13 — closed:** Student notes will be a dated multi-entry history/log, not one overwriteable field.
+- **D-17 — closed:** Keep the current Supabase project/region unless scale, regulation, or a better suitable region requires migration.
+- **D-18 — closed:** Same-field conflicts use field-level Last-Write-Wins; independently edited fields both survive, without routine choice dialogs.
+- **D-20 — closed:** Deletions use tombstones to prevent stale-device resurrection; automated garbage collection is deferred, with a future policy around 12 months or academic-year cleanup.
+- Authentication changes remain deferred.
 
 ## Next recommended tickets — analysis only
 
 1. User merge decision: `preview/phase-5d` → `main` (do not merge automatically).
-2. Resolve D-11 participation no-rating semantics before extending scoring behavior.
-3. Define D-18 same-field sync-conflict policy before any advanced multi-device editing work.
-4. Define D-20 tombstone/hard-delete retention before data-retention cleanup work.
-5. Decide D-17 data-residency requirements before expanding cloud/data handling.
-6. Scope D-12 assignments and D-13 notes as separate teacher-workflow decisions.
-7. Low/medium priority UI polish: refine the timing-profile recess row presentation.
+2. Scope D-12 assignments/projects as a separate teacher-workflow decision.
+3. Low/medium priority UI polish: refine the timing-profile recess row presentation.
 
 ## Remaining decision
 
