@@ -20,6 +20,7 @@ if (import.meta.env?.DEV) {
 let view = null;
 let ctx = null;
 let mainEl = null;
+let syncModule = null;
 const scrollMemory = new Map();
 
 /* ---------- التنقل الرئيسي ---------- */
@@ -238,9 +239,9 @@ async function boot() {
     await cloud.init();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
-      const syncModule = await import('./lib/sync.js');
+      syncModule = await import('./lib/sync.js');
       syncModule.init();
-      window.__syncModule = syncModule; // Export for global access if needed
+      if (import.meta.env?.DEV) window.__syncModule = syncModule;
     } catch (err) {
       console.error('[rakeezx] Sync module failed to load:', err);
     }
@@ -285,8 +286,8 @@ async function boot() {
   store.onWriteError(() => toast('تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
   store.subscribe(scheduleRender);
   cloud.subscribe(scheduleRender);
-  if (window.__syncModule) {
-    window.__syncModule.subscribe(scheduleRender);
+  if (syncModule) {
+    syncModule.subscribe(scheduleRender);
   }
   onNavigate(resolve);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
