@@ -52,14 +52,14 @@ function itemSheet(classId, existing = null) {
         <label class="field" data-when="participation">
           <span class="field__label">درجة لكل نقطة مشاركة</span>
           <input class="input tabular" name="perPoint" type="number" inputmode="decimal"
-                 min="0.1" max="100" step="0.5" value="${it.perPoint ?? 1}">
+                 min="0.1" max="100" step="0.1" value="${it.perPoint ?? 1}">
           <span class="field__hint">مثال: ١ يعني أن ٥ نقاط مشاركة = ٥ درجات، بحدّ أقصى الدرجة العظمى.</span>
         </label>
 
         <label class="field" data-when="attendance">
           <span class="field__label">الخصم عن كل غياب</span>
           <input class="input tabular" name="penalty" type="number" inputmode="decimal"
-                 min="0.1" max="100" step="0.5" value="${it.penalty ?? 1}">
+                 min="0.1" max="100" step="0.1" value="${it.penalty ?? 1}">
           <span class="field__hint">الغياب المستأذن لا يُخصم عنه.</span>
         </label>
       </form>
@@ -209,14 +209,14 @@ export default {
             ${it.auto === 'participation'
               ? html`<label class="field">
                   <span class="field__label">درجة لكل نقطة مشاركة</span>
-                  <input class="input tabular" name="perPoint" type="number" step="0.5" min="0.1"
+                  <input class="input tabular" name="perPoint" type="number" step="0.1" min="0.1"
                          value="${it.perPoint ?? 1}">
                 </label>`
               : ''}
             ${it.auto === 'attendance'
               ? html`<label class="field">
                   <span class="field__label">الخصم عن كل غياب</span>
-                  <input class="input tabular" name="penalty" type="number" step="0.5" min="0.1"
+                  <input class="input tabular" name="penalty" type="number" step="0.1" min="0.1"
                          value="${it.penalty ?? 1}">
                 </label>`
               : ''}
