@@ -563,6 +563,43 @@ export const getSession = (id) => state.sessions.find((s) => s.id === id && !s.d
 
 export const attendanceIn = (sesId) => live(state.attendance).filter((a) => a.sessionId === sesId);
 
+/**
+ * حالة اكتمال الحضور مشتقة من الحصة المؤرخة وسجل الحضور فقط؛ لا تُخزَّن
+ * كحقل مستقل حتى لا تنفصل عن وقت الحصة التاريخي أو عن بيانات الحضور المزامنة.
+ * لا تصبح الحصة مستحقة إلا بعد نهاية وقتها الفعلي في ذلك التاريخ.
+ */
+export function attendanceCompleteness(ses, reference = new Date()) {
+  if (!ses) return { state: 'excluded', completed: false, due: false, recorded: 0, expected: 0 };
+  if (['cancelled_holiday', 'cancelled', 'missed', 'postponed'].includes(ses.status)) {
+    return { state: 'excluded', completed: false, due: false, recorded: 0, expected: 0 };
+  }
+
+  const roster = students(ses.teachingId);
+  const rosterIds = new Set(roster.map((student) => student.id));
+  const records = attendanceIn(ses.id).filter((record) => rosterIds.has(record.studentId));
+  const expected = roster.length;
+  const completed = expected > 0 && records.length >= expected;
+  const end = ses.endTime || ses.startTime || '23:59';
+  const dueAt = new Date(`${ses.date}T${end}:00`);
+  const due = Number.isFinite(dueAt.getTime()) && reference.getTime() >= dueAt.getTime();
+
+  if (completed) return { state: 'completed', completed, due, recorded: records.length, expected };
+  if (due) return { state: 'pending', completed, due, recorded: records.length, expected };
+  return { state: 'future', completed, due, recorded: records.length, expected };
+}
+
+export function attendanceCompletenessFor(tchId, date = todayISO(), reference = new Date()) {
+  const sessions = sessionsOnFor(tchId, date);
+  const summary = { sessions: 0, completed: 0, pending: 0, future: 0 };
+  for (const ses of sessions) {
+    const status = attendanceCompleteness(ses, reference);
+    if (status.state === 'excluded') continue;
+    summary.sessions++;
+    summary[status.state]++;
+  }
+  return summary;
+}
+
 /** كل التواريخ التي فيها حصص لهذا الإسناد، من الأحدث. */
 export function sessionDates(tchId) {
   const set = new Set(sessionsOf(tchId).map((s) => s.date));

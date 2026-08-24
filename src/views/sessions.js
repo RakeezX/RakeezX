@@ -3,8 +3,41 @@
 import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
-import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday } from '../models.js';
+import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday, todayISO } from '../models.js';
 let lastGeneration = null;
+
+const ATTENDANCE_COMPLETENESS = {
+  future: { label: 'مجدولة', tone: '' },
+  pending: { label: 'لم يُرصد الحضور', tone: 'warn' },
+  completed: { label: 'تم رصد الحضور', tone: 'ok' },
+};
+
+function attendanceMeta(session) {
+  const completeness = store.attendanceCompleteness(session);
+  return {
+    completeness,
+    meta: ATTENDANCE_COMPLETENESS[completeness.state]
+      ?? SESSION_STATUS[session.status]
+      ?? SESSION_STATUS.scheduled,
+  };
+}
+
+function dailySummary(teaching) {
+  const summary = store.attendanceCompletenessFor(teaching.id, todayISO());
+  if (!summary.sessions) return '';
+  return html`
+    <div class="card card--pad mb-3">
+      <div class="hstack gap-2 wrap">
+        <span class="fw-7">ملخّص حضور اليوم</span>
+        <span class="push t-3 fs-sm"><span class="tabular">${summary.sessions}</span> حصص اليوم</span>
+      </div>
+      <div class="hstack gap-2 wrap mt-3">
+        <span class="badge badge--ok">تم رصدها <span class="tabular">${summary.completed}</span></span>
+        ${summary.pending ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${summary.pending}</span></span>` : html`<span class="t-3 fs-sm">لا توجد حصص مستحقة بانتظار الرصد.</span>`}
+      </div>
+    </div>
+  `;
+}
 
 function generationCard(teaching) {
   const term = store.getTerm(teaching.termId);
@@ -50,9 +83,11 @@ export default {
 
     const list = store.sessionsOf(tch.id);
     const generator = generationCard(tch);
+    const todaySummary = dailySummary(tch);
     if (!list.length) {
       return html`
         ${generator}
+        ${todaySummary}
         <div class="empty">
           <div class="empty__icon">${icon('session')}</div>
           <div class="empty__title">لا حصص مسجّلة</div>
@@ -75,6 +110,7 @@ export default {
 
     return html`
       ${generator}
+      ${todaySummary}
       <div class="grid grid--3 mb-3">
         <div class="stat">
           <div class="stat__val tabular">${list.length}</div>
@@ -106,19 +142,22 @@ export default {
 
       <div class="list">
         ${list.map((s) => {
-          const m = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
+          const raw = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
+          const { completeness, meta } = attendanceMeta(s);
           const marked = store.attendanceIn(s.id).length;
           const absents = store.attendanceIn(s.id).filter((a) => a.status === 'absent').length;
           const lesson = s.lessonId ? store.getLesson(s.lessonId) : null;
+          const attendanceHref = `#/teaching/${s.teachingId}/attendance?session=${s.id}`;
           return html`
             <div class="row">
               <span class="period">${s.period}</span>
-              <a class="row__main" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
+              <a class="row__main" href="${attendanceHref}">
                 <span class="row__title">
                   ${WEEKDAYS[weekday(s.date)]} · ${fmtDate(s.date, false)}${s.startTime ? ` · ${s.startTime}–${s.endTime}` : ``}
                 </span>
                 <span class="row__sub">
-                  ${m.label}
+                  ${meta.label}
+                  ${completeness.state !== 'excluded' && raw.label !== meta.label ? html` · ${raw.label}` : ''}
                   ${s.reason ? html` · ${s.reason}` : ''}
                   ${marked ? html` · <span class="tabular">${marked}</span> مرصود` : ''}
                   ${absents ? html` · <span class="tabular">${absents}</span> غياب` : ''}
@@ -126,7 +165,12 @@ export default {
                 </span>
               </a>
               <span class="row__end">
-                <span class="badge ${m.tone ? 'badge--' + m.tone : ''}">${m.label}</span>
+                <span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>
+                ${completeness.state === 'pending'
+                  ? html`<a class="btn btn--sm btn--primary" href="${attendanceHref}">${icon('attendance')} رصد الحضور</a>`
+                  : completeness.state === 'completed'
+                    ? html`<a class="btn btn--sm btn--quiet" href="${attendanceHref}">مراجعة الحضور</a>`
+                    : ''}
                 <button class="iconbtn" data-act="status" data-id="${s.id}" aria-label="تغيير الحالة">
                   ${icon('edit')}
                 </button>

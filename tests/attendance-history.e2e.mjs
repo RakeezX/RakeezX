@@ -195,6 +195,8 @@ test('attendance remains historical after recurring slot edit and sync converges
     const records = window.store.state.attendance.filter((item) => !item.deleted && item.sessionId === sessionId);
     return { count: records.length, uniqueStudents: new Set(records.map((item) => item.studentId)).size };
   }, historical.session.id)).toEqual({ count: 4, uniqueStudents: 4 });
+  await pageB.goto('/#/teaching/test-teaching/sessions');
+  await expect(pageB.getByText('تم رصد الحضور', { exact: true })).toBeVisible();
   expect(errorsB).toEqual([]);
   await deviceB.close();
   expect(errors).toEqual([]);

@@ -33,6 +33,7 @@ export default {
     const list = store.teachings();
     const daySessions = store.sessionsOn(today);
     const cal = store.calendarDayFor(today);
+    const pendingToday = daySessions.filter((session) => store.attendanceCompleteness(session).state === 'pending').length;
 
     return html`
       <!-- ترحيب وتاريخ اليوم -->
@@ -59,7 +60,8 @@ export default {
       <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
-          <a class="btn btn--sm btn--quiet" href="#/schedule">الجدول ${icon('back')}</a>
+          ${pendingToday ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${pendingToday}</span></span>` : ''}
+          <a class="btn btn--sm btn--quiet push" href="#/schedule">الجدول ${icon('back')}</a>
         </div>
         ${daySessions.length
           ? html`
@@ -67,6 +69,17 @@ export default {
                 ${daySessions.map((s) => {
                   const tch = store.getTeaching(s.teachingId);
                   const meta = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
+                  const completeness = store.attendanceCompleteness(s);
+                  const attendanceLabel = completeness.state === 'pending'
+                    ? 'لم يُرصد الحضور'
+                    : completeness.state === 'completed'
+                      ? 'تم رصد الحضور'
+                      : meta.label;
+                  const attendanceTone = completeness.state === 'pending'
+                    ? 'warn'
+                    : completeness.state === 'completed'
+                      ? 'ok'
+                      : meta.tone;
                   const marked = store.attendanceIn(s.id).length;
                   const roster = store.students(s.teachingId).length;
                   return html`
@@ -76,15 +89,15 @@ export default {
                         <span class="row__title">${store.teachingLabel(tch)}</span>
                         <span class="row__sub">
                           ${s.startTime ? html`<span class="tabular t-3">${s.startTime} – ${s.endTime}</span> · ` : ''}
-                          ${meta.label}
-                          ${s.status === 'held' && roster
+                          ${attendanceLabel}
+                          ${completeness.state === 'completed' && roster
                             ? html` · <span class="tabular">${marked}/${roster}</span> مرصود`
                             : ''}
                           ${s.reason ? html` · ${s.reason}` : ''}
                         </span>
                       </span>
                       <span class="row__end">
-                        <span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>
+                        <span class="badge ${attendanceTone ? 'badge--' + attendanceTone : ''}">${attendanceLabel}</span>
                         ${icon('chev')}
                       </span>
                     </a>
