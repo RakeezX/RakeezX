@@ -12,7 +12,7 @@ import {
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
-  periodTime, periodNumbers, weekday,
+  periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
 } from './models.js';
 
@@ -595,49 +595,38 @@ export const activeTimeProfile = () =>
   getTimeProfile(state.device?.activeTimeProfileId) ?? timeProfiles()[0] ?? null;
 
 /** وقت حصة برقمها في يوم — من الملف النشط ما لم يُطلب غيره. */
-export const timeFor = (wd, period, profile = activeTimeProfile(), grade = null, date = null) => {
-  const p = resolveProfile(profile, date);
+export const timeFor = (wd, period, profile = activeTimeProfile(), grade = null, date = null, day = undefined) => {
+  const p = resolveProfile(profile, date, day);
   return periodTime(p, wd, period, grade);
 };
 
 /** أرقام الحصص المتاحة في يوم حسب الملف النشط. */
-export const availablePeriods = (wd = null, profile = activeTimeProfile(), date = null) => {
-  const p = resolveProfile(profile, date);
+export const availablePeriods = (wd = null, profile = activeTimeProfile(), date = null, day = undefined) => {
+  const p = resolveProfile(profile, date, day);
   return periodNumbers(p, wd);
 };
 
 /** يستنتج الملف الفعلي ليوم معين حسب الأولوية: استثناء تقويم، تقويم مدمج، موسمي، ثم الملف النشط. */
-export function resolveProfile(profile, date) {
+export function resolveProfile(profile, date, explicitDay = undefined) {
   if (!profile || !date) return profile;
-  
-  const activeCal = activeCalendar();
-  const day = activeCal ? calendarDaysOf(activeCal.id).find((d) => d.date === date) : null;
-  
-  // Priority 1 & 2 & 3: Calendar override (explicit or hybrid-generated remote days)
+
+  const day = explicitDay === undefined ? calendarDayFor(date) : explicitDay;
+
+  // يوم «عن بُعد» يستعمل وقت التوقيت المدمج نفسه، حتى لو كان الملف اليدوي الحالي موسمياً.
   if (day?.kind === 'remote') {
-    return { 
-      ...profile, 
-      periods: profile.overrides?.remote ?? profile.periods, // Fallback if hybrid remote isn't explicitly cached
-      overrides: {
-        config: { type: 'remote', assembly: { enabled: false }, recess: { enabled: false }, gap: 0 }
-      } 
+    const hybrid = timeProfiles().find((p) => p.overrides?.config?.type === 'hybrid') ?? profile;
+    return {
+      ...hybrid,
+      periods: hybrid.overrides?.remote ?? hybrid.periods,
+      overrides: { config: { type: 'remote', assembly: { enabled: false }, recess: { enabled: false }, gap: 0 } },
     };
   }
-  
-  // If we reach here, it's either an in_person day or a day without an override.
-  // Priority 4: Seasonal timing range for that date
+
   const validProfiles = timeProfiles().filter(
     (p) => p.overrides?.config?.type !== 'hybrid' && p.activeFrom && p.activeFrom <= date && (!p.activeTo || p.activeTo >= date)
   );
   validProfiles.sort((a, b) => b.activeFrom.localeCompare(a.activeFrom));
-  const physical = validProfiles[0];
-  
-  // Priority 5: Fallback manual active profile
-  const resolved = physical ?? profile;
-  
-  // If the fallback itself is hybrid (but the day is in_person), the hybrid profile has no periods for in_person.
-  // It shouldn't happen usually because seasonal should catch it, but if it does, we return it as is.
-  return resolved;
+  return validProfiles[0] ?? profile;
 }
 
 export const setActiveTimeProfile = (id) => patchDevice({ activeTimeProfileId: id });
@@ -660,7 +649,12 @@ export const calendarDaysOf = (calId) =>
 
 /** تصنيف يوم معيّن في تقويم السنة النشطة — أو null إن لم يُدخل. */
 export function calendarDayFor(date) {
-  const cal = activeCalendar();
+  return calendarDayForYear(activeYear()?.id, date);
+}
+
+/** يوم تقويم لسنة محددة — مهم عند عرض إسناد تاريخي لا يطابق السنة النشطة. */
+export function calendarDayForYear(yearId, date) {
+  const cal = calendarsOf(yearId)[0];
   if (!cal) return null;
   return live(state.calendarDays).find((d) => d.calendarId === cal.id && d.date === date) ?? null;
 }
@@ -1073,6 +1067,82 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
   return ses;
 }
 
+/**
+ * ينشئ الحصص المؤرخة المفقودة من خانات إسناد واحد ضمن حدود فصله الدراسي.
+ * لا يعيد إنشاء أو إحياء أي سجل موجود، فتظل الحصص والحضور التاريخيان كما هما.
+ */
+export async function generateSessionsForRange(tchId, startDate, endDate) {
+  const teaching = getTeaching(tchId);
+  if (!teaching) throw new Error('الفصل غير موجود.');
+  const term = getTerm(teaching.termId);
+  const year = term ? getYear(term.yearId) : null;
+  if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
+  if (!term.startDate || !term.endDate) throw new Error('أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا.');
+  if (!startDate || !endDate || startDate > endDate) throw new Error('تحقق من نطاق التاريخ.');
+  if (startDate < term.startDate || endDate > term.endDate) {
+    throw new Error('يجب أن يكون النطاق داخل تواريخ الفصل الدراسي الحالي.');
+  }
+
+  const maxDays = 184;
+  let date = startDate;
+  let dayCount = 0;
+  let created = 0;
+  let existing = 0;
+  let holidays = 0;
+  let unavailable = 0;
+  const pending = [];
+  const slots = slotsOf(tchId);
+  const knownSessionIds = new Set(state.sessions.map((s) => s.id));
+  const section = getSection(teaching.sectionId);
+  const profile = activeTimeProfile();
+
+  while (date <= endDate) {
+    dayCount++;
+    if (dayCount > maxDays) throw new Error('النطاق كبير جدًا؛ اختر مدة لا تتجاوز 184 يومًا.');
+
+    const matchingSlots = slots.filter((slot) => slot.weekday === weekday(date));
+    if (matchingSlots.length) {
+      const calendarDay = calendarDayForYear(year.id, date);
+      if (calendarDay && !isTeachingDay(calendarDay.kind)) {
+        holidays++;
+      } else {
+        const resolved = resolveProfile(profile, date, calendarDay);
+        for (const slot of matchingSlots) {
+          const id = sessionId(tchId, date, slot.period);
+          if (knownSessionIds.has(id)) {
+            existing++;
+            continue;
+          }
+          const timing = periodTime(resolved, weekday(date), slot.period, section?.grade);
+          if (!timing) {
+            unavailable++;
+            continue;
+          }
+          pending.push(makeSession({
+            id,
+            teachingId: tchId,
+            date,
+            period: slot.period,
+            slotId: slot.id,
+            startTime: timing.start,
+            endTime: timing.end,
+            timeProfileId: resolved?.id ?? profile?.id ?? null,
+            status: 'scheduled',
+          }));
+          knownSessionIds.add(id);
+          created++;
+        }
+      }
+    }
+    date = shiftDate(date, 1);
+  }
+
+  if (pending.length) {
+    const ok = await save({ sessions: pending });
+    if (!ok) throw new Error('تعذّر حفظ الحصص المولّدة.');
+  }
+  return { created, existing, holidays, unavailable };
+}
 export const setSessionStatus = (sesId, status, reason = '') =>
   patch('sessions', sesId, { status, reason });
 

@@ -1,8 +1,37 @@
 /** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
 
 import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
+import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday } from '../models.js';
+let lastGeneration = null;
+
+function generationCard(teaching) {
+  const term = store.getTerm(teaching.termId);
+  const hasBounds = term?.startDate && term?.endDate;
+  const result = lastGeneration?.teachingId === teaching.id ? lastGeneration : null;
+
+  return html`
+    <div class="card card--pad mb-3">
+      <div class="fw-7 mb-2">توليد الحصص من الجدول</div>
+      <p class="t-3 fs-sm mb-3">سيتم إنشاء الحصص غير الموجودة فقط، ولن تتكرر الحصص التي تم إنشاؤها سابقًا.</p>
+      ${hasBounds
+        ? html`
+            <form data-submit="generate-sessions" class="stack stack-2">
+              <div class="field-row">
+                <label class="field"><span class="field__label">من</span><input class="input tabular" name="startDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.startDate}" required></label>
+                <label class="field"><span class="field__label">إلى</span><input class="input tabular" name="endDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.endDate}" required></label>
+              </div>
+              <button class="btn btn--primary" type="submit">${icon('spark')} توليد الحصص</button>
+            </form>
+          `
+        : html`<p class="t-3 fs-sm">أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا من <a href="#/settings">الإعدادات</a>.</p>`}
+      ${result
+        ? html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة · تم تجاهل ${result.holidays} يوم إجازة${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}</p>`
+        : ''}
+    </div>
+  `;
+}
 
 export default {
   title: () => 'الحصص',
@@ -17,8 +46,10 @@ export default {
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
 
     const list = store.sessionsOf(tch.id);
+    const generator = generationCard(tch);
     if (!list.length) {
       return html`
+        ${generator}
         <div class="empty">
           <div class="empty__icon">${icon('session')}</div>
           <div class="empty__title">لا حصص مسجّلة</div>
@@ -40,6 +71,7 @@ export default {
     const rate = countable ? Math.round((executed / countable) * 100) : null;
 
     return html`
+      ${generator}
       <div class="grid grid--3 mb-3">
         <div class="stat">
           <div class="stat__val tabular">${list.length}</div>
@@ -104,6 +136,23 @@ export default {
   },
 
   actions: {
+    async 'generate-sessions'(el, ev, params) {
+      ev.preventDefault();
+      const fd = new FormData(el);
+      try {
+        const result = await store.generateSessionsForRange(
+          params.id,
+          String(fd.get('startDate') ?? ''),
+          String(fd.get('endDate') ?? ''),
+        );
+        lastGeneration = { teachingId: params.id, ...result };
+        repaint();
+        toast(`تم إنشاء ${result.created} حصة`);
+      } catch (err) {
+        toast(err.message || 'تعذّر توليد الحصص', 'danger');
+      }
+    },
+
     async status(el) {
       const ses = store.getSession(el.dataset.id);
       if (!ses) return;
