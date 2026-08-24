@@ -11,6 +11,11 @@ import { setRepaint } from './repaint.js';
 
 const app = document.getElementById('app');
 
+// Expose for E2E tests ONLY in development
+if (import.meta.env.DEV) {
+  window.store = { ...store, repaint: () => { if (typeof scheduleRender !== 'undefined') scheduleRender(); } };
+}
+
 let view = null;
 let ctx = null;
 let mainEl = null;

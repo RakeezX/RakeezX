@@ -80,16 +80,51 @@ test.describe('Manual Acceptance Requirements', () => {
     
     await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
 
-    // Click edit on the slot
+    // 1. Click edit on the existing Sunday P1 slot
+    const firstSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).getAttribute('id');
     await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').click();
     await expect(page.locator('.sheet')).toBeVisible();
     
-    // Change period to 2
-    await page.selectOption('select[name="period"]', '2');
+    // 2. Edit the SAME slot to Monday (1) / Period 4
+    await page.selectOption('select[name="weekday"]', '1');
+    await page.selectOption('select[name="period"]', '4');
     await page.click('button[form="slot-form"]');
     
-    await expect(page.locator('#toast')).toContainText('تم تعديل الحصة');
-    await expect(page.locator('.slot').filter({ hasText: 'الحصة الثانية' })).toBeVisible();
+    // 3. Confirm it visibly moved
+    await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
+    
+    // 4. Now create: Sunday / Period 1 / DIFFERENT Teaching (we only have one teaching in mock, so we'll use same teaching but new slot ID)
+    // Wait, let's just add it to Sunday P1. If old is released, this will succeed.
+    await page.locator('[data-act="add"]').first().click();
+    await expect(page.locator('.sheet')).toBeVisible();
+    await page.selectOption('select[name="weekday"]', '0'); // Sunday
+    await page.selectOption('select[name="period"]', '1');  // Period 1
+    await page.click('button[form="slot-form"]');
+    
+    // Expected SUCCESS, toast shown
+    await expect(page.locator('#toast')).toContainText('أُضيفت');
+    
+    // 5. Attempt another: Sunday P1
+    await page.locator('[data-act="add"]').first().click();
+    await expect(page.locator('.sheet')).toBeVisible();
+    await page.selectOption('select[name="weekday"]', '0'); // Sunday
+    await page.selectOption('select[name="period"]', '1');  // Period 1
+    await page.click('button[form="slot-form"]');
+    
+    // Expected REJECT
+    await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
+    await page.keyboard.press('Escape'); // Close modal manually here since it didn't submit
+    
+    // 6. Reload the app
+    await page.reload();
+    
+    // 7. Check occupancy
+    await expect(page.locator('.slot').filter({ hasText: 'الحصة الأولى' })).toBeVisible();
+    await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
+    
+    // 8. Verify ID preserved
+    const editedSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الرابعة' }).getAttribute('id');
+    expect(editedSlotId).toBe(firstSlotId);
     
     expect(errors).toEqual([]);
   });
