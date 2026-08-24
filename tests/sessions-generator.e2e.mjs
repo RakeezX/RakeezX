@@ -43,5 +43,16 @@ test('Sessions screen generates a bounded dated range through the real UI', asyn
 
   await page.reload();
   expect(await page.evaluate(() => window.store.sessionsOf('tch:session-ui').length)).toBe(2);
+
+  await page.evaluate(async () => {
+    await window.store.save({
+      sections: [{ id: 'sec:no-slots', yearId: 'y:session-ui', grade: 5, label: 'ب', name: '5/ب', deleted: false }],
+      teachings: [{ id: 'tch:no-slots', sectionId: 'sec:no-slots', subjectId: 'sub:session-ui', termId: 'tm:session-ui:1', deleted: false }],
+    });
+  });
+  await page.goto('/#/teaching/tch:no-slots/sessions');
+  await expect(page.getByText('لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي.')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'افتح الجدول' })).toHaveAttribute('href', '#/schedule');
+  await expect(page.locator('form[data-submit="generate-sessions"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

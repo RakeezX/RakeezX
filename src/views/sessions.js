@@ -9,14 +9,17 @@ let lastGeneration = null;
 function generationCard(teaching) {
   const term = store.getTerm(teaching.termId);
   const hasBounds = term?.startDate && term?.endDate;
+  const hasSlots = store.slotsOf(teaching.id).length > 0;
   const result = lastGeneration?.teachingId === teaching.id ? lastGeneration : null;
 
   return html`
     <div class="card card--pad mb-3">
       <div class="fw-7 mb-2">توليد الحصص من الجدول</div>
       <p class="t-3 fs-sm mb-3">سيتم إنشاء الحصص غير الموجودة فقط، ولن تتكرر الحصص التي تم إنشاؤها سابقًا.</p>
-      ${hasBounds
-        ? html`
+      ${!hasSlots
+        ? html`<p class="t-3 fs-sm">لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي. <a href="#/schedule">افتح الجدول</a></p>`
+        : hasBounds
+          ? html`
             <form data-submit="generate-sessions" class="stack stack-2">
               <div class="field-row">
                 <label class="field"><span class="field__label">من</span><input class="input tabular" name="startDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.startDate}" required></label>

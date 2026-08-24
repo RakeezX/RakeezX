@@ -1079,29 +1079,35 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
   if (!term.startDate || !term.endDate) throw new Error('أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا.');
   if (!startDate || !endDate || startDate > endDate) throw new Error('تحقق من نطاق التاريخ.');
-  if (startDate < term.startDate || endDate > term.endDate) {
-    throw new Error('يجب أن يكون النطاق داخل تواريخ الفصل الدراسي الحالي.');
+  if (endDate < term.startDate || startDate > term.endDate) {
+    throw new Error('النطاق المختار خارج تواريخ الفصل الدراسي الحالي.');
   }
 
+  const effectiveStart = startDate < term.startDate ? term.startDate : startDate;
+  const effectiveEnd = endDate > term.endDate ? term.endDate : endDate;
+  const slots = slotsOf(tchId);
+  if (!slots.length) throw new Error('لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي.');
+
   const maxDays = 184;
-  let date = startDate;
+  let date = effectiveStart;
   let dayCount = 0;
   let created = 0;
   let existing = 0;
   let holidays = 0;
   let unavailable = 0;
+  let matchedSlotDays = 0;
   const pending = [];
-  const slots = slotsOf(tchId);
   const knownSessionIds = new Set(state.sessions.map((s) => s.id));
   const section = getSection(teaching.sectionId);
   const profile = activeTimeProfile();
 
-  while (date <= endDate) {
+  while (date <= effectiveEnd) {
     dayCount++;
     if (dayCount > maxDays) throw new Error('النطاق كبير جدًا؛ اختر مدة لا تتجاوز 184 يومًا.');
 
     const matchingSlots = slots.filter((slot) => slot.weekday === weekday(date));
     if (matchingSlots.length) {
+      matchedSlotDays++;
       const calendarDay = calendarDayForYear(year.id, date);
       if (calendarDay && !isTeachingDay(calendarDay.kind)) {
         holidays++;
@@ -1137,11 +1143,16 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     date = shiftDate(date, 1);
   }
 
+  if (!matchedSlotDays) throw new Error('لا توجد حصص في الجدول ضمن النطاق المختار.');
   if (pending.length) {
     const ok = await save({ sessions: pending });
     if (!ok) throw new Error('تعذّر حفظ الحصص المولّدة.');
   }
-  return { created, existing, holidays, unavailable };
+  return {
+    created, existing, holidays, unavailable,
+    startDate: effectiveStart, endDate: effectiveEnd,
+    clipped: effectiveStart !== startDate || effectiveEnd !== endDate,
+  };
 }
 export const setSessionStatus = (sesId, status, reason = '') =>
   patch('sessions', sesId, { status, reason });

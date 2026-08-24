@@ -124,6 +124,29 @@ test('session range generation preserves dated timetable history', async (t) => 
       assert.equal(store.getSession(future.id).period, 4);
     });
 
+    await t.test('clips a partially overlapping range and explains zero-candidate ranges', async () => {
+      const f = await setup();
+      const clipped = await store.generateSessionsForRange(f.teaching.id, '2026-08-01', '2026-08-23');
+      assert.equal(clipped.created, 1);
+      assert.equal(clipped.startDate, '2026-08-23');
+      assert.equal(clipped.endDate, '2026-08-23');
+      assert.equal(clipped.clipped, true);
+
+      await assert.rejects(
+        store.generateSessionsForRange(f.teaching.id, '2026-08-24', '2026-08-24'),
+        /لا توجد حصص في الجدول ضمن النطاق المختار/
+      );
+    });
+
+    await t.test('rejects a teaching with no timetable slots instead of reporting ambiguous zeroes', async () => {
+      const f = await setup();
+      await store.removeSlot(f.sunday.id);
+      await store.removeSlot(f.tuesday.id);
+      await assert.rejects(
+        store.generateSessionsForRange(f.teaching.id, '2026-08-23', '2026-08-23'),
+        /لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي/
+      );
+    });
     await t.test('generated sessions converge through timetable sync', async () => {
       const f = await setup();
       const backend = new MockBackend();
