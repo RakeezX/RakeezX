@@ -15,7 +15,31 @@ async function expectChronologicalRange(page, expected) {
   const range = page.locator('.time-range').filter({ hasText: expected }).first();
   await expect(range).toHaveText(expected);
   await expect(range).toHaveAttribute('dir', 'ltr');
-  await expect(range.locator('bdi')).toHaveText(expected.split(' – '));
+  const tokens = range.locator('[data-time-token]');
+  await expect(tokens).toHaveText(expected.split(' – '));
+  const geometry = await tokens.evaluateAll((elements) => elements.map((element) => {
+    const box = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    const parent = element.parentElement;
+    return {
+      text: element.textContent,
+      x: box.x,
+      direction: style.direction,
+      unicodeBidi: style.unicodeBidi,
+      parentDirection: getComputedStyle(parent).direction,
+      parentDisplay: getComputedStyle(parent).display,
+    };
+  }));
+  const rangeStyle = await range.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { direction: style.direction, unicodeBidi: style.unicodeBidi, display: style.display };
+  });
+  expect(rangeStyle.direction).toBe('ltr');
+  expect(rangeStyle.unicodeBidi).toBe('isolate');
+  expect(['inline', 'inline-block']).toContain(rangeStyle.display);
+  expect(geometry.map((token) => token.direction)).toEqual(['ltr', 'ltr']);
+  expect(geometry.map((token) => token.parentDirection)).toEqual(['ltr', 'ltr']);
+  expect(geometry[0].x).toBeLessThan(geometry[1].x);
 }
 
 test('RTL mobile renders canonical session, home, and report time ranges chronologically', async ({ page }) => {
@@ -52,6 +76,10 @@ test('timing profile and timetable preserve start-to-end order on desktop and mo
   const startBox = await start.boundingBox();
   const endBox = await end.boundingBox();
   expect(startBox.x).toBeLessThan(endBox.x);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileStartBox = await start.boundingBox();
+  const mobileEndBox = await end.boundingBox();
+  expect(mobileStartBox.x).toBeLessThan(mobileEndBox.x);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/schedule');

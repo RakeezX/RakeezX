@@ -228,7 +228,7 @@ export const fmtTimeRange = (start, end) => {
   const first = String(start ?? '').trim();
   const last = String(end ?? '').trim();
   if (!first && !last) return '';
-  return html`<span class="time-range" dir="ltr"><bdi>${first}</bdi>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><bdi>${last}</bdi>` : ''}</span>`;
+  return html`<span class="time-range" dir="ltr"><span class="time-range__token" data-time-token="start">${first}</span>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><span class="time-range__token" data-time-token="end">${last}</span>` : ''}</span>`;
 };
 
 export const fmtNum = (n, digits = 2) => {
