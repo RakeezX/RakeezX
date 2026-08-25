@@ -123,8 +123,6 @@ function termSheet(existing = null, yearId = null) {
         done({
           name,
           index: Number(fd.get('index')),
-          startDate: String(fd.get('startDate') ?? '') || null,
-          endDate: String(fd.get('endDate') ?? '') || null,
           status: String(fd.get('status') ?? 'active'),
         });
       });
