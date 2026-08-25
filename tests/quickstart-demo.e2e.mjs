@@ -24,7 +24,7 @@ test('one-click local demo classes stay isolated, persistent, and deletable', as
   await page.getByRole('button', { name: 'إضافة فصل تجريبي' }).click();
   await expect(page.getByRole('link', { name: /تجريبي 2/ })).toBeVisible();
   await page.getByRole('button', { name: 'حذف الفصل التجريبي' }).first().click();
-  await page.getByRole('button', { name: 'حذف الفصل التجريبي' }).last().click();
+  await page.getByRole('dialog').getByRole('button', { name: 'حذف الفصل التجريبي' }).click();
   await expect(page.getByRole('link', { name: /تجريبي 1/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /تجريبي 2/ })).toBeVisible();
   await page.reload();
