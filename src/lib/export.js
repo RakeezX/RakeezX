@@ -63,7 +63,7 @@ export async function buildBackup() {
   };
   for (const store of db.STORES) {
     if (DEVICE_ONLY_STORES.includes(store)) continue;
-    payload.data[store] = await db.getAll(store);
+    payload.data[store] = (await db.getAll(store)).filter((record) => !String(record.id ?? '').startsWith('demo:'));
   }
   return payload;
 }

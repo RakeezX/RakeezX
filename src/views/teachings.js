@@ -6,7 +6,8 @@
  * تنشئهما معًا في خطوة واحدة حتى لا يشعر المعلّم بالتعقيد.
  */
 
-import { html, icon, openSheet, toast } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
+import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
   GRADES, SECTION_COLORS, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
@@ -92,6 +93,8 @@ function sheet(existing = null) {
   });
 }
 
+let demoBusy = false;
+
 function row(tch) {
   const sec = store.getSection(tch.sectionId);
   const sub = store.getSubject(tch.subjectId);
@@ -100,12 +103,13 @@ function row(tch) {
   const todaySessions = store.sessionsOnFor(tch.id, today);
   const marked = todaySessions.reduce((n, s) => n + store.attendanceIn(s.id).length, 0);
   const weekly = store.weeklyPeriods(tch.id);
+  const demo = isDemo(tch);
 
   return html`
     <a class="row" href="#/teaching/${tch.id}">
       <span class="class-dot" style="background:${safeColor(sec?.color)}"></span>
       <span class="row__main">
-        <span class="row__title">${sectionLabel(sec) || '—'}</span>
+        <span class="row__title">${sectionLabel(sec) || '—'} ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}</span>
         <span class="row__sub">
           ${sub?.name ?? ''} ·
           <span class="tabular">${roster.length}</span> طالبًا
@@ -150,12 +154,12 @@ export default {
               <p class="t-3 fs-sm mb-3">يمكنك إنشاء الفصول التي تدرّسها الآن دفعة واحدة، ثم تعديلها لاحقًا.</p>
               <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} إعداد الفصول الآن</button>
             </div>
-            <div class="mt-4"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button></div>
+            <div class="mt-4 stack stack-2"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
           ` : html`
             <div class="empty__text">
               أنشئ شعبتك الأولى وأسند إليها مادتك، ويأتي معها نموذج بنود تقييم جاهز.
             </div>
-            <button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button>
+            <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
           `}
         </div>
       `;
@@ -183,11 +187,23 @@ export default {
 
       <div class="list">${list.map(row)}</div>
 
-      <button class="fab" data-act="add">${icon('plus')} فصل جديد</button>
+      <div class="hstack gap-2 mt-3"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
     `;
   },
 
   actions: {
+    async 'add-demo'(el) {
+      if (demoBusy) return; demoBusy = true; el.disabled = true;
+      try { const result = await createDemoPackage(); toast(`تمت إضافة ${result.section.label} بنجاح`); store.repaint(); }
+      catch (err) { toast(err.message || 'تعذّر إنشاء الفصل التجريبي', 'danger'); }
+      finally { demoBusy = false; el.disabled = false; }
+    },
+    async 'delete-demo'(el) {
+      const teaching = store.getTeaching(el.dataset.id);
+      const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(teaching?.id));
+      if (!pkg || !(await confirmSheet({ title: 'حذف الفصل التجريبي', desc: 'سيُحذف فقط الفصل التجريبي وبياناته المحلية.', confirmLabel: 'حذف الفصل التجريبي', danger: true }))) return;
+      await deleteDemoPackage(pkg.packageId); toast('تم حذف الفصل التجريبي'); store.repaint();
+    },
     async add() {
       const data = await sheet();
       if (!data) return;

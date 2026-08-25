@@ -156,6 +156,7 @@ export async function patchMany(store, edits, outboxFor = null, stamp = Date.now
 
         if (!ob) return;
         const entry = outboxFor(next, Object.keys(edit.changes));
+        if (!entry) return;
         const obReq = ob.get(entry.id);
         obReq.onsuccess = () => ob.put(mergeOutbox(obReq.result, entry));
       };

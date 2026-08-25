@@ -277,7 +277,11 @@ async function ensureFoundation() {
 
 /* ---------- الكتابة ---------- */
 
-const outboxEntry = (storeName, rec, fields = null, op = 'put') => ({
+export const isLocalOnlyRecord = (rec) => String(rec?.id ?? '').startsWith('demo:');
+
+const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
+  if (isLocalOnlyRecord(rec)) return null;
+  return ({
   id: `${storeName}:${rec.id}`,
   store: storeName,
   recordId: rec.id,
@@ -285,7 +289,8 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put') => ({
   fields: fields ? [...fields] : null,
   updatedAt: rec.updatedAt,
   queuedAt: now(),
-});
+  });
+};
 
 function applyToMemory(storeName, records) {
   const arr = state[storeName];
@@ -325,7 +330,7 @@ export async function save(batch) {
     writes[storeName] = records;
     undos.push([storeName, records, applyToMemory(storeName, records)]);
     changes.push(...changeList(storeName, records));
-    if (storeName !== 'meta') outbox.push(...records.map((r) => outboxEntry(storeName, r)));
+    if (storeName !== 'meta') outbox.push(...records.map((r) => outboxEntry(storeName, r)).filter(Boolean));
   }
   if (!changes.length) return true;
 
