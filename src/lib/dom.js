@@ -210,6 +210,10 @@ const ICONS = {
 /** يعيد أيقونة SVG جاهزة للحقن. */
 export const icon = (name) => raw(P(ICONS[name] ?? ICONS.note));
 
+/** رابط رجوع صريح إلى الشاشة الأم، مستقل عن سجل المتصفح. */
+export const parentLink = (label, parentRoute) =>
+  html`<a class="btn btn--quiet mt-3" href="#${parentRoute}">${icon('back')} ${label}</a>`;
+
 /* ---------- تنسيق ---------- */
 /** يعرض رقمًا بلا كسور زائدة: 8.50 → 8.5 · 8.00 → 8 */
 export const fmtNum = (n, digits = 2) => {
