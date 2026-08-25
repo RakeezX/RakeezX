@@ -13,6 +13,7 @@ import {
   GRADES, SECTION_COLORS, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
 } from '../models.js';
 import { go } from '../router.js';
+import { repaint } from '../repaint.js';
 
 function sheet(existing = null) {
   const secs = store.sections();
@@ -122,7 +123,7 @@ function row(tch) {
             ? html`<span class="badge badge--ok">${icon('check')} رُصد اليوم</span>`
             : html`<span class="badge badge--warn">حصة اليوم</span>`
           : ''}
-        ${icon('chev')}
+        ${demo ? html`<button class="btn btn--sm btn--quiet" data-act="delete-demo" data-id="${tch.id}">حذف الفصل التجريبي</button>` : ''}${icon('chev')}
       </span>
     </a>
   `;
@@ -194,15 +195,16 @@ export default {
   actions: {
     async 'add-demo'(el) {
       if (demoBusy) return; demoBusy = true; el.disabled = true;
-      try { const result = await createDemoPackage(); toast(`تمت إضافة ${result.section.label} بنجاح`); store.repaint(); }
+      try { const result = await createDemoPackage(); toast(`تمت إضافة ${result.section.label} بنجاح`); repaint(); }
       catch (err) { toast(err.message || 'تعذّر إنشاء الفصل التجريبي', 'danger'); }
       finally { demoBusy = false; el.disabled = false; }
     },
-    async 'delete-demo'(el) {
+    async 'delete-demo'(el, ev) {
+      ev?.preventDefault(); ev?.stopPropagation();
       const teaching = store.getTeaching(el.dataset.id);
       const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(teaching?.id));
       if (!pkg || !(await confirmSheet({ title: 'حذف الفصل التجريبي', desc: 'سيُحذف فقط الفصل التجريبي وبياناته المحلية.', confirmLabel: 'حذف الفصل التجريبي', danger: true }))) return;
-      await deleteDemoPackage(pkg.packageId); toast('تم حذف الفصل التجريبي'); store.repaint();
+      await deleteDemoPackage(pkg.packageId); toast('تم حذف الفصل التجريبي'); repaint();
     },
     async add() {
       const data = await sheet();
@@ -222,7 +224,7 @@ export default {
       });
 
       await store.createTeaching({ sectionId: sec.id, subjectId: data.subjectId, termId: term.id });
-      store.repaint();
+      repaint();
     },
 
     async 'seed-sections'() {
@@ -327,7 +329,7 @@ export default {
       }
       
       toast(`تم إضافة ${added} إسناد بنجاح`);
-      store.repaint();
+      repaint();
     }
   },
 };
