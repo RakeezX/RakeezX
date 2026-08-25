@@ -656,9 +656,10 @@ export const makeLesson = (o = {}) => ({
   ...o,
 });
 
-/** كيان الملاحظات المؤرّخة — النموذج جاهز، ولا واجهة له في الموجة الأولى. */
+/** ملاحظة طالب مؤرّخة: سجل مستقل قابل للمزامنة، لا حقلًا قابلًا للاستبدال. */
 export const makeNote = (o = {}) => ({
   ...base(),
+  createdAt: o.createdAt ?? now(),
   studentId: o.studentId ?? null,
   teachingId: o.teachingId ?? null,
   sessionId: o.sessionId ?? null,

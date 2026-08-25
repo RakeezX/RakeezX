@@ -315,6 +315,11 @@ export default {
             </button>
             ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
 
+            <button class="btn btn--quiet btn--block" data-act="sync-notes" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('spark')} اختبار مزامنة ملاحظات الطلاب
+            </button>
+            ${renderResultPanel('اختبار مزامنة ملاحظات الطلاب', sync.state.results.notes)}
+
             <button class="btn btn--quiet btn--block" data-act="sync-scoring" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
               ${icon('spark')} اختبار مزامنة التقييم والدرجات
             </button>
@@ -444,6 +449,17 @@ export default {
         toast('تعذرت مزامنة الطلاب والانتساب', 'danger');
       } else {
         toast('تمت مزامنة الطلاب والانتساب بنجاح');
+      }
+      repaint();
+    },
+
+    async 'sync-notes'(el) {
+      if (sync.state.status === 'syncing') return;
+      await sync.syncNotes();
+      if (sync.state.results.notes?.status === 'error') {
+        toast('تعذرت مزامنة ملاحظات الطلاب', 'danger');
+      } else {
+        toast('تمت مزامنة ملاحظات الطلاب بنجاح');
       }
       repaint();
     },

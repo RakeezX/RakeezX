@@ -5,7 +5,7 @@
  * بيانات شعبة سابقة بأخرى حالية.
  */
 
-import { html, icon, toast, fmtNum, fmtPct, fmtDate } from '../lib/dom.js';
+import { html, icon, toast, fmtNum, fmtPct, fmtDate, openSheet, confirmSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
   itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
@@ -68,6 +68,17 @@ export default {
     const history = store
       .enrollmentsOf(s.id)
       .sort((a, b) => String(b.startDate ?? '').localeCompare(String(a.startDate ?? '')));
+    const notes = store.notesOf(s.id);
+    const noteTime = (note) => new Date(note.createdAt ?? note.updatedAt ?? Date.now())
+      .toLocaleTimeString('ar-SA', { hour: 'numeric', minute: '2-digit' });
+    const noteContext = (note) => {
+      const parts = [];
+      const noteTeaching = note.teachingId ? store.getTeaching(note.teachingId) : null;
+      const noteSession = note.sessionId ? store.getSession(note.sessionId) : null;
+      if (noteTeaching) parts.push(store.teachingLabel(noteTeaching));
+      if (noteSession) parts.push(`حصة ${noteSession.period} · ${fmtDate(noteSession.date, false)}`);
+      return parts;
+    };
 
     return html`
       <div class="printhead">
@@ -106,7 +117,6 @@ export default {
       ${band.badge
         ? html`<div class="mb-3">
             <span class="badge ${band.badge}">${band.label}</span>
-            ${s.note ? html`<span class="badge">${s.note}</span>` : ''}
           </div>`
         : ''}
 
@@ -203,6 +213,36 @@ export default {
             `}
       </div>
 
+      <!-- الملاحظات المؤرخة -->
+      <div class="section">
+        <div class="section__head">
+          <div class="section__title">الملاحظات</div>
+          <button class="btn btn--sm btn--quiet noprint" data-act="add-note">${icon('plus')} ملاحظة جديدة</button>
+        </div>
+        ${notes.length
+          ? html`<div class="card">
+              ${notes.map((note) => html`
+                <div class="logrow">
+                  <span class="logrow__main">
+                    <span>${note.text}</span>
+                    <span class="logrow__date">
+                      ${fmtDate(note.date, false)} · <bdi class="tabular">${noteTime(note)}</bdi>
+                      ${noteContext(note).map((label) => html`<span class="badge">${label}</span> `)}
+                    </span>
+                  </span>
+                  <span class="row__end noprint">
+                    <button class="iconbtn" data-act="edit-note" data-id="${note.id}" aria-label="تعديل ملاحظة">${icon('edit')}</button>
+                    <button class="iconbtn" data-act="delete-note" data-id="${note.id}" aria-label="حذف ملاحظة">${icon('trash')}</button>
+                  </span>
+                </div>
+              `)}
+            </div>`
+          : html`<div class="card card--pad center t-3 stack stack-2">
+              <div>لا توجد ملاحظات مسجلة لهذا الطالب.</div>
+              <div><button class="btn btn--quiet" data-act="add-note">${icon('plus')} إضافة ملاحظة</button></div>
+            </div>`}
+      </div>
+
       <!-- المشاركة والسلوك -->
       <div class="section">
         <div class="section__head"><div class="section__title">المشاركة والسلوك</div></div>
@@ -254,10 +294,64 @@ export default {
       window.print();
     },
 
+    async 'add-note'(el, ev, params) {
+      const student = store.getStudent(params.id);
+      const teaching = student ? resolveTeaching(student, params.teaching) : null;
+      if (!student) return;
+      const data = await openSheet({
+        title: 'ملاحظة جديدة',
+        body: html`<form id="student-note-form">
+          <label class="field"><span class="field__label">الملاحظة</span>
+            <textarea class="textarea" id="student-note-text" name="text" rows="5" maxlength="1200" required></textarea>
+          </label>
+          ${teaching ? html`<label class="check"><input type="checkbox" name="withTeaching"> ربطها بالفصل الحالي</label>` : ''}
+        </form>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="student-note-form" type="submit">حفظ</button>`,
+        onMount: (root, done) => {
+          root.querySelector('#student-note-text')?.focus();
+          root.querySelector('#student-note-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const form = new FormData(event.target);
+            done({ text: String(form.get('text') ?? '').trim(), withTeaching: form.get('withTeaching') === 'on' });
+          });
+        },
+      });
+      if (!data) return;
+      const saved = await store.addStudentNote({ studentId: student.id, text: data.text, teachingId: data.withTeaching ? teaching?.id ?? null : null });
+      toast(saved ? 'حُفظت الملاحظة' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+    },
+
+    async 'edit-note'(el) {
+      const note = store.state.notes.find((item) => item.id === el.dataset.id && !item.deleted);
+      if (!note) return;
+      const data = await openSheet({
+        title: 'تعديل ملاحظة',
+        body: html`<form id="student-note-edit-form"><label class="field"><span class="field__label">الملاحظة</span>
+          <textarea class="textarea" id="student-note-text" name="text" rows="5" maxlength="1200" required>${note.text}</textarea>
+        </label></form>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="student-note-edit-form" type="submit">حفظ</button>`,
+        onMount: (root, done) => root.querySelector('#student-note-edit-form').addEventListener('submit', (event) => {
+          event.preventDefault(); done(String(new FormData(event.target).get('text') ?? '').trim());
+        }),
+      });
+      if (data === undefined || data === null) return;
+      const saved = await store.editStudentNote(note.id, data);
+      toast(saved ? 'عُدّلت الملاحظة' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+    },
+
+    async 'delete-note'(el) {
+      const note = store.state.notes.find((item) => item.id === el.dataset.id && !item.deleted);
+      if (!note) return;
+      const ok = await confirmSheet({ title: 'حذف الملاحظة؟', desc: 'سيُحذف هذا الإدخال فقط من سجل الطالب.', confirmLabel: 'حذف الملاحظة', danger: true });
+      if (!ok) return;
+      await store.deleteStudentNote(note.id);
+      toast('حُذفت الملاحظة');
+    },
+
     async withdraw(el, ev, params) {
       const s = store.getStudent(params.id);
       if (!s) return;
-      const { confirmSheet } = await import('../lib/dom.js');
+
       const ok = await confirmSheet({
         title: `${s.name} غادر المدرسة؟`,
         desc: 'يُنهى انتسابه ولا يُحذف — درجاته وحضوره وسجله تبقى كاملة ويمكن الرجوع إليها.',

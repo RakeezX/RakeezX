@@ -323,10 +323,7 @@ export default {
                      min="1" max="999" value="${en?.rollNo ?? ''}">
               <span class="field__hint">رقم الكشف يخص انتساب الطالب لهذه الشعبة.</span>
             </label>
-            <label class="field">
-              <span class="field__label">ملاحظة</span>
-              <input class="input" name="note" value="${s.note ?? ''}" maxlength="200" autocomplete="off">
-            </label>
+
           </form>
         `,
         foot: html`
@@ -340,7 +337,7 @@ export default {
             const name = String(fd.get('name') ?? '').trim();
             if (!name) return;
             const roll = String(fd.get('rollNo') ?? '').trim();
-            done({ name, rollNo: roll ? Number(roll) : null, note: String(fd.get('note') ?? '').trim() });
+            done({ name, rollNo: roll ? Number(roll) : null });
           });
           root.querySelector('#btn-transfer').addEventListener('click', () => done({ __transfer: true }));
         },
@@ -362,7 +359,6 @@ export default {
         toast('الاسم غير صالح', 'danger');
         return;
       }
-      await store.patch('students', s.id, { note: data.note });
 
       if (en && data.rollNo !== en.rollNo) {
         const res = await store.setRollNo(en.id, data.rollNo);

@@ -8,7 +8,8 @@ export const state = {
   results: {
     profile: null,
     structural: null,
-    students: null
+    students: null,
+    notes: null
   }
 };
 
@@ -494,6 +495,34 @@ const MAPPERS = {
       deletedAt: rec.deleted_at || undefined
     })
   },
+  notes: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      student_id: rec.studentId,
+      teaching_id: rec.teachingId || null,
+      session_id: rec.sessionId || null,
+      date: rec.date,
+      kind: rec.kind || 'general',
+      text: rec.text,
+      created_at: new Date(rec.createdAt ?? rec.updatedAt).toISOString(),
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      studentId: rec.student_id,
+      teachingId: rec.teaching_id || null,
+      sessionId: rec.session_id || null,
+      date: rec.date,
+      kind: rec.kind || 'general',
+      text: rec.text,
+      createdAt: normalizeTimestamp(rec.created_at || rec.client_updated_at),
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
   attendance: {
     toCloud: (rec) => ({
       id: rec.id,
@@ -889,6 +918,20 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     toPush.push(...sorted);
   }
 
+  if (storeName === 'notes') {
+    for (const p of toPush) {
+      if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
+        throw new Error(`${storeName}: missing remote student ${p.student_id}`);
+      }
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+      if (p.session_id && !context.knownRemoteIds?.sessions?.has(p.session_id)) {
+        throw new Error(`${storeName}: missing remote session ${p.session_id}`);
+      }
+    }
+  }
+
   if (storeName === 'attendance') {
     for (const p of toPush) {
       if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
@@ -1087,6 +1130,46 @@ export async function syncStudents() {
         students: { status: 'error', error: err.message, time: Date.now() }
       }
     });
+  }
+}
+
+/** يزامن سجل ملاحظات الطلاب بعد ضمان وصول الطالب وسياق الحصة إن وُجد. */
+export async function syncNotes() {
+  if (!cloud.session || !cloud.user) {
+    console.log('[rakeezx sync] Not signed in, skipping notes sync.');
+    return;
+  }
+  if (state.status === 'syncing') return;
+
+  await syncStudents();
+  if (state.results.students?.status === 'error') {
+    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الطلاب: ' + state.results.students.error, time: Date.now() } } });
+    return;
+  }
+  await store.migrateLegacyStudentNotes();
+  await syncTimetable();
+  if (state.results.timetable?.status === 'error') {
+    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الجدول: ' + state.results.timetable.error, time: Date.now() } } });
+    return;
+  }
+
+  setState({ status: 'syncing', results: { ...state.results, notes: null } });
+  try {
+    const knownRemoteIds = {};
+    const [remoteStudents, remoteTeachings, remoteSessions] = await Promise.all([
+      cloud.fetchRecords('students'), cloud.fetchRecords('teachings'), cloud.fetchRecords('sessions'),
+    ]);
+    knownRemoteIds.students = new Set(remoteStudents.map((record) => record.id));
+    knownRemoteIds.teachings = new Set(remoteTeachings.map((record) => record.id));
+    knownRemoteIds.sessions = new Set(remoteSessions.map((record) => record.id));
+    const res = await syncCollection('notes', 'notes', { requiredIds: new Set(), knownRemoteIds });
+    const nowStamp = Date.now();
+    await store.patchDevice({ lastSyncAt: nowStamp });
+    setState({ status: 'idle', lastSyncedAt: nowStamp, results: { ...state.results, notes: { status: 'success', stats: { notes: { pushed: res.pushed, pulled: res.pulled } }, time: nowStamp } } });
+    console.log('[rakeezx sync] Notes sync complete.', res);
+  } catch (err) {
+    console.warn('[rakeezx sync] Notes sync failed:', err);
+    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: err.message, time: Date.now() } } });
   }
 }
 

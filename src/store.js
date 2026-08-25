@@ -10,7 +10,7 @@ import * as db from './lib/db.js';
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
-  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice,
+  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
@@ -193,6 +193,7 @@ export async function init() {
 
 
   await ensureFoundation();
+  await migrateLegacyStudentNotes();
 
   applyTheme();
   state.ready = true;
@@ -556,6 +557,13 @@ export const attendanceOf = (studentId) =>
   live(state.attendance).filter((a) => a.studentId === studentId);
 
 export const logsOf = (studentId) => live(state.logs).filter((l) => l.studentId === studentId);
+
+/** سجل ملاحظات الطالب هو المصدر القانوني؛ الأحدث أولًا لسهولة المتابعة اليومية. */
+export const notesOf = (studentId) => live(state.notes)
+  .filter((n) => n.studentId === studentId)
+  .sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')) ||
+    Number(b.createdAt ?? b.updatedAt ?? 0) - Number(a.createdAt ?? a.updatedAt ?? 0) ||
+    Number(b.updatedAt ?? 0) - Number(a.updatedAt ?? 0));
 
 /* ---------- الحصص ---------- */
 
@@ -980,6 +988,51 @@ export async function setRollNo(enrollmentId, rollNo) {
   return { ok: true };
 }
 
+/** ترحيل متكرر آمن: ملاحظة الطالب القديمة تظهر مرة واحدة في السجل المؤرّخ.
+ * نستخدم تاريخ آخر تعديل إن وُجد؛ وإلا تاريخ تشغيل الترحيل كأفضل تاريخ متاح. */
+export async function migrateLegacyStudentNotes() {
+  const migrated = [];
+  for (const student of live(state.students)) {
+    const text = String(student.note ?? '').trim();
+    if (!text) continue;
+    const localOnly = isLocalOnlyRecord(student);
+    const id = `${localOnly ? 'demo:' : ''}legacy-note:${student.id}`;
+    if (state.notes.some((note) => note.id === id)) continue;
+    const stamp = Number.isFinite(Number(student.updatedAt)) ? Number(student.updatedAt) : now();
+    migrated.push(makeNote({
+      id, studentId: student.id, text, kind: 'legacy',
+      date: new Date(stamp).toISOString().slice(0, 10), createdAt: stamp, updatedAt: stamp,
+    }));
+  }
+  if (migrated.length) await save({ notes: migrated });
+  return migrated;
+}
+
+/** يضيف ملاحظة مستقلة إلى سجل الطالب، مع سياق اختياري محفوظ تاريخيًا. */
+export async function addStudentNote({ studentId, text, teachingId = null, sessionId = null, date = todayISO(), createdAt = now() } = {}) {
+  const student = getStudent(studentId);
+  const clean = String(text ?? '').trim();
+  if (!student || !clean || clean.length > 1200) return null;
+  const stamp = Number(createdAt) || now();
+  const note = makeNote({
+    ...(isLocalOnlyRecord(student) ? { id: `demo:note:${uid()}` } : {}),
+    studentId, teachingId, sessionId, date, text: clean, createdAt: stamp, updatedAt: stamp,
+  });
+  return (await save({ notes: [note] })) ? note : null;
+}
+
+export async function editStudentNote(noteId, text) {
+  const clean = String(text ?? '').trim();
+  if (!clean || clean.length > 1200) return null;
+  return patch('notes', noteId, { text: clean });
+}
+
+export async function deleteStudentNote(noteId) {
+  const note = state.notes.find((item) => item.id === noteId && !item.deleted);
+  if (!note) return null;
+  return patch('notes', noteId, { deleted: true, deletedAt: new Date().toISOString() });
+}
+
 /** يضيف طالبًا جديدًا وينسبه لشعبة. يرفض الاسم الفارغ. */
 export async function addStudent(secId, name, { rollNo = null, note = '' } = {}) {
   const clean = normalizeName(name);
@@ -1092,6 +1145,7 @@ export async function deleteStudent(studentId) {
       scores: (s) => s.studentId === studentId,
       attendance: (a) => a.studentId === studentId,
       logs: (l) => l.studentId === studentId,
+      notes: (n) => n.studentId === studentId,
     },
     { op: 'deleteStudent', studentId }
   );
