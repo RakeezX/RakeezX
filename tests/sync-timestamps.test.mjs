@@ -11,9 +11,11 @@ import * as db from "../src/lib/db.js";
 class MockCloudBackend {
   constructor() {
     this.records = {};
+    this.upserts = [];
   }
   async fetchRecords(tableName) { return this.records[tableName] || []; }
   async upsertRecords(tableName, records) {
+    this.upserts.push({ tableName, ids: records.map((record) => record.id) });
     if (!this.records[tableName]) this.records[tableName] = [];
     const table = this.records[tableName];
     for (const rec of records) {
@@ -65,9 +67,12 @@ test("Sync Timestamps Suite", async (t) => {
     await db.put("years", { id: "y1", label: "Local Label", order: 1, updatedAt: 2000 });
     await store.init();
     
-    const stats = await sync.syncStructural();
-    assert.equal(stats.years.pushed, 0);
-    assert.equal(stats.years.pulled, 0);
+    await sync.syncStructural();
+    // The required boot-time foundation may legitimately sync in this run;
+    // the equal-timestamp test is specifically about y1 and must not count it.
+    assert.equal(backend.upserts.some((call) => call.tableName === "years" && call.ids.includes("y1")), false);
+    assert.equal(backend.records["years"].find((record) => record.id === "y1").label, "Remote Label");
+    assert.equal((await db.get("years", "y1")).label, "Local Label");
   });
 
   // Cleanup: close open handles so Node test runner exits cleanly.

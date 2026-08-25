@@ -91,11 +91,15 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     // Device A pushes
     await sync.syncStructural();
     
-    assert.equal(backend.records["years"].length, numYears);
-    assert.equal(backend.records["terms"].length, numTerms);
-    assert.equal(backend.records["subjects"].length, numSubjects);
-    assert.equal(backend.records["sections"].length, numSections);
-    assert.equal(backend.records["teachings"].length, numTeachings);
+    // init() correctly seeds the mandatory academic foundation. Assert this
+    // fuzz graph by its own stable IDs rather than by whole-table counts.
+    const remoteCount = (table, records) =>
+      backend.records[table].filter((record) => records.some((item) => item.id === record.id)).length;
+    assert.equal(remoteCount("years", years), numYears);
+    assert.equal(remoteCount("terms", terms), numTerms);
+    assert.equal(remoteCount("subjects", subjects), numSubjects);
+    assert.equal(remoteCount("sections", sections), numSections);
+    assert.equal(remoteCount("teachings", teachings), numTeachings);
     
     // Device B pulls (clean state)
     await db.clearAll();
