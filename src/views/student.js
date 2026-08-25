@@ -20,6 +20,18 @@ function resolveTeaching(student, requested) {
   return store.teachings().find((t) => t.sectionId === en.sectionId) ?? null;
 }
 
+/** يلتقط سياق الإسناد تلقائيًا فقط حين يكون سياق الطالب الحالي واضحًا. */
+function noteTeachingContext(student, requested) {
+  const enrollment = store.activeEnrollment(student.id);
+  if (!enrollment) return null;
+  const requestedTeaching = requested ? store.getTeaching(requested) : null;
+  if (requestedTeaching) {
+    return requestedTeaching.sectionId === enrollment.sectionId ? requestedTeaching : null;
+  }
+  const candidates = store.teachings().filter((teaching) => teaching.sectionId === enrollment.sectionId);
+  return candidates.length === 1 ? candidates[0] : null;
+}
+
 export default {
   title: (p) => store.getStudent(p.id)?.name ?? 'الطالب',
   subtitle: (p) => {
@@ -296,7 +308,7 @@ export default {
 
     async 'add-note'(el, ev, params) {
       const student = store.getStudent(params.id);
-      const teaching = student ? resolveTeaching(student, params.teaching) : null;
+      const teaching = student ? noteTeachingContext(student, params.teaching) : null;
       if (!student) return;
       const data = await openSheet({
         title: 'ملاحظة جديدة',
@@ -304,20 +316,19 @@ export default {
           <label class="field"><span class="field__label">الملاحظة</span>
             <textarea class="textarea" id="student-note-text" name="text" rows="5" maxlength="1200" required></textarea>
           </label>
-          ${teaching ? html`<label class="check"><input type="checkbox" name="withTeaching"> ربطها بالفصل الحالي</label>` : ''}
+
         </form>`,
         foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="student-note-form" type="submit">حفظ</button>`,
         onMount: (root, done) => {
           root.querySelector('#student-note-text')?.focus();
           root.querySelector('#student-note-form').addEventListener('submit', (event) => {
             event.preventDefault();
-            const form = new FormData(event.target);
-            done({ text: String(form.get('text') ?? '').trim(), withTeaching: form.get('withTeaching') === 'on' });
+            done({ text: String(new FormData(event.target).get('text') ?? '').trim() });
           });
         },
       });
       if (!data) return;
-      const saved = await store.addStudentNote({ studentId: student.id, text: data.text, teachingId: data.withTeaching ? teaching?.id ?? null : null });
+      const saved = await store.addStudentNote({ studentId: student.id, text: data.text, teachingId: teaching?.id ?? null });
       toast(saved ? 'حُفظت الملاحظة' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
     },
 
