@@ -596,8 +596,8 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   const mapper = MAPPERS[storeName];
   if (!mapper) throw new Error(`No mapper for ${storeName}`);
 
-  const remoteRecords = await cloud.fetchRecords(tableName);
-  const localRecords = store.state[storeName] || [];
+  const remoteRecords = (await cloud.fetchRecords(tableName)).filter((record) => !store.isLocalOnlyRecord(record));
+  const localRecords = (store.state[storeName] || []).filter((record) => !store.isLocalOnlyRecord(record));
 
   const remoteById = new Map(remoteRecords.map(r => [r.id, r]));
   const localById = new Map(localRecords.map(r => [r.id, r]));
