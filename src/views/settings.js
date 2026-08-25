@@ -235,7 +235,7 @@ export default {
                             ${t.startDate && t.endDate
                               ? html` · <span class="tabular">${t.startDate}</span> ← <span class="tabular">${t.endDate}</span>`
                               : ' · التواريخ غير مُدخلة'}
-                            · <span class="tabular">${store.teachings(t.id).length}</span> فصلًا
+                            · <span class="tabular">${store.teachings(t.id).length}</span> إسنادًا تدريسيًا
                           </span>
                         </span>
                         <span class="row__end">

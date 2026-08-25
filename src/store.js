@@ -1347,6 +1347,46 @@ export async function setCalendarDay(calId, date, kind, label = '') {
 
 export const removeCalendarDay = (id) => softDelete('calendarDays', id);
 
+export function calendarRangesOf(yearId = activeYear()?.id) {
+  const groups = new Map();
+  for (const calendar of calendarsOf(yearId)) for (const day of calendarDaysOf(calendar.id)) {
+    const key = day.rangeId ?? `legacy:${calendar.id}:${day.id}`;
+    const group = groups.get(key) ?? { id: key, calendarId: calendar.id, source: calendar.source, kind: day.kind, label: day.label, startDate: day.date, endDate: day.date, days: [] };
+    group.startDate = group.startDate < day.date ? group.startDate : day.date;
+    group.endDate = group.endDate > day.date ? group.endDate : day.date;
+    group.days.push(day); groups.set(key, group);
+  }
+  return [...groups.values()].sort((a, b) => a.startDate.localeCompare(b.startDate) || a.label.localeCompare(b.label));
+}
+
+export async function saveCalendarRange({ id = uid(), calendarId, startDate, endDate = startDate, kind, label = '' }) {
+  if (!startDate) throw new Error('تاريخ البداية مطلوب.');
+  if (endDate < startDate) throw new Error('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.');
+  const calendar = state.calendars.find((item) => item.id === calendarId && !item.deleted);
+  if (!calendar || calendar.source !== 'custom') throw new Error('لا يمكن تعديل الفترة الرسمية.');
+  const existing = live(state.calendarDays).filter((day) => day.calendarId === calendarId && day.rangeId === id);
+  const next = [];
+  for (let date = startDate; date <= endDate; date = shiftDate(date, 1)) next.push({ id: `cd:${calendarId}:${id}:${date}`, calendarId, date, kind, label, rangeId: id, rangeStart: startDate, rangeEnd: endDate, deleted: false, updatedAt: now() });
+  const removed = existing.filter((day) => !next.some((item) => item.id === day.id)).map((day) => ({ ...day, deleted: true, updatedAt: now() }));
+  await save({ calendarDays: [...next, ...removed] });
+  return id;
+}
+
+export async function removeCalendarRange(calendarId, rangeId) {
+  const days = live(state.calendarDays).filter((day) => day.calendarId === calendarId && day.rangeId === rangeId);
+  if (!days.length) return;
+  await save({ calendarDays: days.map((day) => ({ ...day, deleted: true, updatedAt: now() })) });
+}
+
+export async function updateTermDates(termId, startDate, endDate) {
+  if (!startDate || !endDate) throw new Error('تاريخ البداية والنهاية مطلوبان.');
+  if (endDate < startDate) throw new Error('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.');
+  const term = getTerm(termId); if (!term) throw new Error('الفصل الدراسي غير موجود.');
+  const overlaps = termsOf(term.yearId).some((other) => other.id !== term.id && other.startDate && other.endDate && startDate <= other.endDate && other.startDate <= endDate);
+  if (overlaps) throw new Error('يتداخل تاريخ هذا الفصل الدراسي مع فصل دراسي آخر. عدّل تاريخ البداية أو النهاية.');
+  return patch('terms', term.id, { startDate, endDate });
+}
+
 /**
  * يولّد تقويم هجين متناوب أسبوعيًا.
  * الأسبوع A: الأحد-الثلاثاء (حضوري)، الأربعاء-الخميس (عن بُعد)

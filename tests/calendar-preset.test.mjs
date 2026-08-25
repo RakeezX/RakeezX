@@ -61,6 +61,17 @@ test('Western Region 1448/1449 calendar preset', async (t) => {
       assert.equal(store.calendarDayForYear(year.id, '2026-09-23').label, 'استثناء محلي');
     });
 
+    await t.test('accepts adjacent term dates and preserves persisted dates after rejected overlap', async () => {
+      await reset();
+      const [first, second] = store.termsOf(store.activeYear().id);
+      await store.updateTermDates(second.id, '2027-01-08', '2027-06-30');
+      assert.equal(store.getTerm(second.id).startDate, '2027-01-08');
+      await assert.rejects(store.updateTermDates(first.id, '2026-08-30', '2027-01-08'), /يتداخل تاريخ/);
+      await assert.rejects(store.updateTermDates(first.id, '2026-08-30', '2027-01-20'), /يتداخل تاريخ/);
+      assert.deepEqual([store.getTerm(first.id).startDate, store.getTerm(first.id).endDate], ['2026-08-30', '2027-01-07']);
+      store.state.ready = false; await store.init();
+      assert.deepEqual([store.getTerm(first.id).startDate, store.getTerm(first.id).endDate], ['2026-08-30', '2027-01-07']);
+    });
     await t.test('calendar days control generated sessions and exclude official holidays from attendance/report debt', async () => {
       await reset();
       const year = store.activeYear();

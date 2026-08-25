@@ -58,7 +58,7 @@ export function calendarPresetRecords(preset) {
   const calendarDays = [];
   for (const holiday of preset.holidays) {
     for (let date = holiday.startDate; date <= holiday.endDate; date = shiftDate(date, 1)) {
-      calendarDays.push(makeCalendarDay({ calendarId: calendar.id, date, kind: holiday.kind, label: holiday.label, presetId: preset.id }));
+      calendarDays.push(makeCalendarDay({ calendarId: calendar.id, date, kind: holiday.kind, label: holiday.label, presetId: preset.id, rangeId: preset.id + ':' + holiday.startDate, rangeStart: holiday.startDate, rangeEnd: holiday.endDate }));
     }
   }
   return { year, calendar, terms, calendarDays };
