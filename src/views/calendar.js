@@ -72,16 +72,17 @@ export default {
 
   render() {
     const year = store.activeYear();
-    const cal = store.activeCalendar();
-    const days = cal ? store.calendarDaysOf(cal.id) : [];
+    const calendars = store.calendarsOf(year?.id);
+    const days = calendars.flatMap((calendar) => store.calendarDaysOf(calendar.id).map((day) => ({ ...day, source: calendar.source })));
     const terms = store.termsOf(year?.id);
+    const preset = store.calendarPresetForYear(year?.id);
 
     return html`
       <div class="card card--pad mb-3">
         <div class="fw-7">${year?.label ?? 'السنة الدراسية'}</div>
+        ${preset ? html`<div class="mt-3"><div class="fw-7">التقويم المعتمد</div><div class="t-3 fs-sm">${preset.label} · ${preset.regionLabel}</div><div class="t-3 fs-sm">${preset.coverage.join(' • ')}</div></div>` : html`<div class="mt-3"><button class="btn btn--quiet" data-act="apply-preset">تطبيق التقويم الرسمي · المنطقة الغربية</button></div>`}
         <p class="t-3 fs-sm mt-3">
-          حدود الفصول الدراسية تُدخَل من الإعدادات، وهذه الصفحة للإجازات والأيام المميّزة.
-          استيراد تقويم وزارة التعليم آليًا يأتي لاحقًا — النموذج مهيّأ له.
+          تظهر هنا حدود الفصول والإجازات الرسمية المعتمدة، ويمكنك إضافة استثناءات محلية دون تعديل التقويم الرسمي.
         </p>
         ${terms.length
           ? html`
@@ -131,7 +132,8 @@ export default {
                         ${k.teaching
                           ? html`<span class="badge">تُدرَّس</span>`
                           : html`<span class="badge badge--info">لا حصص</span>`}
-                        <button class="iconbtn" data-act="remove" data-id="${d.id}" aria-label="حذف">${icon('trash')}</button>
+                        ${d.source?.startsWith('preset:') ? html`<span class="badge">رسمي</span>` : html`<span class="badge">محلي</span>`}
+                        ${d.source === 'custom' ? html`<button class="iconbtn" data-act="remove" data-id="${d.id}" aria-label="حذف">${icon('trash')}</button>` : ''}
                       </span>
                     </div>
                   `;
@@ -157,6 +159,11 @@ export default {
   },
 
   actions: {
+    async 'apply-preset'() {
+      const result = await store.applyCalendarPreset(undefined, { activate: true });
+      if (!result.ok) return toast('توجد سنة 1448–1449 ببيانات محلية؛ لن تُستبدل تلقائيًا.', 'danger');
+      toast(result.applied ? 'تم تطبيق التقويم الرسمي' : 'التقويم الرسمي مطبّق بالفعل');
+    },
     async 'generate-hybrid'() {
       const { todayISO, shiftDate } = await import('../models.js');
       const start = prompt('تاريخ بداية الفصل؟', todayISO());

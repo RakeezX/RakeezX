@@ -15,6 +15,7 @@ import {
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
 } from './models.js';
+import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
 
 export { sectionLabel };
 
@@ -211,7 +212,13 @@ async function ensureFoundation() {
     if (Array.isArray(state[k])) state[k].push(rec);
   };
 
-  if (!live(state.years).length) push('years', makeYear({ hijriStart: 1448 }));
+  if (!live(state.years).length) {
+    const preset = calendarPresetRecords(getCalendarPreset());
+    push('years', preset.year);
+    push('calendars', preset.calendar);
+    preset.terms.forEach((term) => push('terms', term));
+    preset.calendarDays.forEach((day) => push('calendarDays', day));
+  }
 
   // السنة التي نضمن فصولها هي **النشطة**، لا أول سنة في ترتيب الإدخال —
   // وإلا أُنشئ الفصل الثاني لسنة أخرى غير التي يعمل عليها المعلّم.
@@ -724,9 +731,32 @@ export function calendarDayFor(date) {
 
 /** يوم تقويم لسنة محددة — مهم عند عرض إسناد تاريخي لا يطابق السنة النشطة. */
 export function calendarDayForYear(yearId, date) {
-  const cal = calendarsOf(yearId)[0];
-  if (!cal) return null;
-  return live(state.calendarDays).find((d) => d.calendarId === cal.id && d.date === date) ?? null;
+  const matching = calendarsOf(yearId)
+    .map((calendar) => ({ calendar, day: live(state.calendarDays).find((d) => d.calendarId === calendar.id && d.date === date) }))
+    .filter(({ day }) => day);
+  // A local custom exception is intentionally more specific than a preset day.
+  return matching.find(({ calendar }) => calendar.source === 'custom')?.day ?? matching[0]?.day ?? null;
+}
+
+export { getCalendarPreset, WESTERN_1448_1449_PRESET_ID };
+
+export function calendarPresetForYear(yearId = activeYear()?.id) {
+  return getCalendarPreset(getYear(yearId)?.calendarPresetId);
+}
+
+/** Applies a built-in template without replacing existing user calendar data. */
+export async function applyCalendarPreset(presetId = WESTERN_1448_1449_PRESET_ID, { activate = false } = {}) {
+  const preset = getCalendarPreset(presetId);
+  if (!preset) throw new Error('التقويم المعتمد غير متاح.');
+  const records = calendarPresetRecords(preset);
+  const existingYear = getYear(records.year.id);
+  if (existingYear && existingYear.calendarPresetId !== preset.id) return { ok: false, reason: 'year-exists', year: existingYear };
+  const missing = (collection, candidates) => candidates.filter((record) => !state[collection].some((existing) => existing.id === record.id && !existing.deleted));
+  const writes = { years: missing('years', [records.year]), calendars: missing('calendars', [records.calendar]), terms: missing('terms', records.terms), calendarDays: missing('calendarDays', records.calendarDays) };
+  Object.keys(writes).forEach((key) => { if (!writes[key].length) delete writes[key]; });
+  if (Object.keys(writes).length) await save(writes);
+  if (activate) await patchDevice({ activeYearId: records.year.id, activeTermId: records.terms[0].id });
+  return { ok: true, applied: Object.values(writes).flat().length, year: getYear(records.year.id) };
 }
 
 /* ---------- المنهج ---------- */
