@@ -49,7 +49,7 @@ test('demo packages preserve real records, stay out of backup, and work in repor
   }, real);
   expect(result.real).toBe(true); expect(result.demoInBackup).toBe(false);
   await page.getByRole('button', { name:'حذف الفصل التجريبي' }).first().click();
-  await page.getByRole('button', { name:'حذف الفصل التجريبي' }).last().click();
+  await page.getByRole('dialog').getByRole('button', { name:'حذف الفصل التجريبي' }).click();
   await expect(page.getByRole('link', { name:/تجريبي 2/ })).toBeVisible();
   expect(await page.evaluate((real) => [real.section, real.teaching, real.student].every((id) => window.store.state[ id.includes('section') ? 'sections' : id.includes('teaching') ? 'teachings' : 'students' ].some((r) => r.id === id && !r.deleted)), real)).toBe(true);
   await page.goto('/#/teaching/' + real.teaching + '/reports'); await expect(page.locator('body')).not.toBeEmpty();
@@ -63,7 +63,7 @@ test('local demo packages converge across same-profile tabs', async ({ context, 
   await page.getByRole('button', { name:'إضافة فصل تجريبي' }).click();
   await expect(other.getByRole('link', { name:/تجريبي 1/ })).toBeVisible();
   await page.getByRole('button', { name:'حذف الفصل التجريبي' }).first().click();
-  await page.getByRole('button', { name:'حذف الفصل التجريبي' }).last().click();
+  await page.getByRole('dialog').getByRole('button', { name:'حذف الفصل التجريبي' }).click();
   await expect(other.getByRole('link', { name:/تجريبي 1/ })).toHaveCount(0);
   await other.close();
 });
