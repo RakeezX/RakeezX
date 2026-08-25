@@ -3,7 +3,7 @@ import * as store from '../store.js';
 import { uid, now, todayISO, shiftDate, weekday, makeSection, makeTeaching, makeStudent, makeEnrollment, makeSlot, makeSession, makeItem } from '../models.js';
 
 const META_ID = 'demo:packages';
-const NAMES = ['أحمد علي','سارة محمد','خالد حسن','نورة عبدالله','فيصل سعد','ريم أحمد','عمر خالد','جود صالح','تركي فهد','لمى يوسف','مازن عمر','شهد علي','عبدالعزيز محمد','هيا سالم','راكان ناصر','دانة خالد','زياد أحمد','مها سعد','بدر فهد','ليان عمر','حسن صالح','تالا يوسف','ناصر علي','غلا محمد'];
+export const DEMO_STUDENT_NAMES = ['أحمد محمد','محمد خالد','عبدالله سعد','عمر فهد','يوسف علي','خالد عبدالرحمن','سلمان ناصر','عبدالعزيز ماجد','فيصل أحمد','تركي صالح','مازن عمر','راكان بدر','زياد حسن','بدر فهد','ناصر سالم','وليد طارق','سعود إبراهيم','فهد منصور','حسن ياسر','أنس رامي','إياد سامي','معاذ عادل','لؤي كريم','ريان محمود'];
 const demoId = (packageId, type, index = '') => `demo:${packageId}:${type}${index === '' ? '' : `:${index}`}`;
 const teachingDay = (yearId, from, direction) => { let date=from; for(let i=0;i<45;i++,date=shiftDate(date,direction)){ const day=store.calendarDayForYear(yearId,date); if(weekday(date) < 5 && (!day || ['study','exam','event'].includes(day.kind))) return date; } return from; };
 
@@ -18,7 +18,7 @@ export async function createDemoPackage() {
   if (!subject) throw new Error('تعذّر تحديد المادة الدراسية.');
   const section = makeSection({ id: demoId(packageId,'section'), yearId:year.id, grade:5, label:`تجريبي ${number}`, name:'الخامس الابتدائي / تجريبي '+number, color:'#0f766e', order:store.sections().length, updatedAt:stamp });
   const teaching = makeTeaching({ id:demoId(packageId,'teaching'), sectionId:section.id, subjectId:subject.id, termId:term.id, updatedAt:stamp });
-  const students=NAMES.map((name,i)=>makeStudent({id:demoId(packageId,'student',i+1),name,updatedAt:stamp}));
+  const students=DEMO_STUDENT_NAMES.map((name,i)=>makeStudent({id:demoId(packageId,'student',i+1),name,updatedAt:stamp}));
   const enrollments=students.map((student,i)=>makeEnrollment({id:demoId(packageId,'enrollment',i+1),studentId:student.id,sectionId:section.id,rollNo:i+1,updatedAt:stamp}));
   const used=new Set(store.allSlots().map((s)=>`${s.weekday}:${s.period}`)); const slots=[]; for(const [day,period] of [[0,1],[2,2],[4,1]]) if(!used.has(`${day}:${period}`)) slots.push(makeSlot({id:demoId(packageId,'slot',slots.length+1),teachingId:teaching.id,weekday:day,period,updatedAt:stamp}));
   const today=todayISO(); const past=teachingDay(year.id,shiftDate(today,-7),-1); const pending=teachingDay(year.id,shiftDate(today,-3),-1); const future=teachingDay(year.id,shiftDate(today,7),1);

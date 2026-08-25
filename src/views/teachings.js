@@ -155,12 +155,12 @@ export default {
               <p class="t-3 fs-sm mb-3">يمكنك إنشاء الفصول التي تدرّسها الآن دفعة واحدة، ثم تعديلها لاحقًا.</p>
               <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} إعداد الفصول الآن</button>
             </div>
-            <div class="mt-4 stack stack-2"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
+            <div class="mt-4 stack stack-2"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
           ` : html`
             <div class="empty__text">
               أنشئ شعبتك الأولى وأسند إليها مادتك، ويأتي معها نموذج بنود تقييم جاهز.
             </div>
-            <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
+            <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
           `}
         </div>
       `;
@@ -188,7 +188,7 @@ export default {
 
       <div class="list">${list.map(row)}</div>
 
-      <div class="hstack gap-2 mt-3"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--quiet" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
+      <div class="hstack gap-2 mt-3"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
     `;
   },
 

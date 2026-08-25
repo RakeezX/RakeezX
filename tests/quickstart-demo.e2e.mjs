@@ -3,8 +3,16 @@ import { test, expect } from '@playwright/test';
 test('one-click local demo classes stay isolated, persistent, and deletable', async ({ page }) => {
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store);
-  await expect(page.getByRole('button', { name: 'إضافة فصل تجريبي' })).toBeVisible();
-  await page.getByRole('button', { name: 'إضافة فصل تجريبي' }).click();
+  const demoButton = page.getByRole('button', { name: 'إضافة فصل تجريبي' });
+  await expect(demoButton).toBeVisible();
+  await expect(demoButton).toHaveClass(/btn--ghost/);
+  await expect(demoButton).not.toHaveClass(/btn--primary/);
+  const disabledDuringCreate = await page.evaluate(() => {
+    const button = [...document.querySelectorAll('[data-act="add-demo"]')].find((el) => el.textContent.includes('إضافة فصل تجريبي'));
+    button.click();
+    return button.disabled;
+  });
+  expect(disabledDuringCreate).toBe(true);
   await expect(page.getByRole('link', { name: /تجريبي 1/ })).toBeVisible();
   await expect(page.locator('.badge', { hasText: 'تجريبي' })).toBeVisible();
   const first = await page.evaluate(async () => ({
