@@ -588,6 +588,39 @@ export function attendanceCompleteness(ses, reference = new Date()) {
   return { state: 'future', completed, due, recorded: records.length, expected };
 }
 
+/**
+ * إسقاط تقارير التنفيذ: يربط الحصص المؤرخة بالإسناد الحالي وحالة اكتمال الحضور
+ * المشتقة. لا يقرأ وقتًا من خانة الجدول المتكررة، فتظل الحصص التاريخية ثابتة.
+ */
+export function executionReport({ yearId = activeYear()?.id, termId = activeTerm()?.id, reference = new Date() } = {}) {
+  const scopedTerms = live(state.terms).filter((term) => term.yearId === yearId && (!termId || term.id === termId));
+  const termIds = new Set(scopedTerms.map((term) => term.id));
+  const scopedTeachings = live(state.teachings).filter((teaching) => termIds.has(teaching.termId));
+  const teachingIds = new Set(scopedTeachings.map((teaching) => teaching.id));
+  const rows = live(state.sessions)
+    .filter((session) => teachingIds.has(session.teachingId))
+    .map((session) => {
+      const teaching = getTeaching(session.teachingId);
+      const section = teaching ? getSection(teaching.sectionId) : null;
+      const completeness = attendanceCompleteness(session, reference);
+      return { session, teaching, section, completeness };
+    })
+    .sort((a, b) => a.session.date.localeCompare(b.session.date) || a.session.period - b.session.period);
+  const counts = { generated: rows.length, completed: 0, pending: 0, future: 0, excluded: 0 };
+  for (const row of rows) counts[row.completeness.state]++;
+  const eligible = counts.completed + counts.pending;
+  const sectionIds = new Set(scopedTeachings.map((teaching) => teaching.sectionId));
+  const students = live(state.enrollments).filter((enrollment) => sectionIds.has(enrollment.sectionId) && enrollment.status === 'active').length;
+  return {
+    terms: scopedTerms,
+    teachings: scopedTeachings,
+    rows,
+    counts,
+    sections: sectionIds.size,
+    students,
+    percentage: eligible ? Math.round((counts.completed / eligible) * 100) : null,
+  };
+}
 export function attendanceCompletenessFor(tchId, date = todayISO(), reference = new Date()) {
   const sessions = sessionsOnFor(tchId, date);
   const summary = { sessions: 0, completed: 0, pending: 0, future: 0 };

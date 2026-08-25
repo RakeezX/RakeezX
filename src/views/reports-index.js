@@ -52,16 +52,16 @@ export default {
       </div>
 
       <div class="section">
-        <div class="section__head"><div class="section__title">قيد البناء</div></div>
+        <div class="section__head"><div class="section__title">تقارير مجمّعة</div></div>
         <div class="grid grid--2">
-          <div class="soon">
-            <div class="soon__title">تقرير السنة الدراسية</div>
-            <div class="soon__text">يجمع فصلَي السنة في كشف واحد.</div>
-          </div>
-          <div class="soon">
-            <div class="soon__title">تقرير الحصص المنفّذة</div>
-            <div class="soon__text">متاح داخل كل فصل الآن، وسيُجمَّع هنا لاحقًا.</div>
-          </div>
+          <a class="card card--pad" href="#/reports/execution">
+            <div class="fw-7">ملخّص التنفيذ</div>
+            <div class="t-3 fs-sm mt-2">حصص مؤرخة، اكتمال الحضور، والحصص المستحقة.</div>
+          </a>
+          <a class="card card--pad" href="#/reports/execution">
+            <div class="fw-7">تنفيذ الحصص</div>
+            <div class="t-3 fs-sm mt-2">قائمة قابلة للتصفية بحسب التاريخ والفصل والحالة.</div>
+          </a>
         </div>
       </div>
     `;

@@ -19,6 +19,7 @@ const ROUTES = [
   { path: '/schedule/times',            load: () => import('./views/times.js') },
   { path: '/curriculum',                load: () => import('./views/curriculum.js') },
   { path: '/reports',                   load: () => import('./views/reports-index.js') },
+  { path: '/reports/execution',         load: () => import('./views/execution-report.js') },
   { path: '/calendar',                  load: () => import('./views/calendar.js') },
   { path: '/settings',                  load: () => import('./views/settings.js') },
   { path: '/settings/backup',           load: () => import('./views/backup.js') },
