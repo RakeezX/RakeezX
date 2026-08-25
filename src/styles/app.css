@@ -261,6 +261,22 @@ a { color: var(--brand); text-underline-offset: 3px; }
 .tabbar__item svg { width: 22px; height: 22px; }
 .tabbar__item[aria-current="page"] { color: var(--brand); }
 
+/* تنقّل الإسناد السياقي: يظل داخل الصفحة ولا يغيّر معنى الشريط الرئيسي. */
+.teaching-tabs {
+  display: flex; gap: var(--sp-2); overflow-x: auto; overscroll-behavior-inline: contain;
+  padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border);
+  background: var(--bg-elev); scrollbar-width: thin;
+}
+.teaching-tabs__item {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: var(--sp-2);
+  min-height: var(--tap); padding-inline: var(--sp-3); border-radius: var(--r-md);
+  color: var(--text-2); text-decoration: none; font-size: 13px; font-weight: 650;
+  white-space: nowrap;
+}
+.teaching-tabs__item svg { width: 18px; height: 18px; }
+.teaching-tabs__item:hover { background: var(--bg-sunk); color: var(--text); }
+.teaching-tabs__item[aria-current="page"] { background: var(--brand-soft); color: var(--brand); }
+
 /* سطح المكتب: قائمة جانبية.
    القائمة أول عنصر في الصفحة، فتقع في العمود الأول — وهو اليمين في الاتجاه
    العربي. لا تضف order هنا وإلا انتقلت لليسار وأخذ المحتوى عرض القائمة. */

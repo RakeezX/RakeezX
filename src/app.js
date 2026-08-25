@@ -35,29 +35,40 @@ const NAV = [
   { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
 ];
 
-/** تنقّل داخل الإسناد — يبقى على الجوال لأن الحضور والرصد يُستعملان أثناء الحصة. */
+/** تنقّل سياقي داخل الإسناد؛ لا يحل محل تنقّل التطبيق الرئيسي. */
 const teachingNav = (id) => [
   { href: `#/teaching/${id}`,            icon: 'home',       label: 'الفصل', exact: true },
+  { href: `#/teaching/${id}/students`,   icon: 'classes',    label: 'الطلاب' },
   { href: `#/teaching/${id}/attendance`, icon: 'attendance', label: 'الحضور' },
   { href: `#/teaching/${id}/quicklog`,   icon: 'spark',      label: 'الرصد' },
   { href: `#/teaching/${id}/grades`,     icon: 'grades',     label: 'الدرجات' },
-  { href: `#/teaching/${id}/students`,   icon: 'classes',    label: 'الطلاب' },
+  { href: `#/teaching/${id}/reports`,    icon: 'reports',    label: 'التقارير' },
 ];
+
+const primaryParent = (path) => {
+  if (path.startsWith('/teaching/')) return path.endsWith('/reports') ? '/reports' : '/classes';
+  if (path.startsWith('/student/')) return '/classes';
+  if (path.startsWith('/reports/')) return '/reports';
+  if (path.startsWith('/schedule/')) return '/schedule';
+  if (path.startsWith('/settings/')) return '/settings';
+  return path;
+};
 
 const isCurrent = (item, path) => {
   const target = item.href.slice(1);
+  if (item.primary && target === primaryParent(path)) return true;
   return item.exact ? path === target : path.startsWith(target);
 };
 
 const navLink = (it, path, kind) => html`
-  <a class="${kind}__item" href="${it.href}" ${isCurrent(it, path) ? 'aria-current="page"' : ''}>
+  <a class="${kind}__item" href="${it.href}" ${isCurrent(it, path) ? html`aria-current="page"` : ''}>
     ${icon(it.icon)}<span>${it.label}</span>
   </a>
 `;
 
 function shell(path, params) {
   const inTeaching = path.startsWith('/teaching/') && params?.id;
-  const bottom = inTeaching ? teachingNav(params.id) : NAV.filter((n) => n.primary);
+  const bottom = NAV.filter((n) => n.primary);
 
   return html`
     <div class="layout">
@@ -69,12 +80,13 @@ function shell(path, params) {
           ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
           : ''}
       </nav>
-      <main class="main" id="main"></main>
-      <nav class="tabbar">
+      <main class="main">
+        ${inTeaching ? html`<nav class="teaching-tabs" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'teaching-tabs'))}</nav>` : ''}
+        <div id="main"></div>
+      </main>
+      <nav class="tabbar" data-nav-scope="primary" aria-label="التنقل الرئيسي">
         ${bottom.map((it) => navLink(it, path, 'tabbar'))}
-        ${inTeaching
-          ? ''
-          : html`<button class="tabbar__item" data-act="more-nav">${icon('more')}<span>المزيد</span></button>`}
+        <button class="tabbar__item" data-act="more-nav">${icon('more')}<span>المزيد</span></button>
       </nav>
     </div>
   `;
