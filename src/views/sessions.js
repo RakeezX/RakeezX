@@ -1,6 +1,6 @@
 /** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
 
-import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
+import { html, icon, toast, fmtDate, openSheet, fmtTimeRange } from '../lib/dom.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday, todayISO } from '../models.js';
@@ -153,7 +153,7 @@ export default {
               <span class="period">${s.period}</span>
               <a class="row__main" href="${attendanceHref}">
                 <span class="row__title">
-                  ${WEEKDAYS[weekday(s.date)]} · ${fmtDate(s.date, false)}${s.startTime ? ` · ${s.startTime}–${s.endTime}` : ``}
+                  ${WEEKDAYS[weekday(s.date)]} · ${fmtDate(s.date, false)}${s.startTime ? html` · ${fmtTimeRange(s.startTime, s.endTime)}` : ``}
                 </span>
                 <span class="row__sub">
                   ${meta.label}

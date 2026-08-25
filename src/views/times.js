@@ -5,9 +5,9 @@
  * ليوم بعينه، لأن بعض الأيام حضوري وبعضها عن بُعد بأوقات مختلفة.
  */
 
-import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, fmtRange, makeTimeProfile } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, makeTimeProfile } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let openId = null;
@@ -502,7 +502,7 @@ export default {
                             <div class="recess-badge">فسحة</div>
                             <div class="timerow__in" style="text-align: start; display: flex; flex-direction: column; justify-content: center; min-height: auto;">
                               <div style="font-size: 14.5px; font-weight: 700; color: var(--recess); margin-bottom: 2px;">
-                                <span style="direction: ltr; unicode-bidi: isolate; display: inline-block;">${prev.end}</span> ص — <span style="direction: ltr; unicode-bidi: isolate; display: inline-block;">${t.start}</span> ص
+                                ${fmtTimeRange(prev.end, t.start)} ص
                               </div>
                               <div class="row__sub">${cfg?.recess?.duration || gapMins} دقيقة · تفويج ${cfg?.recess?.transition || 0} دقائق</div>
                               <div class="row__sub">${gradesText}</div>
@@ -515,15 +515,17 @@ export default {
                     chunks.push(html`
                       <div class="timerow">
                         <span class="period">${t.period}</span>
-                        <input class="input tabular timerow__in" type="time" value="${t.start}"
-                               data-change="set-time" data-p="${t.period}" data-k="start"
-                               data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-s"
-                               aria-label="بداية الحصة ${t.period}">
-                        <span class="t-3">–</span>
-                        <input class="input tabular timerow__in" type="time" value="${t.end}"
-                               data-change="set-time" data-p="${t.period}" data-k="end"
-                               data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-e"
-                               aria-label="نهاية الحصة ${t.period}">
+                        <span class="timerow__range" dir="ltr">
+                          <input class="input tabular timerow__in" type="time" value="${t.start}"
+                                 data-change="set-time" data-p="${t.period}" data-k="start"
+                                 data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-s"
+                                 aria-label="بداية الحصة ${t.period}">
+                          <span class="t-3">–</span>
+                          <input class="input tabular timerow__in" type="time" value="${t.end}"
+                                 data-change="set-time" data-p="${t.period}" data-k="end"
+                                 data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-e"
+                                 aria-label="نهاية الحصة ${t.period}">
+                        </span>
                         <button class="iconbtn" data-act="del-period" data-p="${t.period}" aria-label="حذف">
                           ${icon('x')}
                         </button>

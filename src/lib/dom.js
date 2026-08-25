@@ -216,6 +216,21 @@ export const parentLink = (label, parentRoute) =>
 
 /* ---------- تنسيق ---------- */
 /** يعرض رقمًا بلا كسور زائدة: 8.50 → 8.5 · 8.00 → 8 */
+/** نص نطاق وقت منطقي؛ العارض أدناه يعزله بصريًا داخل واجهات RTL. */
+export const formatTimeRange = (start, end) => {
+  const first = String(start ?? '').trim();
+  const last = String(end ?? '').trim();
+  return first && last ? `${first} – ${last}` : first || last;
+};
+
+/** نطاق وقت موحّد: يبدأ دائمًا بالبداية ثم النهاية، مهما كان اتجاه الحاوية. */
+export const fmtTimeRange = (start, end) => {
+  const first = String(start ?? '').trim();
+  const last = String(end ?? '').trim();
+  if (!first && !last) return '';
+  return html`<span class="time-range" dir="ltr"><bdi>${first}</bdi>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><bdi>${last}</bdi>` : ''}</span>`;
+};
+
 export const fmtNum = (n, digits = 2) => {
   if (n === null || n === undefined || Number.isNaN(n)) return '—';
   const r = Number(n.toFixed(digits));

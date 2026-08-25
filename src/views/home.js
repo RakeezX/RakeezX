@@ -5,7 +5,7 @@
  * وما لم يُبنَ بعد يظهر كمنطقة معلّمة بوضوح — **بلا بيانات وهمية إطلاقًا**.
  */
 
-import { html, icon, fmtDate, fmtPct } from '../lib/dom.js';
+import { html, icon, fmtDate, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
   todayISO, gradeLabel, studentTotal, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday,
@@ -88,7 +88,7 @@ export default {
                       <span class="row__main">
                         <span class="row__title">${store.teachingLabel(tch)}</span>
                         <span class="row__sub">
-                          ${s.startTime ? html`<span class="tabular t-3">${s.startTime} – ${s.endTime}</span> · ` : ''}
+                          ${s.startTime ? html`${fmtTimeRange(s.startTime, s.endTime)} · ` : ''}
                           ${attendanceLabel}
                           ${completeness.state === 'completed' && roster
                             ? html` · <span class="tabular">${marked}/${roster}</span> مرصود`

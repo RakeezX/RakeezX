@@ -426,7 +426,6 @@ export function periodNumbers(profile, weekday = null) {
   return Array.from(new Set((list ?? []).map((p) => Number(p.period)))).sort((a, b) => a - b);
 }
 
-export const fmtRange = (t) => (t ? `${t.start} – ${t.end}` : '');
 
 /* ---------- الإعدادات: حساب مقابل جهاز ---------- */
 

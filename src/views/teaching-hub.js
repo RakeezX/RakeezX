@@ -1,6 +1,6 @@
 /** لوحة الإسناد: مدخل لكل أدواته، وملخّص حاله اليوم. */
 
-import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES } from '../models.js';
 import { go } from '../router.js';
@@ -109,7 +109,7 @@ export default {
                       <span class="row__main">
                         <span class="row__title">الحصة ${s.period}</span>
                         <span class="row__sub">
-                          ${s.startTime ? html`<span class="tabular t-3">${s.startTime} – ${s.endTime}</span> · ` : ''}
+                          ${s.startTime ? html`${fmtTimeRange(s.startTime, s.endTime)} · ` : ''}
                           ${m.label}
                           ${s.status === 'held' ? html` · <span class="tabular">${marked}/${roster.length}</span> مرصود` : ''}
                         </span>

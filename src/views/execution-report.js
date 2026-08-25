@@ -1,6 +1,6 @@
 /** تقارير التنفيذ المجمعة: بيانات الحصص المؤرخة فقط. */
 
-import { html, icon, fmtDate } from '../lib/dom.js';
+import { html, icon, fmtDate, fmtTimeRange } from '../lib/dom.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -89,7 +89,7 @@ export default {
               const teaching = row.teaching;
               const label = teaching ? `${sectionLabel(row.section)} · ${store.getSubject(teaching.subjectId)?.name ?? ''}` : 'إسناد غير متاح';
               return html`<a class="row" href="#/teaching/${row.session.teachingId}/attendance?session=${row.session.id}">
-                <span class="period">${row.session.period}</span><span class="row__main"><span class="row__title">${fmtDate(row.session.date, false)} · ${label}</span><span class="row__sub">${row.session.startTime ? `${row.session.startTime}–${row.session.endTime}` : 'وقت الحصة غير محفوظ'}${row.completeness.expected ? ` · ${row.completeness.recorded}/${row.completeness.expected} مرصود` : ''}</span></span><span class="row__end"><span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>${icon('chev')}</span>
+                <span class="period">${row.session.period}</span><span class="row__main"><span class="row__title">${fmtDate(row.session.date, false)} · ${label}</span><span class="row__sub">${row.session.startTime ? fmtTimeRange(row.session.startTime, row.session.endTime) : 'وقت الحصة غير محفوظ'}${row.completeness.expected ? ` · ${row.completeness.recorded}/${row.completeness.expected} مرصود` : ''}</span></span><span class="row__end"><span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>${icon('chev')}</span>
               </a>`;
             })}</div>`}
       </div>

@@ -161,6 +161,10 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 a { color: var(--brand); text-underline-offset: 3px; }
 
+/* نطاقات الوقت تظل زمنية من البداية إلى النهاية داخل سياق RTL أو LTR. */
+.time-range { direction: ltr; unicode-bidi: isolate; display: inline-block; white-space: nowrap; }
+.time-range__dash { display: inline-block; }
+
 :focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;

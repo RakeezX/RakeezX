@@ -6,9 +6,9 @@
  * فحصتان أسبوعيًا للمهارات الرقمية سطران هنا، لا رقم في الشيفرة.
  */
 
-import { html, icon, openSheet, toast, confirmSheet } from '../lib/dom.js';
+import { html, icon, openSheet, toast, confirmSheet, fmtTimeRange, formatTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, fmtRange, sectionLabel } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel } from '../models.js';
 import { repaint } from '../repaint.js';
 
 /**
@@ -23,7 +23,7 @@ function slotSheet(defaults = {}) {
     const tch = store.getTeaching(tchId);
     const sec = store.getSection(tch?.sectionId);
     const t = store.timeFor(Number(wd), Number(period), profile, sec?.grade);
-    return t ? fmtRange(t) : 'لا وقت لهذه الحصة في الملف النشط';
+    return t ? formatTimeRange(t.start, t.end) : 'لا وقت لهذه الحصة في الملف النشط';
   };
 
   return openSheet({
@@ -60,7 +60,7 @@ function slotSheet(defaults = {}) {
           </label>
         </div>
         <div class="timepreview" id="slot-time">
-          ${icon('clock')} <span class="tabular" id="slot-time-text"></span>
+          ${icon('clock')} <span class="tabular time-range" dir="ltr" id="slot-time-text"></span>
         </div>
       </form>
     `,
@@ -196,7 +196,7 @@ export default {
                             <span class="period">${s.period}</span>
                             <span class="slot__main">
                               <span class="slot__name">الحصة ${ord}</span>
-                              <span class="slot__time tabular t-3 fs-sm mb-1">${t ? fmtRange(t) : '—'}</span>
+                              <span class="slot__time tabular t-3 fs-sm mb-1">${t ? fmtTimeRange(t.start, t.end) : '—'}</span>
                               <span class="slot__sub fw-7">${store.getSubject(tch?.subjectId)?.name ?? ''}</span>
                               <span class="slot__sub">${sectionLabel(sec) || '—'}</span>
                             </span>
@@ -262,7 +262,7 @@ export default {
         const tch = store.getTeaching(data.teachingId);
         const sec = store.getSection(tch?.sectionId);
         const t = store.timeFor(data.weekday, data.period, store.activeTimeProfile(), sec?.grade);
-        toast(t ? `أُضيفت — ${fmtRange(t)}` : 'أُضيفت للجدول');
+        toast(t ? `أُضيفت — ${formatTimeRange(t.start, t.end)}` : 'أُضيفت للجدول');
       } catch (err) {
         toast(err.message, 'danger');
       }
