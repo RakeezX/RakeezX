@@ -1,6 +1,6 @@
 /** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
 
-import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
@@ -89,16 +89,7 @@ function termSheet(existing = null, yearId = null) {
             </select>
           </label>
         </div>
-        <div class="field-row">
-          <label class="field">
-            <span class="field__label">تاريخ البداية</span>
-            <input class="input tabular" name="startDate" type="date" value="${t.startDate ?? ''}">
-          </label>
-          <label class="field">
-            <span class="field__label">تاريخ النهاية</span>
-            <input class="input tabular" name="endDate" type="date" value="${t.endDate ?? ''}">
-          </label>
-        </div>
+        ${t.startDate && t.endDate ? html`<div class="field"><span class="field__label">مدة الفصل</span><div class="field__hint">${fmtDateRange(t.startDate, t.endDate)} — تُعدّل التواريخ من التقويم الدراسي.</div></div>` : ''}
         <div class="field" style="margin-bottom:0">
           <span class="field__label">الحالة</span>
           <select class="select" name="status">
@@ -231,7 +222,7 @@ export default {
                           <span class="row__sub">
                             ${TERM_STATUS[t.status] ?? t.status}
                             ${t.startDate && t.endDate
-                              ? html` · <span class="tabular">${t.startDate}</span> ← <span class="tabular">${t.endDate}</span>`
+                              ? html` · ${fmtDateRange(t.startDate, t.endDate)}`
                               : ' · التواريخ غير مُدخلة'}
                             · <span class="tabular">${store.teachings(t.id).length}</span> إسنادًا تدريسيًا
                           </span>
@@ -285,6 +276,14 @@ export default {
         </a>
       </div>
 
+      <div class="section">
+        <div class="section__head"><div class="section__title">الأرشيف</div></div>
+        <a class="row" href="#/archive">
+          <span class="row__icon">${icon('archive')}</span>
+          <span class="row__main"><span class="row__title">الأرشيف</span><span class="row__sub">استعراض السنوات والفصول الدراسية المؤرشفة وبياناتها السابقة.</span></span>
+          <span class="row__end">${icon('chev')}</span>
+        </a>
+      </div>
       <div class="section">
         <div class="section__head"><div class="section__title">المزامنة السحابية (تجريبي)</div></div>
         <div class="card card--pad stack stack-3">

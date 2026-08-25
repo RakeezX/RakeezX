@@ -31,7 +31,6 @@ const NAV = [
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
   { href: '#/curriculum',icon: 'book',      label: 'المنهج' },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
-  { href: '#/archive',   icon: 'archive',   label: 'الأرشيف' },
   { href: '#/calendar',  icon: 'calendar',  label: 'التقويم الدراسي' },
   { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
 ];

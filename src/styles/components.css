@@ -405,6 +405,11 @@
 .row__icon svg { width: 18px; height: 18px; }
 .row__icon.is-off { color: var(--text-3); }
 
+.calendar-period--ok .calendar-period__icon { background: var(--ok-soft); color: var(--ok); }
+.calendar-period--info .calendar-period__icon { background: var(--info-soft); color: var(--info); }
+.calendar-period--warn .calendar-period__icon { background: var(--warn-soft); color: var(--warn); }
+.date-range, .date-display { unicode-bidi: isolate; white-space: nowrap; }
+
 /* ---------- الجدول الأسبوعي ---------- */
 .week {
   display: grid;

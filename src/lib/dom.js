@@ -224,16 +224,35 @@ const AR_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأرب
 const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
 /** '2026-08-15' → 'السبت ١٥ أغسطس' (بأرقام لاتينية) */
-export function fmtDate(iso, withDay = true) {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('-').map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  const day = AR_DAYS[dt.getUTCDay()];
-  return `${withDay ? day + ' ' : ''}${d} ${AR_MONTHS[m - 1]}`;
+function dateParts(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso ?? ''));
+  if (!match) return null;
+  const [, year, month, day] = match.map(Number);
+  if (month < 1 || month > 12 || day < 1 || day > new Date(Date.UTC(year, month, 0)).getUTCDate()) return null;
+  return { year, month, day };
 }
 
-export const fmtDateFull = (iso) => {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('-').map(Number);
-  return `${d} ${AR_MONTHS[m - 1]} ${y}`;
-};
+const dateText = (parts) => `${parts.day} ${AR_MONTHS[parts.month - 1]} ${parts.year}`;
+const isolate = (text) => `\u2068${text}\u2069`;
+
+/** '2026-08-15' → 'السبت 15 أغسطس 2026'، مع عزل ثنائي الاتجاه. */
+export function fmtDate(iso, withDay = true) {
+  const parts = dateParts(iso);
+  if (!parts) return '';
+  const weekday = AR_DAYS[new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay()];
+  return isolate(`${withDay ? weekday + ' ' : ''}${dateText(parts)}`);
+}
+
+/** نطاق تاريخي قابل لإعادة الاستخدام، يحافظ على ترتيب البداية والنهاية داخل RTL. */
+export function fmtDateRange(startISO, endISO = startISO) {
+  const start = dateParts(startISO), end = dateParts(endISO);
+  if (!start || !end) return '';
+  if (startISO === endISO) return html`<span class="date-display"><bdi>${dateText(start)}</bdi></span>`;
+  const sameYear = start.year === end.year;
+  const sameMonth = sameYear && start.month === end.month;
+  const first = sameMonth ? `${start.day}` : sameYear ? `${start.day} ${AR_MONTHS[start.month - 1]}` : dateText(start);
+  const last = `${end.day} ${AR_MONTHS[end.month - 1]} ${end.year}`;
+  return html`<span class="date-range" dir="rtl"><bdi>${first}</bdi><span class="date-range__dash" aria-hidden="true"> – </span><bdi>${last}</bdi></span>`;
+}
+
+export const fmtDateFull = (iso) => fmtDate(iso, false);

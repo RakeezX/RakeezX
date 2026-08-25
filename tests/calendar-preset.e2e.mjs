@@ -37,3 +37,36 @@ test('calendar preset UI stays readable in RTL mobile width', async ({ page }) =
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.dir || getComputedStyle(document.documentElement).direction)).toBe('rtl');
 });
+test('calendar dates, semantics, Settings editor, and archive navigation follow the real UI paths', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/#/calendar');
+  await expect(page.getByText('17 يناير – 30 يونيو 2027')).toBeVisible();
+  const nationalDay = page.locator('.calendar-period').filter({ hasText: 'إجازة اليوم الوطني' });
+  await expect(nationalDay.getByText('23 – 26 سبتمبر 2026')).toBeVisible();
+  await expect(nationalDay.getByText('4 أيام')).toBeVisible();
+  await expect(nationalDay.getByText('رسمي')).toBeVisible();
+  await expect(nationalDay).toHaveClass(/calendar-period--warn/);
+
+  await page.getByRole('link', { name: 'الإعدادات' }).click();
+  await expect(page.getByText('السنوات الدراسية')).toBeVisible();
+  await page.locator('.row').filter({ hasText: 'الفصل الدراسي الأول' }).getByRole('button', { name: 'تعديل' }).click();
+  await expect(page.getByRole('dialog').getByLabel('تاريخ البداية')).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByLabel('تاريخ النهاية')).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByLabel('الاسم')).toBeVisible();
+  await expect(page.getByRole('dialog').getByLabel('الترتيب')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('الحالة', { exact: true })).toBeVisible();
+  await page.getByRole('dialog').getByLabel('إغلاق').click();
+
+  await expect(page.getByRole('link', { name: 'الأرشيف' })).toBeVisible();
+  await page.getByRole('link', { name: 'الأرشيف' }).click();
+  await expect(page).toHaveURL(/#\/archive$/);
+  expect(await page.evaluate(() => ({ y: window.store.state.device.activeYearId, t: window.store.state.device.activeTermId }))).toEqual({ y: 'y:1448-1449', t: 'tm:y:1448-1449:1' });
+
+  await page.goto('/#/calendar');
+  await page.getByRole('button', { name: 'تعديل' }).first().click();
+  await expect(page.getByRole('dialog').getByLabel('من *')).toBeVisible();
+  await expect(page.getByRole('dialog').getByLabel('إلى *')).toBeVisible();
+  await expect(page.locator('.sidebar').getByText('الأرشيف')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
