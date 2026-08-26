@@ -37,7 +37,7 @@ test.describe('PWA and Service Worker', () => {
     expect(cacheKeys.some(k => k.startsWith('rakeezx-v'))).toBeTruthy();
 
     // Check no unexpected caches
-    const oldCaches = cacheKeys.filter(k => k.startsWith('rakeezx-') && k !== 'rakeezx-v4');
+    const oldCaches = cacheKeys.filter(k => k.startsWith('rakeezx-') && k !== 'rakeezx-v5');
     expect(oldCaches.length).toBe(0);
 
     // B. CONTROLLED RELOAD

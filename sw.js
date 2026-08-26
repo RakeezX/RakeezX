@@ -4,7 +4,16 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v4';
+const VERSION = 'rakeezx-v5';
+
+const clearOldRakeezCaches = async () => {
+  const keys = await caches.keys();
+  await Promise.all(
+    keys
+      .filter((key) => key !== VERSION && key.startsWith('rakeezx-'))
+      .map((key) => caches.delete(key))
+  );
+};
 
 const SHELL = [
   './',
@@ -75,9 +84,8 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      const keys = await caches.keys();
-      // Remove all old caches that don't match the current version
-      await Promise.all(keys.filter((k) => k !== VERSION && k.startsWith('rakeezx-')).map((k) => caches.delete(k)));
+      // Cache Storage only: IndexedDB and all unrelated cache namespaces remain untouched.
+      await clearOldRakeezCaches();
       await self.clients.claim();
     })()
   );
@@ -93,21 +101,32 @@ self.addEventListener('fetch', (event) => {
   // Ignore non-http(s) requests like chrome-extension://
   if (!url.protocol.startsWith('http')) return;
 
-  // Navigation requests: Network-First
+  // An older worker can finish an in-flight write after activation. Clean only our
+  // prior release caches before this worker serves its first and later requests.
+  const cleanOldCaches = clearOldRakeezCaches();
+
+  const cacheResponse = async (key, response) => {
+    if (!response || !response.ok) return response;
+    const cache = await caches.open(VERSION);
+    await cache.put(key, response.clone());
+    return response;
+  };
+
+  const cachedFallback = async (key, status = 504) => {
+    const cached = await caches.match(key);
+    return cached || new Response('', { status });
+  };
+
+  // Navigation requests: Network-First. Hash routes still resolve to this shell.
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
+        await cleanOldCaches;
         try {
-          const res = await fetch(request);
-          if (res && res.ok) {
-            const cache = await caches.open(VERSION);
-            cache.put('./index.html', res.clone());
-          }
-          return res;
+          return await cacheResponse('./index.html', await fetch(request));
         } catch (err) {
           try {
-            const cached = await caches.match('./index.html');
-            if (cached) return cached;
+            return await cachedFallback('./index.html', 503);
           } catch (e) {
             console.warn('[sw] Cache match error for index.html', e);
           }
@@ -121,9 +140,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets: Stale-While-Revalidate
+  // Executable UI assets must reflect the current deployment while online.
+  // Offline, the last verified response remains available from Cache Storage.
+  if (/\.(?:m?js|css)$/i.test(url.pathname)) {
+    event.respondWith(
+      (async () => {
+        await cleanOldCaches;
+        try {
+          return await cacheResponse(request, await fetch(request));
+        } catch (err) {
+          return cachedFallback(request);
+        }
+      })()
+    );
+    return;
+  }
+
+  // Non-executable shell assets (icons, images, and manifest) stay efficient
+  // with stale-while-revalidate; they cannot keep an older UI renderer alive.
   event.respondWith(
     (async () => {
+      await cleanOldCaches;
       try {
         const cached = await caches.match(request);
         if (cached) {

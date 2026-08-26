@@ -319,8 +319,15 @@ function registerServiceWorker() {
   if (!['https:', 'http:'].includes(location.protocol)) return;
 
   navigator.serviceWorker
-    .register('sw.js')
+    .register('sw.js', { updateViaCache: 'none' })
     .then(async (reg) => {
+      // تحقّق صريح من عامل أحدث؛ لا نفرض إعادة تحميل الصفحة الحالية.
+      try {
+        await reg.update();
+      } catch (err) {
+        console.warn('[rakeezx] تعذّر فحص تحديث عامل الخدمة', err);
+      }
+
       // مخزون مُسح خارجيًا وعامل يبقى مسجّلًا = عمل دون إنترنت مكسور صامتًا.
       // نفحص المخزون ونعيد تهيئته بدل انتظار تثبيت جديد لن يأتي.
       try {
@@ -330,7 +337,7 @@ function registerServiceWorker() {
         if (reg.active && count === 0) {
           console.warn('[rakeezx] مخزون العمل دون إنترنت فارغ — يُعاد بناؤه');
           await reg.unregister();
-          await navigator.serviceWorker.register('sw.js');
+          await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
         }
       } catch (err) {
         console.warn('[rakeezx] تعذّر فحص المخزون', err);
