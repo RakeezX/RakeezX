@@ -6,7 +6,7 @@
  * فحصتان أسبوعيًا للمهارات الرقمية سطران هنا، لا رقم في الشيفرة.
  */
 
-import { html, icon, openSheet, toast, confirmSheet, fmtTimeRange, formatTimeRange } from '../lib/dom.js';
+import { html, render, icon, openSheet, toast, confirmSheet, fmtTimeRange, formatTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel } from '../models.js';
 import { repaint } from '../repaint.js';
@@ -23,7 +23,7 @@ function slotSheet(defaults = {}) {
     const tch = store.getTeaching(tchId);
     const sec = store.getSection(tch?.sectionId);
     const t = store.timeFor(Number(wd), Number(period), profile, sec?.grade);
-    return t ? formatTimeRange(t.start, t.end) : 'لا وقت لهذه الحصة في الملف النشط';
+    return t ? fmtTimeRange(t.start, t.end) : 'لا وقت لهذه الحصة في الملف النشط';
   };
 
   return openSheet({
@@ -60,7 +60,7 @@ function slotSheet(defaults = {}) {
           </label>
         </div>
         <div class="timepreview" id="slot-time">
-          ${icon('clock')} <span class="tabular time-range" dir="ltr" id="slot-time-text"></span>
+          ${icon('clock')} <span>وقت الحصة</span><span id="slot-time-text" aria-live="polite"></span>
         </div>
       </form>
     `,
@@ -83,7 +83,7 @@ function slotSheet(defaults = {}) {
           .map((p) => `<option value="${p}"${p === wanted ? ' selected' : ''}>الحصة ${p}</option>`)
           .join('');
         if (!nums.includes(wanted) && nums.length) period.value = String(nums[0]);
-        text.textContent = timeHint(day.value, period.value, tchId);
+        render(text, timeHint(day.value, period.value, tchId));
       };
       day.addEventListener('change', sync);
       period.addEventListener('change', sync);

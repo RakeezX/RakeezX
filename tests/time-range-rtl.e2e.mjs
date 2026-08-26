@@ -90,3 +90,35 @@ test('timing profile and timetable preserve start-to-end order on desktop and mo
   await expectChronologicalRange(page, '07:00 – 07:45');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
+test('Schedule add-lesson sheet keeps generated lesson time chronological on desktop and mobile', async ({ page }) => {
+  const cases = [
+    { viewport: { width: 1280, height: 800 }, label: 'د', weekday: 0 },
+    { viewport: { width: 390, height: 844 }, label: 'هـ', weekday: 1 },
+  ];
+
+  for (const scenario of cases) {
+    await page.setViewportSize(scenario.viewport);
+    await page.goto('/#/classes');
+    await page.waitForFunction(() => window.store);
+    const teachingId = await page.evaluate(async ({ label }) => {
+      const section = await window.store.createSection({ grade: 5, label, name: `الخامس / ${label}` });
+      const teaching = await window.store.createTeaching({ sectionId: section.id });
+      return teaching.id;
+    }, scenario);
+
+    await page.goto('/#/schedule');
+    await page.getByRole('button', { name: 'حصة في الجدول' }).click();
+    const sheet = page.locator('.sheet');
+    await sheet.locator('[name="teachingId"]').selectOption(teachingId);
+    await sheet.locator('[name="weekday"]').selectOption(String(scenario.weekday));
+    await sheet.locator('[name="period"]').selectOption('1');
+    await expect(sheet.getByText('وقت الحصة', { exact: true })).toBeVisible();
+    await expectChronologicalRange(sheet, '07:00 – 07:45');
+
+    await sheet.locator('button[form="slot-form"]').click();
+    await expect(page.locator('.sheet')).toHaveCount(0);
+    await expectChronologicalRange(page, '07:00 – 07:45');
+    expect(await page.evaluate(({ id, weekday }) => window.store.allSlots().some((slot) => slot.teachingId === id && slot.weekday === weekday && slot.period === 1), { id: teachingId, weekday: scenario.weekday })).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  }
+});
