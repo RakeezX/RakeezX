@@ -453,6 +453,7 @@ export const makeDevice = (o = {}) => ({
   activeYearId: o.activeYearId ?? null,
   activeTermId: o.activeTermId ?? null,
   activeTimeProfileId: o.activeTimeProfileId ?? null,
+  reportPrincipalName: o.reportPrincipalName ?? '',
   lastSyncAt: o.lastSyncAt ?? null,
   schemaVersion: o.schemaVersion ?? 4,
   ...o,

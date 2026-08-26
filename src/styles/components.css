@@ -527,6 +527,42 @@
   @page { margin: 14mm; }
 }
 
+/* ---------- تقارير الإدارة والطباعة ---------- */
+.printhead__brand { font-size: 11px; color: var(--text-3); letter-spacing: .04em; }
+.printhead__title { margin: 2px 0 0; }
+.printhead__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 8px 0 0; font-size: 13px; }
+.printhead__meta div { display: flex; gap: 5px; }
+.printhead__meta dt { color: var(--text-3); }
+.printhead__meta dd { margin: 0; font-weight: 650; }
+.report-identity__known { display: grid; gap: 5px; font-size: 14px; }
+.print-signatures { display: none; }
+
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  html, body { background: #fff !important; color: #000 !important; direction: rtl; }
+  body { font-size: 10.5pt; }
+  .topbar, .tabbar, .sidebar, .teaching-tabs, .fab, .toast, .noprint,
+  .segmented, .searchbar, .datebar, .sheet-backdrop, #modal-root { display: none !important; }
+  .layout, .main, .page { display: block !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
+  .print-report { width: 100%; color: #000; background: #fff; }
+  .printhead { display: block; border-bottom: 1.5px solid #111; padding-bottom: 7px; margin: 0 0 10px; break-inside: avoid; }
+  .printhead__brand { color: #444; }
+  .printhead__meta { font-size: 9.5pt; }
+  .print-tablewrap, .tablewrap, .scroll-x { overflow: visible !important; max-width: none !important; border: 0 !important; }
+  .gtable { width: 100% !important; border-collapse: collapse; table-layout: auto; font-size: 8.5pt; }
+  .gtable thead { display: table-header-group; }
+  .gtable tr { break-inside: avoid; page-break-inside: avoid; }
+  .gtable th, .gtable td { border: 1px solid #888 !important; padding: 4px !important; vertical-align: middle; color: #000 !important; background: #fff !important; }
+  .gtable thead th { background: #eee !important; position: static !important; }
+  .gtable__sticky { position: static !important; inset: auto !important; }
+  .gtable__max { color: #333 !important; }
+  .gtable a { color: #000 !important; text-decoration: none !important; }
+  .badge { color: #000 !important; border: 0 !important; background: transparent !important; padding: 0 !important; font-weight: inherit !important; }
+  .print-signatures { display: flex; justify-content: space-between; gap: 30mm; margin-top: 18mm; break-inside: avoid; page-break-inside: avoid; }
+  .print-signatures > div { min-width: 42mm; border-top: 1px solid #777; padding-top: 4px; display: grid; gap: 5px; }
+  .print-signatures strong { font-weight: 650; }
+  .print-report--grades .gtable { font-size: 7.5pt; }
+}
 /* ---------- ملخص التوقيت ---------- */
 .timing-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--sp-3) var(--sp-2); line-height: 1.4; }
 .timing-summary-item { display: flex; flex-direction: column; }
