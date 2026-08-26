@@ -70,7 +70,11 @@ test('Version A to Version B refreshes executable assets without removing teache
     await expect(page.locator('#release')).toHaveText('B');
     await page.waitForFunction(async () => {
       const keys = await caches.keys();
-      return keys.includes('rakeezx-v5') && !keys.includes('rakeezx-v4');
+      const registration = await navigator.serviceWorker.getRegistration();
+      return keys.includes('rakeezx-v5')
+        && !keys.includes('rakeezx-v4')
+        && registration?.active?.state === 'activated'
+        && navigator.serviceWorker.controller === registration.active;
     });
 
     const onlineAssets = await page.evaluate(async () => ({
