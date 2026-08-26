@@ -12,8 +12,8 @@ test('aggregate execution reports navigate, filter, persist, and stay responsive
     }); await window.store.patchDevice({ activeYearId: 'y:er', activeTermId: 'tm:er' }); window.store.repaint();
   });
   await expect(page.getByText('ملخّص التنفيذ', { exact: true })).toBeVisible(); await page.getByText('ملخّص التنفيذ', { exact: true }).click();
-  await expect(page.getByText('تنفيذ الحصص', { exact: true })).toBeVisible(); await expect(page.getByText('50٪', { exact: true })).toBeVisible(); await expect(page.locator('.list').getByText('لم يُرصد الحضور', { exact: true })).toBeVisible();
-  await page.selectOption('select[data-change="status"]', 'pending'); await expect(page.locator('.list')).toContainText('لم يُرصد الحضور'); await expect(page.locator('.list')).not.toContainText('تم رصد الحضور');
+  await expect(page.getByText('تنفيذ الحصص', { exact: true })).toBeVisible(); await expect(page.getByText('اكتمال الحضور', { exact: true })).toBeVisible(); await expect(page.locator('.gtable--report')).toBeVisible();
+  await page.selectOption('select[data-change="status"]', 'pending'); await expect(page.locator('.gtable--report')).toContainText('لم يُرصد الحضور'); await expect(page.locator('.gtable--report')).not.toContainText('تم رصد الحضور');
   await page.reload(); await expect(page.getByText('تنفيذ الحصص', { exact: true })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(errors).toEqual([]);

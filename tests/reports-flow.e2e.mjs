@@ -140,6 +140,7 @@ test('reports render current historical data, edited section metadata, and synce
   await expect(page.locator('.gtable--report')).toContainText('TEST Report A');
   await expect(page.locator('.gtable--report')).toContainText('TEST Report B');
   await expect(page.locator('.gtable--report')).toContainText('TEST Report C');
+  await page.locator('[data-act="tab"][data-tab="grades"]').click();
   await expect(page.locator('.gtable--report')).toContainText('26');
   await expect(page.locator('.gtable--report')).toContainText('4');
   await expect(page.locator('.gtable--report')).toContainText('6');
@@ -211,10 +212,11 @@ test('reports render current historical data, edited section metadata, and synce
   });
   await pageB.goto('/#/teaching/report-teaching-a/reports');
   await expect(pageB.locator('.printhead')).toContainText('الخامس الابتدائي / Z');
+  await pageB.locator('[data-act="tab"][data-tab="grades"]').click();
   await expect(pageB.locator('.gtable--report')).toContainText('26');
   await pageB.goto('/#/reports/execution');
   await expect(pageB.getByText('تنفيذ الحصص', { exact: true })).toBeVisible();
-  await expect(pageB.locator('.list').getByText('تم رصد الحضور', { exact: true })).toBeVisible();
+  await expect(pageB.locator('.gtable--report')).toContainText('تم رصد الحضور');
   expect(await pageB.evaluate(() => ({
     attendance: window.store.state.attendance.filter((item) => !item.deleted).length,
     scores: window.store.state.scores.filter((item) => !item.deleted).length,

@@ -84,6 +84,7 @@ test('backup UI restores representative TEST data into a clean context without l
   const restoredErrors = observeErrors(restored);
   await restored.goto('/#/settings/backup');
   await restored.waitForFunction(() => window.store, { timeout: 15_000 });
+  await restored.waitForFunction(() => window.store?.state?.ready === true, { timeout: 15_000 });
   await restored.evaluate(async () => {
     await window.store.patchDevice({ theme: 'light' });
     const db = await import('/src/lib/db.js');
@@ -141,7 +142,10 @@ test('backup UI restores representative TEST data into a clean context without l
 
   // Re-importing the same backup in supported merge mode is idempotent: no duplicate records.
   await restored.goto('/#/settings/backup');
-  await fileInput.setInputFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
+  await restored.waitForFunction(() => window.store?.state?.ready === true, { timeout: 15_000 });
+  const restoredFileInput = restored.locator('#restore-file');
+  await restoredFileInput.setInputFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
+  await expect(restored.locator('[data-pick="merge"]')).toBeVisible();
   await restored.locator('[data-pick="merge"]').click();
   await waitForRestore(restored);
   expect(await restored.evaluate(liveCounts)).toEqual(sourceCounts);
