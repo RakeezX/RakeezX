@@ -9,7 +9,7 @@ async function seed(page) {
   await page.evaluate(async (names) => {
     const students = names.map((name, index) => ({ id: `print-student-${index}`, name, status: 'active' }));
     const enrollments = students.map((student, index) => ({ id: `print-enrollment-${index}`, studentId: student.id, sectionId: 'print-section', status: 'active', rollNo: index + 1 }));
-    const attendance = students.map((student, index) => ({ id: `print-attendance-${index}`, studentId: student.id, sessionId: 'print-session', teachingId: 'print-teaching', date: '2026-08-02', status: index % 5 === 0 ? 'absent' : index % 3 === 0 ? 'late' : 'present' }));
+    const attendance = students.map((student, index) => ({ id: `print-attendance-${index}`, studentId: student.id, sessionId: 'print-session', teachingId: 'print-teaching', date: '2026-08-20', status: index % 5 === 0 ? 'absent' : index % 3 === 0 ? 'late' : 'present' }));
     await window.store.save({
       profile: [{ id: 'profile', teacherName: 'معلم تجريبي', schoolName: 'مدرسة تجريبية' }],
       years: [{ id: 'print-year', label: '1448-1449' }], terms: [{ id: 'print-term', yearId: 'print-year', name: 'الفصل الأول' }],
@@ -18,9 +18,9 @@ async function seed(page) {
       students, enrollments,
       items: [{ id: 'print-item', teachingId: 'print-teaching', name: 'اختبار قصير', max: 10 }, { id: 'print-participation', teachingId: 'print-teaching', name: 'المشاركة', max: 5, auto: 'participation', perPoint: 1 }],
       scores: [{ id: 'print-score', studentId: 'print-student-0', itemId: 'print-item', value: 8 }],
-      logs: [{ id: 'print-log', studentId: 'print-student-0', teachingId: 'print-teaching', kind: 'participation', delta: 2, date: '2026-08-02' }],
+      logs: [{ id: 'print-log', studentId: 'print-student-0', teachingId: 'print-teaching', kind: 'participation', delta: 2, date: '2026-08-20' }],
       slots: [{ id: 'print-slot', teachingId: 'print-teaching', weekday: 0, period: 1 }],
-      sessions: [{ id: 'print-session', teachingId: 'print-teaching', slotId: 'print-slot', date: '2026-08-02', weekday: 0, period: 1, startTime: '07:00', endTime: '07:45' }], attendance,
+      sessions: [{ id: 'print-session', teachingId: 'print-teaching', slotId: 'print-slot', date: '2026-08-20', weekday: 0, period: 1, startTime: '07:00', endTime: '07:45' }], attendance,
     });
     await window.store.patchDevice({ activeYearId: 'print-year', activeTermId: 'print-term', reportPrincipalName: '' });
     window.store.repaint();
@@ -63,7 +63,31 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   await expect(page.locator('.gtable--report')).toContainText('غائب');
   const attendanceDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'تصدير CSV' }).click();
-  await expect((await attendanceDownload).suggestedFilename()).toMatch(/^حضور-/);
+  const attendanceFile = await attendanceDownload;
+  await expect(attendanceFile.suggestedFilename()).toMatch(/^حضور-/);
+  const attendanceText = await downloadText(attendanceFile);
+  expect(attendanceText).toContain('20 أغسطس 2026');
+  expect(attendanceText).toContain('أحمد محمد');
+  expect(attendanceText).not.toMatch(/[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]/);
+
+  await page.locator('[data-act="tab"][data-tab="support"]').click();
+  await expect(page.getByRole('button', { name: 'طباعة', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'تصدير CSV' })).toBeVisible();
+  await expect(page.locator('.list')).toContainText('محمد خالد');
+  const supportDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'تصدير CSV' }).click();
+  const supportFile = await supportDownload;
+  await expect(supportFile.suggestedFilename()).toMatch(/^دعم-/);
+  const supportText = await downloadText(supportFile);
+  expect(supportText).toContain('محمد خالد');
+  expect(supportText).toContain('مؤشرات الدعم');
+  expect(supportText).not.toContain('print-student-');
+  expect(supportText).not.toContain('updatedAt');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.print-only .gtable--report')).toContainText('مؤشرات الدعم');
+  await expect(page.locator('.topbar')).toBeHidden();
+  await expect(page.locator('.report-actions')).toBeHidden();
+  await page.emulateMedia({ media: 'screen' });
 
   await page.locator('[data-act="tab"][data-tab="grades"]').click();
   await expect(page.locator('.gtable--report')).toContainText('اختبار قصير');

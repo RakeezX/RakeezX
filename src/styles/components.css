@@ -536,6 +536,7 @@
 .printhead__meta dd { margin: 0; font-weight: 650; }
 .report-identity__known { display: grid; gap: 5px; font-size: 14px; }
 .print-signatures { display: none; }
+.print-only { display: none; }
 
 @media print {
   @page { size: A4 portrait; margin: 12mm; }
@@ -545,6 +546,7 @@
   .segmented, .searchbar, .datebar, .sheet-backdrop, #modal-root { display: none !important; }
   .layout, .main, .page { display: block !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
   .print-report { width: 100%; color: #000; background: #fff; }
+  .print-only { display: block !important; }
   .printhead { display: block; border-bottom: 1.5px solid #111; padding-bottom: 7px; margin: 0 0 10px; break-inside: avoid; }
   .printhead__brand { color: #444; }
   .printhead__meta { font-size: 9.5pt; }

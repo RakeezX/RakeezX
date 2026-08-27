@@ -11,7 +11,7 @@ import { repaint } from '../repaint.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
 
-const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات' }[tab] ?? 'تقرير الفصل');
+const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
 const safeName = (value) => String(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
 function identity(cls) {
@@ -54,10 +54,10 @@ export default {
         ${tab === 'grades' ? gradesReport(roster, items, ctx) : ''}
         ${tab === 'attendance' ? attendanceReport(cls, roster, ctx) : ''}
         ${tab === 'support' ? supportReport(roster, items, ctx) : ''}
-        ${tab !== 'support' ? reportSignatures({ profile: identity(cls).profile }) : ''}
+        ${reportSignatures({ profile: identity(cls).profile })}
         <div class="btn-row mt-6 noprint report-actions">
           <button class="btn btn--ghost" data-act="identity">${icon('edit')} بيانات التقرير والطباعة</button>
-          ${tab !== 'support' ? html`<button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>` : ''}
+          <button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>
         </div>
       </article>
     `;
@@ -98,6 +98,13 @@ export default {
         }
         downloadCSV(`حضور-${safe}.csv`, rows); toast('نُزّل كشف الحضور'); return;
       }
+      if (tab === 'support') {
+        const rows = [['رقم الكشف', 'الطالب', 'النسبة', 'مؤشرات الدعم']];
+        for (const row of supportRows(roster, items, ctx)) {
+          rows.push([row.s.rollNo ?? '', row.s.name, row.total.pct === null ? '' : Math.round(row.total.pct), row.reasons.join(' · ')]);
+        }
+        downloadCSV(`دعم-${safe}.csv`, rows); toast('نُزّل تقرير من يحتاج دعمًا'); return;
+      }
       const rows = [['رقم الكشف', 'الطالب', ...items.map((i) => `${i.name} (${i.max})`), 'المجموع', 'النسبة']];
       for (const s of roster) {
         const total = studentTotal(items, ctx[s.id]);
@@ -124,8 +131,12 @@ function attendanceReport(cls, roster, ctx) {
   return html`<p class="t-3 fs-sm mb-3 noprint">${dates.length} يومًا مرصودًا${dates.length > 20 ? ' — يُعرض آخر ٢٠ يومًا، والتصدير يشملها كلها' : ''}.</p><div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th class="gtable__sticky">الطالب</th>${shown.map((d) => html`<th class="att-col">${fmtDate(d, false)}</th>`)}${ATTENDANCE_ORDER.map((k) => html`<th>${ATTENDANCE[k].label}</th>`)}</tr></thead><tbody>${roster.map((s) => { const byDate = new Map(ctx[s.id].attendance.map((a) => [a.date, a.status])); const tally = { present: 0, late: 0, excused: 0, absent: 0 }; for (const a of ctx[s.id].attendance) tally[a.status] = (tally[a.status] ?? 0) + 1; return html`<tr><th class="gtable__sticky"><span class="gtable__roll tabular">${s.rollNo ?? ''}</span>${s.name}</th>${shown.map((d) => { const state = byDate.get(d); return html`<td class="att-cell ${state ? 'is-' + state : ''}">${state ? ATTENDANCE[state].short : ''}</td>`; })}${ATTENDANCE_ORDER.map((k) => html`<td class="tabular ${k === 'absent' && tally[k] ? 'fw-7' : 't-3'}">${tally[k] || ''}</td>`)}</tr>`; })}</tbody></table></div>`;
 }
 
+function supportRows(roster, items, ctx) {
+  return roster.map((s) => { const total = studentTotal(items, ctx[s.id]); const absents = ctx[s.id].attendance.filter((a) => a.status === 'absent').length; const part = ctx[s.id].logs.filter((l) => l.kind === 'participation').reduce((n, l) => n + l.delta, 0); const reasons = []; if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون ٥٠٪'); if (absents >= 3) reasons.push(`${absents} غيابات`); if (part <= 0 && total.pct !== null) reasons.push('لا مشاركة مرصودة'); if (total.missing > 0 && total.missing === items.filter((i) => !i.auto).length) reasons.push('لم يُرصد له شيء'); return { s, total, reasons }; }).filter((row) => row.reasons.length).sort((a, b) => (a.total.pct ?? 999) - (b.total.pct ?? 999));
+}
+
 function supportReport(roster, items, ctx) {
-  const rows = roster.map((s) => { const total = studentTotal(items, ctx[s.id]); const absents = ctx[s.id].attendance.filter((a) => a.status === 'absent').length; const part = ctx[s.id].logs.filter((l) => l.kind === 'participation').reduce((n, l) => n + l.delta, 0); const reasons = []; if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون ٥٠٪'); if (absents >= 3) reasons.push(`${absents} غيابات`); if (part <= 0 && total.pct !== null) reasons.push('لا مشاركة مرصودة'); if (total.missing > 0 && total.missing === items.filter((i) => !i.auto).length) reasons.push('لم يُرصد له شيء'); return { s, total, reasons }; }).filter((row) => row.reasons.length).sort((a, b) => (a.total.pct ?? 999) - (b.total.pct ?? 999));
+  const rows = supportRows(roster, items, ctx);
   if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون ٥٠٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
-  return html`<p class="t-3 fs-sm mb-3">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span>${icon('chev')}</span></a>`)}</div>`;
+  return html`<p class="t-3 fs-sm mb-3 noprint">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list noprint">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span>${icon('chev')}</span></a>`)}</div><div class="tablewrap print-tablewrap print-only"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>النسبة</th><th>مؤشرات الدعم</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td class="tabular">${fmtPct(row.total.pct)}</td><td>${row.reasons.join(' · ')}</td></tr>`)}</tbody></table></div>`;
 }
