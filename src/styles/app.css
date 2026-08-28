@@ -161,9 +161,10 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 a { color: var(--brand); text-underline-offset: 3px; }
 
-/* نطاقات الوقت تظل زمنية من البداية إلى النهاية داخل سياق RTL أو LTR. */
-.time-range { direction: ltr; unicode-bidi: isolate; display: inline-block; white-space: nowrap; }
-.time-range__dash { display: inline-block; }
+/* نطاقات الوقت: البداية أولًا في RTL، وكل HH:MM معزول للقراءة اللاتينية السليمة. */
+.time-range { direction: rtl; display: inline-flex; align-items: baseline; white-space: nowrap; }
+.time-range__token { direction: ltr; unicode-bidi: isolate; }
+.time-range__dash { direction: ltr; flex: none; }
 
 :focus-visible {
   outline: 2px solid var(--brand);

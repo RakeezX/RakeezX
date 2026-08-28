@@ -223,12 +223,12 @@ export const formatTimeRange = (start, end) => {
   return first && last ? `${first} – ${last}` : first || last;
 };
 
-/** نطاق وقت موحّد: يبدأ دائمًا بالبداية ثم النهاية، مهما كان اتجاه الحاوية. */
+/** نطاق وقت موحّد: البداية أول عنصر RTL، وكل وقت يحافظ على قراءة HH:MM. */
 export const fmtTimeRange = (start, end) => {
   const first = String(start ?? '').trim();
   const last = String(end ?? '').trim();
   if (!first && !last) return '';
-  return html`<span class="time-range" dir="ltr"><span class="time-range__token" data-time-token="start">${first}</span>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><span class="time-range__token" data-time-token="end">${last}</span>` : ''}</span>`;
+  return html`<span class="time-range"><span class="time-range__token" dir="ltr" data-time-token="start">${first}</span>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><span class="time-range__token" dir="ltr" data-time-token="end">${last}</span>` : ''}</span>`;
 };
 
 export const fmtNum = (n, digits = 2) => {
