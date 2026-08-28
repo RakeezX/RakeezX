@@ -11,7 +11,7 @@ import { repaint } from '../repaint.js';
 let kind = 'participation';   // participation | behavior
 let withReason = false;
 
-const KIND_LABEL = { participation: 'المشاركة', behavior: 'السلوك' };
+const KIND_LABEL = { participation: 'المشاركة', behavior: 'سجل السلوك فقط' };
 
 function reasonSheet(kindKey, delta) {
   const tags = LOG_TAGS[kindKey][delta > 0 ? 'up' : 'down'];
@@ -102,7 +102,7 @@ export default {
     const todayTotal = allLogs.filter((l) => l.date === today).length;
 
     return html`
-      <div class="segmented mb-3">
+      <div class="segmented quicklog__modes mb-3">
         ${Object.entries(KIND_LABEL).map(
           ([k, label]) => html`
             <button class="segmented__btn ${kind === k ? 'is-on' : ''}" data-act="kind" data-kind="${k}">
@@ -112,7 +112,7 @@ export default {
         )}
       </div>
 
-      <div class="hstack gap-2 mb-3">
+      <div class="hstack gap-2 mb-3 quicklog__filters">
         <label class="switch">
           <input type="checkbox" data-change="reason" ${withReason ? 'checked' : ''}>
           <span>مع سبب</span>

@@ -147,6 +147,17 @@
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: var(--sp-2);
 }
+/* The behavior-only label is intentionally descriptive. Constrain this one
+   segmented control rather than hiding page overflow or changing global tabs. */
+.quicklog__modes { min-width: 0; }
+.quicklog__modes .segmented__btn {
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.25;
+  padding-inline: var(--sp-2);
+}
+.quicklog__filters { flex-wrap: wrap; }
+.quicklog__filters .push { min-width: 0; }
 @media (max-width: 380px) { .ql-grid { grid-template-columns: repeat(2, 1fr); } }
 
 .qlcard {
