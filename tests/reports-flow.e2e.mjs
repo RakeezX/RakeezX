@@ -60,6 +60,7 @@ test('reports render current historical data, edited section metadata, and synce
   await enableMockSync(page, cloud);
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store && window.__syncModule, { timeout: 15_000 });
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
 
   // Isolated TEST-only data includes multiple sections, a historical dated session,
   // scores, and a no-roster teaching for the report empty state.
@@ -179,6 +180,10 @@ test('reports render current historical data, edited section metadata, and synce
   await expectNoDocumentOverflow(page);
   await page.setViewportSize({ width: 1280, height: 800 });
 
+  // The test saved fixtures through the real store, which schedules automatic sync.
+  // Wait for that pass to settle before asserting the explicit category sync results.
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+
   // Sync the same report sources, confirm immediate convergence, then render them on a fresh device.
   const first = await page.evaluate(async () => ({
     structural: await window.__syncModule.syncStructural(),
@@ -186,8 +191,8 @@ test('reports render current historical data, edited section metadata, and synce
     timetable: await window.__syncModule.syncTimetable(),
     scoring: await window.__syncModule.syncScoring(),
   }));
-  expect(first.timetable.attendance.pushed).toBe(3);
-  expect(first.scoring.scores.pushed).toBe(6);
+  expect(first.timetable.attendance).toEqual({ pushed: 0, pulled: 0 });
+  expect(first.scoring.scores).toEqual({ pushed: 0, pulled: 0 });
   const second = await page.evaluate(async () => ({
     timetable: await window.__syncModule.syncTimetable(),
     scoring: await window.__syncModule.syncScoring(),
