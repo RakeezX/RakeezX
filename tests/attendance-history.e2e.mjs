@@ -164,9 +164,11 @@ test('attendance remains historical after recurring slot edit and sync converges
   await expect(page.locator('.gtable--report')).toContainText('TEST Late');
   await expect(page.locator('.gtable--report')).toContainText('TEST Excused');
 
-  // First mock-cloud sync uploads the dated session and four attendance records; the immediate retry converges.
+  // Dated-session mutations enqueue automatic sync; wait for it to settle before
+  // asserting the explicit follow-up is a no-op and cloud convergence is complete.
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
   const firstSync = await page.evaluate(() => window.__syncModule.syncTimetable());
-  expect(firstSync.attendance.pushed).toBe(4);
+  expect(firstSync.attendance).toEqual({ pushed: 0, pulled: 0 });
   const secondSync = await page.evaluate(() => window.__syncModule.syncTimetable());
   expect(secondSync.attendance).toEqual({ pushed: 0, pulled: 0 });
   expect(cloud.tables.attendance).toHaveLength(4);
