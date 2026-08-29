@@ -1,9 +1,10 @@
 import * as cloud from './cloud.js';
 import * as store from '../store.js';
+import * as db from './db.js';
 import { uid, DEFAULT_TIME_PROFILES } from '../models.js';
 
 export const state = {
-  status: 'idle', // idle, syncing
+  status: 'idle', // idle, pending, offline, syncing, synced, error
   lastSyncedAt: null, // will be initialized from store
   results: {
     profile: null,
@@ -12,6 +13,125 @@ export const state = {
     notes: null
   }
 };
+
+const SYNCABLE_STORES = new Set([
+  'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
+  'students', 'enrollments', 'notes', 'items', 'scores',
+  'timeProfiles', 'slots', 'sessions', 'attendance'
+]);
+const STRUCTURAL_STORES = new Set(['years', 'terms', 'subjects', 'sections', 'teachings']);
+const STUDENT_STORES = new Set(['students', 'enrollments']);
+const SCORING_STORES = new Set(['items', 'scores']);
+const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'attendance']);
+const AUTO_SYNC_DEBOUNCE_MS = 900;
+
+let autoTimer = null;
+let autoRunning = false;
+let rerunRequested = false;
+let suppressAutoSchedule = false;
+let initialized = false;
+
+const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
+const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
+
+async function pendingOutbox() {
+  const entries = await db.getAll('outbox');
+  return entries.filter((entry) => SYNCABLE_STORES.has(entry.store));
+}
+
+async function acknowledgeOutbox(snapshot) {
+  for (const entry of snapshot) {
+    const current = await db.get('outbox', entry.id);
+    // A mutation made while this run was active keeps its newer entry for the
+    // follow-up pass; only the exact successfully-synced snapshot is removed.
+    if (current && current.updatedAt === entry.updatedAt) await db.remove('outbox', entry.id);
+  }
+}
+
+function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
+  if (!cloud.session || !cloud.user) return;
+  if (!isOnline()) {
+    setState({ status: 'offline' });
+    return;
+  }
+  if (autoRunning) {
+    rerunRequested = true;
+    return;
+  }
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    autoTimer = null;
+    syncAll({ full });
+  }, immediate ? 0 : AUTO_SYNC_DEBOUNCE_MS);
+  setState({ status: 'pending' });
+}
+
+function failedResult(name) {
+  return state.results[name]?.status === 'error' ? state.results[name].error : null;
+}
+
+async function runRequiredSync(stores, full) {
+  if (full || stores.has('profile')) {
+    await syncProfile();
+    if (failedResult('profile')) throw new Error(failedResult('profile'));
+  }
+  if (full || intersects(stores, STRUCTURAL_STORES)) {
+    await syncStructural();
+    if (failedResult('structural')) throw new Error(failedResult('structural'));
+  }
+  if (full || intersects(stores, STUDENT_STORES)) {
+    await syncStudents();
+    if (failedResult('students')) throw new Error(failedResult('students'));
+  }
+  if (full || intersects(stores, SCORING_STORES)) {
+    await syncScoring();
+    if (failedResult('scoring')) throw new Error(failedResult('scoring'));
+  }
+  if (full || intersects(stores, TIMETABLE_STORES)) {
+    await syncTimetable();
+    if (failedResult('timetable')) throw new Error(failedResult('timetable'));
+  }
+  if (full || stores.has('notes')) {
+    await syncNotes();
+    if (failedResult('notes')) throw new Error(failedResult('notes'));
+  }
+}
+
+/** Safe orchestration only: existing category merge semantics remain authoritative. */
+export async function syncAll({ full = true } = {}) {
+  if (!cloud.session || !cloud.user) return false;
+  if (!isOnline()) {
+    setState({ status: 'offline' });
+    return false;
+  }
+  if (autoRunning) {
+    rerunRequested = true;
+    return false;
+  }
+
+  autoRunning = true;
+  suppressAutoSchedule = true;
+  const snapshot = await pendingOutbox();
+  const stores = new Set(snapshot.map((entry) => entry.store));
+  try {
+    await runRequiredSync(stores, full);
+    await acknowledgeOutbox(snapshot);
+    setState({ status: (await pendingOutbox()).length ? 'pending' : 'synced' });
+    return true;
+  } catch (err) {
+    console.warn('[rakeezx sync] Automatic sync failed:', err);
+    setState({ status: isOnline() ? 'error' : 'offline' });
+    return false;
+  } finally {
+    suppressAutoSchedule = false;
+    autoRunning = false;
+    const remaining = await pendingOutbox();
+    if (rerunRequested || remaining.length) {
+      rerunRequested = false;
+      scheduleAutomaticSync();
+    }
+  }
+}
 
 const listeners = new Set();
 export function subscribe(fn) {
@@ -29,6 +149,24 @@ function setState(updates) {
 
 export function init() {
   state.lastSyncedAt = store.state.device?.lastSyncAt || null;
+  if (initialized) return;
+  initialized = true;
+  store.subscribe(() => {
+    if (!suppressAutoSchedule) scheduleAutomaticSync();
+  });
+  cloud.subscribe(() => {
+    if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
+    else if (!cloud.session) {
+      if (autoTimer) clearTimeout(autoTimer);
+      autoTimer = null;
+      setState({ status: 'idle' });
+    }
+  });
+  if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
+  if (typeof addEventListener === 'function') {
+    addEventListener('online', () => scheduleAutomaticSync({ full: true, immediate: true }));
+    addEventListener('offline', () => setState({ status: 'offline' }));
+  }
 }
 
 function getDeviceId() {
@@ -158,13 +296,13 @@ export async function syncProfile() {
         phone: merged.phone,
         updatedAt: merged.updatedAt,
         deleted: merged.deleted
-      }, { preserveTimestamp: true });
+      }, { preserveTimestamp: true, queue: false });
     }
 
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
-      status: 'idle',
+      status: 'synced',
       lastSyncedAt: nowStamp,
       results: {
         ...state.results,
@@ -176,7 +314,7 @@ export async function syncProfile() {
   } catch (err) {
     console.warn('[rakeezx sync] Profile sync failed:', err);
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         profile: { status: 'error', error: err.message, time: Date.now() }
@@ -805,7 +943,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
         const ok = await store.patchDevice({ ...store.state.device, ...devicePatch });
         if (!ok) throw new Error(`${storeName} defaults: device persistence failed`);
       }
-      const ok2 = await store.save(patch);
+      const ok2 = await store.save(patch, { queue: false });
       if (!ok2) throw new Error(`${storeName} defaults: local persistence failed`);
   }
 
@@ -951,7 +1089,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   }
 
   if (toUpdateLocal.length > 0) {
-    const ok = await store.save({ [storeName]: toUpdateLocal });
+    const ok = await store.save({ [storeName]: toUpdateLocal }, { queue: false });
     if (!ok) throw new Error(`${storeName}: local persistence failed`);
   }
 
@@ -991,7 +1129,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     for (const [oldId, newId] of remappedLocals) {
       const patch = buildCascadePatch(oldId, newId, storeName);
       if (Object.keys(patch).length > 0) {
-        const ok = await store.save(patch);
+        const ok = await store.save(patch, { queue: false });
         if (!ok) throw new Error(`${storeName} cascade: local persistence failed`);
       }
     }
@@ -1041,7 +1179,7 @@ export async function syncStructural() {
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
-      status: 'idle',
+      status: 'synced',
       lastSyncedAt: nowStamp,
       results: {
         ...state.results,
@@ -1054,7 +1192,7 @@ export async function syncStructural() {
   } catch (err) {
     console.warn('[rakeezx sync] Structural sync failed:', err);
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         structural: { status: 'error', error: err.message, time: Date.now() }
@@ -1080,7 +1218,7 @@ export async function syncStudents() {
   if (state.results.structural?.status === 'error') {
     console.warn('[rakeezx sync] Structural sync failed, aborting students sync.');
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         students: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
@@ -1112,7 +1250,7 @@ export async function syncStudents() {
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
-      status: 'idle',
+      status: 'synced',
       lastSyncedAt: nowStamp,
       results: {
         ...state.results,
@@ -1124,7 +1262,7 @@ export async function syncStudents() {
   } catch (err) {
     console.warn('[rakeezx sync] Students sync failed:', err);
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         students: { status: 'error', error: err.message, time: Date.now() }
@@ -1143,13 +1281,13 @@ export async function syncNotes() {
 
   await syncStudents();
   if (state.results.students?.status === 'error') {
-    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الطلاب: ' + state.results.students.error, time: Date.now() } } });
+    setState({ status: 'error', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الطلاب: ' + state.results.students.error, time: Date.now() } } });
     return;
   }
   await store.migrateLegacyStudentNotes();
   await syncTimetable();
   if (state.results.timetable?.status === 'error') {
-    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الجدول: ' + state.results.timetable.error, time: Date.now() } } });
+    setState({ status: 'error', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الجدول: ' + state.results.timetable.error, time: Date.now() } } });
     return;
   }
 
@@ -1165,11 +1303,11 @@ export async function syncNotes() {
     const res = await syncCollection('notes', 'notes', { requiredIds: new Set(), knownRemoteIds });
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
-    setState({ status: 'idle', lastSyncedAt: nowStamp, results: { ...state.results, notes: { status: 'success', stats: { notes: { pushed: res.pushed, pulled: res.pulled } }, time: nowStamp } } });
+    setState({ status: 'synced', lastSyncedAt: nowStamp, results: { ...state.results, notes: { status: 'success', stats: { notes: { pushed: res.pushed, pulled: res.pulled } }, time: nowStamp } } });
     console.log('[rakeezx sync] Notes sync complete.', res);
   } catch (err) {
     console.warn('[rakeezx sync] Notes sync failed:', err);
-    setState({ status: 'idle', results: { ...state.results, notes: { status: 'error', error: err.message, time: Date.now() } } });
+    setState({ status: 'error', results: { ...state.results, notes: { status: 'error', error: err.message, time: Date.now() } } });
   }
 }
 
@@ -1186,7 +1324,7 @@ export async function syncScoring() {
   if (state.results.structural?.status === 'error') {
     console.warn('[rakeezx sync] Structural sync failed, aborting scoring sync.');
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         scoring: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
@@ -1222,7 +1360,7 @@ export async function syncScoring() {
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
-      status: 'idle',
+      status: 'synced',
       lastSyncedAt: nowStamp,
       results: {
         ...state.results,
@@ -1235,7 +1373,7 @@ export async function syncScoring() {
   } catch (err) {
     console.warn('[rakeezx sync] Scoring sync failed:', err);
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         scoring: { status: 'error', error: err.message, time: Date.now() }
@@ -1257,7 +1395,7 @@ export async function syncTimetable() {
   if (state.results.structural?.status === 'error') {
     console.warn('[rakeezx sync] Structural sync failed, aborting timetable sync.');
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         timetable: { status: 'error', error: 'فشلت المزامنة الهيكلية: ' + state.results.structural.error, time: Date.now() }
@@ -1307,7 +1445,7 @@ export async function syncTimetable() {
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });
     setState({
-      status: 'idle',
+      status: 'synced',
       lastSyncedAt: nowStamp,
       results: {
         ...state.results,
@@ -1320,7 +1458,7 @@ export async function syncTimetable() {
   } catch (err) {
     console.warn('[rakeezx sync] Timetable sync failed:', err);
     setState({
-      status: 'idle',
+      status: 'error',
       results: {
         ...state.results,
         timetable: { status: 'error', error: err.message, time: Date.now() }

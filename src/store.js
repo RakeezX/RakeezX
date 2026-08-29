@@ -320,7 +320,7 @@ function revertMemory(storeName, records, undo) {
 }
 
 /** يحفظ سجلات كاملة — للإنشاء والاستيراد الجماعي. للتعديل استعمل patch(). */
-export async function save(batch) {
+export async function save(batch, options = {}) {
   const writes = {};
   const outbox = [];
   const undos = [];
@@ -331,7 +331,7 @@ export async function save(batch) {
     writes[storeName] = records;
     undos.push([storeName, records, applyToMemory(storeName, records)]);
     changes.push(...changeList(storeName, records));
-    if (storeName !== 'meta') outbox.push(...records.map((r) => outboxEntry(storeName, r)).filter(Boolean));
+    if (options.queue !== false && storeName !== 'meta') outbox.push(...records.map((r) => outboxEntry(storeName, r)).filter(Boolean));
   }
   if (!changes.length) return true;
 
@@ -377,7 +377,7 @@ export async function patch(storeName, id, changes, create = null, options = {})
     const [authoritative] = await db.patchMany(
       storeName,
       [{ id, changes, create: create ? { ...create, id } : null }],
-      storeName === 'device' ? null : (rec, fields) => outboxEntry(storeName, rec, fields, 'patch'),
+      storeName === 'device' || options.queue === false ? null : (rec, fields) => outboxEntry(storeName, rec, fields, 'patch'),
       newStamp
     );
 

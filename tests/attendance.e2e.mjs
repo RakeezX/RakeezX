@@ -70,20 +70,13 @@ test.describe('E2E Attendance Flow', () => {
     // Wait for the app to finish async boot
     await pageA.waitForFunction(() => window.__syncModule !== undefined, { timeout: 10000 });
 
-    // Force sync if it didn't run automatically
-    await pageA.evaluate(async () => {
-      console.log('Forcing sync...');
-      await window.__syncModule.syncStructural();
-      await window.__syncModule.syncStudents();
-      await window.__syncModule.syncTimetable();
-      console.log('Forced sync complete.');
-      const store = await import('/src/store.js');
-      await store.patchDevice({ activeTermId: 't1' });
-    });
-
+    // Authenticated boot now pulls the fixture automatically; wait for actual data,
+    // rather than racing the in-flight initial sync with manual category calls.
+    await pageA.waitForFunction(() => window.store.getTeaching('tch1') && window.store.state.students.length >= 2, { timeout: 15_000 });
+    await pageA.evaluate(() => window.store.patchDevice({ activeTermId: 't1' }));
     await pageA.reload();
-    await expect(pageA.locator('.row__title').first()).toBeVisible({ timeout: 5000 });
-
+    await pageA.waitForFunction(() => window.store.getTeaching('tch1') && window.__syncModule?.state.status === 'synced', { timeout: 15_000 });
+    await expect(pageA.locator('.row__title').first()).toBeVisible({ timeout: 5_000 });
     // Click class
     await pageA.click('a[href="#/teaching/tch1"]');
 

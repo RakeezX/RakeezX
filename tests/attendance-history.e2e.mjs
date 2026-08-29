@@ -183,13 +183,9 @@ test('attendance remains historical after recurring slot edit and sync converges
   await signInForMockSync(pageB, cloud);
   await pageB.goto('/#/classes');
   await pageB.waitForFunction(() => window.__syncModule && window.store, { timeout: 15_000 });
-  await pageB.evaluate(async () => {
-    await window.__syncModule.syncStructural();
-    await window.__syncModule.syncStudents();
-    await window.__syncModule.syncTimetable();
-    await window.store.patchDevice({ activeYearId: 'test-year', activeTermId: 'test-term' });
-  });
-  await pageB.goto(`/#/teaching/test-teaching/attendance?session=${historical.session.id}`);
+  // Authenticated boot now performs the full dependency-safe pull itself.
+  await pageB.waitForFunction(() => window.__syncModule.state.status === 'synced', { timeout: 15_000 });
+  await pageB.evaluate(() => window.store.patchDevice({ activeYearId: 'test-year', activeTermId: 'test-term' }));  await pageB.goto(`/#/teaching/test-teaching/attendance?session=${historical.session.id}`);
   await expect(pageB.locator('.att-row')).toHaveCount(4);
   expect(await pageB.evaluate((sessionId) => {
     const records = window.store.state.attendance.filter((item) => !item.deleted && item.sessionId === sessionId);

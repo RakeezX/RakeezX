@@ -153,6 +153,16 @@ function renderResultPanel(title, result) {
   `;
 }
 
+function syncStatusLabel(status) {
+  return ({
+    synced: 'متزامن',
+    syncing: 'جارٍ المزامنة...',
+    pending: 'تغييرات بانتظار المزامنة',
+    offline: 'غير متصل',
+    error: 'تعذرت المزامنة — ستُعاد المحاولة',
+    idle: 'بانتظار تسجيل الدخول',
+  })[status] ?? 'تغييرات بانتظار المزامنة';
+}
 export default {
   title: () => 'الإعدادات',
 
@@ -167,7 +177,7 @@ export default {
         <div class="section__head"><div class="section__title">بياناتك</div></div>
         <div class="card card--pad">
           <p class="t-3 fs-sm mb-3">
-            تظهر على التقارير والكشوف التي تطبعها. تُحفظ على جهازك ولا تُرسل لأحد.
+            تظهر على التقارير والكشوف التي تطبعها. تُحفظ محليًا وتُزامن مع حسابك عند الاتصال.
           </p>
           <form id="me-form">
             <label class="field">
@@ -285,7 +295,7 @@ export default {
         </a>
       </div>
       <div class="section">
-        <div class="section__head"><div class="section__title">المزامنة السحابية (تجريبي)</div></div>
+        <div class="section__head"><div class="section__title">المزامنة السحابية</div></div>
         <div class="card card--pad stack stack-3">
           ${cloud.session ? html`
             <div class="hstack gap-2">
@@ -297,38 +307,38 @@ export default {
             </div>
 
             <div class="t-3 fs-sm hstack gap-2">
-              <div>الحالة: ${sync.state.status === 'syncing' ? 'جاري المزامنة...' : 'جاهز'}</div>
+              <div>الحالة: ${syncStatusLabel(sync.state.status)}</div>
             </div>
 
             <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار المزامنة (Profile)
+              ${icon('spark')} مزامنة الآن
             </button>
-            ${renderResultPanel('اختبار المزامنة (Profile)', sync.state.results.profile)}
+            ${renderResultPanel('مزامنة الملف الشخصي', sync.state.results.profile)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-structural" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار المزامنة الهيكلية
+              ${icon('spark')} مزامنة البيانات الهيكلية
             </button>
-            ${renderResultPanel('اختبار المزامنة الهيكلية', sync.state.results.structural)}
+            ${renderResultPanel('مزامنة البيانات الهيكلية', sync.state.results.structural)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-students" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار مزامنة الطلاب والانتساب
+              ${icon('spark')} مزامنة الطلاب والانتساب
             </button>
-            ${renderResultPanel('اختبار مزامنة الطلاب والانتساب', sync.state.results.students)}
+            ${renderResultPanel('مزامنة الطلاب والانتساب', sync.state.results.students)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-notes" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار مزامنة ملاحظات الطلاب
+              ${icon('spark')} مزامنة ملاحظات الطلاب
             </button>
-            ${renderResultPanel('اختبار مزامنة ملاحظات الطلاب', sync.state.results.notes)}
+            ${renderResultPanel('مزامنة ملاحظات الطلاب', sync.state.results.notes)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-scoring" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار مزامنة التقييم والدرجات
+              ${icon('spark')} مزامنة التقييم والدرجات
             </button>
-            ${renderResultPanel('اختبار مزامنة التقييم والدرجات', sync.state.results.scoring)}
+            ${renderResultPanel('مزامنة التقييم والدرجات', sync.state.results.scoring)}
 
             <button class="btn btn--quiet btn--block" data-act="sync-timetable" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} اختبار مزامنة الجدول والجلسات
+              ${icon('spark')} مزامنة الجدول والجلسات
             </button>
-            ${renderResultPanel('اختبار مزامنة الجدول والجلسات', sync.state.results.timetable)}
+            ${renderResultPanel('مزامنة الجدول والجلسات', sync.state.results.timetable)}
 
 
           ` : html`
@@ -424,14 +434,9 @@ export default {
 
     async 'sync-now'(el) {
       if (sync.state.status === 'syncing') return;
-      await sync.syncProfile();
-      if (sync.state.results.profile?.status === 'error') {
-        toast('تعذرت المزامنة', 'danger');
-      } else {
-        toast('تمت المزامنة بنجاح');
-      }
+      const ok = await sync.syncAll({ full: true });
+      toast(ok ? 'تمت المزامنة بنجاح' : 'تعذرت المزامنة', ok ? undefined : 'danger');
     },
-
     async 'sync-structural'(el) {
       if (sync.state.status === 'syncing') return;
       await sync.syncStructural();
