@@ -7,6 +7,7 @@ function createCloud() {
   const tables = Object.fromEntries(TABLES.map((name) => [name, []]));
   let profile = { teacher_name: 'معلم سحابي', school_name: 'مدرسة سحابية', phone: '', client_updated_at: Date.now() - 5_000 };
   let nextProfileWrite = null;
+  const nextTableRead = new Map();
   return {
     async route(page) {
       await page.route(`${CLOUD_URL}*`, async (route) => {
@@ -21,7 +22,15 @@ function createCloud() {
           profile = { ...profile, ...patch };
           return route.fulfill({ json: [profile] });
         }
-        if (request.method() === 'GET') return route.fulfill({ json: tables[table] ?? [] });
+        if (request.method() === 'GET') {
+          const gate = nextTableRead.get(table);
+          if (gate) {
+            nextTableRead.delete(table);
+            gate.started();
+            await gate.wait;
+          }
+          return route.fulfill({ json: tables[table] ?? [] });
+        }
         if (request.method() === 'POST') {
           const records = JSON.parse(request.postData() ?? '[]');
           if (table === 'calendars' && records.some((record) => !['moe', 'custom'].includes(record.source))) {
@@ -47,6 +56,13 @@ function createCloud() {
       const startedPromise = new Promise((resolve) => { started = resolve; });
       const wait = new Promise((resolve) => { release = resolve; });
       nextProfileWrite = { started, wait };
+      return { started: startedPromise, release };
+    },
+    holdNextTableRead(table) {
+      let started; let release;
+      const startedPromise = new Promise((resolve) => { started = resolve; });
+      const wait = new Promise((resolve) => { release = resolve; });
+      nextTableRead.set(table, { started, wait });
       return { started: startedPromise, release };
     },
   };
@@ -128,5 +144,39 @@ test('a mutation during an active upload remains queued for a single follow-up p
   await expect.poll(() => cloud.profile().teacher_name, { timeout: 10_000 }).toBe('معلم أثناء المزامنة ٢');
   await page.waitForFunction(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).every((entry) => entry.store !== 'profile'));
   expect(await page.evaluate(() => window.__syncModule.state.status)).toBe('synced');
+  await context.close();
+});
+test('authenticated fresh pull renders existing student notes without a local mutation', async ({ browser }) => {
+  test.setTimeout(45_000);
+  const cloud = createCloud();
+  const stamp = Date.now() - 10_000;
+  cloud.table('students').push({
+    id: 'remote-notes-student', name: 'طالب سحابي', note: '', status: 'active',
+    client_updated_at: stamp, deleted_at: null,
+  });
+  cloud.table('notes').push({
+    id: 'remote-existing-note', student_id: 'remote-notes-student', teaching_id: null, session_id: null,
+    date: '2026-08-30', kind: 'general', text: 'ملاحظة وصلت من السحابة',
+    created_at: new Date(stamp).toISOString(), client_updated_at: stamp, deleted_at: null,
+  });
+
+  const notesRead = cloud.holdNextTableRead('notes');
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await authenticated(page, cloud);
+  await page.goto('/#/student/remote-notes-student');
+
+  await notesRead.started;
+  await expect(page.getByRole('heading', { name: /طالب سحابي/ })).toBeVisible();
+  await expect(page.getByText('لا توجد ملاحظات مسجلة لهذا الطالب.')).toBeVisible();
+
+  notesRead.release();
+  await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
+  await expect(page.getByText('ملاحظة وصلت من السحابة')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.store.notesOf('remote-notes-student').map((note) => note.id))).toEqual(['remote-existing-note']);
+
+  await page.reload();
+  await expect(page.getByText('ملاحظة وصلت من السحابة')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.store.notesOf('remote-notes-student').map((note) => note.id))).toEqual(['remote-existing-note']);
   await context.close();
 });
