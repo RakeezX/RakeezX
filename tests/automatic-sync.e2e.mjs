@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
-const TABLES = ['years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'time_profiles', 'slots', 'sessions', 'attendance', 'notes'];
+const TABLES = ['years', 'calendars', 'calendar_days', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'time_profiles', 'slots', 'sessions', 'attendance', 'notes'];
 
 function createCloud() {
   const tables = Object.fromEntries(TABLES.map((name) => [name, []]));
@@ -23,7 +23,14 @@ function createCloud() {
         }
         if (request.method() === 'GET') return route.fulfill({ json: tables[table] ?? [] });
         if (request.method() === 'POST') {
-          for (const record of JSON.parse(request.postData() ?? '[]')) {
+          const records = JSON.parse(request.postData() ?? '[]');
+          if (table === 'calendars' && records.some((record) => !['moe', 'custom'].includes(record.source))) {
+            return route.fulfill({ status: 422, json: { message: 'calendars_source_check' } });
+          }
+          if (table === 'terms' && records.some((record) => record.calendar_id && !tables.calendars.some((calendar) => calendar.id === record.calendar_id))) {
+            return route.fulfill({ status: 409, json: { message: 'terms_calendar_fk' } });
+          }
+          for (const record of records) {
             const list = tables[table] ??= [];
             const index = list.findIndex((item) => item.id === record.id);
             if (index < 0) list.push({ ...record }); else list[index] = { ...record };
@@ -34,6 +41,7 @@ function createCloud() {
       });
     },
     profile: () => profile,
+    table: (name) => tables[name] ?? [],
     holdNextProfileWrite() {
       let started; let release;
       const startedPromise = new Promise((resolve) => { started = resolve; });
@@ -73,6 +81,10 @@ test('automatic sync pulls on authenticated boot and pushes profile changes with
   await expect(pageB.locator('input[name="teacherName"]')).toHaveValue('معلم تلقائي A');
   await expect(pageB.getByRole('button', { name: 'مزامنة الآن' })).toBeVisible();
   await expect(pageB.getByText('اختبار المزامنة')).toHaveCount(0);
+  expect(cloud.table('calendars').length).toBeGreaterThan(0);
+  expect(cloud.table('calendars').every((calendar) => ['moe', 'custom'].includes(calendar.source))).toBe(true);
+  expect(cloud.table('terms').every((term) => !term.calendar_id || cloud.table('calendars').some((calendar) => calendar.id === term.calendar_id))).toBe(true);
+  await expect.poll(() => pageB.evaluate(() => window.store.state.calendars.some((calendar) => calendar.source.startsWith('preset:')))).toBe(true);
 
   await contextA.close();
   await contextB.close();

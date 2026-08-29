@@ -13,6 +13,7 @@ class MockCloudBackend {
   constructor() {
     this.records = {};
     this.failUpsert = false;
+    this.upsertOrder = [];
   }
   
   async fetchRecords(tableName) {
@@ -21,6 +22,15 @@ class MockCloudBackend {
   
   async upsertRecords(tableName, records) {
     if (this.failUpsert) throw new Error("Mock network failure");
+    this.upsertOrder.push(tableName);
+    if (tableName === 'terms') {
+      const calendars = this.records.calendars || [];
+      for (const record of records) {
+        if (record.calendar_id && !calendars.some((calendar) => calendar.id === record.calendar_id)) {
+          throw new Error(`terms_calendar_fk: missing calendar ${record.calendar_id}`);
+        }
+      }
+    }
     if (!this.records[tableName]) this.records[tableName] = [];
     const table = this.records[tableName];
     
@@ -63,6 +73,43 @@ test("Sync Suite", async (t) => {
     const res2 = await sync.syncStructural();
   });
 
+  await t.test("Calendar parents sync before calendar-dependent terms and converge without duplicates", async () => {
+    const stamp = Date.now();
+    const year = { id: 'calendar-year', label: 'TEST 1448', hijriStart: 1448, hijriEnd: 1449, order: 10, status: 'active', updatedAt: stamp };
+    const calendar = { id: 'calendar:calendar-year:custom', yearId: year.id, source: 'custom', label: 'TEST Calendar', updatedAt: stamp };
+    const term = { id: 'calendar-term', yearId: year.id, name: 'TEST Term', index: 1, startDate: '2026-08-30', endDate: '2026-12-31', status: 'active', calendarId: calendar.id, updatedAt: stamp };
+    const day = { id: 'calendar-day', calendarId: calendar.id, date: '2026-09-23', kind: 'national', label: 'TEST Day', updatedAt: stamp };
+    await db.put('years', year);
+    await db.put('calendars', calendar);
+    await db.put('terms', term);
+    await db.put('calendarDays', day);
+    await store.init();
+
+    const first = await sync.syncStructural();
+    assert.ok(first.calendars.pushed >= 1);
+    assert.ok(first.calendarDays.pushed >= 1);
+    assert.ok(first.terms.pushed >= 1);
+    assert.ok(backend.records.calendars.some((record) => record.id === calendar.id));
+    assert.equal(backend.records.terms.find((record) => record.id === term.id).calendar_id, calendar.id);
+    assert.ok(backend.upsertOrder.indexOf('calendars') < backend.upsertOrder.indexOf('terms'), 'calendar must reach cloud before its term');
+    assert.ok(backend.upsertOrder.indexOf('calendar_days') < backend.upsertOrder.indexOf('terms'), 'calendar days must be part of the parent-first structural pass');
+
+    const second = await sync.syncStructural();
+    assert.equal(second.calendars.pushed, 0);
+    assert.equal(second.calendarDays.pushed, 0);
+    assert.equal(second.terms.pushed, 0);
+    assert.equal(backend.records.calendars.filter((record) => record.id === calendar.id).length, 1);
+    assert.equal(backend.records.calendar_days.filter((record) => record.id === day.id).length, 1);
+    assert.equal(backend.records.terms.filter((record) => record.id === term.id).length, 1);
+
+    await db.clearAll();
+    await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
+    await store.init();
+    await sync.syncStructural();
+    assert.equal((await db.get('calendars', calendar.id)).id, calendar.id);
+    assert.equal((await db.get('terms', term.id)).calendarId, calendar.id);
+    assert.equal((await db.get('calendarDays', day.id)).calendarId, calendar.id);
+  });
   await t.test("Scenario B: Timetable initial local -> cloud push", async () => {
     backend.records["years"] = [{ id: "y1", label: "1445", order: 1 }];
     backend.records["terms"] = [{ id: "t1", year_id: "y1", label: "T1" }];

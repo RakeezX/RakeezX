@@ -15,11 +15,11 @@ export const state = {
 };
 
 const SYNCABLE_STORES = new Set([
-  'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
+  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores',
   'timeProfiles', 'slots', 'sessions', 'attendance'
 ]);
-const STRUCTURAL_STORES = new Set(['years', 'terms', 'subjects', 'sections', 'teachings']);
+const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'attendance']);
@@ -183,6 +183,17 @@ function getDeviceId() {
  * Safely parses any date/number to integer milliseconds.
  * Returns 0 if invalid or absent.
  */
+function calendarSourceForCloud(source) {
+  return String(source ?? '').startsWith('preset:') ? 'moe' : source;
+}
+
+function calendarSourceFromCloud(record) {
+  const prefix = `cal:${record.year_id}:preset:`;
+  return record.source === 'moe' && String(record.id ?? '').startsWith(prefix)
+    ? String(record.id).slice(`cal:${record.year_id}:`.length)
+    : record.source;
+}
+
 function normalizeTimestamp(ts) {
   if (ts === null || ts === undefined || ts === '') return 0;
   if (typeof ts === 'number') return ts;
@@ -346,6 +357,48 @@ const MAPPERS = {
       hijriEnd: rec.hijri_end,
       order: rec.order,
       status: rec.status,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  calendars: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      year_id: rec.yearId,
+      source: calendarSourceForCloud(rec.source),
+      label: rec.label,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      yearId: rec.year_id,
+      source: calendarSourceFromCloud(rec),
+      label: rec.label,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined
+    })
+  },
+  calendarDays: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      calendar_id: rec.calendarId,
+      date: rec.date,
+      kind: rec.kind,
+      label: rec.label,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId()
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      calendarId: rec.calendar_id,
+      date: rec.date,
+      kind: rec.kind,
+      label: rec.label,
       updatedAt: normalizeTimestamp(rec.client_updated_at),
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
@@ -714,16 +767,29 @@ function isMeaningfulStructural(storeName, rec) {
  * that must be pushed because user-created children depend on them.
  */
 function buildLocalDependencies(state) {
-  const req = { years: new Set(), terms: new Set(), subjects: new Set(), sections: new Set(), teachings: new Set(), timeProfiles: new Set(), slots: new Set() };
+  const req = { years: new Set(), calendars: new Set(), calendarDays: new Set(), terms: new Set(), subjects: new Set(), sections: new Set(), teachings: new Set(), timeProfiles: new Set(), slots: new Set() };
 
   for (const sec of state.sections || []) {
     if (sec.yearId && isMeaningfulStructural('sections', sec)) {
       req.years.add(sec.yearId);
     }
   }
+  for (const calendar of state.calendars || []) {
+    if (calendar.yearId && isMeaningfulStructural('calendars', calendar)) {
+      req.years.add(calendar.yearId);
+    }
+  }
   for (const term of state.terms || []) {
     if (term.yearId && isMeaningfulStructural('terms', term)) {
       req.years.add(term.yearId);
+    }
+    if (term.calendarId && isMeaningfulStructural('terms', term)) {
+      req.calendars.add(term.calendarId);
+    }
+  }
+  for (const day of state.calendarDays || []) {
+    if (day.calendarId && isMeaningfulStructural('calendarDays', day)) {
+      req.calendars.add(day.calendarId);
     }
   }
   for (const tch of state.teachings || []) {
@@ -948,10 +1014,20 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   }
 
   // Dependency validation before push
-  if (storeName === 'terms' || storeName === 'sections') {
+  if (storeName === 'calendars' || storeName === 'terms' || storeName === 'sections') {
     for (const p of toPush) {
       if (p.year_id && !context.knownRemoteIds?.years?.has(p.year_id)) {
         throw new Error(`${storeName}: missing remote year ${p.year_id}`);
+      }
+      if (storeName === 'terms' && p.calendar_id && !context.knownRemoteIds?.calendars?.has(p.calendar_id)) {
+        throw new Error(`terms: missing remote calendar ${p.calendar_id}`);
+      }
+    }
+  }
+  if (storeName === 'calendarDays') {
+    for (const p of toPush) {
+      if (p.calendar_id && !context.knownRemoteIds?.calendars?.has(p.calendar_id)) {
+        throw new Error(`calendarDays: missing remote calendar ${p.calendar_id}`);
       }
     }
   }
@@ -1160,6 +1236,8 @@ export async function syncStructural() {
     const stats = {};
     const order = [
       { store: 'years', table: 'years' },
+      { store: 'calendars', table: 'calendars' },
+      { store: 'calendarDays', table: 'calendar_days' },
       { store: 'terms', table: 'terms' },
       { store: 'subjects', table: 'subjects' },
       { store: 'sections', table: 'sections' },
