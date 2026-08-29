@@ -195,6 +195,7 @@ test('manual scoring persists, reports correctly, and converges without duplicat
   await enableMockSync(pageB, cloud);
   await pageB.goto('/#/classes');
   await pageB.waitForFunction(() => window.__syncModule && window.store, { timeout: 15_000 });
+  await pageB.waitForFunction(() => window.__syncModule.state.status === 'synced', { timeout: 15_000 });
   await pageB.evaluate(async () => {
     await window.__syncModule.syncStructural();
     await window.__syncModule.syncStudents();
