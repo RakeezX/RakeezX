@@ -50,6 +50,7 @@ test('manual scoring persists, reports correctly, and converges without duplicat
   await enableMockSync(page, cloud);
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store && window.__syncModule, { timeout: 15_000 });
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
 
   await page.evaluate(async () => {
     await window.store.save({
@@ -171,9 +172,12 @@ test('manual scoring persists, reports correctly, and converges without duplicat
   await expect(page.locator('.gtable--report')).toContainText('31');
   await expect(page.locator('.gtable--report')).toContainText('50');
 
+  // Item and score mutations enqueue automatic sync; wait for that pass before
+  // asserting the explicit follow-up is a no-op and cloud convergence is complete.
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
   const firstSync = await page.evaluate(() => window.__syncModule.syncScoring());
-  expect(firstSync.items.pushed).toBe(5);
-  expect(firstSync.scores.pushed).toBe(13);
+  expect(firstSync.items).toEqual({ pushed: 0, pulled: 0 });
+  expect(firstSync.scores).toEqual({ pushed: 0, pulled: 0 });
   const secondSync = await page.evaluate(() => window.__syncModule.syncScoring());
   expect(secondSync.items).toEqual({ pushed: 0, pulled: 0 });
   expect(secondSync.scores).toEqual({ pushed: 0, pulled: 0 });
