@@ -5,7 +5,7 @@
 
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { LOG_TAGS, netPoints, todayISO } from '../models.js';
+import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let kind = 'participation';   // participation | behavior
@@ -100,6 +100,9 @@ export default {
     }
 
     const todayTotal = allLogs.filter((l) => l.date === today).length;
+    const attendance = quickLogAttendanceState(roster, store.sessionsOnFor(cls.id, today), (sessionId) => store.attendanceIn(sessionId));
+    const displayStudents = [...attendance.filter((entry) => !entry.unavailable), ...attendance.filter((entry) => entry.unavailable)];
+    const unavailableCount = attendance.filter((entry) => entry.unavailable).length;
 
     return html`
       <div class="segmented quicklog__modes mb-3">
@@ -122,15 +125,17 @@ export default {
         </span>
       </div>
 
+      ${unavailableCount ? html`<div class="hstack gap-2 mb-2 fs-xs t-3"><span>الغياب والاستئذان: <strong class="tabular">${unavailableCount}</strong></span></div>` : ''}
       <div class="ql-grid">
-        ${roster.map((s) => {
+        ${displayStudents.map(({ student: s, status, unavailable }) => {
           const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
-          const tone = c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
+          const tone = unavailable ? 'is-unavail' : c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
+          const statusBadge = status === 'absent' ? html`<span class="qlcard__status badge badge--danger">غائب</span>` : status === 'excused' ? html`<span class="qlcard__status badge badge--warn">مستأذن</span>` : '';
           return html`
             <div class="qlcard ${tone}" id="ql-${s.id}">
               <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
                       aria-label="نقطة لـ ${s.name}">
-                <span class="qlcard__roll tabular">${s.rollNo ?? ''}</span>
+                <span class="qlcard__roll tabular">${s.rollNo ?? ''} ${statusBadge}</span>
                 <span class="qlcard__name">${s.name}</span>
                 <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
                 ${c.today ? html`<span class="qlcard__today tabular">اليوم ${c.today > 0 ? '+' : ''}${c.today}</span>` : ''}
@@ -141,7 +146,6 @@ export default {
           `;
         })}
       </div>
-
       <p class="t-3 fs-sm center mt-6">
         نقرة على الطالب = نقطة. النقاط تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.
       </p>

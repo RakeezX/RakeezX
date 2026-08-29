@@ -170,6 +170,9 @@
 }
 .qlcard.is-pos { border-color: color-mix(in srgb, var(--ok) 45%, var(--border)); }
 .qlcard.is-neg { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+.qlcard.is-unavail { opacity: .72; background: var(--bg-sunk); border-color: var(--border-subtle); }
+.qlcard.is-unavail:hover { opacity: .9; }
+.qlcard__status { margin-inline-start: var(--sp-1); font-size: 11px; padding: 1px 6px; }
 
 .qlcard__hit {
   display: grid; gap: 2px;

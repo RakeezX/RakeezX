@@ -66,3 +66,30 @@ test('Quick Log remains fully usable and RTL-safe across narrow mobile viewports
 
   expect(errors).toEqual([]);
 });
+test('Quick Log renders available students before absent and excused students without changing actions', async ({ page }) => {
+  await page.goto('/#/classes');
+  await page.waitForFunction(() => window.store);
+  await page.evaluate(async () => {
+    const now = new Date();
+    const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+    await window.store.save({
+      sections: [{ id: 'ql-order-section', grade: 5, label: 'أ' }],
+      teachings: [{ id: 'ql-order-teaching', sectionId: 'ql-order-section' }],
+      students: [{ id: 'ql-a', name: 'أحمد', status: 'active' }, { id: 'ql-b', name: 'بدر', status: 'active' }, { id: 'ql-c', name: 'تركي', status: 'active' }, { id: 'ql-d', name: 'سالم', status: 'active' }],
+      enrollments: [{ id: 'ql-ea', studentId: 'ql-a', sectionId: 'ql-order-section', status: 'active', rollNo: 1 }, { id: 'ql-eb', studentId: 'ql-b', sectionId: 'ql-order-section', status: 'active', rollNo: 2 }, { id: 'ql-ec', studentId: 'ql-c', sectionId: 'ql-order-section', status: 'active', rollNo: 3 }, { id: 'ql-ed', studentId: 'ql-d', sectionId: 'ql-order-section', status: 'active', rollNo: 4 }],
+      sessions: [{ id: 'ql-early', teachingId: 'ql-order-teaching', date: today, period: 1 }, { id: 'ql-late', teachingId: 'ql-order-teaching', date: today, period: 2 }],
+      attendance: [{ id: 'ql-aa', sessionId: 'ql-early', studentId: 'ql-a', status: 'absent' }, { id: 'ql-ab', sessionId: 'ql-early', studentId: 'ql-b', status: 'absent' }, { id: 'ql-ac', sessionId: 'ql-early', studentId: 'ql-c', status: 'excused' }, { id: 'ql-ad', sessionId: 'ql-early', studentId: 'ql-d', status: 'excused' }, { id: 'ql-al', sessionId: 'ql-late', studentId: 'ql-a', status: 'present' }, { id: 'ql-cl', sessionId: 'ql-late', studentId: 'ql-c', status: 'present' }],
+    });
+  });
+  await page.goto('/#/teaching/ql-order-teaching/quicklog');
+  const cards = page.locator('.qlcard');
+  await expect(cards).toHaveCount(4);
+  await expect(cards.evaluateAll((nodes) => nodes.map((node) => node.id))).resolves.toEqual(['ql-ql-a', 'ql-ql-c', 'ql-ql-b', 'ql-ql-d']);
+  await expect(page.locator('#ql-ql-b')).toHaveClass(/is-unavail/);
+  await expect(page.locator('#ql-ql-b')).toContainText('غائب');
+  await expect(page.locator('#ql-ql-c')).not.toHaveClass(/is-unavail/);
+  await expect(page.locator('#ql-ql-d')).toHaveClass(/is-unavail/);
+  await expect(page.locator('#ql-ql-d')).toContainText('مستأذن');
+  await page.locator('#ql-ql-a [data-act="plus"]').click();
+  await expect(page.locator('#ql-ql-a')).toContainText('+1');
+});

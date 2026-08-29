@@ -25,6 +25,20 @@ export function todayISO(d = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
+/** ترتيب عرض الرصد السريع فقط؛ أحدث حضور مسجل زمنيًا هو المرجع، والسجل الفارغ لا يمحوه. */
+export function quickLogAttendanceState(roster, sessions, attendanceForSession) {
+  const latestRecorded = new Map();
+  const chronological = [...sessions].sort((a, b) => a.period - b.period);
+  for (const session of chronological) {
+    for (const record of attendanceForSession(session.id)) {
+      if (record?.status) latestRecorded.set(record.studentId, record.status);
+    }
+  }
+  return roster.map((student) => {
+    const status = latestRecorded.get(student.id) ?? null;
+    return { student, status, unavailable: status === 'absent' || status === 'excused' };
+  });
+}
 
 export function shiftDate(iso, days) {
   const [y, m, d] = iso.split('-').map(Number);
