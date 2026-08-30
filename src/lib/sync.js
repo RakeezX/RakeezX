@@ -996,8 +996,11 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
         }
       }
 
-      // Mark old as deleted and save new (hydrated) immediately.
-      patch[storeName].push({ id: oldId, deleted: true, deletedAt: new Date().toISOString() });
+      // Mark the old local identity as deleted without discarding its model.
+      // fields. IndexedDB put replaces a record, so an id-only tombstone
+      // would persist a malformed time profile (including no name) and can
+      // later be retried as an invalid cloud payload after a reload.
+      patch[storeName].push({ ...lRec, id: oldId, deleted: true, deletedAt: new Date().toISOString(), updatedAt: Date.now() });
       patch[storeName].push(hydrated);
 
       // Prevent it from being pushed under the old ID if it somehow got queued
