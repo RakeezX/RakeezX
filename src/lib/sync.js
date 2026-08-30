@@ -16,12 +16,12 @@ export const state = {
 
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
-  'students', 'enrollments', 'notes', 'items', 'scores',
+  'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
   'timeProfiles', 'slots', 'sessions', 'attendance'
 ]);
 const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
-const SCORING_STORES = new Set(['items', 'scores']);
+const SCORING_STORES = new Set(['items', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'attendance']);
 const AUTO_SYNC_DEBOUNCE_MS = 900;
 
@@ -83,13 +83,15 @@ async function runRequiredSync(stores, full) {
     await syncStudents();
     if (failedResult('students')) throw new Error(failedResult('students'));
   }
+  // Logs can reference a dated session, so timetable/session records must reach
+  // the cloud before scoring (which owns the logs sync category) attempts log push.
+  if (full || intersects(stores, TIMETABLE_STORES) || stores.has('logs')) {
+    await syncTimetable();
+    if (failedResult('timetable')) throw new Error(failedResult('timetable'));
+  }
   if (full || intersects(stores, SCORING_STORES)) {
     await syncScoring();
     if (failedResult('scoring')) throw new Error(failedResult('scoring'));
-  }
-  if (full || intersects(stores, TIMETABLE_STORES)) {
-    await syncTimetable();
-    if (failedResult('timetable')) throw new Error(failedResult('timetable'));
   }
   if (full || stores.has('notes')) {
     await syncNotes();
@@ -577,6 +579,10 @@ const MAPPERS = {
       deleted: !!rec.deleted_at,
       deletedAt: rec.deleted_at || undefined
     })
+  },
+  logs: {
+    toCloud: (rec) => ({ id:rec.id, student_id:rec.studentId, teaching_id:rec.teachingId, session_id:rec.sessionId || null, date:rec.date, kind:rec.kind, delta:rec.delta, tag:rec.tag || '', note:rec.note || '', deleted_at:rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null, client_updated_at:rec.updatedAt, device_id:getDeviceId() }),
+    fromCloud: (rec) => ({ id:rec.id, studentId:rec.student_id, teachingId:rec.teaching_id, sessionId:rec.session_id || null, date:rec.date, kind:rec.kind, delta:rec.delta, tag:rec.tag || '', note:rec.note || '', updatedAt:normalizeTimestamp(rec.client_updated_at), deleted:!!rec.deleted_at, deletedAt:rec.deleted_at || undefined })
   },
   scores: {
     toCloud: (rec) => ({
@@ -1146,6 +1152,14 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     }
   }
 
+  if (storeName === 'logs') {
+    for (const p of toPush) {
+      if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) throw new Error(String(storeName) + ': missing remote student ' + p.student_id);
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) throw new Error(String(storeName) + ': missing remote teaching ' + p.teaching_id);
+      if (p.session_id && !context.knownRemoteIds?.sessions?.has(p.session_id)) throw new Error(String(storeName) + ': missing remote session ' + p.session_id);
+    }
+  }
+
   if (storeName === 'attendance') {
     for (const p of toPush) {
       if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
@@ -1429,6 +1443,12 @@ export async function syncScoring() {
     const resScores = await syncCollection('scores', 'scores', { requiredIds: new Set(), knownRemoteIds });
     knownRemoteIds.scores = resScores.known;
     stats.scores = { pushed: resScores.pushed, pulled: resScores.pulled };
+
+    // 3. Quick Log events depend on existing students, teachings, and optional sessions.
+    const remoteSessions = await cloud.fetchRecords('sessions');
+    knownRemoteIds.sessions = new Set(remoteSessions.map(r => r.id));
+    const resLogs = await syncCollection('logs', 'logs', { requiredIds: new Set(), knownRemoteIds });
+    stats.logs = { pushed: resLogs.pushed, pulled: resLogs.pulled };
 
     const nowStamp = Date.now();
     await store.patchDevice({ lastSyncAt: nowStamp });

@@ -37,7 +37,7 @@ test("Sync Scoring Suite", async (t) => {
       years: [], terms: [], subjects: [], sections: [], teachings: [],
       time_profiles: [], slots: [], sessions: [],
       students: [], enrollments: [],
-      items: [], scores: []
+      items: [], scores: [], logs: []
     };
     
     // Inject mock backend
@@ -189,5 +189,50 @@ test("Sync Scoring Suite", async (t) => {
     await sync.syncScoring();
     assert.equal(sync.state.results.scoring.status, "error");
     assert.match(sync.state.results.scoring.error, /missing remote item item_missing/);
+  });
+  await t.test("Quick Log push, pull, tombstone, and active-store notification", async () => {
+    setupStruct();
+    const localLog = { id: "log-local", teachingId: "tch1", studentId: "std1", kind: "participation", delta: 2, tag: "", note: "", sessionId: null, date: "2026-08-30", updatedAt: now, deleted: false };
+    await store.save({ logs: [localLog] });
+    await store.init();
+    const first = await sync.syncScoring();
+    assert.equal(first.logs.pushed, 1);
+    assert.equal(backend.records.logs[0].id, "log-local");
+    assert.equal(backend.records.logs[0].student_id, "std1");
+
+    let notifications = 0;
+    const unsubscribe = store.subscribe(() => { notifications += 1; });
+    backend.records.logs.push({ id: "log-remote", student_id: "std1", teaching_id: "tch1", session_id: null, date: "2026-08-30", kind: "participation", delta: 3, tag: "remote", note: "", client_updated_at: now + 10, deleted_at: null });
+    sync.state.status = "idle";
+    const second = await sync.syncScoring();
+    unsubscribe();
+    assert.equal(second.logs.pulled, 1);
+    assert.equal((await db.get("logs", "log-remote")).delta, 3);
+    assert.deepEqual(backend.records.logs.map((record) => record.id).sort(), ["log-local", "log-remote"]);
+    assert.ok(notifications > 0, "remote log pull notifies active store consumers");
+
+    await store.patch("logs", localLog.id, { deleted: true, deletedAt: new Date(now + 20).toISOString(), updatedAt: now + 20 });
+    sync.state.status = "idle";
+    await sync.syncScoring();
+    assert.ok(backend.records.logs.find((record) => record.id === "log-local").deleted_at);
+    await sync.syncAll({ full: false });
+    assert.equal((await db.getAll("outbox")).some((entry) => entry.store === "logs"), false, "acknowledges the exact synchronized log snapshot");
+  });
+
+  await t.test("Quick Log session FK is validated without changing log identity", async () => {
+    setupStruct();
+    backend.records.sessions = [{ id: "session1", teaching_id: "tch1", date: "2026-08-30", client_updated_at: now }];
+    await store.save({ logs: [{ id: "log-session", teachingId: "tch1", studentId: "std1", sessionId: "session1", kind: "behavior", delta: -1, tag: "", note: "", date: "2026-08-30", updatedAt: now, deleted: false }] });
+    await store.init();
+    const stats = await sync.syncScoring();
+    assert.equal(stats.logs.pushed, 1);
+    assert.equal(backend.records.logs[0].session_id, "session1");
+
+    backend.records.sessions = [];
+    await store.save({ logs: [{ id: "log-missing-session", teachingId: "tch1", studentId: "std1", sessionId: "missing-session", kind: "behavior", delta: -1, tag: "", note: "", date: "2026-08-30", updatedAt: now + 1, deleted: false }] });
+    sync.state.status = "idle";
+    await sync.syncScoring();
+    assert.equal(sync.state.results.scoring.status, "error");
+    assert.match(sync.state.results.scoring.error, /missing remote session missing-session/);
   });
 });
