@@ -63,6 +63,12 @@ async function expectRTLRange(scope, startTime, endTime) {
 
 async function expectRangesStayInViewport(page) {
   expect(await page.evaluate(() => document.documentElement.dir)).toBe('rtl');
+  await page.evaluate(async () => {
+    await document.fonts?.ready;
+    const animations = document.getAnimations().map((animation) => animation.finished.catch(() => undefined));
+    await Promise.all(animations);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const rangesFit = await page.evaluate(() => [...document.querySelectorAll('.time-range')].every((range) =>
     range.scrollWidth <= Math.ceil(range.getBoundingClientRect().width)
   ));

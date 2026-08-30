@@ -13,7 +13,7 @@ const runnerEnv = { ...process.env, RAKEEZX_E2E_SERVER: 'external' };
 const run = (file, args, env = process.env) => new Promise((resolve, reject) => {
   const child = spawn(process.execPath, [file, ...args], { cwd: ROOT, env, stdio: 'inherit' });
   child.once('error', reject);
-  child.once('exit', (code, signal) => resolve({ code, signal }));
+  child.once('close', (code, signal) => resolve({ code, signal }));
 });
 
 const listTests = (spec) => new Promise((resolve, reject) => {

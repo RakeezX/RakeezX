@@ -77,21 +77,29 @@ test('Version A to Version B refreshes executable assets without removing teache
         && navigator.serviceWorker.controller === registration.active;
     });
 
-    const onlineAssets = await page.evaluate(async () => ({
-      js: await (await fetch('/versioned/app.js')).text(),
-      css: await (await fetch('/versioned/app.css')).text(),
-      caches: await caches.keys(),
-      teacher: await new Promise((resolve, reject) => {
-        const request = indexedDB.open('pwa-update-retention', 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-          const db = request.result;
-          const get = db.transaction('students', 'readonly').objectStore('students').get('teacher-data');
-          get.onsuccess = () => { resolve(get.result); db.close(); };
-          get.onerror = () => reject(get.error);
-        };
-      }),
-    }));
+    let onlineAssets;
+    await expect.poll(async () => {
+      onlineAssets = await page.evaluate(async () => ({
+        js: await (await fetch('/versioned/app.js')).text(),
+        css: await (await fetch('/versioned/app.css')).text(),
+        caches: await caches.keys(),
+        teacher: await new Promise((resolve, reject) => {
+          const request = indexedDB.open('pwa-update-retention', 1);
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => {
+            const db = request.result;
+            const get = db.transaction('students', 'readonly').objectStore('students').get('teacher-data');
+            get.onsuccess = () => { resolve(get.result); db.close(); };
+            get.onerror = () => reject(get.error);
+          };
+        }),
+      }));
+      return onlineAssets.js.includes("window.__release = 'B'")
+        && onlineAssets.css.includes("--release: 'B'")
+        && onlineAssets.caches.includes('unrelated-cache')
+        && !onlineAssets.caches.includes('rakeezx-v4')
+        && onlineAssets.teacher?.id === 'teacher-data';
+    }, { timeout: 10_000 }).toBe(true);
     expect(onlineAssets.js).toContain("window.__release = 'B'");
     expect(onlineAssets.css).toContain("--release: 'B'");
     expect(onlineAssets.caches).toContain('unrelated-cache');
