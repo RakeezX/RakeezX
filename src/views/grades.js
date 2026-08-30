@@ -1,4 +1,4 @@
-﻿/**
+/**
  * الدرجات — وضعان:
  *   «بند واحد» يرصد بندًا لكل الطلاب (وهكذا يصحّح المعلّم فعلًا: ورقة ورقة).
  *   «الجدول»   يعرض المصفوفة كاملة، أنسب للّابتوب والمراجعة النهائية.
@@ -116,8 +116,10 @@ export default {
       ev.preventDefault();
       const inputs = Array.from(el.closest('.list, table')?.querySelectorAll('input.gradein') ?? []);
       const next = inputs[inputs.indexOf(el) + 1];
-      if (next) next.focus();
-      else el.blur();
+      if (next) {
+        next.focus();
+        if (next.value.trim()) next.select();
+      } else el.blur();
     },
   },
 };

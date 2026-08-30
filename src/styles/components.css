@@ -633,3 +633,10 @@
   .classes-actions { flex-wrap:wrap; }
   .classes-actions .btn { flex:1 1 130px; justify-content:center; }
 }
+/* ---------- ملخص اكتمال الحضور ---------- */
+.att-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--border); border-radius:var(--r-full); font-size:12.5px; font-weight:750; white-space:nowrap; }
+.att-pill svg { inline-size:14px; block-size:14px; }
+.att-pill__dot { inline-size:7px; block-size:7px; border-radius:var(--r-full); background:var(--text-3); }
+.att-pill--unmarked { color:var(--text-2); background:var(--bg-elev); }
+.att-pill--done { color:var(--ok); background:var(--ok-soft); border-color:color-mix(in srgb, var(--ok) 30%, var(--border)); }
+@media (max-width:400px) { .att-pill { padding:4px 8px; font-size:12px; gap:4px; } .att-row { min-width:0; } }

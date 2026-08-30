@@ -463,7 +463,7 @@ export const makeDevice = (o = {}) => ({
   id: 'device',
   updatedAt: now(),
   deleted: false,
-  theme: o.theme ?? 'auto',
+  theme: o.theme ?? 'light',
   activeYearId: o.activeYearId ?? null,
   activeTermId: o.activeTermId ?? null,
   activeTimeProfileId: o.activeTimeProfileId ?? null,

@@ -159,7 +159,7 @@ async function splitMetaIfNeeded() {
     phone: src.phone ?? '',
   });
   const nextDevice = device ?? makeDevice({
-    theme: src.theme ?? 'auto',
+    theme: src.theme ?? 'light',
     activeYearId: src.activeYearId ?? null,
     activeTermId: src.activeTermId ?? null,
     lastSyncAt: src.lastSyncAt ?? null,

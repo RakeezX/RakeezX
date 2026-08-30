@@ -146,9 +146,11 @@ export default {
                     </span>`
                   : ''
               )}
-              ${unmarked
-                ? html`<span class="badge">بلا رصد <span class="tabular">${unmarked}</span></span>`
-                : html`<span class="badge badge--ok">${icon('check')} اكتمل الرصد</span>`}
+              <span class="att-pill ${unmarked ? 'att-pill--unmarked' : 'att-pill--done'}" role="status" aria-label="حالة الرصد: ${unmarked ? 'غير مكتمل' : 'مكتمل'}">
+                ${unmarked ? html`<span class="att-pill__dot"></span>` : icon('check')}
+                <span>${unmarked ? 'غير مكتمل' : 'مكتمل'}</span>
+                <span class="tabular">${records.length}/${roster.length}</span>
+              </span>
               ${!isToday ? html`<button class="btn btn--sm btn--quiet push" data-act="go-today">اليوم</button>` : ''}
             </div>
 
