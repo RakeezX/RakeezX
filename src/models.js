@@ -334,13 +334,13 @@ export function generateAdvancedPeriods(config) {
 
 export const makeTimeProfile = (o = {}) => ({
   ...base(),
-  name: o.name ?? 'ملف توقيت',
+  ...o,
+  name: typeof o.name === 'string' && o.name.trim() ? o.name.trim() : 'ملف توقيت',
   order: o.order ?? 0,
   periods: o.periods ?? buildPeriods(7, '07:00', 40, 5),
   overrides: o.overrides ?? {},
   activeFrom: o.activeFrom ?? null,
   activeTo: o.activeTo ?? null,
-  ...o,
 });
 
 export const TIMING_PRESETS = {

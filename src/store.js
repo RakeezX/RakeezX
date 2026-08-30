@@ -213,6 +213,20 @@ async function ensureFoundation() {
     if (Array.isArray(state[k])) state[k].push(rec);
   };
 
+  // Old offline data could predate the required cloud `name` column. Preserve
+  // its id, periods, and history, but give only nameless records a transparent,
+  // deterministic compatibility label before they can be serialized to cloud.
+  for (const profile of state.timeProfiles) {
+    if (isLocalOnlyRecord(profile) || (typeof profile.name === 'string' && profile.name.trim())) continue;
+    const suffix = String(profile.id ?? 'غير-معرّف').slice(-8);
+    profile.name = `ملف توقيت قديم (${suffix})`;
+    profile.updatedAt = now();
+    (writes.timeProfiles ??= []).push(profile);
+    // Replace only this record's stale payload so a previous invalid outbox
+    // entry cannot keep automatic sync pending after the repair succeeds.
+    (writes.outbox ??= []).push(outboxEntry('timeProfiles', profile));
+  }
+
   if (!live(state.years).length) {
     const preset = calendarPresetRecords(getCalendarPreset());
     push('years', preset.year);

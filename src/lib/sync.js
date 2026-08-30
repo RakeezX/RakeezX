@@ -1363,11 +1363,6 @@ export async function syncNotes() {
     return;
   }
   await store.migrateLegacyStudentNotes();
-  await syncTimetable();
-  if (state.results.timetable?.status === 'error') {
-    setState({ status: 'error', results: { ...state.results, notes: { status: 'error', error: 'فشلت مزامنة الجدول: ' + state.results.timetable.error, time: Date.now() } } });
-    return;
-  }
 
   setState({ status: 'syncing', results: { ...state.results, notes: null } });
   try {
