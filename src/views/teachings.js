@@ -123,7 +123,20 @@ function row(tch) {
             ? html`<span class="badge badge--ok">${icon('check')} رُصد اليوم</span>`
             : html`<span class="badge badge--warn">حصة اليوم</span>`
           : ''}
-        ${demo ? html`<button class="btn btn--sm btn--quiet" data-act="delete-demo" data-id="${tch.id}">حذف الفصل التجريبي</button>` : ''}${icon('chev')}
+        ${demo
+          ? html`<button
+              type="button"
+              class="class-demo-del-btn"
+              data-act="delete-demo"
+              data-id="${tch.id}"
+              aria-label="حذف الفصل التجريبي"
+              title="حذف الفصل التجريبي"
+            >
+              ${icon('trash')}
+              <span class="class-demo-del-btn__label">حذف</span>
+            </button>`
+          : ''}
+        ${icon('chev')}
       </span>
     </a>
   `;
@@ -188,7 +201,7 @@ export default {
 
       <div class="list">${list.map(row)}</div>
 
-      <div class="hstack gap-2 mt-3"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
+      <div class="hstack gap-2 mt-3 classes-actions"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
     `;
   },
 
