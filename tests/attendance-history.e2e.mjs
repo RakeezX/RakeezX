@@ -113,7 +113,7 @@ test('attendance remains historical after recurring slot edit and sync converges
   await setStatus('TEST Absent', 'absent');
   await setStatus('TEST Late', 'late');
   await setStatus('TEST Excused', 'excused');
-  await expect(page.getByText('اكتمل الرصد', { exact: false })).toBeVisible();
+  await expect(page.locator('.att-pill[role="status"][aria-label="حالة الرصد: مكتمل"]')).toBeVisible();
 
   const historical = await page.evaluate(() => {
     const session = window.store.state.sessions.find((item) => item.teachingId === 'test-teaching' && !item.deleted && window.store.state.attendance.some((record) => record.sessionId === item.id && !record.deleted));
