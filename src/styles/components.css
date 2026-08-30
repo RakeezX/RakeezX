@@ -591,3 +591,36 @@
 .recess-badge { flex: none; width: auto; padding: 0 var(--sp-2); height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-sm); background: var(--recess); color: #fff; font-size: 13px; font-weight: 800; }
 .row-recess .row__title { font-weight: 700; color: var(--text); }
 .row-recess .row__sub { color: var(--text-2); font-size: 13px; }
+/* ---------- مساحة عمل الفصل: كثافة هادئة ومتجاوبة ---------- */
+.class-hub { display:grid; gap:var(--sp-3); }
+.class-hub > .section { margin-block:0; }
+.class-hub > .section .section__head { margin-bottom:var(--sp-2); }
+.class-hub > .section .tile { min-height:88px; padding:var(--sp-3); gap:var(--sp-1); }
+.class-hub > .section .tile__icon { width:32px; height:32px; }
+.class-hub > .section .tile__icon svg { width:18px; height:18px; }
+.class-hub > .section .tile__title { font-size:13.5px; }
+.class-hub > .section .tile__sub { font-size:11.5px; }
+.class-hub > .section .stat { padding:var(--sp-2) var(--sp-3); }
+.class-hub > .section .stat__val { font-size:20px; }
+.class-hub__settings { display:flex; align-items:center; justify-content:space-between; gap:var(--sp-3); flex-wrap:wrap; padding:var(--sp-3); background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--r-md); }
+.class-hub__settings-title { font-size:13px; font-weight:750; }
+.class-hub__settings-desc { margin:2px 0 0; color:var(--text-3); font-size:11.5px; }
+.class-hub__settings-actions { display:flex; gap:var(--sp-2); flex-wrap:wrap; }
+
+/* ---------- تأكيد حذف الإسناد ---------- */
+.delete-teaching-dialog { display:grid; gap:var(--sp-3); }
+.delete-teaching-dialog__badge { display:inline-flex; align-items:center; gap:6px; justify-self:start; padding:4px 9px; border-radius:var(--r-full); background:var(--danger-soft); color:var(--danger); font-size:12px; font-weight:700; }
+.delete-teaching-dialog__badge svg { inline-size:14px; block-size:14px; }
+.delete-teaching-dialog__block { padding:var(--sp-3); border:1px solid var(--border); border-radius:var(--r-md); }
+.delete-teaching-dialog__block p { margin:5px 0 0; color:var(--text-2); font-size:13px; line-height:1.6; }
+.delete-teaching-dialog__block--danger { background:color-mix(in srgb, var(--danger-soft) 55%, var(--bg-elev)); border-color:color-mix(in srgb, var(--danger) 28%, var(--border)); }
+.delete-teaching-dialog__block--safe { background:color-mix(in srgb, var(--ok-soft) 55%, var(--bg-elev)); border-color:color-mix(in srgb, var(--ok) 28%, var(--border)); }
+
+@media (max-width:540px) {
+  .class-hub > .section .grid--auto { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .class-hub__settings { align-items:stretch; }
+  .class-hub__settings-actions { width:100%; }
+  .class-hub__settings-actions .btn { flex:1; justify-content:center; }
+  .class-hub__delete { inline-size:34px; min-inline-size:34px; padding-inline:0; flex:0 0 34px !important; }
+  .class-hub__delete span { display:none; }
+}

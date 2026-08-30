@@ -1,6 +1,6 @@
 /** لوحة الإسناد: مدخل لكل أدواته، وملخّص حاله اليوم. */
 
-import { html, icon, openSheet, confirmSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
+import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES } from '../models.js';
 import { go } from '../router.js';
@@ -73,6 +73,7 @@ export default {
     const held = store.sessionsOf(tch.id).filter((s) => s.status === 'held').length;
 
     return html`
+      <div class="class-hub">
       <div class="section">
         <div class="grid grid--3">
           <div class="stat">
@@ -156,13 +157,16 @@ export default {
         </div>
       </div>
 
-      <div class="section">
-        <button class="btn btn--danger btn--block" data-act="delete">
-          ${icon('trash')} حذف الإسناد
-        </button>
-        <p class="t-3 fs-sm mt-3 center">
-          يُحذف الإسناد ودرجاته وحصصه. **الطلاب وشعبتهم يبقون** — فالطالب هوية مستقلة.
-        </p>
+      <div class="class-hub__settings">
+        <div>
+          <div class="class-hub__settings-title">إعدادات الإسناد والشعبة</div>
+          <p class="class-hub__settings-desc">تعديل بيانات الشعبة أو إنهاء هذا الإسناد عند الحاجة.</p>
+        </div>
+        <div class="class-hub__settings-actions">
+          <button class="btn btn--sm btn--quiet" data-act="edit-sec">${icon('edit')} تعديل البيانات</button>
+          <button class="btn btn--sm btn--danger class-hub__delete" data-act="delete" aria-label="حذف الإسناد">${icon('trash')} <span>حذف الإسناد</span></button>
+        </div>
+      </div>
       </div>
     `;
   },
@@ -172,12 +176,21 @@ export default {
       const tch = store.getTeaching(params.id);
       if (!tch) return;
       const sec = store.getSection(tch.sectionId);
-      const ok = await confirmSheet({
-        title: `حذف إسناد ${sectionLabel(sec) || ''}؟`,
-        desc: 'تُحذف بنود التقييم والدرجات والحصص والحضور. الطلاب وانتسابهم للشعبة يبقون كما هم.',
-        confirmLabel: 'احذف الإسناد',
-        danger: true,
-      });
+      const sub = store.getSubject(tch.subjectId);
+      const target = [sectionLabel(sec), sub?.name].filter(Boolean).join(' · ');
+      const ok = await openSheet({
+        title: 'حذف الإسناد',
+        desc: target ? `إلغاء إسناد ${target}` : undefined,
+        body: html`
+          <div class="delete-teaching-dialog">
+            <div class="delete-teaching-dialog__badge">${icon('trash')} إجراء نهائي غير قابل للتراجع</div>
+            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>سيتم حذف بيانات هذا الإسناد مثل بنود التقييم والدرجات والحصص والحضور والسجل.</p></div>
+            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--safe"><strong>بيانات الطلاب والشعبة</strong><p>الطلاب وانتسابهم للشعبة سيبقون كما هم دون أي تعديل أو حذف.</p></div>
+          </div>
+        `,
+        foot: html`<button class="btn btn--quiet" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-confirm>${icon('trash')} حذف الإسناد</button>`,
+        onMount: (root, done) => root.querySelector('[data-confirm]')?.addEventListener('click', () => done(true)),
+      }).then((value) => value === true);
       if (!ok) return;
       await store.deleteTeaching(params.id);
       toast('حُذف الإسناد');
