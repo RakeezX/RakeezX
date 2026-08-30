@@ -182,13 +182,14 @@ function mergeOutbox(prev, next) {
  * حذف ناعم متتالٍ: يقرأ السجلات من القرص (لا من الذاكرة) ويعلّمها محذوفة،
  * في معاملة واحدة.
  */
-export async function markDeleted(predicates, stamp = Date.now()) {
+export async function markDeleted(predicates, stamp = Date.now(), outboxFor = null) {
   const names = Object.keys(predicates).filter((n) => STORES.includes(n));
   if (!names.length) return { count: 0, touched: {} };
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(names, 'readwrite');
+    const tx = db.transaction(outboxFor ? [...names, 'outbox'] : names, 'readwrite');
+    const outbox = outboxFor ? tx.objectStore('outbox') : null;
     const touched = {};
     let count = 0;
 
@@ -199,7 +200,13 @@ export async function markDeleted(predicates, stamp = Date.now()) {
         const hit = all.result.filter((r) => !r.deleted && predicates[name](r));
         touched[name] = hit.map((r) => r.id);
         for (const r of hit) {
-          os.put({ ...r, deleted: true, updatedAt: stamp });
+          const next = { ...r, deleted: true, updatedAt: stamp };
+          os.put(next);
+          const entry = outboxFor?.(name, next);
+          if (entry) {
+            const previous = outbox.get(entry.id);
+            previous.onsuccess = () => outbox.put(mergeOutbox(previous.result, entry));
+          }
           count++;
         }
       };

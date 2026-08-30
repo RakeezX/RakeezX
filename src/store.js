@@ -307,6 +307,15 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
   });
 };
 
+// Keep cascade deletes in the same durable transaction as their tombstones.
+// Quick Log is intentionally absent: it has no current cloud mapper/category,
+// so queuing it would leave an entry that automatic sync cannot drain.
+const CASCADE_SYNCABLE_STORES = new Set([
+  'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
+  'students', 'enrollments', 'notes', 'items', 'scores',
+  'timeProfiles', 'slots', 'sessions', 'attendance',
+]);
+
 function applyToMemory(storeName, records) {
   const arr = state[storeName];
   if (!Array.isArray(arr)) return [];
@@ -448,7 +457,11 @@ async function patchManyRecords(storeName, edits, context) {
 
 async function cascadeDelete(predicates, context) {
   try {
-    const { touched } = await db.markDeleted(predicates, now());
+    const { touched } = await db.markDeleted(predicates, now(), (storeName, record) =>
+      CASCADE_SYNCABLE_STORES.has(storeName)
+        ? outboxEntry(storeName, record, null, 'delete')
+        : null
+    );
     const changes = [];
     for (const [storeName, ids] of Object.entries(touched)) {
       const arr = state[storeName];
