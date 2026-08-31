@@ -26,20 +26,20 @@ test.describe('PWA and Service Worker', () => {
       return reg.active && reg.active.state === 'activated';
     }, { timeout: 15000 });
 
-    // C. CACHE VERSIONING
-    await page.waitForFunction(async () => {
-      const keys = await caches.keys();
-      return keys.some(k => k.startsWith('rakeezx-v'));
-    }, { timeout: 15000 });
-
-    const cacheKeys = await page.evaluate(async () => await caches.keys());
+    // C. CACHE VERSIONING — activation can precede the install cache becoming
+    // observable when another service-worker test just released its context.
+    // Wait for the final lifecycle invariant, not a one-time cache snapshot.
+    let cacheKeys = [];
+    await expect.poll(async () => {
+      cacheKeys = await page.evaluate(async () => await caches.keys());
+      return cacheKeys.includes('rakeezx-v5')
+        && !cacheKeys.some((key) => key.startsWith('rakeezx-') && key !== 'rakeezx-v5');
+    }, { timeout: 15_000 }).toBe(true);
     console.log("Caches found:", cacheKeys);
-    expect(cacheKeys.some(k => k.startsWith('rakeezx-v'))).toBeTruthy();
 
-    // Check no unexpected caches
+    // Check no unexpected caches after the service-worker lifecycle settles.
     const oldCaches = cacheKeys.filter(k => k.startsWith('rakeezx-') && k !== 'rakeezx-v5');
     expect(oldCaches.length).toBe(0);
-
     // B. CONTROLLED RELOAD
     await page.reload();
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, { timeout: 5000 });

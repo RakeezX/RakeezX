@@ -32,10 +32,12 @@ test('mobile Reports → class report retains app nav and exposes class context 
   await expectStablePrimaryNav(page, 'التقارير');
   const context = page.locator('[data-nav-scope="context"]');
   await expect(context).toBeVisible();
-  await expect(context.getByRole('link', { name: 'الطلاب' })).toBeVisible();
+  await expect(context.getByRole('link', { name: 'الفصل' })).toBeVisible();
   await expect(context.getByRole('link', { name: 'الحضور' })).toBeVisible();
-  await expect(context.getByRole('link', { name: 'الدرجات' })).toBeVisible();
-  await expect(context.getByRole('link', { name: 'التقارير' })).toHaveAttribute('aria-current', 'page');
+  await expect(context.getByRole('link', { name: 'الحصص' })).toBeVisible();
+  await expect(context.getByRole('link', { name: 'كشف الدرجات' })).toBeVisible();
+  await expect(context.getByRole('link', { name: 'الطلاب' })).toBeVisible();
+  await expect(context.getByRole('link', { name: 'التقارير' })).toHaveCount(0);
 
   await page.getByRole('link', { name: 'الجدول' }).click();
   await expect(page).toHaveURL(/#\/schedule$/);
@@ -58,9 +60,9 @@ test('mobile Classes context tabs preserve primary parent through students, atte
   await context.getByRole('link', { name: 'الحضور' }).click();
   await expectStablePrimaryNav(page, 'الفصول');
   await expect(context.getByRole('link', { name: 'الحضور' })).toHaveAttribute('aria-current', 'page');
-  await context.getByRole('link', { name: 'الدرجات' }).click();
+  await context.getByRole('link', { name: 'كشف الدرجات' }).click();
   await expectStablePrimaryNav(page, 'الفصول');
-  await expect(context.getByRole('link', { name: 'الدرجات' })).toHaveAttribute('aria-current', 'page');
+  await expect(context.getByRole('link', { name: 'كشف الدرجات' })).toHaveAttribute('aria-current', 'page');
 
   await page.reload();
   await expectStablePrimaryNav(page, 'الفصول');
