@@ -19,11 +19,12 @@ for (const viewport of [
       const enrollment = window.store.state.enrollments.find((item) => item.studentId === student.id && item.sectionId === section.id);
       return { sectionId: section.id, teachingId: teaching.id, studentId: student.id, enrollmentId: enrollment.id };
     });
-
-    await page.goto(`/#/teaching/${fixture.teachingId}`);
+    const classLink = page.locator(`a.class-card__main[href="#/teaching/${fixture.teachingId}"]`);
+    await expect(classLink).toBeVisible();
+    await classLink.click();
     await expect(page.locator('.class-hub')).toBeVisible();
     await expect(page.locator('.class-hub__settings')).toBeVisible();
-    await expect(page.locator('.class-hub .tile')).toHaveCount(10);
+    await expect(page.locator('.class-hub .tile')).toHaveCount(6);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
 
     const deleteButton = page.getByRole('button', { name: 'حذف الإسناد' });

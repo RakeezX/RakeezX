@@ -36,9 +36,11 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
 
     const { roster, items, ctx } = store.teachingContext(cls.id);
+    const distributionAction = html`<div class="grades-page-head noprint"><a class="btn btn--quiet btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} توزيع الدرجات</a></div>`;
 
     if (!roster.length) {
       return html`
+        ${distributionAction}
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">أضف الطلاب أولًا</div>
@@ -49,6 +51,7 @@ export default {
 
     if (!items.length) {
       return html`
+        ${distributionAction}
         <div class="empty">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود تقييم</div>
@@ -63,7 +66,7 @@ export default {
     }
 
     return html`
-      <div class="grades-page-head noprint"><a class="btn btn--quiet btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} توزيع الدرجات</a></div>
+      ${distributionAction}
       <div class="segmented mb-3">
         <button class="segmented__btn ${mode === 'item' ? 'is-on' : ''}" data-act="mode" data-mode="item">
           بند واحد

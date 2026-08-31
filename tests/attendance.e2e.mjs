@@ -76,7 +76,7 @@ test.describe('E2E Attendance Flow', () => {
     await pageA.evaluate(() => window.store.patchDevice({ activeTermId: 't1' }));
     await pageA.reload();
     await pageA.waitForFunction(() => window.store.getTeaching('tch1') && window.__syncModule?.state.status === 'synced', { timeout: 15_000 });
-    await expect(pageA.locator('.row__title').first()).toBeVisible({ timeout: 5_000 });
+    await expect(pageA.locator('.class-card__title').first()).toBeVisible({ timeout: 5_000 });
     // Click class
     await pageA.click('a[href="#/teaching/tch1"]');
 

@@ -14,6 +14,36 @@ const TOOLS = (id) => [
   { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'كشوف وتصدير وطباعة' },
   { href: `#/teaching/${id}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
 ];
+function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount }) {
+  return html`
+    <div class="class-hub-header mb-3">
+      <div class="class-hub-header__top">
+        <div class="class-hub-header__identity-block">
+          <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
+          <div class="class-hub-header__name-group">
+            <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="تبديل الفصل">
+              <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الشعبة'}</span>
+              <span class="class-name-switcher-btn__chevron" aria-hidden="true">‹</span>
+            </button>
+            <span class="class-hub-header__sub">${sub?.name || ''}</span>
+          </div>
+        </div>
+        <div class="class-hub-header__end">
+          <span class="class-hub-header__status-badge ${completeness?.state === 'completed' ? 'is-done' : completeness?.state === 'pending' ? 'is-live' : ''}">
+            ${completeness?.state === 'completed' ? html`${icon('check')} مكتمل` : completeness?.state === 'pending' ? 'بانتظار الرصد' : targetSession ? 'حصة اليوم' : 'لا حصة اليوم'}
+          </span>
+          <button class="iconbtn" data-act="edit-sec" aria-label="تعديل بيانات الشعبة" title="تعديل بيانات الشعبة">${icon('settings')}</button>
+        </div>
+      </div>
+      ${targetSession ? html`
+        <div class="class-hub-lesson-bar">
+          <span class="class-hub-lesson-bar__meta"><strong>الحصة ${targetSession.period}</strong>${targetSession.startTime ? html`${fmtTimeRange(targetSession.startTime, targetSession.endTime)}` : ''}</span>
+          <span class="class-hub-lesson-bar__status ${completeness?.state === 'completed' ? 'is-done' : 'is-pending'}">${completeness?.state === 'completed' ? `الحضور ${markedCount}/${rosterCount}` : 'بانتظار الرصد'}</span>
+          <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${tch.id}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
+        </div>` : ''}
+    </div>
+  `;
+}
 
 export default {
   title: (p) => {
@@ -51,13 +81,16 @@ export default {
 
     if (!roster.length) {
       return html`
-        <div class="empty">
-          <div class="empty__icon">${icon('student')}</div>
-          <div class="empty__title">الشعبة بلا طلاب بعد</div>
-          <div class="empty__text">
-            الصق كشف الأسماء دفعة واحدة — سطر لكل طالب — ويرقّمهم RAKEEZ X تلقائيًا.
+        <div class="class-hub">
+          ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
+          <div class="class-hub__empty empty">
+            <div class="empty__icon">${icon('student')}</div>
+            <div class="empty__title">الشعبة بلا طلاب بعد</div>
+            <div class="empty__text">
+              الصق كشف الأسماء دفعة واحدة — سطر لكل طالب — ويرقّمهم RAKEEZ X تلقائيًا.
+            </div>
+            <a class="btn btn--primary" href="#/teaching/${tch.id}/students">${icon('plus')} أضف الطلاب</a>
           </div>
-          <a class="btn btn--primary" href="#/teaching/${tch.id}/students">${icon('plus')} أضف الطلاب</a>
         </div>
       `;
     }
@@ -71,32 +104,7 @@ export default {
 
     return html`
       <div class="class-hub">
-      <div class="class-hub-header mb-3">
-        <div class="class-hub-header__top">
-          <div class="class-hub-header__identity-block">
-            <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
-            <div class="class-hub-header__name-group">
-              <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="تبديل الفصل">
-                <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الشعبة'}</span>
-                <span class="class-name-switcher-btn__chevron">${icon('chev')}</span>
-              </button>
-              <span class="class-hub-header__sub">${sub?.name || ''}</span>
-            </div>
-          </div>
-          <div class="class-hub-header__end">
-            <span class="class-hub-header__status-badge ${completeness?.state === 'completed' ? 'is-done' : completeness?.state === 'pending' ? 'is-live' : ''}">
-              ${completeness?.state === 'completed' ? html`${icon('check')} مكتمل` : completeness?.state === 'pending' ? 'بانتظار الرصد' : targetSession ? 'حصة اليوم' : 'لا حصة اليوم'}
-            </span>
-            <button class="iconbtn" data-act="edit-sec" aria-label="تعديل بيانات الشعبة" title="تعديل بيانات الشعبة">${icon('settings')}</button>
-          </div>
-        </div>
-        ${targetSession ? html`
-          <div class="class-hub-lesson-bar">
-            <span class="class-hub-lesson-bar__meta"><strong>الحصة ${targetSession.period}</strong>${targetSession.startTime ? html`${fmtTimeRange(targetSession.startTime, targetSession.endTime)}` : ''}</span>
-            <span class="class-hub-lesson-bar__status ${completeness?.state === 'completed' ? 'is-done' : 'is-pending'}">${completeness?.state === 'completed' ? `الحضور ${markedCount}/${roster.length}` : 'بانتظار الرصد'}</span>
-            <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${tch.id}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
-          </div>` : ''}
-      </div>
+      ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
       <div class="section">
         <div class="grid grid--3">
           <div class="stat">
