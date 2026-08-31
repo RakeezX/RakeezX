@@ -23,32 +23,37 @@ for (const viewport of [
     await expect(classLink).toBeVisible();
     await classLink.click();
     await expect(page.locator('.class-hub')).toBeVisible();
-    await expect(page.locator('.class-hub__settings')).toBeVisible();
     await expect(page.locator('.class-hub .tile')).toHaveCount(6);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
 
-    const deleteButton = page.getByRole('button', { name: 'حذف الإسناد' });
-    await expect(deleteButton).toBeVisible();
-    if (viewport.width <= 540) {
-      const box = await deleteButton.boundingBox();
-      expect(box?.width).toBeLessThanOrEqual(36);
-    } else {
-      await expect(deleteButton).toContainText('حذف الإسناد');
-    }
+    // Verify old "حذف الإسناد" button is removed from Class Workspace
+    await expect(page.getByRole('button', { name: 'حذف الإسناد' })).toHaveCount(0);
 
+    // Return to classes page and delete via centralized "حذف فصل"
+    await page.goto('/#/classes');
+    const deleteButton = page.getByRole('button', { name: 'حذف فصل' });
+    await expect(deleteButton).toBeVisible();
     await deleteButton.click();
+
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('سيتم حذف بيانات هذا الإسناد مثل بنود التقييم والدرجات والحصص والحضور والسجل.')).toBeVisible();
-    await expect(dialog.getByText('الطلاب وانتسابهم للشعبة سيبقون كما هم دون أي تعديل أو حذف.')).toBeVisible();
+    await dialog.locator(`.class-delete-row[data-teaching-id="${fixture.teachingId}"]`).click();
+    await dialog.getByRole('button', { name: 'متابعة' }).click();
+
+    await expect(dialog.getByText('سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.')).toBeVisible();
+    await expect(dialog.getByText('الطلاب المرتبطون بفصول أو سجلات أخرى ستبقى بياناتهم الأخرى محفوظة.')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
 
+    await dialog.getByRole('button', { name: 'رجوع' }).click();
     await dialog.getByRole('button', { name: 'إلغاء' }).click();
     expect(await page.evaluate((id) => window.store.state.teachings.some((item) => item.id === id && !item.deleted), fixture.teachingId)).toBe(true);
 
     await deleteButton.click();
-    await page.getByRole('dialog').getByRole('button', { name: 'حذف الإسناد' }).click();
-    await page.waitForURL(/#\/classes/);
+    await dialog.locator(`.class-delete-row[data-teaching-id="${fixture.teachingId}"]`).click();
+    await dialog.getByRole('button', { name: 'متابعة' }).click();
+    await dialog.getByRole('button', { name: 'تأكيد الحذف' }).click();
+    await expect(dialog).toHaveCount(0);
+    await page.waitForFunction((id) => window.store.state.teachings.some((item) => item.id === id && item.deleted), fixture.teachingId);
     const state = await page.evaluate((ids) => ({
       teachingDeleted: window.store.state.teachings.some((item) => item.id === ids.teachingId && item.deleted),
       sectionActive: window.store.state.sections.some((item) => item.id === ids.sectionId && !item.deleted),

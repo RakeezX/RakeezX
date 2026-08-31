@@ -187,16 +187,6 @@ export default {
           )}
         </div>
       </div>
-
-      <div class="class-hub__settings class-hub-settings-bar">
-        <div>
-          <div class="class-hub__settings-title">إعدادات الإسناد والشعبة</div>
-          <p class="class-hub__settings-desc">تعديل بيانات الشعبة أو إنهاء هذا الإسناد عند الحاجة.</p>
-        </div>
-        <div class="class-hub__settings-actions">
-          <button class="btn btn--sm btn--danger class-hub__delete" data-act="delete" aria-label="حذف الإسناد">${icon('trash')} <span>حذف الإسناد</span></button>
-        </div>
-      </div>
       </div>
     `;
   },

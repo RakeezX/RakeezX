@@ -124,12 +124,6 @@ function renderClassCard(tch) {
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
-      ${demo ? html`
-        <button type="button" class="class-demo-del-btn class-card__demo-action"
-                data-act="delete-demo" data-id="${tch.id}"
-                aria-label="حذف الفصل التجريبي" title="حذف الفصل التجريبي">
-          ${icon('trash')}
-        </button>` : ''}
     </div>
   `;
 }
@@ -193,11 +187,192 @@ export default {
 
       <div class="class-cards-grid">${list.map(renderClassCard)}</div>
 
-      <div class="hstack gap-2 mt-3 classes-actions"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
+      <div class="hstack gap-2 wrap mt-3 classes-actions">
+        <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button>
+        <button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button>
+        <button class="btn btn--ghost class-action-delete-btn" data-act="delete-class-flow">${icon('trash')} حذف فصل</button>
+      </div>
     `;
   },
 
   actions: {
+    async 'delete-class-flow'() {
+      const list = store.teachings();
+      if (!list.length) {
+        toast('لا توجد فصول لحذفها', 'warn');
+        return;
+      }
+
+      let selectedId = list[0].id;
+
+      await openSheet({
+        title: 'حذف فصل',
+        desc: 'اختر الفصل الذي ترغب في حذفه من القائمة:',
+        body: html`
+          <div id="class-delete-workflow-root">
+            <div class="class-delete-select-list" id="class-delete-select-list">
+              ${list.map((tch, idx) => {
+                const sec = store.getSection(tch.sectionId);
+                const sub = store.getSubject(tch.subjectId);
+                const demo = isDemo(tch);
+                const isSelected = idx === 0;
+                return html`
+                  <label class="class-delete-row ${isSelected ? 'is-selected' : ''}" data-teaching-id="${tch.id}">
+                    <input type="radio" name="delete_teaching_id" value="${tch.id}" class="class-delete-row__radio" ${isSelected ? 'checked' : ''}>
+                    <span class="class-delete-row__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
+                    <div class="class-delete-row__info">
+                      <span class="class-delete-row__title">${sectionLabel(sec) || '—'}</span>
+                      <span class="class-delete-row__sub">${sub?.name ?? ''}</span>
+                    </div>
+                    ${demo ? html`<span class="badge badge--info ms-auto">تجريبي</span>` : ''}
+                  </label>
+                `;
+              })}
+            </div>
+          </div>
+        `,
+        foot: html`
+          <div class="hstack gap-2 justify-end width-full" id="class-delete-workflow-foot">
+            <button type="button" class="btn btn--ghost" data-sheet-close>إلغاء</button>
+            <button type="button" class="btn btn--primary" id="class-delete-next-btn">متابعة</button>
+          </div>
+        `,
+        onMount: (root, done) => {
+          const container = root.querySelector('#class-delete-workflow-root');
+          const foot = root.querySelector('#class-delete-workflow-foot');
+          const titleEl = root.querySelector('.sheet__title');
+          const descEl = root.querySelector('.sheet__desc');
+
+          function renderStep1() {
+            if (titleEl) titleEl.textContent = 'حذف فصل';
+            if (descEl) descEl.textContent = 'اختر الفصل الذي ترغب في حذفه من القائمة:';
+
+            container.innerHTML = html`
+              <div class="class-delete-select-list" id="class-delete-select-list">
+                ${list.map((tch) => {
+                  const sec = store.getSection(tch.sectionId);
+                  const sub = store.getSubject(tch.subjectId);
+                  const demo = isDemo(tch);
+                  const isSelected = tch.id === selectedId;
+                  return html`
+                    <label class="class-delete-row ${isSelected ? 'is-selected' : ''}" data-teaching-id="${tch.id}">
+                      <input type="radio" name="delete_teaching_id" value="${tch.id}" class="class-delete-row__radio" ${isSelected ? 'checked' : ''}>
+                      <span class="class-delete-row__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
+                      <div class="class-delete-row__info">
+                        <span class="class-delete-row__title">${sectionLabel(sec) || '—'}</span>
+                        <span class="class-delete-row__sub">${sub?.name ?? ''}</span>
+                      </div>
+                      ${demo ? html`<span class="badge badge--info ms-auto">تجريبي</span>` : ''}
+                    </label>
+                  `;
+                })}
+              </div>
+            `.value;
+
+            foot.innerHTML = html`
+              <button type="button" class="btn btn--ghost" data-sheet-close>إلغاء</button>
+              <button type="button" class="btn btn--primary" id="class-delete-next-btn" ${!selectedId ? 'disabled' : ''}>متابعة</button>
+            `.value;
+
+            attachStep1Listeners();
+          }
+
+          function attachStep1Listeners() {
+            const rows = container.querySelectorAll('.class-delete-row');
+            rows.forEach((row) => {
+              row.addEventListener('click', () => {
+                const id = row.dataset.teachingId;
+                selectedId = id;
+                rows.forEach((r) => {
+                  const isMatch = r.dataset.teachingId === id;
+                  r.classList.toggle('is-selected', isMatch);
+                  const radio = r.querySelector('input[type="radio"]');
+                  if (radio) radio.checked = isMatch;
+                });
+                const nextBtn = foot.querySelector('#class-delete-next-btn');
+                if (nextBtn) nextBtn.disabled = !selectedId;
+              });
+            });
+
+            const nextBtn = foot.querySelector('#class-delete-next-btn');
+            if (nextBtn) {
+              nextBtn.addEventListener('click', () => {
+                if (!selectedId) return;
+                renderStep2();
+              });
+            }
+          }
+
+          function renderStep2() {
+            const selectedTch = list.find((t) => t.id === selectedId);
+            const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
+            const sub = selectedTch ? store.getSubject(selectedTch.subjectId) : null;
+            const demo = selectedTch ? isDemo(selectedTch) : false;
+
+            if (titleEl) titleEl.textContent = 'تأكيد حذف الفصل';
+            if (descEl) descEl.textContent = 'إجراء يتطلب التأكيد قبل التنفيذ';
+
+            container.innerHTML = html`
+              <div class="class-delete-confirm-box">
+                <div class="class-delete-confirm-box__badge">
+                  ${icon('alert')} تنبيه تأكيد
+                </div>
+                <div class="t-danger fw-7 fs-sm">أنت على وشك حذف:</div>
+                <div class="class-delete-confirm-box__card">
+                  <div class="hstack gap-2 align-center mb-1">
+                    <span class="class-delete-row__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
+                    <span class="class-delete-row__title">${sectionLabel(sec) || '—'}</span>
+                    ${demo ? html`<span class="badge badge--info ms-auto">تجريبي</span>` : ''}
+                  </div>
+                  <div class="class-delete-row__sub">${sub?.name ?? ''}</div>
+                </div>
+                <p class="class-delete-confirm-box__consequence">
+                  سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.
+                </p>
+                <p class="class-delete-confirm-box__note">
+                  الطلاب المرتبطون بفصول أو سجلات أخرى ستبقى بياناتهم الأخرى محفوظة.
+                </p>
+              </div>
+            `.value;
+
+            foot.innerHTML = html`
+              <button type="button" class="btn btn--ghost" id="class-delete-back-btn">رجوع</button>
+              <button type="button" class="btn btn--danger" id="class-delete-confirm-btn">${icon('trash')} تأكيد الحذف</button>
+            `.value;
+
+            const backBtn = foot.querySelector('#class-delete-back-btn');
+            if (backBtn) {
+              backBtn.addEventListener('click', () => {
+                renderStep1();
+              });
+            }
+
+            const confirmBtn = foot.querySelector('#class-delete-confirm-btn');
+            if (confirmBtn) {
+              confirmBtn.addEventListener('click', async () => {
+                done(undefined);
+                if (demo) {
+                  const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(selectedTch?.id));
+                  if (pkg) {
+                    await deleteDemoPackage(pkg.packageId);
+                    toast('تم حذف الفصل التجريبي');
+                    repaint();
+                    return;
+                  }
+                }
+                if (selectedTch) {
+                  await store.deleteTeaching(selectedTch.id);
+                  toast('تم حذف الفصل');
+                  repaint();
+                }
+              });
+            }
+          }
+
+          attachStep1Listeners();
+        },
+      });
+    },
     async 'add-demo'(el) {
       if (demoBusy) return; demoBusy = true; el.disabled = true;
       try { const result = await createDemoPackage(); toast(`تمت إضافة ${result.section.label} بنجاح`); repaint(); }
