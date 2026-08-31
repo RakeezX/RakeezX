@@ -44,7 +44,7 @@ export default {
         </div>
         <div class="hero__date">
           ${WEEKDAYS[weekday(today)]} · ${fmtDate(today, false)}
-          <span class="hub-head__timing-pill" title="ملف التوقيت المعتمد">${icon('clock')} ${timingProfile}</span>
+          <span class="hub-head__timing-pill" title="ملف التوقيت المعتمد"><span class="hub-head__timing-icon">${icon('clock')}</span><span>${timingProfile}</span></span>
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>

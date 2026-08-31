@@ -12,7 +12,7 @@ const TOOLS = (id) => [
   { href: `#/teaching/${id}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
   { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة النتائج', sub: 'للعرض على البروجكتر' },
   { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'كشوف وتصدير وطباعة' },
-  { href: `#/teaching/${id}/items`, icon: 'note', title: 'بنود التقييم', sub: 'الدرجات العظمى والتوزيع' },
+  { href: `#/teaching/${id}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
 ];
 
 export default {
@@ -198,10 +198,11 @@ export default {
       const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');
       openSheet({
         title: 'تبديل الفصل',
-        body: html`<div class="list">${store.teachings().map((candidate) => {
+        body: html`<div class="class-switcher-list">${store.teachings().map((candidate) => {
           const candidateSection = store.getSection(candidate.sectionId);
           const candidateSubject = store.getSubject(candidate.subjectId);
-          return html`<a class="row" href="#/teaching/${candidate.id}${suffix}" data-sheet-close><span class="class-dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="row__main"><span class="row__title">${sectionLabel(candidateSection) || 'الشعبة'}</span><span class="row__sub">${candidateSubject?.name || ''}</span></span>${icon('chev')}</a>`;
+          const current = candidate.id === params.id;
+          return html`<a class="class-switcher-option ${current ? 'is-current' : ''}" href="#/teaching/${candidate.id}${suffix}" data-sheet-close ${current ? 'aria-current="page"' : ''}><span class="class-switcher-option__dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="class-switcher-option__main"><span class="class-switcher-option__title">${sectionLabel(candidateSection) || 'الشعبة'}</span><span class="class-switcher-option__sub">${candidateSubject?.name || ''}</span></span>${current ? html`<span class="class-switcher-option__current">${icon('check')} الفصل الحالي</span>` : html`<span class="class-switcher-option__chevron">${icon('chev')}</span>`}</a>`;
         })}</div>`,
         foot: html`<a class="btn btn--quiet" href="#/classes" data-sheet-close>كل الفصول</a>`,
       });

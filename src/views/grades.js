@@ -26,10 +26,6 @@ export default {
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 
-  topActions: (p) => html`
-    <a class="iconbtn" href="#/teaching/${p.id}/items" aria-label="بنود التقييم">${icon('note')}</a>
-  `,
-
   onMount() {
     mode = 'item';
     activeItemId = null;
@@ -57,7 +53,7 @@ export default {
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود تقييم</div>
           <div class="empty__text">حدّد بنود الرصد ودرجاتها العظمى أولًا.</div>
-          <a class="btn btn--primary" href="#/teaching/${cls.id}/items">${icon('plus')} بنود التقييم</a>
+          <a class="btn btn--primary" href="#/teaching/${cls.id}/items">${icon('plus')} توزيع الدرجات</a>
         </div>
       `;
     }
@@ -67,6 +63,7 @@ export default {
     }
 
     return html`
+      <div class="grades-page-head noprint"><a class="btn btn--quiet btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} توزيع الدرجات</a></div>
       <div class="segmented mb-3">
         <button class="segmented__btn ${mode === 'item' ? 'is-on' : ''}" data-act="mode" data-mode="item">
           بند واحد

@@ -178,7 +178,7 @@ function paint() {
     render(
       mainEl,
       html`${topbar(view, ctx.params)}
-        <div class="page ${view.wide ? 'page--wide' : ''}">${view.render(ctx.params)}</div>`
+        <div class="page ${view.wide ? 'page--wide' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
     );
   } catch (err) {
     console.error('[rakeezx] فشل رسم الشاشة', err);
