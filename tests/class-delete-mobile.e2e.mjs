@@ -13,13 +13,9 @@ for (const viewport of [
     const deleteButton = page.getByRole('button', { name: 'حذف الفصل التجريبي' });
     await expect(deleteButton).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
-    if (viewport.width <= 540) {
-      const box = await deleteButton.boundingBox();
-      expect(box?.width).toBeLessThanOrEqual(36);
-      await expect(deleteButton.locator('.class-demo-del-btn__label')).toBeHidden();
-    } else {
-      await expect(deleteButton.locator('.class-demo-del-btn__label')).toHaveText('حذف');
-    }
+    const box = await deleteButton.boundingBox();
+    expect(box?.width).toBeLessThanOrEqual(36);
+    await expect(deleteButton.locator('.class-demo-del-btn__label')).toHaveCount(0);
     await deleteButton.click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('dialog').getByRole('button', { name: 'إلغاء' }).click();
