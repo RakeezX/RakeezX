@@ -129,7 +129,7 @@ test('reports render current historical data, edited section metadata, and synce
 
   // Edit the section through its real UI. The report must immediately use the same identity with updated metadata.
   await page.goto('/#/teaching/report-teaching-a');
-  await page.getByRole('button', { name: 'تعديل البيانات' }).click();
+  await page.getByRole('button', { name: 'تعديل بيانات الشعبة' }).click();
   await page.selectOption('select[name="grade"]', '5');
   await page.fill('input[name="label"]', 'Z');
   await page.click('button[form="edit-sec-form"]');

@@ -151,7 +151,7 @@ test('manual scoring persists, reports correctly, and converges without duplicat
 
   // Editing section metadata through its real sheet preserves item and score identities.
   await page.goto('/#/teaching/score-teaching');
-  await page.getByRole('button', { name: 'تعديل البيانات' }).click();
+  await page.getByRole('button', { name: 'تعديل بيانات الشعبة' }).click();
   await page.selectOption('select[name="grade"]', '5');
   await page.fill('input[name="label"]', 'U');
   await page.click('button[form="edit-sec-form"]');
