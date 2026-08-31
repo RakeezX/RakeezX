@@ -308,11 +308,10 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
 };
 
 // Keep cascade deletes in the same durable transaction as their tombstones.
-// Quick Log is intentionally absent: it has no current cloud mapper/category,
-// so queuing it would leave an entry that automatic sync cannot drain.
+// Every store listed here has a cloud mapper and may safely drain through automatic sync.
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
-  'students', 'enrollments', 'notes', 'items', 'scores',
+  'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
   'timeProfiles', 'slots', 'sessions', 'attendance',
 ]);
 
@@ -951,11 +950,56 @@ export async function deleteTeaching(tchId) {
 }
 
 /**
- * حذف شعبة: ينهي انتساب طلابها ويحذف إسناداتها — **ولا يحذف الطلاب أنفسهم**.
- * هوية الطالب مستقلة، فحذف الشعبة لا يجوز أن يمحوه.
+ * حذف فصل: عملية ذرية تُنهي الشعبة وكل بياناتها التعليمية، مع إبقاء الطالب
+ * عندما تكون له علاقة مستقلة محفوظة خارج الفصل المحذوف.
+ */
+export async function deleteClass(secId) {
+  const sectionTeachings = live(state.teachings).filter((t) => t.sectionId === secId);
+  const teachingIds = new Set(sectionTeachings.map((t) => t.id));
+  const itemIds = new Set(live(state.items).filter((i) => teachingIds.has(i.teachingId)).map((i) => i.id));
+  const sessionIds = new Set(live(state.sessions).filter((s) => teachingIds.has(s.teachingId)).map((s) => s.id));
+  const targetEnrollment = (e) => !e.deleted && e.sectionId === secId;
+  const targetNote = (n) => teachingIds.has(n.teachingId) || sessionIds.has(n.sessionId);
+  const targetScore = (s) => itemIds.has(s.itemId);
+  const targetAttendance = (a) => sessionIds.has(a.sessionId) || teachingIds.has(a.teachingId);
+  const targetLog = (l) => teachingIds.has(l.teachingId) || sessionIds.has(l.sessionId);
+  const affectedStudentIds = new Set(live(state.enrollments).filter(targetEnrollment).map((e) => e.studentId));
+
+  // A student remains if any relationship outside this class still gives their
+  // record a valid historical or active home. Deleted enrollments are retained
+  // history and deliberately count when they belong to another section.
+  const orphanStudentIds = new Set([...affectedStudentIds].filter((studentId) => {
+    const otherEnrollment = state.enrollments.some((e) => e.studentId === studentId && e.sectionId !== secId);
+    const otherNote = state.notes.some((n) => !n.deleted && n.studentId === studentId && !targetNote(n));
+    const otherScore = state.scores.some((s) => !s.deleted && s.studentId === studentId && !targetScore(s));
+    const otherAttendance = state.attendance.some((a) => !a.deleted && a.studentId === studentId && !targetAttendance(a));
+    const otherLog = state.logs.some((l) => !l.deleted && l.studentId === studentId && !targetLog(l));
+    return !(otherEnrollment || otherNote || otherScore || otherAttendance || otherLog);
+  }));
+
+  return cascadeDelete(
+    {
+      sections: (s) => s.id === secId,
+      teachings: (t) => teachingIds.has(t.id),
+      enrollments: targetEnrollment,
+      items: (i) => teachingIds.has(i.teachingId),
+      scores: (s) => targetScore(s) || orphanStudentIds.has(s.studentId),
+      slots: (s) => teachingIds.has(s.teachingId),
+      sessions: (s) => teachingIds.has(s.teachingId),
+      attendance: (a) => targetAttendance(a) || orphanStudentIds.has(a.studentId),
+      logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
+      notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
+      students: (s) => orphanStudentIds.has(s.id),
+    },
+    { op: 'deleteClass', secId }
+  );
+}
+
+/**
+ * واجهة إدارية داخلية قديمة: تنهي انتساب الشعبة وإسناداتها ولا تمس الطلاب.
+ * الحذف المرئي للفصل يستخدم deleteClass أعلاه.
  */
 export async function deleteSection(secId) {
-  const stamp = now();
   for (const tch of live(state.teachings).filter((t) => t.sectionId === secId)) {
     await deleteTeaching(tch.id);
   }
@@ -967,7 +1011,6 @@ export async function deleteSection(secId) {
     { op: 'deleteSection', secId }
   );
 }
-
 /* ---------- عمليات: الطلاب والانتساب ---------- */
 
 /* ---------- حدود وتحقق على مستوى البيانات ---------- */
