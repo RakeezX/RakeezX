@@ -96,49 +96,41 @@ function sheet(existing = null) {
 
 let demoBusy = false;
 
-function row(tch) {
+function renderClassCard(tch) {
   const sec = store.getSection(tch.sectionId);
   const sub = store.getSubject(tch.subjectId);
-  const roster = store.students(tch.id);
   const today = todayISO();
+  const roster = store.students(tch.id);
   const todaySessions = store.sessionsOnFor(tch.id, today);
   const marked = todaySessions.reduce((n, s) => n + store.attendanceIn(s.id).length, 0);
-  const weekly = store.weeklyPeriods(tch.id);
   const demo = isDemo(tch);
 
   return html`
-    <a class="row" href="#/teaching/${tch.id}">
-      <span class="class-dot" style="background:${safeColor(sec?.color)}"></span>
-      <span class="row__main">
-        <span class="row__title">${sectionLabel(sec) || '—'} ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}</span>
-        <span class="row__sub">
-          ${sub?.name ?? ''} ·
-          <span class="tabular">${roster.length}</span> طالبًا
-          ${weekly ? html` · <span class="tabular">${weekly}</span> حصص أسبوعيًا` : ''}
-        </span>
-      </span>
-      <span class="row__end">
-        ${todaySessions.length
-          ? marked >= roster.length && roster.length
-            ? html`<span class="badge badge--ok">${icon('check')} رُصد اليوم</span>`
-            : html`<span class="badge badge--warn">حصة اليوم</span>`
-          : ''}
-        ${demo
-          ? html`<button
-              type="button"
-              class="class-demo-del-btn"
-              data-act="delete-demo"
-              data-id="${tch.id}"
-              aria-label="حذف الفصل التجريبي"
-              title="حذف الفصل التجريبي"
-            >
-              ${icon('trash')}
-              <span class="class-demo-del-btn__label">حذف</span>
-            </button>`
-          : ''}
-        ${icon('chev')}
-      </span>
-    </a>
+    <div class="class-card ${demo ? 'is-demo' : ''}">
+      <a class="class-card__main" href="#/teaching/${tch.id}">
+        <div class="class-card__head">
+          <div class="class-card__identity">
+            <span class="class-card__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
+            <span class="class-card__title">${sectionLabel(sec) || '—'}</span>
+          </div>
+          ${todaySessions.length
+            ? marked >= roster.length && roster.length
+              ? html`<span class="badge badge--ok">${icon('check')} رُصد</span>`
+              : html`<span class="badge badge--warn">حصة اليوم</span>`
+            : ''}
+        </div>
+        <div class="class-card__body">
+          <span class="class-card__sub">${sub?.name ?? ''}</span>
+          ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
+        </div>
+      </a>
+      ${demo ? html`
+        <button type="button" class="class-demo-del-btn class-card__demo-action"
+                data-act="delete-demo" data-id="${tch.id}"
+                aria-label="حذف الفصل التجريبي" title="حذف الفصل التجريبي">
+          ${icon('trash')}
+        </button>` : ''}
+    </div>
   `;
 }
 
@@ -199,7 +191,7 @@ export default {
         </div>
       </div>
 
-      <div class="list">${list.map(row)}</div>
+      <div class="class-cards-grid">${list.map(renderClassCard)}</div>
 
       <div class="hstack gap-2 mt-3 classes-actions"><button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
     `;

@@ -29,7 +29,6 @@ const NAV = [
   { href: '#/',          icon: 'home',      label: 'الرئيسية',        exact: true, primary: true },
   { href: '#/classes',   icon: 'classes',   label: 'الفصول',          primary: true },
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
-  { href: '#/curriculum',icon: 'book',      label: 'المنهج' },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
   { href: '#/calendar',  icon: 'calendar',  label: 'التقويم الدراسي' },
   { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
@@ -38,11 +37,10 @@ const NAV = [
 /** تنقّل سياقي داخل الإسناد؛ لا يحل محل تنقّل التطبيق الرئيسي. */
 const teachingNav = (id) => [
   { href: `#/teaching/${id}`,            icon: 'home',       label: 'الفصل', exact: true },
-  { href: `#/teaching/${id}/students`,   icon: 'classes',    label: 'الطلاب' },
   { href: `#/teaching/${id}/attendance`, icon: 'attendance', label: 'الحضور' },
-  { href: `#/teaching/${id}/quicklog`,   icon: 'spark',      label: 'الرصد' },
-  { href: `#/teaching/${id}/grades`,     icon: 'grades',     label: 'الدرجات' },
-  { href: `#/teaching/${id}/reports`,    icon: 'reports',    label: 'التقارير' },
+  { href: `#/teaching/${id}/sessions`,   icon: 'session',    label: 'الحصص' },
+  { href: `#/teaching/${id}/grades`,     icon: 'grades',     label: 'كشف الدرجات' },
+  { href: `#/teaching/${id}/students`,   icon: 'classes',    label: 'الطلاب' },
 ];
 
 const primaryParent = (path) => {
@@ -81,7 +79,7 @@ function shell(path, params) {
           : ''}
       </nav>
       <main class="main">
-        ${inTeaching ? html`<nav class="teaching-tabs" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'teaching-tabs'))}</nav>` : ''}
+        ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
         <div id="main"></div>
       </main>
       <nav class="tabbar" data-nav-scope="primary" aria-label="التنقل الرئيسي">

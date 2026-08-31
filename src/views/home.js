@@ -34,6 +34,7 @@ export default {
     const daySessions = store.sessionsOn(today);
     const cal = store.calendarDayFor(today);
     const pendingToday = daySessions.filter((session) => store.attendanceCompleteness(session).state === 'pending').length;
+    const timingProfile = store.activeTimeProfile()?.name ?? 'التوقيت المعتمد';
 
     return html`
       <!-- ترحيب وتاريخ اليوم -->
@@ -43,18 +44,10 @@ export default {
         </div>
         <div class="hero__date">
           ${WEEKDAYS[weekday(today)]} · ${fmtDate(today, false)}
+          <span class="hub-head__timing-pill" title="ملف التوقيت المعتمد">${icon('clock')} ${timingProfile}</span>
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>
-
-      ${!meta.teacherName
-        ? html`
-            <a class="card card--pad welcome" href="#/settings">
-              <div class="welcome__title">اكتب اسمك واسم مدرستك</div>
-              <p class="welcome__text">يظهران على التقارير والكشوف التي تطبعها.</p>
-            </a>
-          `
-        : ''}
 
       <!-- حصص اليوم -->
       <div class="section">
@@ -145,16 +138,6 @@ export default {
         </div>
       </div>
 
-      ${list.length ? summary(list) : emptyState()}
-
-      <!-- مناطق محجوزة للموجات القادمة -->
-      <div class="section">
-        <div class="section__head"><div class="section__title">قيد البناء</div></div>
-        <div class="grid grid--2">
-          ${soon('نسبة إنجاز المنهج', 'تظهر بعد إدخال وحدات المنهج وربط الدروس بالحصص.')}
-          ${soon('تنبيهات مهمة', 'تعثّر متكرر، غياب متتابع، وحصص لم تُرصد.')}
-        </div>
-      </div>
     `;
   },
 };

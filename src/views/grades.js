@@ -18,8 +18,11 @@ const AUTO_NOTE = {
 };
 
 export default {
-  title: () => 'الدرجات',
-  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
+  title: () => 'كشف الدرجات',
+  subtitle: (p) => {
+    const teaching = store.getTeaching(p.id);
+    return store.sectionLabel(store.getSection(teaching?.sectionId)) ?? '';
+  },
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 

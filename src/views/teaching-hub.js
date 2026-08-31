@@ -7,16 +7,12 @@ import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 
 const TOOLS = (id) => [
-  { href: `#/teaching/${id}/attendance`, icon: 'attendance', title: 'الحضور',       sub: 'رصد حصة بعينها' },
-  { href: `#/teaching/${id}/quicklog`,   icon: 'spark',      title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
-  { href: `#/teaching/${id}/grades`,     icon: 'grades',     title: 'الدرجات',      sub: 'إدخال درجات البنود' },
-  { href: `#/teaching/${id}/sessions`,   icon: 'session',    title: 'الحصص',        sub: 'المنفّذة وغير المنفّذة' },
-  { href: `#/teaching/${id}/picker`,     icon: 'picker',     title: 'القرعة',       sub: 'اختيار عادل لا يكرّر أحدًا' },
-  { href: `#/teaching/${id}/groups`,     icon: 'groups',     title: 'المجموعات',    sub: 'تقسيم عشوائي أو متوازن' },
-  { href: `#/teaching/${id}/board`,      icon: 'board',      title: 'لوحة النتائج',  sub: 'للعرض على البروجكتر' },
-  { href: `#/teaching/${id}/reports`,    icon: 'reports',    title: 'التقارير',     sub: 'كشوف وتصدير وطباعة' },
-  { href: `#/teaching/${id}/students`,   icon: 'classes',    title: 'الطلاب',       sub: 'الكشف والانتساب' },
-  { href: `#/teaching/${id}/items`,      icon: 'note',       title: 'بنود التقييم',  sub: 'الدرجات العظمى والتوزيع' },
+  { href: `#/teaching/${id}/quicklog`, icon: 'spark', title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
+  { href: `#/teaching/${id}/picker`, icon: 'picker', title: 'القرعة', sub: 'اختيار عادل لا يكرّر أحدًا' },
+  { href: `#/teaching/${id}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
+  { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة النتائج', sub: 'للعرض على البروجكتر' },
+  { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'كشوف وتصدير وطباعة' },
+  { href: `#/teaching/${id}/items`, icon: 'note', title: 'بنود التقييم', sub: 'الدرجات العظمى والتوزيع' },
 ];
 
 export default {
@@ -24,16 +20,12 @@ export default {
     const tch = store.getTeaching(p.id);
     return sectionLabel(store.getSection(tch?.sectionId)) || 'فصل';
   },
-  topActions: (p) => html`
-    <button class="iconbtn" data-act="edit-sec" aria-label="إعدادات الشعبة">${icon('settings')}</button>
-  `,
   subtitle: (p) => {
-    const tch = store.getTeaching(p.id);
-    if (!tch) return '';
-    const sec = store.getSection(tch.sectionId);
-    const sub = store.getSubject(tch.subjectId);
-    return [sub?.name].filter(Boolean).join(' · ');
+    const teaching = store.getTeaching(p.id);
+    const subject = store.getSubject(teaching?.subjectId);
+    return subject?.name ?? '';
   },
+
   back: () => '#/classes',
 
   render(p) {
@@ -51,6 +43,11 @@ export default {
     const { roster, items, ctx } = store.teachingContext(tch.id);
     const today = todayISO();
     const todaySessions = store.sessionsOnFor(tch.id, today);
+    const sec = store.getSection(tch.sectionId);
+    const sub = store.getSubject(tch.subjectId);
+    const targetSession = todaySessions.find((s) => store.attendanceCompleteness(s).state === 'pending') || todaySessions[0];
+    const completeness = targetSession ? store.attendanceCompleteness(targetSession) : null;
+    const markedCount = targetSession ? store.attendanceIn(targetSession.id).length : 0;
 
     if (!roster.length) {
       return html`
@@ -74,6 +71,32 @@ export default {
 
     return html`
       <div class="class-hub">
+      <div class="class-hub-header mb-3">
+        <div class="class-hub-header__top">
+          <div class="class-hub-header__identity-block">
+            <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
+            <div class="class-hub-header__name-group">
+              <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="تبديل الفصل">
+                <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الشعبة'}</span>
+                <span class="class-name-switcher-btn__chevron">${icon('chev')}</span>
+              </button>
+              <span class="class-hub-header__sub">${sub?.name || ''}</span>
+            </div>
+          </div>
+          <div class="class-hub-header__end">
+            <span class="class-hub-header__status-badge ${completeness?.state === 'completed' ? 'is-done' : completeness?.state === 'pending' ? 'is-live' : ''}">
+              ${completeness?.state === 'completed' ? html`${icon('check')} مكتمل` : completeness?.state === 'pending' ? 'بانتظار الرصد' : targetSession ? 'حصة اليوم' : 'لا حصة اليوم'}
+            </span>
+            <button class="iconbtn" data-act="edit-sec" aria-label="تعديل بيانات الشعبة" title="تعديل بيانات الشعبة">${icon('settings')}</button>
+          </div>
+        </div>
+        ${targetSession ? html`
+          <div class="class-hub-lesson-bar">
+            <span class="class-hub-lesson-bar__meta"><strong>الحصة ${targetSession.period}</strong>${targetSession.startTime ? html`${fmtTimeRange(targetSession.startTime, targetSession.endTime)}` : ''}</span>
+            <span class="class-hub-lesson-bar__status ${completeness?.state === 'completed' ? 'is-done' : 'is-pending'}">${completeness?.state === 'completed' ? `الحضور ${markedCount}/${roster.length}` : 'بانتظار الرصد'}</span>
+            <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${tch.id}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
+          </div>` : ''}
+      </div>
       <div class="section">
         <div class="grid grid--3">
           <div class="stat">
@@ -141,10 +164,10 @@ export default {
 
       <div class="section">
         <div class="section__head">
-          <div class="section__title">الأدوات</div>
+          <div class="section__title">أدوات الفصل</div>
           <span class="t-3 fs-sm"><span class="tabular">${held}</span> حصة منفّذة</span>
         </div>
-        <div class="grid grid--auto">
+        <div class="grid grid--auto quick-tools-grid">
           ${TOOLS(tch.id).map(
             (t) => html`
               <a class="tile" href="${t.href}">
@@ -157,13 +180,12 @@ export default {
         </div>
       </div>
 
-      <div class="class-hub__settings">
+      <div class="class-hub__settings class-hub-settings-bar">
         <div>
           <div class="class-hub__settings-title">إعدادات الإسناد والشعبة</div>
           <p class="class-hub__settings-desc">تعديل بيانات الشعبة أو إنهاء هذا الإسناد عند الحاجة.</p>
         </div>
         <div class="class-hub__settings-actions">
-          <button class="btn btn--sm btn--quiet" data-act="edit-sec">${icon('edit')} تعديل البيانات</button>
           <button class="btn btn--sm btn--danger class-hub__delete" data-act="delete" aria-label="حذف الإسناد">${icon('trash')} <span>حذف الإسناد</span></button>
         </div>
       </div>
@@ -172,6 +194,18 @@ export default {
   },
 
   actions: {
+    'switch-class'(el, ev, params) {
+      const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');
+      openSheet({
+        title: 'تبديل الفصل',
+        body: html`<div class="list">${store.teachings().map((candidate) => {
+          const candidateSection = store.getSection(candidate.sectionId);
+          const candidateSubject = store.getSubject(candidate.subjectId);
+          return html`<a class="row" href="#/teaching/${candidate.id}${suffix}" data-sheet-close><span class="class-dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="row__main"><span class="row__title">${sectionLabel(candidateSection) || 'الشعبة'}</span><span class="row__sub">${candidateSubject?.name || ''}</span></span>${icon('chev')}</a>`;
+        })}</div>`,
+        foot: html`<a class="btn btn--quiet" href="#/classes" data-sheet-close>كل الفصول</a>`,
+      });
+    },
     async delete(el, ev, params) {
       const tch = store.getTeaching(params.id);
       if (!tch) return;
