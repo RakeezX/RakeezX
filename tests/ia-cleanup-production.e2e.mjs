@@ -34,6 +34,11 @@ for (const viewport of viewports) {
     await expect(tabs).toHaveCount(5);
     expect((await tabs.allTextContents()).map((text) => text.trim())).toEqual(['الفصل', 'الحضور', 'الحصص', 'كشف الدرجات', 'الطلاب']);
     const trigger = page.getByRole('button', { name: 'تبديل الفصل' });
+    const hub = page.locator('.class-hub');
+    const identity = hub.locator('.class-hub-header__identity-block');
+    await expect(identity).toBeVisible();
+    await expect(page.locator('.topbar')).toBeHidden();
+    await expect(page.locator('.topbar:visible, .class-hub-header__identity-block:visible')).toHaveCount(1);
     await expect(trigger).toBeVisible();
     const triggerBox = await trigger.boundingBox();
     expect(triggerBox?.height).toBeGreaterThanOrEqual(40);
