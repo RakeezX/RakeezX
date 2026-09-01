@@ -33,6 +33,22 @@ for (const viewport of [
     await page.goto('/#/classes');
     const deleteButton = page.getByRole('button', { name: 'حذف فصل' });
     await expect(deleteButton).toBeVisible();
+    const deleteStyles = await deleteButton.evaluate((node) => {
+      const dangerProbe = document.createElement('span');
+      dangerProbe.style.color = 'var(--danger)';
+      node.append(dangerProbe);
+      const styles = getComputedStyle(node);
+      const result = {
+        color: styles.color,
+        danger: getComputedStyle(dangerProbe).color,
+        background: styles.backgroundColor,
+        border: styles.borderTopColor,
+      };
+      dangerProbe.remove();
+      return result;
+    });
+    expect(deleteStyles.color).toBe(deleteStyles.danger);
+    expect(deleteStyles.background).not.toBe('rgba(0, 0, 0, 0)');
     await deleteButton.click();
 
     const dialog = page.getByRole('dialog');
