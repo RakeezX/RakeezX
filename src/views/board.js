@@ -1,4 +1,4 @@
-﻿/**
+/**
  * لوحة النتائج — للعرض على البروجكتر أمام الفصل.
  * تعرض نقاط الرصد السريع لا الدرجات، لأن الدرجات لا تُعرض على الملأ.
  */
@@ -6,6 +6,7 @@
 import { html, icon } from '../lib/dom.js';
 import * as store from '../store.js';
 import { todayISO } from '../models.js';
+import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
 let scope = 'term';   // term | today
@@ -88,6 +89,7 @@ export default {
                 (r, i) => html`
                   <li class="board__row ${i < 3 && r.pts > 0 ? 'is-top' : ''}">
                     <span class="board__rank">${i < 3 && r.pts > 0 ? MEDALS[i] : html`<span class="tabular">${i + 1}</span>`}</span>
+                    ${studentAvatar(r.s, 'xs')}
                     <span class="board__name">${r.s.name}</span>
                     <span class="board__bar">
                       <span class="board__fill" style="width:${top > 0 ? Math.max(0, (r.pts / top) * 100) : 0}%"></span>

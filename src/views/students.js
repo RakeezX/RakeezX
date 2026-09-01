@@ -8,6 +8,7 @@
 import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel } from '../models.js';
+import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
 let query = '';
@@ -192,6 +193,7 @@ export default {
                 return html`
                   <div class="row">
                     <span class="rollno">${s.rollNo ?? '—'}</span>
+                    ${studentAvatar(s, 'sm')}
                     <a class="row__main" href="#/student/${s.id}?teaching=${tch.id}">
                       <span class="row__title">${s.name}</span>
                       <span class="row__sub">
@@ -222,6 +224,7 @@ export default {
                   ({ e, s }) => html`
                     <a class="row" href="#/student/${s.id}">
                       <span class="rollno">${e.rollNo ?? '—'}</span>
+                      ${studentAvatar(s, 'sm')}
                       <span class="row__main">
                         <span class="row__title">${s.name}</span>
                         <span class="row__sub">

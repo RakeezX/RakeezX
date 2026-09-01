@@ -10,6 +10,7 @@ import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 import { playPickerSpin, playPickerWinner } from '../lib/sound.js';
 import { showWinnerCelebration } from '../lib/effects.js';
+import { studentAvatar } from '../lib/avatar.js';
 
 let pool = [];        // من لم يُنادَ بعد في هذه الجولة
 let picked = null;    // الطالب المعروض الآن
@@ -85,6 +86,7 @@ export default {
         <div class="picker__stage ${spinning ? 'is-spinning' : ''}">
           ${student
             ? html`
+                <div class="picker__avatar">${studentAvatar(student, 'xl')}</div>
                 <div class="picker__roll tabular">${student.rollNo ?? ''}</div>
                 <div class="picker__name">${student.name}</div>
               `
@@ -120,7 +122,7 @@ export default {
                 <div class="hstack gap-2 wrap">
                   ${history.map((id) => {
                     const s = store.getStudent(id);
-                    return s ? html`<span class="badge">${s.name}</span>` : '';
+                    return s ? html`<span class="badge picker-hist-badge">${studentAvatar(s, 'xxs')}<span>${s.name}</span></span>` : '';
                   })}
                 </div>
               </div>

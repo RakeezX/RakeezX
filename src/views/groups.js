@@ -1,4 +1,4 @@
-﻿/**
+/**
  * تقسيم المجموعات — عشوائي أو متوازن.
  * المتوازن يوزّع المتفوقين والمتعثرين على المجموعات بالتناوب (توزيع الأفعى)
  * فلا تجتمع القوة في مجموعة والضعف في أخرى.
@@ -7,6 +7,7 @@
 import { html, icon, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { studentTotal } from '../models.js';
+import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
 let size = 4;
@@ -137,6 +138,7 @@ export default {
                         return html`
                           <div class="group__member">
                             <span class="rollno">${s.rollNo ?? '—'}</span>
+                            ${studentAvatar(s, 'xs')}
                             <span class="truncate">${s.name}</span>
                             ${pct !== null
                               ? html`<span class="push t-3 fs-sm tabular">${fmtPct(pct)}</span>`

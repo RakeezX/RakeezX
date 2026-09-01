@@ -6,6 +6,7 @@
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO } from '../models.js';
+import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
 let kind = 'participation';   // participation | behavior
@@ -138,6 +139,7 @@ export default {
               <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
                       aria-label="نقطة لـ ${s.name}">
                 <div class="qlcard__head">
+                  ${studentAvatar(s, 'xs')}
                   ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
                   <span class="qlcard__name">${s.name}</span>
                   ${statusBadge}

@@ -11,6 +11,7 @@ import {
   itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
   ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS,
 } from '../models.js';
+import { studentAvatar } from '../lib/avatar.js';
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
 function resolveTeaching(student, requested) {
@@ -106,6 +107,18 @@ export default {
           ${tch ? '· ' + (store.getSubject(tch.subjectId)?.name ?? '') : ''}
           ${tch ? '· ' + (store.getTerm(tch.termId)?.name ?? '') : ''}
           ${store.state.profile?.schoolName ? ` · ${store.state.profile.schoolName}` : ''}
+        </div>
+      </div>
+
+      <div class="student-profile-header noprint mb-3">
+        ${studentAvatar(s, 'lg')}
+        <div class="student-profile-header__info">
+          <div class="student-profile-header__name">${s.name}</div>
+          <div class="student-profile-header__meta">
+            ${section ? html`<span>${sectionLabel(section)}</span>` : ''}
+            ${tch ? html`<span>· ${store.getSubject(tch.subjectId)?.name ?? ''}</span>` : ''}
+            ${s.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${s.rollNo}</span>` : ''}
+          </div>
         </div>
       </div>
 
