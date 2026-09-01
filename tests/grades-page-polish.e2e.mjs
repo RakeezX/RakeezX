@@ -50,6 +50,8 @@ test.describe('Grades Page Polish (Ticket 03)', () => {
       const buttons = nav.locator('.grades-category-btn');
       const count = await buttons.count();
       expect(count).toBeGreaterThanOrEqual(2);
+      await expect(nav.locator('.grades-category-btn__meta')).toHaveCount(0);
+      await expect(nav).not.toContainText('✓');
 
       // Verify no horizontal overflow of the page
       const docScrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);

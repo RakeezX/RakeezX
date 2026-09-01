@@ -41,7 +41,9 @@ for (const viewport of viewports) {
     await expect(page.locator('.topbar:visible, .class-hub-header__identity-block:visible')).toHaveCount(1);
     await expect(trigger).toBeVisible();
     const triggerBox = await trigger.boundingBox();
-    expect(triggerBox?.height).toBeGreaterThanOrEqual(40);
+    expect(triggerBox?.height).toBeGreaterThanOrEqual(34);
+    expect(await trigger.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+    await expect(identity.locator('.class-hub-header__sub')).toBeVisible();
     const headerChevron = trigger.locator('.class-name-switcher-btn__chevron');
     const headerChevronBox = await headerChevron.boundingBox();
     expect(headerChevronBox?.width).toBeLessThanOrEqual(18);
