@@ -1,4 +1,4 @@
-﻿/**
+/**
  * القرعة العادلة: لا تُعيد اسمًا حتى يُنادى كل من في الدورة.
  * القرعة العشوائية الساذجة تُخرج الاسم نفسه مرتين متتاليتين فيظن
  * الطلاب أنها محاباة — هذه تحفظ من خرج ولا تعيده حتى تكتمل الجولة.
@@ -8,6 +8,8 @@ import { html, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
+import { playPickerSpin, playPickerWinner } from '../lib/sound.js';
+import { showWinnerCelebration } from '../lib/effects.js';
 
 let pool = [];        // من لم يُنادَ بعد في هذه الجولة
 let picked = null;    // الطالب المعروض الآن
@@ -16,6 +18,7 @@ let spinning = false;
 let round = 1;
 let currentClassId = null;
 let spinTimer = null;
+let pendingWinner = false;
 
 function reset(classId) {
   pool = store.students(classId).map((s) => s.id);
@@ -47,6 +50,16 @@ export default {
 
   onMount(root, p) {
     reset(p.id);
+    pendingWinner = false;
+  },
+
+  afterPaint(root) {
+    if (!pendingWinner) return;
+    const stage = root.querySelector('.picker__stage');
+    if (stage) {
+      showWinnerCelebration(stage);
+    }
+    pendingWinner = false;
   },
 
   render(p) {
@@ -93,9 +106,9 @@ export default {
           ? html`
               <div class="btn-row mt-4">
                 <button class="btn btn--ghost" data-act="award" data-delta="1">
-                  ${icon('plus')} نقطة مشاركة
+                  ${icon('plus')} إضافة درجة مشاركة
                 </button>
-                <a class="btn btn--quiet" href="#/student/${picked}">${icon('reports')} تقريره</a>
+                <a class="btn btn--quiet" href="#/student/${picked}?from=picker&cls=${cls.id}">${icon('reports')} تقرير الطالب</a>
               </div>
             `
           : ''}
@@ -138,6 +151,7 @@ export default {
       clearInterval(spinTimer);
       spinTimer = setInterval(() => {
         picked = pool[shuffleIndex(pool.length)];
+        playPickerSpin();
         repaint();
         if (++ticks >= 8) {
           clearInterval(spinTimer);
@@ -147,6 +161,8 @@ export default {
           history.unshift(chosen);
           picked = chosen;
           spinning = false;
+          pendingWinner = true;
+          playPickerWinner();
           if (navigator.vibrate) navigator.vibrate(20);
           repaint();
         }
@@ -169,6 +185,7 @@ export default {
 
     reset(el, ev, params) {
       reset(params.id);
+      pendingWinner = false;
       toast('جولة جديدة');
       repaint();
     },
@@ -178,5 +195,6 @@ export default {
     clearInterval(spinTimer);
     spinTimer = null;
     spinning = false;
+    pendingWinner = false;
   },
 };

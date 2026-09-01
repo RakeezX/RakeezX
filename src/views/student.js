@@ -41,7 +41,13 @@ export default {
     const sec = en ? store.getSection(en.sectionId) : null;
     return sec ? sectionLabel(sec) : STUDENT_STATUS[s.status] ?? '';
   },
-  back: (p) => (p.teaching ? `#/teaching/${p.teaching}/students` : '#/classes'),
+  back: (p) => {
+    const teachingId = p.teaching || p.cls;
+    if (p.from === 'picker' && teachingId) {
+      return `#/teaching/${teachingId}/picker`;
+    }
+    return teachingId ? `#/teaching/${teachingId}/students` : '#/classes';
+  },
 
   topActions: () => html`
     <button class="iconbtn noprint" data-act="print" aria-label="طباعة">${icon('print')}</button>

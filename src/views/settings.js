@@ -6,6 +6,7 @@ import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
 import { repaint } from '../repaint.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
+import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
 
 const THEMES = [
   { v: 'auto',  label: 'حسب النظام', icon: 'settings' },
@@ -275,6 +276,26 @@ export default {
       </div>
 
       <div class="section">
+        <div class="section__head"><div class="section__title">المؤثرات الصوتية</div></div>
+        <div class="card card--pad">
+          <div class="hstack gap-3 wrap">
+            <div style="flex: 1; min-width: 180px;">
+              <div class="fw-7">المؤثرات الصوتية</div>
+              <div class="t-3 fs-sm">أصوات تفاعلية أثناء قرعة الطلاب</div>
+            </div>
+            <div class="segmented" style="flex: none;">
+              <button class="segmented__btn ${isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="on">
+                ${icon('spark')} تشغيل
+              </button>
+              <button class="segmented__btn ${!isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="off">
+                إيقاف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section__head"><div class="section__title">البيانات</div></div>
         <a class="row" href="#/settings/backup">
           <span class="row__icon">${icon('download')}</span>
@@ -498,6 +519,13 @@ export default {
     async theme(el) {
       await store.patchDevice({ theme: el.dataset.theme });
       store.applyTheme();
+    },
+
+    sound(el) {
+      const enabled = el.dataset.val === 'on';
+      setSoundEnabled(enabled);
+      toast(enabled ? 'تم تفعيل المؤثرات الصوتية' : 'تم إيقاف المؤثرات الصوتية');
+      repaint();
     },
 
     async 'use-year'(el) {

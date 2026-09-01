@@ -1,4 +1,4 @@
-﻿/**
+/**
  * الرصد السريع: نقرة على الطالب = نقطة له.
  * صُمّم ليُستعمل والهاتف بيد واحدة أثناء الحصة — لا حقول ولا حفظ يدوي.
  */
@@ -70,7 +70,9 @@ export default {
   afterPaint(root) {
     if (!pendingPulse) return;
     const card = root.querySelector(`#ql-${CSS.escape(pendingPulse.studentId)}`);
-    if (card) card.classList.add(pendingPulse.positive ? 'is-plus' : 'is-minus');
+    if (card) {
+      card.classList.add(pendingPulse.positive ? 'is-plus' : 'is-minus');
+    }
     pendingPulse = null;
   },
 
@@ -135,10 +137,15 @@ export default {
             <div class="qlcard ${tone}" id="ql-${s.id}">
               <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
                       aria-label="نقطة لـ ${s.name}">
-                <span class="qlcard__roll tabular">${s.rollNo ?? ''} ${statusBadge}</span>
-                <span class="qlcard__name">${s.name}</span>
-                <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
-                ${c.today ? html`<span class="qlcard__today tabular">اليوم ${c.today > 0 ? '+' : ''}${c.today}</span>` : ''}
+                <div class="qlcard__head">
+                  ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
+                  <span class="qlcard__name">${s.name}</span>
+                  ${statusBadge}
+                </div>
+                <div class="qlcard__foot">
+                  <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
+                  <span class="qlcard__today tabular">${c.today ? (c.today > 0 ? '+' : '') + c.today + ' اليوم' : ''}</span>
+                </div>
               </button>
               <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
                       aria-label="خصم من ${s.name}">${icon('minus')}</button>
