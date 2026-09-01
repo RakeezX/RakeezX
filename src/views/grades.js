@@ -36,7 +36,7 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
 
     const { roster, items, ctx } = store.teachingContext(cls.id);
-    const distributionAction = html`<div class="grades-page-head noprint"><a class="btn btn--quiet btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} توزيع الدرجات</a></div>`;
+    const distributionAction = html`<div class="grades-page-head noprint"><a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
 
     if (!roster.length) {
       return html`
@@ -141,7 +141,7 @@ function itemMode(roster, items, ctx) {
       }).length;
 
   return html`
-    <div class="chips scroll-x mb-3">
+    <div class="grades-category-nav mb-3" role="tablist" aria-label="بنود التقييم">
       ${items.map((i) => {
         const done = i.auto
           ? roster.length
@@ -150,10 +150,14 @@ function itemMode(roster, items, ctx) {
               return sc && sc.value !== null && sc.value !== undefined;
             }).length;
         const full = done === roster.length;
+        const isSelected = i.id === activeItemId;
         return html`
-          <button class="chip ${i.id === activeItemId ? 'is-on' : ''}" data-act="pick" data-id="${i.id}">
-            ${i.name}
-            <span class="chip__meta tabular">${full ? '✓' : `${done}/${roster.length}`}</span>
+          <button class="grades-category-btn chip ${isSelected ? 'is-on' : ''}"
+                  data-act="pick" data-id="${i.id}"
+                  role="tab" aria-selected="${isSelected ? 'true' : 'false'}"
+                  aria-label="${i.name} (${full ? 'مكتمل' : `${done} من ${roster.length}`})">
+            <span class="grades-category-btn__name">${i.name}</span>
+            <span class="grades-category-btn__meta chip__meta tabular">${full ? '✓' : `${done}/${roster.length}`}</span>
           </button>
         `;
       })}
