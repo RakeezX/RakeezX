@@ -360,8 +360,8 @@ export default {
                     return;
                   }
                 }
-                if (selectedTch) {
-                  await store.deleteTeaching(selectedTch.id);
+                if (sec) {
+                  await store.deleteClass(sec.id);
                   toast('تم حذف الفصل');
                   repaint();
                 }

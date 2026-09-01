@@ -53,14 +53,14 @@ for (const viewport of [
     await dialog.getByRole('button', { name: 'متابعة' }).click();
     await dialog.getByRole('button', { name: 'تأكيد الحذف' }).click();
     await expect(dialog).toHaveCount(0);
-    await page.waitForFunction((id) => window.store.state.teachings.some((item) => item.id === id && item.deleted), fixture.teachingId);
+    await page.waitForFunction((id) => window.store.state.sections.some((item) => item.id === id && item.deleted), fixture.sectionId);
     const state = await page.evaluate((ids) => ({
       teachingDeleted: window.store.state.teachings.some((item) => item.id === ids.teachingId && item.deleted),
-      sectionActive: window.store.state.sections.some((item) => item.id === ids.sectionId && !item.deleted),
-      studentActive: window.store.state.students.some((item) => item.id === ids.studentId && !item.deleted),
-      enrollmentActive: window.store.state.enrollments.some((item) => item.id === ids.enrollmentId && !item.deleted),
+      sectionDeleted: window.store.state.sections.some((item) => item.id === ids.sectionId && item.deleted),
+      studentDeleted: window.store.state.students.some((item) => item.id === ids.studentId && item.deleted),
+      enrollmentDeleted: window.store.state.enrollments.some((item) => item.id === ids.enrollmentId && item.deleted),
     }), fixture);
-    expect(state).toEqual({ teachingDeleted: true, sectionActive: true, studentActive: true, enrollmentActive: true });
+    expect(state).toEqual({ teachingDeleted: true, sectionDeleted: true, studentDeleted: true, enrollmentDeleted: true });
     expect(errors.filter((error) => !error.includes('favicon'))).toEqual([]);
   });
 }
