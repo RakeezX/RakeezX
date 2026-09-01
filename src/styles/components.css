@@ -850,3 +850,35 @@
     transition: none !important;
   }
 }
+
+/* Ticket 04: approved class-workspace and centralized-delete polish. */
+.class-name-switcher-btn {
+  min-height: 34px;
+  padding: 4px 10px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  text-decoration: none;
+  transition: background .15s var(--ease), border-color .15s var(--ease), box-shadow .15s var(--ease), transform .08s var(--ease);
+}
+.class-name-switcher-btn:active { transform: scale(0.98); }
+.class-name-switcher-btn__title { font-size: 15.5px; }
+.class-name-switcher-btn__chevron { inline-size: 15px; block-size: 15px; margin-inline-start: 1px; }
+.class-name-switcher-btn__chevron svg { inline-size: 13px; block-size: 13px; transition: color .15s var(--ease); }
+.class-name-switcher-btn:hover .class-name-switcher-btn__chevron svg { color: var(--text-2); }
+
+.class-action-delete-btn {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger-soft) 40%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--danger) 28%, var(--border));
+  transition: background .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease), box-shadow .15s var(--ease), transform .08s var(--ease);
+}
+.class-action-delete-btn:hover,
+.class-action-delete-btn:focus-visible {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--danger) 15%, transparent);
+}
+.class-action-delete-btn:active { transform: scale(0.98); }

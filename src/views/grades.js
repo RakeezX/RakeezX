@@ -157,7 +157,6 @@ function itemMode(roster, items, ctx) {
                   role="tab" aria-selected="${isSelected ? 'true' : 'false'}"
                   aria-label="${i.name} (${full ? 'مكتمل' : `${done} من ${roster.length}`})">
             <span class="grades-category-btn__name">${i.name}</span>
-            <span class="grades-category-btn__meta chip__meta tabular">${full ? '✓' : `${done}/${roster.length}`}</span>
           </button>
         `;
       })}
