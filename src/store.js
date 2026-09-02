@@ -6,6 +6,7 @@
  */
 
 import * as db from './lib/db.js';
+import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
@@ -13,7 +14,7 @@ import {
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
-  sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel
+  sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel, gradeLabel
 } from './models.js';
 import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
 
@@ -130,6 +131,13 @@ async function absorb(changes) {
       } else if (i >= 0) {
         arr.splice(i, 1);
       }
+    }
+  }
+  for (const change of changes ?? []) {
+    if (change.store === 'teachings' && change.replacementId && globalThis.location?.hash &&
+        !getTeaching(change.id) && getTeaching(change.replacementId)) {
+      const next = teachingReplacementHash(location.hash, change.id, change.replacementId);
+      if (next !== location.hash) location.replace(next);
     }
   }
   notify();
@@ -293,6 +301,8 @@ async function ensureFoundation() {
 /* ---------- الكتابة ---------- */
 
 export const isLocalOnlyRecord = (rec) => String(rec?.id ?? '').startsWith('demo:');
+// Private creation-only receipt. It lives in the local outbox, never in cloud payloads.
+const TEACHING_CREATION_PROOF = Symbol('pristineTeachingCreation');
 
 const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
   if (isLocalOnlyRecord(rec)) return null;
@@ -357,6 +367,11 @@ export async function save(batch, options = {}) {
   }
   if (!changes.length) return true;
 
+  const proof = options[TEACHING_CREATION_PROOF];
+  if (proof) {
+    const entry = outbox.find((entry) => entry.id === `teachings:${proof.teaching.id}`);
+    if (entry) entry.pristineTeachingCreation = structuredClone(proof);
+  }
   if (outbox.length) writes.outbox = outbox;
   notify();
 
@@ -370,6 +385,158 @@ export async function save(batch, options = {}) {
     reportWriteError(err, { op: 'save', stores: Object.keys(batch) });
     return false;
   }
+}
+
+/**
+ * Local persistence only. The caller must prevalidate that A is safe to retire
+ * and canonicalSection is the active B in local (camelCase) model format.
+ * Optional expectedSource scalar fields guard evidence against local edits
+ * between caller validation and this transaction; no cloud decisions occur here.
+ * No IDs other than the abandoned section ID are changed.
+ */
+export async function rekeyLocalSectionIdentity({ fromSectionId, canonicalSection, expectedSource } = {}) {
+  const toSectionId = canonicalSection?.id;
+  if (typeof fromSectionId !== 'string' || !fromSectionId ||
+      typeof toSectionId !== 'string' || !toSectionId || fromSectionId === toSectionId) {
+    return { ok: false, status: 'invalid-input' };
+  }
+
+  let result;
+  let committed;
+  try {
+    // Clone once so the caller cannot alter inputs while IndexedDB is opening.
+    const supplied = structuredClone(canonicalSection);
+    const expected = expectedSource && structuredClone(expectedSource);
+    committed = await db.applyBatch({ sections: {}, teachings: {}, enrollments: {}, outbox: {} }, {
+      prepare(current) {
+        const source = current.sections.find((record) => record.id === fromSectionId);
+        const existing = current.sections.find((record) => record.id === toSectionId);
+        const teachings = current.teachings.filter((record) => record.sectionId === fromSectionId)
+          .map((record) => ({ ...record, sectionId: toSectionId }));
+        const enrollments = current.enrollments.filter((record) => record.sectionId === fromSectionId)
+          .map((record) => ({ ...record, sectionId: toSectionId }));
+        const obsolete = current.outbox.filter((entry) => entry.id === `sections:${fromSectionId}` ||
+          (entry.store === 'sections' && entry.recordId === fromSectionId)).map((entry) => entry.id);
+
+        if (!source) {
+          result = existing && !teachings.length && !enrollments.length && !obsolete.length
+            ? { ok: true, status: 'already-rekeyed', sectionId: toSectionId }
+            : { ok: false, status: 'source-missing' };
+          return {};
+        }
+
+        if (expected && Object.entries(expected).some(([field, value]) => source[field] !== value)) {
+          result = { ok: false, status: 'source-changed' };
+          return {};
+        }
+
+        // Supplied canonical fields win; fields not supplied remain local.
+        // Undefined mapping fields must not erase local extension fields.
+        const canonical = { ...existing,
+          ...Object.fromEntries(Object.entries(supplied).filter(([, value]) => value !== undefined)),
+          id: toSectionId };
+        const pending = new Set(current.outbox.map((entry) => `${entry.store}:${entry.recordId}`));
+        const queued = [];
+        for (const [name, records] of [['teachings', teachings], ['enrollments', enrollments]]) {
+          for (const record of records) {
+            // Outbox fields are field NAMES, not payloads. Preserve existing
+            // entries (including delete intent); serialization reads the record.
+            if (pending.has(`${name}:${record.id}`)) continue;
+            const entry = outboxEntry(name, record, ['sectionId'], record.deleted ? 'delete' : 'patch');
+            if (entry) queued.push(entry);
+          }
+        }
+        result = { ok: true, status: 'rekeyed', sectionId: toSectionId,
+          teachings: teachings.length, enrollments: enrollments.length };
+        return {
+          sections: { remove: [fromSectionId], put: [canonical] },
+          teachings: { put: teachings },
+          enrollments: { put: enrollments },
+          outbox: { remove: obsolete, put: queued },
+        };
+      },
+    });
+  } catch (error) {
+    reportWriteError(error, { op: 'rekeyLocalSectionIdentity', fromSectionId, toSectionId });
+    return { ok: false, status: 'write-failed', error: error.message };
+  }
+
+  if (result.ok) {
+    const changes = [{ store: 'sections', id: fromSectionId }, { store: 'sections', id: toSectionId }];
+    for (const name of ['teachings', 'enrollments']) {
+      changes.push(...changeList(name, committed[name]?.put ?? []));
+    }
+    // Memory is updated only after commit. Reuse the normal cross-tab refresh
+    // path, reading current disk values rather than overwriting optimistic edits.
+    await absorb(changes);
+    if (result.status === 'rekeyed') broadcast(changes);
+  }
+  return result;
+}
+
+/**
+ * Pristine-only, local atomic adoption. Caller supplies exact authenticated
+ * TA-absent/TB-active evidence; no cloud decisions or history rekeys occur here.
+ * All stores participate in the transaction so concurrent meaningful work is
+ * observed before cleanup. Only teachings/items/outbox receive writes.
+ */
+export async function adoptPristineTeachingIdentity({ fromTeachingId, canonicalTeaching, expectedSource, validateEvidence } = {}) {
+  const toId = canonicalTeaching?.id;
+  const blocked = (reason, code = 'TEACHING_IDENTITY_CONFLICT_REQUIRES_RESOLUTION') =>
+    ({ ok: false, code, reason });
+  if (typeof fromTeachingId !== 'string' || !fromTeachingId || typeof toId !== 'string' || !toId || fromTeachingId === toId) {
+    return blocked('invalid-input');
+  }
+  let result;
+  try {
+    const supplied = structuredClone(canonicalTeaching);
+    const expected = expectedSource && structuredClone(expectedSource);
+    await db.applyBatch(Object.fromEntries(db.STORES.map((name) => [name, {}])), {
+      prepare(current) {
+        if (validateEvidence && !validateEvidence()) {
+          result = blocked('evidence-changed', 'TEACHING_IDENTITY_PRESENCE_UNKNOWN'); return {};
+        }
+        const source = current.teachings.find((row) => row.id === fromTeachingId);
+        const existing = current.teachings.find((row) => row.id === toId);
+        const sameKey = (row) => row && ['sectionId', 'subjectId', 'termId'].every((key) =>
+          typeof supplied[key] === 'string' && supplied[key] && row[key] === supplied[key]);
+        if (supplied.deleted !== false || (existing && (existing.deleted || !sameKey(existing)))) {
+          result = blocked('canonical-changed'); return {};
+        }
+        if (!source) {
+          result = existing && sameKey(existing) && !hasTeachingReferences(current, fromTeachingId)
+            ? { ok: true, status: 'already-adopted', teachingId: toId, abandonedItemIds: [] }
+            : blocked('source-missing');
+          return {};
+        }
+        if (!sameKey(source) || (expected && !samePristineRecord(source, expected))) {
+          result = blocked('source-changed'); return {};
+        }
+        const checked = inspectPristineTeaching(current, fromTeachingId);
+        if (!checked.pristine) { result = blocked(checked.reason); return {}; }
+        result = { ok: true, status: 'adopted', teachingId: toId, abandonedItemIds: checked.itemIds };
+        return {
+          teachings: { remove: [fromTeachingId], put: [existing ?? supplied] },
+          items: { remove: checked.itemIds },
+          outbox: { remove: checked.outboxIds },
+        };
+      },
+    });
+  } catch (error) {
+    reportWriteError(error, { op: 'adoptPristineTeachingIdentity', fromTeachingId, toId });
+    return blocked(error.message, 'TEACHING_IDENTITY_ADOPTION_WRITE_FAILED');
+  }
+  if (result.ok) {
+    // A peer may have committed first while this tab still holds the retired
+    // teaching/defaults. A write-free repeat must refresh that memory as well.
+    const staleItemIds = state.items.filter((row) => row.teachingId === fromTeachingId).map((row) => row.id);
+    const itemIds = new Set([...result.abandonedItemIds, ...staleItemIds]);
+    const changes = [{ store: 'teachings', id: fromTeachingId, replacementId: toId },
+      { store: 'teachings', id: toId }, ...[...itemIds].map((id) => ({ store: 'items', id }))];
+    await absorb(changes);
+    if (result.status === 'adopted') broadcast(changes);
+  }
+  return result;
 }
 
 /**
@@ -888,14 +1055,15 @@ export async function createSubject(data) {
 
 export async function createSection(data) {
   const year = activeYear();
-  const existing = sections().find(s => 
-    s.yearId === year?.id && 
+  const yearId = data.yearId ?? year?.id;
+  const existing = sections(yearId).find(s =>
+    !s.deleted && s.yearId === yearId &&
     s.grade === Number(data.grade) && 
-    s.label === data.label
+    normalizeSectionLabel(s.label) === normalizeSectionLabel(data.label)
   );
-  if (existing) throw new Error(`الفصل ${existing.name} موجود مسبقاً.`);
+  if (existing) throw new Error(`هذا الفصل موجود مسبقًا (${gradeLabel(existing.grade)} / ${existing.label})`);
   
-  const s = makeSection({ yearId: year?.id, order: sections().length, ...data });
+  const s = makeSection({ yearId, order: sections(yearId).length, ...data });
   await save({ sections: [s] });
   return s;
 }
@@ -904,13 +1072,13 @@ export async function editSection(id, data) {
   const existing = getSection(id);
   if (!existing) throw new Error('الفصل غير موجود.');
   
-  const duplicate = sections().find(s => 
-    s.id !== id && 
+  const duplicate = sections(existing.yearId).find(s =>
+    !s.deleted && s.id !== id &&
     s.yearId === existing.yearId && 
     s.grade === Number(data.grade) && 
-    s.label === data.label
+    normalizeSectionLabel(s.label) === normalizeSectionLabel(data.label)
   );
-  if (duplicate) throw new Error(`الفصل ${duplicate.name} موجود مسبقاً.`);
+  if (duplicate) throw new Error(`هذا الفصل موجود مسبقًا (${gradeLabel(duplicate.grade)} / ${duplicate.label})`);
   
   const { makeSection } = await import('./models.js');
   const name = `${data.grade}/${data.label}`;
@@ -927,7 +1095,10 @@ export async function createTeaching({ sectionId: secId, subjectId: subId, termI
     order: teachings(term).length,
   });
   if (getTeaching(tch.id)) return getTeaching(tch.id);
-  await save({ teachings: [tch], items: defaultItemsFor(tch.id) });
+  const defaults = defaultItemsFor(tch.id);
+  await save({ teachings: [tch], items: defaults }, {
+    [TEACHING_CREATION_PROOF]: { version: 1, teaching: tch, items: defaults },
+  });
   return tch;
 }
 

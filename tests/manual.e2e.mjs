@@ -85,7 +85,8 @@ test.describe('Manual Acceptance Requirements', () => {
     await page.selectOption('select[name="grade"]', '5');
     await page.fill('input[name="label"]', '5');
     await page.click('button[form="edit-sec-form"]');
-    await expect(page.locator('#toast')).toContainText('موجود مسبقاً');
+    await expect(page.locator('#toast')).toContainText('هذا الفصل موجود مسبقًا (الخامس الابتدائي / 5)');
+    await expect(page.locator('#edit-sec-form')).toBeVisible();
     expect(await page.evaluate(() => {
       const section = window.store.state.sections.find((item) => item.id === 'sec2');
       return { id: section.id, grade: section.grade, label: section.label };

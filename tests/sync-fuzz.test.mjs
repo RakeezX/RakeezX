@@ -57,7 +57,7 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     const numTerms = Math.floor(rand() * 2) + 1;
     const numSubjects = Math.floor(rand() * 5) + 1;
     const numSections = Math.floor(rand() * 26) + 5;
-    const numTeachings = Math.floor(rand() * 51) + 10;
+    const numTeachings = Math.min(Math.floor(rand() * 51) + 10, numSections * numSubjects * numTerms);
     
     // We'll just generate the records and push them from Device A
     const now = Date.now();
@@ -75,7 +75,14 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     for (let i = 0; i < numSections; i++) sections.push({ id: `sec${i}`, yearId: `y0`, grade: 1, label: `Sec ${i}`, updatedAt: now });
     
     const teachings = [];
-    for (let i = 0; i < numTeachings; i++) teachings.push({ id: `tch${i}`, termId: `t0`, subjectId: `sub0`, sectionId: `sec${i % numSections}`, updatedAt: now });
+    // Model the existing cloud UNIQUE(owner, section, subject, term). Repeating
+    // one subject/term after numSections creates impossible remote duplicates,
+    // which the identity safety gate must reject rather than silently merge.
+    for (let i = 0; i < numTeachings; i++) teachings.push({ id: `tch${i}`,
+      termId: `t${Math.floor(i / (numSections * numSubjects))}`,
+      subjectId: `sub${Math.floor(i / numSections) % numSubjects}`,
+      sectionId: `sec${i % numSections}`, updatedAt: now });
+    assert.equal(new Set(teachings.map(row => JSON.stringify([row.sectionId, row.subjectId, row.termId]))).size, numTeachings);
     
     // Shuffle teachings randomly
     teachings.sort(() => rand() - 0.5);
@@ -90,6 +97,7 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     
     // Device A pushes
     await sync.syncStructural();
+    assert.equal(sync.state.results.structural.status, 'success');
     
     // init() correctly seeds the mandatory academic foundation. Assert this
     // fuzz graph by its own stable IDs rather than by whole-table counts.
@@ -109,6 +117,7 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     await sync.syncStructural();
     
     const bYears = await db.getAll("years");
+    assert.equal(sync.state.results.structural.status, 'success');
     const bTeachings = await db.getAll("teachings");
     
     // Default year + pulled years
@@ -121,6 +130,7 @@ test("Sync Fuzz & Stress Suite", async (t) => {
     await sync.syncStructural();
     
     const updatedRemote = backend.records["teachings"].find(t => t.id === teachings[0].id);
+    assert.equal(sync.state.results.structural.status, 'success');
     assert.equal(updatedRemote.order, 999);
   });
 

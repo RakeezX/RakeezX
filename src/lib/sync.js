@@ -1,7 +1,7 @@
 import * as cloud from './cloud.js';
 import * as store from '../store.js';
 import * as db from './db.js';
-import { uid, DEFAULT_TIME_PROFILES } from '../models.js';
+import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js';
 
 export const state = {
   status: 'idle', // idle, pending, offline, syncing, synced, error
@@ -128,7 +128,14 @@ export async function syncAll({ full = true } = {}) {
     suppressAutoSchedule = false;
     autoRunning = false;
     const remaining = await pendingOutbox();
-    if (rerunRequested || remaining.length) {
+    const blockedIdentity = state.results.structural?.status === 'error' && state.results.structural.retryable === false;
+    if (blockedIdentity) {
+      // Keep pending data without hammering a blocked section/teaching identity
+      // conflict every 900ms. Manual retry remains available after resolution.
+      rerunRequested = false;
+      if (autoTimer) clearTimeout(autoTimer);
+      autoTimer = null;
+    } else if (rerunRequested || remaining.length) {
       rerunRequested = false;
       scheduleAutomaticSync();
     }
@@ -827,6 +834,180 @@ function buildLocalDependencies(state) {
   return req;
 }
 
+const sameSectionIdentity = (local, remote) => local.yearId === remote.year_id &&
+  String(local.grade) === String(remote.grade) &&
+  normalizeSectionLabel(local.label) === normalizeSectionLabel(remote.label);
+
+function sectionReconciliationError(code, retryable, sectionId, candidateIds = []) {
+  const message = code === 'SECTION_NATURAL_KEY_BLOCKED_BY_TOMBSTONE'
+    ? 'هوية الفصل محجوزة بسجل محذوف سحابياً. لم تُغيّر بياناتك، وأُوقفت إعادة المحاولة التلقائية.'
+    : retryable
+    ? 'تعذر التحقق الآمن من هوية الفصل. أعد محاولة المزامنة.'
+    : 'توجد هويات سحابية متعددة للفصل نفسه. لم يتم دمجها أو حذفها.';
+  return Object.assign(new Error(`${code}: ${message}`), { code, retryable, sectionId, candidateIds });
+}
+
+/**
+ * The owner-scoped broad fetch discovers positive candidates ONLY. Its limited
+ * result cannot prove absence: both technical IDs are checked independently.
+ * Validate all candidates before any section mutation or upload is prepared.
+ */
+async function reconcileSections(remoteRecords, sectionIds = null) {
+  const ownerId = cloud.user?.id;
+  const locals = (await db.getAll('sections')).filter((record) => !record.deleted && !store.isLocalOnlyRecord(record) &&
+    (!sectionIds || sectionIds.has(record.id)));
+  const plans = [];
+  for (const local of locals) {
+    const candidates = remoteRecords.filter((remote) => !remote.deleted_at && sameSectionIdentity(local, remote));
+    if (candidates.length > 1) {
+      throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
+        local.id, candidates.map((record) => record.id));
+    }
+    const candidate = candidates[0];
+    if (!candidate || candidate.id === local.id) continue;
+
+    const [a, b] = await Promise.all([
+      cloud.fetchSectionPresence(local.id), cloud.fetchSectionPresence(candidate.id),
+    ]);
+    const fail = (code, retryable = true) => sectionReconciliationError(code, retryable, local.id, [candidate.id]);
+    if (!cloud.session || cloud.user?.id !== ownerId || !a.authoritative || !b.authoritative ||
+        !['present', 'absent'].includes(a.status) || !['present', 'absent'].includes(b.status)) {
+      throw fail('SECTION_IDENTITY_PRESENCE_UNKNOWN');
+    }
+    if (a.status === 'present' && b.status === 'present') {
+      throw fail('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false);
+    }
+    if (a.status !== 'absent' || b.status !== 'present' || b.row?.id !== candidate.id ||
+        b.row.owner_id !== ownerId || b.row.deleted_at !== null || !sameSectionIdentity(local, b.row)) {
+      throw fail('SECTION_IDENTITY_CANDIDATE_CHANGED');
+    }
+    // Presence selects identity/deletion fields only. Keep full section metadata
+    // from discovery, overlay freshly verified identity, then use the real mapper.
+    plans.push({ local, candidate, canonical: { ...candidate, ...b.row } });
+  }
+
+  for (const { local, candidate, canonical } of plans) {
+    const current = await db.get('sections', local.id);
+    if (!cloud.session || cloud.user?.id !== ownerId || !current || current.deleted || !sameSectionIdentity(current, canonical)) {
+      throw sectionReconciliationError('SECTION_IDENTITY_LOCAL_CHANGED', true, local.id, [candidate.id]);
+    }
+    const result = await store.rekeyLocalSectionIdentity({
+      fromSectionId: local.id, canonicalSection: MAPPERS.sections.fromCloud(canonical),
+      expectedSource: { yearId: current.yearId, grade: current.grade, label: current.label,
+        deleted: current.deleted, updatedAt: current.updatedAt },
+    });
+    if (result.status === 'source-changed') {
+      throw sectionReconciliationError('SECTION_IDENTITY_LOCAL_CHANGED', true, local.id, [candidate.id]);
+    }
+    if (!result.ok) throw sectionReconciliationError('SECTION_IDENTITY_REKEY_FAILED', true, local.id, [candidate.id]);
+    // The rekey helper refreshes local memory after commit. Replace the stale
+    // discovery row too, before the normal merge constructs either ID map.
+    remoteRecords[remoteRecords.findIndex((record) => record.id === candidate.id)] = canonical;
+  }
+  return plans.map(({ local, canonical }) => ({ fromSectionId: local.id, canonical }));
+}
+
+/** One recovery pass for a failed atomic section POST, never for other tables. */
+async function recoverSectionWriteConflict(payloads, originalError) {
+  const scopes = new Map();
+  const candidates = new Map();
+  const sectionIds = new Set();
+  try {
+    for (const payload of payloads) {
+      if (payload.deleted_at) continue;
+      const local = await db.get('sections', payload.id);
+      if (!local || local.deleted || !sameSectionIdentity(local, payload) || local.updatedAt !== payload.client_updated_at) {
+        throw sectionReconciliationError('SECTION_IDENTITY_LOCAL_CHANGED', true, payload.id);
+      }
+      const scope = JSON.stringify([local.yearId, local.grade]);
+      if (!scopes.has(scope)) scopes.set(scope, await cloud.fetchSectionCandidates({ yearId: local.yearId, grade: local.grade }));
+      const result = scopes.get(scope);
+      if (!result.authoritative) {
+        const error = sectionReconciliationError('SECTION_IDENTITY_CANDIDATE_LOOKUP_INCOMPLETE', true, local.id);
+        error.recovery = { reason: result.status };
+        throw error;
+      }
+      const matches = result.rows.filter((remote) => sameSectionIdentity(local, remote));
+      const active = matches.filter((remote) => remote.deleted_at === null);
+      if (active.length > 1) {
+        throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
+          local.id, active.map((row) => row.id));
+      }
+      if (!active.length && matches.length) {
+        throw sectionReconciliationError('SECTION_NATURAL_KEY_BLOCKED_BY_TOMBSTONE', false,
+          local.id, matches.map((row) => row.id));
+      }
+      if (active.length === 1 && active[0].id !== local.id) {
+        sectionIds.add(local.id);
+        candidates.set(active[0].id, active[0]);
+      }
+    }
+    if (!sectionIds.size) {
+      // SQLSTATE alone is not evidence of natural identity. Keep the actual
+      // database error when the scoped lookup does not verify a candidate.
+      originalError.recovery = { reason: 'no-verified-natural-match', sectionIds: payloads.map((row) => row.id) };
+      throw originalError;
+    }
+    // Reuse the locked exact A/B verification, mapper, and atomic rekey path.
+    const adopted = await reconcileSections([...candidates.values()], sectionIds);
+    if (adopted.length !== sectionIds.size) {
+      throw sectionReconciliationError('SECTION_IDENTITY_LOCAL_CHANGED', true, [...sectionIds][0]);
+    }
+    return adopted;
+  } catch (error) {
+    if (error !== originalError) error.cause = originalError;
+    throw error;
+  }
+}
+
+/** Pristine teaching convergence only. Never rekey student/history records. */
+async function reconcilePristineTeachings(remoteRecords) {
+  const ownerId = cloud.user?.id;
+  const token = cloud.session?.access_token;
+  const sameKey = (local, remote) => local.sectionId === remote.section_id &&
+    local.subjectId === remote.subject_id && local.termId === remote.term_id;
+  const fail = (code, local, candidateIds, reason) => Object.assign(new Error(
+    `${code}: تعذر توحيد هوية الفصل بأمان. حُفظت بياناتك؛ يلزم التحقق قبل إعادة المحاولة.`),
+    { code, retryable: false, teachingId: local.id, candidateIds,
+      recovery: { reason, fromTeachingId: local.id, candidateIds } });
+  const locals = (await db.getAll('teachings')).filter((row) => !row.deleted && !store.isLocalOnlyRecord(row));
+  for (const local of locals) {
+    const matches = remoteRecords.filter((row) => sameKey(local, row));
+    if (!matches.some((row) => row.id !== local.id)) continue;
+    if (matches.length !== 1) throw fail('TEACHING_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', local,
+      matches.map((row) => row.id), 'multiple-natural-candidates');
+    const candidate = matches[0];
+    const [a, b] = await Promise.all([cloud.fetchTeachingPresence(local.id), cloud.fetchTeachingPresence(candidate.id)]);
+    const evidenceCurrent = () => !!token && cloud.user?.id === ownerId && cloud.session?.access_token === token;
+    if (!evidenceCurrent() || !a.authoritative || !b.authoritative) {
+      throw fail('TEACHING_IDENTITY_PRESENCE_UNKNOWN', local, [candidate.id], 'exact-presence-unavailable');
+    }
+    if (a.status === 'present' && b.status === 'present') {
+      throw fail('TEACHING_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', local, [candidate.id], 'both-remotely-present');
+    }
+    if (a.status !== 'absent' || b.status !== 'present' || b.row?.deleted_at !== null ||
+        b.row.id !== candidate.id || b.row.owner_id !== ownerId || !sameKey(local, b.row)) {
+      throw fail('TEACHING_IDENTITY_CONFLICT_REQUIRES_RESOLUTION', local, [candidate.id], 'canonical-not-active-or-changed');
+    }
+    const canonical = { ...candidate, ...b.row };
+    const result = await store.adoptPristineTeachingIdentity({ fromTeachingId: local.id,
+      canonicalTeaching: MAPPERS.teachings.fromCloud(canonical), expectedSource: local, validateEvidence: evidenceCurrent });
+    if (!result.ok) {
+      const error = fail(result.code, local, [candidate.id], result.reason);
+      if (result.code === 'TEACHING_IDENTITY_ADOPTION_WRITE_FAILED') error.retryable = true;
+      throw error;
+    }
+    remoteRecords[remoteRecords.findIndex((row) => row.id === candidate.id)] = canonical;
+  }
+}
+
+function postgresDiagnostic(error) {
+  const original = error.code === '23505' ? error : error.cause;
+  if (original?.code !== '23505') return {};
+  return { databaseError: Object.fromEntries(['message', 'code', 'status', 'details', 'hint', 'constraint']
+    .filter((key) => original[key] !== undefined).map((key) => [key, original[key]])) };
+}
+
 /**
  * Generic sync engine for a single collection.
  * Pull → Merge → Push
@@ -836,7 +1017,13 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   if (!mapper) throw new Error(`No mapper for ${storeName}`);
 
   const remoteRecords = (await cloud.fetchRecords(tableName)).filter((record) => !store.isLocalOnlyRecord(record));
-  const localRecords = (store.state[storeName] || []).filter((record) => !store.isLocalOnlyRecord(record));
+  if (storeName === 'sections') await reconcileSections(remoteRecords);
+  if (storeName === 'teachings') await reconcilePristineTeachings(remoteRecords);
+  // A peer can commit pristine retirement before its BroadcastChannel message
+  // arrives here. Never upload abandoned teaching/default IDs from stale memory.
+  const localSnapshot = ['teachings', 'items'].includes(storeName)
+    ? await db.getAll(storeName) : (store.state[storeName] || []);
+  const localRecords = localSnapshot.filter((record) => !store.isLocalOnlyRecord(record));
 
   const remoteById = new Map(remoteRecords.map(r => [r.id, r]));
   const localById = new Map(localRecords.map(r => [r.id, r]));
@@ -1178,7 +1365,34 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
   }
 
   if (toPush.length > 0) {
-    await cloud.upsertRecords(tableName, toPush);
+    try {
+      await cloud.upsertRecords(tableName, toPush);
+    } catch (error) {
+      if (storeName !== 'sections' || tableName !== 'sections' || error.code !== '23505') throw error;
+      const adopted = await recoverSectionWriteConflict(toPush, error);
+      const retiredIds = new Set(adopted.map((entry) => entry.fromSectionId));
+      const canonicalIds = new Set(adopted.map((entry) => entry.canonical.id));
+      for (const { canonical } of adopted) remoteById.set(canonical.id, canonical);
+      // The failed POST is atomic: unrelated rows in that batch still need
+      // uploading. Rebuild them from disk once; NEVER retry an abandoned A.
+      const remainingIds = toPush.map((row) => row.id).filter((id) => !retiredIds.has(id) && !canonicalIds.has(id));
+      toPush.length = 0;
+      for (const id of remainingIds) {
+        const current = await db.get('sections', id);
+        if (!current) throw sectionReconciliationError('SECTION_IDENTITY_LOCAL_CHANGED', true, id);
+        if (current.yearId && !context.knownRemoteIds?.years?.has(current.yearId)) {
+          throw new Error(`sections: missing remote year ${current.yearId}`);
+        }
+        toPush.push(mapper.toCloud(current));
+      }
+      // A previously queued broad-fetch pull must not overwrite verified B.
+      for (let index = toUpdateLocal.length - 1; index >= 0; index--) {
+        if (retiredIds.has(toUpdateLocal[index].id) || canonicalIds.has(toUpdateLocal[index].id)) toUpdateLocal.splice(index, 1);
+      }
+      // Explicit bound: a second failed write escapes directly, without another
+      // candidate lookup/recovery in this collection attempt.
+      if (toPush.length) await cloud.upsertRecords(tableName, toPush);
+    }
   }
 
   if (toUpdateLocal.length > 0) {
@@ -1290,7 +1504,9 @@ export async function syncStructural() {
       status: 'error',
       results: {
         ...state.results,
-        structural: { status: 'error', error: err.message, time: Date.now() }
+        structural: { status: 'error', error: err.message, time: Date.now(),
+          ...(err.code ? { code: err.code, retryable: err.retryable } : {}),
+          ...postgresDiagnostic(err), ...(err.recovery ? { recovery: err.recovery } : {}) }
       }
     });
   }
@@ -1332,6 +1548,16 @@ export async function syncStudents() {
     // First, fetch remote sections to validate enrollment foreign keys.
     const remoteSections = await cloud.fetchRecords('sections');
     knownRemoteIds.sections = new Set(remoteSections.map(r => r.id));
+    // A recovered B can remain outside the broad response cap. Establish
+    // positive exact-ID evidence for missing enrollment parents, not absence.
+    const missingParents = new Set((store.state.enrollments || []).map((row) => row.sectionId)
+      .filter((id) => id && !knownRemoteIds.sections.has(id)));
+    const ownerId = cloud.user?.id;
+    for (const id of missingParents) {
+      const evidence = await cloud.fetchSectionPresence(id);
+      if (cloud.session && cloud.user?.id === ownerId && evidence.authoritative && evidence.status === 'present' &&
+          evidence.row?.id === id && evidence.row.owner_id === ownerId) knownRemoteIds.sections.add(id);
+    }
 
     // 1. Students
     const resStudents = await syncCollection('students', 'students', { requiredIds: new Set(), knownRemoteIds });

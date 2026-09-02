@@ -51,9 +51,15 @@ export async function request(path, options = {}, isAuth = false) {
     try {
       const data = await res.json();
       err = new Error(data.message || data.error_description || `Request failed: ${res.status}`);
+      // Preserve PostgREST diagnostics; callers must use SQLSTATE, not parse
+      // localized/message-only unique-constraint text to decide recovery.
+      for (const field of ['code', 'details', 'hint', 'constraint']) {
+        if (data[field] !== undefined) err[field] = data[field];
+      }
     } catch {
       err = new Error(`Request failed: ${res.status}`);
     }
+    err.status = res.status;
     throw err;
   }
   
@@ -189,6 +195,90 @@ export async function upsertRecords(tableName, records) {
   });
   
   return { success: true };
+}
+
+/** Exact owner-scoped section identity lookup for safe sync reconciliation. */
+export async function fetchSectionPresence(sectionId) {
+  if (!user) return { authoritative: false, status: 'unknown', row: null, error: 'Not authenticated' };
+  try {
+    const rows = mockBackend
+      ? (await mockBackend.fetchRecords('sections')).filter((row) => row.id === sectionId && (row.owner_id == null || row.owner_id === user.id))
+      : await request(`/sections?owner_id=eq.${encodeURIComponent(user.id)}&id=eq.${encodeURIComponent(sectionId)}&select=id,owner_id,year_id,grade,label,deleted_at&limit=1`, {
+        headers: { 'Accept': 'application/json', 'Accept-Profile': 'rakeezx' }
+      });
+    // Only a valid empty row array proves absence. A malformed successful
+    // response must never authorize retirement of a local identity.
+    if (!Array.isArray(rows) || rows.length > 1 || (rows.length === 1 && !rows[0])) {
+      throw new Error('Invalid exact section presence response');
+    }
+    const row = rows[0] ?? null;
+    return { authoritative: true, status: row ? 'present' : 'absent', row };
+  } catch (error) {
+    return { authoritative: false, status: 'unknown', row: null, error: error.message };
+  }
+}
+export const SECTION_CANDIDATE_LIMIT = 1000;
+
+/**
+ * Exact teaching presence evidence only; does not authorize history adoption.
+ * teachings_natural_uniq is (owner_id, section_id, subject_id, term_id), including
+ * tombstones. A successful owner+PK empty query proves scoped absence without
+ * a broad snapshot. Keep deleted_at so a tombstone cannot become active evidence.
+ */
+export async function fetchTeachingPresence(teachingId) {
+  const ownerId = user?.id;
+  const token = session?.access_token;
+  try {
+    if (!ownerId || !token) throw new Error('Not authenticated');
+    if (typeof teachingId !== 'string' || !teachingId) throw new Error('Invalid teaching ID');
+    const rows = mockBackend ? await mockBackend.fetchTeachingPresence(teachingId)
+      : await request(`/teachings?owner_id=eq.${encodeURIComponent(ownerId)}&id=eq.${encodeURIComponent(teachingId)}&select=id,owner_id,section_id,subject_id,term_id,deleted_at&limit=1`, {
+      headers: { 'Accept': 'application/json', 'Accept-Profile': 'rakeezx' },
+    });
+    if (user?.id !== ownerId || session?.access_token !== token || !Array.isArray(rows) || rows.length > 1) {
+      throw new Error('Invalid exact teaching presence response');
+    }
+    const row = rows[0] ?? null;
+    if (rows.length === 1 && (!row || row.id !== teachingId || row.owner_id !== ownerId ||
+        !['section_id', 'subject_id', 'term_id'].every((key) => typeof row[key] === 'string' && row[key]) ||
+        !(row.deleted_at === null || typeof row.deleted_at === 'string'))) {
+      throw new Error('Invalid exact teaching presence scope/row');
+    }
+    return { authoritative: true, status: row ? 'present' : 'absent', row };
+  } catch (error) {
+    return { authoritative: false, status: 'unknown', row: null, error: error.message };
+  }
+}
+
+/**
+ * Bounded owner/year/grade discovery, including tombstones. Strictly fewer
+ * than 1000 valid rows establishes completeness under the request ceiling;
+ * reaching the ceiling is UNKNOWN/overflow, never proof of uniqueness.
+ * Include mapper metadata so canonical adoption does not invent a timestamp.
+ */
+export async function fetchSectionCandidates({ yearId, grade }) {
+  const ownerId = user?.id;
+  try {
+    if (!ownerId || !session) throw new Error('Not authenticated');
+    if (typeof yearId !== 'string' || !yearId || !Number.isInteger(Number(grade)) || Number(grade) < 1) {
+      throw new Error('Invalid section candidate scope');
+    }
+    const rows = mockBackend
+      ? await mockBackend.fetchSectionCandidates({ yearId, grade, limit: SECTION_CANDIDATE_LIMIT })
+      : await request(`/sections?owner_id=eq.${encodeURIComponent(ownerId)}&year_id=eq.${encodeURIComponent(yearId)}&grade=eq.${encodeURIComponent(grade)}&select=id,owner_id,year_id,grade,label,deleted_at,name,color,order,client_updated_at&order=id.asc&limit=${SECTION_CANDIDATE_LIMIT}`, {
+        headers: { 'Accept': 'application/json', 'Accept-Profile': 'rakeezx' },
+      });
+    if (!session || user?.id !== ownerId || !Array.isArray(rows)) throw new Error('Invalid section candidate response');
+    if (rows.length >= SECTION_CANDIDATE_LIMIT) return { authoritative: false, status: 'overflow', rows: [] };
+    if (rows.some((row) => !row || typeof row.id !== 'string' || !row.id || row.owner_id !== ownerId ||
+        row.year_id !== yearId || String(row.grade) !== String(grade) || typeof row.label !== 'string' ||
+        !(row.deleted_at === null || typeof row.deleted_at === 'string')) || new Set(rows.map((row) => row.id)).size !== rows.length) {
+      throw new Error('Invalid section candidate scope/rows');
+    }
+    return { authoritative: true, status: 'complete', rows };
+  } catch (error) {
+    return { authoritative: false, status: 'unknown', rows: [], error: error.message };
+  }
 }
 
 export async function fetchRecords(tableName) {

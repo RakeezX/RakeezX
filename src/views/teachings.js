@@ -10,7 +10,7 @@ import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
-  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
+  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel, normalizeSectionLabel
 } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
@@ -22,11 +22,11 @@ function sheet(existing = null) {
   const c = existing
     ? {
         grade: store.getSection(existing.sectionId)?.grade ?? 4,
-        label: store.getSection(existing.sectionId)?.label ?? 'أ',
+        label: store.getSection(existing.sectionId)?.label ?? '1',
         color: store.getSection(existing.sectionId)?.color ?? SECTION_COLORS[0],
         subjectId: existing.subjectId,
       }
-    : { grade: 4, label: 'أ', color: autoColor, subjectId: subs[0]?.id };
+    : { grade: 4, label: '1', color: autoColor, subjectId: subs[0]?.id };
 
   return openSheet({
     title: existing ? 'تعديل الفصل' : 'فصل جديد',
@@ -45,7 +45,7 @@ function sheet(existing = null) {
           <label class="field">
             <span class="field__label">رمز الشعبة</span>
             <input class="input" name="label" value="${c.label}" required maxlength="8"
-                   autocomplete="off" placeholder="أ">
+                   autocomplete="off" placeholder="1">
           </label>
         </div>
 
@@ -88,8 +88,16 @@ function sheet(existing = null) {
         const fd = new FormData(ev.target);
         const label = String(fd.get('label') ?? '').trim();
         if (!label) return;
+        const grade = Number(fd.get('grade'));
+        const yearId = existing ? store.getSection(existing.sectionId)?.yearId : store.activeYear()?.id;
+        const duplicate = store.sections(yearId).find((s) => !s.deleted && s.id !== existing?.sectionId &&
+          s.yearId === yearId && s.grade === grade && normalizeSectionLabel(s.label) === normalizeSectionLabel(label));
+        if (duplicate) {
+          toast(`هذا الفصل موجود مسبقًا (${gradeLabel(grade)} / ${duplicate.label})`, 'warn');
+          return;
+        }
         done({
-          grade: Number(fd.get('grade')),
+          grade,
           label,
           color: String(fd.get('color') ?? autoColor ?? SECTION_COLORS[0]),
           subjectId: String(fd.get('subjectId') ?? ''),
@@ -403,13 +411,16 @@ export default {
       }
 
       const col = safeColor(data.color, autoAssignSectionColor(store.sections()));
-      const sec = await store.createSection({
-        yearId: year.id, grade: data.grade, label: data.label,
-        name: `${data.grade}/${data.label}`, color: col
-      });
-
-      await store.createTeaching({ sectionId: sec.id, subjectId: data.subjectId, termId: term.id });
-      repaint();
+      try {
+        const sec = await store.createSection({
+          yearId: year.id, grade: data.grade, label: data.label,
+          name: `${data.grade}/${data.label}`, color: col
+        });
+        await store.createTeaching({ sectionId: sec.id, subjectId: data.subjectId, termId: term.id });
+        repaint();
+      } catch (err) {
+        toast(err.message || 'تعذّر إنشاء الفصل', 'warn');
+      }
     },
 
     async 'seed-sections'() {

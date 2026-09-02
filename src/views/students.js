@@ -7,7 +7,7 @@
 
 import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel } from '../models.js';
+import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
@@ -161,8 +161,9 @@ export default {
       `;
     }
 
-    const q = query.trim();
-    const shown = q ? roster.filter((s) => s.name.includes(q)) : roster;
+    const q = normalizeSearchText(query);
+    const shown = q ? roster.filter((s) => normalizeSearchText(s.name).includes(q) ||
+      (s.rollNo != null && normalizeSearchText(s.rollNo).includes(q))) : roster;
     const former = store
       .enrollmentsIn(section.id)
       .filter((e) => e.status !== 'active')

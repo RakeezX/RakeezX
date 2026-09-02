@@ -91,7 +91,7 @@ test('Section editing preserves relationships and history', async (t) => {
     const sec2 = await store.createSection({ grade: 4, label: '6', yearId: year.id });
     await assert.rejects(
       store.editSection(sec.id, { grade: 4, label: '6' }),
-      /موجود مسبقاً/
+      /موجود مسبق/
     );
   } catch (err) {
     console.error("TEST FAILED WITH ERROR:", err);

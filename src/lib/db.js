@@ -267,18 +267,54 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
   });
 }
 
-/** كتابة وحذف مختلطان عبر مخازن، في معاملة واحدة. يستعملها الترحيل. */
-export async function applyBatch(batch) {
+/**
+ * Mixed writes/removals in one transaction. With `prepare`, the initial batch
+ * declares the scope; the synchronous callback builds writes from records read
+ * inside that same transaction, so another tab cannot invalidate the snapshot.
+ */
+export async function applyBatch(batch, { prepare } = {}) {
   const names = Object.keys(batch).filter((n) => STORES.includes(n));
   if (!names.length) return;
   const db = await openDB();
-  const tx = db.transaction(names, 'readwrite');
-  for (const name of names) {
-    const os = tx.objectStore(name);
-    for (const id of batch[name].remove ?? []) os.delete(id);
-    for (const r of batch[name].put ?? []) os.put(r);
-  }
-  return txDone(tx);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(names, 'readwrite');
+    let failure;
+    let writes = batch;
+    tx.oncomplete = () => resolve(writes);
+    tx.onerror = (event) => { failure ??= event.target.error; };
+    tx.onabort = () => reject(failure ?? tx.error ?? new Error('أُلغيت العملية'));
+
+    const write = (current) => {
+      try {
+        writes = prepare ? prepare(current) : batch;
+        if (!writes || typeof writes !== 'object' || typeof writes.then === 'function') {
+          throw new TypeError('applyBatch prepare must return a batch synchronously');
+        }
+        for (const [name, operations] of Object.entries(writes)) {
+          if (!names.includes(name)) throw new Error(`applyBatch: store outside transaction scope: ${name}`);
+          const os = tx.objectStore(name);
+          for (const id of operations.remove ?? []) os.delete(id);
+          for (const record of operations.put ?? []) os.put(record);
+        }
+      } catch (error) {
+        // A synchronous DataCloneError/DataError does not automatically abort
+        // earlier queued writes. Explicitly abort before reporting failure.
+        failure = error;
+        tx.abort();
+      }
+    };
+
+    if (!prepare) return write();
+    const current = {};
+    let pending = names.length;
+    for (const name of names) {
+      const read = tx.objectStore(name).getAll();
+      read.onsuccess = () => {
+        current[name] = read.result;
+        if (--pending === 0) write(current);
+      };
+    }
+  });
 }
 
 export async function remove(store, id) {

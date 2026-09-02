@@ -1,10 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+test.use({ timezoneId: 'Asia/Riyadh' });
+
 async function seedGroups(page) {
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.evaluate(async () => {
-    const today = new Date().toISOString().slice(0, 10);
+    // Attendance is keyed to the device-local date, not the UTC date.
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const students = Array.from({ length: 6 }, (_, index) => ({
       id: 'groups-persist-student-' + index,
       name: 'طالب مجموعات ' + (index + 1),
@@ -32,7 +36,10 @@ async function seedGroups(page) {
 
 test('Groups saves a full-roster base arrangement locally across reloads and tabs', async ({ page }) => {
   const teachingId = 'groups-persist-teaching';
+  // Exercise the Riyadh midnight boundary where UTC still reports yesterday.
+  await page.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
   await seedGroups(page);
+  expect(await page.evaluate(() => window.store.state.sessions[0].date)).toBe('2026-09-03');
   await page.goto('/#/teaching/' + teachingId + '/groups');
 
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
@@ -43,6 +50,7 @@ test('Groups saves a full-roster base arrangement locally across reloads and tab
   await expect(page.locator('.group__member')).toHaveCount(5);
 
   const peer = await page.context().newPage();
+  await peer.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
   await peer.goto('/#/teaching/' + teachingId + '/groups');
   await expect.poll(() => peer.evaluate((id) => window.store.state.device.groupArrangements?.[id]?.flat().length ?? 0, teachingId)).toBe(6);
 

@@ -10,7 +10,7 @@ import { html, icon, toast, fmtDate, openSheet, confirmSheet } from '../lib/dom.
 import * as store from '../store.js';
 import {
   ATTENDANCE, ATTENDANCE_ORDER, SESSION_STATUS, SESSION_STATUS_ORDER,
-  todayISO, shiftDate, isWeekend, WEEKDAYS, weekday,
+  todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText,
 } from '../models.js';
 import { repaint } from '../repaint.js';
 
@@ -87,9 +87,9 @@ export default {
 
     const blocked = ses.status === 'cancelled_holiday' || ses.status === 'cancelled';
 
-    const q = query.trim().toLowerCase();
+    const q = normalizeSearchText(query);
     const shownRoster = q
-      ? roster.filter((s) => s.name.toLowerCase().includes(q) || String(s.rollNo ?? '').includes(q))
+      ? roster.filter((s) => normalizeSearchText(s.name).includes(q) || (s.rollNo != null && normalizeSearchText(s.rollNo).includes(q)))
       : roster;
 
     return html`

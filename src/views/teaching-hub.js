@@ -2,7 +2,7 @@
 
 import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
-import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES, SECTION_COLORS, safeColor } from '../models.js';
+import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 
@@ -307,9 +307,17 @@ export default {
             form?.addEventListener('submit', (ev) => {
               ev.preventDefault();
               const fd = new FormData(ev.target);
+              const label = String(fd.get('label')).trim();
+              const grade = Number(fd.get('grade'));
+              const duplicate = store.sections(sec.yearId).find((s) => !s.deleted && s.id !== sec.id &&
+                s.yearId === sec.yearId && s.grade === grade && normalizeSectionLabel(s.label) === normalizeSectionLabel(label));
+              if (duplicate) {
+                toast(`هذا الفصل موجود مسبقًا (${gradeLabel(grade)} / ${duplicate.label})`, 'warn');
+                return;
+              }
               done({
-                grade: Number(fd.get('grade')),
-                label: String(fd.get('label')).trim(),
+                grade,
+                label,
                 color: String(input?.value || fd.get('color') || sec.color || SECTION_COLORS[0]),
               });
             });
@@ -324,7 +332,7 @@ export default {
         // trigger re-render
         repaint();
       } catch (err) {
-        toast(err.message, 'danger');
+        toast(err.message || 'تعذّر تعديل بيانات الفصل', 'warn');
       }
     }
   },

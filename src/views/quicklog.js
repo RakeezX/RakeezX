@@ -5,7 +5,7 @@
 
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO } from '../models.js';
+import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO, normalizeSearchText } from '../models.js';
 import { repaint } from '../repaint.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
@@ -112,12 +112,12 @@ export default {
     const attendance = quickLogAttendanceState(roster, store.sessionsOnFor(cls.id, today), (sessionId) => store.attendanceIn(sessionId));
 
     // تصفية وبحث الطلاب
-    const q = searchQuery.trim().toLowerCase();
+    const q = normalizeSearchText(searchQuery);
     let displayEntries = attendance.filter((entry) => {
       const s = entry.student;
       if (q) {
-        const matchesName = (s.name || '').toLowerCase().includes(q);
-        const matchesRoll = String(s.rollNo ?? '').includes(q);
+        const matchesName = normalizeSearchText(s.name).includes(q);
+        const matchesRoll = s.rollNo != null && normalizeSearchText(s.rollNo).includes(q);
         if (!matchesName && !matchesRoll) return false;
       }
       const c = byStudent.get(s.id) ?? { total: 0, today: 0 };

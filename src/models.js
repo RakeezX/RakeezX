@@ -130,6 +130,20 @@ export const gradeLabel = (v) => GRADES.find((g) => g.v === Number(v))?.label ??
 
 export const sectionLabel = (sec) => sec ? `${gradeLabel(sec.grade)} / ${sec.label}` : '';
 
+/** Conservative comparison-only normalization for section labels. */
+export function normalizeSectionLabel(label) {
+  return String(label ?? '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+    .replace(/[إأآٱ]/g, 'ا');
+}
+
+/** Search normalization preserves stored text while making Arabic lookup forgiving. */
+export function normalizeSearchText(text) {
+  return normalizeSectionLabel(text).toLowerCase();
+}
 export const SECTION_COLORS = [
   '#0d9488',
   '#2563eb',
