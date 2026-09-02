@@ -7,12 +7,113 @@ import * as sync from '../lib/sync.js';
 import { repaint } from '../repaint.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
 import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
+import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.js';
 
 const THEMES = [
   { v: 'auto',  label: 'حسب النظام', icon: 'settings' },
   { v: 'light', label: 'فاتح',       icon: 'sun' },
   { v: 'dark',  label: 'داكن',       icon: 'moon' },
 ];
+
+function detectUserPlatform() {
+  if (typeof navigator === 'undefined') return 'ios';
+  const ua = navigator.userAgent || '';
+  if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+    return 'ios';
+  }
+  if (/Android/i.test(ua)) {
+    return 'android';
+  }
+  if (/Win/i.test(ua)) {
+    return 'windows';
+  }
+  if (/Mac/i.test(ua)) {
+    return 'mac';
+  }
+  return 'ios';
+}
+
+function isStandaloneMode() {
+  if (typeof window === 'undefined') return false;
+  return !!(window.matchMedia?.('(display-mode: standalone)').matches ||
+    navigator.standalone === true ||
+    document.referrer?.includes('android-app://'));
+}
+
+let activePwaGuide = null;
+
+const PWA_PLATFORMS = [
+  { id: 'ios',     label: 'iPhone / iPad' },
+  { id: 'android', label: 'Android' },
+  { id: 'windows', label: 'Windows' },
+  { id: 'mac',     label: 'Mac' },
+];
+
+function pwaGuideContent(platform) {
+  switch (platform) {
+    case 'android':
+      return html`
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">١</span>
+          <span class="pwa-guide-text">في متصفح <strong>Chrome</strong>، اضغط زر القائمة <strong>(⋮)</strong> في الزاوية العلوية أو السفلية.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٢</span>
+          <span class="pwa-guide-text">اختر <strong>«تثبيت التطبيق» (Install app)</strong> أو <strong>«إضافة إلى الشاشة الرئيسية»</strong>.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٣</span>
+          <span class="pwa-guide-text">أكّد التثبيت ليظهر رَكيز X كبرنامج مستقل وسريع في قائمة وتطبيقات جهازك.</span>
+        </div>
+      `;
+    case 'windows':
+      return html`
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">١</span>
+          <span class="pwa-guide-text">في متصفح <strong>Chrome</strong> أو <strong>Edge</strong>، اضغط على أيقونة التثبيت <strong>${icon('download')}</strong> في شريط العنوان بالأعلى.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٢</span>
+          <span class="pwa-guide-text">أو افتح قائمة المتصفح (⋮) واختر <strong>تطبيقات ← تثبيت RAKEEZ X</strong>.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٣</span>
+          <span class="pwa-guide-text">سيتم تثبيت رَكيز كنافذة مستقلة وإضافته لقائمة «ابدأ» وشريط المهام.</span>
+        </div>
+      `;
+    case 'mac':
+      return html`
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">١</span>
+          <span class="pwa-guide-text">في متصفح <strong>Safari</strong> (macOS Sonoma فما بعد): من القائمة العلوية اختر <strong>ملف (File) ← إضافة إلى Dock</strong>.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٢</span>
+          <span class="pwa-guide-text">أو في متصفح <strong>Chrome</strong>: اضغط أيقونة التثبيت في شريط العنوان بالأعلى.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٣</span>
+          <span class="pwa-guide-text">سيظهر رَكيز في شريط الـ Dock ومجلد البرامج لفتحه مباشرة كتطبيق سطح مكتب.</span>
+        </div>
+      `;
+    case 'ios':
+    default:
+      return html`
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">١</span>
+          <span class="pwa-guide-text">افتح الرابط في متصفح <strong>سفاري (Safari)</strong> واضغط زر المشاركة <strong>${icon('share')}</strong> أسفل الشاشة.</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٢</span>
+          <span class="pwa-guide-text">مرر للأسفل واختر <strong>«إضافة إلى الصفحة الرئيسية»</strong> (Add to Home Screen).</span>
+        </div>
+        <div class="pwa-guide-step">
+          <span class="pwa-guide-num">٣</span>
+          <span class="pwa-guide-text">اضغط <strong>«إضافة»</strong> (Add) في الزاوية العلوية ليظهر رَكيز X كأيقونة تطبيق مباشر.</span>
+        </div>
+      `;
+  }
+}
 
 function yearSheet(existing = null) {
   const y = existing ?? { hijriStart: 1448 };
@@ -276,20 +377,39 @@ export default {
       </div>
 
       <div class="section">
-        <div class="section__head"><div class="section__title">المؤثرات الصوتية</div></div>
-        <div class="card card--pad">
-          <div class="hstack gap-3 wrap">
-            <div style="flex: 1; min-width: 180px;">
-              <div class="fw-7">المؤثرات الصوتية</div>
-              <div class="t-3 fs-sm">أصوات تفاعلية أثناء قرعة الطلاب</div>
+        <div class="section__head"><div class="section__title">المؤثرات والتفاعل</div></div>
+        <div class="stack stack-2">
+          <div class="card card--pad">
+            <div class="hstack gap-3 wrap">
+              <div style="flex: 1; min-width: 180px;">
+                <div class="fw-7">المؤثرات الصوتية</div>
+                <div class="t-3 fs-sm">أصوات تفاعلية أثناء رصد المشاركة والقرعة</div>
+              </div>
+              <div class="segmented" style="flex: none;">
+                <button class="segmented__btn ${isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="on">
+                  ${icon('spark')} تشغيل
+                </button>
+                <button class="segmented__btn ${!isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="off">
+                  إيقاف
+                </button>
+              </div>
             </div>
-            <div class="segmented" style="flex: none;">
-              <button class="segmented__btn ${isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="on">
-                ${icon('spark')} تشغيل
-              </button>
-              <button class="segmented__btn ${!isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="off">
-                إيقاف
-              </button>
+          </div>
+
+          <div class="card card--pad">
+            <div class="hstack gap-3 wrap">
+              <div style="flex: 1; min-width: 180px;">
+                <div class="fw-7">المؤثرات البصرية</div>
+                <div class="t-3 fs-sm">أشكال متحركة وفقاعات الرصد السريع واحتفالات القرعة</div>
+              </div>
+              <div class="segmented" style="flex: none;">
+                <button class="segmented__btn ${isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="on">
+                  ${icon('spark')} تشغيل
+                </button>
+                <button class="segmented__btn ${!isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="off">
+                  إيقاف
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -379,6 +499,51 @@ export default {
       </div>
 
       <div class="section">
+        <div class="section__head"><div class="section__title">تثبيت تطبيق ركيز على الجهاز</div></div>
+        <div class="card card--pad stack stack-3">
+          ${isStandaloneMode()
+            ? html`
+                <div class="pwa-installed-card">
+                  <div class="pwa-installed-card__icon">${icon('check')}</div>
+                  <div>
+                    <div class="fw-7">التطبيق مُثبّت ويعمل كتطبيق جهاز مستقل</div>
+                    <div class="fs-xs" style="opacity:0.9">يعمل رَكيز بكامل مميزاته محليًا دون الحاجة للاتصال بالإنترنت.</div>
+                  </div>
+                </div>
+              `
+            : ''}
+
+          ${!isStandaloneMode() && typeof window !== 'undefined' && window.deferredInstallPrompt
+            ? html`
+                <button class="btn btn--primary btn--block" data-act="pwa-prompt-install">
+                  ${icon('download')} تثبيت تطبيق ركيز الآن
+                </button>
+              `
+            : ''}
+
+          <div>
+            <div class="hstack gap-2 wrap mb-2">
+              <span class="fw-7 fs-sm">إرشادات التثبيت حسب الجهاز:</span>
+            </div>
+            <div class="segmented mb-3">
+              ${PWA_PLATFORMS.map(
+                (p) => html`
+                  <button class="segmented__btn ${(activePwaGuide || detectUserPlatform()) === p.id ? 'is-on' : ''}"
+                          data-act="pwa-select-guide" data-platform="${p.id}">
+                    ${p.label}
+                  </button>
+                `
+              )}
+            </div>
+          </div>
+
+          <div class="stack stack-2">
+            ${pwaGuideContent(activePwaGuide || detectUserPlatform())}
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
         <div class="card card--pad t-3 fs-sm stack stack-2">
           <div>سجل معلّم يعمل كاملًا دون إنترنت. كل ما ترصده محفوظ على جهازك وحده.</div>
@@ -390,6 +555,28 @@ export default {
   },
 
   actions: {
+    'pwa-select-guide'(el) {
+      activePwaGuide = el.dataset.platform;
+      repaint();
+    },
+
+    async 'pwa-prompt-install'() {
+      if (window.deferredInstallPrompt) {
+        window.deferredInstallPrompt.prompt();
+        try {
+          const { outcome } = await window.deferredInstallPrompt.userChoice;
+          if (outcome === 'accepted') {
+            toast('جارٍ تثبيت تطبيق ركيز...');
+            window.deferredInstallPrompt = null;
+            repaint();
+          }
+        } catch {
+          // ignore prompt cancellation
+        }
+      } else {
+        toast('اتبع الخطوات الموضحة لجهازك لتثبيت التطبيق');
+      }
+    },
     async 'copy-result'(el) {
       const payload = JSON.parse(decodeURIComponent(el.dataset.payload));
       let text = `--- ${payload.title} ---\n`;
@@ -525,6 +712,13 @@ export default {
       const enabled = el.dataset.val === 'on';
       setSoundEnabled(enabled);
       toast(enabled ? 'تم تفعيل المؤثرات الصوتية' : 'تم إيقاف المؤثرات الصوتية');
+      repaint();
+    },
+
+    'visual-fx'(el) {
+      const enabled = el.dataset.val === 'on';
+      setVisualEffectsEnabled(enabled);
+      toast(enabled ? 'تم تفعيل المؤثرات البصرية' : 'تم إيقاف المؤثرات البصرية');
       repaint();
     },
 

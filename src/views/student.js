@@ -51,6 +51,7 @@ export default {
   },
 
   topActions: () => html`
+    <button class="iconbtn noprint" data-act="share" aria-label="مشاركة الملخص">${icon('share')}</button>
     <button class="iconbtn noprint" data-act="print" aria-label="طباعة">${icon('print')}</button>
   `,
 
@@ -311,6 +312,7 @@ export default {
 
       <div class="section noprint">
         <div class="btn-row">
+          <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة الملخص</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
           ${s.status === 'active'
             ? html`<button class="btn btn--danger" data-act="withdraw">${icon('back')} غادر المدرسة</button>`
@@ -321,6 +323,93 @@ export default {
   },
 
   actions: {
+    async share(el, ev, params) {
+      const s = store.getStudent(params.id);
+      if (!s) return;
+      const tch = resolveTeaching(s, params.teaching);
+      const section = tch ? store.getSection(tch.sectionId) : null;
+      const items = tch ? store.items(tch.id) : [];
+      const ctx = store.studentContext(s.id, tch?.id);
+      const total = studentTotal(items, ctx);
+      const band = masteryBand(total.pct);
+
+      const tally = { present: 0, late: 0, excused: 0, absent: 0 };
+      for (const a of ctx.attendance) tally[a.status] = (tally[a.status] ?? 0) + 1;
+      const sessions = ctx.attendance.length;
+      const attendedPct = sessions ? Math.round(((tally.present + tally.late) / sessions) * 100) : null;
+
+      const part = ctx.logs.filter((l) => l.kind === 'participation');
+      const behav = ctx.logs.filter((l) => l.kind === 'behavior');
+      const partNet = part.reduce((n, l) => n + l.delta, 0);
+      const behavNet = behav.reduce((n, l) => n + l.delta, 0);
+
+      const textParts = [
+        `📊 ملخص أداء الطالب: ${s.name}`,
+        section ? `🏫 الشعبة: ${sectionLabel(section)}` : '',
+        tch ? `📚 المادة: ${store.getSubject(tch.subjectId)?.name ?? ''}` : '',
+        '━━━━━━━━━━━━━━━',
+        '📈 المستوى والدرجات:',
+        `• المجموع: ${fmtNum(total.earned)} من ${total.outOfAll} (${total.pct != null ? `${fmtPct(total.pct)}` : '—'})`,
+        band.label ? `• التقدير: ${band.label}` : '',
+        '',
+        '📅 الحضور والمواظبة:',
+        `• الحصص المرصودة: ${sessions}`,
+        `• نسبة الحضور: ${attendedPct != null ? `${attendedPct}%` : '—'}`,
+        `• الغياب: ${tally.absent} | التأخر: ${tally.late} | الاستئذان: ${tally.excused}`,
+        '',
+        '⭐ التفاعل والمشاركة:',
+        `• نقاط المشاركة: ${partNet > 0 ? '+' : ''}${partNet}`,
+        `• نقاط السلوك: ${behavNet > 0 ? '+' : ''}${behavNet}`,
+        '━━━━━━━━━━━━━━━',
+        'تطبيق رَكيز X للمعلم',
+      ];
+
+      const summaryText = textParts.filter(Boolean).join('\n');
+
+      await openSheet({
+        title: 'مشاركة ملخص الطالب',
+        desc: 'ملخص شامل ومباشر لتقديمه لولي الأمر أو الإدارة.',
+        body: html`
+          <div class="share-preview-box">${summaryText}</div>
+          <div class="stack stack-2 mt-3">
+            <button class="btn btn--primary btn--block" id="btn-copy-summary">
+              ${icon('copy')} نسخ الملخص
+            </button>
+            <a class="btn btn--ghost btn--block" href="https://api.whatsapp.com/send?text=${encodeURIComponent(summaryText)}" target="_blank" rel="noopener">
+              ${icon('share')} إرسال عبر واتساب
+            </a>
+            ${navigator.share
+              ? html`
+                  <button class="btn btn--quiet btn--block" id="btn-native-share">
+                    ${icon('share')} مشاركة عبر النظام...
+                  </button>
+                `
+              : ''}
+          </div>
+        `,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>`,
+        onMount: (root, done) => {
+          root.querySelector('#btn-copy-summary')?.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(summaryText);
+              toast('تم نسخ الملخص للحافظة', 'ok');
+            } catch {
+              toast('تعذر النسخ التلقائي — حدد النص وانسخه يدويًا', 'danger');
+            }
+          });
+
+          root.querySelector('#btn-native-share')?.addEventListener('click', async () => {
+            try {
+              await navigator.share({
+                title: `ملخص أداء الطالب ${s.name}`,
+                text: summaryText,
+              });
+            } catch {}
+          });
+        },
+      });
+    },
+
     print() {
       window.print();
     },

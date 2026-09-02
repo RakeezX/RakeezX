@@ -10,6 +10,11 @@ import { reportHeader, reportIdentitySheet, reportSignatures } from '../lib/repo
 import { repaint } from '../repaint.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
+let sortKey = 'default'; // default | name | roll | score_desc | score_asc | absent_desc
+let attMode = 'brief'; // brief | detailed
+let filterStartDate = '';
+let filterEndDate = '';
+let a4Preview = false;
 
 const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
 const safeName = (value) => String(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
@@ -25,13 +30,40 @@ function identity(cls) {
   };
 }
 
+function sortRoster(roster, items, ctx) {
+  const arr = [...roster];
+  if (sortKey === 'name') {
+    arr.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+  } else if (sortKey === 'roll') {
+    arr.sort((a, b) => (a.rollNo ?? 9999) - (b.rollNo ?? 9999));
+  } else if (sortKey === 'score_desc') {
+    arr.sort((a, b) => (studentTotal(items, ctx[b.id]).pct ?? -1) - (studentTotal(items, ctx[a.id]).pct ?? -1));
+  } else if (sortKey === 'score_asc') {
+    arr.sort((a, b) => (studentTotal(items, ctx[a.id]).pct ?? 9999) - (studentTotal(items, ctx[b.id]).pct ?? 9999));
+  } else if (sortKey === 'absent_desc') {
+    arr.sort((a, b) => {
+      const absA = ctx[a.id].attendance.filter((rec) => rec.status === 'absent').length;
+      const absB = ctx[b.id].attendance.filter((rec) => rec.status === 'absent').length;
+      return absB - absA;
+    });
+  }
+  return arr;
+}
+
 export default {
   title: () => 'التقارير',
   subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 
-  onMount() { tab = 'grades'; },
+  onMount() {
+    tab = 'grades';
+    sortKey = 'default';
+    attMode = 'brief';
+    filterStartDate = '';
+    filterEndDate = '';
+    a4Preview = false;
+  },
 
   render(p) {
     const cls = store.getTeaching(p.id);
@@ -40,24 +72,76 @@ export default {
     if (!roster.length) return html`
       <div class="empty"><div class="empty__icon">${icon('reports')}</div><div class="empty__title">لا بيانات بعد</div><a class="btn btn--primary" href="#/teaching/${cls.id}/students">${icon('plus')} كشف الطلاب</a></div>`;
 
+    const sortedRoster = sortRoster(roster, items, ctx);
     const header = reportHeader({ title: reportTitle(), ...identity(cls) });
+
+    const reportContent = html`
+      ${header}
+      ${tab === 'roster' ? rosterReport(sortedRoster) : ''}
+      ${tab === 'grades' ? gradesReport(sortedRoster, items, ctx) : ''}
+      ${tab === 'attendance' ? attendanceReport(cls, sortedRoster, ctx) : ''}
+      ${tab === 'support' ? supportReport(sortedRoster, items, ctx) : ''}
+      ${reportSignatures({ profile: identity(cls).profile })}
+    `;
+
     return html`
       <article class="print-report print-report--${tab}" dir="rtl">
-        ${header}
         <div class="segmented mb-3 noprint" aria-label="أنواع التقارير">
           <button class="segmented__btn ${tab === 'roster' ? 'is-on' : ''}" data-act="tab" data-tab="roster">الطلاب</button>
           <button class="segmented__btn ${tab === 'grades' ? 'is-on' : ''}" data-act="tab" data-tab="grades">الدرجات</button>
           <button class="segmented__btn ${tab === 'attendance' ? 'is-on' : ''}" data-act="tab" data-tab="attendance">الحضور</button>
           <button class="segmented__btn ${tab === 'support' ? 'is-on' : ''}" data-act="tab" data-tab="support">من يحتاج دعمًا</button>
         </div>
-        ${tab === 'roster' ? rosterReport(roster) : ''}
-        ${tab === 'grades' ? gradesReport(roster, items, ctx) : ''}
-        ${tab === 'attendance' ? attendanceReport(cls, roster, ctx) : ''}
-        ${tab === 'support' ? supportReport(roster, items, ctx) : ''}
-        ${reportSignatures({ profile: identity(cls).profile })}
+
+        <!-- شريط الترتيب العام وأدوات العرض -->
+        <div class="grades-toolbar noprint mb-3">
+          <label class="field" style="margin-bottom:0; flex: 1; min-width: 140px;">
+            <select class="select" data-change="sort" aria-label="ترتيب التقرير">
+              <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي</option>
+              <option value="name" ${sortKey === 'name' ? 'selected' : ''}>أبجديًا (اسم الطالب)</option>
+              <option value="roll" ${sortKey === 'roll' ? 'selected' : ''}>حسب رقم الكشف</option>
+              <option value="score_desc" ${sortKey === 'score_desc' ? 'selected' : ''}>الأعلى درجة</option>
+              <option value="score_asc" ${sortKey === 'score_asc' ? 'selected' : ''}>الأقل درجة</option>
+              <option value="absent_desc" ${sortKey === 'absent_desc' ? 'selected' : ''}>الأكثر غيابًا</option>
+            </select>
+          </label>
+          ${tab === 'attendance'
+            ? html`
+                <div class="segmented segmented--sm">
+                  <button class="segmented__btn ${attMode === 'brief' ? 'is-on' : ''}" data-act="att-mode" data-mode="brief">موجز</button>
+                  <button class="segmented__btn ${attMode === 'detailed' ? 'is-on' : ''}" data-act="att-mode" data-mode="detailed">تفصيلي</button>
+                </div>
+              `
+            : ''}
+          <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'}" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة">
+            ${icon('reports')} ${a4Preview ? 'إغلاق المعاينة' : 'معاينة A4'}
+          </button>
+        </div>
+
+        ${a4Preview
+          ? html`
+              <div class="a4-preview-container noprint">
+                <div class="a4-preview-banner">
+                  <span>📄 وضع معاينة صفحة A4 الحقيقية</span>
+                  <button class="btn btn--primary btn--sm" data-act="print">${icon('print')} طباعة المستند الآن</button>
+                </div>
+                <div class="a4-sheet">
+                  ${reportContent}
+                </div>
+              </div>
+            `
+          : ''}
+
+        <div class="${a4Preview ? 'print-only' : ''}">
+          ${reportContent}
+        </div>
+
         <div class="btn-row mt-6 noprint report-actions">
+          <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة ملخص التقرير</button>
+          <button class="btn btn--ghost" data-act="toggle-a4">${icon('reports')} ${a4Preview ? 'الوضع العادي' : 'معاينة A4'}</button>
           <button class="btn btn--ghost" data-act="identity">${icon('edit')} بيانات التقرير والطباعة</button>
-          <button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>
+          <button class="btn btn--ghost" data-act="print">${icon('print')} طباعة</button>
+          <button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>
         </div>
       </article>
     `;
@@ -65,7 +149,74 @@ export default {
 
   actions: {
     tab(el) { tab = el.dataset.tab; repaint(); },
+    sort(el) { sortKey = el.value; repaint(); },
+    'att-mode'(el) { attMode = el.dataset.mode; repaint(); },
+    'toggle-a4'() { a4Preview = !a4Preview; repaint(); },
+    'filter-start'(el) { filterStartDate = el.value; repaint(); },
+    'filter-end'(el) { filterEndDate = el.value; repaint(); },
     print() { window.print(); },
+
+    async share(el, ev, params) {
+      const cls = store.getTeaching(params.id);
+      const { roster, items, ctx } = store.teachingContext(params.id);
+      const section = store.getSection(cls?.sectionId);
+      const subject = store.getSubject(cls?.subjectId);
+      const secLabel = store.sectionLabel(section) ?? '';
+
+      const lines = [
+        `📋 تقرير فصل: ${secLabel} — ${subject?.name ?? ''}`,
+        `👥 عدد الطلاب: ${roster.length}`,
+        '━━━━━━━━━━━━━━━',
+      ];
+
+      if (tab === 'grades') {
+        const totalMax = items.reduce((n, i) => n + i.max, 0);
+        lines.push('📊 ملخص الدرجات:');
+        lines.push(`• إجمالي الدرجة العظمى: ${totalMax}`);
+        const pcts = roster.map((s) => studentTotal(items, ctx[s.id]).pct).filter((p) => p !== null);
+        const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : null;
+        if (avg !== null) lines.push(`• متوسط درجات الفصل: ${avg}%`);
+      } else if (tab === 'attendance') {
+        const dates = store.sessionDates(params.id);
+        lines.push('📅 ملخص الحضور:');
+        lines.push(`• إجمالي الأيام المرصودة: ${dates.length}`);
+      } else if (tab === 'support') {
+        const rows = supportRows(roster, items, ctx);
+        lines.push(`⚠️ الطلاب المحتاجون للمتابعة: ${rows.length} طالبًا`);
+      }
+
+      lines.push('━━━━━━━━━━━━━━━');
+      lines.push('تطبيق رَكيز X للمعلم');
+      const text = lines.join('\n');
+
+      await openSheet({
+        title: 'مشاركة ملخص التقرير',
+        desc: 'نص مختصر وسريع للإرسال عبر واتساب أو الحافظة.',
+        body: html`
+          <div class="share-preview-box">${text}</div>
+          <div class="stack stack-2 mt-3">
+            <button class="btn btn--primary btn--block" id="btn-copy-rep">
+              ${icon('copy')} نسخ النص
+            </button>
+            <a class="btn btn--ghost btn--block" href="https://api.whatsapp.com/send?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">
+              ${icon('share')} إرسال عبر واتساب
+            </a>
+          </div>
+        `,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>`,
+        onMount: (root) => {
+          root.querySelector('#btn-copy-rep')?.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(text);
+              toast('تم نسخ التقرير للحافظة', 'ok');
+            } catch {
+              toast('حدد النص وانسخه يدويًا', 'danger');
+            }
+          });
+        },
+      });
+    },
+
     async identity() {
       const value = await openSheet({
         title: 'بيانات التقرير والطباعة',
@@ -80,6 +231,7 @@ export default {
       const saved = await store.patchDevice({ reportPrincipalName: value });
       toast(saved ? 'حُفظت بيانات التقرير' : 'تعذّر حفظ بيانات التقرير', saved ? undefined : 'danger');
     },
+
     csv(el, ev, params) {
       const cls = store.getTeaching(params.id);
       const { roster, items, ctx } = store.teachingContext(params.id);
@@ -125,10 +277,139 @@ function gradesReport(roster, items, ctx) {
 }
 
 function attendanceReport(cls, roster, ctx) {
-  const dates = store.sessionDates(cls.id);
-  if (!dates.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
-  const shown = dates.slice(0, 20).reverse();
-  return html`<p class="t-3 fs-sm mb-3 noprint">${dates.length} يومًا مرصودًا${dates.length > 20 ? ' — يُعرض آخر ٢٠ يومًا، والتصدير يشملها كلها' : ''}.</p><div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th class="gtable__sticky">الطالب</th>${shown.map((d) => html`<th class="att-col">${fmtDate(d, false)}</th>`)}${ATTENDANCE_ORDER.map((k) => html`<th>${ATTENDANCE[k].label}</th>`)}</tr></thead><tbody>${roster.map((s) => { const byDate = new Map(ctx[s.id].attendance.map((a) => [a.date, a.status])); const tally = { present: 0, late: 0, excused: 0, absent: 0 }; for (const a of ctx[s.id].attendance) tally[a.status] = (tally[a.status] ?? 0) + 1; return html`<tr><th class="gtable__sticky"><span class="gtable__roll tabular">${s.rollNo ?? ''}</span>${s.name}</th>${shown.map((d) => { const state = byDate.get(d); return html`<td class="att-cell ${state ? 'is-' + state : ''}">${state ? ATTENDANCE[state].short : ''}</td>`; })}${ATTENDANCE_ORDER.map((k) => html`<td class="tabular ${k === 'absent' && tally[k] ? 'fw-7' : 't-3'}">${tally[k] || ''}</td>`)}</tr>`; })}</tbody></table></div>`;
+  const allDates = store.sessionDates(cls.id);
+  if (!allDates.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
+
+  let dates = allDates;
+  if (filterStartDate) dates = dates.filter((d) => d >= filterStartDate);
+  if (filterEndDate) dates = dates.filter((d) => d <= filterEndDate);
+
+  if (attMode === 'brief') {
+    return html`
+      <div class="hstack gap-2 mb-3 noprint fs-sm">
+        <label class="field" style="margin-bottom:0">
+          <span class="field__label fs-xs">من تاريخ</span>
+          <input class="input" type="date" value="${filterStartDate}" data-change="filter-start">
+        </label>
+        <label class="field" style="margin-bottom:0">
+          <span class="field__label fs-xs">إلى تاريخ</span>
+          <input class="input" type="date" value="${filterEndDate}" data-change="filter-end">
+        </label>
+      </div>
+      <div class="tablewrap print-tablewrap">
+        <table class="gtable gtable--report">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الطالب</th>
+              <th>نسبة الحضور</th>
+              <th>حضور</th>
+              <th>تأخر</th>
+              <th>استئذان</th>
+              <th>غياب</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${roster.map((s) => {
+              const records = ctx[s.id].attendance.filter((a) => {
+                if (filterStartDate && a.date < filterStartDate) return false;
+                if (filterEndDate && a.date > filterEndDate) return false;
+                return true;
+              });
+              const tally = { present: 0, late: 0, excused: 0, absent: 0 };
+              for (const a of records) tally[a.status] = (tally[a.status] ?? 0) + 1;
+              const total = records.length;
+              const pct = total ? Math.round(((tally.present + tally.late) / total) * 100) : null;
+              return html`
+                <tr>
+                  <td class="tabular">${s.rollNo ?? ''}</td>
+                  <th><a href="#/student/${s.id}">${s.name}</a></th>
+                  <td class="tabular fw-7">${pct !== null ? `${pct}%` : '—'}</td>
+                  <td class="tabular t-3">${tally.present || '—'}</td>
+                  <td class="tabular t-3">${tally.late || '—'}</td>
+                  <td class="tabular t-3">${tally.excused || '—'}</td>
+                  <td class="tabular ${tally.absent ? 'fw-7 is-danger' : 't-3'}">${tally.absent || '—'}</td>
+                </tr>
+              `;
+            })}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Detailed mode with clean ~12 session chunk pagination
+  const CHUNK_SIZE = 12;
+  const allReversed = dates.slice().reverse();
+  const chunks = [];
+  if (allReversed.length === 0) {
+    chunks.push([]);
+  } else {
+    for (let i = 0; i < allReversed.length; i += CHUNK_SIZE) {
+      chunks.push(allReversed.slice(i, i + CHUNK_SIZE));
+    }
+  }
+
+  return html`
+    <div class="hstack gap-2 mb-3 noprint fs-sm">
+      <label class="field" style="margin-bottom:0">
+        <span class="field__label fs-xs">من تاريخ</span>
+        <input class="input" type="date" value="${filterStartDate}" data-change="filter-start">
+      </label>
+      <label class="field" style="margin-bottom:0">
+        <span class="field__label fs-xs">إلى تاريخ</span>
+        <input class="input" type="date" value="${filterEndDate}" data-change="filter-end">
+      </label>
+    </div>
+    <p class="t-3 fs-sm mb-3 noprint">${dates.length} يومًا مرصودًا ${chunks.length > 1 ? `(مُقسّمة إلى ${chunks.length} صفحات طباعة لملائمة مقاس A4)` : ''}.</p>
+
+    ${chunks.map(
+      (chunkDates, chunkIdx) => html`
+        <div class="report-chunk ${chunkIdx < chunks.length - 1 ? 'print-page-break' : ''}">
+          ${chunks.length > 1
+            ? html`
+                <div class="report-chunk__head noprint">
+                  <span class="badge">الصفحة ${chunkIdx + 1} من ${chunks.length}</span>
+                  <span class="fs-xs t-3">الحصص (${chunkIdx * CHUNK_SIZE + 1} إلى ${Math.min((chunkIdx + 1) * CHUNK_SIZE, allReversed.length)})</span>
+                </div>
+              `
+            : ''}
+          <div class="tablewrap scroll-x print-tablewrap">
+            <table class="gtable gtable--report">
+              <thead>
+                <tr>
+                  <th class="gtable__sticky">الطالب</th>
+                  ${chunkDates.map((d) => html`<th class="att-col">${fmtDate(d, false)}</th>`)}
+                  ${chunkIdx === chunks.length - 1
+                    ? ATTENDANCE_ORDER.map((k) => html`<th>${ATTENDANCE[k].label}</th>`)
+                    : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${roster.map((s) => {
+                  const byDate = new Map(ctx[s.id].attendance.map((a) => [a.date, a.status]));
+                  const tally = { present: 0, late: 0, excused: 0, absent: 0 };
+                  for (const a of ctx[s.id].attendance) tally[a.status] = (tally[a.status] ?? 0) + 1;
+                  return html`
+                    <tr>
+                      <th class="gtable__sticky"><span class="gtable__roll tabular">${s.rollNo ?? ''}</span>${s.name}</th>
+                      ${chunkDates.map((d) => {
+                        const state = byDate.get(d);
+                        return html`<td class="att-cell ${state ? 'is-' + state : ''}">${state ? ATTENDANCE[state].short : ''}</td>`;
+                      })}
+                      ${chunkIdx === chunks.length - 1
+                        ? ATTENDANCE_ORDER.map((k) => html`<td class="tabular ${k === 'absent' && tally[k] ? 'fw-7' : 't-3'}">${tally[k] || ''}</td>`)
+                        : ''}
+                    </tr>
+                  `;
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `
+    )}
+  `;
 }
 
 function supportRows(roster, items, ctx) {

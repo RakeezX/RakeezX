@@ -3,9 +3,26 @@
  * خفيف، مقيّد، يحترم prefers-reduced-motion، ولا يسبب أي تزحزح في التخطيط أو تراكم في الـ DOM.
  */
 
+const STORAGE_KEY_EFFECTS = 'rakeez_visual_effects_enabled';
+
 let overlayEl = null;
 
-function isReducedMotion() {
+export function isVisualEffectsEnabled() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_EFFECTS);
+    return stored !== 'false';
+  } catch {
+    return true;
+  }
+}
+
+export function setVisualEffectsEnabled(enabled) {
+  try {
+    localStorage.setItem(STORAGE_KEY_EFFECTS, enabled ? 'true' : 'false');
+  } catch {}
+}
+
+export function isReducedMotion() {
   if (typeof window === 'undefined') return false;
   return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
@@ -88,4 +105,34 @@ export function showWinnerCelebration(stageEl) {
     particle.addEventListener('animationend', cleanup, { once: true });
     setTimeout(cleanup, 1200);
   }
+}
+
+/**
+ * تأثير عائم نقطي (+١ أو −١) عند النقر على بطاقة الرصد السريع.
+ */
+export function showScoreFloatEffect(targetEl, delta) {
+  if (!targetEl || !isVisualEffectsEnabled() || isReducedMotion()) return;
+
+  const overlay = getOverlay();
+  if (!overlay) return;
+
+  const rect = targetEl.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 3;
+
+  const badge = document.createElement('div');
+  const isPos = delta > 0;
+  badge.className = `score-float-badge ${isPos ? 'is-pos' : 'is-neg'}`;
+  badge.textContent = isPos ? `+${delta}` : `${delta}`;
+  badge.style.left = `${centerX}px`;
+  badge.style.top = `${centerY}px`;
+
+  overlay.appendChild(badge);
+
+  const cleanup = () => {
+    badge.remove();
+  };
+
+  badge.addEventListener('animationend', cleanup, { once: true });
+  setTimeout(cleanup, 900);
 }

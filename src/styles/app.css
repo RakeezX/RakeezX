@@ -16,6 +16,13 @@
 
   --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 22px; --r-full: 999px;
 
+  /* أحجام الأيقونات القياسية (Semantic Icon Tokens) */
+  --icon-inline:  15px;
+  --icon-compact: 18px;
+  --icon-control: 20px;
+  --icon-status:  24px;
+  --icon-hero:    36px;
+
   /* أصغر هدف لمس مقبول بإبهام */
   --tap: 44px;
 
@@ -620,6 +627,13 @@ a { color: var(--brand); text-underline-offset: 3px; }
 }
 
 .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* أحجام الأيقونات القياسية */
+.icon--inline  { width: var(--icon-inline); height: var(--icon-inline); display: inline-block; vertical-align: -2.5px; }
+.icon--compact { width: var(--icon-compact); height: var(--icon-compact); }
+.icon--control { width: var(--icon-control); height: var(--icon-control); }
+.icon--status  { width: var(--icon-status); height: var(--icon-status); }
+.icon--hero    { width: var(--icon-hero); height: var(--icon-hero); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

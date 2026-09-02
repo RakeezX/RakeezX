@@ -6,11 +6,14 @@
 import { html, icon, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { LOG_TAGS, netPoints, quickLogAttendanceState, todayISO } from '../models.js';
-import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
+import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
+import { showScoreFloatEffect } from '../lib/effects.js';
 
 let kind = 'participation';   // participation | behavior
 let withReason = false;
+let searchQuery = '';
+let filterStatus = 'all';     // all | logged | unlogged
 
 const KIND_LABEL = { participation: 'المشاركة', behavior: 'سجل السلوك فقط' };
 
@@ -65,6 +68,8 @@ export default {
   onMount() {
     kind = 'participation';
     withReason = false;
+    searchQuery = '';
+    filterStatus = 'all';
     pendingPulse = null;
   },
 
@@ -73,6 +78,7 @@ export default {
     const card = root.querySelector(`#ql-${CSS.escape(pendingPulse.studentId)}`);
     if (card) {
       card.classList.add(pendingPulse.positive ? 'is-plus' : 'is-minus');
+      showScoreFloatEffect(card, pendingPulse.delta);
     }
     pendingPulse = null;
   },
@@ -104,7 +110,26 @@ export default {
 
     const todayTotal = allLogs.filter((l) => l.date === today).length;
     const attendance = quickLogAttendanceState(roster, store.sessionsOnFor(cls.id, today), (sessionId) => store.attendanceIn(sessionId));
-    const displayStudents = [...attendance.filter((entry) => !entry.unavailable), ...attendance.filter((entry) => entry.unavailable)];
+
+    // تصفية وبحث الطلاب
+    const q = searchQuery.trim().toLowerCase();
+    let displayEntries = attendance.filter((entry) => {
+      const s = entry.student;
+      if (q) {
+        const matchesName = (s.name || '').toLowerCase().includes(q);
+        const matchesRoll = String(s.rollNo ?? '').includes(q);
+        if (!matchesName && !matchesRoll) return false;
+      }
+      const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
+      if (filterStatus === 'logged') {
+        if (c.today === 0) return false;
+      } else if (filterStatus === 'unlogged') {
+        if (c.today !== 0) return false;
+      }
+      return true;
+    });
+
+    const displayStudents = [...displayEntries.filter((entry) => !entry.unavailable), ...displayEntries.filter((entry) => entry.unavailable)];
     const unavailableCount = attendance.filter((entry) => entry.unavailable).length;
 
     return html`
@@ -118,6 +143,22 @@ export default {
         )}
       </div>
 
+      <!-- شريط البحث والتصفية -->
+      <div class="quicklog-filter-bar noprint">
+        <div class="quicklog-search">
+          <span class="quicklog-search__icon">${icon('search')}</span>
+          <input class="input" type="search" placeholder="ابحث بالاسم أو رقم الكشف..."
+                 data-input="search" data-fk="quicklog-search"
+                 value="${searchQuery}" aria-label="بحث الطلاب">
+          ${searchQuery ? html`<button class="quicklog-search__clear" data-act="clear-search" aria-label="مسح البحث">${icon('close')}</button>` : ''}
+        </div>
+        <div class="segmented segmented--sm">
+          <button class="segmented__btn ${filterStatus === 'all' ? 'is-on' : ''}" data-act="filter-status" data-status="all">الكل</button>
+          <button class="segmented__btn ${filterStatus === 'logged' ? 'is-on' : ''}" data-act="filter-status" data-status="logged">تم رصدهم</button>
+          <button class="segmented__btn ${filterStatus === 'unlogged' ? 'is-on' : ''}" data-act="filter-status" data-status="unlogged">لم يُرصدوا</button>
+        </div>
+      </div>
+
       <div class="hstack gap-2 mb-3 quicklog__filters">
         <label class="switch">
           <input type="checkbox" data-change="reason" ${withReason ? 'checked' : ''}>
@@ -129,32 +170,36 @@ export default {
       </div>
 
       ${unavailableCount ? html`<div class="hstack gap-2 mb-2 fs-xs t-3"><span>الغياب والاستئذان: <strong class="tabular">${unavailableCount}</strong></span></div>` : ''}
-      <div class="ql-grid">
-        ${displayStudents.map(({ student: s, status, unavailable }) => {
-          const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
-          const tone = unavailable ? 'is-unavail' : c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
-          const statusBadge = status === 'absent' ? html`<span class="qlcard__status badge badge--danger">غائب</span>` : status === 'excused' ? html`<span class="qlcard__status badge badge--warn">مستأذن</span>` : '';
-          return html`
-            <div class="qlcard ${tone}" id="ql-${s.id}">
-              <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
-                      aria-label="نقطة لـ ${s.name}">
-                <div class="qlcard__head">
-                  ${studentAvatar(s, 'xs')}
-                  ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
-                  <span class="qlcard__name">${s.name}</span>
-                  ${statusBadge}
-                </div>
-                <div class="qlcard__foot">
-                  <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
-                  <span class="qlcard__today tabular">${c.today ? (c.today > 0 ? '+' : '') + c.today + ' اليوم' : ''}</span>
-                </div>
-              </button>
-              <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
-                      aria-label="خصم من ${s.name}">${icon('minus')}</button>
+
+      ${displayStudents.length === 0
+        ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للبحث أو التصفية</div></div>`
+        : html`
+            <div class="ql-grid">
+              ${displayStudents.map(({ student: s, status, unavailable }) => {
+                const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
+                const tone = unavailable ? 'is-unavail' : c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
+                const statusBadge = status === 'absent' ? html`<span class="qlcard__status badge badge--danger">غائب</span>` : status === 'excused' ? html`<span class="qlcard__status badge badge--warn">مستأذن</span>` : '';
+                return html`
+                  <div class="qlcard ${tone}" id="ql-${s.id}">
+                    <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
+                            aria-label="نقطة لـ ${s.name}">
+                      <div class="qlcard__head">
+                        ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
+                        <span class="qlcard__name">${s.name}</span>
+                        ${statusBadge}
+                      </div>
+                      <div class="qlcard__foot">
+                        <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
+                        <span class="qlcard__today tabular">${c.today ? (c.today > 0 ? '+' : '') + c.today + ' اليوم' : ''}</span>
+                      </div>
+                    </button>
+                    <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
+                            aria-label="خصم من ${s.name}">${icon('minus')}</button>
+                  </div>
+                `;
+              })}
             </div>
-          `;
-        })}
-      </div>
+          `}
       <p class="t-3 fs-sm center mt-6">
         نقرة على الطالب = نقطة. النقاط تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.
       </p>
@@ -167,15 +212,32 @@ export default {
       repaint();
     },
 
+    search(el) {
+      searchQuery = el.value;
+      repaint();
+    },
+
+    'clear-search'() {
+      searchQuery = '';
+      repaint();
+    },
+
+    'filter-status'(el) {
+      filterStatus = el.dataset.status;
+      repaint();
+    },
+
     reason(el) {
       withReason = el.checked;
     },
 
     async plus(el, ev, params) {
+      playQuickLogPlus();
       await record(params.id, el.dataset.id, +1);
     },
 
     async minus(el, ev, params) {
+      playQuickLogMinus();
       await record(params.id, el.dataset.id, -1);
     },
 
@@ -203,7 +265,7 @@ async function record(teachingId, studentId, delta) {
     if (res === undefined) return;
     tag = res.tag ?? '';
   }
-  pendingPulse = { studentId, positive: delta > 0 };
+  pendingPulse = { studentId, positive: delta > 0, delta };
   if (navigator.vibrate) navigator.vibrate(delta > 0 ? 12 : [8, 40, 8]);
   await store.addLog({ teachingId, studentId, kind, delta, tag });
 }

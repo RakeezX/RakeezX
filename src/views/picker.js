@@ -6,7 +6,7 @@
 
 import { html, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { todayISO } from '../models.js';
+import { todayISO, quickLogAttendanceState } from '../models.js';
 import { repaint } from '../repaint.js';
 import { playPickerSpin, playPickerWinner } from '../lib/sound.js';
 import { showWinnerCelebration } from '../lib/effects.js';
@@ -20,9 +20,19 @@ let round = 1;
 let currentClassId = null;
 let spinTimer = null;
 let pendingWinner = false;
+let includeAbsent = false; // افتراضيًا: استبعاد الغائبين والمستأذنين
+
+function getAvailableStudents(classId) {
+  const roster = store.students(classId);
+  if (includeAbsent) return roster;
+  const today = todayISO();
+  const sessions = store.sessionsOnFor(classId, today);
+  const attendance = quickLogAttendanceState(roster, sessions, (sessionId) => store.attendanceIn(sessionId));
+  return attendance.filter((a) => !a.unavailable).map((a) => a.student);
+}
 
 function reset(classId) {
-  pool = store.students(classId).map((s) => s.id);
+  pool = getAvailableStudents(classId).map((s) => s.id);
   picked = null;
   history = [];
   round = 1;
@@ -30,10 +40,13 @@ function reset(classId) {
 }
 
 function ensure(classId) {
-  if (currentClassId !== classId) reset(classId);
-  // طلاب أُضيفوا بعد بدء الجولة
+  if (currentClassId !== classId) {
+    reset(classId);
+    return;
+  }
+  const available = getAvailableStudents(classId);
   const known = new Set([...pool, ...history]);
-  for (const s of store.students(classId)) {
+  for (const s of available) {
     if (!known.has(s.id)) pool.push(s.id);
   }
 }
@@ -79,6 +92,8 @@ export default {
     }
 
     ensure(cls.id);
+    const available = getAvailableStudents(cls.id);
+    const excludedCount = roster.length - available.length;
     const student = picked ? store.getStudent(picked) : null;
 
     return html`
@@ -93,15 +108,23 @@ export default {
             : html`<div class="picker__idle">اضغط للقرعة</div>`}
         </div>
 
-        <button class="btn btn--primary btn--lg btn--block picker__go" data-act="spin" ${spinning ? 'disabled' : ''}>
+        <button class="btn btn--primary btn--lg btn--block picker__go" data-act="spin" ${spinning || !available.length ? 'disabled' : ''}>
           ${icon('picker')} ${picked ? 'التالي' : 'ابدأ القرعة'}
         </button>
 
         <div class="hstack gap-2 mt-4 fs-sm t-3">
           <span>الجولة <span class="tabular fw-7">${round}</span></span>
           <span class="push">
-            بقي <span class="tabular fw-7">${pool.length}</span> من <span class="tabular">${roster.length}</span>
+            بقي <span class="tabular fw-7">${pool.length}</span> من <span class="tabular">${available.length}</span>
+            ${excludedCount > 0 ? html`<span class="fs-xs t-3"> (استُبعد ${excludedCount} غياب/استئذان)</span>` : ''}
           </span>
+        </div>
+
+        <div class="hstack gap-2 mt-3 fs-xs noprint">
+          <label class="switch">
+            <input type="checkbox" data-change="toggle-absent" ${includeAbsent ? 'checked' : ''}>
+            <span>تضمين الغائبين والمستأذنين</span>
+          </label>
         </div>
 
         ${picked
@@ -133,13 +156,25 @@ export default {
   },
 
   actions: {
+    'toggle-absent'(el, ev, params) {
+      includeAbsent = el.checked;
+      reset(params.id);
+      repaint();
+    },
+
     spin(el, ev, params) {
       if (spinning) return;
       ensure(params.id);
 
+      const available = getAvailableStudents(params.id);
+      if (!available.length) {
+        toast('لا يوجد طلاب متاحون للقرعة', 'danger');
+        return;
+      }
+
       if (!pool.length) {
         // اكتملت الجولة — ابدأ جولة جديدة
-        pool = store.students(params.id).map((s) => s.id);
+        pool = available.map((s) => s.id);
         history = [];
         round++;
         toast(`اكتملت الجولة — بدأت الجولة ${round}`);
@@ -148,14 +183,15 @@ export default {
       spinning = true;
       repaint();
 
-      // دوران قصير يعطي الطلاب لحظة ترقّب
+      // دوران أطول يمنح ترقبًا ممتعًا (زيادة ١-٢ ثانية)
       let ticks = 0;
+      const totalTicks = 18;
       clearInterval(spinTimer);
       spinTimer = setInterval(() => {
         picked = pool[shuffleIndex(pool.length)];
         playPickerSpin();
         repaint();
-        if (++ticks >= 8) {
+        if (++ticks >= totalTicks) {
           clearInterval(spinTimer);
           spinTimer = null;
           const chosen = pool[shuffleIndex(pool.length)];
@@ -168,7 +204,7 @@ export default {
           if (navigator.vibrate) navigator.vibrate(20);
           repaint();
         }
-      }, 70);
+      }, 95);
     },
 
     async award(el, ev, params) {

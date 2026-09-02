@@ -11,6 +11,11 @@ import { setRepaint } from './repaint.js';
 
 const app = document.getElementById('app');
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.deferredInstallPrompt = e;
+});
+
 // Expose for E2E tests ONLY in Vite development. Static hosting does not
 // provide import.meta.env, so this must remain safe in the raw ESM build.
 if (import.meta.env?.DEV) {

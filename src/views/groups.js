@@ -4,40 +4,90 @@
  * فلا تجتمع القوة في مجموعة والضعف في أخرى.
  */
 
-import { html, icon, toast, fmtPct } from '../lib/dom.js';
+import { html, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal } from '../models.js';
-import { studentAvatar } from '../lib/avatar.js';
+import { studentTotal, todayISO, quickLogAttendanceState } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let size = 4;
 let mode = 'balanced';   // balanced | random
 let groups = [];
+let includeAbsent = false;
+let selectedStudent = null; // { id, name, fromIdx } for mobile / touch tap-to-move
+let draggedData = null;     // Robust in-memory transfer for HTML5 drag-and-drop
+let isDragging = false;
 
 const GROUP_NAMES = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة',
                      'السابعة', 'الثامنة', 'التاسعة', 'العاشرة', 'الحادية عشرة', 'الثانية عشرة'];
+
+function savedGroupsFor(classId) {
+  const saved = store.state.device?.groupArrangements?.[classId];
+  if (!Array.isArray(saved) || !saved.length) return [];
+
+  const roster = store.students(classId);
+  const byId = new Map(roster.map((student) => [student.id, student]));
+  const seen = new Set();
+  const restored = saved.map((group) => (Array.isArray(group) ? group : [])
+    .map((id) => byId.get(id))
+    .filter((student) => student && !seen.has(student.id) && seen.add(student.id)));
+
+  for (const student of roster) {
+    if (seen.has(student.id)) continue;
+    const target = restored.reduce(
+      (smallest, group, index) => group.length < restored[smallest].length ? index : smallest,
+      0,
+    );
+    if (restored.length) restored[target].push(student);
+  }
+  return restored;
+}
+
+async function persistGroups(classId) {
+  if (!classId) return;
+  const groupArrangements = {
+    ...(store.state.device?.groupArrangements ?? {}),
+    [classId]: groups.map((group) => group.map((student) => student.id)),
+  };
+  await store.patchDevice({ groupArrangements });
+}
+
+function displayedGroups(classId) {
+  if (includeAbsent) return groups;
+  const availableIds = new Set(getAvailableStudents(classId).map((student) => student.id));
+  return groups.map((group) => group.filter((student) => availableIds.has(student.id)));
+}
 
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+    [a[j], a[i]] = [a[i], a[j]];
   }
   return a;
 }
 
-function build(classId) {
-  const { roster, items, ctx } = store.teachingContext(classId);
-  if (!roster.length) return [];
+function getAvailableStudents(classId) {
+  const roster = store.students(classId);
+  if (includeAbsent) return roster;
+  const today = todayISO();
+  const sessions = store.sessionsOnFor(classId, today);
+  const attendance = quickLogAttendanceState(roster, sessions, (sessionId) => store.attendanceIn(sessionId));
+  return attendance.filter((a) => !a.unavailable).map((a) => a.student);
+}
 
-  const count = Math.max(1, Math.ceil(roster.length / size));
+function build(classId, { includeUnavailable = false } = {}) {
+  const { items, ctx } = store.teachingContext(classId);
+  const availableRoster = includeUnavailable ? store.students(classId) : getAvailableStudents(classId);
+  if (!availableRoster.length) return [];
+
+  const count = Math.max(1, Math.ceil(availableRoster.length / size));
   const buckets = Array.from({ length: count }, () => []);
 
   if (mode === 'random') {
-    shuffle(roster).forEach((s, i) => buckets[i % count].push(s));
+    shuffle(availableRoster).forEach((s, i) => buckets[i % count].push(s));
   } else {
     // رتّب بالأداء ثم وزّع ذهابًا وإيابًا
-    const ranked = roster
+    const ranked = availableRoster
       .map((s) => ({ s, pct: studentTotal(items, ctx[s.id]).pct ?? -1 }))
       .sort((a, b) => b.pct - a.pct)
       .map((x) => x.s);
@@ -55,13 +105,35 @@ function build(classId) {
   return buckets.filter((b) => b.length);
 }
 
+async function moveStudent(studentId, fromIdx, toIdx, classId) {
+  if (isNaN(fromIdx) || isNaN(toIdx) || !groups[fromIdx] || !groups[toIdx] || fromIdx === toIdx) return;
+  const sIdx = groups[fromIdx].findIndex((s) => s.id === studentId);
+  if (sIdx === -1) return;
+
+  const [student] = groups[fromIdx].splice(sIdx, 1);
+  // Ensure absolute duplicate prevention across all groups
+  for (let i = 0; i < groups.length; i++) {
+    groups[i] = groups[i].filter((s) => s.id !== student.id);
+  }
+  groups[toIdx].push(student);
+
+  await persistGroups(classId);
+
+  selectedStudent = null;
+  toast(`نُقل ${student.name} إلى المجموعة ${GROUP_NAMES[toIdx] ?? toIdx + 1}`);
+  repaint();
+}
+
 export default {
   title: () => 'المجموعات',
   subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
   back: (p) => `#/teaching/${p.id}`,
 
-  onMount() {
-    groups = [];
+  onMount(root, p) {
+    groups = p?.id ? savedGroupsFor(p.id) : [];
+    selectedStudent = null;
+    draggedData = null;
+    isDragging = false;
   },
 
   render(p) {
@@ -79,8 +151,13 @@ export default {
       `;
     }
 
-    const count = Math.ceil(roster.length / size);
-    const { items, ctx } = store.teachingContext(cls.id);
+    const persisted = savedGroupsFor(cls.id);
+    if (persisted.length) groups = persisted;
+
+    const available = getAvailableStudents(cls.id);
+    const excludedCount = roster.length - available.length;
+    const count = Math.ceil(available.length / size);
+    const visibleGroups = displayedGroups(cls.id);
 
     return html`
       <div class="card card--pad mb-3">
@@ -96,11 +173,11 @@ export default {
             )}
           </div>
           <div class="field__hint">
-            ${roster.length} طالبًا → <span class="tabular">${count}</span> مجموعات
+            ${available.length} طالبًا متاحًا ${excludedCount > 0 ? `(استُبعد ${excludedCount} غياب/استئذان)` : ''} → <span class="tabular">${count}</span> مجموعات
           </div>
         </div>
 
-        <div class="field" style="margin-bottom:0">
+        <div class="field">
           <span class="field__label">طريقة التقسيم</span>
           <div class="segmented">
             <button class="segmented__btn ${mode === 'balanced' ? 'is-on' : ''}" data-act="mode" data-mode="balanced">
@@ -116,37 +193,73 @@ export default {
               : 'خلط كامل بلا نظر إلى المستوى.'}
           </div>
         </div>
+
+        <div class="hstack gap-2 mt-3 fs-xs noprint">
+          <label class="switch">
+            <input type="checkbox" data-change="toggle-absent" ${includeAbsent ? 'checked' : ''}>
+            <span>تضمين الغائبين والمستأذنين</span>
+          </label>
+        </div>
       </div>
 
       <button class="btn btn--primary btn--block mb-3" data-act="make">
         ${icon('groups')} ${groups.length ? 'أعد التقسيم' : 'قسّم المجموعات'}
       </button>
 
+      ${selectedStudent
+        ? html`
+            <div class="card card--pad mb-3 hstack gap-3 justify-between" style="border-color: var(--brand); background: var(--brand-soft);">
+              <div class="hstack gap-2">
+                ${icon('spark')}
+                <div>
+                  <span class="fw-7">تحديد:</span>
+                  <span>${selectedStudent.name}</span>
+                  <span class="t-3 fs-xs">(انقر على أي مجموعة لنقله إليها)</span>
+                </div>
+              </div>
+              <button class="btn btn--ghost btn--sm" data-act="cancel-select">إلغاء</button>
+            </div>
+          `
+        : ''}
+
       ${groups.length
         ? html`
-            <div class="grid grid--auto">
-              ${groups.map(
+            <div class="groups-grid" id="groups-container">
+              ${visibleGroups.map(
                 (g, i) => html`
-                  <div class="card card--pad group">
+                  <div class="card card--pad group"
+                       data-group-idx="${i}"
+                       data-teaching-id="${cls.id}">
                     <div class="group__head">
                       المجموعة ${GROUP_NAMES[i] ?? i + 1}
                       <span class="badge tabular">${g.length}</span>
                     </div>
                     <div class="stack stack-2 mt-3">
-                      ${g.map((s) => {
-                        const pct = studentTotal(items, ctx[s.id]).pct;
-                        return html`
-                          <div class="group__member">
-                            <span class="rollno">${s.rollNo ?? '—'}</span>
-                            ${studentAvatar(s, 'xs')}
-                            <span class="truncate">${s.name}</span>
-                            ${pct !== null
-                              ? html`<span class="push t-3 fs-sm tabular">${fmtPct(pct)}</span>`
-                              : ''}
-                          </div>
-                        `;
-                      })}
+                      ${g.map((s) => html`
+                        <div class="group__member ${selectedStudent?.id === s.id ? 'is-selected' : ''}"
+                             draggable="true"
+                             data-student-id="${s.id}"
+                             data-student-name="${s.name}"
+                             data-from-idx="${i}"
+                             data-teaching-id="${cls.id}"
+                             data-act="toggle-student"
+                             title="اسحب أو انقر لنقل الطالب">
+                          <span class="rollno">${s.rollNo ?? '—'}</span>
+                          <span class="group__member-name">${s.name}</span>
+                          <span class="group__drag-handle noprint">${icon('menu')}</span>
+                        </div>
+                      `)}
                     </div>
+                    ${selectedStudent && selectedStudent.fromIdx !== i
+                      ? html`
+                          <button class="group__target-btn noprint"
+                                  data-act="move-here"
+                                  data-to-idx="${i}"
+                                  data-teaching-id="${cls.id}">
+                            ${icon('check')} نقل ${selectedStudent.name} إلى هنا
+                          </button>
+                        `
+                      : ''}
                   </div>
                 `
               )}
@@ -157,23 +270,136 @@ export default {
     `;
   },
 
+  afterPaint(root, params) {
+    this.bindDragAndDrop(root, params);
+  },
+
+  onRender(root, params) {
+    this.bindDragAndDrop(root, params);
+  },
+
+  bindDragAndDrop(root, params) {
+    const container = root.querySelector('#groups-container');
+    if (!container) return;
+
+    // Desktop Drag and Drop Event Listeners
+    const members = container.querySelectorAll('.group__member');
+    members.forEach((el) => {
+      el.addEventListener('dragstart', (e) => {
+        isDragging = true;
+        const studentId = el.dataset.studentId;
+        const fromIdx = el.dataset.fromIdx;
+        const teachingId = el.dataset.teachingId || params?.id;
+        draggedData = { studentId, fromIdx: Number(fromIdx), teachingId };
+
+        try {
+          e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+          e.dataTransfer.setData('application/json', JSON.stringify(draggedData));
+          e.dataTransfer.effectAllowed = 'move';
+        } catch {}
+        el.classList.add('is-dragging');
+      });
+
+      el.addEventListener('dragend', () => {
+        el.classList.remove('is-dragging');
+        setTimeout(() => {
+          isDragging = false;
+        }, 100);
+        draggedData = null;
+        container.querySelectorAll('.group').forEach((g) => g.classList.remove('is-dragover'));
+      });
+    });
+
+    const groupCards = container.querySelectorAll('.group');
+    groupCards.forEach((card) => {
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        try {
+          e.dataTransfer.dropEffect = 'move';
+        } catch {}
+        card.classList.add('is-dragover');
+      });
+
+      card.addEventListener('dragleave', (e) => {
+        if (!card.contains(e.relatedTarget)) {
+          card.classList.remove('is-dragover');
+        }
+      });
+
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('is-dragover');
+        let data = draggedData;
+        if (!data) {
+          try {
+            const raw = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('application/json');
+            if (raw) data = JSON.parse(raw);
+          } catch {}
+        }
+
+        const toIdx = Number(card.dataset.groupIdx);
+        const fromIdx = data ? Number(data.fromIdx) : NaN;
+        const studentId = data ? data.studentId : null;
+        const teachingId = data?.teachingId || params?.id;
+
+        if (studentId && !isNaN(toIdx) && !isNaN(fromIdx) && fromIdx !== toIdx) {
+          moveStudent(studentId, fromIdx, toIdx, teachingId);
+        }
+        draggedData = null;
+      });
+    });
+  },
+
   actions: {
+    'toggle-absent'(el) {
+      includeAbsent = el.checked;
+      selectedStudent = null;
+      repaint();
+    },
+
     size(el) {
       size = Number(el.dataset.n);
-      groups = [];
+      selectedStudent = null;
       repaint();
     },
 
     mode(el) {
       mode = el.dataset.mode;
-      groups = [];
+      selectedStudent = null;
       repaint();
     },
 
-    make(el, ev, params) {
-      groups = build(params.id);
+    async make(el, ev, params) {
+      selectedStudent = null;
+      groups = build(params.id, { includeUnavailable: true });
+      await persistGroups(params.id);
       toast(`قُسّم الفصل إلى ${groups.length} مجموعات`);
       repaint();
+    },
+
+    'toggle-student'(el) {
+      if (isDragging) return;
+      const studentId = el.dataset.studentId;
+      const studentName = el.dataset.studentName;
+      const fromIdx = Number(el.dataset.fromIdx);
+
+      if (selectedStudent?.id === studentId) {
+        selectedStudent = null;
+      } else {
+        selectedStudent = { id: studentId, name: studentName, fromIdx };
+      }
+      repaint();
+    },
+
+    'cancel-select'() {
+      selectedStudent = null;
+      repaint();
+    },
+
+    async 'move-here'(el, ev, params) {
+      if (!selectedStudent) return;
+      const toIdx = Number(el.dataset.toIdx);
+      await moveStudent(selectedStudent.id, selectedStudent.fromIdx, toIdx, params?.id || el.dataset.teachingId);
     },
 
     print() {
