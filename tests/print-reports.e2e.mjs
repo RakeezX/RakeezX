@@ -60,7 +60,7 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   expect(await downloadText(rosterFile)).toContain('أحمد محمد');
 
   await page.locator('[data-act="tab"][data-tab="attendance"]').click();
-  await expect(page.locator('.gtable--report')).toContainText('غائب');
+  await expect(page.locator('.gtable--report')).toContainText('غياب');
   const attendanceDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'تصدير CSV' }).click();
   const attendanceFile = await attendanceDownload;
