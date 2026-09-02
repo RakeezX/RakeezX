@@ -915,7 +915,7 @@ export async function editSection(id, data) {
   const { makeSection } = await import('./models.js');
   const name = `${data.grade}/${data.label}`;
   const updated = makeSection({ ...existing, ...data, name, id });
-  await patch('sections', id, { grade: updated.grade, label: updated.label, name: updated.name });
+  await patch('sections', id, { grade: updated.grade, label: updated.label, name: updated.name, color: updated.color });
   return updated;
 }
 

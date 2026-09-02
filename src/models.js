@@ -130,7 +130,48 @@ export const gradeLabel = (v) => GRADES.find((g) => g.v === Number(v))?.label ??
 
 export const sectionLabel = (sec) => sec ? `${gradeLabel(sec.grade)} / ${sec.label}` : '';
 
-export const SECTION_COLORS = ['#0f766e', '#1d4ed8', '#7c3aed', '#be123c', '#b45309', '#0369a1', '#4d7c0f', '#9d174d'];
+export const SECTION_COLORS = [
+  '#0d9488',
+  '#2563eb',
+  '#7c3aed',
+  '#e11d48',
+  '#d97706',
+  '#059669',
+  '#ea580c',
+  '#0284c7',
+  '#c026d3',
+  '#4f46e5',
+  '#65a30d',
+  '#9f1239',
+  '#581c87',
+  '#9a3412',
+  '#065f46',
+  '#475569',
+];
+
+/**
+ * اختيار تلقائي للون الشعبة عند إنشاء فصل جديد.
+ * يفضّل الألوان غير المستخدمة في الشعب الحالية، ثم الأقل استخدامًا، بالترتيب المعتمد للوحة الألوان.
+ */
+export function autoAssignSectionColor(existingSections = []) {
+  const usedCounts = new Map();
+  for (const c of SECTION_COLORS) usedCounts.set(c, 0);
+  for (const s of existingSections) {
+    if (s?.color && usedCounts.has(s.color)) {
+      usedCounts.set(s.color, usedCounts.get(s.color) + 1);
+    }
+  }
+  let minCount = Infinity;
+  let bestColor = SECTION_COLORS[0];
+  for (const c of SECTION_COLORS) {
+    const count = usedCounts.get(c) || 0;
+    if (count < minCount) {
+      minCount = count;
+      bestColor = c;
+    }
+  }
+  return bestColor;
+}
 
 const HEX_COLOR = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
 

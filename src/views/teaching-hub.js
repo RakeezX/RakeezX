@@ -2,7 +2,7 @@
 
 import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
-import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES } from '../models.js';
+import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES, SECTION_COLORS, safeColor } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 
@@ -233,10 +233,11 @@ export default {
       const tch = store.getTeaching(params.id);
       if (!tch) return;
       const sec = store.getSection(tch.sectionId);
+      if (!sec) return;
       
       const data = await new Promise(resolve => {
         openSheet({
-          title: 'تعديل بيانات الشعبة',
+          title: 'تعديل الفصل',
           body: html`
             <form id="edit-sec-form">
               <div class="field-row">
@@ -251,6 +252,28 @@ export default {
                   <input class="input" name="label" value="${sec.label}" required maxlength="8" autocomplete="off">
                 </label>
               </div>
+              <div class="field">
+                <span class="field__label">لون الفصل</span>
+                <div class="hstack gap-3 align-center">
+                  <span id="sec-color-preview" class="color-preview-dot" style="background:${safeColor(sec.color)};" aria-hidden="true"></span>
+                  <button type="button" class="btn btn--sm btn--ghost" id="btn-toggle-color-picker">
+                    ${icon('palette')} تغيير اللون
+                  </button>
+                </div>
+                <input type="hidden" name="color" id="sec-color-input" value="${safeColor(sec.color)}">
+                <div id="sec-color-popover" class="color-picker-popover mt-2" style="display: none;">
+                  <div class="color-picker-popover__title fs-xs t-3 mb-2">اختر لونًا لتمييز الفصل:</div>
+                  <div class="color-picker-grid">
+                    ${SECTION_COLORS.map(
+                      (col) => html`
+                        <button type="button" class="color-picker-cell ${safeColor(sec.color) === col ? 'is-selected' : ''}" data-color="${col}" aria-label="لون ${col}">
+                          <span style="background:${col}"></span>
+                        </button>
+                      `
+                    )}
+                  </div>
+                </div>
+              </div>
             </form>
           `,
           foot: html`
@@ -258,12 +281,36 @@ export default {
             <button class="btn btn--primary" form="edit-sec-form" type="submit">حفظ التغييرات</button>
           `,
           onMount: (root, done) => {
-            root.querySelector('#edit-sec-form').addEventListener('submit', (ev) => {
+            const form = root.querySelector('#edit-sec-form');
+            const preview = root.querySelector('#sec-color-preview');
+            const toggleBtn = root.querySelector('#btn-toggle-color-picker');
+            const popover = root.querySelector('#sec-color-popover');
+            const input = root.querySelector('#sec-color-input');
+
+            toggleBtn?.addEventListener('click', () => {
+              const isHidden = popover.style.display === 'none';
+              popover.style.display = isHidden ? 'block' : 'none';
+            });
+
+            popover?.querySelectorAll('.color-picker-cell').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const col = btn.dataset.color;
+                input.value = col;
+                preview.style.background = col;
+                popover.querySelectorAll('.color-picker-cell').forEach((b) => {
+                  b.classList.toggle('is-selected', b.dataset.color === col);
+                });
+                popover.style.display = 'none';
+              });
+            });
+
+            form?.addEventListener('submit', (ev) => {
               ev.preventDefault();
               const fd = new FormData(ev.target);
               done({
                 grade: Number(fd.get('grade')),
-                label: String(fd.get('label')).trim()
+                label: String(fd.get('label')).trim(),
+                color: String(input?.value || fd.get('color') || sec.color || SECTION_COLORS[0]),
               });
             });
           }
@@ -273,7 +320,7 @@ export default {
       if (!data) return;
       try {
         await store.editSection(sec.id, data);
-        toast('تم تعديل الشعبة بنجاح');
+        toast('تم تعديل بيانات الفصل بنجاح');
         // trigger re-render
         repaint();
       } catch (err) {

@@ -10,7 +10,7 @@ import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
-  GRADES, SECTION_COLORS, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
+  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel
 } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
@@ -18,6 +18,7 @@ import { repaint } from '../repaint.js';
 function sheet(existing = null) {
   const secs = store.sections();
   const subs = store.subjects();
+  const autoColor = autoAssignSectionColor(secs);
   const c = existing
     ? {
         grade: store.getSection(existing.sectionId)?.grade ?? 4,
@@ -25,7 +26,7 @@ function sheet(existing = null) {
         color: store.getSection(existing.sectionId)?.color ?? SECTION_COLORS[0],
         subjectId: existing.subjectId,
       }
-    : { grade: 4, label: 'أ', color: SECTION_COLORS[0], subjectId: subs[0]?.id };
+    : { grade: 4, label: 'أ', color: autoColor, subjectId: subs[0]?.id };
 
   return openSheet({
     title: existing ? 'تعديل الفصل' : 'فصل جديد',
@@ -58,19 +59,23 @@ function sheet(existing = null) {
           <span class="field__hint">المنهج يتبع المادة والصف — فدرس الوحدة الأولى واحد لكل شعبك.</span>
         </label>
 
-        <div class="field">
-          <span class="field__label">لون الشعبة</span>
-          <div class="hstack gap-2 wrap">
-            ${SECTION_COLORS.map(
-              (col) => html`
-                <label class="swatch">
-                  <input type="radio" name="color" value="${col}" ${safeColor(c.color) === col ? 'checked' : ''}>
-                  <span style="background:${col}"></span>
-                </label>
-              `
-            )}
-          </div>
-        </div>
+        ${existing
+          ? html`
+              <div class="field">
+                <span class="field__label">لون الشعبة</span>
+                <div class="hstack gap-2 wrap">
+                  ${SECTION_COLORS.map(
+                    (col) => html`
+                      <label class="swatch">
+                        <input type="radio" name="color" value="${col}" ${safeColor(c.color) === col ? 'checked' : ''}>
+                        <span style="background:${col}"></span>
+                      </label>
+                    `
+                  )}
+                </div>
+              </div>
+            `
+          : html`<input type="hidden" name="color" value="${autoColor}">`}
       </form>
     `,
     foot: html`
@@ -86,7 +91,7 @@ function sheet(existing = null) {
         done({
           grade: Number(fd.get('grade')),
           label,
-          color: String(fd.get('color') ?? SECTION_COLORS[0]),
+          color: String(fd.get('color') ?? autoColor ?? SECTION_COLORS[0]),
           subjectId: String(fd.get('subjectId') ?? ''),
         });
       });
@@ -397,7 +402,7 @@ export default {
         return;
       }
 
-      const col = SECTION_COLORS[Math.floor(Math.random() * SECTION_COLORS.length)];
+      const col = safeColor(data.color, autoAssignSectionColor(store.sections()));
       const sec = await store.createSection({
         yearId: year.id, grade: data.grade, label: data.label,
         name: `${data.grade}/${data.label}`, color: col

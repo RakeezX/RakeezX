@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import "fake-indexeddb/auto";
 global.document = { documentElement: { setAttribute: () => {}, removeAttribute: () => {} }, querySelector: () => ({ setAttribute: () => {} }) };
 global.matchMedia = () => ({ matches: false });
-import { makeSection, sectionLabel, makeStudent, makeEnrollment, makeTeaching, makeSlot, makeSession, makeItem } from '../src/models.js';
+import { makeSection, sectionLabel, makeStudent, makeEnrollment, makeTeaching, makeSlot, makeSession, makeItem, autoAssignSectionColor, SECTION_COLORS } from '../src/models.js';
 import * as store from '../src/store.js';
 
 test('Section model and UI labels', (t) => {
@@ -13,6 +13,23 @@ test('Section model and UI labels', (t) => {
   assert.equal(sec.label, 'أ');
   assert.equal(sectionLabel(sec), 'الرابع الابتدائي / أ');
   assert.ok(sec.id.startsWith('sec:'), `Expected ID to start with 'sec:' but got: ${sec.id}`);
+});
+
+test('autoAssignSectionColor assigns least used or first available palette color with 16 curated colors', () => {
+  assert.equal(SECTION_COLORS.length, 16, 'Canonical palette must contain exactly 16 colors');
+  assert.equal(autoAssignSectionColor([]), SECTION_COLORS[0]);
+
+  // 16 unique classes get 16 distinct colors without repetition
+  const assigned = [];
+  for (let i = 0; i < 16; i++) {
+    const nextColor = autoAssignSectionColor(assigned);
+    assert.equal(nextColor, SECTION_COLORS[i], `Class ${i + 1} should receive palette color ${i}`);
+    assigned.push({ color: nextColor });
+  }
+
+  // 17th class re-uses least-used color (starts from SECTION_COLORS[0])
+  const seventeenthColor = autoAssignSectionColor(assigned);
+  assert.equal(seventeenthColor, SECTION_COLORS[0], '17th class should pick least used color');
 });
 
 test('Section editing preserves relationships and history', async (t) => {

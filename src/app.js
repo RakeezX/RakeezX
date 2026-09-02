@@ -2,7 +2,7 @@
  * RAKEEZ X — غلاف التطبيق: الإقلاع، والهيكل، وتوجيه الشاشات، وإعادة الرسم.
  */
 
-import { html, render, icon, delegate, toast, openSheet } from './lib/dom.js';
+import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
@@ -27,6 +27,187 @@ let ctx = null;
 let mainEl = null;
 let syncModule = null;
 const scrollMemory = new Map();
+
+/* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
+
+function isStandaloneMode() {
+  if (typeof window === 'undefined') return false;
+  return !!(window.matchMedia?.('(display-mode: standalone)').matches ||
+    navigator.standalone === true ||
+    document.referrer?.includes('android-app://'));
+}
+
+function teacherInitials(name) {
+  const clean = String(name ?? '').trim();
+  if (!clean || clean === 'المعلّم') return 'م';
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0]} ${parts[1][0]}`;
+  return parts[0].slice(0, 2);
+}
+
+function getSyncState() {
+  const status = syncModule?.state?.status ?? 'idle';
+  const labels = {
+    synced:  { text: 'متزامن', badge: 'badge--brand', label: 'كافة البيانات متزامنة مع السحابة' },
+    syncing: { text: 'جارٍ المزامنة...', badge: 'badge--brand', label: 'جارٍ نقل وتحديث البيانات سحابيًا' },
+    pending: { text: 'تغييرات بانتظار المزامنة', badge: 'badge--warn', label: 'توجد تعديلات محلية بانتظار رفعها' },
+    offline: { text: 'غير متصل (حفظ محلي)', badge: 'badge--neutral', label: 'التطبيق يعمل دون إنترنت ويحفظ محليًا' },
+    error:   { text: 'تعذر إكمال المزامنة', badge: 'badge--danger', label: 'حدث خطأ في الاتصال، ستتم إعادة المحاولة' },
+    idle:    { text: 'محلي', badge: 'badge--neutral', label: 'البيانات محفوظة محليًا على هذا الجهاز' },
+  };
+  return {
+    status,
+    ...(labels[status] || labels.idle),
+  };
+}
+
+function renderSidebarMiniHubTrigger() {
+  const profile = store.state.profile ?? {};
+  const teacherName = profile.teacherName || 'المعلّم';
+  const schoolName = profile.schoolName || '';
+  const syncInfo = getSyncState();
+
+  return html`
+    <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم">
+      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">
+        ${teacherInitials(teacherName)}
+      </div>
+      <div class="teacher-mini-hub-trigger__info">
+        <div class="teacher-mini-hub-trigger__name">${teacherName}</div>
+        ${schoolName ? html`<div class="teacher-mini-hub-trigger__sub">${schoolName}</div>` : ''}
+      </div>
+      <div class="teacher-mini-hub-trigger__sync" title="${syncInfo.text}">
+        <span class="sync-dot sync-dot--${syncInfo.status}" aria-hidden="true"></span>
+      </div>
+      <div class="teacher-mini-hub-trigger__chev" aria-hidden="true">
+        ${icon('chev')}
+      </div>
+    </button>
+  `;
+}
+
+function openTeacherMiniHubSheet() {
+  const profile = store.state.profile ?? {};
+  const device = store.state.device ?? {};
+  const teacherName = profile.teacherName || 'المعلّم';
+  const schoolName = profile.schoolName || '';
+  const year = store.activeYear();
+  const term = store.activeTerm();
+  const currentTheme = device.theme ?? 'auto';
+  const syncInfo = getSyncState();
+  const isInstalled = isStandaloneMode();
+  const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
+  const isLoggedIn = !!(cloud.session && cloud.user);
+  const lastSynced = syncModule?.state?.lastSyncedAt;
+  const lastSyncText = lastSynced ? new Date(lastSynced).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : null;
+
+  return openSheet({
+    title: 'مركز تحكم المعلّم',
+    body: html`
+      <div class="mini-hub-sheet">
+        <!-- 1. الهوية والسياق الأكاديمي -->
+        <div class="mini-hub-card mini-hub-card--identity">
+          <div class="hstack gap-3 align-center">
+            <div class="mini-hub-avatar" aria-hidden="true">${teacherInitials(teacherName)}</div>
+            <div class="flex-1 min-w-0">
+              <div class="mini-hub-name">${teacherName}</div>
+              <div class="mini-hub-school t-3 fs-xs">${schoolName || (isLoggedIn ? 'حساب متصل' : 'سجل معلّم محلي')}</div>
+            </div>
+          </div>
+          <div class="mini-hub-context mt-3 pt-2">
+            <div class="hstack justify-between fs-xs t-2 wrap gap-2">
+              <span>السنة: <strong>${year?.label || '—'}</strong></span>
+              <span>الفصل: <strong>${term?.name || '—'}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. الحساب -->
+        <div class="mini-hub-card mini-hub-account">
+          <div class="mini-hub-account__row">
+            <div class="mini-hub-account__info">
+              <div class="mini-hub-account__title">الحساب</div>
+              ${isLoggedIn
+                ? html`<div class="mini-hub-account__status truncate" dir="ltr">${cloud.user.email}</div>`
+                : html`<div class="mini-hub-account__status">غير مسجل الدخول</div>`}
+            </div>
+            <div class="mini-hub-account__action">
+              ${isLoggedIn
+                ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="mini-hub-logout">تسجيل الخروج</button>`
+                : html`<button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button>`}
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. حالة المزامنة السحابية -->
+        <div class="mini-hub-card">
+          <div class="hstack justify-between align-center mb-2">
+            <div class="fw-7 fs-sm hstack gap-2 align-center">
+              <span class="sync-dot sync-dot--${syncInfo.status}"></span>
+              <span>حالة المزامنة السحابية</span>
+            </div>
+            <span class="badge ${syncInfo.badge}">${syncInfo.text}</span>
+          </div>
+          <p class="t-3 fs-xs mb-2">
+            ${syncInfo.label}
+          </p>
+          ${lastSyncText ? html`<div class="t-3 fs-xs mb-3">آخر مزامنة: <span dir="ltr">${lastSyncText}</span></div>` : ''}
+          <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-sync-now">
+            ${icon('refresh')} مزامنة الآن
+          </button>
+        </div>
+
+        <!-- 4. المظهر -->
+        <div class="mini-hub-card">
+          <div class="fw-7 fs-sm mb-2">المظهر</div>
+          <div class="segmented segmented--sm">
+            <button class="segmented__btn ${currentTheme === 'auto' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="auto">
+              ${icon('settings')} تلقائي
+            </button>
+            <button class="segmented__btn ${currentTheme === 'light' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="light">
+              ${icon('sun')} فاتح
+            </button>
+            <button class="segmented__btn ${currentTheme === 'dark' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="dark">
+              ${icon('moon')} داكن
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. تثبيت التطبيق PWA -->
+        <div class="mini-hub-card">
+          <div class="fw-7 fs-sm mb-1">تطبيق رَكيز X</div>
+          ${isInstalled
+            ? html`
+                <div class="mini-hub-installed mt-2">
+                  <div class="hstack gap-2 align-center fw-7 fs-xs">
+                    ${icon('check')} تطبيق رَكيز مُثبّت
+                  </div>
+                  <div class="fs-xs" style="opacity:0.9">يعمل كبرنامج مستقل وسريع على هذا الجهاز دون إنترنت.</div>
+                </div>
+              `
+            : hasInstallPrompt
+            ? html`
+                <p class="t-3 fs-xs mb-2">ثبّت التطبيق لفتحه مباشرة من الشاشة الرئيسية والعمل دون إنترنت.</p>
+                <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-pwa-install">
+                  ${icon('download')} تثبيت تطبيق رَكيز X
+                </button>
+              `
+            : html`
+                <p class="t-3 fs-xs mb-2">يمكنك تثبيت رَكيز كتطبيق مستقل على هاتفك أو حاسبك.</p>
+                <button class="btn btn--sm btn--ghost btn--block" data-act="mini-hub-pwa-guide">
+                  ${icon('download')} إرشادات تثبيت التطبيق
+                </button>
+              `}
+        </div>
+
+        <!-- 6. رابط الإعدادات -->
+        <a class="btn btn--ghost btn--block mt-1" href="#/settings" data-sheet-close>
+          ${icon('settings')} الانتقال إلى كافة الإعدادات
+        </a>
+      </div>
+    `,
+  });
+}
 
 /* ---------- التنقل الرئيسي ---------- */
 
@@ -82,6 +263,7 @@ function shell(path, params) {
         ${inTeaching
           ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
           : ''}
+        <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
       </nav>
       <main class="main">
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
@@ -98,6 +280,7 @@ function shell(path, params) {
 /** بقية عناصر التنقل على الجوال — حتى لا يزدحم الشريط السفلي. */
 function moreNavSheet() {
   const rest = NAV.filter((n) => !n.primary);
+
   return openSheet({
     title: 'المزيد',
     body: html`
@@ -123,6 +306,9 @@ function topbar(v, params) {
   const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'RAKEEZ X';
   const sub = v.subtitle?.(params);
   const actions = v.topActions?.(params);
+  const profile = store.state.profile ?? {};
+  const teacherName = profile.teacherName || 'المعلّم';
+  const syncInfo = getSyncState();
 
   return html`
     <header class="topbar">
@@ -130,7 +316,13 @@ function topbar(v, params) {
       <h1 class="topbar__title">
         ${title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
-      ${actions ? html`<div class="topbar__actions">${actions}</div>` : ''}
+      <div class="topbar__actions">
+        ${actions ?? ''}
+        <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
+          <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
+          <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" aria-hidden="true" title="${syncInfo.text}"></span>
+        </button>
+      </div>
     </header>
   `;
 }
@@ -180,6 +372,10 @@ function paint() {
   if (!view || !ctx || !mainEl) return;
   const snap = captureFocus();
   try {
+    const hubEl = document.getElementById('sidebar-mini-hub');
+    if (hubEl) {
+      render(hubEl, renderSidebarMiniHubTrigger());
+    }
     render(
       mainEl,
       html`${topbar(view, ctx.params)}
@@ -311,9 +507,118 @@ async function boot() {
   registerServiceWorker();
 }
 
+function openMiniHubLoginSheet() {
+  openSheet({
+    title: 'تسجيل الدخول للحساب السحابي',
+    desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
+    body: html`
+      <form id="mini-hub-login-form">
+        <label class="field">
+          <span class="field__label">البريد الإلكتروني</span>
+          <input class="input" name="email" type="email" required autocomplete="email" dir="ltr" placeholder="teacher@example.com">
+        </label>
+        <label class="field">
+          <span class="field__label">كلمة المرور</span>
+          <input class="input" name="password" type="password" required autocomplete="current-password" dir="ltr">
+        </label>
+      </form>
+    `,
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" form="mini-hub-login-form" type="submit">تسجيل الدخول</button>
+    `,
+    onMount: (root, done) => {
+      root.querySelector('#mini-hub-login-form')?.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const email = String(fd.get('email') ?? '').trim();
+        const pwd = String(fd.get('password') ?? '');
+        if (!email || !pwd) return;
+        const submitBtn = root.querySelector('button[type="submit"]');
+        const prevText = submitBtn.textContent;
+        submitBtn.textContent = 'جارٍ الاتصال...';
+        submitBtn.disabled = true;
+        try {
+          await cloud.signIn(email, pwd);
+          toast('تم تسجيل الدخول بنجاح');
+          done(true);
+          scheduleRender();
+          openTeacherMiniHubSheet();
+        } catch (err) {
+          submitBtn.textContent = prevText;
+          submitBtn.disabled = false;
+          toast(err.message || 'تعذر تسجيل الدخول', 'danger');
+        }
+      });
+    }
+  });
+}
+
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
   'more-nav': () => moreNavSheet(),
+  'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
+  'mini-hub-login': () => {
+    openMiniHubLoginSheet();
+  },
+  'mini-hub-logout': async () => {
+    await cloud.signOut();
+    toast('تم تسجيل الخروج');
+    scheduleRender();
+    openTeacherMiniHubSheet();
+  },
+  'mini-hub-sync-now': async (el) => {
+    if (!syncModule) {
+      toast('المزامنة السحابية غير متوفرة حاليًا', 'danger');
+      return;
+    }
+    const prevText = el.innerHTML;
+    el.disabled = true;
+    el.innerHTML = `${icon('refresh')} جارٍ المزامنة...`;
+    try {
+      const ok = await syncModule.syncAll({ full: true });
+      toast(ok ? 'تمت المزامنة بنجاح' : 'تعذرت المزامنة', ok ? undefined : 'danger');
+    } catch (err) {
+      toast('تعذرت المزامنة', 'danger');
+    } finally {
+      el.disabled = false;
+      el.innerHTML = prevText;
+      scheduleRender();
+      openTeacherMiniHubSheet();
+    }
+  },
+  'mini-hub-theme': async (el) => {
+    const theme = el.dataset.theme;
+    if (theme) {
+      await store.patchDevice({ theme });
+      store.applyTheme();
+      scheduleRender();
+      openTeacherMiniHubSheet();
+    }
+  },
+  'mini-hub-pwa-install': async () => {
+    if (window.deferredInstallPrompt) {
+      window.deferredInstallPrompt.prompt();
+      try {
+        const { outcome } = await window.deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          toast('جارٍ تثبيت تطبيق ركيز...');
+          window.deferredInstallPrompt = null;
+          closeSheet();
+          scheduleRender();
+        }
+      } catch {
+        // ignore
+      }
+    } else {
+      closeSheet();
+      go('/settings');
+    }
+  },
+  'mini-hub-pwa-guide': () => {
+    closeSheet();
+    go('/settings');
+  },
 };
 
 
