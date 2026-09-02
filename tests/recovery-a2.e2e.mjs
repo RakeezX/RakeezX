@@ -62,8 +62,8 @@ test('Recovery A.2 keeps Quick Log stable and preserves Picker sound, celebratio
     const after = await card.boundingBox();
     expect(after?.width).toBe(before?.width);
     expect(after?.height).toBe(before?.height);
-    expect(await page.evaluate(() => window.__recoveryA2AudioContexts)).toBe(0);
-    await expect(page.locator('.effect-overlay')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__recoveryA2AudioContexts)).toBeGreaterThan(0);
+    await expect(page.locator('.effect-overlay')).toHaveCount(1);
     expect(await page.evaluate(() => window.store.state.logs.filter((log) => log.teachingId === 'recovery-a2-teaching' && log.studentId === 'recovery-a2-student-1').length)).toBeGreaterThan(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
