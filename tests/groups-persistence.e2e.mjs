@@ -66,3 +66,73 @@ test('Groups saves a full-roster base arrangement locally across reloads and tab
   expect(await page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId)).toEqual(moved);
   await peer.close();
 });
+async function seedRegenerationGroups(page) {
+  await page.goto('/#/classes');
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await page.evaluate(async () => {
+    const students = Array.from({ length: 16 }, (_, index) => ({
+      id: 'groups-regenerate-student-' + index,
+      name: 'طالب إعادة التقسيم ' + (index + 1),
+      status: 'active',
+    }));
+    await window.store.save({
+      years: [{ id: 'groups-regenerate-year', label: '1448-1449' }],
+      terms: [{ id: 'groups-regenerate-term', yearId: 'groups-regenerate-year', name: 'الفصل الأول' }],
+      subjects: [{ id: 'groups-regenerate-subject', name: 'الرياضيات' }],
+      sections: [{ id: 'groups-regenerate-section', yearId: 'groups-regenerate-year', grade: 5, label: '2' }],
+      teachings: [{ id: 'groups-regenerate-teaching', sectionId: 'groups-regenerate-section', subjectId: 'groups-regenerate-subject', termId: 'groups-regenerate-term' }],
+      students,
+      enrollments: students.map((student, index) => ({
+        id: 'groups-regenerate-enrollment-' + index,
+        studentId: student.id,
+        sectionId: 'groups-regenerate-section',
+        status: 'active',
+        rollNo: index + 1,
+      })),
+    });
+  });
+}
+
+async function distortFirstGroup(page) {
+  for (let moved = 0; moved < 3; moved += 1) {
+    await page.locator('.group').nth(0).locator('.group__member').first().click();
+    await page.locator('.group').nth(1).getByRole('button', { name: /نقل/ }).click();
+  }
+}
+
+const savedGroups = (page, teachingId) => page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId);
+const sortedSizes = (arrangement) => arrangement.map((group) => group.length).sort((a, b) => a - b);
+
+test('New Random and Balanced generation replace distorted saved group structures from a fresh roster', async ({ page }) => {
+  const teachingId = 'groups-regenerate-teaching';
+  await seedRegenerationGroups(page);
+  await page.goto('/#/teaching/' + teachingId + '/groups');
+  await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
+  await expect.poll(() => savedGroups(page, teachingId)).toHaveLength(4);
+
+  await distortFirstGroup(page);
+  const distortedRandom = await savedGroups(page, teachingId);
+  expect(sortedSizes(distortedRandom)).toEqual([1, 4, 4, 7]);
+  await page.reload();
+  expect(sortedSizes(await savedGroups(page, teachingId))).toEqual([1, 4, 4, 7]);
+
+  await page.getByRole('button', { name: 'عشوائي' }).click();
+  await page.getByRole('button', { name: /أعد التقسيم/ }).click();
+  await expect.poll(async () => sortedSizes(await savedGroups(page, teachingId))).toEqual([4, 4, 4, 4]);
+  const randomReplacement = await savedGroups(page, teachingId);
+  expect(new Set(randomReplacement.flat()).size).toBe(16);
+  await page.reload();
+  expect(await savedGroups(page, teachingId)).toEqual(randomReplacement);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await distortFirstGroup(page);
+  expect(sortedSizes(await savedGroups(page, teachingId))).toEqual([1, 4, 4, 7]);
+
+  await page.getByRole('button', { name: 'متوازن' }).click();
+  await page.getByRole('button', { name: /أعد التقسيم/ }).click();
+  await expect.poll(async () => sortedSizes(await savedGroups(page, teachingId))).toEqual([4, 4, 4, 4]);
+  const balancedReplacement = await savedGroups(page, teachingId);
+  expect(new Set(balancedReplacement.flat()).size).toBe(16);
+  await page.reload();
+  expect(await savedGroups(page, teachingId)).toEqual(balancedReplacement);
+});

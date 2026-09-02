@@ -42,11 +42,11 @@ function savedGroupsFor(classId) {
   return restored;
 }
 
-async function persistGroups(classId) {
+async function persistGroups(classId, arrangement = groups) {
   if (!classId) return;
   const groupArrangements = {
     ...(store.state.device?.groupArrangements ?? {}),
-    [classId]: groups.map((group) => group.map((student) => student.id)),
+    [classId]: arrangement.map((group) => group.map((student) => student.id)),
   };
   await store.patchDevice({ groupArrangements });
 }
@@ -371,9 +371,11 @@ export default {
 
     async make(el, ev, params) {
       selectedStudent = null;
-      groups = build(params.id, { includeUnavailable: true });
-      await persistGroups(params.id);
-      toast(`قُسّم الفصل إلى ${groups.length} مجموعات`);
+      // A new distribution always starts from the current roster, never a saved manual arrangement.
+      const freshGroups = build(params.id, { includeUnavailable: true });
+      groups = freshGroups;
+      await persistGroups(params.id, freshGroups);
+      toast('قُسّم الفصل إلى ' + freshGroups.length + ' مجموعات');
       repaint();
     },
 
