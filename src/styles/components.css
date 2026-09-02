@@ -1596,13 +1596,33 @@
 }
 .mini-hub-installed {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: var(--sp-2) var(--sp-3);
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: 6px var(--sp-3);
   background: var(--ok-soft);
-  border: 1px solid var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 35%, var(--border));
   border-radius: var(--r-sm);
   color: var(--ok);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.mini-hub-installed__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: var(--icon-compact);
+  height: var(--icon-compact);
+}
+
+.mini-hub-installed__icon svg {
+  width: var(--icon-compact);
+  height: var(--icon-compact);
+}
+
+.mini-hub-installed__text {
+  color: var(--text-2);
 }
 
 /* بطاقة الحساب في مركز تحكم المعلم */

@@ -139,12 +139,12 @@ function openTeacherMiniHubSheet() {
           </div>
         </div>
 
-        <!-- 3. حالة المزامنة السحابية -->
+        <!-- 3. المزامنة -->
         <div class="mini-hub-card">
           <div class="hstack justify-between align-center mb-2">
             <div class="fw-7 fs-sm hstack gap-2 align-center">
               <span class="sync-dot sync-dot--${syncInfo.status}"></span>
-              <span>حالة المزامنة السحابية</span>
+              <span>المزامنة</span>
             </div>
             <span class="badge ${syncInfo.badge}">${syncInfo.text}</span>
           </div>
@@ -179,10 +179,8 @@ function openTeacherMiniHubSheet() {
           ${isInstalled
             ? html`
                 <div class="mini-hub-installed mt-2">
-                  <div class="hstack gap-2 align-center fw-7 fs-xs">
-                    ${icon('check')} تطبيق رَكيز مُثبّت
-                  </div>
-                  <div class="fs-xs" style="opacity:0.9">يعمل كبرنامج مستقل وسريع على هذا الجهاز دون إنترنت.</div>
+                  <span class="mini-hub-installed__icon" aria-hidden="true">${icon('check')}</span>
+                  <span class="mini-hub-installed__text">مثبت على هذا الجهاز</span>
                 </div>
               `
             : hasInstallPrompt
@@ -574,7 +572,7 @@ const GLOBAL_ACTIONS = {
     }
     const prevText = el.innerHTML;
     el.disabled = true;
-    el.innerHTML = `${icon('refresh')} جارٍ المزامنة...`;
+    el.textContent = 'جارٍ المزامنة...';
     try {
       const ok = await syncModule.syncAll({ full: true });
       toast(ok ? 'تمت المزامنة بنجاح' : 'تعذرت المزامنة', ok ? undefined : 'danger');
