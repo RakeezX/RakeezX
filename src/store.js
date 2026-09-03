@@ -956,12 +956,81 @@ export async function applyCalendarPreset(presetId = WESTERN_1448_1449_PRESET_ID
   if (!preset) throw new Error('التقويم المعتمد غير متاح.');
   const records = calendarPresetRecords(preset);
   const existingYear = getYear(records.year.id);
-  if (existingYear && existingYear.calendarPresetId !== preset.id) return { ok: false, reason: 'year-exists', year: existingYear };
-  const missing = (collection, candidates) => candidates.filter((record) => !state[collection].some((existing) => existing.id === record.id && !existing.deleted));
-  const writes = { years: missing('years', [records.year]), calendars: missing('calendars', [records.calendar]), terms: missing('terms', records.terms), calendarDays: missing('calendarDays', records.calendarDays) };
-  Object.keys(writes).forEach((key) => { if (!writes[key].length) delete writes[key]; });
-  if (Object.keys(writes).length) await save(writes);
-  if (activate) await patchDevice({ activeYearId: records.year.id, activeTermId: records.terms[0].id });
+  if (!existingYear && state.years.some((year) => year.id === records.year.id && year.deleted)) {
+    return { ok: false, reason: 'year-deleted' };
+  }
+  const switching = existingYear?.calendarPresetId !== preset.id;
+  const timestamp = now();
+  const writes = {};
+  const queue = (collection, candidate) => {
+    const previous = state[collection].find((record) => record.id === candidate.id);
+    if (previous && Object.keys(candidate).every((key) => key === 'updatedAt' || candidate[key] === previous[key])) return;
+    (writes[collection] ??= []).push({ ...candidate, updatedAt: timestamp });
+  };
+  queue('years', {
+    ...(existingYear ?? records.year),
+    calendarPresetId: preset.id, calendarRegion: preset.regionLabel,
+    gregorianLabel: preset.gregorianLabel,
+    startDate: switching ? preset.academicYearStart : existingYear.startDate ?? preset.academicYearStart,
+    endOfYearVacationStart: preset.endOfYearVacationStart,
+    nextAcademicYearStart: preset.nextAcademicYearStart,
+  });
+
+  const currentTerms = termsOf(records.year.id);
+  const selectedTerms = [];
+  for (const presetTerm of records.terms) {
+    const term = currentTerms.find((record) => record.index === presetTerm.index);
+    if (!term && state.terms.some((record) => record.id === presetTerm.id && record.deleted)) {
+      return { ok: false, reason: 'term-deleted' };
+    }
+    // Retain persisted term IDs/status/metadata and custom date edits on refresh.
+    // The previously shipped official Western end date was June 30, not July 1.
+    const oldWesternEnd = !switching && preset.id === WESTERN_1448_1449_PRESET_ID &&
+      term?.index === 2 && term.calendarId === records.calendar.id && term.endDate === '2027-06-30';
+    const next = term ? {
+      ...term, calendarId: records.calendar.id,
+      startDate: switching || !term.startDate ? presetTerm.startDate : term.startDate,
+      endDate: switching || !term.endDate || oldWesternEnd ? presetTerm.endDate : term.endDate,
+    } : presetTerm;
+    selectedTerms.push(next);
+    queue('terms', next);
+  }
+
+  // Retirement is scoped by calendar ownership of this year, never by a global
+  // presetId filter. Custom calendars and other years are completely untouched.
+  const oldCalendars = state.calendars.filter((calendar) => calendar.yearId === records.year.id &&
+    calendar.source?.startsWith('preset:') && calendar.id !== records.calendar.id);
+  const oldIds = new Set(oldCalendars.map((calendar) => calendar.id));
+  const retire = (collection, record) => queue(collection, {
+    ...record, deleted: true, deletedAt: new Date(timestamp).toISOString(),
+  });
+  // A locally added extra term must not retain a pointer to a retired calendar.
+  for (const term of currentTerms) {
+    if (!selectedTerms.some((selected) => selected.id === term.id) && oldIds.has(term.calendarId)) {
+      queue('terms', { ...term, calendarId: records.calendar.id });
+    }
+  }
+  for (const calendar of oldCalendars.filter((record) => !record.deleted)) retire('calendars', calendar);
+  const selectedCalendar = state.calendars.find((record) => record.id === records.calendar.id);
+  queue('calendars', { ...selectedCalendar, ...records.calendar, deletedAt: undefined });
+  const expectedIds = new Set(records.calendarDays.map((day) => day.id));
+  for (const day of state.calendarDays.filter((record) => !record.deleted)) {
+    if (oldIds.has(day.calendarId) || (day.calendarId === records.calendar.id && !expectedIds.has(day.id))) {
+      retire('calendarDays', day);
+    }
+  }
+  for (const day of records.calendarDays) {
+    const previous = state.calendarDays.find((record) => record.id === day.id);
+    queue('calendarDays', { ...previous, ...day, deletedAt: undefined });
+  }
+  // Use Production's atomic data+outbox save and existing BroadcastChannel path.
+  if (Object.keys(writes).length && !(await save(writes))) throw new Error('تعذر حفظ إعدادات التقويم. حاول مرة أخرى.');
+  const preference = { preferredEducationRegion: preset.id };
+  if (activate) {
+    preference.activeYearId = records.year.id;
+    preference.activeTermId = currentTerms.find((term) => term.id === state.device.activeTermId)?.id ?? selectedTerms[0].id;
+  }
+  if (Object.entries(preference).some(([key, value]) => state.device[key] !== value)) await patchDevice(preference);
   return { ok: true, applied: Object.values(writes).flat().length, year: getYear(records.year.id) };
 }
 

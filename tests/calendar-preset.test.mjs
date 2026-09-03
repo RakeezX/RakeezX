@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { makeSection, makeSlot, makeSubject, makeTeaching } from '../src/models.js';
-import { getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from '../src/lib/calendar-presets.js';
+import { getCalendarPreset, GENERAL_1448_1449_PRESET_ID, WESTERN_1448_1449_PRESET_ID } from '../src/lib/calendar-presets.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
@@ -33,7 +33,7 @@ test('Western Region 1448/1449 calendar preset', async (t) => {
       assert.equal(year.nextAcademicYearStart, '2027-08-29');
       const terms = store.termsOf(year.id);
       assert.equal(terms.length, 2);
-      assert.deepEqual(terms.map((term) => [term.index, term.startDate, term.endDate]), [[1, '2026-08-30', '2027-01-07'], [2, '2027-01-17', '2027-06-30']]);
+      assert.deepEqual(terms.map((term) => [term.index, term.startDate, term.endDate]), [[1, '2026-08-30', '2027-01-07'], [2, '2027-01-17', '2027-07-01']]);
       expectedRange('2026-09-23', '2026-09-26', 'إجازة اليوم الوطني');
       expectedRange('2026-11-20', '2026-11-28', 'إجازة الخريف');
       expectedRange('2027-01-08', '2027-01-16', 'إجازة منتصف العام');
@@ -59,6 +59,105 @@ test('Western Region 1448/1449 calendar preset', async (t) => {
       assert.equal(store.termsOf(year.id).length, before.terms);
       assert.equal(store.calendarsOf(year.id).flatMap((calendar) => store.calendarDaysOf(calendar.id)).length, before.days + 1);
       assert.equal(store.calendarDayForYear(year.id, '2026-09-23').label, 'استثناء محلي');
+    });
+
+    await t.test('switches between General and Western presets updating terms and holidays while keeping local overrides', async () => {
+      await reset();
+      const year = store.activeYear();
+      // Add local custom override
+      const custom = await store.ensureCalendar(year.id, 'custom');
+      await store.setCalendarDay(custom.id, '2026-10-01', 'holiday', 'إجازة مدرسية خاصة');
+
+      // Switch to General preset
+      const genRes = await store.applyCalendarPreset(GENERAL_1448_1449_PRESET_ID);
+      assert.equal(genRes.ok, true);
+      const genYear = store.getYear(year.id);
+      assert.equal(genYear.calendarPresetId, GENERAL_1448_1449_PRESET_ID);
+      assert.equal(genYear.startDate, '2026-08-23');
+      assert.equal(genYear.endOfYearVacationStart, '2027-06-24');
+      const genTerms = store.termsOf(year.id);
+      assert.deepEqual(genTerms.map((t) => [t.index, t.startDate, t.endDate]), [
+        [1, '2026-08-23', '2027-01-07'],
+        [2, '2027-01-17', '2027-06-24'],
+      ]);
+      // General includes 2027-04-11 extended weekend and 2026-11-29 extended weekend
+      assert.ok(store.calendarDayForYear(year.id, '2027-04-11'));
+      assert.ok(store.calendarDayForYear(year.id, '2026-11-29'));
+      // Custom override remains intact
+      assert.equal(store.calendarDayForYear(year.id, '2026-10-01')?.label, 'إجازة مدرسية خاصة');
+
+      // Switch back to Western preset
+      const westRes = await store.applyCalendarPreset(WESTERN_1448_1449_PRESET_ID);
+      assert.equal(westRes.ok, true);
+      const westYear = store.getYear(year.id);
+      assert.equal(westYear.calendarPresetId, WESTERN_1448_1449_PRESET_ID);
+      assert.equal(westYear.startDate, '2026-08-30');
+      assert.equal(westYear.endOfYearVacationStart, '2027-07-01');
+      const westTerms = store.termsOf(year.id);
+      assert.deepEqual(westTerms.map((t) => [t.index, t.startDate, t.endDate]), [
+        [1, '2026-08-30', '2027-01-07'],
+        [2, '2027-01-17', '2027-07-01'],
+      ]);
+      // Western does NOT have 2027-04-11
+      assert.equal(store.calendarDayForYear(year.id, '2027-04-11'), null);
+      // Western Eid al-Adha starts earlier (2027-04-30)
+      assert.ok(store.calendarDayForYear(year.id, '2027-04-30'));
+      // Custom override still intact
+      assert.equal(store.calendarDayForYear(year.id, '2026-10-01')?.label, 'إجازة مدرسية خاصة');
+    });
+
+    await t.test('switches atomically without identity/history loss, foreign-year cleanup or repeat outbox churn', async () => {
+      await reset();
+      const year = store.activeYear();
+      const legacySecond = store.termsOf(year.id)[1];
+      await store.patch('terms', legacySecond.id, { endDate: '2027-06-30' });
+      await store.applyCalendarPreset(WESTERN_1448_1449_PRESET_ID);
+      assert.equal(store.getTerm(legacySecond.id).endDate, '2027-07-01');
+      const original = store.termsOf(year.id)[0];
+      // Fictional imported term identity: activation must not assume factory IDs.
+      await db.remove('terms', original.id);
+      store.state.terms = store.state.terms.filter((term) => term.id !== original.id);
+      const imported = { ...original, id: 'term:imported-test', name: 'فصل اختبار مستورد' };
+      const foreignCalendar = { id: 'cal:foreign-test', yearId: 'year:foreign-test', source: `preset:${WESTERN_1448_1449_PRESET_ID}`, deleted: false };
+      const foreignDay = { id: 'day:foreign-test', calendarId: foreignCalendar.id, presetId: WESTERN_1448_1449_PRESET_ID, date: '2026-10-04', kind: 'holiday', deleted: false };
+      await store.save({ terms: [imported], calendars: [foreignCalendar], calendarDays: [foreignDay],
+        teachings: [{ id: 'teaching:history-test', termId: imported.id, deleted: false }],
+        sessions: [{ id: 'session:history-test', teachingId: 'teaching:history-test', date: '2026-09-06', period: 1, status: 'completed', deleted: false }],
+        attendance: [{ id: 'attendance:history-test', sessionId: 'session:history-test', studentId: 'student:fictional', status: 'present', deleted: false }],
+      });
+      const custom = await store.ensureCalendar(year.id, 'custom');
+      await store.setCalendarDay(custom.id, '2026-09-23', 'study', 'استثناء المعلم');
+      const beforeHistory = await Promise.all(['teachings', 'sessions', 'attendance'].map(db.getAll));
+      const beforeForeign = [await db.get('calendars', foreignCalendar.id), await db.get('calendarDays', foreignDay.id)];
+      const beforeCustom = await db.getAll('calendarDays').then((days) => days.filter((day) => day.calendarId === custom.id));
+      for (const presetId of [GENERAL_1448_1449_PRESET_ID, WESTERN_1448_1449_PRESET_ID, GENERAL_1448_1449_PRESET_ID]) {
+        await store.applyCalendarPreset(presetId, { activate: true });
+        assert.equal(store.state.device.activeTermId, imported.id);
+        assert.equal(store.getTerm(imported.id).name, imported.name);
+        assert.equal(store.getTerm(original.id), null);
+        const liveCalendars = store.calendarsOf(year.id);
+        const official = liveCalendars.filter((cal) => cal.source.startsWith('preset:'));
+        assert.equal(official.length, 1);
+        assert.equal(official[0].source, `preset:${presetId}`);
+        for (const term of store.termsOf(year.id)) assert.ok(liveCalendars.some((cal) => cal.id === term.calendarId));
+        for (const day of store.state.calendarDays.filter((day) => !day.deleted)) {
+          assert.ok(store.state.calendars.some((cal) => cal.id === day.calendarId && !cal.deleted));
+        }
+        const snapshot = await Promise.all(['years', 'terms', 'calendars', 'calendarDays', 'outbox', 'device'].map(db.getAll));
+        assert.equal((await store.applyCalendarPreset(presetId, { activate: true })).applied, 0);
+        assert.deepEqual(await Promise.all(['years', 'terms', 'calendars', 'calendarDays', 'outbox', 'device'].map(db.getAll)), snapshot);
+      }
+      assert.deepEqual(await Promise.all(['teachings', 'sessions', 'attendance'].map(db.getAll)), beforeHistory);
+      assert.deepEqual([await db.get('calendars', foreignCalendar.id), await db.get('calendarDays', foreignDay.id)], beforeForeign);
+      assert.deepEqual(await db.getAll('calendarDays').then((days) => days.filter((day) => day.calendarId === custom.id)), beforeCustom);
+      assert.ok(store.state.calendarDays.some((day) => day.deleted && day.deletedAt));
+      store.state.ready = false; await store.init();
+      assert.equal(store.state.device.activeTermId, imported.id);
+      assert.equal((await store.applyCalendarPreset(GENERAL_1448_1449_PRESET_ID)).applied, 0);
+      assert.equal(store.calendarDayForYear(year.id, '2026-11-29').label, 'إجازة نهاية أسبوع مطولة');
+      assert.equal(store.calendarDayForYear(year.id, '2027-04-30'), null);
+      assert.ok(store.calendarDayForYear(year.id, '2027-05-07'));
+      await assert.rejects(store.applyCalendarPreset('unknown-preset'), /غير متاح/);
     });
 
     await t.test('accepts adjacent term dates and preserves persisted dates after rejected overlap', async () => {

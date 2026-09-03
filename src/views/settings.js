@@ -8,6 +8,7 @@ import { repaint } from '../repaint.js';
 import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes } from '../models.js';
 import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
 import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.js';
+import { hasValidYearCalendarConfig } from './calendar.js';
 
 const THEMES = [
   { v: 'auto',  label: 'حسب النظام', icon: 'settings' },
@@ -298,69 +299,6 @@ export default {
         </div>
       </div>
 
-      <div class="section">
-        <div class="section__head">
-          <div class="section__title">السنوات الدراسية</div>
-          <button class="btn btn--sm btn--quiet" data-act="add-year">${icon('plus')} سنة جديدة</button>
-        </div>
-        <div class="stack stack-3">
-          ${yrs.map((y) => {
-            const terms = store.termsOf(y.id);
-            return html`
-              <div class="card card--pad ${y.status === 'archived' ? 'is-archived' : ''}">
-                <div class="hstack gap-2">
-                  <div>
-                    <div class="fw-7">${y.label}</div>
-                    <div class="t-3 fs-sm">
-                      ${YEAR_STATUS[y.status] ?? y.status} ·
-                      <span class="tabular">${terms.length}</span> فصلًا دراسيًا
-                    </div>
-                  </div>
-                  <div class="push hstack gap-1">
-                    ${y.id === activeY?.id
-                      ? html`<span class="badge badge--brand">الحالية</span>`
-                      : html`<button class="btn btn--sm btn--ghost" data-act="use-year" data-id="${y.id}">اجعلها الحالية</button>`}
-                    <button class="iconbtn" data-act="edit-year" data-id="${y.id}" aria-label="تعديل">${icon('edit')}</button>
-                  </div>
-                </div>
-
-                <div class="list mt-3">
-                  ${terms.map(
-                    (t) => html`
-                      <div class="row">
-                        <span class="period">${t.index}</span>
-                        <span class="row__main">
-                          <span class="row__title">${t.name}</span>
-                          <span class="row__sub">
-                            ${TERM_STATUS[t.status] ?? t.status}
-                            ${t.startDate && t.endDate
-                              ? html` · ${fmtDateRange(t.startDate, t.endDate)}`
-                              : ' · التواريخ غير مُدخلة'}
-                            · <span class="tabular">${store.teachings(t.id).length}</span> إسنادًا تدريسيًا
-                          </span>
-                        </span>
-                        <span class="row__end">
-                          ${t.id === activeT?.id
-                            ? html`<span class="badge badge--brand">الحالي</span>`
-                            : html`<button class="btn btn--sm btn--ghost" data-act="use-term" data-id="${t.id}">اجعله الحالي</button>`}
-                          <button class="iconbtn" data-act="edit-term" data-id="${t.id}" aria-label="تعديل">${icon('edit')}</button>
-                        </span>
-                      </div>
-                    `
-                  )}
-                </div>
-                <button class="btn btn--sm btn--quiet btn--block mt-3" data-act="add-term" data-year="${y.id}">
-                  ${icon('plus')} فصل دراسي في ${y.label}
-                </button>
-              </div>
-            `;
-          })}
-        </div>
-        <p class="t-3 fs-sm mt-3">
-          عدد الفصول مرن — سنة بفصلين أو ثلاثة، والتطبيق لا يفترض رقمًا ثابتًا.
-          والسنة المؤرشفة تبقى كاملة ويمكن الرجوع إليها.
-        </p>
-      </div>
 
       <div class="section">
         <div class="section__head"><div class="section__title">المظهر</div></div>
@@ -723,14 +661,28 @@ export default {
     },
 
     async 'use-year'(el) {
-      const terms = store.termsOf(el.dataset.id);
-      await store.patchDevice({ activeYearId: el.dataset.id, activeTermId: terms[0]?.id ?? null });
+      const targetYearId = el.dataset.id;
+      if (!hasValidYearCalendarConfig(targetYearId)) {
+        toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
+        return;
+      }
+      const terms = store.termsOf(targetYearId);
+      await store.patchDevice({ activeYearId: targetYearId, activeTermId: terms[0]?.id ?? null });
       toast('تغيّرت السنة الحالية');
     },
 
     async 'use-term'(el) {
       const t = store.getTerm(el.dataset.id);
-      await store.patchDevice({ activeTermId: el.dataset.id, activeYearId: t?.yearId ?? store.activeYear()?.id });
+      if (!t || !t.startDate || !t.endDate) {
+        toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
+        return;
+      }
+      const targetYearId = t.yearId ?? store.activeYear()?.id;
+      if (!hasValidYearCalendarConfig(targetYearId)) {
+        toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
+        return;
+      }
+      await store.patchDevice({ activeTermId: el.dataset.id, activeYearId: targetYearId });
       toast('تغيّر الفصل الدراسي الحالي');
     },
 
