@@ -5,11 +5,68 @@
  * وما لم يُبنَ بعد يظهر كمنطقة معلّمة بوضوح — **بلا بيانات وهمية إطلاقًا**.
  */
 
-import { html, icon, fmtDate, fmtPct, fmtTimeRange } from '../lib/dom.js';
+import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast } from '../lib/dom.js';
 import * as store from '../store.js';
+import { repaint } from '../repaint.js';
+import { go } from '../router.js';
 import {
   todayISO, gradeLabel, studentTotal, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday,
 } from '../models.js';
+
+const DISMISS_STORAGE_KEY = 'rakeezx_home_pwa_dismissed_at';
+const SUPPRESSION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
+
+let sessionDismissed = false;
+
+export function isStandaloneMode() {
+  if (typeof window === 'undefined') return false;
+  return !!(
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    navigator.standalone === true ||
+    document.referrer?.includes('android-app://')
+  );
+}
+
+export function isHomeInstallPromptDismissed() {
+  if (sessionDismissed) return true;
+  if (typeof window === 'undefined' || !window.localStorage) return false;
+  try {
+    const raw = localStorage.getItem(DISMISS_STORAGE_KEY);
+    if (!raw) return false;
+    const dismissedAt = Number(raw);
+    if (!Number.isFinite(dismissedAt)) return false;
+    return Date.now() - dismissedAt < SUPPRESSION_MS;
+  } catch {
+    return false;
+  }
+}
+
+export function dismissHomeInstallPrompt() {
+  sessionDismissed = true;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem(DISMISS_STORAGE_KEY, String(Date.now()));
+    } catch {
+      // ignore storage write errors
+    }
+  }
+}
+
+export function resetHomeInstallPrompt() {
+  sessionDismissed = false;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.removeItem(DISMISS_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+  }
+}
+
+if (typeof window !== 'undefined' && import.meta.env?.DEV) {
+  window.resetHomeInstallPrompt = resetHomeInstallPrompt;
+  window.dismissHomeInstallPrompt = dismissHomeInstallPrompt;
+}
 
 /** منطقة محجوزة لميزة لم تُبنَ واجهتها بعد. */
 const soon = (title, text) => html`
@@ -36,6 +93,11 @@ export default {
     const pendingToday = daySessions.filter((session) => store.attendanceCompleteness(session).state === 'pending').length;
     const timingProfile = store.activeTimeProfile()?.name ?? 'التوقيت المعتمد';
 
+    const isInstalled = isStandaloneMode();
+    const isDismissed = isHomeInstallPromptDismissed();
+    const showInstallPrompt = !isInstalled && !isDismissed;
+    const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
+
     return html`
       <!-- ترحيب وتاريخ اليوم -->
       <div class="hero">
@@ -48,6 +110,39 @@ export default {
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>
+
+      <!-- إشعار تثبيت التطبيق السياقي (مؤقت وغير مسيطر) -->
+      ${showInstallPrompt
+        ? html`
+            <aside class="home-pwa-prompt" id="home-pwa-prompt" aria-label="تثبيت تطبيق رَكيز X">
+              <div class="home-pwa-prompt__main">
+                <div class="home-pwa-prompt__icon" aria-hidden="true">${icon('download')}</div>
+                <div class="home-pwa-prompt__content">
+                  <div class="home-pwa-prompt__title">تطبيق رَكيز X على جهازك</div>
+                  <div class="home-pwa-prompt__desc">ثبّت التطبيق لفتحه مباشرة والعمل دون إنترنت.</div>
+                </div>
+              </div>
+              <div class="home-pwa-prompt__actions">
+                <button
+                  class="btn btn--sm btn--primary home-pwa-prompt__install"
+                  id="home-pwa-install-btn"
+                  data-act="home-pwa-install"
+                >
+                  ${icon('download')} ${hasInstallPrompt ? 'تثبيت التطبيق' : 'إرشادات التثبيت'}
+                </button>
+                <button
+                  class="home-pwa-prompt__dismiss"
+                  id="home-pwa-dismiss-btn"
+                  data-act="home-pwa-dismiss"
+                  title="إغلاق الإشعار"
+                  aria-label="إغلاق الإشعار"
+                >
+                  ${icon('x')}
+                </button>
+              </div>
+            </aside>
+          `
+        : ''}
 
       <!-- حصص اليوم -->
       <div class="section">
@@ -139,6 +234,32 @@ export default {
       </div>
 
     `;
+  },
+
+  actions: {
+    async 'home-pwa-install'() {
+      if (typeof window !== 'undefined' && window.deferredInstallPrompt) {
+        const promptEvent = window.deferredInstallPrompt;
+        promptEvent.prompt();
+        try {
+          const { outcome } = await promptEvent.userChoice;
+          if (outcome === 'accepted') {
+            toast('جارٍ تثبيت تطبيق رَكيز...');
+            window.deferredInstallPrompt = null;
+            repaint();
+          }
+        } catch {
+          // ignore prompt cancellation
+        }
+      } else {
+        go('/settings');
+      }
+    },
+
+    'home-pwa-dismiss'() {
+      dismissHomeInstallPrompt();
+      repaint();
+    },
   },
 };
 
