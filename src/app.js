@@ -77,7 +77,7 @@ function renderSidebarMiniHubTrigger() {
         ${schoolName ? html`<div class="teacher-mini-hub-trigger__sub">${schoolName}</div>` : ''}
       </div>
       <div class="teacher-mini-hub-trigger__sync" title="${syncInfo.text}">
-        <span class="sync-dot sync-dot--${syncInfo.status}" aria-hidden="true"></span>
+        <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status aria-hidden="true"></span>
       </div>
       <div class="teacher-mini-hub-trigger__chev" aria-hidden="true">
         ${icon('chev')}
@@ -318,7 +318,7 @@ function topbar(v, params) {
         ${actions ?? ''}
         <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
           <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
-          <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" aria-hidden="true" title="${syncInfo.text}"></span>
+          <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
         </button>
       </div>
     </header>
@@ -345,6 +345,19 @@ function restoreFocus(snap) {
   el.focus({ preventScroll: true });
   if (snap.start !== undefined && typeof el.setSelectionRange === 'function') {
     try { el.setSelectionRange(snap.start, snap.end); } catch { /* حقول لا تدعم التحديد */ }
+  }
+}
+
+/** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
+function paintSyncStatus() {
+  const syncInfo = getSyncState();
+  for (const el of document.querySelectorAll('[data-sync-status]')) {
+    for (const name of [...el.classList]) {
+      if (name.startsWith('sync-dot--')) el.classList.remove(name);
+    }
+    el.classList.add(`sync-dot--${syncInfo.status}`);
+    el.title = syncInfo.text;
+    el.parentElement?.setAttribute('title', syncInfo.text);
   }
 }
 
@@ -496,7 +509,7 @@ async function boot() {
   store.subscribe(scheduleRender);
   cloud.subscribe(scheduleRender);
   if (syncModule) {
-    syncModule.subscribe(scheduleRender);
+    syncModule.subscribe(paintSyncStatus);
   }
   onNavigate(resolve);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
