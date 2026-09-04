@@ -60,7 +60,12 @@ export default {
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
 
-    const roster = store.students(tch.id);
+    const daySessions = store.sessionsOnFor(tch.id, date);
+    const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
+    if (!ses) return html`<div class="card card--pad center t-3">جارٍ تجهيز الحصة…</div>`;
+
+    const rosterInfo = store.sessionRoster(ses);
+    const roster = rosterInfo.members;
     if (!roster.length) {
       return html`
         <div class="empty">
@@ -71,14 +76,11 @@ export default {
       `;
     }
 
-    const daySessions = store.sessionsOnFor(tch.id, date);
-    const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
-    if (!ses) return html`<div class="card card--pad center t-3">جارٍ تجهيز الحصة…</div>`;
-
     const meta = SESSION_STATUS[ses.status] ?? SESSION_STATUS.scheduled;
     const cal = store.calendarDayFor(date);
     const isToday = date === todayISO();
-    const records = store.attendanceIn(ses.id);
+    const rosterIds = new Set(roster.map((student) => student.id));
+    const records = store.attendanceIn(ses.id).filter((record) => rosterIds.has(record.studentId));
     const byStudent = new Map(records.map((a) => [a.studentId, a]));
 
     const counts = { present: 0, late: 0, excused: 0, absent: 0 };
@@ -106,6 +108,10 @@ export default {
         <button class="iconbtn ${isToday ? 'is-off' : ''}" data-act="next-day"
                 aria-label="اليوم التالي" ${isToday ? 'disabled' : ''}>${icon('chev')}</button>
       </div>
+
+      ${rosterInfo.source === 'snapshot'
+        ? html`<p class="t-3 fs-sm mb-3">كشف هذه الحصة محفوظ عند أول رصد حضور.</p>`
+        : ''}
 
       ${daySessions.length > 1
         ? html`

@@ -27,7 +27,7 @@ const SCHEMA_VERSION = 4;
 
 const COLLECTIONS = [
   'years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments',
-  'items', 'scores', 'slots', 'sessions', 'attendance', 'logs',
+  'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
   'notes', 'assignments', 'submissions',
 ];
@@ -345,7 +345,7 @@ const nextEnrollmentOperationOrder = (outbox = []) => {
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'timeProfiles', 'slots', 'sessions', 'attendance',
+  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance',
 ]);
 
 function applyToMemory(storeName, records) {
@@ -799,6 +799,130 @@ export const getSession = (id) => state.sessions.find((s) => s.id === id && !s.d
 
 export const attendanceIn = (sesId) => live(state.attendance).filter((a) => a.sessionId === sesId);
 
+export const sessionRosterSnapshotId = (sesId) => `srs:${sesId}`;
+
+export const sessionRosterSnapshot = (sesId) =>
+  live(state.sessionRosterSnapshots).find((snapshot) =>
+    snapshot.sessionId === sesId && snapshot.state === 'complete') ?? null;
+
+/**
+ * مصدر كشف الحصة: اللقطة المثبتة هي الحقيقة بعد أول رصد. قبلها فقط تظهر
+ * القائمة النشطة كمعاينة لعملية الرصد القادمة، ولا تصبح حقيقة تاريخية إلا
+ * داخل معاملة أول رصد حضور.
+ */
+export function sessionRoster(ses) {
+  if (!ses) return { source: 'active', members: [], snapshot: null };
+  const snapshot = sessionRosterSnapshot(ses.id);
+  if (!snapshot) return { source: 'active', members: students(ses.teachingId), snapshot: null };
+  return {
+    source: 'snapshot',
+    snapshot,
+    members: snapshot.members.map((member) => {
+      const student = getStudent(member.studentId);
+      return {
+        ...(student ?? { id: member.studentId, name: 'طالب محفوظ' }),
+        id: member.studentId,
+        rollNo: member.rollNo ?? null,
+      };
+    }),
+  };
+}
+
+function snapshotRosterFromCurrent(current, ses) {
+  const teaching = current.teachings.find((record) => record.id === ses.teachingId && !record.deleted);
+  if (!teaching) return null;
+  const studentsById = new Map(current.students.filter((record) => !record.deleted).map((record) => [record.id, record]));
+  const members = current.enrollments
+    .filter((record) => !record.deleted && record.sectionId === teaching.sectionId && record.status === 'active' && studentsById.has(record.studentId))
+    .map((record) => ({ studentId: record.studentId, rollNo: record.rollNo ?? null, name: studentsById.get(record.studentId).name ?? '' }))
+    .sort((left, right) =>
+      (left.rollNo ?? Number.MAX_SAFE_INTEGER) - (right.rollNo ?? Number.MAX_SAFE_INTEGER) ||
+      String(left.name).localeCompare(String(right.name), 'ar') ||
+      left.studentId.localeCompare(right.studentId))
+    .map(({ studentId, rollNo }) => ({ studentId, rollNo }));
+  return { teaching, members };
+}
+
+function applyCommittedPuts(writes) {
+  const changes = [];
+  for (const [storeName, operations] of Object.entries(writes ?? {})) {
+    if (storeName === 'outbox' || !Array.isArray(state[storeName])) continue;
+    const records = operations.put ?? [];
+    if (!records.length) continue;
+    applyToMemory(storeName, records);
+    changes.push(...changeList(storeName, records));
+  }
+  notify();
+  broadcast(changes);
+}
+
+async function mutateSnapshotAttendance(sesId, makeRecords) {
+  const stamp = now();
+  let result = { kind: 'missing', records: [] };
+  let committed;
+  try {
+    committed = await db.applyBatch({
+      sessions: {}, teachings: {}, students: {}, enrollments: {}, attendance: {}, sessionRosterSnapshots: {}, outbox: {},
+    }, {
+      prepare(current) {
+        const ses = current.sessions.find((record) => record.id === sesId && !record.deleted);
+        if (!ses || ['cancelled_holiday', 'cancelled'].includes(ses.status)) return {};
+
+        const existingAttendance = current.attendance.filter((record) => record.sessionId === sesId && !record.deleted);
+        let snapshot = current.sessionRosterSnapshots.find((record) => record.sessionId === sesId && !record.deleted && record.state === 'complete');
+        let isNewSnapshot = false;
+        if (!snapshot) {
+          // Existing experimental attendance predates this feature. Keep its
+          // current behavior; never manufacture a historical snapshot for it.
+          if (existingAttendance.length) {
+            result = { kind: 'legacy', records: [] };
+            return {};
+          }
+          const roster = snapshotRosterFromCurrent(current, ses);
+          if (!roster) return {};
+          snapshot = {
+            id: sessionRosterSnapshotId(ses.id),
+            sessionId: ses.id,
+            teachingId: ses.teachingId,
+            sectionId: roster.teaching.sectionId,
+            capturedAt: stamp,
+            members: roster.members,
+            state: 'complete',
+            updatedAt: stamp,
+            deleted: false,
+          };
+          isNewSnapshot = true;
+        }
+
+        const records = makeRecords(snapshot.members, existingAttendance, ses, stamp);
+        if (!records.length) {
+          result = { kind: 'empty', records: [] };
+          return {};
+        }
+
+        const nextSession = ses.status === 'scheduled' ? { ...ses, status: 'held', updatedAt: stamp } : null;
+        const outbox = [
+          ...(isNewSnapshot ? [outboxEntry('sessionRosterSnapshots', snapshot)] : []),
+          ...records.map((record) => outboxEntry('attendance', record)),
+          ...(nextSession ? [outboxEntry('sessions', nextSession)] : []),
+        ].filter(Boolean);
+        result = { kind: 'snapshot', records, snapshot };
+        return {
+          ...(isNewSnapshot ? { sessionRosterSnapshots: { put: [snapshot] } } : {}),
+          attendance: { put: records },
+          ...(nextSession ? { sessions: { put: [nextSession] } } : {}),
+          outbox: { put: outbox },
+        };
+      },
+    });
+    applyCommittedPuts(committed);
+    return result;
+  } catch (err) {
+    reportWriteError(err, { op: 'mutateSnapshotAttendance', sesId });
+    return { kind: 'error', records: [] };
+  }
+}
+
 /**
  * حالة اكتمال الحضور مشتقة من الحصة المؤرخة وسجل الحضور فقط؛ لا تُخزَّن
  * كحقل مستقل حتى لا تنفصل عن وقت الحصة التاريخي أو عن بيانات الحضور المزامنة.
@@ -810,7 +934,7 @@ export function attendanceCompleteness(ses, reference = new Date()) {
     return { state: 'excluded', completed: false, due: false, recorded: 0, expected: 0 };
   }
 
-  const roster = students(ses.teachingId);
+  const roster = sessionRoster(ses).members;
   const rosterIds = new Set(roster.map((student) => student.id));
   const records = attendanceIn(ses.id).filter((record) => rosterIds.has(record.studentId));
   const expected = roster.length;
@@ -1112,6 +1236,26 @@ export function teachingContext(tchId) {
   return { roster, items: items(tchId), ctx };
 }
 
+/** كشف الحضور التاريخي: لكل حصة مصدر كشف مستقل، لا كشف الفصل الحالي. */
+export function attendanceReportContext(tchId) {
+  const sessions = sessionsOf(tchId).slice().reverse();
+  const studentsById = new Map();
+  const rosterBySession = new Map();
+  const attendanceBySession = new Map();
+  for (const ses of sessions) {
+    const roster = sessionRoster(ses);
+    rosterBySession.set(ses.id, roster);
+    for (const student of roster.members) {
+      if (!studentsById.has(student.id)) studentsById.set(student.id, student);
+    }
+    const memberIds = new Set(roster.members.map((student) => student.id));
+    attendanceBySession.set(ses.id, new Map(
+      attendanceIn(ses.id).filter((record) => memberIds.has(record.studentId)).map((record) => [record.studentId, record])
+    ));
+  }
+  return { sessions, students: [...studentsById.values()], rosterBySession, attendanceBySession };
+}
+
 /** سياق طالب داخل إسناد محدد — لا يخلط إسنادًا بآخر. */
 export function studentContext(studentId, tchId) {
   const inTeaching = (r) => !tchId || r.teachingId === tchId;
@@ -1241,6 +1385,7 @@ export async function deleteTeaching(tchId) {
       scores: (s) => itemIds.has(s.itemId),
       slots: (s) => s.teachingId === tchId,
       sessions: (s) => s.teachingId === tchId,
+      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
       attendance: (a) => sessionIds.has(a.sessionId),
       logs: (l) => l.teachingId === tchId,
     },
@@ -1285,6 +1430,7 @@ export async function deleteClass(secId) {
       scores: (s) => targetScore(s) || orphanStudentIds.has(s.studentId),
       slots: (s) => teachingIds.has(s.teachingId),
       sessions: (s) => teachingIds.has(s.teachingId),
+      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
       attendance: (a) => targetAttendance(a) || orphanStudentIds.has(a.studentId),
       logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
       notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
@@ -1878,6 +2024,20 @@ export const setSessionStatus = (sesId, status, reason = '') =>
 export async function setAttendance(sesId, studentId, status) {
   const ses = getSession(sesId);
   if (!ses) return null;
+  const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp) => {
+    if (!members.some((member) => member.studentId === studentId)) return [];
+    const id = attendanceId(studentId, sesId);
+    const previous = existing.find((record) => record.id === id);
+    return [{
+      ...(previous ?? { id, studentId, sessionId: sesId, teachingId: session.teachingId, date: session.date, note: '' }),
+      status, deleted: false, updatedAt: stamp,
+    }];
+  });
+  if (mutation.kind === 'snapshot') return mutation.records[0] ?? null;
+  if (mutation.kind !== 'legacy') return null;
+
+  // Experimental pre-snapshot sessions retain the previous behavior. The
+  // forward-only guarantee begins only when a snapshot is first captured.
   const id = attendanceId(studentId, sesId);
   const rec = await patch('attendance', id, { status, deleted: false }, {
     id, studentId, sessionId: sesId, teachingId: ses.teachingId, date: ses.date,
@@ -1892,18 +2052,27 @@ export async function setAttendance(sesId, studentId, status) {
 export async function fillAttendance(sesId, status = 'present') {
   const ses = getSession(sesId);
   if (!ses) return 0;
+  const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp) => {
+    const existingIds = new Set(existing.map((record) => record.studentId));
+    return members
+      .filter((member) => !existingIds.has(member.studentId))
+      .map((member) => ({
+        id: attendanceId(member.studentId, sesId), updatedAt: stamp, deleted: false,
+        studentId: member.studentId, sessionId: sesId, teachingId: session.teachingId, date: session.date,
+        status, note: '',
+      }));
+  });
+  if (mutation.kind === 'snapshot') return mutation.records.length;
+  if (mutation.kind !== 'legacy') return 0;
+
   const roster = students(ses.teachingId);
   const existing = new Set(attendanceIn(sesId).map((a) => a.studentId));
   const stamp = now();
-
-  const recs = roster
-    .filter((s) => !existing.has(s.id))
-    .map((s) => ({
-      id: attendanceId(s.id, sesId), updatedAt: stamp, deleted: false,
-      studentId: s.id, sessionId: sesId, teachingId: ses.teachingId, date: ses.date,
-      status, note: '',
-    }));
-
+  const recs = roster.filter((student) => !existing.has(student.id)).map((student) => ({
+    id: attendanceId(student.id, sesId), updatedAt: stamp, deleted: false,
+    studentId: student.id, sessionId: sesId, teachingId: ses.teachingId, date: ses.date,
+    status, note: '',
+  }));
   if (recs.length) await save({ attendance: recs });
   if (ses.status === 'scheduled') await setSessionStatus(sesId, 'held');
   return recs.length;

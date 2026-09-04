@@ -70,7 +70,8 @@ export default {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     const { roster, items, ctx } = store.teachingContext(cls.id);
-    if (!roster.length) return html`
+    const attendance = tab === 'attendance' ? store.attendanceReportContext(cls.id) : null;
+    if (!roster.length && tab !== 'attendance') return html`
       <div class="empty"><div class="empty__icon">${icon('reports')}</div><div class="empty__title">لا بيانات بعد</div><a class="btn btn--primary" href="#/teaching/${cls.id}/students">${icon('plus')} كشف الطلاب</a></div>`;
 
     const sortedRoster = sortRoster(roster, items, ctx);
@@ -80,7 +81,7 @@ export default {
       ${header}
       ${tab === 'roster' ? rosterReport(sortedRoster) : ''}
       ${tab === 'grades' ? gradesReport(sortedRoster, items, ctx) : ''}
-      ${tab === 'attendance' ? attendanceReport(cls, sortedRoster, ctx) : ''}
+      ${tab === 'attendance' ? attendanceReport(cls, attendance) : ''}
       ${tab === 'support' ? supportReport(sortedRoster, items, ctx) : ''}
       ${reportSignatures({ profile: identity(cls).profile })}
     `;
@@ -225,9 +226,9 @@ export default {
         const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : null;
         if (avg !== null) lines.push(`• متوسط درجات الفصل: ${avg}%`);
       } else if (tab === 'attendance') {
-        const dates = store.sessionDates(params.id);
+        const sessions = store.attendanceReportContext(params.id).sessions;
         lines.push('📅 ملخص الحضور:');
-        lines.push(`• إجمالي الأيام المرصودة: ${dates.length}`);
+        lines.push(`• إجمالي الحصص: ${sessions.length}`);
       } else if (tab === 'support') {
         const rows = supportRows(roster, items, ctx);
         lines.push(`⚠️ الطلاب المحتاجون للمتابعة: ${rows.length} طالبًا`);
@@ -274,12 +275,15 @@ export default {
         toast('نُزّل كشف الطلاب'); return;
       }
       if (tab === 'attendance') {
-        const dates = store.sessionDates(params.id).slice().reverse();
-        const rows = [['رقم الكشف', 'الطالب', ...dates.map((d) => fmtDateFull(d)), 'الغياب', 'التأخر']];
-        for (const s of roster) {
-          const records = ctx[s.id].attendance;
-          const byDate = new Map(records.map((a) => [a.date, a.status]));
-          rows.push([s.rollNo ?? '', s.name, ...dates.map((d) => byDate.has(d) ? ATTENDANCE[byDate.get(d)].label : ''), records.filter((a) => a.status === 'absent').length, records.filter((a) => a.status === 'late').length]);
+        const report = store.attendanceReportContext(params.id);
+        const rows = [['رقم الكشف', 'الطالب', ...report.sessions.map((session) => `${fmtDateFull(session.date)} · الحصة ${session.period}`), 'الغياب', 'التأخر']];
+        for (const student of report.students) {
+          const records = report.sessions.map((session) => report.attendanceBySession.get(session.id)?.get(student.id) ?? null).filter(Boolean);
+          rows.push([student.rollNo ?? '', student.name, ...report.sessions.map((session) => {
+            const member = report.rosterBySession.get(session.id)?.members.some((candidate) => candidate.id === student.id);
+            const record = report.attendanceBySession.get(session.id)?.get(student.id);
+            return member && record ? ATTENDANCE[record.status].label : '';
+          }), records.filter((record) => record.status === 'absent').length, records.filter((record) => record.status === 'late').length]);
         }
         downloadCSV(`حضور-${safe}.csv`, rows); toast('نُزّل كشف الحضور'); return;
       }
@@ -309,140 +313,46 @@ function gradesReport(roster, items, ctx) {
   return html`<div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th class="gtable__sticky">الطالب</th>${items.map((i) => html`<th>${i.name}<span class="gtable__max tabular">${i.max}</span></th>`)}<th>المجموع<span class="gtable__max tabular">${totalMax}</span></th><th>النسبة</th></tr></thead><tbody>${roster.map((s) => { const total = studentTotal(items, ctx[s.id]); const band = masteryBand(total.pct); return html`<tr><td class="tabular t-3">${s.rollNo ?? ''}</td><th class="gtable__sticky"><a href="#/student/${s.id}">${s.name}</a></th>${items.map((i) => { const value = itemScore(i, ctx[s.id]); return html`<td class="tabular ${value === null ? 't-3' : ''}">${value === null ? '—' : fmtNum(value)}</td>`; })}<td class="tabular fw-7">${fmtNum(total.earned)}</td><td><span class="badge ${band.badge} tabular">${fmtPct(total.pct)}</span></td></tr>`; })}</tbody></table></div>`;
 }
 
-function attendanceReport(cls, roster, ctx) {
-  const allDates = store.sessionDates(cls.id);
-  if (!allDates.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
+function attendanceReport(cls, report) {
+  let sessions = report.sessions;
+  if (filterStartDate) sessions = sessions.filter((session) => session.date >= filterStartDate);
+  if (filterEndDate) sessions = sessions.filter((session) => session.date <= filterEndDate);
+  if (!sessions.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
 
-  let dates = allDates;
-  if (filterStartDate) dates = dates.filter((d) => d >= filterStartDate);
-  if (filterEndDate) dates = dates.filter((d) => d <= filterEndDate);
-
-  if (attMode === 'brief') {
-    return html`
-      <div class="hstack gap-2 mb-3 noprint fs-sm">
-        <label class="field" style="margin-bottom:0">
-          <span class="field__label fs-xs">من تاريخ</span>
-          <input class="input" type="date" value="${filterStartDate}" data-change="filter-start">
-        </label>
-        <label class="field" style="margin-bottom:0">
-          <span class="field__label fs-xs">إلى تاريخ</span>
-          <input class="input" type="date" value="${filterEndDate}" data-change="filter-end">
-        </label>
-      </div>
-      <div class="tablewrap print-tablewrap">
-        <table class="gtable gtable--report">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>الطالب</th>
-              <th>نسبة الحضور</th>
-              <th>حضور</th>
-              <th>تأخر</th>
-              <th>استئذان</th>
-              <th>غياب</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${roster.map((s) => {
-              const records = ctx[s.id].attendance.filter((a) => {
-                if (filterStartDate && a.date < filterStartDate) return false;
-                if (filterEndDate && a.date > filterEndDate) return false;
-                return true;
-              });
-              const tally = { present: 0, late: 0, excused: 0, absent: 0 };
-              for (const a of records) tally[a.status] = (tally[a.status] ?? 0) + 1;
-              const total = records.length;
-              const pct = total ? Math.round(((tally.present + tally.late) / total) * 100) : null;
-              return html`
-                <tr>
-                  <td class="tabular">${s.rollNo ?? ''}</td>
-                  <th><a href="#/student/${s.id}">${s.name}</a></th>
-                  <td class="tabular fw-7">${pct !== null ? `${pct}%` : '—'}</td>
-                  <td class="tabular t-3">${tally.present || '—'}</td>
-                  <td class="tabular t-3">${tally.late || '—'}</td>
-                  <td class="tabular t-3">${tally.excused || '—'}</td>
-                  <td class="tabular ${tally.absent ? 'fw-7 is-danger' : 't-3'}">${tally.absent || '—'}</td>
-                </tr>
-              `;
-            })}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  // Detailed mode with clean ~12 session chunk pagination
-  const CHUNK_SIZE = 12;
-  const allReversed = dates.slice().reverse();
-  const chunks = [];
-  if (allReversed.length === 0) {
-    chunks.push([]);
-  } else {
-    for (let i = 0; i < allReversed.length; i += CHUNK_SIZE) {
-      chunks.push(allReversed.slice(i, i + CHUNK_SIZE));
+  const rosterFor = (session, studentId) => report.rosterBySession.get(session.id)?.members.find((student) => student.id === studentId) ?? null;
+  const recordFor = (session, studentId) => report.attendanceBySession.get(session.id)?.get(studentId) ?? null;
+  const tallyFor = (studentId) => {
+    const tally = { present: 0, late: 0, excused: 0, absent: 0 };
+    for (const session of sessions) {
+      const record = recordFor(session, studentId);
+      if (record) tally[record.status] = (tally[record.status] ?? 0) + 1;
     }
-  }
+    return tally;
+  };
+  const filters = html`<div class="hstack gap-2 mb-3 noprint fs-sm"><label class="field" style="margin-bottom:0"><span class="field__label fs-xs">من تاريخ</span><input class="input" type="date" value="${filterStartDate}" data-change="filter-start"></label><label class="field" style="margin-bottom:0"><span class="field__label fs-xs">إلى تاريخ</span><input class="input" type="date" value="${filterEndDate}" data-change="filter-end"></label></div>`;
 
-  return html`
-    <div class="hstack gap-2 mb-3 noprint fs-sm">
-      <label class="field" style="margin-bottom:0">
-        <span class="field__label fs-xs">من تاريخ</span>
-        <input class="input" type="date" value="${filterStartDate}" data-change="filter-start">
-      </label>
-      <label class="field" style="margin-bottom:0">
-        <span class="field__label fs-xs">إلى تاريخ</span>
-        <input class="input" type="date" value="${filterEndDate}" data-change="filter-end">
-      </label>
-    </div>
-    <p class="t-3 fs-sm mb-3 noprint">${dates.length} يومًا مرصودًا ${chunks.length > 1 ? `(مُقسّمة إلى ${chunks.length} صفحات طباعة لملائمة مقاس A4)` : ''}.</p>
+  if (attMode === 'brief') return html`
+    ${filters}
+    <div class="tablewrap print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>نسبة الحضور</th><th>حضور</th><th>تأخر</th><th>استئذان</th><th>غياب</th></tr></thead><tbody>
+      ${report.students.map((student) => {
+        const tally = tallyFor(student.id); const total = Object.values(tally).reduce((sum, value) => sum + value, 0);
+        const pct = total ? Math.round(((tally.present + tally.late) / total) * 100) : null;
+        return html`<tr><td class="tabular">${student.rollNo ?? ''}</td><th><a href="#/student/${student.id}">${student.name}</a></th><td class="tabular fw-7">${pct === null ? '—' : `${pct}%`}</td><td class="tabular t-3">${tally.present || '—'}</td><td class="tabular t-3">${tally.late || '—'}</td><td class="tabular t-3">${tally.excused || '—'}</td><td class="tabular ${tally.absent ? 'fw-7 is-danger' : 't-3'}">${tally.absent || '—'}</td></tr>`;
+      })}
+    </tbody></table></div>`;
 
-    ${chunks.map(
-      (chunkDates, chunkIdx) => html`
-        <div class="report-chunk ${chunkIdx < chunks.length - 1 ? 'print-page-break' : ''}">
-          ${chunks.length > 1
-            ? html`
-                <div class="report-chunk__head noprint">
-                  <span class="badge">الصفحة ${chunkIdx + 1} من ${chunks.length}</span>
-                  <span class="fs-xs t-3">الحصص (${chunkIdx * CHUNK_SIZE + 1} إلى ${Math.min((chunkIdx + 1) * CHUNK_SIZE, allReversed.length)})</span>
-                </div>
-              `
-            : ''}
-          <div class="tablewrap scroll-x print-tablewrap">
-            <table class="gtable gtable--report">
-              <thead>
-                <tr>
-                  <th class="gtable__sticky">الطالب</th>
-                  ${chunkDates.map((d) => html`<th class="att-col">${fmtDate(d, false)}</th>`)}
-                  ${chunkIdx === chunks.length - 1
-                    ? ATTENDANCE_ORDER.map((k) => html`<th>${ATTENDANCE[k].label}</th>`)
-                    : ''}
-                </tr>
-              </thead>
-              <tbody>
-                ${roster.map((s) => {
-                  const byDate = new Map(ctx[s.id].attendance.map((a) => [a.date, a.status]));
-                  const tally = { present: 0, late: 0, excused: 0, absent: 0 };
-                  for (const a of ctx[s.id].attendance) tally[a.status] = (tally[a.status] ?? 0) + 1;
-                  return html`
-                    <tr>
-                      <th class="gtable__sticky"><span class="gtable__roll tabular">${s.rollNo ?? ''}</span>${s.name}</th>
-                      ${chunkDates.map((d) => {
-                        const state = byDate.get(d);
-                        return html`<td class="att-cell ${state ? 'is-' + state : ''}">${state ? ATTENDANCE[state].short : ''}</td>`;
-                      })}
-                      ${chunkIdx === chunks.length - 1
-                        ? ATTENDANCE_ORDER.map((k) => html`<td class="tabular ${k === 'absent' && tally[k] ? 'fw-7' : 't-3'}">${tally[k] || ''}</td>`)
-                        : ''}
-                    </tr>
-                  `;
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `
-    )}
-  `;
+  const CHUNK_SIZE = 12;
+  const chunks = Array.from({ length: Math.ceil(sessions.length / CHUNK_SIZE) }, (_, index) => sessions.slice(index * CHUNK_SIZE, (index + 1) * CHUNK_SIZE));
+  return html`${filters}<p class="t-3 fs-sm mb-3 noprint">${sessions.length} حصة مرصودة.</p>${chunks.map((chunk, chunkIndex) => html`
+    <div class="report-chunk ${chunkIndex < chunks.length - 1 ? 'print-page-break' : ''}"><div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th class="gtable__sticky">الطالب</th>${chunk.map((session) => html`<th class="att-col">${fmtDate(session.date, false)} · ${session.period}</th>`)}${chunkIndex === chunks.length - 1 ? ATTENDANCE_ORDER.map((key) => html`<th>${ATTENDANCE[key].label}</th>`) : ''}</tr></thead><tbody>
+      ${report.students.map((student) => {
+        const tally = tallyFor(student.id);
+        return html`<tr><th class="gtable__sticky"><span class="gtable__roll tabular">${student.rollNo ?? ''}</span>${student.name}</th>${chunk.map((session) => {
+          const member = rosterFor(session, student.id); const record = recordFor(session, student.id);
+          return html`<td class="att-cell ${record ? 'is-' + record.status : ''}">${member && record ? ATTENDANCE[record.status].short : member ? '—' : ''}</td>`;
+        })}${chunkIndex === chunks.length - 1 ? ATTENDANCE_ORDER.map((key) => html`<td class="tabular ${key === 'absent' && tally[key] ? 'fw-7' : 't-3'}">${tally[key] || ''}</td>`) : ''}</tr>`;
+      })}
+    </tbody></table></div></div>`)} `;
 }
 
 export function supportRows(roster, items, ctx) {

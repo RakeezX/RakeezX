@@ -6,7 +6,7 @@
  */
 
 export const DB_NAME = 'rakeezx';
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 
 
 export const STORES = [
@@ -25,6 +25,7 @@ export const STORES = [
   'scores',
   'slots',         // الجدول الأسبوعي المتكرر
   'sessions',      // الحصص
+  'sessionRosterSnapshots', // كشف الحصة المثبّت عند أول رصد حضور
   'attendance',    // الحضور — مرتبط بالحصة لا باليوم
   'logs',          // الرصد السريع
   'calendars',

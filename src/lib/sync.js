@@ -17,12 +17,12 @@ export const state = {
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'timeProfiles', 'slots', 'sessions', 'attendance'
+  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance'
 ]);
 const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores', 'logs']);
-const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'attendance']);
+const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
 const AUTO_SYNC_DEBOUNCE_MS = 900;
 
 let autoTimer = null;
@@ -712,6 +712,32 @@ const MAPPERS = {
       deletedAt: rec.deleted_at || undefined
     })
   },
+  sessionRosterSnapshots: {
+    toCloud: (rec) => ({
+      id: rec.id,
+      session_id: rec.sessionId,
+      teaching_id: rec.teachingId,
+      section_id: rec.sectionId,
+      captured_at: new Date(rec.capturedAt).toISOString(),
+      members: rec.members,
+      state: rec.state,
+      deleted_at: rec.deleted ? (rec.deletedAt || new Date(rec.updatedAt).toISOString()) : null,
+      client_updated_at: rec.updatedAt,
+      device_id: getDeviceId(),
+    }),
+    fromCloud: (rec) => ({
+      id: rec.id,
+      sessionId: rec.session_id,
+      teachingId: rec.teaching_id,
+      sectionId: rec.section_id,
+      capturedAt: normalizeTimestamp(rec.captured_at || rec.client_updated_at),
+      members: Array.isArray(rec.members) ? rec.members : [],
+      state: rec.state,
+      updatedAt: normalizeTimestamp(rec.client_updated_at),
+      deleted: !!rec.deleted_at,
+      deletedAt: rec.deleted_at || undefined,
+    }),
+  },
   notes: {
     toCloud: (rec) => ({
       id: rec.id,
@@ -1398,6 +1424,17 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
     toPush.push(...sorted);
   }
 
+  if (storeName === 'sessionRosterSnapshots') {
+    for (const p of toPush) {
+      if (p.session_id && !context.knownRemoteIds?.sessions?.has(p.session_id)) {
+        throw new Error(`${storeName}: missing remote session ${p.session_id}`);
+      }
+      if (p.teaching_id && !context.knownRemoteIds?.teachings?.has(p.teaching_id)) {
+        throw new Error(`${storeName}: missing remote teaching ${p.teaching_id}`);
+      }
+    }
+  }
+
   if (storeName === 'notes') {
     for (const p of toPush) {
       if (p.student_id && !context.knownRemoteIds?.students?.has(p.student_id)) {
@@ -1828,6 +1865,12 @@ export async function syncTimetable() {
     const resSessions = await syncCollection('sessions', 'sessions', { requiredIds: new Set(), knownRemoteIds });
     knownRemoteIds.sessions = resSessions.known;
     stats.sessions = { pushed: resSessions.pushed, pulled: resSessions.pulled };
+
+    // Snapshots explain the historical roster for attendance, so pull/push
+    // them after their session and before its attendance records.
+    const resSnapshots = await syncCollection('sessionRosterSnapshots', 'session_roster_snapshots', { requiredIds: new Set(), knownRemoteIds });
+    knownRemoteIds.sessionRosterSnapshots = resSnapshots.known;
+    stats.sessionRosterSnapshots = { pushed: resSnapshots.pushed, pulled: resSnapshots.pulled };
 
     // Fetch remote students for attendance foreign key validation
     const remoteStudents = await cloud.fetchRecords('students');

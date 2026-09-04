@@ -144,8 +144,10 @@ export default {
         ${list.map((s) => {
           const raw = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
           const { completeness, meta } = attendanceMeta(s);
-          const marked = store.attendanceIn(s.id).length;
-          const absents = store.attendanceIn(s.id).filter((a) => a.status === 'absent').length;
+          const memberIds = new Set(store.sessionRoster(s).members.map((student) => student.id));
+          const records = store.attendanceIn(s.id).filter((record) => memberIds.has(record.studentId));
+          const marked = records.length;
+          const absents = records.filter((record) => record.status === 'absent').length;
           const lesson = s.lessonId ? store.getLesson(s.lessonId) : null;
           const attendanceHref = `#/teaching/${s.teachingId}/attendance?session=${s.id}`;
           return html`
