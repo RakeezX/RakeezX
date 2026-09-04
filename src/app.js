@@ -506,7 +506,9 @@ async function boot() {
 
   setRepaint(scheduleRender);
   store.onWriteError(() => toast('تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
-  store.subscribe(scheduleRender);
+  store.subscribe((_state, update) => {
+    if (update?.render !== false) scheduleRender();
+  });
   cloud.subscribe(scheduleRender);
   if (syncModule) {
     syncModule.subscribe(paintSyncStatus);

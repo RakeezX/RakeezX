@@ -21,6 +21,23 @@ const AUTO_NOTE = {
   attendance: 'يُحسب آليًا من الغياب — لا يُدخل يدويًا.',
 };
 
+function refreshScoreProjection(studentId, itemId) {
+  const item = store.state.items.find((candidate) => candidate.id === itemId && !candidate.deleted);
+  if (!item) return;
+  const { roster, items, ctx } = store.teachingContext(item.teachingId);
+  const currentItem = items.find((candidate) => candidate.id === activeItemId);
+  const countEl = document.querySelector('[data-grade-count]');
+  if (countEl && currentItem) {
+    const count = roster.filter((student) => itemScore(currentItem, ctx[student.id]) !== null).length;
+    countEl.textContent = `${count}/${roster.length}`;
+  }
+  const total = studentTotal(items, ctx[studentId]);
+  const totalEl = document.querySelector(`[data-grade-total="${CSS.escape(studentId)}"]`);
+  const pctEl = document.querySelector(`[data-grade-pct="${CSS.escape(studentId)}"]`);
+  if (totalEl) totalEl.textContent = fmtNum(total.earned);
+  if (pctEl) pctEl.textContent = fmtPct(total.pct);
+}
+
 export default {
   title: () => 'كشف الدرجات',
   subtitle: (p) => {
@@ -240,7 +257,9 @@ export default {
 
       const raw = el.value.trim();
       if (raw === '') {
-        await store.setScore(studentId, itemId, null);
+        const saved = store.setScore(studentId, itemId, null, { render: false });
+        refreshScoreProjection(studentId, itemId);
+        await saved;
         return;
       }
 
@@ -252,9 +271,12 @@ export default {
       if (v < 0) v = 0;
       if (v > item.max) {
         v = item.max;
+        el.value = fmtNum(v);
         toast(`أقصى درجة لهذا البند ${item.max}`);
       }
-      await store.setScore(studentId, itemId, v);
+      const saved = store.setScore(studentId, itemId, v, { render: false });
+      refreshScoreProjection(studentId, itemId);
+      await saved;
     },
 
     'select-score'(el) {
@@ -318,7 +340,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
           </div>
         </div>
         <div class="push center">
-          <div class="stat__val tabular">${gradedCount}/${fullRoster.length}</div>
+          <div class="stat__val tabular" data-grade-count>${gradedCount}/${fullRoster.length}</div>
           <div class="stat__label">مرصود</div>
         </div>
       </div>
@@ -445,9 +467,9 @@ function tableMode(roster, items, ctx) {
                 })}
                 <td class="gtable__total">
                   <span class="badge ${band.badge}">
-                    <span class="tabular">${fmtNum(t.earned)}</span>
+                    <span class="tabular" data-grade-total="${s.id}">${fmtNum(t.earned)}</span>
                   </span>
-                  <div class="t-3 fs-sm tabular">${fmtPct(t.pct)}</div>
+                  <div class="t-3 fs-sm tabular" data-grade-pct="${s.id}">${fmtPct(t.pct)}</div>
                 </td>
               </tr>
             `;

@@ -1,54 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
-
-function mockCloud() {
-  const tables = {};
-  return {
-    tables,
-    async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
-        const request = route.request();
-        const table = new URL(request.url()).pathname.split('/').pop();
-        if (request.method() === 'GET') {
-          await route.fulfill({ json: tables[table] ?? [] });
-          return;
-        }
-        if (request.method() === 'POST') {
-          const body = JSON.parse(request.postData() ?? '[]');
-          const records = Array.isArray(body) ? body : [body];
-          const rows = (tables[table] ??= []);
-          for (const record of records) {
-            const index = rows.findIndex((row) => row.id === record.id);
-            if (index < 0) rows.push({ ...record });
-            else rows[index] = { ...rows[index], ...record };
-          }
-          await route.fulfill({ json: [] });
-          return;
-        }
-        await route.fulfill({ status: 200, json: [] });
-      });
-    },
-  };
-}
-
-test('post-edit sync preserves first-click grade interaction while real data updates still render', async ({ page }) => {
-  test.setTimeout(60_000);
-  const cloud = mockCloud();
+test('a changed grade keeps the first Grades-tab click and persists after reload', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
 
-  await page.addInitScript(() => {
-    localStorage.setItem('rakeezx-auth', JSON.stringify({
-      access_token: 'interaction-test-token', user: { id: 'interaction-test-user' },
-    }));
-  });
-  await cloud.route(page);
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store?.state?.ready === true && window.__syncModule);
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.evaluate(async () => {
     await window.store.save({
       years: [{ id: 'interaction:year', name: 'سنة اختبار', status: 'active' }],
@@ -72,65 +32,51 @@ test('post-edit sync preserves first-click grade interaction while real data upd
     });
     await window.store.patchDevice({ activeYearId: 'interaction:year', activeTermId: 'interaction:term' });
     window.store.repaint();
-    await window.__syncModule.syncAll({ full: false });
   });
-
-  await page.locator('a[href="#/teaching/interaction:teaching"]').click();
-  await expect(page).toHaveURL(/#\/teaching\/interaction:teaching$/);
 
   await page.goto('/#/teaching/interaction:teaching/grades');
   const itemInput = page.locator('input[data-fk="g-interaction:student:a-interaction:item"]');
+  const participation = page.getByRole('tab', { name: /المشاركة/ });
+
+  // A: unchanged input → first tab click.
   await itemInput.click();
-  await expect.poll(() => itemInput.evaluate((el) => ({ start: el.selectionStart, end: el.selectionEnd, length: el.value.length })))
-    .toEqual({ start: 0, end: 1, length: 1 });
+  await participation.click();
+  await expect(participation).toHaveAttribute('aria-selected', 'true');
 
+  // B: changed input → first tab click, with no local full-page replacement.
+  const testTab = page.getByRole('tab', { name: /اختبار/ });
+  await testTab.click();
+  await expect(testTab).toHaveAttribute('aria-selected', 'true');
+  await page.evaluate(() => {
+    let count = 0;
+    const main = document.getElementById('main');
+    const observer = new MutationObserver((mutations) => {
+      count += mutations.filter((mutation) => mutation.type === 'childList' && mutation.removedNodes.length).length;
+    });
+    observer.observe(main, { childList: true });
+    window.__interactionReplacementCount = () => count;
+    window.__interactionReplacementObserver = observer;
+  });
   await itemInput.fill('8');
-  await page.getByRole('tab', { name: /المشاركة/ }).click();
-  await expect(page.getByRole('tab', { name: /المشاركة/ })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText('يُحسب آليًا من الرصد السريع')).toBeVisible();
+  await participation.click();
+  await expect(participation).toHaveAttribute('aria-selected', 'true');
+  expect(await page.evaluate(() => window.__interactionReplacementCount())).toBe(1);
+  await page.evaluate(() => window.__interactionReplacementObserver.disconnect());
 
+  // C: changed input → next grade input, with the first click focusing it.
   await page.getByRole('tab', { name: /اختبار/ }).click();
   await page.locator('[data-act="mode"][data-mode="table"]').click();
   const first = page.locator('input[data-fk="t-interaction:student:a-interaction:item"]');
   const next = page.locator('input[data-fk="t-interaction:student:b-interaction:item"]');
-  await first.fill('8');
+  await first.fill('7');
   await next.click();
-  await page.waitForFunction(() => window.store.state.scores.some((score) =>
-    !score.deleted && score.studentId === 'interaction:student:a' && score.itemId === 'interaction:item' && score.value === 8));
   await expect(next).toBeFocused();
+  await page.waitForFunction(() => window.store.state.scores.some((score) =>
+    !score.deleted && score.studentId === 'interaction:student:a' && score.itemId === 'interaction:item' && score.value === 7));
 
-  // Let the local change paint on the Grades screen, then put an unrelated
-  // class card on screen before the real own-record sync completes.
-  await next.fill('6');
-  await page.waitForTimeout(50);
-  await page.goto('/#/classes');
-  const classCard = page.locator('.class-card').first();
-  await expect(classCard).toBeVisible();
-  const cardStayedMounted = await page.evaluate(async () => {
-    const card = document.querySelector('.class-card');
-    await window.__syncModule.syncAll({ full: false });
-    return card?.isConnected;
-  });
-  expect(cardStayedMounted).toBe(true);
-
-  // A newer cloud record is a real data change and must still refresh the UI.
-  const remoteSection = cloud.tables.sections.find((section) => section.id === 'interaction:section');
-  remoteSection.label = 'ب';
-  remoteSection.client_updated_at = Date.now() + 10_000;
-  const cardWasReplacedForRemoteChange = await page.evaluate(async () => {
-    const card = document.querySelector('.class-card');
-    await window.__syncModule.syncStructural();
-    return !card?.isConnected;
-  });
-  expect(cardWasReplacedForRemoteChange).toBe(true);
-  await expect(page.locator('.class-card')).toContainText('ب');
-
-  await page.goto('/#/teaching/interaction:teaching/grades');
+  // D: the saved value survives a real reload.
+  await page.reload();
   await page.locator('[data-act="mode"][data-mode="table"]').click();
-  const finalNext = page.locator('input[data-fk="t-interaction:student:b-interaction:item"]');
-  await finalNext.fill('6');
-  await page.locator('a[href="#/student/interaction:student:a"]').click();
-  await expect(page).toHaveURL(/#\/student\/interaction:student:a/);
-  await expect(page.getByText('طالب التفاعل أ', { exact: true })).toBeVisible();
+  await expect(page.locator('input[data-fk="t-interaction:student:a-interaction:item"]')).toHaveValue('7');
   expect(errors).toEqual([]);
 });

@@ -56,12 +56,16 @@ export function subscribe(fn) {
 }
 
 let notifyQueued = false;
-function notify() {
+let pendingRender = false;
+function notify({ render = true } = {}) {
+  pendingRender ||= render;
   if (notifyQueued) return;
   notifyQueued = true;
   queueMicrotask(() => {
     notifyQueued = false;
-    for (const fn of listeners) fn(state);
+    const update = { render: pendingRender };
+    pendingRender = false;
+    for (const fn of listeners) fn(state, update);
   });
 }
 
@@ -581,11 +585,12 @@ export async function patch(storeName, id, changes, create = null, options = {})
   const preserve = options.preserveTimestamp && changes.updatedAt !== undefined;
   const newStamp = preserve ? changes.updatedAt : now();
   const shouldNotify = options.notify !== false;
+  const shouldRender = options.render !== false;
   const optimistic = { ...base, ...changes, id, updatedAt: newStamp };
   const undo = singleton ? [] : applyToMemory(storeName, [optimistic]);
   const previous = singleton ? state[storeName] : null;
   if (singleton) state[storeName] = optimistic;
-  if (shouldNotify) notify();
+  if (shouldNotify) notify({ render: shouldRender });
 
   try {
     const [authoritative] = await db.patchMany(
@@ -612,7 +617,7 @@ export async function patch(storeName, id, changes, create = null, options = {})
       else applyToMemory(storeName, [authoritative]);
     }
     broadcast([{ store: storeName, id }]);
-    if (authoritativeChanged && shouldNotify) notify();
+    if (authoritativeChanged && shouldNotify) notify({ render: shouldRender });
     return authoritative;
   } catch (err) {
     if (singleton) state[storeName] = previous;
@@ -2028,7 +2033,7 @@ export function clampScore(value, itemId) {
   return Math.min(max, Math.max(0, n));
 }
 
-export function setScore(studentId, itemId, value) {
+export function setScore(studentId, itemId, value, options = {}) {
   const item = state.items.find((candidate) => candidate.id === itemId && !candidate.deleted);
   if (!item) return null;
   // عندما توجد درجة واحدة متوافقة في شعبة سابقة، نحدّث سجلها نفسه بدل صنع
@@ -2038,7 +2043,7 @@ export function setScore(studentId, itemId, value) {
   const targetItemId = existing?.itemId ?? itemId;
   return patch('scores', id, { value: clampScore(value, itemId), deleted: false }, {
     id, studentId, itemId: targetItemId, value: null, deleted: false, updatedAt: now(),
-  });
+  }, options);
 }
 
 export function deleteItem(itemId) {
