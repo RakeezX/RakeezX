@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v5';
+const VERSION = 'rakeezx-v6';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();

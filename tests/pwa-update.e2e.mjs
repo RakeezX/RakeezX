@@ -20,8 +20,8 @@ async function startVersionedServer() {
     }
     if (pathname === '/versioned/app.css') return send(`:root { --release: '${release}'; }`, 'text/css');
     if (pathname === '/versioned/sw.js') {
-      const version = release === 'A' ? 'rakeezx-v4' : 'rakeezx-v5';
-      return send(workerSource.replace("const VERSION = 'rakeezx-v5';", `const VERSION = '${version}';`), 'text/javascript');
+      const version = release === 'A' ? 'rakeezx-v5' : 'rakeezx-v6';
+      return send(workerSource.replace("const VERSION = 'rakeezx-v6';", `const VERSION = '${version}';`), 'text/javascript');
     }
     response.writeHead(404).end();
   });
@@ -71,8 +71,8 @@ test('Version A to Version B refreshes executable assets without removing teache
     await page.waitForFunction(async () => {
       const keys = await caches.keys();
       const registration = await navigator.serviceWorker.getRegistration();
-      return keys.includes('rakeezx-v5')
-        && !keys.includes('rakeezx-v4')
+      return keys.includes('rakeezx-v6')
+        && !keys.includes('rakeezx-v5')
         && registration?.active?.state === 'activated'
         && navigator.serviceWorker.controller === registration.active;
     });
@@ -97,13 +97,13 @@ test('Version A to Version B refreshes executable assets without removing teache
       return onlineAssets.js.includes("window.__release = 'B'")
         && onlineAssets.css.includes("--release: 'B'")
         && onlineAssets.caches.includes('unrelated-cache')
-        && !onlineAssets.caches.includes('rakeezx-v4')
+        && !onlineAssets.caches.includes('rakeezx-v5')
         && onlineAssets.teacher?.id === 'teacher-data';
     }, { timeout: 10_000 }).toBe(true);
     expect(onlineAssets.js).toContain("window.__release = 'B'");
     expect(onlineAssets.css).toContain("--release: 'B'");
     expect(onlineAssets.caches).toContain('unrelated-cache');
-    expect(onlineAssets.caches).not.toContain('rakeezx-v4');
+    expect(onlineAssets.caches).not.toContain('rakeezx-v5');
     expect(onlineAssets.teacher).toMatchObject({ id: 'teacher-data', name: 'TEST Teacher Data' });
     await page.waitForTimeout(500);
     expect(reloads).toBe(1);

@@ -40,18 +40,37 @@ test('Student Profile shows context-true continuous history through X → Y → 
     });
     await window.store.patchDevice({ activeYearId: 'continuous-history:year', activeTermId: 'continuous-history:term' });
     await window.store.transferStudent(studentId, y, { date: '2026-08-25' });
+    return { studentId, x, y, teachingX, teachingY, sessionY };
+  });
+
+  // Follow the same route a teacher takes after a transfer: open Y's roster and
+  // select the student there before Y has any attendance, notes, or quick logs.
+  await page.goto(`/#/teaching/${fixture.teachingY}/students`);
+  const studentLink = page.locator(`a[href="#/student/${fixture.studentId}?teaching=${fixture.teachingY}"]`);
+  await expect(studentLink.locator('.row__title')).toHaveText('طالب السجل المستمر');
+  await studentLink.click();
+  await expect(page.locator('.student-profile-header__name')).toHaveText('طالب السجل المستمر');
+  await expect(page.locator('.student-profile-header__meta')).toContainText('الانتساب الحالي · الرابع الابتدائي / ب');
+  const initialAttendance = page.locator('.section', { hasText: 'سجل الحضور المستمر' });
+  await expect(initialAttendance.locator('.logrow')).toHaveCount(1);
+  await expect(initialAttendance).toContainText('الرابع الابتدائي / أ · المهارات الرقمية');
+  await expect(initialAttendance).toContainText('سياق سابق');
+  const initialNotes = page.locator('.section', { hasText: 'الملاحظات' });
+  await expect(initialNotes).toContainText('ملاحظة X');
+  const initialLogs = page.locator('.section', { hasText: 'المشاركة والسلوك' });
+  await expect(initialLogs).toContainText('مشاركة X');
+
+  await page.evaluate(async ({ studentId, teachingY, sessionY }) => {
+    const stamp = Date.now();
+    const common = { updatedAt: stamp, deleted: false };
     await window.store.save({
       sessions: [{ id: sessionY, teachingId: teachingY, date: '2026-08-28', period: 4, status: 'held', ...common }],
       attendance: [{ id: `at:${studentId}:${sessionY}`, studentId, sessionId: sessionY, teachingId: teachingY, date: '2026-08-28', status: 'present', ...common }],
       logs: [{ id: 'continuous-history:log:Y', studentId, sessionId: sessionY, teachingId: teachingY, date: '2026-08-28', kind: 'behavior', delta: -1, tag: 'سلوك Y', ...common }],
       notes: [{ id: 'continuous-history:note:Y', studentId, sessionId: sessionY, teachingId: teachingY, date: '2026-08-28', kind: 'general', text: 'ملاحظة Y', createdAt: stamp + 1, ...common }],
     });
-    return { studentId, x, y, teachingX, teachingY };
-  });
+  }, fixture);
 
-  await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingY}`);
-  await expect(page.locator('.student-profile-header__name')).toHaveText('طالب السجل المستمر');
-  await expect(page.locator('.student-profile-header__meta')).toContainText('الانتساب الحالي · الرابع الابتدائي / ب');
   await expect(page.locator('.student-profile-header__meta')).toContainText('السياق المعروض · الرابع الابتدائي / ب · المهارات الرقمية');
 
   const attendance = page.locator('.section', { hasText: 'سجل الحضور المستمر' });

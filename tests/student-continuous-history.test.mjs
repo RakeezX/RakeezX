@@ -66,6 +66,11 @@ test('student history remains continuous and context-true across X → Y → X',
 
   await store.transferStudent(f.student.id, f.y.id, { date: '2026-08-25' });
   history = store.studentHistory(f.student.id);
+  assert.deepEqual(
+    store.studentContext(f.student.id, f.teachingY.id).attendance,
+    [],
+    'Y has no current-class attendance immediately after transfer'
+  );
   assert.deepEqual(history.attendance.map((event) => event.record.id), [f.attendanceX.id]);
   assert.equal(history.attendance[0].section.id, f.x.id, 'X attendance keeps its original section after transfer');
   assert.equal(history.logs[0].section.id, f.x.id, 'X quick log remains visible after transfer');
