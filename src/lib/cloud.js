@@ -197,6 +197,55 @@ export async function upsertRecords(tableName, records) {
   return { success: true };
 }
 
+/**
+ * Commits the two enrollment sides of a student transfer in one database
+ * transaction.  Payload records already use cloud/snake_case field names.
+ */
+export async function commitEnrollmentTransfer({ source, destination } = {}) {
+  if (mockBackend) {
+    if (typeof mockBackend.commitEnrollmentTransfer !== 'function') {
+      throw new Error('Mock backend does not implement enrollment transfer RPC');
+    }
+    return mockBackend.commitEnrollmentTransfer({ source, destination });
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/commit_enrollment_transfer', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({ p_source: source, p_destination: destination }),
+  });
+}
+
+/**
+ * Applies a complete active-roster numbering plan inside one server
+ * transaction.  The server temporarily clears numbers before assigning the
+ * final sequence, so the partial active-roll unique index is never violated.
+ */
+export async function renumberEnrollmentRoster({ sectionId, roster } = {}) {
+  if (mockBackend) {
+    if (typeof mockBackend.renumberEnrollmentRoster !== 'function') {
+      throw new Error('Mock backend does not implement enrollment renumber RPC');
+    }
+    return mockBackend.renumberEnrollmentRoster({ sectionId, roster });
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/renumber_enrollment_roster', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({ p_section_id: sectionId, p_roster: roster }),
+  });
+}
+
 /** Exact owner-scoped section identity lookup for safe sync reconciliation. */
 export async function fetchSectionPresence(sectionId) {
   if (!user) return { authoritative: false, status: 'unknown', row: null, error: 'Not authenticated' };

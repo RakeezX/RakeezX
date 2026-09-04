@@ -1009,6 +1009,49 @@ function postgresDiagnostic(error) {
 }
 
 /**
+ * Enrollment transfer and renumber receipts are written atomically with their
+ * local rows. Drain them before generic enrollment merge so PostgREST never
+ * receives a transient active-roll collision as ordinary upserts.
+ *
+ * A locally tombstoned side deliberately skips its older receipt: deletion is
+ * authoritative locally and must never be undone by replaying a transfer.
+ */
+async function syncEnrollmentOperations() {
+  const entries = (await db.getAll('outbox'))
+    .filter((entry) => entry.store === 'enrollments' && entry.enrollmentOperation)
+    .sort((a, b) => (a.enrollmentOperation.order ?? a.queuedAt ?? a.updatedAt ?? 0) -
+      (b.enrollmentOperation.order ?? b.queuedAt ?? b.updatedAt ?? 0) || a.id.localeCompare(b.id));
+
+  for (const entry of entries) {
+    const operation = entry.enrollmentOperation;
+    if (!operation?.type) continue;
+
+    if (operation.type === 'transfer') {
+      const sourceCurrent = store.state.enrollments.find((row) => row.id === operation.source?.id);
+      const destinationCurrent = store.state.enrollments.find((row) => row.id === operation.destination?.id);
+      if (!sourceCurrent || !destinationCurrent || sourceCurrent.deleted || destinationCurrent.deleted) continue;
+      await cloud.commitEnrollmentTransfer({
+        source: MAPPERS.enrollments.toCloud(operation.source),
+        destination: MAPPERS.enrollments.toCloud(operation.destination),
+      });
+      continue;
+    }
+
+    if (operation.type === 'renumber') {
+      const currentById = new Map(store.state.enrollments.map((row) => [row.id, row]));
+      if (operation.roster?.some((row) => !currentById.get(row.id) || currentById.get(row.id).deleted)) continue;
+      await cloud.renumberEnrollmentRoster({
+        sectionId: operation.sectionId,
+        roster: operation.roster.map((row) => MAPPERS.enrollments.toCloud(row)),
+      });
+      continue;
+    }
+
+    throw new Error(`Unknown enrollment operation: ${operation.type}`);
+  }
+}
+
+/**
  * Generic sync engine for a single collection.
  * Pull → Merge → Push
  */
@@ -1564,7 +1607,11 @@ export async function syncStudents() {
     knownRemoteIds.students = resStudents.known;
     stats.students = { pushed: resStudents.pushed, pulled: resStudents.pulled };
 
-    // 2. Enrollments
+    // 2. Bounded enrollment operations must reach the cloud transaction before
+    // generic record merge can observe their intermediate roll-number state.
+    await syncEnrollmentOperations();
+
+    // 3. Enrollments
     const resEnrollments = await syncCollection('enrollments', 'enrollments', { requiredIds: new Set(), knownRemoteIds });
     stats.enrollments = { pushed: resEnrollments.pushed, pulled: resEnrollments.pulled };
 

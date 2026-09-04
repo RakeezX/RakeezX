@@ -352,7 +352,11 @@ export default {
       if (data.__transfer) {
         const target = await transferSheet(s, tch.sectionId);
         if (!target?.sectionId) return;
-        await store.transferStudent(s.id, target.sectionId, { note: target.note });
+        const moved = await store.transferStudent(s.id, target.sectionId, { note: target.note });
+        if (!moved) {
+          toast('تعذّر نقل الطالب بأمان. تحقق من كشف الشعبة ثم أعد المحاولة.', 'danger');
+          return;
+        }
         const to = store.getSection(target.sectionId);
         toast(`نُقل ${s.name} إلى ${to ? store.sectionLabel(to) : 'الشعبة الجديدة'}`);
         return;
@@ -388,7 +392,11 @@ export default {
         confirmLabel: 'أعد الترقيم',
       });
       if (!ok) return;
-      await store.renumberRoster(tch.sectionId);
+      const renumbered = await store.renumberRoster(tch.sectionId);
+      if (!renumbered) {
+        toast('تعذّرت إعادة الترقيم. أعد المحاولة.', 'danger');
+        return;
+      }
       toast('أُعيد الترقيم');
     },
   },

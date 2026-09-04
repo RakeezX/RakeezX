@@ -317,6 +317,29 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
   });
 };
 
+/**
+ * A durable receipt for a bounded enrollment operation.  The ordinary per-row
+ * entries remain so generic sync can still converge the final records; this
+ * receipt tells student sync to use the server transaction first, before a
+ * generic bulk upsert could expose a transient duplicate roll number.
+ */
+const enrollmentOperationEntry = (operation, stamp) => ({
+  id: `enrollment-operation:${operation.id}`,
+  store: 'enrollments',
+  recordId: null,
+  op: 'enrollment-operation',
+  updatedAt: stamp,
+  queuedAt: stamp,
+  enrollmentOperation: operation,
+});
+
+let enrollmentOperationOrder = 0;
+const nextEnrollmentOperationOrder = (outbox = []) => {
+  const persisted = outbox.reduce((max, entry) => Math.max(max, entry.enrollmentOperation?.order ?? 0), 0);
+  enrollmentOperationOrder = Math.max(Date.now() * 1000, enrollmentOperationOrder + 1, persisted + 1);
+  return enrollmentOperationOrder;
+};
+
 // Keep cascade deletes in the same durable transaction as their tombstones.
 // Every store listed here has a cloud mapper and may safely drain through automatic sync.
 const CASCADE_SYNCABLE_STORES = new Set([
@@ -1283,6 +1306,20 @@ export function rollNoTaken(secId, rollNo, exceptEnrollmentId = null) {
 const nextRollNo = (secId) =>
   enrollmentsIn(secId).reduce((m, e) => Math.max(m, e.rollNo ?? 0), 0) + 1;
 
+const validRollNo = (value) => Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 999;
+
+const nextRollNoFrom = (enrollments, secId) =>
+  enrollments.filter((e) => e.sectionId === secId && !e.deleted)
+    .reduce((max, e) => Math.max(max, Number(e.rollNo) || 0), 0) + 1;
+
+const destinationRollNo = (enrollments, destination, secId) => {
+  const active = enrollments.filter((e) => e.sectionId === secId && e.status === 'active' && !e.deleted && e.id !== destination?.id);
+  const free = (rollNo) => validRollNo(rollNo) && !active.some((e) => Number(e.rollNo) === Number(rollNo));
+  if (destination && free(destination.rollNo)) return Number(destination.rollNo);
+  const next = nextRollNoFrom(enrollments, secId);
+  return free(next) ? next : null;
+};
+
 /** يضبط رقم كشف مع منع التكرار داخل الشعبة. يعيد {ok, reason}. */
 export async function setRollNo(enrollmentId, rollNo) {
   const en = state.enrollments.find((e) => e.id === enrollmentId && !e.deleted);
@@ -1404,29 +1441,109 @@ export async function importStudents(secId, names) {
  * مربوطين بإسنادات شعبته السابقة.
  */
 export async function transferStudent(studentId, toSectionId, { date = todayISO(), note = '' } = {}) {
-  const current = activeEnrollment(studentId);
-  if (current?.sectionId === toSectionId) return current;
+  if (!studentId || !toSectionId || !date) return null;
+  const stamp = now();
+  const operationId = `transfer:${uid()}`;
+  let result = { ok: false, status: 'write-failed' };
+  let committed;
 
-  if (current) {
-    await patch('enrollments', current.id, {
-      status: 'transferred', endDate: date, transferNote: note,
+  try {
+    committed = await db.applyBatch({ students: {}, sections: {}, enrollments: {}, outbox: {} }, {
+      prepare(current) {
+        const student = current.students.find((row) => row.id === studentId && !row.deleted);
+        const destinationSection = current.sections.find((row) => row.id === toSectionId && !row.deleted);
+        if (!student) {
+          result = { ok: false, status: 'student-missing' };
+          return {};
+        }
+        if (!destinationSection) {
+          result = { ok: false, status: 'destination-missing' };
+          return {};
+        }
+
+        const active = current.enrollments.filter((row) =>
+          row.studentId === studentId && row.status === 'active' && !row.deleted);
+        const destinationId = enrollmentId(studentId, toSectionId);
+        const destination = current.enrollments.find((row) => row.id === destinationId) ?? null;
+
+        // A retried completed transfer is intentionally write-free.
+        if (active.length === 1 && active[0].id === destinationId) {
+          result = { ok: true, status: 'already-active', enrollment: active[0] };
+          return {};
+        }
+        if (active.length !== 1) {
+          result = { ok: false, status: active.length ? 'multiple-active-memberships' : 'source-missing' };
+          return {};
+        }
+        if (destination?.deleted) {
+          // A tombstone is a durable deletion signal; transfer must not revive it.
+          result = { ok: false, status: 'destination-tombstoned' };
+          return {};
+        }
+
+        const source = active[0];
+        const rollNo = destinationRollNo(current.enrollments, destination, toSectionId);
+        if (!rollNo) {
+          result = { ok: false, status: 'destination-roll-unavailable' };
+          return {};
+        }
+
+        const retired = {
+          ...source,
+          status: 'transferred',
+          endDate: date,
+          transferNote: String(note ?? ''),
+          updatedAt: stamp,
+        };
+        const activated = destination
+          ? {
+            ...destination,
+            status: 'active',
+            startDate: date,
+            endDate: null,
+            rollNo,
+            updatedAt: stamp,
+          }
+          : makeEnrollment({
+            studentId,
+            sectionId: toSectionId,
+            rollNo,
+            startDate: date,
+            updatedAt: stamp,
+          });
+
+        const operation = {
+          id: operationId,
+          type: 'transfer',
+          source: structuredClone(retired),
+          destination: structuredClone(activated),
+          updatedAt: stamp,
+          order: nextEnrollmentOperationOrder(current.outbox),
+        };
+        result = { ok: true, status: 'transferred', enrollment: activated };
+        return {
+          enrollments: { put: [retired, activated] },
+          outbox: {
+            put: [
+              outboxEntry('enrollments', retired, ['status', 'endDate', 'transferNote'], 'patch'),
+              outboxEntry('enrollments', activated, destination ? ['status', 'startDate', 'endDate', 'rollNo'] : null, destination ? 'patch' : 'put'),
+              enrollmentOperationEntry(operation, stamp),
+            ].filter(Boolean),
+          },
+        };
+      },
     });
+  } catch (error) {
+    reportWriteError(error, { op: 'transferStudent', studentId, toSectionId });
+    return null;
   }
 
-  const id = enrollmentId(studentId, toSectionId);
-  const existing = state.enrollments.find((e) => e.id === id);
-  if (existing) {
-    return patch('enrollments', id, {
-      status: 'active', startDate: date, endDate: null, deleted: false,
-      rollNo: existing.rollNo ?? nextRollNo(toSectionId),
-    });
-  }
-
-  const en = makeEnrollment({
-    studentId, sectionId: toSectionId, rollNo: nextRollNo(toSectionId), startDate: date,
-  });
-  await save({ enrollments: [en] });
-  return en;
+  if (!result.ok) return null;
+  if (result.status === 'already-active') return result.enrollment;
+  const changed = changeList('enrollments', committed.enrollments?.put ?? []);
+  await absorb(changed);
+  broadcast(changed);
+  return result.enrollment;
 }
 
 /** خروج الطالب من المدرسة — بلا حذف، فيبقى سجله التاريخي كاملًا. */
@@ -1462,11 +1579,62 @@ export async function deleteStudent(studentId) {
 }
 
 export async function renumberRoster(secId) {
-  const edits = sectionRoster(secId).map((s, i) => ({
-    id: enrollmentId(s.id, secId),
-    changes: { rollNo: i + 1 },
-  }));
-  return patchManyRecords('enrollments', edits, { op: 'renumberRoster', secId });
+  if (!secId) return false;
+  const stamp = now();
+  const operationId = `renumber:${uid()}`;
+  let result = { ok: false, status: 'write-failed' };
+  let committed;
+
+  try {
+    committed = await db.applyBatch({ students: {}, enrollments: {}, outbox: {} }, {
+      prepare(current) {
+        const studentsById = new Map(current.students.filter((row) => !row.deleted).map((row) => [row.id, row]));
+        const active = current.enrollments
+          .filter((row) => row.sectionId === secId && row.status === 'active' && !row.deleted)
+          .map((row) => ({ enrollment: row, student: studentsById.get(row.studentId) }))
+          .filter((row) => row.student);
+        const sorted = sortStudents(active.map(({ enrollment, student }) => ({
+          ...student, rollNo: enrollment.rollNo, enrollmentId: enrollment.id,
+        })));
+        const planned = sorted.map((student, index) => {
+          const enrollment = active.find((row) => row.enrollment.id === student.enrollmentId).enrollment;
+          return { ...enrollment, rollNo: index + 1, updatedAt: enrollment.rollNo === index + 1 ? enrollment.updatedAt : stamp };
+        });
+        const changed = planned.filter((row) => current.enrollments.find((currentRow) => currentRow.id === row.id)?.rollNo !== row.rollNo);
+        if (!changed.length) {
+          result = { ok: true, status: 'unchanged' };
+          return {};
+        }
+        const operation = {
+          id: operationId,
+          type: 'renumber',
+          sectionId: secId,
+          roster: structuredClone(planned),
+          updatedAt: stamp,
+          order: nextEnrollmentOperationOrder(current.outbox),
+        };
+        result = { ok: true, status: 'renumbered' };
+        return {
+          enrollments: { put: changed },
+          outbox: {
+            put: [
+              ...changed.map((row) => outboxEntry('enrollments', row, ['rollNo'], 'patch')).filter(Boolean),
+              enrollmentOperationEntry(operation, stamp),
+            ],
+          },
+        };
+      },
+    });
+  } catch (error) {
+    reportWriteError(error, { op: 'renumberRoster', secId });
+    return false;
+  }
+
+  if (!result.ok || result.status === 'unchanged') return result.ok;
+  const changed = changeList('enrollments', committed.enrollments?.put ?? []);
+  await absorb(changed);
+  broadcast(changed);
+  return true;
 }
 
 /* ---------- عمليات: بنود ودرجات ---------- */
