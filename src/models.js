@@ -817,15 +817,20 @@ export const absenceCount = (records) => records.filter((a) => !a.deleted && a.s
  * تُعاد null إذا لم يُرصد شيء بعد — وهو فرق جوهري عن الصفر.
  */
 export function itemScore(item, ctx) {
+  const hasAutomaticProjection = Object.prototype.hasOwnProperty.call(ctx.automaticByItem ?? {}, item.id);
+  const automatic = hasAutomaticProjection ? ctx.automaticByItem[item.id] : null;
   if (item.auto === 'participation') {
     // ما دام الإسناد كله بلا رصد مشاركة، فالبند لم يُرصد بعد — لا أن الطالب صفر.
-    if (!ctx.classHasParticipation) return null;
-    const pts = Math.max(0, netPoints(ctx.logs ?? [], 'participation'));
+    if (hasAutomaticProjection && !automatic) return null;
+    if (!(hasAutomaticProjection ? automatic.classHasParticipation : ctx.classHasParticipation)) return null;
+    const pts = Math.max(0, netPoints(hasAutomaticProjection ? automatic.logs : ctx.logs ?? [], 'participation'));
     return Math.min(item.max, pts * (item.perPoint ?? 1));
   }
   if (item.auto === 'attendance') {
-    if (!ctx.attendance?.length) return null;
-    const misses = absenceCount(ctx.attendance);
+    if (hasAutomaticProjection && !automatic) return null;
+    const attendance = hasAutomaticProjection ? automatic.attendance : ctx.attendance;
+    if (!attendance?.length) return null;
+    const misses = absenceCount(attendance);
     return Math.max(0, item.max - misses * (item.penalty ?? 1));
   }
 

@@ -824,7 +824,7 @@ function portableGradeScore(studentId, item) {
   return candidates.length === 1 ? candidates[0] : null;
 }
 
-/** سياق درجات قابل للنقل، مع إبقاء الحضور والرصد الآلي خاصين بالإسناد. */
+/** سياق درجات يدوي قابل للنقل من دون نسخ سجلات الدرجات. */
 function portableScoresByItem(studentId, tchId) {
   const directScores = indexScores(scoresOf(studentId));
   const out = Object.create(null);
@@ -839,6 +839,86 @@ export const attendanceOf = (studentId) =>
   live(state.attendance).filter((a) => a.studentId === studentId);
 
 export const logsOf = (studentId) => live(state.logs).filter((l) => l.studentId === studentId);
+
+function automaticItemIdentity(item) {
+  if (!item?.auto) return null;
+  const name = normalizeSearchText(item.name);
+  if (!name) return null;
+  return `${item.auto}\u0000${name}`;
+}
+
+function automaticItemKey(item) {
+  const identity = automaticItemIdentity(item);
+  const max = Number(item?.max);
+  if (!identity || !Number.isFinite(max) || max <= 0) return null;
+  const factor = item.auto === 'participation' ? Number(item.perPoint ?? 1) :
+    item.auto === 'attendance' ? Number(item.penalty ?? 1) : null;
+  if (!Number.isFinite(factor) || factor <= 0) return null;
+  return `${identity}\u0000${max}\u0000${factor}`;
+}
+
+function dedupeRecords(records) {
+  return [...new Map(records.map((record) => [record.id, record])).values()];
+}
+
+/**
+ * سياقات الطالب التي يمكن أن تمثل بندًا آليًا واحدًا. أي بند بنفس الاسم
+ * والنوع لكن بإعداد مختلف يجعل النتيجة غير مؤكدة، فلا نعرض درجة مُخمّنة.
+ */
+function compatibleAutomaticTeachingIds(studentId, item) {
+  const teaching = getTeaching(item?.teachingId);
+  const identity = automaticItemIdentity(item);
+  const key = automaticItemKey(item);
+  if (!teaching || !identity || !key) return null;
+
+  const targetMatches = items(teaching.id).filter((candidate) =>
+    automaticItemIdentity(candidate) === identity);
+  if (targetMatches.length !== 1 || automaticItemKey(targetMatches[0]) !== key) return null;
+
+  const enrolledSections = new Set(enrollmentsOf(studentId).map((enrollment) => enrollment.sectionId));
+  const teachingIds = new Set([teaching.id]);
+  for (const sourceTeaching of live(state.teachings)) {
+    if (sourceTeaching.id === teaching.id ||
+        sourceTeaching.subjectId !== teaching.subjectId ||
+        sourceTeaching.termId !== teaching.termId ||
+        !enrolledSections.has(sourceTeaching.sectionId)) continue;
+    const sameItem = items(sourceTeaching.id).filter((candidate) =>
+      automaticItemIdentity(candidate) === identity);
+    if (!sameItem.length) continue;
+    if (sameItem.length !== 1 || automaticItemKey(sameItem[0]) !== key) return null;
+    teachingIds.add(sourceTeaching.id);
+  }
+  return teachingIds;
+}
+
+/**
+ * إسقاط آلي فقط: يجمع سجل الطالب الموجود عبر الإسنادات المتوافقة، ولا ينشئ
+ * درجات أو حضورًا أو رصدًا جديدًا. لكل بند نطاقه كي لا تختلط إعدادات مختلفة.
+ */
+function portableAutomaticByItem(studentId, tchId) {
+  const out = Object.create(null);
+  for (const item of items(tchId).filter((candidate) => candidate.auto)) {
+    const teachingIds = compatibleAutomaticTeachingIds(studentId, item);
+    if (!teachingIds) {
+      out[item.id] = null;
+      continue;
+    }
+    if (item.auto === 'participation') {
+      out[item.id] = {
+        logs: dedupeRecords(logsOf(studentId).filter((log) =>
+          teachingIds.has(log.teachingId) && log.kind === 'participation')),
+        classHasParticipation: live(state.logs).some((log) =>
+          teachingIds.has(log.teachingId) && log.kind === 'participation'),
+      };
+    } else if (item.auto === 'attendance') {
+      out[item.id] = {
+        attendance: dedupeRecords(attendanceOf(studentId).filter((record) =>
+          teachingIds.has(record.teachingId))),
+      };
+    }
+  }
+  return out;
+}
 
 /** سجل ملاحظات الطالب هو المصدر القانوني؛ الأحدث أولًا لسهولة المتابعة اليومية. */
 export const notesOf = (studentId) => live(state.notes)
@@ -1292,6 +1372,7 @@ export function teachingContext(tchId) {
   for (const s of roster) {
     ctx[s.id] = {
       scoresByItem: portableScoresByItem(s.id, tchId),
+      automaticByItem: portableAutomaticByItem(s.id, tchId),
       attendance: attByStudent[s.id] ?? [],
       logs: logsByStudent[s.id] ?? [],
       classHasParticipation,
@@ -1325,6 +1406,7 @@ export function studentContext(studentId, tchId) {
   const inTeaching = (r) => !tchId || r.teachingId === tchId;
   return {
     scoresByItem: tchId ? portableScoresByItem(studentId, tchId) : indexScores(scoresOf(studentId)),
+    automaticByItem: tchId ? portableAutomaticByItem(studentId, tchId) : Object.create(null),
     attendance: attendanceOf(studentId).filter(inTeaching),
     logs: logsOf(studentId).filter(inTeaching),
     classHasParticipation: tchId

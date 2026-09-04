@@ -79,6 +79,54 @@ test('manual grades follow a student across same-subject, same-term transfer wit
   assert.equal(itemScore(f.projectY, afterReload), 0, 'recorded zero remains stable after reload');
 });
 
+test('compatible automatic items aggregate X and Y records while incompatible settings stay unrecorded', async () => {
+  const f = await fixture();
+  const participationX = makeItem({ id: 'grade-portability:item:participation:X', teachingId: f.teachingX.id, name: 'مشاركة', max: 10, auto: 'participation', perPoint: 1 });
+  const participationY = makeItem({ id: 'grade-portability:item:participation:Y', teachingId: f.teachingY.id, name: 'مشاركة', max: 10, auto: 'participation', perPoint: 1 });
+  const attendanceX = makeItem({ id: 'grade-portability:item:attendance:X', teachingId: f.teachingX.id, name: 'الحضور', max: 10, auto: 'attendance', penalty: 2 });
+  const attendanceY = makeItem({ id: 'grade-portability:item:attendance:Y', teachingId: f.teachingY.id, name: 'الحضور', max: 10, auto: 'attendance', penalty: 2 });
+  const incompatibleX = makeItem({ id: 'grade-portability:item:incompatible:X', teachingId: f.teachingX.id, name: 'مشاركة إضافية', max: 10, auto: 'participation', perPoint: 1 });
+  const incompatibleY = makeItem({ id: 'grade-portability:item:incompatible:Y', teachingId: f.teachingY.id, name: 'مشاركة إضافية', max: 10, auto: 'participation', perPoint: 2 });
+  await store.save({
+    items: [participationX, participationY, attendanceX, attendanceY, incompatibleX, incompatibleY],
+    logs: [{ id: 'grade-portability:log:X', studentId: f.student.id, teachingId: f.teachingX.id, kind: 'participation', delta: 3, deleted: false, updatedAt: 1 }],
+    attendance: [
+      { id: 'grade-portability:attendance:X:absent', studentId: f.student.id, teachingId: f.teachingX.id, status: 'absent', deleted: false, updatedAt: 1 },
+      { id: 'grade-portability:attendance:X:present', studentId: f.student.id, teachingId: f.teachingX.id, status: 'present', deleted: false, updatedAt: 1 },
+    ],
+  });
+
+  await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
+  let yContext = store.studentContext(f.student.id, f.teachingY.id);
+  assert.equal(itemScore(participationY, yContext), 3, 'X participation follows the student to Y');
+  assert.equal(itemScore(attendanceY, yContext), 8, 'X attendance-derived score follows the student to Y');
+  assert.equal(itemScore(incompatibleY, yContext), null, 'different per-point configuration is not projected');
+  const yGrades = store.teachingContext(f.teachingY.id).ctx[f.student.id];
+  assert.equal(itemScore(participationY, yGrades), 3, 'the destination Grades screen receives the same participation projection');
+  assert.equal(itemScore(attendanceY, yGrades), 8, 'the destination Grades screen receives the same attendance projection');
+
+  await store.save({
+    logs: [{ id: 'grade-portability:log:Y', studentId: f.student.id, teachingId: f.teachingY.id, kind: 'participation', delta: 2, deleted: false, updatedAt: 2 }],
+    attendance: [{ id: 'grade-portability:attendance:Y:absent', studentId: f.student.id, teachingId: f.teachingY.id, status: 'absent', deleted: false, updatedAt: 2 }],
+  });
+  yContext = store.studentContext(f.student.id, f.teachingY.id);
+  assert.equal(itemScore(participationY, yContext), 5, 'new Y participation combines with X');
+  assert.equal(itemScore(attendanceY, yContext), 6, 'new Y absence combines with X');
+  const combinedTotal = studentTotal([participationY, attendanceY], yContext);
+  assert.deepEqual(
+    { earned: combinedTotal.earned, outOfGraded: combinedTotal.outOfGraded, outOfAll: combinedTotal.outOfAll, missing: combinedTotal.missing },
+    { earned: 11, outOfGraded: 20, outOfAll: 20, missing: 0 },
+  );
+  assert.equal(Math.round(combinedTotal.pct), 55);
+
+  await store.transferStudent(f.student.id, f.x.id, { date: '2026-09-08' });
+  const xContext = store.studentContext(f.student.id, f.teachingX.id);
+  assert.equal(itemScore(participationX, xContext), 5, 'returning to X retains the combined participation score');
+  assert.equal(itemScore(attendanceX, xContext), 6, 'returning to X retains the combined attendance score');
+  assert.equal(store.logsOf(f.student.id).length, 2, 'projection adds no log records');
+  assert.equal(store.attendanceOf(f.student.id).length, 3, 'projection adds no attendance records');
+});
+
 after(async () => {
   store.closeChannel();
   await db.closeDB();
