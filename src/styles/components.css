@@ -566,6 +566,13 @@
 .logrow__delta.is-neg { background: var(--danger-soft); color: var(--danger); }
 .logrow__main { flex: 1; display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; min-width: 0; }
 .logrow__date { margin-inline-start: auto; font-size: 12.5px; color: var(--text-3); flex: none; }
+.student-history-row { align-items: flex-start; }
+.student-history-row .logrow__main { align-items: flex-start; flex-direction: column; gap: 4px; }
+.student-history-row .logrow__date {
+  width: 100%; min-width: 0; margin-inline-start: 0; display: flex; flex-wrap: wrap;
+  align-items: center; gap: 4px;
+}
+.student-history-row .badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 
 /* ---------- الصفحة الرئيسية ---------- */
 .hero { margin-bottom: var(--sp-4); }

@@ -1,15 +1,15 @@
 /**
  * ملف الطالب — الهوية، والانتسابات، والدرجات، والحضور.
  *
- * الطالب هوية مستقلة عن الشعبة، فالتقرير يُنطَّق بإسناد محدد ولا يخلط
- * بيانات شعبة سابقة بأخرى حالية.
+ * الطالب هوية مستقلة عن الشعبة. تبقى الدرجات منضبطة بالإسناد المعروض،
+ * بينما يتبع سجل الحضور والرصد والملاحظات الطالب مع سياقه التاريخي الأصلي.
  */
 
 import { html, icon, toast, fmtNum, fmtPct, fmtDate, openSheet, confirmSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
   itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
-  ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS,
+  ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS, SESSION_STATUS,
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 
@@ -69,36 +69,45 @@ export default {
 
     const tch = resolveTeaching(s, p.teaching);
     const section = tch ? store.getSection(tch.sectionId) : null;
+    const currentEnrollment = store.activeEnrollment(s.id);
+    const currentSection = currentEnrollment ? store.getSection(currentEnrollment.sectionId) : null;
     const items = tch ? store.items(tch.id) : [];
-    const ctx = store.studentContext(s.id, tch?.id);
-    const total = studentTotal(items, ctx);
+    const gradeCtx = store.studentContext(s.id, tch?.id);
+    const studentHistory = store.studentHistory(s.id);
+    const attendanceEvents = studentHistory.attendance;
+    const logEvents = studentHistory.logs;
+    const total = studentTotal(items, gradeCtx);
     const band = masteryBand(total.pct);
 
     const tally = { present: 0, late: 0, excused: 0, absent: 0 };
-    for (const a of ctx.attendance) tally[a.status] = (tally[a.status] ?? 0) + 1;
-    const sessions = ctx.attendance.length;
+    for (const event of attendanceEvents) {
+      const status = event.record.status;
+      tally[status] = (tally[status] ?? 0) + 1;
+    }
+    const sessions = attendanceEvents.length;
     const attendedPct = sessions ? ((tally.present + tally.late) / sessions) * 100 : null;
 
-    const part = ctx.logs.filter((l) => l.kind === 'participation');
-    const behav = ctx.logs.filter((l) => l.kind === 'behavior');
-    const partNet = part.reduce((n, l) => n + l.delta, 0);
-    const behavNet = behav.reduce((n, l) => n + l.delta, 0);
-    const recent = [...ctx.logs].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 12);
+    const part = logEvents.filter((event) => event.record.kind === 'participation');
+    const behav = logEvents.filter((event) => event.record.kind === 'behavior');
+    const partNet = part.reduce((n, event) => n + event.record.delta, 0);
+    const behavNet = behav.reduce((n, event) => n + event.record.delta, 0);
 
-    const history = store
+    const enrollmentHistory = store
       .enrollmentsOf(s.id)
       .sort((a, b) => String(b.startDate ?? '').localeCompare(String(a.startDate ?? '')));
-    const notes = store.notesOf(s.id);
+    const notes = studentHistory.notes;
     const noteTime = (note) => new Date(note.createdAt ?? note.updatedAt ?? Date.now())
       .toLocaleTimeString('ar-SA', { hour: 'numeric', minute: '2-digit' });
-    const noteContext = (note) => {
+    const eventContext = (event) => {
       const parts = [];
-      const noteTeaching = note.teachingId ? store.getTeaching(note.teachingId) : null;
-      const noteSession = note.sessionId ? store.getSession(note.sessionId) : null;
-      if (noteTeaching) parts.push(store.teachingLabel(noteTeaching));
-      if (noteSession) parts.push(`حصة ${noteSession.period} · ${fmtDate(noteSession.date, false)}`);
+      if (event.contextLabel) parts.push(event.contextLabel);
+      if (event.term?.name) parts.push(event.term.name);
+      if (event.session) parts.push(`الحصة ${event.session.period}`);
       return parts;
     };
+    const contextKind = (event) => !event.teaching
+      ? 'سجل عام'
+      : event.teaching.id === tch?.id ? 'السياق المعروض' : 'سياق سابق';
 
     return html`
       <div class="printhead">
@@ -116,9 +125,9 @@ export default {
         <div class="student-profile-header__info">
           <div class="student-profile-header__name">${s.name}</div>
           <div class="student-profile-header__meta">
-            ${section ? html`<span>${sectionLabel(section)}</span>` : ''}
-            ${tch ? html`<span>· ${store.getSubject(tch.subjectId)?.name ?? ''}</span>` : ''}
-            ${s.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${s.rollNo}</span>` : ''}
+            ${currentSection ? html`<span class="badge badge--ok">الانتساب الحالي · ${sectionLabel(currentSection)}</span>` : ''}
+            ${tch ? html`<span>السياق المعروض · ${store.teachingLabel(tch)}</span>` : ''}
+            ${currentEnrollment?.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${currentEnrollment.rollNo}</span>` : ''}
           </div>
         </div>
       </div>
@@ -136,13 +145,13 @@ export default {
         </div>
         <div class="stat">
           <div class="stat__val tabular">${attendedPct === null ? '—' : fmtPct(attendedPct)}</div>
-          <div class="stat__label">نسبة الحضور</div>
+          <div class="stat__label">نسبة الحضور · كل السجل</div>
         </div>
         <div class="stat">
           <div class="stat__val tabular" style="color:var(--${partNet > 0 ? 'ok' : partNet < 0 ? 'danger' : 'text-2'})">
             ${partNet > 0 ? '+' : ''}${partNet}
           </div>
-          <div class="stat__label">نقاط المشاركة</div>
+          <div class="stat__label">نقاط المشاركة · كل السجل</div>
         </div>
       </div>
 
@@ -156,8 +165,8 @@ export default {
       <div class="section">
         <div class="section__head"><div class="section__title">سجل الانتساب</div></div>
         <div class="card">
-          ${history.length
-            ? history.map((en) => {
+          ${enrollmentHistory.length
+            ? enrollmentHistory.map((en) => {
                 const sec = store.getSection(en.sectionId);
                 const year = sec ? store.getYear(sec.yearId) : null;
                 return html`
@@ -194,7 +203,7 @@ export default {
           ${items.length === 0
             ? html`<div class="card--pad t-3 center">لا بنود تقييم في هذا الإسناد.</div>`
             : items.map((i) => {
-                const v = itemScore(i, ctx);
+                const v = itemScore(i, gradeCtx);
                 const pct = v === null ? null : (v / i.max) * 100;
                 return html`
                   <div class="itemrow">
@@ -220,14 +229,17 @@ export default {
       <!-- الحضور -->
       <div class="section">
         <div class="section__head">
-          <div class="section__title">الحضور</div>
+          <div>
+            <div class="section__title">سجل الحضور المستمر</div>
+            <div class="t-3 fs-xs">جميع الإسنادات، مع إبقاء سياق كل حصة الأصلي</div>
+          </div>
           <div class="t-3 fs-sm"><span class="tabular">${sessions}</span> حصة مرصودة</div>
         </div>
         ${sessions === 0
           ? html`<div class="card card--pad t-3 center">لم يُرصد حضور بعد.</div>`
           : html`
-              <div class="card card--pad">
-                <div class="hstack gap-2 wrap">
+              <div class="card">
+                <div class="card--pad hstack gap-2 wrap">
                   ${ATTENDANCE_ORDER.map((k) =>
                     tally[k]
                       ? html`<span class="badge" style="background:var(--${ATTENDANCE[k].color}-soft);color:var(--${ATTENDANCE[k].color})">
@@ -236,8 +248,28 @@ export default {
                       : ''
                   )}
                 </div>
+                ${attendanceEvents.map((event) => {
+                  const attendance = event.record;
+                  const meta = ATTENDANCE[attendance.status];
+                  return html`
+                    <div class="logrow student-history-row">
+                      <span class="logrow__delta" style="color:var(--${meta?.color ?? 'text-2'})">
+                        ${meta?.short ?? '—'}
+                      </span>
+                      <span class="logrow__main">
+                        <span>${meta?.label ?? attendance.status}</span>
+                        <span class="logrow__date">
+                          ${fmtDate(event.date, false)}
+                          <span class="badge">${contextKind(event)}</span>
+                          ${eventContext(event).map((label) => html`<span class="badge">${label}</span> `)}
+                          ${event.session ? html`<span class="badge">${SESSION_STATUS[event.session.status]?.label ?? event.session.status}</span>` : ''}
+                        </span>
+                      </span>
+                    </div>
+                  `;
+                })}
                 ${tally.absent >= 3
-                  ? html`<p class="fs-sm mt-3" style="color:var(--danger)">
+                  ? html`<p class="fs-sm card--pad" style="color:var(--danger)">
                       تجاوز الغياب ثلاث حصص — يستحق تواصلًا مع ولي الأمر.
                     </p>`
                   : ''}
@@ -253,21 +285,25 @@ export default {
         </div>
         ${notes.length
           ? html`<div class="card">
-              ${notes.map((note) => html`
-                <div class="logrow">
-                  <span class="logrow__main">
-                    <span>${note.text}</span>
-                    <span class="logrow__date">
-                      ${fmtDate(note.date, false)} · <bdi class="tabular">${noteTime(note)}</bdi>
-                      ${noteContext(note).map((label) => html`<span class="badge">${label}</span> `)}
+              ${notes.map((event) => {
+                const note = event.record;
+                return html`
+                  <div class="logrow student-history-row">
+                    <span class="logrow__main">
+                      <span>${note.text}</span>
+                      <span class="logrow__date">
+                        ${fmtDate(event.date, false)} · <bdi class="tabular">${noteTime(note)}</bdi>
+                        <span class="badge">${contextKind(event)}</span>
+                        ${eventContext(event).map((label) => html`<span class="badge">${label}</span> `)}
+                      </span>
                     </span>
-                  </span>
-                  <span class="row__end noprint">
-                    <button class="iconbtn" data-act="edit-note" data-id="${note.id}" aria-label="تعديل ملاحظة">${icon('edit')}</button>
-                    <button class="iconbtn" data-act="delete-note" data-id="${note.id}" aria-label="حذف ملاحظة">${icon('trash')}</button>
-                  </span>
-                </div>
-              `)}
+                    <span class="row__end noprint">
+                      <button class="iconbtn" data-act="edit-note" data-id="${note.id}" aria-label="تعديل ملاحظة">${icon('edit')}</button>
+                      <button class="iconbtn" data-act="delete-note" data-id="${note.id}" aria-label="حذف ملاحظة">${icon('trash')}</button>
+                    </span>
+                  </div>
+                `;
+              })}
             </div>`
           : html`<div class="card card--pad center t-3 stack stack-2">
               <div>لا توجد ملاحظات مسجلة لهذا الطالب.</div>
@@ -289,21 +325,28 @@ export default {
           </div>
         </div>
 
-        ${recent.length
+        ${logEvents.length
           ? html`
               <div class="card">
-                ${recent.map(
-                  (l) => html`
-                    <div class="logrow">
+                ${logEvents.map(
+                  (event) => {
+                    const l = event.record;
+                    return html`
+                    <div class="logrow student-history-row">
                       <span class="logrow__delta ${l.delta > 0 ? 'is-pos' : 'is-neg'}">
                         ${l.delta > 0 ? '+' : '−'}${Math.abs(l.delta)}
                       </span>
                       <span class="logrow__main">
                         <span>${l.tag || (l.kind === 'participation' ? 'مشاركة' : 'سلوك')}</span>
-                        <span class="logrow__date">${fmtDate(l.date)}</span>
+                        <span class="logrow__date">
+                          ${fmtDate(event.date)}
+                          <span class="badge">${contextKind(event)}</span>
+                          ${eventContext(event).map((label) => html`<span class="badge">${label}</span> `)}
+                        </span>
                       </span>
                     </div>
-                  `
+                  `;
+                  }
                 )}
               </div>
             `
@@ -329,19 +372,23 @@ export default {
       const tch = resolveTeaching(s, params.teaching);
       const section = tch ? store.getSection(tch.sectionId) : null;
       const items = tch ? store.items(tch.id) : [];
-      const ctx = store.studentContext(s.id, tch?.id);
-      const total = studentTotal(items, ctx);
+      const gradeCtx = store.studentContext(s.id, tch?.id);
+      const studentHistory = store.studentHistory(s.id);
+      const total = studentTotal(items, gradeCtx);
       const band = masteryBand(total.pct);
 
       const tally = { present: 0, late: 0, excused: 0, absent: 0 };
-      for (const a of ctx.attendance) tally[a.status] = (tally[a.status] ?? 0) + 1;
-      const sessions = ctx.attendance.length;
+      for (const event of studentHistory.attendance) {
+        const status = event.record.status;
+        tally[status] = (tally[status] ?? 0) + 1;
+      }
+      const sessions = studentHistory.attendance.length;
       const attendedPct = sessions ? Math.round(((tally.present + tally.late) / sessions) * 100) : null;
 
-      const part = ctx.logs.filter((l) => l.kind === 'participation');
-      const behav = ctx.logs.filter((l) => l.kind === 'behavior');
-      const partNet = part.reduce((n, l) => n + l.delta, 0);
-      const behavNet = behav.reduce((n, l) => n + l.delta, 0);
+      const part = studentHistory.logs.filter((event) => event.record.kind === 'participation');
+      const behav = studentHistory.logs.filter((event) => event.record.kind === 'behavior');
+      const partNet = part.reduce((n, event) => n + event.record.delta, 0);
+      const behavNet = behav.reduce((n, event) => n + event.record.delta, 0);
 
       const textParts = [
         `📊 ملخص أداء الطالب: ${s.name}`,
@@ -352,7 +399,7 @@ export default {
         `• المجموع: ${fmtNum(total.earned)} من ${total.outOfAll} (${total.pct != null ? `${fmtPct(total.pct)}` : '—'})`,
         band.label ? `• التقدير: ${band.label}` : '',
         '',
-        '📅 الحضور والمواظبة:',
+        '📅 سجل الحضور والمواظبة عبر جميع الإسنادات:',
         `• الحصص المرصودة: ${sessions}`,
         `• نسبة الحضور: ${attendedPct != null ? `${attendedPct}%` : '—'}`,
         `• الغياب: ${tally.absent} | التأخر: ${tally.late} | الاستئذان: ${tally.excused}`,

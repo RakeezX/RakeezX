@@ -1125,6 +1125,42 @@ export function studentContext(studentId, tchId) {
   };
 }
 
+/**
+ * سجل الطالب المستمر عبر الإسنادات. هذا إسقاط قراءة فقط: تبقى السجلات
+ * مرتبطة بحصتها وإسنادها وشعبتها الأصلية، ولا تدخل الدرجات في هذا التجميع.
+ */
+export function studentHistory(studentId) {
+  const withContext = (record) => {
+    const session = record.sessionId ? getSession(record.sessionId) : null;
+    const teaching = getTeaching(session?.teachingId ?? record.teachingId);
+    const section = teaching ? getSection(teaching.sectionId) : null;
+    const subject = teaching ? getSubject(teaching.subjectId) : null;
+    const term = teaching ? getTerm(teaching.termId) : null;
+    return {
+      record,
+      session,
+      teaching,
+      section,
+      subject,
+      term,
+      date: record.date ?? session?.date ?? '',
+      contextLabel: teachingLabel(teaching) || sectionLabel(section) || '',
+    };
+  };
+  const newestFirst = (left, right) =>
+    String(right.date ?? '').localeCompare(String(left.date ?? '')) ||
+    Number(right.record.createdAt ?? right.record.updatedAt ?? 0) -
+      Number(left.record.createdAt ?? left.record.updatedAt ?? 0) ||
+    String(left.record.id ?? '').localeCompare(String(right.record.id ?? ''));
+  const project = (records) => records.map(withContext).sort(newestFirst);
+
+  return {
+    attendance: project(attendanceOf(studentId)),
+    logs: project(logsOf(studentId)),
+    notes: project(notesOf(studentId)),
+  };
+}
+
 /* ---------- عمليات: البنية ---------- */
 
 export async function createYear(data) {
