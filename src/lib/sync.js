@@ -333,7 +333,7 @@ export async function syncProfile() {
     }
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1593,7 +1593,7 @@ export async function syncStructural() {
     }
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1680,7 +1680,7 @@ export async function syncStudents() {
     stats.enrollments = { pushed: resEnrollments.pushed, pulled: resEnrollments.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1729,7 +1729,7 @@ export async function syncNotes() {
     knownRemoteIds.sessions = new Set(remoteSessions.map((record) => record.id));
     const res = await syncCollection('notes', 'notes', { requiredIds: new Set(), knownRemoteIds });
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({ status: 'synced', lastSyncedAt: nowStamp, results: { ...state.results, notes: { status: 'success', stats: { notes: { pushed: res.pushed, pulled: res.pulled } }, time: nowStamp } } });
     console.log('[rakeezx sync] Notes sync complete.', res);
   } catch (err) {
@@ -1791,7 +1791,7 @@ export async function syncScoring() {
     stats.logs = { pushed: resLogs.pushed, pulled: resLogs.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1882,7 +1882,7 @@ export async function syncTimetable() {
     stats.attendance = { pushed: resAttendance.pushed, pulled: resAttendance.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp });
+    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,

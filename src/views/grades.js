@@ -257,6 +257,10 @@ export default {
       await store.setScore(studentId, itemId, v);
     },
 
+    'select-score'(el) {
+      if (el.value.trim()) el.select();
+    },
+
     keydown(el, ev) {
       if (ev.key !== 'Enter') return;
       ev.preventDefault();
@@ -373,7 +377,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                     : html`
                         <span class="graderow__in">
                           <input class="input gradein tabular" type="text" inputmode="decimal"
-                                 data-change="score" data-keydown="keydown"
+                                 data-change="score" data-focus="select-score" data-keydown="keydown"
                                  data-id="${s.id}" data-item="${item.id}"
                                  data-fk="g-${s.id}-${item.id}"
                                  value="${value === null ? '' : fmtNum(value)}"
@@ -431,7 +435,7 @@ function tableMode(roster, items, ctx) {
                   return html`
                     <td>
                       <input class="gradein gradein--cell tabular" type="text" inputmode="decimal"
-                             data-change="score" data-keydown="keydown"
+                             data-change="score" data-focus="select-score" data-keydown="keydown"
                              data-id="${s.id}" data-item="${i.id}"
                              data-fk="t-${s.id}-${i.id}"
                              value="${v === null ? '' : fmtNum(v)}"

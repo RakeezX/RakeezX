@@ -53,12 +53,13 @@ export const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel
 /**
  * يربط مستمعًا واحدًا على الجذر، ويوزّع على الدوال حسب سمة البيانات.
  *   <button data-act="delete" data-id="5">   →  handlers.delete(el, ev)
- * الأنواع: data-act (نقر) · data-change · data-input · data-submit · data-keydown
+ * الأنواع: data-act (نقر) · data-change · data-input · data-focus · data-submit · data-keydown
  */
 const EVENT_ATTR = {
   click: 'act',
   change: 'change',
   input: 'input',
+  focusin: 'focus',
   submit: 'submit',
   keydown: 'keydown',
 };

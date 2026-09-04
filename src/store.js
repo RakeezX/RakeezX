@@ -580,11 +580,12 @@ export async function patch(storeName, id, changes, create = null, options = {})
 
   const preserve = options.preserveTimestamp && changes.updatedAt !== undefined;
   const newStamp = preserve ? changes.updatedAt : now();
+  const shouldNotify = options.notify !== false;
   const optimistic = { ...base, ...changes, id, updatedAt: newStamp };
   const undo = singleton ? [] : applyToMemory(storeName, [optimistic]);
   const previous = singleton ? state[storeName] : null;
   if (singleton) state[storeName] = optimistic;
-  notify();
+  if (shouldNotify) notify();
 
   try {
     const [authoritative] = await db.patchMany(
@@ -597,19 +598,26 @@ export async function patch(storeName, id, changes, create = null, options = {})
     if (!authoritative) {
       if (singleton) state[storeName] = previous;
       else revertMemory(storeName, [optimistic], undo);
-      notify();
+      if (shouldNotify) notify();
       return null;
     }
 
-    if (singleton) state[storeName] = authoritative;
-    else applyToMemory(storeName, [authoritative]);
+    // patchMany preserves the optimistic record exactly in the normal path.
+    // Do not replace the active screen a second time just to install that same
+    // record after IndexedDB confirms it; a genuinely different authoritative
+    // record still updates memory and notifies every subscriber.
+    const authoritativeChanged = JSON.stringify(optimistic) !== JSON.stringify(authoritative);
+    if (authoritativeChanged) {
+      if (singleton) state[storeName] = authoritative;
+      else applyToMemory(storeName, [authoritative]);
+    }
     broadcast([{ store: storeName, id }]);
-    notify();
+    if (authoritativeChanged && shouldNotify) notify();
     return authoritative;
   } catch (err) {
     if (singleton) state[storeName] = previous;
     else revertMemory(storeName, [optimistic], undo);
-    notify();
+    if (shouldNotify) notify();
     reportWriteError(err, { op: 'patch', store: storeName, id, fields: Object.keys(changes) });
     return null;
   }
@@ -628,7 +636,7 @@ export const softDelete = (storeName, id) => patch(storeName, id, { deleted: tru
 export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
 
 /** إعدادات هذا الجهاز — لا تغادره ولا يستوردها ملف نسخة. */
-export const patchDevice = (changes) => patch('device', 'device', changes, { ...DEFAULT_DEVICE });
+export const patchDevice = (changes, options = {}) => patch('device', 'device', changes, { ...DEFAULT_DEVICE }, options);
 
 async function patchManyRecords(storeName, edits, context) {
   if (!edits.length) return true;
