@@ -14,7 +14,8 @@ import {
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
-  sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel, gradeLabel
+  sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
+  normalizeSearchText, gradeLabel
 } from './models.js';
 import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
 
@@ -769,6 +770,71 @@ export const items = (tchId) =>
 
 export const scoresOf = (studentId) => live(state.scores).filter((s) => s.studentId === studentId);
 
+/**
+ * بنود الرصد اليدوي لا تشترك في المعرّف بين الشعب، رغم أنها قد تمثل
+ * التقييم نفسه. هذا المفتاح قراءة/كتابة فقط: لا يغيّر معرف البند أو السجل.
+ * الاسم والدرجة العظمى وطريقة الرصد هي أقل تعريف دلالي آمن متاح حاليًا.
+ */
+function portableGradeItemKey(item) {
+  if (!item || item.deleted || item.auto) return null;
+  const name = normalizeSearchText(item.name);
+  const max = Number(item.max);
+  if (!name || !Number.isFinite(max) || max <= 0) return null;
+  return `${name}\u0000${max}`;
+}
+
+function scoreForItem(studentId, itemId) {
+  return scoresOf(studentId).find((score) => score.itemId === itemId) ?? null;
+}
+
+/**
+ * يعيد السجل الوحيد الذي يمكن عرضه لبند يدوي في شعبة أخرى من نفس المادة
+ * والفصل الدراسي. وجود أي تكرار دلالي أو أكثر من سجل مصدر يجعل الربط غير
+ * آمن؛ عندها تبقى الخانة غير مرصودة بدل تخمين درجة أو نسخها.
+ */
+function portableGradeScore(studentId, item) {
+  const direct = scoreForItem(studentId, item?.id);
+  if (direct) return direct;
+
+  const key = portableGradeItemKey(item);
+  const teaching = getTeaching(item?.teachingId);
+  if (!key || !teaching) return null;
+
+  // إذا كرر المعلم البند نفسه داخل الشعبة فلا يمكن معرفة أيهما المقصود.
+  if (items(teaching.id).filter((candidate) => portableGradeItemKey(candidate) === key).length !== 1) {
+    return null;
+  }
+
+  // لا نعرض درجة من شعبة لم ينتسب إليها الطالب قط، حتى لو صادف أنها تحمل
+  // مادة وبندًا بالاسم نفسيهما.
+  const enrolledSections = new Set(enrollmentsOf(studentId).map((enrollment) => enrollment.sectionId));
+  const candidates = [];
+  for (const sourceTeaching of live(state.teachings)) {
+    if (sourceTeaching.id === teaching.id ||
+        sourceTeaching.subjectId !== teaching.subjectId ||
+        sourceTeaching.termId !== teaching.termId ||
+        !enrolledSections.has(sourceTeaching.sectionId)) continue;
+    const matches = items(sourceTeaching.id)
+      .filter((candidate) => portableGradeItemKey(candidate) === key);
+    if (matches.length !== 1) continue;
+    const score = scoreForItem(studentId, matches[0].id);
+    if (score) candidates.push(score);
+  }
+
+  return candidates.length === 1 ? candidates[0] : null;
+}
+
+/** سياق درجات قابل للنقل، مع إبقاء الحضور والرصد الآلي خاصين بالإسناد. */
+function portableScoresByItem(studentId, tchId) {
+  const directScores = indexScores(scoresOf(studentId));
+  const out = Object.create(null);
+  for (const item of items(tchId)) {
+    const score = directScores[item.id] ?? portableGradeScore(studentId, item);
+    if (score) out[item.id] = score;
+  }
+  return out;
+}
+
 export const attendanceOf = (studentId) =>
   live(state.attendance).filter((a) => a.studentId === studentId);
 
@@ -1213,8 +1279,6 @@ export function itemCurriculum(item) {
 export function teachingContext(tchId) {
   const roster = students(tchId);
   const ids = new Set(roster.map((s) => s.id));
-
-  const scoresByStudent = groupBy(state.scores.filter((s) => ids.has(s.studentId)), 'studentId');
   const attByStudent = groupBy(
     state.attendance.filter((a) => ids.has(a.studentId) && a.teachingId === tchId), 'studentId');
   const logsByStudent = groupBy(
@@ -1227,7 +1291,7 @@ export function teachingContext(tchId) {
   const ctx = Object.create(null);
   for (const s of roster) {
     ctx[s.id] = {
-      scoresByItem: indexScores(scoresByStudent[s.id] ?? []),
+      scoresByItem: portableScoresByItem(s.id, tchId),
       attendance: attByStudent[s.id] ?? [],
       logs: logsByStudent[s.id] ?? [],
       classHasParticipation,
@@ -1260,7 +1324,7 @@ export function attendanceReportContext(tchId) {
 export function studentContext(studentId, tchId) {
   const inTeaching = (r) => !tchId || r.teachingId === tchId;
   return {
-    scoresByItem: indexScores(scoresOf(studentId)),
+    scoresByItem: tchId ? portableScoresByItem(studentId, tchId) : indexScores(scoresOf(studentId)),
     attendance: attendanceOf(studentId).filter(inTeaching),
     logs: logsOf(studentId).filter(inTeaching),
     classHasParticipation: tchId
@@ -1875,9 +1939,15 @@ export function clampScore(value, itemId) {
 }
 
 export function setScore(studentId, itemId, value) {
-  const id = scoreId(studentId, itemId);
+  const item = state.items.find((candidate) => candidate.id === itemId && !candidate.deleted);
+  if (!item) return null;
+  // عندما توجد درجة واحدة متوافقة في شعبة سابقة، نحدّث سجلها نفسه بدل صنع
+  // سجل ثانٍ للبند الموازي. أما البند المختلف أو الغامض فيبدأ غير مرصود هنا.
+  const existing = portableGradeScore(studentId, item);
+  const id = existing?.id ?? scoreId(studentId, itemId);
+  const targetItemId = existing?.itemId ?? itemId;
   return patch('scores', id, { value: clampScore(value, itemId), deleted: false }, {
-    id, studentId, itemId, value: null, deleted: false, updatedAt: now(),
+    id, studentId, itemId: targetItemId, value: null, deleted: false, updatedAt: now(),
   });
 }
 
