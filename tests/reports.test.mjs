@@ -15,6 +15,7 @@ import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import reports from "../src/views/reports.js";
+import { supportRows } from "../src/views/reports.js";
 
 test("Reports Regression Suite", async (t) => {
   t.beforeEach(async () => {
@@ -88,5 +89,23 @@ test("Reports Regression Suite", async (t) => {
     assert.ok(exportedRowsStr.includes("2026"));
     
     global.Blob = oldBlob;
+  });
+
+  await t.test("Support report honours explicit sorting and ignores soft-deleted records", () => {
+    const roster = [
+      { id: 'support-a', name: 'طالب أ', rollNo: 2 },
+      { id: 'support-b', name: 'طالب ب', rollNo: 1 },
+    ];
+    const item = { id: 'support-item', max: 100, deleted: false };
+    const absent = (deleted = false) => ({ status: 'absent', deleted });
+    const ctx = {
+      'support-a': { scoresByItem: { [item.id]: { value: 10 } }, logs: [], attendance: [absent(), absent(), absent(true), absent(true)] },
+      'support-b': { scoresByItem: { [item.id]: { value: 40 } }, logs: [], attendance: [] },
+    };
+    reports.onMount();
+    assert.deepStrictEqual(supportRows(roster, [item], ctx).map((row) => row.s.id), ['support-a', 'support-b']);
+    assert.ok(!supportRows(roster, [item], ctx)[0].reasons.some((reason) => reason.includes('غيابات')));
+    reports.actions.sort({ value: 'roll' });
+    assert.deepStrictEqual(supportRows([...roster].sort((a, b) => a.rollNo - b.rollNo), [item], ctx).map((row) => row.s.id), ['support-b', 'support-a']);
   });
 });

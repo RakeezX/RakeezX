@@ -41,11 +41,12 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   await expect(page.locator('.gtable--report')).toContainText('أحمد محمد');
   await expect(page.locator('main')).not.toContainText('الهوية الوطنية');
   await expect(page.locator('.print-signatures')).not.toContainText('مدير المدرسة');
-  await expect(page.getByRole('button', { name: 'بيانات التقرير والطباعة' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'طباعة' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'بيانات التقرير والطباعة' }).click();
+  await page.getByRole('button', { name: 'طباعة' }).click();
+  await expect(page.locator('#pre-print-form')).toBeVisible();
   await page.locator('input[name="principalName"]').fill('مدير تجريبي');
-  await page.locator('button[form="report-identity-form"]').click();
+  await page.locator('button[form="pre-print-form"]').click();
   await expect(page.locator('.print-signatures')).toContainText('معلم المادة');
   await expect(page.locator('.print-signatures')).toContainText('مدير المدرسة');
   await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
@@ -106,7 +107,6 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('button', { name: 'طباعة', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'بيانات التقرير والطباعة' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.setViewportSize({ width: 1280, height: 800 });
 

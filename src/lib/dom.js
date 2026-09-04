@@ -167,9 +167,19 @@ export function confirmSheet({ title, desc, confirmLabel = 'تأكيد', danger 
 }
 
 /* ---------- الأيقونات ---------- */
-const P = (d, extra = '') =>
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ` +
-  `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}${extra}</svg>`;
+const SIZE_CLASSES = {
+  inline: 'icon--inline',
+  compact: 'icon--compact',
+  control: 'icon--control',
+  status: 'icon--status',
+  hero: 'icon--hero',
+};
+
+const P = (d, cls = '', extra = '') => {
+  const classAttr = cls ? ` class="icon ${cls}"` : ' class="icon"';
+  return `<svg${classAttr} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ` +
+    `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}${extra}</svg>`;
+};
 
 const ICONS = {
   classes:   '<path d="M17 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -190,6 +200,7 @@ const ICONS = {
   download:  '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/>',
   upload:    '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/>',
   search:    '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  filter:    '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
   x:         '<path d="M18 6 6 18M6 6l12 12"/>',
   check:     '<path d="M20 6 9 17l-5-5"/>',
   print:     '<path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1.5"/>',
@@ -209,8 +220,11 @@ const ICONS = {
   refresh:   '<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>',
 };
 
-/** يعيد أيقونة SVG جاهزة للحقن. */
-export const icon = (name) => raw(P(ICONS[name] ?? ICONS.note));
+/** يعيد أيقونة SVG جاهزة للحقن، مع دعم فئات الحجم الدلالية (inline, compact, control, status, hero). */
+export const icon = (name, sizeOrClass = '') => {
+  const cls = SIZE_CLASSES[sizeOrClass] || (sizeOrClass ? (sizeOrClass.startsWith('icon--') ? sizeOrClass : `icon--${sizeOrClass}`) : '');
+  return raw(P(ICONS[name] ?? ICONS.note, cls));
+};
 
 /** رابط رجوع صريح إلى الشاشة الأم، مستقل عن سجل المتصفح. */
 export const parentLink = (label, parentRoute) =>

@@ -629,11 +629,12 @@ a { color: var(--brand); text-underline-offset: 3px; }
 .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* أحجام الأيقونات القياسية */
-.icon--inline  { width: var(--icon-inline); height: var(--icon-inline); display: inline-block; vertical-align: -2.5px; }
-.icon--compact { width: var(--icon-compact); height: var(--icon-compact); }
-.icon--control { width: var(--icon-control); height: var(--icon-control); }
-.icon--status  { width: var(--icon-status); height: var(--icon-status); }
-.icon--hero    { width: var(--icon-hero); height: var(--icon-hero); }
+.icon { display: inline-block; vertical-align: middle; flex: none; width: var(--icon-control); height: var(--icon-control); }
+.icon--inline  { width: var(--icon-inline); height: var(--icon-inline); display: inline-block; vertical-align: -2.5px; flex: none; }
+.icon--compact { width: var(--icon-compact); height: var(--icon-compact); display: inline-block; vertical-align: middle; flex: none; }
+.icon--control { width: var(--icon-control); height: var(--icon-control); display: inline-block; vertical-align: middle; flex: none; }
+.icon--status  { width: var(--icon-status); height: var(--icon-status); display: inline-block; vertical-align: middle; flex: none; }
+.icon--hero    { width: var(--icon-hero); height: var(--icon-hero); display: inline-block; vertical-align: middle; flex: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

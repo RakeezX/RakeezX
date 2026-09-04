@@ -709,15 +709,41 @@
   justify-content: space-between;
   gap: var(--sp-2);
   margin-bottom: var(--sp-3);
+  min-width: 0;
+}
+
+.cal-card__head .badge {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .cal-card__eyebrow {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 13.5px;
   font-weight: 700;
   color: var(--text-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cal-card__eyebrow span {
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .cal-card {
+    padding: var(--sp-3);
+  }
+  .cal-card__head {
+    gap: 4px;
+    margin-bottom: var(--sp-2);
+  }
+  .cal-card__eyebrow {
+    font-size: 12px;
+    gap: 4px;
+  }
 }
 
 .cal-pulse-dot {
@@ -1767,6 +1793,19 @@
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
+}
+.grades-toolbar .field__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+.grades-toolbar .field__label svg,
+.grades-toolbar svg:not(.btn svg):not(.iconbtn svg) {
+  width: var(--icon-compact);
+  height: var(--icon-compact);
+  display: inline-block;
+  vertical-align: middle;
+  flex: none;
 }
 .grades-toolbar .select {
   min-width: 140px;

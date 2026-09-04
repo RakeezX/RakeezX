@@ -2,7 +2,7 @@
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportHeader, reportIdentitySheet, reportSignatures } from '../lib/report-print.js';
+import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -22,7 +22,10 @@ const statusText = (key) => META[key]?.label ?? key;
 function scoped() { return store.executionReport({ termId: termId || store.activeTerm()?.id }); }
 function filters(report) { return report.rows.filter((row) => (status === 'all' || row.completeness.state === status) && (teachingId === 'all' || row.teaching?.id === teachingId) && (!from || row.session.date >= from) && (!to || row.session.date <= to)); }
 function contextLabel(report) { return [from && `من ${fmtDate(from, false)}`, to && `إلى ${fmtDate(to, false)}`, status !== 'all' && statusText(status)].filter(Boolean).join(' · '); }
-function profile() { return { ...store.state.profile, reportPrincipalName: store.state.device?.reportPrincipalName ?? '' }; }
+function profile() {
+  const principal = store.state.profile?.reportPrincipalName || store.state.device?.reportPrincipalName || store.state.profile?.principalName || '';
+  return { ...store.state.profile, reportPrincipalName: principal };
+}
 
 export default {
   title: () => 'تقارير التنفيذ', subtitle: () => store.activeYear()?.label ?? '', back: () => '#/reports', wide: true,
@@ -40,12 +43,55 @@ export default {
         <div class="section noprint"><div class="section__head"><div class="section__title">ملخّص التنفيذ</div></div><div class="grid grid--auto"><div class="stat"><div class="stat__val tabular">${report.sections}</div><div class="stat__label">فصول/شعب</div></div><div class="stat"><div class="stat__val tabular">${report.teachings.length}</div><div class="stat__label">إسنادات</div></div><div class="stat"><div class="stat__val tabular">${report.counts.generated}</div><div class="stat__label">حصص مؤرخة</div></div><div class="stat"><div class="stat__val tabular">${report.counts.completed}</div><div class="stat__label">تم رصدها</div></div><div class="stat"><div class="stat__val tabular">${report.counts.pending}</div><div class="stat__label">بانتظار الرصد</div></div><div class="stat"><div class="stat__val tabular">${report.percentage === null ? '—' : report.percentage + '٪'}</div><div class="stat__label">اكتمال الحضور</div></div></div></div>
         <div class="section"><div class="section__head noprint"><div class="section__title">تنفيذ الحصص</div><span class="t-3 fs-sm tabular">${rows.length}</span></div>${!rows.length ? html`<div class="empty"><div class="empty__title">لا توجد حصص مطابقة</div><div class="empty__text">غيّر عوامل التصفية أو نطاق التاريخ.</div></div>` : executionTable(rows)}</div>
         ${reportSignatures({ profile: profile() })}
-        <div class="btn-row mt-6 noprint report-actions"><button class="btn btn--ghost" data-act="identity">${icon('edit')} بيانات التقرير والطباعة</button><button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>
+        <div class="btn-row mt-6 noprint report-actions"><button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>
       </article>`;
   },
   actions: {
-    term(el) { termId = el.value; teachingId = 'all'; repaint(); }, status(el) { status = el.value; repaint(); }, teaching(el) { teachingId = el.value; repaint(); }, from(el) { from = el.value; repaint(); }, to(el) { to = el.value; repaint(); }, print() { window.print(); },
-    async identity() { const value = await openSheet({ title: 'بيانات التقرير والطباعة', desc: 'بيانات المعلم والمدرسة تأتي من الإعدادات. مدير المدرسة اختياري ومحفوظ على هذا الجهاز.', body: reportIdentitySheet({ profile: store.state.profile, device: store.state.device }), foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="report-identity-form">حفظ</button>`, onMount: (root, done) => root.querySelector('#report-identity-form').addEventListener('submit', (event) => { event.preventDefault(); done(String(new FormData(event.currentTarget).get('principalName') ?? '').trim()); }) }); if (value === undefined) return; const saved = await store.patchDevice({ reportPrincipalName: value }); toast(saved ? 'حُفظت بيانات التقرير' : 'تعذّر حفظ بيانات التقرير', saved ? undefined : 'danger'); },
+    term(el) { termId = el.value; teachingId = 'all'; repaint(); }, status(el) { status = el.value; repaint(); }, teaching(el) { teachingId = el.value; repaint(); }, from(el) { from = el.value; repaint(); }, to(el) { to = el.value; repaint(); },
+    async print() {
+      const confirmed = await openSheet({
+        title: 'تأكيد بيانات التقرير والطباعة',
+        desc: 'راجع بيانات المعلم والمدرسة والمدير للظهور في ترويسة وتوقيع التقرير.',
+        body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,
+        onMount: (root, done) => {
+          const form = root.querySelector('#pre-print-form') || root.querySelector('#report-identity-form');
+          form?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            done({
+              teacherName: String(fd.get('teacherName') ?? '').trim(),
+              schoolName: String(fd.get('schoolName') ?? '').trim(),
+              principalName: String(fd.get('principalName') ?? '').trim(),
+            });
+          });
+        },
+      });
+      if (!confirmed) return;
+
+      const profilePatch = {};
+      if (confirmed.teacherName !== undefined) profilePatch.teacherName = confirmed.teacherName;
+      if (confirmed.schoolName !== undefined) profilePatch.schoolName = confirmed.schoolName;
+      if (confirmed.principalName !== undefined) {
+        profilePatch.reportPrincipalName = confirmed.principalName;
+        profilePatch.principalName = confirmed.principalName;
+      }
+      if (Object.keys(profilePatch).length) {
+        await store.patchProfile(profilePatch);
+      }
+      if (confirmed.principalName !== undefined) {
+        await store.patchDevice({ reportPrincipalName: confirmed.principalName });
+      }
+
+      repaint();
+
+      setTimeout(() => {
+        window.print();
+      }, 50);
+    },
+    async identity() {
+      return this.print();
+    },
     csv() { const rows = filters(scoped()); const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', out); toast('نُزّل تقرير تنفيذ الحصص'); },
   },
 };

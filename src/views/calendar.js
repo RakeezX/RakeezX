@@ -271,7 +271,7 @@ function affectedSessionsSheet(range) {
 /**
  * نافذة إدارة إعدادات التقويم والمنطقة التعليمية — مركزية داخل التقويم
  */
-function calendarSettingsSheet() {
+function calendarSettingsSheet(savedScrollTop = 0) {
   const year = store.activeYear();
   const yrs = store.years();
   const terms = store.termsOf(year?.id);
@@ -401,10 +401,16 @@ function calendarSettingsSheet() {
       </div>
     `,
     foot: html`<button class="btn btn--primary btn--block" data-sheet-close>تم</button>`,
-    onMount: (root, done) => {
+    onMount: (root) => {
+      const getScroll = () => root.querySelector('.sheet__body')?.scrollTop ?? 0;
+      if (savedScrollTop > 0) requestAnimationFrame(() => {
+        const body = root.querySelector('.sheet__body');
+        if (body) body.scrollTop = savedScrollTop;
+      });
       // اختيار التقويم المعتمد
       root.querySelectorAll('[data-act="set-region"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
+          const scroll = getScroll();
           const regId = btn.dataset.id;
           const reg = getSaudiEducationRegion(regId);
           const presetId = reg.presetId || reg.id;
@@ -416,35 +422,36 @@ function calendarSettingsSheet() {
             return;
           }
           toast(`تم تفعيل التقويم المعتمد: ${reg.name}`);
-          done();
           repaint();
+          calendarSettingsSheet(scroll);
         });
       });
 
       // إضافة سنة
       root.querySelector('[data-act="add-year"]')?.addEventListener('click', async () => {
-        done();
+        const scroll = getScroll();
         const data = await yearSheet();
-        if (!data?.hijriStart) return;
-        const y = makeYear({ hijriStart: data.hijriStart });
-        if (store.getYear(y.id)) return toast('هذه السنة موجودة مسبقًا', 'danger');
-        const ok1 = await store.save({ years: [y] });
-        const ok2 = await store.save({
-          terms: [makeTerm({ yearId: y.id, index: 1, status: 'active' })],
-        });
-        if (ok1 && ok2) toast('تمت إضافة سنة دراسية جديدة');
+        if (data?.hijriStart) {
+          const y = makeYear({ hijriStart: data.hijriStart });
+          if (store.getYear(y.id)) toast('هذه السنة موجودة مسبقًا', 'danger');
+          else {
+            const ok1 = await store.save({ years: [y] });
+            const ok2 = await store.save({ terms: [makeTerm({ yearId: y.id, index: 1, status: 'active' })] });
+            if (ok1 && ok2) { toast('تمت إضافة سنة دراسية جديدة'); repaint(); }
+          }
+        }
+        calendarSettingsSheet(scroll);
       });
 
       // تعديل سنة
       root.querySelectorAll('[data-act="edit-year"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          done();
+          const scroll = getScroll();
           const y = store.getYear(btn.dataset.id);
           if (!y) return;
           const data = await yearSheet(y);
-          if (!data) return;
-          await store.patch('years', y.id, { status: data.status });
-          toast('حُفظت تعديلات السنة');
+          if (data) { await store.patch('years', y.id, { status: data.status }); toast('حُفظت تعديلات السنة'); repaint(); }
+          calendarSettingsSheet(scroll);
         });
       });
 
@@ -456,14 +463,15 @@ function calendarSettingsSheet() {
             toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
             return;
           }
+          const scroll = getScroll();
           const yTerms = store.termsOf(targetYearId);
           await store.patchDevice({
             activeYearId: targetYearId,
             activeTermId: yTerms[0]?.id ?? null,
           });
           toast('تغيّرت السنة الحالية');
-          done();
           repaint();
+          calendarSettingsSheet(scroll);
         });
       });
 
@@ -480,45 +488,45 @@ function calendarSettingsSheet() {
             toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
             return;
           }
+          const scroll = getScroll();
           await store.patchDevice({
             activeTermId: btn.dataset.id,
             activeYearId: targetYearId,
           });
           toast('تغيّر الفصل الدراسي الحالي');
-          done();
           repaint();
+          calendarSettingsSheet(scroll);
         });
       });
 
       // تعديل فصل
       root.querySelectorAll('[data-act="edit-term-in-settings"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          done();
+          const scroll = getScroll();
           const term = store.getTerm(btn.dataset.id);
           if (!term) return;
           const data = await termSheet(term);
-          if (!data) return;
-          try {
-            await store.updateTermDates(term.id, data.startDate, data.endDate);
-            toast('حُفظت تواريخ الفصل الدراسي');
-          } catch (err) {
-            toast(err.message, 'danger');
+          if (data) {
+            try { await store.updateTermDates(term.id, data.startDate, data.endDate); toast('حُفظت تواريخ الفصل الدراسي'); repaint(); }
+            catch (err) { toast(err.message, 'danger'); }
           }
+          calendarSettingsSheet(scroll);
         });
       });
 
       // إضافة فصل
       root.querySelector('[data-act="add-term"]')?.addEventListener('click', async (e) => {
-        done();
+        const scroll = getScroll();
         const yId = e.currentTarget.dataset.year;
         const existing = store.termsOf(yId);
         const nextIndex = Math.max(0, ...existing.map((t) => t.index ?? 0)) + 1;
         const data = await newTermSheet(yId, nextIndex);
-        if (!data) return;
-        const t = makeTerm({ yearId: yId, ...data });
-        if (store.getTerm(t.id)) return toast('يوجد فصل دراسي بهذا الترتيب', 'danger');
-        const ok = await store.save({ terms: [t] });
-        if (ok) toast('تمت إضافة فصل دراسي بنجاح');
+        if (data) {
+          const t = makeTerm({ yearId: yId, ...data });
+          if (store.getTerm(t.id)) toast('يوجد فصل دراسي بهذا الترتيب', 'danger');
+          else { const ok = await store.save({ terms: [t] }); if (ok) { toast('تمت إضافة فصل دراسي بنجاح'); repaint(); } }
+        }
+        calendarSettingsSheet(scroll);
       });
     },
   });
@@ -912,7 +920,7 @@ export default {
           <div>
             <div class="cal-card__head">
               <span class="cal-card__eyebrow">
-                ${icon('clock')}
+                ${icon('clock', 'compact')}
                 <span>الإجازة القادمة</span>
               </span>
               ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate

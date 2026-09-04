@@ -6,7 +6,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportHeader, reportIdentitySheet, reportSignatures } from '../lib/report-print.js';
+import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
@@ -23,8 +23,9 @@ function identity(cls) {
   const section = store.getSection(cls.sectionId);
   const term = store.getTerm(cls.termId);
   const year = store.getYear(term?.yearId);
+  const principal = store.state.profile?.reportPrincipalName || store.state.device?.reportPrincipalName || store.state.profile?.principalName || '';
   return {
-    profile: { ...store.state.profile, reportPrincipalName: store.state.device?.reportPrincipalName ?? '' },
+    profile: { ...store.state.profile, reportPrincipalName: principal },
     year: year?.label ?? '', term: term?.name ?? '',
     section: store.sectionLabel(section) ?? '', subject: store.getSubject(cls.subjectId)?.name ?? '',
   };
@@ -42,8 +43,8 @@ function sortRoster(roster, items, ctx) {
     arr.sort((a, b) => (studentTotal(items, ctx[a.id]).pct ?? 9999) - (studentTotal(items, ctx[b.id]).pct ?? 9999));
   } else if (sortKey === 'absent_desc') {
     arr.sort((a, b) => {
-      const absA = ctx[a.id].attendance.filter((rec) => rec.status === 'absent').length;
-      const absB = ctx[b.id].attendance.filter((rec) => rec.status === 'absent').length;
+      const absA = ctx[a.id].attendance.filter((rec) => !rec.deleted && rec.status === 'absent').length;
+      const absB = ctx[b.id].attendance.filter((rec) => !rec.deleted && rec.status === 'absent').length;
       return absB - absA;
     });
   }
@@ -95,9 +96,12 @@ export default {
 
         <!-- شريط الترتيب العام وأدوات العرض -->
         <div class="grades-toolbar noprint mb-3">
-          <label class="field" style="margin-bottom:0; flex: 1; min-width: 140px;">
+          <label class="field" style="margin-bottom:0; flex: 1; min-width: 160px;">
+            <span class="field__label fs-xs" style="margin-bottom:2px; font-weight: 600; color: var(--text-2);">
+              ${icon('filter', 'compact')} ترتيب الكشف
+            </span>
             <select class="select" data-change="sort" aria-label="ترتيب التقرير">
-              <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي</option>
+              <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي ${tab === 'support' ? '(الأكثر حاجة للدعم)' : '(السجل)'}</option>
               <option value="name" ${sortKey === 'name' ? 'selected' : ''}>أبجديًا (اسم الطالب)</option>
               <option value="roll" ${sortKey === 'roll' ? 'selected' : ''}>حسب رقم الكشف</option>
               <option value="score_desc" ${sortKey === 'score_desc' ? 'selected' : ''}>الأعلى درجة</option>
@@ -107,13 +111,13 @@ export default {
           </label>
           ${tab === 'attendance'
             ? html`
-                <div class="segmented segmented--sm">
+                <div class="segmented segmented--sm" style="align-self: flex-end;">
                   <button class="segmented__btn ${attMode === 'brief' ? 'is-on' : ''}" data-act="att-mode" data-mode="brief">موجز</button>
                   <button class="segmented__btn ${attMode === 'detailed' ? 'is-on' : ''}" data-act="att-mode" data-mode="detailed">تفصيلي</button>
                 </div>
               `
             : ''}
-          <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'}" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة">
+          <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'}" style="align-self: flex-end;" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة">
             ${icon('reports')} ${a4Preview ? 'إغلاق المعاينة' : 'معاينة A4'}
           </button>
         </div>
@@ -139,7 +143,6 @@ export default {
         <div class="btn-row mt-6 noprint report-actions">
           <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة ملخص التقرير</button>
           <button class="btn btn--ghost" data-act="toggle-a4">${icon('reports')} ${a4Preview ? 'الوضع العادي' : 'معاينة A4'}</button>
-          <button class="btn btn--ghost" data-act="identity">${icon('edit')} بيانات التقرير والطباعة</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} طباعة</button>
           <button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>
         </div>
@@ -154,7 +157,52 @@ export default {
     'toggle-a4'() { a4Preview = !a4Preview; repaint(); },
     'filter-start'(el) { filterStartDate = el.value; repaint(); },
     'filter-end'(el) { filterEndDate = el.value; repaint(); },
-    print() { window.print(); },
+
+    async print() {
+      const confirmed = await openSheet({
+        title: 'تأكيد بيانات التقرير والطباعة',
+        desc: 'راجع بيانات المعلم والمدرسة والمدير للظهور في ترويسة وتوقيع التقرير.',
+        body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,
+        onMount: (root, done) => {
+          const form = root.querySelector('#pre-print-form') || root.querySelector('#report-identity-form');
+          form?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            done({
+              teacherName: String(fd.get('teacherName') ?? '').trim(),
+              schoolName: String(fd.get('schoolName') ?? '').trim(),
+              principalName: String(fd.get('principalName') ?? '').trim(),
+            });
+          });
+        },
+      });
+      if (!confirmed) return;
+
+      const profilePatch = {};
+      if (confirmed.teacherName !== undefined) profilePatch.teacherName = confirmed.teacherName;
+      if (confirmed.schoolName !== undefined) profilePatch.schoolName = confirmed.schoolName;
+      if (confirmed.principalName !== undefined) {
+        profilePatch.reportPrincipalName = confirmed.principalName;
+        profilePatch.principalName = confirmed.principalName;
+      }
+      if (Object.keys(profilePatch).length) {
+        await store.patchProfile(profilePatch);
+      }
+      if (confirmed.principalName !== undefined) {
+        await store.patchDevice({ reportPrincipalName: confirmed.principalName });
+      }
+
+      repaint();
+
+      setTimeout(() => {
+        window.print();
+      }, 50);
+    },
+
+    async identity() {
+      return this.print();
+    },
 
     async share(el, ev, params) {
       const cls = store.getTeaching(params.id);
@@ -215,21 +263,6 @@ export default {
           });
         },
       });
-    },
-
-    async identity() {
-      const value = await openSheet({
-        title: 'بيانات التقرير والطباعة',
-        desc: 'بيانات المعلم والمدرسة تأتي من الإعدادات. مدير المدرسة اختياري ومحفوظ على هذا الجهاز.',
-        body: reportIdentitySheet({ profile: store.state.profile, device: store.state.device }),
-        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="report-identity-form">حفظ</button>`,
-        onMount: (root, done) => root.querySelector('#report-identity-form').addEventListener('submit', (event) => {
-          event.preventDefault(); done(String(new FormData(event.currentTarget).get('principalName') ?? '').trim());
-        }),
-      });
-      if (value === undefined) return;
-      const saved = await store.patchDevice({ reportPrincipalName: value });
-      toast(saved ? 'حُفظت بيانات التقرير' : 'تعذّر حفظ بيانات التقرير', saved ? undefined : 'danger');
     },
 
     csv(el, ev, params) {
@@ -412,12 +445,34 @@ function attendanceReport(cls, roster, ctx) {
   `;
 }
 
-function supportRows(roster, items, ctx) {
-  return roster.map((s) => { const total = studentTotal(items, ctx[s.id]); const absents = ctx[s.id].attendance.filter((a) => a.status === 'absent').length; const part = ctx[s.id].logs.filter((l) => l.kind === 'participation').reduce((n, l) => n + l.delta, 0); const reasons = []; if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون ٥٠٪'); if (absents >= 3) reasons.push(`${absents} غيابات`); if (part <= 0 && total.pct !== null) reasons.push('لا مشاركة مرصودة'); if (total.missing > 0 && total.missing === items.filter((i) => !i.auto).length) reasons.push('لم يُرصد له شيء'); return { s, total, reasons }; }).filter((row) => row.reasons.length).sort((a, b) => (a.total.pct ?? 999) - (b.total.pct ?? 999));
+export function supportRows(roster, items, ctx) {
+  const validItems = items.filter((i) => !i.auto && !i.deleted);
+  const rows = roster.map((s) => {
+    const total = studentTotal(items, ctx[s.id]);
+    const absents = ctx[s.id].attendance.filter((a) => !a.deleted && a.status === 'absent').length;
+    const part = ctx[s.id].logs.filter((l) => !l.deleted && l.kind === 'participation').reduce((n, l) => n + l.delta, 0);
+    const reasons = [];
+    if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون ٥٠٪');
+    if (absents >= 3) reasons.push(`${absents} غيابات`);
+    if (part <= 0 && total.pct !== null && validItems.length > 0) reasons.push('لا مشاركة مرصودة');
+    if (total.missing > 0 && validItems.length > 0 && total.missing === validItems.length) reasons.push('لم يُرصد له شيء');
+    return { s, total, reasons, absents };
+  }).filter((row) => row.reasons.length);
+
+  if (sortKey === 'default') {
+    rows.sort((a, b) => {
+      const pctA = a.total.pct === null ? 0 : a.total.pct;
+      const pctB = b.total.pct === null ? 0 : b.total.pct;
+      if (pctA !== pctB) return pctA - pctB;
+      if (b.reasons.length !== a.reasons.length) return b.reasons.length - a.reasons.length;
+      return (b.absents ?? 0) - (a.absents ?? 0);
+    });
+  }
+  return rows;
 }
 
 function supportReport(roster, items, ctx) {
   const rows = supportRows(roster, items, ctx);
   if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون ٥٠٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
-  return html`<p class="t-3 fs-sm mb-3 noprint">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list noprint">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span>${icon('chev')}</span></a>`)}</div><div class="tablewrap print-tablewrap print-only"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>النسبة</th><th>مؤشرات الدعم</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td class="tabular">${fmtPct(row.total.pct)}</td><td>${row.reasons.join(' · ')}</td></tr>`)}</tbody></table></div>`;
+  return html`<p class="t-3 fs-sm mb-3 noprint">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list noprint">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span><span class="row__chev">${icon('chev', 'compact')}</span></span></a>`)}</div><div class="tablewrap print-tablewrap print-only"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>النسبة</th><th>مؤشرات الدعم</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td class="tabular">${fmtPct(row.total.pct)}</td><td>${row.reasons.join(' · ')}</td></tr>`)}</tbody></table></div>`;
 }

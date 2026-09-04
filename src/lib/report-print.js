@@ -28,7 +28,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
 }
 
 export function reportSignatures({ profile, teacherLabel = 'معلم المادة' }) {
-  const principal = String(profile?.reportPrincipalName ?? '').trim();
+  const principal = String(profile?.reportPrincipalName ?? profile?.principalName ?? '').trim();
   return html`
     <footer class="print-signatures" dir="rtl">
       <div><span>${teacherLabel}</span>${profile?.teacherName ? html`<strong>${profile.teacherName}</strong>` : ''}</div>
@@ -37,17 +37,34 @@ export function reportSignatures({ profile, teacherLabel = 'معلم الماد�
   `;
 }
 
-export function reportIdentitySheet({ profile, device }) {
+export function prePrintConfirmationSheet({ profile, device }) {
+  const teacher = profile?.teacherName ?? '';
+  const school = profile?.schoolName ?? '';
+  const principal = profile?.reportPrincipalName ?? device?.reportPrincipalName ?? profile?.principalName ?? '';
+
   return html`
-    <form id="report-identity-form" class="stack stack-3">
-      <div class="report-identity__known">
-        ${profile?.teacherName ? html`<span>المعلم: <b>${profile.teacherName}</b></span>` : ''}
-        ${profile?.schoolName ? html`<span>المدرسة: <b>${profile.schoolName}</b></span>` : ''}
-        ${!profile?.teacherName || !profile?.schoolName ? html`<span class="t-3">أكمل بيانات المعلم والمدرسة من الإعدادات عند الحاجة.</span>` : ''}
+    <form id="pre-print-form" class="stack stack-3">
+      <div class="field-row">
+        <label class="field" style="margin-bottom:0">
+          <span class="field__label">اسم المعلم</span>
+          <input class="input" name="teacherName" maxlength="60" autocomplete="name"
+                 value="${teacher}" placeholder="الاسم كما يظهر في التقرير">
+        </label>
+        <label class="field" style="margin-bottom:0">
+          <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
+          <input class="input" name="principalName" maxlength="80" autocomplete="name"
+                 value="${principal}" placeholder="مدير المدرسة">
+        </label>
       </div>
-      <label class="field"><span class="field__label">مدير المدرسة <span class="t-3">(اختياري)</span></span>
-        <input class="input" name="principalName" maxlength="80" autocomplete="name" value="${device?.reportPrincipalName ?? ''}" placeholder="يظهر في توقيع التقارير عند إدخاله">
+      <label class="field" style="margin-bottom:0">
+        <span class="field__label">اسم المدرسة</span>
+        <input class="input" name="schoolName" maxlength="80" autocomplete="off"
+               value="${school}" placeholder="اسم المدرسة">
       </label>
     </form>
   `;
+}
+
+export function reportIdentitySheet({ profile, device }) {
+  return prePrintConfirmationSheet({ profile, device });
 }

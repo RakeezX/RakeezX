@@ -283,14 +283,22 @@ export default {
             تظهر على التقارير والكشوف التي تطبعها. تُحفظ محليًا وتُزامن مع حسابك عند الاتصال.
           </p>
           <form id="me-form">
-            <label class="field">
-              <span class="field__label">اسمك</span>
-              <input class="input" name="teacherName" value="${m.teacherName ?? ''}"
-                     maxlength="60" autocomplete="name" data-fk="teacherName"
-                     data-change="save" placeholder="الاسم كما يظهر في التقارير">
-            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="field__label">اسم المعلم</span>
+                <input class="input" name="teacherName" value="${m.teacherName ?? ''}"
+                       maxlength="60" autocomplete="name" data-fk="teacherName"
+                       data-change="save" placeholder="الاسم كما يظهر في التقارير">
+              </label>
+              <label class="field">
+                <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
+                <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
+                       maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
+                       data-change="save" placeholder="مدير المدرسة للتقارير">
+              </label>
+            </div>
             <label class="field" style="margin-bottom:0">
-              <span class="field__label">المدرسة</span>
+              <span class="field__label">اسم المدرسة</span>
               <input class="input" name="schoolName" value="${m.schoolName ?? ''}"
                      maxlength="80" autocomplete="off" data-fk="schoolName"
                      data-change="save" placeholder="اسم المدرسة">
@@ -377,50 +385,26 @@ export default {
         <div class="section__head"><div class="section__title">المزامنة السحابية</div></div>
         <div class="card card--pad stack stack-3">
           ${cloud.session ? html`
-            <div class="hstack gap-2">
-              <div class="fw-7">متصل بحساب</div>
-              <div class="t-3 fs-sm" style="direction: ltr; text-align: right;">${cloud.user?.email}</div>
-              <div class="push">
+            <div class="hstack gap-2 wrap">
+              <div>
+                <div class="fw-7">متصل بحساب</div>
+                <div class="t-3 fs-sm" style="direction: ltr; text-align: right;">${cloud.user?.email}</div>
+              </div>
+              <div class="push hstack gap-2">
+                <button class="btn btn--sm btn--primary" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
+                  ${icon('spark')} ${sync.state.status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن'}
+                </button>
                 <button class="btn btn--sm btn--ghost" data-act="cloud-out">تسجيل الخروج</button>
               </div>
             </div>
-
-            <div class="t-3 fs-sm hstack gap-2">
-              <div>الحالة: ${syncStatusLabel(sync.state.status)}</div>
+            <div class="t-3 fs-sm">
+              الحالة: <strong>${syncStatusLabel(sync.state.status)}</strong>
+              — تُحفظ بياناتك محليًا وتُزامن سحابيًا تلقائيًا عند الاتصال.
             </div>
-
-            <button class="btn btn--quiet btn--block" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة الآن
-            </button>
-            ${renderResultPanel('مزامنة الملف الشخصي', sync.state.results.profile)}
-
-            <button class="btn btn--quiet btn--block" data-act="sync-structural" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة البيانات الهيكلية
-            </button>
-            ${renderResultPanel('مزامنة البيانات الهيكلية', sync.state.results.structural)}
-
-            <button class="btn btn--quiet btn--block" data-act="sync-students" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة الطلاب والانتساب
-            </button>
-            ${renderResultPanel('مزامنة الطلاب والانتساب', sync.state.results.students)}
-
-            <button class="btn btn--quiet btn--block" data-act="sync-notes" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة ملاحظات الطلاب
-            </button>
-            ${renderResultPanel('مزامنة ملاحظات الطلاب', sync.state.results.notes)}
-
-            <button class="btn btn--quiet btn--block" data-act="sync-scoring" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة التقييم والدرجات
-            </button>
-            ${renderResultPanel('مزامنة التقييم والدرجات', sync.state.results.scoring)}
-
-            <button class="btn btn--quiet btn--block" data-act="sync-timetable" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('spark')} مزامنة الجدول والجلسات
-            </button>
-            ${renderResultPanel('مزامنة الجدول والجلسات', sync.state.results.timetable)}
-
-
           ` : html`
+            <p class="t-3 fs-sm">
+              يعمل التطبيق دون إنترنت أولًا. سجّل دخولك لحفظ بياناتك سحابيًا ومزامنتها تلقائيًا عبر أجهزتك.
+            </p>
             <form id="cloud-login-form" data-act="cloud-in">
               <label class="field">
                 <span class="field__label">البريد الإلكتروني</span>
@@ -483,10 +467,10 @@ export default {
 
       <div class="section">
         <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
-        <div class="card card--pad t-3 fs-sm stack stack-2">
-          <div>سجل معلّم يعمل كاملًا دون إنترنت. كل ما ترصده محفوظ على جهازك وحده.</div>
-          <div>لا حسابات، ولا إعلانات، ولا تتبّع، ولا إرسال لأي خادم.</div>
-          <div class="t-3">RAKEEZ X · النسخة ١٫٠ · الموجة الأولى</div>
+        <div class="card card--pad stack stack-2">
+          <div class="fw-7">سجل معلّم يعمل دون إنترنت أولًا (Offline-First).</div>
+          <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
+          <div class="t-3 fs-xs">RAKEEZ X · الإصدار 1.0</div>
         </div>
       </div>
     `;
@@ -638,7 +622,14 @@ export default {
     },
 
     async save(el) {
-      if (await store.patchProfile({ [el.name]: el.value.trim() })) toast('حُفظ');
+      const val = el.value.trim();
+      if (el.name === 'reportPrincipalName' || el.name === 'principalName') {
+        await store.patchProfile({ reportPrincipalName: val, principalName: val });
+        await store.patchDevice({ reportPrincipalName: val });
+        toast('حُفظ');
+      } else {
+        if (await store.patchProfile({ [el.name]: val })) toast('حُفظ');
+      }
     },
 
     async theme(el) {
