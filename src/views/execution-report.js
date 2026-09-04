@@ -2,7 +2,7 @@
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet } from '../lib/report-print.js';
+import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -23,7 +23,7 @@ function scoped() { return store.executionReport({ termId: termId || store.activ
 function filters(report) { return report.rows.filter((row) => (status === 'all' || row.completeness.state === status) && (teachingId === 'all' || row.teaching?.id === teachingId) && (!from || row.session.date >= from) && (!to || row.session.date <= to)); }
 function contextLabel(report) { return [from && `من ${fmtDate(from, false)}`, to && `إلى ${fmtDate(to, false)}`, status !== 'all' && statusText(status)].filter(Boolean).join(' · '); }
 function profile() {
-  const principal = store.state.profile?.reportPrincipalName || store.state.device?.reportPrincipalName || store.state.profile?.principalName || '';
+  const principal = resolvedReportPrincipalName(store.state.profile, store.state.device);
   return { ...store.state.profile, reportPrincipalName: principal };
 }
 

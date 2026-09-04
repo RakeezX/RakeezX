@@ -224,8 +224,30 @@ function hasMeaningfulProfile(profile) {
   return Boolean(
     (profile.teacherName && profile.teacherName.trim() !== '') ||
     (profile.schoolName && profile.schoolName.trim() !== '') ||
-    (profile.phone && profile.phone.trim() !== '')
+    (profile.phone && profile.phone.trim() !== '') ||
+    (profile.reportPrincipalName && profile.reportPrincipalName.trim() !== '') ||
+    (profile.principalName && profile.principalName.trim() !== '')
   );
+}
+
+// reportPrincipalName is the canonical synced field. principalName remains a
+// local compatibility alias for profiles created before this field existed.
+function profilePrincipalName(profile) {
+  const canonical = String(profile?.reportPrincipalName ?? '').trim();
+  return canonical || String(profile?.principalName ?? '').trim();
+}
+
+function remoteProfileToLocal(remote, updatedAt) {
+  const principal = String(remote.report_principal_name ?? '').trim();
+  return {
+    teacherName: remote.teacher_name,
+    schoolName: remote.school_name,
+    phone: remote.phone,
+    reportPrincipalName: principal,
+    principalName: principal,
+    updatedAt,
+    deleted: !!remote.deleted_at,
+  };
 }
 
 /**
@@ -265,13 +287,7 @@ export async function syncProfile() {
       if (!hasMeaningfulProfile(local)) {
         console.log('[rakeezx sync] Local is empty/default. Remote wins.');
         shouldUpdateLocal = true;
-        merged = {
-          teacherName: remote.teacher_name,
-          schoolName: remote.school_name,
-          phone: remote.phone,
-          updatedAt: remoteClientUpdatedAt, // Keep remote's timestamp
-          deleted: !!remote.deleted_at
-        };
+        merged = remoteProfileToLocal(remote, remoteClientUpdatedAt);
       } else if (localUpdatedAt > remoteClientUpdatedAt) {
         console.log('[rakeezx sync] Local is strictly newer. Local wins.');
         shouldPush = true;
@@ -279,13 +295,7 @@ export async function syncProfile() {
       } else if (remoteClientUpdatedAt > localUpdatedAt) {
         console.log('[rakeezx sync] Remote is strictly newer. Remote wins.');
         shouldUpdateLocal = true;
-        merged = {
-          teacherName: remote.teacher_name,
-          schoolName: remote.school_name,
-          phone: remote.phone,
-          updatedAt: remoteClientUpdatedAt, // Keep remote's timestamp
-          deleted: !!remote.deleted_at
-        };
+        merged = remoteProfileToLocal(remote, remoteClientUpdatedAt);
       } else {
         console.log('[rakeezx sync] Timestamps are exactly equal. Perfect sync, no action.');
       }
@@ -297,6 +307,7 @@ export async function syncProfile() {
         teacher_name: merged.teacherName || '',
         school_name: merged.schoolName || '',
         phone: merged.phone || '',
+        report_principal_name: profilePrincipalName(merged),
         client_updated_at: merged.updatedAt,
         device_id: getDeviceId()
       };
@@ -314,6 +325,8 @@ export async function syncProfile() {
         teacherName: merged.teacherName,
         schoolName: merged.schoolName,
         phone: merged.phone,
+        reportPrincipalName: merged.reportPrincipalName,
+        principalName: merged.principalName,
         updatedAt: merged.updatedAt,
         deleted: merged.deleted
       }, { preserveTimestamp: true, queue: false });

@@ -511,6 +511,10 @@ export const makeProfile = (o = {}) => ({
   teacherName: o.teacherName ?? '',
   schoolName: o.schoolName ?? '',
   phone: o.phone ?? '',
+  // اسم المدير جزء من هوية الحساب المتزامنة. نحتفظ بالاسم القديم للتوافق
+  // مع النسخ المحلية السابقة التي استخدمت principalName.
+  reportPrincipalName: o.reportPrincipalName ?? o.principalName ?? '',
+  principalName: o.principalName ?? o.reportPrincipalName ?? '',
   ...o,
 });
 

@@ -6,7 +6,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet } from '../lib/report-print.js';
+import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
@@ -23,7 +23,7 @@ function identity(cls) {
   const section = store.getSection(cls.sectionId);
   const term = store.getTerm(cls.termId);
   const year = store.getYear(term?.yearId);
-  const principal = store.state.profile?.reportPrincipalName || store.state.device?.reportPrincipalName || store.state.profile?.principalName || '';
+  const principal = resolvedReportPrincipalName(store.state.profile, store.state.device);
   return {
     profile: { ...store.state.profile, reportPrincipalName: principal },
     year: year?.label ?? '', term: term?.name ?? '',

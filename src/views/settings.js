@@ -9,6 +9,7 @@ import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes }
 import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
 import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.js';
 import { hasValidYearCalendarConfig } from './calendar.js';
+import { resolvedReportPrincipalName } from '../lib/report-print.js';
 
 const THEMES = [
   { v: 'auto',  label: 'حسب النظام', icon: 'settings' },
@@ -270,7 +271,14 @@ export default {
   title: () => 'الإعدادات',
 
   render() {
-    const m = { ...(store.state.profile ?? {}), ...(store.state.device ?? {}) };
+    const profile = store.state.profile ?? {};
+    const device = store.state.device ?? {};
+    const m = {
+      ...profile,
+      ...device,
+      // A blank device fallback must never hide the synced account value.
+      reportPrincipalName: resolvedReportPrincipalName(profile, device),
+    };
     const yrs = store.years();
     const activeY = store.activeYear();
     const activeT = store.activeTerm();

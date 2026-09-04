@@ -8,6 +8,7 @@ import * as sync from "../src/lib/sync.js";
 import * as store from "../src/store.js";
 import * as db from "../src/lib/db.js";
 import { setMockBackend, setMockAuth } from "../src/lib/cloud.js";
+import { resolvedReportPrincipalName } from "../src/lib/report-print.js";
 
 /**
  * MockCloudBackend for syncProfile tests.
@@ -89,6 +90,45 @@ test("Sync Profile Suite", async (t) => {
     // syncProfile calls store.patchProfile({ schoolName: remote.school_name, ... })
     assert.equal(localProfile[0].schoolName, "Cloud School");
     assert.equal(sync.state.results.profile?.status, "success");
+  });
+
+  await t.test("Principal identity uploads and restores on a fresh device without fallback masking", async () => {
+    const savedAt = Date.now();
+    await store.patchProfile({
+      teacherName: "Teacher A",
+      schoolName: "School A",
+      reportPrincipalName: "Principal A",
+      principalName: "Principal A",
+      updatedAt: savedAt,
+    });
+    await store.init();
+
+    await sync.syncProfile();
+    const remote = backend.records.profile?.[0];
+    assert.equal(remote?.teacher_name, "Teacher A");
+    assert.equal(remote?.school_name, "School A");
+    assert.equal(remote?.report_principal_name, "Principal A", "principal must be in the cloud profile payload");
+
+    // Simulate a newly initialized device for the same authenticated account.
+    db.closeDB();
+    await db.clearAll();
+    await store.patchDevice({ reportPrincipalName: "" });
+    await store.init();
+    await sync.syncProfile();
+
+    const freshProfile = (await db.getAll("profile"))[0];
+    const freshDevice = (await db.getAll("device"))[0];
+    assert.equal(freshProfile.teacherName, "Teacher A");
+    assert.equal(freshProfile.schoolName, "School A");
+    assert.equal(freshProfile.reportPrincipalName, "Principal A");
+    assert.equal(freshProfile.principalName, "Principal A", "legacy local alias stays compatible");
+    assert.equal(freshDevice.reportPrincipalName, "", "an empty device fallback remains local-only");
+    assert.equal(resolvedReportPrincipalName(freshProfile, freshDevice), "Principal A", "blank device fallback cannot mask synced identity");
+
+    const remoteBeforeRepeat = JSON.stringify(backend.records.profile);
+    await store.init(); // Reload must retain the pulled account profile.
+    await sync.syncProfile();
+    assert.equal(JSON.stringify(backend.records.profile), remoteBeforeRepeat, "repeat sync must not oscillate profile values");
   });
 
   await t.test("Strict convergence and no-op preservation", async () => {

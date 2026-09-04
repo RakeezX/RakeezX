@@ -12,6 +12,17 @@ import { repaint } from '../repaint.js';
 
 let usageInfo = null;
 
+export const LOCAL_RESET_COPY = {
+  button: 'إعادة ضبط سجل ركيز المحلي على هذا الجهاز',
+  title: 'إعادة ضبط السجل المحلي؟',
+  description: 'سيُمسح سجل ركيز المحلي والتغييرات غير المرفوعة من هذا الجهاز فقط. لن تُحذف بياناتك السحابية، وستُعاد مزامنتها بعد إعادة التحميل عند تسجيل الدخول.',
+  pendingWarning: 'يوجد تغييرات لم تُرفع بعد وستُفقد عند المتابعة.',
+  confirmLabel: 'إعادة ضبط السجل المحلي',
+  finalTitle: 'متأكد من إعادة الضبط؟',
+  finalDescription: 'لا يمكن استعادة التغييرات المحلية غير المرفوعة بعد المتابعة.',
+  finalConfirmLabel: 'نعم، أعد الضبط',
+};
+
 const fmtBytes = (n) => {
   if (!n && n !== 0) return '—';
   if (n < 1024) return `${n} بايت`;
@@ -111,7 +122,7 @@ export default {
       <div class="section">
         <div class="section__head"><div class="section__title">منطقة الخطر</div></div>
         <button class="btn btn--danger btn--block" data-act="wipe">
-          ${icon('trash')} امسح كل البيانات من هذا الجهاز
+          ${icon('trash')} ${LOCAL_RESET_COPY.button}
         </button>
       </div>
     `;
@@ -207,18 +218,20 @@ export default {
     },
 
     async wipe() {
+      const pendingOutbox = await db.getAll('outbox');
+      const pendingWarning = pendingOutbox.length ? ` ${LOCAL_RESET_COPY.pendingWarning}` : '';
       const ok = await confirmSheet({
-        title: 'مسح كل شيء؟',
-        desc: 'كل الفصول والطلاب والدرجات والحضور تُمسح من هذا الجهاز نهائيًا. صدّر نسخة أولًا.',
-        confirmLabel: 'امسح كل شيء',
+        title: LOCAL_RESET_COPY.title,
+        desc: `${LOCAL_RESET_COPY.description}${pendingWarning}`,
+        confirmLabel: LOCAL_RESET_COPY.confirmLabel,
         danger: true,
       });
       if (!ok) return;
 
       const again = await confirmSheet({
-        title: 'متأكد؟',
-        desc: 'لا يمكن التراجع عن هذا.',
-        confirmLabel: 'نعم، امسح',
+        title: LOCAL_RESET_COPY.finalTitle,
+        desc: LOCAL_RESET_COPY.finalDescription,
+        confirmLabel: LOCAL_RESET_COPY.finalConfirmLabel,
         danger: true,
       });
       if (!again) return;

@@ -28,7 +28,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
 }
 
 export function reportSignatures({ profile, teacherLabel = 'معلم المادة' }) {
-  const principal = String(profile?.reportPrincipalName ?? profile?.principalName ?? '').trim();
+  const principal = resolvedReportPrincipalName(profile);
   return html`
     <footer class="print-signatures" dir="rtl">
       <div><span>${teacherLabel}</span>${profile?.teacherName ? html`<strong>${profile.teacherName}</strong>` : ''}</div>
@@ -37,10 +37,20 @@ export function reportSignatures({ profile, teacherLabel = 'معلم الماد�
   `;
 }
 
+/**
+ * The account profile is canonical when it contains a principal name. A
+ * device-local value is only a fallback for older/offline profiles.
+ */
+export function resolvedReportPrincipalName(profile, device) {
+  const synced = String(profile?.reportPrincipalName ?? '').trim()
+    || String(profile?.principalName ?? '').trim();
+  return synced || String(device?.reportPrincipalName ?? '').trim();
+}
+
 export function prePrintConfirmationSheet({ profile, device }) {
   const teacher = profile?.teacherName ?? '';
   const school = profile?.schoolName ?? '';
-  const principal = profile?.reportPrincipalName ?? device?.reportPrincipalName ?? profile?.principalName ?? '';
+  const principal = resolvedReportPrincipalName(profile, device);
 
   return html`
     <form id="pre-print-form" class="stack stack-3">
