@@ -24,12 +24,15 @@ const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
 const AUTO_SYNC_DEBOUNCE_MS = 900;
+const RESUME_STALE_MS = 5 * 60 * 1000;
+const RETRY_DELAYS_MS = [2_000, 4_000, 8_000, 16_000, 30_000];
 
 let autoTimer = null;
 let autoRunning = false;
 let rerunRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
+let retryAttempt = 0;
 
 const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
@@ -64,6 +67,30 @@ function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
     syncAll({ full });
   }, immediate ? 0 : AUTO_SYNC_DEBOUNCE_MS);
   setState({ status: 'pending' });
+}
+
+function retryDelay() {
+  const delay = RETRY_DELAYS_MS[Math.min(retryAttempt, RETRY_DELAYS_MS.length - 1)];
+  retryAttempt = Math.min(retryAttempt + 1, RETRY_DELAYS_MS.length - 1);
+  return delay;
+}
+
+function scheduleRetry() {
+  if (!cloud.session || !cloud.user || !isOnline()) return;
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    autoTimer = null;
+    syncAll({ full: true });
+  }, retryDelay());
+  setState({ status: 'pending' });
+}
+
+async function scheduleResumeSync() {
+  if (!cloud.session || !cloud.user || !isOnline()) return;
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  const pending = await pendingOutbox();
+  const stale = !state.lastSyncedAt || Date.now() - state.lastSyncedAt >= RESUME_STALE_MS;
+  if (pending.length || stale) scheduleAutomaticSync({ full: stale, immediate: true });
 }
 
 function failedResult(name) {
@@ -115,12 +142,15 @@ export async function syncAll({ full = true } = {}) {
   suppressAutoSchedule = true;
   const snapshot = await pendingOutbox();
   const stores = new Set(snapshot.map((entry) => entry.store));
+  let failed = false;
   try {
     await runRequiredSync(stores, full);
     await acknowledgeOutbox(snapshot);
+    retryAttempt = 0;
     setState({ status: (await pendingOutbox()).length ? 'pending' : 'synced' });
     return true;
   } catch (err) {
+    failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
     setState({ status: isOnline() ? 'error' : 'offline' });
     return false;
@@ -135,6 +165,9 @@ export async function syncAll({ full = true } = {}) {
       rerunRequested = false;
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = null;
+    } else if (failed) {
+      rerunRequested = false;
+      scheduleRetry();
     } else if (rerunRequested || remaining.length) {
       rerunRequested = false;
       scheduleAutomaticSync();
@@ -175,6 +208,12 @@ export function init() {
   if (typeof addEventListener === 'function') {
     addEventListener('online', () => scheduleAutomaticSync({ full: true, immediate: true }));
     addEventListener('offline', () => setState({ status: 'offline' }));
+    addEventListener('pageshow', () => { scheduleResumeSync(); });
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') scheduleResumeSync();
+      });
+    }
   }
 }
 

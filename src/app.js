@@ -590,13 +590,12 @@ const GLOBAL_ACTIONS = {
     el.textContent = 'جارٍ المزامنة...';
     try {
       const ok = await syncModule.syncAll({ full: true });
-      toast(ok ? 'تمت المزامنة بنجاح' : 'تعذرت المزامنة', ok ? undefined : 'danger');
+      if (!ok) toast('تعذرت المزامنة', 'danger');
     } catch (err) {
       toast('تعذرت المزامنة', 'danger');
     } finally {
       el.disabled = false;
       el.innerHTML = prevText;
-      scheduleRender();
       openTeacherMiniHubSheet();
     }
   },
