@@ -11,6 +11,10 @@ const migration = await readFile(
   new URL('../supabase/migrations/0008_enrollment_membership_operations.sql', import.meta.url),
   'utf8',
 );
+const transferRenumberMigration = await readFile(
+  new URL('../supabase/migrations/0009_transfer_and_renumber_rosters.sql', import.meta.url),
+  'utf8',
+);
 let pg;
 
 before(async () => {
@@ -57,6 +61,7 @@ beforeEach(async () => {
       where status = 'active' and roll_no is not null and deleted_at is null;
   `);
   await pg.exec(migration);
+  await pg.exec(transferRenumberMigration);
   await insertSection('section:source');
   await insertSection('section:destination');
   await insertSection('section:other');
@@ -107,6 +112,16 @@ async function callRenumber(sectionId, roster) {
   return pg.query(
     'select rakeezx.renumber_enrollment_roster($1, $2::jsonb) as result',
     [sectionId, JSON.stringify(roster)],
+  );
+}
+
+async function callTransferAndRenumber(payload) {
+  return pg.query(
+    'select rakeezx.commit_enrollment_transfer_and_renumber($1::jsonb, $2::jsonb, $3::jsonb, $4::jsonb) as result',
+    [
+      JSON.stringify(payload.source), JSON.stringify(payload.destination),
+      JSON.stringify(payload.sourceRoster), JSON.stringify(payload.destinationRoster),
+    ],
   );
 }
 
@@ -199,4 +214,49 @@ test('valid renumber retry is idempotent', async () => {
   await callRenumber('section:source', roster);
   const rows = (await pg.query("select id, roll_no from rakeezx.enrollments order by id")).rows;
   assert.deepEqual(rows.map(row => [row.id, Number(row.roll_no)]), [['en:one', 2], ['en:two', 1]]);
+});
+
+test('composite transfer atomically retires the source, activates the destination, and sequentially renumbers both rosters', async () => {
+  await insertEnrollment({ id: 'en:student:source', rollNo: 1 });
+  await insertEnrollment({ id: 'en:peer:source', studentId: 'student:peer-source', rollNo: 2 });
+  await insertEnrollment({ id: 'en:peer:destination', studentId: 'student:peer-destination', sectionId: 'section:destination', rollNo: 1 });
+  const { source, destination } = transferPayload({ rollNo: 2 });
+  const payload = {
+    source,
+    destination,
+    sourceRoster: [{ id: 'en:peer:source', roll_no: 1, client_updated_at: 10, device_id: 'device:test' }],
+    destinationRoster: [
+      { id: 'en:peer:destination', roll_no: 1, client_updated_at: 1, device_id: 'device:test' },
+      { id: destination.id, roll_no: 2, client_updated_at: 10, device_id: 'device:test' },
+    ],
+  };
+  await callTransferAndRenumber(payload);
+  await callTransferAndRenumber(payload);
+  const rows = (await pg.query(`select id, section_id, status, roll_no from rakeezx.enrollments
+    where id like 'en:%' order by section_id, roll_no nulls last, id`)).rows;
+  assert.deepEqual(rows.map((row) => [row.id, row.section_id, row.status, row.roll_no == null ? null : Number(row.roll_no)]), [
+    ['en:peer:destination', 'section:destination', 'active', 1],
+    ['en:student:destination', 'section:destination', 'active', 2],
+    ['en:peer:source', 'section:source', 'active', 1],
+    ['en:student:source', 'section:source', 'transferred', 1],
+  ]);
+});
+
+test('a rejected composite final roster rolls back the transfer and never creates an active destination enrollment', async () => {
+  await insertEnrollment({ id: 'en:student:source', rollNo: 1 });
+  await insertEnrollment({ id: 'en:peer:source', studentId: 'student:peer-source', rollNo: 2 });
+  const { source, destination } = transferPayload({ rollNo: 1 });
+  await assert.rejects(callTransferAndRenumber({
+    source,
+    destination,
+    // The plan is deliberately incomplete after the transfer: the source peer
+    // is absent, so server validation must abort the entire transaction.
+    sourceRoster: [],
+    destinationRoster: [{ id: destination.id, roll_no: 1, client_updated_at: 10, device_id: 'device:test' }],
+  }), /Enrollment roster changed before transfer renumber/);
+  const rows = (await pg.query("select id, status, roll_no from rakeezx.enrollments order by id")).rows;
+  assert.deepEqual(rows.map((row) => [row.id, row.status, Number(row.roll_no)]), [
+    ['en:peer:source', 'active', 2],
+    ['en:student:source', 'active', 1],
+  ]);
 });

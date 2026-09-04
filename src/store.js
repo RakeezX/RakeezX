@@ -1312,12 +1312,28 @@ const nextRollNoFrom = (enrollments, secId) =>
   enrollments.filter((e) => e.sectionId === secId && !e.deleted)
     .reduce((max, e) => Math.max(max, Number(e.rollNo) || 0), 0) + 1;
 
-const destinationRollNo = (enrollments, destination, secId) => {
-  const active = enrollments.filter((e) => e.sectionId === secId && e.status === 'active' && !e.deleted && e.id !== destination?.id);
-  const free = (rollNo) => validRollNo(rollNo) && !active.some((e) => Number(e.rollNo) === Number(rollNo));
-  if (destination && free(destination.rollNo)) return Number(destination.rollNo);
-  const next = nextRollNoFrom(enrollments, secId);
-  return free(next) ? next : null;
+/**
+ * Builds the complete final active roster for one section without persisting
+ * an intermediate numbering state. The caller owns the surrounding batch.
+ */
+const sequentialRosterPlan = (enrollments, studentsById, secId, stamp) => {
+  const active = enrollments.filter((row) => row.sectionId === secId && row.status === 'active' && !row.deleted);
+  if (active.length > 999 || active.some((row) => !studentsById.has(row.studentId))) return null;
+  const byEnrollmentId = new Map(active.map((row) => [row.id, row]));
+  const sorted = sortStudents(active.map((enrollment) => ({
+    ...studentsById.get(enrollment.studentId),
+    rollNo: enrollment.rollNo,
+    enrollmentId: enrollment.id,
+  })));
+  return sorted.map((student, index) => {
+    const enrollment = byEnrollmentId.get(student.enrollmentId);
+    const rollNo = index + 1;
+    return {
+      ...enrollment,
+      rollNo,
+      updatedAt: enrollment.rollNo === rollNo ? enrollment.updatedAt : stamp,
+    };
+  });
 };
 
 /** يضبط رقم كشف مع منع التكرار داخل الشعبة. يعيد {ok, reason}. */
@@ -1436,14 +1452,15 @@ export async function importStudents(secId, names) {
 }
 
 /**
- * نقل طالب بين شعبتين: يُنهى الانتساب القديم ويُفتح جديد.
- * لا يُحذف الطالب ولا تُنشأ له هوية جديدة، ودرجاته وحضوره السابقان يبقيان
- * مربوطين بإسنادات شعبته السابقة.
+ * نقل طالب بين شعبتين: يُنهى الانتساب القديم ويُفتح جديد، ثم يُرقّم كشفا
+ * المصدر والوجهة في نفس الدفعة المحلية ونفس العملية السحابية. لا يُحذف
+ * الطالب ولا تُنشأ له هوية جديدة، ودرجاته وحضوره السابقان يبقيان مربوطين
+ * بإسنادات شعبته السابقة.
  */
 export async function transferStudent(studentId, toSectionId, { date = todayISO(), note = '' } = {}) {
   if (!studentId || !toSectionId || !date) return null;
   const stamp = now();
-  const operationId = `transfer:${uid()}`;
+  const operationId = `transfer-renumber:${uid()}`;
   let result = { ok: false, status: 'write-failed' };
   let committed;
 
@@ -1482,11 +1499,10 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
         }
 
         const source = active[0];
-        const rollNo = destinationRollNo(current.enrollments, destination, toSectionId);
-        if (!rollNo) {
-          result = { ok: false, status: 'destination-roll-unavailable' };
-          return {};
-        }
+        // This number is private to the in-memory plan. It is replaced by the
+        // final sequential destination roster before the IndexedDB transaction
+        // commits, so a returned student's old number cannot collide locally.
+        const provisionalRollNo = Number(destination?.rollNo) || nextRollNoFrom(current.enrollments, toSectionId);
 
         const retired = {
           ...source,
@@ -1501,34 +1517,62 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
             status: 'active',
             startDate: date,
             endDate: null,
-            rollNo,
+            rollNo: provisionalRollNo,
             updatedAt: stamp,
           }
           : makeEnrollment({
             studentId,
             sectionId: toSectionId,
-            rollNo,
+            rollNo: provisionalRollNo,
             startDate: date,
             updatedAt: stamp,
           });
 
+        const afterMembership = current.enrollments
+          .filter((row) => row.id !== source.id && row.id !== activated.id)
+          .concat([retired, activated]);
+        const studentsById = new Map(current.students
+          .filter((row) => !row.deleted)
+          .map((row) => [row.id, row]));
+        const sourceRoster = sequentialRosterPlan(afterMembership, studentsById, source.sectionId, stamp);
+        const destinationRoster = sequentialRosterPlan(afterMembership, studentsById, toSectionId, stamp);
+        if (!sourceRoster || !destinationRoster) {
+          result = { ok: false, status: 'roster-plan-unavailable' };
+          return {};
+        }
+
+        const finalById = new Map([retired, ...sourceRoster, ...destinationRoster].map((row) => [row.id, row]));
+        const finalDestination = finalById.get(activated.id);
+        if (!finalDestination || !validRollNo(finalDestination.rollNo)) {
+          result = { ok: false, status: 'destination-roll-unavailable' };
+          return {};
+        }
+        const changedEnrollments = [...finalById.values()].filter((row) => {
+          const before = current.enrollments.find((candidate) => candidate.id === row.id);
+          return !before || before.status !== row.status || before.rollNo !== row.rollNo ||
+            before.startDate !== row.startDate || before.endDate !== row.endDate ||
+            before.transferNote !== row.transferNote || before.updatedAt !== row.updatedAt;
+        });
+
         const operation = {
           id: operationId,
-          type: 'transfer',
+          type: 'transfer-renumber',
           source: structuredClone(retired),
-          destination: structuredClone(activated),
+          destination: structuredClone(finalDestination),
+          sourceRoster: structuredClone(sourceRoster),
+          destinationRoster: structuredClone(destinationRoster),
           updatedAt: stamp,
           order: nextEnrollmentOperationOrder(current.outbox),
         };
-        result = { ok: true, status: 'transferred', enrollment: activated };
+        result = { ok: true, status: 'transferred', enrollment: finalDestination };
         return {
-          enrollments: { put: [retired, activated] },
+          enrollments: { put: changedEnrollments },
           outbox: {
             put: [
-              outboxEntry('enrollments', retired, ['status', 'endDate', 'transferNote'], 'patch'),
-              outboxEntry('enrollments', activated, destination ? ['status', 'startDate', 'endDate', 'rollNo'] : null, destination ? 'patch' : 'put'),
+              ...changedEnrollments.map((row) => outboxEntry('enrollments', row, null,
+                current.enrollments.some((candidate) => candidate.id === row.id) ? 'patch' : 'put')).filter(Boolean),
               enrollmentOperationEntry(operation, stamp),
-            ].filter(Boolean),
+            ],
           },
         };
       },

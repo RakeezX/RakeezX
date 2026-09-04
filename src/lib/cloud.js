@@ -222,6 +222,38 @@ export async function commitEnrollmentTransfer({ source, destination } = {}) {
 }
 
 /**
+ * Commits a transfer and the complete final source/destination rosters in one
+ * server transaction. This is intentionally distinct from the legacy manual
+ * renumber RPC: a transfer must never expose an intermediate active roll.
+ */
+export async function commitEnrollmentTransferAndRenumber({
+  source, destination, sourceRoster, destinationRoster,
+} = {}) {
+  if (mockBackend) {
+    if (typeof mockBackend.commitEnrollmentTransferAndRenumber !== 'function') {
+      throw new Error('Mock backend does not implement transfer-and-renumber RPC');
+    }
+    return mockBackend.commitEnrollmentTransferAndRenumber({ source, destination, sourceRoster, destinationRoster });
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/commit_enrollment_transfer_and_renumber', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_source: source,
+      p_destination: destination,
+      p_source_roster: sourceRoster,
+      p_destination_roster: destinationRoster,
+    }),
+  });
+}
+
+/**
  * Applies a complete active-roster numbering plan inside one server
  * transaction.  The server temporarily clears numbers before assigning the
  * final sequence, so the partial active-roll unique index is never violated.

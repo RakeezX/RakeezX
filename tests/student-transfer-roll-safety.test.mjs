@@ -50,6 +50,38 @@ class MembershipBackend {
     }
   }
 
+  async commitEnrollmentTransferAndRenumber({ source, destination, sourceRoster, destinationRoster }) {
+    const previous = this.records.enrollments ?? [];
+    const candidate = structuredClone(previous);
+    const replace = (row) => {
+      const index = candidate.findIndex((existing) => existing.id === row.id);
+      if (index >= 0) candidate[index] = structuredClone(row);
+      else candidate.push(structuredClone(row));
+    };
+    try {
+      replace(source);
+      replace(destination);
+      const sections = new Set([source.section_id, destination.section_id]);
+      for (const row of candidate) {
+        if (sections.has(row.section_id) && row.status === 'active' && !row.deleted_at) row.roll_no = null;
+      }
+      for (const plan of [...sourceRoster, ...destinationRoster]) {
+        const row = candidate.find((existing) => existing.id === plan.id);
+        assert.ok(row, `planned enrollment ${plan.id} exists remotely`);
+        row.roll_no = plan.roll_no;
+        row.client_updated_at = plan.client_updated_at;
+        row.device_id = plan.device_id;
+      }
+      this.records.enrollments = candidate;
+      this.assertNoDuplicateActiveRolls();
+    } catch (error) {
+      this.records.enrollments = previous;
+      throw error;
+    }
+    this.operations.push({ type: 'transfer-renumber', source: source.id, destination: destination.id });
+    return { source, destination, source_roster: sourceRoster, destination_roster: destinationRoster };
+  }
+
   async commitEnrollmentTransfer({ source, destination }) {
     const target = this.records.enrollments ??= [];
     const sourceIndex = target.findIndex((row) => row.id === source.id);
@@ -112,7 +144,7 @@ async function fixture() {
   return { year, term, subject, x, y, teachingX, a, b, c, enrollmentA, enrollmentB, enrollmentC, session, item, attendance, score, note, log };
 }
 
-test('transfer is atomic locally, keeps student-linked records unchanged, and safely reactivates a prior membership', async () => {
+test('transfer atomically renumbers both local rosters, keeps student-linked records unchanged, and safely reactivates a prior membership', async () => {
   const f = await fixture();
   const before = {
     attendance: structuredClone(store.attendanceOf(f.a.id)),
@@ -126,18 +158,17 @@ test('transfer is atomic locally, keeps student-linked records unchanged, and sa
   assert.equal(store.getStudent(f.a.id)?.id, f.a.id);
   assert.equal(store.enrollmentsOf(f.a.id).find((row) => row.sectionId === f.x.id)?.status, 'transferred');
   assert.equal(store.enrollmentsOf(f.a.id).find((row) => row.sectionId === f.y.id)?.status, 'active');
+  assert.deepEqual(store.sectionRoster(f.x.id).map((row) => row.rollNo), [1]);
+  assert.deepEqual(store.sectionRoster(f.y.id).map((row) => row.rollNo), [1, 2]);
   assert.deepEqual(store.attendanceOf(f.a.id), before.attendance);
   assert.deepEqual(store.scoresOf(f.a.id), before.scores);
   assert.deepEqual(store.notesOf(f.a.id), before.notes);
   assert.deepEqual(store.logsOf(f.a.id), before.logs);
 
-  assert.equal(await store.renumberRoster(f.x.id), true);
-  assert.deepEqual(store.sectionRoster(f.x.id).map((row) => [row.id, row.rollNo]), [[f.b.id, 1]]);
-
   const backToX = await store.transferStudent(f.a.id, f.x.id, { date: '2026-09-01' });
   assert.equal(backToX.studentId, f.a.id);
   assert.deepEqual(store.sectionRoster(f.x.id).map((row) => row.rollNo).sort((a, b) => a - b), [1, 2]);
-  assert.equal(new Set(store.sectionRoster(f.x.id).map((row) => row.rollNo)).size, 2);
+  assert.deepEqual(store.sectionRoster(f.x.id).map((row) => row.rollNo), [1, 2]);
   assert.equal((await store.transferStudent(f.a.id, f.x.id)).id, backToX.id, 'retry is write-free/idempotent');
 
   await db.closeDB();
@@ -149,6 +180,29 @@ test('transfer is atomic locally, keeps student-linked records unchanged, and sa
   assert.deepEqual(store.notesOf(f.a.id), before.notes);
   assert.deepEqual(store.logsOf(f.a.id), before.logs);
   assert.equal(new Set(store.sectionRoster(f.x.id).map((row) => row.rollNo)).size, 2);
+});
+
+test('moving source roll #2 from a 1,2,3 roster automatically closes both rosters and remains sequential on return', async () => {
+  const f = await fixture();
+  const d = makeStudent({ id: 'transfer:D', name: 'داليا' });
+  await store.save({
+    students: [d],
+    enrollments: [makeEnrollment({ studentId: d.id, sectionId: f.x.id, rollNo: 3, startDate: '2026-08-01' })],
+  });
+
+  const toY = await store.transferStudent(f.b.id, f.y.id, { date: '2026-08-25' });
+  assert.equal(toY.studentId, f.b.id);
+  assert.equal(store.getStudent(f.b.id)?.id, f.b.id);
+  assert.deepEqual(store.sectionRoster(f.x.id).map((row) => row.rollNo), [1, 2]);
+  assert.deepEqual(store.sectionRoster(f.y.id).map((row) => row.rollNo), [1, 2]);
+  assert.equal(new Set(store.sectionRoster(f.x.id).map((row) => row.rollNo)).size, 2);
+  assert.equal(new Set(store.sectionRoster(f.y.id).map((row) => row.rollNo)).size, 2);
+
+  const backToX = await store.transferStudent(f.b.id, f.x.id, { date: '2026-09-01' });
+  assert.equal(backToX.studentId, f.b.id);
+  assert.deepEqual(store.sectionRoster(f.x.id).map((row) => row.rollNo), [1, 2, 3]);
+  assert.deepEqual(store.sectionRoster(f.y.id).map((row) => row.rollNo), [1]);
+  assert.equal(new Set(store.sectionRoster(f.x.id).map((row) => row.rollNo)).size, 3);
 });
 
 test('failed destination validation and a destination tombstone leave the current membership unchanged', async () => {
@@ -164,7 +218,7 @@ test('failed destination validation and a destination tombstone leave the curren
   assert.equal(store.enrollmentsOf(f.a.id).some((row) => row.id === tombstoneId), false, 'tombstoned target remains non-live');
 });
 
-test('offline transfer and renumber receipts converge through transactional RPCs without generic enrollment upserts', async () => {
+test('offline transfer-and-renumber receipts converge through one transactional RPC without generic enrollment upserts', async () => {
   const f = await fixture();
   const backend = new MembershipBackend();
   setMockBackend(backend);
@@ -175,24 +229,24 @@ test('offline transfer and renumber receipts converge through transactional RPCs
   backend.enrollmentUpserts = 0;
 
   await store.transferStudent(f.a.id, f.y.id, { date: '2026-08-25' });
-  await store.renumberRoster(f.x.id);
   await store.transferStudent(f.a.id, f.x.id, { date: '2026-09-01' });
 
   const receipts = (await db.getAll('outbox')).filter((entry) => entry.enrollmentOperation);
-  assert.deepEqual(receipts.map((entry) => entry.enrollmentOperation.type).sort(), ['renumber', 'transfer', 'transfer']);
+  assert.deepEqual(receipts.map((entry) => entry.enrollmentOperation.type), ['transfer-renumber', 'transfer-renumber']);
   assert.deepEqual(
     [...receipts].sort((a, b) => a.enrollmentOperation.order - b.enrollmentOperation.order)
       .map((entry) => entry.enrollmentOperation.type),
-    ['transfer', 'renumber', 'transfer'],
+    ['transfer-renumber', 'transfer-renumber'],
   );
   await sync.syncStudents();
 
-  assert.deepEqual(backend.operations.map((operation) => operation.type), ['transfer', 'renumber', 'transfer']);
+  assert.deepEqual(backend.operations.map((operation) => operation.type), ['transfer-renumber', 'transfer-renumber']);
   assert.equal(backend.enrollmentUpserts, 0, 'generic enrollment upsert is bypassed after transactional operations');
   backend.assertNoDuplicateActiveRolls();
   const remoteA = backend.records.enrollments.find((row) => row.id === f.enrollmentA.id);
   assert.equal(remoteA.status, 'active');
-  assert.equal(remoteA.roll_no, 2);
+  assert.deepEqual(backend.activeRolls(f.x.id).sort((a, b) => a - b), [1, 2]);
+  assert.ok([1, 2].includes(remoteA.roll_no), 'the returned student is part of the final sequential roster');
 });
 
 after(async () => {

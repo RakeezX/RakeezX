@@ -1,7 +1,7 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  commitEnrollmentTransfer, renumberEnrollmentRoster, setMockAuth, setMockBackend,
+  commitEnrollmentTransfer, commitEnrollmentTransferAndRenumber, renumberEnrollmentRoster, setMockAuth, setMockBackend,
 } from '../src/lib/cloud.js';
 
 const originalFetch = global.fetch;
@@ -23,12 +23,25 @@ test('enrollment operation RPCs use the current rakeezx REST/RPC path and payloa
     sectionId: 'Y',
     roster: [{ id: 'en:student:Y', roll_no: 1, client_updated_at: 11 }],
   });
+  await commitEnrollmentTransferAndRenumber({
+    source: { id: 'en:student:X', student_id: 'student', section_id: 'X', status: 'transferred', client_updated_at: 12 },
+    destination: { id: 'en:student:Y', student_id: 'student', section_id: 'Y', status: 'active', roll_no: 1, client_updated_at: 12 },
+    sourceRoster: [],
+    destinationRoster: [{ id: 'en:student:Y', roll_no: 1, client_updated_at: 12 }],
+  });
 
   assert.equal(calls[0].url.endsWith('/rest/v1/rpc/commit_enrollment_transfer'), true);
   assert.deepEqual(JSON.parse(calls[0].options.body).p_destination.roll_no, 2);
   assert.equal(calls[1].url.endsWith('/rest/v1/rpc/renumber_enrollment_roster'), true);
   assert.deepEqual(JSON.parse(calls[1].options.body), {
     p_section_id: 'Y', p_roster: [{ id: 'en:student:Y', roll_no: 1, client_updated_at: 11 }],
+  });
+  assert.equal(calls[2].url.endsWith('/rest/v1/rpc/commit_enrollment_transfer_and_renumber'), true);
+  assert.deepEqual(JSON.parse(calls[2].options.body), {
+    p_source: { id: 'en:student:X', student_id: 'student', section_id: 'X', status: 'transferred', client_updated_at: 12 },
+    p_destination: { id: 'en:student:Y', student_id: 'student', section_id: 'Y', status: 'active', roll_no: 1, client_updated_at: 12 },
+    p_source_roster: [],
+    p_destination_roster: [{ id: 'en:student:Y', roll_no: 1, client_updated_at: 12 }],
   });
   assert.equal(calls.every((call) => call.options.headers['Content-Profile'] === 'rakeezx'), true);
 });

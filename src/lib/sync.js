@@ -1009,9 +1009,9 @@ function postgresDiagnostic(error) {
 }
 
 /**
- * Enrollment transfer and renumber receipts are written atomically with their
- * local rows. Drain them before generic enrollment merge so PostgREST never
- * receives a transient active-roll collision as ordinary upserts.
+ * Enrollment-operation receipts are written atomically with their local rows.
+ * Drain them before generic enrollment merge so PostgREST never receives a
+ * transient active-roll collision as ordinary upserts.
  *
  * A locally tombstoned side deliberately skips its older receipt: deletion is
  * authoritative locally and must never be undone by replaying a transfer.
@@ -1025,6 +1025,20 @@ async function syncEnrollmentOperations() {
   for (const entry of entries) {
     const operation = entry.enrollmentOperation;
     if (!operation?.type) continue;
+
+    if (operation.type === 'transfer-renumber') {
+      const currentById = new Map(store.state.enrollments.map((row) => [row.id, row]));
+      const planned = [operation.source, operation.destination,
+        ...(operation.sourceRoster ?? []), ...(operation.destinationRoster ?? [])];
+      if (planned.some((row) => !row || !currentById.get(row.id) || currentById.get(row.id).deleted)) continue;
+      await cloud.commitEnrollmentTransferAndRenumber({
+        source: MAPPERS.enrollments.toCloud(operation.source),
+        destination: MAPPERS.enrollments.toCloud(operation.destination),
+        sourceRoster: operation.sourceRoster.map((row) => MAPPERS.enrollments.toCloud(row)),
+        destinationRoster: operation.destinationRoster.map((row) => MAPPERS.enrollments.toCloud(row)),
+      });
+      continue;
+    }
 
     if (operation.type === 'transfer') {
       const sourceCurrent = store.state.enrollments.find((row) => row.id === operation.source?.id);
