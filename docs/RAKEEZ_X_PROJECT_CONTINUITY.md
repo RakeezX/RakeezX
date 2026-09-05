@@ -45,10 +45,10 @@ Lean Gate means evidence proportionate to the changed risk, not a weaker standar
 ## Current Production baseline
 
 - Repository Production branch: `main`.
-- Documented current Production SHA: `e82f58ad304691a363d500652d1a215382154c1a` (`fix(pwa): activate continuous student history renderer`).
-- Relevant preceding commits: `8e39408` (continuous Student Profile history), `b601519` (synced report principal identity), `c80526b` (automatic transfer roster renumber), and `cef2b60` (transfer/membership safety).
-- Production PWA cache release: `rakeezx-v6` in `sw.js`.
-- Current migration directory: `0001`, `0002`, `0003`, `0004`, `0007`, `0008`, `0009`, `0010`. `0005` and `0006` are not present in this repository and must not be inferred.
-- Supplied Production ledger state: migrations `0008`, `0009`, and `0010` are already applied and migration-history aligned. Do not reapply or edit them.
+- Documented current Production SHA: `b85115d6e2f9b1ebe514fe6e291dabea6fca3d2c` (`fix(schedule): initialize new timing profiles cleanly`).
+- Relevant completed Production work includes session roster truth (`b7a22eb`), grade portability (`4568fce`, `76cda0a`), sync/offline recovery (`47ada73`, `d5365a9`), and Schedule/Timing UX through `b85115d`.
+- Production PWA cache release: `rakeezx-v7` in `sw.js`; quiet automatic sync, reconnect recovery, and covered core offline routes are closed Production behavior.
+- Current migration directory: `0001`, `0002`, `0003`, `0004`, `0007`, `0008`, `0009`, `0010`, `0011`. `0005` and `0006` are not present in this repository and must not be inferred.
+- Supplied Production ledger state: migrations `0008` through `0011` are applied and migration-history aligned. Do not reapply or edit them.
 
 The ticket-level source of truth for current and historical work is [RECOVERY_LEDGER.md](RECOVERY_LEDGER.md); active risks are in [OPEN_ISSUES.md](OPEN_ISSUES.md).
