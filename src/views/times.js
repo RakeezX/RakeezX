@@ -1516,28 +1516,43 @@ export default {
       const meta = await nameSheet(null);
       if (!meta) return;
 
-      const activeProfile = store.activeTimeProfile();
-      const defaultPeriods = (activeProfile?.periods ?? []).map(x => ({ ...x }));
+      // New profiles start from one canonical, contiguous model.  Copying the
+      // active profile can copy its expanded/legacy model paths and make them
+      // appear as duplicated sequences in the new editor.
+      const defaultPeriods = generateAdvancedPeriods({
+        firstPeriodStart: '07:00',
+        periodDuration: 45,
+        count: 7,
+        gap: 0,
+        recess: { enabled: false },
+      });
 
       // الحصص الافتراضية متصلة ولا تفرض فسحة قسرية
       const newP = await store.createTimeProfile({
         name: meta.name,
         activeFrom: meta.activeFrom,
         activeTo: meta.activeTo,
-        periods: defaultPeriods.length ? defaultPeriods : [
-          { period: 1, start: '07:00', end: '07:45' },
-          { period: 2, start: '07:45', end: '08:30' },
-          { period: 3, start: '08:30', end: '09:15' },
-          { period: 4, start: '09:15', end: '10:00' },
-          { period: 5, start: '10:00', end: '10:45' },
-          { period: 6, start: '10:45', end: '11:30' },
-          { period: 7, start: '11:30', end: '12:15' },
-        ],
+        periods: defaultPeriods,
         overrides: {
           config: {
-            assembly: { enabled: true, start: '06:45', duration: 15 },
-            recess: { enabled: false, afterPeriod: 3, duration: 20, transition: 0 }
-          }
+            type: 'custom',
+            gap: 0,
+            assembly: { enabled: false },
+            firstPeriodStart: '07:00',
+            periodDuration: 45,
+            count: 7,
+            recess: { enabled: false }
+          },
+          models: [{
+            id: 'default',
+            name: 'نموذج 1',
+            grades: [],
+            gradesLabel: 'جميع الصفوف',
+            afterPeriod: 0,
+            recessDuration: 0,
+            recessTransition: 0,
+            periods: defaultPeriods.map((period) => ({ ...period })),
+          }],
         }
       });
 

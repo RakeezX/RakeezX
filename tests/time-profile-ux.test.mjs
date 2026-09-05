@@ -68,6 +68,27 @@ test('recess placement is limited to boundaries between existing periods', async
   assert.deepStrictEqual(reflowed.map((period) => period.start), ['07:00', '07:45', '08:30', '09:15']);
 });
 
+test('new profile seed is one contiguous model without a recess', async () => {
+  const { getProfileModels } = await import('../src/views/times.js');
+  const periods = generateAdvancedPeriods({
+    firstPeriodStart: '07:00', periodDuration: 45, count: 7, gap: 0,
+    recess: { enabled: false },
+  });
+  const models = getProfileModels({
+    periods,
+    overrides: {
+      config: { recess: { enabled: false } },
+      models: [{ id: 'default', name: 'نموذج 1', grades: [], afterPeriod: 0, recessDuration: 0, periods }],
+    },
+  });
+  assert.strictEqual(models.length, 1);
+  assert.strictEqual(models[0].name, 'نموذج 1');
+  assert.strictEqual(models[0].afterPeriod, 0);
+  assert.deepStrictEqual(models[0].periods.map((period) => period.start), [
+    '07:00', '07:45', '08:30', '09:15', '10:00', '10:45', '11:30',
+  ]);
+});
+
 test('html and raw template rendering never yields [object Object] during interpolation or string conversion', () => {
   const inner = html`<div class="inner">محتوى تجريبي</div>`;
   // Test raw object toString()
