@@ -119,6 +119,83 @@ test('timing models stay independent through stacked sheets, save, reload, and c
   expect(errors).toEqual([]);
 });
 
+test('timing profiles keep model drafts isolated through A → B → A activation and reload', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/#/schedule/times');
+  await page.evaluate(async () => {
+    const periods = (start, recessAfter = 0, recessMinutes = 0) => {
+      let minutes = start;
+      return [1, 2, 3, 4].map((period) => {
+        const stamp = (value) => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+        const item = { period, start: stamp(minutes), end: stamp(minutes + 40) };
+        minutes += 40 + (period === recessAfter ? recessMinutes : 0);
+        return item;
+      });
+    };
+    const aOne = periods(420, 1, 10);
+    const aTwo = periods(480, 2, 15);
+    const bOnly = periods(540, 3, 20);
+    await window.store.save({ timeProfiles: [
+      {
+        id: 'review-profile-a', name: 'مراجعة A', order: 81, periods: aOne,
+        overrides: { models: [
+          { id: 'a-one', name: 'نموذج A1', grades: [4], gradesLabel: 'الرابع الابتدائي', afterPeriod: 1, recessDuration: 10, recessTransition: 0, periods: aOne },
+          { id: 'a-two', name: 'نموذج A2', grades: [5], gradesLabel: 'الخامس الابتدائي', afterPeriod: 2, recessDuration: 15, recessTransition: 0, periods: aTwo },
+        ] },
+      },
+      {
+        id: 'review-profile-b', name: 'مراجعة B', order: 82, periods: bOnly,
+        overrides: { models: [
+          { id: 'b-only', name: 'نموذج B1', grades: [6], gradesLabel: 'السادس الابتدائي', afterPeriod: 3, recessDuration: 20, recessTransition: 0, periods: bOnly },
+        ] },
+      },
+    ] });
+    await window.store.patchDevice({ activeTimeProfileId: 'review-profile-a' });
+  });
+  await page.reload();
+
+  await page.locator('[data-act="edit-times"][data-id="review-profile-a"]').click();
+  await expect(page.locator('.models-tab')).toHaveCount(2);
+  await expect(page.locator('.row-recess')).toHaveCount(1);
+  await page.locator('.models-tab', { hasText: 'نموذج A2' }).click();
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('08:00');
+  await expect(page.locator('.row-recess')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+
+  await page.locator('[data-act="activate"][data-id="review-profile-b"]').click();
+  await expect(page.locator('.timing-profile-card.is-active-profile')).toContainText('مراجعة B');
+  await page.locator('[data-act="edit-times"][data-id="review-profile-b"]').click();
+  await expect(page.locator('.models-tab')).toHaveCount(1);
+  await expect(page.locator('.models-tab')).toContainText('نموذج B1');
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('09:00');
+  await expect(page.locator('.row-recess')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+
+  await page.locator('[data-act="activate"][data-id="review-profile-a"]').click();
+  await expect(page.locator('.timing-profile-card.is-active-profile')).toContainText('مراجعة A');
+  await page.locator('[data-act="edit-times"][data-id="review-profile-a"]').click();
+  await expect(page.locator('.models-tab')).toHaveCount(2);
+  await expect(page.locator('#periods-sheet-inner')).not.toContainText('نموذج B1');
+  const aOneInput = page.locator('.timerow__in[data-p="1"][data-key="start"]');
+  await aOneInput.fill('06:55');
+  await aOneInput.blur();
+  await page.locator('.models-tab', { hasText: 'نموذج A2' }).click();
+  const aTwoInput = page.locator('.timerow__in[data-p="1"][data-key="start"]');
+  await aTwoInput.fill('08:10');
+  await aTwoInput.blur();
+  await page.locator('#sheet-btn-save-all').click();
+  await expect(page.locator('.sheet')).toHaveCount(0);
+  await page.reload();
+
+  await page.locator('[data-act="edit-times"][data-id="review-profile-a"]').click();
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('06:55');
+  await page.locator('.models-tab', { hasText: 'نموذج A2' }).click();
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('08:10');
+  await expect(page.locator('.row-recess')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
 test('schedule remains daily-columns only with concise class labels and Home timing context', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -133,7 +210,23 @@ test('schedule remains daily-columns only with concise class labels and Home tim
   await expect(page.locator('.week__day')).toHaveCount(5);
   await expect(page.locator('.schedule-layout-switcher')).toHaveCount(0);
   await expect(page.locator('.schedule-class-card')).toContainText('الخامس الابتدائي — تجريبي 5');
-  await page.setViewportSize({ width: 390, height: 844 });
+  const label = page.locator('.slot__grade-sec').first();
+  const actions = page.locator('.slot__actions').first();
+  for (const width of [1200, 900, 768, 600, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(label).toContainText('خامس/تجريبي 5');
+    expect(await page.evaluate(() => {
+      const labelBox = document.querySelector('.slot__grade-sec')?.getBoundingClientRect();
+      const actionsBox = document.querySelector('.slot__actions')?.getBoundingClientRect();
+      return !!labelBox && !!actionsBox && (labelBox.right <= actionsBox.left || actionsBox.right <= labelBox.left);
+    })).toBe(true);
+  }
+  const activeDayStyle = await page.locator('.schedule-day-tab.is-active').evaluate((tab) => {
+    const style = getComputedStyle(tab);
+    return { background: style.backgroundColor, radius: style.borderTopLeftRadius };
+  });
+  expect(activeDayStyle.background).not.toBe('rgba(0, 0, 0, 0)');
+  expect(activeDayStyle.radius).not.toBe('0px');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.goto('/#/');
   await expect(page.locator('.hero__main-row .compact-timing-pill')).toBeVisible();

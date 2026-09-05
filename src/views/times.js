@@ -9,8 +9,6 @@ import * as store from '../store.js';
 import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, makeTimeProfile, todayISO, GRADE_CATALOG, uid } from '../models.js';
 import { repaint } from '../repaint.js';
 
-let activeEditProfileId = null;
-
 /** توليد نص عربي منسق للصفوف لضمان عدم ظهور [object Object] */
 function formatGradesLabel(grades) {
   if (!Array.isArray(grades) || grades.length === 0) return 'جميع الصفوف';
@@ -105,7 +103,7 @@ function getProfileModels(p) {
         : (m.name?.label || m.name?.name || `نموذج ${idx + 1}`);
       if (name === 'نموذج الصف الرابع') name = 'نموذج 1';
       else if (name === 'نموذج الصفين الخامس والسادس') name = 'نموذج 2';
-      const grades = Array.isArray(m.grades) ? m.grades : [];
+      const grades = Array.isArray(m.grades) ? [...m.grades] : [];
       const gradesLabel = typeof m.gradesLabel === 'string' && m.gradesLabel.trim()
         ? m.gradesLabel.trim()
         : formatGradesLabel(grades);
@@ -670,7 +668,13 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
  * نافذة عرض وتعديل أوقات الحصص — Modal / Sheet
  */
 function editPeriodsSheet(profile) {
-  let p = store.getTimeProfile(profile.id) || profile;
+  // The editor is intentionally a private draft.  `store.getTimeProfile()`
+  // returns the live in-memory record, so retaining it here let nested sheet
+  // edits mutate one profile's UI state before Save.  A repaint/active-profile
+  // switch could then compose that transient state with another profile card.
+  // Save is still the sole point that writes this draft back to the store.
+  const sourceProfile = store.getTimeProfile(profile.id) || profile;
+  let p = structuredClone(sourceProfile);
   let selectedDay = null; // null = all days
   let models = getProfileModels(p);
   let selectedModelId = models[0]?.id || 'default';
@@ -1293,11 +1297,6 @@ export default {
       ${icon('plus')} ملف توقيت جديد
     </button>
   `,
-
-  onMount() {
-    activeEditProfileId = store.activeTimeProfile()?.id ?? null;
-    repaint();
-  },
 
   render() {
     const profiles = store.timeProfiles();

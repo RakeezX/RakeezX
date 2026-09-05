@@ -165,6 +165,8 @@ test('getProfileModels produces independent model objects with isolated periods'
   models[1].periods[0].start = '07:15';
   assert.strictEqual(models[0].periods[0].start, '07:00');
   assert.strictEqual(models[1].periods[0].start, '07:15');
+  models[0].grades.push(12);
+  assert.deepStrictEqual(profileWithModels.overrides.models[0].grades, [1, 2, 3]);
 });
 
 test('schedule label helpers formatSectionDisplay and shortClassLabel eliminate duplicate grade text', async () => {
@@ -324,12 +326,14 @@ test('model toolbar, recess row, and input centering adhere to strict UX constra
   assert.ok(!timesCode.includes('models-bar__btn-label'), 'no text label in models-bar actions (icon-only desktop and mobile)');
 
   // CSS: .models-tabs has overflow-x: auto and .models-bar does NOT have overflow-x: auto
-  assert.ok(compCss.includes('.models-tabs {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  flex: 1 1 auto;\n  min-width: 0;\n  overflow-x: auto;'), 'models-tabs must have overflow-x: auto');
-  assert.ok(!compCss.includes('.models-bar {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 4px 6px;\n  background: var(--bg-sunk);\n  border: 1px solid var(--border);\n  border-radius: var(--r-md);\n  min-width: 0;\n  overflow-x: auto;'), 'models-bar must NOT scroll actions');
+  const modelsTabsCss = compCss.match(/\.models-tabs\s*\{([^}]*)\}/)?.[1] ?? '';
+  const modelsBarCss = compCss.match(/\.models-bar\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(modelsTabsCss, /overflow-x:\s*auto/, 'models-tabs must have overflow-x: auto');
+  assert.doesNotMatch(modelsBarCss, /overflow-x:\s*auto/, 'models-bar must NOT scroll actions');
 
   // 2. Recess actions: icon-only on desktop and mobile, delete has danger styling
   assert.ok(!timesCode.includes('recess-btn-label'), 'no text label in recess-edit-btn (icon-only desktop and mobile)');
-  assert.ok(compCss.includes('.recess-del-btn {\n  color: var(--danger) !important;'), 'recess-del-btn must have danger color !important');
+  assert.match(compCss, /\.recess-del-btn\s*\{[\s\S]*?color:\s*var\(--danger\)\s*!important;/, 'recess-del-btn must have danger color !important');
 
   // 3. Compact numeric input centering
   assert.ok(compCss.includes('.input--center'), 'components.css must define .input--center');
