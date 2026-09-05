@@ -4,6 +4,7 @@ import * as db from './db.js';
 import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js';
 
 export const state = {
+  lastError: null,
   status: 'idle', // idle, pending, offline, syncing, synced, error
   lastSyncedAt: null, // will be initialized from store
   results: {
@@ -13,6 +14,19 @@ export const state = {
     notes: null
   }
 };
+
+export function displayState() {
+  const status = autoRunning ? 'syncing' : state.status;
+  const labels = {
+    synced: { text: 'متزامن', badge: 'badge--brand', label: 'كافة البيانات متزامنة مع السحابة' },
+    syncing: { text: 'جارٍ المزامنة...', badge: 'badge--brand', label: 'جارٍ نقل وتحديث البيانات سحابيًا' },
+    pending: { text: 'تغييرات بانتظار المزامنة', badge: 'badge--warn', label: 'توجد تعديلات محلية بانتظار رفعها' },
+    offline: { text: 'غير متصل (حفظ محلي)', badge: 'badge--neutral', label: 'التطبيق يعمل دون إنترنت ويحفظ محليًا' },
+    error: { text: 'تعذر إكمال المزامنة', badge: 'badge--danger', label: 'حُفظت بياناتك محليًا. يمكنك إعادة المحاولة الآن.' },
+    idle: { text: 'محلي', badge: 'badge--neutral', label: 'البيانات محفوظة محليًا على هذا الجهاز' },
+  };
+  return { status, ...labels[status] };
+}
 
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
@@ -39,7 +53,16 @@ const intersects = (stores, expected) => [...expected].some((name) => stores.has
 
 async function pendingOutbox() {
   const entries = await db.getAll('outbox');
-  return entries.filter((entry) => SYNCABLE_STORES.has(entry.store));
+  const pending = [];
+  for (const entry of entries) {
+    if (!SYNCABLE_STORES.has(entry.store)) continue;
+    // Preserve old receipts for diagnosis, but never upload local-only demo
+    // records or let those receipts keep unrelated cloud work pending forever.
+    const record = entry.recordId ? await db.get(entry.store, entry.recordId) : null;
+    if (store.isLocalOnlyRecord(record)) continue;
+    pending.push(entry);
+  }
+  return pending;
 }
 
 async function acknowledgeOutbox(snapshot) {
@@ -82,7 +105,7 @@ function scheduleRetry() {
     autoTimer = null;
     syncAll({ full: true });
   }, retryDelay());
-  setState({ status: 'pending' });
+  // Keep the failed result visible while waiting; a timer is not an active run.
 }
 
 async function scheduleResumeSync() {
@@ -138,25 +161,32 @@ export async function syncAll({ full = true } = {}) {
     return false;
   }
 
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
   autoRunning = true;
   suppressAutoSchedule = true;
-  const snapshot = await pendingOutbox();
-  const stores = new Set(snapshot.map((entry) => entry.store));
+  setState({ lastError: null });
   let failed = false;
   try {
+    const snapshot = await pendingOutbox();
+    const stores = new Set(snapshot.map((entry) => entry.store));
     await runRequiredSync(stores, full);
     await acknowledgeOutbox(snapshot);
+    const lastSyncedAt = Date.now();
+    await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false });
+    state.lastSyncedAt = lastSyncedAt;
     retryAttempt = 0;
     setState({ status: (await pendingOutbox()).length ? 'pending' : 'synced' });
     return true;
   } catch (err) {
     failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
-    setState({ status: isOnline() ? 'error' : 'offline' });
+    setState({ status: isOnline() ? 'error' : 'offline', lastError: err.message });
     return false;
   } finally {
     suppressAutoSchedule = false;
     autoRunning = false;
+    notify();
     const remaining = await pendingOutbox();
     const blockedIdentity = state.results.structural?.status === 'error' && state.results.structural.retryable === false;
     if (blockedIdentity) {
@@ -185,6 +215,12 @@ function notify() {
 }
 
 function setState(updates) {
+  // Category success is not whole-run success. Publish that timestamp only
+  // after the orchestration completes and acknowledges its outbox snapshot.
+  if (autoRunning && 'lastSyncedAt' in updates) {
+    updates = { ...updates };
+    delete updates.lastSyncedAt;
+  }
   Object.assign(state, updates);
   notify();
 }
@@ -372,7 +408,7 @@ export async function syncProfile() {
     }
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1632,7 +1668,7 @@ export async function syncStructural() {
     }
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1719,7 +1755,7 @@ export async function syncStudents() {
     stats.enrollments = { pushed: resEnrollments.pushed, pulled: resEnrollments.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1768,7 +1804,7 @@ export async function syncNotes() {
     knownRemoteIds.sessions = new Set(remoteSessions.map((record) => record.id));
     const res = await syncCollection('notes', 'notes', { requiredIds: new Set(), knownRemoteIds });
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({ status: 'synced', lastSyncedAt: nowStamp, results: { ...state.results, notes: { status: 'success', stats: { notes: { pushed: res.pushed, pulled: res.pulled } }, time: nowStamp } } });
     console.log('[rakeezx sync] Notes sync complete.', res);
   } catch (err) {
@@ -1830,7 +1866,7 @@ export async function syncScoring() {
     stats.logs = { pushed: resLogs.pushed, pulled: resLogs.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,
@@ -1921,7 +1957,7 @@ export async function syncTimetable() {
     stats.attendance = { pushed: resAttendance.pushed, pulled: resAttendance.pulled };
 
     const nowStamp = Date.now();
-    await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
+    if (!autoRunning) await store.patchDevice({ lastSyncAt: nowStamp }, { notify: false });
     setState({
       status: 'synced',
       lastSyncedAt: nowStamp,

@@ -305,7 +305,13 @@ async function ensureFoundation() {
 
 /* ---------- الكتابة ---------- */
 
-export const isLocalOnlyRecord = (rec) => String(rec?.id ?? '').startsWith('demo:');
+// Runtime actions on demo classes use ordinary session/score IDs. Their
+// explicit demo references still make them local-only, even after deletion.
+export const isLocalOnlyRecord = (rec) => [
+  'id', 'teachingId', 'teaching_id', 'studentId', 'student_id',
+  'sectionId', 'section_id', 'sessionId', 'session_id', 'itemId', 'item_id',
+  'slotId', 'slot_id',
+].some(key => String(rec?.[key] ?? '').startsWith('demo:'));
 // Private creation-only receipt. It lives in the local outbox, never in cloud payloads.
 const TEACHING_CREATION_PROOF = Symbol('pristineTeachingCreation');
 

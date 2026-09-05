@@ -257,16 +257,6 @@ function renderResultPanel(title, result) {
   `;
 }
 
-function syncStatusLabel(status) {
-  return ({
-    synced: 'متزامن',
-    syncing: 'جارٍ المزامنة...',
-    pending: 'تغييرات بانتظار المزامنة',
-    offline: 'غير متصل',
-    error: 'تعذرت المزامنة — ستُعاد المحاولة',
-    idle: 'بانتظار تسجيل الدخول',
-  })[status] ?? 'تغييرات بانتظار المزامنة';
-}
 export default {
   title: () => 'الإعدادات',
 
@@ -399,14 +389,14 @@ export default {
                 <div class="t-3 fs-sm" style="direction: ltr; text-align: right;">${cloud.user?.email}</div>
               </div>
               <div class="push hstack gap-2">
-                <button class="btn btn--sm btn--primary" data-act="sync-now" ${sync.state.status === 'syncing' ? 'disabled' : ''}>
-                  ${icon('spark')} ${sync.state.status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن'}
+                <button class="btn btn--sm btn--primary" data-act="sync-now" data-sync-action ${sync.displayState().status === 'syncing' ? 'disabled' : ''}>
+                  ${icon('spark')} <span data-sync-action-label>${sync.displayState().status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن'}</span>
                 </button>
                 <button class="btn btn--sm btn--ghost" data-act="cloud-out">تسجيل الخروج</button>
               </div>
             </div>
             <div class="t-3 fs-sm">
-              الحالة: <strong>${syncStatusLabel(sync.state.status)}</strong>
+              الحالة: <strong data-sync-label>${sync.displayState().text}</strong>
               — تُحفظ بياناتك محليًا وتُزامن سحابيًا تلقائيًا عند الاتصال.
             </div>
           ` : html`

@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v6';
+const VERSION = 'rakeezx-v7';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -40,6 +40,13 @@ const SHELL = [
   './src/lib/migrate.js',
   './src/lib/cloud.js',
   './src/lib/sync.js',
+  './src/lib/avatar.js',
+  './src/lib/report-print.js',
+  './src/lib/pristine-teaching.js',
+  './src/lib/demo.js',
+  './src/lib/calendar-presets.js',
+  './src/lib/effects.js',
+  './src/lib/sound.js',
 
   './src/views/home.js',
   './src/views/teachings.js',
@@ -55,6 +62,9 @@ const SHELL = [
   './src/views/sessions.js',
   './src/views/reports.js',
   './src/views/reports-index.js',
+  './src/views/execution-report.js',
+  './src/views/archive.js',
+  './src/views/archive-detail.js',
   './src/views/student.js',
   './src/views/schedule.js',
   './src/views/times.js',

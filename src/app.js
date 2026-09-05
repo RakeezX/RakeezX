@@ -46,6 +46,7 @@ function teacherInitials(name) {
 }
 
 function getSyncState() {
+  if (syncModule) return syncModule.displayState();
   const status = syncModule?.state?.status ?? 'idle';
   const labels = {
     synced:  { text: 'متزامن', badge: 'badge--brand', label: 'كافة البيانات متزامنة مع السحابة' },
@@ -143,17 +144,17 @@ function openTeacherMiniHubSheet() {
         <div class="mini-hub-card">
           <div class="hstack justify-between align-center mb-2">
             <div class="fw-7 fs-sm hstack gap-2 align-center">
-              <span class="sync-dot sync-dot--${syncInfo.status}"></span>
+              <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
               <span>المزامنة</span>
             </div>
-            <span class="badge ${syncInfo.badge}">${syncInfo.text}</span>
+            <span class="badge ${syncInfo.badge}" data-sync-label>${syncInfo.text}</span>
           </div>
-          <p class="t-3 fs-xs mb-2">
+          <p class="t-3 fs-xs mb-2" data-sync-description>
             ${syncInfo.label}
           </p>
-          ${lastSyncText ? html`<div class="t-3 fs-xs mb-3">آخر مزامنة: <span dir="ltr">${lastSyncText}</span></div>` : ''}
-          <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-sync-now">
-            ${icon('refresh')} مزامنة الآن
+          <div class="t-3 fs-xs mb-3">آخر مزامنة ناجحة: <span dir="ltr" data-sync-time>${lastSyncText || '—'}</span></div>
+          <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-sync-now" data-sync-action ${syncInfo.status === 'syncing' ? 'disabled' : ''}>
+            ${icon('refresh')} <span data-sync-action-label>مزامنة الآن</span>
           </button>
         </div>
 
@@ -351,6 +352,18 @@ function restoreFocus(snap) {
 /** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
 function paintSyncStatus() {
   const syncInfo = getSyncState();
+  for (const el of document.querySelectorAll('[data-sync-label]')) el.textContent = syncInfo.text;
+  for (const el of document.querySelectorAll('[data-sync-description]')) el.textContent = syncInfo.label;
+  for (const el of document.querySelectorAll('[data-sync-time]')) {
+    el.textContent = syncModule?.state.lastSyncedAt
+      ? new Date(syncModule.state.lastSyncedAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
+  }
+  for (const el of document.querySelectorAll('[data-sync-action]')) {
+    el.disabled = syncInfo.status === 'syncing';
+  }
+  for (const el of document.querySelectorAll('[data-sync-action-label]')) {
+    el.textContent = syncInfo.status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن';
+  }
   for (const el of document.querySelectorAll('[data-sync-status]')) {
     for (const name of [...el.classList]) {
       if (name.startsWith('sync-dot--')) el.classList.remove(name);
