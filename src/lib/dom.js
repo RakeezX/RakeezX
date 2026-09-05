@@ -13,7 +13,11 @@ export const esc = (v) =>
 const RAW = Symbol('raw');
 
 /** يعلّم نصًا بأنه HTML جاهز فلا يُهرَّب. استعمله فقط مع نص تكتبه أنت. */
-export const raw = (s) => ({ [RAW]: true, value: String(s ?? '') });
+export const raw = (s) => ({
+  [RAW]: true,
+  value: String(s ?? ''),
+  toString() { return this.value; },
+});
 
 const flatten = (v) => {
   if (v === null || v === undefined || v === false) return '';
@@ -95,17 +99,35 @@ export function toast(message, kind = 'ok') {
 }
 
 /* ---------- الطبقة المنبثقة ---------- */
-let sheetCleanup = null;
+const sheetStack = [];
+
+/** يحوّل الإدخال العربي/الغربي إلى HH:mm غربي صالح دون تغيير ما يُخزَّن. */
+export function normalizeTimeDigits(value) {
+  let text = String(value ?? '').trim().replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit));
+  text = text.replace(/[^0-9:]/g, '');
+  const parts = text.split(':');
+  if (parts.length >= 2) {
+    const hour = Math.max(0, Math.min(23, Number(parts[0]) || 0));
+    const minute = Math.max(0, Math.min(59, Number(parts[1]) || 0));
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  }
+  if (text.length >= 3) {
+    const hour = Math.max(0, Math.min(23, Number(text.slice(0, -2)) || 0));
+    const minute = Math.max(0, Math.min(59, Number(text.slice(-2)) || 0));
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  }
+  return text;
+}
 
 /**
  * يفتح لوحة منبثقة. يعيد Promise يُحلّ بما تمرره close(value).
  * body: قالب html · actions: [{label, kind, value}] أو رسم مخصص.
  */
 export function openSheet({ title, desc, body, foot, onMount }) {
-  closeSheet();
   return new Promise((resolve) => {
+    const depth = sheetStack.length;
     const backdrop = toNode(html`
-      <div class="sheet-backdrop" role="dialog" aria-modal="true">
+      <div class="sheet-backdrop" role="dialog" aria-modal="true" style="z-index:${100 + depth * 20}">
         <div class="sheet">
           <div class="sheet__head">
             <div>
@@ -120,28 +142,32 @@ export function openSheet({ title, desc, body, foot, onMount }) {
       </div>
     `);
 
-    const done = (value) => {
-      if (sheetCleanup) sheetCleanup();
-      resolve(value);
+    let closed = false;
+    const entry = {
+      backdrop,
+      done(value) {
+        if (closed) return;
+        closed = true;
+        document.removeEventListener('keydown', onKey);
+        backdrop.remove();
+        const index = sheetStack.indexOf(entry);
+        if (index >= 0) sheetStack.splice(index, 1);
+        resolve(value);
+      },
     };
 
     backdrop.addEventListener('click', (ev) => {
-      if (ev.target === backdrop || ev.target.closest('[data-sheet-close]')) done(undefined);
+      if (ev.target === backdrop || ev.target.closest('[data-sheet-close]')) entry.done(undefined);
     });
 
     const onKey = (ev) => {
-      if (ev.key === 'Escape') done(undefined);
+      if (ev.key === 'Escape' && sheetStack.at(-1) === entry) entry.done(undefined);
     };
     document.addEventListener('keydown', onKey);
 
-    sheetCleanup = () => {
-      document.removeEventListener('keydown', onKey);
-      backdrop.remove();
-      sheetCleanup = null;
-    };
-
-    document.getElementById('modal-root').append(backdrop);
-    onMount?.(backdrop, done);
+    sheetStack.push(entry);
+    (document.getElementById('modal-root') ?? document.body).append(backdrop);
+    onMount?.(backdrop, entry.done);
 
     const firstInput = backdrop.querySelector('input, textarea, select');
     if (firstInput && window.matchMedia('(min-width: 700px)').matches) firstInput.focus();
@@ -149,7 +175,7 @@ export function openSheet({ title, desc, body, foot, onMount }) {
 }
 
 export function closeSheet() {
-  if (sheetCleanup) sheetCleanup();
+  sheetStack.at(-1)?.done(undefined);
 }
 
 /** تأكيد قبل فعل لا رجعة فيه. */
@@ -206,7 +232,10 @@ const ICONS = {
   check:     '<path d="M20 6 9 17l-5-5"/>',
   print:     '<path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1.5"/>',
   sun:       '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  snowflake: '<path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07 19.07 4.93"/>',
   moon:      '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>',
+  device:    '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  sliders:   '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>',
   cloud:     '<path d="M18 18.5a4 4 0 0 0 .3-8A6.5 6.5 0 0 0 5.6 12 3.75 3.75 0 0 0 6 19.5h12Z"/>',
   spark:     '<path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/>',
   clock:     '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',
@@ -226,6 +255,15 @@ export const icon = (name, sizeOrClass = '') => {
   const cls = SIZE_CLASSES[sizeOrClass] || (sizeOrClass ? (sizeOrClass.startsWith('icon--') ? sizeOrClass : `icon--${sizeOrClass}`) : '');
   return raw(P(ICONS[name] ?? ICONS.note, cls));
 };
+
+export function timingProfileIcon(name = '') {
+  const value = String(name).trim();
+  if (value.includes('صيفي')) return 'sun';
+  if (value.includes('شتوي')) return 'snowflake';
+  if (value.includes('رمضان')) return 'moon';
+  if (value.includes('مدمج') || value.includes('هجين') || value.includes('عن بعد')) return 'device';
+  return 'sliders';
+}
 
 /** رابط رجوع صريح إلى الشاشة الأم، مستقل عن سجل المتصفح. */
 export const parentLink = (label, parentRoute) =>

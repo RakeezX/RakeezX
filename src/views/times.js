@@ -1,280 +1,363 @@
 /**
  * إعداد أوقات الحصص — ملفات توقيت.
  *
- * يضبطها المعلّم مرة واحدة، ثم يضيف الحصص برقمها فقط. وكل ملف يقبل استثناءً
- * ليوم بعينه، لأن بعض الأيام حضوري وبعضها عن بُعد بأوقات مختلفة.
+ * يضبطها المعلّم مرة واحدة، ثم يضيف الحصص برقمها فقط.
  */
 
-import { html, icon, openSheet, confirmSheet, toast, fmtTimeRange } from '../lib/dom.js';
+import { html, render, icon, openSheet, confirmSheet, toast, fmtTimeRange, timingProfileIcon, normalizeTimeDigits } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, makeTimeProfile } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, makeTimeProfile, todayISO, GRADE_CATALOG, uid } from '../models.js';
 import { repaint } from '../repaint.js';
 
-let openId = null;
-let overrideDay = null;   // اليوم الذي يُحرَّر استثناؤه، أو null للافتراضي
+let activeEditProfileId = null;
 
-import { TIMING_PRESETS } from '../models.js';
+/** توليد نص عربي منسق للصفوف لضمان عدم ظهور [object Object] */
+function formatGradesLabel(grades) {
+  if (!Array.isArray(grades) || grades.length === 0) return 'جميع الصفوف';
+  const cleanGrades = grades.map(g => {
+    if (typeof g === 'object' && g !== null) return Number(g.v ?? g.id ?? g.grade ?? 0);
+    return Number(g);
+  }).filter(v => v > 0);
+  if (!cleanGrades.length) return 'جميع الصفوف';
+  cleanGrades.sort((a, b) => a - b);
 
-/** لوحة توليد سريع: استخدام النماذج المسبقة أو التوليد المخصص. */
-function generateSheet(current = {}) {
-  const formatSummary = (p) => {
-    if (p === 'custom') return '';
-    
-    const renderGrid = (title, badge, mainRows, recessRows = null) => `
-      <div class="fw-7 mb-3">${title} ${badge ? `<span class="badge">${badge}</span>` : ''}</div>
-      <div class="timing-summary-grid">
-        ${mainRows.map(([k, v]) => `
-          <div class="timing-summary-item">
-            <span class="timing-summary-label">${k}</span>
-            <strong class="timing-summary-value">${v}</strong>
-          </div>
-        `).join('')}
-      </div>
-      ${recessRows ? `
-        <div class="fw-7 mt-4 mb-3">الفسحة</div>
-        <div class="timing-summary-grid">
-          ${recessRows.map(([k, v]) => `
-            <div class="timing-summary-item">
-              <span class="timing-summary-label">${k}</span>
-              <strong class="timing-summary-value">${v}</strong>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-    `;
+  if (cleanGrades.length === 6 && cleanGrades.every((v, i) => v === i + 1)) {
+    return 'المرحلة الابتدائية';
+  }
+  if (cleanGrades.length === 3 && cleanGrades.every((v, i) => v === i + 7)) {
+    return 'المرحلة المتوسطة';
+  }
+  if (cleanGrades.length === 3 && cleanGrades.every((v, i) => v === i + 10)) {
+    return 'المرحلة الثانوية';
+  }
 
-    if (p === 'summer') return renderGrid('التوقيت الصيفي', 'حسب الدليل', [
-      ['الطابور', '6:45 ص'],
-      ['الحصة الأولى', '7:00 ص'],
-      ['مدة الحصة', '45 دقيقة'],
-      ['عدد الحصص', '7']
-    ], [
-      ['الرابع الابتدائي', 'بعد الحصة الثانية'],
-      ['الخامس والسادس', 'بعد الحصة الثالثة'],
-      ['مدة الفسحة', '20 دقيقة'],
-      ['التفويج', '5 دقائق']
-    ]);
+  const names = cleanGrades.map(v => {
+    const item = GRADE_CATALOG.find(c => c.v === v);
+    return item ? item.label.replace(' الابتدائي', '').replace(' المتوسط', '').replace(' الثانوي', '') : `الصف ${v}`;
+  });
+  return `الصفوف ${names.join('، ')}`;
+}
 
-    if (p === 'winter') return renderGrid('التوقيت الشتوي', 'حسب الدليل', [
-      ['الطابور', '7:15 ص'],
-      ['الحصة الأولى', '7:30 ص'],
-      ['مدة الحصة', '45 دقيقة'],
-      ['عدد الحصص', '7']
-    ], [
-      ['الرابع الابتدائي', 'بعد الحصة الثانية'],
-      ['الخامس والسادس', 'بعد الحصة الثالثة'],
-      ['مدة الفسحة', '20 دقيقة (بدون تفويج)']
-    ]);
+function extractFromProfilePeriods(p, grades) {
+  const all = p.periods ?? [];
+  const maxP = Math.max(0, ...all.map(x => x.period));
+  const list = [];
+  if (grades && grades.length > 0) {
+    for (let i = 1; i <= maxP; i++) {
+      const item = all.find(x => x.period === i && Array.isArray(x.grades) && x.grades.some(g => grades.includes(g)))
+                || all.find(x => x.period === i && (!x.grades || !x.grades.length))
+                || all.find(x => x.period === i);
+      if (item) list.push({ period: item.period, start: item.start, end: item.end });
+    }
+  }
+  return list.length ? list : (p.periods ?? []).map(x => ({ period: x.period, start: x.start, end: x.end }));
+}
 
-    if (p === 'ramadan') return renderGrid('توقيت رمضان', null, [
-      ['الطابور', 'لا يوجد'],
-      ['الحصة الأولى', '9:00 ص'],
-      ['مدة الحصة', '35 دقيقة'],
-      ['عدد الحصص', '6'],
-      ['الفسحة', 'لا توجد']
-    ]);
+function reflowPeriodsWithRecess(basePeriods, { afterPeriod = 0, recessDuration = 20, transition = 0 } = {}) {
+  if (!basePeriods || !basePeriods.length) return [];
 
-    if (p === 'hybrid') return `
-      <div class="fw-7 mb-3">التوقيت المدمج</div>
-      <div class="timing-summary-grid" style="margin-bottom: var(--sp-4);">
-        <div class="timing-summary-item" style="grid-column: 1 / -1;">
-          <span class="timing-summary-label">الحضوري</span>
-          <strong class="timing-summary-value">يستخدم التوقيت الموسمي حسب التاريخ</strong>
-        </div>
-      </div>
-      <div class="fw-7 fs-sm mb-3" style="color: var(--text-1);">عن بعد</div>
-      <div class="timing-summary-grid">
-        <div class="timing-summary-item"><span class="timing-summary-label">الحصة الأولى</span><strong class="timing-summary-value">7:00 ص</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">مدة الحصة</span><strong class="timing-summary-value">30 دقيقة</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">عدد الحصص</span><strong class="timing-summary-value">8</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الطابور</span><strong class="timing-summary-value">لا يوجد</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الفسحة</span><strong class="timing-summary-value">لا توجد</strong></div>
-      </div>
-      <div class="fw-7 fs-sm mt-4 mb-3" style="color: var(--text-1);">نمط الأسبوع</div>
-      <div class="timing-summary-grid">
-        <div class="timing-summary-item"><span class="timing-summary-label">الأحد</span><strong class="timing-summary-value">حضوري</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الاثنين</span><strong class="timing-summary-value">حضوري</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الثلاثاء</span><strong class="timing-summary-value">يتناوب أسبوعيًا</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الأربعاء</span><strong class="timing-summary-value">عن بعد</strong></div>
-        <div class="timing-summary-item"><span class="timing-summary-label">الخميس</span><strong class="timing-summary-value">عن بعد</strong></div>
-      </div>
-    `;
-    return '';
+  const parseMins = (str) => {
+    const [h, m] = (str || '00:00').split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+  const fmtMins = (mins) => {
+    const h = Math.floor(mins / 60) % 24;
+    const m = mins % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   };
 
+  const durations = basePeriods.map(p => Math.max(15, parseMins(p.end) - parseMins(p.start)));
+  const firstStart = basePeriods[0]?.start || '07:00';
+  let cursor = parseMins(firstStart);
+
+  const count = basePeriods.length;
+  const targetAfter = Number(afterPeriod) || 0;
+  const totalRecess = (targetAfter > 0 && targetAfter < count && Number(recessDuration) > 0)
+    ? Number(recessDuration) + Number(transition || 0)
+    : 0;
+
+  const result = [];
+  for (let i = 0; i < count; i++) {
+    const pNum = basePeriods[i].period || (i + 1);
+    const dur = durations[i] || 45;
+    const startStr = fmtMins(cursor);
+    cursor += dur;
+    const endStr = fmtMins(cursor);
+
+    result.push({
+      period: pNum,
+      start: startStr,
+      end: endStr
+    });
+
+    if (targetAfter > 0 && pNum === targetAfter && totalRecess > 0) {
+      cursor += totalRecess;
+    }
+  }
+  return result;
+}
+
+function getProfileModels(p) {
+  if (Array.isArray(p.overrides?.models) && p.overrides.models.length > 0) {
+    return p.overrides.models.map((m, idx) => {
+      let name = typeof m.name === 'string' && m.name.trim()
+        ? m.name.trim()
+        : (m.name?.label || m.name?.name || `نموذج ${idx + 1}`);
+      if (name === 'نموذج الصف الرابع') name = 'نموذج 1';
+      else if (name === 'نموذج الصفين الخامس والسادس') name = 'نموذج 2';
+      const grades = Array.isArray(m.grades) ? m.grades : [];
+      const gradesLabel = typeof m.gradesLabel === 'string' && m.gradesLabel.trim()
+        ? m.gradesLabel.trim()
+        : formatGradesLabel(grades);
+      const afterPeriod = Number(m.afterPeriod || 0);
+      const recessDuration = Number(m.recessDuration || 20);
+      const recessTransition = Number(m.recessTransition || 0);
+      const periods = Array.isArray(m.periods) && m.periods.length > 0
+        ? m.periods.map(x => ({ ...x }))
+        : extractFromProfilePeriods(p, grades);
+      return {
+        ...m,
+        id: String(m.id || `m-${idx}`),
+        name: String(name),
+        grades,
+        gradesLabel: String(gradesLabel),
+        afterPeriod,
+        recessDuration,
+        recessTransition,
+        periods
+      };
+    });
+  }
+  const rules = p.overrides?.config?.recess?.rules;
+  if (Array.isArray(rules) && rules.length > 1) {
+    return [
+      {
+        id: 'm1',
+        name: 'نموذج 1',
+        grades: [4],
+        gradesLabel: 'الرابع الابتدائي',
+        afterPeriod: 2,
+        recessDuration: 20,
+        recessTransition: 5,
+        periods: extractFromProfilePeriods(p, [4])
+      },
+      {
+        id: 'm2',
+        name: 'نموذج 2',
+        grades: [5, 6],
+        gradesLabel: 'الخامس والسادس الابتدائي',
+        afterPeriod: 3,
+        recessDuration: 20,
+        recessTransition: 0,
+        periods: extractFromProfilePeriods(p, [5, 6])
+      }
+    ];
+  }
+  return [
+    {
+      id: 'default',
+      name: 'النموذج الأساسي',
+      grades: [],
+      gradesLabel: 'جميع الصفوف',
+      afterPeriod: Number(p.overrides?.config?.recess?.afterPeriod || 0),
+      recessDuration: Number(p.overrides?.config?.recess?.duration || 20),
+      recessTransition: Number(p.overrides?.config?.recess?.transition || 0),
+      periods: (p.periods ?? []).map(x => ({ ...x }))
+    }
+  ];
+}
+
+const ORDINAL_ARABIC = {
+  1: 'الأولى',
+  2: 'الثانية',
+  3: 'الثالثة',
+  4: 'الرابعة',
+  5: 'الخامسة',
+  6: 'السادسة',
+  7: 'السابعة',
+  8: 'الثامنة',
+  9: 'التاسعة',
+  10: 'العاشرة',
+  11: 'الحادية عشرة',
+  12: 'الثانية عشرة',
+};
+
+/**
+ * لوحة التوليد السريع المبسّطة جذرياً
+ * مدخلات مدرسية مباشرة — والفسحة اختيارية صريحة غير مفروضة
+ */
+function generateSheet(current = {}) {
+  let hasRecess = Boolean(current.recessDuration && current.recessDuration > 0);
+
   return openSheet({
-    title: 'توليد أوقات الحصص',
-    desc: 'اختر نموذجاً مسبقاً أو أدخل أوقاتاً مخصصة.',
+    title: 'توليد أوقات الحصص تلقائيًا',
+    desc: 'أدخل معايير التوقيت لمدرستك وسيقوم النظام بحساب الحصص وتطبيقها فورًا.',
     body: html`
       <form id="gen-form">
-        <label class="field mb-2">
-          <span class="field__label">نموذج التوقيت</span>
-          <select class="select" name="preset" id="preset-sel">
-            <option value="summer" selected>التوقيت الصيفي (حسب الدليل)</option>
-            <option value="winter">التوقيت الشتوي (حسب الدليل)</option>
-            <option value="ramadan">توقيت شهر رمضان</option>
-            <option value="hybrid">التوقيت المدمج (حضوري / عن بُعد)</option>
-            <option value="custom">مخصص</option>
-          </select>
-        </label>
-        
-        <div id="preset-summary" class="t-3 fs-xs mb-4 p-3" style="background: var(--surface-1); border-radius: var(--radius-sm); border: 1px solid var(--border);"></div>
-        
-        <div id="custom-fields" style="display: none;">
-          <div class="field-row">
-            <label class="field"><span class="field__label">عدد الحصص</span><input class="input tabular" name="count" type="number" min="1" max="12" value="7"></label>
-            <label class="field"><span class="field__label">بداية الأولى</span><input class="input tabular" name="start" type="time" value="07:00"></label>
-          </div>
-          <div class="field-row">
-            <label class="field"><span class="field__label">مدة الحصة</span><input class="input tabular" name="minutes" type="number" min="5" max="120" value="40"></label>
-            <label class="field"><span class="field__label">الفاصل بين الحصص</span><input class="input tabular" name="gap" type="number" min="0" max="60" value="0"></label>
-          </div>
-          
-          <label class="field mt-3">
-            <input type="checkbox" name="hasAssembly"> الطابور الصباحي
+        <div class="field-row">
+          <label class="field">
+            <span class="field__label">بداية الطابور الصباحي (إن وجد)</span>
+            <input class="input tabular timerow__in" name="assemblyStart" type="text" inputmode="numeric" maxlength="5" placeholder="06:45" value="${current.assemblyStart || '06:45'}" dir="ltr">
           </label>
-          <div id="assembly-fields" class="field-row" style="display:none;">
-            <label class="field"><span class="field__label">البداية</span><input class="input tabular" name="asmStart" type="time" value="06:45"></label>
-            <label class="field"><span class="field__label">المدة</span><input class="input tabular" name="asmDur" type="number" value="15"></label>
-          </div>
+          <label class="field">
+            <span class="field__label">بداية الحصة الأولى *</span>
+            <input class="input tabular timerow__in" name="firstPeriodStart" type="text" inputmode="numeric" maxlength="5" placeholder="07:00" value="${current.firstPeriodStart || '07:00'}" required dir="ltr">
+          </label>
+        </div>
 
-          <label class="field mt-3">
-            <input type="checkbox" name="hasRecess"> الفسحة
+        <div class="field-row mt-2">
+          <label class="field">
+            <span class="field__label">مدة الحصة (بالدقائق) *</span>
+            <input class="input tabular input--center" name="periodDuration" type="text" inputmode="numeric" maxlength="3" value="${current.periodDuration || 45}" required dir="ltr">
           </label>
-          <div id="recess-fields" style="display:none;">
-            <div class="field-row">
-              <label class="field"><span class="field__label">المدة</span><input class="input tabular" name="recDur" type="number" value="20"></label>
-              <label class="field"><span class="field__label">التفويج</span><input class="input tabular" name="recTrans" type="number" value="0"></label>
+          <label class="field">
+            <span class="field__label">عدد الحصص *</span>
+            <input class="input tabular input--center" name="count" type="text" inputmode="numeric" maxlength="2" value="${(current.count && current.count <= 10) ? current.count : 7}" required dir="ltr">
+          </label>
+        </div>
+
+        <!-- قسم الفسحة المدرسية الاختيارية -->
+        <div class="mt-3 p-2 bg-sunk rounded border">
+          <div class="hstack justify-between items-center mb-1">
+            <span class="fs-sm fw-6">الفسحة المدرسية (اختياري)</span>
+            <button type="button" class="btn btn--xs ${hasRecess ? 'btn--ghost text-danger' : 'btn--quiet'}" id="gen-toggle-recess">
+              ${hasRecess ? html`${icon('trash')} إزالة الفسحة` : html`${icon('plus')} إضافة فسحة`}
+            </button>
+          </div>
+          <div id="gen-recess-fields" style="${hasRecess ? '' : 'display: none;'}">
+            <div class="field-row mt-2">
+              <label class="field">
+                <span class="field__label">موضع الفسحة (بعد الحصة رقم)</span>
+                <input class="input tabular input--center" name="recessAfter" type="text" inputmode="numeric" maxlength="2" value="${current.recessAfter || 3}" dir="ltr">
+              </label>
+              <label class="field">
+                <span class="field__label">مدة الفسحة (بالدقائق)</span>
+                <input class="input tabular input--center" name="recessDuration" type="text" inputmode="numeric" maxlength="3" value="${current.recessDuration || 20}" dir="ltr">
+              </label>
             </div>
-            <label class="field mt-2">
-              <span class="field__label">تطبيق الفسحة على</span>
-              <select class="select" name="recGrades">
-                <option value="all">جميع الصفوف (نفس الوقت)</option>
-                <option value="official">منفصلة (رابع: بعد الـ 2 / خامس وسادس: بعد الـ 3)</option>
-              </select>
-            </label>
-            <label class="field mt-2" id="rec-after-field">
-              <span class="field__label">بعد الحصة رقم</span>
-              <input class="input tabular" name="recAfter" type="number" value="3">
-            </label>
+            <div class="field-row mt-2">
+              <label class="field">
+                <span class="field__label">مدة التفويج بعد الفسحة (دقائق)</span>
+                <input class="input tabular input--center" name="recessTransition" type="text" inputmode="numeric" maxlength="2" value="${current.recessTransition ?? 5}" dir="ltr">
+              </label>
+              <label class="field">
+                <span class="field__label">الفاصل بين الحصص (دقائق)</span>
+                <input class="input tabular input--center" name="gap" type="text" inputmode="numeric" maxlength="2" value="${current.gap ?? 0}" dir="ltr">
+              </label>
+            </div>
           </div>
         </div>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="gen-form" type="submit">ولّد الأوقات</button>
+      <button class="btn btn--primary" form="gen-form" type="submit">توليد وتطبيق الأوقات</button>
     `,
     onMount: (root, done) => {
-      const sel = root.querySelector('#preset-sel');
-      const sum = root.querySelector('#preset-summary');
-      const cust = root.querySelector('#custom-fields');
-      const cbAsm = root.querySelector('input[name="hasAssembly"]');
-      const cbRec = root.querySelector('input[name="hasRecess"]');
-      const asmF = root.querySelector('#assembly-fields');
-      const recF = root.querySelector('#recess-fields');
-      const recGrades = root.querySelector('select[name="recGrades"]');
-      const recAfterField = root.querySelector('#rec-after-field');
+      const toggleBtn = root.querySelector('#gen-toggle-recess');
+      const recessFields = root.querySelector('#gen-recess-fields');
       
-      sel.addEventListener('change', () => {
-        const p = sel.value;
-        if (p === 'custom') {
-          sum.style.display = 'none';
-          cust.style.display = 'block';
+      toggleBtn?.addEventListener('click', () => {
+        hasRecess = !hasRecess;
+        if (hasRecess) {
+          recessFields.style.display = '';
+          toggleBtn.className = 'btn btn--xs btn--ghost text-danger';
+          toggleBtn.innerHTML = `${icon('trash')} إزالة الفسحة`;
         } else {
-          sum.style.display = 'block';
-          sum.innerHTML = formatSummary(p);
-          cust.style.display = 'none';
+          recessFields.style.display = 'none';
+          toggleBtn.className = 'btn btn--xs btn--quiet';
+          toggleBtn.innerHTML = `${icon('plus')} إضافة فسحة`;
         }
       });
-      // Initialize
-      sum.innerHTML = formatSummary(sel.value);
 
-      cbAsm.addEventListener('change', () => asmF.style.display = cbAsm.checked ? 'flex' : 'none');
-      cbRec.addEventListener('change', () => recF.style.display = cbRec.checked ? 'block' : 'none');
-      recGrades.addEventListener('change', () => {
-        recAfterField.style.display = recGrades.value === 'all' ? 'block' : 'none';
+      // توحيد الأرقام 0-9 والتوقيت HH:MM على كافة المدخلات
+      root.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', (ev) => {
+          const val = ev.target.value;
+          const norm = val.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+          if (val !== norm) ev.target.value = norm;
+        });
+        if (inp.name === 'assemblyStart' || inp.name === 'firstPeriodStart') {
+          inp.addEventListener('blur', (ev) => {
+            const norm = normalizeTimeDigits(ev.target.value);
+            if (norm) ev.target.value = norm;
+          });
+        }
       });
-      
+
       root.querySelector('#gen-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
-        const type = fd.get('preset');
-        if (type !== 'custom') {
-          done(TIMING_PRESETS[type]);
-        } else {
-          const config = {
-            type: 'custom',
-            gap: Number(fd.get('gap')),
-            firstPeriodStart: String(fd.get('start')),
-            periodDuration: Number(fd.get('minutes')),
-            count: Number(fd.get('count')),
-            assembly: { enabled: false },
-            recess: { enabled: false }
-          };
-          if (fd.get('hasAssembly')) {
-            config.assembly = { enabled: true, start: String(fd.get('asmStart')), duration: Number(fd.get('asmDur')) };
+        const assemblyStart = normalizeTimeDigits(String(fd.get('assemblyStart') || '')).trim();
+        const firstPeriodStart = normalizeTimeDigits(String(fd.get('firstPeriodStart') || '07:00')).trim() || '07:00';
+        const periodDuration = parseInt(String(fd.get('periodDuration') || '45').replace(/[^0-9]/g, ''), 10) || 45;
+        const count = parseInt(String(fd.get('count') || '7').replace(/[^0-9]/g, ''), 10) || 7;
+        const recessAfter = parseInt(String(fd.get('recessAfter') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+        const recessDuration = hasRecess ? (parseInt(String(fd.get('recessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20) : 0;
+        const recessTransition = hasRecess ? (parseInt(String(fd.get('recessTransition') || '0').replace(/[^0-9]/g, ''), 10) || 0) : 0;
+        const gap = hasRecess ? (parseInt(String(fd.get('gap') || '0').replace(/[^0-9]/g, ''), 10) || 0) : 0;
+
+        const config = {
+          firstPeriodStart,
+          periodDuration,
+          count,
+          gap,
+          assembly: {
+            enabled: Boolean(assemblyStart),
+            start: assemblyStart || '06:45',
+            duration: 15
+          },
+          recess: {
+            enabled: hasRecess && recessDuration > 0,
+            afterPeriod: recessAfter,
+            duration: recessDuration,
+            transition: recessTransition
           }
-          if (fd.get('hasRecess')) {
-            config.recess = { enabled: true, duration: Number(fd.get('recDur')), transition: Number(fd.get('recTrans')) };
-            if (fd.get('recGrades') === 'official') {
-              config.recess.rules = [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }];
-            } else {
-              config.recess.afterPeriod = Number(fd.get('recAfter'));
-            }
-          }
-          done(config);
-        }
+        };
+        done(config);
       });
     },
   });
 }
 
-function manageRangesSheet() {
-  return openSheet({
-    title: 'التفعيل التلقائي حسب التاريخ',
-    desc: 'حدد فترات زمنية ليتم تفعيل التوقيت المناسب تلقائياً. إذا لم يتطابق التاريخ سيتم استخدام التوقيت النشط حالياً.',
-    body: html`
-      <div class="stack stack-2">
-        ${store.timeProfiles().filter(p => p.activeFrom).length === 0 ? html`<div class="empty__text">لا توجد توقيتات مفعلة تلقائياً.</div>` : ''}
-        ${store.timeProfiles().filter(p => p.activeFrom).map(p => html`
-          <div class="card card--pad hstack">
-            <div class="flex">
-              <div class="fw-7 mb-1">${p.name}</div>
-              <div class="t-3 fs-sm">من <span class="tabular fw-7">${p.activeFrom}</span> إلى <span class="tabular fw-7">${p.activeTo || 'مستمر'}</span></div>
-            </div>
-            <button class="iconbtn" data-act="rename" data-id="${p.id}" aria-label="تعديل" data-sheet-close>${icon('edit')}</button>
-          </div>
-        `)}
-      </div>
-      <p class="t-3 fs-xs mt-3 mb-0">لتفعيل أي توقيت تلقائياً، انقر على أيقونة التعديل وحدد تواريخ "يسري من".</p>
-    `,
-    foot: html`<button class="btn btn--primary btn--block" data-sheet-close>إغلاق</button>`
-  });
-}
-
+/**
+ * نافذة تعديل الاسم وفترة السريان
+ */
 function nameSheet(existing = null) {
   return openSheet({
-    title: existing ? 'تعديل اسم الملف' : 'ملف توقيت جديد',
+    title: existing ? 'تعديل الاسم وفترة سريان التوقيت' : 'ملف توقيت جديد',
+    desc: 'حدد اسم ملف التوقيت والتواريخ التي يسري خلالها تلقائيًا.',
     body: html`
       <form id="name-form">
-        <label class="field">
-          <span class="field__label">الاسم</span>
+        <label class="field mb-3">
+          <span class="field__label">اسم ملف التوقيت *</span>
           <input class="input" name="name" value="${existing?.name ?? ''}" required maxlength="60"
-                 autocomplete="off" placeholder="مثال: توقيت الاختبارات">
+                 autocomplete="off" placeholder="مثال: التوقيت الصيفي، توقيت رمضان، توقيت الاختبارات">
         </label>
         <div class="field-row">
           <label class="field">
-            <span class="field__label">يسري من (اختياري)</span>
-            <input class="input tabular" name="activeFrom" type="date" value="${existing?.activeFrom ?? ''}">
+            <span class="field__label">يسري من تاريخ (اختياري)</span>
+            <div class="field-date-wrap">
+              <input class="input tabular" name="activeFrom" type="date" value="${existing?.activeFrom ?? ''}" lang="en" dir="ltr">
+              <button type="button" class="field-date-trigger" tabindex="-1" title="اختيار من التقويم" aria-label="اختيار من التقويم"
+                      onclick="const inp = this.previousElementSibling; inp.showPicker ? inp.showPicker() : inp.focus();">
+                ${icon('calendar')}
+              </button>
+            </div>
           </label>
           <label class="field">
-            <span class="field__label">إلى (اختياري)</span>
-            <input class="input tabular" name="activeTo" type="date" value="${existing?.activeTo ?? ''}">
+            <span class="field__label">إلى تاريخ (اختياري)</span>
+            <div class="field-date-wrap">
+              <input class="input tabular" name="activeTo" type="date" value="${existing?.activeTo ?? ''}" lang="en" dir="ltr">
+              <button type="button" class="field-date-trigger" tabindex="-1" title="اختيار من التقويم" aria-label="اختيار من التقويم"
+                      onclick="const inp = this.previousElementSibling; inp.showPicker ? inp.showPicker() : inp.focus();">
+                ${icon('calendar')}
+              </button>
+            </div>
           </label>
         </div>
-        <p class="t-3 fs-sm">
-          تاريخا السريان للتوثيق الآن — التفعيل يبقى يدويًا باختيارك الملف النشط.
+        <p class="t-3 fs-xs mt-3">
+          إذا حُددت التواريخ يتم تفعيل هذا التوقيت تلقائياً حسب تقويم الأيام الدراسية. إذا تُرِكت فارغة يظل التفعيل يدوياً.
         </p>
       </form>
     `,
@@ -288,6 +371,15 @@ function nameSheet(existing = null) {
         const fd = new FormData(ev.target);
         const name = String(fd.get('name') ?? '').trim();
         if (!name) return;
+
+        // التحقق من عدم تكرار اسم ملف التوقيت
+        const existingProfiles = store.timeProfiles();
+        const isDuplicate = existingProfiles.some(prof => prof.id !== existing?.id && prof.name.trim().toLowerCase() === name.toLowerCase());
+        if (isDuplicate) {
+          toast('يوجد توقيت آخر بنفس هذا الاسم', 'danger');
+          return;
+        }
+
         const activeFrom = String(fd.get('activeFrom') ?? '') || null;
         const activeTo = String(fd.get('activeTo') ?? '') || null;
 
@@ -306,7 +398,7 @@ function nameSheet(existing = null) {
             );
             if (overlap) {
               const rangeStr = p.activeTo ? `من ${p.activeFrom} إلى ${p.activeTo}` : `من ${p.activeFrom} فصاعدًا`;
-              toast(`هذه الفترة تتداخل مع ${p.name} (${rangeStr})`, 'danger');
+              toast(`هذه الفترة تتداخل مع «${p.name}» (${rangeStr})`, 'danger');
               return;
             }
           }
@@ -322,21 +414,874 @@ function nameSheet(existing = null) {
   });
 }
 
-/** قائمة الحصص المعروضة: استثناء اليوم إن كان مفتوحًا، وإلا الافتراضي. */
-const listOf = (p) => {
-  if (overrideDay === null) return p.periods ?? [];
-  const ov = p.overrides?.[String(overrideDay)];
-  return Array.isArray(ov) ? ov : [];
-};
+/**
+ * نافذة ضبط الفسحة المدرسية — إضافة أو تعديل
+ */
+function openRecessConfigSheet({ isEdit = false, currentAfter = 3, currentDur = 20, currentTrans = 0, maxPeriods = 7, onSave }) {
+  const options = [];
+  const limit = Math.max(1, maxPeriods - 1);
+  for (let i = 1; i <= limit; i++) {
+    const ord = ORDINAL_ARABIC[i] || i;
+    options.push(html`<option value="${i}" ${i === currentAfter ? 'selected' : ''}>بعد الحصة ${ord}</option>`);
+  }
 
-async function writeList(p, list) {
-  if (overrideDay === null) return store.patch('timeProfiles', p.id, { periods: list });
-  const overrides = { ...(p.overrides ?? {}) };
-  if (list.length) overrides[String(overrideDay)] = list;
-  else delete overrides[String(overrideDay)];
-  return store.patch('timeProfiles', p.id, { overrides });
+  openSheet({
+    title: isEdit ? 'تعديل الفسحة المدرسية' : 'إضافة فسحة مدرسية',
+    desc: 'حدد موضع الفسحة ومدتها ليتم إعادة ضبط مواعيد الحصص تلقائيًا.',
+    body: html`
+      <form id="recess-config-form">
+        <label class="field mb-3">
+          <span class="field__label">موضع الفسحة *</span>
+          <select class="select select--rtl" name="afterPeriod" dir="rtl" required>
+            ${options}
+          </select>
+        </label>
+
+        <div class="field-row mb-3">
+          <label class="field">
+            <span class="field__label">مدة الفسحة (بالدقائق) *</span>
+            <input class="input tabular input--center" name="duration" type="text" inputmode="numeric" maxlength="3" value="${currentDur || 20}" required dir="ltr">
+          </label>
+          <label class="field">
+            <span class="field__label">مدة التفويج بعد الفسحة (بالدقائق)</span>
+            <input class="input tabular input--center" name="transition" type="text" inputmode="numeric" maxlength="3" value="${currentTrans || 0}" dir="ltr" placeholder="0">
+          </label>
+        </div>
+      </form>
+    `,
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" form="recess-config-form" type="submit">
+        ${isEdit ? 'حفظ تعديل الفسحة' : 'إضافة الفسحة'}
+      </button>
+    `,
+    onMount: (rRoot, rDone) => {
+      rRoot.querySelector('#recess-config-form').addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const afterPeriod = parseInt(String(fd.get('afterPeriod') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+        const duration = parseInt(String(fd.get('duration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
+        const transition = parseInt(String(fd.get('transition') || '0').replace(/[^0-9]/g, ''), 10) || 0;
+
+        onSave({ afterPeriod, duration, transition });
+        rDone();
+      });
+    }
+  });
 }
-let previewGrade = 5;
+
+/**
+ * نافذة تعديل النموذج الحالي — اسم النموذج، الصفوف، وإعداد الفسحة
+ */
+function openEditModelSheet(model, { models, onSave, onDelete }) {
+  const primaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ابتدائي');
+  const middleGrades = GRADE_CATALOG.filter(g => g.stage === 'متوسط');
+  const secondaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ثانوي');
+
+  let curRecessAfter = 0;
+  let curRecessDur = 20;
+  const pList = model.periods || [];
+  for (let i = 1; i < pList.length; i++) {
+    const prev = pList[i - 1];
+    const curr = pList[i];
+    const [ph, pm] = (prev.end || '00:00').split(':').map(Number);
+    const [ch, cm] = (curr.start || '00:00').split(':').map(Number);
+    const gap = (ch * 60 + cm) - (ph * 60 + pm);
+    if (gap > 0) {
+      curRecessAfter = prev.period;
+      curRecessDur = Number(model.recessDuration || gap);
+      break;
+    }
+  }
+
+  const options = [];
+  const limit = Math.max(1, pList.length - 1);
+  for (let i = 1; i <= limit; i++) {
+    const ord = ORDINAL_ARABIC[i] || i;
+    options.push(html`<option value="${i}" ${i === curRecessAfter ? 'selected' : ''}>بعد الحصة ${ord}</option>`);
+  }
+
+  openSheet({
+    title: `تعديل النموذج — ${model.name}`,
+    desc: 'تعديل اسم النموذج والصفوف المشمولة وموضع الفسحة.',
+    body: html`
+      <form id="edit-model-form">
+        <label class="field mb-3">
+          <span class="field__label">اسم النموذج *</span>
+          <input class="input" name="modelName" id="edit-model-name-input" value="${model.name}" required>
+        </label>
+
+        <div class="field mb-3">
+          <span class="field__label mb-2">الصفوف المشمولة بهذا النموذج:</span>
+
+          <div class="grades-stage-group">
+            <div class="grades-stage-title">المرحلة الابتدائية</div>
+            <div class="grades-chips-grid">
+              ${primaryGrades.map(g => html`
+                <label class="grade-chip-label">
+                  <input type="checkbox" name="grades" value="${g.v}" ${model.grades?.includes(g.v) ? 'checked' : ''}>
+                  <span>${g.label.replace(' الابتدائي', '')}</span>
+                </label>
+              `)}
+            </div>
+          </div>
+
+          <div class="grades-stage-group">
+            <div class="grades-stage-title">المرحلة المتوسطة</div>
+            <div class="grades-chips-grid">
+              ${middleGrades.map(g => html`
+                <label class="grade-chip-label">
+                  <input type="checkbox" name="grades" value="${g.v}" ${model.grades?.includes(g.v) ? 'checked' : ''}>
+                  <span>${g.label.replace(' المتوسط', '')}</span>
+                </label>
+              `)}
+            </div>
+          </div>
+
+          <div class="grades-stage-group">
+            <div class="grades-stage-title">المرحلة الثانوية</div>
+            <div class="grades-chips-grid">
+              ${secondaryGrades.map(g => html`
+                <label class="grade-chip-label">
+                  <input type="checkbox" name="grades" value="${g.v}" ${model.grades?.includes(g.v) ? 'checked' : ''}>
+                  <span>${g.label.replace(' الثانوي', '')}</span>
+                </label>
+              `)}
+            </div>
+          </div>
+        </div>
+
+        <!-- إعداد الفسحة لهذا النموذج -->
+        <div class="p-3 bg-sunk rounded border mb-3">
+          <div class="hstack justify-between items-center mb-2">
+            <span class="fs-sm fw-7">الفسحة المدرسية</span>
+            ${curRecessAfter > 0 ? html`
+              <span class="badge badge--brand">بعد الحصة ${curRecessAfter} (${curRecessDur} دقيقة)</span>
+            ` : html`
+              <span class="badge badge--quiet">بدون فسحة</span>
+            `}
+          </div>
+
+          ${curRecessAfter > 0 ? html`
+            <div class="field-row">
+              <label class="field">
+                <span class="field__label">موضع الفسحة</span>
+                <select class="select select--rtl" name="recessAfter" dir="rtl">
+                  ${options}
+                </select>
+              </label>
+              <label class="field">
+                <span class="field__label">مدة الفسحة (دقائق)</span>
+                <input class="input tabular input--center" name="recessDuration" type="text" inputmode="numeric" maxlength="3" value="${curRecessDur}" dir="ltr">
+              </label>
+            </div>
+            <label class="fs-xs pointer hstack gap-1 text-danger mt-2">
+              <input type="checkbox" name="deleteRecess" value="1">
+              <span>إزالة الفسحة من هذا النموذج (بدون فسحة)</span>
+            </label>
+          ` : html`
+            <label class="fs-xs pointer hstack gap-1">
+              <input type="checkbox" name="addRecess" value="1" id="edit-model-add-recess-chk">
+              <span>إضافة فسحة مدرسية لهذا النموذج</span>
+            </label>
+            <div id="edit-model-new-recess-box" style="display: none;" class="field-row mt-2">
+              <label class="field">
+                <span class="field__label">موضع الفسحة</span>
+                <select class="select select--rtl" name="newRecessAfter" dir="rtl">
+                  ${options}
+                </select>
+              </label>
+              <label class="field">
+                <span class="field__label">مدة الفسحة (دقائق)</span>
+                <input class="input tabular input--center" name="newRecessDuration" type="text" inputmode="numeric" maxlength="3" value="20" dir="ltr">
+              </label>
+            </div>
+          `}
+        </div>
+
+        ${models.length > 1 ? html`
+          <div class="border-t pt-3 mt-3 text-start">
+            <button type="button" class="btn btn--sm btn--danger" id="btn-del-model-action">
+              ${icon('trash')} حذف النموذج
+            </button>
+          </div>
+        ` : ''}
+      </form>
+    `,
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" form="edit-model-form" type="submit">حفظ تعديل النموذج</button>
+    `,
+    onMount: (eRoot, eDone) => {
+      const toggleChk = eRoot.querySelector('#edit-model-add-recess-chk');
+      const newRecessBox = eRoot.querySelector('#edit-model-new-recess-box');
+      if (toggleChk && newRecessBox) {
+        toggleChk.addEventListener('change', () => {
+          newRecessBox.style.display = toggleChk.checked ? 'flex' : 'none';
+        });
+      }
+
+      const btnDel = eRoot.querySelector('#btn-del-model-action');
+      if (btnDel) {
+        btnDel.addEventListener('click', async () => {
+          const ok = await confirmSheet({
+            title: 'حذف النموذج؟',
+            desc: `هل أنت متأكد من حذف «${model.name}»؟`,
+            confirmLabel: 'حذف النموذج',
+            danger: true,
+          });
+          if (ok) {
+            onDelete();
+            eDone();
+          }
+        });
+      }
+
+      eRoot.querySelector('#edit-model-form').addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const name = String(fd.get('modelName') || '').trim() || model.name;
+        const checkedGrades = Array.from(eRoot.querySelectorAll('input[name="grades"]:checked')).map(el => Number(el.value));
+        const gradesLabel = formatGradesLabel(checkedGrades);
+
+        let recessChange = null;
+        if (curRecessAfter > 0) {
+          if (fd.get('deleteRecess')) {
+            recessChange = { afterPeriod: 0, duration: 0 };
+          } else {
+            const after = parseInt(String(fd.get('recessAfter') || curRecessAfter).replace(/[^0-9]/g, ''), 10) || curRecessAfter;
+            const dur = parseInt(String(fd.get('recessDuration') || curRecessDur).replace(/[^0-9]/g, ''), 10) || curRecessDur;
+            recessChange = { afterPeriod: after, duration: dur };
+          }
+        } else if (fd.get('addRecess')) {
+          const after = parseInt(String(fd.get('newRecessAfter') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+          const dur = parseInt(String(fd.get('newRecessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
+          recessChange = { afterPeriod: after, duration: dur };
+        }
+
+        onSave({ name, checkedGrades, gradesLabel, recessChange });
+        eDone();
+      });
+    }
+  });
+}
+
+/**
+ * نافذة عرض وتعديل أوقات الحصص — Modal / Sheet
+ */
+function editPeriodsSheet(profile) {
+  let p = store.getTimeProfile(profile.id) || profile;
+  let selectedDay = null; // null = all days
+  let models = getProfileModels(p);
+  let selectedModelId = models[0]?.id || 'default';
+  let dayOverrides = { ...(p.overrides ?? {}) };
+
+  const parseTime = (str) => {
+    const [h, m] = (str || '00:00').split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+
+  const fmtTime = (mins) => {
+    const h = Math.floor(mins / 60) % 24;
+    const m = mins % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  };
+
+  const getActiveModel = () => {
+    return models.find(m => m.id === selectedModelId) || models[0];
+  };
+
+  const renderSheetContent = () => {
+    const currentModel = getActiveModel();
+    selectedModelId = currentModel.id;
+
+    const activePeriods = (selectedDay !== null && Array.isArray(dayOverrides[String(selectedDay)]))
+      ? dayOverrides[String(selectedDay)]
+      : currentModel.periods;
+
+    const cfg = p.overrides?.config;
+
+    return html`
+      <div id="periods-sheet-inner">
+        <!-- شريط النماذج المدمج والموحّد مع أزرار الإجراءات المستقلة الثابتة في اليسار -->
+        <div class="models-bar mb-3">
+          <div class="models-tabs">
+            ${models.map((m) => html`
+              <button type="button" class="models-tab ${selectedModelId === m.id ? 'is-active' : ''}" data-mid="${m.id}">
+                <span>${m.name}</span>
+              </button>
+            `)}
+          </div>
+          <div class="models-bar__actions">
+            <button type="button" class="models-bar__action-btn" id="sheet-btn-edit-model" title="تعديل النموذج" aria-label="تعديل النموذج">
+              ${icon('edit')}
+            </button>
+            <button type="button" class="models-bar__action-btn" id="sheet-btn-add-model" title="إضافة نموذج" aria-label="إضافة نموذج">
+              ${icon('plus')}
+            </button>
+          </div>
+        </div>
+
+        <!-- إجراء التوليد التلقائي في الأعلى بوضوح كزر عملي بارز -->
+        <div class="generator-action-banner mb-3">
+          <div class="generator-action-banner__info">
+            <span class="generator-action-banner__title">توليد الأوقات آليًا</span>
+            <span class="generator-action-banner__desc">توزيع الحصص والفسحة المدرسية بدقة حسب معايير مدرستك</span>
+          </div>
+          <button type="button" class="btn btn--sm btn--primary generator-action-banner__btn" id="sheet-btn-gen">
+            ${icon('spark')} توليد وتطبيق الأوقات
+          </button>
+        </div>
+
+        <!-- شريط استثناءات الأيام -->
+        <div class="field mb-3">
+          <div class="chips scroll-x">
+            <button type="button" class="chip ${selectedDay === null ? 'is-on' : ''}" data-day="">
+              كل الأيام (الافتراضي)
+            </button>
+            ${SCHOOL_WEEKDAYS.map(d => html`
+              <button type="button" class="chip ${selectedDay === d ? 'is-on' : ''}" data-day="${d}">
+                ${WEEKDAYS[d]}
+              </button>
+            `)}
+          </div>
+        </div>
+
+        <!-- الطابور الصباحي إن وجد -->
+        ${cfg?.assembly?.enabled ? html`
+          <div class="timerow timerow--assembly mb-3">
+            <div class="assembly-pill">
+              ${icon('bell')}
+              <span>الطابور الصباحي</span>
+            </div>
+            <div class="timerow__assembly-time tabular">
+              <span dir="ltr">${cfg.assembly.start}</span>
+              <span class="t-3 fs-xs">(${cfg.assembly.duration} دقيقة)</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- قائمة فترات الحصص والفسحة المدرسية -->
+        <div class="stack stack-2" id="sheet-period-rows">
+          ${activePeriods.length ? activePeriods.map((t, idx) => {
+            const items = [];
+            if (idx > 0) {
+              const prev = activePeriods[idx - 1];
+              const gapMins = parseTime(t.start) - parseTime(prev.end);
+              if (gapMins > 0) {
+                items.push(html`
+                  <div class="timerow timerow--recess row-recess">
+                    <div class="recess-pill">
+                      <span class="recess-dot" aria-hidden="true"></span>
+              <span>الفسحة</span>
+                    </div>
+                    <div class="recess-info tabular">
+                <span class="recess-duration">${currentModel.recessDuration || gapMins} دقيقة</span>
+                      <span class="recess-sep" aria-hidden="true">·</span>
+                      <span class="time-range"><span class="time-range__token" dir="ltr">${prev.end}</span> – <span class="time-range__token" dir="ltr">${t.start}</span></span>
+                    </div>
+                    <div class="recess-actions">
+                      <button type="button" class="recess-edit-btn" data-act="edit-recess" data-after="${prev.period}" data-gap="${gapMins}" title="تعديل الفسحة" aria-label="تعديل الفسحة">
+                        ${icon('edit')}
+                      </button>
+                      <button type="button" class="recess-del-btn" data-act="del-recess" title="إزالة الفسحة" aria-label="إزالة الفسحة">
+                        ${icon('trash')}
+                      </button>
+                    </div>
+                  </div>
+                `);
+              }
+            }
+            items.push(html`
+              <div class="timerow" data-row-period="${t.period}">
+                <span class="period tabular" title="الحصة ${t.period}">${t.period}</span>
+                <div class="timerow__range">
+                  <div class="timerow__input-group">
+                    <span class="timerow__label">البداية</span>
+                    <input class="input tabular timerow__in" type="text" inputmode="numeric" maxlength="5"
+                           dir="ltr" placeholder="00:00"
+                           value="${t.start}" data-p="${t.period}" data-key="start"
+                           aria-label="بداية الحصة ${t.period}">
+                  </div>
+                  <span class="timerow__arrow" aria-hidden="true">←</span>
+                  <div class="timerow__input-group">
+                    <span class="timerow__label">النهاية</span>
+                    <input class="input tabular timerow__in" type="text" inputmode="numeric" maxlength="5"
+                           dir="ltr" placeholder="00:00"
+                           value="${t.end}" data-p="${t.period}" data-key="end"
+                           aria-label="نهاية الحصة ${t.period}">
+                  </div>
+                </div>
+                <button type="button" class="iconbtn text-danger" data-del-p="${t.period}" aria-label="حذف الحصة ${t.period}" title="حذف">
+                  ${icon('trash')}
+                </button>
+              </div>
+            `);
+            return items;
+          }) : html`
+            <div class="card--pad center t-3 fs-md">
+              <p class="mb-3">لا توجد أوقات محددة بعد.</p>
+            </div>
+          `}
+        </div>
+
+        ${(() => {
+          const hasRecess = activePeriods.some((pItem, i) => i > 0 && (parseTime(pItem.start) - parseTime(activePeriods[i - 1].end) > 0));
+          return html`
+            <div class="hstack justify-between gap-2 mt-3 pt-2 border-t">
+              <button type="button" class="btn btn--sm btn--ghost" id="sheet-btn-add-p">
+                ${icon('plus')} إضافة حصة
+              </button>
+              ${hasRecess ? html`
+                <span class="fs-xs text-3">تم ضبط الفسحة لهذا النموذج</span>
+              ` : html`
+                <button type="button" class="btn btn--sm btn--ghost" id="sheet-btn-add-recess">
+                  ${icon('plus')} إضافة فسحة
+                </button>
+              `}
+            </div>
+          `;
+        })()}
+      </div>
+    `;
+  };
+
+  return openSheet({
+    title: `أوقات الحصص — ${p.name}`,
+    desc: 'عرض وتعديل فترات الحصص والفسحة المدرسية لهذا الملف.',
+    body: renderSheetContent(),
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" id="sheet-btn-save-all">حفظ التغييرات</button>
+    `,
+    onMount: (root, done) => {
+      const attachListeners = () => {
+        const currentModel = getActiveModel();
+        const activePeriods = (selectedDay !== null && Array.isArray(dayOverrides[String(selectedDay)]))
+          ? dayOverrides[String(selectedDay)]
+          : currentModel.periods;
+
+        // Model tabs click
+        root.querySelectorAll('.models-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            const mid = tab.dataset.mid;
+            if (mid && mid !== selectedModelId) {
+              selectedModelId = mid;
+              refreshDOM();
+            }
+          });
+        });
+
+        // Edit model action
+        const btnEditModel = root.querySelector('#sheet-btn-edit-model');
+        if (btnEditModel) {
+          btnEditModel.addEventListener('click', () => {
+            openEditModelSheet(currentModel, {
+              models,
+              onSave: ({ name, checkedGrades, gradesLabel, recessChange }) => {
+                currentModel.name = name;
+                currentModel.grades = checkedGrades;
+                currentModel.gradesLabel = gradesLabel;
+
+                if (recessChange) {
+                  currentModel.periods = reflowPeriodsWithRecess(currentModel.periods, {
+                    afterPeriod: recessChange.afterPeriod,
+                    recessDuration: recessChange.duration,
+                    transition: 0
+                  });
+                  currentModel.afterPeriod = recessChange.afterPeriod;
+                  currentModel.recessDuration = recessChange.duration;
+                }
+                selectedModelId = currentModel.id;
+                refreshDOM();
+                toast(`تم تحديث «${currentModel.name}» بنجاح`);
+              },
+              onDelete: () => {
+                models = models.filter(m => m.id !== currentModel.id);
+                selectedModelId = models[0].id;
+                refreshDOM();
+                toast('تم حذف النموذج بنجاح');
+              }
+            });
+          });
+        }
+
+        // Add model with canonical Grade Catalog multi-select and explicit recess configuration
+        const btnAddModel = root.querySelector('#sheet-btn-add-model');
+        if (btnAddModel) {
+          btnAddModel.addEventListener('click', () => {
+            const nextModelNum = models.length + 1;
+            const defaultModelName = `نموذج ${nextModelNum}`;
+            const primaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ابتدائي');
+            const middleGrades = GRADE_CATALOG.filter(g => g.stage === 'متوسط');
+            const secondaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ثانوي');
+
+            const options = [];
+            const limit = Math.max(1, (currentModel.periods.length || 7) - 1);
+            for (let i = 1; i <= limit; i++) {
+              const ord = ORDINAL_ARABIC[i] || i;
+              options.push(html`<option value="${i}">بعد الحصة ${ord}</option>`);
+            }
+
+            openSheet({
+              title: 'إضافة نموذج أوقات لصفوف محددة',
+              desc: 'يتيح لك تخصيص مواعيد وفسحة مستقلة لصفوف معينة بالمدرسة.',
+              body: html`
+                <form id="add-model-form">
+                  <label class="field mb-3">
+                    <span class="field__label">اسم النموذج</span>
+                    <input class="input" name="modelName" id="add-model-name-input" value="${defaultModelName}" placeholder="${defaultModelName}">
+                  </label>
+
+                  <div class="field mb-3">
+                    <span class="field__label mb-2">اختر الصفوف المشمولة بهذا النموذج:</span>
+
+                    <div class="grades-stage-group">
+                      <div class="grades-stage-title">المرحلة الابتدائية</div>
+                      <div class="grades-chips-grid">
+                        ${primaryGrades.map(g => html`
+                          <label class="grade-chip-label">
+                            <input type="checkbox" name="grades" value="${g.v}">
+                            <span>${g.label.replace(' الابتدائي', '')}</span>
+                          </label>
+                        `)}
+                      </div>
+                    </div>
+
+                    <div class="grades-stage-group">
+                      <div class="grades-stage-title">المرحلة المتوسطة</div>
+                      <div class="grades-chips-grid">
+                        ${middleGrades.map(g => html`
+                          <label class="grade-chip-label">
+                            <input type="checkbox" name="grades" value="${g.v}">
+                            <span>${g.label.replace(' المتوسط', '')}</span>
+                          </label>
+                        `)}
+                      </div>
+                    </div>
+
+                    <div class="grades-stage-group">
+                      <div class="grades-stage-title">المرحلة الثانوية</div>
+                      <div class="grades-chips-grid">
+                        ${secondaryGrades.map(g => html`
+                          <label class="grade-chip-label">
+                            <input type="checkbox" name="grades" value="${g.v}">
+                            <span>${g.label.replace(' الثانوي', '')}</span>
+                          </label>
+                        `)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-row">
+                    <label class="field">
+                      <span class="field__label">موضع الفسحة لهذا النموذج</span>
+                      <select class="select select--rtl" name="afterPeriod" dir="rtl">
+                        <option value="0">بدون فسحة</option>
+                        ${options}
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span class="field__label">مدة الفسحة (دقائق)</span>
+                      <input class="input tabular input--center" name="recessDuration" type="text" inputmode="numeric" maxlength="3" value="20" dir="ltr">
+                    </label>
+                  </div>
+                </form>
+              `,
+              foot: html`
+                <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+                <button class="btn btn--primary" form="add-model-form" type="submit">إضافة النموذج</button>
+              `,
+              onMount: (mRoot, mDone) => {
+                mRoot.querySelector('#add-model-form').addEventListener('submit', (ev) => {
+                  ev.preventDefault();
+                  const fd = new FormData(ev.target);
+                  const checkedGrades = Array.from(mRoot.querySelectorAll('input[name="grades"]:checked')).map(el => Number(el.value));
+                  const gradesLabel = formatGradesLabel(checkedGrades);
+                  const name = String(fd.get('modelName') || '').trim() || defaultModelName;
+                  const afterPeriod = parseInt(String(fd.get('afterPeriod') || '2').replace(/[^0-9]/g, ''), 10) || 0;
+                  const recessDuration = parseInt(String(fd.get('recessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
+
+                  const newPeriods = reflowPeriodsWithRecess(currentModel.periods, {
+                    afterPeriod,
+                    recessDuration: afterPeriod > 0 ? recessDuration : 0,
+                    transition: 0
+                  });
+
+                  const newModel = {
+                    id: `m-${Date.now()}`,
+                    name,
+                    grades: checkedGrades,
+                    gradesLabel,
+                    afterPeriod,
+                    recessDuration: afterPeriod > 0 ? recessDuration : 0,
+                    recessTransition: 0,
+                    periods: newPeriods
+                  };
+
+                  models.push(newModel);
+                  selectedModelId = newModel.id;
+                  mDone();
+                  refreshDOM();
+                  toast(`أُضيف «${name}» بنجاح`);
+                });
+              }
+            });
+          });
+        }
+
+        // Days chips
+        root.querySelectorAll('.chips .chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const dStr = chip.dataset.day;
+            selectedDay = dStr === '' ? null : Number(dStr);
+            if (selectedDay !== null && !dayOverrides[String(selectedDay)]) {
+              dayOverrides[String(selectedDay)] = currentModel.periods.map(x => ({ ...x }));
+            }
+            refreshDOM();
+          });
+        });
+
+        // Time inputs — ضمان تحويل الأرقام 0-9 مع التحقق
+        root.querySelectorAll('.timerow__in').forEach(input => {
+          input.addEventListener('input', (ev) => {
+            const cur = ev.target.value;
+            const norm = cur.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            if (cur !== norm) ev.target.value = norm;
+          });
+
+          input.addEventListener('change', () => {
+            const norm = normalizeTimeDigits(input.value);
+            if (norm) input.value = norm;
+            const pNum = Number(input.dataset.p);
+            const key = input.dataset.key;
+            const item = activePeriods.find(x => x.period === pNum);
+            if (item) {
+              item[key] = input.value;
+            }
+          });
+
+          input.addEventListener('blur', () => {
+            const norm = normalizeTimeDigits(input.value);
+            if (norm) {
+              input.value = norm;
+              const pNum = Number(input.dataset.p);
+              const key = input.dataset.key;
+              const item = activePeriods.find(x => x.period === pNum);
+              if (item) item[key] = norm;
+            }
+          });
+        });
+
+        // Delete period
+        root.querySelectorAll('button[data-del-p]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const pNum = Number(btn.dataset.delP);
+            const updated = activePeriods.filter(x => x.period !== pNum);
+            if (selectedDay !== null) {
+              dayOverrides[String(selectedDay)] = updated;
+            } else {
+              currentModel.periods = updated;
+            }
+            refreshDOM();
+          });
+        });
+
+        // Delete recess action
+        root.querySelectorAll('button[data-act="del-recess"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const updated = reflowPeriodsWithRecess(activePeriods, { afterPeriod: 0 });
+            if (selectedDay !== null) {
+              dayOverrides[String(selectedDay)] = updated;
+            } else {
+              currentModel.periods = updated;
+              currentModel.afterPeriod = 0;
+            }
+            refreshDOM();
+            toast('تمت إزالة الفسحة المدرسية وتعديل أوقات الحصص');
+          });
+        });
+
+        // Edit recess action
+        root.querySelectorAll('button[data-act="edit-recess"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const afterPeriod = Number(btn.dataset.after) || 3;
+            const gapMins = Number(btn.dataset.gap) || 20;
+            openRecessConfigSheet({
+              isEdit: true,
+              currentAfter: afterPeriod,
+              currentDur: Number(currentModel.recessDuration || gapMins),
+              currentTrans: currentModel.recessTransition || 0,
+              maxPeriods: activePeriods.length,
+              onSave: ({ afterPeriod: newAfter, duration, transition }) => {
+                const updated = reflowPeriodsWithRecess(activePeriods, {
+                  afterPeriod: newAfter,
+                  recessDuration: duration,
+                  transition
+                });
+                if (selectedDay !== null) {
+                  dayOverrides[String(selectedDay)] = updated;
+                } else {
+                  currentModel.periods = updated;
+                  currentModel.afterPeriod = newAfter;
+                  currentModel.recessDuration = duration;
+                  currentModel.recessTransition = transition;
+                }
+                refreshDOM();
+                toast('تم تعديل الفسحة المدرسية بنجاح');
+              }
+            });
+          });
+        });
+
+        // Add recess button — opens explicit configuration dialog without inserting arbitrarily
+        const btnAddRecess = root.querySelector('#sheet-btn-add-recess');
+        if (btnAddRecess) {
+          btnAddRecess.addEventListener('click', () => {
+            if (activePeriods.length < 2) {
+              toast('يلزم وجود حصتين على الأقل لإضافة فسحة بينهما', 'danger');
+              return;
+            }
+            const defaultAfter = Math.min(3, Math.max(1, activePeriods.length - 1));
+            openRecessConfigSheet({
+              isEdit: false,
+              currentAfter: defaultAfter,
+              currentDur: 20,
+              currentTrans: 0,
+              maxPeriods: activePeriods.length,
+              onSave: ({ afterPeriod, duration, transition }) => {
+                const updated = reflowPeriodsWithRecess(activePeriods, {
+                  afterPeriod,
+                  recessDuration: duration,
+                  transition
+                });
+                if (selectedDay !== null) {
+                  dayOverrides[String(selectedDay)] = updated;
+                } else {
+                  currentModel.periods = updated;
+                  currentModel.afterPeriod = afterPeriod;
+                  currentModel.recessDuration = duration;
+                  currentModel.recessTransition = transition;
+                }
+                refreshDOM();
+                toast('أُضيفت الفسحة المدرسية بنجاح');
+              }
+            });
+          });
+        }
+
+        // Add period button
+        const btnAddP = root.querySelector('#sheet-btn-add-p');
+        if (btnAddP) {
+          btnAddP.addEventListener('click', () => {
+            const last = activePeriods.at(-1);
+            let nextStart = '07:00';
+            let nextEnd = '07:45';
+            if (last) {
+              const startMins = parseTime(last.end);
+              const endMins = startMins + 45;
+              nextStart = fmtTime(startMins);
+              nextEnd = fmtTime(endMins);
+            }
+            const nextP = (last?.period ?? 0) + 1;
+            const newPeriod = { period: nextP, start: nextStart, end: nextEnd };
+            if (selectedDay !== null) {
+              dayOverrides[String(selectedDay)] = [...activePeriods, newPeriod];
+            } else {
+              currentModel.periods.push(newPeriod);
+            }
+            refreshDOM();
+          });
+        }
+
+        // Generate button (opens generator, applies to current active model without affecting others)
+        const btnGen = root.querySelector('#sheet-btn-gen');
+        if (btnGen) {
+          btnGen.addEventListener('click', async () => {
+            const cfg = await generateSheet({
+              count: activePeriods.length || 7,
+              firstPeriodStart: activePeriods[0]?.start || '07:00',
+            });
+            if (!cfg) return;
+            const newPeriods = generateAdvancedPeriods(cfg);
+            if (selectedDay !== null) {
+              dayOverrides[String(selectedDay)] = newPeriods.map(x => ({ ...x }));
+            } else {
+              currentModel.periods = newPeriods.map(x => ({ ...x }));
+              currentModel.afterPeriod = cfg.recess?.enabled ? (cfg.recess.afterPeriod || 3) : 0;
+              currentModel.recessDuration = cfg.recess?.duration || 20;
+            }
+            p.overrides = p.overrides || {};
+            p.overrides.config = cfg;
+            refreshDOM();
+            toast('وُلّدت الأوقات الجديدة بنجاح لهذا النموذج');
+          });
+        }
+      };
+
+      const refreshDOM = () => {
+        const body = root.querySelector('.sheet__body');
+        if (body) {
+          render(body, renderSheetContent());
+          attachListeners();
+        }
+      };
+
+      attachListeners();
+
+      // Save all changes
+      root.querySelector('#sheet-btn-save-all').addEventListener('click', async () => {
+        if (selectedDay === null) {
+          const allFlatPeriods = [];
+          if (models.length === 1 && (!models[0].grades || models[0].grades.length === 0)) {
+            allFlatPeriods.push(...models[0].periods.map(x => {
+              const { grades, ...rest } = x;
+              return rest;
+            }));
+          } else {
+            for (const m of models) {
+              for (const pItem of m.periods) {
+                allFlatPeriods.push({
+                  ...pItem,
+                  grades: (m.grades && m.grades.length > 0) ? m.grades : undefined
+                });
+              }
+            }
+          }
+
+          p.overrides = p.overrides || {};
+          p.overrides.models = models.map(m => ({
+            id: m.id,
+            name: m.name,
+            grades: m.grades,
+            gradesLabel: m.gradesLabel,
+            afterPeriod: m.afterPeriod,
+            recessDuration: m.recessDuration,
+            recessTransition: m.recessTransition,
+            periods: m.periods.map(x => ({ ...x }))
+          }));
+
+          await store.patch('timeProfiles', p.id, {
+            periods: allFlatPeriods.length ? allFlatPeriods : models[0].periods,
+            overrides: p.overrides
+          });
+        } else {
+          const overrides = { ...(p.overrides ?? {}) };
+          const dayPeriods = dayOverrides[String(selectedDay)];
+          if (Array.isArray(dayPeriods) && dayPeriods.length) {
+            overrides[String(selectedDay)] = dayPeriods;
+          } else {
+            delete overrides[String(selectedDay)];
+          }
+          await store.patch('timeProfiles', p.id, { overrides });
+        }
+        toast('تم حفظ أوقات الحصص بنجاح');
+        done();
+        repaint();
+      });
+    }
+  });
+}
 
 export default {
   title: () => 'أوقات الحصص',
@@ -344,16 +1289,13 @@ export default {
   back: () => '#/schedule',
 
   topActions: () => html`
-    <button class="iconbtn" data-act="add-profile" aria-label="ملف جديد">${icon('plus')}</button>
+    <button class="btn btn--sm btn--primary-soft" data-act="add-profile">
+      ${icon('plus')} ملف توقيت جديد
+    </button>
   `,
 
   onMount() {
-    openId = store.activeTimeProfile()?.id ?? null;
-    overrideDay = null;
-    const myGrades = new Set(store.teachings().map(t => store.getSection(t.sectionId)?.grade).filter(Boolean));
-    if (myGrades.has(5) || myGrades.has(6)) previewGrade = 5;
-    else if (myGrades.has(4)) previewGrade = 4;
-    else previewGrade = 5;
+    activeEditProfileId = store.activeTimeProfile()?.id ?? null;
     repaint();
   },
 
@@ -372,310 +1314,129 @@ export default {
       `;
     }
 
-    const open = profiles.find((p) => p.id === openId) ?? active ?? profiles[0];
-    const list = listOf(open);
-    const hasOverride = (d) => Array.isArray(open.overrides?.[String(d)]) && open.overrides[String(d)].length;
+    const todayStr = todayISO();
+    const currentResolved = store.resolveProfile(active, todayStr);
+    const profilesWithFrom = profiles.filter(p => p.activeFrom).sort((a, b) => a.activeFrom.localeCompare(b.activeFrom));
+    const nextSwitch = profilesWithFrom.find(p => p.activeFrom > todayStr);
 
     return html`
-      <p class="t-3 fs-md mb-3">
-        اضبط الأوقات هنا مرة واحدة، ثم أضف الحصص في الجدول برقمها فقط.
-      </p>
-
-      <div class="list mb-3">
-        ${profiles.map(
-          (p) => html`
-            <div class="row ${p.id === open.id ? 'is-open' : ''}">
-              <span class="row__icon ${p.id === active?.id ? 'is-active' : ''}">${icon('clock')}</span>
-              <button class="row__main" data-act="open" data-id="${p.id}">
-                <span class="row__title">${p.name}</span>
-                <span class="row__sub">
-                  <span class="tabular">${(p.periods ?? []).length}</span> حصص
-                  ${Object.keys(p.overrides ?? {}).length
-                    ? html` · <span class="tabular">${Object.keys(p.overrides).length}</span> يوم باستثناء`
-                    : ''}
-                  ${p.activeFrom ? html` · من ${p.activeFrom}` : ''}
-                </span>
-              </button>
-              <span class="row__end">
-                ${p.id === active?.id
-                  ? html`<span class="badge badge--brand">النشط</span>`
-                  : html`<button class="btn btn--sm btn--ghost" data-act="activate" data-id="${p.id}">فعّل</button>`}
-                <button class="iconbtn" data-act="rename" data-id="${p.id}" aria-label="تعديل">${icon('edit')}</button>
-                <button class="iconbtn" data-act="del-profile" data-id="${p.id}" aria-label="حذف">${icon('trash')}</button>
-              </span>
+      <!-- شريط التبديل الموسمي القادم يظهر فقط عند وجود تبديل مستقبلي فعلي -->
+      ${nextSwitch ? html`
+        <div class="seasonal-activation-bar">
+          <div class="seasonal-activation-bar__main">
+            <div class="seasonal-activation-bar__item">
+              <span class="seasonal-activation-bar__label">التوقيت المطبق اليوم</span>
+              <strong class="seasonal-activation-bar__val">
+                <span aria-hidden="true">${icon(timingProfileIcon(currentResolved?.name))}</span>
+                <span>${currentResolved?.name || '—'}</span>
+              </strong>
             </div>
-          `
-        )}
-      </div>
-
-      <div class="card card--pad hstack mb-4">
-        <div class="flex">
-          <div class="fw-7 mb-1">التفعيل التلقائي</div>
-          <div class="t-3 fs-sm">تغيير التوقيت تلقائيًا حسب التاريخ</div>
-        </div>
-        <button class="btn btn--sm btn--quiet" data-act="manage-ranges">إدارة الفترات</button>
-      </div>
-
-      <div class="card card--pad">
-        <div class="hstack gap-2 mb-3">
-          <div class="fw-7">${open.name}</div>
-          <button class="btn btn--sm btn--quiet push" data-act="generate">${icon('spark')} توليد سريع</button>
-        </div>
-        ${open.overrides?.config?.assembly?.enabled ? html`
-          <div class="card card--pad mb-3 hstack" style="background: var(--surface-1); border: 1px solid var(--border);">
-            <div class="flex">
-              <div class="fw-7 mb-1">الطابور الصباحي</div>
-              <div class="t-3 fs-sm"><span class="tabular fw-7">${open.overrides.config.assembly.start}</span> (${open.overrides.config.assembly.duration} دقيقة)</div>
+            <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
+            <div class="seasonal-activation-bar__item">
+              <span class="seasonal-activation-bar__label">التبديل الموسمي القادم</span>
+              <strong class="seasonal-activation-bar__val tabular">
+                ${nextSwitch.name} (<span dir="ltr">${nextSwitch.activeFrom}</span>)
+              </strong>
+            </div>
+            <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
+            <div class="seasonal-activation-bar__item">
+              <span class="seasonal-activation-bar__label">التوقيت الافتراضي (الاحتياطي)</span>
+              <strong class="seasonal-activation-bar__val">${active?.name || '—'}</strong>
             </div>
           </div>
-        ` : (open.overrides?.config && open.overrides?.config?.type !== 'hybrid' ? html`
-          <div class="card card--pad mb-3 hstack" style="background: var(--surface-1); border: 1px dashed var(--border);">
-            <div class="flex">
-              <div class="fw-7 mb-1" style="color: var(--text-2);">لا يوجد طابور صباحي</div>
-            </div>
-          </div>
-        ` : '')}
-
-        <div class="field">
-          <span class="field__label">الأوقات المعروضة</span>
-          <div class="chips scroll-x">
-            <button class="chip ${overrideDay === null ? 'is-on' : ''}" data-act="pick-day" data-d="">
-              كل الأيام
-            </button>
-            ${SCHOOL_WEEKDAYS.map(
-              (d) => html`
-                <button class="chip ${overrideDay === d ? 'is-on' : ''}" data-act="pick-day" data-d="${d}">
-                  ${WEEKDAYS[d]}${hasOverride(d) ? ' ✳' : ''}
-                </button>
-              `
-            )}
-          </div>
-          <span class="field__hint">
-            ${overrideDay === null
-              ? 'هذه أوقات كل الأيام. اختر يومًا لتحديد استثناء له.'
-              : `استثناء ${WEEKDAYS[overrideDay]} — إن تُرك فارغًا استُعملت أوقات كل الأيام.`}
-          </span>
         </div>
+      ` : ''}
 
+      <!-- شبكة بطاقات ملفات التوقيت بنظام الإجرائين الصريحين -->
+      <div class="timing-profiles-grid">
+        ${profiles.map((p) => {
+          const isActive = p.id === active?.id;
+          const periodCount = (p.periods ?? []).length;
+          const iconName = timingProfileIcon(p.name);
+          let dataType = 'custom';
+          if (iconName === 'sun') dataType = 'summer';
+          else if (iconName === 'snowflake') dataType = 'winter';
+          else if (iconName === 'crescent') dataType = 'ramadan';
+          else if (iconName === 'device') dataType = 'hybrid';
 
-        ${list.length
-          ? (() => {
-              const filteredList = [];
-              const maxP = Math.max(...list.map(p => p.period));
-              for (let i = 1; i <= maxP; i++) {
-                const p = list.find(x => x.period === i && x.grades?.includes(previewGrade)) 
-                       ?? list.find(x => x.period === i && !x.grades);
-                if (p) filteredList.push(p);
-              }
-              const hasGrades = list.some(p => p.grades);
-              
-              return html`
-                ${hasGrades ? html`
-                  <div class="field mb-3">
-                    <span class="field__label">عرض أوقات</span>
-                    <div class="chips">
-                      <button class="chip ${previewGrade === 4 ? 'is-on' : ''}" data-act="set-preview-grade" data-g="4">الصف الرابع</button>
-                      <button class="chip ${previewGrade === 5 ? 'is-on' : ''}" data-act="set-preview-grade" data-g="5">الخامس والسادس</button>
-                    </div>
+          const startTime = p.periods?.[0]?.start;
+          const endTime = p.periods?.[periodCount - 1]?.end;
+          const models = getProfileModels(p);
+
+          return html`
+            <div class="timing-profile-card ${isActive ? 'is-active-profile' : ''}">
+              <div class="timing-profile-card__head">
+                <div class="timing-profile-card__title-wrap">
+                  <span class="timing-profile-card__icon" data-type="${dataType}" aria-hidden="true">
+                    ${icon(iconName)}
+                  </span>
+                  <div class="timing-profile-card__title-col">
+                    <span class="timing-profile-card__name">${p.name}</span>
+                    <span class="timing-profile-card__sub-status">
+                      ${isActive ? 'التوقيت المعتمد حاليًا' : 'توقيت مخصص'}
+                    </span>
                   </div>
-                ` : ''}
-                <div class="stack stack-2">
-                  ${filteredList.map((t, i) => {
-                    const chunks = [];
-                    if (i > 0) {
-                      const prev = filteredList[i - 1];
-                      const parseTime = (str) => { const [h, m] = str.split(':').map(Number); return h * 60 + m; };
-                      const gapMins = parseTime(t.start) - parseTime(prev.end);
-                      if (gapMins > 0) {
-                        const cfg = open.overrides?.config;
-                        let gradesText = '';
-                        if (cfg?.recess?.rules) {
-                          if (cfg.recess.rules.length === 2) gradesText = 'رابع وخامس وسادس (منفصلة)';
-                          else if (cfg.recess.rules[0]?.grades?.includes(4)) gradesText = 'الصف الرابع';
-                          else gradesText = 'خامس وسادس';
-                        } else {
-                          gradesText = 'جميع الصفوف';
-                        }
-                        
-                        chunks.push(html`
-                          <div class="timerow row-recess my-2">
-                            <div class="recess-badge">فسحة</div>
-                            <div class="timerow__in" style="text-align: start; display: flex; flex-direction: column; justify-content: center; min-height: auto;">
-                              <div style="font-size: 14.5px; font-weight: 700; color: var(--recess); margin-bottom: 2px;">
-                                ${fmtTimeRange(prev.end, t.start)} ص
-                              </div>
-                              <div class="row__sub">${cfg?.recess?.duration || gapMins} دقيقة · تفويج ${cfg?.recess?.transition || 0} دقائق</div>
-                              <div class="row__sub">${gradesText}</div>
-                            </div>
-                            ${cfg?.recess ? html`<button class="iconbtn ms-auto" data-act="edit-recess" aria-label="تعديل الفسحة" style="color: var(--recess);">${icon('edit')}</button>` : ''}
-                          </div>
-                        `);
-                      }
-                    }
-                    chunks.push(html`
-                      <div class="timerow">
-                        <span class="period">${t.period}</span>
-                        <span class="timerow__range" dir="ltr">
-                          <input class="input tabular timerow__in" type="time" value="${t.start}"
-                                 data-change="set-time" data-p="${t.period}" data-k="start"
-                                 data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-s"
-                                 aria-label="بداية الحصة ${t.period}">
-                          <span class="t-3">–</span>
-                          <input class="input tabular timerow__in" type="time" value="${t.end}"
-                                 data-change="set-time" data-p="${t.period}" data-k="end"
-                                 data-fk="t-${open.id}-${overrideDay ?? 'all'}-${t.period}-e"
-                                 aria-label="نهاية الحصة ${t.period}">
-                        </span>
-                        <button class="iconbtn" data-act="del-period" data-p="${t.period}" aria-label="حذف">
-                          ${icon('x')}
-                        </button>
-                      </div>
-                    `);
-                    return chunks;
-                  })}
                 </div>
-                <button class="btn btn--sm btn--ghost btn--block mt-3" data-act="add-period">
-                  ${icon('plus')} حصة إضافية
-                </button>
-              `;
-            })()
-          : html`
-              <div class="card--pad center t-3 fs-md">
-                ${overrideDay === null
-                  ? 'لا أوقات بعد — استعمل «توليد سريع».'
-                  : html`لا استثناء لهذا اليوم.
-                      <button class="btn btn--sm btn--primary mt-3 btn--block" data-act="seed-override">
-                        انسخ أوقات كل الأيام وعدّلها
-                      </button>`}
+                ${isActive
+                  ? html`<span class="badge badge--brand">${icon('check')} التوقيت النشط</span>`
+                  : html`<button class="btn btn--xs btn--ghost" data-act="activate" data-id="${p.id}">تعيين كنشط</button>`}
               </div>
-            `}
+
+              <div class="timing-profile-card__range">
+                ${icon('calendar')}
+                <span>${p.activeFrom ? html`يسري من <strong class="tabular" dir="ltr">${p.activeFrom}</strong>${p.activeTo ? html` إلى <strong class="tabular" dir="ltr">${p.activeTo}</strong>` : ' فصاعدًا'}` : 'تفعيل يدوي (بدون تاريخ مجدول)'}</span>
+              </div>
+
+              <div class="timing-profile-card__specs">
+                <div class="timing-profile-card__spec-item">
+                  <span>عدد الحصص</span>
+                  <strong class="tabular">${periodCount} حصص</strong>
+                </div>
+                <div class="timing-profile-card__spec-item">
+                  <span>أوقات الحصص</span>
+                  <strong class="tabular">${startTime && endTime ? html`<span class="time-range"><span class="time-range__token" dir="ltr">${startTime}</span> – <span class="time-range__token" dir="ltr">${endTime}</span></span>` : '—'}</strong>
+                </div>
+              </div>
+
+              ${models.length > 1 ? html`
+                <div class="hstack justify-between px-2 py-1 bg-sunk rounded fs-xs text-2">
+                  <span>نماذج الحصص:</span>
+                  <strong class="tabular">${models.length} نماذج للصفوف</strong>
+                </div>
+              ` : ''}
+
+              <!-- الإجرائين الصريحين المعتمدين -->
+              <div class="timing-profile-card__actions">
+                <button class="btn btn--sm btn--primary" data-act="edit-times" data-id="${p.id}">
+                  ${icon('clock')} عرض وتعديل أوقات الحصص
+                </button>
+                <div class="timing-profile-card__actions-row">
+                  <button class="btn btn--sm btn--ghost" data-act="rename" data-id="${p.id}">
+                    ${icon('calendar')} تعديل الاسم وفترة سريان التوقيت
+                  </button>
+                  ${!isActive ? html`
+                    <button class="iconbtn iconbtn--xs text-danger" data-act="del-profile" data-id="${p.id}" aria-label="حذف الملف" title="حذف الملف">${icon('trash')}</button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        })}
       </div>
     `;
   },
 
   actions: {
-    open(el) {
-      openId = el.dataset.id;
-      overrideDay = null;
-      repaint();
-    },
-
-    'pick-day'(el) {
-      overrideDay = el.dataset.d === '' ? null : Number(el.dataset.d);
-      repaint();
-    },
-
-    'set-preview-grade'(el) {
-      previewGrade = Number(el.dataset.g);
-      repaint();
-    },
-
     async activate(el) {
       await store.setActiveTimeProfile(el.dataset.id);
       toast('صار الملف النشط — والحصص السابقة تبقى بوقتها');
-    },
-
-    async 'add-profile'() {
-      const config = await generateSheet();
-      if (!config) return;
-      
-      const { generateAdvancedPeriods } = await import('../models.js');
-      const periods = generateAdvancedPeriods(config);
-      
-      const meta = await nameSheet(null);
-      if (!meta) return;
-      
-      const p = await store.createTimeProfile({
-        ...meta,
-        periods,
-        overrides: { config }
-      });
-      openId = p.id;
-      overrideDay = null;
       repaint();
     },
 
-    'edit-recess'() {
-      const p = store.getTimeProfile(openId);
-      if (!p || !p.overrides?.config) return;
-      const cfg = p.overrides.config;
-      const isSep = cfg.recess?.rules?.length === 2;
-      const isG4 = cfg.recess?.rules?.length === 1 && cfg.recess.rules[0].grades.includes(4);
-      const isG56 = cfg.recess?.rules?.length === 1 && cfg.recess.rules[0].grades.includes(5);
-      
-      openSheet({
-        title: 'تعديل الفسحة',
-        body: html`
-          <form id="recess-form">
-            <div class="field-row">
-              <label class="field"><span class="field__label">مدة الفسحة (دقيقة)</span>
-                <input class="input tabular" name="dur" type="number" value="${cfg.recess?.duration || 20}">
-              </label>
-              <label class="field"><span class="field__label">مدة التفويج (دقيقة)</span>
-                <input class="input tabular" name="trans" type="number" value="${cfg.recess?.transition || 0}">
-              </label>
-            </div>
-            <label class="field mt-3">
-              <span class="field__label">تطبيق على</span>
-              <select class="select" name="recGrades" id="rec-grades-sel">
-                <option value="g4" ${isG4 ? 'selected' : ''}>الصف الرابع</option>
-                <option value="g56" ${isG56 ? 'selected' : ''}>الصفان الخامس والسادس</option>
-                <option value="sep" ${isSep ? 'selected' : ''}>منفصلة حسب الصف</option>
-                <option value="all" ${!isSep && !isG4 && !isG56 ? 'selected' : ''}>الجميع</option>
-              </select>
-            </label>
-            <label class="field mt-3" id="rec-after-wrapper" style="display: ${isSep ? 'none' : 'block'};">
-              <span class="field__label">بعد الحصة</span>
-              <input class="input tabular" name="after" type="number" value="${cfg.recess?.afterPeriod || 3}">
-            </label>
-          </form>
-        `,
-        foot: html`
-          <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" form="recess-form" type="submit">حفظ التغييرات</button>
-        `,
-        onMount: (root, done) => {
-          const sel = root.querySelector('#rec-grades-sel');
-          const wrap = root.querySelector('#rec-after-wrapper');
-          sel.addEventListener('change', () => wrap.style.display = sel.value === 'sep' ? 'none' : 'block');
-          
-          root.querySelector('#recess-form').addEventListener('submit', async (ev) => {
-            ev.preventDefault();
-            const fd = new FormData(ev.target);
-            const newCfg = JSON.parse(JSON.stringify(cfg));
-            newCfg.recess = newCfg.recess || { enabled: true };
-            newCfg.recess.enabled = true;
-            newCfg.recess.duration = Number(fd.get('dur'));
-            newCfg.recess.transition = Number(fd.get('trans'));
-            
-            const rType = fd.get('recGrades');
-            const afterP = Number(fd.get('after'));
-            if (rType === 'sep') {
-              newCfg.recess.rules = [{ grades: [4], afterPeriod: 2 }, { grades: [5, 6], afterPeriod: 3 }];
-              delete newCfg.recess.afterPeriod;
-            } else if (rType === 'g4') {
-              newCfg.recess.rules = [{ grades: [4], afterPeriod: afterP }];
-              newCfg.recess.afterPeriod = afterP;
-            } else if (rType === 'g56') {
-              newCfg.recess.rules = [{ grades: [5, 6], afterPeriod: afterP }];
-              newCfg.recess.afterPeriod = afterP;
-            } else {
-              delete newCfg.recess.rules;
-              newCfg.recess.afterPeriod = afterP;
-            }
-            
-            const { generateAdvancedPeriods } = await import('../models.js');
-            const newPeriods = generateAdvancedPeriods(newCfg);
-            
-            await store.patch('timeProfiles', p.id, {
-              periods: newPeriods,
-              overrides: { ...p.overrides, config: newCfg }
-            });
-            done();
-            repaint();
-          });
-        }
-      });
+    'edit-times'(el) {
+      const p = store.getTimeProfile(el.dataset.id);
+      if (!p) return;
+      editPeriodsSheet(p);
     },
 
     async rename(el) {
@@ -684,12 +1445,46 @@ export default {
       const data = await nameSheet(p);
       if (!data) return;
       await store.patch('timeProfiles', p.id, data);
-      toast('حُفظ');
+      toast('تم حفظ بيانات ملف التوقيت');
+      repaint();
     },
 
-    'manage-ranges'() {
-      manageRangesSheet();
+    async 'add-profile'() {
+      // تدفق إنشاء ملف جديد يبدأ بتحديد الاسم والتواريخ أولاً
+      const meta = await nameSheet(null);
+      if (!meta) return;
+
+      const activeProfile = store.activeTimeProfile();
+      const defaultPeriods = (activeProfile?.periods ?? []).map(x => ({ ...x }));
+
+      // الحصص الافتراضية متصلة ولا تفرض فسحة قسرية
+      const newP = await store.createTimeProfile({
+        name: meta.name,
+        activeFrom: meta.activeFrom,
+        activeTo: meta.activeTo,
+        periods: defaultPeriods.length ? defaultPeriods : [
+          { period: 1, start: '07:00', end: '07:45' },
+          { period: 2, start: '07:45', end: '08:30' },
+          { period: 3, start: '08:30', end: '09:15' },
+          { period: 4, start: '09:15', end: '10:00' },
+          { period: 5, start: '10:00', end: '10:45' },
+          { period: 6, start: '10:45', end: '11:30' },
+          { period: 7, start: '11:30', end: '12:15' },
+        ],
+        overrides: {
+          config: {
+            assembly: { enabled: true, start: '06:45', duration: 15 },
+            recess: { enabled: false, afterPeriod: 3, duration: 20, transition: 0 }
+          }
+        }
+      });
+
+      toast(`أُنشئ ملف التوقيت «${newP.name}»`);
+      repaint();
+      // فتح نافذة تعديل أوقات الحصص فوراً للملف الجديد مع خيار التوليد أو التعديل
+      editPeriodsSheet(newP);
     },
+
     async 'del-profile'(el) {
       if (store.timeProfiles().length <= 1) {
         toast('لا يمكن حذف آخر ملف توقيت', 'danger');
@@ -704,62 +1499,14 @@ export default {
       });
       if (!ok) return;
       await store.deleteTimeProfile(el.dataset.id);
-      if (openId === el.dataset.id) openId = store.timeProfiles()[0]?.id ?? null;
-      toast('حُذف الملف');
-    },
-
-    async generate() {
-      const p = store.getTimeProfile(openId);
-      if (!p) return;
-      const cur = listOf(p);
-      const data = await generateSheet({
-        count: cur.length || 7,
-        start: cur[0]?.start ?? '07:00',
-      });
-      if (!data) return;
-      
-      const newPeriods = generateAdvancedPeriods(data);
-      await writeList(p, newPeriods);
-      
-      // Save the config to overrides so we know if it's Hybrid
-      const overrides = { ...(p.overrides ?? {}) };
-      overrides.config = data;
-      await store.patch('timeProfiles', p.id, { overrides });
-      
-      toast('وُلّدت الأوقات');
-    },
-
-    async 'seed-override'() {
-      const p = store.getTimeProfile(openId);
-      if (!p || overrideDay === null) return;
-      await writeList(p, (p.periods ?? []).map((x) => ({ ...x })));
-      toast(`أُنشئ استثناء ${WEEKDAYS[overrideDay]}`);
-    },
-
-    async 'set-time'(el) {
-      const p = store.getTimeProfile(openId);
-      if (!p) return;
-      const period = Number(el.dataset.p);
-      const list = listOf(p).map((t) => (t.period === period ? { ...t, [el.dataset.k]: el.value } : t));
-      await writeList(p, list);
-    },
-
-    async 'add-period'() {
-      const p = store.getTimeProfile(openId);
-      if (!p) return;
-      const list = listOf(p);
-      const last = list.at(-1);
-      const next = last
-        ? buildPeriods(1, last.end, 40, 0)[0]
-        : { period: 0, start: '07:00', end: '07:40' };
-      await writeList(p, [...list, { ...next, period: (last?.period ?? 0) + 1 }]);
-    },
-
-    async 'del-period'(el) {
-      const p = store.getTimeProfile(openId);
-      if (!p) return;
-      const period = Number(el.dataset.p);
-      await writeList(p, listOf(p).filter((t) => t.period !== period));
+      toast('حُذف ملف التوقيت');
+      repaint();
     },
   },
+};
+
+export {
+  reflowPeriodsWithRecess,
+  extractFromProfilePeriods,
+  getProfileModels,
 };

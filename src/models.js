@@ -126,6 +126,9 @@ export const GRADES = [
   { v: 12, label: 'الثالث الثانوي',    stage: 'ثانوي' },
 ];
 
+// Timing-model editing consumes the existing canonical catalog; no second list.
+export const GRADE_CATALOG = GRADES;
+
 export const gradeLabel = (v) => GRADES.find((g) => g.v === Number(v))?.label ?? '';
 
 export const sectionLabel = (sec) => sec ? `${gradeLabel(sec.grade)} / ${sec.label}` : '';

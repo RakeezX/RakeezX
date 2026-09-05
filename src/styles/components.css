@@ -2509,3 +2509,88 @@
     justify-content: center;
   }
 }
+
+/* ---------- SCHEDULE-UX-01: isolated schedule/timing presentation ---------- */
+.compact-timing-pill { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border:1px solid var(--border); border-radius:var(--r-full); background:var(--bg-elev); color:var(--text-2); font-size:12.5px; font-weight:700; text-decoration:none; white-space:nowrap; }
+.compact-timing-pill:hover { color:var(--brand); border-color:var(--brand); }
+.compact-timing-pill__icon { display:grid; place-items:center; color:var(--brand); }
+.compact-timing-pill__icon svg { width:14px; height:14px; }
+.schedule-head,.schedule-summary-bar,.schedule-head__title-group,.schedule-head__actions,.schedule-summary-bar__stats,.schedule-summary-bar__item,.schedule-class-card__head,.schedule-class-card__foot,.timing-profile-card__head,.timing-profile-card__title-wrap,.timing-profile-card__range,.timing-profile-card__actions-row,.slot__top-row,.slot__grade-sec,.slot__actions { display:flex; align-items:center; gap:var(--sp-2); }
+.schedule-head,.schedule-summary-bar { justify-content:space-between; flex-wrap:wrap; margin-bottom:var(--sp-3); }
+.schedule-head__title { color:var(--text-1); font-size:1.35rem; font-weight:800; }
+.schedule-summary-bar { padding:8px 14px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-elev); color:var(--text-2); }
+.schedule-summary-bar__item { white-space:nowrap; }
+.schedule-summary-bar__item strong { color:var(--text-1); }
+.schedule-day-tabs { display:none; }
+.schedule-classes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:var(--sp-3); }
+.schedule-class-card { display:flex; flex-direction:column; gap:6px; padding:14px 16px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-elev); color:inherit; text-decoration:none; }
+.schedule-class-card__foot { justify-content:space-between; padding-top:8px; border-top:1px solid var(--border); }
+.schedule-class-card__title { color:var(--text-1); font-weight:750; }
+.schedule-class-card__sub { color:var(--text-3); font-size:13px; }
+.schedule-class-card .sec-dot,.slot__grade-sec .sec-dot { width:8px; height:8px; flex:none; border-radius:50%; background:var(--sec-color,var(--brand)); }
+.slot { display:flex; align-items:stretch; gap:8px; min-width:0; padding:8px 10px; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-sunk); }
+.slot__side-col { display:flex; align-items:center; justify-content:center; min-width:24px; padding:4px 3px; border:1px solid var(--border); border-radius:4px; background:var(--bg-elev); }
+.slot__period-num { color:var(--brand); font-weight:800; }
+.slot__main-col { flex:1; min-width:0; }
+.slot__grade-sec { min-width:0; font-size:13px; white-space:nowrap; }
+.slot__actions { margin-inline-start:auto; flex:none; }
+.slot__subject { display:block; overflow:hidden; min-width:0; color:var(--text-2); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+.slot__time { color:var(--text-3); font-size:11px; white-space:nowrap; }
+
+.timing-profiles-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--sp-4); }
+.timing-profile-card { display:flex; flex-direction:column; gap:var(--sp-3); padding:var(--sp-4); border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg-elev); }
+.timing-profile-card.is-active-profile { border-color:var(--brand); }
+.timing-profile-card__title-col { display:flex; flex-direction:column; min-width:0; }
+.timing-profile-card__name { overflow:hidden; color:var(--text-1); font-size:15px; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+.timing-profile-card__sub-status,.timing-profile-card__range { color:var(--text-3); font-size:12px; }
+.timing-profile-card__icon { display:grid; place-items:center; width:36px; height:36px; flex:none; border-radius:var(--r-md); background:var(--bg-sunk); color:var(--brand); }
+.timing-profile-card__icon svg { width:19px; height:19px; }
+.timing-profile-card__specs { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; padding:10px; border-radius:var(--r-md); background:var(--bg-sunk); text-align:center; }
+.timing-profile-card__spec-item { display:flex; flex-direction:column; gap:2px; color:var(--text-3); font-size:11px; }
+.timing-profile-card__spec-item strong { color:var(--text-1); font-size:13px; }
+.timing-profile-card__actions { display:flex; flex-direction:column; gap:8px; padding-top:var(--sp-3); margin-top:auto; border-top:1px solid var(--border); }
+.timing-profile-card__actions-row .btn { flex:1; }
+
+.models-bar { display: flex; align-items: center; gap: 8px; padding: 4px 6px; background: var(--bg-sunk); border: 1px solid var(--border); border-radius: var(--r-md); min-width: 0; overflow: visible; }
+.models-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding: 2px 0;
+}
+.models-tab { flex:none; padding:6px 12px; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-elev); color:var(--text-2); white-space:nowrap; }
+.models-tab.is-active { border-color:var(--brand); background:var(--brand); color:#fff; }
+.models-bar__actions { display:flex; align-items:center; gap:6px; flex:0 0 auto; margin-inline-start:auto; }
+.models-bar__action-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-elev); color:var(--text-2); }
+.models-bar__action-btn svg { width:15px; height:15px; }
+.grades-stage-group { margin-bottom:var(--sp-3); }
+.grades-stage-title { margin-bottom:6px; color:var(--text-2); font-size:12px; font-weight:700; }
+.grades-chips-grid { display:flex; flex-wrap:wrap; gap:6px; }
+.grade-chip-label { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-elev); font-size:12px; }
+.generator-action-banner { display:flex; align-items:center; justify-content:space-between; gap:var(--sp-3); padding:10px 14px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-elev); }
+.generator-action-banner__info { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.generator-action-banner__title { font-weight:750; }
+.generator-action-banner__desc { color:var(--text-3); font-size:11.5px; }
+.timerow { display:flex; align-items:center; gap:var(--sp-2); padding:6px 10px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-sunk); }
+.timerow .period { display:grid; place-items:center; width:32px; height:32px; flex:none; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-elev); color:var(--brand); font-weight:800; }
+.timerow__range { display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0; direction:rtl; }
+.timerow__in { width:100%; min-width:0; min-height:38px; direction:ltr; text-align:center; font-variant-numeric:tabular-nums; }
+.timerow--recess { justify-content:space-between; gap:8px; min-width:0; border-style:dashed; border-color:var(--recess); background:var(--recess-soft); }
+.recess-pill { display:inline-flex; align-items:center; gap:5px; flex:none; padding:2px 7px; border-radius:var(--r-sm); background:var(--recess-soft); color:var(--recess); font-weight:700; white-space:nowrap; }
+.recess-dot { width:6px; height:6px; border-radius:50%; background:var(--recess); }
+.recess-info { display:inline-flex; align-items:center; justify-content: center; gap:8px; flex:1 1 auto; min-width:0; text-align:center; white-space:nowrap; }
+.recess-actions { display:inline-flex; gap:4px; flex:none; }
+.recess-edit-btn,.recess-del-btn { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--bg-elev); }
+.recess-del-btn {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+.input--center { text-align: center !important; }
+
+@media (max-width:768px) { .timing-profiles-grid { grid-template-columns:1fr; gap:var(--sp-3); } .schedule-day-tabs { display:flex; gap:6px; overflow-x:auto; margin-bottom:var(--sp-3); } .schedule-day-tab { flex:none; padding:6px 14px; white-space:nowrap; } .week.has-day-filter .week__day:not(.is-selected-day) { display:none; } }
+@media (max-width:540px) { .generator-action-banner { flex-direction:column; align-items:stretch; } .generator-action-banner__btn { width:100%; justify-content:center; } .schedule-summary-bar__stats { width:100%; justify-content:space-between; flex-wrap:wrap; } .schedule-summary-bar__sep { display:none; } }
+@media (max-width:390px) { .timing-profile-card { padding:var(--sp-3); } .recess-info { gap:4px; font-size:11px; } .recess-pill { padding-inline:5px; } }

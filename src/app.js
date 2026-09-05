@@ -507,7 +507,8 @@ async function boot() {
       {},
       {
         get: (_t, key) => {
-          const fn = a?.[key] ?? globals[key];
+          const camelKey = typeof key === 'string' ? key.replace(/-([a-z0-9])/g, (_, letter) => letter.toUpperCase()) : key;
+          const fn = a?.[key] ?? a?.[camelKey] ?? globals[key] ?? globals[camelKey];
           return typeof fn === 'function' ? (el, ev) => fn(el, ev, ctx?.params ?? {}) : undefined;
         },
       }
@@ -609,7 +610,8 @@ const GLOBAL_ACTIONS = {
     } finally {
       el.disabled = false;
       el.innerHTML = prevText;
-      openTeacherMiniHubSheet();
+      // Sync indicators update in place. Reopening here would stack a duplicate
+      // Mini Hub sheet now that timing flows correctly preserve parent sheets.
     }
   },
   'mini-hub-theme': async (el) => {

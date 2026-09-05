@@ -5,7 +5,7 @@
  * وما لم يُبنَ بعد يظهر كمنطقة معلّمة بوضوح — **بلا بيانات وهمية إطلاقًا**.
  */
 
-import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast } from '../lib/dom.js';
+import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
 import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
@@ -99,14 +99,19 @@ export default {
     const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
 
     return html`
-      <!-- ترحيب وتاريخ اليوم -->
+      <!-- الترحيب ومؤشر التوقيت في صف واحد؛ لا يغيّر ترتيب حصص اليوم. -->
       <div class="hero">
-        <div class="hero__hello">
-          ${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك في RAKEEZ X'}
+        <div class="hero__main-row">
+          <div class="hero__hello">
+            ${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك في RAKEEZ X'}
+          </div>
+          <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
+            <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(timingProfile))}</span>
+            <span>${timingProfile}</span>
+          </a>
         </div>
         <div class="hero__date">
           ${WEEKDAYS[weekday(today)]} · ${fmtDate(today, false)}
-          <span class="hub-head__timing-pill" title="ملف التوقيت المعتمد"><span class="hub-head__timing-icon">${icon('clock')}</span><span>${timingProfile}</span></span>
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>

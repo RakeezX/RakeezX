@@ -645,3 +645,7 @@ a { color: var(--brand); text-underline-offset: 3px; }
 
 :root { --recess: #d97706; --recess-soft: #fef3c7; }
 :root[data-theme="dark"] { --recess: #b45309; --recess-soft: #451a03; }
+
+/* SCHEDULE-UX-01: only compact numeric/time controls are centered. */
+.input--center, input.input--center { text-align: center !important; font-variant-numeric: tabular-nums lining-nums; }
+.hero__main-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
