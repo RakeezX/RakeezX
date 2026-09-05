@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { normalizeTimeDigits, html, raw } from '../src/lib/dom.js';
-import { GRADE_CATALOG, generateAdvancedPeriods } from '../src/models.js';
+import { GRADE_CATALOG, generateAdvancedPeriods, isValidRecessPosition, recessPositions } from '../src/models.js';
 
 test('normalizeTimeDigits forces ASCII Western digits and HH:MM format', () => {
   assert.strictEqual(normalizeTimeDigits('٠٧:٣٠'), '07:30');
@@ -45,6 +45,27 @@ test('generateAdvancedPeriods supports optional recess (zero recess if disabled)
   for (let i = 1; i < periods.length; i++) {
     assert.strictEqual(periods[i].start, periods[i - 1].end, `Period ${i + 1} start must equal Period ${i} end`);
   }
+});
+
+test('recess placement is limited to boundaries between existing periods', async () => {
+  assert.deepStrictEqual(recessPositions(1), []);
+  assert.deepStrictEqual(recessPositions(4), [1, 2, 3]);
+  assert.strictEqual(isValidRecessPosition(0, 4), false);
+  assert.strictEqual(isValidRecessPosition(-1, 4), false);
+  assert.strictEqual(isValidRecessPosition(4, 4), false);
+  assert.strictEqual(isValidRecessPosition(2, 4), true);
+
+  const config = {
+    firstPeriodStart: '07:00', periodDuration: 45, count: 4, gap: 0,
+    recess: { enabled: true, afterPeriod: 0, duration: 20, transition: 0 },
+  };
+  const periods = generateAdvancedPeriods(config);
+  assert.deepStrictEqual(periods.map((period) => period.start), ['07:00', '07:45', '08:30', '09:15']);
+
+  const { reflowPeriodsWithRecess } = await import('../src/views/times.js');
+  const basePeriods = periods.map((period) => ({ ...period }));
+  const reflowed = reflowPeriodsWithRecess(basePeriods, { afterPeriod: -1, recessDuration: 20 });
+  assert.deepStrictEqual(reflowed.map((period) => period.start), ['07:00', '07:45', '08:30', '09:15']);
 });
 
 test('html and raw template rendering never yields [object Object] during interpolation or string conversion', () => {

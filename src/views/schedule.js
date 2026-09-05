@@ -140,15 +140,34 @@ function slotSheet(defaults = {}) {
       const day = root.querySelector("#slot-day");
       const period = root.querySelector("#slot-period");
       const text = root.querySelector("#slot-time-text");
+      const submit = root.querySelector('[form="slot-form"][type="submit"]');
+
+      const occupiedSlot = (weekday, period) => store.allSlots().find((slot) => (
+        slot.id !== defaults.id
+        && Number(slot.weekday) === Number(weekday)
+        && Number(slot.period) === Number(period)
+      ));
+
+      const occupiedLabel = (slot) => {
+        const teaching = store.getTeaching(slot?.teachingId);
+        const section = store.getSection(teaching?.sectionId);
+        return section ? shortClassLabel(section) : 'فصل آخر';
+      };
 
       const sync = () => {
         const tchId = form.querySelector('[name="teachingId"]')?.value;
         const nums = store.availablePeriods(Number(day.value), profile);
         const wanted = Number(period.value);
         period.innerHTML = nums
-          .map((p) => `<option value="${p}"${p === wanted ? " selected" : ""}>الحصة ${p}</option>`)
+          .map((p) => {
+            const occupied = occupiedSlot(day.value, p);
+            return `<option value="${p}"${p === wanted ? " selected" : ""}${occupied ? " disabled" : ""}>الحصة ${p}${occupied ? ` — مشغولة (${occupiedLabel(occupied)})` : ""}</option>`;
+          })
           .join("");
-        if (!nums.includes(wanted) && nums.length) period.value = String(nums[0]);
+        const available = nums.filter((p) => !occupiedSlot(day.value, p));
+        if (!available.includes(wanted)) period.value = available.length ? String(available[0]) : "";
+        period.disabled = !available.length;
+        if (submit) submit.disabled = !available.length;
         render(text, timeHint(day.value, period.value, tchId));
       };
       day.addEventListener("change", sync);
@@ -161,10 +180,16 @@ function slotSheet(defaults = {}) {
         const fd = new FormData(ev.target);
         const teachingId = String(fd.get("teachingId") ?? "");
         if (!teachingId) return;
+        const weekday = Number(fd.get("weekday"));
+        const selectedPeriod = Number(fd.get("period"));
+        if (!Number.isInteger(selectedPeriod) || occupiedSlot(weekday, selectedPeriod)) {
+          toast("لديك حصة مسجلة بالفعل في هذا الوقت.", "danger");
+          return;
+        }
         done({
           teachingId,
-          weekday: Number(fd.get("weekday")),
-          period: Number(fd.get("period")),
+          weekday,
+          period: selectedPeriod,
         });
       });
     },

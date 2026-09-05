@@ -6,7 +6,7 @@
 
 import { html, render, icon, openSheet, confirmSheet, toast, fmtTimeRange, timingProfileIcon, normalizeTimeDigits } from '../lib/dom.js';
 import * as store from '../store.js';
-import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, makeTimeProfile, todayISO, GRADE_CATALOG, uid } from '../models.js';
+import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, isValidRecessPosition, makeTimeProfile, recessPositions, todayISO, GRADE_CATALOG, uid } from '../models.js';
 import { repaint } from '../repaint.js';
 
 /** توليد نص عربي منسق للصفوف لضمان عدم ظهور [object Object] */
@@ -69,8 +69,8 @@ function reflowPeriodsWithRecess(basePeriods, { afterPeriod = 0, recessDuration 
   let cursor = parseMins(firstStart);
 
   const count = basePeriods.length;
-  const targetAfter = Number(afterPeriod) || 0;
-  const totalRecess = (targetAfter > 0 && targetAfter < count && Number(recessDuration) > 0)
+  const targetAfter = isValidRecessPosition(afterPeriod, count) ? Number(afterPeriod) : 0;
+  const totalRecess = (targetAfter && Number(recessDuration) > 0)
     ? Number(recessDuration) + Number(transition || 0)
     : 0;
 
@@ -107,7 +107,6 @@ function getProfileModels(p) {
       const gradesLabel = typeof m.gradesLabel === 'string' && m.gradesLabel.trim()
         ? m.gradesLabel.trim()
         : formatGradesLabel(grades);
-      const afterPeriod = Number(m.afterPeriod || 0);
       const recessDuration = Number(m.recessDuration || 20);
       const recessTransition = Number(m.recessTransition || 0);
       const periods = Array.isArray(m.periods) && m.periods.length > 0
@@ -119,7 +118,7 @@ function getProfileModels(p) {
         name: String(name),
         grades,
         gradesLabel: String(gradesLabel),
-        afterPeriod,
+        afterPeriod: isValidRecessPosition(m.afterPeriod, periods.length) ? Number(m.afterPeriod) : 0,
         recessDuration,
         recessTransition,
         periods
@@ -157,7 +156,9 @@ function getProfileModels(p) {
       name: 'النموذج الأساسي',
       grades: [],
       gradesLabel: 'جميع الصفوف',
-      afterPeriod: Number(p.overrides?.config?.recess?.afterPeriod || 0),
+      afterPeriod: isValidRecessPosition(p.overrides?.config?.recess?.afterPeriod, (p.periods ?? []).length)
+        ? Number(p.overrides.config.recess.afterPeriod)
+        : 0,
       recessDuration: Number(p.overrides?.config?.recess?.duration || 20),
       recessTransition: Number(p.overrides?.config?.recess?.transition || 0),
       periods: (p.periods ?? []).map(x => ({ ...x }))
@@ -185,7 +186,12 @@ const ORDINAL_ARABIC = {
  * مدخلات مدرسية مباشرة — والفسحة اختيارية صريحة غير مفروضة
  */
 function generateSheet(current = {}) {
-  let hasRecess = Boolean(current.recessDuration && current.recessDuration > 0);
+  const initialCount = Number(current.count) || 7;
+  const initialPositions = recessPositions(initialCount);
+  let hasRecess = Boolean(current.recessDuration && current.recessDuration > 0 && initialPositions.length);
+  const initialAfter = isValidRecessPosition(current.recessAfter, initialCount)
+    ? Number(current.recessAfter)
+    : initialPositions[Math.min(2, initialPositions.length - 1)];
 
   return openSheet({
     title: 'توليد أوقات الحصص تلقائيًا',
@@ -212,6 +218,10 @@ function generateSheet(current = {}) {
             <span class="field__label">عدد الحصص *</span>
             <input class="input tabular input--center" name="count" type="text" inputmode="numeric" maxlength="2" value="${(current.count && current.count <= 10) ? current.count : 7}" required dir="ltr">
           </label>
+          <label class="field">
+            <span class="field__label">الفاصل بين الحصص (دقائق)</span>
+            <input class="input tabular input--center" name="gap" type="text" inputmode="numeric" maxlength="2" value="${current.gap ?? 0}" dir="ltr">
+          </label>
         </div>
 
         <!-- قسم الفسحة المدرسية الاختيارية -->
@@ -226,7 +236,7 @@ function generateSheet(current = {}) {
             <div class="field-row mt-2">
               <label class="field">
                 <span class="field__label">موضع الفسحة (بعد الحصة رقم)</span>
-                <input class="input tabular input--center" name="recessAfter" type="text" inputmode="numeric" maxlength="2" value="${current.recessAfter || 3}" dir="ltr">
+                <select class="select select--rtl" name="recessAfter" dir="rtl"></select>
               </label>
               <label class="field">
                 <span class="field__label">مدة الفسحة (بالدقائق)</span>
@@ -237,10 +247,6 @@ function generateSheet(current = {}) {
               <label class="field">
                 <span class="field__label">مدة التفويج بعد الفسحة (دقائق)</span>
                 <input class="input tabular input--center" name="recessTransition" type="text" inputmode="numeric" maxlength="2" value="${current.recessTransition ?? 5}" dir="ltr">
-              </label>
-              <label class="field">
-                <span class="field__label">الفاصل بين الحصص (دقائق)</span>
-                <input class="input tabular input--center" name="gap" type="text" inputmode="numeric" maxlength="2" value="${current.gap ?? 0}" dir="ltr">
               </label>
             </div>
           </div>
@@ -254,8 +260,28 @@ function generateSheet(current = {}) {
     onMount: (root, done) => {
       const toggleBtn = root.querySelector('#gen-toggle-recess');
       const recessFields = root.querySelector('#gen-recess-fields');
+      const countInput = root.querySelector('[name="count"]');
+      const recessAfter = root.querySelector('[name="recessAfter"]');
+
+      const syncRecessPositions = () => {
+        const positions = recessPositions(Number(countInput?.value));
+        const selected = Number(recessAfter?.value) || initialAfter;
+        recessAfter.innerHTML = positions.map((position) => {
+          const ordinal = ORDINAL_ARABIC[position] || position;
+          return `<option value="${position}"${position === selected ? ' selected' : ''}>بعد الحصة ${ordinal}</option>`;
+        }).join('');
+        const available = positions.length > 0;
+        toggleBtn.disabled = !available;
+        if (!available && hasRecess) {
+          hasRecess = false;
+          recessFields.style.display = 'none';
+          toggleBtn.className = 'btn btn--xs btn--quiet';
+          toggleBtn.innerHTML = `${icon('plus')} إضافة فسحة`;
+        }
+      };
       
       toggleBtn?.addEventListener('click', () => {
+        if (!recessPositions(Number(countInput?.value)).length) return;
         hasRecess = !hasRecess;
         if (hasRecess) {
           recessFields.style.display = '';
@@ -267,6 +293,9 @@ function generateSheet(current = {}) {
           toggleBtn.innerHTML = `${icon('plus')} إضافة فسحة`;
         }
       });
+
+      countInput?.addEventListener('input', syncRecessPositions);
+      syncRecessPositions();
 
       // توحيد الأرقام 0-9 والتوقيت HH:MM على كافة المدخلات
       root.querySelectorAll('input').forEach(inp => {
@@ -290,10 +319,15 @@ function generateSheet(current = {}) {
         const firstPeriodStart = normalizeTimeDigits(String(fd.get('firstPeriodStart') || '07:00')).trim() || '07:00';
         const periodDuration = parseInt(String(fd.get('periodDuration') || '45').replace(/[^0-9]/g, ''), 10) || 45;
         const count = parseInt(String(fd.get('count') || '7').replace(/[^0-9]/g, ''), 10) || 7;
-        const recessAfter = parseInt(String(fd.get('recessAfter') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+        const recessAfter = Number(fd.get('recessAfter'));
         const recessDuration = hasRecess ? (parseInt(String(fd.get('recessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20) : 0;
         const recessTransition = hasRecess ? (parseInt(String(fd.get('recessTransition') || '0').replace(/[^0-9]/g, ''), 10) || 0) : 0;
-        const gap = hasRecess ? (parseInt(String(fd.get('gap') || '0').replace(/[^0-9]/g, ''), 10) || 0) : 0;
+        const gap = parseInt(String(fd.get('gap') || '0').replace(/[^0-9]/g, ''), 10) || 0;
+
+        if (hasRecess && !isValidRecessPosition(recessAfter, count)) {
+          toast('اختر موضع فسحة بين حصتين موجودتين', 'danger');
+          return;
+        }
 
         const config = {
           firstPeriodStart,
@@ -416,9 +450,13 @@ function nameSheet(existing = null) {
  * نافذة ضبط الفسحة المدرسية — إضافة أو تعديل
  */
 function openRecessConfigSheet({ isEdit = false, currentAfter = 3, currentDur = 20, currentTrans = 0, maxPeriods = 7, onSave }) {
+  const positions = recessPositions(maxPeriods);
+  if (!positions.length) {
+    toast('يلزم وجود حصتين على الأقل لإضافة فسحة بينهما', 'danger');
+    return;
+  }
   const options = [];
-  const limit = Math.max(1, maxPeriods - 1);
-  for (let i = 1; i <= limit; i++) {
+  for (const i of positions) {
     const ord = ORDINAL_ARABIC[i] || i;
     options.push(html`<option value="${i}" ${i === currentAfter ? 'selected' : ''}>بعد الحصة ${ord}</option>`);
   }
@@ -457,9 +495,14 @@ function openRecessConfigSheet({ isEdit = false, currentAfter = 3, currentDur = 
       rRoot.querySelector('#recess-config-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
-        const afterPeriod = parseInt(String(fd.get('afterPeriod') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+        const afterPeriod = Number(fd.get('afterPeriod'));
         const duration = parseInt(String(fd.get('duration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
         const transition = parseInt(String(fd.get('transition') || '0').replace(/[^0-9]/g, ''), 10) || 0;
+
+        if (!isValidRecessPosition(afterPeriod, maxPeriods)) {
+          toast('اختر موضع فسحة بين حصتين موجودتين', 'danger');
+          return;
+        }
 
         onSave({ afterPeriod, duration, transition });
         rDone();
@@ -492,9 +535,11 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
     }
   }
 
+  if (!isValidRecessPosition(curRecessAfter, pList.length)) curRecessAfter = 0;
+
+  const positions = recessPositions(pList.length);
   const options = [];
-  const limit = Math.max(1, pList.length - 1);
-  for (let i = 1; i <= limit; i++) {
+  for (const i of positions) {
     const ord = ORDINAL_ARABIC[i] || i;
     options.push(html`<option value="${i}" ${i === curRecessAfter ? 'selected' : ''}>بعد الحصة ${ord}</option>`);
   }
@@ -577,7 +622,7 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
               <input type="checkbox" name="deleteRecess" value="1">
               <span>إزالة الفسحة من هذا النموذج (بدون فسحة)</span>
             </label>
-          ` : html`
+          ` : positions.length ? html`
             <label class="fs-xs pointer hstack gap-1">
               <input type="checkbox" name="addRecess" value="1" id="edit-model-add-recess-chk">
               <span>إضافة فسحة مدرسية لهذا النموذج</span>
@@ -594,7 +639,7 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
                 <input class="input tabular input--center" name="newRecessDuration" type="text" inputmode="numeric" maxlength="3" value="20" dir="ltr">
               </label>
             </div>
-          `}
+          ` : html`<p class="fs-sm t-3 mb-0">يلزم وجود حصتين على الأقل لإضافة فسحة.</p>`}
         </div>
 
         ${models.length > 1 ? html`
@@ -647,13 +692,21 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
           if (fd.get('deleteRecess')) {
             recessChange = { afterPeriod: 0, duration: 0 };
           } else {
-            const after = parseInt(String(fd.get('recessAfter') || curRecessAfter).replace(/[^0-9]/g, ''), 10) || curRecessAfter;
+            const after = Number(fd.get('recessAfter'));
             const dur = parseInt(String(fd.get('recessDuration') || curRecessDur).replace(/[^0-9]/g, ''), 10) || curRecessDur;
+            if (!isValidRecessPosition(after, pList.length)) {
+              toast('اختر موضع فسحة بين حصتين موجودتين', 'danger');
+              return;
+            }
             recessChange = { afterPeriod: after, duration: dur };
           }
         } else if (fd.get('addRecess')) {
-          const after = parseInt(String(fd.get('newRecessAfter') || '3').replace(/[^0-9]/g, ''), 10) || 3;
+          const after = Number(fd.get('newRecessAfter'));
           const dur = parseInt(String(fd.get('newRecessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
+          if (!isValidRecessPosition(after, pList.length)) {
+            toast('اختر موضع فسحة بين حصتين موجودتين', 'danger');
+            return;
+          }
           recessChange = { afterPeriod: after, duration: dur };
         }
 
@@ -920,9 +973,9 @@ function editPeriodsSheet(profile) {
             const middleGrades = GRADE_CATALOG.filter(g => g.stage === 'متوسط');
             const secondaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ثانوي');
 
+            const positions = recessPositions(currentModel.periods.length);
             const options = [];
-            const limit = Math.max(1, (currentModel.periods.length || 7) - 1);
-            for (let i = 1; i <= limit; i++) {
+            for (const i of positions) {
               const ord = ORDINAL_ARABIC[i] || i;
               options.push(html`<option value="${i}">بعد الحصة ${ord}</option>`);
             }
@@ -981,7 +1034,7 @@ function editPeriodsSheet(profile) {
                     <label class="field">
                       <span class="field__label">موضع الفسحة لهذا النموذج</span>
                       <select class="select select--rtl" name="afterPeriod" dir="rtl">
-                        <option value="0">بدون فسحة</option>
+                        <option value="">بدون فسحة</option>
                         ${options}
                       </select>
                     </label>
@@ -1003,8 +1056,14 @@ function editPeriodsSheet(profile) {
                   const checkedGrades = Array.from(mRoot.querySelectorAll('input[name="grades"]:checked')).map(el => Number(el.value));
                   const gradesLabel = formatGradesLabel(checkedGrades);
                   const name = String(fd.get('modelName') || '').trim() || defaultModelName;
-                  const afterPeriod = parseInt(String(fd.get('afterPeriod') || '2').replace(/[^0-9]/g, ''), 10) || 0;
+                  const selectedAfter = String(fd.get('afterPeriod') || '');
+                  const afterPeriod = selectedAfter === '' ? 0 : Number(selectedAfter);
                   const recessDuration = parseInt(String(fd.get('recessDuration') || '20').replace(/[^0-9]/g, ''), 10) || 20;
+
+                  if (afterPeriod && !isValidRecessPosition(afterPeriod, currentModel.periods.length)) {
+                    toast('اختر موضع فسحة بين حصتين موجودتين', 'danger');
+                    return;
+                  }
 
                   const newPeriods = reflowPeriodsWithRecess(currentModel.periods, {
                     afterPeriod,
@@ -1109,7 +1168,11 @@ function editPeriodsSheet(profile) {
         // Edit recess action
         root.querySelectorAll('button[data-act="edit-recess"]').forEach(btn => {
           btn.addEventListener('click', () => {
-            const afterPeriod = Number(btn.dataset.after) || 3;
+            const afterPeriod = Number(btn.dataset.after);
+            if (!isValidRecessPosition(afterPeriod, activePeriods.length)) {
+              toast('موضع الفسحة الحالي غير صالح؛ أضف فسحة جديدة بين حصتين', 'danger');
+              return;
+            }
             const gapMins = Number(btn.dataset.gap) || 20;
             openRecessConfigSheet({
               isEdit: true,

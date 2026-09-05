@@ -300,6 +300,18 @@ export function buildPeriods(count, startTime, minutes, breakMinutes) {
  *   }
  * }
  */
+export function isValidRecessPosition(afterPeriod, count) {
+  const position = Number(afterPeriod);
+  const periods = Number(count);
+  return Number.isInteger(position) && Number.isInteger(periods) && position >= 1 && position < periods;
+}
+
+export function recessPositions(count) {
+  const periods = Number(count);
+  if (!Number.isInteger(periods) || periods < 2) return [];
+  return Array.from({ length: periods - 1 }, (_, index) => index + 1);
+}
+
 export function generateAdvancedPeriods(config) {
   const parseTime = (t) => {
     const [h, m] = t.split(':').map(Number);
@@ -311,17 +323,23 @@ export function generateAdvancedPeriods(config) {
   };
 
   const periods = [];
-  const rules = config.recess?.enabled && config.recess?.rules?.length ? config.recess.rules : [];
+  const count = Number(config.count) || 0;
+  const rules = config.recess?.enabled && config.recess?.rules?.length
+    ? config.recess.rules.filter((rule) => isValidRecessPosition(rule.afterPeriod, count))
+    : [];
+  const globalRecessAfter = isValidRecessPosition(config.recess?.afterPeriod, count)
+    ? Number(config.recess.afterPeriod)
+    : null;
   
   if (!rules.length) {
     // Basic flat generation, but check if there's a simple global recess
     let cursor = parseTime(config.firstPeriodStart);
-    for (let i = 1; i <= config.count; i++) {
+    for (let i = 1; i <= count; i++) {
       const start = cursor;
       const end = start + config.periodDuration;
       periods.push({ period: i, start: fmt(start), end: fmt(end) });
       cursor = end;
-      if (config.recess?.enabled && i === (config.recess.afterPeriod || 3)) {
+      if (config.recess?.enabled && i === globalRecessAfter) {
         cursor += (config.recess.duration || 0) + (config.recess.transition || 0);
       } else {
         cursor += (config.gap || 0);
@@ -341,7 +359,7 @@ export function generateAdvancedPeriods(config) {
 
   for (let path of paths) {
     let cursor = parseTime(config.firstPeriodStart);
-    for (let i = 1; i <= config.count; i++) {
+    for (let i = 1; i <= count; i++) {
       const start = cursor;
       const end = start + config.periodDuration;
       
