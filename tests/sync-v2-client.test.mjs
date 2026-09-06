@@ -1,0 +1,501 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { IDBFactory } from 'fake-indexeddb';
+
+import { STORES } from '../src/lib/db.js';
+import { createSyncV2Engine } from '../src/lib/sync-v2.js';
+
+const clone = (value) => value == null ? value : structuredClone(value);
+
+function requestResult(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function transactionDone(transaction) {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error ?? new Error('transaction aborted'));
+  });
+}
+
+class IsolatedIndexedDb {
+  constructor(name) {
+    this.name = name;
+    this.factory = new IDBFactory();
+    this.connection = null;
+    this.failNextStore = null;
+  }
+
+  async open() {
+    if (this.connection) return this.connection;
+    const request = this.factory.open(this.name, 1);
+    request.onupgradeneeded = () => {
+      for (const store of STORES) request.result.createObjectStore(store, { keyPath: 'id' });
+    };
+    this.connection = await requestResult(request);
+    return this.connection;
+  }
+
+  async getAll(store) {
+    const connection = await this.open();
+    return requestResult(connection.transaction(store, 'readonly').objectStore(store).getAll());
+  }
+
+  async get(store, id) {
+    const connection = await this.open();
+    return requestResult(connection.transaction(store, 'readonly').objectStore(store).get(id));
+  }
+
+  async applyBatch(batch, { prepare } = {}) {
+    const names = Object.keys(batch);
+    const connection = await this.open();
+    const transaction = connection.transaction(names, 'readwrite');
+    let failure;
+    const completion = transactionDone(transaction);
+    try {
+      const current = {};
+      for (const name of names) current[name] = await requestResult(transaction.objectStore(name).getAll());
+      const writes = prepare ? prepare(current) : batch;
+      if (!writes || typeof writes.then === 'function') throw new TypeError('prepare must be synchronous');
+      for (const [name, operations] of Object.entries(writes)) {
+        if (this.failNextStore === name) {
+          this.failNextStore = null;
+          throw new Error(`injected ${name} write failure`);
+        }
+        const store = transaction.objectStore(name);
+        for (const id of operations.remove ?? []) store.delete(id);
+        for (const record of operations.put ?? []) store.put(record);
+      }
+    } catch (error) {
+      failure = error;
+      transaction.abort();
+    }
+    try {
+      await completion;
+    } catch (error) {
+      throw failure ?? error;
+    }
+  }
+
+  close() {
+    this.connection?.close();
+    this.connection = null;
+  }
+}
+
+const FIELD_GROUPS = {
+  students: { name: 'name', note: 'note', status: 'status' },
+  subjects: { name: 'name', slug: 'identity' },
+  scores: { student_id: 'identity', item_id: 'identity', value: 'value' },
+  teachings: { section_id: 'identity', subject_id: 'identity', term_id: 'identity', order: 'order' },
+};
+
+class MemoryV2Server {
+  constructor() {
+    this.tables = new Map();
+    this.receipts = new Map();
+    this.calls = [];
+  }
+
+  table(entity) {
+    if (!this.tables.has(entity)) this.tables.set(entity, new Map());
+    return this.tables.get(entity);
+  }
+
+  naturalCanonical(entity, patch) {
+    if (entity !== 'subjects' || patch.slug == null) return null;
+    return [...this.table(entity).values()].find((row) => row.slug === patch.slug) ?? null;
+  }
+
+  group(entity, field) {
+    return FIELD_GROUPS[entity]?.[field] ?? field;
+  }
+
+  async applyMutation(envelope) {
+    this.calls.push(clone(envelope));
+    const previous = this.receipts.get(envelope.mutationId);
+    if (previous) {
+      assert.deepEqual(envelope, previous.envelope, 'a retried mutation must retain its exact envelope');
+      return clone(previous.result);
+    }
+
+    const table = this.table(envelope.entity);
+    let row = table.get(envelope.recordId) ?? null;
+    let outcome = 'applied';
+    let canonicalId = envelope.recordId;
+    let appliedGroups = [];
+    let conflictedGroups = [];
+
+    if (envelope.operation === 'create') {
+      const natural = this.naturalCanonical(envelope.entity, envelope.patch);
+      if (natural && natural.id !== envelope.recordId) {
+        row = natural;
+        canonicalId = natural.id;
+        outcome = natural.deleted_at ? 'tombstoned' : 'canonicalized';
+        conflictedGroups = [natural.deleted_at ? '__deleted__' : '__canonical__'];
+      } else if (row) {
+        outcome = 'conflict';
+        conflictedGroups = ['__record__'];
+      } else {
+        const groups = [...new Set(Object.keys(envelope.patch).map((field) => this.group(envelope.entity, field)))];
+        row = {
+          id: envelope.recordId,
+          ...clone(envelope.patch),
+          revision: 1,
+          field_revisions: Object.fromEntries(groups.map((group) => [group, 1])),
+          deleted_at: null,
+          client_updated_at: envelope.clientUpdatedAt,
+        };
+        appliedGroups = groups;
+        table.set(row.id, row);
+      }
+    } else if (!row) {
+      outcome = 'not_found';
+      conflictedGroups = ['__record__'];
+    } else if (row.deleted_at && envelope.operation !== 'delete') {
+      outcome = 'tombstoned';
+      conflictedGroups = ['__deleted__'];
+    } else if (envelope.operation === 'delete') {
+      if (row.deleted_at) {
+        outcome = 'already_deleted';
+      } else {
+        row = { ...row, deleted_at: new Date().toISOString(), revision: row.revision + 1 };
+        table.set(row.id, row);
+        outcome = 'deleted';
+        appliedGroups = ['__deleted__'];
+      }
+    } else {
+      const fields = Object.keys(envelope.patch);
+      const groups = [...new Set(fields.map((field) => this.group(envelope.entity, field)))];
+      conflictedGroups = groups.filter((group) => (row.field_revisions?.[group] ?? 1) > envelope.baseRevision);
+      appliedGroups = groups.filter((group) => !conflictedGroups.includes(group));
+      const effective = Object.fromEntries(fields.filter((field) => appliedGroups.includes(this.group(envelope.entity, field))).map((field) => [field, clone(envelope.patch[field])]));
+      if (Object.keys(effective).length) {
+        const revision = row.revision + 1;
+        row = {
+          ...row,
+          ...effective,
+          revision,
+          field_revisions: {
+            ...(row.field_revisions ?? {}),
+            ...Object.fromEntries(appliedGroups.map((group) => [group, revision])),
+          },
+          client_updated_at: envelope.clientUpdatedAt,
+        };
+        table.set(row.id, row);
+      }
+      outcome = conflictedGroups.length ? (appliedGroups.length ? 'applied_with_conflicts' : 'conflict') : 'applied';
+    }
+
+    const result = {
+      mutationId: envelope.mutationId,
+      entity: envelope.entity,
+      recordId: envelope.recordId,
+      canonicalId: row?.id ?? canonicalId,
+      outcome,
+      appliedGroups,
+      conflictedGroups,
+      resultRevision: row?.revision ?? null,
+      canonical: clone(row),
+    };
+    this.receipts.set(envelope.mutationId, { envelope: clone(envelope), result: clone(result) });
+    return result;
+  }
+
+  async fetchRecords(entity) {
+    return clone([...this.table(entity).values()]);
+  }
+}
+
+let sequence = 0;
+function makeClient(server, label, overrides = {}) {
+  const database = new IsolatedIndexedDb(`sync-v2-${label}-${++sequence}`);
+  let clock = 1_800_000_000_000;
+  let ids = 0;
+  const engine = createSyncV2Engine({
+    database,
+    transport: overrides.transport ?? server,
+    now: () => ++clock,
+    makeId: () => `${label}-${++ids}`,
+  });
+  return { database, engine };
+}
+
+test('Sync V2 atomically persists optimistic data and a durable outbox mutation', async (t) => {
+  const server = new MemoryV2Server();
+  const client = makeClient(server, 'atomic');
+  t.after(() => client.database.close());
+
+  client.database.failNextStore = 'outbox';
+  await assert.rejects(() => client.engine.commitMutation({
+    store: 'students', recordId: 'student-1', op: 'create', patch: { name: 'Student A', note: '' },
+  }), /injected outbox/);
+  assert.equal(await client.database.get('students', 'student-1'), undefined);
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+
+  const committed = await client.engine.commitMutation({
+    store: 'students', recordId: 'student-1', op: 'create', patch: { name: 'Student A', note: '' },
+  });
+  assert.equal((await client.database.get('students', 'student-1')).name, 'Student A');
+  assert.equal((await client.database.getAll('outbox'))[0].mutationId, committed.mutation.mutationId);
+  assert.equal(await client.engine.ensureDeviceId(), committed.mutation.deviceId);
+  assert.equal(await client.engine.ensureDeviceId(), committed.mutation.deviceId);
+  const command = await client.engine.queueCommand({
+    store: 'enrollments', recordId: 'enrollment-command', command: 'transfer',
+    patch: { destinationSectionId: 'section-2' }, groups: ['membership'],
+    dependencies: [{ store: 'students', recordId: 'student-1' }],
+  });
+  assert.equal(command.op, 'command');
+  assert.equal(command.deviceId, committed.mutation.deviceId);
+  assert.equal(command.state, 'pending');
+});
+
+test('lost response retries the exact mutationId and clears one receipt without duplication', async (t) => {
+  const server = new MemoryV2Server();
+  let loseFirstResponse = true;
+  const transport = {
+    fetchRecords: (entity) => server.fetchRecords(entity),
+    async applyMutation(envelope) {
+      const result = await server.applyMutation(envelope);
+      if (loseFirstResponse) {
+        loseFirstResponse = false;
+        throw new Error('response lost after commit');
+      }
+      return result;
+    },
+  };
+  const client = makeClient(server, 'lost', { transport });
+  t.after(() => client.database.close());
+
+  const { mutation } = await client.engine.commitMutation({
+    store: 'students', recordId: 'student-lost', op: 'create', patch: { name: 'Student Lost' },
+  });
+  assert.equal((await client.engine.dispatchPending()).failed, 1);
+  assert.equal((await client.database.getAll('outbox')).length, 1);
+  assert.equal((await client.engine.dispatchPending()).acknowledged, 1);
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+  assert.equal(server.receipts.size, 1);
+  assert.equal(server.table('students').size, 1);
+  assert.equal(server.calls[0].mutationId, mutation.mutationId);
+  assert.equal(server.calls[1].mutationId, mutation.mutationId);
+});
+
+test('different-field stale edits survive while same-field conflicts retain diagnostics and do not stop unrelated records', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'fields-a');
+  const b = makeClient(server, 'fields-b');
+  const c = makeClient(server, 'fields-c');
+  t.after(() => [a, b, c].forEach((client) => client.database.close()));
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-fields', op: 'create', patch: { name: 'Base', note: '' } });
+  await a.engine.dispatchPending();
+  await Promise.all([b.engine.pullStore('students'), c.engine.pullStore('students')]);
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-fields', op: 'patch', patch: { name: 'Name A' } });
+  await a.engine.dispatchPending();
+  await b.engine.commitMutation({ store: 'students', recordId: 'student-fields', op: 'patch', patch: { note: 'Note B' } });
+  await b.engine.dispatchPending();
+  assert.equal(server.table('students').get('student-fields').name, 'Name A');
+  assert.equal(server.table('students').get('student-fields').note, 'Note B');
+
+  await c.engine.commitMutation({ store: 'students', recordId: 'student-fields', op: 'patch', patch: { name: 'Name C' } });
+  await c.engine.commitMutation({ store: 'students', recordId: 'student-unrelated', op: 'create', patch: { name: 'Unrelated' } });
+  const result = await c.engine.dispatchPending();
+  assert.equal(result.acknowledged, 2);
+  assert.equal(server.table('students').get('student-unrelated').name, 'Unrelated');
+  const local = await c.database.get('students', 'student-fields');
+  assert.equal(local.name, 'Name A');
+  assert.equal(local.note, 'Note B');
+  assert.equal(local.syncConflicts.length, 1);
+  assert.deepEqual(local.syncConflicts[0].groups, ['name']);
+  assert.equal((await c.engine.status()).state, 'blocked');
+});
+
+test('pull overlays pending patches and deletes, then converges to an authoritative tombstone', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'overlay-a');
+  const b = makeClient(server, 'overlay-b');
+  t.after(() => [a, b].forEach((client) => client.database.close()));
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-overlay', op: 'create', patch: { name: 'Base', note: '' } });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  await b.engine.commitMutation({ store: 'students', recordId: 'student-overlay', op: 'patch', patch: { note: 'Pending B' } });
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-overlay', op: 'patch', patch: { name: 'Remote A' } });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  let local = await b.database.get('students', 'student-overlay');
+  assert.equal(local.name, 'Remote A');
+  assert.equal(local.note, 'Pending B');
+
+  await b.engine.commitMutation({ store: 'students', recordId: 'student-overlay', op: 'delete' });
+  await b.engine.pullStore('students');
+  local = await b.database.get('students', 'student-overlay');
+  assert.equal(local.deleted, true, 'a pending local delete must survive a pull');
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-overlay', op: 'delete' });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  assert.equal((await b.database.get('students', 'student-overlay')).deleted, true);
+  const pushed = await b.engine.dispatchPending();
+  assert.equal(pushed.acknowledged, 2);
+  assert.equal((await b.database.getAll('outbox')).length, 0);
+  assert.equal((await b.database.get('students', 'student-overlay')).deleted, true);
+});
+
+test('a delayed receipt cannot regress a newer authoritative pull revision', async (t) => {
+  const server = new MemoryV2Server();
+  let releaseReceipt;
+  let receiptApplied;
+  const release = new Promise((resolve) => { releaseReceipt = resolve; });
+  const applied = new Promise((resolve) => { receiptApplied = resolve; });
+  const delayedTransport = {
+    fetchRecords: (entity) => server.fetchRecords(entity),
+    async applyMutation(envelope) {
+      const result = await server.applyMutation(envelope);
+      receiptApplied();
+      await release;
+      return result;
+    },
+  };
+  const a = makeClient(server, 'revision-a');
+  const b = makeClient(server, 'revision-b', { transport: delayedTransport });
+  t.after(() => [a, b].forEach((client) => client.database.close()));
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-revision', op: 'create', patch: { name: 'Base', note: '' } });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  await b.engine.commitMutation({ store: 'students', recordId: 'student-revision', op: 'patch', patch: { note: 'B note' } });
+  const delayedDispatch = b.engine.dispatchPending();
+  await applied;
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-revision', op: 'patch', patch: { name: 'A newer' } });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  assert.equal((await b.database.get('students', 'student-revision')).serverRevision, 3);
+
+  releaseReceipt();
+  await delayedDispatch;
+  const local = await b.database.get('students', 'student-revision');
+  assert.equal(local.serverRevision, 3);
+  assert.equal(local.name, 'A newer');
+  assert.equal(local.note, 'B note');
+  assert.equal((await b.database.getAll('outbox')).length, 0);
+});
+
+test('canonical create remaps local identity and a dependent pending reference atomically', async (t) => {
+  const server = new MemoryV2Server();
+  const winner = makeClient(server, 'remap-winner');
+  const loser = makeClient(server, 'remap-loser');
+  t.after(() => [winner, loser].forEach((client) => client.database.close()));
+
+  await winner.engine.commitMutation({ store: 'subjects', recordId: 'subject-a', op: 'create', patch: { name: 'Math', slug: 'math' } });
+  await winner.engine.dispatchPending();
+  const parent = await loser.engine.commitMutation({ store: 'subjects', recordId: 'subject-b', op: 'create', patch: { name: 'Math duplicate', slug: 'math' } });
+  await loser.engine.commitMutation({
+    store: 'teachings', recordId: 'teaching-b', op: 'create',
+    patch: { sectionId: 'section-x', subjectId: 'subject-b', termId: 'term-x', order: 1 },
+    dependencies: [{ store: 'subjects', recordId: 'subject-b', mutationId: parent.mutation.mutationId }],
+  });
+  const legacyOutbox = { id: 'subjects:subject-b', store: 'subjects', recordId: 'subject-b', op: 'patch', fields: ['name'] };
+  await loser.database.applyBatch({ outbox: { put: [legacyOutbox], remove: [] } });
+
+  assert.equal((await loser.engine.dispatchPending({ maxMutations: 1 })).acknowledged, 1);
+  assert.equal(await loser.database.get('subjects', 'subject-b'), undefined);
+  assert.equal((await loser.database.get('subjects', 'subject-a')).name, 'Math');
+  assert.equal((await loser.database.get('teachings', 'teaching-b')).subjectId, 'subject-a');
+  const childMutation = (await loser.database.getAll('outbox')).find((row) => row.protocol === 'v2');
+  assert.equal(childMutation.localPatch.subjectId, 'subject-a');
+  assert.equal(childMutation.patch.subject_id, 'subject-a');
+  assert.equal(childMutation.dependencies[0].recordId, 'subject-a');
+  assert.equal((await loser.database.get('subjects', 'subject-a')).syncConflicts, undefined);
+  assert.deepEqual(await loser.database.get('outbox', legacyOutbox.id), legacyOutbox, 'V2 reconciliation must not convert or rewrite a V1 outbox entry');
+});
+
+test('each successful mutation is acknowledged before a later independent failure', async (t) => {
+  const server = new MemoryV2Server();
+  let failRecord = 'student-second';
+  const transport = {
+    fetchRecords: (entity) => server.fetchRecords(entity),
+    applyMutation(envelope) {
+      if (envelope.recordId === failRecord) throw new Error('temporary network failure');
+      return server.applyMutation(envelope);
+    },
+  };
+  const client = makeClient(server, 'ack', { transport });
+  t.after(() => client.database.close());
+
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-first', op: 'create', patch: { name: 'First' } });
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-second', op: 'create', patch: { name: 'Second' } });
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-second', op: 'patch', patch: { note: 'After create' } });
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-third', op: 'create', patch: { name: 'Third' } });
+  const firstRun = await client.engine.dispatchPending();
+  assert.deepEqual(firstRun, { attempted: 3, acknowledged: 2, failed: 1, blocked: 1 });
+  assert.equal((await client.database.getAll('outbox')).length, 2);
+  assert.equal(server.calls.filter((call) => call.recordId === 'student-first').length, 1);
+  assert.equal(server.calls.filter((call) => call.recordId === 'student-second').length, 0, 'the later mutation must stop behind the failed create');
+  assert.equal(server.table('students').get('student-third').name, 'Third', 'an unrelated record must still progress');
+  failRecord = null;
+  await client.engine.dispatchPending();
+  assert.equal(server.calls.filter((call) => call.recordId === 'student-first').length, 1, 'the acknowledged first mutation must not replay');
+  assert.equal(server.table('students').get('student-second').note, 'After create');
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+});
+
+test('three isolated clients converge through sequential edit/pull/sync cycles', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'three-a');
+  const b = makeClient(server, 'three-b');
+  const c = makeClient(server, 'three-c');
+  t.after(() => [a, b, c].forEach((client) => client.database.close()));
+
+  await a.engine.commitMutation({ store: 'students', recordId: 'student-three', op: 'create', patch: { name: 'A', note: '' } });
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('students');
+  await b.engine.commitMutation({ store: 'students', recordId: 'student-three', op: 'patch', patch: { note: 'B' } });
+  await b.engine.dispatchPending();
+  await c.engine.pullStore('students');
+  await c.engine.commitMutation({ store: 'students', recordId: 'student-three', op: 'patch', patch: { status: 'active' } });
+  await c.engine.dispatchPending();
+  await Promise.all([a.engine.pullStore('students'), b.engine.pullStore('students'), c.engine.pullStore('students')]);
+  for (const client of [a, b, c]) {
+    const row = await client.database.get('students', 'student-three');
+    assert.deepEqual({ name: row.name, note: row.note, status: row.status }, { name: 'A', note: 'B', status: 'active' });
+  }
+});
+
+test('offline failure remains durable, reconnect succeeds, and score zero is distinct from null', async (t) => {
+  const server = new MemoryV2Server();
+  let online = false;
+  const transport = {
+    fetchRecords(entity) {
+      if (!online) throw new Error('offline');
+      return server.fetchRecords(entity);
+    },
+    applyMutation(envelope) {
+      if (!online) throw new Error('offline');
+      return server.applyMutation(envelope);
+    },
+  };
+  const client = makeClient(server, 'offline', { transport });
+  t.after(() => client.database.close());
+
+  await client.engine.commitMutation({ store: 'scores', recordId: 'score-zero', op: 'create', patch: { studentId: 'student-z', itemId: 'item-z', value: 0 } });
+  assert.equal((await client.engine.dispatchPending()).failed, 1);
+  assert.equal((await client.engine.status()).state, 'error');
+  assert.equal((await client.database.get('scores', 'score-zero')).value, 0);
+
+  online = true;
+  assert.equal((await client.engine.dispatchPending()).acknowledged, 1);
+  assert.equal(server.table('scores').get('score-zero').value, 0);
+  await client.engine.commitMutation({ store: 'scores', recordId: 'score-zero', op: 'patch', patch: { value: null } });
+  await client.engine.dispatchPending();
+  assert.equal(server.table('scores').get('score-zero').value, null);
+  await client.engine.pullStore('scores');
+  assert.equal((await client.database.get('scores', 'score-zero')).value, null);
+  assert.equal((await client.engine.status()).state, 'synced');
+});

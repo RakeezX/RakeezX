@@ -198,6 +198,43 @@ export async function upsertRecords(tableName, records) {
 }
 
 /**
+ * Applies one Sync V2 mutation through the idempotent server protocol.
+ *
+ * This is deliberately not wired into the Production V1 coordinator yet.
+ * Callers must retain the exact envelope (especially mutationId) until this
+ * request returns a canonical receipt.
+ */
+export async function applySyncV2Mutation(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2Mutation !== 'function') {
+      throw new Error('Mock backend does not implement Sync V2 mutation RPC');
+    }
+    return mockBackend.applySyncV2Mutation(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+
+  return request('/rpc/apply_sync_v2_mutation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx',
+      'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_entity: envelope.entity,
+      p_record_id: envelope.recordId,
+      p_mutation_id: envelope.mutationId,
+      p_device_id: envelope.deviceId,
+      p_base_revision: envelope.baseRevision,
+      p_patch: envelope.patch ?? {},
+      p_operation: envelope.operation,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null,
+    }),
+  });
+}
+
+/**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.
  */

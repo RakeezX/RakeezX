@@ -1,0 +1,716 @@
+/**
+ * RAKEEZ X — Sync V2 client foundation.
+ *
+ * This module is intentionally isolated from the current Production V1 sync
+ * coordinator.  It provides the durable mutation/reconciliation primitives
+ * that V2C can wire into runtime store actions after the server cutover.
+ */
+
+import * as databaseDefault from './db.js';
+import { applySyncV2Mutation, fetchRecords } from './cloud.js';
+import { uid } from '../models.js';
+
+const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+const clone = (value) => value == null ? value : structuredClone(value);
+
+export const SYNC_V2_SCHEMAS = Object.freeze({
+  profile: {
+    entity: 'profile',
+    fields: {
+      teacherName: 'teacher_name', schoolName: 'school_name', phone: 'phone',
+      reportPrincipalName: 'report_principal_name',
+    },
+  },
+  years: {
+    entity: 'years',
+    fields: { label: 'label', hijriStart: 'hijri_start', hijriEnd: 'hijri_end', order: 'order', status: 'status' },
+  },
+  calendars: {
+    entity: 'calendars',
+    fields: { yearId: 'year_id', source: 'source', label: 'label' },
+    references: { yearId: 'years' },
+  },
+  calendarDays: {
+    entity: 'calendar_days',
+    fields: { calendarId: 'calendar_id', date: 'date', kind: 'kind', label: 'label' },
+    references: { calendarId: 'calendars' },
+  },
+  terms: {
+    entity: 'terms',
+    fields: { yearId: 'year_id', calendarId: 'calendar_id', index: 'index', name: 'name', startDate: 'start_date', endDate: 'end_date', status: 'status' },
+    references: { yearId: 'years', calendarId: 'calendars' },
+  },
+  subjects: {
+    entity: 'subjects',
+    fields: { name: 'name', slug: 'slug' },
+  },
+  sections: {
+    entity: 'sections',
+    fields: { yearId: 'year_id', grade: 'grade', label: 'label', name: 'name', color: 'color', order: 'order' },
+    references: { yearId: 'years' },
+  },
+  teachings: {
+    entity: 'teachings',
+    fields: { sectionId: 'section_id', subjectId: 'subject_id', termId: 'term_id', order: 'order' },
+    references: { sectionId: 'sections', subjectId: 'subjects', termId: 'terms' },
+  },
+  students: {
+    entity: 'students',
+    fields: { name: 'name', note: 'note', status: 'status' },
+  },
+  enrollments: {
+    entity: 'enrollments',
+    fields: { studentId: 'student_id', sectionId: 'section_id', startDate: 'start_date', endDate: 'end_date', status: 'status', rollNo: 'roll_no', transferNote: 'transfer_note' },
+    references: { studentId: 'students', sectionId: 'sections' },
+  },
+  notes: {
+    entity: 'notes',
+    fields: { studentId: 'student_id', teachingId: 'teaching_id', sessionId: 'session_id', text: 'text', date: 'date', kind: 'kind' },
+    references: { studentId: 'students', teachingId: 'teachings', sessionId: 'sessions' },
+  },
+  items: {
+    entity: 'items',
+    fields: {
+      teachingId: 'teaching_id', name: 'name', max: 'max',
+      auto: 'auto', perPoint: 'per_point', penalty: 'penalty', unitId: 'unit_id', lessonId: 'lesson_id', order: 'order',
+    },
+    references: { teachingId: 'teachings' },
+  },
+  scores: {
+    entity: 'scores',
+    fields: { studentId: 'student_id', itemId: 'item_id', value: 'value' },
+    references: { studentId: 'students', itemId: 'items' },
+  },
+  logs: {
+    entity: 'logs',
+    fields: { studentId: 'student_id', teachingId: 'teaching_id', sessionId: 'session_id', date: 'date', kind: 'kind', delta: 'delta', tag: 'tag', note: 'note' },
+    references: { studentId: 'students', teachingId: 'teachings', sessionId: 'sessions' },
+  },
+  timeProfiles: {
+    entity: 'time_profiles',
+    fields: {
+      name: 'name', order: 'order', periods: 'periods', overrides: 'overrides', activeFrom: 'active_from', activeTo: 'active_to',
+    },
+  },
+  slots: {
+    entity: 'slots',
+    fields: { teachingId: 'teaching_id', weekday: 'weekday', period: 'period' },
+    references: { teachingId: 'teachings' },
+  },
+  sessions: {
+    entity: 'sessions',
+    fields: {
+      teachingId: 'teaching_id', slotId: 'slot_id', timeProfileId: 'time_profile_id', date: 'date',
+      period: 'period', startTime: 'start_time', endTime: 'end_time', status: 'status',
+      reason: 'reason', makeupForId: 'makeup_for_id', lessonId: 'lesson_id', note: 'note', homework: 'homework', covered: 'covered',
+    },
+    references: { teachingId: 'teachings', slotId: 'slots', timeProfileId: 'timeProfiles', makeupForId: 'sessions' },
+  },
+  sessionRosterSnapshots: {
+    entity: 'session_roster_snapshots',
+    fields: { sessionId: 'session_id', teachingId: 'teaching_id', sectionId: 'section_id', capturedAt: 'captured_at', members: 'members', state: 'state' },
+    references: { sessionId: 'sessions', teachingId: 'teachings', sectionId: 'sections' },
+  },
+  attendance: {
+    entity: 'attendance',
+    fields: { studentId: 'student_id', sessionId: 'session_id', teachingId: 'teaching_id', date: 'date', status: 'status', note: 'note' },
+    references: { studentId: 'students', sessionId: 'sessions', teachingId: 'teachings' },
+  },
+});
+
+export const SYNC_V2_STORES = Object.freeze(Object.keys(SYNC_V2_SCHEMAS));
+
+function schemaFor(store) {
+  const schema = SYNC_V2_SCHEMAS[store];
+  if (!schema) throw new Error(`Sync V2 does not support store: ${store}`);
+  return schema;
+}
+
+function normalizeRevision(value) {
+  const revision = Number(value ?? 0);
+  return Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
+}
+
+function encodeFieldValue(store, field, value) {
+  if (store === 'sessionRosterSnapshots' && field === 'capturedAt' && Number.isFinite(value)) {
+    return new Date(value).toISOString();
+  }
+  if (store === 'calendars' && field === 'source' && String(value ?? '').startsWith('preset:')) {
+    return 'moe';
+  }
+  return clone(value);
+}
+
+function decodeFieldValue(store, field, value, row) {
+  if (store === 'sessionRosterSnapshots' && field === 'capturedAt') {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  if (store === 'calendars' && field === 'source' && value === 'moe') {
+    const prefix = `cal:${row.year_id}:preset:`;
+    if (String(row.id ?? '').startsWith(prefix)) return String(row.id).slice(`cal:${row.year_id}:`.length);
+  }
+  return clone(value);
+}
+
+export function encodeSyncV2Patch(store, localPatch = {}) {
+  const schema = schemaFor(store);
+  const patch = {};
+  for (const [localField, serverField] of Object.entries(schema.fields)) {
+    if (hasOwn(localPatch, localField)) patch[serverField] = encodeFieldValue(store, localField, localPatch[localField]);
+  }
+  if (store === 'profile' && !hasOwn(localPatch, 'reportPrincipalName') && hasOwn(localPatch, 'principalName')) {
+    patch.report_principal_name = clone(localPatch.principalName);
+  }
+  return patch;
+}
+
+export function decodeSyncV2Canonical(store, row) {
+  if (!row || typeof row !== 'object') return null;
+  const schema = schemaFor(store);
+  const record = { id: store === 'profile' ? 'profile' : row.id };
+  for (const [localField, serverField] of Object.entries(schema.fields)) {
+    if (hasOwn(row, serverField)) record[localField] = decodeFieldValue(store, localField, row[serverField], row);
+  }
+  if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
+  record.canonicalId = record.id;
+  record.serverRevision = normalizeRevision(row.revision);
+  record.deleted = row.deleted_at != null;
+  if (record.deleted) record.deletedAt = row.deleted_at;
+  if (row.client_updated_at !== null && row.client_updated_at !== undefined) {
+    const clientStamp = Number(row.client_updated_at);
+    if (Number.isFinite(clientStamp)) record.updatedAt = clientStamp;
+  }
+  return record;
+}
+
+function mutationEnvelope(mutation) {
+  return {
+    entity: mutation.entity,
+    recordId: mutation.serverRecordId,
+    mutationId: mutation.mutationId,
+    deviceId: mutation.deviceId,
+    baseRevision: mutation.baseRevision,
+    operation: mutation.op,
+    patch: clone(mutation.patch ?? {}),
+    clientUpdatedAt: mutation.clientUpdatedAt ?? null,
+  };
+}
+
+function sortMutations(rows) {
+  return rows
+    .filter((row) => row?.protocol === 'v2')
+    .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0) || String(a.id).localeCompare(String(b.id)));
+}
+
+function pendingForRecord(rows, store, ids, excludingId = null) {
+  const accepted = new Set(ids.filter(Boolean));
+  return sortMutations(rows).filter((mutation) =>
+    mutation.id !== excludingId && mutation.store === store &&
+    (accepted.has(mutation.recordId) || accepted.has(mutation.serverRecordId) || accepted.has(mutation.canonicalId))
+  );
+}
+
+function overlayMutations(record, mutations, canonicalDeleted = false) {
+  let next = { ...record };
+  for (const mutation of mutations) {
+    if (mutation.op === 'delete') {
+      next.deleted = true;
+      next.deletedAt = mutation.clientUpdatedAt ?? next.deletedAt;
+      continue;
+    }
+    next = { ...next, ...clone(mutation.localPatch ?? {}) };
+  }
+  if (canonicalDeleted) next.deleted = true;
+  return next;
+}
+
+function canonicalSnapshot(record) {
+  if (!record) return null;
+  const { serverCanonical, syncConflicts, ...snapshot } = record;
+  return clone(snapshot);
+}
+
+function conflictDiagnostic(mutation, result, stamp) {
+  const groups = (Array.isArray(result?.conflictedGroups) ? result.conflictedGroups : [])
+    .filter((group) => group !== '__canonical__');
+  if (!groups.length) return null;
+  return {
+    mutationId: mutation.mutationId,
+    outcome: result.outcome ?? 'conflict',
+    fields: [...(mutation.fields ?? [])],
+    groups: [...groups],
+    rejectedPatch: clone(mutation.patch ?? {}),
+    canonicalRevision: normalizeRevision(result.resultRevision),
+    recordedAt: stamp,
+  };
+}
+
+function operationBatch() {
+  return { put: [], remove: [] };
+}
+
+function pushUniquePut(batch, record) {
+  const index = batch.put.findIndex((item) => item.id === record.id);
+  if (index >= 0) batch.put[index] = record;
+  else batch.put.push(record);
+}
+
+function rewriteReferenceRecord(store, record, targetStore, oldId, newId) {
+  const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
+  let changed = false;
+  const next = { ...record };
+  for (const [field, parentStore] of Object.entries(references)) {
+    if (parentStore === targetStore && next[field] === oldId) {
+      next[field] = newId;
+      changed = true;
+    }
+  }
+  return changed ? next : record;
+}
+
+function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
+  if (mutation?.protocol !== 'v2') return mutation;
+  let changed = false;
+  const next = { ...mutation };
+  const localPatch = { ...(mutation.localPatch ?? {}) };
+  const serverPatch = { ...(mutation.patch ?? {}) };
+  const references = SYNC_V2_SCHEMAS[mutation.store]?.references ?? {};
+
+  if (mutation.store === targetStore &&
+      (mutation.recordId === oldId || mutation.serverRecordId === oldId || mutation.canonicalId === oldId)) {
+    if (mutation.envelopeLocked) {
+      return {
+        ...mutation,
+        state: 'blocked',
+        blockedReason: 'canonical-id-remap-after-dispatch',
+      };
+    }
+    next.recordId = newId;
+    next.serverRecordId = newId;
+    next.canonicalId = newId;
+    next.logicalRecordKey = `${targetStore}:${newId}`;
+    changed = true;
+  }
+
+  for (const [localField, parentStore] of Object.entries(references)) {
+    if (parentStore !== targetStore) continue;
+    const serverField = SYNC_V2_SCHEMAS[mutation.store].fields[localField];
+    if (localPatch[localField] === oldId || serverPatch[serverField] === oldId) {
+      if (mutation.envelopeLocked) {
+        return {
+          ...mutation,
+          state: 'blocked',
+          blockedReason: 'canonical-reference-remap-after-dispatch',
+        };
+      }
+      if (localPatch[localField] === oldId) localPatch[localField] = newId;
+      if (serverPatch[serverField] === oldId) serverPatch[serverField] = newId;
+      changed = true;
+    }
+  }
+
+  const dependencies = (mutation.dependencies ?? []).map((dependency) => {
+    if (dependency.store === targetStore && dependency.recordId === oldId) {
+      changed = true;
+      return { ...dependency, recordId: newId };
+    }
+    return dependency;
+  });
+
+  return changed ? { ...next, localPatch, patch: serverPatch, dependencies } : mutation;
+}
+
+function defaultTransport() {
+  return {
+    applyMutation: applySyncV2Mutation,
+    fetchRecords: (entity) => fetchRecords(entity),
+  };
+}
+
+export function createSyncV2Engine({
+  database = databaseDefault,
+  transport = defaultTransport(),
+  now = () => Date.now(),
+  makeId = uid,
+} = {}) {
+  if (!database?.applyBatch || !database?.getAll) throw new Error('Sync V2 requires a transactional database adapter');
+
+  async function ensureDeviceId() {
+    let resolved;
+    await database.applyBatch({ device: {} }, {
+      prepare(current) {
+        const existing = current.device.find((record) => record.id === 'device') ?? null;
+        resolved = existing?.deviceId || makeId();
+        if (existing?.deviceId) return { device: operationBatch() };
+        return {
+          device: {
+            put: [{ ...(existing ?? {}), id: 'device', deviceId: resolved, updatedAt: now() }],
+            remove: [],
+          },
+        };
+      },
+    });
+    return resolved;
+  }
+
+  async function commitMutation({
+    store, recordId, op, patch = {}, create = null, groups = [], dependencies = [], clientUpdatedAt,
+  }) {
+    schemaFor(store);
+    if (!recordId || !['create', 'patch', 'delete'].includes(op)) throw new Error('Invalid Sync V2 local mutation');
+    const mutationId = makeId();
+    const stamp = clientUpdatedAt ?? now();
+    let result;
+
+    await database.applyBatch({ [store]: {}, outbox: {}, device: {} }, {
+      prepare(current) {
+        const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
+        const deviceId = deviceRecord?.deviceId || makeId();
+        const existing = current[store].find((record) => record.id === recordId) ?? create ?? null;
+        if (!existing && op !== 'create') throw new Error(`Sync V2 local record not found: ${store}/${recordId}`);
+
+        const optimisticPatch = op === 'create' ? { ...(create ?? {}), ...patch } : { ...patch };
+        let next = { ...(existing ?? {}), ...optimisticPatch, id: recordId, updatedAt: stamp };
+        if (op === 'delete') next = { ...next, deleted: true, deletedAt: stamp };
+        const canonicalId = existing?.canonicalId ?? recordId;
+        next.canonicalId = canonicalId;
+        next.serverRevision = normalizeRevision(existing?.serverRevision);
+
+        const serverPatch = op === 'delete'
+          ? {}
+          : encodeSyncV2Patch(store, op === 'create' ? next : patch);
+        const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
+        const mutation = {
+          id: `v2:${mutationId}`,
+          protocol: 'v2',
+          mutationId,
+          deviceId,
+          store,
+          entity: schemaFor(store).entity,
+          recordId,
+          serverRecordId: canonicalId,
+          canonicalId,
+          logicalRecordKey: `${store}:${canonicalId}`,
+          op,
+          baseRevision: op === 'create' ? 0 : normalizeRevision(existing?.serverRevision),
+          patch: clone(serverPatch),
+          localPatch: clone(op === 'delete' ? {} : optimisticPatch),
+          fields: Object.keys(serverPatch).sort(),
+          groups: [...new Set(groups)].sort(),
+          dependencies: clone(dependencies),
+          sequence,
+          clientUpdatedAt: stamp,
+          queuedAt: stamp,
+          state: 'pending',
+          attemptCount: 0,
+          envelopeLocked: false,
+          lastError: null,
+          blockedReason: null,
+        };
+        result = { record: next, mutation };
+        return {
+          [store]: { put: [next], remove: [] },
+          outbox: { put: [mutation], remove: [] },
+          device: deviceRecord?.deviceId
+            ? operationBatch()
+            : { put: [{ ...(deviceRecord ?? {}), id: 'device', deviceId, updatedAt: stamp }], remove: [] },
+        };
+      },
+    });
+    return result;
+  }
+
+  async function queueCommand({ store, recordId, command, patch = {}, groups = [], dependencies = [] }) {
+    const schema = schemaFor(store);
+    if (!recordId || !command) throw new Error('Invalid Sync V2 command');
+    const mutationId = makeId();
+    const stamp = now();
+    let queued;
+    await database.applyBatch({ outbox: {}, device: {} }, {
+      prepare(current) {
+        const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
+        const deviceId = deviceRecord?.deviceId || makeId();
+        const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
+        queued = {
+          id: `v2:${mutationId}`,
+          protocol: 'v2', mutationId, deviceId, store, entity: schema.entity,
+          recordId, serverRecordId: recordId, canonicalId: recordId,
+          logicalRecordKey: `${store}:${recordId}`,
+          op: 'command', command, baseRevision: 0,
+          patch: clone(patch), localPatch: {},
+          fields: Object.keys(patch).sort(), groups: [...new Set(groups)].sort(),
+          dependencies: clone(dependencies), sequence,
+          clientUpdatedAt: stamp, queuedAt: stamp,
+          state: 'pending', attemptCount: 0, envelopeLocked: false,
+          lastError: null, blockedReason: null,
+        };
+        return {
+          outbox: { put: [queued], remove: [] },
+          device: deviceRecord?.deviceId
+            ? operationBatch()
+            : { put: [{ ...(deviceRecord ?? {}), id: 'device', deviceId, updatedAt: stamp }], remove: [] },
+        };
+      },
+    });
+    return queued;
+  }
+
+  async function markAttempt(mutation) {
+    let locked = mutation;
+    await database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (!existing) return { outbox: operationBatch() };
+        locked = {
+          ...existing,
+          state: 'pending',
+          envelopeLocked: true,
+          attemptCount: (existing.attemptCount ?? 0) + 1,
+          lastAttemptAt: now(),
+          lastError: null,
+          blockedReason: null,
+        };
+        return { outbox: { put: [locked], remove: [] } };
+      },
+    });
+    return locked;
+  }
+
+  async function markFailure(mutation, error) {
+    await database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (!existing) return { outbox: operationBatch() };
+        return {
+          outbox: {
+            put: [{
+              ...existing,
+              state: 'failed',
+              lastError: {
+                message: error?.message ?? String(error),
+                code: error?.code ?? null,
+                status: error?.status ?? null,
+                at: now(),
+              },
+            }],
+            remove: [],
+          },
+        };
+      },
+    });
+  }
+
+  async function markDependencyBlock(mutation, reason) {
+    await database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (!existing) return { outbox: operationBatch() };
+        return { outbox: { put: [{ ...existing, state: 'blocked', blockedReason: reason }], remove: [] } };
+      },
+    });
+  }
+
+  async function reconcileReceipt(mutation, result) {
+    const resultMutationId = result?.mutationId;
+    if (resultMutationId !== mutation.mutationId) throw new Error('Sync V2 receipt mutationId mismatch');
+    const canonical = decodeSyncV2Canonical(mutation.store, result.canonical);
+    const canonicalId = result.canonicalId || canonical?.id || mutation.serverRecordId;
+    const sourceId = mutation.recordId;
+    const stamp = now();
+    const scope = Object.fromEntries([...SYNC_V2_STORES, 'outbox'].map((store) => [store, {}]));
+
+    await database.applyBatch(scope, {
+      prepare(current) {
+        const currentMutation = current.outbox.find((row) => row.id === mutation.id);
+        if (!currentMutation) return Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
+        const writes = Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
+        const remappedOutbox = current.outbox
+          .filter((row) => row.id !== mutation.id)
+          .map((row) => canonicalId !== sourceId ? rewriteMutationReferences(row, mutation.store, sourceId, canonicalId) : row);
+
+        for (const store of SYNC_V2_STORES) {
+          if (canonicalId === sourceId) break;
+          for (const record of current[store]) {
+            const rewritten = rewriteReferenceRecord(store, record, mutation.store, sourceId, canonicalId);
+            if (rewritten !== record) pushUniquePut(writes[store], rewritten);
+          }
+        }
+
+        const source = current[mutation.store].find((record) => record.id === sourceId) ?? null;
+        const target = current[mutation.store].find((record) => record.id === canonicalId) ?? null;
+        const existingRevision = Math.max(
+          normalizeRevision(source?.serverRevision), normalizeRevision(target?.serverRevision),
+        );
+        const resultRevision = normalizeRevision(result.resultRevision ?? canonical?.serverRevision);
+        const acceptCanonical = canonical && resultRevision >= existingRevision;
+        const authoritative = acceptCanonical
+          ? canonical
+          : (target?.serverCanonical ?? source?.serverCanonical ?? null);
+        let next = { ...(source ?? {}), ...(target ?? {}), ...(authoritative ?? {}), id: canonicalId, canonicalId };
+        next.serverRevision = Math.max(existingRevision, resultRevision);
+        if (acceptCanonical) next.serverCanonical = canonicalSnapshot({ ...canonical, id: canonicalId, canonicalId });
+        else if (target?.serverCanonical ?? source?.serverCanonical) {
+          next.serverCanonical = clone(target?.serverCanonical ?? source?.serverCanonical);
+        }
+        const diagnostic = conflictDiagnostic(currentMutation, result, stamp);
+        if (diagnostic) next.syncConflicts = [...(next.syncConflicts ?? []), diagnostic];
+
+        const later = pendingForRecord(remappedOutbox, mutation.store, [sourceId, canonicalId]);
+        const rebasedOutbox = remappedOutbox.map((row) => {
+          if (!later.some((candidate) => candidate.id === row.id) || row.envelopeLocked || row.op === 'create') return row;
+          return {
+            ...row,
+            baseRevision: next.serverRevision,
+            recordId: canonicalId,
+            serverRecordId: canonicalId,
+            canonicalId,
+            logicalRecordKey: `${mutation.store}:${canonicalId}`,
+            state: row.state === 'blocked' ? 'pending' : row.state,
+            blockedReason: null,
+          };
+        });
+        next = overlayMutations(next, pendingForRecord(rebasedOutbox, mutation.store, [canonicalId]), canonical?.deleted === true);
+
+        if (canonicalId !== sourceId) writes[mutation.store].remove.push(sourceId);
+        pushUniquePut(writes[mutation.store], next);
+        writes.outbox.remove.push(mutation.id);
+        for (const row of rebasedOutbox) {
+          const previous = current.outbox.find((candidate) => candidate.id === row.id);
+          if (JSON.stringify(previous) !== JSON.stringify(row)) pushUniquePut(writes.outbox, row);
+        }
+        return writes;
+      },
+    });
+  }
+
+  async function dependenciesPending(mutation, rows) {
+    for (const dependency of mutation.dependencies ?? []) {
+      if (dependency.mutationId && rows.some((row) => row.mutationId === dependency.mutationId)) return true;
+      if (dependency.store && dependency.recordId && rows.some((row) =>
+        row.store === dependency.store && (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId)
+      )) return true;
+    }
+    return false;
+  }
+
+  async function dispatchPending({ maxMutations = Infinity } = {}) {
+    const snapshot = sortMutations(await database.getAll('outbox'));
+    const stoppedKeys = new Set();
+    const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
+
+    for (const original of snapshot) {
+      if (result.attempted >= maxMutations) break;
+      if (original.op === 'command') {
+        await markDependencyBlock(original, 'command-handler-required');
+        stoppedKeys.add(original.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
+      if (stoppedKeys.has(original.logicalRecordKey)) {
+        result.blocked++;
+        continue;
+      }
+      const liveRows = sortMutations(await database.getAll('outbox'));
+      const live = liveRows.find((row) => row.id === original.id);
+      if (!live) continue;
+      if (await dependenciesPending(live, liveRows.filter((row) => row.id !== live.id))) {
+        await markDependencyBlock(live, 'dependency-pending');
+        stoppedKeys.add(live.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
+
+      const mutation = await markAttempt(live);
+      result.attempted++;
+      try {
+        const receipt = await transport.applyMutation(mutationEnvelope(mutation));
+        await reconcileReceipt(mutation, receipt);
+        result.acknowledged++;
+      } catch (error) {
+        await markFailure(mutation, error);
+        stoppedKeys.add(mutation.logicalRecordKey);
+        result.failed++;
+      }
+    }
+    return result;
+  }
+
+  async function reconcilePull(store, rows) {
+    schemaFor(store);
+    const canonicalRows = Array.isArray(rows) ? rows : [];
+    await database.applyBatch({ [store]: {}, outbox: {} }, {
+      prepare(current) {
+        const writes = operationBatch();
+        for (const row of canonicalRows) {
+          const canonical = decodeSyncV2Canonical(store, row);
+          if (!canonical?.id) continue;
+          const existing = current[store].find((record) => record.id === canonical.id) ?? null;
+          if (existing && normalizeRevision(existing.serverRevision) > normalizeRevision(canonical.serverRevision)) continue;
+          const conflicts = existing?.syncConflicts;
+          let next = { ...(existing ?? {}), ...canonical };
+          next.serverCanonical = canonicalSnapshot(canonical);
+          if (conflicts?.length) next.syncConflicts = conflicts;
+          next = overlayMutations(
+            next,
+            pendingForRecord(current.outbox, store, [canonical.id]),
+            canonical.deleted === true,
+          );
+          pushUniquePut(writes, next);
+        }
+        return { [store]: writes, outbox: operationBatch() };
+      },
+    });
+  }
+
+  async function pullStore(store) {
+    const schema = schemaFor(store);
+    const rows = await transport.fetchRecords(schema.entity);
+    if (!Array.isArray(rows)) throw new Error(`Sync V2 pull expected an array for ${schema.entity}`);
+    await reconcilePull(store, rows);
+    return rows.length;
+  }
+
+  async function pullAll({ stores = SYNC_V2_STORES } = {}) {
+    const result = { pulled: 0, failures: [] };
+    for (const store of stores) {
+      try {
+        result.pulled += await pullStore(store);
+      } catch (error) {
+        result.failures.push({ store, error });
+      }
+    }
+    return result;
+  }
+
+  async function sync(options = {}) {
+    const pull = await pullAll(options);
+    const push = await dispatchPending(options);
+    return { pull, push, status: await status() };
+  }
+
+  async function status() {
+    const outbox = sortMutations(await database.getAll('outbox'));
+    const failed = outbox.filter((row) => row.state === 'failed').length;
+    const blockedOutbox = outbox.filter((row) => row.state === 'blocked').length;
+    let conflicts = 0;
+    for (const store of SYNC_V2_STORES) {
+      const records = await database.getAll(store);
+      conflicts += records.reduce((total, record) => total + (record.syncConflicts?.length ?? 0), 0);
+    }
+    const state = failed ? 'error' : (blockedOutbox || conflicts) ? 'blocked' : outbox.length ? 'pending' : 'synced';
+    return { state, pending: outbox.length, failed, blocked: blockedOutbox, conflicts };
+  }
+
+  return {
+    ensureDeviceId,
+    commitMutation,
+    queueCommand,
+    dispatchPending,
+    reconcilePull,
+    pullStore,
+    pullAll,
+    sync,
+    status,
+  };
+}
