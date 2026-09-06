@@ -300,6 +300,20 @@ export async function applySyncV2LifecycleCommand(envelope) {
   });
 }
 
+export async function applySyncV2TeachingCreationCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2TeachingCreationCommand !== 'function') throw new Error('Mock backend does not implement Sync V2 teaching command RPC');
+    return mockBackend.applySyncV2TeachingCreationCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_teaching_creation_command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId, p_teaching_id: envelope.teachingId,
+      p_section_id: envelope.sectionId, p_subject_id: envelope.subjectId, p_term_id: envelope.termId, p_order: envelope.order,
+      p_item_ids: envelope.itemIds, p_client_updated_at: envelope.clientUpdatedAt ?? null }),
+  });
+}
+
 /**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.

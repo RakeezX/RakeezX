@@ -20,6 +20,7 @@ const migrationFiles = [
   '0013_sync_v2_enrollment_commands.sql',
   '0014_sync_v2_attendance_snapshot_commands.sql',
   '0015_sync_v2_lifecycle_commands.sql',
+  '0016_sync_v2_teaching_creation_commands.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -119,6 +120,12 @@ async function attendanceCommand({ mutationId, attendanceId, sessionId, studentI
 async function lifecycleCommand({ mutationId, command, targetId, deviceId = 'device-lifecycle', clientUpdatedAt = 70 }) {
   const result = await pg.query(`select rakeezx.apply_sync_v2_lifecycle_command($1,$2,$3,$4,$5) as result`,
     [mutationId, deviceId, command, targetId, clientUpdatedAt]);
+  return result.rows[0].result;
+}
+
+async function teachingCommand({ mutationId, teachingId, sectionId, subjectId, termId, order = 0, itemIds, deviceId = 'device-teaching' }) {
+  const result = await pg.query(`select rakeezx.apply_sync_v2_teaching_creation_command($1,$2,$3,$4,$5,$6,$7,$8::jsonb,80) as result`,
+    [mutationId, deviceId, teachingId, sectionId, subjectId, termId, order, JSON.stringify(itemIds)]);
   return result.rows[0].result;
 }
 
@@ -570,5 +577,25 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     const staleConfiguration = await mutate({ entity: 'time_profiles', recordId: 'profile:v2-group', mutationId: 'profile:v2-stale-config', baseRevision: 1, patch: { overrides: { config: { recess: { enabled: true, after: 1 }, gap: 5 } } } });
     assert.equal(staleConfiguration.outcome, 'conflict');
     assert.deepEqual(staleConfiguration.conflictedGroups, ['configuration']);
+  });
+
+  await t.test('teaching creation canonicalizes three clients and creates Product defaults exactly once', async () => {
+    await useOwner(OWNER);
+    const context = await seedAcademicContext('teaching-command');
+    const subject = 'subject:teaching-command:two';
+    await pg.query(`insert into rakeezx.subjects(id,owner_id,name,slug,client_updated_at,device_id) values($1,$2,'مادة ثانية','subject-teaching-command-two',1,'seed')`, [subject, OWNER]);
+    const results = await Promise.all(['a','b','c'].map((device) => teachingCommand({
+      mutationId: `teaching-command:${device}`, teachingId: `teaching-command:${device}`,
+      sectionId: context.sectionId, subjectId: subject, termId: context.termId,
+      itemIds: Array.from({ length: 5 }, (_, index) => `item:teaching-command:${device}:${index}`), deviceId: `device-${device}`,
+    })));
+    const canonicalId = results[0].canonicalTeaching.id;
+    assert.ok(results.every((result) => result.canonicalTeaching.id === canonicalId));
+    assert.equal((await pg.query(`select count(*) from rakeezx.teachings where owner_id=$1 and section_id=$2 and subject_id=$3 and term_id=$4`, [OWNER, context.sectionId, subject, context.termId])).rows[0].count, 1);
+    assert.equal((await pg.query(`select count(*) from rakeezx.items where owner_id=$1 and teaching_id=$2 and deleted_at is null`, [OWNER, canonicalId])).rows[0].count, 5);
+    assert.deepEqual(results[0].items.map((item) => [item.name, item.max, item.auto]), [
+      ['المشاركة والتفاعل', 10, 'participation'], ['الواجبات', 10, null], ['الأنشطة والمشاريع', 20, null], ['الاختبارات القصيرة', 20, null], ['الاختبار النهائي', 40, null],
+    ]);
+    assert.deepEqual(await teachingCommand({ mutationId: 'teaching-command:a', teachingId: 'teaching-command:a', sectionId: context.sectionId, subjectId: subject, termId: context.termId, itemIds: Array.from({ length: 5 }, (_, index) => `item:teaching-command:a:${index}`), deviceId: 'device-a' }), results[0]);
   });
 });

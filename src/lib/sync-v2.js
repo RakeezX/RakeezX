@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2TeachingCreationCommand, fetchRecords } from './cloud.js';
 import { uid } from '../models.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -388,6 +388,7 @@ function defaultTransport() {
     applyEnrollmentCommand: applySyncV2EnrollmentCommand,
     applyAttendanceCommand: applySyncV2AttendanceCommand,
     applyLifecycleCommand: applySyncV2LifecycleCommand,
+    applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -563,6 +564,24 @@ export function createSyncV2Engine({
   async function queueLifecycleCommand({ command, targetId, dependencies = [] }) {
     if (!['delete_item', 'delete_teaching', 'delete_student', 'delete_class'].includes(command) || !targetId) throw new Error('Invalid Sync V2 lifecycle command');
     return queueCommand({ store: 'sessions', recordId: `${command}:${targetId}`, command: `lifecycle:${command}`, patch: { targetId }, groups: ['__deleted__'], dependencies });
+  }
+
+  async function queueTeachingCreationCommand({ teaching, items, dependencies = [] }) {
+    if (!teaching?.id || !teaching.sectionId || !teaching.subjectId || !teaching.termId || !Array.isArray(items) || items.length !== 5) {
+      throw new Error('Invalid Sync V2 teaching creation command');
+    }
+    const mutationId = makeId(), stamp = now(); let queued;
+    await database.applyBatch({ teachings: {}, items: {}, outbox: {}, device: {} }, { prepare(current) {
+      const device = current.device.find((row) => row.id === 'device'); const deviceId = device?.deviceId || makeId();
+      const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
+      queued = { id: `v2:${mutationId}`, protocol: 'v2', mutationId, deviceId, store: 'teachings', entity: 'teachings',
+        recordId: teaching.id, serverRecordId: teaching.id, canonicalId: teaching.id, logicalRecordKey: `teachings:${teaching.id}`,
+        op: 'command', command: 'teaching:create', patch: { sectionId: teaching.sectionId, subjectId: teaching.subjectId, termId: teaching.termId, order: teaching.order ?? 0, itemIds: items.map((item) => item.id) },
+        localPatch: {}, fields: [], groups: ['__create__'], dependencies: uniqueDependencies([{ store: 'sections', recordId: teaching.sectionId, requiresServerRevision: true }, { store: 'subjects', recordId: teaching.subjectId, requiresServerRevision: true }, { store: 'terms', recordId: teaching.termId, requiresServerRevision: true }, ...dependencies]),
+        sequence, clientUpdatedAt: stamp, queuedAt: stamp, state: 'pending', attemptCount: 0, envelopeLocked: false, lastError: null, blockedReason: null };
+      return { teachings: { put: [{ ...teaching, canonicalId: teaching.id, serverRevision: 0 }], remove: [] }, items: { put: items.map((item) => ({ ...item, canonicalId: item.id, serverRevision: 0 })), remove: [] }, outbox: { put: [queued], remove: [] }, device: device ? operationBatch() : { put: [{ id: 'device', deviceId, updatedAt: stamp }], remove: [] } };
+    }});
+    return queued;
   }
 
   async function markAttempt(mutation) {
@@ -772,6 +791,37 @@ export function createSyncV2Engine({
     });
   }
 
+  async function reconcileTeachingCreationReceipt(mutation, result) {
+    if (result?.mutationId !== mutation.mutationId) throw new Error('Sync V2 teaching receipt mutationId mismatch');
+    const teaching = decodeSyncV2Canonical('teachings', result.canonicalTeaching);
+    const items = (result.items ?? []).map((row) => decodeSyncV2Canonical('items', row)).filter(Boolean);
+    if (!teaching?.id || items.length !== 5) throw new Error('Sync V2 teaching receipt is incomplete');
+    const scope = Object.fromEntries([...SYNC_V2_STORES, 'outbox'].map((store) => [store, {}]));
+    await database.applyBatch(scope, { prepare(current) {
+      const active = current.outbox.find((row) => row.id === mutation.id);
+      if (!active) return Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
+      const writes = Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
+      const localTeaching = current.teachings.find((row) => row.id === mutation.recordId);
+      const localItems = current.items.filter((row) => row.teachingId === mutation.recordId && !row.deleted);
+      const role = (item) => `${item.name}|${item.auto ?? ''}|${item.max}|${item.perPoint ?? 1}|${item.penalty ?? 1}`;
+      const canonByRole = new Map(items.map((item) => [role(item), item]));
+      const mappings = [[mutation.recordId, teaching.id, 'teachings'], ...localItems.map((item) => [item.id, canonByRole.get(role(item))?.id, 'items'])].filter(([, to]) => to);
+      const rewritten = current.outbox.filter((row) => row.id !== mutation.id).map((row) => mappings.reduce((next, [from, to, store]) => rewriteMutationReferences(next, store, from, to), row));
+      for (const [from, to, store] of mappings) {
+        if (from !== to) writes[store].remove.push(from);
+        for (const candidateStore of SYNC_V2_STORES) for (const record of current[candidateStore]) {
+          const next = rewriteReferenceRecord(candidateStore, record, store, from, to);
+          if (next !== record) pushUniquePut(writes[candidateStore], next);
+        }
+      }
+      pushUniquePut(writes.teachings, { ...(localTeaching ?? {}), ...teaching, serverCanonical: canonicalSnapshot(teaching) });
+      for (const item of items) pushUniquePut(writes.items, { ...(current.items.find((row) => row.id === item.id) ?? {}), ...item, serverCanonical: canonicalSnapshot(item) });
+      writes.outbox.remove.push(mutation.id);
+      for (const row of rewritten) { const before = current.outbox.find((old) => old.id === row.id); if (JSON.stringify(before) !== JSON.stringify(row)) pushUniquePut(writes.outbox, row); }
+      return writes;
+    }});
+  }
+
   async function dependencyReadiness(mutation, rows) {
     for (const dependency of mutation.dependencies ?? []) {
       const identifiedMutation = dependency.mutationId
@@ -926,6 +976,18 @@ export function createSyncV2Engine({
         }
         continue;
       }
+      if (original.op === 'command' && original.command === 'teaching:create' && typeof transport.applyTeachingCreationCommand === 'function') {
+        const live = (await database.getAll('outbox')).find((row) => row.id === original.id); if (!live) continue;
+        const readiness = await dependencyReadiness(live, (await database.getAll('outbox')).filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') { await markDependencyBlock(live, readiness.reason); result.blocked++; continue; }
+        if (readiness.state === 'rejected') { await markRejected(live, readiness.reason); result.blocked++; continue; }
+        const mutation = await markAttempt(live); result.attempted++;
+        try {
+          const receipt = await transport.applyTeachingCreationCommand({ mutationId: mutation.mutationId, deviceId: mutation.deviceId, teachingId: mutation.recordId, sectionId: mutation.patch.sectionId, subjectId: mutation.patch.subjectId, termId: mutation.patch.termId, order: mutation.patch.order, itemIds: mutation.patch.itemIds, clientUpdatedAt: mutation.clientUpdatedAt });
+          await reconcileTeachingCreationReceipt(mutation, receipt); result.acknowledged++;
+        } catch (error) { if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error); else await markFailure(mutation, error); if (isRejectedProtocolError(error)) result.blocked++; else result.failed++; }
+        continue;
+      }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');
         stoppedKeys.add(original.logicalRecordKey);
@@ -1050,6 +1112,7 @@ export function createSyncV2Engine({
     queueEnrollmentCommand,
     queueAttendanceCommand,
     queueLifecycleCommand,
+    queueTeachingCreationCommand,
     dispatchPending,
     reconcilePull,
     pullStore,
