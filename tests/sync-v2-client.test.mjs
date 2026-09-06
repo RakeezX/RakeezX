@@ -631,3 +631,49 @@ test('enrollment command receipts reconcile canonical IDs and rewrite pending ty
   assert.equal(pending.patch.sourceEnrollmentId, 'enrollment-canonical-y');
   assert.equal(calls.length, 1);
 });
+
+test('attendance commands wait for canonical parents, then reconcile the atomic snapshot receipt', async (t) => {
+  const calls = [];
+  const transport = {
+    async applyAttendanceCommand(envelope) {
+      calls.push(clone(envelope));
+      return {
+        mutationId: envelope.mutationId,
+        outcome: 'applied', appliedGroups: ['status'], conflictedGroups: [],
+        snapshot: {
+          id: `srs:${envelope.sessionId}`, session_id: envelope.sessionId, teaching_id: 'teaching-attendance',
+          section_id: 'section-attendance', captured_at: '2026-09-06T07:00:00Z',
+          members: [{ studentId: envelope.studentId, rollNo: 1 }], state: 'complete', revision: 1, deleted_at: null,
+        },
+        attendance: {
+          id: envelope.attendanceId, student_id: envelope.studentId, session_id: envelope.sessionId,
+          teaching_id: 'teaching-attendance', date: '2026-09-06', status: envelope.patch.status,
+          note: envelope.patch.note ?? '', revision: 1, deleted_at: null,
+        },
+      };
+    },
+    async applyMutation(envelope) {
+      return { mutationId: envelope.mutationId, entity: envelope.entity, recordId: envelope.recordId, canonicalId: envelope.recordId, outcome: 'applied', appliedGroups: Object.keys(envelope.patch), conflictedGroups: [], resultRevision: 1, canonical: { id: envelope.recordId, ...envelope.patch, revision: 1, deleted_at: null } };
+    },
+    fetchRecords: async () => [],
+  };
+  const client = makeClient(null, 'attendance-command', { transport });
+  t.after(() => client.database.close());
+  await client.engine.queueAttendanceCommand({
+    attendanceId: 'attendance-local', sessionId: 'session-attendance', studentId: 'student-attendance', patch: { status: 'present' },
+  });
+  await client.engine.commitMutation({ store: 'subjects', recordId: 'subject-unrelated', op: 'create', patch: { name: 'Unrelated', slug: 'unrelated' } });
+  const blocked = await client.engine.dispatchPending();
+  assert.equal(blocked.acknowledged, 1);
+  assert.equal(blocked.blocked, 1);
+  assert.equal((await client.engine.status()).state, 'blocked');
+
+  await seedAuthoritative(client, 'students', { id: 'student-attendance', name: 'Student', note: '', status: 'active' });
+  await seedAuthoritative(client, 'sessions', { id: 'session-attendance', teachingId: 'teaching-attendance', date: '2026-09-06', period: 1, status: 'scheduled' });
+  const recovered = await client.engine.dispatchPending();
+  assert.equal(recovered.acknowledged, 1);
+  assert.equal(calls.length, 1);
+  assert.equal((await client.database.get('attendance', 'attendance-local')).status, 'present');
+  assert.equal((await client.database.get('sessionRosterSnapshots', 'srs:session-attendance')).members[0].studentId, 'student-attendance');
+  assert.equal((await client.engine.status()).state, 'synced');
+});

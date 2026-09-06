@@ -18,6 +18,7 @@ const migrationFiles = [
   '0011_session_roster_snapshots.sql',
   '0012_sync_v2_server_protocol.sql',
   '0013_sync_v2_enrollment_commands.sql',
+  '0014_sync_v2_attendance_snapshot_commands.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -104,6 +105,13 @@ async function enrollmentCommand({ mutationId, command = 'transfer', payload, de
   const result = await pg.query(`select rakeezx.apply_sync_v2_enrollment_command(
     $1, $2, $3, $4::jsonb, $5
   ) as result`, [mutationId, deviceId, command, JSON.stringify(payload), clientUpdatedAt]);
+  return result.rows[0].result;
+}
+
+async function attendanceCommand({ mutationId, attendanceId, sessionId, studentId, baseRevision = 0, patch, deviceId = 'device-attendance', clientUpdatedAt = 60 }) {
+  const result = await pg.query(`select rakeezx.apply_sync_v2_attendance_command(
+    $1, $2, $3, $4, $5, $6, $7::jsonb, $8
+  ) as result`, [mutationId, deviceId, attendanceId, sessionId, studentId, baseRevision, JSON.stringify(patch), clientUpdatedAt]);
   return result.rows[0].result;
 }
 
@@ -349,27 +357,21 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     assert.equal(Number(unrecorded.resultRevision), 2);
 
     const snapshotContext = await seedAcademicContext('snapshot');
-    const snapshot = await mutate({
-      entity: 'session_roster_snapshots', recordId: 'snapshot:one',
-      mutationId: 'mutation:snapshot-create', baseRevision: 0, operation: 'create',
-      patch: {
-        session_id: snapshotContext.sessionId,
-        teaching_id: snapshotContext.teachingId,
-        section_id: snapshotContext.sectionId,
-        captured_at: '2026-09-06T05:00:00Z',
-        members: [{ studentId: snapshotContext.studentId, rollNo: null }],
-        state: 'complete',
-      },
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ('enrollment:snapshot', $1, $2, $3, 1, '2026-08-01', 'active', 1, 'seed')`, [OWNER, snapshotContext.studentId, snapshotContext.sectionId]);
+    const snapshot = await attendanceCommand({
+      mutationId: 'mutation:snapshot-create', attendanceId: 'attendance:snapshot',
+      sessionId: snapshotContext.sessionId, studentId: snapshotContext.studentId, patch: { status: 'present' },
     });
     assert.equal(snapshot.outcome, 'applied');
     const immutable = await mutate({
-      entity: 'session_roster_snapshots', recordId: 'snapshot:one',
+      entity: 'session_roster_snapshots', recordId: snapshot.snapshot.id,
       mutationId: 'mutation:snapshot-edit', baseRevision: 1,
       patch: { members: [] },
     });
     assert.equal(immutable.outcome, 'conflict');
     assert.deepEqual(immutable.conflictedGroups, ['__immutable__']);
-    await assert.rejects(pg.query("update rakeezx.session_roster_snapshots set members = '[]'::jsonb where id = 'snapshot:one'"),
+    await assert.rejects(pg.query(`update rakeezx.session_roster_snapshots set members = '[]'::jsonb where id = $1`, [snapshot.snapshot.id]),
       /immutable/);
   });
 
@@ -488,5 +490,44 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     assert.equal(withdrawn.outcome, 'applied');
     assert.equal((await pg.query(`select status from rakeezx.students where owner_id=$1 and id=$2`, [OWNER, student])).rows[0].status, 'withdrawn');
     assert.deepEqual((await pg.query(`select roll_no from rakeezx.enrollments where owner_id=$1 and section_id=$2 and status='active' order by roll_no`, [OWNER, y])).rows.map((row) => row.roll_no), [1]);
+  });
+
+  await t.test('attendance command atomically creates one immutable snapshot and converges concurrent devices', async () => {
+    await useOwner(OWNER);
+    const suffix = 'v2-attendance';
+    const context = await seedAcademicContext(suffix);
+    const secondStudent = `student:${suffix}:two`;
+    await seedStudent(secondStudent, OWNER, { name: 'طالب ثان' });
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ($1,$2,$3,$4,$5,'2026-08-01','active',1,'seed'), ($6,$2,$7,$4,$8,'2026-08-01','active',1,'seed')`,
+      [`enrollment:${suffix}:one`, OWNER, context.studentId, context.sectionId, 1, `enrollment:${suffix}:two`, secondStudent, 2]);
+    const firstPayload = { mutationId: `attendance:${suffix}:a`, attendanceId: `attendance:${suffix}:one`, sessionId: context.sessionId, studentId: context.studentId, patch: { status: 'present' }, deviceId: 'device-a' };
+    const [first, second] = await Promise.all([
+      attendanceCommand(firstPayload),
+      attendanceCommand({ mutationId: `attendance:${suffix}:b`, attendanceId: `attendance:${suffix}:two`, sessionId: context.sessionId, studentId: secondStudent, patch: { status: 'absent' }, deviceId: 'device-b' }),
+    ]);
+    assert.equal(first.outcome, 'applied');
+    assert.equal(second.outcome, 'applied');
+    assert.deepEqual(await attendanceCommand(firstPayload), first);
+    assert.equal((await pg.query(`select count(*) from rakeezx.session_roster_snapshots where owner_id=$1 and session_id=$2`, [OWNER, context.sessionId])).rows[0].count, 1);
+    assert.equal((await pg.query(`select count(*) from rakeezx.attendance where owner_id=$1 and session_id=$2 and deleted_at is null`, [OWNER, context.sessionId])).rows[0].count, 2);
+    assert.equal(first.snapshot.members.length, 2);
+
+    const stale = await attendanceCommand({ ...firstPayload, mutationId: `attendance:${suffix}:stale`, patch: { status: 'absent' }, deviceId: 'device-c' });
+    assert.equal(stale.outcome, 'conflict');
+    assert.equal(stale.attendance.status, 'present');
+    const note = await attendanceCommand({ ...firstPayload, mutationId: `attendance:${suffix}:note`, baseRevision: 1, patch: { note: 'ملاحظة' }, deviceId: 'device-c' });
+    assert.equal(note.outcome, 'applied');
+    assert.equal(note.attendance.note, 'ملاحظة');
+
+    const membersBefore = first.snapshot.members;
+    await pg.query(`update rakeezx.enrollments set roll_no = 9 where owner_id=$1 and id=$2`, [OWNER, `enrollment:${suffix}:one`]);
+    const snapshotAfter = (await pg.query(`select members from rakeezx.session_roster_snapshots where owner_id=$1 and session_id=$2`, [OWNER, context.sessionId])).rows[0];
+    assert.deepEqual(snapshotAfter.members, membersBefore);
+    const generic = await mutate({ entity: 'session_roster_snapshots', recordId: `other:${suffix}`, mutationId: `snapshot:${suffix}:generic`, baseRevision: 0, operation: 'create', patch: {
+      session_id: context.sessionId, teaching_id: context.teachingId, section_id: context.sectionId, captured_at: '2026-09-06T00:00:00Z', members: [], state: 'complete',
+    } });
+    assert.equal(generic.outcome, 'canonicalized');
+    assert.deepEqual(generic.canonical.members, membersBefore);
   });
 });
