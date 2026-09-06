@@ -677,3 +677,34 @@ test('attendance commands wait for canonical parents, then reconcile the atomic 
   assert.equal((await client.database.get('sessionRosterSnapshots', 'srs:session-attendance')).members[0].studentId, 'student-attendance');
   assert.equal((await client.engine.status()).state, 'synced');
 });
+
+test('bulk attendance reconciliation replaces stale rows from both applied and skipped canonical receipt entries', async (t) => {
+  const calls = [];
+  const transport = {
+    async applyFillAttendanceCommand(envelope) {
+      calls.push(clone(envelope));
+      return {
+        mutationId: envelope.mutationId, outcome: 'applied',
+        snapshot: { id: `srs:${envelope.sessionId}`, session_id: envelope.sessionId, teaching_id: 'teaching-fill', section_id: 'section-fill', captured_at: '2026-09-06T07:00:00Z', members: [{ studentId: 'student-fill-a', rollNo: 1 }, { studentId: 'student-fill-b', rollNo: 2 }], state: 'complete', revision: 4, deleted_at: null },
+        applied: [{ id: 'attendance-fill-a', session_id: envelope.sessionId, student_id: 'student-fill-a', teaching_id: 'teaching-fill', date: '2026-09-06', status: 'present', note: '', revision: 6, field_revisions: { status: 6 }, deleted_at: null }],
+        skipped: [{ id: 'attendance-fill-b', session_id: envelope.sessionId, student_id: 'student-fill-b', teaching_id: 'teaching-fill', date: '2026-09-06', status: 'absent', note: 'canonical', revision: 9, field_revisions: { status: 9, note: 8 }, bulkDisposition: 'skipped', deleted_at: null }],
+      };
+    },
+    fetchRecords: async () => [],
+  };
+  const client = makeClient(null, 'fill-command', { transport });
+  t.after(() => client.database.close());
+  await seedAuthoritative(client, 'students', { id: 'student-fill-a', name: 'A', note: '', status: 'active' });
+  await seedAuthoritative(client, 'students', { id: 'student-fill-b', name: 'B', note: '', status: 'active' });
+  await seedAuthoritative(client, 'sessions', { id: 'session-fill', teachingId: 'teaching-fill', date: '2026-09-06', period: 1, status: 'scheduled' });
+  await seedAuthoritative(client, 'attendance', { id: 'attendance-fill-b', sessionId: 'session-fill', studentId: 'student-fill-b', teachingId: 'teaching-fill', date: '2026-09-06', status: 'present', note: 'stale optimistic' });
+  await client.engine.queueFillAttendanceCommand({ sessionId: 'session-fill', status: 'present', studentIds: ['student-fill-a', 'student-fill-b'] });
+  const result = await client.engine.dispatchPending();
+  assert.equal(result.acknowledged, 1);
+  assert.equal(calls.length, 1);
+  assert.equal((await client.database.get('attendance', 'attendance-fill-a')).status, 'present');
+  const skipped = await client.database.get('attendance', 'attendance-fill-b');
+  assert.deepEqual({ status: skipped.status, note: skipped.note, serverRevision: skipped.serverRevision, fieldRevisions: skipped.fieldRevisions }, { status: 'absent', note: 'canonical', serverRevision: 9, fieldRevisions: { status: 9, note: 8 } });
+  assert.equal(skipped.bulkDisposition.outcome, 'skipped');
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+});

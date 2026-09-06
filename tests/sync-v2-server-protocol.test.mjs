@@ -21,6 +21,7 @@ const migrationFiles = [
   '0014_sync_v2_attendance_snapshot_commands.sql',
   '0015_sync_v2_lifecycle_commands.sql',
   '0016_sync_v2_teaching_creation_commands.sql',
+  '0017_sync_v2_bulk_attendance_commands.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -114,6 +115,12 @@ async function attendanceCommand({ mutationId, attendanceId, sessionId, studentI
   const result = await pg.query(`select rakeezx.apply_sync_v2_attendance_command(
     $1, $2, $3, $4, $5, $6, $7::jsonb, $8
   ) as result`, [mutationId, deviceId, attendanceId, sessionId, studentId, baseRevision, JSON.stringify(patch), clientUpdatedAt]);
+  return result.rows[0].result;
+}
+
+async function fillAttendanceCommand({ mutationId, sessionId, status = 'present', deviceId = 'device-fill', clientUpdatedAt = 90 }) {
+  const result = await pg.query(`select rakeezx.apply_sync_v2_fill_attendance_command($1,$2,$3,$4,$5) as result`,
+    [mutationId, deviceId, sessionId, status, clientUpdatedAt]);
   return result.rows[0].result;
 }
 
@@ -543,6 +550,35 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     } });
     assert.equal(generic.outcome, 'canonicalized');
     assert.deepEqual(generic.canonical.members, membersBefore);
+  });
+
+  await t.test('bulk attendance receipts return canonical applied and skipped rows and replay unchanged', async () => {
+    await useOwner(OWNER);
+    const suffix = 'v2-fill-canonical';
+    const context = await seedAcademicContext(suffix);
+    const secondStudent = `student:${suffix}:two`;
+    await seedStudent(secondStudent, OWNER, { name: 'طالب ثان' });
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ($1,$2,$3,$4,1,'2026-08-01','active',1,'seed'), ($5,$2,$6,$4,2,'2026-08-01','active',1,'seed')`,
+      [`enrollment:${suffix}:one`, OWNER, context.studentId, context.sectionId, `enrollment:${suffix}:two`, secondStudent]);
+    await attendanceCommand({ mutationId: `attendance:${suffix}:existing`, attendanceId: `attendance:${suffix}:existing`, sessionId: context.sessionId, studentId: context.studentId, patch: { status: 'absent', note: 'canonical note' } });
+    const first = await fillAttendanceCommand({ mutationId: `fill:${suffix}`, sessionId: context.sessionId, status: 'present' });
+    const retry = await fillAttendanceCommand({ mutationId: `fill:${suffix}`, sessionId: context.sessionId, status: 'present' });
+    assert.deepEqual(retry, first, 'lost-response retry must replay the complete stored canonical receipt');
+    assert.equal(first.applied.length, 1);
+    assert.equal(first.skipped.length, 1);
+    const applied = first.applied[0];
+    const skipped = first.skipped[0];
+    assert.equal(applied.student_id, secondStudent);
+    assert.equal(applied.status, 'present');
+    assert.equal(skipped.id, `attendance:${suffix}:existing`);
+    assert.equal(skipped.session_id, context.sessionId);
+    assert.equal(skipped.student_id, context.studentId);
+    assert.equal(skipped.status, 'absent');
+    assert.equal(skipped.note, 'canonical note');
+    assert.equal(skipped.bulkDisposition, 'skipped');
+    assert.ok(Number(skipped.revision) > 0);
+    assert.equal(typeof skipped.field_revisions, 'object');
   });
 
   await t.test('lifecycle commands tombstone dependent teaching data atomically and are retry-safe', async () => {

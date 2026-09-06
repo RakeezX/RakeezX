@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2TeachingCreationCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, fetchRecords } from './cloud.js';
 import { uid } from '../models.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -175,6 +175,7 @@ export function decodeSyncV2Canonical(store, row) {
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
   record.canonicalId = record.id;
   record.serverRevision = normalizeRevision(row.revision);
+  if (row.field_revisions && typeof row.field_revisions === 'object') record.fieldRevisions = clone(row.field_revisions);
   record.deleted = row.deleted_at != null;
   if (record.deleted) record.deletedAt = row.deleted_at;
   if (row.client_updated_at !== null && row.client_updated_at !== undefined) {
@@ -330,11 +331,20 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
       if (serverPatch[field] === oldId) { serverPatch[field] = newId; changed = true; }
     }
   }
-  if (String(mutation.command ?? '') === 'attendance:record') {
+  if (['attendance:record', 'attendance:fill'].includes(String(mutation.command ?? ''))) {
     const field = targetStore === 'sessions' ? 'sessionId' : targetStore === 'students' ? 'studentId' : null;
     if (field) {
-      if (localPatch[field] === oldId) { localPatch[field] = newId; changed = true; }
-      if (serverPatch[field] === oldId) { serverPatch[field] = newId; changed = true; }
+      if (field === 'studentId' && String(mutation.command ?? '') === 'attendance:fill') {
+        for (const patch of [localPatch, serverPatch]) {
+          if (Array.isArray(patch.studentIds) && patch.studentIds.includes(oldId)) {
+            patch.studentIds = patch.studentIds.map((id) => id === oldId ? newId : id);
+            changed = true;
+          }
+        }
+      } else {
+        if (localPatch[field] === oldId) { localPatch[field] = newId; changed = true; }
+        if (serverPatch[field] === oldId) { serverPatch[field] = newId; changed = true; }
+      }
     }
   }
 
@@ -389,6 +399,7 @@ function defaultTransport() {
     applyAttendanceCommand: applySyncV2AttendanceCommand,
     applyLifecycleCommand: applySyncV2LifecycleCommand,
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
+    applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -582,6 +593,11 @@ export function createSyncV2Engine({
       return { teachings: { put: [{ ...teaching, canonicalId: teaching.id, serverRevision: 0 }], remove: [] }, items: { put: items.map((item) => ({ ...item, canonicalId: item.id, serverRevision: 0 })), remove: [] }, outbox: { put: [queued], remove: [] }, device: device ? operationBatch() : { put: [{ id: 'device', deviceId, updatedAt: stamp }], remove: [] } };
     }});
     return queued;
+  }
+
+  async function queueFillAttendanceCommand({ sessionId, status, studentIds = [] }) {
+    if (!sessionId || !['present','late','excused','absent'].includes(status)) throw new Error('Invalid Sync V2 fill attendance command');
+    return queueCommand({ store:'attendance', recordId:`fill:${sessionId}`, command:'attendance:fill', patch:{ sessionId,status,studentIds:[...studentIds] }, groups:['status'], dependencies: uniqueDependencies([{ store:'sessions',recordId:sessionId,requiresServerRevision:true }, ...studentIds.map((recordId)=>({store:'students',recordId,requiresServerRevision:true}))]) });
   }
 
   async function markAttempt(mutation) {
@@ -988,6 +1004,16 @@ export function createSyncV2Engine({
         } catch (error) { if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error); else await markFailure(mutation, error); if (isRejectedProtocolError(error)) result.blocked++; else result.failed++; }
         continue;
       }
+      if (original.op === 'command' && original.command === 'attendance:fill' && typeof transport.applyFillAttendanceCommand === 'function') {
+        const live=(await database.getAll('outbox')).find((row)=>row.id===original.id); if(!live) continue;
+        const ready=await dependencyReadiness(live,(await database.getAll('outbox')).filter((row)=>row.id!==live.id));
+        if(ready.state==='blocked'){await markDependencyBlock(live,ready.reason);result.blocked++;continue;} if(ready.state==='rejected'){await markRejected(live,ready.reason);result.blocked++;continue;}
+        const mutation=await markAttempt(live); result.attempted++;
+        try { const receipt=await transport.applyFillAttendanceCommand({mutationId:mutation.mutationId,deviceId:mutation.deviceId,sessionId:mutation.patch.sessionId,status:mutation.patch.status,clientUpdatedAt:mutation.clientUpdatedAt}); if(receipt?.mutationId!==mutation.mutationId) throw new Error('Sync V2 fill receipt mutationId mismatch');
+          const snapshot=decodeSyncV2Canonical('sessionRosterSnapshots',receipt.snapshot); const skippedIds=new Set((receipt.skipped??[]).map((row)=>row?.id)); const rows=[...(receipt.applied??[]),...(receipt.skipped??[])].map((row)=>decodeSyncV2Canonical('attendance',row)).filter(Boolean);
+          await database.applyBatch({attendance:{},sessionRosterSnapshots:{},outbox:{}},{prepare:(current)=>({attendance:{put:rows.map((row)=>{const prior=current.attendance.find((x)=>x.id===row.id);const next={...prior,...row,serverCanonical:canonicalSnapshot(row)};return skippedIds.has(row.id)?{...next,bulkDisposition:{mutationId:mutation.mutationId,outcome:'skipped',canonicalRevision:row.serverRevision,recordedAt:now()}}:next;}),remove:[]},sessionRosterSnapshots:{put:snapshot?[{...current.sessionRosterSnapshots.find((x)=>x.id===snapshot.id),...snapshot,serverCanonical:canonicalSnapshot(snapshot)}]:[],remove:[]},outbox:{put:[],remove:[mutation.id]}})}); result.acknowledged++;
+        } catch(error){if(isRejectedProtocolError(error))await markRejected(mutation,'protocol-rejected',error);else await markFailure(mutation,error);if(isRejectedProtocolError(error))result.blocked++;else result.failed++;} continue;
+      }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');
         stoppedKeys.add(original.logicalRecordKey);
@@ -1113,6 +1139,7 @@ export function createSyncV2Engine({
     queueAttendanceCommand,
     queueLifecycleCommand,
     queueTeachingCreationCommand,
+    queueFillAttendanceCommand,
     dispatchPending,
     reconcilePull,
     pullStore,

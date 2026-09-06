@@ -314,6 +314,12 @@ export async function applySyncV2TeachingCreationCommand(envelope) {
   });
 }
 
+export async function applySyncV2FillAttendanceCommand(envelope) {
+  if (mockBackend) return mockBackend.applySyncV2FillAttendanceCommand(envelope);
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_fill_attendance_command', { method: 'POST', headers: { 'Content-Type':'application/json','Accept':'application/json','Accept-Profile':'rakeezx','Content-Profile':'rakeezx' }, body: JSON.stringify({ p_mutation_id:envelope.mutationId,p_device_id:envelope.deviceId,p_session_id:envelope.sessionId,p_status:envelope.status,p_client_updated_at:envelope.clientUpdatedAt ?? null }) });
+}
+
 /**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.
