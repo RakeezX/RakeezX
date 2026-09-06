@@ -197,6 +197,50 @@ function mutationEnvelope(mutation) {
   };
 }
 
+function uniqueDependencies(dependencies) {
+  const seen = new Set();
+  return dependencies.filter((dependency) => {
+    const key = [dependency.store, dependency.recordId, dependency.mutationId, dependency.requiresServerRevision].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function mutationScope(store) {
+  const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
+  return [...new Set([store, 'outbox', 'device', ...Object.values(references)])];
+}
+
+function inferredDependencies(store, record, current, supplied) {
+  const dependencies = [...(supplied ?? [])];
+  const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
+  for (const [field, parentStore] of Object.entries(references)) {
+    const parentId = record[field];
+    if (!parentId) continue;
+    const parent = current[parentStore]?.find((candidate) => candidate.id === parentId) ?? null;
+    if (!parent) {
+      dependencies.push({ store: parentStore, recordId: parentId, requiresServerRevision: true });
+      continue;
+    }
+    if (parent.deleted) throw new Error(`Sync V2 parent is deleted locally: ${parentStore}/${parentId}`);
+    const parentPending = sortMutations(current.outbox).find((mutation) =>
+      mutation.store === parentStore &&
+      (mutation.recordId === parentId || mutation.serverRecordId === parentId) &&
+      mutation.op === 'create'
+    );
+    if (normalizeRevision(parent.serverRevision) === 0 || parentPending) {
+      dependencies.push({
+        store: parentStore,
+        recordId: parent.canonicalId ?? parentId,
+        mutationId: parentPending?.mutationId,
+        requiresServerRevision: true,
+      });
+    }
+  }
+  return uniqueDependencies(dependencies);
+}
+
 function sortMutations(rows) {
   return rows
     .filter((row) => row?.protocol === 'v2')
@@ -362,8 +406,9 @@ export function createSyncV2Engine({
     const mutationId = makeId();
     const stamp = clientUpdatedAt ?? now();
     let result;
+    const scope = Object.fromEntries(mutationScope(store).map((name) => [name, {}]));
 
-    await database.applyBatch({ [store]: {}, outbox: {}, device: {} }, {
+    await database.applyBatch(scope, {
       prepare(current) {
         const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
         const deviceId = deviceRecord?.deviceId || makeId();
@@ -380,6 +425,9 @@ export function createSyncV2Engine({
         const serverPatch = op === 'delete'
           ? {}
           : encodeSyncV2Patch(store, op === 'create' ? next : patch);
+        const resolvedDependencies = op === 'delete'
+          ? uniqueDependencies(dependencies)
+          : inferredDependencies(store, next, current, dependencies);
         const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
         const mutation = {
           id: `v2:${mutationId}`,
@@ -398,7 +446,7 @@ export function createSyncV2Engine({
           localPatch: clone(op === 'delete' ? {} : optimisticPatch),
           fields: Object.keys(serverPatch).sort(),
           groups: [...new Set(groups)].sort(),
-          dependencies: clone(dependencies),
+          dependencies: clone(resolvedDependencies),
           sequence,
           clientUpdatedAt: stamp,
           queuedAt: stamp,
@@ -584,14 +632,61 @@ export function createSyncV2Engine({
     });
   }
 
-  async function dependenciesPending(mutation, rows) {
+  async function dependencyReadiness(mutation, rows) {
     for (const dependency of mutation.dependencies ?? []) {
-      if (dependency.mutationId && rows.some((row) => row.mutationId === dependency.mutationId)) return true;
-      if (dependency.store && dependency.recordId && rows.some((row) =>
-        row.store === dependency.store && (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId)
-      )) return true;
+      const identifiedMutation = dependency.mutationId
+        ? rows.find((row) => row.mutationId === dependency.mutationId)
+        : null;
+      if (identifiedMutation?.state === 'rejected') return { state: 'rejected', reason: 'dependency-rejected' };
+      if (identifiedMutation) {
+        return { state: 'blocked', reason: identifiedMutation.state === 'failed' ? 'dependency-failed' : 'dependency-pending' };
+      }
+      if (!dependency.store || !dependency.recordId) continue;
+      const parent = await database.get(dependency.store, dependency.recordId);
+      if (!parent) return { state: 'blocked', reason: 'dependency-not-local-yet' };
+      if (parent.deleted) return { state: 'rejected', reason: 'dependency-deleted' };
+      if (dependency.requiresServerRevision && normalizeRevision(parent.serverRevision) === 0) {
+        return { state: 'blocked', reason: 'dependency-not-authoritative' };
+      }
+      const createMutation = rows.find((row) => row.store === dependency.store &&
+        (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId) && row.op === 'create');
+      if (createMutation?.state === 'rejected') return { state: 'rejected', reason: 'dependency-rejected' };
+      if (createMutation) {
+        return { state: 'blocked', reason: createMutation.state === 'failed' ? 'dependency-failed' : 'dependency-pending' };
+      }
     }
-    return false;
+    return { state: 'ready', reason: null };
+  }
+
+  async function markRejected(mutation, reason, error = null) {
+    await database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (!existing) return { outbox: operationBatch() };
+        return {
+          outbox: {
+            put: [{
+              ...existing,
+              state: 'rejected',
+              blockedReason: reason,
+              lastError: {
+                message: error?.message ?? reason,
+                code: error?.code ?? null,
+                status: error?.status ?? null,
+                at: now(),
+              },
+            }],
+            remove: [],
+          },
+        };
+      },
+    });
+  }
+
+  function isRejectedProtocolError(error) {
+    const status = Number(error?.status);
+    return error?.code === '22023' || error?.code === '23503' ||
+      status === 400 || status === 409 || status === 422;
   }
 
   async function dispatchPending({ maxMutations = Infinity } = {}) {
@@ -601,6 +696,11 @@ export function createSyncV2Engine({
 
     for (const original of snapshot) {
       if (result.attempted >= maxMutations) break;
+      if (original.state === 'rejected') {
+        stoppedKeys.add(original.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');
         stoppedKeys.add(original.logicalRecordKey);
@@ -614,8 +714,15 @@ export function createSyncV2Engine({
       const liveRows = sortMutations(await database.getAll('outbox'));
       const live = liveRows.find((row) => row.id === original.id);
       if (!live) continue;
-      if (await dependenciesPending(live, liveRows.filter((row) => row.id !== live.id))) {
-        await markDependencyBlock(live, 'dependency-pending');
+      const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
+      if (readiness.state === 'blocked') {
+        await markDependencyBlock(live, readiness.reason);
+        stoppedKeys.add(live.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
+      if (readiness.state === 'rejected') {
+        await markRejected(live, readiness.reason);
         stoppedKeys.add(live.logicalRecordKey);
         result.blocked++;
         continue;
@@ -628,9 +735,11 @@ export function createSyncV2Engine({
         await reconcileReceipt(mutation, receipt);
         result.acknowledged++;
       } catch (error) {
-        await markFailure(mutation, error);
+        if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+        else await markFailure(mutation, error);
         stoppedKeys.add(mutation.logicalRecordKey);
-        result.failed++;
+        if (isRejectedProtocolError(error)) result.blocked++;
+        else result.failed++;
       }
     }
     return result;
@@ -693,13 +802,20 @@ export function createSyncV2Engine({
     const outbox = sortMutations(await database.getAll('outbox'));
     const failed = outbox.filter((row) => row.state === 'failed').length;
     const blockedOutbox = outbox.filter((row) => row.state === 'blocked').length;
+    const rejected = outbox.filter((row) => row.state === 'rejected').length;
+    const pending = outbox.filter((row) => row.state === 'pending').length;
     let conflicts = 0;
     for (const store of SYNC_V2_STORES) {
       const records = await database.getAll(store);
       conflicts += records.reduce((total, record) => total + (record.syncConflicts?.length ?? 0), 0);
     }
-    const state = failed ? 'error' : (blockedOutbox || conflicts) ? 'blocked' : outbox.length ? 'pending' : 'synced';
-    return { state, pending: outbox.length, failed, blocked: blockedOutbox, conflicts };
+    const state = failed ? 'error'
+      : rejected ? 'rejected'
+      : conflicts ? 'conflicted'
+      : blockedOutbox ? 'blocked'
+      : pending ? 'pending'
+      : 'synced';
+    return { state, pending, queued: outbox.length, failed, blocked: blockedOutbox, rejected, conflicts };
   }
 
   return {

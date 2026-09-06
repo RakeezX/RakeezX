@@ -225,6 +225,18 @@ function makeClient(server, label, overrides = {}) {
   return { database, engine };
 }
 
+async function seedAuthoritative(client, store, record) {
+  const canonical = {
+    ...record,
+    canonicalId: record.id,
+    serverRevision: 1,
+    deleted: false,
+  };
+  await client.database.applyBatch({ [store]: {} }, {
+    prepare: () => ({ [store]: { put: [{ ...canonical, serverCanonical: clone(canonical) }], remove: [] } }),
+  });
+}
+
 test('Sync V2 atomically persists optimistic data and a durable outbox mutation', async (t) => {
   const server = new MemoryV2Server();
   const client = makeClient(server, 'atomic');
@@ -284,6 +296,76 @@ test('lost response retries the exact mutationId and clears one receipt without 
   assert.equal(server.calls[1].mutationId, mutation.mutationId);
 });
 
+test('automatic parent dependencies send the parent before its child', async (t) => {
+  const server = new MemoryV2Server();
+  const client = makeClient(server, 'dependency-order');
+  t.after(() => client.database.close());
+
+  await seedAuthoritative(client, 'sections', { id: 'section-order', yearId: 'year-order', grade: 4, label: 'A', name: '4/A', color: '#000', order: 0 });
+  await seedAuthoritative(client, 'terms', { id: 'term-order', yearId: 'year-order', index: 1, name: 'Term', startDate: null, endDate: null, status: 'active', calendarId: null });
+  const parent = await client.engine.commitMutation({ store: 'subjects', recordId: 'subject-order', op: 'create', patch: { name: 'Order', slug: 'order' } });
+  const child = await client.engine.commitMutation({
+    store: 'teachings', recordId: 'teaching-order', op: 'create',
+    patch: { sectionId: 'section-order', subjectId: 'subject-order', termId: 'term-order', order: 0 },
+  });
+  assert.equal(child.mutation.dependencies[0].mutationId, parent.mutation.mutationId);
+  assert.equal((await client.engine.dispatchPending()).acknowledged, 2);
+  assert.deepEqual(server.calls.map((call) => call.entity), ['subjects', 'teachings']);
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+});
+
+test('a blocked child is durable, does not turn the run fatal, and automatically recovers after its parent arrives', async (t) => {
+  const server = new MemoryV2Server();
+  const client = makeClient(server, 'dependency-recovery');
+  t.after(() => client.database.close());
+
+  await seedAuthoritative(client, 'sections', { id: 'section-later', yearId: 'year-later', grade: 4, label: 'A', name: '4/A', color: '#000', order: 0 });
+  await seedAuthoritative(client, 'terms', { id: 'term-later', yearId: 'year-later', index: 1, name: 'Term', startDate: null, endDate: null, status: 'active', calendarId: null });
+  await client.engine.commitMutation({
+    store: 'teachings', recordId: 'teaching-later', op: 'create',
+    patch: { sectionId: 'section-later', subjectId: 'subject-later', termId: 'term-later', order: 0 },
+  });
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-independent', op: 'create', patch: { name: 'Independent' } });
+
+  const first = await client.engine.dispatchPending();
+  assert.deepEqual(first, { attempted: 1, acknowledged: 1, failed: 0, blocked: 1 });
+  assert.equal(server.table('students').get('student-independent').name, 'Independent');
+  assert.equal((await client.engine.status()).state, 'blocked');
+  assert.equal((await client.database.getAll('outbox'))[0].state, 'blocked');
+
+  await client.engine.reconcilePull('subjects', [{ id: 'subject-later', name: 'Later', slug: 'later', revision: 1, deleted_at: null, client_updated_at: 1 }]);
+  const recovered = await client.engine.dispatchPending();
+  assert.equal(recovered.acknowledged, 1);
+  assert.equal((await client.database.getAll('outbox')).length, 0);
+  assert.equal((await client.engine.status()).state, 'synced');
+  assert.equal(server.calls.at(-1).entity, 'teachings');
+});
+
+test('protocol-invalid work is durably rejected without a fatal sync state', async (t) => {
+  const server = new MemoryV2Server();
+  const transport = {
+    fetchRecords: (entity) => server.fetchRecords(entity),
+    applyMutation() {
+      const error = new Error('invalid protocol field');
+      error.status = 400;
+      error.code = '22023';
+      throw error;
+    },
+  };
+  const client = makeClient(server, 'rejected', { transport });
+  t.after(() => client.database.close());
+
+  await client.engine.commitMutation({ store: 'students', recordId: 'student-rejected', op: 'create', patch: { name: 'Rejected' } });
+  const result = await client.engine.dispatchPending();
+  assert.deepEqual(result, { attempted: 1, acknowledged: 0, failed: 0, blocked: 1 });
+  assert.equal((await client.database.getAll('outbox'))[0].state, 'rejected');
+  const status = await client.engine.status();
+  assert.equal(status.state, 'rejected');
+  assert.equal(status.failed, 0);
+  await client.engine.dispatchPending();
+  assert.equal((await client.database.getAll('outbox'))[0].attemptCount, 1, 'rejected work is retained for diagnosis, not retried as a network failure');
+});
+
 test('different-field stale edits survive while same-field conflicts retain diagnostics and do not stop unrelated records', async (t) => {
   const server = new MemoryV2Server();
   const a = makeClient(server, 'fields-a');
@@ -312,7 +394,7 @@ test('different-field stale edits survive while same-field conflicts retain diag
   assert.equal(local.note, 'Note B');
   assert.equal(local.syncConflicts.length, 1);
   assert.deepEqual(local.syncConflicts[0].groups, ['name']);
-  assert.equal((await c.engine.status()).state, 'blocked');
+  assert.equal((await c.engine.status()).state, 'conflicted');
 });
 
 test('pull overlays pending patches and deletes, then converges to an authoritative tombstone', async (t) => {
@@ -396,6 +478,8 @@ test('canonical create remaps local identity and a dependent pending reference a
   await winner.engine.commitMutation({ store: 'subjects', recordId: 'subject-a', op: 'create', patch: { name: 'Math', slug: 'math' } });
   await winner.engine.dispatchPending();
   const parent = await loser.engine.commitMutation({ store: 'subjects', recordId: 'subject-b', op: 'create', patch: { name: 'Math duplicate', slug: 'math' } });
+  await seedAuthoritative(loser, 'sections', { id: 'section-x', yearId: 'year-x', grade: 4, label: 'A', name: '4/A', color: '#000', order: 0 });
+  await seedAuthoritative(loser, 'terms', { id: 'term-x', yearId: 'year-x', index: 1, name: 'Term', startDate: null, endDate: null, status: 'active', calendarId: null });
   await loser.engine.commitMutation({
     store: 'teachings', recordId: 'teaching-b', op: 'create',
     patch: { sectionId: 'section-x', subjectId: 'subject-b', termId: 'term-x', order: 1 },
@@ -484,6 +568,8 @@ test('offline failure remains durable, reconnect succeeds, and score zero is dis
   const client = makeClient(server, 'offline', { transport });
   t.after(() => client.database.close());
 
+  await seedAuthoritative(client, 'students', { id: 'student-z', name: 'Student Z', note: '', status: 'active' });
+  await seedAuthoritative(client, 'items', { id: 'item-z', teachingId: 'teaching-z', name: 'Item Z', max: 10, order: 0, auto: null, perPoint: 1, penalty: 1, unitId: null, lessonId: null });
   await client.engine.commitMutation({ store: 'scores', recordId: 'score-zero', op: 'create', patch: { studentId: 'student-z', itemId: 'item-z', value: 0 } });
   assert.equal((await client.engine.dispatchPending()).failed, 1);
   assert.equal((await client.engine.status()).state, 'error');
