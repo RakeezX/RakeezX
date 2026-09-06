@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, fetchRecords } from './cloud.js';
 import { uid } from '../models.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -321,6 +321,16 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
   const serverPatch = { ...(mutation.patch ?? {}) };
   const references = SYNC_V2_SCHEMAS[mutation.store]?.references ?? {};
 
+  // Enrollment commands carry their enrollment references inside the typed
+  // command payload. Remap those exact fields only; never use a generic
+  // string replacement on command data.
+  if (targetStore === 'enrollments' && String(mutation.command ?? '').startsWith('enrollment:')) {
+    for (const field of ['sourceEnrollmentId', 'destinationEnrollmentId']) {
+      if (localPatch[field] === oldId) { localPatch[field] = newId; changed = true; }
+      if (serverPatch[field] === oldId) { serverPatch[field] = newId; changed = true; }
+    }
+  }
+
   if (mutation.store === targetStore &&
       (mutation.recordId === oldId || mutation.serverRecordId === oldId || mutation.canonicalId === oldId)) {
     if (mutation.envelopeLocked) {
@@ -368,6 +378,7 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
 function defaultTransport() {
   return {
     applyMutation: applySyncV2Mutation,
+    applyEnrollmentCommand: applySyncV2EnrollmentCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -504,6 +515,25 @@ export function createSyncV2Engine({
     return queued;
   }
 
+  async function queueEnrollmentCommand({
+    command, studentId, sourceEnrollmentId = null, destinationEnrollmentId = null,
+    destinationSectionId = null, date = null, note = '', dependencies = [],
+  }) {
+    if (!['enroll', 'transfer', 'withdraw'].includes(command) || !studentId) {
+      throw new Error('Invalid Sync V2 enrollment command');
+    }
+    const payload = { studentId, sourceEnrollmentId, destinationEnrollmentId, destinationSectionId, date, note };
+    const required = [
+      { store: 'students', recordId: studentId, requiresServerRevision: true },
+      ...(destinationSectionId ? [{ store: 'sections', recordId: destinationSectionId, requiresServerRevision: true }] : []),
+      ...dependencies,
+    ];
+    return queueCommand({
+      store: 'enrollments', recordId: studentId, command: `enrollment:${command}`,
+      patch: payload, groups: ['membership'], dependencies: uniqueDependencies(required),
+    });
+  }
+
   async function markAttempt(mutation) {
     let locked = mutation;
     await database.applyBatch({ outbox: {} }, {
@@ -632,6 +662,46 @@ export function createSyncV2Engine({
     });
   }
 
+  async function reconcileEnrollmentCommandReceipt(mutation, result) {
+    if (result?.mutationId !== mutation.mutationId) throw new Error('Sync V2 enrollment receipt mutationId mismatch');
+    const canonicalRows = Array.isArray(result.enrollments) ? result.enrollments
+      .map((row) => decodeSyncV2Canonical('enrollments', row)).filter(Boolean) : [];
+    const payload = mutation.patch ?? {};
+    const destination = canonicalRows.find((row) => row.sectionId === payload.destinationSectionId && row.studentId === payload.studentId) ?? null;
+    const remap = payload.destinationEnrollmentId && destination && payload.destinationEnrollmentId !== destination.id
+      ? { from: payload.destinationEnrollmentId, to: destination.id } : null;
+    await database.applyBatch({ enrollments: {}, students: {}, outbox: {} }, {
+      prepare(current) {
+        const currentMutation = current.outbox.find((row) => row.id === mutation.id);
+        if (!currentMutation) return { enrollments: operationBatch(), students: operationBatch(), outbox: operationBatch() };
+        const writes = { enrollments: operationBatch(), students: operationBatch(), outbox: operationBatch() };
+        for (const row of canonicalRows) {
+          const existing = current.enrollments.find((record) => record.id === row.id);
+          pushUniquePut(writes.enrollments, { ...(existing ?? {}), ...row, serverCanonical: canonicalSnapshot(row) });
+        }
+        const student = current.students.find((row) => row.id === payload.studentId);
+        if (['conflict', 'rejected'].includes(result.outcome) && student) {
+          pushUniquePut(writes.students, {
+            ...student,
+            syncConflicts: [...(student.syncConflicts ?? []), {
+              mutationId: mutation.mutationId, outcome: result.outcome, groups: ['__membership__'],
+              rejectedPatch: clone(payload), recordedAt: now(),
+            }],
+          });
+        }
+        const others = current.outbox.filter((row) => row.id !== mutation.id).map((row) =>
+          remap ? rewriteMutationReferences(row, 'enrollments', remap.from, remap.to) : row);
+        if (remap) writes.enrollments.remove.push(remap.from);
+        writes.outbox.remove.push(mutation.id);
+        for (const row of others) {
+          const before = current.outbox.find((candidate) => candidate.id === row.id);
+          if (JSON.stringify(before) !== JSON.stringify(row)) pushUniquePut(writes.outbox, row);
+        }
+        return writes;
+      },
+    });
+  }
+
   async function dependencyReadiness(mutation, rows) {
     for (const dependency of mutation.dependencies ?? []) {
       const identifiedMutation = dependency.mutationId
@@ -699,6 +769,37 @@ export function createSyncV2Engine({
       if (original.state === 'rejected') {
         stoppedKeys.add(original.logicalRecordKey);
         result.blocked++;
+        continue;
+      }
+      if (original.op === 'command' && String(original.command ?? '').startsWith('enrollment:') &&
+          typeof transport.applyEnrollmentCommand === 'function') {
+        if (stoppedKeys.has(original.logicalRecordKey)) { result.blocked++; continue; }
+        const liveRows = sortMutations(await database.getAll('outbox'));
+        const live = liveRows.find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') {
+          await markDependencyBlock(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+        }
+        if (readiness.state === 'rejected') {
+          await markRejected(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+        }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = await transport.applyEnrollmentCommand({
+            mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            command: mutation.command.slice('enrollment:'.length), payload: clone(mutation.patch),
+            clientUpdatedAt: mutation.clientUpdatedAt,
+          });
+          await reconcileEnrollmentCommandReceipt(mutation, receipt);
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+          else await markFailure(mutation, error);
+          stoppedKeys.add(mutation.logicalRecordKey);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
         continue;
       }
       if (original.op === 'command') {
@@ -822,6 +923,7 @@ export function createSyncV2Engine({
     ensureDeviceId,
     commitMutation,
     queueCommand,
+    queueEnrollmentCommand,
     dispatchPending,
     reconcilePull,
     pullStore,

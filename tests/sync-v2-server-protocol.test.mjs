@@ -17,6 +17,7 @@ const migrationFiles = [
   '0010_profile_report_principal_name.sql',
   '0011_session_roster_snapshots.sql',
   '0012_sync_v2_server_protocol.sql',
+  '0013_sync_v2_enrollment_commands.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -96,6 +97,13 @@ async function mutate({
     entity, recordId, mutationId, deviceId, baseRevision,
     JSON.stringify(patch), operation, clientUpdatedAt,
   ]);
+  return result.rows[0].result;
+}
+
+async function enrollmentCommand({ mutationId, command = 'transfer', payload, deviceId = 'device-enrollment', clientUpdatedAt = 50 }) {
+  const result = await pg.query(`select rakeezx.apply_sync_v2_enrollment_command(
+    $1, $2, $3, $4::jsonb, $5
+  ) as result`, [mutationId, deviceId, command, JSON.stringify(payload), clientUpdatedAt]);
   return result.rows[0].result;
 }
 
@@ -437,5 +445,48 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     });
     assert.equal(retried.outcome, 'applied');
     assert.equal(Number(retried.resultRevision), 1);
+  });
+
+  await t.test('enrollment commands are idempotent, serialize conflicting transfers, and return complete sequential rosters', async () => {
+    await useOwner(OWNER);
+    const suffix = 'v2-command';
+    const year = `year:${suffix}`, student = `student:${suffix}`, xOther = `student:${suffix}:x-other`, yOther = `student:${suffix}:y-other`, x = `section:${suffix}:x`, y = `section:${suffix}:y`, z = `section:${suffix}:z`;
+    const source = `enrollment:${suffix}:x`, destination = `enrollment:${suffix}:y`;
+    await pg.query(`insert into rakeezx.years (id, owner_id, label, hijri_start, hijri_end, status, client_updated_at, device_id)
+      values ($1,$2,'سنة',1488,1489,'active',1,'seed')`, [year, OWNER]);
+    for (const [id, label] of [[x, 'أ'], [y, 'ب'], [z, 'ج']]) {
+      await pg.query(`insert into rakeezx.sections (id, owner_id, year_id, grade, label, name, client_updated_at, device_id)
+        values ($1,$2,$3,4,$4,$5,1,'seed')`, [id, OWNER, year, label, `4/${label}`]);
+    }
+    await seedStudent(student, OWNER, { name: 'طالب نقل' });
+    await seedStudent(xOther, OWNER, { name: 'طالب س' });
+    await seedStudent(yOther, OWNER, { name: 'طالب ص' });
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ($1,$2,$3,$4,1,'2026-08-01','active',1,'seed')`, [source, OWNER, student, x]);
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ($1,$2,$3,$4,$5,'2026-08-01','active',1,'seed')`, [`enrollment:${suffix}:x-other`, OWNER, xOther, x, 2]);
+    await pg.query(`insert into rakeezx.enrollments (id, owner_id, student_id, section_id, roll_no, start_date, status, client_updated_at, device_id)
+      values ($1,$2,$3,$4,$5,'2026-08-01','active',1,'seed')`, [`enrollment:${suffix}:y-other`, OWNER, yOther, y, 1]);
+    const payload = { studentId: student, sourceEnrollmentId: source, destinationEnrollmentId: destination, destinationSectionId: y, date: '2026-09-01', note: 'نقل' };
+    const first = await enrollmentCommand({ mutationId: `command:${suffix}:a`, payload });
+    const retry = await enrollmentCommand({ mutationId: `command:${suffix}:a`, payload });
+    assert.deepEqual(retry, first);
+    assert.equal(first.outcome, 'applied');
+    assert.equal((await pg.query(`select count(*) from rakeezx.enrollments where owner_id=$1 and student_id=$2 and status='active' and deleted_at is null`, [OWNER, student])).rows[0].count, 1);
+    assert.deepEqual((await pg.query(`select roll_no from rakeezx.enrollments where owner_id=$1 and section_id=$2 and status='active' order by roll_no`, [OWNER, x])).rows.map((row) => row.roll_no), [1]);
+    assert.deepEqual((await pg.query(`select roll_no from rakeezx.enrollments where owner_id=$1 and section_id=$2 and status='active' order by roll_no`, [OWNER, y])).rows.map((row) => row.roll_no), [1, 2]);
+
+    const same = await enrollmentCommand({ mutationId: `command:${suffix}:same`, payload });
+    assert.equal(same.outcome, 'already_applied');
+    const conflict = await enrollmentCommand({ mutationId: `command:${suffix}:conflict`, payload: { ...payload, destinationEnrollmentId: `enrollment:${suffix}:z`, destinationSectionId: z } });
+    assert.equal(conflict.outcome, 'conflict');
+    assert.equal((await pg.query(`select count(*) from rakeezx.enrollments where owner_id=$1 and student_id=$2 and status='active' and deleted_at is null`, [OWNER, student])).rows[0].count, 1);
+
+    const withdrawn = await enrollmentCommand({ mutationId: `command:${suffix}:withdraw`, command: 'withdraw', payload: { studentId: student, date: '2026-09-02', note: 'انسحاب' } });
+    const withdrawRetry = await enrollmentCommand({ mutationId: `command:${suffix}:withdraw`, command: 'withdraw', payload: { studentId: student, date: '2026-09-02', note: 'انسحاب' } });
+    assert.deepEqual(withdrawRetry, withdrawn);
+    assert.equal(withdrawn.outcome, 'applied');
+    assert.equal((await pg.query(`select status from rakeezx.students where owner_id=$1 and id=$2`, [OWNER, student])).rows[0].status, 'withdrawn');
+    assert.deepEqual((await pg.query(`select roll_no from rakeezx.enrollments where owner_id=$1 and section_id=$2 and status='active' order by roll_no`, [OWNER, y])).rows.map((row) => row.roll_no), [1]);
   });
 });

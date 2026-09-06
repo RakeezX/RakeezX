@@ -585,3 +585,49 @@ test('offline failure remains durable, reconnect succeeds, and score zero is dis
   assert.equal((await client.database.get('scores', 'score-zero')).value, null);
   assert.equal((await client.engine.status()).state, 'synced');
 });
+
+test('enrollment command receipts reconcile canonical IDs and rewrite pending typed enrollment references', async (t) => {
+  const receipts = new Map();
+  const calls = [];
+  const transport = {
+    async applyEnrollmentCommand(envelope) {
+      calls.push(clone(envelope));
+      if (receipts.has(envelope.mutationId)) return clone(receipts.get(envelope.mutationId));
+      const result = {
+        mutationId: envelope.mutationId,
+        command: envelope.command,
+        outcome: 'applied',
+        canonicalEnrollmentId: 'enrollment-canonical-y',
+        enrollments: [
+          { id: 'enrollment-x', student_id: 'student-enrollment', section_id: 'section-x', roll_no: 1, start_date: '2026-08-01', end_date: '2026-09-01', status: 'transferred', transfer_note: '', revision: 2, deleted_at: null },
+          { id: 'enrollment-canonical-y', student_id: 'student-enrollment', section_id: 'section-y', roll_no: 1, start_date: '2026-09-01', end_date: null, status: 'active', transfer_note: '', revision: 2, deleted_at: null },
+        ],
+      };
+      receipts.set(envelope.mutationId, result);
+      return clone(result);
+    },
+    fetchRecords: async () => [],
+  };
+  const client = makeClient(null, 'enrollment-command', { transport });
+  t.after(() => client.database.close());
+
+  await seedAuthoritative(client, 'students', { id: 'student-enrollment', name: 'Student', note: '', status: 'active' });
+  await seedAuthoritative(client, 'sections', { id: 'section-y', yearId: 'year-y', grade: 4, label: 'Y', name: '4/Y', color: '#000', order: 0 });
+  await seedAuthoritative(client, 'enrollments', { id: 'enrollment-x', studentId: 'student-enrollment', sectionId: 'section-x', rollNo: 1, startDate: '2026-08-01', endDate: null, status: 'active', transferNote: '' });
+  await client.engine.queueEnrollmentCommand({
+    command: 'transfer', studentId: 'student-enrollment', sourceEnrollmentId: 'enrollment-x',
+    destinationEnrollmentId: 'enrollment-local-y', destinationSectionId: 'section-y', date: '2026-09-01',
+  });
+  await client.engine.queueEnrollmentCommand({
+    command: 'transfer', studentId: 'student-enrollment', sourceEnrollmentId: 'enrollment-local-y',
+    destinationEnrollmentId: 'enrollment-local-z', destinationSectionId: 'section-y', date: '2026-09-02',
+  });
+
+  const first = await client.engine.dispatchPending({ maxMutations: 1 });
+  assert.equal(first.acknowledged, 1);
+  assert.equal((await client.database.get('enrollments', 'enrollment-local-y')), undefined);
+  assert.equal((await client.database.get('enrollments', 'enrollment-canonical-y')).status, 'active');
+  const pending = (await client.database.getAll('outbox')).find((row) => row.command === 'enrollment:transfer');
+  assert.equal(pending.patch.sourceEnrollmentId, 'enrollment-canonical-y');
+  assert.equal(calls.length, 1);
+});

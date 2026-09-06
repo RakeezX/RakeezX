@@ -234,6 +234,31 @@ export async function applySyncV2Mutation(envelope) {
   });
 }
 
+/** Development-only V2 enrollment command transport. V1 enrollment RPCs stay intact. */
+export async function applySyncV2EnrollmentCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2EnrollmentCommand !== 'function') {
+      throw new Error('Mock backend does not implement Sync V2 enrollment command RPC');
+    }
+    return mockBackend.applySyncV2EnrollmentCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_enrollment_command', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_mutation_id: envelope.mutationId,
+      p_device_id: envelope.deviceId,
+      p_command: envelope.command,
+      p_payload: envelope.payload,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null,
+    }),
+  });
+}
+
 /**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.
