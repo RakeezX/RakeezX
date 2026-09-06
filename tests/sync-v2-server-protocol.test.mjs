@@ -19,6 +19,7 @@ const migrationFiles = [
   '0012_sync_v2_server_protocol.sql',
   '0013_sync_v2_enrollment_commands.sql',
   '0014_sync_v2_attendance_snapshot_commands.sql',
+  '0015_sync_v2_lifecycle_commands.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -112,6 +113,12 @@ async function attendanceCommand({ mutationId, attendanceId, sessionId, studentI
   const result = await pg.query(`select rakeezx.apply_sync_v2_attendance_command(
     $1, $2, $3, $4, $5, $6, $7::jsonb, $8
   ) as result`, [mutationId, deviceId, attendanceId, sessionId, studentId, baseRevision, JSON.stringify(patch), clientUpdatedAt]);
+  return result.rows[0].result;
+}
+
+async function lifecycleCommand({ mutationId, command, targetId, deviceId = 'device-lifecycle', clientUpdatedAt = 70 }) {
+  const result = await pg.query(`select rakeezx.apply_sync_v2_lifecycle_command($1,$2,$3,$4,$5) as result`,
+    [mutationId, deviceId, command, targetId, clientUpdatedAt]);
   return result.rows[0].result;
 }
 
@@ -529,5 +536,39 @@ test('SYNC-V2A server protocol foundation', async (t) => {
     } });
     assert.equal(generic.outcome, 'canonicalized');
     assert.deepEqual(generic.canonical.members, membersBefore);
+  });
+
+  await t.test('lifecycle commands tombstone dependent teaching data atomically and are retry-safe', async () => {
+    await useOwner(OWNER);
+    const context = await seedAcademicContext('lifecycle');
+    const scoreId = 'score:lifecycle';
+    await pg.query(`insert into rakeezx.scores (id, owner_id, student_id, item_id, value, client_updated_at, device_id)
+      values ($1,$2,$3,$4,0,1,'seed')`, [scoreId, OWNER, context.studentId, context.itemId]);
+    const first = await lifecycleCommand({ mutationId: 'lifecycle:teaching:one', command: 'delete_teaching', targetId: context.teachingId });
+    const retry = await lifecycleCommand({ mutationId: 'lifecycle:teaching:one', command: 'delete_teaching', targetId: context.teachingId });
+    assert.deepEqual(retry, first);
+    assert.equal(first.outcome, 'deleted');
+    for (const [table, id] of [['teachings', context.teachingId], ['items', context.itemId], ['sessions', context.sessionId], ['scores', scoreId]]) {
+      const row = (await pg.query(`select deleted_at from rakeezx.${table} where owner_id=$1 and id=$2`, [OWNER, id])).rows[0];
+      assert.ok(row.deleted_at, `${table} must be tombstoned`);
+    }
+    const stale = await mutate({ entity: 'teachings', recordId: context.teachingId, mutationId: 'lifecycle:stale', baseRevision: 1, patch: { order: 9 } });
+    assert.equal(stale.outcome, 'tombstoned');
+  });
+
+  await t.test('timing profile metadata merges independently while nested configuration is one conflict group', async () => {
+    await useOwner(OWNER);
+    const created = await mutate({ entity: 'time_profiles', recordId: 'profile:v2-group', mutationId: 'profile:v2-create', baseRevision: 0, operation: 'create', patch: {
+      name: 'ملف', order: 0, periods: [{ number: 1, start: '07:00', end: '07:45' }],
+      overrides: { config: { recess: { enabled: false }, gap: 0 } }, active_from: null, active_to: null,
+    } });
+    assert.equal(created.outcome, 'applied');
+    const metadata = await mutate({ entity: 'time_profiles', recordId: 'profile:v2-group', mutationId: 'profile:v2-name', baseRevision: 1, patch: { name: 'ملف جديد' } });
+    assert.equal(metadata.outcome, 'applied');
+    const configuration = await mutate({ entity: 'time_profiles', recordId: 'profile:v2-group', mutationId: 'profile:v2-config', baseRevision: 1, patch: { periods: [{ number: 1, start: '08:00', end: '08:45' }] } });
+    assert.equal(configuration.outcome, 'applied');
+    const staleConfiguration = await mutate({ entity: 'time_profiles', recordId: 'profile:v2-group', mutationId: 'profile:v2-stale-config', baseRevision: 1, patch: { overrides: { config: { recess: { enabled: true, after: 1 }, gap: 5 } } } });
+    assert.equal(staleConfiguration.outcome, 'conflict');
+    assert.deepEqual(staleConfiguration.conflictedGroups, ['configuration']);
   });
 });

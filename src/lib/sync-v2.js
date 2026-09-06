@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, fetchRecords } from './cloud.js';
 import { uid } from '../models.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -387,6 +387,7 @@ function defaultTransport() {
     applyMutation: applySyncV2Mutation,
     applyEnrollmentCommand: applySyncV2EnrollmentCommand,
     applyAttendanceCommand: applySyncV2AttendanceCommand,
+    applyLifecycleCommand: applySyncV2LifecycleCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -557,6 +558,11 @@ export function createSyncV2Engine({
       patch: { sessionId, studentId, ...patch }, groups: Object.keys(patch),
       dependencies: uniqueDependencies(required), baseRevision: normalizeRevision(existing?.serverRevision),
     });
+  }
+
+  async function queueLifecycleCommand({ command, targetId, dependencies = [] }) {
+    if (!['delete_item', 'delete_teaching', 'delete_student', 'delete_class'].includes(command) || !targetId) throw new Error('Invalid Sync V2 lifecycle command');
+    return queueCommand({ store: 'sessions', recordId: `${command}:${targetId}`, command: `lifecycle:${command}`, patch: { targetId }, groups: ['__deleted__'], dependencies });
   }
 
   async function markAttempt(mutation) {
@@ -899,6 +905,27 @@ export function createSyncV2Engine({
         }
         continue;
       }
+      if (original.op === 'command' && String(original.command ?? '').startsWith('lifecycle:') &&
+          typeof transport.applyLifecycleCommand === 'function') {
+        const live = (await database.getAll('outbox')).find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, (await database.getAll('outbox')).filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') { await markDependencyBlock(live, readiness.reason); result.blocked++; continue; }
+        if (readiness.state === 'rejected') { await markRejected(live, readiness.reason); result.blocked++; continue; }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = await transport.applyLifecycleCommand({ mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            command: mutation.command.slice('lifecycle:'.length), targetId: mutation.patch.targetId, clientUpdatedAt: mutation.clientUpdatedAt });
+          if (receipt?.mutationId !== mutation.mutationId) throw new Error('Sync V2 lifecycle receipt mutationId mismatch');
+          await database.applyBatch({ outbox: {} }, { prepare: () => ({ outbox: { put: [], remove: [mutation.id] } }) });
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error); else await markFailure(mutation, error);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
+        continue;
+      }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');
         stoppedKeys.add(original.logicalRecordKey);
@@ -1022,6 +1049,7 @@ export function createSyncV2Engine({
     queueCommand,
     queueEnrollmentCommand,
     queueAttendanceCommand,
+    queueLifecycleCommand,
     dispatchPending,
     reconcilePull,
     pullStore,
