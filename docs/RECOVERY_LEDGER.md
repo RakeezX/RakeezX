@@ -17,7 +17,8 @@ This is the current product ledger, not a claim that every historical branch is 
 | SET-DATA-01 | `CLOSED` | Principal cloud sync/local-reset safety; production lineage includes `b601519`; migration `0010` is supplied as applied/aligned. |
 | STU-HIST-01 | `CLOSED` | Historical session roster truth was approved and Production-verified; migration `0011` is applied/aligned. |
 | STU-REC-01C | `CLOSED` | Grade portability was approved and Production-verified. |
-| SYNC-UX-01 / OFFLINE-ROUTES-01 | `CLOSED` | Quiet automatic sync, reconnect recovery, and core offline-route coverage were Production-verified; current cache release is `rakeezx-v7`. |
+| SYNC-UX-01 / OFFLINE-ROUTES-01 | `CLOSED` | Quiet automatic sync, reconnect recovery, and core offline-route coverage were Production-verified; carried forward in the Sync V2 release. |
+| SYNC-V2 | `CLOSED` | Production `aeffd5e54207109fa2ef53569583d694ff8a6d3d`: PO verified three-device bootstrap and automatic propagation, offline write/reconnect, and tombstone non-resurrection. Candidate migrations `0001–0017`, RLS/owner isolation, and publishable-key-only browser access were verified. |
 | SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
 
 ## Open, deferred, or redesign work
@@ -36,4 +37,5 @@ This is the current product ledger, not a claim that every historical branch is 
 - Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
 - The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
 - Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `b85115d6e2f9b1ebe514fe6e291dabea6fca3d2c`.
+- Current Production baseline: `aeffd5e54207109fa2ef53569583d694ff8a6d3d`.
+- The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.

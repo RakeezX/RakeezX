@@ -45,10 +45,16 @@ Lean Gate means evidence proportionate to the changed risk, not a weaker standar
 ## Current Production baseline
 
 - Repository Production branch: `main`.
-- Documented current Production SHA: `b85115d6e2f9b1ebe514fe6e291dabea6fca3d2c` (`fix(schedule): initialize new timing profiles cleanly`).
-- Relevant completed Production work includes session roster truth (`b7a22eb`), grade portability (`4568fce`, `76cda0a`), sync/offline recovery (`47ada73`, `d5365a9`), and Schedule/Timing UX through `b85115d`.
-- Production PWA cache release: `rakeezx-v7` in `sw.js`; quiet automatic sync, reconnect recovery, and covered core offline routes are closed Production behavior.
-- Current migration directory: `0001`, `0002`, `0003`, `0004`, `0007`, `0008`, `0009`, `0010`, `0011`. `0005` and `0006` are not present in this repository and must not be inferred.
-- Supplied Production ledger state: migrations `0008` through `0011` are applied and migration-history aligned. Do not reapply or edit them.
+- Documented current Production SHA: `aeffd5e54207109fa2ef53569583d694ff8a6d3d`.
+- `SYNC-V2` is CLOSED after Product Owner Production verification: three devices converged automatically from fresh bootstrap, offline writes propagated after reconnect, and deleted data did not resurrect after refresh or reopen.
+- Production PWA cache release: `rakeezx-v8` in `sw.js`; it contains the V2 runtime assets and retains the verified offline core-route coverage and service-worker update behavior.
+- The active Sync V2 database is validated through migrations `0001`–`0017`. The former Production database remains frozen as fallback/archive for now; do not write to or migrate it as part of normal work.
+- Browser/runtime access uses `sb_publishable_*` only. Legacy `anon` and `service_role` API keys are disabled; RLS/owner isolation and zero anonymous `rakeezx` table grants were verified.
+- Current migration directory: `0001`, `0002`, `0003`, `0004`, `0007` through `0017`. `0005` and `0006` are not present in this repository and must not be inferred.
+- Sync V2 migration history was verified aligned through `0017`; do not reapply or edit applied migration SQL.
 
 The ticket-level source of truth for current and historical work is [RECOVERY_LEDGER.md](RECOVERY_LEDGER.md); active risks are in [OPEN_ISSUES.md](OPEN_ISSUES.md).
+
+## Sync V2 closure guard
+
+The closure preserves the V2 architecture and its regression warnings. Any future sync-affecting change must run focused release/Auth and Sync V2 runtime regressions for the affected path before promotion. Realtime is not required for correctness: current verified automatic cross-device propagation can take approximately one minute. A perceived-speed improvement may be scoped separately without changing the proven synchronization semantics.
