@@ -3,12 +3,15 @@
  * Zero-build, vanilla JS fetch wrapper for Auth and REST.
  */
 
-const URL = 'https://bmekljhmepgkhywjzkdx.supabase.co';
-const ANON_KEY = 'sb_publishable_x_JjPvd0BLxl-FPlq56fGw_KFX46M2X';
-const STORAGE_KEY = 'rakeezx-auth';
+export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
+const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
+export const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
+const REFRESH_SKEW_SECONDS = 30;
 
 export let session = null;
 export let user = null;
+let authRequired = false;
+let refreshInFlight = null;
 
 let mockBackend = null;
 export function setMockBackend(adapter) { mockBackend = adapter; }
@@ -16,6 +19,15 @@ export function setMockBackend(adapter) { mockBackend = adapter; }
 export function setMockAuth(u, s) {
   user = u;
   session = s;
+  authRequired = false;
+}
+
+export function authStatus() {
+  return { state: authRequired ? 'auth_required' : session && user ? 'authenticated' : 'signed_out' };
+}
+
+export function isAuthRequiredError(error) {
+  return error?.code === 'AUTH_REQUIRED';
 }
 
 const listeners = new Set();
@@ -27,40 +39,138 @@ function notify() {
   listeners.forEach((fn) => fn());
 }
 
-export async function request(path, options = {}, isAuth = false) {
+function authError(message = 'Authentication required') {
+  const error = new Error(message);
+  error.code = 'AUTH_REQUIRED';
+  error.status = 401;
+  return error;
+}
+
+function sessionExpiresAt(value = session) {
+  const explicit = Number(value?.expires_at);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  try {
+    const payload = JSON.parse(atob(String(value?.access_token ?? '').split('.')[1]));
+    return Number(payload?.exp) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function tokenNeedsRefresh(value = session) {
+  const expiresAt = sessionExpiresAt(value);
+  return !!expiresAt && expiresAt <= Math.floor(Date.now() / 1000) + REFRESH_SKEW_SECONDS;
+}
+
+function parseFailure(data, status) {
+  const error = new Error(data?.message || data?.error_description || `Request failed: ${status}`);
+  for (const field of ['code', 'details', 'hint', 'constraint']) {
+    if (data?.[field] !== undefined) error[field] = data[field];
+  }
+  error.status = status;
+  return error;
+}
+
+async function responseFailure(response) {
+  let data = null;
+  try { data = await response.clone().json(); } catch {}
+  return parseFailure(data, response.status);
+}
+
+function saveSession(data, { required = true } = {}) {
+  if (!data?.access_token) {
+    session = null;
+    user = null;
+    authRequired = required;
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } else {
+    const priorUser = user;
+    const expiresAt = Number(data.expires_at) ||
+      (Number(data.expires_in) ? Math.floor(Date.now() / 1000) + Number(data.expires_in) : undefined);
+    session = { ...data, ...(expiresAt ? { expires_at: expiresAt } : {}) };
+    user = data.user ?? priorUser ?? null;
+    if (user && !session.user) session.user = user;
+    authRequired = false;
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  }
+  notify();
+}
+
+export async function refreshSession() {
+  if (refreshInFlight) return refreshInFlight;
+  if (!session?.refresh_token) {
+    saveSession(null);
+    throw authError('No refresh token is available');
+  }
+  const refreshToken = session.refresh_token;
+  const previous = session;
+  refreshInFlight = (async () => {
+    let response;
+    try {
+      response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: { apikey: PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+    } catch (error) {
+      error.code ??= 'AUTH_NETWORK';
+      throw error;
+    }
+    if (!response.ok) {
+      const failure = await responseFailure(response);
+      if ([400, 401, 403].includes(response.status)) {
+        saveSession(null);
+        throw authError(failure.message);
+      }
+      throw failure;
+    }
+    const refreshed = await response.json();
+    saveSession({ ...previous, ...refreshed, user: refreshed.user ?? previous.user ?? user });
+    return session;
+  })().finally(() => { refreshInFlight = null; });
+  return refreshInFlight;
+}
+
+async function ensureFreshSession() {
+  if (!session || !tokenNeedsRefresh(session)) return session;
+  return refreshSession();
+}
+
+async function sendRequest(path, options, isAuth) {
   const headers = {
-    'apikey': ANON_KEY,
+    apikey: PUBLISHABLE_KEY,
     ...options.headers,
   };
   
   if (session?.access_token) {
     headers['Authorization'] = `Bearer ${session.access_token}`;
   } else if (!isAuth) {
-    // If not authenticated, REST endpoints still need the anon key as bearer token
-    headers['Authorization'] = `Bearer ${ANON_KEY}`;
+    headers.Authorization = `Bearer ${PUBLISHABLE_KEY}`;
   }
-  
-  const base = isAuth ? `${URL}/auth/v1` : `${URL}/rest/v1`;
-  const res = await fetch(`${base}${path}`, {
+  const base = isAuth ? `${SUPABASE_URL}/auth/v1` : `${SUPABASE_URL}/rest/v1`;
+  return fetch(`${base}${path}`, {
     ...options,
     headers,
   });
-  
-  if (!res.ok) {
-    let err;
-    try {
-      const data = await res.json();
-      err = new Error(data.message || data.error_description || `Request failed: ${res.status}`);
-      // Preserve PostgREST diagnostics; callers must use SQLSTATE, not parse
-      // localized/message-only unique-constraint text to decide recovery.
-      for (const field of ['code', 'details', 'hint', 'constraint']) {
-        if (data[field] !== undefined) err[field] = data[field];
-      }
-    } catch {
-      err = new Error(`Request failed: ${res.status}`);
+}
+
+export async function request(path, options = {}, isAuth = false) {
+  if (!isAuth) await ensureFreshSession();
+  const attemptedToken = session?.access_token ?? null;
+  let res = await sendRequest(path, options, isAuth);
+  if (!isAuth && [401, 403].includes(res.status)) {
+    if (session?.refresh_token) {
+      if (session.access_token === attemptedToken) await refreshSession();
+      res = await sendRequest(path, options, false);
     }
-    err.status = res.status;
-    throw err;
+    if ([401, 403].includes(res.status)) {
+      const failure = await responseFailure(res);
+      saveSession(null);
+      throw authError(failure.message);
+    }
+  }
+  if (!res.ok) {
+    throw await responseFailure(res);
   }
   
   if (res.status === 204) return null;
@@ -76,31 +186,23 @@ export async function request(path, options = {}, isAuth = false) {
   }
 }
 
-function saveSession(data) {
-  if (!data || !data.access_token) {
-    session = null;
-    user = null;
-    localStorage.removeItem(STORAGE_KEY);
-  } else {
-    session = data;
-    user = data.user;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }
-  notify();
-}
-
 export async function init() {
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = localStorage.getItem(AUTH_STORAGE_KEY);
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-      // Basic check if token exists, we don't block boot to verify it with server
       if (parsed?.access_token) {
         saveSession(parsed);
+        if (tokenNeedsRefresh(parsed)) {
+          try { await refreshSession(); }
+          catch (error) {
+            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');
+          }
+        }
       }
     } catch (e) {
       console.warn('[rakeezx cloud] Failed to parse stored session', e);
-      saveSession(null);
+      saveSession(null, { required: false });
     }
   }
 }
@@ -122,7 +224,7 @@ export async function signOut() {
       console.warn('[rakeezx cloud] Logout request failed, clearing local session anyway', e);
     }
   }
-  saveSession(null);
+  saveSession(null, { required: false });
 }
 
 export async function fetchProfile() {
@@ -200,7 +302,7 @@ export async function upsertRecords(tableName, records) {
 /**
  * Applies one Sync V2 mutation through the idempotent server protocol.
  *
- * This is deliberately not wired into the Production V1 coordinator yet.
+ * Used by the Sync V2 runtime coordinator for generic mutations.
  * Callers must retain the exact envelope (especially mutationId) until this
  * request returns a canonical receipt.
  */
@@ -234,7 +336,7 @@ export async function applySyncV2Mutation(envelope) {
   });
 }
 
-/** Development-only V2 enrollment command transport. V1 enrollment RPCs stay intact. */
+/** Sync V2 enrollment command transport. */
 export async function applySyncV2EnrollmentCommand(envelope) {
   if (mockBackend) {
     if (typeof mockBackend.applySyncV2EnrollmentCommand !== 'function') {
@@ -259,7 +361,7 @@ export async function applySyncV2EnrollmentCommand(envelope) {
   });
 }
 
-/** Development-only V2 attendance/snapshot command transport. */
+/** Sync V2 attendance/snapshot command transport. */
 export async function applySyncV2AttendanceCommand(envelope) {
   if (mockBackend) {
     if (typeof mockBackend.applySyncV2AttendanceCommand !== 'function') {
@@ -287,7 +389,7 @@ export async function applySyncV2AttendanceCommand(envelope) {
   });
 }
 
-/** Development-only V2 lifecycle/cascade command transport. */
+/** Sync V2 lifecycle/cascade command transport. */
 export async function applySyncV2LifecycleCommand(envelope) {
   if (mockBackend) {
     if (typeof mockBackend.applySyncV2LifecycleCommand !== 'function') throw new Error('Mock backend does not implement Sync V2 lifecycle command RPC');

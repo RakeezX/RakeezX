@@ -26,6 +26,7 @@ export function displayState() {
     blocked: { text: 'تغييرات بانتظار اكتمال بيانات مرتبطة', badge: 'badge--warn', label: 'بياناتك محفوظة محليًا وستُرسل بعد اكتمال البيانات المرتبطة' },
     conflicted: { text: 'توجد تغييرات تحتاج مراجعة', badge: 'badge--warn', label: 'البيانات محفوظة، ويوجد تعارض مسجل يحتاج مراجعة' },
     rejected: { text: 'تعذّر قبول بعض التغييرات', badge: 'badge--warn', label: 'بعض التغييرات محفوظة محليًا ولم يقبلها الخادم' },
+    auth_required: { text: 'يلزم تسجيل الدخول', badge: 'badge--warn', label: 'بياناتك محفوظة محليًا. سجّل الدخول لاستئناف المزامنة' },
     offline: { text: 'غير متصل (حفظ محلي)', badge: 'badge--neutral', label: 'التطبيق يعمل دون إنترنت ويحفظ محليًا' },
     error: { text: 'تعذر إكمال المزامنة', badge: 'badge--danger', label: 'حُفظت بياناتك محليًا. يمكنك إعادة المحاولة الآن.' },
     idle: { text: 'محلي', badge: 'badge--neutral', label: 'البيانات محفوظة محليًا على هذا الجهاز' },
@@ -191,7 +192,10 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true } = {}) {
-  if (!cloud.session || !cloud.user) return false;
+  if (!cloud.session || !cloud.user) {
+    setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
+    return false;
+  }
   if (!isOnline()) {
     setState({ status: 'offline' });
     return false;
@@ -231,14 +235,15 @@ export async function syncAll({ full = true } = {}) {
   } catch (err) {
     failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
-    setState({ status: isOnline() ? 'error' : 'offline', lastError: err.message });
+    const needsAuth = cloud.isAuthRequiredError?.(err) || cloud.authStatus?.().state === 'auth_required';
+    setState({ status: needsAuth ? 'auth_required' : (isOnline() ? 'error' : 'offline'), lastError: err.message });
     return false;
   } finally {
     suppressAutoSchedule = false;
     autoRunning = false;
     notify();
     const v2Status = await v2Engine.status();
-    if (failed) {
+    if (failed && cloud.authStatus?.().state !== 'auth_required') {
       rerunRequested = false;
       scheduleRetry();
     } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
@@ -291,7 +296,7 @@ export function init() {
     else if (!cloud.session) {
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = null;
-      setState({ status: 'idle' });
+      setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     }
   });
   if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });

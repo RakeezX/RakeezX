@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v7';
+const VERSION = 'rakeezx-v8';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -40,6 +40,7 @@ const SHELL = [
   './src/lib/migrate.js',
   './src/lib/cloud.js',
   './src/lib/sync.js',
+  './src/lib/sync-v2.js',
   './src/lib/avatar.js',
   './src/lib/report-print.js',
   './src/lib/pristine-teaching.js',

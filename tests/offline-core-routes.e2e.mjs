@@ -7,6 +7,9 @@ test('unvisited core routes and dependencies open offline from the installed she
   const root = process.cwd();
   const server = http.createServer(async (req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
+    if (pathname === '/cache-bootstrap') {
+      return res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }).end('<!doctype html><title>cache bootstrap</title>');
+    }
     const file = path.resolve(root, pathname === '/' ? 'index.html' : pathname.slice(1));
     if (!file.startsWith(root + path.sep)) return res.writeHead(403).end();
     try {
@@ -22,11 +25,14 @@ test('unvisited core routes and dependencies open offline from the installed she
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const base = `http://127.0.0.1:${server.address().port}`;
+    await page.goto(base + '/cache-bootstrap');
+    await page.evaluate(() => caches.open('rakeezx-v7'));
     await page.goto(base + '/#/classes');
     await page.evaluate(() => navigator.serviceWorker.ready);
     await page.waitForFunction(async () => {
-      const cache = await caches.open('rakeezx-v7');
-      return (await Promise.all(['src/lib/avatar.js', 'src/lib/report-print.js', 'src/views/archive.js', 'src/views/execution-report.js'].map(p => cache.match(new URL(p, location.href))))).every(Boolean);
+      if ((await caches.keys()).includes('rakeezx-v7')) return false;
+      const cache = await caches.open('rakeezx-v8');
+      return (await Promise.all(['src/lib/sync-v2.js', 'src/lib/avatar.js', 'src/lib/report-print.js', 'src/views/archive.js', 'src/views/execution-report.js'].map(p => cache.match(new URL(p, location.href))))).every(Boolean);
     });
     await page.evaluate(async () => {
       const store = await import('/src/store.js');
