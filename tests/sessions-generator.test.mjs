@@ -3,8 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import * as sync from '../src/lib/sync.js';
-import { setMockAuth, setMockBackend } from '../src/lib/cloud.js';
 import {
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeSlot,
   makeCalendar, makeTimeProfile,
@@ -12,21 +10,6 @@ import {
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
-
-class MockBackend {
-  constructor() { this.records = {}; }
-  async fetchRecords(table) { return this.records[table] ?? []; }
-  async upsertRecords(table, records) {
-    const list = this.records[table] ?? (this.records[table] = []);
-    for (const record of records) {
-      const i = list.findIndex((row) => row.id === record.id);
-      const stamped = { ...record, client_updated_at: record.client_updated_at ?? Date.now() };
-      if (i >= 0) list[i] = stamped;
-      else list.push(stamped);
-    }
-    return { success: true };
-  }
-}
 
 async function setup() {
   await db.clearAll();
@@ -147,21 +130,14 @@ test('session range generation preserves dated timetable history', async (t) => 
         /لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي/
       );
     });
-    await t.test('generated sessions converge through timetable sync', async () => {
+    await t.test('generated sessions use the durable V2 outbox path', async () => {
       const f = await setup();
-      const backend = new MockBackend();
-      backend.records.teachings = [{ id: f.teaching.id, section_id: f.section.id, subject_id: f.subject.id, term_id: f.term.id, client_updated_at: Date.now() }];
-      setMockBackend(backend);
-      setMockAuth({ id: 'session-test-user' }, {});
-      sync.state.status = 'idle';
-
       await store.generateSessionsForRange(f.teaching.id, '2026-08-23', '2026-08-23');
-      const first = await sync.syncTimetable();
-      const second = await sync.syncTimetable();
-      assert.equal(first.sessions.pushed, 1);
-      assert.equal(second.sessions.pushed, 0);
-      assert.equal(second.sessions.pulled, 0);
-      assert.equal(backend.records.sessions.length, 1);
+      const outbox = await db.getAll('outbox');
+      const sessionWrite = outbox.find((row) => row.store === 'sessions');
+      assert.equal(sessionWrite.protocol, 'v2');
+      assert.equal(sessionWrite.op, 'create');
+      assert.equal(sessionWrite.recordId, `se:${f.teaching.id}:2026-08-23:1`);
     });
   } finally {
     store.closeChannel();
