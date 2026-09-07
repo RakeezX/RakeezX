@@ -2,6 +2,7 @@ import * as cloud from './cloud.js';
 import * as store from '../store.js';
 import * as db from './db.js';
 import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js';
+import { createSyncV2Engine, SYNC_V2_STORES } from './sync-v2.js';
 
 export const state = {
   lastError: null,
@@ -17,15 +18,19 @@ export const state = {
 
 export function displayState() {
   const status = autoRunning ? 'syncing' : state.status;
+  const visualStatus = ['blocked', 'conflicted', 'rejected'].includes(status) ? 'pending' : status;
   const labels = {
     synced: { text: 'متزامن', badge: 'badge--brand', label: 'كافة البيانات متزامنة مع السحابة' },
     syncing: { text: 'جارٍ المزامنة...', badge: 'badge--brand', label: 'جارٍ نقل وتحديث البيانات سحابيًا' },
     pending: { text: 'تغييرات بانتظار المزامنة', badge: 'badge--warn', label: 'توجد تعديلات محلية بانتظار رفعها' },
+    blocked: { text: 'تغييرات بانتظار اكتمال بيانات مرتبطة', badge: 'badge--warn', label: 'بياناتك محفوظة محليًا وستُرسل بعد اكتمال البيانات المرتبطة' },
+    conflicted: { text: 'توجد تغييرات تحتاج مراجعة', badge: 'badge--warn', label: 'البيانات محفوظة، ويوجد تعارض مسجل يحتاج مراجعة' },
+    rejected: { text: 'تعذّر قبول بعض التغييرات', badge: 'badge--warn', label: 'بعض التغييرات محفوظة محليًا ولم يقبلها الخادم' },
     offline: { text: 'غير متصل (حفظ محلي)', badge: 'badge--neutral', label: 'التطبيق يعمل دون إنترنت ويحفظ محليًا' },
     error: { text: 'تعذر إكمال المزامنة', badge: 'badge--danger', label: 'حُفظت بياناتك محليًا. يمكنك إعادة المحاولة الآن.' },
     idle: { text: 'محلي', badge: 'badge--neutral', label: 'البيانات محفوظة محليًا على هذا الجهاز' },
   };
-  return { status, ...labels[status] };
+  return { status: visualStatus, detailStatus: status, ...labels[status] };
 }
 
 const SYNCABLE_STORES = new Set([
@@ -47,6 +52,7 @@ let rerunRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
 let retryAttempt = 0;
+const v2Engine = createSyncV2Engine();
 
 const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
@@ -55,7 +61,7 @@ async function pendingOutbox() {
   const entries = await db.getAll('outbox');
   const pending = [];
   for (const entry of entries) {
-    if (!SYNCABLE_STORES.has(entry.store)) continue;
+    if (entry.protocol !== 'v2' || !SYNCABLE_STORES.has(entry.store)) continue;
     // Preserve old receipts for diagnosis, but never upload local-only demo
     // records or let those receipts keep unrelated cloud work pending forever.
     const record = entry.recordId ? await db.get(entry.store, entry.recordId) : null;
@@ -149,7 +155,41 @@ async function runRequiredSync(stores, full) {
   }
 }
 
-/** Safe orchestration only: existing category merge semantics remain authoritative. */
+function v2StoresFor(snapshot, full) {
+  if (full) return [...SYNC_V2_STORES];
+  const stores = new Set(snapshot.map((entry) => entry.store).filter((name) => SYNCABLE_STORES.has(name)));
+  for (const entry of snapshot) {
+    for (const dependency of entry.dependencies ?? []) {
+      if (SYNCABLE_STORES.has(dependency.store)) stores.add(dependency.store);
+    }
+  }
+  return [...stores];
+}
+
+function v2PostPullStores(snapshot, full) {
+  if (full || snapshot.some((entry) => String(entry.command ?? '').startsWith('lifecycle:'))) {
+    return [...SYNC_V2_STORES];
+  }
+  const stores = new Set(v2StoresFor(snapshot, false));
+  for (const entry of snapshot) {
+    if (String(entry.command ?? '').startsWith('enrollment:')) {
+      stores.add('students'); stores.add('enrollments');
+    } else if (['attendance:record', 'attendance:fill'].includes(entry.command)) {
+      stores.add('sessions'); stores.add('sessionRosterSnapshots'); stores.add('attendance');
+    } else if (entry.command === 'teaching:create') {
+      stores.add('teachings'); stores.add('items');
+    }
+  }
+  return [...stores];
+}
+
+function firstPullError(result) {
+  const failure = result?.failures?.[0];
+  if (!failure) return null;
+  return new Error(`${failure.store}: ${failure.error?.message ?? failure.error}`);
+}
+
+/** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true } = {}) {
   if (!cloud.session || !cloud.user) return false;
   if (!isOnline()) {
@@ -167,16 +207,26 @@ export async function syncAll({ full = true } = {}) {
   suppressAutoSchedule = true;
   setState({ lastError: null });
   let failed = false;
+  let madeProgress = false;
   try {
     const snapshot = await pendingOutbox();
-    const stores = new Set(snapshot.map((entry) => entry.store));
-    await runRequiredSync(stores, full);
-    await acknowledgeOutbox(snapshot);
+    const stores = v2StoresFor(snapshot, full);
+    const pull = await v2Engine.pullAll({ stores });
+    const pullError = firstPullError(pull);
+    if (pullError) throw pullError;
+    const pushed = await v2Engine.dispatchPending();
+    madeProgress = pushed.acknowledged > 0;
+    if (pushed.failed) throw new Error(`${pushed.failed} Sync V2 mutation(s) failed`);
+    const postPull = await v2Engine.pullAll({ stores: v2PostPullStores(snapshot, full) });
+    const postPullError = firstPullError(postPull);
+    if (postPullError) throw postPullError;
+    await store.refreshSyncedState();
+    const v2Status = await v2Engine.status();
     const lastSyncedAt = Date.now();
-    await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false });
+    await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false, queue: false });
     state.lastSyncedAt = lastSyncedAt;
     retryAttempt = 0;
-    setState({ status: (await pendingOutbox()).length ? 'pending' : 'synced' });
+    setState({ status: v2Status.state, lastError: null });
     return true;
   } catch (err) {
     failed = true;
@@ -187,22 +237,26 @@ export async function syncAll({ full = true } = {}) {
     suppressAutoSchedule = false;
     autoRunning = false;
     notify();
-    const remaining = await pendingOutbox();
-    const blockedIdentity = state.results.structural?.status === 'error' && state.results.structural.retryable === false;
-    if (blockedIdentity) {
-      // Keep pending data without hammering a blocked section/teaching identity
-      // conflict every 900ms. Manual retry remains available after resolution.
-      rerunRequested = false;
-      if (autoTimer) clearTimeout(autoTimer);
-      autoTimer = null;
-    } else if (failed) {
+    const v2Status = await v2Engine.status();
+    if (failed) {
       rerunRequested = false;
       scheduleRetry();
-    } else if (rerunRequested || remaining.length) {
+    } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
       rerunRequested = false;
       scheduleAutomaticSync();
+    } else {
+      rerunRequested = false;
     }
   }
+}
+
+async function syncV2Category(name) {
+  const ok = await syncAll({ full: true });
+  const result = ok
+    ? { status: 'success', time: Date.now() }
+    : { status: 'error', error: state.lastError ?? 'تعذّرت المزامنة', time: Date.now() };
+  setState({ results: { ...state.results, [name]: result } });
+  return ok;
 }
 
 const listeners = new Set();
@@ -330,6 +384,8 @@ function remoteProfileToLocal(remote, updatedAt) {
  * Sync direction: Pull → Merge → Push.
  */
 export async function syncProfile() {
+  return syncV2Category('profile');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping sync.');
     return;
@@ -1634,6 +1690,8 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
  * Phase 5B: Sync structural academic data.
  */
 export async function syncStructural() {
+  return syncV2Category('structural');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping structural sync.');
     return;
@@ -1699,6 +1757,8 @@ export async function syncStructural() {
  * Dependency-aware execution: structural sync runs first.
  */
 export async function syncStudents() {
+  return syncV2Category('students');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping students sync.');
     return;
@@ -1780,6 +1840,8 @@ export async function syncStudents() {
 
 /** يزامن سجل ملاحظات الطلاب بعد ضمان وصول الطالب وسياق الحصة إن وُجد. */
 export async function syncNotes() {
+  return syncV2Category('notes');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping notes sync.');
     return;
@@ -1814,6 +1876,8 @@ export async function syncNotes() {
 }
 
 export async function syncScoring() {
+  return syncV2Category('scoring');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping scoring sync.');
     return;
@@ -1891,6 +1955,8 @@ export async function syncScoring() {
 }
 
 export async function syncTimetable() {
+  return syncV2Category('timetable');
+  /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
     console.log('[rakeezx sync] Not signed in, skipping timetable sync.');
     return;

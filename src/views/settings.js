@@ -563,15 +563,13 @@ export default {
     async 'sync-now'(el) {
       if (sync.state.status === 'syncing') return;
       const ok = await sync.syncAll({ full: true });
-      toast(ok ? 'تمت المزامنة بنجاح' : 'تعذرت المزامنة', ok ? undefined : 'danger');
+      if (!ok) toast('تعذرت المزامنة', 'danger');
     },
     async 'sync-structural'(el) {
       if (sync.state.status === 'syncing') return;
       await sync.syncStructural();
       if (sync.state.results.structural?.status === 'error') {
         toast('تعذرت المزامنة الهيكلية', 'danger');
-      } else {
-        toast('تمت المزامنة الهيكلية بنجاح');
       }
     },
 
@@ -580,10 +578,7 @@ export default {
       await sync.syncStudents();
       if (sync.state.results.students?.status === 'error') {
         toast('تعذرت مزامنة الطلاب والانتساب', 'danger');
-      } else {
-        toast('تمت مزامنة الطلاب والانتساب بنجاح');
       }
-      repaint();
     },
 
     async 'sync-notes'(el) {
@@ -591,10 +586,7 @@ export default {
       await sync.syncNotes();
       if (sync.state.results.notes?.status === 'error') {
         toast('تعذرت مزامنة ملاحظات الطلاب', 'danger');
-      } else {
-        toast('تمت مزامنة ملاحظات الطلاب بنجاح');
       }
-      repaint();
     },
 
     async 'sync-scoring'(el) {
@@ -602,10 +594,7 @@ export default {
       await sync.syncScoring();
       if (sync.state.results.scoring?.status === 'error') {
         toast('تعذرت مزامنة التقييم والدرجات', 'danger');
-      } else {
-        toast('تمت مزامنة التقييم والدرجات بنجاح');
       }
-      repaint();
     },
 
     async 'sync-timetable'(el) {
@@ -613,10 +602,7 @@ export default {
       await sync.syncTimetable();
       if (sync.state.results.timetable?.status === 'error') {
         toast('تعذرت مزامنة الجدول والجلسات', 'danger');
-      } else {
-        toast('تمت مزامنة الجدول والجلسات بنجاح');
       }
-      repaint();
     },
 
     async save(el) {

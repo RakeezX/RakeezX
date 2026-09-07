@@ -692,6 +692,7 @@ export function createSyncV2Engine({
           ? canonical
           : (target?.serverCanonical ?? source?.serverCanonical ?? null);
         let next = { ...(source ?? {}), ...(target ?? {}), ...(authoritative ?? {}), id: canonicalId, canonicalId };
+        delete next.syncCreatePending;
         next.serverRevision = Math.max(existingRevision, resultRevision);
         if (acceptCanonical) next.serverCanonical = canonicalSnapshot({ ...canonical, id: canonicalId, canonicalId });
         else if (target?.serverCanonical ?? source?.serverCanonical) {
@@ -743,7 +744,9 @@ export function createSyncV2Engine({
         const writes = { enrollments: operationBatch(), students: operationBatch(), outbox: operationBatch() };
         for (const row of canonicalRows) {
           const existing = current.enrollments.find((record) => record.id === row.id);
-          pushUniquePut(writes.enrollments, { ...(existing ?? {}), ...row, serverCanonical: canonicalSnapshot(row) });
+          const next = { ...(existing ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
+          delete next.syncCreatePending;
+          pushUniquePut(writes.enrollments, next);
         }
         const student = current.students.find((row) => row.id === payload.studentId);
         if (['conflict', 'rejected'].includes(result.outcome) && student) {
@@ -755,8 +758,13 @@ export function createSyncV2Engine({
             }],
           });
         }
-        const others = current.outbox.filter((row) => row.id !== mutation.id).map((row) =>
-          remap ? rewriteMutationReferences(row, 'enrollments', remap.from, remap.to) : row);
+        const revisions = new Map(canonicalRows.map((row) => [row.id, normalizeRevision(row.serverRevision)]));
+        const others = current.outbox.filter((row) => row.id !== mutation.id).map((row) => {
+          const rewritten = remap ? rewriteMutationReferences(row, 'enrollments', remap.from, remap.to) : row;
+          const revision = revisions.get(rewritten.recordId);
+          if (rewritten.store !== 'enrollments' || revision == null || rewritten.envelopeLocked || rewritten.op === 'create') return rewritten;
+          return { ...rewritten, baseRevision: revision, state: rewritten.state === 'blocked' ? 'pending' : rewritten.state, blockedReason: null };
+        });
         if (remap) writes.enrollments.remove.push(remap.from);
         writes.outbox.remove.push(mutation.id);
         for (const row of others) {
@@ -789,6 +797,7 @@ export function createSyncV2Engine({
           serverCanonical: canonicalSnapshot(attendance),
           ...(diagnostic ? { syncConflicts: [...(target?.syncConflicts ?? source?.syncConflicts ?? []), diagnostic] } : {}),
         };
+        delete next.syncCreatePending;
         if (snapshot?.id) {
           const existingSnapshot = current.sessionRosterSnapshots.find((row) => row.id === snapshot.id);
           pushUniquePut(writes.sessionRosterSnapshots, { ...(existingSnapshot ?? {}), ...snapshot, serverCanonical: canonicalSnapshot(snapshot) });
@@ -830,8 +839,14 @@ export function createSyncV2Engine({
           if (next !== record) pushUniquePut(writes[candidateStore], next);
         }
       }
-      pushUniquePut(writes.teachings, { ...(localTeaching ?? {}), ...teaching, serverCanonical: canonicalSnapshot(teaching) });
-      for (const item of items) pushUniquePut(writes.items, { ...(current.items.find((row) => row.id === item.id) ?? {}), ...item, serverCanonical: canonicalSnapshot(item) });
+      const nextTeaching = { ...(localTeaching ?? {}), ...teaching, serverCanonical: canonicalSnapshot(teaching) };
+      delete nextTeaching.syncCreatePending;
+      pushUniquePut(writes.teachings, nextTeaching);
+      for (const item of items) {
+        const nextItem = { ...(current.items.find((row) => row.id === item.id) ?? {}), ...item, serverCanonical: canonicalSnapshot(item) };
+        delete nextItem.syncCreatePending;
+        pushUniquePut(writes.items, nextItem);
+      }
       writes.outbox.remove.push(mutation.id);
       for (const row of rewritten) { const before = current.outbox.find((old) => old.id === row.id); if (JSON.stringify(before) !== JSON.stringify(row)) pushUniquePut(writes.outbox, row); }
       return writes;
@@ -896,7 +911,7 @@ export function createSyncV2Engine({
   }
 
   async function dispatchPending({ maxMutations = Infinity } = {}) {
-    const snapshot = sortMutations(await database.getAll('outbox'));
+    const snapshot = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
     const stoppedKeys = new Set();
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
@@ -1071,6 +1086,7 @@ export function createSyncV2Engine({
           if (existing && normalizeRevision(existing.serverRevision) > normalizeRevision(canonical.serverRevision)) continue;
           const conflicts = existing?.syncConflicts;
           let next = { ...(existing ?? {}), ...canonical };
+          delete next.syncCreatePending;
           next.serverCanonical = canonicalSnapshot(canonical);
           if (conflicts?.length) next.syncConflicts = conflicts;
           next = overlayMutations(
@@ -1112,7 +1128,7 @@ export function createSyncV2Engine({
   }
 
   async function status() {
-    const outbox = sortMutations(await database.getAll('outbox'));
+    const outbox = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
     const failed = outbox.filter((row) => row.state === 'failed').length;
     const blockedOutbox = outbox.filter((row) => row.state === 'blocked').length;
     const rejected = outbox.filter((row) => row.state === 'rejected').length;

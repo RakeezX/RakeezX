@@ -5,7 +5,7 @@
  * لا يُنشئ طالبًا جديدًا، والخروج من المدرسة لا يحذف أحدًا.
  */
 
-import { html, icon, openSheet, confirmSheet, toast, fmtPct } from '../lib/dom.js';
+import { html, icon, openSheet, toast, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
@@ -180,7 +180,6 @@ export default {
 
       <div class="hstack gap-2 wrap mb-3 t-3 fs-sm">
         <span><span class="tabular fw-7">${roster.length}</span> طالبًا</span>
-        <button class="btn btn--sm btn--quiet push" data-act="renumber">${icon('note')} إعادة الترقيم</button>
       </div>
 
       ${shown.length === 0
@@ -383,21 +382,5 @@ export default {
       toast('حُفظ');
     },
 
-    async renumber(el, ev, params) {
-      const tch = store.getTeaching(params.id);
-      if (!tch) return;
-      const ok = await confirmSheet({
-        title: 'إعادة ترقيم الكشف؟',
-        desc: 'يُعاد الترقيم من ١ حسب الترتيب المعروض الآن.',
-        confirmLabel: 'أعد الترقيم',
-      });
-      if (!ok) return;
-      const renumbered = await store.renumberRoster(tch.sectionId);
-      if (!renumbered) {
-        toast('تعذّرت إعادة الترقيم. أعد المحاولة.', 'danger');
-        return;
-      }
-      toast('أُعيد الترقيم');
-    },
   },
 };

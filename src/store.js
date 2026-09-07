@@ -7,6 +7,7 @@
 
 import * as db from './lib/db.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
+import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
 
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
@@ -91,10 +92,10 @@ function reportWriteError(err, context) {
 const TAB_ID = uid();
 const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('rakeezx-data') : null;
 
-function broadcast(changes) {
+function broadcast(changes, { render = true } = {}) {
   if (!channel || !changes.length) return;
   try {
-    channel.postMessage({ from: TAB_ID, changes });
+    channel.postMessage({ from: TAB_ID, changes, render });
   } catch (err) {
     console.warn('[rakeezx] تعذّر إبلاغ التبويبات الأخرى', err);
   }
@@ -102,7 +103,8 @@ function broadcast(changes) {
 
 channel?.addEventListener('message', (ev) => {
   if (!ev.data || ev.data.from === TAB_ID) return;
-  absorb(ev.data.changes).catch((err) => console.warn('[rakeezx] تعذّر استقبال تغيير', err));
+  absorb(ev.data.changes, { render: ev.data.render !== false })
+    .catch((err) => console.warn('[rakeezx] تعذّر استقبال تغيير', err));
 });
 
 /**
@@ -114,7 +116,7 @@ export function closeChannel() {
   if (channel) channel.close();
 }
 
-async function absorb(changes) {
+async function absorb(changes, { render = true } = {}) {
   const byStore = {};
   for (const c of changes ?? []) (byStore[c.store] ??= new Set()).add(c.id);
 
@@ -145,7 +147,47 @@ async function absorb(changes) {
       if (next !== location.hash) location.replace(next);
     }
   }
-  notify();
+  notify({ render });
+}
+
+function visibleSyncValue(storeName, record) {
+  if (!record) return null;
+  const fields = Object.keys(SYNC_V2_SCHEMAS[storeName]?.fields ?? {});
+  return Object.fromEntries(['id', 'deleted', ...fields].map((field) => [field, record[field]]));
+}
+
+/** Refresh only cloud-backed state after Sync V2 reconciliation. */
+export async function refreshSyncedState() {
+  const stores = Object.keys(SYNC_V2_SCHEMAS);
+  const loaded = await Promise.all(stores.map((storeName) =>
+    storeName === 'profile' ? db.get('profile', 'profile') : db.getAll(storeName)));
+  const changes = [];
+  let shouldRender = false;
+  stores.forEach((storeName, index) => {
+    const fresh = loaded[index];
+    if (storeName === 'profile') {
+      const next = { ...DEFAULT_PROFILE, ...(fresh ?? {}) };
+      if (JSON.stringify(state.profile) !== JSON.stringify(next)) {
+        shouldRender ||= JSON.stringify(visibleSyncValue('profile', state.profile)) !== JSON.stringify(visibleSyncValue('profile', next));
+        state.profile = next;
+        changes.push({ store: 'profile', id: 'profile' });
+      }
+      return;
+    }
+    const current = Array.isArray(state[storeName]) ? state[storeName] : [];
+    if (JSON.stringify(current) === JSON.stringify(fresh)) return;
+    const visible = (records) => records.map((record) => visibleSyncValue(storeName, record))
+      .sort((left, right) => String(left.id).localeCompare(String(right.id)));
+    shouldRender ||= JSON.stringify(visible(current)) !== JSON.stringify(visible(fresh));
+    const ids = new Set([...current, ...fresh].map((record) => record.id));
+    state[storeName] = fresh;
+    changes.push(...[...ids].map((id) => ({ store: storeName, id })));
+  });
+  if (changes.length) {
+    notify({ render: shouldRender });
+    broadcast(changes, { render: shouldRender });
+  }
+  return changes;
 }
 
 const changeList = (storeName, records) => records.map((r) => ({ store: storeName, id: r.id }));
@@ -221,9 +263,22 @@ export async function init() {
  */
 async function ensureFoundation() {
   const writes = {};
+  if (!state.device?.deviceId) {
+    state.device = { ...(state.device ?? DEFAULT_DEVICE), id: 'device', deviceId: uid(), updatedAt: now() };
+    writes.device = [state.device];
+  }
+  if (!Number(state.profile?.serverRevision) && !state.profile?.syncCreatePending) {
+    state.profile = syncV2Record('profile', state.profile ?? DEFAULT_PROFILE, { pendingCreate: true });
+    writes.profile = [state.profile];
+    const entry = outboxEntry('profile', state.profile, null, 'put', null);
+    if (entry) (writes.outbox ??= []).push(entry);
+  }
   const push = (k, rec) => {
-    (writes[k] ??= []).push(rec);
-    if (Array.isArray(state[k])) state[k].push(rec);
+    const next = syncV2Record(k, rec, { pendingCreate: !!SYNC_V2_SCHEMAS[k] });
+    (writes[k] ??= []).push(next);
+    if (Array.isArray(state[k])) state[k].push(next);
+    const entry = outboxEntry(k, next, null, 'put', null);
+    if (entry) (writes.outbox ??= []).push(entry);
   };
 
   // Old offline data could predate the required cloud `name` column. Preserve
@@ -237,7 +292,7 @@ async function ensureFoundation() {
     (writes.timeProfiles ??= []).push(profile);
     // Replace only this record's stale payload so a previous invalid outbox
     // entry cannot keep automatic sync pending after the repair succeeds.
-    (writes.outbox ??= []).push(outboxEntry('timeProfiles', profile));
+    (writes.outbox ??= []).push(outboxEntry('timeProfiles', profile, ['name'], 'patch', profile));
   }
 
   if (!live(state.years).length) {
@@ -315,18 +370,128 @@ export const isLocalOnlyRecord = (rec) => [
 // Private creation-only receipt. It lives in the local outbox, never in cloud payloads.
 const TEACHING_CREATION_PROOF = Symbol('pristineTeachingCreation');
 
-const outboxEntry = (storeName, rec, fields = null, op = 'put') => {
-  if (isLocalOnlyRecord(rec)) return null;
+let syncV2Sequence = 0;
+const nextSyncV2Sequence = () => {
+  syncV2Sequence = Math.max(Date.now() * 1000, syncV2Sequence + 1);
+  return syncV2Sequence;
+};
+
+function syncV2DeviceId() {
+  if (!state.device?.deviceId) {
+    state.device = { ...(state.device ?? DEFAULT_DEVICE), id: 'device', deviceId: uid(), updatedAt: now() };
+  }
+  return state.device.deviceId;
+}
+
+function syncV2Record(storeName, record, { pendingCreate = false } = {}) {
+  if (!SYNC_V2_SCHEMAS[storeName] || isLocalOnlyRecord(record)) return record;
+  return {
+    ...record,
+    canonicalId: record.canonicalId ?? record.id,
+    serverRevision: Number.isSafeInteger(Number(record.serverRevision)) ? Number(record.serverRevision) : 0,
+    ...(pendingCreate ? { syncCreatePending: true } : {}),
+  };
+}
+
+function syncV2Dependencies(storeName, record) {
+  const references = SYNC_V2_SCHEMAS[storeName]?.references ?? {};
+  return Object.entries(references)
+    .filter(([field]) => record?.[field])
+    .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }));
+}
+
+function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
+  if (isLocalOnlyRecord({ id: recordId, ...commandPatch }) ||
+      dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
+  const mutationId = uid();
+  const canonicalId = recordId;
+  return {
+    id: `v2:${mutationId}`,
+    protocol: 'v2', mutationId, deviceId: syncV2DeviceId(), store,
+    entity: SYNC_V2_SCHEMAS[store]?.entity ?? store,
+    recordId, serverRecordId: canonicalId, canonicalId,
+    logicalRecordKey: `${store}:${canonicalId}`,
+    op: 'command', command, baseRevision: Number(baseRevision) || 0,
+    patch: structuredClone(commandPatch), localPatch: {},
+    fields: Object.keys(commandPatch).sort(), groups: [],
+    dependencies: structuredClone(dependencies),
+    sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
+    state: 'pending', attemptCount: 0, envelopeLocked: false,
+    lastError: null, blockedReason: null,
+  };
+}
+
+const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
+  const schema = SYNC_V2_SCHEMAS[storeName];
+  if (!schema || isLocalOnlyRecord(rec)) return null;
+  const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
+  const localFields = operation === 'create' ? Object.keys(schema.fields) : (fields ?? Object.keys(schema.fields));
+  const localPatch = operation === 'delete'
+    ? {}
+    : Object.fromEntries(localFields.filter((field) => field in rec).map((field) => [field, structuredClone(rec[field])]));
+  const patch = operation === 'delete' ? {} : encodeSyncV2Patch(storeName, localPatch);
+  const mutationId = uid();
+  const canonicalId = rec.canonicalId ?? rec.id;
+  const stamp = rec.updatedAt ?? now();
   return ({
-  id: `${storeName}:${rec.id}`,
-  store: storeName,
-  recordId: rec.id,
-  op,
-  fields: fields ? [...fields] : null,
-  updatedAt: rec.updatedAt,
-  queuedAt: now(),
+    id: `v2:${mutationId}`,
+    protocol: 'v2', mutationId, deviceId: syncV2DeviceId(),
+    store: storeName, entity: schema.entity,
+    recordId: rec.id, serverRecordId: canonicalId, canonicalId,
+    logicalRecordKey: `${storeName}:${canonicalId}`,
+    op: operation,
+    baseRevision: operation === 'create' ? 0 : Number(rec.serverRevision ?? previous?.serverRevision ?? 0),
+    patch, localPatch,
+    fields: Object.keys(patch).sort(), groups: [],
+    dependencies: syncV2Dependencies(storeName, rec),
+    sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
+    state: 'pending', attemptCount: 0, envelopeLocked: false,
+    lastError: null, blockedReason: null,
   });
 };
+
+function teachingCreationEntry(proof, stamp = now()) {
+  return syncV2CommandEntry({
+    store: 'teachings', recordId: proof.teaching.id, command: 'teaching:create', stamp,
+    patch: {
+      sectionId: proof.teaching.sectionId,
+      subjectId: proof.teaching.subjectId,
+      termId: proof.teaching.termId,
+      order: proof.teaching.order ?? 0,
+      itemIds: proof.items.map((item) => item.id),
+    },
+    dependencies: [
+      { store: 'sections', recordId: proof.teaching.sectionId, requiresServerRevision: true },
+      { store: 'subjects', recordId: proof.teaching.subjectId, requiresServerRevision: true },
+      { store: 'terms', recordId: proof.teaching.termId, requiresServerRevision: true },
+    ],
+  });
+}
+
+function enrollmentCommandEntry(command, enrollment, { sourceEnrollmentId = null, date = null, note = '' } = {}) {
+  return syncV2CommandEntry({
+    store: 'enrollments', recordId: enrollment.studentId, command: `enrollment:${command}`,
+    patch: {
+      studentId: enrollment.studentId,
+      sourceEnrollmentId,
+      destinationEnrollmentId: command === 'withdraw' ? null : enrollment.id,
+      destinationSectionId: command === 'withdraw' ? null : enrollment.sectionId,
+      date: date ?? enrollment.startDate ?? todayISO(), note,
+    },
+    dependencies: [
+      { store: 'students', recordId: enrollment.studentId, requiresServerRevision: true },
+      ...(command === 'withdraw' ? [] : [{ store: 'sections', recordId: enrollment.sectionId, requiresServerRevision: true }]),
+    ],
+    stamp: enrollment.updatedAt ?? now(),
+  });
+}
+
+function lifecycleCommandEntry(command, targetId, storeName, stamp = now()) {
+  return syncV2CommandEntry({
+    store: storeName, recordId: targetId, command: `lifecycle:${command}`,
+    patch: { targetId }, stamp,
+  });
+}
 
 /**
  * A durable receipt for a bounded enrollment operation.  The ordinary per-row
@@ -391,20 +556,40 @@ export async function save(batch, options = {}) {
   const outbox = [];
   const undos = [];
   const changes = [];
+  const proof = options[TEACHING_CREATION_PROOF];
 
   for (const [storeName, records] of Object.entries(batch)) {
     if (!records?.length) continue;
-    writes[storeName] = records;
-    undos.push([storeName, records, applyToMemory(storeName, records)]);
-    changes.push(...changeList(storeName, records));
-    if (options.queue !== false && storeName !== 'meta') outbox.push(...records.map((r) => outboxEntry(storeName, r)).filter(Boolean));
+    const previous = new Map((Array.isArray(state[storeName]) ? state[storeName] : [state[storeName]])
+      .filter(Boolean).map((record) => [record.id, record]));
+    const prepared = records.map((record) => syncV2Record(storeName, record, {
+      pendingCreate: !!SYNC_V2_SCHEMAS[storeName] && !previous.has(record.id),
+    }));
+    writes[storeName] = prepared;
+    undos.push([storeName, prepared, applyToMemory(storeName, prepared)]);
+    changes.push(...changeList(storeName, prepared));
+    if (options.queue === false || storeName === 'meta' ||
+        (proof && (storeName === 'teachings' || storeName === 'items'))) continue;
+    for (const record of prepared) {
+      const prior = previous.get(record.id) ?? null;
+      if (storeName === 'enrollments' && !prior && record.status === 'active') {
+        const entry = enrollmentCommandEntry('enroll', record);
+        if (entry) outbox.push(entry);
+      } else {
+        const fields = prior
+          ? Object.keys(SYNC_V2_SCHEMAS[storeName]?.fields ?? {}).filter((field) =>
+            JSON.stringify(prior[field]) !== JSON.stringify(record[field]))
+          : null;
+        const entry = outboxEntry(storeName, record, fields, 'put', prior);
+        if (entry && (entry.op === 'create' || entry.fields.length)) outbox.push(entry);
+      }
+    }
   }
   if (!changes.length) return true;
 
-  const proof = options[TEACHING_CREATION_PROOF];
   if (proof) {
-    const entry = outbox.find((entry) => entry.id === `teachings:${proof.teaching.id}`);
-    if (entry) entry.pristineTeachingCreation = structuredClone(proof);
+    const entry = teachingCreationEntry(proof, proof.teaching.updatedAt ?? now());
+    if (entry) outbox.push(entry);
   }
   if (outbox.length) writes.outbox = outbox;
   notify();
@@ -592,7 +777,10 @@ export async function patch(storeName, id, changes, create = null, options = {})
   const newStamp = preserve ? changes.updatedAt : now();
   const shouldNotify = options.notify !== false;
   const shouldRender = options.render !== false;
-  const optimistic = { ...base, ...changes, id, updatedAt: newStamp };
+  const operation = options.v2Operation ?? (changes.deleted === true ? 'delete' : (!known && create ? 'create' : 'patch'));
+  const optimistic = syncV2Record(storeName, { ...base, ...changes, id, updatedAt: newStamp }, {
+    pendingCreate: operation === 'create',
+  });
   const undo = singleton ? [] : applyToMemory(storeName, [optimistic]);
   const previous = singleton ? state[storeName] : null;
   if (singleton) state[storeName] = optimistic;
@@ -602,7 +790,9 @@ export async function patch(storeName, id, changes, create = null, options = {})
     const [authoritative] = await db.patchMany(
       storeName,
       [{ id, changes, create: create ? { ...create, id } : null }],
-      storeName === 'device' || options.queue === false ? null : (rec, fields) => outboxEntry(storeName, rec, fields, 'patch'),
+      storeName === 'device' || options.queue === false ? null : (rec, fields) =>
+        outboxEntry(storeName, syncV2Record(storeName, rec, { pendingCreate: operation === 'create' }),
+          fields, operation, known),
       newStamp
     );
 
@@ -641,7 +831,7 @@ export async function upsert(storeName, rec) {
   return ok ? rec : null;
 }
 
-export const softDelete = (storeName, id) => patch(storeName, id, { deleted: true });
+export const softDelete = (storeName, id) => patch(storeName, id, { deleted: true }, null, { v2Operation: 'delete' });
 
 /** بيانات المعلّم — تُصدَّر في النسخ الاحتياطية وتُدمج. */
 export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
@@ -664,13 +854,19 @@ async function patchManyRecords(storeName, edits, context) {
   }
 }
 
-async function cascadeDelete(predicates, context) {
+async function cascadeDelete(predicates, context, lifecycle = null) {
   try {
-    const { touched } = await db.markDeleted(predicates, now(), (storeName, record) =>
-      CASCADE_SYNCABLE_STORES.has(storeName)
+    let commandQueued = false;
+    const { touched } = await db.markDeleted(predicates, now(), (storeName, record) => {
+      if (lifecycle) {
+        if (commandQueued || storeName !== lifecycle.store || record.id !== lifecycle.targetId) return null;
+        commandQueued = true;
+        return lifecycleCommandEntry(lifecycle.command, lifecycle.targetId, lifecycle.store, record.updatedAt);
+      }
+      return CASCADE_SYNCABLE_STORES.has(storeName)
         ? outboxEntry(storeName, record, null, 'delete')
-        : null
-    );
+        : null;
+    });
     const changes = [];
     for (const [storeName, ids] of Object.entries(touched)) {
       const arr = state[storeName];
@@ -1021,7 +1217,7 @@ function applyCommittedPuts(writes) {
   broadcast(changes);
 }
 
-async function mutateSnapshotAttendance(sesId, makeRecords) {
+async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'record') {
   const stamp = now();
   let result = { kind: 'missing', records: [] };
   let committed;
@@ -1059,18 +1255,35 @@ async function mutateSnapshotAttendance(sesId, makeRecords) {
           isNewSnapshot = true;
         }
 
-        const records = makeRecords(snapshot.members, existingAttendance, ses, stamp);
+        const records = makeRecords(snapshot.members, existingAttendance, ses, stamp)
+          .map((record) => syncV2Record('attendance', record, {
+            pendingCreate: !existingAttendance.some((candidate) => candidate.id === record.id),
+          }));
         if (!records.length) {
           result = { kind: 'empty', records: [] };
           return {};
         }
 
-        const nextSession = ses.status === 'scheduled' ? { ...ses, status: 'held', updatedAt: stamp } : null;
-        const outbox = [
-          ...(isNewSnapshot ? [outboxEntry('sessionRosterSnapshots', snapshot)] : []),
-          ...records.map((record) => outboxEntry('attendance', record)),
-          ...(nextSession ? [outboxEntry('sessions', nextSession)] : []),
-        ].filter(Boolean);
+        const nextSession = ses.status === 'scheduled'
+          ? syncV2Record('sessions', { ...ses, status: 'held', updatedAt: stamp }) : null;
+        const outbox = (commandKind === 'fill'
+          ? [syncV2CommandEntry({
+            store: 'attendance', recordId: `fill:${sesId}`, command: 'attendance:fill', stamp,
+            patch: { sessionId: sesId, status: records[0]?.status, studentIds: records.map((record) => record.studentId) },
+            dependencies: [
+              { store: 'sessions', recordId: sesId, requiresServerRevision: true },
+              ...records.map((record) => ({ store: 'students', recordId: record.studentId, requiresServerRevision: true })),
+            ],
+          })]
+          : records.map((record) => syncV2CommandEntry({
+            store: 'attendance', recordId: record.id, command: 'attendance:record', stamp,
+            baseRevision: existingAttendance.find((candidate) => candidate.id === record.id)?.serverRevision ?? 0,
+            patch: { sessionId: sesId, studentId: record.studentId, status: record.status, note: record.note ?? '' },
+            dependencies: [
+              { store: 'sessions', recordId: sesId, requiresServerRevision: true },
+              { store: 'students', recordId: record.studentId, requiresServerRevision: true },
+            ],
+          }))).filter(Boolean);
         result = { kind: 'snapshot', records, snapshot };
         return {
           ...(isNewSnapshot ? { sessionRosterSnapshots: { put: [snapshot] } } : {}),
@@ -1554,7 +1767,8 @@ export async function deleteTeaching(tchId) {
       attendance: (a) => sessionIds.has(a.sessionId),
       logs: (l) => l.teachingId === tchId,
     },
-    { op: 'deleteTeaching', tchId }
+    { op: 'deleteTeaching', tchId },
+    { command: 'delete_teaching', store: 'teachings', targetId: tchId }
   );
 }
 
@@ -1601,7 +1815,8 @@ export async function deleteClass(secId) {
       notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
       students: (s) => orphanStudentIds.has(s.id),
     },
-    { op: 'deleteClass', secId }
+    { op: 'deleteClass', secId },
+    { command: 'delete_class', store: 'sections', targetId: secId }
   );
 }
 
@@ -1807,7 +2022,6 @@ export async function importStudents(secId, names) {
 export async function transferStudent(studentId, toSectionId, { date = todayISO(), note = '' } = {}) {
   if (!studentId || !toSectionId || !date) return null;
   const stamp = now();
-  const operationId = `transfer-renumber:${uid()}`;
   let result = { ok: false, status: 'write-failed' };
   let committed;
 
@@ -1899,27 +2113,17 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
           return !before || before.status !== row.status || before.rollNo !== row.rollNo ||
             before.startDate !== row.startDate || before.endDate !== row.endDate ||
             before.transferNote !== row.transferNote || before.updatedAt !== row.updatedAt;
-        });
-
-        const operation = {
-          id: operationId,
-          type: 'transfer-renumber',
-          source: structuredClone(retired),
-          destination: structuredClone(finalDestination),
-          sourceRoster: structuredClone(sourceRoster),
-          destinationRoster: structuredClone(destinationRoster),
-          updatedAt: stamp,
-          order: nextEnrollmentOperationOrder(current.outbox),
-        };
+        }).map((row) => syncV2Record('enrollments', row, {
+          pendingCreate: !current.enrollments.some((candidate) => candidate.id === row.id),
+        }));
+        const destinationForCommand = changedEnrollments.find((row) => row.id === finalDestination.id) ?? finalDestination;
         result = { ok: true, status: 'transferred', enrollment: finalDestination };
         return {
           enrollments: { put: changedEnrollments },
           outbox: {
-            put: [
-              ...changedEnrollments.map((row) => outboxEntry('enrollments', row, null,
-                current.enrollments.some((candidate) => candidate.id === row.id) ? 'patch' : 'put')).filter(Boolean),
-              enrollmentOperationEntry(operation, stamp),
-            ],
+            put: [enrollmentCommandEntry('transfer', destinationForCommand, {
+              sourceEnrollmentId: source.id, date, note,
+            })].filter(Boolean),
           },
         };
       },
@@ -1939,13 +2143,30 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
 
 /** خروج الطالب من المدرسة — بلا حذف، فيبقى سجله التاريخي كاملًا. */
 export async function withdrawStudent(studentId, { date = todayISO(), note = '' } = {}) {
-  const current = activeEnrollment(studentId);
-  if (current) {
-    await patch('enrollments', current.id, {
-      status: 'withdrawn', endDate: date, transferNote: note,
+  const enrollment = activeEnrollment(studentId);
+  const student = getStudent(studentId);
+  if (!enrollment || !student) return null;
+  const stamp = now();
+  const nextEnrollment = syncV2Record('enrollments', {
+    ...enrollment, status: 'withdrawn', endDate: date, transferNote: note, updatedAt: stamp,
+  });
+  const nextStudent = syncV2Record('students', { ...student, status: 'withdrawn', updatedAt: stamp });
+  try {
+    const committed = await db.applyBatch({ students: {}, enrollments: {}, outbox: {} }, {
+      prepare: () => ({
+        students: { put: [nextStudent] },
+        enrollments: { put: [nextEnrollment] },
+        outbox: { put: [enrollmentCommandEntry('withdraw', nextEnrollment, {
+          sourceEnrollmentId: enrollment.id, date, note,
+        })].filter(Boolean) },
+      }),
     });
+    applyCommittedPuts(committed);
+    return nextStudent;
+  } catch (error) {
+    reportWriteError(error, { op: 'withdrawStudent', studentId });
+    return null;
   }
-  return patch('students', studentId, { status: 'withdrawn' });
 }
 
 /** عودة طالب غادر. */
@@ -1965,7 +2186,8 @@ export async function deleteStudent(studentId) {
       logs: (l) => l.studentId === studentId,
       notes: (n) => n.studentId === studentId,
     },
-    { op: 'deleteStudent', studentId }
+    { op: 'deleteStudent', studentId },
+    { command: 'delete_student', store: 'students', targetId: studentId }
   );
 }
 
@@ -2055,7 +2277,8 @@ export function setScore(studentId, itemId, value, options = {}) {
 export function deleteItem(itemId) {
   return cascadeDelete(
     { items: (i) => i.id === itemId, scores: (s) => s.itemId === itemId },
-    { op: 'deleteItem', itemId }
+    { op: 'deleteItem', itemId },
+    { command: 'delete_item', store: 'items', targetId: itemId }
   );
 }
 
@@ -2203,7 +2426,7 @@ export async function setAttendance(sesId, studentId, status) {
       ...(previous ?? { id, studentId, sessionId: sesId, teachingId: session.teachingId, date: session.date, note: '' }),
       status, deleted: false, updatedAt: stamp,
     }];
-  });
+  }, 'record');
   if (mutation.kind === 'snapshot') return mutation.records[0] ?? null;
   if (mutation.kind !== 'legacy') return null;
 
@@ -2232,7 +2455,7 @@ export async function fillAttendance(sesId, status = 'present') {
         studentId: member.studentId, sessionId: sesId, teachingId: session.teachingId, date: session.date,
         status, note: '',
       }));
-  });
+  }, 'fill');
   if (mutation.kind === 'snapshot') return mutation.records.length;
   if (mutation.kind !== 'legacy') return 0;
 
