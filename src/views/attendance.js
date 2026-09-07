@@ -20,14 +20,14 @@ let query = '';
 
 /** يختار حصة اليوم المناسبة: المطلوبة في الرابط، أو الأولى، أو ينشئ واحدة. */
 async function ensureActive(tchId) {
+  await store.ensureSessionsForDate(date);
   const list = store.sessionsOnFor(tchId, date);
   if (activeSessionId && list.some((s) => s.id === activeSessionId)) return;
   if (list.length) {
     activeSessionId = list[0].id;
     return;
   }
-  const ses = await store.ensureSession(tchId, date, 1);
-  activeSessionId = ses.id;
+  activeSessionId = null;
 }
 
 export default {
@@ -62,7 +62,7 @@ export default {
 
     const daySessions = store.sessionsOnFor(tch.id, date);
     const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
-    if (!ses) return html`<div class="card card--pad center t-3">جارٍ تجهيز الحصة…</div>`;
+    if (!ses) return html`<div class="empty"><div class="empty__title">لا توجد حصة مجدولة لهذا الفصل في هذا اليوم</div></div>`;
 
     const rosterInfo = store.sessionRoster(ses);
     const roster = rosterInfo.members;

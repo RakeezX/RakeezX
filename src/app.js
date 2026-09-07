@@ -435,6 +435,8 @@ async function resolve() {
     return;
   }
 
+  if (cloud.session && cloud.user) await store.ensureSessionsForDate();
+
   if (ctx) scrollMemory.set(ctx.path, window.scrollY);
   view?.onUnmount?.();
 
@@ -480,6 +482,7 @@ async function boot() {
     } catch (err) {
       console.error('[rakeezx] Sync module failed to load:', err);
     }
+    if (cloud.session && cloud.user) await store.ensureSessionsForDate();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
@@ -528,6 +531,15 @@ async function boot() {
     syncModule.subscribe(paintSyncStatus);
   }
   onNavigate(resolve);
+  const materializeToday = () => {
+    if (cloud.session && cloud.user) {
+      store.ensureSessionsForDate().catch((err) => console.warn('[rakeezx sessions] automatic materialization failed:', err));
+    }
+  };
+  addEventListener('pageshow', materializeToday);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') materializeToday();
+  });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 
   await resolve();

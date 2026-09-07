@@ -14,7 +14,7 @@ import {
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
-  periodTime, periodNumbers, weekday, shiftDate, isTeachingDay,
+  periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
   normalizeSearchText, gradeLabel
 } from './models.js';
@@ -1471,6 +1471,16 @@ export function calendarDayForYear(yearId, date) {
   return matching.find(({ calendar }) => calendar.source === 'custom')?.day ?? matching[0]?.day ?? null;
 }
 
+/** المصدر الواحد لأهلية الحصة الاعتيادية؛ لا ينشئ بيانات. */
+export function isSessionEligibleDate(date, { year = activeYear(), term = activeTerm() } = {}) {
+  if (!date || !year || !term || term.yearId !== year.id) return false;
+  if (!term.startDate || !term.endDate || date < term.startDate || date > term.endDate) return false;
+  const day = calendarDayForYear(year.id, date);
+  // التقويم الصريح يغلب عطلة نهاية الأسبوع الافتراضية.
+  if (day) return isTeachingDay(day.kind);
+  return !isWeekend(date);
+}
+
 export { getCalendarPreset, WESTERN_1448_1449_PRESET_ID };
 
 export function calendarPresetForYear(yearId = activeYear()?.id) {
@@ -2329,6 +2339,58 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
   return ses;
 }
 
+/** يولّد أغلفة حصص اليوم فقط من الجدول الحالي، من دون لمس الموجود أو tombstone. */
+export async function ensureSessionsForDate(date = todayISO()) {
+  if (date !== todayISO() || !isSessionEligibleDate(date)) return { created: 0, existing: 0, skipped: 0 };
+  const term = activeTerm();
+  const year = activeYear();
+  const profile = activeTimeProfile();
+  const pending = [];
+  let existing = 0;
+  let skipped = 0;
+  for (const teaching of teachings(term?.id)) {
+    const section = getSection(teaching.sectionId);
+    const calendarDay = calendarDayForYear(year?.id, date);
+    const resolved = resolveProfile(profile, date, calendarDay);
+    for (const slot of slotsOf(teaching.id).filter((candidate) => candidate.weekday === weekday(date))) {
+      const sameIdentity = state.sessions.find((session) =>
+        session.teachingId === teaching.id && session.date === date && Number(session.period) === Number(slot.period));
+      if (sameIdentity) {
+        if (sameIdentity.deleted) skipped++;
+        else existing++;
+        continue;
+      }
+      const timing = periodTime(resolved, weekday(date), slot.period, section?.grade);
+      if (!timing) { skipped++; continue; }
+      pending.push(makeSession({
+        teachingId: teaching.id, date, period: slot.period, slotId: slot.id,
+        startTime: timing.start, endTime: timing.end,
+        timeProfileId: resolved?.id ?? profile?.id ?? null, status: 'scheduled',
+      }));
+    }
+  }
+  if (pending.length && !await save({ sessions: pending })) throw new Error('تعذّر حفظ الحصص التلقائية.');
+  return { created: pending.length, existing, skipped };
+}
+
+/** إسقاط قراءة فقط للحصص المقبلة؛ لا يكتب صفوف sessions. */
+export function projectedSessionsForDate(date, { term = activeTerm() } = {}) {
+  if (!date || date <= todayISO() || !isSessionEligibleDate(date, { term })) return [];
+  const profile = activeTimeProfile();
+  const year = activeYear();
+  const calendarDay = calendarDayForYear(year?.id, date);
+  const resolved = resolveProfile(profile, date, calendarDay);
+  return teachings(term?.id).flatMap((teaching) => {
+    const section = getSection(teaching.sectionId);
+    return slotsOf(teaching.id).filter((slot) => slot.weekday === weekday(date)).map((slot) => {
+      const timing = periodTime(resolved, weekday(date), slot.period, section?.grade);
+      return timing && makeSession({ teachingId: teaching.id, date, period: slot.period, slotId: slot.id,
+        startTime: timing.start, endTime: timing.end, timeProfileId: resolved?.id ?? profile?.id ?? null,
+        status: 'scheduled', projected: true });
+    }).filter(Boolean);
+  }).sort((a, b) => a.period - b.period);
+}
+
 /**
  * ينشئ الحصص المؤرخة المفقودة من خانات إسناد واحد ضمن حدود فصله الدراسي.
  * لا يعيد إنشاء أو إحياء أي سجل موجود، فتظل الحصص والحضور التاريخيان كما هما.
@@ -2341,12 +2403,14 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
   if (!term.startDate || !term.endDate) throw new Error('أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا.');
   if (!startDate || !endDate || startDate > endDate) throw new Error('تحقق من نطاق التاريخ.');
+  if (startDate > todayISO()) throw new Error('لا تُولَّد الحصص المستقبلية؛ تظهر من الجدول عند حلول يومها.');
   if (endDate < term.startDate || startDate > term.endDate) {
     throw new Error('النطاق المختار خارج تواريخ الفصل الدراسي الحالي.');
   }
 
   const effectiveStart = startDate < term.startDate ? term.startDate : startDate;
-  const effectiveEnd = endDate > term.endDate ? term.endDate : endDate;
+  const requestedEnd = endDate > todayISO() ? todayISO() : endDate;
+  const effectiveEnd = requestedEnd > term.endDate ? term.endDate : requestedEnd;
   const slots = slotsOf(tchId);
   if (!slots.length) throw new Error('لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي.');
 
@@ -2371,7 +2435,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     if (matchingSlots.length) {
       matchedSlotDays++;
       const calendarDay = calendarDayForYear(year.id, date);
-      if (calendarDay && !isTeachingDay(calendarDay.kind)) {
+      if (!isSessionEligibleDate(date, { year, term })) {
         holidays++;
       } else {
         const resolved = resolveProfile(profile, date, calendarDay);
@@ -2416,8 +2480,15 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     clipped: effectiveStart !== startDate || effectiveEnd !== endDate,
   };
 }
-export const setSessionStatus = (sesId, status, reason = '') =>
-  patch('sessions', sesId, { status, reason });
+export async function setSessionStatus(sesId, status, reason = '') {
+  const session = getSession(sesId);
+  if (!session) return null;
+  if (['cancelled', 'cancelled_holiday'].includes(status) &&
+      (session.status === 'held' || attendanceIn(sesId).length > 0)) {
+    throw new Error('لا يمكن إلغاء حصة تم رصد حضورها؛ صحّح الحضور أولًا.');
+  }
+  return patch('sessions', sesId, { status, reason });
+}
 
 /** يضبط حضور طالب في حصة. لا يُنشأ حضور إلا لحصة قائمة. */
 export async function setAttendance(sesId, studentId, status) {
@@ -2488,6 +2559,7 @@ export async function addSlot(tchId, weekday, period, times = {}) {
   const slot = makeSlot({ teachingId: tchId, weekday, period, ...times });
   if (live(state.slots).some((s) => s.id === slot.id)) return null;
   await save({ slots: [slot] });
+  await ensureSessionsForDate();
   return slot;
 }
 
@@ -2510,6 +2582,7 @@ export async function editSlot(slotId, data) {
     start: updated.start,
     end: updated.end
   });
+  await ensureSessionsForDate();
   return updated;
 }
 

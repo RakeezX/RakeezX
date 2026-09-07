@@ -56,7 +56,7 @@ function generationCard(teaching) {
             <form data-submit="generate-sessions" class="stack stack-2">
               <div class="field-row">
                 <label class="field"><span class="field__label">من</span><input class="input tabular" name="startDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.startDate}" required></label>
-                <label class="field"><span class="field__label">إلى</span><input class="input tabular" name="endDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.endDate}" required></label>
+                <label class="field"><span class="field__label">إلى</span><input class="input tabular" name="endDate" type="date" min="${term.startDate}" max="${term.endDate < todayISO() ? term.endDate : todayISO()}" value="${term.endDate < todayISO() ? term.endDate : todayISO()}" required></label>
               </div>
               <button class="btn btn--primary" type="submit">${icon('spark')} توليد الحصص</button>
             </form>
