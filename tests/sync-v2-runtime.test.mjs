@@ -8,7 +8,7 @@ import * as cloud from '../src/lib/cloud.js';
 import * as store from '../src/store.js';
 import * as sync from '../src/lib/sync.js';
 import {
-  makeEnrollment, makeSection, makeSession, makeStudent, makeSubject, makeTeaching, makeTerm, makeYear,
+  DEFAULT_TIME_PROFILES, makeEnrollment, makeSection, makeSession, makeStudent, makeSubject, makeTeaching, makeTerm, makeYear,
 } from '../src/models.js';
 
 global.document = {
@@ -58,6 +58,56 @@ beforeEach(async () => {
   cloud.setMockBackend(null);
   cloud.setMockAuth(null, null);
   await resetStore();
+});
+
+test('offline-first foundation creates are explicitly marked as bootstrap work', async () => {
+  await db.clearAll();
+  store.state.ready = false;
+  await store.init();
+  const outbox = (await db.getAll('outbox')).filter((row) => row.protocol === 'v2');
+  assert.ok(outbox.length > 0);
+  assert.equal(outbox.every((row) => row.op === 'create' && row.bootstrap === true), true);
+  assert.deepEqual(
+    store.timeProfiles().map((profile) => profile.id).sort(),
+    DEFAULT_TIME_PROFILES.map((profile) => profile.id).sort(),
+  );
+  assert.deepEqual(
+    store.timeProfiles().map((profile) => profile.overrides?.config?.type).sort(),
+    ['hybrid', 'ramadan', 'summer', 'winter'],
+  );
+});
+
+test('retained default Timing Profile tombstones are not recreated during bootstrap', async () => {
+  await db.clearAll();
+  const deleted = {
+    ...DEFAULT_TIME_PROFILES[0],
+    order: 0,
+    deleted: true,
+    deletedAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  await db.put('timeProfiles', deleted);
+  store.state.ready = false;
+  await store.init();
+
+  assert.equal(store.timeProfiles().length, 0);
+  assert.equal(store.state.timeProfiles.length, 1);
+  assert.equal(store.state.timeProfiles[0].id, deleted.id);
+  assert.equal(store.state.timeProfiles[0].deleted, true);
+  assert.equal((await db.getAll('outbox')).some((row) => row.store === 'timeProfiles'), false);
+});
+
+test('section creation without an active academic year is rejected before queuing cloud work', async () => {
+  await db.clearStore('outbox');
+  store.state.years = store.state.years.map((year) => ({ ...year, deleted: true }));
+
+  await assert.rejects(
+    store.createSection({ grade: 10, label: 'بلا سنة' }),
+    /السنة الدراسية النشطة/,
+  );
+
+  assert.equal((await db.getAll('outbox')).length, 0);
+  assert.equal(store.state.sections.some((section) => section.label === 'بلا سنة'), false);
 });
 
 test('reachable store actions emit only V2 generic or specialized mutations', async () => {

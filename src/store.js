@@ -271,14 +271,14 @@ async function ensureFoundation() {
     state.profile = syncV2Record('profile', state.profile ?? DEFAULT_PROFILE, { pendingCreate: true });
     writes.profile = [state.profile];
     const entry = outboxEntry('profile', state.profile, null, 'put', null);
-    if (entry) (writes.outbox ??= []).push(entry);
+    if (entry) (writes.outbox ??= []).push({ ...entry, bootstrap: true });
   }
   const push = (k, rec) => {
     const next = syncV2Record(k, rec, { pendingCreate: !!SYNC_V2_SCHEMAS[k] });
     (writes[k] ??= []).push(next);
     if (Array.isArray(state[k])) state[k].push(next);
     const entry = outboxEntry(k, next, null, 'put', null);
-    if (entry) (writes.outbox ??= []).push(entry);
+    if (entry) (writes.outbox ??= []).push({ ...entry, bootstrap: true });
   };
 
   // Old offline data could predate the required cloud `name` column. Preserve
@@ -318,7 +318,9 @@ async function ensureFoundation() {
   if (!live(state.subjects).length) push('subjects', makeSubject({ name: 'المهارات الرقمية' }));
 
   // ملفات التوقيت المبدئية — سجلات قابلة للتعديل، لا ثوابت
-  if (!live(state.timeProfiles).length) {
+  // Only a truly empty device receives the four first-use presets. Retained
+  // tombstones are authoritative deletion evidence and must not be recreated.
+  if (!state.timeProfiles.length) {
     DEFAULT_TIME_PROFILES.forEach((p, i) => push('timeProfiles', makeTimeProfile({ ...p, order: i })));
   } else {
     // Auto-upgrade legacy default profiles that lack exact official configs
@@ -1706,6 +1708,9 @@ export async function createSubject(data) {
 export async function createSection(data) {
   const year = activeYear();
   const yearId = data.yearId ?? year?.id;
+  if (!yearId || !live(state.years).some((candidate) => candidate.id === yearId)) {
+    throw new Error('تعذّر تحديد السنة الدراسية النشطة.');
+  }
   const existing = sections(yearId).find(s =>
     !s.deleted && s.yearId === yearId &&
     s.grade === Number(data.grade) && 

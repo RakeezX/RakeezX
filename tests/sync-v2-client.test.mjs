@@ -4,6 +4,7 @@ import { IDBFactory } from 'fake-indexeddb';
 
 import { STORES } from '../src/lib/db.js';
 import { createSyncV2Engine } from '../src/lib/sync-v2.js';
+import { DEFAULT_TIME_PROFILES, makeTimeProfile } from '../src/models.js';
 
 const clone = (value) => value == null ? value : structuredClone(value);
 
@@ -237,6 +238,21 @@ async function seedAuthoritative(client, store, record) {
   });
 }
 
+async function queueDefaultTimeProfiles(client) {
+  for (const [order, preset] of DEFAULT_TIME_PROFILES.entries()) {
+    const record = makeTimeProfile({ ...preset, order });
+    const { mutation } = await client.engine.commitMutation({
+      store: 'timeProfiles', recordId: record.id, op: 'create', create: record,
+    });
+    await client.database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const queued = current.outbox.find((row) => row.id === mutation.id);
+        return { outbox: { put: queued ? [{ ...queued, bootstrap: true }] : [], remove: [] } };
+      },
+    });
+  }
+}
+
 test('Sync V2 atomically persists optimistic data and a durable outbox mutation', async (t) => {
   const server = new MemoryV2Server();
   const client = makeClient(server, 'atomic');
@@ -264,6 +280,94 @@ test('Sync V2 atomically persists optimistic data and a durable outbox mutation'
   assert.equal(command.op, 'command');
   assert.equal(command.deviceId, committed.mutation.deviceId);
   assert.equal(command.state, 'pending');
+});
+
+test('pull adopts an existing bootstrap identity and preserves a later local edit', async (t) => {
+  const server = new MemoryV2Server();
+  const client = makeClient(server, 'bootstrap-adoption');
+  t.after(() => client.database.close());
+
+  await client.engine.commitMutation({
+    store: 'profile', recordId: 'profile', op: 'create',
+    patch: { teacherName: '', schoolName: '', phone: '', reportPrincipalName: '' },
+  });
+  await client.database.applyBatch({ outbox: {} }, {
+    prepare(current) {
+      return { outbox: { put: current.outbox.map((mutation) => ({ ...mutation, bootstrap: true })), remove: [] } };
+    },
+  });
+  await client.engine.commitMutation({
+    store: 'profile', recordId: 'profile', op: 'patch', patch: { schoolName: 'Local School' },
+  });
+  server.table('profile').set('profile', {
+    id: 'profile', teacher_name: 'Cloud Teacher', school_name: '', phone: '', report_principal_name: '',
+    revision: 3, field_revisions: { teacher_name: 3, school_name: 1, phone: 1, report_principal_name: 1 },
+    deleted_at: null, client_updated_at: 1_800_000_000_000,
+  });
+
+  await client.engine.pullStore('profile');
+  const adopted = await client.database.get('profile', 'profile');
+  assert.equal(adopted.teacherName, 'Cloud Teacher');
+  assert.equal(adopted.schoolName, 'Local School');
+  const [pending] = await client.database.getAll('outbox');
+  assert.equal(pending.op, 'patch');
+  assert.equal(pending.baseRevision, 3);
+  assert.equal(server.calls.length, 0, 'the redundant bootstrap create must not reach the server');
+
+  const pushed = await client.engine.dispatchPending();
+  assert.equal(pushed.acknowledged, 1);
+  assert.equal(server.table('profile').get('profile').school_name, 'Local School');
+  assert.equal((await client.engine.status()).state, 'synced');
+});
+
+test('stable default Timing Profile identities converge across concurrent and later devices', async (t) => {
+  const server = new MemoryV2Server();
+  const clients = ['timing-a', 'timing-b', 'timing-c'].map((label) => makeClient(server, label));
+  const later = makeClient(server, 'timing-later');
+  t.after(() => [...clients, later].forEach((client) => client.database.close()));
+  const expectedIds = DEFAULT_TIME_PROFILES.map((profile) => profile.id).sort();
+
+  await Promise.all(clients.map((client) => queueDefaultTimeProfiles(client)));
+  await Promise.all(clients.map((client) => client.engine.pullStore('timeProfiles')));
+  await Promise.all(clients.map((client) => client.engine.dispatchPending()));
+  await Promise.all(clients.map((client) => client.engine.pullStore('timeProfiles')));
+
+  assert.equal(server.table('time_profiles').size, 4);
+  for (const client of clients) {
+    const rows = await client.database.getAll('timeProfiles');
+    assert.deepEqual(rows.filter((row) => !row.deleted).map((row) => row.id).sort(), expectedIds);
+    assert.equal(rows.some((row) => row.syncConflicts?.length), false);
+    assert.equal((await client.engine.status()).state, 'synced');
+  }
+  assert.deepEqual(
+    [...server.table('time_profiles').values()].map((row) => row.overrides?.config?.type).sort(),
+    ['hybrid', 'ramadan', 'summer', 'winter'],
+  );
+
+  const custom = makeTimeProfile({ id: 'timing-custom', name: 'ملف مخصص', overrides: { config: { type: 'custom' } } });
+  await clients[0].engine.commitMutation({
+    store: 'timeProfiles', recordId: custom.id, op: 'create', create: custom,
+  });
+  await clients[0].engine.dispatchPending();
+  assert.equal(server.table('time_profiles').size, 5);
+  assert.equal(server.table('time_profiles').get(custom.id).name, 'ملف مخصص');
+
+  const deletedId = DEFAULT_TIME_PROFILES[0].id;
+  await clients[0].engine.commitMutation({ store: 'timeProfiles', recordId: deletedId, op: 'delete' });
+  await clients[0].engine.dispatchPending();
+  assert.ok(server.table('time_profiles').get(deletedId).deleted_at);
+
+  await queueDefaultTimeProfiles(later);
+  const serverCallsBeforePull = server.calls.length;
+  await later.engine.pullStore('timeProfiles');
+  assert.equal((await later.engine.dispatchPending()).attempted, 0);
+  assert.equal(server.calls.length, serverCallsBeforePull, 'a later device must adopt without duplicate creates');
+  const laterRows = await later.database.getAll('timeProfiles');
+  assert.deepEqual(laterRows.filter((row) => !row.deleted).map((row) => row.id).sort(),
+    [...expectedIds.filter((id) => id !== deletedId), custom.id].sort());
+  assert.equal(laterRows.find((row) => row.id === deletedId)?.deleted, true);
+  assert.equal(laterRows.some((row) => row.syncConflicts?.length), false);
+  assert.equal(server.table('time_profiles').size, 5);
 });
 
 test('lost response retries the exact mutationId and clears one receipt without duplication', async (t) => {

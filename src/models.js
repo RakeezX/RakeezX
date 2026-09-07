@@ -468,23 +468,34 @@ export const TIMING_PRESETS = {
  * الملفات المبدئية — **سجلات قابلة للتعديل والحذف وإعادة التسمية**، لا ثوابت
  * في الشيفرة. تُنشأ مرة واحدة عند أول تشغيل ثم تصير ملك المعلّم.
  */
+export const DEFAULT_TIME_PROFILE_IDS = Object.freeze({
+  summer: 'time-profile:default:summer',
+  winter: 'time-profile:default:winter',
+  ramadan: 'time-profile:default:ramadan',
+  hybrid: 'time-profile:default:hybrid',
+});
+
 export const DEFAULT_TIME_PROFILES = [
   {
+    id: DEFAULT_TIME_PROFILE_IDS.summer,
     name: 'التوقيت الصيفي',
     periods: generateAdvancedPeriods(TIMING_PRESETS.summer),
     overrides: { config: TIMING_PRESETS.summer }
   },
   {
+    id: DEFAULT_TIME_PROFILE_IDS.winter,
     name: 'التوقيت الشتوي',
     periods: generateAdvancedPeriods(TIMING_PRESETS.winter),
     overrides: { config: TIMING_PRESETS.winter }
   },
   {
+    id: DEFAULT_TIME_PROFILE_IDS.ramadan,
     name: 'توقيت رمضان',
     periods: generateAdvancedPeriods(TIMING_PRESETS.ramadan),
     overrides: { config: TIMING_PRESETS.ramadan }
   },
   {
+    id: DEFAULT_TIME_PROFILE_IDS.hybrid,
     name: 'التوقيت المدمج',
     periods: generateAdvancedPeriods(TIMING_PRESETS.hybrid),
     overrides: { config: TIMING_PRESETS.hybrid, remote: generateAdvancedPeriods(TIMING_PRESETS.remote) }

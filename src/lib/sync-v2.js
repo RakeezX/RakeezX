@@ -8,6 +8,7 @@
 
 import * as databaseDefault from './db.js';
 import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, fetchRecords } from './cloud.js';
+import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -289,6 +290,14 @@ function conflictDiagnostic(mutation, result, stamp) {
     canonicalRevision: normalizeRevision(result.resultRevision),
     recordedAt: stamp,
   };
+}
+
+const DEFAULT_TIME_PROFILE_ID_SET = new Set(Object.values(DEFAULT_TIME_PROFILE_IDS));
+
+function isDefaultTimeProfileBootstrapAdoption(mutation, result, canonical, canonicalId) {
+  return mutation.bootstrap === true && mutation.store === 'timeProfiles' && mutation.op === 'create' &&
+    DEFAULT_TIME_PROFILE_ID_SET.has(mutation.recordId) && canonical?.id === mutation.recordId &&
+    canonicalId === mutation.recordId && ['conflict', 'canonicalized', 'tombstoned'].includes(result?.outcome);
 }
 
 function operationBatch() {
@@ -698,7 +707,14 @@ export function createSyncV2Engine({
         else if (target?.serverCanonical ?? source?.serverCanonical) {
           next.serverCanonical = clone(target?.serverCanonical ?? source?.serverCanonical);
         }
-        const diagnostic = conflictDiagnostic(currentMutation, result, stamp);
+        // Concurrent first-use devices intentionally create the same four
+        // stable preset IDs. The server's same-ID create response is canonical
+        // adoption for bootstrap work, not a teacher-visible conflict. This is
+        // deliberately restricted to the four Product-owned bootstrap IDs;
+        // ordinary/custom Timing Profile creates keep normal conflict handling.
+        const diagnostic = isDefaultTimeProfileBootstrapAdoption(
+          currentMutation, result, canonical, canonicalId,
+        ) ? null : conflictDiagnostic(currentMutation, result, stamp);
         if (diagnostic) next.syncConflicts = [...(next.syncConflicts ?? []), diagnostic];
 
         const later = pendingForRecord(remappedOutbox, mutation.store, [sourceId, canonicalId]);
@@ -1078,12 +1094,36 @@ export function createSyncV2Engine({
     const canonicalRows = Array.isArray(rows) ? rows : [];
     await database.applyBatch({ [store]: {}, outbox: {} }, {
       prepare(current) {
-        const writes = operationBatch();
+        const recordWrites = operationBatch();
+        const outboxWrites = operationBatch();
         for (const row of canonicalRows) {
           const canonical = decodeSyncV2Canonical(store, row);
           if (!canonical?.id) continue;
           const existing = current[store].find((record) => record.id === canonical.id) ?? null;
           if (existing && normalizeRevision(existing.serverRevision) > normalizeRevision(canonical.serverRevision)) continue;
+          // The offline-first bootstrap runs before Auth and therefore cannot
+          // know whether this account already owns its singleton/default rows.
+          // A pull of the same durable identity is authoritative proof that the
+          // bootstrap create is redundant. Adopt it without dispatching a
+          // guaranteed create-existing conflict, while retaining and rebasing
+          // any later teacher-authored mutation for that record.
+          const bootstrapCreates = current.outbox.filter((mutation) =>
+            mutation.protocol === 'v2' && mutation.bootstrap === true && mutation.store === store &&
+            mutation.op === 'create' &&
+            [mutation.recordId, mutation.serverRecordId, mutation.canonicalId].includes(canonical.id));
+          const bootstrapIds = new Set(bootstrapCreates.map((mutation) => mutation.id));
+          const remainingOutbox = current.outbox.filter((mutation) => !bootstrapIds.has(mutation.id));
+          const rebasedOutbox = bootstrapIds.size ? remainingOutbox.map((mutation) => {
+            if (mutation.protocol !== 'v2' || mutation.store !== store || mutation.op === 'create' ||
+                mutation.envelopeLocked ||
+                ![mutation.recordId, mutation.serverRecordId, mutation.canonicalId].includes(canonical.id)) return mutation;
+            return {
+              ...mutation,
+              baseRevision: normalizeRevision(canonical.serverRevision),
+              state: mutation.state === 'blocked' ? 'pending' : mutation.state,
+              blockedReason: null,
+            };
+          }) : remainingOutbox;
           const conflicts = existing?.syncConflicts;
           let next = { ...(existing ?? {}), ...canonical };
           delete next.syncCreatePending;
@@ -1091,12 +1131,19 @@ export function createSyncV2Engine({
           if (conflicts?.length) next.syncConflicts = conflicts;
           next = overlayMutations(
             next,
-            pendingForRecord(current.outbox, store, [canonical.id]),
+            pendingForRecord(rebasedOutbox, store, [canonical.id]),
             canonical.deleted === true,
           );
-          pushUniquePut(writes, next);
+          pushUniquePut(recordWrites, next);
+          outboxWrites.remove.push(...bootstrapIds);
+          for (const mutation of rebasedOutbox) {
+            const previous = current.outbox.find((candidate) => candidate.id === mutation.id);
+            if (previous && JSON.stringify(previous) !== JSON.stringify(mutation)) {
+              pushUniquePut(outboxWrites, mutation);
+            }
+          }
         }
-        return { [store]: writes, outbox: operationBatch() };
+        return { [store]: recordWrites, outbox: outboxWrites };
       },
     });
   }

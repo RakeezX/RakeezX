@@ -300,6 +300,7 @@ export function init() {
     }
   });
   if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
+  else if (cloud.authStatus?.().state === 'auth_required') setState({ status: 'auth_required' });
   if (typeof addEventListener === 'function') {
     addEventListener('online', () => scheduleAutomaticSync({ full: true, immediate: true }));
     addEventListener('offline', () => setState({ status: 'offline' }));

@@ -178,7 +178,7 @@ test('invalid refresh requires authentication and clears only the candidate sess
   assert.equal(cloud.authStatus().state, 'auth_required');
   assert.equal(localStorage.getItem(cloud.AUTH_STORAGE_KEY), null);
   assert.equal(localStorage.getItem(OLD_AUTH_STORAGE_KEY), 'untouched-v1-session');
-  assert.equal(await sync.syncAll(), false);
+  sync.init();
   assert.equal(sync.displayState().detailStatus, 'auth_required');
 });
 
