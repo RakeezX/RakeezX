@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import 'fake-indexeddb/auto';
 
@@ -8,21 +8,53 @@ global.matchMedia = () => ({ matches: false });
 import { makeSession, todayISO } from '../src/models.js';
 import { buildBackup, restoreBackup } from '../src/lib/export.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
+import { encodeSyncV2Patch } from '../src/lib/sync-v2.js';
 import * as sync from '../src/lib/sync.js';
 import * as store from '../src/store.js';
 import * as db from '../src/lib/db.js';
 
 class Backend {
-  constructor() { this.records = {}; }
-  async fetchRecords(table) { return this.records[table] || []; }
-  async upsertRecords(table, records) {
-    const target = this.records[table] ??= [];
-    for (const record of records) {
-      const index = target.findIndex((item) => item.id === record.id);
-      if (index >= 0) target[index] = { ...record };
-      else target.push({ ...record });
+  constructor() {
+    this.records = {};
+    this.receipts = new Map();
+  }
+  rows(table) { return this.records[table] ??= []; }
+  async fetchRecords(table) { return structuredClone(this.rows(table)); }
+  seed(store, record) {
+    this.rows(store).push({
+      id: record.id,
+      ...encodeSyncV2Patch(store, record),
+      revision: 1,
+      field_revisions: Object.fromEntries(Object.keys(encodeSyncV2Patch(store, record)).map((field) => [field, 1])),
+      deleted_at: null,
+      client_updated_at: record.updatedAt,
+    });
+  }
+  async applySyncV2Mutation(envelope) {
+    const prior = this.receipts.get(envelope.mutationId);
+    if (prior) {
+      assert.deepEqual(envelope, prior.envelope, 'a V2 retry must preserve its original envelope');
+      return structuredClone(prior.result);
     }
-    return { success: true };
+    const rows = this.rows(envelope.entity);
+    const index = rows.findIndex((row) => row.id === envelope.recordId);
+    const existing = index >= 0 ? rows[index] : null;
+    const revision = (existing?.revision ?? 0) + 1;
+    const canonical = {
+      ...(existing ?? {}), id: envelope.recordId, ...structuredClone(envelope.patch), revision,
+      field_revisions: Object.fromEntries(Object.keys(envelope.patch).map((field) => [field, revision])),
+      deleted_at: envelope.operation === 'delete' ? new Date(envelope.clientUpdatedAt).toISOString() : null,
+      client_updated_at: envelope.clientUpdatedAt,
+    };
+    if (index >= 0) rows[index] = canonical;
+    else rows.push(canonical);
+    const result = {
+      mutationId: envelope.mutationId, entity: envelope.entity, recordId: envelope.recordId,
+      canonicalId: canonical.id, outcome: 'applied', appliedGroups: Object.keys(envelope.patch),
+      conflictedGroups: [], resultRevision: revision, canonical: structuredClone(canonical),
+    };
+    this.receipts.set(envelope.mutationId, { envelope: structuredClone(envelope), result: structuredClone(result) });
+    return result;
   }
 }
 
@@ -32,12 +64,13 @@ async function fresh() {
   sync.state.status = 'idle';
 }
 
-async function fixture() {
-  const section = await store.createSection({ grade: 5, label: 'م', name: 'الخامس / ملاحظات' });
-  const teaching = await store.createTeaching({ sectionId: section.id });
-  const student = await store.addStudent(section.id, 'طالب اختبار الملاحظات');
-  const session = makeSession({ teachingId: teaching.id, date: '2026-08-25', period: 1 });
-  await store.save({ sessions: [session] });
+async function fixture(backend = null) {
+  const section = { id: 'notes-section', yearId: 'year-notes', grade: 5, label: 'م', name: 'الخامس / ملاحظات', updatedAt: 1, serverRevision: 1 };
+  const teaching = { id: 'notes-teaching', sectionId: section.id, subjectId: 'subject-notes', termId: 'term-notes', order: 0, updatedAt: 1, serverRevision: 1 };
+  const student = { id: 'notes-student', name: 'طالب اختبار الملاحظات', status: 'active', updatedAt: 1, serverRevision: 1 };
+  const session = { ...makeSession({ id: 'notes-session', teachingId: teaching.id, date: '2026-08-25', period: 1 }), updatedAt: 1, serverRevision: 1 };
+  await store.save({ sections: [section], teachings: [teaching], students: [student], sessions: [session] }, { queue: false });
+  if (backend) for (const [storeName, record] of Object.entries({ sections: section, teachings: teaching, students: student, sessions: session })) backend.seed(storeName, record);
   return { section, teaching, student, session };
 }
 
@@ -91,7 +124,7 @@ test('notes converge on fresh devices and preserve tombstones; demo-student note
   setMockBackend(backend);
   setMockAuth({ id: 'notes-user' }, {});
   await fresh();
-  const { student } = await fixture();
+  const { student } = await fixture(backend);
   const note = await store.addStudentNote({ studentId: student.id, text: 'ملاحظة مزامنة' });
   await sync.syncNotes();
   assert.equal(sync.state.results.notes.status, 'success');
@@ -123,6 +156,11 @@ test('notes converge on fresh devices and preserve tombstones; demo-student note
   const demoNote = await store.addStudentNote({ studentId: demoStudent.id, text: 'ملاحظة محلية تجريبية' });
   assert.equal(demoNote.id.startsWith('demo:'), true);
   assert.equal((await db.getAll('outbox')).some((entry) => entry.recordId === demoNote.id), false);
+});
+
+after(async () => {
+  setMockBackend(null);
+  setMockAuth(null, null);
   store.closeChannel();
-  db.closeDB();
+  await db.closeDB();
 });
