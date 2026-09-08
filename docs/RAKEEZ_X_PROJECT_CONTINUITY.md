@@ -45,9 +45,10 @@ Lean Gate means evidence proportionate to the changed risk, not a weaker standar
 ## Current Production baseline
 
 - Repository Production branch: `main`.
-- Documented current Production SHA: `725c28c79de2fb8a4cf132fb9a64a840053370eb`.
+- Documented current Production SHA: `5644a019b7006560f082a0af090f96ff8a8f4ace`.
 - `SESSION-AUTO-01B` is merged and deployed: eligible ordinary scheduled-session shells materialize only through today, while future sessions remain derived from the timetable until their date. It remains `PRODUCTION REVIEW` pending Product Owner verification, not `CLOSED`.
 - `SYNC-V2` is CLOSED after Product Owner Production verification: three devices converged automatically from fresh bootstrap, offline writes propagated after reconnect, and deleted data did not resurrect after refresh or reopen.
+- `SYNC-UX-02` is CLOSED after Product Owner Production verification: a stale Teacher Control Center yellow badge was a UI-only class-reconciliation defect, not a Sync V2 engine/data defect. Future changes to sync indicators retain focused Mini Hub state-transition and reconnect regression coverage.
 - Production PWA cache release: `rakeezx-v8` in `sw.js`; it contains the V2 runtime assets and retains the verified offline core-route coverage and service-worker update behavior.
 - The active Sync V2 database is validated through migrations `0001`–`0017`. The former Production database remains frozen as fallback/archive for now; do not write to or migrate it as part of normal work.
 - Browser/runtime access uses `sb_publishable_*` only. Legacy `anon` and `service_role` API keys are disabled; RLS/owner isolation and zero anonymous `rakeezx` table grants were verified.

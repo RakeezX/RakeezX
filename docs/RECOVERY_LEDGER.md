@@ -19,6 +19,7 @@ This is the current product ledger, not a claim that every historical branch is 
 | STU-REC-01C | `CLOSED` | Grade portability was approved and Production-verified. |
 | SYNC-UX-01 / OFFLINE-ROUTES-01 | `CLOSED` | Quiet automatic sync, reconnect recovery, and core offline-route coverage were Production-verified; carried forward in the Sync V2 release. |
 | SYNC-V2 | `CLOSED` | Production `aeffd5e54207109fa2ef53569583d694ff8a6d3d`: PO verified three-device bootstrap and automatic propagation, offline write/reconnect, and tombstone non-resurrection. Candidate migrations `0001–0017`, RLS/owner isolation, and publishable-key-only browser access were verified. |
+| SYNC-UX-02 | `CLOSED` | Production `5644a01`: PO verified the Teacher Control Center no longer retains a stale yellow badge after sync completes. Root cause was UI-only badge-class reconciliation; Sync V2 engine/data correctness was not affected. Preserve focused Mini Hub sync-state and reconnect regression coverage for future sync-indicator changes. |
 | SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
 
 ## Awaiting Product Owner Production review
@@ -42,7 +43,6 @@ This is the current product ledger, not a claim that every historical branch is 
 
 | ID | Status | Ledger evidence / required boundary |
 | --- | --- | --- |
-| SYNC-UX-02 — Teacher Control Center Sync State | `OPEN BUG / AUDIT REQUIRED` | PO observed a yellow sync state remaining after a successful sync while another surface shows green synced. Audit later for stale UI state, duplicate surface/rendering, subscription, or another cause; do not reopen SYNC-V2 unless engine/data correctness evidence requires it. |
 | CLASS-RULES-01 — Classroom Rules | `PLANNED` | Add a Class tools card immediately after Quick Log / `الرصد السريع`: `القوانين الصفية`, with view/manage, add/edit, and icon-plus-text rules. Google Visual Lab review is required before Production implementation. |
 | SCHEDULE-EXPORT-01 — Schedule Export | `PLANNED` | Export the schedule as an image or PDF. Exact visual/export design requires later review. |
 | SUPPORT-FEEDBACK-01 — Support / Feedback / Problem Report | `PLANNED` | Structured in-app technical problem, suggestion, and inquiry support. Future diagnostics must be privacy-safe and exclude instructional content, credentials, tokens, and secrets; storage/delivery design remains a Product/Production decision. |
@@ -54,5 +54,5 @@ This is the current product ledger, not a claim that every historical branch is 
 - Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
 - The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
 - Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `725c28c79de2fb8a4cf132fb9a64a840053370eb`.
+- Current Production baseline: `5644a019b7006560f082a0af090f96ff8a8f4ace`.
 - The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.
