@@ -27,6 +27,8 @@ let view = null;
 let ctx = null;
 let mainEl = null;
 let syncModule = null;
+let teacherMiniHubSheet = null;
+let teacherMiniHubAuthPending = null;
 const scrollMemory = new Map();
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
@@ -88,7 +90,7 @@ function renderSidebarMiniHubTrigger() {
   `;
 }
 
-function openTeacherMiniHubSheet() {
+function renderTeacherMiniHubBody() {
   const profile = store.state.profile ?? {};
   const device = store.state.device ?? {};
   const teacherName = profile.teacherName || 'المعلّم';
@@ -100,12 +102,11 @@ function openTeacherMiniHubSheet() {
   const isInstalled = isStandaloneMode();
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
   const isLoggedIn = !!(cloud.session && cloud.user);
+  const authPending = teacherMiniHubAuthPending;
   const lastSynced = syncModule?.state?.lastSyncedAt;
   const lastSyncText = lastSynced ? new Date(lastSynced).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : null;
 
-  return openSheet({
-    title: 'مركز تحكم المعلّم',
-    body: html`
+  return html`
       <div class="mini-hub-sheet">
         <!-- 1. الهوية والسياق الأكاديمي -->
         <div class="mini-hub-card mini-hub-card--identity">
@@ -129,12 +130,16 @@ function openTeacherMiniHubSheet() {
           <div class="mini-hub-account__row">
             <div class="mini-hub-account__info">
               <div class="mini-hub-account__title">الحساب</div>
-              ${isLoggedIn
+              ${authPending === 'logout'
+                ? html`<div class="mini-hub-account__status">جارٍ تسجيل الخروج...</div>`
+                : isLoggedIn
                 ? html`<div class="mini-hub-account__status truncate" dir="ltr">${cloud.user.email}</div>`
-                : html`<div class="mini-hub-account__status">غير مسجل الدخول</div>`}
+                : html`<div class="mini-hub-account__status">${authPending === 'login' ? 'جارٍ تسجيل الدخول...' : 'غير مسجل الدخول'}</div>`}
             </div>
             <div class="mini-hub-account__action">
-              ${isLoggedIn
+              ${authPending
+                ? html`<button type="button" class="btn btn--xs btn--quiet" disabled>${authPending === 'logout' ? 'جارٍ تسجيل الخروج...' : 'جارٍ الاتصال...'}</button>`
+                : isLoggedIn
                 ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="mini-hub-logout">تسجيل الخروج</button>`
                 : html`<button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button>`}
             </div>
@@ -205,16 +210,31 @@ function openTeacherMiniHubSheet() {
           ${icon('settings')} الانتقال إلى كافة الإعدادات
         </a>
       </div>
-    `,
-  });
+    `;
 }
 
-// Login is opened above the Hub. After an auth transition, replace that
-// underlying Hub rather than stacking a refreshed copy above it.
-function replaceTeacherMiniHubAfterAuthTransition() {
-  closeSheet();
-  scheduleRender();
-  return openTeacherMiniHubSheet();
+function refreshTeacherMiniHubSheet({ focusAccountAction = false } = {}) {
+  if (!teacherMiniHubSheet?.isConnected) return false;
+  const body = teacherMiniHubSheet.querySelector('.sheet__body');
+  if (!body) return false;
+  render(body, renderTeacherMiniHubBody());
+  if (focusAccountAction) {
+    teacherMiniHubSheet.querySelector('.mini-hub-account__action button')?.focus({ preventScroll: true });
+  }
+  return true;
+}
+
+function openTeacherMiniHubSheet() {
+  if (refreshTeacherMiniHubSheet()) return Promise.resolve();
+  const sheet = openSheet({
+    title: 'مركز تحكم المعلّم',
+    body: renderTeacherMiniHubBody(),
+    onMount: (root) => { teacherMiniHubSheet = root; },
+  });
+  sheet.finally(() => {
+    if (teacherMiniHubSheet?.isConnected === false) teacherMiniHubSheet = null;
+  });
+  return sheet;
 }
 
 /* ---------- التنقل الرئيسي ---------- */
@@ -541,7 +561,10 @@ async function boot() {
   store.subscribe((_state, update) => {
     if (update?.render !== false) scheduleRender();
   });
-  cloud.subscribe(scheduleRender);
+  cloud.subscribe(() => {
+    scheduleRender();
+    refreshTeacherMiniHubSheet();
+  });
   if (syncModule) {
     syncModule.subscribe(paintSyncStatus);
   }
@@ -557,7 +580,9 @@ async function boot() {
 }
 
 function openMiniHubLoginSheet() {
-  openSheet({
+  teacherMiniHubAuthPending = 'login';
+  refreshTeacherMiniHubSheet();
+  const loginSheet = openSheet({
     title: 'تسجيل الدخول للحساب السحابي',
     desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
     body: html`
@@ -590,9 +615,12 @@ function openMiniHubLoginSheet() {
         try {
           await cloud.signIn(email, pwd);
           toast('تم تسجيل الدخول بنجاح');
+          teacherMiniHubAuthPending = null;
           done(true);
-          replaceTeacherMiniHubAfterAuthTransition();
+          refreshTeacherMiniHubSheet({ focusAccountAction: true });
         } catch (err) {
+          teacherMiniHubAuthPending = null;
+          refreshTeacherMiniHubSheet();
           submitBtn.textContent = prevText;
           submitBtn.disabled = false;
           toast(err.message || 'تعذر تسجيل الدخول', 'danger');
@@ -600,6 +628,13 @@ function openMiniHubLoginSheet() {
       });
     }
   });
+  loginSheet.finally(() => {
+    if (teacherMiniHubAuthPending === 'login') {
+      teacherMiniHubAuthPending = null;
+      refreshTeacherMiniHubSheet({ focusAccountAction: true });
+    }
+  });
+  return loginSheet;
 }
 
 /** أفعال متاحة في كل الشاشات. */
@@ -607,12 +642,20 @@ const GLOBAL_ACTIONS = {
   'more-nav': () => moreNavSheet(),
   'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
   'mini-hub-login': () => {
-    openMiniHubLoginSheet();
+    return openMiniHubLoginSheet();
   },
   'mini-hub-logout': async () => {
-    await cloud.signOut();
-    toast('تم تسجيل الخروج');
-    replaceTeacherMiniHubAfterAuthTransition();
+    teacherMiniHubAuthPending = 'logout';
+    refreshTeacherMiniHubSheet();
+    try {
+      await cloud.signOut();
+      toast('تم تسجيل الخروج');
+    } catch (err) {
+      toast(err.message || 'تعذر تسجيل الخروج', 'danger');
+    } finally {
+      teacherMiniHubAuthPending = null;
+      refreshTeacherMiniHubSheet({ focusAccountAction: true });
+    }
   },
   'mini-hub-sync-now': async (el) => {
     if (!syncModule) {
