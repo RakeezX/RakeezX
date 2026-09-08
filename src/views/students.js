@@ -5,7 +5,7 @@
  * لا يُنشئ طالبًا جديدًا، والخروج من المدرسة لا يحذف أحدًا.
  */
 
-import { html, icon, openSheet, toast, fmtPct } from '../lib/dom.js';
+import { html, icon, openSheet, toast, fmtPct, fmtDateFull } from '../lib/dom.js';
 import * as store from '../store.js';
 import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
@@ -229,7 +229,7 @@ export default {
                         <span class="row__title">${s.name}</span>
                         <span class="row__sub">
                           ${ENROLLMENT_STATUS[e.status] ?? e.status}
-                          ${e.endDate ? html` · ${e.endDate}` : ''}
+                          ${e.endDate ? html` · ${fmtDateFull(e.endDate)}` : ''}
                           ${e.transferNote ? html` · ${e.transferNote}` : ''}
                         </span>
                       </span>

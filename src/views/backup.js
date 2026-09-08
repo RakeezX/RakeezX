@@ -4,10 +4,11 @@
  * يضيّعها. الملف الذي تصدّره من هنا هو أمانك الوحيد حتى تُفعَّل المزامنة.
  */
 
-import { html, icon, toast, confirmSheet, openSheet } from '../lib/dom.js';
+import { html, icon, toast, confirmSheet, openSheet, fmtDateFull } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as db from '../lib/db.js';
 import { downloadBackup, restoreBackup, readJSONFile } from '../lib/export.js';
+import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let usageInfo = null;
@@ -28,6 +29,11 @@ const fmtBytes = (n) => {
   if (n < 1024) return `${n} بايت`;
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} ك.ب`;
   return `${(n / 1024 / 1024).toFixed(1)} م.ب`;
+};
+
+const backupExportDate = (value) => {
+  const stamp = new Date(value);
+  return Number.isFinite(stamp.getTime()) ? fmtDateFull(todayISO(stamp)) : '';
 };
 
 export default {
@@ -165,7 +171,7 @@ export default {
       const mode = await openSheet({
         title: 'استرجاع نسخة',
         desc: `الملف يحوي ${counts} سجلًا، صُدّر في ${
-          payload?.exportedAt ? payload.exportedAt.slice(0, 10) : 'تاريخ غير معروف'
+          backupExportDate(payload?.exportedAt) || 'تاريخ غير معروف'
         }.`,
         body: html`
           <div class="stack stack-2">

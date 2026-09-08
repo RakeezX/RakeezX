@@ -5,7 +5,7 @@
  * بينما يتبع سجل الحضور والرصد والملاحظات الطالب مع سياقه التاريخي الأصلي.
  */
 
-import { html, icon, toast, fmtNum, fmtPct, fmtDate, openSheet, confirmSheet } from '../lib/dom.js';
+import { html, icon, toast, fmtNum, fmtPct, fmtDate, fmtDateRange, openSheet, confirmSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
   itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
@@ -183,7 +183,7 @@ export default {
                         </span>
                       </span>
                       <span class="logrow__date">
-                        ${en.startDate ?? '—'}${en.endDate ? ` ← ${en.endDate}` : ''}
+                        ${en.startDate ? fmtDateRange(en.startDate, en.endDate ?? en.startDate) : '—'}
                       </span>
                     </span>
                   </div>

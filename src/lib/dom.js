@@ -330,3 +330,9 @@ export function fmtDateRange(startISO, endISO = startISO) {
 }
 
 export const fmtDateFull = (iso) => fmtDate(iso, false);
+
+/** ISO date keys are technical values; keep their numeric order stable inside RTL text. */
+export function fmtISODate(iso) {
+  if (!dateParts(iso)) return '';
+  return html`<bdi class="date-key tabular" dir="ltr">${iso}</bdi>`;
+}

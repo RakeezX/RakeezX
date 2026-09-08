@@ -1,10 +1,9 @@
 /** Shared, deliberately small print foundation for administration reports. */
 
 import { html, fmtDateFull } from './dom.js';
+import { todayISO } from '../models.js';
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
-
-export function reportHeader({ title, profile, year, term, section, subject, period }) {
+export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
   const details = [
     profile?.schoolName && ['المدرسة', profile.schoolName],
     profile?.teacherName && ['المعلم', profile.teacherName],
@@ -13,7 +12,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
     year && ['السنة الدراسية', year],
     term && ['الفصل الدراسي', term],
     period && ['الفترة', period],
-    ['تاريخ الطباعة', fmtDateFull(todayISO())],
+    ['تاريخ الطباعة', fmtDateFull(printedOn)],
   ].filter(Boolean);
 
   return html`
