@@ -292,6 +292,30 @@ test('Sync V2 atomically persists optimistic data and a durable outbox mutation'
   assert.equal(command.state, 'pending');
 });
 
+test('class rules converge through the generic V2 mutation path and tombstones win on a fresh device', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'class-rules-a');
+  const b = makeClient(server, 'class-rules-b');
+  t.after(() => [a, b].forEach((client) => client.database.close()));
+
+  const teaching = { id: 'rule-teaching', sectionId: 'section-1', subjectId: 'subject-1', termId: 'term-1', order: 0 };
+  await Promise.all([seedAuthoritative(a, 'teachings', teaching), seedAuthoritative(b, 'teachings', teaching)]);
+  await a.engine.commitMutation({
+    store: 'classRules', recordId: 'rule-1', op: 'create',
+    patch: { teachingId: teaching.id, iconKey: 'star', text: 'قاعدة مشتركة' },
+  });
+  assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
+  await b.engine.pullStore('classRules');
+  assert.equal((await b.database.get('classRules', 'rule-1')).text, 'قاعدة مشتركة');
+
+  await a.engine.commitMutation({ store: 'classRules', recordId: 'rule-1', op: 'delete' });
+  assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
+  await b.engine.pullStore('classRules');
+  const fresh = await b.database.get('classRules', 'rule-1');
+  assert.equal(fresh.deleted, true);
+  assert.equal((await b.engine.status()).state, 'synced');
+});
+
 test('pull adopts an existing bootstrap identity and preserves a later local edit', async (t) => {
   const server = new MemoryV2Server();
   const client = makeClient(server, 'bootstrap-adoption');

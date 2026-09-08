@@ -70,6 +70,11 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: { studentId: 'student_id', teachingId: 'teaching_id', sessionId: 'session_id', text: 'text', date: 'date', kind: 'kind' },
     references: { studentId: 'students', teachingId: 'teachings', sessionId: 'sessions' },
   },
+  classRules: {
+    entity: 'class_rules',
+    fields: { teachingId: 'teaching_id', iconKey: 'icon_key', text: 'text' },
+    references: { teachingId: 'teachings' },
+  },
   items: {
     entity: 'items',
     fields: {
@@ -175,6 +180,10 @@ export function decodeSyncV2Canonical(store, row) {
     if (hasOwn(row, serverField)) record[localField] = decodeFieldValue(store, localField, row[serverField], row);
   }
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
+  if (store === 'classRules' && row.created_at) {
+    const createdAt = Date.parse(row.created_at);
+    if (Number.isFinite(createdAt)) record.createdAt = createdAt;
+  }
   record.canonicalId = record.id;
   record.serverRevision = normalizeRevision(row.revision);
   if (row.field_revisions && typeof row.field_revisions === 'object') record.fieldRevisions = clone(row.field_revisions);

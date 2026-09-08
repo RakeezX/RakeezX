@@ -37,9 +37,10 @@ export function displayState() {
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
+  'classRules',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance'
 ]);
-const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings']);
+const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);

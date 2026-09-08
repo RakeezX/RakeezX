@@ -776,6 +776,16 @@ export const makeNote = (o = {}) => ({
   ...o,
 });
 
+/** قانون صفي مستقل يتبع الإسناد التدريسي، بلا ترتيب أو حالة عرض في V1. */
+export const makeClassRule = (o = {}) => ({
+  ...base(),
+  createdAt: o.createdAt ?? now(),
+  teachingId: o.teachingId,
+  iconKey: o.iconKey ?? '',
+  text: o.text ?? '',
+  ...o,
+});
+
 /** الواجبات والتسليمات — النموذج جاهز، ولا واجهة لهما في الموجة الأولى. */
 export const makeAssignment = (o = {}) => ({
   ...base(),
