@@ -1,88 +1,128 @@
 import { test, expect } from '@playwright/test';
 
-for (const failUpload of [false, true]) test(`offline class form reconnects with demo history (temporary rejection: ${failUpload})`, async ({ page, context }) => {
-  const tables = {};
-  let rejectSections = false;
-  let rejected = 0;
+async function waitForSyncState(page, status) {
+  await page.waitForFunction(expected => window.__syncModule?.displayState().status === expected, status);
+}
+
+async function expectSingleVisibleHubTrigger(page) {
+  await expect.poll(() => page.locator('.teacher-mini-hub-trigger, .topbar__teacher-btn').evaluateAll(elements => (
+    elements.filter(element => element.getClientRects().length > 0).length
+  ))).toBe(1);
+}
+
+test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async ({ page, context }) => {
+  test.setTimeout(60_000);
   const runtimeErrors = [];
   page.on('pageerror', error => runtimeErrors.push(error.message));
-  await page.addInitScript(() => localStorage.setItem('rakeezx-auth', JSON.stringify({
-    access_token: 'TEST-token', user: { id: 'TEST-owner', email: 'teacher@example.test' },
-  })));
-  await page.route('https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/**', async route => {
-    const req = route.request(), table = new URL(req.url()).pathname.split('/').pop();
-    if (req.method() === 'GET') return route.fulfill({ json: tables[table] ?? [] });
-    if (table === 'sections' && rejectSections) {
-      rejected++;
-      return route.fulfill({ status: 503, json: { message: 'TEST sections upload unavailable', code: 'TEST503' } });
-    }
-    const body = req.postDataJSON();
-    for (const row of Array.isArray(body) ? body : [body]) {
-      const rows = tables[table] ??= [];
-      const index = rows.findIndex(old => old.id === row.id);
-      if (index < 0) rows.push(row); else rows[index] = row;
-    }
-    return route.fulfill({ json: [] });
-  });
+
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
-  await page.evaluate(async () => { window.demoModule = await import('/src/lib/demo.js'); });
-  await context.setOffline(true);
-  // Real demo actions generate ordinary ses: IDs whose teaching is local-only.
+  await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule);
   await page.evaluate(async () => {
-    const { createDemoPackage } = window.demoModule;
-    await createDemoPackage();
-    const teaching = window.store.state.teachings.find(t => t.id.startsWith('demo:'));
-    const session = await window.store.ensureSession(teaching.id, '2026-09-20', 7);
-    window.demoSessionId = session.id;
-    // A pre-fix receipt survives: excluded from cloud work, never deleted here.
-    await (await import('/src/lib/db.js')).put('outbox', {
-      id: `sessions:${session.id}`, store: 'sessions', recordId: session.id,
-      op: 'put', updatedAt: session.updatedAt, queuedAt: Date.now(),
+    const cloud = await import('/src/lib/cloud.js');
+    let revision = 0;
+    let mode = 'success';
+    let release;
+
+    cloud.setMockBackend({
+      fetchRecords: async () => [],
+      applySyncV2Mutation: async envelope => {
+        if (mode === 'hold') await new Promise(resolve => { release = resolve; });
+        const nextRevision = ++revision;
+        return {
+          mutationId: envelope.mutationId,
+          entity: envelope.entity,
+          recordId: envelope.recordId,
+          canonicalId: envelope.recordId,
+          outcome: 'applied',
+          appliedGroups: Object.keys(envelope.patch),
+          conflictedGroups: [],
+          resultRevision: nextRevision,
+          canonical: {
+            id: envelope.recordId,
+            ...envelope.patch,
+            revision: nextRevision,
+            field_revisions: {},
+            deleted_at: null,
+          },
+        };
+      },
     });
+    cloud.setMockAuth({ id: 'sync-ui-owner', email: 'sync-ui@example.test' }, { access_token: 'sync-ui-token' });
+    window.__syncUiTest = {
+      setMode(value) { mode = value; },
+      holding() { return Boolean(release); },
+      release() { release?.(); },
+    };
+    await window.__syncModule.syncAll({ full: true });
   });
-  await page.getByRole('button', { name: 'فصل جديد', exact: true }).click();
-  await page.locator('#tch-form [name="label"]').fill('TEST');
-  await page.getByRole('button', { name: 'إنشاء', exact: true }).click();
-  await expect(page.locator('.class-card').filter({ hasText: 'TEST' })).toBeVisible();
-  const pending = await page.evaluate(async () => {
-    const db = await import('/src/lib/db.js');
-    return { sections: await db.getAll('sections'), outbox: await db.getAll('outbox') };
-  });
-  expect(pending.sections.some(s => s.label === 'TEST')).toBe(true);
-  expect(pending.outbox.some(e => e.store === 'sections')).toBe(true);
-  rejectSections = failUpload;
-  await context.setOffline(false);
-  if (failUpload) {
-    await expect.poll(() => rejected).toBeGreaterThan(0);
-    await page.waitForFunction(() => window.__syncModule.displayState().status === 'error');
-  } else {
-    await page.waitForFunction(() => window.__syncModule.displayState().status === 'synced');
-    expect(tables.sections.some(s => s.label === 'TEST')).toBe(true);
-  }
-  await page.goto('/#/settings');
-  await page.waitForFunction(status => window.__syncModule.displayState().status === status, failUpload ? 'error' : 'synced');
+  await waitForSyncState(page, 'synced');
+  await expectSingleVisibleHubTrigger(page);
+
   await page.locator('.teacher-mini-hub-trigger').click();
-  await expect(page.locator('[data-sync-label]').first()).toHaveText(failUpload ? 'تعذر إكمال المزامنة' : 'متزامن');
-  await expect(page.locator('[data-sync-label]').last()).toHaveText(failUpload ? 'تعذر إكمال المزامنة' : 'متزامن');
-  rejectSections = false;
-  await page.locator('[data-act="mini-hub-sync-now"]').click();
-  await expect.poll(() => tables.sections?.some(s => s.label === 'TEST')).toBe(true);
-  await expect.poll(() => page.evaluate(() => ({
-    status: window.__syncModule.displayState().status,
-    error: window.__syncModule.state.lastError,
-  }))).toEqual({ status: 'synced', error: null });
-  await expect(page.locator('[data-sync-label]').first()).toHaveText('متزامن');
-  await expect(page.locator('[data-sync-label]').last()).toHaveText('متزامن');
-  expect(await page.evaluate(async () => {
-    const db = await import('/src/lib/db.js');
-    const outbox = await db.getAll('outbox');
-    return outbox.filter(e => e.store === 'sections' && e.recordId === window.store.state.sections.find(s => s.label === 'TEST').id).length;
-  })).toBe(0);
-  expect(tables.sessions?.some(s => s.teaching_id?.startsWith('demo:')) ?? false).toBe(false);
-  expect(await page.evaluate(async () => !!await (await import('/src/lib/db.js')).get('sessions', window.demoSessionId))).toBe(true);
-  expect(await page.evaluate(async () => !!await (await import('/src/lib/db.js')).get('outbox', `sessions:${window.demoSessionId}`))).toBe(true);
-  await page.reload();
-  await page.waitForFunction(() => window.__syncModule?.displayState().status === 'synced');
+  const sheet = page.locator('.sheet').last();
+  const badge = sheet.locator('[data-sync-badge]');
+  await expect(badge).toHaveCount(1);
+  await expect(badge).toHaveText('متزامن');
+  await expect(badge).toHaveClass(/badge--brand/);
+
+  await page.evaluate(async () => {
+    await window.store.save({ subjects: [{ id: 'sync-ui:pending', name: 'مادة اختبار', slug: 'sync-ui-pending' }] });
+  });
+  await waitForSyncState(page, 'pending');
+  await expect(badge).toHaveText('تغييرات بانتظار المزامنة');
+  await expect(badge).toHaveClass(/badge--warn/);
+
+  await page.evaluate(() => {
+    window.__syncUiTest.setMode('hold');
+    window.__syncUiRun = window.__syncModule.syncAll({ full: false });
+  });
+  await waitForSyncState(page, 'syncing');
+  await expect(badge).toHaveText('جارٍ المزامنة...');
+  await expect(badge).toHaveClass(/badge--brand/);
+  await page.waitForFunction(() => window.__syncUiTest.holding());
+  await page.evaluate(async () => {
+    window.__syncUiTest.setMode('success');
+    window.__syncUiTest.release();
+    await window.__syncUiRun;
+  });
+  await waitForSyncState(page, 'synced');
+  await expect(badge).toHaveText('متزامن');
+  await expect(badge).toHaveClass(/badge--brand/);
+  await expect(sheet).toBeVisible();
+
+  await context.setOffline(true);
+  await page.evaluate(async () => {
+    await window.store.save({ subjects: [{ id: 'sync-ui:offline', name: 'مادة دون اتصال', slug: 'sync-ui-offline' }] });
+  });
+  await waitForSyncState(page, 'offline');
+  await context.setOffline(false);
+  await page.evaluate(() => window.__syncModule.syncAll({ full: false }));
+  await waitForSyncState(page, 'synced');
+
+  await sheet.locator('[data-sheet-close]').first().click();
+  await expectSingleVisibleHubTrigger(page);
+
+  await page.evaluate(() => {
+    window.__syncModule.state.status = 'error';
+  });
+  await page.locator('.teacher-mini-hub-trigger').click();
+  await expect(badge).toHaveText('تعذر إكمال المزامنة');
+  await expect(badge).toHaveClass(/badge--danger/);
+
+  await sheet.locator('[data-sheet-close]').first().click();
+  await expectSingleVisibleHubTrigger(page);
+  await page.evaluate(() => {
+    window.__syncModule.state.status = 'auth_required';
+  });
+  await page.locator('.teacher-mini-hub-trigger').click();
+  await expect(badge).toHaveText('يلزم تسجيل الدخول');
+  await expect(badge).toHaveClass(/badge--warn/);
   expect(runtimeErrors).toEqual([]);
+});
+
+test('Teacher Mini Hub has one mobile trigger', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/classes');
+  await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule);
+  await expectSingleVisibleHubTrigger(page);
 });

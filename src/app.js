@@ -148,7 +148,7 @@ function openTeacherMiniHubSheet() {
               <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
               <span>المزامنة</span>
             </div>
-            <span class="badge ${syncInfo.badge}" data-sync-label>${syncInfo.text}</span>
+            <span class="badge ${syncInfo.badge}" data-sync-label data-sync-badge>${syncInfo.text}</span>
           </div>
           <p class="t-3 fs-xs mb-2" data-sync-description>
             ${syncInfo.label}
@@ -354,6 +354,12 @@ function restoreFocus(snap) {
 function paintSyncStatus() {
   const syncInfo = getSyncState();
   for (const el of document.querySelectorAll('[data-sync-label]')) el.textContent = syncInfo.text;
+  for (const el of document.querySelectorAll('[data-sync-badge]')) {
+    for (const className of [...el.classList]) {
+      if (className.startsWith('badge--')) el.classList.remove(className);
+    }
+    el.classList.add(syncInfo.badge);
+  }
   for (const el of document.querySelectorAll('[data-sync-description]')) el.textContent = syncInfo.label;
   for (const el of document.querySelectorAll('[data-sync-time]')) {
     el.textContent = syncModule?.state.lastSyncedAt
