@@ -12,7 +12,7 @@ import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
-  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote,
+  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule,
   defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
@@ -23,7 +23,7 @@ import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID }
 export { sectionLabel };
 
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 /* ---------- الحالة ---------- */
 
@@ -31,7 +31,7 @@ const COLLECTIONS = [
   'years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments',
   'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
-  'notes', 'assignments', 'submissions',
+  'notes', 'classRules', 'assignments', 'submissions',
 ];
 
 export const state = {
@@ -523,6 +523,7 @@ const nextEnrollmentOperationOrder = (outbox = []) => {
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
+  'classRules',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance',
 ]);
 
@@ -984,6 +985,12 @@ export const students = (tchId) => {
 
 export const items = (tchId) =>
   sortByOrder(live(state.items).filter((i) => i.teachingId === tchId));
+
+/** قوانين الإسناد محفوظة بترتيب إنشائها فقط؛ لا يوجد حقل ترتيب مستقل في V1. */
+export const classRulesOf = (tchId) => [...live(state.classRules)]
+  .filter((rule) => rule.teachingId === tchId)
+  .sort((left, right) => Number(left.createdAt ?? left.updatedAt ?? 0) - Number(right.createdAt ?? right.updatedAt ?? 0) ||
+    String(left.id).localeCompare(String(right.id)));
 
 export const scoresOf = (studentId) => live(state.scores).filter((s) => s.studentId === studentId);
 
@@ -1792,6 +1799,7 @@ export async function deleteTeaching(tchId) {
       sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
       attendance: (a) => sessionIds.has(a.sessionId),
       logs: (l) => l.teachingId === tchId,
+      classRules: (rule) => rule.teachingId === tchId,
     },
     { op: 'deleteTeaching', tchId },
     { command: 'delete_teaching', store: 'teachings', targetId: tchId }
@@ -1839,6 +1847,7 @@ export async function deleteClass(secId) {
       attendance: (a) => targetAttendance(a) || orphanStudentIds.has(a.studentId),
       logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
       notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
+      classRules: (rule) => teachingIds.has(rule.teachingId),
       students: (s) => orphanStudentIds.has(s.id),
     },
     { op: 'deleteClass', secId },
@@ -1982,6 +1991,46 @@ export async function deleteStudentNote(noteId) {
   const note = state.notes.find((item) => item.id === noteId && !item.deleted);
   if (!note) return null;
   return patch('notes', noteId, { deleted: true, deletedAt: new Date().toISOString() });
+}
+
+const normalizeClassRuleText = (value) => String(value ?? '').trim();
+const normalizeClassRuleIcon = (value) => String(value ?? '').trim().toLowerCase();
+const validClassRuleIcon = (value) => /^[a-z][a-z0-9_-]{0,39}$/.test(value);
+
+/** أساس بيانات القوانين الصفية: CRUD محلي/متصل بلا واجهة أو دلالات عرض. */
+export async function addClassRule({ teachingId, iconKey, text, createdAt = now() } = {}) {
+  const teaching = getTeaching(teachingId);
+  const cleanText = normalizeClassRuleText(text);
+  const cleanIcon = normalizeClassRuleIcon(iconKey);
+  if (!teaching || !cleanText || cleanText.length > 240 || !validClassRuleIcon(cleanIcon)) return null;
+  const stamp = Number(createdAt) || now();
+  const rule = makeClassRule({
+    ...(isLocalOnlyRecord(teaching) ? { id: `demo:class-rule:${uid()}` } : {}),
+    teachingId, iconKey: cleanIcon, text: cleanText, createdAt: stamp, updatedAt: stamp,
+  });
+  return (await save({ classRules: [rule] })) ? rule : null;
+}
+
+export async function editClassRule(ruleId, { iconKey, text } = {}) {
+  const rule = state.classRules.find((candidate) => candidate.id === ruleId && !candidate.deleted);
+  if (!rule) return null;
+  const changes = {};
+  if (text !== undefined) {
+    const cleanText = normalizeClassRuleText(text);
+    if (!cleanText || cleanText.length > 240) return null;
+    changes.text = cleanText;
+  }
+  if (iconKey !== undefined) {
+    const cleanIcon = normalizeClassRuleIcon(iconKey);
+    if (!validClassRuleIcon(cleanIcon)) return null;
+    changes.iconKey = cleanIcon;
+  }
+  return Object.keys(changes).length ? patch('classRules', ruleId, changes) : rule;
+}
+
+export async function deleteClassRule(ruleId) {
+  const rule = state.classRules.find((candidate) => candidate.id === ruleId && !candidate.deleted);
+  return rule ? softDelete('classRules', ruleId) : null;
 }
 
 /** يضيف طالبًا جديدًا وينسبه لشعبة. يرفض الاسم الفارغ. */
