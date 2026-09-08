@@ -1,6 +1,7 @@
 /** RAKEEZ X — التصدير: ملفات CSV تفتح في إكسل بالعربية، ونسخة احتياطية JSON كاملة. */
 
 import * as db from './db.js';
+import { todayISO } from '../models.js';
 
 
 /** معرّف المنتج التقني — يُكتب في كل نسخة احتياطية. */
@@ -75,11 +76,12 @@ export async function buildBackup() {
   return payload;
 }
 
+export const backupFilenameForDate = (date = new Date()) => `rakeezx-backup-${todayISO(date)}.json`;
+
 export async function downloadBackup() {
   const payload = await buildBackup();
-  const stamp = payload.exportedAt.slice(0, 10);
   downloadBlob(
-    `rakeezx-backup-${stamp}.json`,
+    backupFilenameForDate(),
     new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
   );
   return payload;

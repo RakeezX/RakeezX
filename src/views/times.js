@@ -4,7 +4,7 @@
  * يضبطها المعلّم مرة واحدة، ثم يضيف الحصص برقمها فقط.
  */
 
-import { html, render, icon, openSheet, confirmSheet, toast, fmtTimeRange, timingProfileIcon, normalizeTimeDigits } from '../lib/dom.js';
+import { html, render, icon, openSheet, confirmSheet, toast, fmtDateFull, fmtTimeRange, timingProfileIcon, normalizeTimeDigits } from '../lib/dom.js';
 import * as store from '../store.js';
 import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, isValidRecessPosition, makeTimeProfile, recessPositions, todayISO, GRADE_CATALOG, uid } from '../models.js';
 import { repaint } from '../repaint.js';
@@ -429,7 +429,7 @@ function nameSheet(existing = null) {
               (activeTo && p.activeFrom >= activeFrom && p.activeFrom <= activeTo)
             );
             if (overlap) {
-              const rangeStr = p.activeTo ? `من ${p.activeFrom} إلى ${p.activeTo}` : `من ${p.activeFrom} فصاعدًا`;
+              const rangeStr = p.activeTo ? `من ${fmtDateFull(p.activeFrom)} إلى ${fmtDateFull(p.activeTo)}` : `من ${fmtDateFull(p.activeFrom)} فصاعدًا`;
               toast(`هذه الفترة تتداخل مع «${p.name}» (${rangeStr})`, 'danger');
               return;
             }
@@ -1398,7 +1398,7 @@ export default {
               <div class="seasonal-activation-bar__item">
                 <span class="seasonal-activation-bar__label">التبديل الموسمي القادم</span>
                 <strong class="seasonal-activation-bar__val tabular">
-                  ${nextSwitch.name} (<span dir="ltr">${nextSwitch.activeFrom}</span>)
+                  ${nextSwitch.name} (${fmtDateFull(nextSwitch.activeFrom)})
                 </strong>
               </div>
             ` : ''}
@@ -1453,7 +1453,7 @@ export default {
 
               <div class="timing-profile-card__range">
                 ${icon('calendar')}
-                <span>${p.activeFrom ? html`يسري من <strong class="tabular" dir="ltr">${p.activeFrom}</strong>${p.activeTo ? html` إلى <strong class="tabular" dir="ltr">${p.activeTo}</strong>` : ' فصاعدًا'}` : 'تفعيل يدوي (بدون تاريخ مجدول)'}</span>
+                <span>${p.activeFrom ? html`يسري من <strong>${fmtDateFull(p.activeFrom)}</strong>${p.activeTo ? html` إلى <strong>${fmtDateFull(p.activeTo)}</strong>` : ' فصاعدًا'}` : 'تفعيل يدوي (بدون تاريخ مجدول)'}</span>
               </div>
 
               <div class="timing-profile-card__specs">
