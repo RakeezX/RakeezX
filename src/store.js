@@ -1952,7 +1952,7 @@ export async function migrateLegacyStudentNotes() {
     const stamp = Number.isFinite(Number(student.updatedAt)) ? Number(student.updatedAt) : now();
     migrated.push(makeNote({
       id, studentId: student.id, text, kind: 'legacy',
-      date: new Date(stamp).toISOString().slice(0, 10), createdAt: stamp, updatedAt: stamp,
+      date: todayISO(new Date(stamp)), createdAt: stamp, updatedAt: stamp,
     }));
   }
   if (migrated.length) await save({ notes: migrated });
