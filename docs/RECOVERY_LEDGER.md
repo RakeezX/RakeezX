@@ -21,6 +21,8 @@ This is the current product ledger, not a claim that every historical branch is 
 | SYNC-V2 | `CLOSED` | Production `aeffd5e54207109fa2ef53569583d694ff8a6d3d`: PO verified three-device bootstrap and automatic propagation, offline write/reconnect, and tombstone non-resurrection. Candidate migrations `0001–0017`, RLS/owner isolation, and publishable-key-only browser access were verified. |
 | SYNC-UX-02 | `CLOSED` | Production `5644a01`: PO verified the Teacher Control Center no longer retains a stale yellow badge after sync completes. Root cause was UI-only badge-class reconciliation; Sync V2 engine/data correctness was not affected. Preserve focused Mini Hub sync-state and reconnect regression coverage for future sync-indicator changes. |
 | SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
+| TIMING-SYNC-01 | `CLOSED` | PO Production verification passed: owner-global active timing selection and `activeFrom` / `activeTo` changes converge across devices without manual Sync, with no profile duplication. |
+| TIMING-EFFECTIVE-UX-01 | `CLOSED` | PO Production verification passed: Home and Schedule agree on today's effective timing; Timing Settings distinguishes effective and base profiles; existing materialized session timing remains frozen. |
 
 ## Awaiting Product Owner Production review
 
@@ -48,11 +50,12 @@ This is the current product ledger, not a claim that every historical branch is 
 | SUPPORT-FEEDBACK-01 — Support / Feedback / Problem Report | `PLANNED` | Structured in-app technical problem, suggestion, and inquiry support. Future diagnostics must be privacy-safe and exclude instructional content, credentials, tokens, and secrets; storage/delivery design remains a Product/Production decision. |
 | SCHEDULE-MOBILE-TODAY-01 — Mobile Current-Day Navigation | `PLANNED` | On school-week mobile schedule entry, navigate to the current day; do not force it on weekend/non-school days. Google Visual Lab must define interaction details. |
 | HOME-ONBOARDING-01 — New User Getting Started | `PLANNED` | A restrained Home empty state for users without classes should make the path clear: create a class, add students, then configure lessons/schedule. Google Visual Lab defines final UX. |
+| TIMING-DISPLAY-UX-01 — Effective/Base Timing Presentation | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Calm, mobile-first visual refinement of the Timing / lesson-times effective-today versus base timing presentation. Google Visual Lab may improve hierarchy, spacing, alignment, and icon/text treatment only; do not change timing runtime semantics. |
 
 ## Reconciliation notes
 
 - Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
 - The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
 - Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `5644a019b7006560f082a0af090f96ff8a8f4ace`.
+- Current Production baseline: `4b4269c0201a9c9c0c33b382df9ff7a411782326`.
 - The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.
