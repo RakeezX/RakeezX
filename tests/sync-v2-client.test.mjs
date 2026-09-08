@@ -292,27 +292,35 @@ test('Sync V2 atomically persists optimistic data and a durable outbox mutation'
   assert.equal(command.state, 'pending');
 });
 
-test('class rules converge through the generic V2 mutation path and tombstones win on a fresh device', async (t) => {
+test('class rules converge across three generic V2 clients and tombstones win on a fresh device', async (t) => {
   const server = new MemoryV2Server();
   const a = makeClient(server, 'class-rules-a');
   const b = makeClient(server, 'class-rules-b');
-  t.after(() => [a, b].forEach((client) => client.database.close()));
+  const c = makeClient(server, 'class-rules-c');
+  t.after(() => [a, b, c].forEach((client) => client.database.close()));
 
   const teaching = { id: 'rule-teaching', sectionId: 'section-1', subjectId: 'subject-1', termId: 'term-1', order: 0 };
-  await Promise.all([seedAuthoritative(a, 'teachings', teaching), seedAuthoritative(b, 'teachings', teaching)]);
+  await Promise.all([seedAuthoritative(a, 'teachings', teaching), seedAuthoritative(b, 'teachings', teaching), seedAuthoritative(c, 'teachings', teaching)]);
   await a.engine.commitMutation({
     store: 'classRules', recordId: 'rule-1', op: 'create',
     patch: { teachingId: teaching.id, iconKey: 'star', text: 'قاعدة مشتركة' },
   });
   assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
-  await b.engine.pullStore('classRules');
-  assert.equal((await b.database.get('classRules', 'rule-1')).text, 'قاعدة مشتركة');
+  await Promise.all([b.engine.pullStore('classRules'), c.engine.pullStore('classRules')]);
+  await b.engine.commitMutation({ store: 'classRules', recordId: 'rule-1', op: 'patch', patch: { text: 'قاعدة معدلة' } });
+  await c.engine.commitMutation({ store: 'classRules', recordId: 'rule-1', op: 'patch', patch: { iconKey: 'shield' } });
+  await Promise.all([b.engine.dispatchPending(), c.engine.dispatchPending()]);
+  await Promise.all([a.engine.pullStore('classRules'), b.engine.pullStore('classRules'), c.engine.pullStore('classRules')]);
+  for (const client of [a, b, c]) {
+    const record = await client.database.get('classRules', 'rule-1');
+    assert.equal(record.text, 'قاعدة معدلة');
+    assert.equal(record.iconKey, 'shield');
+  }
 
   await a.engine.commitMutation({ store: 'classRules', recordId: 'rule-1', op: 'delete' });
   assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
-  await b.engine.pullStore('classRules');
-  const fresh = await b.database.get('classRules', 'rule-1');
-  assert.equal(fresh.deleted, true);
+  await Promise.all([b.engine.pullStore('classRules'), c.engine.pullStore('classRules')]);
+  for (const client of [b, c]) assert.equal((await client.database.get('classRules', 'rule-1')).deleted, true);
   assert.equal((await b.engine.status()).state, 'synced');
 });
 
