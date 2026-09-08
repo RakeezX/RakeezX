@@ -90,6 +90,7 @@ class IsolatedIndexedDb {
 
 const FIELD_GROUPS = {
   profile: { active_time_profile_id: 'timing_selection' },
+  time_profiles: { active_from: 'activation', active_to: 'activation' },
   students: { name: 'name', note: 'note', status: 'status' },
   subjects: { name: 'name', slug: 'identity' },
   scores: { student_id: 'identity', item_id: 'identity', value: 'value' },
@@ -433,6 +434,49 @@ test('owner-global Timing Profile selection converges without bootstrap writes f
   assert.equal((await fresh.database.getAll('timeProfiles')).filter((row) => !row.deleted).length, 4);
   assert.equal(bSelection.mutation.patch.active_time_profile_id, ramadan);
   assert.equal(bConcurrentSelection.mutation.patch.active_time_profile_id, ramadan);
+});
+
+test('Timing Profile effective dates converge through the ordinary activation group', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'timing-dates-a');
+  const b = makeClient(server, 'timing-dates-b');
+  const fresh = makeClient(server, 'timing-dates-fresh');
+  t.after(() => [a, b, fresh].forEach((client) => client.database.close()));
+  const profile = makeTimeProfile({ ...DEFAULT_TIME_PROFILES[1], order: 1 });
+
+  await a.engine.commitMutation({ store: 'timeProfiles', recordId: profile.id, op: 'create', create: profile });
+  await a.engine.dispatchPending();
+  await Promise.all([b.engine.pullStore('timeProfiles'), fresh.engine.pullStore('timeProfiles')]);
+
+  const start = await a.engine.commitMutation({
+    store: 'timeProfiles', recordId: profile.id, op: 'patch', patch: { activeFrom: '2026-09-01' },
+  });
+  assert.equal(start.mutation.patch.active_from, '2026-09-01');
+  assert.equal((await a.database.getAll('outbox')).length, 1, 'offline start-date edit is durable');
+  await a.engine.dispatchPending();
+  await b.engine.pullStore('timeProfiles');
+  assert.equal((await b.database.get('timeProfiles', profile.id)).activeFrom, '2026-09-01');
+
+  const end = await b.engine.commitMutation({
+    store: 'timeProfiles', recordId: profile.id, op: 'patch', patch: { activeTo: '2026-10-01' },
+  });
+  assert.equal(end.mutation.patch.active_to, '2026-10-01');
+  await b.engine.dispatchPending();
+  await a.engine.pullStore('timeProfiles');
+  assert.deepEqual(
+    [
+      (await a.database.get('timeProfiles', profile.id)).activeFrom,
+      (await a.database.get('timeProfiles', profile.id)).activeTo,
+    ],
+    ['2026-09-01', '2026-10-01'],
+  );
+
+  await fresh.engine.pullStore('timeProfiles');
+  const freshProfile = await fresh.database.get('timeProfiles', profile.id);
+  assert.equal(freshProfile.activeFrom, '2026-09-01');
+  assert.equal(freshProfile.activeTo, '2026-10-01');
+  assert.equal((await a.engine.status()).state, 'synced');
+  assert.equal((await b.engine.status()).state, 'synced');
 });
 
 test('lost response retries the exact mutationId and clears one receipt without duplication', async (t) => {

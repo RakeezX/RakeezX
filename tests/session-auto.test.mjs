@@ -74,6 +74,28 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
       assert.equal(store.sessionsOn(shiftDate(f.today, -2)).length, 0);
     });
 
+    await t.test('a synced effective range overrides the owner base selection only for applicable new sessions', async () => {
+      const f = await setup();
+      const seasonal = makeTimeProfile({
+        id: 'tp:auto:effective', name: 'توقيت فعّال',
+        periods: [{ period: 1, start: '10:00', end: '10:45' }],
+        activeFrom: f.today, activeTo: f.today,
+      });
+      await store.save({ timeProfiles: [seasonal] }, { queue: false });
+      await store.patchProfile({ activeTimeProfileId: f.profile.id }, { queue: false });
+
+      await store.ensureSessionsForDate(f.today);
+      const session = store.sessionsOnFor(f.teaching.id, f.today)[0];
+      assert.equal(session.timeProfileId, seasonal.id);
+      assert.equal(session.startTime, '10:00');
+
+      await store.patch('timeProfiles', seasonal.id, { activeTo: shiftDate(f.today, -1) }, null, { queue: false });
+      assert.equal(store.activeTimeProfile().id, f.profile.id, 'the owner base selection itself remains explicit');
+      await store.ensureSessionsForDate(f.today);
+      assert.equal(store.getSession(session.id).timeProfileId, seasonal.id);
+      assert.equal(store.getSession(session.id).startTime, '10:00');
+    });
+
     await t.test('today existing shell remains unchanged, but a newly applicable period materializes once', async () => {
       const f = await setup();
       await store.ensureSessionsForDate(f.today);
