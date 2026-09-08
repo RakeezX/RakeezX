@@ -209,6 +209,14 @@ function openTeacherMiniHubSheet() {
   });
 }
 
+// Login is opened above the Hub. After an auth transition, replace that
+// underlying Hub rather than stacking a refreshed copy above it.
+function replaceTeacherMiniHubAfterAuthTransition() {
+  closeSheet();
+  scheduleRender();
+  return openTeacherMiniHubSheet();
+}
+
 /* ---------- التنقل الرئيسي ---------- */
 
 const NAV = [
@@ -583,8 +591,7 @@ function openMiniHubLoginSheet() {
           await cloud.signIn(email, pwd);
           toast('تم تسجيل الدخول بنجاح');
           done(true);
-          scheduleRender();
-          openTeacherMiniHubSheet();
+          replaceTeacherMiniHubAfterAuthTransition();
         } catch (err) {
           submitBtn.textContent = prevText;
           submitBtn.disabled = false;
@@ -605,8 +612,7 @@ const GLOBAL_ACTIONS = {
   'mini-hub-logout': async () => {
     await cloud.signOut();
     toast('تم تسجيل الخروج');
-    scheduleRender();
-    openTeacherMiniHubSheet();
+    replaceTeacherMiniHubAfterAuthTransition();
   },
   'mini-hub-sync-now': async (el) => {
     if (!syncModule) {
