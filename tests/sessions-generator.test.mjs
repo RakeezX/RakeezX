@@ -5,7 +5,7 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import {
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeSlot,
-  makeCalendar, makeTimeProfile,
+  makeCalendar, makeTimeProfile, shiftDate, todayISO,
 } from '../src/models.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
@@ -114,6 +114,11 @@ test('session range generation preserves dated timetable history', async (t) => 
       assert.equal(clipped.startDate, '2026-08-23');
       assert.equal(clipped.endDate, '2026-08-23');
       assert.equal(clipped.clipped, true);
+      assert.equal(clipped.futureClipped, false);
+
+      const futureOnly = await store.generateSessionsForRange(f.teaching.id, shiftDate(todayISO(), 1), shiftDate(todayISO(), 1));
+      assert.equal(futureOnly.futureOnly, true);
+      assert.equal(futureOnly.created, 0);
 
       await assert.rejects(
         store.generateSessionsForRange(f.teaching.id, '2026-08-24', '2026-08-24'),

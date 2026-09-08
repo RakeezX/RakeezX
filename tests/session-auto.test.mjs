@@ -36,6 +36,8 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
       assert.equal(store.attendanceIn(session.id).length, 0);
       assert.deepEqual(await store.ensureSessionsForDate(f.today), { created: 0, existing: 1, skipped: 0 });
       assert.equal(store.sessionsOnFor(f.teaching.id, f.today).length, 1);
+      const outbox = await db.getAll('outbox');
+      assert.equal(outbox.find((row) => row.store === 'sessions' && row.recordId === session.id)?.protocol, 'v2');
     });
 
     await t.test('non-study, outside-term, and future dates persist no ordinary session', async () => {
@@ -57,6 +59,18 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
       await store.editSlot(f.slot.id, { teachingId: f.teaching.id, weekday: weekday(future), period: 2 });
       assert.equal(store.projectedSessionsForDate(future)[0].period, 2);
       assert.equal(store.sessionsOn(future).length, 0);
+    });
+
+    await t.test('several missed dates are not backfilled and a timing edit cannot rewrite a materialized shell', async () => {
+      const f = await setup();
+      await store.ensureSessionsForDate(f.today);
+      const session = store.sessionsOnFor(f.teaching.id, f.today)[0];
+      await store.patch('timeProfiles', f.profile.id, { periods: [{ period: 1, start: '10:00', end: '10:45' }] });
+      await store.ensureSessionsForDate(f.today);
+      assert.equal(store.getSession(session.id).startTime, '07:00');
+      assert.equal(store.getSession(session.id).endTime, '07:45');
+      assert.equal((await store.ensureSessionsForDate(shiftDate(f.today, -2))).created, 0);
+      assert.equal(store.sessionsOn(shiftDate(f.today, -2)).length, 0);
     });
 
     await t.test('today existing shell remains unchanged, but a newly applicable period materializes once', async () => {
@@ -84,7 +98,12 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
 
     await t.test('legacy range generator cannot materialize ordinary future sessions', async () => {
       const f = await setup();
-      await assert.rejects(store.generateSessionsForRange(f.teaching.id, shiftDate(f.today, 1), shiftDate(f.today, 1)), /لا تُولَّد الحصص المستقبلية/);
+      const futureOnly = await store.generateSessionsForRange(f.teaching.id, shiftDate(f.today, 1), shiftDate(f.today, 1));
+      assert.equal(futureOnly.futureOnly, true);
+      assert.equal(futureOnly.created, 0);
+      const clipped = await store.generateSessionsForRange(f.teaching.id, f.today, shiftDate(f.today, 1));
+      assert.equal(clipped.clipped, true);
+      assert.equal(clipped.futureClipped, true);
     });
   } finally {
     store.closeChannel();

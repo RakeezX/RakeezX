@@ -2403,13 +2403,17 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
   if (!term.startDate || !term.endDate) throw new Error('أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا.');
   if (!startDate || !endDate || startDate > endDate) throw new Error('تحقق من نطاق التاريخ.');
-  if (startDate > todayISO()) throw new Error('لا تُولَّد الحصص المستقبلية؛ تظهر من الجدول عند حلول يومها.');
+  const today = todayISO();
+  if (startDate > today) {
+    return { created: 0, existing: 0, holidays: 0, unavailable: 0, startDate, endDate, clipped: true, futureClipped: true, futureOnly: true };
+  }
   if (endDate < term.startDate || startDate > term.endDate) {
     throw new Error('النطاق المختار خارج تواريخ الفصل الدراسي الحالي.');
   }
 
   const effectiveStart = startDate < term.startDate ? term.startDate : startDate;
-  const requestedEnd = endDate > todayISO() ? todayISO() : endDate;
+  const futureClipped = endDate > today;
+  const requestedEnd = futureClipped ? today : endDate;
   const effectiveEnd = requestedEnd > term.endDate ? term.endDate : requestedEnd;
   const slots = slotsOf(tchId);
   if (!slots.length) throw new Error('لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي.');
@@ -2478,6 +2482,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     created, existing, holidays, unavailable,
     startDate: effectiveStart, endDate: effectiveEnd,
     clipped: effectiveStart !== startDate || effectiveEnd !== endDate,
+    futureClipped,
   };
 }
 export async function setSessionStatus(sesId, status, reason = '') {

@@ -63,7 +63,9 @@ function generationCard(teaching) {
           `
         : html`<p class="t-3 fs-sm">أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا من <a href="#/settings">الإعدادات</a>.</p>`}
       ${result
-        ? html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة · تم تجاهل ${result.holidays} يوم إجازة${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}</p>`
+        ? result.futureOnly
+          ? html`<p class="t-3 fs-sm mt-3">لا يتم إنشاء الحصص المستقبلية مسبقًا؛ ستظهر تلقائيًا حسب الجدول عند حلول تاريخها.</p>`
+          : html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة · تم تجاهل ${result.holidays} يوم إجازة${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}${result.futureClipped ? ' · تم إنشاء الحصص حتى اليوم فقط؛ الحصص المستقبلية تظهر تلقائيًا حسب الجدول.' : ''}</p>`
         : ''}
     </div>
   `;
@@ -196,7 +198,11 @@ export default {
         );
         lastGeneration = { teachingId: params.id, ...result };
         repaint();
-        toast(`تم إنشاء ${result.created} حصة`);
+        toast(result.futureOnly
+          ? 'لا يتم إنشاء الحصص المستقبلية مسبقًا؛ ستظهر تلقائيًا حسب الجدول عند حلول تاريخها.'
+          : result.futureClipped
+            ? 'تم إنشاء الحصص حتى اليوم فقط. الحصص المستقبلية تُعرض تلقائيًا حسب الجدول ولا يتم إنشاؤها مسبقًا.'
+            : `تم إنشاء ${result.created} حصة`);
       } catch (err) {
         toast(err.message || 'تعذّر توليد الحصص', 'danger');
       }

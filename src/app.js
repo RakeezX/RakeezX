@@ -8,6 +8,7 @@ import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
 import { match, currentPath, onNavigate, go } from './router.js';
 import { setRepaint } from './repaint.js';
+import { installSessionAutoTriggers } from './lib/session-auto.js';
 
 const app = document.getElementById('app');
 
@@ -531,14 +532,9 @@ async function boot() {
     syncModule.subscribe(paintSyncStatus);
   }
   onNavigate(resolve);
-  const materializeToday = () => {
-    if (cloud.session && cloud.user) {
-      store.ensureSessionsForDate().catch((err) => console.warn('[rakeezx sessions] automatic materialization failed:', err));
-    }
-  };
-  addEventListener('pageshow', materializeToday);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') materializeToday();
+  installSessionAutoTriggers({
+    materialize: (date) => cloud.session && cloud.user ? store.ensureSessionsForDate(date) : null,
+    onError: (err) => console.warn('[rakeezx sessions] automatic materialization failed:', err),
   });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 

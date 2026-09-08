@@ -93,6 +93,7 @@ const FIELD_GROUPS = {
   subjects: { name: 'name', slug: 'identity' },
   scores: { student_id: 'identity', item_id: 'identity', value: 'value' },
   teachings: { section_id: 'identity', subject_id: 'identity', term_id: 'identity', order: 'order' },
+  sessions: { teaching_id: 'identity', date: 'identity', period: 'identity' },
 };
 
 class MemoryV2Server {
@@ -108,8 +109,15 @@ class MemoryV2Server {
   }
 
   naturalCanonical(entity, patch) {
-    if (entity !== 'subjects' || patch.slug == null) return null;
-    return [...this.table(entity).values()].find((row) => row.slug === patch.slug) ?? null;
+    if (entity === 'subjects' && patch.slug != null) {
+      return [...this.table(entity).values()].find((row) => row.slug === patch.slug) ?? null;
+    }
+    if (entity === 'sessions' && patch.teaching_id && patch.date && patch.period != null) {
+      return [...this.table(entity).values()].find((row) =>
+        row.teaching_id === patch.teaching_id && row.date === patch.date && row.period === patch.period,
+      ) ?? null;
+    }
+    return null;
   }
 
   group(entity, field) {
@@ -688,6 +696,54 @@ test('offline failure remains durable, reconnect succeeds, and score zero is dis
   await client.engine.pullStore('scores');
   assert.equal((await client.database.get('scores', 'score-zero')).value, null);
   assert.equal((await client.engine.status()).state, 'synced');
+});
+
+test('SESSION-AUTO V2 session shells canonicalize across devices, survive offline reconnect, and never resurrect after delete', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'session-a');
+  const b = makeClient(server, 'session-b');
+  let online = false;
+  const c = makeClient(server, 'session-offline', {
+    transport: {
+      fetchRecords(entity) {
+        if (!online) throw new Error('offline');
+        return server.fetchRecords(entity);
+      },
+      applyMutation(envelope) {
+        if (!online) throw new Error('offline');
+        return server.applyMutation(envelope);
+      },
+    },
+  });
+  t.after(() => [a, b, c].forEach((client) => client.database.close()));
+
+  const teaching = { id: 'teaching-session', sectionId: 'section-session', subjectId: 'subject-session', termId: 'term-session', order: 0 };
+  for (const client of [a, b, c]) await seedAuthoritative(client, 'teachings', teaching);
+  const shell = { teachingId: teaching.id, date: '2026-09-06', period: 1, startTime: '07:00', endTime: '07:45', status: 'scheduled' };
+
+  await a.engine.commitMutation({ store: 'sessions', recordId: 'session-a', op: 'create', create: { id: 'session-a', ...shell } });
+  await b.engine.commitMutation({ store: 'sessions', recordId: 'session-b', op: 'create', create: { id: 'session-b', ...shell } });
+  await a.engine.dispatchPending();
+  await b.engine.dispatchPending();
+  assert.equal(server.table('sessions').size, 1, 'two devices must converge on one logical shell');
+  assert.equal((await b.database.get('sessions', 'session-a')).id, 'session-a');
+  assert.equal(await b.database.get('sessions', 'session-b'), undefined);
+
+  await c.engine.commitMutation({ store: 'sessions', recordId: 'session-offline', op: 'create', create: { id: 'session-offline', ...shell, date: '2026-09-07' } });
+  assert.equal((await c.engine.dispatchPending()).failed, 1);
+  assert.equal((await c.database.getAll('outbox')).length, 1, 'offline shell remains durable until reconnect');
+  online = true;
+  assert.equal((await c.engine.dispatchPending()).acknowledged, 1);
+  assert.equal((await c.database.getAll('outbox')).length, 0);
+  assert.equal(server.table('sessions').get('session-offline').date, '2026-09-07');
+
+  await a.engine.commitMutation({ store: 'sessions', recordId: 'session-a', op: 'delete' });
+  await a.engine.dispatchPending();
+  await b.engine.commitMutation({ store: 'sessions', recordId: 'session-a', op: 'create', create: { id: 'session-a', ...shell } });
+  await b.engine.dispatchPending();
+  const deleted = server.table('sessions').get('session-a');
+  assert.ok(deleted.deleted_at, 'a stale auto-create cannot resurrect the deleted shell');
+  assert.equal((await b.database.get('sessions', 'session-a')).deleted, true);
 });
 
 test('enrollment command receipts reconcile canonical IDs and rewrite pending typed enrollment references', async (t) => {
