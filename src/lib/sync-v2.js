@@ -19,8 +19,9 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     entity: 'profile',
     fields: {
       teacherName: 'teacher_name', schoolName: 'school_name', phone: 'phone',
-      reportPrincipalName: 'report_principal_name',
+      reportPrincipalName: 'report_principal_name', activeTimeProfileId: 'active_time_profile_id',
     },
+    references: { activeTimeProfileId: 'timeProfiles' },
   },
   years: {
     entity: 'years',
@@ -298,6 +299,19 @@ function isDefaultTimeProfileBootstrapAdoption(mutation, result, canonical, cano
   return mutation.bootstrap === true && mutation.store === 'timeProfiles' && mutation.op === 'create' &&
     DEFAULT_TIME_PROFILE_ID_SET.has(mutation.recordId) && canonical?.id === mutation.recordId &&
     canonicalId === mutation.recordId && ['conflict', 'canonicalized', 'tombstoned'].includes(result?.outcome);
+}
+
+// The owner-global Timing Profile is a single explicit preference. When two
+// devices select it from the same revision, the server returns one canonical
+// value. The losing optimistic choice is fully reconciled from that canonical
+// row, so retaining a permanent conflict badge would be stale rather than
+// actionable. Other profile fields keep their ordinary conflict diagnostics.
+function isTimingSelectionCanonicalConvergence(mutation, result, canonical) {
+  return mutation.store === 'profile' && mutation.op === 'patch' &&
+    mutation.fields?.length === 1 && mutation.fields[0] === 'active_time_profile_id' &&
+    Array.isArray(result?.conflictedGroups) && result.conflictedGroups.length === 1 &&
+    result.conflictedGroups[0] === 'timing_selection' &&
+    Object.hasOwn(canonical ?? {}, 'activeTimeProfileId');
 }
 
 function operationBatch() {
@@ -714,7 +728,9 @@ export function createSyncV2Engine({
         // ordinary/custom Timing Profile creates keep normal conflict handling.
         const diagnostic = isDefaultTimeProfileBootstrapAdoption(
           currentMutation, result, canonical, canonicalId,
-        ) ? null : conflictDiagnostic(currentMutation, result, stamp);
+        ) || isTimingSelectionCanonicalConvergence(currentMutation, result, canonical)
+          ? null
+          : conflictDiagnostic(currentMutation, result, stamp);
         if (diagnostic) next.syncConflicts = [...(next.syncConflicts ?? []), diagnostic];
 
         const later = pendingForRecord(remappedOutbox, mutation.store, [sourceId, canonicalId]);

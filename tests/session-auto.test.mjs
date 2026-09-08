@@ -21,7 +21,8 @@ async function setup({ slotDate = todayISO() } = {}) {
   const calendar = makeCalendar({ id: 'cal:auto', yearId: year.id, source: 'custom' });
   const slot = makeSlot({ id: 'sl:auto', teachingId: teaching.id, weekday: weekday(slotDate), period: 1 });
   await store.save({ years: [year], terms: [term], subjects: [subject], sections: [section], teachings: [teaching], timeProfiles: [profile], calendars: [calendar], slots: [slot] });
-  await store.patchDevice({ activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: profile.id }, { queue: false });
+  await store.patchDevice({ activeYearId: year.id, activeTermId: term.id }, { queue: false });
+  await store.patchProfile({ activeTimeProfileId: profile.id }, { queue: false });
   return { today, year, term, teaching, profile, calendar, slot };
 }
 

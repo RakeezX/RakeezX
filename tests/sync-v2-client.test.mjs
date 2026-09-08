@@ -89,6 +89,7 @@ class IsolatedIndexedDb {
 }
 
 const FIELD_GROUPS = {
+  profile: { active_time_profile_id: 'timing_selection' },
   students: { name: 'name', note: 'note', status: 'status' },
   subjects: { name: 'name', slug: 'identity' },
   scores: { student_id: 'identity', item_id: 'identity', value: 'value' },
@@ -376,6 +377,62 @@ test('stable default Timing Profile identities converge across concurrent and la
   assert.equal(laterRows.find((row) => row.id === deletedId)?.deleted, true);
   assert.equal(laterRows.some((row) => row.syncConflicts?.length), false);
   assert.equal(server.table('time_profiles').size, 5);
+});
+
+test('owner-global Timing Profile selection converges without bootstrap writes from old device preferences', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'timing-selection-a');
+  const b = makeClient(server, 'timing-selection-b');
+  const fresh = makeClient(server, 'timing-selection-fresh');
+  t.after(() => [a, b, fresh].forEach((client) => client.database.close()));
+
+  await queueDefaultTimeProfiles(a);
+  await a.engine.dispatchPending();
+  server.table('profile').set('profile', {
+    id: 'profile', teacher_name: '', school_name: '', phone: '', report_principal_name: '',
+    active_time_profile_id: null, revision: 1,
+    field_revisions: { teacher_name: 1, school_name: 1, phone: 1, report_principal_name: 1, timing_selection: 1 },
+    deleted_at: null, client_updated_at: 1,
+  });
+
+  await Promise.all([a.engine.pullStore('profile'), a.engine.pullStore('timeProfiles'), b.engine.pullStore('profile'), b.engine.pullStore('timeProfiles')]);
+  const winter = DEFAULT_TIME_PROFILES.find((profile) => profile.id.endsWith(':winter')).id;
+  const ramadan = DEFAULT_TIME_PROFILES.find((profile) => profile.id.endsWith(':ramadan')).id;
+
+  const aSelection = await a.engine.commitMutation({
+    store: 'profile', recordId: 'profile', op: 'patch', patch: { activeTimeProfileId: winter },
+  });
+  const bConcurrentSelection = await b.engine.commitMutation({
+    store: 'profile', recordId: 'profile', op: 'patch', patch: { activeTimeProfileId: ramadan },
+  });
+  assert.equal(aSelection.mutation.patch.active_time_profile_id, winter);
+  assert.equal((await a.database.getAll('outbox')).length, 1, 'offline selection is durable before reconnect');
+  await Promise.all([a.engine.dispatchPending(), b.engine.dispatchPending()]);
+  await Promise.all([a.engine.pullStore('profile'), b.engine.pullStore('profile')]);
+  assert.equal((await a.database.get('profile', 'profile')).activeTimeProfileId, winter);
+  assert.equal((await b.database.get('profile', 'profile')).activeTimeProfileId, winter);
+  assert.equal((await a.engine.status()).state, 'synced');
+  assert.equal((await b.engine.status()).state, 'synced');
+
+  const bSelection = await b.engine.commitMutation({
+    store: 'profile', recordId: 'profile', op: 'patch', patch: { activeTimeProfileId: ramadan },
+  });
+  await b.engine.dispatchPending();
+  await a.engine.pullStore('profile');
+  assert.equal((await a.database.get('profile', 'profile')).activeTimeProfileId, ramadan);
+  assert.equal(server.table('profile').get('profile').active_time_profile_id, ramadan);
+
+  // A later device may bootstrap its four stable rows, but must only adopt the
+  // owner selection it pulled; it never emits a selection from local defaults.
+  await queueDefaultTimeProfiles(fresh);
+  await fresh.engine.pullStore('profile');
+  const pending = await fresh.database.getAll('outbox');
+  assert.equal(pending.some((mutation) => mutation.store === 'profile'), false);
+  assert.equal((await fresh.database.get('profile', 'profile')).activeTimeProfileId, ramadan);
+  await fresh.engine.pullStore('timeProfiles');
+  assert.equal((await fresh.database.getAll('timeProfiles')).filter((row) => !row.deleted).length, 4);
+  assert.equal(bSelection.mutation.patch.active_time_profile_id, ramadan);
+  assert.equal(bConcurrentSelection.mutation.patch.active_time_profile_id, ramadan);
 });
 
 test('lost response retries the exact mutationId and clears one receipt without duplication', async (t) => {

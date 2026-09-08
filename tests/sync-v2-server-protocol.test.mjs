@@ -22,6 +22,7 @@ const migrationFiles = [
   '0015_sync_v2_lifecycle_commands.sql',
   '0016_sync_v2_teaching_creation_commands.sql',
   '0017_sync_v2_bulk_attendance_commands.sql',
+  '0018_profile_active_time_profile.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -183,6 +184,28 @@ test('SYNC-V2A server protocol foundation', async (t) => {
       const row = (await pg.query("select rakeezx.sync_v2_natural_key($1, '{}'::jsonb) as key", [entity])).rows[0];
       assert.equal(row.key, null, `${entity} must remain durable-id only`);
     }
+  });
+
+  await t.test('keeps owner-global active Timing Profile selection isolated from unrelated profile fields', async () => {
+    await useOwner(OWNER);
+    const created = await mutate({
+      entity: 'profile', recordId: 'profile', mutationId: 'timing-profile-create', baseRevision: 0, operation: 'create',
+      patch: { teacher_name: '', school_name: '', phone: '', report_principal_name: '', active_time_profile_id: null },
+    });
+    assert.equal(created.outcome, 'applied');
+    const timing = await mutate({
+      entity: 'profile', recordId: 'profile', mutationId: 'timing-selection', baseRevision: 1,
+      patch: { active_time_profile_id: 'time-profile:default:winter' }, clientUpdatedAt: 20,
+    });
+    assert.deepEqual(timing.appliedGroups, ['timing_selection']);
+    const identity = await mutate({
+      entity: 'profile', recordId: 'profile', mutationId: 'timing-unrelated-profile-edit', baseRevision: 1,
+      patch: { school_name: 'مدرسة مستقلة' }, clientUpdatedAt: 21,
+    });
+    assert.deepEqual(identity.appliedGroups, ['school_name']);
+    const row = (await pg.query(`select active_time_profile_id, school_name from rakeezx.profile where owner_id = $1`, [OWNER])).rows[0];
+    assert.equal(row.active_time_profile_id, 'time-profile:default:winter');
+    assert.equal(row.school_name, 'مدرسة مستقلة');
   });
 
   await t.test('creates a canonical row and retries the same mutation idempotently', async () => {

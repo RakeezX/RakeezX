@@ -1401,8 +1401,16 @@ export const timeProfiles = () => sortByOrder(live(state.timeProfiles));
 export const getTimeProfile = (id) =>
   state.timeProfiles.find((p) => p.id === id && !p.deleted) ?? null;
 
+// A null/invalid owner selection deliberately does not adopt any old local
+// device choice. Stable default IDs make first-use fallback deterministic on
+// every device; custom-only legacy data still has a deterministic sort order.
+const fallbackTimeProfile = () =>
+  DEFAULT_TIME_PROFILES.map((profile) => getTimeProfile(profile.id)).find(Boolean)
+  ?? timeProfiles()[0]
+  ?? null;
+
 export const activeTimeProfile = () =>
-  getTimeProfile(state.device?.activeTimeProfileId) ?? timeProfiles()[0] ?? null;
+  getTimeProfile(state.profile?.activeTimeProfileId) ?? fallbackTimeProfile();
 
 /** وقت حصة برقمها في يوم — من الملف النشط ما لم يُطلب غيره. */
 export const timeFor = (wd, period, profile = activeTimeProfile(), grade = null, date = null, day = undefined) => {
@@ -1439,7 +1447,10 @@ export function resolveProfile(profile, date, explicitDay = undefined) {
   return validProfiles[0] ?? profile;
 }
 
-export const setActiveTimeProfile = (id) => patchDevice({ activeTimeProfileId: id });
+export const setActiveTimeProfile = (id) => {
+  if (!getTimeProfile(id)) throw new Error('ملف التوقيت المحدد غير متاح.');
+  return patchProfile({ activeTimeProfileId: id });
+};
 
 export async function createTimeProfile(data) {
   const p = makeTimeProfile({ order: timeProfiles().length, ...data });

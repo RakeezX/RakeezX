@@ -534,7 +534,7 @@ export function periodNumbers(profile, weekday = null) {
  * فُصلت عمدًا إلى سجلين:
  *   profile — بيانات المعلّم. تخصّ الحساب، تُصدَّر في النسخ الاحتياطية وتُدمج.
  *   device  — إعدادات هذا الجهاز. **لا تُصدَّر ولا تُستورد أبدًا**، فلا يغيّر
- *             ملفُ نسخةٍ من جهاز آخر مظهرَك ولا فصلك الدراسي النشط.
+ *             ملفُ نسخةٍ من جهاز آخر مظهرَك أو فصلك الدراسي النشط.
  */
 export const makeProfile = (o = {}) => ({
   id: 'profile',
@@ -547,6 +547,8 @@ export const makeProfile = (o = {}) => ({
   // مع النسخ المحلية السابقة التي استخدمت principalName.
   reportPrincipalName: o.reportPrincipalName ?? o.principalName ?? '',
   principalName: o.principalName ?? o.reportPrincipalName ?? '',
+  // اختيار ملف التوقيت قرار للحساب كله. يظل null إلى أن يختار المعلّم صراحةً.
+  activeTimeProfileId: o.activeTimeProfileId ?? null,
   ...o,
 });
 

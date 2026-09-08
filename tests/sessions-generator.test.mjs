@@ -41,7 +41,8 @@ async function setup() {
     years: [year], terms: [term], subjects: [subject], sections: [section], teachings: [teaching],
     timeProfiles: [summer, hybrid], calendars: [calendar], slots: [sunday, tuesday],
   });
-  await store.patchDevice({ activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: hybrid.id, lastSyncAt: 0 });
+  await store.patchDevice({ activeYearId: year.id, activeTermId: term.id, lastSyncAt: 0 });
+  await store.patchProfile({ activeTimeProfileId: hybrid.id }, { queue: false });
   return { year, term, subject, section, teaching, summer, hybrid, calendar, sunday, tuesday };
 }
 
