@@ -91,7 +91,8 @@ export default {
     const daySessions = store.sessionsOn(today);
     const cal = store.calendarDayFor(today);
     const pendingToday = daySessions.filter((session) => store.attendanceCompleteness(session).state === 'pending').length;
-    const timingProfile = store.activeTimeProfile()?.name ?? 'التوقيت المعتمد';
+    const baseTimingProfile = store.activeTimeProfile();
+    const timingProfile = store.resolveProfile(baseTimingProfile, today)?.name ?? 'التوقيت المعتمد';
 
     const isInstalled = isStandaloneMode();
     const isDismissed = isHomeInstallPromptDismissed();

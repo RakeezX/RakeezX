@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import { DEFAULT_TIME_PROFILES } from '../src/models.js';
+import { DEFAULT_TIME_PROFILES, makeSession, todayISO } from '../src/models.js';
 
 global.document = {
   documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } },
@@ -45,4 +45,26 @@ test('null, missing, and deleted owner selections use deterministic fallback wit
   assert.equal(store.activeTimeProfile().id, summer.id);
   assert.equal(store.state.timeProfiles.find((profile) => profile.id === winter.id)?.deleted, true);
   assert.equal(store.timeProfiles().length, 3);
+});
+
+test('a newly effective dated profile cannot rewrite an existing frozen session', async () => {
+  const [summer, winter] = DEFAULT_TIME_PROFILES;
+  const date = todayISO();
+  const frozen = makeSession({
+    teachingId: 'timing-effective-frozen', date, period: 1,
+    timeProfileId: summer.id, startTime: '07:00', endTime: '07:45',
+  });
+  await store.save({ sessions: [frozen] }, { queue: false });
+  await store.patchProfile({ activeTimeProfileId: summer.id }, { queue: false });
+  await store.patch('timeProfiles', winter.id, {
+    activeFrom: date, activeTo: date,
+    periods: [{ period: 1, start: '09:00', end: '09:45' }],
+  }, null, { queue: false });
+
+  assert.equal(store.resolveProfile(store.activeTimeProfile(), date).id, winter.id);
+  const existing = await store.ensureSession('timing-effective-frozen', date, 1);
+  assert.deepEqual(
+    [existing.timeProfileId, existing.startTime, existing.endTime],
+    [summer.id, '07:00', '07:45'],
+  );
 });

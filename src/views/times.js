@@ -1352,7 +1352,7 @@ function editPeriodsSheet(profile) {
 
 export default {
   title: () => 'أوقات الحصص',
-  subtitle: () => store.activeTimeProfile()?.name ?? '',
+  subtitle: () => store.resolveProfile(store.activeTimeProfile(), todayISO())?.name ?? '',
   back: () => '#/schedule',
 
   topActions: () => html`
@@ -1382,8 +1382,8 @@ export default {
     const nextSwitch = profilesWithFrom.find(p => p.activeFrom > todayStr);
 
     return html`
-      <!-- شريط التبديل الموسمي القادم يظهر فقط عند وجود تبديل مستقبلي فعلي -->
-      ${nextSwitch ? html`
+      <!-- يعرض التوقيت المطبق، والتبديل القادم عند وجوده، والأساسي عند اختلافه. -->
+      ${nextSwitch || currentResolved?.id !== active?.id ? html`
         <div class="seasonal-activation-bar">
           <div class="seasonal-activation-bar__main">
             <div class="seasonal-activation-bar__item">
@@ -1393,18 +1393,22 @@ export default {
                 <span>${currentResolved?.name || '—'}</span>
               </strong>
             </div>
-            <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
-            <div class="seasonal-activation-bar__item">
-              <span class="seasonal-activation-bar__label">التبديل الموسمي القادم</span>
-              <strong class="seasonal-activation-bar__val tabular">
-                ${nextSwitch.name} (<span dir="ltr">${nextSwitch.activeFrom}</span>)
-              </strong>
-            </div>
-            <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
-            <div class="seasonal-activation-bar__item">
-              <span class="seasonal-activation-bar__label">التوقيت الافتراضي (الاحتياطي)</span>
-              <strong class="seasonal-activation-bar__val">${active?.name || '—'}</strong>
-            </div>
+            ${nextSwitch ? html`
+              <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
+              <div class="seasonal-activation-bar__item">
+                <span class="seasonal-activation-bar__label">التبديل الموسمي القادم</span>
+                <strong class="seasonal-activation-bar__val tabular">
+                  ${nextSwitch.name} (<span dir="ltr">${nextSwitch.activeFrom}</span>)
+                </strong>
+              </div>
+            ` : ''}
+            ${currentResolved?.id !== active?.id ? html`
+              <div class="seasonal-activation-bar__sep" aria-hidden="true"></div>
+              <div class="seasonal-activation-bar__item">
+                <span class="seasonal-activation-bar__label">التوقيت الأساسي</span>
+                <strong class="seasonal-activation-bar__val">${active?.name || '—'}</strong>
+              </div>
+            ` : ''}
           </div>
         </div>
       ` : ''}
@@ -1413,6 +1417,7 @@ export default {
       <div class="timing-profiles-grid">
         ${profiles.map((p) => {
           const isActive = p.id === active?.id;
+          const isEffective = p.id === currentResolved?.id;
           const periodCount = (p.periods ?? []).length;
           const iconName = timingProfileIcon(p.name);
           let dataType = 'custom';
@@ -1435,13 +1440,15 @@ export default {
                   <div class="timing-profile-card__title-col">
                     <span class="timing-profile-card__name">${p.name}</span>
                     <span class="timing-profile-card__sub-status">
-                      ${isActive ? 'التوقيت المعتمد حاليًا' : 'توقيت مخصص'}
+                      ${isEffective ? 'مطبق الآن' : isActive ? 'التوقيت الأساسي' : 'توقيت مخصص'}
                     </span>
                   </div>
                 </div>
-                ${isActive
-                  ? html`<span class="badge badge--brand">${icon('check')} التوقيت النشط</span>`
-                  : html`<button class="btn btn--xs btn--ghost" data-act="activate" data-id="${p.id}">تعيين كنشط</button>`}
+                ${isEffective
+                  ? html`<span class="badge badge--brand">${icon('check')} مطبق الآن</span>`
+                  : isActive
+                    ? html`<span class="badge badge--info">${icon('check')} التوقيت الأساسي</span>`
+                    : html`<button class="btn btn--xs btn--ghost" data-act="activate" data-id="${p.id}">تعيين كنشط</button>`}
               </div>
 
               <div class="timing-profile-card__range">
