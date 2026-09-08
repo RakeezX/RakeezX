@@ -75,6 +75,19 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
     });
 
     await t.test('a synced effective range overrides the owner base selection only for applicable new sessions', async () => {
+      const futureDate = shiftDate(todayISO(), 1);
+      const future = await setup({ slotDate: futureDate });
+      const futureSeasonal = makeTimeProfile({
+        id: 'tp:auto:effective:future', name: 'توقيت فعّال مستقبلي',
+        periods: [{ period: 1, start: '09:00', end: '09:45' }],
+        activeFrom: futureDate, activeTo: futureDate,
+      });
+      await store.save({ timeProfiles: [futureSeasonal] }, { queue: false });
+      await store.patchProfile({ activeTimeProfileId: future.profile.id }, { queue: false });
+      const projected = store.projectedSessionsForDate(futureDate);
+      assert.equal(projected[0].timeProfileId, futureSeasonal.id);
+      assert.equal(projected[0].startTime, '09:00');
+
       const f = await setup();
       const seasonal = makeTimeProfile({
         id: 'tp:auto:effective', name: 'توقيت فعّال',
