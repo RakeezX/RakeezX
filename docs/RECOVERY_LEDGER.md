@@ -21,6 +21,12 @@ This is the current product ledger, not a claim that every historical branch is 
 | SYNC-V2 | `CLOSED` | Production `aeffd5e54207109fa2ef53569583d694ff8a6d3d`: PO verified three-device bootstrap and automatic propagation, offline write/reconnect, and tombstone non-resurrection. Candidate migrations `0001–0017`, RLS/owner isolation, and publishable-key-only browser access were verified. |
 | SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
 
+## Awaiting Product Owner Production review
+
+| Ticket | Status | Evidence / boundary |
+| --- | --- | --- |
+| SESSION-AUTO-01B | `PRODUCTION REVIEW` | Production main `725c28c`: today-only scheduled-session materialization, future projection without future persistence, durable V2 session writes, and focused race/tombstone/rollover coverage are deployed. Await PO Production verification; do not mark `CLOSED`. |
+
 ## Open, deferred, or redesign work
 
 | ID | Status | Ledger evidence / required boundary |
@@ -32,10 +38,21 @@ This is the current product ledger, not a claim that every historical branch is 
 | RUNTIME-FOCUS-01 | `CONDITIONAL / REPRO REQUIRED` | Do not treat as active implementation work without a reproducible Production path. |
 | Manual `إعادة الترقيم` button | `DEFERRED` | Automatic transfer renumber exists, but manual renumber remains in current UI until its remaining use case is assessed. |
 
+## Planned product work
+
+| ID | Status | Ledger evidence / required boundary |
+| --- | --- | --- |
+| SYNC-UX-02 — Teacher Control Center Sync State | `OPEN BUG / AUDIT REQUIRED` | PO observed a yellow sync state remaining after a successful sync while another surface shows green synced. Audit later for stale UI state, duplicate surface/rendering, subscription, or another cause; do not reopen SYNC-V2 unless engine/data correctness evidence requires it. |
+| CLASS-RULES-01 — Classroom Rules | `PLANNED` | Add a Class tools card immediately after Quick Log / `الرصد السريع`: `القوانين الصفية`, with view/manage, add/edit, and icon-plus-text rules. Google Visual Lab review is required before Production implementation. |
+| SCHEDULE-EXPORT-01 — Schedule Export | `PLANNED` | Export the schedule as an image or PDF. Exact visual/export design requires later review. |
+| SUPPORT-FEEDBACK-01 — Support / Feedback / Problem Report | `PLANNED` | Structured in-app technical problem, suggestion, and inquiry support. Future diagnostics must be privacy-safe and exclude instructional content, credentials, tokens, and secrets; storage/delivery design remains a Product/Production decision. |
+| SCHEDULE-MOBILE-TODAY-01 — Mobile Current-Day Navigation | `PLANNED` | On school-week mobile schedule entry, navigate to the current day; do not force it on weekend/non-school days. Google Visual Lab must define interaction details. |
+| HOME-ONBOARDING-01 — New User Getting Started | `PLANNED` | A restrained Home empty state for users without classes should make the path clear: create a class, add students, then configure lessons/schedule. Google Visual Lab defines final UX. |
+
 ## Reconciliation notes
 
 - Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
 - The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
 - Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `aeffd5e54207109fa2ef53569583d694ff8a6d3d`.
+- Current Production baseline: `725c28c79de2fb8a4cf132fb9a64a840053370eb`.
 - The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.
