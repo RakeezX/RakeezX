@@ -23,6 +23,7 @@ This is the current product ledger, not a claim that every historical branch is 
 | SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
 | TIMING-SYNC-01 | `CLOSED` | PO Production verification passed: owner-global active timing selection and `activeFrom` / `activeTo` changes converge across devices without manual Sync, with no profile duplication. |
 | TIMING-EFFECTIVE-UX-01 | `CLOSED` | PO Production verification passed: Home and Schedule agree on today's effective timing; Timing Settings distinguishes effective and base profiles; existing materialized session timing remains frozen. |
+| TEACHER-HUB-AUTH-01 | `CLOSED` | PO Production verification passed: login/logout leaves one Teacher Control Center, one close dismisses it, repeated auth cycles do not accumulate sheets, and the live Sync badge remains correct. |
 
 ## Awaiting Product Owner Production review
 
@@ -51,11 +52,12 @@ This is the current product ledger, not a claim that every historical branch is 
 | SCHEDULE-MOBILE-TODAY-01 — Mobile Current-Day Navigation | `PLANNED` | On school-week mobile schedule entry, navigate to the current day; do not force it on weekend/non-school days. Google Visual Lab must define interaction details. |
 | HOME-ONBOARDING-01 — New User Getting Started | `PLANNED` | A restrained Home empty state for users without classes should make the path clear: create a class, add students, then configure lessons/schedule. Google Visual Lab defines final UX. |
 | TIMING-DISPLAY-UX-01 — Effective/Base Timing Presentation | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Calm, mobile-first visual refinement of the Timing / lesson-times effective-today versus base timing presentation. Google Visual Lab may improve hierarchy, spacing, alignment, and icon/text treatment only; do not change timing runtime semantics. |
+| TEACHER-HUB-UX-01 — Teacher Control Center Compact Redesign | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Google Visual Lab should redesign the Hub as a calm, compact mobile-first sheet with clearer account, academic-context, and Sync hierarchy. Preserve live Sync badge and single-sheet auth lifecycle behavior; no Auth, Sync V2, data, or runtime semantics change. |
 
 ## Reconciliation notes
 
 - Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
 - The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
 - Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `4b4269c0201a9c9c0c33b382df9ff7a411782326`.
+- Current Production baseline: `45329ae4511b6a955a7314999f61e192b6549bed`.
 - The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.

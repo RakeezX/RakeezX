@@ -45,13 +45,15 @@ Lean Gate means evidence proportionate to the changed risk, not a weaker standar
 ## Current Production baseline
 
 - Repository Production branch: `main`.
-- Documented current Production SHA: `4b4269c0201a9c9c0c33b382df9ff7a411782326`.
+- Documented current Production SHA: `45329ae4511b6a955a7314999f61e192b6549bed`.
 - `SESSION-AUTO-01B` is merged and deployed: eligible ordinary scheduled-session shells materialize only through today, while future sessions remain derived from the timetable until their date. It remains `PRODUCTION REVIEW` pending Product Owner verification, not `CLOSED`.
 - `SYNC-V2` is CLOSED after Product Owner Production verification: three devices converged automatically from fresh bootstrap, offline writes propagated after reconnect, and deleted data did not resurrect after refresh or reopen.
 - `SYNC-UX-02` is CLOSED after Product Owner Production verification: a stale Teacher Control Center yellow badge was a UI-only class-reconciliation defect, not a Sync V2 engine/data defect. Future changes to sync indicators retain focused Mini Hub state-transition and reconnect regression coverage.
 - `TIMING-SYNC-01` is CLOSED after Product Owner Production verification: active timing selection is owner-global across devices, and effective-date ranges synchronize without manual Sync or duplicate timing profiles.
 - `TIMING-EFFECTIVE-UX-01` is CLOSED after Product Owner Production verification: Home and Schedule show the same effective timing, Settings distinguishes the effective and base concepts, and materialized historical session timing remains frozen.
 - `TIMING-DISPLAY-UX-01` is `PLANNED / GOOGLE VISUAL REVIEW REQUIRED`: improve only the calm, mobile-first presentation of effective-today versus base timing; no timing runtime or semantic change is authorized.
+- `TEACHER-HUB-AUTH-01` is CLOSED after Product Owner Production verification: login/logout replaces rather than stacks the Teacher Control Center, one close dismisses it, and its live Sync badge behavior remains intact.
+- `TEACHER-HUB-UX-01` is `PLANNED / GOOGLE VISUAL REVIEW REQUIRED`: redesign only the calm, compact, mobile-first presentation of teacher/account, academic context, account actions, and Sync state. Preserve the closed Hub auth lifecycle and Sync behavior; no Auth or Sync V2 semantic change is authorized.
 - Production PWA cache release: `rakeezx-v8` in `sw.js`; it contains the V2 runtime assets and retains the verified offline core-route coverage and service-worker update behavior.
 - The active Sync V2 database is validated through migrations `0001`–`0017`. The former Production database remains frozen as fallback/archive for now; do not write to or migrate it as part of normal work.
 - Browser/runtime access uses `sb_publishable_*` only. Legacy `anon` and `service_role` API keys are disabled; RLS/owner isolation and zero anonymous `rakeezx` table grants were verified.

@@ -17,6 +17,7 @@ Priority: `P0` data correctness/loss, `P1` runtime/sync/user-workflow defect, `P
 | SCHEDULE-MOBILE-TODAY-01 | Mobile Current-Day Navigation | `PLANNED` | During a school week on mobile, open Schedule at the current day; no forced current-day navigation on weekend/non-school days. | Mobile Schedule | Google + PO + Codex | Google Visual Lab approval | Define exact interaction. |
 | HOME-ONBOARDING-01 | New User Getting Started | `PLANNED` | Restrained Home empty state for users with no classes: create class, add students, configure lessons/schedule. | Home | Google + PO + Codex | Google Visual Lab approval | Define final empty-state UX without a heavy tutorial. |
 | TIMING-DISPLAY-UX-01 | Effective/Base Timing Presentation | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | The functionally correct Timing / lesson-times effective-today and base-timing presentation needs calmer hierarchy, spacing, alignment, and icon/text treatment. | Timing Settings | Google + PO | Google Visual Lab review | Define a mobile-first visual treatment only; do not alter runtime or timing semantics. |
+| TEACHER-HUB-UX-01 | Teacher Control Center Compact Redesign | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Redesign the Hub as one calm, compact, mobile-first sheet with clearer teacher/account, academic-context, login/account-action, and Sync presentation. | Teacher Control Center | Google + PO | Google Visual Lab baseline refresh and review | Preserve live Sync badge and single-sheet auth lifecycle behavior; no Auth, Sync V2, data, or runtime change. |
 
 ## Closed sync guard
 
@@ -25,3 +26,5 @@ Priority: `P0` data correctness/loss, `P1` runtime/sync/user-workflow defect, `P
 `SESSION-AUTO-01B` is deployed on Production main `725c28c` and remains in `PRODUCTION REVIEW` pending Product Owner verification; it is not an open issue or a closed ticket.
 
 `TIMING-SYNC-01` and `TIMING-EFFECTIVE-UX-01` are CLOSED after Product Owner Production verification. Preserve focused timing synchronization, effective-date, and frozen-materialized-session regressions for future timing work. `TIMING-DISPLAY-UX-01` is a planned Google Visual Lab-only presentation refinement, not a timing-runtime ticket.
+
+`TEACHER-HUB-AUTH-01` is CLOSED after Product Owner Production verification. The Hub must continue to have one sheet/backdrop relationship through login/logout and retain its live Sync badge. `TEACHER-HUB-UX-01` is a planned Google Visual Lab-only redesign and must not alter Auth or Sync V2 semantics.
