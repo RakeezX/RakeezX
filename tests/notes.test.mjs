@@ -5,7 +5,7 @@ import 'fake-indexeddb/auto';
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
 
-import { makeSession } from '../src/models.js';
+import { makeSession, todayISO } from '../src/models.js';
 import { buildBackup, restoreBackup } from '../src/lib/export.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
 import * as sync from '../src/lib/sync.js';
@@ -79,7 +79,7 @@ test('legacy student.note migrates exactly once using its historical timestamp',
   assert.equal(migrated.length, 1);
   assert.equal(migrated[0].id, 'legacy-note:legacy-student');
   assert.equal(migrated[0].text, 'ملاحظة قديمة');
-  assert.equal(migrated[0].date, '2023-11-14');
+  assert.equal(migrated[0].date, todayISO(new Date(1_700_000_000_000)));
   await store.migrateLegacyStudentNotes();
   await db.closeDB();
   await store.init();
