@@ -276,9 +276,9 @@ export default {
       ${renderTodayFocus(focus)}
 
       <!-- حصص اليوم -->
-      ${onboarding.state !== 'A' ? html`<div class="section home-sessions">
+      ${onboarding.state !== 'A' ? html`<section class="section home-sessions" aria-labelledby="home-sessions-title">
         <div class="section__head">
-          <div class="section__title">${focus ? 'بقية حصص اليوم' : 'حصص اليوم'}</div>
+          <h2 class="section__title" id="home-sessions-title">${focus ? 'بقية حصص اليوم' : 'حصص اليوم'}</h2>
           ${pendingToday ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${pendingToday}</span></span>` : ''}
           <a class="btn btn--sm btn--quiet push" href="#/schedule">الجدول ${icon('back')}</a>
         </div>
@@ -335,12 +335,12 @@ export default {
                 </a>
               </div>
             `}
-      </div>` : ''}
+      </section>` : ''}
 
       <!-- اختصارات سريعة -->
-      <div class="section">
-        <div class="section__head"><div class="section__title">اختصارات</div></div>
-        <div class="grid grid--auto">
+      <section class="section home-shortcuts" aria-labelledby="home-shortcuts-title">
+        <div class="section__head"><h2 class="section__title" id="home-shortcuts-title">اختصارات</h2></div>
+        <div class="grid grid--auto home-shortcuts__grid">
           <a class="tile" href="#/classes">
             <span class="tile__icon">${icon('classes')}</span>
             <span class="tile__title">فصولي</span>
@@ -362,7 +362,7 @@ export default {
             <span class="tile__sub">الإجازات والأيام المميّزة</span>
           </a>
         </div>
-      </div>
+      </section>
 
     `;
   },

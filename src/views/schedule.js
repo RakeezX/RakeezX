@@ -287,7 +287,7 @@ export default {
       <!-- شريط الملخص وشريط التوقيت: محاذاة متوازنة ومتباعدة بشكل احترافي -->
       ${slots.length
         ? html`
-            <div class="schedule-summary-bar">
+            <div class="schedule-summary-bar surface surface--flat">
               <div class="schedule-summary-bar__stats">
                 <span class="schedule-summary-bar__item">
                   ${icon("timetable")}
@@ -362,6 +362,22 @@ export default {
       repaint();
     },
 
+    "schedule-day-keydown"(el, ev) {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+      const tablist = el.closest('[role="tablist"]');
+      const tabs = [...(tablist?.querySelectorAll('[role="tab"]') ?? [])];
+      if (!tabs.length) return;
+      ev.preventDefault();
+      const current = tabs.indexOf(el);
+      const nextIndex = ev.key === 'Home'
+        ? 0
+        : ev.key === 'End'
+          ? tabs.length - 1
+          : (current + (ev.key === 'ArrowLeft' ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[nextIndex].focus();
+      tabs[nextIndex].click();
+    },
+
     selectDay(el) {
       activeMobileDay = el.dataset.day || "all";
       repaint();
@@ -427,9 +443,15 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
   return html`
     <!-- تبويبات الأيام لشاشات الجوال -->
     <div class="schedule-day-tabs" role="tablist" aria-label="أيام الأسبوع">
-      <button class="schedule-day-tab ${selectedMobileDay === "all" ? "is-active" : ""}" data-act="select-day" data-day="all">الكل</button>
+      <button class="schedule-day-tab ${selectedMobileDay === "all" ? "is-active" : ""}"
+              role="tab" aria-selected="${selectedMobileDay === "all"}" aria-controls="schedule-week"
+              tabindex="${selectedMobileDay === "all" ? "0" : "-1"}" data-fk="schedule-day-all"
+              data-act="select-day" data-keydown="schedule-day-keydown" data-day="all">الكل</button>
       ${SCHOOL_WEEKDAYS.map((d) => html`
-        <button class="schedule-day-tab ${selectedMobileDay === String(d) ? "is-active" : ""}" data-act="select-day" data-day="${d}">
+        <button class="schedule-day-tab ${selectedMobileDay === String(d) ? "is-active" : ""}"
+                role="tab" aria-selected="${selectedMobileDay === String(d)}" aria-controls="schedule-week"
+                tabindex="${selectedMobileDay === String(d) ? "0" : "-1"}" data-fk="schedule-day-${d}"
+                data-act="select-day" data-keydown="schedule-day-keydown" data-day="${d}">
           ${WEEKDAYS[d]}
           ${d === today ? html`<span class="tab-dot" title="اليوم"></span>` : ""}
           <span class="tabular fs-xs">(${byDay[d]?.length || 0})</span>
@@ -437,7 +459,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
       `)}
     </div>
 
-    <div class="week ${selectedMobileDay !== "all" ? "has-day-filter" : ""}">
+    <div class="week ${selectedMobileDay !== "all" ? "has-day-filter" : ""}" id="schedule-week" role="tabpanel" aria-label="حصص الأسبوع">
       ${SCHOOL_WEEKDAYS.map((d) => html`
         <div class="week__day ${d === today ? "is-today" : ""} ${selectedMobileDay === String(d) ? "is-selected-day" : ""}">
           <div class="week__head">

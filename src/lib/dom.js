@@ -92,14 +92,32 @@ export function toast(message, kind = 'ok') {
   const el = document.getElementById('toast');
   if (!el) return;
   el.textContent = message;
-  el.classList.toggle('is-danger', kind === 'danger');
+  el.classList.remove('is-danger', 'is-warn', 'is-info');
+  if (kind === 'danger') el.classList.add('is-danger');
+  if (kind === 'warn') el.classList.add('is-warn');
+  if (kind === 'info') el.classList.add('is-info');
+  const urgent = kind === 'danger';
+  el.setAttribute('role', urgent ? 'alert' : 'status');
+  el.setAttribute('aria-live', urgent ? 'assertive' : 'polite');
   el.classList.add('is-on');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('is-on'), 2600);
+  toastTimer = setTimeout(() => el.classList.remove('is-on'), urgent ? 5000 : 3200);
 }
 
 /* ---------- الطبقة المنبثقة ---------- */
 const sheetStack = [];
+let sheetCounter = 0;
+
+const focusableSelector = [
+  '[autofocus]',
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+const initialFocusSelector = '[autofocus], input:not([disabled]), select:not([disabled]), textarea:not([disabled])';
 
 /** يحوّل الإدخال العربي/الغربي إلى HH:mm غربي صالح دون تغيير ما يُخزَّن. */
 export function normalizeTimeDigits(value) {
@@ -126,13 +144,18 @@ export function normalizeTimeDigits(value) {
 export function openSheet({ title, desc, body, foot, onMount }) {
   return new Promise((resolve) => {
     const depth = sheetStack.length;
+    const id = ++sheetCounter;
+    const titleId = `sheet-title-${id}`;
+    const descId = desc ? `sheet-desc-${id}` : '';
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const backdrop = toNode(html`
-      <div class="sheet-backdrop" role="dialog" aria-modal="true" style="z-index:${100 + depth * 20}">
-        <div class="sheet">
+      <div class="sheet-backdrop" style="z-index:${100 + depth * 20}">
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="${titleId}"
+             ${descId ? html`aria-describedby="${descId}"` : ''} tabindex="-1">
           <div class="sheet__head">
             <div>
-              <div class="sheet__title">${title}</div>
-              ${desc ? html`<div class="sheet__desc">${desc}</div>` : ''}
+              <div class="sheet__title" id="${titleId}">${title}</div>
+              ${desc ? html`<div class="sheet__desc" id="${descId}">${desc}</div>` : ''}
             </div>
             <button class="iconbtn" data-sheet-close aria-label="إغلاق">${icon('x')}</button>
           </div>
@@ -145,6 +168,7 @@ export function openSheet({ title, desc, body, foot, onMount }) {
     let closed = false;
     const entry = {
       backdrop,
+      opener,
       done(value) {
         if (closed) return;
         closed = true;
@@ -152,6 +176,19 @@ export function openSheet({ title, desc, body, foot, onMount }) {
         backdrop.remove();
         const index = sheetStack.indexOf(entry);
         if (index >= 0) sheetStack.splice(index, 1);
+        const previous = sheetStack.at(-1);
+        if (previous) {
+          previous.backdrop.inert = false;
+          previous.backdrop.removeAttribute('aria-hidden');
+        } else {
+          const appRoot = document.getElementById('app');
+          if (appRoot) {
+            appRoot.inert = false;
+            appRoot.removeAttribute('aria-hidden');
+          }
+          document.body.classList.remove('has-modal');
+        }
+        if (entry.opener?.isConnected) entry.opener.focus({ preventScroll: true });
         resolve(value);
       },
     };
@@ -161,16 +198,53 @@ export function openSheet({ title, desc, body, foot, onMount }) {
     });
 
     const onKey = (ev) => {
-      if (ev.key === 'Escape' && sheetStack.at(-1) === entry) entry.done(undefined);
+      if (sheetStack.at(-1) !== entry) return;
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        entry.done(undefined);
+        return;
+      }
+      if (ev.key !== 'Tab') return;
+      const controls = [...backdrop.querySelectorAll(focusableSelector)].filter((el) =>
+        !el.hidden && el.getClientRects().length > 0 && el.getAttribute('aria-hidden') !== 'true'
+      );
+      if (!controls.length) {
+        ev.preventDefault();
+        backdrop.querySelector('.sheet')?.focus();
+        return;
+      }
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (ev.shiftKey && document.activeElement === first) {
+        ev.preventDefault();
+        last.focus();
+      } else if (!ev.shiftKey && document.activeElement === last) {
+        ev.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
 
+    const previous = sheetStack.at(-1);
+    if (previous) {
+      previous.backdrop.inert = true;
+      previous.backdrop.setAttribute('aria-hidden', 'true');
+    } else {
+      const appRoot = document.getElementById('app');
+      if (appRoot) {
+        appRoot.inert = true;
+        appRoot.setAttribute('aria-hidden', 'true');
+      }
+      document.body.classList.add('has-modal');
+    }
     sheetStack.push(entry);
     (document.getElementById('modal-root') ?? document.body).append(backdrop);
     onMount?.(backdrop, entry.done);
 
-    const firstInput = backdrop.querySelector('input, textarea, select');
-    if (firstInput && window.matchMedia('(min-width: 700px)').matches) firstInput.focus();
+    if (!backdrop.contains(document.activeElement)) {
+      (backdrop.querySelector(initialFocusSelector) ?? backdrop.querySelector(focusableSelector) ?? backdrop.querySelector('.sheet'))
+        ?.focus({ preventScroll: true });
+    }
   });
 }
 

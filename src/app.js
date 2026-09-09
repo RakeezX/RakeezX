@@ -253,10 +253,13 @@ const navLink = (it, path, kind) => html`
 function shell(path, params) {
   const inTeaching = path.startsWith('/teaching/') && params?.id;
   const bottom = NAV.filter((n) => n.primary);
+  const syncInfo = getSyncState();
+  const showConnectionState = syncInfo.status === 'offline' || syncInfo.status === 'error';
 
   return html`
+    <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
     <div class="layout">
-      <nav class="sidebar">
+      <nav class="sidebar" aria-label="التنقل الرئيسي">
         <div class="sidebar__brand">${icon('spark')} <span>RAKEEZ&nbsp;X</span></div>
         ${NAV.map((it) => navLink(it, path, 'sidebar'))}
         <div class="sidebar__spacer"></div>
@@ -267,7 +270,11 @@ function shell(path, params) {
       </nav>
       <main class="main">
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
-        <div id="main"></div>
+        <div class="app-status-strip ${showConnectionState ? `is-visible is-${syncInfo.status}` : ''}"
+             data-app-status role="status" aria-live="polite" aria-atomic="true">
+          ${icon('cloud')} <span data-app-status-text>${syncInfo.label}</span>
+        </div>
+        <div id="main" tabindex="-1"></div>
       </main>
       <nav class="tabbar" data-nav-scope="primary" aria-label="التنقل الرئيسي">
         ${bottom.map((it) => navLink(it, path, 'tabbar'))}
@@ -331,6 +338,12 @@ function restoreFocus(snap) {
 /** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
 function paintSyncStatus() {
   const syncInfo = getSyncState();
+  const statusStrip = document.querySelector('[data-app-status]');
+  if (statusStrip) {
+    const visible = syncInfo.status === 'offline' || syncInfo.status === 'error';
+    statusStrip.className = `app-status-strip${visible ? ` is-visible is-${syncInfo.status}` : ''}`;
+    statusStrip.querySelector('[data-app-status-text]')?.replaceChildren(syncInfo.label);
+  }
   for (const el of document.querySelectorAll('[data-sync-label]')) el.textContent = syncInfo.text;
   for (const el of document.querySelectorAll('[data-sync-badge]')) {
     for (const className of [...el.classList]) {
@@ -395,11 +408,11 @@ function paint() {
     render(
       mainEl,
       html`<div class="page">
-        <div class="empty">
+        <div class="empty empty--error" role="alert">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">تعذّر عرض هذه الشاشة</div>
           <div class="empty__text">${String(err?.message ?? err)}</div>
-          <a class="btn btn--ghost" href="#/">العودة للرئيسية</a>
+          <a class="btn btn--primary" href="#/">العودة للرئيسية</a>
         </div>
       </div>`
     );
@@ -473,7 +486,7 @@ async function boot() {
     render(
       app,
       html`<div class="page">
-        <div class="empty">
+        <div class="empty empty--error" role="alert">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">تعذّر فتح سجلّك</div>
           <div class="empty__text">${String(err?.message ?? err)}</div>
@@ -481,7 +494,7 @@ async function boot() {
             إن كنت في وضع التصفح الخاص فافتح التطبيق في نافذة عادية،
             وتأكد أن تخزين المواقع مسموح.
           </div>
-          <button class="btn btn--ghost" onclick="location.reload()">أعد المحاولة</button>
+          <button class="btn btn--primary" onclick="location.reload()">أعد المحاولة</button>
         </div>
       </div>`
     );

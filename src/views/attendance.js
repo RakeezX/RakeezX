@@ -30,6 +30,26 @@ async function ensureActive(tchId) {
   activeSessionId = null;
 }
 
+function renderDateNavigation() {
+  const cal = store.calendarDayFor(date);
+  const isToday = date === todayISO();
+  return html`
+    <div class="datebar" aria-label="التنقل بين أيام الحضور">
+      <button class="iconbtn" data-act="prev-day" aria-label="اليوم السابق">${icon('back')}</button>
+      <div class="datebar__mid">
+        <div class="datebar__label">${WEEKDAYS[weekday(date)]} · ${fmtDate(date, false)}</div>
+        ${cal
+          ? html`<div class="datebar__note">${cal.label || 'يوم مميّز في التقويم'}</div>`
+          : isWeekend(date)
+            ? html`<div class="datebar__note">نهاية الأسبوع</div>`
+            : ''}
+      </div>
+      <button class="iconbtn ${isToday ? 'is-off' : ''}" data-act="next-day"
+              aria-label="اليوم التالي" ${isToday ? 'disabled' : ''}>${icon('chev')}</button>
+    </div>
+  `;
+}
+
 export default {
   title: () => 'الحضور',
   subtitle: (p) => {
@@ -63,7 +83,14 @@ export default {
 
     const daySessions = store.sessionsOnFor(tch.id, date);
     const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
-    if (!ses) return html`<div class="empty"><div class="empty__title">لا توجد حصة مجدولة لهذا الفصل في هذا اليوم</div></div>`;
+    if (!ses) return html`
+      ${renderDateNavigation()}
+      <div class="empty empty--compact">
+        <div class="empty__icon">${icon('calendar')}</div>
+        <div class="empty__title">لا توجد حصة مجدولة لهذا اليوم</div>
+        <div class="empty__text">انتقل بين الأيام أو أضف حصة أخرى عندما تحتاج إلى رصد مستقل.</div>
+      </div>
+    `;
 
     const rosterInfo = store.sessionRoster(ses);
     const roster = rosterInfo.members;
@@ -78,7 +105,6 @@ export default {
     }
 
     const meta = SESSION_STATUS[ses.status] ?? SESSION_STATUS.scheduled;
-    const cal = store.calendarDayFor(date);
     const isToday = date === todayISO();
     const rosterIds = new Set(roster.map((student) => student.id));
     const records = store.attendanceIn(ses.id).filter((record) => rosterIds.has(record.studentId));
@@ -96,19 +122,7 @@ export default {
       : roster;
 
     return html`
-      <div class="datebar">
-        <button class="iconbtn" data-act="prev-day" aria-label="اليوم السابق">${icon('back')}</button>
-        <div class="datebar__mid">
-          <div class="datebar__label">${WEEKDAYS[weekday(date)]} · ${fmtDate(date, false)}</div>
-          ${cal
-            ? html`<div class="datebar__note">${cal.label || 'يوم مميّز في التقويم'}</div>`
-            : isWeekend(date)
-              ? html`<div class="datebar__note">نهاية الأسبوع</div>`
-              : ''}
-        </div>
-        <button class="iconbtn ${isToday ? 'is-off' : ''}" data-act="next-day"
-                aria-label="اليوم التالي" ${isToday ? 'disabled' : ''}>${icon('chev')}</button>
-      </div>
+      ${renderDateNavigation()}
 
       ${rosterInfo.source === 'snapshot'
         ? html`<p class="t-3 fs-sm mb-3">كشف هذه الحصة محفوظ عند أول رصد حضور.</p>`
@@ -116,11 +130,11 @@ export default {
 
       ${daySessions.length > 1
         ? html`
-            <div class="segmented mb-3">
+            <div class="segmented mb-3" role="group" aria-label="اختر حصة اليوم">
               ${daySessions.map(
                 (s) => html`
                   <button class="segmented__btn ${s.id === ses.id ? 'is-on' : ''}"
-                          data-act="pick-session" data-id="${s.id}">
+                          data-act="pick-session" data-id="${s.id}" aria-pressed="${s.id === ses.id}">
                     الحصة ${s.period}
                   </button>
                 `
@@ -129,7 +143,7 @@ export default {
           `
         : ''}
 
-      <div class="card card--pad mb-3">
+      <div class="surface surface--compact surface--flat attendance-session-summary mb-3">
         <div class="hstack gap-2 wrap">
           <span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>
           ${ses.reason ? html`<span class="t-3 fs-sm">${ses.reason}</span>` : ''}
@@ -176,8 +190,8 @@ export default {
                 `
               : ''}
 
-            <div class="searchbar">
-              ${icon('search')}
+            <div class="searchbar attendance-search">
+              <span class="searchbar__icon" aria-hidden="true">${icon('search')}</span>
               <input class="searchbar__input" type="search" data-input="search" data-fk="attendance-search"
                      value="${query}" placeholder="ابحث باسم الطالب أو رقمه" autocomplete="off">
               ${query ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
@@ -201,7 +215,7 @@ export default {
                                   aria-label="ملاحظة لـ ${s.name}">
                             ${icon('note')}
                           </button>
-                          <span class="segbtns">
+                          <span class="segbtns" role="group" aria-label="حالة حضور ${s.name}">
                             ${ATTENDANCE_ORDER.map(
                               (k) => html`
                                 <button class="segbtn ${status === k ? 'is-on' : ''}" data-color="${ATTENDANCE[k].color}"
