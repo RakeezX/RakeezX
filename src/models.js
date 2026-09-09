@@ -87,6 +87,7 @@ export const slotId = () => `sl:${uid()}`;
 export const sessionId = (tchId, date, period) => `se:${tchId}:${date}:${period}`;
 export const attendanceId = (studentId, sesId) => `at:${studentId}:${sesId}`;
 export const scoreId = (studentId, itemId) => `sc:${studentId}:${itemId}`;
+export const groupArrangementId = (teachingId) => `group-arrangement:${teachingId}`;
 export const calendarId = (yId, source) => `cal:${yId}:${source}`;
 export const calendarDayId = (calId, date) => `cd:${calId}:${date}`;
 export const submissionId = (studentId, assignmentId) => `sb:${studentId}:${assignmentId}`;
@@ -789,6 +790,15 @@ export const makeClassRule = (o = {}) => ({
   teachingId: o.teachingId,
   iconKey: o.iconKey ?? '',
   text: o.text ?? '',
+  ...o,
+});
+
+/** ترتيب مجموعات واحد متزامن لكل إسناد؛ هوية الأعضاء دائمًا student.id. */
+export const makeGroupArrangement = (o = {}) => ({
+  ...base(),
+  id: o.id ?? groupArrangementId(o.teachingId),
+  teachingId: o.teachingId,
+  groups: Array.isArray(o.groups) ? o.groups : [],
   ...o,
 });
 

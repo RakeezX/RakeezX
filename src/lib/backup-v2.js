@@ -17,7 +17,7 @@ const IMMUTABLE_STORES = new Set(['logs', 'sessionRosterSnapshots', 'closedTermR
 const RESTORE_STORE_ORDER = Object.freeze([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'students',
   'enrollments', 'timeProfiles', 'profile', 'items', 'slots', 'sessions', 'notes', 'classRules',
-  'classCharterSelections', 'classGoals',
+  'classCharterSelections', 'classGoals', 'groupArrangements',
   'scores', 'logs', 'sessionRosterSnapshots', 'attendance', 'closedTermReports',
 ]);
 const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>

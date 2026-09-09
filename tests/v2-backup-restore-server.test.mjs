@@ -15,7 +15,7 @@ const migrationFiles = [
   '0016_sync_v2_teaching_creation_commands.sql', '0017_sync_v2_bulk_attendance_commands.sql',
   '0018_profile_active_time_profile.sql', '0019_class_rules.sql', '0020_support_requests.sql',
   '0021_section_archive_lifecycle.sql', '0022_closed_term_reports.sql',
-  '0023_sync_v2_backup_restore.sql',
+  '0023_sync_v2_backup_restore.sql', '0024_class_goal_runtime.sql', '0025_group_arrangements.sql',
 ];
 const migrations = await Promise.all(migrationFiles.map((name) =>
   readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')));
@@ -78,6 +78,33 @@ test('failure during finalization rolls back every domain write', async () => {
   await assert.rejects(finalize({ id: 'restore:rollback', hash: 'b'.repeat(64), stageHash: staged.stageHash }));
   assert.equal((await pg.query("select count(*)::int count from rakeezx.students where owner_id=$1 and id='restore:atomic-student'", [OWNER])).rows[0].count, 0);
   assert.equal((await pg.query("select count(*)::int count from rakeezx.sync_restore_receipts where owner_id=$1 and restore_id='restore:rollback'", [OWNER])).rows[0].count, 0);
+});
+
+test('V4 restore plans and canonically reconciles teaching group arrangements', async () => {
+  await useOwner(OWNER);
+  await pg.exec(`
+    insert into rakeezx.years(id,label,hijri_start,hijri_end,status) values('restore:year','سنة',1450,1451,'active');
+    insert into rakeezx.terms(id,year_id,name,"index",status) values('restore:term','restore:year','فصل',1,'active');
+    insert into rakeezx.subjects(id,name,slug) values('restore:subject','رياضيات','restore-math');
+    insert into rakeezx.sections(id,year_id,grade,label,name) values('restore:section','restore:year',5,'أ','خامس أ');
+    insert into rakeezx.teachings(id,section_id,subject_id,term_id) values('restore:teaching','restore:section','restore:subject','restore:term');
+    insert into rakeezx.students(id,name,status) values('restore:group-a','طالب أ','active'),('restore:group-b','طالب ب','active');
+    insert into rakeezx.enrollments(id,student_id,section_id,status,roll_no) values
+      ('restore:enrollment-a','restore:group-a','restore:section','active',1),
+      ('restore:enrollment-b','restore:group-b','restore:section','active',2);
+    insert into rakeezx.group_arrangements(id,teaching_id,groups,client_updated_at,device_id)
+      values('restore:groups','restore:teaching','[["restore:group-a"],["restore:group-b"]]'::jsonb,1,'seed');
+  `);
+  const before = await manifest();
+  const row = before.find((candidate) => candidate.entity === 'group_arrangements' && candidate.id === 'restore:groups');
+  assert.ok(row);
+  const staged = await stage({ id: 'restore:groups-v4', hash: 'f'.repeat(64), source: before, operations: [{
+    entity: 'group_arrangements', recordId: row.id, operation: 'patch', baseRevision: row.revision,
+    patch: { groups: [['restore:group-b'], ['restore:group-a']] }, clientUpdatedAt: 40,
+  }] });
+  const result = await finalize({ id: 'restore:groups-v4', hash: 'f'.repeat(64), stageHash: staged.stageHash });
+  assert.deepEqual(result.canonical.group_arrangements.find((candidate) => candidate.id === row.id).groups,
+    [['restore:group-b'], ['restore:group-a']]);
 });
 
 test('owner isolation, canonical-source recheck, and safe legacy empty-owner restore', async () => {

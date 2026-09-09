@@ -37,10 +37,10 @@ export function displayState() {
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'classRules', 'classGoals', 'classCharterSelections',
+  'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
 ]);
-const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules', 'classGoals', 'classCharterSelections']);
+const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
@@ -177,7 +177,7 @@ function v2PostPullStores(snapshot, full) {
   const stores = new Set(v2StoresFor(snapshot, false));
   for (const entry of snapshot) {
     if (String(entry.command ?? '').startsWith('enrollment:')) {
-      stores.add('students'); stores.add('enrollments');
+      stores.add('students'); stores.add('enrollments'); stores.add('groupArrangements');
     } else if (['attendance:record', 'attendance:fill'].includes(entry.command)) {
       stores.add('sessions'); stores.add('sessionRosterSnapshots'); stores.add('attendance');
     } else if (entry.command === 'teaching:create') {

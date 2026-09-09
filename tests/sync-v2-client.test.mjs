@@ -102,6 +102,7 @@ const FIELD_GROUPS = {
     started_at: 'goal', completed_at: 'goal', reward_operation_id: 'goal',
   },
   class_charter_selections: { teaching_id: 'identity', selected_rule_ids: 'selection' },
+  group_arrangements: { teaching_id: 'identity', groups: 'arrangement' },
 };
 
 class MemoryV2Server {
@@ -124,6 +125,9 @@ class MemoryV2Server {
       return [...this.table(entity).values()].find((row) =>
         row.teaching_id === patch.teaching_id && row.date === patch.date && row.period === patch.period,
       ) ?? null;
+    }
+    if (entity === 'group_arrangements' && patch.teaching_id) {
+      return [...this.table(entity).values()].find((row) => row.teaching_id === patch.teaching_id) ?? null;
     }
     return null;
   }
@@ -328,6 +332,87 @@ test('class rules converge across three generic V2 clients and tombstones win on
   await Promise.all([b.engine.pullStore('classRules'), c.engine.pullStore('classRules')]);
   for (const client of [b, c]) assert.equal((await client.database.get('classRules', 'rule-1')).deleted, true);
   assert.equal((await b.engine.status()).state, 'synced');
+});
+
+test('one teaching group arrangement canonicalizes and converges as one invariant field across three clients', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'groups-a');
+  const b = makeClient(server, 'groups-b');
+  const c = makeClient(server, 'groups-c');
+  const later = makeClient(server, 'groups-later');
+  t.after(() => [a, b, c, later].forEach((client) => client.database.close()));
+
+  const teaching = { id: 'groups-teaching', sectionId: 'section-1', subjectId: 'subject-1', termId: 'term-1', order: 0 };
+  await Promise.all([a, b, c].map((client) => seedAuthoritative(client, 'teachings', teaching)));
+  const creates = [
+    [a, 'groups:a', [['student-1', 'student-2'], ['student-3']]],
+    [b, 'groups:b', [['student-2'], ['student-1', 'student-3']]],
+    [c, 'groups:c', [['student-3'], ['student-2', 'student-1']]],
+  ];
+  await Promise.all(creates.map(([client, id, groups]) => client.engine.commitMutation({
+    store: 'groupArrangements', recordId: id, op: 'create', patch: { teachingId: teaching.id, groups },
+  })));
+  await Promise.all(creates.map(([client]) => client.engine.dispatchPending()));
+  assert.equal(server.table('group_arrangements').size, 1, 'one canonical arrangement must survive a create race');
+  const canonicalId = [...server.table('group_arrangements').keys()][0];
+  await Promise.all([a, b, c].map((client) => client.engine.pullStore('groupArrangements')));
+  for (const client of [a, b, c]) {
+    assert.equal((await client.database.getAll('groupArrangements')).filter((row) => !row.deleted).length, 1);
+    assert.ok(await client.database.get('groupArrangements', canonicalId));
+  }
+
+  await b.engine.commitMutation({
+    store: 'groupArrangements', recordId: canonicalId, op: 'patch',
+    patch: { groups: [['student-1'], ['student-2', 'student-3']] },
+  });
+  await c.engine.commitMutation({
+    store: 'groupArrangements', recordId: canonicalId, op: 'patch',
+    patch: { groups: [['student-3', 'student-1'], ['student-2']] },
+  });
+  await b.engine.dispatchPending();
+  await c.engine.dispatchPending();
+  await Promise.all([a, b, c].map((client) => client.engine.pullStore('groupArrangements')));
+  for (const client of [a, b, c]) {
+    assert.deepEqual((await client.database.get('groupArrangements', canonicalId)).groups,
+      [['student-1'], ['student-2', 'student-3']], 'concurrent layouts must never field-merge');
+  }
+
+  await a.engine.commitMutation({ store: 'groupArrangements', recordId: canonicalId, op: 'delete' });
+  assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
+  await later.engine.pullStore('groupArrangements');
+  assert.equal((await later.database.get('groupArrangements', canonicalId)).deleted, true);
+});
+
+test('offline group arrangement edit remains durable and converges after reconnect', async (t) => {
+  const server = new MemoryV2Server();
+  let online = false;
+  const transport = {
+    fetchRecords: (entity) => server.fetchRecords(entity),
+    applyMutation(envelope) {
+      if (!online) throw new Error('offline');
+      return server.applyMutation(envelope);
+    },
+  };
+  const source = makeClient(server, 'groups-offline', { transport });
+  const peer = makeClient(server, 'groups-peer');
+  t.after(() => [source, peer].forEach((client) => client.database.close()));
+
+  const teaching = { id: 'groups-offline-teaching', sectionId: 'section-1', subjectId: 'subject-1', termId: 'term-1', order: 0 };
+  await Promise.all([source, peer].map((client) => seedAuthoritative(client, 'teachings', teaching)));
+  const groups = [['student-1', 'student-2'], ['student-3']];
+  const { mutation } = await source.engine.commitMutation({
+    store: 'groupArrangements', recordId: 'groups:offline', op: 'create',
+    patch: { teachingId: teaching.id, groups },
+  });
+  assert.equal((await source.engine.dispatchPending()).failed, 1);
+  assert.equal((await source.database.getAll('outbox'))[0].mutationId, mutation.mutationId,
+    'offline work must retain its original durable identity');
+
+  online = true;
+  assert.equal((await source.engine.dispatchPending()).acknowledged, 1);
+  assert.equal((await source.database.getAll('outbox')).length, 0);
+  await peer.engine.pullStore('groupArrangements');
+  assert.deepEqual((await peer.database.get('groupArrangements', 'groups:offline')).groups, groups);
 });
 
 test('class Goal invariant fields and charter selection converge across devices without tombstone resurrection', async (t) => {

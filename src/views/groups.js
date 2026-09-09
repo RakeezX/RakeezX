@@ -21,7 +21,7 @@ const GROUP_NAMES = ['الأولى', 'الثانية', 'الثالثة', 'الر
                      'السابعة', 'الثامنة', 'التاسعة', 'العاشرة', 'الحادية عشرة', 'الثانية عشرة'];
 
 function savedGroupsFor(classId) {
-  const saved = store.state.device?.groupArrangements?.[classId];
+  const saved = store.groupArrangementOf(classId)?.groups ?? store.state.device?.groupArrangements?.[classId];
   if (!Array.isArray(saved) || !saved.length) return [];
 
   const roster = store.students(classId);
@@ -44,11 +44,7 @@ function savedGroupsFor(classId) {
 
 async function persistGroups(classId, arrangement = groups) {
   if (!classId) return;
-  const groupArrangements = {
-    ...(store.state.device?.groupArrangements ?? {}),
-    [classId]: arrangement.map((group) => group.map((student) => student.id)),
-  };
-  await store.patchDevice({ groupArrangements });
+  await store.saveGroupArrangement(classId, arrangement.map((group) => group.map((student) => student.id)));
 }
 
 function displayedGroups(classId) {
@@ -139,6 +135,7 @@ export default {
   render(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    const readOnly = store.isTeachingArchived(cls);
 
     const roster = store.students(cls.id);
     if (roster.length < 2) {
@@ -202,7 +199,7 @@ export default {
         </div>
       </div>
 
-      <button class="btn btn--primary btn--block mb-3" data-act="make">
+      <button class="btn btn--primary btn--block mb-3" data-act="make" ${readOnly ? 'disabled' : ''}>
         ${icon('groups')} ${groups.length ? 'أعد التقسيم' : 'قسّم المجموعات'}
       </button>
 
@@ -237,20 +234,21 @@ export default {
                     <div class="stack stack-2 mt-3">
                       ${g.map((s) => html`
                         <div class="group__member ${selectedStudent?.id === s.id ? 'is-selected' : ''}"
-                             draggable="true"
+                             draggable="${readOnly ? 'false' : 'true'}"
                              data-student-id="${s.id}"
                              data-student-name="${s.name}"
                              data-from-idx="${i}"
                              data-teaching-id="${cls.id}"
                              data-act="toggle-student"
-                             title="اسحب أو انقر لنقل الطالب">
+                             aria-disabled="${readOnly ? 'true' : 'false'}"
+                             title="${readOnly ? 'الفصل مؤرشف للعرض فقط' : 'اسحب أو انقر لنقل الطالب'}">
                           <span class="rollno">${s.rollNo ?? '—'}</span>
                           <span class="group__member-name">${s.name}</span>
                           <span class="group__drag-handle noprint">${icon('menu')}</span>
                         </div>
                       `)}
                     </div>
-                    ${selectedStudent && selectedStudent.fromIdx !== i
+                    ${!readOnly && selectedStudent && selectedStudent.fromIdx !== i
                       ? html`
                           <button class="group__target-btn noprint"
                                   data-act="move-here"
@@ -279,6 +277,7 @@ export default {
   },
 
   bindDragAndDrop(root, params) {
+    if (store.isTeachingArchived(params?.id)) return;
     const container = root.querySelector('#groups-container');
     if (!container) return;
 
@@ -379,8 +378,8 @@ export default {
       repaint();
     },
 
-    'toggle-student'(el) {
-      if (isDragging) return;
+    'toggle-student'(el, ev, params) {
+      if (isDragging || store.isTeachingArchived(params?.id)) return;
       const studentId = el.dataset.studentId;
       const studentName = el.dataset.studentName;
       const fromIdx = Number(el.dataset.fromIdx);

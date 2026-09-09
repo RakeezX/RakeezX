@@ -34,7 +34,7 @@ async function seedGroups(page) {
   });
 }
 
-test('Groups saves a full-roster base arrangement locally across reloads and tabs', async ({ page }) => {
+test('Groups saves one durable full-roster arrangement across reloads and tabs', async ({ page }) => {
   const teachingId = 'groups-persist-teaching';
   // Exercise the Riyadh midnight boundary where UTC still reports yesterday.
   await page.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
@@ -43,35 +43,35 @@ test('Groups saves a full-roster base arrangement locally across reloads and tab
   await page.goto('/#/teaching/' + teachingId + '/groups');
 
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
-  await expect.poll(() => page.evaluate((id) => window.store.state.device.groupArrangements?.[id]?.flat().length ?? 0, teachingId)).toBe(6);
+  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups?.flat().length ?? 0, teachingId)).toBe(6);
 
-  const baseBeforeMove = await page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId);
+  const baseBeforeMove = await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId);
   expect(new Set(baseBeforeMove.flat()).size).toBe(6);
   await expect(page.locator('.group__member')).toHaveCount(5);
 
   const peer = await page.context().newPage();
   await peer.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
   await peer.goto('/#/teaching/' + teachingId + '/groups');
-  await expect.poll(() => peer.evaluate((id) => window.store.state.device.groupArrangements?.[id]?.flat().length ?? 0, teachingId)).toBe(6);
+  await expect.poll(() => peer.evaluate((id) => window.store.groupArrangementOf(id)?.groups?.flat().length ?? 0, teachingId)).toBe(6);
 
   const firstMember = page.locator('.group').nth(0).locator('.group__member').first();
   const movingId = await firstMember.getAttribute('data-student-id');
   await firstMember.click();
   await page.locator('.group').nth(1).getByRole('button', { name: /نقل/ }).click();
 
-  await expect.poll(() => page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId)).not.toEqual(baseBeforeMove);
-  const moved = await page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId);
+  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).not.toEqual(baseBeforeMove);
+  const moved = await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId);
   expect(new Set(moved.flat()).size).toBe(6);
   expect(moved.flat().filter((id) => id === movingId)).toHaveLength(1);
 
-  await expect.poll(() => peer.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId)).toEqual(moved);
+  await expect.poll(() => peer.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
   await page.reload();
-  await expect.poll(() => page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId)).toEqual(moved);
+  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
   await expect(page.locator('.group__member')).toHaveCount(5);
 
   await page.locator('[data-change="toggle-absent"]').check();
   await expect(page.locator('.group__member')).toHaveCount(6);
-  expect(await page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId)).toEqual(moved);
+  expect(await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
   await peer.close();
 });
 async function seedRegenerationGroups(page) {
@@ -108,7 +108,7 @@ async function distortFirstGroup(page) {
   }
 }
 
-const savedGroups = (page, teachingId) => page.evaluate((id) => window.store.state.device.groupArrangements[id], teachingId);
+const savedGroups = (page, teachingId) => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId);
 const sortedSizes = (arrangement) => arrangement.map((group) => group.length).sort((a, b) => a - b);
 
 test('New Random and Balanced generation replace distorted saved group structures from a fresh roster', async ({ page }) => {

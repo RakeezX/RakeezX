@@ -93,6 +93,11 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: { teachingId: 'teaching_id', selectedRuleIds: 'selected_rule_ids' },
     references: { teachingId: 'teachings' },
   },
+  groupArrangements: {
+    entity: 'group_arrangements',
+    fields: { teachingId: 'teaching_id', groups: 'groups' },
+    references: { teachingId: 'teachings' },
+  },
   items: {
     entity: 'items',
     fields: {

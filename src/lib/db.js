@@ -6,7 +6,7 @@
  */
 
 export const DB_NAME = 'rakeezx';
-export const DB_VERSION = 6;
+export const DB_VERSION = 7;
 
 
 export const STORES = [
@@ -36,6 +36,7 @@ export const STORES = [
   'classRules',    // قوانين صفية مرتبطة بالإسناد — بلا واجهة في مرحلة الأساس
   'classGoals',    // هدف صف حالي واحد لكل إسناد
   'classCharterSelections', // اختيار بنود الميثاق المعروضة لكل إسناد
+  'groupArrangements', // ترتيب مجموعات مخصص واحد متزامن لكل إسناد
   'closedTermReports', // حقيقة تقارير فصل مغلق — سجلات مكتملة غير قابلة للتعديل
   'assignments',   // الواجبات — النموذج جاهز، بلا واجهة بعد
   'submissions',   // التسليمات — النموذج جاهز، بلا واجهة بعد

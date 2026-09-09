@@ -10,9 +10,9 @@ import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, tea
 import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
 
 import {
-  now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId,
+  now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
-  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule,
+  makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
@@ -23,7 +23,7 @@ import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID }
 export { sectionLabel };
 
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 /* ---------- الحالة ---------- */
 
@@ -31,7 +31,7 @@ const COLLECTIONS = [
   'years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments',
   'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
-  'notes', 'classRules', 'classGoals', 'classCharterSelections', 'assignments', 'submissions',
+  'notes', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements', 'assignments', 'submissions',
   'closedTermReports',
 ];
 
@@ -262,6 +262,7 @@ export async function init() {
 
   await normalizeSectionLifecycle();
   await ensureFoundation();
+  await migrateLegacyGroupArrangements();
   await migrateLegacyStudentNotes();
 
   applyTheme();
@@ -389,6 +390,39 @@ async function ensureFoundation() {
   }
 
   if (Object.keys(writes).length) await db.putAcross(writes);
+}
+
+/** ينقل ترتيب المجموعات القديم من إعدادات الجهاز مرة واحدة إلى سجل Sync V2. */
+async function migrateLegacyGroupArrangements() {
+  const legacy = state.device?.groupArrangements;
+  if (!legacy || typeof legacy !== 'object' || Array.isArray(legacy)) return;
+  const remaining = { ...legacy };
+  let changed = false;
+  for (const [teachingId, arrangement] of Object.entries(legacy)) {
+    const teaching = getTeaching(teachingId);
+    const existing = groupArrangementOf(teachingId);
+    if (existing) {
+      delete remaining[teachingId];
+      changed = true;
+      continue;
+    }
+    if (!teaching || teaching.deleted) {
+      delete remaining[teachingId];
+      changed = true;
+      continue;
+    }
+    // An archived teaching is read-only. Retain its old local display source,
+    // but never emit a new cloud mutation after archival.
+    if (isTeachingArchived(teaching)) continue;
+    const groups = projectGroupArrangement(teachingId, arrangement);
+    if (!groups.length) continue;
+    const record = makeGroupArrangement({ teachingId, groups });
+    if (await save({ groupArrangements: [record] })) {
+      delete remaining[teachingId];
+      changed = true;
+    }
+  }
+  if (changed) await patchDevice({ groupArrangements: remaining });
 }
 
 /* ---------- الكتابة ---------- */
@@ -544,7 +578,7 @@ function sectionForOperationalRecord(storeName, record, pending = null) {
   if (storeName === 'enrollments') return recordFrom('sections', record.sectionId, pending);
   if (storeName === 'teachings') return recordFrom('sections', record.sectionId, pending);
   let teachingId = record.teachingId ?? null;
-  if (storeName === 'items' || storeName === 'slots' || storeName === 'sessions' || storeName === 'logs' || storeName === 'classRules' || storeName === 'classGoals' || storeName === 'classCharterSelections') {
+  if (storeName === 'items' || storeName === 'slots' || storeName === 'sessions' || storeName === 'logs' || storeName === 'classRules' || storeName === 'classGoals' || storeName === 'classCharterSelections' || storeName === 'groupArrangements') {
     teachingId = record.teachingId;
   } else if (storeName === 'scores') {
     teachingId = recordFrom('items', record.itemId, pending)?.teachingId ?? null;
@@ -622,7 +656,7 @@ const nextEnrollmentOperationOrder = (outbox = []) => {
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'classRules', 'classGoals', 'classCharterSelections',
+  'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance',
 ]);
 
@@ -1098,6 +1132,44 @@ export const students = (tchId) => {
   const tch = getTeaching(tchId);
   return tch ? sectionRoster(tch.sectionId) : [];
 };
+
+export const groupArrangementOf = (tchId) => live(state.groupArrangements)
+  .find((record) => record.teachingId === tchId) ?? null;
+
+/**
+ * يعرض الترتيب على كشف الإسناد الحالي: يحذف المنقول/المزال، يمنع التكرار،
+ * ويلحق الطالب الجديد بأصغر مجموعة. لا يكتب هذا الإسقاط ولا يغيّر الحضور.
+ */
+export function projectGroupArrangement(tchId, arrangement = groupArrangementOf(tchId)?.groups ?? []) {
+  if (!Array.isArray(arrangement) || !arrangement.length) return [];
+  const roster = students(tchId);
+  const eligible = new Set(roster.map((student) => student.id));
+  const seen = new Set();
+  const projected = arrangement.map((group) => (Array.isArray(group) ? group : [])
+    .filter((studentId) => typeof studentId === 'string' && eligible.has(studentId) && !seen.has(studentId) && seen.add(studentId)));
+  for (const student of roster) {
+    if (seen.has(student.id)) continue;
+    const target = projected.reduce(
+      (smallest, group, index) => group.length < projected[smallest].length ? index : smallest,
+      0,
+    );
+    if (projected.length) projected[target].push(student.id);
+  }
+  return projected;
+}
+
+export async function saveGroupArrangement(tchId, arrangement) {
+  const teaching = getTeaching(tchId);
+  if (!teaching) throw new Error('الفصل غير موجود.');
+  if (isTeachingArchived(teaching)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+  const groups = projectGroupArrangement(tchId, arrangement);
+  if (!groups.length) return null;
+  const existing = groupArrangementOf(tchId);
+  if (existing) return patch('groupArrangements', existing.id, { groups });
+  const id = groupArrangementId(tchId);
+  const record = makeGroupArrangement({ id, teachingId: tchId, groups });
+  return (await save({ groupArrangements: [record] })) ? record : null;
+}
 
 export const items = (tchId) =>
   sortByOrder(live(state.items).filter((i) => i.teachingId === tchId));
@@ -2162,6 +2234,7 @@ export function teachingDeleteEvidence(tchId) {
   check('class-rules', state.classRules.filter((row) => row.teachingId === tchId));
   check('class-goal', state.classGoals.filter((row) => row.teachingId === tchId));
   check('class-charter-selection', state.classCharterSelections.filter((row) => row.teachingId === tchId));
+  check('group-arrangement', state.groupArrangements.filter((row) => row.teachingId === tchId));
   check('assignments', assignmentRows);
   check('submissions', state.submissions.filter((row) => assignmentIds.has(row.assignmentId)));
   return [...new Set(evidence)];
@@ -2262,6 +2335,7 @@ export async function deleteTeaching(tchId) {
       classRules: (rule) => rule.teachingId === tchId,
       classGoals: (goal) => goal.teachingId === tchId,
       classCharterSelections: (selection) => selection.teachingId === tchId,
+      groupArrangements: (arrangement) => arrangement.teachingId === tchId,
     },
     { op: 'deleteTeaching', tchId },
     { command: 'delete_teaching', store: 'teachings', targetId: tchId }
@@ -2314,6 +2388,7 @@ export async function deleteClass(secId) {
       classRules: (rule) => teachingIds.has(rule.teachingId),
       classGoals: (goal) => teachingIds.has(goal.teachingId),
       classCharterSelections: (selection) => teachingIds.has(selection.teachingId),
+      groupArrangements: (arrangement) => teachingIds.has(arrangement.teachingId),
       students: (s) => orphanStudentIds.has(s.id),
     },
     { op: 'deleteClass', secId },
