@@ -437,6 +437,35 @@ export async function applySyncV2FillAttendanceCommand(envelope) {
   return request('/rpc/apply_sync_v2_fill_attendance_command', { method: 'POST', headers: { 'Content-Type':'application/json','Accept':'application/json','Accept-Profile':'rakeezx','Content-Profile':'rakeezx' }, body: JSON.stringify({ p_mutation_id:envelope.mutationId,p_device_id:envelope.deviceId,p_session_id:envelope.sessionId,p_status:envelope.status,p_client_updated_at:envelope.clientUpdatedAt ?? null }) });
 }
 
+/** Atomic close/correction command for immutable closed-term report truth. */
+export async function applySyncV2ClosedTermReportCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2ClosedTermReportCommand !== 'function') {
+      throw new Error('Mock backend does not implement closed-term report RPC');
+    }
+    return mockBackend.applySyncV2ClosedTermReportCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_closed_term_report_command', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_mutation_id: envelope.mutationId,
+      p_device_id: envelope.deviceId,
+      p_command: envelope.command,
+      p_term_id: envelope.termId,
+      p_report_id: envelope.reportId,
+      p_supersedes_id: envelope.supersedesId ?? null,
+      p_source_manifest: envelope.sourceManifest,
+      p_payload: envelope.payload,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null,
+    }),
+  });
+}
+
 /**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.

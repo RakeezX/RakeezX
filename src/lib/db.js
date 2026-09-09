@@ -6,7 +6,7 @@
  */
 
 export const DB_NAME = 'rakeezx';
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 
 export const STORES = [
@@ -34,6 +34,7 @@ export const STORES = [
   'lessons',
   'notes',         // ملاحظات مؤرّخة — النموذج جاهز، بلا واجهة بعد
   'classRules',    // قوانين صفية مرتبطة بالإسناد — بلا واجهة في مرحلة الأساس
+  'closedTermReports', // حقيقة تقارير فصل مغلق — سجلات مكتملة غير قابلة للتعديل
   'assignments',   // الواجبات — النموذج جاهز، بلا واجهة بعد
   'submissions',   // التسليمات — النموذج جاهز، بلا واجهة بعد
   'outbox',        // تغييرات تنتظر المزامنة

@@ -38,7 +38,7 @@ const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
   'classRules',
-  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance'
+  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
 ]);
 const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
@@ -180,9 +180,33 @@ function v2PostPullStores(snapshot, full) {
       stores.add('sessions'); stores.add('sessionRosterSnapshots'); stores.add('attendance');
     } else if (entry.command === 'teaching:create') {
       stores.add('teachings'); stores.add('items');
+    } else if (String(entry.command ?? '').startsWith('term-report:')) {
+      stores.add('closedTermReports'); stores.add('terms');
     }
   }
   return [...stores];
+}
+
+/**
+ * A term closure is deliberately online-only: first reach canonical Sync V2
+ * state, then submit one durable idempotent command containing frozen facts.
+ */
+export async function finalizeClosedTermReport(termId, { supersedesId = null } = {}) {
+  if (!cloud.session || !cloud.user) throw new Error('سجّل الدخول قبل إغلاق الفصل الدراسي.');
+  if (!isOnline()) throw new Error('إغلاق الفصل الدراسي يحتاج اتصالًا بالإنترنت.');
+  const prepared = await syncAll({ full: true });
+  const before = await v2Engine.status();
+  if (!prepared || before.state !== 'synced') {
+    throw new Error('أكمل المزامنة وعالج التغييرات المعلقة قبل إغلاق الفصل الدراسي.');
+  }
+  const queued = await store.queueClosedTermReport({ termId, supersedesId });
+  const committed = await syncAll({ full: true });
+  const after = await v2Engine.status();
+  const report = store.closedTermReports(termId).find((candidate) => candidate.id === queued.reportId) ?? null;
+  if (!committed || after.state !== 'synced' || !report) {
+    throw new Error('لم يكتمل تثبيت تقارير الفصل الدراسي. بقي الطلب محفوظًا لإعادة المحاولة.');
+  }
+  return report;
 }
 
 function firstPullError(result) {

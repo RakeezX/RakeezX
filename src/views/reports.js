@@ -20,6 +20,15 @@ const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف 
 const safeName = (value) => String(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
 function identity(cls) {
+  const snapshot = store.latestClosedTermReport(cls.termId);
+  const document = snapshot?.payload?.teachingDocuments?.find((entry) => entry.teaching?.id === cls.id);
+  if (snapshot && document) {
+    const saved = snapshot.payload.identity ?? {};
+    return {
+      profile: saved.profile ?? {}, year: saved.year?.label ?? '', term: saved.term?.name ?? '',
+      section: store.sectionLabel(document.section) ?? '', subject: document.subject?.name ?? '',
+    };
+  }
   const section = store.getSection(cls.sectionId);
   const term = store.getTerm(cls.termId);
   const year = store.getYear(term?.yearId);
@@ -53,7 +62,7 @@ function sortRoster(roster, items, ctx) {
 
 export default {
   title: () => 'التقارير',
-  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
+  subtitle: (p) => store.getTeaching(p.id)?.name ?? store.closedTeachingReport(p.id)?.teaching?.name ?? '',
   back: (p) => `#/teaching/${p.id}`,
   wide: true,
 
@@ -67,9 +76,10 @@ export default {
   },
 
   render(p) {
-    const cls = store.getTeaching(p.id);
+    const historical = store.closedTeachingReport(p.id);
+    const cls = historical?.teaching ?? store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
-    if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">سيظهر في قارئ الأرشيف التاريخي عند اكتمال واجهته.</div></div>`;
+    if (store.isTeachingArchived(cls) && !historical) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">لا توجد له حقيقة تقارير مغلقة مكتملة.</div></div>`;
     const { roster, items, ctx } = store.teachingContext(cls.id);
     const attendance = tab === 'attendance' ? store.attendanceReportContext(cls.id) : null;
     if (!roster.length && tab !== 'attendance') return html`
@@ -207,10 +217,11 @@ export default {
     },
 
     async share(el, ev, params) {
-      const cls = store.getTeaching(params.id);
+      const historical = store.closedTeachingReport(params.id);
+      const cls = historical?.teaching ?? store.getTeaching(params.id);
       const { roster, items, ctx } = store.teachingContext(params.id);
-      const section = store.getSection(cls?.sectionId);
-      const subject = store.getSubject(cls?.subjectId);
+      const section = historical?.section ?? store.getSection(cls?.sectionId);
+      const subject = historical?.subject ?? store.getSubject(cls?.subjectId);
       const secLabel = store.sectionLabel(section) ?? '';
 
       const lines = [
@@ -268,9 +279,10 @@ export default {
     },
 
     csv(el, ev, params) {
-      const cls = store.getTeaching(params.id);
+      const historical = store.closedTeachingReport(params.id);
+      const cls = historical?.teaching ?? store.getTeaching(params.id);
       const { roster, items, ctx } = store.teachingContext(params.id);
-      const safe = safeName(store.sectionLabel(store.getSection(cls?.sectionId)));
+      const safe = safeName(store.sectionLabel(historical?.section ?? store.getSection(cls?.sectionId)));
       if (tab === 'roster') {
         downloadCSV(`طلاب-${safe}.csv`, [['رقم الكشف', 'الطالب'], ...roster.map((s) => [s.rollNo ?? '', s.name])]);
         toast('نُزّل كشف الطلاب'); return;

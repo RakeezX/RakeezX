@@ -669,8 +669,29 @@ export default {
       const data = await termSheet(t, t.yearId);
       if (!data) return;
       // الترتيب جزء من المعرّف، فلا يُعدَّل بعد الإنشاء
-      const { index, ...rest } = data;
-      await store.patch('terms', t.id, rest);
+      const { index, status, ...rest } = data;
+      if (t.status === 'closed') {
+        toast('الفصل الدراسي المغلق محفوظ للقراءة فقط.', 'warn');
+        return;
+      }
+      if (status === 'closed') {
+        const confirmed = await confirmSheet({
+          title: 'إغلاق الفصل الدراسي وتثبيت تقاريره؟',
+          desc: 'يتطلب الإغلاق مزامنة مكتملة واتصالًا بالإنترنت. ستُحفظ حقيقة التقارير الحالية كنسخة ثابتة لا تتغير لاحقًا.',
+          confirmLabel: 'إغلاق وتثبيت التقارير',
+        });
+        if (!confirmed) return;
+        try {
+          const changed = Object.fromEntries(Object.entries(rest).filter(([key, value]) => value !== t[key]));
+          if (Object.keys(changed).length) await store.patch('terms', t.id, changed);
+          await sync.finalizeClosedTermReport(t.id);
+          toast('أُغلق الفصل الدراسي وثُبّتت تقاريره');
+        } catch (error) {
+          toast(error?.message ?? 'تعذّر تثبيت تقارير الفصل الدراسي', 'danger');
+        }
+        return;
+      }
+      await store.patch('terms', t.id, { ...rest, status });
       toast('حُفظ');
     },
   },

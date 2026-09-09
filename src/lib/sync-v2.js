@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 
@@ -126,6 +126,15 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: { studentId: 'student_id', sessionId: 'session_id', teachingId: 'teaching_id', date: 'date', status: 'status', note: 'note' },
     references: { studentId: 'students', sessionId: 'sessions', teachingId: 'teachings' },
   },
+  closedTermReports: {
+    entity: 'closed_term_reports',
+    readOnly: true,
+    fields: {
+      termId: 'term_id', yearId: 'year_id', version: 'version', supersedesId: 'supersedes_id',
+      sourceManifest: 'source_manifest', payload: 'payload', state: 'state', createdAt: 'created_at',
+    },
+    references: { termId: 'terms', yearId: 'years', supersedesId: 'closedTermReports' },
+  },
 });
 
 export const SYNC_V2_STORES = Object.freeze(Object.keys(SYNC_V2_SCHEMAS));
@@ -189,6 +198,10 @@ export function decodeSyncV2Canonical(store, row) {
   }
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
   if (store === 'classRules' && row.created_at) {
+    const createdAt = Date.parse(row.created_at);
+    if (Number.isFinite(createdAt)) record.createdAt = createdAt;
+  }
+  if (store === 'closedTermReports' && row.created_at) {
     const createdAt = Date.parse(row.created_at);
     if (Number.isFinite(createdAt)) record.createdAt = createdAt;
   }
@@ -441,6 +454,7 @@ function defaultTransport() {
     applySectionLifecycleCommand: applySyncV2SectionLifecycleCommand,
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
     applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
+    applyClosedTermReportCommand: applySyncV2ClosedTermReportCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -1092,6 +1106,52 @@ export function createSyncV2Engine({
           const snapshot=decodeSyncV2Canonical('sessionRosterSnapshots',receipt.snapshot); const skippedIds=new Set((receipt.skipped??[]).map((row)=>row?.id)); const rows=[...(receipt.applied??[]),...(receipt.skipped??[])].map((row)=>decodeSyncV2Canonical('attendance',row)).filter(Boolean);
           await database.applyBatch({attendance:{},sessionRosterSnapshots:{},outbox:{}},{prepare:(current)=>({attendance:{put:rows.map((row)=>{const prior=current.attendance.find((x)=>x.id===row.id);const next={...prior,...row,serverCanonical:canonicalSnapshot(row)};return skippedIds.has(row.id)?{...next,bulkDisposition:{mutationId:mutation.mutationId,outcome:'skipped',canonicalRevision:row.serverRevision,recordedAt:now()}}:next;}),remove:[]},sessionRosterSnapshots:{put:snapshot?[{...current.sessionRosterSnapshots.find((x)=>x.id===snapshot.id),...snapshot,serverCanonical:canonicalSnapshot(snapshot)}]:[],remove:[]},outbox:{put:[],remove:[mutation.id]}})}); result.acknowledged++;
         } catch(error){if(isRejectedProtocolError(error))await markRejected(mutation,'protocol-rejected',error);else await markFailure(mutation,error);if(isRejectedProtocolError(error))result.blocked++;else result.failed++;} continue;
+      }
+      if (original.op === 'command' && String(original.command ?? '').startsWith('term-report:') &&
+          typeof transport.applyClosedTermReportCommand === 'function') {
+        const live = (await database.getAll('outbox')).find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, (await database.getAll('outbox')).filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') { await markDependencyBlock(live, readiness.reason); result.blocked++; continue; }
+        if (readiness.state === 'rejected') { await markRejected(live, readiness.reason); result.blocked++; continue; }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = await transport.applyClosedTermReportCommand({
+            mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            command: mutation.command.slice('term-report:'.length),
+            termId: mutation.patch.termId, reportId: mutation.patch.reportId,
+            supersedesId: mutation.patch.supersedesId,
+            sourceManifest: clone(mutation.patch.sourceManifest), payload: clone(mutation.patch.payload),
+            clientUpdatedAt: mutation.clientUpdatedAt,
+          });
+          if (receipt?.mutationId !== mutation.mutationId) throw new Error('Closed-term report receipt mutationId mismatch');
+          if (receipt.outcome === 'rejected_source_changed') {
+            await database.remove('outbox', mutation.id);
+            result.acknowledged++;
+            continue;
+          }
+          const report = decodeSyncV2Canonical('closedTermReports', receipt.report);
+          const term = decodeSyncV2Canonical('terms', receipt.term);
+          if (!report?.id || report.state !== 'complete' || !term?.id) throw new Error('Closed-term report receipt is incomplete');
+          await database.applyBatch({ closedTermReports: {}, terms: {}, outbox: {} }, {
+            prepare(current) {
+              const currentReport = current.closedTermReports.find((row) => row.id === report.id);
+              const currentTerm = current.terms.find((row) => row.id === term.id);
+              return {
+                closedTermReports: { put: [{ ...(currentReport ?? {}), ...report, serverCanonical: canonicalSnapshot(report) }], remove: [] },
+                terms: { put: [{ ...(currentTerm ?? {}), ...term, serverCanonical: canonicalSnapshot(term) }], remove: [] },
+                outbox: { put: [], remove: [mutation.id] },
+              };
+            },
+          });
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+          else await markFailure(mutation, error);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
+        continue;
       }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');

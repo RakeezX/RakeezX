@@ -21,6 +21,7 @@ const ROUTES = [
   { path: '/reports',                   load: () => import('./views/reports-index.js') },
   { path: '/reports/execution',         load: () => import('./views/execution-report.js') },
   { path: '/archive',                  load: () => import('./views/archive.js') },
+  { path: '/archive/year/:yearId/term/:termId/execution', load: () => import('./views/execution-report.js') },
   { path: '/archive/year/:yearId/term/:termId', load: () => import('./views/archive-detail.js') },
   { path: '/calendar',                  load: () => import('./views/calendar.js') },
   { path: '/settings',                  load: () => import('./views/settings.js') },

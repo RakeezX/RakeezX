@@ -10,13 +10,13 @@ import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, tea
 import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
 
 import {
-  now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
+  now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
-  normalizeSearchText, gradeLabel
+  normalizeSearchText, gradeLabel, itemScore, studentTotal
 } from './models.js';
 import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
 
@@ -32,6 +32,7 @@ const COLLECTIONS = [
   'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
   'notes', 'classRules', 'assignments', 'submissions',
+  'closedTermReports',
 ];
 
 export const state = {
@@ -442,7 +443,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
 
 const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
   const schema = SYNC_V2_SCHEMAS[storeName];
-  if (!schema || isLocalOnlyRecord(rec)) return null;
+  if (!schema || schema.readOnly || isLocalOnlyRecord(rec)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
   const localFields = operation === 'create' ? Object.keys(schema.fields) : (fields ?? Object.keys(schema.fields));
   const localPatch = operation === 'delete'
@@ -551,6 +552,15 @@ function sectionForOperationalRecord(storeName, record, pending = null) {
 function assertOperationalWritesAllowed(batch) {
   for (const [storeName, records] of Object.entries(batch ?? {})) {
     for (const record of records ?? []) {
+      if (storeName === 'closedTermReports') {
+        throw new Error('تقارير الفصل المغلق تُنشأ وتُصحح بالأمر الخادمي المخصص فقط.');
+      }
+      if (storeName === 'terms') {
+        const existing = state.terms.find((term) => term.id === record.id);
+        if ((record.status === 'closed' && existing?.status !== 'closed') || existing?.status === 'closed') {
+          throw new Error('إغلاق الفصل الدراسي أو تعديل فصل مغلق يتطلب أمر التقارير المخصص.');
+        }
+      }
       if (storeName === 'sections') {
         const existing = state.sections.find((section) => section.id === record.id);
         const invalidCreate = !existing && ((record.status ?? 'active') !== 'active' || record.archivedAt != null || record.archiveDate != null);
@@ -1432,11 +1442,11 @@ export function attendanceCompleteness(ses, reference = new Date()) {
  * إسقاط تقارير التنفيذ: يربط الحصص المؤرخة بالإسناد الحالي وحالة اكتمال الحضور
  * المشتقة. لا يقرأ وقتًا من خانة الجدول المتكررة، فتظل الحصص التاريخية ثابتة.
  */
-export function executionReport({ yearId = activeYear()?.id, termId = activeTerm()?.id, reference = new Date() } = {}) {
+function liveExecutionReport({ yearId = activeYear()?.id, termId = activeTerm()?.id, reference = new Date(), includeArchived = false } = {}) {
   const scopedTerms = live(state.terms).filter((term) => term.yearId === yearId && (!termId || term.id === termId));
   const termIds = new Set(scopedTerms.map((term) => term.id));
   const scopedTeachings = live(state.teachings).filter((teaching) =>
-    termIds.has(teaching.termId) && !isSectionArchived(teaching.sectionId));
+    termIds.has(teaching.termId) && (includeArchived || !isSectionArchived(teaching.sectionId)));
   const teachingIds = new Set(scopedTeachings.map((teaching) => teaching.id));
   const rows = live(state.sessions)
     .filter((session) => teachingIds.has(session.teachingId))
@@ -1461,6 +1471,13 @@ export function executionReport({ yearId = activeYear()?.id, termId = activeTerm
     students,
     percentage: eligible ? Math.round((counts.completed / eligible) * 100) : null,
   };
+}
+
+export function executionReport(options = {}) {
+  const termId = options.termId ?? activeTerm()?.id;
+  const snapshot = latestClosedTermReport(termId);
+  if (snapshot?.payload?.executionDocument) return structuredClone(snapshot.payload.executionDocument);
+  return liveExecutionReport(options);
 }
 export function attendanceCompletenessFor(tchId, date = todayISO(), reference = new Date()) {
   const sessions = sessionsOnFor(tchId, date);
@@ -1712,7 +1729,7 @@ export function itemCurriculum(item) {
 
 /* ---------- سياق الحساب ---------- */
 
-export function teachingContext(tchId) {
+function liveTeachingContext(tchId) {
   const roster = students(tchId);
   const ids = new Set(roster.map((s) => s.id));
   const attByStudent = groupBy(
@@ -1737,8 +1754,14 @@ export function teachingContext(tchId) {
   return { roster, items: items(tchId), ctx };
 }
 
+export function teachingContext(tchId) {
+  const historical = closedTeachingReport(tchId);
+  if (historical) return structuredClone({ roster: historical.roster, items: historical.items, ctx: historical.contexts });
+  return liveTeachingContext(tchId);
+}
+
 /** كشف الحضور التاريخي: لكل حصة مصدر كشف مستقل، لا كشف الفصل الحالي. */
-export function attendanceReportContext(tchId) {
+function liveAttendanceReportContext(tchId) {
   const sessions = sessionsOf(tchId).slice().reverse();
   const studentsById = new Map();
   const rosterBySession = new Map();
@@ -1755,6 +1778,193 @@ export function attendanceReportContext(tchId) {
     ));
   }
   return { sessions, students: [...studentsById.values()], rosterBySession, attendanceBySession };
+}
+
+export function attendanceReportContext(tchId) {
+  const historical = closedTeachingReport(tchId)?.attendanceDocument;
+  if (!historical) return liveAttendanceReportContext(tchId);
+  return {
+    sessions: structuredClone(historical.sessions),
+    students: structuredClone(historical.students),
+    rosterBySession: new Map(historical.rosters.map((entry) => [entry.sessionId, structuredClone(entry.roster)])),
+    attendanceBySession: new Map(historical.records.map((entry) => [entry.sessionId,
+      new Map(entry.records.map((record) => [record.studentId, structuredClone(record)]))])),
+  };
+}
+
+const CLOSED_TERM_SCHEMA_VERSION = 1;
+
+const frozenRecord = (storeName, record, extras = {}) => {
+  if (!record) return null;
+  const fields = Object.keys(SYNC_V2_SCHEMAS[storeName]?.fields ?? {});
+  return structuredClone(Object.fromEntries([
+    ['id', record.id],
+    ...fields.filter((field) => field !== 'payload' && field !== 'sourceManifest')
+      .filter((field) => Object.prototype.hasOwnProperty.call(record, field))
+      .map((field) => [field, record[field]]),
+    ...Object.entries(extras),
+  ]));
+};
+
+function closedTermSourceRecords(termId) {
+  const term = getTerm(termId);
+  if (!term) throw new Error('الفصل الدراسي غير موجود.');
+  const year = getYear(term.yearId);
+  if (!year) throw new Error('السنة الدراسية غير موجودة.');
+  const teachings = live(state.teachings).filter((record) => record.termId === termId);
+  const teachingIds = new Set(teachings.map((record) => record.id));
+  const sectionIds = new Set(teachings.map((record) => record.sectionId));
+  const subjectIds = new Set(teachings.map((record) => record.subjectId));
+  const items = live(state.items).filter((record) => teachingIds.has(record.teachingId));
+  const itemIds = new Set(items.map((record) => record.id));
+  const sessions = live(state.sessions).filter((record) => teachingIds.has(record.teachingId));
+  const sessionIds = new Set(sessions.map((record) => record.id));
+  const enrollments = live(state.enrollments).filter((record) => sectionIds.has(record.sectionId));
+  const scores = live(state.scores).filter((record) => itemIds.has(record.itemId));
+  const snapshots = live(state.sessionRosterSnapshots).filter((record) => sessionIds.has(record.sessionId));
+  const attendance = live(state.attendance).filter((record) => sessionIds.has(record.sessionId));
+  const logs = live(state.logs).filter((record) => teachingIds.has(record.teachingId));
+  const notes = live(state.notes).filter((record) => teachingIds.has(record.teachingId) || sessionIds.has(record.sessionId));
+  const studentIds = new Set([
+    ...enrollments.map((record) => record.studentId), ...scores.map((record) => record.studentId),
+    ...attendance.map((record) => record.studentId), ...logs.map((record) => record.studentId),
+    ...notes.map((record) => record.studentId),
+    ...snapshots.flatMap((record) => (record.members ?? []).map((member) => member.studentId ?? member.id)),
+  ].filter(Boolean));
+  const records = {
+    profile: [state.profile], years: [year], terms: [term], teachings,
+    sections: live(state.sections).filter((record) => sectionIds.has(record.id)),
+    subjects: live(state.subjects).filter((record) => subjectIds.has(record.id)),
+    students: live(state.students).filter((record) => studentIds.has(record.id)),
+    enrollments, items, scores, sessions, sessionRosterSnapshots: snapshots, attendance, logs, notes,
+  };
+  return records;
+}
+
+export function closedTermSourceManifest(termId) {
+  const records = closedTermSourceRecords(termId);
+  const manifest = [];
+  for (const [storeName, rows] of Object.entries(records)) {
+    const entity = SYNC_V2_SCHEMAS[storeName]?.entity;
+    for (const record of rows) {
+      const revision = Number(record?.serverRevision ?? 0);
+      if (!entity || !record?.id || !Number.isSafeInteger(revision) || revision < 1) {
+        throw new Error('يجب إكمال المزامنة والتحقق من النسخ السحابية قبل إغلاق الفصل الدراسي.');
+      }
+      manifest.push({ entity, id: record.id, revision });
+    }
+  }
+  const lexical = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+  return manifest.sort((left, right) => lexical(left.entity, right.entity) || lexical(left.id, right.id));
+}
+
+function serializeAttendanceDocument(tchId) {
+  const context = liveAttendanceReportContext(tchId);
+  return {
+    sessions: structuredClone(context.sessions),
+    students: structuredClone(context.students),
+    rosters: context.sessions.map((session) => ({ sessionId: session.id, roster: structuredClone(context.rosterBySession.get(session.id)) })),
+    records: context.sessions.map((session) => ({ sessionId: session.id,
+      records: [...(context.attendanceBySession.get(session.id)?.values() ?? [])].map((record) => structuredClone(record)) })),
+  };
+}
+
+/** Build frozen facts with the existing Product report/scoring implementation. */
+export function buildClosedTermReportPayload(termId) {
+  const source = closedTermSourceRecords(termId);
+  const term = source.terms[0];
+  const year = source.years[0];
+  const teachingDocuments = source.teachings
+    .slice().sort((a, b) => String(a.id).localeCompare(String(b.id)))
+    .map((teaching) => {
+      const context = liveTeachingContext(teaching.id);
+      const section = source.sections.find((record) => record.id === teaching.sectionId);
+      const subject = source.subjects.find((record) => record.id === teaching.subjectId);
+      const gradeResults = context.roster.map((student) => ({
+        studentId: student.id,
+        itemResults: context.items.map((item) => ({ itemId: item.id, value: itemScore(item, context.ctx[student.id]) })),
+        total: studentTotal(context.items, context.ctx[student.id]),
+      }));
+      return {
+        teaching: frozenRecord('teachings', teaching),
+        section: frozenRecord('sections', section),
+        subject: frozenRecord('subjects', subject),
+        roster: structuredClone(context.roster),
+        membership: source.enrollments.filter((record) => record.sectionId === teaching.sectionId).map((record) => frozenRecord('enrollments', record)),
+        items: context.items.map((record) => frozenRecord('items', record)),
+        contexts: structuredClone(context.ctx),
+        gradeResults,
+        attendanceDocument: serializeAttendanceDocument(teaching.id),
+        notes: source.notes.filter((record) => record.teachingId === teaching.id ||
+          source.sessions.some((session) => session.teachingId === teaching.id && session.id === record.sessionId))
+          .map((record) => frozenRecord('notes', record)),
+      };
+    });
+  const execution = liveExecutionReport({ yearId: year.id, termId, includeArchived: true });
+  const executionDocument = structuredClone({
+    ...execution,
+    snapshotIdentity: {
+      profile: frozenRecord('profile', state.profile),
+      year: frozenRecord('years', year),
+      term: { ...frozenRecord('terms', term), status: 'closed' },
+    },
+    rows: execution.rows.map((row) => ({ ...row,
+      subject: row.teaching ? frozenRecord('subjects', source.subjects.find((subject) => subject.id === row.teaching.subjectId)) : null })),
+  });
+  return {
+    schemaVersion: CLOSED_TERM_SCHEMA_VERSION,
+    identity: {
+      profile: frozenRecord('profile', state.profile),
+      year: frozenRecord('years', year),
+      term: { ...frozenRecord('terms', term), status: 'closed' },
+    },
+    teachingDocuments,
+    executionDocument,
+  };
+}
+
+export function closedTermReports(termId) {
+  return live(state.closedTermReports).filter((record) => !termId || record.termId === termId)
+    .sort((a, b) => Number(b.version) - Number(a.version) || Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
+}
+
+export const latestClosedTermReport = (termId) => closedTermReports(termId)[0] ?? null;
+
+export function closedTeachingReport(teachingId) {
+  const teaching = getTeaching(teachingId) ?? state.teachings.find((record) => record.id === teachingId);
+  const report = teaching ? latestClosedTermReport(teaching.termId) :
+    live(state.closedTermReports).find((candidate) => candidate.payload?.teachingDocuments?.some((doc) => doc.teaching?.id === teachingId));
+  return report?.payload?.teachingDocuments?.find((document) => document.teaching?.id === teachingId) ?? null;
+}
+
+export function closedTermReportState(termId) {
+  const term = getTerm(termId);
+  const report = latestClosedTermReport(termId);
+  if (report) return { state: 'complete', report, versions: closedTermReports(termId).length };
+  if (term?.status === 'closed') return { state: 'legacy-unresolved', report: null, versions: 0 };
+  return { state: 'open', report: null, versions: 0 };
+}
+
+export async function queueClosedTermReport({ termId, supersedesId = null } = {}) {
+  const term = getTerm(termId);
+  if (!term) throw new Error('الفصل الدراسي غير موجود.');
+  const existing = closedTermReports(termId);
+  if (!supersedesId && existing.length) throw new Error('توجد حقيقة تقارير مغلقة لهذا الفصل بالفعل.');
+  if (supersedesId && existing[0]?.id !== supersedesId) throw new Error('يجب أن يصحح الإصدار الجديد أحدث إصدار محفوظ.');
+  const reportId = closedTermReportId(termId);
+  const stamp = now();
+  const sourceManifest = closedTermSourceManifest(termId);
+  const payload = buildClosedTermReportPayload(termId);
+  const command = syncV2CommandEntry({
+    store: 'closedTermReports', recordId: reportId,
+    command: supersedesId ? 'term-report:correct' : 'term-report:close', stamp,
+    patch: { termId, reportId, supersedesId, sourceManifest, payload },
+    dependencies: [{ store: 'terms', recordId: termId, requiresServerRevision: true }],
+  });
+  await db.put('outbox', command);
+  notify({ render: false });
+  broadcast([{ store: 'outbox', id: command.id }], { render: false });
+  return { reportId, mutationId: command.mutationId };
 }
 
 /** سياق طالب داخل إسناد محدد — لا يخلط إسنادًا بآخر. */

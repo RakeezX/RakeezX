@@ -90,6 +90,7 @@ export const scoreId = (studentId, itemId) => `sc:${studentId}:${itemId}`;
 export const calendarId = (yId, source) => `cal:${yId}:${source}`;
 export const calendarDayId = (calId, date) => `cd:${calId}:${date}`;
 export const submissionId = (studentId, assignmentId) => `sb:${studentId}:${assignmentId}`;
+export const closedTermReportId = (termId) => `ctr:${termId}:${uid()}`;
 
 /** السجلات الحدثية (الرصد السريع والملاحظات) تبقى بمعرّف عشوائي: كل حدث مستقل. */
 
@@ -788,6 +789,21 @@ export const makeClassRule = (o = {}) => ({
   teachingId: o.teachingId,
   iconKey: o.iconKey ?? '',
   text: o.text ?? '',
+  ...o,
+});
+
+/** مجموعة تقارير فصل مغلق. المحتوى الكامل يأتي من أمر الإغلاق الخادمي فقط. */
+export const makeClosedTermReport = (o = {}) => ({
+  ...base(),
+  id: o.id ?? closedTermReportId(o.termId),
+  termId: o.termId,
+  yearId: o.yearId,
+  version: Number(o.version ?? 1),
+  supersedesId: o.supersedesId ?? null,
+  sourceManifest: o.sourceManifest ?? [],
+  payload: o.payload ?? {},
+  state: 'complete',
+  createdAt: o.createdAt ?? now(),
   ...o,
 });
 
