@@ -402,6 +402,21 @@ export async function applySyncV2LifecycleCommand(envelope) {
   });
 }
 
+/** Sync V2 section archive/reopen command transport. */
+export async function applySyncV2SectionLifecycleCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2SectionLifecycleCommand !== 'function') throw new Error('Mock backend does not implement Sync V2 section lifecycle RPC');
+    return mockBackend.applySyncV2SectionLifecycleCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_section_lifecycle_command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+      p_command: envelope.command, p_section_id: envelope.targetId, p_archive_date: envelope.archiveDate,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null }),
+  });
+}
+
 export async function applySyncV2TeachingCreationCommand(envelope) {
   if (mockBackend) {
     if (typeof mockBackend.applySyncV2TeachingCreationCommand !== 'function') throw new Error('Mock backend does not implement Sync V2 teaching command RPC');

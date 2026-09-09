@@ -83,23 +83,25 @@ test('class rules validate, persist offline, queue generic V2 mutations, and pre
   assert.equal(await store.editClassRule(first.id, { text: 'x'.repeat(241) }), null);
 });
 
-test('class-rule tombstones converge with teaching and class lifecycle deletes without orphan live rules', async () => {
+test('class-rule evidence is preserved by archive and blocks destructive teaching/class deletion', async () => {
   await fresh();
   const { section, teaching } = await teachingFixture();
   const rule = await store.addClassRule({ teachingId: teaching.id, iconKey: 'shield', text: 'نحافظ على الأدوات' });
   assert.ok(rule);
 
-  await store.deleteTeaching(teaching.id);
-  assert.equal(store.state.classRules.find((item) => item.id === rule.id)?.deleted, true);
-  assert.equal(store.classRulesOf(teaching.id).length, 0);
+  await assert.rejects(store.deleteTeaching(teaching.id), /بيانات محفوظة/);
+  await assert.rejects(store.deleteClass(section.id), /استخدم الأرشفة/);
+  await store.archiveSection(section.id);
+  assert.equal(store.state.classRules.find((item) => item.id === rule.id)?.deleted, false);
+  assert.equal(store.classRulesOf(teaching.id).length, 1);
 
+  await fresh();
+  const nextSection = await store.createSection({ grade: 6, label: 'م', name: 'فصل آخر' });
   const subject = await store.createSubject({ name: 'المهارات' });
-  const nextTeaching = await store.createTeaching({ sectionId: section.id, subjectId: subject.id });
+  const nextTeaching = await store.createTeaching({ sectionId: nextSection.id, subjectId: subject.id });
   const nextRule = await store.addClassRule({ teachingId: nextTeaching.id, iconKey: 'users', text: 'نتعاون' });
-  await store.deleteClass(section.id);
-  assert.equal(store.state.classRules.find((item) => item.id === nextRule.id)?.deleted, true);
-  const lifecycle = (await db.getAll('outbox')).filter((entry) => entry.command?.startsWith('lifecycle:'));
-  assert.equal(lifecycle.length >= 1, true);
+  await assert.rejects(store.deleteClass(nextSection.id), /استخدم الأرشفة/);
+  assert.equal(store.state.classRules.find((item) => item.id === nextRule.id)?.deleted, false);
 });
 
 test('class rules have a constrained generic V2 wire shape and retain server creation time on bootstrap', () => {

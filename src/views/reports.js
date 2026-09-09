@@ -69,6 +69,7 @@ export default {
   render(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">سيظهر في قارئ الأرشيف التاريخي عند اكتمال واجهته.</div></div>`;
     const { roster, items, ctx } = store.teachingContext(cls.id);
     const attendance = tab === 'attendance' ? store.attendanceReportContext(cls.id) : null;
     if (!roster.length && tab !== 'attendance') return html`

@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 
@@ -48,7 +48,10 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   sections: {
     entity: 'sections',
-    fields: { yearId: 'year_id', grade: 'grade', label: 'label', name: 'name', color: 'color', order: 'order' },
+    fields: {
+      yearId: 'year_id', grade: 'grade', label: 'label', name: 'name', color: 'color', order: 'order',
+      status: 'status', archivedAt: 'archived_at', archiveDate: 'archive_date',
+    },
     references: { yearId: 'years' },
   },
   teachings: {
@@ -178,6 +181,11 @@ export function decodeSyncV2Canonical(store, row) {
   const record = { id: store === 'profile' ? 'profile' : row.id };
   for (const [localField, serverField] of Object.entries(schema.fields)) {
     if (hasOwn(row, serverField)) record[localField] = decodeFieldValue(store, localField, row[serverField], row);
+  }
+  if (store === 'sections') {
+    record.status ??= 'active';
+    record.archivedAt ??= null;
+    record.archiveDate ??= null;
   }
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
   if (store === 'classRules' && row.created_at) {
@@ -430,6 +438,7 @@ function defaultTransport() {
     applyEnrollmentCommand: applySyncV2EnrollmentCommand,
     applyAttendanceCommand: applySyncV2AttendanceCommand,
     applyLifecycleCommand: applySyncV2LifecycleCommand,
+    applySectionLifecycleCommand: applySyncV2SectionLifecycleCommand,
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
     applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
     fetchRecords: (entity) => fetchRecords(entity),
@@ -605,7 +614,7 @@ export function createSyncV2Engine({
   }
 
   async function queueLifecycleCommand({ command, targetId, dependencies = [] }) {
-    if (!['delete_item', 'delete_teaching', 'delete_student', 'delete_class'].includes(command) || !targetId) throw new Error('Invalid Sync V2 lifecycle command');
+    if (!['delete_item', 'delete_teaching', 'delete_student', 'delete_class', 'archive_class', 'reopen_class'].includes(command) || !targetId) throw new Error('Invalid Sync V2 lifecycle command');
     return queueCommand({ store: 'sessions', recordId: `${command}:${targetId}`, command: `lifecycle:${command}`, patch: { targetId }, groups: ['__deleted__'], dependencies });
   }
 
@@ -1028,7 +1037,7 @@ export function createSyncV2Engine({
         continue;
       }
       if (original.op === 'command' && String(original.command ?? '').startsWith('lifecycle:') &&
-          typeof transport.applyLifecycleCommand === 'function') {
+          (typeof transport.applyLifecycleCommand === 'function' || typeof transport.applySectionLifecycleCommand === 'function')) {
         const live = (await database.getAll('outbox')).find((row) => row.id === original.id);
         if (!live) continue;
         const readiness = await dependencyReadiness(live, (await database.getAll('outbox')).filter((row) => row.id !== live.id));
@@ -1037,10 +1046,24 @@ export function createSyncV2Engine({
         const mutation = await markAttempt(live);
         result.attempted++;
         try {
-          const receipt = await transport.applyLifecycleCommand({ mutationId: mutation.mutationId, deviceId: mutation.deviceId,
-            command: mutation.command.slice('lifecycle:'.length), targetId: mutation.patch.targetId, clientUpdatedAt: mutation.clientUpdatedAt });
+          const command = mutation.command.slice('lifecycle:'.length);
+          const sectionLifecycle = ['archive_class', 'reopen_class'].includes(command);
+          const apply = sectionLifecycle && typeof transport.applySectionLifecycleCommand === 'function'
+            ? transport.applySectionLifecycleCommand : transport.applyLifecycleCommand;
+          const receipt = await apply({ mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            command, targetId: mutation.patch.targetId, archiveDate: mutation.patch.archiveDate ?? null,
+            clientUpdatedAt: mutation.clientUpdatedAt });
           if (receipt?.mutationId !== mutation.mutationId) throw new Error('Sync V2 lifecycle receipt mutationId mismatch');
-          await database.applyBatch({ outbox: {} }, { prepare: () => ({ outbox: { put: [], remove: [mutation.id] } }) });
+          const canonicalSection = sectionLifecycle ? decodeSyncV2Canonical('sections', receipt.section) : null;
+          await database.applyBatch(sectionLifecycle ? { sections: {}, outbox: {} } : { outbox: {} }, {
+            prepare: (current) => ({
+              ...(sectionLifecycle ? { sections: {
+                put: canonicalSection ? [{ ...(current.sections.find((row) => row.id === canonicalSection.id) ?? {}),
+                  ...canonicalSection, serverCanonical: canonicalSnapshot(canonicalSection) }] : [], remove: [],
+              } } : {}),
+              outbox: { put: [], remove: [mutation.id] },
+            }),
+          });
           result.acknowledged++;
         } catch (error) {
           if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error); else await markFailure(mutation, error);

@@ -374,9 +374,13 @@ export default {
                   }
                 }
                 if (sec) {
-                  await store.deleteClass(sec.id);
-                  toast('تم حذف الفصل');
-                  repaint();
+                  try {
+                    await store.deleteClass(sec.id);
+                    toast('تم حذف الفصل');
+                    repaint();
+                  } catch (error) {
+                    toast(error.message || 'لا يمكن حذف فصل يحتوي على بيانات محفوظة.', 'warn');
+                  }
                 }
               });
             }

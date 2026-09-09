@@ -69,6 +69,9 @@ export default {
         </div>
       `;
     }
+    if (store.isTeachingArchived(tch)) {
+      return html`<div class="empty"><div class="empty__icon">${icon('archive')}</div><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">بيانات الفصل محفوظة للعرض التاريخي، ولا تتوفر إجراءات تشغيلية قبل إعادة فتحه.</div><a class="btn btn--ghost" href="#/classes">العودة للفصول</a></div>`;
+    }
 
     const { roster, items, ctx } = store.teachingContext(tch.id);
     const today = todayISO();

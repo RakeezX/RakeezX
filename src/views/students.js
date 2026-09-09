@@ -143,6 +143,7 @@ export default {
   render(p) {
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">كشف الطلاب محفوظ للعرض التاريخي ولا يقبل تعديلات تشغيلية.</div></div>`;
     const section = store.getSection(tch.sectionId);
 
     const { roster, items, ctx } = store.teachingContext(tch.id);

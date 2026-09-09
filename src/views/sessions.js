@@ -82,6 +82,7 @@ export default {
   render(p) {
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الحصص السابقة محفوظة، ولا يمكن توليد حصص تشغيلية جديدة.</div></div>`;
 
     const list = store.sessionsOf(tch.id);
     const generator = generationCard(tch);

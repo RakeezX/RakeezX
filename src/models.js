@@ -204,6 +204,8 @@ export const safeColor = (v, fallback = SECTION_COLORS[0]) =>
 
 export const YEAR_STATUS = { active: 'جارية', archived: 'مؤرشفة' };
 
+export const SECTION_STATUS = { active: 'نشط', archived: 'مؤرشف' };
+
 export const TERM_STATUS = { upcoming: 'قادم', active: 'جارٍ', closed: 'منتهٍ' };
 
 export const STUDENT_STATUS = { active: 'مستمر', withdrawn: 'غادر المدرسة' };
@@ -634,6 +636,9 @@ export const makeSection = (o = {}) => ({
   name: o.name ?? `${o.grade ?? 4}/${o.label ?? 'أ'}`,
   color: safeColor(o.color),
   order: o.order ?? 0,
+  status: o.status ?? 'active',
+  archivedAt: o.archivedAt ?? null,
+  archiveDate: o.archiveDate ?? null,
   ...o,
 });
 

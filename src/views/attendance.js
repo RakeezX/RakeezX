@@ -52,13 +52,14 @@ export default {
       const ses = store.getSession(p.session);
       if (ses) date = ses.date;
     }
-    await ensureActive(p.id);
+    if (!store.isTeachingArchived(p.id)) await ensureActive(p.id);
     repaint();
   },
 
   render(p) {
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">سجل الحضور محفوظ للعرض التاريخي، ولا يمكن إضافة رصد جديد.</div></div>`;
 
     const daySessions = store.sessionsOnFor(tch.id, date);
     const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;

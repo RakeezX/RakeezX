@@ -111,6 +111,7 @@ export default {
   render(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">بنود الدرجات محفوظة ولا يمكن تعديلها.</div></div>`;
 
     const items = store.items(cls.id);
     const total = items.reduce((n, i) => n + i.max, 0);

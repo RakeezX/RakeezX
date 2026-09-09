@@ -13,7 +13,7 @@ import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule,
-  defaultItemsFor, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
+  defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
   normalizeSearchText, gradeLabel
@@ -246,7 +246,7 @@ export async function init() {
     state[c] = loaded[i] ?? [];
   });
 
-
+  await normalizeSectionLifecycle();
   await ensureFoundation();
   await migrateLegacyStudentNotes();
 
@@ -255,6 +255,23 @@ export async function init() {
   notify();
   db.persist();
   return state;
+}
+
+/** Forward-compatible local normalization; no outbox entry or timestamp churn. */
+async function normalizeSectionLifecycle() {
+  const changed = [];
+  state.sections = state.sections.map((section) => {
+    if (section.status && 'archivedAt' in section && 'archiveDate' in section) return section;
+    const normalized = {
+      ...section,
+      status: section.status ?? 'active',
+      archivedAt: section.archivedAt ?? null,
+      archiveDate: section.archiveDate ?? null,
+    };
+    changed.push(normalized);
+    return normalized;
+  });
+  if (changed.length) await db.putMany('sections', changed);
 }
 
 /**
@@ -488,11 +505,67 @@ function enrollmentCommandEntry(command, enrollment, { sourceEnrollmentId = null
   });
 }
 
-function lifecycleCommandEntry(command, targetId, storeName, stamp = now()) {
+function lifecycleCommandEntry(command, targetId, storeName, stamp = now(), extraPatch = {}) {
   return syncV2CommandEntry({
     store: storeName, recordId: targetId, command: `lifecycle:${command}`,
-    patch: { targetId }, stamp,
+    patch: { targetId, ...extraPatch }, stamp,
+    dependencies: ['archive_class', 'reopen_class'].includes(command)
+      ? [{ store: storeName, recordId: targetId, requiresServerRevision: true }]
+      : [],
   });
+}
+
+const ARCHIVED_SECTION_WRITE_MESSAGE = 'الفصل مؤرشف ومحمي من التعديل. أعد فتحه بعد التحقق من التعارضات أولًا.';
+
+function recordFrom(storeName, id, pending = null) {
+  if (!id) return null;
+  return pending?.[storeName]?.find((record) => record.id === id) ??
+    (Array.isArray(state[storeName]) ? state[storeName].find((record) => record.id === id) : null) ?? null;
+}
+
+function sectionForOperationalRecord(storeName, record, pending = null) {
+  if (!record || ['sections', 'years', 'terms', 'subjects', 'students', 'profile', 'timeProfiles', 'calendars', 'calendarDays'].includes(storeName)) return null;
+  if (storeName === 'enrollments') return recordFrom('sections', record.sectionId, pending);
+  if (storeName === 'teachings') return recordFrom('sections', record.sectionId, pending);
+  let teachingId = record.teachingId ?? null;
+  if (storeName === 'items' || storeName === 'slots' || storeName === 'sessions' || storeName === 'logs' || storeName === 'classRules') {
+    teachingId = record.teachingId;
+  } else if (storeName === 'scores') {
+    teachingId = recordFrom('items', record.itemId, pending)?.teachingId ?? null;
+  } else if (storeName === 'attendance') {
+    teachingId = record.teachingId ?? recordFrom('sessions', record.sessionId, pending)?.teachingId ?? null;
+  } else if (storeName === 'sessionRosterSnapshots') {
+    return recordFrom('sections', record.sectionId, pending);
+  } else if (storeName === 'notes') {
+    teachingId = record.teachingId ?? recordFrom('sessions', record.sessionId, pending)?.teachingId ?? null;
+  } else if (storeName === 'assignments') {
+    teachingId = record.teachingId ?? null;
+  } else if (storeName === 'submissions') {
+    const assignment = recordFrom('assignments', record.assignmentId, pending);
+    teachingId = assignment?.teachingId ?? null;
+  }
+  const teaching = recordFrom('teachings', teachingId, pending);
+  return teaching ? recordFrom('sections', teaching.sectionId, pending) : null;
+}
+
+function assertOperationalWritesAllowed(batch) {
+  for (const [storeName, records] of Object.entries(batch ?? {})) {
+    for (const record of records ?? []) {
+      if (storeName === 'sections') {
+        const existing = state.sections.find((section) => section.id === record.id);
+        const invalidCreate = !existing && ((record.status ?? 'active') !== 'active' || record.archivedAt != null || record.archiveDate != null);
+        const lifecycleChanged = existing && (
+          (record.status ?? existing.status ?? 'active') !== (existing.status ?? 'active') ||
+          (record.archivedAt ?? null) !== (existing.archivedAt ?? null) ||
+          (record.archiveDate ?? null) !== (existing.archiveDate ?? null)
+        );
+        if (invalidCreate || lifecycleChanged) throw new Error('تغيير حالة أرشفة الفصل يتطلب أمر دورة الحياة المخصص.');
+        if (existing?.status === 'archived') throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+      }
+      const section = sectionForOperationalRecord(storeName, record, batch);
+      if (section?.status === 'archived') throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+    }
+  }
 }
 
 /**
@@ -555,6 +628,7 @@ function revertMemory(storeName, records, undo) {
 
 /** يحفظ سجلات كاملة — للإنشاء والاستيراد الجماعي. للتعديل استعمل patch(). */
 export async function save(batch, options = {}) {
+  if (options.queue !== false) assertOperationalWritesAllowed(batch);
   const writes = {};
   const outbox = [];
   const undos = [];
@@ -775,6 +849,7 @@ export async function patch(storeName, id, changes, create = null, options = {})
   const known = singleton ? state[storeName] : idx >= 0 ? arr[idx] : null;
   const base = known ?? create;
   if (!base) return null;
+  if (options.queue !== false) assertOperationalWritesAllowed({ [storeName]: [{ ...base, ...changes, id }] });
 
   const preserve = options.preserveTimestamp && changes.updatedAt !== undefined;
   const newStamp = preserve ? changes.updatedAt : now();
@@ -844,6 +919,9 @@ export const patchDevice = (changes, options = {}) => patch('device', 'device', 
 
 async function patchManyRecords(storeName, edits, context) {
   if (!edits.length) return true;
+  assertOperationalWritesAllowed({ [storeName]: edits.map(({ id, changes }) => ({
+    ...(state[storeName]?.find((record) => record.id === id) ?? {}), ...changes, id,
+  })) });
   try {
     const updated = await db.patchMany(storeName, edits,
       (rec, fields) => outboxEntry(storeName, rec, fields, 'patch'));
@@ -935,14 +1013,26 @@ export const isTermClosed = (tmId) => {
 export const subjects = () => live(state.subjects).sort((a, b) => compareArabic(a.name, b.name));
 export const getSubject = (id) => state.subjects.find((s) => s.id === id && !s.deleted) ?? null;
 
-export const sections = (yId = activeYear()?.id) =>
-  sortByOrder(live(state.sections).filter((s) => !yId || s.yearId === yId));
+export const isSectionArchived = (sectionOrId) => {
+  const section = typeof sectionOrId === 'string' ? getSection(sectionOrId) : sectionOrId;
+  return section?.status === 'archived';
+};
+
+export const sections = (yId = activeYear()?.id, { includeArchived = false } = {}) =>
+  sortByOrder(live(state.sections).filter((s) => (!yId || s.yearId === yId) && (includeArchived || !isSectionArchived(s))));
+export const archivedSections = (yId = activeYear()?.id) =>
+  sortByOrder(live(state.sections).filter((s) => (!yId || s.yearId === yId) && isSectionArchived(s)));
 export const getSection = (id) => state.sections.find((s) => s.id === id && !s.deleted) ?? null;
 
 /** الإسنادات التدريسية في فصل دراسي — وهي ما يراه المعلّم في «الفصول». */
-export const teachings = (tmId = activeTerm()?.id) =>
-  sortByOrder(live(state.teachings).filter((t) => !tmId || t.termId === tmId));
+export const teachings = (tmId = activeTerm()?.id, { includeArchived = false } = {}) =>
+  sortByOrder(live(state.teachings).filter((t) =>
+    (!tmId || t.termId === tmId) && (includeArchived || !isSectionArchived(t.sectionId))));
 export const getTeaching = (id) => state.teachings.find((t) => t.id === id && !t.deleted) ?? null;
+export const isTeachingArchived = (teachingOrId) => {
+  const teaching = typeof teachingOrId === 'string' ? getTeaching(teachingOrId) : teachingOrId;
+  return !!teaching && isSectionArchived(teaching.sectionId);
+};
 
 /** وصف مقروء للإسناد: «الرابع الابتدائي / أ · المهارات الرقمية». */
 export function teachingLabel(tch) {
@@ -1159,7 +1249,8 @@ export const sessionsOf = (tchId) =>
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.period - b.period));
 
 export const sessionsOn = (date) =>
-  live(state.sessions).filter((s) => s.date === date).sort((a, b) => a.period - b.period);
+  live(state.sessions).filter((s) => s.date === date && !isTeachingArchived(s.teachingId))
+    .sort((a, b) => a.period - b.period);
 
 export const sessionsOnFor = (tchId, date) =>
   live(state.sessions).filter((s) => s.teachingId === tchId && s.date === date)
@@ -1227,6 +1318,8 @@ function applyCommittedPuts(writes) {
 }
 
 async function mutateSnapshotAttendance(sesId, makeRecords, commandKind = 'record') {
+  const knownSession = getSession(sesId);
+  if (knownSession && isTeachingArchived(knownSession.teachingId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const stamp = now();
   let result = { kind: 'missing', records: [] };
   let committed;
@@ -1342,7 +1435,8 @@ export function attendanceCompleteness(ses, reference = new Date()) {
 export function executionReport({ yearId = activeYear()?.id, termId = activeTerm()?.id, reference = new Date() } = {}) {
   const scopedTerms = live(state.terms).filter((term) => term.yearId === yearId && (!termId || term.id === termId));
   const termIds = new Set(scopedTerms.map((term) => term.id));
-  const scopedTeachings = live(state.teachings).filter((teaching) => termIds.has(teaching.termId));
+  const scopedTeachings = live(state.teachings).filter((teaching) =>
+    termIds.has(teaching.termId) && !isSectionArchived(teaching.sectionId));
   const teachingIds = new Set(scopedTeachings.map((teaching) => teaching.id));
   const rows = live(state.sessions)
     .filter((session) => teachingIds.has(session.teachingId))
@@ -1754,6 +1848,7 @@ export async function createSection(data) {
 export async function editSection(id, data) {
   const existing = getSection(id);
   if (!existing) throw new Error('الفصل غير موجود.');
+  if (isSectionArchived(existing)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   
   const duplicate = sections(existing.yearId).find(s =>
     !s.deleted && s.id !== id &&
@@ -1772,6 +1867,7 @@ export async function editSection(id, data) {
 
 /** ينشئ إسنادًا تدريسيًا ومعه بنود التقييم الافتراضية. */
 export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }) {
+  if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const term = tmId ?? activeTerm()?.id;
   const tch = makeTeaching({
     sectionId: secId, subjectId: subId, termId: term,
@@ -1785,8 +1881,119 @@ export async function createTeaching({ sectionId: secId, subjectId: subId, termI
   return tch;
 }
 
+const pristineDefaultItem = (item, expected, index) => !item.deleted &&
+  Number(item.serverRevision ?? 0) <= 1 && Number(item.order) === index &&
+  item.name === expected.name && Number(item.max) === Number(expected.max) &&
+  (item.auto ?? null) === (expected.auto ?? null) &&
+  Number(item.perPoint ?? 1) === Number(expected.perPoint ?? 1) &&
+  Number(item.penalty ?? 1) === Number(expected.penalty ?? 1) &&
+  (item.unitId ?? null) === null && (item.lessonId ?? null) === null;
+
+/** Retained evidence which makes destructive teaching deletion unsafe. */
+export function teachingDeleteEvidence(tchId) {
+  const teaching = state.teachings.find((row) => row.id === tchId);
+  if (!teaching || teaching.deleted) return [];
+  const itemRows = state.items.filter((row) => row.teachingId === tchId);
+  const itemIds = new Set(itemRows.map((row) => row.id));
+  const sessionRows = state.sessions.filter((row) => row.teachingId === tchId);
+  const sessionIds = new Set(sessionRows.map((row) => row.id));
+  const assignmentRows = state.assignments.filter((row) => row.teachingId === tchId);
+  const assignmentIds = new Set(assignmentRows.map((row) => row.id));
+  const evidence = [];
+  const exactDefaults = Number(teaching.serverRevision ?? 0) <= 1 && itemRows.length === DEFAULT_ITEMS.length &&
+    DEFAULT_ITEMS.every((expected, index) => pristineDefaultItem(
+      itemRows.find((row) => Number(row.order) === index), expected, index));
+  if (!exactDefaults) evidence.push('teaching/default-items');
+  const check = (name, rows) => { if (rows.some(Boolean)) evidence.push(name); };
+  check('enrollments', state.enrollments.filter((row) => row.sectionId === teaching.sectionId));
+  check('scores', state.scores.filter((row) => itemIds.has(row.itemId)));
+  check('slots', state.slots.filter((row) => row.teachingId === tchId));
+  check('sessions', sessionRows);
+  check('roster-snapshots', state.sessionRosterSnapshots.filter((row) => sessionIds.has(row.sessionId) || row.teachingId === tchId));
+  check('attendance', state.attendance.filter((row) => sessionIds.has(row.sessionId) || row.teachingId === tchId));
+  check('logs', state.logs.filter((row) => row.teachingId === tchId || sessionIds.has(row.sessionId)));
+  check('notes', state.notes.filter((row) => row.teachingId === tchId || sessionIds.has(row.sessionId)));
+  check('class-rules', state.classRules.filter((row) => row.teachingId === tchId));
+  check('assignments', assignmentRows);
+  check('submissions', state.submissions.filter((row) => assignmentIds.has(row.assignmentId)));
+  return [...new Set(evidence)];
+}
+
+/** Retained evidence which makes destructive class deletion unsafe. */
+export function sectionDeleteEvidence(secId) {
+  const evidence = [];
+  if (state.enrollments.some((row) => row.sectionId === secId)) evidence.push('enrollments');
+  for (const teaching of state.teachings.filter((row) => row.sectionId === secId)) {
+    if (teaching.deleted) evidence.push('teaching-tombstone');
+    evidence.push(...teachingDeleteEvidence(teaching.id));
+  }
+  return [...new Set(evidence)];
+}
+
+const validCivilDate = (value) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? ''));
+  if (!match) return false;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return todayISO(date) === value;
+};
+
+export function validateSectionReopen(secId) {
+  const section = getSection(secId);
+  if (!section || section.status !== 'archived' || !section.archivedAt || !validCivilDate(section.archiveDate)) {
+    return { ok: false, reason: 'lifecycle-inconsistent' };
+  }
+  const year = getYear(section.yearId);
+  if (!year || year.status === 'archived') return { ok: false, reason: 'year-closed' };
+  const openTerms = live(state.terms).filter((term) => term.yearId === year.id && term.status !== 'closed');
+  if (!openTerms.length) return { ok: false, reason: 'term-closed' };
+  const archivedTeachingIds = new Set(live(state.teachings).filter((teaching) => teaching.sectionId === secId).map((teaching) => teaching.id));
+  const activeTeachingIds = new Set(live(state.teachings).filter((teaching) =>
+    teaching.sectionId !== secId && !isSectionArchived(teaching.sectionId)).map((teaching) => teaching.id));
+  const activeSlots = live(state.slots).filter((slot) => activeTeachingIds.has(slot.teachingId));
+  const conflict = live(state.slots).find((slot) => archivedTeachingIds.has(slot.teachingId) &&
+    activeSlots.some((other) => slot.weekday === other.weekday && slot.period === other.period));
+  return conflict ? { ok: false, reason: 'slot-conflict', slotId: conflict.id } : { ok: true };
+}
+
+/** Archive is immediate locally and durable offline; no child record is touched. */
+export async function archiveSection(secId, archiveDate = todayISO()) {
+  const section = getSection(secId);
+  if (!section) throw new Error('الفصل غير موجود.');
+  if (!validCivilDate(archiveDate)) throw new Error('تاريخ الأرشفة غير صالح.');
+  if (section.status === 'archived') return section;
+  const stamp = now();
+  const archived = syncV2Record('sections', { ...section, status: 'archived', archivedAt: new Date(stamp).toISOString(), archiveDate, updatedAt: stamp });
+  const command = lifecycleCommandEntry('archive_class', secId, 'sections', stamp, { archiveDate });
+  await db.applyBatch({ sections: {}, outbox: {} }, { prepare: () => ({
+    sections: { put: [archived], remove: [] },
+    outbox: { put: command ? [command] : [], remove: [] },
+  }) });
+  applyToMemory('sections', [archived]);
+  notify();
+  broadcast([{ store: 'sections', id: secId }]);
+  return archived;
+}
+
+/** Reopen remains read-only locally until the server repeats the validation. */
+export async function reopenSection(secId) {
+  const validation = validateSectionReopen(secId);
+  if (!validation.ok) return validation;
+  const stamp = now();
+  const command = lifecycleCommandEntry('reopen_class', secId, 'sections', stamp);
+  if (!command) return { ok: false, reason: 'local-only' };
+  let queued = false;
+  await db.applyBatch({ outbox: {} }, { prepare: (current) => {
+    const existing = current.outbox.some((row) => row.command === 'lifecycle:reopen_class' && row.patch?.targetId === secId && !['rejected', 'conflict'].includes(row.state));
+    queued = !existing;
+    return { outbox: { put: existing ? [] : [command], remove: [] } };
+  } });
+  return { ok: true, status: queued ? 'pending-server-validation' : 'already-pending' };
+}
+
 /** حذف إسناد: يحذف بنوده ودرجاته وحصصه — **ولا يمس الطلاب ولا الشعبة**. */
 export async function deleteTeaching(tchId) {
+  const evidence = teachingDeleteEvidence(tchId);
+  if (evidence.length) throw new Error('لا يمكن حذف الإسناد لأنه يحتوي على بيانات محفوظة. استخدم أرشفة الفصل.');
   const itemIds = new Set(state.items.filter((i) => i.teachingId === tchId).map((i) => i.id));
   const sessionIds = new Set(state.sessions.filter((s) => s.teachingId === tchId).map((s) => s.id));
   return cascadeDelete(
@@ -1811,6 +2018,8 @@ export async function deleteTeaching(tchId) {
  * عندما تكون له علاقة مستقلة محفوظة خارج الفصل المحذوف.
  */
 export async function deleteClass(secId) {
+  const evidence = sectionDeleteEvidence(secId);
+  if (evidence.length) throw new Error('لا يمكن حذف الفصل لأنه يحتوي على بيانات محفوظة. استخدم الأرشفة بدلًا من الحذف.');
   const sectionTeachings = live(state.teachings).filter((t) => t.sectionId === secId);
   const teachingIds = new Set(sectionTeachings.map((t) => t.id));
   const itemIds = new Set(live(state.items).filter((i) => teachingIds.has(i.teachingId)).map((i) => i.id));
@@ -2109,7 +2318,7 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
           result = { ok: false, status: 'student-missing' };
           return {};
         }
-        if (!destinationSection) {
+        if (!destinationSection || destinationSection.status === 'archived') {
           result = { ok: false, status: 'destination-missing' };
           return {};
         }
@@ -2135,6 +2344,11 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
         }
 
         const source = active[0];
+        const sourceSection = current.sections.find((row) => row.id === source.sectionId && !row.deleted);
+        if (!sourceSection || sourceSection.status === 'archived') {
+          result = { ok: false, status: 'source-unavailable' };
+          return {};
+        }
         // This number is private to the in-memory plan. It is replaced by the
         // final sequential destination roster before the IndexedDB transaction
         // commits, so a returned student's old number cannot collide locally.
@@ -2221,6 +2435,7 @@ export async function withdrawStudent(studentId, { date = todayISO(), note = '' 
   const enrollment = activeEnrollment(studentId);
   const student = getStudent(studentId);
   if (!enrollment || !student) return null;
+  if (isSectionArchived(enrollment.sectionId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const stamp = now();
   const nextEnrollment = syncV2Record('enrollments', {
     ...enrollment, status: 'withdrawn', endDate: date, transferNote: note, updatedAt: stamp,
@@ -2379,6 +2594,7 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
   // يُطبع وقت الحصة فيها الآن من الملف النشط. تغيير الملف لاحقًا لا يمسّها.
   const profile = activeTimeProfile();
   const tch = getTeaching(tchId);
+  if (tch && isTeachingArchived(tch)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const sec = tch ? getSection(tch.sectionId) : null;
   const t = timeFor(weekday(date), period, profile, sec?.grade, date);
   const slot = live(state.slots).find(
@@ -2458,6 +2674,7 @@ export function projectedSessionsForDate(date, { term = activeTerm() } = {}) {
 export async function generateSessionsForRange(tchId, startDate, endDate) {
   const teaching = getTeaching(tchId);
   if (!teaching) throw new Error('الفصل غير موجود.');
+  if (isTeachingArchived(teaching)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const term = getTerm(teaching.termId);
   const year = term ? getYear(term.yearId) : null;
   if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
@@ -2616,6 +2833,7 @@ export async function fillAttendance(sesId, status = 'present') {
 /* ---------- عمليات: الجدول والتقويم ---------- */
 
 export async function addSlot(tchId, weekday, period, times = {}) {
+  if (isTeachingArchived(tchId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const existing = allSlots().find(s => s.weekday === weekday && s.period === period);
   if (existing) {
     throw new Error('لديك حصة مسجلة بالفعل في هذا الوقت.');
@@ -2631,6 +2849,7 @@ export async function addSlot(tchId, weekday, period, times = {}) {
 export async function editSlot(slotId, data) {
   const existingSlot = getSlot(slotId);
   if (!existingSlot) throw new Error('الحصة غير موجودة');
+  if (isTeachingArchived(existingSlot.teachingId) || isTeachingArchived(data.teachingId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
 
   // Check for conflicts
   const conflict = allSlots().find(s => s.id !== slotId && s.weekday === Number(data.weekday) && s.period === Number(data.period));

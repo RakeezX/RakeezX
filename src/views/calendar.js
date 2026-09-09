@@ -120,7 +120,7 @@ export function getAffectedSchedule(startDate, endDate) {
   if (!schoolDays.length) return [];
 
   const activeTeachings = (store.state.teachings ?? []).filter(
-    (t) => !t.deleted && termIds.has(t.termId)
+    (t) => !t.deleted && termIds.has(t.termId) && !store.isTeachingArchived(t)
   );
   const teachingMap = new Map(activeTeachings.map((t) => [t.id, t]));
 
