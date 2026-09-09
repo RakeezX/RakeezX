@@ -640,7 +640,6 @@
 .today-focus.is-pending::before,
 .today-focus.is-pending .today-focus__signal i { background: var(--warn); }
 .today-focus.is-pending .today-focus__signal span { color: color-mix(in srgb, var(--warn) 80%, var(--text)); }
-.today-focus.is-upcoming .today-focus__action { background: var(--info); color: #fff; }
 @media (max-width: 520px) {
   .home-onboarding,
   .today-focus { grid-template-columns: auto minmax(0, 1fr); padding: var(--sp-4) var(--sp-3); }
