@@ -76,6 +76,115 @@ const soon = (title, text) => html`
   </div>
 `;
 
+const CANCELLED_SESSION_STATUSES = new Set(['cancelled', 'cancelled_holiday']);
+
+function timeToMinutes(value) {
+  const match = /^(\d{1,2}):(\d{2})/.exec(String(value ?? ''));
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+/**
+ * The Home priority is intentionally narrow: active lesson, nearest future
+ * lesson, then the latest past lesson whose attendance remains pending.
+ */
+export function selectTodayFocus(sessions, {
+  now = new Date(),
+  attendanceState = () => 'pending',
+} = {}) {
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  const eligible = (sessions ?? []).filter((session) => !CANCELLED_SESSION_STATUSES.has(session.status));
+  const withTimes = eligible.map((session) => ({
+    session,
+    start: timeToMinutes(session.startTime),
+    end: timeToMinutes(session.endTime),
+  }));
+
+  const current = withTimes
+    .filter((item) => item.start !== null && item.end !== null && item.start <= minutesNow && minutesNow < item.end)
+    .sort((a, b) => a.start - b.start)[0];
+  if (current) return { kind: 'current', session: current.session };
+
+  const upcoming = withTimes
+    .filter((item) => item.start !== null && item.start > minutesNow)
+    .sort((a, b) => a.start - b.start)[0];
+  if (upcoming) return { kind: 'upcoming', session: upcoming.session };
+
+  const pastPending = withTimes
+    .filter((item) => item.end !== null && item.end <= minutesNow && attendanceState(item.session) === 'pending')
+    .sort((a, b) => b.end - a.end)[0];
+  return pastPending ? { kind: 'past-pending', session: pastPending.session } : null;
+}
+
+export function homeOnboardingState(teachings, {
+  studentsFor = () => [],
+  slotsFor = () => [],
+} = {}) {
+  const activeTeachings = (teachings ?? []).filter(Boolean);
+  if (!activeTeachings.length) return { state: 'A', teaching: null };
+  const teachingWithStudents = activeTeachings.find((teaching) => studentsFor(teaching.id).length > 0);
+  if (!teachingWithStudents) return { state: 'B', teaching: activeTeachings[0] };
+  const teachingWithSchedule = activeTeachings.find((teaching) => slotsFor(teaching.id).length > 0);
+  if (!teachingWithSchedule) return { state: 'C', teaching: teachingWithStudents };
+  return { state: 'D', teaching: teachingWithSchedule };
+}
+
+function renderOnboarding(onboarding) {
+  if (onboarding.state === 'D') return '';
+  const content = {
+    A: {
+      kicker: 'خطوتك الأولى', title: 'أنشئ فصلك الأول',
+      text: 'ابدأ بفصل واحد، ثم أضف طلابه ومواعيد حصصه عندما تكون جاهزًا.',
+      action: 'إنشاء أول فصل', href: '#/classes', iconName: 'classes',
+    },
+    B: {
+      kicker: 'الخطوة التالية', title: 'أضف طلابك',
+      text: 'أضف أسماء طلاب الفصل لتصبح الحضور والمتابعة جاهزة للعمل.',
+      action: 'إضافة الطلاب', href: `#/teaching/${onboarding.teaching?.id ?? ''}/students`, iconName: 'classes',
+    },
+    C: {
+      kicker: 'الخطوة التالية', title: 'حدّد جدولك الأسبوعي',
+      text: 'أضف مواعيد حصصك الأسبوعية لتظهر حصص يومك تلقائيًا وفق الجدول المعتمد.',
+      action: 'إعداد الجدول', href: '#/schedule', iconName: 'timetable',
+    },
+  }[onboarding.state];
+  return html`
+    <section class="home-onboarding" aria-label="بدء إعداد سجل المعلّم">
+      <span class="home-onboarding__mark" aria-hidden="true">${icon(content.iconName)}</span>
+      <div class="home-onboarding__copy">
+        <span class="home-onboarding__kicker">${content.kicker}</span>
+        <h2>${content.title}</h2>
+        <p>${content.text}</p>
+      </div>
+      <a class="btn btn--primary home-onboarding__action" href="${content.href}">${content.action} ${icon('back')}</a>
+    </section>
+  `;
+}
+
+function renderTodayFocus(focus) {
+  if (!focus) return '';
+  const { session, kind } = focus;
+  const teaching = store.getTeaching(session.teachingId);
+  const content = {
+    current: { eyebrow: 'الآن', title: 'حصتك الحالية', detail: 'الحصة جارية الآن', tone: 'is-current' },
+    upcoming: { eyebrow: 'بعد قليل', title: 'الحصة التالية', detail: session.startTime ? `تبدأ ${fmtTimeRange(session.startTime, session.endTime)}` : 'موعد الحصة التالي', tone: 'is-upcoming' },
+    'past-pending': { eyebrow: 'يتطلب انتباهك', title: 'رصد حضور معلّق', detail: 'انتهت الحصة ولم يُرصد الحضور بعد.', tone: 'is-pending' },
+  }[kind];
+  return html`
+    <section class="today-focus ${content.tone}" aria-label="تركيز اليوم">
+      <div class="today-focus__signal"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
+      <div class="today-focus__main">
+        <div class="today-focus__title">${content.title}</div>
+        <div class="today-focus__class">${store.teachingLabel(teaching)}</div>
+        <div class="today-focus__detail">${content.detail}</div>
+      </div>
+      <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}">
+        ${icon('attendance')} رصد الحضور
+      </a>
+    </section>
+  `;
+}
+
 export default {
   title: () => 'الرئيسية',
   subtitle: () => {
@@ -89,8 +198,18 @@ export default {
     const meta = store.state.profile ?? {};
     const list = store.teachings();
     const daySessions = store.sessionsOn(today);
+    const onboarding = homeOnboardingState(list, {
+      studentsFor: (teachingId) => store.students(teachingId),
+      slotsFor: (teachingId) => store.slotsOf(teachingId),
+    });
+    const focus = onboarding.state === 'D'
+      ? selectTodayFocus(daySessions, { attendanceState: (session) => store.attendanceCompleteness(session).state })
+      : null;
+    const remainingSessions = focus ? daySessions.filter((session) => session.id !== focus.session.id) : daySessions;
     const cal = store.calendarDayFor(today);
-    const pendingToday = daySessions.filter((session) => store.attendanceCompleteness(session).state === 'pending').length;
+    const pendingToday = remainingSessions.filter((session) =>
+      !CANCELLED_SESSION_STATUSES.has(session.status) && store.attendanceCompleteness(session).state === 'pending'
+    ).length;
     const baseTimingProfile = store.activeTimeProfile();
     const timingProfile = store.resolveProfile(baseTimingProfile, today)?.name ?? 'التوقيت المعتمد';
 
@@ -116,6 +235,8 @@ export default {
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>
+
+      ${renderOnboarding(onboarding)}
 
       <!-- إشعار تثبيت التطبيق السياقي (مؤقت وغير مسيطر) -->
       ${showInstallPrompt
@@ -150,17 +271,19 @@ export default {
           `
         : ''}
 
+      ${renderTodayFocus(focus)}
+
       <!-- حصص اليوم -->
-      <div class="section">
+      ${onboarding.state !== 'A' ? html`<div class="section home-sessions">
         <div class="section__head">
-          <div class="section__title">حصص اليوم</div>
+          <div class="section__title">${focus ? 'بقية حصص اليوم' : 'حصص اليوم'}</div>
           ${pendingToday ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${pendingToday}</span></span>` : ''}
           <a class="btn btn--sm btn--quiet push" href="#/schedule">الجدول ${icon('back')}</a>
         </div>
-        ${daySessions.length
+        ${remainingSessions.length
           ? html`
               <div class="list">
-                ${daySessions.map((s) => {
+                ${remainingSessions.map((s) => {
                   const tch = store.getTeaching(s.teachingId);
                   const meta = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
                   const completeness = store.attendanceCompleteness(s);
@@ -200,8 +323,8 @@ export default {
               </div>
             `
           : html`
-              <div class="card card--pad center">
-                <div class="t-3 fs-md">لا حصص مجدولة اليوم.</div>
+              <div class="home-sessions__empty">
+                <div class="t-3 fs-md">لا حصص أخرى مجدولة اليوم.</div>
                 <p class="t-3 fs-sm mt-3">
                   أضف حصصك الأسبوعية في «الجدول» لتظهر هنا تلقائيًا كل يوم.
                 </p>
@@ -210,7 +333,7 @@ export default {
                 </a>
               </div>
             `}
-      </div>
+      </div>` : ''}
 
       <!-- اختصارات سريعة -->
       <div class="section">

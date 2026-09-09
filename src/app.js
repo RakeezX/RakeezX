@@ -27,6 +27,8 @@ let view = null;
 let ctx = null;
 let mainEl = null;
 let syncModule = null;
+let teacherMiniHubSheet = null;
+let teacherMiniHubAuthPending = null;
 const scrollMemory = new Map();
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
@@ -88,133 +90,124 @@ function renderSidebarMiniHubTrigger() {
   `;
 }
 
-function openTeacherMiniHubSheet() {
+function renderTeacherMiniHubBody() {
   const profile = store.state.profile ?? {};
-  const device = store.state.device ?? {};
   const teacherName = profile.teacherName || 'المعلّم';
   const schoolName = profile.schoolName || '';
-  const year = store.activeYear();
-  const term = store.activeTerm();
-  const currentTheme = device.theme ?? 'auto';
   const syncInfo = getSyncState();
   const isInstalled = isStandaloneMode();
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
   const isLoggedIn = !!(cloud.session && cloud.user);
+  const authPending = teacherMiniHubAuthPending;
   const lastSynced = syncModule?.state?.lastSyncedAt;
   const lastSyncText = lastSynced ? new Date(lastSynced).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : null;
 
-  return openSheet({
-    title: 'مركز تحكم المعلّم',
-    body: html`
+  return html`
       <div class="mini-hub-sheet">
-        <!-- 1. الهوية والسياق الأكاديمي -->
-        <div class="mini-hub-card mini-hub-card--identity">
-          <div class="hstack gap-3 align-center">
+        <section class="mini-hub-surface" aria-label="مركز المعلّم">
+          <div class="mini-hub-identity">
             <div class="mini-hub-avatar" aria-hidden="true">${teacherInitials(teacherName)}</div>
             <div class="flex-1 min-w-0">
+              <div class="mini-hub-eyebrow">مركز المعلّم</div>
               <div class="mini-hub-name">${teacherName}</div>
               <div class="mini-hub-school t-3 fs-xs">${schoolName || (isLoggedIn ? 'حساب متصل' : 'سجل معلّم محلي')}</div>
             </div>
           </div>
-          <div class="mini-hub-context mt-3 pt-2">
-            <div class="hstack justify-between fs-xs t-2 wrap gap-2">
-              <span>السنة: <strong>${year?.label || '—'}</strong></span>
-              <span>الفصل: <strong>${term?.name || '—'}</strong></span>
-            </div>
-          </div>
-        </div>
 
-        <!-- 2. الحساب -->
-        <div class="mini-hub-card mini-hub-account">
+          <div class="mini-hub-account mini-hub-section">
           <div class="mini-hub-account__row">
             <div class="mini-hub-account__info">
               <div class="mini-hub-account__title">الحساب</div>
-              ${isLoggedIn
+              ${authPending === 'logout'
+                ? html`<div class="mini-hub-account__status">جارٍ تسجيل الخروج...</div>`
+                : isLoggedIn
                 ? html`<div class="mini-hub-account__status truncate" dir="ltr">${cloud.user.email}</div>`
-                : html`<div class="mini-hub-account__status">غير مسجل الدخول</div>`}
+                : html`<div class="mini-hub-account__status">${authPending === 'login' ? 'جارٍ تسجيل الدخول...' : 'غير مسجل الدخول'}</div>`}
             </div>
             <div class="mini-hub-account__action">
-              ${isLoggedIn
+              ${authPending
+                ? html`<button type="button" class="btn btn--xs btn--quiet" disabled>${authPending === 'logout' ? 'جارٍ تسجيل الخروج...' : 'جارٍ الاتصال...'}</button>`
+                : isLoggedIn
                 ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="mini-hub-logout">تسجيل الخروج</button>`
                 : html`<button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button>`}
             </div>
           </div>
-        </div>
+          </div>
 
-        <!-- 3. المزامنة -->
-        <div class="mini-hub-card">
-          <div class="hstack justify-between align-center mb-2">
-            <div class="fw-7 fs-sm hstack gap-2 align-center">
-              <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
-              <span>المزامنة</span>
+          <div class="mini-hub-sync mini-hub-section" aria-live="polite">
+            <div class="mini-hub-section__head">
+              <div class="mini-hub-sync__state">
+                <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
+                <span class="fw-7 fs-sm">المزامنة</span>
+                <span class="badge ${syncInfo.badge}" data-sync-label data-sync-badge>${syncInfo.text}</span>
+              </div>
             </div>
-            <span class="badge ${syncInfo.badge}" data-sync-label data-sync-badge>${syncInfo.text}</span>
-          </div>
-          <p class="t-3 fs-xs mb-2" data-sync-description>
-            ${syncInfo.label}
-          </p>
-          <div class="t-3 fs-xs mb-3">آخر مزامنة ناجحة: <span dir="ltr" data-sync-time>${lastSyncText || '—'}</span></div>
-          <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-sync-now" data-sync-action ${syncInfo.status === 'syncing' ? 'disabled' : ''}>
-            ${icon('refresh')} <span data-sync-action-label>مزامنة الآن</span>
-          </button>
-        </div>
-
-        <!-- 4. المظهر -->
-        <div class="mini-hub-card">
-          <div class="fw-7 fs-sm mb-2">المظهر</div>
-          <div class="segmented segmented--sm">
-            <button class="segmented__btn ${currentTheme === 'auto' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="auto">
-              ${icon('settings')} تلقائي
-            </button>
-            <button class="segmented__btn ${currentTheme === 'light' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="light">
-              ${icon('sun')} فاتح
-            </button>
-            <button class="segmented__btn ${currentTheme === 'dark' ? 'is-on' : ''}" data-act="mini-hub-theme" data-theme="dark">
-              ${icon('moon')} داكن
+            <div class="mini-hub-sync__meta t-3 fs-xs">
+              <span data-sync-description>${syncInfo.label}</span>
+              <span>آخر تحديث <b dir="ltr" data-sync-time>${lastSyncText || '—'}</b></span>
+            </div>
+            <button class="btn btn--sm btn--quiet mini-hub-sync__action" data-act="mini-hub-sync-now" data-sync-action ${syncInfo.status === 'syncing' ? 'disabled' : ''}>
+              ${icon('refresh')} <span data-sync-action-label>تحديث</span>
             </button>
           </div>
-        </div>
 
-        <!-- 5. تثبيت التطبيق PWA -->
-        <div class="mini-hub-card">
-          <div class="fw-7 fs-sm mb-1">تطبيق رَكيز X</div>
+          <div class="mini-hub-pwa mini-hub-section">
+            <div class="mini-hub-pwa__copy">
+              <div class="fw-7 fs-sm">تطبيق رَكيز X</div>
           ${isInstalled
             ? html`
-                <div class="mini-hub-installed mt-2">
+                <div class="mini-hub-installed">
                   <span class="mini-hub-installed__icon" aria-hidden="true">${icon('check')}</span>
                   <span class="mini-hub-installed__text">مثبت على هذا الجهاز</span>
                 </div>
               `
             : hasInstallPrompt
             ? html`
-                <p class="t-3 fs-xs mb-2">ثبّت التطبيق لفتحه مباشرة من الشاشة الرئيسية والعمل دون إنترنت.</p>
-                <button class="btn btn--sm btn--primary btn--block" data-act="mini-hub-pwa-install">
-                  ${icon('download')} تثبيت تطبيق رَكيز X
-                </button>
+                <span class="t-3 fs-xs">متاح للتثبيت</span>
               `
             : html`
-                <p class="t-3 fs-xs mb-2">يمكنك تثبيت رَكيز كتطبيق مستقل على هاتفك أو حاسبك.</p>
-                <button class="btn btn--sm btn--ghost btn--block" data-act="mini-hub-pwa-guide">
-                  ${icon('download')} إرشادات تثبيت التطبيق
-                </button>
+                <span class="t-3 fs-xs">ثبّته للوصول السريع</span>
               `}
-        </div>
+            </div>
+            ${!isInstalled ? html`
+              <button class="btn btn--xs btn--ghost" data-act="${hasInstallPrompt ? 'mini-hub-pwa-install' : 'mini-hub-pwa-guide'}">
+                ${icon('download')} ${hasInstallPrompt ? 'تثبيت' : 'إرشادات'}
+              </button>
+            ` : ''}
+          </div>
 
-        <!-- 6. رابط الإعدادات -->
-        <a class="btn btn--ghost btn--block mt-1" href="#/settings" data-sheet-close>
-          ${icon('settings')} الانتقال إلى كافة الإعدادات
-        </a>
+          <a class="mini-hub-settings-link" href="#/settings" data-sheet-close>
+            <span class="mini-hub-settings-link__icon" aria-hidden="true">${icon('settings')}</span>
+            <span class="mini-hub-settings-link__copy"><b>الإعدادات</b><small>تخصيص التطبيق وإدارة البيانات</small></span>
+            <span class="mini-hub-settings-link__chev" aria-hidden="true">${icon('chev')}</span>
+          </a>
+        </section>
       </div>
-    `,
-  });
+    `;
 }
 
-// Login is opened above the Hub. After an auth transition, replace that
-// underlying Hub rather than stacking a refreshed copy above it.
-function replaceTeacherMiniHubAfterAuthTransition() {
-  closeSheet();
-  scheduleRender();
-  return openTeacherMiniHubSheet();
+function refreshTeacherMiniHubSheet({ focusAccountAction = false } = {}) {
+  if (!teacherMiniHubSheet?.isConnected) return false;
+  const body = teacherMiniHubSheet.querySelector('.sheet__body');
+  if (!body) return false;
+  render(body, renderTeacherMiniHubBody());
+  if (focusAccountAction) {
+    teacherMiniHubSheet.querySelector('.mini-hub-account__action button')?.focus({ preventScroll: true });
+  }
+  return true;
+}
+
+function openTeacherMiniHubSheet() {
+  if (refreshTeacherMiniHubSheet()) return Promise.resolve();
+  const sheet = openSheet({
+    title: 'مركز المعلّم',
+    body: renderTeacherMiniHubBody(),
+    onMount: (root) => { teacherMiniHubSheet = root; },
+  });
+  sheet.finally(() => {
+    if (teacherMiniHubSheet?.isConnected === false) teacherMiniHubSheet = null;
+  });
+  return sheet;
 }
 
 /* ---------- التنقل الرئيسي ---------- */
@@ -224,7 +217,7 @@ const NAV = [
   { href: '#/classes',   icon: 'classes',   label: 'الفصول',          primary: true },
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
-  { href: '#/calendar',  icon: 'calendar',  label: 'التقويم الدراسي' },
+  { href: '#/calendar',  icon: 'calendar',  label: 'التقويم',          primary: true },
   { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
 ];
 
@@ -279,34 +272,12 @@ function shell(path, params) {
       </main>
       <nav class="tabbar" data-nav-scope="primary" aria-label="التنقل الرئيسي">
         ${bottom.map((it) => navLink(it, path, 'tabbar'))}
-        <button class="tabbar__item" data-act="more-nav">${icon('more')}<span>المزيد</span></button>
       </nav>
     </div>
   `;
 }
 
 /** بقية عناصر التنقل على الجوال — حتى لا يزدحم الشريط السفلي. */
-function moreNavSheet() {
-  const rest = NAV.filter((n) => !n.primary);
-
-  return openSheet({
-    title: 'المزيد',
-    body: html`
-      <div class="list">
-        ${rest.map(
-          (it) => html`
-            <a class="row" href="${it.href}" data-sheet-close>
-              <span class="row__icon">${icon(it.icon)}</span>
-              <span class="row__main"><span class="row__title">${it.label}</span></span>
-              <span class="row__end">${icon('chev')}</span>
-            </a>
-          `
-        )}
-      </div>
-    `,
-  });
-}
-
 /* ---------- الشريط العلوي ---------- */
 
 function topbar(v, params) {
@@ -541,7 +512,10 @@ async function boot() {
   store.subscribe((_state, update) => {
     if (update?.render !== false) scheduleRender();
   });
-  cloud.subscribe(scheduleRender);
+  cloud.subscribe(() => {
+    scheduleRender();
+    refreshTeacherMiniHubSheet();
+  });
   if (syncModule) {
     syncModule.subscribe(paintSyncStatus);
   }
@@ -557,7 +531,9 @@ async function boot() {
 }
 
 function openMiniHubLoginSheet() {
-  openSheet({
+  teacherMiniHubAuthPending = 'login';
+  refreshTeacherMiniHubSheet();
+  const loginSheet = openSheet({
     title: 'تسجيل الدخول للحساب السحابي',
     desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
     body: html`
@@ -590,9 +566,12 @@ function openMiniHubLoginSheet() {
         try {
           await cloud.signIn(email, pwd);
           toast('تم تسجيل الدخول بنجاح');
+          teacherMiniHubAuthPending = null;
           done(true);
-          replaceTeacherMiniHubAfterAuthTransition();
+          refreshTeacherMiniHubSheet({ focusAccountAction: true });
         } catch (err) {
+          teacherMiniHubAuthPending = null;
+          refreshTeacherMiniHubSheet();
           submitBtn.textContent = prevText;
           submitBtn.disabled = false;
           toast(err.message || 'تعذر تسجيل الدخول', 'danger');
@@ -600,19 +579,33 @@ function openMiniHubLoginSheet() {
       });
     }
   });
+  loginSheet.finally(() => {
+    if (teacherMiniHubAuthPending === 'login') {
+      teacherMiniHubAuthPending = null;
+      refreshTeacherMiniHubSheet({ focusAccountAction: true });
+    }
+  });
+  return loginSheet;
 }
 
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
-  'more-nav': () => moreNavSheet(),
   'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
   'mini-hub-login': () => {
-    openMiniHubLoginSheet();
+    return openMiniHubLoginSheet();
   },
   'mini-hub-logout': async () => {
-    await cloud.signOut();
-    toast('تم تسجيل الخروج');
-    replaceTeacherMiniHubAfterAuthTransition();
+    teacherMiniHubAuthPending = 'logout';
+    refreshTeacherMiniHubSheet();
+    try {
+      await cloud.signOut();
+      toast('تم تسجيل الخروج');
+    } catch (err) {
+      toast(err.message || 'تعذر تسجيل الخروج', 'danger');
+    } finally {
+      teacherMiniHubAuthPending = null;
+      refreshTeacherMiniHubSheet({ focusAccountAction: true });
+    }
   },
   'mini-hub-sync-now': async (el) => {
     if (!syncModule) {
@@ -632,15 +625,6 @@ const GLOBAL_ACTIONS = {
       el.innerHTML = prevText;
       // Sync indicators update in place. Reopening here would stack a duplicate
       // Mini Hub sheet now that timing flows correctly preserve parent sheets.
-    }
-  },
-  'mini-hub-theme': async (el) => {
-    const theme = el.dataset.theme;
-    if (theme) {
-      await store.patchDevice({ theme });
-      store.applyTheme();
-      scheduleRender();
-      openTeacherMiniHubSheet();
     }
   },
   'mini-hub-pwa-install': async () => {

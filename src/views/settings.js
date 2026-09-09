@@ -380,45 +380,6 @@ export default {
         </a>
       </div>
       <div class="section">
-        <div class="section__head"><div class="section__title">المزامنة السحابية</div></div>
-        <div class="card card--pad stack stack-3">
-          ${cloud.session ? html`
-            <div class="hstack gap-2 wrap">
-              <div>
-                <div class="fw-7">متصل بحساب</div>
-                <div class="t-3 fs-sm" style="direction: ltr; text-align: right;">${cloud.user?.email}</div>
-              </div>
-              <div class="push hstack gap-2">
-                <button class="btn btn--sm btn--primary" data-act="sync-now" data-sync-action ${sync.displayState().status === 'syncing' ? 'disabled' : ''}>
-                  ${icon('spark')} <span data-sync-action-label>${sync.displayState().status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن'}</span>
-                </button>
-                <button class="btn btn--sm btn--ghost" data-act="cloud-out">تسجيل الخروج</button>
-              </div>
-            </div>
-            <div class="t-3 fs-sm">
-              الحالة: <strong data-sync-label>${sync.displayState().text}</strong>
-              — تُحفظ بياناتك محليًا وتُزامن سحابيًا تلقائيًا عند الاتصال.
-            </div>
-          ` : html`
-            <p class="t-3 fs-sm">
-              يعمل التطبيق دون إنترنت أولًا. سجّل دخولك لحفظ بياناتك سحابيًا ومزامنتها تلقائيًا عبر أجهزتك.
-            </p>
-            <form id="cloud-login-form" data-act="cloud-in">
-              <label class="field">
-                <span class="field__label">البريد الإلكتروني</span>
-                <input class="input" name="email" type="email" required autocomplete="email" dir="ltr">
-              </label>
-              <label class="field">
-                <span class="field__label">كلمة المرور</span>
-                <input class="input" name="password" type="password" required autocomplete="current-password" dir="ltr">
-              </label>
-              <button class="btn btn--primary btn--block mt-3" type="submit">تسجيل الدخول</button>
-            </form>
-          `}
-        </div>
-      </div>
-
-      <div class="section">
         <div class="section__head"><div class="section__title">تثبيت تطبيق ركيز على الجهاز</div></div>
         <div class="card card--pad stack stack-3">
           ${isStandaloneMode()

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const primaryLabels = ['الرئيسية', 'الفصول', 'الجدول', 'التقارير'];
+const primaryLabels = ['الرئيسية', 'الفصول', 'الجدول', 'التقارير', 'التقويم'];
 
 async function seedTeaching(page, label = '١') {
   return page.evaluate(async (sectionLabel) => {

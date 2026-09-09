@@ -75,7 +75,15 @@ export function shortClassLabel(sec) {
   return shortGrade ? `${shortGrade}/${secName}` : secName;
 }
 
-let activeMobileDay = "all";
+// A selection is kept only for the current visit. The first mobile view follows
+// the actual school day: today when it is teachable, otherwise the weekly view.
+let activeMobileDay = null;
+
+export function defaultMobileScheduleDay({ today, calendarKind = null } = {}) {
+  const isScheduledSchoolDay = SCHOOL_WEEKDAYS.includes(Number(today));
+  const isCalendarTeachingDay = !calendarKind || isTeachingDay(calendarKind);
+  return isScheduledSchoolDay && isCalendarTeachingDay ? String(today) : "all";
+}
 
 /**
  * لوحة إضافة أو تعديل حصة — ثلاثة حقول فقط: اليوم ورقم الحصة والفصل.
@@ -226,6 +234,13 @@ export default {
     const baseProfile = store.activeTimeProfile();
     const profile = store.resolveProfile(baseProfile, todayStr);
     const calDay = store.calendarDayFor(todayStr);
+    const selectedMobileDay = activeMobileDay ?? defaultMobileScheduleDay({
+      today,
+      calendarKind: calDay?.kind,
+    });
+    const todayIsTeachingDay = selectedMobileDay === String(today)
+      && SCHOOL_WEEKDAYS.includes(today)
+      && (!calDay || isTeachingDay(calDay.kind));
 
     const now = new Date();
     const nowMins = now.getHours() * 60 + now.getMinutes();
@@ -304,7 +319,7 @@ export default {
           `}
 
       <!-- جدول الأعمدة اليومية -->
-      ${renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins })}
+      ${renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins, selectedMobileDay, todayIsTeachingDay })}
 
       <!-- الحصص الأسبوعية لكل فصل: تصميم بطاقات مدمجة أنيقة بدل سطر ممتد -->
       <div class="section">
@@ -408,13 +423,13 @@ export default {
 /**
  * الخيار 1: الأعمدة اليومية (Refined Day Columns)
  */
-function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins }) {
+function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins, selectedMobileDay, todayIsTeachingDay }) {
   return html`
     <!-- تبويبات الأيام لشاشات الجوال -->
     <div class="schedule-day-tabs" role="tablist" aria-label="أيام الأسبوع">
-      <button class="schedule-day-tab ${activeMobileDay === "all" ? "is-active" : ""}" data-act="select-day" data-day="all">الكل</button>
+      <button class="schedule-day-tab ${selectedMobileDay === "all" ? "is-active" : ""}" data-act="select-day" data-day="all">الكل</button>
       ${SCHOOL_WEEKDAYS.map((d) => html`
-        <button class="schedule-day-tab ${activeMobileDay === String(d) ? "is-active" : ""}" data-act="select-day" data-day="${d}">
+        <button class="schedule-day-tab ${selectedMobileDay === String(d) ? "is-active" : ""}" data-act="select-day" data-day="${d}">
           ${WEEKDAYS[d]}
           ${d === today ? html`<span class="tab-dot" title="اليوم"></span>` : ""}
           <span class="tabular fs-xs">(${byDay[d]?.length || 0})</span>
@@ -422,9 +437,9 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
       `)}
     </div>
 
-    <div class="week ${activeMobileDay !== "all" ? "has-day-filter" : ""}">
+    <div class="week ${selectedMobileDay !== "all" ? "has-day-filter" : ""}">
       ${SCHOOL_WEEKDAYS.map((d) => html`
-        <div class="week__day ${d === today ? "is-today" : ""} ${activeMobileDay === String(d) ? "is-selected-day" : ""}">
+        <div class="week__day ${d === today ? "is-today" : ""} ${selectedMobileDay === String(d) ? "is-selected-day" : ""}">
           <div class="week__head">
             <div class="flex items-center gap-2">
               <span>${WEEKDAYS[d]}</span>
@@ -474,6 +489,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                           </div>
                           <div class="slot__time-row">
                             <span class="slot__time tabular">${t ? fmtTimeRange(t.start, t.end) : "—"}</span>
+                            ${isCurrentSlot ? html`<span class="slot__live" aria-label="الحصة جارية الآن">جارية الآن</span>` : ""}
                           </div>
                         </div>
                       </div>
@@ -481,7 +497,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                   })}
                 </div>
               `
-            : html`<div class="week__empty">لا توجد حصص مجدولة</div>`}
+            : html`<div class="week__empty">${d === today && todayIsTeachingDay ? "لا توجد لديك حصص مجدولة اليوم." : "لا توجد حصص مجدولة"}</div>`}
           <!-- زر إضافة موحّد بصياغة صريحة: + أضف حصة -->
           <button class="btn btn--sm btn--quiet btn--block mt-3" data-act="add" data-day="${d}" aria-label="أضف حصة في الجدول">
             ${icon("plus")} أضف حصة

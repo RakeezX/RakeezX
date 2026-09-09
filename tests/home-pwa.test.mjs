@@ -40,7 +40,33 @@ import homeView, {
   isHomeInstallPromptDismissed,
   dismissHomeInstallPrompt,
   resetHomeInstallPrompt,
+  selectTodayFocus,
+  homeOnboardingState,
 } from '../src/views/home.js';
+
+test('Today Focus keeps the locked priority order and never falls back to cancelled sessions', () => {
+  const sessions = [
+    { id: 'past', startTime: '07:00', endTime: '07:45', status: 'scheduled' },
+    { id: 'current', startTime: '08:00', endTime: '08:45', status: 'scheduled' },
+    { id: 'upcoming', startTime: '09:00', endTime: '09:45', status: 'scheduled' },
+  ];
+  const at = (hour, minute) => new Date(2026, 8, 9, hour, minute);
+  assert.equal(selectTodayFocus(sessions, { now: at(8, 20) }).session.id, 'current');
+  assert.equal(selectTodayFocus(sessions.filter((item) => item.id !== 'current'), { now: at(8, 20) }).session.id, 'upcoming');
+  assert.equal(selectTodayFocus(sessions.filter((item) => item.id === 'past'), { now: at(8, 20) }).kind, 'past-pending');
+  const cancelled = [{ id: 'cancelled', startTime: '08:00', endTime: '09:00', status: 'cancelled' }];
+  assert.equal(selectTodayFocus(cancelled, { now: at(8, 20) }), null);
+});
+
+test('Home onboarding follows classes, students, then weekly schedule', () => {
+  assert.equal(homeOnboardingState([]).state, 'A');
+  const teaching = { id: 't1' };
+  assert.equal(homeOnboardingState([teaching]).state, 'B');
+  assert.equal(homeOnboardingState([teaching], { studentsFor: () => [{ id: 's1' }] }).state, 'C');
+  assert.equal(homeOnboardingState([teaching], {
+    studentsFor: () => [{ id: 's1' }], slotsFor: () => [{ id: 'slot1' }],
+  }).state, 'D');
+});
 
 test('isStandaloneMode detection logic', () => {
   matchMediaStandalone = false;

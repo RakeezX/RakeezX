@@ -30,6 +30,9 @@ This is the current product ledger, not a claim that every historical branch is 
 | Ticket | Status | Evidence / boundary |
 | --- | --- | --- |
 | SESSION-AUTO-01B | `PRODUCTION REVIEW` | Production main `725c28c`: today-only scheduled-session materialization, future projection without future persistence, durable V2 session writes, and focused race/tombstone/rollover coverage are deployed. Await PO Production verification; do not mark `CLOSED`. |
+| TEACHER-HUB-UX-01 | `PRODUCTION REVIEW` | The approved compact Teacher Control Center hierarchy is promoted: identity, account action, live Sync state, contextual PWA guidance, and Settings access share one calm surface. The closed one-sheet auth lifecycle and live Sync badge behavior remain runtime invariants. |
+| HOME-ONBOARDING-01 | `PRODUCTION REVIEW` | The approved restrained no-class Home path is promoted: create a class, add students, then configure the weekly schedule. Today Focus remains the single primary teaching action for established teachers. |
+| SCHEDULE-MOBILE-TODAY-01 | `PRODUCTION REVIEW` | The approved mobile Schedule behavior is promoted: use Today on teaching days, leave every day reachable, label the active slot, and use the locked empty-Today wording. Weekend/non-school entry remains All. |
 
 ## Open, deferred, or redesign work
 
@@ -49,10 +52,8 @@ This is the current product ledger, not a claim that every historical branch is 
 | CLASS-RULES-01 — Classroom Rules | `PLANNED` | Add a Class tools card immediately after Quick Log / `الرصد السريع`: `القوانين الصفية`, with view/manage, add/edit, and icon-plus-text rules. Google Visual Lab review is required before Production implementation. |
 | SCHEDULE-EXPORT-01 — Schedule Export | `PLANNED` | Export the schedule as an image or PDF. Exact visual/export design requires later review. |
 | SUPPORT-FEEDBACK-01 — Support / Feedback / Problem Report | `PLANNED` | Structured in-app technical problem, suggestion, and inquiry support. Future diagnostics must be privacy-safe and exclude instructional content, credentials, tokens, and secrets; storage/delivery design remains a Product/Production decision. |
-| SCHEDULE-MOBILE-TODAY-01 — Mobile Current-Day Navigation | `PLANNED` | On school-week mobile schedule entry, navigate to the current day; do not force it on weekend/non-school days. Google Visual Lab must define interaction details. |
-| HOME-ONBOARDING-01 — New User Getting Started | `PLANNED` | A restrained Home empty state for users without classes should make the path clear: create a class, add students, then configure lessons/schedule. Google Visual Lab defines final UX. |
 | TIMING-DISPLAY-UX-01 — Effective/Base Timing Presentation | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Calm, mobile-first visual refinement of the Timing / lesson-times effective-today versus base timing presentation. Google Visual Lab may improve hierarchy, spacing, alignment, and icon/text treatment only; do not change timing runtime semantics. |
-| TEACHER-HUB-UX-01 — Teacher Control Center Compact Redesign | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Google Visual Lab should redesign the Hub as a calm, compact mobile-first sheet with clearer account, academic-context, and Sync hierarchy. Preserve live Sync badge and single-sheet auth lifecycle behavior; no Auth, Sync V2, data, or runtime semantics change. |
+| Mobile More navigation | `REPLACED` | The mobile More surface is replaced by direct Calendar navigation. Keep Settings as the intentional full Product configuration page; its routine account/auth and Sync controls are now represented in the compact Teacher Control Center. |
 
 ## Reconciliation notes
 
