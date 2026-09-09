@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "build_command": "npx vite build",
+  "diff_check_command": "git diff --check",
+  "profiles": {
+    "teacher-center": {
+      "unit": [],
+      "browser": [
+        "tests/teacher-hub-auth.e2e.mjs",
+        "tests/sync-reconnect.e2e.mjs"
+      ],
+      "review": [
+        "Open the Teacher Control Center and review account, academic-context, and sync states.",
+        "Verify the compact sheet on mobile and desktop."
+      ],
+      "strict": false
+    },
+    "home": {
+      "unit": [
+        "tests/home-pwa.test.mjs"
+      ],
+      "browser": [
+        "tests/home-onboarding.e2e.mjs"
+      ],
+      "review": [
+        "Review Home empty, populated, and Today Focus states on mobile and desktop."
+      ],
+      "strict": false
+    },
+    "schedule": {
+      "unit": [
+        "tests/schedule-mobile-today.test.mjs",
+        "tests/sessions-generator.test.mjs",
+        "tests/timing-sync.test.mjs"
+      ],
+      "browser": [
+        "tests/schedule-mobile-today.e2e.mjs",
+        "tests/schedule-residual.e2e.mjs",
+        "tests/timing-effective-ux.e2e.mjs"
+      ],
+      "review": [
+        "Review Schedule day navigation, occupied slots, timing labels, and mobile layout."
+      ],
+      "strict": false
+    },
+    "sync-data": {
+      "unit": [
+        "tests/sync-v2-release.test.mjs",
+        "tests/sync-v2-runtime.test.mjs"
+      ],
+      "browser": [
+        "tests/sync-reconnect.e2e.mjs"
+      ],
+      "review": [
+        "Verify pending, syncing, failed, and synced indicators without exposing domain data."
+      ],
+      "strict": true
+    },
+    "default-ui": {
+      "unit": [],
+      "browser": [
+        "tests/routes.e2e.mjs",
+        "tests/responsive.e2e.mjs"
+      ],
+      "review": [
+        "Review the changed route on mobile and desktop, including empty and populated states."
+      ],
+      "strict": false
+    }
+  }
+}
