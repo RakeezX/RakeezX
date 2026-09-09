@@ -54,6 +54,15 @@ test('Today Focus keeps the locked priority order and never falls back to cancel
   assert.equal(selectTodayFocus(sessions, { now: at(8, 20) }).session.id, 'current');
   assert.equal(selectTodayFocus(sessions.filter((item) => item.id !== 'current'), { now: at(8, 20) }).session.id, 'upcoming');
   assert.equal(selectTodayFocus(sessions.filter((item) => item.id === 'past'), { now: at(8, 20) }).kind, 'past-pending');
+  const completedCurrent = selectTodayFocus(sessions, {
+    now: at(8, 20),
+    attendanceState: (session) => session.id === 'current' ? 'completed' : 'pending',
+  });
+  assert.equal(completedCurrent.session.id, 'upcoming', 'completed current attendance must not keep the same focus action');
+  assert.equal(selectTodayFocus(sessions, {
+    now: at(10, 0),
+    attendanceState: () => 'completed',
+  }), null, 'completed attendance must not produce a stale pending focus');
   const cancelled = [{ id: 'cancelled', startTime: '08:00', endTime: '09:00', status: 'cancelled' }];
   assert.equal(selectTodayFocus(cancelled, { now: at(8, 20) }), null);
 });

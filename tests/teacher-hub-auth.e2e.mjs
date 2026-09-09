@@ -120,6 +120,12 @@ test('Teacher Hub keeps its surface usable when login is cancelled or rejected',
   await loginSheet.locator('input[name="password"]').fill('wrong-password');
   await loginSheet.getByRole('button', { name: 'تسجيل الدخول' }).click();
   await expect(loginSheet.getByRole('button', { name: 'تسجيل الدخول' })).toBeEnabled();
+  await expect(page.locator('#toast')).toHaveClass(/is-on/);
+  expect(await page.evaluate(() => {
+    const toast = document.getElementById('toast');
+    const topSheet = [...document.querySelectorAll('.sheet-backdrop')].at(-1);
+    return Number(getComputedStyle(toast).zIndex) > Number(getComputedStyle(topSheet).zIndex);
+  })).toBe(true);
   await expectSameHubSurface(page);
   await loginSheet.locator('[data-sheet-close]').first().click();
   await closeHub(page);

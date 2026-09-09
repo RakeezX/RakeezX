@@ -93,7 +93,9 @@ export function selectTodayFocus(sessions, {
   attendanceState = () => 'pending',
 } = {}) {
   const minutesNow = now.getHours() * 60 + now.getMinutes();
-  const eligible = (sessions ?? []).filter((session) => !CANCELLED_SESSION_STATUSES.has(session.status));
+  const eligible = (sessions ?? []).filter((session) =>
+    !CANCELLED_SESSION_STATUSES.has(session.status) && attendanceState(session) !== 'completed'
+  );
   const withTimes = eligible.map((session) => ({
     session,
     start: timeToMinutes(session.startTime),

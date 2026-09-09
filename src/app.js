@@ -108,7 +108,6 @@ function renderTeacherMiniHubBody() {
           <div class="mini-hub-identity">
             <div class="mini-hub-avatar" aria-hidden="true">${teacherInitials(teacherName)}</div>
             <div class="flex-1 min-w-0">
-              <div class="mini-hub-eyebrow">مركز المعلّم</div>
               <div class="mini-hub-name">${teacherName}</div>
               <div class="mini-hub-school t-3 fs-xs">${schoolName || (isLoggedIn ? 'حساب متصل' : 'سجل معلّم محلي')}</div>
             </div>
@@ -138,7 +137,7 @@ function renderTeacherMiniHubBody() {
             <div class="mini-hub-section__head">
               <div class="mini-hub-sync__state">
                 <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
-                <span class="fw-7 fs-sm">المزامنة</span>
+                <span class="fw-7 fs-sm">حالة المزامنة</span>
                 <span class="badge ${syncInfo.badge}" data-sync-label data-sync-badge>${syncInfo.text}</span>
               </div>
             </div>
@@ -147,7 +146,7 @@ function renderTeacherMiniHubBody() {
               <span>آخر تحديث <b dir="ltr" data-sync-time>${lastSyncText || '—'}</b></span>
             </div>
             <button class="btn btn--sm btn--quiet mini-hub-sync__action" data-act="mini-hub-sync-now" data-sync-action ${syncInfo.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('refresh')} <span data-sync-action-label>تحديث</span>
+              ${icon('refresh')} <span data-sync-action-label>مزامنة الآن</span>
             </button>
           </div>
 

@@ -33,6 +33,8 @@ This is the current product ledger, not a claim that every historical branch is 
 | TEACHER-HUB-UX-01 | `PRODUCTION REVIEW` | The approved compact Teacher Control Center hierarchy is promoted: identity, account action, live Sync state, contextual PWA guidance, and Settings access share one calm surface. The closed one-sheet auth lifecycle and live Sync badge behavior remain runtime invariants. |
 | HOME-ONBOARDING-01 | `PRODUCTION REVIEW` | The approved restrained no-class Home path is promoted: create a class, add students, then configure the weekly schedule. Today Focus remains the single primary teaching action for established teachers. |
 | SCHEDULE-MOBILE-TODAY-01 | `PRODUCTION REVIEW` | The approved mobile Schedule behavior is promoted: use Today on teaching days, leave every day reachable, label the active slot, and use the locked empty-Today wording. Weekend/non-school entry remains All. |
+| TEACHER-CENTER-UX-02 | `PRODUCTION REVIEW` | The post-review refinement removes the repeated inner title, clarifies the Sync labels and hierarchy, and keeps Teacher Center action toasts above its sheet. Auth lifecycle and Sync semantics remain unchanged. |
+| HOME-FOCUS-ATTENDANCE-01 | `PRODUCTION REVIEW` | Today Focus no longer retains the attendance action for a session whose roster attendance is complete; current, upcoming, past-pending, cancelled-exclusion, and onboarding behavior remain preserved. |
 
 ## Open, deferred, or redesign work
 

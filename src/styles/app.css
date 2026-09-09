@@ -584,7 +584,7 @@ a { color: var(--brand); text-underline-offset: 3px; }
 
 /* ---------- 13. التنبيه العابر ---------- */
 .toast {
-  position: fixed; z-index: 90;
+  position: fixed; z-index: 1000;
   inset-inline: var(--sp-4);
   bottom: calc(var(--tap) + env(safe-area-inset-bottom) + var(--sp-4));
   margin-inline: auto; max-width: 400px;

@@ -24,14 +24,15 @@ for (const viewport of [
     await trigger.click();
 
     const sheet = page.locator('.sheet');
-    await expect(sheet.getByText('المزامنة', { exact: true })).toBeVisible();
+    await expect(sheet.getByText('حالة المزامنة', { exact: true })).toBeVisible();
+    await expect(sheet.getByText('مركز المعلّم', { exact: true })).toHaveCount(1);
     await expect(sheet.getByText('حالة المزامنة السحابية', { exact: true })).toHaveCount(0);
     await expect(sheet.getByRole('link', { name: 'الإعدادات' })).toHaveAttribute('href', '#/settings');
     await expect(sheet.getByText('المؤثرات الصوتية', { exact: true })).toHaveCount(0);
     await expect(sheet.getByText('الأرشيف', { exact: true })).toHaveCount(0);
     await expect(sheet).not.toContainText('[object Object]');
     await sheet.locator('[data-act="mini-hub-sync-now"]').click();
-    await expect(page.locator('.sheet [data-act="mini-hub-sync-now"]')).toContainText('تحديث');
+    await expect(page.locator('.sheet [data-act="mini-hub-sync-now"]')).toContainText('مزامنة الآن');
     await expect(page.locator('.sheet')).not.toContainText('[object Object]');
 
     const installed = sheet.locator('.mini-hub-installed');

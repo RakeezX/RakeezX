@@ -39,12 +39,17 @@ test('Home renders a single current focus and uses attendance wording', async ({
     const now = new Date();
     const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     await window.store.ensureSession(teaching.id, date, 9, { startTime: '00:00', endTime: '23:59' });
-    return teaching.id;
+    const session = window.store.sessionsOn(date).find((candidate) => candidate.teachingId === teaching.id && candidate.period === 9);
+    return { teachingId: teaching.id, sessionId: session.id };
   });
   await page.goto('/#/');
   const focus = page.locator('.today-focus');
   await expect(focus).toBeVisible();
   await expect(focus.getByRole('link', { name: 'رصد الحضور' })).toBeVisible();
   await expect(focus).not.toContainText('تحضير الحصة');
-  await expect(focus.getByRole('link', { name: 'رصد الحضور' })).toHaveAttribute('href', new RegExp(`#/teaching/${fixture}/attendance\\?session=`));
+  await expect(focus.getByRole('link', { name: 'رصد الحضور' })).toHaveAttribute('href', new RegExp(`#/teaching/${fixture.teachingId}/attendance\\?session=`));
+
+  await page.evaluate(async ({ sessionId }) => window.store.fillAttendance(sessionId, 'present'), fixture);
+  await expect(page.locator('.today-focus')).toHaveCount(0);
+  await expect(page.getByText('تم رصد الحضور', { exact: true }).first()).toBeVisible();
 });
