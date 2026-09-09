@@ -33,6 +33,11 @@ test('Student Profile shows context-true continuous history through X → Y → 
       ],
       students: [{ id: studentId, name: 'طالب السجل المستمر', status: 'active', ...common }],
       enrollments: [{ id: `en:${studentId}:${x}`, studentId, sectionId: x, rollNo: 1, startDate: '2026-08-01', endDate: null, status: 'active', ...common }],
+      items: [
+        { id: 'continuous-history:item:X', teachingId: teachingX, name: 'اختبار قصير', max: 10, order: 0, auto: null, ...common },
+        { id: 'continuous-history:item:Y', teachingId: teachingY, name: 'اختبار قصير', max: 10, order: 0, auto: null, ...common },
+      ],
+      scores: [{ id: `sc:${studentId}:continuous-history:item:X`, studentId, itemId: 'continuous-history:item:X', value: 6, ...common }],
       sessions: [{ id: sessionX, teachingId: teachingX, date: '2026-08-20', period: 2, status: 'held', ...common }],
       attendance: [{ id: `at:${studentId}:${sessionX}`, studentId, sessionId: sessionX, teachingId: teachingX, date: '2026-08-20', status: 'absent', ...common }],
       logs: [{ id: 'continuous-history:log:X', studentId, sessionId: sessionX, teachingId: teachingX, date: '2026-08-20', kind: 'participation', delta: 1, tag: 'مشاركة X', ...common }],
@@ -51,6 +56,19 @@ test('Student Profile shows context-true continuous history through X → Y → 
   await studentLink.click();
   await expect(page.locator('.student-profile-header__name')).toHaveText('طالب السجل المستمر');
   await expect(page.locator('.student-profile-header__meta')).toContainText('الانتساب الحالي · الرابع الابتدائي / ب');
+  await expect(page.locator('.student-profile-header__meta')).toContainText('السجل الحالي · الرابع الابتدائي / ب · المهارات الرقمية');
+  const grades = page.locator('.section', { hasText: 'الدرجات — المهارات الرقمية' });
+  await expect(grades).toContainText('6 / 10');
+  const previous = page.locator('.student-previous-history');
+  await expect(previous).toContainText('السجل السابق');
+  await expect(previous).toContainText('الرابع الابتدائي / أ · المهارات الرقمية');
+  await expect(previous).toContainText('اختبار قصير');
+  await expect(previous).toContainText('6 / 10');
+  await expect(previous).toContainText('للقراءة فقط');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(previous).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 1280, height: 900 });
   const initialAttendance = page.locator('.section', { hasText: 'سجل الحضور المستمر' });
   await expect(initialAttendance.locator('.logrow')).toHaveCount(1);
   await expect(initialAttendance).toContainText('الرابع الابتدائي / أ · المهارات الرقمية');
@@ -71,13 +89,13 @@ test('Student Profile shows context-true continuous history through X → Y → 
     });
   }, fixture);
 
-  await expect(page.locator('.student-profile-header__meta')).toContainText('السياق المعروض · الرابع الابتدائي / ب · المهارات الرقمية');
+  await expect(page.locator('.student-profile-header__meta')).toContainText('السجل الحالي · الرابع الابتدائي / ب · المهارات الرقمية');
 
   const attendance = page.locator('.section', { hasText: 'سجل الحضور المستمر' });
   await expect(attendance.locator('.logrow')).toHaveCount(2);
   await expect(attendance).toContainText('الرابع الابتدائي / أ · المهارات الرقمية');
   await expect(attendance).toContainText('الرابع الابتدائي / ب · المهارات الرقمية');
-  await expect(attendance.getByText('السياق المعروض', { exact: true })).toHaveCount(1);
+  await expect(attendance.getByText('السجل الحالي', { exact: true })).toHaveCount(1);
   await expect(attendance.getByText('سياق سابق', { exact: true })).toHaveCount(1);
   await expect(attendance).toContainText('غائب');
   await expect(attendance).toContainText('حاضر');
@@ -95,7 +113,8 @@ test('Student Profile shows context-true continuous history through X → Y → 
 
   const beforeReturn = await page.evaluate((studentId) => {
     const history = window.store.studentHistory(studentId);
-    return Object.fromEntries(Object.entries(history).map(([name, events]) => [name, events.map((event) => event.record.id)]));
+    return Object.fromEntries(['attendance', 'logs', 'notes', 'scores']
+      .map((name) => [name, history[name].map((event) => event.record.id)]));
   }, fixture.studentId);
   await page.evaluate(({ studentId, x }) => window.store.transferStudent(studentId, x, { date: '2026-09-01' }), fixture);
   await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingX}`);
@@ -103,7 +122,18 @@ test('Student Profile shows context-true continuous history through X → Y → 
   await expect(page.locator('.section', { hasText: 'سجل الحضور المستمر' }).locator('.logrow')).toHaveCount(2);
   expect(await page.evaluate((studentId) => {
     const history = window.store.studentHistory(studentId);
-    return Object.fromEntries(Object.entries(history).map(([name, events]) => [name, events.map((event) => event.record.id)]));
+    return Object.fromEntries(['attendance', 'logs', 'notes', 'scores']
+      .map((name) => [name, history[name].map((event) => event.record.id)]));
   }, fixture.studentId)).toEqual(beforeReturn);
+
+  await page.evaluate(async ({ studentId, y, x }) => {
+    await window.store.transferStudent(studentId, y, { date: '2026-09-02' });
+    await window.store.archiveSection(x, '2026-09-03');
+  }, fixture);
+  await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingY}`);
+  const archivedHistory = page.locator(`[data-history-teaching="${fixture.teachingX}"]`);
+  await expect(archivedHistory).toContainText('مؤرشف');
+  await expect(archivedHistory).toContainText('6 / 10');
+  await expect(page.locator(`[data-id="continuous-history:note:X"]`)).toHaveCount(0);
   expect(errors).toEqual([]);
 });
