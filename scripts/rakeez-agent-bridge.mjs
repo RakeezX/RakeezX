@@ -47,6 +47,7 @@ export const DEFAULT_HANDOFF_ROOT = process.env.RAKEEZ_HANDOFF_ROOT
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TRANSPORT_TOOL = join(HERE, 'visual-patch-transport.mjs');
 const PROFILE_CONFIG = resolve(HERE, '..', 'config', 'rakeez-test-profiles.json');
+const BRIDGE_CONFIG = resolve(HERE, '..', 'config', 'rakeez-agent-bridge.json');
 const FORBIDDEN_HANDOFF_PREFIXES = [
   '.git/', '.preservation/', '.aistudio/', 'ai-studio/', '.idx/',
   'backups/', 'backup/', 'exports/', 'production-data/', 'school-data/',
@@ -66,9 +67,10 @@ function usage() {
   return [
     'Usage:',
     '  node scripts/rakeez-agent-bridge.mjs status [ticket] [--root <dir>]',
-    '  node scripts/rakeez-agent-bridge.mjs pack <ticket> --source-agent <work|google|codex> --source-repo <dir> --base <sha> --allow <path> [--patch <file>] [--test-profile <id>]',
+    '  node scripts/rakeez-agent-bridge.mjs pack <ticket> --source-agent <work|google|codex> --source-repo <dir> --base <sha> --allow <path> [--patch <file>] [--test-profile <id>] [--local-artifact <pattern>]',
     '  node scripts/rakeez-agent-bridge.mjs approve-local <ticket> --candidate <candidate-sha> [--root <dir>]',
-    '  node scripts/rakeez-agent-bridge.mjs inspect <ticket> [--root <dir>]',
+    '  node scripts/rakeez-agent-bridge.mjs record-validation <ticket> --candidate <candidate-sha> [--profile <id>] [--command <focused-command>] --exit-code <code> [--build-pass|--build-fail] [--diff-check-pass|--diff-check-fail] [--note <text>]',
+    '  node scripts/rakeez-agent-bridge.mjs inspect <ticket> [--root <dir>] [--read-only]',
     '  node scripts/rakeez-agent-bridge.mjs processes [--root <dir>]',
     '  node scripts/rakeez-agent-bridge.mjs resume-info <ticket> [--root <dir>]',
   ].join('\n');
@@ -92,15 +94,22 @@ function safeTicket(value) {
 }
 
 function parseOptions(args) {
-  const options = { allow: [], testProfile: [] };
+  const options = {
+    allow: [], testProfile: [], localArtifact: [], profile: [], command: [],
+  };
+  const booleanOptions = new Set(['buildPass', 'buildFail', 'diffCheckPass', 'diffCheckFail', 'readOnly']);
+  const repeatedOptions = new Set(['allow', 'testProfile', 'localArtifact', 'profile', 'command']);
   for (let index = 0; index < args.length; index += 1) {
     const key = args[index];
     if (!key.startsWith('--')) throw new Error(`Unexpected argument: ${key}`);
+    const name = key.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    if (booleanOptions.has(name)) {
+      options[name] = true;
+      continue;
+    }
     const value = args[++index];
     if (value === undefined || value.startsWith('--')) throw new Error(`Missing value for ${key}`);
-    const name = key.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-    if (name === 'allow') options.allow.push(slash(value));
-    else if (name === 'testProfile') options.testProfile.push(value);
+    if (repeatedOptions.has(name)) options[name].push(name === 'allow' ? slash(value) : value);
     else options[name] = value;
   }
   return options;
@@ -136,6 +145,51 @@ function nulList(buffer) {
   return buffer.toString('utf8').split('\0').filter(Boolean).map(slash);
 }
 
+function bridgeConfig() {
+  return existsSync(BRIDGE_CONFIG) ? json(BRIDGE_CONFIG) : { local_artifact_patterns: [] };
+}
+
+function safeLocalArtifactPattern(value) {
+  const pattern = slash(String(value ?? '').trim());
+  if (!pattern || pattern.startsWith('/') || /^[A-Za-z]:/.test(pattern)
+    || pattern.includes('\\') || pattern.split('/').some((part) => part === '.' || part === '..')
+    || pattern.includes('**') || ['*', '*.md', '*.*'].includes(pattern)) {
+    throw new Error(`Unsafe or overly broad local-artifact pattern: ${value}`);
+  }
+  const protectedPrefix = /^(?:src|tests|config|docs|supabase|public|assets)\//i.test(pattern)
+    || /^(?:package(?:-lock)?\.json|sw\.js)$/i.test(pattern);
+  const conservativeRootName = !pattern.includes('/')
+    && /^(?:WORK|LOCAL|BRIDGE|REVIEW|HANDOFF)[A-Za-z0-9._?*-]*$/i.test(pattern);
+  const bridgeLocalPath = /^\.bridge-local\/[A-Za-z0-9._/?*-]+$/i.test(pattern);
+  if (protectedPrefix || (!conservativeRootName && !bridgeLocalPath)) {
+    throw new Error(`Local-artifact pattern is outside the conservative workflow namespace: ${value}`);
+  }
+  return pattern;
+}
+
+function localArtifactPatterns(extra = []) {
+  return [...new Set([
+    ...(bridgeConfig().local_artifact_patterns ?? []),
+    ...extra,
+  ].map(safeLocalArtifactPattern))].sort();
+}
+
+function globRegex(pattern) {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replaceAll('*', '[^/]*').replaceAll('?', '[^/]');
+  return new RegExp(`^${escaped}$`, 'i');
+}
+
+function findLocalArtifacts(repo, patterns, untracked = null) {
+  const candidates = new Set(untracked ?? nulList(gitBuffer(['ls-files', '--others', '--exclude-standard', '-z'], repo)));
+  for (const pattern of patterns) {
+    const pathspec = `:(glob)${pattern}`;
+    for (const path of nulList(gitBuffer(['ls-files', '--others', '--exclude-standard', '-z', '--', pathspec], repo))) candidates.add(path);
+    for (const path of nulList(gitBuffer(['ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', pathspec], repo))) candidates.add(path);
+  }
+  return [...candidates].filter((path) => patterns.some((pattern) => globRegex(pattern).test(path))).sort();
+}
+
 function repositoryBase(repo, supplied) {
   if (supplied) return git(['rev-parse', '--verify', `${supplied}^{commit}`], repo).text;
   const originMain = git(['rev-parse', '--verify', 'origin/main^{commit}'], repo, { allowFailure: true });
@@ -151,13 +205,18 @@ function untrackedPatch(repo, path) {
   return result;
 }
 
-export function gitCandidate(repoPath, suppliedBase = null) {
+export function gitCandidate(repoPath, suppliedBase = null, suppliedLocalPatterns = null) {
   const repo = resolve(repoPath);
   const base = repositoryBase(repo, suppliedBase);
   const head = git(['rev-parse', 'HEAD'], repo).text;
-  const status = git(['status', '--porcelain'], repo).text;
+  const patterns = suppliedLocalPatterns ?? localArtifactPatterns();
   const trackedPatch = gitBuffer(['diff', '--binary', '--full-index', base, '--'], repo);
-  const untracked = nulList(gitBuffer(['ls-files', '--others', '--exclude-standard', '-z'], repo));
+  const allUntracked = nulList(gitBuffer(['ls-files', '--others', '--exclude-standard', '-z'], repo));
+  const localArtifacts = findLocalArtifacts(repo, patterns, allUntracked);
+  const localSet = new Set(localArtifacts);
+  const untracked = allUntracked.filter((path) => !localSet.has(path));
+  const trackedWorktreeDirty = git(['diff', '--quiet', 'HEAD', '--'], repo, { allowFailure: true }).status !== 0;
+  const workingCandidate = trackedWorktreeDirty || untracked.length > 0;
   const parts = [trackedPatch, ...untracked.map((path) => untrackedPatch(repo, path))];
   const patch = normalizePatchBytes(Buffer.concat(parts));
   if (!patch.toString('utf8').trim()) throw new Error('Candidate has no changes relative to its base');
@@ -167,9 +226,9 @@ export function gitCandidate(repoPath, suppliedBase = null) {
   ].filter((value, index, all) => all.indexOf(value) === index).sort();
   const patchSha = sha256(patch);
   return {
-    repo, base, head, status: status ? 'dirty' : 'clean', patch,
-    patchSha256: patchSha, changedFiles,
-    candidateSha: status ? `working-tree:${patchSha}` : head,
+    repo, base, head, status: workingCandidate ? 'dirty' : 'clean', patch,
+    patchSha256: patchSha, changedFiles, localArtifacts, localArtifactPatterns: patterns,
+    candidateSha: workingCandidate ? `working-tree:${patchSha}` : head,
   };
 }
 
@@ -221,7 +280,7 @@ function validateWithTransport({ repo, base, patchPath, allowlist }) {
 function loadProfiles() { return json(PROFILE_CONFIG); }
 
 export function resolveTestProfiles(profileIds, config = loadProfiles()) {
-  const selected = profileIds.length ? profileIds : ['default-ui'];
+  const selected = [...new Set(profileIds.length ? profileIds : ['default-ui'])];
   const unit = new Set();
   const browser = new Set();
   const review = new Set();
@@ -239,23 +298,81 @@ export function resolveTestProfiles(profileIds, config = loadProfiles()) {
   if (browser.size) commands.push(`npx playwright test ${[...browser].sort().join(' ')}`);
   commands.push(config.build_command);
   commands.push(config.diff_check_command);
-  return { ids: selected, unit: [...unit].sort(), browser: [...browser].sort(), commands, review: [...review], strict };
+  return {
+    ids: selected,
+    unit: [...unit].sort(),
+    browser: [...browser].sort(),
+    commands,
+    focusedCommands: commands.filter((command) => ![config.build_command, config.diff_check_command].includes(command)),
+    buildCommand: config.build_command,
+    diffCheckCommand: config.diff_check_command,
+    review: [...review],
+    strict,
+  };
 }
 
-function validationSkeleton(candidateFingerprint, profilePlan, previous = null) {
+function validationSkeleton(candidateSha, candidateFingerprint, profilePlan, previous = null) {
   const changed = previous && previous.candidate_fingerprint !== candidateFingerprint;
   if (previous && !changed) return previous;
   return {
+    candidate_sha: candidateSha,
     candidate_fingerprint: candidateFingerprint,
+    patch_sha256: candidateFingerprint,
+    freshness: changed ? 'STALE' : 'MISSING',
+    freshness_reason: changed
+      ? 'Candidate changed after the recorded validation.'
+      : 'No candidate-bound validation has been recorded.',
     status: changed ? 'STALE' : 'NOT_RUN',
-    commands: profilePlan.commands.map((command) => ({
-      command, exit_code: null, status: 'NOT_RUN', started_at: null, completed_at: null,
-    })),
-    test_profiles: profilePlan.ids,
+    required_profiles: profilePlan.ids,
+    profiles_recorded: [],
+    custom_commands: [],
+    commands: [],
+    planned_commands: profilePlan.commands,
+    records: [],
     build_status: 'NOT_RUN',
+    build_exit_code: null,
     git_diff_check_status: 'NOT_RUN',
+    git_diff_check_exit_code: null,
     created_at: previous?.created_at ?? nowIso(),
     updated_at: nowIso(),
+  };
+}
+
+function validationAssessment(manifest, validation, candidateStale = false) {
+  if (!validation) return { freshness: 'MISSING', reason: 'validation.json is missing.', status: 'NOT_RUN' };
+  if (candidateStale || validation.candidate_fingerprint !== manifest.patch_sha256) {
+    return { freshness: 'STALE', reason: 'Candidate changed after the focused validation record.', status: 'STALE' };
+  }
+  const records = validation.records ?? [];
+  const profilesRecorded = [...new Set([
+    ...(validation.profiles_recorded ?? []),
+    ...records.flatMap((record) => record.profiles ?? []),
+  ])];
+  if (!records.length) return { freshness: 'MISSING', reason: 'No candidate-bound validation results are recorded.', status: 'NOT_RUN' };
+  const missingProfiles = (manifest.test_profiles ?? []).filter((profile) => !profilesRecorded.includes(profile));
+  if (missingProfiles.length) {
+    return {
+      freshness: 'MISSING',
+      reason: `Required test profile(s) not recorded: ${missingProfiles.join(', ')}.`,
+      status: 'INCOMPLETE',
+    };
+  }
+  if (!['PASS', 'FAIL'].includes(validation.build_status)) {
+    return { freshness: 'MISSING', reason: 'Build result is not recorded.', status: 'INCOMPLETE' };
+  }
+  if (!['PASS', 'FAIL'].includes(validation.git_diff_check_status)) {
+    return { freshness: 'MISSING', reason: 'git diff --check result is not recorded.', status: 'INCOMPLETE' };
+  }
+  const commands = validation.commands ?? [];
+  const failed = commands.some((command) => Number(command.exit_code) !== 0)
+    || validation.build_status === 'FAIL'
+    || validation.git_diff_check_status === 'FAIL';
+  return {
+    freshness: 'FRESH',
+    reason: failed
+      ? `Complete validation is recorded for candidate ${manifest.candidate_sha}, with failures.`
+      : `All required profiles are recorded for candidate ${manifest.candidate_sha}.`,
+    status: failed ? 'FAIL' : 'PASS',
   };
 }
 
@@ -263,13 +380,17 @@ function sensitiveOverlaps(paths) {
   return paths.filter((path) => /^(?:src\/(?:app|store|models|lib\/(?:sync|sync-v2|cloud|db))\.js|sw\.js|supabase\/migrations\/)/.test(path));
 }
 
-function reviewMarkdown(manifest, plan, options) {
+function reviewMarkdown(manifest, plan, options, validation = null) {
   const areas = plan.review.length ? plan.review.map((item) => `- ${item}`).join('\n') : '- Review the allowlisted visible change.';
+  const assessment = validationAssessment(manifest, validation);
+  const localArtifacts = (manifest.local_artifacts ?? []).join(', ') || 'None';
   return `# ${manifest.ticket} — Product Owner Local Review
 
 Source: ${manifest.source_agent}
 Candidate: \`${manifest.candidate_sha}\`
 Patch SHA256: \`${manifest.patch_sha256}\`
+Validation: ${assessment.freshness} — ${assessment.reason}
+Local artifacts excluded: ${localArtifacts}
 ${options.localUrl ? `Local URL: ${options.localUrl}\n` : ''}${options.lanUrl ? `LAN URL: ${options.lanUrl}\n` : ''}
 ## What to review
 
@@ -285,8 +406,9 @@ Review the listed states on mobile and desktop where applicable. Confirm that un
 `;
 }
 
-function handoffMarkdown(manifest) {
+function handoffMarkdown(manifest, validation = null) {
   const files = manifest.allowlist.map((path) => `- \`${path}\``).join('\n');
+  const assessment = validationAssessment(manifest, validation);
   const overlaps = manifest.known_sensitive_overlaps.length
     ? manifest.known_sensitive_overlaps.map((path) => `- \`${path}\``).join('\n')
     : '- None';
@@ -296,8 +418,15 @@ function handoffMarkdown(manifest) {
 - Exact base: \`${manifest.base_sha}\`
 - Candidate: \`${manifest.candidate_sha}\`
 - Patch SHA256: \`${manifest.patch_sha256}\`
-- Validation: ${manifest.validation_status} for \`${manifest.patch_sha256}\`
+- Validation: ${assessment.freshness} / ${assessment.status} — ${assessment.reason}
+- Validation fingerprint: \`${validation?.candidate_fingerprint ?? 'MISSING'}\`
 - Test profiles: ${manifest.test_profiles.join(', ')}
+- Profiles recorded: ${(validation?.profiles_recorded ?? []).join(', ') || 'None'}
+- Custom commands: ${(validation?.custom_commands ?? []).join(' | ') || 'None'}
+- Build: ${validation?.build_status ?? 'NOT_RUN'}
+- git diff --check: ${validation?.git_diff_check_status ?? 'NOT_RUN'}
+- Local artifacts excluded: ${(manifest.local_artifacts ?? []).join(', ') || 'None'}
+- Local-artifact patterns: ${(manifest.local_artifact_patterns ?? []).join(', ') || 'None'}
 - Last completed gate: ${manifest.last_completed_gate}
 - Recommended next gate: ${manifest.recommended_next_gate}
 
@@ -325,6 +454,13 @@ function packageFiles(root, ticket) {
   };
 }
 
+function writeHandoffDocuments(files, manifest, validation) {
+  const plan = resolveTestProfiles(manifest.test_profiles ?? []);
+  const options = { localUrl: manifest.local_url, lanUrl: manifest.lan_url };
+  writeFileSync(files.review, reviewMarkdown(manifest, plan, options, validation), 'utf8');
+  writeFileSync(files.handoff, handoffMarkdown(manifest, validation), 'utf8');
+}
+
 function existingPackage(root, ticket) {
   const files = packageFiles(root, ticket);
   return existsSync(files.manifest) ? { files, manifest: json(files.manifest) } : null;
@@ -343,6 +479,7 @@ function pack(ticket, options) {
   if (!SOURCE_AGENTS.includes(sourceAgent)) throw new Error(`Invalid --source-agent; expected ${SOURCE_AGENTS.join(', ')}`);
   const repo = resolve(options.sourceRepo ?? process.cwd());
   const allowlist = [...new Set(options.allow.map(slash))].sort();
+  const artifactPatterns = localArtifactPatterns(options.localArtifact);
   let candidate;
   if (sourceAgent === 'google') {
     if (!options.patch || !options.base) throw new Error('Google intake requires --patch and --base');
@@ -356,10 +493,12 @@ function pack(ticket, options) {
       patch,
       patchSha256: patchSha,
       changedFiles: [],
+      localArtifacts: findLocalArtifacts(repo, artifactPatterns),
+      localArtifactPatterns: artifactPatterns,
       candidateSha: options.candidate ?? `patch:${patchSha}`,
     };
   } else {
-    candidate = gitCandidate(repo, options.base);
+    candidate = gitCandidate(repo, options.base, artifactPatterns);
   }
   assertNoSensitivePayload(candidate.changedFiles, candidate.patch);
 
@@ -396,6 +535,8 @@ function pack(ticket, options) {
     patch_sha256: candidate.patchSha256,
     changed_files: candidate.changedFiles,
     allowlist,
+    local_artifacts: candidate.localArtifacts,
+    local_artifact_patterns: candidate.localArtifactPatterns,
     test_profiles: plan.ids,
     validation_status: sameCandidate ? (previous?.validation_status ?? priorValidation?.status ?? 'NOT_RUN') : (previous ? 'STALE' : 'NOT_RUN'),
     po_status: sameCandidate ? (previous?.po_status ?? 'PENDING') : (previous?.po_status ? 'STALE' : 'PENDING'),
@@ -417,23 +558,37 @@ function pack(ticket, options) {
     created_at: previous?.created_at ?? timestamp,
     updated_at: timestamp,
   };
-  const validation = validationSkeleton(candidate.patchSha256, plan, priorValidation);
-  manifest.validation_status = validation.status;
+  const validation = validationSkeleton(candidate.candidateSha, candidate.patchSha256, plan, priorValidation);
+  const assessment = validationAssessment(manifest, validation);
+  manifest.validation_status = assessment.status;
+  manifest.validation_state = assessment.freshness;
+  manifest.validation_reason = assessment.reason;
   writeJson(files.manifest, manifest);
   writeJson(files.validation, validation);
-  writeFileSync(files.review, reviewMarkdown(manifest, plan, options), 'utf8');
-  writeFileSync(files.handoff, handoffMarkdown(manifest), 'utf8');
+  writeHandoffDocuments(files, manifest, validation);
   return { ok: true, package: files.dir, manifest, validation };
 }
 
 function candidateReality(manifest, patchPath) {
   const currentPatchSha = sha256(normalizePatchBytes(readFileSync(patchPath)));
   let sourcePatchSha = currentPatchSha;
+  let localArtifacts = manifest.local_artifacts ?? [];
   let sourceError = null;
   if (manifest.source_agent !== 'google') {
     try {
-      sourcePatchSha = gitCandidate(manifest.source_repo, manifest.base_sha).patchSha256;
+      const current = gitCandidate(
+        manifest.source_repo,
+        manifest.base_sha,
+        localArtifactPatterns(manifest.local_artifact_patterns ?? []),
+      );
+      sourcePatchSha = current.patchSha256;
+      localArtifacts = current.localArtifacts;
     } catch (error) { sourceError = error.message; }
+  } else {
+    localArtifacts = findLocalArtifacts(
+      manifest.source_repo,
+      localArtifactPatterns(manifest.local_artifact_patterns ?? []),
+    );
   }
   return {
     current_patch_sha256: currentPatchSha,
@@ -441,40 +596,79 @@ function candidateReality(manifest, patchPath) {
     package_matches_manifest: currentPatchSha === manifest.patch_sha256,
     source_matches_manifest: !sourceError && sourcePatchSha === manifest.patch_sha256,
     source_error: sourceError,
+    local_artifacts: localArtifacts,
   };
 }
 
-function refreshPackage(root, ticket) {
+function refreshPackage(root, ticket, { writeState = true } = {}) {
   const current = existingPackage(root, ticket);
   if (!current) throw new Error(`Unknown ticket package: ${ticket}`);
   const validationFile = current.files.validation;
   const validation = existsSync(validationFile) ? json(validationFile) : null;
   const reality = candidateReality(current.manifest, current.files.patch);
   const stale = !reality.package_matches_manifest || !reality.source_matches_manifest;
-  const validationStale = !validation
-    || validation.candidate_fingerprint !== current.manifest.patch_sha256;
+  const validationStale = !!validation
+    && validation.candidate_fingerprint !== current.manifest.patch_sha256;
   let manifest = current.manifest;
+  let wroteState = false;
   if (stale && (manifest.po_status !== 'STALE' || manifest.validation_status !== 'STALE')) {
     manifest = {
       ...manifest,
       po_status: manifest.po_status === 'PENDING' ? 'PENDING' : 'STALE',
       validation_status: 'STALE',
+      validation_state: 'STALE',
+      validation_reason: 'Candidate changed after the focused validation record.',
       state: 'LOCAL_WORK',
       recommended_next_gate: 'CANDIDATE_IDENTIFIED',
       updated_at: nowIso(),
     };
-    writeJson(current.files.manifest, manifest);
+    wroteState = true;
   }
   if ((stale || validationStale) && validation && validation.status !== 'STALE') {
     validation.status = 'STALE';
+    validation.freshness = 'STALE';
+    validation.freshness_reason = 'Candidate changed after the focused validation record.';
     validation.updated_at = nowIso();
-    writeJson(validationFile, validation);
+    if (writeState) writeJson(validationFile, validation);
+    wroteState = true;
   }
   if (validationStale && !stale && manifest.validation_status !== 'STALE') {
-    manifest = { ...manifest, validation_status: 'STALE', updated_at: nowIso() };
-    writeJson(current.files.manifest, manifest);
+    manifest = {
+      ...manifest,
+      validation_status: 'STALE',
+      validation_state: 'STALE',
+      validation_reason: 'Candidate changed after the focused validation record.',
+      updated_at: nowIso(),
+    };
+    wroteState = true;
   }
-  return { files: current.files, manifest, validation, reality, stale, validation_stale: stale || validationStale };
+  const assessment = validationAssessment(manifest, validation, stale || validationStale);
+  const surfacedManifest = {
+    ...manifest,
+    validation_status: assessment.status,
+    validation_state: assessment.freshness,
+    validation_reason: assessment.reason,
+    local_artifacts: reality.local_artifacts,
+  };
+  const surfacedValidation = validation ? {
+    ...validation,
+    freshness: assessment.freshness,
+    freshness_reason: assessment.reason,
+    status: assessment.status,
+  } : null;
+  if (wroteState && writeState) {
+    writeJson(current.files.manifest, surfacedManifest);
+    writeHandoffDocuments(current.files, surfacedManifest, surfacedValidation);
+  }
+  return {
+    files: current.files,
+    manifest: surfacedManifest,
+    validation: surfacedValidation,
+    reality,
+    stale,
+    validation_stale: stale || validationStale,
+    validation_assessment: assessment,
+  };
 }
 
 function approveLocal(ticket, options) {
@@ -496,7 +690,141 @@ function approveLocal(ticket, options) {
     recommended_next_gate: 'TRANSPORT_READY',
   };
   writeJson(current.files.manifest, manifest);
+  writeHandoffDocuments(current.files, manifest, current.validation);
   return { ok: true, ticket, candidate: manifest.candidate_sha, patch_sha256: manifest.patch_sha256, state: manifest.state };
+}
+
+function recordedResultFlag(pass, fail, label) {
+  if (pass && fail) throw new Error(`${label} cannot be both PASS and FAIL`);
+  if (pass) return 'PASS';
+  if (fail) return 'FAIL';
+  return null;
+}
+
+function recordValidation(ticket, options) {
+  if (!options.candidate) throw new Error('record-validation requires --candidate with the exact current candidate SHA');
+  const root = resolve(options.root ?? DEFAULT_HANDOFF_ROOT);
+  const current = refreshPackage(root, ticket);
+  if (current.stale) throw new Error('Candidate differs from its package; validation cannot be recorded');
+  if (options.candidate !== current.manifest.candidate_sha) {
+    throw new Error(`Candidate mismatch; expected ${current.manifest.candidate_sha}`);
+  }
+  const profiles = [...new Set(options.profile)];
+  const customCommands = [...new Set(options.command.map((command) => command.trim()).filter(Boolean))];
+  const profileCommandOwners = new Map();
+  for (const profile of profiles) {
+    for (const command of resolveTestProfiles([profile]).focusedCommands) {
+      profileCommandOwners.set(command, [...new Set([...(profileCommandOwners.get(command) ?? []), profile])]);
+    }
+  }
+  const plan = profiles.length ? resolveTestProfiles(profiles) : {
+    ids: [], focusedCommands: [], buildCommand: loadProfiles().build_command,
+    diffCheckCommand: loadProfiles().diff_check_command,
+  };
+  const executedCommands = [...new Set([...plan.focusedCommands, ...customCommands])];
+  const buildResult = recordedResultFlag(options.buildPass, options.buildFail, 'Build result');
+  const diffResult = recordedResultFlag(options.diffCheckPass, options.diffCheckFail, 'git diff --check result');
+  if (!executedCommands.length && !buildResult && !diffResult) {
+    throw new Error('record-validation requires a profile, custom command, build result, or diff-check result');
+  }
+  let exitCode = null;
+  if (executedCommands.length) {
+    if (options.exitCode === undefined || !/^-?\d+$/.test(options.exitCode)) {
+      throw new Error('--exit-code is required for recorded profile/custom commands');
+    }
+    exitCode = Number(options.exitCode);
+  }
+  const previous = current.validation;
+  let validation = previous && Array.isArray(previous.records)
+    ? { ...previous }
+    : validationSkeleton(
+      current.manifest.candidate_sha,
+      current.manifest.patch_sha256,
+      resolveTestProfiles(current.manifest.test_profiles),
+      null,
+    );
+  if (validation.candidate_fingerprint !== current.manifest.patch_sha256) {
+    throw new Error('Existing validation belongs to a different candidate; repack before recording');
+  }
+  if (buildResult && ['PASS', 'FAIL'].includes(validation.build_status)) {
+    throw new Error('Build result is already recorded for this candidate; build-once policy prevents duplicate recording');
+  }
+  if (diffResult && ['PASS', 'FAIL'].includes(validation.git_diff_check_status)) {
+    throw new Error('git diff --check result is already recorded for this candidate');
+  }
+  const recordedAt = nowIso();
+  const commandRecords = executedCommands.map((command) => ({
+    command,
+    kind: customCommands.includes(command) ? 'custom' : 'profile',
+    profiles: profileCommandOwners.get(command) ?? [],
+    exit_code: exitCode,
+    status: exitCode === 0 ? 'PASS' : 'FAIL',
+    recorded_at: recordedAt,
+  }));
+  const record = {
+    candidate_sha: current.manifest.candidate_sha,
+    candidate_fingerprint: current.manifest.patch_sha256,
+    patch_sha256: current.manifest.patch_sha256,
+    recorded_at: recordedAt,
+    profiles,
+    custom_commands: customCommands,
+    commands: commandRecords,
+    exit_code: exitCode,
+    build_status: buildResult ?? 'NOT_RECORDED',
+    build_exit_code: buildResult ? (buildResult === 'PASS' ? 0 : 1) : null,
+    git_diff_check_status: diffResult ?? 'NOT_RECORDED',
+    git_diff_check_exit_code: diffResult ? (diffResult === 'PASS' ? 0 : 1) : null,
+    note: options.note ?? null,
+  };
+  validation = {
+    ...validation,
+    candidate_sha: current.manifest.candidate_sha,
+    candidate_fingerprint: current.manifest.patch_sha256,
+    patch_sha256: current.manifest.patch_sha256,
+    required_profiles: current.manifest.test_profiles,
+    profiles_recorded: [...new Set([...(validation.profiles_recorded ?? []), ...profiles])],
+    custom_commands: [...new Set([...(validation.custom_commands ?? []), ...customCommands])],
+    commands: [...(validation.commands ?? []), ...commandRecords],
+    records: [...(validation.records ?? []), record],
+    build_status: buildResult ?? validation.build_status ?? 'NOT_RUN',
+    build_exit_code: buildResult
+      ? (buildResult === 'PASS' ? 0 : 1)
+      : validation.build_exit_code ?? null,
+    git_diff_check_status: diffResult ?? validation.git_diff_check_status ?? 'NOT_RUN',
+    git_diff_check_exit_code: diffResult
+      ? (diffResult === 'PASS' ? 0 : 1)
+      : validation.git_diff_check_exit_code ?? null,
+    updated_at: recordedAt,
+  };
+  const assessment = validationAssessment(current.manifest, validation);
+  validation.freshness = assessment.freshness;
+  validation.freshness_reason = assessment.reason;
+  validation.status = assessment.status;
+  const manifest = {
+    ...current.manifest,
+    validation_status: assessment.status,
+    validation_state: assessment.freshness,
+    validation_reason: assessment.reason,
+    last_completed_gate: assessment.status === 'PASS' ? 'BUILD_PASSED' : current.manifest.last_completed_gate,
+    recommended_next_gate: current.manifest.po_status === 'PO_PRELIMINARY_APPROVED'
+      ? 'TRANSPORT_READY'
+      : current.manifest.recommended_next_gate,
+    updated_at: recordedAt,
+  };
+  writeJson(current.files.validation, validation);
+  writeJson(current.files.manifest, manifest);
+  writeHandoffDocuments(current.files, manifest, validation);
+  return {
+    ok: assessment.status === 'PASS',
+    ticket,
+    candidate: manifest.candidate_sha,
+    patch_sha256: manifest.patch_sha256,
+    validation: assessment,
+    profiles_recorded: validation.profiles_recorded,
+    custom_commands: validation.custom_commands,
+    build_status: validation.build_status,
+    git_diff_check_status: validation.git_diff_check_status,
+  };
 }
 
 function commitReality(manifest) {
@@ -524,7 +852,14 @@ function resumeInfo(ticket, options) {
   const root = resolve(options.root ?? DEFAULT_HANDOFF_ROOT);
   const current = refreshPackage(root, ticket);
   const gitReality = commitReality(current.manifest);
-  const stop = current.stale || gitReality.remote_main_advanced;
+  const validationBlocks = current.validation_assessment.freshness === 'STALE'
+    || current.validation_assessment.status === 'FAIL';
+  const stop = current.stale || gitReality.remote_main_advanced || validationBlocks;
+  let recommendation = `CONTINUE: ${current.manifest.recommended_next_gate}`;
+  if (current.stale) recommendation = 'STOP: candidate differs from the recorded handoff';
+  else if (gitReality.remote_main_advanced) recommendation = 'STOP: remote main advanced beyond the recorded Production SHA';
+  else if (validationBlocks) recommendation = `STOP: ${current.validation_assessment.reason}`;
+  else if (current.validation_assessment.freshness === 'MISSING') recommendation = 'CONTINUE: RECORD_VALIDATION';
   return {
     ok: !stop,
     ticket,
@@ -534,12 +869,12 @@ function resumeInfo(ticket, options) {
       candidate_sha: current.manifest.candidate_sha,
       po_status: current.manifest.po_status,
       validation_status: current.manifest.validation_status,
+      validation_state: current.validation_assessment.freshness,
+      validation_reason: current.validation_assessment.reason,
     },
     candidate: current.reality,
     git: gitReality,
-    recommendation: stop
-      ? 'STOP: candidate or remote reality differs from the recorded handoff'
-      : `CONTINUE: ${current.manifest.recommended_next_gate}`,
+    recommendation,
   };
 }
 
@@ -554,8 +889,11 @@ function status(ticket, options) {
       candidate_sha: current.manifest.candidate_sha,
       patch_sha256: current.manifest.patch_sha256,
       validation_status: current.manifest.validation_status,
+      validation_state: current.validation_assessment.freshness,
+      validation_reason: current.validation_assessment.reason,
       po_status: current.manifest.po_status,
       last_completed_gate: current.manifest.last_completed_gate,
+      local_artifacts: current.reality.local_artifacts,
       stale: current.stale,
     };
   }
@@ -566,7 +904,16 @@ function status(ticket, options) {
     const path = join(root, entry.name, 'manifest.json');
     if (existsSync(path)) tickets.push(json(path));
   }
-  return { ok: true, root, tickets: tickets.map((item) => ({ ticket: item.ticket, state: item.state, updated_at: item.updated_at })) };
+  return {
+    ok: true,
+    root,
+    tickets: tickets.map((item) => ({
+      ticket: item.ticket,
+      state: item.state,
+      validation_state: item.validation_state ?? 'MISSING',
+      updated_at: item.updated_at,
+    })),
+  };
 }
 
 function processAlive(pid) {
@@ -616,7 +963,7 @@ function processes(options) {
 
 function inspect(ticket, options) {
   const root = resolve(options.root ?? DEFAULT_HANDOFF_ROOT);
-  const current = refreshPackage(root, ticket);
+  const current = refreshPackage(root, ticket, { writeState: !options.readOnly });
   return { ok: !current.stale, ...current, files: current.files };
 }
 
@@ -637,6 +984,7 @@ export async function main(argv = process.argv.slice(2)) {
   const options = parseOptions(args);
   if (command === 'pack') return pack(ticket, options);
   if (command === 'approve-local') return approveLocal(ticket, options);
+  if (command === 'record-validation') return recordValidation(ticket, options);
   if (command === 'inspect') return inspect(ticket, options);
   if (command === 'resume-info') return resumeInfo(ticket, options);
   if (command === 'status') return status(ticket, options);

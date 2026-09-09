@@ -10,6 +10,8 @@ Set `RAKEEZ_HANDOFF_ROOT` or pass `--root`. The Windows default is:
 
 Each ticket contains `manifest.json`, `candidate.patch`, `validation.json`, `REVIEW.md`, and `HANDOFF_CODEX.md`.
 
+`WORK_TICKET.md` and `WORK_DESIGN_BRIEF.md` are reported as local artifacts and excluded from candidate bytes automatically. Add a conservative future workflow pattern with repeated `--local-artifact`, for example `--local-artifact "LOCAL_REVIEW_*.md"`. Patterns cannot target tracked Product areas or use broad forms such as `*.md`.
+
 ## Work or Codex candidate
 
 ```powershell
@@ -61,3 +63,22 @@ The bridge rejects forbidden paths and credential-like content. Never package en
 Work: candidate workspace → pack → Product Owner local review → approve-local → Codex inspect/transport → Production Review → Product Owner verifies → CLOSED.
 
 Google: exact patch → pack/intake → the same review, approval, transport, and Production Review path.
+
+## Candidate-bound validation
+
+Record focused evidence without executing it again:
+
+```powershell
+node scripts/rakeez-agent-bridge.mjs record-validation TICKET-01 `
+  --candidate <exact-candidate-sha-or-working-tree-fingerprint> `
+  --profile home `
+  --command "node --test tests/focused.test.mjs" `
+  --exit-code 0 `
+  --build-pass `
+  --diff-check-pass `
+  --note "Focused local gate"
+```
+
+Repeated profiles and commands are deduplicated. Build evidence can be recorded only once per candidate. `status`, `inspect`, and `resume-info` report validation as `FRESH`, `STALE`, or `MISSING`, with a reason. Changing candidate bytes automatically makes earlier validation stale.
+
+Use `inspect <ticket> --read-only` when auditing an existing handoff that must not be reconciled or rewritten. It computes current candidate, local-artifact, and validation state without modifying package files.

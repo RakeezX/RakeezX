@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "local_artifact_patterns": [
+    "WORK_TICKET.md",
+    "WORK_DESIGN_BRIEF.md"
+  ]
+}
