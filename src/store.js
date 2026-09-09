@@ -2091,15 +2091,17 @@ export function studentContext(studentId, tchId) {
 
 /**
  * سجل الطالب المستمر عبر الإسنادات. هذا إسقاط قراءة فقط: تبقى السجلات
- * مرتبطة بحصتها وإسنادها وشعبتها الأصلية، ولا تدخل الدرجات في هذا التجميع.
+ * مرتبطة بحصتها وإسنادها وشعبتها الأصلية. الدرجات هنا هي سجلات الدرجات
+ * اليدوية المحفوظة فعلًا مع بنودها الأصلية؛ ولا تدخل في حساب الإسناد الحالي.
  */
 export function studentHistory(studentId) {
-  const withContext = (record) => {
+  const withContext = (record, teachingId = record.teachingId) => {
     const session = record.sessionId ? getSession(record.sessionId) : null;
-    const teaching = getTeaching(session?.teachingId ?? record.teachingId);
+    const teaching = getTeaching(session?.teachingId ?? teachingId);
     const section = teaching ? getSection(teaching.sectionId) : null;
     const subject = teaching ? getSubject(teaching.subjectId) : null;
     const term = teaching ? getTerm(teaching.termId) : null;
+    const year = term ? getYear(term.yearId) : section ? getYear(section.yearId) : null;
     return {
       record,
       session,
@@ -2107,6 +2109,7 @@ export function studentHistory(studentId) {
       section,
       subject,
       term,
+      year,
       date: record.date ?? session?.date ?? '',
       contextLabel: teachingLabel(teaching) || sectionLabel(section) || '',
     };
@@ -2116,13 +2119,57 @@ export function studentHistory(studentId) {
     Number(right.record.createdAt ?? right.record.updatedAt ?? 0) -
       Number(left.record.createdAt ?? left.record.updatedAt ?? 0) ||
     String(left.record.id ?? '').localeCompare(String(right.record.id ?? ''));
-  const project = (records) => records.map(withContext).sort(newestFirst);
+  const unique = (records) => [...new Map(records.map((record) => [record.id, record])).values()];
+  const project = (records) => unique(records).map((record) => withContext(record)).sort(newestFirst);
+  const itemById = new Map(live(state.items).map((item) => [item.id, item]));
+  const scores = unique(scoresOf(studentId))
+    .map((record) => {
+      const item = itemById.get(record.itemId);
+      if (!item || item.auto || record.value === null || record.value === undefined) return null;
+      return { ...withContext(record, item.teachingId), item };
+    })
+    .filter(Boolean)
+    .sort((left, right) =>
+      String(left.teaching?.id ?? '').localeCompare(String(right.teaching?.id ?? '')) ||
+      Number(left.item.order ?? 0) - Number(right.item.order ?? 0) ||
+      String(left.item.id).localeCompare(String(right.item.id)));
 
-  return {
-    attendance: project(attendanceOf(studentId)),
-    logs: project(logsOf(studentId)),
-    notes: project(notesOf(studentId)),
+  const attendance = project(attendanceOf(studentId));
+  const logs = project(logsOf(studentId));
+  const notes = project(notesOf(studentId));
+  const contextsByTeaching = new Map();
+  const addToContext = (kind, event) => {
+    if (!event.teaching) return;
+    let context = contextsByTeaching.get(event.teaching.id);
+    if (!context) {
+      context = {
+        teaching: event.teaching,
+        section: event.section,
+        subject: event.subject,
+        term: event.term,
+        year: event.year,
+        attendance: [], logs: [], notes: [], scores: [],
+        latestDate: '', latestUpdatedAt: 0,
+      };
+      contextsByTeaching.set(event.teaching.id, context);
+    }
+    context[kind].push(event);
+    context.latestDate = [context.latestDate, event.date].sort().at(-1) ?? '';
+    context.latestUpdatedAt = Math.max(
+      context.latestUpdatedAt,
+      Number(event.record.createdAt ?? event.record.updatedAt ?? 0),
+    );
   };
+  attendance.forEach((event) => addToContext('attendance', event));
+  logs.forEach((event) => addToContext('logs', event));
+  notes.forEach((event) => addToContext('notes', event));
+  scores.forEach((event) => addToContext('scores', event));
+  const contexts = [...contextsByTeaching.values()].sort((left, right) =>
+    String(right.latestDate).localeCompare(String(left.latestDate)) ||
+    right.latestUpdatedAt - left.latestUpdatedAt ||
+    String(left.teaching.id).localeCompare(String(right.teaching.id)));
+
+  return { attendance, logs, notes, scores, contexts };
 }
 
 /* ---------- عمليات: البنية ---------- */

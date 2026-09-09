@@ -15,10 +15,15 @@ import { studentAvatar } from '../lib/avatar.js';
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
 function resolveTeaching(student, requested) {
-  if (requested && store.getTeaching(requested)) return store.getTeaching(requested);
-  const en = store.activeEnrollment(student.id) ?? store.enrollmentsOf(student.id)[0];
+  const active = store.activeEnrollment(student.id);
+  const requestedTeaching = requested ? store.getTeaching(requested) : null;
+  if (requestedTeaching && (!active || requestedTeaching.sectionId === active.sectionId)) {
+    return requestedTeaching;
+  }
+  const en = active ?? store.enrollmentsOf(student.id)[0];
   if (!en) return null;
-  return store.teachings().find((t) => t.sectionId === en.sectionId) ?? null;
+  return store.teachings().find((t) => t.sectionId === en.sectionId) ??
+    store.teachings(null, { includeArchived: true }).find((t) => t.sectionId === en.sectionId) ?? null;
 }
 
 /** يلتقط سياق الإسناد تلقائيًا فقط حين يكون سياق الطالب الحالي واضحًا. */
@@ -96,6 +101,9 @@ export default {
       .enrollmentsOf(s.id)
       .sort((a, b) => String(b.startDate ?? '').localeCompare(String(a.startDate ?? '')));
     const notes = studentHistory.notes;
+    const previousContexts = studentHistory.contexts.filter((context) => context.teaching.id !== tch?.id);
+    const currentContext = !!tch && currentEnrollment?.sectionId === tch.sectionId &&
+      store.activeTerm()?.id === tch.termId && !store.isTeachingArchived(tch);
     const noteTime = (note) => new Date(note.createdAt ?? note.updatedAt ?? Date.now())
       .toLocaleTimeString('ar-SA', { hour: 'numeric', minute: '2-digit' });
     const eventContext = (event) => {
@@ -107,7 +115,15 @@ export default {
     };
     const contextKind = (event) => !event.teaching
       ? 'سجل عام'
-      : event.teaching.id === tch?.id ? 'السياق المعروض' : 'سياق سابق';
+      : event.teaching.id === tch?.id
+        ? (currentContext ? 'السجل الحالي' : 'سياق تاريخي معروض')
+        : 'سياق سابق';
+    const historicalScore = (event) => {
+      const value = Number(event.record.value);
+      return Number.isFinite(value) ? Math.min(event.item.max, Math.max(0, value)) : null;
+    };
+    const canEditNote = (event) => currentContext && !store.isTeachingArchived(tch) && !store.isTermClosed(tch.termId) &&
+      (!event.teaching || event.teaching.id === tch.id);
 
     return html`
       <div class="printhead">
@@ -126,7 +142,7 @@ export default {
           <div class="student-profile-header__name">${s.name}</div>
           <div class="student-profile-header__meta">
             ${currentSection ? html`<span class="badge badge--ok">الانتساب الحالي · ${sectionLabel(currentSection)}</span>` : ''}
-            ${tch ? html`<span>السياق المعروض · ${store.teachingLabel(tch)}</span>` : ''}
+            ${tch ? html`<span>${currentContext ? 'السجل الحالي' : 'سياق تاريخي معروض'} · ${store.teachingLabel(tch)}</span>` : ''}
             ${currentEnrollment?.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${currentEnrollment.rollNo}</span>` : ''}
           </div>
         </div>
@@ -226,6 +242,59 @@ export default {
         </div>
       </div>
 
+      ${previousContexts.length
+        ? html`
+            <div class="section student-previous-history">
+              <div class="section__head">
+                <div>
+                  <div class="section__title">السجل السابق</div>
+                  <div class="t-3 fs-xs">عرض للقراءة فقط؛ كل سجل يبقى في إسناده الأصلي</div>
+                </div>
+              </div>
+              <div class="stack stack-3">
+                ${previousContexts.map((context) => html`
+                  <div class="card" data-history-teaching="${context.teaching.id}">
+                    <div class="card--pad stack stack-2">
+                      <div class="hstack gap-2 wrap">
+                        <strong>${store.teachingLabel(context.teaching)}</strong>
+                        <span class="badge">للقراءة فقط</span>
+                        ${store.isTeachingArchived(context.teaching) || store.isTermClosed(context.teaching.termId)
+                          ? html`<span class="badge badge--warn">مؤرشف</span>` : ''}
+                      </div>
+                      <div class="t-3 fs-sm hstack gap-2 wrap">
+                        ${context.year?.label ? html`<span>${context.year.label}</span>` : ''}
+                        ${context.term?.name ? html`<span>${context.term.name}</span>` : ''}
+                        <span><span class="tabular">${context.attendance.length}</span> حضور</span>
+                        <span><span class="tabular">${context.logs.length}</span> رصد</span>
+                        <span><span class="tabular">${context.notes.length}</span> ملاحظة</span>
+                      </div>
+                    </div>
+                    ${context.scores.length
+                      ? html`
+                          <div class="history-context-grades">
+                            ${context.scores.map((event) => {
+                              const value = historicalScore(event);
+                              return html`
+                                <div class="itemrow">
+                                  <div class="itemrow__head">
+                                    <span class="itemrow__name">${event.item.name}</span>
+                                    <span class="itemrow__val tabular ${value === null ? 't-3' : ''}">
+                                      ${value === null ? 'غير متاح' : `${fmtNum(value)} / ${event.item.max}`}
+                                    </span>
+                                  </div>
+                                </div>
+                              `;
+                            })}
+                          </div>
+                        `
+                      : ''}
+                  </div>
+                `)}
+              </div>
+            </div>
+          `
+        : ''}
+
       <!-- الحضور -->
       <div class="section">
         <div class="section__head">
@@ -297,10 +366,12 @@ export default {
                         ${eventContext(event).map((label) => html`<span class="badge">${label}</span> `)}
                       </span>
                     </span>
-                    <span class="row__end noprint">
-                      <button class="iconbtn" data-act="edit-note" data-id="${note.id}" aria-label="تعديل ملاحظة">${icon('edit')}</button>
-                      <button class="iconbtn" data-act="delete-note" data-id="${note.id}" aria-label="حذف ملاحظة">${icon('trash')}</button>
-                    </span>
+                    ${canEditNote(event)
+                      ? html`<span class="row__end noprint">
+                          <button class="iconbtn" data-act="edit-note" data-id="${note.id}" aria-label="تعديل ملاحظة">${icon('edit')}</button>
+                          <button class="iconbtn" data-act="delete-note" data-id="${note.id}" aria-label="حذف ملاحظة">${icon('trash')}</button>
+                        </span>`
+                      : ''}
                   </div>
                 `;
               })}
