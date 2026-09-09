@@ -169,18 +169,18 @@ function renderTodayFocus(focus) {
   const teaching = store.getTeaching(session.teachingId);
   const content = {
     current: { eyebrow: 'الآن', title: 'حصتك الحالية', detail: 'الحصة جارية الآن', tone: 'is-current' },
-    upcoming: { eyebrow: 'بعد قليل', title: 'الحصة التالية', detail: session.startTime ? `تبدأ ${fmtTimeRange(session.startTime, session.endTime)}` : 'موعد الحصة التالي', tone: 'is-upcoming' },
+    upcoming: { eyebrow: 'بعد قليل', title: 'الحصة التالية', detail: session.startTime ? html`تبدأ ${fmtTimeRange(session.startTime, session.endTime)}` : 'موعد الحصة التالي', tone: 'is-upcoming' },
     'past-pending': { eyebrow: 'يتطلب انتباهك', title: 'رصد حضور معلّق', detail: 'انتهت الحصة ولم يُرصد الحضور بعد.', tone: 'is-pending' },
   }[kind];
   return html`
-    <section class="today-focus ${content.tone}" aria-label="تركيز اليوم">
+    <section class="today-focus ${content.tone}" aria-label="تركيز اليوم" data-session-id="${session.id}">
       <div class="today-focus__signal"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
       <div class="today-focus__main">
         <div class="today-focus__title">${content.title}</div>
         <div class="today-focus__class">${store.teachingLabel(teaching)}</div>
         <div class="today-focus__detail">${content.detail}</div>
       </div>
-      <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}">
+      <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}">
         ${icon('attendance')} رصد الحضور
       </a>
     </section>
