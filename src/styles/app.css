@@ -46,6 +46,7 @@
   --brand:     #18A878;
   --brand-ink: #ffffff;
   --brand-soft:#e8f6f1;
+  --brand-border:#9edbc7;
   --brand-hover: #148f66;
 
   /* Semantic action colors stay separate from status/navigation colors. */
@@ -93,6 +94,7 @@
     --brand:     #18A878;
     --brand-ink: #06231f;
     --brand-soft:#123734;
+    --brand-border:#296158;
     --brand-hover: #5eead4;
     
     --x-purple:       #8b5cf6;
@@ -129,6 +131,7 @@
   --brand:     #18A878;
   --brand-ink: #06231f;
   --brand-soft:#123734;
+  --brand-border:#296158;
   --brand-hover: #5eead4;
   
   --x-purple:       #8b5cf6;

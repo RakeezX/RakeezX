@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 
@@ -76,6 +76,21 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   classRules: {
     entity: 'class_rules',
     fields: { teachingId: 'teaching_id', iconKey: 'icon_key', text: 'text' },
+    references: { teachingId: 'teachings' },
+  },
+  classGoals: {
+    entity: 'class_goals',
+    fields: {
+      teachingId: 'teaching_id', runId: 'run_id', date: 'date', sessionId: 'session_id',
+      text: 'text', presetKey: 'preset_key', durationMinutes: 'duration_minutes',
+      rewardPoints: 'reward_points', state: 'state', startedAt: 'started_at',
+      completedAt: 'completed_at', rewardOperationId: 'reward_operation_id',
+    },
+    references: { teachingId: 'teachings', sessionId: 'sessions' },
+  },
+  classCharterSelections: {
+    entity: 'class_charter_selections',
+    fields: { teachingId: 'teaching_id', selectedRuleIds: 'selected_rule_ids' },
     references: { teachingId: 'teachings' },
   },
   items: {
@@ -157,6 +172,9 @@ function encodeFieldValue(store, field, value) {
   if (store === 'calendars' && field === 'source' && String(value ?? '').startsWith('preset:')) {
     return 'moe';
   }
+  if (store === 'classGoals' && ['startedAt', 'completedAt'].includes(field) && Number.isFinite(value)) {
+    return new Date(value).toISOString();
+  }
   return clone(value);
 }
 
@@ -168,6 +186,11 @@ function decodeFieldValue(store, field, value, row) {
   if (store === 'calendars' && field === 'source' && value === 'moe') {
     const prefix = `cal:${row.year_id}:preset:`;
     if (String(row.id ?? '').startsWith(prefix)) return String(row.id).slice(`cal:${row.year_id}:`.length);
+  }
+  if (store === 'classGoals' && ['startedAt', 'completedAt'].includes(field)) {
+    if (value == null) return null;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
   return clone(value);
 }
@@ -455,6 +478,7 @@ function defaultTransport() {
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
     applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
     applyClosedTermReportCommand: applySyncV2ClosedTermReportCommand,
+    applyClassGoalRewardCommand: applySyncV2ClassGoalRewardCommand,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -1141,6 +1165,43 @@ export function createSyncV2Engine({
               return {
                 closedTermReports: { put: [{ ...(currentReport ?? {}), ...report, serverCanonical: canonicalSnapshot(report) }], remove: [] },
                 terms: { put: [{ ...(currentTerm ?? {}), ...term, serverCanonical: canonicalSnapshot(term) }], remove: [] },
+                outbox: { put: [], remove: [mutation.id] },
+              };
+            },
+          });
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+          else await markFailure(mutation, error);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
+        continue;
+      }
+      if (original.op === 'command' && original.command === 'class-goal:reward' &&
+          typeof transport.applyClassGoalRewardCommand === 'function') {
+        const liveRows = sortMutations(await database.getAll('outbox'));
+        const live = liveRows.find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') { await markDependencyBlock(live, readiness.reason); result.blocked++; continue; }
+        if (readiness.state === 'rejected') { await markRejected(live, readiness.reason); result.blocked++; continue; }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = await transport.applyClassGoalRewardCommand({
+            mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            goalId: mutation.patch.goalId, runId: mutation.patch.runId,
+            clientUpdatedAt: mutation.clientUpdatedAt,
+          });
+          if (receipt?.mutationId !== mutation.mutationId) throw new Error('Class goal reward receipt mutationId mismatch');
+          const goal = decodeSyncV2Canonical('classGoals', receipt.goal);
+          const logs = (receipt.logs ?? []).map((row) => decodeSyncV2Canonical('logs', row)).filter(Boolean);
+          if (!goal?.id || goal.state !== 'completed') throw new Error('Class goal reward receipt is incomplete');
+          await database.applyBatch({ classGoals: {}, logs: {}, outbox: {} }, {
+            prepare(current) {
+              return {
+                classGoals: { put: [{ ...(current.classGoals.find((row) => row.id === goal.id) ?? {}), ...goal, serverCanonical: canonicalSnapshot(goal) }], remove: [] },
+                logs: { put: logs.map((row) => ({ ...(current.logs.find((item) => item.id === row.id) ?? {}), ...row, serverCanonical: canonicalSnapshot(row) })), remove: [] },
                 outbox: { put: [], remove: [mutation.id] },
               };
             },

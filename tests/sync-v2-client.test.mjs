@@ -96,6 +96,12 @@ const FIELD_GROUPS = {
   scores: { student_id: 'identity', item_id: 'identity', value: 'value' },
   teachings: { section_id: 'identity', subject_id: 'identity', term_id: 'identity', order: 'order' },
   sessions: { teaching_id: 'identity', date: 'identity', period: 'identity' },
+  class_goals: {
+    teaching_id: 'identity', run_id: 'goal', date: 'goal', session_id: 'goal', text: 'goal',
+    preset_key: 'goal', duration_minutes: 'goal', reward_points: 'goal', state: 'goal',
+    started_at: 'goal', completed_at: 'goal', reward_operation_id: 'goal',
+  },
+  class_charter_selections: { teaching_id: 'identity', selected_rule_ids: 'selection' },
 };
 
 class MemoryV2Server {
@@ -322,6 +328,63 @@ test('class rules converge across three generic V2 clients and tombstones win on
   await Promise.all([b.engine.pullStore('classRules'), c.engine.pullStore('classRules')]);
   for (const client of [b, c]) assert.equal((await client.database.get('classRules', 'rule-1')).deleted, true);
   assert.equal((await b.engine.status()).state, 'synced');
+});
+
+test('class Goal invariant fields and charter selection converge across devices without tombstone resurrection', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'class-goal-a');
+  const b = makeClient(server, 'class-goal-b');
+  const c = makeClient(server, 'class-goal-c');
+  const later = makeClient(server, 'class-goal-later');
+  t.after(() => [a, b, c, later].forEach((client) => client.database.close()));
+
+  const teaching = { id: 'goal-teaching', sectionId: 'section-1', subjectId: 'subject-1', termId: 'term-1', order: 0 };
+  await Promise.all([a, b, c].map((client) => seedAuthoritative(client, 'teachings', teaching)));
+  const original = {
+    teachingId: teaching.id, runId: 'run-1', date: '2026-09-09', sessionId: null,
+    text: 'الهدف الأصلي', presetKey: null, durationMinutes: 10, rewardPoints: 2,
+    state: 'active', startedAt: 1_800_000_000_100, completedAt: null, rewardOperationId: null,
+  };
+  await a.engine.commitMutation({ store: 'classGoals', recordId: `class-goal:${teaching.id}`, op: 'create', patch: original });
+  await a.engine.commitMutation({
+    store: 'classCharterSelections', recordId: `class-charter-selection:${teaching.id}`, op: 'create',
+    patch: { teachingId: teaching.id, selectedRuleIds: ['rule-a'] },
+  });
+  assert.equal((await a.engine.dispatchPending()).acknowledged, 2);
+  await Promise.all([
+    b.engine.pullStore('classGoals'), c.engine.pullStore('classGoals'),
+    b.engine.pullStore('classCharterSelections'), c.engine.pullStore('classCharterSelections'),
+  ]);
+
+  await b.engine.commitMutation({
+    store: 'classGoals', recordId: `class-goal:${teaching.id}`, op: 'patch',
+    patch: { text: 'هدف الجهاز ب', rewardPoints: 3 },
+  });
+  await c.engine.commitMutation({
+    store: 'classGoals', recordId: `class-goal:${teaching.id}`, op: 'patch',
+    patch: { durationMinutes: 25, startedAt: 1_800_000_000_500 },
+  });
+  await b.engine.commitMutation({
+    store: 'classCharterSelections', recordId: `class-charter-selection:${teaching.id}`, op: 'patch',
+    patch: { selectedRuleIds: ['rule-a', 'rule-b'] },
+  });
+  await b.engine.dispatchPending();
+  await c.engine.dispatchPending();
+  await Promise.all([a, b, c].flatMap((client) => [client.engine.pullStore('classGoals'), client.engine.pullStore('classCharterSelections')]));
+  for (const client of [a, b, c]) {
+    const goal = await client.database.get('classGoals', `class-goal:${teaching.id}`);
+    assert.deepEqual(
+      { text: goal.text, rewardPoints: goal.rewardPoints, durationMinutes: goal.durationMinutes, startedAt: goal.startedAt },
+      { text: 'هدف الجهاز ب', rewardPoints: 3, durationMinutes: 10, startedAt: original.startedAt },
+      'one device must win the whole Goal invariant group; mixed timer/reward state is invalid',
+    );
+    assert.deepEqual((await client.database.get('classCharterSelections', `class-charter-selection:${teaching.id}`)).selectedRuleIds, ['rule-a', 'rule-b']);
+  }
+
+  await a.engine.commitMutation({ store: 'classGoals', recordId: `class-goal:${teaching.id}`, op: 'delete' });
+  assert.equal((await a.engine.dispatchPending()).acknowledged, 1);
+  await later.engine.pullStore('classGoals');
+  assert.equal((await later.database.get('classGoals', `class-goal:${teaching.id}`)).deleted, true);
 });
 
 test('pull adopts an existing bootstrap identity and preserves a later local edit', async (t) => {

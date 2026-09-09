@@ -198,11 +198,11 @@ test('network failure during refresh retains the local session for later retry',
   assert.deepEqual(await db.get('outbox', pending.id), pending);
 });
 
-test('PWA release v8 precaches Sync V2 and preserves the update lifecycle', async () => {
+test('PWA release v9 precaches Sync V2 and preserves the update lifecycle', async () => {
   const sw = await readFile(new URL('../sw.js', import.meta.url), 'utf8');
   const cloudSource = await readFile(new URL('../src/lib/cloud.js', import.meta.url), 'utf8');
 
-  assert.match(sw, /const VERSION = 'rakeezx-v8'/);
+  assert.match(sw, /const VERSION = 'rakeezx-v9'/);
   assert.match(sw, /\.\/src\/lib\/sync-v2\.js/);
   assert.match(sw, /self\.skipWaiting\(\)/);
   assert.match(sw, /self\.clients\.claim\(\)/);

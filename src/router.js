@@ -4,6 +4,7 @@ const ROUTES = [
   { path: '/',                          load: () => import('./views/home.js') },
   { path: '/classes',                   load: () => import('./views/teachings.js') },
   { path: '/teaching/:id',              load: () => import('./views/teaching-hub.js') },
+  { path: '/teaching/:id/class-rules',  load: () => import('./views/class-rules.js') },
   { path: '/teaching/:id/students',     load: () => import('./views/students.js') },
   { path: '/teaching/:id/attendance',   load: () => import('./views/attendance.js') },
   { path: '/teaching/:id/quicklog',     load: () => import('./views/quicklog.js') },

@@ -37,10 +37,10 @@ export function displayState() {
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'classRules',
+  'classRules', 'classGoals', 'classCharterSelections',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
 ]);
-const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules']);
+const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules', 'classGoals', 'classCharterSelections']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
@@ -184,6 +184,8 @@ function v2PostPullStores(snapshot, full) {
       stores.add('teachings'); stores.add('items');
     } else if (String(entry.command ?? '').startsWith('term-report:')) {
       stores.add('closedTermReports'); stores.add('terms');
+    } else if (entry.command === 'class-goal:reward') {
+      stores.add('classGoals'); stores.add('logs');
     }
   }
   return [...stores];

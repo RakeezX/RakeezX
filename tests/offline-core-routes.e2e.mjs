@@ -31,8 +31,8 @@ test('unvisited core routes and dependencies open offline from the installed she
     await page.evaluate(() => navigator.serviceWorker.ready);
     await page.waitForFunction(async () => {
       if ((await caches.keys()).includes('rakeezx-v7')) return false;
-      const cache = await caches.open('rakeezx-v8');
-      return (await Promise.all(['src/lib/sync-v2.js', 'src/lib/avatar.js', 'src/lib/report-print.js', 'src/views/archive.js', 'src/views/execution-report.js'].map(p => cache.match(new URL(p, location.href))))).every(Boolean);
+      const cache = await caches.open('rakeezx-v9');
+      return (await Promise.all(['src/lib/sync-v2.js', 'src/lib/avatar.js', 'src/lib/report-print.js', 'src/views/archive.js', 'src/views/execution-report.js', 'src/views/class-rules.js'].map(p => cache.match(new URL(p, location.href))))).every(Boolean);
     });
     await page.evaluate(async () => {
       const store = await import('/src/store.js');

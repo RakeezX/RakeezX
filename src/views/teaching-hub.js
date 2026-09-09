@@ -5,12 +5,15 @@ import * as store from '../store.js';
 import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
+import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
 
 const TOOLS = (id) => [
+  { href: `#/teaching/${id}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
   { href: `#/teaching/${id}/quicklog`, icon: 'spark', title: 'الرصد السريع', sub: 'مشاركة وسلوك أثناء الحصة' },
   { href: `#/teaching/${id}/picker`, icon: 'picker', title: 'القرعة', sub: 'اختيار عادل لا يكرّر أحدًا' },
   { href: `#/teaching/${id}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
-  { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة النتائج', sub: 'للعرض على البروجكتر' },
+  { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة التميز', sub: 'لعرض التميز على البروجكتر' },
+  { href: `#/teaching/${id}/sessions`, icon: 'session', title: 'الحصص', sub: 'السجل والحصص السابقة' },
   { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'كشوف وتصدير وطباعة' },
   { href: `#/teaching/${id}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
 ];
@@ -42,6 +45,19 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
           <a class="btn btn--sm ${completeness?.state === 'pending' ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${tch.id}/attendance?session=${targetSession.id}">${completeness?.state === 'completed' ? 'تعديل الحضور' : 'رصد الحضور'}</a>
         </div>` : ''}
     </div>
+  `;
+}
+
+function activeGoalIndicator(teachingId, activeGoal) {
+  if (!activeGoal) return '';
+  return html`
+    <a class="class-goal-indicator" href="#/teaching/${teachingId}/class-rules" aria-label="الهدف النشط: ${activeGoal.goal}">
+      <span class="class-goal-indicator__status">${icon('clock')} هدف نشط</span>
+      <strong class="class-goal-indicator__title">${activeGoal.goal}</strong>
+      <span class="class-goal-indicator__timer tabular" aria-label="الوقت المتبقي ${activeGoal.countdown}">${activeGoal.countdown}</span>
+      <span class="class-goal-indicator__reward tabular">+${activeGoal.reward} مشاركة</span>
+      <span class="class-goal-indicator__chevron">${icon('chev')}</span>
+    </a>
   `;
 }
 
@@ -81,11 +97,13 @@ export default {
     const targetSession = todaySessions.find((s) => store.attendanceCompleteness(s).state === 'pending') || todaySessions[0];
     const completeness = targetSession ? store.attendanceCompleteness(targetSession) : null;
     const markedCount = targetSession ? store.attendanceIn(targetSession.id).length : 0;
+    const activeGoal = activeGoalSummary(tch.id);
 
     if (!roster.length) {
       return html`
         <div class="class-hub">
           ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
+          ${activeGoalIndicator(tch.id, activeGoal)}
           <div class="class-hub__empty empty">
             <div class="empty__icon">${icon('student')}</div>
             <div class="empty__title">الشعبة بلا طلاب بعد</div>
@@ -108,6 +126,7 @@ export default {
     return html`
       <div class="class-hub">
       ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
+      ${activeGoalIndicator(tch.id, activeGoal)}
       <div class="section">
         <div class="grid grid--3">
           <div class="stat">
@@ -192,6 +211,10 @@ export default {
       </div>
       </div>
     `;
+  },
+
+  afterPaint(root, params) {
+    watchActiveGoalTimer(params.id);
   },
 
   actions: {

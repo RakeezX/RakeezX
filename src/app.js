@@ -222,11 +222,10 @@ const NAV = [
 
 /** تنقّل سياقي داخل الإسناد؛ لا يحل محل تنقّل التطبيق الرئيسي. */
 const teachingNav = (id) => [
-  { href: `#/teaching/${id}`,            icon: 'home',       label: 'الفصل', exact: true },
-  { href: `#/teaching/${id}/attendance`, icon: 'attendance', label: 'الحضور' },
-  { href: `#/teaching/${id}/sessions`,   icon: 'session',    label: 'الحصص' },
-  { href: `#/teaching/${id}/grades`,     icon: 'grades',     label: 'كشف الدرجات' },
+  { href: `#/teaching/${id}`,            icon: 'home',       label: 'الفصل', exact: true, activeFor: [`/teaching/${id}/class-rules`, `/teaching/${id}/sessions`] },
   { href: `#/teaching/${id}/students`,   icon: 'classes',    label: 'الطلاب' },
+  { href: `#/teaching/${id}/attendance`, icon: 'attendance', label: 'الحضور' },
+  { href: `#/teaching/${id}/grades`,     icon: 'grades',     label: 'كشف الدرجات' },
 ];
 
 const primaryParent = (path) => {
@@ -241,6 +240,7 @@ const primaryParent = (path) => {
 const isCurrent = (item, path) => {
   const target = item.href.slice(1);
   if (item.primary && target === primaryParent(path)) return true;
+  if (item.activeFor?.some((candidate) => path === candidate || path.startsWith(`${candidate}?`))) return true;
   return item.exact ? path === target : path.startsWith(target);
 };
 

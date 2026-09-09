@@ -466,6 +466,31 @@ export async function applySyncV2ClosedTermReportCommand(envelope) {
   });
 }
 
+/** Atomic class-goal completion and participation reward. */
+export async function applySyncV2ClassGoalRewardCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2ClassGoalRewardCommand !== 'function') {
+      throw new Error('Mock backend does not implement class goal reward RPC');
+    }
+    return mockBackend.applySyncV2ClassGoalRewardCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_class_goal_reward_command', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_mutation_id: envelope.mutationId,
+      p_device_id: envelope.deviceId,
+      p_goal_id: envelope.goalId,
+      p_run_id: envelope.runId,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null,
+    }),
+  });
+}
+
 /** Stage a hash-bound restore plan. This RPC never changes domain rows. */
 export async function stageSyncV2Restore(envelope) {
   if (mockBackend) {

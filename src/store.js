@@ -23,7 +23,7 @@ import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID }
 export { sectionLabel };
 
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 /* ---------- الحالة ---------- */
 
@@ -31,7 +31,7 @@ const COLLECTIONS = [
   'years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments',
   'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
-  'notes', 'classRules', 'assignments', 'submissions',
+  'notes', 'classRules', 'classGoals', 'classCharterSelections', 'assignments', 'submissions',
   'closedTermReports',
 ];
 
@@ -544,7 +544,7 @@ function sectionForOperationalRecord(storeName, record, pending = null) {
   if (storeName === 'enrollments') return recordFrom('sections', record.sectionId, pending);
   if (storeName === 'teachings') return recordFrom('sections', record.sectionId, pending);
   let teachingId = record.teachingId ?? null;
-  if (storeName === 'items' || storeName === 'slots' || storeName === 'sessions' || storeName === 'logs' || storeName === 'classRules') {
+  if (storeName === 'items' || storeName === 'slots' || storeName === 'sessions' || storeName === 'logs' || storeName === 'classRules' || storeName === 'classGoals' || storeName === 'classCharterSelections') {
     teachingId = record.teachingId;
   } else if (storeName === 'scores') {
     teachingId = recordFrom('items', record.itemId, pending)?.teachingId ?? null;
@@ -622,7 +622,7 @@ const nextEnrollmentOperationOrder = (outbox = []) => {
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
-  'classRules',
+  'classRules', 'classGoals', 'classCharterSelections',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance',
 ]);
 
@@ -1107,6 +1107,26 @@ export const classRulesOf = (tchId) => [...live(state.classRules)]
   .filter((rule) => rule.teachingId === tchId)
   .sort((left, right) => Number(left.createdAt ?? left.updatedAt ?? 0) - Number(right.createdAt ?? right.updatedAt ?? 0) ||
     String(left.id).localeCompare(String(right.id)));
+
+export const classGoalId = (tchId) => `class-goal:${tchId}`;
+export const classCharterSelectionId = (tchId) => `class-charter-selection:${tchId}`;
+
+export const classGoalOf = (tchId) => live(state.classGoals)
+  .find((goal) => goal.teachingId === tchId && goal.id === classGoalId(tchId)) ?? null;
+
+export const activeClassGoal = (tchId) => {
+  const goal = classGoalOf(tchId);
+  if (!goal || goal.state !== 'active' || isTeachingArchived(tchId) || isTermClosed(getTeaching(tchId)?.termId)) return null;
+  return goal;
+};
+
+export function selectedClassRules(tchId) {
+  const rules = classRulesOf(tchId);
+  const config = live(state.classCharterSelections).find((row) => row.teachingId === tchId);
+  if (!config) return rules;
+  const selected = new Set(config.selectedRuleIds ?? []);
+  return rules.filter((rule) => selected.has(rule.id));
+}
 
 export const scoresOf = (studentId) => live(state.scores).filter((s) => s.studentId === studentId);
 
@@ -2140,6 +2160,8 @@ export function teachingDeleteEvidence(tchId) {
   check('logs', state.logs.filter((row) => row.teachingId === tchId || sessionIds.has(row.sessionId)));
   check('notes', state.notes.filter((row) => row.teachingId === tchId || sessionIds.has(row.sessionId)));
   check('class-rules', state.classRules.filter((row) => row.teachingId === tchId));
+  check('class-goal', state.classGoals.filter((row) => row.teachingId === tchId));
+  check('class-charter-selection', state.classCharterSelections.filter((row) => row.teachingId === tchId));
   check('assignments', assignmentRows);
   check('submissions', state.submissions.filter((row) => assignmentIds.has(row.assignmentId)));
   return [...new Set(evidence)];
@@ -2190,13 +2212,18 @@ export async function archiveSection(secId, archiveDate = todayISO()) {
   const stamp = now();
   const archived = syncV2Record('sections', { ...section, status: 'archived', archivedAt: new Date(stamp).toISOString(), archiveDate, updatedAt: stamp });
   const command = lifecycleCommandEntry('archive_class', secId, 'sections', stamp, { archiveDate });
-  await db.applyBatch({ sections: {}, outbox: {} }, { prepare: () => ({
+  const teachingIds = new Set(live(state.teachings).filter((row) => row.sectionId === secId).map((row) => row.id));
+  const cancelledGoals = live(state.classGoals).filter((goal) => teachingIds.has(goal.teachingId) && goal.state === 'active')
+    .map((goal) => syncV2Record('classGoals', { ...goal, state: 'cancelled', completedAt: stamp, updatedAt: stamp }));
+  await db.applyBatch({ sections: {}, classGoals: {}, outbox: {} }, { prepare: () => ({
     sections: { put: [archived], remove: [] },
+    classGoals: { put: cancelledGoals, remove: [] },
     outbox: { put: command ? [command] : [], remove: [] },
   }) });
   applyToMemory('sections', [archived]);
+  applyToMemory('classGoals', cancelledGoals);
   notify();
-  broadcast([{ store: 'sections', id: secId }]);
+  broadcast([{ store: 'sections', id: secId }, ...changeList('classGoals', cancelledGoals)]);
   return archived;
 }
 
@@ -2233,6 +2260,8 @@ export async function deleteTeaching(tchId) {
       attendance: (a) => sessionIds.has(a.sessionId),
       logs: (l) => l.teachingId === tchId,
       classRules: (rule) => rule.teachingId === tchId,
+      classGoals: (goal) => goal.teachingId === tchId,
+      classCharterSelections: (selection) => selection.teachingId === tchId,
     },
     { op: 'deleteTeaching', tchId },
     { command: 'delete_teaching', store: 'teachings', targetId: tchId }
@@ -2283,6 +2312,8 @@ export async function deleteClass(secId) {
       logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
       notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
       classRules: (rule) => teachingIds.has(rule.teachingId),
+      classGoals: (goal) => teachingIds.has(goal.teachingId),
+      classCharterSelections: (selection) => teachingIds.has(selection.teachingId),
       students: (s) => orphanStudentIds.has(s.id),
     },
     { op: 'deleteClass', secId },
@@ -2465,7 +2496,124 @@ export async function editClassRule(ruleId, { iconKey, text } = {}) {
 
 export async function deleteClassRule(ruleId) {
   const rule = state.classRules.find((candidate) => candidate.id === ruleId && !candidate.deleted);
-  return rule ? softDelete('classRules', ruleId) : null;
+  if (!rule) return null;
+  const removed = await softDelete('classRules', ruleId);
+  const config = live(state.classCharterSelections).find((row) => row.teachingId === rule.teachingId);
+  if (removed && config?.selectedRuleIds?.includes(ruleId)) {
+    await patch('classCharterSelections', config.id, {
+      selectedRuleIds: config.selectedRuleIds.filter((id) => id !== ruleId),
+    });
+  }
+  return removed;
+}
+
+const goalText = (value) => String(value ?? '').replace(/\s+/g, ' ').trim();
+const validGoalState = (value) => ['active', 'cancelled', 'completed'].includes(value);
+
+async function persistGoalRecord(storeName, record, previous = null) {
+  assertOperationalWritesAllowed({ [storeName]: [record] });
+  const prepared = syncV2Record(storeName, record, { pendingCreate: !previous });
+  const fields = previous ? Object.keys(SYNC_V2_SCHEMAS[storeName].fields)
+    .filter((field) => JSON.stringify(previous[field]) !== JSON.stringify(prepared[field])) : null;
+  const entry = outboxEntry(storeName, prepared, fields, previous ? 'patch' : 'put', previous);
+  await db.putAcross({ [storeName]: [prepared], outbox: entry ? [entry] : [] });
+  applyToMemory(storeName, [prepared]);
+  notify();
+  broadcast([{ store: storeName, id: prepared.id }]);
+  return prepared;
+}
+
+/** Creates a new run of the single durable current goal for one teaching. */
+export async function startClassGoal({ teachingId, text, presetKey = null, durationMinutes, rewardPoints, date = todayISO(), sessionId: requestedSessionId = null } = {}) {
+  const teaching = getTeaching(teachingId);
+  const section = teaching ? getSection(teaching.sectionId) : null;
+  const clean = goalText(text);
+  const duration = Number(durationMinutes);
+  const reward = Number(rewardPoints);
+  if (!teaching || !section || section.status === 'archived' || isTermClosed(teaching.termId)) {
+    throw new Error('لا يمكن بدء هدف في فصل مؤرشف أو فصل دراسي مغلق.');
+  }
+  if (!clean || clean.length > 120) throw new Error('يجب أن يكون الهدف بين 1 و120 حرفًا.');
+  if (!validCivilDate(date)) throw new Error('تاريخ الهدف غير صالح.');
+  if (!Number.isInteger(duration) || duration < 1 || duration > 180) throw new Error('مدة الهدف يجب أن تكون بين 1 و180 دقيقة.');
+  if (!Number.isInteger(reward) || reward < 1 || reward > 10) throw new Error('المكافأة يجب أن تكون بين 1 و10 نقاط مشاركة.');
+  const sessions = sessionsOnFor(teachingId, date).filter((session) => !['cancelled', 'cancelled_holiday'].includes(session.status));
+  const selectedSession = requestedSessionId
+    ? sessions.find((session) => session.id === requestedSessionId)
+    : sessions.find((session) => !attendanceCompleteness(session).completed) ?? sessions[0] ?? null;
+  if (requestedSessionId && !selectedSession) throw new Error('الحصة المحددة لا تنتمي إلى هذا الإسناد والتاريخ.');
+  const stamp = now();
+  const record = {
+    id: classGoalId(teachingId), teachingId, runId: uid(), date,
+    sessionId: selectedSession?.id ?? null, text: clean, presetKey: presetKey || null,
+    durationMinutes: duration, rewardPoints: reward, state: 'active',
+    startedAt: stamp, completedAt: null, rewardOperationId: null,
+    updatedAt: stamp, deleted: false,
+  };
+  const existing = classGoalOf(teachingId);
+  return persistGoalRecord('classGoals', record, existing);
+}
+
+export async function cancelClassGoal(teachingId) {
+  const goal = activeClassGoal(teachingId);
+  return goal ? patch('classGoals', goal.id, { state: 'cancelled', completedAt: now() }) : null;
+}
+
+export async function setClassCharterSelection(teachingId, ruleIds = []) {
+  const teaching = getTeaching(teachingId);
+  if (!teaching) return null;
+  const available = new Set(classRulesOf(teachingId).map((rule) => rule.id));
+  const selectedRuleIds = [...new Set(ruleIds)].filter((id) => available.has(id));
+  const id = classCharterSelectionId(teachingId);
+  const existing = live(state.classCharterSelections).find((row) => row.id === id);
+  return persistGoalRecord('classCharterSelections', {
+    ...(existing ?? {}), id, teachingId, selectedRuleIds, updatedAt: now(), deleted: false,
+  }, existing);
+}
+
+/** Exact, displayable eligibility used by the confirmation sheet. */
+export function classGoalRewardPreview(teachingId) {
+  const goal = activeClassGoal(teachingId);
+  if (!goal) return { ok: false, reason: 'inactive', students: [] };
+  let members = students(teachingId);
+  if (goal.sessionId) {
+    const session = getSession(goal.sessionId);
+    if (!session || session.teachingId !== teachingId || session.date !== goal.date) {
+      return { ok: false, reason: 'session-mismatch', students: [] };
+    }
+    const snapshot = sessionRosterSnapshot(session.id);
+    const attendance = attendanceIn(session.id);
+    if (!snapshot && attendance.length) return { ok: false, reason: 'legacy-membership-unresolved', students: [] };
+    members = sessionRoster(session).members;
+    const excluded = new Set(attendance.filter((row) => ['absent', 'excused'].includes(row.status)).map((row) => row.studentId));
+    members = members.filter((student) => !excluded.has(student.id));
+  }
+  const unique = [...new Map(members.map((student) => [student.id, student])).values()];
+  return { ok: true, reason: null, students: unique, count: unique.length, sessionId: goal.sessionId ?? null };
+}
+
+/** Queue one atomic server reward command; no local participation row is invented. */
+export async function rewardClassGoal(teachingId) {
+  const goal = activeClassGoal(teachingId);
+  const preview = classGoalRewardPreview(teachingId);
+  if (!goal || !preview.ok || !preview.count) throw new Error('لا يوجد طلاب مؤهلون لمكافأة هذا الهدف.');
+  const stamp = now();
+  const command = syncV2CommandEntry({
+    store: 'classGoals', recordId: goal.id, command: 'class-goal:reward', stamp,
+    baseRevision: goal.serverRevision ?? 0,
+    patch: { goalId: goal.id, runId: goal.runId },
+    dependencies: [{ store: 'classGoals', recordId: goal.id, requiresServerRevision: true }],
+  });
+  if (!command) throw new Error('لا يمكن مزامنة هدف تجريبي محلي.');
+  let queued = false;
+  await db.applyBatch({ outbox: {} }, { prepare(current) {
+    const exists = current.outbox.some((row) => row.command === 'class-goal:reward' &&
+      row.patch?.goalId === goal.id && row.patch?.runId === goal.runId && !['rejected'].includes(row.state));
+    queued = !exists;
+    return { outbox: { put: exists ? [] : [command], remove: [] } };
+  } });
+  if (queued) notify({ render: false });
+  return { queued, count: preview.count, mutationId: queued ? command.mutationId : null };
 }
 
 /** يضيف طالبًا جديدًا وينسبه لشعبة. يرفض الاسم الفارغ. */

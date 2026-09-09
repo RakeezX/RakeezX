@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v8';
+const VERSION = 'rakeezx-v9';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -52,6 +52,7 @@ const SHELL = [
   './src/views/home.js',
   './src/views/teachings.js',
   './src/views/teaching-hub.js',
+  './src/views/class-rules.js',
   './src/views/students.js',
   './src/views/attendance.js',
   './src/views/quicklog.js',
