@@ -466,6 +466,46 @@ export async function applySyncV2ClosedTermReportCommand(envelope) {
   });
 }
 
+/** Stage a hash-bound restore plan. This RPC never changes domain rows. */
+export async function stageSyncV2Restore(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.stageSyncV2Restore !== 'function') throw new Error('Mock backend does not implement restore staging RPC');
+    return mockBackend.stageSyncV2Restore(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/stage_sync_v2_restore', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({
+      p_restore_id: envelope.restoreId,
+      p_backup_hash: envelope.backupHash,
+      p_backup_version: envelope.backupVersion,
+      p_source_manifest: envelope.sourceManifest,
+      p_operations: envelope.operations,
+    }),
+  });
+}
+
+/** Atomically finalize one staged restore and return the complete canonical owner state. */
+export async function finalizeSyncV2Restore(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.finalizeSyncV2Restore !== 'function') throw new Error('Mock backend does not implement restore finalization RPC');
+    return mockBackend.finalizeSyncV2Restore(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/finalize_sync_v2_restore', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({
+      p_restore_id: envelope.restoreId,
+      p_backup_hash: envelope.backupHash,
+      p_expected_stage_hash: envelope.expectedStageHash,
+    }),
+  });
+}
+
 /**
  * Commits the two enrollment sides of a student transfer in one database
  * transaction.  Payload records already use cloud/snake_case field names.

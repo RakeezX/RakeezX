@@ -45,6 +45,19 @@ export const state = {
   ...Object.fromEntries(COLLECTIONS.map((c) => [c, []])),
 };
 
+let cloudRestoreInProgress = false;
+export function setCloudRestoreInProgress(active) {
+  cloudRestoreInProgress = active === true;
+}
+
+function assertCloudRestoreWritable() {
+  if (cloudRestoreInProgress) {
+    throw Object.assign(new Error('استعادة النسخة السحابية قيد التنفيذ. انتظر اكتمالها قبل التعديل.'), {
+      code: 'CLOUD_RESTORE_IN_PROGRESS',
+    });
+  }
+}
+
 const DEFAULT_PROFILE = makeProfile();
 const DEFAULT_DEVICE = makeDevice({ schemaVersion: SCHEMA_VERSION });
 
@@ -421,6 +434,7 @@ function syncV2Dependencies(storeName, record) {
 }
 
 function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
+  assertCloudRestoreWritable();
   if (isLocalOnlyRecord({ id: recordId, ...commandPatch }) ||
       dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
   const mutationId = uid();
@@ -442,6 +456,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
 }
 
 const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
+  assertCloudRestoreWritable();
   const schema = SYNC_V2_SCHEMAS[storeName];
   if (!schema || schema.readOnly || isLocalOnlyRecord(rec)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
@@ -550,6 +565,7 @@ function sectionForOperationalRecord(storeName, record, pending = null) {
 }
 
 function assertOperationalWritesAllowed(batch) {
+  assertCloudRestoreWritable();
   for (const [storeName, records] of Object.entries(batch ?? {})) {
     for (const record of records ?? []) {
       if (storeName === 'closedTermReports') {

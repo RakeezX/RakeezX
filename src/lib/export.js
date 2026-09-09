@@ -1,12 +1,14 @@
 /** RAKEEZ X — التصدير: ملفات CSV تفتح في إكسل بالعربية، ونسخة احتياطية JSON كاملة. */
 
 import * as db from './db.js';
+import * as cloud from './cloud.js';
 import { todayISO } from '../models.js';
 
 
 /** معرّف المنتج التقني — يُكتب في كل نسخة احتياطية. */
 export const APP_ID = 'rakeezx';
-export const BACKUP_VERSION = 3;
+export const BACKUP_VERSION = 4;
+export const LEGACY_BACKUP_VERSION = 3;
 
 /**
  * مخازن **لا تدخل النسخة الاحتياطية ولا تُستورد منها إطلاقًا**.
@@ -62,17 +64,56 @@ export function downloadCSV(filename, rows) {
 
 /* ---------- نسخة احتياطية ---------- */
 
-export async function buildBackup() {
+function canonicalize(value) {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])]));
+}
+
+export function stableBackupJSON(value) {
+  return JSON.stringify(canonicalize(value));
+}
+
+export async function sha256Hex(value) {
+  const bytes = new TextEncoder().encode(typeof value === 'string' ? value : stableBackupJSON(value));
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export function backupHashInput(payload) {
+  const copy = structuredClone(payload);
+  delete copy.backupHash;
+  return copy;
+}
+
+function baselineFor(record) {
+  const canonical = record.serverCanonical && typeof record.serverCanonical === 'object'
+    ? record.serverCanonical : null;
+  return {
+    id: record.id,
+    revision: Number(record.serverRevision ?? canonical?.serverRevision ?? 0),
+    fieldRevisions: structuredClone(record.fieldRevisions ?? canonical?.fieldRevisions ?? {}),
+    deleted: canonical?.deleted === true || record.deleted === true,
+    value: canonical ? structuredClone(canonical) : null,
+  };
+}
+
+export async function buildBackup({ sourceOwnerId = cloud.user?.id ?? null, backupId = globalThis.crypto.randomUUID() } = {}) {
   const payload = {
     app: APP_ID,
     version: BACKUP_VERSION,
+    backupId,
+    sourceOwnerId,
     exportedAt: new Date().toISOString(),
     data: {},
+    baselines: {},
   };
   for (const store of db.STORES) {
     if (DEVICE_ONLY_STORES.includes(store)) continue;
     payload.data[store] = (await db.getAll(store)).filter((record) => !String(record.id ?? '').startsWith('demo:'));
+    payload.baselines[store] = payload.data[store].map(baselineFor);
   }
+  payload.backupHash = await sha256Hex(backupHashInput(payload));
   return payload;
 }
 
@@ -163,7 +204,60 @@ export function validateBackup(payload) {
   }
 
   if (!total) add('الملف لا يحوي أي سجل.');
+  if (payload.version >= 4) {
+    if (typeof payload.backupId !== 'string' || !payload.backupId || payload.backupId.length > 200) add('معرّف النسخة الاحتياطية مفقود.');
+    if (!(payload.sourceOwnerId === null || (typeof payload.sourceOwnerId === 'string' && payload.sourceOwnerId.length <= 200))) {
+      add('هوية مالك النسخة غير صالحة.');
+    }
+    if (typeof payload.backupHash !== 'string' || !/^[a-f0-9]{64}$/.test(payload.backupHash)) add('بصمة النسخة الاحتياطية غير صالحة.');
+    if (!payload.baselines || typeof payload.baselines !== 'object' || Array.isArray(payload.baselines)) {
+      add('دليل خط الأساس السحابي مفقود.');
+    } else {
+      for (const [storeName, baselines] of Object.entries(payload.baselines)) {
+        if (!allowed.has(storeName) || !Array.isArray(baselines)) {
+          add(`خط أساس غير صالح: ${storeName}`);
+          continue;
+        }
+        const dataIds = new Set(Array.isArray(payload.data[storeName]) ? payload.data[storeName].map((row) => row.id) : []);
+        const seen = new Set();
+        for (const baseline of baselines) {
+          if (!baseline || typeof baseline.id !== 'string' || !dataIds.has(baseline.id) || seen.has(baseline.id) ||
+              !Number.isSafeInteger(baseline.revision) || baseline.revision < 0 ||
+              (baseline.value !== null && (typeof baseline.value !== 'object' || Array.isArray(baseline.value))) ||
+              (baseline.fieldRevisions !== undefined && (!baseline.fieldRevisions || typeof baseline.fieldRevisions !== 'object' || Array.isArray(baseline.fieldRevisions)))) {
+            add(`خط أساس غير صالح في ${storeName}.`);
+            break;
+          }
+          seen.add(baseline.id);
+        }
+        for (const record of payload.data[storeName] ?? []) {
+          if (Number(record.serverRevision ?? 0) > 0 && !baselines.some((baseline) => baseline.id === record.id && baseline.value)) {
+            add(`سجل سحابي بلا خط أساس في ${storeName}.`);
+            break;
+          }
+        }
+      }
+      for (const [storeName, records] of Object.entries(payload.data)) {
+        const baselines = Array.isArray(payload.baselines[storeName]) ? payload.baselines[storeName] : [];
+        if (records.some((record) => Number(record.serverRevision ?? 0) > 0 &&
+            !baselines.some((baseline) => baseline.id === record.id && baseline.value))) {
+          add(`سجل سحابي بلا خط أساس في ${storeName}.`);
+        }
+      }
+    }
+  }
   return { ok: errors.length === 0, errors, counts, total };
+}
+
+/** Full integrity verification for V4. V3 remains structurally readable. */
+export async function validateBackupIntegrity(payload) {
+  const structural = validateBackup(payload);
+  if (!structural.ok || payload.version < 4) return { ...structural, integrity: payload?.version === 3 ? 'legacy' : 'invalid' };
+  const actualHash = await sha256Hex(backupHashInput(payload));
+  if (actualHash !== payload.backupHash) {
+    return { ...structural, ok: false, integrity: 'invalid', errors: [...structural.errors, 'بصمة النسخة الاحتياطية لا تطابق محتواها.'] };
+  }
+  return { ...structural, integrity: 'verified' };
 }
 
 /**
@@ -178,7 +272,7 @@ export function validateBackup(payload) {
  * سجلات بشكل قديم ولا يعمل التطبيق بأسماء مخفية.
  */
 export async function restoreBackup(payload, mode = 'merge') {
-  const check = validateBackup(payload);
+  const check = await validateBackupIntegrity(payload);
   if (!check.ok) {
     const err = new Error(check.errors.join('\n'));
     err.name = 'BackupValidationError';

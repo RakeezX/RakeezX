@@ -54,6 +54,7 @@ let rerunRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
 let retryAttempt = 0;
+let restoreRunning = false;
 const v2Engine = createSyncV2Engine();
 
 const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
@@ -83,6 +84,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
+  if (restoreRunning) return;
   if (!cloud.session || !cloud.user) return;
   if (!isOnline()) {
     setState({ status: 'offline' });
@@ -217,6 +219,7 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true } = {}) {
+  if (restoreRunning) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;
@@ -277,6 +280,50 @@ export async function syncAll({ full = true } = {}) {
     } else {
       rerunRequested = false;
     }
+  }
+}
+
+/**
+ * A cloud restore starts only from a completely acknowledged V2 state. It does
+ * not consume or reinterpret pre-existing work; the teacher must let that work
+ * synchronize (or resolve it) first.
+ */
+export async function assertCloudRestoreReady() {
+  if (!cloud.session || !cloud.user) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
+  if (!isOnline()) throw Object.assign(new Error('Cloud restore requires a network connection'), { code: 'OFFLINE' });
+  if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  const before = await v2Engine.status();
+  if (before.state !== 'synced') throw Object.assign(new Error('Pending or unresolved Sync V2 work blocks restore'), {
+    code: 'RESTORE_OUTBOX_NOT_EMPTY', status: before,
+  });
+  const healthy = await syncAll({ full: true });
+  const after = await v2Engine.status();
+  if (!healthy || after.state !== 'synced' || state.status !== 'synced') {
+    throw Object.assign(new Error('Sync V2 is not healthy enough for cloud restore'), {
+      code: 'RESTORE_SYNC_NOT_HEALTHY', status: after,
+    });
+  }
+  return after;
+}
+
+/** Pause automatic sync and normal Product mutations around finalization/reconciliation. */
+export async function runCloudRestoreExclusive(task) {
+  if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  restoreRunning = true;
+  suppressAutoSchedule = true;
+  store.setCloudRestoreInProgress(true);
+  setState({ status: 'syncing', lastError: null });
+  try {
+    return await task();
+  } finally {
+    store.setCloudRestoreInProgress(false);
+    suppressAutoSchedule = false;
+    restoreRunning = false;
+    setState({ status: 'synced', lastError: null });
+    scheduleAutomaticSync({ full: true, immediate: true });
   }
 }
 
