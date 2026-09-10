@@ -28,9 +28,13 @@ test('class goal and charter flow persists its timer/selection and previews an e
   await expect(page.getByRole('link', { name: /هدف وميثاق الصف/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /الحصص السجل والحصص السابقة/ })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(page.locator('.quick-tools-grid .tile').first()).toHaveCSS('min-height', '88px');
+  await expect(page.locator('.quick-tools-grid')).toHaveCSS('grid-template-columns', /.+ .+/);
+  await expect(page.locator('.quick-tools-grid .tile').first()).toHaveCSS('min-height', '104px');
   await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(page.locator('.quick-tools-grid .tile').first()).toHaveCSS('min-height', '109px');
+  const toolCards = page.locator('.quick-tools-grid .class-tool-card');
+  await expect(toolCards).toHaveCount(8);
+  await expect(toolCards.first()).toHaveCSS('min-height', '134px');
+  expect(await toolCards.evaluateAll((cards) => new Set(cards.map((card) => Math.round(card.getBoundingClientRect().top))).size)).toBe(1);
   await page.getByRole('link', { name: /هدف وميثاق الصف/ }).click();
 
   await expect(page.getByRole('heading', { name: 'الهدف الرئيسي', exact: true })).toBeVisible();

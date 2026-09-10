@@ -192,15 +192,15 @@ export default {
             `}
       </div>
 
-      <div class="section">
+      <div class="section class-tools-section">
         <div class="section__head">
           <div class="section__title">أدوات الفصل</div>
           <span class="t-3 fs-sm"><span class="tabular">${held}</span> حصة منفّذة</span>
         </div>
-        <div class="grid grid--auto quick-tools-grid">
+        <div class="grid quick-tools-grid" aria-label="أدوات الفصل">
           ${TOOLS(tch.id).map(
             (t) => html`
-              <a class="tile" href="${t.href}">
+              <a class="tile class-tool-card" href="${t.href}">
                 <span class="tile__icon">${icon(t.icon)}</span>
                 <span class="tile__title">${t.title}</span>
                 <span class="tile__sub">${t.sub}</span>

@@ -131,7 +131,8 @@ export default {
     }
 
     return html`
-      <div class="card card--pad mb-3">
+      <div class="classroom-tool-page grade-distribution-page">
+      <section class="surface grade-distribution-summary mb-3" aria-label="ملخص توزيع الدرجات">
         <div class="hstack gap-3">
           <div>
             <div class="fw-7">مجموع الدرجات</div>
@@ -143,12 +144,12 @@ export default {
           </div>
           <div class="push stat__val tabular" style="${total === 100 ? 'color:var(--ok)' : ''}">${total}</div>
         </div>
-      </div>
+      </section>
 
-      <div class="list">
+      <div class="list grade-item-list">
         ${items.map(
           (i, idx) => html`
-            <div class="row">
+            <div class="row grade-item-row">
               <span class="row__main">
                 <span class="row__title">${i.name}</span>
                 <span class="row__sub">
@@ -172,6 +173,7 @@ export default {
       </div>
 
       <button class="btn btn--ghost btn--block mt-4" data-act="add">${icon('plus')} بند جديد</button>
+      </div>
     `;
   },
 

@@ -134,10 +134,12 @@ export default {
     const unavailableCount = attendance.filter((entry) => entry.unavailable).length;
 
     return html`
-      <div class="segmented quicklog__modes mb-3">
+      <div class="classroom-tool-page quicklog-page">
+      <div class="classroom-toolbar quicklog-toolbar">
+      <div class="segmented quicklog__modes" role="group" aria-label="نوع الرصد">
         ${Object.entries(KIND_LABEL).map(
           ([k, label]) => html`
-            <button class="segmented__btn ${kind === k ? 'is-on' : ''}" data-act="kind" data-kind="${k}">
+            <button type="button" class="segmented__btn ${kind === k ? 'is-on' : ''}" data-act="kind" data-kind="${k}" aria-pressed="${kind === k ? 'true' : 'false'}">
               ${label}
             </button>
           `
@@ -147,20 +149,20 @@ export default {
       <!-- شريط البحث والتصفية -->
       <div class="quicklog-filter-bar noprint">
         <div class="quicklog-search">
-          <span class="quicklog-search__icon">${icon('search')}</span>
+          <span class="quicklog-search__icon" aria-hidden="true">${icon('search')}</span>
           <input class="input" type="search" placeholder="ابحث بالاسم أو رقم الكشف..."
                  data-input="search" data-fk="quicklog-search"
                  value="${searchQuery}" aria-label="بحث الطلاب">
-          ${searchQuery ? html`<button class="quicklog-search__clear" data-act="clear-search" aria-label="مسح البحث">${icon('close')}</button>` : ''}
+          ${searchQuery ? html`<button type="button" class="quicklog-search__clear" data-act="clear-search" aria-label="مسح البحث">${icon('close')}</button>` : ''}
         </div>
-        <div class="segmented segmented--sm">
-          <button class="segmented__btn ${filterStatus === 'all' ? 'is-on' : ''}" data-act="filter-status" data-status="all">الكل</button>
-          <button class="segmented__btn ${filterStatus === 'logged' ? 'is-on' : ''}" data-act="filter-status" data-status="logged">تم رصدهم</button>
-          <button class="segmented__btn ${filterStatus === 'unlogged' ? 'is-on' : ''}" data-act="filter-status" data-status="unlogged">لم يُرصدوا</button>
+        <div class="segmented segmented--sm" role="group" aria-label="حالة الرصد">
+          <button type="button" class="segmented__btn ${filterStatus === 'all' ? 'is-on' : ''}" data-act="filter-status" data-status="all" aria-pressed="${filterStatus === 'all' ? 'true' : 'false'}">الكل</button>
+          <button type="button" class="segmented__btn ${filterStatus === 'logged' ? 'is-on' : ''}" data-act="filter-status" data-status="logged" aria-pressed="${filterStatus === 'logged' ? 'true' : 'false'}">تم رصدهم</button>
+          <button type="button" class="segmented__btn ${filterStatus === 'unlogged' ? 'is-on' : ''}" data-act="filter-status" data-status="unlogged" aria-pressed="${filterStatus === 'unlogged' ? 'true' : 'false'}">لم يُرصدوا</button>
         </div>
       </div>
 
-      <div class="hstack gap-2 mb-3 quicklog__filters">
+      <div class="hstack gap-2 quicklog__filters classroom-meta-bar">
         <label class="switch">
           <input type="checkbox" data-change="reason" ${withReason ? 'checked' : ''}>
           <span>مع سبب</span>
@@ -169,13 +171,14 @@ export default {
           اليوم: <span class="tabular fw-7">${todayTotal}</span> رصدة
         </span>
       </div>
+      </div>
 
       ${unavailableCount ? html`<div class="hstack gap-2 mb-2 fs-xs t-3"><span>الغياب والاستئذان: <strong class="tabular">${unavailableCount}</strong></span></div>` : ''}
 
       ${displayStudents.length === 0
         ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للبحث أو التصفية</div></div>`
         : html`
-            <div class="ql-grid">
+            <div class="ql-grid" aria-label="طلاب الفصل">
               ${displayStudents.map(({ student: s, status, unavailable }) => {
                 const c = byStudent.get(s.id) ?? { total: 0, today: 0 };
                 const tone = unavailable ? 'is-unavail' : c.total > 0 ? 'is-pos' : c.total < 0 ? 'is-neg' : '';
@@ -192,6 +195,7 @@ export default {
                       <div class="qlcard__foot">
                         <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
                         <span class="qlcard__today tabular">${c.today ? (c.today > 0 ? '+' : '') + c.today + ' اليوم' : ''}</span>
+                        <span class="qlcard__plus" aria-hidden="true">${icon('plus')}</span>
                       </div>
                     </button>
                     <button class="qlcard__minus" data-act="minus" data-id="${s.id}"
@@ -204,6 +208,7 @@ export default {
       <p class="t-3 fs-sm center mt-6">
         نقرة على الطالب = نقطة. النقاط تغذّي بند «المشاركة والتفاعل» في الدرجات تلقائيًا.
       </p>
+      </div>
     `;
   },
 

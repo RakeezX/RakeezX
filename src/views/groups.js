@@ -157,13 +157,15 @@ export default {
     const visibleGroups = displayedGroups(cls.id);
 
     return html`
-      <div class="card card--pad mb-3">
+      <div class="classroom-tool-page groups-page">
+      <section class="surface groups-setup mb-3" aria-label="إعداد المجموعات">
+        <div class="groups-setup__grid">
         <div class="field">
           <span class="field__label">عدد الطلاب في المجموعة</span>
-          <div class="segmented">
+          <div class="segmented" role="group" aria-label="عدد الطلاب في المجموعة">
             ${[2, 3, 4, 5, 6].map(
               (n) => html`
-                <button class="segmented__btn ${size === n ? 'is-on' : ''}" data-act="size" data-n="${n}">
+                <button type="button" class="segmented__btn ${size === n ? 'is-on' : ''}" data-act="size" data-n="${n}" aria-pressed="${size === n ? 'true' : 'false'}">
                   ${n}
                 </button>
               `
@@ -176,11 +178,11 @@ export default {
 
         <div class="field">
           <span class="field__label">طريقة التقسيم</span>
-          <div class="segmented">
-            <button class="segmented__btn ${mode === 'balanced' ? 'is-on' : ''}" data-act="mode" data-mode="balanced">
+          <div class="segmented" role="group" aria-label="طريقة التقسيم">
+            <button type="button" class="segmented__btn ${mode === 'balanced' ? 'is-on' : ''}" data-act="mode" data-mode="balanced" aria-pressed="${mode === 'balanced' ? 'true' : 'false'}">
               متوازن
             </button>
-            <button class="segmented__btn ${mode === 'random' ? 'is-on' : ''}" data-act="mode" data-mode="random">
+            <button type="button" class="segmented__btn ${mode === 'random' ? 'is-on' : ''}" data-act="mode" data-mode="random" aria-pressed="${mode === 'random' ? 'true' : 'false'}">
               عشوائي
             </button>
           </div>
@@ -191,21 +193,22 @@ export default {
           </div>
         </div>
 
-        <div class="hstack gap-2 mt-3 fs-xs noprint">
+        </div>
+        <div class="groups-setup__presence fs-xs noprint">
           <label class="switch">
             <input type="checkbox" data-change="toggle-absent" ${includeAbsent ? 'checked' : ''}>
             <span>تضمين الغائبين والمستأذنين</span>
           </label>
         </div>
-      </div>
+      </section>
 
-      <button class="btn btn--primary btn--block mb-3" data-act="make" ${readOnly ? 'disabled' : ''}>
+      <button class="btn btn--primary btn--block groups-generate mb-3" data-act="make" ${readOnly ? 'disabled' : ''}>
         ${icon('groups')} ${groups.length ? 'أعد التقسيم' : 'قسّم المجموعات'}
       </button>
 
       ${selectedStudent
         ? html`
-            <div class="card card--pad mb-3 hstack gap-3 justify-between" style="border-color: var(--brand); background: var(--brand-soft);">
+            <div class="surface group-move-notice mb-3 hstack gap-3 justify-between" role="status">
               <div class="hstack gap-2">
                 ${icon('spark')}
                 <div>
@@ -224,7 +227,7 @@ export default {
             <div class="groups-grid" id="groups-container">
               ${visibleGroups.map(
                 (g, i) => html`
-                  <div class="card card--pad group"
+                  <div class="surface group"
                        data-group-idx="${i}"
                        data-teaching-id="${cls.id}">
                     <div class="group__head">
@@ -233,19 +236,20 @@ export default {
                     </div>
                     <div class="stack stack-2 mt-3">
                       ${g.map((s) => html`
-                        <div class="group__member ${selectedStudent?.id === s.id ? 'is-selected' : ''}"
+                        <button type="button" class="group__member ${selectedStudent?.id === s.id ? 'is-selected' : ''}"
                              draggable="${readOnly ? 'false' : 'true'}"
                              data-student-id="${s.id}"
                              data-student-name="${s.name}"
                              data-from-idx="${i}"
                              data-teaching-id="${cls.id}"
                              data-act="toggle-student"
-                             aria-disabled="${readOnly ? 'true' : 'false'}"
+                             aria-pressed="${selectedStudent?.id === s.id ? 'true' : 'false'}"
+                             ${readOnly ? 'disabled' : ''}
                              title="${readOnly ? 'الفصل مؤرشف للعرض فقط' : 'اسحب أو انقر لنقل الطالب'}">
                           <span class="rollno">${s.rollNo ?? '—'}</span>
                           <span class="group__member-name">${s.name}</span>
                           <span class="group__drag-handle noprint">${icon('menu')}</span>
-                        </div>
+                        </button>
                       `)}
                     </div>
                     ${!readOnly && selectedStudent && selectedStudent.fromIdx !== i
@@ -265,6 +269,7 @@ export default {
             <button class="btn btn--ghost btn--block mt-4" data-act="print">${icon('print')} اطبع التقسيم</button>
           `
         : ''}
+      </div>
     `;
   },
 

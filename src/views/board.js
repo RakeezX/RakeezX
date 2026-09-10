@@ -12,8 +12,6 @@ import { repaint } from '../repaint.js';
 let scope = 'term';   // term | today
 let kind = 'participation';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
-
 export default {
   title: () => 'لوحة التميز',
   subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
@@ -56,18 +54,19 @@ export default {
     const anyPoints = ranked.some((r) => r.pts !== 0);
 
     return html`
-      <div class="hstack gap-2 wrap mb-3 board-controls">
-        <div class="segmented">
-          <button class="segmented__btn ${kind === 'participation' ? 'is-on' : ''}"
-                  data-act="kind" data-kind="participation">المشاركة</button>
-          <button class="segmented__btn ${kind === 'behavior' ? 'is-on' : ''}"
-                  data-act="kind" data-kind="behavior">السلوك</button>
+      <div class="classroom-tool-page excellence-board-page">
+      <div class="classroom-toolbar board-controls">
+        <div class="segmented" role="group" aria-label="نوع التميز">
+          <button type="button" class="segmented__btn ${kind === 'participation' ? 'is-on' : ''}"
+                  data-act="kind" data-kind="participation" aria-pressed="${kind === 'participation' ? 'true' : 'false'}">المشاركة</button>
+          <button type="button" class="segmented__btn ${kind === 'behavior' ? 'is-on' : ''}"
+                  data-act="kind" data-kind="behavior" aria-pressed="${kind === 'behavior' ? 'true' : 'false'}">السلوك</button>
         </div>
-        <div class="segmented">
-          <button class="segmented__btn ${scope === 'term' ? 'is-on' : ''}"
-                  data-act="scope" data-scope="term">الفصل كله</button>
-          <button class="segmented__btn ${scope === 'today' ? 'is-on' : ''}"
-                  data-act="scope" data-scope="today">اليوم</button>
+        <div class="segmented" role="group" aria-label="نطاق التميز">
+          <button type="button" class="segmented__btn ${scope === 'term' ? 'is-on' : ''}"
+                  data-act="scope" data-scope="term" aria-pressed="${scope === 'term' ? 'true' : 'false'}">الفصل كله</button>
+          <button type="button" class="segmented__btn ${scope === 'today' ? 'is-on' : ''}"
+                  data-act="scope" data-scope="today" aria-pressed="${scope === 'today' ? 'true' : 'false'}">اليوم</button>
         </div>
         <button class="btn btn--sm btn--ghost push" data-act="fullscreen">
           ${icon('board')} ملء الشاشة
@@ -84,11 +83,11 @@ export default {
             </div>
           `
         : html`
-            <ol class="board">
+            <ol class="board" aria-label="ترتيب التميز">
               ${ranked.map(
                 (r, i) => html`
                   <li class="board__row ${i < 3 && r.pts > 0 ? 'is-top' : ''}">
-                    <span class="board__rank">${i < 3 && r.pts > 0 ? MEDALS[i] : html`<span class="tabular">${i + 1}</span>`}</span>
+                    <span class="board__rank"><span class="board__rank-mark tabular">${i + 1}</span></span>
                     ${studentAvatar(r.s, 'xs')}
                     <span class="board__name">${r.s.name}</span>
                     <span class="board__bar">
@@ -100,6 +99,7 @@ export default {
               )}
             </ol>
           `}
+      </div>
     `;
   },
 

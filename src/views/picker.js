@@ -97,13 +97,20 @@ export default {
     const student = picked ? store.getStudent(picked) : null;
 
     return html`
+      <div class="classroom-tool-page picker-page">
       <div class="picker">
-        <div class="picker__stage ${spinning ? 'is-spinning' : ''}">
+        <div class="picker__summary" aria-label="حالة الجولة">
+          <span>الجولة <strong class="tabular">${round}</strong></span>
+          <span>بقي <strong class="tabular">${pool.length}</strong> من <bdi class="tabular">${available.length}</bdi></span>
+          ${excludedCount > 0 ? html`<span class="picker__excluded">استُبعد ${excludedCount} غياب/استئذان</span>` : ''}
+        </div>
+        <div class="picker__stage ${spinning ? 'is-spinning' : ''}" aria-live="polite" aria-busy="${spinning}">
           ${student
             ? html`
+                <div class="picker__winner-label">اختيار الجولة</div>
                 <div class="picker__avatar">${studentAvatar(student, 'xl')}</div>
                 <div class="picker__roll tabular">${student.rollNo ?? ''}</div>
-                <div class="picker__name">${student.name}</div>
+                <h2 class="picker__name">${student.name}</h2>
               `
             : html`<div class="picker__idle">اضغط للقرعة</div>`}
         </div>
@@ -112,15 +119,7 @@ export default {
           ${icon('picker')} ${picked ? 'التالي' : 'ابدأ القرعة'}
         </button>
 
-        <div class="hstack gap-2 mt-4 fs-sm t-3">
-          <span>الجولة <span class="tabular fw-7">${round}</span></span>
-          <span class="push">
-            بقي <span class="tabular fw-7">${pool.length}</span> من <span class="tabular">${available.length}</span>
-            ${excludedCount > 0 ? html`<span class="fs-xs t-3"> (استُبعد ${excludedCount} غياب/استئذان)</span>` : ''}
-          </span>
-        </div>
-
-        <div class="hstack gap-2 mt-3 fs-xs noprint">
+        <div class="picker__options noprint">
           <label class="switch">
             <input type="checkbox" data-change="toggle-absent" ${includeAbsent ? 'checked' : ''}>
             <span>تضمين الغائبين والمستأذنين</span>
@@ -149,8 +148,9 @@ export default {
                   })}
                 </div>
               </div>
-            `
+          `
           : ''}
+      </div>
       </div>
     `;
   },

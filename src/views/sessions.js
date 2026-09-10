@@ -26,7 +26,7 @@ function dailySummary(teaching) {
   const summary = store.attendanceCompletenessFor(teaching.id, todayISO());
   if (!summary.sessions) return '';
   return html`
-    <div class="card card--pad mb-3">
+    <section class="surface session-panel session-panel--summary mb-3">
       <div class="hstack gap-2 wrap">
         <span class="fw-7">ملخّص حضور اليوم</span>
         <span class="push t-3 fs-sm"><span class="tabular">${summary.sessions}</span> حصص اليوم</span>
@@ -35,7 +35,7 @@ function dailySummary(teaching) {
         <span class="badge badge--ok">تم رصدها <span class="tabular">${summary.completed}</span></span>
         ${summary.pending ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${summary.pending}</span></span>` : html`<span class="t-3 fs-sm">لا توجد حصص مستحقة بانتظار الرصد.</span>`}
       </div>
-    </div>
+    </section>
   `;
 }
 
@@ -46,7 +46,7 @@ function generationCard(teaching) {
   const result = lastGeneration?.teachingId === teaching.id ? lastGeneration : null;
 
   return html`
-    <div class="card card--pad mb-3">
+    <section class="surface session-panel session-panel--generator mb-3">
       <div class="fw-7 mb-2">توليد الحصص من الجدول</div>
       <p class="t-3 fs-sm mb-3">سيتم إنشاء الحصص غير الموجودة فقط، ولن تتكرر الحصص التي تم إنشاؤها سابقًا.</p>
       ${!hasSlots
@@ -67,7 +67,7 @@ function generationCard(teaching) {
           ? html`<p class="t-3 fs-sm mt-3">لا يتم إنشاء الحصص المستقبلية مسبقًا؛ ستظهر تلقائيًا حسب الجدول عند حلول تاريخها.</p>`
           : html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة · تم تجاهل ${result.holidays} يوم إجازة${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}${result.futureClipped ? ' · تم إنشاء الحصص حتى اليوم فقط؛ الحصص المستقبلية تظهر تلقائيًا حسب الجدول.' : ''}</p>`
         : ''}
-    </div>
+    </section>
   `;
 }
 
@@ -89,6 +89,7 @@ export default {
     const todaySummary = dailySummary(tch);
     if (!list.length) {
       return html`
+        <div class="classroom-tool-page sessions-page">
         ${generator}
         ${todaySummary}
         <div class="empty">
@@ -102,6 +103,7 @@ export default {
             <a class="btn btn--ghost" href="#/schedule">${icon('timetable')} الجدول</a>
           </div>
         </div>
+        </div>
       `;
     }
 
@@ -111,10 +113,13 @@ export default {
     const countable = list.filter((s) => SESSION_STATUS[s.status]?.counts).length;
     const rate = countable ? Math.round((executed / countable) * 100) : null;
 
+    const today = todayISO();
+
     return html`
+      <div class="classroom-tool-page sessions-page">
       ${generator}
       ${todaySummary}
-      <div class="grid grid--3 mb-3">
+      <div class="grid grid--3 session-stats mb-3">
         <div class="stat">
           <div class="stat__val tabular">${list.length}</div>
           <div class="stat__label">حصة مسجّلة</div>
@@ -129,7 +134,7 @@ export default {
         </div>
       </div>
 
-      <div class="hstack gap-2 wrap mb-3">
+      <div class="hstack gap-2 wrap session-status-legend mb-3" aria-label="ملخص حالات الحصص">
         ${SESSION_STATUS_ORDER.filter((k) => tally[k]).map((k) => {
           const m = SESSION_STATUS[k];
           return html`<span class="badge ${m.tone ? 'badge--' + m.tone : ''}">
@@ -143,7 +148,7 @@ export default {
         ولا تُسجَّل غيابًا على أحد.
       </p>
 
-      <div class="list">
+      <div class="list session-list">
         ${list.map((s) => {
           const raw = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
           const { completeness, meta } = attendanceMeta(s);
@@ -154,7 +159,7 @@ export default {
           const lesson = s.lessonId ? store.getLesson(s.lessonId) : null;
           const attendanceHref = `#/teaching/${s.teachingId}/attendance?session=${s.id}`;
           return html`
-            <div class="row">
+            <div class="row session-row ${s.date === today ? 'is-today' : s.date > today ? 'is-future' : 'is-past'} is-${completeness.state}">
               <span class="period">${s.period}</span>
               <a class="row__main" href="${attendanceHref}">
                 <span class="row__title">
@@ -183,6 +188,7 @@ export default {
             </div>
           `;
         })}
+      </div>
       </div>
     `;
   },
