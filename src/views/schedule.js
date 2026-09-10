@@ -447,7 +447,7 @@ export default {
             <div class="card card--pad mb-3 center">
               <div class="fw-7">جدولك فارغ</div>
               <p class="t-3 fs-sm mt-3">
-                أضف حصصك الأسبوعية — مثلًا حصتان لكل فصل في مادة المهارات الرقمية —
+                أضف حصصك الأسبوعية — مثلًا حصتان لكل فصل في المادة التي تدرّسها —
                 فتظهر حصص اليوم في الصفحة الرئيسية تلقائيًا.
               </p>
               <button class="btn btn--primary mt-3" data-act="add">${icon("plus")} أضف أول حصة</button>
@@ -473,7 +473,7 @@ export default {
                   <span class="sec-dot" aria-hidden="true"></span>
                   <span class="schedule-class-card__title">${gradeLabel(sec?.grade)} — ${formatSectionDisplay(sec)}</span>
                 </div>
-                <div class="schedule-class-card__sub">${sub?.name || "المهارات الرقمية"}</div>
+                <div class="schedule-class-card__sub">${sub?.name || "مادة"}</div>
                 <div class="schedule-class-card__foot">
                   <span class="schedule-class-card__count tabular">
                     <strong>${n || 0}</strong> حصص أسبوعيًا
@@ -647,7 +647,7 @@ function renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toM
                             </div>
                           </div>
                           <div class="slot__subject-row">
-                            <span class="slot__subject">${store.getSubject(tch?.subjectId)?.name || "المهارات الرقمية"}</span>
+                            <span class="slot__subject">${store.getSubject(tch?.subjectId)?.name || "مادة"}</span>
                           </div>
                           <div class="slot__time-row">
                             <span class="slot__time tabular">${t ? fmtTimeRange(t.start, t.end) : "—"}</span>

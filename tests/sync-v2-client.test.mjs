@@ -5,6 +5,7 @@ import { IDBFactory } from 'fake-indexeddb';
 import { STORES } from '../src/lib/db.js';
 import { createSyncV2Engine } from '../src/lib/sync-v2.js';
 import { DEFAULT_TIME_PROFILES, makeTimeProfile } from '../src/models.js';
+import { customSubjectSlug } from '../src/lib/subject-catalog.js';
 
 const clone = (value) => value == null ? value : structuredClone(value);
 
@@ -891,6 +892,34 @@ test('canonical create remaps local identity and a dependent pending reference a
   assert.equal(childMutation.dependencies[0].recordId, 'subject-a');
   assert.equal((await loser.database.get('subjects', 'subject-a')).syncConflicts, undefined);
   assert.deepEqual(await loser.database.get('outbox', legacyOutbox.id), legacyOutbox, 'V2 reconciliation must not convert or rewrite a V1 outbox entry');
+});
+
+test('three offline clients creating the same normalized custom subject converge on one canonical identity', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'custom-subject-a');
+  const b = makeClient(server, 'custom-subject-b');
+  const c = makeClient(server, 'custom-subject-c');
+  t.after(() => [a, b, c].forEach((client) => client.database.close()));
+  const slug = customSubjectSlug('علم الأرض');
+
+  for (const [client, id, name] of [
+    [a, 'subject-custom-a', 'علم الأرض'],
+    [b, 'subject-custom-b', 'عِلْم الأرض'],
+    [c, 'subject-custom-c', '  علم   الأرض  '],
+  ]) {
+    await client.engine.commitMutation({ store: 'subjects', recordId: id, op: 'create', patch: { name, slug } });
+  }
+
+  await Promise.all([a.engine.dispatchPending(), b.engine.dispatchPending(), c.engine.dispatchPending()]);
+  assert.equal(server.table('subjects').size, 1);
+  const canonicalId = [...server.table('subjects').keys()][0];
+  await Promise.all([a, b, c].map((client) => client.engine.pullStore('subjects')));
+  for (const client of [a, b, c]) {
+    const live = (await client.database.getAll('subjects')).filter((subject) => !subject.deleted);
+    assert.equal(live.length, 1);
+    assert.equal(live[0].id, canonicalId);
+    assert.equal(live[0].slug, slug);
+  }
 });
 
 test('each successful mutation is acknowledged before a later independent failure', async (t) => {

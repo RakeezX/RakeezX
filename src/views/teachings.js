@@ -10,27 +10,57 @@ import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
-  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionId as mkSectionId, sectionLabel, normalizeSectionLabel
+  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionLabel, normalizeSectionLabel
 } from '../models.js';
-import { go } from '../router.js';
+import { normalizeSubjectName, validateCustomSubjectName } from '../lib/subject-catalog.js';
 import { repaint } from '../repaint.js';
+
+function subjectMenu(options, query = '') {
+  const normalized = normalizeSubjectName(query);
+  const matches = options.filter((option) => !normalized || option.searchText.includes(normalized));
+  const used = matches.filter((option) => option.used);
+  const rest = matches.filter((option) => !option.used);
+  const rows = (items) => items.map((option) => html`
+    <button type="button" class="subject-picker__option" role="option"
+            data-subject-token="${option.token}" data-subject-name="${option.name}">
+      <span>${option.name}</span>
+      ${option.builtin ? '' : html`<span class="badge">مخصصة</span>`}
+    </button>
+  `);
+  return html`
+    ${used.length ? html`
+      <div class="subject-picker__group-label">موادك</div>
+      <div class="subject-picker__group">${rows(used)}</div>
+    ` : ''}
+    ${rest.length ? html`
+      <div class="subject-picker__group-label">كل المواد</div>
+      <div class="subject-picker__group">${rows(rest)}</div>
+    ` : ''}
+    ${!matches.length ? html`<div class="subject-picker__empty">لا توجد مادة مطابقة</div>` : ''}
+    <button type="button" class="subject-picker__custom-action" data-subject-custom>
+      ${icon('plus')} مادة مخصصة
+    </button>
+  `;
+}
 
 function sheet(existing = null) {
   const secs = store.sections();
-  const subs = store.subjects();
+  const options = store.subjectOptions();
   const autoColor = autoAssignSectionColor(secs);
+  const selectedOption = options.find((option) => option.subjectId === existing?.subjectId) ??
+    options.find((option) => option.used) ??
+    options.find((option) => option.name === 'المهارات الرقمية') ?? options[0];
   const c = existing
     ? {
         grade: store.getSection(existing.sectionId)?.grade ?? 4,
         label: store.getSection(existing.sectionId)?.label ?? '1',
         color: store.getSection(existing.sectionId)?.color ?? SECTION_COLORS[0],
-        subjectId: existing.subjectId,
       }
-    : { grade: 4, label: '1', color: autoColor, subjectId: subs[0]?.id };
+    : { grade: 4, label: '1', color: autoColor };
 
   return openSheet({
     title: existing ? 'تعديل الفصل' : 'فصل جديد',
-    desc: existing ? null : 'الشعبة مجموعة الطلاب، والمادة تُسنَد إليها في هذا الفصل الدراسي.',
+    desc: existing ? null : 'اختر الصف ورمز الفصل والمادة.',
     body: html`
       <form id="tch-form" class="management-form class-form">
         <div class="field-row">
@@ -43,26 +73,41 @@ function sheet(existing = null) {
             </select>
           </label>
           <label class="field">
-            <span class="field__label">رمز الشعبة</span>
+            <span class="field__label">رمز الفصل</span>
             <input class="input" name="label" value="${c.label}" required maxlength="8"
                    autocomplete="off" placeholder="1">
           </label>
         </div>
 
-        <label class="field">
+        <div class="field subject-picker" data-subject-picker>
           <span class="field__label">المادة</span>
-          <select class="select" name="subjectId">
-            ${subs.map(
-              (s) => html`<option value="${s.id}" ${c.subjectId === s.id ? 'selected' : ''}>${s.name}</option>`
-            )}
-          </select>
-          <span class="field__hint">المنهج يتبع المادة والصف — فدرس الوحدة الأولى واحد لكل شعبك.</span>
-        </label>
+          <input type="hidden" name="subjectToken" value="${selectedOption?.token ?? ''}">
+          <button type="button" class="subject-picker__trigger" data-subject-trigger
+                  aria-haspopup="listbox" aria-expanded="false">
+            <span data-subject-selected>${selectedOption?.name ?? 'اختر المادة'}</span>
+            ${icon('chev')}
+          </button>
+          <div class="subject-picker__menu" data-subject-menu hidden>
+            <input class="input subject-picker__search" type="search" inputmode="search"
+                   placeholder="ابحث عن مادة" aria-label="ابحث عن مادة"
+                   role="combobox" aria-expanded="true" aria-controls="subject-picker-options"
+                   autocomplete="off">
+            <div id="subject-picker-options" class="subject-picker__options" role="listbox" data-subject-options>
+              ${subjectMenu(options)}
+            </div>
+          </div>
+          <div class="subject-picker__custom" data-subject-custom-fields hidden>
+            <input class="input" name="customSubjectName" maxlength="60" autocomplete="off"
+                   placeholder="اسم المادة بالعربية أو الإنجليزية" aria-label="اسم المادة المخصصة">
+            <button type="button" class="btn btn--quiet btn--sm" data-subject-custom-back>العودة إلى المواد</button>
+          </div>
+          <span class="field__hint">يمكنك البحث في المواد أو إضافة مادة مخصصة.</span>
+        </div>
 
         ${existing
           ? html`
               <div class="field">
-                <span class="field__label">لون الشعبة</span>
+                <span class="field__label">لون الفصل</span>
                 <div class="hstack gap-2 wrap">
                   ${SECTION_COLORS.map(
                     (col) => html`
@@ -83,6 +128,60 @@ function sheet(existing = null) {
       <button class="btn btn--primary" form="tch-form" type="submit">${existing ? 'حفظ' : 'إنشاء'}</button>
     `,
     onMount: (root, done) => {
+      const picker = root.querySelector('[data-subject-picker]');
+      const trigger = picker.querySelector('[data-subject-trigger]');
+      const menu = picker.querySelector('[data-subject-menu]');
+      const search = picker.querySelector('.subject-picker__search');
+      const optionList = picker.querySelector('[data-subject-options]');
+      const selected = picker.querySelector('[data-subject-selected]');
+      const tokenInput = picker.querySelector('[name="subjectToken"]');
+      const customFields = picker.querySelector('[data-subject-custom-fields]');
+      const customInput = picker.querySelector('[name="customSubjectName"]');
+
+      const closeMenu = () => {
+        menu.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      };
+      const openMenu = () => {
+        customFields.hidden = true;
+        menu.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        search.focus();
+      };
+      const renderOptions = () => { optionList.innerHTML = subjectMenu(options, search.value).value; };
+
+      trigger.addEventListener('click', () => menu.hidden ? openMenu() : closeMenu());
+      search.addEventListener('input', renderOptions);
+      search.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape') { closeMenu(); trigger.focus(); }
+        if (ev.key === 'Enter') {
+          const first = optionList.querySelector('[data-subject-token]');
+          if (first) { ev.preventDefault(); first.click(); }
+        }
+      });
+      optionList.addEventListener('click', (ev) => {
+        const option = ev.target.closest('[data-subject-token]');
+        if (option) {
+          tokenInput.value = option.dataset.subjectToken;
+          selected.textContent = option.dataset.subjectName;
+          customInput.value = '';
+          closeMenu();
+          trigger.focus();
+          return;
+        }
+        if (ev.target.closest('[data-subject-custom]')) {
+          tokenInput.value = 'custom';
+          selected.textContent = 'مادة مخصصة';
+          closeMenu();
+          customFields.hidden = false;
+          customInput.focus();
+        }
+      });
+      picker.querySelector('[data-subject-custom-back]').addEventListener('click', () => {
+        customInput.value = '';
+        openMenu();
+      });
+
       root.querySelector('#tch-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
@@ -96,11 +195,26 @@ function sheet(existing = null) {
           toast(`هذا الفصل موجود مسبقًا (${gradeLabel(grade)} / ${duplicate.label})`, 'warn');
           return;
         }
+        const subjectToken = String(fd.get('subjectToken') ?? '');
+        const customSubjectName = String(fd.get('customSubjectName') ?? '');
+        if (subjectToken === 'custom') {
+          const validation = validateCustomSubjectName(customSubjectName);
+          if (!validation.ok) {
+            toast(validation.error, 'warn');
+            customFields.hidden = false;
+            customInput.focus();
+            return;
+          }
+        } else if (!subjectToken) {
+          toast('اختر مادة للفصل', 'warn');
+          openMenu();
+          return;
+        }
         done({
           grade,
           label,
           color: String(fd.get('color') ?? autoColor ?? SECTION_COLORS[0]),
-          subjectId: String(fd.get('subjectId') ?? ''),
+          subjectSelection: { token: subjectToken, customName: customSubjectName },
         });
       });
     },
@@ -156,26 +270,16 @@ export default {
     const closed = term ? store.isTermClosed(term.id) : false;
 
     if (!list.length) {
-      const yearSecs = store.sections();
       return html`
         <div class="management-page classes-page">
         <div class="empty management-empty classes-empty">
           <div class="empty__icon">${icon('classes')}</div>
           <div class="empty__title">لا فصول في ${term?.name ?? 'هذا الفصل الدراسي'}</div>
           
-          ${yearSecs.length === 0 ? html`
-            <div class="management-empty__setup mt-4 center">
-              <div class="fw-7 mb-2">إعداد الفصول</div>
-              <p class="t-3 fs-sm mb-3">يمكنك إنشاء الفصول التي تدرّسها الآن دفعة واحدة، ثم تعديلها لاحقًا.</p>
-              <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} إعداد الفصول الآن</button>
-            </div>
-            <div class="mt-4 stack stack-2"><button class="btn btn--ghost" data-act="add">${icon('plus')} إضافة فصل واحد يدويًا</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
-          ` : html`
-            <div class="empty__text">
-              أنشئ شعبتك الأولى وأسند إليها مادتك، ويأتي معها نموذج بنود تقييم جاهز.
-            </div>
-            <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
-          `}
+          <div class="empty__text">
+            أنشئ فصلك الأول واختر مادته، ويأتي معه نموذج بنود تقييم جاهز.
+          </div>
+          <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
         </div>
         </div>
       `;
@@ -421,120 +525,16 @@ export default {
 
       const col = safeColor(data.color, autoAssignSectionColor(store.sections()));
       try {
+        const subject = await store.resolveSubjectSelection(data.subjectSelection);
         const sec = await store.createSection({
           yearId: year.id, grade: data.grade, label: data.label,
           name: `${data.grade}/${data.label}`, color: col
         });
-        await store.createTeaching({ sectionId: sec.id, subjectId: data.subjectId, termId: term.id });
+        await store.createTeaching({ sectionId: sec.id, subjectId: subject.id, termId: term.id });
         repaint();
       } catch (err) {
         toast(err.message || 'تعذّر إنشاء الفصل', 'warn');
       }
-    },
-
-    async 'seed-sections'() {
-      const year = store.activeYear();
-      const term = store.activeTerm();
-      if (!year || !term) return toast('أنشئ سنة وفصلًا أولًا', 'danger');
-      const subs = store.subjects();
-
-      let items = [
-        { grade: 5, label: '1' }, { grade: 5, label: '2' }, { grade: 5, label: '3' }, { grade: 5, label: '4' },
-        { grade: 5, label: '5' }, { grade: 5, label: '6' }, { grade: 5, label: '7' }, { grade: 5, label: '8' },
-        { grade: 6, label: '6' }, { grade: 6, label: '7' }
-      ];
-
-      const selected = await new Promise(resolve => {
-        const renderList = () => {
-          return html`
-            <div id="seed-list" class="stack stack-2">
-              ${items.map((it, i) => html`
-                <div class="timerow" style="align-items: center;" data-index="${i}">
-                  <select class="select" style="width: auto;" data-field="grade">
-                    ${GRADES.map(g => html`<option value="${g.v}" ${g.v == it.grade ? 'selected' : ''}>${g.label}</option>`)}
-                  </select>
-                  <span class="mx-2">/</span>
-                  <input class="input tabular" type="text" data-field="label" value="${it.label}" style="width: 4rem;">
-                  <button type="button" class="iconbtn ms-auto" data-action="remove-row" aria-label="حذف">${icon('x')}</button>
-                </div>
-              `)}
-            </div>
-            <button type="button" class="btn btn--sm btn--ghost mt-3" data-action="add-row">${icon('plus')} إضافة فصل</button>
-          `;
-        };
-
-        openSheet({
-          title: 'إعداد الفصول',
-          desc: 'راجع الفصول وعدلها قبل إنشائها',
-          body: html`
-            <form id="seed-form">
-              <label class="field mb-3">
-                <span class="field__label">أسند هذه الفصول لمادة:</span>
-                <select class="select" name="subjectId">
-                  ${subs.map(s => html`<option value="${s.id}">${s.name}</option>`)}
-                </select>
-              </label>
-              <div id="seed-list-container">
-                ${renderList()}
-              </div>
-            </form>
-          `,
-          foot: html`
-            <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-            <button class="btn btn--primary" form="seed-form" type="submit">حفظ وإنشاء</button>
-          `,
-          onMount: (root, done) => {
-            const container = root.querySelector('#seed-list-container');
-            
-            const updateState = () => {
-              const rows = container.querySelectorAll('.timerow');
-              items = Array.from(rows).map(row => ({
-                grade: Number(row.querySelector('[data-field="grade"]').value),
-                label: row.querySelector('[data-field="label"]').value
-              }));
-            };
-
-            container.addEventListener('click', (ev) => {
-              const btn = ev.target.closest('button[data-action]');
-              if (!btn) return;
-              
-              if (btn.dataset.action === 'remove-row') {
-                const row = btn.closest('.timerow');
-                row.remove();
-                updateState();
-              } else if (btn.dataset.action === 'add-row') {
-                updateState();
-                items.push({ grade: items.length ? items[items.length - 1].grade : 1, label: '1' });
-                container.innerHTML = renderList().value;
-              }
-            });
-
-            root.querySelector('#seed-form').addEventListener('submit', (ev) => {
-              ev.preventDefault();
-              updateState();
-              const fd = new FormData(ev.target);
-              const sub = String(fd.get('subjectId'));
-              done({ items, subjectId: sub });
-            });
-          }
-        }).then(resolve).catch(() => resolve(null));
-      });
-
-      if (!selected || !selected.items.length) return;
-
-      let added = 0;
-      for (const it of selected.items) {
-        const col = SECTION_COLORS[added % SECTION_COLORS.length];
-        const sec = await store.createSection({
-          yearId: year.id, grade: it.grade, label: it.label,
-          name: `${it.grade}/${it.label}`, color: col
-        });
-        await store.createTeaching({ sectionId: sec.id, subjectId: selected.subjectId, termId: term.id });
-        added++;
-      }
-      
-      toast(`تمت إضافة ${added} فصل بنجاح`);
-      repaint();
     }
   },
 };

@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v9';
+const VERSION = 'rakeezx-v10';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -46,6 +46,7 @@ const SHELL = [
   './src/lib/pristine-teaching.js',
   './src/lib/demo.js',
   './src/lib/calendar-presets.js',
+  './src/lib/subject-catalog.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
 

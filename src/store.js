@@ -19,6 +19,10 @@ import {
   normalizeSearchText, gradeLabel, itemScore, studentTotal
 } from './models.js';
 import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
+import {
+  builtinSubject, customSubjectSlug, findPersistedBuiltin, matchBuiltinSubject,
+  normalizeSubjectName, subjectCatalogOptions, validateCustomSubjectName,
+} from './lib/subject-catalog.js';
 
 export { sectionLabel };
 
@@ -1075,6 +1079,12 @@ export const isTermClosed = (tmId) => {
 export const subjects = () => live(state.subjects).sort((a, b) => compareArabic(a.name, b.name));
 export const getSubject = (id) => state.subjects.find((s) => s.id === id && !s.deleted) ?? null;
 
+/** مواد الفهرس الثابت مع مواد المعلّم المستخدمة، من دون إنشاء سجلات غير مستخدمة. */
+export function subjectOptions() {
+  const usedIds = live(state.teachings).map((teaching) => teaching.subjectId);
+  return subjectCatalogOptions(live(state.subjects), usedIds);
+}
+
 export const isSectionArchived = (sectionOrId) => {
   const section = typeof sectionOrId === 'string' ? getSection(sectionOrId) : sectionOrId;
   return section?.status === 'archived';
@@ -1096,7 +1106,7 @@ export const isTeachingArchived = (teachingOrId) => {
   return !!teaching && isSectionArchived(teaching.sectionId);
 };
 
-/** وصف مقروء للإسناد: «الرابع الابتدائي / أ · المهارات الرقمية». */
+/** وصف مقروء للفصل والمادة: «الرابع الابتدائي / أ · الرياضيات». */
 export function teachingLabel(tch) {
   if (!tch) return '';
   const sec = getSection(tch.sectionId);
@@ -2194,6 +2204,45 @@ export async function createSubject(data) {
   return s;
 }
 
+/**
+ * Resolves a picker token to one durable subject identity. Built-ins are
+ * created lazily; equivalent legacy/custom rows are reused rather than copied.
+ */
+export async function resolveSubjectSelection({ token, customName = '' } = {}) {
+  const value = String(token ?? '');
+  if (value.startsWith('subject:')) {
+    const existing = getSubject(value.slice('subject:'.length));
+    if (!existing) throw new Error('المادة المحددة غير متاحة. اختر مادة أخرى.');
+    return existing;
+  }
+
+  let definition = value.startsWith('builtin:') ? builtinSubject(value.slice('builtin:'.length)) : null;
+  let validated = null;
+  if (value === 'custom') {
+    validated = validateCustomSubjectName(customName);
+    if (!validated.ok) throw new Error(validated.error);
+    definition = matchBuiltinSubject(validated.name);
+  }
+
+  if (definition) {
+    const existing = findPersistedBuiltin(live(state.subjects), definition);
+    if (existing) return existing;
+    const created = makeSubject({ id: definition.id, name: definition.name, slug: definition.slug });
+    if (!(await save({ subjects: [created] }))) throw new Error('تعذّر حفظ المادة. حاول مرة أخرى.');
+    return created;
+  }
+
+  if (!validated) throw new Error('اختر مادة للفصل.');
+  const duplicate = live(state.subjects).find((subject) => normalizeSubjectName(subject.name) === validated.normalized);
+  if (duplicate) return duplicate;
+  const slug = customSubjectSlug(validated.name);
+  const sameNaturalIdentity = live(state.subjects).find((subject) => subject.slug === slug);
+  if (sameNaturalIdentity) return sameNaturalIdentity;
+  const created = makeSubject({ id: `sub:${uid()}`, name: validated.name, slug });
+  if (!(await save({ subjects: [created] }))) throw new Error('تعذّر حفظ المادة المخصصة. حاول مرة أخرى.');
+  return created;
+}
+
 export async function createSection(data) {
   const year = activeYear();
   const yearId = data.yearId ?? year?.id;
@@ -2236,8 +2285,10 @@ export async function editSection(id, data) {
 export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }) {
   if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const term = tmId ?? activeTerm()?.id;
+  const subject = subId ?? getSubject('sub:digital-skills')?.id ?? subjects()[0]?.id;
+  if (!getSubject(subject)) throw new Error('اختر مادة صالحة للفصل.');
   const tch = makeTeaching({
-    sectionId: secId, subjectId: subId, termId: term,
+    sectionId: secId, subjectId: subject, termId: term,
     order: teachings(term).length,
   });
   if (getTeaching(tch.id)) return getTeaching(tch.id);
