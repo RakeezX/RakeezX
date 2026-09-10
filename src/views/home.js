@@ -344,7 +344,7 @@ export default {
           <a class="tile" href="#/classes">
             <span class="tile__icon">${icon('classes')}</span>
             <span class="tile__title">فصولي</span>
-            <span class="tile__sub"><span class="tabular">${list.length}</span> إسنادًا هذا الفصل</span>
+            <span class="tile__sub"><span class="tabular">${list.length}</span> فصلاً هذا الفصل</span>
           </a>
           <a class="tile" href="#/schedule">
             <span class="tile__icon">${icon('timetable')}</span>

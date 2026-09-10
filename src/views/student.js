@@ -126,6 +126,7 @@ export default {
       (!event.teaching || event.teaching.id === tch.id);
 
     return html`
+      <div class="management-page student-profile-page">
       <div class="printhead">
         <div class="printhead__title">${s.name}</div>
         <div class="printhead__sub">
@@ -136,7 +137,7 @@ export default {
         </div>
       </div>
 
-      <div class="student-profile-header noprint mb-3">
+      <div class="student-profile-header rakeez-accent-surface noprint mb-3">
         ${studentAvatar(s, 'lg')}
         <div class="student-profile-header__info">
           <div class="student-profile-header__name">${s.name}</div>
@@ -154,7 +155,7 @@ export default {
           </div>`
         : ''}
 
-      <div class="grid grid--3 mb-3">
+      <div class="grid grid--3 management-overview student-profile-summary mb-3" aria-label="ملخص الطالب الحالي">
         <div class="stat">
           <div class="stat__val tabular">${fmtPct(total.pct)}</div>
           <div class="stat__label">من المرصود</div>
@@ -177,47 +178,15 @@ export default {
           </div>`
         : ''}
 
-      <!-- سجل الانتساب -->
-      <div class="section">
-        <div class="section__head"><div class="section__title">سجل الانتساب</div></div>
-        <div class="card">
-          ${enrollmentHistory.length
-            ? enrollmentHistory.map((en) => {
-                const sec = store.getSection(en.sectionId);
-                const year = sec ? store.getYear(sec.yearId) : null;
-                return html`
-                  <div class="logrow">
-                    <span class="logrow__delta ${en.status === 'active' ? 'is-pos' : ''}">
-                      ${en.rollNo ?? '—'}
-                    </span>
-                    <span class="logrow__main">
-                      <span>
-                        ${sectionLabel(sec) || 'شعبة محذوفة'}
-                        ${year ? html` · ${year.label}` : ''}
-                        <span class="badge ${en.status === 'active' ? 'badge--ok' : ''}">
-                          ${ENROLLMENT_STATUS[en.status] ?? en.status}
-                        </span>
-                      </span>
-                      <span class="logrow__date">
-                        ${en.startDate ? fmtDateRange(en.startDate, en.endDate ?? en.startDate) : '—'}
-                      </span>
-                    </span>
-                  </div>
-                `;
-              })
-            : html`<div class="card--pad t-3 center">لا انتساب مسجّل.</div>`}
-        </div>
-      </div>
-
       <!-- الدرجات -->
-      <div class="section">
+      <div class="section student-profile-section student-profile-current-grades">
         <div class="section__head">
           <div class="section__title">الدرجات${tch ? ` — ${store.getSubject(tch.subjectId)?.name ?? ''}` : ''}</div>
           <div class="t-3 fs-sm tabular">${fmtNum(total.earned)} / ${total.outOfAll}</div>
         </div>
         <div class="card">
           ${items.length === 0
-            ? html`<div class="card--pad t-3 center">لا بنود تقييم في هذا الإسناد.</div>`
+            ? html`<div class="card--pad t-3 center">لا بنود تقييم في هذا الفصل.</div>`
             : items.map((i) => {
                 const v = itemScore(i, gradeCtx);
                 const pct = v === null ? null : (v / i.max) * 100;
@@ -244,14 +213,15 @@ export default {
 
       ${previousContexts.length
         ? html`
-            <div class="section student-previous-history">
-              <div class="section__head">
+            <details class="section student-profile-section student-profile-disclosure student-previous-history">
+              <summary class="student-profile-disclosure__summary">
                 <div>
                   <div class="section__title">السجل السابق</div>
-                  <div class="t-3 fs-xs">عرض للقراءة فقط؛ كل سجل يبقى في إسناده الأصلي</div>
+                  <div class="t-3 fs-xs">عرض للقراءة فقط؛ كل سجل يبقى في فصله الأصلي</div>
                 </div>
-              </div>
-              <div class="stack stack-3">
+                <span class="student-profile-disclosure__meta"><span class="tabular">${previousContexts.length}</span> سجل</span>
+              </summary>
+              <div class="student-profile-disclosure__body stack stack-3">
                 ${previousContexts.map((context) => html`
                   <div class="card" data-history-teaching="${context.teaching.id}">
                     <div class="card--pad stack stack-2">
@@ -291,19 +261,20 @@ export default {
                   </div>
                 `)}
               </div>
-            </div>
+            </details>
           `
         : ''}
 
       <!-- الحضور -->
-      <div class="section">
-        <div class="section__head">
+      <details class="section student-profile-section student-profile-disclosure student-attendance-history">
+        <summary class="student-profile-disclosure__summary">
           <div>
             <div class="section__title">سجل الحضور المستمر</div>
-            <div class="t-3 fs-xs">جميع الإسنادات، مع إبقاء سياق كل حصة الأصلي</div>
+            <div class="t-3 fs-xs">جميع الفصول، مع إبقاء سياق كل حصة الأصلي</div>
           </div>
-          <div class="t-3 fs-sm"><span class="tabular">${sessions}</span> حصة مرصودة</div>
-        </div>
+          <span class="student-profile-disclosure__meta"><span class="tabular">${sessions}</span> حصة</span>
+        </summary>
+        <div class="student-profile-disclosure__body">
         ${sessions === 0
           ? html`<div class="card card--pad t-3 center">لم يُرصد حضور بعد.</div>`
           : html`
@@ -344,14 +315,19 @@ export default {
                   : ''}
               </div>
             `}
-      </div>
+        </div>
+      </details>
 
       <!-- الملاحظات المؤرخة -->
-      <div class="section">
-        <div class="section__head">
+      <details class="section student-profile-section student-profile-disclosure student-notes-history">
+        <summary class="student-profile-disclosure__summary">
           <div class="section__title">الملاحظات</div>
+          <span class="student-profile-disclosure__meta"><span class="tabular">${notes.length}</span> ملاحظة</span>
+        </summary>
+        <div class="student-profile-disclosure__body">
+          <div class="student-profile-disclosure__actions noprint">
           <button class="btn btn--sm btn--quiet noprint" data-act="add-note">${icon('plus')} ملاحظة جديدة</button>
-        </div>
+          </div>
         ${notes.length
           ? html`<div class="card">
               ${notes.map((event) => {
@@ -380,11 +356,16 @@ export default {
               <div>لا توجد ملاحظات مسجلة لهذا الطالب.</div>
               <div><button class="btn btn--quiet" data-act="add-note">${icon('plus')} إضافة ملاحظة</button></div>
             </div>`}
-      </div>
+        </div>
+      </details>
 
       <!-- المشاركة والسلوك -->
-      <div class="section">
-        <div class="section__head"><div class="section__title">المشاركة والسلوك</div></div>
+      <details class="section student-profile-section student-profile-disclosure student-engagement-history">
+        <summary class="student-profile-disclosure__summary">
+          <div class="section__title">المشاركة والسلوك</div>
+          <span class="student-profile-disclosure__meta"><span class="tabular">${logEvents.length}</span> رصد</span>
+        </summary>
+        <div class="student-profile-disclosure__body">
         <div class="grid grid--2 mb-3">
           <div class="stat">
             <div class="stat__val tabular">${partNet > 0 ? '+' : ''}${partNet}</div>
@@ -422,16 +403,53 @@ export default {
               </div>
             `
           : html`<div class="card card--pad t-3 center">لا رصد سريع بعد.</div>`}
-      </div>
+        </div>
+      </details>
 
-      <div class="section noprint">
-        <div class="btn-row">
+      <!-- سجل الانتساب: مرجع تاريخي منخفض الأولوية -->
+      <details class="section student-profile-section student-profile-disclosure student-profile-enrollment">
+        <summary class="student-profile-disclosure__summary">
+          <div class="section__title">سجل الانتساب</div>
+          <span class="student-profile-disclosure__meta"><span class="tabular">${enrollmentHistory.length}</span> سجل</span>
+        </summary>
+        <div class="student-profile-disclosure__body card">
+          ${enrollmentHistory.length
+            ? enrollmentHistory.map((en) => {
+                const sec = store.getSection(en.sectionId);
+                const year = sec ? store.getYear(sec.yearId) : null;
+                return html`
+                  <div class="logrow">
+                    <span class="logrow__delta ${en.status === 'active' ? 'is-pos' : ''}">
+                      ${en.rollNo ?? '—'}
+                    </span>
+                    <span class="logrow__main">
+                      <span>
+                        ${sectionLabel(sec) || 'شعبة محذوفة'}
+                        ${year ? html` · ${year.label}` : ''}
+                        <span class="badge ${en.status === 'active' ? 'badge--ok' : ''}">
+                          ${ENROLLMENT_STATUS[en.status] ?? en.status}
+                        </span>
+                      </span>
+                      <span class="logrow__date">
+                        ${en.startDate ? fmtDateRange(en.startDate, en.endDate ?? en.startDate) : '—'}
+                      </span>
+                    </span>
+                  </div>
+                `;
+              })
+            : html`<div class="card--pad t-3 center">لا انتساب مسجّل.</div>`}
+        </div>
+      </details>
+
+      <div class="section student-profile-actions noprint">
+        <div class="btn-row student-profile-actions__row">
           <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة الملخص</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
           ${s.status === 'active'
             ? html`<button class="btn btn--danger" data-act="withdraw">${icon('back')} غادر المدرسة</button>`
             : html`<button class="btn btn--ghost" data-act="reinstate">${icon('check')} أعده للدراسة</button>`}
         </div>
+      </div>
       </div>
     `;
   },
@@ -470,7 +488,7 @@ export default {
         `• المجموع: ${fmtNum(total.earned)} من ${total.outOfAll} (${total.pct != null ? `${fmtPct(total.pct)}` : '—'})`,
         band.label ? `• التقدير: ${band.label}` : '',
         '',
-        '📅 سجل الحضور والمواظبة عبر جميع الإسنادات:',
+        '📅 سجل الحضور والمواظبة عبر جميع الفصول:',
         `• الحصص المرصودة: ${sessions}`,
         `• نسبة الحضور: ${attendedPct != null ? `${attendedPct}%` : '—'}`,
         `• الغياب: ${tally.absent} | التأخر: ${tally.late} | الاستئذان: ${tally.excused}`,

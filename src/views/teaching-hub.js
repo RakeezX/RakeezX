@@ -238,21 +238,21 @@ export default {
       const sub = store.getSubject(tch.subjectId);
       const target = [sectionLabel(sec), sub?.name].filter(Boolean).join(' · ');
       const ok = await openSheet({
-        title: 'حذف الإسناد',
-        desc: target ? `إلغاء إسناد ${target}` : undefined,
+        title: 'حذف الفصل',
+        desc: target ? `إلغاء فصل ${target}` : undefined,
         body: html`
           <div class="delete-teaching-dialog">
             <div class="delete-teaching-dialog__badge">${icon('trash')} إجراء نهائي غير قابل للتراجع</div>
-            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>سيتم حذف بيانات هذا الإسناد مثل بنود التقييم والدرجات والحصص والحضور والسجل.</p></div>
+            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>سيتم حذف بيانات هذا الفصل مثل بنود التقييم والدرجات والحصص والحضور والسجل.</p></div>
             <div class="delete-teaching-dialog__block delete-teaching-dialog__block--safe"><strong>بيانات الطلاب والشعبة</strong><p>الطلاب وانتسابهم للشعبة سيبقون كما هم دون أي تعديل أو حذف.</p></div>
           </div>
         `,
-        foot: html`<button class="btn btn--quiet" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-confirm>${icon('trash')} حذف الإسناد</button>`,
+        foot: html`<button class="btn btn--quiet" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-confirm>${icon('trash')} حذف الفصل</button>`,
         onMount: (root, done) => root.querySelector('[data-confirm]')?.addEventListener('click', () => done(true)),
       }).then((value) => value === true);
       if (!ok) return;
       await store.deleteTeaching(params.id);
-      toast('حُذف الإسناد');
+      toast('حُذف الفصل');
       go('/classes');
     },
     async 'edit-sec'(el, ev, params) {

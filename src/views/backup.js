@@ -51,7 +51,7 @@ export default {
       'سنوات دراسية': n('years'),
       'فصول دراسية': n('terms'),
       شعب: n('sections'),
-      إسنادات: n('teachings'),
+      فصول: n('teachings'),
       طلاب: n('students'),
       انتسابات: n('enrollments'),
       حصص: n('sessions'),

@@ -153,9 +153,9 @@ export default {
               <span class="row__main">
                 <span class="row__title">${i.name}</span>
                 <span class="row__sub">
-                  <span class="tabular">${i.max}</span> درجة
+                  <span class="tabular">${i.max}</span> ${i.auto === 'participation' ? 'درجات' : 'درجة'}
                   ${i.auto === 'participation'
-                    ? html` · آلي من الرصد (<span class="tabular">${i.perPoint}</span> لكل نقطة)`
+                    ? html` · رصد آلي من الرصد السريع (<span class="tabular">${i.perPoint}</span> لكل نقطة)`
                     : i.auto === 'attendance'
                       ? html` · آلي من الحضور (خصم <span class="tabular">${i.penalty}</span>)`
                       : ''}

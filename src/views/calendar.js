@@ -378,7 +378,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
                       ${t.startDate && t.endDate
                         ? fmtDateRange(t.startDate, t.endDate)
                         : 'التواريخ غير محددة'}
-                      · <span class="tabular">${store.teachings(t.id).length}</span> إسنادًا
+                      · <span class="tabular">${store.teachings(t.id).length}</span> فصلاً
                     </span>
                   </span>
                   <span class="row__end">
@@ -818,6 +818,7 @@ export default {
       filteredRanges = ranges.filter((r) => !r.source.startsWith('preset:'));
 
     return html`
+      <div class="management-page calendar-management-page">
       <!-- شريط الهوية والتقويم المعتمد وإجراءات التحكم -->
       <div class="cal-hero-strip">
         <div class="cal-hero-strip__identity">
@@ -851,7 +852,7 @@ export default {
       <!-- رادار الزمن الدراسي (أين نحن الآن + المحطة القادمة) -->
       <div class="cal-radar-grid">
         <!-- بطاقة: نبض الفصل الدراسي الجاري -->
-        <div class="cal-card cal-card--pulse">
+        <div class="cal-card cal-card--pulse rakeez-accent-surface">
           <div class="cal-card__head">
             <span class="cal-card__eyebrow">
               <span class="cal-pulse-dot" aria-hidden="true"></span>
@@ -899,15 +900,15 @@ export default {
           <div class="cal-metrics-row">
             <div class="cal-metric">
               <div class="cal-metric__label">الأيام المتبقية</div>
-              <div class="cal-metric__val">${remainingDays} يومًا</div>
+              <div class="cal-metric__val"><bdi class="tabular">${remainingDays}</bdi> يومًا</div>
             </div>
             <div class="cal-metric">
               <div class="cal-metric__label">الأيام المنقضية</div>
-              <div class="cal-metric__val">${elapsedDays} يومًا</div>
+              <div class="cal-metric__val"><bdi class="tabular">${elapsedDays}</bdi> يومًا</div>
             </div>
             <div class="cal-metric">
               <div class="cal-metric__label">نسبة الإنجاز الزمني</div>
-              <div class="cal-metric__val">${progressPct}٪</div>
+              <div class="cal-metric__val"><bdi class="tabular">${progressPct}٪</bdi></div>
             </div>
           </div>
           <div class="t-3 fs-xs mt-2" style="opacity: 0.85;">
@@ -1108,35 +1109,43 @@ export default {
         </div>
 
         <!-- تبويبات التصفية السريعة -->
-        <div class="cal-filters-row" role="tablist">
+        <div class="cal-filters-row" role="group" aria-label="تصفية فترات التقويم">
           <button
+            type="button"
             class="cal-filter-btn ${activeFilter === 'all' ? 'is-active' : ''}"
             data-act="filter"
             data-filter="all"
+            aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
           >
             <span>الكل</span>
             <span class="cal-filter-btn__count tabular">${ranges.length}</span>
           </button>
           <button
+            type="button"
             class="cal-filter-btn ${activeFilter === 'upcoming' ? 'is-active' : ''}"
             data-act="filter"
             data-filter="upcoming"
+            aria-pressed="${activeFilter === 'upcoming' ? 'true' : 'false'}"
           >
             <span>القادمة</span>
             <span class="cal-filter-btn__count tabular">${upcomingCount}</span>
           </button>
           <button
+            type="button"
             class="cal-filter-btn ${activeFilter === 'official' ? 'is-active' : ''}"
             data-act="filter"
             data-filter="official"
+            aria-pressed="${activeFilter === 'official' ? 'true' : 'false'}"
           >
             <span>رسمية معتمدة</span>
             <span class="cal-filter-btn__count tabular">${officialCount}</span>
           </button>
           <button
+            type="button"
             class="cal-filter-btn ${activeFilter === 'exceptions' ? 'is-active' : ''}"
             data-act="filter"
             data-filter="exceptions"
+            aria-pressed="${activeFilter === 'exceptions' ? 'true' : 'false'}"
           >
             <span>استثناءات محلية</span>
             <span class="cal-filter-btn__count tabular">${exceptionsCount}</span>
@@ -1297,6 +1306,7 @@ export default {
             نظام تقويم موحد ومرن مهيأ لإدارات التعليم بمناطق المملكة العربية السعودية. تُحفظ الفترات الرسمية المعتمدة لحماية دقة تقارير التنفيذ والغياب المدرسي، مع إمكانية إضافة وتعديل استثناءات خاصة بمدارسك دون المساس بالأصل الوزاري.
           </div>
         </div>
+      </div>
       </div>
     `;
   },

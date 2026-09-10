@@ -274,13 +274,14 @@ export default {
     const activeT = store.activeTerm();
 
     return html`
-      <div class="section">
+      <div class="management-page settings-page">
+      <div class="section settings-section settings-section--identity">
         <div class="section__head"><div class="section__title">بياناتك</div></div>
         <div class="card card--pad">
           <p class="t-3 fs-sm mb-3">
             تظهر على التقارير والكشوف التي تطبعها. تُحفظ محليًا وتُزامن مع حسابك عند الاتصال.
           </p>
-          <form id="me-form">
+          <form id="me-form" class="management-form settings-identity-form">
             <div class="field-row">
               <label class="field">
                 <span class="field__label">اسم المعلم</span>
@@ -306,62 +307,61 @@ export default {
       </div>
 
 
-      <div class="section">
-        <div class="section__head"><div class="section__title">المظهر</div></div>
-        <div class="segmented">
-          ${THEMES.map(
-            (t) => html`
-              <button class="segmented__btn ${(m.theme ?? 'auto') === t.v ? 'is-on' : ''}"
-                      data-act="theme" data-theme="${t.v}">
-                ${icon(t.icon)} ${t.label}
+      <div class="section settings-section settings-section--experience">
+        <div class="section__head"><div class="section__title">المظهر والمؤثرات والتفاعل</div></div>
+        <div class="settings-preference-surface">
+          <div class="settings-preference-row">
+            <div class="settings-preference-row__copy">
+              <div class="fw-7">المظهر</div>
+              <div class="t-3 fs-sm">اختر المظهر الأنسب لبيئة العمل</div>
+            </div>
+            <div class="segmented settings-preference-row__control" role="group" aria-label="مظهر التطبيق">
+              ${THEMES.map(
+                (t) => html`
+                  <button type="button" class="segmented__btn ${(m.theme ?? 'auto') === t.v ? 'is-on' : ''}"
+                          data-act="theme" data-theme="${t.v}" aria-pressed="${(m.theme ?? 'auto') === t.v ? 'true' : 'false'}">
+                    ${icon(t.icon)} ${t.label}
+                  </button>
+                `
+              )}
+            </div>
+          </div>
+
+          <div class="settings-preference-row">
+            <div class="settings-preference-row__copy">
+              <div class="fw-7">المؤثرات الصوتية</div>
+              <div class="t-3 fs-sm">أصوات تفاعلية أثناء رصد المشاركة والقرعة</div>
+            </div>
+            <div class="segmented settings-preference-row__control" role="group" aria-label="المؤثرات الصوتية">
+              <button type="button" class="segmented__btn ${isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="on" aria-pressed="${isSoundEnabled() ? 'true' : 'false'}">
+                ${icon('spark')} تشغيل
               </button>
-            `
-          )}
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section__head"><div class="section__title">المؤثرات والتفاعل</div></div>
-        <div class="stack stack-2">
-          <div class="card card--pad">
-            <div class="hstack gap-3 wrap">
-              <div style="flex: 1; min-width: 180px;">
-                <div class="fw-7">المؤثرات الصوتية</div>
-                <div class="t-3 fs-sm">أصوات تفاعلية أثناء رصد المشاركة والقرعة</div>
-              </div>
-              <div class="segmented" style="flex: none;">
-                <button class="segmented__btn ${isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="on">
-                  ${icon('spark')} تشغيل
-                </button>
-                <button class="segmented__btn ${!isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="off">
-                  إيقاف
-                </button>
-              </div>
+              <button type="button" class="segmented__btn ${!isSoundEnabled() ? 'is-on' : ''}" data-act="sound" data-val="off" aria-pressed="${!isSoundEnabled() ? 'true' : 'false'}">
+                إيقاف
+              </button>
             </div>
           </div>
 
-          <div class="card card--pad">
-            <div class="hstack gap-3 wrap">
-              <div style="flex: 1; min-width: 180px;">
-                <div class="fw-7">المؤثرات البصرية</div>
-                <div class="t-3 fs-sm">أشكال متحركة وفقاعات الرصد السريع واحتفالات القرعة</div>
-              </div>
-              <div class="segmented" style="flex: none;">
-                <button class="segmented__btn ${isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="on">
-                  ${icon('spark')} تشغيل
-                </button>
-                <button class="segmented__btn ${!isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="off">
-                  إيقاف
-                </button>
-              </div>
+          <div class="settings-preference-row">
+            <div class="settings-preference-row__copy">
+              <div class="fw-7">المؤثرات البصرية</div>
+              <div class="t-3 fs-sm">الحركة واحتفالات الرصد والقرعة</div>
+            </div>
+            <div class="segmented settings-preference-row__control" role="group" aria-label="المؤثرات البصرية">
+              <button type="button" class="segmented__btn ${isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="on" aria-pressed="${isVisualEffectsEnabled() ? 'true' : 'false'}">
+                ${icon('spark')} تشغيل
+              </button>
+              <button type="button" class="segmented__btn ${!isVisualEffectsEnabled() ? 'is-on' : ''}" data-act="visual-fx" data-val="off" aria-pressed="${!isVisualEffectsEnabled() ? 'true' : 'false'}">
+                إيقاف
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="section">
+      <div class="section settings-section settings-section--destinations">
         <div class="section__head"><div class="section__title">البيانات</div></div>
-        <a class="row" href="#/settings/backup">
+        <a class="row settings-destination" href="#/settings/backup">
           <span class="row__icon">${icon('download')}</span>
           <span class="row__main">
             <span class="row__title">البيانات والنسخ الاحتياطي</span>
@@ -371,15 +371,15 @@ export default {
         </a>
       </div>
 
-      <div class="section">
+      <div class="section settings-section settings-section--destinations">
         <div class="section__head"><div class="section__title">الأرشيف</div></div>
-        <a class="row" href="#/archive">
+        <a class="row settings-destination" href="#/archive">
           <span class="row__icon">${icon('archive')}</span>
           <span class="row__main"><span class="row__title">الأرشيف</span><span class="row__sub">استعراض السنوات والفصول الدراسية المؤرشفة وبياناتها السابقة.</span></span>
           <span class="row__end">${icon('chev')}</span>
         </a>
       </div>
-      <div class="section">
+      <div class="section settings-section settings-section--pwa">
         <div class="section__head"><div class="section__title">تثبيت تطبيق ركيز على الجهاز</div></div>
         <div class="card card--pad stack stack-3">
           ${isStandaloneMode()
@@ -406,11 +406,11 @@ export default {
             <div class="hstack gap-2 wrap mb-2">
               <span class="fw-7 fs-sm">إرشادات التثبيت حسب الجهاز:</span>
             </div>
-            <div class="segmented mb-3">
+            <div class="segmented mb-3" role="tablist" aria-label="نظام الجهاز">
               ${PWA_PLATFORMS.map(
                 (p) => html`
-                  <button class="segmented__btn ${(activePwaGuide || detectUserPlatform()) === p.id ? 'is-on' : ''}"
-                          data-act="pwa-select-guide" data-platform="${p.id}">
+                  <button type="button" class="segmented__btn ${(activePwaGuide || detectUserPlatform()) === p.id ? 'is-on' : ''}"
+                          data-act="pwa-select-guide" data-platform="${p.id}" role="tab" aria-selected="${(activePwaGuide || detectUserPlatform()) === p.id ? 'true' : 'false'}">
                     ${p.label}
                   </button>
                 `
@@ -424,13 +424,14 @@ export default {
         </div>
       </div>
 
-      <div class="section">
+      <div class="section settings-section settings-section--about">
         <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
         <div class="card card--pad stack stack-2">
           <div class="fw-7">سجل معلّم يعمل دون إنترنت أولًا (Offline-First).</div>
           <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
           <div class="t-3 fs-xs">RAKEEZ X · الإصدار 1.0</div>
         </div>
+      </div>
       </div>
     `;
   },

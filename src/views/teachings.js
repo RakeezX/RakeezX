@@ -32,7 +32,7 @@ function sheet(existing = null) {
     title: existing ? 'تعديل الفصل' : 'فصل جديد',
     desc: existing ? null : 'الشعبة مجموعة الطلاب، والمادة تُسنَد إليها في هذا الفصل الدراسي.',
     body: html`
-      <form id="tch-form">
+      <form id="tch-form" class="management-form class-form">
         <div class="field-row">
           <label class="field">
             <span class="field__label">الصف</span>
@@ -134,6 +134,7 @@ function renderClassCard(tch) {
         </div>
         <div class="class-card__body">
           <span class="class-card__sub">${sub?.name ?? ''}</span>
+          <span class="class-card__count"><span class="tabular">${roster.length}</span> طالبًا</span>
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
@@ -157,12 +158,13 @@ export default {
     if (!list.length) {
       const yearSecs = store.sections();
       return html`
-        <div class="empty">
+        <div class="management-page classes-page">
+        <div class="empty management-empty classes-empty">
           <div class="empty__icon">${icon('classes')}</div>
           <div class="empty__title">لا فصول في ${term?.name ?? 'هذا الفصل الدراسي'}</div>
           
           ${yearSecs.length === 0 ? html`
-            <div class="card card--pad mt-4 center" style="background: var(--surface-1); border: 1px dashed var(--border);">
+            <div class="management-empty__setup mt-4 center">
               <div class="fw-7 mb-2">إعداد الفصول</div>
               <p class="t-3 fs-sm mb-3">يمكنك إنشاء الفصول التي تدرّسها الآن دفعة واحدة، ثم تعديلها لاحقًا.</p>
               <button class="btn btn--primary" data-act="seed-sections">${icon('spark')} إعداد الفصول الآن</button>
@@ -175,35 +177,38 @@ export default {
             <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
           `}
         </div>
+        </div>
       `;
     }
 
     const totalStudents = list.reduce((n, t) => n + store.students(t.id).length, 0);
 
     return html`
+      <div class="management-page classes-page">
       ${closed
         ? html`<div class="card card--pad mb-3 banner-closed">
             ${icon('note')} هذا الفصل الدراسي مُغلق — البيانات للعرض فقط.
           </div>`
         : ''}
 
-      <div class="grid grid--2 mb-3">
-        <div class="stat">
-          <div class="stat__val tabular">${list.length}</div>
-          <div class="stat__label">إسنادًا</div>
+      <div class="management-overview classes-overview mb-3" aria-label="ملخص الفصول">
+        <div class="classes-overview__metric">
+          <span class="classes-overview__label">عدد الفصول</span>
+          <strong class="classes-overview__value tabular">${list.length}</strong>
         </div>
-        <div class="stat">
-          <div class="stat__val tabular">${totalStudents}</div>
-          <div class="stat__label">طالبًا</div>
+        <div class="classes-overview__metric">
+          <span class="classes-overview__label">عدد الطلاب</span>
+          <strong class="classes-overview__value tabular">${totalStudents}</strong>
         </div>
       </div>
 
-      <div class="class-cards-grid">${list.map(renderClassCard)}</div>
+      <div class="class-cards-grid" aria-label="قائمة الفصول">${list.map(renderClassCard)}</div>
 
       <div class="hstack gap-2 wrap mt-3 classes-actions">
         <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button>
         <button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button>
         <button class="btn btn--ghost class-action-delete-btn" data-act="delete-class-flow">${icon('trash')} حذف فصل</button>
+      </div>
       </div>
     `;
   },
@@ -528,7 +533,7 @@ export default {
         added++;
       }
       
-      toast(`تم إضافة ${added} إسناد بنجاح`);
+      toast(`تمت إضافة ${added} فصل بنجاح`);
       repaint();
     }
   },

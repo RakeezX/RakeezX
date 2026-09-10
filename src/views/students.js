@@ -150,7 +150,8 @@ export default {
 
     if (!roster.length) {
       return html`
-        <div class="empty">
+        <div class="management-page students-roster-page">
+        <div class="empty management-empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الشعبة'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
@@ -158,6 +159,7 @@ export default {
             <button class="btn btn--primary" data-act="import">${icon('upload')} لصق كشف الأسماء</button>
             <button class="btn btn--ghost" data-act="add">${icon('plus')} طالب واحد</button>
           </div>
+        </div>
         </div>
       `;
     }
@@ -172,28 +174,31 @@ export default {
       .filter((x) => x.s);
 
     return html`
-      <div class="searchbar">
+      <div class="management-page students-roster-page">
+      <div class="management-toolbar roster-toolbar">
+      <div class="searchbar roster-search">
         ${icon('search')}
         <input class="searchbar__input" type="search" data-input="search" data-fk="student-search"
-               value="${query}" placeholder="ابحث باسم طالب" autocomplete="off">
-        ${q ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
+               value="${query}" placeholder="ابحث بالاسم أو رقم الكشف" autocomplete="off" aria-label="بحث الطلاب">
+        ${q ? html`<button type="button" class="iconbtn" data-act="clear-search" aria-label="مسح البحث">${icon('x')}</button>` : ''}
       </div>
 
-      <div class="hstack gap-2 wrap mb-3 t-3 fs-sm">
-        <span><span class="tabular fw-7">${roster.length}</span> طالبًا</span>
+      <div class="roster-summary t-3 fs-sm" aria-live="polite">
+        <span><span class="tabular fw-7">${shown.length}</span> من <span class="tabular fw-7">${roster.length}</span> طالبًا</span>
+      </div>
       </div>
 
       ${shown.length === 0
         ? html`<div class="empty"><div class="empty__text">لا نتيجة لبحثك.</div></div>`
         : html`
-            <div class="list">
+            <div class="list roster-list">
               ${shown.map((s) => {
                 const t = studentTotal(items, ctx[s.id]);
                 const band = masteryBand(t.pct);
                 const absents = absenceCount(ctx[s.id].attendance);
                 return html`
-                  <div class="row">
-                    <span class="rollno">${s.rollNo ?? '—'}</span>
+                  <div class="row roster-row">
+                    <span class="rollno" aria-label="رقم الكشف ${s.rollNo ?? 'غير محدد'}">${s.rollNo ?? '—'}</span>
                     ${studentAvatar(s, 'sm')}
                     <a class="row__main" href="#/student/${s.id}?teaching=${tch.id}">
                       <span class="row__title">${s.name}</span>
@@ -218,7 +223,7 @@ export default {
 
       ${former.length
         ? html`
-            <div class="section">
+            <div class="section former-students-section">
               <div class="section__head"><div class="section__title">غادروا هذه الشعبة</div></div>
               <div class="list">
                 ${former.map(
@@ -240,13 +245,14 @@ export default {
                 )}
               </div>
               <p class="t-3 fs-sm mt-3">
-                سجلّهم محفوظ كاملًا، ودرجاتهم في هذا الإسناد تبقى في التقارير التاريخية.
+                سجلّهم محفوظ كاملًا، ودرجاتهم في هذا الفصل تبقى في التقارير التاريخية.
               </p>
             </div>
           `
         : ''}
 
       <button class="fab" data-act="import">${icon('upload')} لصق كشف</button>
+      </div>
     `;
   },
 

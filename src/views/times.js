@@ -1356,7 +1356,7 @@ export default {
   back: () => '#/schedule',
 
   topActions: () => html`
-    <button class="btn btn--sm btn--primary-soft" data-act="add-profile">
+    <button class="btn btn--sm btn--primary" data-act="add-profile">
       ${icon('plus')} ملف توقيت جديد
     </button>
   `,
@@ -1382,9 +1382,10 @@ export default {
     const nextSwitch = profilesWithFrom.find(p => p.activeFrom > todayStr);
 
     return html`
+      <div class="management-page timing-profiles-page">
       <!-- يعرض التوقيت المطبق، والتبديل القادم عند وجوده، والأساسي عند اختلافه. -->
       ${nextSwitch || currentResolved?.id !== active?.id ? html`
-        <div class="seasonal-activation-bar">
+        <div class="seasonal-activation-bar" role="status">
           <div class="seasonal-activation-bar__main">
             <div class="seasonal-activation-bar__item">
               <span class="seasonal-activation-bar__label">التوقيت المطبق اليوم</span>
@@ -1414,7 +1415,7 @@ export default {
       ` : ''}
 
       <!-- شبكة بطاقات ملفات التوقيت بنظام الإجرائين الصريحين -->
-      <div class="timing-profiles-grid">
+      <div class="timing-profiles-grid" aria-label="ملفات التوقيت">
         ${profiles.map((p) => {
           const isActive = p.id === active?.id;
           const isEffective = p.id === currentResolved?.id;
@@ -1431,7 +1432,7 @@ export default {
           const models = getProfileModels(p);
 
           return html`
-            <div class="timing-profile-card ${isActive ? 'is-active-profile' : ''}">
+            <div class="timing-profile-card ${isEffective ? 'is-effective-profile rakeez-accent-surface' : ''} ${isActive ? 'is-active-profile is-base-profile' : ''}">
               <div class="timing-profile-card__head">
                 <div class="timing-profile-card__title-wrap">
                   <span class="timing-profile-card__icon" data-type="${dataType}" aria-hidden="true">
@@ -1440,7 +1441,7 @@ export default {
                   <div class="timing-profile-card__title-col">
                     <span class="timing-profile-card__name">${p.name}</span>
                     <span class="timing-profile-card__sub-status">
-                      ${isEffective ? 'مطبق الآن' : isActive ? 'التوقيت الأساسي' : 'توقيت مخصص'}
+                      ${isEffective && isActive ? 'مطبق الآن · التوقيت الأساسي' : isEffective ? 'مطبق الآن' : isActive ? 'التوقيت الأساسي · احتياطي' : 'توقيت مخصص'}
                     </span>
                   </div>
                 </div>
@@ -1448,7 +1449,7 @@ export default {
                   ? html`<span class="badge badge--brand">${icon('check')} مطبق الآن</span>`
                   : isActive
                     ? html`<span class="badge badge--info">${icon('check')} التوقيت الأساسي</span>`
-                    : html`<button class="btn btn--xs btn--ghost" data-act="activate" data-id="${p.id}">تعيين كنشط</button>`}
+                    : ''}
               </div>
 
               <div class="timing-profile-card__range">
@@ -1476,6 +1477,11 @@ export default {
 
               <!-- الإجرائين الصريحين المعتمدين -->
               <div class="timing-profile-card__actions">
+                ${!isEffective && !isActive ? html`
+                  <button class="btn btn--sm btn--ghost timing-profile-card__set-base" data-act="activate" data-id="${p.id}" aria-label="تعيين ${p.name} كتوقيت أساسي">
+                    ${icon('check')} تعيين كأساسي
+                  </button>
+                ` : ''}
                 <button class="btn btn--sm btn--primary" data-act="edit-times" data-id="${p.id}">
                   ${icon('clock')} عرض وتعديل أوقات الحصص
                 </button>
@@ -1492,13 +1498,14 @@ export default {
           `;
         })}
       </div>
+      </div>
     `;
   },
 
   actions: {
     async activate(el) {
       await store.setActiveTimeProfile(el.dataset.id);
-      toast('صار الملف النشط — والحصص السابقة تبقى بوقتها');
+      toast('تم تعيين التوقيت الأساسي — والحصص السابقة تبقى بوقتها');
       repaint();
     },
 

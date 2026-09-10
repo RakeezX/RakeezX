@@ -2300,6 +2300,9 @@
 .presentation-controls { display:flex; align-items:center; justify-content:flex-end; gap:var(--sp-2); flex-wrap:wrap; }
 .presentation-controls > .btn { min-height:30px; padding-block:3px; color:var(--text-3); background:transparent; border-color:transparent; box-shadow:none; }
 .presentation-controls > .btn:hover { color:var(--text); background:var(--bg-sunk); border-color:var(--border); }
+.presentation-controls > .presentation-controls__action { color:var(--brand-text); background:color-mix(in srgb,var(--brand-soft) 42%,var(--bg-elev)); border-color:var(--brand-border); }
+.presentation-controls > .presentation-controls__action:hover { color:var(--brand-text); background:color-mix(in srgb,var(--brand-soft) 68%,var(--bg-elev)); border-color:var(--brand); }
+.presentation-controls > .presentation-controls__action:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
 .goal-builder { position:relative; display:grid; grid-template-columns:minmax(0,1.35fr) minmax(270px,.85fr) auto; grid-template-areas:"goal settings start"; gap:var(--sp-3); align-items:start; }
 .goal-builder__goal { grid-area:goal; }.goal-builder__settings { grid-area:settings; display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-2); align-items:start; }.goal-builder__start { grid-area:start; align-self:start; min-width:138px; min-height:43px; margin-top:25px; justify-content:center; }.goal-builder__reveal { display:block; margin-top:5px; padding:4px; background:color-mix(in srgb,var(--bg-elev) 72%,transparent); border:1px solid var(--border); border-radius:var(--r-md); animation:goal-reveal .12s var(--ease); }.goal-builder__reveal--compact { padding:4px; }.goal-builder__reveal .input { min-height:38px; }.goal-builder__reveal--compact .input { min-width:0; padding-inline:9px; }.goal-builder__reveal input.tabular { text-align:start; }
 @keyframes goal-reveal { from { opacity:0; } to { opacity:1; } }
@@ -3750,5 +3753,889 @@
   .class-context-nav .class-context-nav__item {
     font-size: 11px;
     letter-spacing: -.15px;
+  }
+}
+
+/* ---------- Visual System Batch C1: الإدارة الأساسية ---------- */
+.management-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.management-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.management-overview {
+  gap: 0;
+  overflow: hidden;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+/*
+ * RAKEEZ Accent Surface
+ * للحالة النشطة أو السياق الأعلى أولوية فقط؛ لا يُستخدم للبطاقات العادية
+ * أو القوائم المتكررة أو الزخرفة غير الوظيفية.
+ */
+.rakeez-accent-surface {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--brand-soft) 52%, var(--bg-elev)) 0%,
+      var(--bg-elev) 72%
+    );
+  border-color: var(--brand-border);
+  border-inline-start: 3px solid var(--brand);
+  box-shadow: var(--shadow-1);
+}
+
+[data-theme="dark"] .rakeez-accent-surface {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--brand-soft) 24%, var(--bg-elev)) 0%,
+      var(--bg-elev) 76%
+    );
+}
+
+.management-overview > .stat {
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.management-overview > .stat + .stat {
+  border-inline-start: 1px solid var(--border);
+}
+
+.management-empty__setup {
+  width: min(100%, 560px);
+  margin-inline: auto;
+  padding: var(--sp-4);
+  background: color-mix(in srgb, var(--brand-soft) 20%, var(--bg-elev));
+  border: 1px dashed var(--brand-border);
+  border-radius: var(--r-lg);
+}
+
+/* الفصول */
+.classes-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  box-shadow: none;
+}
+
+.classes-overview__metric {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  min-height: 56px;
+  padding: var(--sp-2) var(--sp-4);
+}
+
+.classes-overview__metric + .classes-overview__metric {
+  border-inline-start: 1px solid var(--border);
+}
+
+.classes-overview__label {
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.classes-overview__value {
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.class-cards-grid {
+  gap: var(--sp-3);
+}
+
+.class-card {
+  min-height: 116px;
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.class-card__main {
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.class-card__identity {
+  align-items: center;
+}
+
+.class-card__dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 0;
+  box-shadow: 0 0 0 4px var(--bg-sunk);
+}
+
+.class-card__title {
+  font-size: 16px;
+}
+
+.class-card__body {
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--sp-2);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+}
+
+.class-card__sub {
+  flex: 1;
+  min-width: 0;
+}
+
+.class-card__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.classes-actions {
+  justify-content: flex-end;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 1200px) {
+  .classes-page .class-cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* كشف الطلاب */
+.roster-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+}
+
+.roster-search {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.roster-search .searchbar__input {
+  min-height: 44px;
+}
+
+.roster-search .iconbtn {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+
+.roster-summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--sp-2);
+  white-space: nowrap;
+}
+
+.roster-list {
+  gap: 0;
+  overflow: hidden;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.roster-row {
+  min-height: 64px;
+  padding-block: 8px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.roster-row + .roster-row {
+  border-top: 1px solid var(--border);
+}
+
+.roster-row .rollno {
+  width: 32px;
+  height: 32px;
+  color: var(--brand-text);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+}
+
+.roster-row .row__main {
+  padding-block: 4px;
+}
+
+.former-students-section {
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+/* ملف الطالب */
+.student-profile-header {
+  padding: var(--sp-3) var(--sp-4);
+  border-color: var(--brand-border);
+  border-inline-start: 4px solid var(--brand);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.student-profile-header__name {
+  font-size: 19px;
+}
+
+.student-profile-header__roll {
+  min-height: 26px;
+  padding: 3px 8px;
+  color: var(--brand-text);
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--r-full);
+}
+
+.student-profile-summary {
+  margin-bottom: var(--sp-4);
+}
+
+.student-profile-section {
+  scroll-margin-top: var(--sp-4);
+}
+
+.student-profile-section > .card,
+.student-profile-section > .stack > .card {
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.student-profile-current-grades > .card {
+  border-inline-start: 3px solid var(--brand);
+}
+
+.student-profile-disclosure {
+  overflow: hidden;
+  margin-block: var(--sp-3) 0;
+  padding: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.student-profile-disclosure__summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 54px;
+  padding: var(--sp-3) calc(var(--sp-4) + 18px) var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.student-profile-disclosure__summary::-webkit-details-marker {
+  display: none;
+}
+
+.student-profile-disclosure__summary::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: var(--sp-4);
+  width: 8px;
+  height: 8px;
+  border-inline-end: 2px solid var(--text-3);
+  border-block-end: 2px solid var(--text-3);
+  transform: rotate(45deg);
+  transition: transform .16s var(--ease);
+}
+
+.student-profile-disclosure[open] > .student-profile-disclosure__summary::before {
+  transform: rotate(225deg);
+}
+
+.student-profile-disclosure__summary:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+  border-radius: var(--r-lg);
+}
+
+.student-profile-disclosure__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  min-height: 28px;
+  padding-inline: 9px;
+  color: var(--text-3);
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-profile-disclosure__body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.student-profile-disclosure__body > .card:first-child,
+.student-profile-disclosure__body > .grid:first-child,
+.student-profile-disclosure__body > .stack:first-child {
+  margin-top: var(--sp-3);
+}
+
+.student-profile-disclosure__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-block: var(--sp-3);
+}
+
+.student-previous-history .student-profile-disclosure__body > .stack > .card {
+  background: color-mix(in srgb, var(--bg-elev) 72%, var(--bg-sunk));
+  border-style: dashed;
+}
+
+.student-previous-history > .student-profile-disclosure__summary {
+  background: color-mix(in srgb, var(--bg-sunk) 72%, var(--bg-elev));
+}
+
+.student-profile-enrollment {
+  color: var(--text-2);
+}
+
+.student-history-row {
+  min-height: 54px;
+}
+
+.student-profile-page > .section:not(.student-previous-history) {
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.student-profile-page > .student-profile-disclosure {
+  padding-top: 0;
+}
+
+.student-profile-actions__row .btn {
+  min-height: 44px;
+}
+
+/* التقويم */
+.calendar-management-page {
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.calendar-management-page .cal-hero-strip {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.calendar-management-page .cal-hero-strip__title {
+  margin-block: 5px 2px;
+  font-size: clamp(19px, 2.2vw, 25px);
+  line-height: 1.35;
+}
+
+.calendar-management-page .cal-hero-strip__actions .btn {
+  width: auto;
+  min-width: 210px;
+}
+
+.calendar-management-page .cal-radar-grid {
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.calendar-management-page .cal-card {
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.calendar-management-page .cal-card--pulse {
+  border-color: var(--brand-border);
+  border-inline-start: 4px solid var(--brand);
+}
+
+.calendar-management-page .cal-card__title {
+  margin-block: var(--sp-2) var(--sp-3);
+  font-size: clamp(18px, 2vw, 23px);
+}
+
+.calendar-management-page .cal-progress-box {
+  padding: var(--sp-3);
+}
+
+.calendar-management-page .cal-metrics-row {
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.calendar-management-page .cal-metric {
+  min-width: 0;
+  padding: var(--sp-2);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  text-align: center;
+}
+
+.calendar-management-page .cal-metric + .cal-metric {
+  border-inline-start: 1px solid var(--border);
+}
+
+.calendar-management-page .cal-term-card {
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.calendar-management-page .cal-filters-row {
+  min-height: 48px;
+  margin-bottom: var(--sp-3);
+  padding: 3px;
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.calendar-management-page .cal-filter-btn {
+  min-height: 40px;
+  border-radius: var(--r-md);
+}
+
+.calendar-management-page .cal-timeline-list {
+  gap: 0;
+  overflow: hidden;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.calendar-management-page .cal-period-row {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.calendar-management-page .cal-period-row + .cal-period-row {
+  border-top: 1px solid var(--border);
+}
+
+.calendar-management-page .cal-period-row--active {
+  border-inline-start: 4px solid var(--brand);
+}
+
+.calendar-management-page .cal-accreditation-card {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-sunk);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+/* ملفات التوقيت */
+.timing-profiles-page {
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.timing-profiles-page .seasonal-activation-bar {
+  padding: var(--sp-3) var(--sp-4);
+  background: color-mix(in srgb, var(--brand-soft) 28%, var(--bg-elev));
+  border-color: var(--brand-border);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.timing-profiles-page .timing-profiles-grid {
+  gap: var(--sp-3);
+}
+
+.timing-profiles-page .timing-profile-card {
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.timing-profiles-page .timing-profile-card.is-effective-profile {
+  border: 2px solid var(--brand);
+  box-shadow: var(--shadow-1);
+}
+
+.timing-profiles-page .timing-profile-card.is-base-profile:not(.is-effective-profile) {
+  border-inline-start: 4px solid var(--info);
+}
+
+.timing-profiles-page .timing-profile-card__sub-status {
+  line-height: 1.4;
+}
+
+.timing-profiles-page .timing-profile-card.is-effective-profile .timing-profile-card__sub-status {
+  color: var(--brand-text);
+  font-weight: 750;
+}
+
+.timing-profiles-page .timing-profile-card__range {
+  min-height: 36px;
+  padding-block: var(--sp-1);
+}
+
+.timing-profiles-page .timing-profile-card__specs {
+  padding: var(--sp-2);
+  border: 1px solid var(--border);
+}
+
+.timing-profiles-page .timing-profile-card__actions {
+  gap: var(--sp-2);
+  padding-top: var(--sp-2);
+}
+
+.timing-profiles-page .timing-profile-card__set-base {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+}
+
+@media (min-width: 1200px) {
+  .timing-profiles-page .timing-profiles-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* الإعدادات */
+.settings-page {
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+.settings-section {
+  min-width: 0;
+}
+
+.settings-section > .card {
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.settings-preference-surface {
+  overflow: hidden;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.settings-preference-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(270px, .9fr);
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 72px;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.settings-preference-row + .settings-preference-row {
+  border-top: 1px solid var(--border);
+}
+
+.settings-preference-row__copy {
+  min-width: 0;
+}
+
+.settings-preference-row__control {
+  width: 100%;
+  min-width: 0;
+}
+
+.settings-destination {
+  min-height: 72px;
+  border-radius: var(--r-lg);
+  box-shadow: none;
+}
+
+.settings-section--pwa > .card,
+.settings-section--about > .card {
+  background: color-mix(in srgb, var(--bg-sunk) 35%, var(--bg-elev));
+}
+
+@media (min-width: 1000px) {
+  .settings-page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
+    align-items: start;
+  }
+
+  .settings-page > .settings-section {
+    margin: 0;
+  }
+
+  .settings-section--identity,
+  .settings-section--experience,
+  .settings-section--pwa,
+  .settings-section--about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .management-overview > .stat {
+    padding: var(--sp-3);
+  }
+
+  .class-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .class-card,
+  .class-card__main,
+  .settings-destination,
+  .roster-row {
+    min-height: 64px;
+  }
+
+  .classes-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .classes-actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .classes-actions .btn,
+  .roster-row .iconbtn,
+  .student-profile-page .iconbtn,
+  .calendar-management-page .cal-filter-btn,
+  .calendar-management-page .cal-affected-btn,
+  .calendar-management-page .cal-period-actions .btn,
+  .calendar-management-page .cal-period-actions .iconbtn,
+  .timing-profiles-page .timing-profile-card .btn,
+  .timing-profiles-page .timing-profile-card .iconbtn,
+  .settings-page .segmented__btn,
+  .settings-destination {
+    min-height: 44px;
+  }
+
+  .roster-row .iconbtn,
+  .student-profile-page .iconbtn,
+  .calendar-management-page .cal-period-actions .iconbtn,
+  .timing-profiles-page .timing-profile-card .iconbtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .roster-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+  }
+
+  .roster-summary {
+    justify-content: flex-end;
+    min-height: 28px;
+    padding-inline: 0;
+  }
+
+  .student-profile-header {
+    align-items: flex-start;
+    padding: var(--sp-3);
+  }
+
+  .student-profile-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .student-profile-summary .stat__val {
+    font-size: 18px;
+  }
+
+  .student-profile-summary .stat__label {
+    font-size: 11px;
+  }
+
+  .student-profile-disclosure__summary {
+    min-height: 52px;
+    padding: var(--sp-3) calc(var(--sp-3) + 17px) var(--sp-3) var(--sp-3);
+  }
+
+  .student-profile-disclosure__summary::before {
+    inset-inline-start: var(--sp-3);
+  }
+
+  .student-profile-disclosure__body {
+    padding-inline: var(--sp-3);
+    padding-bottom: var(--sp-3);
+  }
+
+  .student-profile-actions__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+  }
+
+  .student-profile-actions__row .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .calendar-management-page .cal-hero-strip {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--sp-3);
+  }
+
+  .calendar-management-page .cal-hero-strip__actions .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .calendar-management-page .cal-card {
+    padding: var(--sp-3);
+  }
+
+  .calendar-management-page .cal-progress-bounds {
+    font-size: 10.5px;
+  }
+
+  .calendar-management-page .cal-metric {
+    padding-inline: 4px;
+  }
+
+  .calendar-management-page .cal-metric__label {
+    font-size: 10.5px;
+  }
+
+  .calendar-management-page .cal-metric__val {
+    font-size: 13px;
+  }
+
+  .calendar-management-page .cal-filter-btn {
+    min-width: max-content;
+  }
+
+  .calendar-management-page .cal-period-row {
+    padding: var(--sp-3);
+  }
+
+  .timing-profiles-page .timing-profile-card__actions-row {
+    align-items: stretch;
+  }
+
+  .settings-preference-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+  }
+}
+
+@media (max-width: 520px) {
+  .settings-section--pwa .segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .classes-overview__metric {
+    gap: 6px;
+    min-height: 52px;
+    padding-inline: var(--sp-2);
+  }
+
+  .classes-overview__label {
+    font-size: 12px;
+  }
+
+  .classes-overview__value {
+    font-size: 17px;
+  }
+
+  .student-profile-summary .stat {
+    padding-inline: 5px;
+  }
+
+  .student-profile-header .student-avatar--lg {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+
+  .student-profile-header__name {
+    font-size: 17px;
+  }
+
+  .calendar-management-page .cal-progress-box {
+    padding-inline: var(--sp-2);
+  }
+
+  .timing-profiles-page .timing-profile-card__head,
+  .timing-profiles-page .timing-profile-card__actions-row {
+    flex-wrap: wrap;
+  }
+
+  .timing-profiles-page .timing-profile-card__actions-row .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .class-card,
+  .roster-row,
+  .cal-period-row,
+  .cal-progress-fill,
+  .cal-progress-pin,
+  .timing-profile-card,
+  .settings-destination {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  .student-profile-disclosure > .student-profile-disclosure__summary {
+    display: none;
+  }
+
+  .student-profile-disclosure > .student-profile-disclosure__body {
+    display: block !important;
+    padding: 0;
+    border: 0;
   }
 }

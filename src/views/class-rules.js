@@ -310,7 +310,7 @@ export default {
             <div class="lesson-goal__head">
               <h1 id="lesson-goal-title">الهدف الرئيسي</h1>
               <div class="presentation-controls">
-                <button class="btn btn--quiet btn--sm" data-act="open-presentation">${icon('board')} عرض صفي</button>
+                <button class="btn btn--quiet btn--sm presentation-controls__action" data-act="open-presentation">${icon('board')} عرض صفي</button>
               </div>
             </div>
             ${state.status === 'builder' ? goalBuilder(state) : activeGoal(state, rewardPreview)}
