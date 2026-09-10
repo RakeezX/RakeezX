@@ -2178,7 +2178,7 @@
   @page { size: A4 portrait; margin: 12mm; }
   html, body { background: #fff !important; color: #000 !important; direction: rtl; }
   body { font-size: 10.5pt; }
-  .topbar, .tabbar, .sidebar, .teaching-tabs, .fab, .toast, .noprint, .student-avatar,
+  .topbar, .tabbar, .sidebar, .teaching-tabs, .class-context-nav-bar, .app-status-strip, .fab, .toast, .noprint, .student-avatar,
   .segmented, .searchbar, .datebar, .sheet-backdrop, #modal-root { display: none !important; }
   .student-avatar { display: none !important; }
   .layout, .main, .page { display: block !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
@@ -4637,5 +4637,814 @@
     display: block !important;
     padding: 0;
     border: 0;
+  }
+}
+
+/* ---------- Visual System Batch C2A: reports, print, and schedule export ---------- */
+.reports-index-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr);
+  gap: var(--sp-4);
+  max-width: 1200px;
+  margin-inline: auto;
+  align-items: start;
+}
+
+.report-hub {
+  overflow: hidden;
+}
+
+.report-hub__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-block-end: 1px solid var(--border);
+}
+
+.report-hub__title,
+.report-workspace__head h2,
+.report-metrics__head h3 {
+  margin: 0;
+  color: var(--text-1);
+  font-size: var(--fs-section);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.report-hub__desc,
+.report-workspace__head p {
+  margin: 4px 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.report-grade-groups {
+  display: grid;
+}
+
+.report-grade-group + .report-grade-group {
+  border-block-start: 1px solid var(--border);
+}
+
+.report-grade-group__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 20px;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 50px;
+  padding: 9px var(--sp-4);
+  color: var(--text-1);
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--motion-fast) var(--ease);
+}
+
+.report-grade-group__summary::-webkit-details-marker {
+  display: none;
+}
+
+.report-grade-group__summary:hover {
+  background: color-mix(in srgb, var(--bg-sunk) 68%, transparent);
+}
+
+.report-grade-group__summary:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+.report-grade-group__title {
+  min-width: 0;
+  font-weight: var(--fw-bold);
+}
+
+.report-grade-group__count {
+  min-width: 62px;
+  padding: 3px 8px;
+  color: var(--text-2);
+  background: var(--bg-sunk);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.report-grade-group__chev {
+  display: grid;
+  place-items: center;
+  color: var(--text-3);
+  transition: transform var(--motion-fast) var(--ease);
+}
+
+.report-grade-group__chev svg {
+  width: 16px;
+  height: 16px;
+}
+
+.report-grade-group[open] > .report-grade-group__summary {
+  background: color-mix(in srgb, var(--brand-soft) 36%, transparent);
+}
+
+.report-grade-group[open] > .report-grade-group__summary .report-grade-group__chev {
+  transform: rotate(90deg);
+}
+
+.report-grade-group .report-hub__list {
+  border-block-start: 1px solid var(--border);
+}
+
+.report-class-row,
+.report-destination {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 64px;
+  padding: var(--sp-3) var(--sp-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+}
+
+.report-class-row + .report-class-row,
+.report-destination {
+  border-block-start: 1px solid var(--border);
+}
+
+.report-class-row:hover,
+.report-destination:hover {
+  background: color-mix(in srgb, var(--bg-sunk) 68%, transparent);
+}
+
+.report-class-row:focus-visible,
+.report-destination:focus-visible,
+.schedule-export-preview__tablewrap:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+.report-class-row__icon,
+.report-destination__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  color: var(--info);
+  background: var(--info-soft);
+  border-radius: var(--r-md);
+}
+
+.report-class-row__icon svg,
+.report-destination__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.report-destination {
+  min-height: 82px;
+}
+
+.report-destination .row__sub {
+  max-width: 48ch;
+  white-space: normal;
+}
+
+.report-workspace,
+.execution-report-page {
+  width: 100%;
+  min-width: 0;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.report-workspace__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: 0 0 var(--sp-4);
+  margin-bottom: var(--sp-3);
+  border-block-end: 1px solid var(--border);
+}
+
+.report-workspace__eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--brand-text);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+.report-tabs {
+  margin-bottom: var(--sp-3);
+}
+
+.report-toolbar {
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3);
+  box-shadow: none;
+}
+
+.report-toolbar__field {
+  flex: 1 1 260px;
+  min-width: 190px;
+  margin: 0;
+}
+
+.report-toolbar__mode,
+.report-preview-toggle {
+  flex: none;
+  align-self: end;
+}
+
+.report-document > .tablewrap,
+.report-results > .tablewrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border-color: var(--border-strong);
+}
+
+.report-actions {
+  justify-content: flex-start;
+  padding-top: var(--sp-4);
+  border-block-start: 1px solid var(--border);
+}
+
+.report-filters {
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.report-filters .field {
+  margin-bottom: 0;
+}
+
+.report-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(150px, .7fr) minmax(150px, .7fr);
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.report-metrics {
+  margin-bottom: var(--sp-4);
+  overflow: hidden;
+}
+
+.report-metrics__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-block-end: 1px solid var(--border);
+}
+
+.report-metrics__head h3 {
+  font-size: 15px;
+}
+
+.report-metrics__head span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.report-metrics__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.report-metrics .stat {
+  min-width: 0;
+  padding: var(--sp-3);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.report-metrics .stat + .stat {
+  border-inline-start: 1px solid var(--border);
+}
+
+.report-metrics .stat__val {
+  font-size: 21px;
+}
+
+.report-results {
+  margin-top: var(--sp-4);
+}
+
+.attendance-date-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  max-width: 620px;
+  margin: 0 0 var(--sp-3);
+}
+
+.attendance-date-range__field {
+  min-width: 0;
+  margin: 0;
+}
+
+.attendance-date-range__field .field__label {
+  min-height: 20px;
+  margin-bottom: 5px;
+  font-size: var(--fs-xs);
+}
+
+.attendance-date-range__field .date-field {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+}
+
+.print-report__footer {
+  display: none;
+}
+
+.printhead {
+  position: relative;
+  padding: 0 88px 12px;
+  border-block-end: 1px solid #a9c9be;
+  color: #183239;
+  text-align: center;
+}
+
+.printhead__brand {
+  position: absolute;
+  inset-block-start: 1px;
+  inset-inline-end: 0;
+  display: grid;
+  gap: 1px;
+  color: #0f7655;
+  text-align: start;
+  letter-spacing: 0;
+}
+
+.printhead__brand strong,
+.printhead__brand span {
+  display: block;
+}
+
+.printhead__brand span {
+  color: #607378;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.printhead__title {
+  margin: 0 0 9px;
+  color: #183239;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.printhead__details {
+  display: grid;
+  gap: 1px;
+}
+
+.printhead__meta {
+  display: flex;
+  justify-content: center;
+  gap: 3px 16px;
+  margin: 3px 0 0;
+  color: #52666b;
+  font-size: 11px;
+}
+
+.printhead__meta div {
+  display: flex;
+  gap: 4px;
+}
+
+.printhead__meta dt {
+  color: #718287;
+}
+
+.printhead__meta dd {
+  margin: 0;
+  color: #263f45;
+  font-weight: 650;
+}
+
+.printhead__meta--context {
+  margin-block-start: 5px;
+}
+
+.printhead__date {
+  margin-top: 6px;
+  color: #66797d;
+  font-size: 10px;
+}
+
+.printhead__date strong {
+  color: #344e54;
+  font-weight: 650;
+}
+
+.a4-sheet .printhead + .tablewrap,
+.a4-sheet .printhead + .list,
+.a4-sheet .printhead + .empty {
+  margin-block-start: 14px;
+}
+
+.a4-sheet--landscape {
+  max-width: 297mm;
+  min-height: 210mm;
+}
+
+.a4-sheet .print-report__footer {
+  display: flex;
+}
+
+.a4-sheet .support-report-screen {
+  display: none !important;
+}
+
+.a4-sheet .support-report-print {
+  display: block !important;
+  overflow: visible;
+  border: 0;
+}
+
+.schedule-export-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  margin-bottom: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.schedule-export-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-height: 58px;
+  padding: 10px var(--sp-3);
+  cursor: pointer;
+}
+
+.schedule-export-option + .schedule-export-option {
+  border-inline-start: 1px solid var(--border);
+}
+
+.schedule-export-option:has(input:focus-visible) {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+.schedule-export-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.schedule-export-option span,
+.schedule-export-option strong,
+.schedule-export-option small {
+  display: block;
+  min-width: 0;
+}
+
+.schedule-export-option strong {
+  font-size: 13px;
+}
+
+.schedule-export-option small {
+  overflow: hidden;
+  margin-top: 1px;
+  color: var(--text-3);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet:has(#schedule-export-form) {
+  max-width: 920px;
+}
+
+.schedule-export-preview {
+  overflow: hidden;
+  color: #18333a;
+  background: #fff;
+  border: 1px solid #cbd8da;
+  border-radius: var(--r-md);
+}
+
+.schedule-export-preview__head {
+  padding: var(--sp-3) var(--sp-4);
+  border-block-end: 1px solid #cbd8da;
+}
+
+.schedule-export-preview__brand {
+  color: #0f7655;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.schedule-export-preview__head h3 {
+  margin: 1px 0 2px;
+  font-size: 17px;
+}
+
+.schedule-export-preview__head p {
+  margin: 0;
+  color: #52696f;
+  font-size: 11px;
+}
+
+.schedule-export-preview__tablewrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.schedule-export-preview__table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.schedule-export-preview__table th,
+.schedule-export-preview__table td {
+  height: 48px;
+  padding: 5px;
+  border-inline-start: 1px solid #d9e2e4;
+  border-block-start: 1px solid #d9e2e4;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.schedule-export-preview__table thead th,
+.schedule-export-preview__table tbody th {
+  background: #eff5f4;
+  font-weight: 750;
+}
+
+.schedule-export-preview__table thead th:first-child,
+.schedule-export-preview__table tbody th {
+  width: 90px;
+}
+
+.schedule-export-preview__table td strong,
+.schedule-export-preview__table td span {
+  display: block;
+}
+
+.schedule-export-preview__table td span {
+  color: #5f7479;
+  font-size: 9px;
+}
+
+.schedule-export-preview__table bdi {
+  white-space: nowrap;
+}
+
+.schedule-export-preview__table td.is-empty {
+  background: #fbfcfc;
+}
+
+.schedule-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+@media (max-width: 860px) {
+  .reports-index-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-metrics__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .report-metrics .stat:nth-child(4) {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--border);
+  }
+
+  .report-metrics .stat:nth-child(n + 4) {
+    border-block-start: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 620px) {
+  .report-hub__head,
+  .report-grade-group__summary,
+  .report-class-row,
+  .report-destination {
+    padding-inline: var(--sp-3);
+  }
+
+  .report-class-row__icon {
+    display: none;
+  }
+
+  .report-class-row .badge--danger {
+    max-width: 108px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .report-workspace__head {
+    gap: var(--sp-2);
+  }
+
+  .report-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-tabs .segmented__btn {
+    min-width: 0;
+    padding-inline: var(--sp-2);
+    white-space: normal;
+  }
+
+  .report-toolbar {
+    align-items: stretch;
+  }
+
+  .report-toolbar__field,
+  .report-toolbar__mode,
+  .report-preview-toggle {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .report-toolbar__mode {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-filter-grid .field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .report-actions .btn,
+  .schedule-export-actions .btn {
+    flex: 1 1 140px;
+  }
+
+  .schedule-export-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .schedule-export-option + .schedule-export-option {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 390px) {
+  .report-class-row .badge--danger {
+    display: none;
+  }
+
+  .report-metrics .stat {
+    padding-inline: 5px;
+  }
+
+  .report-metrics .stat__val {
+    font-size: 18px;
+  }
+
+  .report-metrics .stat__label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .attendance-date-range {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-class-row,
+  .report-destination,
+  .report-grade-group__summary,
+  .report-grade-group__chev {
+    transition: none !important;
+  }
+}
+
+@media print {
+  .printhead {
+    display: block;
+    margin: 0 0 7mm;
+    padding: 0 25mm 3.5mm;
+    border-bottom: .65pt solid #8eafa4;
+    color: #172f35;
+    break-inside: avoid;
+  }
+
+  .printhead__brand {
+    display: grid;
+    gap: 0;
+  }
+
+  .printhead__brand strong {
+    color: #0f7655;
+    font-size: 11pt;
+  }
+
+  .printhead__brand span {
+    color: #5d6f73;
+    font-size: 7.5pt;
+  }
+
+  .printhead__title {
+    margin: 0 0 2mm;
+    color: #172f35;
+    font-size: 16pt;
+  }
+
+  .printhead__meta {
+    justify-content: center;
+    gap: 1mm 5mm;
+    margin: .8mm 0 0;
+    color: #43595e;
+    font-size: 8pt;
+  }
+
+  .printhead__meta dt {
+    color: #63777b;
+  }
+
+  .printhead__meta dd {
+    color: #233a40;
+  }
+
+  .printhead__date {
+    margin-top: 1.5mm;
+    color: #5d7074;
+    font-size: 7.5pt;
+  }
+
+  .printhead__date strong {
+    color: #2c444a;
+  }
+
+  .printhead + .tablewrap,
+  .printhead + .list,
+  .printhead + .empty {
+    margin-block-start: 5mm;
+  }
+
+  .print-report .gtable th,
+  .print-report .gtable td {
+    border-color: #a9b8b4 !important;
+    color: #172f35 !important;
+    background: #fff !important;
+  }
+
+  .print-report .gtable thead th {
+    background: #eaf4f0 !important;
+  }
+
+  .print-report .gtable tbody tr:nth-child(even) td,
+  .print-report .gtable tbody tr:nth-child(even) th {
+    background: #f8faf9 !important;
+  }
+
+  .print-report__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10mm;
+    margin-top: 9mm;
+    padding-top: 3mm;
+    border-top: .5pt solid #a9b8b4;
+    color: #52666b;
+    font-size: 7.5pt;
+    break-inside: avoid;
+  }
+
+  .print-report--wide .gtable {
+    font-size: 7pt;
+  }
+
+  .print-report--wide .gtable th,
+  .print-report--wide .gtable td {
+    padding: 3px !important;
   }
 }

@@ -6,7 +6,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportHeader, reportIdentitySheet, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
@@ -86,7 +86,11 @@ export default {
       <div class="empty"><div class="empty__icon">${icon('reports')}</div><div class="empty__title">لا بيانات بعد</div><a class="btn btn--primary" href="#/teaching/${cls.id}/students">${icon('plus')} كشف الطلاب</a></div>`;
 
     const sortedRoster = sortRoster(roster, items, ctx);
-    const header = reportHeader({ title: reportTitle(), ...identity(cls) });
+    const datePeriod = tab === 'attendance'
+      ? [filterStartDate && `من ${fmtDateFull(filterStartDate)}`, filterEndDate && `إلى ${fmtDateFull(filterEndDate)}`].filter(Boolean).join(' · ')
+      : '';
+    const header = reportHeader({ title: reportTitle(), ...identity(cls), period: datePeriod });
+    const widePrint = tab === 'grades' || (tab === 'attendance' && attMode === 'detailed');
 
     const reportContent = html`
       ${header}
@@ -95,21 +99,31 @@ export default {
       ${tab === 'attendance' ? attendanceReport(cls, attendance) : ''}
       ${tab === 'support' ? supportReport(sortedRoster, items, ctx) : ''}
       ${reportSignatures({ profile: identity(cls).profile })}
+      ${reportFooter()}
     `;
 
     return html`
-      <article class="print-report print-report--${tab}" dir="rtl">
-        <div class="segmented mb-3 noprint" aria-label="أنواع التقارير">
+      <article class="print-report print-report--${tab} ${widePrint ? 'print-report--wide' : ''} report-workspace" dir="rtl">
+        ${reportPageSetup({ wide: widePrint })}
+        <header class="report-workspace__head noprint">
+          <div>
+            <span class="report-workspace__eyebrow">تقرير الفصل</span>
+            <h2>${reportTitle()}</h2>
+            <p>${[identity(cls).section, identity(cls).subject].filter(Boolean).join(' · ')}</p>
+          </div>
+          <span class="badge tabular">${roster.length} طالبًا</span>
+        </header>
+
+        <div class="segmented report-tabs noprint" aria-label="أنواع التقارير">
           <button class="segmented__btn ${tab === 'roster' ? 'is-on' : ''}" data-act="tab" data-tab="roster">الطلاب</button>
           <button class="segmented__btn ${tab === 'grades' ? 'is-on' : ''}" data-act="tab" data-tab="grades">الدرجات</button>
           <button class="segmented__btn ${tab === 'attendance' ? 'is-on' : ''}" data-act="tab" data-tab="attendance">الحضور</button>
           <button class="segmented__btn ${tab === 'support' ? 'is-on' : ''}" data-act="tab" data-tab="support">من يحتاج دعمًا</button>
         </div>
 
-        <!-- شريط الترتيب العام وأدوات العرض -->
-        <div class="grades-toolbar noprint mb-3">
-          <label class="field" style="margin-bottom:0; flex: 1; min-width: 160px;">
-            <span class="field__label fs-xs" style="margin-bottom:2px; font-weight: 600; color: var(--text-2);">
+        <div class="grades-toolbar report-toolbar noprint">
+          <label class="field report-toolbar__field">
+            <span class="field__label fs-xs">
               ${icon('filter', 'compact')} ترتيب الكشف
             </span>
             <select class="select" data-change="sort" aria-label="ترتيب التقرير">
@@ -123,13 +137,13 @@ export default {
           </label>
           ${tab === 'attendance'
             ? html`
-                <div class="segmented segmented--sm" style="align-self: flex-end;">
+                <div class="segmented segmented--sm report-toolbar__mode" aria-label="تفصيل كشف الحضور">
                   <button class="segmented__btn ${attMode === 'brief' ? 'is-on' : ''}" data-act="att-mode" data-mode="brief">موجز</button>
                   <button class="segmented__btn ${attMode === 'detailed' ? 'is-on' : ''}" data-act="att-mode" data-mode="detailed">تفصيلي</button>
                 </div>
               `
             : ''}
-          <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'}" style="align-self: flex-end;" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة">
+          <button class="btn btn--sm ${a4Preview ? 'btn--primary' : 'btn--ghost'} report-preview-toggle" data-act="toggle-a4" title="معاينة التقرير بصفحة A4 جاهزة للطباعة" aria-pressed="${a4Preview}">
             ${icon('reports')} ${a4Preview ? 'إغلاق المعاينة' : 'معاينة A4'}
           </button>
         </div>
@@ -138,25 +152,24 @@ export default {
           ? html`
               <div class="a4-preview-container noprint">
                 <div class="a4-preview-banner">
-                  <span>📄 وضع معاينة صفحة A4 الحقيقية</span>
+                  <span>${icon('reports')} معاينة مستند A4 ${widePrint ? 'أفقي' : 'رأسي'}</span>
                   <button class="btn btn--primary btn--sm" data-act="print">${icon('print')} طباعة المستند الآن</button>
                 </div>
-                <div class="a4-sheet">
+                <div class="a4-sheet ${widePrint ? 'a4-sheet--landscape' : ''}">
                   ${reportContent}
                 </div>
               </div>
             `
           : ''}
 
-        <div class="${a4Preview ? 'print-only' : ''}">
+        <div class="report-document ${a4Preview ? 'print-only' : ''}">
           ${reportContent}
         </div>
 
         <div class="btn-row mt-6 noprint report-actions">
-          <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة ملخص التقرير</button>
-          <button class="btn btn--ghost" data-act="toggle-a4">${icon('reports')} ${a4Preview ? 'الوضع العادي' : 'معاينة A4'}</button>
-          <button class="btn btn--ghost" data-act="print">${icon('print')} طباعة</button>
+          <button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button>
           <button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button>
+          <button class="btn btn--quiet" data-act="share">${icon('share')} مشاركة الملخص</button>
         </div>
       </article>
     `;
@@ -342,7 +355,17 @@ function attendanceReport(cls, report) {
     }
     return tally;
   };
-  const filters = html`<div class="hstack gap-2 mb-3 noprint fs-sm"><label class="field" style="margin-bottom:0"><span class="field__label fs-xs">من تاريخ</span><input class="input" type="date" value="${filterStartDate}" data-change="filter-start"></label><label class="field" style="margin-bottom:0"><span class="field__label fs-xs">إلى تاريخ</span><input class="input" type="date" value="${filterEndDate}" data-change="filter-end"></label></div>`;
+  const filters = html`
+    <div class="attendance-date-range noprint" aria-label="نطاق تاريخ كشف الحضور">
+      <label class="field attendance-date-range__field">
+        <span class="field__label">من:</span>
+        <input class="input date-field tabular" type="date" value="${filterStartDate}" data-change="filter-start">
+      </label>
+      <label class="field attendance-date-range__field">
+        <span class="field__label">إلى:</span>
+        <input class="input date-field tabular" type="date" value="${filterEndDate}" data-change="filter-end">
+      </label>
+    </div>`;
 
   if (attMode === 'brief') return html`
     ${filters}
@@ -397,5 +420,5 @@ export function supportRows(roster, items, ctx) {
 function supportReport(roster, items, ctx) {
   const rows = supportRows(roster, items, ctx);
   if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون ٥٠٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
-  return html`<p class="t-3 fs-sm mb-3 noprint">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list noprint">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span><span class="row__chev">${icon('chev', 'compact')}</span></span></a>`)}</div><div class="tablewrap print-tablewrap print-only"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>النسبة</th><th>مؤشرات الدعم</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td class="tabular">${fmtPct(row.total.pct)}</td><td>${row.reasons.join(' · ')}</td></tr>`)}</tbody></table></div>`;
+  return html`<div class="support-report-screen noprint"><p class="t-3 fs-sm mb-3">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span><span class="row__chev">${icon('chev', 'compact')}</span></span></a>`)}</div></div><div class="tablewrap print-tablewrap print-only support-report-print"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>مؤشرات الدعم</th><th>النسبة</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td>${row.reasons.join(' · ')}</td><td class="tabular">${fmtPct(row.total.pct)}</td></tr>`)}</tbody></table></div>`;
 }

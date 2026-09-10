@@ -2,14 +2,48 @@
 
 import { html, icon, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal, sectionLabel } from '../models.js';
+import { studentTotal, sectionLabel, gradeLabel } from '../models.js';
+
+const classCount = (count) => count === 1 ? 'فصل واحد' : count === 2 ? 'فصلان' : `${count} فصول`;
+
+function classReportRow(tch) {
+  const { roster, items, ctx } = store.teachingContext(tch.id);
+  const totals = roster.map((student) => studentTotal(items, ctx[student.id])).filter((total) => total.pct !== null);
+  const avg = totals.length ? totals.reduce((sum, total) => sum + total.pct, 0) / totals.length : null;
+  const need = totals.filter((total) => total.pct < 50).length;
+  const section = store.getSection(tch.sectionId);
+
+  return html`
+    <a class="report-class-row" href="#/teaching/${tch.id}/reports">
+      <span class="report-class-row__icon" aria-hidden="true">${icon('reports')}</span>
+      <span class="row__main">
+        <span class="row__title">${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}</span>
+        <span class="row__sub">
+          <span class="tabular">${roster.length}</span> طالبًا
+          ${avg !== null ? html` · متوسط <span class="tabular">${fmtPct(avg)}</span>` : ''}
+        </span>
+      </span>
+      <span class="row__end">
+        ${need ? html`<span class="badge badge--danger tabular">${need} يحتاج دعمًا</span>` : ''}
+        <span class="row__chev">${icon('chev')}</span>
+      </span>
+    </a>
+  `;
+}
 
 export default {
   title: () => 'التقارير',
   subtitle: () => store.activeTerm()?.name ?? '',
+  wide: true,
 
   render() {
     const list = store.teachings();
+    const groups = [...list.reduce((result, teaching) => {
+      const grade = Number(store.getSection(teaching.sectionId)?.grade) || 0;
+      if (!result.has(grade)) result.set(grade, []);
+      result.get(grade).push(teaching);
+      return result;
+    }, new Map()).entries()].sort(([gradeA], [gradeB]) => gradeA - gradeB);
 
     if (!list.length) {
       return html`
@@ -23,46 +57,45 @@ export default {
     }
 
     return html`
-      <p class="t-3 fs-md mb-3">اختر فصلًا لعرض كشوفه وتقاريره.</p>
+      <div class="reports-index-page">
+        <section class="surface surface--flat report-hub" aria-labelledby="class-reports-title">
+          <div class="report-hub__head">
+            <div>
+              <h2 class="report-hub__title" id="class-reports-title">تقارير الفصول</h2>
+              <p class="report-hub__desc">اختر فصلًا لعرض كشوف الطلاب والدرجات والحضور.</p>
+            </div>
+            <span class="badge tabular">${list.length === 1 ? 'فصل واحد' : `${list.length} فصول`}</span>
+          </div>
+          <div class="report-grade-groups">
+            ${groups.map(([grade, teachings]) => html`
+              <details class="report-grade-group">
+                <summary class="report-grade-group__summary">
+                  <span class="report-grade-group__title">${gradeLabel(grade) || 'صف غير محدد'}</span>
+                  <span class="report-grade-group__count tabular">${classCount(teachings.length)}</span>
+                  <span class="report-grade-group__chev" aria-hidden="true">${icon('chev')}</span>
+                </summary>
+                <div class="report-hub__list">${teachings.map(classReportRow)}</div>
+              </details>
+            `)}
+          </div>
+        </section>
 
-      <div class="list">
-        ${list.map((tch) => {
-          const { roster, items, ctx } = store.teachingContext(tch.id);
-          const totals = roster.map((s) => studentTotal(items, ctx[s.id])).filter((t) => t.pct !== null);
-          const avg = totals.length ? totals.reduce((n, t) => n + t.pct, 0) / totals.length : null;
-          const need = totals.filter((t) => t.pct < 50).length;
-          const sec = store.getSection(tch.sectionId);
-
-          return html`
-            <a class="row" href="#/teaching/${tch.id}/reports">
-              <span class="row__main">
-                <span class="row__title">${sectionLabel(sec) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}</span>
-                <span class="row__sub">
-                  <span class="tabular">${roster.length}</span> طالبًا
-                  ${avg !== null ? html` · متوسط <span class="tabular">${fmtPct(avg)}</span>` : ''}
-                </span>
-              </span>
-              <span class="row__end">
-                ${need ? html`<span class="badge badge--danger tabular">${need} يحتاج دعمًا</span>` : ''}
-                ${icon('chev')}
-              </span>
-            </a>
-          `;
-        })}
-      </div>
-
-      <div class="section">
-        <div class="section__head"><div class="section__title">تقارير مجمّعة</div></div>
-        <div class="grid grid--2">
-          <a class="card card--pad" href="#/reports/execution">
-            <div class="fw-7">ملخّص التنفيذ</div>
-            <div class="t-3 fs-sm mt-2">حصص مؤرخة، اكتمال الحضور، والحصص المستحقة.</div>
+        <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
+          <div class="report-hub__head">
+            <div>
+              <h2 class="report-hub__title" id="aggregate-reports-title">التقارير المجمّعة</h2>
+              <p class="report-hub__desc">صورة واحدة عن تنفيذ الحصص في جميع الفصول.</p>
+            </div>
+          </div>
+          <a class="report-destination" href="#/reports/execution">
+            <span class="report-destination__icon" aria-hidden="true">${icon('timetable')}</span>
+            <span class="row__main">
+              <span class="row__title">ملخّص التنفيذ</span>
+              <span class="row__sub">تنفيذ الحصص، اكتمال الحضور، وتصفية النتائج بحسب التاريخ والفصل والحالة.</span>
+            </span>
+            <span class="row__chev">${icon('chev')}</span>
           </a>
-          <a class="card card--pad" href="#/reports/execution">
-            <div class="fw-7">تنفيذ الحصص</div>
-            <div class="t-3 fs-sm mt-2">قائمة قابلة للتصفية بحسب التاريخ والفصل والحالة.</div>
-          </a>
-        </div>
+        </section>
       </div>
     `;
   },

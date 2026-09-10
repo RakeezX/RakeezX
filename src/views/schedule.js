@@ -7,6 +7,15 @@
  */
 
 import { html, render, icon, openSheet, toast, confirmSheet, fmtTimeRange, formatTimeRange, timingProfileIcon } from "../lib/dom.js";
+import { downloadBlob } from "../lib/export.js";
+import {
+  buildScheduleExportModel,
+  canShareScheduleFile,
+  createSchedulePngFile,
+  openSchedulePrint,
+  renderSchedulePng,
+  shareOrDownloadSchedule,
+} from "../lib/schedule-export.js";
 import * as store from "../store.js";
 import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, safeColor, gradeLabel } from "../models.js";
 import { repaint } from "../repaint.js";
@@ -78,6 +87,130 @@ export function shortClassLabel(sec) {
 // A selection is kept only for the current visit. The first mobile view follows
 // the actual school day: today when it is teachable, otherwise the weekly view.
 let activeMobileDay = null;
+
+function scheduleExportPreview(model) {
+  const identity = [
+    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
+  ].filter(Boolean);
+  return html`
+    <article class="schedule-export-preview" dir="rtl" aria-label="معاينة الجدول الأسبوعي">
+      <header class="schedule-export-preview__head">
+        <span class="schedule-export-preview__brand">رَكيز X</span>
+        <h3>${model.title}</h3>
+        ${identity.length ? html`<p>${identity.join(' · ')}</p>` : ''}
+        <p>${[model.academic.year, model.academic.term, model.timing?.label].filter(Boolean).join(' · ')}</p>
+      </header>
+      <div class="schedule-export-preview__tablewrap" tabindex="0" aria-label="جدول المعاينة قابل للتمرير أفقيًا">
+        <table class="schedule-export-preview__table">
+          <thead><tr><th scope="col">اليوم</th>${model.periods.map(({ period }) => html`<th scope="col">الحصة ${period}</th>`)}</tr></thead>
+          <tbody>${model.days.map((day) => html`
+            <tr>
+              <th scope="row">${day.label}</th>
+              ${model.periods.map((unused, periodIndex) => {
+                const cell = day.periods[periodIndex];
+                if (!cell?.teaching) return html`<td class="is-empty"><span class="sr-only">لا توجد حصة</span></td>`;
+                return html`<td><strong>${cell.teaching.classLabel}</strong><span>${cell.teaching.subjectLabel}${cell.time ? html` · <bdi dir="ltr">${formatTimeRange(cell.time.start, cell.time.end)}</bdi>` : ''}</span></td>`;
+              })}
+            </tr>
+          `)}</tbody>
+        </table>
+      </div>
+    </article>
+  `;
+}
+
+function openScheduleExportSheet() {
+  const profile = store.state.profile ?? {};
+  const initial = {
+    includeTeacherName: Boolean(String(profile.teacherName ?? '').trim()),
+    includeSchoolName: Boolean(String(profile.schoolName ?? '').trim()),
+    includeTimes: true,
+  };
+
+  return openSheet({
+    title: 'تصدير الجدول',
+    desc: 'راجع الجدول ثم نزّله صورة أو اطبعه واحفظه PDF بحجم A4 أفقي.',
+    body: html`
+      <form id="schedule-export-form" class="schedule-export-options">
+        <label class="schedule-export-option">
+          <input type="checkbox" name="includeTeacherName" ${initial.includeTeacherName ? 'checked' : 'disabled'}>
+          <span><strong>اسم المعلم</strong><small>${initial.includeTeacherName ? profile.teacherName : 'غير متاح في الملف الشخصي'}</small></span>
+        </label>
+        <label class="schedule-export-option">
+          <input type="checkbox" name="includeSchoolName" ${initial.includeSchoolName ? 'checked' : 'disabled'}>
+          <span><strong>اسم المدرسة</strong><small>${initial.includeSchoolName ? profile.schoolName : 'غير متاح في الملف الشخصي'}</small></span>
+        </label>
+        <label class="schedule-export-option">
+          <input type="checkbox" name="includeTimes" checked>
+          <span><strong>أوقات الحصص</strong><small>من ملف التوقيت الأساسي المتكرر</small></span>
+        </label>
+      </form>
+      <div id="schedule-export-preview"></div>
+      <div class="schedule-export-actions" aria-label="خيارات تصدير الجدول">
+        <button class="btn btn--primary" type="button" id="schedule-export-png">${icon('download')} تنزيل PNG</button>
+        <button class="btn btn--ghost" type="button" id="schedule-export-print">${icon('print')} طباعة / PDF</button>
+        <button class="btn btn--ghost" type="button" id="schedule-export-share" hidden>${icon('share')} مشاركة</button>
+      </div>
+    `,
+    foot: html`<button class="btn btn--quiet" data-sheet-close>إغلاق</button>`,
+    onMount: (root) => {
+      const form = root.querySelector('#schedule-export-form');
+      const preview = root.querySelector('#schedule-export-preview');
+      const pngButton = root.querySelector('#schedule-export-png');
+      const printButton = root.querySelector('#schedule-export-print');
+      const shareButton = root.querySelector('#schedule-export-share');
+      const controls = [pngButton, printButton, shareButton].filter(Boolean);
+      const model = () => {
+        const data = new FormData(form);
+        return buildScheduleExportModel(store, {
+          includeTeacherName: data.has('includeTeacherName'),
+          includeSchoolName: data.has('includeSchoolName'),
+          includeTimes: data.has('includeTimes'),
+        });
+      };
+      const refresh = () => render(preview, scheduleExportPreview(model()));
+      const busy = (active) => controls.forEach((button) => { button.disabled = active; });
+      const probe = createSchedulePngFile(new Blob(['rakeezx'], { type: 'image/png' }));
+      shareButton.hidden = !canShareScheduleFile(probe);
+
+      form.addEventListener('change', refresh);
+      pngButton.addEventListener('click', async () => {
+        busy(true);
+        try {
+          const blob = await renderSchedulePng(model());
+          downloadBlob('rakeezx-schedule.png', blob);
+          toast('نُزّلت صورة الجدول');
+        } catch (error) {
+          toast(error?.message ?? 'تعذّر تصدير الجدول.', 'danger');
+        } finally {
+          busy(false);
+        }
+      });
+      printButton.addEventListener('click', () => {
+        try {
+          openSchedulePrint(model());
+        } catch (error) {
+          toast(error?.message ?? 'تعذّرت طباعة الجدول.', 'danger');
+        }
+      });
+      shareButton.addEventListener('click', async () => {
+        busy(true);
+        try {
+          const blob = await renderSchedulePng(model());
+          const result = await shareOrDownloadSchedule(blob);
+          if (result.method === 'share') toast('فُتحت مشاركة الجدول');
+          if (result.method === 'download') toast('المشاركة غير متاحة؛ نُزّلت صورة الجدول');
+        } catch (error) {
+          toast(error?.message ?? 'تعذّرت مشاركة الجدول.', 'danger');
+        } finally {
+          busy(false);
+        }
+      });
+      refresh();
+    },
+  });
+}
 
 export function defaultMobileScheduleDay({ today, calendarKind = null } = {}) {
   const isScheduledSchoolDay = SCHOOL_WEEKDAYS.includes(Number(today));
@@ -277,6 +410,9 @@ export default {
           ${calStatusText ? html`<span class="badge badge--${calStatusType}">${calStatusText}</span>` : ""}
         </div>
         <div class="schedule-head__actions">
+          <button class="btn btn--ghost btn--sm" type="button" data-act="export">
+            ${icon("download")} <span>تصدير الجدول</span>
+          </button>
           <a class="btn btn--primary btn--sm schedule-head__times-btn" href="#/schedule/times">
             <span class="schedule-head__times-btn-icon" aria-hidden="true">${icon("sliders")}</span>
             <span>تعديل أوقات الحصص</span>
@@ -357,6 +493,10 @@ export default {
   },
 
   actions: {
+    export() {
+      openScheduleExportSheet();
+    },
+
     "select-day"(el) {
       activeMobileDay = el.dataset.day || "all";
       repaint();

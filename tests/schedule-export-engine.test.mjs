@@ -75,8 +75,12 @@ test('weekly export model uses only base recurring timing and retains empty slot
   assert.deepEqual(model.days[0].periods[0].time, { start: '07:00', end: '07:45' });
   assert.equal(model.days[0].periods[1].teaching, null);
   assert.deepEqual(model.days[2].periods[2].teaching, {
-    classLabel: 'السادس الابتدائي / ب',
+    classLabel: 'سادس/ب',
     subjectLabel: 'الحاسب الآلي',
+  });
+  assert.deepEqual(model.days[0].periods[0].teaching, {
+    classLabel: 'خامس/أ',
+    subjectLabel: 'رقمية',
   });
   assert.deepEqual(model.days[1].periods[0].time, { start: '07:05', end: '07:50' });
   assert.equal(JSON.stringify(model).includes('توقيت مؤقت سري'), false);
@@ -99,7 +103,7 @@ test('weekly export model excludes private data and optional identity when disab
 
 test('canvas renderer creates a deterministic 1600x1200 RTL PNG Blob', async () => {
   const { source } = fixture();
-  const model = buildScheduleExportModel(source, { includeTimes: true });
+  const model = buildScheduleExportModel(source, { includeTimes: true, includeTeacherName: true, includeSchoolName: true });
   const calls = [];
   const context = {
     save() {}, restore() {}, fillRect() {}, strokeRect() {},
@@ -120,15 +124,22 @@ test('canvas renderer creates a deterministic 1600x1200 RTL PNG Blob', async () 
   assert.equal(blob.type, 'image/png');
   assert.equal(blob.size > 0, true);
   assert.equal(calls.includes('الجدول الأسبوعي'), true);
+  assert.equal(calls.includes('المعلم: المعلم الاختباري'), true);
+  assert.equal(calls.includes('المدرسة: مدرسة الاختبار'), true);
 });
 
 test('isolated print document is A4 landscape and leaves existing report CSS untouched', () => {
   const { source } = fixture();
-  const model = buildScheduleExportModel(source, { includeTimes: true });
+  const model = buildScheduleExportModel(source, { includeTimes: true, includeTeacherName: true, includeSchoolName: true });
   const documentText = schedulePrintDocument(model);
   assert.match(documentText, /@page\s*\{\s*size:\s*A4 landscape;/);
   assert.match(documentText, /dir="rtl"/);
   assert.match(documentText, /التوقيت الأساسي: التوقيت الصيفي/);
+  assert.match(documentText, /المعلم: المعلم الاختباري/);
+  assert.match(documentText, /المدرسة: مدرسة الاختبار/);
+  assert.match(documentText, /<th scope="col">اليوم<\/th><th scope="col">الحصة 1<\/th>/);
+  assert.match(documentText, /<th scope="row">الأحد<\/th>/);
+  assert.match(documentText, /خامس\/أ/);
   assert.doesNotMatch(documentText, /التوقيت المعتمد/);
 
   const writes = [];

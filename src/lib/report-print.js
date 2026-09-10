@@ -1,28 +1,53 @@
 /** Shared, deliberately small print foundation for administration reports. */
 
-import { html, fmtDateFull } from './dom.js';
+import { html, raw, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
 
 export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
-  const details = [
-    profile?.schoolName && ['المدرسة', profile.schoolName],
+  const identity = [
     profile?.teacherName && ['المعلم', profile.teacherName],
-    subject && ['المادة', subject],
+    profile?.schoolName && ['المدرسة', profile.schoolName],
+  ].filter(Boolean);
+  const context = [
     section && ['الفصل', section],
+    subject && ['المادة', subject],
+    period && ['الفترة', period],
+  ].filter(Boolean);
+  const academic = [
     year && ['السنة الدراسية', year],
     term && ['الفصل الدراسي', term],
-    period && ['الفترة', period],
-    ['تاريخ الطباعة', fmtDateFull(printedOn)],
   ].filter(Boolean);
+  const metadata = (items, className) => items.length ? html`
+    <dl class="printhead__meta ${className}">
+      ${items.map(([label, value]) => html`<div><dt>${label}</dt><dd>${value}</dd></div>`)}
+    </dl>
+  ` : '';
 
   return html`
     <header class="printhead print-report__header" dir="rtl">
-      <div class="printhead__brand">رَكيز X</div>
+      <div class="printhead__brand"><strong>رَكيز X</strong><span>تقارير المعلم</span></div>
       <h2 class="printhead__title">${title}</h2>
-      <dl class="printhead__meta">
-        ${details.map(([label, value]) => html`<div><dt>${label}</dt><dd>${value}</dd></div>`)}
-      </dl>
+      <div class="printhead__details">
+        ${metadata(identity, 'printhead__meta--identity')}
+        ${metadata(context, 'printhead__meta--context')}
+        ${metadata(academic, 'printhead__meta--academic')}
+      </div>
+      <div class="printhead__date">تاريخ الطباعة <strong>${fmtDateFull(printedOn)}</strong></div>
     </header>
+  `;
+}
+
+/** Keeps the browser's native print/save-PDF output aligned with the report width. */
+export function reportPageSetup({ wide = false } = {}) {
+  return raw(`<style data-report-page-size>@media print { @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; } }</style>`);
+}
+
+export function reportFooter({ printedOn = todayISO() } = {}) {
+  return html`
+    <div class="print-report__footer" dir="rtl">
+      <span>رَكيز X</span>
+      <span>أُنشئ في ${fmtDateFull(printedOn)}</span>
+    </div>
   `;
 }
 

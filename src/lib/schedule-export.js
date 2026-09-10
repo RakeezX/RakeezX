@@ -6,7 +6,7 @@
  * instead of resolving dated/calendar timing overrides.
  */
 
-import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, sectionLabel } from '../models.js';
+import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, sectionLabel } from '../models.js';
 import { downloadBlob } from './export.js';
 
 export const SCHEDULE_PNG_WIDTH = 1600;
@@ -14,6 +14,28 @@ export const SCHEDULE_PNG_HEIGHT = 1200;
 export const SCHEDULE_EXPORT_VERSION = 1;
 
 const text = (value) => String(value ?? '').trim();
+const COMPACT_GRADES = {
+  1: 'أول', 2: 'ثاني', 3: 'ثالث', 4: 'رابع', 5: 'خامس', 6: 'سادس',
+  7: 'أول متوسط', 8: 'ثاني متوسط', 9: 'ثالث متوسط',
+  10: 'أول ثانوي', 11: 'ثاني ثانوي', 12: 'ثالث ثانوي',
+};
+
+/** Export-only labels. Stored class and subject values remain untouched. */
+export function compactScheduleClassLabel(section) {
+  if (!section) return '';
+  const fullGrade = gradeLabel(section.grade);
+  const shortGrade = COMPACT_GRADES[Number(section.grade)] ?? fullGrade;
+  let sectionName = text(section.label || section.name);
+  if (fullGrade && sectionName.startsWith(fullGrade)) {
+    sectionName = sectionName.slice(fullGrade.length).replace(/^[\s/—–-]+/, '').trim();
+  }
+  return shortGrade && sectionName ? `${shortGrade}/${sectionName}` : text(sectionLabel(section));
+}
+
+export function compactScheduleSubjectLabel(name) {
+  const label = text(name);
+  return label === 'المهارات الرقمية' ? 'رقمية' : label;
+}
 const positivePeriod = (value) => {
   const period = Number(value);
   return Number.isInteger(period) && period > 0 ? period : null;
@@ -86,8 +108,8 @@ export function buildScheduleExportModel(source, {
         order: periodIndex + 1,
         time: includeTimes ? safeTime(baseProfile, weekday, period, section?.grade ?? null) : null,
         teaching: slot ? {
-          classLabel: text(sectionLabel(section)),
-          subjectLabel: text(subject?.name),
+          classLabel: compactScheduleClassLabel(section),
+          subjectLabel: compactScheduleSubjectLabel(subject?.name),
         } : null,
       };
     }),
@@ -128,24 +150,32 @@ function drawScheduleCanvas(ctx, model, width, height) {
 
   const margin = 70;
   ctx.textAlign = 'right';
-  ctx.fillStyle = '#12333b';
-  ctx.font = '700 46px Tahoma, Arial, sans-serif';
-  ctx.fillText(model.title, width - margin, 74);
+  ctx.fillStyle = '#0f7655';
+  ctx.font = '700 20px Tahoma, Arial, sans-serif';
+  ctx.fillText('رَكيز X', width - margin, 40);
 
-  const identityLines = [model.identity.schoolName, model.identity.teacherName].filter(Boolean);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#12333b';
+  ctx.font = '700 42px Tahoma, Arial, sans-serif';
+  ctx.fillText(model.title, width / 2, 78);
+
+  const identityLines = [
+    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
+  ].filter(Boolean);
   const academicLine = [model.academic.year, model.academic.term].filter(Boolean).join(' · ');
   const metaLines = [...identityLines, academicLine, model.timing?.label].filter(Boolean);
-  ctx.font = '500 23px Tahoma, Arial, sans-serif';
+  ctx.font = '500 21px Tahoma, Arial, sans-serif';
   ctx.fillStyle = '#4a6268';
-  metaLines.forEach((line, index) => ctx.fillText(line, width - margin, 125 + index * 32));
+  metaLines.forEach((line, index) => ctx.fillText(line, width / 2, 126 + index * 29));
 
   const gridTop = 245;
   const gridLeft = margin;
   const gridWidth = width - margin * 2;
   const gridBottom = height - 70;
-  const periodColumnWidth = 130;
-  const dayWidth = (gridWidth - periodColumnWidth) / Math.max(1, model.days.length);
-  const rowHeight = (gridBottom - gridTop - 66) / Math.max(1, model.periods.length);
+  const dayColumnWidth = 170;
+  const periodWidth = (gridWidth - dayColumnWidth) / Math.max(1, model.periods.length);
+  const rowHeight = (gridBottom - gridTop - 66) / Math.max(1, model.days.length);
 
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#cbd8da';
@@ -153,43 +183,43 @@ function drawScheduleCanvas(ctx, model, width, height) {
   ctx.fillRect(gridLeft, gridTop, gridWidth, 66);
   ctx.strokeRect(gridLeft, gridTop, gridWidth, gridBottom - gridTop);
 
-  const xForDay = (dayIndex) => gridLeft + gridWidth - (dayIndex + 1) * dayWidth;
+  const dayX = gridLeft + gridWidth - dayColumnWidth;
+  const xForPeriod = (periodIndex) => dayX - (periodIndex + 1) * periodWidth;
   ctx.font = '700 24px Tahoma, Arial, sans-serif';
   ctx.fillStyle = '#12333b';
   ctx.textAlign = 'center';
-  model.days.forEach((day, dayIndex) => {
-    const x = xForDay(dayIndex);
-    ctx.strokeRect(x, gridTop, dayWidth, 66);
-    ctx.fillText(day.label, x + dayWidth / 2, gridTop + 33);
+  ctx.strokeRect(dayX, gridTop, dayColumnWidth, 66);
+  ctx.fillText('اليوم', dayX + dayColumnWidth / 2, gridTop + 33);
+  model.periods.forEach(({ period }, periodIndex) => {
+    const x = xForPeriod(periodIndex);
+    ctx.strokeRect(x, gridTop, periodWidth, 66);
+    ctx.fillText(`الحصة ${period}`, x + periodWidth / 2, gridTop + 33);
   });
-  const periodX = gridLeft;
-  ctx.strokeRect(periodX, gridTop, periodColumnWidth, 66);
-  ctx.fillText('الحصة', periodX + periodColumnWidth / 2, gridTop + 33);
 
-  model.periods.forEach(({ period }, rowIndex) => {
+  model.days.forEach((day, rowIndex) => {
     const y = gridTop + 66 + rowIndex * rowHeight;
     ctx.fillStyle = rowIndex % 2 ? '#fbfdfc' : '#ffffff';
     ctx.fillRect(gridLeft, y, gridWidth, rowHeight);
     ctx.strokeStyle = '#cbd8da';
-    ctx.strokeRect(periodX, y, periodColumnWidth, rowHeight);
+    ctx.strokeRect(dayX, y, dayColumnWidth, rowHeight);
     ctx.fillStyle = '#12333b';
     ctx.font = '700 22px Tahoma, Arial, sans-serif';
-    ctx.fillText(String(period), periodX + periodColumnWidth / 2, y + rowHeight / 2);
+    ctx.fillText(day.label, dayX + dayColumnWidth / 2, y + rowHeight / 2);
 
-    model.days.forEach((day, dayIndex) => {
-      const cell = day.periods[rowIndex];
-      const x = xForDay(dayIndex);
+    model.periods.forEach((unused, periodIndex) => {
+      const cell = day.periods[periodIndex];
+      const x = xForPeriod(periodIndex);
       ctx.strokeStyle = '#cbd8da';
-      ctx.strokeRect(x, y, dayWidth, rowHeight);
+      ctx.strokeRect(x, y, periodWidth, rowHeight);
       if (!cell?.teaching) return;
       ctx.fillStyle = '#12333b';
       ctx.font = '700 19px Tahoma, Arial, sans-serif';
-      ctx.fillText(clippedText(ctx, cell.teaching.classLabel, dayWidth - 24), x + dayWidth / 2, y + rowHeight * 0.34);
+      ctx.fillText(clippedText(ctx, cell.teaching.classLabel, periodWidth - 24), x + periodWidth / 2, y + rowHeight * 0.34);
       ctx.fillStyle = '#52696f';
       ctx.font = '500 16px Tahoma, Arial, sans-serif';
-      const detail = [cell.teaching.subjectLabel, cell.time ? `${cell.time.start} – ${cell.time.end}` : '']
+      const detail = [cell.teaching.subjectLabel, cell.time ? `\u2066${cell.time.start} – ${cell.time.end}\u2069` : '']
         .filter(Boolean).join(' · ');
-      ctx.fillText(clippedText(ctx, detail, dayWidth - 24), x + dayWidth / 2, y + rowHeight * 0.68);
+      ctx.fillText(clippedText(ctx, detail, periodWidth - 24), x + periodWidth / 2, y + rowHeight * 0.68);
     });
   });
   ctx.restore();
@@ -224,15 +254,19 @@ const escapeHtml = (value) => text(value)
 
 /** Purpose-built isolated A4-landscape print document. */
 export function schedulePrintDocument(model) {
-  const identity = [model.identity.schoolName, model.identity.teacherName]
-    .filter(Boolean).map((line) => `<span>${escapeHtml(line)}</span>`).join('');
-  const rows = model.periods.map(({ period }, rowIndex) => `<tr>
-    <th scope="row">${period}</th>
-    ${model.days.map((day) => {
-      const cell = day.periods[rowIndex];
+  const identity = [
+    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
+  ].filter(Boolean).map((line) => `<span>${escapeHtml(line)}</span>`).join('');
+  const rows = model.days.map((day) => `<tr>
+    <th scope="row">${escapeHtml(day.label)}</th>
+    ${model.periods.map((unused, periodIndex) => {
+      const cell = day.periods[periodIndex];
       if (!cell?.teaching) return '<td class="empty-cell"></td>';
-      const detail = [cell.teaching.subjectLabel, cell.time ? `${cell.time.start} – ${cell.time.end}` : '']
-        .filter(Boolean).map(escapeHtml).join(' · ');
+      const detail = [
+        cell.teaching.subjectLabel ? escapeHtml(cell.teaching.subjectLabel) : '',
+        cell.time ? `<bdi dir="ltr">${escapeHtml(cell.time.start)} – ${escapeHtml(cell.time.end)}</bdi>` : '',
+      ].filter(Boolean).join(' · ');
       return `<td><strong>${escapeHtml(cell.teaching.classLabel)}</strong>${detail ? `<small>${detail}</small>` : ''}</td>`;
     }).join('')}
   </tr>`).join('');
@@ -242,20 +276,24 @@ export function schedulePrintDocument(model) {
 @page { size: A4 landscape; margin: 10mm; }
 * { box-sizing: border-box; }
 body { margin: 0; color: #162f35; background: #fff; font: 12px Tahoma, Arial, sans-serif; }
-header { display: grid; gap: 4px; margin-bottom: 12px; }
+header { position: relative; display: grid; gap: 4px; margin-bottom: 18px; padding: 0 4px 10px; border-bottom: 1px solid #a9c9be; text-align: center; }
+.brand { position: absolute; inset-block-start: 0; inset-inline-end: 0; display: flex; align-items: baseline; gap: 8px; color: #0f7655; font-weight: 700; }
+.brand small { color: #62757a; font-size: 9px; font-weight: 500; }
 h1 { margin: 0; font-size: 24px; }
-.identity, .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: #52666b; }
+.identity, .meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; color: #52666b; }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
 th, td { border: 1px solid #aebfc2; padding: 7px; text-align: center; vertical-align: middle; }
-thead th { background: #edf4f3; font-size: 13px; }
-tbody th { width: 9%; background: #f6f8f8; }
+thead th { background: #eaf4f0; font-size: 13px; }
+thead th:first-child, tbody th { width: 11%; background: #f1f6f4; }
 td strong, td small { display: block; }
 td small { margin-top: 3px; color: #52666b; font-size: 10px; }
 .empty-cell { background: #fbfcfc; }
 </style></head><body>
-<header><h1>${escapeHtml(model.title)}</h1>${identity ? `<div class="identity">${identity}</div>` : ''}
+<header><div class="brand"><span>رَكيز X</span><small>الجدول الأسبوعي</small></div><h1>${escapeHtml(model.title)}</h1>${identity ? `<div class="identity">${identity}</div>` : ''}
 <div class="meta"><span>${escapeHtml(model.academic.year)}</span><span>${escapeHtml(model.academic.term)}</span>${model.timing ? `<span>${escapeHtml(model.timing.label)}</span>` : ''}</div></header>
-<table aria-label="${escapeHtml(model.title)}"><thead><tr><th scope="col">الحصة</th>${model.days.map((day) => `<th scope="col">${escapeHtml(day.label)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+<table aria-label="${escapeHtml(model.title)}"><thead><tr><th scope="col">اليوم</th>${model.periods.map(({ period }) => `<th scope="col">الحصة ${period}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
 </body></html>`;
 }
 
