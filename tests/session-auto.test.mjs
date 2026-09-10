@@ -3,10 +3,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import { makeCalendar, makeSection, makeSlot, makeSubject, makeTeaching, makeTerm, makeTimeProfile, makeYear, shiftDate, todayISO, weekday } from '../src/models.js';
+import { isWeekend, makeCalendar, makeSection, makeSlot, makeSubject, makeTeaching, makeTerm, makeTimeProfile, makeYear, shiftDate, todayISO, weekday } from '../src/models.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
+
+const nextSchoolDate = () => {
+  let date = shiftDate(todayISO(), 1);
+  while (isWeekend(date)) date = shiftDate(date, 1);
+  return date;
+};
 
 async function setup({ slotDate = todayISO() } = {}) {
   await db.clearAll();
@@ -42,7 +48,7 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
     });
 
     await t.test('non-study, outside-term, and future dates persist no ordinary session', async () => {
-      const future = shiftDate(todayISO(), 1);
+      const future = nextSchoolDate();
       const f = await setup({ slotDate: future });
       await store.setCalendarDay(f.calendar.id, f.today, 'holiday', 'إجازة');
       assert.equal((await store.ensureSessionsForDate(f.today)).created, 0);
@@ -54,7 +60,7 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
     });
 
     await t.test('future projections follow a slot edit without materializing future rows', async () => {
-      const future = shiftDate(todayISO(), 1);
+      const future = nextSchoolDate();
       const f = await setup({ slotDate: future });
       assert.equal(store.projectedSessionsForDate(future)[0].period, 1);
       await store.editSlot(f.slot.id, { teachingId: f.teaching.id, weekday: weekday(future), period: 2 });
@@ -75,7 +81,7 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
     });
 
     await t.test('a synced effective range overrides the owner base selection only for applicable new sessions', async () => {
-      const futureDate = shiftDate(todayISO(), 1);
+      const futureDate = nextSchoolDate();
       const future = await setup({ slotDate: futureDate });
       const futureSeasonal = makeTimeProfile({
         id: 'tp:auto:effective:future', name: 'توقيت فعّال مستقبلي',

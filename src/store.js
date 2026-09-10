@@ -969,7 +969,9 @@ export async function upsert(storeName, rec) {
   return ok ? rec : null;
 }
 
-export const softDelete = (storeName, id) => patch(storeName, id, { deleted: true }, null, { v2Operation: 'delete' });
+export const softDelete = (storeName, id) => storeName === 'sessions'
+  ? deleteSession(id)
+  : patch(storeName, id, { deleted: true }, null, { v2Operation: 'delete' });
 
 /** بيانات المعلّم — تُصدَّر في النسخ الاحتياطية وتُدمج. */
 export const patchProfile = (changes, options = {}) => patch('profile', 'profile', changes, { ...DEFAULT_PROFILE }, options);
@@ -3081,8 +3083,13 @@ export const reorderItems = (pairs) =>
  */
 export async function ensureSession(tchId, date, period = 1, extra = {}) {
   const id = sessionId(tchId, date, period);
-  const existing = getSession(id);
-  if (existing) return existing;
+  // A retained tombstone owns this natural identity permanently.  Looking only
+  // through getSession() used to let this direct path overwrite the tombstone,
+  // even though the automatic/range materializers already preserved it.
+  const existing = state.sessions.find((session) => session.id === id || (
+    session.teachingId === tchId && session.date === date && Number(session.period) === Number(period)
+  ));
+  if (existing) return existing.deleted ? null : existing;
 
   const day = calendarDayFor(date);
   const holiday = day && !['study', 'exam', 'event'].includes(day.kind);
@@ -3200,7 +3207,10 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   let unavailable = 0;
   let matchedSlotDays = 0;
   const pending = [];
-  const knownSessionIds = new Set(state.sessions.map((s) => s.id));
+  const naturalIdentity = (teachingId, sessionDate, sessionPeriod) =>
+    `${teachingId}\u0000${sessionDate}\u0000${Number(sessionPeriod)}`;
+  const knownSessionIdentities = new Set(state.sessions.map((session) =>
+    naturalIdentity(session.teachingId, session.date, session.period)));
   const section = getSection(teaching.sectionId);
   const profile = activeTimeProfile();
 
@@ -3218,7 +3228,8 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
         const resolved = resolveProfile(profile, date, calendarDay);
         for (const slot of matchingSlots) {
           const id = sessionId(tchId, date, slot.period);
-          if (knownSessionIds.has(id)) {
+          const identity = naturalIdentity(tchId, date, slot.period);
+          if (knownSessionIdentities.has(identity)) {
             existing++;
             continue;
           }
@@ -3238,7 +3249,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
             timeProfileId: resolved?.id ?? profile?.id ?? null,
             status: 'scheduled',
           }));
-          knownSessionIds.add(id);
+          knownSessionIdentities.add(identity);
           created++;
         }
       }
@@ -3266,6 +3277,79 @@ export async function setSessionStatus(sesId, status, reason = '') {
     throw new Error('لا يمكن إلغاء حصة تم رصد حضورها؛ صحّح الحضور أولًا.');
   }
   return patch('sessions', sesId, { status, reason });
+}
+
+const SESSION_DELETE_PROTECTED_MESSAGE = 'لا يمكن حذف هذه الحصة لأنها تحتوي على سجل محفوظ. استخدم الإلغاء عند الحاجة.';
+
+/** Evidence which makes a dated session historical rather than pristine. */
+export function sessionDeleteEvidence(sesId, source = state) {
+  const rows = (name) => Array.isArray(source[name]) ? source[name] : [];
+  const session = rows('sessions').find((record) => record.id === sesId);
+  if (!session || session.deleted) return [];
+  const evidence = [];
+  if (session.status !== 'scheduled') evidence.push('status');
+  if (session.makeupForId || rows('sessions').some((record) =>
+    !record.deleted && record.id !== sesId && record.makeupForId === sesId)) evidence.push('makeup');
+  if (rows('attendance').some((record) => !record.deleted && record.sessionId === sesId)) evidence.push('attendance');
+  if (rows('sessionRosterSnapshots').some((record) => !record.deleted && record.sessionId === sesId)) evidence.push('roster-snapshot');
+  if (rows('logs').some((record) => !record.deleted && record.sessionId === sesId)) evidence.push('logs');
+  if (rows('notes').some((record) => !record.deleted && record.sessionId === sesId)) evidence.push('notes');
+  if (rows('classGoals').some((record) => !record.deleted && record.sessionId === sesId)) evidence.push('class-goal');
+  if (session.lessonId || session.note || session.homework || session.covered) evidence.push('content');
+  return [...new Set(evidence)];
+}
+
+/**
+ * Tombstone one genuinely unused session and queue the server-authoritative
+ * guard in the same IndexedDB transaction.  No user-facing control calls this
+ * yet; this is the runtime/data boundary for the later Sessions UI.
+ */
+export async function deleteSession(sesId) {
+  const known = state.sessions.find((record) => record.id === sesId);
+  if (!known) return null;
+  if (known.deleted) return known;
+  assertOperationalWritesAllowed({ sessions: [{ ...known, deleted: true }] });
+  const knownEvidence = sessionDeleteEvidence(sesId);
+  if (knownEvidence.length) throw new Error(SESSION_DELETE_PROTECTED_MESSAGE);
+
+  const stamp = now();
+  const command = isLocalOnlyRecord(known) ? null : syncV2CommandEntry({
+    store: 'sessions', recordId: sesId, command: 'session:delete', stamp,
+    baseRevision: known.serverRevision ?? 0,
+    patch: { sessionId: sesId },
+    dependencies: [{ store: 'sessions', recordId: sesId, requiresServerRevision: true }],
+  });
+  if (command) command.localPatch = { deleted: true, deletedAt: new Date(stamp).toISOString() };
+  let deleted = null;
+  await db.applyBatch({
+    sessions: {}, attendance: {}, sessionRosterSnapshots: {}, logs: {}, notes: {}, classGoals: {}, outbox: {},
+  }, {
+    prepare(current) {
+      const persisted = current.sessions.find((record) => record.id === sesId);
+      if (!persisted || persisted.deleted) {
+        deleted = persisted ?? null;
+        return Object.fromEntries(Object.keys(current).map((name) => [name, { put: [], remove: [] }]));
+      }
+      if (sessionDeleteEvidence(sesId, current).length) throw new Error(SESSION_DELETE_PROTECTED_MESSAGE);
+      deleted = syncV2Record('sessions', {
+        ...persisted, deleted: true, deletedAt: new Date(stamp).toISOString(), updatedAt: stamp,
+      });
+      const alreadyQueued = current.outbox.some((entry) =>
+        entry.protocol === 'v2' && entry.command === 'session:delete' && entry.patch?.sessionId === sesId);
+      return {
+        sessions: { put: [deleted], remove: [] },
+        attendance: { put: [], remove: [] }, sessionRosterSnapshots: { put: [], remove: [] },
+        logs: { put: [], remove: [] }, notes: { put: [], remove: [] }, classGoals: { put: [], remove: [] },
+        outbox: { put: command && !alreadyQueued ? [command] : [], remove: [] },
+      };
+    },
+  });
+  if (deleted) {
+    applyToMemory('sessions', [deleted]);
+    notify();
+    broadcast([{ store: 'sessions', id: sesId }]);
+  }
+  return deleted;
 }
 
 /** يضبط حضور طالب في حصة. لا يُنشأ حضور إلا لحصة قائمة. */

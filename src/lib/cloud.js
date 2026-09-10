@@ -389,6 +389,30 @@ export async function applySyncV2AttendanceCommand(envelope) {
   });
 }
 
+/** Server-authoritative guarded deletion for one dated session. */
+export async function applySyncV2SessionDeleteCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applySyncV2SessionDeleteCommand !== 'function') {
+      throw new Error('Mock backend does not implement Sync V2 session delete command RPC');
+    }
+    return mockBackend.applySyncV2SessionDeleteCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_sync_v2_session_delete_command', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx',
+    },
+    body: JSON.stringify({
+      p_mutation_id: envelope.mutationId,
+      p_device_id: envelope.deviceId,
+      p_session_id: envelope.sessionId,
+      p_client_updated_at: envelope.clientUpdatedAt ?? null,
+    }),
+  });
+}
+
 /** Sync V2 lifecycle/cascade command transport. */
 export async function applySyncV2LifecycleCommand(envelope) {
   if (mockBackend) {

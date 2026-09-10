@@ -7,7 +7,7 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 
@@ -428,6 +428,14 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
       }
     }
   }
+  if (mutation.command === 'session:delete' && targetStore === 'sessions') {
+    for (const patch of [localPatch, serverPatch]) {
+      if (patch.sessionId === oldId) {
+        patch.sessionId = newId;
+        changed = true;
+      }
+    }
+  }
 
   if (mutation.store === targetStore &&
       (mutation.recordId === oldId || mutation.serverRecordId === oldId || mutation.canonicalId === oldId)) {
@@ -478,6 +486,7 @@ function defaultTransport() {
     applyMutation: applySyncV2Mutation,
     applyEnrollmentCommand: applySyncV2EnrollmentCommand,
     applyAttendanceCommand: applySyncV2AttendanceCommand,
+    applySessionDeleteCommand: applySyncV2SessionDeleteCommand,
     applyLifecycleCommand: applySyncV2LifecycleCommand,
     applySectionLifecycleCommand: applySyncV2SectionLifecycleCommand,
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
@@ -653,6 +662,19 @@ export function createSyncV2Engine({
       store: 'attendance', recordId: attendanceId, command: 'attendance:record',
       patch: { sessionId, studentId, ...patch }, groups: Object.keys(patch),
       dependencies: uniqueDependencies(required), baseRevision: normalizeRevision(existing?.serverRevision),
+    });
+  }
+
+  async function queueSessionDeleteCommand({ sessionId, dependencies = [] }) {
+    if (!sessionId) throw new Error('Invalid Sync V2 session delete command');
+    const existing = await database.get('sessions', sessionId);
+    return queueCommand({
+      store: 'sessions', recordId: sessionId, command: 'session:delete',
+      patch: { sessionId }, groups: ['__deleted__'],
+      dependencies: uniqueDependencies([
+        { store: 'sessions', recordId: sessionId, requiresServerRevision: true }, ...dependencies,
+      ]),
+      baseRevision: normalizeRevision(existing?.serverRevision),
     });
   }
 
@@ -958,7 +980,9 @@ export function createSyncV2Engine({
       if (!dependency.store || !dependency.recordId) continue;
       const parent = await database.get(dependency.store, dependency.recordId);
       if (!parent) return { state: 'blocked', reason: 'dependency-not-local-yet' };
-      if (parent.deleted) return { state: 'rejected', reason: 'dependency-deleted' };
+      const deletingThisSession = mutation.command === 'session:delete' && dependency.store === 'sessions' &&
+        [mutation.recordId, mutation.serverRecordId, mutation.canonicalId].includes(dependency.recordId);
+      if (parent.deleted && !deletingThisSession) return { state: 'rejected', reason: 'dependency-deleted' };
       if (dependency.requiresServerRevision && normalizeRevision(parent.serverRevision) === 0) {
         return { state: 'blocked', reason: 'dependency-not-authoritative' };
       }
@@ -1070,6 +1094,54 @@ export function createSyncV2Engine({
             clientUpdatedAt: mutation.clientUpdatedAt,
           });
           await reconcileAttendanceCommandReceipt(mutation, receipt);
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+          else await markFailure(mutation, error);
+          stoppedKeys.add(mutation.logicalRecordKey);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
+        continue;
+      }
+      if (original.op === 'command' && original.command === 'session:delete' &&
+          typeof transport.applySessionDeleteCommand === 'function') {
+        if (stoppedKeys.has(original.logicalRecordKey)) { result.blocked++; continue; }
+        const liveRows = sortMutations(await database.getAll('outbox'));
+        const live = liveRows.find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') {
+          await markDependencyBlock(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+        }
+        if (readiness.state === 'rejected') {
+          await markRejected(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+        }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = await transport.applySessionDeleteCommand({
+            mutationId: mutation.mutationId, deviceId: mutation.deviceId,
+            sessionId: mutation.patch.sessionId, clientUpdatedAt: mutation.clientUpdatedAt,
+          });
+          if (receipt?.mutationId !== mutation.mutationId) throw new Error('Sync V2 session delete receipt mutationId mismatch');
+          const canonical = decodeSyncV2Canonical('sessions', receipt.session);
+          await database.applyBatch({ sessions: {}, outbox: {} }, {
+            prepare(current) {
+              const existing = current.sessions.find((row) => row.id === mutation.recordId);
+              const session = canonical ? {
+                ...(existing ?? {}), ...canonical,
+                serverCanonical: canonicalSnapshot(canonical),
+                ...(receipt.outcome === 'protected' ? {
+                  deleteProtection: { mutationId: mutation.mutationId, reason: receipt.reason ?? 'retained-evidence', recordedAt: now() },
+                } : {}),
+              } : existing;
+              if (session && receipt.outcome !== 'protected') delete session.deleteProtection;
+              return {
+                sessions: { put: session ? [session] : [], remove: [] },
+                outbox: { put: [], remove: [mutation.id] },
+              };
+            },
+          });
           result.acknowledged++;
         } catch (error) {
           if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
@@ -1374,6 +1446,7 @@ export function createSyncV2Engine({
     queueCommand,
     queueEnrollmentCommand,
     queueAttendanceCommand,
+    queueSessionDeleteCommand,
     queueLifecycleCommand,
     queueTeachingCreationCommand,
     queueFillAttendanceCommand,
