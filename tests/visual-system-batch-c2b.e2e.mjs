@@ -19,8 +19,18 @@ async function seed(page) {
   await page.goto('/#/');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.evaluate(async () => {
-    const a = (record) => ({ ...record, canonicalId: record.id, serverRevision: 1, fieldRevisions: { all: 1 }, deleted: false });
-    await window.store.patch('profile', 'profile', { teacherName: 'معلم ركيز', serverRevision: 1 }, null, { queue: false });
+    const a = (record) => {
+      const canonical = {
+        ...record,
+        canonicalId: record.id,
+        serverRevision: 1,
+        fieldRevisions: { all: 1 },
+        deleted: false,
+      };
+      return { ...canonical, serverCanonical: structuredClone(canonical) };
+    };
+    const profile = a({ ...window.store.state.profile, id: 'profile', teacherName: 'معلم ركيز' });
+    await window.store.patch('profile', 'profile', profile, null, { queue: false });
     const year = a({ id: 'c2b-year', label: '1447-1448', order: 10, status: 'archived' });
     const olderYear = a({ id: 'c2b-year-old', label: '1446-1447', order: 9, status: 'archived' });
     const term = a({ id: 'c2b-term', yearId: year.id, index: 1, name: 'الفصل الدراسي الأول', status: 'active' });
@@ -68,7 +78,8 @@ test('C2B backup and archive are responsive, accessible, and behavior-preserving
       await setTheme(page, selectedTheme);
       await expect(page.locator('.data-safety-surface')).toBeVisible();
       await expect(page.locator('.recovery-path')).toHaveCount(2);
-      await expect(page.getByRole('button', { name: 'مراجعة النسخة' })).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'اختيار نسخة للمراجعة' })).toBeEnabled();
+      await expect(page.locator('.recovery-path--cloud')).toContainText('الاستعادة السحابية الآمنة');
       await expect(page.locator('.data-danger-zone')).toBeVisible();
       expect(await noOverflow(page), `${selectedTheme}/${viewport.width}/backup`).toBe(true);
 
@@ -94,6 +105,8 @@ test('C2B backup and archive are responsive, accessible, and behavior-preserving
   const restoreDialog = page.getByRole('dialog', { name: 'استعادة نسخة على هذا الجهاز' });
   await expect(restoreDialog).toBeVisible();
   await expect(restoreDialog).toContainText('هذه استعادة محلية');
+  await expect(restoreDialog.getByRole('button', { name: /دمج السجلات/ })).toBeVisible();
+  await expect(restoreDialog.getByRole('button', { name: /استبدال كامل/ })).toBeVisible();
   await expect(restoreDialog.getByRole('button', { name: /دمج السجلات/ })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(restoreDialog).toBeHidden();

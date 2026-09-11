@@ -5557,7 +5557,233 @@
 .recovery-path p { margin: 3px 0 0; color: var(--text-3); font-size: var(--fs-sm); line-height: 1.5; }
 .recovery-path__icon.is-info,
 .archive-record-row__icon.is-info { color: var(--info); background: var(--info-soft); }
-.recovery-path--future { background: color-mix(in srgb, var(--info-soft) 22%, var(--bg-elev)); }
+.recovery-path--future,
+.recovery-path--cloud { background: color-mix(in srgb, var(--info-soft) 22%, var(--bg-elev)); }
+
+.cloud-recovery-flow,
+.cloud-resume-panel {
+  margin-top: var(--sp-3);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bg-elev) 90%, var(--info-soft));
+  border: 1px solid color-mix(in srgb, var(--info) 18%, var(--border));
+  border-radius: var(--r-lg);
+}
+.cloud-recovery-flow { padding: var(--sp-4); }
+.cloud-recovery-flow__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.cloud-recovery-flow__head h3 {
+  margin: 2px 0 0;
+  color: var(--text-1);
+  font-size: var(--fs-section);
+  line-height: var(--lh-tight);
+}
+.cloud-recovery-flow__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+.cloud-recovery-blocked-copy { color: var(--danger); font-size: var(--fs-sm); }
+
+.cloud-recovery-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: var(--sp-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.cloud-recovery-steps li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+.cloud-recovery-steps li::before {
+  position: absolute;
+  z-index: 0;
+  inset-block-start: 14px;
+  inset-inline: calc(-50% + 15px) calc(50% + 15px);
+  height: 1px;
+  background: var(--border-strong);
+  content: '';
+}
+.cloud-recovery-steps li:first-child::before { display: none; }
+.cloud-recovery-steps li > span {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: var(--fw-bold);
+}
+.cloud-recovery-steps li > span svg { width: 14px; height: 14px; }
+.cloud-recovery-steps li.is-current { color: var(--info); font-weight: var(--fw-semibold); }
+.cloud-recovery-steps li.is-current > span { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 48%, transparent); }
+.cloud-recovery-steps li.is-complete { color: var(--ok); }
+.cloud-recovery-steps li.is-complete > span { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+
+.cloud-validation { display: grid; border-block: 1px solid var(--border); }
+.cloud-validation__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 56px;
+  padding-block: var(--sp-2);
+  color: var(--text-3);
+}
+.cloud-validation__item + .cloud-validation__item { border-block-start: 1px solid var(--border); }
+.cloud-validation__item > svg { width: 20px; height: 20px; flex: none; }
+.cloud-validation__item > span { display: grid; gap: 1px; min-width: 0; }
+.cloud-validation__item strong { color: var(--text-2); font-size: var(--fs-sm); }
+.cloud-validation__item small { overflow-wrap: anywhere; color: var(--text-3); font-size: var(--fs-xs); }
+.cloud-validation__item.is-complete > svg { color: var(--ok); }
+.cloud-validation__item.is-error > svg { color: var(--danger); }
+
+.cloud-recovery-message,
+.cloud-restore-progress,
+.cloud-resume-panel {
+  color: var(--text-2);
+  outline: none;
+}
+.cloud-recovery-message {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--info-soft);
+  border-radius: var(--r-md);
+}
+.cloud-recovery-message > svg,
+.cloud-recovery-message > span:first-child { width: 24px; height: 24px; flex: none; color: var(--info); }
+.cloud-recovery-message > span:nth-child(2) { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.cloud-recovery-message strong { color: var(--text-1); }
+.cloud-recovery-message small { color: var(--text-3); font-size: var(--fs-sm); line-height: 1.5; }
+.cloud-recovery-message.is-error { background: var(--danger-soft); }
+.cloud-recovery-message.is-error > span:first-child { color: var(--danger); }
+.cloud-recovery-message.is-success { background: var(--ok-soft); }
+.cloud-recovery-message.is-success > span:first-child { color: var(--ok); }
+.cloud-recovery-message:focus-visible,
+.cloud-resume-panel:focus-visible,
+.cloud-restore-progress:focus-visible { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--brand) 38%, transparent); }
+
+.cloud-plan-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-top: var(--sp-3);
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.cloud-plan-metric { display: grid; gap: 2px; min-width: 0; padding: var(--sp-3); background: var(--bg-elev); }
+.cloud-plan-metric span { overflow: hidden; color: var(--text-3); font-size: var(--fs-xs); text-overflow: ellipsis; white-space: nowrap; }
+.cloud-plan-metric strong { color: var(--text-1); font-size: var(--fs-lg); }
+.cloud-plan-metric.is-positive strong { color: var(--ok); }
+.cloud-plan-metric.is-informational strong { color: var(--info); }
+.cloud-plan-metric.is-danger strong,
+.cloud-plan-metric.is-blocked strong { color: var(--danger); }
+
+.cloud-plan-details { margin-top: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); }
+.cloud-plan-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  list-style: none;
+}
+.cloud-plan-details > summary::-webkit-details-marker { display: none; }
+.cloud-plan-details > summary:hover { background: var(--bg-sunk); }
+.cloud-plan-details > summary:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+.cloud-plan-details__list { border-block-start: 1px solid var(--border); }
+.cloud-plan-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 58px;
+  padding: var(--sp-2) var(--sp-3);
+}
+.cloud-plan-row + .cloud-plan-row { border-block-start: 1px solid var(--border); }
+.cloud-plan-row__mark { display: grid; place-items: center; width: 32px; height: 32px; color: var(--text-3); background: var(--bg-sunk); border-radius: var(--r-full); }
+.cloud-plan-row__mark svg { width: 16px; height: 16px; }
+.cloud-plan-row > span:nth-child(2) { display: grid; gap: 1px; min-width: 0; }
+.cloud-plan-row strong { color: var(--text-1); font-size: var(--fs-sm); }
+.cloud-plan-row small { color: var(--text-3); font-size: var(--fs-xs); line-height: 1.45; }
+.cloud-plan-row__end { display: flex; align-items: center; gap: var(--sp-2); }
+.cloud-plan-row__end > bdi { font-weight: var(--fw-bold); }
+.cloud-plan-row.is-danger .cloud-plan-row__mark,
+.cloud-plan-row.is-blocked .cloud-plan-row__mark { color: var(--danger); background: var(--danger-soft); }
+.cloud-plan-row.is-positive .cloud-plan-row__mark { color: var(--ok); background: var(--ok-soft); }
+.cloud-plan-row.is-informational .cloud-plan-row__mark { color: var(--info); background: var(--info-soft); }
+.cloud-local-only-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}
+.cloud-local-only-note svg { width: 17px; height: 17px; flex: none; }
+
+.cloud-confirm-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+.cloud-confirm-summary > div { display: grid; gap: 3px; padding: var(--sp-3); background: var(--bg-sunk); border: 1px solid var(--border); border-radius: var(--r-md); }
+.cloud-confirm-summary span { color: var(--text-3); font-size: var(--fs-xs); }
+.cloud-confirm-summary strong { color: var(--text-1); font-size: var(--fs-xl); }
+.cloud-confirm-summary .is-delete { background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); }
+.cloud-confirm-summary .is-delete span,
+.cloud-confirm-summary .is-delete strong { color: var(--danger); }
+.cloud-confirm-note { color: var(--text-3); font-size: var(--fs-sm); line-height: 1.6; }
+
+.cloud-restore-progress { padding: var(--sp-4); }
+.cloud-restore-progress__head { display: flex; align-items: center; gap: var(--sp-3); }
+.cloud-restore-progress__head > svg { width: 26px; height: 26px; color: var(--info); }
+.cloud-restore-progress__head > span { display: grid; gap: 2px; }
+.cloud-restore-progress__head small { color: var(--text-3); font-size: var(--fs-sm); }
+.cloud-restore-progress ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); margin: var(--sp-4) 0 0; padding: 0; list-style: none; }
+.cloud-restore-progress li { display: flex; align-items: center; gap: var(--sp-2); min-height: 52px; padding: var(--sp-3); color: var(--text-3); background: var(--bg-sunk); border-radius: var(--r-md); font-size: var(--fs-sm); }
+.cloud-restore-progress li span { display: grid; place-items: center; width: 28px; height: 28px; }
+.cloud-restore-progress li svg { width: 18px; height: 18px; }
+.cloud-restore-progress li.is-active { color: var(--info); background: var(--info-soft); }
+.cloud-restore-progress li.is-active svg { animation: cloud-progress-spin .9s linear infinite; }
+@keyframes cloud-progress-spin { to { transform: rotate(-360deg); } }
+
+.cloud-resume-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: color-mix(in srgb, var(--warn-soft) 44%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--warn) 32%, var(--border));
+}
+.cloud-resume-panel.is-error { background: color-mix(in srgb, var(--danger-soft) 44%, var(--bg-elev)); border-color: color-mix(in srgb, var(--danger) 32%, var(--border)); }
+.cloud-resume-panel__icon { display: grid; place-items: center; width: 42px; height: 42px; color: var(--warn); background: var(--warn-soft); border-radius: var(--r-md); }
+.cloud-resume-panel__icon svg { width: 21px; height: 21px; }
+.cloud-resume-panel h3 { margin: var(--sp-2) 0 0; font-size: var(--fs-section); }
+.cloud-resume-panel p { margin: 3px 0 0; color: var(--text-3); font-size: var(--fs-sm); }
 
 .data-inventory { padding: 0; }
 .data-inventory > summary {
@@ -5717,6 +5943,14 @@
   .data-inventory__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .data-danger-zone { align-items: stretch; flex-direction: column; }
   .data-danger-zone .btn { width: 100%; white-space: normal; }
+  .cloud-recovery-flow { padding: var(--sp-3); }
+  .cloud-recovery-flow__actions { align-items: stretch; flex-direction: column; }
+  .cloud-recovery-flow__actions .btn { width: 100%; }
+  .cloud-recovery-blocked-copy { text-align: center; }
+  .cloud-plan-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cloud-resume-panel { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .cloud-resume-panel .btn { grid-column: 1 / -1; width: 100%; }
+  .cloud-restore-progress ol { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 420px) {
@@ -5742,11 +5976,23 @@
   .data-inventory > summary { padding-inline: var(--sp-3); }
   .data-inventory__summary .data-safety-section__icon { display: none; }
   .data-inventory__meta { font-size: var(--fs-xs); }
+  .cloud-recovery-flow__head { align-items: stretch; flex-direction: column; }
+  .cloud-recovery-flow__head .btn { align-self: flex-start; min-height: 44px; }
+  .cloud-recovery-steps { margin-block: var(--sp-3); }
+  .cloud-recovery-steps li small { max-width: 62px; line-height: 1.25; }
+  .cloud-plan-metric { padding: var(--sp-2); }
+  .cloud-plan-row { grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-2); }
+  .cloud-plan-row__end { grid-column: 2; justify-content: space-between; }
+  .cloud-recovery-message { align-items: flex-start; flex-wrap: wrap; }
+  .cloud-recovery-message .btn { width: 100%; }
+  .cloud-confirm-summary > div { padding: var(--sp-2); }
+  .cloud-confirm-summary strong { font-size: var(--fs-lg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .data-inventory__meta svg,
   .archive-year__chev { transition: none !important; }
+  .cloud-restore-progress li.is-active svg { animation: none !important; }
 }
 
 @media print {

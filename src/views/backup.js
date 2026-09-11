@@ -2,12 +2,30 @@
 import { html, icon, toast, confirmSheet, openSheet, fmtDateFull, parentLink } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as db from '../lib/db.js';
-import { downloadBackup, restoreBackup, readJSONFile, validateBackupIntegrity } from '../lib/export.js';
+import * as cloud from '../lib/cloud.js';
+import * as sync from '../lib/sync.js';
+import { downloadBackup, restoreBackup, readJSONFile, validateBackup, validateBackupIntegrity } from '../lib/export.js';
+import {
+  getCloudRestoreResumeState, previewCloudRestore, restoreBackupToCloud, resumeCloudRestore,
+} from '../lib/backup-v2.js';
+import {
+  CLOUD_RECOVERY_STATE_META, cloudRecoveryErrorPresentation,
+  groupCloudRestoreEntries, summarizeCloudRestorePlan,
+} from '../lib/cloud-recovery-ui.js';
 import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let usageInfo = null;
 let latestLocalAction = null;
+let cloudResumeState = null;
+let cloudResumeError = null;
+let backupViewRevision = 0;
+
+const emptyCloudRecovery = () => ({
+  phase: 'idle', fileName: '', payload: null, structural: null, validation: null,
+  plan: null, error: null, result: null, busy: false,
+});
+let cloudRecovery = emptyCloudRecovery();
 
 export const LOCAL_RESET_COPY = {
   button: 'إعادة ضبط سجل ركيز المحلي على هذا الجهاز',
@@ -34,10 +52,207 @@ const actionTime = (value) => value ? new Intl.DateTimeFormat('ar-SA-u-ca-gregor
   day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
 }).format(value) : '';
 
+const cloudPhaseStep = (phase) => ({
+  idle: 0, reading: 0, validating: 1, validated: 1, previewing: 2, review: 2,
+  restoring: 3, resuming: 3, success: 4, error: 1,
+})[phase] ?? 0;
+
+function setCloudRecovery(update, { focus = true } = {}) {
+  cloudRecovery = { ...cloudRecovery, ...update };
+  repaint();
+  if (focus && typeof document !== 'undefined') {
+    setTimeout(() => document.querySelector('[data-cloud-focus]')?.focus({ preventScroll: true }), 0);
+  }
+}
+
+function cloudAvailability() {
+  if (cloudResumeState || cloudResumeError) return { label: 'يلزم الإكمال', badge: 'badge--warn' };
+  if (!cloud.session || !cloud.user) return { label: 'يلزم تسجيل الدخول', badge: 'badge--neutral' };
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return { label: 'يلزم الاتصال', badge: 'badge--neutral' };
+  const status = sync.displayState();
+  if (status.detailStatus === 'synced') return { label: 'متصلة بالحساب', badge: 'badge--ok' };
+  return { label: 'تُفحص الجاهزية عند المتابعة', badge: 'badge--info' };
+}
+
+function renderCloudSteps() {
+  const current = cloudPhaseStep(cloudRecovery.phase);
+  const labels = ['اختيار النسخة', 'التحقق', 'المراجعة', 'الاستعادة'];
+  return html`<ol class="cloud-recovery-steps" aria-label="مراحل الاستعادة السحابية">
+    ${labels.map((label, index) => html`<li class="${current > index ? 'is-complete' : current === index ? 'is-current' : ''}" ${current === index ? html`aria-current="step"` : ''}>
+      <span>${current > index ? icon('check') : index + 1}</span><small>${label}</small>
+    </li>`)}
+  </ol>`;
+}
+
+function renderValidationState() {
+  if (!cloudRecovery.payload && cloudRecovery.phase !== 'error') return '';
+  const structuralOk = cloudRecovery.structural?.ok === true;
+  const validationOk = cloudRecovery.validation?.ok === true;
+  const isV3 = cloudRecovery.payload?.version === 3;
+  return html`<div class="cloud-validation" aria-label="حالة التحقق من النسخة">
+    <div class="cloud-validation__item is-complete">${icon('check')}<span><strong>تم قراءة الملف</strong><small>${cloudRecovery.fileName}</small></span></div>
+    <div class="cloud-validation__item ${structuralOk ? 'is-complete' : cloudRecovery.structural ? 'is-error' : 'is-pending'}">
+      ${structuralOk ? icon('check') : icon('shield')}
+      <span><strong>${structuralOk ? 'تم التحقق من بنية النسخة' : cloudRecovery.structural ? 'تعذّر التحقق من بنية النسخة' : 'جارٍ التحقق من بنية النسخة…'}</strong>
+      ${cloudRecovery.structural && !structuralOk ? html`<small>${cloudRecovery.structural.errors?.[0] ?? 'بنية الملف غير صالحة.'}</small>` : ''}</span>
+    </div>
+    ${structuralOk ? html`<div class="cloud-validation__item ${isV3 || validationOk ? 'is-complete' : cloudRecovery.validation ? 'is-error' : 'is-pending'}">
+      ${isV3 || validationOk ? icon('check') : icon('shield')}
+      <span><strong>${isV3 ? 'تحقق بنيوي لإصدار V3' : validationOk ? 'تم التحقق من سلامة النسخة' : cloudRecovery.validation ? 'تعذّر التحقق من سلامة النسخة' : 'جارٍ التحقق من سلامة النسخة…'}</strong>
+      <small>${isV3 ? 'لا يتضمن هذا الإصدار تحقق سلامة V4.' : cloudRecovery.validation && !validationOk ? cloudRecovery.validation.errors?.at(-1) : `نسخة V4 · ${cloudRecovery.validation?.total ?? cloudRecovery.structural?.total ?? 0} سجلًا`}</small></span>
+    </div>` : ''}
+  </div>`;
+}
+
+const stateActionCopy = (state) => ({
+  add: 'ستُضاف إلى بيانات الحساب.',
+  update: 'ستُحدّث بالقيمة الآمنة من النسخة.',
+  delete: 'ستُحذف من بيانات الحساب بعد التأكيد.',
+  keep: 'لن تتغير.',
+  cloudOnly: 'ستبقى في السحابة كما هي.',
+  blocked: 'تمنع تنفيذ الاستعادة كاملة.',
+})[state];
+
+function renderPlanSummary(plan) {
+  const summary = summarizeCloudRestorePlan(plan);
+  return html`
+    <div class="cloud-plan-summary" aria-label="ملخص تأثير الاستعادة">
+      ${Object.entries(CLOUD_RECOVERY_STATE_META).map(([key, meta]) => html`
+        <div class="cloud-plan-metric is-${meta.tone}">
+          <span>${meta.label}</span><strong class="tabular">${summary[key]}</strong>
+        </div>`)}
+    </div>
+    <details class="cloud-plan-details" ${plan.ready ? '' : 'open'}>
+      <summary><span>تفاصيل المراجعة</span><span class="badge ${plan.ready ? 'badge--neutral' : 'badge--warn'}">${plan.entries.length} سجلًا</span></summary>
+      <div class="cloud-plan-details__list">
+        ${groupCloudRestoreEntries(plan).map((group) => {
+          const meta = CLOUD_RECOVERY_STATE_META[group.state];
+          return html`<div class="cloud-plan-row is-${meta.tone}">
+            <span class="cloud-plan-row__mark" aria-hidden="true">${group.state === 'blocked' ? icon('shield') : group.state === 'delete' ? icon('trash') : icon('check')}</span>
+            <span><strong>${group.label}</strong><small>${group.reason || stateActionCopy(group.state)}</small></span>
+            <span class="cloud-plan-row__end"><bdi class="tabular">${group.count}</bdi><span class="badge badge--${group.state === 'blocked' ? 'warn' : group.state === 'delete' ? 'danger' : group.state === 'add' ? 'ok' : group.state === 'update' ? 'info' : 'neutral'}">${meta.short}</span></span>
+          </div>`;
+        })}
+      </div>
+    </details>
+    <div class="cloud-local-only-note">${icon('device')}<span>بعض البيانات المحلية الخاصة بهذا الجهاز لا تدخل ضمن المقارنة السحابية.</span></div>`;
+}
+
+function renderCloudError(error) {
+  if (!error) return '';
+  return html`<div class="cloud-recovery-message is-error" role="alert" tabindex="-1" data-cloud-focus>
+    <span aria-hidden="true">${icon('shield')}</span><span><strong>${error.title}</strong><small>${error.message}</small></span>
+  </div>`;
+}
+
+function renderResumeState() {
+  if (cloudResumeError) return html`<section class="cloud-resume-panel is-error" aria-labelledby="cloud-resume-title" tabindex="-1" data-cloud-focus>
+    <span class="cloud-resume-panel__icon">${icon('shield')}</span>
+    <div><h3 id="cloud-resume-title">${cloudResumeError.title}</h3><p>${cloudResumeError.message}</p></div>
+  </section>`;
+  if (!cloudResumeState) return '';
+  const finalized = cloudResumeState.state === 'finalized';
+  return html`<section class="cloud-resume-panel" aria-labelledby="cloud-resume-title" tabindex="-1" data-cloud-focus>
+    <span class="cloud-resume-panel__icon">${icon(finalized ? 'device' : 'cloud')}</span>
+    <div><span class="badge badge--warn">إكمال مطلوب</span><h3 id="cloud-resume-title">${finalized ? 'اكتملت الاستعادة في السحابة' : 'بدأت الاستعادة السحابية الآمنة'}</h3>
+      <p>${finalized ? 'يحتاج هذا الجهاز إلى إكمال التحديث بالنسخة النهائية.' : 'تحتاج العملية المحفوظة إلى إكمال التنفيذ على السحابة وهذا الجهاز.'}</p></div>
+    <button class="btn btn--primary" data-act="resume-cloud" ${cloudRecovery.busy ? html`disabled` : ''}>${icon('refresh')} ${cloudRecovery.busy ? 'جارٍ الإكمال…' : 'إكمال تحديث هذا الجهاز'}</button>
+  </section>`;
+}
+
+function renderRestoreProgress() {
+  const resuming = cloudRecovery.phase === 'resuming';
+  return html`<div class="cloud-restore-progress" role="status" aria-live="polite" tabindex="-1" data-cloud-focus>
+    <div class="cloud-restore-progress__head">${icon('cloud')}<span><strong>${resuming ? 'جارٍ إكمال الاستعادة المحفوظة' : 'جارٍ استعادة النسخة بأمان'}</strong><small>لا تغلق رَكيز حتى يكتمل التحديث.</small></span></div>
+    <ol>
+      <li class="is-active"><span>${icon('refresh')}</span><strong>تنفيذ الاستعادة السحابية</strong></li>
+      <li><span>${icon('device')}</span><strong>تحديث هذا الجهاز بالنسخة النهائية</strong></li>
+    </ol>
+  </div>`;
+}
+
+function renderCloudFlow() {
+  if (['restoring', 'resuming'].includes(cloudRecovery.phase)) return html`<section class="cloud-recovery-flow">${renderCloudSteps()}${renderRestoreProgress()}</section>`;
+  if (cloudResumeState || cloudResumeError) return renderResumeState();
+  if (cloudRecovery.phase === 'idle') return '';
+  if (cloudRecovery.phase === 'success') {
+    const summary = summarizeCloudRestorePlan(cloudRecovery.result?.plan);
+    return html`<section class="cloud-recovery-flow">${renderCloudSteps()}<div class="cloud-recovery-message is-success" role="status" tabindex="-1" data-cloud-focus>
+      <span>${icon('check')}</span><span><strong>تمت استعادة بياناتك بنجاح</strong><small>${cloudRecovery.result?.plan ? `أُضيف ${summary.add}، وتحدّث ${summary.update}، وحُذف ${summary.delete}. ` : ''}هذا الجهاز محدث بالنسخة النهائية.</small></span>
+      <button class="btn btn--ghost" data-act="reset-cloud">إنهاء</button>
+    </div></section>`;
+  }
+  const canPreview = cloudRecovery.payload && cloudRecovery.validation?.ok && !cloudRecovery.busy;
+  return html`<section class="cloud-recovery-flow" aria-labelledby="cloud-flow-title">
+    <div class="cloud-recovery-flow__head"><div><span class="eyebrow">استعادة متقدمة</span><h3 id="cloud-flow-title">مراجعة النسخة قبل استعادتها</h3></div><button class="btn btn--quiet btn--sm" data-act="reset-cloud" ${cloudRecovery.busy ? html`disabled` : ''}>اختيار نسخة أخرى</button></div>
+    ${renderCloudSteps()}
+    ${renderValidationState()}
+    ${renderCloudError(cloudRecovery.error)}
+    ${cloudRecovery.phase === 'previewing' ? html`<div class="cloud-recovery-message" role="status" aria-live="polite" tabindex="-1" data-cloud-focus>${icon('cloud')}<span><strong>جارٍ إعداد المقارنة السحابية الآمنة…</strong><small>يتحقق رَكيز من الحساب وحالة المزامنة قبل عرض الخطة.</small></span></div>` : ''}
+    ${cloudRecovery.plan ? renderPlanSummary(cloudRecovery.plan) : ''}
+    <div class="cloud-recovery-flow__actions">
+      ${cloudRecovery.plan ? html`
+        <button class="btn btn--primary" data-act="confirm-cloud" ${!cloudRecovery.plan.ready || cloudRecovery.busy ? html`disabled aria-disabled="true"` : ''}>المتابعة إلى التأكيد</button>
+        ${!cloudRecovery.plan.ready ? html`<span class="cloud-recovery-blocked-copy">وجود أي عنصر محظور يمنع الاستعادة كاملة.</span>` : ''}
+      ` : canPreview ? html`<button class="btn btn--info" data-act="preview-cloud">${icon('cloud')} متابعة إلى المعاينة السحابية</button>` : ''}
+    </div>
+  </section>`;
+}
+
+async function cloudRestoreConfirmation(plan) {
+  const summary = summarizeCloudRestorePlan(plan);
+  return openSheet({
+    title: 'تأكيد الاستعادة السحابية الآمنة',
+    desc: 'هذه الخطوة تطبق الخطة كاملة على بيانات الحساب، ثم تُحدّث هذا الجهاز بالنسخة النهائية.',
+    body: html`<div class="cloud-confirm-summary">
+      <div><span>إضافات</span><strong class="tabular">${summary.add}</strong></div>
+      <div><span>تحديثات</span><strong class="tabular">${summary.update}</strong></div>
+      <div class="is-delete"><span>حذف</span><strong class="tabular">${summary.delete}</strong></div>
+    </div><p class="cloud-confirm-note">تحقق من عدد السجلات التي ستُحذف. لا توفر هذه العملية تراجعًا، ولا تستبدل السحابة بالقوة.</p>`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close autofocus>إلغاء</button><button class="btn btn--primary" data-cloud-confirm>استعادة النسخة بأمان</button>`,
+    onMount: (root, done) => root.querySelector('[data-cloud-confirm]')?.addEventListener('click', () => done(true)),
+  }).then((value) => value === true);
+}
+
+async function refreshResumeState() {
+  try {
+    cloudResumeState = await getCloudRestoreResumeState();
+    cloudResumeError = null;
+  } catch (error) {
+    cloudResumeState = null;
+    cloudResumeError = cloudRecoveryErrorPresentation(error);
+  }
+}
+
+function presentCloudError(error) {
+  if (cloud.isAuthRequiredError?.(error) && error.code !== 'AUTH_REQUIRED') {
+    return cloudRecoveryErrorPresentation({ ...error, code: 'AUTH_REQUIRED' });
+  }
+  return cloudRecoveryErrorPresentation(error);
+}
+
 export default {
   title: () => 'البيانات والنسخ الاحتياطي',
   wide: true,
-  async onMount() { usageInfo = await db.usage(); repaint(); },
+  async onMount() {
+    const revision = ++backupViewRevision;
+    const nextUsage = await db.usage();
+    let nextResume = null;
+    let nextResumeError = null;
+    try { nextResume = await getCloudRestoreResumeState(); }
+    catch (error) { nextResumeError = cloudRecoveryErrorPresentation(error); }
+    if (revision !== backupViewRevision) return;
+    usageInfo = nextUsage;
+    cloudResumeState = nextResume;
+    cloudResumeError = nextResumeError;
+    repaint();
+  },
+  onUnmount() {
+    backupViewRevision += 1;
+    cloudRecovery = emptyCloudRecovery();
+    cloudResumeState = null;
+    cloudResumeError = null;
+  },
   render() {
     const s = store.state;
     const n = (key) => (s[key] ?? []).filter((record) => !record.deleted).length;
@@ -47,6 +262,8 @@ export default {
       حصص: n('sessions'), درجات: n('scores'), 'سجلات حضور': n('attendance'), 'رصدات سريعة': n('logs'),
     };
     const totalRecords = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    const availability = cloudAvailability();
+    const cloudStartBlocked = !!cloudResumeState || !!cloudResumeError || cloudRecovery.busy;
     return html`
       <main class="management-page backup-data-page">
         ${parentLink('العودة إلى الإعدادات', '/settings')}
@@ -70,18 +287,20 @@ export default {
           <section class="surface__section data-safety-section" aria-labelledby="restore-title">
             <div class="data-safety-section__heading"><h2 id="restore-title">الاستعادة والاسترداد</h2><p>اختر المسار المناسب لمكان النسخة التي تريد استعادتها.</p></div>
             <input type="file" id="restore-file" accept="application/json,.json" class="sr-only" data-change="file" aria-label="اختيار ملف نسخة احتياطية للاستعادة">
+            <input type="file" id="cloud-restore-file" accept="application/json,.json" class="sr-only" data-change="cloud-file" aria-label="اختيار ملف للاستعادة السحابية الآمنة">
             <div class="recovery-paths">
               <div class="recovery-path">
                 <span class="recovery-path__icon">${icon('device')}</span>
-                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>استعادة من ملف على هذا الجهاز</h3><span class="badge badge--ok">متاحة</span></div><p>يفحص ركيز الملف أولًا، ثم يتيح الدمج الآمن أو الاستبدال الكامل على هذا الجهاز.</p></div>
+                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>استعادة نسخة على هذا الجهاز</h3><span class="badge badge--ok">محلية</span></div><p>يقرأ رَكيز الملف ويتحقق منه، ثم يتيح الدمج أو الاستبدال على هذا الجهاز فقط. لا يستبدل بيانات السحابة.</p></div>
                 <button class="btn btn--ghost recovery-path__action" data-act="pick-file">${icon('upload')} اختيار ملف</button>
               </div>
-              <div class="recovery-path recovery-path--future" aria-describedby="cloud-recovery-note">
+              <div class="recovery-path recovery-path--cloud" aria-describedby="cloud-recovery-note">
                 <span class="recovery-path__icon is-info">${icon('cloud')}</span>
-                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>استعادة متصلة بالحساب</h3><span class="badge badge--info">غير مفعّلة من هذه الشاشة</span></div><p id="cloud-recovery-note">ستراجع النسخة وتأثيرها قبل تأكيد استعادتها إلى بيانات الحساب المتصلة. لا يبدأ هذا المسار حاليًا من هنا.</p></div>
-                <button class="btn btn--info recovery-path__action" disabled aria-disabled="true">مراجعة النسخة</button>
+                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>الاستعادة السحابية الآمنة</h3><span class="badge ${availability.badge}">${availability.label}</span></div><p id="cloud-recovery-note">تقارن النسخة ببيانات الحساب، وتمنع التنفيذ عند وجود تعارض، ثم تُحدّث هذا الجهاز بالنسخة النهائية.</p></div>
+                <button class="btn btn--info recovery-path__action" data-act="pick-cloud-file" ${cloudStartBlocked ? html`disabled aria-disabled="true"` : ''}>${icon('upload')} اختيار نسخة للمراجعة</button>
               </div>
             </div>
+            ${renderCloudFlow()}
           </section>
           <details class="surface__section data-inventory">
             <summary><span class="data-inventory__summary"><span class="data-safety-section__icon">${icon('reports')}</span><span><strong>محتوى سجل ركيز الحالي</strong><small>تفاصيل البيانات التي تدخل في النسخة</small></span></span><span class="data-inventory__meta"><bdi class="tabular">${totalRecords}</bdi> سجلًا ${icon('chev')}</span></summary>
@@ -103,6 +322,102 @@ export default {
       catch (err) { console.error(err); toast('تعذّر التصدير', 'danger'); }
     },
     'pick-file'() { document.getElementById('restore-file')?.click(); },
+    'pick-cloud-file'() {
+      if (cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
+      document.getElementById('cloud-restore-file')?.click();
+    },
+    async 'cloud-file'(el) {
+      const file = el.files?.[0];
+      el.value = '';
+      if (!file || cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
+      cloudRecovery = { ...emptyCloudRecovery(), phase: 'reading', fileName: file.name, busy: true };
+      repaint();
+      let payload;
+      try {
+        payload = await readJSONFile(file);
+      } catch (error) {
+        setCloudRecovery({ phase: 'error', busy: false, error: presentCloudError({ ...error, code: 'INVALID_BACKUP' }) });
+        return;
+      }
+      const structural = validateBackup(payload);
+      setCloudRecovery({ phase: 'validating', payload, structural, busy: true, error: null }, { focus: false });
+      if (!structural.ok) {
+        const presentation = presentCloudError({ code: structural.code ?? 'INVALID_BACKUP' });
+        setCloudRecovery({
+          phase: 'error', busy: false,
+          error: { ...presentation, message: structural.errors?.[0] ?? presentation.message },
+        });
+        return;
+      }
+      const validation = await validateBackupIntegrity(payload);
+      if (!validation.ok) {
+        const presentation = presentCloudError({ code: validation.code ?? 'INVALID_BACKUP' });
+        setCloudRecovery({
+          phase: 'error', validation, busy: false,
+          error: { ...presentation, message: validation.errors?.at(-1) ?? presentation.message },
+        });
+        return;
+      }
+      setCloudRecovery({ phase: 'validated', validation, busy: false, error: null });
+    },
+    async 'preview-cloud'() {
+      if (cloudRecovery.busy || !cloudRecovery.payload || !cloudRecovery.validation?.ok || cloudResumeState || cloudResumeError) return;
+      setCloudRecovery({ phase: 'previewing', busy: true, plan: null, error: null });
+      try {
+        await sync.assertCloudRestoreReady();
+        const preview = await previewCloudRestore(cloudRecovery.payload);
+        if (!preview.plan) throw Object.assign(new Error('Cloud preview unavailable'), { code: preview.validation?.code ?? 'INVALID_BACKUP' });
+        setCloudRecovery({ phase: 'review', busy: false, validation: preview.validation, plan: preview.plan, error: null });
+      } catch (error) {
+        setCloudRecovery({ phase: 'error', busy: false, error: presentCloudError(error) });
+      }
+    },
+    async 'confirm-cloud'() {
+      if (cloudRecovery.busy || !cloudRecovery.payload || !cloudRecovery.plan?.ready || cloudResumeState || cloudResumeError) return;
+      const confirmed = await cloudRestoreConfirmation(cloudRecovery.plan);
+      if (!confirmed) return;
+      setCloudRecovery({ phase: 'restoring', busy: true, error: null });
+      try {
+        const result = await restoreBackupToCloud(cloudRecovery.payload);
+        cloudResumeState = null;
+        cloudResumeError = null;
+        setCloudRecovery({ phase: 'success', busy: false, result, plan: result.plan });
+      } catch (error) {
+        if (error.code === 'RESTORE_REVIEW_REQUIRED' && error.plan) {
+          setCloudRecovery({ phase: 'review', busy: false, plan: error.plan, error: presentCloudError(error) });
+          return;
+        }
+        if (['LOCAL_RECONCILIATION_REQUIRED', 'CLOUD_RESTORE_RESUME_REQUIRED'].includes(error.code)) {
+          await refreshResumeState();
+          cloudRecovery = { ...cloudRecovery, phase: 'error', busy: false, error: presentCloudError(error) };
+          repaint();
+          setTimeout(() => document.querySelector('[data-cloud-focus]')?.focus({ preventScroll: true }), 0);
+          return;
+        }
+        setCloudRecovery({ phase: 'error', busy: false, error: presentCloudError(error) });
+      }
+    },
+    async 'resume-cloud'() {
+      if (cloudRecovery.busy || !cloudResumeState) return;
+      setCloudRecovery({ phase: 'resuming', busy: true, error: null });
+      try {
+        const result = await resumeCloudRestore();
+        cloudResumeState = null;
+        cloudResumeError = null;
+        setCloudRecovery({ phase: 'success', busy: false, result, plan: null });
+      } catch (error) {
+        await refreshResumeState();
+        cloudRecovery = { ...cloudRecovery, phase: 'error', busy: false, error: presentCloudError(error) };
+        repaint();
+        setTimeout(() => document.querySelector('[data-cloud-focus]')?.focus({ preventScroll: true }), 0);
+      }
+    },
+    'reset-cloud'() {
+      if (cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
+      cloudRecovery = emptyCloudRecovery();
+      repaint();
+      setTimeout(() => document.querySelector('[data-act="pick-cloud-file"]')?.focus({ preventScroll: true }), 0);
+    },
     async file(el) {
       const file = el.files?.[0]; el.value = ''; if (!file) return;
       let payload;
