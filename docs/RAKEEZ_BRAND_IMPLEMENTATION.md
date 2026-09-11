@@ -26,7 +26,7 @@ Primary name: **رَكيز المعلم**. RAKEEZ X is a restrained digital sign
 
 Model 3 retains the ivory tile, four green workspace modules and central Arabic name.
 T3 hierarchy is retained: stronger/larger رَكيز, lighter المعلم, and a quiet X.
-The favicon and monochrome derivative retain the central workspace and four modules without unreadable text.
+The current favicon is wordmark-first on an ivory tile, without modules or X: ركيز المعلم at 24/32px and above, ركيز only at 16px. The browser title supplies the complete name. The monochrome derivative uses the complete wordmark without a tile. The full Model 3 installed-app assets are unchanged by the mobile refinement.
 
 ## Typography and distribution
 
@@ -98,3 +98,45 @@ Installed OS shortcut labels/icons can remain cached until the browser refreshes
 - Local test screenshots and PDF outputs remain ignored under `test-results/`.
 - Browser console/runtime errors in completed checks: none. Playwright prints only its environment-level NO_COLOR/FORCE_COLOR warning.
 - Native OS PWA install/update is not claimed as verified. Existing browser install guidance and the new manifest/assets are verified.
+
+## BRAND-MOBILE-UX-REFINEMENT-01 — local refinement, 2026-09-11
+
+Workspace: `D:\Abdullah Projects\RakeezX-Work-Active`. Existing candidate preserved on local `main`, HEAD `cf637d176642b6106d9b0df6ffe2827307e96db2`. The supplied Production baseline `d1657568da23906a633bca0a8b02517b4b2de5ef` is not present in the local Git object database. This refinement does not claim alignment with that baseline; no fetch/reset/merge was performed.
+
+Changes in this ticket only:
+
+- Keyboard-only skip-link presentation; activation transfers focus to main without altering the hash route. Pointer usage leaves it visually clipped.
+- Wordmark-only ivory favicon: complete name at 24/32px+, first word at 16px. Full installed/PWA artwork preserved. Cache revision changed through the existing shell update mechanism only.
+- Home mobile header uses the full Model 3 asset and quiet digital signature; Teacher Center receives a restrained labeled entry. Greeting spacing, install treatment and shortcuts are tighter.
+- Mobile Schedule has calmer summary/actions and six equal-width, fully visible day choices; counts remain in content and desktop. No schedule/export logic changes.
+- Mobile Calendar has a quieter settings action, bidi-isolated academic-year labels and a compact three-metric progress surface. Timeline text uses contrast-safe semantic tokens in both themes, including desktop.
+
+Files edited by this refinement (other working-tree brand edits predate it):
+
+- `src/app.js`
+- `src/styles/app.css`
+- `src/styles/components.css`
+- `src/views/calendar.js`
+- `index.html`
+- `sw.js`
+- `scripts/build-brand-assets.mjs`
+- `assets/favicon.svg`
+- `assets/favicon-16.png`
+- `assets/favicon-32.png`
+- `assets/brand-monochrome.svg`
+- `tests/brand-identity.e2e.mjs`
+- `tests/brand-mobile-ux.e2e.mjs`
+- `docs/RAKEEZ_BRAND_IMPLEMENTATION.md`
+
+Focused evidence:
+
+- 18 Node assertions passed across Home/PWA, Calendar, mobile Schedule default-day and Schedule export-engine tests. `--test-force-exit` lets the focused runner exit after completion despite existing retained handles; no tests cancelled or skipped.
+- Five Playwright checks passed: full brand regression, manifest/assets, native-size favicon comparison, daily surfaces, and skip-link standalone/reduced-motion behavior.
+- Daily surface matrix: 320 / 390 / 412 / 1280, both themes, RTL, no horizontal overflow. Real Teacher Center entry, all six mobile day selections, export dialog and Calendar settings controls exercised. Desktop weekly grid retained.
+- Scoped accessibility audits passed for Home header/greeting/install, Schedule header/summary/day choices, Calendar header/progress; brand regression also covers login and About through 1440px.
+- Skip link: hidden by default; keyboard Tab reveals it; Enter focuses main and preserves the Calendar URL; pointer interaction hides it. Standalone display mode and reduced motion were simulated. Native OS installed-app chrome/install update has not been tested.
+- Browser console/page errors: none. Vite build ran once and passed. `git diff --check` passed. Generated review images are ignored under `test-results/brand-mobile-ux` and `test-results/brand-implementation`.
+- No supplied screenshots accompanied this ticket, so the existing reachable UI and current rules were the visual review basis.
+
+Local: http://localhost:5174/ · LAN: http://192.168.3.19:5174/
+Candidate remains uncommitted; no push, deployment or Production writes.

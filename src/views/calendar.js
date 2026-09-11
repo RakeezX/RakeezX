@@ -827,9 +827,7 @@ export default {
               ${icon('calendar')}
               <span>التقويم المعتمد</span>
             </span>
-            <span class="t-3 fs-xs fw-7">${year?.label ?? '1448–1449 هـ'}</span>
-            <span class="t-3 fs-xs">·</span>
-            <span class="t-3 fs-xs">${preset?.gregorianLabel ?? '2026–2027 م'}</span>
+            <span class="cal-year-label t-3 fs-xs"><bdi class="fw-7">${year?.label ?? '1448–1449 هـ'}</bdi> · <bdi>${preset?.gregorianLabel ?? '2026–2027 م'}</bdi></span>
           </div>
 
           <h1 class="cal-hero-strip__title">
@@ -891,7 +889,7 @@ export default {
             </div>
             <div class="cal-progress-bounds">
               <span>${currentTerm?.startDate ? fmtDate(currentTerm.startDate, false) : ''}</span>
-              <span class="fw-7" style="color: var(--brand);">أنت هنا · ${fmtDate(today, false)}</span>
+              <span class="fw-7 cal-progress-now">أنت هنا · ${fmtDate(today, false)}</span>
               <span>${currentTerm?.endDate ? fmtDate(currentTerm.endDate, false) : ''}</span>
             </div>
           </div>

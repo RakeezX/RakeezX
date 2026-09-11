@@ -84,6 +84,15 @@ export function shortClassLabel(sec) {
   return shortGrade ? `${shortGrade}/${secName}` : secName;
 }
 
+/** صياغة عربية موجزة لعدد الحصص الأسبوعية دون تغيير القيمة المشتقة من الجدول. */
+export function weeklySessionsLabel(value) {
+  const count = Number(value) || 0;
+  if (count === 1) return "حصة واحدة أسبوعيًا";
+  if (count === 2) return "حصتان أسبوعيًا";
+  if (count >= 3 && count <= 10) return `${count} حصص أسبوعيًا`;
+  return `${count} حصة أسبوعيًا`;
+}
+
 // A selection is kept only for the current visit. The first mobile view follows
 // the actual school day: today when it is teachable, otherwise the weekly view.
 let activeMobileDay = null;
@@ -402,6 +411,8 @@ export default {
     const maxPeriod = periodsList.length ? Math.max(...periodsList) : 7;
     const allPeriods = Array.from({ length: maxPeriod }, (_, i) => i + 1);
 
+    const weeklySessionsText = weeklySessionsLabel(slots.length);
+
     return html`
       <!-- ترويسة الجدول الأسبوعي: عنوان وزر تعديل أوقات الحصص فقط -->
       <div class="schedule-head">
@@ -427,10 +438,10 @@ export default {
               <div class="schedule-summary-bar__stats">
                 <span class="schedule-summary-bar__item">
                   ${icon("timetable")}
-                  <span>إجمالي الحصص: <strong>${slots.length} حصة</strong> أسبوعيًا</span>
+                  <span>إجمالي الحصص: <strong>${weeklySessionsText}</strong></span>
                 </span>
                 <span class="schedule-summary-bar__sep" aria-hidden="true">·</span>
-                <span class="schedule-summary-bar__item">
+                <span class="schedule-summary-bar__item schedule-summary-bar__classes">
                   ${icon("classes")}
                   <span>الفصول المجدولة: <strong>${list.length} فصول</strong></span>
                 </span>

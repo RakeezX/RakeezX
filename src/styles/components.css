@@ -5849,3 +5849,84 @@
     padding: 3px !important;
   }
 }
+
+/* BRAND-MOBILE-UX-REFINEMENT-01: presentation only, scoped to daily mobile surfaces. */
+@media screen {
+  .calendar-management-page .cal-progress-bounds { color: var(--text-2); }
+  .calendar-management-page .cal-progress-bounds .cal-progress-now { color: var(--brand-text); }
+  .timing-mobile-actions { display: none; }
+}
+@media screen and (max-width: 899px) {
+  .topbar--home { padding-block: 8px; padding-block-start: calc(8px + env(safe-area-inset-top)); }
+  .topbar--home .brand-lockup__icon--app { inline-size: 48px; block-size: 48px; }
+  .topbar--home .brand-lockup { gap: 7px; }
+  .topbar--home .brand-lockup__name strong { font-size: 19px; }
+  .topbar--home .brand-lockup__name > span { font-size: 17px; }
+  .topbar--home .brand-lockup__signature { font-size: 7px; letter-spacing: 1px; }
+  .topbar--home .topbar__sub { font-size: 10.5px; margin-top: 2px; }
+  .topbar--home .topbar__teacher-btn { position: relative; gap: 5px; padding: 6px 8px; background: var(--brand-soft); border-color: var(--brand-border); color: var(--brand-text); }
+  .topbar__teacher-label { max-inline-size: 36px; font-size: 11px; line-height: 1.3; text-align: start; }
+  .topbar--home .topbar__teacher-sync { position: absolute; inset-block-start: 4px; inset-inline-end: 4px; }
+}
+@media screen and (max-width: 768px) {
+  .page--home, .page--schedule { padding-block-start: 12px; }
+  .page--home .hero { margin-bottom: 12px; }
+  .page--home .hero__hello { font-size: 22px; }
+  .page--home .hero__date { font-size: 12px; margin-top: 2px; }
+  .page--home .compact-timing-pill { min-height: 32px; gap: 4px; padding: 2px 7px; font-size: 11.5px; font-weight: 650; }
+  .page--home .compact-timing-pill__icon svg { inline-size: 12px; block-size: 12px; }
+  .page--home .home-shortcuts { margin-block: 16px; }
+  .page--home .home-shortcuts .tile { min-height: 88px; gap: 4px; padding: 8px; }
+  .page--home .home-shortcuts .tile__sub { font-size: 12px; line-height: 1.45; }
+  .page--home .home-pwa-prompt { padding: 10px 12px; box-shadow: none; gap: 6px; }
+  .page--home .home-pwa-prompt__main { align-items: center; padding-inline-end: 34px; gap: 8px; }
+  .page--home .home-pwa-prompt__title { font-size: 12.5px; }
+  .page--home .home-pwa-prompt__desc { font-size: 12px; line-height: 1.5; }
+  .page--home .home-pwa-prompt__install { background: var(--brand-soft); border-color: var(--brand-border); color: var(--brand-text); box-shadow: none; }
+  .page--home .home-pwa-prompt__install:hover { background: color-mix(in srgb, var(--brand) 16%, var(--bg-elev)); }
+
+  .page--schedule .schedule-head { gap: 8px; }
+  .page--schedule .schedule-head__title-group { width: 100%; flex-wrap: wrap; }
+  .page--schedule .schedule-head__actions { display: grid; grid-template-columns: 1fr 1.3fr; gap: 8px; width: 100%; }
+  .page--schedule .schedule-head__actions .btn { min-width: 0; min-height: 44px; padding: 6px 8px; font-size: 12px; justify-content: center; }
+  .page--schedule .schedule-summary-bar { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; padding: 8px 10px; box-shadow: none; flex-wrap: nowrap; }
+  .page--schedule .schedule-summary-bar__stats { display: block; width: auto; min-width: 0; }
+  .page--schedule .schedule-summary-bar__item { gap: 5px; align-items: center; white-space: nowrap; font-size: clamp(10.5px,3vw,12px); line-height: 1.4; }
+  .page--schedule .schedule-summary-bar__item svg { inline-size: 15px; block-size: 15px; flex: none; margin-top: 0; }
+  .page--schedule .schedule-summary-bar__classes { display: none; }
+  .page--schedule .schedule-summary-bar__sep { display: none; }
+  .page--schedule .schedule-summary-bar .compact-timing-pill { min-height: 32px; gap: 4px; border-color: transparent; background: transparent; padding: 2px 0; font-size: clamp(10.5px,2.9vw,12px); font-weight: 650; }
+  .page--schedule .schedule-summary-bar .compact-timing-pill__icon svg { inline-size: 12px; block-size: 12px; }
+  .page--schedule .schedule-day-tabs { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 3px; padding: 4px 0 8px; overflow: visible; box-shadow: none; }
+  .page--schedule .schedule-day-tab { min-width: 0; min-height: 44px; padding: 4px 0; gap: 0; font-size: clamp(10.5px,2.9vw,12px); border-radius: var(--r-md); }
+  .page--schedule .schedule-day-tab .tabular, .page--schedule .schedule-day-tab .tab-dot { display: none; }
+  .page--schedule .schedule-day-tab.is-active { box-shadow: none; }
+  .page--schedule .slot { padding: 9px; gap: 8px; box-shadow: none; }
+  .page--schedule .week.has-day-filter .week__day { padding: 10px; }
+
+  .calendar-management-page .cal-hero-strip { gap: 10px; padding: 12px; }
+  .calendar-management-page .cal-hero-strip__identity { gap: 3px; }
+  .calendar-management-page .cal-hero-strip__meta-line { gap: 5px 8px; }
+  .calendar-management-page .cal-year-label { font-size: 11px; white-space: nowrap; }
+  .calendar-management-page .cal-hero-strip__title { font-size: 17px; margin-block: 4px 2px; line-height: 1.45; }
+  .calendar-management-page .cal-hero-strip__subtitle { font-size: 12px; }
+  .calendar-management-page .cal-hero-strip__actions .btn { min-height: 44px; background: var(--bg-sunk); border-color: var(--border); color: var(--info); font-size: 13px; box-shadow: none; }
+  .calendar-management-page .cal-hero-strip__actions .btn:hover { background: var(--info-soft); }
+  .calendar-management-page .cal-card__head { gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+  .calendar-management-page .cal-card__title { font-size: 18px; margin-block: 4px 8px; }
+  .calendar-management-page .cal-progress-box { padding: 4px 2px; margin-block: 4px 8px; background: transparent; border: 0; }
+  .calendar-management-page .cal-progress-track { height: 6px; margin-block: 8px; }
+  .calendar-management-page .cal-progress-bounds { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; font-size: 11px; }
+  .calendar-management-page .cal-progress-bounds > span:nth-child(2) { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+  .calendar-management-page .cal-progress-bounds > span:last-child { text-align: end; }
+  .calendar-management-page .cal-metrics-row { grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: 2px; }
+  .calendar-management-page .cal-metric, .calendar-management-page .cal-metric:last-child { grid-column: auto; padding: 8px 3px; }
+  .calendar-management-page .cal-metric__label { font-size: 10.5px; line-height: 1.4; }
+  .calendar-management-page .cal-metric__val { font-size: 14px; line-height: 1.5; }
+}
+
+@media screen and (max-width: 899px) {
+  .timing-new-profile-action--header { display: none; }
+  .timing-mobile-actions { display: flex; justify-content: flex-start; margin-block-end: var(--sp-3); }
+  .timing-mobile-actions .btn { min-height: 44px; }
+}

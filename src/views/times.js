@@ -1356,7 +1356,7 @@ export default {
   back: () => '#/schedule',
 
   topActions: () => html`
-    <button class="btn btn--sm btn--primary" data-act="add-profile">
+    <button class="btn btn--sm btn--primary timing-new-profile-action--header" data-act="add-profile">
       ${icon('plus')} ملف توقيت جديد
     </button>
   `,
@@ -1367,6 +1367,9 @@ export default {
 
     if (!profiles.length) {
       return html`
+        <div class="timing-mobile-actions">
+          <button class="btn btn--primary" data-act="add-profile">${icon('plus')} ملف توقيت جديد</button>
+        </div>
         <div class="empty">
           <div class="empty__icon">${icon('clock')}</div>
           <div class="empty__title">لا ملفات توقيت</div>
@@ -1383,6 +1386,9 @@ export default {
 
     return html`
       <div class="management-page timing-profiles-page">
+      <div class="timing-mobile-actions">
+        <button class="btn btn--primary" data-act="add-profile">${icon('plus')} ملف توقيت جديد</button>
+      </div>
       <!-- يعرض التوقيت المطبق، والتبديل القادم عند وجوده، والأساسي عند اختلافه. -->
       ${nextSwitch || currentResolved?.id !== active?.id ? html`
         <div class="seasonal-activation-bar" role="status">

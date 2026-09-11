@@ -258,7 +258,7 @@ function shell(path, params) {
   const showConnectionState = syncInfo.status === 'offline' || syncInfo.status === 'error';
 
   return html`
-    <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
+    <a class="skip-link" href="#main" data-act="skip-to-content">انتقل إلى المحتوى</a>
     <div class="layout">
       <nav class="sidebar" aria-label="التنقل الرئيسي">
         <div class="sidebar__brand">${brandLockup({ signature: true, appIcon: true })}</div>
@@ -297,15 +297,16 @@ function topbar(v, params) {
   const syncInfo = getSyncState();
 
   return html`
-    <header class="topbar">
+    <header class="topbar ${currentPath() === '/' ? 'topbar--home' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
-        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup()}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
+        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup({ appIcon: true, signature: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
         <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
           <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
+          ${currentPath() === '/' ? html`<span class="topbar__teacher-label" aria-hidden="true">مركز المعلم</span>` : ''}
           <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
         </button>
       </div>
@@ -402,7 +403,7 @@ function paint() {
     render(
       mainEl,
       html`${topbar(view, ctx.params)}
-        <div class="page ${view.wide ? 'page--wide' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
+        <div class="page ${view.wide ? 'page--wide' : ''} ${currentPath() === '/' ? 'page--home' : currentPath() === '/schedule' ? 'page--schedule' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
     );
   } catch (err) {
     console.error('[rakeezx] فشل رسم الشاشة', err);
@@ -604,6 +605,10 @@ function openMiniHubLoginSheet() {
 
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
+  'skip-to-content': (_el, event) => {
+    event.preventDefault();
+    document.getElementById('main')?.focus();
+  },
   'app-back': (el, event) => {
     event.preventDefault();
     backWithinApp(el.dataset.backFallback || el.getAttribute('href'));

@@ -38,11 +38,13 @@ try {
   // Full-bleed ivory and all artwork inside the central mask-safe circle.
   await screenshot(wrap(`<rect width="1024" height="1024" fill="#F8FBF8"/><g transform="translate(154 154) scale(.7)">${artwork}</g>`), 512, asset('icon-maskable.png'));
   }
-  // Four substantial modules frame one open workspace. No tiny text or central dot.
-  // Integer-aligned geometry retains an open center and clear gaps at 16px.
-  const module = '<path d="M16 8h12v12h-8v8H8V16a8 8 0 0 1 8-8Z"/>';
-  const small = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#F8FBF8"/><g fill="#0F5132">${[0,90,180,270].map(angle => `<g transform="rotate(${angle} 32 32)">${module}</g>`).join('')}</g></svg>`;
+  // Complete wordmark graphics from the installed safe font, never a font file.
+  // At 16px the first word leads; the browser title supplies the full brand name.
+  const wordmark = async (micro = false, fill = '#0F5132') => (await screenshot(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g fill="${fill}" font-family="Segoe UI, Tahoma, Arial, sans-serif" text-anchor="middle" direction="rtl">${micro ? '<text x="128" y="154" font-size="145" font-weight="700">ركيز</text>' : '<text x="128" y="103" font-size="105" font-weight="700">ركيز</text><text x="128" y="208" font-size="91" font-weight="600">المعلم</text>'}</g></svg>`, 256)).toString('base64');
+  const full = await wordmark();
+  const micro = await wordmark(true);
+  const small = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="رَكيز المعلم"><style>.micro{display:none}@media(max-width:20px){.full{display:none}.micro{display:block}}</style><rect width="64" height="64" rx="13" fill="#F8FBF8"/><image class="full" width="64" height="64" href="data:image/png;base64,${full}"/><image class="micro" width="64" height="64" href="data:image/png;base64,${micro}"/></svg>`;
   await writeFile(asset('favicon.svg'), small + '\n');
   for (const size of [16,32]) await screenshot(small, size, asset(`favicon-${size}.png`));
-  await writeFile(asset('brand-monochrome.svg'), small.replace(/<rect width="64"[^>]*\/>/, '').replaceAll('#198754', 'currentColor').replaceAll('#0F5132', 'currentColor') + '\n');
+  await writeFile(asset('brand-monochrome.svg'), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="رَكيز المعلم"><image width="64" height="64" href="data:image/png;base64,${await wordmark(false, '#000000')}"/></svg>\n`);
 } finally { await browser.close(); }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultMobileScheduleDay } from '../src/views/schedule.js';
+import { defaultMobileScheduleDay, weeklySessionsLabel } from '../src/views/schedule.js';
 
 test('Schedule defaults to Today only on a teachable school day', () => {
   assert.equal(defaultMobileScheduleDay({ today: 0 }), '0');
@@ -8,4 +8,12 @@ test('Schedule defaults to Today only on a teachable school day', () => {
   assert.equal(defaultMobileScheduleDay({ today: 5 }), 'all');
   assert.equal(defaultMobileScheduleDay({ today: 6 }), 'all');
   assert.equal(defaultMobileScheduleDay({ today: 2, calendarKind: 'holiday' }), 'all');
+});
+
+test('Schedule uses natural Arabic weekly-session wording', () => {
+  assert.equal(weeklySessionsLabel(1), 'حصة واحدة أسبوعيًا');
+  assert.equal(weeklySessionsLabel(2), 'حصتان أسبوعيًا');
+  assert.equal(weeklySessionsLabel(3), '3 حصص أسبوعيًا');
+  assert.equal(weeklySessionsLabel(10), '10 حصص أسبوعيًا');
+  assert.equal(weeklySessionsLabel(11), '11 حصة أسبوعيًا');
 });

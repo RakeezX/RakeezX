@@ -190,11 +190,6 @@ function renderTodayFocus(focus) {
 
 export default {
   title: () => 'الرئيسية',
-  subtitle: () => {
-    const y = store.activeYear();
-    const t = store.activeTerm();
-    return [t?.name, y?.label].filter(Boolean).join(' · ');
-  },
 
   render() {
     const today = todayISO();

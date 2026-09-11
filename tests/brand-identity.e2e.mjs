@@ -76,7 +76,7 @@ test('manifest and brand artwork keep internal identity and required icon sizes'
   expect(manifest.id).toBe('rakeezx');
   expect(manifest.start_url).toBe('./');
   await page.goto('/');
-  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute('href', 'assets/favicon.svg?v=12');
+  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute('href', 'assets/favicon.svg?v=13');
   for (const [file, size] of [['icon-180.png',180],['icon-192.png',192],['icon-512.png',512],['icon-maskable.png',512],['favicon-16.png',16],['favicon-32.png',32]]) {
     expect(await page.evaluate(async ({ file }) => {
       const image = new Image(); image.src = `/assets/${file}`; await image.decode(); return [image.naturalWidth, image.naturalHeight];
@@ -89,7 +89,7 @@ test('tiny derivative stays legible at native sizes and browser favicon URLs res
   const links = await page.locator('link[rel="icon"]').evaluateAll(nodes => nodes.map(node => node.href));
   for (const url of links) expect((await request.get(url)).ok()).toBe(true);
   const root = new URL(page.url()).origin;
-  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونات المصغرة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2>${[16,24,32,48].map(size=>`<div class="sample"><img src="${root}/assets/favicon.svg?v=12" width="${size}" height="${size}" alt="رمز مساحة العمل"><span>${size}px</span></div>`).join('')}<img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
+  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونات المصغرة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2>${[16,24,32,48].map(size=>`<div class="sample"><img src="${root}/assets/favicon.svg?v=13" width="${size}" height="${size}" alt="العلامة الكتابية المصغرة"><span>${size}px</span></div>`).join('')}<img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
   await page.setViewportSize({ width: 820, height: 400 });
   await page.locator('img').evaluateAll(nodes => Promise.all(nodes.map(node => node.decode())));
   await page.screenshot({ path: 'test-results/brand-implementation/tiny-native-size.png' });

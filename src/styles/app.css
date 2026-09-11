@@ -292,10 +292,16 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   color: var(--action-primary-ink);
   font-weight: var(--fw-bold);
   text-decoration: none;
-  transform: translateY(-160%);
-  transition: transform var(--motion-fast) var(--ease);
 }
-.skip-link:focus { transform: none; }
+.skip-link:not(:focus-visible) {
+  clip-path: inset(50%);
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.skip-link:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
 /* الأرقام تبقى لاتينية ومحاذاة أفقيًا لسهولة قراءة الدرجات */
 .num, input[type="number"], .tabular {
