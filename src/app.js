@@ -6,7 +6,7 @@ import { html, render, icon, delegate, toast, openSheet, closeSheet } from './li
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
-import { match, currentPath, onNavigate, go } from './router.js';
+import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
 
@@ -297,7 +297,7 @@ function topbar(v, params) {
 
   return html`
     <header class="topbar">
-      ${backHref ? html`<a class="iconbtn" href="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
+      ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
         ${title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
@@ -602,6 +602,10 @@ function openMiniHubLoginSheet() {
 
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
+  'app-back': (el, event) => {
+    event.preventDefault();
+    backWithinApp(el.dataset.backFallback || el.getAttribute('href'));
+  },
   'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
   'mini-hub-login': () => {
     return openMiniHubLoginSheet();

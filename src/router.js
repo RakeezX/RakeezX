@@ -46,6 +46,11 @@ const compile = (path) => {
 
 const COMPILED = ROUTES.map((r) => ({ ...r, ...compile(r.path) }));
 
+const NAVIGATION_STATE_KEY = '__rakeezNavigation';
+let activeNavigation = null;
+let pendingReplacement = null;
+let navigationSequence = 0;
+
 export function currentPath() {
   const h = location.hash.replace(/^#/, '');
   return h || '/';
@@ -66,16 +71,84 @@ export function match(path = currentPath()) {
   return null;
 }
 
+const navigationState = () => history.state?.[NAVIGATION_STATE_KEY] ?? null;
+const validAppPath = (path) => typeof path === 'string' && path.startsWith('/') && !!match(path);
+
+function replaceNavigationState(value) {
+  const state = history.state && typeof history.state === 'object' ? history.state : {};
+  history.replaceState({ ...state, [NAVIGATION_STATE_KEY]: value }, '');
+}
+
+function navigationEntry(path, previous = null) {
+  navigationSequence += 1;
+  return {
+    id: `${Date.now().toString(36)}-${navigationSequence}`,
+    path,
+    previous: validAppPath(previous) && previous !== path ? previous : null,
+  };
+}
+
+/**
+ * Associates each same-tab RAKEEZ history entry with its actual in-app parent.
+ * Browser Back/Forward keeps its native session-history behavior; this metadata
+ * is used only by explicit Back controls rendered inside RAKEEZ.
+ */
+export function syncNavigationContext() {
+  const path = currentPath();
+  const stored = navigationState();
+
+  if (stored?.path === path && validAppPath(path)) {
+    activeNavigation = stored;
+    pendingReplacement = null;
+    return stored;
+  }
+
+  const previous = pendingReplacement
+    ? pendingReplacement.previous
+    : activeNavigation?.path;
+  const entry = navigationEntry(path, previous);
+  replaceNavigationState(entry);
+  activeNavigation = entry;
+  pendingReplacement = null;
+  return entry;
+}
+
 export const go = (path, { replace = false } = {}) => {
   const target = '#' + path;
   if (location.hash === target) return;
-  if (replace) location.replace(target);
+  if (replace) {
+    const current = navigationState();
+    pendingReplacement = { previous: current?.previous ?? activeNavigation?.previous ?? null };
+    location.replace(target);
+  }
   else location.hash = target;
 };
 
 export const back = () => history.back();
 
+/** Prefer a verified same-tab RAKEEZ predecessor; otherwise replace with the logical parent. */
+export function backWithinApp(fallback) {
+  syncNavigationContext();
+  const previous = activeNavigation?.previous;
+  if (validAppPath(previous) && previous !== currentPath()) {
+    history.back();
+    return 'history';
+  }
+
+  const fallbackPath = String(fallback ?? '').replace(/^#/, '');
+  if (validAppPath(fallbackPath) && fallbackPath !== currentPath()) {
+    go(fallbackPath, { replace: true });
+    return 'fallback';
+  }
+  return 'none';
+}
+
 export function onNavigate(fn) {
-  addEventListener('hashchange', fn);
-  return () => removeEventListener('hashchange', fn);
+  syncNavigationContext();
+  const handler = (...args) => {
+    syncNavigationContext();
+    fn(...args);
+  };
+  addEventListener('hashchange', handler);
+  return () => removeEventListener('hashchange', handler);
 }

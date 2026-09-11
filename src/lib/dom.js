@@ -345,9 +345,9 @@ export function timingProfileIcon(name = '') {
   return 'sliders';
 }
 
-/** رابط رجوع صريح إلى الشاشة الأم، مستقل عن سجل المتصفح. */
+/** رابط رجوع يحافظ على سياق ركيز السابق، مع الشاشة الأم كوجهة آمنة للرابط المباشر. */
 export const parentLink = (label, parentRoute) =>
-  html`<a class="btn btn--quiet mt-3" href="#${parentRoute}">${icon('back')} ${label}</a>`;
+  html`<a class="btn btn--quiet mt-3" href="#${parentRoute}" data-act="app-back" data-back-fallback="#${parentRoute}">${icon('back')} ${label}</a>`;
 
 /* ---------- تنسيق ---------- */
 /** يعرض رقمًا بلا كسور زائدة: 8.50 → 8.5 · 8.00 → 8 */
