@@ -94,6 +94,7 @@ test('backup UI restores representative TEST data into a clean context without l
 
   const fileInput = restored.locator('#restore-file');
   await fileInput.setInputFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
+  await expect(restored.getByText('تمت قراءة الملف والتحقق من سلامة محتواه', { exact: false })).toBeVisible();
   await expect(restored.locator('[data-pick="replace"]')).toBeVisible();
   await restored.locator('[data-pick="replace"]').click();
   await expect(restored.locator('[data-confirm]')).toBeVisible();

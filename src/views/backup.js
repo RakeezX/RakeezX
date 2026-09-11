@@ -2,7 +2,7 @@
 import { html, icon, toast, confirmSheet, openSheet, fmtDateFull, parentLink } from '../lib/dom.js';
 import * as store from '../store.js';
 import * as db from '../lib/db.js';
-import { downloadBackup, restoreBackup, readJSONFile } from '../lib/export.js';
+import { downloadBackup, restoreBackup, readJSONFile, validateBackupIntegrity } from '../lib/export.js';
 import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
@@ -107,10 +107,17 @@ export default {
       const file = el.files?.[0]; el.value = ''; if (!file) return;
       let payload;
       try { payload = await readJSONFile(file); } catch (err) { toast(err.message, 'danger'); return; }
-      const counts = payload?.data ? Object.entries(payload.data).filter(([, value]) => Array.isArray(value)).reduce((sum, [, records]) => sum + records.length, 0) : 0;
+      let validation;
+      try { validation = await validateBackupIntegrity(payload); }
+      catch (err) { console.error(err); toast('تعذّر التحقق من النسخة الاحتياطية', 'danger'); return; }
+      if (!validation.ok) { toast(validation.errors.join('\n'), 'danger'); return; }
+      const counts = validation.total;
+      const validationSummary = validation.integrity === 'verified'
+        ? 'تمت قراءة الملف والتحقق من سلامة محتواه'
+        : 'تمت قراءة الملف واجتاز التحقق البنيوي لإصدار V3';
       const mode = await openSheet({
         title: 'استعادة نسخة على هذا الجهاز',
-        desc: `تم فحص الملف: ${counts} سجلًا، صُدّر في ${backupExportDate(payload?.exportedAt) || 'تاريخ غير معروف'}.`,
+        desc: `${validationSummary}: ${counts} سجلًا، صُدّر في ${backupExportDate(payload?.exportedAt) || 'تاريخ غير معروف'}.`,
         body: html`<div class="recovery-review-note">${icon('device')}<span><strong>هذه استعادة محلية</strong><small>سيُطبّق اختيارك على سجل ركيز في هذا الجهاز.</small></span></div><div class="stack stack-2 mt-3"><button class="radiocard radiocard--btn" data-pick="merge" autofocus><span class="radiocard__body"><span class="radiocard__title">دمج السجلات <span class="badge badge--brand">موصى به</span></span><span class="radiocard__hint">يبقي ما على الجهاز ويأخذ الأحدث لكل سجل.</span></span></button><button class="radiocard radiocard--btn recovery-replace-option" data-pick="replace"><span class="radiocard__body"><span class="radiocard__title">استبدال كامل</span><span class="radiocard__hint">يمسح ما على هذا الجهاز ويضع محتوى النسخة مكانه. سيُطلب تأكيد إضافي.</span></span></button></div>`,
         onMount: (root, done) => root.querySelectorAll('[data-pick]').forEach((button) => button.addEventListener('click', () => done(button.dataset.pick))),
       });

@@ -14,7 +14,8 @@ import {
   buildBackup, restoreBackup, sha256Hex, backupHashInput, validateBackup, validateBackupIntegrity,
 } from '../src/lib/export.js';
 import {
-  planCloudRestore, reconcileCanonicalRestore, restoreBackupToCloud,
+  getCloudRestoreResumeState, planCloudRestore, reconcileCanonicalRestore,
+  restoreBackupToCloud, resumeCloudRestore,
 } from '../src/lib/backup-v2.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 
@@ -155,6 +156,20 @@ test('invalid hash is rejected before any stage write and pending writes are gua
   assert.equal(await db.get('students', 'blocked'), undefined);
 });
 
+test('unsupported backup versions are rejected before cloud staging with a stable code', async () => {
+  let staged = 0;
+  const transport = { async stageSyncV2Restore() { staged++; } };
+  const coordinator = {
+    async assertCloudRestoreReady() { throw new Error('must not reach readiness'); },
+  };
+  for (const version of [2, 5]) {
+    const payload = { app: 'rakeezx', version, data: { students: [{ id: `student:v${version}`, name: 'نسخة' }] } };
+    await assert.rejects(restoreBackupToCloud(payload, { transport, coordinator }),
+      (error) => error.code === 'UNSUPPORTED_BACKUP_VERSION');
+  }
+  assert.equal(staged, 0);
+});
+
 test('canonical reconciliation is atomic and quarantines late outbox work so it cannot replay', async () => {
   const payload = { data: { units: [{ id: 'unit:a', name: 'محلي' }] } };
   await db.put('students', { id: 'old', name: 'قديم' });
@@ -168,4 +183,65 @@ test('canonical reconciliation is atomic and quarantines late outbox work so it 
   const device = await db.get('device', 'device');
   assert.equal(device.restoreQuarantinedOutbox[0].restoreId, 'restore:late');
   assert.equal(device.restoreQuarantinedOutbox[0].entries[0].id, 'pending');
+});
+
+test('a finalized restore resumes local reconciliation with the same identity and no duplicate server mutation', async () => {
+  const backup = await rehash({ app: 'rakeezx', version: 4, backupId: 'resume-backup', sourceOwnerId: OWNER, exportedAt: 'x',
+    data: {
+      students: [{ id: 'student:resume', name: 'مستعاد', note: '', status: 'active', deleted: false, updatedAt: 4 }],
+      units: [{ id: 'unit:resume', name: 'وحدة محلية' }],
+    },
+    baselines: { students: [{ id: 'student:resume', revision: 0, value: null }] } });
+  const canonical = canonicalPayload({ students: [{
+    id: 'student:resume', name: 'مستعاد', note: '', status: 'active', revision: 1,
+    field_revisions: { name: 1 }, deleted_at: null,
+  }] });
+  let finalized = false;
+  let stageCalls = 0;
+  let finalizeCalls = 0;
+  let serverMutations = 0;
+  const transport = {
+    async stageSyncV2Restore(envelope) {
+      stageCalls++;
+      return { backupHash: envelope.backupHash, stageHash: 'resume-stage-hash' };
+    },
+    async finalizeSyncV2Restore(envelope) {
+      finalizeCalls++;
+      assert.equal(envelope.restoreId, 'restore:resume');
+      if (!finalized) { finalized = true; serverMutations++; }
+      return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical };
+    },
+  };
+  const coordinator = {
+    async assertCloudRestoreReady() {},
+    async runCloudRestoreExclusive(task) { return task(); },
+  };
+
+  await assert.rejects(restoreBackupToCloud(backup, {
+    restoreId: 'restore:resume', transport, coordinator, sourceFetcher: async () => emptyServer(),
+    reconciler: async () => { throw new Error('TEST local quota failure'); },
+  }), (error) => error.code === 'LOCAL_RECONCILIATION_REQUIRED' && error.restore.restoreId === 'restore:resume');
+
+  assert.deepEqual(await getCloudRestoreResumeState(), {
+    restoreId: 'restore:resume', backupHash: backup.backupHash, backupVersion: 4,
+    stageHash: 'resume-stage-hash', state: 'finalized',
+    receipt: { restoreId: 'restore:resume', status: 'finalized' },
+    stagedAt: (await getCloudRestoreResumeState()).stagedAt,
+    finalizedAt: (await getCloudRestoreResumeState()).finalizedAt,
+  });
+  await assert.rejects(restoreBackupToCloud(backup, {
+    restoreId: 'restore:new', transport, coordinator, sourceFetcher: async () => emptyServer(),
+  }), (error) => error.code === 'CLOUD_RESTORE_RESUME_REQUIRED');
+
+  const resumed = await resumeCloudRestore({
+    transport, coordinator, canonicalFetcher: async () => canonical,
+  });
+  assert.equal(resumed.restoreId, 'restore:resume');
+  assert.equal(resumed.resumed, true);
+  assert.equal(stageCalls, 1);
+  assert.equal(finalizeCalls, 2);
+  assert.equal(serverMutations, 1);
+  assert.equal((await db.get('students', 'student:resume')).name, 'مستعاد');
+  assert.equal((await db.get('units', 'unit:resume')).name, 'وحدة محلية');
+  assert.equal(await getCloudRestoreResumeState(), null);
 });

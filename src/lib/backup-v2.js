@@ -22,6 +22,7 @@ const RESTORE_STORE_ORDER = Object.freeze([
 ]);
 const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>
   !SYNC_V2_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
+const RESTORE_RESUME_VERSION = 1;
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);
 const clone = (value) => value == null ? value : structuredClone(value);
 const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right);
@@ -167,9 +168,19 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
 }
 
 export async function fetchCanonicalRestoreSource() {
-  const pairs = await Promise.all(SYNC_V2_STORES.map(async (storeName) => {
-    const rows = await cloud.fetchRecords(SYNC_V2_SCHEMAS[storeName].entity);
+  const canonical = await fetchCanonicalRestoreSnapshot();
+  const pairs = SYNC_V2_STORES.map((storeName) => {
+    const rows = canonical[SYNC_V2_SCHEMAS[storeName].entity];
     return [storeName, rows.map((row) => decodeSyncV2Canonical(storeName, row)).filter(Boolean)];
+  });
+  return Object.fromEntries(pairs);
+}
+
+/** Fetch the complete current owner snapshot in the shape local reconciliation consumes. */
+export async function fetchCanonicalRestoreSnapshot() {
+  const pairs = await Promise.all(SYNC_V2_STORES.map(async (storeName) => {
+    const entity = SYNC_V2_SCHEMAS[storeName].entity;
+    return [entity, await cloud.fetchRecords(entity)];
   }));
   return Object.fromEntries(pairs);
 }
@@ -217,6 +228,125 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
   await store.refreshSyncedState();
 }
 
+function resumeLocalData(payload) {
+  return Object.fromEntries(LOCAL_ONLY_STORES
+    .filter((name) => Array.isArray(payload.data?.[name]))
+    .map((name) => [name, clone(payload.data[name])]));
+}
+
+async function updateResumeCheckpoint(update) {
+  let saved = null;
+  await db.applyBatch({ device: {} }, {
+    prepare(current) {
+      const device = current.device.find((row) => row.id === 'device') ?? { id: 'device' };
+      const next = update(clone(device.cloudRestoreResume ?? null));
+      const replacement = { ...device };
+      if (next) replacement.cloudRestoreResume = clone(next);
+      else delete replacement.cloudRestoreResume;
+      saved = clone(next);
+      return { device: { remove: [], put: [replacement] } };
+    },
+  });
+  return saved;
+}
+
+function validateResumeCheckpoint(checkpoint) {
+  const valid = checkpoint?.version === RESTORE_RESUME_VERSION &&
+    typeof checkpoint.restoreId === 'string' && checkpoint.restoreId &&
+    typeof checkpoint.backupHash === 'string' && checkpoint.backupHash &&
+    typeof checkpoint.stageHash === 'string' && checkpoint.stageHash &&
+    ['staged', 'finalized'].includes(checkpoint.state) &&
+    checkpoint.localData && typeof checkpoint.localData === 'object' && !Array.isArray(checkpoint.localData);
+  if (!valid) throw Object.assign(new Error('Stored cloud restore resume state is invalid'), {
+    code: 'INVALID_RESTORE_RESUME_STATE',
+  });
+  return checkpoint;
+}
+
+async function resumeCheckpoint() {
+  const device = await db.get('device', 'device');
+  return device?.cloudRestoreResume ? validateResumeCheckpoint(clone(device.cloudRestoreResume)) : null;
+}
+
+/** Metadata-only state for a future UI. Local payload content remains internal. */
+export async function getCloudRestoreResumeState() {
+  const checkpoint = await resumeCheckpoint();
+  if (!checkpoint) return null;
+  return {
+    restoreId: checkpoint.restoreId,
+    backupHash: checkpoint.backupHash,
+    backupVersion: checkpoint.backupVersion,
+    stageHash: checkpoint.stageHash,
+    state: checkpoint.state,
+    receipt: clone(checkpoint.receipt ?? null),
+    stagedAt: checkpoint.stagedAt ?? null,
+    finalizedAt: checkpoint.finalizedAt ?? null,
+  };
+}
+
+async function markFinalized(checkpoint, receipt) {
+  return updateResumeCheckpoint((current) => {
+    if (!current || current.restoreId !== checkpoint.restoreId || current.stageHash !== checkpoint.stageHash) {
+      throw Object.assign(new Error('Cloud restore resume identity changed'), { code: 'RESTORE_RESUME_IDENTITY_MISMATCH' });
+    }
+    return { ...current, state: 'finalized', receipt: clone(receipt), finalizedAt: Date.now() };
+  });
+}
+
+async function clearResumeCheckpoint(checkpoint) {
+  await updateResumeCheckpoint((current) => {
+    if (!current) return null;
+    if (current.restoreId !== checkpoint.restoreId || current.stageHash !== checkpoint.stageHash) {
+      throw Object.assign(new Error('Cloud restore resume identity changed'), { code: 'RESTORE_RESUME_IDENTITY_MISMATCH' });
+    }
+    return null;
+  });
+}
+
+function reconciliationRequired(error, checkpoint) {
+  return Object.assign(new Error('Cloud restore finalized; local reconciliation must be resumed'), {
+    code: 'LOCAL_RECONCILIATION_REQUIRED',
+    cause: error,
+    restore: {
+      restoreId: checkpoint.restoreId,
+      backupHash: checkpoint.backupHash,
+      stageHash: checkpoint.stageHash,
+    },
+  });
+}
+
+/**
+ * Explicitly resume the exact staged/finalized restore. Finalize is receipt-idempotent;
+ * the fresh canonical fetch avoids replacing local state with an older receipt snapshot.
+ */
+export async function resumeCloudRestore({
+  transport = cloud,
+  coordinator = sync,
+  canonicalFetcher = fetchCanonicalRestoreSnapshot,
+  reconciler = reconcileCanonicalRestore,
+} = {}) {
+  const checkpoint = await resumeCheckpoint();
+  if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });
+  await coordinator.assertCloudRestoreReady();
+  return coordinator.runCloudRestoreExclusive(async () => {
+    const result = await transport.finalizeSyncV2Restore({
+      restoreId: checkpoint.restoreId,
+      backupHash: checkpoint.backupHash,
+      expectedStageHash: checkpoint.stageHash,
+    });
+    let finalized = checkpoint;
+    try {
+      finalized = await markFinalized(checkpoint, result.receipt);
+      const canonical = await canonicalFetcher();
+      await reconciler({ data: finalized.localData }, canonical, { restoreId: finalized.restoreId });
+      await clearResumeCheckpoint(finalized);
+    } catch (error) {
+      throw reconciliationRequired(error, finalized);
+    }
+    return { restoreId: finalized.restoreId, resumed: true, receipt: result.receipt };
+  });
+}
+
 /** Final cloud-aware restore. No UI calls this foundation yet. */
 export async function restoreBackupToCloud(payload, {
   restoreId = globalThis.crypto.randomUUID(),
@@ -226,7 +356,13 @@ export async function restoreBackupToCloud(payload, {
   reconciler = reconcileCanonicalRestore,
 } = {}) {
   const validation = await validateBackupIntegrity(payload);
-  if (!validation.ok) throw Object.assign(new Error(validation.errors.join('\n')), { code: 'INVALID_BACKUP' });
+  if (!validation.ok) throw Object.assign(new Error(validation.errors.join('\n')), { code: validation.code ?? 'INVALID_BACKUP' });
+  if (await resumeCheckpoint()) {
+    throw Object.assign(new Error('A prior cloud restore must be resumed before starting another'), {
+      code: 'CLOUD_RESTORE_RESUME_REQUIRED',
+      restore: await getCloudRestoreResumeState(),
+    });
+  }
   await coordinator.assertCloudRestoreReady();
   return coordinator.runCloudRestoreExclusive(async () => {
     const serverData = await sourceFetcher();
@@ -236,10 +372,26 @@ export async function restoreBackupToCloud(payload, {
       restoreId, backupHash: payload.backupHash ?? `legacy-v3:${restoreId}`,
       backupVersion: payload.version, sourceManifest: plan.sourceManifest, operations: plan.operations,
     });
+    let checkpoint = await updateResumeCheckpoint(() => ({
+      version: RESTORE_RESUME_VERSION,
+      restoreId,
+      backupHash: stage.backupHash,
+      backupVersion: payload.version,
+      stageHash: stage.stageHash,
+      state: 'staged',
+      localData: resumeLocalData(payload),
+      stagedAt: Date.now(),
+    }));
     const result = await transport.finalizeSyncV2Restore({
       restoreId, backupHash: stage.backupHash, expectedStageHash: stage.stageHash,
     });
-    await reconciler(payload, result.canonical, { restoreId });
+    try {
+      checkpoint = await markFinalized(checkpoint, result.receipt);
+      await reconciler(payload, result.canonical, { restoreId });
+      await clearResumeCheckpoint(checkpoint);
+    } catch (error) {
+      throw reconciliationRequired(error, checkpoint);
+    }
     return { restoreId, plan, receipt: result.receipt };
   });
 }

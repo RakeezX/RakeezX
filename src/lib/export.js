@@ -9,6 +9,7 @@ import { todayISO } from '../models.js';
 export const APP_ID = 'rakeezx';
 export const BACKUP_VERSION = 4;
 export const LEGACY_BACKUP_VERSION = 3;
+export const SUPPORTED_BACKUP_VERSIONS = Object.freeze([LEGACY_BACKUP_VERSION, BACKUP_VERSION]);
 
 /**
  * مخازن **لا تدخل النسخة الاحتياطية ولا تُستورد منها إطلاقًا**.
@@ -141,25 +142,30 @@ const MAX_ERRORS = 8;
 export function validateBackup(payload) {
   const errors = [];
   const counts = {};
-  const add = (msg) => {
+  let code = null;
+  const add = (msg, errorCode = 'INVALID_BACKUP') => {
     if (errors.length < MAX_ERRORS) errors.push(msg);
+    if (errorCode === 'UNSUPPORTED_BACKUP_VERSION') code = errorCode;
+    else code ??= errorCode;
   };
 
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-    return { ok: false, errors: ['الملف ليس نسخة احتياطية صالحة.'], counts, total: 0, legacy: false };
+    return { ok: false, code: 'INVALID_BACKUP', errors: ['الملف ليس نسخة احتياطية صالحة.'], counts, total: 0, legacy: false };
   }
 
   if (payload.app !== APP_ID) {
     add('هذا الملف ليس نسخة احتياطية من رَكيز المعلم.');
   }
-  if (!Number.isInteger(payload.version)) add('إصدار النسخة غير معروف.');
-  else if (payload.version > BACKUP_VERSION) {
-    add('النسخة أحدث من التطبيق. حدّث التطبيق أولًا.');
+  if (!Number.isInteger(payload.version)) add('إصدار النسخة غير معروف.', 'UNSUPPORTED_BACKUP_VERSION');
+  else if (!SUPPORTED_BACKUP_VERSIONS.includes(payload.version)) {
+    add(payload.version > BACKUP_VERSION
+      ? 'النسخة أحدث من التطبيق. حدّث التطبيق أولًا.'
+      : 'إصدار النسخة أقدم من الإصدارات المدعومة.', 'UNSUPPORTED_BACKUP_VERSION');
   }
 
   if (!payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data)) {
     add('الملف لا يحوي بيانات.');
-    return { ok: false, errors, counts, total: 0 };
+    return { ok: false, code: code ?? 'INVALID_BACKUP', errors, counts, total: 0 };
   }
 
   // المخازن المسموحة
@@ -246,7 +252,7 @@ export function validateBackup(payload) {
       }
     }
   }
-  return { ok: errors.length === 0, errors, counts, total };
+  return { ok: errors.length === 0, code: errors.length ? (code ?? 'INVALID_BACKUP') : null, errors, counts, total };
 }
 
 /** Full integrity verification for V4. V3 remains structurally readable. */
@@ -255,7 +261,7 @@ export async function validateBackupIntegrity(payload) {
   if (!structural.ok || payload.version < 4) return { ...structural, integrity: payload?.version === 3 ? 'legacy' : 'invalid' };
   const actualHash = await sha256Hex(backupHashInput(payload));
   if (actualHash !== payload.backupHash) {
-    return { ...structural, ok: false, integrity: 'invalid', errors: [...structural.errors, 'بصمة النسخة الاحتياطية لا تطابق محتواها.'] };
+    return { ...structural, ok: false, code: 'INVALID_BACKUP', integrity: 'invalid', errors: [...structural.errors, 'بصمة النسخة الاحتياطية لا تطابق محتواها.'] };
   }
   return { ...structural, integrity: 'verified' };
 }
@@ -276,6 +282,7 @@ export async function restoreBackup(payload, mode = 'merge') {
   if (!check.ok) {
     const err = new Error(check.errors.join('\n'));
     err.name = 'BackupValidationError';
+    err.code = check.code ?? 'INVALID_BACKUP';
     err.details = check;
     throw err;
   }

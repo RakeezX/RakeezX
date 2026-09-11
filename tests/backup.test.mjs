@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
-import { buildBackup, validateBackup, restoreBackup } from "../src/lib/export.js";
+import { buildBackup, validateBackup, validateBackupIntegrity, restoreBackup } from "../src/lib/export.js";
 
 test("Backup and Restore Suite", async (t) => {
   t.beforeEach(async () => {
@@ -78,6 +78,18 @@ test("Backup and Restore Suite", async (t) => {
     assert.ok(!validateBackup("not a json").ok);
     assert.ok(!validateBackup({ app: "wrong" }).ok); // invalid root
     assert.ok(!validateBackup({ app: "rakeezx", version: 9999 }).ok); // unsupported version
+
+    const belowSupported = { app: "rakeezx", version: 2, data: { students: [{ id: "old", name: "Old" }] } };
+    assert.equal(validateBackup(belowSupported).code, "UNSUPPORTED_BACKUP_VERSION");
+    await assert.rejects(restoreBackup(belowSupported), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
+
+    const future = { app: "rakeezx", version: 5, data: { students: [{ id: "future", name: "Future" }] } };
+    assert.equal(validateBackup(future).code, "UNSUPPORTED_BACKUP_VERSION");
+    await assert.rejects(restoreBackup(future), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
+
+    const parsed = JSON.parse(JSON.stringify(belowSupported));
+    assert.equal(typeof parsed, "object", "JSON parsing only establishes that the file was read");
+    assert.equal((await validateBackupIntegrity(parsed)).ok, false, "parsed content is not implicitly validated");
     
     const corruptedRecord = {
       app: "rakeezx", version: 3, data: { years: [{ no_id: "missing" }] }
