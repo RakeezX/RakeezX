@@ -447,6 +447,11 @@
   background-color: var(--brand-soft) !important;
   box-shadow: 0 0 0 2px var(--brand);
 }
+.group.is-drop-invalid {
+  border-color: var(--warn) !important;
+  background-color: var(--warn-soft) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warn) 70%, transparent);
+}
 .group__head {
   display: flex; align-items: center; gap: var(--sp-2);
   font-weight: 750; font-size: 15px;
@@ -510,6 +515,7 @@
   width: 14px;
   height: 14px;
 }
+.groups-touch-hint { display: none; }
 .group__target-btn {
   display: flex;
   align-items: center;
@@ -1180,6 +1186,68 @@
   min-height: 44px;
   color: var(--brand-text);
   border-color: var(--brand);
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .groups-touch-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    color: var(--text-2);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .groups-touch-hint svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+    color: var(--brand-text);
+  }
+
+  .group__member {
+    touch-action: pan-y;
+  }
+
+  .group__drag-handle {
+    width: 44px;
+    height: 44px;
+    margin-block: -6px;
+    margin-inline-end: -6px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-elev);
+    color: var(--text-2);
+    opacity: 1;
+    cursor: grab;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .group__drag-handle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .group__member.is-touch-dragging {
+    position: relative;
+    z-index: 3;
+    opacity: 0.78;
+    transform: scale(1.015);
+    border-color: var(--brand);
+    background: var(--bg-elev);
+    box-shadow: var(--shadow-2);
+    cursor: grabbing;
+  }
+
+  .groups-page.is-touch-drag-active,
+  .groups-page.is-touch-drag-active * {
+    user-select: none;
+  }
 }
 
 /* لوحة التميز */

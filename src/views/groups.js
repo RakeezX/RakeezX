@@ -224,6 +224,10 @@ export default {
 
       ${groups.length
         ? html`
+            <div class="groups-touch-hint noprint" role="note">
+              ${icon('grip')}
+              <span>اسحب الطالب من مقبض النقل، أو اضغط عليه ثم اختر المجموعة.</span>
+            </div>
             <div class="groups-grid" id="groups-container">
               ${visibleGroups.map(
                 (g, i) => html`
@@ -244,11 +248,12 @@ export default {
                              data-teaching-id="${cls.id}"
                              data-act="toggle-student"
                              aria-pressed="${selectedStudent?.id === s.id ? 'true' : 'false'}"
+                             aria-label="${s.name}، اسحب من المقبض أو اضغط لاختيار مجموعة"
                              ${readOnly ? 'disabled' : ''}
                              title="${readOnly ? 'الفصل مؤرشف للعرض فقط' : 'اسحب أو انقر لنقل الطالب'}">
                           <span class="rollno">${s.rollNo ?? '—'}</span>
                           <span class="group__member-name">${s.name}</span>
-                          <span class="group__drag-handle noprint">${icon('menu')}</span>
+                          <span class="group__drag-handle noprint" aria-hidden="true">${icon('grip')}</span>
                         </button>
                       `)}
                     </div>
@@ -266,6 +271,7 @@ export default {
                 `
               )}
             </div>
+            <div class="sr-only" data-groups-drag-status aria-live="polite"></div>
             <button class="btn btn--ghost btn--block mt-4" data-act="print">${icon('print')} اطبع التقسيم</button>
           `
         : ''}
@@ -284,12 +290,28 @@ export default {
   bindDragAndDrop(root, params) {
     if (store.isTeachingArchived(params?.id)) return;
     const container = root.querySelector('#groups-container');
-    if (!container) return;
+    if (!container || container.dataset.groupsDndBound === 'true') return;
+    container.dataset.groupsDndBound = 'true';
+
+    const page = container.closest('.groups-page');
+    const dragStatus = root.querySelector('[data-groups-drag-status]');
+
+    const clearDropStates = () => {
+      container.querySelectorAll('.group').forEach((group) => {
+        group.classList.remove('is-dragover', 'is-drop-invalid');
+        group.removeAttribute('data-drop-state');
+      });
+    };
 
     // Desktop Drag and Drop Event Listeners
     const members = container.querySelectorAll('.group__member');
     members.forEach((el) => {
       el.addEventListener('dragstart', (e) => {
+        // A native long-press drag must not compete with the Pointer Events path.
+        if (touchDrag) {
+          e.preventDefault();
+          return;
+        }
         isDragging = true;
         const studentId = el.dataset.studentId;
         const fromIdx = el.dataset.fromIdx;
@@ -310,7 +332,7 @@ export default {
           isDragging = false;
         }, 100);
         draggedData = null;
-        container.querySelectorAll('.group').forEach((g) => g.classList.remove('is-dragover'));
+        clearDropStates();
       });
     });
 
@@ -318,21 +340,25 @@ export default {
     groupCards.forEach((card) => {
       card.addEventListener('dragover', (e) => {
         e.preventDefault();
+        const isSameGroup = Number(card.dataset.groupIdx) === Number(draggedData?.fromIdx);
         try {
-          e.dataTransfer.dropEffect = 'move';
+          e.dataTransfer.dropEffect = isSameGroup ? 'none' : 'move';
         } catch {}
-        card.classList.add('is-dragover');
+        clearDropStates();
+        card.classList.add(isSameGroup ? 'is-drop-invalid' : 'is-dragover');
+        card.dataset.dropState = isSameGroup ? 'invalid' : 'valid';
       });
 
       card.addEventListener('dragleave', (e) => {
         if (!card.contains(e.relatedTarget)) {
-          card.classList.remove('is-dragover');
+          card.classList.remove('is-dragover', 'is-drop-invalid');
+          card.removeAttribute('data-drop-state');
         }
       });
 
       card.addEventListener('drop', (e) => {
         e.preventDefault();
-        card.classList.remove('is-dragover');
+        clearDropStates();
         let data = draggedData;
         if (!data) {
           try {
@@ -351,6 +377,139 @@ export default {
         }
         draggedData = null;
       });
+    });
+
+    // Touch/pen direct manipulation uses the dedicated handle so normal page
+    // scrolling remains available from the rest of each student row.
+    let touchDrag = null;
+    let autoScrollFrame = null;
+
+    const groupAtPoint = (x, y) => document.elementFromPoint(x, y)?.closest?.('.group');
+
+    const updateTouchTarget = (x, y) => {
+      if (!touchDrag) return;
+      touchDrag.lastX = x;
+      touchDrag.lastY = y;
+      clearDropStates();
+      const target = groupAtPoint(x, y);
+      touchDrag.toIdx = null;
+      if (!target || !container.contains(target)) {
+        if (dragStatus) dragStatus.textContent = 'حرّك الطالب فوق مجموعة لنقله.';
+        return;
+      }
+      const toIdx = Number(target.dataset.groupIdx);
+      if (toIdx === touchDrag.fromIdx) {
+        target.classList.add('is-drop-invalid');
+        target.dataset.dropState = 'invalid';
+        if (dragStatus) dragStatus.textContent = 'الطالب موجود في هذه المجموعة.';
+        return;
+      }
+      target.classList.add('is-dragover');
+      target.dataset.dropState = 'valid';
+      touchDrag.toIdx = toIdx;
+      if (dragStatus) dragStatus.textContent = `جاهز للنقل إلى المجموعة ${GROUP_NAMES[toIdx] ?? toIdx + 1}.`;
+    };
+
+    const stopAutoScroll = () => {
+      if (autoScrollFrame) cancelAnimationFrame(autoScrollFrame);
+      autoScrollFrame = null;
+    };
+
+    const runAutoScroll = () => {
+      if (!touchDrag || !touchDrag.scrollSpeed) {
+        autoScrollFrame = null;
+        return;
+      }
+      window.scrollBy(0, touchDrag.scrollSpeed);
+      updateTouchTarget(touchDrag.lastX, touchDrag.lastY);
+      autoScrollFrame = requestAnimationFrame(runAutoScroll);
+    };
+
+    const updateAutoScroll = (y) => {
+      if (!touchDrag) return;
+      const edge = Math.min(84, window.innerHeight * 0.14);
+      let speed = 0;
+      if (y < edge) speed = -Math.max(3, Math.round((edge - y) / 7));
+      else if (y > window.innerHeight - edge) speed = Math.max(3, Math.round((y - (window.innerHeight - edge)) / 7));
+      touchDrag.scrollSpeed = speed;
+      if (speed && !autoScrollFrame) autoScrollFrame = requestAnimationFrame(runAutoScroll);
+      if (!speed) stopAutoScroll();
+    };
+
+    const finishTouchDrag = (event, shouldMove) => {
+      const activeDrag = touchDrag;
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+      event.preventDefault?.();
+      // Clear the shared state before releasing capture. releasePointerCapture()
+      // can synchronously fire lostpointercapture, so cleanup must be idempotent.
+      touchDrag = null;
+      const { handle, member, studentId, fromIdx, teachingId, toIdx } = activeDrag;
+      stopAutoScroll();
+      try {
+        if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+      } catch {}
+      member.classList.remove('is-touch-dragging');
+      member.setAttribute('aria-grabbed', 'false');
+      page?.classList.remove('is-touch-drag-active');
+      clearDropStates();
+      draggedData = null;
+      if (dragStatus) dragStatus.textContent = '';
+
+      if (shouldMove && Number.isInteger(toIdx) && toIdx !== fromIdx) {
+        void moveStudent(studentId, fromIdx, toIdx, teachingId);
+      }
+      setTimeout(() => { isDragging = false; }, 120);
+    };
+
+    members.forEach((member) => {
+      const handle = member.querySelector('.group__drag-handle');
+      if (!handle) return;
+
+      handle.addEventListener('pointerdown', (event) => {
+        if (event.pointerType === 'mouse' || event.isPrimary === false) return;
+        event.preventDefault();
+        if (touchDrag) {
+          finishTouchDrag({ pointerId: touchDrag.pointerId, preventDefault() {} }, false);
+        }
+        selectedStudent = null;
+        isDragging = true;
+        const fromIdx = Number(member.dataset.fromIdx);
+        touchDrag = {
+          handle,
+          member,
+          pointerId: event.pointerId,
+          studentId: member.dataset.studentId,
+          fromIdx,
+          teachingId: member.dataset.teachingId || params?.id,
+          toIdx: null,
+          lastX: event.clientX,
+          lastY: event.clientY,
+          scrollSpeed: 0,
+        };
+        draggedData = {
+          studentId: touchDrag.studentId,
+          fromIdx,
+          teachingId: touchDrag.teachingId,
+        };
+        try { handle.setPointerCapture(event.pointerId); } catch {}
+        member.classList.add('is-touch-dragging');
+        member.setAttribute('aria-grabbed', 'true');
+        page?.classList.add('is-touch-drag-active');
+        if (dragStatus) dragStatus.textContent = `تم رفع ${member.dataset.studentName}. حرّكه إلى مجموعة أخرى.`;
+        updateTouchTarget(event.clientX, event.clientY);
+      });
+
+      handle.addEventListener('pointermove', (event) => {
+        if (!touchDrag || event.pointerId !== touchDrag.pointerId) return;
+        event.preventDefault();
+        updateTouchTarget(event.clientX, event.clientY);
+        updateAutoScroll(event.clientY);
+      });
+
+      handle.addEventListener('pointerup', (event) => finishTouchDrag(event, true));
+      handle.addEventListener('pointercancel', (event) => finishTouchDrag(event, false));
+      handle.addEventListener('lostpointercapture', (event) => finishTouchDrag(event, false));
+      handle.addEventListener('contextmenu', (event) => event.preventDefault());
     });
   },
 
