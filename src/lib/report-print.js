@@ -25,7 +25,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
 
   return html`
     <header class="printhead print-report__header" dir="rtl">
-      <div class="printhead__brand"><strong>رَكيز X</strong><span>تقارير المعلم</span></div>
+      <div class="printhead__brand"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong><span>تقارير المعلم</span></div>
       <h2 class="printhead__title">${title}</h2>
       <div class="printhead__details">
         ${metadata(identity, 'printhead__meta--identity')}
@@ -45,7 +45,7 @@ export function reportPageSetup({ wide = false } = {}) {
 export function reportFooter({ printedOn = todayISO() } = {}) {
   return html`
     <div class="print-report__footer" dir="rtl">
-      <span>رَكيز X</span>
+      <span>رَكيز المعلم</span>
       <span>أُنشئ في ${fmtDateFull(printedOn)}</span>
     </div>
   `;

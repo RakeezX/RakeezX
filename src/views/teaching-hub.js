@@ -108,7 +108,7 @@ export default {
             <div class="empty__icon">${icon('student')}</div>
             <div class="empty__title">الشعبة بلا طلاب بعد</div>
             <div class="empty__text">
-              الصق كشف الأسماء دفعة واحدة — سطر لكل طالب — ويرقّمهم RAKEEZ X تلقائيًا.
+              الصق كشف الأسماء دفعة واحدة — سطر لكل طالب — ويرقّمهم رَكيز المعلم تلقائيًا.
             </div>
             <a class="btn btn--primary" href="#/teaching/${tch.id}/students">${icon('plus')} أضف الطلاب</a>
           </div>

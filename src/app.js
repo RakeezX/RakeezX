@@ -3,6 +3,7 @@
  */
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { brandLockup } from './lib/brand.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
@@ -152,7 +153,7 @@ function renderTeacherMiniHubBody() {
 
           <div class="mini-hub-pwa mini-hub-section">
             <div class="mini-hub-pwa__copy">
-              <div class="fw-7 fs-sm">تطبيق رَكيز X</div>
+              <div class="fw-7 fs-sm">تطبيق رَكيز المعلم</div>
           ${isInstalled
             ? html`
                 <div class="mini-hub-installed">
@@ -260,7 +261,7 @@ function shell(path, params) {
     <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
     <div class="layout">
       <nav class="sidebar" aria-label="التنقل الرئيسي">
-        <div class="sidebar__brand">${icon('spark')} <span>RAKEEZ&nbsp;X</span></div>
+        <div class="sidebar__brand">${brandLockup({ signature: true, appIcon: true })}</div>
         ${NAV.map((it) => navLink(it, path, 'sidebar'))}
         <div class="sidebar__spacer"></div>
         ${inTeaching
@@ -288,7 +289,7 @@ function shell(path, params) {
 
 function topbar(v, params) {
   const backHref = v.back?.(params);
-  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'RAKEEZ X';
+  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'رَكيز المعلم';
   const sub = v.subtitle?.(params);
   const actions = v.topActions?.(params);
   const profile = store.state.profile ?? {};
@@ -299,7 +300,7 @@ function topbar(v, params) {
     <header class="topbar">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
-        ${title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
+        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup()}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
@@ -549,6 +550,7 @@ function openMiniHubLoginSheet() {
     title: 'تسجيل الدخول للحساب السحابي',
     desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
     body: html`
+      <div class="auth-brand">${brandLockup({ signature: true, appIcon: true })}<p>مساحة العمل الرقمية للمعلم</p></div>
       <form id="mini-hub-login-form">
         <label class="field">
           <span class="field__label">البريد الإلكتروني</span>
@@ -649,7 +651,7 @@ const GLOBAL_ACTIONS = {
       try {
         const { outcome } = await window.deferredInstallPrompt.userChoice;
         if (outcome === 'accepted') {
-          toast('جارٍ تثبيت تطبيق ركيز...');
+          toast('جارٍ تثبيت تطبيق رَكيز المعلم...');
           window.deferredInstallPrompt = null;
           closeSheet();
           scheduleRender();

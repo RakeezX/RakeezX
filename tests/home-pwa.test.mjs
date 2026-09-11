@@ -141,7 +141,7 @@ test('Home view render: shows prompt when not installed and not dismissed', asyn
   assert.ok(htmlStr.includes('id="home-pwa-install-btn"'), 'Install/guide button should be rendered');
   assert.ok(htmlStr.includes('id="home-pwa-dismiss-btn"'), 'Dismiss button should be rendered');
   assert.ok(htmlStr.includes('إرشادات التثبيت'), 'Should show "إرشادات التثبيت" when deferredInstallPrompt is absent');
-  assert.ok(htmlStr.includes('تطبيق رَكيز X على جهازك'), 'Should show brief title');
+  assert.ok(htmlStr.includes('تطبيق رَكيز المعلم على جهازك'), 'Should show brief title');
 });
 
 test('Home view render: shows direct install button when deferredInstallPrompt exists', async () => {

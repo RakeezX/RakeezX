@@ -260,7 +260,7 @@ export default {
       }
 
       lines.push('━━━━━━━━━━━━━━━');
-      lines.push('تطبيق رَكيز X للمعلم');
+      lines.push('تطبيق رَكيز المعلم');
       const text = lines.join('\n');
 
       await openSheet({

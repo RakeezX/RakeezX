@@ -121,7 +121,7 @@ export default {
       }
       try {
         const { written, migration } = await restoreBackup(payload, mode);
-        toast(migration ? `استُرجع ${written} سجلًا ورُحّل إلى شكل RAKEEZ X — يُعاد التحميل` : `استُرجع ${written} سجلًا — يُعاد التحميل`);
+        toast(migration ? `استُرجع ${written} سجلًا ورُحّل إلى شكل رَكيز المعلم — يُعاد التحميل` : `استُرجع ${written} سجلًا — يُعاد التحميل`);
         if (migration?.warnings?.length) console.warn('[rakeezx] ملاحظات ترحيل النسخة:', migration.warnings);
         setTimeout(() => location.reload(), 1100);
       } catch (err) { console.error(err); toast(err.message ?? 'تعذّر الاسترجاع', 'danger'); }

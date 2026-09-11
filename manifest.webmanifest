@@ -1,7 +1,7 @@
 {
-  "name": "RAKEEZ X — رَكيز X",
-  "short_name": "RAKEEZ X",
-  "description": "سجل المعلّم: الفصول والحصص والحضور والدرجات والتقارير — يعمل دون إنترنت.",
+  "name": "رَكيز المعلم",
+  "short_name": "رَكيز المعلم",
+  "description": "مساحة العمل الرقمية للمعلم — الفصول والحضور والدرجات والتقارير، حتى دون إنترنت.",
   "lang": "ar",
   "dir": "rtl",
   "id": "rakeezx",
@@ -9,8 +9,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#f6f7f9",
-  "theme_color": "#0f766e",
+  "background_color": "#F8FBF8",
+  "theme_color": "#18A878",
   "categories": ["education", "productivity"],
   "icons": [
     { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

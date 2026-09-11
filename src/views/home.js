@@ -6,6 +6,7 @@
  */
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
+import { APP_ICON_URL } from '../lib/brand.js';
 import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
@@ -221,12 +222,10 @@ export default {
     const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
 
     return html`
-      <!-- الترحيب ومؤشر التوقيت في صف واحد؛ لا يغيّر ترتيب حصص اليوم. -->
+      <!-- الهوية في غلاف التطبيق؛ يبدأ المحتوى بالترحيب والسياق اليومي فقط. -->
       <div class="hero">
         <div class="hero__main-row">
-          <div class="hero__hello">
-            ${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك في RAKEEZ X'}
-          </div>
+          <div class="hero__hello">${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك'}</div>
           <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
             <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(timingProfile))}</span>
             <span>${timingProfile}</span>
@@ -243,11 +242,11 @@ export default {
       <!-- إشعار تثبيت التطبيق السياقي (مؤقت وغير مسيطر) -->
       ${showInstallPrompt
         ? html`
-            <aside class="home-pwa-prompt" id="home-pwa-prompt" aria-label="تثبيت تطبيق رَكيز X">
+            <aside class="home-pwa-prompt" id="home-pwa-prompt" aria-label="تثبيت تطبيق رَكيز المعلم">
               <div class="home-pwa-prompt__main">
-                <div class="home-pwa-prompt__icon" aria-hidden="true">${icon('download')}</div>
+                <img class="home-pwa-brand-icon" src="${APP_ICON_URL}" width="56" height="56" alt="" aria-hidden="true">
                 <div class="home-pwa-prompt__content">
-                  <div class="home-pwa-prompt__title">تطبيق رَكيز X على جهازك</div>
+                  <div class="home-pwa-prompt__title">تطبيق رَكيز المعلم على جهازك</div>
                   <div class="home-pwa-prompt__desc">ثبّت التطبيق لفتحه مباشرة والعمل دون إنترنت.</div>
                 </div>
               </div>
@@ -375,7 +374,7 @@ export default {
         try {
           const { outcome } = await promptEvent.userChoice;
           if (outcome === 'accepted') {
-            toast('جارٍ تثبيت تطبيق رَكيز...');
+            toast('جارٍ تثبيت تطبيق رَكيز المعلم...');
             window.deferredInstallPrompt = null;
             repaint();
           }

@@ -497,7 +497,7 @@ export default {
         `• نقاط المشاركة: ${partNet > 0 ? '+' : ''}${partNet}`,
         `• نقاط السلوك: ${behavNet > 0 ? '+' : ''}${behavNet}`,
         '━━━━━━━━━━━━━━━',
-        'تطبيق رَكيز X للمعلم',
+        'تطبيق رَكيز المعلم',
       ];
 
       const summaryText = textParts.filter(Boolean).join('\n');

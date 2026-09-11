@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v10';
+const VERSION = 'rakeezx-v12';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -20,6 +20,12 @@ const SHELL = [
   './index.html',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/favicon.svg',
+  './assets/favicon-16.png',
+  './assets/favicon-32.png',
+  './assets/favicon.svg?v=12',
+  './assets/favicon-16.png?v=12',
+  './assets/favicon-32.png?v=12',
   './assets/icon-180.png',
   './assets/icon-192.png',
   './assets/icon-512.png',
@@ -35,6 +41,7 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/brand.js',
   './src/lib/db.js',
   './src/lib/export.js',
   './src/lib/migrate.js',

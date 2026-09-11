@@ -238,7 +238,7 @@ function presentationView(state, rules) {
   return html`
     <div class="classroom-presentation" role="dialog" aria-modal="true" aria-label="العرض الصفي">
       <header class="classroom-presentation__head">
-        <div class="classroom-presentation__brand">رَكيز <bdi>X</bdi></div>
+        <div class="classroom-presentation__brand">رَكيز المعلم</div>
         <span class="classroom-presentation__label">عرض صفي</span>
         <button class="btn classroom-presentation__exit" data-act="close-presentation">${icon('x')} إنهاء العرض</button>
       </header>

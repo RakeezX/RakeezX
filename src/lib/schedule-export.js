@@ -151,8 +151,11 @@ function drawScheduleCanvas(ctx, model, width, height) {
   const margin = 70;
   ctx.textAlign = 'right';
   ctx.fillStyle = '#0f7655';
-  ctx.font = '700 20px Tahoma, Arial, sans-serif';
-  ctx.fillText('رَكيز X', width - margin, 40);
+  ctx.font = '800 24px "Segoe UI", Tahoma, Arial, sans-serif';
+  ctx.fillText('رَكيز', width - margin, 40);
+  const brandWidth = ctx.measureText('رَكيز').width;
+  ctx.font = '500 21px "Segoe UI", Tahoma, Arial, sans-serif';
+  ctx.fillText('المعلم', width - margin - brandWidth - 8, 40);
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#12333b';
@@ -277,7 +280,8 @@ export function schedulePrintDocument(model) {
 * { box-sizing: border-box; }
 body { margin: 0; color: #162f35; background: #fff; font: 12px Tahoma, Arial, sans-serif; }
 header { position: relative; display: grid; gap: 4px; margin-bottom: 18px; padding: 0 4px 10px; border-bottom: 1px solid #a9c9be; text-align: center; }
-.brand { position: absolute; inset-block-start: 0; inset-inline-end: 0; display: flex; align-items: baseline; gap: 8px; color: #0f7655; font-weight: 700; }
+.brand { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; color: #0f7655; font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-weight: 700; }
+.brand b { font-size: 15px; } .brand em { font-size: 13px; font-style: normal; font-weight: 500; }
 .brand small { color: #62757a; font-size: 9px; font-weight: 500; }
 h1 { margin: 0; font-size: 24px; }
 .identity, .meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; color: #52666b; }
@@ -291,7 +295,7 @@ td strong, td small { display: block; }
 td small { margin-top: 3px; color: #52666b; font-size: 10px; }
 .empty-cell { background: #fbfcfc; }
 </style></head><body>
-<header><div class="brand"><span>رَكيز X</span><small>الجدول الأسبوعي</small></div><h1>${escapeHtml(model.title)}</h1>${identity ? `<div class="identity">${identity}</div>` : ''}
+<header><div class="brand"><span><b>رَكيز</b> <em>المعلم</em></span><small>الجدول الأسبوعي</small></div><h1>${escapeHtml(model.title)}</h1>${identity ? `<div class="identity">${identity}</div>` : ''}
 <div class="meta"><span>${escapeHtml(model.academic.year)}</span><span>${escapeHtml(model.academic.term)}</span>${model.timing ? `<span>${escapeHtml(model.timing.label)}</span>` : ''}</div></header>
 <table aria-label="${escapeHtml(model.title)}"><thead><tr><th scope="col">اليوم</th>${model.periods.map(({ period }) => `<th scope="col">الحصة ${period}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
 </body></html>`;

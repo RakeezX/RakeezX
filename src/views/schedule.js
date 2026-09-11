@@ -96,7 +96,7 @@ function scheduleExportPreview(model) {
   return html`
     <article class="schedule-export-preview" dir="rtl" aria-label="معاينة الجدول الأسبوعي">
       <header class="schedule-export-preview__head">
-        <span class="schedule-export-preview__brand">رَكيز X</span>
+        <span class="schedule-export-preview__brand">رَكيز المعلم</span>
         <h3>${model.title}</h3>
         ${identity.length ? html`<p>${identity.join(' · ')}</p>` : ''}
         <p>${[model.academic.year, model.academic.term, model.timing?.label].filter(Boolean).join(' · ')}</p>

@@ -4,6 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
 test.setTimeout(120_000);
+test.use({ ...(process.env.RAKEEZX_E2E_BASE_URL ? { baseURL: process.env.RAKEEZX_E2E_BASE_URL } : {}) });
 
 const viewports = [
   { width: 320, height: 760 },
@@ -133,7 +134,7 @@ test('C2A reports stay cohesive, responsive, and print only the report document'
   await page.goto('/#/teaching/c2a-teaching/reports');
   await page.getByRole('button', { name: 'معاينة A4' }).click();
   await expect(page.locator('.a4-sheet')).toHaveClass(/a4-sheet--landscape/);
-  await expect(page.locator('.a4-sheet .printhead')).toContainText('رَكيز X');
+  await expect(page.locator('.a4-sheet .printhead')).toContainText('رَكيز المعلم');
   await expect(page.locator('.a4-sheet .print-report__footer')).toBeVisible();
   await page.getByRole('button', { name: 'الطلاب', exact: true }).click();
   await expect(page.locator('.a4-sheet')).not.toHaveClass(/a4-sheet--landscape/);
@@ -266,7 +267,7 @@ test('Schedule export UI previews options, downloads PNG, and prints isolated A4
   await expect.poll(() => page.evaluate(() => window.__c2aPrint.called)).toBe(true);
   const printDocument = await page.evaluate(() => window.__c2aPrint.document);
   expect(printDocument).toContain('@page { size: A4 landscape;');
-  expect(printDocument).toContain('رَكيز X');
+  expect(printDocument).toContain('<b>رَكيز</b> <em>المعلم</em>');
   expect(printDocument).toContain('التوقيت الأساسي: التوقيت الصيفي');
   expect(printDocument).toContain('المعلم: معلم رَكيز');
   expect(printDocument).toContain('المدرسة: مدرسة رَكيز');

@@ -1,6 +1,7 @@
 /** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
 
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
+import { brandLockup } from '../lib/brand.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
@@ -65,7 +66,7 @@ function pwaGuideContent(platform) {
         </div>
         <div class="pwa-guide-step">
           <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">أكّد التثبيت ليظهر رَكيز X كبرنامج مستقل وسريع في قائمة وتطبيقات جهازك.</span>
+          <span class="pwa-guide-text">أكّد التثبيت ليظهر رَكيز المعلم كبرنامج مستقل وسريع في قائمة وتطبيقات جهازك.</span>
         </div>
       `;
     case 'windows':
@@ -76,7 +77,7 @@ function pwaGuideContent(platform) {
         </div>
         <div class="pwa-guide-step">
           <span class="pwa-guide-num">٢</span>
-          <span class="pwa-guide-text">أو افتح قائمة المتصفح (⋮) واختر <strong>تطبيقات ← تثبيت RAKEEZ X</strong>.</span>
+          <span class="pwa-guide-text">أو افتح قائمة المتصفح (⋮) واختر <strong>تطبيقات ← تثبيت رَكيز المعلم</strong>.</span>
         </div>
         <div class="pwa-guide-step">
           <span class="pwa-guide-num">٣</span>
@@ -111,7 +112,7 @@ function pwaGuideContent(platform) {
         </div>
         <div class="pwa-guide-step">
           <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">اضغط <strong>«إضافة»</strong> (Add) في الزاوية العلوية ليظهر رَكيز X كأيقونة تطبيق مباشر.</span>
+          <span class="pwa-guide-text">اضغط <strong>«إضافة»</strong> (Add) في الزاوية العلوية ليظهر رَكيز المعلم كأيقونة تطبيق مباشر.</span>
         </div>
       `;
   }
@@ -380,7 +381,7 @@ export default {
         </a>
       </div>
       <div class="section settings-section settings-section--pwa">
-        <div class="section__head"><div class="section__title">تثبيت تطبيق ركيز على الجهاز</div></div>
+        <div class="section__head"><div class="section__title">تثبيت تطبيق رَكيز المعلم على الجهاز</div></div>
         <div class="card card--pad stack stack-3">
           ${isStandaloneMode()
             ? html`
@@ -397,7 +398,7 @@ export default {
           ${!isStandaloneMode() && typeof window !== 'undefined' && window.deferredInstallPrompt
             ? html`
                 <button class="btn btn--primary btn--block" data-act="pwa-prompt-install">
-                  ${icon('download')} تثبيت تطبيق ركيز الآن
+                  ${icon('download')} تثبيت تطبيق رَكيز المعلم الآن
                 </button>
               `
             : ''}
@@ -425,11 +426,13 @@ export default {
       </div>
 
       <div class="section settings-section settings-section--about">
-        <div class="section__head"><div class="section__title">عن RAKEEZ X</div></div>
+        <div class="section__head"><div class="section__title">عن رَكيز المعلم</div></div>
         <div class="card card--pad stack stack-2">
-          <div class="fw-7">سجل معلّم يعمل دون إنترنت أولًا (Offline-First).</div>
+          ${brandLockup({ signature: true, appIcon: true, prominent: true })}
+          <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
+          <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
           <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
-          <div class="t-3 fs-xs">RAKEEZ X · الإصدار 1.0</div>
+          <div class="t-3 fs-xs">الإصدار 1.0</div>
         </div>
       </div>
       </div>
@@ -448,7 +451,7 @@ export default {
         try {
           const { outcome } = await window.deferredInstallPrompt.userChoice;
           if (outcome === 'accepted') {
-            toast('جارٍ تثبيت تطبيق ركيز...');
+            toast('جارٍ تثبيت تطبيق رَكيز المعلم...');
             window.deferredInstallPrompt = null;
             repaint();
           }

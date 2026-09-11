@@ -150,7 +150,7 @@ export function validateBackup(payload) {
   }
 
   if (payload.app !== APP_ID) {
-    add('هذا الملف ليس نسخة احتياطية من RAKEEZ X.');
+    add('هذا الملف ليس نسخة احتياطية من رَكيز المعلم.');
   }
   if (!Number.isInteger(payload.version)) add('إصدار النسخة غير معروف.');
   else if (payload.version > BACKUP_VERSION) {
