@@ -4728,37 +4728,23 @@
   border-block-start: 1px solid var(--border);
 }
 
-.support-diagnostics__toggle {
+.support-diagnostics__disclosure {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-3);
-  min-height: 44px;
-  cursor: pointer;
-}
-
-.support-diagnostics__toggle input {
-  width: 20px;
-  height: 20px;
   flex: none;
-  margin-block-start: 2px;
-  accent-color: var(--brand);
-}
-
-.support-diagnostics__toggle strong,
-.support-diagnostics__toggle small {
-  display: block;
-}
-
-.support-diagnostics__toggle strong {
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-}
-
-.support-diagnostics__toggle small {
-  margin-block-start: var(--sp-1);
+  margin: 0;
   color: var(--text-3);
   font-size: var(--fs-xs);
-  line-height: 1.55;
+  line-height: 1.65;
+}
+
+.support-diagnostics__disclosure svg {
+  width: var(--icon-compact);
+  height: var(--icon-compact);
+  flex: none;
+  margin-block-start: 2px;
+  color: var(--info);
 }
 
 .support-diagnostics__preview-action {

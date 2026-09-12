@@ -37,7 +37,7 @@ const DIAGNOSTIC_LABELS = Object.freeze({
 });
 
 const initialDraft = () => ({
-  type: 'technical', message: '', includeDiagnostics: false, previewDiagnostics: false,
+  type: 'technical', message: '', previewDiagnostics: false,
   submitting: false, success: false, error: '',
 });
 let draft = initialDraft();
@@ -170,7 +170,7 @@ export default {
 
   render() {
     const canSubmit = authenticated() && online();
-    const diagnostics = draft.includeDiagnostics ? currentSafeSupportDiagnostics() : {};
+    const diagnostics = currentSafeSupportDiagnostics();
     return html`<div class="management-page support-page">
       <header class="support-intro">
         <span class="support-intro__icon" aria-hidden="true">${icon('note')}</span>
@@ -220,17 +220,12 @@ export default {
               </label>
 
               <div class="support-diagnostics">
-                <label class="support-diagnostics__toggle">
-                  <input type="checkbox" data-change="support-diagnostics" ${draft.includeDiagnostics ? 'checked' : ''}>
-                  <span><strong>إرفاق معلومات تقنية آمنة للمساعدة في التشخيص</strong><small>تتضمن معلومات عامة عن التطبيق والجهاز والمزامنة، دون بيانات الطلاب أو كلمات المرور.</small></span>
-                </label>
-                ${draft.includeDiagnostics ? html`
-                  <button class="btn btn--sm btn--quiet support-diagnostics__preview-action" type="button"
-                    data-act="support-diagnostics-preview" aria-expanded="${draft.previewDiagnostics}" aria-controls="support-diagnostics-preview">
-                    ${draft.previewDiagnostics ? 'إخفاء المعلومات المرفقة' : 'عرض المعلومات المرفقة'}
-                  </button>
-                  ${draft.previewDiagnostics ? diagnosticsPreview(diagnostics) : ''}
-                ` : ''}
+                <p class="support-diagnostics__disclosure">${icon('shield')}<span>سيتم إرفاق معلومات تقنية عامة وآمنة تساعد فريق الدعم، دون بيانات الطلاب أو كلمات المرور.</span></p>
+                <button class="btn btn--sm btn--quiet support-diagnostics__preview-action" type="button"
+                  data-act="support-diagnostics-preview" aria-expanded="${draft.previewDiagnostics ? 'true' : 'false'}">
+                  ${draft.previewDiagnostics ? 'إخفاء المعلومات التقنية' : 'عرض المعلومات التقنية'}
+                </button>
+                ${draft.previewDiagnostics ? diagnosticsPreview(diagnostics) : ''}
               </div>
             </fieldset>
             <button class="btn btn--primary support-submit" type="submit" ${canSubmit && draft.message.trim() && !draft.submitting ? '' : 'disabled'}>
@@ -269,12 +264,6 @@ export default {
       if (submit) submit.disabled = !authenticated() || !online() || !draft.message.trim() || draft.submitting;
     },
 
-    'support-diagnostics'(el) {
-      draft.includeDiagnostics = el.checked;
-      draft.previewDiagnostics = false;
-      repaint();
-    },
-
     'support-diagnostics-preview'() {
       draft.previewDiagnostics = !draft.previewDiagnostics;
       repaint();
@@ -297,7 +286,7 @@ export default {
         await submitSupportRequest({
           type: draft.type,
           message: draft.message,
-          diagnostics: draft.includeDiagnostics ? currentSafeSupportDiagnostics() : {},
+          diagnostics: currentSafeSupportDiagnostics(),
         });
         draft = { ...initialDraft(), success: true };
         toast('تم إرسال طلبك بنجاح.');

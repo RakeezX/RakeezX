@@ -365,6 +365,21 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .app-status-strip.is-offline { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-border); }
 .app-status-strip.is-error { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
 .app-status-strip svg { width: var(--icon-compact); height: var(--icon-compact); }
+.app-status-strip__support {
+  display: none;
+  align-items: center;
+  min-height: 32px;
+  margin-inline-start: var(--sp-1);
+  padding-inline: var(--sp-2);
+  color: inherit;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.app-status-strip.is-error .app-status-strip__support { display: inline-flex; }
+.app-status-strip__support:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
 
 /* شريط علوي */
 .topbar {

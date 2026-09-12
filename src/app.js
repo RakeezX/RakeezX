@@ -279,6 +279,7 @@ function shell(path, params) {
         <div class="app-status-strip ${showConnectionState ? `is-visible is-${syncInfo.status}` : ''}"
              data-app-status role="status" aria-live="polite" aria-atomic="true">
           ${icon('cloud')} <span data-app-status-text>${syncInfo.label}</span>
+          <a class="app-status-strip__support" href="#/support">تحتاج مساعدة؟</a>
         </div>
         <div id="main" tabindex="-1"></div>
       </main>

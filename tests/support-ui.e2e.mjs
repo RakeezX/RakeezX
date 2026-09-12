@@ -59,6 +59,19 @@ test('Support is reachable from Teacher Center and Settings and always exposes d
   await expect(settingsLink).toHaveAttribute('href', '#/support');
   await settingsLink.click();
   await expect(page).toHaveURL(/#\/support$/);
+
+  await page.evaluate(async () => {
+    const sync = await import('/src/lib/sync.js');
+    sync.state.status = 'error';
+    location.hash = '#/calendar';
+  });
+  await expect(page).toHaveURL(/#\/calendar$/);
+  const contextualSupport = page.getByRole('link', { name: 'تحتاج مساعدة؟' });
+  await expect(contextualSupport).toBeVisible();
+  await expect(contextualSupport).toHaveAttribute('href', '#/support');
+  await contextualSupport.click();
+  await expect(page).toHaveURL(/#\/support$/);
+  expect(new URL(page.url()).hash).toBe('#/support');
 });
 
 test('Support keeps direct email available while in-app submission reflects auth and offline states', async ({ page, context }) => {
@@ -66,17 +79,19 @@ test('Support keeps direct email available while in-app submission reflects auth
   await expect(page.getByText('يلزم تسجيل الدخول لإرسال طلب دعم من داخل التطبيق.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'إرسال', exact: true })).toBeDisabled();
   await expect(page.getByRole('link', { name: SUPPORT_EMAIL })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'تحتاج مساعدة؟' })).toHaveCount(0);
 
   await authenticate(page);
   await context.setOffline(true);
   await expect(page.getByText('إرسال الطلب من داخل التطبيق يحتاج اتصالًا بالإنترنت.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'إرسال', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'نسخ البريد' })).toBeEnabled();
+  await expect(page.getByRole('link', { name: 'تحتاج مساعدة؟' })).toHaveCount(0);
   await context.setOffline(false);
   await expect(page.getByText('إرسال الطلب من داخل التطبيق يحتاج اتصالًا بالإنترنت.')).toHaveCount(0);
 });
 
-test('Support submits all V1 request types, enforces message bounds, previews only safe diagnostics, and hides raw failures', async ({ page }) => {
+test('Support automatically attaches only safe diagnostics to all V1 request types and hides raw failures', async ({ page }) => {
   const payloads = [];
   let failNext = false;
   await page.route(SUPPORT_ENDPOINT, async (route) => {
@@ -95,19 +110,9 @@ test('Support submits all V1 request types, enforces message bounds, previews on
   const message = page.getByLabel('رسالتك');
   const submit = page.getByRole('button', { name: 'إرسال', exact: true });
 
-  await expect(submit).toBeDisabled();
-  await message.fill('أ');
-  await expect(submit).toBeEnabled();
-  await submit.click();
-  await expect(page.locator('.support-result.is-success')).toContainText('تم إرسال طلبك بنجاح.');
-  expect(payloads[0].type).toBe('technical');
-  expect(payloads[0].message).toBe('أ');
-  expect(Object.keys(payloads[0].diagnostics)).toEqual(['timestamp']);
-
-  await type.selectOption('suggestion');
-  await message.fill('ن'.repeat(4000));
-  await page.getByText('إرفاق معلومات تقنية آمنة للمساعدة في التشخيص').click();
-  await page.getByRole('button', { name: 'عرض المعلومات المرفقة' }).click();
+  await expect(page.getByText('سيتم إرفاق معلومات تقنية عامة وآمنة تساعد فريق الدعم، دون بيانات الطلاب أو كلمات المرور.')).toBeVisible();
+  await expect(page.getByRole('checkbox')).toHaveCount(0);
+  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
   const preview = page.locator('#support-diagnostics-preview');
   await expect(preview).toBeVisible();
   const previewKeys = await preview.locator('[data-diagnostic-key]').evaluateAll((nodes) => nodes.map((node) => node.dataset.diagnosticKey));
@@ -115,6 +120,18 @@ test('Support submits all V1 request types, enforces message bounds, previews on
   expect(previewKeys.length).toBeGreaterThan(5);
   expect(previewKeys.every((key) => allowed.has(key))).toBe(true);
   await expect(preview).not.toContainText(/طالب|فصل|رمز دخول|support-ui-token|#\/support/i);
+
+  await expect(submit).toBeDisabled();
+  await message.fill('أ');
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(page.locator('.support-result.is-success')).toContainText('تم إرسال طلبك بنجاح.');
+  expect(payloads[0].type).toBe('technical');
+  expect(payloads[0].message).toBe('أ');
+  expect(payloads[0].diagnostics.routeCategory).toBe('support');
+
+  await type.selectOption('suggestion');
+  await message.fill('ن'.repeat(4000));
   await submit.click();
   await expect.poll(() => payloads.length).toBe(2);
   expect(payloads[1].type).toBe('suggestion');
@@ -129,6 +146,12 @@ test('Support submits all V1 request types, enforces message bounds, previews on
   await expect(page.getByRole('alert')).toContainText('تعذّر إرسال الطلب الآن');
   await expect(page.getByRole('alert')).not.toContainText('raw-secret-server-detail');
   expect(payloads.at(-1).type).toBe('inquiry');
+
+  for (const payload of payloads) {
+    expect(payload.diagnostics.routeCategory).toBe('support');
+    expect(Object.keys(payload.diagnostics).every((key) => allowed.has(key))).toBe(true);
+    expect(JSON.stringify(payload.diagnostics)).not.toMatch(/token|student|class|owner|routePath|outbox/i);
+  }
 });
 
 test('Support remains accessible, focused, and overflow-free across responsive light/dark states', async ({ page }) => {
