@@ -1,8 +1,9 @@
 /** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
 
-import { html, icon, toast, fmtDate, openSheet, fmtTimeRange } from '../lib/dom.js';
+import { html, icon, toast, fmtDate, fmtTimeRange } from '../lib/dom.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
+import { openSessionEditor, sessionDeletionPresentation } from '../lib/session-editor-ui.js';
 import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday, todayISO } from '../models.js';
 let lastGeneration = null;
 
@@ -158,8 +159,9 @@ export default {
           const absents = records.filter((record) => record.status === 'absent').length;
           const lesson = s.lessonId ? store.getLesson(s.lessonId) : null;
           const attendanceHref = `#/teaching/${s.teachingId}/attendance?session=${s.id}`;
+          const deletion = sessionDeletionPresentation(s);
           return html`
-            <div class="row session-row ${s.date === today ? 'is-today' : s.date > today ? 'is-future' : 'is-past'} is-${completeness.state}">
+            <div class="row session-row ${s.date === today ? 'is-today' : s.date > today ? 'is-future' : 'is-past'} is-${completeness.state} ${deletion.restored ? 'has-delete-protection' : ''}">
               <span class="period">${s.period}</span>
               <a class="row__main" href="${attendanceHref}">
                 <span class="row__title">
@@ -173,6 +175,7 @@ export default {
                   ${absents ? html` · <span class="tabular">${absents}</span> غياب` : ''}
                   ${lesson ? html` · ${lesson.name}` : ''}
                 </span>
+                ${deletion.restored ? html`<span class="session-delete-restored">${icon('shield')}<span><strong>لم يتم حذف الحصة لأنها تحتوي على بيانات محفوظة.</strong> ${deletion.primaryReason}</span></span>` : ''}
               </a>
               <span class="row__end">
                 <span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>
@@ -181,7 +184,7 @@ export default {
                   : completeness.state === 'completed'
                     ? html`<a class="btn btn--sm btn--quiet" href="${attendanceHref}">مراجعة الحضور</a>`
                     : ''}
-                <button class="iconbtn" data-act="status" data-id="${s.id}" aria-label="تغيير الحالة">
+                <button class="iconbtn" data-act="status" data-id="${s.id}" aria-label="تفاصيل الحصة وحالتها">
                   ${icon('edit')}
                 </button>
               </span>
@@ -218,41 +221,10 @@ export default {
     async status(el) {
       const ses = store.getSession(el.dataset.id);
       if (!ses) return;
-
-      const picked = await openSheet({
+      await openSessionEditor(ses, {
         title: `الحصة ${ses.period} — ${fmtDate(ses.date)}`,
-        desc: 'الحصة غير المنفّذة لا تُسجَّل غيابًا على الطلاب.',
-        body: html`
-          <div class="stack stack-2">
-            ${SESSION_STATUS_ORDER.map(
-              (k) => html`
-                <button class="radiocard radiocard--btn ${ses.status === k ? 'is-on' : ''}" data-pick="${k}">
-                  <span class="radiocard__body">
-                    <span class="radiocard__title">${SESSION_STATUS[k].label}</span>
-                    <span class="radiocard__hint">
-                      ${SESSION_STATUS[k].counts ? 'تُحسب في نسبة التنفيذ' : 'لا تُحسب'}
-                    </span>
-                  </span>
-                </button>
-              `
-            )}
-          </div>
-          <label class="field mt-4">
-            <span class="field__label">السبب (اختياري)</span>
-            <input class="input" id="ses-reason" value="${ses.reason ?? ''}" maxlength="120">
-          </label>
-        `,
-        onMount: (root, done) => {
-          const reason = root.querySelector('#ses-reason');
-          root.querySelectorAll('[data-pick]').forEach((b) =>
-            b.addEventListener('click', () => done({ status: b.dataset.pick, reason: reason.value.trim() }))
-          );
-        },
+        countedHint: 'تُحسب في نسبة التنفيذ',
       });
-
-      if (!picked) return;
-      await store.setSessionStatus(ses.id, picked.status, picked.reason);
-      toast(`الحصة: ${SESSION_STATUS[picked.status].label}`);
     },
   },
 };

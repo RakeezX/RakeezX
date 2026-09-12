@@ -6,10 +6,11 @@
  * وحصة لم تُنفَّذ لا تولّد سجلات حضور إطلاقًا، فلا تُحسب غيابًا على أحد.
  */
 
-import { html, icon, toast, fmtDate, openSheet, confirmSheet } from '../lib/dom.js';
+import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
 import * as store from '../store.js';
+import { openSessionEditor } from '../lib/session-editor-ui.js';
 import {
-  ATTENDANCE, ATTENDANCE_ORDER, SESSION_STATUS, SESSION_STATUS_ORDER,
+  ATTENDANCE, ATTENDANCE_ORDER, SESSION_STATUS,
   todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText,
 } from '../models.js';
 import { repaint } from '../repaint.js';
@@ -130,7 +131,7 @@ export default {
 
       ${daySessions.length > 1
         ? html`
-            <div class="segmented mb-3" role="group" aria-label="اختر حصة اليوم">
+            <div class="segmented attendance-session-tabs mb-3" role="group" aria-label="اختر حصة اليوم">
               ${daySessions.map(
                 (s) => html`
                   <button class="segmented__btn ${s.id === ses.id ? 'is-on' : ''}"
@@ -341,41 +342,15 @@ export default {
       const ses = store.getSession(activeSessionId);
       if (!ses) return;
 
-      const picked = await openSheet({
+      const result = await openSessionEditor(ses, {
         title: `حالة الحصة ${ses.period}`,
-        desc: 'الحصة غير المنفّذة لا تُسجَّل غيابًا على الطلاب.',
-        body: html`
-          <div class="stack stack-2">
-            ${SESSION_STATUS_ORDER.map(
-              (k) => html`
-                <button class="radiocard radiocard--btn ${ses.status === k ? 'is-on' : ''}" data-pick="${k}">
-                  <span class="radiocard__body">
-                    <span class="radiocard__title">${SESSION_STATUS[k].label}</span>
-                    <span class="radiocard__hint">
-                      ${SESSION_STATUS[k].counts ? 'تُحسب في سجل الحصص' : 'لا تُحسب حصة فائتة'}
-                    </span>
-                  </span>
-                </button>
-              `
-            )}
-          </div>
-          <label class="field mt-4">
-            <span class="field__label">السبب (اختياري)</span>
-            <input class="input" id="ses-reason" value="${ses.reason ?? ''}" maxlength="120"
-                   placeholder="مثال: اجتماع طارئ">
-          </label>
-        `,
-        onMount: (root, done) => {
-          const reason = root.querySelector('#ses-reason');
-          root.querySelectorAll('[data-pick]').forEach((b) =>
-            b.addEventListener('click', () => done({ status: b.dataset.pick, reason: reason.value.trim() }))
-          );
-        },
+        notCountedHint: 'لا تُحسب حصة فائتة',
+        reasonPlaceholder: 'مثال: اجتماع طارئ',
       });
-
-      if (!picked) return;
-      await store.setSessionStatus(activeSessionId, picked.status, picked.reason);
-      toast(`الحصة: ${SESSION_STATUS[picked.status].label}`);
+      if (result?.type === 'deleted') {
+        activeSessionId = store.sessionsOnFor(ses.teachingId, date)[0]?.id ?? null;
+        repaint();
+      }
     },
   },
 };

@@ -129,6 +129,15 @@
 }
 
 @media (max-width: 520px) {
+  .attendance-session-tabs {
+    max-inline-size: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+  .attendance-session-tabs::-webkit-scrollbar { display: none; }
+  .attendance-session-tabs .segmented__btn { flex: 0 0 auto; }
+
   .att-row {
     display: grid;
     grid-template-columns: 34px minmax(0, 1fr) 44px;
@@ -1342,6 +1351,79 @@
   color: var(--text-2);
 }
 
+.session-delete-context {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin: 0 0 var(--sp-4);
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.session-delete-context > div {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 58px;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-elev);
+}
+.session-delete-context dt { color: var(--text-3); font-size: var(--fs-xs); }
+.session-delete-context dd { margin: 0; color: var(--text-1); font-size: var(--fs-sm); font-weight: var(--fw-semibold); line-height: 1.45; }
+
+.session-delete-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-block-start: 1px solid var(--border);
+}
+.session-delete-option__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--r-md);
+}
+.session-delete-option__icon svg { width: 19px; height: 19px; }
+.session-delete-option > div { min-width: 0; }
+.session-delete-option strong { color: var(--text-1); font-size: var(--fs-sm); }
+.session-delete-option p { margin: 3px 0 0; color: var(--text-3); font-size: var(--fs-xs); line-height: 1.55; }
+.session-delete-option.is-protected .session-delete-option__icon { color: var(--warn); background: var(--warn-soft); }
+.session-delete-option.is-protected strong { color: var(--text-2); }
+
+.session-delete-scope-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  color: var(--text-2);
+  background: color-mix(in srgb, var(--info-soft) 54%, var(--bg-elev));
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+.session-delete-scope-note svg { width: 18px; height: 18px; flex: none; color: var(--info); }
+
+.session-delete-restored {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 5px;
+  color: var(--warn);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+}
+.session-delete-restored svg { width: 15px; height: 15px; flex: none; }
+.session-delete-restored strong { font-weight: var(--fw-bold); }
+.session-row.has-delete-protection { background: color-mix(in srgb, var(--warn-soft) 20%, var(--bg-elev)); }
+
 /* توزيع الدرجات */
 .grade-distribution-summary {
   background: var(--bg-sunk);
@@ -1453,6 +1535,10 @@
     justify-content: flex-end;
     flex-wrap: wrap;
   }
+
+  .session-delete-context { grid-template-columns: minmax(0, 1fr); }
+  .session-delete-option { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .session-delete-option .btn { grid-column: 1 / -1; width: 100%; min-height: 44px; }
 }
 
 @media (max-width: 360px) {

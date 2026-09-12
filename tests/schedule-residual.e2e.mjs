@@ -5,7 +5,7 @@ test('generator keeps the inter-period gap core and slot choices disclose occupi
   page.on('pageerror', (error) => errors.push(error.message));
 
   await page.goto('/#/schedule/times');
-  await page.evaluate(async () => {
+  const fixture = await page.evaluate(async () => {
     const periods = [1, 2, 3, 4].map((period) => {
       const start = 420 + (period - 1) * 45;
       const stamp = (value) => `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
@@ -21,9 +21,10 @@ test('generator keeps the inter-period gap core and slot choices disclose occupi
     const first = await window.store.createSection({ id: 'res-sec-a', grade: 5, label: 'أ' });
     const second = await window.store.createSection({ id: 'res-sec-b', grade: 5, label: 'ب' });
     const teachingA = await window.store.createTeaching({ id: 'res-tch-a', sectionId: first.id, subjectId: 'res-sub-a', termId: 'res-t' });
-    await window.store.createTeaching({ id: 'res-tch-b', sectionId: second.id, subjectId: 'res-sub-b', termId: 'res-t' });
+    const teachingB = await window.store.createTeaching({ sectionId: second.id, subjectId: 'res-sub-b', termId: 'res-t' });
     await window.store.addSlot(teachingA.id, 0, 1);
     window.store.repaint();
+    return { teachingBId: teachingB.id };
   });
   await page.reload();
 
@@ -42,10 +43,10 @@ test('generator keeps the inter-period gap core and slot choices disclose occupi
 
   await page.goto('/#/schedule');
   await page.locator('[data-act="add"]').first().click();
-  await page.selectOption('select[name="teachingId"]', 'res-tch-b');
+  await page.selectOption('select[name="teachingId"]', fixture.teachingBId);
   await page.selectOption('select[name="weekday"]', '0');
   const occupied = page.locator('select[name="period"] option[value="1"]');
-  await expect(occupied).toBeDisabled();
+  await expect.poll(() => occupied.evaluate((option) => option.disabled)).toBe(true);
   await expect(occupied).toContainText('مشغولة (خامس/أ)');
 
   // UI state can be tampered with; the form still rejects an occupied slot before saving.
