@@ -45,15 +45,27 @@ test('support diagnostics retain only the documented allowlist and redact sensit
     browser: 'chrome', browserVersion: '140.0', mobile: true, viewport: { width: 393, height: 852 },
     pwaStandalone: true, online: true, syncState: 'synced', pendingMutations: 2, failedMutations: 0,
     lastSuccessfulSyncAt: '2026-09-08T12:30:00.000Z', routeCategory: 'classes',
+    appVersion: '1.0.0', buildSha: 'a'.repeat(64), buildTimestamp: '2026-09-08T12:00:00.000Z',
     route: '#/classes/secret-teaching', ownerId: 'owner-secret', email: 'teacher@example.test',
     rawError: 'token=secret', stack: 'stack', supabaseUrl: 'https://candidate.example', token: 'secret',
   });
   assert.deepEqual(diagnostics, {
+    appVersion: '1.0.0', buildSha: 'a'.repeat(64), buildTimestamp: '2026-09-08T12:00:00.000Z',
     timestamp: '2026-09-08T12:34:56.000Z', timezone: 'Asia/Riyadh', deviceCategory: 'mobile',
     browser: 'chrome', browserVersion: '140.0', mobile: true, viewport: { width: 400, height: 850 },
     pwaStandalone: true, online: true, syncState: 'synced', pendingMutations: 2, failedMutations: 0,
     lastSuccessfulSyncAt: '2026-09-08T12:30:00.000Z', routeCategory: 'classes',
   });
+});
+
+test('support diagnostics reject malformed or private Build Meta values', () => {
+  assert.deepEqual(sanitizeSupportDiagnostics({
+    appVersion: 'version from C:\\private\\repo',
+    buildSha: 'development; token=secret',
+    buildTimestamp: 'not-a-date',
+    canonicalOrigin: 'https://user:password@example.test',
+    branch: 'main', repository: 'private/repo', developerPath: 'C:\\Users\\Developer',
+  }), {});
 });
 
 test('support submission is authenticated, online-only, direct, and never carries owner or unsafe diagnostics', async () => {
@@ -66,7 +78,10 @@ test('support submission is authenticated, online-only, direct, and never carrie
   };
   const result = await submitSupportRequest({
     type: 'technical', message: '  لا تظهر الصفحة  ',
-    diagnostics: { syncState: 'error', pendingMutations: 3, routeCategory: 'settings', rawOutbox: [{ id: 'secret' }] },
+    diagnostics: {
+      appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
+      syncState: 'error', pendingMutations: 3, routeCategory: 'settings', rawOutbox: [{ id: 'secret' }],
+    },
   });
   assert.match(result.id, /^support:/);
   assert.match(captured.url, /\/rest\/v1\/support_requests$/);
@@ -75,7 +90,10 @@ test('support submission is authenticated, online-only, direct, and never carrie
   const body = JSON.parse(captured.options.body);
   assert.deepEqual(body, {
     id: result.id, type: 'technical', message: 'لا تظهر الصفحة',
-    diagnostics: { timestamp: body.diagnostics.timestamp, syncState: 'error', pendingMutations: 3, routeCategory: 'settings' },
+    diagnostics: {
+      appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
+      timestamp: body.diagnostics.timestamp, syncState: 'error', pendingMutations: 3, routeCategory: 'settings',
+    },
   });
   assert.equal('owner_id' in body, false);
   assert.equal('rawOutbox' in body.diagnostics, false);

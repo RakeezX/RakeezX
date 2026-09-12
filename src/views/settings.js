@@ -2,6 +2,7 @@
 
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
 import { brandLockup } from '../lib/brand.js';
+import { BUILD_META } from '../lib/build-meta.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
@@ -432,7 +433,7 @@ export default {
           <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
           <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
           <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
-          <div class="t-3 fs-xs">الإصدار 1.0</div>
+          <div class="t-3 fs-xs">الإصدار ${BUILD_META.appVersion}</div>
         </div>
       </div>
       </div>

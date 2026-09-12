@@ -40,6 +40,9 @@ function safeViewport(value) {
 /** Returns a new JSON-safe object containing only V1-approved diagnostic fields. */
 export function sanitizeSupportDiagnostics(input = {}) {
   const diagnostics = {};
+  const appVersion = inputString(input.appVersion, 40);
+  const buildSha = inputString(input.buildSha, 64)?.toLowerCase();
+  const buildTimestamp = safeTimestamp(input.buildTimestamp);
   const timestamp = safeTimestamp(input.timestamp);
   const timezone = inputString(input.timezone, 80);
   const deviceCategory = inputString(input.deviceCategory, 16)?.toLowerCase();
@@ -52,6 +55,9 @@ export function sanitizeSupportDiagnostics(input = {}) {
   const failedMutations = safeCount(input.failedMutations);
   const lastSuccessfulSyncAt = safeTimestamp(input.lastSuccessfulSyncAt);
 
+  if (appVersion && /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(appVersion)) diagnostics.appVersion = appVersion;
+  if (buildSha && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(buildSha)) diagnostics.buildSha = buildSha;
+  if (buildTimestamp) diagnostics.buildTimestamp = buildTimestamp;
   if (timestamp) diagnostics.timestamp = timestamp;
   if (timezone) diagnostics.timezone = timezone;
   if (DEVICE_CATEGORIES.has(deviceCategory)) diagnostics.deviceCategory = deviceCategory;
