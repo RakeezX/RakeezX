@@ -4,6 +4,7 @@ import {
   buildNotificationEmail,
   classifyProviderResult,
   retryAt,
+  resolveSupportContact,
   safeFailureCategory,
   safeReference,
 } from './core.mjs';
@@ -73,7 +74,19 @@ Deno.serve(async (request) => {
       if (loadError) throw Object.assign(new Error('internal'), { category: 'internal' });
       if (!record) throw Object.assign(new Error('request_missing'), { permanent: true, category: 'request_missing' });
 
-      const email = buildNotificationEmail(record, { to: SUPPORT_DESTINATION });
+      const contact = await resolveSupportContact(job.owner_id, {
+        getAuthUser: async (ownerId: string) => {
+          const { data, error } = await supabase.auth.admin.getUserById(ownerId);
+          if (error) throw error;
+          return data.user;
+        },
+        getProfile: async (ownerId: string) => {
+          const { data, error } = await supabase.from('profile').select('teacher_name').eq('owner_id', ownerId).maybeSingle();
+          if (error) throw error;
+          return data;
+        },
+      });
+      const email = buildNotificationEmail(record, { to: SUPPORT_DESTINATION, contact });
       if (!email.ok) throw Object.assign(new Error(email.category), { permanent: true, category: email.category });
 
       let provider;

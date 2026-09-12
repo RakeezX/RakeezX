@@ -28,6 +28,32 @@ export const DELIVERY_POLICY = Object.freeze({
   backoffSeconds: Object.freeze([60, 300, 900, 3600]),
 });
 
+const CONTACT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function sanitizeAuthenticatedEmail(value) {
+  const email = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return email.length <= 254 && !/[\r\n]/.test(email) && CONTACT_EMAIL_PATTERN.test(email) ? email : '';
+}
+
+export function sanitizeDisplayName(value) {
+  const name = typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim() : '';
+  return name && name.length <= 120 ? name : '';
+}
+
+export async function resolveSupportContact(ownerId, { getAuthUser, getProfile }) {
+  let email = '';
+  let name = '';
+  try {
+    const user = await getAuthUser(ownerId);
+    email = sanitizeAuthenticatedEmail(user?.email);
+  } catch {}
+  try {
+    const profile = await getProfile(ownerId);
+    name = sanitizeDisplayName(profile?.teacher_name);
+  } catch {}
+  return { email, name };
+}
+
 function validTimestamp(value) {
   return typeof value === 'string' && value.length <= 40 && Number.isFinite(Date.parse(value));
 }
@@ -82,7 +108,34 @@ export function safeReference(id) {
   return (suffix || 'request').slice(0, 12);
 }
 
-export function buildNotificationEmail(record, { to, from = 'RAKEEZ Support <support@rakeezx.com>' } = {}) {
+export function formatRiyadhTime(value) {
+  if (!validTimestamp(value)) return '';
+  return new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
+    timeZone: 'Asia/Riyadh',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(new Date(value));
+}
+
+function formatDiagnosticLines(diagnostics) {
+  const lines = [];
+  if (diagnostics.appVersion) lines.push(`الإصدار: ${diagnostics.appVersion}`);
+  if (diagnostics.buildSha) lines.push(`البناء: ${diagnostics.buildSha.slice(0, 12)}`);
+  if (diagnostics.deviceCategory) {
+    const viewport = diagnostics.viewport ? ` — ${diagnostics.viewport.width}×${diagnostics.viewport.height}` : '';
+    lines.push(`الجهاز: ${diagnostics.deviceCategory}${viewport}`);
+  }
+  if (diagnostics.browser) lines.push(`المتصفح: ${diagnostics.browser}${diagnostics.browserVersion ? ` ${diagnostics.browserVersion}` : ''}`);
+  if (diagnostics.syncState) lines.push(`المزامنة: ${diagnostics.syncState}`);
+  if (typeof diagnostics.online === 'boolean') lines.push(`الاتصال: ${diagnostics.online ? 'متصل' : 'غير متصل'}`);
+  return lines;
+}
+
+export function buildNotificationEmail(record, { to, from = 'RAKEEZ Support <support@rakeezx.com>', contact = {} } = {}) {
   const validation = validateSupportRequest(record);
   if (!validation.ok) return validation;
   if (typeof to !== 'string' || !/^\S+@\S+\.\S+$/.test(to) || /[\r\n]/.test(to)) {
@@ -90,25 +143,27 @@ export function buildNotificationEmail(record, { to, from = 'RAKEEZ Support <sup
   }
   const request = validation.request;
   const reference = safeReference(request.id);
-  const diagnosticLines = Object.entries(request.diagnostics)
-    .map(([key, value]) => `${key}: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}`);
+  const email = sanitizeAuthenticatedEmail(contact.email);
+  const name = sanitizeDisplayName(contact.name);
+  const diagnosticLines = formatDiagnosticLines(request.diagnostics);
   return {
     ok: true,
     reference,
     payload: {
       from,
       to: [to],
-      subject: `RAKEEZ Support — ${TYPE_LABELS[request.type]} — ${reference}`,
+      subject: `رَكيز المعلم — ${TYPE_LABELS[request.type]} — ${reference}`,
       text: [
-        'RAKEEZ Support',
+        `رَكيز المعلم — ${TYPE_LABELS[request.type]}`,
         '',
-        `النوع: ${TYPE_LABELS[request.type]}`,
+        ...(name ? [`الاسم: ${name}`] : []),
+        ...(email ? [`البريد: ${email}`] : []),
         `المرجع: ${reference}`,
-        `وقت الإرسال: ${request.createdAt}`,
+        `الوقت: ${formatRiyadhTime(request.createdAt)}`,
         '',
         'الرسالة:',
         request.message,
-        ...(diagnosticLines.length ? ['', 'معلومات تقنية آمنة:', ...diagnosticLines] : []),
+        ...(diagnosticLines.length ? ['', 'معلومات تقنية:', ...diagnosticLines] : []),
       ].join('\n'),
     },
   };

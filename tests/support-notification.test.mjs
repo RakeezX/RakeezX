@@ -6,6 +6,8 @@ import {
   DELIVERY_POLICY,
   buildNotificationEmail,
   classifyProviderResult,
+  formatRiyadhTime,
+  resolveSupportContact,
   retryAt,
 } from '../supabase/functions/support-notification-worker/core.mjs';
 
@@ -13,6 +15,7 @@ const OWNER = '11111111-1111-4111-8111-111111111111';
 const coreMigration = await readFile(new URL('../supabase/migrations/0001_core_schema.sql', import.meta.url), 'utf8');
 const supportMigration = await readFile(new URL('../supabase/migrations/0020_support_requests.sql', import.meta.url), 'utf8');
 const notificationMigration = await readFile(new URL('../supabase/migrations/0027_support_notification_outbox.sql', import.meta.url), 'utf8');
+const contactMigration = await readFile(new URL('../supabase/migrations/0028_support_notification_contact_identity.sql', import.meta.url), 'utf8');
 let pg;
 
 before(async () => {
@@ -32,6 +35,7 @@ before(async () => {
   await pg.exec(coreMigration.replace(/^\uFEFF/, ''));
   await pg.exec(supportMigration.replace(/^\uFEFF/, ''));
   await pg.exec(notificationMigration.replace(/^\uFEFF/, ''));
+  await pg.exec(contactMigration.replace(/^\uFEFF/, ''));
 });
 
 after(async () => { await pg.close(); });
@@ -114,10 +118,38 @@ test('per-owner rate guard allows normal use but rejects unbounded hourly submis
   assert.equal((await pg.query(`select count(*)::int count from rakeezx.support_notification_outbox`)).rows[0].count, 10);
 });
 
-test('email builder emits fixed headers and only safe request fields', () => {
+test('contact identity resolves only from server authorities and degrades independently', async () => {
+  const contact = await resolveSupportContact(OWNER, {
+    getAuthUser: async (ownerId) => ({ id: ownerId, email: 'Teacher@Example.test' }),
+    getProfile: async () => ({ teacher_name: '  عبدالله\nالمعلّم  ' }),
+  });
+  assert.deepEqual(contact, { email: 'teacher@example.test', name: 'عبدالله المعلّم' });
+
+  const emailOnly = await resolveSupportContact(OWNER, {
+    getAuthUser: async () => ({ email: 'teacher@example.test' }),
+    getProfile: async () => ({ teacher_name: '' }),
+  });
+  assert.deepEqual(emailOnly, { email: 'teacher@example.test', name: '' });
+
+  const injected = await resolveSupportContact(OWNER, {
+    getAuthUser: async () => ({ email: 'teacher@example.test\r\nBcc: attacker@example.test' }),
+    getProfile: async () => ({ teacher_name: 'المعلّم\r\nBcc: attacker@example.test' }),
+  });
+  assert.deepEqual(injected, { email: '', name: 'المعلّم Bcc: attacker@example.test' });
+
+  const unavailable = await resolveSupportContact(OWNER, {
+    getAuthUser: async () => { throw new Error('auth unavailable'); },
+    getProfile: async () => { throw new Error('profile unavailable'); },
+  });
+  assert.deepEqual(unavailable, { email: '', name: '' });
+});
+
+test('email builder emits fixed Arabic-first presentation and ignores browser-supplied identity', () => {
   const result = buildNotificationEmail({
     id: 'support:abc-123',
     owner_id: OWNER,
+    email: 'browser-attacker@example.test',
+    name: 'اسم غير موثوق',
     type: 'technical',
     message: 'سطر أول\nBcc: attacker@example.test',
     created_at: '2026-09-12T12:00:00.000Z',
@@ -126,15 +158,53 @@ test('email builder emits fixed headers and only safe request fields', () => {
       browserVersion: 'token=secret', timezone: 'Asia/Riyadh',
       ownerId: OWNER, email: 'teacher@example.test', token: 'secret', rawOutbox: [{ id: 'private' }],
     },
-  }, { to: 'internal@example.test' });
+  }, {
+    to: 'internal@example.test',
+    contact: { email: 'teacher@example.test', name: 'المعلّم عبدالله' },
+  });
   assert.equal(result.ok, true);
   assert.equal(result.payload.from, 'RAKEEZ Support <support@rakeezx.com>');
   assert.deepEqual(result.payload.to, ['internal@example.test']);
-  assert.equal(result.payload.subject, 'RAKEEZ Support — مشكلة تقنية — abc-123');
+  assert.equal(result.payload.subject, 'رَكيز المعلم — مشكلة تقنية — abc-123');
   assert.match(result.payload.text, /Bcc: attacker@example\.test/);
   assert.doesNotMatch(result.payload.subject, /Bcc|attacker|owner/i);
-  assert.doesNotMatch(result.payload.text, new RegExp(`${OWNER}|teacher@example|token|rawOutbox|private`, 'i'));
-  assert.match(result.payload.text, /appVersion: 1\.0\.0/);
+  assert.doesNotMatch(result.payload.text, new RegExp(`${OWNER}|browser-attacker@example|اسم غير موثوق|token|rawOutbox|private`, 'i'));
+  assert.match(result.payload.text, /الاسم: المعلّم عبدالله/);
+  assert.match(result.payload.text, /البريد: teacher@example\.test/);
+  assert.match(result.payload.text, /الإصدار: 1\.0\.0/);
+  assert.match(result.payload.text, /البناء: a{12}/);
+  assert.doesNotMatch(result.payload.text, new RegExp(`a{13}`));
+});
+
+test('email contact fallback and Riyadh time remain safe and human-readable', () => {
+  const formatted = formatRiyadhTime('2026-09-12T20:32:00.000Z');
+  assert.match(formatted, /12|١٢/);
+  assert.match(formatted, /سبتمبر/);
+  assert.match(formatted, /2026|٢٠٢٦/);
+  assert.match(formatted, /11|١١/);
+
+  const result = buildNotificationEmail({
+    id: 'support:fallback', type: 'inquiry', message: 'استفسار',
+    created_at: '2026-09-12T20:32:00.000Z', diagnostics: {},
+  }, { to: 'internal@example.test', contact: { email: 'reply@example.test', name: '' } });
+  assert.match(result.payload.text, /البريد: reply@example\.test/);
+  assert.doesNotMatch(result.payload.text, /الاسم:/);
+  assert.match(result.payload.text, new RegExp(`الوقت: ${formatted.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+
+  const noContact = buildNotificationEmail({
+    id: 'support:no-contact', type: 'suggestion', message: 'اقتراح محفوظ',
+    created_at: '2026-09-12T20:32:00.000Z', diagnostics: {},
+  }, { to: 'internal@example.test', contact: {} });
+  assert.equal(noContact.ok, true);
+  assert.doesNotMatch(noContact.payload.text, /الاسم:|البريد:/);
+});
+
+test('worker operational logs never include contact identity or message content', async () => {
+  const worker = await readFile(new URL('../supabase/functions/support-notification-worker/index.ts', import.meta.url), 'utf8');
+  assert.match(worker, /auth\.admin\.getUserById\(ownerId\)/);
+  assert.match(worker, /select\('teacher_name'\)/);
+  const logCalls = [...worker.matchAll(/console\.(?:log|error)\(([^\n]+)\)/g)].map((match) => match[1]).join('\n');
+  assert.doesNotMatch(logCalls, /contact|email|teacher_name|message|diagnostics|owner_id/i);
 });
 
 test('delivery classification and retry policy are bounded and deterministic', () => {
@@ -171,4 +241,5 @@ test('existing Support RLS contract remains insert-only for authenticated users'
     has_table_privilege('authenticated','rakeezx.support_requests','insert') authenticated_insert,
     has_table_privilege('authenticated','rakeezx.support_requests','select') authenticated_select`)).rows[0];
   assert.deepEqual(privileges, { anon_insert: false, authenticated_insert: true, authenticated_select: false });
+  assert.equal((await pg.query(`select has_table_privilege('service_role','rakeezx.profile','select') allowed`)).rows[0].allowed, true);
 });
