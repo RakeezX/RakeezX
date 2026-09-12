@@ -32,6 +32,7 @@ test('Home, Schedule and Calendar: compact RTL surfaces and real controls in bot
     await expect(page.locator('.hero .compact-timing-pill')).toBeVisible();
     if (width < 900) {
       await expect(page.locator('.mobile-brand img')).toHaveJSProperty('naturalWidth', 192);
+      expect((await page.locator('.mobile-brand img').boundingBox()).width).toBe(54);
       await expect(page.locator('.topbar__teacher-label')).toHaveText('مركز المعلم');
       expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(44);
       await page.locator('.topbar__teacher-btn').click();

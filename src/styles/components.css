@@ -6497,7 +6497,7 @@
 }
 @media screen and (max-width: 899px) {
   .topbar--home { padding-block: 8px; padding-block-start: calc(8px + env(safe-area-inset-top)); }
-  .topbar--home .brand-lockup__icon--app { inline-size: 48px; block-size: 48px; }
+  .topbar--home .brand-lockup__icon--app { inline-size: 54px; block-size: 54px; }
   .topbar--home .brand-lockup { gap: 7px; }
   .topbar--home .brand-lockup__name strong { font-size: 19px; }
   .topbar--home .brand-lockup__name > span { font-size: 17px; }

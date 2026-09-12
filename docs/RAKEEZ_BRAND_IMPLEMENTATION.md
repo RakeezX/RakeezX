@@ -1,5 +1,38 @@
 # Brand implementation — local candidate
 
+## BRAND-ICON-ASSET-LOCK-01.1 — display scale and favicon framing
+
+All platform icon exports and the authoritative 1254px Master remain unchanged. Presentation-only sizing increases the persistent desktop sidebar/header icon from 56px to 64px, and the mobile Home/header icon from 48px to 54px. Both dimensions are explicit before image load, so the refinement introduces no loading-driven layout shift.
+
+The only asset transformation in this refinement is the Product Owner-authorized 32px favicon framing. `scripts/build-brand-assets.mjs` removes an equal 108 source pixels of outer canvas on every side, leaving a centered 1038×1038 source frame. It then proportionally scales the complete image into the 32×32 RGB PNG canvas. This is one uniform image transform: internal modules, typography, colors, spacing, shadows, and relative positions are untouched. Cache key `v15` exposes the revised favicon without changing service-worker behavior.
+
+The untouched 16px Master review remains insufficiently legible and unsupported. No 16px favicon or replacement symbol is shipped: **MASTER ICON NOT LEGIBLE AT THIS SIZE — PRODUCT OWNER DECISION REQUIRED**.
+
+## BRAND-ICON-ASSET-LOCK-01 — locked master, 2026-09-12
+
+This section supersedes every earlier icon-generation or favicon statement below. Earlier sections are retained only as historical implementation notes; their generated SVG, reconstructed artwork, simplified favicon, and monochrome derivative are no longer Product assets.
+
+Authoritative external source: `ChatGPT Image 12 سبتمبر 2026، 01_01_17 م (1).png`. The byte-identical repository source is `assets/brand-icon-master-1254.png`: PNG, 1254×1254, RGB, SHA-256 `a83bbe865c835e1162d313bc95c6ad9aac34630cceae62a79dab55cf746e5a27`.
+
+`scripts/build-brand-assets.mjs` verifies the source hash and dimensions, then performs proportional PNG resampling only. It does not recreate, redraw, retype, recolor, simplify, or rearrange any artwork. No canvas padding is applied: the supplied source already keeps the functional modules and central wordmark inside the mask-safe area. `assets/icon-maskable.png` is byte-identical to the proportional 512px export.
+
+Generated exports:
+
+- Web/PWA: 512, 256, 192, 180, 96, 64, 48, and 32px.
+- Android: 512, 192, 144, 96, 72, and 48px.
+- iOS/iPadOS: 1024, 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29, and 20px.
+- Shared output naming: `assets/icon-{size}.png`; identical dimensions shared by platforms are one byte-identical file.
+- PWA maskable alias: `assets/icon-maskable.png` at 512px.
+- Favicon: `assets/favicon-32.png`; its framing is governed exclusively by the approved 01.1 rule above.
+
+The 32px Master treatment remains recognizable by the locked four-module silhouette and is used with the authorized outer-canvas framing above. The untouched 16px export was reviewed but is not sufficiently legible, so it is generated only under ignored review output and is not referenced or shipped: **MASTER ICON NOT LEGIBLE AT THIS SIZE — PRODUCT OWNER DECISION REQUIRED**. No replacement or simplified derivative was created.
+
+The locked raster source now supplies the installed PWA/Desktop icon, manifest Android-style icons, Apple touch icon, mobile Home header identity, install prompt, Login, and About identity. The previous `icon.svg`, `favicon.svg`, 16px favicon, and monochrome SVG derivative were removed. Browser title remains `رَكيز المعلم`; Product/runtime/data behavior is unchanged.
+
+---
+
+The remaining sections document superseded brand exploration and earlier responsive refinements. Where they conflict with the locked-master section above, the locked-master section is authoritative.
+
 ## Refinement 01.2 — one Home brand treatment
 
 This supersedes the Home hero direction in 01.1. Home no longer renders its own icon/wordmark block at any width. It begins with the existing greeting and timing link, followed by date/calendar context and daily content; no placeholder space remains. Desktop retains the persistent sidebar brand; mobile retains the compact app-header brand.

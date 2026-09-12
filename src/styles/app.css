@@ -18,7 +18,7 @@
 .brand-lockup--prominent .brand-lockup__name > span { font-size:27px; }
 .brand-lockup__caption { margin-top:7px; color:var(--text-2); font-size:15px; font-weight:500; line-height:1.5; overflow-wrap:anywhere; }
 .brand-lockup--prominent .brand-lockup__copy { min-inline-size:0; }
-.sidebar__brand .brand-lockup__icon--app { inline-size:56px; block-size:56px; }
+.sidebar__brand .brand-lockup__icon--app { inline-size:64px; block-size:64px; }
 .home-pwa-brand-icon { display:block; inline-size:56px; block-size:56px; flex:none; }
 @media (max-width: 599px) {
   .brand-lockup--prominent { gap:12px; }

@@ -4,7 +4,7 @@ import { html } from './dom.js';
 export const BRAND_NAME = 'رَكيز المعلم';
 export const BRAND_SIGNATURE = 'RAKEEZ X';
 export const APP_ICON_URL = new URL('../../assets/icon-192.png', import.meta.url).href;
-const SMALL_ICON_URL = new URL('../../assets/favicon.svg', import.meta.url).href;
+const SMALL_ICON_URL = new URL('../../assets/favicon-32.png', import.meta.url).href;
 
 export function brandLockup({ signature = false, appIcon = false, prominent = false, caption = '' } = {}) {
   return html`<span class="brand-lockup ${prominent ? 'brand-lockup--prominent' : ''}" aria-label="${BRAND_NAME}">

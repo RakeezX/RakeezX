@@ -32,7 +32,12 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
       await expect(page.locator(selector)).toHaveJSProperty('naturalWidth', 192);
       expect(await page.locator(selector).evaluate(img => img.getBoundingClientRect().width)).toBeGreaterThanOrEqual(56);
     }
-    if (width >= 900) await expect(page.locator('.sidebar__brand img')).toHaveJSProperty('naturalWidth', 192);
+    if (width >= 900) {
+      await expect(page.locator('.sidebar__brand img')).toHaveJSProperty('naturalWidth', 192);
+      expect((await page.locator('.sidebar__brand img').boundingBox()).width).toBe(64);
+    } else {
+      expect((await page.locator('.mobile-brand img').boundingBox()).width).toBe(54);
+    }
     const heroAudit = await new AxeBuilder({ page }).include('.hero').analyze();
     expect(heroAudit.violations).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -75,22 +80,55 @@ test('manifest and brand artwork keep internal identity and required icon sizes'
   expect(manifest.short_name).toBe('رَكيز المعلم');
   expect(manifest.id).toBe('rakeezx');
   expect(manifest.start_url).toBe('./');
+  expect(manifest.icons).toEqual([
+    { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    { src: 'assets/icon-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+  ]);
   await page.goto('/');
-  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute('href', 'assets/favicon.svg?v=13');
-  for (const [file, size] of [['icon-180.png',180],['icon-192.png',192],['icon-512.png',512],['icon-maskable.png',512],['favicon-16.png',16],['favicon-32.png',32]]) {
+  await expect(page.locator('link[rel="icon"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'assets/favicon-32.png?v=15');
+  for (const size of [1024, 512, 256, 192, 180, 167, 152, 144, 120, 96, 87, 80, 76, 72, 64, 60, 58, 48, 40, 32, 29, 20]) {
+    expect(await page.evaluate(async ({ file }) => {
+      const image = new Image(); image.src = `/assets/${file}`; await image.decode(); return [image.naturalWidth, image.naturalHeight];
+    }, { file: `icon-${size}.png` })).toEqual([size,size]);
+  }
+  for (const [file, size] of [['brand-icon-master-1254.png',1254],['icon-maskable.png',512],['favicon-32.png',32]]) {
     expect(await page.evaluate(async ({ file }) => {
       const image = new Image(); image.src = `/assets/${file}`; await image.decode(); return [image.naturalWidth, image.naturalHeight];
     }, { file })).toEqual([size,size]);
   }
+  expect((await request.get('/assets/favicon-16.png')).headers()['content-type']).not.toMatch(/^image\//);
+  expect((await request.get('/assets/icon.svg')).headers()['content-type']).not.toMatch(/^image\//);
 });
 
-test('tiny derivative stays legible at native sizes and browser favicon URLs resolve', async ({ page, request }) => {
+test('locked 32px master favicon and full icon resolve without a substitute derivative', async ({ page, request }) => {
   await page.goto('/');
   const links = await page.locator('link[rel="icon"]').evaluateAll(nodes => nodes.map(node => node.href));
   for (const url of links) expect((await request.get(url)).ok()).toBe(true);
   const root = new URL(page.url()).origin;
-  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونات المصغرة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2>${[16,24,32,48].map(size=>`<div class="sample"><img src="${root}/assets/favicon.svg?v=13" width="${size}" height="${size}" alt="العلامة الكتابية المصغرة"><span>${size}px</span></div>`).join('')}<img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
+  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونة المعتمدة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2><div class="sample"><img src="${root}/assets/favicon-32.png?v=15" width="32" height="32" alt="أيقونة رَكيز المعلم المعتمدة"><span>32px</span></div><img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
   await page.setViewportSize({ width: 820, height: 400 });
   await page.locator('img').evaluateAll(nodes => Promise.all(nodes.map(node => node.decode())));
   await page.screenshot({ path: 'test-results/brand-implementation/tiny-native-size.png' });
+});
+
+test('locked master artwork survives desktop, Android-mask and iOS presentation', async ({ page }) => {
+  await mkdir('test-results/brand-implementation', { recursive: true });
+  await page.setViewportSize({ width: 940, height: 440 });
+  await page.goto('/');
+  const root = new URL(page.url()).origin;
+  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص منصات الأيقونة المعتمدة</title><style>
+    *{box-sizing:border-box}body{margin:0;padding:40px;background:#eef4f0;color:#10251d;font:16px Segoe UI,sans-serif}
+    main{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.sample{display:grid;justify-items:center;gap:14px;padding:24px;background:#fff;border:1px solid #dce7e1;border-radius:22px}
+    .frame{width:160px;height:160px;overflow:hidden;background:#fff}.desktop{border-radius:28px}.android{border-radius:50%}.ios{border-radius:35px}.frame img{display:block;width:100%;height:100%}
+    h2{margin:0;font-size:17px}
+  </style></head><body><main>
+    <section class="sample"><div class="frame desktop"><img src="${root}/assets/icon-192.png" alt="أيقونة تطبيق سطح المكتب"></div><h2>تطبيق سطح المكتب</h2></section>
+    <section class="sample"><div class="frame android"><img src="${root}/assets/icon-maskable.png" alt="معاينة القص الدائري في أندرويد"></div><h2>منطقة أندرويد الآمنة</h2></section>
+    <section class="sample"><div class="frame ios"><img src="${root}/assets/icon-180.png" alt="أيقونة آيفون وآيباد"></div><h2>iOS / iPadOS</h2></section>
+  </main></body></html>`);
+  await page.locator('img').evaluateAll((images) => Promise.all(images.map((image) => image.decode())));
+  await expect(page.locator('img')).toHaveCount(3);
+  await page.screenshot({ path: 'test-results/brand-implementation/platform-icon-contexts.png' });
 });

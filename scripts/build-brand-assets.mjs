@@ -1,50 +1,87 @@
-/** Brand artwork generation only. Uses installed Windows Segoe UI; no font files copied.
- * Run on Windows: node scripts/build-brand-assets.mjs
- * Fixed Model 3 composition, T3 hierarchy. PNG text keeps PWA artwork deterministic.
+/**
+ * Locked RAKEEZ brand asset exporter.
+ *
+ * Source artwork is never rebuilt or edited. Chromium decodes the authoritative
+ * PNG and performs only proportional square resampling at deviceScaleFactor 1.
  */
 import { chromium } from '@playwright/test';
-import { writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-if (process.platform !== 'win32') throw new Error('Generate approved artwork on Windows with installed Segoe UI.');
 const asset = (name) => fileURLToPath(new URL(`../assets/${name}`, import.meta.url));
-const browser = await chromium.launch();
-try {
-  const page = await browser.newPage({ viewport: { width: 1024, height: 1024 }, deviceScaleFactor: 1 });
-  const screenshot = async (svg, size, path) => {
-    await page.setViewportSize({ width: size, height: size });
-    await page.setContent(`<style>html,body{margin:0;background:transparent}svg{display:block;width:100%;height:100%}</style>${svg}`);
-    await page.evaluate(() => document.fonts.ready);
-    return page.screenshot({ omitBackground: true, ...(path ? { path } : {}) });
-  };
-  if (!process.argv.includes('--small-only')) {
-  // A complete two-word graphic, not font outlines, glyph sets or a bundled font.
-  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 724 400"><g fill="#0C3022" font-family="Segoe UI, Tahoma, Arial, sans-serif" text-anchor="middle" direction="rtl"><text x="362" y="161" font-size="218" font-weight="700">رَكيز</text><text x="362" y="337" font-size="188" font-weight="400">المعلم</text></g></svg>`;
-  await page.setViewportSize({ width: 724, height: 400 });
-  await page.setContent(`<style>html,body{margin:0;background:transparent}svg{display:block}</style>${textSvg}`);
-  await page.evaluate(() => document.fonts.ready);
-  const name = (await page.screenshot({ omitBackground: true })).toString('base64');
-  const cues = [
-    '<circle cy="-16" r="15"/><path d="M-26 26v-9a26 26 0 0 1 52 0v9z"/><circle cx="-35" cy="-10" r="10"/><circle cx="35" cy="-10" r="10"/>',
-    '<g fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"><path d="M-36-22h72M-36 0h72M-36 22h45"/></g>',
-    '<g fill="none" stroke="currentColor" stroke-width="11" stroke-linejoin="round"><rect x="-34" y="-30" width="68" height="65" rx="10"/><path d="M-34-10h68M-19-42v21M19-42v21m-37 28 14 14 27-31"/></g>',
-    '<rect x="-34" y="6" width="17" height="33" rx="3"/><rect x="-8" y="-14" width="17" height="53" rx="3"/><rect x="18" y="-35" width="17" height="74" rx="3"/>',
-  ];
-  const artwork = `<defs><linearGradient id="tile" x2=".7" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#EAF3E9"/></linearGradient><linearGradient id="module" x2="1" y2="1"><stop stop-color="#34B77E"/><stop offset="1" stop-color="#0F5132"/></linearGradient></defs><rect x="6" y="6" width="1012" height="1012" rx="225" fill="url(#tile)" stroke="#D9EAD7" stroke-width="8"/><rect x="221" y="208" width="582" height="610" rx="165" fill="none" stroke="#B7DCC2" stroke-width="12" opacity=".8"/>${[[235,220],[789,220],[235,805],[789,805]].map(([x,y],i)=>`<g transform="translate(${x} ${y})"><rect x="-116" y="-81" width="232" height="180" rx="48" fill="#0F5132" opacity=".045"/><rect x="-116" y="-90" width="232" height="180" rx="48" fill="url(#module)"/><g transform="scale(1.5)" fill="#F8FBF8" color="#F8FBF8">${cues[i]}</g></g>`).join('')}<image x="150" y="315" width="724" height="400" href="data:image/png;base64,${name}"/><path d="m710 687 20 24m0-24-20 24" fill="none" stroke="#529D72" stroke-width="3" stroke-linecap="round" opacity=".71"/>`;
-  const wrap = (content) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="رَكيز المعلم">${content}</svg>`;
-  const svg = wrap(artwork);
-  await writeFile(asset('icon.svg'), svg + '\n');
-  for (const size of [180,192,512,1024]) await screenshot(svg, size, asset(`icon-${size}.png`));
-  // Full-bleed ivory and all artwork inside the central mask-safe circle.
-  await screenshot(wrap(`<rect width="1024" height="1024" fill="#F8FBF8"/><g transform="translate(154 154) scale(.7)">${artwork}</g>`), 512, asset('icon-maskable.png'));
+const reviewAsset = (name) => fileURLToPath(new URL(`../test-results/brand-icon/${name}`, import.meta.url));
+export const MASTER_NAME = 'brand-icon-master-1254.png';
+export const MASTER_SIZE = 1254;
+export const MASTER_SHA256 = 'a83bbe865c835e1162d313bc95c6ad9aac34630cceae62a79dab55cf746e5a27';
+export const FAVICON_CROP_INSET = 108;
+
+export const PLATFORM_ICON_SIZES = Object.freeze({
+  web: [512, 256, 192, 180, 96, 64, 48, 32],
+  android: [512, 192, 144, 96, 72, 48],
+  ios: [1024, 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29, 20],
+});
+
+const pngDimensions = (buffer) => ({ width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) });
+
+export async function buildLockedBrandAssets() {
+  const sizes = [...new Set(Object.values(PLATFORM_ICON_SIZES).flat())].sort((a, b) => b - a);
+  const master = await readFile(asset(MASTER_NAME));
+  const masterHash = createHash('sha256').update(master).digest('hex');
+  if (masterHash !== MASTER_SHA256) throw new Error(`Locked master hash mismatch: ${masterHash}`);
+
+  const masterDimensions = pngDimensions(master);
+  if (masterDimensions.width !== MASTER_SIZE || masterDimensions.height !== MASTER_SIZE) {
+    throw new Error(`Locked master must be ${MASTER_SIZE}x${MASTER_SIZE}; received ${masterDimensions.width}x${masterDimensions.height}.`);
   }
-  // Complete wordmark graphics from the installed safe font, never a font file.
-  // At 16px the first word leads; the browser title supplies the full brand name.
-  const wordmark = async (micro = false, fill = '#0F5132') => (await screenshot(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g fill="${fill}" font-family="Segoe UI, Tahoma, Arial, sans-serif" text-anchor="middle" direction="rtl">${micro ? '<text x="128" y="154" font-size="145" font-weight="700">ركيز</text>' : '<text x="128" y="103" font-size="105" font-weight="700">ركيز</text><text x="128" y="208" font-size="91" font-weight="600">المعلم</text>'}</g></svg>`, 256)).toString('base64');
-  const full = await wordmark();
-  const micro = await wordmark(true);
-  const small = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="رَكيز المعلم"><style>.micro{display:none}@media(max-width:20px){.full{display:none}.micro{display:block}}</style><rect width="64" height="64" rx="13" fill="#F8FBF8"/><image class="full" width="64" height="64" href="data:image/png;base64,${full}"/><image class="micro" width="64" height="64" href="data:image/png;base64,${micro}"/></svg>`;
-  await writeFile(asset('favicon.svg'), small + '\n');
-  for (const size of [16,32]) await screenshot(small, size, asset(`favicon-${size}.png`));
-  await writeFile(asset('brand-monochrome.svg'), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="رَكيز المعلم"><image width="64" height="64" href="data:image/png;base64,${await wordmark(false, '#000000')}"/></svg>\n`);
-} finally { await browser.close(); }
+
+  const source = `data:image/png;base64,${master.toString('base64')}`;
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: MASTER_SIZE, height: MASTER_SIZE }, deviceScaleFactor: 1 });
+    const showMaster = async (size, cropInset = 0) => {
+      const sourceFrame = MASTER_SIZE - cropInset * 2;
+      const renderedSize = size * MASTER_SIZE / sourceFrame;
+      const offset = -(size * cropInset / sourceFrame);
+      await page.setViewportSize({ width: size, height: size });
+      await page.setContent(`<style>html,body{width:100%;height:100%;margin:0;overflow:hidden;background:transparent}img{position:absolute;display:block;inline-size:${renderedSize}px;block-size:${renderedSize}px;inset-inline-start:${offset}px;inset-block-start:${offset}px}</style><img src="${source}" alt="">`);
+      await page.locator('img').evaluate((image) => image.decode());
+    };
+
+    await showMaster(MASTER_SIZE);
+    await page.locator('img').evaluate((image) => image.decode());
+    const decoded = await page.locator('img').evaluate((image) => [image.naturalWidth, image.naturalHeight]);
+    if (decoded[0] !== MASTER_SIZE || decoded[1] !== MASTER_SIZE) throw new Error(`Unexpected decoded master size: ${decoded.join('x')}`);
+
+    for (const size of sizes) {
+      await showMaster(size);
+      const output = asset(`icon-${size}.png`);
+      await page.screenshot({ path: output, omitBackground: true, animations: 'disabled' });
+      const dimensions = pngDimensions(await readFile(output));
+      if (dimensions.width !== size || dimensions.height !== size) throw new Error(`Unexpected ${output} dimensions.`);
+    }
+
+    // Favicon-only authorization: trim equal outer canvas on all sides, while
+    // scaling the complete untouched internal artwork as one image.
+    await showMaster(32, FAVICON_CROP_INSET);
+    await page.screenshot({ path: asset('favicon-32.png'), omitBackground: true, animations: 'disabled' });
+
+    // Review-only: the untouched master is not sufficiently legible at 16px.
+    await mkdir(fileURLToPath(new URL('../test-results/brand-icon/', import.meta.url)), { recursive: true });
+    await showMaster(16);
+    await page.screenshot({ path: reviewAsset('favicon-master-16-review.png'), omitBackground: true, animations: 'disabled' });
+
+    // The source composition already keeps functional modules and wordmark in the
+    // central mask-safe area, so no additional padding or artwork change is used.
+    await copyFile(asset('icon-512.png'), asset('icon-maskable.png'));
+  } finally {
+    await browser.close();
+  }
+
+  console.log(`Exported locked ${MASTER_SIZE}px master to ${sizes.length} proportional product sizes; 16px is review-only.`);
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await buildLockedBrandAssets();
+}
