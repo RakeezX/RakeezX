@@ -32,6 +32,12 @@ const DIAGNOSTIC_LABELS = Object.freeze({
   syncState: 'حالة المزامنة العامة',
   pendingMutations: 'تغييرات قيد الانتظار',
   failedMutations: 'تغييرات تعذّر إرسالها',
+  pendingCount: 'تغييرات بانتظار الرفع',
+  failedCount: 'تغييرات تعذّر إرسالها',
+  blockedCount: 'تغييرات تنتظر بيانات مرتبطة',
+  rejectedCount: 'تغييرات لم يقبلها الخادم',
+  historicalConflictCount: 'اختلافات تاريخية متصالحة',
+  actionableSyncIssue: 'توجد حالة مزامنة تحتاج متابعة',
   lastSuccessfulSyncAt: 'آخر مزامنة ناجحة',
   routeCategory: 'قسم التطبيق',
 });
@@ -75,7 +81,7 @@ function pwaStandalone() {
     navigator.standalone === true || document.referrer?.includes('android-app://'));
 }
 
-export function currentSafeSupportDiagnostics() {
+export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperationalSummarySnapshot?.() ?? {}) {
   const width = window.innerWidth;
   const deviceCategory = width < 600 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
   const browser = browserDetails();
@@ -91,8 +97,14 @@ export function currentSafeSupportDiagnostics() {
     viewport: { width: window.innerWidth, height: window.innerHeight },
     pwaStandalone: pwaStandalone(),
     online: online(),
-    syncState: sync.displayState().detailStatus,
-    lastSuccessfulSyncAt: sync.state.lastSyncedAt,
+    syncState: syncSummary.state ?? sync.displayState().detailStatus,
+    pendingCount: syncSummary.pendingCount,
+    failedCount: syncSummary.failedCount,
+    blockedCount: syncSummary.blockedCount,
+    rejectedCount: syncSummary.rejectedCount,
+    historicalConflictCount: syncSummary.historicalConflictCount,
+    actionableSyncIssue: syncSummary.actionableSyncIssue,
+    lastSuccessfulSyncAt: syncSummary.lastSuccessfulSyncAt ?? sync.state.lastSyncedAt,
     routeCategory: routeCategory(),
   });
 }
@@ -285,10 +297,11 @@ export default {
         button.textContent = 'جارٍ الإرسال…';
       }
       try {
+        const syncSummary = await sync.getSyncOperationalSummary();
         await submitSupportRequest({
           type: draft.type,
           message: draft.message,
-          diagnostics: currentSafeSupportDiagnostics(),
+          diagnostics: currentSafeSupportDiagnostics(syncSummary),
         });
         draft = { ...initialDraft(), success: true };
         toast('تم إرسال طلبك بنجاح.');

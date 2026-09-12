@@ -43,7 +43,9 @@ test('support diagnostics retain only the documented allowlist and redact sensit
   const diagnostics = sanitizeSupportDiagnostics({
     timestamp: '2026-09-08T12:34:56.000Z', timezone: 'Asia/Riyadh', deviceCategory: 'mobile',
     browser: 'chrome', browserVersion: '140.0', mobile: true, viewport: { width: 393, height: 852 },
-    pwaStandalone: true, online: true, syncState: 'synced', pendingMutations: 2, failedMutations: 0,
+    pwaStandalone: true, online: true, syncState: 'pending', pendingMutations: 2, failedMutations: 0,
+    pendingCount: 2, failedCount: 0, blockedCount: 1, rejectedCount: 0,
+    historicalConflictCount: 3, actionableSyncIssue: true,
     lastSuccessfulSyncAt: '2026-09-08T12:30:00.000Z', routeCategory: 'classes',
     appVersion: '1.0.0', buildSha: 'a'.repeat(64), buildTimestamp: '2026-09-08T12:00:00.000Z',
     route: '#/classes/secret-teaching', ownerId: 'owner-secret', email: 'teacher@example.test',
@@ -53,7 +55,9 @@ test('support diagnostics retain only the documented allowlist and redact sensit
     appVersion: '1.0.0', buildSha: 'a'.repeat(64), buildTimestamp: '2026-09-08T12:00:00.000Z',
     timestamp: '2026-09-08T12:34:56.000Z', timezone: 'Asia/Riyadh', deviceCategory: 'mobile',
     browser: 'chrome', browserVersion: '140.0', mobile: true, viewport: { width: 400, height: 850 },
-    pwaStandalone: true, online: true, syncState: 'synced', pendingMutations: 2, failedMutations: 0,
+    pwaStandalone: true, online: true, syncState: 'pending', pendingMutations: 2, failedMutations: 0,
+    pendingCount: 2, failedCount: 0, blockedCount: 1, rejectedCount: 0,
+    historicalConflictCount: 3, actionableSyncIssue: true,
     lastSuccessfulSyncAt: '2026-09-08T12:30:00.000Z', routeCategory: 'classes',
   });
 });
@@ -80,7 +84,9 @@ test('support submission is authenticated, online-only, direct, and never carrie
     type: 'technical', message: '  لا تظهر الصفحة  ',
     diagnostics: {
       appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
-      syncState: 'error', pendingMutations: 3, routeCategory: 'settings', rawOutbox: [{ id: 'secret' }],
+      syncState: 'error', pendingMutations: 3, pendingCount: 3, failedCount: 1, blockedCount: 0,
+      rejectedCount: 0, historicalConflictCount: 2, actionableSyncIssue: true,
+      routeCategory: 'settings', rawOutbox: [{ id: 'secret' }],
     },
   });
   assert.match(result.id, /^support:/);
@@ -92,7 +98,9 @@ test('support submission is authenticated, online-only, direct, and never carrie
     id: result.id, type: 'technical', message: 'لا تظهر الصفحة',
     diagnostics: {
       appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
-      timestamp: body.diagnostics.timestamp, syncState: 'error', pendingMutations: 3, routeCategory: 'settings',
+      timestamp: body.diagnostics.timestamp, syncState: 'error', pendingMutations: 3,
+      pendingCount: 3, failedCount: 1, blockedCount: 0, rejectedCount: 0,
+      historicalConflictCount: 2, actionableSyncIssue: true, routeCategory: 'settings',
     },
   });
   assert.equal('owner_id' in body, false);

@@ -58,6 +58,14 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
   await waitForSyncState(page, 'synced');
   await expectSingleVisibleHubTrigger(page);
 
+  const healthySummary = await page.evaluate(() => window.__syncModule.getSyncOperationalSummary());
+  expect(healthySummary).toMatchObject({
+    state: 'synced', pendingCount: 0, failedCount: 0, blockedCount: 0,
+    rejectedCount: 0, actionableSyncIssue: false, localWorkSaved: true,
+    cloudSyncHealthy: true, teacherActionRequired: false, safeToContinueUnrelatedWork: true,
+  });
+  expect(JSON.stringify(healthySummary)).not.toMatch(/recordId|mutationId|patch|receipt|token|student|class/i);
+
   await page.locator('.teacher-mini-hub-trigger').click();
   const sheet = page.locator('.sheet').last();
   const badge = sheet.locator('[data-sync-badge]');
@@ -95,6 +103,12 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
     await window.store.save({ subjects: [{ id: 'sync-ui:offline', name: 'مادة دون اتصال', slug: 'sync-ui-offline' }] });
   });
   await waitForSyncState(page, 'offline');
+  const offlineSummary = await page.evaluate(() => window.__syncModule.getSyncOperationalSummary());
+  expect(offlineSummary).toMatchObject({
+    state: 'offline', pendingCount: 1, actionableSyncIssue: true,
+    automaticRetryActive: false, teacherActionRequired: false,
+    localWorkSaved: true, cloudSyncHealthy: false, safeToContinueUnrelatedWork: true,
+  });
   await context.setOffline(false);
   await page.evaluate(() => window.__syncModule.syncAll({ full: false }));
   await waitForSyncState(page, 'synced');

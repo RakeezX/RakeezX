@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { IDBFactory } from 'fake-indexeddb';
 
 import { STORES } from '../src/lib/db.js';
-import { createSyncV2Engine } from '../src/lib/sync-v2.js';
-import { DEFAULT_TIME_PROFILES, makeTimeProfile } from '../src/models.js';
+import { createSyncV2Engine, summarizeSyncV2OperationalState } from '../src/lib/sync-v2.js';
+import { DEFAULT_TIME_PROFILES, makeTimeProfile, sessionId } from '../src/models.js';
 import { customSubjectSlug } from '../src/lib/subject-catalog.js';
 
 const clone = (value) => value == null ? value : structuredClone(value);
@@ -788,7 +788,92 @@ test('different-field stale edits survive while same-field conflicts retain diag
   assert.equal(local.note, 'Note B');
   assert.equal(local.syncConflicts.length, 1);
   assert.deepEqual(local.syncConflicts[0].groups, ['name']);
-  assert.equal((await c.engine.status()).state, 'conflicted');
+  assert.equal(local.syncConflicts[0].lifecycle, 'historical_reconciled');
+  const status = await c.engine.status();
+  assert.equal(status.state, 'synced', 'reconciled evidence must not remain an actionable Sync failure');
+  assert.equal(status.historicalConflictCount, 1);
+  assert.equal(status.actionableSyncIssue, false);
+});
+
+test('operational summary preserves historical evidence without masking actionable outbox priority or leaking private data', () => {
+  const recordsByStore = {
+    students: [{ id: 'private-student-id', name: 'Private Student', syncConflicts: [{
+      mutationId: 'private-mutation-id', rejectedPatch: { name: 'Private Student' }, recordedAt: 1,
+    }] }],
+  };
+  const mutation = (state, extra = {}) => ({
+    protocol: 'v2', state, store: 'sessions', recordId: 'private-session-id',
+    patch: { note: 'private payload' }, lastError: { message: 'private raw error' }, ...extra,
+  });
+
+  const pending = summarizeSyncV2OperationalState({ outbox: [mutation('pending')], recordsByStore });
+  assert.equal(pending.state, 'pending');
+  assert.equal(pending.pendingCount, 1);
+  assert.equal(pending.historicalConflictCount, 1);
+  assert.equal(pending.actionableSyncIssue, true);
+
+  const blocked = summarizeSyncV2OperationalState({ outbox: [mutation('blocked', { blockedReason: 'dependency-pending' })], recordsByStore });
+  assert.equal(blocked.state, 'blocked');
+  assert.equal(blocked.blockedCount, 1);
+
+  const rejected = summarizeSyncV2OperationalState({ outbox: [mutation('rejected')], recordsByStore });
+  assert.equal(rejected.state, 'rejected');
+  assert.equal(rejected.rejectedCount, 1);
+
+  const failed = summarizeSyncV2OperationalState({
+    outbox: [mutation('pending'), mutation('blocked'), mutation('rejected'), mutation('failed')], recordsByStore,
+  });
+  assert.equal(failed.state, 'error');
+  assert.equal(failed.failedCount, 1);
+  assert.deepEqual(failed.affectedCategories, ['schedule']);
+  assert.deepEqual(failed.historicalConflictCategories, ['students']);
+  assert.doesNotMatch(JSON.stringify(failed), /private|recordId|mutationId|patch|lastError/i);
+});
+
+test('two devices materializing the same dated session converge to one canonical identity and retain only historical evidence', async (t) => {
+  const server = new MemoryV2Server();
+  const a = makeClient(server, 'session-materialize-a');
+  const b = makeClient(server, 'session-materialize-b');
+  const remapped = makeClient(server, 'session-materialize-remap');
+  t.after(() => [a, b, remapped].forEach((client) => client.database.close()));
+
+  const teachingId = 'teaching-materialize';
+  const date = '2026-09-13';
+  const period = 1;
+  const canonicalId = sessionId(teachingId, date, period);
+  const session = {
+    id: canonicalId, teachingId, date, period, status: 'scheduled',
+    slotId: 'slot-materialize', startTime: '08:00', endTime: '08:45', timeProfileId: 'time-materialize',
+  };
+  for (const client of [a, b, remapped]) {
+    await seedAuthoritative(client, 'teachings', { id: teachingId });
+    await seedAuthoritative(client, 'slots', { id: session.slotId });
+    await seedAuthoritative(client, 'timeProfiles', { id: session.timeProfileId });
+  }
+  await Promise.all([a, b].map((client) => client.engine.commitMutation({
+    store: 'sessions', recordId: canonicalId, op: 'create', create: session,
+  })));
+  await Promise.all([a.engine.dispatchPending(), b.engine.dispatchPending()]);
+  await Promise.all([a.engine.pullStore('sessions'), b.engine.pullStore('sessions')]);
+
+  assert.equal(server.table('sessions').size, 1, 'concurrent materialization must not create duplicate live sessions');
+  const statuses = await Promise.all([a.engine.status(), b.engine.status()]);
+  assert.ok(statuses.every((status) => status.state === 'synced'));
+  assert.equal(statuses.reduce((total, status) => total + status.historicalConflictCount, 0), 1);
+  const evidence = [...await a.database.getAll('sessions'), ...await b.database.getAll('sessions')]
+    .flatMap((record) => record.syncConflicts ?? []);
+  assert.equal(evidence.length, 1);
+  assert.equal(evidence[0].lifecycle, 'historical_reconciled');
+
+  await remapped.engine.commitMutation({
+    store: 'sessions', recordId: 'temporary-session-id', op: 'create', create: { ...session, id: 'temporary-session-id' },
+  });
+  await remapped.engine.dispatchPending();
+  assert.equal(await remapped.database.get('sessions', 'temporary-session-id'), undefined);
+  assert.ok(await remapped.database.get('sessions', canonicalId));
+  assert.equal(server.table('sessions').size, 1);
+  assert.equal((await remapped.engine.status()).historicalConflictCount, 0,
+    'natural canonical remapping is convergence, not a historical conflict');
 });
 
 test('pull overlays pending patches and deletes, then converges to an authoritative tombstone', async (t) => {

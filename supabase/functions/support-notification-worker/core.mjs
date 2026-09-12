@@ -8,7 +8,8 @@ const DIAGNOSTIC_KEYS = new Set([
   'appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone',
   'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport',
   'pwaStandalone', 'online', 'syncState', 'pendingMutations',
-  'failedMutations', 'lastSuccessfulSyncAt', 'routeCategory',
+  'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount',
+  'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory',
 ]);
 
 const FAILURE_CATEGORIES = new Set([
@@ -77,9 +78,10 @@ function sanitizeDiagnostics(input) {
     output.viewport = { width: input.viewport.width, height: input.viewport.height };
   }
   if (SYNC_STATES.has(input.syncState)) output.syncState = input.syncState;
-  for (const key of ['pendingMutations', 'failedMutations']) {
+  for (const key of ['pendingMutations', 'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount']) {
     if (Number.isInteger(input[key]) && input[key] >= 0 && input[key] <= 999999) output[key] = input[key];
   }
+  if (typeof input.actionableSyncIssue === 'boolean') output.actionableSyncIssue = input.actionableSyncIssue;
   if (ROUTE_CATEGORIES.has(input.routeCategory)) output.routeCategory = input.routeCategory;
   return output;
 }
@@ -131,6 +133,11 @@ function formatDiagnosticLines(diagnostics) {
   }
   if (diagnostics.browser) lines.push(`المتصفح: ${diagnostics.browser}${diagnostics.browserVersion ? ` ${diagnostics.browserVersion}` : ''}`);
   if (diagnostics.syncState) lines.push(`المزامنة: ${diagnostics.syncState}`);
+  if (typeof diagnostics.pendingCount === 'number') lines.push(`قيد الانتظار: ${diagnostics.pendingCount}`);
+  if (typeof diagnostics.failedCount === 'number') lines.push(`تعذّر إرسالها: ${diagnostics.failedCount}`);
+  if (typeof diagnostics.blockedCount === 'number') lines.push(`بانتظار بيانات مرتبطة: ${diagnostics.blockedCount}`);
+  if (typeof diagnostics.rejectedCount === 'number') lines.push(`لم يقبلها الخادم: ${diagnostics.rejectedCount}`);
+  if (typeof diagnostics.historicalConflictCount === 'number') lines.push(`اختلافات تاريخية متصالحة: ${diagnostics.historicalConflictCount}`);
   if (typeof diagnostics.online === 'boolean') lines.push(`الاتصال: ${diagnostics.online ? 'متصل' : 'غير متصل'}`);
   return lines;
 }

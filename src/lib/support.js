@@ -53,6 +53,11 @@ export function sanitizeSupportDiagnostics(input = {}) {
   const syncState = inputString(input.syncState, 24)?.toLowerCase();
   const pendingMutations = safeCount(input.pendingMutations);
   const failedMutations = safeCount(input.failedMutations);
+  const pendingCount = safeCount(input.pendingCount);
+  const failedCount = safeCount(input.failedCount);
+  const blockedCount = safeCount(input.blockedCount);
+  const rejectedCount = safeCount(input.rejectedCount);
+  const historicalConflictCount = safeCount(input.historicalConflictCount);
   const lastSuccessfulSyncAt = safeTimestamp(input.lastSuccessfulSyncAt);
 
   if (appVersion && /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(appVersion)) diagnostics.appVersion = appVersion;
@@ -70,6 +75,12 @@ export function sanitizeSupportDiagnostics(input = {}) {
   if (SYNC_STATES.has(syncState)) diagnostics.syncState = syncState;
   if (pendingMutations !== null) diagnostics.pendingMutations = pendingMutations;
   if (failedMutations !== null) diagnostics.failedMutations = failedMutations;
+  if (pendingCount !== null) diagnostics.pendingCount = pendingCount;
+  if (failedCount !== null) diagnostics.failedCount = failedCount;
+  if (blockedCount !== null) diagnostics.blockedCount = blockedCount;
+  if (rejectedCount !== null) diagnostics.rejectedCount = rejectedCount;
+  if (historicalConflictCount !== null) diagnostics.historicalConflictCount = historicalConflictCount;
+  if (typeof input.actionableSyncIssue === 'boolean') diagnostics.actionableSyncIssue = input.actionableSyncIssue;
   if (lastSuccessfulSyncAt) diagnostics.lastSuccessfulSyncAt = lastSuccessfulSyncAt;
   if (ROUTE_CATEGORIES.has(routeCategory)) diagnostics.routeCategory = routeCategory;
   return diagnostics;

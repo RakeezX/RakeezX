@@ -155,6 +155,8 @@ test('email builder emits fixed Arabic-first presentation and ignores browser-su
     created_at: '2026-09-12T12:00:00.000Z',
     diagnostics: {
       appVersion: '1.0.0', buildSha: 'a'.repeat(64), routeCategory: 'support',
+      syncState: 'blocked', pendingCount: 2, failedCount: 0, blockedCount: 1,
+      rejectedCount: 0, historicalConflictCount: 4, actionableSyncIssue: true,
       browserVersion: 'token=secret', timezone: 'Asia/Riyadh',
       ownerId: OWNER, email: 'teacher@example.test', token: 'secret', rawOutbox: [{ id: 'private' }],
     },
@@ -173,6 +175,9 @@ test('email builder emits fixed Arabic-first presentation and ignores browser-su
   assert.match(result.payload.text, /البريد: teacher@example\.test/);
   assert.match(result.payload.text, /الإصدار: 1\.0\.0/);
   assert.match(result.payload.text, /البناء: a{12}/);
+  assert.match(result.payload.text, /قيد الانتظار: 2/);
+  assert.match(result.payload.text, /بانتظار بيانات مرتبطة: 1/);
+  assert.match(result.payload.text, /اختلافات تاريخية متصالحة: 4/);
   assert.doesNotMatch(result.payload.text, new RegExp(`a{13}`));
 });
 

@@ -119,7 +119,7 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   const preview = page.locator('#support-diagnostics-preview');
   await expect(preview).toBeVisible();
   const previewKeys = await preview.locator('[data-diagnostic-key]').evaluateAll((nodes) => nodes.map((node) => node.dataset.diagnosticKey));
-  const allowed = new Set(['appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone', 'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport', 'pwaStandalone', 'online', 'syncState', 'pendingMutations', 'failedMutations', 'lastSuccessfulSyncAt', 'routeCategory']);
+  const allowed = new Set(['appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone', 'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport', 'pwaStandalone', 'online', 'syncState', 'pendingMutations', 'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory']);
   expect(previewKeys.length).toBeGreaterThan(5);
   expect(previewKeys.every((key) => allowed.has(key))).toBe(true);
   await expect(preview).not.toContainText(/طالب|فصل|رمز دخول|support-ui-token|#\/support/i);
@@ -132,6 +132,10 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   expect(payloads[0].type).toBe('technical');
   expect(payloads[0].message).toBe('أ');
   expect(payloads[0].diagnostics.routeCategory).toBe('support');
+  for (const key of ['pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount']) {
+    expect(Number.isInteger(payloads[0].diagnostics[key]), `${key} must be a safe integer`).toBe(true);
+  }
+  expect(typeof payloads[0].diagnostics.actionableSyncIssue).toBe('boolean');
 
   await type.selectOption('suggestion');
   await expect(disclosure).toBeVisible();

@@ -159,6 +159,68 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
 
 export const SYNC_V2_STORES = Object.freeze(Object.keys(SYNC_V2_SCHEMAS));
 
+const SAFE_FEATURE_CATEGORY = Object.freeze({
+  profile: 'account',
+  years: 'academic', calendars: 'academic', calendarDays: 'academic', terms: 'academic',
+  subjects: 'classes', sections: 'classes', teachings: 'classes',
+  students: 'students', enrollments: 'students', notes: 'students',
+  classRules: 'classes', classGoals: 'classes', classCharterSelections: 'classes', groupArrangements: 'classes',
+  items: 'assessment', scores: 'assessment', logs: 'assessment',
+  timeProfiles: 'schedule', slots: 'schedule', sessions: 'schedule',
+  sessionRosterSnapshots: 'attendance', attendance: 'attendance',
+  closedTermReports: 'reports',
+});
+
+const SAFE_REASON = Object.freeze({
+  error: ['temporary_sync_failure', 'تعذّر إرسال بعض التغييرات وستُعاد المحاولة.'],
+  rejected: ['server_rejected_change', 'يوجد تغيير لم يقبله الخادم ويحتاج تدخّلًا.'],
+  blocked: ['waiting_for_related_data', 'توجد تغييرات تنتظر اكتمال بيانات مرتبطة.'],
+  pending: ['waiting_for_upload', 'توجد تغييرات محفوظة محليًا بانتظار الرفع.'],
+  synced: ['none', 'لا توجد تغييرات حالية تحتاج إجراءً.'],
+});
+
+/**
+ * Privacy-safe, read-only projection of durable Sync V2 state.
+ * It deliberately exposes no record/mutation identity, patches, receipts, or raw errors.
+ */
+export function summarizeSyncV2OperationalState({ outbox = [], recordsByStore = {} } = {}) {
+  const rows = Array.isArray(outbox) ? outbox.filter((row) => row?.protocol === 'v2') : [];
+  const pendingCount = rows.filter((row) => row.state === 'pending').length;
+  const failedCount = rows.filter((row) => row.state === 'failed').length;
+  const blockedCount = rows.filter((row) => row.state === 'blocked').length;
+  const rejectedCount = rows.filter((row) => row.state === 'rejected').length;
+  let historicalConflictCount = 0;
+  const historicalCategories = new Set();
+  for (const [store, records] of Object.entries(recordsByStore ?? {})) {
+    if (!Array.isArray(records)) continue;
+    const count = records.reduce((total, record) => total + (Array.isArray(record?.syncConflicts) ? record.syncConflicts.length : 0), 0);
+    historicalConflictCount += count;
+    if (count && SAFE_FEATURE_CATEGORY[store]) historicalCategories.add(SAFE_FEATURE_CATEGORY[store]);
+  }
+  const state = failedCount ? 'error'
+    : rejectedCount ? 'rejected'
+    : blockedCount ? 'blocked'
+    : pendingCount ? 'pending'
+    : 'synced';
+  const affectedCategories = new Set(rows.map((row) => SAFE_FEATURE_CATEGORY[row.store]).filter(Boolean));
+  const [reasonCategory, reasonLabel] = SAFE_REASON[state];
+  return Object.freeze({
+    state,
+    queuedCount: rows.length,
+    pendingCount,
+    failedCount,
+    blockedCount,
+    rejectedCount,
+    historicalConflictCount,
+    conflicts: historicalConflictCount,
+    actionableSyncIssue: state !== 'synced',
+    affectedCategories: Object.freeze([...affectedCategories].sort()),
+    historicalConflictCategories: Object.freeze([...historicalCategories].sort()),
+    reasonCategory,
+    reasonLabel,
+  });
+}
+
 function schemaFor(store) {
   const schema = SYNC_V2_SCHEMAS[store];
   if (!schema) throw new Error(`Sync V2 does not support store: ${store}`);
@@ -341,6 +403,7 @@ function conflictDiagnostic(mutation, result, stamp) {
     .filter((group) => group !== '__canonical__');
   if (!groups.length) return null;
   return {
+    lifecycle: 'historical_reconciled',
     mutationId: mutation.mutationId,
     outcome: result.outcome ?? 'conflict',
     fields: [...(mutation.fields ?? [])],
@@ -868,6 +931,7 @@ export function createSyncV2Engine({
           pushUniquePut(writes.students, {
             ...student,
             syncConflicts: [...(student.syncConflicts ?? []), {
+              lifecycle: 'historical_reconciled',
               mutationId: mutation.mutationId, outcome: result.outcome, groups: ['__membership__'],
               rejectedPatch: clone(payload), recordedAt: now(),
             }],
@@ -1422,22 +1486,20 @@ export function createSyncV2Engine({
 
   async function status() {
     const outbox = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
-    const failed = outbox.filter((row) => row.state === 'failed').length;
-    const blockedOutbox = outbox.filter((row) => row.state === 'blocked').length;
-    const rejected = outbox.filter((row) => row.state === 'rejected').length;
-    const pending = outbox.filter((row) => row.state === 'pending').length;
-    let conflicts = 0;
+    const recordsByStore = {};
     for (const store of SYNC_V2_STORES) {
-      const records = await database.getAll(store);
-      conflicts += records.reduce((total, record) => total + (record.syncConflicts?.length ?? 0), 0);
+      recordsByStore[store] = await database.getAll(store);
     }
-    const state = failed ? 'error'
-      : rejected ? 'rejected'
-      : conflicts ? 'conflicted'
-      : blockedOutbox ? 'blocked'
-      : pending ? 'pending'
-      : 'synced';
-    return { state, pending, queued: outbox.length, failed, blocked: blockedOutbox, rejected, conflicts };
+    const summary = summarizeSyncV2OperationalState({ outbox, recordsByStore });
+    return {
+      ...summary,
+      // Backward-compatible count names for existing internal callers.
+      pending: summary.pendingCount,
+      queued: summary.queuedCount,
+      failed: summary.failedCount,
+      blocked: summary.blockedCount,
+      rejected: summary.rejectedCount,
+    };
   }
 
   return {

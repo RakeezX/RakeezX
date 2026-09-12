@@ -54,11 +54,115 @@ let rerunRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
 let retryAttempt = 0;
+let retryScheduled = false;
 let restoreRunning = false;
 const v2Engine = createSyncV2Engine();
 
+const COORDINATOR_REASON = Object.freeze({
+  idle: ['local_only', 'العمل محفوظ محليًا ولم تبدأ مزامنة سحابية.'],
+  auth_required: ['authentication_required', 'يلزم تسجيل الدخول لاستئناف المزامنة.'],
+  offline: ['offline', 'العمل محفوظ محليًا وسيُرفع عند عودة الاتصال.'],
+  syncing: ['sync_in_progress', 'المزامنة تعمل الآن.'],
+  error: ['temporary_sync_failure', 'تعذّر إكمال المزامنة وستُعاد المحاولة.'],
+});
+
+const DURABLE_REASON = Object.freeze({
+  error: ['temporary_sync_failure', 'تعذّر إرسال بعض التغييرات وستُعاد المحاولة.'],
+  rejected: ['server_rejected_change', 'يوجد تغيير لم يقبله الخادم ويحتاج تدخّلًا.'],
+  blocked: ['waiting_for_related_data', 'توجد تغييرات تنتظر اكتمال بيانات مرتبطة.'],
+  pending: ['waiting_for_upload', 'توجد تغييرات محفوظة محليًا بانتظار الرفع.'],
+  synced: ['none', 'لا توجد تغييرات حالية تحتاج إجراءً.'],
+});
+
+let operationalSummaryCache = Object.freeze({
+  state: 'idle', queuedCount: 0, pendingCount: 0, failedCount: 0, blockedCount: 0,
+  rejectedCount: 0, historicalConflictCount: 0, actionableSyncIssue: false,
+  affectedCategories: Object.freeze([]), historicalConflictCategories: Object.freeze([]),
+  reasonCategory: 'local_only', reasonLabel: COORDINATOR_REASON.idle[1],
+  lastSuccessfulSyncAt: null, automaticRetryActive: false, automaticSyncActive: false,
+  teacherActionRequired: false, localWorkSaved: true, cloudSyncHealthy: false,
+  safeToContinueUnrelatedWork: true,
+});
+
 const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
+
+function coordinatorOperationalState(durable) {
+  if (autoRunning) return 'syncing';
+  if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
+  if (!isOnline()) return 'offline';
+  if (state.status === 'error' && durable.failedCount === 0) return 'error';
+  return durable.state;
+}
+
+function normalizeDurableSummary(durable = {}) {
+  const pendingCount = durable.pendingCount ?? durable.pending ?? 0;
+  const failedCount = durable.failedCount ?? durable.failed ?? 0;
+  const blockedCount = durable.blockedCount ?? durable.blocked ?? 0;
+  const rejectedCount = durable.rejectedCount ?? durable.rejected ?? 0;
+  const historicalConflictCount = durable.historicalConflictCount ?? durable.conflicts ?? 0;
+  const state = failedCount ? 'error'
+    : rejectedCount ? 'rejected'
+    : blockedCount ? 'blocked'
+    : pendingCount ? 'pending'
+    : 'synced';
+  const [reasonCategory, reasonLabel] = DURABLE_REASON[state];
+  return {
+    ...durable,
+    state,
+    queuedCount: durable.queuedCount ?? durable.queued ?? (pendingCount + failedCount + blockedCount + rejectedCount),
+    pendingCount,
+    failedCount,
+    blockedCount,
+    rejectedCount,
+    historicalConflictCount,
+    actionableSyncIssue: state !== 'synced',
+    affectedCategories: durable.affectedCategories ?? [],
+    historicalConflictCategories: durable.historicalConflictCategories ?? [],
+    reasonCategory: durable.reasonCategory ?? reasonCategory,
+    reasonLabel: durable.reasonLabel ?? reasonLabel,
+  };
+}
+
+function cacheOperationalSummary(durable) {
+  const normalized = normalizeDurableSummary(durable);
+  const currentState = coordinatorOperationalState(normalized);
+  const reason = COORDINATOR_REASON[currentState] ?? [normalized.reasonCategory, normalized.reasonLabel];
+  const actionableSyncIssue = normalized.actionableSyncIssue || ['auth_required', 'offline', 'error'].includes(currentState);
+  operationalSummaryCache = Object.freeze({
+    state: currentState,
+    queuedCount: normalized.queuedCount,
+    pendingCount: normalized.pendingCount,
+    failedCount: normalized.failedCount,
+    blockedCount: normalized.blockedCount,
+    rejectedCount: normalized.rejectedCount,
+    historicalConflictCount: normalized.historicalConflictCount,
+    actionableSyncIssue,
+    affectedCategories: Object.freeze([...normalized.affectedCategories]),
+    historicalConflictCategories: Object.freeze([...normalized.historicalConflictCategories]),
+    reasonCategory: reason[0],
+    reasonLabel: reason[1],
+    lastSuccessfulSyncAt: state.lastSyncedAt,
+    automaticRetryActive: retryScheduled,
+    automaticSyncActive: autoRunning,
+    teacherActionRequired: currentState === 'auth_required' || normalized.rejectedCount > 0 ||
+      (normalized.blockedCount > 0 && !autoRunning) || (normalized.failedCount > 0 && !retryScheduled),
+    localWorkSaved: true,
+    cloudSyncHealthy: currentState === 'synced' && !normalized.actionableSyncIssue,
+    safeToContinueUnrelatedWork: !restoreRunning,
+  });
+  return operationalSummaryCache;
+}
+
+/** Fresh privacy-safe Sync health; never returns records, identities, patches, receipts, or raw errors. */
+export async function getSyncOperationalSummary() {
+  return cacheOperationalSummary(await v2Engine.status());
+}
+
+/** Synchronous last-known projection for existing render/diagnostic paths. */
+export function getSyncOperationalSummarySnapshot() {
+  return operationalSummaryCache;
+}
 
 async function pendingOutbox() {
   const entries = await db.getAll('outbox');
@@ -95,6 +199,7 @@ function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
     return;
   }
   if (autoTimer) clearTimeout(autoTimer);
+  retryScheduled = false;
   autoTimer = setTimeout(() => {
     autoTimer = null;
     syncAll({ full });
@@ -111,10 +216,13 @@ function retryDelay() {
 function scheduleRetry() {
   if (!cloud.session || !cloud.user || !isOnline()) return;
   if (autoTimer) clearTimeout(autoTimer);
+  retryScheduled = true;
   autoTimer = setTimeout(() => {
     autoTimer = null;
+    retryScheduled = false;
     syncAll({ full: true });
   }, retryDelay());
+  void getSyncOperationalSummary().catch(() => {});
   // Keep the failed result visible while waiting; a timer is not an active run.
 }
 
@@ -260,7 +368,9 @@ export async function syncAll({ full = true } = {}) {
     await store.patchDevice({ lastSyncAt: lastSyncedAt }, { notify: false, queue: false });
     state.lastSyncedAt = lastSyncedAt;
     retryAttempt = 0;
+    retryScheduled = false;
     setState({ status: v2Status.state, lastError: null });
+    cacheOperationalSummary(v2Status);
     return true;
   } catch (err) {
     failed = true;
@@ -273,6 +383,7 @@ export async function syncAll({ full = true } = {}) {
     autoRunning = false;
     notify();
     const v2Status = await v2Engine.status();
+    cacheOperationalSummary(v2Status);
     if (failed && cloud.authStatus?.().state !== 'auth_required') {
       rerunRequested = false;
       scheduleRetry();
@@ -362,6 +473,7 @@ export function init() {
   state.lastSyncedAt = store.state.device?.lastSyncAt || null;
   if (initialized) return;
   initialized = true;
+  void getSyncOperationalSummary().catch(() => {});
   store.subscribe(() => {
     if (!suppressAutoSchedule) scheduleAutomaticSync();
   });
@@ -370,14 +482,20 @@ export function init() {
     else if (!cloud.session) {
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = null;
+      retryScheduled = false;
       setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
+      void getSyncOperationalSummary().catch(() => {});
     }
   });
   if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
   else if (cloud.authStatus?.().state === 'auth_required') setState({ status: 'auth_required' });
   if (typeof addEventListener === 'function') {
     addEventListener('online', () => scheduleAutomaticSync({ full: true, immediate: true }));
-    addEventListener('offline', () => setState({ status: 'offline' }));
+    addEventListener('offline', () => {
+      retryScheduled = false;
+      setState({ status: 'offline' });
+      void getSyncOperationalSummary().catch(() => {});
+    });
     addEventListener('pageshow', () => { scheduleResumeSync(); });
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
