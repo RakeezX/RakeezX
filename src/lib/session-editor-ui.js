@@ -6,6 +6,10 @@ import * as sync from './sync.js';
 import { SESSION_STATUS, SESSION_STATUS_ORDER, WEEKDAYS, weekday } from '../models.js';
 import { sessionDeletePresentation, sessionDeleteQueuedCopy } from './session-delete-ui.js';
 
+// `makeup` remains a readable legacy status, but it is not a generic status
+// transition. A future dedicated Makeup workflow must own its creation rules.
+const EDITABLE_SESSION_STATUS_ORDER = SESSION_STATUS_ORDER.filter((key) => key !== 'makeup');
+
 export function sessionDeletionPresentation(session) {
   const teaching = store.getTeaching(session?.teachingId);
   return sessionDeletePresentation({
@@ -71,7 +75,7 @@ export async function openSessionEditor(session, {
     desc,
     body: html`${sessionContext(session)}
       <div class="stack stack-2">
-        ${SESSION_STATUS_ORDER.map((key) => html`
+        ${EDITABLE_SESSION_STATUS_ORDER.map((key) => html`
           <button class="radiocard radiocard--btn ${session.status === key ? 'is-on' : ''}" data-pick="${key}">
             <span class="radiocard__body">
               <span class="radiocard__title">${SESSION_STATUS[key].label}</span>

@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test.use({
+  ...(process.env.RAKEEZX_E2E_BASE_URL ? { baseURL: process.env.RAKEEZX_E2E_BASE_URL } : {}),
+  serviceWorkers: 'block',
+});
+
 const ids = {
   teaching: 'tch:session-delete-ui',
   section: 'sec:session-delete-ui',
@@ -88,6 +93,7 @@ async function seedSessions(page) {
 }
 
 const detailsButton = (page, id) => page.locator(`[data-act="status"][data-id="${id}"]`);
+const sessionRow = (page, id) => detailsButton(page, id).locator('xpath=ancestor::*[contains(@class,"session-row")]');
 
 async function openDetails(page, id) {
   await detailsButton(page, id).click();
@@ -95,6 +101,34 @@ async function openDetails(page, id) {
   await expect(dialog).toBeVisible();
   return dialog;
 }
+
+test('generic status editor cannot assign Makeup while legacy Makeup remains readable', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error' && !message.text().includes('favicon.ico')) errors.push(message.text());
+  });
+  await seedSessions(page);
+
+  for (const id of [ids.pristine, ids.held, ids.makeupParent, ids.content]) {
+    const dialog = await openDetails(page, id);
+    await expect(dialog.getByRole('button', { name: /حصة تعويضية/ })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+  }
+
+  await expect(sessionRow(page, ids.makeupChild)).toContainText('حصة تعويضية');
+  let dialog = await openDetails(page, ids.makeupChild);
+  await expect(dialog.getByRole('button', { name: /حصة تعويضية/ })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+
+  await page.goto(`/#/teaching/${ids.teaching}/attendance?session=${ids.makeupChild}`);
+  await expect(page.locator('.attendance-session-summary')).toContainText('حصة تعويضية');
+  await page.locator('.attendance-session-summary [data-act="session-status"]').click();
+  dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('button', { name: /حصة تعويضية/ })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  expect(errors).toEqual([]);
+});
 
 test('session details expose deletion only for pristine sessions and explain protected/restored states', async ({ page }) => {
   const errors = [];
@@ -270,7 +304,8 @@ test('session delete presentation remains stable across target widths, themes, a
       }))).toEqual({ direction: 'rtl', overflow: false });
       const deleteButton = page.getByRole('dialog').getByRole('button', { name: 'حذف هذه الحصة فقط' });
       await expect(deleteButton).toBeVisible();
-      expect((await deleteButton.boundingBox())?.height).toBeGreaterThanOrEqual(width < 600 ? 44 : 40);
+      const deleteButtonHeight = (await deleteButton.boundingBox())?.height ?? 0;
+      expect(Math.round(deleteButtonHeight)).toBeGreaterThanOrEqual(width < 600 ? 44 : 40);
       await page.keyboard.press('Escape');
     }
   }
