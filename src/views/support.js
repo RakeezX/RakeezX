@@ -219,14 +219,16 @@ export default {
                 <span class="support-character-count" data-support-character-count aria-live="polite"><bdi>${draft.message.length}</bdi> / 4000</span>
               </label>
 
-              <div class="support-diagnostics">
-                <p class="support-diagnostics__disclosure">${icon('shield')}<span>سيتم إرفاق معلومات تقنية عامة وآمنة تساعد فريق الدعم، دون بيانات الطلاب أو كلمات المرور.</span></p>
-                <button class="btn btn--sm btn--quiet support-diagnostics__preview-action" type="button"
-                  data-act="support-diagnostics-preview" aria-expanded="${draft.previewDiagnostics ? 'true' : 'false'}">
-                  ${draft.previewDiagnostics ? 'إخفاء المعلومات التقنية' : 'عرض المعلومات التقنية'}
-                </button>
-                ${draft.previewDiagnostics ? diagnosticsPreview(diagnostics) : ''}
-              </div>
+              ${authenticated() ? html`
+                <div class="support-diagnostics">
+                  <p class="support-diagnostics__disclosure">${icon('shield')}<span>سيُرفق اسم حسابك وبريده الإلكتروني لتمكين فريق الدعم من التواصل معك، إضافةً إلى معلومات تقنية عامة وآمنة، دون بيانات الطلاب أو كلمات المرور.</span></p>
+                  <button class="btn btn--sm btn--quiet support-diagnostics__preview-action" type="button"
+                    data-act="support-diagnostics-preview" aria-expanded="${draft.previewDiagnostics ? 'true' : 'false'}">
+                    ${draft.previewDiagnostics ? 'إخفاء المعلومات التقنية' : 'عرض المعلومات التقنية'}
+                  </button>
+                  ${draft.previewDiagnostics ? diagnosticsPreview(diagnostics) : ''}
+                </div>
+              ` : ''}
             </fieldset>
             <button class="btn btn--primary support-submit" type="submit" ${canSubmit && draft.message.trim() && !draft.submitting ? '' : 'disabled'}>
               ${draft.submitting ? 'جارٍ الإرسال…' : 'إرسال'}

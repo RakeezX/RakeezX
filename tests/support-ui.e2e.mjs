@@ -5,6 +5,7 @@ test.setTimeout(90_000);
 
 const SUPPORT_ENDPOINT = '**/rest/v1/support_requests';
 const SUPPORT_EMAIL = 'support@rakeezx.com';
+const CONTACT_DISCLOSURE = 'سيُرفق اسم حسابك وبريده الإلكتروني لتمكين فريق الدعم من التواصل معك، إضافةً إلى معلومات تقنية عامة وآمنة، دون بيانات الطلاب أو كلمات المرور.';
 
 async function waitForApp(page) {
   await page.waitForFunction(() => window.store?.state?.ready === true);
@@ -77,6 +78,7 @@ test('Support is reachable from Teacher Center and Settings and always exposes d
 test('Support keeps direct email available while in-app submission reflects auth and offline states', async ({ page, context }) => {
   await openSupport(page);
   await expect(page.getByText('يلزم تسجيل الدخول لإرسال طلب دعم من داخل التطبيق.')).toBeVisible();
+  await expect(page.getByText(CONTACT_DISCLOSURE)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'إرسال', exact: true })).toBeDisabled();
   await expect(page.getByRole('link', { name: SUPPORT_EMAIL })).toBeVisible();
   await expect(page.getByRole('link', { name: 'تحتاج مساعدة؟' })).toHaveCount(0);
@@ -110,7 +112,8 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   const message = page.getByLabel('رسالتك');
   const submit = page.getByRole('button', { name: 'إرسال', exact: true });
 
-  await expect(page.getByText('سيتم إرفاق معلومات تقنية عامة وآمنة تساعد فريق الدعم، دون بيانات الطلاب أو كلمات المرور.')).toBeVisible();
+  const disclosure = page.getByText(CONTACT_DISCLOSURE);
+  await expect(disclosure).toBeVisible();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
   await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
   const preview = page.locator('#support-diagnostics-preview');
@@ -131,6 +134,7 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   expect(payloads[0].diagnostics.routeCategory).toBe('support');
 
   await type.selectOption('suggestion');
+  await expect(disclosure).toBeVisible();
   await message.fill('ن'.repeat(4000));
   await submit.click();
   await expect.poll(() => payloads.length).toBe(2);
@@ -140,6 +144,7 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   expect(JSON.stringify(payloads[1].diagnostics)).not.toMatch(/token|student|class|owner|routePath|outbox/i);
 
   await type.selectOption('inquiry');
+  await expect(disclosure).toBeVisible();
   await message.fill('أحتاج مساعدة في استخدام الميزة.');
   failNext = true;
   await submit.click();
