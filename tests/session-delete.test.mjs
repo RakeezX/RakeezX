@@ -97,7 +97,8 @@ test('held/cancelled sessions and retained attendance, snapshot, or makeup evide
   assert.ok(store.sessionDeleteEvidence(makeupParent.id).includes('makeup'));
 });
 
-test('a deleted natural identity cannot rematerialize through direct, today, or range ensure paths', async () => {
+test('a deleted natural identity cannot rematerialize through direct, today, or range ensure paths', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-09-09T12:00:00Z') });
   const fixture = await setup('ensure');
   const session = authoritative(makeSession({ teachingId: fixture.teaching.id, date: fixture.date, period: 1, slotId: fixture.slot.id }));
   await store.save({ sessions: [session] }, { queue: false });
