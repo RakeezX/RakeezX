@@ -181,6 +181,11 @@ function renderTeacherMiniHubBody() {
             <span class="mini-hub-settings-link__copy"><b>الإعدادات</b><small>تخصيص التطبيق وإدارة البيانات</small></span>
             <span class="mini-hub-settings-link__chev" aria-hidden="true">${icon('chev')}</span>
           </a>
+          <a class="mini-hub-settings-link" href="#/support" data-sheet-close>
+            <span class="mini-hub-settings-link__icon" aria-hidden="true">${icon('note')}</span>
+            <span class="mini-hub-settings-link__copy"><b>الدعم</b><small>تواصل مع فريق رَكيز المعلم</small></span>
+            <span class="mini-hub-settings-link__chev" aria-hidden="true">${icon('chev')}</span>
+          </a>
         </section>
       </div>
     `;

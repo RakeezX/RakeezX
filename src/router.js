@@ -27,6 +27,7 @@ const ROUTES = [
   { path: '/calendar',                  load: () => import('./views/calendar.js') },
   { path: '/settings',                  load: () => import('./views/settings.js') },
   { path: '/settings/backup',           load: () => import('./views/backup.js') },
+  { path: '/support',                   load: () => import('./views/support.js') },
 ];
 
 const compile = (path) => {

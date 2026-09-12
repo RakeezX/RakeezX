@@ -1,8 +1,8 @@
 /**
  * Private Support/Feedback foundation.
  *
- * This deliberately has no route or UI. A future Google-approved screen may
- * call submitSupportRequest(), but requests never enter the Sync V2 outbox and
+ * The Support screen calls submitSupportRequest(), but requests never enter
+ * the Sync V2 outbox and
  * diagnostics are reduced to this allowlist before they leave the browser.
  */
 import * as cloud from './cloud.js';

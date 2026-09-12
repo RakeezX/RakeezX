@@ -381,6 +381,14 @@ export default {
           <span class="row__end">${icon('chev')}</span>
         </a>
       </div>
+      <div class="section settings-section settings-section--destinations">
+        <div class="section__head"><div class="section__title">المساعدة</div></div>
+        <a class="row settings-destination" href="#/support">
+          <span class="row__icon">${icon('note')}</span>
+          <span class="row__main"><span class="row__title">الدعم</span><span class="row__sub">تواصل بالبريد أو أرسل طلب دعم خاصًا من داخل التطبيق.</span></span>
+          <span class="row__end">${icon('chev')}</span>
+        </a>
+      </div>
       <div class="section settings-section settings-section--pwa">
         <div class="section__head"><div class="section__title">تثبيت تطبيق رَكيز المعلم على الجهاز</div></div>
         <div class="card card--pad stack stack-3">
