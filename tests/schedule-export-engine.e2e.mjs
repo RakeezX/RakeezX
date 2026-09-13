@@ -2,7 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test('Schedule export creates a real privacy-safe RTL PNG in the browser', async ({ page }) => {
   await page.goto('/#/schedule');
-  const result = await page.evaluate(async () => {
+  const results = [];
+  for (const theme of ['light', 'dark', 'auto']) {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.waitForFunction(() => window.store?.state?.ready);
+    await page.evaluate(async theme => { await window.store.patchDevice({ theme }); window.store.applyTheme(); window.store.repaint(); }, theme);
+    const result = await page.evaluate(async () => {
     const engine = await import('/src/lib/schedule-export.js');
     let canvas = null;
     const profile = {
@@ -39,6 +44,7 @@ test('Schedule export creates a real privacy-safe RTL PNG in the browser', async
       height: canvas.height,
       blobType: blob.type,
       blobSize: blob.size,
+      pngHash: [...new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()))].map(byte => byte.toString(16).padStart(2, '0')).join(''),
       model: JSON.stringify(model),
       printDocument: engine.schedulePrintDocument(model),
     };
@@ -53,4 +59,21 @@ test('Schedule export creates a real privacy-safe RTL PNG in the browser', async
   expect(result.model).not.toContain('private-slot-id');
   expect(result.printDocument).toContain('@page { size: A4 landscape;');
   expect(result.printDocument).not.toContain('التوقيت المعتمد');
+    results.push(result);
+    // The dedicated document must remain light, RTL, landscape, and independent
+    // of app CSS even with browser background graphics disabled.
+    const popup = await page.context().newPage();
+    await popup.setContent(result.printDocument);
+    await popup.emulateMedia({ media: 'print', colorScheme: 'dark' });
+    const colors = await popup.evaluate(() => ({
+      body: getComputedStyle(document.body).backgroundColor,
+      text: getComputedStyle(document.body).color,
+      border: getComputedStyle(document.querySelector('td')).borderTopColor,
+      direction: getComputedStyle(document.body).direction,
+    }));
+    expect(colors).toEqual({ body: 'rgb(255, 255, 255)', text: 'rgb(22, 47, 53)', border: 'rgb(174, 191, 194)', direction: 'rtl' });
+    await popup.close();
+  }
+  expect(results[1]).toEqual(results[0]);
+  expect(results[2]).toEqual(results[0]);
 });

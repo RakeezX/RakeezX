@@ -2284,11 +2284,33 @@
 /* ---------- الطباعة ---------- */
 @media print {
   :root {
-    --bg: #fff; --bg-elev: #fff; --bg-sunk: #f4f4f4;
-    --border: #ccc; --border-strong: #999;
-    --text: #000; --text-2: #333; --text-3: #666;
+    /* Print is a fixed light output contract, not a screen-theme preference.
+       Important tokens beat explicit/system-dark selectors without changing
+       the data-theme attribute or the persisted device preference. */
+    color-scheme: only light !important;
+    --bg: #fff !important; --bg-elev: #fff !important; --bg-sunk: #f4f4f4 !important;
+    --border: #ccc !important; --border-strong: #999 !important;
+    --surface-page: #fff !important; --surface-raised: #fff !important; --surface-subtle: #f4f4f4 !important;
+    --border-subtle: #ccc !important; --border-emphasis: #999 !important;
+    --text: #000 !important; --text-2: #333 !important; --text-3: #666 !important;
+    --brand: #0f7655 !important; --brand-text: #0f7655 !important;
+    --brand-ink: #06231f !important; --brand-soft: #fff !important; --brand-border: #9eb8af !important;
+    --ok: #15803d !important; --ok-soft: #fff !important; --ok-border: #888 !important;
+    --warn: #b45309 !important; --warn-soft: #fff !important; --warn-border: #888 !important;
+    --danger: #b91c1c !important; --danger-soft: #fff !important; --danger-border: #888 !important;
+    --info: #1d4ed8 !important; --info-soft: #fff !important; --info-border: #888 !important;
+    --present: var(--ok) !important; --present-soft: #fff !important;
+    --absent: var(--danger) !important; --absent-soft: #fff !important;
+    --late: var(--warn) !important; --late-soft: #fff !important;
+    --excused: var(--info) !important; --excused-soft: #fff !important;
+    --x-purple: #6549c4 !important; --x-purple-soft: #fff !important;
+    --recess: #92400e !important; --recess-soft: #fff !important;
   }
   body { background: #fff; font-size: 11pt; }
+  body * { box-shadow: none !important; text-shadow: none !important; background-image: none !important; transition: none !important; }
+  button:not(.group__member), input, select, textarea, nav, [role="navigation"], [role="tablist"] { display: none !important; }
+  /* Group members are report data carried by screen buttons, not print actions. */
+  .group__member { background: transparent !important; color: #000 !important; border: 0 !important; cursor: default !important; }
 
   .topbar, .tabbar, .sidebar, .fab, .toast, .noprint,
   .segmented, .searchbar, .datebar, #modal-root { display: none !important; }

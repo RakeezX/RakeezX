@@ -51,6 +51,8 @@ test('closed-term Archive reads only the immutable report set, including offline
   await expect(page.getByText('الإصدار 1')).toBeVisible();
   await page.getByRole('link', { name: /الخامس الابتدائي \/ أ/ }).click();
   await expect(page).toHaveURL(/teaching\/.*closed.*teaching\/reports/);
+  // Cache the loaded report module before cutting the network, not just its URL.
+  await expect(page.locator('.print-report')).toContainText('طالب الحقيقة الثابتة');
   await context.setOffline(true);
   await page.reload();
   await page.waitForFunction(() => window.store?.state?.ready);
@@ -59,6 +61,22 @@ test('closed-term Archive reads only the immutable report set, including offline
   await expect(page.locator('.print-report')).toContainText('9');
   await expect(page.locator('.print-report')).not.toContainText('اسم حي لا يجب عرضه');
   await expect(page.locator('.print-report')).not.toContainText('بند حي لا يجب عرضه');
+  let lightColors;
+  for (const theme of ['light', 'dark', 'auto']) {
+    await page.emulateMedia({ media: 'screen', colorScheme: 'dark' });
+    await page.evaluate(async theme => { await window.store.patchDevice({ theme }); window.store.applyTheme(); window.store.repaint(); }, theme);
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('.print-report')).toContainText('طالب الحقيقة الثابتة');
+    await expect(page.locator('.print-report')).toContainText('واجب ثابت');
+    const colors = await page.evaluate(() => [...document.querySelectorAll('.print-report, .print-report *')]
+      .filter(el => el.getClientRects().length).map(el => {
+        const s = getComputedStyle(el);
+        return [s.color, s.backgroundColor, s.borderTopColor];
+      }));
+    if (theme === 'light') lightColors = colors;
+    else expect(colors).toEqual(lightColors);
+  }
+  await page.emulateMedia({ media: 'screen' });
   await page.getByRole('button', { name: 'الحضور' }).click();
   await expect(page.locator('.print-report')).toContainText('طالب الحقيقة الثابتة');
   expect(errors).toEqual([]);
