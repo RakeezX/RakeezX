@@ -51,7 +51,21 @@ function extractFromProfilePeriods(p, grades) {
   return list.length ? list : (p.periods ?? []).map(x => ({ period: x.period, start: x.start, end: x.end }));
 }
 
-function reflowPeriodsWithRecess(basePeriods, { afterPeriod = 0, recessDuration = 20, transition = 0 } = {}) {
+// A separation in the clock is not evidence of a recess. Only explicit
+// model/day configuration gives that separation a named-break meaning.
+function explicitRecess(model, periods = model.periods) {
+  const afterPeriod = Number(model.afterPeriod);
+  const duration = Number(model.recessDuration);
+  if (!isValidRecessPosition(afterPeriod, periods?.length) || !(duration > 0)) return null;
+  const index = periods.findIndex((period) => Number(period.period) === afterPeriod);
+  if (index < 0 || !periods[index + 1]) return null;
+  const minutes = (time) => String(time || '00:00').split(':').reduce((hours, value) => hours * 60 + Number(value), 0);
+  if (minutes(periods[index + 1].start) <= minutes(periods[index].end)) return null;
+  return { afterPeriod, duration, transition: Number(model.recessTransition || 0) };
+}
+
+function reflowPeriodsWithRecess(basePeriods, { afterPeriod = 0, recessDuration = 20, transition = 0,
+  previousAfterPeriod, gap = 0 } = {}) {
   if (!basePeriods || !basePeriods.length) return [];
 
   const parseMins = (str) => {
@@ -90,6 +104,12 @@ function reflowPeriodsWithRecess(basePeriods, { afterPeriod = 0, recessDuration 
 
     if (targetAfter > 0 && pNum === targetAfter && totalRecess > 0) {
       cursor += totalRecess;
+    } else if (i < count - 1) {
+      // Preserve generic/manual separations when changing an explicit recess.
+      // The old recess boundary returns to the configured generic gap.
+      cursor += previousAfterPeriod === undefined || pNum === Number(previousAfterPeriod)
+        ? Number(gap || 0)
+        : Math.max(0, parseMins(basePeriods[i + 1].start) - parseMins(basePeriods[i].end));
     }
   }
   return result;
@@ -121,11 +141,13 @@ function getProfileModels(p) {
         afterPeriod: isValidRecessPosition(m.afterPeriod, periods.length) ? Number(m.afterPeriod) : 0,
         recessDuration,
         recessTransition,
+        gap: Number(m.gap ?? p.overrides?.config?.gap ?? 0),
         periods
       };
     });
   }
-  const rules = p.overrides?.config?.recess?.rules;
+  const recess = p.overrides?.config?.recess;
+  const rules = recess?.enabled !== false ? recess?.rules : null;
   if (Array.isArray(rules) && rules.length > 1) {
     return [
       {
@@ -136,6 +158,7 @@ function getProfileModels(p) {
         afterPeriod: 2,
         recessDuration: 20,
         recessTransition: 5,
+        gap: Number(p.overrides?.config?.gap || 0),
         periods: extractFromProfilePeriods(p, [4])
       },
       {
@@ -146,6 +169,7 @@ function getProfileModels(p) {
         afterPeriod: 3,
         recessDuration: 20,
         recessTransition: 0,
+        gap: Number(p.overrides?.config?.gap || 0),
         periods: extractFromProfilePeriods(p, [5, 6])
       }
     ];
@@ -156,7 +180,8 @@ function getProfileModels(p) {
       name: 'النموذج الأساسي',
       grades: [],
       gradesLabel: 'جميع الصفوف',
-      afterPeriod: isValidRecessPosition(p.overrides?.config?.recess?.afterPeriod, (p.periods ?? []).length)
+      gap: Number(p.overrides?.config?.gap || 0),
+      afterPeriod: recess?.enabled !== false && isValidRecessPosition(recess?.afterPeriod, (p.periods ?? []).length)
         ? Number(p.overrides.config.recess.afterPeriod)
         : 0,
       recessDuration: Number(p.overrides?.config?.recess?.duration || 20),
@@ -519,23 +544,10 @@ function openEditModelSheet(model, { models, onSave, onDelete }) {
   const middleGrades = GRADE_CATALOG.filter(g => g.stage === 'متوسط');
   const secondaryGrades = GRADE_CATALOG.filter(g => g.stage === 'ثانوي');
 
-  let curRecessAfter = 0;
-  let curRecessDur = 20;
   const pList = model.periods || [];
-  for (let i = 1; i < pList.length; i++) {
-    const prev = pList[i - 1];
-    const curr = pList[i];
-    const [ph, pm] = (prev.end || '00:00').split(':').map(Number);
-    const [ch, cm] = (curr.start || '00:00').split(':').map(Number);
-    const gap = (ch * 60 + cm) - (ph * 60 + pm);
-    if (gap > 0) {
-      curRecessAfter = prev.period;
-      curRecessDur = Number(model.recessDuration || gap);
-      break;
-    }
-  }
-
-  if (!isValidRecessPosition(curRecessAfter, pList.length)) curRecessAfter = 0;
+  const recess = explicitRecess(model, pList);
+  const curRecessAfter = recess?.afterPeriod || 0;
+  const curRecessDur = recess?.duration || 20;
 
   const positions = recessPositions(pList.length);
   const options = [];
@@ -757,6 +769,9 @@ function editPeriodsSheet(profile) {
       : currentModel.periods;
 
     const cfg = p.overrides?.config;
+    const activeRecessModel = selectedDay !== null && dayOverrides.recessByDay?.[String(selectedDay)]
+      ? dayOverrides.recessByDay[String(selectedDay)] : currentModel;
+    const recess = explicitRecess(activeRecessModel, activePeriods);
 
     return html`
       <div id="periods-sheet-inner">
@@ -825,7 +840,7 @@ function editPeriodsSheet(profile) {
             if (idx > 0) {
               const prev = activePeriods[idx - 1];
               const gapMins = parseTime(t.start) - parseTime(prev.end);
-              if (gapMins > 0) {
+              if (gapMins > 0 && recess?.afterPeriod === Number(prev.period)) {
                 items.push(html`
                   <div class="timerow timerow--recess row-recess">
                     <div class="recess-pill">
@@ -833,7 +848,7 @@ function editPeriodsSheet(profile) {
               <span>الفسحة</span>
                     </div>
                     <div class="recess-info tabular">
-                <span class="recess-duration">${currentModel.recessDuration || gapMins} دقيقة</span>
+                <span class="recess-duration">${recess.duration} دقيقة</span>
                       <span class="recess-sep" aria-hidden="true">·</span>
                       <span class="time-range"><span class="time-range__token" dir="ltr">${prev.end}</span> – <span class="time-range__token" dir="ltr">${t.start}</span></span>
                     </div>
@@ -883,7 +898,7 @@ function editPeriodsSheet(profile) {
         </div>
 
         ${(() => {
-          const hasRecess = activePeriods.some((pItem, i) => i > 0 && (parseTime(pItem.start) - parseTime(activePeriods[i - 1].end) > 0));
+          const hasRecess = Boolean(recess);
           return html`
             <div class="hstack justify-between gap-2 mt-3 pt-2 border-t">
               <button type="button" class="btn btn--sm btn--ghost" id="sheet-btn-add-p">
@@ -917,6 +932,16 @@ function editPeriodsSheet(profile) {
         const activePeriods = (selectedDay !== null && Array.isArray(dayOverrides[String(selectedDay)]))
           ? dayOverrides[String(selectedDay)]
           : currentModel.periods;
+        const activeRecessModel = selectedDay !== null && dayOverrides.recessByDay?.[String(selectedDay)]
+          ? dayOverrides.recessByDay[String(selectedDay)] : currentModel;
+        const reflowOptions = {
+          previousAfterPeriod: explicitRecess(activeRecessModel, activePeriods)?.afterPeriod || 0,
+          gap: Number(activeRecessModel.gap ?? currentModel.gap ?? 0),
+        };
+        const setDayRecess = (afterPeriod, duration = 0, transition = 0, gap = reflowOptions.gap) => {
+          dayOverrides.recessByDay = { ...(dayOverrides.recessByDay || {}),
+            [String(selectedDay)]: { afterPeriod, recessDuration: duration, recessTransition: transition, gap } };
+        };
 
         // Model tabs click
         root.querySelectorAll('.models-tab').forEach(tab => {
@@ -942,6 +967,8 @@ function editPeriodsSheet(profile) {
 
                 if (recessChange) {
                   currentModel.periods = reflowPeriodsWithRecess(currentModel.periods, {
+                    previousAfterPeriod: explicitRecess(currentModel)?.afterPeriod || 0,
+                    gap: currentModel.gap,
                     afterPeriod: recessChange.afterPeriod,
                     recessDuration: recessChange.duration,
                     transition: 0
@@ -1066,6 +1093,8 @@ function editPeriodsSheet(profile) {
                   }
 
                   const newPeriods = reflowPeriodsWithRecess(currentModel.periods, {
+                    previousAfterPeriod: explicitRecess(currentModel)?.afterPeriod || 0,
+                    gap: currentModel.gap,
                     afterPeriod,
                     recessDuration: afterPeriod > 0 ? recessDuration : 0,
                     transition: 0
@@ -1079,6 +1108,7 @@ function editPeriodsSheet(profile) {
                     afterPeriod,
                     recessDuration: afterPeriod > 0 ? recessDuration : 0,
                     recessTransition: 0,
+                    gap: currentModel.gap,
                     periods: newPeriods
                   };
 
@@ -1153,9 +1183,10 @@ function editPeriodsSheet(profile) {
         // Delete recess action
         root.querySelectorAll('button[data-act="del-recess"]').forEach(btn => {
           btn.addEventListener('click', () => {
-            const updated = reflowPeriodsWithRecess(activePeriods, { afterPeriod: 0 });
+            const updated = reflowPeriodsWithRecess(activePeriods, { ...reflowOptions, afterPeriod: 0 });
             if (selectedDay !== null) {
               dayOverrides[String(selectedDay)] = updated;
+              setDayRecess(0);
             } else {
               currentModel.periods = updated;
               currentModel.afterPeriod = 0;
@@ -1177,17 +1208,19 @@ function editPeriodsSheet(profile) {
             openRecessConfigSheet({
               isEdit: true,
               currentAfter: afterPeriod,
-              currentDur: Number(currentModel.recessDuration || gapMins),
-              currentTrans: currentModel.recessTransition || 0,
+              currentDur: Number(activeRecessModel.recessDuration || gapMins),
+              currentTrans: activeRecessModel.recessTransition || 0,
               maxPeriods: activePeriods.length,
               onSave: ({ afterPeriod: newAfter, duration, transition }) => {
                 const updated = reflowPeriodsWithRecess(activePeriods, {
+                  ...reflowOptions,
                   afterPeriod: newAfter,
                   recessDuration: duration,
                   transition
                 });
                 if (selectedDay !== null) {
                   dayOverrides[String(selectedDay)] = updated;
+                  setDayRecess(newAfter, duration, transition);
                 } else {
                   currentModel.periods = updated;
                   currentModel.afterPeriod = newAfter;
@@ -1218,12 +1251,14 @@ function editPeriodsSheet(profile) {
               maxPeriods: activePeriods.length,
               onSave: ({ afterPeriod, duration, transition }) => {
                 const updated = reflowPeriodsWithRecess(activePeriods, {
+                  ...reflowOptions,
                   afterPeriod,
                   recessDuration: duration,
                   transition
                 });
                 if (selectedDay !== null) {
                   dayOverrides[String(selectedDay)] = updated;
+                  setDayRecess(afterPeriod, duration, transition);
                 } else {
                   currentModel.periods = updated;
                   currentModel.afterPeriod = afterPeriod;
@@ -1268,18 +1303,23 @@ function editPeriodsSheet(profile) {
             const cfg = await generateSheet({
               count: activePeriods.length || 7,
               firstPeriodStart: activePeriods[0]?.start || '07:00',
+              gap: reflowOptions.gap,
             });
             if (!cfg) return;
             const newPeriods = generateAdvancedPeriods(cfg);
             if (selectedDay !== null) {
               dayOverrides[String(selectedDay)] = newPeriods.map(x => ({ ...x }));
+              setDayRecess(cfg.recess?.enabled ? cfg.recess.afterPeriod : 0,
+                cfg.recess?.duration || 0, cfg.recess?.transition || 0, cfg.gap);
             } else {
               currentModel.periods = newPeriods.map(x => ({ ...x }));
               currentModel.afterPeriod = cfg.recess?.enabled ? (cfg.recess.afterPeriod || 3) : 0;
               currentModel.recessDuration = cfg.recess?.duration || 20;
+              currentModel.recessTransition = cfg.recess?.transition || 0;
+              currentModel.gap = cfg.gap;
+              p.overrides = p.overrides || {};
+              p.overrides.config = cfg;
             }
-            p.overrides = p.overrides || {};
-            p.overrides.config = cfg;
             refreshDOM();
             toast('وُلّدت الأوقات الجديدة بنجاح لهذا النموذج');
           });
@@ -1325,6 +1365,7 @@ function editPeriodsSheet(profile) {
             afterPeriod: m.afterPeriod,
             recessDuration: m.recessDuration,
             recessTransition: m.recessTransition,
+            gap: m.gap,
             periods: m.periods.map(x => ({ ...x }))
           }));
 
@@ -1337,6 +1378,10 @@ function editPeriodsSheet(profile) {
           const dayPeriods = dayOverrides[String(selectedDay)];
           if (Array.isArray(dayPeriods) && dayPeriods.length) {
             overrides[String(selectedDay)] = dayPeriods;
+            if (dayOverrides.recessByDay?.[String(selectedDay)]) {
+              overrides.recessByDay = { ...(overrides.recessByDay || {}),
+                [String(selectedDay)]: dayOverrides.recessByDay[String(selectedDay)] };
+            }
           } else {
             delete overrides[String(selectedDay)];
           }
@@ -1603,6 +1648,7 @@ export default {
 };
 
 export {
+  explicitRecess,
   reflowPeriodsWithRecess,
   extractFromProfilePeriods,
   getProfileModels,
