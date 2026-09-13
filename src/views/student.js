@@ -447,7 +447,7 @@ export default {
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
           ${s.status === 'active'
             ? html`<button class="btn btn--danger" data-act="withdraw">${icon('back')} غادر المدرسة</button>`
-            : html`<button class="btn btn--ghost" data-act="reinstate">${icon('check')} أعده للدراسة</button>`}
+            : ''}
         </div>
       </div>
       </div>
@@ -621,14 +621,5 @@ export default {
       toast('سُجّلت مغادرته — سجلّه محفوظ');
     },
 
-    async reinstate(el, ev, params) {
-      const s = store.getStudent(params.id);
-      const en = store.enrollmentsOf(params.id).filter((row) => row.status === 'withdrawn')
-        .sort((a, b) => String(b.endDate ?? '').localeCompare(String(a.endDate ?? '')))[0];
-      if (!s || !en) return;
-      const result = await store.reinstateStudent(params.id, en.sectionId);
-      if (!result) { toast('لم تكتمل إعادة الطالب للدراسة.'); return; }
-      toast('أُعيد للدراسة');
-    },
   },
 };

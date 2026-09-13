@@ -121,7 +121,8 @@ test('V1 rejects reinstatement before checkpoint or local activation; stale endi
   assert.equal(store.activeEnrollment(f.student), null);
   await assert.rejects(store.endStudentEnrollment(f.student, en.id, { sourceRevision: en.serverRevision, date: '2099-01-01' }), { code: 'IMMEDIATE_ONLY' });
   const source = await readFile(new URL('../src/views/student.js', import.meta.url), 'utf8');
-  assert.match(source, /if \(!result\).*return;[^]*toast\('أُعيد للدراسة'\)/);
+  assert.doesNotMatch(source, /reinstate|أعده للدراسة|أُعيد للدراسة/,
+    'deferred reinstatement has neither a selectable UI action nor a delegated handler/success toast');
 });
 
 test('finalized receipt resumes local reconciliation after transaction failure without another server call', async () => {
