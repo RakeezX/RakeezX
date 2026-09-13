@@ -70,6 +70,76 @@ async function printPalette(page) {
 }
 
 for (const width of [1280, 390]) {
+  test(`A4 paper preview isolates computed descendant colors before printing (${width}px)`, async ({ page }, testInfo) => {
+    test.setTimeout(120_000);
+    const errors = errorsFor(page);
+    await page.setViewportSize({ width, height: 844 });
+    await page.route('**/*.supabase.co/**', route => route.abort());
+    await page.goto('/#/classes');
+    await page.waitForFunction(() => window.store);
+    await seed(page);
+    for (const tab of ['roster', 'grades', 'attendance']) {
+      let lightPaper;
+      for (const theme of ['light', 'dark', 'auto']) {
+        await page.emulateMedia({ media: 'screen', colorScheme: 'dark' });
+        await page.goto('/#/settings');
+        await page.locator(`[data-act="theme"][data-theme="${theme}"]`).click();
+        await expect.poll(() => page.evaluate(() => window.store.state.device.theme)).toBe(theme);
+        await page.goto('/#/teaching/print-teaching/reports');
+        // Reload the persisted route: hash-only goto can leave the previous
+        // view visible while a lazy onMount resets preview state.
+        await page.reload();
+        await page.locator(`[data-act="tab"][data-tab="${tab}"]`).click();
+        if (tab === 'attendance') await page.locator('[data-act="att-mode"][data-mode="detailed"]').click();
+        if (!await page.locator('.a4-sheet').count()) await page.locator('[data-act="toggle-a4"]').click();
+        const sheet = page.locator('.a4-sheet');
+        await expect(sheet).toBeVisible();
+        const paper = await sheet.evaluate(root => {
+          const inspect = el => {
+            const s = getComputedStyle(el);
+            return [s.color, s.backgroundColor, s.borderTopColor, s.colorScheme];
+          };
+          return {
+            root: inspect(root),
+            aliases: ['--bg-elev', '--surface-raised', '--text', '--text-1', '--t-1', '--text-2', '--text-3', '--t-3']
+              .map(name => getComputedStyle(root).getPropertyValue(name).trim()),
+            cells: [...root.querySelectorAll('th,td,.printhead__sub,.printhead__meta dt')].map(inspect),
+          };
+        });
+        expect(paper.root[1]).toBe('rgb(255, 255, 255)');
+        expect(paper.root[3]).toBe('light only');
+        expect(paper.aliases).toEqual(['#fff', '#fff', '#000', '#000', '#000', '#333', '#666', '#666']);
+        expect(paper.cells.length).toBeGreaterThan(30);
+        expect(paper.cells.every(cell => cell[3] === 'light only')).toBe(true);
+        expect(paper.cells.every(cell => !cell[1].includes('23, 27, 33'))).toBe(true);
+        if (theme === 'light') lightPaper = paper;
+        else expect(paper).toEqual(lightPaper);
+        const screenBg = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
+        if (theme !== 'light') expect(screenBg).not.toBe('rgb(255, 255, 255)');
+        await sheet.screenshot({ path: testInfo.outputPath(`${theme}-${tab}-paper.png`) });
+        // Use the actual preview Print control, preserving native window.print.
+        await page.evaluate(() => {
+          window.__paperPrintCalls = 0;
+          const nativePrint = window.print.bind(window);
+          window.print = () => { window.__paperPrintCalls++; nativePrint(); };
+        });
+        await page.locator('[data-act="print"]').first().click();
+        await page.locator('button[form="pre-print-form"]').click();
+        await expect.poll(() => page.evaluate(() => window.__paperPrintCalls)).toBe(1);
+        await page.emulateMedia({ media: 'print' });
+        const printed = await printPalette(page);
+        expect(printed.scheme).toBe('light only');
+        expect(printed.canvas).toBe('rgb(255, 255, 255)');
+        expect(printed.controls).toBe(0);
+        expect(printed.faintText).toEqual([]);
+        await page.pdf({ path: testInfo.outputPath(`${theme}-${tab}.pdf`), preferCSSPageSize: true, printBackground: false });
+        await page.emulateMedia({ media: 'screen' });
+        expect(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor)).toBe(screenBg);
+      }
+    }
+    expect(errors).toEqual([]);
+  });
+
   test(`print output is theme-independent on desktop/mobile (${width}px) without changing screen preference`, async ({ page }) => {
     test.setTimeout(120_000);
     const errors = errorsFor(page);
@@ -96,6 +166,10 @@ for (const width of [1280, 390]) {
         await page.emulateMedia({ media: 'screen', colorScheme: 'dark' });
         await page.evaluate(async theme => { await window.store.patchDevice({ theme }); window.store.applyTheme(); window.store.repaint(); }, theme);
         await page.goto(surface.route ?? '/#/teaching/print-teaching/reports');
+        await page.reload();
+        // Hash navigation does not await the lazy Student view; do not click
+        // the previous report's Print control while that view is still loading.
+        if (surface.route === '/#/student/print-student-0') await expect(page.locator('.student-profile-header')).toBeVisible();
         if (surface.tab) await page.locator(`[data-act="tab"][data-tab="${surface.tab}"]`).click();
         if (surface.detailed) await page.locator('[data-act="att-mode"][data-mode="detailed"]').click();
         else if (surface.tab === 'attendance') await page.locator('[data-act="att-mode"][data-mode="brief"]').click();
@@ -137,6 +211,7 @@ for (const width of [1280, 390]) {
         expect(await page.evaluate(() => JSON.stringify({ attendance: window.store.state.attendance, scores: window.store.state.scores, sessions: window.store.state.sessions }))).toBe(dataBefore);
       }
       await page.reload();
+      await page.waitForFunction(() => window.store?.state?.ready && window.store.state.device);
       expect(await page.evaluate(() => window.store.state.device.theme)).toBe('auto');
     }
     expect(errors).toEqual([]);

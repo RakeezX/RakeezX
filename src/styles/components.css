@@ -2282,29 +2282,54 @@
 .printhead__sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
 
 /* ---------- الطباعة ---------- */
+/* One immutable palette for native print and the on-screen A4 paper.
+   Paper roots rebind semantic aliases too: inherited var() aliases have
+   already resolved against the screen theme at their defining ancestor. */
+:root {
+  --paper-white: #fff;
+  --paper-subtle: #f4f4f4;
+  --paper-border: #ccc;
+  --paper-border-strong: #999;
+  --paper-text: #000;
+  --paper-text-2: #333;
+  --paper-text-3: #666;
+  --paper-brand: #0f7655;
+  --paper-brand-ink: #06231f;
+  --paper-brand-border: #9eb8af;
+  --paper-ok: #15803d;
+  --paper-warn: #b45309;
+  --paper-danger: #b91c1c;
+  --paper-info: #1d4ed8;
+  --paper-status-border: #888;
+  --paper-purple: #6549c4;
+  --paper-recess: #92400e;
+}
 @media print {
   :root {
-    /* Print is a fixed light output contract, not a screen-theme preference.
-       Important tokens beat explicit/system-dark selectors without changing
-       the data-theme attribute or the persisted device preference. */
+    /* Beat explicit/system screen themes without changing device preference. */
     color-scheme: only light !important;
-    --bg: #fff !important; --bg-elev: #fff !important; --bg-sunk: #f4f4f4 !important;
-    --border: #ccc !important; --border-strong: #999 !important;
-    --surface-page: #fff !important; --surface-raised: #fff !important; --surface-subtle: #f4f4f4 !important;
-    --border-subtle: #ccc !important; --border-emphasis: #999 !important;
-    --text: #000 !important; --text-2: #333 !important; --text-3: #666 !important;
-    --brand: #0f7655 !important; --brand-text: #0f7655 !important;
-    --brand-ink: #06231f !important; --brand-soft: #fff !important; --brand-border: #9eb8af !important;
-    --ok: #15803d !important; --ok-soft: #fff !important; --ok-border: #888 !important;
-    --warn: #b45309 !important; --warn-soft: #fff !important; --warn-border: #888 !important;
-    --danger: #b91c1c !important; --danger-soft: #fff !important; --danger-border: #888 !important;
-    --info: #1d4ed8 !important; --info-soft: #fff !important; --info-border: #888 !important;
-    --present: var(--ok) !important; --present-soft: #fff !important;
-    --absent: var(--danger) !important; --absent-soft: #fff !important;
-    --late: var(--warn) !important; --late-soft: #fff !important;
-    --excused: var(--info) !important; --excused-soft: #fff !important;
-    --x-purple: #6549c4 !important; --x-purple-soft: #fff !important;
-    --recess: #92400e !important; --recess-soft: #fff !important;
+    --bg: var(--paper-white) !important; --bg-elev: var(--paper-white) !important; --surface-page: var(--paper-white) !important;
+    --surface-raised: var(--paper-white) !important; --brand-soft: var(--paper-white) !important; --ok-soft: var(--paper-white) !important;
+    --warn-soft: var(--paper-white) !important; --danger-soft: var(--paper-white) !important; --info-soft: var(--paper-white) !important;
+    --present-soft: var(--paper-white) !important; --absent-soft: var(--paper-white) !important; --late-soft: var(--paper-white) !important;
+    --excused-soft: var(--paper-white) !important; --x-purple-soft: var(--paper-white) !important; --recess-soft: var(--paper-white) !important;
+    --bg-sunk: var(--paper-subtle) !important; --surface-subtle: var(--paper-subtle) !important;
+    --border: var(--paper-border) !important; --border-subtle: var(--paper-border) !important;
+    --border-strong: var(--paper-border-strong) !important; --border-emphasis: var(--paper-border-strong) !important;
+    --text: var(--paper-text) !important; --text-1: var(--paper-text) !important; --t-1: var(--paper-text) !important;
+    --text-2: var(--paper-text-2) !important;
+    --text-3: var(--paper-text-3) !important; --t-3: var(--paper-text-3) !important;
+    --brand: var(--paper-brand) !important; --brand-text: var(--paper-brand) !important;
+    --brand-ink: var(--paper-brand-ink) !important;
+    --brand-border: var(--paper-brand-border) !important;
+    --ok: var(--paper-ok) !important; --present: var(--paper-ok) !important;
+    --warn: var(--paper-warn) !important; --late: var(--paper-warn) !important;
+    --danger: var(--paper-danger) !important; --absent: var(--paper-danger) !important;
+    --info: var(--paper-info) !important; --excused: var(--paper-info) !important;
+    --ok-border: var(--paper-status-border) !important; --warn-border: var(--paper-status-border) !important; --danger-border: var(--paper-status-border) !important;
+    --info-border: var(--paper-status-border) !important;
+    --x-purple: var(--paper-purple) !important;
+    --recess: var(--paper-recess) !important;
   }
   body { background: #fff; font-size: 11pt; }
   body * { box-shadow: none !important; text-shadow: none !important; background-image: none !important; transition: none !important; }
@@ -2907,6 +2932,30 @@
   color: var(--brand);
 }
 .a4-sheet {
+  /* This is paper even before entering print media, not a screen card. */
+  color-scheme: only light;
+  --bg: var(--paper-white) !important; --bg-elev: var(--paper-white) !important; --surface-page: var(--paper-white) !important;
+  --surface-raised: var(--paper-white) !important; --brand-soft: var(--paper-white) !important; --ok-soft: var(--paper-white) !important;
+  --warn-soft: var(--paper-white) !important; --danger-soft: var(--paper-white) !important; --info-soft: var(--paper-white) !important;
+  --present-soft: var(--paper-white) !important; --absent-soft: var(--paper-white) !important; --late-soft: var(--paper-white) !important;
+  --excused-soft: var(--paper-white) !important; --x-purple-soft: var(--paper-white) !important; --recess-soft: var(--paper-white) !important;
+  --bg-sunk: var(--paper-subtle) !important; --surface-subtle: var(--paper-subtle) !important;
+  --border: var(--paper-border) !important; --border-subtle: var(--paper-border) !important;
+  --border-strong: var(--paper-border-strong) !important; --border-emphasis: var(--paper-border-strong) !important;
+  --text: var(--paper-text) !important; --text-1: var(--paper-text) !important; --t-1: var(--paper-text) !important;
+  --text-2: var(--paper-text-2) !important;
+  --text-3: var(--paper-text-3) !important; --t-3: var(--paper-text-3) !important;
+  --brand: var(--paper-brand) !important; --brand-text: var(--paper-brand) !important;
+  --brand-ink: var(--paper-brand-ink) !important;
+  --brand-border: var(--paper-brand-border) !important;
+  --ok: var(--paper-ok) !important; --present: var(--paper-ok) !important;
+  --warn: var(--paper-warn) !important; --late: var(--paper-warn) !important;
+  --danger: var(--paper-danger) !important; --absent: var(--paper-danger) !important;
+  --info: var(--paper-info) !important; --excused: var(--paper-info) !important;
+  --ok-border: var(--paper-status-border) !important; --warn-border: var(--paper-status-border) !important; --danger-border: var(--paper-status-border) !important;
+  --info-border: var(--paper-status-border) !important;
+  --x-purple: var(--paper-purple) !important;
+  --recess: var(--paper-recess) !important;
   background: #ffffff;
   color: #111111;
   width: 100%;

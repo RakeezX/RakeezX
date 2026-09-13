@@ -66,12 +66,14 @@ test('Schedule export creates a real privacy-safe RTL PNG in the browser', async
     await popup.setContent(result.printDocument);
     await popup.emulateMedia({ media: 'print', colorScheme: 'dark' });
     const colors = await popup.evaluate(() => ({
+      scheme: getComputedStyle(document.documentElement).colorScheme,
+      canvas: getComputedStyle(document.documentElement).backgroundColor,
       body: getComputedStyle(document.body).backgroundColor,
       text: getComputedStyle(document.body).color,
       border: getComputedStyle(document.querySelector('td')).borderTopColor,
       direction: getComputedStyle(document.body).direction,
     }));
-    expect(colors).toEqual({ body: 'rgb(255, 255, 255)', text: 'rgb(22, 47, 53)', border: 'rgb(174, 191, 194)', direction: 'rtl' });
+    expect(colors).toEqual({ scheme: 'light only', canvas: 'rgb(255, 255, 255)', body: 'rgb(255, 255, 255)', text: 'rgb(22, 47, 53)', border: 'rgb(174, 191, 194)', direction: 'rtl' });
     await popup.close();
   }
   expect(results[1]).toEqual(results[0]);

@@ -278,6 +278,7 @@ export function schedulePrintDocument(model) {
 <style>
 @page { size: A4 landscape; margin: 10mm; }
 * { box-sizing: border-box; }
+html { color-scheme: only light; background: #fff; }
 body { margin: 0; color: #162f35; background: #fff; font: 12px Tahoma, Arial, sans-serif; }
 header { position: relative; display: grid; gap: 4px; margin-bottom: 18px; padding: 0 4px 10px; border-bottom: 1px solid #a9c9be; text-align: center; }
 .brand { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; color: #0f7655; font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-weight: 700; }
