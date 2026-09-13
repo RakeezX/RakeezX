@@ -3409,8 +3409,11 @@ export async function setAttendance(sesId, studentId, status) {
   if (!ses) return null;
   const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp) => {
     if (!members.some((member) => member.studentId === studentId)) return [];
-    const id = attendanceId(studentId, sesId);
-    const previous = existing.find((record) => record.id === id);
+    // Bulk server commands may supply a different canonical ID. Attendance
+    // identity remains student/session; never recreate its optimistic alias.
+    const previous = existing.filter((record) => record.studentId === studentId)
+      .sort((a, b) => (b.serverRevision ?? 0) - (a.serverRevision ?? 0))[0];
+    const id = previous?.id ?? attendanceId(studentId, sesId);
     return [{
       ...(previous ?? { id, studentId, sessionId: sesId, teachingId: session.teachingId, date: session.date, note: '' }),
       status, deleted: false, updatedAt: stamp,
@@ -3421,7 +3424,7 @@ export async function setAttendance(sesId, studentId, status) {
 
   // Experimental pre-snapshot sessions retain the previous behavior. The
   // forward-only guarantee begins only when a snapshot is first captured.
-  const id = attendanceId(studentId, sesId);
+  const id = attendanceIn(sesId).find((record) => record.studentId === studentId)?.id ?? attendanceId(studentId, sesId);
   const rec = await patch('attendance', id, { status, deleted: false }, {
     id, studentId, sessionId: sesId, teachingId: ses.teachingId, date: ses.date,
     status, note: '', deleted: false, updatedAt: now(),

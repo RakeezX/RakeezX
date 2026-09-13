@@ -378,6 +378,30 @@ function pendingForRecord(rows, store, ids, excludingId = null) {
   );
 }
 
+function pendingAttendanceForRecord(rows, record) {
+  return sortMutations(rows).filter((mutation) => mutation.store === 'attendance' &&
+    ([mutation.recordId, mutation.serverRecordId, mutation.canonicalId].includes(record.id) ||
+      (mutation.command === 'attendance:record' && mutation.patch?.sessionId === record.sessionId &&
+        mutation.patch?.studentId === record.studentId)));
+}
+
+function adoptAttendanceCanonical(current, canonical, outbox) {
+  const aliases = current.attendance.filter((row) => row.id === canonical.id ||
+    (row.studentId === canonical.studentId && row.sessionId === canonical.sessionId));
+  const prior = [...aliases].sort((a,b) => normalizeRevision(b.serverRevision) - normalizeRevision(a.serverRevision))[0];
+  const acceptCanonical = normalizeRevision(canonical.serverRevision) >= normalizeRevision(prior?.serverRevision);
+  const record = { ...prior, ...(acceptCanonical ? canonical : {}), id:canonical.id,canonicalId:canonical.id,
+    serverCanonical:acceptCanonical ? canonicalSnapshot(canonical) : prior?.serverCanonical };
+  delete record.syncCreatePending;
+  const conflicts = aliases.flatMap((row) => row.syncConflicts ?? []);
+  if (conflicts.length) record.syncConflicts = [...new Map(conflicts.map((row) => [JSON.stringify(row),row])).values()];
+  const remove = aliases.filter((row) => row.id !== canonical.id).map((row) => row.id);
+  let remapped = outbox;
+  for (const id of remove) remapped = remapped.map((row) => row.envelopeLocked ? row :
+    rewriteMutationReferences(row,'attendance',id,canonical.id));
+  return {record,remove,outbox:remapped,acceptCanonical};
+}
+
 function overlayMutations(record, mutations, canonicalDeleted = false) {
   let next = { ...record };
   for (const mutation of mutations) {
@@ -387,6 +411,14 @@ function overlayMutations(record, mutations, canonicalDeleted = false) {
       continue;
     }
     next = { ...next, ...clone(mutation.localPatch ?? {}) };
+    // Specialized attendance commands already persist their intent in patch.
+    // Older queued commands have an empty localPatch: keep that intent visible
+    // through canonical receipts/pulls without rewriting a locked envelope.
+    if (mutation.op === 'command' && mutation.command === 'attendance:record') {
+      for (const field of ['status', 'note']) {
+        if (hasOwn(mutation.patch ?? {}, field)) next[field] = clone(mutation.patch[field]);
+      }
+    }
   }
   if (canonicalDeleted) next.deleted = true;
   return next;
@@ -960,30 +992,31 @@ export function createSyncV2Engine({
     const snapshot = decodeSyncV2Canonical('sessionRosterSnapshots', result.snapshot);
     const attendance = decodeSyncV2Canonical('attendance', result.attendance);
     if (!attendance?.id) throw new Error('Sync V2 attendance receipt is missing canonical attendance');
-    const sourceId = mutation.recordId;
-    const canonicalId = attendance.id;
     const scope = { attendance: {}, sessionRosterSnapshots: {}, outbox: {} };
     await database.applyBatch(scope, {
       prepare(current) {
         const currentMutation = current.outbox.find((row) => row.id === mutation.id);
         if (!currentMutation) return Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
         const writes = Object.fromEntries(Object.keys(scope).map((store) => [store, operationBatch()]));
-        const source = current.attendance.find((row) => row.id === sourceId) ?? null;
-        const target = current.attendance.find((row) => row.id === canonicalId) ?? null;
+        const adopted = adoptAttendanceCanonical(current, attendance, current.outbox.filter((row) => row.id !== mutation.id));
         const diagnostic = conflictDiagnostic(currentMutation, result, now());
-        const next = {
-          ...(source ?? {}), ...(target ?? {}), ...attendance, id: canonicalId, canonicalId,
-          serverCanonical: canonicalSnapshot(attendance),
-          ...(diagnostic ? { syncConflicts: [...(target?.syncConflicts ?? source?.syncConflicts ?? []), diagnostic] } : {}),
-        };
-        delete next.syncCreatePending;
+        let next = adopted.record;
+        if (diagnostic) next.syncConflicts = [...(next.syncConflicts ?? []),diagnostic];
         if (snapshot?.id) {
           const existingSnapshot = current.sessionRosterSnapshots.find((row) => row.id === snapshot.id);
           pushUniquePut(writes.sessionRosterSnapshots, { ...(existingSnapshot ?? {}), ...snapshot, serverCanonical: canonicalSnapshot(snapshot) });
         }
-        const others = current.outbox.filter((row) => row.id !== mutation.id).map((row) =>
-          canonicalId !== sourceId ? rewriteMutationReferences(row, 'attendance', sourceId, canonicalId) : row);
-        if (canonicalId !== sourceId) writes.attendance.remove.push(sourceId);
+        let others = adopted.outbox;
+        const successors = pendingAttendanceForRecord(others, attendance);
+        others = others.map((row) => {
+          if (!adopted.acceptCanonical || result.outcome !== 'applied' || row.envelopeLocked ||
+              row.command !== 'attendance:record' || row.sequence <= mutation.sequence ||
+              !successors.some((candidate) => candidate.id === row.id)) return row;
+          return { ...row, baseRevision: Math.max(normalizeRevision(row.baseRevision), next.serverRevision),
+            state: row.state === 'blocked' ? 'pending' : row.state, blockedReason: null };
+        });
+        next = overlayMutations(next, pendingAttendanceForRecord(others, next), next.deleted === true);
+        writes.attendance.remove.push(...adopted.remove);
         pushUniquePut(writes.attendance, next);
         writes.outbox.remove.push(mutation.id);
         for (const row of others) {
@@ -991,6 +1024,50 @@ export function createSyncV2Engine({
           if (JSON.stringify(before) !== JSON.stringify(row)) pushUniquePut(writes.outbox, row);
         }
         return writes;
+      },
+    });
+  }
+
+  async function reconcileFillAttendanceReceipt(mutation, receipt) {
+    if (receipt?.mutationId !== mutation.mutationId) throw new Error('Sync V2 fill receipt mutationId mismatch');
+    const snapshot = decodeSyncV2Canonical('sessionRosterSnapshots', receipt.snapshot);
+    const skippedIds = new Set((receipt.skipped ?? []).map((row) => row?.id));
+    const rows = [...(receipt.applied ?? []), ...(receipt.skipped ?? [])]
+      .map((row) => decodeSyncV2Canonical('attendance', row)).filter(Boolean);
+    await database.applyBatch({ attendance: {}, sessionRosterSnapshots: {}, outbox: {} }, {
+      prepare(current) {
+        if (!current.outbox.some((row) => row.id === mutation.id)) return {};
+        let others = current.outbox.filter((row) => row.id !== mutation.id);
+        const remove = [];
+        const attendance = rows.map((row) => {
+          const adopted = adoptAttendanceCanonical(current,row,others);
+          others = adopted.outbox;
+          remove.push(...adopted.remove);
+          // Only a row created by THIS successful fill supplies a causal base.
+          // Skipped rows may contain another device's work; retain stale-base
+          // conflict protection, and never change already-sent envelopes.
+          if (adopted.acceptCanonical && !skippedIds.has(row.id)) {
+            const successors = pendingAttendanceForRecord(others,row);
+            others = others.map((pending) => {
+              if (pending.command !== 'attendance:record' || pending.envelopeLocked ||
+                  pending.sequence <= mutation.sequence ||
+                  !successors.some((candidate) => candidate.id === pending.id)) return pending;
+              return { ...pending, baseRevision: Math.max(normalizeRevision(pending.baseRevision), row.serverRevision),
+                state: pending.state === 'blocked' ? 'pending' : pending.state, blockedReason: null };
+            });
+          }
+          let next = adopted.record;
+          if (skippedIds.has(row.id)) next.bulkDisposition = { mutationId: mutation.mutationId,
+            outcome: 'skipped', canonicalRevision: row.serverRevision, recordedAt: now() };
+          next = overlayMutations(next, pendingAttendanceForRecord(others,row), next.deleted === true);
+          return next;
+        });
+        return {
+          attendance: { put: attendance, remove },
+          sessionRosterSnapshots: { put: snapshot ? [{ ...current.sessionRosterSnapshots.find((row) => row.id === snapshot.id),
+            ...snapshot, serverCanonical: canonicalSnapshot(snapshot) }] : [], remove: [] },
+          outbox: { put: others.filter((row) => row !== current.outbox.find((prior) => prior.id === row.id)), remove: [mutation.id] },
+        };
       },
     });
   }
@@ -1140,6 +1217,12 @@ export function createSyncV2Engine({
         const liveRows = sortMutations(await database.getAll('outbox'));
         const live = liveRows.find((row) => row.id === original.id);
         if (!live) continue;
+        if (liveRows.some((row) => row.sequence < live.sequence && row.patch?.sessionId === live.patch.sessionId &&
+            (row.command === 'attendance:fill' ||
+              (row.command === 'attendance:record' && row.patch?.studentId === live.patch.studentId)))) {
+          await markDependencyBlock(live, 'attendance-predecessor-pending');
+          stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+        }
         const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
         if (readiness.state === 'blocked') {
           await markDependencyBlock(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
@@ -1267,9 +1350,8 @@ export function createSyncV2Engine({
         const ready=await dependencyReadiness(live,(await database.getAll('outbox')).filter((row)=>row.id!==live.id));
         if(ready.state==='blocked'){await markDependencyBlock(live,ready.reason);result.blocked++;continue;} if(ready.state==='rejected'){await markRejected(live,ready.reason);result.blocked++;continue;}
         const mutation=await markAttempt(live); result.attempted++;
-        try { const receipt=await transport.applyFillAttendanceCommand({mutationId:mutation.mutationId,deviceId:mutation.deviceId,sessionId:mutation.patch.sessionId,status:mutation.patch.status,clientUpdatedAt:mutation.clientUpdatedAt}); if(receipt?.mutationId!==mutation.mutationId) throw new Error('Sync V2 fill receipt mutationId mismatch');
-          const snapshot=decodeSyncV2Canonical('sessionRosterSnapshots',receipt.snapshot); const skippedIds=new Set((receipt.skipped??[]).map((row)=>row?.id)); const rows=[...(receipt.applied??[]),...(receipt.skipped??[])].map((row)=>decodeSyncV2Canonical('attendance',row)).filter(Boolean);
-          await database.applyBatch({attendance:{},sessionRosterSnapshots:{},outbox:{}},{prepare:(current)=>({attendance:{put:rows.map((row)=>{const prior=current.attendance.find((x)=>x.id===row.id);const next={...prior,...row,serverCanonical:canonicalSnapshot(row)};return skippedIds.has(row.id)?{...next,bulkDisposition:{mutationId:mutation.mutationId,outcome:'skipped',canonicalRevision:row.serverRevision,recordedAt:now()}}:next;}),remove:[]},sessionRosterSnapshots:{put:snapshot?[{...current.sessionRosterSnapshots.find((x)=>x.id===snapshot.id),...snapshot,serverCanonical:canonicalSnapshot(snapshot)}]:[],remove:[]},outbox:{put:[],remove:[mutation.id]}})}); result.acknowledged++;
+        try { const receipt=await transport.applyFillAttendanceCommand({mutationId:mutation.mutationId,deviceId:mutation.deviceId,sessionId:mutation.patch.sessionId,status:mutation.patch.status,clientUpdatedAt:mutation.clientUpdatedAt});
+          await reconcileFillAttendanceReceipt(mutation, receipt); result.acknowledged++;
         } catch(error){if(isRejectedProtocolError(error))await markRejected(mutation,'protocol-rejected',error);else await markFailure(mutation,error);if(isRejectedProtocolError(error))result.blocked++;else result.failed++;} continue;
       }
       if (original.op === 'command' && String(original.command ?? '').startsWith('term-report:') &&
@@ -1406,9 +1488,21 @@ export function createSyncV2Engine({
       prepare(current) {
         const recordWrites = operationBatch();
         const outboxWrites = operationBatch();
+        let workingOutbox = current.outbox;
         for (const row of canonicalRows) {
           const canonical = decodeSyncV2Canonical(store, row);
           if (!canonical?.id) continue;
+          if (store === 'attendance') {
+            const adopted = adoptAttendanceCanonical(current,canonical,workingOutbox);
+            workingOutbox = adopted.outbox;
+            const next = overlayMutations(adopted.record,pendingAttendanceForRecord(workingOutbox,canonical),adopted.record.deleted === true);
+            pushUniquePut(recordWrites,next);
+            recordWrites.remove.push(...adopted.remove);
+            for (const mutation of workingOutbox) {
+              if (mutation !== current.outbox.find((prior) => prior.id === mutation.id)) pushUniquePut(outboxWrites,mutation);
+            }
+            continue;
+          }
           const existing = current[store].find((record) => record.id === canonical.id) ?? null;
           if (existing && normalizeRevision(existing.serverRevision) > normalizeRevision(canonical.serverRevision)) continue;
           // The offline-first bootstrap runs before Auth and therefore cannot

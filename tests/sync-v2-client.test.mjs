@@ -6,6 +6,7 @@ import { STORES } from '../src/lib/db.js';
 import { createSyncV2Engine, summarizeSyncV2OperationalState } from '../src/lib/sync-v2.js';
 import { DEFAULT_TIME_PROFILES, makeTimeProfile, sessionId } from '../src/models.js';
 import { customSubjectSlug } from '../src/lib/subject-catalog.js';
+import { createAttendanceServer } from './helpers/attendance-server-fixture.mjs';
 
 const clone = (value) => value == null ? value : structuredClone(value);
 
@@ -1262,4 +1263,178 @@ test('bulk attendance reconciliation replaces stale rows from both applied and s
   assert.deepEqual({ status: skipped.status, note: skipped.note, serverRevision: skipped.serverRevision, fieldRevisions: skipped.fieldRevisions }, { status: 'absent', note: 'canonical', serverRevision: 9, fieldRevisions: { status: 9, note: 8 } });
   assert.equal(skipped.bulkDisposition.outcome, 'skipped');
   assert.equal((await client.database.getAll('outbox')).length, 0);
+});
+
+test('attendance overrides survive delayed bulk receipts, reload, and two-device PostgreSQL convergence', async (t) => {
+  const server = await createAttendanceServer();
+  const a = makeClient(server, 'override-a');
+  const b = makeClient(server, 'override-b');
+  t.after(async () => { a.database.close(); b.database.close(); await server.close(); });
+  await a.engine.pullAll({ stores: ['students', 'sessions'] });
+  await a.engine.queueFillAttendanceCommand({ sessionId: 'override-session', status: 'present', studentIds: ['override-a','override-b','override-c'] });
+  // Same-millisecond writes must still obey durable mutation sequence ordering.
+  const fill = (await a.database.getAll('outbox'))[0];
+  for (const [studentId,status] of [['override-a','absent'],['override-b','excused']]) {
+    const id = `at:${studentId}:override-session`;
+    await a.database.applyBatch({ attendance: { put: [{ id,studentId,sessionId:'override-session',status,serverRevision:0 }], remove:[] } });
+    const queued = await a.engine.queueAttendanceCommand({ attendanceId:id,sessionId:'override-session',studentId,patch:{status} });
+    await a.database.applyBatch({ outbox: { put:[{ ...queued,clientUpdatedAt:fill.clientUpdatedAt }],remove:[] } });
+  }
+  const first = await a.engine.dispatchPending({ maxMutations:1 });
+  assert.equal(first.acknowledged,1);
+  assert.equal((await a.database.get('attendance','att:override-a:override-session')).status,'absent');
+  assert.equal((await a.database.get('attendance','att:override-b:override-session')).status,'excused');
+  const pending = await a.database.getAll('outbox');
+  assert.equal(pending.every((row) => row.baseRevision > 0),true,'bulk-created revisions become the causal base of later local commands');
+  a.database.close(); // reopen the same IndexedDB: no in-memory intent required.
+  await a.engine.pullAll({ stores:['attendance'] });
+  assert.equal((await a.database.get('attendance','att:override-a:override-session')).status,'absent');
+  const pushed = await a.engine.dispatchPending();
+  assert.equal(pushed.acknowledged,2);
+  await a.engine.pullAll({ stores:['attendance','sessionRosterSnapshots'] });
+  await b.engine.pullAll({ stores:['attendance','sessionRosterSnapshots'] });
+  const expected = ['absent','excused','present'];
+  for (const client of [a,b]) {
+    const rows = (await client.database.getAll('attendance')).sort((x,y) => x.studentId.localeCompare(y.studentId));
+    assert.deepEqual(rows.map((row) => row.status),expected);
+    assert.equal(new Set(rows.map((row) => `${row.sessionId}:${row.studentId}`)).size,3);
+    assert.equal((await client.database.getAll('outbox')).length,0);
+  }
+  // Current fill means remaining/unmarked only; it is not an overwrite-all command.
+  await a.engine.queueFillAttendanceCommand({ sessionId:'override-session',status:'present',studentIds:[] });
+  await a.engine.dispatchPending();
+  assert.deepEqual((await server.fetchRecords('attendance')).sort((x,y)=>x.student_id.localeCompare(y.student_id)).map((row)=>row.status),expected);
+  // Explicit later PRESENT edits, unlike stale bulk replay, intentionally win.
+  await a.engine.queueAttendanceCommand({ attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status:'present'} });
+  await a.engine.dispatchPending();
+  await b.engine.pullAll({ stores:['attendance'] });
+  assert.equal((await b.database.get('attendance','att:override-a:override-session')).status,'present');
+});
+
+test('attendance lost bulk responses retain order and retry the same server receipt', async (t) => {
+  const server = await createAttendanceServer();
+  let loseResponse = true;
+  const client = makeClient(server,'attendance-lost-response',{ transport:{
+    ...server,
+    async applyFillAttendanceCommand(e) {
+      const receipt = await server.applyFillAttendanceCommand(e);
+      if (loseResponse) { loseResponse=false; throw new Error('synthetic lost response'); }
+      return receipt;
+    },
+  } });
+  t.after(async()=>{client.database.close();await server.close();});
+  await client.engine.pullAll({stores:['students','sessions']});
+  await client.engine.queueFillAttendanceCommand({sessionId:'override-session',status:'present',studentIds:['override-a','override-b','override-c']});
+  const fill=(await client.database.getAll('outbox'))[0];
+  await client.engine.queueAttendanceCommand({attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status:'absent'}});
+  const first=await client.engine.dispatchPending();
+  assert.equal(first.failed,1);
+  assert.equal(first.blocked,1);
+  assert.equal(server.calls.length,1,'an override must not overtake a failed/lost predecessor');
+  client.database.close();
+  const retry=await client.engine.dispatchPending();
+  assert.equal(retry.acknowledged,2);
+  assert.equal(server.calls[1].mutationId,fill.mutationId);
+  assert.equal((await client.database.get('attendance','att:override-a:override-session')).status,'absent');
+  assert.equal((await server.pg.query('select count(*) from rakeezx.sync_mutation_receipts')).rows[0].count,2);
+  assert.equal((await server.fetchRecords('attendance')).length,3);
+});
+
+test('attendance delayed individual receipts preserve and rebase later same-student intent', async (t) => {
+  const server=await createAttendanceServer();
+  let client;
+  let laterQueued=false;
+  client=makeClient(server,'attendance-single-later',{transport:{...server,
+    async applyAttendanceCommand(e) {
+      const receipt=await server.applyAttendanceCommand(e);
+      if (!laterQueued) {
+        laterQueued=true;
+        await client.engine.queueAttendanceCommand({attendanceId:e.attendanceId,sessionId:e.sessionId,studentId:e.studentId,patch:{status:'excused'}});
+      }
+      return receipt;
+    },
+  }});
+  t.after(async()=>{client.database.close();await server.close();});
+  await client.engine.pullAll({stores:['students','sessions']});
+  await client.engine.queueAttendanceCommand({attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status:'present'}});
+  await client.engine.dispatchPending();
+  assert.equal((await client.database.get('attendance','att:override-a:override-session')).status,'excused');
+  await client.engine.dispatchPending();
+  assert.equal((await server.fetchRecords('attendance'))[0].status,'excused');
+});
+
+test('attendance skipped bulk rows retain other-device conflicts and locked envelope identity', async (t) => {
+  const server=await createAttendanceServer();
+  const client=makeClient(server,'attendance-protected');
+  t.after(async()=>{client.database.close();await server.close();});
+  await server.applyAttendanceCommand({mutationId:'other-device-absence',deviceId:'other-device',attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',baseRevision:0,patch:{status:'absent'},clientUpdatedAt:1});
+  await client.engine.pullAll({stores:['students','sessions']});
+  await client.engine.queueFillAttendanceCommand({sessionId:'override-session',status:'present',studentIds:['override-a','override-b','override-c']});
+  const skipped=await client.engine.queueAttendanceCommand({attendanceId:'att:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status:'present'}});
+  const locked=await client.engine.queueAttendanceCommand({attendanceId:'att:override-b:override-session',sessionId:'override-session',studentId:'override-b',patch:{status:'excused'}});
+  await client.database.applyBatch({outbox:{put:[{...locked,envelopeLocked:true,attemptCount:1}],remove:[]}});
+  await client.engine.dispatchPending({maxMutations:1});
+  assert.equal((await client.database.get('outbox',skipped.id)).baseRevision,0,'skipped canonical work cannot authorize a stale override');
+  assert.deepEqual(await client.database.get('outbox',locked.id),{...locked,envelopeLocked:true,attemptCount:1});
+  await client.engine.dispatchPending();
+  const row=await client.database.get('attendance','att:override-a:override-session');
+  assert.equal(row.status,'absent');
+  assert.equal(row.syncConflicts.length,1,'historical genuine conflict evidence remains');
+  assert.equal(row.syncConflicts[0].lifecycle,'historical_reconciled');
+});
+
+test('attendance reconciliation rollback and pre-receipt pull preserve alias intent and conflict history', async (t) => {
+  const server=await createAttendanceServer();
+  const client=makeClient(server,'attendance-rollback');
+  t.after(async()=>{client.database.close();await server.close();});
+  await client.engine.pullAll({stores:['students','sessions']});
+  await client.engine.queueFillAttendanceCommand({sessionId:'override-session',status:'present',studentIds:['override-a','override-b','override-c']});
+  const fill=(await client.database.getAll('outbox'))[0];
+  const history={lifecycle:'historical_reconciled',mutationId:'synthetic-history',conflictedGroups:['note']};
+  await client.database.applyBatch({attendance:{put:[{id:'at:override-a:override-session',sessionId:'override-session',studentId:'override-a',status:'late',serverRevision:0,syncConflicts:[history]}],remove:[]}});
+  await client.engine.queueAttendanceCommand({attendanceId:'at:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status:'late'}});
+  let injectFailure=true;
+  const applyFill=server.applyFillAttendanceCommand;
+  server.applyFillAttendanceCommand=async(envelope)=>{
+    const receipt=await applyFill(envelope);
+    if(injectFailure){injectFailure=false;client.database.failNextStore='outbox';}
+    return receipt;
+  };
+  assert.equal((await client.engine.dispatchPending({maxMutations:1})).failed,1);
+  assert.equal((await client.database.get('attendance','at:override-a:override-session')).status,'late');
+  assert.equal((await client.database.getAll('outbox')).length,2,'receipt acknowledgement and local reconciliation must commit together');
+  client.database.close();
+  await client.engine.pullAll({stores:['attendance']});
+  assert.equal(await client.database.get('attendance','at:override-a:override-session'),undefined);
+  const adopted=await client.database.get('attendance','att:override-a:override-session');
+  assert.equal(adopted.status,'late');
+  assert.deepEqual(adopted.syncConflicts,[history]);
+  assert.equal((await client.engine.dispatchPending()).acknowledged,2);
+  assert.equal(server.calls[1].mutationId,fill.mutationId);
+  assert.equal((await server.fetchRecords('attendance')).find((row)=>row.student_id==='override-a').status,'late');
+  assert.equal((await client.database.getAll('attendance')).length,3);
+});
+
+test('attendance same-student successors cannot overtake a lost response after bulk ID remapping', async (t) => {
+  const server=await createAttendanceServer();
+  let lose=true;
+  const client=makeClient(server,'attendance-remapped-order',{transport:{...server,
+    async applyAttendanceCommand(e){
+      const receipt=await server.applyAttendanceCommand(e);
+      if(lose){lose=false;throw new Error('synthetic lost individual response');}
+      return receipt;
+    },
+  }});
+  t.after(async()=>{client.database.close();await server.close();});
+  await client.engine.pullAll({stores:['students','sessions']});
+  await client.engine.queueFillAttendanceCommand({sessionId:'override-session',status:'present',studentIds:['override-a','override-b','override-c']});
+  for(const status of ['absent','excused']) await client.engine.queueAttendanceCommand({attendanceId:'at:override-a:override-session',sessionId:'override-session',studentId:'override-a',patch:{status}});
+  const first=await client.engine.dispatchPending();
+  assert.deepEqual(first,{attempted:2,acknowledged:1,failed:1,blocked:1});
+  assert.equal(server.calls.length,2,'later same-student intent cannot bypass a predecessor under its old alias');
+  assert.equal((await client.database.get('attendance','att:override-a:override-session')).status,'excused');
+  assert.equal((await client.engine.dispatchPending()).acknowledged,2);
+  assert.equal(server.calls[1].mutationId,server.calls[2].mutationId);
+  assert.equal((await server.fetchRecords('attendance')).find((row)=>row.student_id==='override-a').status,'excused');
+  assert.equal((await server.fetchRecords('attendance')).length,3);
 });

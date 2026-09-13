@@ -137,6 +137,41 @@ async function teachingCommand({ mutationId, teachingId, sectionId, subjectId, t
   return result.rows[0].result;
 }
 
+test('attendance bulk then later explicit overrides use revisions, canonical identity, and idempotent receipts', async () => {
+  await useOwner(OWNER);
+  const suffix='override-causal';
+  const f=await seedAcademicContext(suffix);
+  const b=`student:${suffix}:b`,c=`student:${suffix}:c`;
+  await seedStudent(b);
+  await seedStudent(c);
+  for (const [index,id] of [f.studentId,b,c].entries()) await pg.query(`insert into rakeezx.enrollments
+    (id,student_id,section_id,roll_no,start_date,status) values ($1,$2,$3,$4,'2026-08-01','active')`,
+    [`en:${id}`,id,f.sectionId,index+1]);
+  const fill=await fillAttendanceCommand({mutationId:'override-fill',sessionId:f.sessionId,clientUpdatedAt:90});
+  assert.equal(fill.applied.length,3);
+  const stale=await attendanceCommand({mutationId:'override-stale',attendanceId:`at:${f.studentId}:${f.sessionId}`,sessionId:f.sessionId,studentId:f.studentId,patch:{status:'absent'},clientUpdatedAt:90});
+  assert.equal(stale.outcome,'conflict');
+  for (const [studentId,status] of [[f.studentId,'absent'],[b,'excused']]) {
+    const canonical=fill.applied.find((row)=>row.student_id===studentId);
+    const payload={mutationId:`override-${studentId}`,attendanceId:`at:${studentId}:${f.sessionId}`,sessionId:f.sessionId,studentId,
+      baseRevision:Number(canonical.revision),patch:{status},clientUpdatedAt:90};
+    const result=await attendanceCommand(payload);
+    assert.equal(result.outcome,'applied');
+    assert.equal(result.attendance.id,canonical.id,'different client ID cannot create a second natural attendance row');
+    assert.equal(result.attendance.status,status);
+    assert.deepEqual(await attendanceCommand(payload),result);
+  }
+  assert.deepEqual(await fillAttendanceCommand({mutationId:'override-fill',sessionId:f.sessionId,clientUpdatedAt:90}),fill);
+  const again=await fillAttendanceCommand({mutationId:'override-fill-again',sessionId:f.sessionId,clientUpdatedAt:100});
+  assert.equal(again.applied.length,0,'fill remains unmarked-only, never overwrite-all');
+  assert.equal(again.skipped.length,3);
+  const rows=(await pg.query('select student_id,status from rakeezx.attendance where session_id=$1 order by student_id',[f.sessionId])).rows;
+  assert.equal(rows.length,3);
+  assert.equal(rows.find((row)=>row.student_id===f.studentId).status,'absent');
+  assert.equal(rows.find((row)=>row.student_id===b).status,'excused');
+  assert.equal(rows.find((row)=>row.student_id===c).status,'present');
+});
+
 test('SYNC-V2A server protocol foundation', async (t) => {
   await t.test('covers every current Production synced table and no local-only curriculum table', async () => {
     const expected = [
