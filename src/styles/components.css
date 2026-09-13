@@ -4239,6 +4239,30 @@
 }
 
 /* ملف الطالب */
+.student-profile-management { min-height: 44px; flex-shrink: 0; }
+.student-management { display: grid; gap: var(--sp-3); min-width: 0; }
+.student-management p { margin: 0; line-height: 1.65; }
+.student-management__identity { display: grid; gap: var(--sp-1); padding-block-end: var(--sp-3); border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.student-management__identity span { color: var(--text-3); font-size: var(--fs-sm); }
+.student-management__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.student-management .btn, .student-management summary { min-height: 44px; }
+.student-management .btn--danger { color: color-mix(in srgb, var(--danger) 80%, var(--text)); }
+.student-management .btn--danger:hover { background: var(--danger-soft); color: color-mix(in srgb, var(--danger) 80%, var(--text)); border-color: var(--danger); }
+.archive-former-entry { margin-block-end: var(--sp-3); }
+.former-students-list { list-style: none; padding: 0; margin: 0; }
+.former-student-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); }
+.former-student-row + .former-student-row { border-block-start: 1px solid var(--border); }
+.former-student-row__identity, .former-student-row__context { display: grid; gap: var(--sp-1); min-width: 0; overflow-wrap: anywhere; }
+.former-student-row__context { justify-items: start; }
+.former-student-row .btn { min-height: 44px; }
+@media (max-width: 599px) {
+  .student-profile-header:has(.student-profile-management) { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .student-profile-management { grid-column: 2; justify-self: start; }
+  .former-student-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .former-student-row__identity { grid-column: 1 / -1; }
+  .former-student-row__context { grid-column: 1; }
+  .former-student-row > .btn { grid-column: 2; grid-row: 2; }
+}
 .student-profile-header {
   padding: var(--sp-3) var(--sp-4);
   border-color: var(--brand-border);

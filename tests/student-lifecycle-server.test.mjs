@@ -139,7 +139,8 @@ test('cleared inline notes and reward receipts still count as meaningful history
 
 test('schema/privileges match manual handoff and malformed commands cannot mutate data', async () => {
   const verification = await readFile(new URL('../supabase/verify-0029-student-lifecycle.sql', import.meta.url), 'utf8');
-  const frozen = await readFile(new URL('../supabase/migrations/0029_student_lifecycle_safety.sql', import.meta.url));
+  // The frozen handoff hash identifies the canonical LF Git asset, not Windows checkout CRLF conversion.
+  const frozen = Buffer.from((await readFile(new URL('../supabase/migrations/0029_student_lifecycle_safety.sql', import.meta.url), 'utf8')).replaceAll('\r\n', '\n'));
   const handoff = await readFile(new URL('../docs/STUDENT_LIFECYCLE_0029_MANUAL_HANDOFF.md', import.meta.url), 'utf8');
   assert.ok(handoff.includes(`SHA256: ${createHash('sha256').update(frozen).digest('hex')}`));
   const normalized = (text) => text.replaceAll('\r\n', '\n').trimEnd();

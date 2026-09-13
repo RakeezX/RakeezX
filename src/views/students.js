@@ -84,7 +84,7 @@ function importSheet(secId) {
   });
 }
 
-function transferSheet(student, fromSectionId) {
+export function transferSheet(student, fromSectionId) {
   const others = store.sections().filter((s) => s.id !== fromSectionId);
 
   return openSheet({

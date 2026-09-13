@@ -68,6 +68,6 @@ test('a transferred student sees and updates compatible grades from the destinat
   await page.locator('[data-act="mode"][data-mode="table"]').click();
   await expect(destinationInput).toHaveValue('9');
   await page.goto(`/#/student/${fixture.student}?teaching=${fixture.teachingY}`);
-  await expect(page.locator('.itemrow__val')).toContainText('9 / 10');
+  await expect(page.locator('.student-profile-current-grades .itemrow__val')).toContainText('9 / 10');
   expect(errors).toEqual([]);
 });

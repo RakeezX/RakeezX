@@ -22,11 +22,12 @@ export default {
       <main class="management-page archive-page archive-page--empty"><div class="empty">
         <div class="empty__icon">${icon('archive')}</div><div class="empty__title">لا توجد سجلات تاريخية في الأرشيف</div>
         <div class="empty__text">تظهر هنا الأعوام المؤرشفة والفصول المغلقة للعرض فقط. النسخة الاحتياطية تبقى مسارًا منفصلًا للاسترداد.</div>
-        <div class="btn-row archive-empty__actions"><a class="btn btn--info" href="#/settings/backup">${icon('shield')} النسخ الاحتياطي</a><a class="btn btn--ghost" href="#/settings">العودة إلى الإعدادات</a></div>
+        <div class="btn-row archive-empty__actions"><a class="btn btn--info" href="#/archive/former-students">${icon('users')} الطلاب السابقون</a><a class="btn btn--ghost" href="#/settings/backup">${icon('shield')} النسخ الاحتياطي</a><a class="btn btn--ghost" href="#/settings">العودة إلى الإعدادات</a></div>
       </div></main>`;
     return html`
       <main class="management-page archive-page">
         ${parentLink('العودة إلى الإعدادات', '/settings')}
+        <a class="btn btn--info archive-former-entry" href="#/archive/former-students">${icon('users')} الطلاب السابقون</a>
         <section class="archive-intro" aria-labelledby="archive-intro-title">
           <span class="archive-intro__icon">${icon('archive')}</span><div><h2 id="archive-intro-title">السجل التاريخي للمدرسة</h2><p>استعرض الأعوام والفصول المغلقة دون تغييرها. الأرشيف للعرض التاريخي، وليس لاستعادة بيانات التطبيق.</p></div>
           <a class="btn btn--info" href="#/settings/backup">${icon('shield')} النسخ الاحتياطي</a>

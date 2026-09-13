@@ -101,7 +101,7 @@ for (const width of [320, 390, 1280]) for (const theme of ['light', 'dark']) {
     await expect(page.locator('[data-act="reinstate"]')).toHaveCount(0);
     expect(await recordState(page, ids.withdrawn)).toEqual(before);
     await page.goto(`/#/student/${ids.active}?teaching=${ids.tx}`);
-    await expect(page.locator('[data-act="withdraw"]')).toBeVisible();
+    await expect(page.locator('[data-act="manage-student"]')).toBeVisible();
     await expect(page.locator('.student-profile-actions [data-act="share"]')).toBeVisible();
     await expect(page.locator('.student-profile-actions [data-act="print"]')).toBeVisible();
     await expect(page.locator('[data-act="reinstate"]')).toHaveCount(0);

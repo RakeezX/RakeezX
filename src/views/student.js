@@ -12,6 +12,7 @@ import {
   ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS, SESSION_STATUS,
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
+import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
 function resolveTeaching(student, requested) {
@@ -48,6 +49,7 @@ export default {
     return sec ? sectionLabel(sec) : STUDENT_STATUS[s.status] ?? '';
   },
   back: (p) => {
+    if (p.from === 'former-students') return '#/archive/former-students';
     const teachingId = p.teaching || p.cls;
     if (p.from === 'picker' && teachingId) {
       return `#/teaching/${teachingId}/picker`;
@@ -147,6 +149,7 @@ export default {
             ${currentEnrollment?.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${currentEnrollment.rollNo}</span>` : ''}
           </div>
         </div>
+        <button class="btn btn--quiet student-profile-management" data-act="manage-student">إدارة الطالب</button>
       </div>
 
       ${s.status === 'withdrawn'
@@ -445,9 +448,6 @@ export default {
         <div class="btn-row student-profile-actions__row">
           <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة الملخص</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
-          ${s.status === 'active'
-            ? html`<button class="btn btn--danger" data-act="withdraw">${icon('back')} غادر المدرسة</button>`
-            : ''}
         </div>
       </div>
       </div>
@@ -603,22 +603,14 @@ export default {
       toast('حُذفت الملاحظة');
     },
 
-    async withdraw(el, ev, params) {
-      const s = store.getStudent(params.id);
-      if (!s) return;
-
-      const ok = await confirmSheet({
-        title: `${s.name} غادر المدرسة؟`,
-        desc: 'يُنهى انتسابه ولا يُحذف — درجاته وحضوره وسجله تبقى كاملة ويمكن الرجوع إليها.',
-        confirmLabel: 'سجّل مغادرته',
-        danger: true,
-      });
-      if (!ok) return;
-      const en = store.activeEnrollment(params.id);
-      if (!en) return;
-      const result = await store.endStudentEnrollment(params.id, en.id, { sourceRevision: en.serverRevision });
-      if (!result.ok) { toast('لم تُسجّل المغادرة. حدّث البيانات وأعد المحاولة.'); return; }
-      toast('سُجّلت مغادرته — سجلّه محفوظ');
+    async manageStudent(el, ev, params) {
+      const result = await openStudentManagement(params.id);
+      if (result?.action === 'delete') location.hash = params.teaching ? `#/teaching/${params.teaching}/students` : '#/classes';
+      else {
+        // Restore to the current control after any runtime-triggered profile render.
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        document.querySelector('[data-act="manage-student"]')?.focus({ preventScroll: true });
+      }
     },
 
   },
