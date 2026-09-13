@@ -8,7 +8,7 @@ export async function lifecycleServer(options = {}) {
   return pg;
 }
 
-export async function installLifecycleServer(pg, { migration29 = true } = {}) {
+export async function installLifecycleServer(pg, { migration29 = true, migration30 = migration29 } = {}) {
   await pg.exec(`create schema auth; create role authenticated; create role anon;
     create table auth.users(id uuid primary key); create table auth.current_identity(id uuid);
     insert into auth.users values ('${OWNER}'); insert into auth.current_identity values ('${OWNER}');
@@ -17,7 +17,8 @@ export async function installLifecycleServer(pg, { migration29 = true } = {}) {
     grant usage on schema auth to authenticated, anon;`);
   const directory = new URL('../../supabase/migrations/', import.meta.url);
   for (const name of (await readdir(directory)).sort().filter((name) => /^\d+.*\.sql$/.test(name) &&
-      (Number(name.slice(0, 4)) <= 26 || (migration29 && Number(name.slice(0, 4)) === 29)))) {
+      (Number(name.slice(0, 4)) <= 26 || (migration29 && Number(name.slice(0, 4)) === 29) ||
+       (migration30 && Number(name.slice(0, 4)) === 30)))) {
     await pg.exec((await readFile(new URL(name, directory), 'utf8')).replace(/^\uFEFF/, ''));
   }
 }
@@ -87,6 +88,10 @@ export class LifecycleBackend {
       [e.mutationId, e.deviceId, e.command, JSON.stringify(e.payload), e.clientUpdatedAt])).rows[0].result;
     this.operations.push({ type: e.command, ...result });
     return result;
+  }
+  async previewStudentRemoval(studentId, enrollmentId, revision) {
+    return (await this.pg.query(`select rakeezx.preview_student_removal($1,$2,$3) result`,
+      [studentId, enrollmentId, revision])).rows[0].result;
   }
   async applyStudentLifecycleCommand(e) {
     this.calls.push(structuredClone(e));

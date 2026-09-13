@@ -32,6 +32,73 @@ export function localPristineBlocker(data, studentId) {
   return null;
 }
 
+const previewReasons = Object.freeze({
+  delete_pristine: ['pristine'], end_enrollment: ['history_exists'],
+  blocked: ['invalid_source', 'student_unavailable', 'student_deleted', 'stale_source', 'archived_enrollment'],
+});
+const blockedPreview = (reason, retryable = true) => ({ outcome: 'blocked', reason, retryable });
+const previewStores = ['device', 'outbox', 'students', 'enrollments', 'sections', 'attendance', 'scores',
+  'logs', 'notes', 'submissions', 'sessionRosterSnapshots', 'closedTermReports', 'groupArrangements'];
+
+// One disk snapshot, no readwrite transaction, checkpoint, outbox or Sync push.
+async function removalEvidenceSnapshot() {
+  const handle = await db.openDB();
+  return new Promise((resolve, reject) => {
+    const tx = handle.transaction(previewStores, 'readonly'), data = {};
+    for (const name of previewStores) {
+      const request = tx.objectStore(name).getAll();
+      request.onsuccess = () => { data[name] = request.result; };
+    }
+    tx.oncomplete = () => resolve(data);
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/** Informational only. Execution still rechecks 0029 authority and local evidence. */
+export async function previewStudentRemoval(studentId, enrollmentId, revision) {
+  if (typeof studentId !== 'string' || !studentId || studentId.length > 200 ||
+    typeof enrollmentId !== 'string' || !enrollmentId || enrollmentId.length > 200 ||
+    !Number.isSafeInteger(revision) || revision < 0) return blockedPreview('invalid_source', false);
+  if (!cloud.session || !cloud.user) return blockedPreview('auth_required');
+  if (globalThis.navigator?.onLine === false) return blockedPreview('offline');
+  const ownerId = cloud.user.id;
+  try {
+    const before = await removalEvidenceSnapshot();
+    const beforeDevice = before.device.find((row) => row.id === 'device');
+    if (before.outbox.length || beforeDevice?.studentLifecycleResume || beforeDevice?.cloudRestoreResume) {
+      return blockedPreview('sync_not_ready');
+    }
+    const available = async () => {
+      if (!cloud.session || cloud.user?.id !== ownerId) return false;
+      const summary = await sync.getSyncOperationalSummary(); // READ-ONLY; never assertCloudRestoreReady().
+      return summary.cloudSyncHealthy && !summary.automaticSyncActive && summary.safeToContinueUnrelatedWork;
+    };
+    if (!await available()) return blockedPreview('sync_not_ready');
+    const result = await cloud.previewStudentRemoval(studentId, enrollmentId, revision);
+    if (!cloud.session || cloud.user?.id !== ownerId) return blockedPreview('auth_required');
+    if (!previewReasons[result?.outcome]?.includes(result?.reason) || typeof result.retryable !== 'boolean') {
+      return blockedPreview('preview_unavailable');
+    }
+    // Re-read after the server response: a local-only submission may arrive while waiting.
+    const current = await removalEvidenceSnapshot();
+    const device = current.device.find((row) => row.id === 'device');
+    if (current.outbox.length || device?.studentLifecycleResume || device?.cloudRestoreResume || !await available()) {
+      return blockedPreview('sync_not_ready');
+    }
+    if (!cloud.session || cloud.user?.id !== ownerId) return blockedPreview('auth_required');
+    if (result.outcome === 'delete_pristine') {
+      const reason = localPristineBlocker(current, studentId);
+      if (reason === 'STUDENT_TOMBSTONED') return blockedPreview('student_unavailable');
+      if (reason) return { outcome: 'end_enrollment', reason: 'local_protected_evidence', retryable: false };
+    }
+    return { outcome: result.outcome, reason: result.reason, retryable: result.retryable };
+  } catch (error) {
+    return blockedPreview(cloud.isAuthRequiredError(error) ? 'auth_required'
+      : globalThis.navigator?.onLine === false ? 'offline' : 'preview_unavailable');
+  }
+}
+
 export async function getStudentLifecycleResumeState() {
   const pending = (await db.get('device', 'device'))?.studentLifecycleResume;
   if (!pending) return null;

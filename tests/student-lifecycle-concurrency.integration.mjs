@@ -171,3 +171,33 @@ test('normal 40-student bulk attendance and 24 concurrent Sync commands complete
   assert.equal((await admin.query(`select count(*)::int n from rakeezx.notes where id like 'throughput-note:%'`)).rows[0].n, 24);
   console.log(`Local PostgreSQL: 40-student bulk + 24 Sync commands: ${Math.round(elapsed)}ms; no deadlocks.`);
 });
+
+const removalPreview = async(client,f,revision=1) => (await client.query(
+  `select rakeezx.preview_student_removal($1,$2,$3) result`,[f.student,f.enrollment,revision])).rows[0].result;
+
+test('preview waiting behind another-device history commit sees fresh authority, not a pre-lock snapshot',async()=>{
+  const f=await academicFixture(admin,'preview-lock-fresh'),a=await connection(),b=await connection();
+  await holdOwner(a);
+  const pending=removalPreview(b,f);await waitingOnOwner(b);
+  await a.query(`insert into rakeezx.notes(id,student_id,date,text) values('preview-lock-note',$1,'2026-08-02','synthetic')`,[f.student]);
+  await a.query('commit');
+  assert.deepEqual(await pending,{outcome:'end_enrollment',reason:'history_exists',retryable:false});
+  assert.equal((await admin.query(`select count(*)::int n from rakeezx.student_lifecycle_receipts where student_id=$1`,[f.student])).rows[0].n,0);
+});
+
+test('preview is NOT a deletion lease: concurrent evidence after preview protects student at execution',async()=>{
+  const f=await academicFixture(admin,'preview-lock-toctou'),a=await connection(),b=await connection();
+  await holdOwner(a);assert.equal((await removalPreview(a,f)).outcome,'delete_pristine');
+  const deletion=lifecycle(b,'delete_pristine',{studentId:f.student});await waitingOnOwner(b);
+  await a.query(`insert into rakeezx.scores(id,student_id,item_id,value) values('preview-lock-score',$1,$2,0)`,[f.student,f.item]);
+  await a.query('commit');assert.equal((await deletion).code,'NOT_PRISTINE');
+  assert.equal((await removalPreview(b,f)).outcome,'end_enrollment');
+  assert.equal((await admin.query(`select deleted_at from rakeezx.students where id=$1`,[f.student])).rows[0].deleted_at,null);
+});
+
+test('preview concurrent with committed deletion returns only tombstone classification without resurrection',async()=>{
+  const f=await academicFixture(admin,'preview-lock-deleted'),a=await connection(),b=await connection();
+  await holdOwner(a);const pending=removalPreview(b,f);await waitingOnOwner(b);
+  assert.equal((await lifecycle(a,'delete_pristine',{studentId:f.student})).outcome,'applied');
+  await a.query('commit');assert.deepEqual(await pending,{outcome:'blocked',reason:'student_deleted',retryable:false});
+});

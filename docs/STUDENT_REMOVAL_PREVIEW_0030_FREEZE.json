@@ -1,0 +1,53 @@
+{
+  "ticket": "STUDENT-REMOVAL-PREVIEW-0030 — ERROR-SEQUENCE CONFIRMATION / 0087",
+  "status": "CORRECTED FROZEN LOCAL HANDOFF; READY FOR MANUAL RETRY",
+  "manualRetryReady": true,
+  "confirmedFailureLocation": "MIGRATION EXECUTION ALONE; POSTCHECK NOT RUN",
+  "historicalFailureMechanism": "Not conclusively reconstructable from retained SQL artifacts. No current live semantic/privilege drift found; no claim that line endings caused the historical failure.",
+  "supersededMigrationSha256": "e067c91fb3afec46096db130a59cf420f43aa258a7f93d8542e0a4591181d2ad",
+  "productionSha": "74309ac606321fc7d0a458b20bc7b98bc1cd49d5",
+  "projectRef": "xlrubcwjqktzzunrvuns",
+  "files": [
+    {
+      "path": "supabase/migrations/0030_student_removal_preview.sql",
+      "sha256": "a368b7e343884a9406eda26206e13ecb36107cb70dd14525ce5dfbe778d68d4d"
+    },
+    {
+      "path": "supabase/precheck-0030-student-removal-preview.sql",
+      "sha256": "e4cd9b6dcc1cfba2cdfeb11b55b1618e16393fbce9c678058d3eb5d2956474ea"
+    },
+    {
+      "path": "supabase/verify-0030-student-removal-preview.sql",
+      "sha256": "7f9d01dc8c61deed3c0a1d35810d0c654750e3612b10c00c5af8d281e517306e"
+    },
+    {
+      "path": "docs/STUDENT_REMOVAL_PREVIEW_0030_MANUAL_HANDOFF.md",
+      "sha256": "fd182670b1ce69f91e664d02faf6f8abab4565a2f319496c7bba52c8540b2755"
+    }
+  ],
+  "freezePolicy": "Any handed-off SQL change invalidates freeze; republish handoff and new SHA for changed file before manual application.",
+  "validation": "0087 handoff/drift safety rerun 7/7 PASS and git diff --check PASS. All three SQL files unchanged from 0086: focused client/server/handoff/drift 53/53 PASS; isolated concurrency/two-device 10/10 PASS; Build Meta 4/4 PASS; revised live read-only PRECHECK PASS. No runtime/Product source changes in 0086/0087; original single-build evidence retained.",
+  "liveReadOnlyEvidence": {
+    "new0030Functions": 0,
+    "migration0030HistoryEntries": 0,
+    "lifecycleSourceSha256Lf": "5160b50798e8c92c30d66d5db7dab31c8e636c5549e90f7bd4a57719f1054e32",
+    "securityMetadataSha256": "18fa8c7a905e4dc5072924798d8a4af3b1a750e744318128baae5e33aa28f8a6",
+    "approved0029BodyAndPrivileges": "MATCH",
+    "revisedPrecheck": "PASS",
+    "priorErrorScriptSequence": "0087 PO CONFIRMED: PRECHECK PASS; MIGRATION ALONE FAILED; POSTCHECK NOT RUN"
+  },
+  "order": [
+    "correct project",
+    "precheck including deterministic transformation; require saved approved security fingerprint",
+    "complete frozen SQL with internal baseline/compiled postconditions before commit",
+    "postcheck exact definitions/privileges and same security fingerprint",
+    "Product Owner confirms",
+    "supported linked migration repair/history list",
+    "source promotion and deployment gate"
+  ],
+  "remoteApplied": false,
+  "historyRepaired": false,
+  "sourceCommitted": false,
+  "sourcePushed": false,
+  "workActiveTouched": false
+}

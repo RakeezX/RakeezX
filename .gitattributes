@@ -1,0 +1,5 @@
+# Preserve exact frozen 0030 handoff bytes across Windows and deployment checkouts.
+supabase/migrations/0030_student_removal_preview.sql text eol=lf
+supabase/precheck-0030-student-removal-preview.sql text eol=lf
+supabase/verify-0030-student-removal-preview.sql text eol=lf
+docs/STUDENT_REMOVAL_PREVIEW_0030_MANUAL_HANDOFF.md text eol=lf

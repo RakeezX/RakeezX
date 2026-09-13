@@ -3024,6 +3024,11 @@ export async function reinstateStudent(studentId, secId, { date = todayISO() } =
   return transferStudent(studentId, secId, { date });
 }
 
+export async function previewStudentRemoval(studentId, sourceEnrollmentId, sourceRevision) {
+  const lifecycle = await import('./lib/student-lifecycle.js');
+  return lifecycle.previewStudentRemoval(studentId, sourceEnrollmentId, sourceRevision);
+}
+
 export async function deletePristineStudent(studentId) {
   const { executeStudentLifecycle } = await import('./lib/student-lifecycle.js');
   return executeStudentLifecycle('delete_pristine', { studentId });

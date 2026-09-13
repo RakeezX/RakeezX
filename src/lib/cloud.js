@@ -361,6 +361,16 @@ export async function applySyncV2EnrollmentCommand(envelope) {
   });
 }
 
+/** Read-only owner-derived removal classification; no lifecycle envelope. */
+export async function previewStudentRemoval(studentId, enrollmentId, revision) {
+  if (mockBackend) return mockBackend.previewStudentRemoval(studentId, enrollmentId, revision);
+  return request('/rpc/preview_student_removal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_student_id: studentId, p_source_enrollment_id: enrollmentId, p_source_revision: revision }),
+  });
+}
+
 export async function applyStudentLifecycleCommand(envelope) {
   if (mockBackend) return mockBackend.applyStudentLifecycleCommand(envelope);
   return request('/rpc/apply_student_lifecycle_command', {
