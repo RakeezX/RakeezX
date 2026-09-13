@@ -8,7 +8,7 @@ global.matchMedia = () => ({ matches: false });
 import { makeSession, todayISO } from '../src/models.js';
 import { buildBackup, restoreBackup } from '../src/lib/export.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
-import { encodeSyncV2Patch } from '../src/lib/sync-v2.js';
+import { encodeSyncV2Patch, decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
 import * as sync from '../src/lib/sync.js';
 import * as store from '../src/store.js';
 import * as db from '../src/lib/db.js';
@@ -69,7 +69,15 @@ async function fixture(backend = null) {
   const teaching = { id: 'notes-teaching', sectionId: section.id, subjectId: 'subject-notes', termId: 'term-notes', order: 0, updatedAt: 1, serverRevision: 1 };
   const student = { id: 'notes-student', name: 'طالب اختبار الملاحظات', status: 'active', updatedAt: 1, serverRevision: 1 };
   const session = { ...makeSession({ id: 'notes-session', teachingId: teaching.id, date: '2026-08-25', period: 1 }), updatedAt: 1, serverRevision: 1 };
-  await store.save({ sections: [section], teachings: [teaching], students: [student], sessions: [session] }, { queue: false });
+  // A V4 cloud-backed fixture needs a real canonical baseline, not just a
+  // claimed revision. Decode the same server representation used by Sync V2.
+  const authoritative = (name, record) => {
+    const canonical = decodeSyncV2Canonical(name, { id: record.id, ...encodeSyncV2Patch(name, record),
+      revision: 1, deleted_at: null, client_updated_at: record.updatedAt });
+    return { ...record, ...canonical, serverCanonical: structuredClone(canonical) };
+  };
+  await store.save(Object.fromEntries(Object.entries({ sections: section, teachings: teaching,
+    students: student, sessions: session }).map(([name, record]) => [name, [authoritative(name, record)]])), { queue: false });
   if (backend) for (const [storeName, record] of Object.entries({ sections: section, teachings: teaching, students: student, sessions: session })) backend.seed(storeName, record);
   return { section, teaching, student, session };
 }

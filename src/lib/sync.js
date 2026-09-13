@@ -88,6 +88,7 @@ const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== 
 const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
 
 function coordinatorOperationalState(durable) {
+  if (store.state.device?.studentLifecycleResume) return 'error';
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
@@ -149,7 +150,7 @@ function cacheOperationalSummary(durable) {
       (normalized.blockedCount > 0 && !autoRunning) || (normalized.failedCount > 0 && !retryScheduled),
     localWorkSaved: true,
     cloudSyncHealthy: currentState === 'synced' && !normalized.actionableSyncIssue,
-    safeToContinueUnrelatedWork: !restoreRunning,
+    safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume,
   });
   return operationalSummaryCache;
 }
@@ -330,6 +331,9 @@ function firstPullError(result) {
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true } = {}) {
   if (restoreRunning) return false;
+  // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
+  // by automatic pulls or followed by a new destructive command.
+  if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;
@@ -405,6 +409,9 @@ export async function assertCloudRestoreReady() {
   if (!cloud.session || !cloud.user) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
   if (!isOnline()) throw Object.assign(new Error('Cloud restore requires a network connection'), { code: 'OFFLINE' });
   if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  if ((await db.get('device', 'device'))?.studentLifecycleResume) {
+    throw Object.assign(new Error('Resume the pending student lifecycle command first'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
+  }
   const before = await v2Engine.status();
   if (before.state !== 'synced') throw Object.assign(new Error('Pending or unresolved Sync V2 work blocks restore'), {
     code: 'RESTORE_OUTBOX_NOT_EMPTY', status: before,
@@ -420,7 +427,7 @@ export async function assertCloudRestoreReady() {
 }
 
 /** Pause automatic sync and normal Product mutations around finalization/reconciliation. */
-export async function runCloudRestoreExclusive(task) {
+export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true } = {}) {
   if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
   if (autoTimer) clearTimeout(autoTimer);
@@ -436,8 +443,12 @@ export async function runCloudRestoreExclusive(task) {
     suppressAutoSchedule = false;
     restoreRunning = false;
     setState({ status: 'synced', lastError: null });
-    scheduleAutomaticSync({ full: true, immediate: true });
+    if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
   }
+}
+
+export function runStudentLifecycleExclusive(task) {
+  return runCloudRestoreExclusive(task, { scheduleAutomatic: initialized });
 }
 
 async function syncV2Category(name) {

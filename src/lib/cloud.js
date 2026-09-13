@@ -361,6 +361,16 @@ export async function applySyncV2EnrollmentCommand(envelope) {
   });
 }
 
+export async function applyStudentLifecycleCommand(envelope) {
+  if (mockBackend) return mockBackend.applyStudentLifecycleCommand(envelope);
+  return request('/rpc/apply_student_lifecycle_command', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+      p_command: envelope.command, p_payload: envelope.payload, p_client_updated_at: envelope.clientUpdatedAt }),
+  });
+}
+
 /** Sync V2 attendance/snapshot command transport. */
 export async function applySyncV2AttendanceCommand(envelope) {
   if (mockBackend) {

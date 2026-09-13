@@ -5,6 +5,7 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import * as sync from '../src/lib/sync.js';
 import { setMockAuth, setMockBackend } from '../src/lib/cloud.js';
+import { lifecycleServer, LifecycleBackend, OWNER } from './helpers/student-lifecycle-server.mjs';
 import {
   attendanceId, makeEnrollment, makeItem, makeNote, makeSection, makeSession,
   makeStudent, makeSubject, makeTeaching, makeTerm, makeYear, scoreId,
@@ -13,105 +14,7 @@ import {
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
 
-class MembershipBackend {
-  constructor() {
-    this.records = {};
-    this.operations = [];
-    this.enrollmentUpserts = 0;
-  }
-
-  async fetchRecords(table) { return structuredClone(this.records[table] ?? []); }
-
-  async upsertRecords(table, records) {
-    if (table === 'enrollments') this.enrollmentUpserts++;
-    const target = this.records[table] ??= [];
-    for (const record of records) {
-      const index = target.findIndex((row) => row.id === record.id);
-      if (index >= 0) target[index] = structuredClone(record);
-      else target.push(structuredClone(record));
-    }
-    return { success: true };
-  }
-
-  activeRolls(sectionId) {
-    return (this.records.enrollments ?? [])
-      .filter((row) => row.section_id === sectionId && row.status === 'active' && !row.deleted_at && row.roll_no != null)
-      .map((row) => row.roll_no);
-  }
-
-  assertNoDuplicateActiveRolls() {
-    const bySection = new Map();
-    for (const row of this.records.enrollments ?? []) {
-      if (row.status !== 'active' || row.deleted_at || row.roll_no == null) continue;
-      const seen = bySection.get(row.section_id) ?? new Set();
-      assert.equal(seen.has(row.roll_no), false, `duplicate active roll ${row.roll_no} in ${row.section_id}`);
-      seen.add(row.roll_no);
-      bySection.set(row.section_id, seen);
-    }
-  }
-
-  async commitEnrollmentTransferAndRenumber({ source, destination, sourceRoster, destinationRoster }) {
-    const previous = this.records.enrollments ?? [];
-    const candidate = structuredClone(previous);
-    const replace = (row) => {
-      const index = candidate.findIndex((existing) => existing.id === row.id);
-      if (index >= 0) candidate[index] = structuredClone(row);
-      else candidate.push(structuredClone(row));
-    };
-    try {
-      replace(source);
-      replace(destination);
-      const sections = new Set([source.section_id, destination.section_id]);
-      for (const row of candidate) {
-        if (sections.has(row.section_id) && row.status === 'active' && !row.deleted_at) row.roll_no = null;
-      }
-      for (const plan of [...sourceRoster, ...destinationRoster]) {
-        const row = candidate.find((existing) => existing.id === plan.id);
-        assert.ok(row, `planned enrollment ${plan.id} exists remotely`);
-        row.roll_no = plan.roll_no;
-        row.client_updated_at = plan.client_updated_at;
-        row.device_id = plan.device_id;
-      }
-      this.records.enrollments = candidate;
-      this.assertNoDuplicateActiveRolls();
-    } catch (error) {
-      this.records.enrollments = previous;
-      throw error;
-    }
-    this.operations.push({ type: 'transfer-renumber', source: source.id, destination: destination.id });
-    return { source, destination, source_roster: sourceRoster, destination_roster: destinationRoster };
-  }
-
-  async commitEnrollmentTransfer({ source, destination }) {
-    const target = this.records.enrollments ??= [];
-    const sourceIndex = target.findIndex((row) => row.id === source.id);
-    if (sourceIndex >= 0) target[sourceIndex] = structuredClone(source);
-    else target.push(structuredClone(source));
-    const destinationIndex = target.findIndex((row) => row.id === destination.id);
-    if (destinationIndex >= 0) target[destinationIndex] = structuredClone(destination);
-    else target.push(structuredClone(destination));
-    this.assertNoDuplicateActiveRolls();
-    this.operations.push({ type: 'transfer', source: source.id, destination: destination.id });
-    return { source, destination };
-  }
-
-  async renumberEnrollmentRoster({ sectionId, roster }) {
-    const target = this.records.enrollments ??= [];
-    const active = target.filter((row) => row.section_id === sectionId && row.status === 'active' && !row.deleted_at);
-    assert.equal(roster.length, active.length, 'renumber RPC receives the complete active roster');
-    for (const row of active) row.roll_no = null;
-    for (const plan of roster) {
-      const row = target.find((candidate) => candidate.id === plan.id);
-      assert.ok(row, `planned enrollment ${plan.id} exists remotely`);
-      row.roll_no = plan.roll_no;
-      row.client_updated_at = plan.client_updated_at;
-      row.device_id = plan.device_id;
-    }
-    this.assertNoDuplicateActiveRolls();
-    this.operations.push({ type: 'renumber', sectionId });
-    return active;
-  }
-}
+class MembershipBackend extends LifecycleBackend {}
 
 async function fresh() {
   await db.clearAll();
@@ -134,7 +37,7 @@ async function fixture() {
   const enrollmentA = makeEnrollment({ studentId: a.id, sectionId: x.id, rollNo: 1, startDate: '2026-08-01' });
   const enrollmentB = makeEnrollment({ studentId: b.id, sectionId: x.id, rollNo: 2, startDate: '2026-08-01' });
   const enrollmentC = makeEnrollment({ studentId: c.id, sectionId: y.id, rollNo: 1, startDate: '2026-08-01' });
-  const session = makeSession({ id: 'transfer:session', teachingId: teachingX.id, date: '2026-08-20', period: 1 });
+  const session = makeSession({ id: 'transfer:session', teachingId: teachingX.id, date: '2026-08-20', period: 1, startTime: '08:00', endTime: '08:45' });
   const item = makeItem({ id: 'transfer:item', teachingId: teachingX.id, name: 'اختبار', max: 10 });
   const attendance = { id: attendanceId(a.id, session.id), studentId: a.id, sessionId: session.id, teachingId: teachingX.id, date: session.date, status: 'present', updatedAt: 1, deleted: false };
   const score = { id: scoreId(a.id, item.id), studentId: a.id, itemId: item.id, value: 8, updatedAt: 1, deleted: false };
@@ -218,29 +121,31 @@ test('failed destination validation and a destination tombstone leave the curren
   assert.equal(store.enrollmentsOf(f.a.id).some((row) => row.id === tombstoneId), false, 'tombstoned target remains non-live');
 });
 
-test('offline transfer-and-renumber receipts converge through one transactional RPC without generic enrollment upserts', async () => {
+let pg;
+test('offline V2 transfer commands converge through atomic RPCs without generic enrollment upserts', async () => {
   const f = await fixture();
-  const backend = new MembershipBackend();
+  pg = await lifecycleServer();
+  const backend = new MembershipBackend(pg);
   setMockBackend(backend);
-  setMockAuth({ id: 'transfer-owner' }, { access_token: 'test' });
+  setMockAuth({ id: OWNER }, { access_token: 'test' });
 
-  await sync.syncStudents();
-  await db.clearStore('outbox');
+  assert.equal(await sync.syncAll({ full: true }), true, JSON.stringify(await db.getAll('outbox')));
+  assert.equal((await db.getAll('outbox')).length, 0);
   backend.enrollmentUpserts = 0;
+  backend.operations = [];
 
   await store.transferStudent(f.a.id, f.y.id, { date: '2026-08-25' });
   await store.transferStudent(f.a.id, f.x.id, { date: '2026-09-01' });
 
-  const receipts = (await db.getAll('outbox')).filter((entry) => entry.enrollmentOperation);
-  assert.deepEqual(receipts.map((entry) => entry.enrollmentOperation.type), ['transfer-renumber', 'transfer-renumber']);
+  const receipts = (await db.getAll('outbox')).filter((entry) => entry.command === 'enrollment:transfer');
+  assert.deepEqual(receipts.map((entry) => entry.command), ['enrollment:transfer', 'enrollment:transfer']);
   assert.deepEqual(
-    [...receipts].sort((a, b) => a.enrollmentOperation.order - b.enrollmentOperation.order)
-      .map((entry) => entry.enrollmentOperation.type),
-    ['transfer-renumber', 'transfer-renumber'],
+    [...receipts].sort((a, b) => a.sequence - b.sequence).map((entry) => entry.patch.destinationSectionId),
+    [f.y.id, f.x.id],
   );
-  await sync.syncStudents();
+  assert.equal(await sync.syncAll({ full: true }), true);
 
-  assert.deepEqual(backend.operations.map((operation) => operation.type), ['transfer-renumber', 'transfer-renumber']);
+  assert.deepEqual(backend.operations.map((operation) => operation.type), ['transfer', 'transfer']);
   assert.equal(backend.enrollmentUpserts, 0, 'generic enrollment upsert is bypassed after transactional operations');
   backend.assertNoDuplicateActiveRolls();
   const remoteA = backend.records.enrollments.find((row) => row.id === f.enrollmentA.id);
@@ -254,4 +159,5 @@ after(async () => {
   setMockAuth(null, null);
   store.closeChannel();
   await db.closeDB();
+  await pg?.close();
 });

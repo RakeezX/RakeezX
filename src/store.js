@@ -55,6 +55,9 @@ export function setCloudRestoreInProgress(active) {
 }
 
 function assertCloudRestoreWritable() {
+  if (state.device?.studentLifecycleResume) {
+    throw Object.assign(new Error('أكمل تحديث حالة الطالب قبل إجراء تعديلات أخرى.'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
+  }
   if (cloudRestoreInProgress) {
     throw Object.assign(new Error('استعادة النسخة السحابية قيد التنفيذ. انتظر اكتمالها قبل التعديل.'), {
       code: 'CLOUD_RESTORE_IN_PROGRESS',
@@ -264,10 +267,12 @@ export async function init() {
     state[c] = loaded[i] ?? [];
   });
 
-  await normalizeSectionLifecycle();
-  await ensureFoundation();
-  await migrateLegacyGroupArrangements();
-  await migrateLegacyStudentNotes();
+  if (!device?.studentLifecycleResume) {
+    await normalizeSectionLifecycle();
+    await ensureFoundation();
+    await migrateLegacyGroupArrangements();
+    await migrateLegacyStudentNotes();
+  }
 
   applyTheme();
   state.ready = true;
@@ -606,6 +611,10 @@ function assertOperationalWritesAllowed(batch) {
   assertCloudRestoreWritable();
   for (const [storeName, records] of Object.entries(batch ?? {})) {
     for (const record of records ?? []) {
+      const parent = record.studentId ? recordFrom('students', record.studentId, batch) : null;
+      if (record.studentId && !record.deleted && (!parent || parent.deleted)) {
+        throw Object.assign(new Error('لا يمكن إضافة بيانات لطالب محذوف.'), { code: 'STUDENT_TOMBSTONED' });
+      }
       if (storeName === 'closedTermReports') {
         throw new Error('تقارير الفصل المغلق تُنشأ وتُصحح بالأمر الخادمي المخصص فقط.');
       }
@@ -3010,24 +3019,25 @@ export async function withdrawStudent(studentId, { date = todayISO(), note = '' 
 
 /** عودة طالب غادر. */
 export async function reinstateStudent(studentId, secId, { date = todayISO() } = {}) {
+  // Existing Production compatibility path; redesign is explicitly deferred.
   await patch('students', studentId, { status: 'active' });
   return transferStudent(studentId, secId, { date });
 }
 
-/** حذف نهائي (ناعم) للطالب — للخطأ في الإدخال لا للانتقال. */
+export async function deletePristineStudent(studentId) {
+  const { executeStudentLifecycle } = await import('./lib/student-lifecycle.js');
+  return executeStudentLifecycle('delete_pristine', { studentId });
+}
+
+export async function endStudentEnrollment(studentId, sourceEnrollmentId, { sourceRevision, note = '', date } = {}) {
+  if (date !== undefined) throw Object.assign(new Error('Server-dated immediate ending only'), { code: 'IMMEDIATE_ONLY' });
+  const { executeStudentLifecycle } = await import('./lib/student-lifecycle.js');
+  return executeStudentLifecycle('end_enrollment', { studentId, sourceEnrollmentId, sourceRevision, note });
+}
+
+/** Compatibility alias: never expose the old unrestricted history cascade. */
 export async function deleteStudent(studentId) {
-  return cascadeDelete(
-    {
-      students: (s) => s.id === studentId,
-      enrollments: (e) => e.studentId === studentId,
-      scores: (s) => s.studentId === studentId,
-      attendance: (a) => a.studentId === studentId,
-      logs: (l) => l.studentId === studentId,
-      notes: (n) => n.studentId === studentId,
-    },
-    { op: 'deleteStudent', studentId },
-    { command: 'delete_student', store: 'students', targetId: studentId }
-  );
+  return (await deletePristineStudent(studentId)).ok;
 }
 
 export async function renumberRoster(secId) {

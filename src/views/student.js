@@ -614,15 +614,20 @@ export default {
         danger: true,
       });
       if (!ok) return;
-      await store.withdrawStudent(params.id);
+      const en = store.activeEnrollment(params.id);
+      if (!en) return;
+      const result = await store.endStudentEnrollment(params.id, en.id, { sourceRevision: en.serverRevision });
+      if (!result.ok) { toast('لم تُسجّل المغادرة. حدّث البيانات وأعد المحاولة.'); return; }
       toast('سُجّلت مغادرته — سجلّه محفوظ');
     },
 
     async reinstate(el, ev, params) {
       const s = store.getStudent(params.id);
-      const en = store.enrollmentsOf(params.id)[0];
+      const en = store.enrollmentsOf(params.id).filter((row) => row.status === 'withdrawn')
+        .sort((a, b) => String(b.endDate ?? '').localeCompare(String(a.endDate ?? '')))[0];
       if (!s || !en) return;
-      await store.reinstateStudent(params.id, en.sectionId);
+      const result = await store.reinstateStudent(params.id, en.sectionId);
+      if (!result) { toast('لم تكتمل إعادة الطالب للدراسة.'); return; }
       toast('أُعيد للدراسة');
     },
   },

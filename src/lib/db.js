@@ -104,32 +104,34 @@ export async function get(store, id) {
 }
 
 export async function put(store, record) {
-  const db = await openDB();
-  const tx = db.transaction(store, 'readwrite');
-  tx.objectStore(store).put(record);
-  return txDone(tx).then(() => record);
+  await applyBatch({ [store]: { put: [record] } });
+  return record;
 }
 
 export async function putMany(store, records) {
   if (!records.length) return records;
-  const db = await openDB();
-  const tx = db.transaction(store, 'readwrite');
-  const os = tx.objectStore(store);
-  for (const r of records) os.put(r);
-  return txDone(tx).then(() => records);
+  await applyBatch({ [store]: { put: records } });
+  return records;
 }
 
 /** كتابة ذرّية عبر عدة مخازن: { students: [...], scores: [...] } */
 export async function putAcross(batch) {
   const names = Object.keys(batch).filter((k) => batch[k]?.length);
   if (!names.length) return;
-  const db = await openDB();
-  const tx = db.transaction(names, 'readwrite');
-  for (const name of names) {
-    const os = tx.objectStore(name);
-    for (const r of batch[name]) os.put(r);
-  }
-  return txDone(tx);
+  await applyBatch(Object.fromEntries(names.map((name) => [name, { put: batch[name] }])));
+}
+
+// The device checkpoint and Product write share a transaction, so a stale tab
+// cannot write between the lifecycle safety check and the actual disk commit.
+function guardStudentLifecycle(tx, run, allow = false) {
+  if (allow) return run();
+  const read = tx.objectStore('device').get('device');
+  read.onsuccess = () => {
+    if (read.result?.studentLifecycleResume) {
+      tx.lifecycleError = Object.assign(new Error('Resume pending student lifecycle reconciliation first'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
+      tx.abort();
+    } else run();
+  };
 }
 
 /* ---------- تعديل جزئي ذرّي ---------- */
@@ -143,7 +145,7 @@ export async function putAcross(batch) {
 export async function patchMany(store, edits, outboxFor = null, stamp = Date.now()) {
   if (!edits.length) return [];
   const db = await openDB();
-  const scope = outboxFor ? [store, 'outbox'] : [store];
+  const scope = [...new Set(outboxFor ? [store, 'outbox', 'device'] : [store, 'device'])];
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction(scope, 'readwrite');
@@ -151,7 +153,7 @@ export async function patchMany(store, edits, outboxFor = null, stamp = Date.now
     const ob = outboxFor ? tx.objectStore('outbox') : null;
     const results = [];
 
-    for (const edit of edits) {
+    const write = () => { for (const edit of edits) {
       const getReq = os.get(edit.id);
       getReq.onsuccess = () => {
         const current = getReq.result ?? edit.create ?? null;
@@ -166,11 +168,13 @@ export async function patchMany(store, edits, outboxFor = null, stamp = Date.now
         const obReq = ob.get(entry.id);
         obReq.onsuccess = () => ob.put(mergeOutbox(obReq.result, entry));
       };
-    }
+    } };
+    if (store === 'device') write();
+    else guardStudentLifecycle(tx, write);
 
     tx.oncomplete = () => resolve(results);
     tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error ?? new Error('أُلغيت المعاملة'));
+    tx.onabort = () => reject(tx.lifecycleError ?? tx.error ?? new Error('أُلغيت المعاملة'));
   });
 }
 
@@ -194,12 +198,12 @@ export async function markDeleted(predicates, stamp = Date.now(), outboxFor = nu
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(outboxFor ? [...names, 'outbox'] : names, 'readwrite');
+    const tx = db.transaction([...new Set([...names, 'device', ...(outboxFor ? ['outbox'] : [])])], 'readwrite');
     const outbox = outboxFor ? tx.objectStore('outbox') : null;
     const touched = {};
     let count = 0;
 
-    for (const name of names) {
+    guardStudentLifecycle(tx, () => { for (const name of names) {
       const os = tx.objectStore(name);
       const all = os.getAll();
       all.onsuccess = () => {
@@ -216,11 +220,11 @@ export async function markDeleted(predicates, stamp = Date.now(), outboxFor = nu
           count++;
         }
       };
-    }
+    } });
 
     tx.oncomplete = () => resolve({ count, touched });
     tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error ?? new Error('أُلغيت المعاملة'));
+    tx.onabort = () => reject(tx.lifecycleError ?? tx.error ?? new Error('أُلغيت المعاملة'));
   });
 }
 
@@ -237,7 +241,7 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
     const tx = db.transaction(STORES, 'readwrite');
     let written = 0;
 
-    if (mode === 'replace') {
+    guardStudentLifecycle(tx, () => { if (mode === 'replace') {
       // `keep` تُستثنى من المسح: إعدادات الجهاز تبقى ملك الجهاز حتى في الاستبدال
       for (const name of STORES) {
         if (keep.includes(name)) continue;
@@ -265,11 +269,11 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
           }
         };
       }
-    }
+    } });
 
     tx.oncomplete = () => resolve(written);
     tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error ?? new Error('أُلغيت المعاملة'));
+    tx.onabort = () => reject(tx.lifecycleError ?? tx.error ?? new Error('أُلغيت المعاملة'));
   });
 }
 
@@ -278,17 +282,17 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
  * declares the scope; the synchronous callback builds writes from records read
  * inside that same transaction, so another tab cannot invalidate the snapshot.
  */
-export async function applyBatch(batch, { prepare } = {}) {
+export async function applyBatch(batch, { prepare, allowStudentLifecycle = false } = {}) {
   const names = Object.keys(batch).filter((n) => STORES.includes(n));
   if (!names.length) return;
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(names, 'readwrite');
+    const tx = db.transaction([...new Set([...names, 'device'])], 'readwrite');
     let failure;
     let writes = batch;
     tx.oncomplete = () => resolve(writes);
     tx.onerror = (event) => { failure ??= event.target.error; };
-    tx.onabort = () => reject(failure ?? tx.error ?? new Error('أُلغيت العملية'));
+    tx.onabort = () => reject(failure ?? tx.lifecycleError ?? tx.error ?? new Error('أُلغيت العملية'));
 
     const write = (current) => {
       try {
@@ -310,6 +314,7 @@ export async function applyBatch(batch, { prepare } = {}) {
       }
     };
 
+    const start = () => {
     if (!prepare) return write();
     const current = {};
     let pending = names.length;
@@ -320,6 +325,8 @@ export async function applyBatch(batch, { prepare } = {}) {
         if (--pending === 0) write(current);
       };
     }
+    };
+    guardStudentLifecycle(tx, start, allowStudentLifecycle || names.every((name) => name === 'device'));
   });
 }
 
