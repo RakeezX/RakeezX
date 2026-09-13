@@ -3185,13 +3185,16 @@
   box-shadow: 0 0 0 2px var(--ok-soft);
 }
 .sync-dot--syncing {
-  background: var(--brand);
+  background: var(--info);
   animation: sync-pulse 1.2s infinite ease-in-out;
 }
 .sync-dot--pending {
-  background: var(--warn);
-  box-shadow: 0 0 0 2px var(--warn-soft);
+  background: var(--info);
+  box-shadow: 0 0 0 2px var(--info-soft);
 }
+.sync-dot--blocked { background: var(--warn); box-shadow: 0 0 0 2px var(--warn-soft); }
+.sync-dot--auth_required { background: var(--warn); }
+.sync-dot--rejected { background: var(--danger); box-shadow: 0 0 0 2px var(--danger-soft); }
 .sync-dot--offline {
   background: var(--text-3);
 }
@@ -3449,8 +3452,8 @@
 .mini-hub-sync__state .badge { white-space: nowrap; }
 .mini-hub-sync {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--sp-3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-1);
   align-items: center;
   padding: var(--sp-3) var(--sp-4);
   background: transparent;
@@ -3461,9 +3464,23 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  margin-top: var(--sp-2);
-  line-height: 1.45;
+  margin-top: 0;
+  line-height: 1.65;
 }
+.mini-hub-sync__meta p, .mini-hub-sync__detail-content p { margin: 0; }
+.mini-hub-sync__attention { color: var(--text); font-weight: var(--fw-semibold); }
+.mini-hub-sync__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.mini-hub-sync__controls { display: flex; align-items: start; flex-wrap: wrap; gap: 0 var(--sp-2); }
+.mini-hub-sync__controls .mini-hub-sync__details[open] { flex-basis: 100%; }
+.mini-hub-sync__actions .btn { min-height: 44px; }
+.mini-hub-sync__details { min-width: 0; color: var(--text-3); font-size: var(--fs-xs); }
+.mini-hub-sync__details summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; border-radius: var(--r-sm); width: fit-content; padding-inline: var(--sp-2); gap: var(--sp-2); }
+.mini-hub-sync__details summary::before { content: '+'; font-size: var(--fs-sm); }
+.mini-hub-sync__details[open] summary::before { content: '−'; }
+.mini-hub-sync__detail-content { display: grid; gap: var(--sp-2); border-inline-start: 2px solid var(--border); padding-inline-start: var(--sp-3); line-height: 1.65; }
+.mini-hub-sync__historical { color: var(--text-3); }
+.mini-hub-sync__categories { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.mini-hub-sync__categories span { padding: 2px var(--sp-2); border-radius: var(--r-sm); background: var(--bg-sunk); }
 .mini-hub-sync__action {
   grid-column: 2;
   grid-row: 1 / span 2;

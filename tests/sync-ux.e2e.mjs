@@ -1,20 +1,33 @@
 import { test, expect } from '@playwright/test';
+import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
+const CLOUD_URL = `${SUPABASE_URL}/rest/v1/`;
+
+// Same field-group conventions as the current generic Sync V2 protocol.
+const FIELD_GROUPS = {
+  profile: { active_time_profile_id: 'timing_selection' },
+  time_profiles: { active_from: 'activation', active_to: 'activation' },
+  subjects: { slug: 'identity' },
+};
 
 function mockCloud() {
   const tables = {};
   const calls = { get: {}, post: {} };
+  const receipts = new Map();
   let failing = false;
   return {
     tables,
     calls,
     fail(value) { failing = value; },
     async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
+      // Never send fixture credentials or mutations to an unmocked cloud endpoint.
+      await page.route('https://*.supabase.co/**', (route) => route.abort());
+      await page.route(`${CLOUD_URL}**`, async (route) => {
         const request = route.request();
         const table = new URL(request.url()).pathname.split('/').pop();
         const kind = request.method() === 'GET' ? 'get' : 'post';
+        expect(request.headers().authorization).toBe('Bearer sync-ux-test-token');
+        expect(request.headers()['accept-profile']).toBe('rakeezx');
         calls[kind][table] = (calls[kind][table] ?? 0) + 1;
         if (failing) {
           await route.fulfill({ status: 503, json: { message: 'temporary test failure' } });
@@ -25,15 +38,47 @@ function mockCloud() {
           return;
         }
         if (request.method() === 'POST') {
-          const body = JSON.parse(request.postData() ?? '[]');
-          const records = Array.isArray(body) ? body : [body];
-          const rows = (tables[table] ??= []);
-          for (const record of records) {
-            const index = rows.findIndex((row) => row.id === record.id);
-            if (index < 0) rows.push({ ...record });
-            else rows[index] = { ...rows[index], ...record };
+          expect(table).toBe('apply_sync_v2_mutation');
+          expect(request.headers()['content-profile']).toBe('rakeezx');
+          const envelope = JSON.parse(request.postData() ?? '{}');
+          const previous = receipts.get(envelope.p_mutation_id);
+          if (previous) {
+            expect(envelope).toEqual(previous.envelope);
+            await route.fulfill({ json: previous.receipt });
+            return;
           }
-          await route.fulfill({ json: [] });
+          const { p_entity: entity, p_record_id: recordId, p_operation: operation, p_patch: patch, p_base_revision: baseRevision } = envelope;
+          expect(envelope.p_mutation_id).toBeTruthy();
+          expect(envelope.p_device_id).toBeTruthy();
+          expect(['create', 'update', 'delete']).toContain(operation);
+          const rows = (tables[entity] ??= []);
+          const index = rows.findIndex((row) => row.id === recordId);
+          const existing = rows[index];
+          const group = (field) => FIELD_GROUPS[entity]?.[field] ?? field;
+          const groups = [...new Set(Object.keys(patch).map(group))];
+          // This fixture exercises successful writes, not conflict resolution.
+          if (operation === 'create') expect(existing).toBeUndefined();
+          else {
+            expect(existing).toBeTruthy();
+            expect(baseRevision).toBe(existing.revision);
+          }
+          const revision = (existing?.revision ?? 0) + 1;
+          const canonical = {
+            ...existing, id: recordId, ...patch, revision,
+            field_revisions: { ...existing?.field_revisions, ...Object.fromEntries(groups.map((key) => [key, revision])) },
+            deleted_at: operation === 'delete' ? new Date().toISOString() : null,
+            client_updated_at: envelope.p_client_updated_at,
+          };
+          if (index < 0) rows.push(canonical);
+          else rows[index] = canonical;
+          const receipt = {
+            mutationId: envelope.p_mutation_id, entity, recordId, canonicalId: recordId,
+            outcome: operation === 'delete' ? 'deleted' : 'applied',
+            appliedGroups: operation === 'delete' ? ['__deleted__'] : groups,
+            conflictedGroups: [], resultRevision: revision, canonical,
+          };
+          receipts.set(envelope.p_mutation_id, { envelope, receipt });
+          await route.fulfill({ json: receipt });
           return;
         }
         await route.fulfill({ status: 200, json: [] });
@@ -51,14 +96,14 @@ test('automatic sync is quiet, coalesced, resumes pending writes, and retries a 
     if (message.type() === 'error') errors.push(message.text());
   });
 
-  await page.addInitScript(() => {
-    localStorage.setItem('rakeezx-auth', JSON.stringify({
+  await page.addInitScript((storageKey) => {
+    localStorage.setItem(storageKey, JSON.stringify({
       access_token: 'sync-ux-test-token', user: { id: 'sync-ux-test-user' },
     }));
-  });
+  }, AUTH_STORAGE_KEY);
   await cloud.route(page);
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule?.state.status === 'synced');
+  await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule?.getSyncOperationalSummarySnapshot().cloudSyncHealthy);
 
   // Nearby writes share the 900ms automatic-sync window rather than starting a storm.
   const beforeWrites = cloud.calls.get.years ?? 0;
@@ -70,9 +115,11 @@ test('automatic sync is quiet, coalesced, resumes pending writes, and retries a 
       { id: 'sync-ux:year:b', label: 'ب', hijriStart: 1451, hijriEnd: 1452, status: 'active' },
     ] });
   });
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced' &&
+  await expect.poll(() => cloud.tables.years?.some((item) => item.id === 'sync-ux:year:b') ?? false).toBe(true);
+  await page.waitForFunction(() => window.__syncModule.getSyncOperationalSummarySnapshot().cloudSyncHealthy &&
     window.store.state.years.some((item) => item.id === 'sync-ux:year:b'));
-  expect((cloud.calls.get.years ?? 0) - beforeWrites).toBe(1);
+  // One current V2 cycle has one pre-dispatch and one post-dispatch pull.
+  expect((cloud.calls.get.years ?? 0) - beforeWrites).toBe(2);
   expect(cloud.tables.years.map((item) => item.id)).toEqual(expect.arrayContaining(['sync-ux:year:a', 'sync-ux:year:b']));
 
   // Offline writes remain local; the online event resumes them automatically.
@@ -87,7 +134,8 @@ test('automatic sync is quiet, coalesced, resumes pending writes, and retries a 
   await page.reload();
   await page.waitForFunction(() => window.store?.state?.ready === true && window.__syncModule);
   await expect.poll(() => page.evaluate(() => window.store.state.years.some((item) => item.id === 'sync-ux:year:offline'))).toBe(true);
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced' &&
+  await expect.poll(() => cloud.tables.years?.some((item) => item.id === 'sync-ux:year:offline') ?? false).toBe(true);
+  await page.waitForFunction(() => window.__syncModule.getSyncOperationalSummarySnapshot().cloudSyncHealthy &&
     window.store.state.years.some((item) => item.id === 'sync-ux:year:offline'));
   expect(cloud.tables.years.some((item) => item.id === 'sync-ux:year:offline')).toBe(true);
 
@@ -99,39 +147,41 @@ test('automatic sync is quiet, coalesced, resumes pending writes, and retries a 
   }] }));
   await expect.poll(() => cloud.calls.get.years ?? 0).toBeGreaterThan(beforeFailure);
   cloud.fail(false);
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced', null, { timeout: 10_000 });
+  await page.waitForFunction(() => window.__syncModule.getSyncOperationalSummarySnapshot().cloudSyncHealthy, null, { timeout: 10_000 });
   await expect.poll(() => cloud.tables.years.some((item) => item.id === 'sync-ux:year:retry')).toBe(true);
 
   // Resume is quiet: stale state requests sync without replacing the active page.
-  const stayedMounted = await page.evaluate(async () => {
-    const shell = document.getElementById('main').firstElementChild;
+  const beforeResume = cloud.calls.get.years ?? 0;
+  await page.evaluate(() => {
+    window.__syncUxMountedPage = document.getElementById('main').firstElementChild;
     window.__syncModule.state.lastSyncedAt = 0;
     document.dispatchEvent(new Event('visibilitychange'));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    return shell.isConnected;
   });
-  expect(stayedMounted).toBe(true);
+  await expect.poll(() => cloud.calls.get.years ?? 0).toBeGreaterThan(beforeResume);
+  await page.waitForFunction(() => window.__syncModule.getSyncOperationalSummarySnapshot().cloudSyncHealthy);
+  expect(await page.evaluate(() => window.__syncUxMountedPage.isConnected)).toBe(true);
 
   // The visible fallback still requests a full sync without a success toast.
   const beforeManual = cloud.calls.get.years ?? 0;
   await page.locator('.teacher-mini-hub-trigger').click();
   await page.locator('[data-act="mini-hub-sync-now"]').click();
   await expect.poll(() => cloud.calls.get.years ?? 0).toBeGreaterThan(beforeManual);
+  await expect(page.locator('.mini-hub-sync .badge')).toHaveText('متزامن');
   await expect(page.locator('#toast')).not.toHaveClass(/is-on/);
 
   // A genuinely newer remote record still reaches the visible page.
   const remote = cloud.tables.years.find((item) => item.id === 'sync-ux:year:a');
   remote.label = 'تحديث سحابي';
+  remote.revision += 1;
+  remote.field_revisions.label = remote.revision;
   remote.client_updated_at = Date.now() + 10_000;
-  const remoteResult = await page.evaluate(async () => {
-    const shell = document.getElementById('main').firstElementChild;
+  await page.evaluate(async () => {
+    window.__syncUxMountedPage = document.getElementById('main').firstElementChild;
     await window.__syncModule.syncAll({ full: true });
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    return {
-      rendered: !shell.isConnected,
-      label: window.store.state.years.find((item) => item.id === 'sync-ux:year:a')?.label,
-    };
   });
-  expect(remoteResult).toEqual({ rendered: true, label: 'تحديث سحابي' });
+  await expect.poll(() => page.evaluate(() => ({
+      rendered: !window.__syncUxMountedPage.isConnected,
+      label: window.store.state.years.find((item) => item.id === 'sync-ux:year:a')?.label,
+  }))).toEqual({ rendered: true, label: 'تحديث سحابي' });
   expect(errors.filter((message) => !message.includes('503'))).toEqual([]);
 });

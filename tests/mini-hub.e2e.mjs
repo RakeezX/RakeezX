@@ -15,8 +15,17 @@ for (const viewport of [
         : nativeMatchMedia(query);
     });
     await page.setViewportSize(viewport);
+    await page.route('**/rest/v1/**', (route) => route.fulfill({ json: [] }));
     await page.goto('/#/classes');
     await page.waitForFunction(() => window.store?.state?.ready === true);
+    await page.evaluate(async () => {
+      const cloud = await import('/src/lib/cloud.js');
+      const sync = await import('/src/lib/sync.js');
+      const db = await import('/src/lib/db.js');
+      await db.clearStore('outbox');
+      cloud.setMockAuth({ id: 'mini-hub-test-owner', email: 'teacher@example.test' }, { access_token: 'test-only' });
+      await sync.getSyncOperationalSummary();
+    });
 
     const trigger = viewport.width < 768
       ? page.locator('.topbar__teacher-btn')

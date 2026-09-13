@@ -4,6 +4,7 @@
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
 import { brandLockup } from './lib/brand.js';
+import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
@@ -50,20 +51,7 @@ function teacherInitials(name) {
 }
 
 function getSyncState() {
-  if (syncModule) return syncModule.displayState();
-  const status = syncModule?.state?.status ?? 'idle';
-  const labels = {
-    synced:  { text: 'متزامن', badge: 'badge--brand', label: 'كافة البيانات متزامنة مع السحابة' },
-    syncing: { text: 'جارٍ المزامنة...', badge: 'badge--brand', label: 'جارٍ نقل وتحديث البيانات سحابيًا' },
-    pending: { text: 'تغييرات بانتظار المزامنة', badge: 'badge--warn', label: 'توجد تعديلات محلية بانتظار رفعها' },
-    offline: { text: 'غير متصل (حفظ محلي)', badge: 'badge--neutral', label: 'التطبيق يعمل دون إنترنت ويحفظ محليًا' },
-    error:   { text: 'تعذر إكمال المزامنة', badge: 'badge--danger', label: 'حدث خطأ في الاتصال، ستتم إعادة المحاولة' },
-    idle:    { text: 'محلي', badge: 'badge--neutral', label: 'البيانات محفوظة محليًا على هذا الجهاز' },
-  };
-  return {
-    status,
-    ...(labels[status] || labels.idle),
-  };
+  return syncOperationalPresentation(syncModule?.getSyncOperationalSummarySnapshot());
 }
 
 function renderSidebarMiniHubTrigger() {
@@ -100,8 +88,6 @@ function renderTeacherMiniHubBody() {
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
   const isLoggedIn = !!(cloud.session && cloud.user);
   const authPending = teacherMiniHubAuthPending;
-  const lastSynced = syncModule?.state?.lastSyncedAt;
-  const lastSyncText = lastSynced ? new Date(lastSynced).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : null;
 
   return html`
       <div class="mini-hub-sheet">
@@ -135,20 +121,7 @@ function renderTeacherMiniHubBody() {
           </div>
 
           <div class="mini-hub-sync mini-hub-section" aria-live="polite">
-            <div class="mini-hub-section__head">
-              <div class="mini-hub-sync__state">
-                <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status></span>
-                <span class="fw-7 fs-sm">حالة المزامنة</span>
-                <span class="badge ${syncInfo.badge}" data-sync-label data-sync-badge>${syncInfo.text}</span>
-              </div>
-            </div>
-            <div class="mini-hub-sync__meta t-3 fs-xs">
-              <span data-sync-description>${syncInfo.label}</span>
-              <span>آخر تحديث <b dir="ltr" data-sync-time>${lastSyncText || '—'}</b></span>
-            </div>
-            <button class="btn btn--sm btn--quiet mini-hub-sync__action" data-act="mini-hub-sync-now" data-sync-action ${syncInfo.status === 'syncing' ? 'disabled' : ''}>
-              ${icon('refresh')} <span data-sync-action-label>مزامنة الآن</span>
-            </button>
+            ${renderSyncOperationalSection(syncInfo.summary)}
           </div>
 
           <div class="mini-hub-pwa mini-hub-section">
@@ -203,6 +176,7 @@ function refreshTeacherMiniHubSheet({ focusAccountAction = false } = {}) {
 }
 
 function openTeacherMiniHubSheet() {
+  void refreshSyncOperationalUI();
   if (refreshTeacherMiniHubSheet()) return Promise.resolve();
   const sheet = openSheet({
     title: 'مركز المعلّم',
@@ -260,7 +234,7 @@ function shell(path, params) {
   const inTeaching = path.startsWith('/teaching/') && params?.id;
   const bottom = NAV.filter((n) => n.primary);
   const syncInfo = getSyncState();
-  const showConnectionState = syncInfo.status === 'offline' || syncInfo.status === 'error';
+  const showConnectionState = syncInfo.status === 'offline' || syncInfo.help;
 
   return html`
     <a class="skip-link" href="#main" data-act="skip-to-content">انتقل إلى المحتوى</a>
@@ -348,9 +322,22 @@ function paintSyncStatus() {
   const syncInfo = getSyncState();
   const statusStrip = document.querySelector('[data-app-status]');
   if (statusStrip) {
-    const visible = syncInfo.status === 'offline' || syncInfo.status === 'error';
+    const visible = syncInfo.status === 'offline' || syncInfo.help;
     statusStrip.className = `app-status-strip${visible ? ` is-visible is-${syncInfo.status}` : ''}`;
     statusStrip.querySelector('[data-app-status-text]')?.replaceChildren(syncInfo.label);
+  }
+  const section = teacherMiniHubSheet?.querySelector('.mini-hub-sync');
+  if (section) {
+    const expanded = section.querySelector('details')?.open;
+    const focused = section.contains(document.activeElement) ? document.activeElement : null;
+    const focusKey = focused?.dataset.act;
+    const focusHref = focused?.getAttribute('href');
+    const focusSummary = focused?.tagName === 'SUMMARY';
+    render(section, renderSyncOperationalSection(syncInfo.summary));
+    section.querySelector('details').open = !!expanded;
+    if (focusKey) section.querySelector(`[data-act="${focusKey}"]`)?.focus({ preventScroll: true });
+    else if (focusHref === '#/support') section.querySelector('a[href="#/support"]')?.focus({ preventScroll: true });
+    else if (focusSummary) section.querySelector('summary')?.focus({ preventScroll: true });
   }
   for (const el of document.querySelectorAll('[data-sync-label]')) el.textContent = syncInfo.text;
   for (const el of document.querySelectorAll('[data-sync-badge]')) {
@@ -361,11 +348,11 @@ function paintSyncStatus() {
   }
   for (const el of document.querySelectorAll('[data-sync-description]')) el.textContent = syncInfo.label;
   for (const el of document.querySelectorAll('[data-sync-time]')) {
-    el.textContent = syncModule?.state.lastSyncedAt
-      ? new Date(syncModule.state.lastSyncedAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
+    el.textContent = syncInfo.summary.lastSuccessfulSyncAt
+      ? new Date(syncInfo.summary.lastSuccessfulSyncAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
   }
   for (const el of document.querySelectorAll('[data-sync-action]')) {
-    el.disabled = syncInfo.status === 'syncing';
+    el.disabled = !syncInfo.canSync;
   }
   for (const el of document.querySelectorAll('[data-sync-action-label]')) {
     el.textContent = syncInfo.status === 'syncing' ? 'جارٍ المزامنة...' : 'مزامنة الآن';
@@ -378,6 +365,24 @@ function paintSyncStatus() {
     el.title = syncInfo.text;
     el.parentElement?.setAttribute('title', syncInfo.text);
   }
+}
+
+// Refresh the existing read-only contract before painting; never infer outbox truth here.
+let syncSummaryRefresh = null;
+let syncSummaryRefreshAgain = false;
+async function refreshSyncOperationalUI() {
+  if (!syncModule) return;
+  if (syncSummaryRefresh) { syncSummaryRefreshAgain = true; return syncSummaryRefresh; }
+  syncSummaryRefresh = (async () => {
+    do {
+      syncSummaryRefreshAgain = false;
+      await syncModule.getSyncOperationalSummary();
+      paintSyncStatus();
+    } while (syncSummaryRefreshAgain);
+  })();
+  try { await syncSummaryRefresh; }
+  catch { /* Keep the last safe runtime snapshot; do not invent a new Sync state. */ }
+  finally { syncSummaryRefresh = null; }
 }
 
 /* ---------- الرسم ---------- */
@@ -484,6 +489,7 @@ async function boot() {
     try {
       syncModule = await import('./lib/sync.js');
       syncModule.init();
+      await syncModule.getSyncOperationalSummary();
       if (import.meta.env?.DEV) window.__syncModule = syncModule;
     } catch (err) {
       console.error('[rakeezx] Sync module failed to load:', err);
@@ -537,7 +543,7 @@ async function boot() {
     refreshTeacherMiniHubSheet();
   });
   if (syncModule) {
-    syncModule.subscribe(paintSyncStatus);
+    syncModule.subscribe(() => { void refreshSyncOperationalUI(); });
   }
   onNavigate(resolve);
   installSessionAutoTriggers({

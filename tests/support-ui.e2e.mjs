@@ -62,8 +62,11 @@ test('Support is reachable from Teacher Center and Settings and always exposes d
   await expect(page).toHaveURL(/#\/support$/);
 
   await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    cloud.setMockAuth({ id: 'support-context-owner' }, { access_token: 'test-only' });
     const sync = await import('/src/lib/sync.js');
     sync.state.status = 'error';
+    await sync.getSyncOperationalSummary();
     location.hash = '#/calendar';
   });
   await expect(page).toHaveURL(/#\/calendar$/);

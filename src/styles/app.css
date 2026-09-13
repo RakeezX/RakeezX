@@ -353,6 +353,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
+  flex-wrap: wrap;
   min-height: 36px;
   padding: 6px var(--sp-4);
   border-bottom: 1px solid var(--border);
@@ -368,7 +369,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .app-status-strip__support {
   display: none;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px;
   margin-inline-start: var(--sp-1);
   padding-inline: var(--sp-2);
   color: inherit;
@@ -378,7 +379,11 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.app-status-strip.is-error .app-status-strip__support { display: inline-flex; }
+.app-status-strip.is-error .app-status-strip__support,
+.app-status-strip.is-blocked .app-status-strip__support,
+.app-status-strip.is-rejected .app-status-strip__support { display: inline-flex; }
+.app-status-strip.is-blocked { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-border); }
+.app-status-strip.is-rejected { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
 .app-status-strip__support:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
 
 /* شريط علوي */
