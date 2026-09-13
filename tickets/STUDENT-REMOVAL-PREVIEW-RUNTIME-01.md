@@ -1,7 +1,6 @@
 # STUDENT-REMOVAL-PREVIEW-RUNTIME-01 — 0088 live verification / promotion
 
-Status: LIVE MIGRATION VERIFIED; SOURCE GATES PASS; PROMOTION AUTHORIZED.
-Product status after deployment: PRODUCTION REVIEW — PENDING PRODUCT OWNER VERIFICATION. NOT CLOSED.
+Status: PRODUCTION REVIEW — PENDING PRODUCT OWNER VERIFICATION. NOT CLOSED.
 Production before source promotion: `74309ac606321fc7d0a458b20bc7b98bc1cd49d5`.
 Work-Active was neither read nor modified during this ticket.
 
@@ -23,7 +22,7 @@ Work-Active was neither read nor modified during this ticket.
 10/10 PASS: real isolated PostgreSQL two-connection lifecycle/concurrency suite, including preview behind committed history/deletion and evidence arriving after preview.
 4/4 PASS: Build Meta privacy/content checks.
 4/4 PASS: transfer/roll safety regression including independent roster integrity, tombstone rejection and offline atomic V2 convergence.
-Single `npm run build` in 0088: PASS. `git diff --check`: PASS. Normal local content Build Meta regenerated; Cloudflare generates deployed Git identity through the unchanged normal build pipeline.
+Single `npm run build` in 0088: PASS. `git diff --check`: PASS. Normal content Build Meta regenerated. Production serves the supported content identity, matching the built runtime fingerprint; successful Cloudflare deployment is independently tied to the promoted Git commit. No build-pipeline changes were made.
 No real accounts/student records queried or mutated. No frontend UI added.
 
 ## Historical delivery blocker (resolved)
@@ -45,5 +44,14 @@ Authoritative origin/main after fetch still equals the approved baseline; no new
 Synthetic preview evidence is isolated local PGlite / real PostgreSQL plus fake IndexedDB; no live Product rows queried or mutated.
 Only reviewed preview runtime, its tests/migration documentation and normal generated Build Meta are in scope. No Work UI is included.
 Narrow .gitattributes rules preserve the four SHA-bound handoff files as LF, so Windows checkout conversion cannot invalidate the reviewed byte-level freeze. No unrelated file normalization is performed.
+
+## Production delivery evidence
+
+Runtime integration commit: `d587ac7fc5a281896eaeb655f12f80f82d97684f`; pushed and remote main verified.
+Cloudflare Pages check: completed / success for that exact commit.
+Signed-out isolated-browser smoke on rakeezx.com: PASS at 390 and 1280, Support readable, visible Home navigation and reload working, no horizontal overflow or console/runtime errors.
+Public deployed Build Meta: version 1.0.0, kind content, fingerprint `5ff6d168103490cb3c1585d593b2315987044516dcce0788567a13369bfd7f93`, matching the built runtime. Public deployed transport contains the new preview RPC endpoint.
+No real accounts accessed, no live Product rows inspected, no student lifecycle commands invoked; no Work-Active access and no unfinished lifecycle UI promotion.
+This delivery-note correction changes no runtime/build input and requires no second build.
 
 Do not touch Work-Active, apply destructive/data-changing SQL, query Product Owner private records, or promote source before migration verification.
