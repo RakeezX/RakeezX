@@ -579,6 +579,31 @@ test('Student Management Arabic name and class share the RTL right start edge', 
       await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
       const sheet = await profile(page, name), person = sheet.locator('.student-management__person');
       await expect(person.locator('strong')).toHaveText(name);
+      for (const [action, title, helper] of [['transfer', 'نقل الطالب إلى فصل آخر', 'مع الاحتفاظ بهويته وسجله'], ['remove', 'إزالة الطالب من الفصل', 'تُعرض النتيجة الآمنة قبل تأكيدك']]) {
+        const row = sheet.locator(`[data-management="${action}"]`), text = row.locator('.student-management__row-text');
+        await expect(row).toHaveAccessibleName(title);
+        await expect(text.locator('strong')).toHaveText(title);
+        await expect(text.locator('small')).toHaveText(helper);
+        if (kind === 'short' && width === 320 && theme === 'light') await testInfo.attach(`rendered-${action}`, { body: JSON.stringify(await row.evaluate(el => ({ html: el.outerHTML, visibleText: el.innerText, text: el.textContent, icons: [...el.querySelectorAll('svg')].map(svg => ({ namespace: svg.namespaceURI, hidden: svg.getAttribute('aria-hidden'), text: svg.textContent })) })), null, 2), contentType: 'application/json' });
+        await expect(row).not.toContainText(/svg/i);
+        await expect(row.locator('svg')).toHaveCount(2);
+        expect(await row.locator('svg').evaluateAll(icons => icons.every(svg => svg.namespaceURI === 'http://www.w3.org/2000/svg' && svg.getAttribute('aria-hidden') === 'true' && svg.textContent === '' && svg.getBoundingClientRect().width > 0))).toBe(true);
+        const titleBox = await text.locator('strong').boundingBox(), helperBox = await text.locator('small').boundingBox();
+        expect(helperBox.y - titleBox.y - titleBox.height).toBeGreaterThanOrEqual(4);
+        const rawText = await text.textContent();
+        expect(rawText).toMatch(new RegExp(`${title}\\s+${helper}`));
+        await expect(row.locator('.student-management__row-icon, .student-management__row-chevron')).toHaveCount(2);
+        expect(await row.locator('.student-management__row-icon, .student-management__row-chevron').evaluateAll(icons => icons.every(el => el.getAttribute('aria-hidden') === 'true'))).toBe(true);
+        if (width === 320) {
+          const helperLine = text.locator('small');
+          await helperLine.evaluate((el, value) => { el.textContent = value; }, `${helper} ${helper} ${helper}`);
+          expect((await helperLine.boundingBox()).height).toBeGreaterThan(helperBox.height);
+          expect(await helperLine.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+          expect(await row.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+          await helperLine.evaluate((el, value) => { el.textContent = value; }, helper);
+        }
+      }
       const context = await person.evaluate(el => {
         const metrics = child => {
           const range = document.createRange(); range.selectNodeContents(child);
@@ -592,6 +617,11 @@ test('Student Management Arabic name and class share the RTL right start edge', 
         expect(Math.abs(line.right - context.right)).toBeLessThan(1);
       }
       expect(context.section.top).toBeGreaterThanOrEqual(context.name.bottom);
+      const avatar = person.locator('..').locator('.student-management__avatar'), avatarBox = await avatar.boundingBox();
+      await expect(avatar).toHaveAttribute('aria-hidden', 'true');
+      await expect(avatar.locator('svg')).toHaveCount(1);
+      expect(Math.abs(avatarBox.y - context.name.top)).toBeLessThan(1);
+      expect(avatarBox.x - context.right).toBeGreaterThanOrEqual(11);
       expect(context.contained).toBe(true);
       expect(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
