@@ -116,6 +116,58 @@ async function historicalData(page) {
   }, f.student);
 }
 
+test('signed-out review names authentication, with no destructive fallback or RPC', async ({ page }) => {
+  await page.evaluate(async () => (await import('/src/lib/cloud.js')).setMockAuth(null, null));
+  await profile(page); await removeStudent(page);
+  await expect(page.getByRole('dialog')).toContainText('يلزم تسجيل الدخول إلى الحساب المعني لإتمام هذا الإجراء.');
+  await expect(page.locator('[data-management="confirm"], [data-management="sync-preview"]')).toHaveCount(0);
+  expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0);
+});
+
+test('new local student requires acknowledgement; explicit Sync re-previews, never auto-deletes', async ({ page }) => {
+  await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
+  let release; const gate = new Promise(resolve => { release = resolve; });
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/apply_sync_v2_mutation`, async route => { await gate; await route.fallback(); });
+  const id = await page.evaluate(async section => (await window.store.addStudent(section, 'طالب جديد اصطناعي')).id, f.section);
+  await page.goto(`/#/student/${id}?teaching=${f.teaching}`);
+  await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+  await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('تحتاج بيانات الطالب إلى المزامنة أولًا قبل إزالته.');
+  expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0);
+  await expect(page.locator('[data-management="confirm"]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'مزامنة الآن', exact: true }).click(); release();
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('حذف هذا الطالب؟');
+  expect(previews.at(-1).outcome).toBe('delete_pristine'); expect(backend.calls).toHaveLength(0);
+  expect(await page.evaluate(id => window.store.getStudent(id).serverRevision, id)).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'إلغاء', exact: true }).click();
+  expect(await page.evaluate(id => !!window.store.getStudent(id), id)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('actual Demo package uses a precise local-only block, never cloud lifecycle', async ({ page }) => {
+  const ids = await page.evaluate(async () => {
+    const pkg = await (await import('/src/lib/demo.js')).createDemoPackage();
+    const student = window.store.state.students.find(s => s.id.startsWith('demo:') && window.store.activeEnrollment(s.id)?.sectionId === pkg.section.id);
+    return { student: student.id, teaching: pkg.teaching.id };
+  });
+  await page.goto(`/#/student/${ids.student}?teaching=${ids.teaching}`);
+  await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+  await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('هذا طالب في فصل تجريبي محلي. يمكن حذف الفصل التجريبي من إدارة الفصول.');
+  await expect(page.locator('[data-management="confirm"], [data-management="sync-preview"]')).toHaveCount(0);
+  expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0);
+  expect(errors).toEqual([]);
+});
+
+test('genuine unavailable RPC is informational only and exposes no server details', async ({ page }) => {
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/preview_student_removal`, route => route.fulfill({ status: 503, json: { message: 'PRIVATE synthetic server error' } }));
+  await profile(page); await removeStudent(page);
+  await expect(page.getByRole('dialog')).toContainText('تعذر التحقق من نتيجة الإزالة الآن. تحقق من الاتصال وحدّث البيانات ثم حاول مرة أخرى.');
+  await expect(page.getByRole('dialog')).not.toContainText(/PRIVATE|503|student:|enrollment:/);
+  await expect(page.locator('[data-management="confirm"], [data-management="sync-preview"]')).toHaveCount(0);
+  expect(backend.calls).toHaveLength(0);
+});
+
 test('pristine delete uses the real authoritative command, no cascade or false erasure promise, and survives reload', async ({ page }) => {
   const sheet = await profile(page);
   await expect(sheet.getByRole('button', { name: 'حذف الطالب', exact: true })).not.toBeVisible();

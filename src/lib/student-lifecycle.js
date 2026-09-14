@@ -58,13 +58,22 @@ async function removalEvidenceSnapshot() {
 /** Informational only. Execution still rechecks 0029 authority and local evidence. */
 export async function previewStudentRemoval(studentId, enrollmentId, revision) {
   if (typeof studentId !== 'string' || !studentId || studentId.length > 200 ||
-    typeof enrollmentId !== 'string' || !enrollmentId || enrollmentId.length > 200 ||
-    !Number.isSafeInteger(revision) || revision < 0) return blockedPreview('invalid_source', false);
+    typeof enrollmentId !== 'string' || !enrollmentId || enrollmentId.length > 200) return blockedPreview('invalid_source', false);
+  if (studentId.startsWith('demo:') || enrollmentId.startsWith('demo:')) return blockedPreview('demo_local_only', false);
   if (!cloud.session || !cloud.user) return blockedPreview('auth_required');
   if (globalThis.navigator?.onLine === false) return blockedPreview('offline');
   const ownerId = cloud.user.id;
   try {
     const before = await removalEvidenceSnapshot();
+    const student = before.students.find(row => row.id === studentId);
+    const source = before.enrollments.find(row => row.id === enrollmentId && row.studentId === studentId);
+    if (store.isLocalOnlyRecord(student) || store.isLocalOnlyRecord(source)) return blockedPreview('demo_local_only', false);
+    // Classification only: lack of authority never permits local deletion.
+    if (student && source && !student.deleted && !source.deleted &&
+        (!(student.serverRevision >= 1) || !(source.serverRevision >= 1) || student.syncCreatePending || source.syncCreatePending)) {
+      return blockedPreview('student_not_synced');
+    }
+    if (!Number.isSafeInteger(revision) || revision < 0) return blockedPreview('invalid_source', false);
     const beforeDevice = before.device.find((row) => row.id === 'device');
     if (before.outbox.length || beforeDevice?.studentLifecycleResume || beforeDevice?.cloudRestoreResume) {
       return blockedPreview('sync_not_ready');

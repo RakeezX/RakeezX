@@ -3,6 +3,8 @@ import { html, icon, openSheet, render, toast } from './dom.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
 import { getStudentLifecycleResumeState, resumeStudentLifecycle } from './student-lifecycle.js';
+import * as cloud from './cloud.js';
+import * as sync from './sync.js';
 
 export function friendlyStudentLifecycleError(code) {
   if (code === 'OFFLINE') return 'يلزم الاتصال بالإنترنت لإتمام هذا الإجراء.';
@@ -18,7 +20,9 @@ export function friendlyStudentLifecycleError(code) {
 
 const previewMessage = (reason) => ({
   offline: 'يلزم الاتصال بالإنترنت لإتمام هذا الإجراء.',
-  auth_required: 'يلزم تسجيل الدخول لإتمام هذا الإجراء.',
+  auth_required: 'يلزم تسجيل الدخول إلى الحساب المعني لإتمام هذا الإجراء.',
+  student_not_synced: 'تحتاج بيانات الطالب إلى المزامنة أولًا قبل إزالته.',
+  demo_local_only: 'هذا طالب في فصل تجريبي محلي. يمكن حذف الفصل التجريبي من إدارة الفصول.',
   sync_not_ready: 'أكمل المزامنة أو تحديث الجهاز أولًا، ثم حاول مرة أخرى.',
   stale_source: 'تغيرت حالة الطالب، حدّث البيانات ثم حاول مرة أخرى.',
   invalid_source: 'بيانات الانتساب الحالي غير متاحة. حدّث البيانات ثم حاول مرة أخرى.',
@@ -31,7 +35,7 @@ export async function openStudentManagement(studentId) {
   const student = store.getStudent(studentId);
   if (!student) return;
   let stage = 'choose', action = null, source = null, busy = false, previewing = false, message = '', checkpoint = null;
-  let result = null;
+  let result = null, previewReason = null;
   try { checkpoint = await getStudentLifecycleResumeState(); }
   catch (error) { stage = 'error'; message = friendlyStudentLifecycleError(error.code); }
 
@@ -80,6 +84,7 @@ export async function openStudentManagement(studentId) {
           ` : stage === 'busy' ? html`<p role="status">${previewing ? 'جارٍ التحقق من نتيجة الإزالة…' : checkpoint?.state === 'reconciliation_required' ? 'جارٍ إكمال تحديث هذا الجهاز…' : 'جارٍ التحقق وإتمام الإجراء…'}</p>`
           : stage === 'success' ? html`<p role="status">${message}</p><button class="btn btn--primary" data-management="close">${result.action === 'delete' ? 'العودة للكشف' : 'العودة إلى ملف الطالب'}</button>`
           : html`<p role="status">${message}</p>
+              ${previewReason === 'student_not_synced' ? html`<button class="btn btn--primary" data-management="sync-preview">مزامنة الآن</button>` : ''}
               ${resumeAvailable ? html`<p class="t-3 fs-sm">${checkpoint.state === 'reconciliation_required' ? 'تم تأكيد الإجراء، ويحتاج هذا الجهاز إلى إكمال التحديث.' : 'أكمل التحقق من الإجراء السابق بدل بدء إجراء جديد.'}</p><button class="btn btn--primary" data-management="resume">${checkpoint.state === 'reconciliation_required' ? 'إكمال تحديث هذا الجهاز' : 'إكمال الإجراء السابق'}</button>` : html`<button class="btn btn--ghost" data-management="back">العودة للإدارة</button>`}`}
         `);
         if (!busy) (host.querySelector('[data-management="back"]') ?? host.querySelector('button') ?? close).focus({ preventScroll: true });
@@ -116,12 +121,12 @@ export async function openStudentManagement(studentId) {
       }
 
       async function preview() {
-        source = store.activeEnrollment(studentId); message = ''; busy = true; previewing = true; stage = 'busy'; show();
+        source = store.activeEnrollment(studentId); message = ''; previewReason = null; busy = true; previewing = true; stage = 'busy'; show();
         try {
           const result = await store.previewStudentRemoval(studentId, source?.id, source?.serverRevision);
-          if (result.outcome === 'blocked') { stage = 'error'; message = previewMessage(result.reason); }
+          if (result.outcome === 'blocked') { stage = 'error'; previewReason = result.reason; message = previewMessage(result.reason); }
           else { action = result.outcome === 'delete_pristine' ? 'delete' : 'end'; stage = 'confirm'; }
-        } catch { stage = 'error'; message = previewMessage('preview_unavailable'); }
+        } catch { stage = 'error'; previewReason = !cloud.session || !cloud.user ? 'auth_required' : navigator.onLine === false ? 'offline' : 'preview_unavailable'; message = previewMessage(previewReason); }
         finally { busy = false; previewing = false; show(); }
       }
 
@@ -130,7 +135,16 @@ export async function openStudentManagement(studentId) {
         if (!choice || busy) return;
         if (choice === 'close') { done(result); return; }
         if (choice === 'former') { done(null); return; }
-        if (choice === 'back') { stage = 'choose'; message = ''; show(); return; }
+        if (choice === 'back') { stage = 'choose'; message = ''; previewReason = null; show(); return; }
+        if (choice === 'sync-preview') {
+          previewReason = null; busy = true; previewing = true; stage = 'busy'; show();
+          try {
+            if (await sync.syncAll({ full: true })) { await preview(); }
+            else { stage = 'error'; message = previewMessage(!cloud.session || !cloud.user ? 'auth_required' : navigator.onLine === false ? 'offline' : 'sync_not_ready'); }
+          } catch { stage = 'error'; message = previewMessage(!cloud.session || !cloud.user ? 'auth_required' : navigator.onLine === false ? 'offline' : 'preview_unavailable'); }
+          finally { busy = false; previewing = false; show(); }
+          return;
+        }
         if (choice === 'confirm') { await run(); return; }
         if (choice === 'resume') { await run(true); return; }
         if (checkpoint) return;

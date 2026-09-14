@@ -22,6 +22,37 @@ async function device(factory=new IDBFactory()) {
   store.state.ready=false;await store.init();assert.equal(await sync.syncAll({full:true}),true);return factory;
 }
 const preview=f=>store.previewStudentRemoval(f.student,f.enrollment,store.activeEnrollment(f.student)?.serverRevision??1);
+
+test('signed-out local student reports authentication before missing canonical revision',async()=>{
+  const f=await academicFixture(pg,'integration-auth');await device();
+  cloud.setMockAuth(null,null);const before=await dump(),count=previews;
+  assert.deepEqual(await store.previewStudentRemoval(f.student,f.enrollment,undefined),{outcome:'blocked',reason:'auth_required',retryable:true});
+  assert.equal(previews,count);assert.deepEqual(await dump(),before);
+});
+
+test('unacknowledged locally added student requires Sync, never guessed pristine or sent to preview RPC',async()=>{
+  const f=await academicFixture(pg,'integration-unsynced');await device();
+  const student=await store.addStudent(f.section,'طالب محلي اصطناعي');
+  const en=store.activeEnrollment(student.id),before=await dump(),count=previews;
+  assert.equal(store.getStudent(student.id).serverRevision,0);assert.equal(en.serverRevision,0);
+  assert.deepEqual(await store.previewStudentRemoval(student.id,en.id,en.serverRevision),{outcome:'blocked',reason:'student_not_synced',retryable:true});
+  assert.equal(previews,count);assert.deepEqual(await dump(),before);
+  assert.equal(await sync.syncAll({full:true}),true);
+  assert.deepEqual(await store.previewStudentRemoval(student.id,en.id,store.activeEnrollment(student.id).serverRevision),{outcome:'delete_pristine',reason:'pristine',retryable:false});
+});
+
+test('real Demo package and ordinary-ID student in its Demo class never use server lifecycle preview',async()=>{
+  const f=await academicFixture(pg,'integration-demo');await device();
+  await store.patchDevice({activeYearId:f.year,activeTermId:f.term});
+  const {createDemoPackage}=await import('../src/lib/demo.js');const pkg=await createDemoPackage();
+  const ordinary=await store.addStudent(pkg.section.id,'طالب تجريبي مضاف');
+  const student=store.state.students.find(row=>row.id.startsWith('demo:')&&store.activeEnrollment(row.id)?.sectionId===pkg.section.id);
+  for(const id of [student.id,ordinary.id]){
+    const en=store.activeEnrollment(id),before=await dump(),count=previews;
+    assert.deepEqual(await store.previewStudentRemoval(id,en.id,en.serverRevision),{outcome:'blocked',reason:'demo_local_only',retryable:false});
+    assert.equal(previews,count);assert.deepEqual(await dump(),before);
+  }
+});
 test('runtime pristine preview is disk/server authoritative, sanitized and performs ZERO writes or command calls',async()=>{
   const f=await academicFixture(pg,'client-preview-pristine');await device();
   const before=await dump(),calls=backend.calls.length,ops=backend.operations.length;
