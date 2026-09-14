@@ -4239,11 +4239,27 @@
 }
 
 /* ملف الطالب */
-.student-profile-management { min-height: 44px; flex-shrink: 0; }
+.student-profile-management { min-height: 44px; flex-shrink: 0; background: var(--bg-elev); border-color: var(--brand-border); color: var(--text); }
+.student-profile-management:hover { background: var(--brand-soft); border-color: var(--brand); }
+.student-management-sheet { width: min(100%, 520px); }
+.student-management-sheet .sheet__title { font-size: var(--fs-section); font-weight: var(--fw-bold); }
 .student-management { display: grid; gap: var(--sp-3); min-width: 0; }
 .student-management p { margin: 0; line-height: 1.65; }
-.student-management__identity { display: grid; gap: var(--sp-1); padding-block-end: var(--sp-3); border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
-.student-management__identity span { color: var(--text-3); font-size: var(--fs-sm); }
+.student-management__identity { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--sp-3); padding-block-end: var(--sp-4); border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.student-management__avatar { display: grid; place-items: center; width: 40px; height: 40px; background: var(--bg-sunk); color: var(--text-2); border-radius: var(--r-md); }
+.student-management__person { display: grid; gap: var(--sp-1); min-width: 0; direction: rtl; text-align: right; }
+.student-management__person strong { font-size: var(--fs-section); font-weight: var(--fw-bold); line-height: 1.55; direction: rtl; text-align: inherit; }
+.student-management__person > span { color: var(--text-3); font-size: var(--fs-sm); line-height: 1.6; }
+.student-management .student-management__row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--sp-3); padding: var(--sp-3); text-align: start; white-space: normal; background: var(--bg-elev); border-color: var(--border); border-radius: var(--r-md); }
+.student-management .student-management__row:hover { background: var(--bg-sunk); border-color: var(--border-strong); }
+.student-management__row-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--bg-sunk); color: var(--text-2); }
+.student-management__row-icon--sensitive { color: color-mix(in srgb, var(--danger) 70%, var(--text)); }
+.student-management__row-text { display: grid; gap: var(--sp-1); min-width: 0; overflow-wrap: anywhere; }
+.student-management__row-text strong { font-size: var(--fs-body); font-weight: var(--fw-semibold); line-height: 1.55; }
+.student-management__row-text small { font-size: var(--fs-sm); color: var(--text-3); font-weight: 400; line-height: 1.6; }
+.student-management__row > .icon { color: var(--text-3); width: 16px; height: 16px; }
+.student-management[data-management-consequence="delete"] .student-management__avatar { color: color-mix(in srgb, var(--danger) 80%, var(--text)); background: var(--danger-soft); }
+.student-management[data-management-consequence="delete"] > p:not(.t-3) { font-weight: 600; }
 .student-management__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .student-management .btn, .student-management summary { min-height: 44px; }
 .student-management .btn--danger { color: color-mix(in srgb, var(--danger) 80%, var(--text)); }
@@ -4257,6 +4273,7 @@
 .former-student-row .btn { min-height: 44px; }
 @media (max-width: 599px) {
   .student-profile-header:has(.student-profile-management) { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .student-profile-header__meta > .badge { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .student-profile-management { grid-column: 2; justify-self: start; }
   .former-student-row { grid-template-columns: minmax(0, 1fr) auto; }
   .former-student-row__identity { grid-column: 1 / -1; }

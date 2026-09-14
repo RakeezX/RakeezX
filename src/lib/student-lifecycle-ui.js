@@ -48,6 +48,7 @@ export async function openStudentManagement(studentId) {
     title: 'إدارة الطالب',
     body: html`<div class="student-management" data-student-management></div>`,
     onMount(root, done) {
+      root.querySelector('.sheet').classList.add('student-management-sheet');
       const host = root.querySelector('[data-student-management]');
       const title = root.querySelector('.sheet__title');
       const close = root.querySelector('[data-sheet-close]');
@@ -63,8 +64,11 @@ export async function openStudentManagement(studentId) {
         const { en, sec, active } = context();
         title.textContent = stage === 'confirm' ? (action === 'delete' ? 'حذف هذا الطالب؟' : 'إزالة الطالب من الفصل؟') : 'إدارة الطالب';
         close.disabled = busy && !previewing;
+        host.dataset.managementState = stage;
+        host.dataset.managementConsequence = stage === 'confirm' ? action : '';
         const displayedSection = stage === 'confirm' && source ? store.getSection(source.sectionId) : sec;
-        const identity = html`<div class="student-management__identity"><strong>${student.name}</strong><span>${displayedSection ? sectionLabel(displayedSection) : 'لا يوجد انتساب حالي'}</span></div>`;
+        const identity = html`<div class="student-management__identity"><span class="student-management__avatar">${icon('student')}</span><div class="student-management__person"><strong dir="auto">${student.name}</strong>
+          <span>${displayedSection ? sectionLabel(displayedSection) : 'لا يوجد انتساب حالي'}</span></div></div>`;
         const resumeAvailable = checkpoint?.studentId === studentId;
         render(host, html`
           ${identity}
@@ -72,9 +76,8 @@ export async function openStudentManagement(studentId) {
             ${checkpoint ? html`<p>${resumeAvailable ? (checkpoint.state === 'reconciliation_required' ? 'تم تأكيد الإجراء، ويحتاج هذا الجهاز إلى إكمال التحديث.' : 'يحتاج الإجراء السابق إلى إكمال التحقق من نتيجته.') : 'يلزم إكمال إجراء سابق قبل إدارة هذا الطالب.'}</p>
               ${resumeAvailable ? html`<button class="btn btn--primary" data-management="resume">${checkpoint.state === 'reconciliation_required' ? 'إكمال تحديث هذا الجهاز' : 'إكمال الإجراء السابق'}</button>` : ''}`
               : active ? html`
-                ${en ? html`<button class="btn btn--ghost btn--block" data-management="transfer">${icon('picker')} نقل الطالب إلى فصل آخر</button>
-                  <button class="btn btn--ghost btn--block" data-management="remove">${icon('back')} إزالة الطالب من الفصل</button>
-                  <p class="t-3 fs-sm">سيوضح ركيز نتيجة الإزالة الآمنة قبل تأكيدك.</p>` : html`<p class="t-3">لا يوجد انتساب حالي متاح للإدارة.</p>`}`
+                ${en ? html`<button class="btn btn--ghost btn--block student-management__row" data-management="transfer" aria-label="نقل الطالب إلى فصل آخر"><span class="student-management__row-icon">${icon('picker')}</span><span class="student-management__row-text"><strong>نقل الطالب إلى فصل آخر</strong><small>مع الاحتفاظ بهويته وسجله</small></span>${icon('chev')}</button>
+                  <button class="btn btn--ghost btn--block student-management__row" data-management="remove" aria-label="إزالة الطالب من الفصل"><span class="student-management__row-icon student-management__row-icon--sensitive">${icon('back')}</span><span class="student-management__row-text"><strong>إزالة الطالب من الفصل</strong><small>تُعرض النتيجة الآمنة قبل تأكيدك</small></span>${icon('chev')}</button>` : html`<p class="t-3">لا يوجد انتساب حالي متاح للإدارة.</p>`}`
               : html`<p class="t-3">انتهى الانتساب الحالي. السجل السابق متاح للعرض.</p><a class="btn btn--info" href="#/archive/former-students" data-management="former">الطلاب السابقون</a>`}
           ` : stage === 'confirm' ? html`
             ${message ? html`<p role="status" class="t-3 fs-sm">${message}</p>` : ''}

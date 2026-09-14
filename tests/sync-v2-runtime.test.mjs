@@ -257,6 +257,18 @@ test('V2 coordinator performs quiet automatic sync and manual retry without V1 d
     poll();
   });
 
+  // Seeing the server row is not completion: canonical pull/reconciliation still runs.
+  // Settle that run before injecting the next operation's one-shot outage.
+  await new Promise((resolve, reject) => {
+    const until = Date.now() + 4_000;
+    const poll = async () => {
+      const summary = await sync.getSyncOperationalSummary();
+      if (!summary.automaticSyncActive && summary.queuedCount === 0) return resolve();
+      if (Date.now() >= until) return reject(new Error('automatic V2 reconciliation did not finish'));
+      setTimeout(poll, 25);
+    };
+    poll().catch(reject);
+  });
   const retrySection = await store.createSection({ grade: 5, label: 'يدوي' });
   const renderEvents = [];
   const unsubscribe = store.subscribe((_state, update) => renderEvents.push(update.render));

@@ -55,6 +55,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/#/classes');
   await page.waitForFunction(studentId => window.store?.state.ready && window.store.getStudent(studentId) && window.__syncModule?.getSyncOperationalSummarySnapshot().cloudSyncHealthy, f.student);
   await page.evaluate(async f => window.store.patchDevice({ activeYearId: f.year, activeTermId: f.term }), f);
+  await settleCloudSync(page);
 });
 
 test('ambiguous response resumes the same command after reload, without a second deletion identity', async ({ page }) => {
@@ -90,9 +91,9 @@ test('finalized lifecycle receipt finishes local reconciliation without another 
 });
 test.afterEach(async () => { await pg?.close(); });
 
-async function profile(page) {
+async function profile(page, name = 'طالب اصطناعي') {
   await page.goto(`/#/student/${f.student}?teaching=${f.teaching}`);
-  await expect(page.locator('.student-profile-header__name')).toHaveText('طالب اصطناعي');
+  await expect(page.locator('.student-profile-header__name')).toHaveText(name);
   await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
   return page.getByRole('dialog', { name: 'إدارة الطالب', exact: true });
 }
@@ -108,6 +109,16 @@ async function confirmDelete(page) {
 async function removeStudent(page) {
   await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
   await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
+}
+async function settleCloudSync(page) {
+  // Context writes schedule a debounced run: an idle snapshot alone is not readiness.
+  // Complete the real Sync path, which also drains its scheduled bootstrap timer.
+  await expect.poll(() => page.evaluate(async () => {
+    if (!await window.__syncModule.syncAll({ full: true })) return false;
+    const summary = await window.__syncModule.getSyncOperationalSummary();
+    return summary.cloudSyncHealthy && !summary.automaticSyncActive &&
+      !summary.automaticRetryActive && summary.queuedCount === 0 && summary.safeToContinueUnrelatedWork;
+  })).toBe(true);
 }
 async function historicalData(page) {
   return page.evaluate(async id => {
@@ -125,12 +136,18 @@ test('signed-out review names authentication, with no destructive fallback or RP
 });
 
 test('new local student requires acknowledgement; explicit Sync re-previews, never auto-deletes', async ({ page }) => {
-  await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
+  await settleCloudSync(page);
+  // This case exercises manual Sync, not a click racing an already running auto Sync.
+  // Pause the debounce clock before creating the unsynced fixture; RPC remains real.
+  await page.clock.install();
+  await page.clock.pauseAt(new Date());
   let release; const gate = new Promise(resolve => { release = resolve; });
   await page.route(`${SUPABASE_URL}/rest/v1/rpc/apply_sync_v2_mutation`, async route => { await gate; await route.fallback(); });
   const id = await page.evaluate(async section => (await window.store.addStudent(section, 'طالب جديد اصطناعي')).id, f.section);
-  await page.goto(`/#/student/${id}?teaching=${f.teaching}`);
+  await page.evaluate(({ id, teaching }) => { location.hash = `/student/${id}?teaching=${teaching}`; }, { id, teaching: f.teaching });
+  await page.clock.runFor(50); // Render the route without reaching the 900ms auto-Sync debounce.
   await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+  await page.clock.runFor(50); // Finish the sheet's opening animation frame.
   await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('تحتاج بيانات الطالب إلى المزامنة أولًا قبل إزالته.');
   expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0);
@@ -160,12 +177,19 @@ test('actual Demo package uses a precise local-only block, never cloud lifecycle
 });
 
 test('genuine unavailable RPC is informational only and exposes no server details', async ({ page }) => {
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/preview_student_removal`, route => route.fulfill({ status: 503, json: { message: 'PRIVATE synthetic server error' } }));
-  await profile(page); await removeStudent(page);
+  await profile(page);
+  await settleCloudSync(page);
+  let unavailableCalls = 0;
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/preview_student_removal`, route => {
+    unavailableCalls++;
+    return route.fulfill({ status: 503, json: { message: 'PRIVATE synthetic server error' } });
+  });
+  await removeStudent(page);
   await expect(page.getByRole('dialog')).toContainText('تعذر التحقق من نتيجة الإزالة الآن. تحقق من الاتصال وحدّث البيانات ثم حاول مرة أخرى.');
   await expect(page.getByRole('dialog')).not.toContainText(/PRIVATE|503|student:|enrollment:/);
   await expect(page.locator('[data-management="confirm"], [data-management="sync-preview"]')).toHaveCount(0);
   expect(backend.calls).toHaveLength(0);
+  expect(unavailableCalls).toBe(1, 'the intended unavailable RPC must actually be reached');
 });
 
 test('pristine delete uses the real authoritative command, no cascade or false erasure promise, and survives reload', async ({ page }) => {
@@ -419,4 +443,163 @@ test('management/confirmation is accessible and calm at mobile/desktop widths in
     await expect(page.getByRole('button', { name: 'إدارة الطالب', exact: true })).toBeFocused();
   }
   expect(errors).toEqual([]);
+});
+
+test('Student Management polish keeps long Arabic context and both consequences calm and accessible', async ({ page }, testInfo) => {
+  const name = 'عبدالله محمد عبدالرحمن أحمد يوسف عبدالعزيز الطالب الاصطناعي';
+  await pg.query(`update rakeezx.students set name=$2 where id=$1`, [f.student, name]);
+  await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
+  await page.evaluate(async () => window.__syncModule.syncAll({ full: true }));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const consequence of ['delete', 'end']) {
+    if (consequence === 'end') {
+      await evidence(pg, f, 'notes');
+      await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
+      await page.evaluate(async () => window.__syncModule.syncAll({ full: true }));
+    }
+    for (const width of [320, 390, 412, 1280, 1440]) for (const theme of ['light', 'dark']) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
+      await profile(page, name);
+      const entry = page.locator('.student-profile-management');
+      expect((await entry.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      await expect(entry.locator('svg')).toHaveCount(1);
+      const person = page.locator('.student-management__person');
+      await expect(person.locator('strong')).toHaveText(name);
+      const titleBox = await person.locator('strong').boundingBox(), classBox = await person.locator('span').boundingBox();
+      expect(classBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
+      await expect(page.locator('.student-management__row')).toHaveCount(2);
+      if (consequence === 'delete') await page.screenshot({ path: testInfo.outputPath(`polish-choose-${width}-${theme}.png`), animations: 'disabled' });
+      await removeStudent(page);
+      await expect(page.getByRole('dialog')).toHaveAccessibleName(consequence === 'delete' ? 'حذف هذا الطالب؟' : 'إزالة الطالب من الفصل؟');
+      await expect(page.getByRole('button', { name: 'إلغاء', exact: true })).toBeFocused();
+      const sheet = page.getByRole('dialog');
+      expect((await sheet.boundingBox()).width).toBeLessThanOrEqual(520);
+      expect(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await expect(page.locator('[data-management="confirm"]')).toHaveClass(consequence === 'delete' ? /btn--danger/ : /btn--primary/);
+      expect((await new AxeBuilder({ page }).include('.sheet').analyze()).violations).toEqual([]);
+      await page.screenshot({ path: testInfo.outputPath(`polish-${consequence}-${width}-${theme}.png`), animations: 'disabled' });
+      await page.getByRole('button', { name: 'إلغاء', exact: true }).click();
+      await page.getByRole('button', { name: 'إغلاق', exact: true }).click();
+      await expect(entry).toBeFocused();
+    }
+  }
+  expect(backend.calls).toHaveLength(0); expect(errors).toEqual([]);
+});
+
+test('Student Management polish reviews precise sync/auth/Demo/blocked/unknown states in both themes', async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const state of ['auth', 'Demo', 'sync', 'blocked', 'unknown']) {
+    let studentId = f.student, teachingId = f.teaching, release;
+    if (state === 'auth') await page.evaluate(async () => (await import('/src/lib/cloud.js')).setMockAuth(null, null));
+    else await page.evaluate(async owner => (await import('/src/lib/cloud.js')).setMockAuth({ id: owner }, { access_token: 'student-ui-test' }), OWNER);
+    if (state === 'Demo') {
+      const demo = await page.evaluate(async () => {
+        const pkg = await (await import('/src/lib/demo.js')).createDemoPackage();
+        return { student: window.store.state.students.find(s => s.id.startsWith('demo:') && window.store.activeEnrollment(s.id)?.sectionId === pkg.section.id).id, teaching: pkg.teaching.id };
+      }); studentId = demo.student; teachingId = demo.teaching;
+    }
+    if (state === 'sync') {
+      const gate = new Promise(resolve => { release = resolve; });
+      await page.route(`${SUPABASE_URL}/rest/v1/rpc/apply_sync_v2_mutation`, async route => { await gate; await route.fallback(); });
+      studentId = await page.evaluate(async section => (await window.store.addStudent(section, 'طالب غير متزامن اصطناعي')).id, f.section);
+    }
+    if (state === 'blocked') await evidence(pg, f, 'archived');
+    if (state === 'unknown') await page.route(`${SUPABASE_URL}/rest/v1/rpc/preview_student_removal`, route => route.fulfill({ status: 503, json: { message: 'PRIVATE synthetic error' } }));
+    const expected = { auth: 'يلزم تسجيل الدخول إلى الحساب المعني', Demo: 'هذا طالب في فصل تجريبي محلي', sync: 'تحتاج بيانات الطالب إلى المزامنة أولًا', blocked: 'لا يمكن تنفيذ الإجراء على فصل مؤرشف', unknown: 'تعذر التحقق من نتيجة الإزالة الآن' }[state];
+    for (const width of [320, 390, 412, 1280, 1440]) for (const theme of ['light', 'dark']) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
+      await page.goto(`/#/student/${studentId}?teaching=${teachingId}`);
+      await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+      if (state === 'blocked' || state === 'unknown') await settleCloudSync(page);
+      await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
+      const sheet = page.getByRole('dialog', { name: 'إدارة الطالب', exact: true });
+      await expect(sheet).toContainText(expected);
+      await expect(sheet.locator('[data-management="confirm"]')).toHaveCount(0);
+      await expect(sheet.locator('[data-management="sync-preview"]')).toHaveCount(state === 'sync' ? 1 : 0);
+      await expect(sheet).not.toContainText(/PRIVATE|RPC|student:|enrollment:|student_not_synced|demo_local_only|preview_unavailable/);
+      expect(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      const overflow = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, elements: [...document.querySelectorAll('main *')].map(el => ({ tag: el.tagName, class: el.className, left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right })).filter(el => el.left < -1 || el.right > innerWidth + 1) }));
+      // Collect every responsive state without hiding an out-of-scope page overflow.
+      expect.soft(overflow.scrollWidth, JSON.stringify({ state, theme, ...overflow })).toBeLessThanOrEqual(width);
+      for (const button of await sheet.locator('button:visible').all()) await expect.poll(async () => (await button.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      expect((await new AxeBuilder({ page }).include('.sheet').analyze()).violations).toEqual([]);
+      await page.screenshot({ path: testInfo.outputPath(`polish-${state}-${width}-${theme}.png`), animations: 'disabled' });
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('button', { name: 'إدارة الطالب', exact: true })).toBeFocused();
+    }
+    if (release) {
+      release(); await page.unroute(`${SUPABASE_URL}/rest/v1/rpc/apply_sync_v2_mutation`);
+      await settleCloudSync(page);
+    }
+  }
+  expect(backend.calls).toHaveLength(0);
+  expect(errors.filter(error => !error.includes('503'))).toEqual([]);
+});
+
+test('Demo enrollment badge stays readable and contained with short and long Arabic names', async ({ page }, testInfo) => {
+  const ids = await page.evaluate(async () => {
+    const pkg = await (await import('/src/lib/demo.js')).createDemoPackage();
+    const student = window.store.state.students.find(s => s.id.startsWith('demo:') && window.store.activeEnrollment(s.id)?.sectionId === pkg.section.id);
+    return { student: student.id, teaching: pkg.teaching.id };
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const [kind, name] of [['short', 'أحمد محمد'], ['long', 'عبدالله محمد عبدالرحمن أحمد يوسف عبدالعزيز الطالب الاصطناعي']]) {
+    await page.evaluate(async ({ id, name }) => window.store.renameStudent(id, name), { id: ids.student, name });
+    for (const width of [320, 390, 412, 1280, 1440]) for (const theme of ['light', 'dark']) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
+      await page.goto(`/#/student/${ids.student}?teaching=${ids.teaching}`);
+      const header = page.locator('.student-profile-header'), badge = header.locator('.student-profile-header__meta > .badge');
+      await expect(header.locator('.student-profile-header__name')).toHaveText(name);
+      await expect(badge).toBeVisible();
+      await expect(badge).toContainText('الانتساب الحالي');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(await badge.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await badge.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(12);
+      const bounds = await badge.boundingBox();
+      expect(bounds.x).toBeGreaterThanOrEqual(0); expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      expect((await new AxeBuilder({ page }).include('.student-profile-header').analyze()).violations).toEqual([]);
+      await page.screenshot({ path: testInfo.outputPath(`demo-badge-${kind}-${width}-${theme}.png`), animations: 'disabled' });
+    }
+  }
+  expect(backend.calls).toHaveLength(0); expect(previews).toHaveLength(0); expect(errors).toEqual([]);
+});
+
+test('Student Management Arabic name and class share the RTL right start edge', async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const [kind, name] of [['short', 'تجربة 1'], ['long', 'عبدالله محمد عبدالرحمن أحمد يوسف عبدالعزيز الطالب الاصطناعي']]) {
+    await pg.query(`update rakeezx.students set name=$2 where id=$1`, [f.student, name]);
+    await page.waitForFunction(() => !window.__syncModule.getSyncOperationalSummarySnapshot().automaticSyncActive);
+    await page.evaluate(async () => window.__syncModule.syncAll({ full: true }));
+    for (const width of [320, 390, 412, 1280, 1440]) for (const theme of ['light', 'dark']) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
+      const sheet = await profile(page, name), person = sheet.locator('.student-management__person');
+      await expect(person.locator('strong')).toHaveText(name);
+      const context = await person.evaluate(el => {
+        const metrics = child => {
+          const range = document.createRange(); range.selectNodeContents(child);
+          const styles = getComputedStyle(child), box = child.getBoundingClientRect();
+          return { direction: styles.direction, align: styles.textAlign, top: box.top, bottom: box.bottom, right: Math.max(...[...range.getClientRects()].map(rect => rect.right)) };
+        };
+        return { name: metrics(el.querySelector('strong')), section: metrics(el.querySelector('span')), right: el.getBoundingClientRect().right, contained: el.scrollWidth <= el.clientWidth };
+      });
+      for (const line of [context.name, context.section]) {
+        expect(line.direction).toBe('rtl'); expect(line.align).toBe('right');
+        expect(Math.abs(line.right - context.right)).toBeLessThan(1);
+      }
+      expect(context.section.top).toBeGreaterThanOrEqual(context.name.bottom);
+      expect(context.contained).toBe(true);
+      expect(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect((await new AxeBuilder({ page }).include('.sheet').analyze()).violations).toEqual([]);
+      await page.screenshot({ path: testInfo.outputPath(`context-rtl-${kind}-${width}-${theme}.png`), animations: 'disabled' });
+      await sheet.getByRole('button', { name: 'إغلاق', exact: true }).click();
+      await expect(page.getByRole('button', { name: 'إدارة الطالب', exact: true })).toBeFocused();
+    }
+  }
+  expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0); expect(errors).toEqual([]);
 });

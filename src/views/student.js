@@ -149,7 +149,7 @@ export default {
             ${currentEnrollment?.rollNo != null ? html`<span class="student-profile-header__roll tabular">رقم الكشف: ${currentEnrollment.rollNo}</span>` : ''}
           </div>
         </div>
-        <button class="btn btn--quiet student-profile-management" data-act="manage-student">إدارة الطالب</button>
+        <button class="btn btn--ghost student-profile-management" data-act="manage-student">${icon('settings')} إدارة الطالب</button>
       </div>
 
       ${s.status === 'withdrawn'
