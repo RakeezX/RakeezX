@@ -112,6 +112,37 @@ async function seedProductionIndexedDB(page, prefix) {
   }, { prefix, dbName: DB_NAME, dbVersion: DB_VERSION });
 }
 
+const OFFLINE_ROUTE_MATRIX = [
+  ['#/', 'الرئيسية'],
+  ['#/classes', 'الفصول'],
+  ['#/teaching/offline-graph-teaching', 'فصل'],
+  ['#/teaching/offline-graph-teaching/class-rules', 'هدف وميثاق الصف'],
+  ['#/teaching/offline-graph-teaching/students', 'الطلاب'],
+  ['#/teaching/offline-graph-teaching/attendance', 'الحضور'],
+  ['#/teaching/offline-graph-teaching/quicklog', 'الرصد السريع'],
+  ['#/teaching/offline-graph-teaching/grades', 'كشف الدرجات'],
+  ['#/teaching/offline-graph-teaching/items', 'توزيع الدرجات'],
+  ['#/teaching/offline-graph-teaching/picker', 'القرعة'],
+  ['#/teaching/offline-graph-teaching/groups', 'المجموعات'],
+  ['#/teaching/offline-graph-teaching/board', 'لوحة التميز'],
+  ['#/teaching/offline-graph-teaching/sessions', 'الحصص'],
+  ['#/teaching/offline-graph-teaching/reports', 'التقارير'],
+  ['#/student/offline-graph-student', 'الطالب'],
+  ['#/schedule', 'الجدول'],
+  ['#/schedule/times', 'أوقات الحصص'],
+  ['#/curriculum', 'المنهج'],
+  ['#/reports', 'التقارير'],
+  ['#/reports/execution', 'تقارير التنفيذ'],
+  ['#/archive', 'الأرشيف'],
+  ['#/archive/former-students', 'الطلاب السابقون'],
+  ['#/archive/year/offline-year/term/offline-term/execution', 'تقارير التنفيذ'],
+  ['#/archive/year/offline-year/term/offline-term', 'السجل التاريخي'],
+  ['#/calendar', 'التقويم الدراسي'],
+  ['#/settings', 'الإعدادات'],
+  ['#/settings/backup', 'البيانات والنسخ الاحتياطي'],
+  ['#/support', 'الدعم'],
+];
+
 test('same-context tabs converge section, timetable, attendance, and scoring changes without duplicates', async ({ context }) => {
   test.setTimeout(90_000);
   const pageA = await context.newPage();
@@ -265,6 +296,88 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
   } finally {
     await context.close();
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test('one online load precaches every lazy route and supports offline reload and reopen', async ({ browser }) => {
+  test.setTimeout(150_000);
+  const { server, url } = await startStaticServer();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const errors = observeErrors(page);
+  const badResponses = [];
+  page.on('response', (response) => {
+    if (response.status() >= 400) badResponses.push(`${response.status()} ${response.url()}`);
+  });
+
+  try {
+    // This is the only route visited online. Every lazy route below must come
+    // from the installed app shell after the origin server is unavailable.
+    await page.goto(`${url}/#/`, { waitUntil: 'networkidle' });
+    await page.waitForFunction(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      return registration?.active?.state === 'activated';
+    }, { timeout: 15_000 });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), { timeout: 15_000 });
+
+    const cacheAudit = await page.evaluate(async () => {
+      const key = (await caches.keys()).find((candidate) => candidate === 'rakeezx-v17');
+      const cache = key ? await caches.open(key) : null;
+      return {
+        key,
+        paths: cache ? (await cache.keys()).map((request) => new URL(request.url).pathname) : [],
+      };
+    });
+    expect(cacheAudit.key).toBe('rakeezx-v17');
+    expect(cacheAudit.paths).toEqual(expect.arrayContaining([
+      '/index.html',
+      '/src/generated/build-meta.generated.js',
+      '/src/lib/backup-v2.js',
+      '/src/lib/build-meta.js',
+      '/src/lib/cloud-recovery-ui.js',
+      '/src/lib/student-lifecycle-ui.js',
+      '/src/lib/support.js',
+      '/src/views/former-students.js',
+      '/src/views/settings.js',
+      '/src/views/support.js',
+    ]));
+
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+
+    for (const [hash, title] of OFFLINE_ROUTE_MATRIX) {
+      await page.evaluate((nextHash) => { location.hash = nextHash; }, hash);
+      await expect(page).toHaveURL(`${url}/${hash}`);
+      await expect(page.locator('.topbar__title')).toContainText(title);
+      await expect(page.locator('#toast')).not.toContainText('تعذّر فتح هذه الشاشة');
+    }
+
+    await page.evaluate(() => { location.hash = '#/'; });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
+
+    await page.evaluate(() => { location.hash = '#/settings'; });
+    await expect(page.locator('.topbar__title')).toContainText('الإعدادات');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.topbar__title')).toContainText('الإعدادات');
+    await page.evaluate(() => { location.hash = '#/schedule'; });
+    await expect(page.locator('.topbar__title')).toContainText('الجدول');
+
+    const reopened = await context.newPage();
+    const reopenedErrors = observeErrors(reopened);
+    await reopened.goto(`${url}/#/support`, { waitUntil: 'domcontentloaded' });
+    await expect(reopened.locator('.topbar__title')).toContainText('الدعم');
+    await reopened.evaluate(() => { location.hash = '#/'; });
+    await expect(reopened.locator('.topbar__title')).toContainText('الرئيسية');
+
+    expect(badResponses).toEqual([]);
+    expect(errors).toEqual([]);
+    expect(reopenedErrors).toEqual([]);
+  } finally {
+    await context.close();
+    if (server.listening) {
+      await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    }
   }
 });
 

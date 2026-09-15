@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v16';
+const VERSION = 'rakeezx-v17';
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
@@ -43,12 +43,20 @@ const SHELL = [
   './src/lib/cloud.js',
   './src/lib/sync.js',
   './src/lib/sync-v2.js',
+  './src/lib/sync-operational-ui.js',
   './src/lib/avatar.js',
+  './src/lib/backup-v2.js',
+  './src/lib/build-meta.js',
+  './src/lib/cloud-recovery-ui.js',
   './src/lib/report-print.js',
   './src/lib/schedule-export.js',
+  './src/lib/session-auto.js',
   './src/lib/session-editor-ui.js',
   './src/lib/session-delete-ui.js',
+  './src/lib/student-lifecycle.js',
+  './src/lib/student-lifecycle-ui.js',
   './src/lib/pristine-teaching.js',
+  './src/lib/support.js',
   './src/lib/demo.js',
   './src/lib/calendar-presets.js',
   './src/lib/subject-catalog.js',
@@ -73,6 +81,7 @@ const SHELL = [
   './src/views/execution-report.js',
   './src/views/archive.js',
   './src/views/archive-detail.js',
+  './src/views/former-students.js',
   './src/views/student.js',
   './src/views/schedule.js',
   './src/views/times.js',
@@ -80,6 +89,9 @@ const SHELL = [
   './src/views/calendar.js',
   './src/views/settings.js',
   './src/views/backup.js',
+  './src/views/support.js',
+
+  './src/generated/build-meta.generated.js',
 ];
 
 self.addEventListener('install', (event) => {
