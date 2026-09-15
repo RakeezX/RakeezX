@@ -186,7 +186,7 @@ export async function request(path, options = {}, isAuth = false) {
   }
 }
 
-export async function init() {
+export async function init({ waitForRefresh = true } = {}) {
   const stored = localStorage.getItem(AUTH_STORAGE_KEY);
   if (stored) {
     try {
@@ -194,10 +194,10 @@ export async function init() {
       if (parsed?.access_token) {
         saveSession(parsed);
         if (tokenNeedsRefresh(parsed)) {
-          try { await refreshSession(); }
-          catch (error) {
+          const refresh = refreshSession().catch((error) => {
             if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');
-          }
+          });
+          if (waitForRefresh) await refresh;
         }
       }
     } catch (e) {

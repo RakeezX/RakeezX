@@ -67,6 +67,7 @@ function assertCloudRestoreWritable() {
 
 const DEFAULT_PROFILE = makeProfile();
 const DEFAULT_DEVICE = makeDevice({ schemaVersion: SCHEMA_VERSION });
+export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme';
 
 /* ---------- الاشتراك ---------- */
 
@@ -1049,6 +1050,12 @@ export function applyTheme() {
   const root = document.documentElement;
   if (t === 'auto') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', t);
+
+  // IndexedDB remains authoritative. This same-origin mirror exists only so
+  // index.html can select the correct palette before asynchronous DB startup.
+  if (t === 'light' || t === 'dark' || t === 'auto') {
+    try { globalThis.localStorage?.setItem(THEME_BOOT_STORAGE_KEY, t); } catch {}
+  }
 
   const dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0f1216' : '#0f766e');

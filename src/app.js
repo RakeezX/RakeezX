@@ -484,7 +484,9 @@ async function boot() {
 
   try {
     await store.init();
-    await cloud.init();
+    // Restore the cached identity immediately, but never make the local shell
+    // depend on a refresh request that Android may suspend while backgrounded.
+    await cloud.init({ waitForRefresh: false });
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
       syncModule = await import('./lib/sync.js');

@@ -14,6 +14,11 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
   test.setTimeout(60_000);
   const runtimeErrors = [];
   page.on('pageerror', error => runtimeErrors.push(error.message));
+  await page.route('**/auth/v1/token?grant_type=refresh_token', (route) => route.fulfill({
+    status: 400,
+    contentType: 'application/json',
+    body: JSON.stringify({ error_description: 'Synthetic expired session' }),
+  }));
 
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule);
@@ -68,7 +73,7 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
 
   await page.locator('.teacher-mini-hub-trigger').click();
   const sheet = page.locator('.sheet').last();
-  const badge = sheet.locator('[data-sync-badge]');
+  const badge = sheet.locator('.mini-hub-sync__state .badge');
   await expect(badge).toHaveCount(1);
   await expect(badge).toHaveText('متزامن');
   await expect(badge).toHaveClass(/badge--brand/);
@@ -78,15 +83,15 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
   });
   await waitForSyncState(page, 'pending');
   await expect(badge).toHaveText('تغييرات بانتظار المزامنة');
-  await expect(badge).toHaveClass(/badge--warn/);
+  await expect(badge).toHaveClass(/badge--neutral/);
 
   await page.evaluate(() => {
     window.__syncUiTest.setMode('hold');
     window.__syncUiRun = window.__syncModule.syncAll({ full: false });
   });
   await waitForSyncState(page, 'syncing');
-  await expect(badge).toHaveText('جارٍ المزامنة...');
-  await expect(badge).toHaveClass(/badge--brand/);
+  await expect(badge).toHaveText('جارٍ مزامنة التغييرات');
+  await expect(badge).toHaveClass(/badge--neutral/);
   await page.waitForFunction(() => window.__syncUiTest.holding());
   await page.evaluate(async () => {
     window.__syncUiTest.setMode('success');
@@ -125,9 +130,16 @@ test('Teacher Mini Hub reconciles live V2 sync state without dismissal', async (
 
   await sheet.locator('[data-sheet-close]').first().click();
   await expectSingleVisibleHubTrigger(page);
-  await page.evaluate(() => {
-    window.__syncModule.state.status = 'auth_required';
+  await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    const user = { id: 'sync-ui-owner', email: 'sync-ui@example.test' };
+    cloud.setMockAuth(user, {
+      access_token: 'expired-sync-ui-token', refresh_token: 'invalid-sync-ui-refresh',
+      expires_at: 1, user,
+    });
+    await cloud.request('/students?select=*').catch(() => {});
   });
+  await waitForSyncState(page, 'auth_required');
   await page.locator('.teacher-mini-hub-trigger').click();
   await expect(badge).toHaveText('يلزم تسجيل الدخول');
   await expect(badge).toHaveClass(/badge--warn/);
