@@ -4,6 +4,7 @@ import { stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DB_NAME, DB_VERSION } from '../src/lib/db.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MIME = {
@@ -39,8 +40,8 @@ async function startStaticServer() {
 }
 
 async function hasIndexedRecord(page, store, id) {
-  return page.evaluate(({ store, id }) => new Promise((resolve, reject) => {
-    const request = indexedDB.open('rakeezx', 2);
+  return page.evaluate(({ store, id, dbName, dbVersion }) => new Promise((resolve, reject) => {
+    const request = indexedDB.open(dbName, dbVersion);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
       const db = request.result;
@@ -49,7 +50,7 @@ async function hasIndexedRecord(page, store, id) {
       get.onsuccess = () => { resolve(!!get.result); db.close(); };
       get.onerror = () => reject(get.error);
     };
-  }), { store, id });
+  }), { store, id, dbName: DB_NAME, dbVersion: DB_VERSION });
 }
 
 async function seed(page, prefix) {
@@ -79,7 +80,7 @@ const countsFor = (prefix) => ({
 });
 
 async function seedProductionIndexedDB(page, prefix) {
-  await page.evaluate(async ({ prefix }) => {
+  await page.evaluate(async ({ prefix, dbName, dbVersion }) => {
     const date = new Date().toISOString().slice(0, 10);
     const stamp = Date.now();
     const records = {
@@ -94,7 +95,7 @@ async function seedProductionIndexedDB(page, prefix) {
       sessions: [{ id: `${prefix}-session`, teachingId: `${prefix}-teaching`, date, weekday: new Date().getDay(), period: 1, status: 'held', updatedAt: stamp }],
     };
     const db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('rakeezx', 2);
+      const request = indexedDB.open(dbName, dbVersion);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -108,7 +109,7 @@ async function seedProductionIndexedDB(page, prefix) {
       tx.onabort = () => reject(tx.error);
     });
     db.close();
-  }, { prefix });
+  }, { prefix, dbName: DB_NAME, dbVersion: DB_VERSION });
 }
 
 test('same-context tabs converge section, timetable, attendance, and scoring changes without duplicates', async ({ context }) => {
@@ -134,7 +135,8 @@ test('same-context tabs converge section, timetable, attendance, and scoring cha
   await pageA.fill('input[name="label"]', 'Z');
   await pageA.click('button[form="edit-sec-form"]');
   await expect(pageA.locator('#toast')).toContainText('تم تعديل');
-  await expect(pageB.locator('.list')).toContainText('الخامس الابتدائي / Z');
+  await expect(pageB.locator('.report-class-row[href="#/teaching/local-teaching/reports"] .row__title'))
+    .toContainText('الخامس الابتدائي / Z');
 
   // Add and then move the same recurring slot through Tab A's schedule UI.
   await pageA.goto('/#/schedule');
@@ -151,7 +153,8 @@ test('same-context tabs converge section, timetable, attendance, and scoring cha
   await pageA.selectOption('select[name="period"]', '4');
   await pageA.click('button[form="slot-form"]');
   await expect.poll(() => pageB.evaluate((id) => window.store.state.slots.find((record) => record.id === id), slotId)).toMatchObject({ id: slotId, weekday: 1, period: 4 });
-  await expect(pageB.locator('.slot')).toContainText('الحصة الرابعة');
+  const movedSlot = pageB.locator('.slot').filter({ has: pageB.locator(`[data-act="edit"][data-id="${slotId}"]`) });
+  await expect(movedSlot.locator('.slot__period-num')).toHaveText('4');
 
   // Attendance and scoring controls write in Tab A and Tab B re-renders the propagated records.
   await pageA.goto('/#/teaching/local-teaching/attendance?session=local-session');
@@ -183,7 +186,8 @@ test('same-context tabs converge section, timetable, attendance, and scoring cha
 
   await pageB.close();
   await pageA.goto('/#/reports');
-  await expect(pageA.locator('.list')).toContainText('الخامس الابتدائي / Z');
+  await expect(pageA.locator('.report-class-row[href="#/teaching/local-teaching/reports"] .row__title'))
+    .toContainText('الخامس الابتدائي / Z');
   expect(errorsA).toEqual([]);
   expect(errorsB).toEqual([]);
 });
@@ -207,25 +211,41 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
       const cache = await caches.open(keys.find((key) => key.startsWith('rakeezx-')));
       return (await cache.keys()).map((request) => new URL(request.url).pathname);
     });
-    expect(cacheEntries).toEqual(expect.arrayContaining(['/index.html', '/src/app.js', '/src/views/attendance.js', '/src/views/grades.js']));
-    expect(await page.evaluate(() => [...document.querySelectorAll('link[href], script[src]')].every((node) => new URL(node.href || node.src, location.href).origin === location.origin))).toBe(true);
+    expect(cacheEntries).toEqual(expect.arrayContaining([
+      '/index.html',
+      '/src/app.js',
+      '/src/views/attendance.js',
+      '/src/views/grades.js',
+      '/src/lib/schedule-export.js',
+      '/src/lib/session-editor-ui.js',
+      '/src/lib/session-delete-ui.js',
+    ]));
+    const dependencyOrigins = await page.evaluate(() => [
+      ...document.querySelectorAll('link[rel="stylesheet"], link[rel="manifest"], link[rel="icon"], link[rel="apple-touch-icon"], script[src]'),
+    ].map((node) => new URL(node.href || node.src, location.href).origin));
+    expect(dependencyOrigins.length).toBeGreaterThan(0);
+    expect(dependencyOrigins.every((origin) => origin === new URL(page.url()).origin)).toBe(true);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://rakeezx.com/');
 
     await seedProductionIndexedDB(page, 'offline');
     await page.reload({ waitUntil: 'networkidle' });
     await context.setOffline(true);
-    for (const route of [
-      '/#/classes', '/#/schedule', '/#/teaching/offline-teaching/attendance?session=offline-session', '/#/teaching/offline-teaching/grades',
+    for (const [route, title] of [
+      ['/#/classes', 'الفصول'],
+      ['/#/schedule', 'الجدول'],
+      ['/#/teaching/offline-teaching/attendance?session=offline-session', 'الحضور'],
+      ['/#/teaching/offline-teaching/grades', 'كشف الدرجات'],
     ]) {
       await page.goto(`${url}${route}`);
-      await expect(page.locator('.topbar__title')).toBeVisible();
+      await expect(page.locator('.topbar__title')).toContainText(title);
       expect(await hasIndexedRecord(page, 'students', 'offline-student')).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     }
     await page.locator('[data-act="mode"][data-mode="table"]').click();
     await page.locator('input[data-fk="t-offline-student-offline-item"]').fill('7');
     await page.locator('input[data-fk="t-offline-student-offline-item"]').press('Tab');
-    await expect.poll(() => page.evaluate(() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('rakeezx', 2);
+    await expect.poll(() => page.evaluate(({ dbName, dbVersion }) => new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, dbVersion);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         const db = request.result;
@@ -233,7 +253,7 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
         get.onsuccess = () => { resolve(get.result?.value ?? null); db.close(); };
         get.onerror = () => reject(get.error);
       };
-    }))).toBe(7);
+    }), { dbName: DB_NAME, dbVersion: DB_VERSION })).toBe(7);
     await page.reload();
     await page.locator('[data-act="mode"][data-mode="table"]').click();
     await expect(page.locator('input[data-fk="t-offline-student-offline-item"]')).toHaveValue('7');
@@ -241,6 +261,48 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
     await context.setOffline(false);
     await page.reload({ waitUntil: 'networkidle' });
     await expect(page.locator('.topbar__title')).toBeVisible();
+    expect(errors).toEqual([]);
+  } finally {
+    await context.close();
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test('visited Schedule and Attendance remain available across offline reload and navigation', async ({ browser }) => {
+  test.setTimeout(90_000);
+  const { server, url } = await startStaticServer();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const errors = observeErrors(page);
+  try {
+    await page.goto(`${url}/#/classes`, { waitUntil: 'networkidle' });
+    await page.waitForFunction(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      return registration?.active?.state === 'activated';
+    }, { timeout: 15_000 });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), { timeout: 15_000 });
+    await seedProductionIndexedDB(page, 'warm-offline');
+    await page.reload({ waitUntil: 'networkidle' });
+
+    await page.goto(`${url}/#/schedule`);
+    await expect(page.locator('.topbar__title')).toContainText('الجدول');
+    await expect(page.locator('.schedule-head__title')).toBeVisible();
+    await page.goto(`${url}/#/teaching/warm-offline-teaching/attendance?session=warm-offline-session`);
+    await expect(page.locator('.topbar__title')).toContainText('الحضور');
+    await expect(page.locator('.attendance-session-summary')).toBeVisible();
+
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.locator('.topbar__title')).toContainText('الحضور');
+    await expect(page.locator('.attendance-session-summary')).toBeVisible();
+    await page.goto(`${url}/#/schedule`);
+    await expect(page.locator('.topbar__title')).toContainText('الجدول');
+    await expect(page.locator('.schedule-head__title')).toBeVisible();
+    await page.reload();
+    await expect(page.locator('.schedule-head__title')).toBeVisible();
+    await page.goto(`${url}/#/teaching/warm-offline-teaching/attendance?session=warm-offline-session`);
+    await expect(page.locator('.attendance-session-summary')).toBeVisible();
     expect(errors).toEqual([]);
   } finally {
     await context.close();

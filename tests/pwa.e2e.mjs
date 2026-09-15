@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+
+const workerSource = await readFile(new URL('../sw.js', import.meta.url), 'utf8');
+const currentCache = workerSource.match(/const VERSION = '([^']+)'/)?.[1];
+if (!currentCache) throw new Error('Service Worker cache version is missing.');
 
 test.describe('PWA and Service Worker', () => {
   // Ensure we can see console errors
@@ -32,13 +37,13 @@ test.describe('PWA and Service Worker', () => {
     let cacheKeys = [];
     await expect.poll(async () => {
       cacheKeys = await page.evaluate(async () => await caches.keys());
-      return cacheKeys.includes('rakeezx-v5')
-        && !cacheKeys.some((key) => key.startsWith('rakeezx-') && key !== 'rakeezx-v5');
+      return cacheKeys.includes(currentCache)
+        && !cacheKeys.some((key) => key.startsWith('rakeezx-') && key !== currentCache);
     }, { timeout: 15_000 }).toBe(true);
     console.log("Caches found:", cacheKeys);
 
     // Check no unexpected caches after the service-worker lifecycle settles.
-    const oldCaches = cacheKeys.filter(k => k.startsWith('rakeezx-') && k !== 'rakeezx-v5');
+    const oldCaches = cacheKeys.filter(k => k.startsWith('rakeezx-') && k !== currentCache);
     expect(oldCaches.length).toBe(0);
     // B. CONTROLLED RELOAD
     await page.reload();
