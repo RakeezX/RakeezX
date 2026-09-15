@@ -6614,11 +6614,6 @@
 }
 @media screen and (max-width: 899px) {
   .topbar--home { padding-block: 8px; padding-block-start: calc(8px + env(safe-area-inset-top)); }
-  .topbar--home .brand-lockup__icon--app { inline-size: 54px; block-size: 54px; }
-  .topbar--home .brand-lockup { gap: 7px; }
-  .topbar--home .brand-lockup__name strong { font-size: 19px; }
-  .topbar--home .brand-lockup__name > span { font-size: 17px; }
-  .topbar--home .brand-lockup__signature { font-size: 7px; letter-spacing: 1px; }
   .topbar--home .topbar__sub { font-size: 10.5px; margin-top: 2px; }
   .topbar--home .topbar__teacher-btn { position: relative; gap: 5px; padding: 6px 8px; background: var(--brand-soft); border-color: var(--brand-border); color: var(--brand-text); }
   .topbar__teacher-label { max-inline-size: 36px; font-size: 11px; line-height: 1.3; text-align: start; }

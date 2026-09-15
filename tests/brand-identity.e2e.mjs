@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { A1_RASTERS, A1_VECTORS } from './helpers/a1-production-assets.mjs';
 
 test.use({ baseURL: process.env.RAKEEZX_E2E_BASE_URL || 'http://localhost:5174' });
 test.setTimeout(120_000);
-const widths = [320, 390, 412, 1280, 1440];
+const widths = [320, 360, 384, 390, 412, 1280, 1440];
 
 test('brand identity: shell, Home, Teacher Center, login and install in both themes', async ({ page }) => {
   const errors = [];
@@ -20,7 +22,11 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     await page.goto('/#/');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await expect(page).toHaveTitle('رَكيز المعلم');
-    await expect(page.locator(width < 900 ? '.mobile-brand' : '.sidebar__brand')).toContainText('رَكيز');
+    const header = page.locator(width < 900 ? '.mobile-brand img:visible' : '.sidebar__brand img:visible');
+    await expect(page.locator(width < 900 ? '.mobile-brand' : '.sidebar__brand').getByRole('img', { name: 'رَكيز المعلم', exact: true })).toBeVisible();
+    await expect(header).toHaveAttribute('src', new RegExp(`header-${theme}-${width < 900 ? 'compact' : 'standard'}\\.svg$`));
+    expect((await header.boundingBox()).width).toBeCloseTo(width < 900 ? Math.min(220, Math.max(199, width * .225 + 127)) : 245, 1);
+    expect(await header.evaluate(img => { const box = img.getBoundingClientRect(); return box.left >= 0 && box.right <= innerWidth && Math.abs(box.width / box.height - img.naturalWidth / img.naturalHeight) < .01; })).toBe(true);
     await expect(page.locator('.home-pwa-prompt')).toContainText('تطبيق رَكيز المعلم');
     await expect(page.locator('.brand-lockup:visible')).toHaveCount(1);
     await expect(page.locator('.hero .brand-lockup, .hero img')).toHaveCount(0);
@@ -30,13 +36,14 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     expect(await page.locator('.hero').evaluate(node => node.getBoundingClientRect().height)).toBeLessThan(100);
     for (const selector of ['.home-pwa-brand-icon']) {
       await expect(page.locator(selector)).toHaveJSProperty('naturalWidth', 192);
-      expect(await page.locator(selector).evaluate(img => img.getBoundingClientRect().width)).toBeGreaterThanOrEqual(56);
+      expect(await page.locator(selector).evaluate(img => img.getBoundingClientRect().width)).toBe(52);
+      await expect(page.locator(selector)).toHaveAttribute('src', /icon-192\.png$/);
+      expect(await page.locator('.home-pwa-brand-mark').evaluate(node => getComputedStyle(node).borderRadius)).toBe('12px');
     }
     if (width >= 900) {
-      await expect(page.locator('.sidebar__brand img')).toHaveJSProperty('naturalWidth', 192);
-      expect((await page.locator('.sidebar__brand img').boundingBox()).width).toBe(64);
+      await expect(header).toHaveJSProperty('naturalWidth', 345);
     } else {
-      expect((await page.locator('.mobile-brand img').boundingBox()).width).toBe(54);
+      await expect(header).toHaveJSProperty('naturalWidth', 295);
     }
     const heroAudit = await new AxeBuilder({ page }).include('.hero').analyze();
     expect(heroAudit.violations).toEqual([]);
@@ -46,8 +53,8 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     await expect(page.locator('.mini-hub-pwa')).toContainText('تطبيق رَكيز المعلم');
     await page.screenshot({ path: `test-results/brand-implementation/center-${width}-${theme}.png` });
     await page.getByRole('button', { name: 'تسجيل الدخول', exact: true }).click();
-    await expect(page.locator('.auth-brand')).toContainText('رَكيز');
-    await expect(page.locator('.auth-brand img')).toHaveJSProperty('naturalWidth', 192);
+    await expect(page.locator('.auth-brand').getByRole('img', { name: 'رَكيز المعلم', exact: true })).toBeVisible();
+    await expect(page.locator('.auth-brand img:visible')).toHaveAttribute('src', new RegExp(`header-${theme}-standard\\.svg$`));
     await page.getByRole('textbox', { name: 'البريد الإلكتروني' }).focus();
     await page.keyboard.press('Tab');
     await expect(page.locator('input[name="password"]')).toBeFocused();
@@ -59,8 +66,10 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     await page.getByRole('button', { name: 'إغلاق', exact: true }).last().click();
     await page.goto('/#/settings');
     await expect(page.locator('.settings-section--about')).toContainText('مساحة العمل الرقمية للمعلم');
-    await expect(page.locator('.settings-section--about img')).toHaveJSProperty('naturalWidth', 192);
+    await expect(page.locator('.settings-section--about img:visible')).toHaveJSProperty('naturalWidth', 345);
+    await expect(page.locator('.settings-section--about img:visible')).toHaveAttribute('src', new RegExp(`header-${theme}-standard\\.svg$`));
     await page.locator('.settings-section--about').scrollIntoViewIfNeeded();
+    expect(await page.locator('.settings-section--about img:visible').evaluate(img => { const box = img.getBoundingClientRect(), card = img.closest('.card').getBoundingClientRect(); return box.left >= card.left && box.right <= card.right && box.left >= 0 && box.right <= innerWidth && Math.abs(box.width / box.height - img.naturalWidth / img.naturalHeight) < .01; })).toBe(true);
     await page.screenshot({ path: `test-results/brand-implementation/about-${width}-${theme}.png` });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.goto('/#/');
@@ -87,7 +96,14 @@ test('manifest and brand artwork keep internal identity and required icon sizes'
   ]);
   await page.goto('/');
   await expect(page.locator('link[rel="icon"]')).toHaveCount(1);
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'assets/favicon-32.png?v=15');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'assets/favicon-32.png?v=19');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', 'assets/icon-180.png');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('sizes', '180x180');
+  for (const [file,,,sha256] of [...A1_RASTERS, ...A1_VECTORS]) {
+    const response = await request.get(`/assets/${file}`);
+    expect(response.ok()).toBe(true);
+    expect(createHash('sha256').update(await response.body()).digest('hex')).toBe(sha256);
+  }
   for (const size of [1024, 512, 256, 192, 180, 167, 152, 144, 120, 96, 87, 80, 76, 72, 64, 60, 58, 48, 40, 32, 29, 20]) {
     expect(await page.evaluate(async ({ file }) => {
       const image = new Image(); image.src = `/assets/${file}`; await image.decode(); return [image.naturalWidth, image.naturalHeight];
@@ -102,12 +118,12 @@ test('manifest and brand artwork keep internal identity and required icon sizes'
   expect((await request.get('/assets/icon.svg')).headers()['content-type']).not.toMatch(/^image\//);
 });
 
-test('locked 32px master favicon and full icon resolve without a substitute derivative', async ({ page, request }) => {
+test('approved A1 favicon and A1-L2 app icon resolve as their distinct approved outputs', async ({ page, request }) => {
   await page.goto('/');
   const links = await page.locator('link[rel="icon"]').evaluateAll(nodes => nodes.map(node => node.href));
   for (const url of links) expect((await request.get(url)).ok()).toBe(true);
   const root = new URL(page.url()).origin;
-  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونة المعتمدة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2><div class="sample"><img src="${root}/assets/favicon-32.png?v=15" width="32" height="32" alt="أيقونة رَكيز المعلم المعتمدة"><span>32px</span></div><img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
+  await page.setContent(`<html lang="ar" dir="rtl"><head><title>فحص الأيقونة المعتمدة</title><style>body{margin:0;font:16px Segoe UI,sans-serif}section{padding:32px;display:flex;align-items:center;gap:32px}section:nth-child(2){background:#101319;color:#fff}.sample{display:grid;gap:16px;justify-items:center}</style></head><body>${['فاتح','داكن'].map(theme=>`<section><h2>${theme}</h2><div class="sample"><img src="${root}/assets/favicon-32.png?v=19" width="32" height="32" alt="أيقونة رَكيز المعلم المعتمدة"><span>32px</span></div><img src="${root}/assets/icon-192.png" width="96" height="96" alt="رَكيز المعلم"></section>`).join('')}</body></html>`);
   await page.setViewportSize({ width: 820, height: 400 });
   await page.locator('img').evaluateAll(nodes => Promise.all(nodes.map(node => node.decode())));
   await page.screenshot({ path: 'test-results/brand-implementation/tiny-native-size.png' });

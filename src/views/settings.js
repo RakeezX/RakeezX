@@ -437,7 +437,7 @@ export default {
       <div class="section settings-section settings-section--about">
         <div class="section__head"><div class="section__title">عن رَكيز المعلم</div></div>
         <div class="card card--pad stack stack-2">
-          ${brandLockup({ signature: true, appIcon: true, prominent: true })}
+          ${brandLockup({ prominent: true })}
           <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
           <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
           <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>

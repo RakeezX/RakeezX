@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { A1_RASTERS, A1_VECTORS } from './helpers/a1-production-assets.mjs';
 import {
   FAVICON_CROP_INSET,
   MASTER_NAME,
@@ -26,26 +28,58 @@ test('authoritative master is the locked 1254px RGB PNG', async () => {
   assert.deepEqual(pngInfo(master), { width: MASTER_SIZE, height: MASTER_SIZE, colorType: 2 });
 });
 
-test('all platform exports are square opaque RGB PNGs at their declared sizes', async () => {
+test('platform matrix remains square; approved A1-L2 active exports preserve their exact formats', async () => {
   const sizes = [...new Set(Object.values(PLATFORM_ICON_SIZES).flat())];
   assert.deepEqual(PLATFORM_ICON_SIZES.web, [512, 256, 192, 180, 96, 64, 48, 32]);
   assert.deepEqual(PLATFORM_ICON_SIZES.android, [512, 192, 144, 96, 72, 48]);
   assert.deepEqual(PLATFORM_ICON_SIZES.ios, [1024, 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29, 20]);
   for (const size of sizes) {
     const output = await readFile(assetFile(`icon-${size}.png`));
-    assert.deepEqual(pngInfo(output), { width: size, height: size, colorType: 2 }, `icon-${size}.png`);
+    assert.deepEqual(pngInfo(output), { width: size, height: size, colorType: [192,512].includes(size) ? 6 : 2 }, `icon-${size}.png`);
   }
 });
 
-test('favicon uses only the authorized equal outer-canvas crop and maskable remains untouched', async () => {
+test('approved A1 outputs retain exact bytes, PNG dimensions and encodings without regeneration', async () => {
+  for (const [file,size,colorType,sha256] of A1_RASTERS) {
+    const bytes = await readFile(assetFile(file));
+    assert.equal(hash(bytes),sha256,file);
+    assert.equal(bytes.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+    assert.equal(bytes[24],8);
+    assert.deepEqual(pngInfo(bytes),{width:size,height:size,colorType});
+  }
   const favicon = await readFile(assetFile('favicon-32.png'));
   const icon32 = await readFile(assetFile('icon-32.png'));
   const maskable = await readFile(assetFile('icon-maskable.png'));
   const icon512 = await readFile(assetFile('icon-512.png'));
   assert.equal(FAVICON_CROP_INSET, 108);
   assert.notEqual(hash(favicon), hash(icon32));
-  assert.deepEqual(pngInfo(favicon), { width: 32, height: 32, colorType: 2 });
-  assert.equal(hash(maskable), hash(icon512));
+  assert.deepEqual(pngInfo(favicon), { width: 32, height: 32, colorType: 6 });
+  assert.notEqual(hash(maskable), hash(icon512));
+});
+
+test('approved outlined headers and sanitized Micro-Mark have exact safe vector bytes', async () => {
+  for (const [file,width,height,sha256] of A1_VECTORS) {
+    const bytes = await readFile(assetFile(file)), svg = bytes.toString();
+    assert.equal(hash(bytes),sha256,file);
+    assert.match(svg,new RegExp(`viewBox="0 0 ${width} ${height}"`));
+    assert.doesNotMatch(svg,/<text\b|<script\b|<foreignObject\b|<!ENTITY|@font-face|\bon\w+=/i);
+    for (const match of svg.matchAll(/(?:href|src)=["']([^"']+)/g)) assert.ok(match[1].startsWith('#'));
+    for (const match of svg.matchAll(/url\(([^)]+)\)/g)) assert.ok(match[1].startsWith('#'));
+  }
+});
+
+test('Brand release preserves Production manifest, data sources, install actions and offline policy', async () => {
+  const baseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`66b0f4bd1748ac1fb756d47fb814c66cf4df64af:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
+  const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
+  for (const file of ['manifest.webmanifest','src/store.js','src/models.js','src/lib/db.js','src/lib/cloud.js','src/lib/sync.js','src/lib/sync-v2.js','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
+  const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
+  assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
+  const worker=await read('sw.js'),oldWorker=baseline('sw.js');
+  assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
+  assert.match(worker,/const VERSION = 'rakeezx-v19';/);
+  assert.match(worker,/return \(await caches\.match\('\.\/'\)\) \|\| cachedFallback\('\.\/index\.html', 503\)/);
+  assert.match(worker,/generation < CACHE_GENERATION/);
+  for (const [file] of A1_VECTORS) assert.ok(worker.includes(`'./assets/${file}'`));
 });
 
 test('rejected 16px and previous generated SVG derivatives are not product assets', async () => {
@@ -59,5 +93,5 @@ test('rejected 16px and previous generated SVG derivatives are not product asset
   ]);
   const references = files.join('\n');
   assert.doesNotMatch(references, /favicon-16|favicon\.svg|icon\.svg|brand-monochrome/);
-  assert.match(references, /favicon-32\.png\?v=15/);
+  assert.match(references, /favicon-32\.png\?v=19/);
 });

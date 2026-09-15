@@ -240,7 +240,7 @@ function shell(path, params) {
     <a class="skip-link" href="#main" data-act="skip-to-content">انتقل إلى المحتوى</a>
     <div class="layout">
       <nav class="sidebar" aria-label="التنقل الرئيسي">
-        <div class="sidebar__brand">${brandLockup({ signature: true, appIcon: true })}</div>
+        <div class="sidebar__brand">${brandLockup()}</div>
         ${NAV.map((it) => navLink(it, path, 'sidebar'))}
         <div class="sidebar__spacer"></div>
         ${inTeaching
@@ -280,7 +280,7 @@ function topbar(v, params) {
     <header class="topbar ${currentPath() === '/' ? 'topbar--home' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
-        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup({ appIcon: true, signature: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
+        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup({ compact: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
@@ -563,7 +563,7 @@ function openMiniHubLoginSheet() {
     title: 'تسجيل الدخول للحساب السحابي',
     desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
     body: html`
-      <div class="auth-brand">${brandLockup({ signature: true, appIcon: true })}<p>مساحة العمل الرقمية للمعلم</p></div>
+      <div class="auth-brand">${brandLockup()}<p>مساحة العمل الرقمية للمعلم</p></div>
       <form id="mini-hub-login-form">
         <label class="field">
           <span class="field__label">البريد الإلكتروني</span>

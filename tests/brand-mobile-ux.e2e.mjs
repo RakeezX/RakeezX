@@ -31,8 +31,8 @@ test('Home, Schedule and Calendar: compact RTL surfaces and real controls in bot
     await expect(page.locator('.topbar__sub')).toHaveCount(0);
     await expect(page.locator('.hero .compact-timing-pill')).toBeVisible();
     if (width < 900) {
-      await expect(page.locator('.mobile-brand img')).toHaveJSProperty('naturalWidth', 192);
-      expect((await page.locator('.mobile-brand img').boundingBox()).width).toBe(54);
+      await expect(page.locator('.mobile-brand img:visible')).toHaveJSProperty('naturalWidth', 295);
+      expect((await page.locator('.mobile-brand img:visible').boundingBox()).width).toBeCloseTo(Math.min(220, Math.max(199, width * .225 + 127)), 1);
       await expect(page.locator('.topbar__teacher-label')).toHaveText('مركز المعلم');
       expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(44);
       await page.locator('.topbar__teacher-btn').click();
@@ -121,8 +121,9 @@ test('Home, Schedule and Calendar: compact RTL surfaces and real controls in bot
 
 test('startup uses the approved single calm loading message', async ({ page }) => {
   const response = await page.request.get('/');
+  const fixtureBase = new URL('/', response.url()).href;
   const source = (await response.text())
-    .replace('<head>', '<head><base href="http://localhost:5174/">')
+    .replace('<head>', `<head><base href="${fixtureBase}">`)
     .replace(/<script type="module" src="src\/app\.js"><\/script>/, '');
   await page.setViewportSize({ width: 320, height: 844 });
   await page.setContent(source);

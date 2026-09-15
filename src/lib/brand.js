@@ -4,11 +4,17 @@ import { html } from './dom.js';
 export const BRAND_NAME = 'رَكيز المعلم';
 export const BRAND_SIGNATURE = 'RAKEEZ X';
 export const APP_ICON_URL = new URL('../../assets/icon-192.png', import.meta.url).href;
-const SMALL_ICON_URL = new URL('../../assets/favicon-32.png', import.meta.url).href;
+const HEADER_LIGHT_URL = new URL('../../assets/header-light-standard.svg', import.meta.url).href;
+const HEADER_LIGHT_COMPACT_URL = new URL('../../assets/header-light-compact.svg', import.meta.url).href;
+const HEADER_DARK_URL = new URL('../../assets/header-dark-standard.svg', import.meta.url).href;
+const HEADER_DARK_COMPACT_URL = new URL('../../assets/header-dark-compact.svg', import.meta.url).href;
 
-export function brandLockup({ signature = false, appIcon = false, prominent = false, caption = '' } = {}) {
-  return html`<span class="brand-lockup ${prominent ? 'brand-lockup--prominent' : ''}" aria-label="${BRAND_NAME}">
-    <img class="brand-lockup__icon ${appIcon ? 'brand-lockup__icon--app' : ''}" src="${appIcon ? APP_ICON_URL : SMALL_ICON_URL}" width="40" height="40" alt="" aria-hidden="true">
-    <span class="brand-lockup__copy"><span class="brand-lockup__name"><strong>رَكيز</strong> <span>المعلم</span></span>${signature ? html`<small class="brand-lockup__signature" dir="ltr">${BRAND_SIGNATURE}</small>` : ''}${caption ? html`<span class="brand-lockup__caption">${caption}</span>` : ''}</span>
+export function brandLockup({ compact = false, prominent = false, caption = '' } = {}) {
+  const width = compact ? 295 : 345;
+  const height = compact ? 52 : 56;
+  return html`<span class="brand-lockup ${prominent ? 'brand-lockup--prominent' : ''}" role="img" aria-label="${BRAND_NAME}">
+    <img class="brand-lockup__image brand-lockup__image--light" src="${compact ? HEADER_LIGHT_COMPACT_URL : HEADER_LIGHT_URL}" width="${width}" height="${height}" alt="" aria-hidden="true">
+    <img class="brand-lockup__image brand-lockup__image--dark" src="${compact ? HEADER_DARK_COMPACT_URL : HEADER_DARK_URL}" width="${width}" height="${height}" alt="" aria-hidden="true">
+    ${caption ? html`<span class="brand-lockup__caption">${caption}</span>` : ''}
   </span>`;
 }

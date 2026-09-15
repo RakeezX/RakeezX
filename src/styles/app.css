@@ -2,30 +2,18 @@
    RAKEEZ X — نظام التصميم
    عربي أولًا، RTL، ومصمم ليُستعمل بإبهام واحد والمعلّم واقف بين طلابه.
    ========================================================================== */
-/* Brand typography: T3 hierarchy on the existing offline-safe font stack. */
-.brand-lockup { display:inline-flex; align-items:center; gap:9px; min-inline-size:0; color:var(--brand-text); letter-spacing:normal; direction:rtl; }
-.brand-lockup__icon { display:block; inline-size:36px; block-size:36px; flex:none; }
-.brand-lockup__copy { display:flex; flex-direction:column; gap:3px; }
-.brand-lockup__name { white-space:nowrap; font-family:var(--font); line-height:1.5; }
-.brand-lockup__name strong { font-size:23px; font-weight:800; }
-.brand-lockup__name > span { font-size:20px; font-weight:500; }
-.brand-lockup__signature { align-self:flex-start; font:600 8px/1.3 var(--font); letter-spacing:1.6px; color:var(--text-3); }
+/* Approved outlined A1 lockups; Product typography and runtime remain native. */
+.brand-lockup { display:inline-flex; flex-direction:column; min-inline-size:0; inline-size:216px; max-inline-size:100%; direction:rtl; }
+.brand-lockup__image { display:block; inline-size:100%; block-size:auto; }
+.brand-lockup__image--dark { display:none; }
+[data-theme="dark"] .brand-lockup__image--light { display:none; }
+[data-theme="dark"] .brand-lockup__image--dark { display:block; }
 .brand-wordmark-secondary { font-size:.88em; font-style:normal; font-weight:500; }
-.brand-lockup__icon--app { inline-size:80px; block-size:80px; }
-.brand-lockup--prominent { gap:16px; max-inline-size:100%; }
-.brand-lockup--prominent .brand-lockup__icon--app { inline-size:104px; block-size:104px; }
-.brand-lockup--prominent .brand-lockup__name strong { font-size:32px; }
-.brand-lockup--prominent .brand-lockup__name > span { font-size:27px; }
+.brand-lockup--prominent { inline-size:345px; }
 .brand-lockup__caption { margin-top:7px; color:var(--text-2); font-size:15px; font-weight:500; line-height:1.5; overflow-wrap:anywhere; }
-.brand-lockup--prominent .brand-lockup__copy { min-inline-size:0; }
-.sidebar__brand .brand-lockup__icon--app { inline-size:64px; block-size:64px; }
-.home-pwa-brand-icon { display:block; inline-size:56px; block-size:56px; flex:none; }
-@media (max-width: 599px) {
-  .brand-lockup--prominent { gap:12px; }
-  .brand-lockup--prominent .brand-lockup__icon--app { inline-size:80px; block-size:80px; }
-  .brand-lockup--prominent .brand-lockup__name strong { font-size:27px; }
-  .brand-lockup--prominent .brand-lockup__name > span { font-size:23px; }
-}
+.sidebar__brand .brand-lockup { inline-size:245px; max-inline-size:calc(100% + 26px); flex-shrink:0; margin-inline:-13px; }
+.home-pwa-brand-mark { display:block; inline-size:52px; block-size:52px; flex:none; border-radius:12px; overflow:hidden; }
+.home-pwa-brand-icon { display:block; inline-size:100%; block-size:100%; object-fit:contain; }
 .auth-brand { padding-block:4px 20px; }
 .auth-brand p { margin-block:8px 0; color:var(--text-2); font-size:14px; }
 .boot__mark { display:flex; flex-direction:column; align-items:center; gap:12px; }
@@ -33,10 +21,8 @@
 @media (max-width: 899px) {
   .mobile-brand { display:flex; min-inline-size:0; }
   .desktop-home-title { display:none; }
-  .mobile-brand .brand-lockup__name strong { font-size:21px; }
-  .mobile-brand .brand-lockup__name > span { font-size:18px; }
+  .mobile-brand .brand-lockup { inline-size:clamp(199px, calc(22.5vw + 127px), 220px); }
 }
-@media print { .brand-lockup { color:#0F5132; } .brand-lockup__signature { color:#52666b; } }
 
 /* ---------- 1. الرموز (tokens) ---------- */
 :root {
@@ -475,7 +461,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 }
 .sidebar__brand {
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-3) var(--sp-5);
+  padding: var(--sp-2) 2px var(--sp-5);
   font-size: 22px; font-weight: 800; color: var(--brand);
   letter-spacing: -.5px;
 }

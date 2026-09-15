@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v18';
+const VERSION = 'rakeezx-v19';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -34,11 +34,16 @@ const SHELL = [
   './index.html',
   './manifest.webmanifest',
   './assets/favicon-32.png',
-  './assets/favicon-32.png?v=15',
+  './assets/favicon-32.png?v=19',
   './assets/icon-180.png',
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/icon-maskable.png',
+  './assets/header-light-standard.svg',
+  './assets/header-light-compact.svg',
+  './assets/header-dark-standard.svg',
+  './assets/header-dark-compact.svg',
+  './assets/micro-mark.svg',
 
   './src/styles/app.css',
   './src/styles/components.css',

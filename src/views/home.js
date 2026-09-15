@@ -239,7 +239,7 @@ export default {
         ? html`
             <aside class="home-pwa-prompt" id="home-pwa-prompt" aria-label="تثبيت تطبيق رَكيز المعلم">
               <div class="home-pwa-prompt__main">
-                <img class="home-pwa-brand-icon" src="${APP_ICON_URL}" width="56" height="56" alt="" aria-hidden="true">
+                <span class="home-pwa-brand-mark" aria-hidden="true"><img class="home-pwa-brand-icon" src="${APP_ICON_URL}" width="52" height="52" alt=""></span>
                 <div class="home-pwa-prompt__content">
                   <div class="home-pwa-prompt__title">تطبيق رَكيز المعلم على جهازك</div>
                   <div class="home-pwa-prompt__desc">ثبّت التطبيق لفتحه مباشرة والعمل دون إنترنت.</div>
