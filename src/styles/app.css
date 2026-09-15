@@ -16,7 +16,6 @@
 .home-pwa-brand-icon { display:block; inline-size:100%; block-size:100%; object-fit:contain; }
 .auth-brand { padding-block:4px 20px; }
 .auth-brand p { margin-block:8px 0; color:var(--text-2); font-size:14px; }
-.boot__mark { display:flex; flex-direction:column; align-items:center; gap:12px; }
 .mobile-brand { display:none; }
 @media (max-width: 899px) {
   .mobile-brand { display:flex; min-inline-size:0; }
@@ -302,26 +301,58 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 
 /* ---------- 3. شاشة الإقلاع ---------- */
 .boot {
+  box-sizing: border-box;
+  min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: var(--sp-3);
+  place-items: center;
+  padding: max(var(--sp-5), env(safe-area-inset-top)) var(--sp-6) max(var(--sp-5), env(safe-area-inset-bottom));
 }
-.boot::after {
-  content: '';
+.boot__composition {
+  --boot-identity-scale: 1.12;
+  --boot-lockup-width: calc(216px * var(--boot-identity-scale));
+  --boot-lockup-crop-width: calc(var(--boot-lockup-width) * 196 / 345);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  inline-size: min(280px, 100%);
+  min-inline-size: 0;
+  text-align: center;
+}
+.boot__mark {
+  position: relative;
+  inline-size: var(--boot-lockup-crop-width);
+  block-size: calc(var(--boot-lockup-width) * 56 / 345);
+  flex: none;
+  overflow: hidden;
+  line-height: 0;
+}
+.boot__mark .brand-lockup {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: var(--boot-lockup-width);
+  max-inline-size: none;
+}
+.boot__msg {
+  max-inline-size: 100%;
+  margin-block-start: 14px;
+  color: var(--text-3);
+  font-size: 16px;
+  font-weight: var(--fw-medium);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.boot__progress {
   width: 28px;
   height: 3px;
+  margin-block-start: 10px;
+  flex: none;
   border-radius: var(--r-full);
   background: linear-gradient(90deg, var(--brand) 0 45%, var(--brand-soft) 45% 100%);
   background-size: 220% 100%;
   animation: boot-progress 1.1s var(--ease) infinite;
 }
-.boot__mark {
-  font-size: 40px; font-weight: 800; letter-spacing: -.5px;
-  color: var(--brand);
-}
-.boot__msg { color: var(--text-3); font-size: 14px; }
 
 /* ---------- 4. هيكل التطبيق ---------- */
 .app-shell { min-height: 100dvh; }

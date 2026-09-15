@@ -275,20 +275,36 @@ function topbar(v, params) {
   const profile = store.state.profile ?? {};
   const teacherName = profile.teacherName || 'المعلّم';
   const syncInfo = getSyncState();
+  const isHome = currentPath() === '/';
+  const isLoggedIn = !!(cloud.session && cloud.user);
+  const accountName = String(profile.teacherName ?? '').trim();
+  const homeAccountLabel = isLoggedIn ? (accountName || 'إكمال الحساب') : 'تسجيل الدخول';
+  const homeAccountA11y = isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
 
   return html`
-    <header class="topbar ${currentPath() === '/' ? 'topbar--home' : ''}">
+    <header class="topbar ${isHome ? 'topbar--home' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
-        ${currentPath() === '/' ? html`<span class="mobile-brand">${brandLockup({ compact: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
+        ${isHome ? html`<span class="mobile-brand">${brandLockup({ compact: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
-        <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
-          <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
-          ${currentPath() === '/' ? html`<span class="topbar__teacher-label" aria-hidden="true">مركز المعلم</span>` : ''}
-          <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
-        </button>
+        ${isHome ? html`
+          <button class="topbar__teacher-btn topbar__teacher-btn--home-account"
+                  data-act="open-teacher-mini-hub"
+                  ${isLoggedIn ? html`data-sync-account-label="${homeAccountLabel}"` : ''}
+                  aria-label="${homeAccountA11y}"
+                  title="${isLoggedIn ? `${homeAccountLabel} — ${syncInfo.text}` : homeAccountLabel}">
+            <span class="topbar__account-icon" aria-hidden="true">${icon(isLoggedIn ? 'student' : 'login')}</span>
+            <span class="topbar__account-name">${homeAccountLabel}</span>
+            ${isLoggedIn ? html`<span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>` : ''}
+          </button>
+        ` : html`
+          <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
+            <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
+            <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
+          </button>
+        `}
       </div>
     </header>
   `;
@@ -364,6 +380,11 @@ function paintSyncStatus() {
     el.classList.add(`sync-dot--${syncInfo.status}`);
     el.title = syncInfo.text;
     el.parentElement?.setAttribute('title', syncInfo.text);
+  }
+  for (const el of document.querySelectorAll('[data-sync-account-label]')) {
+    const label = el.dataset.syncAccountLabel;
+    el.setAttribute('aria-label', `${label}، ${syncInfo.text}`);
+    el.title = `${label} — ${syncInfo.text}`;
   }
 }
 

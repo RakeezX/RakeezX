@@ -33,8 +33,9 @@ test('Home, Schedule and Calendar: compact RTL surfaces and real controls in bot
     if (width < 900) {
       await expect(page.locator('.mobile-brand img:visible')).toHaveJSProperty('naturalWidth', 295);
       expect((await page.locator('.mobile-brand img:visible').boundingBox()).width).toBeCloseTo(Math.min(220, Math.max(199, width * .225 + 127)), 1);
-      await expect(page.locator('.topbar__teacher-label')).toHaveText('مركز المعلم');
-      expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(44);
+      await expect(page.locator('.topbar__account-name')).toHaveText('تسجيل الدخول');
+      await expect(page.locator('.topbar__teacher-sync')).toHaveCount(0);
+      expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(48);
       await page.locator('.topbar__teacher-btn').click();
       await expect(page.locator('.mini-hub-pwa')).toBeVisible();
       await page.getByRole('button', { name: 'إغلاق', exact: true }).last().click();
