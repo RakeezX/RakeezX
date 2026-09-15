@@ -27,6 +27,7 @@ test('mobile Reports → class report retains app nav and exposes class context 
   await page.getByRole('link', { name: 'التقارير' }).click();
 
   await expectStablePrimaryNav(page, 'التقارير');
+  await page.locator('.report-grade-group').first().locator('summary').click();
   await page.locator(`a[href="#/teaching/${fixture.teachingId}/reports"]`).click();
   await expect(page).toHaveURL(new RegExp(`#/teaching/${fixture.teachingId}/reports$`));
   await expectStablePrimaryNav(page, 'التقارير');
@@ -34,7 +35,6 @@ test('mobile Reports → class report retains app nav and exposes class context 
   await expect(context).toBeVisible();
   await expect(context.getByRole('link', { name: 'الفصل' })).toBeVisible();
   await expect(context.getByRole('link', { name: 'الحضور' })).toBeVisible();
-  await expect(context.getByRole('link', { name: 'الحصص' })).toBeVisible();
   await expect(context.getByRole('link', { name: 'كشف الدرجات' })).toBeVisible();
   await expect(context.getByRole('link', { name: 'الطلاب' })).toBeVisible();
   await expect(context.getByRole('link', { name: 'التقارير' })).toHaveCount(0);

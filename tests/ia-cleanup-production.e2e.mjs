@@ -3,10 +3,10 @@ import { test, expect } from '@playwright/test';
 const viewports = [
   { width: 320, height: 680, columns: 1 },
   { width: 350, height: 740, columns: 1 },
-  { width: 390, height: 844, columns: 2 },
-  { width: 430, height: 860, columns: 2 },
+  { width: 390, height: 844, columns: 1 },
+  { width: 430, height: 860, columns: 1 },
   { width: 1024, height: 768, columns: 2 },
-  { width: 1440, height: 900, columns: 2 },
+  { width: 1440, height: 900, columns: 3 },
 ];
 
 for (const viewport of viewports) {
@@ -31,8 +31,8 @@ for (const viewport of viewports) {
     }
     await cards.nth(0).locator('.class-card__main').click();
     const tabs = page.locator('.class-context-nav__item');
-    await expect(tabs).toHaveCount(5);
-    expect((await tabs.allTextContents()).map((text) => text.trim())).toEqual(['الفصل', 'الحضور', 'الحصص', 'كشف الدرجات', 'الطلاب']);
+    await expect(tabs).toHaveCount(4);
+    expect((await tabs.allTextContents()).map((text) => text.trim())).toEqual(['الفصل', 'الطلاب', 'الحضور', 'كشف الدرجات']);
     const trigger = page.getByRole('button', { name: 'تبديل الفصل' });
     const hub = page.locator('.class-hub');
     const identity = hub.locator('.class-hub-header__identity-block');
@@ -58,7 +58,7 @@ for (const viewport of viewports) {
     const chevronBox = await chevron.boundingBox();
     expect(chevronBox?.width).toBeLessThanOrEqual(20);
     expect(chevronBox?.height).toBeLessThanOrEqual(20);
-    expect((await dialog.locator('.sheet').boundingBox())?.height).toBeLessThan(viewport.height * .8);
+    expect((await dialog.boundingBox())?.height).toBeLessThan(viewport.height * .8);
     for (const box of await dialog.locator('svg').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON()))) {
       expect(box.width).toBeLessThanOrEqual(22);
       expect(box.height).toBeLessThanOrEqual(22);
@@ -72,11 +72,11 @@ test('Home timing indicator stays compact without a giant SVG', async ({ page })
   await page.goto('/#/');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await expect(page.locator('.welcome__title')).toHaveCount(0);
-  const pill = page.locator('.hub-head__timing-pill');
-  const timingIcon = page.locator('.hub-head__timing-icon svg');
+  const pill = page.locator('.compact-timing-pill');
+  const timingIcon = page.locator('.compact-timing-pill__icon svg');
   await expect(pill).toBeVisible();
   const [pillBox, iconBox] = await Promise.all([pill.boundingBox(), timingIcon.boundingBox()]);
-  expect(pillBox?.height).toBeLessThanOrEqual(32);
+  expect(pillBox?.height).toBeLessThanOrEqual(36);
   expect(iconBox?.width).toBeLessThanOrEqual(16);
   expect(iconBox?.height).toBeLessThanOrEqual(16);
   expect(await page.evaluate(() => document.documentElement.scrollHeight < 1200)).toBe(true);
@@ -89,7 +89,7 @@ test('Class workspace pages share a wide shell and Grades exposes distribution a
   await page.getByRole('button', { name: 'إضافة فصل تجريبي' }).click();
   await page.locator('.class-card__main').click();
   const widths = [];
-  for (const label of ['الفصل', 'الحضور', 'الحصص', 'كشف الدرجات', 'الطلاب']) {
+  for (const label of ['الفصل', 'الطلاب', 'الحضور', 'كشف الدرجات']) {
     const contextLink = page.locator('.class-context-nav').getByRole('link', { name: label });
     await contextLink.click();
     const width = await page.waitForFunction(() => {
@@ -109,7 +109,7 @@ test('Grades keeps the distribution action visible before a roster exists', asyn
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store?.state?.ready === true);
-  await page.getByRole('button', { name: 'فصل جديد' }).click();
+  await page.getByRole('button', { name: 'فصل جديد' }).first().click();
   const sheet = page.getByRole('dialog');
   await sheet.getByRole('button', { name: 'إنشاء' }).click();
   const href = await page.locator('.class-card__main').first().getAttribute('href');

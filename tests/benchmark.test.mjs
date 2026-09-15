@@ -1,4 +1,4 @@
-import { test, before, after } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import 'fake-indexeddb/auto';
 
@@ -12,28 +12,7 @@ import * as sync from '../src/lib/sync.js';
 import * as store from '../src/store.js';
 import * as db from '../src/lib/db.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
-
-class MockCloudBackend {
-  constructor() {
-    this.records = {};
-  }
-  async fetchRecords(tableName) {
-    return this.records[tableName] || [];
-  }
-  async upsertRecords(tableName, records) {
-    if (!this.records[tableName]) this.records[tableName] = [];
-    const table = this.records[tableName];
-    for (const rec of records) {
-      const idx = table.findIndex((r) => r.id === rec.id);
-      if (idx >= 0) {
-        table[idx] = { ...rec, client_updated_at: rec.client_updated_at || Date.now() };
-      } else {
-        table.push({ ...rec, client_updated_at: rec.client_updated_at || Date.now() });
-      }
-    }
-    return { success: true };
-  }
-}
+import { GenericV2Backend } from './helpers/generic-v2-backend.mjs';
 
 // Cleanup after ALL benchmark tests complete to close the IndexedDB and BroadcastChannel.
 // Without this, Node's event loop stays alive indefinitely.
@@ -44,7 +23,7 @@ after(async () => {
 
 test('Boot time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
-  const backend = new MockCloudBackend();
+  const backend = new GenericV2Backend();
   setMockBackend(backend);
   setMockAuth({ id: 'test' }, {});
   db.closeDB();
@@ -69,7 +48,7 @@ test('Boot time benchmark', async () => {
 
 test('Sync time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
-  const backend = new MockCloudBackend();
+  const backend = new GenericV2Backend();
   setMockBackend(backend);
   setMockAuth({ id: 'test' }, {});
   db.closeDB();
@@ -89,12 +68,11 @@ test('Sync time benchmark', async () => {
   }
 
   const startSync = Date.now();
-  await sync.syncStructural();
-  await sync.syncStudents();
-  await sync.syncTimetable();
+  const synced = await sync.syncAll({ full: true });
   const syncMs = Date.now() - startSync;
 
   console.log(`[Benchmark] Full sync time for 1000 pulled records: ${syncMs}ms`);
 
+  assert.equal(synced, true, 'Current Sync V2 full pass must succeed');
   assert.ok(syncMs < 1500, 'Sync time should be reasonable');
 });

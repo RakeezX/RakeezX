@@ -10,12 +10,13 @@ import { studentTotal } from "../src/models.js";
 test("Scoring Business Rules Suite", async (t) => {
   t.beforeEach(async () => {
     await db.clearAll();
+    store.state.ready = false;
     await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   });
 
-  t.afterEach(async () => {
+  t.after(async () => {
     store.closeChannel();
-    await db.closeDB();
+    db.closeDB();
   });
 
   await t.test("Non-scored item must not count as zero", async () => {
@@ -77,6 +78,7 @@ test("Scoring Business Rules Suite", async (t) => {
 
   await t.test("Score update and persistence failure isolation", async () => {
     const now = Date.now();
+    await db.put("students", { id: "std1", name: "Test Student", status: "active", deleted: false, updatedAt: now });
     await db.put("items", { id: "item1", max: 10, deleted: false, updatedAt: now });
     await db.put("scores", { id: "score1", studentId: "std1", itemId: "item1", value: 5, deleted: false, updatedAt: now });
     await store.init();

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
+const CLOUD_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co/rest/v1/';
+const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
 const TABLES = ['years', 'calendars', 'calendar_days', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'time_profiles', 'slots', 'sessions', 'attendance', 'notes'];
 
 function createCloud() {
@@ -10,7 +11,7 @@ function createCloud() {
   const nextTableRead = new Map();
   return {
     async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
+      await page.route(`${CLOUD_URL}**`, async (route) => {
         const request = route.request();
         const table = new URL(request.url()).pathname.split('/').pop();
         if (table === 'profile') {
@@ -21,6 +22,44 @@ function createCloud() {
           const patch = JSON.parse(request.postData() ?? '{}');
           profile = { ...profile, ...patch };
           return route.fulfill({ json: [profile] });
+        }
+        if (table === 'apply_sync_v2_mutation' && request.method() === 'POST') {
+          const envelope = JSON.parse(request.postData() ?? '{}');
+          const entity = envelope.p_entity;
+          if (entity === 'profile' && nextProfileWrite) {
+            const gate = nextProfileWrite; nextProfileWrite = null; gate.started(); await gate.wait;
+          }
+          const list = entity === 'profile' ? [profile] : (tables[entity] ??= []);
+          const index = list.findIndex((record) => record?.id === envelope.p_record_id);
+          const prior = index >= 0 ? list[index] : null;
+          const revision = Number(prior?.revision ?? 0) + 1;
+          const canonical = {
+            ...(prior ?? {}),
+            id: envelope.p_record_id,
+            ...(envelope.p_patch ?? {}),
+            revision,
+            field_revisions: Object.fromEntries(
+              Object.keys(envelope.p_patch ?? {}).map((field) => [field, revision]),
+            ),
+            deleted_at: envelope.p_operation === 'delete'
+              ? new Date(envelope.p_client_updated_at ?? Date.now()).toISOString()
+              : null,
+            client_updated_at: envelope.p_client_updated_at ?? Date.now(),
+          };
+          if (entity === 'profile') profile = canonical;
+          else if (index >= 0) list[index] = canonical;
+          else list.push(canonical);
+          return route.fulfill({ json: {
+            mutationId: envelope.p_mutation_id,
+            entity,
+            recordId: envelope.p_record_id,
+            canonicalId: canonical.id,
+            outcome: 'applied',
+            appliedGroups: Object.keys(envelope.p_patch ?? {}),
+            conflictedGroups: [],
+            resultRevision: revision,
+            canonical,
+          } });
         }
         if (request.method() === 'GET') {
           const gate = nextTableRead.get(table);
@@ -69,9 +108,9 @@ function createCloud() {
 }
 
 async function authenticated(page, cloud) {
-  await page.addInitScript(() => localStorage.setItem('rakeezx-auth', JSON.stringify({
+  await page.addInitScript((storageKey) => localStorage.setItem(storageKey, JSON.stringify({
     access_token: 'auto-sync-test-token', user: { id: 'auto-sync-test-user' },
-  })));
+  })), AUTH_STORAGE_KEY);
   await cloud.route(page);
 }
 
@@ -95,7 +134,9 @@ test('automatic sync pulls on authenticated boot and pushes profile changes with
   await pageB.goto('/#/settings');
   await pageB.waitForFunction(() => window.__syncModule?.state.status === 'synced');
   await expect(pageB.locator('input[name="teacherName"]')).toHaveValue('معلم تلقائي A');
-  await expect(pageB.getByRole('button', { name: 'مزامنة الآن' })).toBeVisible();
+  await pageB.getByRole('button', { name: 'مركز تحكم المعلّم' }).click();
+  await expect(pageB.locator('.sheet').getByRole('button', { name: 'مزامنة الآن' })).toBeVisible();
+  await pageB.keyboard.press('Escape');
   await expect(pageB.getByText('اختبار المزامنة')).toHaveCount(0);
   expect(cloud.table('calendars').length).toBeGreaterThan(0);
   expect(cloud.table('calendars').every((calendar) => ['moe', 'custom'].includes(calendar.source))).toBe(true);
@@ -167,15 +208,15 @@ test('authenticated fresh pull renders existing student notes without a local mu
   await page.goto('/#/student/remote-notes-student');
 
   await notesRead.started;
-  await expect(page.getByRole('heading', { name: /طالب سحابي/ })).toBeVisible();
-  await expect(page.getByText('لا توجد ملاحظات مسجلة لهذا الطالب.')).toBeVisible();
-
   notesRead.release();
   await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
+  await expect(page.getByRole('heading', { name: /طالب سحابي/ })).toBeVisible();
+  await page.locator('.student-notes-history > summary').click();
   await expect(page.getByText('ملاحظة وصلت من السحابة')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.store.notesOf('remote-notes-student').map((note) => note.id))).toEqual(['remote-existing-note']);
 
   await page.reload();
+  await page.locator('.student-notes-history > summary').click();
   await expect(page.getByText('ملاحظة وصلت من السحابة')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.store.notesOf('remote-notes-student').map((note) => note.id))).toEqual(['remote-existing-note']);
   await context.close();

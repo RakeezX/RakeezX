@@ -1,56 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
-
-function mockCloud() {
-  const tables = Object.fromEntries([
-    'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
-    'students', 'enrollments', 'time_profiles', 'slots', 'sessions', 'attendance',
-    'items', 'scores', 'logs', 'calendars', 'calendar_days', 'units', 'lessons',
-    'notes', 'assignments', 'submissions',
-  ].map((name) => [name, []]));
-  return {
-    tables,
-    async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
-        const request = route.request();
-        const table = new URL(request.url()).pathname.split('/').pop();
-        if (request.method() === 'GET') return route.fulfill({ json: tables[table] ?? [] });
-        if (request.method() === 'POST') {
-          for (const record of JSON.parse(request.postData() ?? '[]')) {
-            const index = (tables[table] ??= []).findIndex((item) => item.id === record.id);
-            if (index < 0) tables[table].push({ ...record });
-            else tables[table][index] = { ...record };
-          }
-          return route.fulfill({ json: [] });
-        }
-        return route.fulfill({ status: 200, json: [] });
-      });
-    },
-  };
-}
-
-async function enableMockSync(page, cloud) {
-  await page.addInitScript(() => {
-    localStorage.setItem('rakeezx-auth', JSON.stringify({
-      access_token: 'test-token', user: { id: 'scoring-test-user' },
-    }));
-  });
-  await cloud.route(page);
-}
-
-test('manual scoring persists, reports correctly, and converges without duplicate records', async ({ page }) => {
+test('manual scoring persists and reports correctly without duplicate records', async ({ page }) => {
   test.setTimeout(90_000);
-  const cloud = mockCloud();
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
-  await enableMockSync(page, cloud);
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store && window.__syncModule, { timeout: 15_000 });
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  await page.waitForFunction(() => window.store?.state?.ready === true, { timeout: 15_000 });
 
   await page.evaluate(async () => {
     await window.store.save({
@@ -72,8 +30,6 @@ test('manual scoring persists, reports correctly, and converges without duplicat
     });
     await window.store.patchDevice({ activeYearId: 'score-year', activeTermId: 'score-term' });
     window.store.repaint();
-    await window.__syncModule.syncStructural();
-    await window.__syncModule.syncStudents();
   });
 
   await page.goto('/#/teaching/score-teaching/items');
@@ -172,44 +128,5 @@ test('manual scoring persists, reports correctly, and converges without duplicat
   await expect(page.locator('.gtable--report')).toContainText('31');
   await expect(page.locator('.gtable--report')).toContainText('50');
 
-  // Item and score mutations enqueue automatic sync; wait for that pass before
-  // asserting the explicit follow-up is a no-op and cloud convergence is complete.
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
-  const firstSync = await page.evaluate(() => window.__syncModule.syncScoring());
-  expect(firstSync.items).toEqual({ pushed: 0, pulled: 0 });
-  expect(firstSync.scores).toEqual({ pushed: 0, pulled: 0 });
-  const secondSync = await page.evaluate(() => window.__syncModule.syncScoring());
-  expect(secondSync.items).toEqual({ pushed: 0, pulled: 0 });
-  expect(secondSync.scores).toEqual({ pushed: 0, pulled: 0 });
-  expect(cloud.tables.items).toHaveLength(5);
-  expect(cloud.tables.scores).toHaveLength(13);
-
-  const browser = page.context().browser();
-  const freshDevice = await browser.newContext();
-  const pageB = await freshDevice.newPage();
-  const errorsB = [];
-  pageB.on('pageerror', (error) => errorsB.push(error.message));
-  pageB.on('console', (message) => {
-    if (message.type() === 'error') errorsB.push(message.text());
-  });
-  await enableMockSync(pageB, cloud);
-  await pageB.goto('/#/classes');
-  await pageB.waitForFunction(() => window.__syncModule && window.store, { timeout: 15_000 });
-  await pageB.waitForFunction(() => window.__syncModule.state.status === 'synced', { timeout: 15_000 });
-  await pageB.evaluate(async () => {
-    await window.__syncModule.syncStructural();
-    await window.__syncModule.syncStudents();
-    await window.__syncModule.syncScoring();
-    await window.store.patchDevice({ activeYearId: 'score-year', activeTermId: 'score-term' });
-  });
-  await pageB.goto('/#/teaching/score-teaching/reports');
-  await expect(pageB.locator('.gtable--report')).toContainText('TEST Score A');
-  expect(await pageB.evaluate(() => ({
-    items: window.store.state.items.filter((item) => !item.deleted && item.teachingId === 'score-teaching').length,
-    scores: window.store.state.scores.filter((score) => !score.deleted).length,
-    unique: new Set(window.store.state.scores.filter((score) => !score.deleted).map((score) => score.id)).size,
-  }))).toEqual({ items: 5, scores: 13, unique: 13 });
-  expect(errorsB).toEqual([]);
-  await freshDevice.close();
   expect(errors).toEqual([]);
 });

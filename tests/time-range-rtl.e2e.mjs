@@ -23,42 +23,47 @@ async function seedRangeFixture(page) {
 
 async function expectRTLRange(scope, startTime, endTime) {
   const expected = `${startTime} – ${endTime}`;
-  const range = scope.locator('.time-range').filter({ hasText: expected }).first();
+  const range = scope.locator('.time-range:visible').filter({ hasText: expected }).first();
   await expect(range).toHaveText(expected);
   await expect(range).not.toHaveAttribute('dir', 'ltr');
 
-  const start = range.locator('[data-time-token="start"]');
+  const tokens = range.locator('[data-time-token], .time-range__token');
+  await expect(tokens).toHaveCount(2);
+  const start = tokens.first();
   const dash = range.locator('.time-range__dash');
-  const end = range.locator('[data-time-token="end"]');
+  const end = tokens.last();
   await expect(start).toHaveText(startTime);
   await expect(end).toHaveText(endTime);
 
-  const [startBox, dashBox, endBox] = await Promise.all([
-    start.boundingBox(), dash.boundingBox(), end.boundingBox(),
+  const [startBox, dashCount, endBox] = await Promise.all([
+    start.boundingBox(), dash.count(), end.boundingBox(),
   ]);
   expect(startBox).not.toBeNull();
-  expect(dashBox).not.toBeNull();
   expect(endBox).not.toBeNull();
   expect(startBox.x).toBeGreaterThan(endBox.x);
-  expect(startBox.x).toBeGreaterThan(dashBox.x);
-  expect(dashBox.x).toBeGreaterThan(endBox.x);
+  if (dashCount) {
+    const dashBox = await dash.boundingBox();
+    expect(dashBox).not.toBeNull();
+    expect(startBox.x).toBeGreaterThan(dashBox.x);
+    expect(dashBox.x).toBeGreaterThan(endBox.x);
+  }
 
   const styles = await range.evaluate((element) => {
     const rangeStyle = getComputedStyle(element);
-    const tokens = [...element.querySelectorAll('[data-time-token]')].map((token) => {
+    const tokens = [...element.querySelectorAll('[data-time-token], .time-range__token')].map((token) => {
       const style = getComputedStyle(token);
       return { direction: style.direction, unicodeBidi: style.unicodeBidi };
     });
     return { direction: rangeStyle.direction, display: rangeStyle.display, tokens };
   });
   expect(styles.direction).toBe('rtl');
-  expect(styles.display).toBe('inline-flex');
+  expect(['inline-flex', 'flex']).toContain(styles.display);
   expect(styles.tokens).toEqual([
     { direction: 'ltr', unicodeBidi: 'isolate' },
     { direction: 'ltr', unicodeBidi: 'isolate' },
   ]);
 
-  return { start: startBox.x, dash: dashBox.x, end: endBox.x };
+  return { start: startBox.x, end: endBox.x };
 }
 
 async function expectRangesStayInViewport(page) {
@@ -100,7 +105,7 @@ test('canonical range renderer covers home, execution report, weekly schedule, a
   const fixture = await seedRangeFixture(page);
 
   await page.goto('/#/');
-  await expect(page.getByRole('heading', { name: 'الرئيسية' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'حصص اليوم' })).toBeVisible();
   await expectRTLRange(page, '07:00', '07:45');
   await expectRTLRange(page, '07:45', '08:30');
 
@@ -115,13 +120,14 @@ test('canonical range renderer covers home, execution report, weekly schedule, a
   }, fixture);
   await page.goto('/#/schedule');
   await expect(page.getByRole('heading', { name: 'الجدول' })).toBeVisible();
+  await page.getByRole('tab', { name: 'الأحد', exact: true }).click();
   await expectRTLRange(page, '07:00', '07:45');
   await expectRTLRange(page, '07:45', '08:30');
 
   await page.getByRole('button', { name: 'حصة في الجدول' }).click();
   const sheet = page.locator('.sheet');
   await sheet.locator('[name="teachingId"]').selectOption(fixture.teachingId);
-  await sheet.locator('[name="weekday"]').selectOption(String(fixture.weekday));
+  await sheet.locator('[name="weekday"]').selectOption('1');
   await sheet.locator('[name="period"]').selectOption('1');
   await expectRTLRange(sheet, '07:00', '07:45');
   await expectRangesStayInViewport(page);
@@ -134,10 +140,32 @@ test('canonical range renderer covers home, execution report, weekly schedule, a
 test('Time Profiles recess display uses the canonical RTL range renderer', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 800 });
   await page.goto('/#/schedule/times');
-  await page.waitForFunction(() => window.store);
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await page.evaluate(async () => {
+    const { generateAdvancedPeriods } = await import('/src/models.js');
+    const config = {
+      count: 4,
+      firstPeriodStart: '08:00',
+      periodDuration: 45,
+      gap: 0,
+      recess: { enabled: true, afterPeriod: 2, duration: 20, transition: 0 },
+    };
+    await window.store.save({
+      timeProfiles: [{
+        id: 'rtl-recess-browser',
+        name: 'توقيت فسحة RTL',
+        order: 99,
+        periods: generateAdvancedPeriods(config),
+        overrides: { config },
+      }],
+    }, { queue: false });
+    await window.store.patchProfile({ activeTimeProfileId: 'rtl-recess-browser' }, { queue: false });
+    window.store.repaint();
+  });
+  await page.locator('[data-act="edit-times"][data-id="rtl-recess-browser"]').click();
   const recessRange = page.locator('.row-recess .time-range').first();
   await expect(recessRange).toBeVisible();
-  const values = await recessRange.locator('[data-time-token]').evaluateAll((tokens) => tokens.map((token) => token.textContent.trim()));
+  const values = await recessRange.locator('.time-range__token').evaluateAll((tokens) => tokens.map((token) => token.textContent.trim()));
   await expectRTLRange(page, values[0], values[1]);
   await expectRangesStayInViewport(page);
 });

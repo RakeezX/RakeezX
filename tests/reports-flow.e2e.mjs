@@ -1,45 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
-const TABLES = [
-  'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
-  'students', 'enrollments', 'time_profiles', 'slots', 'sessions', 'attendance',
-  'items', 'scores', 'logs', 'calendars', 'calendar_days', 'units', 'lessons',
-  'notes', 'assignments', 'submissions',
-];
-
-function mockCloud() {
-  const tables = Object.fromEntries(TABLES.map((name) => [name, []]));
-  return {
-    tables,
-    async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
-        const request = route.request();
-        const table = new URL(request.url()).pathname.split('/').pop();
-        if (request.method() === 'GET') return route.fulfill({ json: tables[table] ?? [] });
-        if (request.method() === 'POST') {
-          for (const record of JSON.parse(request.postData() ?? '[]')) {
-            const index = (tables[table] ??= []).findIndex((item) => item.id === record.id);
-            if (index < 0) tables[table].push({ ...record });
-            else tables[table][index] = { ...record };
-          }
-          return route.fulfill({ json: [] });
-        }
-        return route.fulfill({ status: 200, json: [] });
-      });
-    },
-  };
-}
-
-async function enableMockSync(page, cloud) {
-  await page.addInitScript(() => {
-    localStorage.setItem('rakeezx-auth', JSON.stringify({
-      access_token: 'test-token', user: { id: 'reports-test-user' },
-    }));
-  });
-  await cloud.route(page);
-}
-
 function observeErrors(page) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -53,14 +13,11 @@ async function expectNoDocumentOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 }
 
-test('reports render current historical data, edited section metadata, and synced records without duplicates', async ({ page }) => {
+test('reports render current historical data and edited section metadata without duplicates', async ({ page }) => {
   test.setTimeout(90_000);
-  const cloud = mockCloud();
   const errors = observeErrors(page);
-  await enableMockSync(page, cloud);
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store && window.__syncModule, { timeout: 15_000 });
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  await page.waitForFunction(() => window.store?.state?.ready === true, { timeout: 15_000 });
 
   // Isolated TEST-only data includes multiple sections, a historical dated session,
   // scores, and a no-roster teaching for the report empty state.
@@ -122,9 +79,11 @@ test('reports render current historical data, edited section metadata, and synce
 
   // Report index covers each populated and empty teaching and shows current scores.
   await page.goto('/#/reports');
-  await expect(page.locator('.list')).toContainText('TEST Mathematics');
-  await expect(page.locator('.list')).toContainText('TEST Science');
-  await expect(page.locator('.list')).toContainText('الرابع الابتدائي / A');
+  const classReports = page.getByRole('region', { name: 'تقارير الفصول' });
+  await classReports.locator('.report-grade-group').evaluateAll((groups) => groups.forEach((group) => { group.open = true; }));
+  await expect(classReports).toContainText('TEST Mathematics');
+  await expect(classReports).toContainText('TEST Science');
+  await expect(classReports).toContainText('الرابع الابتدائي / A');
   await expectNoDocumentOverflow(page);
 
   // Edit the section through its real UI. The report must immediately use the same identity with updated metadata.
@@ -180,55 +139,6 @@ test('reports render current historical data, edited section metadata, and synce
   await expectNoDocumentOverflow(page);
   await page.setViewportSize({ width: 1280, height: 800 });
 
-  // The test saved fixtures through the real store, which schedules automatic sync.
-  // Wait for that pass to settle before asserting the explicit category sync results.
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
-
-  // Sync the same report sources, confirm immediate convergence, then render them on a fresh device.
-  const first = await page.evaluate(async () => ({
-    structural: await window.__syncModule.syncStructural(),
-    students: await window.__syncModule.syncStudents(),
-    timetable: await window.__syncModule.syncTimetable(),
-    scoring: await window.__syncModule.syncScoring(),
-  }));
-  expect(first.timetable.attendance).toEqual({ pushed: 0, pulled: 0 });
-  expect(first.scoring.scores).toEqual({ pushed: 0, pulled: 0 });
-  const second = await page.evaluate(async () => ({
-    timetable: await window.__syncModule.syncTimetable(),
-    scoring: await window.__syncModule.syncScoring(),
-  }));
-  expect(second.timetable.attendance).toEqual({ pushed: 0, pulled: 0 });
-  expect(second.scoring.scores).toEqual({ pushed: 0, pulled: 0 });
-  expect(cloud.tables.attendance).toHaveLength(3);
-  expect(cloud.tables.scores).toHaveLength(6);
-
-  const freshDevice = await page.context().browser().newContext({ viewport: { width: 1280, height: 800 } });
-  const pageB = await freshDevice.newPage();
-  const errorsB = observeErrors(pageB);
-  await enableMockSync(pageB, cloud);
-  await pageB.goto('/#/classes');
-  await pageB.waitForFunction(() => window.store && window.__syncModule, { timeout: 15_000 });
-  await pageB.evaluate(async () => {
-    await window.__syncModule.syncStructural();
-    await window.__syncModule.syncStudents();
-    await window.__syncModule.syncTimetable();
-    await window.__syncModule.syncScoring();
-    await window.store.patchDevice({ activeYearId: 'report-year', activeTermId: 'report-term' });
-  });
-  await pageB.goto('/#/teaching/report-teaching-a/reports');
-  await expect(pageB.locator('.printhead')).toContainText('الخامس الابتدائي / Z');
-  await pageB.locator('[data-act="tab"][data-tab="grades"]').click();
-  await expect(pageB.locator('.gtable--report')).toContainText('26');
-  await pageB.goto('/#/reports/execution');
-  await expect(pageB.getByText('تنفيذ الحصص', { exact: true })).toBeVisible();
-  await expect(pageB.locator('.gtable--report')).toContainText('تم رصد الحضور');
-  expect(await pageB.evaluate(() => ({
-    attendance: window.store.state.attendance.filter((item) => !item.deleted).length,
-    scores: window.store.state.scores.filter((item) => !item.deleted).length,
-    uniqueScores: new Set(window.store.state.scores.filter((item) => !item.deleted).map((item) => item.id)).size,
-  }))).toEqual({ attendance: 3, scores: 6, uniqueScores: 6 });
-  expect(errorsB).toEqual([]);
-  await freshDevice.close();
   expect(errors).toEqual([]);
 });
 

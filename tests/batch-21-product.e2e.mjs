@@ -6,12 +6,16 @@ async function seed(page) {
   await page.evaluate(async () => {
     const names = ['أحمد اختبار', 'إبراهيم اختبار', 'آدم اختبار', 'سالم اختبار'];
     const students = names.map((name,index) => ({ id:`b21-student-${index}`, name, status:'active' }));
+    const current = new Date();
+    const part = (value) => String(value).padStart(2, '0');
+    const today = `${current.getFullYear()}-${part(current.getMonth() + 1)}-${part(current.getDate())}`;
     await window.store.save({
       years:[{id:'b21-year',label:'سنة اختبار'}], terms:[{id:'b21-term',yearId:'b21-year',name:'فصل اختبار'}],
       subjects:[{id:'b21-subject',name:'مادة اختبار'}],
       sections:[{id:'b21-section',yearId:'b21-year',grade:4,label:'8'}],
       teachings:[{id:'b21-teaching',sectionId:'b21-section',subjectId:'b21-subject',termId:'b21-term'}],
       students, enrollments:students.map((student,index)=>({id:`b21-en-${index}`,studentId:student.id,sectionId:'b21-section',status:'active',rollNo:index+1})),
+      sessions:[{id:'b21-session',teachingId:'b21-teaching',date:today,period:1,status:'scheduled'}],
     });
     await window.store.patchDevice({activeYearId:'b21-year',activeTermId:'b21-term'});
     window.store.repaint();

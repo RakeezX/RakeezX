@@ -40,7 +40,8 @@ test('Section editing preserves relationships and history', async (t) => {
 
     // Create section رابع / 1
     const sec = await store.createSection({ grade: 4, label: '1', yearId: year.id });
-    const tch = await store.createTeaching({ sectionId: sec.id, subjectId: 'sub:math', termId: term.id });
+    const subject = await store.createSubject({ name: 'رياضيات اختبارية', slug: `test-math-${Date.now()}` });
+    const tch = await store.createTeaching({ sectionId: sec.id, subjectId: subject.id, termId: term.id });
     
     // Attach relations
     const st = makeStudent({ name: 'Test Student' });

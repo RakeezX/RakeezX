@@ -1,7 +1,14 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert';
 import { normalizeTimeDigits, html, raw } from '../src/lib/dom.js';
 import { GRADE_CATALOG, generateAdvancedPeriods, isValidRecessPosition, recessPositions } from '../src/models.js';
+import * as db from '../src/lib/db.js';
+import * as store from '../src/store.js';
+
+after(() => {
+  store.closeChannel();
+  db.closeDB();
+});
 
 test('normalizeTimeDigits forces ASCII Western digits and HH:MM format', () => {
   assert.strictEqual(normalizeTimeDigits('٠٧:٣٠'), '07:30');

@@ -92,10 +92,11 @@ test('backup UI restores representative TEST data into a clean context without l
     await db.put('outbox', { id: 'target-outbox', store: 'attendance', op: 'upsert' });
   });
 
-  const fileInput = restored.locator('#restore-file');
-  await fileInput.setInputFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
-  await expect(restored.getByText('تمت قراءة الملف والتحقق من سلامة محتواه', { exact: false })).toBeVisible();
-  await expect(restored.locator('[data-pick="replace"]')).toBeVisible();
+  const firstChooser = restored.waitForEvent('filechooser');
+  await restored.getByRole('button', { name: 'اختيار ملف', exact: true }).click();
+  await (await firstChooser).setFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
+  await expect(restored.getByText('تمت قراءة الملف والتحقق من سلامة محتواه', { exact: false })).toBeVisible({ timeout: 15_000 });
+  await expect(restored.locator('[data-pick="replace"]')).toBeVisible({ timeout: 15_000 });
   await restored.locator('[data-pick="replace"]').click();
   await expect(restored.locator('[data-confirm]')).toBeVisible();
   await restored.locator('[data-confirm]').click();
@@ -144,9 +145,10 @@ test('backup UI restores representative TEST data into a clean context without l
   // Re-importing the same backup in supported merge mode is idempotent: no duplicate records.
   await restored.goto('/#/settings/backup');
   await restored.waitForFunction(() => window.store?.state?.ready === true, { timeout: 15_000 });
-  const restoredFileInput = restored.locator('#restore-file');
-  await restoredFileInput.setInputFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
-  await expect(restored.locator('[data-pick="merge"]')).toBeVisible();
+  const mergeChooser = restored.waitForEvent('filechooser');
+  await restored.getByRole('button', { name: 'اختيار ملف', exact: true }).click();
+  await (await mergeChooser).setFiles({ name: 'rakeezx-test-backup.json', mimeType: 'application/json', buffer: backupBuffer });
+  await expect(restored.locator('[data-pick="merge"]')).toBeVisible({ timeout: 15_000 });
   await restored.locator('[data-pick="merge"]').click();
   await waitForRestore(restored);
   expect(await restored.evaluate(liveCounts)).toEqual(sourceCounts);

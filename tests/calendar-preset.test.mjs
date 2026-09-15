@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import { makeSection, makeSlot, makeSubject, makeTeaching } from '../src/models.js';
+import { makeSection, makeSlot, makeStudent, makeSubject, makeTeaching } from '../src/models.js';
 import { getCalendarPreset, GENERAL_1448_1449_PRESET_ID, WESTERN_1448_1449_PRESET_ID } from '../src/lib/calendar-presets.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
@@ -22,6 +22,7 @@ function expectedRange(startDate, endDate, label) {
 }
 
 test('Western Region 1448/1449 calendar preset', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2027-05-02T12:00:00Z') });
   try {
     await t.test('creates the approved empty-user foundation with exact terms and inclusive holidays', async () => {
       await reset();
@@ -120,7 +121,9 @@ test('Western Region 1448/1449 calendar preset', async (t) => {
       const imported = { ...original, id: 'term:imported-test', name: 'فصل اختبار مستورد' };
       const foreignCalendar = { id: 'cal:foreign-test', yearId: 'year:foreign-test', source: `preset:${WESTERN_1448_1449_PRESET_ID}`, deleted: false };
       const foreignDay = { id: 'day:foreign-test', calendarId: foreignCalendar.id, presetId: WESTERN_1448_1449_PRESET_ID, date: '2026-10-04', kind: 'holiday', deleted: false };
+      const historyStudent = makeStudent({ id: 'student:fictional', name: 'طالب سجل اختبار' });
       await store.save({ terms: [imported], calendars: [foreignCalendar], calendarDays: [foreignDay],
+        students: [historyStudent],
         teachings: [{ id: 'teaching:history-test', termId: imported.id, deleted: false }],
         sessions: [{ id: 'session:history-test', teachingId: 'teaching:history-test', date: '2026-09-06', period: 1, status: 'completed', deleted: false }],
         attendance: [{ id: 'attendance:history-test', sessionId: 'session:history-test', studentId: 'student:fictional', status: 'present', deleted: false }],
@@ -174,22 +177,23 @@ test('Western Region 1448/1449 calendar preset', async (t) => {
     await t.test('calendar days control generated sessions and exclude official holidays from attendance/report debt', async () => {
       await reset();
       const year = store.activeYear();
-      const term = store.termsOf(year.id)[0];
+      const term = store.termsOf(year.id)[1];
       const subject = makeSubject({ id: 'sub:preset', name: 'اختبار', slug: 'preset' });
       const section = makeSection({ id: 'sec:preset', yearId: year.id, grade: 4, label: 'أ' });
       const teaching = makeTeaching({ id: 'tch:preset', sectionId: section.id, subjectId: subject.id, termId: term.id });
+      const student = makeStudent({ id: 'student:preset', name: 'طالب اختبار التقويم' });
       const sunday = makeSlot({ id: 'sl:preset:sunday', teachingId: teaching.id, weekday: 0, period: 1 });
-      const wednesday = makeSlot({ id: 'sl:preset:wednesday', teachingId: teaching.id, weekday: 3, period: 1 });
-      await store.save({ subjects: [subject], sections: [section], teachings: [teaching], slots: [sunday, wednesday] });
-      const result = await store.generateSessionsForRange(teaching.id, '2026-09-20', '2026-09-26');
+      const friday = makeSlot({ id: 'sl:preset:friday', teachingId: teaching.id, weekday: 5, period: 1 });
+      await store.save({ subjects: [subject], sections: [section], teachings: [teaching], students: [student], slots: [sunday, friday] });
+      const result = await store.generateSessionsForRange(teaching.id, '2027-04-25', '2027-05-01');
       assert.equal(result.created, 1);
       assert.equal(result.holidays, 1);
-      assert.ok(store.getSession(`se:${teaching.id}:2026-09-20:1`));
-      assert.equal(store.getSession(`se:${teaching.id}:2026-09-23:1`), null);
-      const holidaySession = await store.ensureSession(teaching.id, '2026-09-23', 1);
+      assert.ok(store.getSession(`se:${teaching.id}:2027-04-25:1`));
+      assert.equal(store.getSession(`se:${teaching.id}:2027-04-30:1`), null);
+      const holidaySession = await store.ensureSession(teaching.id, '2027-04-30', 1);
       assert.equal(holidaySession.status, 'cancelled_holiday');
-      assert.equal(store.attendanceCompleteness(holidaySession, new Date('2026-09-24T12:00:00')).state, 'excluded');
-      const report = store.executionReport({ yearId: year.id, termId: term.id, reference: new Date('2026-09-24T12:00:00') });
+      assert.equal(store.attendanceCompleteness(holidaySession, new Date('2027-05-01T12:00:00')).state, 'excluded');
+      const report = store.executionReport({ yearId: year.id, termId: term.id, reference: new Date('2027-05-01T12:00:00') });
       assert.equal(report.counts.generated, 2);
       assert.equal(report.counts.excluded, 1);
       assert.equal(report.counts.pending, 1);

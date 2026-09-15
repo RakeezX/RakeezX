@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import test, { beforeEach } from 'node:test';
+import test, { beforeEach, after } from 'node:test';
 import assert from 'node:assert/strict';
 
 import * as db from '../src/lib/db.js';
@@ -17,6 +17,11 @@ beforeEach(async () => {
   store.state.ready = false;
   await store.init();
   await db.clearStore('outbox');
+});
+
+after(() => {
+  store.closeChannel();
+  db.closeDB();
 });
 
 test('owner-global activation queues only a profile V2 mutation and ignores legacy device selection', async () => {

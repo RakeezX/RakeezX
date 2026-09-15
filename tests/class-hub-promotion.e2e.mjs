@@ -23,7 +23,18 @@ for (const viewport of [
     await expect(classLink).toBeVisible();
     await classLink.click();
     await expect(page.locator('.class-hub')).toBeVisible();
-    await expect(page.locator('.class-hub .tile')).toHaveCount(6);
+    const tools = page.locator('.class-hub .tile');
+    await expect(tools).toHaveCount(8);
+    await expect(tools.locator('.tile__title')).toHaveText([
+      'هدف وميثاق الصف',
+      'الرصد السريع',
+      'القرعة',
+      'المجموعات',
+      'لوحة التميز',
+      'الحصص',
+      'التقارير',
+      'توزيع الدرجات',
+    ]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
 
     // Verify old "حذف الإسناد" button is removed from Class Workspace
@@ -69,14 +80,14 @@ for (const viewport of [
     await dialog.getByRole('button', { name: 'متابعة' }).click();
     await dialog.getByRole('button', { name: 'تأكيد الحذف' }).click();
     await expect(dialog).toHaveCount(0);
-    await page.waitForFunction((id) => window.store.state.sections.some((item) => item.id === id && item.deleted), fixture.sectionId);
+    await expect(page.locator('#toast')).toContainText('لا يمكن حذف الفصل لأنه يحتوي على بيانات محفوظة');
     const state = await page.evaluate((ids) => ({
       teachingDeleted: window.store.state.teachings.some((item) => item.id === ids.teachingId && item.deleted),
       sectionDeleted: window.store.state.sections.some((item) => item.id === ids.sectionId && item.deleted),
       studentDeleted: window.store.state.students.some((item) => item.id === ids.studentId && item.deleted),
       enrollmentDeleted: window.store.state.enrollments.some((item) => item.id === ids.enrollmentId && item.deleted),
     }), fixture);
-    expect(state).toEqual({ teachingDeleted: true, sectionDeleted: true, studentDeleted: true, enrollmentDeleted: true });
+    expect(state).toEqual({ teachingDeleted: false, sectionDeleted: false, studentDeleted: false, enrollmentDeleted: false });
     expect(errors.filter((error) => !error.includes('favicon'))).toEqual([]);
   });
 }

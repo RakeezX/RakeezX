@@ -12,8 +12,7 @@ test.describe('Manual Acceptance Requirements', () => {
     await page.goto('/#/classes');
     await expect(page.locator('.sidebar__brand').or(page.locator('.topbar__title')).first()).toBeVisible({ timeout: 15000 });
     
-    const ctaVisible = await page.getByRole('button', { name: /إعداد الفصول/ }).first().isVisible();
-    expect(ctaVisible).toBe(true);
+    await expect(page.locator('.empty').getByRole('button', { name: 'فصل جديد' })).toBeVisible();
   });
 
   test('Section edit uses the canonical grade catalog and preserves section identity', async ({ page }) => {
@@ -130,25 +129,30 @@ test.describe('Manual Acceptance Requirements', () => {
     // Teaching A: Sunday / Period 1.
     await addSlot('tchA', '0', '1');
     await expect(page.locator('#toast')).toContainText('أُضيفت');
-    const firstSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').getAttribute('data-id');
+    const firstSlot = page.locator('.slot').filter({ hasText: 'Math A' });
+    const firstSlotId = await firstSlot.getByRole('button', { name: 'تعديل الحصة' }).getAttribute('data-id');
     expect(firstSlotId).toBeTruthy();
 
     // Move the same slot to Monday / Period 4.
-    await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').click();
+    await firstSlot.getByRole('button', { name: 'تعديل الحصة' }).click();
     await expect(page.locator('.sheet')).toBeVisible();
     await page.selectOption('select[name="weekday"]', '1');
     await page.selectOption('select[name="period"]', '4');
     await page.click('button[form="slot-form"]');
     await expect(page.locator('#toast')).toContainText('تم تعديل');
-    await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
+    await expect(page.locator('.slot').filter({ hasText: 'Math A' }).locator('.slot__period-num')).toHaveText('4');
 
     // Teaching B can now use the released Sunday / Period 1 position.
     await addSlot('tchB', '0', '1');
     await expect(page.locator('#toast')).toContainText('أُضيفت');
 
-    // Teaching C is rejected because Teaching B occupies Sunday / Period 1.
-    await addSlot('tchC', '0', '1');
-    await expect(page.locator('#toast')).toContainText('مسجلة بالفعل');
+    // Teaching C cannot select Sunday / Period 1 because Teaching B occupies it.
+    await page.locator('[data-act="add"]').first().click();
+    await expect(page.locator('.sheet')).toBeVisible();
+    await page.selectOption('select[name="teachingId"]', 'tchC');
+    await page.selectOption('select[name="weekday"]', '0');
+    await expect(page.locator('select[name="period"] option[value="1"]')).toHaveAttribute('disabled', '');
+    await expect(page.locator('select[name="period"]')).not.toHaveValue('1');
     await page.keyboard.press('Escape');
 
     const snapshot = () => window.store.state.slots
@@ -162,9 +166,9 @@ test.describe('Manual Acceptance Requirements', () => {
     ]);
 
     await page.reload();
-    await expect(page.locator('.slot').filter({ hasText: 'الحصة الأولى' })).toBeVisible();
-    await expect(page.locator('.slot').filter({ hasText: 'الحصة الرابعة' })).toBeVisible();
-    const editedSlotId = await page.locator('.slot').filter({ hasText: 'الحصة الرابعة' }).locator('[data-act="edit"]').getAttribute('data-id');
+    await expect(page.locator('.slot').filter({ hasText: 'Math B' }).locator('.slot__period-num')).toHaveText('1');
+    await expect(page.locator('.slot').filter({ hasText: 'Math A' }).locator('.slot__period-num')).toHaveText('4');
+    const editedSlotId = await page.locator('.slot').filter({ hasText: 'Math A' }).getByRole('button', { name: 'تعديل الحصة' }).getAttribute('data-id');
     expect(editedSlotId).toBe(firstSlotId);
 
     const afterReload = await page.evaluate(snapshot);

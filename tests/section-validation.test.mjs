@@ -7,8 +7,12 @@ import * as store from '../src/store.js';
 beforeEach(async () => {
   await db.clearAll();
   for (const name of Object.keys(store.state)) if (Array.isArray(store.state[name])) store.state[name] = [];
-  await store.save({ years: [{ id:'year:A', label:'TEST year A' }, { id:'year:B', label:'TEST year B' }] });
-  await store.patchDevice({ activeYearId:'year:A' });
+  await store.save({
+    years: [{ id:'year:A', label:'TEST year A' }, { id:'year:B', label:'TEST year B' }],
+    terms: [{ id:'term:test', yearId:'year:A', name:'TEST term', index:1 }],
+    subjects: [{ id:'subject:test', name:'TEST subject', slug:'test-subject' }],
+  });
+  await store.patchDevice({ activeYearId:'year:A', activeTermId:'term:test' });
 });
 after(() => { store.closeChannel(); db.closeDB(); });
 

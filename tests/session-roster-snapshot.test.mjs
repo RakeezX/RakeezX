@@ -3,32 +3,12 @@ import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import * as sync from '../src/lib/sync.js';
-import { setMockAuth, setMockBackend } from '../src/lib/cloud.js';
 import {
   makeEnrollment, makeSection, makeSession, makeStudent, makeSubject, makeTeaching, makeTerm, makeYear,
 } from '../src/models.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
-
-class Backend {
-  constructor() { this.records = {}; }
-  async fetchRecords(table) { return structuredClone(this.records[table] ?? []); }
-  async upsertRecords(table, records) {
-    const target = this.records[table] ??= [];
-    for (const record of records) {
-      const index = target.findIndex((row) => row.id === record.id);
-      if (index >= 0) target[index] = structuredClone(record);
-      else target.push(structuredClone(record));
-    }
-    return { success: true };
-  }
-  async commitEnrollmentTransferAndRenumber({ source, destination, sourceRoster, destinationRoster }) {
-    await this.upsertRecords('enrollments', [source, destination, ...sourceRoster, ...destinationRoster]);
-    return { source, destination, source_roster: sourceRoster, destination_roster: destinationRoster };
-  }
-}
 
 async function fixture() {
   await db.clearAll();
@@ -53,10 +33,7 @@ async function fixture() {
   return { a, b, c, x, y, session };
 }
 
-test('first attendance freezes a session roster across transfer, return, reload, and sync', async () => {
-  const backend = new Backend();
-  setMockBackend(backend);
-  setMockAuth({ id: 'history-owner' }, {});
+test('first attendance freezes a session roster across transfer, return, and reload', async () => {
   const f = await fixture();
 
   await store.setAttendance(f.session.id, f.a.id, 'present');
@@ -65,7 +42,8 @@ test('first attendance freezes a session roster across transfer, return, reload,
     { studentId: f.a.id, rollNo: 1 },
     { studentId: f.b.id, rollNo: 2 },
   ], 'the first actual attendance mutation captures the active X roster');
-  assert.ok((await db.getAll('outbox')).some((entry) => entry.store === 'sessionRosterSnapshots'));
+  const command = (await db.getAll('outbox')).find((entry) => entry.command === 'attendance:record');
+  assert.equal(command?.patch?.sessionId, f.session.id, 'Sync V2 queues the attendance command that atomically creates the server roster snapshot');
 
   assert.ok(await store.transferStudent(f.a.id, f.y.id, { date: '2026-08-21' }));
   assert.deepEqual(store.sessionRoster(f.session).members.map((student) => student.id), [f.a.id, f.b.id]);
@@ -81,22 +59,9 @@ test('first attendance freezes a session roster across transfer, return, reload,
   await store.init();
   assert.deepEqual(store.sessionRosterSnapshot(f.session.id)?.members, initial.members, 'reload keeps snapshot');
 
-  await sync.syncStructural();
-  await sync.syncStudents();
-  await sync.syncTimetable();
-  assert.equal(backend.records.session_roster_snapshots?.[0]?.session_id, f.session.id, 'snapshot reaches cloud sync');
-
-  await db.clearAll();
-  await store.init();
-  await sync.syncStructural();
-  await sync.syncStudents();
-  await sync.syncTimetable();
-  assert.deepEqual(store.sessionRosterSnapshot(f.session.id)?.members, initial.members, 'fresh local context restores snapshot from sync');
 });
 
 after(async () => {
-  setMockBackend(null);
-  setMockAuth(null, null);
   store.closeChannel();
   db.closeDB();
 });

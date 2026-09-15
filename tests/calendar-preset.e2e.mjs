@@ -3,10 +3,11 @@ import { test, expect } from '@playwright/test';
 test('Western Region preset is visible and its official holiday is skipped through the real generator UI', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  await page.clock.setFixedTime(new Date('2026-09-27T12:00:00+03:00'));
   await page.goto('/#/calendar');
   await page.waitForFunction(() => window.store);
-  await expect(page.getByText('التقويم المعتمد')).toBeVisible();
-  await expect(page.getByText('1448–1449 هـ · المنطقة الغربية')).toBeVisible();
+  await expect(page.getByText('التقويم المعتمد', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'تقويم مكة المكرمة • المدينة المنورة • جدة • الطائف' })).toBeVisible();
   await expect(page.getByText('إجازة اليوم الوطني').first()).toBeVisible();
 
   await page.evaluate(async () => {
@@ -33,7 +34,7 @@ test('Western Region preset is visible and its official holiday is skipped throu
 test('calendar preset UI stays readable in RTL mobile width', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/calendar');
-  await expect(page.getByText('التقويم المعتمد')).toBeVisible();
+  await expect(page.getByText('التقويم المعتمد', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.dir || getComputedStyle(document.documentElement).direction)).toBe('rtl');
 });
@@ -41,23 +42,27 @@ test('calendar dates, semantics, Settings editor, and archive navigation follow 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/calendar');
-  await expect(page.getByText('17 يناير – 30 يونيو 2027')).toBeVisible();
+  await expect(page.getByText('17 يناير – 1 يوليو 2027')).toBeVisible();
   const nationalDay = page.locator('.calendar-period').filter({ hasText: 'إجازة اليوم الوطني' });
   await expect(nationalDay.getByText('23 – 26 سبتمبر 2026')).toBeVisible();
   await expect(nationalDay.getByText('4 أيام')).toBeVisible();
   await expect(nationalDay.getByText('رسمي')).toBeVisible();
   await expect(nationalDay).toHaveClass(/calendar-period--warn/);
 
-  await page.getByRole('link', { name: 'الإعدادات' }).click();
-  await expect(page.getByText('السنوات الدراسية')).toBeVisible();
-  await page.locator('.row').filter({ hasText: 'الفصل الدراسي الأول' }).getByRole('button', { name: 'تعديل' }).click();
-  await expect(page.getByRole('dialog').getByLabel('تاريخ البداية')).toHaveCount(0);
-  await expect(page.getByRole('dialog').getByLabel('تاريخ النهاية')).toHaveCount(0);
-  await expect(page.getByRole('dialog').getByLabel('الاسم')).toBeVisible();
-  await expect(page.getByRole('dialog').getByLabel('الترتيب')).toBeVisible();
-  await expect(page.getByRole('dialog').getByText('الحالة', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'إعدادات التقويم والمنطقة' }).click();
+  await expect(page.getByRole('dialog').getByText('السنوات الدراسية', { exact: true })).toBeVisible();
+  await page.getByRole('dialog').locator('.cal-settings-term').filter({ hasText: 'الفصل الدراسي الأول' })
+    .getByRole('button', { name: 'تعديل التواريخ' }).click();
+  await expect(page.getByRole('dialog').getByLabel('من *')).toBeVisible();
+  await expect(page.getByRole('dialog').getByLabel('إلى *')).toBeVisible();
+  await expect(page.getByRole('dialog').getByLabel('الاسم')).toHaveCount(0);
   await page.getByRole('dialog').getByLabel('إغلاق').click();
+  await expect(page.getByRole('dialog').getByText('السنوات الدراسية', { exact: true })).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'تم', exact: true }).click();
 
+  await page.goto('/#/settings');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'الإعدادات' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'الأرشيف' })).toBeVisible();
   await page.getByRole('link', { name: 'الأرشيف' }).click();
   await expect(page).toHaveURL(/#\/archive$/);

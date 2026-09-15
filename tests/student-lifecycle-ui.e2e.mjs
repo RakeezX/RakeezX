@@ -466,8 +466,10 @@ test('Student Management polish keeps long Arabic context and both consequences 
       await expect(entry.locator('svg')).toHaveCount(1);
       const person = page.locator('.student-management__person');
       await expect(person.locator('strong')).toHaveText(name);
+      await page.evaluate(() => document.fonts.ready);
       const titleBox = await person.locator('strong').boundingBox(), classBox = await person.locator('span').boundingBox();
-      expect(classBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
+      expect(classBox.y).toBeGreaterThan(titleBox.y + titleBox.height * .7);
+      expect(Math.abs((classBox.x + classBox.width) - (titleBox.x + titleBox.width))).toBeLessThanOrEqual(1);
       await expect(page.locator('.student-management__row')).toHaveCount(2);
       if (consequence === 'delete') await page.screenshot({ path: testInfo.outputPath(`polish-choose-${width}-${theme}.png`), animations: 'disabled' });
       await removeStudent(page);

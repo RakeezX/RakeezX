@@ -1,6 +1,13 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { defaultMobileScheduleDay, weeklySessionsLabel } from '../src/views/schedule.js';
+import * as db from '../src/lib/db.js';
+import * as store from '../src/store.js';
+
+after(() => {
+  store.closeChannel();
+  db.closeDB();
+});
 
 test('Schedule defaults to Today only on a teachable school day', () => {
   assert.equal(defaultMobileScheduleDay({ today: 0 }), '0');
