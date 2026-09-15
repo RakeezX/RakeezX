@@ -1,201 +1,192 @@
 import { test, expect } from '@playwright/test';
+import { createAttendanceServer } from './helpers/attendance-server-fixture.mjs';
 
-const CLOUD_URL = 'https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/';
+test.use({ baseURL: process.env.RAKEEZX_ATTENDANCE_TEST_URL ?? 'http://localhost:5173' });
 
-function mockCloud() {
-  const tables = Object.fromEntries([
-    'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
-    'students', 'enrollments', 'time_profiles', 'slots', 'sessions', 'attendance',
-    'items', 'scores', 'logs', 'calendars', 'calendar_days', 'units', 'lessons',
-    'notes', 'assignments', 'submissions',
-  ].map((name) => [name, []]));
+const STORES = [
+  'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
+  'students', 'enrollments', 'slots', 'sessions', 'attendance', 'sessionRosterSnapshots',
+];
+const ATTENDANCE_ROUTE = '/#/teaching/override-teaching/attendance?session=override-session';
 
-  return {
-    tables,
-    async route(page) {
-      await page.route(`${CLOUD_URL}*`, async (route) => {
-        const request = route.request();
-        const table = new URL(request.url()).pathname.split('/').pop();
-        if (request.method() === 'GET') {
-          await route.fulfill({ json: tables[table] ?? [] });
-          return;
-        }
-        if (request.method() === 'POST') {
-          const payload = JSON.parse(request.postData() ?? '[]');
-          for (const record of payload) {
-            const row = { ...record };
-            const index = (tables[table] ??= []).findIndex((item) => item.id === row.id);
-            if (index < 0) tables[table].push(row);
-            else tables[table][index] = row;
-          }
-          await route.fulfill({ json: [] });
-          return;
-        }
-        await route.fulfill({ status: 200, json: [] });
-      });
-    },
-  };
-}
-
-async function signInForMockSync(page, cloud) {
-  await page.addInitScript(() => {
-    localStorage.setItem('rakeezx-auth', JSON.stringify({
-      access_token: 'test-token', user: { id: 'attendance-test-user' },
-    }));
-  });
-  await cloud.route(page);
-}
-
-test('attendance remains historical after recurring slot edit and sync converges', async ({ page }) => {
-  test.setTimeout(90_000);
-  const cloud = mockCloud();
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
-  await signInForMockSync(page, cloud);
-  await page.goto('/#/schedule');
-  await page.waitForFunction(() => window.__syncModule && window.store, { timeout: 15_000 });
-
-  // Isolated TEST-only fixture: one section, one teaching, and four students.
-  await page.evaluate(async () => {
-    await window.store.save({
-      years: [{ id: 'test-year', name: 'TEST Year' }],
-      terms: [{ id: 'test-term', yearId: 'test-year', name: 'TEST Term' }],
-      subjects: [{ id: 'test-subject', name: 'TEST Attendance' }],
-      sections: [{ id: 'test-section', yearId: 'test-year', grade: 4, label: 'T', name: 'TEST 4/T', order: 0 }],
-      teachings: [{ id: 'test-teaching', sectionId: 'test-section', subjectId: 'test-subject', termId: 'test-term', order: 0 }],
-      students: [
-        { id: 'test-student-present', name: 'TEST Present', status: 'active' },
-        { id: 'test-student-absent', name: 'TEST Absent', status: 'active' },
-        { id: 'test-student-late', name: 'TEST Late', status: 'active' },
-        { id: 'test-student-excused', name: 'TEST Excused', status: 'active' },
-      ],
-      enrollments: [
-        { id: 'test-enrollment-present', studentId: 'test-student-present', sectionId: 'test-section', status: 'active', rollNo: 1 },
-        { id: 'test-enrollment-absent', studentId: 'test-student-absent', sectionId: 'test-section', status: 'active', rollNo: 2 },
-        { id: 'test-enrollment-late', studentId: 'test-student-late', sectionId: 'test-section', status: 'active', rollNo: 3 },
-        { id: 'test-enrollment-excused', studentId: 'test-student-excused', sectionId: 'test-section', status: 'active', rollNo: 4 },
-      ],
-    });
-    await window.store.patchDevice({ activeYearId: 'test-year', activeTermId: 'test-term' });
-    window.store.repaint();
-  });
-  // Establish the TEST fixture's structural and student dependencies before syncing attendance.
-  await page.evaluate(async () => {
-    await window.__syncModule.syncStructural();
-    await window.__syncModule.syncStudents();
-  });
-
-  // Create the recurring Sunday/P1 slot through the actual timetable UI.
-  await page.locator('[data-act="add"]').first().click();
-  await page.selectOption('select[name="teachingId"]', 'test-teaching');
-  await page.selectOption('select[name="weekday"]', '0');
-  await page.selectOption('select[name="period"]', '1');
-  await page.click('button[form="slot-form"]');
-  await expect(page.locator('#toast')).toContainText('أُضيفت');
-  const slotId = await page.locator('.slot').filter({ hasText: 'الحصة الأولى' }).locator('[data-act="edit"]').getAttribute('data-id');
-  expect(slotId).toBeTruthy();
-
-  // Open the Sunday dated session through the attendance UI, not by seeding a session.
-  await page.goto('/#/teaching/test-teaching/attendance');
-  const daysSinceSunday = await page.evaluate(() => new Date().getDay());
-  for (let index = 0; index < daysSinceSunday; index += 1) {
-    await page.locator('[data-act="prev-day"]').click();
+async function fetchCanonical(server, entity) {
+  if (entity === 'slots') {
+    return (await server.pg.query('select to_jsonb(t) as record from rakeezx.slots t')).rows.map((row) => row.record);
   }
-  await expect(page.locator('.att-row')).toHaveCount(4);
+  return server.fetchRecords(entity === 'sessionRosterSnapshots' ? 'session_roster_snapshots' : entity);
+}
 
-  const setStatus = async (student, status) => {
-    await page.locator('.att-row', { hasText: student }).locator(`[data-status="${status}"]`).click();
+async function applyMutation(server, envelope) {
+  return (await server.pg.query(
+    'select rakeezx.apply_sync_v2_mutation($1,$2,$3,$4,$5,$6::jsonb,$7,$8) as result',
+    [
+      envelope.entity, envelope.recordId, envelope.mutationId, envelope.deviceId,
+      envelope.baseRevision, JSON.stringify(envelope.patch ?? {}), envelope.operation,
+      envelope.clientUpdatedAt ?? null,
+    ],
+  )).rows[0].result;
+}
+
+async function installEngine(page) {
+  await page.waitForFunction(() => window.store?.state.ready);
+  await page.evaluate(async () => {
+    const database = await import('/src/lib/db.js');
+    const { createSyncV2Engine } = await import('/src/lib/sync-v2.js');
+    window.attendanceHistoryEngine = createSyncV2Engine({
+      database,
+      transport: {
+        fetchRecords: (entity) => window.attendanceHistoryRpc({ method: 'fetchRecords', args: entity }),
+        applyMutation: (args) => window.attendanceHistoryRpc({ method: 'applyMutation', args }),
+        applyFillAttendanceCommand: (args) => window.attendanceHistoryRpc({ method: 'applyFillAttendanceCommand', args }),
+        applyAttendanceCommand: (args) => window.attendanceHistoryRpc({ method: 'applyAttendanceCommand', args }),
+      },
+    });
+  });
+}
+
+async function setupDevice(page, server) {
+  await page.route('**/*.supabase.co/**', (route) => route.abort('blockedbyclient'));
+  await page.exposeFunction('attendanceHistoryRpc', ({ method, args }) => {
+    if (method === 'fetchRecords') return fetchCanonical(server, args);
+    if (method === 'applyMutation') return applyMutation(server, args);
+    return server[method](args);
+  });
+  const records = Object.fromEntries(await Promise.all(
+    STORES.map(async (store) => [store, await fetchCanonical(server, store)]),
+  ));
+  await page.goto('/');
+  await page.waitForFunction(() => window.store?.state.ready);
+  await page.evaluate(async (canonical) => {
+    const database = await import('/src/lib/db.js');
+    const { decodeSyncV2Canonical } = await import('/src/lib/sync-v2.js');
+    await window.store.save(Object.fromEntries(Object.entries(canonical).map(([store, rows]) => [
+      store,
+      rows.map((row) => decodeSyncV2Canonical(store, row)),
+    ])), { queue: false });
+    await window.store.patchDevice({ activeYearId: 'override-year', activeTermId: 'override-term' });
+    await database.clearStore('outbox');
+  }, records);
+  await installEngine(page);
+}
+
+test('attendance remains historical after recurring slot edit and Sync V2 convergence', async ({ page, browser }) => {
+  test.setTimeout(60_000);
+  const server = await createAttendanceServer();
+  const peerContext = await browser.newContext({ viewport: { width: 390, height: 850 } });
+  const errors = [];
+  const watchErrors = (target) => {
+    target.on('pageerror', (error) => errors.push(error.message));
+    target.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
   };
-  await setStatus('TEST Present', 'present');
-  await setStatus('TEST Absent', 'absent');
-  await setStatus('TEST Late', 'late');
-  await setStatus('TEST Excused', 'excused');
-  await expect(page.locator('.att-pill[role="status"][aria-label="حالة الرصد: مكتمل"]')).toBeVisible();
+  watchErrors(page);
 
-  const historical = await page.evaluate(() => {
-    const session = window.store.state.sessions.find((item) => item.teachingId === 'test-teaching' && !item.deleted && window.store.state.attendance.some((record) => record.sessionId === item.id && !record.deleted));
-    const attendance = window.store.state.attendance
-      .filter((item) => item.sessionId === session.id && !item.deleted)
-      .map(({ id, studentId, sessionId, teachingId, date, status }) => ({ id, studentId, sessionId, teachingId, date, status }))
-      .sort((left, right) => left.studentId.localeCompare(right.studentId));
-    return { session: { id: session.id, date: session.date, period: session.period, slotId: session.slotId }, attendance };
-  });
-  expect(historical.session.slotId).toBe(slotId);
-  expect(historical.attendance).toHaveLength(4);
-  expect(new Set(historical.attendance.map((item) => item.studentId)).size).toBe(4);
-  expect(historical.attendance.map((item) => item.status)).toEqual(['absent', 'excused', 'late', 'present']);
+  try {
+    await server.pg.exec(`
+      insert into rakeezx.slots(id,teaching_id,weekday,period)
+        values ('history-slot','override-teaching',0,1);
+      update rakeezx.sessions set slot_id='history-slot' where id='override-session';
+    `);
+    await setupDevice(page, server);
 
-  // Reload the exact dated session and confirm the same records survive locally.
-  await page.goto(`/#/teaching/test-teaching/attendance?session=${historical.session.id}`);
-  await expect(page.locator('.att-row', { hasText: 'TEST Excused' }).locator('[data-status="excused"]')).toHaveClass(/is-on/);
-  expect(await page.evaluate(() => window.store.state.attendance.filter((item) => !item.deleted && item.sessionId).length)).toBe(4);
+    await page.goto('/#/schedule');
+    const firstPeriodSlot = page.locator('.slot').filter({
+      has: page.locator('.slot__period-num', { hasText: /^1$/ }),
+    });
+    await expect(firstPeriodSlot.locator('.slot__period-num')).toHaveText('1');
+    await expect(firstPeriodSlot.locator('[data-act="edit"]')).toHaveAttribute('data-id', 'history-slot');
 
-  // Move the recurring slot through the real edit sheet. Historical dated attendance must not move or duplicate.
-  await page.goto('/#/schedule');
-  await page.locator(`[data-act="edit"][data-id="${slotId}"]`).click();
-  await page.selectOption('select[name="weekday"]', '1');
-  await page.selectOption('select[name="period"]', '4');
-  await page.click('button[form="slot-form"]');
-  await expect(page.locator('#toast')).toContainText('تم تعديل');
-  expect(await page.evaluate((expected) => {
-    const slot = window.store.state.slots.find((item) => item.id === expected);
-    return { id: slot.id, weekday: slot.weekday, period: slot.period };
-  }, slotId)).toEqual({ id: slotId, weekday: 1, period: 4 });
-  expect(await page.evaluate((snapshot) => {
-    const session = window.store.state.sessions.find((item) => item.id === snapshot.session.id);
-    const attendance = window.store.state.attendance
-      .filter((item) => item.sessionId === snapshot.session.id && !item.deleted)
-      .map(({ studentId, status, date, teachingId }) => ({ studentId, status, date, teachingId }))
-      .sort((left, right) => left.studentId.localeCompare(right.studentId));
-    return { session: { id: session.id, date: session.date, period: session.period, slotId: session.slotId }, attendance };
-  }, historical)).toEqual({
-    session: historical.session,
-    attendance: historical.attendance.map(({ studentId, status, date, teachingId }) => ({ studentId, status, date, teachingId })),
-  });
+    await page.goto(ATTENDANCE_ROUTE);
+    await expect(page.locator('.att-row')).toHaveCount(3);
+    for (const [studentId, status] of [
+      ['override-a', 'present'], ['override-b', 'absent'], ['override-c', 'excused'],
+    ]) {
+      await page.locator(`[data-act="set"][data-id="${studentId}"][data-status="${status}"]`).click();
+    }
+    const attendancePush = await page.evaluate(async () => {
+      const result = await window.attendanceHistoryEngine.dispatchPending();
+      await window.store.refreshSyncedState();
+      return result;
+    });
+    expect(attendancePush).toMatchObject({ acknowledged: 3, failed: 0, blocked: 0 });
 
-  // The attendance report reads the same historical session data.
-  await page.goto('/#/teaching/test-teaching/reports');
-  await page.locator('[data-act="tab"][data-tab="attendance"]').click();
-  await expect(page.locator('.gtable--report')).toContainText('TEST Present');
-  await expect(page.locator('.gtable--report')).toContainText('TEST Absent');
-  await expect(page.locator('.gtable--report')).toContainText('TEST Late');
-  await expect(page.locator('.gtable--report')).toContainText('TEST Excused');
+    const historical = await page.evaluate(async () => {
+      const database = await import('/src/lib/db.js');
+      const session = await database.get('sessions', 'override-session');
+      const rows = (await database.getAll('attendance'))
+        .filter((row) => row.sessionId === session.id && !row.deleted)
+        .sort((left, right) => left.studentId.localeCompare(right.studentId));
+      return {
+        session: { id: session.id, date: session.date, period: session.period, slotId: session.slotId },
+        attendance: rows.map(({ studentId, status, sessionId, teachingId, date }) => ({ studentId, status, sessionId, teachingId, date })),
+      };
+    });
+    expect(historical.session).toEqual({ id: 'override-session', date: '2026-09-06', period: 1, slotId: 'history-slot' });
+    expect(historical.attendance.map((row) => row.status)).toEqual(['present', 'absent', 'excused']);
 
-  // Dated-session mutations enqueue automatic sync; wait for it to settle before
-  // asserting the explicit follow-up is a no-op and cloud convergence is complete.
-  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
-  const firstSync = await page.evaluate(() => window.__syncModule.syncTimetable());
-  expect(firstSync.attendance).toEqual({ pushed: 0, pulled: 0 });
-  const secondSync = await page.evaluate(() => window.__syncModule.syncTimetable());
-  expect(secondSync.attendance).toEqual({ pushed: 0, pulled: 0 });
-  expect(cloud.tables.attendance).toHaveLength(4);
+    await page.reload();
+    await installEngine(page);
+    await expect(page.locator('[data-id="override-b"][data-status="absent"]')).toHaveClass(/is-on/);
 
-  // A fresh device downloads exactly the same four dated records: no duplicate or resurrection.
-  const browser = page.context().browser();
-  const deviceB = await browser.newContext();
-  const pageB = await deviceB.newPage();
-  const errorsB = [];
-  pageB.on('pageerror', (error) => errorsB.push(error.message));
-  pageB.on('console', (message) => {
-    if (message.type() === 'error') errorsB.push(message.text());
-  });
-  await signInForMockSync(pageB, cloud);
-  await pageB.goto('/#/classes');
-  await pageB.waitForFunction(() => window.__syncModule && window.store, { timeout: 15_000 });
-  // Authenticated boot now performs the full dependency-safe pull itself.
-  await pageB.waitForFunction(() => window.__syncModule.state.status === 'synced', { timeout: 15_000 });
-  await pageB.evaluate(() => window.store.patchDevice({ activeYearId: 'test-year', activeTermId: 'test-term' }));  await pageB.goto(`/#/teaching/test-teaching/attendance?session=${historical.session.id}`);
-  await expect(pageB.locator('.att-row')).toHaveCount(4);
-  expect(await pageB.evaluate((sessionId) => {
-    const records = window.store.state.attendance.filter((item) => !item.deleted && item.sessionId === sessionId);
-    return { count: records.length, uniqueStudents: new Set(records.map((item) => item.studentId)).size };
-  }, historical.session.id)).toEqual({ count: 4, uniqueStudents: 4 });
-  await pageB.goto('/#/teaching/test-teaching/sessions');
-  await expect(pageB.getByText('تم رصد الحضور', { exact: true })).toBeVisible();
-  expect(errorsB).toEqual([]);
-  await deviceB.close();
-  expect(errors).toEqual([]);
+    await page.goto('/#/schedule');
+    await page.locator('[data-act="edit"][data-id="history-slot"]').click();
+    await page.selectOption('select[name="weekday"]', '1');
+    await page.selectOption('select[name="period"]', '4');
+    await page.click('button[form="slot-form"]');
+    await expect(page.locator('#toast')).toContainText('تم تعديل');
+    const slotPush = await page.evaluate(async () => {
+      const result = await window.attendanceHistoryEngine.dispatchPending();
+      await window.store.refreshSyncedState();
+      return result;
+    });
+    expect(slotPush).toMatchObject({ acknowledged: 1, failed: 0, blocked: 0 });
+
+    expect(await page.evaluate(async (snapshot) => {
+      const database = await import('/src/lib/db.js');
+      const session = await database.get('sessions', snapshot.session.id);
+      const attendance = (await database.getAll('attendance'))
+        .filter((row) => row.sessionId === snapshot.session.id && !row.deleted)
+        .sort((left, right) => left.studentId.localeCompare(right.studentId))
+        .map(({ studentId, status, sessionId, teachingId, date }) => ({ studentId, status, sessionId, teachingId, date }));
+      return { session: { id: session.id, date: session.date, period: session.period, slotId: session.slotId }, attendance };
+    }, historical)).toEqual(historical);
+
+    await page.goto('/#/teaching/override-teaching/reports');
+    await page.locator('[data-act="tab"][data-tab="attendance"]').click();
+    await expect(page.locator('.gtable--report')).toContainText('طالب اختبار أ');
+    await expect(page.locator('.gtable--report')).toContainText('طالب اختبار ب');
+    await expect(page.locator('.gtable--report')).toContainText('طالب اختبار ج');
+
+    const peer = await peerContext.newPage();
+    watchErrors(peer);
+    await setupDevice(peer, server);
+    await peer.goto(ATTENDANCE_ROUTE);
+    await expect(peer.locator('.att-row')).toHaveCount(3);
+    await expect(peer.locator('[data-id="override-b"][data-status="absent"]')).toHaveClass(/is-on/);
+    const peerState = await peer.evaluate(async () => {
+      const database = await import('/src/lib/db.js');
+      const slot = await database.get('slots', 'history-slot');
+      const session = await database.get('sessions', 'override-session');
+      const rows = (await database.getAll('attendance')).filter((row) => row.sessionId === session.id && !row.deleted);
+      return {
+        slot: { id: slot.id, weekday: slot.weekday, period: slot.period },
+        session: { id: session.id, date: session.date, period: session.period, slotId: session.slotId },
+        attendanceCount: rows.length,
+        uniqueStudents: new Set(rows.map((row) => row.studentId)).size,
+      };
+    });
+    expect(peerState).toEqual({
+      slot: { id: 'history-slot', weekday: 1, period: 4 },
+      session: historical.session,
+      attendanceCount: 3,
+      uniqueStudents: 3,
+    });
+    await peer.goto('/#/teaching/override-teaching/sessions');
+    await expect(peer.getByText('تم رصد الحضور', { exact: true })).toBeVisible();
+    expect(errors).toEqual([]);
+  } finally {
+    await peerContext.close();
+    await server.close();
+  }
 });

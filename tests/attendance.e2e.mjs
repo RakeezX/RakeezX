@@ -1,127 +1,150 @@
 import { test, expect } from '@playwright/test';
+import { createAttendanceServer } from './helpers/attendance-server-fixture.mjs';
 
-const NOW = Date.now() + 86400000; // Future timestamp to override local defaults
-const today = new Date().toLocaleDateString('en-CA'); // 'YYYY-MM-DD'
-const MOCK_DB = {
-  years: [{ id: 'y1', label: '1445', order: 1, client_updated_at: NOW }],
-  terms: [{ id: 't1', year_id: 'y1', name: 'T1', client_updated_at: NOW }],
-  subjects: [{ id: 'sub1', name: 'Math', client_updated_at: NOW }],
-  sections: [{ id: 'sec1', year_id: 'y1', grade: 1, label: 'A', name: '1/A', client_updated_at: NOW }],
-  teachings: [{ id: 'tch1', section_id: 'sec1', subject_id: 'sub1', term_id: 't1', client_updated_at: NOW }],
-  students: [
-    { id: 'std1', name: 'Student 1', status: 'active', client_updated_at: NOW },
-    { id: 'std2', name: 'Student 2', status: 'active', client_updated_at: NOW }
-  ],
-  enrollments: [
-    { id: 'enr1', student_id: 'std1', section_id: 'sec1', status: 'active', client_updated_at: NOW },
-    { id: 'enr2', student_id: 'std2', section_id: 'sec1', status: 'active', client_updated_at: NOW }
-  ],
-  time_profiles: [{ id: 'tp1', name: 'Default', periods: [], client_updated_at: NOW }],
-  slots: [],
-  sessions: [{ id: 'ses1', teaching_id: 'tch1', date: today, period: 1, status: 'scheduled', client_updated_at: NOW }],
-  attendance: []
-};
+test.use({ baseURL: process.env.RAKEEZX_ATTENDANCE_TEST_URL ?? 'http://localhost:5173' });
 
-function setupMockCloud(page) {
-  return page.route('https://bmekljhmepgkhywjzkdx.supabase.co/rest/v1/*', async (route) => {
-    const request = route.request();
-    const url = new URL(request.url());
-    const table = url.pathname.split('/').pop();
+const STORES = [
+  'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
+  'students', 'enrollments', 'sessions', 'attendance', 'sessionRosterSnapshots',
+];
+const ROUTE = '/#/teaching/override-teaching/attendance?session=override-session';
 
-    if (request.method() === 'GET') {
-      await route.fulfill({ json: MOCK_DB[table] || [] });
-    } else if (request.method() === 'POST') {
-      const payload = JSON.parse(request.postData());
-      if (!MOCK_DB[table]) MOCK_DB[table] = [];
-      for (const rec of payload) {
-        const idx = MOCK_DB[table].findIndex(r => r.id === rec.id);
-        if (idx >= 0) MOCK_DB[table][idx] = { ...rec, client_updated_at: Date.now() };
-        else MOCK_DB[table].push({ ...rec, client_updated_at: Date.now() });
-      }
-      await route.fulfill({ json: [] });
-    } else {
-      await route.continue();
-    }
+async function installEngine(page) {
+  await page.waitForFunction(() => window.store?.state.ready);
+  await page.evaluate(async () => {
+    const database = await import('/src/lib/db.js');
+    const { createSyncV2Engine } = await import('/src/lib/sync-v2.js');
+    window.attendanceE2eEngine = createSyncV2Engine({
+      database,
+      transport: {
+        fetchRecords: (entity) => window.attendanceE2eRpc({ method: 'fetchRecords', args: entity }),
+        applyFillAttendanceCommand: (args) => window.attendanceE2eRpc({ method: 'applyFillAttendanceCommand', args }),
+        applyAttendanceCommand: (args) => window.attendanceE2eRpc({ method: 'applyAttendanceCommand', args }),
+      },
+    });
   });
 }
 
-test.describe('E2E Attendance Flow', () => {
-  test('should run cross-device sync workflow safely', async ({ page }) => {
-    test.setTimeout(60000); // Give plenty of time for 2 browsers + multiple syncs
+async function setupDevice(page, server) {
+  // This test never reaches Supabase; all server work uses isolated PostgreSQL.
+  // Keep the app's automatic coordinator offline so the explicit isolated V2
+  // engine is the only dispatcher; page assets and the test RPC remain local.
+  await page.addInitScript(() => Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false }));
+  await page.route('**/*.supabase.co/**', (route) => route.abort('blockedbyclient'));
+  await page.exposeFunction('attendanceE2eRpc', ({ method, args }) => server[method](args));
+  const records = Object.fromEntries(await Promise.all(
+    STORES.map(async (store) => [
+      store,
+      await server.fetchRecords(store === 'sessionRosterSnapshots' ? 'session_roster_snapshots' : store),
+    ]),
+  ));
+  await page.goto('/');
+  await page.waitForFunction(() => window.store?.state.ready);
+  await page.evaluate(async (canonical) => {
+    const database = await import('/src/lib/db.js');
+    const { decodeSyncV2Canonical } = await import('/src/lib/sync-v2.js');
+    await window.store.save(Object.fromEntries(Object.entries(canonical).map(([store, rows]) => [
+      store,
+      rows.map((row) => decodeSyncV2Canonical(store, row)),
+    ])), { queue: false });
+    await window.store.patchDevice({ activeYearId: 'override-year', activeTermId: 'override-term' });
+    await database.clearStore('outbox');
+  }, records);
+  await installEngine(page);
+  await page.goto(ROUTE);
+  await expect(page.locator('.att-row')).toHaveCount(3);
+}
 
-    // We'll manage multiple pages manually for Device A and Device B
-    const browser = page.context().browser();
-    const contextA = await browser.newContext();
-    const pageA = await contextA.newPage();
-    pageA.on('console', msg => console.log(`[Device A] ${msg.type()}: ${msg.text()}`));
-    pageA.on('pageerror', err => console.error(`[Device A] Error: ${err}`));
+async function expectStates(page, states) {
+  for (const [studentId, status] of Object.entries(states)) {
+    await expect(page.locator(`[data-act="set"][data-id="${studentId}"][data-status="${status}"]`)).toHaveClass(/is-on/);
+  }
+}
 
-    // Auth bypass
-    await pageA.addInitScript(() => {
-      localStorage.setItem('rakeezx-auth', JSON.stringify({
-        access_token: 'fake-token',
-        user: { id: 'test-user' }
+test('current Sync V2 attendance persists, acknowledges, and converges in both directions', async ({ page, browser }) => {
+  test.setTimeout(60_000);
+  const server = await createAttendanceServer();
+  const peerContext = await browser.newContext({ viewport: { width: 390, height: 850 } });
+  const errors = [];
+  const watchErrors = (target) => {
+    target.on('pageerror', (error) => errors.push(error.message));
+    target.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
+  };
+  watchErrors(page);
+
+  try {
+    await setupDevice(page, server);
+    await page.locator('[data-act="set"][data-id="override-a"][data-status="present"]').click();
+    await page.locator('[data-act="set"][data-id="override-b"][data-status="absent"]').click();
+    await page.locator('[data-act="set"][data-id="override-c"][data-status="excused"]').click();
+    const initial = { 'override-a': 'present', 'override-b': 'absent', 'override-c': 'excused' };
+    await expectStates(page, initial);
+
+    const queued = await page.evaluate(async () => {
+      const database = await import('/src/lib/db.js');
+      return (await database.getAll('outbox')).map(({ command, state }) => ({ command, state }));
+    });
+    expect(queued).toHaveLength(3);
+    expect(queued.every((entry) => entry.command === 'attendance:record' && entry.state === 'pending')).toBe(true);
+
+    const pushed = await page.evaluate(async () => {
+      const result = await window.attendanceE2eEngine.dispatchPending();
+      await window.store.refreshSyncedState();
+      return result;
+    });
+    expect(pushed).toMatchObject({ acknowledged: 3, failed: 0, blocked: 0 });
+    expect(await page.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).length)).toBe(0);
+
+    await page.reload();
+    await installEngine(page);
+    await expectStates(page, initial);
+
+    const peer = await peerContext.newPage();
+    watchErrors(peer);
+    await setupDevice(peer, server);
+    await expectStates(peer, initial);
+
+    // A later explicit action on the second client is authoritative and returns to the first.
+    await peer.locator('[data-act="set"][data-id="override-c"][data-status="late"]').click();
+    const reverse = await peer.evaluate(async () => {
+      const result = await window.attendanceE2eEngine.dispatchPending();
+      await window.store.refreshSyncedState();
+      const database = await import('/src/lib/db.js');
+      const pending = (await database.getAll('outbox')).map(({ command, state, lastError, blockedReason }) => ({
+        command, state, lastError, blockedReason,
       }));
+      return { result, pending };
     });
-    await setupMockCloud(pageA);
-
-    await pageA.goto('/#/classes');
-
-    // Wait for the app to finish async boot
-    await pageA.waitForFunction(() => window.__syncModule !== undefined, { timeout: 10000 });
-
-    // Authenticated boot now pulls the fixture automatically; wait for actual data,
-    // rather than racing the in-flight initial sync with manual category calls.
-    await pageA.waitForFunction(() => window.store.getTeaching('tch1') && window.store.state.students.length >= 2, { timeout: 15_000 });
-    await pageA.evaluate(() => window.store.patchDevice({ activeTermId: 't1' }));
-    await pageA.reload();
-    await pageA.waitForFunction(() => window.store.getTeaching('tch1') && window.__syncModule?.state.status === 'synced', { timeout: 15_000 });
-    await expect(pageA.locator('.class-card__title').first()).toBeVisible({ timeout: 5_000 });
-    // Click class
-    await pageA.click('a[href="#/teaching/tch1"]');
-
-    // Teaching Hub -> Attendance
-    await pageA.click('a[href="#/teaching/tch1/attendance"]');
-
-    // Check if students are rendered
-    await expect(pageA.locator('text="Student 1"')).toBeVisible();
-    await expect(pageA.locator('text="Student 2"')).toBeVisible();
-
-    // Mark Student 1 as present (assume there is a button for presence)
-    // Actually, RakeezX attendance UI marks by clicking the state icon or standard buttons.
-    const student1Row = pageA.locator('.att-row', { hasText: 'Student 1' }).first();
-    await student1Row.locator('.segbtn[data-status="present"]').click();
-
-    // Explicitly sync timetable after marking attendance to ensure the MOCK cloud backend receives the record.
-    // Auto-sync timing is non-deterministic in test environments; explicit sync is reliable.
-    await pageA.evaluate(async () => {
-      await window.__syncModule.syncTimetable();
+    expect(reverse.result, JSON.stringify(reverse.pending)).toMatchObject({ acknowledged: 1, failed: 0, blocked: 0 });
+    await page.evaluate(async () => {
+      await window.attendanceE2eEngine.pullAll({ stores: ['attendance', 'sessionRosterSnapshots'] });
+      await window.store.refreshSyncedState();
     });
+    const final = { 'override-a': 'present', 'override-b': 'absent', 'override-c': 'late' };
+    await expectStates(page, final);
+    await expectStates(peer, final);
 
-    // DEVICE B
-    const contextB = await browser.newContext();
-    const pageB = await contextB.newPage();
-    await pageB.addInitScript(() => {
-      localStorage.setItem('rakeezx-auth', JSON.stringify({
-        access_token: 'fake-token',
-        user: { id: 'test-user' }
-      }));
-    });
-    await setupMockCloud(pageB);
-
-    await pageB.goto('/#/teaching/tch1/attendance');
-
-    // Give page B a moment to initialize
-    await pageB.waitForTimeout(1000);
-
-    // Verify Device B reaches the attendance view without JS errors.
-    // The mock MOCK_DB.attendance state was set by Device A's explicit sync call.
-    await expect(pageB.locator('#app')).toBeVisible({ timeout: 5000 });
-    // The attendance record pushed by Device A must be in the mock cloud backend
-    expect(MOCK_DB.attendance.length).toBeGreaterThan(0); // Device A must have synced at least one record
-
-    // Cleanup: close browser contexts to release resources
-    await contextA.close();
-    await contextB.close();
-  });
+    for (const target of [page, peer]) {
+      const local = await target.evaluate(async () => {
+        const database = await import('/src/lib/db.js');
+        const rows = (await database.getAll('attendance'))
+          .filter((row) => row.sessionId === 'override-session' && !row.deleted);
+        return {
+          count: rows.length,
+          unique: new Set(rows.map((row) => `${row.sessionId}:${row.studentId}`)).size,
+          statuses: rows.sort((left, right) => left.studentId.localeCompare(right.studentId)).map((row) => row.status),
+        };
+      });
+      expect(local).toEqual({ count: 3, unique: 3, statuses: ['present', 'absent', 'late'] });
+    }
+    const remote = await server.fetchRecords('attendance');
+    expect(remote).toHaveLength(3);
+    expect(new Set(remote.map((row) => `${row.session_id}:${row.student_id}`)).size).toBe(3);
+    expect(errors).toEqual([]);
+  } finally {
+    await peerContext.close();
+    await server.close();
+  }
 });
