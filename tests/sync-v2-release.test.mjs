@@ -209,7 +209,8 @@ test('PWA release precaches Sync V2 and the subject catalog while preserving the
   assert.match(sw, /\.\/src\/lib\/subject-catalog\.js/);
   assert.match(sw, /self\.skipWaiting\(\)/);
   assert.match(sw, /self\.clients\.claim\(\)/);
-  assert.match(sw, /key\.startsWith\('rakeezx-'\)/);
+  assert.match(sw, /key\.startsWith\(CACHE_PREFIX\)/);
+  assert.match(sw, /generation < CACHE_GENERATION/);
   assert.match(cloudSource, new RegExp(CANDIDATE_REF));
   assert.doesNotMatch(cloudSource, /bmekljhmepgkhywjzkdx/);
   assert.doesNotMatch(cloudSource, /service_role/i);

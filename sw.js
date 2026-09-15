@@ -4,13 +4,27 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v17';
+const VERSION = 'rakeezx-v18';
+const CACHE_PREFIX = 'rakeezx-v';
+const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
+
+const rakeezCacheGeneration = (key) => {
+  if (!key.startsWith(CACHE_PREFIX)) return null;
+  const generation = Number(key.slice(CACHE_PREFIX.length));
+  return Number.isInteger(generation) && generation >= 0 ? generation : null;
+};
 
 const clearOldRakeezCaches = async () => {
   const keys = await caches.keys();
   await Promise.all(
     keys
-      .filter((key) => key !== VERSION && key.startsWith('rakeezx-'))
+      // A prior worker can still control a page while this release installs.
+      // It may remove only older generations, never a cache being built by a
+      // newer worker.
+      .filter((key) => {
+        const generation = rakeezCacheGeneration(key);
+        return generation !== null && generation < CACHE_GENERATION;
+      })
       .map((key) => caches.delete(key))
   );
 };
@@ -147,6 +161,13 @@ self.addEventListener('fetch', (event) => {
     return cached || new Response('', { status });
   };
 
+  const cachedNavigationFallback = async () => {
+    // Cloudflare Pages redirects /index.html to /. Returning that cached
+    // redirected response from respondWith() makes Chrome fail the navigation.
+    // The canonical root shell is cached separately as a non-redirected 200.
+    return (await caches.match('./')) || cachedFallback('./index.html', 503);
+  };
+
   // Navigation requests: Network-First. Hash routes still resolve to this shell.
   if (request.mode === 'navigate') {
     event.respondWith(
@@ -156,7 +177,7 @@ self.addEventListener('fetch', (event) => {
           return await cacheResponse('./index.html', await fetch(request));
         } catch (err) {
           try {
-            return await cachedFallback('./index.html', 503);
+            return await cachedNavigationFallback();
           } catch (e) {
             console.warn('[sw] Cache match error for index.html', e);
           }

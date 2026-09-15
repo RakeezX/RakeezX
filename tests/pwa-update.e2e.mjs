@@ -6,44 +6,120 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workerSource = await readFile(path.join(ROOT, 'sw.js'), 'utf8');
+const currentGeneration = Number(workerSource.match(/const VERSION = 'rakeezx-v(\d+)'/)?.[1]);
+
+if (!Number.isInteger(currentGeneration) || currentGeneration < 2) {
+  throw new Error('Unable to derive the current RAKEEZ service-worker generation');
+}
+
+const versions = {
+  A: `rakeezx-v${currentGeneration - 1}`,
+  B: `rakeezx-v${currentGeneration}`,
+};
+
+const versionedShell = `const SHELL = [
+  './',
+  './index.html',
+  './app.js',
+  './app.css',
+  './lazy.js',
+  './install-gate.js',
+];`;
 
 async function startVersionedServer() {
   let release = 'A';
+  let installGateOpen = true;
+  let closed = false;
+  const gatedResponses = new Set();
   const server = http.createServer((request, response) => {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const send = (body, type) => response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' }).end(body);
-    if (pathname === '/versioned/' || pathname === '/versioned/index.html') {
-      return send(`<!doctype html><link rel="stylesheet" href="app.css"><main id="release"></main><script type="module" src="app.js"></script>`, 'text/html');
+    if (pathname === '/versioned/') {
+      return send('<!doctype html><link rel="stylesheet" href="app.css"><main id="release"></main><output id="lazy"></output><script type="module" src="app.js"></script>', 'text/html');
+    }
+    if (pathname === '/versioned/index.html') {
+      response.writeHead(308, { Location: '/versioned/', 'Cache-Control': 'no-store' });
+      return response.end();
     }
     if (pathname === '/versioned/app.js') {
-      return send(`window.__release = '${release}'; document.getElementById('release').textContent = window.__release; navigator.serviceWorker.register('/versioned/sw.js', { updateViaCache: 'none' }).then((registration) => registration.update());`, 'text/javascript');
+      return send(`
+        window.__release = '${release}';
+        document.getElementById('release').textContent = window.__release;
+        const renderRoute = async () => {
+          if (location.hash === '#/lazy') {
+            const { lazyRelease } = await import('./lazy.js');
+            document.getElementById('lazy').textContent = lazyRelease;
+          }
+        };
+        addEventListener('hashchange', renderRoute);
+        renderRoute();
+        navigator.serviceWorker.register('/versioned/sw.js', { updateViaCache: 'none' });
+      `, 'text/javascript');
     }
     if (pathname === '/versioned/app.css') return send(`:root { --release: '${release}'; }`, 'text/css');
+    if (pathname === '/versioned/lazy.js') return send(`export const lazyRelease = 'lazy-${release}';`, 'text/javascript');
+    if (pathname === '/versioned/install-gate.js') {
+      if (release === 'B' && !installGateOpen) {
+        gatedResponses.add(response);
+        response.on('close', () => gatedResponses.delete(response));
+        return;
+      }
+      return send(`export const installGate = '${release}';`, 'text/javascript');
+    }
     if (pathname === '/versioned/sw.js') {
-      const version = release === 'A' ? 'rakeezx-v5' : 'rakeezx-v6';
-      return send(workerSource.replace("const VERSION = 'rakeezx-v6';", `const VERSION = '${version}';`), 'text/javascript');
+      const source = workerSource
+        .replace(/const VERSION = 'rakeezx-v\d+';/, `const VERSION = '${versions[release]}';`)
+        .replace(/const SHELL = \[[\s\S]*?\n\];/, versionedShell);
+      return send(source, 'text/javascript');
     }
     response.writeHead(404).end();
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  const releaseInstall = () => {
+    installGateOpen = true;
+    for (const response of gatedResponses) {
+      response.writeHead(200, { 'Content-Type': 'text/javascript', 'Cache-Control': 'no-store' });
+      response.end("export const installGate = 'B';");
+    }
+    gatedResponses.clear();
+  };
+
+  const close = async () => {
+    if (closed) return;
+    closed = true;
+    for (const response of gatedResponses) response.destroy();
+    gatedResponses.clear();
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  };
+
   return {
     url: `http://127.0.0.1:${server.address().port}`,
-    deploy(nextRelease) { release = nextRelease; },
-    close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())),
+    deploy(nextRelease) {
+      release = nextRelease;
+      installGateOpen = nextRelease !== 'B';
+    },
+    releaseInstall,
+    close,
   };
 }
 
-test('Version A to Version B refreshes executable assets without removing teacher data', async ({ browser }) => {
+test('Version A to Version B preserves the new shell during install and supports offline reload/reopen', async ({ browser }) => {
   test.setTimeout(90_000);
   const deployment = await startVersionedServer();
   const context = await browser.newContext();
-  const page = await context.newPage();
+  let page = await context.newPage();
   try {
     await page.goto(`${deployment.url}/versioned/`);
     await page.waitForFunction(async () => (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated');
     await page.reload();
-    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
     await expect(page.locator('#release')).toHaveText('A');
+    await expect.poll(() => page.evaluate(async () => ({
+      controlled: Boolean(navigator.serviceWorker.controller),
+      active: (await navigator.serviceWorker.getRegistration())?.active?.state,
+      caches: await caches.keys(),
+    }))).toMatchObject({ controlled: true, active: 'activated', caches: expect.arrayContaining([versions.A]) });
 
     await page.evaluate(async () => {
       await fetch('/versioned/app.js');
@@ -64,18 +140,31 @@ test('Version A to Version B refreshes executable assets without removing teache
     });
 
     deployment.deploy('B');
-    let reloads = 0;
-    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) reloads += 1; });
-    await page.reload();
-    await expect(page.locator('#release')).toHaveText('B');
-    await page.waitForFunction(async () => {
+    await page.evaluate(() => {
+      navigator.serviceWorker.getRegistration().then((registration) => registration.update());
+    });
+    await page.waitForFunction(async (nextVersion) => {
+      const [registration, keys] = await Promise.all([
+        navigator.serviceWorker.getRegistration(),
+        caches.keys(),
+      ]);
+      return Boolean(registration?.installing && keys.includes(nextVersion));
+    }, versions.B);
+
+    // A still controls this fetch while B is installing. A must not delete the
+    // newer generation's partially populated cache.
+    await page.evaluate(() => fetch('/versioned/app.js?upgrade-race=1').then((response) => response.text()));
+    expect(await page.evaluate(() => caches.keys())).toContain(versions.B);
+
+    deployment.releaseInstall();
+    await page.waitForFunction(async ({ nextVersion, priorVersion }) => {
       const keys = await caches.keys();
       const registration = await navigator.serviceWorker.getRegistration();
-      return keys.includes('rakeezx-v6')
-        && !keys.includes('rakeezx-v5')
+      return keys.includes(nextVersion)
+        && !keys.includes(priorVersion)
         && registration?.active?.state === 'activated'
         && navigator.serviceWorker.controller === registration.active;
-    });
+    }, { nextVersion: versions.B, priorVersion: versions.A });
 
     let onlineAssets;
     await expect.poll(async () => {
@@ -97,27 +186,31 @@ test('Version A to Version B refreshes executable assets without removing teache
       return onlineAssets.js.includes("window.__release = 'B'")
         && onlineAssets.css.includes("--release: 'B'")
         && onlineAssets.caches.includes('unrelated-cache')
-        && !onlineAssets.caches.includes('rakeezx-v5')
+        && onlineAssets.caches.includes(versions.B)
+        && !onlineAssets.caches.includes(versions.A)
         && onlineAssets.teacher?.id === 'teacher-data';
     }, { timeout: 10_000 }).toBe(true);
-    expect(onlineAssets.js).toContain("window.__release = 'B'");
-    expect(onlineAssets.css).toContain("--release: 'B'");
-    expect(onlineAssets.caches).toContain('unrelated-cache');
-    expect(onlineAssets.caches).not.toContain('rakeezx-v5');
     expect(onlineAssets.teacher).toMatchObject({ id: 'teacher-data', name: 'TEST Teacher Data' });
-    await page.waitForTimeout(500);
-    expect(reloads).toBe(1);
 
+    await page.evaluate(() => { location.hash = '#/lazy'; });
+    await deployment.close();
     await context.setOffline(true);
-    const offlineAssets = await page.evaluate(async () => ({
-      js: await (await fetch('/versioned/app.js')).text(),
-      css: await (await fetch('/versioned/app.css')).text(),
-    }));
-    expect(offlineAssets.js).toContain("window.__release = 'B'");
-    expect(offlineAssets.css).toContain("--release: 'B'");
-    await page.reload();
+
+    const reloadResponse = await page.reload();
+    expect(reloadResponse?.status()).toBe(200);
+    expect(reloadResponse?.fromServiceWorker()).toBe(true);
     await expect(page.locator('#release')).toHaveText('B');
+    await expect(page.locator('#lazy')).toHaveText('lazy-B');
+
+    await page.close();
+    page = await context.newPage();
+    const reopenResponse = await page.goto(`${deployment.url}/versioned/#/lazy`);
+    expect(reopenResponse?.status()).toBe(200);
+    expect(reopenResponse?.fromServiceWorker()).toBe(true);
+    await expect(page.locator('#release')).toHaveText('B');
+    await expect(page.locator('#lazy')).toHaveText('lazy-B');
   } finally {
+    deployment.releaseInstall();
     await context.close();
     await deployment.close();
   }

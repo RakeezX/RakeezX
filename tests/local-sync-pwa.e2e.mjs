@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DB_NAME, DB_VERSION } from '../src/lib/db.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const serviceWorkerSource = await readFile(path.join(ROOT, 'sw.js'), 'utf8');
+const currentServiceWorkerCache = serviceWorkerSource.match(/const VERSION = '([^']+)'/)?.[1];
 const MIME = {
   '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.png': 'image/png',
@@ -321,15 +323,15 @@ test('one online load precaches every lazy route and supports offline reload and
     await page.reload({ waitUntil: 'networkidle' });
     await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), { timeout: 15_000 });
 
-    const cacheAudit = await page.evaluate(async () => {
-      const key = (await caches.keys()).find((candidate) => candidate === 'rakeezx-v17');
+    const cacheAudit = await page.evaluate(async (expectedCache) => {
+      const key = (await caches.keys()).find((candidate) => candidate === expectedCache);
       const cache = key ? await caches.open(key) : null;
       return {
         key,
         paths: cache ? (await cache.keys()).map((request) => new URL(request.url).pathname) : [],
       };
-    });
-    expect(cacheAudit.key).toBe('rakeezx-v17');
+    }, currentServiceWorkerCache);
+    expect(cacheAudit.key).toBe(currentServiceWorkerCache);
     expect(cacheAudit.paths).toEqual(expect.arrayContaining([
       '/index.html',
       '/src/generated/build-meta.generated.js',
