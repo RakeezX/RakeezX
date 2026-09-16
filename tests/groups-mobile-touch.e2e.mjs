@@ -40,7 +40,9 @@ async function seedGroups(page, studentCount = 24) {
     }, { queue: false });
   }, { count: studentCount, currentTeachingId: teachingId });
   await expect.poll(() => page.evaluate((id) => Boolean(window.store.getTeaching(id)), teachingId)).toBe(true);
-  await page.goto(`/#/teaching/${teachingId}/groups`);
+  await page.locator(`a[href="#/teaching/${teachingId}"]`).click();
+  await page.locator(`a[href="#/teaching/${teachingId}/groups"]`).click();
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
   await expect(page.locator('.group')).toHaveCount(Math.ceil(studentCount / 4));
 }
@@ -181,7 +183,11 @@ test('long press lifecycle always moves or returns to a clean idle state', async
   await expectTouchIdle(page);
   await lostCapture.cancel();
 
-  const finalDrag = await touchDrag(page, handle(), page.locator('.group').nth(2), {
+  const beforeFinal = await savedArrangement(page);
+  const finalFromIdx = beforeFinal.findIndex((group) => group.includes(movingId));
+  const finalToIdx = finalFromIdx === 0 ? 1 : 0;
+  const finalTarget = page.locator('.group').nth(finalToIdx);
+  const finalDrag = await touchDrag(page, handle(), finalTarget, {
     holdMs: 500,
     duringHold: async (grip) => {
       await grip.evaluate((node) => {
@@ -194,8 +200,10 @@ test('long press lifecycle always moves or returns to a clean idle state', async
       await expect.poll(() => page.evaluate(() => window.__groupsContextMenuPrevented)).toBe(true);
     },
   });
+  await expect(member()).toHaveClass(/is-touch-dragging/);
+  await expect(finalTarget).toHaveAttribute('data-drop-state', 'valid');
   await finalDrag.end();
-  await expect.poll(async () => (await savedArrangement(page)).findIndex((group) => group.includes(movingId))).toBe(2);
+  await expect.poll(async () => (await savedArrangement(page)).findIndex((group) => group.includes(movingId))).toBe(finalToIdx);
   const arrangement = await savedArrangement(page);
   expect(arrangement.flat().filter((id) => id === movingId)).toHaveLength(1);
   expect(new Set(arrangement.flat()).size).toBe(16);

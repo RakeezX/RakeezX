@@ -1,5 +1,16 @@
 import { test, expect } from '@playwright/test';
 
+async function openGrades(page, teachingId) {
+  if (await page.evaluate(() => location.hash) !== '#/classes') {
+    await page.getByRole('link', { name: 'الفصول', exact: true }).click();
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/classes');
+  }
+  await page.locator(`a[href="#/teaching/${teachingId}"]`).click();
+  await page.locator(`a[href="#/teaching/${teachingId}/grades"]`).click();
+  await expect.poll(() => page.evaluate(() => location.hash)).toBe(`#/teaching/${teachingId}/grades`);
+  await page.locator('[data-act="mode"][data-mode="table"]').click();
+}
+
 test('a transferred student sees and updates compatible grades from the destination grade screen', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -42,8 +53,7 @@ test('a transferred student sees and updates compatible grades from the destinat
     return ids;
   });
 
-  await page.goto(`/#/teaching/${fixture.teachingY}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGrades(page, fixture.teachingY);
   const destinationInput = page.locator(`input[data-fk="t-${fixture.student}-${fixture.itemY}"]`);
   await expect(destinationInput).toHaveValue('8');
 
@@ -57,17 +67,15 @@ test('a transferred student sees and updates compatible grades from the destinat
   }, fixture);
 
   await page.evaluate(({ student, x }) => window.store.transferStudent(student, x, { date: '2026-09-08' }), fixture);
-  await page.goto(`/#/teaching/${fixture.teachingX}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGrades(page, fixture.teachingX);
   await expect(page.locator(`input[data-fk="t-${fixture.student}-${fixture.itemX}"]`)).toHaveValue('9');
 
   await page.evaluate(({ student, y }) => window.store.transferStudent(student, y, { date: '2026-09-15' }), fixture);
-  await page.goto(`/#/teaching/${fixture.teachingY}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGrades(page, fixture.teachingY);
   await page.reload();
   await page.locator('[data-act="mode"][data-mode="table"]').click();
   await expect(destinationInput).toHaveValue('9');
-  await page.goto(`/#/student/${fixture.student}?teaching=${fixture.teachingY}`);
+  await page.locator(`a[href^="#/student/${fixture.student}"]`).first().click();
   await expect(page.locator('.student-profile-current-grades .itemrow__val')).toContainText('9 / 10');
   expect(errors).toEqual([]);
 });

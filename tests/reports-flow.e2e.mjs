@@ -78,8 +78,10 @@ test('reports render current historical data and edited section metadata without
   });
 
   // Report index covers each populated and empty teaching and shows current scores.
-  await page.goto('/#/reports');
+  await page.locator('a[href="#/reports"]:visible').first().click();
+  await expect(page).toHaveURL(/#\/reports$/);
   const classReports = page.getByRole('region', { name: 'تقارير الفصول' });
+  await expect(classReports).toBeVisible();
   await classReports.locator('.report-grade-group').evaluateAll((groups) => groups.forEach((group) => { group.open = true; }));
   await expect(classReports).toContainText('TEST Mathematics');
   await expect(classReports).toContainText('TEST Science');

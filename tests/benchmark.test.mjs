@@ -14,6 +14,9 @@ import * as db from '../src/lib/db.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
 import { GenericV2Backend } from './helpers/generic-v2-backend.mjs';
 
+const benchmarkCase = process.env.RAKEEZX_BENCHMARK_CASE ?? 'all';
+const measures = (name) => benchmarkCase === 'all' || benchmarkCase === name;
+
 // Cleanup after ALL benchmark tests complete to close the IndexedDB and BroadcastChannel.
 // Without this, Node's event loop stays alive indefinitely.
 after(async () => {
@@ -21,7 +24,7 @@ after(async () => {
   db.closeDB();
 });
 
-test('Boot time benchmark', async () => {
+if (measures('boot')) test('Boot time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
   const backend = new GenericV2Backend();
   setMockBackend(backend);
@@ -46,7 +49,7 @@ test('Boot time benchmark', async () => {
   assert.ok(bootMs < 1000, 'Boot time should be under 1 second for 2000 records');
 });
 
-test('Sync time benchmark', async () => {
+if (measures('sync')) test('Sync time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
   const backend = new GenericV2Backend();
   setMockBackend(backend);

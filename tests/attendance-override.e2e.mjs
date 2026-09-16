@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createAttendanceServer } from './helpers/attendance-server-fixture.mjs';
 
-test.use({baseURL:process.env.RAKEEZX_ATTENDANCE_TEST_URL ?? 'http://localhost:5173'});
+test.use({...(process.env.RAKEEZX_ATTENDANCE_TEST_URL ? {baseURL:process.env.RAKEEZX_ATTENDANCE_TEST_URL} : {})});
 
 const STORES = ['profile','years','terms','subjects','sections','teachings','students','enrollments','sessions'];
 const route = '/#/teaching/override-teaching/attendance?session=override-session';

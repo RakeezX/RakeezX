@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+
+const TEST_ORIGIN = process.env.RAKEEZX_E2E_BASE_URL || 'http://127.0.0.1:5173';
 import AxeBuilder from '@axe-core/playwright';
 
 test.setTimeout(90_000);
@@ -35,7 +37,7 @@ async function expectNoOverflow(page, label) {
 }
 
 test('Support is reachable from Teacher Center and Settings and always exposes direct email', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: 'http://localhost:5173' });
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: TEST_ORIGIN });
   await page.goto('/');
   await waitForApp(page);
 

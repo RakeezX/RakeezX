@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+async function followTeachingLink(page, href) {
+  const link = page.locator(`a[href="${href}"]`).first();
+  await expect(link).toBeVisible();
+  await link.click();
+  await expect.poll(() => page.evaluate(() => location.hash)).toBe(href);
+}
+
 test('manual scoring persists and reports correctly without duplicate records', async ({ page }) => {
   test.setTimeout(90_000);
   const errors = [];
@@ -32,11 +39,15 @@ test('manual scoring persists and reports correctly without duplicate records', 
     window.store.repaint();
   });
 
-  await page.goto('/#/teaching/score-teaching/items');
+  await followTeachingLink(page, '#/teaching/score-teaching');
+  await followTeachingLink(page, '#/teaching/score-teaching/items');
+  await expect(page.getByRole('heading', { name: 'توزيع الدرجات', exact: true })).toBeVisible();
   const addItem = async (name, max) => {
-    await page.locator('[data-act="add"]').first().click();
-    await page.fill('input[name="name"]', name);
-    await page.fill('input[name="max"]', String(max));
+    await page.getByRole('button', { name: 'بند جديد', exact: true }).first().click();
+    const itemForm = page.locator('#item-form');
+    await expect(itemForm).toBeVisible();
+    await itemForm.locator('input[name="name"]').fill(name);
+    await itemForm.locator('input[name="max"]').fill(String(max));
     await page.click('button[form="item-form"]');
     await expect(page.getByText(name, { exact: true })).toBeVisible();
   };
@@ -55,7 +66,7 @@ test('manual scoring persists and reports correctly without duplicate records', 
   ));
   expect(Object.keys(itemIds)).toHaveLength(5);
 
-  await page.goto('/#/teaching/score-teaching/grades');
+  await followTeachingLink(page, '#/teaching/score-teaching/grades');
   await page.locator('[data-act="mode"][data-mode="table"]').click();
   const enter = async (studentId, itemName, value) => {
     const input = page.locator(`input[data-fk="t-${studentId}-${itemIds[itemName]}"]`);
@@ -106,7 +117,7 @@ test('manual scoring persists and reports correctly without duplicate records', 
   await expect(page.locator('input[data-fk="t-score-student-a-' + itemIds['TEST Test'] + '"]')).toHaveValue('18');
 
   // Editing section metadata through its real sheet preserves item and score identities.
-  await page.goto('/#/teaching/score-teaching');
+  await followTeachingLink(page, '#/teaching/score-teaching');
   await page.locator('[data-act="edit-sec"]').click();
   await page.selectOption('select[name="grade"]', '5');
   await page.fill('input[name="label"]', 'U');
@@ -120,7 +131,7 @@ test('manual scoring persists and reports correctly without duplicate records', 
     scoreIds: beforeReload.scores.map((score) => score.id).sort(),
   });
 
-  await page.goto('/#/teaching/score-teaching/reports');
+  await followTeachingLink(page, '#/teaching/score-teaching/reports');
   await expect(page.locator('.gtable--report')).toContainText('TEST Score A');
   await expect(page.locator('.gtable--report')).toContainText('TEST Score B');
   await expect(page.locator('.gtable--report')).toContainText('TEST Score C');

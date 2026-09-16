@@ -70,9 +70,9 @@ test.describe('XSS Security Regression', () => {
       window._xss_triggered = false;
     });
 
-    await page.goto('http://localhost:5173');
+    await page.goto('/');
     await setupMockCloud(page);
-    await page.goto('http://localhost:5173');
+    await page.goto('/');
     await expect(page.locator('.sidebar__brand').or(page.locator('.topbar__title')).first()).toBeVisible({ timeout: 15000 });
   });
 
@@ -89,7 +89,7 @@ test.describe('XSS Security Regression', () => {
 
   for (const route of routesToTest) {
     test(`No XSS execution on ${route}`, async ({ page }) => {
-      await page.goto(`http://localhost:5173/${route}`);
+      await page.goto(`/${route}`);
       // Give it some time to render and potentially execute malicious scripts
       await page.waitForTimeout(500);
       

@@ -467,9 +467,20 @@ test('Student Management polish keeps long Arabic context and both consequences 
       const person = page.locator('.student-management__person');
       await expect(person.locator('strong')).toHaveText(name);
       await page.evaluate(() => document.fonts.ready);
-      const titleBox = await person.locator('strong').boundingBox(), classBox = await person.locator('span').boundingBox();
+      const title = person.locator('strong'), classContext = person.locator(':scope > span');
+      const titleBox = await title.boundingBox(), classBox = await classContext.boundingBox();
       expect(classBox.y).toBeGreaterThan(titleBox.y + titleBox.height * .7);
-      expect(Math.abs((classBox.x + classBox.width) - (titleBox.x + titleBox.width))).toBeLessThanOrEqual(1);
+      const alignment = await person.evaluate((element) => {
+        const titleElement = element.querySelector(':scope > strong');
+        const classElement = element.querySelector(':scope > span');
+        return {
+          direction: getComputedStyle(element).direction,
+          textAlign: getComputedStyle(element).textAlign,
+          titleAlign: getComputedStyle(titleElement).textAlign,
+          classAlign: getComputedStyle(classElement).textAlign,
+        };
+      });
+      expect(alignment).toEqual({ direction: 'rtl', textAlign: 'right', titleAlign: 'right', classAlign: 'right' });
       await expect(page.locator('.student-management__row')).toHaveCount(2);
       if (consequence === 'delete') await page.screenshot({ path: testInfo.outputPath(`polish-choose-${width}-${theme}.png`), animations: 'disabled' });
       await removeStudent(page);

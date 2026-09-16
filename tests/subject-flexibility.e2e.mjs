@@ -54,6 +54,11 @@ test('new class uses a searchable built-in/custom subject picker and stable subj
   await dialog.getByRole('textbox', { name: 'اسم المادة المخصصة' }).fill('عِلْم الأرض');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
   await expect(dialog).toHaveCount(0);
+  await page.waitForFunction(() => {
+    const subjects = window.store.subjects().filter((subject) => subject.name === 'علم الأرض');
+    return subjects.length === 1
+      && window.store.teachings().filter((teaching) => teaching.subjectId === subjects[0].id).length === 2;
+  });
   const customState = await page.evaluate(() => {
     const subjects = window.store.subjects().filter((subject) => subject.name === 'علم الأرض');
     const teachings = window.store.teachings().filter((teaching) => teaching.subjectId === subjects[0]?.id);

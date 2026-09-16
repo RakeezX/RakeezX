@@ -56,15 +56,15 @@ async function setupMockCloud(page) {
 
 test.describe('Accessibility / Axe', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173');
+    await page.goto('/');
     await setupMockCloud(page);
-    await page.goto('http://localhost:5173');
+    await page.goto('/');
     await expect(page.locator('.sidebar__brand').or(page.locator('.topbar__title')).first()).toBeVisible({ timeout: 15000 });
   });
 
   for (const route of testRoutes) {
     test(`Axe check for ${route}`, async ({ page }) => {
-      await page.goto(`http://localhost:5173/${route}`);
+      await page.goto(`/${route}`);
       // wait a bit for the route to render
       await page.waitForTimeout(500); 
 

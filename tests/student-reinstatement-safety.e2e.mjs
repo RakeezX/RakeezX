@@ -55,6 +55,16 @@ async function recordState(page, id) {
   }, id);
 }
 
+async function openRoster(page, teachingId) {
+  const classLink = page.locator(`a[href="#/teaching/${teachingId}"]`);
+  await expect(classLink).toBeVisible();
+  await classLink.click();
+  const studentsTab = page.locator(`a[href="#/teaching/${teachingId}/students"]`);
+  await expect(studentsTab).toBeVisible();
+  await studentsTab.click();
+  await expect(page.locator('.roster-list')).toBeVisible();
+}
+
 for (const width of [320, 390, 1280]) for (const theme of ['light', 'dark']) {
   test(`withdrawn history without reinstatement — ${width}px ${theme}`, async ({ page }) => {
     const errors = [];
@@ -68,8 +78,9 @@ for (const width of [320, 390, 1280]) for (const theme of ['light', 'dark']) {
     }, theme);
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-    await page.goto(`/#/teaching/${ids.tx}/students`);
+    await openRoster(page, ids.tx);
     const former = page.locator('.former-students-section');
+    await expect(former).toBeVisible();
     await expect(former).toContainText('طالب اختبار مغادر');
     await former.locator(`a[href="#/student/${ids.withdrawn}"]`).click();
     await expect(page.locator('.student-profile-header__name')).toHaveText('طالب اختبار مغادر');
@@ -116,7 +127,7 @@ test('active roster edit and actual Transfer control retain identity/history aft
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const ids = await seed(page);
   const withdrawnBefore = await recordState(page, ids.withdrawn);
-  await page.goto(`/#/teaching/${ids.tx}/students`);
+  await openRoster(page, ids.tx);
   await page.locator(`[data-act="edit"][data-id="${ids.active}"]`).click();
   await page.locator('#edit-student input[name="name"]').fill('طالب اختبار معدل');
   await page.getByRole('button', { name: 'حفظ', exact: true }).click();

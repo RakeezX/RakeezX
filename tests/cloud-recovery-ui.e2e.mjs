@@ -44,6 +44,11 @@ async function setCloudFile(page, payload, name = 'rakeez-cloud-backup.json') {
   });
 }
 
+async function resetCloudFile(page) {
+  await page.getByRole('button', { name: 'اختيار نسخة أخرى' }).click();
+  await expect(page.locator('.cloud-recovery-flow')).toHaveCount(0);
+}
+
 async function installHealthyCloud(page, { finalizeDelay = 0, serverStudents = [], finalStudents = serverStudents } = {}) {
   await page.evaluate(async ({ ownerId, delay, initialStudents, reconciledStudents }) => {
     const cloud = await import('/src/lib/cloud.js');
@@ -88,13 +93,13 @@ test('Cloud Recovery validates V3/V4 accurately and represents file/auth failure
     buffer: Buffer.from(JSON.stringify({ app: 'rakeezx', version: 2, data: { students: [{ id: 'legacy', name: 'قديم' }] } })),
   });
   await expect(page.getByRole('alert')).toContainText('النسخة غير مدعومة');
-  await page.getByRole('button', { name: 'اختيار نسخة أخرى' }).click();
+  await resetCloudFile(page);
 
   await page.locator('#cloud-restore-file').setInputFiles({
     name: 'corrupt.json', mimeType: 'application/json', buffer: Buffer.from('{not-json'),
   });
   await expect(page.getByRole('alert')).toContainText('النسخة غير صالحة');
-  await page.getByRole('button', { name: 'اختيار نسخة أخرى' }).click();
+  await resetCloudFile(page);
 
   const legacy = {
     app: 'rakeezx', version: 3, exportedAt: new Date().toISOString(),
@@ -104,7 +109,7 @@ test('Cloud Recovery validates V3/V4 accurately and represents file/auth failure
   await expect(page.locator('.cloud-validation')).toContainText('تم التحقق من بنية النسخة');
   await expect(page.locator('.cloud-validation')).toContainText('تحقق بنيوي لإصدار V3');
   await expect(page.locator('.cloud-validation')).not.toContainText('تم التحقق من سلامة النسخة');
-  await page.getByRole('button', { name: 'اختيار نسخة أخرى' }).click();
+  await resetCloudFile(page);
 
   const v4 = await createBackup(page);
   await setCloudFile(page, v4, 'supported-v4.json');
@@ -168,7 +173,7 @@ test('blocked review cannot restore and finalized checkpoint resumes local recon
   await expect(page.getByRole('button', { name: 'المتابعة إلى التأكيد' })).toBeDisabled();
   await expect(page.locator('.cloud-recovery-blocked-copy')).toContainText('يمنع الاستعادة كاملة');
 
-  await page.getByRole('button', { name: 'اختيار نسخة أخرى' }).click();
+  await resetCloudFile(page);
   await page.evaluate(async () => {
     await window.store.patchDevice({
       cloudRestoreResume: {

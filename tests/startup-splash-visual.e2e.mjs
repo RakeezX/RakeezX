@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir } from 'node:fs/promises';
 
-test.use({ baseURL: process.env.RAKEEZX_E2E_BASE_URL || 'http://localhost:5174' });
+test.use({ ...(process.env.RAKEEZX_E2E_BASE_URL ? { baseURL: process.env.RAKEEZX_E2E_BASE_URL } : {}) });
 test.setTimeout(120_000);
 
 const output = 'test-results/startup-splash-visual';

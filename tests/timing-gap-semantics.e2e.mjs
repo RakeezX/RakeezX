@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.use({baseURL:process.env.RAKEEZX_TIMING_TEST_URL || 'http://localhost:5173'});
+test.use({...(process.env.RAKEEZX_TIMING_TEST_URL ? {baseURL:process.env.RAKEEZX_TIMING_TEST_URL} : {})});
 for (const width of [1280, 390]) {
   test(`generic gaps and explicit recess remain distinct through real controls/save/reload (${width}px)`, async ({page, context}) => {
     const errors = [];

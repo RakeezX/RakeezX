@@ -20,6 +20,7 @@ async function seed(page) {
     await window.store.patchDevice({activeYearId:'b21-year',activeTermId:'b21-term'});
     window.store.repaint();
   });
+  await expect(page.locator('.class-card')).toHaveCount(1);
 }
 function errorsOf(page) {
   const errors=[];
@@ -90,6 +91,8 @@ for(const width of [1440,390,320]) {
     const before=await page.evaluate(()=>window.store.state.students.filter(s=>s.id.startsWith('b21-')).map(s=>({id:s.id,name:s.name})));
     for(const [route,nameSelector] of [['students','.row__title'],['attendance','.att-row__name'],['quicklog','.qlcard__name']]) {
       await page.goto(`/#/teaching/b21-teaching/${route}`);
+      await expect(page).toHaveURL(new RegExp(`/#/teaching/b21-teaching/${route}$`));
+      await expect(page.locator(nameSelector)).toHaveCount(4);
       const search=page.locator('[data-input="search"]');
       await expect(search).toBeVisible();
       for(const [query,name] of [['احمد','أحمد اختبار'],['ابراهيم','إبراهيم اختبار'],['ادم','آدم اختبار'],['1','أحمد اختبار'],['١','أحمد اختبار']]) {

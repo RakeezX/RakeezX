@@ -32,12 +32,21 @@ async function seedNavigationContext(page, prefix) {
 
 const appBack = (page) => page.locator('.topbar [data-act="app-back"]');
 
+async function openReportsContext(page) {
+  await page.locator('a[href="#/reports"]:visible').first().click();
+  await expect(page).toHaveURL(/#\/reports$/);
+  await expect(page.locator('a[href="#/reports/execution"]')).toBeVisible();
+  await page.evaluate(() => { location.hash = '/reports?scope=current'; });
+  await expect(page).toHaveURL(/#\/reports\?scope=current$/);
+  await expect(page.locator('a[href="#/reports/execution"]')).toBeVisible();
+}
+
 test('Reports detail prefers its exact in-app context and browser Back remains native', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await seedNavigationContext(page, 'nav-reports');
 
-  await page.goto('/#/reports?scope=current');
+  await openReportsContext(page);
   await page.locator('a[href="#/reports/execution"]').click();
   await expect(page).toHaveURL(/#\/reports\/execution$/);
   await appBack(page).click();

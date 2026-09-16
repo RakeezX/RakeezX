@@ -136,8 +136,28 @@ test('class goal and charter flow persists its timer/selection and previews an e
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.getByRole('heading', { name: 'ميثاق الصف', exact: true })).toBeInViewport();
   expect(await page.locator('.lesson-goal').evaluate((element) => element.getBoundingClientRect().height)).toBeLessThan(240);
-  await page.clock.runFor(1_100);
-  await expect(page.locator('.goal-live__timer')).toHaveText('11:59');
+  const goalTiming = await page.evaluate((id) => {
+    const goal = window.store.activeClassGoal(id);
+    return {
+      now: Date.now(),
+      endsAt: Number(goal.startedAt) + Number(goal.durationMinutes) * 60_000,
+    };
+  }, teachingId);
+  const pausedAt = goalTiming.now + 100;
+  await page.clock.pauseAt(pausedAt);
+  const timer = page.locator('.goal-live__timer');
+  const timerSeconds = async () => {
+    const [minutes, seconds] = String(await timer.textContent()).split(':').map(Number);
+    return minutes * 60 + seconds;
+  };
+  await page.clock.fastForward(1_000);
+  const firstTick = await timerSeconds();
+  expect(firstTick).toBe(Math.ceil((goalTiming.endsAt - pausedAt - 1_000) / 1_000));
+  await page.clock.fastForward(1_000);
+  const secondTick = await timerSeconds();
+  expect(secondTick).toBe(firstTick - 1);
+  expect(secondTick).toBe(Math.ceil((goalTiming.endsAt - pausedAt - 2_000) / 1_000));
+  await page.clock.resume();
 
   await page.getByRole('button', { name: 'تم تحقيق الهدف' }).click();
   await expect(page.getByText('سيتم منح +7 لـ 24 طالبًا مؤهلًا', { exact: true })).toBeVisible();
@@ -155,7 +175,17 @@ test('class goal and charter flow persists its timer/selection and previews an e
   await expect(presentation.locator('.classroom-presentation__reward')).toContainText('+7');
   await page.getByRole('button', { name: 'إنهاء العرض' }).click();
 
-  await page.clock.runFor(718_900);
+  const expiryTiming = await page.evaluate((id) => {
+    const goal = window.store.activeClassGoal(id);
+    return {
+      now: Date.now(),
+      endsAt: Number(goal.startedAt) + Number(goal.durationMinutes) * 60_000,
+    };
+  }, teachingId);
+  const expiryPausedAt = expiryTiming.now + 100;
+  await page.clock.pauseAt(expiryPausedAt);
+  await page.clock.fastForward(Math.max(0, expiryTiming.endsAt - expiryPausedAt) + 1);
+  await page.clock.resume();
   await expect(page.locator('.goal-live__timer')).toHaveText('00:00');
   await expect(page.getByText('انتهى الوقت — بانتظار قرار المعلّم. لا تُضاف نقاط تلقائيًا.')).toBeVisible();
 

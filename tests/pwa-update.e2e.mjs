@@ -90,7 +90,13 @@ async function startVersionedServer() {
     closed = true;
     for (const response of gatedResponses) response.destroy();
     gatedResponses.clear();
-    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    await new Promise((resolve, reject) => {
+      server.close((error) => error ? reject(error) : resolve());
+      // The browser may retain an idle keep-alive connection after the last
+      // synthetic deployment response. Close it deterministically before the
+      // test switches offline; no request is in flight at this point.
+      server.closeAllConnections?.();
+    });
   };
 
   return {

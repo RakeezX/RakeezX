@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL = process.env.RAKEEZX_E2E_BASE_URL || 'http://127.0.0.1:5173';
+
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.e2e.mjs',
@@ -10,7 +12,7 @@ export default defineConfig({
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    baseURL: 'http://localhost:5173', // Vite default, we'll start a local server
+    baseURL,
   },
   projects: [
     {
@@ -20,9 +22,9 @@ export default defineConfig({
   ],
   ...(process.env.RAKEEZX_E2E_SERVER ? {} : {
     webServer: {
-      command: 'npx vite',
-      url: 'http://localhost:5173',
-      reuseExistingServer: true,
+      command: 'npx vite --host 127.0.0.1',
+      url: baseURL,
+      reuseExistingServer: false,
     },
   }),
 });

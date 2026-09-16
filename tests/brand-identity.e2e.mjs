@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { A1_RASTERS, A1_VECTORS } from './helpers/a1-production-assets.mjs';
 
-test.use({ baseURL: process.env.RAKEEZX_E2E_BASE_URL || 'http://localhost:5174' });
+test.use({ ...(process.env.RAKEEZX_E2E_BASE_URL ? { baseURL: process.env.RAKEEZX_E2E_BASE_URL } : {}) });
 test.setTimeout(120_000);
 const widths = [320, 360, 384, 390, 412, 1280, 1440];
 

@@ -31,7 +31,19 @@ async function seedGroups(page) {
       sessions: [{ id: 'groups-persist-session', teachingId: 'groups-persist-teaching', date: today, period: 1 }],
       attendance: [{ id: 'groups-persist-absence', sessionId: 'groups-persist-session', studentId: 'groups-persist-student-5', status: 'absent' }],
     });
+    await window.store.patchDevice({
+      activeYearId: 'groups-persist-year',
+      activeTermId: 'groups-persist-term',
+    }, { queue: false });
   });
+}
+
+async function openGroups(page, teachingId) {
+  await expect.poll(() => page.evaluate((id) => Boolean(window.store?.getTeaching(id)), teachingId)).toBe(true);
+  await page.goto('/#/classes');
+  await page.locator(`a[href="#/teaching/${teachingId}"]`).click();
+  await page.locator(`a[href="#/teaching/${teachingId}/groups"]`).click();
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
 }
 
 test('Groups saves one durable full-roster arrangement across reloads and tabs', async ({ page }) => {
@@ -40,7 +52,7 @@ test('Groups saves one durable full-roster arrangement across reloads and tabs',
   await page.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
   await seedGroups(page);
   expect(await page.evaluate(() => window.store.state.sessions[0].date)).toBe('2026-09-03');
-  await page.goto('/#/teaching/' + teachingId + '/groups');
+  await openGroups(page, teachingId);
 
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
   await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups?.flat().length ?? 0, teachingId)).toBe(6);
@@ -51,7 +63,9 @@ test('Groups saves one durable full-roster arrangement across reloads and tabs',
 
   const peer = await page.context().newPage();
   await peer.clock.setFixedTime(new Date('2026-09-02T21:30:00Z'));
-  await peer.goto('/#/teaching/' + teachingId + '/groups');
+  await peer.goto('/#/classes');
+  await peer.waitForFunction(() => window.store?.state?.ready === true);
+  await openGroups(peer, teachingId);
   await expect.poll(() => peer.evaluate((id) => window.store.groupArrangementOf(id)?.groups?.flat().length ?? 0, teachingId)).toBe(6);
 
   const firstMember = page.locator('.group').nth(0).locator('.group__member').first();
@@ -98,6 +112,10 @@ async function seedRegenerationGroups(page) {
         rollNo: index + 1,
       })),
     });
+    await window.store.patchDevice({
+      activeYearId: 'groups-regenerate-year',
+      activeTermId: 'groups-regenerate-term',
+    }, { queue: false });
   });
 }
 
@@ -114,7 +132,7 @@ const sortedSizes = (arrangement) => arrangement.map((group) => group.length).so
 test('New Random and Balanced generation replace distorted saved group structures from a fresh roster', async ({ page }) => {
   const teachingId = 'groups-regenerate-teaching';
   await seedRegenerationGroups(page);
-  await page.goto('/#/teaching/' + teachingId + '/groups');
+  await openGroups(page, teachingId);
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
   await expect.poll(() => savedGroups(page, teachingId)).toHaveLength(4);
 
