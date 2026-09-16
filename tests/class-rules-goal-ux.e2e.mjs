@@ -16,8 +16,7 @@ async function seedClass(page) {
 test('class goal and charter flow persists its timer/selection and previews an explicit atomic reward', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  const fixedNow = new Date('2026-09-09T07:00:00+03:00');
-  await page.clock.install({ time: fixedNow });
+  await page.clock.install({ time: new Date('2026-09-09T07:00:00+03:00') });
   const teachingId = await seedClass(page);
 
   await page.goto(`/#/teaching/${encodeURIComponent(teachingId)}`);
@@ -137,12 +136,8 @@ test('class goal and charter flow persists its timer/selection and previews an e
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.getByRole('heading', { name: 'ميثاق الصف', exact: true })).toBeInViewport();
   expect(await page.locator('.lesson-goal').evaluate((element) => element.getBoundingClientRect().height)).toBeLessThan(240);
-  const timerBeforeTick = await page.locator('.goal-live__timer').textContent();
   await page.clock.runFor(1_100);
-  const timerAfterTick = await page.locator('.goal-live__timer').textContent();
-  const seconds = (value) => value.split(':').reduce((minutes, part) => minutes * 60 + Number(part), 0);
-  expect(seconds(timerBeforeTick) - seconds(timerAfterTick)).toBeGreaterThanOrEqual(1);
-  expect(seconds(timerBeforeTick) - seconds(timerAfterTick)).toBeLessThanOrEqual(2);
+  await expect(page.locator('.goal-live__timer')).toHaveText('11:59');
 
   await page.getByRole('button', { name: 'تم تحقيق الهدف' }).click();
   await expect(page.getByText('سيتم منح +7 لـ 24 طالبًا مؤهلًا', { exact: true })).toBeVisible();

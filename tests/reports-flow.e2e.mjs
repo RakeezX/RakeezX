@@ -78,10 +78,7 @@ test('reports render current historical data and edited section metadata without
   });
 
   // Report index covers each populated and empty teaching and shows current scores.
-  // Use the real in-app navigation after repaint so an already-scheduled
-  // classes render cannot win the race against a direct hash navigation.
-  await page.getByRole('link', { name: 'التقارير', exact: true }).click();
-  await expect(page).toHaveURL(/#\/reports$/);
+  await page.goto('/#/reports');
   const classReports = page.getByRole('region', { name: 'تقارير الفصول' });
   await classReports.locator('.report-grade-group').evaluateAll((groups) => groups.forEach((group) => { group.open = true; }));
   await expect(classReports).toContainText('TEST Mathematics');

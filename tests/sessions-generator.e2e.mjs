@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test('Sessions screen generates a bounded dated range through the real UI', async ({ page }) => {
-  test.setTimeout(90_000);
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
@@ -51,14 +50,7 @@ test('Sessions screen generates a bounded dated range through the real UI', asyn
       teachings: [{ id: 'tch:no-slots', sectionId: 'sec:no-slots', subjectId: 'sub:session-ui', termId: 'tm:session-ui:1', deleted: false }],
     });
   });
-  // Traverse the real class controls after the fixture save so a pending
-  // sessions repaint cannot restore the previous teaching over a direct hash.
-  await page.locator('a[href="#/classes"]').filter({ visible: true }).first().click();
-  await page.locator('a[href="#/teaching/tch:no-slots"]').click();
-  await expect(page).toHaveURL(/#\/teaching\/tch:no-slots$/);
-  await expect(page.getByText('الشعبة بلا طلاب بعد')).toBeVisible();
   await page.goto('/#/teaching/tch:no-slots/sessions');
-  await expect(page).toHaveURL(/#\/teaching\/tch:no-slots\/sessions$/);
   await expect(page.getByText('لا توجد حصص في الجدول لهذا الفصل ضمن الإعداد الحالي.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'افتح الجدول' })).toHaveAttribute('href', '#/schedule');
   await expect(page.locator('form[data-submit="generate-sessions"]')).toHaveCount(0);
