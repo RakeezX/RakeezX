@@ -32,9 +32,13 @@ test('manual scoring persists and reports correctly without duplicate records', 
     window.store.repaint();
   });
 
-  await page.goto('/#/teaching/score-teaching/items');
+  await page.locator('a[href="#/teaching/score-teaching"]').click();
+  await expect(page.locator('[data-act="edit-sec"]')).toBeVisible();
+  await page.locator('a[href="#/teaching/score-teaching/items"]').click();
+  await expect(page.getByRole('heading', { name: 'توزيع الدرجات' })).toBeVisible();
   const addItem = async (name, max) => {
     await page.locator('[data-act="add"]').first().click();
+    await expect(page.getByRole('dialog', { name: 'بند جديد' })).toBeVisible();
     await page.fill('input[name="name"]', name);
     await page.fill('input[name="max"]', String(max));
     await page.click('button[form="item-form"]');
@@ -55,8 +59,10 @@ test('manual scoring persists and reports correctly without duplicate records', 
   ));
   expect(Object.keys(itemIds)).toHaveLength(5);
 
-  await page.goto('/#/teaching/score-teaching/grades');
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await page.locator('a[href="#/teaching/score-teaching/grades"]').click();
+  const tableMode = page.locator('[data-act="mode"][data-mode="table"]');
+  await expect(tableMode).toBeVisible();
+  await tableMode.click();
   const enter = async (studentId, itemName, value) => {
     const input = page.locator(`input[data-fk="t-${studentId}-${itemIds[itemName]}"]`);
     await input.fill(String(value));
@@ -101,13 +107,16 @@ test('manual scoring persists and reports correctly without duplicate records', 
   expect(new Set(beforeReload.scores.map((score) => score.id)).size).toBe(13);
 
   await page.reload();
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await expect(tableMode).toBeVisible();
+  await tableMode.click();
   expect(await page.evaluate(() => window.store.state.scores.filter((score) => !score.deleted).length)).toBe(13);
   await expect(page.locator('input[data-fk="t-score-student-a-' + itemIds['TEST Test'] + '"]')).toHaveValue('18');
 
   // Editing section metadata through its real sheet preserves item and score identities.
-  await page.goto('/#/teaching/score-teaching');
-  await page.locator('[data-act="edit-sec"]').click();
+  await page.getByRole('link', { name: 'الفصل', exact: true }).click();
+  const editSection = page.locator('[data-act="edit-sec"]');
+  await expect(editSection).toBeVisible();
+  await editSection.click();
   await page.selectOption('select[name="grade"]', '5');
   await page.fill('input[name="label"]', 'U');
   await page.click('button[form="edit-sec-form"]');
@@ -120,7 +129,7 @@ test('manual scoring persists and reports correctly without duplicate records', 
     scoreIds: beforeReload.scores.map((score) => score.id).sort(),
   });
 
-  await page.goto('/#/teaching/score-teaching/reports');
+  await page.locator('a[href="#/teaching/score-teaching/reports"]').click();
   await expect(page.locator('.gtable--report')).toContainText('TEST Score A');
   await expect(page.locator('.gtable--report')).toContainText('TEST Score B');
   await expect(page.locator('.gtable--report')).toContainText('TEST Score C');

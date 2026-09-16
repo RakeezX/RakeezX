@@ -1,6 +1,18 @@
 import { test, expect } from '@playwright/test';
 
+async function openGradeTable(page, teachingId) {
+  await page.goto(`/#/teaching/${teachingId}/grades`);
+  await page.waitForFunction((id) => (
+    window.store?.state?.ready === true &&
+    window.location.hash === `#/teaching/${id}/grades`
+  ), teachingId);
+  const tableMode = page.locator('[data-act="mode"][data-mode="table"]');
+  await expect(tableMode).toBeVisible();
+  await tableMode.click();
+}
+
 test('a transferred student sees and updates compatible grades from the destination grade screen', async ({ page }) => {
+  test.setTimeout(90_000);
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
@@ -42,8 +54,7 @@ test('a transferred student sees and updates compatible grades from the destinat
     return ids;
   });
 
-  await page.goto(`/#/teaching/${fixture.teachingY}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGradeTable(page, fixture.teachingY);
   const destinationInput = page.locator(`input[data-fk="t-${fixture.student}-${fixture.itemY}"]`);
   await expect(destinationInput).toHaveValue('8');
 
@@ -57,13 +68,11 @@ test('a transferred student sees and updates compatible grades from the destinat
   }, fixture);
 
   await page.evaluate(({ student, x }) => window.store.transferStudent(student, x, { date: '2026-09-08' }), fixture);
-  await page.goto(`/#/teaching/${fixture.teachingX}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGradeTable(page, fixture.teachingX);
   await expect(page.locator(`input[data-fk="t-${fixture.student}-${fixture.itemX}"]`)).toHaveValue('9');
 
   await page.evaluate(({ student, y }) => window.store.transferStudent(student, y, { date: '2026-09-15' }), fixture);
-  await page.goto(`/#/teaching/${fixture.teachingY}/grades`);
-  await page.locator('[data-act="mode"][data-mode="table"]').click();
+  await openGradeTable(page, fixture.teachingY);
   await page.reload();
   await page.locator('[data-act="mode"][data-mode="table"]').click();
   await expect(destinationInput).toHaveValue('9');

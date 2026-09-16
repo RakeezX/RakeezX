@@ -5,6 +5,7 @@ test.setTimeout(90_000);
 
 const SUPPORT_ENDPOINT = '**/rest/v1/support_requests';
 const SUPPORT_EMAIL = 'support@rakeezx.com';
+const SUPPORT_TEST_ORIGIN = process.env.RAKEEZX_E2E_SERVER ? 'http://127.0.0.1:5173' : 'http://localhost:5173';
 const CONTACT_DISCLOSURE = 'سيُرفق اسم حسابك وبريده الإلكتروني لتمكين فريق الدعم من التواصل معك، إضافةً إلى معلومات تقنية عامة وآمنة، دون بيانات الطلاب أو كلمات المرور.';
 
 async function waitForApp(page) {
@@ -35,7 +36,7 @@ async function expectNoOverflow(page, label) {
 }
 
 test('Support is reachable from Teacher Center and Settings and always exposes direct email', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: 'http://localhost:5173' });
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: SUPPORT_TEST_ORIGIN });
   await page.goto('/');
   await waitForApp(page);
 

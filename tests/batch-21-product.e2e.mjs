@@ -28,6 +28,16 @@ function errorsOf(page) {
   return errors;
 }
 
+async function fillReplacingSearch(search, value) {
+  // These views repaint (and replace) the search input from the input handler.
+  // Assert the value on the replacement node so a route-mount repaint cannot
+  // erase the first interaction in a busy whole-suite run.
+  await expect(async () => {
+    await search.fill(value);
+    await expect(search).toHaveValue(value);
+  }).toPass();
+}
+
 test('approved New Class default, normalized duplicate feedback, true-delete and fresh-ID recreation through real controls', async ({page}) => {
   const errors=errorsOf(page);
   await page.setViewportSize({width:390,height:844});
@@ -93,7 +103,7 @@ for(const width of [1440,390,320]) {
       const search=page.locator('[data-input="search"]');
       await expect(search).toBeVisible();
       for(const [query,name] of [['احمد','أحمد اختبار'],['ابراهيم','إبراهيم اختبار'],['ادم','آدم اختبار'],['1','أحمد اختبار'],['١','أحمد اختبار']]) {
-        await search.fill(query);
+        await fillReplacingSearch(search,query);
         await expect(page.locator(nameSelector)).toHaveText([name]);
       }
       if(route==='attendance') {

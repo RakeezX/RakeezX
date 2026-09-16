@@ -10,7 +10,7 @@ test('native v18 to v19 Brand cache refresh preserves IndexedDB and unrelated ca
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const send = (body, type) => response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' }).end(body);
     if (pathname === '/' || pathname === '/index.html') return send('<!doctype html><title>Brand cache fixture</title><main>synthetic cache verification</main>', 'text/html');
-    if (pathname === '/sw.js') return send(worker.replace("const VERSION = 'rakeezx-v19';", `const VERSION = 'rakeezx-v${generation}';`), 'text/javascript');
+    if (pathname === '/sw.js') return send(worker.replace(/const VERSION = 'rakeezx-v\d+';/, `const VERSION = 'rakeezx-v${generation}';`), 'text/javascript');
     if (pathname.startsWith('/assets/')) {
       const name = pathname.slice('/assets/'.length);
       if (![...A1_RASTERS, ...A1_VECTORS].some(([file]) => file === name)) return response.writeHead(404).end();

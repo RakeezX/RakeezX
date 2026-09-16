@@ -10,7 +10,9 @@ export default defineConfig({
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    baseURL: 'http://localhost:5173', // Vite default, we'll start a local server
+    // The isolated runner binds IPv4 explicitly so another local Vite server on
+    // IPv6 localhost cannot leak a different RAKEEZ worktree into this gate.
+    baseURL: process.env.RAKEEZX_E2E_SERVER ? 'http://127.0.0.1:5173' : 'http://localhost:5173',
   },
   projects: [
     {
