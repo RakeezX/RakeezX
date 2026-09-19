@@ -33,6 +33,7 @@ async function setup({ slotDate = todayISO() } = {}) {
 }
 
 test('SESSION-AUTO materializes only eligible today shells and is idempotent', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2027-05-02T12:00:00Z') });
   try {
     await t.test('today shell is frozen, has no attendance, and repeated ensure does not duplicate', async () => {
       const f = await setup();
@@ -50,6 +51,15 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
     await t.test('non-study, outside-term, and future dates persist no ordinary session', async () => {
       const future = nextSchoolDate();
       const f = await setup({ slotDate: future });
+      const friday = shiftDate(f.today, -2);
+      const saturday = shiftDate(f.today, -1);
+      assert.equal(weekday(friday), 5);
+      assert.equal(weekday(saturday), 6);
+      for (const weekendDate of [friday, saturday]) {
+        assert.equal(store.isSessionEligibleDate(weekendDate), false);
+        assert.deepEqual(await store.ensureSessionsForDate(weekendDate), { created: 0, existing: 0, skipped: 0 });
+        assert.equal(store.sessionsOn(weekendDate).length, 0);
+      }
       await store.setCalendarDay(f.calendar.id, f.today, 'holiday', 'إجازة');
       assert.equal((await store.ensureSessionsForDate(f.today)).created, 0);
       assert.equal(store.sessionsOn(f.today).length, 0);
@@ -148,7 +158,11 @@ test('SESSION-AUTO materializes only eligible today shells and is idempotent', a
       assert.equal(clipped.futureClipped, true);
     });
   } finally {
-    store.closeChannel();
-    await db.closeDB();
+    try {
+      store.closeChannel();
+      await db.closeDB();
+    } finally {
+      t.mock.timers.reset();
+    }
   }
 });

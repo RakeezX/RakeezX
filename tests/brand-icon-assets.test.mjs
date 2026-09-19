@@ -68,14 +68,14 @@ test('approved outlined headers and sanitized Micro-Mark have exact safe vector 
   }
 });
 
-test('Brand release preserves Production manifest, data sources, install actions and offline policy', async () => {
+test('Brand release preserves Production identity, install actions and offline policy across later runtime work', async () => {
   const baseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`66b0f4bd1748ac1fb756d47fb814c66cf4df64af:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
   const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
-  for (const file of ['manifest.webmanifest','src/models.js','src/lib/db.js','src/lib/sync.js','src/lib/sync-v2.js','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
-  const store = (await read('src/store.js'))
-    .replace("export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme';\n", '')
-    .replace("\n  // IndexedDB remains authoritative. This same-origin mirror exists only so\n  // index.html can select the correct palette before asynchronous DB startup.\n  if (t === 'light' || t === 'dark' || t === 'auto') {\n    try { globalThis.localStorage?.setItem(THEME_BOOT_STORAGE_KEY, t); } catch {}\n  }\n", '');
-  assert.equal(store, baseline('src/store.js'), 'src/store.js outside the authorized first-paint mirror');
+  for (const file of ['manifest.webmanifest','src/models.js','src/lib/db.js','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
+  const store = await read('src/store.js');
+  assert.match(store, /export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme'/);
+  assert.match(store, /localStorage\?\.setItem\(THEME_BOOT_STORAGE_KEY, t\)/);
+  assert.doesNotMatch(store, /assets\/(?:icon|header|micro-mark|favicon)/);
   const cloud = (await read('src/lib/cloud.js'))
     .replace('export async function init({ waitForRefresh = true } = {}) {', 'export async function init() {')
     .replace("          const refresh = refreshSession().catch((error) => {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          });\n          if (waitForRefresh) await refresh;", "          try { await refreshSession(); }\n          catch (error) {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          }");
@@ -84,7 +84,7 @@ test('Brand release preserves Production manifest, data sources, install actions
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
   const worker=await read('sw.js'),oldWorker=baseline('sw.js');
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v19';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v20';/);
   assert.match(worker,/return \(await caches\.match\('\.\/'\)\) \|\| cachedFallback\('\.\/index\.html', 503\)/);
   assert.match(worker,/generation < CACHE_GENERATION/);
   for (const [file] of A1_VECTORS) assert.ok(worker.includes(`'./assets/${file}'`));

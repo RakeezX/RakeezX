@@ -45,7 +45,7 @@ test('calendar dates, semantics, Settings editor, and archive navigation follow 
   await expect(page.getByText('17 يناير – 1 يوليو 2027')).toBeVisible();
   const nationalDay = page.locator('.calendar-period').filter({ hasText: 'إجازة اليوم الوطني' });
   await expect(nationalDay.getByText('23 – 26 سبتمبر 2026')).toBeVisible();
-  await expect(nationalDay.getByText('4 أيام')).toBeVisible();
+  await expect(nationalDay.getByText('4 أيام', { exact: true })).toBeVisible();
   await expect(nationalDay.getByText('رسمي')).toBeVisible();
   await expect(nationalDay).toHaveClass(/calendar-period--warn/);
 

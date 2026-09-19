@@ -3,10 +3,11 @@ import * as store from '../store.js';
 import * as db from './db.js';
 import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js';
 import { createSyncV2Engine, SYNC_V2_STORES } from './sync-v2.js';
+import { ownershipBlockedError, runtimeSyncOwnershipGuard } from './sync-ownership.js';
 
 export const state = {
   lastError: null,
-  status: 'idle', // idle, pending, offline, syncing, synced, error
+  status: 'idle', // idle, pending, offline, syncing, synced, blocked, error
   lastSyncedAt: null, // will be initialized from store
   results: {
     profile: null,
@@ -56,7 +57,10 @@ let initialized = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
-const v2Engine = createSyncV2Engine();
+const v2Engine = createSyncV2Engine({
+  ownershipGuard: runtimeSyncOwnershipGuard,
+  currentAuthenticatedUserId: () => cloud.user?.id ?? null,
+});
 
 const COORDINATOR_REASON = Object.freeze({
   idle: ['local_only', 'العمل محفوظ محليًا ولم تبدأ مزامنة سحابية.'],
@@ -64,6 +68,7 @@ const COORDINATOR_REASON = Object.freeze({
   offline: ['offline', 'العمل محفوظ محليًا وسيُرفع عند عودة الاتصال.'],
   syncing: ['sync_in_progress', 'المزامنة تعمل الآن.'],
   error: ['temporary_sync_failure', 'تعذّر إكمال المزامنة وستُعاد المحاولة.'],
+  blocked: ['workspace_ownership_blocked', 'توقفت المزامنة لحماية بيانات مساحة العمل.'],
 });
 
 const DURABLE_REASON = Object.freeze({
@@ -86,12 +91,32 @@ let operationalSummaryCache = Object.freeze({
 
 const isOnline = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 const intersects = (stores, expected) => [...expected].some((name) => stores.has(name));
+const cloudOwnershipAccess = (operation = 'pull', command = null) => runtimeSyncOwnershipGuard.cloudAccess({
+  operation, authenticatedUserId: cloud.user?.id ?? null, command,
+});
+
+function stopOwnershipBlockedScheduling(access) {
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  retryAttempt = 0;
+  rerunRequested = false;
+  setState({ status: 'blocked', lastError: `Sync ownership blocked: ${access.reason}` });
+}
+
+function assertCloudOwnership(operation = 'pull') {
+  const access = cloudOwnershipAccess(operation);
+  if (access.allowed) return access;
+  stopOwnershipBlockedScheduling(access);
+  throw ownershipBlockedError(access);
+}
 
 function coordinatorOperationalState(durable) {
   if (store.state.device?.studentLifecycleResume) return 'error';
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
+  if (state.status === 'blocked') return 'blocked';
   if (state.status === 'error' && durable.failedCount === 0) return 'error';
   return durable.state;
 }
@@ -191,6 +216,11 @@ async function acknowledgeOutbox(snapshot) {
 function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
   if (restoreRunning) return;
   if (!cloud.session || !cloud.user) return;
+  const ownership = cloudOwnershipAccess('pull');
+  if (!ownership.allowed) {
+    stopOwnershipBlockedScheduling(ownership);
+    return;
+  }
   if (!isOnline()) {
     setState({ status: 'offline' });
     return;
@@ -216,6 +246,11 @@ function retryDelay() {
 
 function scheduleRetry() {
   if (!cloud.session || !cloud.user || !isOnline()) return;
+  const ownership = cloudOwnershipAccess('pull');
+  if (!ownership.allowed) {
+    stopOwnershipBlockedScheduling(ownership);
+    return;
+  }
   if (autoTimer) clearTimeout(autoTimer);
   retryScheduled = true;
   autoTimer = setTimeout(() => {
@@ -229,6 +264,11 @@ function scheduleRetry() {
 
 async function scheduleResumeSync() {
   if (!cloud.session || !cloud.user || !isOnline()) return;
+  const ownership = cloudOwnershipAccess('pull');
+  if (!ownership.allowed) {
+    stopOwnershipBlockedScheduling(ownership);
+    return;
+  }
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
   const pending = await pendingOutbox();
   const stale = !state.lastSyncedAt || Date.now() - state.lastSyncedAt >= RESUME_STALE_MS;
@@ -342,6 +382,16 @@ export async function syncAll({ full = true } = {}) {
     setState({ status: 'offline' });
     return false;
   }
+  const ownership = cloudOwnershipAccess('pull');
+  if (!ownership.allowed) {
+    // Mark retained commands with the same non-retryable safety state, but the
+    // engine guard guarantees that this pass cannot make a network mutation.
+    await v2Engine.dispatchPending();
+    stopOwnershipBlockedScheduling(ownership);
+    cacheOperationalSummary(await v2Engine.status());
+    notify();
+    return false;
+  }
   if (autoRunning) {
     rerunRequested = true;
     return false;
@@ -358,12 +408,24 @@ export async function syncAll({ full = true } = {}) {
     const snapshot = await pendingOutbox();
     const stores = v2StoresFor(snapshot, full);
     const pull = await v2Engine.pullAll({ stores });
+    if (pull.ownershipBlocked) {
+      stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
+      return false;
+    }
     const pullError = firstPullError(pull);
     if (pullError) throw pullError;
     const pushed = await v2Engine.dispatchPending();
     madeProgress = pushed.acknowledged > 0;
+    if (pushed.ownershipBlocked) {
+      stopOwnershipBlockedScheduling({ reason: pushed.blockReason });
+      return false;
+    }
     if (pushed.failed) throw new Error(`${pushed.failed} Sync V2 mutation(s) failed`);
     const postPull = await v2Engine.pullAll({ stores: v2PostPullStores(snapshot, full) });
+    if (postPull.ownershipBlocked) {
+      stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
+      return false;
+    }
     const postPullError = firstPullError(postPull);
     if (postPullError) throw postPullError;
     await store.refreshSyncedState();
@@ -593,6 +655,7 @@ function remoteProfileToLocal(remote, updatedAt) {
  * Sync direction: Pull → Merge → Push.
  */
 export async function syncProfile() {
+  assertCloudOwnership('pull');
   return syncV2Category('profile');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
@@ -1899,6 +1962,7 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
  * Phase 5B: Sync structural academic data.
  */
 export async function syncStructural() {
+  assertCloudOwnership('pull');
   return syncV2Category('structural');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
@@ -1966,6 +2030,7 @@ export async function syncStructural() {
  * Dependency-aware execution: structural sync runs first.
  */
 export async function syncStudents() {
+  assertCloudOwnership('pull');
   return syncV2Category('students');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
@@ -2049,6 +2114,7 @@ export async function syncStudents() {
 
 /** يزامن سجل ملاحظات الطلاب بعد ضمان وصول الطالب وسياق الحصة إن وُجد. */
 export async function syncNotes() {
+  assertCloudOwnership('pull');
   return syncV2Category('notes');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
@@ -2085,6 +2151,7 @@ export async function syncNotes() {
 }
 
 export async function syncScoring() {
+  assertCloudOwnership('pull');
   return syncV2Category('scoring');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {
@@ -2164,6 +2231,7 @@ export async function syncScoring() {
 }
 
 export async function syncTimetable() {
+  assertCloudOwnership('pull');
   return syncV2Category('timetable');
   /* istanbul ignore next -- unreachable V1 implementation retained for rollback reference */
   if (!cloud.session || !cloud.user) {

@@ -8,6 +8,7 @@
 import * as db from './lib/db.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
+import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
 
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
@@ -483,7 +484,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
       dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
   const mutationId = uid();
   const canonicalId = recordId;
-  return {
+  return runtimeSyncOwnershipGuard.bindNewCommand({
     id: `v2:${mutationId}`,
     protocol: 'v2', mutationId, deviceId: syncV2DeviceId(), store,
     entity: SYNC_V2_SCHEMAS[store]?.entity ?? store,
@@ -496,7 +497,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
     sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
     state: 'pending', attemptCount: 0, envelopeLocked: false,
     lastError: null, blockedReason: null,
-  };
+  });
 }
 
 const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
@@ -512,7 +513,7 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null)
   const mutationId = uid();
   const canonicalId = rec.canonicalId ?? rec.id;
   const stamp = rec.updatedAt ?? now();
-  return ({
+  return runtimeSyncOwnershipGuard.bindNewCommand({
     id: `v2:${mutationId}`,
     protocol: 'v2', mutationId, deviceId: syncV2DeviceId(),
     store: storeName, entity: schema.entity,
@@ -648,7 +649,7 @@ function assertOperationalWritesAllowed(batch) {
  * receipt tells student sync to use the server transaction first, before a
  * generic bulk upsert could expose a transient duplicate roll number.
  */
-const enrollmentOperationEntry = (operation, stamp) => ({
+const enrollmentOperationEntry = (operation, stamp) => runtimeSyncOwnershipGuard.bindNewCommand({
   id: `enrollment-operation:${operation.id}`,
   store: 'enrollments',
   recordId: null,

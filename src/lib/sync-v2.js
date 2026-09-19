@@ -10,6 +10,7 @@ import * as databaseDefault from './db.js';
 import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
+import { createSyncOwnershipGuard, ownershipBlockedError, SYNC_OWNERSHIP_BLOCKED } from './sync-ownership.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const clone = (value) => value == null ? value : structuredClone(value);
@@ -597,6 +598,8 @@ export function createSyncV2Engine({
   transport = defaultTransport(),
   now = () => Date.now(),
   makeId = uid,
+  ownershipGuard = createSyncOwnershipGuard(),
+  currentAuthenticatedUserId = () => null,
 } = {}) {
   if (!database?.applyBatch || !database?.getAll) throw new Error('Sync V2 requires a transactional database adapter');
 
@@ -649,7 +652,7 @@ export function createSyncV2Engine({
           ? uniqueDependencies(dependencies)
           : inferredDependencies(store, next, current, dependencies);
         const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
-        const mutation = {
+        const mutation = ownershipGuard.bindNewCommand({
           id: `v2:${mutationId}`,
           protocol: 'v2',
           mutationId,
@@ -675,7 +678,7 @@ export function createSyncV2Engine({
           envelopeLocked: false,
           lastError: null,
           blockedReason: null,
-        };
+        });
         result = { record: next, mutation };
         return {
           [store]: { put: [next], remove: [] },
@@ -700,7 +703,7 @@ export function createSyncV2Engine({
         const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
         const deviceId = deviceRecord?.deviceId || makeId();
         const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
-        queued = {
+        queued = ownershipGuard.bindNewCommand({
           id: `v2:${mutationId}`,
           protocol: 'v2', mutationId, deviceId, store, entity: schema.entity,
           recordId, serverRecordId: recordId, canonicalId: recordId,
@@ -712,7 +715,7 @@ export function createSyncV2Engine({
           clientUpdatedAt: stamp, queuedAt: stamp,
           state: 'pending', attemptCount: 0, envelopeLocked: false,
           lastError: null, blockedReason: null,
-        };
+        });
         return {
           outbox: { put: [queued], remove: [] },
           device: deviceRecord?.deviceId
@@ -786,11 +789,11 @@ export function createSyncV2Engine({
     await database.applyBatch({ teachings: {}, items: {}, outbox: {}, device: {} }, { prepare(current) {
       const device = current.device.find((row) => row.id === 'device'); const deviceId = device?.deviceId || makeId();
       const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
-      queued = { id: `v2:${mutationId}`, protocol: 'v2', mutationId, deviceId, store: 'teachings', entity: 'teachings',
+      queued = ownershipGuard.bindNewCommand({ id: `v2:${mutationId}`, protocol: 'v2', mutationId, deviceId, store: 'teachings', entity: 'teachings',
         recordId: teaching.id, serverRecordId: teaching.id, canonicalId: teaching.id, logicalRecordKey: `teachings:${teaching.id}`,
         op: 'command', command: 'teaching:create', patch: { sectionId: teaching.sectionId, subjectId: teaching.subjectId, termId: teaching.termId, order: teaching.order ?? 0, itemIds: items.map((item) => item.id) },
         localPatch: {}, fields: [], groups: ['__create__'], dependencies: uniqueDependencies([{ store: 'sections', recordId: teaching.sectionId, requiresServerRevision: true }, { store: 'subjects', recordId: teaching.subjectId, requiresServerRevision: true }, { store: 'terms', recordId: teaching.termId, requiresServerRevision: true }, ...dependencies]),
-        sequence, clientUpdatedAt: stamp, queuedAt: stamp, state: 'pending', attemptCount: 0, envelopeLocked: false, lastError: null, blockedReason: null };
+        sequence, clientUpdatedAt: stamp, queuedAt: stamp, state: 'pending', attemptCount: 0, envelopeLocked: false, lastError: null, blockedReason: null });
       return { teachings: { put: [{ ...teaching, canonicalId: teaching.id, serverRevision: 0 }], remove: [] }, items: { put: items.map((item) => ({ ...item, canonicalId: item.id, serverRevision: 0 })), remove: [] }, outbox: { put: [queued], remove: [] }, device: device ? operationBatch() : { put: [{ id: 'device', deviceId, updatedAt: stamp }], remove: [] } };
     }});
     return queued;
@@ -1162,6 +1165,31 @@ export function createSyncV2Engine({
     });
   }
 
+  async function markOwnershipBlocked(mutation, access) {
+    await database.applyBatch({ outbox: {} }, {
+      prepare(current) {
+        const existing = current.outbox.find((row) => row.id === mutation.id);
+        if (!existing) return { outbox: operationBatch() };
+        return {
+          outbox: {
+            put: [{
+              ...existing,
+              state: 'blocked',
+              blockedReason: `ownership:${access.reason}`,
+              lastError: {
+                message: `Sync ownership blocked: ${access.reason}`,
+                code: SYNC_OWNERSHIP_BLOCKED,
+                retryable: false,
+                at: now(),
+              },
+            }],
+            remove: [],
+          },
+        };
+      },
+    });
+  }
+
   function isRejectedProtocolError(error) {
     const status = Number(error?.status);
     return error?.code === '22023' || error?.code === '23503' ||
@@ -1175,6 +1203,19 @@ export function createSyncV2Engine({
 
     for (const original of snapshot) {
       if (result.attempted >= maxMutations) break;
+      const ownership = ownershipGuard.cloudAccess({
+        operation: 'dispatch',
+        authenticatedUserId: currentAuthenticatedUserId(),
+        command: original,
+      });
+      if (!ownership.allowed) {
+        await markOwnershipBlocked(original, ownership);
+        stoppedKeys.add(original.logicalRecordKey);
+        result.blocked++;
+        result.ownershipBlocked = (result.ownershipBlocked ?? 0) + 1;
+        result.blockReason ??= ownership.reason;
+        continue;
+      }
       if (original.state === 'rejected') {
         stoppedKeys.add(original.logicalRecordKey);
         result.blocked++;
@@ -1553,6 +1594,10 @@ export function createSyncV2Engine({
   }
 
   async function pullStore(store) {
+    const ownership = ownershipGuard.cloudAccess({
+      operation: 'pull', authenticatedUserId: currentAuthenticatedUserId(),
+    });
+    if (!ownership.allowed) throw ownershipBlockedError(ownership);
     const schema = schemaFor(store);
     const rows = await transport.fetchRecords(schema.entity);
     if (!Array.isArray(rows)) throw new Error(`Sync V2 pull expected an array for ${schema.entity}`);
@@ -1561,7 +1606,16 @@ export function createSyncV2Engine({
   }
 
   async function pullAll({ stores = SYNC_V2_STORES } = {}) {
-    const result = { pulled: 0, failures: [] };
+    const ownership = ownershipGuard.cloudAccess({
+      operation: 'pull', authenticatedUserId: currentAuthenticatedUserId(),
+    });
+    if (!ownership.allowed) {
+      return {
+        pulled: 0, failures: [], blocked: true, ownershipBlocked: true,
+        blockReason: ownership.reason, retryable: false,
+      };
+    }
+    const result = { pulled: 0, failures: [], blocked: false, ownershipBlocked: false };
     for (const store of stores) {
       try {
         result.pulled += await pullStore(store);
@@ -1574,6 +1628,7 @@ export function createSyncV2Engine({
 
   async function sync(options = {}) {
     const pull = await pullAll(options);
+    if (pull.ownershipBlocked) return { pull, push: null, status: await status() };
     const push = await dispatchPending(options);
     return { pull, push, status: await status() };
   }
