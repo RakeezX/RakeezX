@@ -115,7 +115,8 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
   const worker=await read('sw.js'),oldWorker=baseline('sw.js');
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v20';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v21';/);
+  assert.match(worker,/\.\/src\/lib\/workspace-claim\.js/);
   assert.match(worker,/return \(await caches\.match\('\.\/'\)\) \|\| cachedFallback\('\.\/index\.html', 503\)/);
   assert.match(worker,/generation < CACHE_GENERATION/);
   for (const [file] of A1_VECTORS) assert.ok(worker.includes(`'./assets/${file}'`));

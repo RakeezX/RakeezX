@@ -12,6 +12,13 @@ import {
   CLOUD_RECOVERY_STATE_META, cloudRecoveryErrorPresentation,
   groupCloudRestoreEntries, summarizeCloudRestorePlan,
 } from '../lib/cloud-recovery-ui.js';
+import {
+  CANONICAL_PRODUCTION_ORIGIN,
+  LEGACY_WORKSPACE_CLAIM_CONFIRMATION,
+  createLegacyWorkspaceClaimService,
+} from '../lib/workspace-claim.js';
+import { createWorkspaceRegistry, resolveWorkspace } from '../lib/workspaces.js';
+import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
@@ -20,6 +27,13 @@ let latestLocalAction = null;
 let cloudResumeState = null;
 let cloudResumeError = null;
 let backupViewRevision = 0;
+let latestVerifiedBackup = null;
+let legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+let legacyClaimService = null;
+
+const claimCanonicalOrigin = () => import.meta.env?.DEV
+  ? globalThis.location?.origin ?? CANONICAL_PRODUCTION_ORIGIN
+  : CANONICAL_PRODUCTION_ORIGIN;
 
 const emptyCloudRecovery = () => ({
   phase: 'idle', fileName: '', payload: null, structural: null, validation: null,
@@ -231,6 +245,125 @@ function presentCloudError(error) {
   return cloudRecoveryErrorPresentation(error);
 }
 
+const claimErrorPresentation = (error) => {
+  const code = error?.code ?? 'WORKSPACE_CLAIM_FAILED';
+  if (['WORKSPACE_CLAIM_IDENTITY_UNVERIFIED', 'AUTH_REQUIRED'].includes(code)) {
+    return 'تعذّر التحقق من هوية الحساب. تأكد من الاتصال ثم أعد المحاولة.';
+  }
+  if (['WORKSPACE_CLAIM_EVIDENCE_CONFLICT', 'WORKSPACE_CLAIM_OUTBOX_CONFLICT',
+    'WORKSPACE_CLAIM_CONFLICT', 'WORKSPACE_REGISTRY_MISMATCH'].includes(code)) {
+    return 'توقّف الربط لأن دليل الملكية أو سجل المزامنة غير متطابق. لم تتغير بياناتك.';
+  }
+  if (['WORKSPACE_CLAIM_RECONCILIATION_PENDING', 'SYNC_BUSY'].includes(code)) {
+    return 'توجد عملية أخرى تحتاج إلى الاكتمال قبل ربط السجل. لم تتغير بياناتك.';
+  }
+  return 'تعذّر ربط السجل بأمان. لم تتغير بياناتك، ولن يعيد رَكيز المحاولة تلقائيًا.';
+};
+
+async function refreshLegacyClaimState() {
+  const userId = String(cloud.user?.id ?? '').trim().toLowerCase();
+  const marker = store.state.device?.workspaceClaim ?? null;
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  if (marker?.state === 'claimed' && (!cloud.session || !userId)) {
+    runtimeSyncOwnershipGuard.setWorkspace({
+      type: 'unresolved', ownershipState: 'unresolved', reason: 'claimed-workspace-signed-out',
+    });
+    legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+    return;
+  }
+  if (!cloud.session || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId) ||
+      workspace?.type === 'demo') {
+    legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+    return;
+  }
+  if (marker?.state === 'claimed') {
+    if (String(marker.ownerId ?? '').toLowerCase() !== userId) {
+      runtimeSyncOwnershipGuard.setWorkspace({
+        type: 'unresolved', ownershipState: 'unresolved', reason: 'claimed-workspace-owner-mismatch',
+      });
+      legacyClaimState = { phase: 'blocked', error: 'هذا السجل مرتبط بحساب آخر على هذا الجهاز.', pendingRecovery: false };
+      return;
+    }
+    const registry = createWorkspaceRegistry();
+    try {
+      const resolved = await resolveWorkspace({ type: 'account', authUserId: userId, legacyDetected: true }, { registry });
+      if (resolved.status !== 'resolved' || resolved.workspace?.databaseName !== 'rakeezx' ||
+          resolved.workspace?.claimId !== marker.claimId) {
+        legacyClaimState = { phase: 'blocked', error: 'بيانات ربط السجل تحتاج إلى مراجعة قبل المتابعة.', pendingRecovery: false };
+        return;
+      }
+      runtimeSyncOwnershipGuard.setWorkspace(resolved.workspace);
+      legacyClaimState = { phase: 'claimed', error: null, pendingRecovery: false };
+      return;
+    } finally {
+      await registry.close();
+    }
+  }
+  if (marker && marker.state !== 'registry_pending') {
+    legacyClaimState = { phase: 'blocked', error: 'حالة ربط السجل غير معروفة. لم يُنفّذ أي تغيير.', pendingRecovery: false };
+    return;
+  }
+  if (marker?.state === 'registry_pending' && String(marker.ownerId ?? '').toLowerCase() !== userId) {
+    legacyClaimState = { phase: 'blocked', error: 'محاولة الربط المحفوظة تخص حسابًا آخر.', pendingRecovery: true };
+    return;
+  }
+  if (workspace?.type !== 'legacy' || workspace?.ownershipState !== 'unclaimed' ||
+      workspace?.databaseName !== 'rakeezx' || !store.state.device?.deviceId ||
+      globalThis.location?.origin !== claimCanonicalOrigin()) {
+    legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+    return;
+  }
+  legacyClaimState = {
+    phase: typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : 'eligible',
+    error: null,
+    pendingRecovery: marker?.state === 'registry_pending',
+  };
+}
+
+function renderLegacyClaimSection() {
+  const state = legacyClaimState;
+  if (state.phase === 'hidden') return '';
+  if (state.phase === 'claimed') return html`<section class="surface__section data-safety-section" aria-labelledby="legacy-claim-title">
+    <div class="data-safety-section__head">
+      <span class="data-safety-section__icon is-brand">${icon('shield')}</span>
+      <div class="data-safety-section__copy"><h2 id="legacy-claim-title">السجل المحلي مرتبط بالحساب</h2><p>هذا السجل المحلي محفوظ لهذا الحساب على هذا الجهاز.</p></div>
+      <span class="badge badge--ok">تم الربط</span>
+    </div>
+  </section>`;
+  const busy = state.phase === 'busy';
+  const blocked = state.phase === 'blocked';
+  const offline = state.phase === 'offline';
+  const backupReady = !!latestVerifiedBackup &&
+    String(latestVerifiedBackup.sourceOwnerId ?? '').toLowerCase() === String(cloud.user?.id ?? '').toLowerCase();
+  return html`<section class="surface__section data-safety-section" aria-labelledby="legacy-claim-title">
+    <div class="data-safety-section__head">
+      <span class="data-safety-section__icon is-info">${icon('shield')}</span>
+      <div class="data-safety-section__copy"><h2 id="legacy-claim-title">ربط السجل المحلي بالحساب</h2><p>${state.pendingRecovery
+        ? 'توجد محاولة ربط محفوظة يمكن إكمالها بأمان للحساب نفسه.'
+        : 'يربط سجل ركيز الموجود في هذا المتصفح بالحساب بعد فحص الهوية والتعارضات.'}</p></div>
+      ${blocked ? '' : html`<button class="btn btn--info data-safety-section__action" data-act="claim-legacy-workspace"
+        ${busy || offline || !backupReady ? html`disabled aria-disabled="true"` : ''}>${busy ? 'جارٍ التحقق والربط…' : 'ربط السجل المحلي بالحساب'}</button>`}
+    </div>
+    ${offline ? html`<div class="cloud-recovery-message is-error" role="status">${icon('cloud')}<span><strong>يلزم الاتصال للربط الأول</strong><small>يمكنك متابعة استخدام ركيز محليًا، ثم العودة عند توفر الاتصال.</small></span></div>` : ''}
+    ${!blocked && !backupReady ? html`<div class="backup-action-status"><span class="backup-action-status__mark">${icon('download')}</span><span><strong>نزّل نسخة احتياطية حديثة أولًا</strong><small>بعد اكتمال التنزيل في هذه الجلسة سيصبح إجراء الربط متاحًا.</small></span></div>` : ''}
+    ${state.error ? html`<div class="cloud-recovery-message is-error" role="alert">${icon('shield')}<span><strong>لم يُنفّذ الربط</strong><small>${state.error}</small></span></div>` : ''}
+  </section>`;
+}
+
+function confirmLegacyClaim(email) {
+  return openSheet({
+    title: 'تأكيد ربط السجل المحلي بالحساب',
+    desc: 'سيُفحص الحساب وسجل المزامنة مرة أخرى قبل أي كتابة.',
+    body: html`<div class="stack stack-3">
+      <p>الحساب: <bdi dir="ltr">${email}</bdi></p>
+      <div class="recovery-review-note">${icon('device')}<span><strong>الهدف هو سجل ركيز الموجود في هذا المتصفح والجهاز</strong><small>لن تُنسخ قاعدة البيانات أو تتغير معرّفات الفصول والطلاب والسجلات.</small></span></div>
+      <p class="t-3 fs-sm">بالمتابعة تؤكد أن النسخة الاحتياطية الحديثة محفوظة، وأن تبويبات ركيز الأخرى مغلقة، وأنك أوقفت التعديل مؤقتًا.</p>
+    </div>`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" data-claim-confirm>نعم، اربط السجل</button>`,
+    onMount: (root, done) => root.querySelector('[data-claim-confirm]')?.addEventListener('click', () => done(true)),
+  }).then((value) => value === true);
+}
+
 export default {
   title: () => 'البيانات والنسخ الاحتياطي',
   wide: true,
@@ -245,6 +378,7 @@ export default {
     usageInfo = nextUsage;
     cloudResumeState = nextResume;
     cloudResumeError = nextResumeError;
+    await refreshLegacyClaimState();
     repaint();
   },
   onUnmount() {
@@ -252,6 +386,7 @@ export default {
     cloudRecovery = emptyCloudRecovery();
     cloudResumeState = null;
     cloudResumeError = null;
+    legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
   },
   render() {
     const s = store.state;
@@ -284,6 +419,7 @@ export default {
               <span><strong>${latestLocalAction ? 'اكتمل آخر تنزيل في هذه الجلسة' : 'لم تُنزّل نسخة في هذه الجلسة'}</strong><small>${latestLocalAction ? actionTime(latestLocalAction) : 'احتفظ بالملف في مكان آمن يمكنك الوصول إليه لاحقًا.'}</small></span>
             </div>
           </section>
+          ${renderLegacyClaimSection()}
           <section class="surface__section data-safety-section" aria-labelledby="restore-title">
             <div class="data-safety-section__heading"><h2 id="restore-title">الاستعادة والاسترداد</h2><p>اختر المسار المناسب لمكان النسخة التي تريد استعادتها.</p></div>
             <input type="file" id="restore-file" accept="application/json,.json" class="sr-only" data-change="file" aria-label="اختيار ملف نسخة احتياطية للاستعادة">
@@ -318,8 +454,66 @@ export default {
   },
   actions: {
     async export() {
-      try { await downloadBackup(); latestLocalAction = new Date(); toast('نُزّلت النسخة الاحتياطية'); repaint(); }
+      try {
+        const payload = await downloadBackup();
+        const validation = await validateBackupIntegrity(payload);
+        if (!validation.ok || validation.integrity !== 'verified') throw new Error('Backup integrity verification failed');
+        latestVerifiedBackup = {
+          backupHash: payload.backupHash,
+          exportedAt: payload.exportedAt,
+          sourceOwnerId: payload.sourceOwnerId,
+        };
+        latestLocalAction = new Date();
+        toast('نُزّلت النسخة الاحتياطية');
+        repaint();
+      }
       catch (err) { console.error(err); toast('تعذّر التصدير', 'danger'); }
+    },
+    async 'claim-legacy-workspace'() {
+      if (legacyClaimState.phase !== 'eligible' || !latestVerifiedBackup || !cloud.session || !cloud.user ||
+          String(latestVerifiedBackup.sourceOwnerId ?? '').toLowerCase() !== String(cloud.user.id ?? '').toLowerCase()) return;
+      const expectedOwnerId = String(cloud.user.id ?? '').trim().toLowerCase();
+      const expectedEmail = String(cloud.user.email ?? '').trim();
+      const confirmed = await confirmLegacyClaim(expectedEmail);
+      if (!confirmed) return;
+      if (!cloud.user || String(cloud.user.id ?? '').trim().toLowerCase() !== expectedOwnerId) {
+        legacyClaimState = { ...legacyClaimState, phase: 'blocked', error: 'تغيّر الحساب قبل التنفيذ. لم يُنفّذ الربط.' };
+        repaint();
+        return;
+      }
+      legacyClaimState = { ...legacyClaimState, phase: 'busy', error: null };
+      repaint();
+      try {
+        legacyClaimService ??= createLegacyWorkspaceClaimService({
+          activationEnabled: true,
+          canonicalOrigin: claimCanonicalOrigin(),
+        });
+        await legacyClaimService.claim({
+          expectedOwnerId,
+          confirmation: {
+            action: LEGACY_WORKSPACE_CLAIM_CONFIRMATION,
+            confirmed: true,
+            otherTabsClosed: true,
+            expectedOwnerId,
+            origin: globalThis.location.origin,
+            databaseName: 'rakeezx',
+          },
+        });
+        store.state.device = await db.get('device', 'device');
+        legacyClaimState = { phase: 'claimed', error: null, pendingRecovery: false };
+        toast('تم ربط السجل المحلي بالحساب');
+        repaint();
+      } catch (error) {
+        console.error('[rakeezx claim] Workspace claim failed:', error);
+        const conflict = ['WORKSPACE_CLAIM_EVIDENCE_CONFLICT', 'WORKSPACE_CLAIM_OUTBOX_CONFLICT',
+          'WORKSPACE_CLAIM_CONFLICT', 'WORKSPACE_REGISTRY_MISMATCH'].includes(error?.code);
+        legacyClaimState = {
+          phase: conflict ? 'blocked' : (typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : 'eligible'),
+          error: claimErrorPresentation(error),
+          pendingRecovery: (await db.get('device', 'device'))?.workspaceClaim?.state === 'registry_pending',
+        };
+        repaint();
+      }
     },
     'pick-file'() { document.getElementById('restore-file')?.click(); },
     'pick-cloud-file'() {
