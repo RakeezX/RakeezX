@@ -4,6 +4,7 @@ import { stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { STORES } from '../src/lib/db.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
@@ -47,6 +48,26 @@ const collectErrors = (page) => {
   return errors;
 };
 
+async function provisionUnclaimedLegacyWorkspace(page) {
+  await page.evaluate(async (stores) => {
+    const database = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('rakeezx', 7);
+      request.onupgradeneeded = () => {
+        for (const store of stores) {
+          if (!request.result.objectStoreNames.contains(store)) {
+            request.result.createObjectStore(store, { keyPath: 'id' });
+          }
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    database.close();
+  }, STORES);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
+}
+
 test('a suspended expired-session refresh cannot keep the startup Splash mounted', async ({ browser }) => {
   const host = await startStaticServer();
   const context = await browser.newContext({ serviceWorkers: 'block' });
@@ -68,7 +89,7 @@ test('a suspended expired-session refresh cannot keep the startup Splash mounted
 
   try {
     await page.goto(`${host.url}/#/`, { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('.topbar__title')).toContainText('الرئيسية', { timeout: 4_000 });
+    await expect(page.locator('[data-workspace-gate]')).toHaveAttribute('data-workspace-reason', 'initial-restore-required', { timeout: 4_000 });
     await expect(page.locator('.boot')).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {
@@ -103,7 +124,7 @@ test('resume lifecycle primitives never re-mount Splash or duplicate startup lis
 
   try {
     await page.goto(`${host.url}/#/`, { waitUntil: 'networkidle' });
-    await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
+    await expect(page.locator('[data-workspace-gate]')).toHaveAttribute('data-workspace-reason', 'workspace-not-provisioned');
     const initial = await page.evaluate(() => structuredClone(window.__rakeezBootProbe));
 
     for (let cycle = 0; cycle < 4; cycle += 1) {
@@ -113,7 +134,7 @@ test('resume lifecycle primitives never re-mount Splash or duplicate startup lis
         document.dispatchEvent(new Event('visibilitychange'));
       });
       await expect(page.locator('.boot')).toHaveCount(0);
-      await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
+      await expect(page.locator('[data-workspace-gate]')).toHaveAttribute('data-workspace-reason', 'workspace-not-provisioned');
     }
 
     await context.setOffline(true);
@@ -185,6 +206,7 @@ test('canonical theme changes update the early-paint mirror and survive reload',
 
   try {
     await page.goto(`${host.url}/#/`, { waitUntil: 'networkidle' });
+    await provisionUnclaimedLegacyWorkspace(page);
     await page.evaluate(async () => {
       const store = await import('/src/store.js');
       await store.patchDevice({ theme: 'light' });
@@ -209,6 +231,7 @@ test('saved Light remains the first practical frame on an offline service-worker
 
   try {
     await page.goto(`${host.url}/#/`, { waitUntil: 'networkidle' });
+    await provisionUnclaimedLegacyWorkspace(page);
     await page.evaluate(async () => {
       const store = await import('/src/store.js');
       await store.patchDevice({ theme: 'light' });

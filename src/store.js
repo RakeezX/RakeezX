@@ -9,6 +9,7 @@ import * as db from './lib/db.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
+import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
 
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
@@ -52,6 +53,7 @@ export const state = {
 
 let cloudRestoreInProgress = false;
 let workspaceClaimInProgress = false;
+let workspaceInitializationInProgress = false;
 export function setCloudRestoreInProgress(active) {
   cloudRestoreInProgress = active === true;
 }
@@ -61,6 +63,9 @@ export function setWorkspaceClaimInProgress(active) {
 }
 
 function assertCloudRestoreWritable() {
+  if (!state.ready && !workspaceInitializationInProgress) {
+    throw Object.assign(new Error('Workspace is not ready for Product writes'), { code: 'WORKSPACE_NOT_READY' });
+  }
   if (workspaceClaimInProgress) {
     throw Object.assign(new Error('Workspace ownership verification is in progress'), {
       code: 'WORKSPACE_CLAIM_IN_PROGRESS',
@@ -123,7 +128,8 @@ function reportWriteError(err, context) {
 /* ---------- التنسيق بين التبويبات ---------- */
 
 const TAB_ID = uid();
-const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('rakeezx-data') : null;
+let channel = null;
+let activeWorkspace = null;
 
 function broadcast(changes, { render = true } = {}) {
   if (!channel || !changes.length) return;
@@ -134,11 +140,37 @@ function broadcast(changes, { render = true } = {}) {
   }
 }
 
-channel?.addEventListener('message', (ev) => {
+function receiveBroadcast(ev) {
   if (!ev.data || ev.data.from === TAB_ID) return;
   absorb(ev.data.changes, { render: ev.data.render !== false })
     .catch((err) => console.warn('[rakeezx] تعذّر استقبال تغيير', err));
-});
+}
+
+export function activateWorkspace(workspace) {
+  if (!workspace?.databaseName || !workspace?.broadcastChannelName) {
+    throw Object.assign(new Error('A resolved workspace is required before store initialization'), {
+      code: 'WORKSPACE_NOT_READY',
+    });
+  }
+  if (state.ready && activeWorkspace?.databaseName !== workspace.databaseName) {
+    throw Object.assign(new Error('Cannot switch an initialized Product workspace in place'), {
+      code: 'WORKSPACE_ALREADY_MOUNTED',
+    });
+  }
+  db.selectDatabase(workspace.databaseName);
+  runtimeSyncOwnershipGuard.setWorkspace(workspace);
+  activeWorkspace = Object.freeze({ ...workspace });
+  closeChannel();
+  if (typeof BroadcastChannel === 'function') {
+    channel = openWorkspaceBroadcastChannel(activeWorkspace, BroadcastChannel);
+    channel.addEventListener('message', receiveBroadcast);
+  }
+  return activeWorkspace;
+}
+
+export function getActiveWorkspace() {
+  return activeWorkspace;
+}
 
 /**
  * يُغلق قناة BroadcastChannel.
@@ -147,6 +179,19 @@ channel?.addEventListener('message', (ev) => {
  */
 export function closeChannel() {
   if (channel) channel.close();
+  channel = null;
+}
+
+export function deactivateWorkspace(reason = 'workspace-not-ready') {
+  closeChannel();
+  db.closeDB();
+  activeWorkspace = null;
+  runtimeSyncOwnershipGuard.setWorkspace({ type: 'unresolved', ownershipState: 'unresolved', reason });
+  state.ready = false;
+  state.profile = null;
+  state.device = null;
+  for (const collection of COLLECTIONS) state[collection] = [];
+  notify();
 }
 
 async function absorb(changes, { render = true } = {}) {
@@ -260,37 +305,49 @@ async function splitMetaIfNeeded() {
 }
 
 export async function init() {
-  await db.openDB();
-
-  const hadProfile = await db.get('profile', 'profile');
-  const hadMeta = await db.get('meta', 'meta');
-
-  await splitMetaIfNeeded();
-
-  const [profile, device, ...loaded] = await Promise.all([
-    db.get('profile', 'profile'),
-    db.get('device', 'device'),
-    ...COLLECTIONS.map((c) => db.getAll(c)),
-  ]);
-
-  state.profile = { ...DEFAULT_PROFILE, ...(profile ?? {}) };
-  state.device = { ...DEFAULT_DEVICE, ...(device ?? {}) };
-  COLLECTIONS.forEach((c, i) => {
-    state[c] = loaded[i] ?? [];
-  });
-
-  if (!device?.studentLifecycleResume) {
-    await normalizeSectionLifecycle();
-    await ensureFoundation();
-    await migrateLegacyGroupArrangements();
-    await migrateLegacyStudentNotes();
+  if (!activeWorkspace) {
+    activateWorkspace({
+      id: 'legacy', type: 'legacy', authUserId: null,
+      databaseName: db.DB_NAME, ownershipState: 'unclaimed', syncEligible: false,
+      broadcastChannelName: LEGACY_BROADCAST_CHANNEL_NAME,
+    });
   }
+  workspaceInitializationInProgress = true;
+  try {
+    await db.openDB();
 
-  applyTheme();
-  state.ready = true;
-  notify();
-  db.persist();
-  return state;
+    const hadProfile = await db.get('profile', 'profile');
+    const hadMeta = await db.get('meta', 'meta');
+
+    await splitMetaIfNeeded();
+
+    const [profile, device, ...loaded] = await Promise.all([
+      db.get('profile', 'profile'),
+      db.get('device', 'device'),
+      ...COLLECTIONS.map((c) => db.getAll(c)),
+    ]);
+
+    state.profile = { ...DEFAULT_PROFILE, ...(profile ?? {}) };
+    state.device = { ...DEFAULT_DEVICE, ...(device ?? {}) };
+    COLLECTIONS.forEach((c, i) => {
+      state[c] = loaded[i] ?? [];
+    });
+
+    if (!device?.studentLifecycleResume) {
+      await normalizeSectionLifecycle();
+      await ensureFoundation();
+      await migrateLegacyGroupArrangements();
+      await migrateLegacyStudentNotes();
+    }
+
+    applyTheme();
+    state.ready = true;
+    notify();
+    db.persist();
+    return state;
+  } finally {
+    workspaceInitializationInProgress = false;
+  }
 }
 
 /** Forward-compatible local normalization; no outbox entry or timestamp churn. */

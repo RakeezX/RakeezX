@@ -11,6 +11,8 @@ import * as cloud from './lib/cloud.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
+import { createWorkspaceRegistry } from './lib/workspaces.js';
+import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
 
 const app = document.getElementById('app');
 
@@ -31,6 +33,7 @@ let mainEl = null;
 let syncModule = null;
 let teacherMiniHubSheet = null;
 let teacherMiniHubAuthPending = null;
+let workspaceRouting = null;
 const scrollMemory = new Map();
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
@@ -504,10 +507,29 @@ async function boot() {
   });
 
   try {
-    await store.init();
     // Restore the cached identity immediately, but never make the local shell
     // depend on a refresh request that Android may suspend while backgrounded.
     await cloud.init({ waitForRefresh: false });
+    const registry = createWorkspaceRegistry();
+    try {
+      workspaceRouting = await resolveWorkspaceForBoot({
+        authUser: cloud.user,
+        authState: cloud.session && cloud.user ? 'authenticated' : 'signed_out',
+        registry,
+        allowDevelopmentLegacyBootstrap: import.meta.env?.DEV === true,
+      });
+    } finally {
+      await registry.close();
+    }
+    if (import.meta.env?.DEV) window.__workspaceRouting = workspaceRouting;
+    if (workspaceRouting.status !== 'ready') {
+      store.deactivateWorkspace(workspaceRouting.reason);
+      mountWorkspaceGate(workspaceRouting);
+      registerServiceWorker();
+      return;
+    }
+    store.activateWorkspace(workspaceRouting.workspace);
+    await store.init();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
       syncModule = await import('./lib/sync.js');
@@ -579,7 +601,7 @@ async function boot() {
   registerServiceWorker();
 }
 
-function openMiniHubLoginSheet() {
+function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
   teacherMiniHubAuthPending = 'login';
   refreshTeacherMiniHubSheet();
   const loginSheet = openSheet({
@@ -618,6 +640,10 @@ function openMiniHubLoginSheet() {
           toast('تم تسجيل الدخول بنجاح');
           teacherMiniHubAuthPending = null;
           done(true);
+          if (reloadOnSuccess) {
+            location.reload();
+            return;
+          }
           refreshTeacherMiniHubSheet({ focusAccountAction: true });
         } catch (err) {
           teacherMiniHubAuthPending = null;
@@ -638,6 +664,32 @@ function openMiniHubLoginSheet() {
   return loginSheet;
 }
 
+function mountWorkspaceGate(routing) {
+  const signedOut = routing.authState === 'signed_out' || !cloud.session || !cloud.user;
+  render(app, html`
+    <div class="page" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
+      <div class="empty" role="status">
+        <div class="empty__icon">${icon('shield')}</div>
+        <div class="empty__title">${signedOut ? 'سجّل الدخول لفتح مساحة العمل' : 'مساحة العمل غير جاهزة على هذا الجهاز'}</div>
+        <div class="empty__text">${signedOut
+          ? 'بيانات الحساب المحفوظة على هذا الجهاز محمية، ولا تُفتح إلا بعد تسجيل الدخول بالحساب المرتبط.'
+          : 'لم يتم العثور على مساحة عمل محلية مرتبطة بهذا الحساب. لم تُفتح أو تُنشأ أي قاعدة بيانات.'}</div>
+        ${signedOut
+          ? html`<button class="btn btn--primary" type="button" data-workspace-login>${icon('login')} تسجيل الدخول</button>`
+          : html`<button class="btn btn--ghost" type="button" data-workspace-logout>تسجيل الخروج</button>`}
+      </div>
+    </div>
+  `);
+  app.querySelector('[data-workspace-login]')?.addEventListener('click', () => {
+    void openMiniHubLoginSheet({ reloadOnSuccess: true });
+  });
+  app.querySelector('[data-workspace-logout]')?.addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+    await cloud.signOut();
+    location.reload();
+  });
+}
+
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
   'skip-to-content': (_el, event) => {
@@ -656,13 +708,21 @@ const GLOBAL_ACTIONS = {
     teacherMiniHubAuthPending = 'logout';
     refreshTeacherMiniHubSheet();
     try {
+      const protectedAccountWorkspace = store.getActiveWorkspace()?.type === 'account';
+      if (protectedAccountWorkspace) await syncModule?.suspendForWorkspaceDeactivation?.();
       await cloud.signOut();
       toast('تم تسجيل الخروج');
+      if (protectedAccountWorkspace) {
+        store.deactivateWorkspace('explicit-logout');
+        location.reload();
+        return;
+      }
     } catch (err) {
+      syncModule?.resumeAfterWorkspaceDeactivationFailure?.();
       toast(err.message || 'تعذر تسجيل الخروج', 'danger');
     } finally {
       teacherMiniHubAuthPending = null;
-      refreshTeacherMiniHubSheet({ focusAccountAction: true });
+      if (store.state.ready) refreshTeacherMiniHubSheet({ focusAccountAction: true });
     }
   },
   'mini-hub-sync-now': async (el) => {

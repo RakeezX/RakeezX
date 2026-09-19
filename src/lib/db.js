@@ -8,6 +8,8 @@
 export const DB_NAME = 'rakeezx';
 export const DB_VERSION = 7;
 
+let activeDatabaseName = DB_NAME;
+
 
 export const STORES = [
   'profile',       // بيانات المعلّم — تُصدَّر وتُدمج
@@ -46,6 +48,22 @@ export const STORES = [
 let _db = null;
 let onVersionChange = null;
 
+export function selectDatabase(databaseName) {
+  const name = String(databaseName ?? '').trim();
+  if (!/^rakeezx(?:-user-[0-9a-f]{32})?$/.test(name)) {
+    throw Object.assign(new Error('Invalid resolved Product database name'), { code: 'INVALID_WORKSPACE_DATABASE' });
+  }
+  if (_db && _db.name !== name) {
+    throw Object.assign(new Error('Cannot switch Product databases while one is mounted'), {
+      code: 'WORKSPACE_DATABASE_ALREADY_OPEN',
+    });
+  }
+  activeDatabaseName = name;
+  return activeDatabaseName;
+}
+
+export const getActiveDatabaseName = () => activeDatabaseName;
+
 /** يُبلَّغ حين يطلب تبويب آخر ترقية القاعدة، فيعيد التطبيق تحميل نفسه. */
 export const setVersionChangeHandler = (fn) => {
   onVersionChange = fn;
@@ -69,7 +87,7 @@ function upgrade(db) {
 export function openDB() {
   if (_db) return Promise.resolve(_db);
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open(DB_NAME, DB_VERSION);
+    const r = indexedDB.open(activeDatabaseName, DB_VERSION);
 
     r.onupgradeneeded = () => upgrade(r.result);
 

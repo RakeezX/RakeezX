@@ -71,7 +71,34 @@ test('approved outlined headers and sanitized Micro-Mark have exact safe vector 
 test('Brand release preserves Production identity, install actions and offline policy across later runtime work', async () => {
   const baseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`66b0f4bd1748ac1fb756d47fb814c66cf4df64af:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
   const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
-  for (const file of ['manifest.webmanifest','src/models.js','src/lib/db.js','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
+  for (const file of ['manifest.webmanifest','src/models.js','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
+  const databaseSelector = `let activeDatabaseName = DB_NAME;
+
+`;
+  const databaseRouting = `export function selectDatabase(databaseName) {
+  const name = String(databaseName ?? '').trim();
+  if (!/^rakeezx(?:-user-[0-9a-f]{32})?$/.test(name)) {
+    throw Object.assign(new Error('Invalid resolved Product database name'), { code: 'INVALID_WORKSPACE_DATABASE' });
+  }
+  if (_db && _db.name !== name) {
+    throw Object.assign(new Error('Cannot switch Product databases while one is mounted'), {
+      code: 'WORKSPACE_DATABASE_ALREADY_OPEN',
+    });
+  }
+  activeDatabaseName = name;
+  return activeDatabaseName;
+}
+
+export const getActiveDatabaseName = () => activeDatabaseName;
+
+`;
+  const database = await read('src/lib/db.js');
+  assert.equal(database.split(databaseSelector).length - 1, 1, 'workspace database selector must occur exactly once');
+  assert.equal(database.split(databaseRouting).length - 1, 1, 'approved workspace database routing must occur exactly once');
+  assert.equal(database
+    .replace(databaseSelector, '')
+    .replace(databaseRouting, '')
+    .replace('indexedDB.open(activeDatabaseName, DB_VERSION)', 'indexedDB.open(DB_NAME, DB_VERSION)'), baseline('src/lib/db.js'), 'src/lib/db.js outside approved workspace routing');
   const store = await read('src/store.js');
   assert.match(store, /export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme'/);
   assert.match(store, /localStorage\?\.setItem\(THEME_BOOT_STORAGE_KEY, t\)/);
@@ -115,8 +142,9 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
   const worker=await read('sw.js'),oldWorker=baseline('sw.js');
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v21';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v22';/);
   assert.match(worker,/\.\/src\/lib\/workspace-claim\.js/);
+  assert.match(worker,/\.\/src\/lib\/workspace-routing\.js/);
   assert.match(worker,/return \(await caches\.match\('\.\/'\)\) \|\| cachedFallback\('\.\/index\.html', 503\)/);
   assert.match(worker,/generation < CACHE_GENERATION/);
   for (const [file] of A1_VECTORS) assert.ok(worker.includes(`'./assets/${file}'`));

@@ -530,8 +530,19 @@ export default {
     },
 
     async 'cloud-out'() {
-      await cloud.signOut();
-      toast('تم تسجيل الخروج');
+      const protectedAccountWorkspace = store.getActiveWorkspace()?.type === 'account';
+      try {
+        if (protectedAccountWorkspace) await sync.suspendForWorkspaceDeactivation();
+        await cloud.signOut();
+        toast('تم تسجيل الخروج');
+        if (protectedAccountWorkspace) {
+          store.deactivateWorkspace('explicit-logout');
+          globalThis.location?.reload();
+        }
+      } catch (error) {
+        if (protectedAccountWorkspace) sync.resumeAfterWorkspaceDeactivationFailure();
+        throw error;
+      }
     },
 
     async 'sync-now'(el) {

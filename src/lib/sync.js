@@ -216,7 +216,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning) return;
+  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
   if (!cloud.session || !cloud.user) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -545,6 +545,28 @@ export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = fal
     suppressAutoSchedule = false;
     workspaceClaimRunning = false;
     if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
+  }
+}
+
+/**
+ * Stop new automatic work and let an already-running pass settle before an
+ * account workspace is hidden on explicit logout. This never changes Product
+ * records or command ownership; the caller either reloads or resumes scheduling
+ * if the logout request itself fails.
+ */
+export async function suspendForWorkspaceDeactivation() {
+  suppressAutoSchedule = true;
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  rerunRequested = false;
+  if (autoRunning) await new Promise((resolve) => syncSettledWaiters.add(resolve));
+}
+
+export function resumeAfterWorkspaceDeactivationFailure() {
+  suppressAutoSchedule = false;
+  if (initialized && cloud.session && cloud.user) {
+    scheduleAutomaticSync({ full: true, immediate: true });
   }
 }
 
