@@ -76,9 +76,40 @@ test('Brand release preserves Production identity, install actions and offline p
   assert.match(store, /export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme'/);
   assert.match(store, /localStorage\?\.setItem\(THEME_BOOT_STORAGE_KEY, t\)/);
   assert.doesNotMatch(store, /assets\/(?:icon|header|micro-mark|favicon)/);
-  const cloud = (await read('src/lib/cloud.js'))
+  const identityValidation = `/**
+ * Revalidate the current Auth identity with Supabase before a local workspace
+ * ownership transition. Cached session/user data alone is deliberately not
+ * sufficient for this operation.
+ */
+export async function verifyCurrentAuthIdentity(expectedOwnerId) {
+  const expected = String(expectedOwnerId ?? '').trim().toLowerCase();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(expected)) {
+    throw Object.assign(new Error('A valid expected Auth user ID is required'), { code: 'INVALID_AUTH_USER_ID' });
+  }
+  await ensureFreshSession();
+  if (!session?.access_token) throw authError('Authentication required');
+  const verified = await request('/user', { method: 'GET' }, true);
+  const actual = String(verified?.id ?? '').trim().toLowerCase();
+  if (actual !== expected) {
+    throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
+      code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
+    });
+  }
+  saveSession({ ...session, user: verified });
+  return Object.freeze({
+    id: actual,
+    verifiedAt: Date.now(),
+    source: 'supabase-auth-user',
+  });
+}
+
+`;
+  const cloudSource = await read('src/lib/cloud.js');
+  assert.equal(cloudSource.split(identityValidation).length - 1, 1, 'approved Auth identity validation must occur exactly once');
+  const cloud = cloudSource
     .replace('export async function init({ waitForRefresh = true } = {}) {', 'export async function init() {')
-    .replace("          const refresh = refreshSession().catch((error) => {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          });\n          if (waitForRefresh) await refresh;", "          try { await refreshSession(); }\n          catch (error) {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          }");
+    .replace("          const refresh = refreshSession().catch((error) => {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          });\n          if (waitForRefresh) await refresh;", "          try { await refreshSession(); }\n          catch (error) {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          }")
+    .replace(identityValidation, '');
   assert.equal(cloud, baseline('src/lib/cloud.js'), 'src/lib/cloud.js outside the authorized non-blocking startup refresh');
   const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));

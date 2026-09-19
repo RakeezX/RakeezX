@@ -10,7 +10,10 @@ const viewports = [
 
 async function seedQuickLog(page) {
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store, { timeout: 15_000 });
+  await page.waitForFunction(() => window.store?.state.ready, { timeout: 15_000 });
+  const classesHeading = page.getByRole('heading', { level: 1, name: /^الفصول(?:\s|$)/ });
+  await expect(classesHeading).toHaveCount(1);
+  await expect(classesHeading).toBeVisible();
   await page.evaluate(async () => {
     const students = Array.from({ length: 8 }, (_, index) => ({ id: `ql-mobile-student-${index}`, name: `طالب تجريبي ${index + 1}`, status: 'active' }));
     await window.store.save({
@@ -68,7 +71,10 @@ test('Quick Log remains fully usable and RTL-safe across narrow mobile viewports
 });
 test('Quick Log renders available students before absent and excused students without changing actions', async ({ page }) => {
   await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store);
+  await page.waitForFunction(() => window.store?.state.ready);
+  const classesHeading = page.getByRole('heading', { level: 1, name: /^الفصول(?:\s|$)/ });
+  await expect(classesHeading).toHaveCount(1);
+  await expect(classesHeading).toBeVisible();
   await page.evaluate(async () => {
     const now = new Date();
     const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
