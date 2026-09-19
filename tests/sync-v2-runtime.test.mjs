@@ -256,6 +256,44 @@ class GenericV2Backend {
   }
 }
 
+test('workspace claim exclusivity settles an active Sync pass and fences new Sync and Product writes', async () => {
+  const backend = new GenericV2Backend();
+  let announceFetch;
+  let releaseFetch;
+  const fetchStarted = new Promise((resolve) => { announceFetch = resolve; });
+  const fetchReleased = new Promise((resolve) => { releaseFetch = resolve; });
+  const ordinaryFetch = backend.fetchRecords.bind(backend);
+  let gated = false;
+  backend.fetchRecords = async (entity) => {
+    if (!gated) {
+      gated = true;
+      announceFetch();
+      await fetchReleased;
+    }
+    return ordinaryFetch(entity);
+  };
+  cloud.setMockBackend(backend);
+  cloud.setMockAuth({ id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' }, { access_token: 'claim-fence' });
+
+  const running = sync.syncAll({ full: true });
+  await fetchStarted;
+  let claimEntered = false;
+  const exclusive = sync.runWorkspaceClaimExclusive(async () => {
+    claimEntered = true;
+    assert.equal(await sync.syncAll({ full: true }), false, 'a claim fence blocks a second dispatch');
+    await assert.rejects(
+      store.patchProfile({ teacherName: 'must-not-write-during-claim' }),
+      (error) => error.code === 'WORKSPACE_CLAIM_IN_PROGRESS',
+    );
+    return 'settled';
+  });
+  await Promise.resolve();
+  assert.equal(claimEntered, false, 'claim waits for the already-running Sync pass');
+  releaseFetch();
+  assert.equal(await running, true);
+  assert.equal(await exclusive, 'settled');
+});
+
 test('V2 coordinator performs quiet automatic sync and manual retry without V1 dispatch', async () => {
   const backend = new GenericV2Backend();
   cloud.setMockBackend(backend);

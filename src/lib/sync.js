@@ -57,6 +57,8 @@ let initialized = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
+let workspaceClaimRunning = false;
+const syncSettledWaiters = new Set();
 const v2Engine = createSyncV2Engine({
   ownershipGuard: runtimeSyncOwnershipGuard,
   currentAuthenticatedUserId: () => cloud.user?.id ?? null,
@@ -214,7 +216,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
-  if (restoreRunning) return;
+  if (restoreRunning || workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -245,6 +247,7 @@ function retryDelay() {
 }
 
 function scheduleRetry() {
+  if (workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -263,6 +266,7 @@ function scheduleRetry() {
 }
 
 async function scheduleResumeSync() {
+  if (workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -370,7 +374,7 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true } = {}) {
-  if (restoreRunning) return false;
+  if (restoreRunning || workspaceClaimRunning) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
   if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
@@ -448,16 +452,21 @@ export async function syncAll({ full = true } = {}) {
     suppressAutoSchedule = false;
     autoRunning = false;
     notify();
-    const v2Status = await v2Engine.status();
-    cacheOperationalSummary(v2Status);
-    if (failed && cloud.authStatus?.().state !== 'auth_required') {
-      rerunRequested = false;
-      scheduleRetry();
-    } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
-      rerunRequested = false;
-      scheduleAutomaticSync();
-    } else {
-      rerunRequested = false;
+    try {
+      const v2Status = await v2Engine.status();
+      cacheOperationalSummary(v2Status);
+      if (failed && cloud.authStatus?.().state !== 'auth_required') {
+        rerunRequested = false;
+        scheduleRetry();
+      } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
+        rerunRequested = false;
+        scheduleAutomaticSync();
+      } else {
+        rerunRequested = false;
+      }
+    } finally {
+      for (const resolve of syncSettledWaiters) resolve();
+      syncSettledWaiters.clear();
     }
   }
 }
@@ -490,7 +499,7 @@ export async function assertCloudRestoreReady() {
 
 /** Pause automatic sync and normal Product mutations around finalization/reconciliation. */
 export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true } = {}) {
-  if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  if (restoreRunning || workspaceClaimRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
@@ -505,6 +514,36 @@ export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true 
     suppressAutoSchedule = false;
     restoreRunning = false;
     setState({ status: 'synced', lastError: null });
+    if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
+  }
+}
+
+/**
+ * Stop new writes and Sync scheduling, then wait for an already-running pass
+ * to settle before an ownership transaction starts. This API does not claim a
+ * workspace by itself and is dormant until an explicit caller invokes it.
+ */
+export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = false } = {}) {
+  if (workspaceClaimRunning || restoreRunning) {
+    throw Object.assign(new Error('Another exclusive operation is already running'), { code: 'SYNC_BUSY' });
+  }
+  if (typeof task !== 'function') throw new TypeError('Workspace claim task is required');
+  workspaceClaimRunning = true;
+  suppressAutoSchedule = true;
+  store.setWorkspaceClaimInProgress(true);
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  rerunRequested = false;
+  if (autoRunning) {
+    await new Promise((resolve) => syncSettledWaiters.add(resolve));
+  }
+  try {
+    return await task();
+  } finally {
+    store.setWorkspaceClaimInProgress(false);
+    suppressAutoSchedule = false;
+    workspaceClaimRunning = false;
     if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
   }
 }

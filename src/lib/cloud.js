@@ -216,6 +216,33 @@ export async function signIn(email, password) {
   saveSession(data);
 }
 
+/**
+ * Revalidate the current Auth identity with Supabase before a local workspace
+ * ownership transition. Cached session/user data alone is deliberately not
+ * sufficient for this operation.
+ */
+export async function verifyCurrentAuthIdentity(expectedOwnerId) {
+  const expected = String(expectedOwnerId ?? '').trim().toLowerCase();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(expected)) {
+    throw Object.assign(new Error('A valid expected Auth user ID is required'), { code: 'INVALID_AUTH_USER_ID' });
+  }
+  await ensureFreshSession();
+  if (!session?.access_token) throw authError('Authentication required');
+  const verified = await request('/user', { method: 'GET' }, true);
+  const actual = String(verified?.id ?? '').trim().toLowerCase();
+  if (actual !== expected) {
+    throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
+      code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
+    });
+  }
+  saveSession({ ...session, user: verified });
+  return Object.freeze({
+    id: actual,
+    verifiedAt: Date.now(),
+    source: 'supabase-auth-user',
+  });
+}
+
 export async function signOut() {
   if (session?.access_token) {
     try {

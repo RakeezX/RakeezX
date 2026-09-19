@@ -70,6 +70,39 @@ test('account workspaces resolve deterministically and cannot cross-resolve', as
   await workspaces.close();
 });
 
+test('an explicit legacy claim resolves the existing database in place and remains owner-idempotent', async () => {
+  const factory = new IDBFactory();
+  const workspaces = registry(factory);
+  await workspaces.recordLegacyPresence();
+  const first = await workspaces.registerLegacyClaim(USER_A, {
+    claimId: 'claim:legacy-a', evidenceHash: 'evidence-a', cryptoProvider: webcrypto,
+  });
+  const repeated = await workspaces.registerLegacyClaim(USER_A, {
+    claimId: 'claim:legacy-a', evidenceHash: 'evidence-a', cryptoProvider: webcrypto,
+  });
+  const resolved = await resolveWorkspace({ type: 'account', authUserId: USER_A }, {
+    registry: workspaces, cryptoProvider: webcrypto,
+  });
+
+  assert.equal(first.id, repeated.id);
+  assert.equal(resolved.status, 'resolved');
+  assert.deepEqual(resolved.workspace, {
+    id: first.id,
+    type: 'account', authUserId: USER_A,
+    databaseName: LEGACY_WORKSPACE_DB_NAME,
+    ownershipState: 'claimed', syncEligible: true,
+    broadcastChannelName: 'rakeezx-data',
+    workspaceKind: 'legacy-in-place', claimId: 'claim:legacy-a',
+  });
+  await assert.rejects(
+    workspaces.registerLegacyClaim(USER_B, {
+      claimId: 'claim:legacy-b', evidenceHash: 'evidence-b', cryptoProvider: webcrypto,
+    }),
+    (error) => error?.code === 'WORKSPACE_REGISTRY_MISMATCH',
+  );
+  await workspaces.close();
+});
+
 test('Demo resolves only to its isolated, cloud-ineligible workspace', async () => {
   const workspaces = registry();
   await workspaces.registerDemo();

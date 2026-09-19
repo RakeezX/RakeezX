@@ -51,11 +51,21 @@ export const state = {
 };
 
 let cloudRestoreInProgress = false;
+let workspaceClaimInProgress = false;
 export function setCloudRestoreInProgress(active) {
   cloudRestoreInProgress = active === true;
 }
 
+export function setWorkspaceClaimInProgress(active) {
+  workspaceClaimInProgress = active === true;
+}
+
 function assertCloudRestoreWritable() {
+  if (workspaceClaimInProgress) {
+    throw Object.assign(new Error('Workspace ownership verification is in progress'), {
+      code: 'WORKSPACE_CLAIM_IN_PROGRESS',
+    });
+  }
   if (state.device?.studentLifecycleResume) {
     throw Object.assign(new Error('أكمل تحديث حالة الطالب قبل إجراء تعديلات أخرى.'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
   }

@@ -21,7 +21,7 @@ const transactionDone = (transaction) => new Promise((resolve, reject) => {
   transaction.onabort = () => reject(transaction.error);
 });
 
-function normalizeAuthUserId(value) {
+export function normalizeAuthUserId(value) {
   const id = String(value ?? '').trim().toLowerCase();
   if (!AUTH_USER_ID_PATTERN.test(id)) {
     throw Object.assign(new Error('A valid Auth user ID is required'), { code: 'INVALID_AUTH_USER_ID' });
@@ -66,6 +66,8 @@ function accountChannelName(key) {
 }
 
 function accountDescriptor(record, key) {
+  const legacyInPlace = record.workspaceKind === 'legacy-in-place' &&
+    record.databaseName === LEGACY_WORKSPACE_DB_NAME;
   return {
     id: record.id,
     type: 'account',
@@ -73,7 +75,8 @@ function accountDescriptor(record, key) {
     databaseName: record.databaseName,
     ownershipState: 'claimed',
     syncEligible: true,
-    broadcastChannelName: accountChannelName(key),
+    broadcastChannelName: legacyInPlace ? LEGACY_BROADCAST_CHANNEL_NAME : accountChannelName(key),
+    ...(legacyInPlace ? { workspaceKind: 'legacy-in-place', claimId: record.claimId } : {}),
   };
 }
 
@@ -138,6 +141,12 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     return requestResult(tx.objectStore(WORKSPACE_REGISTRY_STORE).index('authUserId').getAll(authUserId));
   }
 
+  async function list() {
+    const db = await database();
+    return requestResult(db.transaction(WORKSPACE_REGISTRY_STORE, 'readonly')
+      .objectStore(WORKSPACE_REGISTRY_STORE).getAll());
+  }
+
   async function write(record) {
     const db = await database();
     const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
@@ -194,6 +203,51 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     });
   }
 
+  async function registerLegacyClaim(authUserId, { claimId, evidenceHash, ...options } = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    if (typeof claimId !== 'string' || !claimId) {
+      throw Object.assign(new Error('A durable legacy claim ID is required'), { code: 'INVALID_WORKSPACE_CLAIM' });
+    }
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const records = await requestResult(store.getAll());
+    const conflicting = records.find((record) =>
+      record.databaseName === LEGACY_WORKSPACE_DB_NAME && record.ownershipState === 'claimed' &&
+      (record.authUserId !== normalized || record.claimId !== claimId));
+    if (conflicting) {
+      throw Object.assign(new Error('The legacy workspace is already registered to another claim'), {
+        code: 'WORKSPACE_REGISTRY_MISMATCH',
+      });
+    }
+    const existingForOwner = records.filter((record) => record.authUserId === normalized);
+    if (existingForOwner.some((record) => record.id !== id)) {
+      throw Object.assign(new Error('Auth user has ambiguous workspace registrations'), {
+        code: 'AMBIGUOUS_ACCOUNT_WORKSPACE',
+      });
+    }
+    const existing = records.find((record) => record.id === id);
+    assertExistingRecord(existing, {
+      id, type: 'account', authUserId: normalized,
+      databaseName: LEGACY_WORKSPACE_DB_NAME, ownershipState: 'claimed',
+      workspaceKind: 'legacy-in-place', claimId,
+    });
+    const stamp = now();
+    const record = {
+      id, type: 'account', authUserId: normalized,
+      databaseName: LEGACY_WORKSPACE_DB_NAME, ownershipState: 'claimed',
+      workspaceKind: 'legacy-in-place', claimId,
+      evidenceHash: evidenceHash ?? existing?.evidenceHash ?? null,
+      createdAt: existing?.createdAt ?? stamp, updatedAt: stamp,
+    };
+    store.put(record);
+    await committed;
+    return record;
+  }
+
   async function registerDemo() {
     const existing = await read('demo');
     assertExistingRecord(existing, {
@@ -214,7 +268,10 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     databasePromise = null;
   }
 
-  return Object.freeze({ read, findByAuthUserId, recordLegacyPresence, registerAccount, registerDemo, close });
+  return Object.freeze({
+    read, list, findByAuthUserId, recordLegacyPresence,
+    registerAccount, registerLegacyClaim, registerDemo, close,
+  });
 }
 
 export async function resolveWorkspace(request, {
@@ -255,9 +312,12 @@ export async function resolveWorkspace(request, {
 
   const record = matches[0];
   const expectedId = accountRecordId(key);
-  const expectedDatabaseName = `rakeezx-user-${key}`;
+  const expectedDatabaseName = record.workspaceKind === 'legacy-in-place'
+    ? LEGACY_WORKSPACE_DB_NAME
+    : `rakeezx-user-${key}`;
   if (record.id !== expectedId || record.type !== 'account' || record.authUserId !== authUserId ||
-      record.databaseName !== expectedDatabaseName || record.ownershipState !== 'claimed') {
+      record.databaseName !== expectedDatabaseName || record.ownershipState !== 'claimed' ||
+      (record.workspaceKind === 'legacy-in-place' && (typeof record.claimId !== 'string' || !record.claimId))) {
     return unresolved('account-registry-mismatch');
   }
   return resolved(accountDescriptor(record, key));
