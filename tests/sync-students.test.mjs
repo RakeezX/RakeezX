@@ -31,7 +31,7 @@ async function assertBlockedEnrollment(missingStore, missingId) {
 test("Sync Students & Enrollments Suite", async (t) => {
   t.beforeEach(async () => {
     setMockAuth(null, null);
-    pg = await lifecycleServer();
+    pg = await lifecycleServer({ migration32: true });
     backend = new LifecycleBackend(pg);
     setMockBackend(backend);
     await db.clearAll();

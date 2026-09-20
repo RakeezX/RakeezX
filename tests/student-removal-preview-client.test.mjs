@@ -11,7 +11,7 @@ let pg,backend,previews=0;
 global.document={documentElement:{setAttribute(){},removeAttribute(){},classList:{add(){},remove(){}}},querySelector:()=>({setAttribute(){}})};
 global.matchMedia=()=>({matches:false});
 before(async()=>{
-  pg=await lifecycleServer(); backend=new LifecycleBackend(pg);
+  pg=await lifecycleServer({migration32:true}); backend=new LifecycleBackend(pg);
   const original=backend.previewStudentRemoval.bind(backend);
   backend.previewStudentRemoval=async(...args)=>{previews++;return original(...args);}; cloud.setMockBackend(backend);
 });

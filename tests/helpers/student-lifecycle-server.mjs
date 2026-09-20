@@ -8,7 +8,7 @@ export async function lifecycleServer(options = {}) {
   return pg;
 }
 
-export async function installLifecycleServer(pg, { migration29 = true, migration30 = migration29 } = {}) {
+export async function installLifecycleServer(pg, { migration29 = true, migration30 = migration29, migration32 = false } = {}) {
   await pg.exec(`create schema auth; create role authenticated; create role anon;
     create table auth.users(id uuid primary key); create table auth.current_identity(id uuid);
     insert into auth.users values ('${OWNER}'); insert into auth.current_identity values ('${OWNER}');
@@ -18,7 +18,7 @@ export async function installLifecycleServer(pg, { migration29 = true, migration
   const directory = new URL('../../supabase/migrations/', import.meta.url);
   for (const name of (await readdir(directory)).sort().filter((name) => /^\d+.*\.sql$/.test(name) &&
       (Number(name.slice(0, 4)) <= 26 || (migration29 && Number(name.slice(0, 4)) === 29) ||
-       (migration30 && Number(name.slice(0, 4)) === 30)))) {
+       (migration30 && Number(name.slice(0, 4)) === 30) || (migration32 && Number(name.slice(0, 4)) === 32)))) {
     await pg.exec((await readFile(new URL(name, directory), 'utf8')).replace(/^\uFEFF/, ''));
   }
 }

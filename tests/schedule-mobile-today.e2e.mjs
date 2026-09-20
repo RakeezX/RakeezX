@@ -33,6 +33,9 @@ async function seedWeeklySchedule(page, { includeToday = true } = {}) {
 
 test('mobile Schedule opens Today, highlights the current slot, and keeps every day reachable', async ({ page }, testInfo) => {
   test.skip([5, 6].includes(new Date().getDay()), 'Current-slot view requires a school day.');
+  const fixedNow = new Date();
+  fixedNow.setHours(8, 20, 0, 0);
+  await page.clock.setFixedTime(fixedNow);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/schedule');
   await page.waitForFunction(() => window.store?.state?.ready === true);

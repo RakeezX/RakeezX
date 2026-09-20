@@ -64,6 +64,19 @@ function createCloud() {
             canonical,
           } });
         }
+        if (table === 'account_contract' && request.method() === 'POST') {
+          return route.fulfill({ json: {
+            ownerId: AUTH_OWNER_ID,
+            profileStatus: 'READY',
+            profile: {
+              teacherName: profile?.teacher_name ?? '',
+              phone: profile?.phone ?? '',
+              teacherForm: profile?.teacher_form === 'feminine' ? 'feminine' : 'masculine',
+              schoolName: profile?.school_name ?? '',
+            },
+            access: { grantType: 'beta_full', status: 'active', source: 'public_beta', expiresAt: null },
+          } });
+        }
         if (request.method() === 'GET') {
           const gate = nextTableRead.get(table);
           if (gate) {

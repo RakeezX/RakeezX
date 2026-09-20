@@ -13,7 +13,7 @@ import { lifecycleServer, academicFixture, LifecycleBackend, OWNER } from './hel
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
 let pg, backend;
-before(async () => { pg = await lifecycleServer(); backend = new LifecycleBackend(pg); cloud.setMockBackend(backend); });
+before(async () => { pg = await lifecycleServer({ migration32: true }); backend = new LifecycleBackend(pg); cloud.setMockBackend(backend); });
 after(async () => { cloud.setMockBackend(null); cloud.setMockAuth(null, null); store.closeChannel(); db.closeDB(); await pg?.close(); });
 
 async function device(factory = new IDBFactory()) {
