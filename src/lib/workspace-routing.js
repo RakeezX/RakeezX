@@ -73,7 +73,7 @@ export async function readWorkspaceClaimMetadata(databaseName, {
     return Object.freeze({
       status: 'read',
       marker: device?.workspaceClaim ? structuredClone(device.workspaceClaim) : null,
-      recoveryPending: device?.workspaceClaim?.state === 'registry_pending' || !!device?.workspaceClaimRecovery,
+      recoveryPending: device?.workspaceClaim?.state === 'registry_pending',
     });
   } finally {
     database.close();

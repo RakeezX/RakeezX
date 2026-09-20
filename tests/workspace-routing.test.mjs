@@ -5,6 +5,11 @@ import { IDBFactory } from 'fake-indexeddb';
 
 import { createWorkspaceRegistry } from '../src/lib/workspaces.js';
 import {
+  CANONICAL_PRODUCTION_ORIGIN,
+  LEGACY_WORKSPACE_CLAIM_CONFIRMATION,
+  createLegacyWorkspaceClaimService,
+} from '../src/lib/workspace-claim.js';
+import {
   WORKSPACE_NOT_READY,
   readWorkspaceClaimMetadata,
   resolveWorkspaceForBoot,
@@ -44,6 +49,44 @@ async function putDevice(factory, workspaceClaim = null) {
   database.close();
 }
 
+async function openClaimDatabase(factory) {
+  const database = await new Promise((resolve, reject) => {
+    const request = factory.open('rakeezx', 7);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('device')) db.createObjectStore('device', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('outbox')) db.createObjectStore('outbox', { keyPath: 'id' });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
+  const request = (store, method, value) => new Promise((resolve, reject) => {
+    const tx = database.transaction(store, method === 'get' || method === 'getAll' ? 'readonly' : 'readwrite');
+    const operation = value === undefined
+      ? tx.objectStore(store)[method]()
+      : tx.objectStore(store)[method](value);
+    operation.onsuccess = () => resolve(structuredClone(operation.result));
+    operation.onerror = () => reject(operation.error);
+  });
+
+  return {
+    get: (store, id) => request(store, 'get', id),
+    getAll: (store) => request(store, 'getAll'),
+    async applyBatch(batch, { prepare } = {}) {
+      const current = {};
+      for (const store of Object.keys(batch)) current[store] = await request(store, 'getAll');
+      const writes = prepare ? prepare(current) : batch;
+      for (const [store, operations] of Object.entries(writes ?? {})) {
+        for (const record of operations.put ?? []) await request(store, 'put', record);
+        for (const id of operations.remove ?? []) await request(store, 'delete', id);
+      }
+      return writes;
+    },
+    close: () => database.close(),
+  };
+}
+
 async function claimedFixture({ markerOverrides = {}, includeRegistry = true } = {}) {
   const indexedDBFactory = new IDBFactory();
   await putDevice(indexedDBFactory, marker(markerOverrides));
@@ -74,6 +117,65 @@ test('claimed A resolves the exact in-place workspace online or from cached offl
     assert.equal(guard.bindNewCommand({ id: authSource }).ownerId, A);
     await registry.close();
   }
+});
+
+test('the real claim API persists a claimed marker that resolves after runtime recreation', async () => {
+  const backingFactory = new IDBFactory();
+  const productDatabase = await openClaimDatabase(backingFactory);
+  await productDatabase.applyBatch({
+    device: { put: [{ id: 'device', deviceId: 'device:real-claim-reload' }] },
+    outbox: { put: [] },
+  });
+  const claimingRegistry = createWorkspaceRegistry({ indexedDBFactory: backingFactory, now: () => 123 });
+  const guard = createSyncOwnershipGuard();
+  const claimant = createLegacyWorkspaceClaimService({
+    activationEnabled: true,
+    database: productDatabase,
+    registry: claimingRegistry,
+    ownershipGuard: guard,
+    verifyIdentity: async () => ({ id: A, source: 'supabase-auth-user', verifiedAt: 123 }),
+    evidenceProvider: async () => ({ online: true, canonicalEvidence: [] }),
+    runExclusive: async (task) => task(),
+    originProvider: () => CANONICAL_PRODUCTION_ORIGIN,
+    now: () => 123,
+    makeId: () => CLAIM_ID,
+    cryptoProvider: webcrypto,
+  });
+
+  await claimant.claim({
+    expectedOwnerId: A,
+    confirmation: {
+      action: LEGACY_WORKSPACE_CLAIM_CONFIRMATION,
+      confirmed: true,
+      otherTabsClosed: true,
+      expectedOwnerId: A,
+      origin: CANONICAL_PRODUCTION_ORIGIN,
+      databaseName: 'rakeezx',
+    },
+  });
+  const claimedDevice = await productDatabase.get('device', 'device');
+  assert.equal(claimedDevice.workspaceClaim.state, 'claimed');
+  assert.equal(claimedDevice.workspaceClaim.ownerId, A);
+  assert.equal(claimedDevice.workspaceClaimRecovery.claimId, CLAIM_ID);
+  await claimingRegistry.close();
+  productDatabase.close();
+
+  // A real reload recreates both the registry handle and routing runtime while
+  // preserving the completed claim's historical recovery evidence.
+  const reloadedRegistry = createWorkspaceRegistry({ indexedDBFactory: backingFactory });
+  const result = await resolveWorkspaceForBoot({
+    authUser: { id: A },
+    authState: 'authenticated',
+    registry: reloadedRegistry,
+    indexedDBFactory: backingFactory,
+    cryptoProvider: webcrypto,
+  });
+
+  assert.equal(result.status, 'ready', JSON.stringify(result));
+  assert.equal(result.mode, 'claimed-account');
+  assert.equal(result.workspace.databaseName, 'rakeezx');
+  assert.equal(result.workspace.authUserId, A);
+  await reloadedRegistry.close();
 });
 
 test('explicit signed-out state protects a claimed workspace without opening its Product DB', async () => {
