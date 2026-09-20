@@ -363,6 +363,88 @@ export async function applySyncV2Mutation(envelope) {
   });
 }
 
+/** Owner-derived curriculum bootstrap status. Domain rows are never returned here. */
+export async function getCurriculumSyncBootstrapStatus() {
+  if (mockBackend) {
+    if (typeof mockBackend.getCurriculumSyncBootstrapStatus !== 'function') {
+      throw new Error('Mock backend does not implement curriculum bootstrap status RPC');
+    }
+    return mockBackend.getCurriculumSyncBootstrapStatus();
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/get_curriculum_sync_bootstrap_status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: '{}',
+  });
+}
+
+/** Atomic, same-owner historical curriculum contribution. */
+export async function contributeCurriculumSyncBootstrap(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.contributeCurriculumSyncBootstrap !== 'function') {
+      throw new Error('Mock backend does not implement curriculum bootstrap contribution RPC');
+    }
+    return mockBackend.contributeCurriculumSyncBootstrap(envelope);
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/contribute_curriculum_sync_bootstrap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({
+      p_bootstrap_id: envelope.bootstrapId,
+      p_device_id: envelope.deviceId,
+      p_snapshot_hash: envelope.snapshotHash,
+      p_units: envelope.units,
+      p_lessons: envelope.lessons,
+      p_authoritative: envelope.authoritative === true,
+    }),
+  });
+}
+
+/** Explicitly finalizes the accepted authoritative snapshot. */
+export async function finalizeCurriculumSyncBootstrap(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.finalizeCurriculumSyncBootstrap !== 'function') {
+      throw new Error('Mock backend does not implement curriculum bootstrap finalize RPC');
+    }
+    return mockBackend.finalizeCurriculumSyncBootstrap(envelope);
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/finalize_curriculum_sync_bootstrap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({
+      p_bootstrap_id: envelope.bootstrapId,
+      p_device_id: envelope.deviceId,
+      p_snapshot_hash: envelope.snapshotHash,
+    }),
+  });
+}
+
+export async function getSyncV2RestoreManifestFull() {
+  if (mockBackend) return mockBackend.getSyncV2RestoreManifestFull();
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/sync_v2_restore_manifest_full', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_owner: user.id }),
+  });
+}
+
+export async function getSyncV2RestoreCanonicalFull() {
+  if (mockBackend) return mockBackend.getSyncV2RestoreCanonicalFull();
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/sync_v2_restore_canonical_full', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_owner: user.id }),
+  });
+}
+
 /** Sync V2 enrollment command transport. */
 export async function applySyncV2EnrollmentCommand(envelope) {
   if (mockBackend) {

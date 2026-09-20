@@ -47,6 +47,19 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     entity: 'subjects',
     fields: { name: 'name', slug: 'slug' },
   },
+  units: {
+    entity: 'units',
+    fields: {
+      subjectId: 'subject_id', grade: 'grade', termIndex: 'term_index', name: 'name',
+      order: 'order', plannedSessions: 'planned_sessions',
+    },
+    references: { subjectId: 'subjects' },
+  },
+  lessons: {
+    entity: 'lessons',
+    fields: { unitId: 'unit_id', name: 'name', order: 'order', plannedSessions: 'planned_sessions' },
+    references: { unitId: 'units' },
+  },
   sections: {
     entity: 'sections',
     fields: {
@@ -164,6 +177,7 @@ const SAFE_FEATURE_CATEGORY = Object.freeze({
   profile: 'account',
   years: 'academic', calendars: 'academic', calendarDays: 'academic', terms: 'academic',
   subjects: 'classes', sections: 'classes', teachings: 'classes',
+  units: 'curriculum', lessons: 'curriculum',
   students: 'students', enrollments: 'students', notes: 'students',
   classRules: 'classes', classGoals: 'classes', classCharterSelections: 'classes', groupArrangements: 'classes',
   items: 'assessment', scores: 'assessment', logs: 'assessment',

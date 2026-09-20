@@ -4,6 +4,7 @@ import * as db from './db.js';
 import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js';
 import { createSyncV2Engine, SYNC_V2_STORES } from './sync-v2.js';
 import { ownershipBlockedError, runtimeSyncOwnershipGuard } from './sync-ownership.js';
+import { isCurriculumOrdinarySyncAllowed } from './curriculum-bootstrap.js';
 
 export const state = {
   lastError: null,
@@ -36,7 +37,7 @@ export function displayState() {
 }
 
 const SYNCABLE_STORES = new Set([
-  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
+  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
   'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
@@ -313,19 +314,19 @@ async function runRequiredSync(stores, full) {
 }
 
 function v2StoresFor(snapshot, full) {
-  if (full) return [...SYNC_V2_STORES];
+  if (full) return SYNC_V2_STORES.filter(isCurriculumOrdinarySyncAllowed);
   const stores = new Set(snapshot.map((entry) => entry.store).filter((name) => SYNCABLE_STORES.has(name)));
   for (const entry of snapshot) {
     for (const dependency of entry.dependencies ?? []) {
       if (SYNCABLE_STORES.has(dependency.store)) stores.add(dependency.store);
     }
   }
-  return [...stores];
+  return [...stores].filter(isCurriculumOrdinarySyncAllowed);
 }
 
 function v2PostPullStores(snapshot, full) {
   if (full || snapshot.some((entry) => String(entry.command ?? '').startsWith('lifecycle:'))) {
-    return [...SYNC_V2_STORES];
+    return SYNC_V2_STORES.filter(isCurriculumOrdinarySyncAllowed);
   }
   const stores = new Set(v2StoresFor(snapshot, false));
   for (const entry of snapshot) {
@@ -341,7 +342,7 @@ function v2PostPullStores(snapshot, full) {
       stores.add('classGoals'); stores.add('logs');
     }
   }
-  return [...stores];
+  return [...stores].filter(isCurriculumOrdinarySyncAllowed);
 }
 
 /**

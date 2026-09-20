@@ -7,9 +7,12 @@
 
 import * as db from './lib/db.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
-import { SYNC_V2_SCHEMAS, encodeSyncV2Patch } from './lib/sync-v2.js';
+import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
+import {
+  initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
+} from './lib/curriculum-bootstrap.js';
 
 import {
   now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
@@ -160,6 +163,7 @@ export function activateWorkspace(workspace) {
   db.selectDatabase(workspace.databaseName);
   runtimeSyncOwnershipGuard.setWorkspace(workspace);
   activeWorkspace = Object.freeze({ ...workspace });
+  resetCurriculumOrdinarySyncAccess();
   closeChannel();
   if (typeof BroadcastChannel === 'function') {
     channel = openWorkspaceBroadcastChannel(activeWorkspace, BroadcastChannel);
@@ -186,6 +190,7 @@ export function deactivateWorkspace(reason = 'workspace-not-ready') {
   closeChannel();
   db.closeDB();
   activeWorkspace = null;
+  resetCurriculumOrdinarySyncAccess();
   runtimeSyncOwnershipGuard.setWorkspace({ type: 'unresolved', ownershipState: 'unresolved', reason });
   state.ready = false;
   state.profile = null;
@@ -332,6 +337,7 @@ export async function init() {
     COLLECTIONS.forEach((c, i) => {
       state[c] = loaded[i] ?? [];
     });
+    initializeCurriculumSyncGate({ workspace: activeWorkspace, device: state.device });
 
     if (!device?.studentLifecycleResume) {
       await normalizeSectionLifecycle();
@@ -570,7 +576,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
 const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
   assertCloudRestoreWritable();
   const schema = SYNC_V2_SCHEMAS[storeName];
-  if (!schema || schema.readOnly || isLocalOnlyRecord(rec)) return null;
+  if (!schema || schema.readOnly || isLocalOnlyRecord(rec) || !isCurriculumOrdinarySyncAllowed(storeName)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
   const localFields = operation === 'create' ? Object.keys(schema.fields) : (fields ?? Object.keys(schema.fields));
   const localPatch = operation === 'delete'
@@ -1918,6 +1924,35 @@ export const unitsFor = (subId, grade, termIndex) =>
 export const lessonsOf = (unitId) => sortByOrder(live(state.lessons).filter((l) => l.unitId === unitId));
 export const getLesson = (id) => state.lessons.find((l) => l.id === id && !l.deleted) ?? null;
 export const getUnit = (id) => state.units.find((u) => u.id === id && !u.deleted) ?? null;
+
+/** Installs the server-verified curriculum snapshot without creating outbox work. */
+export async function reconcileCurriculumBootstrapCanonical({ units = [], lessons = [] } = {}) {
+  const decodedUnits = units.map((row) => decodeSyncV2Canonical('units', row)).filter(Boolean);
+  const decodedLessons = lessons.map((row) => decodeSyncV2Canonical('lessons', row)).filter(Boolean);
+  if (decodedUnits.length !== units.length || decodedLessons.length !== lessons.length) {
+    throw Object.assign(new Error('Curriculum bootstrap returned malformed canonical rows'), {
+      code: 'CURRICULUM_BOOTSTRAP_RESPONSE_INVALID',
+    });
+  }
+  const unitIds = new Set(decodedUnits.map((row) => row.id));
+  if (decodedLessons.some((row) => !unitIds.has(row.unitId))) {
+    throw Object.assign(new Error('Curriculum bootstrap returned a broken lesson reference'), {
+      code: 'CURRICULUM_BOOTSTRAP_REFERENCE_INVALID',
+    });
+  }
+  await db.applyBatch({
+    units: { remove: state.units.map((row) => row.id), put: decodedUnits },
+    lessons: { remove: state.lessons.map((row) => row.id), put: decodedLessons },
+  });
+  state.units = decodedUnits;
+  state.lessons = decodedLessons;
+  notify();
+  broadcast([
+    ...decodedUnits.map((row) => ({ store: 'units', id: row.id })),
+    ...decodedLessons.map((row) => ({ store: 'lessons', id: row.id })),
+  ]);
+  return { units: decodedUnits.length, lessons: decodedLessons.length };
+}
 
 /**
  * وحدة المنهج التي يقيسها بند التقييم — من ربطه المباشر أو عبر درسه.

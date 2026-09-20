@@ -133,10 +133,31 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
 `;
   const cloudSource = await read('src/lib/cloud.js');
   assert.equal(cloudSource.split(identityValidation).length - 1, 1, 'approved Auth identity validation must occur exactly once');
+  const curriculumCloudStart = '/** Owner-derived curriculum bootstrap status. Domain rows are never returned here. */';
+  const curriculumCloudEnd = '/** Sync V2 enrollment command transport. */';
+  const curriculumStartAt = cloudSource.indexOf(curriculumCloudStart);
+  const curriculumEndAt = cloudSource.indexOf(curriculumCloudEnd);
+  assert.ok(curriculumStartAt > -1 && curriculumEndAt > curriculumStartAt, 'approved curriculum RPC support must be one bounded block');
+  const curriculumCloud = cloudSource.slice(curriculumStartAt, curriculumEndAt);
+  for (const name of [
+    'getCurriculumSyncBootstrapStatus', 'contributeCurriculumSyncBootstrap',
+    'finalizeCurriculumSyncBootstrap', 'getSyncV2RestoreManifestFull', 'getSyncV2RestoreCanonicalFull',
+  ]) assert.equal(curriculumCloud.split(`export async function ${name}`).length - 1, 1, `${name} must occur exactly once`);
+  for (const endpoint of [
+    '/rpc/get_curriculum_sync_bootstrap_status', '/rpc/contribute_curriculum_sync_bootstrap',
+    '/rpc/finalize_curriculum_sync_bootstrap', '/rpc/sync_v2_restore_manifest_full',
+    '/rpc/sync_v2_restore_canonical_full',
+  ]) assert.equal(curriculumCloud.split(endpoint).length - 1, 1, endpoint);
+  assert.doesNotMatch(
+    curriculumCloud.slice(0, curriculumCloud.indexOf('export async function getSyncV2RestoreManifestFull')),
+    /p_owner\s*:/,
+    'bootstrap owner must remain exclusively server-derived',
+  );
   const cloud = cloudSource
     .replace('export async function init({ waitForRefresh = true } = {}) {', 'export async function init() {')
     .replace("          const refresh = refreshSession().catch((error) => {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          });\n          if (waitForRefresh) await refresh;", "          try { await refreshSession(); }\n          catch (error) {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          }")
-    .replace(identityValidation, '');
+    .replace(identityValidation, '')
+    .replace(curriculumCloud, '');
   assert.equal(cloud, baseline('src/lib/cloud.js'), 'src/lib/cloud.js outside the authorized non-blocking startup refresh');
   const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
@@ -150,7 +171,8 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v23';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v24';/);
+  assert.match(worker,/\.\/src\/lib\/curriculum-bootstrap\.js/);
   assert.equal(rawWorker.split(executableRevalidation).length - 1, 1, 'executable HTTP-cache revalidation must occur exactly once');
   assert.match(worker,/\.\/src\/lib\/workspace-claim\.js/);
   assert.match(worker,/\.\/src\/lib\/workspace-routing\.js/);
