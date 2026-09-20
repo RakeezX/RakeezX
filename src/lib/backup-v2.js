@@ -14,14 +14,18 @@ export const RESTORE_CLASSIFICATIONS = Object.freeze([
 ]);
 
 const IMMUTABLE_STORES = new Set(['logs', 'sessionRosterSnapshots', 'closedTermReports']);
+// The deployed stage/finalize RPC contract predates curriculum Sync V2. Keep
+// that reachable flow byte-compatible until its separately versioned server
+// activation; Initial Restore uses the new full manifest RPC instead.
+const CLOUD_RESTORE_STORES = Object.freeze(SYNC_V2_STORES.filter((name) => !['units', 'lessons'].includes(name)));
 const RESTORE_STORE_ORDER = Object.freeze([
-  'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'students',
+  'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings', 'students',
   'enrollments', 'timeProfiles', 'profile', 'items', 'slots', 'sessions', 'notes', 'classRules',
   'classCharterSelections', 'classGoals', 'groupArrangements',
   'scores', 'logs', 'sessionRosterSnapshots', 'attendance', 'closedTermReports',
 ]);
 const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>
-  !SYNC_V2_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
+  !CLOUD_RESTORE_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
 const RESTORE_RESUME_VERSION = 1;
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);
 const clone = (value) => value == null ? value : structuredClone(value);
@@ -102,7 +106,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord }) {
 }
 
 export function canonicalRestoreManifest(serverData) {
-  return SYNC_V2_STORES.flatMap((storeName) => [...(serverData[storeName] ?? [])]
+  return CLOUD_RESTORE_STORES.flatMap((storeName) => [...(serverData[storeName] ?? [])]
     .sort((left, right) => left.id.localeCompare(right.id)).map((row) => ({
     entity: SYNC_V2_SCHEMAS[storeName].entity,
     id: row.id,
@@ -115,7 +119,7 @@ export function canonicalRestoreManifest(serverData) {
 export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
   const entries = [];
   const legacy = payload.version === 3;
-  const ownerHasRows = SYNC_V2_STORES.some((name) => (serverData[name] ?? []).length > 0);
+  const ownerHasRows = CLOUD_RESTORE_STORES.some((name) => (serverData[name] ?? []).length > 0);
   if (legacy && ownerHasRows) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'legacy-backup-requires-empty-owner' });
   } else if (!legacy && payload.sourceOwnerId && ownerId && payload.sourceOwnerId !== ownerId) {
@@ -123,7 +127,7 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
   } else if (!legacy && !payload.sourceOwnerId && ownerHasRows) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'unknown-backup-owner-requires-empty-owner' });
   } else {
-    for (const storeName of SYNC_V2_STORES) {
+    for (const storeName of CLOUD_RESTORE_STORES) {
       const backupRows = recordMap(payload.data?.[storeName]);
       const serverRows = recordMap(serverData[storeName]);
       const baselines = baselineMap(payload, storeName);
@@ -169,7 +173,7 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
 
 export async function fetchCanonicalRestoreSource() {
   const canonical = await fetchCanonicalRestoreSnapshot();
-  const pairs = SYNC_V2_STORES.map((storeName) => {
+  const pairs = CLOUD_RESTORE_STORES.map((storeName) => {
     const rows = canonical[SYNC_V2_SCHEMAS[storeName].entity];
     return [storeName, rows.map((row) => decodeSyncV2Canonical(storeName, row)).filter(Boolean)];
   });
@@ -178,7 +182,7 @@ export async function fetchCanonicalRestoreSource() {
 
 /** Fetch the complete current owner snapshot in the shape local reconciliation consumes. */
 export async function fetchCanonicalRestoreSnapshot() {
-  const pairs = await Promise.all(SYNC_V2_STORES.map(async (storeName) => {
+  const pairs = await Promise.all(CLOUD_RESTORE_STORES.map(async (storeName) => {
     const entity = SYNC_V2_SCHEMAS[storeName].entity;
     return [entity, await cloud.fetchRecords(entity)];
   }));
@@ -194,11 +198,11 @@ export async function previewCloudRestore(payload) {
 }
 
 export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null } = {}) {
-  if (!canonicalRows || typeof canonicalRows !== 'object' || SYNC_V2_STORES.some((storeName) =>
+  if (!canonicalRows || typeof canonicalRows !== 'object' || CLOUD_RESTORE_STORES.some((storeName) =>
     !Array.isArray(canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]))) {
     throw new Error('Restore server returned an incomplete canonical snapshot');
   }
-  const decoded = Object.fromEntries(SYNC_V2_STORES.map((storeName) => {
+  const decoded = Object.fromEntries(CLOUD_RESTORE_STORES.map((storeName) => {
     const rows = canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]
       .map((row) => decodeSyncV2Canonical(storeName, row));
     if (rows.some((row) => !row?.id) || new Set(rows.map((row) => row.id)).size !== rows.length) {
@@ -206,7 +210,7 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
     }
     return [storeName, rows];
   }));
-  const scope = Object.fromEntries([...SYNC_V2_STORES, ...LOCAL_ONLY_STORES, 'device', 'outbox'].map((name) => [name, {}]));
+  const scope = Object.fromEntries([...CLOUD_RESTORE_STORES, ...LOCAL_ONLY_STORES, 'device', 'outbox'].map((name) => [name, {}]));
   await db.applyBatch(scope, {
     prepare(current) {
       return Object.fromEntries(Object.keys(scope).map((name) => {
@@ -220,7 +224,7 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
             { restoreId, capturedAt: Date.now(), entries: clone(current.outbox) },
           ] }] }];
         }
-        const next = SYNC_V2_STORES.includes(name) ? decoded[name] : (payload.data?.[name] ?? current[name]);
+        const next = CLOUD_RESTORE_STORES.includes(name) ? decoded[name] : (payload.data?.[name] ?? current[name]);
         return [name, { remove: current[name].map((row) => row.id), put: next }];
       }));
     },

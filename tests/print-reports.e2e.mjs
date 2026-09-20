@@ -226,7 +226,8 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   await seed(page);
 
   await page.goto('/#/teaching/print-teaching/reports');
-  await page.locator('[data-act="tab"][data-tab="roster"]').click();
+  await expect(page.getByRole('heading', { name: 'كشف الدرجات', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'الطلاب', exact: true }).click();
   await expect(page.locator('[data-act="tab"][data-tab="roster"]')).toBeVisible();
   await expect(page.locator('.gtable--report tbody tr')).toHaveCount(30);
   await expect(page.locator('.gtable--report')).toContainText('أحمد محمد');
@@ -242,7 +243,8 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   await expect(page.locator('.print-signatures')).toContainText('مدير المدرسة');
   await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
   await page.reload();
-  await page.locator('[data-act="tab"][data-tab="roster"]').click();
+  await expect(page.getByRole('heading', { name: 'كشف الدرجات', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'الطلاب', exact: true }).click();
   await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
 
   const rosterDownload = page.waitForEvent('download');

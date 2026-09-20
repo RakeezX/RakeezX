@@ -19,6 +19,10 @@ import {
 } from '../lib/workspace-claim.js';
 import { createWorkspaceRegistry, resolveWorkspace } from '../lib/workspaces.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
+import {
+  finalizeCurriculumBootstrap, initializeCurriculumSyncGate, readCurriculumBootstrapStatus,
+  submitCurriculumBootstrap,
+} from '../lib/curriculum-bootstrap.js';
 import { todayISO } from '../models.js';
 import { repaint } from '../repaint.js';
 
@@ -30,6 +34,7 @@ let backupViewRevision = 0;
 let latestVerifiedBackup = null;
 let legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
 let legacyClaimService = null;
+let curriculumBootstrap = { phase: 'hidden', status: null, error: null };
 
 const claimCanonicalOrigin = () => import.meta.env?.DEV
   ? globalThis.location?.origin ?? CANONICAL_PRODUCTION_ORIGIN
@@ -350,6 +355,59 @@ function renderLegacyClaimSection() {
   </section>`;
 }
 
+async function refreshCurriculumBootstrapState() {
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  if (workspace?.type !== 'account' || workspace?.ownershipState !== 'claimed' || workspace?.syncEligible !== true ||
+      !cloud.session || String(cloud.user?.id ?? '').toLowerCase() !== String(workspace.authUserId ?? '').toLowerCase()) {
+    curriculumBootstrap = { phase: 'hidden', status: null, error: null };
+    return;
+  }
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    curriculumBootstrap = { phase: 'offline', status: null, error: null };
+    return;
+  }
+  try {
+    const status = await readCurriculumBootstrapStatus({ workspace });
+    const localReady = store.state.device?.curriculumSyncBootstrap?.state === 'COMPLETE' &&
+      store.state.device?.curriculumSyncBootstrap?.bootstrapId === status.bootstrapId;
+    curriculumBootstrap = {
+      phase: status.state === 'COMPLETE' && localReady ? 'complete' :
+        status.state === 'CONFLICT' ? 'conflict' : status.state === 'FAILED' ? 'failed' : 'ready',
+      status, error: null,
+    };
+  } catch (error) {
+    curriculumBootstrap = { phase: 'failed', status: null, error: 'تعذّر التحقق من جاهزية مزامنة المنهج.' };
+  }
+}
+
+function renderCurriculumBootstrapSection() {
+  if (curriculumBootstrap.phase === 'hidden') return '';
+  const status = curriculumBootstrap.status;
+  const backupReady = !!latestVerifiedBackup &&
+    String(latestVerifiedBackup.sourceOwnerId ?? '').toLowerCase() === String(cloud.user?.id ?? '').toLowerCase();
+  const busy = curriculumBootstrap.phase === 'busy';
+  if (curriculumBootstrap.phase === 'complete') return html`<section class="surface__section data-safety-section" aria-labelledby="curriculum-sync-title">
+    <div class="data-safety-section__head"><span class="data-safety-section__icon is-brand">${icon('check')}</span>
+      <div class="data-safety-section__copy"><h2 id="curriculum-sync-title">المنهج محفوظ مع الحساب</h2><p>أصبحت الوحدات والدروس على هذا الجهاز متوافقة مع النسخة السحابية.</p></div>
+      <span class="badge badge--ok">مكتمل</span></div>
+  </section>`;
+  const needsReconcile = status?.state === 'COMPLETE';
+  return html`<section class="surface__section data-safety-section" aria-labelledby="curriculum-sync-title">
+    <div class="data-safety-section__head"><span class="data-safety-section__icon is-info">${icon('cloud')}</span>
+      <div class="data-safety-section__copy"><h2 id="curriculum-sync-title">حفظ المنهج مع الحساب</h2><p>${
+        curriculumBootstrap.phase === 'conflict' ? 'توجد نسختان مختلفتان من وحدة أو درس. لم يستبدل ركيز أي بيانات.' :
+        needsReconcile ? 'راجع وحدات ودروس هذا الجهاز بأمان قبل تفعيل مزامنتها.' :
+        'أنشئ نسخة احتياطية أولًا، ثم احفظ الوحدات والدروس الحالية مع الحساب.'}</p></div>
+      ${['conflict', 'offline'].includes(curriculumBootstrap.phase) ? '' : html`<button class="btn btn--info data-safety-section__action" data-act="bootstrap-curriculum"
+        ${busy || !backupReady ? html`disabled aria-disabled="true"` : ''}>${busy ? 'جارٍ التحقق…' : needsReconcile ? 'مراجعة منهج هذا الجهاز' : 'تهيئة حفظ المنهج'}</button>`}
+    </div>
+    ${!backupReady && !['conflict', 'offline'].includes(curriculumBootstrap.phase) ? html`<div class="backup-action-status"><span class="backup-action-status__mark">${icon('download')}</span><span><strong>نزّل نسخة احتياطية حديثة أولًا</strong><small>لن يبدأ حفظ المنهج السحابي قبل التحقق من النسخة.</small></span></div>` : ''}
+    ${curriculumBootstrap.phase === 'offline' ? html`<div class="cloud-recovery-message is-error" role="status"><span><strong>يلزم الاتصال للتهيئة الأولى</strong><small>يبقى المنهج المحلي متاحًا دون اتصال.</small></span></div>` : ''}
+    ${curriculumBootstrap.phase === 'conflict' ? html`<div class="cloud-recovery-message is-error" role="alert"><span><strong>توقفت التهيئة لحماية البيانات</strong><small>لم تُستبدل الوحدات أو الدروس المختلفة. يلزم مسار مراجعة منفصل.</small></span></div>` : ''}
+    ${curriculumBootstrap.error ? html`<div class="cloud-recovery-message is-error" role="alert"><span><strong>لم تكتمل التهيئة</strong><small>${curriculumBootstrap.error}</small></span></div>` : ''}
+  </section>`;
+}
+
 function confirmLegacyClaim(email) {
   return openSheet({
     title: 'تأكيد ربط السجل المحلي بالحساب',
@@ -379,6 +437,7 @@ export default {
     cloudResumeState = nextResume;
     cloudResumeError = nextResumeError;
     await refreshLegacyClaimState();
+    await refreshCurriculumBootstrapState();
     repaint();
   },
   onUnmount() {
@@ -387,6 +446,7 @@ export default {
     cloudResumeState = null;
     cloudResumeError = null;
     legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+    curriculumBootstrap = { phase: 'hidden', status: null, error: null };
   },
   render() {
     const s = store.state;
@@ -420,6 +480,7 @@ export default {
             </div>
           </section>
           ${renderLegacyClaimSection()}
+          ${renderCurriculumBootstrapSection()}
           <section class="surface__section data-safety-section" aria-labelledby="restore-title">
             <div class="data-safety-section__heading"><h2 id="restore-title">الاستعادة والاسترداد</h2><p>اختر المسار المناسب لمكان النسخة التي تريد استعادتها.</p></div>
             <input type="file" id="restore-file" accept="application/json,.json" class="sr-only" data-change="file" aria-label="اختيار ملف نسخة احتياطية للاستعادة">
@@ -511,6 +572,64 @@ export default {
           phase: conflict ? 'blocked' : (typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : 'eligible'),
           error: claimErrorPresentation(error),
           pendingRecovery: (await db.get('device', 'device'))?.workspaceClaim?.state === 'registry_pending',
+        };
+        repaint();
+      }
+    },
+    async 'bootstrap-curriculum'() {
+      if (curriculumBootstrap.phase === 'busy' || !latestVerifiedBackup || !cloud.session || !cloud.user) return;
+      const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+      const expectedOwnerId = String(cloud.user.id ?? '').trim().toLowerCase();
+      if (workspace?.type !== 'account' || workspace?.ownershipState !== 'claimed' ||
+          String(workspace.authUserId ?? '').toLowerCase() !== expectedOwnerId ||
+          String(latestVerifiedBackup.sourceOwnerId ?? '').toLowerCase() !== expectedOwnerId) return;
+      const status = curriculumBootstrap.status ?? await readCurriculumBootstrapStatus({ workspace });
+      const authoritative = status.state === 'NOT_STARTED';
+      const confirmed = await openSheet({
+        title: authoritative ? 'تأكيد حفظ المنهج مع الحساب' : 'تأكيد مراجعة منهج هذا الجهاز',
+        desc: 'سيُقارن ركيز الوحدات والدروس بالنسخة السحابية دون استبدال أي اختلاف تلقائيًا.',
+        body: html`<div class="stack stack-3"><p>ستبقى معرّفات الوحدات والدروس كما هي.</p><p class="t-3 fs-sm">عند وجود اختلاف سيتوقف الإجراء دون اختيار نسخة فائزة.</p></div>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" data-curriculum-confirm>متابعة آمنة</button>`,
+        onMount: (root, done) => root.querySelector('[data-curriculum-confirm]')?.addEventListener('click', () => done(true)),
+      });
+      if (confirmed !== true) return;
+      curriculumBootstrap = { ...curriculumBootstrap, phase: 'busy', error: null };
+      repaint();
+      try {
+        const contribution = await submitCurriculumBootstrap({
+          workspace, deviceId: store.state.device?.deviceId,
+          units: store.state.units, lessons: store.state.lessons,
+          bootstrapId: status.bootstrapId ?? undefined,
+          authoritative, backupVerified: true,
+        });
+        if (contribution.state === 'CONFLICT') {
+          curriculumBootstrap = { phase: 'conflict', status: contribution, error: null };
+          repaint();
+          return;
+        }
+        const completed = contribution.state === 'COMPLETE' ? contribution : await finalizeCurriculumBootstrap({
+          workspace, deviceId: store.state.device.deviceId,
+          bootstrapId: contribution.bootstrapId, snapshotHash: contribution.snapshotHash,
+        });
+        await store.reconcileCurriculumBootstrapCanonical(completed);
+        await store.patchDevice({
+          curriculumSyncBootstrap: {
+            version: 1, state: 'COMPLETE', reconciled: true, ownerId: expectedOwnerId,
+            bootstrapId: completed.bootstrapId, snapshotHash: contribution.snapshotHash, reconciledAt: Date.now(),
+          },
+        }, { queue: false });
+        initializeCurriculumSyncGate({ workspace, device: store.state.device });
+        curriculumBootstrap = { phase: 'complete', status: completed, error: null };
+        toast('اكتمل حفظ المنهج مع الحساب');
+        repaint();
+      } catch (error) {
+        console.error('[rakeezx curriculum bootstrap] failed:', error);
+        curriculumBootstrap = {
+          phase: error?.code === 'CURRICULUM_BOOTSTRAP_CONFLICT' ? 'conflict' : 'failed',
+          status: error?.result ?? status,
+          error: error?.code === 'CURRICULUM_BOOTSTRAP_BACKUP_REQUIRED'
+            ? 'نزّل نسخة احتياطية حديثة أولًا.'
+            : 'لم تتغير بيانات المنهج. أعد المحاولة عند توفر اتصال مستقر.',
         };
         repaint();
       }
