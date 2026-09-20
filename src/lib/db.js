@@ -370,6 +370,41 @@ export async function clearAll() {
 }
 
 /**
+ * Installs a verified CORE_V1 snapshot and a local-only receipt atomically.
+ * This is valid only for an unmounted deterministic account database.
+ */
+export async function importInitialRestoreSnapshot(snapshot, device) {
+  const coreStores = Object.keys(snapshot ?? {});
+  if (!coreStores.length || coreStores.some((name) => !STORES.includes(name) || !Array.isArray(snapshot[name])) ||
+      !device?.initialRestoreReceipt || device.initialRestoreReceipt.protocol !== 'CORE_V1') {
+    throw new Error('Invalid Initial Restore atomic import');
+  }
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction(STORES, 'readwrite');
+    let failure = null;
+    try {
+      for (const name of STORES) tx.objectStore(name).clear();
+      for (const name of coreStores) {
+        for (const record of snapshot[name]) tx.objectStore(name).put(record);
+      }
+      tx.objectStore('device').put(device);
+    } catch (error) {
+      failure = error;
+      tx.abort();
+    }
+    tx.oncomplete = () => resolve(device.initialRestoreReceipt);
+    tx.onerror = (event) => { failure ??= event.target.error; };
+    tx.onabort = () => reject(failure ?? tx.error ?? new Error('Initial Restore transaction aborted'));
+  });
+}
+
+export async function readInitialRestoreReceipt() {
+  const device = await get('device', 'device');
+  return device?.initialRestoreReceipt ?? null;
+}
+
+/**
  * يُغلق اتصال قاعدة البيانات تمامًا.
  * يُستدعى من بيئة الاختبار فقط بعد انتهاء جميع الاختبارات لمنع تسرّب الموارد
  * وإبقاء Node.js حيًّا بعد انتهاء مجموعة الاختبارات.

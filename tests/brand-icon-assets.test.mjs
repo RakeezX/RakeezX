@@ -93,11 +93,20 @@ export const getActiveDatabaseName = () => activeDatabaseName;
 
 `;
   const database = await read('src/lib/db.js');
+  const initialRestoreDbStart = '/**\n * Installs a verified CORE_V1 snapshot and a local-only receipt atomically.';
+  const initialRestoreDbEnd = '/**\n * يُغلق اتصال قاعدة البيانات تمامًا.';
+  const restoreStartAt = database.indexOf(initialRestoreDbStart);
+  const restoreEndAt = database.indexOf(initialRestoreDbEnd);
+  assert.ok(restoreStartAt > -1 && restoreEndAt > restoreStartAt, 'Initial Restore DB support must be one bounded block');
+  const initialRestoreDb = database.slice(restoreStartAt, restoreEndAt);
+  assert.equal(initialRestoreDb.split('export async function importInitialRestoreSnapshot').length - 1, 1);
+  assert.equal(initialRestoreDb.split('export async function readInitialRestoreReceipt').length - 1, 1);
   assert.equal(database.split(databaseSelector).length - 1, 1, 'workspace database selector must occur exactly once');
   assert.equal(database.split(databaseRouting).length - 1, 1, 'approved workspace database routing must occur exactly once');
   assert.equal(database
     .replace(databaseSelector, '')
     .replace(databaseRouting, '')
+    .replace(initialRestoreDb, '')
     .replace('indexedDB.open(activeDatabaseName, DB_VERSION)', 'indexedDB.open(DB_NAME, DB_VERSION)'), baseline('src/lib/db.js'), 'src/lib/db.js outside approved workspace routing');
   const store = await read('src/store.js');
   assert.match(store, /export const THEME_BOOT_STORAGE_KEY = 'rakeezx-theme'/);
@@ -171,7 +180,8 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v24';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v25';/);
+  assert.match(worker, /\.\/src\/lib\/initial-restore\.js/);
   assert.match(worker,/\.\/src\/lib\/curriculum-bootstrap\.js/);
   assert.equal(rawWorker.split(executableRevalidation).length - 1, 1, 'executable HTTP-cache revalidation must occur exactly once');
   assert.match(worker,/\.\/src\/lib\/workspace-claim\.js/);

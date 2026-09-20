@@ -89,7 +89,7 @@ test('a suspended expired-session refresh cannot keep the startup Splash mounted
 
   try {
     await page.goto(`${host.url}/#/`, { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-workspace-gate]')).toHaveAttribute('data-workspace-reason', 'initial-restore-required', { timeout: 4_000 });
+    await expect(page.locator('[data-initial-restore-state="RESTORE_PREFLIGHT"]')).toBeVisible({ timeout: 4_000 });
     await expect(page.locator('.boot')).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {

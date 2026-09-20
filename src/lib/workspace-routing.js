@@ -80,6 +80,33 @@ export async function readWorkspaceClaimMetadata(databaseName, {
   }
 }
 
+/** Reads only the local Initial Restore receipt from a proven-existing DB. */
+export async function readInitialRestoreMetadata(databaseName, {
+  indexedDBFactory = globalThis.indexedDB,
+  databasePresence = null,
+} = {}) {
+  if (databasePresence?.status !== 'known' || databasePresence.exists !== true || !indexedDBFactory?.open) {
+    return Object.freeze({ status: 'unavailable', receipt: null });
+  }
+  const database = await new Promise((resolve, reject) => {
+    const request = indexedDBFactory.open(databaseName);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(Object.assign(new Error('Product database metadata read is blocked'), { code: WORKSPACE_NOT_READY }));
+    request.onupgradeneeded = () => {
+      request.transaction?.abort();
+      reject(Object.assign(new Error('Product database appeared after the presence check'), { code: WORKSPACE_NOT_READY }));
+    };
+  });
+  try {
+    if (!database.objectStoreNames.contains('device')) return Object.freeze({ status: 'read', receipt: null });
+    const device = await requestResult(database.transaction('device', 'readonly').objectStore('device').get('device'));
+    return Object.freeze({ status: 'read', receipt: device?.initialRestoreReceipt ? structuredClone(device.initialRestoreReceipt) : null });
+  } finally {
+    database.close();
+  }
+}
+
 function markerMatchesWorkspace(marker, workspace) {
   if (!marker || marker.version !== CLAIM_VERSION || marker.state !== 'claimed') return false;
   let ownerId;
@@ -106,6 +133,7 @@ export async function resolveWorkspaceForBoot({
   cryptoProvider = globalThis.crypto,
   detectDatabase = detectWorkspaceDatabase,
   readClaimMetadata = readWorkspaceClaimMetadata,
+  readRestoreMetadata = readInitialRestoreMetadata,
   allowDevelopmentLegacyBootstrap = false,
 } = {}) {
   let records;
@@ -129,6 +157,14 @@ export async function resolveWorkspaceForBoot({
   }
 
   if (authenticatedUserId) {
+    const pendingForOwner = (records ?? []).filter((record) => record?.type === 'account' &&
+      record.authUserId === authenticatedUserId && record.ownershipState === 'restoring');
+    if (pendingForOwner.length > 1) return notReady('ambiguous-account-workspace', { authState: 'authenticated' });
+    if (pendingForOwner.length === 1) {
+      return notReady('initial-restore-pending', {
+        authState: 'authenticated', restorePhase: pendingForOwner[0].restore?.phase ?? 'RESTORE_FAILED',
+      });
+    }
     const resolution = await resolveWorkspace({
       type: 'account', authUserId: authenticatedUserId,
       legacyDetected: legacyPresence?.exists === true,
@@ -136,10 +172,23 @@ export async function resolveWorkspaceForBoot({
 
     if (resolution.status === 'resolved') {
       const workspace = resolution.workspace;
-      // Initial/fresh account workspaces are intentionally deferred. Only the
-      // already-claimed legacy-in-place contract is activated in this ticket.
       if (workspace.workspaceKind !== 'legacy-in-place') {
-        return notReady('initial-restore-required', { authState: 'authenticated' });
+        let presence;
+        try { presence = await detectDatabase(workspace.databaseName, { indexedDBFactory }); }
+        catch (error) { return notReady('workspace-metadata-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
+        if (presence?.status !== 'known' || presence.exists !== true) {
+          return notReady('claimed-workspace-database-missing', { authState: 'authenticated' });
+        }
+        let metadata;
+        try { metadata = await readRestoreMetadata(workspace.databaseName, { indexedDBFactory, databasePresence: presence }); }
+        catch (error) { return notReady('restore-receipt-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
+        const receipt = metadata?.receipt;
+        const registryReceipt = records.find((record) => record.id === workspace.id)?.restoreReceipt;
+        if (metadata?.status !== 'read' || receipt?.protocol !== 'CORE_V1' || receipt?.ownerId !== authenticatedUserId ||
+            !registryReceipt || receipt.restoreId !== registryReceipt.restoreId || receipt.manifestHash !== registryReceipt.manifestHash) {
+          return notReady('initial-restore-receipt-mismatch', { authState: 'authenticated' });
+        }
+        return ready(workspace, 'restored-account');
       }
       if (legacyPresence?.status !== 'known' || legacyPresence.exists !== true) {
         return notReady('claimed-workspace-database-missing', { authState: 'authenticated' });

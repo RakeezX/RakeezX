@@ -203,6 +203,118 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     });
   }
 
+  async function beginAccountRestore(authUserId, checkpoint, options = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const databaseName = `rakeezx-user-${key}`;
+    if (!checkpoint || checkpoint.protocol !== 'CORE_V1' || typeof checkpoint.restoreId !== 'string' ||
+        !checkpoint.restoreId || typeof checkpoint.manifestHash !== 'string' || !checkpoint.manifestHash) {
+      throw Object.assign(new Error('Invalid Initial Restore checkpoint'), { code: 'INVALID_INITIAL_RESTORE_CHECKPOINT' });
+    }
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const records = await requestResult(store.getAll());
+    if (records.some((record) => record.authUserId === normalized && record.id !== id)) {
+      tx.abort();
+      await committed.catch(() => {});
+      throw Object.assign(new Error('Auth user has ambiguous workspace registrations'), { code: 'AMBIGUOUS_ACCOUNT_WORKSPACE' });
+    }
+    const existing = records.find((record) => record.id === id);
+    if (existing?.ownershipState === 'claimed') {
+      tx.abort();
+      await committed.catch(() => {});
+      throw Object.assign(new Error('Account workspace is already ready'), { code: 'WORKSPACE_ALREADY_READY' });
+    }
+    if (existing && (existing.type !== 'account' || existing.authUserId !== normalized ||
+        existing.databaseName !== databaseName || existing.ownershipState !== 'restoring' ||
+        existing.restore?.restoreId !== checkpoint.restoreId)) {
+      tx.abort();
+      await committed.catch(() => {});
+      throw Object.assign(new Error('Pending restore belongs to different evidence'), {
+        code: 'WORKSPACE_REGISTRY_MISMATCH',
+      });
+    }
+    const stamp = now();
+    const record = {
+      id, type: 'account', authUserId: normalized, databaseName,
+      ownershipState: 'restoring', workspaceKind: 'account-initial-restore',
+      restore: {
+        protocol: 'CORE_V1', restoreId: checkpoint.restoreId,
+        manifestHash: checkpoint.manifestHash,
+        phase: checkpoint.phase ?? 'RESTORE_PREFLIGHT',
+        createdAt: existing?.restore?.createdAt ?? stamp, updatedAt: stamp,
+      },
+      createdAt: existing?.createdAt ?? stamp, updatedAt: stamp,
+    };
+    store.put(record);
+    await committed;
+    return record;
+  }
+
+  async function updateAccountRestore(authUserId, restoreId, update, options = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const existing = await requestResult(store.get(id));
+    if (!existing || existing.type !== 'account' || existing.authUserId !== normalized ||
+        existing.databaseName !== `rakeezx-user-${key}` || existing.ownershipState !== 'restoring' ||
+        existing.restore?.restoreId !== restoreId || existing.restore?.protocol !== 'CORE_V1') {
+      tx.abort();
+      await committed.catch(() => {});
+      throw Object.assign(new Error('Initial Restore checkpoint mismatch'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+    }
+    const stamp = now();
+    const record = {
+      ...existing, restore: { ...existing.restore, ...update, restoreId, protocol: 'CORE_V1', updatedAt: stamp },
+      updatedAt: stamp,
+    };
+    store.put(record);
+    await committed;
+    return record;
+  }
+
+  async function finalizeAccountRestore(authUserId, receipt, options = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const existing = await requestResult(store.get(id));
+    if (!existing || existing.type !== 'account' || existing.authUserId !== normalized ||
+        existing.databaseName !== `rakeezx-user-${key}` || existing.ownershipState !== 'restoring' ||
+        existing.restore?.protocol !== 'CORE_V1' || existing.restore?.restoreId !== receipt?.restoreId ||
+        existing.restore?.manifestHash !== receipt?.manifestHash || receipt?.ownerId !== normalized ||
+        receipt?.protocol !== 'CORE_V1') {
+      tx.abort();
+      await committed.catch(() => {});
+      throw Object.assign(new Error('Initial Restore receipt does not match pending workspace'), {
+        code: 'WORKSPACE_REGISTRY_MISMATCH',
+      });
+    }
+    const stamp = now();
+    const record = {
+      id, type: 'account', authUserId: normalized,
+      databaseName: `rakeezx-user-${key}`, ownershipState: 'claimed',
+      restoreReceipt: {
+        protocol: 'CORE_V1', restoreId: receipt.restoreId,
+        manifestHash: receipt.manifestHash, completedAt: receipt.completedAt,
+      },
+      createdAt: existing.createdAt ?? stamp, updatedAt: stamp,
+    };
+    store.put(record);
+    await committed;
+    return record;
+  }
+
   async function registerLegacyClaim(authUserId, { claimId, evidenceHash, ...options } = {}) {
     const normalized = normalizeAuthUserId(authUserId);
     if (typeof claimId !== 'string' || !claimId) {
@@ -270,7 +382,8 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
 
   return Object.freeze({
     read, list, findByAuthUserId, recordLegacyPresence,
-    registerAccount, registerLegacyClaim, registerDemo, close,
+    registerAccount, beginAccountRestore, updateAccountRestore, finalizeAccountRestore,
+    registerLegacyClaim, registerDemo, close,
   });
 }
 

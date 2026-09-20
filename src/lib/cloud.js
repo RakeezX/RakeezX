@@ -425,13 +425,32 @@ export async function finalizeCurriculumSyncBootstrap(envelope) {
   });
 }
 
-export async function getSyncV2RestoreManifestFull() {
-  if (mockBackend) return mockBackend.getSyncV2RestoreManifestFull();
+export async function getSyncV2RestoreManifestFull({ signal } = {}) {
+  if (mockBackend) return mockBackend.getSyncV2RestoreManifestFull({ signal });
   if (!user) throw authError('Authentication required');
   return request('/rpc/sync_v2_restore_manifest_full', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
       'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
-    body: JSON.stringify({ p_owner: user.id }),
+    body: JSON.stringify({ p_owner: user.id }), signal,
+  });
+}
+
+/** One deterministic owner-scoped page used by Initial Restore V1. */
+export async function fetchRestoreEntityPage(entity, { offset = 0, limit = 500, signal } = {}) {
+  if (mockBackend) {
+    if (typeof mockBackend.fetchRestoreEntityPage !== 'function') {
+      throw new Error('Mock backend does not implement paginated Initial Restore');
+    }
+    return mockBackend.fetchRestoreEntityPage(entity, { offset, limit, signal });
+  }
+  if (!user?.id) throw authError('Authentication required');
+  if (!/^[a-z_]+$/.test(String(entity)) || !Number.isSafeInteger(offset) || offset < 0 ||
+      !Number.isSafeInteger(limit) || limit < 1 || limit > 500) {
+    throw new Error('Invalid Initial Restore page request');
+  }
+  const order = entity === 'profile' ? 'owner_id.asc' : 'id.asc';
+  return request(`/${entity}?owner_id=eq.${encodeURIComponent(user.id)}&select=*&order=${order}&limit=${limit}&offset=${offset}`, {
+    headers: { 'Accept': 'application/json', 'Accept-Profile': 'rakeezx' }, signal,
   });
 }
 

@@ -13,6 +13,7 @@ import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
 import { createWorkspaceRegistry } from './lib/workspaces.js';
 import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
+import { runInitialRestore } from './lib/initial-restore.js';
 
 const app = document.getElementById('app');
 
@@ -34,6 +35,7 @@ let syncModule = null;
 let teacherMiniHubSheet = null;
 let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
+let initialRestoreAbortController = null;
 const scrollMemory = new Map();
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
@@ -522,6 +524,12 @@ async function boot() {
       await registry.close();
     }
     if (import.meta.env?.DEV) window.__workspaceRouting = workspaceRouting;
+    if (workspaceRouting.status !== 'ready' && cloud.session && cloud.user &&
+        ['initial-restore-required', 'initial-restore-pending'].includes(workspaceRouting.reason)) {
+      await mountAndRunInitialRestore();
+      registerServiceWorker();
+      return;
+    }
     if (workspaceRouting.status !== 'ready') {
       store.deactivateWorkspace(workspaceRouting.reason);
       mountWorkspaceGate(workspaceRouting);
@@ -599,6 +607,71 @@ async function boot() {
 
   await resolve();
   registerServiceWorker();
+}
+
+const INITIAL_RESTORE_COPY = Object.freeze({
+  RESTORE_PREFLIGHT: ['جارٍ التحقق من بيانات حسابك', 'يتم التحقق من النسخة السحابية الآمنة.'],
+  RESTORING: ['جارٍ استعادة بياناتك', 'يرجى إبقاء هذه الصفحة مفتوحة حتى تكتمل الاستعادة.'],
+  RESTORE_FINALIZING: ['جارٍ تجهيز مساحة العمل', 'اكتملت البيانات ويجري تجهيزها للاستخدام.'],
+  RESTORE_REQUIRES_ONLINE: ['تحتاج إلى اتصال بالإنترنت لاستعادة بيانات الحساب', 'اتصل بالإنترنت ثم أعد المحاولة.'],
+  RESTORE_FAILED: ['تعذر استعادة بيانات الحساب', 'لم تُفتح مساحة عمل جزئية. يمكنك إعادة المحاولة بأمان.'],
+  PROVISIONING_REQUIRED: ['لا توجد مساحة عمل قابلة للاستعادة', 'هذا الحساب لا يملك بعد مساحة عمل سحابية موجودة. لن ينشئ التطبيق سجلًا فارغًا تلقائيًا.'],
+});
+
+function renderInitialRestoreState(state, { error = null } = {}) {
+  const [title, description] = INITIAL_RESTORE_COPY[state] ?? INITIAL_RESTORE_COPY.RESTORE_FAILED;
+  const actionable = ['RESTORE_REQUIRES_ONLINE', 'RESTORE_FAILED'].includes(state);
+  render(app, html`
+    <div class="page" data-initial-restore-state="${state}">
+      <div class="empty ${state === 'RESTORE_FAILED' ? 'empty--error' : ''}" role="status">
+        <div class="empty__icon">${icon(state === 'RESTORE_FAILED' ? 'note' : 'cloud')}</div>
+        <div class="empty__title">${title}</div>
+        <div class="empty__text">${description}</div>
+        ${error && import.meta.env?.DEV ? html`<div class="empty__text t-3">${error.code ?? error.message}</div>` : ''}
+        ${actionable ? html`<button class="btn btn--primary" type="button" data-restore-retry>إعادة المحاولة</button>` : ''}
+        <button class="btn btn--ghost" type="button" data-restore-logout>تسجيل الخروج</button>
+        <a class="btn btn--quiet" href="mailto:support@rakeezx.com">الدعم</a>
+      </div>
+    </div>
+  `);
+  app.querySelector('[data-restore-retry]')?.addEventListener('click', () => location.reload());
+  app.querySelector('[data-restore-logout]')?.addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+    initialRestoreAbortController?.abort();
+    store.deactivateWorkspace('initial-restore-logout');
+    await cloud.signOut();
+    location.reload();
+  });
+}
+
+async function mountAndRunInitialRestore() {
+  const registry = createWorkspaceRegistry();
+  initialRestoreAbortController = new AbortController();
+  try {
+    renderInitialRestoreState(navigator.onLine === false ? 'RESTORE_REQUIRES_ONLINE' : 'RESTORE_PREFLIGHT');
+    if (navigator.onLine === false) return;
+    const result = await runInitialRestore({
+      expectedOwnerId: cloud.user.id,
+      registry,
+      onState: (state) => renderInitialRestoreState(state),
+      signal: initialRestoreAbortController.signal,
+    });
+    if (result.status === 'provisioning_required') {
+      renderInitialRestoreState('PROVISIONING_REQUIRED');
+      return;
+    }
+    if (result.status === 'ready') {
+      location.reload();
+      return;
+    }
+    renderInitialRestoreState('RESTORE_FAILED');
+  } catch (error) {
+    console.error('[rakeezx] Initial Restore failed', error);
+    renderInitialRestoreState(error?.code === 'RESTORE_REQUIRES_ONLINE' ? 'RESTORE_REQUIRES_ONLINE' : 'RESTORE_FAILED', { error });
+  } finally {
+    initialRestoreAbortController = null;
+    await registry.close();
+  }
 }
 
 function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
