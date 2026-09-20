@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { DB_VERSION, STORES } from '../src/lib/db.js';
 
 const CLOUD_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co/rest/v1/';
 const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
+const AUTH_OWNER_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const CLAIM_ID = 'claim:automatic-sync-a';
 const TABLES = ['years', 'calendars', 'calendar_days', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'time_profiles', 'slots', 'sessions', 'attendance', 'notes'];
 
 function createCloud() {
@@ -108,9 +111,52 @@ function createCloud() {
 }
 
 async function authenticated(page, cloud) {
-  await page.addInitScript((storageKey) => localStorage.setItem(storageKey, JSON.stringify({
-    access_token: 'auto-sync-test-token', user: { id: 'auto-sync-test-user' },
-  })), AUTH_STORAGE_KEY);
+  await page.route('**/__automatic-sync-workspace__', (route) => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><title>automatic sync workspace fixture</title>',
+  }));
+  await page.goto('/__automatic-sync-workspace__');
+  await page.evaluate(async ({ ownerId, claimId, stores, databaseVersion }) => {
+    const requestResult = (request) => new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transactionDone = (transaction) => new Promise((resolve, reject) => {
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
+    const productRequest = indexedDB.open('rakeezx', databaseVersion);
+    productRequest.onupgradeneeded = () => {
+      for (const store of stores) {
+        if (!productRequest.result.objectStoreNames.contains(store)) {
+          productRequest.result.createObjectStore(store, { keyPath: 'id' });
+        }
+      }
+    };
+    const product = await requestResult(productRequest);
+    const productTransaction = product.transaction('device', 'readwrite');
+    productTransaction.objectStore('device').put({
+      id: 'device', deviceId: 'device:automatic-sync', schemaVersion: databaseVersion,
+      workspaceClaim: {
+        version: 1, claimId, state: 'claimed', ownerId,
+        origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:automatic-sync',
+        evidenceHash: 'automatic-sync-evidence', createdAt: 100, updatedAt: 100,
+      },
+    });
+    await transactionDone(productTransaction);
+    product.close();
+
+    const { createWorkspaceRegistry } = await import('/src/lib/workspaces.js');
+    const registry = createWorkspaceRegistry();
+    await registry.registerLegacyClaim(ownerId, {
+      claimId, evidenceHash: 'automatic-sync-evidence',
+    });
+    await registry.close();
+  }, { ownerId: AUTH_OWNER_ID, claimId: CLAIM_ID, stores: STORES, databaseVersion: DB_VERSION });
+  await page.unroute('**/__automatic-sync-workspace__');
+  await page.addInitScript(({ storageKey, ownerId }) => localStorage.setItem(storageKey, JSON.stringify({
+    access_token: 'auto-sync-test-token', user: { id: ownerId },
+  })), { storageKey: AUTH_STORAGE_KEY, ownerId: AUTH_OWNER_ID });
   await cloud.route(page);
 }
 

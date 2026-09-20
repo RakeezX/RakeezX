@@ -4,11 +4,14 @@ import { readFile, stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DB_NAME, DB_VERSION } from '../src/lib/db.js';
+import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
+import { DB_NAME, DB_VERSION, STORES } from '../src/lib/db.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const serviceWorkerSource = await readFile(path.join(ROOT, 'sw.js'), 'utf8');
 const currentServiceWorkerCache = serviceWorkerSource.match(/const VERSION = '([^']+)'/)?.[1];
+const ROUTING_OWNER = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const ROUTING_CLAIM_ID = 'claim:local-sync-pwa';
 const MIME = {
   '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.png': 'image/png',
@@ -39,6 +42,105 @@ async function startStaticServer() {
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   return { server, url: `http://127.0.0.1:${server.address().port}` };
+}
+
+const routingSession = {
+  access_token: 'local-sync-pwa-token',
+  refresh_token: 'local-sync-pwa-refresh',
+  expires_at: 4_102_444_800,
+  user: { id: ROUTING_OWNER, email: 'local-sync-pwa@example.test' },
+};
+
+async function installCloudMock(context) {
+  const unexpectedCloudRequests = [];
+  await context.route('https://*.supabase.co/**', (route) => {
+    unexpectedCloudRequests.push(route.request().url());
+    return route.abort();
+  });
+  await context.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
+  await context.route(`${SUPABASE_URL}/auth/v1/**`, (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith('/token')) return route.fulfill({ json: routingSession });
+    if (pathname.endsWith('/user')) return route.fulfill({ json: routingSession.user });
+    return route.fulfill({ status: 204 });
+  });
+  return unexpectedCloudRequests;
+}
+
+async function seedClaimedWorkspace(page, origin) {
+  await page.route('**/__local-sync-workspace__', (route) => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><title>local sync workspace fixture</title>',
+  }));
+  await page.goto(`${origin}/__local-sync-workspace__`);
+  await page.evaluate(async ({ stores, authKey, authSession, ownerId, claimId }) => {
+    const request = (operation) => new Promise((resolve, reject) => {
+      operation.onsuccess = () => resolve(operation.result);
+      operation.onerror = () => reject(operation.error);
+    });
+    const transaction = (tx) => new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+
+    const productRequest = indexedDB.open('rakeezx', 7);
+    productRequest.onupgradeneeded = () => {
+      for (const store of stores) {
+        if (!productRequest.result.objectStoreNames.contains(store)) {
+          productRequest.result.createObjectStore(store, { keyPath: 'id' });
+        }
+      }
+    };
+    const product = await request(productRequest);
+    const productTx = product.transaction(['device', 'profile'], 'readwrite');
+    productTx.objectStore('device').put({
+      id: 'device', deviceId: 'device:local-sync-pwa', schemaVersion: 7,
+      workspaceClaim: {
+        version: 1, claimId, state: 'claimed', ownerId,
+        origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:local-sync-pwa',
+        evidenceHash: 'local-sync-pwa-evidence', createdAt: 100, updatedAt: 100,
+      },
+    });
+    productTx.objectStore('profile').put({
+      id: 'profile', teacherName: 'معلم الاختبار', schoolName: 'مدرسة الاختبار',
+      serverRevision: 1, updatedAt: 100,
+    });
+    await transaction(productTx);
+    product.close();
+
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`rakeezx-workspace-v1:${ownerId}`));
+    const key = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('').slice(0, 32);
+    const registryRequest = indexedDB.open('rakeezx-workspace-registry', 1);
+    registryRequest.onupgradeneeded = () => {
+      const workspaceStore = registryRequest.result.createObjectStore('workspaces', { keyPath: 'id' });
+      workspaceStore.createIndex('authUserId', 'authUserId', { unique: false });
+    };
+    const registry = await request(registryRequest);
+    const registryTx = registry.transaction('workspaces', 'readwrite');
+    registryTx.objectStore('workspaces').put({
+      id: `account:${key}`, type: 'account', authUserId: ownerId,
+      databaseName: 'rakeezx', ownershipState: 'claimed', workspaceKind: 'legacy-in-place',
+      claimId, evidenceHash: 'local-sync-pwa-evidence', createdAt: 100, updatedAt: 100,
+    });
+    await transaction(registryTx);
+    registry.close();
+    localStorage.setItem(authKey, JSON.stringify(authSession));
+  }, {
+    stores: STORES,
+    authKey: AUTH_STORAGE_KEY,
+    authSession: routingSession,
+    ownerId: ROUTING_OWNER,
+    claimId: ROUTING_CLAIM_ID,
+  });
+  await page.unroute('**/__local-sync-workspace__');
+}
+
+async function expectClaimedWorkspaceReady(page) {
+  await expect.poll(() => page.evaluate(async () => (await import('/src/store.js')).state.ready)).toBe(true);
+  await expect(page.locator('[data-workspace-gate]')).toHaveCount(0);
+  expect(await page.evaluate(async () => (await import('/src/store.js')).getActiveWorkspace())).toMatchObject({
+    type: 'account', authUserId: ROUTING_OWNER, databaseName: 'rakeezx', ownershipState: 'claimed',
+  });
 }
 
 async function hasIndexedRecord(page, store, id) {
@@ -229,10 +331,13 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
   test.setTimeout(90_000);
   const { server, url } = await startStaticServer();
   const context = await browser.newContext();
+  const unexpectedCloudRequests = await installCloudMock(context);
   const page = await context.newPage();
   const errors = observeErrors(page);
   try {
+    await seedClaimedWorkspace(page, url);
     await page.goto(`${url}/#/classes`, { waitUntil: 'networkidle' });
+    await expectClaimedWorkspaceReady(page);
     await page.waitForFunction(async () => {
       const reg = await navigator.serviceWorker.getRegistration();
       return reg?.active?.state === 'activated';
@@ -294,6 +399,7 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
     await context.setOffline(false);
     await page.reload({ waitUntil: 'networkidle' });
     await expect(page.locator('.topbar__title')).toBeVisible();
+    expect(unexpectedCloudRequests).toEqual([]);
     expect(errors).toEqual([]);
   } finally {
     await context.close();
@@ -305,6 +411,7 @@ test('one online load precaches every lazy route and supports offline reload and
   test.setTimeout(150_000);
   const { server, url } = await startStaticServer();
   const context = await browser.newContext();
+  const unexpectedCloudRequests = await installCloudMock(context);
   const page = await context.newPage();
   const errors = observeErrors(page);
   const badResponses = [];
@@ -313,9 +420,11 @@ test('one online load precaches every lazy route and supports offline reload and
   });
 
   try {
+    await seedClaimedWorkspace(page, url);
     // This is the only route visited online. Every lazy route below must come
     // from the installed app shell after the origin server is unavailable.
     await page.goto(`${url}/#/`, { waitUntil: 'networkidle' });
+    await expectClaimedWorkspaceReady(page);
     await page.waitForFunction(async () => {
       const registration = await navigator.serviceWorker.getRegistration();
       return registration?.active?.state === 'activated';
@@ -373,6 +482,7 @@ test('one online load precaches every lazy route and supports offline reload and
     await expect(reopened.locator('.topbar__title')).toContainText('الرئيسية');
 
     expect(badResponses).toEqual([]);
+    expect(unexpectedCloudRequests).toEqual([]);
     expect(errors).toEqual([]);
     expect(reopenedErrors).toEqual([]);
   } finally {
@@ -387,10 +497,13 @@ test('visited Schedule and Attendance remain available across offline reload and
   test.setTimeout(90_000);
   const { server, url } = await startStaticServer();
   const context = await browser.newContext();
+  const unexpectedCloudRequests = await installCloudMock(context);
   const page = await context.newPage();
   const errors = observeErrors(page);
   try {
+    await seedClaimedWorkspace(page, url);
     await page.goto(`${url}/#/classes`, { waitUntil: 'networkidle' });
+    await expectClaimedWorkspaceReady(page);
     await page.waitForFunction(async () => {
       const registration = await navigator.serviceWorker.getRegistration();
       return registration?.active?.state === 'activated';
@@ -418,6 +531,7 @@ test('visited Schedule and Attendance remain available across offline reload and
     await expect(page.locator('.schedule-head__title')).toBeVisible();
     await page.goto(`${url}/#/teaching/warm-offline-teaching/attendance?session=warm-offline-session`);
     await expect(page.locator('.attendance-session-summary')).toBeVisible();
+    expect(unexpectedCloudRequests).toEqual([]);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

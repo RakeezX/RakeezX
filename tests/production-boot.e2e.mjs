@@ -45,7 +45,11 @@ async function verifyBoot(context, url) {
   });
   page.on('requestfailed', (request) => failed.push(request.url()));
   await page.goto(`${url}/#/`, { waitUntil: 'networkidle' });
-  await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
+  const workspaceGate = page.locator('[data-workspace-gate]');
+  await expect(workspaceGate).toHaveAttribute('data-workspace-code', 'WORKSPACE_NOT_READY');
+  await expect(workspaceGate).toHaveAttribute('data-workspace-reason', 'workspace-not-provisioned');
+  await expect(workspaceGate.getByText('سجّل الدخول لفتح مساحة العمل', { exact: true })).toBeVisible();
+  await expect(workspaceGate.getByRole('button', { name: 'تسجيل الدخول' })).toBeVisible();
   await expect(page.locator('.boot')).toHaveCount(0);
   expect(await page.evaluate(() => typeof window.store)).toBe('undefined');
   expect(failed).toEqual([]);

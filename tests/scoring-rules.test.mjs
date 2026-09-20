@@ -6,11 +6,15 @@ import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import { studentTotal } from "../src/models.js";
+import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 
 test("Scoring Business Rules Suite", async (t) => {
   t.beforeEach(async () => {
+    db.closeDB();
+    await activateSyntheticAccountWorkspace();
     await db.clearAll();
     store.state.ready = false;
+    await store.init();
     await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   });
 

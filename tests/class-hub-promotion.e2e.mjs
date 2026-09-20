@@ -44,6 +44,7 @@ for (const viewport of [
     await page.goto('/#/classes');
     const deleteButton = page.getByRole('button', { name: 'حذف فصل' });
     await expect(deleteButton).toBeVisible();
+    await expect(deleteButton).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     const deleteStyles = await deleteButton.evaluate((node) => {
       const dangerProbe = document.createElement('span');
       dangerProbe.style.color = 'var(--danger)';

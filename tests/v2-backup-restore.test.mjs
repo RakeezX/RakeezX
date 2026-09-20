@@ -18,6 +18,7 @@ import {
   restoreBackupToCloud, resumeCloudRestore,
 } from '../src/lib/backup-v2.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
 const emptyServer = () => Object.fromEntries(SYNC_V2_STORES.map((name) => [name, []]));
@@ -37,7 +38,10 @@ async function rehash(payload) {
 beforeEach(async () => {
   cloud.setMockBackend(null);
   cloud.setMockAuth({ id: OWNER }, { access_token: 'test', user: { id: OWNER } });
+  db.closeDB();
+  await activateSyntheticAccountWorkspace({ ownerId: OWNER });
   await db.clearAll();
+  await store.init();
 });
 
 afterEach(async () => {

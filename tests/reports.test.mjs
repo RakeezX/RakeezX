@@ -16,10 +16,14 @@ import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import reports from "../src/views/reports.js";
 import { supportRows } from "../src/views/reports.js";
+import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 
 test("Reports Regression Suite", async (t) => {
   t.beforeEach(async () => {
+    db.closeDB();
+    await activateSyntheticAccountWorkspace();
     await db.clearAll();
+    await store.init();
     await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   });
 

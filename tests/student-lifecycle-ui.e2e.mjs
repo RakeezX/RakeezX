@@ -1,10 +1,74 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
+import { STORES } from '../src/lib/db.js';
 import { lifecycleServer, academicFixture, evidence, LifecycleBackend, OWNER } from './helpers/student-lifecycle-server.mjs';
 
 test.setTimeout(120_000);
 let pg, backend, f, errors, failReconciliation, previews;
+
+async function seedClaimedWorkspace(page) {
+  const claimId = 'claim:student-lifecycle-ui';
+  await page.route('**/__student-lifecycle-workspace__', (route) => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><title>student lifecycle workspace fixture</title>',
+  }));
+  await page.goto('/__student-lifecycle-workspace__');
+  await page.evaluate(async ({ stores, ownerId, claimId }) => {
+    const request = (operation) => new Promise((resolve, reject) => {
+      operation.onsuccess = () => resolve(operation.result);
+      operation.onerror = () => reject(operation.error);
+    });
+    const transaction = (tx) => new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+
+    const productRequest = indexedDB.open('rakeezx', 7);
+    productRequest.onupgradeneeded = () => {
+      for (const store of stores) {
+        if (!productRequest.result.objectStoreNames.contains(store)) {
+          productRequest.result.createObjectStore(store, { keyPath: 'id' });
+        }
+      }
+    };
+    const product = await request(productRequest);
+    const productTx = product.transaction(['device', 'profile'], 'readwrite');
+    productTx.objectStore('device').put({
+      id: 'device', deviceId: 'device:student-lifecycle-ui', schemaVersion: 7,
+      workspaceClaim: {
+        version: 1, claimId, state: 'claimed', ownerId,
+        origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:student-lifecycle-ui',
+        evidenceHash: 'student-lifecycle-ui-evidence', createdAt: 100, updatedAt: 100,
+      },
+    });
+    productTx.objectStore('profile').put({
+      id: 'profile', teacherName: 'معلم الاختبار', schoolName: 'مدرسة الاختبار',
+      serverRevision: 1, updatedAt: 100,
+    });
+    await transaction(productTx);
+    product.close();
+
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`rakeezx-workspace-v1:${ownerId}`));
+    const key = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('').slice(0, 32);
+    const registryRequest = indexedDB.open('rakeezx-workspace-registry', 1);
+    registryRequest.onupgradeneeded = () => {
+      const workspaceStore = registryRequest.result.createObjectStore('workspaces', { keyPath: 'id' });
+      workspaceStore.createIndex('authUserId', 'authUserId', { unique: false });
+    };
+    const registry = await request(registryRequest);
+    const registryTx = registry.transaction('workspaces', 'readwrite');
+    registryTx.objectStore('workspaces').put({
+      id: `account:${key}`, type: 'account', authUserId: ownerId,
+      databaseName: 'rakeezx', ownershipState: 'claimed', workspaceKind: 'legacy-in-place',
+      claimId, evidenceHash: 'student-lifecycle-ui-evidence', createdAt: 100, updatedAt: 100,
+    });
+    await transaction(registryTx);
+    registry.close();
+  }, { stores: STORES, ownerId: OWNER, claimId });
+  await page.unroute('**/__student-lifecycle-workspace__');
+}
+
 test.beforeEach(async ({ page }) => {
   pg = await lifecycleServer();
   backend = new LifecycleBackend(pg);
@@ -52,6 +116,7 @@ test.beforeEach(async ({ page }) => {
     }
   });
   await page.addInitScript(({ key, owner }) => localStorage.setItem(key, JSON.stringify({ access_token: 'student-ui-test', user: { id: owner } })), { key: AUTH_STORAGE_KEY, owner: OWNER });
+  await seedClaimedWorkspace(page);
   await page.goto('/#/classes');
   await page.waitForFunction(studentId => window.store?.state.ready && window.store.getStudent(studentId) && window.__syncModule?.getSyncOperationalSummarySnapshot().cloudSyncHealthy, f.student);
   await page.evaluate(async f => window.store.patchDevice({ activeYearId: f.year, activeTermId: f.term }), f);

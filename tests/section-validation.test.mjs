@@ -3,9 +3,25 @@ import assert from 'node:assert/strict';
 import 'fake-indexeddb/auto';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+
+const originalDocument = globalThis.document;
+const originalMatchMedia = globalThis.matchMedia;
+
+globalThis.document = {
+  documentElement: {
+    setAttribute() {},
+    removeAttribute() {},
+    classList: { add() {}, remove() {} },
+  },
+  querySelector: () => ({ setAttribute() {} }),
+};
+globalThis.matchMedia = () => ({ matches: false });
 
 beforeEach(async () => {
+  await activateSyntheticAccountWorkspace();
   await db.clearAll();
+  await store.init();
   for (const name of Object.keys(store.state)) if (Array.isArray(store.state[name])) store.state[name] = [];
   await store.save({
     years: [{ id:'year:A', label:'TEST year A' }, { id:'year:B', label:'TEST year B' }],
@@ -14,7 +30,14 @@ beforeEach(async () => {
   });
   await store.patchDevice({ activeYearId:'year:A', activeTermId:'term:test' });
 });
-after(() => { store.closeChannel(); db.closeDB(); });
+after(() => {
+  store.closeChannel();
+  db.closeDB();
+  if (originalDocument === undefined) delete globalThis.document;
+  else globalThis.document = originalDocument;
+  if (originalMatchMedia === undefined) delete globalThis.matchMedia;
+  else globalThis.matchMedia = originalMatchMedia;
+});
 
 for (const [first, duplicate] of [['1','1'], ['1','١'], ['1','۱'], ['أ','ا'], ['أ','إ'], ['أ','آ'], ['أ','ٱ'], [' أ   ١ ', 'ا 1']]) {
   test(`active normalized label ${JSON.stringify(first)} rejects creation/edit to ${JSON.stringify(duplicate)} without changing stored labels`, async () => {

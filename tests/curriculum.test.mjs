@@ -6,10 +6,14 @@ import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import { makeUnit, makeLesson } from "../src/models.js";
+import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 
 test("Curriculum Regression Suite", async (t) => {
   t.beforeEach(async () => {
+    db.closeDB();
+    await activateSyntheticAccountWorkspace();
     await db.clearAll();
+    await store.init();
     await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   });
 

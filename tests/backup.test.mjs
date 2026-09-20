@@ -6,11 +6,14 @@ import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import { buildBackup, validateBackup, validateBackupIntegrity, restoreBackup } from "../src/lib/export.js";
+import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 
 test("Backup and Restore Suite", async (t) => {
   t.beforeEach(async () => {
+    db.closeDB();
+    await activateSyntheticAccountWorkspace();
     await db.clearAll();
-    await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
+    await db.put("device", { id: "device", lastSyncAt: 0, activeTimeProfileId: null });
   });
 
   t.afterEach(async () => {

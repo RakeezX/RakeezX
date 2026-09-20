@@ -13,6 +13,7 @@ import * as store from '../src/store.js';
 import * as db from '../src/lib/db.js';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
 import { GenericV2Backend } from './helpers/generic-v2-backend.mjs';
+import { activateSyntheticAccountWorkspace, SYNTHETIC_WORKSPACE_OWNER } from './helpers/synthetic-workspace.mjs';
 
 const benchmarkCase = process.env.RAKEEZX_BENCHMARK_CASE ?? 'all';
 const measures = (name) => benchmarkCase === 'all' || benchmarkCase === name;
@@ -28,10 +29,11 @@ if (measures('boot')) test('Boot time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
   const backend = new GenericV2Backend();
   setMockBackend(backend);
-  setMockAuth({ id: 'test' }, {});
+  setMockAuth({ id: SYNTHETIC_WORKSPACE_OWNER }, {});
   db.closeDB();
+  await activateSyntheticAccountWorkspace();
   await db.clearAll();
-  await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
+  await db.put('device', { id: 'device', lastSyncAt: 0, activeTimeProfileId: null });
 
   // Seed DB with many records
   const startWrite = Date.now();
@@ -53,11 +55,12 @@ if (measures('sync')) test('Sync time benchmark', async () => {
   // Isolated setup: fresh backend and clear DB before this test.
   const backend = new GenericV2Backend();
   setMockBackend(backend);
-  setMockAuth({ id: 'test' }, {});
+  setMockAuth({ id: SYNTHETIC_WORKSPACE_OWNER }, {});
   db.closeDB();
+  await activateSyntheticAccountWorkspace();
   await db.clearAll();
-  await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   await store.init();
+  await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
 
   // Seed Cloud with many records
   const startWrite = Date.now();

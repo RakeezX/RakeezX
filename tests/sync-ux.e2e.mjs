@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
+import { STORES } from '../src/lib/db.js';
 
 const CLOUD_URL = `${SUPABASE_URL}/rest/v1/`;
+const SYNC_UX_OWNER = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const SYNC_UX_CLAIM_ID = 'claim:sync-ux';
 
 // Same field-group conventions as the current generic Sync V2 protocol.
 const FIELD_GROUPS = {
@@ -87,6 +90,66 @@ function mockCloud() {
   };
 }
 
+async function seedClaimedWorkspace(page) {
+  await page.route('**/__sync-ux-workspace__', (route) => route.fulfill({
+    contentType: 'text/html', body: '<!doctype html><title>sync ux workspace fixture</title>',
+  }));
+  await page.goto('/__sync-ux-workspace__');
+  await page.evaluate(async ({ stores, authKey, ownerId, claimId }) => {
+    const request = (operation) => new Promise((resolve, reject) => {
+      operation.onsuccess = () => resolve(operation.result);
+      operation.onerror = () => reject(operation.error);
+    });
+    const transaction = (tx) => new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+    const productRequest = indexedDB.open('rakeezx', 7);
+    productRequest.onupgradeneeded = () => {
+      for (const store of stores) {
+        if (!productRequest.result.objectStoreNames.contains(store)) {
+          productRequest.result.createObjectStore(store, { keyPath: 'id' });
+        }
+      }
+    };
+    const product = await request(productRequest);
+    const productTx = product.transaction(['device', 'profile'], 'readwrite');
+    productTx.objectStore('device').put({
+      id: 'device', deviceId: 'device:sync-ux', schemaVersion: 7,
+      workspaceClaim: {
+        version: 1, claimId, state: 'claimed', ownerId,
+        origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:sync-ux',
+        evidenceHash: 'sync-ux-evidence', createdAt: 100, updatedAt: 100,
+      },
+    });
+    productTx.objectStore('profile').put({ id: 'profile', serverRevision: 1, updatedAt: 100 });
+    await transaction(productTx);
+    product.close();
+
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`rakeezx-workspace-v1:${ownerId}`));
+    const key = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('').slice(0, 32);
+    const registryRequest = indexedDB.open('rakeezx-workspace-registry', 1);
+    registryRequest.onupgradeneeded = () => {
+      const workspaceStore = registryRequest.result.createObjectStore('workspaces', { keyPath: 'id' });
+      workspaceStore.createIndex('authUserId', 'authUserId', { unique: false });
+    };
+    const registry = await request(registryRequest);
+    const registryTx = registry.transaction('workspaces', 'readwrite');
+    registryTx.objectStore('workspaces').put({
+      id: `account:${key}`, type: 'account', authUserId: ownerId,
+      databaseName: 'rakeezx', ownershipState: 'claimed', workspaceKind: 'legacy-in-place',
+      claimId, evidenceHash: 'sync-ux-evidence', createdAt: 100, updatedAt: 100,
+    });
+    await transaction(registryTx);
+    registry.close();
+    localStorage.setItem(authKey, JSON.stringify({
+      access_token: 'sync-ux-test-token', user: { id: ownerId },
+    }));
+  }, { stores: STORES, authKey: AUTH_STORAGE_KEY, ownerId: SYNC_UX_OWNER, claimId: SYNC_UX_CLAIM_ID });
+  await page.unroute('**/__sync-ux-workspace__');
+}
+
 test('automatic sync is quiet, coalesced, resumes pending writes, and retries a temporary failure', async ({ page, context }) => {
   test.setTimeout(30_000);
   const cloud = mockCloud();
@@ -96,12 +159,8 @@ test('automatic sync is quiet, coalesced, resumes pending writes, and retries a 
     if (message.type() === 'error') errors.push(message.text());
   });
 
-  await page.addInitScript((storageKey) => {
-    localStorage.setItem(storageKey, JSON.stringify({
-      access_token: 'sync-ux-test-token', user: { id: 'sync-ux-test-user' },
-    }));
-  }, AUTH_STORAGE_KEY);
   await cloud.route(page);
+  await seedClaimedWorkspace(page);
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store?.state?.ready && window.__syncModule?.getSyncOperationalSummarySnapshot().cloudSyncHealthy);
 
