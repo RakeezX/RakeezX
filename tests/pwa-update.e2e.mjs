@@ -110,6 +110,79 @@ async function startVersionedServer() {
   };
 }
 
+async function startSameGenerationServer() {
+  let release = 'A';
+  const executableRequests = [];
+  const shell = `const SHELL = [
+  './',
+  './index.html',
+  './app.js',
+];`;
+  const document = '<!doctype html><main id="release"></main><script type="module" src="app.js"></script>';
+  const server = http.createServer((request, response) => {
+    const pathname = new URL(request.url, 'http://localhost').pathname;
+    const send = (body, type, cacheControl = 'no-store') => response.writeHead(200, {
+      'Content-Type': type,
+      'Cache-Control': cacheControl,
+    }).end(body);
+    if (pathname === '/same/' || pathname === '/same/index.html') {
+      return send(document, 'text/html');
+    }
+    if (pathname === '/same/app.js') {
+      executableRequests.push({
+        release,
+        cacheControl: request.headers['cache-control'] ?? null,
+        pragma: request.headers.pragma ?? null,
+      });
+      return send(`
+        window.__release = '${release}';
+        document.getElementById('release').textContent = window.__release;
+        navigator.serviceWorker.register('/same/sw.js', { updateViaCache: 'none' });
+      `, 'text/javascript', 'public, max-age=14400, must-revalidate');
+    }
+    if (pathname === '/same/sw.js') {
+      return send(workerSource.replace(/const SHELL = \[[\s\S]*?\n\];/, shell), 'text/javascript');
+    }
+    response.writeHead(404).end();
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  return {
+    url: `http://127.0.0.1:${server.address().port}`,
+    deploy(nextRelease) { release = nextRelease; },
+    executableRequests,
+    close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())),
+  };
+}
+
+test('an unchanged worker generation fetches current executable bytes instead of a fresh HTTP-cache entry', async ({ browser }) => {
+  const deployment = await startSameGenerationServer();
+  const context = await browser.newContext();
+  let page = await context.newPage();
+  try {
+    await page.goto(`${deployment.url}/same/`);
+    await page.waitForFunction(async () => (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated');
+    await page.reload();
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+    await expect(page.locator('#release')).toHaveText('A');
+
+    deployment.deploy('B');
+    page = await page.context().newPage();
+    await page.goto(`${deployment.url}/same/`);
+    await expect(page.locator('#release')).toHaveText('B');
+    expect(deployment.executableRequests.at(-1)).toMatchObject({ release: 'B' });
+
+    await deployment.close();
+    await context.setOffline(true);
+    const reloadResponse = await page.reload();
+    expect(reloadResponse?.fromServiceWorker()).toBe(true);
+    await expect(page.locator('#release')).toHaveText('B');
+  } finally {
+    await context.setOffline(false).catch(() => {});
+    await context.close();
+    await deployment.close().catch(() => {});
+  }
+});
+
 test('Version A to Version B preserves the new shell during install and supports offline reload/reopen', async ({ browser }) => {
   test.setTimeout(90_000);
   const deployment = await startVersionedServer();

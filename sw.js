@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v22';
+const VERSION = 'rakeezx-v23';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -207,7 +207,10 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         await cleanOldCaches;
         try {
-          return await cacheResponse(request, await fetch(request));
+          // Cloudflare may keep executable responses fresh in the browser HTTP
+          // cache for hours. Revalidate them explicitly so a runtime-only
+          // deployment cannot keep executing the prior release until expiry.
+          return await cacheResponse(request, await fetch(new Request(request, { cache: 'reload' })));
         } catch (err) {
           return cachedFallback(request);
         }

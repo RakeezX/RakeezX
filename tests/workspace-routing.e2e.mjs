@@ -158,6 +158,19 @@ test('claimed A boots from cached identity, works offline, and keeps workspace/t
     await page.evaluate(() => navigator.serviceWorker.ready);
     if (!await page.evaluate(() => !!navigator.serviceWorker.controller)) await page.reload();
     await expectReadyForA(page);
+
+    // Removing only Cache Storage and the PWA worker must not remove or
+    // invalidate the claimed IndexedDB workspace.
+    await page.evaluate(async () => {
+      await Promise.all((await caches.keys()).map((key) => caches.delete(key)));
+      await Promise.all((await navigator.serviceWorker.getRegistrations()).map((registration) => registration.unregister()));
+    });
+    await page.reload();
+    await expectReadyForA(page);
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    if (!await page.evaluate(() => !!navigator.serviceWorker.controller)) await page.reload();
+    await expectReadyForA(page);
+
     await context.setOffline(true);
     await page.reload();
     await expectReadyForA(page);

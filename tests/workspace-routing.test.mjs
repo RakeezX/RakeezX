@@ -161,15 +161,31 @@ test('the real claim API persists a claimed marker that resolves after runtime r
   productDatabase.close();
 
   // A real reload recreates both the registry handle and routing runtime while
-  // preserving the completed claim's historical recovery evidence.
+  // preserving the completed claim's historical recovery evidence. Delayed
+  // registry/marker readiness must be awaited rather than finalized as a
+  // temporary WORKSPACE_NOT_READY result.
   const reloadedRegistry = createWorkspaceRegistry({ indexedDBFactory: backingFactory });
-  const result = await resolveWorkspaceForBoot({
+  const delayedRegistry = {
+    list: async () => { await new Promise((resolve) => setTimeout(resolve, 15)); return reloadedRegistry.list(); },
+    findByAuthUserId: async (...args) => { await new Promise((resolve) => setTimeout(resolve, 15)); return reloadedRegistry.findByAuthUserId(...args); },
+    read: (...args) => reloadedRegistry.read(...args),
+  };
+  let routingSettled = false;
+  const routing = resolveWorkspaceForBoot({
     authUser: { id: A },
     authState: 'authenticated',
-    registry: reloadedRegistry,
+    registry: delayedRegistry,
     indexedDBFactory: backingFactory,
     cryptoProvider: webcrypto,
+    readClaimMetadata: async (...args) => {
+      await new Promise((resolve) => setTimeout(resolve, 15));
+      return readWorkspaceClaimMetadata(...args);
+    },
   });
+  routing.finally(() => { routingSettled = true; });
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  assert.equal(routingSettled, false);
+  const result = await routing;
 
   assert.equal(result.status, 'ready', JSON.stringify(result));
   assert.equal(result.mode, 'claimed-account');
@@ -241,6 +257,24 @@ test('a claimed marker with a missing registry never falls back to ownerless leg
   });
   assert.equal(result.status, 'not_ready');
   assert.equal(result.reason, 'claimed-workspace-registry-missing');
+  await registry.close();
+});
+
+test('a claimed registry with missing Product storage fails closed without recreating rakeezx', async () => {
+  const indexedDBFactory = new IDBFactory();
+  const registry = createWorkspaceRegistry({ indexedDBFactory });
+  await registry.registerLegacyClaim(A, {
+    claimId: CLAIM_ID,
+    evidenceHash: 'evidence:routing',
+    cryptoProvider: webcrypto,
+  });
+  const result = await resolveWorkspaceForBoot({
+    authUser: { id: A }, authState: 'authenticated', registry,
+    indexedDBFactory, cryptoProvider: webcrypto,
+  });
+  assert.equal(result.status, 'not_ready');
+  assert.equal(result.reason, 'claimed-workspace-database-missing');
+  assert.equal((await indexedDBFactory.databases()).some(({ name }) => name === 'rakeezx'), false);
   await registry.close();
 });
 

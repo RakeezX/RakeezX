@@ -140,9 +140,18 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   assert.equal(cloud, baseline('src/lib/cloud.js'), 'src/lib/cloud.js outside the authorized non-blocking startup refresh');
   const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
-  const worker=await read('sw.js'),oldWorker=baseline('sw.js');
+  const rawWorker=await read('sw.js'),oldWorker=baseline('sw.js');
+  const executableRevalidation = `          // Cloudflare may keep executable responses fresh in the browser HTTP
+          // cache for hours. Revalidate them explicitly so a runtime-only
+          // deployment cannot keep executing the prior release until expiry.
+          return await cacheResponse(request, await fetch(new Request(request, { cache: 'reload' })));`;
+  const worker = rawWorker.replace(
+    executableRevalidation,
+    '          return await cacheResponse(request, await fetch(request));',
+  );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v22';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v23';/);
+  assert.equal(rawWorker.split(executableRevalidation).length - 1, 1, 'executable HTTP-cache revalidation must occur exactly once');
   assert.match(worker,/\.\/src\/lib\/workspace-claim\.js/);
   assert.match(worker,/\.\/src\/lib\/workspace-routing\.js/);
   assert.match(worker,/return \(await caches\.match\('\.\/'\)\) \|\| cachedFallback\('\.\/index\.html', 503\)/);
