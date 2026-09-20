@@ -129,7 +129,7 @@ function canonicalEvidenceValue(storeName, record) {
 
 function meaningfulCanonicalRecord(storeName, record) {
   if (storeName === 'profile') {
-    return ['teacherName', 'schoolName', 'phone', 'reportPrincipalName']
+    return ['teacherName', 'schoolName', 'phone', 'teacherForm', 'reportPrincipalName']
       .some((field) => String(record?.[field] ?? '').trim());
   }
   return !SHARED_DEFAULT_STORES.has(storeName);

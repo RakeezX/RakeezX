@@ -124,7 +124,7 @@ test('failed destination validation and a destination tombstone leave the curren
 let pg;
 test('offline V2 transfer commands converge through atomic RPCs without generic enrollment upserts', async () => {
   const f = await fixture();
-  pg = await lifecycleServer();
+  pg = await lifecycleServer({ migration32: true });
   const backend = new MembershipBackend(pg);
   setMockBackend(backend);
   setMockAuth({ id: OWNER }, { access_token: 'test' });

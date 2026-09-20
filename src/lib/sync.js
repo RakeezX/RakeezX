@@ -705,6 +705,7 @@ function remoteProfileToLocal(remote, updatedAt) {
     teacherName: remote.teacher_name,
     schoolName: remote.school_name,
     phone: remote.phone,
+    teacherForm: remote.teacher_form === 'feminine' ? 'feminine' : 'masculine',
     reportPrincipalName: principal,
     principalName: principal,
     updatedAt,
@@ -772,6 +773,7 @@ export async function syncProfile() {
         teacher_name: merged.teacherName || '',
         school_name: merged.schoolName || '',
         phone: merged.phone || '',
+        teacher_form: merged.teacherForm === 'feminine' ? 'feminine' : 'masculine',
         report_principal_name: profilePrincipalName(merged),
         client_updated_at: merged.updatedAt,
         device_id: getDeviceId()
@@ -790,6 +792,7 @@ export async function syncProfile() {
         teacherName: merged.teacherName,
         schoolName: merged.schoolName,
         phone: merged.phone,
+        teacherForm: merged.teacherForm === 'feminine' ? 'feminine' : 'masculine',
         reportPrincipalName: merged.reportPrincipalName,
         principalName: merged.principalName,
         updatedAt: merged.updatedAt,

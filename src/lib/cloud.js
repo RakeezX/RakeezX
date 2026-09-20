@@ -305,6 +305,62 @@ export async function updateProfile(profileData) {
   return data?.[0] || null;
 }
 
+/** Owner-derived account profile/access foundation RPCs. */
+export async function getAccountContract() {
+  if (mockBackend) {
+    if (typeof mockBackend.getAccountContract !== 'function') {
+      throw new Error('Mock backend does not implement account contract RPC');
+    }
+    return mockBackend.getAccountContract();
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/account_contract', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: '{}',
+  });
+}
+
+export async function provisionAccountProfile() {
+  if (mockBackend) {
+    if (typeof mockBackend.provisionAccountProfile !== 'function') {
+      throw new Error('Mock backend does not implement account provisioning RPC');
+    }
+    return mockBackend.provisionAccountProfile();
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/provision_account_profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: '{}',
+  });
+}
+
+export async function completeAccountProfile(profile) {
+  if (mockBackend) {
+    if (typeof mockBackend.completeAccountProfile !== 'function') {
+      throw new Error('Mock backend does not implement profile completion RPC');
+    }
+    return mockBackend.completeAccountProfile(profile);
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/complete_account_profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({
+      p_teacher_name: profile.teacherName,
+      p_phone: profile.phone,
+      p_teacher_form: profile.teacherForm,
+      p_school_name: profile.schoolName || null,
+    }),
+  });
+}
+
+/** End account profile/access foundation RPCs. */
+
 export async function upsertRecords(tableName, records) {
   if (mockBackend) return mockBackend.upsertRecords(tableName, records);
   if (!user) throw new Error('Not authenticated');

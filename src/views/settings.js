@@ -12,6 +12,9 @@ import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
 import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.js';
 import { hasValidYearCalendarConfig } from './calendar.js';
 import { resolvedReportPrincipalName } from '../lib/report-print.js';
+import {
+  BETA_ACCESS_LABEL, currentAccountContract, refreshAccountContract, teacherAddress,
+} from '../lib/account-profile.js';
 
 const THEMES = [
   { v: 'auto',  label: 'حسب النظام', icon: 'settings' },
@@ -45,6 +48,8 @@ function isStandaloneMode() {
 }
 
 let activePwaGuide = null;
+let accountContractRequest = 0;
+let accountContractUnavailable = false;
 
 const PWA_PLATFORMS = [
   { id: 'ios',     label: 'iPhone / iPad' },
@@ -274,6 +279,10 @@ export default {
     const yrs = store.years();
     const activeY = store.activeYear();
     const activeT = store.activeTerm();
+    const accountContract = currentAccountContract();
+    const accountEmail = accountContract?.email ?? cloud.user?.email ?? '';
+    const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
+    const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
 
     return html`
       <div class="management-page settings-page">
@@ -292,17 +301,47 @@ export default {
                        data-change="save" placeholder="الاسم كما يظهر في التقارير">
               </label>
               <label class="field">
-                <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
-                <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
-                       maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
-                       data-change="save" placeholder="مدير المدرسة للتقارير">
+                <span class="field__label">صيغة المخاطبة</span>
+                <select class="select" name="teacherForm" data-change="save">
+                  <option value="masculine" ${teacherForm === 'masculine' ? 'selected' : ''}>أستاذ</option>
+                  <option value="feminine" ${teacherForm === 'feminine' ? 'selected' : ''}>أستاذة</option>
+                </select>
+                <span class="field__hint">تؤثر في صيغة المخاطبة فقط، ولا تغيّر صلاحيات الحساب.</span>
               </label>
             </div>
+            <div class="field-row">
+              <label class="field">
+                <span class="field__label">رقم الجوال</span>
+                <input class="input" name="phone" value="${m.phone ?? ''}" required
+                       maxlength="30" autocomplete="tel" inputmode="tel" dir="ltr"
+                       data-fk="phone" data-change="save" placeholder="05xxxxxxxx">
+                <span class="field__hint">بيان تواصل خاص بالحساب، ولا يظهر للطلاب.</span>
+              </label>
+              <label class="field">
+                <span class="field__label">اسم المدرسة <span class="t-3 fs-xs">(اختياري)</span></span>
+                <input class="input" name="schoolName" value="${m.schoolName ?? ''}"
+                       maxlength="80" autocomplete="organization" data-fk="schoolName"
+                       data-change="save" placeholder="اسم المدرسة">
+              </label>
+            </div>
+            <div class="field-row">
+              <label class="field">
+                <span class="field__label">البريد الإلكتروني</span>
+                <input class="input" value="${accountEmail}" type="email" dir="ltr" readonly
+                       aria-readonly="true" autocomplete="email">
+                <span class="field__hint">البريد موثّق من حساب الدخول ولا يُعدّل من هذه الصفحة.</span>
+              </label>
+              <div class="field">
+                <span class="field__label">الوصول</span>
+                <div class="input" role="status" aria-label="حالة الوصول">${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</div>
+                <span class="field__hint">${accountContract ? `صيغة المخاطبة الحالية: ${teacherAddress(teacherForm)}` : 'تُحدّث حالة الوصول عند الاتصال بالحساب.'}</span>
+              </div>
+            </div>
             <label class="field" style="margin-bottom:0">
-              <span class="field__label">اسم المدرسة</span>
-              <input class="input" name="schoolName" value="${m.schoolName ?? ''}"
-                     maxlength="80" autocomplete="off" data-fk="schoolName"
-                     data-change="save" placeholder="اسم المدرسة">
+              <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
+              <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
+                     maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
+                     data-change="save" placeholder="مدير المدرسة للتقارير">
             </label>
           </form>
         </div>
@@ -446,6 +485,23 @@ export default {
       </div>
       </div>
     `;
+  },
+
+  onMount() {
+    const request = ++accountContractRequest;
+    accountContractUnavailable = false;
+    if (!cloud.session || !cloud.user) return;
+    refreshAccountContract()
+      .then(() => { if (request === accountContractRequest) repaint(); })
+      .catch(() => {
+        if (request !== accountContractRequest) return;
+        accountContractUnavailable = true;
+        repaint();
+      });
+  },
+
+  onUnmount() {
+    accountContractRequest += 1;
   },
 
   actions: {
