@@ -51,7 +51,8 @@ async function installCloudMock(page, loginOwnerId = A) {
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/auth/v1/**`, (route) => {
     const path = new URL(route.request().url()).pathname;
-    if (path.endsWith('/token')) return route.fulfill({ json: sessionFor(loginOwnerId) });
+    if (path.endsWith('/otp')) return route.fulfill({ status: 204 });
+    if (path.endsWith('/verify')) return route.fulfill({ json: sessionFor(loginOwnerId) });
     if (path.endsWith('/user')) return route.fulfill({ json: sessionFor(loginOwnerId).user });
     return route.fulfill({ status: 204 });
   });
@@ -229,10 +230,11 @@ test('explicit logout hides claimed data and same-account login restores the sam
   await page.locator('[data-workspace-login]').click();
   const login = page.locator('.sheet-backdrop').last();
   await login.locator('input[name="email"]').fill('a@example.test');
-  await login.locator('input[name="password"]').fill('synthetic-password');
+  await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
+  await login.locator('input[name="token"]').fill('123456');
   await Promise.all([
     page.waitForEvent('framenavigated'),
-    login.getByRole('button', { name: 'تسجيل الدخول' }).click(),
+    login.getByRole('button', { name: 'تحقق وتسجيل الدخول' }).click(),
   ]);
   await expectReadyForA(page);
 });

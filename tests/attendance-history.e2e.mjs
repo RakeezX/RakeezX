@@ -8,6 +8,7 @@ const STORES = [
   'students', 'enrollments', 'slots', 'sessions', 'attendance', 'sessionRosterSnapshots',
 ];
 const ATTENDANCE_ROUTE = '/#/teaching/override-teaching/attendance?session=override-session';
+const FIXED_NON_STUDY_TIME = new Date('2026-09-12T09:00:00+03:00');
 
 async function fetchCanonical(server, entity) {
   if (entity === 'slots') {
@@ -81,6 +82,7 @@ test('attendance remains historical after recurring slot edit and Sync V2 conver
     });
   };
   watchErrors(page);
+  await page.clock.setFixedTime(FIXED_NON_STUDY_TIME);
 
   try {
     await server.pg.exec(`
@@ -160,6 +162,7 @@ test('attendance remains historical after recurring slot edit and Sync V2 conver
 
     const peer = await peerContext.newPage();
     watchErrors(peer);
+    await peer.clock.setFixedTime(FIXED_NON_STUDY_TIME);
     await setupDevice(peer, server);
     await peer.goto(ATTENDANCE_ROUTE);
     await expect(peer.locator('.att-row')).toHaveCount(3);

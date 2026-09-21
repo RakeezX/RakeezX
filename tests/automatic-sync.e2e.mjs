@@ -193,7 +193,7 @@ test('automatic sync pulls on authenticated boot and pushes profile changes with
   await pageB.goto('/#/settings');
   await pageB.waitForFunction(() => window.__syncModule?.state.status === 'synced');
   await expect(pageB.locator('input[name="teacherName"]')).toHaveValue('معلم تلقائي A');
-  await pageB.getByRole('button', { name: 'مركز تحكم المعلّم' }).click();
+  await pageB.getByRole('button', { name: 'مركز تحكم المعلم' }).click();
   await expect(pageB.locator('.sheet').getByRole('button', { name: 'مزامنة الآن' })).toBeVisible();
   await pageB.keyboard.press('Escape');
   await expect(pageB.getByText('اختبار المزامنة')).toHaveCount(0);

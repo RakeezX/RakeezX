@@ -6,9 +6,13 @@ async function mockAuth(page, { rejectLogin = false, waitForLogout = null } = {}
   await page.route(`${CLOUD_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${CLOUD_URL}/auth/v1/**`, async (route) => {
     const url = new URL(route.request().url());
-    if (url.pathname.endsWith('/token')) {
+    if (url.pathname.endsWith('/otp')) {
+      await route.fulfill({ status: 204 });
+      return;
+    }
+    if (url.pathname.endsWith('/verify')) {
       if (rejectLogin) {
-        await route.fulfill({ status: 400, json: { error_description: 'بيانات الدخول غير صحيحة' } });
+        await route.fulfill({ status: 400, json: { code: 'otp_invalid', message: 'Invalid OTP' } });
         return;
       }
       await route.fulfill({ json: {
@@ -52,8 +56,9 @@ async function loginFromHub(page) {
   await expectSameHubSurface(page);
   const loginSheet = backdrops(page).last();
   await loginSheet.locator('input[name="email"]').fill('teacher-hub@example.test');
-  await loginSheet.locator('input[name="password"]').fill('fictional-password');
-  await loginSheet.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await loginSheet.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
+  await loginSheet.locator('input[name="token"]').fill('123456');
+  await loginSheet.getByRole('button', { name: 'تحقق وتسجيل الدخول' }).click();
   await expect(hub(page)).toHaveCount(1);
   await expect(backdrops(page)).toHaveCount(1);
   await expectSameHubSurface(page);
@@ -117,9 +122,10 @@ test('Teacher Hub keeps its surface usable when login is cancelled or rejected',
   await page.locator('[data-act="mini-hub-login"]').click();
   const loginSheet = backdrops(page).last();
   await loginSheet.locator('input[name="email"]').fill('teacher-hub@example.test');
-  await loginSheet.locator('input[name="password"]').fill('wrong-password');
-  await loginSheet.getByRole('button', { name: 'تسجيل الدخول' }).click();
-  await expect(loginSheet.getByRole('button', { name: 'تسجيل الدخول' })).toBeEnabled();
+  await loginSheet.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
+  await loginSheet.locator('input[name="token"]').fill('654321');
+  await loginSheet.getByRole('button', { name: 'تحقق وتسجيل الدخول' }).click();
+  await expect(loginSheet.getByRole('button', { name: 'تحقق وتسجيل الدخول' })).toBeEnabled();
   await expect(page.locator('#toast')).toHaveClass(/is-on/);
   expect(await page.evaluate(() => {
     const toast = document.getElementById('toast');

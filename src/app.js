@@ -15,6 +15,15 @@ import { createWorkspaceRegistry } from './lib/workspaces.js';
 import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
 import { runInitialRestore } from './lib/initial-restore.js';
 import { getAccountPresentation } from './lib/account-profile.js';
+import {
+  EMAIL_OTP_LENGTH,
+  EMAIL_OTP_RESEND_COOLDOWN_SECONDS,
+  emailOtpFailureMessage,
+  emailOtpFailureState,
+  isValidEmailOtp,
+  normalizeEmailAddress,
+  normalizeEmailOtp,
+} from './lib/email-otp.js';
 
 const app = document.getElementById('app');
 
@@ -682,41 +691,121 @@ async function mountAndRunInitialRestore() {
 function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
   teacherMiniHubAuthPending = 'login';
   refreshTeacherMiniHubSheet();
+  let cleanupLoginSheet = () => {};
   const loginSheet = openSheet({
     title: 'تسجيل الدخول للحساب السحابي',
-    desc: 'أدخل بيانات حسابك للمزامنة التلقائية مع السحابة.',
+    desc: 'سنرسل رمز تحقق إلى بريد حسابك الحالي.',
     body: html`
       <div class="auth-brand">${brandLockup()}<p>مساحة العمل الرقمية للمعلم</p></div>
-      <form id="mini-hub-login-form">
+      <form id="mini-hub-login-form" data-step="email">
+        <div data-email-otp-email-step>
         <label class="field">
           <span class="field__label">البريد الإلكتروني</span>
           <input class="input" name="email" type="email" required autocomplete="email" dir="ltr" placeholder="teacher@example.com">
         </label>
-        <label class="field">
-          <span class="field__label">كلمة المرور</span>
-          <input class="input" name="password" type="password" required autocomplete="current-password" dir="ltr">
-        </label>
+        </div>
+        <div data-email-otp-code-step hidden>
+          <div class="field">
+            <span class="field__label">أدخل رمز التحقق</span>
+            <div class="t-3 fs-xs" data-email-otp-sent aria-live="polite"></div>
+            <input class="input" name="token" inputmode="numeric" autocomplete="one-time-code" dir="ltr"
+              pattern="[0-9]{6}" maxlength="6" aria-label="رمز التحقق المكون من 6 أرقام">
+          </div>
+          <div class="cluster mt-2">
+            <button type="button" class="btn btn--xs btn--quiet" data-email-otp-resend>إعادة إرسال الرمز</button>
+            <button type="button" class="btn btn--xs btn--ghost" data-email-otp-change>العودة وتغيير البريد</button>
+          </div>
+        </div>
+        <a class="fs-xs" href="mailto:support@rakeezx.com">الدعم: support@rakeezx.com</a>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="mini-hub-login-form" type="submit">تسجيل الدخول</button>
+      <button class="btn btn--primary" form="mini-hub-login-form" type="submit">إرسال رمز التحقق</button>
     `,
     onMount: (root, done) => {
-      root.querySelector('#mini-hub-login-form')?.addEventListener('submit', async (ev) => {
+      const form = root.querySelector('#mini-hub-login-form');
+      const emailStep = root.querySelector('[data-email-otp-email-step]');
+      const codeStep = root.querySelector('[data-email-otp-code-step]');
+      const emailInput = root.querySelector('input[name="email"]');
+      const tokenInput = root.querySelector('input[name="token"]');
+      const submitBtn = root.querySelector('button[type="submit"]');
+      const resendBtn = root.querySelector('[data-email-otp-resend]');
+      const sentText = root.querySelector('[data-email-otp-sent]');
+      let selectedEmail = '';
+      let cooldownTimer = null;
+      let cooldownUntil = 0;
+      cleanupLoginSheet = () => clearTimeout(cooldownTimer);
+
+      const updateCooldown = () => {
+        const remaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+        resendBtn.disabled = remaining > 0;
+        resendBtn.textContent = remaining > 0 ? `إعادة الإرسال بعد ${remaining} ث` : 'إعادة إرسال الرمز';
+        clearTimeout(cooldownTimer);
+        if (remaining > 0) cooldownTimer = setTimeout(updateCooldown, 1000);
+      };
+      const startCooldown = () => {
+        cooldownUntil = Date.now() + EMAIL_OTP_RESEND_COOLDOWN_SECONDS * 1000;
+        updateCooldown();
+      };
+      const requestCode = async (email) => {
+        if (navigator.onLine === false) throw Object.assign(new Error('Offline'), { code: 'AUTH_NETWORK' });
+        await cloud.requestEmailOtp(email);
+        selectedEmail = email;
+        sentText.textContent = `أُرسل الرمز إلى ${email}`;
+        emailStep.hidden = true;
+        codeStep.hidden = false;
+        form.dataset.step = 'verify';
+        submitBtn.textContent = 'تحقق وتسجيل الدخول';
+        tokenInput.required = true;
+        tokenInput.focus({ preventScroll: true });
+        startCooldown();
+      };
+
+      tokenInput?.addEventListener('input', () => { tokenInput.value = normalizeEmailOtp(tokenInput.value); });
+      root.querySelector('[data-email-otp-change]')?.addEventListener('click', () => {
+        clearTimeout(cooldownTimer);
+        codeStep.hidden = true;
+        emailStep.hidden = false;
+        form.dataset.step = 'email';
+        tokenInput.required = false;
+        tokenInput.value = '';
+        submitBtn.textContent = 'إرسال رمز التحقق';
+        emailInput.focus({ preventScroll: true });
+      });
+      resendBtn?.addEventListener('click', async () => {
+        if (resendBtn.disabled || !selectedEmail) return;
+        resendBtn.disabled = true;
+        try {
+          await requestCode(selectedEmail);
+          toast('أُعيد إرسال رمز التحقق');
+        } catch (error) {
+          toast(emailOtpFailureMessage(emailOtpFailureState(error, 'send')), 'danger');
+          updateCooldown();
+        }
+      });
+
+      form?.addEventListener('submit', async (ev) => {
         ev.preventDefault();
-        const fd = new FormData(ev.target);
-        const email = String(fd.get('email') ?? '').trim();
-        const pwd = String(fd.get('password') ?? '');
-        if (!email || !pwd) return;
-        const submitBtn = root.querySelector('button[type="submit"]');
+        const email = normalizeEmailAddress(emailInput.value);
+        const token = normalizeEmailOtp(tokenInput.value);
+        if (!email || (form.dataset.step === 'verify' && !isValidEmailOtp(token))) {
+          if (form.dataset.step === 'verify') toast(`أدخل رمز التحقق المكون من ${EMAIL_OTP_LENGTH} أرقام`, 'danger');
+          return;
+        }
         const prevText = submitBtn.textContent;
-        submitBtn.textContent = 'جارٍ الاتصال...';
+        submitBtn.textContent = form.dataset.step === 'verify' ? 'جارٍ التحقق...' : 'جارٍ الإرسال...';
         submitBtn.disabled = true;
         try {
-          await cloud.signIn(email, pwd);
+          if (form.dataset.step === 'email') {
+            await requestCode(email);
+            submitBtn.disabled = false;
+            return;
+          }
+          await cloud.verifyEmailOtp(selectedEmail, token);
           toast('تم تسجيل الدخول بنجاح');
           teacherMiniHubAuthPending = null;
+          clearTimeout(cooldownTimer);
           done(true);
           if (reloadOnSuccess) {
             location.reload();
@@ -724,16 +813,15 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
           }
           refreshTeacherMiniHubSheet({ focusAccountAction: true });
         } catch (err) {
-          teacherMiniHubAuthPending = null;
-          refreshTeacherMiniHubSheet();
           submitBtn.textContent = prevText;
           submitBtn.disabled = false;
-          toast(err.message || 'تعذر تسجيل الدخول', 'danger');
+          toast(emailOtpFailureMessage(emailOtpFailureState(err, form.dataset.step === 'verify' ? 'verify' : 'send')), 'danger');
         }
       });
     }
   });
   loginSheet.finally(() => {
+    cleanupLoginSheet();
     if (teacherMiniHubAuthPending === 'login') {
       teacherMiniHubAuthPending = null;
       refreshTeacherMiniHubSheet({ focusAccountAction: true });

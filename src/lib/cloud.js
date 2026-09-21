@@ -216,6 +216,27 @@ export async function signIn(email, password) {
   saveSession(data);
 }
 
+/** Requests an email OTP for an existing Auth user without provisioning. */
+export async function requestEmailOtp(email) {
+  return request('/otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, create_user: false }),
+  }, true);
+}
+
+/** Verifies an email OTP and persists the returned Supabase session. */
+export async function verifyEmailOtp(email, token) {
+  const data = await request('/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, token, type: 'email' }),
+  }, true);
+  if (!data?.access_token || !data?.user?.id) throw authError('OTP verification did not return an authenticated user');
+  saveSession(data);
+  return user;
+}
+
 /**
  * Revalidate the current Auth identity with Supabase before a local workspace
  * ownership transition. Cached session/user data alone is deliberately not

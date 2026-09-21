@@ -57,7 +57,8 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     await expect(page.locator('.auth-brand img:visible')).toHaveAttribute('src', new RegExp(`header-${theme}-standard\\.svg$`));
     await page.getByRole('textbox', { name: 'البريد الإلكتروني' }).focus();
     await page.keyboard.press('Tab');
-    await expect(page.locator('input[name="password"]')).toBeFocused();
+    await expect(page.getByRole('link', { name: /الدعم/ })).toBeFocused();
+    await expect(page.locator('input[name="password"]')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const audit = await new AxeBuilder({ page }).include('.auth-brand').analyze();
     expect(audit.violations).toEqual([]);

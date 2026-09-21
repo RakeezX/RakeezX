@@ -34,7 +34,7 @@ for (const viewport of [
 
     const sheet = page.locator('.sheet');
     await expect(sheet.getByText('حالة المزامنة', { exact: true })).toBeVisible();
-    await expect(sheet.getByText('مركز المعلّم', { exact: true })).toHaveCount(1);
+    await expect(sheet.getByText('مركز المعلم', { exact: true })).toHaveCount(1);
     await expect(sheet.getByText('حالة المزامنة السحابية', { exact: true })).toHaveCount(0);
     await expect(sheet.getByRole('link', { name: 'الإعدادات' })).toHaveAttribute('href', '#/settings');
     await expect(sheet.getByText('المؤثرات الصوتية', { exact: true })).toHaveCount(0);

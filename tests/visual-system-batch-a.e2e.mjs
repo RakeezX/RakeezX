@@ -82,7 +82,7 @@ test('AppShell, Home, and Teacher Center share accessible daily primitives', asy
       const trigger = page.locator('[data-act="open-teacher-mini-hub"]:visible');
       await trigger.focus();
       await trigger.click();
-      const dialog = page.getByRole('dialog', { name: 'مركز المعلّم' });
+      const dialog = page.getByRole('dialog', { name: 'مركز المعلم' });
       await expect(dialog).toBeVisible();
       const hubSectionBackgrounds = await dialog.locator(
         '.mini-hub-identity, .mini-hub-account, .mini-hub-sync, .mini-hub-pwa, .mini-hub-settings-link'

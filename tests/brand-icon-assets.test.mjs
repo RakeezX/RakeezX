@@ -144,6 +144,24 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
 `;
   const cloudSource = await read('src/lib/cloud.js');
   assert.equal(cloudSource.split(identityValidation).length - 1, 1, 'approved Auth identity validation must occur exactly once');
+  const emailOtpStart = '/** Requests an email OTP for an existing Auth user without provisioning. */';
+  const emailOtpEnd = '/**\n * Revalidate the current Auth identity with Supabase before a local workspace';
+  const emailOtpStartAt = cloudSource.indexOf(emailOtpStart);
+  const emailOtpEndAt = cloudSource.indexOf(emailOtpEnd);
+  assert.ok(emailOtpStartAt > -1 && emailOtpEndAt > emailOtpStartAt, 'email OTP support must be one bounded block');
+  const emailOtpCloud = cloudSource.slice(emailOtpStartAt, emailOtpEndAt);
+  assert.equal(emailOtpCloud.split('export async function requestEmailOtp').length - 1, 1);
+  assert.equal(emailOtpCloud.split('export async function verifyEmailOtp').length - 1, 1);
+  assert.match(emailOtpCloud, /create_user:\s*false/);
+  const emailChangeStart = '/**\n * Request an Auth-authoritative email change.';
+  const emailChangeEnd = 'export async function signOut() {';
+  const emailChangeStartAt = cloudSource.indexOf(emailChangeStart);
+  const emailChangeEndAt = cloudSource.indexOf(emailChangeEnd);
+  assert.ok(emailChangeStartAt > -1 && emailChangeEndAt > emailChangeStartAt, 'approved email-change support must be one bounded block');
+  const emailChangeCloud = cloudSource.slice(emailChangeStartAt, emailChangeEndAt);
+  assert.equal(emailChangeCloud.split('export async function updateCurrentUserEmail').length - 1, 1);
+  assert.match(emailChangeCloud, /request\('\/user'/);
+  assert.match(emailChangeCloud, /actualOwnerId !== expectedOwnerId/);
   const curriculumCloudStart = '/** Owner-derived curriculum bootstrap status. Domain rows are never returned here. */';
   const curriculumCloudEnd = '/** Sync V2 enrollment command transport. */';
   const curriculumStartAt = cloudSource.indexOf(curriculumCloudStart);
@@ -180,6 +198,8 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     .replace('export async function init({ waitForRefresh = true } = {}) {', 'export async function init() {')
     .replace("          const refresh = refreshSession().catch((error) => {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          });\n          if (waitForRefresh) await refresh;", "          try { await refreshSession(); }\n          catch (error) {\n            if (!isAuthRequiredError(error)) console.warn('[rakeezx auth] Session refresh deferred until connectivity returns.');\n          }")
     .replace(identityValidation, '')
+    .replace(emailOtpCloud, '')
+    .replace(emailChangeCloud, '')
     .replace(accountCloud, '')
     .replace(curriculumCloud, '');
   assert.equal(cloud, baseline('src/lib/cloud.js'), 'src/lib/cloud.js outside the authorized non-blocking startup refresh');
@@ -195,7 +215,8 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v26';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v27';/);
+  assert.match(worker,/\.\/src\/lib\/email-otp\.js/);
   assert.match(worker,/\.\/src\/lib\/account-profile\.js/);
   assert.match(worker, /\.\/src\/lib\/initial-restore\.js/);
   assert.match(worker,/\.\/src\/lib\/curriculum-bootstrap\.js/);
