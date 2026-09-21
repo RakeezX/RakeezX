@@ -217,8 +217,10 @@ export default {
     const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
 
     return html`
+      <div class="home-dashboard">
+        <div class="home-dashboard__primary">
       <!-- الهوية في غلاف التطبيق؛ يبدأ المحتوى بالترحيب والسياق اليومي فقط. -->
-      <div class="hero">
+      <div class="hero home-hero">
         <div class="hero__main-row">
           <div class="hero__hello">${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك'}</div>
           <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
@@ -278,7 +280,7 @@ export default {
         </div>
         ${remainingSessions.length
           ? html`
-              <div class="list">
+              <div class="list home-session-list">
                 ${remainingSessions.map((s) => {
                   const tch = store.getTeaching(s.teachingId);
                   const meta = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
@@ -296,7 +298,7 @@ export default {
                   const marked = store.attendanceIn(s.id).length;
                   const roster = store.students(s.teachingId).length;
                   return html`
-                    <a class="row" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
+                    <a class="row home-session-row is-${attendanceTone || 'neutral'}" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
                       <span class="period">${s.period}</span>
                       <span class="row__main">
                         <span class="row__title">${store.teachingLabel(tch)}</span>
@@ -331,6 +333,8 @@ export default {
             `}
       </section>` : ''}
 
+        </div>
+        <aside class="home-dashboard__aside" aria-label="اختصارات وملخص مساحة العمل">
       <!-- اختصارات سريعة -->
       <section class="section home-shortcuts" aria-labelledby="home-shortcuts-title">
         <div class="section__head"><h2 class="section__title" id="home-shortcuts-title">اختصارات</h2></div>
@@ -357,6 +361,10 @@ export default {
           </a>
         </div>
       </section>
+
+      ${summary(list)}
+        </aside>
+      </div>
 
     `;
   },
@@ -419,8 +427,8 @@ function summary(list) {
   const avg = graded ? pctSum / graded : null;
 
   return html`
-    <div class="section">
-      <div class="section__head"><div class="section__title">نظرة سريعة</div></div>
+    <section class="section home-summary surface surface--compact" aria-labelledby="home-summary-title">
+      <div class="section__head"><h2 class="section__title" id="home-summary-title">نظرة سريعة</h2></div>
       <div class="grid grid--3">
         <div class="stat">
           <div class="stat__val tabular">${students}</div>
@@ -449,7 +457,7 @@ function summary(list) {
             </div>
           `
         : ''}
-    </div>
+    </section>
   `;
 }
 

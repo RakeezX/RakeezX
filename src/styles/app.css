@@ -71,11 +71,11 @@
   --motion-base: 180ms;
 
   /* ألوان — الوضع الفاتح */
-  --bg:        #f8fafc;
+  --bg:        #f4f7f5;
   --bg-elev:   #ffffff;
-  --bg-sunk:   #eef0f3;
-  --border:    #e2e8f0;
-  --border-strong: #cbd1da;
+  --bg-sunk:   #edf3ef;
+  --border:    #dce7e1;
+  --border-strong: #bfd2c8;
 
   --text:      #15253D;
   --text-2:    #334155;
@@ -138,11 +138,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:        #0f1216;
-    --bg-elev:   #171b21;
-    --bg-sunk:   #0a0d10;
-    --border:    #272d36;
-    --border-strong: #3a424e;
+    --bg:        #0d1511;
+    --bg-elev:   #14201a;
+    --bg-sunk:   #0a100d;
+    --border:    #26372e;
+    --border-strong: #3c5247;
 
     --text:      #eef1f5;
     --text-2:    #a3adba;
@@ -176,11 +176,11 @@
 }
 
 :root[data-theme="dark"] {
-  --bg:        #0f1216;
-  --bg-elev:   #171b21;
-  --bg-sunk:   #0a0d10;
-  --border:    #272d36;
-  --border-strong: #3a424e;
+  --bg:        #0d1511;
+  --bg-elev:   #14201a;
+  --bg-sunk:   #0a100d;
+  --border:    #26372e;
+  --border-strong: #3c5247;
 
   --text:      #eef1f5;
   --text-2:    #a3adba;
@@ -227,6 +227,7 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 img, svg { display: block; max-width: 100%; }
@@ -366,6 +367,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .main {
   padding-bottom: calc(var(--tap) + env(safe-area-inset-bottom) + var(--sp-6));
   min-width: 0;
+  min-height: 100dvh;
 }
 
 .app-status-strip {
@@ -410,12 +412,12 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .topbar {
   position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) clamp(var(--sp-4), 3vw, var(--sp-6));
   padding-top: calc(var(--sp-3) + env(safe-area-inset-top));
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: saturate(180%) blur(12px);
+  background: color-mix(in srgb, var(--bg-elev) 91%, transparent);
+  backdrop-filter: saturate(160%) blur(16px);
   border-bottom: 1px solid var(--border);
-  min-height: 56px;
+  min-height: 64px;
 }
 .topbar__title {
   font-size: var(--fs-section); font-weight: var(--fw-bold); letter-spacing: -.2px;
@@ -441,8 +443,12 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .iconbtn[disabled], .iconbtn[aria-disabled="true"] { color: var(--action-disabled-ink); opacity: .55; pointer-events: none; transform: none; }
 
 /* المحتوى */
-.page { padding: var(--sp-4); max-width: 900px; margin-inline: auto; }
-.page--wide { max-width: 1200px; }
+.page {
+  width: min(100%, 1240px);
+  padding: clamp(var(--sp-4), 2.6vw, var(--sp-8));
+  margin-inline: auto;
+}
+.page--wide { max-width: 1240px; }
 
 /* شريط التنقل السفلي (جوال) */
 .tabbar {
@@ -452,18 +458,24 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   backdrop-filter: saturate(180%) blur(14px);
   border-top: 1px solid var(--border);
   padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -8px 28px rgb(15 35 25 / .07);
 }
 .tabbar__item {
   display: grid; place-items: center; gap: 2px;
   padding: var(--sp-2) var(--sp-1);
-  min-height: var(--tap);
+  min-height: 62px;
   color: var(--text-3);
   font-size: 11px; font-weight: 600;
   text-decoration: none;
-  transition: color .15s var(--ease);
+  transition: color .15s var(--ease), background .15s var(--ease);
 }
 .tabbar__item svg { width: 22px; height: 22px; }
-.tabbar__item[aria-current="page"] { color: var(--brand-text); }
+.tabbar__item:hover { color: var(--text-2); background: color-mix(in srgb, var(--brand-soft) 38%, transparent); }
+.tabbar__item[aria-current="page"] {
+  color: var(--brand-text);
+  background: linear-gradient(to top, color-mix(in srgb, var(--brand-soft) 78%, transparent), transparent 88%);
+}
+.tabbar__item:focus-visible { outline-offset: -4px; }
 
 /* تنقّل الإسناد السياقي: يظل داخل الصفحة ولا يغيّر معنى الشريط الرئيسي. */
 .teaching-tabs {
@@ -487,31 +499,53 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .sidebar {
   display: none;
   flex-direction: column;
-  gap: var(--sp-1);
-  padding: var(--sp-4) var(--sp-3);
+  gap: 5px;
+  padding: 18px 14px;
   border-inline-start: 1px solid var(--border);
   background: var(--bg-elev);
   position: sticky; top: 0; height: 100dvh;
 }
 .sidebar__brand {
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: var(--sp-2) 2px var(--sp-5);
+  min-height: 76px;
+  padding: 4px 2px var(--sp-5);
   font-size: 22px; font-weight: 800; color: var(--brand);
   letter-spacing: -.5px;
 }
+.sidebar__section-label {
+  margin: 15px 12px 4px;
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: var(--fw-bold);
+  letter-spacing: .01em;
+}
+.sidebar__brand + .sidebar__section-label { margin-top: 0; }
 .sidebar__item {
+  position: relative;
   display: flex; align-items: center; gap: var(--sp-3);
-  padding: var(--sp-3);
+  min-height: 46px;
+  padding: 10px 12px;
   border-radius: var(--r-md);
   color: var(--text-2); text-decoration: none;
   font-size: 15px; font-weight: 600;
-  transition: background .15s var(--ease), color .15s var(--ease);
+  transition: background .15s var(--ease), color .15s var(--ease), transform .15s var(--ease);
 }
 .sidebar__item svg { width: 20px; height: 20px; flex: none; }
-.sidebar__item:hover { background: var(--bg-sunk); color: var(--text); }
+.sidebar__item:hover { background: var(--bg-sunk); color: var(--text); transform: translateX(-2px); }
 .sidebar__item[aria-current="page"] {
   background: var(--brand-soft); color: var(--brand-text);
+  font-weight: var(--fw-bold);
 }
+.sidebar__item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: var(--r-full);
+  background: var(--brand);
+}
+.sidebar__item:focus-visible { outline-offset: 1px; }
 .sidebar__spacer { flex: 1; }
 
 /* استعلام الوسائط بعد قواعد القائمة الأساسية، وإلا غلبَته قاعدة display:none */
@@ -520,6 +554,21 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   .sidebar { display: flex; }
   .tabbar { display: none; }
   .main { padding-bottom: var(--sp-8); }
+}
+
+@media (max-width: 899px) {
+  .topbar {
+    min-height: 62px;
+    padding: 7px 12px;
+    padding-block-start: calc(7px + env(safe-area-inset-top));
+  }
+  .page { padding: 20px 14px 34px; }
+}
+
+@media (max-width: 360px) {
+  .topbar { gap: 5px; padding-inline: 8px; }
+  .page { padding-inline: 10px; }
+  .tabbar__item { font-size: 10px; }
 }
 
 /* ---------- 5. البطاقات ---------- */

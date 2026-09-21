@@ -233,12 +233,12 @@ function openTeacherMiniHubSheet() {
 /* ---------- التنقل الرئيسي ---------- */
 
 const NAV = [
-  { href: '#/',          icon: 'home',      label: 'الرئيسية',        exact: true, primary: true },
+  { href: '#/',          icon: 'home',      label: 'الرئيسية',        exact: true, primary: true, group: 'مساحة العمل' },
   { href: '#/classes',   icon: 'classes',   label: 'الفصول',          primary: true },
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
   { href: '#/calendar',  icon: 'calendar',  label: 'التقويم',          primary: true },
-  { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
+  { href: '#/settings',  icon: 'settings',  label: 'الإعدادات', group: 'النظام' },
 ];
 
 /** تنقّل سياقي داخل الإسناد؛ لا يحل محل تنقّل التطبيق الرئيسي. */
@@ -282,7 +282,7 @@ function shell(path, params) {
     <div class="layout">
       <nav class="sidebar" aria-label="التنقل الرئيسي">
         <div class="sidebar__brand">${brandLockup()}</div>
-        ${NAV.map((it) => navLink(it, path, 'sidebar'))}
+        ${NAV.map((it) => html`${it.group ? html`<div class="sidebar__section-label">${it.group}</div>` : ''}${navLink(it, path, 'sidebar')}`)}
         <div class="sidebar__spacer"></div>
         ${inTeaching
           ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
