@@ -6,7 +6,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 
@@ -111,6 +111,7 @@ export default {
             <span class="report-workspace__eyebrow">تقرير الفصل</span>
             <h2>${reportTitle()}</h2>
             <p>${[identity(cls).section, identity(cls).subject].filter(Boolean).join(' · ')}</p>
+            ${demoOutputMarker({ screenOnly: true })}
           </div>
           <span class="badge tabular">${roster.length} طالبًا</span>
         </header>
@@ -239,11 +240,11 @@ export default {
       const subject = historical?.subject ?? store.getSubject(cls?.subjectId);
       const secLabel = store.sectionLabel(section) ?? '';
 
-      const lines = [
+      const lines = markDemoSharedText([
         `📋 تقرير فصل: ${secLabel} — ${subject?.name ?? ''}`,
         `👥 عدد الطلاب: ${roster.length}`,
         '━━━━━━━━━━━━━━━',
-      ];
+      ]);
 
       if (tab === 'grades') {
         const totalMax = items.reduce((n, i) => n + i.max, 0);
@@ -299,7 +300,7 @@ export default {
       const { roster, items, ctx } = store.teachingContext(params.id);
       const safe = safeName(store.sectionLabel(historical?.section ?? store.getSection(cls?.sectionId)));
       if (tab === 'roster') {
-        downloadCSV(`طلاب-${safe}.csv`, [['رقم الكشف', 'الطالب'], ...roster.map((s) => [s.rollNo ?? '', s.name])]);
+        downloadCSV(`طلاب-${safe}.csv`, markDemoExportRows([['رقم الكشف', 'الطالب'], ...roster.map((s) => [s.rollNo ?? '', s.name])]));
         toast('نُزّل كشف الطلاب'); return;
       }
       if (tab === 'attendance') {
@@ -313,21 +314,21 @@ export default {
             return member && record ? ATTENDANCE[record.status].label : '';
           }), records.filter((record) => record.status === 'absent').length, records.filter((record) => record.status === 'late').length]);
         }
-        downloadCSV(`حضور-${safe}.csv`, rows); toast('نُزّل كشف الحضور'); return;
+        downloadCSV(`حضور-${safe}.csv`, markDemoExportRows(rows)); toast('نُزّل كشف الحضور'); return;
       }
       if (tab === 'support') {
         const rows = [['رقم الكشف', 'الطالب', 'النسبة', 'مؤشرات الدعم']];
         for (const row of supportRows(roster, items, ctx)) {
           rows.push([row.s.rollNo ?? '', row.s.name, row.total.pct === null ? '' : Math.round(row.total.pct), row.reasons.join(' · ')]);
         }
-        downloadCSV(`دعم-${safe}.csv`, rows); toast('نُزّل تقرير من يحتاج دعمًا'); return;
+        downloadCSV(`دعم-${safe}.csv`, markDemoExportRows(rows)); toast('نُزّل تقرير من يحتاج دعمًا'); return;
       }
       const rows = [['رقم الكشف', 'الطالب', ...items.map((i) => `${i.name} (${i.max})`), 'المجموع', 'النسبة']];
       for (const s of roster) {
         const total = studentTotal(items, ctx[s.id]);
         rows.push([s.rollNo ?? '', s.name, ...items.map((i) => { const value = itemScore(i, ctx[s.id]); return value === null ? '' : fmtNum(value); }), fmtNum(total.earned), total.pct === null ? '' : Math.round(total.pct)]);
       }
-      downloadCSV(`درجات-${safe}.csv`, rows); toast('نُزّل كشف الدرجات');
+      downloadCSV(`درجات-${safe}.csv`, markDemoExportRows(rows)); toast('نُزّل كشف الدرجات');
     },
   },
 };

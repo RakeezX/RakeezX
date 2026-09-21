@@ -6,7 +6,10 @@ import {
   DEFAULT_TIME_PROFILE_IDS, periodTime,
 } from '../models.js';
 
-export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
+export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-session-v1';
+export const LEGACY_DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
+export const DEMO_PREPARING = 'preparing';
+export const DEMO_ACTIVE = 'active';
 export const DEMO_SEED_ID = 'demo:workspace-seed-v3';
 const PREVIOUS_DEMO_SEED_ID = 'demo:workspace-seed-v2';
 const FIXED_TIME = Date.parse('2026-09-01T06:00:00.000Z');
@@ -37,16 +40,32 @@ const SESSION_DATE_BY_WEEKDAY = Object.freeze({ 0: '2026-09-06', 1: '2026-09-07'
 
 const record = (value) => ({ updatedAt: FIXED_TIME, deleted: false, ...value });
 
-export function isDemoRequested(storage = globalThis.localStorage) {
-  try { return storage?.getItem(DEMO_ACTIVE_STORAGE_KEY) === '1'; } catch { return false; }
+export function demoRequestState(storage = globalThis.sessionStorage) {
+  try { return storage?.getItem(DEMO_ACTIVE_STORAGE_KEY) ?? null; } catch { return null; }
 }
 
-export function requestDemo(storage = globalThis.localStorage) {
-  storage?.setItem(DEMO_ACTIVE_STORAGE_KEY, '1');
+export function isDemoRequested(storage = globalThis.sessionStorage) {
+  return [DEMO_PREPARING, DEMO_ACTIVE].includes(demoRequestState(storage));
 }
 
-export function clearDemoRequest(storage = globalThis.localStorage) {
-  storage?.removeItem(DEMO_ACTIVE_STORAGE_KEY);
+export function isDemoPreparing(storage = globalThis.sessionStorage) {
+  return demoRequestState(storage) === DEMO_PREPARING;
+}
+
+export function requestDemo(storage = globalThis.sessionStorage) {
+  try { storage?.setItem(DEMO_ACTIVE_STORAGE_KEY, DEMO_PREPARING); } catch { /* unavailable storage stays signed out */ }
+}
+
+export function markDemoReady(storage = globalThis.sessionStorage) {
+  try { storage?.setItem(DEMO_ACTIVE_STORAGE_KEY, DEMO_ACTIVE); } catch { /* unavailable storage stays transient */ }
+}
+
+export function clearDemoRequest(storage = globalThis.sessionStorage) {
+  try { storage?.removeItem(DEMO_ACTIVE_STORAGE_KEY); } catch { /* storage may be unavailable */ }
+}
+
+export function clearLegacyDemoRequest(storage = globalThis.localStorage) {
+  try { storage?.removeItem(LEGACY_DEMO_ACTIVE_STORAGE_KEY); } catch { /* storage may be unavailable */ }
 }
 
 export function createDemoDataset() {

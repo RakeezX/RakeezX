@@ -38,6 +38,14 @@ test.describe('isolated Demo runtime', () => {
     await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
   }
 
+  async function expectDemoEntryAvailable(page) {
+    const action = page.getByRole('button', { name: 'جرّب ركيز', exact: true });
+    if (!await action.isVisible().catch(() => false)) {
+      await page.getByRole('button', { name: /مركز تحكم/ }).click();
+    }
+    await expect(action).toBeVisible();
+  }
+
   async function freezeLocalDate(page, isoDate) {
     await page.addInitScript(({ isoDate }) => {
       const NativeDate = Date;
@@ -104,6 +112,7 @@ test.describe('isolated Demo runtime', () => {
       await expect(page.locator('[data-demo-indicator]')).toBeVisible();
       expect((await todayState(page, date)).sessions).toHaveLength(expected);
       await page.reload();
+      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
       expect((await todayState(page, date)).sessions).toHaveLength(expected);
       await context.close();
     };
@@ -115,7 +124,7 @@ test.describe('isolated Demo runtime', () => {
     await page.goto('/');
     await enterDemo(page);
     await expect(page.locator('[data-demo-indicator]')).toContainText('الوضع التجريبي');
-    await expect(page.getByText('معلم ركيز', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/أهلًا، معلم ركيز/)).toBeVisible();
 
     const initial = await page.evaluate(async () => {
       const open = indexedDB.open('rakeezx-demo', 7);
@@ -151,7 +160,10 @@ test.describe('isolated Demo runtime', () => {
     expect((await todayState(page, new Date().toISOString().slice(0, 10))).outbox).toBe(0);
     await page.getByRole('button', { name: 'الخروج من التجربة', exact: true }).first().click();
     await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
-    await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
+    await expectDemoEntryAvailable(page);
+    await enterDemo(page);
+    await page.goto('/#/settings');
+    await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلم ركيز');
   });
 
   test('separate context has no Demo marker or Product data exposure', async ({ browser, page }) => {
@@ -162,8 +174,7 @@ test.describe('isolated Demo runtime', () => {
     const other = await isolated.newPage();
     await other.route('https://*.supabase.co/**', (route) => route.abort());
     await other.goto('/');
-    await other.getByRole('button', { name: /مركز تحكم/ }).click();
-    await expect(other.getByRole('button', { name: 'جرّب ركيز', exact: true })).toBeVisible();
+    await expectDemoEntryAvailable(other);
     await expect(other.locator('[data-demo-indicator]')).toHaveCount(0);
     await isolated.close();
   });
@@ -180,6 +191,8 @@ test.describe('isolated Demo runtime', () => {
       await expect(page.locator('.empty--error')).toHaveCount(0);
     }
     await expect(page.locator('[data-demo-cloud-unavailable]')).toBeVisible();
+    await expect(page.getByRole('button', { name: /تنزيل نسخة|اختيار ملف|ربط السجل|تهيئة حفظ المنهج/ })).toHaveCount(0);
+    await expect(page.locator('input[type="file"]')).toHaveCount(0);
     expect(cloudRequests).toBe(0);
   });
 
@@ -213,19 +226,34 @@ test.describe('isolated Demo runtime', () => {
     await expect(page.getByText('التوقيت التجريبي', { exact: true })).toHaveCount(0);
   });
 
-  test('same-profile tabs share Demo persistence while another browser context stays isolated', async ({ page }) => {
+  test('new tab does not inherit Demo activation from the active tab', async ({ page }) => {
     await page.goto('/');
     await enterDemo(page);
     const second = await page.context().newPage();
     await second.route('https://*.supabase.co/**', (route) => route.abort());
     await second.goto('/#/settings');
-    await expect(second.locator('[data-demo-indicator]')).toBeVisible();
-    await page.goto('/#/settings');
-    await page.locator('input[name="schoolName"]').fill('مدرسة متعددة التبويبات');
-    await page.locator('input[name="schoolName"]').blur();
-    await second.reload();
-    await expect(second.locator('input[name="schoolName"]')).toHaveValue('مدرسة متعددة التبويبات');
+    await expect(second.locator('[data-demo-indicator]')).toHaveCount(0);
+    await expectDemoEntryAvailable(second);
     await second.close();
+  });
+
+  test('topbar login exits Demo and returns to the signed-out auth entry', async ({ page }) => {
+    await page.goto('/');
+    await enterDemo(page);
+    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await page.locator('[data-act="demo-login"]:visible').first().click();
+    await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
+    await expectDemoEntryAvailable(page);
+    await expect(page.getByRole('button', { name: 'تسجيل الدخول', exact: true })).toBeVisible();
+  });
+
+  test('Demo report outputs carry a visible and printable marker', async ({ page }) => {
+    await page.goto('/');
+    await enterDemo(page);
+    await page.goto('/#/teaching/demo:teaching:1/reports');
+    await expect(page.locator('[data-demo-output-marker]')).toHaveCount(2);
+    await expect(page.locator('[data-demo-output-marker].noprint')).toBeVisible();
+    await expect(page.locator('.printhead [data-demo-output-marker]')).toContainText('بيانات تجريبية');
   });
 
   test('Demo reloads offline after online initialization', async ({ page, context }) => {
@@ -264,6 +292,7 @@ test.describe('isolated Demo runtime', () => {
     }, { authKey: AUTH_STORAGE_KEY });
     await page.reload();
     await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
+    expect(await page.evaluate(() => sessionStorage.getItem('rakeezx-demo-session-v1'))).toBeNull();
     expect(await page.evaluate(() => localStorage.getItem('rakeezx-demo-active-v1'))).toBeNull();
   });
 });

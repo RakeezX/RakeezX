@@ -428,6 +428,16 @@ export default {
   async onMount() {
     const revision = ++backupViewRevision;
     const nextUsage = await db.usage();
+    if (store.getActiveWorkspace()?.type === 'demo') {
+      if (revision !== backupViewRevision) return;
+      usageInfo = nextUsage;
+      cloudResumeState = null;
+      cloudResumeError = null;
+      legacyClaimState = { phase: 'hidden', error: null, pendingRecovery: false };
+      curriculumBootstrap = { phase: 'hidden', status: null, error: null };
+      repaint();
+      return;
+    }
     let nextResume = null;
     let nextResumeError = null;
     try { nextResume = await getCloudRestoreResumeState(); }
@@ -460,6 +470,27 @@ export default {
     const totalRecords = Object.values(counts).reduce((sum, count) => sum + count, 0);
     const availability = cloudAvailability();
     const cloudStartBlocked = !!cloudResumeState || !!cloudResumeError || cloudRecovery.busy;
+    if (demo) return html`
+      <main class="management-page backup-data-page" data-demo-data-guard>
+        ${parentLink('العودة إلى الإعدادات', '/settings')}
+        <section class="data-safety-intro" aria-labelledby="data-safety-title">
+          <span class="data-safety-intro__icon">${icon('shield')}</span>
+          <div><h2 id="data-safety-title">بيانات الوضع التجريبي</h2><p>النسخ الاحتياطي ونقل البيانات غير متاحين في الوضع التجريبي.</p></div>
+        </section>
+        <div class="surface surface--flat data-safety-surface">
+          <section class="surface__section data-safety-section" data-demo-cloud-unavailable>
+            <div class="data-safety-section__copy"><h2>بيانات تجريبية محلية فقط</h2><p>لا يمكن تنزيلها أو استيرادها أو ربطها أو نقلها إلى حساب.</p></div>
+          </section>
+          <details class="surface__section data-inventory">
+            <summary><span class="data-inventory__summary"><span class="data-safety-section__icon">${icon('reports')}</span><span><strong>محتوى التجربة الحالية</strong><small>للاستكشاف داخل الوضع التجريبي فقط</small></span></span><span class="data-inventory__meta"><bdi class="tabular">${totalRecords}</bdi> سجلًا ${icon('chev')}</span></summary>
+            <div class="data-inventory__body">
+              <dl class="data-inventory__grid">${Object.entries(counts).map(([label, count]) => html`<div><dt>${label}</dt><dd class="tabular">${count}</dd></div>`)}</dl>
+              ${usageInfo ? html`<div class="data-inventory__storage"><span>المساحة المستعملة في التجربة</span><bdi class="tabular">${fmtBytes(usageInfo.used)}</bdi></div>` : ''}
+            </div>
+          </details>
+        </div>
+        <section class="data-danger-zone" aria-labelledby="demo-reset-title"><div><h2 id="demo-reset-title">إعادة ضبط التجربة</h2><p>يعيد البيانات التجريبية فقط إلى حالتها الأصلية.</p></div><button class="btn btn--danger" data-act="demo-reset">${icon('refresh')} إعادة ضبط البيانات التجريبية</button></section>
+      </main>`;
     return html`
       <main class="management-page backup-data-page">
         ${parentLink('العودة إلى الإعدادات', '/settings')}
@@ -516,6 +547,7 @@ export default {
   },
   actions: {
     async export() {
+      if (store.getActiveWorkspace()?.type === 'demo') return;
       try {
         const payload = await downloadBackup();
         const validation = await validateBackupIntegrity(payload);
@@ -635,7 +667,10 @@ export default {
         repaint();
       }
     },
-    'pick-file'() { document.getElementById('restore-file')?.click(); },
+    'pick-file'() {
+      if (store.getActiveWorkspace()?.type === 'demo') return;
+      document.getElementById('restore-file')?.click();
+    },
     'pick-cloud-file'() {
       if (cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
       document.getElementById('cloud-restore-file')?.click();
@@ -733,6 +768,7 @@ export default {
       setTimeout(() => document.querySelector('[data-act="pick-cloud-file"]')?.focus({ preventScroll: true }), 0);
     },
     async file(el) {
+      if (store.getActiveWorkspace()?.type === 'demo') return;
       const file = el.files?.[0]; el.value = ''; if (!file) return;
       let payload;
       try { payload = await readJSONFile(file); } catch (err) { toast(err.message, 'danger'); return; }

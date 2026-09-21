@@ -3,6 +3,23 @@
 import { html, raw, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
 import { getAccountPresentation } from './account-profile.js';
+import * as store from '../store.js';
+
+export const isDemoOutput = () => store.getActiveWorkspace()?.type === 'demo';
+
+export function demoOutputMarker({ screenOnly = false } = {}) {
+  return isDemoOutput()
+    ? html`<span class="demo-output-marker ${screenOnly ? 'noprint' : ''}" data-demo-output-marker>بيانات تجريبية</span>`
+    : '';
+}
+
+export function markDemoExportRows(rows) {
+  return isDemoOutput() ? [['بيانات تجريبية'], ...rows] : rows;
+}
+
+export function markDemoSharedText(lines) {
+  return isDemoOutput() ? ['بيانات تجريبية', ...lines] : lines;
+}
 
 export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
   const presentation = getAccountPresentation(profile?.teacherForm);
@@ -28,6 +45,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
   return html`
     <header class="printhead print-report__header" dir="rtl">
       <div class="printhead__brand"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong><span>تقارير المعلم</span></div>
+      ${demoOutputMarker()}
       <h2 class="printhead__title">${title}</h2>
       <div class="printhead__details">
         ${metadata(identity, 'printhead__meta--identity')}

@@ -13,7 +13,10 @@ import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
 import { createWorkspaceRegistry, demoDescriptor } from './lib/workspaces.js';
 import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
-import { clearDemoRequest, isDemoRequested, requestDemo, seedDemoWorkspace } from './lib/demo-workspace.js';
+import {
+  clearDemoRequest, clearLegacyDemoRequest, isDemoPreparing, isDemoRequested,
+  markDemoReady, requestDemo, seedDemoWorkspace,
+} from './lib/demo-workspace.js';
 import { runInitialRestore } from './lib/initial-restore.js';
 import { getAccountPresentation } from './lib/account-profile.js';
 import {
@@ -80,6 +83,17 @@ function renderSidebarMiniHubTrigger() {
   const schoolName = profile.schoolName || '';
   const syncInfo = getSyncState();
 
+  if (isDemoWorkspace()) return html`
+    <button class="teacher-mini-hub-trigger" data-act="demo-login" aria-label="الخروج من الوضع التجريبي وتسجيل الدخول">
+      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">${icon('login')}</div>
+      <div class="teacher-mini-hub-trigger__info">
+        <div class="teacher-mini-hub-trigger__name">تسجيل الدخول</div>
+        <div class="teacher-mini-hub-trigger__sub">الوضع التجريبي</div>
+      </div>
+      <div class="teacher-mini-hub-trigger__chev" aria-hidden="true">${icon('chev')}</div>
+    </button>
+  `;
+
   return html`
     <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}">
       <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">
@@ -108,8 +122,8 @@ function renderTeacherMiniHubBody() {
   const isInstalled = isStandaloneMode();
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
   const isLoggedIn = !!(cloud.session && cloud.user);
-  const authPending = teacherMiniHubAuthPending;
   const demo = isDemoWorkspace();
+  const authPending = teacherMiniHubAuthPending;
 
   return html`
       <div class="mini-hub-sheet">
@@ -306,6 +320,7 @@ function topbar(v, params) {
   const syncInfo = getSyncState();
   const isHome = currentPath() === '/';
   const isLoggedIn = !!(cloud.session && cloud.user);
+  const demo = isDemoWorkspace();
   const accountName = String(profile.teacherName ?? '').trim();
   const homeAccountLabel = isLoggedIn ? (accountName || 'إكمال الحساب') : 'تسجيل الدخول';
   const homeAccountA11y = isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
@@ -320,13 +335,17 @@ function topbar(v, params) {
         ${actions ?? ''}
         ${isHome ? html`
           <button class="topbar__teacher-btn topbar__teacher-btn--home-account"
-                  data-act="open-teacher-mini-hub"
+                  data-act="${demo ? 'demo-login' : 'open-teacher-mini-hub'}"
                   ${isLoggedIn ? html`data-sync-account-label="${homeAccountLabel}"` : ''}
                   aria-label="${homeAccountA11y}"
                   title="${isLoggedIn ? `${homeAccountLabel} — ${syncInfo.text}` : homeAccountLabel}">
             <span class="topbar__account-icon" aria-hidden="true">${icon(isLoggedIn ? 'student' : 'login')}</span>
             <span class="topbar__account-name">${homeAccountLabel}</span>
             ${isLoggedIn ? html`<span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>` : ''}
+          </button>
+        ` : demo ? html`
+          <button class="btn btn--xs btn--quiet topbar__demo-login" data-act="demo-login" aria-label="الخروج من الوضع التجريبي وتسجيل الدخول">
+            ${icon('login')} تسجيل الدخول
           </button>
         ` : html`
           <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}: ${teacherName}">
@@ -536,11 +555,13 @@ async function boot() {
     // Restore the cached identity immediately, but never make the local shell
     // depend on a refresh request that Android may suspend while backgrounded.
     await cloud.init({ waitForRefresh: false });
+    clearLegacyDemoRequest();
     if (cloud.session && cloud.user) clearDemoRequest();
     const registry = createWorkspaceRegistry();
+    const demoPreparing = !cloud.session && !cloud.user && isDemoPreparing();
     try {
+      await registry.unregisterDemo();
       if (!cloud.session && !cloud.user && isDemoRequested()) {
-        await registry.registerDemo();
         workspaceRouting = { status: 'ready', authState: 'signed_out', workspace: demoDescriptor() };
       } else workspaceRouting = await resolveWorkspaceForBoot({
         authUser: cloud.user,
@@ -565,7 +586,7 @@ async function boot() {
       return;
     }
     store.activateWorkspace(workspaceRouting.workspace);
-    if (workspaceRouting.workspace.type === 'demo') await seedDemoWorkspace();
+    if (workspaceRouting.workspace.type === 'demo') await seedDemoWorkspace({ force: demoPreparing });
     await store.init();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
@@ -580,6 +601,7 @@ async function boot() {
       console.error('[rakeezx] Sync module failed to load:', err);
     }
     if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
+    if (isDemoWorkspace()) markDemoReady();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
@@ -935,6 +957,11 @@ const GLOBAL_ACTIONS = {
   'demo-exit': async () => {
     clearDemoRequest();
     store.deactivateWorkspace('demo-exit');
+    location.reload();
+  },
+  'demo-login': async () => {
+    clearDemoRequest();
+    store.deactivateWorkspace('demo-login');
     location.reload();
   },
   'demo-reset': async () => {

@@ -216,7 +216,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v28';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v29';/);
   assert.match(worker,/\.\/src\/lib\/email-otp\.js/);
   assert.match(worker,/\.\/src\/lib\/account-profile\.js/);
   assert.match(worker,/\.\/src\/lib\/demo-workspace\.js/);

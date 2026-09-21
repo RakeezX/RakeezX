@@ -8,6 +8,7 @@ import { html, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { studentTotal, todayISO, quickLogAttendanceState } from '../models.js';
 import { repaint } from '../repaint.js';
+import { demoOutputMarker } from '../lib/report-print.js';
 
 let size = 4;
 let mode = 'balanced';   // balanced | random
@@ -158,6 +159,7 @@ export default {
 
     return html`
       <div class="classroom-tool-page groups-page">
+      ${demoOutputMarker()}
       <section class="surface groups-setup mb-3" aria-label="إعداد المجموعات">
         <div class="groups-setup__grid">
         <div class="field">

@@ -2,7 +2,7 @@
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
 import { downloadCSV } from '../lib/export.js';
-import { reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoExportRows, reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -43,7 +43,7 @@ export default {
         ${reportPageSetup()}
         ${reportHeader({ title: 'تقرير تنفيذ الحصص', profile: profile(report), year: report.snapshotIdentity?.year?.label ?? store.getYear(yearId ?? selectedTerm?.yearId)?.label ?? store.activeYear()?.label ?? '', term: report.snapshotIdentity?.term?.name ?? selectedTerm?.name ?? '', period: contextLabel(report) })}
         <header class="report-workspace__head noprint">
-          <div><span class="report-workspace__eyebrow">تقرير مجمّع</span><h2>تنفيذ الحصص</h2><p>تابع اكتمال الرصد عبر الفصول والحصص المؤرخة.</p></div>
+          <div><span class="report-workspace__eyebrow">تقرير مجمّع</span><h2>تنفيذ الحصص</h2><p>تابع اكتمال الرصد عبر الفصول والحصص المؤرخة.</p>${demoOutputMarker({ screenOnly: true })}</div>
           <span class="badge tabular">${rows.length} نتيجة</span>
         </header>
         <div class="surface surface--flat report-filters noprint" aria-label="عوامل تصفية تقرير التنفيذ">
@@ -104,7 +104,7 @@ export default {
     async identity() {
       return this.print();
     },
-    csv() { const rows = filters(scoped()); const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', out); toast('نُزّل تقرير تنفيذ الحصص'); },
+    csv() { const rows = filters(scoped()); const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', markDemoExportRows(out)); toast('نُزّل تقرير تنفيذ الحصص'); },
   },
 };
 

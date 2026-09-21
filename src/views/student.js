@@ -13,6 +13,7 @@ import {
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
+import { demoOutputMarker, markDemoSharedText } from '../lib/report-print.js';
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
 function resolveTeaching(student, requested) {
@@ -130,6 +131,7 @@ export default {
     return html`
       <div class="management-page student-profile-page">
       <div class="printhead">
+        ${demoOutputMarker()}
         <div class="printhead__title">${s.name}</div>
         <div class="printhead__sub">
           ${section ? sectionLabel(section) : ''}
@@ -500,7 +502,7 @@ export default {
         'تطبيق رَكيز المعلم',
       ];
 
-      const summaryText = textParts.filter(Boolean).join('\n');
+      const summaryText = markDemoSharedText(textParts.filter(Boolean)).join('\n');
 
       await openSheet({
         title: 'مشاركة ملخص الطالب',

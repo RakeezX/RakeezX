@@ -1,10 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createDemoDataset, clearDemoRequest, isDemoRequested, requestDemo } from '../src/lib/demo-workspace.js';
+import {
+  createDemoDataset, clearDemoRequest, demoRequestState, isDemoPreparing,
+  isDemoRequested, markDemoReady, requestDemo,
+} from '../src/lib/demo-workspace.js';
 import { createSyncOwnershipGuard } from '../src/lib/sync-ownership.js';
 import { demoDescriptor } from '../src/lib/workspaces.js';
 import { DEFAULT_TIME_PROFILES } from '../src/models.js';
+import { demoOutputMarker, markDemoExportRows } from '../src/lib/report-print.js';
+import * as store from '../src/store.js';
 
 function memoryStorage() {
   const values = new Map();
@@ -15,11 +20,16 @@ function memoryStorage() {
   };
 }
 
-test('demo marker is explicit and reversible', () => {
+test('demo marker has explicit preparing and active session states', () => {
   const storage = memoryStorage();
   assert.equal(isDemoRequested(storage), false);
   requestDemo(storage);
   assert.equal(isDemoRequested(storage), true);
+  assert.equal(isDemoPreparing(storage), true);
+  assert.equal(demoRequestState(storage), 'preparing');
+  markDemoReady(storage);
+  assert.equal(isDemoPreparing(storage), false);
+  assert.equal(demoRequestState(storage), 'active');
   clearDemoRequest(storage);
   assert.equal(isDemoRequested(storage), false);
 });
@@ -145,4 +155,13 @@ test('demo descriptor is denied cloud enqueue and pull by Owner Guard', () => {
   assert.equal(guard.enqueueAccess().reason, 'demo-sync-disabled');
   assert.equal(guard.cloudAccess().allowed, false);
   assert.equal(guard.cloudAccess().reason, 'demo-sync-disabled');
+});
+
+test('external output markers are Demo-only', () => {
+  store.activateWorkspace(demoDescriptor());
+  assert.match(String(demoOutputMarker()), /بيانات تجريبية/);
+  assert.deepEqual(markDemoExportRows([['الطالب']]), [['بيانات تجريبية'], ['الطالب']]);
+  store.deactivateWorkspace('test-complete');
+  assert.equal(String(demoOutputMarker()), '');
+  assert.deepEqual(markDemoExportRows([['الطالب']]), [['الطالب']]);
 });

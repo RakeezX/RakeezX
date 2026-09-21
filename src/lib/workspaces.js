@@ -156,6 +156,14 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     return record;
   }
 
+  async function remove(id) {
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    tx.objectStore(WORKSPACE_REGISTRY_STORE).delete(id);
+    await committed;
+  }
+
   function assertExistingRecord(existing, expected) {
     if (!existing) return;
     const matches = Object.entries(expected).every(([key, value]) => existing[key] === value);
@@ -374,6 +382,10 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     });
   }
 
+  async function unregisterDemo() {
+    await remove('demo');
+  }
+
   async function close() {
     if (!databasePromise) return;
     (await databasePromise).close();
@@ -383,7 +395,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
   return Object.freeze({
     read, list, findByAuthUserId, recordLegacyPresence,
     registerAccount, beginAccountRestore, updateAccountRestore, finalizeAccountRestore,
-    registerLegacyClaim, registerDemo, close,
+    registerLegacyClaim, registerDemo, unregisterDemo, close,
   });
 }
 
