@@ -11,8 +11,9 @@ import * as cloud from './lib/cloud.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
-import { createWorkspaceRegistry } from './lib/workspaces.js';
+import { createWorkspaceRegistry, demoDescriptor } from './lib/workspaces.js';
 import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
+import { clearDemoRequest, isDemoRequested, requestDemo, seedDemoWorkspace } from './lib/demo-workspace.js';
 import { runInitialRestore } from './lib/initial-restore.js';
 import { getAccountPresentation } from './lib/account-profile.js';
 import {
@@ -47,6 +48,8 @@ let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
 let initialRestoreAbortController = null;
 const scrollMemory = new Map();
+
+const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
 
@@ -105,6 +108,7 @@ function renderTeacherMiniHubBody() {
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
   const isLoggedIn = !!(cloud.session && cloud.user);
   const authPending = teacherMiniHubAuthPending;
+  const demo = isDemoWorkspace();
 
   return html`
       <div class="mini-hub-sheet">
@@ -121,25 +125,29 @@ function renderTeacherMiniHubBody() {
           <div class="mini-hub-account__row">
             <div class="mini-hub-account__info">
               <div class="mini-hub-account__title">الحساب</div>
-              ${authPending === 'logout'
+              ${demo
+                ? html`<div class="mini-hub-account__status">الوضع التجريبي</div>`
+                : authPending === 'logout'
                 ? html`<div class="mini-hub-account__status">جارٍ تسجيل الخروج...</div>`
                 : isLoggedIn
                 ? html`<div class="mini-hub-account__status truncate" dir="ltr">${cloud.user.email}</div>`
                 : html`<div class="mini-hub-account__status">${authPending === 'login' ? 'جارٍ تسجيل الدخول...' : 'غير مسجل الدخول'}</div>`}
             </div>
             <div class="mini-hub-account__action">
-              ${authPending
+              ${demo
+                ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="demo-exit">الخروج من التجربة</button>`
+                : authPending
                 ? html`<button type="button" class="btn btn--xs btn--quiet" disabled>${authPending === 'logout' ? 'جارٍ تسجيل الخروج...' : 'جارٍ الاتصال...'}</button>`
                 : isLoggedIn
                 ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="mini-hub-logout">تسجيل الخروج</button>`
-                : html`<button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button>`}
+                : html`<div class="hstack gap-1 wrap"><button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button><button type="button" class="btn btn--xs btn--quiet" data-act="demo-enter">جرّب ركيز</button></div>`}
             </div>
           </div>
           </div>
 
-          <div class="mini-hub-sync mini-hub-section" aria-live="polite">
-            ${renderSyncOperationalSection(syncInfo.summary)}
-          </div>
+          ${demo ? html`<div class="mini-hub-sync mini-hub-section"><div class="t-3 fs-xs">بيانات تجريبية محلية فقط — لا مزامنة سحابية</div></div>` : html`
+            <div class="mini-hub-sync mini-hub-section" aria-live="polite">${renderSyncOperationalSection(syncInfo.summary)}</div>
+          `}
 
           <div class="mini-hub-pwa mini-hub-section">
             <div class="mini-hub-pwa__copy">
@@ -267,6 +275,7 @@ function shell(path, params) {
         <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
       </nav>
       <main class="main">
+        ${isDemoWorkspace() ? html`<div class="demo-mode-banner" role="status" data-demo-indicator>الوضع التجريبي — بيانات محلية</div>` : ''}
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
         <div class="app-status-strip ${showConnectionState ? `is-visible is-${syncInfo.status}` : ''}"
              data-app-status role="status" aria-live="polite" aria-atomic="true">
@@ -526,9 +535,13 @@ async function boot() {
     // Restore the cached identity immediately, but never make the local shell
     // depend on a refresh request that Android may suspend while backgrounded.
     await cloud.init({ waitForRefresh: false });
+    if (cloud.session && cloud.user) clearDemoRequest();
     const registry = createWorkspaceRegistry();
     try {
-      workspaceRouting = await resolveWorkspaceForBoot({
+      if (!cloud.session && !cloud.user && isDemoRequested()) {
+        await registry.registerDemo();
+        workspaceRouting = { status: 'ready', authState: 'signed_out', workspace: demoDescriptor() };
+      } else workspaceRouting = await resolveWorkspaceForBoot({
         authUser: cloud.user,
         authState: cloud.session && cloud.user ? 'authenticated' : 'signed_out',
         registry,
@@ -551,14 +564,18 @@ async function boot() {
       return;
     }
     store.activateWorkspace(workspaceRouting.workspace);
+    if (workspaceRouting.workspace.type === 'demo') await seedDemoWorkspace();
     await store.init();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
+      if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
       syncModule = await import('./lib/sync.js');
       syncModule.init();
       await syncModule.getSyncOperationalSummary();
       if (import.meta.env?.DEV) window.__syncModule = syncModule;
     } catch (err) {
+      if (err?.code === 'DEMO_SYNC_DISABLED') syncModule = null;
+      else
       console.error('[rakeezx] Sync module failed to load:', err);
     }
     if (cloud.session && cloud.user) await store.ensureSessionsForDate();
@@ -606,6 +623,12 @@ async function boot() {
     if (update?.render !== false) scheduleRender();
   });
   cloud.subscribe(() => {
+    if (cloud.session && cloud.user && isDemoWorkspace()) {
+      clearDemoRequest();
+      store.deactivateWorkspace('authenticated-session-replaces-demo');
+      location.reload();
+      return;
+    }
     scheduleRender();
     refreshTeacherMiniHubSheet();
   });
@@ -873,13 +896,17 @@ function mountWorkspaceGate(routing) {
           ? 'بيانات الحساب المحفوظة على هذا الجهاز محمية، ولا تُفتح إلا بعد تسجيل الدخول بالحساب المرتبط.'
           : 'لم يتم العثور على مساحة عمل محلية مرتبطة بهذا الحساب. لم تُفتح أو تُنشأ أي قاعدة بيانات.'}</div>
         ${signedOut
-          ? html`<button class="btn btn--primary" type="button" data-workspace-login>${icon('login')} تسجيل الدخول</button>`
+          ? html`<div class="stack stack-2"><button class="btn btn--primary" type="button" data-workspace-login>${icon('login')} تسجيل الدخول</button><button class="btn btn--ghost" type="button" data-workspace-demo>جرّب ركيز</button><div class="empty__text t-3">بيانات تجريبية محلية يمكنك إعادة ضبطها أو الخروج منها في أي وقت.</div></div>`
           : html`<button class="btn btn--ghost" type="button" data-workspace-logout>تسجيل الخروج</button>`}
       </div>
     </div>
   `);
   app.querySelector('[data-workspace-login]')?.addEventListener('click', () => {
     void openMiniHubLoginSheet({ reloadOnSuccess: true });
+  });
+  app.querySelector('[data-workspace-demo]')?.addEventListener('click', () => {
+    requestDemo();
+    location.reload();
   });
   app.querySelector('[data-workspace-logout]')?.addEventListener('click', async (event) => {
     event.currentTarget.disabled = true;
@@ -899,6 +926,28 @@ const GLOBAL_ACTIONS = {
     backWithinApp(el.dataset.backFallback || el.getAttribute('href'));
   },
   'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
+  'demo-enter': () => {
+    if (cloud.session || cloud.user) return;
+    requestDemo();
+    location.reload();
+  },
+  'demo-exit': async () => {
+    clearDemoRequest();
+    store.deactivateWorkspace('demo-exit');
+    location.reload();
+  },
+  'demo-reset': async () => {
+    if (!isDemoWorkspace()) return;
+    const accepted = await openSheet({
+      title: 'إعادة ضبط البيانات التجريبية',
+      body: html`<p>ستعود البيانات التجريبية إلى حالتها الأصلية. لن تتأثر أي بيانات حساب.</p>`,
+      foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-demo-reset-confirm>إعادة الضبط</button>`,
+      onMount: (root, done) => root.querySelector('[data-demo-reset-confirm]')?.addEventListener('click', () => done(true)),
+    });
+    if (!accepted) return;
+    await seedDemoWorkspace({ force: true });
+    location.reload();
+  },
   'mini-hub-login': () => {
     return openMiniHubLoginSheet();
   },

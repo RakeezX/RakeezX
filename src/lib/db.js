@@ -50,7 +50,7 @@ let onVersionChange = null;
 
 export function selectDatabase(databaseName) {
   const name = String(databaseName ?? '').trim();
-  if (!/^rakeezx(?:-user-[0-9a-f]{32})?$/.test(name)) {
+  if (!/^(?:rakeezx|rakeezx-demo|rakeezx-user-[0-9a-f]{32})$/.test(name)) {
     throw Object.assign(new Error('Invalid resolved Product database name'), { code: 'INVALID_WORKSPACE_DATABASE' });
   }
   if (_db && _db.name !== name) {

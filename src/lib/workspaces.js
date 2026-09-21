@@ -80,7 +80,7 @@ function accountDescriptor(record, key) {
   };
 }
 
-function demoDescriptor() {
+export function demoDescriptor() {
   return {
     id: 'demo',
     type: 'demo',

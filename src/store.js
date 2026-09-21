@@ -553,6 +553,7 @@ function syncV2Dependencies(storeName, record) {
 
 function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
   assertCloudRestoreWritable();
+  if (activeWorkspace?.type === 'demo') return null;
   if (isLocalOnlyRecord({ id: recordId, ...commandPatch }) ||
       dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
   const mutationId = uid();
@@ -575,6 +576,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
 
 const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null) => {
   assertCloudRestoreWritable();
+  if (activeWorkspace?.type === 'demo') return null;
   const schema = SYNC_V2_SCHEMAS[storeName];
   if (!schema || schema.readOnly || isLocalOnlyRecord(rec) || !isCurriculumOrdinarySyncAllowed(storeName)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
@@ -722,7 +724,7 @@ function assertOperationalWritesAllowed(batch) {
  * receipt tells student sync to use the server transaction first, before a
  * generic bulk upsert could expose a transient duplicate roll number.
  */
-const enrollmentOperationEntry = (operation, stamp) => runtimeSyncOwnershipGuard.bindNewCommand({
+const enrollmentOperationEntry = (operation, stamp) => activeWorkspace?.type === 'demo' ? null : runtimeSyncOwnershipGuard.bindNewCommand({
   id: `enrollment-operation:${operation.id}`,
   store: 'enrollments',
   recordId: null,
@@ -3197,7 +3199,7 @@ export async function renumberRoster(secId) {
             put: [
               ...changed.map((row) => outboxEntry('enrollments', row, ['rollNo'], 'patch')).filter(Boolean),
               enrollmentOperationEntry(operation, stamp),
-            ],
+            ].filter(Boolean),
           },
         };
       },

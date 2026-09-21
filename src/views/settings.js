@@ -325,9 +325,22 @@ export default {
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
     const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
+    const demo = store.getActiveWorkspace()?.type === 'demo';
 
     return html`
       <div class="management-page settings-page">
+      ${demo ? html`
+        <div class="section settings-section settings-section--demo" data-demo-settings>
+          <div class="section__head"><div class="section__title">الوضع التجريبي</div></div>
+          <div class="card card--pad stack stack-3">
+            <div><div class="fw-7">بيانات تجريبية محلية</div><div class="t-3 fs-sm">يمكنك تجربة جميع أدوات ركيز دون حساب أو مزامنة سحابية.</div></div>
+            <div class="hstack gap-2 wrap">
+              <button class="btn btn--ghost" type="button" data-act="demo-reset">إعادة ضبط البيانات التجريبية</button>
+              <button class="btn btn--quiet" type="button" data-act="demo-exit">الخروج من التجربة</button>
+            </div>
+          </div>
+        </div>
+      ` : ''}
       <div class="section settings-section settings-section--identity">
         <div class="section__head"><div class="section__title">بياناتك</div></div>
         <div class="card card--pad">
@@ -372,19 +385,19 @@ export default {
                        aria-describedby="settings-phone-hint">
                 <span class="field__hint" id="settings-phone-hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span>
               </label>
-              <div class="field settings-email-field">
+              ${demo ? '' : html`<div class="field settings-email-field">
                 <span class="field__label">البريد الإلكتروني</span>
                 <div class="settings-email-line">
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email">تعديل</button>` : ''}
                 </div>
                 ${emailChangePending ? html`<span class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد</span>` : ''}
-              </div>
+              </div>`}
             </div>
-            <div class="settings-access-summary" aria-label="معلومات الوصول">
+            ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
               <span class="settings-account-summary__label">الوصول</span>
               <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
-            </div>
+            </div>`}
           </form>
         </div>
       </div>

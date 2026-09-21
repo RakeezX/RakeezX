@@ -70,6 +70,7 @@ test('approved outlined headers and sanitized Micro-Mark have exact safe vector 
 
 test('Brand release preserves Production identity, install actions and offline policy across later runtime work', async () => {
   const baseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`66b0f4bd1748ac1fb756d47fb814c66cf4df64af:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
+  const productionBaseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`5f88e74d7d0af36df136ec2c90a57619143013bf:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
   const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
   for (const file of ['manifest.webmanifest','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
   const accountProfileField = "  teacherForm: o.teacherForm === 'feminine' ? 'feminine' : 'masculine',\n";
@@ -79,7 +80,7 @@ test('Brand release preserves Production identity, install actions and offline p
 `;
   const databaseRouting = `export function selectDatabase(databaseName) {
   const name = String(databaseName ?? '').trim();
-  if (!/^rakeezx(?:-user-[0-9a-f]{32})?$/.test(name)) {
+  if (!/^(?:rakeezx|rakeezx-demo|rakeezx-user-[0-9a-f]{32})$/.test(name)) {
     throw Object.assign(new Error('Invalid resolved Product database name'), { code: 'INVALID_WORKSPACE_DATABASE' });
   }
   if (_db && _db.name !== name) {
@@ -202,7 +203,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     .replace(emailChangeCloud, '')
     .replace(accountCloud, '')
     .replace(curriculumCloud, '');
-  assert.equal(cloud, baseline('src/lib/cloud.js'), 'src/lib/cloud.js outside the authorized non-blocking startup refresh');
+  assert.equal(cloudSource, productionBaseline('src/lib/cloud.js'), 'src/lib/cloud.js must remain byte-identical to the Demo candidate Production baseline');
   const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
   assert.equal(home.slice(home.indexOf('  actions:')),oldHome.slice(oldHome.indexOf('  actions:')));
   const rawWorker=await read('sw.js'),oldWorker=baseline('sw.js');
@@ -215,9 +216,10 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v27';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v28';/);
   assert.match(worker,/\.\/src\/lib\/email-otp\.js/);
   assert.match(worker,/\.\/src\/lib\/account-profile\.js/);
+  assert.match(worker,/\.\/src\/lib\/demo-workspace\.js/);
   assert.match(worker, /\.\/src\/lib\/initial-restore\.js/);
   assert.match(worker,/\.\/src\/lib\/curriculum-bootstrap\.js/);
   assert.equal(rawWorker.split(executableRevalidation).length - 1, 1, 'executable HTTP-cache revalidation must occur exactly once');

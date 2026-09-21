@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v27';
+const VERSION = 'rakeezx-v28';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -85,6 +85,7 @@ const SHELL = [
   './src/lib/pristine-teaching.js',
   './src/lib/support.js',
   './src/lib/demo.js',
+  './src/lib/demo-workspace.js',
   './src/lib/calendar-presets.js',
   './src/lib/subject-catalog.js',
   './src/lib/effects.js',

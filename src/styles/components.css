@@ -6754,3 +6754,14 @@
   .timing-mobile-actions { display: flex; justify-content: flex-start; margin-block-end: var(--sp-3); }
   .timing-mobile-actions .btn { min-height: 44px; }
 }
+.demo-mode-banner {
+  margin: .6rem max(1rem, env(safe-area-inset-left)) 0;
+  padding: .45rem .8rem;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--brand) 8%, var(--bg));
+  color: var(--brand-strong, var(--brand));
+  font-size: .78rem;
+  font-weight: 700;
+  text-align: center;
+}

@@ -450,6 +450,7 @@ export default {
   },
   render() {
     const s = store.state;
+    const demo = store.getActiveWorkspace()?.type === 'demo';
     const n = (key) => (s[key] ?? []).filter((record) => !record.deleted).length;
     const counts = {
       'سنوات دراسية': n('years'), 'فصول دراسية': n('terms'), شعب: n('sections'),
@@ -479,8 +480,8 @@ export default {
               <span><strong>${latestLocalAction ? 'اكتمل آخر تنزيل في هذه الجلسة' : 'لم تُنزّل نسخة في هذه الجلسة'}</strong><small>${latestLocalAction ? actionTime(latestLocalAction) : 'احتفظ بالملف في مكان آمن يمكنك الوصول إليه لاحقًا.'}</small></span>
             </div>
           </section>
-          ${renderLegacyClaimSection()}
-          ${renderCurriculumBootstrapSection()}
+          ${demo ? html`<section class="surface__section data-safety-section" data-demo-cloud-unavailable><div class="data-safety-section__copy"><h2>البيانات التجريبية محلية فقط</h2><p>الربط بالحساب والاستعادة السحابية غير متاحين في الوضع التجريبي.</p></div></section>` : renderLegacyClaimSection()}
+          ${demo ? '' : renderCurriculumBootstrapSection()}
           <section class="surface__section data-safety-section" aria-labelledby="restore-title">
             <div class="data-safety-section__heading"><h2 id="restore-title">الاستعادة والاسترداد</h2><p>اختر المسار المناسب لمكان النسخة التي تريد استعادتها.</p></div>
             <input type="file" id="restore-file" accept="application/json,.json" class="sr-only" data-change="file" aria-label="اختيار ملف نسخة احتياطية للاستعادة">
@@ -491,11 +492,11 @@ export default {
                 <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>استعادة نسخة على هذا الجهاز</h3><span class="badge badge--ok">محلية</span></div><p>يقرأ رَكيز الملف ويتحقق منه، ثم يتيح الدمج أو الاستبدال على هذا الجهاز فقط. لا يستبدل بيانات السحابة.</p></div>
                 <button class="btn btn--ghost recovery-path__action" data-act="pick-file">${icon('upload')} اختيار ملف</button>
               </div>
-              <div class="recovery-path recovery-path--cloud" aria-describedby="cloud-recovery-note">
+              ${demo ? '' : html`<div class="recovery-path recovery-path--cloud" aria-describedby="cloud-recovery-note">
                 <span class="recovery-path__icon is-info">${icon('cloud')}</span>
                 <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>الاستعادة السحابية الآمنة</h3><span class="badge ${availability.badge}">${availability.label}</span></div><p id="cloud-recovery-note">تقارن النسخة ببيانات الحساب، وتمنع التنفيذ عند وجود تعارض، ثم تُحدّث هذا الجهاز بالنسخة النهائية.</p></div>
                 <button class="btn btn--info recovery-path__action" data-act="pick-cloud-file" ${cloudStartBlocked ? html`disabled aria-disabled="true"` : ''}>${icon('upload')} اختيار نسخة للمراجعة</button>
-              </div>
+              </div>`}
             </div>
             ${renderCloudFlow()}
           </section>
@@ -507,10 +508,10 @@ export default {
             </div>
           </details>
         </div>
-        <section class="data-danger-zone" aria-labelledby="local-reset-title">
+        ${demo ? html`<section class="data-danger-zone" aria-labelledby="demo-reset-title"><div><h2 id="demo-reset-title">إعادة ضبط التجربة</h2><p>يعيد البيانات التجريبية فقط إلى حالتها الأصلية.</p></div><button class="btn btn--danger" data-act="demo-reset">${icon('refresh')} إعادة ضبط البيانات التجريبية</button></section>` : html`<section class="data-danger-zone" aria-labelledby="local-reset-title">
           <div><h2 id="local-reset-title">إعادة ضبط هذا الجهاز</h2><p>يمسح سجل ركيز المحلي من هذا الجهاز. لا تستخدمه كبديل عن إنشاء نسخة احتياطية.</p></div>
           <button class="btn btn--danger" data-act="wipe">${icon('trash')} ${LOCAL_RESET_COPY.button}</button>
-        </section>
+        </section>`}
       </main>`;
   },
   actions: {
