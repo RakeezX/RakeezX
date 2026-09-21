@@ -103,7 +103,7 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(page.locator('input[type="email"]')).toHaveCount(0);
   await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
   await expect(page.locator('[data-account-email]').locator('xpath=ancestor::*[contains(@class,"settings-email-field")]')).toContainText('البريد الإلكتروني');
-  await expect(page.getByText('الوصول التجريبي المجاني', { exact: true })).toBeVisible();
+  await expect(page.getByText('الوصول التجريبي', { exact: true })).toBeVisible();
   await expect(page.locator('[data-account-access]')).toHaveClass(/badge/);
   await expect(page.locator('[data-account-access]')).not.toHaveClass(/input/);
   await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-access-summary")]')).toContainText('الوصول');
@@ -171,7 +171,7 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(page.getByText(/اسم المدير/, { exact: false })).toBeVisible();
   await expect(page.getByText('اسم المدرسة', { exact: false })).toBeVisible();
   await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
-  await expect(page.locator('[data-account-access]')).toHaveText('الوصول التجريبي المجاني');
+  await expect(page.locator('[data-account-access]')).toHaveText('الوصول التجريبي');
   await page.reload();
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);

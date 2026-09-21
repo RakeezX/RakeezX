@@ -2,7 +2,7 @@ import * as cloud from './cloud.js';
 
 export const PROFILE_STATUS = Object.freeze({ PENDING: 'PENDING_PROFILE', READY: 'READY' });
 export const TEACHER_FORM = Object.freeze({ MASCULINE: 'masculine', FEMININE: 'feminine' });
-export const BETA_ACCESS_LABEL = 'الوصول التجريبي المجاني';
+export const BETA_ACCESS_LABEL = 'الوصول التجريبي';
 export const SAUDI_MOBILE_PATTERN = /^05[0-9]{8}$/;
 export const AUTH_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
