@@ -681,16 +681,29 @@ const INITIAL_RESTORE_COPY = Object.freeze({
 function renderInitialRestoreState(state, { error = null } = {}) {
   const [title, description] = INITIAL_RESTORE_COPY[state] ?? INITIAL_RESTORE_COPY.RESTORE_FAILED;
   const actionable = ['RESTORE_REQUIRES_ONLINE', 'RESTORE_FAILED'].includes(state);
+  const pending = ['RESTORE_PREFLIGHT', 'RESTORING', 'RESTORE_FINALIZING'].includes(state);
+  const failed = state === 'RESTORE_FAILED';
   render(app, html`
-    <div class="page" data-initial-restore-state="${state}">
-      <div class="empty ${state === 'RESTORE_FAILED' ? 'empty--error' : ''}" role="status">
-        <div class="empty__icon">${icon(state === 'RESTORE_FAILED' ? 'note' : 'cloud')}</div>
-        <div class="empty__title">${title}</div>
-        <div class="empty__text">${description}</div>
-        ${error && import.meta.env?.DEV ? html`<div class="empty__text t-3">${error.code ?? error.message}</div>` : ''}
-        ${actionable ? html`<button class="btn btn--primary" type="button" data-restore-retry>إعادة المحاولة</button>` : ''}
-        <button class="btn btn--ghost" type="button" data-restore-logout>تسجيل الخروج</button>
-        <a class="btn btn--quiet" href="mailto:support@rakeezx.com">الدعم</a>
+    <div class="page first-run-page" data-initial-restore-state="${state}">
+      <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
+      <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
+      <div class="first-run-card first-run-status ${failed ? 'first-run-status--error' : ''}"
+           role="${failed ? 'alert' : 'status'}" aria-live="polite">
+        <div class="first-run-status__brand">${brandLockup({ compact: true })}</div>
+        ${pending
+          ? html`<div class="first-run-status__spinner" aria-hidden="true"></div>`
+          : html`<div class="first-run-status__icon">${icon(failed ? 'note' : 'cloud')}</div>`}
+        <div class="first-run-status__copy">
+          <div class="first-run-eyebrow">مساحة حسابك</div>
+          <h1>${title}</h1>
+          <p>${description}</p>
+        </div>
+        ${error && import.meta.env?.DEV ? html`<div class="first-run-status__detail">${error.code ?? error.message}</div>` : ''}
+        <div class="first-run-status__actions">
+          ${actionable ? html`<button class="btn btn--primary" type="button" data-restore-retry>إعادة المحاولة</button>` : ''}
+          <button class="btn btn--ghost" type="button" data-restore-logout>تسجيل الخروج</button>
+          <a class="btn btn--quiet" href="mailto:support@rakeezx.com">الدعم</a>
+        </div>
       </div>
     </div>
   `);
@@ -739,11 +752,12 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
   refreshTeacherMiniHubSheet();
   let cleanupLoginSheet = () => {};
   const loginSheet = openSheet({
-    title: 'تسجيل الدخول للحساب السحابي',
-    desc: 'سنرسل رمز تحقق إلى بريد حسابك الحالي.',
+    title: 'ابدأ مع ركيز',
+    desc: 'أدخل بريد حسابك الحالي لنرسل إليك رمز تحقق.',
     body: html`
-      <div class="auth-brand">${brandLockup()}<p>مساحة العمل الرقمية للمعلم</p></div>
-      <form id="mini-hub-login-form" data-step="email">
+      <div class="first-run-auth">
+      <div class="auth-brand">${brandLockup()}<p>رَكيزة المعلم الرقمية</p></div>
+      <form id="mini-hub-login-form" data-step="email" aria-live="polite">
         <div data-email-otp-email-step>
         <label class="field">
           <span class="field__label">البريد الإلكتروني</span>
@@ -753,18 +767,20 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
         </div>
         <div data-email-otp-code-step hidden>
           <div class="field">
-            <span class="field__label">أدخل رمز التحقق</span>
+            <h2 class="first-run-auth__step-title">أدخل رمز التحقق</h2>
+            <span class="field__label">رمز التحقق المكوّن من 6 أرقام</span>
             <div class="t-3 fs-xs" data-email-otp-sent aria-live="polite"></div>
-            <input class="input" name="token" inputmode="numeric" autocomplete="one-time-code" dir="ltr"
+            <input class="input first-run-auth__otp" name="token" inputmode="numeric" autocomplete="one-time-code" dir="ltr"
               pattern="[0-9]{6}" maxlength="6" aria-label="رمز التحقق المكون من 6 أرقام">
           </div>
-          <div class="cluster mt-2">
+          <div class="first-run-auth__otp-actions mt-2">
             <button type="button" class="btn btn--xs btn--quiet" data-email-otp-resend>إعادة إرسال الرمز</button>
             <button type="button" class="btn btn--xs btn--ghost" data-email-otp-change>العودة وتغيير البريد</button>
           </div>
         </div>
-        <a class="fs-xs" href="mailto:support@rakeezx.com">الدعم: support@rakeezx.com</a>
+        <a class="first-run-auth__support" href="mailto:support@rakeezx.com">الدعم: support@rakeezx.com</a>
       </form>
+      </div>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
@@ -911,17 +927,30 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
 function mountWorkspaceGate(routing) {
   const signedOut = routing.authState === 'signed_out' || !cloud.session || !cloud.user;
   render(app, html`
-    <div class="page" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
-      <div class="empty" role="status">
-        <div class="empty__icon">${icon('shield')}</div>
-        <div class="empty__title">${signedOut ? 'سجّل الدخول لفتح مساحة العمل' : 'مساحة العمل غير جاهزة على هذا الجهاز'}</div>
-        <div class="empty__text">${signedOut
-          ? 'بيانات الحساب المحفوظة على هذا الجهاز محمية، ولا تُفتح إلا بعد تسجيل الدخول بالحساب المرتبط.'
-          : 'لم يتم العثور على مساحة عمل محلية مرتبطة بهذا الحساب. لم تُفتح أو تُنشأ أي قاعدة بيانات.'}</div>
-        ${signedOut
-          ? html`<div class="stack stack-2"><button class="btn btn--primary" type="button" data-workspace-login>${icon('login')} تسجيل الدخول</button><button class="btn btn--ghost" type="button" data-workspace-demo>جرّب ركيز</button><div class="empty__text t-3">بيانات تجريبية محلية يمكنك إعادة ضبطها أو الخروج منها في أي وقت.</div></div>`
-          : html`<button class="btn btn--ghost" type="button" data-workspace-logout>تسجيل الخروج</button>`}
-      </div>
+    <div class="page ${signedOut ? 'first-run-page' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
+      ${signedOut ? html`
+        <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
+        <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
+        <main class="first-run-card first-run-welcome" aria-labelledby="first-run-title">
+          <div class="first-run-welcome__brand">${brandLockup()}</div>
+          <div class="first-run-welcome__copy">
+            <h1 id="first-run-title">رَكيزة المعلم الرقمية</h1>
+            <p>كل ما يحتاجه المعلم، في مكان واحد.</p>
+          </div>
+          <div class="first-run-welcome__actions">
+            <button class="btn btn--primary" type="button" data-workspace-login>ابدأ مع ركيز</button>
+            <button class="btn btn--ghost" type="button" data-workspace-demo>جرّب ركيز</button>
+          </div>
+          <p class="first-run-welcome__note">تسجيل الدخول مخصص للحسابات الحالية. التجربة محلية ويمكن إعادة ضبطها أو الخروج منها في أي وقت.</p>
+        </main>
+      ` : html`
+        <div class="empty" role="status">
+          <div class="empty__icon">${icon('shield')}</div>
+          <div class="empty__title">مساحة العمل غير جاهزة على هذا الجهاز</div>
+          <div class="empty__text">لم يتم العثور على مساحة عمل محلية مرتبطة بهذا الحساب. لم تُفتح أو تُنشأ أي قاعدة بيانات.</div>
+          <button class="btn btn--ghost" type="button" data-workspace-logout>تسجيل الخروج</button>
+        </div>
+      `}
     </div>
   `);
   app.querySelector('[data-workspace-login]')?.addEventListener('click', () => {

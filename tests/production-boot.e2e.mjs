@@ -48,8 +48,9 @@ async function verifyBoot(context, url) {
   const workspaceGate = page.locator('[data-workspace-gate]');
   await expect(workspaceGate).toHaveAttribute('data-workspace-code', 'WORKSPACE_NOT_READY');
   await expect(workspaceGate).toHaveAttribute('data-workspace-reason', 'workspace-not-provisioned');
-  await expect(workspaceGate.getByText('سجّل الدخول لفتح مساحة العمل', { exact: true })).toBeVisible();
-  await expect(workspaceGate.getByRole('button', { name: 'تسجيل الدخول' })).toBeVisible();
+  await expect(workspaceGate.getByRole('heading', { name: 'رَكيزة المعلم الرقمية', exact: true })).toBeVisible();
+  await expect(workspaceGate.getByText('كل ما يحتاجه المعلم، في مكان واحد.', { exact: true })).toBeVisible();
+  await expect(workspaceGate.getByRole('button', { name: 'ابدأ مع ركيز', exact: true })).toBeVisible();
   await expect(page.locator('.boot')).toHaveCount(0);
   expect(await page.evaluate(() => typeof window.store)).toBe('undefined');
   expect(failed).toEqual([]);

@@ -39,7 +39,7 @@ async function installRestoreCloud(page, { manifest, delayManifest = false } = {
   return () => release();
 }
 
-test('fresh Account A stays gated until actual CORE_V1 restore completes and then mounts A', async ({ page }) => {
+test('fresh Account A stays gated until actual CORE_V1 restore completes and then mounts A', async ({ page }, testInfo) => {
   await installAuth(page);
   const release = await installRestoreCloud(page, {
     manifest: [{ entity: 'profile', id: 'profile', revision: 7, deleted: false }],
@@ -48,10 +48,15 @@ test('fresh Account A stays gated until actual CORE_V1 restore completes and the
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/');
-  await expect(page.locator('[data-initial-restore-state="RESTORE_PREFLIGHT"]')).toBeVisible();
+  const preflight = page.locator('[data-initial-restore-state="RESTORE_PREFLIGHT"]');
+  await expect(preflight).toBeVisible();
+  await expect(preflight.locator('.first-run-card')).toBeVisible();
+  await expect(preflight.getByRole('heading', { name: 'جارٍ التحقق من بيانات حسابك' })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('first-run-restore-loading.png'), fullPage: true });
   expect(await page.evaluate(() => window.store?.state?.ready)).toBe(false);
   release();
-  await expect.poll(() => page.evaluate(() => window.store?.state?.ready), { timeout: 15_000 }).toBe(true);
+  await expect(page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  expect(await page.evaluate(() => window.store?.state?.ready)).toBe(true);
   expect(await page.evaluate(() => window.store.getActiveWorkspace())).toMatchObject({
     type: 'account', authUserId: OWNER, ownershipState: 'claimed', syncEligible: true,
   });
@@ -83,7 +88,11 @@ test('authoritative zero-row core manifest shows provisioning-required without e
   await installAuth(page);
   await installRestoreCloud(page, { manifest: [] });
   await page.goto('/#/');
-  await expect(page.locator('[data-initial-restore-state="PROVISIONING_REQUIRED"]')).toBeVisible();
+  const provisioning = page.locator('[data-initial-restore-state="PROVISIONING_REQUIRED"]');
+  await expect(provisioning).toBeVisible();
+  await expect(provisioning.getByRole('heading', { name: 'لا توجد مساحة عمل قابلة للاستعادة' })).toBeVisible();
+  await expect(provisioning.getByRole('button', { name: 'تسجيل الخروج' })).toBeVisible();
+  await expect(provisioning.getByRole('link', { name: 'الدعم' })).toHaveAttribute('href', 'mailto:support@rakeezx.com');
   expect(await page.evaluate(() => window.store?.state?.ready)).toBe(false);
   await expect(page.locator('.topbar__title')).toHaveCount(0);
 });
@@ -92,7 +101,11 @@ test('fresh offline account remains gated and cannot create an account workspace
   await installAuth(page);
   await page.addInitScript(() => Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false }));
   await page.goto('/#/');
-  await expect(page.locator('[data-initial-restore-state="RESTORE_REQUIRES_ONLINE"]')).toBeVisible();
+  const offline = page.locator('[data-initial-restore-state="RESTORE_REQUIRES_ONLINE"]');
+  await expect(offline).toBeVisible();
+  await expect(offline.getByRole('button', { name: 'إعادة المحاولة' })).toBeVisible();
+  await expect(offline.getByRole('button', { name: 'تسجيل الخروج' })).toBeVisible();
+  await expect(offline.getByRole('link', { name: 'الدعم' })).toBeVisible();
   expect(await page.evaluate(() => window.store?.state?.ready)).toBe(false);
   const databases = await page.evaluate(async () => (await indexedDB.databases()).map((entry) => entry.name));
   expect(databases.some((name) => name?.startsWith('rakeezx-user-'))).toBe(false);
