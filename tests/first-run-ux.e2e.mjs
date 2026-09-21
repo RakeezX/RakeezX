@@ -55,6 +55,7 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
   await expect(gate.getByText('كل ما يحتاجه المعلم، في مكان واحد.', { exact: true })).toBeVisible();
   await expect(gate.getByRole('button', { name: 'ابدأ مع ركيز', exact: true })).toBeVisible();
   await expect(gate.getByRole('button', { name: 'جرّب ركيز', exact: true })).toBeVisible();
+  await expect(gate.getByText('تسجيل الدخول مخصص للحسابات الحالية.', { exact: false })).toHaveCount(0);
   await expect(gate.locator('.first-run-orb--green')).toHaveCSS('background-color', 'rgba(36, 164, 105, 0.14)');
   await expect(gate.locator('.first-run-orb--blue')).toHaveCSS('background-color', 'rgba(56, 131, 205, 0.11)');
   expect((await new AxeBuilder({ page }).include('[data-workspace-gate]').analyze()).violations).toEqual([]);
@@ -96,6 +97,7 @@ test('primary action opens the existing account-only OTP contract and code treat
   const login = page.locator('.sheet-backdrop').last();
   await expect(login.getByRole('dialog')).toBeVisible();
   await expect(login.getByText('رَكيزة المعلم الرقمية', { exact: true })).toBeVisible();
+  await expect(login.getByText('أدخل بريدك الإلكتروني لإرسال رمز التحقق.', { exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-email-entry.png'), fullPage: true });
   await login.locator('input[name="email"]').fill(' Existing@Example.Test ');
   await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
@@ -104,6 +106,7 @@ test('primary action opens the existing account-only OTP contract and code treat
   await expect(login.locator('input[name="token"]')).toHaveAttribute('autocomplete', 'one-time-code');
   await expect(login.locator('[data-email-otp-resend]')).toBeDisabled();
   await expect(login.locator('[data-email-otp-resend]')).toContainText('إعادة الإرسال بعد');
+  await expect(login.getByRole('button', { name: 'تغيير الإيميل', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-otp.png'), fullPage: true });
   await context.close();
 });

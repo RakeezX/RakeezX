@@ -19,12 +19,12 @@ async function installAuth(page) {
 }
 
 async function installRestoreCloud(page, { manifest, delayManifest = false } = {}) {
-  let release;
-  const waiting = new Promise((resolve) => { release = resolve; });
+  let releaseManifest;
+  const manifestWaiting = new Promise((resolve) => { releaseManifest = resolve; });
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname.endsWith('/rpc/sync_v2_restore_manifest_full')) {
-      if (delayManifest) await waiting;
+      if (delayManifest) await manifestWaiting;
       return route.fulfill({ json: manifest });
     }
     if (url.pathname.endsWith('/profile')) {
@@ -36,14 +36,33 @@ async function installRestoreCloud(page, { manifest, delayManifest = false } = {
     }
     return route.fulfill({ json: [] });
   });
-  return () => release();
+  return releaseManifest;
 }
 
 test('fresh Account A stays gated until actual CORE_V1 restore completes and then mounts A', async ({ page }, testInfo) => {
   await installAuth(page);
-  const release = await installRestoreCloud(page, {
+  const releaseManifest = await installRestoreCloud(page, {
     manifest: [{ entity: 'profile', id: 'profile', revision: 7, deleted: false }],
     delayManifest: true,
+  });
+  await page.addInitScript(() => {
+    window.__restoreVisualTransitions = JSON.parse(sessionStorage.getItem('__restoreVisualTransitions') ?? '[]');
+    let firstCard = null;
+    const record = () => {
+      const root = document.querySelector('[data-initial-restore-state]');
+      const card = root?.querySelector('.first-run-card');
+      const state = root?.dataset.initialRestoreState;
+      if (!root || !card || window.__restoreVisualTransitions.some((entry) => entry.state === state)) return;
+      firstCard ||= card;
+      window.__restoreVisualTransitions.push({
+        state,
+        heading: root.querySelector('h1')?.textContent,
+        progress: root.querySelector('[data-restore-progress]')?.textContent,
+        sameCard: card === firstCard,
+      });
+      sessionStorage.setItem('__restoreVisualTransitions', JSON.stringify(window.__restoreVisualTransitions));
+    };
+    new MutationObserver(record).observe(document, { childList: true, subtree: true, attributes: true });
   });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -51,11 +70,18 @@ test('fresh Account A stays gated until actual CORE_V1 restore completes and the
   const preflight = page.locator('[data-initial-restore-state="RESTORE_PREFLIGHT"]');
   await expect(preflight).toBeVisible();
   await expect(preflight.locator('.first-run-card')).toBeVisible();
-  await expect(preflight.getByRole('heading', { name: 'جارٍ التحقق من بيانات حسابك' })).toBeVisible();
+  await expect(preflight.getByRole('heading', { name: 'جارٍ تجهيز مساحة حسابك' })).toBeVisible();
+  await expect(preflight.locator('[data-restore-progress]')).toHaveText('جارٍ التحقق من بيانات الحساب...');
   await page.screenshot({ path: testInfo.outputPath('first-run-restore-loading.png'), fullPage: true });
   expect(await page.evaluate(() => window.store?.state?.ready)).toBe(false);
-  release();
+  releaseManifest();
   await expect(page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  const transitions = await page.evaluate(() => window.__restoreVisualTransitions);
+  expect(transitions).toEqual(expect.arrayContaining([
+    expect.objectContaining({ state: 'RESTORE_PREFLIGHT', heading: 'جارٍ تجهيز مساحة حسابك', progress: 'جارٍ التحقق من بيانات الحساب...', sameCard: true }),
+    expect.objectContaining({ state: 'RESTORING', heading: 'جارٍ تجهيز مساحة حسابك', progress: 'جارٍ تجهيز مساحة العمل...', sameCard: true }),
+    expect.objectContaining({ state: 'RESTORE_FINALIZING', heading: 'جارٍ تجهيز مساحة حسابك', progress: 'أوشكنا على الانتهاء...', sameCard: true }),
+  ]));
   expect(await page.evaluate(() => window.store?.state?.ready)).toBe(true);
   expect(await page.evaluate(() => window.store.getActiveWorkspace())).toMatchObject({
     type: 'account', authUserId: OWNER, ownershipState: 'claimed', syncEligible: true,

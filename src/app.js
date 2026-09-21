@@ -670,9 +670,9 @@ async function boot() {
 }
 
 const INITIAL_RESTORE_COPY = Object.freeze({
-  RESTORE_PREFLIGHT: ['جارٍ التحقق من بيانات حسابك', 'يتم التحقق من النسخة السحابية الآمنة.'],
-  RESTORING: ['جارٍ استعادة بياناتك', 'يرجى إبقاء هذه الصفحة مفتوحة حتى تكتمل الاستعادة.'],
-  RESTORE_FINALIZING: ['جارٍ تجهيز مساحة العمل', 'اكتملت البيانات ويجري تجهيزها للاستخدام.'],
+  RESTORE_PREFLIGHT: ['جارٍ تجهيز مساحة حسابك', 'جارٍ التحقق من بيانات الحساب...'],
+  RESTORING: ['جارٍ تجهيز مساحة حسابك', 'جارٍ تجهيز مساحة العمل...'],
+  RESTORE_FINALIZING: ['جارٍ تجهيز مساحة حسابك', 'أوشكنا على الانتهاء...'],
   RESTORE_REQUIRES_ONLINE: ['تحتاج إلى اتصال بالإنترنت لاستعادة بيانات الحساب', 'اتصل بالإنترنت ثم أعد المحاولة.'],
   RESTORE_FAILED: ['تعذر استعادة بيانات الحساب', 'لم تُفتح مساحة عمل جزئية. يمكنك إعادة المحاولة بأمان.'],
   PROVISIONING_REQUIRED: ['لا توجد مساحة عمل قابلة للاستعادة', 'هذا الحساب لا يملك بعد مساحة عمل سحابية موجودة. لن ينشئ التطبيق سجلًا فارغًا تلقائيًا.'],
@@ -683,8 +683,14 @@ function renderInitialRestoreState(state, { error = null } = {}) {
   const actionable = ['RESTORE_REQUIRES_ONLINE', 'RESTORE_FAILED'].includes(state);
   const pending = ['RESTORE_PREFLIGHT', 'RESTORING', 'RESTORE_FINALIZING'].includes(state);
   const failed = state === 'RESTORE_FAILED';
+  const current = app.querySelector('[data-initial-restore-state][data-restore-pending="true"]');
+  if (pending && current) {
+    current.dataset.initialRestoreState = state;
+    current.querySelector('[data-restore-progress]').textContent = description;
+    return;
+  }
   render(app, html`
-    <div class="page first-run-page" data-initial-restore-state="${state}">
+    <div class="page first-run-page" data-initial-restore-state="${state}" data-restore-pending="${pending}">
       <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
       <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
       <div class="first-run-card first-run-status ${failed ? 'first-run-status--error' : ''}"
@@ -696,7 +702,7 @@ function renderInitialRestoreState(state, { error = null } = {}) {
         <div class="first-run-status__copy">
           <div class="first-run-eyebrow">مساحة حسابك</div>
           <h1>${title}</h1>
-          <p>${description}</p>
+          <p data-restore-progress>${description}</p>
         </div>
         ${error && import.meta.env?.DEV ? html`<div class="first-run-status__detail">${error.code ?? error.message}</div>` : ''}
         <div class="first-run-status__actions">
@@ -753,7 +759,7 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
   let cleanupLoginSheet = () => {};
   const loginSheet = openSheet({
     title: 'ابدأ مع ركيز',
-    desc: 'أدخل بريد حسابك الحالي لنرسل إليك رمز تحقق.',
+    desc: 'أدخل بريدك الإلكتروني لإرسال رمز التحقق.',
     body: html`
       <div class="first-run-auth">
       <div class="auth-brand">${brandLockup()}<p>رَكيزة المعلم الرقمية</p></div>
@@ -775,7 +781,7 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
           </div>
           <div class="first-run-auth__otp-actions mt-2">
             <button type="button" class="btn btn--xs btn--quiet" data-email-otp-resend>إعادة إرسال الرمز</button>
-            <button type="button" class="btn btn--xs btn--ghost" data-email-otp-change>العودة وتغيير البريد</button>
+            <button type="button" class="btn btn--xs btn--ghost" data-email-otp-change>تغيير الإيميل</button>
           </div>
         </div>
         <a class="first-run-auth__support" href="mailto:support@rakeezx.com">الدعم: support@rakeezx.com</a>
@@ -941,7 +947,6 @@ function mountWorkspaceGate(routing) {
             <button class="btn btn--primary" type="button" data-workspace-login>ابدأ مع ركيز</button>
             <button class="btn btn--ghost" type="button" data-workspace-demo>جرّب ركيز</button>
           </div>
-          <p class="first-run-welcome__note">تسجيل الدخول مخصص للحسابات الحالية. التجربة محلية ويمكن إعادة ضبطها أو الخروج منها في أي وقت.</p>
         </main>
       ` : html`
         <div class="empty" role="status">

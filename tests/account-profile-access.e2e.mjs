@@ -68,7 +68,7 @@ async function localOutboxCount(page) {
   }));
 }
 
-test('Settings exposes polished profile controls and read-only account information', async ({ page }) => {
+test('Settings exposes polished profile controls and read-only account information', async ({ page }, testInfo) => {
   const emailUpdates = [];
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: {
@@ -116,6 +116,24 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(page.locator('input[name="schoolName"]')).not.toHaveAttribute('required', '');
 
   const phone = page.locator('input[name="phone"]');
+  await page.screenshot({ path: testInfo.outputPath('settings-phone-10-digits.png'), fullPage: true });
+  await phone.evaluate((element) => element.setSelectionRange(0, 0));
+  await phone.pressSequentially('9');
+  await expect(phone).toHaveValue('0500000000');
+  await phone.evaluate((element) => element.setSelectionRange(5, 5));
+  await phone.pressSequentially('9');
+  await expect(phone).toHaveValue('0500000000');
+  await phone.evaluate((element) => element.setSelectionRange(2, 3));
+  await phone.pressSequentially('1');
+  await expect(phone).toHaveValue('0510000000');
+  await phone.evaluate((element) => element.setSelectionRange(3, 5));
+  await phone.pressSequentially('23');
+  await expect(phone).toHaveValue('0512300000');
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(page.url()).origin });
+  await page.evaluate(() => navigator.clipboard.writeText('0500000000123'));
+  await phone.evaluate((element) => element.setSelectionRange(4, 4));
+  await phone.press('Control+V');
+  await expect(phone).toHaveValue('0512300000');
   await phone.fill('abc٠٥١٢٣٤٥٦٧٨99');
   await expect(phone).toHaveValue('0512345678');
   await phone.fill('0412345678');

@@ -52,6 +52,26 @@ let activePwaGuide = null;
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
 let requestedEmailChange = '';
+let removePhoneInputGuards = () => {};
+
+function applyPhoneInsertion(input, rawText, event) {
+  const current = normalizeSaudiMobile(input.value);
+  const inserted = normalizeSaudiMobile(rawText);
+  const start = input.selectionStart ?? current.length;
+  const end = input.selectionEnd ?? start;
+  const next = `${current.slice(0, start)}${inserted}${current.slice(end)}`;
+  if (!inserted || next.length > 10) {
+    event.preventDefault();
+    return;
+  }
+  if (event.type === 'paste' || rawText !== inserted || input.value !== current) {
+    event.preventDefault();
+    input.value = next;
+    const caret = start + inserted.length;
+    input.setSelectionRange(caret, caret);
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: inserted }));
+  }
+}
 
 function emailChangeSheet(currentEmail) {
   return openSheet({
@@ -542,6 +562,23 @@ export default {
     `;
   },
 
+  afterPaint(root) {
+    removePhoneInputGuards();
+    const phone = root.querySelector('input[name="phone"]');
+    const beforeInput = (event) => {
+      if (!event.inputType?.startsWith('insert') || event.inputType === 'insertFromPaste' || event.data == null) return;
+      applyPhoneInsertion(phone, event.data, event);
+    };
+    const paste = (event) => applyPhoneInsertion(phone, event.clipboardData?.getData('text') ?? '', event);
+    phone?.addEventListener('beforeinput', beforeInput);
+    phone?.addEventListener('paste', paste);
+    removePhoneInputGuards = () => {
+      phone?.removeEventListener('beforeinput', beforeInput);
+      phone?.removeEventListener('paste', paste);
+      removePhoneInputGuards = () => {};
+    };
+  },
+
   onMount() {
     const request = ++accountContractRequest;
     accountContractUnavailable = false;
@@ -556,6 +593,7 @@ export default {
   },
 
   onUnmount() {
+    removePhoneInputGuards();
     accountContractRequest += 1;
   },
 

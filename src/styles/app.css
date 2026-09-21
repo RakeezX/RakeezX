@@ -874,7 +874,6 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .first-run-welcome__copy p { margin: 10px 0 0; color: var(--text-2); font-size: clamp(15px, 2.7vw, 17px); line-height: 1.7; }
 .first-run-welcome__actions { display: grid; align-self: end; gap: 10px; width: min(100%, 360px); }
 .first-run-welcome__actions .btn { min-height: 48px; font-weight: var(--fw-bold); }
-.first-run-welcome__note { align-self: end; max-width: 46ch; margin: var(--sp-4) 0 0; color: var(--text-3); font-size: 12px; line-height: 1.7; }
 .first-run-status { display: grid; justify-items: center; gap: var(--sp-4); min-height: min(470px, calc(100dvh - 48px)); text-align: center; }
 .first-run-status__brand { position: relative; z-index: 1; width: min(100%, 210px); }
 .first-run-status__spinner { width: 64px; height: 64px; border: 4px solid var(--brand-soft); border-block-start-color: var(--brand); border-radius: 50%; animation: spin .9s linear infinite; }
@@ -919,7 +918,6 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 @media (max-width: 340px) {
   .first-run-card { padding-inline: 17px; }
   .first-run-welcome__brand { width: min(100%, 226px); }
-  .first-run-welcome__note { font-size: 11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
