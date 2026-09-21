@@ -4,6 +4,7 @@ export const PROFILE_STATUS = Object.freeze({ PENDING: 'PENDING_PROFILE', READY:
 export const TEACHER_FORM = Object.freeze({ MASCULINE: 'masculine', FEMININE: 'feminine' });
 export const BETA_ACCESS_LABEL = 'الوصول التجريبي المجاني';
 export const SAUDI_MOBILE_PATTERN = /^05[0-9]{8}$/;
+export const AUTH_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 let cachedContract = null;
 
@@ -30,6 +31,21 @@ export function normalizeSaudiMobile(value) {
     .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
     .replace(/[^0-9]/g, '')
     .slice(0, 10);
+}
+
+export function normalizeAuthEmail(value) {
+  return String(value ?? '').trim().toLowerCase();
+}
+
+export function validateAuthEmailChange(value, currentEmail) {
+  const email = normalizeAuthEmail(value);
+  if (!email || email.length > 254 || !AUTH_EMAIL_PATTERN.test(email)) {
+    return Object.freeze({ valid: false, code: 'INVALID_EMAIL', email });
+  }
+  if (email === normalizeAuthEmail(currentEmail)) {
+    return Object.freeze({ valid: false, code: 'EMAIL_UNCHANGED', email });
+  }
+  return Object.freeze({ valid: true, code: null, email });
 }
 
 export function isValidSaudiMobile(value) {

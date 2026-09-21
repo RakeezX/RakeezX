@@ -243,6 +243,29 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   });
 }
 
+/**
+ * Request an Auth-authoritative email change. With Secure Email Change enabled,
+ * Supabase keeps the current email authoritative until both confirmations finish.
+ */
+export async function updateCurrentUserEmail(email) {
+  await ensureFreshSession();
+  if (!session?.access_token || !user?.id) throw authError('Authentication required');
+  const expectedOwnerId = String(user.id).trim().toLowerCase();
+  const updated = await request('/user', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  }, true);
+  const actualOwnerId = String(updated?.id ?? '').trim().toLowerCase();
+  if (actualOwnerId !== expectedOwnerId) {
+    throw Object.assign(new Error('Updated Auth user does not match the active workspace owner'), {
+      code: 'AUTH_OWNER_MISMATCH', expectedOwnerId, verifiedOwnerId: actualOwnerId || null,
+    });
+  }
+  saveSession({ ...session, user: { ...user, ...updated, id: expectedOwnerId } });
+  return user;
+}
+
 export async function signOut() {
   if (session?.access_token) {
     try {

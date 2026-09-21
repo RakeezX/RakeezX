@@ -4643,28 +4643,31 @@
   width: 100%;
 }
 
-.settings-phone-row > .field {
-  grid-column: 1;
-}
-
-.settings-account-summary {
-  grid-column: 1 / -1;
-  overflow: hidden;
-  border-block: 1px solid var(--border);
-}
-
-.settings-account-summary__row {
+.settings-email-line,
+.settings-access-summary {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--sp-3);
-  min-height: 48px;
-  padding-block: var(--sp-2);
 }
 
-.settings-account-summary__row + .settings-account-summary__row {
-  border-top: 1px solid var(--border);
+.settings-email-line {
+  min-height: 44px;
+}
+
+.settings-email-edit {
+  min-height: 32px;
+  padding: 4px 10px;
+}
+
+.settings-email-pending {
+  color: var(--info);
+}
+
+.settings-access-summary {
+  grid-column: 1 / -1;
+  min-height: 36px;
 }
 
 .settings-account-summary__label {
@@ -4678,14 +4681,6 @@
   overflow-wrap: anywhere;
   color: var(--text-2);
   font-size: 14px;
-}
-
-@media (max-width: 520px) {
-  .settings-account-summary__row {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
-  }
 }
 
 .settings-preference-surface {

@@ -14,7 +14,7 @@ import { hasValidYearCalendarConfig } from './calendar.js';
 import { resolvedReportPrincipalName } from '../lib/report-print.js';
 import {
   BETA_ACCESS_LABEL, currentAccountContract, getAccountPresentation, isValidSaudiMobile, normalizeSaudiMobile,
-  refreshAccountContract,
+  refreshAccountContract, validateAuthEmailChange,
 } from '../lib/account-profile.js';
 
 const THEMES = [
@@ -51,6 +51,44 @@ function isStandaloneMode() {
 let activePwaGuide = null;
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
+let requestedEmailChange = '';
+
+function emailChangeSheet(currentEmail) {
+  return openSheet({
+    title: 'تغيير البريد الإلكتروني',
+    desc: 'سيبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد من البريدين الحالي والجديد.',
+    body: html`
+      <form id="email-change-form" class="stack stack-3" novalidate>
+        <label class="field" style="margin-bottom:0">
+          <span class="field__label">البريد الإلكتروني الجديد</span>
+          <input class="input" name="newEmail" type="email" maxlength="254" autocomplete="email"
+                 inputmode="email" dir="ltr" required autofocus>
+        </label>
+        <div class="field__error" role="alert" data-email-change-error hidden></div>
+      </form>
+    `,
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" type="submit" form="email-change-form">تأكيد التغيير</button>
+    `,
+    onMount: (root, done) => root.querySelector('#email-change-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = event.currentTarget.elements.newEmail;
+      const result = validateAuthEmailChange(input.value, currentEmail);
+      const error = root.querySelector('[data-email-change-error]');
+      if (!result.valid) {
+        error.textContent = result.code === 'EMAIL_UNCHANGED'
+          ? 'أدخل بريدًا مختلفًا عن البريد الحالي.'
+          : 'أدخل بريدًا إلكترونيًا صالحًا.';
+        error.hidden = false;
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+        return;
+      }
+      done(result.email);
+    }),
+  });
+}
 
 const PWA_PLATFORMS = [
   { id: 'ios',     label: 'iPhone / iPad' },
@@ -282,6 +320,8 @@ export default {
     const activeT = store.activeTerm();
     const accountContract = currentAccountContract();
     const accountEmail = accountContract?.email ?? cloud.user?.email ?? '';
+    const pendingEmail = String(cloud.user?.new_email ?? requestedEmailChange ?? '').trim().toLowerCase();
+    const emailChangePending = Boolean(pendingEmail && pendingEmail !== String(accountEmail).trim().toLowerCase());
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
     const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
@@ -323,7 +363,7 @@ export default {
                        data-change="save" placeholder="${presentation.schoolPrincipalLabel} للتقارير">
               </label>
             </div>
-            <div class="field-row settings-phone-row">
+            <div class="field-row settings-contact-row">
               <label class="field">
                 <span class="field__label">رقم الجوال</span>
                 <input class="input" name="phone" value="${m.phone ?? ''}" required
@@ -332,16 +372,18 @@ export default {
                        aria-describedby="settings-phone-hint">
                 <span class="field__hint" id="settings-phone-hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span>
               </label>
+              <div class="field settings-email-field">
+                <span class="field__label">البريد الإلكتروني</span>
+                <div class="settings-email-line">
+                  <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
+                  ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email">تعديل</button>` : ''}
+                </div>
+                ${emailChangePending ? html`<span class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد</span>` : ''}
+              </div>
             </div>
-            <div class="settings-account-summary" aria-label="معلومات الحساب">
-              <div class="settings-account-summary__row">
-                <span class="settings-account-summary__label">البريد الإلكتروني</span>
-                <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
-              </div>
-              <div class="settings-account-summary__row">
-                <span class="settings-account-summary__label">الوصول</span>
-                <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
-              </div>
+            <div class="settings-access-summary" aria-label="معلومات الوصول">
+              <span class="settings-account-summary__label">الوصول</span>
+              <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
             </div>
           </form>
         </div>
@@ -510,6 +552,25 @@ export default {
       if (await store.patchProfile({ teacherForm })) {
         toast('حُفظ');
         repaint();
+      }
+    },
+
+    async 'change-email'() {
+      const currentEmail = currentAccountContract()?.email ?? cloud.user?.email ?? '';
+      if (!currentEmail || !cloud.user?.id) return;
+      const nextEmail = await emailChangeSheet(currentEmail);
+      if (!nextEmail) return;
+      const ownerId = cloud.user.id;
+      try {
+        const updated = await cloud.updateCurrentUserEmail(nextEmail);
+        if (updated.id !== ownerId) {
+          throw Object.assign(new Error('Auth owner changed unexpectedly'), { code: 'AUTH_OWNER_MISMATCH' });
+        }
+        requestedEmailChange = updated.new_email || nextEmail;
+        toast('طلب تغيير البريد قيد التأكيد', 'info');
+        repaint();
+      } catch (error) {
+        toast(error?.message || 'تعذر طلب تغيير البريد الإلكتروني', 'danger');
       }
     },
 

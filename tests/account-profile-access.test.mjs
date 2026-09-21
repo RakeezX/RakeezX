@@ -8,9 +8,11 @@ import {
   getAccountPresentation,
   isValidSaudiMobile,
   normalizeAccountContract,
+  normalizeAuthEmail,
   normalizeSaudiMobile,
   provisionAccount,
   teacherAddress,
+  validateAuthEmailChange,
   validateProfileCompletion,
 } from '../src/lib/account-profile.js';
 import { prePrintConfirmationSheet, reportHeader, reportSignatures } from '../src/lib/report-print.js';
@@ -90,6 +92,19 @@ test('Saudi mobile normalization keeps ten digits and rejects invalid values', (
   assert.equal(isValidSaudiMobile('0412345678'), false);
   assert.equal(isValidSaudiMobile('05letters12'), false);
   assert.deepEqual(validateProfileCompletion({ teacherName: 'معلم', phone: '0412345678' }).invalid, ['phone']);
+});
+
+test('Auth email change validation normalizes safely and rejects invalid or unchanged values', () => {
+  assert.equal(normalizeAuthEmail('  NEW.Teacher@Example.TEST  '), 'new.teacher@example.test');
+  assert.deepEqual(validateAuthEmailChange('not-an-email', 'teacher@example.test'), {
+    valid: false, code: 'INVALID_EMAIL', email: 'not-an-email',
+  });
+  assert.deepEqual(validateAuthEmailChange(' TEACHER@example.test ', 'teacher@example.test'), {
+    valid: false, code: 'EMAIL_UNCHANGED', email: 'teacher@example.test',
+  });
+  assert.deepEqual(validateAuthEmailChange('new@example.test', 'teacher@example.test'), {
+    valid: true, code: null, email: 'new@example.test',
+  });
 });
 
 test('provisioning is delegated to the fixed server contract and normalizes beta access', async () => {

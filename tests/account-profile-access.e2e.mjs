@@ -55,14 +55,32 @@ async function seedClaimedWorkspace(page) {
   await page.unroute('**/__account_profile_fixture__');
 }
 
+async function localOutboxCount(page) {
+  return page.evaluate(() => new Promise((resolve, reject) => {
+    const open = indexedDB.open('rakeezx');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const database = open.result;
+      const request = database.transaction('outbox', 'readonly').objectStore('outbox').count();
+      request.onsuccess = () => { database.close(); resolve(request.result); };
+      request.onerror = () => { database.close(); reject(request.error); };
+    };
+  }));
+}
+
 test('Settings exposes polished profile controls and read-only account information', async ({ page }) => {
+  const emailUpdates = [];
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: {
     ownerId: OWNER, profileStatus: 'READY',
     profile: { teacherName: 'معلمة الاختبار', phone: '0500000000', teacherForm: 'feminine', schoolName: '' },
     access: { grantType: 'beta_full', status: 'active', source: 'public_beta', expiresAt: null },
   } }));
-  await page.route(`${SUPABASE_URL}/auth/v1/user`, (route) => route.fulfill({ json: SESSION.user }));
+  await page.route(`${SUPABASE_URL}/auth/v1/user`, async (route) => {
+    if (route.request().method() !== 'PUT') return route.fulfill({ json: SESSION.user });
+    emailUpdates.push({ body: route.request().postDataJSON(), authorization: route.request().headers().authorization });
+    return route.fulfill({ json: { ...SESSION.user, new_email: route.request().postDataJSON().email } });
+  });
   await seedClaimedWorkspace(page);
   await page.goto('/#/settings');
   await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلمة الاختبار');
@@ -71,17 +89,26 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(page.getByText('اسم المدرسة', { exact: false })).toBeVisible();
   await expect(page.getByText('صفة المستخدم', { exact: true })).toBeVisible();
   await expect(page.getByText('تظهر على التقارير والكشوف التي تطبعها.', { exact: false })).toHaveCount(0);
+  const profileRows = page.locator('.settings-identity-form > .field-row');
+  await expect(profileRows).toHaveCount(3);
+  await expect(profileRows.nth(0)).toContainText('اسم المعلمة');
+  await expect(profileRows.nth(0)).toContainText('صفة المستخدم');
+  await expect(profileRows.nth(1)).toContainText('اسم المدرسة');
+  await expect(profileRows.nth(1)).toContainText('اسم المديرة');
+  await expect(profileRows.nth(2)).toContainText('رقم الجوال');
+  await expect(profileRows.nth(2)).toContainText('البريد الإلكتروني');
   await expect(page.locator('input[name="phone"]')).toHaveValue('0500000000');
   await expect(page.getByRole('button', { name: 'معلمة', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('input[type="email"]')).toHaveCount(0);
   await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
-  await expect(page.locator('[data-account-email]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]')).toContainText('البريد الإلكتروني');
+  await expect(page.locator('[data-account-email]').locator('xpath=ancestor::*[contains(@class,"settings-email-field")]')).toContainText('البريد الإلكتروني');
   await expect(page.getByText('الوصول التجريبي المجاني', { exact: true })).toBeVisible();
   await expect(page.locator('[data-account-access]')).toHaveClass(/badge/);
   await expect(page.locator('[data-account-access]')).not.toHaveClass(/input/);
-  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]')).toContainText('الوصول');
-  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]').locator('input, button')).toHaveCount(0);
+  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-access-summary")]')).toContainText('الوصول');
+  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-access-summary")]').locator('input, button')).toHaveCount(0);
+  await expect(page.locator('.settings-account-summary')).toHaveCount(0);
   await expect(page.getByText(/تؤثر في صيغة المخاطبة|صيغة المخاطبة الحالية/)).toHaveCount(0);
   await expect(page.locator('input[name="phone"]')).toHaveAttribute('required', '');
   await expect(page.locator('input[name="phone"]')).toHaveAttribute('pattern', '05[0-9]{8}');
@@ -97,6 +124,47 @@ test('Settings exposes polished profile controls and read-only account informati
   await page.reload();
   await expect(phone).toHaveValue('0500000000');
 
+  const beforeEmailChange = await page.evaluate(async () => ({
+    ownerId: window.store.getActiveWorkspace().authUserId,
+    databaseName: window.store.getActiveWorkspace().databaseName,
+    profile: { ...window.store.state.profile },
+    databaseNames: (await indexedDB.databases()).map(({ name }) => name).sort(),
+  }));
+  const beforeOutboxCount = await localOutboxCount(page);
+  await page.getByRole('button', { name: 'تعديل', exact: true }).click();
+  const emailDialog = page.getByRole('dialog', { name: 'تغيير البريد الإلكتروني' });
+  await expect(emailDialog).toBeVisible();
+  const newEmail = emailDialog.locator('input[name="newEmail"]');
+  await newEmail.fill('invalid');
+  await emailDialog.getByRole('button', { name: 'تأكيد التغيير' }).click();
+  await expect(emailDialog.getByRole('alert')).toHaveText('أدخل بريدًا إلكترونيًا صالحًا.');
+  expect(emailUpdates).toHaveLength(0);
+  await newEmail.fill('TEACHER@example.test');
+  await emailDialog.getByRole('button', { name: 'تأكيد التغيير' }).click();
+  await expect(emailDialog.getByRole('alert')).toHaveText('أدخل بريدًا مختلفًا عن البريد الحالي.');
+  expect(emailUpdates).toHaveLength(0);
+  await newEmail.fill(' NEW-TEACHER@EXAMPLE.TEST ');
+  await emailDialog.getByRole('button', { name: 'تأكيد التغيير' }).click();
+  await expect(emailDialog).toHaveCount(0);
+  await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
+  await expect(page.locator('[data-email-change-pending]')).toHaveText('طلب تغيير البريد قيد التأكيد');
+  expect(emailUpdates).toEqual([{ body: { email: 'new-teacher@example.test' }, authorization: `Bearer ${SESSION.access_token}` }]);
+  const afterEmailChange = await page.evaluate(async (authKey) => ({
+    ownerId: window.store.getActiveWorkspace().authUserId,
+    databaseName: window.store.getActiveWorkspace().databaseName,
+    profile: { ...window.store.state.profile },
+    authOwnerId: JSON.parse(localStorage.getItem(authKey)).user.id,
+    databaseNames: (await indexedDB.databases()).map(({ name }) => name).sort(),
+  }), AUTH_STORAGE_KEY);
+  const afterOutboxCount = await localOutboxCount(page);
+  expect(afterEmailChange.ownerId).toBe(beforeEmailChange.ownerId);
+  expect(afterEmailChange.authOwnerId).toBe(OWNER);
+  expect(afterEmailChange.databaseName).toBe(beforeEmailChange.databaseName);
+  expect(afterEmailChange.databaseNames).toEqual(beforeEmailChange.databaseNames);
+  expect(afterOutboxCount).toBe(beforeOutboxCount);
+  expect(afterEmailChange.profile.email).toBeUndefined();
+  expect(afterEmailChange.profile).toEqual(beforeEmailChange.profile);
+
   await page.getByRole('button', { name: 'معلم', exact: true }).click();
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('اسم المعلم', { exact: true })).toBeVisible();
@@ -106,4 +174,6 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(page.locator('[data-account-access]')).toHaveText('الوصول التجريبي المجاني');
   await page.reload();
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
+  await expect(page.locator('[data-email-change-pending]')).toHaveText('طلب تغيير البريد قيد التأكيد');
 });
