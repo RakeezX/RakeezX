@@ -7,7 +7,8 @@ import {
 } from '../models.js';
 
 export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
-export const DEMO_SEED_ID = 'demo:workspace-seed-v2';
+export const DEMO_SEED_ID = 'demo:workspace-seed-v3';
+const PREVIOUS_DEMO_SEED_ID = 'demo:workspace-seed-v2';
 const FIXED_TIME = Date.parse('2026-09-01T06:00:00.000Z');
 const CLASS_PLAN = Object.freeze([
   { grade: 4, label: '1', students: 23, slots: [[0, 1], [2, 3]] },
@@ -15,7 +16,11 @@ const CLASS_PLAN = Object.freeze([
   { grade: 5, label: '1', students: 21, slots: [[1, 1], [4, 3]] },
   { grade: 5, label: '2', students: 24, slots: [[1, 2], [2, 4]] },
   { grade: 6, label: '1', students: 22, slots: [[3, 1], [4, 2]] },
+  { grade: 4, label: '3', students: 23, slots: [[0, 3], [4, 1]] },
+  { grade: 5, label: '3', students: 21, slots: [[1, 3], [3, 2]] },
+  { grade: 6, label: '2', students: 25, slots: [[2, 1], [4, 4]] },
 ]);
+const CLASS_COLORS = Object.freeze(['#0f766e', '#2563eb', '#7c3aed', '#d97706', '#be123c', '#0891b2', '#4f46e5', '#65a30d']);
 const FIRST_NAMES = Object.freeze([
   'أحمد', 'محمد', 'عبدالله', 'سلمان', 'خالد', 'تركي', 'فيصل', 'ناصر', 'سعد', 'عمر', 'زياد', 'مازن',
   'راكان', 'عبدالعزيز', 'يوسف', 'إبراهيم', 'صالح', 'حمد', 'بدر', 'فهد', 'وليد', 'أنس', 'معاذ', 'ياسر',
@@ -57,7 +62,7 @@ export function createDemoDataset() {
   const sections = CLASS_PLAN.map((plan, index) => makeSection({
     id: `demo:section:${index + 1}`, yearId: year.id, grade: plan.grade,
     label: plan.label, name: `${plan.grade}/${plan.label}`,
-    order: index, color: ['#0f766e', '#2563eb', '#7c3aed', '#d97706', '#be123c'][index], updatedAt: FIXED_TIME,
+    order: index, color: CLASS_COLORS[index], updatedAt: FIXED_TIME,
   }));
   const teachings = sections.map((section, index) => makeTeaching({
     id: `demo:teaching:${index + 1}`, sectionId: section.id, subjectId: subject.id, termId: term.id,
@@ -140,7 +145,7 @@ export function createDemoDataset() {
   return {
     profile: [record({ id: 'profile', teacherName: 'معلم ركيز', schoolName: 'مدرسة ركيز التجريبية', phone: '', teacherForm: 'masculine', reportPrincipalName: 'مدير المدرسة', principalName: 'مدير المدرسة', activeTimeProfileId: timeProfile.id })],
     device: [record({ id: 'device', deviceId: 'demo-device', theme: 'light', activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: timeProfile.id, reportPrincipalName: 'مدير المدرسة', lastSyncAt: null, schemaVersion: 7 })],
-    meta: [record({ id: DEMO_SEED_ID, version: 2, seededAt: FIXED_TIME })],
+    meta: [record({ id: DEMO_SEED_ID, version: 3, seededAt: FIXED_TIME })],
     years: [year], terms: [term, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
     items, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
     units: [], lessons: [], timeProfiles, notes, classRules, classGoals, classCharterSelections,
@@ -152,6 +157,17 @@ export async function seedDemoWorkspace({ force = false } = {}) {
   if (db.getActiveDatabaseName() !== 'rakeezx-demo') throw new Error('Demo seed requires the isolated demo database');
   if (!force && await db.get('meta', DEMO_SEED_ID)) return { seeded: false };
   const snapshot = createDemoDataset();
+  if (!force && await db.get('meta', PREVIOUS_DEMO_SEED_ID)) {
+    const additions = {};
+    for (const [storeName, rows] of Object.entries(snapshot)) {
+      if (!rows.length) continue;
+      const existingIds = new Set((await db.getAll(storeName)).map((row) => row.id));
+      const missing = rows.filter((row) => !existingIds.has(row.id));
+      if (missing.length) additions[storeName] = missing;
+    }
+    if (Object.keys(additions).length) await db.putAcross(additions);
+    return { seeded: false, upgraded: true, students: snapshot.students.length, sections: snapshot.sections.length };
+  }
   await db.writeAll(snapshot, 'replace');
   return { seeded: true, students: snapshot.students.length, sections: snapshot.sections.length };
 }

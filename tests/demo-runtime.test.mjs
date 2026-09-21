@@ -28,10 +28,10 @@ test('deterministic demo dataset is substantial, isolated, and excludes deferred
   const first = createDemoDataset();
   const second = createDemoDataset();
   assert.deepEqual(first, second);
-  assert.equal(first.sections.length, 5);
-  assert.equal(first.students.length, 115);
-  assert.equal(first.enrollments.length, 115);
-  assert.equal(first.teachings.length, 5);
+  assert.equal(first.sections.length, 8);
+  assert.equal(first.students.length, 184);
+  assert.equal(first.enrollments.length, 184);
+  assert.equal(first.teachings.length, 8);
   assert.ok(first.attendance.length >= 200);
   assert.ok(first.scores.length >= 400);
   assert.ok(first.logs.length >= 25);
@@ -61,6 +61,9 @@ test('demo roster, naming, timetable, and canonical timing profiles are realisti
     dataset.enrollments.filter((enrollment) => enrollment.sectionId === section.id),
   ]));
 
+  assert.deepEqual(dataset.sections.map((section) => `${section.grade}:${section.label}`).sort(), [
+    '4:1', '4:2', '4:3', '5:1', '5:2', '5:3', '6:1', '6:2',
+  ]);
   assert.equal(new Set(dataset.students.map((student) => student.name)).size, dataset.students.length);
   for (const section of dataset.sections) {
     assert.match(section.label, /^\d+$/);
@@ -74,6 +77,7 @@ test('demo roster, naming, timetable, and canonical timing profiles are realisti
   }
 
   const occupied = new Set();
+  const weekdayLoads = new Map();
   for (const teaching of dataset.teachings) {
     const teachingSlots = dataset.slots.filter((slot) => slot.teachingId === teaching.id);
     assert.equal(teachingSlots.length, 2);
@@ -81,8 +85,11 @@ test('demo roster, naming, timetable, and canonical timing profiles are realisti
       const key = `${slot.weekday}:${slot.period}`;
       assert.equal(occupied.has(key), false, `teacher schedule collision at ${key}`);
       occupied.add(key);
+      weekdayLoads.set(slot.weekday, (weekdayLoads.get(slot.weekday) ?? 0) + 1);
     }
   }
+  assert.equal(dataset.slots.length, 16);
+  assert.deepEqual([...weekdayLoads.entries()].sort(([a], [b]) => a - b), [[0, 3], [1, 3], [2, 3], [3, 3], [4, 4]]);
 
   assert.deepEqual(dataset.timeProfiles.map(({ id, name, periods, overrides }) => ({ id, name, periods, overrides })), DEFAULT_TIME_PROFILES);
   assert.equal(dataset.timeProfiles.some((profile) => /تجريبي|demo/i.test(profile.name)), false);
@@ -100,6 +107,23 @@ test('demo roster, naming, timetable, and canonical timing profiles are realisti
   for (const attendance of dataset.attendance) {
     assert.ok(studentIds.has(attendance.studentId));
     assert.ok(sessionIds.has(attendance.sessionId));
+  }
+  for (const snapshot of dataset.sessionRosterSnapshots) {
+    assert.ok(sessionIds.has(snapshot.sessionId));
+    assert.ok(teachingIds.has(snapshot.teachingId));
+    for (const member of snapshot.members) {
+      assert.ok(studentIds.has(member.studentId));
+      assert.ok(dataset.enrollments.some((enrollment) => enrollment.id === member.enrollmentId && enrollment.studentId === member.studentId));
+    }
+  }
+  for (const note of dataset.notes) {
+    assert.ok(studentIds.has(note.studentId));
+    assert.ok(teachingIds.has(note.teachingId));
+  }
+  for (const log of dataset.logs) {
+    assert.ok(studentIds.has(log.studentId));
+    assert.ok(teachingIds.has(log.teachingId));
+    assert.ok(sessionIds.has(log.sessionId));
   }
   for (const score of dataset.scores) {
     assert.ok(studentIds.has(score.studentId));

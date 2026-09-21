@@ -71,16 +71,17 @@ test.describe('isolated Demo runtime', () => {
     await expect(page.locator('.home-sessions')).toBeVisible();
 
     const first = await todayState(page, monday);
-    expect(first.sessions).toHaveLength(2);
+    expect(first.sessions).toHaveLength(3);
     expect(first.outbox).toBe(0);
-    expect(new Set(first.sessions.map((session) => session.id)).size).toBe(2);
+    expect(new Set(first.sessions.map((session) => session.id)).size).toBe(3);
     expect(first.sessions.every((session) => session.teachingId && session.slotId)).toBe(true);
-    expect(first.slots).toHaveLength(10);
-    expect(first.slots.reduce((counts, slot) => counts.set(slot.weekday, (counts.get(slot.weekday) ?? 0) + 1), new Map())).toEqual(new Map([[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]]));
+    expect(first.slots).toHaveLength(16);
+    expect(first.slots.reduce((counts, slot) => counts.set(slot.weekday, (counts.get(slot.weekday) ?? 0) + 1), new Map())).toEqual(new Map([[0, 3], [1, 3], [2, 3], [3, 3], [4, 4]]));
     expect(first.slots.reduce((counts, slot) => counts.set(slot.teachingId, (counts.get(slot.teachingId) ?? 0) + 1), new Map())).toEqual(new Map([
-      ['demo:teaching:1', 2], ['demo:teaching:2', 2], ['demo:teaching:3', 2], ['demo:teaching:4', 2], ['demo:teaching:5', 2],
+      ['demo:teaching:1', 2], ['demo:teaching:2', 2], ['demo:teaching:3', 2], ['demo:teaching:4', 2],
+      ['demo:teaching:5', 2], ['demo:teaching:6', 2], ['demo:teaching:7', 2], ['demo:teaching:8', 2],
     ]));
-    expect(new Set(first.slots.map((slot) => `${slot.weekday}:${slot.period}`)).size).toBe(10);
+    expect(new Set(first.slots.map((slot) => `${slot.weekday}:${slot.period}`)).size).toBe(16);
 
     await page.reload();
     await expect(page.locator('[data-demo-indicator]')).toBeVisible();
@@ -106,7 +107,7 @@ test.describe('isolated Demo runtime', () => {
       expect((await todayState(page, date)).sessions).toHaveLength(expected);
       await context.close();
     };
-    await verifyDate('2026-09-22', 2);
+    await verifyDate('2026-09-22', 3);
     await verifyDate('2026-09-25', 0);
   });
 
@@ -127,7 +128,7 @@ test.describe('isolated Demo runtime', () => {
       database.close();
       return result;
     });
-    expect(initial).toEqual({ students: 115, sections: 5, outbox: 0 });
+    expect(initial).toEqual({ students: 184, sections: 8, outbox: 0 });
 
     await page.goto('/#/settings');
     await expect(page.locator('[data-demo-settings]')).toBeVisible();
@@ -185,15 +186,16 @@ test.describe('isolated Demo runtime', () => {
   test('realistic roster, numeric sections, two-period schedule, and standard timing profiles render in Product pages', async ({ page }) => {
     await page.goto('/');
     await enterDemo(page);
-    await expect(page.getByText('5 فصلاً هذا الفصل', { exact: true })).toBeVisible();
+    await expect(page.getByText('8 فصلاً هذا الفصل', { exact: true })).toBeVisible();
 
     await page.goto('/#/classes');
-    await expect(page.locator('.class-card')).toHaveCount(5);
+    await expect(page.locator('.class-card')).toHaveCount(8);
     await expect(page.locator('.class-card__title')).toHaveText([
       'الرابع الابتدائي / 1', 'الرابع الابتدائي / 2', 'الخامس الابتدائي / 1',
-      'الخامس الابتدائي / 2', 'السادس الابتدائي / 1',
+      'الخامس الابتدائي / 2', 'السادس الابتدائي / 1', 'الرابع الابتدائي / 3',
+      'الخامس الابتدائي / 3', 'السادس الابتدائي / 2',
     ]);
-    await expect(page.locator('.class-card__count')).toHaveText(['23 طالبًا', '25 طالبًا', '21 طالبًا', '24 طالبًا', '22 طالبًا']);
+    await expect(page.locator('.class-card__count')).toHaveText(['23 طالبًا', '25 طالبًا', '21 طالبًا', '24 طالبًا', '22 طالبًا', '23 طالبًا', '21 طالبًا', '25 طالبًا']);
 
     await page.goto('/#/teaching/demo:teaching:1/students');
     await expect(page.locator('.roster-row')).toHaveCount(23);
@@ -202,7 +204,7 @@ test.describe('isolated Demo runtime', () => {
     expect(new Set(names.map((name) => name.split(' ').at(-1))).size).toBeGreaterThanOrEqual(15);
 
     await page.goto('/#/schedule');
-    await expect(page.locator('.slot')).toHaveCount(10);
+    await expect(page.locator('.slot')).toHaveCount(16);
 
     await page.goto('/#/schedule/times');
     await expect(page.locator('.timing-profile-card__name')).toHaveText([
