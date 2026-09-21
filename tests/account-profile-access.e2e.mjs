@@ -66,14 +66,22 @@ test('Settings exposes polished profile controls and read-only account informati
   await seedClaimedWorkspace(page);
   await page.goto('/#/settings');
   await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلمة الاختبار');
+  await expect(page.getByText('اسم المعلمة', { exact: true })).toBeVisible();
+  await expect(page.getByText(/اسم المديرة/, { exact: false })).toBeVisible();
+  await expect(page.getByText('اسم المدرسة', { exact: false })).toBeVisible();
+  await expect(page.getByText('صفة المستخدم', { exact: true })).toBeVisible();
+  await expect(page.getByText('تظهر على التقارير والكشوف التي تطبعها.', { exact: false })).toHaveCount(0);
   await expect(page.locator('input[name="phone"]')).toHaveValue('0500000000');
   await expect(page.getByRole('button', { name: 'معلمة', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('input[type="email"]')).toHaveCount(0);
   await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
+  await expect(page.locator('[data-account-email]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]')).toContainText('البريد الإلكتروني');
   await expect(page.getByText('الوصول التجريبي المجاني', { exact: true })).toBeVisible();
   await expect(page.locator('[data-account-access]')).toHaveClass(/badge/);
   await expect(page.locator('[data-account-access]')).not.toHaveClass(/input/);
+  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]')).toContainText('الوصول');
+  await expect(page.locator('[data-account-access]').locator('xpath=ancestor::*[contains(@class,"settings-account-summary__row")]').locator('input, button')).toHaveCount(0);
   await expect(page.getByText(/تؤثر في صيغة المخاطبة|صيغة المخاطبة الحالية/)).toHaveCount(0);
   await expect(page.locator('input[name="phone"]')).toHaveAttribute('required', '');
   await expect(page.locator('input[name="phone"]')).toHaveAttribute('pattern', '05[0-9]{8}');
@@ -91,6 +99,11 @@ test('Settings exposes polished profile controls and read-only account informati
 
   await page.getByRole('button', { name: 'معلم', exact: true }).click();
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('اسم المعلم', { exact: true })).toBeVisible();
+  await expect(page.getByText(/اسم المدير/, { exact: false })).toBeVisible();
+  await expect(page.getByText('اسم المدرسة', { exact: false })).toBeVisible();
+  await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
+  await expect(page.locator('[data-account-access]')).toHaveText('الوصول التجريبي المجاني');
   await page.reload();
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });

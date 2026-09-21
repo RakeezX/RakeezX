@@ -14,6 +14,7 @@ import { installSessionAutoTriggers } from './lib/session-auto.js';
 import { createWorkspaceRegistry } from './lib/workspaces.js';
 import { resolveWorkspaceForBoot, WORKSPACE_NOT_READY } from './lib/workspace-routing.js';
 import { runInitialRestore } from './lib/initial-restore.js';
+import { getAccountPresentation } from './lib/account-profile.js';
 
 const app = document.getElementById('app');
 
@@ -49,7 +50,7 @@ function isStandaloneMode() {
 
 function teacherInitials(name) {
   const clean = String(name ?? '').trim();
-  if (!clean || clean === 'المعلّم') return 'م';
+  if (!clean || clean === 'المعلم' || clean === 'المعلمة' || clean === 'المعلّم' || clean === 'المعلّمة') return 'م';
   const parts = clean.split(/\s+/).filter(Boolean);
   if (parts.length >= 2) return `${parts[0][0]} ${parts[1][0]}`;
   return parts[0].slice(0, 2);
@@ -61,12 +62,13 @@ function getSyncState() {
 
 function renderSidebarMiniHubTrigger() {
   const profile = store.state.profile ?? {};
-  const teacherName = profile.teacherName || 'المعلّم';
+  const presentation = getAccountPresentation(profile.teacherForm);
+  const teacherName = profile.teacherName || presentation.teacherLabel;
   const schoolName = profile.schoolName || '';
   const syncInfo = getSyncState();
 
   return html`
-    <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم">
+    <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}">
       <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">
         ${teacherInitials(teacherName)}
       </div>
@@ -86,7 +88,8 @@ function renderSidebarMiniHubTrigger() {
 
 function renderTeacherMiniHubBody() {
   const profile = store.state.profile ?? {};
-  const teacherName = profile.teacherName || 'المعلّم';
+  const presentation = getAccountPresentation(profile.teacherForm);
+  const teacherName = profile.teacherName || presentation.teacherLabel;
   const schoolName = profile.schoolName || '';
   const syncInfo = getSyncState();
   const isInstalled = isStandaloneMode();
@@ -96,7 +99,7 @@ function renderTeacherMiniHubBody() {
 
   return html`
       <div class="mini-hub-sheet">
-        <section class="mini-hub-surface" aria-label="مركز المعلّم">
+        <section class="mini-hub-surface" aria-label="مركز ${presentation.teacherLabel}">
           <div class="mini-hub-identity">
             <div class="mini-hub-avatar" aria-hidden="true">${teacherInitials(teacherName)}</div>
             <div class="flex-1 min-w-0">
@@ -183,8 +186,9 @@ function refreshTeacherMiniHubSheet({ focusAccountAction = false } = {}) {
 function openTeacherMiniHubSheet() {
   void refreshSyncOperationalUI();
   if (refreshTeacherMiniHubSheet()) return Promise.resolve();
+  const presentation = getAccountPresentation(store.state.profile?.teacherForm);
   const sheet = openSheet({
-    title: 'مركز المعلّم',
+    title: `مركز ${presentation.teacherLabel}`,
     body: renderTeacherMiniHubBody(),
     onMount: (root) => { teacherMiniHubSheet = root; },
   });
@@ -278,7 +282,8 @@ function topbar(v, params) {
   const sub = v.subtitle?.(params);
   const actions = v.topActions?.(params);
   const profile = store.state.profile ?? {};
-  const teacherName = profile.teacherName || 'المعلّم';
+  const presentation = getAccountPresentation(profile.teacherForm);
+  const teacherName = profile.teacherName || presentation.teacherLabel;
   const syncInfo = getSyncState();
   const isHome = currentPath() === '/';
   const isLoggedIn = !!(cloud.session && cloud.user);
@@ -305,7 +310,7 @@ function topbar(v, params) {
             ${isLoggedIn ? html`<span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>` : ''}
           </button>
         ` : html`
-          <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم المعلّم: ${teacherName}">
+          <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}: ${teacherName}">
             <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
             <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
           </button>

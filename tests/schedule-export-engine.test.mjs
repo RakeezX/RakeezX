@@ -154,6 +154,18 @@ test('isolated print document is A4 landscape and leaves existing report CSS unt
   assert.equal(printed, 1);
 });
 
+test('feminine account presentation reaches schedule identity while generic brand remains unchanged', () => {
+  const { source } = fixture();
+  source.state.profile.teacherForm = 'feminine';
+  const model = buildScheduleExportModel(source, { includeTeacherName: true, includeSchoolName: true });
+  const documentText = schedulePrintDocument(model);
+
+  assert.equal(model.identity.teacherForm, 'feminine');
+  assert.match(documentText, /المعلمة: المعلم الاختباري/);
+  assert.match(documentText, /رَكيز/);
+  assert.match(documentText, /<em>المعلم<\/em>/);
+});
+
 test('file share is capability-detected and uses a PNG File when supported', async () => {
   class TestFile extends Blob {
     constructor(parts, name, options) {

@@ -13,7 +13,8 @@ import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.
 import { hasValidYearCalendarConfig } from './calendar.js';
 import { resolvedReportPrincipalName } from '../lib/report-print.js';
 import {
-  BETA_ACCESS_LABEL, currentAccountContract, isValidSaudiMobile, normalizeSaudiMobile, refreshAccountContract,
+  BETA_ACCESS_LABEL, currentAccountContract, getAccountPresentation, isValidSaudiMobile, normalizeSaudiMobile,
+  refreshAccountContract,
 } from '../lib/account-profile.js';
 
 const THEMES = [
@@ -282,6 +283,7 @@ export default {
     const accountContract = currentAccountContract();
     const accountEmail = accountContract?.email ?? cloud.user?.email ?? '';
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
+    const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
 
     return html`
@@ -289,20 +291,17 @@ export default {
       <div class="section settings-section settings-section--identity">
         <div class="section__head"><div class="section__title">بياناتك</div></div>
         <div class="card card--pad">
-          <p class="t-3 fs-sm mb-3">
-            تظهر على التقارير والكشوف التي تطبعها. تُحفظ محليًا وتُزامن مع حسابك عند الاتصال.
-          </p>
           <form id="me-form" class="management-form settings-identity-form">
             <div class="field-row">
               <label class="field">
-                <span class="field__label">اسم المعلم</span>
+                <span class="field__label">${presentation.teacherNameLabel}</span>
                 <input class="input" name="teacherName" value="${m.teacherName ?? ''}"
                        maxlength="60" autocomplete="name" data-fk="teacherName"
                        data-change="save" placeholder="الاسم كما يظهر في التقارير">
               </label>
               <div class="field">
-                <span class="field__label">صيغة المخاطبة</span>
-                <div class="segmented settings-teacher-form" role="group" aria-label="صيغة المخاطبة">
+                <span class="field__label">صفة المستخدم</span>
+                <div class="segmented settings-teacher-form" role="group" aria-label="صفة المستخدم">
                   <button type="button" class="segmented__btn ${teacherForm === 'masculine' ? 'is-on' : ''}"
                           data-act="teacher-form" data-val="masculine" aria-pressed="${teacherForm === 'masculine' ? 'true' : 'false'}">معلم</button>
                   <button type="button" class="segmented__btn ${teacherForm === 'feminine' ? 'is-on' : ''}"
@@ -312,18 +311,26 @@ export default {
             </div>
             <div class="field-row">
               <label class="field">
+                <span class="field__label">اسم المدرسة <span class="t-3 fs-xs">(اختياري)</span></span>
+                <input class="input" name="schoolName" value="${m.schoolName ?? ''}"
+                       maxlength="80" autocomplete="organization" data-fk="schoolName"
+                       data-change="save" placeholder="اسم المدرسة">
+              </label>
+              <label class="field">
+                <span class="field__label">${presentation.principalNameLabel} <span class="t-3 fs-xs">(اختياري)</span></span>
+                <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
+                       maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
+                       data-change="save" placeholder="${presentation.schoolPrincipalLabel} للتقارير">
+              </label>
+            </div>
+            <div class="field-row settings-phone-row">
+              <label class="field">
                 <span class="field__label">رقم الجوال</span>
                 <input class="input" name="phone" value="${m.phone ?? ''}" required
                        pattern="05[0-9]{8}" autocomplete="tel" inputmode="numeric" dir="ltr"
                        data-fk="phone" data-input="phone-input" data-change="save" placeholder="05xxxxxxxx"
                        aria-describedby="settings-phone-hint">
                 <span class="field__hint" id="settings-phone-hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span>
-              </label>
-              <label class="field">
-                <span class="field__label">اسم المدرسة <span class="t-3 fs-xs">(اختياري)</span></span>
-                <input class="input" name="schoolName" value="${m.schoolName ?? ''}"
-                       maxlength="80" autocomplete="organization" data-fk="schoolName"
-                       data-change="save" placeholder="اسم المدرسة">
               </label>
             </div>
             <div class="settings-account-summary" aria-label="معلومات الحساب">
@@ -336,12 +343,6 @@ export default {
                 <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
               </div>
             </div>
-            <label class="field" style="margin-bottom:0">
-              <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
-              <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
-                     maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
-                     data-change="save" placeholder="مدير المدرسة للتقارير">
-            </label>
           </form>
         </div>
       </div>

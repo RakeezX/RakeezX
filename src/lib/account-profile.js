@@ -7,8 +7,21 @@ export const SAUDI_MOBILE_PATTERN = /^05[0-9]{8}$/;
 
 let cachedContract = null;
 
+export function getAccountPresentation(form) {
+  const feminine = form === TEACHER_FORM.FEMININE;
+  return Object.freeze({
+    teacherLabel: feminine ? 'المعلمة' : 'المعلم',
+    teacherNameLabel: feminine ? 'اسم المعلمة' : 'اسم المعلم',
+    teacherHonorific: feminine ? 'أستاذة' : 'أستاذ',
+    teacherSubjectLabel: feminine ? 'معلمة المادة' : 'معلم المادة',
+    principalLabel: feminine ? 'المديرة' : 'المدير',
+    principalNameLabel: feminine ? 'اسم المديرة' : 'اسم المدير',
+    schoolPrincipalLabel: feminine ? 'مديرة المدرسة' : 'مدير المدرسة',
+  });
+}
+
 export function teacherAddress(form) {
-  return form === TEACHER_FORM.FEMININE ? 'أستاذة' : 'أستاذ';
+  return getAccountPresentation(form).teacherHonorific;
 }
 
 export function normalizeSaudiMobile(value) {

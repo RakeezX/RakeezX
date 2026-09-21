@@ -8,6 +8,7 @@ import {
 import { downloadCSV } from '../lib/export.js';
 import { reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
+import { getAccountPresentation } from '../lib/account-profile.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
 let sortKey = 'default'; // default | name | roll | score_desc | score_asc | absent_desc
@@ -184,9 +185,10 @@ export default {
     'filter-end'(el) { filterEndDate = el.value; repaint(); },
 
     async print() {
+      const presentation = getAccountPresentation(store.state.profile?.teacherForm);
       const confirmed = await openSheet({
         title: 'تأكيد بيانات التقرير والطباعة',
-        desc: 'راجع بيانات المعلم والمدرسة والمدير للظهور في ترويسة وتوقيع التقرير.',
+        desc: `راجع بيانات ${presentation.teacherLabel} والمدرسة و${presentation.principalLabel} للظهور في ترويسة وتوقيع التقرير.`,
         body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),
         foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,
         onMount: (root, done) => {

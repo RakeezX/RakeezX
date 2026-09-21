@@ -19,6 +19,7 @@ import {
 import * as store from "../store.js";
 import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, safeColor, gradeLabel } from "../models.js";
 import { repaint } from "../repaint.js";
+import { getAccountPresentation } from "../lib/account-profile.js";
 
 const SHORT_GRADES = {
   1: "أول",
@@ -98,8 +99,9 @@ export function weeklySessionsLabel(value) {
 let activeMobileDay = null;
 
 function scheduleExportPreview(model) {
+  const presentation = getAccountPresentation(model.identity.teacherForm);
   const identity = [
-    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.teacherName && `${presentation.teacherLabel}: ${model.identity.teacherName}`,
     model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
   ].filter(Boolean);
   return html`
@@ -131,6 +133,7 @@ function scheduleExportPreview(model) {
 
 function openScheduleExportSheet() {
   const profile = store.state.profile ?? {};
+  const presentation = getAccountPresentation(profile.teacherForm);
   const initial = {
     includeTeacherName: Boolean(String(profile.teacherName ?? '').trim()),
     includeSchoolName: Boolean(String(profile.schoolName ?? '').trim()),
@@ -144,7 +147,7 @@ function openScheduleExportSheet() {
       <form id="schedule-export-form" class="schedule-export-options">
         <label class="schedule-export-option">
           <input type="checkbox" name="includeTeacherName" ${initial.includeTeacherName ? 'checked' : 'disabled'}>
-          <span><strong>اسم المعلم</strong><small>${initial.includeTeacherName ? profile.teacherName : 'غير متاح في الملف الشخصي'}</small></span>
+          <span><strong>${presentation.teacherNameLabel}</strong><small>${initial.includeTeacherName ? profile.teacherName : 'غير متاح في الملف الشخصي'}</small></span>
         </label>
         <label class="schedule-export-option">
           <input type="checkbox" name="includeSchoolName" ${initial.includeSchoolName ? 'checked' : 'disabled'}>

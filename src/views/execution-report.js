@@ -6,6 +6,7 @@ import { reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, repor
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
+import { getAccountPresentation } from '../lib/account-profile.js';
 
 let termId = null;
 let status = 'all';
@@ -59,9 +60,10 @@ export default {
   actions: {
     term(el) { termId = el.value; teachingId = 'all'; repaint(); }, status(el) { status = el.value; repaint(); }, teaching(el) { teachingId = el.value; repaint(); }, from(el) { from = el.value; repaint(); }, to(el) { to = el.value; repaint(); },
     async print() {
+      const presentation = getAccountPresentation(store.state.profile?.teacherForm);
       const confirmed = await openSheet({
         title: 'تأكيد بيانات التقرير والطباعة',
-        desc: 'راجع بيانات المعلم والمدرسة والمدير للظهور في ترويسة وتوقيع التقرير.',
+        desc: `راجع بيانات ${presentation.teacherLabel} والمدرسة و${presentation.principalLabel} للظهور في ترويسة وتوقيع التقرير.`,
         body: prePrintConfirmationSheet({ profile: store.state.profile, device: store.state.device }),
         foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" form="pre-print-form">متابعة للطباعة</button>`,
         onMount: (root, done) => {

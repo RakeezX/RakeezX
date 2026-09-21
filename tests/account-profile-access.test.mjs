@@ -5,6 +5,7 @@ import {
   BETA_ACCESS_LABEL,
   PROFILE_STATUS,
   completeProfile,
+  getAccountPresentation,
   isValidSaudiMobile,
   normalizeAccountContract,
   normalizeSaudiMobile,
@@ -12,6 +13,7 @@ import {
   teacherAddress,
   validateProfileCompletion,
 } from '../src/lib/account-profile.js';
+import { prePrintConfirmationSheet, reportHeader, reportSignatures } from '../src/lib/report-print.js';
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
 const authUser = Object.freeze({ id: OWNER, email: 'teacher@example.test' });
@@ -39,6 +41,28 @@ test('feminine form persists in the account contract and affects addressing only
   assert.equal(feminine.profile.teacherForm, 'feminine');
   assert.equal(teacherAddress(feminine.profile.teacherForm), 'أستاذة');
   assert.deepEqual(feminine.access, masculine.access);
+});
+
+test('central account presentation covers masculine and feminine labels without changing generic branding', () => {
+  assert.deepEqual(getAccountPresentation('masculine'), {
+    teacherLabel: 'المعلم', teacherNameLabel: 'اسم المعلم', teacherHonorific: 'أستاذ',
+    teacherSubjectLabel: 'معلم المادة', principalLabel: 'المدير', principalNameLabel: 'اسم المدير',
+    schoolPrincipalLabel: 'مدير المدرسة',
+  });
+  assert.deepEqual(getAccountPresentation('feminine'), {
+    teacherLabel: 'المعلمة', teacherNameLabel: 'اسم المعلمة', teacherHonorific: 'أستاذة',
+    teacherSubjectLabel: 'معلمة المادة', principalLabel: 'المديرة', principalNameLabel: 'اسم المديرة',
+    schoolPrincipalLabel: 'مديرة المدرسة',
+  });
+
+  const profile = { teacherName: 'نورة', schoolName: 'مدرسة الاختبار', teacherForm: 'feminine' };
+  const printable = `${reportHeader({ title: 'اختبار', profile })}${reportSignatures({ profile })}${prePrintConfirmationSheet({ profile })}`;
+  assert.match(printable, /المعلمة/);
+  assert.match(printable, /اسم المعلمة/);
+  assert.match(printable, /معلمة المادة/);
+  assert.match(printable, /اسم المديرة/);
+  assert.match(printable, /رَكيز/);
+  assert.match(printable, /تقارير المعلم/);
 });
 
 test('email is always taken from authenticated identity, never profile payload', () => {

@@ -2,10 +2,12 @@
 
 import { html, raw, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
+import { getAccountPresentation } from './account-profile.js';
 
 export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
+  const presentation = getAccountPresentation(profile?.teacherForm);
   const identity = [
-    profile?.teacherName && ['المعلم', profile.teacherName],
+    profile?.teacherName && [presentation.teacherLabel, profile.teacherName],
     profile?.schoolName && ['المدرسة', profile.schoolName],
   ].filter(Boolean);
   const context = [
@@ -51,12 +53,13 @@ export function reportFooter({ printedOn = todayISO() } = {}) {
   `;
 }
 
-export function reportSignatures({ profile, teacherLabel = 'معلم المادة' }) {
+export function reportSignatures({ profile, teacherLabel = null }) {
+  const presentation = getAccountPresentation(profile?.teacherForm);
   const principal = resolvedReportPrincipalName(profile);
   return html`
     <footer class="print-signatures" dir="rtl">
-      <div><span>${teacherLabel}</span>${profile?.teacherName ? html`<strong>${profile.teacherName}</strong>` : ''}</div>
-      ${principal ? html`<div><span>مدير المدرسة</span><strong>${principal}</strong></div>` : ''}
+      <div><span>${teacherLabel ?? presentation.teacherSubjectLabel}</span>${profile?.teacherName ? html`<strong>${profile.teacherName}</strong>` : ''}</div>
+      ${principal ? html`<div><span>${presentation.schoolPrincipalLabel}</span><strong>${principal}</strong></div>` : ''}
     </footer>
   `;
 }
@@ -72,6 +75,7 @@ export function resolvedReportPrincipalName(profile, device) {
 }
 
 export function prePrintConfirmationSheet({ profile, device }) {
+  const presentation = getAccountPresentation(profile?.teacherForm);
   const teacher = profile?.teacherName ?? '';
   const school = profile?.schoolName ?? '';
   const principal = resolvedReportPrincipalName(profile, device);
@@ -80,14 +84,14 @@ export function prePrintConfirmationSheet({ profile, device }) {
     <form id="pre-print-form" class="stack stack-3">
       <div class="field-row">
         <label class="field" style="margin-bottom:0">
-          <span class="field__label">اسم المعلم</span>
+          <span class="field__label">${presentation.teacherNameLabel}</span>
           <input class="input" name="teacherName" maxlength="60" autocomplete="name"
                  value="${teacher}" placeholder="الاسم كما يظهر في التقرير">
         </label>
         <label class="field" style="margin-bottom:0">
-          <span class="field__label">اسم المدير <span class="t-3 fs-xs">(اختياري)</span></span>
+          <span class="field__label">${presentation.principalNameLabel} <span class="t-3 fs-xs">(اختياري)</span></span>
           <input class="input" name="principalName" maxlength="80" autocomplete="name"
-                 value="${principal}" placeholder="مدير المدرسة">
+                 value="${principal}" placeholder="${presentation.schoolPrincipalLabel}">
         </label>
       </div>
       <label class="field" style="margin-bottom:0">

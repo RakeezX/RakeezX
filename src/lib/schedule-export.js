@@ -8,6 +8,7 @@
 
 import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, sectionLabel } from '../models.js';
 import { downloadBlob } from './export.js';
+import { getAccountPresentation } from './account-profile.js';
 
 export const SCHEDULE_PNG_WIDTH = 1600;
 export const SCHEDULE_PNG_HEIGHT = 1200;
@@ -91,7 +92,10 @@ export function buildScheduleExportModel(source, {
   }
 
   const identity = {};
-  if (includeTeacherName && text(profile?.teacherName)) identity.teacherName = text(profile.teacherName);
+  if (includeTeacherName && text(profile?.teacherName)) {
+    identity.teacherName = text(profile.teacherName);
+    identity.teacherForm = profile?.teacherForm === 'feminine' ? 'feminine' : 'masculine';
+  }
   if (includeSchoolName && text(profile?.schoolName)) identity.schoolName = text(profile.schoolName);
 
   const days = dayNumbers.map((weekday, dayIndex) => ({
@@ -142,6 +146,7 @@ function clippedText(ctx, value, maxWidth) {
 }
 
 function drawScheduleCanvas(ctx, model, width, height) {
+  const presentation = getAccountPresentation(model.identity.teacherForm);
   ctx.save();
   ctx.direction = 'rtl';
   ctx.textBaseline = 'middle';
@@ -163,7 +168,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
   ctx.fillText(model.title, width / 2, 78);
 
   const identityLines = [
-    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.teacherName && `${presentation.teacherLabel}: ${model.identity.teacherName}`,
     model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
   ].filter(Boolean);
   const academicLine = [model.academic.year, model.academic.term].filter(Boolean).join(' · ');
@@ -257,8 +262,9 @@ const escapeHtml = (value) => text(value)
 
 /** Purpose-built isolated A4-landscape print document. */
 export function schedulePrintDocument(model) {
+  const presentation = getAccountPresentation(model.identity.teacherForm);
   const identity = [
-    model.identity.teacherName && `المعلم: ${model.identity.teacherName}`,
+    model.identity.teacherName && `${presentation.teacherLabel}: ${model.identity.teacherName}`,
     model.identity.schoolName && `المدرسة: ${model.identity.schoolName}`,
   ].filter(Boolean).map((line) => `<span>${escapeHtml(line)}</span>`).join('');
   const rows = model.days.map((day) => `<tr>

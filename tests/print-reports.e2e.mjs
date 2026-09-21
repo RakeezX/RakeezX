@@ -19,7 +19,7 @@ async function seed(page) {
     const enrollments = students.map((student, index) => ({ id: `print-enrollment-${index}`, studentId: student.id, sectionId: 'print-section', status: 'active', rollNo: index + 1 }));
     const attendance = students.map((student, index) => ({ id: `print-attendance-${index}`, studentId: student.id, sessionId: 'print-session', teachingId: 'print-teaching', date: '2026-08-20', status: index % 5 === 0 ? 'absent' : index % 3 === 0 ? 'late' : 'present' }));
     await window.store.save({
-      profile: [{ id: 'profile', teacherName: 'معلم تجريبي', schoolName: 'مدرسة تجريبية' }],
+      profile: [{ id: 'profile', teacherName: 'معلمة تجريبية', teacherForm: 'feminine', schoolName: 'مدرسة تجريبية' }],
       years: [{ id: 'print-year', label: '1448-1449' }], terms: [{ id: 'print-term', yearId: 'print-year', name: 'الفصل الأول' }],
       subjects: [{ id: 'print-subject', name: 'الرياضيات' }], sections: [{ id: 'print-section', yearId: 'print-year', grade: 5, label: '1', name: 'الخامس / 1' }],
       teachings: [{ id: 'print-teaching', sectionId: 'print-section', subjectId: 'print-subject', termId: 'print-term' }],
@@ -226,26 +226,31 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   await seed(page);
 
   await page.goto('/#/teaching/print-teaching/reports');
+  // Match the established readiness path above: a hash-only transition can
+  // briefly leave the classes view mounted while the lazy report view loads.
+  await page.reload();
   await expect(page.getByRole('heading', { name: 'كشف الدرجات', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'الطلاب', exact: true }).click();
   await expect(page.locator('[data-act="tab"][data-tab="roster"]')).toBeVisible();
   await expect(page.locator('.gtable--report tbody tr')).toHaveCount(30);
   await expect(page.locator('.gtable--report')).toContainText('أحمد محمد');
   await expect(page.locator('main')).not.toContainText('الهوية الوطنية');
-  await expect(page.locator('.print-signatures')).not.toContainText('مدير المدرسة');
+  await expect(page.locator('.print-signatures')).not.toContainText('مديرة المدرسة');
   await expect(page.getByRole('button', { name: 'طباعة' })).toBeVisible();
 
   await page.getByRole('button', { name: 'طباعة' }).click();
   await expect(page.locator('#pre-print-form')).toBeVisible();
-  await page.locator('input[name="principalName"]').fill('مدير تجريبي');
+  await expect(page.getByText('اسم المعلمة', { exact: true })).toBeVisible();
+  await expect(page.getByText(/اسم المديرة/, { exact: false })).toBeVisible();
+  await page.locator('input[name="principalName"]').fill('مديرة تجريبية');
   await page.locator('button[form="pre-print-form"]').click();
-  await expect(page.locator('.print-signatures')).toContainText('معلم المادة');
-  await expect(page.locator('.print-signatures')).toContainText('مدير المدرسة');
-  await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
+  await expect(page.locator('.print-signatures')).toContainText('معلمة المادة');
+  await expect(page.locator('.print-signatures')).toContainText('مديرة المدرسة');
+  await expect(page.locator('.print-signatures')).toContainText('مديرة تجريبية');
   await page.reload();
   await expect(page.getByRole('heading', { name: 'كشف الدرجات', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'الطلاب', exact: true }).click();
-  await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
+  await expect(page.locator('.print-signatures')).toContainText('مديرة تجريبية');
 
   const rosterDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'تصدير CSV' }).click();
@@ -315,7 +320,7 @@ test('administration print reports preserve data, local metadata, privacy, RTL, 
   expect(executionText).not.toContain('print-session');
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.topbar')).toBeHidden();
-  await expect(page.locator('.print-signatures')).toContainText('مدير تجريبي');
+  await expect(page.locator('.print-signatures')).toContainText('مديرة تجريبية');
   await page.emulateMedia({ media: 'screen' });
   expect(errors).toEqual([]);
 });
