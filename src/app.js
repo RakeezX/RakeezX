@@ -50,6 +50,7 @@ let initialRestoreAbortController = null;
 const scrollMemory = new Map();
 
 const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
+const canMaterializeTodaySessions = () => isDemoWorkspace() || Boolean(cloud.session && cloud.user);
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
 
@@ -495,7 +496,7 @@ async function resolve() {
     return;
   }
 
-  if (cloud.session && cloud.user) await store.ensureSessionsForDate();
+  if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
 
   if (ctx) scrollMemory.set(ctx.path, window.scrollY);
   view?.onUnmount?.();
@@ -578,7 +579,7 @@ async function boot() {
       else
       console.error('[rakeezx] Sync module failed to load:', err);
     }
-    if (cloud.session && cloud.user) await store.ensureSessionsForDate();
+    if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
     render(
@@ -637,7 +638,7 @@ async function boot() {
   }
   onNavigate(resolve);
   installSessionAutoTriggers({
-    materialize: (date) => cloud.session && cloud.user ? store.ensureSessionsForDate(date) : null,
+    materialize: (date) => canMaterializeTodaySessions() ? store.ensureSessionsForDate(date) : null,
     onError: (err) => console.warn('[rakeezx sessions] automatic materialization failed:', err),
   });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);

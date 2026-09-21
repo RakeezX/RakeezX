@@ -38,6 +38,78 @@ test.describe('isolated Demo runtime', () => {
     await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
   }
 
+  async function freezeLocalDate(page, isoDate) {
+    await page.addInitScript(({ isoDate }) => {
+      const NativeDate = Date;
+      const fixed = new NativeDate(`${isoDate}T09:00:00`).getTime();
+      globalThis.Date = class extends NativeDate {
+        constructor(...args) { super(...(args.length ? args : [fixed])); }
+        static now() { return fixed; }
+      };
+    }, { isoDate });
+  }
+
+  const todayState = (page, date) => page.evaluate(async (date) => ({
+    sessions: window.store.sessionsOn(date).map((session) => ({
+      id: session.id, teachingId: session.teachingId, slotId: session.slotId, period: session.period,
+    })),
+    slots: window.store.allSlots().filter((slot) => !slot.deleted).map((slot) => ({
+      teachingId: slot.teachingId, weekday: slot.weekday, period: slot.period,
+    })),
+    outbox: (await (await import('/src/lib/db.js')).getAll('outbox')).length,
+  }), date);
+
+  test('first school-day entry materializes normal today sessions before Home and remains idempotent', async ({ page }) => {
+    const monday = '2026-09-21';
+    await freezeLocalDate(page, monday);
+    let cloudRequests = 0;
+    await page.unroute('https://*.supabase.co/**');
+    await page.route('https://*.supabase.co/**', (route) => { cloudRequests += 1; return route.abort(); });
+    await page.goto('/');
+    await enterDemo(page);
+    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('.home-sessions')).toBeVisible();
+
+    const first = await todayState(page, monday);
+    expect(first.sessions).toHaveLength(2);
+    expect(first.outbox).toBe(0);
+    expect(new Set(first.sessions.map((session) => session.id)).size).toBe(2);
+    expect(first.sessions.every((session) => session.teachingId && session.slotId)).toBe(true);
+    expect(first.slots).toHaveLength(10);
+    expect(first.slots.reduce((counts, slot) => counts.set(slot.weekday, (counts.get(slot.weekday) ?? 0) + 1), new Map())).toEqual(new Map([[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]]));
+    expect(first.slots.reduce((counts, slot) => counts.set(slot.teachingId, (counts.get(slot.teachingId) ?? 0) + 1), new Map())).toEqual(new Map([
+      ['demo:teaching:1', 2], ['demo:teaching:2', 2], ['demo:teaching:3', 2], ['demo:teaching:4', 2], ['demo:teaching:5', 2],
+    ]));
+    expect(new Set(first.slots.map((slot) => `${slot.weekday}:${slot.period}`)).size).toBe(10);
+
+    await page.reload();
+    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    expect((await todayState(page, monday)).sessions).toEqual(first.sessions);
+
+    await page.goto('/#/teaching/demo:teaching:3/sessions');
+    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    expect((await todayState(page, monday)).sessions).toEqual(first.sessions);
+    expect(cloudRequests).toBe(0);
+  });
+
+  test('later school date materializes once while Friday creates no artificial sessions', async ({ browser }) => {
+    const verifyDate = async (date, expected) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await page.route('https://*.supabase.co/**', (route) => route.abort());
+      await freezeLocalDate(page, date);
+      await page.goto('/');
+      await enterDemo(page);
+      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+      expect((await todayState(page, date)).sessions).toHaveLength(expected);
+      await page.reload();
+      expect((await todayState(page, date)).sessions).toHaveLength(expected);
+      await context.close();
+    };
+    await verifyDate('2026-09-22', 2);
+    await verifyDate('2026-09-25', 0);
+  });
+
   test('enters explicitly, persists local edits without outbox, resets, and exits', async ({ page }) => {
     await page.goto('/');
     await enterDemo(page);
@@ -75,6 +147,7 @@ test.describe('isolated Demo runtime', () => {
     await page.getByRole('button', { name: 'إعادة ضبط البيانات التجريبية', exact: true }).first().click();
     await page.locator('[data-demo-reset-confirm]').click();
     await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلم ركيز');
+    expect((await todayState(page, new Date().toISOString().slice(0, 10))).outbox).toBe(0);
     await page.getByRole('button', { name: 'الخروج من التجربة', exact: true }).first().click();
     await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
     await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
