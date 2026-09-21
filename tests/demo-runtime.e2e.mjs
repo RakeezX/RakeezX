@@ -55,7 +55,7 @@ test.describe('isolated Demo runtime', () => {
       database.close();
       return result;
     });
-    expect(initial).toEqual({ students: 60, sections: 5, outbox: 0 });
+    expect(initial).toEqual({ students: 115, sections: 5, outbox: 0 });
 
     await page.goto('/#/settings');
     await expect(page.locator('[data-demo-settings]')).toBeVisible();
@@ -107,6 +107,35 @@ test.describe('isolated Demo runtime', () => {
     }
     await expect(page.locator('[data-demo-cloud-unavailable]')).toBeVisible();
     expect(cloudRequests).toBe(0);
+  });
+
+  test('realistic roster, numeric sections, two-period schedule, and standard timing profiles render in Product pages', async ({ page }) => {
+    await page.goto('/');
+    await enterDemo(page);
+    await expect(page.getByText('5 فصلاً هذا الفصل', { exact: true })).toBeVisible();
+
+    await page.goto('/#/classes');
+    await expect(page.locator('.class-card')).toHaveCount(5);
+    await expect(page.locator('.class-card__title')).toHaveText([
+      'الرابع الابتدائي / 1', 'الرابع الابتدائي / 2', 'الخامس الابتدائي / 1',
+      'الخامس الابتدائي / 2', 'السادس الابتدائي / 1',
+    ]);
+    await expect(page.locator('.class-card__count')).toHaveText(['23 طالبًا', '25 طالبًا', '21 طالبًا', '24 طالبًا', '22 طالبًا']);
+
+    await page.goto('/#/teaching/demo:teaching:1/students');
+    await expect(page.locator('.roster-row')).toHaveCount(23);
+    const names = (await page.locator('.roster-row .row__title').allTextContents()).map((name) => name.trim());
+    expect(new Set(names).size).toBe(23);
+    expect(new Set(names.map((name) => name.split(' ').at(-1))).size).toBeGreaterThanOrEqual(15);
+
+    await page.goto('/#/schedule');
+    await expect(page.locator('.slot')).toHaveCount(10);
+
+    await page.goto('/#/schedule/times');
+    await expect(page.locator('.timing-profile-card__name')).toHaveText([
+      'التوقيت الصيفي', 'التوقيت الشتوي', 'توقيت رمضان', 'التوقيت المدمج',
+    ]);
+    await expect(page.getByText('التوقيت التجريبي', { exact: true })).toHaveCount(0);
   });
 
   test('same-profile tabs share Demo persistence while another browser context stays isolated', async ({ page }) => {

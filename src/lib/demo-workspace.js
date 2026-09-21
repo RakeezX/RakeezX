@@ -2,12 +2,33 @@ import * as db from './db.js';
 import {
   makeCalendar, makeEnrollment, makeGroupArrangement, makeItem, makeSection,
   makeSession, makeSlot, makeStudent, makeSubject, makeTeaching, makeTerm,
-  makeTimeProfile, makeYear, scoreId, attendanceId,
+  makeTimeProfile, makeYear, scoreId, attendanceId, DEFAULT_TIME_PROFILES,
+  DEFAULT_TIME_PROFILE_IDS, periodTime,
 } from '../models.js';
 
 export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
-export const DEMO_SEED_ID = 'demo:workspace-seed-v1';
+export const DEMO_SEED_ID = 'demo:workspace-seed-v2';
 const FIXED_TIME = Date.parse('2026-09-01T06:00:00.000Z');
+const CLASS_PLAN = Object.freeze([
+  { grade: 4, label: '1', students: 23, slots: [[0, 1], [2, 3]] },
+  { grade: 4, label: '2', students: 25, slots: [[0, 2], [3, 4]] },
+  { grade: 5, label: '1', students: 21, slots: [[1, 1], [4, 3]] },
+  { grade: 5, label: '2', students: 24, slots: [[1, 2], [2, 4]] },
+  { grade: 6, label: '1', students: 22, slots: [[3, 1], [4, 2]] },
+]);
+const FIRST_NAMES = Object.freeze([
+  'أحمد', 'محمد', 'عبدالله', 'سلمان', 'خالد', 'تركي', 'فيصل', 'ناصر', 'سعد', 'عمر', 'زياد', 'مازن',
+  'راكان', 'عبدالعزيز', 'يوسف', 'إبراهيم', 'صالح', 'حمد', 'بدر', 'فهد', 'وليد', 'أنس', 'معاذ', 'ياسر',
+]);
+const FATHER_NAMES = Object.freeze([
+  'محمد', 'عبدالله', 'خالد', 'سعد', 'عبدالرحمن', 'إبراهيم', 'صالح', 'ناصر', 'فهد', 'سلمان',
+  'أحمد', 'عبدالعزيز', 'حمد', 'فيصل', 'تركي', 'ماجد', 'يوسف', 'علي', 'حسن',
+]);
+const FAMILY_NAMES = Object.freeze([
+  'العتيبي', 'القحطاني', 'الدوسري', 'الشهري', 'الغامدي', 'الحربي', 'الزهراني', 'المطيري', 'العنزي', 'الشمري',
+  'المالكي', 'القرني', 'العمري', 'الجهني', 'السبيعي', 'الرويلي', 'التميمي', 'العسيري', 'البلوي', 'الحازمي',
+]);
+const SESSION_DATE_BY_WEEKDAY = Object.freeze({ 0: '2026-09-06', 1: '2026-09-07', 2: '2026-09-08', 3: '2026-09-09', 4: '2026-09-10' });
 
 const record = (value) => ({ updatedAt: FIXED_TIME, deleted: false, ...value });
 
@@ -28,18 +49,20 @@ export function createDemoDataset() {
   const term = makeTerm({ id: 'demo:term:1', yearId: year.id, index: 1, status: 'active', startDate: '2026-08-23', endDate: '2027-01-07', updatedAt: FIXED_TIME });
   const pastTerm = makeTerm({ id: 'demo:term:past', yearId: year.id, index: 2, name: 'فصل تجريبي مكتمل', status: 'closed', startDate: '2026-01-01', endDate: '2026-05-31', updatedAt: FIXED_TIME });
   const subject = makeSubject({ id: 'demo:subject:digital', name: 'المهارات الرقمية', slug: 'demo-digital', updatedAt: FIXED_TIME });
-  const timeProfile = makeTimeProfile({ id: 'demo:time-profile', name: 'التوقيت التجريبي', order: 0, updatedAt: FIXED_TIME });
+  const timeProfiles = DEFAULT_TIME_PROFILES.map((profile, order) => makeTimeProfile({
+    ...structuredClone(profile), order, updatedAt: FIXED_TIME,
+  }));
+  const timeProfile = timeProfiles.find((profile) => profile.id === DEFAULT_TIME_PROFILE_IDS.summer);
   const calendar = makeCalendar({ id: 'demo:calendar', yearId: year.id, label: 'التقويم التجريبي', updatedAt: FIXED_TIME });
-  const sections = Array.from({ length: 5 }, (_, index) => makeSection({
-    id: `demo:section:${index + 1}`, yearId: year.id, grade: 4 + (index % 3),
-    label: String.fromCharCode(0x0623 + index), name: `${4 + (index % 3)}/${String.fromCharCode(0x0623 + index)}`,
+  const sections = CLASS_PLAN.map((plan, index) => makeSection({
+    id: `demo:section:${index + 1}`, yearId: year.id, grade: plan.grade,
+    label: plan.label, name: `${plan.grade}/${plan.label}`,
     order: index, color: ['#0f766e', '#2563eb', '#7c3aed', '#d97706', '#be123c'][index], updatedAt: FIXED_TIME,
   }));
   const teachings = sections.map((section, index) => makeTeaching({
     id: `demo:teaching:${index + 1}`, sectionId: section.id, subjectId: subject.id, termId: term.id,
     order: index, updatedAt: FIXED_TIME,
   }));
-  const names = ['أحمد','محمد','عبدالله','سلمان','خالد','تركي','فيصل','ناصر','سعد','عمر','زياد','مازن'];
   const students = [];
   const enrollments = [];
   const items = [];
@@ -54,12 +77,21 @@ export function createDemoDataset() {
   const classGoals = [];
   const classCharterSelections = [];
   const groupArrangements = [];
+  let studentNumber = 0;
 
   teachings.forEach((teaching, classIndex) => {
     const members = [];
-    for (let studentIndex = 0; studentIndex < 12; studentIndex += 1) {
-      const n = classIndex * 12 + studentIndex + 1;
-      const student = makeStudent({ id: `demo:student:${n}`, name: `${names[studentIndex]} ${['العتيبي','القحطاني','الدوسري','الشهري','الغامدي'][classIndex]}`, updatedAt: FIXED_TIME });
+    const plan = CLASS_PLAN[classIndex];
+    for (let studentIndex = 0; studentIndex < plan.students; studentIndex += 1) {
+      studentNumber += 1;
+      const n = studentNumber;
+      const zeroBased = n - 1;
+      const firstIndex = (zeroBased * 5 + 7) % FIRST_NAMES.length;
+      const nameBlock = Math.floor(zeroBased / FIRST_NAMES.length);
+      const first = FIRST_NAMES[firstIndex];
+      const father = FATHER_NAMES[(nameBlock * 7 + firstIndex * 3) % FATHER_NAMES.length];
+      const family = FAMILY_NAMES[(zeroBased * 11 + classIndex * 7) % FAMILY_NAMES.length];
+      const student = makeStudent({ id: `demo:student:${n}`, name: `${first} ${father} ${family}`, updatedAt: FIXED_TIME });
       students.push(student);
       enrollments.push(makeEnrollment({ id: `demo:enrollment:${n}`, studentId: student.id, sectionId: teaching.sectionId, rollNo: studentIndex + 1, startDate: '2026-08-23', updatedAt: FIXED_TIME }));
       members.push({ studentId: student.id, enrollmentId: `demo:enrollment:${n}`, rollNo: studentIndex + 1 });
@@ -75,10 +107,14 @@ export function createDemoDataset() {
         value: item.auto === 'participation' ? (member.rollNo % 6) : Math.min(item.max, 5 + ((member.rollNo + itemIndex * 3) % item.max)),
       })));
     }
-    const slot = makeSlot({ id: `demo:slot:${classIndex + 1}`, teachingId: teaching.id, weekday: classIndex % 5, period: (classIndex % 4) + 1, updatedAt: FIXED_TIME });
-    slots.push(slot);
-    ['2026-09-01', '2026-09-08'].forEach((date, sessionIndex) => {
-      const session = makeSession({ id: `demo:session:${classIndex + 1}:${sessionIndex + 1}`, teachingId: teaching.id, date, period: slot.period, slotId: slot.id, status: 'held', startTime: '07:00', endTime: '07:45', timeProfileId: timeProfile.id, covered: 'نشاط تعليمي تجريبي', updatedAt: FIXED_TIME });
+    const teachingSlots = plan.slots.map(([weekday, period], slotIndex) => makeSlot({
+      id: `demo:slot:${classIndex + 1}:${slotIndex + 1}`, teachingId: teaching.id, weekday, period, updatedAt: FIXED_TIME,
+    }));
+    slots.push(...teachingSlots);
+    teachingSlots.forEach((slot, sessionIndex) => {
+      const date = SESSION_DATE_BY_WEEKDAY[slot.weekday];
+      const timing = periodTime(timeProfile, slot.weekday, slot.period, plan.grade);
+      const session = makeSession({ id: `demo:session:${classIndex + 1}:${sessionIndex + 1}`, teachingId: teaching.id, date, period: slot.period, slotId: slot.id, status: 'held', startTime: timing.start, endTime: timing.end, timeProfileId: timeProfile.id, covered: 'نشاط تعليمي تجريبي', updatedAt: FIXED_TIME });
       sessions.push(session);
       sessionRosterSnapshots.push(record({ id: `demo:roster:${session.id}`, sessionId: session.id, teachingId: teaching.id, sectionId: teaching.sectionId, capturedAt: FIXED_TIME, members, state: 'complete' }));
       members.forEach((member) => attendance.push(record({
@@ -94,19 +130,20 @@ export function createDemoDataset() {
     classRules.push(...rules);
     classGoals.push(record({ id: `class-goal:${teaching.id}`, teachingId: teaching.id, runId: `demo:goal-run:${classIndex + 1}`, date: '2026-09-21', sessionId: null, text: 'إنجاز النشاط بدقة وتعاون', presetKey: null, durationMinutes: 20, rewardPoints: 2, state: 'active', startedAt: FIXED_TIME, completedAt: null, rewardOperationId: null }));
     classCharterSelections.push(record({ id: `class-charter-selection:${teaching.id}`, teachingId: teaching.id, selectedRuleIds: rules.map((rule) => rule.id) }));
-    groupArrangements.push(makeGroupArrangement({ id: `demo:groups:${classIndex + 1}`, teachingId: teaching.id, groups: [
-      members.slice(0, 6).map((m) => m.studentId),
-      members.slice(6).map((m) => m.studentId),
-    ], updatedAt: FIXED_TIME }));
+    const groups = [];
+    for (let offset = 0; offset < members.length; offset += 5) {
+      groups.push(members.slice(offset, offset + 5).map((member) => member.studentId));
+    }
+    groupArrangements.push(makeGroupArrangement({ id: `demo:groups:${classIndex + 1}`, teachingId: teaching.id, groups, updatedAt: FIXED_TIME }));
   });
 
   return {
     profile: [record({ id: 'profile', teacherName: 'معلم ركيز', schoolName: 'مدرسة ركيز التجريبية', phone: '', teacherForm: 'masculine', reportPrincipalName: 'مدير المدرسة', principalName: 'مدير المدرسة', activeTimeProfileId: timeProfile.id })],
     device: [record({ id: 'device', deviceId: 'demo-device', theme: 'light', activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: timeProfile.id, reportPrincipalName: 'مدير المدرسة', lastSyncAt: null, schemaVersion: 7 })],
-    meta: [record({ id: DEMO_SEED_ID, version: 1, seededAt: FIXED_TIME })],
+    meta: [record({ id: DEMO_SEED_ID, version: 2, seededAt: FIXED_TIME })],
     years: [year], terms: [term, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
     items, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
-    units: [], lessons: [], timeProfiles: [timeProfile], notes, classRules, classGoals, classCharterSelections,
+    units: [], lessons: [], timeProfiles, notes, classRules, classGoals, classCharterSelections,
     groupArrangements, closedTermReports: [], assignments: [], submissions: [], outbox: [],
   };
 }
