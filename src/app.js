@@ -702,6 +702,7 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
         <label class="field">
           <span class="field__label">البريد الإلكتروني</span>
           <input class="input" name="email" type="email" required autocomplete="email" dir="ltr" placeholder="teacher@example.com">
+          <span class="t-3 fs-xs" data-email-otp-cooldown aria-live="polite"></span>
         </label>
         </div>
         <div data-email-otp-code-step hidden>
@@ -732,54 +733,80 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
       const submitBtn = root.querySelector('button[type="submit"]');
       const resendBtn = root.querySelector('[data-email-otp-resend]');
       const sentText = root.querySelector('[data-email-otp-sent]');
+      const cooldownText = root.querySelector('[data-email-otp-cooldown]');
       let selectedEmail = '';
       let cooldownTimer = null;
-      let cooldownUntil = 0;
+      let requestInFlight = false;
+      const cooldownByEmail = new Map();
       cleanupLoginSheet = () => clearTimeout(cooldownTimer);
 
-      const updateCooldown = () => {
-        const remaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
-        resendBtn.disabled = remaining > 0;
-        resendBtn.textContent = remaining > 0 ? `إعادة الإرسال بعد ${remaining} ث` : 'إعادة إرسال الرمز';
-        clearTimeout(cooldownTimer);
-        if (remaining > 0) cooldownTimer = setTimeout(updateCooldown, 1000);
+      const cooldownRemaining = (email) => {
+        const until = cooldownByEmail.get(normalizeEmailAddress(email)) ?? 0;
+        return Math.max(0, Math.ceil((until - Date.now()) / 1000));
       };
-      const startCooldown = () => {
-        cooldownUntil = Date.now() + EMAIL_OTP_RESEND_COOLDOWN_SECONDS * 1000;
+      const updateCooldown = () => {
+        const emailRemaining = cooldownRemaining(emailInput.value);
+        const resendRemaining = cooldownRemaining(selectedEmail);
+        cooldownText.textContent = emailRemaining > 0 ? `يمكنك طلب رمز جديد بعد ${emailRemaining} ثانية` : '';
+        resendBtn.disabled = requestInFlight || resendRemaining > 0;
+        resendBtn.textContent = resendRemaining > 0 ? `إعادة الإرسال بعد ${resendRemaining} ث` : 'إعادة إرسال الرمز';
+        if (form.dataset.step === 'email') submitBtn.disabled = requestInFlight || emailRemaining > 0;
+        clearTimeout(cooldownTimer);
+        if (Math.max(emailRemaining, resendRemaining) > 0) cooldownTimer = setTimeout(updateCooldown, 1000);
+      };
+      const startCooldown = (email, seconds = EMAIL_OTP_RESEND_COOLDOWN_SECONDS) => {
+        cooldownByEmail.set(normalizeEmailAddress(email), Date.now() + (seconds * 1000));
         updateCooldown();
       };
       const requestCode = async (email) => {
+        email = normalizeEmailAddress(email);
+        if (requestInFlight || cooldownRemaining(email) > 0) {
+          updateCooldown();
+          return false;
+        }
         if (navigator.onLine === false) throw Object.assign(new Error('Offline'), { code: 'AUTH_NETWORK' });
-        await cloud.requestEmailOtp(email);
-        selectedEmail = email;
-        sentText.textContent = `أُرسل الرمز إلى ${email}`;
-        emailStep.hidden = true;
-        codeStep.hidden = false;
-        form.dataset.step = 'verify';
-        submitBtn.textContent = 'تحقق وتسجيل الدخول';
-        tokenInput.required = true;
-        tokenInput.focus({ preventScroll: true });
-        startCooldown();
+        requestInFlight = true;
+        updateCooldown();
+        try {
+          await cloud.requestEmailOtp(email);
+          selectedEmail = email;
+          sentText.textContent = `أُرسل الرمز إلى ${email}`;
+          emailStep.hidden = true;
+          codeStep.hidden = false;
+          form.dataset.step = 'verify';
+          submitBtn.textContent = 'تحقق وتسجيل الدخول';
+          tokenInput.required = true;
+          tokenInput.focus({ preventScroll: true });
+          startCooldown(email);
+          return true;
+        } finally {
+          requestInFlight = false;
+          updateCooldown();
+          if (form.dataset.step === 'verify') submitBtn.disabled = false;
+        }
       };
 
+      emailInput?.addEventListener('input', updateCooldown);
       tokenInput?.addEventListener('input', () => { tokenInput.value = normalizeEmailOtp(tokenInput.value); });
       root.querySelector('[data-email-otp-change]')?.addEventListener('click', () => {
-        clearTimeout(cooldownTimer);
         codeStep.hidden = true;
         emailStep.hidden = false;
         form.dataset.step = 'email';
         tokenInput.required = false;
         tokenInput.value = '';
         submitBtn.textContent = 'إرسال رمز التحقق';
+        updateCooldown();
         emailInput.focus({ preventScroll: true });
       });
       resendBtn?.addEventListener('click', async () => {
         if (resendBtn.disabled || !selectedEmail) return;
         resendBtn.disabled = true;
         try {
-          await requestCode(selectedEmail);
-          toast('أُعيد إرسال رمز التحقق');
+          if (await requestCode(selectedEmail)) toast('أُعيد إرسال رمز التحقق');
         } catch (error) {
+          if (emailOtpFailureState(error, 'send') === 'rate_limited' && error.retryAfterSeconds) {
+            startCooldown(selectedEmail, error.retryAfterSeconds);
+          }
           toast(emailOtpFailureMessage(emailOtpFailureState(error, 'send')), 'danger');
           updateCooldown();
         }
@@ -798,8 +825,9 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
         submitBtn.disabled = true;
         try {
           if (form.dataset.step === 'email') {
-            await requestCode(email);
-            submitBtn.disabled = false;
+            const sent = await requestCode(email);
+            if (!sent) submitBtn.textContent = prevText;
+            updateCooldown();
             return;
           }
           await cloud.verifyEmailOtp(selectedEmail, token);
@@ -814,7 +842,11 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
           refreshTeacherMiniHubSheet({ focusAccountAction: true });
         } catch (err) {
           submitBtn.textContent = prevText;
-          submitBtn.disabled = false;
+          if (emailOtpFailureState(err, form.dataset.step === 'verify' ? 'verify' : 'send') === 'rate_limited' && err.retryAfterSeconds) {
+            startCooldown(email, err.retryAfterSeconds);
+          }
+          updateCooldown();
+          if (form.dataset.step === 'verify') submitBtn.disabled = false;
           toast(emailOtpFailureMessage(emailOtpFailureState(err, form.dataset.step === 'verify' ? 'verify' : 'send')), 'danger');
         }
       });

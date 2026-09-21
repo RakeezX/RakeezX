@@ -81,7 +81,20 @@ test('invalid, expired, offline, and cooldown states are deterministic', () => {
   assert.equal(emailOtpFailureState({ code: 'otp_expired' }), 'expired');
   assert.equal(emailOtpFailureState({ code: 'otp_invalid' }), 'invalid');
   assert.equal(emailOtpFailureState({ code: 'AUTH_NETWORK' }, 'send'), 'offline');
+  assert.equal(emailOtpFailureState({ status: 429 }, 'send'), 'rate_limited');
   assert.equal(EMAIL_OTP_RESEND_COOLDOWN_SECONDS, 60);
+  assert.equal(emailOtpFailureMessage('rate_limited'), 'تم إرسال رمز قبل قليل. انتظر قليلًا ثم أعد المحاولة.');
   assert.match(emailOtpFailureMessage('expired'), /انتهت صلاحية/);
   assert.match(emailOtpFailureMessage('invalid'), /غير صحيح/);
+});
+
+test('OTP request preserves a reliable server retry-after value', async () => {
+  globalThis.fetch = async () => new Response(JSON.stringify({ code: 'over_email_send_rate_limit' }), {
+    status: 429,
+    headers: { 'Content-Type': 'application/json', 'Retry-After': '42' },
+  });
+  await assert.rejects(
+    () => cloud.requestEmailOtp('existing@example.test'),
+    (error) => error.status === 429 && error.retryAfterSeconds === 42,
+  );
 });

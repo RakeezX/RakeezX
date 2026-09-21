@@ -19,15 +19,17 @@ export function isValidEmailOtp(value) {
 
 export function emailOtpFailureState(error, phase = 'verify') {
   if (error?.code === 'AUTH_NETWORK' || error instanceof TypeError) return 'offline';
-  if (phase === 'send') return 'send_failed';
   const code = String(error?.code ?? '').toLowerCase();
   const message = String(error?.message ?? '').toLowerCase();
+  if (error?.status === 429 || code.includes('rate_limit') || message.includes('rate limit')) return 'rate_limited';
+  if (phase === 'send') return 'send_failed';
   if (code.includes('expired') || message.includes('expired')) return 'expired';
   return 'invalid';
 }
 
 export function emailOtpFailureMessage(state) {
   if (state === 'offline') return 'يلزم الاتصال بالإنترنت لإرسال رمز التحقق.';
+  if (state === 'rate_limited') return 'تم إرسال رمز قبل قليل. انتظر قليلًا ثم أعد المحاولة.';
   if (state === 'expired') return 'انتهت صلاحية الرمز. اطلب رمزًا جديدًا.';
   if (state === 'invalid') return 'رمز التحقق غير صحيح. تحقق من الرمز وحاول مرة أخرى.';
   return 'تعذر إرسال رمز التحقق. تحقق من البريد وحاول مرة أخرى.';

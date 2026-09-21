@@ -74,7 +74,15 @@ function parseFailure(data, status) {
 async function responseFailure(response) {
   let data = null;
   try { data = await response.clone().json(); } catch {}
-  return parseFailure(data, response.status);
+  const error = parseFailure(data, response.status);
+  const retryAfter = response.headers.get('retry-after');
+  if (retryAfter) {
+    const numericSeconds = Number(retryAfter);
+    const dateSeconds = Math.ceil((Date.parse(retryAfter) - Date.now()) / 1000);
+    const seconds = Number.isFinite(numericSeconds) ? Math.ceil(numericSeconds) : dateSeconds;
+    if (Number.isFinite(seconds) && seconds > 0) error.retryAfterSeconds = seconds;
+  }
+  return error;
 }
 
 function saveSession(data, { required = true } = {}) {

@@ -97,3 +97,54 @@ test('offline state cannot initiate OTP and never falls back to SMS or password'
   await expect(login.locator('input[name="password"]')).toHaveCount(0);
   await expect(login.locator('input[type="tel"]')).toHaveCount(0);
 });
+
+test('email-specific cooldown survives back navigation, prevents duplicates, and maps server rate limits', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-09-21T12:00:00Z') });
+  const requests = [];
+  await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
+  await page.route(`${SUPABASE_URL}/auth/v1/**`, async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (!path.endsWith('/otp')) return route.fulfill({ status: 204 });
+    const body = route.request().postDataJSON();
+    requests.push(body);
+    if (body.email === 'limited@example.test') {
+      return route.fulfill({
+        status: 429,
+        headers: { 'Retry-After': '42', 'Access-Control-Expose-Headers': 'Retry-After' },
+        json: { code: 'over_email_send_rate_limit', message: 'rate limit exceeded' },
+      });
+    }
+    return route.fulfill({ status: 204 });
+  });
+
+  const login = await openLogin(page);
+  const email = login.locator('input[name="email"]');
+  const submit = login.getByRole('button', { name: 'إرسال رمز التحقق' });
+  await email.fill(' Existing@Example.Test ');
+  await submit.click();
+  expect(requests).toHaveLength(1);
+
+  await login.locator('[data-email-otp-change]').click();
+  await expect(login.locator('[data-email-otp-cooldown]')).toHaveText('يمكنك طلب رمز جديد بعد 60 ثانية');
+  await expect(submit).toBeDisabled();
+  await login.locator('form').dispatchEvent('submit');
+  expect(requests).toHaveLength(1);
+
+  await email.fill('different@example.test');
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  expect(requests).toHaveLength(2);
+  await expect(login.locator('[data-email-otp-resend]')).toBeDisabled();
+  await login.locator('[data-email-otp-resend]').dispatchEvent('click');
+  expect(requests).toHaveLength(2);
+
+  await page.clock.runFor(60_000);
+  await expect(login.locator('[data-email-otp-resend]')).toBeEnabled();
+  await login.locator('[data-email-otp-change]').click();
+  await email.fill('limited@example.test');
+  await submit.click();
+  expect(requests).toHaveLength(3);
+  await expect(page.locator('#toast')).toContainText('تم إرسال رمز قبل قليل. انتظر قليلًا ثم أعد المحاولة.');
+  await expect(login.locator('[data-email-otp-cooldown]')).toHaveText('يمكنك طلب رمز جديد بعد 42 ثانية');
+  await expect(submit).toBeDisabled();
+});
