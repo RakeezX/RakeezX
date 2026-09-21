@@ -13,7 +13,7 @@ import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.
 import { hasValidYearCalendarConfig } from './calendar.js';
 import { resolvedReportPrincipalName } from '../lib/report-print.js';
 import {
-  BETA_ACCESS_LABEL, currentAccountContract, refreshAccountContract, teacherAddress,
+  BETA_ACCESS_LABEL, currentAccountContract, isValidSaudiMobile, normalizeSaudiMobile, refreshAccountContract,
 } from '../lib/account-profile.js';
 
 const THEMES = [
@@ -300,22 +300,24 @@ export default {
                        maxlength="60" autocomplete="name" data-fk="teacherName"
                        data-change="save" placeholder="الاسم كما يظهر في التقارير">
               </label>
-              <label class="field">
+              <div class="field">
                 <span class="field__label">صيغة المخاطبة</span>
-                <select class="select" name="teacherForm" data-change="save">
-                  <option value="masculine" ${teacherForm === 'masculine' ? 'selected' : ''}>أستاذ</option>
-                  <option value="feminine" ${teacherForm === 'feminine' ? 'selected' : ''}>أستاذة</option>
-                </select>
-                <span class="field__hint">تؤثر في صيغة المخاطبة فقط، ولا تغيّر صلاحيات الحساب.</span>
-              </label>
+                <div class="segmented settings-teacher-form" role="group" aria-label="صيغة المخاطبة">
+                  <button type="button" class="segmented__btn ${teacherForm === 'masculine' ? 'is-on' : ''}"
+                          data-act="teacher-form" data-val="masculine" aria-pressed="${teacherForm === 'masculine' ? 'true' : 'false'}">معلم</button>
+                  <button type="button" class="segmented__btn ${teacherForm === 'feminine' ? 'is-on' : ''}"
+                          data-act="teacher-form" data-val="feminine" aria-pressed="${teacherForm === 'feminine' ? 'true' : 'false'}">معلمة</button>
+                </div>
+              </div>
             </div>
             <div class="field-row">
               <label class="field">
                 <span class="field__label">رقم الجوال</span>
                 <input class="input" name="phone" value="${m.phone ?? ''}" required
-                       maxlength="30" autocomplete="tel" inputmode="tel" dir="ltr"
-                       data-fk="phone" data-change="save" placeholder="05xxxxxxxx">
-                <span class="field__hint">بيان تواصل خاص بالحساب، ولا يظهر للطلاب.</span>
+                       pattern="05[0-9]{8}" autocomplete="tel" inputmode="numeric" dir="ltr"
+                       data-fk="phone" data-input="phone-input" data-change="save" placeholder="05xxxxxxxx"
+                       aria-describedby="settings-phone-hint">
+                <span class="field__hint" id="settings-phone-hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span>
               </label>
               <label class="field">
                 <span class="field__label">اسم المدرسة <span class="t-3 fs-xs">(اختياري)</span></span>
@@ -324,17 +326,14 @@ export default {
                        data-change="save" placeholder="اسم المدرسة">
               </label>
             </div>
-            <div class="field-row">
-              <label class="field">
-                <span class="field__label">البريد الإلكتروني</span>
-                <input class="input" value="${accountEmail}" type="email" dir="ltr" readonly
-                       aria-readonly="true" autocomplete="email">
-                <span class="field__hint">البريد موثّق من حساب الدخول ولا يُعدّل من هذه الصفحة.</span>
-              </label>
-              <div class="field">
-                <span class="field__label">الوصول</span>
-                <div class="input" role="status" aria-label="حالة الوصول">${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</div>
-                <span class="field__hint">${accountContract ? `صيغة المخاطبة الحالية: ${teacherAddress(teacherForm)}` : 'تُحدّث حالة الوصول عند الاتصال بالحساب.'}</span>
+            <div class="settings-account-summary" aria-label="معلومات الحساب">
+              <div class="settings-account-summary__row">
+                <span class="settings-account-summary__label">البريد الإلكتروني</span>
+                <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
+              </div>
+              <div class="settings-account-summary__row">
+                <span class="settings-account-summary__label">الوصول</span>
+                <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
               </div>
             </div>
             <label class="field" style="margin-bottom:0">
@@ -505,6 +504,20 @@ export default {
   },
 
   actions: {
+    async 'teacher-form'(el) {
+      const teacherForm = el.dataset.val === 'feminine' ? 'feminine' : 'masculine';
+      if (await store.patchProfile({ teacherForm })) {
+        toast('حُفظ');
+        repaint();
+      }
+    },
+
+    'phone-input'(el) {
+      const normalized = normalizeSaudiMobile(el.value);
+      if (el.value !== normalized) el.value = normalized;
+      el.removeAttribute('aria-invalid');
+    },
+
     'pwa-select-guide'(el) {
       activePwaGuide = el.dataset.platform;
       repaint();
@@ -648,6 +661,18 @@ export default {
 
     async save(el) {
       const val = el.value.trim();
+      if (el.name === 'phone') {
+        const phone = normalizeSaudiMobile(val);
+        el.value = phone;
+        if (!isValidSaudiMobile(phone)) {
+          el.setAttribute('aria-invalid', 'true');
+          toast('أدخل رقم جوال يبدأ بـ 05 ويتكوّن من 10 أرقام', 'danger');
+          return;
+        }
+        el.removeAttribute('aria-invalid');
+        if (await store.patchProfile({ phone })) toast('حُفظ');
+        return;
+      }
       if (el.name === 'reportPrincipalName' || el.name === 'principalName') {
         await store.patchProfile({ reportPrincipalName: val, principalName: val });
         await store.patchDevice({ reportPrincipalName: val });

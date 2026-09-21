@@ -55,7 +55,7 @@ async function seedClaimedWorkspace(page) {
   await page.unroute('**/__account_profile_fixture__');
 }
 
-test('Settings exposes the minimal profile and free beta access contract without editable email', async ({ page }) => {
+test('Settings exposes polished profile controls and read-only account information', async ({ page }) => {
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: {
     ownerId: OWNER, profileStatus: 'READY',
@@ -67,11 +67,30 @@ test('Settings exposes the minimal profile and free beta access contract without
   await page.goto('/#/settings');
   await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلمة الاختبار');
   await expect(page.locator('input[name="phone"]')).toHaveValue('0500000000');
-  await expect(page.locator('select[name="teacherForm"]')).toHaveValue('feminine');
-  await expect(page.locator('input[type="email"]')).toHaveValue(SESSION.user.email);
-  await expect(page.locator('input[type="email"]')).toHaveAttribute('readonly', '');
+  await expect(page.getByRole('button', { name: 'معلمة', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('input[type="email"]')).toHaveCount(0);
+  await expect(page.locator('[data-account-email]')).toHaveText(SESSION.user.email);
   await expect(page.getByText('الوصول التجريبي المجاني', { exact: true })).toBeVisible();
-  await expect(page.getByText('صيغة المخاطبة الحالية: أستاذة', { exact: true })).toBeVisible();
+  await expect(page.locator('[data-account-access]')).toHaveClass(/badge/);
+  await expect(page.locator('[data-account-access]')).not.toHaveClass(/input/);
+  await expect(page.getByText(/تؤثر في صيغة المخاطبة|صيغة المخاطبة الحالية/)).toHaveCount(0);
   await expect(page.locator('input[name="phone"]')).toHaveAttribute('required', '');
+  await expect(page.locator('input[name="phone"]')).toHaveAttribute('pattern', '05[0-9]{8}');
+  await expect(page.getByText('خاص ببيانات الحساب ولا يظهر للطلاب.', { exact: true })).toBeVisible();
   await expect(page.locator('input[name="schoolName"]')).not.toHaveAttribute('required', '');
+
+  const phone = page.locator('input[name="phone"]');
+  await phone.fill('abc٠٥١٢٣٤٥٦٧٨99');
+  await expect(phone).toHaveValue('0512345678');
+  await phone.fill('0412345678');
+  await phone.blur();
+  await expect(phone).toHaveAttribute('aria-invalid', 'true');
+  await page.reload();
+  await expect(phone).toHaveValue('0500000000');
+
+  await page.getByRole('button', { name: 'معلم', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });

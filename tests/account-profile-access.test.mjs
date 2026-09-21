@@ -5,7 +5,9 @@ import {
   BETA_ACCESS_LABEL,
   PROFILE_STATUS,
   completeProfile,
+  isValidSaudiMobile,
   normalizeAccountContract,
+  normalizeSaudiMobile,
   provisionAccount,
   teacherAddress,
   validateProfileCompletion,
@@ -45,13 +47,25 @@ test('email is always taken from authenticated identity, never profile payload',
   assert.equal('email' in contract.profile, false);
 });
 
-test('phone and teacher name are required while school remains optional', () => {
+test('Saudi mobile and teacher name are required while school remains optional', () => {
   assert.deepEqual(validateProfileCompletion({ teacherName: '', phone: '', schoolName: '' }).missing,
     ['teacherName', 'phone']);
-  const valid = validateProfileCompletion({ teacherName: ' معلمة ', phone: ' 0500 ', teacherForm: 'feminine' });
+  const valid = validateProfileCompletion({ teacherName: ' معلمة ', phone: ' ٠٥٠٠٠٠٠٠٠٠ ', teacherForm: 'feminine' });
   assert.equal(valid.valid, true);
   assert.equal(valid.profile.schoolName, '');
   assert.equal(valid.profile.teacherName, 'معلمة');
+  assert.equal(valid.profile.phone, '0500000000');
+});
+
+test('Saudi mobile normalization keeps ten digits and rejects invalid values', () => {
+  assert.equal(normalizeSaudiMobile('٠٥١٢٣٤٥٦٧٨'), '0512345678');
+  assert.equal(normalizeSaudiMobile('۰۵۱۲۳۴۵۶۷۸'), '0512345678');
+  assert.equal(normalizeSaudiMobile('05ab1234567899'), '0512345678');
+  assert.equal(isValidSaudiMobile('0512345678'), true);
+  assert.equal(isValidSaudiMobile('05123456789'), false);
+  assert.equal(isValidSaudiMobile('0412345678'), false);
+  assert.equal(isValidSaudiMobile('05letters12'), false);
+  assert.deepEqual(validateProfileCompletion({ teacherName: 'معلم', phone: '0412345678' }).invalid, ['phone']);
 });
 
 test('provisioning is delegated to the fixed server contract and normalizes beta access', async () => {
