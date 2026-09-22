@@ -2846,20 +2846,21 @@
     text-align: start;
   }
   .home-shortcuts .tile__icon { width: 38px; height: 38px; margin: 0; border-radius: 12px; background: var(--bg-elev); box-shadow: 0 1px 3px rgb(20 50 36 / .08); }
+  .home-shortcuts .tile__copy { display: block; min-width: 0; }
   .home-shortcuts .tile__title,
-  .home-shortcuts .tile__sub { text-align: start; }
+  .home-shortcuts .tile__sub { display: block; width: 100%; text-align: start; }
   .home-shortcuts .tile__title { font-size: 11px; }
-  .home-shortcuts .tile__sub { font-size: 9px; }
+  .home-shortcuts .tile__sub { margin-top: 2px; font-size: 9px; line-height: 1.35; }
 
   .home-summary { padding: 13px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-elev); box-shadow: var(--shadow-1); }
   .home-summary .grid--3 { gap: 7px; }
-  .home-summary .stat { min-width: 0; padding: 8px 4px; border-radius: 12px; background: color-mix(in srgb, var(--bg-sunk) 72%, var(--bg-elev)); box-shadow: none; }
-  .home-summary .stat__val { font-size: 15px; font-weight: 750; line-height: 1.25; }
-  .home-summary .stat__label { margin-top: 2px; font-size: 8px; line-height: 1.35; }
-  .home-summary .card { margin-top: 10px !important; padding: 9px 0 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; background: transparent; box-shadow: none; }
-  .home-summary .card .fs-md { font-size: 9px; color: var(--text-3); }
-  .home-summary .card .fw-7 { font-size: 9px; color: var(--text-3); }
-  .home-summary .meter { height: 6px; margin-top: 8px !important; }
+  .home-summary .stat { min-width: 0; padding: 8px 4px; border-radius: 12px; background: color-mix(in srgb, var(--bg-sunk) 72%, var(--bg-elev)); box-shadow: none; text-align: center; }
+  .home-summary .stat__val { width: 100%; font-size: 15px; font-weight: 750; line-height: 1.25; text-align: center; }
+  .home-summary .stat__label { width: 100%; margin-top: 2px; font-size: 8px; line-height: 1.35; text-align: center; }
+  .home-day-progress { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border); }
+  .home-day-progress__copy { display: flex; justify-content: space-between; gap: 10px; color: var(--text-3); font-size: 9px; }
+  .home-day-progress__track { height: 6px; margin-top: 8px; overflow: hidden; border-radius: var(--r-full); background: var(--bg-sunk); }
+  .home-day-progress__track > span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
 
   .today-empty-card {
     display: grid;
@@ -2923,6 +2924,7 @@
   .home-shortcuts__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .home-shortcuts .tile { display: grid; grid-template-columns: 1fr; place-items: center; align-content: center; gap: 4px; min-height: 82px; padding: 7px 3px; text-align: center; }
   .home-shortcuts .tile__icon { width: 32px; height: 32px; margin-inline: auto; }
+  .home-shortcuts .tile__copy { display: contents; }
   .home-shortcuts .tile__title { width: 100%; text-align: center; font-size: 10px; }
   .home-shortcuts .tile__sub { display: none; }
   .today-empty-card { grid-template-columns: 44px minmax(0, 1fr); min-height: 0; padding: 16px 14px; }

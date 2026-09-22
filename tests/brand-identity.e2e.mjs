@@ -25,18 +25,20 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
     const header = page.locator(width < 900 ? '.mobile-brand img:visible' : '.sidebar__brand img:visible');
     await expect(page.locator(width < 900 ? '.mobile-brand' : '.sidebar__brand').getByRole('img', { name: 'رَكيز المعلم', exact: true })).toBeVisible();
     await expect(header).toHaveAttribute('src', new RegExp(`header-${theme}-${width < 900 ? 'compact' : 'standard'}\\.svg$`));
-    expect((await header.boundingBox()).width).toBeCloseTo(width < 900 ? Math.min(220, Math.max(199, width * .225 + 127)) : 245, 1);
+    const expectedHeaderWidth = width < 900 ? (width <= 360 ? 118 : Math.min(160, Math.max(122, width * .37))) : 203;
+    expect((await header.boundingBox()).width).toBeCloseTo(expectedHeaderWidth, 1);
     expect(await header.evaluate(img => { const box = img.getBoundingClientRect(); return box.left >= 0 && box.right <= innerWidth && Math.abs(box.width / box.height - img.naturalWidth / img.naturalHeight) < .01; })).toBe(true);
     await expect(page.locator('.home-pwa-prompt')).toContainText('تطبيق رَكيز المعلم');
     await expect(page.locator('.brand-lockup:visible')).toHaveCount(1);
     await expect(page.locator('.hero .brand-lockup, .hero img')).toHaveCount(0);
-    await expect(page.locator('.hero__hello')).toHaveText('أهلًا بك');
+    const signedOutGreeting = await page.evaluate(() => new Date().getHours() < 12 ? 'صباح الخير' : 'أهلاً بك');
+    await expect(page.locator('.hero__hello')).toHaveText(signedOutGreeting);
     await expect(page.locator('.hero__date')).toBeVisible();
     await expect(page.locator('.hero .compact-timing-pill')).toBeVisible();
     expect(await page.locator('.hero').evaluate(node => node.getBoundingClientRect().height)).toBeLessThan(100);
     for (const selector of ['.home-pwa-brand-icon']) {
       await expect(page.locator(selector)).toHaveJSProperty('naturalWidth', 192);
-      expect(await page.locator(selector).evaluate(img => img.getBoundingClientRect().width)).toBe(52);
+      expect(await page.locator(selector).evaluate(img => img.getBoundingClientRect().width)).toBe(44);
       await expect(page.locator(selector)).toHaveAttribute('src', /icon-192\.png$/);
       expect(await page.locator('.home-pwa-brand-mark').evaluate(node => getComputedStyle(node).borderRadius)).toBe('12px');
     }
@@ -79,7 +81,10 @@ test('brand identity: shell, Home, Teacher Center, login and install in both the
   await expect(page).toHaveTitle('رَكيز المعلم');
   await page.evaluate(() => window.store.patchProfile({ teacherName: 'معلم الاختبار' }, { queue: false }));
   await page.reload();
-  await expect(page.locator('.hero__hello')).toHaveText('أهلًا، معلم الاختبار');
+  const teacherGreeting = await page.evaluate(() => new Date().getHours() < 12
+    ? 'صباح الخير، أستاذ معلم الاختبار'
+    : 'أهلاً، أستاذ معلم الاختبار');
+  await expect(page.locator('.hero__hello')).toHaveText(teacherGreeting);
   await expect(page.locator('.brand-lockup:visible')).toHaveCount(1);
   expect(errors).toEqual([]);
 });

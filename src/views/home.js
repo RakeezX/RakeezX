@@ -7,17 +7,61 @@
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
 import { APP_ICON_URL } from '../lib/brand.js';
+import { getAccountPresentation } from '../lib/account-profile.js';
 import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
 import {
-  todayISO, gradeLabel, studentTotal, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday,
+  todayISO, shiftDate, gradeLabel, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday,
 } from '../models.js';
 
 const DISMISS_STORAGE_KEY = 'rakeezx_home_pwa_dismissed_at';
 const SUPPRESSION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 let sessionDismissed = false;
+
+export function homeGreeting(profile = {}, now = new Date()) {
+  const teacherName = String(profile.teacherName ?? '').trim();
+  const presentation = getAccountPresentation(profile.teacherForm);
+  const morning = now.getHours() < 12;
+  if (!teacherName) return morning ? 'صباح الخير' : 'أهلاً بك';
+  return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific} ${teacherName}`;
+}
+
+export function homeSummaryMetrics(list, {
+  today = todayISO(),
+  studentsFor = (teachingId) => store.students(teachingId),
+  sessionsForDate = (date) => store.sessionsOn(date),
+  attendanceFor = (sessionId) => store.attendanceIn(sessionId),
+  completenessFor = (session) => store.attendanceCompleteness(session),
+} = {}) {
+  const teachingIds = new Set((list ?? []).map((teaching) => teaching.id));
+  const studentIds = new Set();
+  for (const teaching of list ?? []) {
+    for (const student of studentsFor(teaching.id)) studentIds.add(student.id);
+  }
+
+  const todaySessions = sessionsForDate(today).filter((session) =>
+    teachingIds.has(session.teachingId) && !CANCELLED_SESSION_STATUSES.has(session.status)
+  );
+  const completedToday = todaySessions.filter((session) => completenessFor(session).state === 'completed').length;
+
+  const weekStart = shiftDate(today, -weekday(today));
+  const weekSessions = Array.from({ length: weekday(today) + 1 }, (_, offset) => shiftDate(weekStart, offset))
+    .flatMap((date) => sessionsForDate(date))
+    .filter((session) => teachingIds.has(session.teachingId) && !CANCELLED_SESSION_STATUSES.has(session.status));
+  const weekAttendance = weekSessions.flatMap((session) => attendanceFor(session.id))
+    .filter((record) => Object.hasOwn(ATTENDANCE, record.status));
+  const attended = weekAttendance.filter((record) => record.status === 'present' || record.status === 'late').length;
+
+  return Object.freeze({
+    classes: (list ?? []).length,
+    students: studentIds.size,
+    weeklyAttendance: weekAttendance.length ? Math.round((attended / weekAttendance.length) * 100) : null,
+    completedToday,
+    totalToday: todaySessions.length,
+  });
+}
 
 export function isStandaloneMode() {
   if (typeof window === 'undefined') return false;
@@ -220,9 +264,8 @@ export default {
       <div class="home-stack">
       <!-- الهوية في غلاف التطبيق؛ يبدأ المحتوى بالترحيب والسياق اليومي فقط. -->
       <div class="hero home-hero">
-        <span class="home-hero__eyebrow">الرئيسية</span>
         <div class="hero__main-row">
-          <div class="hero__hello">${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك'}</div>
+          <div class="hero__hello">${homeGreeting(meta)}</div>
           <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
             <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(timingProfile))}</span>
             <span>${timingProfile}</span>
@@ -350,36 +393,32 @@ export default {
       </section>
 
         </div>
-        <aside class="home-dashboard__aside" aria-label="اختصارات وملخص مساحة العمل">
+        <aside class="home-dashboard__aside" aria-label="اختصارات وملخص">
       <!-- اختصارات سريعة -->
       <section class="section home-shortcuts" aria-labelledby="home-shortcuts-title">
         <div class="section__head"><h2 class="section__title" id="home-shortcuts-title">اختصارات</h2></div>
         <div class="grid grid--auto home-shortcuts__grid">
           <a class="tile" href="#/classes">
             <span class="tile__icon">${icon('classes')}</span>
-            <span class="tile__title">فصولي</span>
-            <span class="tile__sub"><span class="tabular">${list.length}</span> فصلاً هذا الفصل</span>
+            <span class="tile__copy"><span class="tile__title">فصولي</span><span class="tile__sub"><span class="tabular">${list.length}</span> فصلاً هذا الفصل</span></span>
           </a>
           <a class="tile" href="#/schedule">
             <span class="tile__icon">${icon('timetable')}</span>
-            <span class="tile__title">الجدول</span>
-            <span class="tile__sub">حصصك الأسبوعية</span>
+            <span class="tile__copy"><span class="tile__title">الجدول</span><span class="tile__sub">حصصك الأسبوعية</span></span>
           </a>
           <a class="tile" href="#/reports">
             <span class="tile__icon">${icon('reports')}</span>
-            <span class="tile__title">التقارير</span>
-            <span class="tile__sub">كشوف ومتابعة</span>
+            <span class="tile__copy"><span class="tile__title">التقارير</span><span class="tile__sub">كشوف ومتابعة</span></span>
           </a>
           <a class="tile" href="#/calendar">
             <span class="tile__icon">${icon('calendar')}</span>
-            <span class="tile__title">التقويم</span>
-            <span class="tile__sub">الإجازات والأيام المميّزة</span>
+            <span class="tile__copy"><span class="tile__title">التقويم</span><span class="tile__sub">الإجازات والأيام المميّزة</span></span>
           </a>
         </div>
       </section>
 
       ${onboarding.state === 'A'
-        ? html`<section class="section home-summary home-workspace-note" aria-labelledby="home-workspace-note-title"><div class="section__head"><h2 class="section__title" id="home-workspace-note-title">مساحة العمل</h2></div><p>ابدأ بفصلك الأول، وستتكوّن مؤشراتك اليومية تدريجيًا دون إعدادات معقدة.</p></section>`
+        ? html`<section class="section home-summary home-workspace-note" aria-label="إرشاد البدء"><p>ابدأ بفصلك الأول، وستتكوّن مؤشراتك اليومية تدريجيًا دون إعدادات معقدة.</p></section>`
         : summary(list)}
         </aside>
       </div>
@@ -417,64 +456,32 @@ export default {
 /* ---------- ملخّصات مبنية على بيانات حقيقية فقط ---------- */
 
 function summary(list) {
-  const today = todayISO();
-  let students = 0;
-  let needSupport = 0;
-  let graded = 0;
-  let pctSum = 0;
-  let markedToday = 0;
-  let expectedToday = 0;
-
-  for (const tch of list) {
-    const { roster, items, ctx } = store.teachingContext(tch.id);
-    students += roster.length;
-    for (const s of roster) {
-      const t = studentTotal(items, ctx[s.id]);
-      if (t.pct === null) continue;
-      graded++;
-      pctSum += t.pct;
-      if (t.pct < 50) needSupport++;
-    }
-    for (const ses of store.sessionsOnFor(tch.id, today)) {
-      if (ses.status === 'cancelled_holiday') continue;
-      expectedToday += roster.length;
-      markedToday += store.attendanceIn(ses.id).length;
-    }
-  }
-
-  const avg = graded ? pctSum / graded : null;
+  const metrics = homeSummaryMetrics(list);
+  const progress = metrics.totalToday ? Math.round((metrics.completedToday / metrics.totalToday) * 100) : 0;
 
   return html`
     <section class="section home-summary surface surface--compact" aria-labelledby="home-summary-title">
       <div class="section__head"><h2 class="section__title" id="home-summary-title">نظرة سريعة</h2></div>
-      <div class="grid grid--3">
+      <div class="grid grid--3 home-summary__stats">
         <div class="stat">
-          <div class="stat__val tabular">${students}</div>
+          <div class="stat__val tabular">${metrics.classes}</div>
+          <div class="stat__label">فصول</div>
+        </div>
+        <div class="stat">
+          <div class="stat__val tabular">${metrics.students}</div>
           <div class="stat__label">طالبًا</div>
         </div>
         <div class="stat">
-          <div class="stat__val tabular">${avg === null ? '—' : fmtPct(avg)}</div>
-          <div class="stat__label">متوسط المرصود</div>
-        </div>
-        <div class="stat">
-          <div class="stat__val tabular" style="${needSupport ? 'color:var(--danger)' : ''}">${needSupport}</div>
-          <div class="stat__label">يحتاج متابعة</div>
+          <div class="stat__val tabular">${metrics.weeklyAttendance === null ? '—' : fmtPct(metrics.weeklyAttendance)}</div>
+          <div class="stat__label">حضور الأسبوع</div>
         </div>
       </div>
-      ${expectedToday
-        ? html`
-            <div class="card card--pad mt-3">
-              <div class="hstack gap-2">
-                <span class="t-2 fs-md">حضور اليوم</span>
-                <span class="push tabular fw-7">${markedToday}/${expectedToday}</span>
-              </div>
-              <div class="meter mt-3">
-                <div class="meter__fill" style="width:${Math.round((markedToday / expectedToday) * 100)}%;
-                     background:var(--${markedToday >= expectedToday ? 'ok' : 'warn'})"></div>
-              </div>
-            </div>
-          `
-        : ''}
+      <div class="home-day-progress">
+        <div class="home-day-progress__copy"><span>تقدم اليوم</span><span class="tabular">${metrics.completedToday} من ${metrics.totalToday} حصص</span></div>
+        <div class="home-day-progress__track" role="progressbar" aria-label="تقدم حصص اليوم" aria-valuemin="0" aria-valuemax="${metrics.totalToday}" aria-valuenow="${metrics.completedToday}">
+          <span style="width:${progress}%"></span>
+        </div>
+      </div>
     </section>
   `;
 }

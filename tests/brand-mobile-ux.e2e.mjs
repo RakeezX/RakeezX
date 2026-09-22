@@ -32,15 +32,16 @@ test('Home, Schedule and Calendar: compact RTL surfaces and real controls in bot
     await expect(page.locator('.hero .compact-timing-pill')).toBeVisible();
     if (width < 900) {
       await expect(page.locator('.mobile-brand img:visible')).toHaveJSProperty('naturalWidth', 295);
-      expect((await page.locator('.mobile-brand img:visible').boundingBox()).width).toBeCloseTo(Math.min(220, Math.max(199, width * .225 + 127)), 1);
+      const expectedHeaderWidth = width <= 360 ? 118 : Math.min(160, Math.max(122, width * .37));
+      expect((await page.locator('.mobile-brand img:visible').boundingBox()).width).toBeCloseTo(expectedHeaderWidth, 1);
       await expect(page.locator('.topbar__account-name')).toHaveText('تسجيل الدخول');
       await expect(page.locator('.topbar__teacher-sync')).toHaveCount(0);
-      expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(48);
+      expect((await page.locator('.topbar__teacher-btn').boundingBox()).height).toBeGreaterThanOrEqual(44);
       await page.locator('.topbar__teacher-btn').click();
       await expect(page.locator('.mini-hub-pwa')).toBeVisible();
       await page.getByRole('button', { name: 'إغلاق', exact: true }).last().click();
     }
-    if (width < 769) expect((await page.locator('.hero .compact-timing-pill').boundingBox()).height).toBeLessThanOrEqual(34);
+    if (width < 769) expect((await page.locator('.hero .compact-timing-pill').boundingBox()).height).toBeLessThanOrEqual(36);
     await noOverflow(page);
     await page.screenshot({ path: `${output}/home-${width}-${theme}.png` });
     expect((await new AxeBuilder({ page }).include('.topbar').include('.hero').include('.home-pwa-prompt').analyze()).violations).toEqual([]);

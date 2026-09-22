@@ -233,7 +233,7 @@ function openTeacherMiniHubSheet() {
 /* ---------- التنقل الرئيسي ---------- */
 
 const NAV = [
-  { href: '#/',          icon: 'home',      label: 'الرئيسية',        exact: true, primary: true, group: 'مساحة العمل' },
+  { href: '#/',          icon: 'home',      label: 'الرئيسية',        exact: true, primary: true },
   { href: '#/classes',   icon: 'classes',   label: 'الفصول',          primary: true },
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
@@ -331,7 +331,6 @@ function topbar(v, params) {
         ${isHome ? html`
           <span class="mobile-brand">${brandLockup({ compact: true })}</span>
           <span class="topbar__page desktop-home-title">
-            <small>مساحة العمل</small>
             <span class="topbar__title-row"><strong>${title}</strong>${demo ? html`<span class="demo-pill demo-pill--desktop" data-demo-indicator>الوضع التجريبي <small>· بيانات محلية</small></span>` : ''}</span>
           </span>
         ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}

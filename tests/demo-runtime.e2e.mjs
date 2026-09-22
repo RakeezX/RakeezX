@@ -124,7 +124,7 @@ test.describe('isolated Demo runtime', () => {
     await page.goto('/');
     await enterDemo(page);
     await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
-    await expect(page.getByText(/أهلًا، معلم ركيز/)).toBeVisible();
+    await expect(page.locator('.hero__hello')).toHaveText(/^(صباح الخير|أهلاً)، أستاذ معلم ركيز$/);
 
     const initial = await page.evaluate(async () => {
       const open = indexedDB.open('rakeezx-demo', 7);
