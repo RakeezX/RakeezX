@@ -75,7 +75,7 @@ test.describe('isolated Demo runtime', () => {
     await page.route('https://*.supabase.co/**', (route) => { cloudRequests += 1; return route.abort(); });
     await page.goto('/');
     await enterDemo(page);
-    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
     await expect(page.locator('.home-sessions')).toBeVisible();
 
     const first = await todayState(page, monday);
@@ -92,11 +92,11 @@ test.describe('isolated Demo runtime', () => {
     expect(new Set(first.slots.map((slot) => `${slot.weekday}:${slot.period}`)).size).toBe(16);
 
     await page.reload();
-    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
     expect((await todayState(page, monday)).sessions).toEqual(first.sessions);
 
     await page.goto('/#/teaching/demo:teaching:3/sessions');
-    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
     expect((await todayState(page, monday)).sessions).toEqual(first.sessions);
     expect(cloudRequests).toBe(0);
   });
@@ -109,10 +109,10 @@ test.describe('isolated Demo runtime', () => {
       await freezeLocalDate(page, date);
       await page.goto('/');
       await enterDemo(page);
-      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+      await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
       expect((await todayState(page, date)).sessions).toHaveLength(expected);
       await page.reload();
-      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+      await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
       expect((await todayState(page, date)).sessions).toHaveLength(expected);
       await context.close();
     };
@@ -123,7 +123,7 @@ test.describe('isolated Demo runtime', () => {
   test('enters explicitly, persists local edits without outbox, resets, and exits', async ({ page }) => {
     await page.goto('/');
     await enterDemo(page);
-    await expect(page.locator('[data-demo-indicator]')).toContainText('الوضع التجريبي');
+    await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
     await expect(page.getByText(/أهلًا، معلم ركيز/)).toBeVisible();
 
     const initial = await page.evaluate(async () => {
@@ -169,7 +169,7 @@ test.describe('isolated Demo runtime', () => {
   test('separate context has no Demo marker or Product data exposure', async ({ browser, page }) => {
     await page.goto('/');
     await enterDemo(page);
-    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
     const isolated = await browser.newContext();
     const other = await isolated.newPage();
     await other.route('https://*.supabase.co/**', (route) => route.abort());
@@ -187,7 +187,7 @@ test.describe('isolated Demo runtime', () => {
     await enterDemo(page);
     for (const route of ['/#/classes', '/#/schedule', '/#/reports', '/#/calendar', '/#/settings', '/#/settings/backup']) {
       await page.goto(route);
-      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+      await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
       await expect(page.locator('.empty--error')).toHaveCount(0);
     }
     await expect(page.locator('[data-demo-cloud-unavailable]')).toBeVisible();
@@ -240,7 +240,7 @@ test.describe('isolated Demo runtime', () => {
   test('topbar login exits Demo and returns to the signed-out auth entry', async ({ page }) => {
     await page.goto('/');
     await enterDemo(page);
-    await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+    await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
     await page.locator('[data-act="demo-login"]:visible').first().click();
     await expect(page.locator('[data-demo-indicator]')).toHaveCount(0);
     await expectDemoEntryAvailable(page);
@@ -264,15 +264,15 @@ test.describe('isolated Demo runtime', () => {
     try {
       await page.goto(server.url);
       await enterDemo(page);
-      await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+      await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
       await expect.poll(() => page.evaluate(async () => !!(await navigator.serviceWorker.getRegistration())?.active), { timeout: 10_000 }).toBe(true);
       if (!await page.evaluate(() => !!navigator.serviceWorker.controller)) {
         await page.reload();
-        await expect(page.locator('[data-demo-indicator]')).toBeVisible();
+        await expect(page.locator('[data-demo-indicator]:visible')).toBeVisible();
       }
       await context.setOffline(true);
       await page.reload();
-      await expect(page.locator('[data-demo-indicator]'), failures.join('\n')).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('[data-demo-indicator]:visible'), failures.join('\n')).toBeVisible({ timeout: 10_000 });
       await expect(page.locator('.empty--error')).toHaveCount(0);
       await context.setOffline(false);
     } finally {

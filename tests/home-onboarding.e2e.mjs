@@ -6,7 +6,8 @@ test('Home guides a teacher from first class to students to a weekly schedule', 
   await page.waitForFunction(() => window.store?.state?.ready === true);
 
   await expect(page.getByRole('heading', { name: 'أنشئ فصلك الأول' })).toBeVisible();
-  await expect(page.getByText('حصص اليوم', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('حصص اليوم', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'لا توجد حصص بعد' })).toBeVisible();
 
   const fixture = await page.evaluate(async () => {
     const section = await window.store.createSection({ grade: 5, label: `بدء-${Date.now()}`, name: 'الخامس / بدء' });

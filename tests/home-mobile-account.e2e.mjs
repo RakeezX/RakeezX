@@ -102,7 +102,7 @@ test('real Mobile Home binds the compact signed-in account button to authoritati
     await expect(button).toHaveAttribute('aria-label', new RegExp(stateText[state]));
     await expect(button.locator('.topbar__teacher-sync')).toHaveClass(new RegExp(`sync-dot--${state}`));
     const geometry = await accountGeometry(page);
-    expect(geometry).toMatchObject({ height: 48, labelNowrap: true, labelTruncated: false, ledWidth: 8, ledHeight: 8 });
+    expect(geometry).toMatchObject({ height: 44, labelNowrap: true, labelTruncated: false, ledWidth: 8, ledHeight: 8 });
     await expectNoOverflow(page);
     if (['synced', 'pending', 'error'].includes(state)) {
       await page.screenshot({ path: `${output}/${state}-390-light.png`, animations: 'disabled' });
@@ -129,7 +129,7 @@ test('signed-out and no-name states keep the existing Teacher Center action with
   const button = page.locator('.topbar__teacher-btn--home-account');
   await expect(button.locator('.topbar__account-name')).toHaveText('تسجيل الدخول');
   await expect(button.locator('.topbar__teacher-sync')).toHaveCount(0);
-  expect((await accountGeometry(page)).height).toBe(48);
+  expect((await accountGeometry(page)).height).toBe(44);
   await page.screenshot({ path: `${output}/signed-out-390-light.png`, animations: 'disabled' });
   await button.click();
   await expect(page.locator('.mini-hub-sheet')).toBeVisible();
@@ -155,13 +155,13 @@ test('mobile widths, themes, long names and retained shortcuts remain stable', a
       await page.setViewportSize({ width, height: 844 });
       await seedHeader(page, { signedIn: true, name: longName, state: 'synced' });
       const geometry = await accountGeometry(page);
-      expect(geometry.height).toBe(48);
+      expect(geometry.height).toBe(44);
       expect(geometry.labelNowrap).toBe(true);
       expect(geometry.labelTruncated).toBe(true);
       expect(geometry.ledWidth).toBe(8);
       await expect(page.locator('.mobile-brand')).toBeVisible();
       expect((await page.locator('.mobile-brand img:visible').boundingBox()).width)
-        .toBeCloseTo(Math.min(220, Math.max(199, width * .225 + 127)), 1);
+        .toBeCloseTo(width <= 360 ? 118 : Math.min(160, Math.max(122, width * .37)), 1);
       await expect(page.locator('.topbar__teacher-btn--home-account')).toBeVisible();
       expect(await page.locator('.topbar').evaluate(node => {
         const brand = node.querySelector('.mobile-brand').getBoundingClientRect();

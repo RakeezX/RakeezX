@@ -217,10 +217,10 @@ export default {
     const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
 
     return html`
-      <div class="home-dashboard">
-        <div class="home-dashboard__primary">
+      <div class="home-stack">
       <!-- الهوية في غلاف التطبيق؛ يبدأ المحتوى بالترحيب والسياق اليومي فقط. -->
       <div class="hero home-hero">
+        <span class="home-hero__eyebrow">الرئيسية</span>
         <div class="hero__main-row">
           <div class="hero__hello">${meta.teacherName ? html`أهلًا، ${meta.teacherName}` : 'أهلًا بك'}</div>
           <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
@@ -233,8 +233,6 @@ export default {
           ${cal ? html` · <span class="badge badge--info">${cal.label || 'يوم مميّز'}</span>` : ''}
         </div>
       </div>
-
-      ${renderOnboarding(onboarding)}
 
       <!-- إشعار تثبيت التطبيق السياقي (مؤقت وغير مسيطر) -->
       ${showInstallPrompt
@@ -269,16 +267,31 @@ export default {
           `
         : ''}
 
+      <div class="home-dashboard">
+        <div class="home-dashboard__primary">
+
+      ${renderOnboarding(onboarding)}
+
       ${renderTodayFocus(focus)}
 
       <!-- حصص اليوم -->
-      ${onboarding.state !== 'A' ? html`<section class="section home-sessions" aria-labelledby="home-sessions-title">
-        <div class="section__head">
-          <h2 class="section__title" id="home-sessions-title">${focus ? 'بقية حصص اليوم' : 'حصص اليوم'}</h2>
-          ${pendingToday ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${pendingToday}</span></span>` : ''}
-          <a class="btn btn--sm btn--quiet push" href="#/schedule">الجدول ${icon('back')}</a>
-        </div>
-        ${remainingSessions.length
+      <section class="section home-sessions" aria-labelledby="home-sessions-title">
+        ${onboarding.state === 'A' || daySessions.length ? html`
+          <div class="section__head">
+            <h2 class="section__title" id="home-sessions-title">${focus ? 'بقية حصص اليوم' : 'حصص اليوم'}</h2>
+            ${pendingToday ? html`<span class="badge badge--warn">بانتظار الرصد <span class="tabular">${pendingToday}</span></span>` : ''}
+            ${onboarding.state !== 'A' ? html`<a class="btn btn--sm btn--quiet push" href="#/schedule">عرض الجدول ${icon('back')}</a>` : ''}
+          </div>
+        ` : ''}
+        ${onboarding.state === 'A'
+          ? html`
+              <div class="home-sessions__empty empty-day">
+                <span class="empty-day__icon" aria-hidden="true">${icon('classes')}</span>
+                <h3>لا توجد حصص بعد</h3>
+                <p>بعد إنشاء الفصل وإضافة الجدول، ستظهر هنا حصص يومك تلقائيًا.</p>
+              </div>
+            `
+          : remainingSessions.length
           ? html`
               <div class="list home-session-list">
                 ${remainingSessions.map((s) => {
@@ -320,18 +333,21 @@ export default {
                 })}
               </div>
             `
-          : html`
-              <div class="home-sessions__empty">
-                <div class="t-3 fs-md">لا حصص أخرى مجدولة اليوم.</div>
-                <p class="t-3 fs-sm mt-3">
-                  أضف حصصك الأسبوعية في «الجدول» لتظهر هنا تلقائيًا كل يوم.
-                </p>
-                <a class="btn btn--sm btn--primary mt-3" href="#/schedule">
-                  ${icon('timetable')} إعداد الجدول
-                </a>
-              </div>
-            `}
-      </section>` : ''}
+          : daySessions.length
+            ? html`
+                <div class="home-sessions__empty">
+                  <div class="t-3 fs-md">لا حصص أخرى مجدولة اليوم.</div>
+                  <p class="t-3 fs-sm mt-3">اكتملت قائمة حصص اليوم الحالية.</p>
+                </div>
+              `
+            : html`
+                <div class="home-sessions__empty today-empty-card">
+                  <span class="today-empty-card__icon" aria-hidden="true">${icon('timetable')}</span>
+                  <div><small>اليوم الدراسي</small><h2 id="home-sessions-title">لا توجد حصص اليوم</h2><p>يمكنك مراجعة جدول الأسبوع أو متابعة أعمال فصولك.</p></div>
+                  <a class="btn btn--quiet" href="#/schedule">عرض الجدول</a>
+                </div>
+              `}
+      </section>
 
         </div>
         <aside class="home-dashboard__aside" aria-label="اختصارات وملخص مساحة العمل">
@@ -362,7 +378,9 @@ export default {
         </div>
       </section>
 
-      ${summary(list)}
+      ${onboarding.state === 'A'
+        ? html`<section class="section home-summary home-workspace-note" aria-labelledby="home-workspace-note-title"><div class="section__head"><h2 class="section__title" id="home-workspace-note-title">مساحة العمل</h2></div><p>ابدأ بفصلك الأول، وستتكوّن مؤشراتك اليومية تدريجيًا دون إعدادات معقدة.</p></section>`
+        : summary(list)}
         </aside>
       </div>
 

@@ -117,7 +117,7 @@ test('secondary action hands off to the current isolated Demo runtime', async ({
   await page.route(`${SUPABASE_URL}/**`, (route) => route.abort());
   await page.goto(`${host.url}/#/`);
   await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
-  await expect(page.getByText('الوضع التجريبي — بيانات محلية', { exact: true })).toBeVisible();
+  await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
   await page.getByRole('link', { name: 'الفصول', exact: true }).click();
   await expect(page.getByText('184', { exact: true })).toBeVisible();
   await expect(page.getByText('8', { exact: true })).toBeVisible();

@@ -85,10 +85,10 @@ function renderSidebarMiniHubTrigger() {
 
   if (isDemoWorkspace()) return html`
     <button class="teacher-mini-hub-trigger" data-act="demo-login" aria-label="الخروج من الوضع التجريبي وتسجيل الدخول">
-      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">${icon('login')}</div>
+      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">ع</div>
       <div class="teacher-mini-hub-trigger__info">
-        <div class="teacher-mini-hub-trigger__name">تسجيل الدخول</div>
-        <div class="teacher-mini-hub-trigger__sub">الوضع التجريبي</div>
+        <div class="teacher-mini-hub-trigger__name">مساحة تجريبية</div>
+        <div class="teacher-mini-hub-trigger__sub">بيانات خيالية</div>
       </div>
       <div class="teacher-mini-hub-trigger__chev" aria-hidden="true">${icon('chev')}</div>
     </button>
@@ -290,7 +290,6 @@ function shell(path, params) {
         <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
       </nav>
       <main class="main">
-        ${isDemoWorkspace() ? html`<div class="demo-mode-banner" role="status" data-demo-indicator>الوضع التجريبي — بيانات محلية</div>` : ''}
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
         <div class="app-status-strip ${showConnectionState ? `is-visible is-${syncInfo.status}` : ''}"
              data-app-status role="status" aria-live="polite" aria-atomic="true">
@@ -322,17 +321,25 @@ function topbar(v, params) {
   const isLoggedIn = !!(cloud.session && cloud.user);
   const demo = isDemoWorkspace();
   const accountName = String(profile.teacherName ?? '').trim();
-  const homeAccountLabel = isLoggedIn ? (accountName || 'إكمال الحساب') : 'تسجيل الدخول';
-  const homeAccountA11y = isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
+  const homeAccountLabel = demo ? 'تجريبي' : isLoggedIn ? (accountName || 'إكمال الحساب') : 'تسجيل الدخول';
+  const homeAccountA11y = demo ? 'الوضع التجريبي، بيانات محلية' : isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
 
   return html`
     <header class="topbar ${isHome ? 'topbar--home' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
-        ${isHome ? html`<span class="mobile-brand">${brandLockup({ compact: true })}</span><span class="desktop-home-title">${title}</span>` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
+        ${isHome ? html`
+          <span class="mobile-brand">${brandLockup({ compact: true })}</span>
+          <span class="topbar__page desktop-home-title">
+            <small>مساحة العمل</small>
+            <span class="topbar__title-row"><strong>${title}</strong>${demo ? html`<span class="demo-pill demo-pill--desktop" data-demo-indicator>الوضع التجريبي <small>· بيانات محلية</small></span>` : ''}</span>
+          </span>
+        ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
+        ${isHome && demo ? html`<span class="demo-pill demo-pill--mobile" data-demo-indicator>تجريبي</span>` : ''}
+        ${!isHome && demo ? html`<span class="demo-pill" data-demo-indicator>الوضع التجريبي</span>` : ''}
         ${isHome ? html`
           <button class="topbar__teacher-btn topbar__teacher-btn--home-account"
                   data-act="${demo ? 'demo-login' : 'open-teacher-mini-hub'}"
