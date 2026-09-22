@@ -7206,9 +7206,10 @@
   }
   .classes-page .class-card__main { padding: 13px 14px; }
   .classes-page .class-card__dot { display: none; }
-  .classes-page .class-card__title { font-size: 16px; line-height: 1.45; }
-  .classes-page .class-card__sub { font-size: 10px; color: var(--text-3); }
-  .classes-page .class-card__count { color: var(--text-3); font-size: 9px; }
+  .classes-page .class-card__title { font-size: 17px; font-weight: 800; line-height: 1.42; }
+  .classes-page .class-card__sub { color: var(--text-3); font-size: 12px; font-weight: 650; line-height: 1.4; }
+  .classes-page .class-card__count { color: var(--text-3); font-size: 10px; }
+  .classes-page .class-card__count .tabular { color: var(--text); font-size: 15px; font-weight: 760; }
   .classes-page .classes-actions { gap: 8px; }
   .classes-page .class-action-delete-btn { margin-inline-start: auto; }
 
@@ -7287,10 +7288,10 @@
     border-radius: var(--r-md);
     background: var(--bg-sunk);
   }
-  .class-hub .class-hub-stats .stat { min-block-size: 58px; padding: 9px 8px; border: 0; border-radius: 0; box-shadow: none; }
+  .class-hub .class-hub-stats .stat { display: grid; place-items: center; align-content: center; gap: 1px; min-inline-size: 0; min-block-size: 58px; padding: 9px 8px; border: 0; border-radius: 0; box-shadow: none; text-align: center; }
   .class-hub .class-hub-stats .stat + .stat { border-inline-start: 1px solid var(--border); }
-  .class-hub .class-hub-stats .stat__val { font-size: 15px; }
-  .class-hub .class-hub-stats .stat__label { font-size: 9px; }
+  .class-hub .class-hub-stats .stat__val { inline-size: 100%; font-size: 15px; text-align: center; }
+  .class-hub .class-hub-stats .stat__label { inline-size: 100%; font-size: 9px; text-align: center; }
 
   .students-roster-page .roster-toolbar {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -7340,6 +7341,7 @@
   .topbar--class-hub .topbar__actions { margin-inline-start: auto; }
   .classes-page .class-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .classes-page .class-card { min-block-size: 112px; }
+  .classes-page .class-card__title { font-size: 15px; white-space: normal; }
   .class-hub > .section.class-tools-section .quick-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .students-roster-page .roster-row { grid-template-columns: 36px minmax(0, 1fr) auto; min-block-size: 64px; padding: 8px 9px; }
   .students-roster-page .roster-row > .avatar { display: none; }
@@ -7350,6 +7352,7 @@
 @media screen and (max-width: 520px) {
   .classes-page .class-cards-grid { grid-template-columns: 1fr; }
   .classes-page .class-card { min-block-size: 100px; }
+  .classes-page .class-card__title { white-space: nowrap; }
   .classes-page .class-action-delete-btn { margin-inline-start: 0; }
   .class-hub .class-hub-header__top { padding: 13px 14px; }
   .class-hub .class-hub-header__end { width: auto; }
@@ -7357,8 +7360,15 @@
   .class-hub .class-hub-lesson-bar > .btn { grid-column: 1 / -1; inline-size: 100%; margin: 0; }
   .class-hub .class-tool-card { min-block-size: 66px; padding: 9px; }
   .class-hub .class-tool-card .tile__sub { display: none; }
+  .class-hub .class-hub-stats .stat { padding-inline: 3px; }
+  .class-hub .class-hub-stats .stat__val { font-size: 15px; }
+  .class-hub .class-hub-stats .stat__label { font-size: 8px; }
   .students-roster-page .roster-toolbar { grid-template-columns: 1fr; gap: 7px; }
   .students-roster-page .roster-summary { justify-self: start; min-block-size: 32px; }
   .students-roster-page .roster-row { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; }
   .students-roster-page .roster-row .rollno { inline-size: 34px; block-size: 34px; }
+}
+
+@media screen and (max-width: 360px) {
+  .classes-page .class-card__title { font-size: 14px; }
 }

@@ -47,6 +47,20 @@ test('Classes and Class Hub match the approved Work hierarchy with Production ro
   await expect(page.locator('.classes-actions').getByRole('button', { name: 'إضافة فصل', exact: true })).toBeVisible();
   const cardHeights = await page.locator('.class-card').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
   expect(cardHeights.every((height) => height >= 110 && height <= 130)).toBe(true);
+  const classType = await page.locator('.class-card').first().evaluate((node) => {
+    const title = getComputedStyle(node.querySelector('.class-card__title'));
+    const subject = getComputedStyle(node.querySelector('.class-card__sub'));
+    return {
+      titleSize: parseFloat(title.fontSize), titleWeight: parseFloat(title.fontWeight), titleLine: parseFloat(title.lineHeight),
+      subjectSize: parseFloat(subject.fontSize), subjectWeight: parseFloat(subject.fontWeight), subjectLine: parseFloat(subject.lineHeight),
+    };
+  });
+  expect(classType.titleSize).toBe(17);
+  expect(classType.titleWeight).toBe(800);
+  expect(classType.titleLine).toBeCloseTo(24.14, 1);
+  expect(classType.subjectSize).toBe(12);
+  expect(classType.subjectWeight).toBe(650);
+  expect(classType.subjectLine).toBeCloseTo(16.8, 1);
   await expectNoOverflow(page);
   await page.screenshot({ path: `${output}/desktop-classes-light.png`, fullPage: true, animations: 'disabled' });
 
@@ -64,6 +78,19 @@ test('Classes and Class Hub match the approved Work hierarchy with Production ro
     };
   });
   expect(placement).toEqual({ after: true, aligned: true });
+  const statsAlignment = await page.locator('.class-hub-stats .stat').evaluateAll((nodes) => nodes.map((node) => {
+    const value = node.querySelector('.stat__val');
+    const label = node.querySelector('.stat__label');
+    const style = getComputedStyle(node);
+    return {
+      placeItems: style.placeItems,
+      alignContent: style.alignContent,
+      textAlign: style.textAlign,
+      valueAlign: getComputedStyle(value).textAlign,
+      labelAlign: getComputedStyle(label).textAlign,
+    };
+  }));
+  expect(statsAlignment.every((item) => item.placeItems === 'center' && item.alignContent === 'center' && item.textAlign === 'center' && item.valueAlign === 'center' && item.labelAlign === 'center')).toBe(true);
   const toolSizes = await page.locator('.class-tool-card').evaluateAll((nodes) => nodes.map((node) => ({
     height: node.getBoundingClientRect().height,
     title: parseFloat(getComputedStyle(node.querySelector('.tile__title')).fontSize),
@@ -72,6 +99,7 @@ test('Classes and Class Hub match the approved Work hierarchy with Production ro
   expect(toolSizes.every(({ height, title, support }) => height >= 76 && title >= 12 && support >= 10)).toBe(true);
   await expectNoOverflow(page);
   await page.screenshot({ path: `${output}/desktop-class-hub-light.png`, fullPage: true, animations: 'disabled' });
+  await page.locator('.class-hub-stats').screenshot({ path: `${output}/desktop-class-hub-statistics-light.png`, animations: 'disabled' });
 
   const axe = await new AxeBuilder({ page }).include('.main').analyze();
   expect(axe.violations).toEqual([]);
@@ -125,7 +153,10 @@ test('mobile 390, 360 and 320 preserve hierarchy, touch targets and overflow saf
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/#/classes');
     await expect(page.locator('.class-card')).toHaveCount(8);
+    const expectedTitleSize = width <= 360 ? 14 : 15;
+    expect(await page.locator('.class-card__title').first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize))).toBe(expectedTitleSize);
     await expectNoOverflow(page);
+    if (width === 390) await page.screenshot({ path: `${output}/mobile-390-classes-light.png`, fullPage: true, animations: 'disabled' });
     await page.locator('.class-card__main').first().click();
     await expect(page.locator('.topbar--class-hub .topbar__title')).toBeHidden();
     await expect(page.locator('.class-tool-card')).toHaveCount(8);
@@ -138,6 +169,7 @@ test('mobile 390, 360 and 320 preserve hierarchy, touch targets and overflow saf
     if (width === 390 || width === 320) {
       await page.screenshot({ path: `${output}/mobile-${width}-class-hub-light.png`, fullPage: true, animations: 'disabled' });
     }
+    if (width === 390) await page.locator('.class-hub-stats').screenshot({ path: `${output}/mobile-390-class-hub-statistics-light.png`, animations: 'disabled' });
   }
   expect(errors).toEqual([]);
 });
