@@ -32,9 +32,6 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
           </div>
         </div>
         <div class="class-hub-header__end">
-          <span class="class-hub-header__status-badge ${completeness?.state === 'completed' ? 'is-done' : completeness?.state === 'pending' ? 'is-live' : ''}">
-            ${completeness?.state === 'completed' ? html`${icon('check')} مكتمل` : completeness?.state === 'pending' ? 'بانتظار الرصد' : targetSession ? 'حصة اليوم' : 'لا حصة اليوم'}
-          </span>
           <button class="iconbtn" data-act="edit-sec" aria-label="تعديل بيانات الشعبة" title="تعديل بيانات الشعبة">${icon('settings')}</button>
         </div>
       </div>
@@ -128,23 +125,6 @@ export default {
       ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
       ${activeGoalIndicator(tch.id, activeGoal)}
       <div class="section">
-        <div class="grid grid--3">
-          <div class="stat">
-            <div class="stat__val tabular">${roster.length}</div>
-            <div class="stat__label">طالبًا</div>
-          </div>
-          <div class="stat">
-            <div class="stat__val tabular">${avg === null ? '—' : fmtPct(avg)}</div>
-            <div class="stat__label">متوسط المرصود</div>
-          </div>
-          <div class="stat">
-            <div class="stat__val tabular" style="${needSupport ? 'color:var(--danger)' : ''}">${needSupport}</div>
-            <div class="stat__label">يحتاج دعمًا</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
           <a class="btn btn--sm btn--quiet" href="#/teaching/${tch.id}/attendance">
@@ -202,11 +182,29 @@ export default {
             (t) => html`
               <a class="tile class-tool-card" href="${t.href}">
                 <span class="tile__icon">${icon(t.icon)}</span>
-                <span class="tile__title">${t.title}</span>
-                <span class="tile__sub">${t.sub}</span>
+                <span class="class-tool-card__copy">
+                  <span class="tile__title">${t.title}</span>
+                  <span class="tile__sub">${t.sub}</span>
+                </span>
               </a>
             `
           )}
+        </div>
+      </div>
+      <div class="section class-stats-section" aria-label="ملخص الفصل">
+        <div class="grid grid--3 class-hub-stats">
+          <div class="stat">
+            <div class="stat__val tabular">${roster.length}</div>
+            <div class="stat__label">طالبًا</div>
+          </div>
+          <div class="stat">
+            <div class="stat__val tabular">${avg === null ? '—' : fmtPct(avg)}</div>
+            <div class="stat__label">متوسط المرصود</div>
+          </div>
+          <div class="stat">
+            <div class="stat__val tabular" style="${needSupport ? 'color:var(--danger)' : ''}">${needSupport}</div>
+            <div class="stat__label">يحتاج دعمًا</div>
+          </div>
         </div>
       </div>
       </div>

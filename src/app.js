@@ -318,6 +318,7 @@ function topbar(v, params) {
   const teacherName = profile.teacherName || presentation.teacherLabel;
   const syncInfo = getSyncState();
   const isHome = currentPath() === '/';
+  const isClassHub = /^\/teaching\/[^/]+$/.test(currentPath());
   const isLoggedIn = !!(cloud.session && cloud.user);
   const demo = isDemoWorkspace();
   const accountName = String(profile.teacherName ?? '').trim();
@@ -325,7 +326,7 @@ function topbar(v, params) {
   const homeAccountA11y = demo ? 'الوضع التجريبي، بيانات محلية' : isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
 
   return html`
-    <header class="topbar ${isHome ? 'topbar--home' : ''}">
+    <header class="topbar ${isHome ? 'topbar--home' : ''} ${isClassHub ? 'topbar--class-hub' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
       <h1 class="topbar__title">
         ${isHome ? html`

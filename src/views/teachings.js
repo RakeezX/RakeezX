@@ -233,7 +233,7 @@ function renderClassCard(tch) {
   const demo = isDemo(tch);
 
   return html`
-    <div class="class-card ${demo ? 'is-demo' : ''}">
+    <div class="class-card ${demo ? 'is-demo' : ''}" style="--class-color:${safeColor(sec?.color)}">
       <a class="class-card__main" href="#/teaching/${tch.id}">
         <div class="class-card__head">
           <div class="class-card__identity">
@@ -259,10 +259,6 @@ function renderClassCard(tch) {
 export default {
   title: () => 'الفصول',
   subtitle: () => store.activeTerm()?.name ?? '',
-
-  topActions: () => html`
-    <button class="iconbtn" data-act="add" aria-label="فصل جديد">${icon('plus')}</button>
-  `,
 
   render() {
     const list = store.teachings();
