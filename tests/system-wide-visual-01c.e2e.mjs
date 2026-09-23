@@ -161,6 +161,68 @@ test('copy conflict review offers retain or independent addition and zero select
   await expect(review).toHaveCount(0);
 });
 
+test('final polish keeps Work attendance rows and grade filters compact with stable score metrics', async ({ page }, testInfo) => {
+  await enterDemo(page);
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#/teaching/demo:teaching:1/attendance?session=demo:session:1:1');
+    const row = page.locator('.attendance-01c__row').first();
+    await expect(row).toBeVisible();
+    const attendance = await row.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const buttons = [...element.querySelectorAll('.attendance-01c__status')];
+      return { display: style.display, borderTop: style.borderTopWidth,
+        gap: getComputedStyle(element.parentElement).gap,
+        buttonWidths: buttons.map((button) => button.getBoundingClientRect().width),
+        buttonHeights: buttons.map((button) => button.getBoundingClientRect().height) };
+    });
+    expect(attendance.display).toBe('grid');
+    expect(attendance.borderTop).toBe('0px');
+    expect(attendance.gap).toBe('0px');
+    expect(Math.max(...attendance.buttonWidths) - Math.min(...attendance.buttonWidths)).toBeLessThan(2);
+    expect(Math.min(...attendance.buttonWidths)).toBeGreaterThan(45);
+    expect(Math.min(...attendance.buttonHeights)).toBeGreaterThanOrEqual(44);
+    await page.screenshot({ path: testInfo.outputPath(`polish-attendance-${width}.png`), fullPage: true });
+
+    await page.goto('/#/teaching/demo:teaching:1/grades');
+    const checkbox = page.locator('.grades-01c__missing-filter input');
+    await expect(checkbox).toBeVisible();
+    const checkboxSize = await checkbox.boundingBox();
+    expect(Math.round(checkboxSize.width)).toBe(18);
+    expect(Math.round(checkboxSize.height)).toBe(18);
+    await expect(page.locator('.grades-01c__missing-filter')).toContainText('غير المرصود فقط');
+    await page.getByRole('tab', { name: /واجب/ }).click();
+    const equation = page.locator('.grades-01c__equation').first();
+    await expect(equation).toBeVisible();
+    await expect(equation.locator('.grades-01c__metric')).toHaveCount(2);
+    const equationStyle = await equation.evaluate((element) => ({ display: getComputedStyle(element).display,
+      columns: getComputedStyle(element).gridTemplateColumns.split(' ').length }));
+    expect(equationStyle.display).toBe('grid');
+    expect(equationStyle.columns).toBe(5);
+    expect((await page.locator('.grades-01c__subscore-row').first().boundingBox()).height).toBeLessThan(width < 700 ? 190 : 110);
+    await page.screenshot({ path: testInfo.outputPath(`polish-subitems-${width}.png`), fullPage: true });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width + 1);
+  }
+
+  await page.goto('/#/teaching/demo:teaching:1/items');
+  const summary = page.locator('.distribution-hero p');
+  await expect(summary).toBeVisible();
+  expect(Number.parseFloat(await summary.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(14);
+  await page.locator('.distribution-item').filter({ hasText: 'واجب' })
+    .getByRole('button', { name: 'تحرير العناصر' }).click();
+  const total = page.locator('.subitem-total');
+  await expect(total).toBeVisible();
+  const labels = await total.evaluate((element) => {
+    const name = element.querySelector('span').getBoundingClientRect();
+    const value = element.querySelector('strong').getBoundingClientRect();
+    return { nameY: name.y, valueY: value.y, nameHeight: name.height, valueHeight: value.height };
+  });
+  expect(Math.abs(labels.nameY - labels.valueY)).toBeLessThan(4);
+  expect(labels.nameHeight).toBeLessThan(30);
+  expect(labels.valueHeight).toBeLessThan(30);
+  await page.screenshot({ path: testInfo.outputPath('polish-summary-320.png'), fullPage: true });
+});
+
 test('01C visuals are responsive, themed, keyboard usable, and accessible in Demo', async ({ page }, testInfo) => {
   await enterDemo(page);
   for (const theme of ['light', 'dark']) {

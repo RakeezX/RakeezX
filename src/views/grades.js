@@ -169,7 +169,8 @@ export default {
       <div class="grades-toolbar grades-01c__toolbar noprint">
         <label class="grades-01c__search">${icon('search')}<input type="search" data-input="search" data-fk="grades-search"
           value="${query}" placeholder="ابحث عن طالب" aria-label="بحث في كشف الدرجات"></label>
-        <label class="field" style="margin-bottom:0; flex: 1; min-width: 140px;">
+        <div class="grades-01c__filters">
+          <label class="grades-01c__sort">
           <select class="select" data-change="sort" aria-label="ترتيب الطلاب">
             <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي</option>
             <option value="name" ${sortKey === 'name' ? 'selected' : ''}>أبجديًا (اسم الطالب)</option>
@@ -178,10 +179,11 @@ export default {
             <option value="score_asc" ${sortKey === 'score_asc' ? 'selected' : ''}>الأقل درجة</option>
           </select>
         </label>
-        <label class="switch" style="margin-inline-start: auto;">
+        <label class="grades-01c__missing-filter">
           <input type="checkbox" data-change="toggle-missing" ${filterMissing ? 'checked' : ''}>
-          <span>غير المرصودة درجاتهم</span>
+          <span>غير المرصود فقط</span>
         </label>
+        </div>
       </div>
 
       ${mode === 'item' ? itemMode(processedRoster, items, ctx, currentItem, roster) : tableMode(processedRoster, items, ctx)}
@@ -456,12 +458,12 @@ function subitemMode(roster, ctx, item) {
               <span>${definition.name}<b class="tabular">${fmtNum(definition.value)}</b></span>
             </label>`)}</div>
           <div class="grades-01c__equation" aria-label="ملخص درجة ${student.name}">
-            <span>العناصر <b class="tabular">${fmtNum(derived)}</b></span><i aria-hidden="true">+</i>
-            <label><span>يدوي</span><input class="grades-01c__manual tabular" type="text" inputmode="decimal"
+            <span class="grades-01c__metric"><small>العناصر</small><b class="tabular">${fmtNum(derived)}</b></span><i aria-hidden="true">+</i>
+            <label class="grades-01c__manual-field"><small>يدوي</small><input class="grades-01c__manual tabular" type="text" inputmode="decimal"
               data-change="manual-contribution" data-student="${student.id}" data-item="${item.id}"
               data-fk="manual-${student.id}-${item.id}" value="${manual === null ? '' : fmtNum(manual)}"
               aria-label="إضافة يدوية للطالب ${student.name}"></label><i aria-hidden="true">=</i>
-            <strong class="tabular">${final === null ? '—' : fmtNum(final)} / ${fmtNum(item.max)}</strong>
+            <strong class="grades-01c__metric grades-01c__metric--final"><small>النهائي</small><b class="tabular">${final === null ? '—' : fmtNum(final)} / ${fmtNum(item.max)}</b></strong>
             ${warning ? html`<small class="grades-01c__capacity" role="alert">${warning}</small>` : ''}
           </div>
         </article>`;
