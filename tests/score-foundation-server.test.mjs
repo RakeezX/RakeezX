@@ -22,12 +22,42 @@ before(async () => {
     grant usage on schema auth to authenticated,anon;
   `);
   const names = (await readdir(migrationsDirectory)).sort()
-    .filter((name) => /^\d+.*\.sql$/.test(name) && Number(name.slice(0, 4)) <= 33);
+    .filter((name) => /^\d+.*\.sql$/.test(name) && Number(name.slice(0, 4)) <= 34);
   for (const name of names) {
     await pg.exec((await readFile(new URL(name, migrationsDirectory), 'utf8')).replace(/^\uFEFF/, ''));
   }
 });
 after(async () => pg?.close());
+
+test('0034 removes direct guard execution without changing trigger bindings', async () => {
+  const guards = ['guard_subitem_definition_write', 'guard_subitem_score_write'];
+  for (const guard of guards) {
+    const [acl] = (await pg.query(`select
+      has_function_privilege('anon', $1, 'EXECUTE') anon,
+      has_function_privilege('authenticated', $1, 'EXECUTE') authenticated,
+      exists (select 1 from pg_proc p, aclexplode(p.proacl) a
+        where p.oid=$1::regprocedure and a.grantee=0 and a.privilege_type='EXECUTE') public`,
+    [`rakeezx.${guard}()`])).rows;
+    assert.deepEqual(acl, { anon: false, authenticated: false, public: false });
+    for (const role of ['anon', 'authenticated']) {
+      await pg.exec(`set role ${role}`);
+      try {
+        await assert.rejects(() => pg.query(`select rakeezx.${guard}()`), /permission denied/i);
+      } finally {
+        await pg.exec('reset role');
+      }
+    }
+  }
+  const bindings = (await pg.query(`select p.proname, count(*)::int bindings
+    from pg_trigger t join pg_proc p on p.oid=t.tgfoid
+    where p.pronamespace='rakeezx'::regnamespace
+      and p.proname in ('guard_subitem_definition_write','guard_subitem_score_write')
+    group by p.proname order by p.proname`)).rows;
+  assert.deepEqual(bindings, [
+    { proname: 'guard_subitem_definition_write', bindings: 3 },
+    { proname: 'guard_subitem_score_write', bindings: 1 },
+  ]);
+});
 
 test('score foundation migration is additive and exposes owner-bound domain capability', async () => {
   const columns = (await pg.query(`select table_name,column_name from information_schema.columns

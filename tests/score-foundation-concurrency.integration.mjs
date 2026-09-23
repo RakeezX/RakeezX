@@ -56,7 +56,7 @@ before(async () => {
       as $$select id from auth.current_identity limit 1$$;
     grant usage on schema auth to authenticated,anon;`);
   for (const name of (await readdir(migrations)).sort()
-    .filter((entry) => /^\d+.*\.sql$/.test(entry) && Number(entry.slice(0, 4)) <= 33)) {
+    .filter((entry) => /^\d+.*\.sql$/.test(entry) && Number(entry.slice(0, 4)) <= 34)) {
     await admin.query((await readFile(new URL(name, migrations), 'utf8')).replace(/^\uFEFF/, ''));
   }
   await admin.query(`insert into rakeezx.years(id,label,hijri_start,hijri_end) values('race:year','synthetic',1500,1501);
@@ -147,6 +147,19 @@ async function overlap(first, second) {
     if (!committed) await a.query('rollback');
   }
 }
+
+test('native PostgreSQL denies direct score-guard calls after 0034', async () => {
+  // Isolate function EXECUTE from the separate schema-USAGE boundary in this disposable DB.
+  await admin.query('grant usage on schema rakeezx to anon');
+  for (const role of ['anon', 'authenticated']) {
+    const client = await connection();
+    await client.query(`set role ${role}`);
+    for (const guard of ['guard_subitem_definition_write', 'guard_subitem_score_write']) {
+      await assert.rejects(() => client.query(`select rakeezx.${guard}()`),
+        /permission denied for function/i);
+    }
+  }
+});
 
 test('two independent sessions: completion and manual both survive', async () => {
   const f = await fixture('three', 3);
