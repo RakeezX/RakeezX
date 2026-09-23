@@ -6,7 +6,7 @@
 
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { itemScore, studentTotal, masteryBand } from '../models.js';
+import { itemScore, studentTotal, masteryBand, normalizeSearchText } from '../models.js';
 import { repaint } from '../repaint.js';
 
 let mode = 'item';        // item | table
@@ -15,6 +15,8 @@ let sortKey = 'default';   // default | name | roll | score_desc | score_asc
 let filterMissing = false;
 let bulkSelected = new Set();
 let bulkScoreVal = '';
+let query = '';
+const scoreValidation = new Map();
 
 const AUTO_NOTE = {
   participation: 'يُحسب آليًا من الرصد السريع — لا يُدخل يدويًا.',
@@ -29,7 +31,7 @@ function refreshScoreProjection(studentId, itemId) {
   const countEl = document.querySelector('[data-grade-count]');
   if (countEl && currentItem) {
     const count = roster.filter((student) => itemScore(currentItem, ctx[student.id]) !== null).length;
-    countEl.textContent = `${count}/${roster.length}`;
+    countEl.textContent = count;
   }
   const total = studentTotal(items, ctx[studentId]);
   const totalEl = document.querySelector(`[data-grade-total="${CSS.escape(studentId)}"]`);
@@ -54,6 +56,8 @@ export default {
     filterMissing = false;
     bulkSelected = new Set();
     bulkScoreVal = '';
+    query = '';
+    scoreValidation.clear();
   },
 
   render(p) {
@@ -62,11 +66,11 @@ export default {
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الدرجات محفوظة، ولا يمكن تعديلها من مسار العمل النشط.</div></div>`;
 
     const { roster, items, ctx } = store.teachingContext(cls.id);
-    const distributionAction = html`<div class="grades-page-head noprint"><a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
+    const distributionAction = html`<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a>`;
 
     if (!roster.length) {
       return html`
-        ${distributionAction}
+        <div class="grades-page-head noprint">${distributionAction}</div>
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">أضف الطلاب أولًا</div>
@@ -77,7 +81,7 @@ export default {
 
     if (!items.length) {
       return html`
-        ${distributionAction}
+        <div class="grades-page-head noprint">${distributionAction}</div>
         <div class="empty">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود تقييم</div>
@@ -109,6 +113,13 @@ export default {
       }
     }
 
+    if (query) {
+      const normalized = normalizeSearchText(query);
+      processedRoster = processedRoster.filter((student) =>
+        normalizeSearchText(student.name).includes(normalized) ||
+        normalizeSearchText(student.rollNo ?? '').includes(normalized));
+    }
+
     // الترتيب
     if (sortKey === 'name') {
       processedRoster.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
@@ -129,18 +140,35 @@ export default {
     }
 
     return html`
-      ${distributionAction}
-      <div class="segmented mb-3">
-        <button class="segmented__btn ${mode === 'item' ? 'is-on' : ''}" data-act="mode" data-mode="item">
+      <div class="grades-01c">
+      <section class="grades-01c__context">
+      <div class="grades-01c__mode-bar"><div class="segmented" role="group" aria-label="طريقة عرض الدرجات">
+        <button class="segmented__btn ${mode === 'item' ? 'is-on' : ''}" data-act="mode" data-mode="item" aria-pressed="${mode === 'item'}">
           بند واحد
         </button>
-        <button class="segmented__btn ${mode === 'table' ? 'is-on' : ''}" data-act="mode" data-mode="table">
+        <button class="segmented__btn ${mode === 'table' ? 'is-on' : ''}" data-act="mode" data-mode="table" aria-pressed="${mode === 'table'}">
           الجدول
         </button>
-      </div>
+      </div>${distributionAction}</div>
+      ${mode === 'item' ? html`<div class="grades-01c__item-tabs" role="tablist" aria-label="بنود التقييم">
+        ${items.map((item) => html`<button class="grades-01c__item-tab ${item.id === activeItemId ? 'is-active' : ''}"
+          data-act="pick" data-id="${item.id}" role="tab" aria-selected="${item.id === activeItemId}">
+          <strong>${item.name}</strong><small>${item.max} درجات${item.auto ? ' · آلي' : ''}</small>
+        </button>`)}</div>` : ''}
+      ${mode === 'item' ? html`<div class="grades-01c__assessment">
+        <div><h2>${currentItem.name}</h2><p>${currentItem.scoreMode === 'subitems' ? 'عناصر فرعية' : currentItem.auto ? 'رصد آلي' : 'رصد يدوي'} · الدرجة العظمى ${currentItem.max}</p></div>
+        <div class="grades-01c__summary">
+          <div><strong data-grade-count>${roster.filter((student) => itemScore(currentItem, ctx[student.id]) !== null).length}</strong><span>مرصودة</span></div>
+          <div><strong>${roster.filter((student) => itemScore(currentItem, ctx[student.id]) === null).length}</strong><span>غير مرصودة</span></div>
+          <div><strong>${currentItem.max}</strong><span>الدرجة العظمى</span></div>
+        </div>
+      </div>` : ''}
+      </section>
 
       <!-- شريط الإنتاجية: الفلترة والترتيب -->
-      <div class="grades-toolbar noprint">
+      <div class="grades-toolbar grades-01c__toolbar noprint">
+        <label class="grades-01c__search">${icon('search')}<input type="search" data-input="search" data-fk="grades-search"
+          value="${query}" placeholder="ابحث عن طالب" aria-label="بحث في كشف الدرجات"></label>
         <label class="field" style="margin-bottom:0; flex: 1; min-width: 140px;">
           <select class="select" data-change="sort" aria-label="ترتيب الطلاب">
             <option value="default" ${sortKey === 'default' ? 'selected' : ''}>الترتيب الافتراضي</option>
@@ -157,6 +185,7 @@ export default {
       </div>
 
       ${mode === 'item' ? itemMode(processedRoster, items, ctx, currentItem, roster) : tableMode(processedRoster, items, ctx)}
+      </div>
     `;
   },
 
@@ -175,6 +204,11 @@ export default {
 
     sort(el) {
       sortKey = el.value;
+      repaint();
+    },
+
+    search(el) {
+      query = el.value.trim();
       repaint();
     },
 
@@ -211,7 +245,7 @@ export default {
       }
       const raw = bulkScoreVal.trim();
       const item = store.state.items.find((i) => i.id === activeItemId);
-      if (!item || item.auto) return;
+      if (!item || item.auto || item.scoreMode === 'subitems') return;
 
       if (raw === '') {
         for (const sId of bulkSelected) {
@@ -284,6 +318,31 @@ export default {
       if (el.value.trim()) el.select();
     },
 
+    async 'subitem-completion'(el) {
+      try {
+        const result = await store.setScoreSubitemCompletion(el.dataset.student, el.dataset.subitem, el.checked);
+        scoreValidation.delete(`${el.dataset.student}:${result.score.itemId}`);
+      } catch (error) {
+        toast(error?.message || 'تعذر حفظ حالة العنصر', 'danger');
+      }
+      repaint();
+    },
+
+    async 'manual-contribution'(el) {
+      const studentId = el.dataset.student;
+      const itemId = el.dataset.item;
+      try {
+        const result = await store.setScoreManualContribution(studentId, itemId, el.value.trim());
+        const key = `${studentId}:${itemId}`;
+        if (result.manualClamped) {
+          scoreValidation.set(key, `الحد المتبقي ${fmtNum(Math.max(0, store.state.items.find((item) => item.id === itemId).max - result.derivedValue))} درجات.`);
+        } else scoreValidation.delete(key);
+      } catch (error) {
+        toast(error?.message || 'تعذر حفظ الإضافة اليدوية', 'danger');
+      }
+      repaint();
+    },
+
     keydown(el, ev) {
       if (ev.key !== 'Enter') return;
       ev.preventDefault();
@@ -300,57 +359,14 @@ export default {
 /* ---------- وضع البند الواحد ---------- */
 
 function itemMode(roster, items, ctx, item, fullRoster) {
+  if (item.scoreMode === 'subitems') return subitemMode(roster, ctx, item);
   const auto = !!item.auto;
 
-  const gradedCount = auto
-    ? fullRoster.length
-    : fullRoster.filter((s) => {
-        const sc = ctx[s.id].scoresByItem[item.id];
-        return sc && sc.value !== null && sc.value !== undefined;
-      }).length;
-
   return html`
-    <div class="grades-category-nav mb-3" role="tablist" aria-label="بنود التقييم">
-      ${items.map((i) => {
-        const done = i.auto
-          ? fullRoster.length
-          : fullRoster.filter((s) => {
-              const sc = ctx[s.id].scoresByItem[i.id];
-              return sc && sc.value !== null && sc.value !== undefined;
-            }).length;
-        const full = done === fullRoster.length;
-        const isSelected = i.id === activeItemId;
-        return html`
-          <button class="grades-category-btn chip ${isSelected ? 'is-on' : ''}"
-                  data-act="pick" data-id="${i.id}"
-                  role="tab" aria-selected="${isSelected ? 'true' : 'false'}"
-                  aria-label="${i.name} (${full ? 'مكتمل' : `${done} من ${fullRoster.length}`})">
-            <span class="grades-category-btn__name">${i.name}</span>
-          </button>
-        `;
-      })}
-    </div>
-
-    <div class="card card--pad mb-3">
-      <div class="hstack gap-3">
-        <div>
-          <div class="fw-7">${item.name}</div>
-          <div class="t-3 fs-sm">
-            من <span class="tabular">${item.max}</span> درجة
-            ${auto ? html` · ${AUTO_NOTE[item.auto]}` : ''}
-          </div>
-        </div>
-        <div class="push center">
-          <div class="stat__val tabular" data-grade-count>${gradedCount}/${fullRoster.length}</div>
-          <div class="stat__label">مرصود</div>
-        </div>
-      </div>
-    </div>
-
     <!-- شريط الرصد الجماعي المباشر أعلى جدول/قائمة الدرجات -->
     ${!auto
       ? html`
-          <div class="bulk-bar noprint">
+          <div class="bulk-bar grades-01c__bulk noprint">
             <label class="hstack gap-1 fs-sm fw-6 pointer">
               <input type="checkbox" data-act="toggle-all-bulk"
                      ${bulkSelected.size > 0 && bulkSelected.size === fullRoster.length ? 'checked' : ''}>
@@ -373,14 +389,14 @@ function itemMode(roster, items, ctx, item, fullRoster) {
     ${roster.length === 0
       ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>`
       : html`
-          <div class="list">
+          <div class="list grades-01c__score-panel">
             ${roster.map((s) => {
               const value = itemScore(item, ctx[s.id]);
               const pct = value === null ? null : (value / item.max) * 100;
               const band = masteryBand(pct);
               const isChecked = bulkSelected.has(s.id);
               return html`
-                <div class="graderow ${isChecked ? 'is-selected' : ''}">
+                <div class="graderow grades-01c__direct-row ${isChecked ? 'is-selected' : ''}">
                   ${!auto
                     ? html`
                         <input type="checkbox" class="noprint" data-act="toggle-student-bulk" data-id="${s.id}"
@@ -388,7 +404,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                       `
                     : ''}
                   <span class="rollno">${s.rollNo ?? '—'}</span>
-                  <span class="graderow__name">${s.name}</span>
+                  <span class="graderow__name"><strong>${s.name}</strong><small>${value === null ? 'لم تُرصد الدرجة' : 'تم الرصد'}</small></span>
                   ${auto
                     ? html`
                         <span class="graderow__auto">
@@ -414,6 +430,43 @@ function itemMode(roster, items, ctx, item, fullRoster) {
           </div>
         `}
   `;
+}
+
+function subitemMode(roster, ctx, item) {
+  const definitions = store.scoreSubitemsOf(item.id);
+  return html`
+    <section class="grades-01c__subscore" aria-label="رصد العناصر الفرعية">
+      <div class="grades-01c__provenance-key">العناصر الفرعية <span>+</span> الإضافة اليدوية <span>=</span> الدرجة النهائية</div>
+      ${roster.length === 0 ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>` : roster.map((student) => {
+        const score = ctx[student.id].scoresByItem[item.id] ?? null;
+        const final = itemScore(item, ctx[student.id]);
+        const checked = new Set(store.state.scoreSubitemCompletions.filter((row) =>
+          row.studentId === student.id && row.checked && !row.deleted).map((row) => row.subitemId));
+        const derived = score?.derivedValue ?? 0;
+        const manual = score?.manualValue ?? null;
+        const warning = scoreValidation.get(`${student.id}:${item.id}`);
+        return html`<article class="grades-01c__subscore-row">
+          <div class="grades-01c__student"><span class="rollno tabular">${student.rollNo ?? '—'}</span>
+            <span><strong>${student.name}</strong><small>${final === null ? 'غير مرصود' : 'تم الرصد'}</small></span></div>
+          <div class="grades-01c__subitems" role="group" aria-label="عناصر ${item.name} للطالب ${student.name}">
+            ${definitions.map((definition) => html`<label class="grades-01c__subitem">
+              <input type="checkbox" data-change="subitem-completion" data-student="${student.id}"
+                data-subitem="${definition.id}" ${checked.has(definition.id) ? 'checked' : ''}
+                aria-label="${definition.name} للطالب ${student.name}">
+              <span>${definition.name}<b class="tabular">${fmtNum(definition.value)}</b></span>
+            </label>`)}</div>
+          <div class="grades-01c__equation" aria-label="ملخص درجة ${student.name}">
+            <span>العناصر <b class="tabular">${fmtNum(derived)}</b></span><i aria-hidden="true">+</i>
+            <label><span>يدوي</span><input class="grades-01c__manual tabular" type="text" inputmode="decimal"
+              data-change="manual-contribution" data-student="${student.id}" data-item="${item.id}"
+              data-fk="manual-${student.id}-${item.id}" value="${manual === null ? '' : fmtNum(manual)}"
+              aria-label="إضافة يدوية للطالب ${student.name}"></label><i aria-hidden="true">=</i>
+            <strong class="tabular">${final === null ? '—' : fmtNum(final)} / ${fmtNum(item.max)}</strong>
+            ${warning ? html`<small class="grades-01c__capacity" role="alert">${warning}</small>` : ''}
+          </div>
+        </article>`;
+      })}
+    </section>`;
 }
 
 /* ---------- وضع الجدول ---------- */
@@ -452,7 +505,7 @@ function tableMode(roster, items, ctx) {
                 </th>
                 ${items.map((i) => {
                   const v = itemScore(i, ctx[s.id]);
-                  if (i.auto) {
+                  if (i.auto || i.scoreMode === 'subitems') {
                     return html`<td class="is-auto tabular">${fmtNum(v)}</td>`;
                   }
                   return html`

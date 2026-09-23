@@ -425,6 +425,7 @@ begin
   select * into v_target_section from rakeezx.sections where owner_id=v_owner
     and id=v_target.section_id and deleted_at is null;
   if v_source_teaching.id is null or v_source_section.id is null or v_target_section.id is null or
+     v_source_section.status='archived' or v_target_section.status='archived' or
      v_source_teaching.id=v_target.id or v_source_section.id=v_target_section.id or
      v_source_teaching.subject_id<>v_target.subject_id or
      v_source_teaching.term_id<>v_target.term_id or

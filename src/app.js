@@ -238,7 +238,7 @@ const NAV = [
   { href: '#/schedule',  icon: 'timetable', label: 'الجدول',          primary: true },
   { href: '#/reports',   icon: 'reports',   label: 'التقارير',        primary: true },
   { href: '#/calendar',  icon: 'calendar',  label: 'التقويم',          primary: true },
-  { href: '#/settings',  icon: 'settings',  label: 'الإعدادات', group: 'النظام' },
+  { href: '#/settings',  icon: 'settings',  label: 'الإعدادات' },
 ];
 
 /** تنقّل سياقي داخل الإسناد؛ لا يحل محل تنقّل التطبيق الرئيسي. */
@@ -284,7 +284,7 @@ function shell(path, params) {
         <div class="sidebar__brand">${brandLockup()}</div>
         ${NAV.map((it) => html`${it.group ? html`<div class="sidebar__section-label">${it.group}</div>` : ''}${navLink(it, path, 'sidebar')}`)}
         <div class="sidebar__spacer"></div>
-        ${inTeaching
+        ${inTeaching && !/\/teaching\/[^/]+\/(attendance|grades)$/.test(path)
           ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
           : ''}
         <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
@@ -339,7 +339,7 @@ function topbar(v, params) {
       <div class="topbar__actions">
         ${actions ?? ''}
         ${isHome && demo ? html`<span class="demo-pill demo-pill--mobile" data-demo-indicator>تجريبي</span>` : ''}
-        ${!isHome && demo ? html`<span class="demo-pill" data-demo-indicator>الوضع التجريبي</span>` : ''}
+        ${!isHome && demo ? html`<span class="demo-pill demo-pill--desktop" data-demo-indicator>الوضع التجريبي</span><span class="demo-pill demo-pill--mobile" data-demo-indicator>تجريبي</span>` : ''}
         ${isHome ? html`
           <button class="topbar__teacher-btn topbar__teacher-btn--home-account"
                   data-act="${demo ? 'demo-login' : 'open-teacher-mini-hub'}"

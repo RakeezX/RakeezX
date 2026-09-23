@@ -2,9 +2,11 @@ import * as db from './db.js';
 import {
   makeCalendar, makeEnrollment, makeGroupArrangement, makeItem, makeSection,
   makeSession, makeSlot, makeStudent, makeSubject, makeTeaching, makeTerm,
+  makeScoreSubitem, makeScoreSubitemCompletion,
   makeTimeProfile, makeYear, scoreId, attendanceId, DEFAULT_TIME_PROFILES,
   DEFAULT_TIME_PROFILE_IDS, periodTime,
 } from '../models.js';
+import { projectSubitemScore } from './score-foundation.js';
 
 export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-session-v1';
 export const LEGACY_DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
@@ -90,6 +92,8 @@ export function createDemoDataset() {
   const students = [];
   const enrollments = [];
   const items = [];
+  const scoreSubitems = [];
+  const scoreSubitemCompletions = [];
   const scores = [];
   const slots = [];
   const sessions = [];
@@ -123,13 +127,45 @@ export function createDemoDataset() {
     }
     const teachingItems = [
       ['واجب', 10, null], ['مشروع', 20, null], ['اختبار قصير', 20, null], ['مشاركة', 10, 'participation'],
-    ].map(([name, max, auto], itemIndex) => makeItem({ id: `demo:item:${classIndex + 1}:${itemIndex + 1}`, teachingId: teaching.id, name, max, auto, order: itemIndex, updatedAt: FIXED_TIME }));
+    ].map(([name, max, auto], itemIndex) => makeItem({ id: `demo:item:${classIndex + 1}:${itemIndex + 1}`, teachingId: teaching.id,
+      name: classIndex === 1 && itemIndex === 0 ? 'مهام' : name,
+      max, auto, order: itemIndex, updatedAt: FIXED_TIME,
+      ...(classIndex === 1 && itemIndex === 2 ? { distributionOriginId: 'demo:item:1:3' } : {}),
+      ...(classIndex === 0 && itemIndex < 2 ? { scoreMode: 'subitems', distributionMode: itemIndex === 0 ? 'auto' : 'manual' } : {}) }));
     items.push(...teachingItems);
+    if (classIndex === 0) {
+      for (const [itemIndex, names, values] of [
+        [0, ['واجب 1', 'واجب 2', 'واجب 3'], [3.33, 3.33, 3.34]],
+        [1, ['مشروع 1', 'مشروع 2', 'مشروع 3'], [5, 5, 10]],
+      ]) {
+        const item = teachingItems[itemIndex];
+        const definitions = names.map((name, index) => makeScoreSubitem({
+          id: `demo:subitem:${itemIndex + 1}:${index + 1}`, itemId: item.id,
+          name, value: values[index], order: index, updatedAt: FIXED_TIME,
+        }));
+        scoreSubitems.push(...definitions);
+        members.slice(0, 6).forEach((member, index) => {
+          const selected = index === 0 ? definitions.slice(0, 2) : index === 1 ? definitions : index === 2 ? [] : definitions.slice(0, 1);
+          const completions = selected.map((definition) => makeScoreSubitemCompletion({
+            id: `demo:completion:${member.studentId}:${definition.id}`, studentId: member.studentId,
+            subitemId: definition.id, checked: true, updatedAt: FIXED_TIME,
+          }));
+          scoreSubitemCompletions.push(...completions);
+          const manual = index === 0 ? 2 : index === 2 ? 0 : null;
+          const projection = projectSubitemScore(item, definitions, completions, manual,
+            { studentId: member.studentId });
+          if (projection.value !== null) scores.push(record({
+            id: scoreId(member.studentId, item.id), studentId: member.studentId, itemId: item.id,
+            derivedValue: projection.derivedValue, manualValue: projection.manualValue, value: projection.value,
+          }));
+        });
+      }
+    }
     for (const member of members) {
-      teachingItems.forEach((item, itemIndex) => scores.push(record({
+      teachingItems.forEach((item, itemIndex) => { if (item.scoreMode === 'subitems') return; scores.push(record({
         id: scoreId(member.studentId, item.id), studentId: member.studentId, itemId: item.id,
         value: item.auto === 'participation' ? (member.rollNo % 6) : Math.min(item.max, 5 + ((member.rollNo + itemIndex * 3) % item.max)),
-      })));
+      })); });
     }
     const teachingSlots = plan.slots.map(([weekday, period], slotIndex) => makeSlot({
       id: `demo:slot:${classIndex + 1}:${slotIndex + 1}`, teachingId: teaching.id, weekday, period, updatedAt: FIXED_TIME,
@@ -166,7 +202,7 @@ export function createDemoDataset() {
     device: [record({ id: 'device', deviceId: 'demo-device', theme: 'light', activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: timeProfile.id, reportPrincipalName: 'مدير المدرسة', lastSyncAt: null, schemaVersion: 7 })],
     meta: [record({ id: DEMO_SEED_ID, version: 3, seededAt: FIXED_TIME })],
     years: [year], terms: [term, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
-    items, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
+    items, scoreSubitems, scoreSubitemCompletions, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
     units: [], lessons: [], timeProfiles, notes, classRules, classGoals, classCharterSelections,
     groupArrangements, closedTermReports: [], assignments: [], submissions: [], outbox: [],
   };

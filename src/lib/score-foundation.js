@@ -20,10 +20,15 @@ export function distributeAutomatically(maximum, count) {
   ));
 }
 
-export function projectSubitemScore(item, definitions, completions, manualInput) {
+export function projectSubitemScore(item, definitions, completions, manualInput, { studentId = null, ownerId = null } = {}) {
+  if (!studentId && completions.some((row) => row.studentId)) {
+    throw new Error('Student identity is required for score projection');
+  }
   const maximum = scoreCents(item.max);
-  const active = definitions.filter((row) => !row.deleted);
-  const selected = new Set(completions.filter((row) => !row.deleted && row.checked === true &&
+  const active = definitions.filter((row) => !row.deleted && (!item.id || row.itemId === item.id) &&
+    (!ownerId || !row.ownerId || row.ownerId === ownerId));
+  const selected = new Set(completions.filter((row) => (!studentId || row.studentId === studentId) &&
+    (!ownerId || !row.ownerId || row.ownerId === ownerId) && !row.deleted && row.checked === true &&
     active.some((definition) => definition.id === row.subitemId)).map((row) => row.subitemId));
   const derivedCents = Math.min(maximum, active.filter((row) => selected.has(row.id))
     .reduce((sum, row) => sum + scoreCents(row.value), 0));

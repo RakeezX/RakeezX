@@ -232,6 +232,10 @@ test('distribution copy is one owner-scoped idempotent definition command', asyn
       values('copy:section','score:year',4,'B','target',1,'seed');
     insert into rakeezx.teachings(id,section_id,subject_id,term_id,client_updated_at,device_id)
       values('copy:teaching','copy:section','score:subject','score:term',1,'seed');
+    insert into rakeezx.sections(id,year_id,grade,label,name,client_updated_at,device_id)
+      values('copy:section:other','score:year',4,'C','other target',1,'seed');
+    insert into rakeezx.teachings(id,section_id,subject_id,term_id,client_updated_at,device_id)
+      values('copy:teaching:other','copy:section:other','score:subject','score:term',1,'seed');
   `);
   const revision = Number((await pg.query("select revision from rakeezx.items where id='score:item'"))
     .rows[0].revision);
@@ -252,6 +256,10 @@ test('distribution copy is one owner-scoped idempotent definition command', asyn
   await assert.rejects(() => pg.query(`select rakeezx.apply_score_distribution_copy_command(
     $1,$2,$3,$4,$5,$6,$7::jsonb,$8)`, [...args.slice(0, 5), 'copy:second', args[6], args[7]]),
   /Copy mutation ID reused/);
+  await assert.rejects(() => pg.query(`select rakeezx.apply_score_distribution_copy_command(
+    $1,$2,$3,$4,$5,$6,$7::jsonb,$8)`, [args[0], args[1], args[2], args[3],
+    'copy:teaching:other', args[5], args[6], args[7]]),
+  /Copy mutation ID reused/, 'same per-target command identity cannot replay for a changed selection');
 });
 
 test('authenticated RLS isolates both owners and old direct scoring cannot overwrite SUBITEM', async () => {

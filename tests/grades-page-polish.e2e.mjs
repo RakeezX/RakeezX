@@ -36,7 +36,7 @@ test.describe('Grades Page Polish (Ticket 03)', () => {
   ];
 
   for (const vp of viewports) {
-    test(`Category buttons distribute evenly and proportionally at ${vp.name}`, async ({ page }) => {
+    test(`Assessment item tabs stay usable without page overflow at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto('/#/classes');
       await page.waitForFunction(() => window.store?.state?.ready === true);
@@ -44,52 +44,34 @@ test.describe('Grades Page Polish (Ticket 03)', () => {
       await page.locator('.class-card__main').first().click();
       await page.locator('.class-context-nav').getByRole('link', { name: 'كشف الدرجات' }).click();
 
-      const nav = page.locator('.grades-category-nav');
+      const nav = page.getByRole('tablist', { name: 'بنود التقييم' });
       await expect(nav).toBeVisible();
 
-      const buttons = nav.locator('.grades-category-btn');
+      const buttons = nav.getByRole('tab');
       const count = await buttons.count();
       expect(count).toBeGreaterThanOrEqual(2);
-      await expect(nav.locator('.grades-category-btn__meta')).toHaveCount(0);
-      await expect(nav).not.toContainText('✓');
+      await expect(buttons.first()).toHaveAttribute('aria-selected', 'true');
 
       // Verify no horizontal overflow of the page
       const docScrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       const docClientWidth = await page.evaluate(() => document.documentElement.clientWidth);
       expect(docScrollWidth).toBeLessThanOrEqual(docClientWidth + 1);
 
-      // Verify buttons in the same row have equal width (within 1px tolerance)
-      const boxes = await Promise.all(
-        Array.from({ length: count }, (_, i) => buttons.nth(i).boundingBox())
-      );
-
-      // Group by top Y coordinate (same row)
-      const rows = {};
-      boxes.forEach((box, i) => {
-        if (!box) return;
-        const rowKey = Math.round(box.y / 8) * 8; // grouping tolerance
-        if (!rows[rowKey]) rows[rowKey] = [];
-        rows[rowKey].push(box);
-      });
-
-      for (const rowBoxes of Object.values(rows)) {
-        if (rowBoxes.length > 1) {
-          const widths = rowBoxes.map((b) => b.width);
-          const maxW = Math.max(...widths);
-          const minW = Math.min(...widths);
-          expect(maxW - minW).toBeLessThanOrEqual(2); // equal width across row
-        }
-      }
+      const geometry = await nav.evaluate((el) => ({ width: el.clientWidth, content: el.scrollWidth }));
+      expect(geometry.width).toBeGreaterThan(0);
+      expect(geometry.content).toBeGreaterThanOrEqual(geometry.width);
+      const firstBox = await buttons.first().boundingBox();
+      expect(firstBox?.height).toBeGreaterThanOrEqual(42);
 
       // Verify active tab switching
       const secondBtn = buttons.nth(1);
       await secondBtn.click();
-      await expect(secondBtn).toHaveClass(/is-on/);
+      await expect(secondBtn).toHaveClass(/is-active/);
       expect(await secondBtn.getAttribute('aria-selected')).toBe('true');
     });
   }
 
-  test('Dynamically adjusts equal-width distribution for 2, 3, and 5 categories', async ({ page }) => {
+  test('Assessment tabs track the live item count after item deletion', async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.goto('/#/classes');
     await page.waitForFunction(() => window.store?.state?.ready === true);
@@ -102,26 +84,22 @@ test.describe('Grades Page Polish (Ticket 03)', () => {
 
     // Verify we can modify items and then go back to grades to check 2-category layout
     const teachingId = await page.evaluate(() => window.store.state.teachings[0]?.id);
-    await page.evaluate((tId) => {
+    await page.evaluate(async (tId) => {
       // Keep only 2 items
       const currentItems = window.store.state.items.filter(i => i.teachingId === tId && !i.deleted);
       if (currentItems.length > 2) {
         for (let i = 2; i < currentItems.length; i++) {
-          window.store.deleteItem(currentItems[i].id);
+          await window.store.deleteItem(currentItems[i].id);
         }
       }
     }, teachingId);
 
     await page.goto(`/#/teaching/${teachingId}/grades`);
-    const nav2 = page.locator('.grades-category-nav');
+    const nav2 = page.getByRole('tablist', { name: 'بنود التقييم' });
     await expect(nav2).toBeVisible();
-    const btns2 = nav2.locator('.grades-category-btn');
-    expect(await btns2.count()).toBe(2);
-
-    const b0 = await btns2.nth(0).boundingBox();
-    const b1 = await btns2.nth(1).boundingBox();
-    expect(Math.abs((b0?.width ?? 0) - (b1?.width ?? 0))).toBeLessThanOrEqual(2);
-    // On 1024px, 2 items each take ~50% of content width (>300px each)
-    expect(b0?.width).toBeGreaterThan(300);
+    const btns2 = nav2.getByRole('tab');
+    await expect(btns2).toHaveCount(2);
+    await btns2.nth(1).click();
+    await expect(btns2.nth(1)).toHaveAttribute('aria-selected', 'true');
   });
 });

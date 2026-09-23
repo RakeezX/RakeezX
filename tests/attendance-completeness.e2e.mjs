@@ -46,7 +46,7 @@ test('Sessions exposes derived attendance completeness and reuses the same dated
   await page.getByText('رصد الحضور', { exact: true }).click();
   await expect(page.locator('.att-row')).toHaveCount(2);
   await page.locator('[data-act="fill-present"]').click();
-  await expect(page.getByRole('status', { name: 'حالة الرصد: مكتمل' })).toContainText('2/2');
+  await expect(page.getByRole('status', { name: 'حالة الرصد: مكتمل' })).toContainText('2 من 2');
 
   await page.goto('/#/teaching/tch:attendance-ui/sessions');
   await expect(page.getByText('تم رصد الحضور', { exact: true })).toBeVisible();

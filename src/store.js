@@ -3274,14 +3274,17 @@ const scoreFoundationScope = () => ({
 
 async function commitScoreFoundation(prepare) {
   assertCloudRestoreWritable();
-  if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
-      !activeWorkspace.authUserId) {
+  const isolatedDemo = activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
+  if (!isolatedDemo && (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
+      !activeWorkspace.authUserId)) {
     throw new Error('Score foundation requires a claimed account workspace');
   }
-  const capability = await getScoreFoundationCapability();
-  if (capability?.scoreDomainVersion !== 1 || capability?.restoreProtocol !== 'CORE_V2' ||
-      capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
-    throw new Error('Score foundation server capability is unavailable');
+  if (!isolatedDemo) {
+    const capability = await getScoreFoundationCapability();
+    if (capability?.scoreDomainVersion !== 1 || capability?.restoreProtocol !== 'CORE_V2' ||
+        capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
+      throw new Error('Score foundation server capability is unavailable');
+    }
   }
   const committed = await db.applyBatch(scoreFoundationScope(), { prepare });
   const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
@@ -3335,7 +3338,9 @@ export async function linkPortableScoreItems(sourceItemId, destinationItemId, { 
 function preparedScore(current, item, studentId, completions, manualValue, stamp) {
   const prior = current.scores.find((row) => row.studentId === studentId && row.itemId === item.id && !row.deleted);
   const projection = projectSubitemScore(item,
-    current.scoreSubitems.filter((row) => row.itemId === item.id), completions, manualValue);
+    current.scoreSubitems.filter((row) => row.itemId === item.id),
+    completions.filter((row) => row.studentId === studentId), manualValue,
+    { studentId, ownerId: activeWorkspace?.authUserId ?? null });
   const record = syncV2Record('scores', {
     ...(prior ?? { id: scoreId(studentId, item.id), studentId, itemId: item.id }),
     ...projection, deleted: false, updatedAt: stamp,
@@ -3435,7 +3440,8 @@ export function previewScoreConfiguration(itemId, proposed) {
     if (nextMode === 'direct') return { studentId, before: prior?.value ?? null, after: prior?.value ?? null };
     const manual = item.scoreMode === 'direct' ? prior?.value ?? null : prior?.manualValue ?? null;
     const next = projectSubitemScore(nextItem, nextDefinitions,
-      state.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual);
+      state.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual,
+      { studentId, ownerId: activeWorkspace?.authUserId ?? null });
     return { studentId, before: prior?.value ?? null, after: next.value, manualClamped: next.manualClamped };
   });
   return {
@@ -3528,7 +3534,8 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       } else {
         const manual = prior.scoreMode === 'direct' ? previous.value : previous.manualValue;
         next = { ...previous, ...projectSubitemScore(item, workingDefinitions,
-          current.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual), updatedAt: stamp };
+          current.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual,
+          { studentId, ownerId: activeWorkspace?.authUserId ?? null }), updatedAt: stamp };
       }
       scoreWrites.push(syncV2Record('scores', next));
     }
@@ -3589,13 +3596,18 @@ export function previewScoreDistributionCopy(sourceTeachingId) {
 
 /** One-time definition copy. A conflict choice is "keep" or "add"; replacement is unsupported. */
 export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachingIds, conflictChoices = {}) {
-  const expected = previewScoreDistributionCopy(sourceTeachingId).map((row) => row.teachingId).sort();
-  const selected = [...new Set(targetTeachingIds)].sort();
-  if (JSON.stringify(expected) !== JSON.stringify(selected)) throw new Error('Copy targets are stale or incomplete');
+  if (!Array.isArray(targetTeachingIds) || !targetTeachingIds.length ||
+      targetTeachingIds.some((id) => typeof id !== 'string' || !id) ||
+      new Set(targetTeachingIds).size !== targetTeachingIds.length) {
+    throw new Error('Copy requires distinct selected target IDs');
+  }
+  const selected = [...targetTeachingIds].sort();
+  const expected = new Set(previewScoreDistributionCopy(sourceTeachingId).map((row) => row.teachingId));
+  if (selected.some((id) => !expected.has(id))) throw new Error('Copy target is not eligible');
   let result;
   await commitScoreFoundation((current) => {
-    const currentTargets = eligibleScoreCopyTargets(current, sourceTeachingId).map((row) => row.id);
-    if (JSON.stringify(currentTargets) !== JSON.stringify(selected)) throw new Error('Copy targets changed');
+    const currentTargets = new Set(eligibleScoreCopyTargets(current, sourceTeachingId).map((row) => row.id));
+    if (selected.some((id) => !currentTargets.has(id))) throw new Error('Copy target changed');
     const sourceItems = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
       .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
     const clonedItems = [];

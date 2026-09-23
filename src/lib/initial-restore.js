@@ -115,7 +115,8 @@ export function assertScoreSnapshotInvariant(snapshot) {
     if (!score) throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Materialized score is missing');
     const projected = projectSubitemScore(item,
       definitions.filter((row) => row.itemId === itemId),
-      completions.filter((row) => row.studentId === studentId), score.manualValue ?? null);
+      completions.filter((row) => row.studentId === studentId), score.manualValue ?? null,
+      { studentId });
     if (scoreCents(score.value, { allowBlank: true }) !== scoreCents(projected.value, { allowBlank: true }) ||
         scoreCents(score.derivedValue, { allowBlank: true }) !== scoreCents(projected.derivedValue, { allowBlank: true }) ||
         scoreCents(score.manualValue, { allowBlank: true }) !== scoreCents(projected.manualValue, { allowBlank: true })) {

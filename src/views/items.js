@@ -6,6 +6,102 @@
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { makeItem, defaultItemsFor } from '../models.js';
+import { getScoreFoundationCapability } from '../lib/cloud.js';
+import { distributeAutomatically, scoreCents } from '../lib/score-foundation.js';
+import { repaint } from '../repaint.js';
+
+let foundationAvailable = false;
+let foundationChecking = false;
+const isDemo = () => store.getActiveWorkspace()?.type === 'demo';
+const supportsFoundation = () => isDemo() || foundationAvailable;
+
+async function requireFoundation() {
+  if (supportsFoundation()) return true;
+  toast('العناصر الفرعية ونسخ التوزيع غير متاحين حتى يكتمل تحديث الخادم. الرصد المباشر متاح.', 'warn');
+  return false;
+}
+
+function subitemEditor(item) {
+  const original = store.scoreSubitemsOf(item.id);
+  const rows = original.length ? original.map((row) => ({ ...row })) : [{ name: 'عنصر 1', value: item.max }];
+  let distributionMode = item.distributionMode ?? 'auto';
+  const rowMarkup = (row, index) => html`<div class="subitem-editor-row" data-subitem-row data-id="${row.id ?? ''}">
+    <button class="drag-handle" type="button" data-move-up aria-label="رفع ${row.name}" ${index === 0 ? 'disabled' : ''}>⋮⋮</button>
+    <label class="field"><span>اسم العنصر</span><input data-subitem-name maxlength="50" value="${row.name}" required></label>
+    <label class="field subitem-points"><span>الدرجة</span><input data-subitem-value type="number" min="0" step="0.01" value="${row.value}" ${distributionMode === 'auto' ? 'readonly' : ''}></label>
+    <button class="iconbtn" type="button" data-subitem-remove aria-label="حذف ${row.name}" ${rows.length === 1 ? 'disabled' : ''}>${icon('x')}</button>
+  </div>`;
+  return openSheet({
+    title: 'العناصر الفرعية',
+    desc: `${item.name} · ${item.max} درجات`,
+    body: html`<div class="score-01c-editor">
+      <div class="segmented subitem-mode" role="group" aria-label="طريقة توزيع درجات العناصر">
+        <button type="button" class="segmented__btn" data-distribution="auto">توزيع تلقائي</button>
+        <button type="button" class="segmented__btn" data-distribution="manual">توزيع يدوي</button>
+      </div>
+      <p class="mode-explainer" data-mode-explainer></p>
+      <div class="subitem-editor-list" data-subitem-list></div>
+      <div class="subitem-editor-actions"><button class="btn btn--ghost" type="button" data-subitem-add>${icon('plus')} إضافة عنصر فرعي</button>
+        <button class="btn btn--ghost" type="button" data-direct-mode>استخدام درجة مباشرة</button></div>
+      <div class="subitem-total" role="status"><span>مجموع العناصر</span><strong data-subitem-total></strong><small data-subitem-warning></small></div>
+    </div>`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" type="button" data-save-subitems>حفظ العناصر</button>`,
+    onMount(root, done) {
+      const list = root.querySelector('[data-subitem-list]');
+      const read = () => {
+        list.querySelectorAll('[data-subitem-row]').forEach((element, index) => {
+          rows[index].name = element.querySelector('[data-subitem-name]').value.trim();
+          rows[index].value = Number(element.querySelector('[data-subitem-value]').value);
+        });
+      };
+      const draw = () => {
+        if (distributionMode === 'auto') {
+          const values = distributeAutomatically(item.max, rows.length);
+          rows.forEach((row, index) => { row.value = values[index]; });
+        }
+        list.innerHTML = rows.map(rowMarkup).join('');
+        root.querySelectorAll('[data-distribution]').forEach((button) => {
+          const active = button.dataset.distribution === distributionMode;
+          button.classList.toggle('is-on', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+        root.querySelector('[data-mode-explainer]').textContent = distributionMode === 'auto'
+          ? 'يوزّع ركيز الدرجة العظمى بالتساوي، ويضع فرق التقريب في العنصر الأخير.'
+          : 'حدّد درجة كل عنصر، وسيظهر أي فرق عن الدرجة العظمى.';
+        const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+        root.querySelector('[data-subitem-total]').textContent = `${total.toFixed(2)} / ${item.max}`;
+        root.querySelector('.subitem-total').classList.toggle('is-warning', distributionMode === 'manual' && Math.abs(total - item.max) > 0.001);
+        root.querySelector('[data-subitem-warning]').textContent = distributionMode === 'manual' && Math.abs(total - item.max) > 0.001
+          ? 'مجموع العناصر لا يطابق الدرجة العظمى.' : '';
+      };
+      root.addEventListener('click', (event) => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.dataset.distribution) { read(); distributionMode = button.dataset.distribution; draw(); }
+        else if (button.hasAttribute('data-subitem-add')) { read(); rows.push({ name: `عنصر ${rows.length + 1}`, value: 0 }); draw(); }
+        else if (button.hasAttribute('data-subitem-remove')) {
+          read(); if (rows.length > 1) rows.splice([...list.children].indexOf(button.closest('[data-subitem-row]')), 1); draw();
+        } else if (button.hasAttribute('data-move-up')) {
+          read(); const index = [...list.children].indexOf(button.closest('[data-subitem-row]'));
+          if (index > 0) [rows[index - 1], rows[index]] = [rows[index], rows[index - 1]];
+          draw();
+        } else if (button.hasAttribute('data-direct-mode')) done({ scoreMode: 'direct', subitems: [] });
+        else if (button.hasAttribute('data-save-subitems')) {
+          read();
+          if (rows.some((row) => !row.name || !Number.isFinite(row.value))) { toast('أكمل أسماء العناصر ودرجاتها', 'danger'); return; }
+          try { rows.forEach((row) => scoreCents(row.value)); } catch { toast('استخدم درجة موجبة بدقة منزلتين', 'danger'); return; }
+          done({ scoreMode: 'subitems', distributionMode, subitems: rows });
+        }
+      });
+      list.addEventListener('input', () => { if (distributionMode === 'manual') { read();
+        const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+        root.querySelector('[data-subitem-total]').textContent = `${total.toFixed(2)} / ${item.max}`;
+        root.querySelector('.subitem-total').classList.toggle('is-warning', Math.abs(total - item.max) > 0.001);
+      } });
+      draw();
+    },
+  });
+}
 
 const AUTO_OPTIONS = [
   { v: '',              label: 'إدخال يدوي',  hint: 'تكتب الدرجة بنفسك لكل طالب.' },
@@ -108,6 +204,20 @@ export default {
     <button class="iconbtn" data-act="add" aria-label="بند جديد">${icon('plus')}</button>
   `,
 
+  onMount() {
+    foundationAvailable = false;
+    foundationChecking = !isDemo();
+    if (isDemo()) return;
+    getScoreFoundationCapability().then((capability) => {
+      foundationAvailable = capability?.scoreDomainVersion === 1 &&
+        capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
+        capability?.copyDomainVersion === 1;
+    }).catch(() => { foundationAvailable = false; }).finally(() => {
+      foundationChecking = false;
+      repaint();
+    });
+  },
+
   render(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
@@ -130,54 +240,131 @@ export default {
       `;
     }
 
-    return html`
-      <div class="classroom-tool-page grade-distribution-page">
-      <section class="surface grade-distribution-summary mb-3" aria-label="ملخص توزيع الدرجات">
-        <div class="hstack gap-3">
-          <div>
-            <div class="fw-7">مجموع الدرجات</div>
-            <div class="t-3 fs-sm">
-              ${total === 100
-                ? 'مطابق للتوزيع المعتاد.'
-                : 'المجموع ليس ١٠٠ — تأكد أنه يوافق نموذج مدرستك.'}
-            </div>
-          </div>
-          <div class="push stat__val tabular" style="${total === 100 ? 'color:var(--ok)' : ''}">${total}</div>
-        </div>
-      </section>
-
-      <div class="list grade-item-list">
-        ${items.map(
-          (i, idx) => html`
-            <div class="row grade-item-row">
-              <span class="row__main">
-                <span class="row__title">${i.name}</span>
-                <span class="row__sub">
-                  <span class="tabular">${i.max}</span> ${i.auto === 'participation' ? 'درجات' : 'درجة'}
-                  ${i.auto === 'participation'
-                    ? html` · رصد آلي من الرصد السريع (<span class="tabular">${i.perPoint}</span> لكل نقطة)`
-                    : i.auto === 'attendance'
-                      ? html` · آلي من الحضور (خصم <span class="tabular">${i.penalty}</span>)`
-                      : ''}
-                </span>
-              </span>
-              <span class="row__end">
-                ${i.auto ? html`<span class="badge badge--brand">آلي</span>` : ''}
-                <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''}
-                        aria-label="رفع">${icon('upload')}</button>
-                <button class="iconbtn" data-act="edit" data-id="${i.id}" aria-label="تعديل">${icon('edit')}</button>
-              </span>
-            </div>
-          `
-        )}
-      </div>
-
-      <button class="btn btn--ghost btn--block mt-4" data-act="add">${icon('plus')} بند جديد</button>
-      </div>
-    `;
+    const section = store.getSection(cls.sectionId);
+    const targets = store.previewScoreDistributionCopy(cls.id);
+    return html`<div class="classroom-tool-page grade-distribution-page distribution-01c">
+      <section class="distribution-hero"><div><span class="eyebrow">${store.sectionLabel(section)} · ${cls.name}</span>
+        <h1>توزيع الدرجات</h1><p>${items.length} بنود · المجموع ${total} درجة</p></div>
+        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
+          ${icon('classes')} تطبيق التوزيع على كل فصول المادة نفسها</button></section>
+      ${foundationChecking ? html`<p class="score-01c-capability" role="status">جارٍ التحقق من توفر مزامنة التوزيع…</p>` :
+        !supportsFoundation() ? html`<p class="score-01c-capability" role="status">الدرجة المباشرة متاحة. العناصر الفرعية ونسخ التوزيع ينتظران تحديث الخادم.</p>` : ''}
+      <section class="distribution-panel"><header class="distribution-head"><div><h2>بنود التقييم</h2>
+        <p>الدرجة المباشرة تبقى بسيطة، ويمكن تفعيل العناصر الفرعية لأي بند.</p></div>
+        <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة بند</button></header>
+        <div class="distribution-list">${items.map((i, idx) => html`<article class="distribution-item">
+          <span class="distribution-order">${idx + 1}</span>
+          <span class="distribution-name"><strong>${i.name}</strong><small>${i.max} درجات</small></span>
+          <span class="mode-badge ${i.scoreMode === 'subitems' ? 'mode-badge--sub' : i.auto ? 'mode-badge--auto' : 'mode-badge--direct'}">
+            ${i.scoreMode === 'subitems' ? 'عناصر فرعية' : i.auto ? 'رصد آلي' : 'درجة مباشرة'}</span>
+          <span class="distribution-actions"><button class="btn btn--ghost" data-act="${i.scoreMode === 'subitems' ? 'configure' : 'edit'}" data-id="${i.id}">
+            ${icon('edit')} ${i.scoreMode === 'subitems' ? 'تحرير العناصر' : 'تحرير'}</button>
+            ${i.scoreMode !== 'subitems' && supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">عناصر فرعية</button>` : ''}
+            <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''} aria-label="رفع ${i.name}">${icon('upload')}</button>
+          </span></article>`)}</div></section>
+      <aside class="copy-note">${icon('check')}<p><strong>النسخ إلى الفصول الأخرى عملية واحدة مستقلة.</strong>
+        <span>ينسخ بنية البنود وإعداداتها فقط، ولا ينسخ درجات الطلاب أو حالاتهم.</span></p></aside>
+    </div>`;
   },
 
   actions: {
+    async configure(el) {
+      if (!await requireFoundation()) return;
+      const item = store.state.items.find((row) => row.id === el.dataset.id && !row.deleted);
+      if (!item) return;
+      const proposed = await subitemEditor(item);
+      if (!proposed) return;
+      proposed.max = item.max;
+      let preview;
+      try { preview = store.previewScoreConfiguration(item.id, proposed); }
+      catch (error) { toast(error.message, 'danger'); return; }
+      const conversion = item.scoreMode === 'direct' && proposed.scoreMode === 'subitems' &&
+        store.state.scores.some((row) => row.itemId === item.id && row.value !== null && !row.deleted);
+      const approved = await confirmSheet({
+        title: 'مراجعة تغيير توزيع الدرجات',
+        desc: `قد تتغير درجات ${preview.affectedStudentCount} طالبًا. ${preview.usedDeletedSubitems.length ? `ستُحذف ${preview.usedDeletedSubitems.length} عناصر مستخدمة. ` : ''}${conversion ? 'الدرجات المباشرة الحالية ستبقى كإضافة يدوية، ولن تضيع. ' : ''}راجِع النتيجة قبل التأكيد.`,
+        confirmLabel: 'تأكيد التغيير',
+      });
+      if (!approved) return;
+      try {
+        await store.applyConfirmedScoreConfiguration(item.id, proposed, {
+          expectedVersion: preview.expectedVersion, confirmed: true,
+          ...(conversion ? { conversionStrategy: 'retain-as-manual' } : {}),
+        });
+        toast('حُفظ توزيع العناصر');
+        repaint();
+      } catch (error) { toast(error.message || 'تعذر حفظ التوزيع', 'danger'); }
+    },
+
+    async copy(el, ev, params) {
+      if (!await requireFoundation()) return;
+      const preview = store.previewScoreDistributionCopy(params.id);
+      if (!preview.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
+      const source = store.getTeaching(params.id);
+      const sourceSection = store.getSection(source.sectionId);
+      const selected = await openSheet({
+        title: 'تطبيق التوزيع على فصول المادة',
+        desc: 'عملية نسخ واحدة؛ تبقى الفصول مستقلة بعد التطبيق.',
+        body: html`<div class="copy-summary"><div><span>المصدر</span><strong>${store.sectionLabel(sourceSection)}</strong>
+          <small>${source.name}</small></div><div><span>التوزيع</span><strong>${store.items(params.id).length} بنود</strong>
+          <small>تُنسخ البنود والعناصر الفرعية فقط، دون درجات الطلاب.</small></div></div>
+          <fieldset class="target-list"><legend>الفصول المطابقة والمتاحة</legend>${preview.map((target) => html`
+            <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}" checked>
+              <span><strong>${store.sectionLabel(store.getSection(target.sectionId))}</strong><small>${source.name}</small></span></label>`)}</fieldset>
+          <aside class="review-callout"><strong>لن يتم تغيير درجات الطلاب الموجودة.</strong>
+            <p>لا تُنسخ درجات الطلاب أو اختيارات العناصر أو الإضافات اليدوية أو سجل أي طالب.</p></aside>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+          <button class="btn btn--primary" type="button" data-copy-next>مراجعة التطبيق</button>`,
+        onMount(root, done) {
+          const next = root.querySelector('[data-copy-next]');
+          const update = () => { next.disabled = !root.querySelector('[data-copy-target]:checked'); };
+          root.addEventListener('change', update);
+          next.addEventListener('click', () => done([...root.querySelectorAll('[data-copy-target]:checked')]
+            .map((input) => input.value)));
+          update();
+        },
+      });
+      if (!selected?.length) return;
+      const selectedSet = new Set(selected);
+      const review = preview.filter((target) => selectedSet.has(target.teachingId));
+      const choices = await openSheet({
+        title: 'مراجعة بنود الفصول المحددة',
+        desc: 'لا حذف ولا استبدال للدرجات أو البنود الحالية.',
+        body: html`<div class="conflict-list">${review.map((target) => html`<section class="target-review">
+          <h3>${store.sectionLabel(store.getSection(target.sectionId))}</h3>
+          ${target.items.map((item) => html`<div class="target-review__item">
+            <p><span class="review-status review-status--${item.kind === 'MISSING' ? 'add' : item.kind === 'EQUIVALENT' ? 'keep' : 'conflict'}">
+              ${item.kind === 'MISSING' ? 'سيتم إضافته' : item.kind === 'EQUIVALENT' ? 'موجود مسبقًا' : 'يوجد بند مختلف'}</span>
+              ${store.state.items.find((row) => row.id === item.sourceItemId)?.name ?? ''}</p>
+            ${item.kind === 'CONFLICTING' ? html`<fieldset class="safe-choices"><legend>معالجة هذا البند</legend>
+              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="keep" checked> الاحتفاظ بالبند الحالي</label>
+              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="add"> إضافة البند الجديد بشكل مستقل</label>
+            </fieldset>` : ''}</div>`)}</section>`)}</div>
+          <aside class="review-callout"><strong>كل فصل يبقى مستقلًا بعد النسخ.</strong>
+            <p>أي تعديل لاحق على المصدر لن ينتقل تلقائيًا إلى هذه الفصول.</p></aside>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+          <button class="btn btn--primary" type="button" data-copy-apply>تطبيق التوزيع</button>`,
+        onMount(root, done) {
+          root.querySelector('[data-copy-apply]').addEventListener('click', () => {
+            const result = {};
+            for (const target of review) for (const item of target.items) {
+              if (item.kind !== 'CONFLICTING') continue;
+              const choice = root.querySelector(`input[name="choice-${CSS.escape(target.teachingId)}-${CSS.escape(item.sourceItemId)}"]:checked`);
+              if (!choice) return;
+              result[`${target.teachingId}:${item.sourceItemId}`] = choice.value;
+            }
+            done(result);
+          });
+        },
+      });
+      if (!choices) return;
+      try {
+        const result = await store.applyScoreDistributionCopy(params.id, selected, choices);
+        toast(isDemo() ? `طُبّق التوزيع على ${selected.length} فصول محددة` :
+          `أُعدّ النسخ إلى ${selected.length} فصول محددة للمزامنة (${result.itemIds.length} بنود)`);
+        repaint();
+      } catch (error) { toast(error.message || 'تعذر نسخ التوزيع؛ لم تُطبّق تغييرات', 'danger'); }
+    },
     async add(el, ev, params) {
       const data = await itemSheet(params.id);
       if (!data) return;

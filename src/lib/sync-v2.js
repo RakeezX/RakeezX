@@ -1800,7 +1800,7 @@ export function createSyncV2Engine({
       const projected = projectSubitemScore(item,
         canonical.scoreSubitems.filter((row) => row.itemId === itemId),
         canonical.scoreSubitemCompletions.filter((row) => row.studentId === studentId),
-        score.manualValue ?? null);
+        score.manualValue ?? null, { studentId });
       for (const field of ['derivedValue', 'manualValue', 'value']) {
         if (scoreCents(score[field], { allowBlank: true }) !==
             scoreCents(projected[field], { allowBlank: true })) {

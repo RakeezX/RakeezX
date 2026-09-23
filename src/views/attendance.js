@@ -35,8 +35,8 @@ function renderDateNavigation() {
   const cal = store.calendarDayFor(date);
   const isToday = date === todayISO();
   return html`
-    <div class="datebar" aria-label="التنقل بين أيام الحضور">
-      <button class="iconbtn" data-act="prev-day" aria-label="اليوم السابق">${icon('back')}</button>
+    <div class="datebar attendance-01c__date" aria-label="التنقل بين أيام الحضور">
+      <button class="iconbtn attendance-01c__date-nav" data-act="prev-day" aria-label="اليوم السابق">${icon('back')}</button>
       <div class="datebar__mid">
         <div class="datebar__label">${WEEKDAYS[weekday(date)]} · ${fmtDate(date, false)}</div>
         ${cal
@@ -45,10 +45,43 @@ function renderDateNavigation() {
             ? html`<div class="datebar__note">نهاية الأسبوع</div>`
             : ''}
       </div>
-      <button class="iconbtn ${isToday ? 'is-off' : ''}" data-act="next-day"
+      <button class="iconbtn attendance-01c__date-nav ${isToday ? 'is-off' : ''}" data-act="next-day"
               aria-label="اليوم التالي" ${isToday ? 'disabled' : ''}>${icon('chev')}</button>
     </div>
   `;
+}
+
+function renderSessionContext(teaching, session, sessions, status) {
+  const section = store.getSection(teaching.sectionId);
+  const subject = store.getSubject(teaching.subjectId);
+  return html`
+    <section class="attendance-01c__context" aria-label="سياق الحصة">
+      <div class="attendance-01c__context-top">
+        <div class="attendance-01c__identity">
+          <span class="attendance-01c__icon" aria-hidden="true">${icon('attendance')}</span>
+          <div><h2>حضور ${store.sectionLabel(section)}</h2>
+            <p>${subject?.name ?? ''}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
+        </div>
+        <div class="attendance-01c__context-actions">
+          ${session ? html`<button class="btn btn--sm btn--ghost" data-act="session-status">${icon('edit')} تعديل حالة الحصة</button>` : ''}
+          <button class="btn btn--sm btn--quiet" data-act="add-period">${icon('plus')} إضافة حصة أخرى</button>
+        </div>
+      </div>
+      ${renderDateNavigation()}
+      ${sessions.length > 1 ? html`
+        <div class="attendance-01c__session-switch" role="group" aria-label="حصص اليوم">
+          ${sessions.map((entry) => html`<button class="attendance-01c__session-chip ${entry.id === session?.id ? 'is-active' : ''}"
+            data-act="pick-session" data-id="${entry.id}" aria-pressed="${entry.id === session?.id}">
+            الحصة ${entry.period}${entry.startTime ? html` · <bdi>${entry.startTime}</bdi>` : ''}
+          </button>`)}
+        </div>` : ''}
+      ${session ? html`<div class="attendance-01c__session-meta">
+        <span class="attendance-01c__status-pill ${status.tone ? `is-${status.tone}` : ''}">${status.label}</span>
+        <span class="attendance-01c__meta">الحصة ${session.period}</span>
+        ${session.startTime ? html`<span class="attendance-01c__meta"><bdi>${session.startTime}${session.endTime ? `–${session.endTime}` : ''}</bdi></span>` : ''}
+        ${session.reason ? html`<span class="attendance-01c__meta">${session.reason}</span>` : ''}
+      </div>` : ''}
+    </section>`;
 }
 
 export default {
@@ -85,11 +118,13 @@ export default {
     const daySessions = store.sessionsOnFor(tch.id, date);
     const ses = activeSessionId ? store.getSession(activeSessionId) : daySessions[0] ?? null;
     if (!ses) return html`
-      ${renderDateNavigation()}
+      <div class="attendance-01c">
+      ${renderSessionContext(tch, null, daySessions, SESSION_STATUS.scheduled)}
       <div class="empty empty--compact">
         <div class="empty__icon">${icon('calendar')}</div>
         <div class="empty__title">لا توجد حصة مجدولة لهذا اليوم</div>
         <div class="empty__text">انتقل بين الأيام أو أضف حصة أخرى عندما تحتاج إلى رصد مستقل.</div>
+      </div>
       </div>
     `;
 
@@ -97,10 +132,13 @@ export default {
     const roster = rosterInfo.members;
     if (!roster.length) {
       return html`
+        <div class="attendance-01c">
+        ${renderSessionContext(tch, ses, daySessions, SESSION_STATUS[ses.status] ?? SESSION_STATUS.scheduled)}
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">أضف الطلاب أولًا</div>
           <a class="btn btn--primary" href="#/teaching/${tch.id}/students">${icon('plus')} كشف الطلاب</a>
+        </div>
         </div>
       `;
     }
@@ -123,36 +161,12 @@ export default {
       : roster;
 
     return html`
-      ${renderDateNavigation()}
+      <div class="attendance-01c">
+      ${renderSessionContext(tch, ses, daySessions, meta)}
 
       ${rosterInfo.source === 'snapshot'
         ? html`<p class="t-3 fs-sm mb-3">كشف هذه الحصة محفوظ عند أول رصد حضور.</p>`
         : ''}
-
-      ${daySessions.length > 1
-        ? html`
-            <div class="segmented attendance-session-tabs mb-3" role="group" aria-label="اختر حصة اليوم">
-              ${daySessions.map(
-                (s) => html`
-                  <button class="segmented__btn ${s.id === ses.id ? 'is-on' : ''}"
-                          data-act="pick-session" data-id="${s.id}" aria-pressed="${s.id === ses.id}">
-                    الحصة ${s.period}
-                  </button>
-                `
-              )}
-            </div>
-          `
-        : ''}
-
-      <div class="surface surface--compact surface--flat attendance-session-summary mb-3">
-        <div class="hstack gap-2 wrap">
-          <span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">${meta.label}</span>
-          ${ses.reason ? html`<span class="t-3 fs-sm">${ses.reason}</span>` : ''}
-          <button class="btn btn--sm btn--quiet push" data-act="session-status">
-            ${icon('edit')} حالة الحصة
-          </button>
-        </div>
-      </div>
 
       ${blocked
         ? html`
@@ -167,63 +181,62 @@ export default {
             </div>
           `
         : html`
-            <div class="hstack gap-2 wrap mb-3">
-              ${ATTENDANCE_ORDER.map((k) =>
-                counts[k]
-                  ? html`<span class="badge" style="background:var(--${ATTENDANCE[k].color}-soft);color:var(--${ATTENDANCE[k].color})">
-                      ${ATTENDANCE[k].label} <span class="tabular">${counts[k]}</span>
-                    </span>`
-                  : ''
-              )}
-              <span class="att-pill ${unmarked ? 'att-pill--unmarked' : 'att-pill--done'}" role="status" aria-label="حالة الرصد: ${unmarked ? 'غير مكتمل' : 'مكتمل'}">
-                ${unmarked ? html`<span class="att-pill__dot"></span>` : icon('check')}
-                <span>${unmarked ? 'غير مكتمل' : 'مكتمل'}</span>
-                <span class="tabular">${records.length}/${roster.length}</span>
-              </span>
-              ${!isToday ? html`<button class="btn btn--sm btn--quiet push" data-act="go-today">اليوم</button>` : ''}
+            <div class="attendance-01c__progress" aria-label="تقدم رصد الحضور">
+              <div class="attendance-01c__progress-main">
+                <div class="attendance-01c__progress-copy">
+                  <strong class="att-pill ${unmarked ? 'att-pill--unmarked' : 'att-pill--done'}" role="status" aria-label="حالة الرصد: ${unmarked ? 'غير مكتمل' : 'مكتمل'}">
+                    <span class="tabular">${records.length} من ${roster.length}</span> · ${unmarked ? 'غير مكتمل' : 'مكتمل'}
+                  </strong>
+                  <span>يتبقى ${unmarked} طلاب</span>
+                </div>
+                <div class="attendance-01c__progress-track"><i style="width:${roster.length ? records.length / roster.length * 100 : 0}%"></i></div>
+              </div>
+              <div class="attendance-01c__counts">
+                ${ATTENDANCE_ORDER.map((k) => html`<span class="attendance-01c__count">
+                  ${ATTENDANCE[k].label} <b class="tabular" data-count="${k}">${counts[k]}</b></span>`)}
+                ${!isToday ? html`<button class="btn btn--sm btn--quiet" data-act="go-today">اليوم</button>` : ''}
+              </div>
             </div>
 
-            ${unmarked > 0
-              ? html`
-                  <button class="btn btn--primary btn--block mb-3" data-act="fill-present">
-                    ${icon('check')} علّم الباقي (${unmarked}) حاضرين
-                  </button>
-                `
-              : ''}
-
+            <section class="attendance-01c__roster" aria-label="كشف الحضور">
+            <div class="attendance-01c__toolbar">
             <div class="searchbar attendance-search">
               <span class="searchbar__icon" aria-hidden="true">${icon('search')}</span>
               <input class="searchbar__input" type="search" data-input="search" data-fk="attendance-search"
-                     value="${query}" placeholder="ابحث باسم الطالب أو رقمه" autocomplete="off">
+                     value="${query}" placeholder="ابحث بالاسم أو الرقم" aria-label="بحث في قائمة الحضور" autocomplete="off">
               ${query ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
             </div>
+            ${unmarked > 0 ? html`<button class="btn btn--primary" data-act="fill-present">
+              ${icon('check')} علّم الباقي (${unmarked}) حاضرين</button>` : ''}
+            </div>
+            <div class="attendance-01c__roster-head" aria-hidden="true"><span>الرقم</span><span>الطالب</span><span>ملاحظة</span><span>الحالة</span></div>
 
             ${shownRoster.length === 0
               ? html`<div class="empty"><div class="empty__text">لا توجد نتائج مطابقة للبحث في كشف الحضور.</div></div>`
               : html`
-                  <div class="list">
+                  <div class="list attendance-01c__list">
                     ${shownRoster.map((s) => {
                       const rec = byStudent.get(s.id);
                       const status = rec?.status ?? null;
                       const notesCount = store.notesOf(s.id).length;
                       return html`
-                        <div class="att-row ${status ? '' : 'is-unmarked'}">
+                        <div class="att-row attendance-01c__row ${status ? '' : 'is-unmarked'}">
                           <span class="rollno">${s.rollNo ?? '—'}</span>
-                          <span class="att-row__name">${s.name}</span>
+                          <span class="att-row__name"><strong>${s.name}</strong><small>الرقم ${s.rollNo ?? '—'}</small></span>
                           <button class="att-row__note ${notesCount > 0 ? 'has-notes' : ''}"
                                   data-act="quick-note" data-id="${s.id}"
                                   title="${notesCount > 0 ? `ملاحظات الطالب (${notesCount})` : 'إضافة ملاحظة سريعة'}"
                                   aria-label="ملاحظة لـ ${s.name}">
                             ${icon('note')}
                           </button>
-                          <span class="segbtns" role="group" aria-label="حالة حضور ${s.name}">
+                          <span class="segbtns attendance-01c__status-options" role="group" aria-label="حالة حضور ${s.name}">
                             ${ATTENDANCE_ORDER.map(
                               (k) => html`
-                                <button class="segbtn ${status === k ? 'is-on' : ''}" data-color="${ATTENDANCE[k].color}"
+                                <button class="segbtn attendance-01c__status ${status === k ? 'is-on' : ''}" data-color="${ATTENDANCE[k].color}"
                                         data-act="set" data-id="${s.id}" data-status="${k}"
                                         title="${ATTENDANCE[k].label}" aria-label="${s.name}: ${ATTENDANCE[k].label}"
                                         aria-pressed="${status === k ? 'true' : 'false'}">
-                                  ${ATTENDANCE[k].short}
+                                  ${ATTENDANCE[k].label}
                                 </button>
                               `
                             )}
@@ -234,8 +247,9 @@ export default {
                   </div>
                 `}
 
-            <p class="t-3 fs-sm center mt-6">ح حاضر · ت متأخر · ذ مستأذن · غ غائب</p>
+            </section>
           `}
+      </div>
     `;
   },
 

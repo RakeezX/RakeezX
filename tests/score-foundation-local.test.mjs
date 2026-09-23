@@ -55,6 +55,47 @@ test('two-decimal automatic distribution and null versus explicit zero', () => {
   })), null).value, 10);
 });
 
+test('projection boundary ignores foreign student, item, and owner components', () => {
+  const item = { id: 'scoped:item', max: 10 };
+  const definitions = [
+    { id: 'scoped:three', itemId: item.id, value: 3 },
+    { id: 'foreign:item-sub', itemId: 'other:item', value: 9 },
+  ];
+  const completions = [
+    { studentId: 'A', subitemId: 'scoped:three', checked: true },
+    { studentId: 'B', subitemId: 'scoped:three', checked: false },
+    { studentId: 'B', subitemId: 'foreign:item-sub', checked: true },
+    { studentId: 'B', subitemId: 'scoped:three', checked: true, ownerId: 'other-owner' },
+  ];
+  assert.throws(() => projectSubitemScore(item, definitions, completions, null),
+    /Student identity is required/);
+  assert.equal(projectSubitemScore(item, definitions, completions, null,
+    { studentId: 'B', ownerId: 'owner-A' }).value, null);
+  assert.equal(projectSubitemScore(item, definitions, completions, 0,
+    { studentId: 'B', ownerId: 'owner-A' }).value, 0);
+  assert.equal(projectSubitemScore(item, definitions, completions, null,
+    { studentId: 'A', ownerId: 'owner-A' }).value, 3);
+});
+
+test('unsupported server rejects SUBITEM configuration while DIRECT score remains writable', async () => {
+  const { item, student } = await fixture();
+  cloud.setMockBackend({ getScoreFoundationCapability: () => null });
+  try {
+    const proposed = { scoreMode: 'subitems', distributionMode: 'auto',
+      subitems: [{ name: 'واجب 1' }] };
+    const preview = store.previewScoreConfiguration(item.id, proposed);
+    await assert.rejects(() => store.applyConfirmedScoreConfiguration(item.id, proposed,
+      { expectedVersion: preview.expectedVersion, confirmed: true }), /capability is unavailable/);
+    assert.equal(store.state.items.find((row) => row.id === item.id).scoreMode, 'direct');
+    assert.equal(store.scoreSubitemsOf(item.id).length, 0);
+    await store.setScore(student.id, item.id, 4);
+    assert.equal(store.scoresOf(student.id).find((row) => row.itemId === item.id)?.value, 4);
+  } finally {
+    cloud.setMockBackend({ getScoreFoundationCapability: () => ({ scoreDomainVersion: 1,
+      restoreProtocol: 'CORE_V2', backupVersion: 5, copyDomainVersion: 1 }) });
+  }
+});
+
 test('completion/manual/final projection is one local transaction and survives reload', async () => {
   const { item, student } = await fixture();
   const proposed = { scoreMode: 'subitems', distributionMode: 'auto', subitems: [
@@ -90,6 +131,48 @@ test('completion/manual/final projection is one local transaction and survives r
   assert.equal(restored.value, 6.67);
   assert.equal(store.state.scoreSubitemCompletions.filter((row) => row.checked).length, 1);
   assert.equal(store.state.scoreSubitemCompletions.filter((row) => !row.checked).length, 1);
+});
+
+test('per-student prepared scores never inherit another student completion or manual cap', async () => {
+  const { item, student: a } = await fixture();
+  const b = makeStudent({ id: 'score-foundation:student:b' });
+  const c = makeStudent({ id: 'score-foundation:student:c' });
+  await store.save({ students: [b, c], enrollments: [b, c].map((row) =>
+    makeEnrollment({ studentId: row.id, sectionId: 'score-foundation:section' })) });
+  const proposed = { scoreMode: 'subitems', distributionMode: 'manual', subitems: [
+    { name: 'ثلاث', value: 3 }, { name: 'خمس', value: 5 }, { name: 'اثنتان', value: 2 },
+  ] };
+  await store.applyConfirmedScoreConfiguration(item.id, proposed,
+    { expectedVersion: store.previewScoreConfiguration(item.id, proposed).expectedVersion, confirmed: true });
+  const [three, five, two] = store.scoreSubitemsOf(item.id);
+  await store.setScoreSubitemCompletion(a.id, three.id, true);
+  assert.equal(store.scoresOf(a.id).find((row) => row.itemId === item.id).derivedValue, 3);
+  assert.equal(store.scoresOf(b.id).find((row) => row.itemId === item.id), undefined,
+    'blank B remains unrecorded when A checks a shared definition');
+  const bManual = await store.setScoreManualContribution(b.id, item.id, 4);
+  assert.deepEqual([bManual.derivedValue, bManual.manualValue, bManual.value], [0, 4, 4]);
+  await store.setScoreSubitemCompletion(c.id, three.id, true);
+  assert.equal(store.scoresOf(c.id).find((row) => row.itemId === item.id).value, 3);
+  await store.setScoreSubitemCompletion(a.id, three.id, false);
+  assert.equal(store.scoresOf(c.id).find((row) => row.itemId === item.id).value, 3,
+    'unchecking A does not change C');
+  assert.equal(store.scoresOf(b.id).find((row) => row.itemId === item.id).value, 4);
+  await store.setScoreSubitemCompletion(a.id, three.id, true);
+  await store.setScoreSubitemCompletion(a.id, five.id, true);
+  await store.setScoreSubitemCompletion(b.id, two.id, true);
+  const capped = await store.setScoreManualContribution(b.id, item.id, 9);
+  assert.deepEqual([capped.derivedValue, capped.manualValue, capped.value], [2, 8, 10],
+    'A derived 8 cannot reduce B remaining capacity');
+  await db.closeDB();
+  store.state.ready = false;
+  await store.init();
+  assert.equal(store.scoresOf(a.id).find((row) => row.itemId === item.id).derivedValue, 8);
+  assert.deepEqual(store.scoresOf(b.id).find((row) => row.itemId === item.id) && [
+    store.scoresOf(b.id).find((row) => row.itemId === item.id).derivedValue,
+    store.scoresOf(b.id).find((row) => row.itemId === item.id).manualValue,
+    store.scoresOf(b.id).find((row) => row.itemId === item.id).value,
+  ], [2, 8, 10]);
+  assert.equal(store.scoresOf(c.id).find((row) => row.itemId === item.id).value, 3);
 });
 
 test('score domain outbox retries the same command and adopts one canonical projection', async () => {
@@ -135,6 +218,8 @@ test('score domain outbox retries the same command and adopts one canonical proj
 
 test('atomic cloud score snapshot repairs stale local projection from authoritative components', async () => {
   const { item, student } = await fixture();
+  const second = makeStudent({ id: 'score-foundation:snapshot-other-student' });
+  await db.put('students', second);
   await db.clearStore('outbox');
   const scoreId = 'score-foundation:snapshot-score';
   const subitemId = 'score-foundation:snapshot-subitem';
@@ -155,7 +240,10 @@ test('atomic cloud score snapshot repairs stale local projection from authoritat
     score_subitem_completions: [{ id: completionId, owner_id, student_id: student.id,
       subitem_id: subitemId, checked: true, revision: 2, deleted_at: null }],
     scores: [{ id: scoreId, owner_id, student_id: student.id, item_id: item.id,
-      derived_value: 3, manual_value: 5, value: 8, revision: 2, deleted_at: null }],
+      derived_value: 3, manual_value: 5, value: 8, revision: 2, deleted_at: null },
+    { id: 'score-foundation:snapshot-other-score', owner_id, student_id: second.id,
+      item_id: item.id, derived_value: 0, manual_value: 4, value: 4,
+      revision: 2, deleted_at: null }],
   };
   const transport = { fetchRecords: async () => [], getScoreDomainSnapshot: async () => snapshot };
   const engine = createSyncV2Engine({ database: db, transport,
@@ -164,6 +252,8 @@ test('atomic cloud score snapshot repairs stale local projection from authoritat
   const pulled = await engine.pullAll({ stores: ['scores'], scoreDomainSnapshot: true });
   assert.deepEqual(pulled.failures, []);
   assert.equal((await db.get('scores', scoreId)).value, 8);
+  assert.equal((await db.get('scores', 'score-foundation:snapshot-other-score')).value, 4,
+    'the second student receives only their own cloud manual value');
   assert.equal((await db.get('scoreSubitemCompletions', completionId)).checked, true);
   const corrupted = structuredClone(snapshot);
   corrupted.scores[0].value = 9;
@@ -227,6 +317,76 @@ test('distribution copy queues one domain command and retry preserves cloned ide
   assert.equal((await db.get('items', copiedItem.id)).serverRevision, 1);
   assert.equal((await db.get('scoreSubitems', copiedSubitem.id)).serverRevision, 1);
   assert.equal((await db.getAll('scores')).length, 0);
+});
+
+test('distribution copy accepts only an explicit nonempty eligible subset', async () => {
+  const { item, student } = await fixture();
+  await db.clearStore('outbox');
+  const source = store.state.teachings.find((row) => row.id === item.teachingId);
+  const sourceSection = store.state.sections.find((row) => row.id === source.sectionId);
+  const targets = [];
+  for (let index = 1; index <= 4; index++) {
+    const section = makeSection({ id: `subset:section:${index}`, yearId: sourceSection.yearId,
+      grade: sourceSection.grade, label: String(index + 1) });
+    const teaching = makeTeaching({ id: `subset:teaching:${index}`, sectionId: section.id,
+      subjectId: source.subjectId, termId: source.termId, serverRevision: 1 });
+    await db.put('sections', section);
+    await db.put('teachings', teaching);
+    targets.push(teaching);
+  }
+  const existing = makeItem({ id: 'subset:existing', teachingId: targets[0].id,
+    name: 'بند مستقل', max: 15, order: 1 });
+  await db.put('items', existing);
+  await db.put('scores', { id: 'subset:existing-score', itemId: existing.id,
+    studentId: student.id, value: 7 });
+  await store.refreshSyncedState();
+  const beforeUnselected = [1, 3].map((index) => store.state.items
+    .filter((row) => row.teachingId === targets[index].id));
+  const selected = [targets[2].id, targets[0].id];
+  const copied = await store.applyScoreDistributionCopy(source.id, selected);
+  assert.deepEqual(copied.classifications.map((row) => row.teachingId), [...selected].sort());
+  assert.equal(copied.itemIds.length, 2);
+  assert.deepEqual([1, 3].map((index) => store.state.items
+    .filter((row) => row.teachingId === targets[index].id)), beforeUnselected);
+  assert.deepEqual(await db.get('scores', 'subset:existing-score'), {
+    id: 'subset:existing-score', itemId: existing.id, studentId: student.id, value: 7,
+  });
+  assert.ok(copied.itemIds.every((id) => store.state.items.find((row) => row.id === id)
+    .portabilityGroupId === null));
+  const count = store.state.items.length;
+  const reject = async (ids) => {
+    await assert.rejects(() => store.applyScoreDistributionCopy(source.id, ids));
+    assert.equal(store.state.items.length, count);
+  };
+  await reject([]);
+  await reject([targets[0].id, targets[0].id]);
+  await reject([targets[0].id, 'subset:unknown']);
+  await reject([source.id]);
+  const otherYear = makeYear({ id: 'subset:other-year' });
+  const otherTerm = makeTerm({ id: 'subset:other-term', yearId: sourceSection.yearId });
+  const otherSubject = makeSubject({ id: 'subset:other-subject' });
+  await db.put('years', otherYear);
+  await db.put('terms', otherTerm);
+  await db.put('subjects', otherSubject);
+  for (const [name, yearId, grade, subjectId, termId] of [
+    ['grade', sourceSection.yearId, sourceSection.grade + 1, source.subjectId, source.termId],
+    ['year', otherYear.id, sourceSection.grade, source.subjectId, source.termId],
+    ['term', sourceSection.yearId, sourceSection.grade, source.subjectId, otherTerm.id],
+    ['subject', sourceSection.yearId, sourceSection.grade, otherSubject.id, source.termId],
+  ]) {
+    const section = makeSection({ id: `subset:${name}:section`, yearId, grade, label: name });
+    const teaching = makeTeaching({ id: `subset:${name}:teaching`, sectionId: section.id,
+      subjectId, termId });
+    await db.put('sections', section);
+    await db.put('teachings', teaching);
+  }
+  await store.refreshSyncedState();
+  for (const name of ['grade', 'year', 'term', 'subject']) {
+    await reject([targets[0].id, `subset:${name}:teaching`]);
+  }
+  const remaining = await store.applyScoreDistributionCopy(source.id, [targets[1].id]);
+  assert.equal(remaining.itemIds.length, 1);
+  assert.equal(store.state.items.length, count + 1);
 });
 
 after(async () => { store.closeChannel(); await db.closeDB(); cloud.setMockBackend(null); });

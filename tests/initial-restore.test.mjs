@@ -128,6 +128,38 @@ test('CORE_V2 restores subitem provenance and rejects a numeric-only or divergen
   { code: 'RESTORE_FAILED' });
 });
 
+test('CORE_V2 restores two students against one definition without cross-student contribution', async () => {
+  const canonical = {
+    students: [{ ...row('students', 'restore:A'), name: 'A' },
+      { ...row('students', 'restore:B'), name: 'B' }],
+    items: [{ ...row('items', 'restore:item'), teaching_id: 'restore:teaching',
+      max: 10, score_mode: 'subitems', distribution_mode: 'manual' }],
+    score_subitems: [{ ...row('score_subitems', 'restore:sub'), item_id: 'restore:item',
+      name: 'three', value: 3, order: 0 }],
+    score_subitem_completions: [{ ...row('score_subitem_completions', 'restore:completion:A'),
+      student_id: 'restore:A', subitem_id: 'restore:sub', checked: true }],
+    scores: [{ ...row('scores', 'restore:score:A'), student_id: 'restore:A', item_id: 'restore:item',
+      derived_value: 3, manual_value: null, value: 3 },
+    { ...row('scores', 'restore:score:B'), student_id: 'restore:B', item_id: 'restore:item',
+      derived_value: 0, manual_value: 4, value: 4 }],
+  };
+  const manifest = Object.entries(canonical).flatMap(([entity, rows]) => rows.map((entry) => ({
+    entity, id: entry.id, revision: entry.revision, deleted: false,
+  })));
+  const cloud = { getScoreRestoreManifestV2: async () => manifest,
+    fetchRestoreEntityPage: async (entity) => canonical[entity] ?? [] };
+  const acquired = await restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A, cloud,
+    protocol: restore.SCORE_RESTORE_PROTOCOL });
+  assert.equal(acquired.status, 'ready');
+  assert.deepEqual(acquired.snapshot.scores.map((entry) => entry.value).sort(), [3, 4]);
+  const contaminated = { ...cloud, fetchRestoreEntityPage: async (entity) => entity === 'scores'
+    ? [canonical.scores[0], { ...canonical.scores[1], derived_value: 3, value: 7 }]
+    : canonical[entity] ?? [] };
+  await assert.rejects(restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A,
+    cloud: contaminated, protocol: restore.SCORE_RESTORE_PROTOCOL, attempts: 1 }),
+  { code: 'RESTORE_FAILED' });
+});
+
 test('CORE_V2-capable client restores a direct-only cloud workspace without fabricated provenance', async () => {
   const canonical = {
     students: [{ ...row('students', 'direct:student'), name: 'synthetic' }],
