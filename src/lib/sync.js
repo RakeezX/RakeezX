@@ -197,7 +197,7 @@ async function pendingOutbox() {
   const entries = await db.getAll('outbox');
   const pending = [];
   for (const entry of entries) {
-    if (entry.protocol !== 'v2' || !SYNCABLE_STORES.has(entry.store)) continue;
+    if (entry.protocol !== 'v2' || entry.state === 'superseded' || !SYNCABLE_STORES.has(entry.store)) continue;
     // Preserve old receipts for diagnosis, but never upload local-only demo
     // records or let those receipts keep unrelated cloud work pending forever.
     const record = entry.recordId ? await db.get(entry.store, entry.recordId) : null;

@@ -212,7 +212,7 @@ const SAFE_REASON = Object.freeze({
  * It deliberately exposes no record/mutation identity, patches, receipts, or raw errors.
  */
 export function summarizeSyncV2OperationalState({ outbox = [], recordsByStore = {} } = {}) {
-  const rows = Array.isArray(outbox) ? outbox.filter((row) => row?.protocol === 'v2') : [];
+  const rows = Array.isArray(outbox) ? outbox.filter((row) => row?.protocol === 'v2' && row.state !== 'superseded') : [];
   const pendingCount = rows.filter((row) => row.state === 'pending').length;
   const failedCount = rows.filter((row) => row.state === 'failed').length;
   const blockedCount = rows.filter((row) => row.state === 'blocked').length;
@@ -394,8 +394,13 @@ function inferredDependencies(store, record, current, supplied) {
 
 function sortMutations(rows) {
   return rows
-    .filter((row) => row?.protocol === 'v2')
+    .filter((row) => row?.protocol === 'v2' && row.state !== 'superseded')
     .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0) || String(a.id).localeCompare(String(b.id)));
+}
+
+function missingScoreCreateIdentity(mutation) {
+  return mutation?.store === 'scores' && mutation.op === 'create' &&
+    (!mutation.patch?.student_id || !mutation.patch?.item_id);
 }
 
 function pendingForRecord(rows, store, ids, excludingId = null) {
@@ -1221,6 +1226,64 @@ export function createSyncV2Engine({
     });
   }
 
+  // The 01C client could persist a complete local score but queue only its
+  // edited value for CREATE. Repair only that exact rejected server signature.
+  // The rejected envelope remains durable evidence; an atomic new command is
+  // created with a fresh identity and the original is marked superseded.
+  async function recoverRejectedScoreCreates() {
+    const workspace = ownershipGuard.getWorkspace();
+    if (workspace?.type !== 'account' || workspace.ownershipState !== 'claimed') return 0;
+    const outbox = await database.getAll('outbox');
+    let recovered = 0;
+    for (const original of outbox) {
+      if (original?.protocol !== 'v2' || original.state !== 'rejected' ||
+          !missingScoreCreateIdentity(original) || original.lastError?.code !== '23503' ||
+          !String(original.lastError?.message ?? '').includes('STUDENT_TOMBSTONED') ||
+          !ownershipGuard.cloudAccess({ operation: 'dispatch',
+            authenticatedUserId: currentAuthenticatedUserId(), command: original }).allowed) continue;
+      await database.applyBatch({ scores: {}, students: {}, items: {}, outbox: {} }, {
+        prepare(current) {
+          const prior = current.outbox.find((row) => row.id === original.id);
+          const score = current.scores.find((row) => row.id === original.recordId);
+          const student = current.students.find((row) => row.id === score?.studentId);
+          const item = current.items.find((row) => row.id === score?.itemId);
+          const other = current.outbox.some((row) => row.id !== original.id && row.state !== 'superseded' &&
+            row.store === 'scores' && row.recordId === original.recordId);
+          if (!prior || prior.state !== 'rejected' || !missingScoreCreateIdentity(prior) ||
+              prior.lastError?.code !== '23503' ||
+              !String(prior.lastError?.message ?? '').includes('STUDENT_TOMBSTONED') ||
+              !score || score.deleted || Number(score.serverRevision ?? 0) !== 0 ||
+              !score.studentId || !score.itemId || !student || student.deleted || student.status !== 'active' ||
+              !item || item.deleted || other ||
+              !hasOwn(prior.localPatch ?? {}, 'value') ||
+              !Object.is(prior.localPatch.value, score.value)) return { outbox: operationBatch() };
+          const localPatch = Object.fromEntries(Object.keys(SYNC_V2_SCHEMAS.scores.fields)
+            .filter((field) => hasOwn(score, field)).map((field) => [field, clone(score[field])]));
+          const patch = encodeSyncV2Patch('scores', localPatch);
+          if (!patch.student_id || !patch.item_id) return { outbox: operationBatch() };
+          const mutationId = makeId();
+          const stamp = now();
+          const replacement = ownershipGuard.bindNewCommand({
+            id: `v2:${mutationId}`, protocol: 'v2', mutationId, deviceId: prior.deviceId,
+            store: 'scores', entity: 'scores', recordId: score.id,
+            serverRecordId: score.canonicalId ?? score.id, canonicalId: score.canonicalId ?? score.id,
+            logicalRecordKey: `scores:${score.canonicalId ?? score.id}`, op: 'create', baseRevision: 0,
+            patch, localPatch, fields: Object.keys(patch).sort(), groups: [],
+            dependencies: inferredDependencies('scores', score, current, []),
+            sequence: sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1,
+            clientUpdatedAt: score.updatedAt ?? stamp, queuedAt: stamp,
+            state: 'pending', attemptCount: 0, envelopeLocked: false,
+            lastError: null, blockedReason: null,
+          });
+          recovered++;
+          return { outbox: { put: [{ ...prior, state: 'superseded', supersededByMutationId: mutationId,
+            supersededAt: stamp, recoveryReason: 'score-create-identity-01c' }, replacement], remove: [] } };
+        },
+      });
+    }
+    return recovered;
+  }
+
   function isRejectedProtocolError(error) {
     const status = Number(error?.status);
     return error?.code === '22023' || error?.code === '23503' ||
@@ -1278,6 +1341,7 @@ export function createSyncV2Engine({
   }
 
   async function dispatchPending({ maxMutations = Infinity } = {}) {
+    await recoverRejectedScoreCreates();
     const snapshot = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
     const stoppedKeys = new Set();
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
@@ -1644,6 +1708,13 @@ export function createSyncV2Engine({
         continue;
       }
 
+      if (missingScoreCreateIdentity(live)) {
+        await markRejected(live, 'score-create-identity-missing');
+        stoppedKeys.add(live.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
+
       const mutation = await markAttempt(live);
       result.attempted++;
       try {
@@ -1824,12 +1895,15 @@ export function createSyncV2Engine({
         const result = {};
         for (const [store] of entries) {
           const remoteIds = new Set(canonical[store].map((row) => row.id));
+          const locallyPending = (row) => store === 'scores' && current.outbox.some((mutation) =>
+            mutation.protocol === 'v2' && mutation.state !== 'superseded' &&
+            mutation.store === 'scores' && mutation.recordId === row.id);
           result[store] = {
-            put: canonical[store].map((row) => {
+            put: canonical[store].filter((row) => !locallyPending(row)).map((row) => {
               const local = current[store].find((candidate) => candidate.id === row.id);
               return { ...(local ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
             }),
-            remove: current[store].filter((row) => covered[store](row) && !remoteIds.has(row.id))
+            remove: current[store].filter((row) => covered[store](row) && !remoteIds.has(row.id) && !locallyPending(row))
               .map((row) => row.id),
           };
         }
@@ -1849,6 +1923,7 @@ export function createSyncV2Engine({
         blockReason: ownership.reason, retryable: false,
       };
     }
+    await recoverRejectedScoreCreates();
     const result = { pulled: 0, failures: [], blocked: false, ownershipBlocked: false };
     for (const store of stores) {
       try {
@@ -1904,6 +1979,7 @@ export function createSyncV2Engine({
     queueTeachingCreationCommand,
     queueFillAttendanceCommand,
     dispatchPending,
+    recoverRejectedScoreCreates,
     reconcilePull,
     pullStore,
     pullAll,

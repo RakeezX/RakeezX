@@ -583,6 +583,12 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null)
   if (!schema || schema.readOnly || isLocalOnlyRecord(rec) || !isCurriculumOrdinarySyncAllowed(storeName)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
   let localFields = fields ?? Object.keys(schema.fields);
+  // patchMany reports only edited fields even when it inserted a new record.
+  // A new score must carry its immutable parent identities to Sync V2.
+  if (storeName === 'scores' && operation === 'create') {
+    if (!rec.studentId || !rec.itemId) throw new Error('Score create requires canonical student and item IDs');
+    localFields = [...new Set([...localFields, 'studentId', 'itemId'])];
+  }
   // The server derives subitem totals from completion and manual-value rows.
   // Uploading an optimistic numeric projection could overwrite a newer device's contribution.
   if (storeName === 'scores' && state.items.find((item) => item.id === rec.itemId)?.scoreMode === 'subitems') {
