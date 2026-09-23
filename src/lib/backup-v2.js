@@ -5,8 +5,9 @@ import * as cloud from './cloud.js';
 import * as sync from './sync.js';
 import * as store from '../store.js';
 import { DEVICE_ONLY_STORES, validateBackupIntegrity } from './export.js';
+import { assertScoreSnapshotInvariant } from './initial-restore.js';
 import {
-  SYNC_V2_SCHEMAS, SYNC_V2_STORES, decodeSyncV2Canonical, encodeSyncV2Patch,
+  SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch,
 } from './sync-v2.js';
 
 export const RESTORE_CLASSIFICATIONS = Object.freeze([
@@ -17,15 +18,27 @@ const IMMUTABLE_STORES = new Set(['logs', 'sessionRosterSnapshots', 'closedTermR
 // The deployed stage/finalize RPC contract predates curriculum Sync V2. Keep
 // that reachable flow byte-compatible until its separately versioned server
 // activation; Initial Restore uses the new full manifest RPC instead.
-const CLOUD_RESTORE_STORES = Object.freeze(SYNC_V2_STORES.filter((name) => !['units', 'lessons'].includes(name)));
+// Manifest arrays are order-sensitive at staging. Match the deployed server
+// helper rather than relying on object/property declaration order.
+const LEGACY_CLOUD_RESTORE_STORES = Object.freeze([
+  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections',
+  'teachings', 'students', 'enrollments', 'notes', 'classRules',
+  'classCharterSelections', 'classGoals', 'groupArrangements', 'items', 'scores',
+  'logs', 'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots',
+  'attendance', 'closedTermReports',
+]);
+const SCORE_CLOUD_RESTORE_STORES = Object.freeze([...LEGACY_CLOUD_RESTORE_STORES,
+  'scoreSubitems', 'scoreSubitemCompletions']);
+const restoreStores = (version) => version === 5 ? SCORE_CLOUD_RESTORE_STORES : LEGACY_CLOUD_RESTORE_STORES;
 const RESTORE_STORE_ORDER = Object.freeze([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings', 'students',
   'enrollments', 'timeProfiles', 'profile', 'items', 'slots', 'sessions', 'notes', 'classRules',
   'classCharterSelections', 'classGoals', 'groupArrangements',
-  'scores', 'logs', 'sessionRosterSnapshots', 'attendance', 'closedTermReports',
+  'scoreSubitems', 'scores', 'scoreSubitemCompletions', 'logs', 'sessionRosterSnapshots',
+  'attendance', 'closedTermReports',
 ]);
 const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>
-  !CLOUD_RESTORE_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
+  !SCORE_CLOUD_RESTORE_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
 const RESTORE_RESUME_VERSION = 1;
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);
 const clone = (value) => value == null ? value : structuredClone(value);
@@ -46,7 +59,8 @@ function recordMap(records) {
   return new Map((records ?? []).map((row) => [row.id, row]));
 }
 
-function planRecord({ storeName, backupRecord, baseline, serverRecord }) {
+function planRecord({ storeName, backupRecord, baseline, serverRecord,
+  allowAuthoritativeRecreate = false, version = 4 }) {
   const identity = { store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id: backupRecord.id };
   if ((storeName === 'items' && (backupRecord.unitId || backupRecord.lessonId)) ||
       (storeName === 'sessions' && backupRecord.lessonId)) {
@@ -55,11 +69,19 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord }) {
   if (serverRecord?.deleted && !backupRecord.deleted) {
     return { ...identity, classification: 'TOMBSTONED_SERVER', reason: 'server-tombstone' };
   }
+  if (!serverRecord && allowAuthoritativeRecreate) {
+    return { ...identity, classification: 'SAFE_APPLY',
+      operation: backupRecord.deleted ? 'create_deleted' : 'create', baseRevision: 0,
+      patch: encodeSyncV2Patch(storeName, backupRecord),
+      clientUpdatedAt: backupRecord.updatedAt ?? null };
+  }
   if (!baseline?.value) {
     if (Number(backupRecord.serverRevision ?? 0) > 0) {
       return { ...identity, classification: 'INVALID', reason: 'missing-baseline-evidence' };
     }
-    if (backupRecord.deleted) return { ...identity, classification: 'KEEP_SERVER', reason: 'local-only-tombstone' };
+    if (backupRecord.deleted) return version === 5 && serverRecord && !serverRecord.deleted
+      ? { ...identity, classification: 'CONFLICT', reason: 'local-tombstone-versus-live-server' }
+      : { ...identity, classification: 'KEEP_SERVER', reason: 'local-only-tombstone' };
     if (serverRecord) return { ...identity, classification: 'CONFLICT', reason: 'identity-already-exists' };
     return {
       ...identity, classification: 'SAFE_APPLY', operation: 'create', baseRevision: 0,
@@ -105,8 +127,8 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord }) {
   };
 }
 
-export function canonicalRestoreManifest(serverData) {
-  return CLOUD_RESTORE_STORES.flatMap((storeName) => [...(serverData[storeName] ?? [])]
+export function canonicalRestoreManifest(serverData, { version = 4 } = {}) {
+  return restoreStores(version).flatMap((storeName) => [...(serverData[storeName] ?? [])]
     .sort((left, right) => left.id.localeCompare(right.id)).map((row) => ({
     entity: SYNC_V2_SCHEMAS[storeName].entity,
     id: row.id,
@@ -117,17 +139,20 @@ export function canonicalRestoreManifest(serverData) {
 
 /** Pure, deterministic three-way planner. It never reads or writes storage. */
 export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
+  const cloudStores = restoreStores(payload.version);
   const entries = [];
   const legacy = payload.version === 3;
-  const ownerHasRows = CLOUD_RESTORE_STORES.some((name) => (serverData[name] ?? []).length > 0);
-  if (legacy && ownerHasRows) {
+  const ownerHasRows = cloudStores.some((name) => (serverData[name] ?? []).length > 0);
+  if (payload.version === 5 && payload.sourceOwnerId !== ownerId) {
+    entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'v5-owner-mismatch' });
+  } else if (legacy && ownerHasRows) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'legacy-backup-requires-empty-owner' });
   } else if (!legacy && payload.sourceOwnerId && ownerId && payload.sourceOwnerId !== ownerId) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'backup-owner-mismatch' });
   } else if (!legacy && !payload.sourceOwnerId && ownerHasRows) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'unknown-backup-owner-requires-empty-owner' });
   } else {
-    for (const storeName of CLOUD_RESTORE_STORES) {
+    for (const storeName of cloudStores) {
       const backupRows = recordMap(payload.data?.[storeName]);
       const serverRows = recordMap(serverData[storeName]);
       const baselines = baselineMap(payload, storeName);
@@ -140,7 +165,17 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
             classification: 'KEEP_SERVER', reason: 'server-only' });
           continue;
         }
-        entries.push(planRecord({ storeName, backupRecord, baseline: baselines.get(id), serverRecord }));
+        const planned = planRecord({ storeName, backupRecord, baseline: baselines.get(id), serverRecord,
+          allowAuthoritativeRecreate: payload.version === 5 && !ownerHasRows,
+          version: payload.version });
+        const item = storeName === 'items' ? backupRecord :
+          (storeName === 'scores' ? (payload.data?.items ?? []).find((row) => row.id === backupRecord.itemId) : null);
+        const protectedDomain = payload.version === 5 &&
+          (['scoreSubitems', 'scoreSubitemCompletions'].includes(storeName) || item?.scoreMode === 'subitems');
+        entries.push(protectedDomain && planned.classification === 'SAFE_APPLY' &&
+            !['create', 'create_deleted'].includes(planned.operation)
+          ? { ...planned, classification: 'INVALID', reason: 'subitem-domain-restore-requires-explicit-review' }
+          : planned);
       }
     }
   }
@@ -151,7 +186,7 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
   return {
     backupHash: payload.backupHash ?? null,
     backupVersion: payload.version,
-    sourceManifest: canonicalRestoreManifest(serverData),
+    sourceManifest: canonicalRestoreManifest(serverData, { version: payload.version }),
     entries,
     operations: entries.filter((entry) => entry.classification === 'SAFE_APPLY')
       .sort((left, right) => {
@@ -171,9 +206,9 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
   };
 }
 
-export async function fetchCanonicalRestoreSource() {
-  const canonical = await fetchCanonicalRestoreSnapshot();
-  const pairs = CLOUD_RESTORE_STORES.map((storeName) => {
+export async function fetchCanonicalRestoreSource({ version = 4 } = {}) {
+  const canonical = await fetchCanonicalRestoreSnapshot({ version });
+  const pairs = restoreStores(version).map((storeName) => {
     const rows = canonical[SYNC_V2_SCHEMAS[storeName].entity];
     return [storeName, rows.map((row) => decodeSyncV2Canonical(storeName, row)).filter(Boolean)];
   });
@@ -181,8 +216,8 @@ export async function fetchCanonicalRestoreSource() {
 }
 
 /** Fetch the complete current owner snapshot in the shape local reconciliation consumes. */
-export async function fetchCanonicalRestoreSnapshot() {
-  const pairs = await Promise.all(CLOUD_RESTORE_STORES.map(async (storeName) => {
+export async function fetchCanonicalRestoreSnapshot({ version = 4 } = {}) {
+  const pairs = await Promise.all(restoreStores(version).map(async (storeName) => {
     const entity = SYNC_V2_SCHEMAS[storeName].entity;
     return [entity, await cloud.fetchRecords(entity)];
   }));
@@ -193,16 +228,17 @@ export async function previewCloudRestore(payload) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) return { validation, plan: null };
   if (!cloud.user || !cloud.session) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
-  const serverData = await fetchCanonicalRestoreSource();
+  const serverData = await fetchCanonicalRestoreSource({ version: payload.version });
   return { validation, plan: planCloudRestore(payload, serverData, { ownerId: cloud.user.id }), serverData };
 }
 
 export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null } = {}) {
-  if (!canonicalRows || typeof canonicalRows !== 'object' || CLOUD_RESTORE_STORES.some((storeName) =>
+  const cloudStores = restoreStores(payload.version);
+  if (!canonicalRows || typeof canonicalRows !== 'object' || cloudStores.some((storeName) =>
     !Array.isArray(canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]))) {
     throw new Error('Restore server returned an incomplete canonical snapshot');
   }
-  const decoded = Object.fromEntries(CLOUD_RESTORE_STORES.map((storeName) => {
+  const decoded = Object.fromEntries(cloudStores.map((storeName) => {
     const rows = canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]
       .map((row) => decodeSyncV2Canonical(storeName, row));
     if (rows.some((row) => !row?.id) || new Set(rows.map((row) => row.id)).size !== rows.length) {
@@ -210,7 +246,8 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
     }
     return [storeName, rows];
   }));
-  const scope = Object.fromEntries([...CLOUD_RESTORE_STORES, ...LOCAL_ONLY_STORES, 'device', 'outbox'].map((name) => [name, {}]));
+  if (payload.version === 5) assertScoreSnapshotInvariant(decoded);
+  const scope = Object.fromEntries([...cloudStores, ...LOCAL_ONLY_STORES, 'device', 'outbox'].map((name) => [name, {}]));
   await db.applyBatch(scope, {
     prepare(current) {
       return Object.fromEntries(Object.keys(scope).map((name) => {
@@ -224,7 +261,7 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
             { restoreId, capturedAt: Date.now(), entries: clone(current.outbox) },
           ] }] }];
         }
-        const next = CLOUD_RESTORE_STORES.includes(name) ? decoded[name] : (payload.data?.[name] ?? current[name]);
+        const next = cloudStores.includes(name) ? decoded[name] : (payload.data?.[name] ?? current[name]);
         return [name, { remove: current[name].map((row) => row.id), put: next }];
       }));
     },
@@ -333,7 +370,10 @@ export async function resumeCloudRestore({
   if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });
   await coordinator.assertCloudRestoreReady();
   return coordinator.runCloudRestoreExclusive(async () => {
-    const result = await transport.finalizeSyncV2Restore({
+    const finalize = checkpoint.backupVersion === 5
+      ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
+    if (typeof finalize !== 'function') throw new Error('Versioned score restore is unavailable');
+    const result = await finalize({
       restoreId: checkpoint.restoreId,
       backupHash: checkpoint.backupHash,
       expectedStageHash: checkpoint.stageHash,
@@ -341,8 +381,9 @@ export async function resumeCloudRestore({
     let finalized = checkpoint;
     try {
       finalized = await markFinalized(checkpoint, result.receipt);
-      const canonical = await canonicalFetcher();
-      await reconciler({ data: finalized.localData }, canonical, { restoreId: finalized.restoreId });
+      const canonical = await canonicalFetcher({ version: finalized.backupVersion });
+      await reconciler({ version: finalized.backupVersion, data: finalized.localData }, canonical,
+        { restoreId: finalized.restoreId });
       await clearResumeCheckpoint(finalized);
     } catch (error) {
       throw reconciliationRequired(error, finalized);
@@ -369,10 +410,15 @@ export async function restoreBackupToCloud(payload, {
   }
   await coordinator.assertCloudRestoreReady();
   return coordinator.runCloudRestoreExclusive(async () => {
-    const serverData = await sourceFetcher();
+    const serverData = await sourceFetcher({ version: payload.version });
     const plan = planCloudRestore(payload, serverData, { ownerId: cloud.user.id });
     if (!plan.ready) throw Object.assign(new Error('Restore requires review'), { code: 'RESTORE_REVIEW_REQUIRED', plan });
-    const stage = await transport.stageSyncV2Restore({
+    const stageCall = payload.version === 5 ? transport.stageScoreRestoreV2 : transport.stageSyncV2Restore;
+    const finalizeCall = payload.version === 5 ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
+    if (typeof stageCall !== 'function' || typeof finalizeCall !== 'function') {
+      throw Object.assign(new Error('Versioned score restore is unavailable'), { code: 'SCORE_RESTORE_UNAVAILABLE' });
+    }
+    const stage = await stageCall({
       restoreId, backupHash: payload.backupHash ?? `legacy-v3:${restoreId}`,
       backupVersion: payload.version, sourceManifest: plan.sourceManifest, operations: plan.operations,
     });
@@ -386,7 +432,7 @@ export async function restoreBackupToCloud(payload, {
       localData: resumeLocalData(payload),
       stagedAt: Date.now(),
     }));
-    const result = await transport.finalizeSyncV2Restore({
+    const result = await finalizeCall({
       restoreId, backupHash: stage.backupHash, expectedStageHash: stage.stageHash,
     });
     try {

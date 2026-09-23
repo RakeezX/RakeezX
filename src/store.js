@@ -6,17 +6,19 @@
  */
 
 import * as db from './lib/db.js';
+import { getScoreFoundationCapability } from './lib/cloud.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
+import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
 } from './lib/curriculum-bootstrap.js';
 
 import {
-  now, uid, todayISO, scoreId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
-  makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment,
+  now, uid, todayISO, scoreId, scoreSubitemCompletionId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
+  makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment, makeItem, makeScoreSubitem, makeScoreSubitemCompletion,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
   periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
@@ -32,13 +34,13 @@ import {
 export { sectionLabel };
 
 /** إصدار شكل البيانات — يرتفع حين تحتاج السجلات الموجودة ترقية. */
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 /* ---------- الحالة ---------- */
 
 const COLLECTIONS = [
   'years', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments',
-  'items', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
+  'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',
   'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',
   'notes', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements', 'assignments', 'submissions',
   'closedTermReports',
@@ -580,7 +582,12 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null)
   const schema = SYNC_V2_SCHEMAS[storeName];
   if (!schema || schema.readOnly || isLocalOnlyRecord(rec) || !isCurriculumOrdinarySyncAllowed(storeName)) return null;
   const operation = op === 'put' ? (previous ? 'patch' : 'create') : op;
-  const localFields = operation === 'create' ? Object.keys(schema.fields) : (fields ?? Object.keys(schema.fields));
+  let localFields = fields ?? Object.keys(schema.fields);
+  // The server derives subitem totals from completion and manual-value rows.
+  // Uploading an optimistic numeric projection could overwrite a newer device's contribution.
+  if (storeName === 'scores' && state.items.find((item) => item.id === rec.itemId)?.scoreMode === 'subitems') {
+    localFields = localFields.filter((field) => !['value', 'derivedValue'].includes(field));
+  }
   const localPatch = operation === 'delete'
     ? {}
     : Object.fromEntries(localFields.filter((field) => field in rec).map((field) => [field, structuredClone(rec[field])]));
@@ -745,7 +752,7 @@ const nextEnrollmentOperationOrder = (outbox = []) => {
 // Every store listed here has a cloud mapper and may safely drain through automatic sync.
 const CASCADE_SYNCABLE_STORES = new Set([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings',
-  'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
+  'students', 'enrollments', 'notes', 'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'logs',
   'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance',
 ]);
@@ -1306,52 +1313,44 @@ export function selectedClassRules(tchId) {
 
 export const scoresOf = (studentId) => live(state.scores).filter((s) => s.studentId === studentId);
 
-/**
- * بنود الرصد اليدوي لا تشترك في المعرّف بين الشعب، رغم أنها قد تمثل
- * التقييم نفسه. هذا المفتاح قراءة/كتابة فقط: لا يغيّر معرف البند أو السجل.
- * الاسم والدرجة العظمى وطريقة الرصد هي أقل تعريف دلالي آمن متاح حاليًا.
- */
-function portableGradeItemKey(item) {
-  if (!item || item.deleted || item.auto) return null;
-  const name = normalizeSearchText(item.name);
-  const max = Number(item.max);
-  if (!name || !Number.isFinite(max) || max <= 0) return null;
-  return `${name}\u0000${max}`;
+function portableGroup(item) {
+  return item && !item.deleted && item.scoreMode !== 'subitems' &&
+    typeof item.portabilityGroupId === 'string' && item.portabilityGroupId.trim()
+    ? item.portabilityGroupId : null;
 }
 
 function scoreForItem(studentId, itemId) {
   return scoresOf(studentId).find((score) => score.itemId === itemId) ?? null;
 }
 
-/**
- * يعيد السجل الوحيد الذي يمكن عرضه لبند يدوي في شعبة أخرى من نفس المادة
- * والفصل الدراسي. وجود أي تكرار دلالي أو أكثر من سجل مصدر يجعل الربط غير
- * آمن؛ عندها تبقى الخانة غير مرصودة بدل تخمين درجة أو نسخها.
- */
+/** Historical name/max similarity is never authority to reuse or edit a score. */
 function portableGradeScore(studentId, item) {
   const direct = scoreForItem(studentId, item?.id);
   if (direct) return direct;
 
-  const key = portableGradeItemKey(item);
+  const group = portableGroup(item);
   const teaching = getTeaching(item?.teachingId);
-  if (!key || !teaching) return null;
-
-  // إذا كرر المعلم البند نفسه داخل الشعبة فلا يمكن معرفة أيهما المقصود.
-  if (items(teaching.id).filter((candidate) => portableGradeItemKey(candidate) === key).length !== 1) {
-    return null;
-  }
+  if (!group || !teaching || item.auto) return null;
+  if (items(teaching.id).filter((candidate) => portableGroup(candidate) === group).length !== 1) return null;
 
   // لا نعرض درجة من شعبة لم ينتسب إليها الطالب قط، حتى لو صادف أنها تحمل
   // مادة وبندًا بالاسم نفسيهما.
-  const enrolledSections = new Set(enrollmentsOf(studentId).map((enrollment) => enrollment.sectionId));
+  const targetSection = getSection(teaching.sectionId);
+  const targetEnrollment = enrollmentsOf(studentId).find((enrollment) => enrollment.sectionId === teaching.sectionId);
+  if (!targetSection || !targetEnrollment) return null;
+  const transferredSections = new Set(enrollmentsOf(studentId)
+    .filter((enrollment) => enrollment.status === 'transferred')
+    .map((enrollment) => enrollment.sectionId));
   const candidates = [];
   for (const sourceTeaching of live(state.teachings)) {
     if (sourceTeaching.id === teaching.id ||
         sourceTeaching.subjectId !== teaching.subjectId ||
         sourceTeaching.termId !== teaching.termId ||
-        !enrolledSections.has(sourceTeaching.sectionId)) continue;
+        !transferredSections.has(sourceTeaching.sectionId) ||
+        getSection(sourceTeaching.sectionId)?.yearId !== targetSection.yearId ||
+        getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;
     const matches = items(sourceTeaching.id)
-      .filter((candidate) => portableGradeItemKey(candidate) === key);
+      .filter((candidate) => !candidate.auto && portableGroup(candidate) === group);
     if (matches.length !== 1) continue;
     const score = scoreForItem(studentId, matches[0].id);
     if (score) candidates.push(score);
@@ -1403,23 +1402,30 @@ function dedupeRecords(records) {
  */
 function compatibleAutomaticTeachingIds(studentId, item) {
   const teaching = getTeaching(item?.teachingId);
-  const identity = automaticItemIdentity(item);
+  const group = portableGroup(item);
   const key = automaticItemKey(item);
-  if (!teaching || !identity || !key) return null;
+  if (!teaching || !key) return null;
+  if (!group) return new Set([teaching.id]);
 
   const targetMatches = items(teaching.id).filter((candidate) =>
-    automaticItemIdentity(candidate) === identity);
+    portableGroup(candidate) === group);
   if (targetMatches.length !== 1 || automaticItemKey(targetMatches[0]) !== key) return null;
 
-  const enrolledSections = new Set(enrollmentsOf(studentId).map((enrollment) => enrollment.sectionId));
+  const targetSection = getSection(teaching.sectionId);
+  const targetEnrollment = enrollmentsOf(studentId).find((enrollment) => enrollment.sectionId === teaching.sectionId);
+  if (!targetSection || !targetEnrollment) return new Set([teaching.id]);
+  const transferredSections = new Set(enrollmentsOf(studentId)
+    .filter((enrollment) => enrollment.status === 'transferred')
+    .map((enrollment) => enrollment.sectionId));
   const teachingIds = new Set([teaching.id]);
   for (const sourceTeaching of live(state.teachings)) {
     if (sourceTeaching.id === teaching.id ||
         sourceTeaching.subjectId !== teaching.subjectId ||
         sourceTeaching.termId !== teaching.termId ||
-        !enrolledSections.has(sourceTeaching.sectionId)) continue;
-    const sameItem = items(sourceTeaching.id).filter((candidate) =>
-      automaticItemIdentity(candidate) === identity);
+        !transferredSections.has(sourceTeaching.sectionId) ||
+        getSection(sourceTeaching.sectionId)?.yearId !== targetSection.yearId ||
+        getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;
+    const sameItem = items(sourceTeaching.id).filter((candidate) => portableGroup(candidate) === group);
     if (!sameItem.length) continue;
     if (sameItem.length !== 1 || automaticItemKey(sameItem[0]) !== key) return null;
     teachingIds.add(sourceTeaching.id);
@@ -3229,7 +3235,7 @@ export function clampScore(value, itemId) {
 
 export function setScore(studentId, itemId, value, options = {}) {
   const item = state.items.find((candidate) => candidate.id === itemId && !candidate.deleted);
-  if (!item) return null;
+  if (!item || item.scoreMode === 'subitems') return null;
   // عندما توجد درجة واحدة متوافقة في شعبة سابقة، نحدّث سجلها نفسه بدل صنع
   // سجل ثانٍ للبند الموازي. أما البند المختلف أو الغامض فيبدأ غير مرصود هنا.
   const existing = portableGradeScore(studentId, item);
@@ -3241,8 +3247,14 @@ export function setScore(studentId, itemId, value, options = {}) {
 }
 
 export function deleteItem(itemId) {
+  const subitemIds = new Set(state.scoreSubitems.filter((row) => row.itemId === itemId).map((row) => row.id));
   return cascadeDelete(
-    { items: (i) => i.id === itemId, scores: (s) => s.itemId === itemId },
+    {
+      items: (i) => i.id === itemId,
+      scoreSubitems: (s) => s.itemId === itemId,
+      scoreSubitemCompletions: (s) => subitemIds.has(s.subitemId),
+      scores: (s) => s.itemId === itemId,
+    },
     { op: 'deleteItem', itemId },
     { command: 'delete_item', store: 'items', targetId: itemId }
   );
@@ -3251,6 +3263,393 @@ export function deleteItem(itemId) {
 export const reorderItems = (pairs) =>
   patchManyRecords('items', pairs.map((p) => ({ id: p.id, changes: { order: p.order } })),
     { op: 'reorderItems' });
+
+export const scoreSubitemsOf = (itemId) => sortByOrder(live(state.scoreSubitems)
+  .filter((row) => row.itemId === itemId));
+
+const scoreFoundationScope = () => ({
+  items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {},
+  students: {}, sections: {}, teachings: {}, terms: {}, outbox: {},
+});
+
+async function commitScoreFoundation(prepare) {
+  assertCloudRestoreWritable();
+  if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
+      !activeWorkspace.authUserId) {
+    throw new Error('Score foundation requires a claimed account workspace');
+  }
+  const capability = await getScoreFoundationCapability();
+  if (capability?.scoreDomainVersion !== 1 || capability?.restoreProtocol !== 'CORE_V2' ||
+      capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
+    throw new Error('Score foundation server capability is unavailable');
+  }
+  const committed = await db.applyBatch(scoreFoundationScope(), { prepare });
+  const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
+    .flatMap(([name, operations]) => (operations.put ?? []).map((row) => ({ store: name, id: row.id })));
+  await absorb(changes);
+  broadcast(changes);
+  return committed;
+}
+
+/** Establish an explicit, reviewed equivalence; never infer it from labels. */
+export async function linkPortableScoreItems(sourceItemId, destinationItemId, { confirmed = false } = {}) {
+  if (!confirmed || sourceItemId === destinationItemId) throw new Error('Explicit item-equivalence confirmation is required');
+  let groupId;
+  await commitScoreFoundation((current) => {
+    const source = current.items.find((row) => row.id === sourceItemId && !row.deleted);
+    const destination = current.items.find((row) => row.id === destinationItemId && !row.deleted);
+    const sourceTeaching = current.teachings.find((row) => row.id === source?.teachingId && !row.deleted);
+    const destinationTeaching = current.teachings.find((row) => row.id === destination?.teachingId && !row.deleted);
+    const sourceSection = current.sections.find((row) => row.id === sourceTeaching?.sectionId && !row.deleted);
+    const destinationSection = current.sections.find((row) => row.id === destinationTeaching?.sectionId && !row.deleted);
+    if (!source || !destination || !sourceTeaching || !destinationTeaching || !sourceSection || !destinationSection ||
+        sourceTeaching.id === destinationTeaching.id || sourceSection.id === destinationSection.id ||
+        sourceTeaching.termId !== destinationTeaching.termId ||
+        sourceTeaching.subjectId !== destinationTeaching.subjectId ||
+        sourceSection.yearId !== destinationSection.yearId || sourceSection.grade !== destinationSection.grade ||
+        source.scoreMode === 'subitems' || destination.scoreMode === 'subitems' ||
+        Number(source.max) !== Number(destination.max) || automaticItemKey(source) !== automaticItemKey(destination) ||
+        Boolean(source.auto) !== Boolean(destination.auto) ||
+        (source.portabilityGroupId && destination.portabilityGroupId &&
+          source.portabilityGroupId !== destination.portabilityGroupId)) {
+      throw new Error('Item equivalence is unsafe or outside the same academic boundary');
+    }
+    groupId = source.portabilityGroupId || destination.portabilityGroupId || `portability:${uid()}`;
+    const members = current.items.filter((row) => !row.deleted &&
+      (row.portabilityGroupId === groupId || row.id === source.id || row.id === destination.id));
+    if (new Set(members.map((row) => row.teachingId)).size !== members.length) {
+      throw new Error('Portable group contains ambiguous items in one teaching');
+    }
+    const changed = [source, destination].filter((row) => row.portabilityGroupId !== groupId)
+      .map((row) => syncV2Record('items', { ...row, portabilityGroupId: groupId, updatedAt: now() }));
+    assertOperationalWritesAllowed({ items: changed });
+    return {
+      items: { put: changed },
+      outbox: { put: changed.map((row) => outboxEntry('items', row, ['portabilityGroupId'], 'patch',
+        current.items.find((old) => old.id === row.id))).filter(Boolean) },
+    };
+  });
+  return groupId;
+}
+
+function preparedScore(current, item, studentId, completions, manualValue, stamp) {
+  const prior = current.scores.find((row) => row.studentId === studentId && row.itemId === item.id && !row.deleted);
+  const projection = projectSubitemScore(item,
+    current.scoreSubitems.filter((row) => row.itemId === item.id), completions, manualValue);
+  const record = syncV2Record('scores', {
+    ...(prior ?? { id: scoreId(studentId, item.id), studentId, itemId: item.id }),
+    ...projection, deleted: false, updatedAt: stamp,
+  });
+  return { prior, record, projection };
+}
+
+/** A checkbox and its local numeric projection commit in one IndexedDB transaction. */
+export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
+  if (typeof checked !== 'boolean') throw new TypeError('checked must be boolean');
+  const stamp = now();
+  let result;
+  await commitScoreFoundation((current) => {
+    const subitem = current.scoreSubitems.find((row) => row.id === subitemId && !row.deleted);
+    const item = current.items.find((row) => row.id === subitem?.itemId && !row.deleted && row.scoreMode === 'subitems');
+    if (!item || !current.students.some((row) => row.id === studentId && !row.deleted)) {
+      throw new Error('Subitem or student is unavailable');
+    }
+    const id = scoreSubitemCompletionId(studentId, subitemId);
+    const prior = current.scoreSubitemCompletions.find((row) => row.id === id);
+    if (prior?.deleted) throw new Error('A deleted completion identity cannot be resurrected');
+    const completion = syncV2Record('scoreSubitemCompletions', makeScoreSubitemCompletion({
+      ...(prior ?? {}), id, studentId, subitemId, checked, updatedAt: stamp,
+    }), { pendingCreate: !prior });
+    const completions = current.scoreSubitemCompletions.filter((row) => row.id !== id).concat(completion);
+    const score = preparedScore(current, item, studentId, completions,
+      current.scores.find((row) => row.studentId === studentId && row.itemId === item.id)?.manualValue ?? null, stamp);
+    const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
+      command: 'score:set_completion', stamp,
+      patch: { itemId: item.id, studentId, subitemId, checked },
+      dependencies: [
+        { store: 'items', recordId: item.id, requiresServerRevision: true },
+        { store: 'students', recordId: studentId, requiresServerRevision: true },
+        { store: 'scoreSubitems', recordId: subitemId, requiresServerRevision: true },
+      ],
+    });
+    result = { completion, score: score.record, ...score.projection };
+    return {
+      scoreSubitemCompletions: { put: [completion] }, scores: { put: [score.record] },
+      outbox: { put: entry ? [entry] : [] },
+    };
+  });
+  return result;
+}
+
+/** Explicit blank remains unrecorded; explicit numeric zero remains recorded. */
+export async function setScoreManualContribution(studentId, itemId, manualInput) {
+  const requested = scoreCents(manualInput, { allowBlank: true });
+  const stamp = now();
+  let result;
+  await commitScoreFoundation((current) => {
+    const item = current.items.find((row) => row.id === itemId && !row.deleted && row.scoreMode === 'subitems');
+    if (!item || !current.students.some((row) => row.id === studentId && !row.deleted)) {
+      throw new Error('Subitem score item or student is unavailable');
+    }
+    const score = preparedScore(current, item, studentId, current.scoreSubitemCompletions,
+      requested === null ? null : requested / 100, stamp);
+    const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
+      command: 'score:set_manual', stamp,
+      patch: { itemId, studentId, manualValue: score.record.manualValue },
+      dependencies: [
+        { store: 'items', recordId: itemId, requiresServerRevision: true },
+        { store: 'students', recordId: studentId, requiresServerRevision: true },
+      ],
+    });
+    result = { score: score.record, ...score.projection };
+    return { scores: { put: [score.record] }, outbox: { put: entry ? [entry] : [] } };
+  });
+  return result;
+}
+
+/** Read-only impact preview; the committing API rechecks the version inside its transaction. */
+export function previewScoreConfiguration(itemId, proposed) {
+  const item = state.items.find((row) => row.id === itemId && !row.deleted);
+  if (!item) throw new Error('Score item is unavailable');
+  const nextMode = proposed.scoreMode ?? item.scoreMode ?? 'direct';
+  const maximum = proposed.max ?? item.max;
+  scoreCents(maximum);
+  const supplied = proposed.subitems ?? scoreSubitemsOf(itemId);
+  const values = nextMode === 'subitems' && (proposed.distributionMode ?? item.distributionMode) === 'auto'
+    ? distributeAutomatically(maximum, supplied.length) : supplied.map((row) => {
+      scoreCents(row.value);
+      return row.value;
+    });
+  const nextDefinitions = supplied.map((row, index) => ({ ...row, itemId, value: values[index], order: index }));
+  const priorIds = new Set(scoreSubitemsOf(itemId).map((row) => row.id));
+  const keptIds = new Set(nextDefinitions.map((row) => row.id).filter(Boolean));
+  const removedIds = [...priorIds].filter((id) => !keptIds.has(id));
+  const studentIds = new Set([
+    ...state.scores.filter((row) => row.itemId === itemId && !row.deleted).map((row) => row.studentId),
+    ...state.scoreSubitemCompletions.filter((row) => priorIds.has(row.subitemId) && row.checked && !row.deleted)
+      .map((row) => row.studentId),
+  ]);
+  const nextItem = { ...item, ...proposed, max: maximum, scoreMode: nextMode };
+  const projections = [...studentIds].map((studentId) => {
+    const prior = state.scores.find((row) => row.studentId === studentId && row.itemId === itemId && !row.deleted);
+    if (nextMode === 'direct') return { studentId, before: prior?.value ?? null, after: prior?.value ?? null };
+    const manual = item.scoreMode === 'direct' ? prior?.value ?? null : prior?.manualValue ?? null;
+    const next = projectSubitemScore(nextItem, nextDefinitions,
+      state.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual);
+    return { studentId, before: prior?.value ?? null, after: next.value, manualClamped: next.manualClamped };
+  });
+  return {
+    itemId, expectedVersion: item.distributionVersion ?? 1,
+    affectedStudentCount: projections.filter((row) => row.before !== row.after).length,
+    usedDeletedSubitems: removedIds.filter((id) => state.scoreSubitemCompletions
+      .some((row) => row.subitemId === id && row.checked && !row.deleted)),
+    projections,
+    requiresConfirmation: projections.some((row) => row.before !== row.after) || removedIds.length > 0 ||
+      item.scoreMode !== nextMode,
+  };
+}
+
+/** Apply a reviewed configuration and every affected local score in one transaction. */
+export async function applyConfirmedScoreConfiguration(itemId, proposed, {
+  expectedVersion, confirmed = false, conversionStrategy = null,
+} = {}) {
+  const preview = previewScoreConfiguration(itemId, proposed);
+  if (preview.requiresConfirmation && !confirmed) throw new Error('Score recalculation requires explicit confirmation');
+  if (expectedVersion !== preview.expectedVersion) throw new Error('Score configuration changed since preview');
+  const supplied = proposed.subitems ?? scoreSubitemsOf(itemId);
+  const prepared = supplied.map((row) => ({ ...row, id: row.id ?? uid() }));
+  const stamp = now();
+  let result;
+  await commitScoreFoundation((current) => {
+    const prior = current.items.find((row) => row.id === itemId && !row.deleted);
+    if (!prior || (prior.distributionVersion ?? 1) !== expectedVersion) {
+      throw new Error('Score configuration changed since preview');
+    }
+    const mode = proposed.scoreMode ?? prior.scoreMode ?? 'direct';
+    if (!['direct', 'subitems'].includes(mode)) throw new Error('Invalid score mode');
+    const distributionMode = mode === 'subitems' ? (proposed.distributionMode ?? prior.distributionMode) : null;
+    if (mode === 'subitems' && !['auto', 'manual'].includes(distributionMode)) {
+      throw new Error('Invalid subitem distribution mode');
+    }
+    if (prior.scoreMode === 'direct' && mode === 'subitems' &&
+        current.scores.some((row) => row.itemId === itemId && row.value !== null && !row.deleted) &&
+        conversionStrategy !== 'retain-as-manual') {
+      throw new Error('Existing direct scores require an explicit reviewed conversion');
+    }
+    const maximum = proposed.max ?? prior.max;
+    scoreCents(maximum);
+    const values = mode === 'subitems' && distributionMode === 'auto'
+      ? distributeAutomatically(maximum, prepared.length)
+      : prepared.map((row) => { scoreCents(row.value); return row.value; });
+    const existing = current.scoreSubitems.filter((row) => row.itemId === itemId);
+    const existingIds = new Set(existing.map((row) => row.id));
+    const keptIds = new Set(prepared.map((row) => row.id));
+    if (prepared.some((row) => row.itemId && row.itemId !== itemId) ||
+        prepared.some((row) => row.id && current.scoreSubitems.some((old) => old.id === row.id && old.itemId !== itemId))) {
+      throw new Error('Subitem belongs to a different score item');
+    }
+    if (keptIds.size !== prepared.length) throw new Error('Duplicate subitem identity');
+    const nextDefinitions = prepared.map((row, index) => {
+      const old = existing.find((candidate) => candidate.id === row.id);
+      if (old?.deleted) throw new Error('A deleted subitem identity cannot be resurrected');
+      return syncV2Record('scoreSubitems', makeScoreSubitem({
+        ...(old ?? {}), id: row.id, itemId, name: row.name,
+        value: values[index], order: index, distributionVersion: (prior.distributionVersion ?? 1) + 1,
+        updatedAt: stamp,
+      }), { pendingCreate: !old });
+    });
+    const removed = existing.filter((row) => !row.deleted && !keptIds.has(row.id))
+      .map((row) => syncV2Record('scoreSubitems', { ...row, deleted: true, updatedAt: stamp }));
+    if (removed.some((row) => current.scoreSubitemCompletions.some((completion) =>
+      completion.subitemId === row.id && completion.checked && !completion.deleted)) && !confirmed) {
+      throw new Error('Deleting a used subitem requires confirmation');
+    }
+    const item = syncV2Record('items', {
+      ...prior, max: maximum, scoreMode: mode, distributionMode,
+      distributionVersion: (prior.distributionVersion ?? 1) + 1,
+      ...(mode === 'subitems' ? { portabilityGroupId: null } : {}),
+      updatedAt: stamp,
+    });
+    const workingDefinitions = current.scoreSubitems.filter((row) => row.itemId !== itemId)
+      .concat(nextDefinitions, removed);
+    const relevantIds = new Set(existingIds);
+    const studentIds = new Set([
+      ...current.scores.filter((row) => row.itemId === itemId && !row.deleted).map((row) => row.studentId),
+      ...current.scoreSubitemCompletions.filter((row) => relevantIds.has(row.subitemId) && row.checked && !row.deleted)
+        .map((row) => row.studentId),
+    ]);
+    const scoreWrites = [];
+    for (const studentId of studentIds) {
+      const previous = current.scores.find((row) => row.studentId === studentId && row.itemId === itemId && !row.deleted);
+      if (!previous) continue;
+      let next;
+      if (mode === 'direct') {
+        next = { ...previous, manualValue: null, derivedValue: null, updatedAt: stamp };
+      } else {
+        const manual = prior.scoreMode === 'direct' ? previous.value : previous.manualValue;
+        next = { ...previous, ...projectSubitemScore(item, workingDefinitions,
+          current.scoreSubitemCompletions.filter((row) => row.studentId === studentId), manual), updatedAt: stamp };
+      }
+      scoreWrites.push(syncV2Record('scores', next));
+    }
+    const configuration = {
+      scoreMode: mode, distributionMode, max: maximum,
+      subitems: mode === 'subitems' ? nextDefinitions.map((row) => ({
+        id: row.id, name: row.name, value: row.value, order: row.order,
+      })) : [],
+      ...(conversionStrategy ? { conversionStrategy } : {}),
+    };
+    const entry = syncV2CommandEntry({ store: 'items', recordId: itemId,
+      command: 'score:configure', stamp,
+      patch: { itemId, expectedVersion, payload: configuration },
+      dependencies: [
+        { store: 'teachings', recordId: item.teachingId, requiresServerRevision: true },
+        { store: 'items', recordId: itemId, requiresServerRevision: true },
+      ],
+    });
+    result = { item, affectedStudentCount: scoreWrites.filter((row) =>
+      row.value !== current.scores.find((priorScore) => priorScore.id === row.id)?.value).length,
+      removedSubitemIds: removed.map((row) => row.id) };
+    return {
+      items: { put: [item] }, scoreSubitems: { put: [...nextDefinitions, ...removed] },
+      scores: { put: scoreWrites }, outbox: { put: entry ? [entry] : [] },
+    };
+  });
+  return result;
+}
+
+function eligibleScoreCopyTargets(current, sourceTeachingId) {
+  const source = current.teachings.find((row) => row.id === sourceTeachingId && !row.deleted);
+  const sourceSection = current.sections.find((row) => row.id === source?.sectionId && !row.deleted);
+  const sourceTerm = current.terms.find((row) => row.id === source?.termId && !row.deleted);
+  if (!source || !sourceSection || !sourceTerm || sourceTerm.yearId !== sourceSection.yearId) {
+    throw new Error('Source teaching boundary is unavailable');
+  }
+  return current.teachings.filter((teaching) => {
+    if (teaching.deleted || teaching.sectionId === source.sectionId ||
+        teaching.subjectId !== source.subjectId || teaching.termId !== source.termId) return false;
+    const section = current.sections.find((row) => row.id === teaching.sectionId && !row.deleted);
+    return section && section.yearId === sourceSection.yearId && section.grade === sourceSection.grade &&
+      section.status !== 'archived';
+  }).sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export function previewScoreDistributionCopy(sourceTeachingId) {
+  const current = state;
+  const targets = eligibleScoreCopyTargets(current, sourceTeachingId);
+  const incoming = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
+    .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+  return targets.map((teaching) => ({
+    teachingId: teaching.id, sectionId: teaching.sectionId,
+    items: incoming.map((item) => ({ sourceItemId: item.id, ...classifyIncomingItem(item,
+      current.scoreSubitems.filter((row) => row.itemId === item.id),
+      current.items.filter((row) => row.teachingId === teaching.id), current.scoreSubitems) })),
+  }));
+}
+
+/** One-time definition copy. A conflict choice is "keep" or "add"; replacement is unsupported. */
+export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachingIds, conflictChoices = {}) {
+  const expected = previewScoreDistributionCopy(sourceTeachingId).map((row) => row.teachingId).sort();
+  const selected = [...new Set(targetTeachingIds)].sort();
+  if (JSON.stringify(expected) !== JSON.stringify(selected)) throw new Error('Copy targets are stale or incomplete');
+  let result;
+  await commitScoreFoundation((current) => {
+    const currentTargets = eligibleScoreCopyTargets(current, sourceTeachingId).map((row) => row.id);
+    if (JSON.stringify(currentTargets) !== JSON.stringify(selected)) throw new Error('Copy targets changed');
+    const sourceItems = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
+      .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+    const clonedItems = [];
+    const clonedSubitems = [];
+    const entries = [];
+    const classifications = [];
+    for (const teachingId of selected) for (const source of sourceItems) {
+      const sourceDefinitions = current.scoreSubitems.filter((row) => row.itemId === source.id && !row.deleted);
+      const classification = classifyIncomingItem(source, sourceDefinitions,
+        current.items.filter((row) => row.teachingId === teachingId), current.scoreSubitems);
+      const key = `${teachingId}:${source.id}`;
+      const choice = classification.kind === 'CONFLICTING' ? conflictChoices[key] : null;
+      if (classification.kind === 'CONFLICTING' && !['keep', 'add'].includes(choice)) {
+        throw new Error(`Distribution conflict requires an explicit choice: ${key}`);
+      }
+      classifications.push({ teachingId, sourceItemId: source.id, kind: classification.kind, choice });
+      if (classification.kind === 'EQUIVALENT' || choice === 'keep') continue;
+      const item = syncV2Record('items', makeItem({
+        teachingId, name: source.name, max: source.max, order: source.order,
+        auto: source.auto, perPoint: source.perPoint, penalty: source.penalty,
+        unitId: source.unitId, lessonId: source.lessonId,
+        scoreMode: source.scoreMode ?? 'direct', distributionMode: source.distributionMode ?? null,
+        distributionVersion: 1, portabilityGroupId: null, distributionOriginId: source.id,
+      }), { pendingCreate: true });
+      clonedItems.push(item);
+      const subitemIds = {};
+      for (const definition of sourceDefinitions) {
+        const clone = syncV2Record('scoreSubitems', makeScoreSubitem({
+          itemId: item.id, name: definition.name, value: definition.value, order: definition.order,
+          distributionVersion: 1,
+        }), { pendingCreate: true });
+        clonedSubitems.push(clone);
+        subitemIds[definition.id] = clone.id;
+      }
+      const entry = syncV2CommandEntry({ store: 'items', recordId: item.id,
+        command: 'score:copy_definition',
+        patch: { sourceItemId: source.id, sourceRevision: source.serverRevision ?? 0,
+          targetTeachingId: teachingId, newItemId: item.id, subitemIds,
+          conflictChoice: classification.kind === 'MISSING' ? 'missing' : 'add' },
+        dependencies: [
+          { store: 'items', recordId: source.id, requiresServerRevision: true },
+          { store: 'teachings', recordId: teachingId, requiresServerRevision: true },
+          ...sourceDefinitions.map((row) => ({ store: 'scoreSubitems', recordId: row.id,
+            requiresServerRevision: true })),
+        ],
+      });
+      if (entry) entries.push(entry);
+    }
+    result = { classifications, itemIds: clonedItems.map((row) => row.id),
+      subitemIds: clonedSubitems.map((row) => row.id) };
+    return { items: { put: clonedItems }, scoreSubitems: { put: clonedSubitems }, outbox: { put: entries } };
+  });
+  return result;
+}
 
 /* ---------- عمليات: الحصص والحضور ---------- */
 

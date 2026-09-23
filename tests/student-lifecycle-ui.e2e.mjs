@@ -96,6 +96,10 @@ test.beforeEach(async ({ page }) => {
       }
       const p = request.postDataJSON();
       let value;
+      if (endpoint === 'score_foundation_capability') {
+        await route.fulfill({ status: 204 });
+        return;
+      }
       if (endpoint === 'preview_student_removal') {
         value = await backend.previewStudentRemoval(p.p_student_id, p.p_source_enrollment_id, p.p_source_revision);
         previews.push(value);

@@ -34,8 +34,10 @@ test('Student Profile shows context-true continuous history through X → Y → 
       students: [{ id: studentId, name: 'طالب السجل المستمر', status: 'active', ...common }],
       enrollments: [{ id: `en:${studentId}:${x}`, studentId, sectionId: x, rollNo: 1, startDate: '2026-08-01', endDate: null, status: 'active', ...common }],
       items: [
-        { id: 'continuous-history:item:X', teachingId: teachingX, name: 'اختبار قصير', max: 10, order: 0, auto: null, ...common },
-        { id: 'continuous-history:item:Y', teachingId: teachingY, name: 'اختبار قصير', max: 10, order: 0, auto: null, ...common },
+        { id: 'continuous-history:item:X', teachingId: teachingX, name: 'اختبار قصير', max: 10,
+          order: 0, auto: null, portabilityGroupId: 'continuous-history:reviewed-link', ...common },
+        { id: 'continuous-history:item:Y', teachingId: teachingY, name: 'اختبار قصير', max: 10,
+          order: 0, auto: null, portabilityGroupId: 'continuous-history:reviewed-link', ...common },
       ],
       scores: [{ id: `sc:${studentId}:continuous-history:item:X`, studentId, itemId: 'continuous-history:item:X', value: 6, ...common }],
       sessions: [{ id: sessionX, teachingId: teachingX, date: '2026-08-20', period: 2, status: 'held', ...common }],

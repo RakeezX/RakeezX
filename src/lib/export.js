@@ -3,13 +3,14 @@
 import * as db from './db.js';
 import * as cloud from './cloud.js';
 import { todayISO } from '../models.js';
+import { assertScoreSnapshotInvariant } from './initial-restore.js';
 
 
 /** معرّف المنتج التقني — يُكتب في كل نسخة احتياطية. */
 export const APP_ID = 'rakeezx';
-export const BACKUP_VERSION = 4;
+export const BACKUP_VERSION = 5;
 export const LEGACY_BACKUP_VERSION = 3;
-export const SUPPORTED_BACKUP_VERSIONS = Object.freeze([LEGACY_BACKUP_VERSION, BACKUP_VERSION]);
+export const SUPPORTED_BACKUP_VERSIONS = Object.freeze([LEGACY_BACKUP_VERSION, 4, BACKUP_VERSION]);
 
 /**
  * مخازن **لا تدخل النسخة الاحتياطية ولا تُستورد منها إطلاقًا**.
@@ -114,6 +115,7 @@ export async function buildBackup({ sourceOwnerId = cloud.user?.id ?? null, back
     payload.data[store] = (await db.getAll(store)).filter((record) => !String(record.id ?? '').startsWith('demo:'));
     payload.baselines[store] = payload.data[store].map(baselineFor);
   }
+  assertScoreSnapshotInvariant(payload.data);
   payload.backupHash = await sha256Hex(backupHashInput(payload));
   return payload;
 }
@@ -210,6 +212,15 @@ export function validateBackup(payload) {
   }
 
   if (!total) add('الملف لا يحوي أي سجل.');
+  if (payload.version === 5) {
+    for (const storeName of ['items', 'scores', 'scoreSubitems', 'scoreSubitemCompletions']) {
+      if (!Array.isArray(payload.data[storeName])) add(`نسخة V5 بلا مخزن مطلوب: ${storeName}`);
+    }
+    if (!errors.length) {
+      try { assertScoreSnapshotInvariant(payload.data); }
+      catch { add('بيانات درجات المكونات في النسخة غير متسقة.'); }
+    }
+  }
   if (payload.version >= 4) {
     if (typeof payload.backupId !== 'string' || !payload.backupId || payload.backupId.length > 200) add('معرّف النسخة الاحتياطية مفقود.');
     if (!(payload.sourceOwnerId === null || (typeof payload.sourceOwnerId === 'string' && payload.sourceOwnerId.length <= 200))) {
@@ -285,6 +296,19 @@ export async function restoreBackup(payload, mode = 'merge') {
     err.code = check.code ?? 'INVALID_BACKUP';
     err.details = check;
     throw err;
+  }
+
+  const hasSubitemData = payload.data.items?.some((row) => row.scoreMode === 'subitems') ||
+    payload.data.scoreSubitems?.length > 0 || payload.data.scoreSubitemCompletions?.length > 0;
+  if (hasSubitemData && mode !== 'replace') {
+    throw Object.assign(new Error('Subitem backup requires a reviewed atomic replacement'), {
+      code: 'SUBITEM_BACKUP_MERGE_UNSUPPORTED',
+    });
+  }
+  if (hasSubitemData && payload.version !== BACKUP_VERSION) {
+    throw Object.assign(new Error('Subitem backup requires the versioned provenance contract'), {
+      code: 'SUBITEM_BACKUP_VERSION_REQUIRED',
+    });
   }
 
   let source = payload.data;

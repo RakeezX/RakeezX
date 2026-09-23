@@ -87,6 +87,7 @@ export const slotId = () => `sl:${uid()}`;
 export const sessionId = (tchId, date, period) => `se:${tchId}:${date}:${period}`;
 export const attendanceId = (studentId, sesId) => `at:${studentId}:${sesId}`;
 export const scoreId = (studentId, itemId) => `sc:${studentId}:${itemId}`;
+export const scoreSubitemCompletionId = (studentId, subitemId) => `ssc:${studentId}:${subitemId}`;
 export const groupArrangementId = (teachingId) => `group-arrangement:${teachingId}`;
 export const calendarId = (yId, source) => `cal:${yId}:${source}`;
 export const calendarDayId = (calId, date) => `cd:${calId}:${date}`;
@@ -684,6 +685,12 @@ export const makeItem = (o = {}) => ({
   order: o.order ?? 0,
   /** null = إدخال يدوي · 'participation' · 'attendance' */
   auto: o.auto ?? null,
+  scoreMode: o.scoreMode ?? 'direct',
+  distributionMode: o.distributionMode ?? null,
+  // Only an explicitly reviewed group establishes cross-teaching equivalence.
+  portabilityGroupId: o.portabilityGroupId ?? null,
+  distributionOriginId: o.distributionOriginId ?? null,
+  distributionVersion: o.distributionVersion ?? 1,
   perPoint: o.perPoint ?? 1,
   penalty: o.penalty ?? 1,
   /**
@@ -694,6 +701,25 @@ export const makeItem = (o = {}) => ({
    */
   unitId: o.unitId ?? null,
   lessonId: o.lessonId ?? null,
+  ...o,
+});
+
+export const makeScoreSubitem = (o = {}) => ({
+  ...base(),
+  itemId: o.itemId,
+  name: o.name ?? '',
+  value: o.value ?? 0,
+  order: o.order ?? 0,
+  distributionVersion: o.distributionVersion ?? 1,
+  ...o,
+});
+
+export const makeScoreSubitemCompletion = (o = {}) => ({
+  ...base(),
+  id: o.id ?? scoreSubitemCompletionId(o.studentId, o.subitemId),
+  studentId: o.studentId,
+  subitemId: o.subitemId,
+  checked: o.checked === true,
   ...o,
 });
 

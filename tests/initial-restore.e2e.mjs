@@ -23,6 +23,9 @@ async function installRestoreCloud(page, { manifest, delayManifest = false } = {
   const manifestWaiting = new Promise((resolve) => { releaseManifest = resolve; });
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async (route) => {
     const url = new URL(route.request().url());
+    if (url.pathname.endsWith('/rpc/score_foundation_capability')) {
+      return route.fulfill({ status: 204 });
+    }
     if (url.pathname.endsWith('/rpc/sync_v2_restore_manifest_full')) {
       if (delayManifest) await manifestWaiting;
       return route.fulfill({ json: manifest });

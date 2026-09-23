@@ -1,9 +1,11 @@
 import 'fake-indexeddb/auto';
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
+import * as cloud from '../src/lib/cloud.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
 import {
   attendanceId, itemScore, makeEnrollment, makeItem, makeNote, makeSection, makeSession,
   makeStudent, makeSubject, makeTeaching, makeTerm, makeYear, scoreId, studentTotal,
@@ -11,6 +13,12 @@ import {
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
+
+before(async () => {
+  cloud.setMockBackend({ getScoreFoundationCapability: () => ({ scoreDomainVersion: 1,
+    restoreProtocol: 'CORE_V2', backupVersion: 5, copyDomainVersion: 1 }) });
+  await activateSyntheticAccountWorkspace();
+});
 
 async function fixture() {
   await db.clearAll();
@@ -79,6 +87,7 @@ test('student history remains continuous and context-true across X → Y → X',
   assert.equal(history.scores.find((event) => event.record.id === f.scoreX.id).teaching.id, f.teachingX.id);
 
   await store.transferStudent(f.student.id, f.y.id, { date: '2026-08-25' });
+  await store.linkPortableScoreItems(f.itemX.id, f.itemY.id, { confirmed: true });
   history = store.studentHistory(f.student.id);
   assert.deepEqual(
     store.studentContext(f.student.id, f.teachingY.id).attendance,
@@ -149,4 +158,5 @@ test('student history remains continuous and context-true across X → Y → X',
 after(async () => {
   store.closeChannel();
   await db.closeDB();
+  cloud.setMockBackend(null);
 });

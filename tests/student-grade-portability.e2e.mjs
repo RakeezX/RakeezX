@@ -43,8 +43,10 @@ test('a transferred student sees and updates compatible grades from the destinat
       students: [{ id: ids.student, name: 'طالب نقل الدرجات', status: 'active' }],
       enrollments: [{ id: 'grade-portability-e2e:enrollment:X', studentId: ids.student, sectionId: ids.x, status: 'active', rollNo: 1 }],
       items: [
-        { id: ids.itemX, teachingId: ids.teachingX, name: 'اختبار قصير', max: 10, auto: null, order: 0 },
-        { id: ids.itemY, teachingId: ids.teachingY, name: 'اختبار قصير', max: 10, auto: null, order: 0 },
+        { id: ids.itemX, teachingId: ids.teachingX, name: 'اختبار قصير', max: 10, auto: null,
+          order: 0, portabilityGroupId: 'grade-portability-e2e:reviewed-link' },
+        { id: ids.itemY, teachingId: ids.teachingY, name: 'اختبار قصير', max: 10, auto: null,
+          order: 0, portabilityGroupId: 'grade-portability-e2e:reviewed-link' },
       ],
       scores: [{ id: `sc:${ids.student}:${ids.itemX}`, studentId: ids.student, itemId: ids.itemX, value: 8 }],
     });

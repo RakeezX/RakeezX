@@ -38,13 +38,13 @@ export function displayState() {
 
 const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings',
-  'students', 'enrollments', 'notes', 'items', 'scores', 'logs',
+  'students', 'enrollments', 'notes', 'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'logs',
   'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
   'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
 ]);
 const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
-const SCORING_STORES = new Set(['items', 'scores', 'logs']);
+const SCORING_STORES = new Set(['items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
 const AUTO_SYNC_DEBOUNCE_MS = 900;
 const RESUME_STALE_MS = 5 * 60 * 1000;
@@ -313,23 +313,45 @@ async function runRequiredSync(stores, full) {
   }
 }
 
-function v2StoresFor(snapshot, full) {
-  if (full) return SYNC_V2_STORES.filter(isCurriculumOrdinarySyncAllowed);
+const SCORE_PROVENANCE_STORES = new Set(['scoreSubitems', 'scoreSubitemCompletions']);
+
+function v2StoreAllowed(name, scoreDomainAvailable) {
+  return isCurriculumOrdinarySyncAllowed(name) &&
+    (scoreDomainAvailable || !SCORE_PROVENANCE_STORES.has(name));
+}
+
+async function scoreDomainAvailableForSync() {
+  let capability;
+  try {
+    capability = await cloud.getScoreFoundationCapability();
+  } catch (error) {
+    if (Number(error?.status) === 404 || error?.code === 'PGRST202') return false;
+    throw error;
+  }
+  return capability?.scoreDomainVersion === 1 && capability?.restoreProtocol === 'CORE_V2' &&
+    capability?.backupVersion === 5 && capability?.copyDomainVersion === 1;
+}
+
+function v2StoresFor(snapshot, full, scoreDomainAvailable) {
+  if (full) return SYNC_V2_STORES.filter((name) => v2StoreAllowed(name, scoreDomainAvailable));
   const stores = new Set(snapshot.map((entry) => entry.store).filter((name) => SYNCABLE_STORES.has(name)));
   for (const entry of snapshot) {
     for (const dependency of entry.dependencies ?? []) {
       if (SYNCABLE_STORES.has(dependency.store)) stores.add(dependency.store);
     }
   }
-  return [...stores].filter(isCurriculumOrdinarySyncAllowed);
+  return [...stores].filter((name) => v2StoreAllowed(name, scoreDomainAvailable));
 }
 
-function v2PostPullStores(snapshot, full) {
+function v2PostPullStores(snapshot, full, scoreDomainAvailable) {
   if (full || snapshot.some((entry) => String(entry.command ?? '').startsWith('lifecycle:'))) {
-    return SYNC_V2_STORES.filter(isCurriculumOrdinarySyncAllowed);
+    return SYNC_V2_STORES.filter((name) => v2StoreAllowed(name, scoreDomainAvailable));
   }
-  const stores = new Set(v2StoresFor(snapshot, false));
+  const stores = new Set(v2StoresFor(snapshot, false, scoreDomainAvailable));
   for (const entry of snapshot) {
+    if (['scoreSubitems', 'scoreSubitemCompletions', 'scores', 'items'].includes(entry.store)) {
+      stores.add('scores');
+    }
     if (String(entry.command ?? '').startsWith('enrollment:')) {
       stores.add('students'); stores.add('enrollments'); stores.add('groupArrangements');
     } else if (['attendance:record', 'attendance:fill'].includes(entry.command)) {
@@ -342,7 +364,7 @@ function v2PostPullStores(snapshot, full) {
       stores.add('classGoals'); stores.add('logs');
     }
   }
-  return [...stores].filter(isCurriculumOrdinarySyncAllowed);
+  return [...stores].filter((name) => v2StoreAllowed(name, scoreDomainAvailable));
 }
 
 /**
@@ -411,8 +433,9 @@ export async function syncAll({ full = true } = {}) {
   let madeProgress = false;
   try {
     const snapshot = await pendingOutbox();
-    const stores = v2StoresFor(snapshot, full);
-    const pull = await v2Engine.pullAll({ stores });
+    const scoreDomainAvailable = await scoreDomainAvailableForSync();
+    const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
+    const pull = await v2Engine.pullAll({ stores, scoreDomainSnapshot: scoreDomainAvailable });
     if (pull.ownershipBlocked) {
       stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
       return false;
@@ -426,7 +449,10 @@ export async function syncAll({ full = true } = {}) {
       return false;
     }
     if (pushed.failed) throw new Error(`${pushed.failed} Sync V2 mutation(s) failed`);
-    const postPull = await v2Engine.pullAll({ stores: v2PostPullStores(snapshot, full) });
+    const postPull = await v2Engine.pullAll({
+      stores: v2PostPullStores(snapshot, full, scoreDomainAvailable),
+      scoreDomainSnapshot: scoreDomainAvailable,
+    });
     if (postPull.ownershipBlocked) {
       stopOwnershipBlockedScheduling(cloudOwnershipAccess('pull'));
       return false;

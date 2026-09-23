@@ -86,6 +86,69 @@ test('M1/M2 mismatch retries whole operation and fails after three attempts', as
   assert.equal(manifests, 6);
 });
 
+test('CORE_V2 restores subitem provenance and rejects a numeric-only or divergent score', async () => {
+  const canonical = {
+    students: [{ ...row('students', 'score:student'), name: 'synthetic' }],
+    items: [{ ...row('items', 'score:item'), teaching_id: 'score:teaching', max: 10,
+      score_mode: 'subitems', distribution_mode: 'manual', portability_group_id: 'reviewed:group' }],
+    score_subitems: [{ ...row('score_subitems', 'score:subitem'), item_id: 'score:item',
+      name: 'واجب', value: 6, order: 0 }],
+    score_subitem_completions: [{ ...row('score_subitem_completions', 'ssc:score:student:score:subitem'),
+      student_id: 'score:student', subitem_id: 'score:subitem', checked: true }],
+    scores: [{ ...row('scores', 'sc:score:student:score:item'), student_id: 'score:student',
+      item_id: 'score:item', derived_value: 6, manual_value: 4, value: 10 }],
+  };
+  const manifest = Object.entries(canonical).flatMap(([entity, rows]) => rows.map((entry) => ({
+    entity, id: entry.id, revision: entry.revision, deleted: false,
+  })));
+  const cloud = {
+    getScoreRestoreManifestV2: async () => manifest,
+    fetchRestoreEntityPage: async (entity) => canonical[entity] ?? [],
+  };
+  const acquired = await restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A, cloud,
+    protocol: restore.SCORE_RESTORE_PROTOCOL });
+  assert.equal(acquired.status, 'ready');
+  assert.equal(acquired.snapshot.scores[0].value, 10);
+  assert.equal(acquired.snapshot.items[0].portabilityGroupId, 'reviewed:group');
+  const numericOnly = { ...cloud, fetchRestoreEntityPage: async (entity) =>
+    entity === 'score_subitem_completions' ? [] : canonical[entity] ?? [] };
+  await assert.rejects(restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A,
+    cloud: numericOnly, protocol: restore.SCORE_RESTORE_PROTOCOL, attempts: 1 }),
+  { code: 'RESTORE_FAILED' });
+  const divergent = { ...cloud, fetchRestoreEntityPage: async (entity) =>
+    entity === 'scores' ? [{ ...canonical.scores[0], value: 9 }] : canonical[entity] ?? [] };
+  await assert.rejects(restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A,
+    cloud: divergent, protocol: restore.SCORE_RESTORE_PROTOCOL, attempts: 1 }),
+  { code: 'RESTORE_FAILED' });
+  const noDefinitions = { ...cloud,
+    getScoreRestoreManifestV2: async () => manifest.filter((entry) => entry.entity !== 'score_subitems'),
+    fetchRestoreEntityPage: async (entity) => entity === 'score_subitems' ? [] : canonical[entity] ?? [] };
+  await assert.rejects(restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A,
+    cloud: noDefinitions, protocol: restore.SCORE_RESTORE_PROTOCOL, attempts: 1 }),
+  { code: 'RESTORE_FAILED' });
+});
+
+test('CORE_V2-capable client restores a direct-only cloud workspace without fabricated provenance', async () => {
+  const canonical = {
+    students: [{ ...row('students', 'direct:student'), name: 'synthetic' }],
+    items: [{ ...row('items', 'direct:item'), teaching_id: 'direct:teaching', max: 10,
+      score_mode: 'direct' }],
+    scores: [{ ...row('scores', 'direct:score'), student_id: 'direct:student',
+      item_id: 'direct:item', value: 0 }],
+  };
+  const manifest = Object.entries(canonical).flatMap(([entity, rows]) => rows.map((entry) => ({
+    entity, id: entry.id, revision: entry.revision, deleted: false,
+  })));
+  const cloud = { getScoreRestoreManifestV2: async () => manifest,
+    fetchRestoreEntityPage: async (entity) => canonical[entity] ?? [] };
+  const acquired = await restore.acquireConsistentCoreSnapshot({ ownerId: OWNER_A, cloud,
+    protocol: restore.SCORE_RESTORE_PROTOCOL });
+  assert.equal(acquired.status, 'ready');
+  assert.deepEqual(acquired.snapshot.scoreSubitems, []);
+  assert.deepEqual(acquired.snapshot.scoreSubitemCompletions, []);
+  assert.equal(acquired.snapshot.scores[0].value, 0);
+});
+
 test('atomic import preserves opaque curriculum IDs and starts with empty outbox', async () => {
   globalThis.indexedDB = fakeIndexedDB;
   db.closeDB();

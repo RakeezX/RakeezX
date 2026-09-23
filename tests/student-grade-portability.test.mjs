@@ -1,8 +1,10 @@
 import 'fake-indexeddb/auto';
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
+import * as cloud from '../src/lib/cloud.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
 import {
   makeEnrollment, makeItem, makeSection, makeStudent, makeSubject,
   makeTeaching, makeTerm, makeYear, scoreId, itemScore, studentTotal,
@@ -13,6 +15,12 @@ global.document = {
   querySelector: () => ({ setAttribute() {} }),
 };
 global.matchMedia = () => ({ matches: false });
+
+before(async () => {
+  cloud.setMockBackend({ getScoreFoundationCapability: () => ({ scoreDomainVersion: 1,
+    restoreProtocol: 'CORE_V2', backupVersion: 5, copyDomainVersion: 1 }) });
+  await activateSyntheticAccountWorkspace();
+});
 
 async function fresh() {
   await db.clearAll();
@@ -43,11 +51,15 @@ async function fixture() {
   return { x, y, teachingX, teachingY, student, examX, examY, projectX, projectY, examScore, projectScore };
 }
 
-test('manual grades follow a student across same-subject, same-term transfer without copying score records', async () => {
+test('historical name/max match fails closed; reviewed mapping restores intended transfer portability', async () => {
   const f = await fixture();
   await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
 
   let yContext = store.studentContext(f.student.id, f.teachingY.id);
+  assert.equal(yContext.scoresByItem[f.examY.id], undefined, 'name/max alone cannot bind historical scores');
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.id === f.examScore.id)?.value, 0);
+  await store.linkPortableScoreItems(f.examX.id, f.examY.id, { confirmed: true });
+  yContext = store.studentContext(f.student.id, f.teachingY.id);
   assert.equal(yContext.scoresByItem[f.examY.id]?.id, f.examScore.id, 'compatible Y item projects the existing X score');
   assert.equal(itemScore(f.examY, yContext), 0, 'a recorded zero remains a real grade');
   assert.equal(itemScore(f.projectY, yContext), null, 'same-name item with a different maximum remains unrecorded');
@@ -79,6 +91,61 @@ test('manual grades follow a student across same-subject, same-term transfer wit
   assert.equal(itemScore(f.projectY, afterReload), 0, 'recorded zero remains stable after reload');
 });
 
+test('independent copied item does not project or mutate a prior class score', async () => {
+  const f = await fixture();
+  const independent = makeItem({
+    id: 'grade-portability:item:independent:Y', teachingId: f.teachingY.id,
+    name: f.examX.name, max: f.examX.max,
+  });
+  await store.save({ items: [independent] });
+  await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
+
+  assert.equal(itemScore(independent, store.studentContext(f.student.id, f.teachingY.id)), null);
+  await store.setScore(f.student.id, independent.id, 8);
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.itemId === f.examX.id)?.value, 0);
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.itemId === independent.id)?.value, 8);
+  assert.equal(itemScore(independent, store.studentContext(f.student.id, f.teachingY.id)), 8);
+});
+
+test('ambiguous historical name/max edits remain local to the destination item', async () => {
+  const f = await fixture();
+  const second = makeItem({
+    id: 'grade-portability:item:second:Y', teachingId: f.teachingY.id,
+    name: f.examX.name, max: f.examX.max,
+  });
+  await store.save({ items: [second] });
+  await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
+  assert.equal(store.studentContext(f.student.id, f.teachingY.id).scoresByItem[f.examY.id], undefined);
+  await store.setScore(f.student.id, f.examY.id, 9);
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.id === f.examScore.id)?.value, 0);
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.itemId === f.examY.id)?.value, 9);
+  assert.equal(store.studentContext(f.student.id, f.teachingY.id).scoresByItem[second.id], undefined);
+});
+
+test('one-time distribution copy creates an independent item and no portable mapping', async () => {
+  const f = await fixture();
+  const preview = store.previewScoreDistributionCopy(f.teachingX.id);
+  assert.equal(preview.length, 1);
+  const result = await store.applyScoreDistributionCopy(f.teachingX.id, [f.teachingY.id], {
+    [`${f.teachingY.id}:${f.examX.id}`]: 'add',
+    [`${f.teachingY.id}:${f.projectX.id}`]: 'add',
+  });
+  const copied = store.items(f.teachingY.id).find((item) => item.distributionOriginId === f.examX.id);
+  assert.ok(copied);
+  assert.notEqual(copied.id, f.examX.id);
+  assert.equal(copied.portabilityGroupId, null);
+  assert.ok(result.itemIds.includes(copied.id));
+  const queued = await db.getAll('outbox');
+  const copiedMutations = queued.filter((row) => result.itemIds.includes(row.recordId));
+  assert.equal(copiedMutations.length, result.itemIds.length);
+  assert.ok(copiedMutations.every((row) => row.command === 'score:copy_definition'));
+  assert.equal(queued.some((row) => result.subitemIds.includes(row.recordId)), false,
+    'copied definitions do not use forbidden generic subitem mutations');
+  await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
+  assert.equal(store.studentContext(f.student.id, f.teachingY.id).scoresByItem[copied.id], undefined);
+  assert.equal(store.scoresOf(f.student.id).find((score) => score.id === f.examScore.id)?.value, 0);
+});
+
 test('compatible automatic items aggregate X and Y records while incompatible settings stay unrecorded', async () => {
   const f = await fixture();
   const participationX = makeItem({ id: 'grade-portability:item:participation:X', teachingId: f.teachingX.id, name: 'مشاركة', max: 10, auto: 'participation', perPoint: 1 });
@@ -97,6 +164,8 @@ test('compatible automatic items aggregate X and Y records while incompatible se
   });
 
   await store.transferStudent(f.student.id, f.y.id, { date: '2026-09-01' });
+  await store.linkPortableScoreItems(participationX.id, participationY.id, { confirmed: true });
+  await store.linkPortableScoreItems(attendanceX.id, attendanceY.id, { confirmed: true });
   let yContext = store.studentContext(f.student.id, f.teachingY.id);
   assert.equal(itemScore(participationY, yContext), 3, 'X participation follows the student to Y');
   assert.equal(itemScore(attendanceY, yContext), 8, 'X attendance-derived score follows the student to Y');
@@ -130,4 +199,5 @@ test('compatible automatic items aggregate X and Y records while incompatible se
 after(async () => {
   store.closeChannel();
   await db.closeDB();
+  cloud.setMockBackend(null);
 });

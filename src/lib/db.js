@@ -6,7 +6,7 @@
  */
 
 export const DB_NAME = 'rakeezx';
-export const DB_VERSION = 7;
+export const DB_VERSION = 8;
 
 let activeDatabaseName = DB_NAME;
 
@@ -24,6 +24,8 @@ export const STORES = [
   'students',      // هوية الطالب — بلا انتماء دائم
   'enrollments',   // انتساب الطالب لشعبة خلال مدة
   'items',         // بنود التقييم
+  'scoreSubitems',
+  'scoreSubitemCompletions',
   'scores',
   'slots',         // الجدول الأسبوعي المتكرر
   'sessions',      // الحصص
@@ -370,13 +372,14 @@ export async function clearAll() {
 }
 
 /**
- * Installs a verified CORE_V1 snapshot and a local-only receipt atomically.
+ * Installs a verified CORE_V1 or CORE_V2 snapshot and a local-only receipt atomically.
  * This is valid only for an unmounted deterministic account database.
  */
 export async function importInitialRestoreSnapshot(snapshot, device) {
   const coreStores = Object.keys(snapshot ?? {});
   if (!coreStores.length || coreStores.some((name) => !STORES.includes(name) || !Array.isArray(snapshot[name])) ||
-      !device?.initialRestoreReceipt || device.initialRestoreReceipt.protocol !== 'CORE_V1') {
+      !device?.initialRestoreReceipt ||
+      !['CORE_V1', 'CORE_V2'].includes(device.initialRestoreReceipt.protocol)) {
     throw new Error('Invalid Initial Restore atomic import');
   }
   const database = await openDB();

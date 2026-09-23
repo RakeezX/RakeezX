@@ -86,7 +86,7 @@ test("Backup and Restore Suite", async (t) => {
     assert.equal(validateBackup(belowSupported).code, "UNSUPPORTED_BACKUP_VERSION");
     await assert.rejects(restoreBackup(belowSupported), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
 
-    const future = { app: "rakeezx", version: 5, data: { students: [{ id: "future", name: "Future" }] } };
+    const future = { app: "rakeezx", version: 6, data: { students: [{ id: "future", name: "Future" }] } };
     assert.equal(validateBackup(future).code, "UNSUPPORTED_BACKUP_VERSION");
     await assert.rejects(restoreBackup(future), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
 

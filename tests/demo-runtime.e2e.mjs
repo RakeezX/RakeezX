@@ -127,7 +127,7 @@ test.describe('isolated Demo runtime', () => {
     await expect(page.locator('.hero__hello')).toHaveText(/^(صباح الخير|أهلاً)، أستاذ معلم ركيز$/);
 
     const initial = await page.evaluate(async () => {
-      const open = indexedDB.open('rakeezx-demo', 7);
+      const open = indexedDB.open('rakeezx-demo');
       const database = await new Promise((resolve, reject) => { open.onsuccess = () => resolve(open.result); open.onerror = () => reject(open.error); });
       const read = (store) => new Promise((resolve, reject) => {
         const request = database.transaction(store).objectStore(store).getAll();
@@ -147,7 +147,7 @@ test.describe('isolated Demo runtime', () => {
     await page.reload();
     await expect(page.locator('input[name="teacherName"]')).toHaveValue('تعديل تجريبي');
     expect(await page.evaluate(async () => {
-      const open = indexedDB.open('rakeezx-demo', 7);
+      const open = indexedDB.open('rakeezx-demo');
       const database = await new Promise((resolve, reject) => { open.onsuccess = () => resolve(open.result); open.onerror = () => reject(open.error); });
       const request = database.transaction('outbox').objectStore('outbox').getAll();
       const rows = await new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); });

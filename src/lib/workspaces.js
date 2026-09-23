@@ -216,7 +216,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const key = await accountWorkspaceKey(normalized, options);
     const id = accountRecordId(key);
     const databaseName = `rakeezx-user-${key}`;
-    if (!checkpoint || checkpoint.protocol !== 'CORE_V1' || typeof checkpoint.restoreId !== 'string' ||
+    if (!checkpoint || !['CORE_V1', 'CORE_V2'].includes(checkpoint.protocol) || typeof checkpoint.restoreId !== 'string' ||
         !checkpoint.restoreId || typeof checkpoint.manifestHash !== 'string' || !checkpoint.manifestHash) {
       throw Object.assign(new Error('Invalid Initial Restore checkpoint'), { code: 'INVALID_INITIAL_RESTORE_CHECKPOINT' });
     }
@@ -238,7 +238,8 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     }
     if (existing && (existing.type !== 'account' || existing.authUserId !== normalized ||
         existing.databaseName !== databaseName || existing.ownershipState !== 'restoring' ||
-        existing.restore?.restoreId !== checkpoint.restoreId)) {
+        existing.restore?.restoreId !== checkpoint.restoreId ||
+        existing.restore?.protocol !== checkpoint.protocol)) {
       tx.abort();
       await committed.catch(() => {});
       throw Object.assign(new Error('Pending restore belongs to different evidence'), {
@@ -250,7 +251,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
       id, type: 'account', authUserId: normalized, databaseName,
       ownershipState: 'restoring', workspaceKind: 'account-initial-restore',
       restore: {
-        protocol: 'CORE_V1', restoreId: checkpoint.restoreId,
+        protocol: checkpoint.protocol, restoreId: checkpoint.restoreId,
         manifestHash: checkpoint.manifestHash,
         phase: checkpoint.phase ?? 'RESTORE_PREFLIGHT',
         createdAt: existing?.restore?.createdAt ?? stamp, updatedAt: stamp,
@@ -273,14 +274,16 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const existing = await requestResult(store.get(id));
     if (!existing || existing.type !== 'account' || existing.authUserId !== normalized ||
         existing.databaseName !== `rakeezx-user-${key}` || existing.ownershipState !== 'restoring' ||
-        existing.restore?.restoreId !== restoreId || existing.restore?.protocol !== 'CORE_V1') {
+        existing.restore?.restoreId !== restoreId ||
+        !['CORE_V1', 'CORE_V2'].includes(existing.restore?.protocol)) {
       tx.abort();
       await committed.catch(() => {});
       throw Object.assign(new Error('Initial Restore checkpoint mismatch'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
     }
     const stamp = now();
     const record = {
-      ...existing, restore: { ...existing.restore, ...update, restoreId, protocol: 'CORE_V1', updatedAt: stamp },
+      ...existing, restore: { ...existing.restore, ...update, restoreId,
+        protocol: existing.restore.protocol, updatedAt: stamp },
       updatedAt: stamp,
     };
     store.put(record);
@@ -299,9 +302,10 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const existing = await requestResult(store.get(id));
     if (!existing || existing.type !== 'account' || existing.authUserId !== normalized ||
         existing.databaseName !== `rakeezx-user-${key}` || existing.ownershipState !== 'restoring' ||
-        existing.restore?.protocol !== 'CORE_V1' || existing.restore?.restoreId !== receipt?.restoreId ||
+        !['CORE_V1', 'CORE_V2'].includes(existing.restore?.protocol) ||
+        existing.restore?.protocol !== receipt?.protocol || existing.restore?.restoreId !== receipt?.restoreId ||
         existing.restore?.manifestHash !== receipt?.manifestHash || receipt?.ownerId !== normalized ||
-        receipt?.protocol !== 'CORE_V1') {
+        !['CORE_V1', 'CORE_V2'].includes(receipt?.protocol)) {
       tx.abort();
       await committed.catch(() => {});
       throw Object.assign(new Error('Initial Restore receipt does not match pending workspace'), {
@@ -313,7 +317,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
       id, type: 'account', authUserId: normalized,
       databaseName: `rakeezx-user-${key}`, ownershipState: 'claimed',
       restoreReceipt: {
-        protocol: 'CORE_V1', restoreId: receipt.restoreId,
+        protocol: receipt.protocol, restoreId: receipt.restoreId,
         manifestHash: receipt.manifestHash, completedAt: receipt.completedAt,
       },
       createdAt: existing.createdAt ?? stamp, updatedAt: stamp,

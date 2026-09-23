@@ -7,9 +7,10 @@
  */
 
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, applyScoreSubitemCommand, applyScoreConfigurationCommand, applyScoreDistributionCopyCommand, getScoreDomainSnapshot, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
+import { projectSubitemScore, scoreCents } from './score-foundation.js';
 import { createSyncOwnershipGuard, ownershipBlockedError, SYNC_OWNERSHIP_BLOCKED } from './sync-ownership.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -117,12 +118,24 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: {
       teachingId: 'teaching_id', name: 'name', max: 'max',
       auto: 'auto', perPoint: 'per_point', penalty: 'penalty', unitId: 'unit_id', lessonId: 'lesson_id', order: 'order',
+      scoreMode: 'score_mode', distributionMode: 'distribution_mode', portabilityGroupId: 'portability_group_id',
+      distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id',
     },
     references: { teachingId: 'teachings' },
   },
+  scoreSubitems: {
+    entity: 'score_subitems',
+    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version' },
+    references: { itemId: 'items' },
+  },
+  scoreSubitemCompletions: {
+    entity: 'score_subitem_completions',
+    fields: { studentId: 'student_id', subitemId: 'subitem_id', checked: 'checked' },
+    references: { studentId: 'students', subitemId: 'scoreSubitems' },
+  },
   scores: {
     entity: 'scores',
-    fields: { studentId: 'student_id', itemId: 'item_id', value: 'value' },
+    fields: { studentId: 'student_id', itemId: 'item_id', value: 'value', manualValue: 'manual_value', derivedValue: 'derived_value' },
     references: { studentId: 'students', itemId: 'items' },
   },
   logs: {
@@ -180,7 +193,7 @@ const SAFE_FEATURE_CATEGORY = Object.freeze({
   units: 'curriculum', lessons: 'curriculum',
   students: 'students', enrollments: 'students', notes: 'students',
   classRules: 'classes', classGoals: 'classes', classCharterSelections: 'classes', groupArrangements: 'classes',
-  items: 'assessment', scores: 'assessment', logs: 'assessment',
+  items: 'assessment', scoreSubitems: 'assessment', scoreSubitemCompletions: 'assessment', scores: 'assessment', logs: 'assessment',
   timeProfiles: 'schedule', slots: 'schedule', sessions: 'schedule',
   sessionRosterSnapshots: 'attendance', attendance: 'attendance',
   closedTermReports: 'reports',
@@ -603,6 +616,10 @@ function defaultTransport() {
     applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
     applyClosedTermReportCommand: applySyncV2ClosedTermReportCommand,
     applyClassGoalRewardCommand: applySyncV2ClassGoalRewardCommand,
+    applyScoreSubitemCommand,
+    applyScoreConfigurationCommand,
+    applyScoreDistributionCopyCommand,
+    getScoreDomainSnapshot,
     fetchRecords: (entity) => fetchRecords(entity),
   };
 }
@@ -1210,6 +1227,56 @@ export function createSyncV2Engine({
       status === 400 || status === 409 || status === 422;
   }
 
+  async function reconcileScoreDomainReceipt(mutation, receipt) {
+    if (receipt?.mutationId !== mutation.mutationId) {
+      throw new Error('Score domain receipt mutationId mismatch');
+    }
+    const configuration = ['score:configure', 'score:copy_definition'].includes(mutation.command);
+    const score = configuration ? null : decodeSyncV2Canonical('scores', receipt.score);
+    const completion = receipt.completion
+      ? decodeSyncV2Canonical('scoreSubitemCompletions', receipt.completion) : null;
+    const item = configuration ? decodeSyncV2Canonical('items', receipt.item) : null;
+    const subitems = configuration ? (receipt.subitems ?? []).map((row) =>
+      decodeSyncV2Canonical('scoreSubitems', row)) : [];
+    const scores = configuration ? (receipt.scores ?? []).map((row) =>
+      decodeSyncV2Canonical('scores', row)) : [score];
+    if (configuration ? !item?.id || subitems.some((row) => !row?.id) || scores.some((row) => !row?.id)
+      : !score?.id || (mutation.command === 'score:set_completion' && !completion?.id)) {
+      throw new Error('Score domain receipt is incomplete');
+    }
+    await database.applyBatch({ items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {}, outbox: {} }, {
+      prepare(current) {
+        const pending = current.outbox.filter((row) => row.id !== mutation.id &&
+          String(row.command ?? '').startsWith('score:') && row.state !== 'rejected');
+        const protectedByLaterCommand = (store, row) => pending.some((command) => {
+          if (command.sequence <= mutation.sequence) return false;
+          if (store === 'items' || store === 'scoreSubitems') {
+            return command.command === 'score:configure' &&
+              command.patch?.itemId === (store === 'items' ? row.id : row.itemId);
+          }
+          if (store === 'scores') return command.patch?.itemId === row.itemId &&
+            (command.command === 'score:configure' || command.patch?.studentId === row.studentId);
+          return command.command === 'score:set_completion' &&
+            command.patch?.studentId === row.studentId && command.patch?.subitemId === row.subitemId;
+        });
+        const adopt = (store, rows) => rows.filter(Boolean).map((row) => {
+          const local = current[store].find((candidate) => candidate.id === row.id);
+          if (local && protectedByLaterCommand(store, row)) return local;
+          const next = { ...(local ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
+          delete next.syncCreatePending;
+          return next;
+        });
+        return {
+          items: { put: adopt('items', item ? [item] : []) },
+          scoreSubitems: { put: adopt('scoreSubitems', subitems) },
+          scoreSubitemCompletions: { put: adopt('scoreSubitemCompletions', completion ? [completion] : []) },
+          scores: { put: adopt('scores', scores) },
+          outbox: { remove: [mutation.id] },
+        };
+      },
+    });
+  }
+
   async function dispatchPending({ maxMutations = Infinity } = {}) {
     const snapshot = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
     const stoppedKeys = new Set();
@@ -1492,6 +1559,64 @@ export function createSyncV2Engine({
         }
         continue;
       }
+      if (original.op === 'command' && String(original.command ?? '').startsWith('score:')) {
+        if (stoppedKeys.has(original.logicalRecordKey)) { result.blocked++; continue; }
+        const liveRows = sortMutations(await database.getAll('outbox'));
+        const live = liveRows.find((row) => row.id === original.id);
+        if (!live) continue;
+        const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
+        if (readiness.state === 'blocked') {
+          await markDependencyBlock(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey);
+          result.blocked++; continue;
+        }
+        if (readiness.state === 'rejected') {
+          await markRejected(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey);
+          result.blocked++; continue;
+        }
+        if (live.command === 'score:copy_definition' && !live.envelopeLocked &&
+            !Number(live.patch.sourceRevision)) {
+          const source = await database.get('items', live.patch.sourceItemId);
+          if (!normalizeRevision(source?.serverRevision)) {
+            await markDependencyBlock(live, 'copy-source-not-authoritative');
+            stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
+          }
+          await database.applyBatch({ outbox: {} }, { prepare(current) {
+            const existing = current.outbox.find((row) => row.id === live.id);
+            if (!existing || existing.envelopeLocked) return { outbox: operationBatch() };
+            return { outbox: { put: [{ ...existing, patch: {
+              ...existing.patch, sourceRevision: normalizeRevision(source.serverRevision),
+            } }] } };
+          } });
+        }
+        const mutation = await markAttempt(live);
+        result.attempted++;
+        try {
+          const receipt = mutation.command === 'score:copy_definition'
+            ? await transport.applyScoreDistributionCopyCommand({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, sourceItemId: mutation.patch.sourceItemId,
+              sourceRevision: mutation.patch.sourceRevision,
+              targetTeachingId: mutation.patch.targetTeachingId,
+              newItemId: mutation.patch.newItemId, subitemIds: clone(mutation.patch.subitemIds),
+              conflictChoice: mutation.patch.conflictChoice })
+            : mutation.command === 'score:configure'
+            ? await transport.applyScoreConfigurationCommand({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, itemId: mutation.patch.itemId,
+              expectedVersion: mutation.patch.expectedVersion, payload: clone(mutation.patch.payload) })
+            : await transport.applyScoreSubitemCommand({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, command: mutation.command.slice('score:'.length),
+              itemId: mutation.patch.itemId, studentId: mutation.patch.studentId,
+              subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
+              manualValue: mutation.patch.manualValue ?? null });
+          await reconcileScoreDomainReceipt(mutation, receipt);
+          result.acknowledged++;
+        } catch (error) {
+          if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
+          else await markFailure(mutation, error);
+          stoppedKeys.add(mutation.logicalRecordKey);
+          if (isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
+        continue;
+      }
       if (original.op === 'command') {
         await markDependencyBlock(original, 'command-handler-required');
         stoppedKeys.add(original.logicalRecordKey);
@@ -1560,6 +1685,19 @@ export function createSyncV2Engine({
           }
           const existing = current[store].find((record) => record.id === canonical.id) ?? null;
           if (existing && normalizeRevision(existing.serverRevision) > normalizeRevision(canonical.serverRevision)) continue;
+          const pendingScoreDomain = existing && current.outbox.some((mutation) => {
+            if (mutation.protocol !== 'v2' || !String(mutation.command ?? '').startsWith('score:') ||
+                mutation.state === 'rejected') return false;
+            const patch = mutation.patch ?? {};
+            if (store === 'items') return mutation.command === 'score:configure' && patch.itemId === existing.id;
+            if (store === 'scoreSubitems') return mutation.command === 'score:configure' && patch.itemId === existing.itemId;
+            if (store === 'scoreSubitemCompletions') return mutation.command === 'score:set_completion' &&
+              patch.studentId === existing.studentId && patch.subitemId === existing.subitemId;
+            if (store === 'scores') return patch.itemId === existing.itemId &&
+              (mutation.command === 'score:configure' || patch.studentId === existing.studentId);
+            return false;
+          });
+          if (pendingScoreDomain) continue; // Keep the complete optimistic local projection until its domain receipt.
           // The offline-first bootstrap runs before Auth and therefore cannot
           // know whether this account already owns its singleton/default rows.
           // A pull of the same durable identity is authoritative proof that the
@@ -1619,7 +1757,89 @@ export function createSyncV2Engine({
     return rows.length;
   }
 
-  async function pullAll({ stores = SYNC_V2_STORES } = {}) {
+  async function pullScoreDomainSnapshot() {
+    if (typeof transport.getScoreDomainSnapshot !== 'function') {
+      throw new Error('Atomic score-domain snapshot transport is unavailable');
+    }
+    const raw = await transport.getScoreDomainSnapshot();
+    const entries = [
+      ['items', 'items'], ['scoreSubitems', 'score_subitems'],
+      ['scoreSubitemCompletions', 'score_subitem_completions'], ['scores', 'scores'],
+    ];
+    const canonical = {};
+    for (const [store, key] of entries) {
+      if (!Array.isArray(raw?.[key])) throw new Error(`Incomplete atomic score-domain snapshot: ${key}`);
+      canonical[store] = raw[key].map((row) => {
+        if (row?.owner_id !== currentAuthenticatedUserId()) {
+          throw new Error('Atomic score-domain snapshot owner mismatch');
+        }
+        const decoded = decodeSyncV2Canonical(store, row);
+        if (!decoded?.id) throw new Error(`Invalid atomic score-domain row: ${key}`);
+        return decoded;
+      });
+    }
+    const itemIds = new Set(canonical.items.map((row) => row.id));
+    const definitions = new Map(canonical.scoreSubitems.map((row) => [row.id, row]));
+    const scorePairs = new Map(canonical.scores.filter((row) => !row.deleted)
+      .map((row) => [`${row.studentId}\0${row.itemId}`, row]));
+    for (const row of canonical.scoreSubitems) {
+      if (!itemIds.has(row.itemId)) throw new Error('Score-domain snapshot has an orphan definition');
+    }
+    for (const row of canonical.scoreSubitemCompletions) {
+      if (!definitions.has(row.subitemId)) throw new Error('Score-domain snapshot has an orphan completion');
+    }
+    const pairs = new Set([...scorePairs.keys(), ...canonical.scoreSubitemCompletions
+      .filter((row) => row.checked && !row.deleted && !definitions.get(row.subitemId)?.deleted)
+      .map((row) => `${row.studentId}\0${definitions.get(row.subitemId).itemId}`)]);
+    for (const pair of pairs) {
+      const [studentId, itemId] = pair.split('\0');
+      const item = canonical.items.find((row) => row.id === itemId);
+      if (!item || item.deleted) continue;
+      const score = scorePairs.get(pair);
+      if (!score) throw new Error('Score-domain snapshot lacks a materialized score');
+      const projected = projectSubitemScore(item,
+        canonical.scoreSubitems.filter((row) => row.itemId === itemId),
+        canonical.scoreSubitemCompletions.filter((row) => row.studentId === studentId),
+        score.manualValue ?? null);
+      for (const field of ['derivedValue', 'manualValue', 'value']) {
+        if (scoreCents(score[field], { allowBlank: true }) !==
+            scoreCents(projected[field], { allowBlank: true })) {
+          throw new Error('Score-domain snapshot projection disagrees with components');
+        }
+      }
+    }
+    await database.applyBatch({ items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {}, outbox: {} }, {
+      prepare(current) {
+        if (current.outbox.some((row) => row.protocol === 'v2' && row.state !== 'rejected' &&
+            String(row.command ?? '').startsWith('score:'))) {
+          return Object.fromEntries(entries.map(([store]) => [store, operationBatch()]));
+        }
+        const localDefinitions = new Map(current.scoreSubitems.map((row) => [row.id, row]));
+        const covered = {
+          items: (row) => itemIds.has(row.id),
+          scoreSubitems: (row) => itemIds.has(row.itemId),
+          scoreSubitemCompletions: (row) => itemIds.has(localDefinitions.get(row.subitemId)?.itemId),
+          scores: (row) => itemIds.has(row.itemId),
+        };
+        const result = {};
+        for (const [store] of entries) {
+          const remoteIds = new Set(canonical[store].map((row) => row.id));
+          result[store] = {
+            put: canonical[store].map((row) => {
+              const local = current[store].find((candidate) => candidate.id === row.id);
+              return { ...(local ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
+            }),
+            remove: current[store].filter((row) => covered[store](row) && !remoteIds.has(row.id))
+              .map((row) => row.id),
+          };
+        }
+        return result;
+      },
+    });
+    return Object.values(canonical).reduce((sum, rows) => sum + rows.length, 0);
+  }
+
+  async function pullAll({ stores = SYNC_V2_STORES, scoreDomainSnapshot = false } = {}) {
     const ownership = ownershipGuard.cloudAccess({
       operation: 'pull', authenticatedUserId: currentAuthenticatedUserId(),
     });
@@ -1635,6 +1855,14 @@ export function createSyncV2Engine({
         result.pulled += await pullStore(store);
       } catch (error) {
         result.failures.push({ store, error });
+      }
+    }
+    if (scoreDomainSnapshot && !result.failures.length &&
+        stores.some((store) => ['items', 'scores', 'scoreSubitems', 'scoreSubitemCompletions'].includes(store))) {
+      try {
+        result.pulled += await pullScoreDomainSnapshot();
+      } catch (error) {
+        result.failures.push({ store: 'scoreDomainSnapshot', error });
       }
     }
     return result;

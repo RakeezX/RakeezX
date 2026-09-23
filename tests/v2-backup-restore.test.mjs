@@ -50,11 +50,11 @@ afterEach(async () => {
 });
 after(() => store.closeChannel());
 
-test('V4 export is hash-bound with canonical baseline while V3 remains locally readable', async () => {
+test('V5 export is hash-bound with canonical baseline while V3 remains locally readable', async () => {
   const student = canonical({ id: 'student:a', name: 'قبل', note: '', status: 'active', deleted: false, updatedAt: 10 });
   await db.put('students', student);
   const backup = await buildBackup({ sourceOwnerId: OWNER, backupId: 'backup:a' });
-  assert.equal(backup.version, 4);
+  assert.equal(backup.version, 5);
   assert.equal(backup.sourceOwnerId, OWNER);
   assert.equal(backup.baselines.students[0].value.name, 'قبل');
   assert.equal((await validateBackupIntegrity(backup)).integrity, 'verified');
@@ -67,6 +67,141 @@ test('V4 export is hash-bound with canonical baseline while V3 remains locally r
   assert.equal(validateBackup(legacy).ok, true);
   await restoreBackup(legacy, 'replace');
   assert.equal((await db.get('students', 'legacy:a')).name, 'قديم');
+});
+
+test('V5 backup survives disposable wipe/replace with mixed direct and SUBITEM provenance', async () => {
+  const rows = {
+    students: [{ id: 'student:one', name: 'synthetic' }, { id: 'student:missing', name: 'synthetic' }],
+    items: [
+      { id: 'item:direct', name: 'direct', max: 10, scoreMode: 'direct',
+        portabilityGroupId: 'portability:reviewed' },
+      { id: 'item:sub', name: 'subitem', max: 10, scoreMode: 'subitems',
+        distributionMode: 'manual', portabilityGroupId: null },
+    ],
+    scoreSubitems: [
+      { id: 'sub:three', itemId: 'item:sub', name: 'three', value: 3, order: 0 },
+      { id: 'sub:deleted', itemId: 'item:sub', name: 'old', value: 2, order: 1, deleted: true },
+    ],
+    scoreSubitemCompletions: [
+      { id: 'completion:three', studentId: 'student:one', subitemId: 'sub:three', checked: true },
+      { id: 'completion:deleted', studentId: 'student:missing', subitemId: 'sub:deleted',
+        checked: true, deleted: true },
+    ],
+    scores: [
+      { id: 'score:direct', studentId: 'student:one', itemId: 'item:direct', value: 7 },
+      { id: 'score:sub', studentId: 'student:one', itemId: 'item:sub',
+        derivedValue: 3, manualValue: 5, value: 8 },
+      { id: 'score:zero', studentId: 'student:missing', itemId: 'item:sub',
+        derivedValue: 0, manualValue: 0, value: 0 },
+    ],
+  };
+  for (const [storeName, records] of Object.entries(rows)) {
+    for (const record of records) await db.put(storeName, record);
+  }
+  const backup = await buildBackup({ sourceOwnerId: OWNER, backupId: 'backup:v5:mixed' });
+  assert.equal((await validateBackupIntegrity(backup)).ok, true);
+  assert.equal(backup.data.scoreSubitems.length, 2);
+  await db.clearAll();
+  await assert.rejects(restoreBackup(backup, 'merge'),
+    (error) => error.code === 'SUBITEM_BACKUP_MERGE_UNSUPPORTED');
+  await restoreBackup(backup, 'replace');
+  for (const [storeName, records] of Object.entries(rows)) {
+    assert.deepEqual((await db.getAll(storeName)).sort((a, b) => a.id.localeCompare(b.id)),
+      records.sort((a, b) => a.id.localeCompare(b.id)));
+  }
+  assert.equal((await db.get('scores', 'score:zero')).value, 0);
+  assert.equal((await db.get('scoreSubitems', 'sub:deleted')).deleted, true);
+  assert.equal((await db.get('items', 'item:direct')).portabilityGroupId, 'portability:reviewed');
+});
+
+for (const mode of ['direct', 'subitems']) {
+  test(`V5 ${mode}-only backup survives wipe/replace without manufacturing the other mode`, async () => {
+    const rows = {
+      students: [{ id: 'single:student', name: 'synthetic' }],
+      items: [{ id: 'single:item', name: 'assessment', max: 10, scoreMode: mode,
+        ...(mode === 'subitems' ? { distributionMode: 'manual' }
+          : { portabilityGroupId: 'single:explicit-portability' }) }],
+      scoreSubitems: mode === 'subitems'
+        ? [{ id: 'single:subitem', itemId: 'single:item', name: 'part', value: 3, order: 0 }] : [],
+      scoreSubitemCompletions: mode === 'subitems'
+        ? [{ id: 'single:completion', studentId: 'single:student', subitemId: 'single:subitem', checked: true }] : [],
+      scores: [{ id: 'single:score', studentId: 'single:student', itemId: 'single:item',
+        ...(mode === 'subitems' ? { derivedValue: 3, manualValue: 0, value: 3 } : { value: 0 }) }],
+    };
+    for (const [name, records] of Object.entries(rows)) {
+      for (const record of records) await db.put(name, record);
+    }
+    const backup = await buildBackup({ sourceOwnerId: OWNER, backupId: `backup:v5:${mode}` });
+    assert.equal((await validateBackupIntegrity(backup)).ok, true);
+    await db.clearAll();
+    await restoreBackup(backup, 'replace');
+    for (const [name, records] of Object.entries(rows)) assert.deepEqual(await db.getAll(name), records);
+    assert.equal((await db.get('scores', 'single:score')).value, mode === 'direct' ? 0 : 3);
+  });
+}
+
+test('V5 cloud restore selects versioned RPCs and reconciles complete canonical provenance', async () => {
+  await db.put('students', { id: 'v5:student', name: 'synthetic' });
+  await db.put('items', { id: 'v5:item', teachingId: 'v5:teaching', name: 'assessment',
+    max: 10, scoreMode: 'subitems', distributionMode: 'manual', distributionVersion: 1 });
+  await db.put('scoreSubitems', { id: 'v5:subitem', itemId: 'v5:item', name: 'one',
+    value: 3, order: 0 });
+  await db.put('scoreSubitemCompletions', { id: 'v5:completion', studentId: 'v5:student',
+    subitemId: 'v5:subitem', checked: true });
+  await db.put('scores', { id: 'v5:score', studentId: 'v5:student', itemId: 'v5:item',
+    derivedValue: 3, manualValue: 5, value: 8 });
+  const backup = await buildBackup({ sourceOwnerId: OWNER, backupId: 'backup:v5:cloud' });
+  let stageCalls = 0;
+  let finalizeCalls = 0;
+  const canonicalRows = canonicalPayload({
+    students: [{ id: 'v5:student', name: 'synthetic', revision: 1, deleted_at: null }],
+    items: [{ id: 'v5:item', teaching_id: 'v5:teaching', name: 'assessment', max: 10,
+      score_mode: 'subitems', distribution_mode: 'manual', distribution_version: 1,
+      revision: 1, deleted_at: null }],
+    scoreSubitems: [{ id: 'v5:subitem', item_id: 'v5:item', name: 'one', value: 3,
+      order: 0, revision: 1, deleted_at: null }],
+    scoreSubitemCompletions: [{ id: 'v5:completion', student_id: 'v5:student',
+      subitem_id: 'v5:subitem', checked: true, revision: 1, deleted_at: null }],
+    scores: [{ id: 'v5:score', student_id: 'v5:student', item_id: 'v5:item',
+      derived_value: 3, manual_value: 5, value: 8, revision: 1, deleted_at: null }],
+  });
+  const transport = {
+    async stageScoreRestoreV2(envelope) {
+      stageCalls++;
+      assert.equal(envelope.backupVersion, 5);
+      const entities = envelope.operations.map((row) => row.entity);
+      assert.ok(entities.indexOf('items') < entities.indexOf('score_subitems'));
+      assert.ok(entities.indexOf('score_subitems') < entities.indexOf('score_subitem_completions'));
+      return { backupHash: envelope.backupHash, stageHash: 'stage:v5' };
+    },
+    async finalizeScoreRestoreV2() {
+      finalizeCalls++;
+      return { receipt: { status: 'finalized' }, canonical: canonicalRows };
+    },
+  };
+  const coordinator = { async assertCloudRestoreReady() {},
+    async runCloudRestoreExclusive(action) { return action(); } };
+  await restoreBackupToCloud(backup, { transport, coordinator, sourceFetcher: async () => emptyServer() });
+  assert.equal(stageCalls, 1);
+  assert.equal(finalizeCalls, 1);
+  assert.equal((await db.get('scores', 'v5:score')).value, 8);
+  assert.equal((await db.get('scoreSubitemCompletions', 'v5:completion')).checked, true);
+  assert.equal((await db.getAll('outbox')).length, 0);
+});
+
+test('V5 empty-owner recovery retains tombstones but rejects another owner', () => {
+  const payload = { version: 5, sourceOwnerId: OWNER,
+    data: { students: [{ id: 'v5:deleted-student', name: 'old', deleted: true,
+      serverRevision: 4, updatedAt: 1 }] },
+    baselines: { students: [{ id: 'v5:deleted-student', value: { id: 'v5:deleted-student' },
+      revision: 4 }] } };
+  const plan = planCloudRestore(payload, emptyServer(), { ownerId: OWNER });
+  assert.equal(plan.ready, true);
+  assert.equal(plan.operations[0].operation, 'create_deleted');
+  const wrongOwner = planCloudRestore(payload, emptyServer(), {
+    ownerId: '22222222-2222-4222-8222-222222222222' });
+  assert.equal(wrongOwner.ready, false);
+  assert.equal(wrongOwner.entries[0].reason, 'v5-owner-mismatch');
 });
 
 test('three-way planner preserves server-only edits and applies non-overlapping local fields', async () => {
@@ -166,7 +301,7 @@ test('unsupported backup versions are rejected before cloud staging with a stabl
   const coordinator = {
     async assertCloudRestoreReady() { throw new Error('must not reach readiness'); },
   };
-  for (const version of [2, 5]) {
+  for (const version of [2, 6]) {
     const payload = { app: 'rakeezx', version, data: { students: [{ id: `student:v${version}`, name: 'نسخة' }] } };
     await assert.rejects(restoreBackupToCloud(payload, { transport, coordinator }),
       (error) => error.code === 'UNSUPPORTED_BACKUP_VERSION');

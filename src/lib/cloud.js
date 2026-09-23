@@ -543,6 +543,36 @@ export async function getSyncV2RestoreManifestFull({ signal } = {}) {
   });
 }
 
+export async function getScoreRestoreManifestV2({ signal } = {}) {
+  if (mockBackend) {
+    if (typeof mockBackend.getScoreRestoreManifestV2 !== 'function') {
+      throw new Error('Mock backend does not implement CORE_V2 manifest');
+    }
+    return mockBackend.getScoreRestoreManifestV2({ signal });
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/sync_v2_restore_manifest_score_v2', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_owner: user.id }), signal,
+  });
+}
+
+export async function getScoreRestoreCanonicalV2() {
+  if (mockBackend) {
+    if (typeof mockBackend.getScoreRestoreCanonicalV2 !== 'function') {
+      throw new Error('Mock backend does not implement CORE_V2 canonical snapshot');
+    }
+    return mockBackend.getScoreRestoreCanonicalV2();
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/sync_v2_restore_canonical_score_v2', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_owner: user.id }),
+  });
+}
+
 /** One deterministic owner-scoped page used by Initial Restore V1. */
 export async function fetchRestoreEntityPage(entity, { offset = 0, limit = 500, signal } = {}) {
   if (mockBackend) {
@@ -771,6 +801,87 @@ export async function applySyncV2ClassGoalRewardCommand(envelope) {
   });
 }
 
+/** Score provenance and final numeric projection share one server transaction. */
+export async function applyScoreSubitemCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applyScoreSubitemCommand !== 'function') {
+      throw new Error('Mock backend does not implement score subitem command RPC');
+    }
+    return mockBackend.applyScoreSubitemCommand(envelope);
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/apply_score_subitem_command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+      p_command: envelope.command, p_item_id: envelope.itemId, p_student_id: envelope.studentId,
+      p_subitem_id: envelope.subitemId ?? null, p_checked: envelope.checked ?? null,
+      p_manual_value: envelope.manualValue ?? null }),
+  });
+}
+
+export async function applyScoreConfigurationCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applyScoreConfigurationCommand !== 'function') {
+      throw new Error('Mock backend does not implement score configuration command RPC');
+    }
+    return mockBackend.applyScoreConfigurationCommand(envelope);
+  }
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/apply_score_configuration_command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+      p_item_id: envelope.itemId, p_expected_version: envelope.expectedVersion,
+      p_payload: envelope.payload }),
+  });
+}
+
+export async function applyScoreDistributionCopyCommand(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.applyScoreDistributionCopyCommand !== 'function') {
+      throw new Error('Mock backend lacks score distribution copy RPC');
+    }
+    return mockBackend.applyScoreDistributionCopyCommand(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/apply_score_distribution_copy_command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+      p_source_item_id: envelope.sourceItemId, p_source_revision: envelope.sourceRevision,
+      p_target_teaching_id: envelope.targetTeachingId, p_new_item_id: envelope.newItemId,
+      p_subitem_ids: envelope.subitemIds, p_conflict_choice: envelope.conflictChoice }),
+  });
+}
+
+export async function getScoreFoundationCapability() {
+  if (mockBackend) {
+    if (typeof mockBackend.getScoreFoundationCapability !== 'function') return null;
+    return mockBackend.getScoreFoundationCapability();
+  }
+  if (!user) return null;
+  return request('/rpc/score_foundation_capability', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
+  });
+}
+
+/** Owner-scoped, statement-consistent score components and materialized totals. */
+export async function getScoreDomainSnapshot() {
+  if (mockBackend) {
+    if (typeof mockBackend.getScoreDomainSnapshot !== 'function') {
+      throw new Error('Mock backend lacks atomic score-domain snapshot');
+    }
+    return mockBackend.getScoreDomainSnapshot();
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/sync_v2_score_domain_snapshot', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
+  });
+}
+
 /** Stage a hash-bound restore plan. This RPC never changes domain rows. */
 export async function stageSyncV2Restore(envelope) {
   if (mockBackend) {
@@ -808,6 +919,36 @@ export async function finalizeSyncV2Restore(envelope) {
       p_backup_hash: envelope.backupHash,
       p_expected_stage_hash: envelope.expectedStageHash,
     }),
+  });
+}
+
+/** V5-only restore RPCs: the deployed V3/V4 stage/finalize contract is unchanged. */
+export async function stageScoreRestoreV2(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.stageScoreRestoreV2 !== 'function') throw new Error('Mock backend lacks V5 staging');
+    return mockBackend.stageScoreRestoreV2(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/stage_sync_v2_restore_score_v2', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,
+      p_backup_version: envelope.backupVersion, p_source_manifest: envelope.sourceManifest,
+      p_operations: envelope.operations }),
+  });
+}
+
+export async function finalizeScoreRestoreV2(envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend.finalizeScoreRestoreV2 !== 'function') throw new Error('Mock backend lacks V5 finalization');
+    return mockBackend.finalizeScoreRestoreV2(envelope);
+  }
+  if (!user) throw new Error('Not authenticated');
+  return request('/rpc/finalize_sync_v2_restore_score_v2', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,
+      p_expected_stage_hash: envelope.expectedStageHash }),
   });
 }
 

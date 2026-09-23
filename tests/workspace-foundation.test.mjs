@@ -22,7 +22,7 @@ function registry(factory = new IDBFactory()) {
   return createWorkspaceRegistry({ indexedDBFactory: factory, now: () => 1_900_000_000_000 });
 }
 
-test('legacy foundation detects the unchanged Production database without claiming or migrating it', async () => {
+test('legacy foundation detects the Product database without claiming or opening it', async () => {
   const factory = new IDBFactory();
   const workspaces = registry(factory);
   await workspaces.recordLegacyPresence();
@@ -35,7 +35,7 @@ test('legacy foundation detects the unchanged Production database without claimi
     broadcastChannelName: 'rakeezx-data',
   });
   assert.equal(DB_NAME, LEGACY_WORKSPACE_DB_NAME);
-  assert.equal(DB_VERSION, 7);
+  assert.equal(DB_VERSION, 8);
   assert.equal(STORES.length > 25, true);
   assert.equal((await detectWorkspaceDatabase(DB_NAME, { indexedDBFactory: factory })).exists, false,
     'registry operations must not open or upgrade the Product database');
