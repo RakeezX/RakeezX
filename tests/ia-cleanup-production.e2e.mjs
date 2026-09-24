@@ -5,7 +5,8 @@ const viewports = [
   { width: 350, height: 740, columns: 1 },
   { width: 390, height: 844, columns: 1 },
   { width: 430, height: 860, columns: 1 },
-  { width: 1024, height: 768, columns: 2 },
+  { width: 768, height: 768, columns: 2 },
+  { width: 1024, height: 768, columns: 3 },
   { width: 1440, height: 900, columns: 3 },
 ];
 

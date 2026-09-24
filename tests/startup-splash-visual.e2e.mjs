@@ -71,6 +71,37 @@ test('startup scale options keep one shared optical center', async ({ page }) =>
   expect((await new AxeBuilder({ page }).include('.boot').analyze()).violations).toEqual([]);
 });
 
+test('Work-approved startup background keeps message contrast accessible at target widths', async ({ page }) => {
+  const luminance = (rgb) => {
+    const channels = rgb.match(/[\d.]+/g).slice(0, 3).map((value) => {
+      const normalized = Number(value) / 255;
+      return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+    });
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  };
+  for (const theme of ['light', 'dark']) {
+    for (const width of [320, 390, 1440]) {
+      await loadStartup(page, { width, theme });
+      const colors = await page.locator('.boot__msg').evaluate((message) => {
+        const boot = message.closest('.boot');
+        const bootBackground = getComputedStyle(boot).backgroundColor;
+        return {
+          foreground: getComputedStyle(message).color,
+          background: bootBackground === 'rgba(0, 0, 0, 0)' ? getComputedStyle(document.body).backgroundColor : bootBackground,
+          bootBackground,
+        };
+      });
+      const foreground = luminance(colors.foreground);
+      const background = luminance(colors.background);
+      const contrast = (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+      expect(contrast, `${theme}/${width} startup contrast`).toBeGreaterThanOrEqual(4.5);
+      if (theme === 'light') expect(colors.background).toBe('rgb(248, 250, 252)');
+      else expect(colors.bootBackground).toBe('rgba(0, 0, 0, 0)');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    }
+  }
+});
+
 test('recommended startup is balanced across mobile sizes and settled themes', async ({ page }) => {
   await mkdir(output, { recursive: true });
   await page.emulateMedia({ reducedMotion: 'reduce' });

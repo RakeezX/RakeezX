@@ -132,7 +132,7 @@ test('desktop shell and Home preserve real routes while matching the approved hi
   const sidebar = page.locator('.sidebar');
   await expect(sidebar).toBeVisible();
   expect((await sidebar.boundingBox()).width).toBeCloseTo(248, 0);
-  await expect(sidebar.locator('.sidebar__section-label')).toHaveText(['النظام']);
+  await expect(sidebar.locator('.sidebar__section-label')).toHaveCount(0);
   await expect(sidebar.locator('.sidebar__item')).toHaveCount(6);
   await expect(sidebar.locator('.sidebar__item[aria-current="page"]')).toContainText('الرئيسية');
 

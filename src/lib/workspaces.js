@@ -77,6 +77,7 @@ function accountDescriptor(record, key) {
     syncEligible: true,
     broadcastChannelName: legacyInPlace ? LEGACY_BROADCAST_CHANNEL_NAME : accountChannelName(key),
     ...(legacyInPlace ? { workspaceKind: 'legacy-in-place', claimId: record.claimId } : {}),
+    ...(record.workspaceKind === 'account-provisioned' ? { workspaceKind: 'account-provisioned' } : {}),
   };
 }
 
@@ -209,6 +210,79 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
       databaseName: `rakeezx-user-${key}`, ownershipState: 'claimed',
       createdAt: existing?.createdAt ?? stamp, updatedAt: stamp,
     });
+  }
+
+  async function registerProvisionedAccount(authUserId, receipt, options = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    if (receipt?.ownerId !== normalized || receipt?.contractVersion !== 1 ||
+        typeof receipt?.foundationHash !== 'string' || !receipt.foundationHash) {
+      throw Object.assign(new Error('Invalid owner-bound provisioning receipt'), { code: 'INVALID_ACCOUNT_PROVISIONING_RECEIPT' });
+    }
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const databaseName = `rakeezx-user-${key}`;
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const records = await requestResult(store.getAll());
+    if (records.some((record) => record.authUserId === normalized && record.id !== id) ||
+        records.some((record) => record.databaseName === databaseName && record.authUserId !== normalized)) {
+      tx.abort(); await committed.catch(() => {});
+      throw Object.assign(new Error('Conflicting account workspace registration'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+    }
+    const existing = records.find((record) => record.id === id);
+    if (existing && (existing.type !== 'account' || existing.authUserId !== normalized ||
+        existing.databaseName !== databaseName || existing.workspaceKind !== 'account-provisioned' ||
+        !['provisioning', 'claimed'].includes(existing.ownershipState) ||
+        (existing.ownershipState === 'claimed' &&
+          (existing.provisioningReceipt?.ownerId !== normalized ||
+           existing.provisioningReceipt?.foundationHash !== receipt.foundationHash ||
+           existing.provisioningReceipt?.contractVersion !== 1)))) {
+      tx.abort(); await committed.catch(() => {});
+      throw Object.assign(new Error('Existing account workspace does not match provisioning evidence'), {
+        code: 'WORKSPACE_REGISTRY_MISMATCH',
+      });
+    }
+    const stamp = now();
+    const record = { id, type: 'account', authUserId: normalized, databaseName,
+      ownershipState: 'claimed', workspaceKind: 'account-provisioned',
+      provisioningReceipt: { ownerId: normalized, contractVersion: 1, foundationHash: receipt.foundationHash },
+      createdAt: existing?.createdAt ?? stamp, updatedAt: stamp };
+    store.put(record);
+    await committed;
+    return record;
+  }
+
+  async function beginAccountProvisioning(authUserId, options = {}) {
+    const normalized = normalizeAuthUserId(authUserId);
+    const key = await accountWorkspaceKey(normalized, options);
+    const id = accountRecordId(key);
+    const databaseName = `rakeezx-user-${key}`;
+    const db = await database();
+    const tx = db.transaction(WORKSPACE_REGISTRY_STORE, 'readwrite');
+    const committed = transactionDone(tx);
+    const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
+    const records = await requestResult(store.getAll());
+    if (records.some((record) => record.authUserId === normalized && record.id !== id)) {
+      tx.abort(); await committed.catch(() => {});
+      throw Object.assign(new Error('Ambiguous account workspace'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+    }
+    const existing = records.find((record) => record.id === id);
+    if (existing && (existing.type !== 'account' || existing.authUserId !== normalized ||
+        existing.databaseName !== databaseName || existing.ownershipState !== 'provisioning' ||
+        existing.workspaceKind !== 'account-provisioned')) {
+      tx.abort(); await committed.catch(() => {});
+      throw Object.assign(new Error('Account workspace is not a pending provision'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+    }
+    if (!existing) {
+      const stamp = now();
+      store.put({ id, type: 'account', authUserId: normalized, databaseName,
+        ownershipState: 'provisioning', workspaceKind: 'account-provisioned',
+        createdAt: stamp, updatedAt: stamp });
+    }
+    await committed;
+    return existing ?? read(id);
   }
 
   async function beginAccountRestore(authUserId, checkpoint, options = {}) {
@@ -398,7 +472,8 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
 
   return Object.freeze({
     read, list, findByAuthUserId, recordLegacyPresence,
-    registerAccount, beginAccountRestore, updateAccountRestore, finalizeAccountRestore,
+    registerAccount, beginAccountProvisioning, registerProvisionedAccount,
+    beginAccountRestore, updateAccountRestore, finalizeAccountRestore,
     registerLegacyClaim, registerDemo, unregisterDemo, close,
   });
 }

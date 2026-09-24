@@ -218,7 +218,7 @@ test('explicit logout hides claimed data and same-account login restores the sam
   await page.goto('/#/');
   await expectReadyForA(page);
 
-  await page.locator('.teacher-mini-hub-trigger, .topbar__teacher-btn').filter({ visible: true }).click();
+  await page.locator('.teacher-mini-hub-trigger').click();
   await page.waitForFunction(() => window.__syncModule?.displayState().detailStatus !== 'syncing');
   unexpectedSyncWarnings.length = 0;
   await page.locator('[data-act="mini-hub-logout"]').click();

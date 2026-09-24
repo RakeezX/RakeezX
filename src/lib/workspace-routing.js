@@ -107,6 +107,31 @@ export async function readInitialRestoreMetadata(databaseName, {
   }
 }
 
+/** Only a prior server-verified first-account receipt can unlock this local database. */
+export async function readAccountProvisioningMetadata(databaseName, {
+  indexedDBFactory = globalThis.indexedDB, databasePresence = null,
+} = {}) {
+  if (databasePresence?.status !== 'known' || databasePresence.exists !== true || !indexedDBFactory?.open) {
+    return Object.freeze({ status: 'unavailable', receipt: null });
+  }
+  const database = await new Promise((resolve, reject) => {
+    const request = indexedDBFactory.open(databaseName);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(Object.assign(new Error('Provisioned database metadata read is blocked'), { code: WORKSPACE_NOT_READY }));
+    request.onupgradeneeded = () => {
+      request.transaction?.abort();
+      reject(Object.assign(new Error('Provisioned database appeared after presence check'), { code: WORKSPACE_NOT_READY }));
+    };
+  });
+  try {
+    if (!database.objectStoreNames.contains('device')) return Object.freeze({ status: 'read', receipt: null });
+    const device = await requestResult(database.transaction('device', 'readonly').objectStore('device').get('device'));
+    return Object.freeze({ status: 'read', receipt: device?.accountProvisioningReceipt
+      ? structuredClone(device.accountProvisioningReceipt) : null });
+  } finally { database.close(); }
+}
+
 function markerMatchesWorkspace(marker, workspace) {
   if (!marker || marker.version !== CLAIM_VERSION || marker.state !== 'claimed') return false;
   let ownerId;
@@ -134,6 +159,7 @@ export async function resolveWorkspaceForBoot({
   detectDatabase = detectWorkspaceDatabase,
   readClaimMetadata = readWorkspaceClaimMetadata,
   readRestoreMetadata = readInitialRestoreMetadata,
+  readProvisioningMetadata = readAccountProvisioningMetadata,
   allowDevelopmentLegacyBootstrap = false,
 } = {}) {
   let records;
@@ -157,6 +183,9 @@ export async function resolveWorkspaceForBoot({
   }
 
   if (authenticatedUserId) {
+    const provisioningForOwner = (records ?? []).filter((record) => record?.type === 'account' &&
+      record.authUserId === authenticatedUserId && record.ownershipState === 'provisioning');
+    if (provisioningForOwner.length) return notReady('account-provisioning-pending', { authState: 'authenticated' });
     const pendingForOwner = (records ?? []).filter((record) => record?.type === 'account' &&
       record.authUserId === authenticatedUserId && record.ownershipState === 'restoring');
     if (pendingForOwner.length > 1) return notReady('ambiguous-account-workspace', { authState: 'authenticated' });
@@ -178,6 +207,23 @@ export async function resolveWorkspaceForBoot({
         catch (error) { return notReady('workspace-metadata-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
         if (presence?.status !== 'known' || presence.exists !== true) {
           return notReady('claimed-workspace-database-missing', { authState: 'authenticated' });
+        }
+        if (workspace.workspaceKind === 'account-provisioned') {
+          let metadata;
+          try { metadata = await readProvisioningMetadata(workspace.databaseName, {
+            indexedDBFactory, databasePresence: presence,
+          }); } catch (error) { return notReady('provisioning-receipt-unavailable', {
+            authState: 'authenticated', cause: error?.code ?? error?.name ?? null,
+          }); }
+          const receipt = metadata?.receipt;
+          const registryReceipt = records.find((record) => record.id === workspace.id)?.provisioningReceipt;
+          if (metadata?.status !== 'read' || receipt?.ownerId !== authenticatedUserId ||
+              receipt?.contractVersion !== 1 || !receipt?.foundationHash ||
+              registryReceipt?.ownerId !== authenticatedUserId || registryReceipt?.contractVersion !== 1 ||
+              registryReceipt?.foundationHash !== receipt.foundationHash) {
+            return notReady('account-provisioning-receipt-mismatch', { authState: 'authenticated' });
+          }
+          return ready(workspace, 'provisioned-account');
         }
         let metadata;
         try { metadata = await readRestoreMetadata(workspace.databaseName, { indexedDBFactory, databasePresence: presence }); }

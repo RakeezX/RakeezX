@@ -407,6 +407,53 @@ export async function readInitialRestoreReceipt() {
   return device?.initialRestoreReceipt ?? null;
 }
 
+/** Atomically install a server-verified fresh-account foundation, never replacing existing Product rows. */
+export async function importAccountProvisioningSnapshot(snapshot, device) {
+  const stores = Object.keys(snapshot ?? {});
+  const receipt = device?.accountProvisioningReceipt;
+  if (!receipt?.ownerId || receipt.contractVersion !== 1 || !receipt.foundationHash ||
+      !stores.includes('profile') || stores.some((name) => !STORES.includes(name) || !Array.isArray(snapshot[name]))) {
+    throw Object.assign(new Error('Invalid account provisioning snapshot'), { code: 'ACCOUNT_PROVISIONING_SNAPSHOT_INVALID' });
+  }
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction(STORES, 'readwrite');
+    let failure = null;
+    const abort = (code) => {
+      failure = Object.assign(new Error(code), { code });
+      tx.abort();
+    };
+    const request = tx.objectStore('device').get('device');
+    request.onsuccess = () => {
+      const existing = request.result;
+      if (existing?.accountProvisioningReceipt) {
+        const previous = existing.accountProvisioningReceipt;
+        if (previous.ownerId !== receipt.ownerId || previous.contractVersion !== receipt.contractVersion ||
+            previous.foundationHash !== receipt.foundationHash) abort('ACCOUNT_PROVISIONING_RECEIPT_MISMATCH');
+        return;
+      }
+      if (existing) { abort('ACCOUNT_PROVISIONING_DATABASE_CONFLICT'); return; }
+      let remaining = STORES.length - 1;
+      for (const name of STORES) {
+        if (name === 'device') continue;
+        const count = tx.objectStore(name).count();
+        count.onsuccess = () => {
+          if (count.result !== 0) { abort('ACCOUNT_PROVISIONING_DATABASE_CONFLICT'); return; }
+          remaining -= 1;
+          if (remaining !== 0) return;
+          try {
+            for (const store of stores) for (const record of snapshot[store]) tx.objectStore(store).put(record);
+            tx.objectStore('device').put(device);
+          } catch (error) { failure = error; tx.abort(); }
+        };
+      }
+    };
+    tx.oncomplete = () => resolve(receipt);
+    tx.onerror = (event) => { failure ??= event.target.error; };
+    tx.onabort = () => reject(failure ?? tx.error ?? new Error('Account provisioning import aborted'));
+  });
+}
+
 /**
  * يُغلق اتصال قاعدة البيانات تمامًا.
  * يُستدعى من بيئة الاختبار فقط بعد انتهاء جميع الاختبارات لمنع تسرّب الموارد

@@ -91,6 +91,12 @@ export function normalizeAccountContract(raw, authUser = cloud.user) {
     ownerId: authUser.id,
     email: String(authUser.email ?? ''),
     profileStatus: raw.profileStatus === PROFILE_STATUS.READY ? PROFILE_STATUS.READY : PROFILE_STATUS.PENDING,
+    provisioning: raw.provisioning && ['PROFILE_REQUIRED', 'PROVISIONING_REQUIRED', 'PROVISIONING', 'READY']
+      .includes(raw.provisioning.state) ? Object.freeze({
+        state: raw.provisioning.state,
+        version: Number(raw.provisioning.version ?? 0),
+        foundationHash: raw.provisioning.foundationHash ?? null,
+      }) : null,
     profile: Object.freeze({
       teacherName: String(raw.profile?.teacherName ?? ''),
       phone: String(raw.profile?.phone ?? ''),

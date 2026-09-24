@@ -75,7 +75,7 @@ test('Home attendance completes the exact Focus session and advances to a distin
   await attendanceAction.click();
   await expect(page).toHaveURL(new RegExp(`session=${fixture.currentSessionId}$`));
   await page.getByRole('button', { name: /علّم الباقي \(1\) حاضرين/ }).click();
-  await expect(page.getByText('مكتمل', { exact: true })).toBeVisible();
+  await expect(page.getByRole('status', { name: 'حالة الرصد: مكتمل' })).toBeVisible();
 
   await page.locator('a[href="#/"]:visible').first().click();
   await expect(page).toHaveURL(/\/#\/$/);

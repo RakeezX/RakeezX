@@ -305,7 +305,10 @@ test('C2A print verification artifacts use portrait and landscape A4 layouts', a
   const outputDir = path.resolve('test-results/c2a-print');
   await mkdir(outputDir, { recursive: true });
 
+  await page.goto('/#/reports');
+  await expect(page.locator('.report-hub')).toHaveCount(2);
   await page.goto('/#/teaching/c2a-teaching/reports');
+  await expect(page.locator('.report-workspace')).toBeVisible();
   await page.getByRole('button', { name: 'من يحتاج دعمًا' }).click();
   await page.emulateMedia({ media: 'print' });
   const portrait = await page.pdf({

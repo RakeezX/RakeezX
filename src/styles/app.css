@@ -309,6 +309,10 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   place-items: center;
   padding: max(var(--sp-5), env(safe-area-inset-top)) var(--sp-6) max(var(--sp-5), env(safe-area-inset-bottom));
 }
+:root[data-theme="light"] .boot { background: #f8fafc; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .boot { background: #f8fafc; }
+}
 .boot__composition {
   --boot-identity-scale: 1.12;
   --boot-lockup-width: calc(216px * var(--boot-identity-scale));

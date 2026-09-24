@@ -19,7 +19,10 @@ test('class goal and charter flow persists its timer/selection and previews an e
   await page.clock.install({ time: new Date('2026-09-09T07:00:00+03:00') });
   const teachingId = await seedClass(page);
 
-  await page.goto(`/#/teaching/${encodeURIComponent(teachingId)}`);
+  await page.goto('/#/classes');
+  await expect(page.locator('.class-card')).toHaveCount(1);
+  await page.locator('.class-card__main').click();
+  await expect(page).toHaveURL((url) => decodeURIComponent(url.hash) === `#/teaching/${teachingId}`);
   await expect(page.locator('.class-context-nav__item span')).toHaveText(['الفصل', 'الطلاب', 'الحضور', 'كشف الدرجات']);
   await expect(page.locator('.quick-tools-grid .tile__title')).toHaveText([
     'هدف وميثاق الصف', 'الرصد السريع', 'القرعة', 'المجموعات',
@@ -34,7 +37,14 @@ test('class goal and charter flow persists its timer/selection and previews an e
   const toolCards = page.locator('.quick-tools-grid .class-tool-card');
   await expect(toolCards).toHaveCount(8);
   await expect(toolCards.first()).toHaveCSS('min-height', '134px');
-  expect(await toolCards.evaluateAll((cards) => new Set(cards.map((card) => Math.round(card.getBoundingClientRect().top))).size)).toBe(1);
+  expect(await toolCards.evaluateAll((cards) => {
+    const rows = new Map();
+    for (const card of cards) {
+      const top = Math.round(card.getBoundingClientRect().top);
+      rows.set(top, (rows.get(top) ?? 0) + 1);
+    }
+    return [...rows.values()];
+  })).toEqual([4, 4]);
   await page.getByRole('link', { name: /هدف وميثاق الصف/ }).click();
 
   await expect(page.getByRole('heading', { name: 'الهدف الرئيسي', exact: true })).toBeVisible();

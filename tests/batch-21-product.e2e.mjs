@@ -89,7 +89,7 @@ for(const width of [1440,390,320]) {
     await page.setViewportSize({width,height:900});
     await seed(page);
     const before=await page.evaluate(()=>window.store.state.students.filter(s=>s.id.startsWith('b21-')).map(s=>({id:s.id,name:s.name})));
-    for(const [route,nameSelector] of [['students','.row__title'],['attendance','.att-row__name'],['quicklog','.qlcard__name']]) {
+    for(const [route,nameSelector] of [['students','.row__title'],['attendance','.att-row__name > strong'],['quicklog','.qlcard__name']]) {
       await page.goto(`/#/teaching/b21-teaching/${route}`);
       await expect(page).toHaveURL(new RegExp(`/#/teaching/b21-teaching/${route}$`));
       await expect(page.locator(nameSelector)).toHaveCount(4);

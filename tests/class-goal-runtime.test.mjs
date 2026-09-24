@@ -137,13 +137,13 @@ test('archive cancels active goal locally without reward and closed terms reject
   await assert.rejects(store.startClassGoal({ teachingId: closed.teaching.id, text: 'مغلق', durationMinutes: 5, rewardPoints: 1, date: closed.session.date }), /مغلق/);
 });
 
-test('Backup V4 includes Goal and charter selection records without device/outbox data', async () => {
+test('Backup V5 includes Goal and charter selection records without device/outbox data', async () => {
   const f = await fixture();
   const rule = await store.addClassRule({ teachingId: f.teaching.id, iconKey: 'check', text: 'نستمع' });
   await store.setClassCharterSelection(f.teaching.id, [rule.id]);
   await store.startClassGoal({ teachingId: f.teaching.id, text: 'نتعاون', durationMinutes: 10, rewardPoints: 2, date: f.session.date });
   const backup = await buildBackup({ sourceOwnerId: 'owner:test', backupId: 'goal-backup' });
-  assert.equal(backup.version, 4);
+  assert.equal(backup.version, 5);
   assert.equal(backup.data.classGoals.length, 1);
   assert.equal(backup.data.classCharterSelections.length, 1);
   assert.equal('outbox' in backup.data, false);

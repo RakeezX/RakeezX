@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const ARABIC_WEEKDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+const TEACHING_DAY = new Date('2026-09-09T08:20:00+03:00');
 
 async function seedWeeklySchedule(page, { includeToday = true } = {}) {
   await page.evaluate(async ({ includeToday: withToday }) => {
@@ -32,17 +33,14 @@ async function seedWeeklySchedule(page, { includeToday = true } = {}) {
 }
 
 test('mobile Schedule opens Today, highlights the current slot, and keeps every day reachable', async ({ page }, testInfo) => {
-  test.skip([5, 6].includes(new Date().getDay()), 'Current-slot view requires a school day.');
-  const fixedNow = new Date();
-  fixedNow.setHours(8, 20, 0, 0);
-  await page.clock.setFixedTime(fixedNow);
+  await page.clock.setFixedTime(TEACHING_DAY);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/schedule');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await seedWeeklySchedule(page);
   await page.reload();
 
-  await expect(page.locator('.schedule-day-tab.is-active')).toHaveText(new RegExp(ARABIC_WEEKDAYS[new Date().getDay()]));
+  await expect(page.locator('.schedule-day-tab.is-active')).toHaveText(new RegExp(ARABIC_WEEKDAYS[TEACHING_DAY.getDay()]));
   await expect(page.locator('.week__day:visible')).toHaveCount(1);
   await expect(page.locator('.slot.is-current-slot')).toHaveCount(1);
   await expect(page.locator('.slot.is-current-slot')).toContainText('جارية الآن');
@@ -65,17 +63,18 @@ test('mobile Schedule opens Today, highlights the current slot, and keeps every 
 });
 
 test('mobile Schedule uses the locked empty-Today wording on a teaching day', async ({ page }) => {
-  test.skip([5, 6].includes(new Date().getDay()), 'Today is not a school day.');
+  await page.clock.setFixedTime(TEACHING_DAY);
   await page.setViewportSize({ width: 360, height: 844 });
   await page.goto('/#/schedule');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await seedWeeklySchedule(page, { includeToday: false });
   await page.reload();
-  await expect(page.locator('.schedule-day-tab.is-active')).toHaveText(new RegExp(ARABIC_WEEKDAYS[new Date().getDay()]));
+  await expect(page.locator('.schedule-day-tab.is-active')).toHaveText(new RegExp(ARABIC_WEEKDAYS[TEACHING_DAY.getDay()]));
   await expect(page.locator('.week__empty')).toHaveText('لا توجد لديك حصص مجدولة اليوم.');
 });
 
 test('mobile Schedule defaults to All on a non-teaching calendar day', async ({ page }) => {
+  await page.clock.setFixedTime(TEACHING_DAY);
   await page.setViewportSize({ width: 360, height: 844 });
   await page.goto('/#/schedule');
   await page.waitForFunction(() => window.store?.state?.ready === true);

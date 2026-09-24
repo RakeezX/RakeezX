@@ -62,17 +62,21 @@ async function installHealthyCloud(page, { finalizeDelay = 0, serverStudents = [
     cloud.setMockAuth({ id: ownerId, email: 'teacher@example.test' }, {
       access_token: 'test-token', user: { id: ownerId, email: 'teacher@example.test' },
     });
+    const stageRestore = async (envelope) => {
+      window.__cloudRecoveryCalls.stage += 1;
+      return { backupHash: envelope.backupHash, stageHash: 'cloud-ui-stage-hash' };
+    };
+    const finalizeRestore = async (envelope) => {
+      window.__cloudRecoveryCalls.finalize += 1;
+      if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+      return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: finalCanonical };
+    };
     cloud.setMockBackend({
       async fetchRecords(tableName) { return canonical[tableName] ?? []; },
-      async stageSyncV2Restore(envelope) {
-        window.__cloudRecoveryCalls.stage += 1;
-        return { backupHash: envelope.backupHash, stageHash: 'cloud-ui-stage-hash' };
-      },
-      async finalizeSyncV2Restore(envelope) {
-        window.__cloudRecoveryCalls.finalize += 1;
-        if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
-        return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: finalCanonical };
-      },
+      stageSyncV2Restore: stageRestore,
+      finalizeSyncV2Restore: finalizeRestore,
+      stageScoreRestoreV2: stageRestore,
+      finalizeScoreRestoreV2: finalizeRestore,
     });
     await db.clearStore('outbox');
   }, { ownerId: OWNER, delay: finalizeDelay, initialStudents: serverStudents, reconciledStudents: finalStudents });
@@ -158,20 +162,42 @@ test('ready Cloud Recovery previews six states, confirms counts, and reconciles 
   expect(errors).toEqual([]);
 });
 
-test('blocked review cannot restore and finalized checkpoint resumes local reconciliation', async ({ page }) => {
+test('blocked review cannot restore and finalized checkpoint resumes local reconciliation', async ({ page, browser }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await openBackup(page);
   await installHealthyCloud(page);
   const differentOwner = '22222222-2222-4222-8222-222222222222';
-  const mismatched = await createBackup(page, differentOwner);
+  await page.evaluate(async () => (await import('/src/lib/db.js')).put('students', {
+    id: 'cloud-ui:b-preserve', name: 'synthetic B', status: 'active', deleted: false, updatedAt: 1,
+  }));
+  const before = await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    return { students: await db.getAll('students'), outbox: await db.getAll('outbox') };
+  });
+  const sourceContext = await browser.newContext();
+  const sourcePage = await sourceContext.newPage();
+  await openBackup(sourcePage);
+  const mismatched = await createBackup(sourcePage, differentOwner);
+  await sourceContext.close();
+  expect(mismatched.version).toBe(5);
+  expect(mismatched.sourceOwnerId).toBe(differentOwner);
   await setCloudFile(page, mismatched, 'different-account.json');
+  await expect(page.locator('.cloud-validation')).toContainText('تم التحقق من سلامة النسخة');
   await page.getByRole('button', { name: 'متابعة إلى المعاينة السحابية' }).click();
   await expect(page.locator('.cloud-plan-summary')).toContainText('محظورة وتحتاج مراجعة');
-  await expect(page.locator('.cloud-plan-details')).toContainText('النسخة تخص حسابًا مختلفًا');
+  await expect(page.locator('.cloud-plan-details')).toContainText('لا يمكن تطبيق هذا السجل تلقائيًا بأمان');
   await expect(page.getByRole('button', { name: 'المتابعة إلى التأكيد' })).toBeDisabled();
   await expect(page.locator('.cloud-recovery-blocked-copy')).toContainText('يمنع الاستعادة كاملة');
+  expect(await page.evaluate(() => window.__cloudRecoveryCalls)).toEqual({ stage: 0, finalize: 0 });
+  expect(await page.evaluate(() => import('/src/lib/cloud.js').then((cloud) => cloud.user.id))).toBe(OWNER);
+  expect(await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    return { students: await db.getAll('students'), outbox: await db.getAll('outbox') };
+  })).toEqual(before);
+  expect(await page.evaluate((ownerId) => import('/src/lib/db.js').then((db) =>
+    db.get('students', `cloud-ui:${ownerId}`)), differentOwner)).toBeUndefined();
 
   await resetCloudFile(page);
   await page.evaluate(async () => {

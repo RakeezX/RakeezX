@@ -411,6 +411,28 @@ export async function completeAccountProfile(profile) {
   });
 }
 
+export async function beginAccountProvisioning() {
+  if (mockBackend) return mockBackend.beginAccountProvisioning();
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/begin_account_provisioning', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: '{}',
+  });
+}
+
+export async function provisionAccountWorkspace(defaults) {
+  if (mockBackend) return mockBackend.provisionAccountWorkspace(defaults);
+  if (!user) throw authError('Authentication required');
+  return request('/rpc/provision_account_workspace', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_defaults: defaults }),
+  });
+}
+
 /** End account profile/access foundation RPCs. */
 
 export async function upsertRecords(tableName, records) {

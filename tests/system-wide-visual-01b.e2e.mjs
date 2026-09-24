@@ -38,6 +38,7 @@ test.beforeEach(async () => mkdir(output, { recursive: true }));
 
 test('Classes and Class Hub match the approved Work hierarchy with Production routes', async ({ page }) => {
   const errors = watchErrors(page);
+  await page.clock.setFixedTime(new Date('2026-09-09T08:20:00+03:00'));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await enterDemo(page);
   await page.goto('/#/classes');
@@ -66,6 +67,11 @@ test('Classes and Class Hub match the approved Work hierarchy with Production ro
 
   await page.locator('.class-card__main').first().click();
   await expect(page.locator('.class-hub')).toBeVisible();
+  await page.evaluate(async () => {
+    const teachingId = location.hash.match(/^#\/teaching\/([^/]+)/)?.[1];
+    await window.store.ensureSession(teachingId, '2026-09-09', 2);
+    window.store.repaint();
+  });
   await expect(page.locator('.class-context-nav__item')).toHaveCount(4);
   await expect(page.locator('.class-tool-card')).toHaveCount(8);
   await expect(page.getByText('بانتظار الرصد', { exact: true })).toHaveCount(1);

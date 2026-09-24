@@ -133,8 +133,9 @@ test('Classes, roster, and Student Profile share the C1 hierarchy at every appro
     await window.store.patch('items', participation.id, { max: 13 }, null, { queue: false });
   }, fixture.teachingId);
   await page.goto(`/#/teaching/${fixture.teachingId}/items`);
-  const participationRow = page.locator('.grade-item-row', { hasText: 'المشاركة والتفاعل' });
-  await expect(participationRow).toContainText('13 درجات · رصد آلي من الرصد السريع (1 لكل نقطة)');
+  const participationRow = page.locator('.distribution-item', { hasText: 'المشاركة والتفاعل' });
+  await expect(participationRow.locator('.distribution-name')).toContainText('13 درجات');
+  await expect(participationRow.locator('.mode-badge--auto')).toHaveText('رصد آلي');
 
   await page.setViewportSize({ width: 1280, height: 900 });
   for (const route of routes) {

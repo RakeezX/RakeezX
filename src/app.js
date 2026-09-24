@@ -18,7 +18,8 @@ import {
   markDemoReady, requestDemo, seedDemoWorkspace,
 } from './lib/demo-workspace.js';
 import { runInitialRestore } from './lib/initial-restore.js';
-import { getAccountPresentation } from './lib/account-profile.js';
+import { runAccountProvisioning } from './lib/account-provisioning.js';
+import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
 import {
   EMAIL_OTP_LENGTH,
   EMAIL_OTP_RESEND_COOLDOWN_SECONDS,
@@ -581,7 +582,7 @@ async function boot() {
     }
     if (import.meta.env?.DEV) window.__workspaceRouting = workspaceRouting;
     if (workspaceRouting.status !== 'ready' && cloud.session && cloud.user &&
-        ['initial-restore-required', 'initial-restore-pending'].includes(workspaceRouting.reason)) {
+        ['initial-restore-required', 'initial-restore-pending', 'account-provisioning-pending'].includes(workspaceRouting.reason)) {
       await mountAndRunInitialRestore();
       registerServiceWorker();
       return;
@@ -683,13 +684,15 @@ const INITIAL_RESTORE_COPY = Object.freeze({
   RESTORE_REQUIRES_ONLINE: ['تحتاج إلى اتصال بالإنترنت لاستعادة بيانات الحساب', 'اتصل بالإنترنت ثم أعد المحاولة.'],
   RESTORE_FAILED: ['تعذر استعادة بيانات الحساب', 'لم تُفتح مساحة عمل جزئية. يمكنك إعادة المحاولة بأمان.'],
   PROVISIONING_REQUIRED: ['لا توجد مساحة عمل قابلة للاستعادة', 'هذا الحساب لا يملك بعد مساحة عمل سحابية موجودة. لن ينشئ التطبيق سجلًا فارغًا تلقائيًا.'],
+  PROVISIONING: ['جارٍ تجهيز مساحة حسابك', 'جارٍ تجهيز مساحة العمل...'],
+  PROVISIONING_FAILED: ['تعذر تجهيز مساحة حسابك', 'لم تُفتح مساحة عمل جزئية. يمكنك إعادة المحاولة بأمان.'],
 });
 
 function renderInitialRestoreState(state, { error = null } = {}) {
   const [title, description] = INITIAL_RESTORE_COPY[state] ?? INITIAL_RESTORE_COPY.RESTORE_FAILED;
-  const actionable = ['RESTORE_REQUIRES_ONLINE', 'RESTORE_FAILED'].includes(state);
-  const pending = ['RESTORE_PREFLIGHT', 'RESTORING', 'RESTORE_FINALIZING'].includes(state);
-  const failed = state === 'RESTORE_FAILED';
+  const actionable = ['RESTORE_REQUIRES_ONLINE', 'RESTORE_FAILED', 'PROVISIONING_FAILED'].includes(state);
+  const pending = ['RESTORE_PREFLIGHT', 'RESTORING', 'RESTORE_FINALIZING', 'PROVISIONING'].includes(state);
+  const failed = ['RESTORE_FAILED', 'PROVISIONING_FAILED'].includes(state);
   const current = app.querySelector('[data-initial-restore-state][data-restore-pending="true"]');
   if (pending && current) {
     current.dataset.initialRestoreState = state;
@@ -730,12 +733,97 @@ function renderInitialRestoreState(state, { error = null } = {}) {
   });
 }
 
+function renderFirstAccountProfile(contract) {
+  const current = contract.profile ?? {};
+  render(app, html`
+    <div class="page first-run-page" data-account-profile-required>
+      <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
+      <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
+      <form class="first-run-card first-run-status" data-account-profile-form>
+        <div class="first-run-status__brand">${brandLockup({ compact: true })}</div>
+        <div class="first-run-status__copy">
+          <div class="first-run-eyebrow">مساحة حسابك</div>
+          <h1>أكمل بيانات حسابك</h1>
+        </div>
+        <label class="field"><span class="field__label">اسم المعلم أو المعلمة</span>
+          <input name="teacherName" required autocomplete="name" value="${current.teacherName}" /></label>
+        <label class="field"><span class="field__label">رقم الجوال</span>
+          <input name="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
+                 maxlength="10" required pattern="05[0-9]{8}" value="${current.phone}" />
+          <span class="field__hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span></label>
+        <div class="field"><span class="field__label">صفة المستخدم</span>
+          <div class="segmented settings-teacher-form" role="group" aria-label="صفة المستخدم">
+            <button class="segmented__btn" type="button" data-profile-form="masculine" aria-pressed="true">معلم</button>
+            <button class="segmented__btn" type="button" data-profile-form="feminine" aria-pressed="false">معلمة</button>
+          </div></div>
+        <label class="field"><span class="field__label">اسم المدرسة (اختياري)</span>
+          <input name="schoolName" value="${current.schoolName}" /></label>
+        <div class="field__error" role="alert" data-profile-error hidden></div>
+        <div class="first-run-status__actions">
+          <button class="btn btn--primary" type="submit">متابعة</button>
+          <button class="btn btn--ghost" type="button" data-profile-logout>تسجيل الخروج</button>
+        </div>
+      </form>
+    </div>`);
+  const form = app.querySelector('[data-account-profile-form]');
+  let teacherForm = current.teacherForm === 'feminine' ? 'feminine' : 'masculine';
+  form.querySelectorAll('[data-profile-form]').forEach((button) => button.addEventListener('click', () => {
+    teacherForm = button.dataset.profileForm;
+    form.querySelectorAll('[data-profile-form]').forEach((choice) => {
+      choice.setAttribute('aria-pressed', String(choice.dataset.profileForm === teacherForm));
+    });
+  }));
+  form.elements.phone.addEventListener('input', (event) => {
+    event.target.value = normalizeSaudiMobile(event.target.value);
+  });
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('[type="submit"]');
+    const error = form.querySelector('[data-profile-error]');
+    button.disabled = true;
+    error.hidden = true;
+    try {
+      await completeProfile({ teacherName: form.elements.teacherName.value,
+        phone: form.elements.phone.value, teacherForm, schoolName: form.elements.schoolName.value });
+      renderInitialRestoreState('PROVISIONING');
+      const registry = createWorkspaceRegistry();
+      try {
+        const result = await runAccountProvisioning({ expectedOwnerId: cloud.user.id, registry });
+        if (result.status !== 'ready') throw new Error('Account provisioning did not reach READY');
+      } finally { await registry.close(); }
+      location.reload();
+    } catch (failure) {
+      if (app.contains(form)) {
+        error.textContent = 'تعذر حفظ البيانات الآن. تحقق من الاتصال وأعد المحاولة.';
+        error.hidden = false;
+        button.disabled = false;
+      } else renderInitialRestoreState('PROVISIONING_FAILED', { error: failure });
+    }
+  });
+  form.querySelector('[data-profile-logout]').addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+    await cloud.signOut();
+    location.reload();
+  });
+}
+
 async function mountAndRunInitialRestore() {
   const registry = createWorkspaceRegistry();
   initialRestoreAbortController = new AbortController();
   try {
     renderInitialRestoreState(navigator.onLine === false ? 'RESTORE_REQUIRES_ONLINE' : 'RESTORE_PREFLIGHT');
     if (navigator.onLine === false) return;
+    const provisioning = await runAccountProvisioning({ expectedOwnerId: cloud.user.id, registry,
+      onState: (state) => { if (state === 'PROVISIONING') renderInitialRestoreState('PROVISIONING'); },
+    });
+    if (provisioning.status === 'profile_required') {
+      renderFirstAccountProfile(provisioning.contract);
+      return;
+    }
+    if (provisioning.status === 'ready') {
+      location.reload();
+      return;
+    }
     const result = await runInitialRestore({
       expectedOwnerId: cloud.user.id,
       registry,

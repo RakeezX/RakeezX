@@ -57,7 +57,7 @@ test('manual scoring persists and reports correctly without duplicate records', 
   await addItem('TEST Project', 10);
   await addItem('TEST Behavior', 10);
   await addItem('TEST Test', 20);
-  expect(await page.locator('.row').filter({ hasText: 'TEST Participation' }).count()).toBe(1);
+  await expect(page.locator('.distribution-item').filter({ hasText: 'TEST Participation' })).toHaveCount(1);
 
   const itemIds = await page.evaluate(() => Object.fromEntries(
     window.store.state.items

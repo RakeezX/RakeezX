@@ -1,0 +1,130 @@
+import * as cloudDefault from './cloud.js';
+import * as databaseDefault from './db.js';
+import { decodeSyncV2Canonical } from './sync-v2.js';
+import { normalizeAccountContract } from './account-profile.js';
+import { accountWorkspaceDatabaseName, createWorkspaceRegistry, normalizeAuthUserId } from './workspaces.js';
+import { calendarPresetRecords, getCalendarPreset } from './calendar-presets.js';
+import { DEFAULT_TIME_PROFILES, makeDevice, makeSubject, makeTimeProfile } from '../models.js';
+
+export const ACCOUNT_PROVISIONING_VERSION = 1;
+export const FOUNDATION_STORES = Object.freeze([
+  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'timeProfiles',
+]);
+const SERVER_ENTITY = Object.freeze({ profile: 'profile', years: 'years', calendars: 'calendars',
+  calendarDays: 'calendar_days', terms: 'terms', subjects: 'subjects', timeProfiles: 'time_profiles' });
+
+function fail(code, message) { return Object.assign(new Error(message), { code }); }
+
+export function buildAccountFoundationDefaults() {
+  const preset = calendarPresetRecords(getCalendarPreset());
+  return Object.freeze({
+    years: [preset.year], calendars: [preset.calendar], terms: preset.terms,
+    calendarDays: preset.calendarDays,
+    subjects: [makeSubject({ name: 'المهارات الرقمية' })],
+    timeProfiles: DEFAULT_TIME_PROFILES.map((profile, order) => makeTimeProfile({ ...profile, order })),
+  });
+}
+
+export function decodeAccountFoundationSnapshot(raw, ownerId) {
+  if (!raw || typeof raw !== 'object' || Object.keys(raw).sort().join('|') !==
+      Object.values(SERVER_ENTITY).sort().join('|')) {
+    throw fail('ACCOUNT_PROVISIONING_SNAPSHOT_INVALID', 'Foundation stores do not match the server contract');
+  }
+  const expected = { profile: 1, years: 1, calendars: 1, terms: 2, subjects: 1, timeProfiles: 4 };
+  const result = {};
+  for (const store of FOUNDATION_STORES) {
+    const rows = raw[SERVER_ENTITY[store]];
+    if (!Array.isArray(rows) || (expected[store] != null && rows.length !== expected[store]) ||
+        (store === 'calendarDays' && rows.length < 1)) {
+      throw fail('ACCOUNT_PROVISIONING_SNAPSHOT_INVALID', 'Foundation row count is invalid');
+    }
+    if (rows.some((row) => row?.owner_id !== ownerId || row?.deleted_at != null)) {
+      throw fail('ACCOUNT_PROVISIONING_OWNER_MISMATCH', 'Foundation row belongs to another owner');
+    }
+    result[store] = rows.map((row) => decodeSyncV2Canonical(store, row));
+  }
+  return result;
+}
+
+/** Server checkpoint comes first; local import is atomic and never replaces an existing workspace. */
+export async function runAccountProvisioning({ expectedOwnerId, api = cloudDefault,
+  database = databaseDefault, registry = createWorkspaceRegistry(),
+  indexedDBFactory = globalThis.indexedDB, cryptoProvider = globalThis.crypto,
+  onState = () => {},
+} = {}) {
+  const ownerId = normalizeAuthUserId(expectedOwnerId);
+  if (globalThis.navigator?.onLine === false) throw fail('ACCOUNT_PROVISIONING_REQUIRES_ONLINE', 'Provisioning requires a connection');
+  const verified = await api.verifyCurrentAuthIdentity(ownerId);
+  if (verified?.id !== ownerId || api.user?.id !== ownerId) {
+    throw fail('ACCOUNT_PROVISIONING_OWNER_MISMATCH', 'Verified account changed');
+  }
+  let contract = normalizeAccountContract(await api.getAccountContract(), api.user);
+  if (!contract.provisioning && contract.profileStatus !== 'READY') {
+    contract = normalizeAccountContract(await api.provisionAccountProfile(), api.user);
+  }
+  if (!contract.provisioning) return Object.freeze({ status: 'not_applicable', contract });
+  if (!contract.access) throw fail('ACCOUNT_ACCESS_REQUIRED', 'Beta access is not active');
+  if (contract.profileStatus !== 'READY' || contract.provisioning.state === 'PROFILE_REQUIRED') {
+    onState('PROFILE_REQUIRED');
+    return Object.freeze({ status: 'profile_required', contract });
+  }
+  if (contract.provisioning.version !== ACCOUNT_PROVISIONING_VERSION) {
+    throw fail('ACCOUNT_PROVISIONING_VERSION_UNSUPPORTED', 'Provisioning contract is unsupported');
+  }
+  const registrations = await registry.findByAuthUserId(ownerId);
+  if (registrations.length > 1 || (registrations[0] &&
+      (registrations[0].workspaceKind !== 'account-provisioned' ||
+       !['provisioning', 'claimed'].includes(registrations[0].ownershipState)))) {
+    throw fail('WORKSPACE_REGISTRY_MISMATCH', 'Existing workspace cannot be reprovisioned');
+  }
+  if (registrations[0]?.ownershipState === 'claimed') {
+    if (registrations[0].provisioningReceipt?.foundationHash !== contract.provisioning.foundationHash) {
+      throw fail('ACCOUNT_PROVISIONING_RECEIPT_MISMATCH', 'Claimed workspace does not match server readiness');
+    }
+    if (contract.provisioning.state === 'PROVISIONING') {
+      onState('PROVISIONING');
+      await api.beginAccountProvisioning();
+      const repaired = normalizeAccountContract((await api.provisionAccountWorkspace(
+        buildAccountFoundationDefaults()))?.contract, api.user);
+      if (repaired.provisioning?.state !== 'READY' ||
+          repaired.provisioning.foundationHash !== registrations[0].provisioningReceipt.foundationHash) {
+        throw fail('ACCOUNT_PROVISIONING_RECEIPT_MISMATCH', 'Server foundation repair did not preserve the owner receipt');
+      }
+      contract = repaired;
+    }
+    if (contract.provisioning.state !== 'READY') {
+      throw fail('ACCOUNT_PROVISIONING_NOT_READY', 'Server foundation is incomplete');
+    }
+    return Object.freeze({ status: 'ready', contract, receipt: registrations[0].provisioningReceipt,
+      workspaceDatabaseName: registrations[0].databaseName });
+  }
+  // A different, newly opened device must use ordinary Initial Restore, never
+  // import only foundation rows over a potentially mature cloud workspace.
+  if (contract.provisioning.state === 'READY' && !registrations.length) {
+    return Object.freeze({ status: 'not_applicable', contract });
+  }
+  if (!registrations.length) await registry.beginAccountProvisioning(ownerId, { cryptoProvider });
+  onState('PROVISIONING');
+  const begun = normalizeAccountContract(await api.beginAccountProvisioning(), api.user);
+  if (!['PROVISIONING', 'READY'].includes(begun.provisioning?.state)) {
+    throw fail('ACCOUNT_PROVISIONING_NOT_READY', 'Server did not accept provisioning');
+  }
+  const result = await api.provisionAccountWorkspace(buildAccountFoundationDefaults());
+  contract = normalizeAccountContract(result?.contract, api.user);
+  if (contract.provisioning?.state !== 'READY' ||
+      contract.provisioning.version !== ACCOUNT_PROVISIONING_VERSION ||
+      !contract.provisioning.foundationHash) {
+    throw fail('ACCOUNT_PROVISIONING_NOT_READY', 'Server foundation was not verified');
+  }
+  const snapshot = decodeAccountFoundationSnapshot(result.snapshot, ownerId);
+  const receipt = Object.freeze({ ownerId, contractVersion: ACCOUNT_PROVISIONING_VERSION,
+    foundationHash: contract.provisioning.foundationHash });
+  const name = await accountWorkspaceDatabaseName(ownerId, { cryptoProvider });
+  database.selectDatabase(name);
+  const device = makeDevice({ deviceId: cryptoProvider?.randomUUID?.(), schemaVersion: database.DB_VERSION,
+    accountProvisioningReceipt: receipt });
+  await database.importAccountProvisioningSnapshot(snapshot, device);
+  await registry.registerProvisionedAccount(ownerId, receipt, { cryptoProvider });
+  onState('READY');
+  return Object.freeze({ status: 'ready', contract, receipt, workspaceDatabaseName: name });
+}

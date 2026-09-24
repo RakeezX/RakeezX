@@ -60,11 +60,14 @@ test('AppShell, Home, and Teacher Center share accessible daily primitives', asy
         return {
           centerOffset: Math.abs((tileBox.left + tileBox.width / 2) - (iconBox.left + iconBox.width / 2)),
           textAlign: getComputedStyle(tile).textAlign,
+          columns: getComputedStyle(tile).gridTemplateColumns,
           height: tileBox.height,
         };
       }));
-      expect(shortcutAlignment.every(({ centerOffset, textAlign, height }) =>
-        centerOffset <= 1 && textAlign === 'center' && height >= 44 && height <= 112
+      expect(shortcutAlignment.every(({ centerOffset, textAlign, columns, height }) =>
+        height >= 44 && height <= 112 && (width >= 900
+          ? textAlign === 'start' && columns.startsWith('38px ')
+          : centerOffset <= 1 && textAlign === 'center')
       ), `${theme}/${width}: ${JSON.stringify(shortcutAlignment)}`).toBe(true);
       const primaryContrast = await page.locator('.btn--primary').first().evaluate((node) => {
         const parse = (value) => value.match(/[\d.]+/g).slice(0, 3).map(Number);
@@ -79,7 +82,9 @@ test('AppShell, Home, and Teacher Center share accessible daily primitives', asy
       expect(primaryContrast).toBeGreaterThanOrEqual(4.5);
       expect(await noHorizontalOverflow(page), `${theme}/${width}`).toBe(true);
 
-      const trigger = page.locator('[data-act="open-teacher-mini-hub"]:visible');
+      const trigger = width >= 900
+        ? page.locator('.teacher-mini-hub-trigger')
+        : page.locator('.topbar__teacher-btn[data-act="open-teacher-mini-hub"]');
       await trigger.focus();
       await trigger.click();
       const dialog = page.getByRole('dialog', { name: 'مركز المعلم' });
@@ -113,10 +118,10 @@ test('Schedule day tabs support RTL keyboard navigation and mobile targets', asy
   const selected = page.locator('.schedule-day-tab[aria-selected="true"]');
   await expect(selected).toHaveCount(1);
   await selected.focus();
+  await expect(selected).toBeFocused();
   const before = await selected.getAttribute('data-day');
   await page.keyboard.press('ArrowLeft');
-  const after = await page.locator('.schedule-day-tab[aria-selected="true"]').getAttribute('data-day');
-  expect(after).not.toBe(before);
+  await expect(page.locator('.schedule-day-tab[aria-selected="true"]')).not.toHaveAttribute('data-day', before);
   await expect(page.locator('.schedule-day-tab[aria-selected="true"]')).toBeFocused();
 
   const targets = await page.locator('.schedule-day-tab, .slot__actions .iconbtn').evaluateAll((nodes) =>
@@ -138,7 +143,8 @@ test('Attendance keeps 44px status actions without overflow at approved mobile w
   await page.goto('/#/');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await seedCoreDaily(page);
-  await page.goto('/#/teaching/tch:visual-a/attendance?session=ses:visual-a-1');
+  await page.reload();
+  await page.locator('a[href="#/teaching/tch:visual-a/attendance?session=ses:visual-a-1"]').click();
   await expect(page.locator('.att-row')).toHaveCount(2);
   await expect(page.locator('.segbtns').first()).toHaveAttribute('role', 'group');
 

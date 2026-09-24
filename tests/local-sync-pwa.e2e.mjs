@@ -518,19 +518,19 @@ test('visited Schedule and Attendance remain available across offline reload and
     await expect(page.locator('.schedule-head__title')).toBeVisible();
     await page.goto(`${url}/#/teaching/warm-offline-teaching/attendance?session=warm-offline-session`);
     await expect(page.locator('.topbar__title')).toContainText('الحضور');
-    await expect(page.locator('.attendance-session-summary')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'كشف الحضور' })).toBeVisible();
 
     await context.setOffline(true);
     await page.reload();
     await expect(page.locator('.topbar__title')).toContainText('الحضور');
-    await expect(page.locator('.attendance-session-summary')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'كشف الحضور' })).toBeVisible();
     await page.goto(`${url}/#/schedule`);
     await expect(page.locator('.topbar__title')).toContainText('الجدول');
     await expect(page.locator('.schedule-head__title')).toBeVisible();
     await page.reload();
     await expect(page.locator('.schedule-head__title')).toBeVisible();
     await page.goto(`${url}/#/teaching/warm-offline-teaching/attendance?session=warm-offline-session`);
-    await expect(page.locator('.attendance-session-summary')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'كشف الحضور' })).toBeVisible();
     expect(unexpectedCloudRequests).toEqual([]);
     expect(errors).toEqual([]);
   } finally {

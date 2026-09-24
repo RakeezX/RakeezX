@@ -71,7 +71,9 @@ test('approved outlined headers and sanitized Micro-Mark have exact safe vector 
 test('Brand release preserves Production identity, install actions and offline policy across later runtime work', async () => {
   const baseline = file => execFileSync('git',['-c',`safe.directory=${process.cwd()}`,'show',`66b0f4bd1748ac1fb756d47fb814c66cf4df64af:${file}`],{encoding:'utf8'}).replace(/\r\n/g,'\n');
   const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
-  for (const file of ['manifest.webmanifest','src/lib/student-lifecycle.js','src/views/attendance.js']) assert.equal(await read(file),baseline(file),file);
+  // Attendance presentation evolved in 01C; this Brand guard owns Product
+  // identity and install/offline wiring, not historical view byte equality.
+  for (const file of ['manifest.webmanifest','src/lib/student-lifecycle.js']) assert.equal(await read(file),baseline(file),file);
   const accountProfileField = "  teacherForm: o.teacherForm === 'feminine' ? 'feminine' : 'masculine',\n";
   assert.equal((await read('src/models.js')).split(accountProfileField).length - 1, 1,
     'approved teacher-form normalization remains present exactly once');
@@ -209,10 +211,11 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v30';/);
+  assert.match(worker,/const VERSION = 'rakeezx-v31';/);
   assert.match(worker,/\.\/src\/lib\/score-foundation\.js/);
   assert.match(worker,/\.\/src\/lib\/email-otp\.js/);
   assert.match(worker,/\.\/src\/lib\/account-profile\.js/);
+  assert.match(worker,/\.\/src\/lib\/account-provisioning\.js/);
   assert.match(worker,/\.\/src\/lib\/demo-workspace\.js/);
   assert.match(worker, /\.\/src\/lib\/initial-restore\.js/);
   assert.match(worker,/\.\/src\/lib\/curriculum-bootstrap\.js/);

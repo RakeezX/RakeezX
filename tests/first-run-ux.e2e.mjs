@@ -118,9 +118,9 @@ test('secondary action hands off to the current isolated Demo runtime', async ({
   await page.goto(`${host.url}/#/`);
   await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
   await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
+  await expect(page.getByLabel('نظرة سريعة').getByText('8', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'الفصول', exact: true }).click();
   await expect(page.getByText('184', { exact: true })).toBeVisible();
-  await expect(page.getByText('8', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'الخروج من الوضع التجريبي وتسجيل الدخول' }).first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-demo-entry.png'), fullPage: true });
   await context.close();

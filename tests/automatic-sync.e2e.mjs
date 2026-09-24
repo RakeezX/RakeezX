@@ -77,6 +77,9 @@ function createCloud() {
             access: { grantType: 'beta_full', status: 'active', source: 'public_beta', expiresAt: null },
           } });
         }
+        if (table === 'score_foundation_capability' && request.method() === 'POST') {
+          return route.fulfill({ status: 204 });
+        }
         if (request.method() === 'GET') {
           const gate = nextTableRead.get(table);
           if (gate) {

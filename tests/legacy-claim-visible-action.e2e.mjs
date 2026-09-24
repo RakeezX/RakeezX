@@ -58,7 +58,7 @@ test('visible claim requires a fresh backup and explicit confirmation, then remo
   await expect(page.getByText('نزّل نسخة احتياطية حديثة أولًا')).toBeVisible();
 
   const downloaded = await downloadFreshBackup(page);
-  expect(downloaded).toMatchObject({ app: 'rakeezx', version: 4, sourceOwnerId: OWNER });
+  expect(downloaded).toMatchObject({ app: 'rakeezx', version: 5, sourceOwnerId: OWNER });
   await expect(action).toBeEnabled();
   await mkdir('test-results/legacy-claim-visible-action', { recursive: true });
   await page.screenshot({ path: 'test-results/legacy-claim-visible-action/claim-action.png', fullPage: true });

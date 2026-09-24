@@ -122,8 +122,8 @@ test('generic status editor cannot assign Makeup while legacy Makeup remains rea
   await page.keyboard.press('Escape');
 
   await page.goto(`/#/teaching/${ids.teaching}/attendance?session=${ids.makeupChild}`);
-  await expect(page.locator('.attendance-session-summary')).toContainText('حصة تعويضية');
-  await page.locator('.attendance-session-summary [data-act="session-status"]').click();
+  await expect(page.locator('.attendance-01c__status-pill')).toContainText('حصة تعويضية');
+  await page.locator('.attendance-01c__context [data-act="session-status"]').click();
   dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('button', { name: /حصة تعويضية/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
@@ -229,7 +229,7 @@ test('Sessions, in-session status, and top clock entry points share one delete c
   await page.keyboard.press('Escape');
 
   await page.goto(`/#/teaching/${ids.teaching}/attendance?session=${ids.pristine}`);
-  const statusEntry = page.locator('.attendance-session-summary [data-act="session-status"]');
+  const statusEntry = page.locator('.attendance-01c__context [data-act="session-status"]');
   await expect(statusEntry).toBeVisible();
   await statusEntry.click();
   dialog = page.getByRole('dialog');
@@ -260,7 +260,7 @@ test('in-session delete access stays singular and stable on mobile and desktop',
   await page.goto(`/#/teaching/${ids.teaching}/attendance?session=${ids.pristine}`);
   for (const width of [320, 390, 412, 1280]) {
     await page.setViewportSize({ width, height: width < 600 ? 844 : 900 });
-    const entry = page.locator('.attendance-session-summary [data-act="session-status"]');
+    const entry = page.locator('.attendance-01c__context [data-act="session-status"]');
     await expect(entry).toBeVisible();
     await entry.click();
     const dialog = page.getByRole('dialog');
@@ -276,7 +276,7 @@ test('in-session delete access stays singular and stable on mobile and desktop',
 test('shared in-session editor preserves status updates and deletes through the top clock action', async ({ page }) => {
   await seedSessions(page);
   await page.goto(`/#/teaching/${ids.teaching}/attendance?session=${ids.content}`);
-  await page.locator('.attendance-session-summary [data-act="session-status"]').click();
+  await page.locator('.attendance-01c__context [data-act="session-status"]').click();
   await page.getByRole('dialog').getByRole('button', { name: /^تمت/ }).click();
   await expect.poll(() => page.evaluate((sessionId) => window.store.getSession(sessionId)?.status, ids.content)).toBe('held');
 

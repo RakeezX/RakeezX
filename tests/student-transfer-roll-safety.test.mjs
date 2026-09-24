@@ -39,6 +39,9 @@ async function fixture() {
   const enrollmentC = makeEnrollment({ studentId: c.id, sectionId: y.id, rollNo: 1, startDate: '2026-08-01' });
   const session = makeSession({ id: 'transfer:session', teachingId: teachingX.id, date: '2026-08-20', period: 1, startTime: '08:00', endTime: '08:45' });
   const item = makeItem({ id: 'transfer:item', teachingId: teachingX.id, name: 'اختبار', max: 10 });
+  // This transfer-only server fixture predates score-domain migration 0033.
+  // Keep its item payload within the deliberately selected legacy protocol.
+  for (const field of ['scoreMode','distributionMode','distributionVersion','distributionOriginId','portabilityGroupId']) delete item[field];
   const attendance = { id: attendanceId(a.id, session.id), studentId: a.id, sessionId: session.id, teachingId: teachingX.id, date: session.date, status: 'present', updatedAt: 1, deleted: false };
   const score = { id: scoreId(a.id, item.id), studentId: a.id, itemId: item.id, value: 8, updatedAt: 1, deleted: false };
   const note = makeNote({ id: 'transfer:note', studentId: a.id, teachingId: teachingX.id, sessionId: session.id, date: session.date, text: 'ملاحظة نقل' });

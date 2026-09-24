@@ -11,7 +11,7 @@ const session = {
 async function openLogin(page) {
   await page.goto('/#/');
   await page.waitForFunction(() => window.store?.state?.ready);
-  await page.locator('.teacher-mini-hub-trigger, .topbar__teacher-btn').filter({ visible: true }).click();
+  await page.getByRole('button', { name: 'تسجيل الدخول', exact: true }).click();
   await page.locator('[data-act="mini-hub-login"]').click();
   return page.locator('.sheet-backdrop').last();
 }

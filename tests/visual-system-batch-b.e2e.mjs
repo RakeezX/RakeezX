@@ -71,12 +71,16 @@ test('class hub keeps the ordered tools responsive, equal, and accessible in bot
           height: box.height,
           iconWidth: iconBox.width,
           iconCenterOffset: Math.abs((box.left + box.width / 2) - (iconBox.left + iconBox.width / 2)),
+          columns: getComputedStyle(node).gridTemplateColumns,
+          textAlign: getComputedStyle(node).textAlign,
         };
       }));
-      expect(metrics.every(({ height, iconCenterOffset }) => height >= 104 && iconCenterOffset <= 1), JSON.stringify(metrics)).toBe(true);
+      expect(metrics.every(({ height, iconWidth, columns, textAlign }) =>
+        height >= 104 && iconWidth >= 40 && columns.startsWith('42px ') && textAlign === 'center'
+      ), JSON.stringify(metrics)).toBe(true);
 
       if (viewport.width >= 1200) {
-        expect(new Set(metrics.map(({ top }) => top)).size, `${viewport.width}: tools must stay on one row`).toBe(1);
+        expect(new Set(metrics.map(({ top }) => top)).size, `${viewport.width}: tools must form two balanced rows`).toBe(2);
         const widths = metrics.map(({ width }) => width);
         expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
         expect(metrics.every(({ iconWidth }) => iconWidth >= 44)).toBe(true);

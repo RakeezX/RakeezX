@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
-import { STORES } from '../src/lib/db.js';
+import { DB_VERSION, STORES } from '../src/lib/db.js';
 
 const XSS_OWNER = '9e3a9858-50bb-470e-91f6-8ea901ffb030';
 const XSS_CLAIM_ID = 'claim:xss-security';
@@ -40,7 +40,7 @@ async function setupMockCloud(page) {
     contentType: 'text/html', body: '<!doctype html><title>xss workspace fixture</title>',
   }));
   await page.goto('/__xss-workspace__');
-  await page.evaluate(async ({ stores, authKey, ownerId, claimId }) => {
+  await page.evaluate(async ({ stores, dbVersion, authKey, ownerId, claimId }) => {
     const request = (operation) => new Promise((resolve, reject) => {
       operation.onsuccess = () => resolve(operation.result);
       operation.onerror = () => reject(operation.error);
@@ -50,7 +50,7 @@ async function setupMockCloud(page) {
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(tx.error);
     });
-    const productRequest = indexedDB.open('rakeezx', 7);
+    const productRequest = indexedDB.open('rakeezx', dbVersion);
     productRequest.onupgradeneeded = () => {
       for (const store of stores) {
         if (!productRequest.result.objectStoreNames.contains(store)) {
@@ -61,7 +61,7 @@ async function setupMockCloud(page) {
     const product = await request(productRequest);
     const productTx = product.transaction(['device', 'profile'], 'readwrite');
     productTx.objectStore('device').put({
-      id: 'device', deviceId: 'device:xss-security', schemaVersion: 7,
+      id: 'device', deviceId: 'device:xss-security', schemaVersion: dbVersion,
       workspaceClaim: {
         version: 1, claimId, state: 'claimed', ownerId,
         origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:xss-security',
@@ -89,7 +89,7 @@ async function setupMockCloud(page) {
     await transaction(registryTx);
     registry.close();
     localStorage.setItem(authKey, JSON.stringify({ access_token: 'fake', user: { id: ownerId } }));
-  }, { stores: STORES, authKey: AUTH_STORAGE_KEY, ownerId: XSS_OWNER, claimId: XSS_CLAIM_ID });
+  }, { stores: STORES, dbVersion: DB_VERSION, authKey: AUTH_STORAGE_KEY, ownerId: XSS_OWNER, claimId: XSS_CLAIM_ID });
   await page.unroute('**/__xss-workspace__');
 
   await page.route(`${SUPABASE_URL}/rest/v1/*`, async route => {

@@ -32,7 +32,7 @@ function mockCloud() {
         expect(request.headers().authorization).toBe('Bearer sync-ux-test-token');
         expect(request.headers()['accept-profile']).toBe('rakeezx');
         calls[kind][table] = (calls[kind][table] ?? 0) + 1;
-        if (failing) {
+        if (failing && table !== 'score_foundation_capability') {
           await route.fulfill({ status: 503, json: { message: 'temporary test failure' } });
           return;
         }
@@ -41,6 +41,10 @@ function mockCloud() {
           return;
         }
         if (request.method() === 'POST') {
+          if (table === 'score_foundation_capability') {
+            await route.fulfill({ status: 204 });
+            return;
+          }
           expect(table).toBe('apply_sync_v2_mutation');
           expect(request.headers()['content-profile']).toBe('rakeezx');
           const envelope = JSON.parse(request.postData() ?? '{}');

@@ -1,8 +1,10 @@
 import 'fake-indexeddb/auto';
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 
 import * as db from '../src/lib/db.js';
+import * as cloud from '../src/lib/cloud.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
 import { buildBackup } from '../src/lib/export.js';
 import {
   BUILTIN_SUBJECTS, customSubjectSlug, matchBuiltinSubject, normalizeSubjectName,
@@ -17,7 +19,14 @@ global.document = {
 };
 global.matchMedia = () => ({ matches: false });
 
+before(async () => {
+  cloud.setMockBackend({ getScoreFoundationCapability: () => ({ scoreDomainVersion: 1,
+    restoreProtocol: 'CORE_V2', backupVersion: 5, copyDomainVersion: 1 }) });
+  await activateSyntheticAccountWorkspace();
+});
+
 after(() => {
+  cloud.setMockBackend(null);
   store.closeChannel();
   db.closeDB();
 });
@@ -70,7 +79,7 @@ test('picker options put used subjects first without precreating the full catalo
   assert.equal(legacy.length, 12, 'the legacy alias must not appear as a duplicate custom subject');
 });
 
-test('custom and alias-equivalent subjects are reused, persist offline, queue V2, and enter V4 backup', async () => {
+test('custom and alias-equivalent subjects are reused, persist offline, queue V2, and enter V5 backup', async () => {
   await fresh();
   const arabic = await store.resolveSubjectSelection({ token: 'custom', customName: 'اللغة العربية' });
   assert.equal(arabic.id, 'sub:arabic');
@@ -94,7 +103,7 @@ test('custom and alias-equivalent subjects are reused, persist offline, queue V2
   await store.init();
   assert.equal(store.getSubject(custom.id)?.name, 'علم الأرض');
   const backup = await buildBackup({ sourceOwnerId: 'subject-test-owner', backupId: 'subject-test-backup' });
-  assert.equal(backup.version, 4);
+  assert.equal(backup.version, 5);
   assert.equal(backup.data.subjects.some((subject) => subject.id === custom.id), true);
 });
 
@@ -110,7 +119,7 @@ test('a proven legacy subject alias keeps its existing production identity', asy
   assert.equal(store.subjects().filter((subject) => ['computer', 'digital-skills'].includes(subject.slug)).length, 1);
 });
 
-test('the same custom subject identity preserves grade portability across sections', async () => {
+test('the same custom subject identity supports reviewed grade portability across sections', async () => {
   await fresh();
   const subject = await store.resolveSubjectSelection({ token: 'custom', customName: 'علوم الأرض' });
   const x = await store.createSection({ grade: 5, label: 'س', name: 'الخامس / س' });
@@ -122,6 +131,9 @@ test('the same custom subject identity preserves grade portability across sectio
   const itemY = store.items(teachingY.id).find((item) => item.name === itemX.name && item.max === itemX.max && item.auto == null);
   await store.setScore(student.id, itemX.id, 8);
   await store.transferStudent(student.id, y.id, { date: '2026-09-10' });
+  assert.equal(itemScore(itemY, store.studentContext(student.id, teachingY.id)), null,
+    'matching subject and item names never grant portability automatically');
+  await store.linkPortableScoreItems(itemX.id, itemY.id, { confirmed: true });
   assert.equal(itemScore(itemY, store.studentContext(student.id, teachingY.id)), 8);
   assert.equal(store.getSubject(teachingX.subjectId)?.id, store.getSubject(teachingY.subjectId)?.id);
   const frozen = store.buildClosedTermReportPayload(teachingX.termId).teachingDocuments

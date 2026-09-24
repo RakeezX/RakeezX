@@ -23,6 +23,11 @@ async function installRestoreCloud(page, { manifest, delayManifest = false } = {
   const manifestWaiting = new Promise((resolve) => { releaseManifest = resolve; });
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async (route) => {
     const url = new URL(route.request().url());
+    if (url.pathname.endsWith('/rpc/account_contract')) {
+      return route.fulfill({ json: { ownerId: OWNER, profileStatus: 'READY',
+        profile: { teacherName: 'معلّم الاستعادة', phone: '', teacherForm: 'masculine', schoolName: '' },
+        access: { grantType: 'beta_full', status: 'active' }, provisioning: null } });
+    }
     if (url.pathname.endsWith('/rpc/score_foundation_capability')) {
       return route.fulfill({ status: 204 });
     }

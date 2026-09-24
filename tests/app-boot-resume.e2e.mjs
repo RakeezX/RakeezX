@@ -189,13 +189,13 @@ async function inspectFirstPaint(browser, { savedTheme, colorScheme }) {
 
 test('saved Light and Dark are applied before the application module can bootstrap', async ({ browser }) => {
   const light = await inspectFirstPaint(browser, { savedTheme: 'light', colorScheme: 'dark' });
-  expect(light).toEqual({ theme: 'light', background: '#f8fafc', ready: false });
+  expect(light).toEqual({ theme: 'light', background: '#f4f7f5', ready: false });
 
   const dark = await inspectFirstPaint(browser, { savedTheme: 'dark', colorScheme: 'light' });
-  expect(dark).toEqual({ theme: 'dark', background: '#0f1216', ready: false });
+  expect(dark).toEqual({ theme: 'dark', background: '#0d1511', ready: false });
 
   const automatic = await inspectFirstPaint(browser, { savedTheme: 'auto', colorScheme: 'dark' });
-  expect(automatic).toEqual({ theme: null, background: '#0f1216', ready: false });
+  expect(automatic).toEqual({ theme: null, background: '#0d1511', ready: false });
 });
 
 test('canonical theme changes update the early-paint mirror and survive reload', async ({ browser }) => {
