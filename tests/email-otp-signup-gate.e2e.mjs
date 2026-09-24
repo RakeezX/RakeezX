@@ -37,17 +37,6 @@ test.afterAll(async () => {
   await new Promise((resolve, reject) => host.server.close((error) => error ? reject(error) : resolve()));
 });
 
-async function enableDisposableProductGate(page) {
-  await page.route('**/src/lib/cloud.js*', async (route) => {
-    const response = await route.fetch();
-    const source = await response.text();
-    const declaration = 'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;';
-    expect(source.split(declaration)).toHaveLength(2);
-    await route.fulfill({ response, body: source.replace(declaration,
-      'export const NEW_ACCOUNT_SIGNUP_ENABLED = true;') });
-  });
-}
-
 async function openUnifiedOtp(page) {
   await page.goto(`${host.url}/#/`);
   await page.getByRole('button', { name: 'ابدأ مع ركيز', exact: true }).click();
@@ -55,7 +44,6 @@ async function openUnifiedOtp(page) {
 }
 
 test('one approved email surface serves a new synthetic owner when Product gate is on', async ({ page }) => {
-  await enableDisposableProductGate(page);
   const authRequests = [];
   const users = new Map();
   const errors = [];
@@ -100,7 +88,6 @@ test('one approved email surface serves a new synthetic owner when Product gate 
 });
 
 test('same unified OTP surface preserves an existing synthetic Auth UUID with gate on', async ({ page }) => {
-  await enableDisposableProductGate(page);
   const users = new Map([['existing@example.test', { id: EXISTING_OWNER, email: 'existing@example.test' }]]);
   const requests = [];
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
