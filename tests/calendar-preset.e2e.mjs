@@ -26,7 +26,7 @@ test('Western Region preset is visible and its official holiday is skipped throu
   await form.getByRole('button', { name: 'توليد الحصص' }).click();
   await expect(page.getByText('تم إنشاء 1 حصة · تم تجاوز 0 حصة موجودة · تم تجاهل 1 يوم إجازة')).toBeVisible();
   await page.reload();
-  expect(await page.evaluate(() => window.store.getSession('se:tch:calendar-e2e:2026-09-20:1')?.teachingId)).toBe('tch:calendar-e2e');
+  await expect.poll(() => page.evaluate(() => window.store?.getSession('se:tch:calendar-e2e:2026-09-20:1')?.teachingId)).toBe('tch:calendar-e2e');
   expect(await page.evaluate(() => window.store.getSession('se:tch:calendar-e2e:2026-09-23:1'))).toBeNull();
   expect(errors).toEqual([]);
 });
