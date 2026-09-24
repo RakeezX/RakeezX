@@ -230,8 +230,12 @@ export async function resolveWorkspaceForBoot({
         catch (error) { return notReady('restore-receipt-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
         const receipt = metadata?.receipt;
         const registryReceipt = records.find((record) => record.id === workspace.id)?.restoreReceipt;
-        if (metadata?.status !== 'read' || receipt?.protocol !== 'CORE_V1' || receipt?.ownerId !== authenticatedUserId ||
-            !registryReceipt || receipt.restoreId !== registryReceipt.restoreId || receipt.manifestHash !== registryReceipt.manifestHash) {
+        if (metadata?.status !== 'read' || !['CORE_V1', 'CORE_V2'].includes(receipt?.protocol) ||
+            receipt?.ownerId !== authenticatedUserId ||
+            !registryReceipt || receipt.protocol !== registryReceipt.protocol ||
+            !receipt.restoreId || receipt.restoreId !== registryReceipt.restoreId ||
+            !receipt.manifestHash || receipt.manifestHash !== registryReceipt.manifestHash ||
+            !Number.isFinite(receipt.completedAt) || receipt.completedAt !== registryReceipt.completedAt) {
           return notReady('initial-restore-receipt-mismatch', { authState: 'authenticated' });
         }
         return ready(workspace, 'restored-account');

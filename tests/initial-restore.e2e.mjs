@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, chromium } from '@playwright/test';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
 
 const OWNER = '55555555-5555-4555-8555-555555555555';
@@ -7,37 +7,43 @@ const session = {
   expires_at: 4_102_444_800, user: { id: OWNER, email: 'restore@example.test' },
 };
 
-async function installAuth(page) {
+async function installAuth(page, { user = session.user } = {}) {
   await page.addInitScript(({ key, value }) => localStorage.setItem(key, JSON.stringify(value)), {
-    key: AUTH_STORAGE_KEY, value: session,
+    key: AUTH_STORAGE_KEY, value: { ...session, user },
   });
   await page.route(`${SUPABASE_URL}/auth/v1/**`, (route) => {
     const pathname = new URL(route.request().url()).pathname;
-    if (pathname.endsWith('/user')) return route.fulfill({ json: session.user });
+    if (pathname.endsWith('/user')) return route.fulfill({ json: user });
     return route.fulfill({ status: 204 });
   });
 }
 
-async function installRestoreCloud(page, { manifest, delayManifest = false } = {}) {
+async function installRestoreCloud(page, { manifest, delayManifest = false,
+  protocol = 'CORE_V1', canonical = {}, ownerId = OWNER } = {}) {
   let releaseManifest;
   const manifestWaiting = new Promise((resolve) => { releaseManifest = resolve; });
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname.endsWith('/rpc/account_contract')) {
-      return route.fulfill({ json: { ownerId: OWNER, profileStatus: 'READY',
+      return route.fulfill({ json: { ownerId, profileStatus: 'READY',
         profile: { teacherName: 'معلّم الاستعادة', phone: '', teacherForm: 'masculine', schoolName: '' },
         access: { grantType: 'beta_full', status: 'active' }, provisioning: null } });
     }
     if (url.pathname.endsWith('/rpc/score_foundation_capability')) {
-      return route.fulfill({ status: 204 });
+      return protocol === 'CORE_V2'
+        ? route.fulfill({ json: { scoreDomainVersion: 1, restoreProtocol: 'CORE_V2' } })
+        : route.fulfill({ status: 204 });
     }
-    if (url.pathname.endsWith('/rpc/sync_v2_restore_manifest_full')) {
+    if (url.pathname.endsWith(protocol === 'CORE_V2'
+      ? '/rpc/sync_v2_restore_manifest_score_v2' : '/rpc/sync_v2_restore_manifest_full')) {
       if (delayManifest) await manifestWaiting;
       return route.fulfill({ json: manifest });
     }
+    const entity = url.pathname.split('/').at(-1);
+    if (canonical[entity]) return route.fulfill({ json: canonical[entity] });
     if (url.pathname.endsWith('/profile')) {
       return route.fulfill({ json: [{
-        owner_id: OWNER, revision: 7, field_revisions: {}, deleted_at: null,
+        owner_id: ownerId, revision: 7, field_revisions: {}, deleted_at: null,
         teacher_name: 'معلّم الاستعادة', school_name: 'مدرسة الاستعادة', phone: null,
         report_principal_name: null, active_time_profile_id: null, client_updated_at: 100,
       }] });
@@ -46,6 +52,91 @@ async function installRestoreCloud(page, { manifest, delayManifest = false } = {
   });
   return releaseManifest;
 }
+
+test('fresh CORE_V2 account reopens after reload and a new page without receipt mismatch', async ({ page, context }) => {
+  const core = {
+    students: [{ id: 'v2:student', owner_id: OWNER, revision: 1, field_revisions: {},
+      deleted_at: null, name: 'Synthetic student' }],
+    items: [{ id: 'v2:item', owner_id: OWNER, revision: 1, field_revisions: {}, deleted_at: null,
+      teaching_id: 'v2:teaching', max: 10, score_mode: 'direct' }],
+    scores: [{ id: 'v2:score', owner_id: OWNER, revision: 1, field_revisions: {}, deleted_at: null,
+      student_id: 'v2:student', item_id: 'v2:item', value: 8 }],
+  };
+  const manifest = [{ entity: 'profile', id: 'profile', revision: 7, deleted: false },
+    ...Object.entries(core).flatMap(([entity, rows]) => rows.map((row) => ({
+      entity, id: row.id, revision: row.revision, deleted: false,
+    })))];
+  const setup = async (target) => {
+    await installAuth(target);
+    await installRestoreCloud(target, { manifest, canonical: core, protocol: 'CORE_V2' });
+  };
+  await setup(page);
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/#/');
+  await expect(page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  const inventory = async (target) => target.evaluate(() => ({
+    workspace: window.store?.getActiveWorkspace(),
+    students: window.store?.state?.students?.length,
+    scores: window.store?.state?.scores?.length,
+  }));
+  expect(await inventory(page)).toMatchObject({ students: 1, scores: 1,
+    workspace: { authUserId: OWNER } });
+  await page.reload();
+  await expect(page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  expect(await inventory(page)).toMatchObject({ students: 1, scores: 1 });
+  const reopened = await context.newPage();
+  await setup(reopened);
+  reopened.on('pageerror', (error) => errors.push(error.message));
+  await reopened.goto('/#/');
+  await expect(reopened.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  expect(await inventory(reopened)).toMatchObject({ students: 1, scores: 1 });
+  expect(await reopened.locator('[data-workspace-gate]').count()).toBe(0);
+  expect(errors).toEqual([]);
+  await reopened.close();
+
+  const other = await context.newPage();
+  const otherOwner = '99999999-9999-4999-8999-999999999999';
+  await installAuth(other, { user: { id: otherOwner, email: 'other@example.test' } });
+  await installRestoreCloud(other, { manifest: [], protocol: 'CORE_V2', ownerId: otherOwner });
+  await other.goto('/#/');
+  await expect(other.locator('[data-initial-restore-state="PROVISIONING_REQUIRED"]')).toBeVisible();
+  expect(await other.locator('.topbar__title').count()).toBe(0);
+  await other.close();
+
+  const returned = await context.newPage();
+  await setup(returned);
+  await returned.goto('/#/');
+  await expect(returned.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+  expect(await inventory(returned)).toMatchObject({ students: 1, scores: 1,
+    workspace: { authUserId: OWNER } });
+  await returned.close();
+});
+
+test('CORE_V2 receipt survives a disposable browser-profile restart', async ({}, testInfo) => {
+  const directory = testInfo.outputPath('core-v2-browser-profile');
+  const baseURL = testInfo.project.use.baseURL;
+  const manifest = [{ entity: 'profile', id: 'profile', revision: 7, deleted: false }];
+  const open = async () => {
+    const context = await chromium.launchPersistentContext(directory, { headless: true });
+    const page = context.pages()[0] ?? await context.newPage();
+    await installAuth(page);
+    await installRestoreCloud(page, { manifest, protocol: 'CORE_V2' });
+    return { context, page };
+  };
+  let opened = await open();
+  try {
+    await opened.page.goto(`${baseURL}/#/`);
+    await expect(opened.page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+    await opened.context.close();
+    opened = await open();
+    await opened.page.goto(`${baseURL}/#/`);
+    await expect(opened.page.locator('.topbar__title')).toBeVisible({ timeout: 15_000 });
+    expect(await opened.page.locator('[data-workspace-gate]').count()).toBe(0);
+  } finally {
+    await opened.context.close();
+  }
+});
 
 test('fresh Account A stays gated until actual CORE_V1 restore completes and then mounts A', async ({ page }, testInfo) => {
   await installAuth(page);
