@@ -102,8 +102,9 @@ async function seedAuthenticatedVisualWorkspace(page) {
   await page.unroute('**/__visual_auth_fixture__');
 }
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
   await mkdir(output, { recursive: true });
+  await page.clock.setFixedTime(new Date('2026-09-21T07:00:00+03:00'));
 });
 
 test('authenticated Home renders the Work composition with real synthetic Product bindings', async ({ page }) => {

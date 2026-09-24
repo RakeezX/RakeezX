@@ -6,6 +6,8 @@
 export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
 const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
 export const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
+// Explicit Product-side gate. Supabase disable_signup remains authoritative.
+export const NEW_ACCOUNT_SIGNUP_ENABLED = false;
 const REFRESH_SKEW_SECONDS = 30;
 
 export let session = null;
@@ -224,12 +226,12 @@ export async function signIn(email, password) {
   saveSession(data);
 }
 
-/** Requests an email OTP for an existing Auth user without provisioning. */
+/** One email OTP flow; the global Product gate controls new-user creation. */
 export async function requestEmailOtp(email) {
   return request('/otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, create_user: false }),
+    body: JSON.stringify({ email, create_user: NEW_ACCOUNT_SIGNUP_ENABLED }),
   }, true);
 }
 

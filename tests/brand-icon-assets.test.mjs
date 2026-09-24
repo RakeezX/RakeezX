@@ -144,7 +144,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
 `;
   const cloudSource = await read('src/lib/cloud.js');
   assert.equal(cloudSource.split(identityValidation).length - 1, 1, 'approved Auth identity validation must occur exactly once');
-  const emailOtpStart = '/** Requests an email OTP for an existing Auth user without provisioning. */';
+  const emailOtpStart = '/** One email OTP flow; the global Product gate controls new-user creation. */';
   const emailOtpEnd = '/**\n * Revalidate the current Auth identity with Supabase before a local workspace';
   const emailOtpStartAt = cloudSource.indexOf(emailOtpStart);
   const emailOtpEndAt = cloudSource.indexOf(emailOtpEnd);
@@ -152,7 +152,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   const emailOtpCloud = cloudSource.slice(emailOtpStartAt, emailOtpEndAt);
   assert.equal(emailOtpCloud.split('export async function requestEmailOtp').length - 1, 1);
   assert.equal(emailOtpCloud.split('export async function verifyEmailOtp').length - 1, 1);
-  assert.match(emailOtpCloud, /create_user:\s*false/);
+  assert.match(emailOtpCloud, /create_user:\s*NEW_ACCOUNT_SIGNUP_ENABLED/);
   const emailChangeStart = '/**\n * Request an Auth-authoritative email change.';
   const emailChangeEnd = 'export async function signOut() {';
   const emailChangeStartAt = cloudSource.indexOf(emailChangeStart);

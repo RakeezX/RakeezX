@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   EMAIL_OTP_LENGTH,
@@ -43,6 +44,36 @@ test('OTP request is email-only and explicitly forbids Auth user creation', asyn
   assert.deepEqual(request.body, { email: 'existing@example.test', create_user: false });
   assert.equal('phone' in request.body, false);
   assert.equal('password' in request.body, false);
+});
+
+test('Product signup gate is off by default and unified OTP forbids Auth user creation', async () => {
+  let requestBody;
+  globalThis.fetch = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
+    return new Response(null, { status: 204 });
+  };
+  assert.equal(cloud.NEW_ACCOUNT_SIGNUP_ENABLED, false);
+  await cloud.requestEmailOtp('new@example.test');
+  assert.deepEqual(requestBody, { email: 'new@example.test', create_user: false });
+});
+
+test('explicitly enabled disposable module sends create_user true; server disable_signup still blocks', async () => {
+  const source = await readFile(new URL('../src/lib/cloud.js', import.meta.url), 'utf8');
+  const gateDeclaration = 'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;';
+  assert.equal(source.split(gateDeclaration).length - 1, 1);
+  const enabledSource = source.replace(gateDeclaration, 'export const NEW_ACCOUNT_SIGNUP_ENABLED = true;');
+  const disposableCloud = await import(`data:text/javascript,${encodeURIComponent(enabledSource)}`);
+  let requestBody;
+  globalThis.fetch = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
+    return new Response(JSON.stringify({ code: 'signup_disabled', message: 'Signups not allowed' }), {
+      status: 403, headers: { 'Content-Type': 'application/json' },
+    });
+  };
+  await assert.rejects(() => disposableCloud.requestEmailOtp('new@example.test'),
+    (error) => error.status === 403 && error.code === 'signup_disabled');
+  assert.deepEqual(requestBody, { email: 'new@example.test', create_user: true });
+  assert.equal(disposableCloud.user, null);
 });
 
 test('unknown email rejection cannot create a user and remains a neutral send failure', async () => {

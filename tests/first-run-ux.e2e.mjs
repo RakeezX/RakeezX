@@ -79,7 +79,7 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
   await context.close();
 });
 
-test('primary action opens the existing account-only OTP contract and code treatment', async ({ browser }, testInfo) => {
+test('primary action opens the unified OTP surface with the default-off signup gate', async ({ browser }, testInfo) => {
   const context = await browser.newContext({ serviceWorkers: 'block' });
   const page = await context.newPage();
   const requests = [];
