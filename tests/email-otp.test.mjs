@@ -33,7 +33,7 @@ test('email OTP input normalizes Arabic and Persian digits to exactly six ASCII 
   assert.equal(normalizeEmailAddress(' Teacher@Example.Test '), 'teacher@example.test');
 });
 
-test('unified OTP request is email-only with the pilot gate enabled', async () => {
+test('OTP request is email-only and explicitly forbids Auth user creation', async () => {
   let request;
   globalThis.fetch = async (url, options) => {
     request = { url: String(url), options, body: JSON.parse(options.body) };
@@ -41,25 +41,28 @@ test('unified OTP request is email-only with the pilot gate enabled', async () =
   };
   await cloud.requestEmailOtp('existing@example.test');
   assert.match(request.url, /\/auth\/v1\/otp$/);
-  assert.deepEqual(request.body, { email: 'existing@example.test', create_user: true });
+  assert.deepEqual(request.body, { email: 'existing@example.test', create_user: false });
   assert.equal('phone' in request.body, false);
   assert.equal('password' in request.body, false);
 });
 
-test('Product pilot gate is on and unified OTP permits Auth user creation', async () => {
+test('Product signup gate is off by default and unified OTP forbids Auth user creation', async () => {
   let requestBody;
   globalThis.fetch = async (_url, options) => {
     requestBody = JSON.parse(options.body);
     return new Response(null, { status: 204 });
   };
-  assert.equal(cloud.NEW_ACCOUNT_SIGNUP_ENABLED, true);
+  assert.equal(cloud.NEW_ACCOUNT_SIGNUP_ENABLED, false);
   await cloud.requestEmailOtp('new@example.test');
-  assert.deepEqual(requestBody, { email: 'new@example.test', create_user: true });
+  assert.deepEqual(requestBody, { email: 'new@example.test', create_user: false });
 });
 
-test('server disable_signup still blocks the pilot Product gate', async () => {
+test('explicitly enabled disposable module sends create_user true; server disable_signup still blocks', async () => {
   const source = await readFile(new URL('../src/lib/cloud.js', import.meta.url), 'utf8');
-  assert.equal(source.split('export const NEW_ACCOUNT_SIGNUP_ENABLED = true;').length - 1, 1);
+  const gateDeclaration = 'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;';
+  assert.equal(source.split(gateDeclaration).length - 1, 1);
+  const enabledSource = source.replace(gateDeclaration, 'export const NEW_ACCOUNT_SIGNUP_ENABLED = true;');
+  const disposableCloud = await import(`data:text/javascript,${encodeURIComponent(enabledSource)}`);
   let requestBody;
   globalThis.fetch = async (_url, options) => {
     requestBody = JSON.parse(options.body);
@@ -67,17 +70,13 @@ test('server disable_signup still blocks the pilot Product gate', async () => {
       status: 403, headers: { 'Content-Type': 'application/json' },
     });
   };
-  await assert.rejects(() => cloud.requestEmailOtp('new@example.test'),
+  await assert.rejects(() => disposableCloud.requestEmailOtp('new@example.test'),
     (error) => error.status === 403 && error.code === 'signup_disabled');
   assert.deepEqual(requestBody, { email: 'new@example.test', create_user: true });
-  assert.equal(cloud.user, null);
+  assert.equal(disposableCloud.user, null);
 });
 
-test('closed Product gate sends create_user false and unknown email remains a neutral failure', async () => {
-  const source = await readFile(new URL('../src/lib/cloud.js', import.meta.url), 'utf8');
-  const gatedSource = source.replace('export const NEW_ACCOUNT_SIGNUP_ENABLED = true;',
-    'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;');
-  const gatedCloud = await import(`data:text/javascript,${encodeURIComponent(gatedSource)}`);
+test('unknown email rejection cannot create a user and remains a neutral send failure', async () => {
   let body;
   globalThis.fetch = async (_url, options) => {
     body = JSON.parse(options.body);
@@ -85,7 +84,7 @@ test('closed Product gate sends create_user false and unknown email remains a ne
       status: 400, headers: { 'Content-Type': 'application/json' },
     });
   };
-  await assert.rejects(() => gatedCloud.requestEmailOtp('unknown@example.test'));
+  await assert.rejects(() => cloud.requestEmailOtp('unknown@example.test'));
   assert.equal(body.create_user, false);
   assert.equal(emailOtpFailureMessage(emailOtpFailureState({ code: 'user_not_found' }, 'send')),
     'تعذر إرسال رمز التحقق. تحقق من البريد وحاول مرة أخرى.');

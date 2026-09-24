@@ -7,7 +7,7 @@ export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
 const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
 export const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
 // Explicit Product-side gate. Supabase disable_signup remains authoritative.
-export const NEW_ACCOUNT_SIGNUP_ENABLED = true;
+export const NEW_ACCOUNT_SIGNUP_ENABLED = false;
 const REFRESH_SKEW_SECONDS = 30;
 
 export let session = null;

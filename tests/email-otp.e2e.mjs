@@ -16,7 +16,7 @@ async function openLogin(page) {
   return page.locator('.sheet-backdrop').last();
 }
 
-test('pilot OTP request preserves the existing Auth UUID and six-digit verification', async ({ page }) => {
+test('existing-account OTP request forbids signup and six normalized digits restore the same Auth UUID', async ({ page }) => {
   const requests = [];
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/auth/v1/**`, async (route) => {
@@ -34,7 +34,7 @@ test('pilot OTP request preserves the existing Auth UUID and six-digit verificat
   await login.locator('input[name="email"]').fill(' Existing@Example.Test ');
   await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
   expect(requests[0]).toEqual({
-    path: '/auth/v1/otp', body: { email: 'existing@example.test', create_user: true },
+    path: '/auth/v1/otp', body: { email: 'existing@example.test', create_user: false },
   });
   await expect(login.locator('[data-email-otp-resend]')).toBeDisabled();
   await expect(login.locator('[data-email-otp-resend]')).toContainText('إعادة الإرسال بعد');
@@ -47,15 +47,7 @@ test('pilot OTP request preserves the existing Auth UUID and six-digit verificat
   await expect(page.locator('.mini-hub-sheet')).toContainText('existing@example.test');
 });
 
-test('closed signup gate and invalid or expired OTP fail neutrally without a Product workspace', async ({ page }) => {
-  await page.route('**/src/lib/cloud.js*', async (route) => {
-    const response = await route.fetch();
-    const source = await response.text();
-    const enabled = 'export const NEW_ACCOUNT_SIGNUP_ENABLED = true;';
-    expect(source.split(enabled)).toHaveLength(2);
-    await route.fulfill({ response, body: source.replace(enabled,
-      'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;') });
-  });
+test('unknown email and invalid or expired OTP fail neutrally without creating a Product workspace', async ({ page }) => {
   let verifyFailure = 'otp_invalid';
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
   await page.route(`${SUPABASE_URL}/auth/v1/**`, async (route) => {

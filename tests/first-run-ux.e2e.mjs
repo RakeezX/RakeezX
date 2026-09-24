@@ -79,7 +79,7 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
   await context.close();
 });
 
-test('primary action opens the unified OTP surface with the pilot signup gate', async ({ browser }, testInfo) => {
+test('primary action opens the unified OTP surface with the default-off signup gate', async ({ browser }, testInfo) => {
   const context = await browser.newContext({ serviceWorkers: 'block' });
   const page = await context.newPage();
   const requests = [];
@@ -101,7 +101,7 @@ test('primary action opens the unified OTP surface with the pilot signup gate', 
   await page.screenshot({ path: testInfo.outputPath('first-run-email-entry.png'), fullPage: true });
   await login.locator('input[name="email"]').fill(' Existing@Example.Test ');
   await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
-  expect(requests).toEqual([{ email: 'existing@example.test', create_user: true }]);
+  expect(requests).toEqual([{ email: 'existing@example.test', create_user: false }]);
   await expect(login.getByRole('heading', { name: 'أدخل رمز التحقق', exact: true })).toBeVisible();
   await expect(login.locator('input[name="token"]')).toHaveAttribute('autocomplete', 'one-time-code');
   await expect(login.locator('[data-email-otp-resend]')).toBeDisabled();
