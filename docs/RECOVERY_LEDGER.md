@@ -1,66 +1,39 @@
-# RAKEEZ X — Recovery Ledger
+# RAKEEZ X — Archive recovery ledger
 
-This is the current product ledger, not a claim that every historical branch is deployable. `CLOSED` requires Product Owner Production verification. Preserve previously approved capabilities when their older container/page was superseded; recover them through a scoped ticket instead of restoring archived runtime files.
+Reconciled 2026-09-25. **Archive recovery only:** this is a first-pass, 25-area review map, not permission to restore code or a claim that every historical atom has been adjudicated. Current `origin/main`/Production wins over old handoffs. `A28` below means the read-only `D:\Abdullah Projects\RakeezX-Google-Snapshot-2026-08-28` source snapshot; Work-Active is read-only visual evidence, not deployable runtime. Expand one page's capabilities only when that page is reviewed.
 
-## Closed from supplied PO/project state
+Classification vocabulary: `موجودة` (present), `نستعيدها` (recover), `نعيد تصميمها` (redesign), `مؤجلة` (deferred), `مرفوضة` (rejected), `مستبدلة` (replaced). **Authority** is `PO CONFIRMED`, `CURRENT PRODUCT FACT`, or `AUDIT PROPOSAL — PO REVIEW REQUIRED`; the latter is never an approval. Presence of a module does not certify visual/behavioral parity with its archive.
 
-| Ticket / batch | Status | Evidence / boundary |
-| --- | --- | --- |
-| Recovery B Batch 1 | `CLOSED` | Supplied project state; production recovery batch. |
-| Recovery B Batch 2 | `CLOSED` | Supplied project state; class colors/mini-hub recovery scope. |
-| Recovery B Batch 2.1 | `CLOSED` | Supplied project state; section identity convergence work. |
-| Calendar Batch 3 | `CLOSED` | Supplied project state; calendar controls/presets. |
-| Batch 4 | `CLOSED` | Supplied project state; retain its approved behavior even if its older container changed. |
-| CAL-FU-01 | `CLOSED` | Supplied project state. |
-| STU-TR-01A | `CLOSED` | Membership/roll/sync safety; production lineage includes `cef2b60`. |
-| STU-REC-01A | `CLOSED` | Automatic dual-roster renumber; production lineage includes `c80526b`. |
-| SET-DATA-01 | `CLOSED` | Principal cloud sync/local-reset safety; production lineage includes `b601519`; migration `0010` is supplied as applied/aligned. |
-| STU-HIST-01 | `CLOSED` | Historical session roster truth was approved and Production-verified; migration `0011` is applied/aligned. |
-| STU-REC-01C | `CLOSED` | Grade portability was approved and Production-verified. |
-| SYNC-UX-01 / OFFLINE-ROUTES-01 | `CLOSED` | Quiet automatic sync, reconnect recovery, and core offline-route coverage were Production-verified; carried forward in the Sync V2 release. |
-| SYNC-V2 | `CLOSED` | Production `aeffd5e54207109fa2ef53569583d694ff8a6d3d`: PO verified three-device bootstrap and automatic propagation, offline write/reconnect, and tombstone non-resurrection. Candidate migrations `0001–0017`, RLS/owner isolation, and publishable-key-only browser access were verified. |
-| SYNC-UX-02 | `CLOSED` | Production `5644a01`: PO verified the Teacher Control Center no longer retains a stale yellow badge after sync completes. Root cause was UI-only badge-class reconciliation; Sync V2 engine/data correctness was not affected. Preserve focused Mini Hub sync-state and reconnect regression coverage for future sync-indicator changes. |
-| SCHEDULE-UX-01 | `CLOSED` | Daily schedule, timing-model, residual validation, and new-profile initialization work were Production-verified. |
-| TIMING-SYNC-01 | `CLOSED` | PO Production verification passed: owner-global active timing selection and `activeFrom` / `activeTo` changes converge across devices without manual Sync, with no profile duplication. |
-| TIMING-EFFECTIVE-UX-01 | `CLOSED` | PO Production verification passed: Home and Schedule agree on today's effective timing; Timing Settings distinguishes effective and base profiles; existing materialized session timing remains frozen. |
-| TEACHER-HUB-AUTH-01 | `CLOSED` | PO Production verification passed: login/logout leaves one Teacher Control Center, one close dismisses it, repeated auth cycles do not accumulate sheets, and the live Sync badge remains correct. |
+| Area | Capability | Old/archive location | Current equivalent | Classification | Authority | Evidence | Next action | Related ticket |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 01 Home / Teacher Day | Today focus and teacher-day entry | `A28/src/views/home.js` | `src/views/home.js` | موجودة | CURRENT PRODUCT FACT | Current Home source and 01A Production lineage | Compare old Teacher Day details with current Home; do not infer parity | Recovery page review |
+| 02 Classes / Class Hub | Class overview and hub | `A28/src/views/teachings.js`, `teaching-hub.js` | `src/views/teachings.js`, `teaching-hub.js` | موجودة | CURRENT PRODUCT FACT | Current routes/views; 01B Production lineage | Review class card/hub capabilities separately | 01B |
+| 03 Teaching setup | Subject/class teaching assignment | `A28/src/views/teachings.js` | `src/views/teachings.js` | موجودة | CURRENT PRODUCT FACT | Current teaching view and Sync entities | Compare archive affordances only | Recovery page review |
+| 04 Student roster | Students and membership | `A28/src/views/students.js` | `src/views/students.js` | موجودة | CURRENT PRODUCT FACT | Current roster and lifecycle source | Preserve stable IDs and lifecycle guards in any later change | STU-REC |
+| 05 Student Profile | Dated notes and continuous history | `A28/src/views/student.js` | `src/views/student.js` | مؤجلة | AUDIT PROPOSAL — PO REVIEW REQUIRED | Current notes view exists; old PO continuity report in `docs/OPEN_ISSUES.md` remains unreproduced on current Production | Reproduce X→Y history path before deciding correction; keep notes capability | STU-REC-01B |
+| 06 Quick Log | Rapid behavior-only capture | `A28/src/views/quicklog.js` | `src/views/quicklog.js` | موجودة | CURRENT PRODUCT FACT | Current view and focused 0193–0195 evidence | **First page review**: compare controls, scoring, mobile and persistence | Quick Log review |
+| 07 Picker | Classroom student selection | `A28/src/views/picker.js` | `src/views/picker.js` | موجودة | CURRENT PRODUCT FACT | Current view present | Review selection/focus and downstream actions | Picker review |
+| 08 Groups | Group arrangement | `A28/src/views/groups.js` | `src/views/groups.js` | موجودة | CURRENT PRODUCT FACT | Current view and owner-bound arrangement stores | Review mobile drag/selection and persistence; do not import Work runtime | Groups review |
+| 09 Board | Excellence board | `A28/src/views/board.js` | `src/views/board.js` | موجودة | CURRENT PRODUCT FACT | Current board view | Review classroom projection and controls | Board review |
+| 10 Goal / Charter | Class goal, reward and charter rules | Older August snapshot lacks `class-rules.js`; later Work/Production lineage | `src/views/class-rules.js`, `src/store.js` | موجودة | CURRENT PRODUCT FACT | Current goal/charter view, stores and Sync V2 RPC | Review approved capability and status with PO; no new reward semantics | Class Goal / Charter review |
+| 11 Safe Display | Distinct projection-safe classroom presentation | Exact archive capability/location not yet evidenced | Current `class-rules.js` classroom-presentation and Board fullscreen, not proved equivalent | نعيد تصميمها | AUDIT PROPOSAL — PO REVIEW REQUIRED | No separately named current Safe Display contract established by source audit | PO defines whether distinct capability is needed; preserve existing presentation meanwhile | Safe Display review |
+| 12 Calendar | Calendar/date navigation | `A28/src/views/calendar.js` | `src/views/calendar.js` | موجودة | CURRENT PRODUCT FACT | Current view and calendar models | Compare archive controls/presets, not old runtime | Calendar review |
+| 13 Schedule | Weekly/day schedule | `A28/src/views/schedule.js` | `src/views/schedule.js` | موجودة | CURRENT PRODUCT FACT | Current schedule and slot identity contract | Review day/mobile/export ideas separately | Schedule review |
+| 14 Timing | Built-in/effective timing profiles | `A28/src/views/times.js` | `src/views/times.js` | موجودة | CURRENT PRODUCT FACT | Current timing view and approved profile model | Review visual debt without changing timing semantics | Timing review |
+| 15 Sessions | Session materialization and history | `A28/src/views/sessions.js` | `src/views/sessions.js` | موجودة | CURRENT PRODUCT FACT | Current session view and today-only materialization contract | Compare historic session actions; retain immutable history | Session review |
+| 16 Attendance | Dated session attendance | `A28/src/views/attendance.js` | `src/views/attendance.js` | موجودة | CURRENT PRODUCT FACT | Current view; 01C implementation | Review presentation against approved Work, not archived calculations | 01C |
+| 17 Score distribution | Items/configuration and subitems | `A28/src/views/items.js` | `src/views/items.js`, `src/lib/score-foundation.js` | موجودة | CURRENT PRODUCT FACT | Current 01C score domain | Review archive UX only; preserve DIRECT/SUBITEM semantics | 01C |
+| 18 Grades | Student DIRECT/SUBITEM scoring | `A28/src/views/grades.js` | `src/views/grades.js` | موجودة | CURRENT PRODUCT FACT | Current score view and 01C incident hotfix lineage | Compare clarity/alignment, not score persistence rules | 01C |
+| 19 Curriculum | Units and lessons | `A28/src/views/curriculum.js` | `src/views/curriculum.js` | موجودة | CURRENT PRODUCT FACT | Current view; migration 0031 and Sync V2 client | Review lesson workflow after classroom-tool pages | Curriculum review |
+| 20 Reports | Report index, details and execution | `A28/src/views/reports-index.js`, `reports.js`, `execution-report.js` | Same current view modules | موجودة | CURRENT PRODUCT FACT | Current report routes/views | Review output fidelity and historical context | Reports review |
+| 21 Archive | Archived class/year access | `A28/src/views/archive.js`, `archive-detail.js` | Same current view modules | موجودة | CURRENT PRODUCT FACT | Current archive views and lifecycle migration 0021 | Review recovery/export/retention separately | Archive review |
+| 22 Backup / Data | Local backup and cloud restore | `A28/src/views/backup.js` | `src/views/backup.js`, `src/lib/initial-restore.js` | موجودة | CURRENT PRODUCT FACT | Current CORE_V2/CORE_V1 contracts | Review data UI only; never restore old DB/Sync code | Backup/Data review |
+| 23 Settings / Teacher Center | Account and configuration surfaces | `A28/src/views/settings.js`; older Teacher Hub source | `src/views/settings.js`, current Teacher Center | موجودة | CURRENT PRODUCT FACT | Current Settings view and Profile/Access lineage | Review only approved UX gaps | Settings review |
+| 24 PWA / Offline | Installed shell and verified-account local work | `A28/sw.js`, app boot source | `sw.js`, `src/app.js`, workspace routing | موجودة | CURRENT PRODUCT FACT | Current offline-first boot and routing contracts | Never transplant archived SW/cache/runtime; test any future change | PWA review |
+| 25 Support | Support/contact surface | August archive location not confirmed | `src/views/support.js` | موجودة | CURRENT PRODUCT FACT | Current Support view and server contract | Review old useful contact ideas; no private-content attachment | Support review |
 
-## Awaiting Product Owner Production review
+## Review order and unresolved authority
 
-| Ticket | Status | Evidence / boundary |
-| --- | --- | --- |
-| SESSION-AUTO-01B | `PRODUCTION REVIEW` | Production main `725c28c`: today-only scheduled-session materialization, future projection without future persistence, durable V2 session writes, and focused race/tombstone/rollover coverage are deployed. Await PO Production verification; do not mark `CLOSED`. |
-| TEACHER-HUB-UX-01 | `PRODUCTION REVIEW` | The approved compact Teacher Control Center hierarchy is promoted: identity, account action, live Sync state, contextual PWA guidance, and Settings access share one calm surface. The closed one-sheet auth lifecycle and live Sync badge behavior remain runtime invariants. |
-| HOME-ONBOARDING-01 | `PRODUCTION REVIEW` | The approved restrained no-class Home path is promoted: create a class, add students, then configure the weekly schedule. Today Focus remains the single primary teaching action for established teachers. |
-| SCHEDULE-MOBILE-TODAY-01 | `PRODUCTION REVIEW` | The approved mobile Schedule behavior is promoted: use Today on teaching days, leave every day reachable, label the active slot, and use the locked empty-Today wording. Weekend/non-school entry remains All. |
-| TEACHER-CENTER-UX-02 | `PRODUCTION REVIEW` | The post-review refinement removes the repeated inner title, clarifies the Sync labels and hierarchy, and keeps Teacher Center action toasts above its sheet. Auth lifecycle and Sync semantics remain unchanged. |
-| HOME-FOCUS-ATTENDANCE-01 | `PRODUCTION REVIEW` | Today Focus no longer retains the attendance action for a session whose roster attendance is complete; current, upcoming, past-pending, cancelled-exclusion, and onboarding behavior remain preserved. |
+Start small: **Quick Log → Picker → Groups → Board → Goal/Charter → Safe Display**. Then Curriculum/lesson flow; then Reports → Archive → Backup/Data. This is an **audit proposal for PO review**, not an approved implementation queue. Teacher Day and Student Profile continuity need their own evidence before classification beyond the current fact/deferral above.
 
-## Open, deferred, or redesign work
-
-| ID | Status | Ledger evidence / required boundary |
-| --- | --- | --- |
-| STU-REC-01B — Continuous Student History | `DEFERRED` | Implementation exists in Production (`8e39408`, PWA follow-up `e82f58a`), but supplied PO verification failed: after X → Y, previous-class attendance/history still appeared empty; returning to X restored prior contextual record. Do **not** mark fixed. Later work must reproduce the actual Production path before changing code. |
-| Academic-year / term management | `DEFERRED` | Future product workflow needs an explicit ticket; do not infer lifecycle semantics from existing stores. |
-| PWA identity / splash / boot / install-guidance refinement | `DEFERRED` | Preserve the verified offline shell and current install guidance; future refinement is visual/product work. |
-| Home / reports / classes presentation refinement | `DEFERRED` | Visual refinement, scoped by approved Google work; the next recovery page review is Home. |
-| RUNTIME-FOCUS-01 | `CONDITIONAL / REPRO REQUIRED` | Do not treat as active implementation work without a reproducible Production path. |
-| Manual `إعادة الترقيم` button | `DEFERRED` | Automatic transfer renumber exists, but manual renumber remains in current UI until its remaining use case is assessed. |
-
-## Planned product work
-
-| ID | Status | Ledger evidence / required boundary |
-| --- | --- | --- |
-| CLASS-RULES-01 — Classroom Rules | `PLANNED` | Add a Class tools card immediately after Quick Log / `الرصد السريع`: `القوانين الصفية`, with view/manage, add/edit, and icon-plus-text rules. Google Visual Lab review is required before Production implementation. |
-| SCHEDULE-EXPORT-01 — Schedule Export | `PLANNED` | Export the schedule as an image or PDF. Exact visual/export design requires later review. |
-| SUPPORT-FEEDBACK-01 — Support / Feedback / Problem Report | `WORK CANDIDATE` | Shared Support surface exposes direct email and the existing private authenticated, online-only submission contract. Safe diagnostics attach automatically through the existing runtime allowlist; tracking, history, replies, and chat remain deferred. |
-| TIMING-DISPLAY-UX-01 — Effective/Base Timing Presentation | `PLANNED / GOOGLE VISUAL REVIEW REQUIRED` | Calm, mobile-first visual refinement of the Timing / lesson-times effective-today versus base timing presentation. Google Visual Lab may improve hierarchy, spacing, alignment, and icon/text treatment only; do not change timing runtime semantics. |
-| Mobile More navigation | `REPLACED` | The mobile More surface is replaced by direct Calendar navigation. Keep Settings as the intentional full Product configuration page; its routine account/auth and Sync controls are now represented in the compact Teacher Control Center. |
-
-## Reconciliation notes
-
-- Current Git evidence can show a commit is on `main`; it cannot substitute for PO Production verification.
-- The supplied status for STU-REC-01B conflicts with earlier implementation/promotion history: code and focused tests exist, yet PO reported the original visible symptom. The PO observation governs this ledger.
-- Repository migration filenames skip `0005` and `0006`. No purpose/history is asserted for them without external migration records.
-- Current Production baseline: `45329ae4511b6a955a7314999f61e192b6549bed`.
-- The former Production database remains frozen as fallback/archive; Sync V2 Production is the active runtime baseline.
+The prior `docs/RECOVERY_LEDGER.md` mixed current Product work, stale Production SHA, and Google-as-active-lab language. Those items now belong in [Project State](PROJECT_STATE.md), [Product Ledger](PRODUCT_LEDGER.md), and [Governance](GOVERNANCE.md), respectively. Historical handoffs remain historical evidence; no archive file was restored here.
