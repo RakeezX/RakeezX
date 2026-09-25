@@ -102,7 +102,7 @@ export async function openStudentManagement(studentId) {
           : stage === 'success' ? html`<p role="status">${message}</p><button class="btn btn--primary" data-management="close">${result.action === 'delete' ? 'العودة للكشف' : 'العودة إلى ملف الطالب'}</button>`
           : html`<p role="status">${message}</p>
               ${previewReason === 'student_not_synced' ? html`<button class="btn btn--primary" data-management="sync-preview">مزامنة الآن</button>` : ''}
-              ${resumeAvailable ? html`<p class="t-3 fs-sm">${checkpoint.state === 'reconciliation_required' ? 'تم تأكيد الإجراء، ويحتاج هذا الجهاز إلى إكمال التحديث.' : 'أكمل التحقق من الإجراء السابق بدل بدء إجراء جديد.'}</p><button class="btn btn--primary" data-management="resume">${checkpoint.state === 'reconciliation_required' ? 'إكمال تحديث هذا الجهاز' : 'إكمال الإجراء السابق'}</button>` : html`<button class="btn btn--ghost" data-management="back">العودة للإدارة</button>`}`}
+              ${resumeAvailable ? html`<p class="t-3 fs-sm">${checkpoint.state === 'reconciliation_required' ? 'تم تأكيد الإجراء، ويحتاج هذا الجهاز إلى إكمال التحديث.' : 'أكمل التحقق من الإجراء السابق بدل بدء إجراء جديد.'}</p><button class="btn btn--primary" data-management="resume">${checkpoint.state === 'reconciliation_required' ? 'إكمال تحديث هذا الجهاز' : 'إكمال الإجراء السابق'}</button>` : html`<button class="btn btn--ghost" data-management="back">العودة</button>`}`}
         `);
         if (!busy) (host.querySelector('[data-management="back"]') ?? host.querySelector('button') ?? close).focus({ preventScroll: true });
         else host.querySelector('[role="status"]')?.setAttribute('tabindex', '-1');

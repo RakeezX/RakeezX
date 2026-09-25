@@ -73,7 +73,8 @@ test('Brand release preserves Production identity, install actions and offline p
   const read = async file => (await readFile(rootFile(file),'utf8')).replace(/\r\n/g,'\n');
   // Attendance presentation evolved in 01C; this Brand guard owns Product
   // identity and install/offline wiring, not historical view byte equality.
-  for (const file of ['manifest.webmanifest','src/lib/student-lifecycle.js']) assert.equal(await read(file),baseline(file),file);
+  assert.equal(await read('manifest.webmanifest'),baseline('manifest.webmanifest'),
+    'brand install identity stays byte-identical across scoped runtime changes');
   const accountProfileField = "  teacherForm: o.teacherForm === 'feminine' ? 'feminine' : 'masculine',\n";
   assert.equal((await read('src/models.js')).split(accountProfileField).length - 1, 1,
     'approved teacher-form normalization remains present exactly once');

@@ -295,4 +295,22 @@ test.describe('isolated Demo runtime', () => {
     expect(await page.evaluate(() => sessionStorage.getItem('rakeezx-demo-session-v1'))).toBeNull();
     expect(await page.evaluate(() => localStorage.getItem('rakeezx-demo-active-v1'))).toBeNull();
   });
+
+  test('N27 Demo removal explanation uses the shared العودة control without cloud work', async ({ page }) => {
+    let cloudRequests = 0;
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.unroute('https://*.supabase.co/**');
+    await page.route('https://*.supabase.co/**', route => { cloudRequests++; return route.abort(); });
+    await page.goto('/');
+    await enterDemo(page);
+    await page.goto('/#/student/demo:student:1?teaching=demo:teaching:1');
+    await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+    await page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true }).click();
+    await expect(page.getByRole('dialog')).toContainText('هذا طالب في فصل تجريبي محلي.');
+    await page.getByRole('button', { name: 'العودة', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true })).toBeVisible();
+    expect(cloudRequests).toBe(0);
+    expect(errors).toEqual([]);
+  });
 });

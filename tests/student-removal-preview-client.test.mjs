@@ -6,6 +6,7 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import * as cloud from '../src/lib/cloud.js';
 import * as sync from '../src/lib/sync.js';
+import { runtimeSyncOwnershipGuard } from '../src/lib/sync-ownership.js';
 import { lifecycleServer, academicFixture, LifecycleBackend, OWNER, evidence } from './helpers/student-lifecycle-server.mjs';
 let pg,backend,previews=0;
 global.document={documentElement:{setAttribute(){},removeAttribute(){},classList:{add(){},remove(){}}},querySelector:()=>({setAttribute(){}})};
@@ -63,6 +64,19 @@ test('runtime pristine preview is disk/server authoritative, sanitized and perfo
   assert.equal(modes.every(mode=>mode==='readonly'),true);
   assert.deepEqual(await dump(),before);assert.equal(backend.calls.length,calls);assert.equal(backend.operations.length,ops);
 });
+test('N27: synced V2 with retained superseded evidence previews and completes removal without rewriting the evidence',async()=>{
+  const f=await academicFixture(pg,'client-preview-n27');await device();
+  const superseded={id:'synthetic-n27-superseded',protocol:'v2',store:'scores',recordId:'synthetic-old-score',
+    state:'superseded',supersededByMutationId:'synthetic-replacement',recoveryReason:'score-create-identity-01c'};
+  await db.put('outbox',superseded);
+  const summary=await sync.getSyncOperationalSummary();
+  assert.equal(summary.state,'synced');assert.equal(summary.queuedCount,0);assert.equal(summary.cloudSyncHealthy,true);
+  const before=await dump();
+  assert.deepEqual(await preview(f),{outcome:'delete_pristine',reason:'pristine',retryable:false});
+  assert.deepEqual(await dump(),before,'preview is read-only, including superseded evidence');
+  assert.equal((await store.deletePristineStudent(f.student)).ok,true);
+  assert.deepEqual(await db.get('outbox',superseded.id),superseded,'historical evidence remains unchanged after command and reconciliation');
+});
 test('server history and this-device protected local-only/retained evidence select end enrollment',async()=>{
   const f=await academicFixture(pg,'client-preview-local');await device();
   await db.put('submissions',{id:'synthetic-local-submission',studentId:f.student,content:'private fixture',deleted:true});
@@ -90,7 +104,7 @@ test('offline, auth, pending/rejected/blocked work and restore checkpoint never 
   cloud.setMockAuth({id:OWNER},{access_token:'synthetic'});
   Object.defineProperty(global.navigator,'onLine',{value:false,configurable:true});
   try {assert.equal((await preview(f)).reason,'offline');}finally{delete global.navigator.onLine;}
-  for(const state of ['pending','blocked','rejected','error']) {
+  for(const state of ['pending','blocked','rejected','failed','error']) {
     await db.put('outbox',{id:'synthetic-preview-pending',protocol:'v2',store:'students',state});
     const before=await dump();assert.equal((await preview(f)).reason,'sync_not_ready');assert.deepEqual(await dump(),before);
   }
@@ -98,6 +112,42 @@ test('offline, auth, pending/rejected/blocked work and restore checkpoint never 
   await device();const deviceRow=await db.get('device','device');
   await db.put('device',{...deviceRow,cloudRestoreResume:{version:1}});
   const before=await dump();assert.equal((await preview(f)).reason,'sync_not_ready');assert.deepEqual(await dump(),before);
+});
+test('N27: superseded history does not mask active or unknown outbox work',async()=>{
+  const f=await academicFixture(pg,'client-preview-n27-unsafe');await device();const count=previews;
+  const history={id:'synthetic-n27-history',protocol:'v2',store:'scores',state:'superseded'};
+  await db.put('outbox',history);
+  for(const state of ['pending','blocked','rejected','failed','error','unknown']) {
+    const active={id:'synthetic-n27-active',protocol:'v2',store:'students',state};
+    await db.put('outbox',active);
+    const before=await dump();
+    assert.equal((await preview(f)).reason,'sync_not_ready',state);
+    assert.deepEqual(await dump(),before,state);
+  }
+  await db.remove('outbox','synthetic-n27-active');
+  const previousStatus=sync.state.status;
+  try {
+    sync.state.status='error';
+    assert.equal((await preview(f)).reason,'sync_not_ready','coordinator failure blocks even with only superseded history');
+  } finally {sync.state.status=previousStatus;}
+  await db.put('outbox',{id:'synthetic-n27-legacy',store:'students',state:'pending'});
+  assert.equal((await preview(f)).reason,'sync_not_ready','unknown protocol remains fail-closed');
+  assert.deepEqual(await db.get('outbox',history.id),history);
+  assert.equal(previews,count);
+});
+test('N27: missing workspace proof or mismatched owner blocks preview before server RPC',async()=>{
+  const f=await academicFixture(pg,'client-preview-n27-owner');await device();
+  const workspace=runtimeSyncOwnershipGuard.getWorkspace(),count=previews;
+  try {
+    runtimeSyncOwnershipGuard.setWorkspace({type:'unresolved',reason:'synthetic-n27-unavailable'});
+    assert.equal((await preview(f)).outcome,'blocked');
+    assert.equal(previews,count);
+    runtimeSyncOwnershipGuard.setWorkspace({type:'account',ownershipState:'claimed',syncEligible:true,
+      authUserId:OWNER,databaseName:'synthetic-n27-owned-workspace'});
+    cloud.setMockAuth({id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'},{access_token:'synthetic'});
+    assert.equal((await preview(f)).outcome,'blocked');
+    assert.equal(previews,count);
+  } finally {runtimeSyncOwnershipGuard.setWorkspace(workspace);cloud.setMockAuth({id:OWNER},{access_token:'synthetic'});}
 });
 test('account change and malformed/private server errors never escape in result or become pristine',async()=>{
   const f=await academicFixture(pg,'client-preview-errors');await device();const original=backend.previewStudentRemoval;

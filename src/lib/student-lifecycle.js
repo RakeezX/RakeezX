@@ -2,8 +2,9 @@
 import * as db from './db.js';
 import * as cloud from './cloud.js';
 import * as sync from './sync.js';
+import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
 import * as store from '../store.js';
-import { decodeSyncV2Canonical } from './sync-v2.js';
+import { decodeSyncV2Canonical, summarizeSyncV2OperationalState } from './sync-v2.js';
 import { uid } from '../models.js';
 
 const fail = (code) => Object.assign(new Error(code), { code });
@@ -39,6 +40,10 @@ const previewReasons = Object.freeze({
 const blockedPreview = (reason, retryable = true) => ({ outcome: 'blocked', reason, retryable });
 const previewStores = ['device', 'outbox', 'students', 'enrollments', 'sections', 'attendance', 'scores',
   'logs', 'notes', 'submissions', 'sessionRosterSnapshots', 'closedTermReports', 'groupArrangements'];
+// V2 superseded rows are retained history, not queued work. Keep unknown/legacy
+// rows fail-closed; the Sync V2 summary is authoritative for active V2 work.
+const lifecycleOutboxReady = (rows) => rows.every((row) => row?.protocol === 'v2') &&
+  summarizeSyncV2OperationalState({ outbox: rows }).queuedCount === 0;
 
 // One disk snapshot, no readwrite transaction, checkpoint, outbox or Sync push.
 async function removalEvidenceSnapshot() {
@@ -75,13 +80,15 @@ export async function previewStudentRemoval(studentId, enrollmentId, revision) {
     }
     if (!Number.isSafeInteger(revision) || revision < 0) return blockedPreview('invalid_source', false);
     const beforeDevice = before.device.find((row) => row.id === 'device');
-    if (before.outbox.length || beforeDevice?.studentLifecycleResume || beforeDevice?.cloudRestoreResume) {
+    if (!lifecycleOutboxReady(before.outbox) || beforeDevice?.studentLifecycleResume || beforeDevice?.cloudRestoreResume) {
       return blockedPreview('sync_not_ready');
     }
     const available = async () => {
       if (!cloud.session || cloud.user?.id !== ownerId) return false;
+      if (!runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: ownerId }).allowed) return false;
       const summary = await sync.getSyncOperationalSummary(); // READ-ONLY; never assertCloudRestoreReady().
-      return summary.cloudSyncHealthy && !summary.automaticSyncActive && summary.safeToContinueUnrelatedWork;
+      return summary.cloudSyncHealthy && summary.queuedCount === 0 &&
+        !summary.automaticSyncActive && summary.safeToContinueUnrelatedWork;
     };
     if (!await available()) return blockedPreview('sync_not_ready');
     const result = await cloud.previewStudentRemoval(studentId, enrollmentId, revision);
@@ -92,7 +99,7 @@ export async function previewStudentRemoval(studentId, enrollmentId, revision) {
     // Re-read after the server response: a local-only submission may arrive while waiting.
     const current = await removalEvidenceSnapshot();
     const device = current.device.find((row) => row.id === 'device');
-    if (current.outbox.length || device?.studentLifecycleResume || device?.cloudRestoreResume || !await available()) {
+    if (!lifecycleOutboxReady(current.outbox) || device?.studentLifecycleResume || device?.cloudRestoreResume || !await available()) {
       return blockedPreview('sync_not_ready');
     }
     if (!cloud.session || cloud.user?.id !== ownerId) return blockedPreview('auth_required');
@@ -139,7 +146,7 @@ async function reconcile(checkpoint) {
     prepare(current) {
       const device = current.device.find((row) => row.id === 'device');
       if (device?.studentLifecycleResume?.envelope.mutationId !== checkpoint.envelope.mutationId) throw fail('LIFECYCLE_CHECKPOINT_CHANGED');
-      if (current.outbox.length) throw fail('LIFECYCLE_OUTBOX_NOT_EMPTY');
+      if (!lifecycleOutboxReady(current.outbox)) throw fail('LIFECYCLE_OUTBOX_NOT_EMPTY');
       const adopt = (name, canonical) => {
         const existing = current[name].find((row) => row.id === canonical.id);
         if ((existing?.serverRevision ?? 0) > canonical.serverRevision) return existing;
@@ -214,7 +221,7 @@ export async function executeStudentLifecycle(command, payload) {
   await db.applyBatch(scope, { prepare(current) {
     const device = current.device.find((row) => row.id === 'device') ?? { id: 'device' };
     if (device.studentLifecycleResume || device.cloudRestoreResume) throw fail('RECONCILIATION_REQUIRED');
-    if (current.outbox.length) throw fail('LIFECYCLE_OUTBOX_NOT_EMPTY');
+    if (!lifecycleOutboxReady(current.outbox)) throw fail('LIFECYCLE_OUTBOX_NOT_EMPTY');
     if (command === 'delete_pristine') {
       const reason = localPristineBlocker(current, payload.studentId);
       if (reason) throw Object.assign(fail('NOT_PRISTINE'), { reason });

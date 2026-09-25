@@ -201,7 +201,35 @@ test('signed-out review names authentication, with no destructive fallback or RP
   await profile(page); await removeStudent(page);
   await expect(page.getByRole('dialog')).toContainText('يلزم تسجيل الدخول إلى الحساب المعني لإتمام هذا الإجراء.');
   await expect(page.locator('[data-management="confirm"], [data-management="sync-preview"]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'العودة', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'إزالة الطالب من الفصل', exact: true })).toBeVisible();
   expect(previews).toHaveLength(0); expect(backend.calls).toHaveLength(0);
+  expect(errors).toEqual([]);
+});
+
+test('N27 retained superseded evidence allows the real removal flow and survives reload', async ({ page }) => {
+  await profile(page);
+  const row = { id: 'synthetic-n27-browser-history', protocol: 'v2', store: 'scores',
+    recordId: 'synthetic-old-score', state: 'superseded', supersededByMutationId: 'synthetic-replacement' };
+  const summary = await page.evaluate(async (evidence) => {
+    const db = await import('/src/lib/db.js');
+    await db.put('outbox', evidence);
+    return window.__syncModule.getSyncOperationalSummary();
+  }, row);
+  expect(summary).toMatchObject({ state: 'synced', queuedCount: 0, cloudSyncHealthy: true });
+  await removeStudent(page);
+  await expect(page.getByRole('dialog', { name: 'حذف هذا الطالب؟', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'حذف الطالب', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('تم حذف الطالب المضاف بالخطأ.');
+  await page.reload();
+  const afterReload = await page.evaluate(async (id) => {
+    const db = await import('/src/lib/db.js');
+    return { student: await db.get('students', id), history: await db.get('outbox', 'synthetic-n27-browser-history') };
+  }, f.student);
+  expect(afterReload.student).toMatchObject({ id: f.student, deleted: true });
+  expect(afterReload.history).toEqual(row);
+  expect(backend.calls).toHaveLength(1);
+  expect(errors.filter(error => !error.includes('ERR_FAILED'))).toEqual([]);
 });
 
 test('new local student requires acknowledgement; explicit Sync re-previews, never auto-deletes', async ({ page }) => {
