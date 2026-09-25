@@ -65,20 +65,27 @@ Temporary `N` keys refer to the unchanged Inbox notes above. These entries autho
 | N27 | Synthetic/read-only student-removal `sync_not_ready` investigation | INVESTIGATING | No real-account data access; no lifecycle guard bypass; copy choice remains pending below |
 | N33 | Synthetic/local automatic and manual Sync performance baseline | INVESTIGATING | No Sync architecture or guard change |
 
+## PO-approved decisions — 2026-09-25
+
+The Product Owner approved these decisions on 2026-09-25. The raw Inbox above remains the verbatim source. `PO APPROVED` records Product direction, **not** implementation completion or authorization to change runtime, schema, Production, Supabase, or Work-Active. All implementation scopes remain open unless a later ticket proves them fully satisfied.
+
+| Source note | Decision state | Approved contract | Next disposition |
+| --- | --- | --- | --- |
+| N02 | PO APPROVED | Any RAKEEZ user-experience feature, design, presentation, interaction, flow, or functional change must also be reflected in Demo wherever logically applicable. Account-specific/Auth/cloud/Supabase/private-user-data behavior without a logical Demo equivalent is exempt. | Permanent [governance](GOVERNANCE.md) rule; apply in future scoped tickets. |
+| N03 | PO APPROVED — AWAITING IMPLEMENTATION | Add Education Department to teacher/account profile as an optional searchable/selectable structured value, not arbitrary free text. Store it now for future use. Do not force calendar behavior; future integration may suggest a calendar, but the teacher may change it manually. | Separate schema/runtime/UX ticket after design; no implementation here. |
+| N04 + N10 | PO APPROVED — ONE FUTURE IMPLEMENTATION SCOPE | Preserve both source notes. Before a scheduled session's start time, opening attendance shows a calm non-blocking warning; pre-start “mark all present” requires extra confirmation. No time warning without a defined scheduled time. Home shows period number and session time clearly, preserving class/subject. N10 is the Home period/time sub-concern of N04. | Link both N-keys to one future implementation ticket; no implementation here. |
+| N05 | PO APPROVED — AWAITING WORK/IMPLEMENTATION | Quick Log names use up to two lines, then ellipsis; do not shrink text excessively. Keep cards usable on mobile and desktop. Give the minus `−` control a very subtle discoverability tint, never a warning/destructive look. | One N05 UX scope; Work approves final treatment before implementation. |
+| N06 | PO APPROVED — AWAITING WORK/IMPLEMENTATION | If a weekly schedule exists but today has no sessions, never show schedule-setup onboarding. On a normal school day, show suitable no-session text such as “لا توجد لديك حصص اليوم” with a light line for reviewing the week/other work. Friday/Saturday use a friendlier rest-day message. A known calendar holiday uses its context/name when available and indicates no scheduled sessions. Setup onboarding appears only with no configured schedule. | Work may refine microcopy/visuals without changing this behavior; implementation remains open. |
+| N23 | PO APPROVED DEFERRAL — LAST | Current report design is not accepted. Footer/signature concerns belong in later dedicated report-design work, not a narrow print-CSS patch; the representative synthetic investigation did not close the Product note. | Defer to last/later report-design scope; no implementation here. |
+
 ## WAITING_PO — EVENING REVIEW — 2026-09-25
 
 These references preserve unresolved Product/UX decisions without guessing or merging the original notes. “Waiting” does not block the explicitly authorized investigations above. Work-Active remains the visual authority; no row is implementation authorization.
 
 | Source note | Decision or approval to reserve for evening review |
 | --- | --- |
-| N02 | Approve the scope/exceptions of a Production–Demo parity governance rule. |
-| N03 | Define Education Department data authority and relation to existing calendar presets. |
-| N04 | Define future-session attendance warning/confirmation; confirm whether its Home-period subconcern overlaps N10. |
-| N05 | Approve Work treatment for long Quick Log names across viewports. |
-| N06 | Approve weekend/holiday/no-session wording; distinguish the already-present general no-sessions state. |
 | N07 | Approve Work typography for schedule period numbers. |
 | N09 | Prioritize and scope a comprehensive mobile UX audit. |
-| N10 | Confirm linkage with N04's Home period/time request while preserving both source notes. |
 | N11 | Decide how completed past sessions appear in Today’s Sessions. |
 | N12 | Define Excel file/template, grade mapping, and duplicate-student identity rules. |
 | N13 | Define same logical section/multiple-subject teaching and roster/score semantics. |
