@@ -20,7 +20,7 @@ Continue through routine test/tooling setup autonomously. Stop for Product decis
 
 - [Project State](PROJECT_STATE.md): what is true **now**; update after material live state changes.
 - [Decisions](DECISIONS.md): durable approved Product/architecture decisions and supersessions.
-- [Recovery Ledger](RECOVERY_LEDGER.md): archive capability classification and page-by-page review map, not Product backlog authorization.
+- [Recovery Ledger](RECOVERY_LEDGER.md): historical capability dispositions and explicit deferrals; no active Recovery backlog.
 - [Product Ledger](PRODUCT_LEDGER.md): raw PO notes, triage, current/future Product follow-ups.
 - [Test Matrix](TEST_MATRIX.md): gates selected by change risk.
 - [Release Checklist](RELEASE_CHECKLIST.md): exact-SHA promotion/review steps.
@@ -28,4 +28,4 @@ Continue through routine test/tooling setup autonomously. Stop for Product decis
 
 ## Autopilot Relay (0302)
 
-The local dry-run tooling at `D:\Abdullah Projects\RakeezX-Autopilot` can transport **Codex → ChatGPT → Codex** handoffs. It accepts only explicit `RAKEEZ_AUTOPILOT: CONTINUE`, `PO_REVIEW_REQUIRED`, `HARD_STOP`, or `DONE` markers; absent/ambiguous markers stop. The relay transports decisions; it does not make Product decisions, infer authorization, or bypass Work, Preview, or Production PO review. Normal-ticket relay use remains pending PM review; no unattended watcher is enabled by 0302.
+The local tooling at `D:\Abdullah Projects\RakeezX-Autopilot` can transport **Codex → ChatGPT → Codex** handoffs for normal-ticket coordination after PO/PM approval. It accepts only explicit `RAKEEZ_AUTOPILOT: CONTINUE`, `PO_REVIEW_REQUIRED`, `HARD_STOP`, or `DONE` markers; absent/ambiguous markers stop. The relay transports decisions; it does not make Product decisions, infer authorization, or bypass Work, Preview, or Production PO review. No unattended watcher is enabled.
