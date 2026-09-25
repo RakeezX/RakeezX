@@ -1,11 +1,10 @@
-# RAKEEZ X — AI Bootstrap Handoff
+# RAKEEZ X — agent bootstrap handoff
 
-Read this first, then [RAKEEZ_X_PROJECT_CONTINUITY.md](RAKEEZ_X_PROJECT_CONTINUITY.md), [RECOVERY_LEDGER.md](RECOVERY_LEDGER.md), [OPEN_ISSUES.md](OPEN_ISSUES.md), `AGENTS.md`, and the named ticket.
+Updated 2026-09-25. Read this short route map first; it is not a frozen Production release report.
 
-1. **What this is:** RAKEEZ X is an Arabic-first, offline-first teacher PWA. Student identity, historical sessions/attendance, sync safety, and small verified changes matter more than speed.
-2. **Sources of truth:** Google AI Studio is the approved visible UX source. Production `main` is the runtime/data/sync source. Never wholesale-merge `visual/main` or copy prototype runtime code.
-3. **Workflow:** obtain PO-approved scope, inspect current branch/status/diff, make only scoped changes, run the ticket Lean Gate, commit logically, promote only when explicitly authorized, then wait for PO Production verification before `CLOSED`.
-4. **Current baseline:** Production `main` is documented at `e82f58a`; PWA cache release is `rakeezx-v6`. Migrations `0008`, `0009`, and `0010` are already applied in Production and must not be reapplied.
-5. **Open work:** Treat `STU-REC-01B` as `DEFERRED`, not fixed: implementation exists but PO reported transferred student history still appears empty in destination context. Grade portability and historical class-report truth are separate open tickets.
-6. **Do not:** change schema/migrations without explicit authority; rekey history; change sync architecture casually; run destructive cloud work; mark implementation as closed; or replace Production runtime from an archive.
-7. **Read next:** the relevant view/store/sync files, focused tests, matching migration(s), the ticket template, and recent commits. For data/sync work also read `docs/SUPABASE-AND-SYNC.md`.
+1. **Authority:** Read repository `AGENTS.md`, the named ticket, [Governance](GOVERNANCE.md), and [Decisions](DECISIONS.md). The PO decides Product behavior. Production/main is runtime/data authority; Work-Active is the sole active visual/UX golden source after PO approval. ChatGPT coordinates/reviews; Codex implements approved Production changes.
+2. **Current state:** Read [Project State](PROJECT_STATE.md), then verify current Git and provider identity for any release claim. Do not reuse a hard-coded old SHA, service-worker generation, migration count, or historical ticket status from this handoff.
+3. **Source architecture:** Read [Current Architecture](CURRENT_ARCHITECTURE.md) and the cited `src/` or migration files. For Product follow-ups, preserve the raw [Product Ledger](PRODUCT_LEDGER.md) Inbox. [Recovery Ledger](RECOVERY_LEDGER.md) has no active Recovery backlog; its inventory is not an automatic implementation queue.
+4. **Verification:** Select risk-proportional checks from [Test Matrix](TEST_MATRIX.md), then follow [Release Checklist](RELEASE_CHECKLIST.md). A user-visible ticket stays pending PO Production review until the PO verifies it. A docs-only change does not authorize a Product deployment.
+5. **Safety:** Do not copy whole Work or Archive trees; reset user work; alter an applied migration; touch Production/private data or Work-Active beyond explicit ticket authority; or let the Autopilot Relay make a Product decision. Exact source and evidence outrank an old chat summary.
+6. **Historical references:** [Project Continuity](RAKEEZ_X_PROJECT_CONTINUITY.md), [Architecture](ARCHITECTURE.md), [Technical Architecture](RAKEEZ_X_TECHNICAL_ARCHITECTURE.md), [Supabase and Sync](SUPABASE-AND-SYNC.md), and [Open Issues](OPEN_ISSUES.md) preserve dated historical context. Do not use their old “current” assertions as live truth.

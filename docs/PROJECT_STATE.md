@@ -18,7 +18,7 @@ Last updated: 2026-09-25 (Asia/Riyadh). This is a short snapshot, not a changelo
 
 ## Focus and limits
 
-- Active ticket: **0304 — Ledger Cleanup After PO Review**. There is **no active Recovery restoration batch or backlog**. The next Product work source is the [Product Ledger](PRODUCT_LEDGER.md) Inbox, real Silent Beta observations, and explicit PO priorities—not a standing archive-review program.
+- Active documentation/triage ticket: **PRODUCT-LEDGER-CLEAR-EXECUTION-01**. The Product Owner's 2026-09-25 raw Inbox notes are preserved verbatim in the [Product Ledger](PRODUCT_LEDGER.md); clear investigations and N17 documentation reconciliation are in progress, while unresolved Product decisions wait for evening review. No Product implementation is authorized by that organization. There is **no active Recovery restoration batch or backlog**. Future Product work derives from the Inbox, real Silent Beta observations, and explicit PO priorities—not a standing archive-review program.
 - True known Silent Beta blockers: **none established by the latest pilot evidence**. A new security, ownership, data-loss, or production failure must be classified on its own evidence.
 - The historical Student Profile continuity concern is closed by PO decision; any recurrence needs a new bug report based on current evidence. Lesson-to-session linking is deferred future Lessons development, not Recovery. Full Archive validation waits until a real prior year/term archive exists.
 
