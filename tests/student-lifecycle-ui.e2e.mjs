@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
-import { STORES } from '../src/lib/db.js';
+import { DB_VERSION, STORES } from '../src/lib/db.js';
 import { lifecycleServer, academicFixture, evidence, LifecycleBackend, OWNER } from './helpers/student-lifecycle-server.mjs';
 
 test.setTimeout(120_000);
@@ -13,7 +13,7 @@ async function seedClaimedWorkspace(page) {
     contentType: 'text/html', body: '<!doctype html><title>student lifecycle workspace fixture</title>',
   }));
   await page.goto('/__student-lifecycle-workspace__');
-  await page.evaluate(async ({ stores, ownerId, claimId }) => {
+  await page.evaluate(async ({ stores, ownerId, claimId, dbVersion }) => {
     const request = (operation) => new Promise((resolve, reject) => {
       operation.onsuccess = () => resolve(operation.result);
       operation.onerror = () => reject(operation.error);
@@ -24,7 +24,8 @@ async function seedClaimedWorkspace(page) {
       tx.onabort = () => reject(tx.error);
     });
 
-    const productRequest = indexedDB.open('rakeezx', 7);
+    // Seed the schema the app will open; lifecycle tests do not exercise DB upgrades.
+    const productRequest = indexedDB.open('rakeezx', dbVersion);
     productRequest.onupgradeneeded = () => {
       for (const store of stores) {
         if (!productRequest.result.objectStoreNames.contains(store)) {
@@ -35,7 +36,7 @@ async function seedClaimedWorkspace(page) {
     const product = await request(productRequest);
     const productTx = product.transaction(['device', 'profile'], 'readwrite');
     productTx.objectStore('device').put({
-      id: 'device', deviceId: 'device:student-lifecycle-ui', schemaVersion: 7,
+      id: 'device', deviceId: 'device:student-lifecycle-ui', schemaVersion: dbVersion,
       workspaceClaim: {
         version: 1, claimId, state: 'claimed', ownerId,
         origin: location.origin, databaseName: 'rakeezx', deviceId: 'device:student-lifecycle-ui',
@@ -65,7 +66,7 @@ async function seedClaimedWorkspace(page) {
     });
     await transaction(registryTx);
     registry.close();
-  }, { stores: STORES, ownerId: OWNER, claimId });
+  }, { stores: STORES, ownerId: OWNER, claimId, dbVersion: DB_VERSION });
   await page.unroute('**/__student-lifecycle-workspace__');
 }
 
