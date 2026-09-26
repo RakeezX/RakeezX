@@ -12,7 +12,7 @@ import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
 import {
-  todayISO, shiftDate, gradeLabel, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday,
+  todayISO, shiftDate, gradeLabel, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday, isTeachingDay, CALENDAR_KIND,
 } from '../models.js';
 
 const DISMISS_STORAGE_KEY = 'rakeezx_home_pwa_dismissed_at';
@@ -122,6 +122,26 @@ const soon = (title, text) => html`
 `;
 
 const CANCELLED_SESSION_STATUSES = new Set(['cancelled', 'cancelled_holiday']);
+
+// Presentation only: use the configured schedule and existing calendar context.
+function todayEmptyCopy(hasSchedule, date, calendarDay) {
+  if (!hasSchedule) return {
+    kicker: 'جدولك الأسبوعي', title: 'لم تُضف حصصك الأسبوعية بعد',
+    text: 'بعد إعداد الجدول، ستظهر هنا حصص يومك.', action: 'إعداد الجدول', iconName: 'timetable',
+  };
+  if (calendarDay && !isTeachingDay(calendarDay.kind)) return {
+    kicker: 'إجازة', title: calendarDay.label || CALENDAR_KIND[calendarDay.kind]?.label || 'إجازة رسمية',
+    text: 'لا توجد لديك حصص مجدولة اليوم. يمكنك مراجعة جدول الأسبوع.', action: 'عرض الجدول', iconName: 'calendar',
+  };
+  if ([5, 6].includes(weekday(date))) return {
+    kicker: 'عطلة نهاية الأسبوع', title: 'لا توجد لديك حصص اليوم',
+    text: 'نتمنى لك يومًا هادئًا. يمكنك مراجعة جدول الأسبوع.', action: 'عرض الجدول', iconName: 'calendar',
+  };
+  return {
+    kicker: 'حصص اليوم', title: 'لا توجد لديك حصص اليوم',
+    text: 'يمكنك مراجعة جدول الأسبوع أو متابعة أعمال فصولك.', action: 'عرض الجدول', iconName: 'timetable',
+  };
+}
 
 function timeToMinutes(value) {
   const match = /^(\d{1,2}):(\d{2})/.exec(String(value ?? ''));
@@ -249,6 +269,7 @@ export default {
       : null;
     const remainingSessions = focus ? daySessions.filter((session) => session.id !== focus.session.id) : daySessions;
     const cal = store.calendarDayFor(today);
+    const emptyCopy = todayEmptyCopy(list.some((teaching) => store.slotsOf(teaching.id).length > 0), today, cal);
     const pendingToday = remainingSessions.filter((session) =>
       !CANCELLED_SESSION_STATUSES.has(session.status) && store.attendanceCompleteness(session).state === 'pending'
     ).length;
@@ -385,9 +406,9 @@ export default {
               `
             : html`
                 <div class="home-sessions__empty today-empty-card">
-                  <span class="today-empty-card__icon" aria-hidden="true">${icon('timetable')}</span>
-                  <div><small>اليوم الدراسي</small><h2 id="home-sessions-title">لا توجد حصص اليوم</h2><p>يمكنك مراجعة جدول الأسبوع أو متابعة أعمال فصولك.</p></div>
-                  <a class="btn btn--quiet" href="#/schedule">عرض الجدول</a>
+                  <span class="today-empty-card__icon" aria-hidden="true">${icon(emptyCopy.iconName)}</span>
+                  <div><small>${emptyCopy.kicker}</small><h2 id="home-sessions-title">${emptyCopy.title}</h2><p>${emptyCopy.text}</p></div>
+                  <a class="btn btn--quiet" href="#/schedule">${emptyCopy.action}</a>
                 </div>
               `}
       </section>
