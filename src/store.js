@@ -101,14 +101,17 @@ export function subscribe(fn) {
 
 let notifyQueued = false;
 let pendingRender = false;
-function notify({ render = true } = {}) {
+let pendingSyncReady = false;
+function notify({ render = true, syncReady = true } = {}) {
   pendingRender ||= render;
+  pendingSyncReady ||= syncReady;
   if (notifyQueued) return;
   notifyQueued = true;
   queueMicrotask(() => {
     notifyQueued = false;
-    const update = { render: pendingRender };
+    const update = { render: pendingRender, syncReady: pendingSyncReady };
     pendingRender = false;
+    pendingSyncReady = false;
     for (const fn of listeners) fn(state, update);
   });
 }
@@ -832,15 +835,16 @@ export async function save(batch, options = {}) {
     if (entry) outbox.push(entry);
   }
   if (outbox.length) writes.outbox = outbox;
-  notify();
+  notify({ syncReady: false });
 
   try {
     await db.putAcross(writes);
     broadcast(changes);
+    if (outbox.length) notify({ render: false });
     return true;
   } catch (err) {
     for (const [storeName, records, undo] of undos) revertMemory(storeName, records, undo);
-    notify();
+    notify({ syncReady: false });
     reportWriteError(err, { op: 'save', stores: Object.keys(batch) });
     return false;
   }
@@ -1025,7 +1029,7 @@ export async function patch(storeName, id, changes, create = null, options = {})
   const undo = singleton ? [] : applyToMemory(storeName, [optimistic]);
   const previous = singleton ? state[storeName] : null;
   if (singleton) state[storeName] = optimistic;
-  if (shouldNotify) notify({ render: shouldRender });
+  if (shouldNotify) notify({ render: shouldRender, syncReady: false });
 
   try {
     const [authoritative] = await db.patchMany(
@@ -1040,7 +1044,7 @@ export async function patch(storeName, id, changes, create = null, options = {})
     if (!authoritative) {
       if (singleton) state[storeName] = previous;
       else revertMemory(storeName, [optimistic], undo);
-      if (shouldNotify) notify();
+      if (shouldNotify) notify({ syncReady: false });
       return null;
     }
 
@@ -1054,12 +1058,17 @@ export async function patch(storeName, id, changes, create = null, options = {})
       else applyToMemory(storeName, [authoritative]);
     }
     broadcast([{ store: storeName, id }]);
-    if (authoritativeChanged && shouldNotify) notify({ render: shouldRender });
+    if (shouldNotify) {
+      notify({
+        render: authoritativeChanged && shouldRender,
+        syncReady: options.queue !== false && storeName !== 'device' && !!SYNC_V2_SCHEMAS[storeName],
+      });
+    }
     return authoritative;
   } catch (err) {
     if (singleton) state[storeName] = previous;
     else revertMemory(storeName, [optimistic], undo);
-    if (shouldNotify) notify();
+    if (shouldNotify) notify({ syncReady: false });
     reportWriteError(err, { op: 'patch', store: storeName, id, fields: Object.keys(changes) });
     return null;
   }

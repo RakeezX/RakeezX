@@ -9,16 +9,27 @@ const TABLES = ['years', 'calendars', 'calendar_days', 'terms', 'subjects', 'sec
 
 function createCloud() {
   const tables = Object.fromEntries(TABLES.map((name) => [name, []]));
+  const requests = [];
   let profile = { teacher_name: 'معلم سحابي', school_name: 'مدرسة سحابية', phone: '', client_updated_at: Date.now() - 5_000 };
   let nextProfileWrite = null;
+  let failNextProfileRead = false;
+  let activeWrites = 0;
+  let maxActiveWrites = 0;
   const nextTableRead = new Map();
   return {
     async route(page) {
       await page.route(`${CLOUD_URL}**`, async (route) => {
         const request = route.request();
         const table = new URL(request.url()).pathname.split('/').pop();
+        requests.push({ table, method: request.method(), at: Date.now() });
         if (table === 'profile') {
-          if (request.method() === 'GET') return route.fulfill({ json: profile ? [profile] : [] });
+          if (request.method() === 'GET') {
+            if (failNextProfileRead) {
+              failNextProfileRead = false;
+              return route.fulfill({ status: 503, json: { message: 'Synthetic transient failure' } });
+            }
+            return route.fulfill({ json: profile ? [profile] : [] });
+          }
           if (nextProfileWrite) {
             const gate = nextProfileWrite; nextProfileWrite = null; gate.started(); await gate.wait;
           }
@@ -27,42 +38,48 @@ function createCloud() {
           return route.fulfill({ json: [profile] });
         }
         if (table === 'apply_sync_v2_mutation' && request.method() === 'POST') {
-          const envelope = JSON.parse(request.postData() ?? '{}');
-          const entity = envelope.p_entity;
-          if (entity === 'profile' && nextProfileWrite) {
-            const gate = nextProfileWrite; nextProfileWrite = null; gate.started(); await gate.wait;
+          activeWrites++;
+          maxActiveWrites = Math.max(maxActiveWrites, activeWrites);
+          try {
+            const envelope = JSON.parse(request.postData() ?? '{}');
+            const entity = envelope.p_entity;
+            if (entity === 'profile' && nextProfileWrite) {
+              const gate = nextProfileWrite; nextProfileWrite = null; gate.started(); await gate.wait;
+            }
+            const list = entity === 'profile' ? [profile] : (tables[entity] ??= []);
+            const index = list.findIndex((record) => record?.id === envelope.p_record_id);
+            const prior = index >= 0 ? list[index] : null;
+            const revision = Number(prior?.revision ?? 0) + 1;
+            const canonical = {
+              ...(prior ?? {}),
+              id: envelope.p_record_id,
+              ...(envelope.p_patch ?? {}),
+              revision,
+              field_revisions: Object.fromEntries(
+                Object.keys(envelope.p_patch ?? {}).map((field) => [field, revision]),
+              ),
+              deleted_at: envelope.p_operation === 'delete'
+                ? new Date(envelope.p_client_updated_at ?? Date.now()).toISOString()
+                : null,
+              client_updated_at: envelope.p_client_updated_at ?? Date.now(),
+            };
+            if (entity === 'profile') profile = canonical;
+            else if (index >= 0) list[index] = canonical;
+            else list.push(canonical);
+            return await route.fulfill({ json: {
+              mutationId: envelope.p_mutation_id,
+              entity,
+              recordId: envelope.p_record_id,
+              canonicalId: canonical.id,
+              outcome: 'applied',
+              appliedGroups: Object.keys(envelope.p_patch ?? {}),
+              conflictedGroups: [],
+              resultRevision: revision,
+              canonical,
+            } });
+          } finally {
+            activeWrites--;
           }
-          const list = entity === 'profile' ? [profile] : (tables[entity] ??= []);
-          const index = list.findIndex((record) => record?.id === envelope.p_record_id);
-          const prior = index >= 0 ? list[index] : null;
-          const revision = Number(prior?.revision ?? 0) + 1;
-          const canonical = {
-            ...(prior ?? {}),
-            id: envelope.p_record_id,
-            ...(envelope.p_patch ?? {}),
-            revision,
-            field_revisions: Object.fromEntries(
-              Object.keys(envelope.p_patch ?? {}).map((field) => [field, revision]),
-            ),
-            deleted_at: envelope.p_operation === 'delete'
-              ? new Date(envelope.p_client_updated_at ?? Date.now()).toISOString()
-              : null,
-            client_updated_at: envelope.p_client_updated_at ?? Date.now(),
-          };
-          if (entity === 'profile') profile = canonical;
-          else if (index >= 0) list[index] = canonical;
-          else list.push(canonical);
-          return route.fulfill({ json: {
-            mutationId: envelope.p_mutation_id,
-            entity,
-            recordId: envelope.p_record_id,
-            canonicalId: canonical.id,
-            outcome: 'applied',
-            appliedGroups: Object.keys(envelope.p_patch ?? {}),
-            conflictedGroups: [],
-            resultRevision: revision,
-            canonical,
-          } });
         }
         if (table === 'account_contract' && request.method() === 'POST') {
           return route.fulfill({ json: {
@@ -108,6 +125,9 @@ function createCloud() {
       });
     },
     profile: () => profile,
+    requests: () => [...requests],
+    maxActiveWrites: () => maxActiveWrites,
+    failNextProfileRead: () => { failNextProfileRead = true; },
     table: (name) => tables[name] ?? [],
     holdNextProfileWrite() {
       let started; let release;
@@ -209,6 +229,93 @@ test('automatic sync pulls on authenticated boot and pushes profile changes with
   await contextB.close();
 });
 
+test('durable edits use the measured trailing cadence while manual and stale resume stay immediate', async ({ browser }) => {
+  test.setTimeout(45_000);
+  const cloud = createCloud();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await authenticated(page, cloud);
+  await page.goto('/#/settings');
+  await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
+
+  let mark = cloud.requests().length;
+  const oneCommittedAt = await page.evaluate(async () => {
+    await window.store.patchProfile({ teacherName: 'Cadence single edit' });
+    return Date.now();
+  });
+  await expect.poll(() => cloud.profile().teacher_name).toBe('Cadence single edit');
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  let events = cloud.requests().slice(mark);
+  let pulls = events.filter((event) => event.table === 'profile' && event.method === 'GET');
+  expect(pulls).toHaveLength(2);
+  expect(events.filter((event) => event.table === 'apply_sync_v2_mutation')).toHaveLength(1);
+  expect(pulls[0].at - oneCommittedAt).toBeGreaterThanOrEqual(240);
+  expect(pulls[0].at - oneCommittedAt).toBeLessThan(1200);
+
+  mark = cloud.requests().length;
+  const lastCommittedAt = await page.evaluate(async () => {
+    for (let i = 0; i < 3; i++) {
+      await window.store.patchProfile({ teacherName: `Cadence rapid edit ${i}` });
+      if (i < 2) await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    return Date.now();
+  });
+  await expect.poll(() => cloud.profile().teacher_name).toBe('Cadence rapid edit 2');
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  events = cloud.requests().slice(mark);
+  pulls = events.filter((event) => event.table === 'profile' && event.method === 'GET');
+  expect(pulls).toHaveLength(2);
+  expect(events.filter((event) => event.table === 'apply_sync_v2_mutation')).toHaveLength(3);
+  expect(pulls[0].at - lastCommittedAt).toBeGreaterThanOrEqual(240);
+
+  mark = cloud.requests().length;
+  const manualStartedAt = await page.evaluate(async () => {
+    const started = Date.now();
+    const ok = await window.__syncModule.syncAll({ full: true });
+    if (!ok) throw new Error('manual Sync failed');
+    return started;
+  });
+  events = cloud.requests().slice(mark);
+  expect(events.some((event) => event.table === 'profile' && event.method === 'GET')).toBe(true);
+  expect(events[0].at - manualStartedAt).toBeLessThan(250);
+
+  mark = cloud.requests().length;
+  const resumedAt = await page.evaluate(() => {
+    window.__syncModule.state.lastSyncedAt = Date.now() - 6 * 60 * 1000;
+    const started = Date.now();
+    window.dispatchEvent(new Event('pageshow'));
+    return started;
+  });
+  await expect.poll(() => cloud.requests().slice(mark).some((event) => event.table === 'profile' && event.method === 'GET')).toBe(true);
+  events = cloud.requests().slice(mark);
+  expect(events[0].at - resumedAt).toBeLessThan(250);
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  await context.close();
+});
+
+test('temporary automatic failure retains the edit and uses the existing retry backoff', async ({ browser }) => {
+  test.setTimeout(45_000);
+  const cloud = createCloud();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await authenticated(page, cloud);
+  await page.goto('/#/settings');
+  await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
+
+  const mark = cloud.requests().length;
+  cloud.failNextProfileRead();
+  await page.evaluate(() => window.store.patchProfile({ schoolName: 'Cadence retry school' }));
+  await page.waitForFunction(() => window.__syncModule.state.status === 'error');
+  expect((await page.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('outbox'))
+    .some((entry) => entry.store === 'profile')))).toBe(true);
+  await expect.poll(() => cloud.profile().school_name, { timeout: 10_000 }).toBe('Cadence retry school');
+  await page.waitForFunction(() => window.__syncModule.state.status === 'synced');
+  const reads = cloud.requests().slice(mark).filter((event) => event.table === 'profile' && event.method === 'GET');
+  expect(reads.length).toBeGreaterThanOrEqual(3);
+  expect(reads[1].at - reads[0].at).toBeGreaterThanOrEqual(1800);
+  await context.close();
+});
+
 test('offline profile edits remain local and automatically drain on reconnect', async ({ browser }) => {
   test.setTimeout(45_000);
   const cloud = createCloud();
@@ -238,6 +345,7 @@ test('a mutation during an active upload remains queued for a single follow-up p
   await page.goto('/#/settings');
   await page.waitForFunction(() => window.__syncModule?.state.status === 'synced');
 
+  const mark = cloud.requests().length;
   const gate = cloud.holdNextProfileWrite();
   await page.evaluate(() => window.store.patchProfile({ teacherName: 'معلم أثناء المزامنة ١' }));
   await gate.started;
@@ -247,6 +355,10 @@ test('a mutation during an active upload remains queued for a single follow-up p
   await expect.poll(() => cloud.profile().teacher_name, { timeout: 10_000 }).toBe('معلم أثناء المزامنة ٢');
   await page.waitForFunction(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).every((entry) => entry.store !== 'profile'));
   expect(await page.evaluate(() => window.__syncModule.state.status)).toBe('synced');
+  const events = cloud.requests().slice(mark);
+  expect(events.filter((event) => event.table === 'score_foundation_capability')).toHaveLength(2);
+  expect(events.filter((event) => event.table === 'apply_sync_v2_mutation')).toHaveLength(2);
+  expect(cloud.maxActiveWrites()).toBe(1);
   await context.close();
 });
 test('authenticated fresh pull renders existing student notes without a local mutation', async ({ browser }) => {

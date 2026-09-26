@@ -46,7 +46,7 @@ const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms'
 const STUDENT_STORES = new Set(['students', 'enrollments']);
 const SCORING_STORES = new Set(['items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'logs']);
 const TIMETABLE_STORES = new Set(['timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance']);
-const AUTO_SYNC_DEBOUNCE_MS = 900;
+const AUTO_SYNC_DEBOUNCE_MS = 325;
 const RESUME_STALE_MS = 5 * 60 * 1000;
 const RETRY_DELAYS_MS = [2_000, 4_000, 8_000, 16_000, 30_000];
 
@@ -635,8 +635,8 @@ export function init() {
   if (initialized) return;
   initialized = true;
   void getSyncOperationalSummary().catch(() => {});
-  store.subscribe(() => {
-    if (!suppressAutoSchedule) scheduleAutomaticSync();
+  store.subscribe((_state, update) => {
+    if (!suppressAutoSchedule && update.syncReady) scheduleAutomaticSync();
   });
   cloud.subscribe(() => {
     if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
