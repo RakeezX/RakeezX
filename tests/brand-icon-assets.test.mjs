@@ -212,7 +212,9 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
     '          return await cacheResponse(request, await fetch(request));',
   );
   assert.equal(worker.slice(worker.indexOf("self.addEventListener('install'")),oldWorker.slice(oldWorker.indexOf("self.addEventListener('install'")));
-  assert.match(worker,/const VERSION = 'rakeezx-v31';/);
+  const cacheGeneration = worker.match(/const VERSION = 'rakeezx-v(\d+)';/);
+  assert.ok(cacheGeneration && Number(cacheGeneration[1]) >= 31,
+    'later runtime releases must retain or advance the Brand cache generation');
   assert.match(worker,/\.\/src\/lib\/score-foundation\.js/);
   assert.match(worker,/\.\/src\/lib\/email-otp\.js/);
   assert.match(worker,/\.\/src\/lib\/account-profile\.js/);

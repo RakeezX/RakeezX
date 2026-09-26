@@ -18,6 +18,36 @@ let refreshInFlight = null;
 let mockBackend = null;
 export function setMockBackend(adapter) { mockBackend = adapter; }
 
+export async function fetchOwnerSyncMarker({ signal } = {}) {
+  const ownerId = user?.id;
+  if (!ownerId || !session) return null;
+  const { validOwnerMarker } = await import('./remote-sync.js');
+  let marker;
+  try {
+    marker = mockBackend ? await mockBackend.fetchOwnerSyncMarker?.()
+      : await request('/rpc/owner_sync_change_marker', {
+        method: 'POST', signal, headers: { 'Content-Type': 'application/json',
+          'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}' });
+  } catch (error) {
+    if (error.status === 404 || error.code === 'PGRST202') return null;
+    throw error;
+  }
+  return user?.id === ownerId && session && validOwnerMarker(marker, ownerId) ? marker : null;
+}
+
+export function openOwnerSyncChannel(options) {
+  if (!user?.id || !session?.access_token || options.ownerId !== user.id || options.accessToken !== session.access_token) {
+    throw new Error('Owner signal identity changed');
+  }
+  if (mockBackend) return mockBackend.openOwnerSyncChannel?.(options) ?? (() => {});
+  let stopped = false, close;
+  void import('./owner-invalidation-channel.js').then(({ openOwnerInvalidationChannel }) => {
+    if (stopped || options.ownerId !== user?.id || options.accessToken !== session?.access_token) return;
+    close = openOwnerInvalidationChannel({ ...options, url: SUPABASE_URL, apiKey: PUBLISHABLE_KEY });
+  }).catch(() => {});
+  return () => { stopped = true; close?.(); };
+}
+
 export function setMockAuth(u, s) {
   user = u;
   session = s;

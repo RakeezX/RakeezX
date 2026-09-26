@@ -175,6 +175,8 @@ test('same-owner READY foundation repair preserves an already mounted local work
 
 test('new offline dependency is precached under the next service-worker generation', async () => {
   const worker = await readFile(new URL('../sw.js', import.meta.url), 'utf8');
-  assert.match(worker, /const VERSION = 'rakeezx-v31';/);
+  const cacheGeneration = worker.match(/const VERSION = 'rakeezx-v(\d+)';/);
+  assert.ok(cacheGeneration && Number(cacheGeneration[1]) >= 31,
+    'the provisioning dependency must remain cached in this or a later generation');
   assert.match(worker, /\.\/src\/lib\/account-provisioning\.js/);
 });

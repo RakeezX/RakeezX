@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
+import { installRealtimeFixture } from './helpers/realtime-server-fixture.mjs';
 
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
@@ -19,6 +20,7 @@ test('internal ownership helpers deny direct client execution for both identitie
       create function auth.uid() returns uuid language sql stable security definer set search_path=''
         as $$select id from auth.current_identity limit 1$$;
       grant usage on schema auth to authenticated, anon;`);
+    await installRealtimeFixture(pg);
     for (const name of migrations) {
       const sql = await readFile(new URL(name, migrationsDirectory), 'utf8');
       await pg.exec(sql.replace(/^\uFEFF/, ''));

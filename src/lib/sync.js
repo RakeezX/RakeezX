@@ -5,6 +5,7 @@ import { uid, DEFAULT_TIME_PROFILES, normalizeSectionLabel } from '../models.js'
 import { createSyncV2Engine, SYNC_V2_STORES } from './sync-v2.js';
 import { ownershipBlockedError, runtimeSyncOwnershipGuard } from './sync-ownership.js';
 import { isCurriculumOrdinarySyncAllowed } from './curriculum-bootstrap.js';
+import { createRemoteSync, browserRemoteLeadership } from './remote-sync.js';
 
 export const state = {
   lastError: null,
@@ -53,6 +54,7 @@ const RETRY_DELAYS_MS = [2_000, 4_000, 8_000, 16_000, 30_000];
 let autoTimer = null;
 let autoRunning = false;
 let rerunRequested = false;
+let fullRequested = false;
 let suppressAutoSchedule = false;
 let initialized = false;
 let retryAttempt = 0;
@@ -98,7 +100,31 @@ const cloudOwnershipAccess = (operation = 'pull', command = null) => runtimeSync
   operation, authenticatedUserId: cloud.user?.id ?? null, command,
 });
 
+const remoteSync = createRemoteSync({
+  debounceMs: AUTO_SYNC_DEBOUNCE_MS,
+  getContext: () => ({ ownerId: cloud.user?.id, token: cloud.session?.access_token,
+    workspace: store.getActiveWorkspace()?.databaseName, ready: store.state.ready,
+    proven: cloudOwnershipAccess('pull').allowed
+      && store.getActiveWorkspace()?.type === 'account'
+      && store.getActiveWorkspace()?.authUserId === cloud.user?.id
+      && store.getActiveWorkspace()?.ownershipState === 'claimed'
+      && !workspaceClaimRunning && !restoreRunning,
+    online: isOnline(), visible: typeof document === 'undefined' || document.visibilityState === 'visible' }),
+  getMarker: cloud.fetchOwnerSyncMarker,
+  openChannel: cloud.openOwnerSyncChannel,
+  acquireLeadership: browserRemoteLeadership,
+  requestSync: () => {
+    if (restoreRunning || workspaceClaimRunning || retryScheduled || !cloudOwnershipAccess('pull').allowed) return;
+    if (autoRunning) { rerunRequested = true; fullRequested = true; }
+    else scheduleAutomaticSync({ full: true, immediate: true });
+  },
+});
+
+export const getRemoteSyncDiagnostics = () => remoteSync.diagnostics();
+
 function stopOwnershipBlockedScheduling(access) {
+  remoteSync.stop();
+  fullRequested = false;
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
   retryScheduled = false;
@@ -230,13 +256,17 @@ function scheduleAutomaticSync({ full = false, immediate = false } = {}) {
   }
   if (autoRunning) {
     rerunRequested = true;
+    fullRequested ||= full;
     return;
   }
   if (autoTimer) clearTimeout(autoTimer);
   retryScheduled = false;
+  fullRequested ||= full;
   autoTimer = setTimeout(() => {
     autoTimer = null;
-    syncAll({ full });
+    const requestedFull = fullRequested;
+    fullRequested = false;
+    syncAll({ full: requestedFull });
   }, immediate ? 0 : AUTO_SYNC_DEBOUNCE_MS);
   setState({ status: 'pending' });
 }
@@ -421,9 +451,14 @@ export async function syncAll({ full = true } = {}) {
   }
   if (autoRunning) {
     rerunRequested = true;
+    fullRequested ||= full;
     return false;
   }
 
+  // A manual pass can cancel a queued full timer. Consume that intent in this
+  // pass so it cannot expand the next unrelated local-change pass.
+  full ||= fullRequested;
+  fullRequested = false;
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
   autoRunning = true;
@@ -431,7 +466,9 @@ export async function syncAll({ full = true } = {}) {
   setState({ lastError: null });
   let failed = false;
   let madeProgress = false;
+  let remoteCapture = null;
   try {
+    if (full) remoteCapture = await remoteSync.beforeFullSync();
     const snapshot = await pendingOutbox();
     const scoreDomainAvailable = await scoreDomainAvailableForSync();
     const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
@@ -468,8 +505,10 @@ export async function syncAll({ full = true } = {}) {
     retryScheduled = false;
     setState({ status: v2Status.state, lastError: null });
     cacheOperationalSummary(v2Status);
+    if (full) remoteSync.afterFullSync(remoteCapture, true);
     return true;
   } catch (err) {
+    if (full) remoteSync.afterFullSync(remoteCapture, false);
     failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
     const needsAuth = cloud.isAuthRequiredError?.(err) || cloud.authStatus?.().state === 'auth_required';
@@ -487,7 +526,7 @@ export async function syncAll({ full = true } = {}) {
         scheduleRetry();
       } else if (rerunRequested || v2Status.pending || (v2Status.blocked && madeProgress)) {
         rerunRequested = false;
-        scheduleAutomaticSync();
+        scheduleAutomaticSync({ full: fullRequested });
       } else {
         rerunRequested = false;
       }
@@ -528,6 +567,8 @@ export async function assertCloudRestoreReady() {
 export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true } = {}) {
   if (restoreRunning || workspaceClaimRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
+  remoteSync.stop();
+  fullRequested = false;
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
   restoreRunning = true;
@@ -540,6 +581,7 @@ export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true 
     store.setCloudRestoreInProgress(false);
     suppressAutoSchedule = false;
     restoreRunning = false;
+    if (initialized) void remoteSync.refresh();
     setState({ status: 'synced', lastError: null });
     if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
   }
@@ -555,6 +597,8 @@ export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = fal
     throw Object.assign(new Error('Another exclusive operation is already running'), { code: 'SYNC_BUSY' });
   }
   if (typeof task !== 'function') throw new TypeError('Workspace claim task is required');
+  remoteSync.stop();
+  fullRequested = false;
   workspaceClaimRunning = true;
   suppressAutoSchedule = true;
   store.setWorkspaceClaimInProgress(true);
@@ -571,6 +615,7 @@ export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = fal
     store.setWorkspaceClaimInProgress(false);
     suppressAutoSchedule = false;
     workspaceClaimRunning = false;
+    if (initialized) void remoteSync.refresh();
     if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
   }
 }
@@ -582,6 +627,8 @@ export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = fal
  * if the logout request itself fails.
  */
 export async function suspendForWorkspaceDeactivation() {
+  remoteSync.stop();
+  fullRequested = false;
   suppressAutoSchedule = true;
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
@@ -592,6 +639,7 @@ export async function suspendForWorkspaceDeactivation() {
 
 export function resumeAfterWorkspaceDeactivationFailure() {
   suppressAutoSchedule = false;
+  if (initialized) void remoteSync.refresh();
   if (initialized && cloud.session && cloud.user) {
     scheduleAutomaticSync({ full: true, immediate: true });
   }
@@ -636,11 +684,14 @@ export function init() {
   initialized = true;
   void getSyncOperationalSummary().catch(() => {});
   store.subscribe((_state, update) => {
+    void remoteSync.refresh();
     if (!suppressAutoSchedule && update.syncReady) scheduleAutomaticSync();
   });
   cloud.subscribe(() => {
+    void remoteSync.refresh();
     if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
     else if (!cloud.session) {
+      fullRequested = false;
       if (autoTimer) clearTimeout(autoTimer);
       autoTimer = null;
       retryScheduled = false;
@@ -648,18 +699,25 @@ export function init() {
       void getSyncOperationalSummary().catch(() => {});
     }
   });
+  void remoteSync.refresh();
   if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
   else if (cloud.authStatus?.().state === 'auth_required') setState({ status: 'auth_required' });
   if (typeof addEventListener === 'function') {
-    addEventListener('online', () => scheduleAutomaticSync({ full: true, immediate: true }));
+    addEventListener('online', () => {
+      void remoteSync.refresh();
+      scheduleAutomaticSync({ full: true, immediate: true });
+    });
     addEventListener('offline', () => {
+      remoteSync.stop();
       retryScheduled = false;
       setState({ status: 'offline' });
       void getSyncOperationalSummary().catch(() => {});
     });
-    addEventListener('pageshow', () => { scheduleResumeSync(); });
+    addEventListener('pagehide', () => remoteSync.stop());
+    addEventListener('pageshow', () => { void remoteSync.refresh(); scheduleResumeSync(); });
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
+        void remoteSync.refresh();
         if (document.visibilityState === 'visible') scheduleResumeSync();
       });
     }
