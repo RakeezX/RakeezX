@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v31';
+const VERSION = 'rakeezx-v33';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -62,6 +62,8 @@ const SHELL = [
   './src/lib/cloud.js',
   './src/lib/email-otp.js',
   './src/lib/sync.js',
+  './src/lib/remote-sync.js',
+  './src/lib/owner-invalidation-channel.js',
   './src/lib/sync-v2.js',
   './src/lib/score-foundation.js',
   './src/lib/sync-ownership.js',

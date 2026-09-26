@@ -1913,7 +1913,7 @@ export function createSyncV2Engine({
     return Object.values(canonical).reduce((sum, rows) => sum + rows.length, 0);
   }
 
-  async function pullAll({ stores = SYNC_V2_STORES, scoreDomainSnapshot = false } = {}) {
+  async function pullAll({ stores = SYNC_V2_STORES, scoreDomainSnapshot = false, readConcurrency = 1 } = {}) {
     const ownership = ownershipGuard.cloudAccess({
       operation: 'pull', authenticatedUserId: currentAuthenticatedUserId(),
     });
@@ -1925,11 +1925,34 @@ export function createSyncV2Engine({
     }
     await recoverRejectedScoreCreates();
     const result = { pulled: 0, failures: [], blocked: false, ownershipBlocked: false };
-    for (const store of stores) {
-      try {
-        result.pulled += await pullStore(store);
-      } catch (error) {
-        result.failures.push({ store, error });
+    const width = Number.isInteger(readConcurrency) ? Math.max(1, Math.min(4, readConcurrency)) : 1;
+    // Fetch independent owner-filtered table snapshots in bounded groups.
+    // Apply in the original store order: dependency/remap/overlay semantics
+    // remain in reconcilePull, and the atomic score snapshot stays last.
+    for (let offset = 0; offset < stores.length; offset += width) {
+      const group = stores.slice(offset, offset + width);
+      if (width === 1) {
+        try { result.pulled += await pullStore(group[0]); }
+        catch (error) { result.failures.push({ store: group[0], error }); }
+        continue;
+      }
+      const owner = currentAuthenticatedUserId();
+      const fetched = await Promise.allSettled(group.map(async (store) => {
+        const access = ownershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: owner });
+        if (!access.allowed) throw ownershipBlockedError(access);
+        const rows = await transport.fetchRecords(schemaFor(store).entity);
+        if (!Array.isArray(rows)) throw new Error(`Sync V2 pull expected an array for ${schemaFor(store).entity}`);
+        return rows;
+      }));
+      for (let index = 0; index < group.length; index++) {
+        const store = group[index], response = fetched[index];
+        try {
+          if (response.status === 'rejected') throw response.reason;
+          const access = ownershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: currentAuthenticatedUserId() });
+          if (owner !== currentAuthenticatedUserId() || !access.allowed) throw ownershipBlockedError(access);
+          await reconcilePull(store, response.value);
+          result.pulled += response.value.length;
+        } catch (error) { result.failures.push({ store, error }); }
       }
     }
     if (scoreDomainSnapshot && !result.failures.length &&

@@ -22,6 +22,10 @@ function createCloud() {
         const request = route.request();
         const table = new URL(request.url()).pathname.split('/').pop();
         requests.push({ table, method: request.method(), at: Date.now() });
+        if (table === 'owner_sync_change_marker') {
+          return route.fulfill({ status: 404, json: { code: 'PGRST202',
+            message: 'Synthetic backend has no owner invalidation capability' } });
+        }
         if (table === 'profile') {
           if (request.method() === 'GET') {
             if (failNextProfileRead) {

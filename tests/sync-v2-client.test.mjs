@@ -260,6 +260,59 @@ async function seedAuthoritative(client, store, record) {
   });
 }
 
+test('bounded remote pull overlaps only four reads and reconciles in original dependency order',async(t)=>{
+  const server=new MemoryV2Server(), gates=[],started=[],applied=[];
+  const client=makeClient(server,'bounded-reads',{transport:{fetchRecords:async entity=>{
+    started.push(entity);await new Promise(resolve=>gates.push(resolve));return [];
+  }}});t.after(()=>client.database.close());
+  const batch=client.database.applyBatch.bind(client.database);
+  client.database.applyBatch=async(...args)=>{applied.push(Object.keys(args[0])[0]);return batch(...args);};
+  const stores=['years','calendars','terms','subjects','students'];
+  const task=client.engine.pullAll({stores,readConcurrency:4});
+  await new Promise(setImmediate);assert.deepEqual(started,stores.slice(0,4));assert.deepEqual(applied,[]);
+  for(const resolve of gates.slice().reverse())resolve();
+  while(started.length<5)await new Promise(setImmediate);
+  assert.deepEqual(applied,stores.slice(0,4));gates[4]();
+  const result=await task;assert.deepEqual(result.failures,[]);assert.deepEqual(applied,stores);
+});
+
+test('bounded pull retains failure evidence and does not apply a malformed response',async(t)=>{
+  const server=new MemoryV2Server();
+  const client=makeClient(server,'bounded-failure',{transport:{fetchRecords:async entity=>{
+    if(entity==='students')throw Error('Synthetic read failure');
+    if(entity==='subjects')return {};
+    return [];
+  }}});t.after(()=>client.database.close());
+  const result=await client.engine.pullAll({stores:['years','students','subjects','terms'],readConcurrency:4});
+  assert.deepEqual(result.failures.map(x=>x.store),['students','subjects']);
+  assert.match(result.failures[0].error.message,/Synthetic/);assert.match(result.failures[1].error.message,/array/);
+  assert.deepEqual(await client.database.getAll('students'),[]);
+});
+
+test('owner identity change while bounded reads are in flight prevents all local applies',async(t)=>{
+  const client=makeClient(new MemoryV2Server(),'owner-read-race');t.after(()=>client.database.close());
+  let owner='owner-a',release,started;
+  const beginning=new Promise(resolve=>{started=resolve;});
+  const engine=createSyncV2Engine({database:client.database,currentAuthenticatedUserId:()=>owner,
+    ownershipGuard:{cloudAccess:()=>({allowed:true}),getWorkspace:()=>null},transport:{fetchRecords:async()=>{
+      started();await new Promise(resolve=>{release=resolve;});return [{id:'foreign',revision:1,name:'Must not apply'}];
+    }}});
+  const pulling=engine.pullAll({stores:['students'],readConcurrency:4});await beginning;
+  owner='owner-b';release();const result=await pulling;
+  assert.equal(result.failures.length,1);assert.deepEqual(await client.database.getAll('students'),[]);
+});
+
+test('default full pull remains serial; bounded pulls clamp concurrency to four',async(t)=>{
+  for(const width of [undefined,100]){
+    const server=new MemoryV2Server();let active=0,max=0;
+    const client=makeClient(server,'read-bound',{transport:{fetchRecords:async()=>{
+      active++;max=Math.max(max,active);await new Promise(setImmediate);active--;return [];
+    }}});t.after(()=>client.database.close());
+    await client.engine.pullAll({stores:['years','calendars','terms','subjects','students'],readConcurrency:width});
+    assert.equal(max,width===undefined?1:4);
+  }
+});
+
 async function queueDefaultTimeProfiles(client) {
   for (const [order, preset] of DEFAULT_TIME_PROFILES.entries()) {
     const record = makeTimeProfile({ ...preset, order });
