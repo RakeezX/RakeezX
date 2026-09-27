@@ -2,8 +2,9 @@
  * RAKEEZ X — غلاف التطبيق: الإقلاع، والهيكل، وتوجيه الشاشات، وإعادة الرسم.
  */
 
-import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { html, raw, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
 import { brandLockup } from './lib/brand.js';
+import { renderLandingDemo, mountLandingDemo } from './lib/landing-demo.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
 import * as store from './store.js';
@@ -1031,20 +1032,20 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
 function mountWorkspaceGate(routing) {
   const signedOut = routing.authState === 'signed_out' || !cloud.session || !cloud.user;
   render(app, html`
-    <div class="page ${signedOut ? 'first-run-page' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
+    <div class="page ${signedOut ? 'n37-landing' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
       ${signedOut ? html`
-        <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
-        <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
-        <main class="first-run-card first-run-welcome" aria-labelledby="first-run-title">
-          <div class="first-run-welcome__brand">${brandLockup()}</div>
-          <div class="first-run-welcome__copy">
-            <h1 id="first-run-title">رَكيزة المعلم الرقمية</h1>
-            <p>كل ما يحتاجه المعلم، في مكان واحد.</p>
-          </div>
-          <div class="first-run-welcome__actions">
+        <main aria-labelledby="first-run-title">
+          <header class="n37-landing__top"><div class="n37-landing__brand">${brandLockup()}</div><span class="t-3 fs-sm">رَكيزة المعلم الرقمية</span></header>
+          <section class="n37-landing__intro">
+            <h1 id="first-run-title"><span>من أول حصة،</span> <span>متابعة أسهل،</span> <span>ويوم أكثر تنظيمًا.</span></h1>
+            <p>فصولك وطلابك وحضورك ودرجاتك، في مساحة واحدة.</p>
+          <div class="n37-landing__actions">
             <button class="btn btn--primary" type="button" data-workspace-login><span class="welcome-option__title">ابدأ مع ركيز المعلم</span><span class="welcome-option__detail">إنشاء حساب أو تسجيل الدخول</span></button>
             <button class="btn btn--ghost" type="button" data-workspace-demo><span class="welcome-option__title">جرّب ركيز المعلم</span><span class="welcome-option__detail">استكشف وجرّب بدون حساب</span></button>
           </div>
+          </section>
+          ${raw(renderLandingDemo())}
+          <p class="n37-landing__note">معاينة ببيانات تجريبية · لا تُحفظ التغييرات</p>
         </main>
       ` : html`
         <div class="empty" role="status">
@@ -1056,6 +1057,7 @@ function mountWorkspaceGate(routing) {
       `}
     </div>
   `);
+  if (signedOut) mountLandingDemo();
   app.querySelector('[data-workspace-login]')?.addEventListener('click', () => {
     void openMiniHubLoginSheet({ reloadOnSuccess: true });
   });
