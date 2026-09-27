@@ -40,4 +40,3 @@ html[data-theme] .p54 .attendance-01c__status[data-color="absent"].is-on{color:v
 
 .n37-landing .pf-intro h1>span{display:inline-block;white-space:nowrap}
 @media(min-width:1000px){.n37-landing .p54 .attendance-01c__row{grid-template-columns:26px minmax(100px,1fr) minmax(280px,1.25fr);min-block-size:66px}.n37-landing .p54 .attendance-01c__status-options{grid-column:auto}}
-
