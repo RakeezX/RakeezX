@@ -44,7 +44,7 @@ import homeView, {
   homeOnboardingState,
 } from '../src/views/home.js';
 
-test('Today Focus keeps the locked priority order and never falls back to cancelled sessions', () => {
+test('Today Focus keeps the approved current/pending/upcoming priority and never falls back to cancelled sessions', () => {
   const sessions = [
     { id: 'past', startTime: '07:00', endTime: '07:45', status: 'scheduled' },
     { id: 'current', startTime: '08:00', endTime: '08:45', status: 'scheduled' },
@@ -52,13 +52,13 @@ test('Today Focus keeps the locked priority order and never falls back to cancel
   ];
   const at = (hour, minute) => new Date(2026, 8, 9, hour, minute);
   assert.equal(selectTodayFocus(sessions, { now: at(8, 20) }).session.id, 'current');
-  assert.equal(selectTodayFocus(sessions.filter((item) => item.id !== 'current'), { now: at(8, 20) }).session.id, 'upcoming');
+  assert.equal(selectTodayFocus(sessions.filter((item) => item.id !== 'current'), { now: at(8, 20) }).session.id, 'past');
   assert.equal(selectTodayFocus(sessions.filter((item) => item.id === 'past'), { now: at(8, 20) }).kind, 'past-pending');
   const completedCurrent = selectTodayFocus(sessions, {
     now: at(8, 20),
     attendanceState: (session) => session.id === 'current' ? 'completed' : 'pending',
   });
-  assert.equal(completedCurrent.session.id, 'upcoming', 'completed current attendance must not keep the same focus action');
+  assert.equal(completedCurrent.session.id, 'current', 'completed current session remains openable for review');
   assert.equal(selectTodayFocus(sessions, {
     now: at(10, 0),
     attendanceState: () => 'completed',

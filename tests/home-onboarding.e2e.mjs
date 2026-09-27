@@ -28,7 +28,7 @@ test('Home guides a teacher from first class to students to a weekly schedule', 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
 });
 
-test('Home attendance completes the exact Focus session and advances to a distinct upcoming session', async ({ page }) => {
+test('Home attendance completes the exact Focus session and retains current review context', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-09-09T08:20:00+03:00'));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/');
@@ -80,16 +80,12 @@ test('Home attendance completes the exact Focus session and advances to a distin
   await page.locator('a[href="#/"]:visible').first().click();
   await expect(page).toHaveURL(/\/#\/$/);
   await expect(focus).toBeVisible();
-  await expect(focus).toHaveAttribute('data-session-id', fixture.upcomingSessionId);
-  expect(fixture.upcomingSessionId).not.toBe(fixture.currentSessionId);
-  expect(fixture.upcomingStartTime).not.toBe(fixture.currentStartTime);
-  await expect(focus.locator('.today-focus__class')).toContainText(fixture.upcomingClassLabel);
-  await expect(focus.locator('.today-focus__class')).not.toContainText(fixture.currentClassLabel);
-  await expect(focus.locator('.time-range__token[data-time-token="start"]')).toHaveText(fixture.upcomingStartTime);
-  await expect(focus.locator('.time-range__token[data-time-token="end"]')).toHaveText(fixture.upcomingEndTime);
-  await expect(focus.getByRole('link', { name: 'رصد الحضور' })).toHaveAttribute('data-session-id', fixture.upcomingSessionId);
-  await expect(page.getByText('تم رصد الحضور', { exact: true }).first()).toBeVisible();
-  console.log(`HOME_FOCUS_SESSIONS current=${fixture.currentSessionId} completed=${fixture.currentSessionId} advanced=${fixture.upcomingSessionId} advancedTime=${fixture.upcomingStartTime}-${fixture.upcomingEndTime}`);
+  await expect(focus).toHaveAttribute('data-session-id', fixture.currentSessionId);
+  await expect(focus.locator('.today-focus__class')).toContainText(fixture.currentClassLabel);
+  await expect(focus.locator('.time-range__token[data-time-token="start"]')).toHaveText(fixture.currentStartTime);
+  await expect(focus.getByRole('link', { name: 'مراجعة الحضور' })).toHaveAttribute('data-session-id', fixture.currentSessionId);
+  await expect(focus).toContainText('تم رصد الحضور');
+  await expect(page.locator('.home-session-row[data-session-id="'+fixture.upcomingSessionId+'"]')).toBeVisible();
 });
 
 for (const viewport of [
@@ -119,9 +115,9 @@ for (const viewport of [
     await expect(focus).toBeVisible();
     await expect(focus).toHaveAttribute('data-session-id', fixture.sessionId);
     await expect(focus.getByText(fixture.subjectName, { exact: false })).toBeVisible();
-    await expect(focus.locator('.time-range__token[data-time-token="start"]')).toHaveText('10:25');
-    await expect(focus.locator('.time-range__token[data-time-token="end"]')).toHaveText('11:10');
-    await expect(focus.locator('.today-focus__detail')).toContainText(/تبدأ\s*10:25\s*–\s*11:10/);
+    await expect(focus.locator('.today-focus__detail .time-range__token[data-time-token="start"]')).toHaveText('10:25');
+    await expect(focus.locator('.today-focus__detail .time-range__token[data-time-token="end"]')).toHaveText('11:10');
+    await expect(focus.locator('.today-focus__detail')).toContainText(/الحصة 8\s*·\s*10:25\s*–\s*11:10/);
     const action = focus.getByRole('link', { name: 'رصد الحضور' });
     await expect(action).toHaveAttribute('data-session-id', fixture.sessionId);
     await expect(action).toHaveAttribute('href', `#/teaching/${fixture.teachingId}/attendance?session=${fixture.sessionId}`);

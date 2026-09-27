@@ -9,6 +9,7 @@
 import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import { openSessionEditor } from '../lib/session-editor-ui.js';
+import { isBeforeScheduledStart } from '../lib/session-start-ui.js';
 import {
   ATTENDANCE, ATTENDANCE_ORDER, SESSION_STATUS,
   todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText,
@@ -181,6 +182,10 @@ export default {
             </div>
           `
         : html`
+            ${isBeforeScheduledStart(ses) ? html`<aside class="attendance-prestart" aria-label="موعد الحصة">
+              <span aria-hidden="true">${icon('clock')}</span>
+              <div><strong>لم يبدأ وقت الحصة بعد</strong><p>يمكنك رصد الحضور الآن إذا كنت تقصد ذلك.</p></div>
+            </aside>` : ''}
             <div class="attendance-01c__progress" aria-label="تقدم رصد الحضور">
               <div class="attendance-01c__progress-main">
                 <div class="attendance-01c__progress-copy">
@@ -310,7 +315,18 @@ export default {
 
     async 'fill-present'() {
       if (!activeSessionId) return;
-      const n = await store.fillAttendance(activeSessionId, 'present');
+      const sessionId = activeSessionId;
+      if (isBeforeScheduledStart(store.getSession(sessionId))) {
+        const confirmed = await openSheet({
+          title: 'رصد الحضور قبل بدء الحصة؟',
+          desc: 'لم يبدأ وقت الحصة بعد. هل تريد تعليم الطلاب غير المرصودين حاضرين الآن؟',
+          foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+            <button class="btn btn--primary" data-confirm-present>نعم، رصد الحضور</button>`,
+          onMount: (root, done) => root.querySelector('[data-confirm-present]').addEventListener('click', () => done(true)),
+        });
+        if (!confirmed) return;
+      }
+      const n = await store.fillAttendance(sessionId, 'present');
       toast(`رُصد ${n} طالبًا حاضرين`);
     },
 

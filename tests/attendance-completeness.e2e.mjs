@@ -16,7 +16,7 @@ test('Sessions exposes derived attendance completeness and reuses the same dated
   const tomorrow = isoOffset(1);
 
   await page.goto('/#/teaching/tch:attendance-ui/sessions');
-  await page.waitForFunction(() => window.store);
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.evaluate(async ({ yesterday, tomorrow }) => {
     await window.store.save({
       years: [{ id: 'y:attendance-ui', label: 'سنة الاختبار' }],

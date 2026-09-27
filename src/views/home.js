@@ -149,9 +149,22 @@ function timeToMinutes(value) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+// Display state only. Attendance truth comes from store.attendanceCompleteness.
+export function todaySessionPresentation(session, completeness, now = new Date()) {
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  const start = timeToMinutes(session.startTime);
+  const end = timeToMinutes(session.endTime);
+  if (completeness.state === 'excluded') return { kind: 'neutral', label: (SESSION_STATUS[session.status] ?? SESSION_STATUS.scheduled).label };
+  if (start !== null && end !== null && start <= minutes && minutes < end) return { kind: 'current', label: 'الحصة الحالية' };
+  if (completeness.state === 'completed' && completeness.due) return { kind: 'completed', label: 'تم رصد الحضور' };
+  if (completeness.state === 'pending') return { kind: 'pending', label: completeness.recorded ? 'رصد الحضور غير مكتمل' : 'بانتظار رصد الحضور' };
+  if (completeness.state === 'completed') return { kind: 'upcoming', label: 'تم رصد الحضور' };
+  return { kind: 'upcoming', label: start === null ? 'حصة بدون وقت محدد' : 'قادمة' };
+}
+
 /**
- * The Home priority is intentionally narrow: active lesson, nearest future
- * lesson, then the latest past lesson whose attendance remains pending.
+ * Display priority: active lesson, latest past lesson requiring attendance,
+ * then nearest future lesson. The remaining list keeps Product period order.
  */
 export function selectTodayFocus(sessions, {
   now = new Date(),
@@ -159,7 +172,7 @@ export function selectTodayFocus(sessions, {
 } = {}) {
   const minutesNow = now.getHours() * 60 + now.getMinutes();
   const eligible = (sessions ?? []).filter((session) =>
-    !CANCELLED_SESSION_STATUSES.has(session.status) && attendanceState(session) !== 'completed'
+    !CANCELLED_SESSION_STATUSES.has(session.status)
   );
   const withTimes = eligible.map((session) => ({
     session,
@@ -172,15 +185,14 @@ export function selectTodayFocus(sessions, {
     .sort((a, b) => a.start - b.start)[0];
   if (current) return { kind: 'current', session: current.session };
 
-  const upcoming = withTimes
-    .filter((item) => item.start !== null && item.start > minutesNow)
-    .sort((a, b) => a.start - b.start)[0];
-  if (upcoming) return { kind: 'upcoming', session: upcoming.session };
-
   const pastPending = withTimes
     .filter((item) => item.end !== null && item.end <= minutesNow && attendanceState(item.session) === 'pending')
     .sort((a, b) => b.end - a.end)[0];
-  return pastPending ? { kind: 'past-pending', session: pastPending.session } : null;
+  if (pastPending) return { kind: 'past-pending', session: pastPending.session };
+  const upcoming = withTimes
+    .filter((item) => item.start !== null && item.start > minutesNow && attendanceState(item.session) !== 'completed')
+    .sort((a, b) => a.start - b.start)[0];
+  return upcoming ? { kind: 'upcoming', session: upcoming.session } : null;
 }
 
 export function homeOnboardingState(teachings, {
@@ -243,10 +255,11 @@ function renderTodayFocus(focus) {
       <div class="today-focus__main">
         <div class="today-focus__title">${content.title}</div>
         <div class="today-focus__class">${store.teachingLabel(teaching)}</div>
-        <div class="today-focus__detail">${content.detail}</div>
+        <div class="today-focus__detail">الحصة ${session.period}${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</div>
+        <div class="today-focus__state">${store.attendanceCompleteness(session).completed ? 'تم رصد الحضور' : content.detail}</div>
       </div>
       <a class="btn btn--primary today-focus__action" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}">
-        ${icon('attendance')} رصد الحضور
+        ${icon('attendance')} ${store.attendanceCompleteness(session).completed ? 'مراجعة الحضور' : 'رصد الحضور'}
       </a>
     </section>
   `;
@@ -360,36 +373,26 @@ export default {
               <div class="list home-session-list">
                 ${remainingSessions.map((s) => {
                   const tch = store.getTeaching(s.teachingId);
-                  const meta = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
                   const completeness = store.attendanceCompleteness(s);
-                  const attendanceLabel = completeness.state === 'pending'
-                    ? 'لم يُرصد الحضور'
-                    : completeness.state === 'completed'
-                      ? 'تم رصد الحضور'
-                      : meta.label;
-                  const attendanceTone = completeness.state === 'pending'
-                    ? 'warn'
-                    : completeness.state === 'completed'
-                      ? 'ok'
-                      : meta.tone;
-                  const marked = store.attendanceIn(s.id).length;
-                  const roster = store.students(s.teachingId).length;
+                  const presentation = todaySessionPresentation(s, completeness);
+                  const attendanceLabel = presentation.label;
+                  const marked = completeness.recorded;
+                  const roster = completeness.expected;
                   return html`
-                    <a class="row home-session-row is-${attendanceTone || 'neutral'}" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
+                    <a class="row home-session-row is-session-${presentation.kind}" data-session-id="${s.id}" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
                       <span class="period">${s.period}</span>
                       <span class="row__main">
                         <span class="row__title">${store.teachingLabel(tch)}</span>
                         <span class="row__sub">
-                          ${s.startTime ? html`${fmtTimeRange(s.startTime, s.endTime)} · ` : ''}
-                          ${attendanceLabel}
-                          ${completeness.state === 'completed' && roster
+                          ${s.startTime ? html`<bdi dir="ltr">${fmtTimeRange(s.startTime, s.endTime)}</bdi>` : 'بدون وقت محدد'}
+                          ${marked && roster
                             ? html` · <span class="tabular">${marked}/${roster}</span> مرصود`
                             : ''}
                           ${s.reason ? html` · ${s.reason}` : ''}
                         </span>
                       </span>
                       <span class="row__end">
-                        <span class="badge ${attendanceTone ? 'badge--' + attendanceTone : ''}">${attendanceLabel}</span>
+                        <span class="home-session-state">${attendanceLabel}</span>
                         ${icon('chev')}
                       </span>
                     </a>
