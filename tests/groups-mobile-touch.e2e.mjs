@@ -51,12 +51,18 @@ async function touchDrag(page, source, target, { holdMs = 60, duringHold = null 
   await source.scrollIntoViewIfNeeded();
   const targetGroup = target.locator('.group__head');
   await targetGroup.scrollIntoViewIfNeeded();
+  // Keep both gesture endpoints clear of the fixed header and bottom navigation.
+  const initialSource = await source.boundingBox();
+  const initialTarget = await targetGroup.boundingBox();
+  await page.evaluate(({source,target}) => window.scrollBy({top:Math.min(source.y,target.y)-80,behavior:'instant'}),{source:initialSource,target:initialTarget});
   const sourceBox = await source.boundingBox();
   const targetBox = await targetGroup.boundingBox();
   expect(sourceBox).toBeTruthy();
   expect(targetBox).toBeTruthy();
   const from = { x: Math.round(sourceBox.x + sourceBox.width / 2), y: Math.round(sourceBox.y + sourceBox.height / 2) };
   const to = { x: Math.round(targetBox.x + targetBox.width / 2), y: Math.round(targetBox.y + targetBox.height / 2) };
+  await expect.poll(() => source.evaluate((node,p)=>node.contains(document.elementFromPoint(p.x,p.y)),from)).toBe(true);
+  await expect.poll(() => targetGroup.evaluate((node,p)=>node.contains(document.elementFromPoint(p.x,p.y)),to)).toBe(true);
   const cdp = await page.context().newCDPSession(page);
   const point = (position) => [{ ...position, id: 1, radiusX: 5, radiusY: 5, force: 1 }];
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: point(from) });
@@ -127,6 +133,8 @@ test('direct touch handle moves repeatedly without duplicates and persists', asy
   expect(await page.evaluate(() => window.scrollY)).toBe(validDrag.scrollAtStart);
   await validDrag.end();
   await expect.poll(() => savedArrangement(page)).not.toEqual(beforeInvalid);
+  await expect(page.locator('.group').nth(firstTarget).locator(`.group__member[data-student-id="${movingId}"]`)).toBeVisible();
+  await expectTouchIdle(page);
 
   let arrangement = await savedArrangement(page);
   expect(arrangement.flat().filter((id) => id === movingId)).toHaveLength(1);
@@ -163,6 +171,7 @@ test('long press lifecycle always moves or returns to a clean idle state', async
     await drag.end();
     await expect.poll(async () => (await savedArrangement(page)).findIndex((group) => group.includes(movingId))).toBe(toIdx);
     await expectTouchIdle(page);
+    await expect(page.locator('.group').nth(toIdx).locator(`.group__member[data-student-id="${movingId}"]`)).toBeVisible();
   }
 
   const beforeRelease = await savedArrangement(page);

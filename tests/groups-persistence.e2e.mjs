@@ -57,7 +57,7 @@ test('Groups saves one durable full-roster arrangement across reloads and tabs',
   await page.getByRole('button', { name: /قسّم المجموعات/ }).click();
   await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups?.flat().length ?? 0, teachingId)).toBe(6);
 
-  const baseBeforeMove = await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId);
+  const baseBeforeMove = await page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId);
   expect(new Set(baseBeforeMove.flat()).size).toBe(6);
   await expect(page.locator('.group__member')).toHaveCount(5);
 
@@ -73,19 +73,22 @@ test('Groups saves one durable full-roster arrangement across reloads and tabs',
   await firstMember.click();
   await page.locator('.group').nth(1).getByRole('button', { name: /نقل/ }).click();
 
-  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).not.toEqual(baseBeforeMove);
-  const moved = await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId);
+  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId)).not.toEqual(baseBeforeMove);
+  const moved = await page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId);
   expect(new Set(moved.flat()).size).toBe(6);
   expect(moved.flat().filter((id) => id === movingId)).toHaveLength(1);
 
-  await expect.poll(() => peer.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
+  await expect.poll(() => peer.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId)).toEqual(moved);
+  await expect.poll(() => page.evaluate(async (id) => (await (await import('/src/lib/db.js')).getAll('groupArrangements')).find(row => row.teachingId === id)?.groups, teachingId)).toEqual(await savedGroups(page, teachingId));
   await page.reload();
-  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId)).toEqual(moved);
   await expect(page.locator('.group__member')).toHaveCount(5);
 
   await page.locator('[data-change="toggle-absent"]').check();
   await expect(page.locator('.group__member')).toHaveCount(6);
-  expect(await page.evaluate((id) => window.store.groupArrangementOf(id).groups, teachingId)).toEqual(moved);
+  expect(await page.evaluate((id) => window.store.groupArrangementOf(id)?.groups, teachingId)).toEqual(moved);
   await peer.close();
 });
 async function seedRegenerationGroups(page) {
@@ -139,7 +142,10 @@ test('New Random and Balanced generation replace distorted saved group structure
   await distortFirstGroup(page);
   const distortedRandom = await savedGroups(page, teachingId);
   expect(sortedSizes(distortedRandom)).toEqual([1, 4, 4, 7]);
+  await expect.poll(() => page.evaluate(async (id) => (await (await import('/src/lib/db.js')).getAll('groupArrangements')).find(row => row.teachingId === id)?.groups, teachingId)).toEqual(await savedGroups(page, teachingId));
   await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
   expect(sortedSizes(await savedGroups(page, teachingId))).toEqual([1, 4, 4, 7]);
 
   await page.getByRole('button', { name: 'عشوائي' }).click();
@@ -147,7 +153,10 @@ test('New Random and Balanced generation replace distorted saved group structure
   await expect.poll(async () => sortedSizes(await savedGroups(page, teachingId))).toEqual([4, 4, 4, 4]);
   const randomReplacement = await savedGroups(page, teachingId);
   expect(new Set(randomReplacement.flat()).size).toBe(16);
+  await expect.poll(() => page.evaluate(async (id) => (await (await import('/src/lib/db.js')).getAll('groupArrangements')).find(row => row.teachingId === id)?.groups, teachingId)).toEqual(await savedGroups(page, teachingId));
   await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
   expect(await savedGroups(page, teachingId)).toEqual(randomReplacement);
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -159,6 +168,9 @@ test('New Random and Balanced generation replace distorted saved group structure
   await expect.poll(async () => sortedSizes(await savedGroups(page, teachingId))).toEqual([4, 4, 4, 4]);
   const balancedReplacement = await savedGroups(page, teachingId);
   expect(new Set(balancedReplacement.flat()).size).toBe(16);
+  await expect.poll(() => page.evaluate(async (id) => (await (await import('/src/lib/db.js')).getAll('groupArrangements')).find(row => row.teachingId === id)?.groups, teachingId)).toEqual(await savedGroups(page, teachingId));
   await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
+  await expect(page.getByRole('heading', { name: 'المجموعات', exact: true })).toBeVisible();
   expect(await savedGroups(page, teachingId)).toEqual(balancedReplacement);
 });

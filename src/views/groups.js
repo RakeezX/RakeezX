@@ -9,8 +9,13 @@ import * as store from '../store.js';
 import { studentTotal, todayISO, quickLogAttendanceState } from '../models.js';
 import { repaint } from '../repaint.js';
 import { demoOutputMarker } from '../lib/report-print.js';
+import { validTargetCount, targetGroupSizes, smartGroupCounts } from '../lib/group-count-ui.js';
 
 let size = 4;
+let inputMethod = 'size';
+let targetCount = 3;
+let targetSelection = 'ready';
+let targetRosterKey = '';
 let mode = 'balanced';   // balanced | random
 let groups = [];
 let includeAbsent = false;
@@ -77,7 +82,8 @@ function build(classId, { includeUnavailable = false } = {}) {
   const availableRoster = includeUnavailable ? store.students(classId) : getAvailableStudents(classId);
   if (!availableRoster.length) return [];
 
-  const count = Math.max(1, Math.ceil(availableRoster.length / size));
+  const count = inputMethod === 'count' ? Number(targetCount) : Math.max(1, Math.ceil(availableRoster.length / size));
+  if (!validTargetCount(count, availableRoster.length)) return [];
   const buckets = Array.from({ length: count }, () => []);
 
   if (mode === 'random') {
@@ -154,16 +160,36 @@ export default {
 
     const available = getAvailableStudents(cls.id);
     const excludedCount = roster.length - available.length;
-    const count = Math.ceil(available.length / size);
+    const suggestions = smartGroupCounts(available.length);
+    const rosterKey = `${cls.id}:${available.length}`;
+    if (inputMethod === 'count' && targetRosterKey !== rosterKey) {
+      if (targetSelection === 'ready') targetCount = suggestions.recommended ?? 0;
+      targetRosterKey = rosterKey;
+    }
+    const count = inputMethod === 'count' ? Number(targetCount) : Math.ceil(available.length / size);
+    const validCount = inputMethod !== 'count' || validTargetCount(targetCount, available.length);
     const visibleGroups = displayedGroups(cls.id);
 
     return html`
       <div class="classroom-tool-page groups-page">
       ${demoOutputMarker()}
       <section class="surface groups-setup mb-3" aria-label="إعداد المجموعات">
+        <div class="group-input-method field">
+          <span class="field__label">التقسيم حسب</span>
+          <div class="segmented" role="group" aria-label="التقسيم حسب">
+            <button type="button" class="segmented__btn ${inputMethod === 'size' ? 'is-on' : ''}" data-act="group-input-method" data-method="size" aria-pressed="${inputMethod === 'size'}">طلاب في المجموعة</button>
+            <button type="button" class="segmented__btn ${inputMethod === 'count' ? 'is-on' : ''}" data-act="group-input-method" data-method="count" aria-pressed="${inputMethod === 'count'}">عدد المجموعات</button>
+          </div>
+        </div>
         <div class="groups-setup__grid">
         <div class="field">
-          <span class="field__label">عدد الطلاب في المجموعة</span>
+          ${inputMethod === 'count' ? html`<span class="field__label">عدد المجموعات</span>
+            <div class="segmented group-count-choices" role="group" aria-label="عدد المجموعات">
+              ${suggestions.choices.map(n => html`<button type="button" class="segmented__btn ${targetSelection === 'ready' && count === n ? 'is-on' : ''}" data-act="target-ready" data-n="${n}" aria-pressed="${targetSelection === 'ready' && count === n ? 'true' : 'false'}"><span class="tabular">${n}</span>${n === suggestions.recommended ? html`<small class="group-count-recommended">مقترح</small>` : ''}</button>`)}
+              <input id="target-group-count" class="group-count-inline ${targetSelection === 'custom' ? 'is-on' : ''}" type="number" inputmode="numeric" min="1" max="${available.length}" step="1" value="${targetSelection === 'custom' ? targetCount : ''}" placeholder="اكتب العدد" aria-label="اكتب عدد المجموعات" data-input="target-count" data-fk="target-count" aria-describedby="target-group-hint" aria-invalid="${targetSelection === 'custom' && !validCount ? 'true' : 'false'}" ${!available.length ? 'disabled' : ''}>
+            </div>
+            <div id="target-group-hint" class="${validCount ? 'group-count-preview' : 'field__error'}" role="status" aria-live="polite">${validCount ? html`<span>${available.length} طالبًا متاحًا ← ${count} مجموعات</span><bdi dir="ltr">${targetGroupSizes(available.length, count).join(' + ')}</bdi>` : available.length ? html`اختر عددًا صحيحًا من 1 إلى ${available.length} حسب الطلاب المتاحين.` : html`لا يوجد طلاب متاحون للتقسيم. راجع خيار تضمين الغائبين والمستأذنين.`}</div>
+          ` : html`<span class="field__label">عدد الطلاب في المجموعة</span>
           <div class="segmented" role="group" aria-label="عدد الطلاب في المجموعة">
             ${[2, 3, 4, 5, 6].map(
               (n) => html`
@@ -176,6 +202,7 @@ export default {
           <div class="field__hint">
             ${available.length} طالبًا متاحًا ${excludedCount > 0 ? `(استُبعد ${excludedCount} غياب/استئذان)` : ''} → <span class="tabular">${count}</span> مجموعات
           </div>
+          `}
         </div>
 
         <div class="field">
@@ -204,9 +231,10 @@ export default {
         </div>
       </section>
 
-      <button class="btn btn--primary btn--block groups-generate mb-3" data-act="make" ${readOnly ? 'disabled' : ''}>
+      <button class="btn btn--primary btn--block groups-generate mb-3" data-act="make" ${readOnly || !validCount ? 'disabled' : ''}>
         ${icon('groups')} ${groups.length ? 'أعد التقسيم' : 'قسّم المجموعات'}
       </button>
+      ${inputMethod === 'count' && visibleGroups.length ? html`<p class="group-count-summary" role="status">أحجام المجموعات الحالية: <bdi dir="ltr">${visibleGroups.map(group => group.length).join(' + ')}</bdi></p>` : ''}
 
       ${selectedStudent
         ? html`
@@ -516,6 +544,12 @@ export default {
   },
 
   actions: {
+    'group-input-method'(el, ev, params) {
+      inputMethod = el.dataset.method;
+      repaint();
+    },
+    'target-ready'(el) { targetSelection = 'ready'; targetCount = Number(el.dataset.n); repaint(); },
+    'target-count'(el) { targetSelection = 'custom'; targetCount = el.value; repaint(); },
     'toggle-absent'(el) {
       includeAbsent = el.checked;
       selectedStudent = null;
@@ -537,7 +571,8 @@ export default {
     async make(el, ev, params) {
       selectedStudent = null;
       // A new distribution always starts from the current roster, never a saved manual arrangement.
-      const freshGroups = build(params.id, { includeUnavailable: true });
+      if (inputMethod === 'count' && !validTargetCount(targetCount, getAvailableStudents(params.id).length)) return;
+      const freshGroups = build(params.id, { includeUnavailable: inputMethod === 'size' });
       groups = freshGroups;
       await persistGroups(params.id, freshGroups);
       toast('قُسّم الفصل إلى ' + freshGroups.length + ' مجموعات');

@@ -66,6 +66,8 @@ test('new class uses a searchable built-in/custom subject picker and stable subj
   });
   expect(customState).toEqual({ subjects: 1, teachings: 2 });
 
+  // The card reflects memory before the asynchronous local transaction completes.
+  await expect.poll(() => page.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('teachings')).filter(row => !row.deleted).length)).toBe(3);
   await page.reload();
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await expect(page.locator('.class-card__sub').filter({ hasText: 'علم الأرض' })).toHaveCount(2);

@@ -13,6 +13,7 @@ import {
   GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionLabel, normalizeSectionLabel
 } from '../models.js';
 import { normalizeSubjectName, validateCustomSubjectName } from '../lib/subject-catalog.js';
+import { classSubjectDefault } from '../lib/class-subject-default.js';
 import { repaint } from '../repaint.js';
 
 function subjectMenu(options, query = '') {
@@ -47,9 +48,7 @@ function sheet(existing = null) {
   const secs = store.sections();
   const options = store.subjectOptions();
   const autoColor = autoAssignSectionColor(secs);
-  const selectedOption = options.find((option) => option.subjectId === existing?.subjectId) ??
-    options.find((option) => option.used) ??
-    options.find((option) => option.name === 'المهارات الرقمية') ?? options[0];
+  const selectedOption = classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
   const c = existing
     ? {
         grade: store.getSection(existing.sectionId)?.grade ?? 4,

@@ -7668,3 +7668,37 @@
   .today-focus__detail { font-size:13px; }
   .home-session-row.is-session-completed .row__title { font-size:13px; }
 }
+/* MICRO-BATCH 04 — scoped search and group-count controls. */
+.home-student-search { min-height:44px; gap:6px; }
+.student-search-result { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:68px; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:14px; background:var(--bg-elev); color:var(--text); text-decoration:none; }
+.student-search-result > span { min-width:0; }
+.student-search-result strong { display:block; font-size:15px; line-height:1.65; overflow-wrap:anywhere; }
+.student-search-result small { display:block; margin-top:4px; color:var(--text-2); font-size:12px; line-height:1.6; }
+.student-search-result > svg { width:18px; height:18px; flex:none; color:var(--text-3); }
+.student-search-result:hover { background:var(--brand-soft); border-color:var(--brand-border); }
+.student-search-result:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+.student-search-context { display:flex; align-items:center; gap:8px; min-height:44px; color:var(--text); text-decoration:none; }
+.student-search-context svg { width:18px; height:18px; flex:none; }
+.student-search-context:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+.student-search__status { color:var(--text-2); font-size:13px; line-height:1.7; }
+.student-search .field { margin-bottom:12px; }
+.group-input-method { max-width:430px; }
+.group-input-method .segmented { width:100%; }
+.group-input-method .segmented__btn { flex:1; min-height:44px; white-space:normal; line-height:1.5; }
+.group-count-input { max-width:160px; min-height:44px; }
+.group-count-summary { margin:0 0 14px; color:var(--text-2); font-size:13px; line-height:1.7; }
+@media(max-width:420px) { .student-search-result { padding:10px; }.student-search-result strong { font-size:14px; }.home-shortcuts .section__head { flex-wrap:wrap; gap:8px; }.group-input-method .segmented__btn { font-size:12px; } }
+/* 0339 — N28 only: ready group-count choices and optional custom field. */
+.group-count-choices { display:flex; width:100%; }
+.group-count-choices .segmented__btn { flex:1; min-width:44px; min-height:58px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:6px 4px; }
+.group-count-recommended { font-size:10px; font-weight:500; line-height:1.4; color:var(--text-2); }
+.group-count-custom { display:block; margin-top:12px; }
+.group-count-preview { display:flex; flex-direction:column; gap:4px; margin-top:10px; color:var(--text-2); font-size:12px; line-height:1.7; }
+.group-count-preview bdi { align-self:flex-start; font-size:14px; font-weight:650; color:var(--text); }
+/* 0340 — N28 inline entry stays inside the ready-choice control. */
+.group-count-choices { flex-wrap:wrap; gap:2px; }
+.group-count-inline { flex:1.6; width:0; min-width:76px; min-height:58px; padding:6px 4px; border:1px solid var(--border); border-radius:var(--radius-sm,8px); background:transparent; color:var(--text); text-align:center; font:inherit; font-size:13px; appearance:textfield; }
+.group-count-inline::placeholder { color:var(--text-2); font-size:11px; opacity:1; }
+.group-count-inline.is-on { background:var(--bg-elev); border-color:var(--brand-border); }
+.group-count-inline:focus-visible { outline:2px solid var(--action-focus-ring); outline-offset:-2px; }
+.group-count-inline::-webkit-inner-spin-button,.group-count-inline::-webkit-outer-spin-button { appearance:none; margin:0; }

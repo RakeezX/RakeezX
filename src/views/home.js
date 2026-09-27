@@ -7,6 +7,7 @@
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
 import { APP_ICON_URL } from '../lib/brand.js';
+import { openStudentSearch } from '../lib/student-search-ui.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 import * as store from '../store.js';
 import { repaint } from '../repaint.js';
@@ -420,7 +421,7 @@ export default {
         <aside class="home-dashboard__aside" aria-label="اختصارات وملخص">
       <!-- اختصارات سريعة -->
       <section class="section home-shortcuts" aria-labelledby="home-shortcuts-title">
-        <div class="section__head"><h2 class="section__title" id="home-shortcuts-title">اختصارات</h2></div>
+        <div class="section__head"><h2 class="section__title" id="home-shortcuts-title">اختصارات</h2><button class="btn btn--sm btn--ghost home-student-search" data-act="student-search">${icon('search')} بحث عن طالب</button></div>
         <div class="grid grid--auto home-shortcuts__grid">
           <a class="tile" href="#/classes">
             <span class="tile__icon">${icon('classes')}</span>
@@ -451,6 +452,7 @@ export default {
   },
 
   actions: {
+    'student-search': () => openStudentSearch(),
     async 'home-pwa-install'() {
       if (typeof window !== 'undefined' && window.deferredInstallPrompt) {
         const promptEvent = window.deferredInstallPrompt;
