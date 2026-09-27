@@ -965,7 +965,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   .first-run-welcome__brand { width: min(100%, 244px); }
   .first-run-welcome__copy h1 { font-size: 25px; }
   .first-run-auth__otp { padding-inline: 16px 5px; font-size: 23px; letter-spacing: .48em; }
-  .sheet:has(.first-run-auth) { max-height: 96dvh; }
+  .sheet:has(.first-run-auth) { max-height: calc(var(--visible-viewport-height, 100dvh) - 12px); }
 }
 
 @media (max-width: 340px) {
@@ -979,7 +979,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 
 /* ---------- 12. الطبقة المنبثقة ---------- */
 .sheet-backdrop {
-  position: fixed; inset: 0; z-index: 50;
+  position: fixed; inset: var(--visible-viewport-top, 0px) 0 auto; height: var(--visible-viewport-height, 100dvh); z-index: 50;
   background: rgb(9 12 16 / .5);
   backdrop-filter: blur(2px);
   display: flex; align-items: flex-end; justify-content: center;
@@ -991,8 +991,8 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .sheet {
   background: var(--bg-elev);
   width: 100%; max-width: 560px;
-  max-height: 92dvh;
-  overflow-y: auto;
+  max-height: calc(var(--visible-viewport-height, 100dvh) - 12px);
+  display: flex; flex-direction: column; overflow: hidden;
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   box-shadow: var(--shadow-3);
   padding: var(--sp-5) var(--sp-4)
@@ -1095,3 +1095,38 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 /* SCHEDULE-UX-01: only compact numeric/time controls are centered. */
 .input--center, input.input--center { text-align: center !important; font-variant-numeric: tabular-nums lining-nums; }
 .hero__main-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+
+/* MICRO-BATCH 02: N29 choice clarity; N21 profile presentation; N20 viewport geometry. */
+.first-run-welcome__actions .btn { display: grid; gap: 4px; padding: 13px 16px; white-space: normal; }
+.welcome-option__title { font-size: 17px; font-weight: 700; line-height: 1.5; }
+[data-workspace-login] .welcome-option__title { font-size: 20px; font-weight: 800; }
+.welcome-option__detail { font-size: 13px; font-weight: 400; line-height: 1.6; }
+[data-workspace-demo] .welcome-option__detail { color: var(--text-2); }
+.profile-completion { display: grid; gap: 18px; min-height: 0; padding: 28px 32px; text-align: start; background: var(--bg-elev); }
+.profile-completion::before { display: none; }
+.profile-completion .first-run-status__brand { width: 180px; }
+.profile-completion .first-run-status__copy h1 { font-size: 26px; }
+.profile-completion .first-run-status__copy p { margin-top: 6px; }
+.profile-completion .field { width: 100%; margin: 0; }
+.profile-completion .field__hint { display: block; }
+.profile-completion .field__label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.profile-completion .field__label small { font-size: 12px; font-weight: 400; color: var(--text-2); }
+.profile-completion input { min-height: 46px; scroll-margin-block: 16px; }
+.profile-completion input[type=tel] { direction: ltr; text-align: right; }
+.profile-completion .settings-teacher-form { width: 100%; }
+.profile-completion .settings-teacher-form button { flex: 1; min-height: 44px; }
+.profile-completion .first-run-status__actions { width: 100%; margin-top: 2px; }
+.profile-completion .field__error:not([hidden]) { margin: 0; padding: 10px 12px; border: 1px solid var(--danger); border-radius: var(--r-md); background: var(--danger-soft); line-height: 1.7; }
+[data-account-profile-required] { display: flex; flex-direction: column; align-items: center; height: var(--visible-viewport-height, 100dvh); min-height: 0; overflow-y: auto; overflow-x: clip; }
+[data-account-profile-required] .profile-completion { flex-shrink: 0; margin-block: auto; }
+.sheet__head, .sheet__foot { flex-shrink: 0; }
+.sheet__body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 2px; }
+.sheet__body input, .sheet__body textarea, .sheet__body select { scroll-margin-block: 16px; }
+@media(max-width: 420px) {
+  .profile-completion { min-height: 0; padding: 22px 18px; gap: 16px; border-radius: 22px; }
+  [data-account-profile-required] { padding-block: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-bottom)); }
+  .profile-completion .first-run-status__copy h1 { font-size: 24px; }
+}
+@media(max-height: 500px) {
+  [data-account-profile-required] { align-items: start; }
+}

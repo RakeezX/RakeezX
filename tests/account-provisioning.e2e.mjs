@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+test.use({ serviceWorkers: 'block' });
+
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
 import { buildAccountFoundationDefaults } from '../src/lib/account-provisioning.js';
 import { encodeSyncV2Patch } from '../src/lib/sync-v2.js';
@@ -34,29 +36,29 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   let provisionCalls = 0;
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
-  await page.route(`${SUPABASE_URL}/auth/v1/**`, (route) => route.fulfill({ json: SESSION.user }));
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: contract(state, profileStatus) }));
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_profile`, (route) => {
+  await page.context().route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
+  await page.context().route(`${SUPABASE_URL}/auth/v1/**`, (route) => route.fulfill({ json: SESSION.user }));
+  await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: contract(state, profileStatus) }));
+  await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_profile`, (route) => {
     state = 'PROFILE_REQUIRED';
     return route.fulfill({ json: contract(state, profileStatus) });
   });
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/complete_account_profile`, (route) => {
+  await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/complete_account_profile`, (route) => {
     expect(route.request().postDataJSON().p_phone).toBe('0500000001');
     expect(route.request().postDataJSON().p_teacher_form).toBe('feminine');
     profileStatus = 'READY'; state = 'PROVISIONING_REQUIRED';
     return route.fulfill({ json: contract(state, profileStatus) });
   });
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/begin_account_provisioning`, (route) => {
+  await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/begin_account_provisioning`, (route) => {
     state = 'PROVISIONING';
     return route.fulfill({ json: contract(state, profileStatus) });
   });
-  await page.route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_workspace`, (route) => {
+  await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_workspace`, (route) => {
     provisionCalls += 1;
     state = 'READY';
     return route.fulfill({ json: { contract: contract(state, profileStatus), snapshot: snapshot() } });
   });
-  await page.route('**/__provisioning_fixture__', (route) => route.fulfill({
+  await page.context().route('**/__provisioning_fixture__', (route) => route.fulfill({
     contentType: 'text/html', body: '<!doctype html><title>fixture</title>',
   }));
   await page.goto('/__provisioning_fixture__');
@@ -76,6 +78,8 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   await page.locator('[data-profile-form="feminine"]').click();
   await page.getByRole('button', { name: 'متابعة' }).click();
   await expect(page.locator('#main')).toBeVisible();
+  // Finish mocked startup Sync before navigation tears down its in-flight requests.
+  await expect.poll(() => page.evaluate(() => window.__syncModule?.displayState().status)).toBe('synced');
   expect(provisionCalls).toBe(1);
   await page.reload();
   await expect(page.locator('#main')).toBeVisible();

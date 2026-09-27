@@ -4,6 +4,7 @@
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
 import { brandLockup } from './lib/brand.js';
+import { installVisibleViewport } from './lib/visible-viewport.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
@@ -31,6 +32,7 @@ import {
 } from './lib/email-otp.js';
 
 const app = document.getElementById('app');
+installVisibleViewport();
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -739,16 +741,17 @@ function renderFirstAccountProfile(contract) {
     <div class="page first-run-page" data-account-profile-required>
       <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
       <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
-      <form class="first-run-card first-run-status" data-account-profile-form>
+      <form class="first-run-card profile-completion" data-account-profile-form>
         <div class="first-run-status__brand">${brandLockup({ compact: true })}</div>
         <div class="first-run-status__copy">
           <div class="first-run-eyebrow">مساحة حسابك</div>
           <h1>أكمل بيانات حسابك</h1>
+          <p>خطوة بسيطة لتجهيز مساحة عملك.</p>
         </div>
-        <label class="field"><span class="field__label">اسم المعلم أو المعلمة</span>
-          <input name="teacherName" required autocomplete="name" value="${current.teacherName}" /></label>
-        <label class="field"><span class="field__label">رقم الجوال</span>
-          <input name="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
+        <label class="field"><span class="field__label">اسم المعلم أو المعلمة <small>مطلوب</small></span>
+          <input class="input" name="teacherName" required autocomplete="name" value="${current.teacherName}" /></label>
+        <label class="field"><span class="field__label">رقم الجوال <small>مطلوب</small></span>
+          <input class="input" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
                  maxlength="10" required pattern="05[0-9]{8}" value="${current.phone}" />
           <span class="field__hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span></label>
         <div class="field"><span class="field__label">صفة المستخدم</span>
@@ -756,8 +759,8 @@ function renderFirstAccountProfile(contract) {
             <button class="segmented__btn" type="button" data-profile-form="masculine" aria-pressed="true">معلم</button>
             <button class="segmented__btn" type="button" data-profile-form="feminine" aria-pressed="false">معلمة</button>
           </div></div>
-        <label class="field"><span class="field__label">اسم المدرسة (اختياري)</span>
-          <input name="schoolName" value="${current.schoolName}" /></label>
+        <label class="field"><span class="field__label">اسم المدرسة <small>اختياري</small></span>
+          <input class="input" name="schoolName" value="${current.schoolName}" /></label>
         <div class="field__error" role="alert" data-profile-error hidden></div>
         <div class="first-run-status__actions">
           <button class="btn btn--primary" type="submit">متابعة</button>
@@ -1039,8 +1042,8 @@ function mountWorkspaceGate(routing) {
             <p>كل ما يحتاجه المعلم، في مكان واحد.</p>
           </div>
           <div class="first-run-welcome__actions">
-            <button class="btn btn--primary" type="button" data-workspace-login>ابدأ مع ركيز</button>
-            <button class="btn btn--ghost" type="button" data-workspace-demo>جرّب ركيز</button>
+            <button class="btn btn--primary" type="button" data-workspace-login><span class="welcome-option__title">ابدأ مع ركيز المعلم</span><span class="welcome-option__detail">إنشاء حساب أو تسجيل الدخول</span></button>
+            <button class="btn btn--ghost" type="button" data-workspace-demo><span class="welcome-option__title">جرّب ركيز المعلم</span><span class="welcome-option__detail">استكشف وجرّب بدون حساب</span></button>
           </div>
         </main>
       ` : html`
