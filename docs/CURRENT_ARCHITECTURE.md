@@ -1,6 +1,6 @@
 # RAKEEZ X — current source architecture
 
-Checked against repository source at `eda978fc79979e889adfe97ed65afae88446580a` on 2026-09-25. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
+Checked against repository source at `e3fed26523538a65978daf83d81805f8cb0a7cfe` on 2026-09-27. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
 
 ## Authorities and entry points
 
@@ -17,17 +17,25 @@ Checked against repository source at `eda978fc79979e889adfe97ed65afae88446580a` 
 
 ## Cloud, Sync, and bootstrap
 
-- Repository SQL lives in `supabase/migrations/`, through `20260924173929_security_definer_direct_execute_hardening.sql`. Applied migrations are immutable. The directory is **not** proof of live migration history; query the approved Production metadata path before any schema claim or change.
+- Repository SQL lives in `supabase/migrations/`, through `20260926115629_owner_sync_invalidation.sql`. Applied migrations are immutable. The directory is **not** proof of live migration history; query the approved Production metadata path before any schema claim or change.
 - `src/lib/sync-v2.js` defines versioned entities, owner-bound outbox mutations, revisions, dependencies, and reconciliation. `src/lib/sync.js` orchestrates automatic/manual synchronization; `src/lib/cloud.js` maps client calls to authenticated Supabase endpoints/RPCs. No direct browser `service_role` path is allowed. Owner Guard and RLS remain mandatory.
 - New accounts must pass required profile and owner-bound provisioning (`src/lib/account-profile.js`, `account-provisioning.js`, app gate) before editable Home. Existing claimed accounts route only to their own local workspace.
 - `src/lib/initial-restore.js` supports `CORE_V2` with `CORE_V1` compatibility. It validates an owner-scoped manifest and consistent cloud snapshot before making a fresh local account workspace READY. Fresh offline clients do not invent an editable real workspace; previously verified claimed clients may continue locally offline.
 - `src/lib/curriculum-bootstrap.js` manages the separate, explicit units/lessons historical cloud bootstrap. Units/lessons are not silently part of Initial Restore's CORE_V1/V2 store lists. Assignments/submissions remain deferred and outside core restore.
 - `src/lib/score-foundation.js` and the 0033/0034 SQL lineage implement DIRECT and SUBITEM scoring contracts. Student lifecycle/removal uses guarded preview and owner-bound operations, not generic local deletion.
 
+## Delivered scheduling, remote wake-up and UI contracts
+
+- N33 Phase 1: `src/lib/sync.js` uses a measured **325 ms trailing debounce** after durable local changes. Coordinator coalesces bursts, prevents overlapping runs and preserves trailing work; manual/reconnect/open/resume and retry semantics remain separate.
+- N33 Phase 2: `remote-sync.js`, `owner-invalidation-channel.js` and Sync/cloud integration use owner-scoped private Realtime only as advisory invalidation. Sync V2 remains authoritative; no Product payload is applied directly from signals. Revision coverage suppresses writer self-echo; newer revisions preserve required trailing work. Idle receiver path is guarded; independent reads are bounded to four. Periodic owner-marker checking supports missed-event recovery. Account/logout lifecycle and same-browser BroadcastChannel remain guarded.
+- The source includes additive `20260926115629_owner_sync_invalidation.sql`. Production application was verified in the earlier backend ticket, not re-executed by this docs checkpoint. No-Web-Locks environments lack automatic remote wake-up but retain safe manual/reconnect convergence. Chromium/Edge/WebKit evidence is recorded; physical Safari/iOS was not available. Phase 3 broader store-level/incremental/full-pass optimization is deferred.
+- N27 removal readiness uses authoritative `summarizeSyncV2OperationalState` while preserving retained superseded evidence and fail-closed unsafe/owner states; lifecycle guards/tombstones remain. Approved return copy is “العودة”.
+- Micro-Batches 01–04 selectively delivered Quick Log/Schedule text treatments, calendar-aware Home empty states, viewport/form/profile/first-run UX, calm timed-session attendance warning/bulk confirmation and Today state hierarchy, safe subject default, active identity-aware Home search and eligible target-count grouping. Current helpers include `visible-viewport.js`, `session-start-ui.js`, `class-subject-default.js`, `student-search-ui.js` and `group-count-ui.js`. Auth, student/session identity and attendance/scoring semantics remain current Product contracts. See [Changelog](CHANGELOG.md) for release identities.
+
 ## Offline shell and presentation
 
-- `sw.js` currently names cache generation **`rakeezx-v31`**, precaches shell assets, and has update/fallback logic for offline boot. `manifest.webmanifest` declares install icons. Service-worker asset caching does not guarantee that an OS refreshes a previously installed launcher icon.
-- `src/styles/app.css` and `components.css` contain current Product CSS. Font stack is local/system fallback; no remote runtime font is required. Work-Active, not this source tree alone, is the authority for a *new* visual choice.
+- `sw.js` currently names cache generation **`rakeezx-v33`**, precaches shell assets, and has update/fallback logic for offline boot. `manifest.webmanifest` declares install icons. Service-worker asset caching does not guarantee that an OS refreshes a previously installed launcher icon.
+- `src/styles/app.css` and `components.css` contain current Product CSS. Font stack is local/system fallback; no remote runtime font is required. Work provides the authority for a *new* visual choice after PO approval; held Work-Active is not permission to port unapproved experiments.
 - `src/views/reports.js` and `src/lib/report-print.js` provide A4 preview/printing and export paths. A visible UI or data claim still needs direct focused verification, not only source inspection.
 
 ## What to read next

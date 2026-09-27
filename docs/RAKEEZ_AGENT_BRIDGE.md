@@ -60,9 +60,9 @@ The bridge rejects forbidden paths and credential-like content. Never package en
 
 ## Workflow
 
-Work: candidate workspace → pack → Product Owner local review → approve-local → Codex inspect/transport → Production Review → Product Owner verifies → CLOSED.
+Work: isolated candidate → pack → PO Work review → approve-local → Codex selective implementation and focused validation → Cloudflare Preview → PO Preview approval → separately authorized exact-SHA Production promotion → PO Production verification → CLOSED.
 
-Google: exact patch → pack/intake → the same review, approval, transport, and Production Review path.
+Google AI Studio is parked/backup. The optional exact-patch intake above remains a technical CLI capability, not active visual authority or automatic promotion authorization. Any explicitly authorized intake follows the same PO/Preview/Production review boundaries.
 
 ## Candidate-bound validation
 

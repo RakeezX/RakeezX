@@ -1,25 +1,24 @@
 # RAKEEZ X — Current project state
 
-Last updated: 2026-09-25 (Asia/Riyadh). This is a short snapshot, not a changelog. [Governance](GOVERNANCE.md) defines authority; [Decisions](DECISIONS.md) records durable choices.
+Last updated: 2026-09-27 (Asia/Riyadh). Short current snapshot; release history is in [Changelog](CHANGELOG.md).
 
-## Live identity and stage
+## Production and stage
 
-- Stage: **Silent Beta active**, without marketing. The two authorized fresh-account pilot journeys passed; this is not a claim of a full Production regression audit.
-- Last externally verified Product app deployment before the docs-only 0303 promotion: Cloudflare Pages `rakeezx`, `main`, deployment `f990667c-1836-4052-842d-99238762bed5`, `success`, commit `8b965c2e4e14226f058d9aa61bc6ca3afceee004`. Docs-only commits can advance `main` without changing Product source; check current Git/deployment metadata for an exact release identity.
-- Supabase Production project `xlrubcwjqktzzunrvuns` is `ACTIVE_HEALTHY`. Its **Allow new users to sign up** setting is ON; RAKEEZ `NEW_ACCOUNT_SIGNUP_ENABLED` is ON. Both were checked against the current dashboard/deployed source. Registration remains silent.
-- Auth uses one visible email → six-digit OTP journey for existing and new users; there is no user-visible login/signup split or account-existence precheck. Server Auth identity remains the owner authority.
+- **Silent Beta active**, signup remains silent; no marketing launch is authorized by this checkpoint. Unified email OTP, owner-bound provisioning/restore and offline-first contracts remain current.
+- Product baseline: **`e3fed26523538a65978daf83d81805f8cb0a7cfe`**. Cloudflare Pages `rakeezx`, branch `main`, Production deployment `3c76cb83-5ceb-4102-9ffb-bce76c0570b6`, success; canonical `rakeezx.com` verified in 0345. A later docs SHA does not change this Product baseline.
+- PO Production verification confirmed explicitly in 0346: N27; N33 Phases 1/2; Micro-Batch 01 (N05/N06/N07), 02 (N20/N21/N29), 03 (N04+N10/N11), and latest **04 (N14/N19/N28) are CLOSED**. N33 overall stays OPEN: Phase 3 is DEFERRED.
+- Known current Product blocker: **none established by the latest focused evidence**; this is not a full Production audit. Demo remains isolated and issues no Product cloud mutations. Production provider checks from earlier tickets are dated evidence, not a fresh Supabase-health assertion in 0346.
 
-## Current Product contracts
+## Authority and canonical sources
 
-- New accounts pass profile and owner-bound provisioning before READY/Home. Existing claimed workspaces route by verified owner; fresh devices restore online through CORE_V2 (CORE_V1 compatibility) before editable Home. Unknown or mismatched workspaces fail closed. Previously verified local work remains available offline.
-- Demo uses the isolated `rakeezx-demo` database, not an authenticated Product workspace. The approved pilot found no A/B cross-account data exposure; its evidence does not include direct inspection of every local IndexedDB/outbox receipt.
-- Work-Active is the sole **active** Visual/UX lab. Approved outcomes carried into Production include the 01A/01B shell/classes and 01C attendance/scores surfaces; only PO-approved Work outcomes are golden. Work's current uncommitted experiments are not Production facts. Google AI Studio is parked/backup, not current visual authority.
-- Latest established milestones: 01C, 0295 automation foundation, 0297 provisioning, 0298 CORE_V2 restore/reload, 0299 security hardening, 0301 unified OTP gate, Silent Signup Pilot, and 0302 relay. Normal-ticket relay coordination is PO/PM-approved but remains fail-closed on missing markers; no unattended watcher is enabled.
+- PO is final Product/acceptance authority; ChatGPT is PM/reviewer/coordinator; Work supplies the active Visual/UX authority after PO approval; Codex implements/tests and manages document/Git changes. Production is runtime/data authority. Google AI Studio is parked/backup. Dirty Work-Active and unapproved candidates are not approved implementation sources.
+- Local canonical docs: **`D:\Abdullah Projects\RakeezX\docs`**. Git/main is the shared committed record. Historical ChatGPT Project attachments and old conversations are not current authority. ChatGPT may read live local canonical files through Desktop Commander.
+- **CANONICAL-DOCS-FOUNDATION-0346 = PO REVIEW PENDING**: this isolated docs candidate reconciles the six local PO-review docs commits and preserves both new raw Inbox notes. It is not promoted to main or copied into the dirty canonical root yet; root HEAD remains `d10319e82f60eb00fd9bf50c203e5eb4206f9845`. Until approved integration, this candidate describes the proposed updated snapshot; verify exact refs and local-file state.
 
-## Focus and limits
+## Open and deferred direction
 
-- Active documentation/triage ticket: **PRODUCT-LEDGER-CLEAR-EXECUTION-01**. The Product Owner's 2026-09-25 raw Inbox notes are preserved verbatim in the [Product Ledger](PRODUCT_LEDGER.md); clear investigations and N17 documentation reconciliation are in progress, while unresolved Product decisions wait for evening review. No Product implementation is authorized by that organization. There is **no active Recovery restoration batch or backlog**. Future Product work derives from the Inbox, real Silent Beta observations, and explicit PO priorities—not a standing archive-review program.
-- True known Silent Beta blockers: **none established by the latest pilot evidence**. A new security, ownership, data-loss, or production failure must be classified on its own evidence.
-- The historical Student Profile continuity concern is closed by PO decision; any recurrence needs a new bug report based on current evidence. Lesson-to-session linking is deferred future Lessons development, not Recovery. Full Archive validation waits until a real prior year/term archive exists.
+- Remaining work follows the [Product Ledger](PRODUCT_LEDGER.md) and separate PO-selected tickets. N01 investigation, N03 profile design, N08 font comparison/licensing, N12 import design, N13 Work-only review, N15 platform icons, N16/N18 inventories, N22 Schedule UX, N30 path benchmark, N31 continuity, N34 feedback UX, N35 storage/security and N36 import research retain their existing dispositions.
+- N09 Mobile UX, N26 theme, N32 former-student lifecycle and N33 Phase 3 remain later/deferred directions. N23/N24 reports overhaul is LAST; N25 belongs to that future phase. Two new 2026-09-27 landing/digit Inbox notes await PM/PO triage; neither is merged into an existing item.
+- **No active Recovery backlog**. Do not restore archived runtime or begin cleanup. No Product ticket, deployment, migration or Work mutation is authorized by this docs checkpoint.
 
-Evidence: current Git/Cloudflare/Supabase read-only checks (2026-09-25); `D:\Abdullah Projects\RakeezX-Evidence\SILENT-SIGNUP-PILOT-01\checkpoint.md`; source contracts in `src/lib/cloud.js`, `src/lib/workspace-routing.js`, `src/lib/initial-restore.js`, and `src/lib/demo-workspace.js`.
+Sources: explicit PO closure directive 0346; exact Git history and 0345 provider/synthetic smoke evidence; [Decisions](DECISIONS.md), [Governance](GOVERNANCE.md), [Current Architecture](CURRENT_ARCHITECTURE.md).
