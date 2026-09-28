@@ -1,10 +1,10 @@
 # RAKEEZ X — Product ledger
 
-Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded by PRODUCT-LEDGER-RECONCILIATION-PO-UPDATE-0375. **Docs candidate — PO REVIEW PENDING; no implementation authorization.** Current Product release: `c1c33db41adc25c14204f570b86e359b3c747ffd`; Production `7d9f7c7c-dbef-4e3e-aa6c-8f29c37f55fb`.
+Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded by PRODUCT-LEDGER-RECONCILIATION-PO-UPDATE-0375. **PO-approved reconciliation/update promoted to canonical main in 0377; this integrated ledger is current status authority.** Docs-only integration did not create a new Product release or authorize implementation. Current Product release: `c1c33db41adc25c14204f570b86e359b3c747ffd`; Production `7d9f7c7c-dbef-4e3e-aa6c-8f29c37f55fb`.
 
 ## Active / new PO note index
 
-Verbatim wording and all dated note mappings are preserved in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). Open historical notes remain in the current table below; resolved notes remain in closed history. No notes were deleted or silently merged. N38–N45 directions are PO-approved in 0375; the combined docs candidate remains pending PO review/integration. Direction approval is not implementation completion or execution authorization in this docs ticket.
+Verbatim wording and all dated note mappings are preserved in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). Open historical notes remain in the current table below; resolved notes remain in closed history. No notes were deleted or silently merged. N38–N45 directions are PO-approved in 0375; the approved 0374/0375 reconciliation was promoted to canonical main in 0377. Direction approval is not implementation completion or execution authorization in this docs ticket.
 
 | Source | Current identity | Concern |
 | --- | --- | --- |

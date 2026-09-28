@@ -1,6 +1,6 @@
 # RAKEEZ X — Current project state
 
-Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374 with PO direction update 0375, PO review pending. Short current snapshot; release history is in [Changelog](CHANGELOG.md).
+Last updated: 2026-09-28 (Asia/Riyadh); PO-approved docs reconciliation 0374/0375 integrated in 0377; status wording corrected in 0378. Short current snapshot; release history is in [Changelog](CHANGELOG.md).
 
 ## Production and stage
 
@@ -15,7 +15,7 @@ Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374 with PO di
 
 - PO is final Product/acceptance authority; ChatGPT is PM/reviewer/coordinator; Work supplies the active Visual/UX authority after PO approval; Codex implements/tests and manages document/Git changes. Production is runtime/data authority. Google AI Studio is parked/backup. Dirty Work-Active and unapproved candidates are not approved implementation sources.
 - Local canonical docs: **`D:\Abdullah Projects\RakeezX\docs`**. Git/main is the shared committed record. Historical ChatGPT Project attachments and old conversations are not current authority. ChatGPT may read live local canonical files through Desktop Commander.
-- Canonical foundation **0346/0347** was integrated in **0348**, incorporating the six local PO-review docs commits and preserving the original raw notes. The local **0374** reconciliation candidate updates the ledger and current release snapshot for PO review. Docs-only commits may advance Git/main without changing the current Product release baseline: `c1c33db41adc25c14204f570b86e359b3c747ffd`. This checkpoint does not claim a Product/runtime deployment; reverify exact refs and local-file state before integration.
+- Canonical foundation **0346/0347** was integrated in **0348**, incorporating the six local PO-review docs commits and preserving the original raw notes. The PO-approved **0374** reconciliation and **0375** direction update were promoted to canonical main in **0377**, at docs checkpoint SHA `6d2545a3bfc3d76a8a749df7dd1487affa97bb81`; the canonical ledger and release snapshot are integrated/current. Docs-only commits may advance Git/main without changing the current Product release baseline: `c1c33db41adc25c14204f570b86e359b3c747ffd`. This docs-only integration did not create a Product release or runtime deployment; reverify exact refs and local-file state before future work.
 
 ## Open and deferred direction
 
@@ -23,6 +23,6 @@ Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374 with PO di
 - N09 Mobile UX, N26 theme, N32 former-student lifecycle and N33 Phase 3 remain later/deferred directions. N23/N24 reports overhaul is LAST; N25 belongs to that future phase. N37 landing is active Work exploration; N38 digit consistency remains distinct from N08. In 0375 the PO approved directions N38–N45: numeral presentation review/planning; search tokens plus student/class quick actions; profile gender/title bug reproduction; Work reviews for teacher identity, Settings IA and compact install guidance; categorized notifications study with optional marketing; and read-only verification-email deliverability audit. N39–N45 retain all seven 2026-09-28 note identities. Direction approval does not authorize implementation in this docs ticket; see the ledger for exact states, priorities and next actions.
 - **No active Recovery backlog**. Do not restore archived runtime or begin cleanup. No Product ticket, deployment, migration or Work mutation is authorized by this docs checkpoint.
 
-0374/0375 is a local DOCS-ONLY candidate awaiting PO review; it has not been pushed/merged. Canonical reconciliation through 0346–0348 remains the integrated docs checkpoint. Later docs SHAs do not create a new Product release.
+PO-approved reconciliation 0374 and direction update 0375 were fast-forwarded and pushed to main in 0377. Canonical docs are integrated/current through that checkpoint. Later docs SHAs do not create a new Product release.
 
 Sources: PO Production verification in the corresponding ticket flows, reconciled/recorded in 0346; Grades verification in the 0370 flow explicitly confirmed in 0374; exact Git history and 0345/0370 provider/synthetic smoke evidence, with read-only current Cloudflare metadata checked in 0374; [Decisions](DECISIONS.md), [Governance](GOVERNANCE.md), [Current Architecture](CURRENT_ARCHITECTURE.md).
