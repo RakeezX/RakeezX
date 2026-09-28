@@ -1119,6 +1119,15 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .profile-completion .field__error:not([hidden]) { margin: 0; padding: 10px 12px; border: 1px solid var(--danger); border-radius: var(--r-md); background: var(--danger-soft); line-height: 1.7; }
 [data-account-profile-required] { display: flex; flex-direction: column; align-items: center; height: var(--visible-viewport-height, 100dvh); min-height: 0; overflow-y: auto; overflow-x: clip; }
 [data-account-profile-required] .profile-completion { flex-shrink: 0; margin-block: auto; }
+/* N47: offscreen decoration must not enlarge the profile scroll region. */
+[data-account-profile-required] > .first-run-orb { position: fixed; }
+@media (min-width: 700px) {
+  /* Override the later general .page spacing only for this full-viewport form. */
+  .first-run-page[data-account-profile-required] {
+    padding-block: max(clamp(12px, 2dvh, 24px), env(safe-area-inset-top)) max(clamp(12px, 2dvh, 24px), env(safe-area-inset-bottom));
+  }
+  [data-account-profile-required] .profile-completion { gap: clamp(12px, 2dvh, 18px); }
+}
 .sheet__head, .sheet__foot { flex-shrink: 0; }
 .sheet__body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 2px; }
 .sheet__body input, .sheet__body textarea, .sheet__body select { scroll-margin-block: 16px; }
