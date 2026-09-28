@@ -1033,19 +1033,33 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
 function mountWorkspaceGate(routing) {
   const signedOut = routing.authState === 'signed_out' || !cloud.session || !cloud.user;
   render(app, html`
-    <div class="page ${signedOut ? 'first-run-page' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
+    <div class="page ${signedOut ? 'n37-landing-gate' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
       ${signedOut ? html`
-        <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
-        <div class="first-run-orb first-run-orb--blue" aria-hidden="true"></div>
-        <main class="first-run-card first-run-welcome" aria-labelledby="first-run-title">
-          <div class="first-run-welcome__brand">${brandLockup()}</div>
-          <div class="first-run-welcome__copy">
-            <h1 id="first-run-title">رَكيزة المعلم الرقمية</h1>
-            <p>كل ما يحتاجه المعلم، في مكان واحد.</p>
+        <main class="n37-landing" aria-labelledby="first-run-title">
+          <div class="n37-atmosphere" aria-hidden="true">
+            <i class="n37-orb n37-orb--green"></i><i class="n37-orb n37-orb--blue"></i><i class="n37-ring"></i>
           </div>
-          <div class="first-run-welcome__actions">
-            <button class="btn btn--primary" type="button" data-workspace-login><span class="welcome-option__title">ابدأ مع ركيز المعلم</span><span class="welcome-option__detail">إنشاء حساب أو تسجيل الدخول</span></button>
-            <button class="btn btn--ghost" type="button" data-workspace-demo><span class="welcome-option__title">جرّب ركيز المعلم</span><span class="welcome-option__detail">استكشف وجرّب بدون حساب</span></button>
+          <header class="n37-identity">${brandLockup()}<span>ركيزة المعلم الرقمية</span></header>
+          <section class="n37-message">
+            <h1 id="first-run-title">لأن وقتك للتعليم، مو للتنقّل بين الأدوات.</h1>
+            <p>ركيز يجمع فصولك وطلابك وحضورك ودرجاتك وتقاريرك في مكان واحد.</p>
+          </section>
+          <div class="n37-actions">
+            <button class="n37-primary" type="button" data-workspace-login><strong>ابدأ مع ركيز المعلم</strong><span>إنشاء حساب أو تسجيل الدخول</span></button>
+            <button type="button" data-workspace-demo><strong>جرّب ركيز المعلم</strong><span>استكشف ركيز بنفسك، بدون حساب</span></button>
+          </div>
+          <section class="n37-benefits" aria-label="لماذا ركيز؟">
+            ${[
+              ['classes', 'كل شغلك في مكان واحد', 'فصولك وطلابك وجدولك كلها قدامك، مرتبة وواضحة.'],
+              ['attendance', 'رصد أسرع وأسهل', 'حضور طلابك ودرجاتهم مرتبة مع كل فصل، وتوصل لها بسرعة وقت الرصد.'],
+              ['note', 'تلقى المعلومة وقت ما تحتاجها', 'كشوف وتقارير وسجل الطالب، مرتبة وسهلة الوصول.'],
+              ['calendar', 'يومك مرتب', 'حصصك ومواعيدك قدامك، مرتبة في الجدول والتقويم الدراسي.'],
+            ].map(([symbol, title, copy]) => html`<article><span class="n37-icon n37-icon--lit" aria-hidden="true">${icon(symbol)}</span><h2>${title}</h2><p>${copy}</p></article>`)}
+          </section>
+          <div class="n37-continuity" role="group" aria-label="شغلك يكمل معك">
+            <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4V4Zm4 16h8m-4-4v4M8 9l3 3 5-5"/></svg></span><div><strong>شغلك ما يوقف</strong><span>حتى بدون اتصال</span></div></div>
+            <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true">${icon('refresh')}</span><div><strong>كل شيء يتحدّث ويتزامن</strong><span>تلقائيًا عند رجوع الإنترنت</span></div></div>
+            <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h13v10H3V4Zm3 14h7m-4-4v4m9-9h4v11h-4V9Z"/></svg></span><div><strong>مساحتك معك</strong><span>من أي جهاز بعد تسجيل الدخول</span></div></div>
           </div>
         </main>
       ` : html`

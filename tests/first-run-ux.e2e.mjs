@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { SUPABASE_URL } from '../src/lib/cloud.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PREVIEW = process.env.N37_PREVIEW_URL;
+if (PREVIEW && !/^https:\/\/[a-z0-9-]+\.rakeezx\.pages\.dev\/?$/.test(PREVIEW)) throw new Error('N37 smoke requires an isolated Pages Preview URL');
 const MIME = {
   '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json',
@@ -42,7 +44,7 @@ test.afterAll(async () => {
 async function openFirstRun(page) {
   await page.route(`${SUPABASE_URL}/auth/v1/**`, (route) => route.fulfill({ status: 204 }));
   await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
-  await page.goto(`${host.url}/#/`);
+  await page.goto(`${PREVIEW || host.url}/#/`);
   return page.locator('[data-workspace-gate]');
 }
 
@@ -51,18 +53,18 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
   const page = await context.newPage();
   await page.setViewportSize({ width: 1440, height: 900 });
   const gate = await openFirstRun(page);
-  await expect(gate.getByRole('heading', { name: 'رَكيزة المعلم الرقمية', exact: true })).toBeVisible();
-  await expect(gate.getByText('كل ما يحتاجه المعلم، في مكان واحد.', { exact: true })).toBeVisible();
-  await expect(gate.getByRole('button', { name: 'ابدأ مع ركيز', exact: true })).toBeVisible();
-  await expect(gate.getByRole('button', { name: 'جرّب ركيز', exact: true })).toBeVisible();
+  await expect(gate.getByRole('heading', { name: 'لأن وقتك للتعليم، مو للتنقّل بين الأدوات.', exact: true })).toBeVisible();
+  await expect(gate.getByText('ركيز يجمع فصولك وطلابك وحضورك ودرجاتك وتقاريرك في مكان واحد.', { exact: true })).toBeVisible();
+  await expect(gate.locator('[data-workspace-login]')).toBeVisible();
+  await expect(gate.locator('[data-workspace-demo]')).toBeVisible();
   await expect(gate.getByText('تسجيل الدخول مخصص للحسابات الحالية.', { exact: false })).toHaveCount(0);
-  await expect(gate.locator('.first-run-orb--green')).toHaveCSS('background-color', 'rgba(36, 164, 105, 0.14)');
-  await expect(gate.locator('.first-run-orb--blue')).toHaveCSS('background-color', 'rgba(56, 131, 205, 0.11)');
+  await expect(gate.locator('.n37-atmosphere')).toHaveAttribute('aria-hidden', 'true');
+  await expect(gate.locator('.n37-atmosphere')).toHaveCSS('pointer-events', 'none');
   expect((await new AxeBuilder({ page }).include('[data-workspace-gate]').analyze()).violations).toEqual([]);
   await page.screenshot({ path: testInfo.outputPath('first-run-desktop-light.png'), fullPage: true });
 
   await page.evaluate(() => document.documentElement.dataset.theme = 'dark');
-  await expect(gate.locator('.first-run-card')).toBeVisible();
+  await expect(gate.locator('.n37-landing')).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-desktop-dark.png'), fullPage: true });
 
   await page.setViewportSize({ width: 768, height: 1024 });
@@ -70,8 +72,8 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-  await gate.getByRole('button', { name: 'ابدأ مع ركيز', exact: true }).focus();
-  await expect(gate.getByRole('button', { name: 'ابدأ مع ركيز', exact: true })).toBeFocused();
+  await gate.locator('[data-workspace-login]').focus();
+  await expect(gate.locator('[data-workspace-login]')).toBeFocused();
   await page.screenshot({ path: testInfo.outputPath('first-run-mobile-dark.png'), fullPage: true });
 
   await page.setViewportSize({ width: 320, height: 700 });
@@ -92,8 +94,8 @@ test('primary action opens the unified OTP surface with the pilot signup gate', 
     }
     return route.fulfill({ status: 204 });
   });
-  await page.goto(`${host.url}/#/`);
-  await page.getByRole('button', { name: 'ابدأ مع ركيز', exact: true }).click();
+  await page.goto(`${PREVIEW || host.url}/#/`);
+  await page.locator('[data-workspace-login]').click();
   const login = page.locator('.sheet-backdrop').last();
   await expect(login.getByRole('dialog')).toBeVisible();
   await expect(login.getByText('رَكيزة المعلم الرقمية', { exact: true })).toBeVisible();
@@ -114,14 +116,23 @@ test('primary action opens the unified OTP surface with the pilot signup gate', 
 test('secondary action hands off to the current isolated Demo runtime', async ({ browser }, testInfo) => {
   const context = await browser.newContext({ serviceWorkers: 'block' });
   const page = await context.newPage();
-  await page.route(`${SUPABASE_URL}/**`, (route) => route.abort());
-  await page.goto(`${host.url}/#/`);
-  await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
+  const errors = [], cloudRequests = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.route(`${SUPABASE_URL}/**`, (route) => { cloudRequests.push(route.request().url()); return route.abort(); });
+  await page.goto(`${PREVIEW || host.url}/#/`);
+  await page.locator('[data-workspace-demo]').focus();
+  await page.keyboard.press('Space');
   await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
   await expect(page.getByLabel('نظرة سريعة').getByText('8', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'الفصول', exact: true }).click();
   await expect(page.getByText('184', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'الخروج من الوضع التجريبي وتسجيل الدخول' }).first()).toBeVisible();
+  await page.reload();
+  await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
+  await expect(page.getByText('184', { exact: true })).toBeVisible();
+  expect(cloudRequests).toEqual([]);
+  expect(errors).toEqual([]);
   await page.screenshot({ path: testInfo.outputPath('first-run-demo-entry.png'), fullPage: true });
   await context.close();
 });
