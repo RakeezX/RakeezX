@@ -3,6 +3,8 @@
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
 import { brandLockup } from '../lib/brand.js';
 import { BUILD_META } from '../lib/build-meta.js';
+import { profileAttention } from '../lib/settings-profile-ui.js';
+import { currentInstallContext, INSTALL_COPY, openInstallGuide } from '../lib/install-guide-ui.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
@@ -23,32 +25,8 @@ const THEMES = [
   { v: 'dark',  label: 'داكن',       icon: 'moon' },
 ];
 
-function detectUserPlatform() {
-  if (typeof navigator === 'undefined') return 'ios';
-  const ua = navigator.userAgent || '';
-  if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-    return 'ios';
-  }
-  if (/Android/i.test(ua)) {
-    return 'android';
-  }
-  if (/Win/i.test(ua)) {
-    return 'windows';
-  }
-  if (/Mac/i.test(ua)) {
-    return 'mac';
-  }
-  return 'ios';
-}
-
-function isStandaloneMode() {
-  if (typeof window === 'undefined') return false;
-  return !!(window.matchMedia?.('(display-mode: standalone)').matches ||
-    navigator.standalone === true ||
-    document.referrer?.includes('android-app://'));
-}
-
-let activePwaGuide = null;
+let profileExpanded = false;
+let removeProfileAttention = () => {};
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
 let requestedEmailChange = '';
@@ -108,79 +86,6 @@ function emailChangeSheet(currentEmail) {
       done(result.email);
     }),
   });
-}
-
-const PWA_PLATFORMS = [
-  { id: 'ios',     label: 'iPhone / iPad' },
-  { id: 'android', label: 'Android' },
-  { id: 'windows', label: 'Windows' },
-  { id: 'mac',     label: 'Mac' },
-];
-
-function pwaGuideContent(platform) {
-  switch (platform) {
-    case 'android':
-      return html`
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">١</span>
-          <span class="pwa-guide-text">في متصفح <strong>Chrome</strong>، اضغط زر القائمة <strong>(⋮)</strong> في الزاوية العلوية أو السفلية.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٢</span>
-          <span class="pwa-guide-text">اختر <strong>«تثبيت التطبيق» (Install app)</strong> أو <strong>«إضافة إلى الشاشة الرئيسية»</strong>.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">أكّد التثبيت ليظهر رَكيز المعلم كبرنامج مستقل وسريع في قائمة وتطبيقات جهازك.</span>
-        </div>
-      `;
-    case 'windows':
-      return html`
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">١</span>
-          <span class="pwa-guide-text">في متصفح <strong>Chrome</strong> أو <strong>Edge</strong>، اضغط على أيقونة التثبيت <strong>${icon('download')}</strong> في شريط العنوان بالأعلى.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٢</span>
-          <span class="pwa-guide-text">أو افتح قائمة المتصفح (⋮) واختر <strong>تطبيقات ← تثبيت رَكيز المعلم</strong>.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">سيتم تثبيت رَكيز كنافذة مستقلة وإضافته لقائمة «ابدأ» وشريط المهام.</span>
-        </div>
-      `;
-    case 'mac':
-      return html`
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">١</span>
-          <span class="pwa-guide-text">في متصفح <strong>Safari</strong> (macOS Sonoma فما بعد): من القائمة العلوية اختر <strong>ملف (File) ← إضافة إلى Dock</strong>.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٢</span>
-          <span class="pwa-guide-text">أو في متصفح <strong>Chrome</strong>: اضغط أيقونة التثبيت في شريط العنوان بالأعلى.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">سيظهر رَكيز في شريط الـ Dock ومجلد البرامج لفتحه مباشرة كتطبيق سطح مكتب.</span>
-        </div>
-      `;
-    case 'ios':
-    default:
-      return html`
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">١</span>
-          <span class="pwa-guide-text">افتح الرابط في متصفح <strong>سفاري (Safari)</strong> واضغط زر المشاركة <strong>${icon('share')}</strong> أسفل الشاشة.</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٢</span>
-          <span class="pwa-guide-text">مرر للأسفل واختر <strong>«إضافة إلى الصفحة الرئيسية»</strong> (Add to Home Screen).</span>
-        </div>
-        <div class="pwa-guide-step">
-          <span class="pwa-guide-num">٣</span>
-          <span class="pwa-guide-text">اضغط <strong>«إضافة»</strong> (Add) في الزاوية العلوية ليظهر رَكيز المعلم كأيقونة تطبيق مباشر.</span>
-        </div>
-      `;
-  }
 }
 
 function yearSheet(existing = null) {
@@ -323,7 +228,7 @@ function renderResultPanel(title, result) {
   `;
 }
 
-export default {
+const settings = {
   title: () => 'الإعدادات',
 
   render() {
@@ -346,9 +251,11 @@ export default {
     const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
     const demo = store.getActiveWorkspace()?.type === 'demo';
+    const attention = profileAttention({ profile, demo, pendingEmail: emailChangePending, unavailable: accountContractUnavailable, contract: accountContract });
+    const install = currentInstallContext();
 
     return html`
-      <div class="management-page settings-page">
+      <div class="management-page settings-page settings-compact">
       ${demo ? html`
         <div class="section settings-section settings-section--demo" data-demo-settings>
           <div class="section__head"><div class="section__title">الوضع التجريبي</div></div>
@@ -362,8 +269,13 @@ export default {
         </div>
       ` : ''}
       <div class="section settings-section settings-section--identity">
-        <div class="section__head"><div class="section__title">بياناتك</div></div>
-        <div class="card card--pad">
+        <details class="settings-profile card" data-settings-profile ${profileExpanded || attention ? 'open' : ''}>
+          <summary class="settings-profile-summary">
+            <span class="row__icon">${icon('student')}</span>
+            <span class="row__main"><span class="row__title">بياناتك</span><span class="row__sub">${m.teacherName || 'بيانات الحساب والتقارير'}</span><span class="settings-profile-attention" data-profile-attention role="status" ${attention ? '' : 'hidden'}>${attention}</span></span>
+            <span class="settings-profile-edit">عرض وتعديل ${icon('chev')}</span>
+          </summary>
+          <div class="card--pad">
           <form id="me-form" class="management-form settings-identity-form">
             <div class="field-row">
               <label class="field">
@@ -419,12 +331,13 @@ export default {
               <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
             </div>`}
           </form>
-        </div>
+          </div>
+        </details>
       </div>
 
 
       <div class="section settings-section settings-section--experience">
-        <div class="section__head"><div class="section__title">المظهر والمؤثرات والتفاعل</div></div>
+        <div class="section__head"><h2 class="section__title">المظهر والتفاعل</h2></div>
         <div class="settings-preference-surface">
           <div class="settings-preference-row">
             <div class="settings-preference-row__copy">
@@ -475,8 +388,9 @@ export default {
         </div>
       </div>
 
-      <div class="section settings-section settings-section--destinations">
-        <div class="section__head"><div class="section__title">البيانات</div></div>
+      <section class="section settings-section settings-section--destinations">
+        <div class="section__head"><h2 class="section__title">البيانات والمساعدة</h2></div>
+        <div class="settings-link-group">
         <a class="row settings-destination" href="#/settings/backup">
           <span class="row__icon">${icon('download')}</span>
           <span class="row__main">
@@ -485,84 +399,54 @@ export default {
           </span>
           <span class="row__end">${icon('chev')}</span>
         </a>
-      </div>
-
-      <div class="section settings-section settings-section--destinations">
-        <div class="section__head"><div class="section__title">الأرشيف</div></div>
         <a class="row settings-destination" href="#/archive">
           <span class="row__icon">${icon('archive')}</span>
           <span class="row__main"><span class="row__title">الأرشيف</span><span class="row__sub">استعراض السنوات والفصول الدراسية المؤرشفة وبياناتها السابقة.</span></span>
           <span class="row__end">${icon('chev')}</span>
         </a>
-      </div>
-      <div class="section settings-section settings-section--destinations">
-        <div class="section__head"><div class="section__title">المساعدة</div></div>
         <a class="row settings-destination" href="#/support">
           <span class="row__icon">${icon('note')}</span>
           <span class="row__main"><span class="row__title">الدعم</span><span class="row__sub">تواصل بالبريد أو أرسل طلب دعم خاصًا من داخل التطبيق.</span></span>
           <span class="row__end">${icon('chev')}</span>
         </a>
-      </div>
-      <div class="section settings-section settings-section--pwa">
-        <div class="section__head"><div class="section__title">تثبيت تطبيق رَكيز المعلم على الجهاز</div></div>
-        <div class="card card--pad stack stack-3">
-          ${isStandaloneMode()
-            ? html`
-                <div class="pwa-installed-card">
-                  <div class="pwa-installed-card__icon">${icon('check')}</div>
-                  <div>
-                    <div class="fw-7">التطبيق مُثبّت ويعمل كتطبيق جهاز مستقل</div>
-                    <div class="fs-xs" style="opacity:0.9">يعمل رَكيز بكامل مميزاته محليًا دون الحاجة للاتصال بالإنترنت.</div>
-                  </div>
-                </div>
-              `
-            : ''}
-
-          ${!isStandaloneMode() && typeof window !== 'undefined' && window.deferredInstallPrompt
-            ? html`
-                <button class="btn btn--primary btn--block" data-act="pwa-prompt-install">
-                  ${icon('download')} تثبيت تطبيق رَكيز المعلم الآن
-                </button>
-              `
-            : ''}
-
-          <div>
-            <div class="hstack gap-2 wrap mb-2">
-              <span class="fw-7 fs-sm">إرشادات التثبيت حسب الجهاز:</span>
-            </div>
-            <div class="segmented mb-3" role="tablist" aria-label="نظام الجهاز">
-              ${PWA_PLATFORMS.map(
-                (p) => html`
-                  <button type="button" class="segmented__btn ${(activePwaGuide || detectUserPlatform()) === p.id ? 'is-on' : ''}"
-                          data-act="pwa-select-guide" data-platform="${p.id}" role="tab" aria-selected="${(activePwaGuide || detectUserPlatform()) === p.id ? 'true' : 'false'}">
-                    ${p.label}
-                  </button>
-                `
-              )}
-            </div>
-          </div>
-
-          <div class="stack stack-2">
-            ${pwaGuideContent(activePwaGuide || detectUserPlatform())}
-          </div>
         </div>
-      </div>
-
-      <div class="section settings-section settings-section--about">
-        <div class="section__head"><div class="section__title">عن رَكيز المعلم</div></div>
-        <div class="card card--pad stack stack-2">
-          ${brandLockup({ prominent: true })}
-          <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
-          <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
-          <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
-          <div class="t-3 fs-xs">الإصدار ${BUILD_META.appVersion}</div>
+      </section>
+      <section class="section settings-section settings-section--device">
+        <div class="section__head"><h2 class="section__title">على جهازك</h2></div>
+        <div class="settings-link-group">
+          ${install.state === 'standalone' ? html`<div class="row settings-destination" data-install-state="standalone"><span class="row__icon">${icon('check')}</span><span class="row__main"><span class="row__title">${INSTALL_COPY.standalone[0]}</span><span class="row__sub">${INSTALL_COPY.standalone[1]}</span></span></div>` : html`
+          <button class="row settings-destination" type="button" data-act="${install.state === 'native' ? 'pwa-prompt-install' : 'install-guide'}" data-install-state="${install.state}">
+            <span class="row__icon">${icon('device')}</span>
+            <span class="row__main"><span class="row__title">تثبيت ركيز على جهازك</span><span class="row__sub">${INSTALL_COPY[install.state][1]}</span>${install.state === 'limited' ? html`<span class="row__sub">افتح ركيز في متصفح يدعم التثبيت</span>` : ''}</span>
+            <span class="row__end">${install.state === 'native' ? 'تثبيت ركيز' : install.state === 'limited' ? 'اختر جهازك' : icon('chev')}</span>
+          </button>`}
+          <button class="row settings-destination" type="button" data-act="about-rakeez"><span class="row__icon">${icon('note')}</span><span class="row__main"><span class="row__title">عن ركيز المعلم</span><span class="row__sub">معلومات التطبيق والإصدار</span></span><span class="row__end">${icon('chev')}</span></button>
         </div>
-      </div>
+      </section>
       </div>
     `;
   },
 
   afterPaint(root) {
+    removeProfileAttention();
+    const details = root.querySelector('[data-settings-profile]');
+    const notice = root.querySelector('[data-profile-attention]');
+    const initialNotice = notice.textContent;
+    const revealError = () => {
+      if (details.querySelector('[aria-invalid="true"]')) {
+        details.open = true;
+        notice.hidden = false;
+        notice.textContent = 'راجع البيانات غير الصالحة';
+      } else {
+        notice.textContent = initialNotice;
+        notice.hidden = !initialNotice;
+      }
+    };
+    const toggle = () => { revealError(); profileExpanded = details.open; };
+    details.addEventListener('toggle', toggle);
+    const observer = new MutationObserver(revealError);
+    observer.observe(details, { subtree: true, attributes: true, attributeFilter: ['aria-invalid'] });
+    removeProfileAttention = () => { observer.disconnect(); details.removeEventListener('toggle', toggle); };
     removePhoneInputGuards();
     const phone = root.querySelector('input[name="phone"]');
     const beforeInput = (event) => {
@@ -593,6 +477,8 @@ export default {
   },
 
   onUnmount() {
+    removeProfileAttention();
+    profileExpanded = false;
     removePhoneInputGuards();
     accountContractRequest += 1;
   },
@@ -631,9 +517,18 @@ export default {
       el.removeAttribute('aria-invalid');
     },
 
-    'pwa-select-guide'(el) {
-      activePwaGuide = el.dataset.platform;
-      repaint();
+    'install-guide'() {
+      return openInstallGuide(() => settings.actions['pwa-prompt-install']());
+    },
+
+    'about-rakeez'() {
+      return openSheet({ title: 'عن ركيز المعلم', body: html`<div class="stack stack-2 settings-about-details">
+        ${brandLockup({ prominent: true })}
+        <div class="fw-7">مساحة العمل الرقمية للمعلم</div>
+        <div class="t-2 fs-sm">أقل وقت للإدارة. أكثر وقت للتعليم.</div>
+        <div class="t-3 fs-sm">بياناتك وسجلاتك محفوظة محليًا على جهازك لسرعة العمل والخصوصية، مع دعم المزامنة السحابية الآمنة واستمرارية السجلات عبر أجهزتك.</div>
+        <div class="t-3 fs-xs" data-about-version>الإصدار ${BUILD_META.appVersion}</div>
+      </div>` });
     },
 
     async 'pwa-prompt-install'() {
@@ -914,3 +809,5 @@ export default {
     },
   },
 };
+
+export default settings;

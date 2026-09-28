@@ -4993,6 +4993,83 @@
   margin-inline: auto;
 }
 
+/* N42: approved compact groups; existing controls and routes retain their behavior. */
+.settings-compact .settings-profile { padding: 0; overflow: hidden; }
+.settings-profile-summary { display: flex; align-items: center; gap: 12px; padding: 16px; min-height: 76px; cursor: pointer; list-style: none; }
+.settings-profile-summary::-webkit-details-marker { display: none; }
+.settings-profile-summary .row__main { flex: 1; min-width: 0; }
+.settings-profile-edit { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.settings-profile[open] .settings-profile-summary { border-bottom: 1px solid var(--border); }
+.settings-profile[open] .settings-profile-edit .icon { transform: rotate(-90deg); }
+.settings-profile-attention { display: block; font-size: 13px; color: var(--info); margin-top: 4px; }
+.settings-profile-attention[hidden] { display: none; }
+.settings-compact .settings-link-group { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elev); overflow: hidden; }
+.settings-compact .settings-destination { width: 100%; text-align: start; border: 0; border-radius: 0; background: transparent; color: var(--text); }
+.settings-compact .settings-destination + .settings-destination { border-top: 1px solid var(--border); }
+.settings-compact .settings-destination .row__main { min-width: 0; }
+.settings-compact .settings-destination .row__sub { overflow-wrap: anywhere; }
+.settings-compact .settings-email-edit { min-height: 44px; }
+.settings-compact .segmented__btn { min-height: 44px; }
+.settings-compact .settings-preference-row { min-width: 0; }
+.settings-compact .settings-preference-row__control { flex-wrap: wrap; }
+.settings-compact summary:focus-visible, .n43-install-guide summary:focus-visible { outline: 2px solid var(--info); outline-offset: -3px; border-radius: 8px; }
+@media (min-width: 1000px) {
+  .settings-compact .settings-preference-surface { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .settings-compact .settings-preference-row { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+  .settings-compact .settings-preference-row + .settings-preference-row { border-top: 0; border-inline-start: 1px solid var(--border); }
+  .settings-compact .settings-section--demo { grid-column: 1 / -1; }
+}
+@media (max-width: 999px) {
+  .settings-compact .settings-preference-row { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (max-width: 359px) {
+  .settings-profile-summary { padding: 12px; gap: 8px; }
+  .settings-profile-edit { font-size: 12px; }
+}
+
+/* N43 Pattern A: instructional schematics, scoped to the existing Product sheet. */
+.sheet.n43-install-guide { width: min(900px, calc(100% - 28px)); max-width: 900px; }
+.n43-install-guide .sheet__head .iconbtn { min-width: 44px; min-height: 44px; }
+.n43-install-guide svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.n43-install-guide .guide-context { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; font-size: 14px; color: var(--text-2); }
+.n43-install-guide .guide-context label { display: flex; align-items: center; gap: 8px; }
+.n43-install-guide select { min-height: 44px; width: auto; }
+.n43-install-guide .visual-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
+.n43-install-guide .visual-step { min-width: 0; background: var(--bg-sunk); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.n43-install-guide .step-title { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.n43-install-guide .step-title h3 { font-size: 15px; line-height: 1.6; margin: 0; }
+.n43-install-guide .step-number { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border: 1px solid var(--brand-border); background: var(--brand-soft); color: var(--brand-text); border-radius: 50%; font-size: 14px; font-weight: 700; }
+.n43-install-guide .visual-step p { font-size: 14px; line-height: 1.8; margin: 12px 0 0; }
+.n43-install-guide .schematic { min-height: 170px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 10px; display: flex; flex-direction: column; justify-content: center; font-size: 12px; color: var(--text); }
+.n43-install-guide .mock-page { display: flex; align-items: center; gap: 7px; padding: 8px; flex-wrap: wrap; }
+.n43-install-guide .app-mark { width: 28px; height: 28px; flex: none; border-radius: 6px; }
+.n43-install-guide .mock-page i { display: block; width: 100%; height: 5px; border-radius: 3px; background: var(--border); margin-top: 4px; }
+.n43-install-guide .mock-page i:last-child { width: 60%; }
+.n43-install-guide .mock-toolbar { display: flex; gap: 8px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 6px; order: -1; }
+.n43-install-guide .mock-toolbar.at-bottom { order: 1; border-bottom: 0; border-top: 1px solid var(--border); }
+.n43-install-guide .target { border: 2px solid var(--brand-text); background: var(--brand-soft); border-radius: 6px; color: var(--brand-text); font-weight: 650; padding: 5px; }
+.n43-install-guide .icon-target { display: flex; padding: 4px; }
+.n43-install-guide .target-caption { color: var(--brand-text); margin-top: 6px; text-align: center; }
+.n43-install-guide .mock-menu { display: grid; gap: 5px; }
+.n43-install-guide .chain-row { line-height: 1.7; padding: 5px; }
+.n43-install-guide .mac-menu-bar { display: flex; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 6px; }
+.n43-install-guide .confirm-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.n43-install-guide .confirm-brand strong { font-size: 13px; }
+.n43-install-guide .mock-confirm-actions, .n43-install-guide .web-app-switch { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.n43-install-guide .web-app-switch { margin: 12px 0; }
+.n43-install-guide .schematic-note, .n43-install-guide .small-hint { font-size: 12px; line-height: 1.8; color: var(--text-2); }
+.n43-install-guide .device-switch { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 12px; }
+.n43-install-guide .device-switch summary { font-size: 14px; color: var(--brand-text); min-height: 44px; padding: 10px 0; cursor: pointer; }
+.n43-install-guide .device-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.n43-install-guide .device-options button { min-height: 44px; border: 1px solid var(--border); }
+.n43-install-guide .device-options button[aria-pressed=true] { background: var(--brand-soft); color: var(--brand-text); border-color: var(--brand-text); }
+@media (max-width: 700px) {
+  .n43-install-guide .visual-cards { grid-template-columns: 1fr; }
+  .n43-install-guide .visual-step { padding: 12px; }
+  .n43-install-guide .schematic { min-height: 140px; }
+  .n43-install-guide .device-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 .settings-section {
   min-width: 0;
 }

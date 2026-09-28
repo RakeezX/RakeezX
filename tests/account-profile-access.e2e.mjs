@@ -83,6 +83,7 @@ test('Settings exposes polished profile controls and read-only account informati
   });
   await seedClaimedWorkspace(page);
   await page.goto('/#/settings');
+  await page.locator('[data-settings-profile] summary').click();
   await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلمة الاختبار');
   await expect(page.getByText('اسم المعلمة', { exact: true })).toBeVisible();
   await expect(page.getByText(/اسم المديرة/, { exact: false })).toBeVisible();
@@ -140,6 +141,7 @@ test('Settings exposes polished profile controls and read-only account informati
   await phone.blur();
   await expect(phone).toHaveAttribute('aria-invalid', 'true');
   await page.reload();
+  await page.locator('[data-settings-profile] summary').click();
   await expect(phone).toHaveValue('0500000000');
 
   const beforeEmailChange = await page.evaluate(async () => ({
