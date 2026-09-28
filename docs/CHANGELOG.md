@@ -1,6 +1,6 @@
 # RAKEEZ X — Production changelog
 
-Material Production changes, oldest first. Dates are established release milestones; PO Production verification and closure were completed in the corresponding ticket flows; reconciled/recorded in 0346 (2026-09-27), not inferred from commit dates or tests. Full decisions/status remain in [Product Ledger](PRODUCT_LEDGER.md); Git and ticket evidence retain detail.
+Material Production changes, oldest first. Dates are established release milestones; PO Production verification and closure were completed in the corresponding ticket flows; reconciled/recorded in 0346 (2026-09-27), not inferred from commit dates or tests. Grades verification was completed in the 0370 flow and explicitly confirmed/recorded in 0374. Full decisions/status remain in [Product Ledger](PRODUCT_LEDGER.md); Git and ticket evidence retain detail.
 
 | Date | Ticket / notes | User-facing outcome | Production SHA | Production deployment |
 | --- | --- | --- | --- | --- |
@@ -11,5 +11,6 @@ Material Production changes, oldest first. Dates are established release milesto
 | 2026-09-27 | Micro-Batch 02, 0330/0331 — N20/N21/N29 CLOSED | Visible-viewport forms, profile hierarchy and clear first-run account/Demo choices; unified OTP retained. | `d62732d1ecb086b28b09ee0fd4c3a3d91cc19a05` | `e9bb1d7d-847c-4fd1-8e83-d1298bd6080a` |
 | 2026-09-27 | Micro-Batch 03, 0335/0336 — N04+N10/N11 CLOSED | Calm pre-start notice/bulk confirmation, period/time context and actionable/completed Today hierarchy. | `7e84571ca41ad93128e2b724d9424fc308416996` | `6de4226a-bfe8-407d-b55a-266d22007a29` |
 | 2026-09-27 | Micro-Batch 04, 0344/0345 — N14/N19/N28 CLOSED | Safe subject default, active identity-aware Home student search and eligible target-count grouping with inline custom input. | `e3fed26523538a65978daf83d81805f8cb0a7cfe` | `3c76cb83-5ceb-4102-9ffb-bce76c0570b6` |
+| 2026-09-28 | N46 Grades, 0364–0370 — CLOSED | Manual input/slash/max RTL order, correct automatic fractions/row edges, safe long-name wrapping and centered roll badges; shared Demo presentation corrected without scoring/data changes. | `c1c33db41adc25c14204f570b86e359b3c747ffd` | `7d9f7c7c-dbef-4e3e-aa6c-8f29c37f55fb` |
 
-Source: exact main Git history, prior promotion/provider evidence (including 0345), and PO Production verification in the corresponding ticket flows, reconciled/recorded in 0346. Docs-only checkpoints are not Product release entries; this is not a test log or evidence archive.
+Source: exact main Git history, prior promotion/provider evidence (including 0345 and 0370), and PO Production verification in the corresponding ticket flows, reconciled/recorded in 0346; Grades verification confirmed/recorded in 0374. Docs-only checkpoints are not Product release entries; this is not a test log or evidence archive.
