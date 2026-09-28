@@ -152,4 +152,3 @@ for (const [engine, launcher] of Object.entries({ chromium, webkit })) {
     } finally { await browser.close(); }
   });
 }
-
