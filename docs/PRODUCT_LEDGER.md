@@ -1,6 +1,6 @@
 # RAKEEZ X — Product ledger
 
-Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded in 0375 and promoted to canonical main in 0377. The 0388 release/status record and 0390 PO closure follow-up are integrated into canonical main in 0390: N40/N47 CLOSED following PO Production verification after 0388; N45 read-only audit complete, remediation not yet authorized. Docs-only records do not create a Product release or authorize further implementation. Current Product release: `eb520ceed8cd8e736b34f8d8d45168a2fb593a9e`; Production `d755bfa0-7b90-4441-9c7f-64e199fd68a0`.
+Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded in 0375 and promoted to canonical main in 0377. The 0388 release/status record and 0390 PO closure follow-up are integrated into canonical main in 0390: N40/N47 CLOSED following PO Production verification after 0388; N45 read-only audit complete, remediation not yet authorized. Docs-only records do not create a Product release or authorize further implementation. N37 exact-SHA Production promotion 0394 is recorded below, awaiting PO Production verification. Current Product release: `59a8fcf9c80a3d64d2eecfcd6c0f80274f5bc139`; Production `5b848eb3-1882-452c-a3aa-e1046a75334a`.
 
 ## Active / new PO note index
 
@@ -8,7 +8,7 @@ Verbatim wording and all dated note mappings are preserved in [Historical raw no
 
 | Source | Current identity | Concern |
 | --- | --- | --- |
-| 2026-09-27 #01 | N37 | Landing value proposition — Work review active |
+| 2026-09-27 #01 | N37 | Landing value proposition — Production deployed / PO Production verification pending |
 | 2026-09-27 #02 | N38 | Numeric presentation — distinct from N08 typography |
 | 2026-09-28 #01 | N39 | Student-search token matching and student/class quick actions — PO approved |
 | 2026-09-28 #02 | N40 | Teacher gender/title selection not saving |
@@ -49,7 +49,7 @@ CLOSED requires implementation, user-visible Preview and PO approval, Production
 | N34 | 2026-09-25 | 2026-09-28 | Feedback | UX | Discoverable ideas/problems submission | WAITING_PO | MEDIUM | MEDIUM | D-058 | Work entry-point design, then separate implementation plan. |
 | N35 | 2026-09-25 | 2026-09-28 | Feedback storage | FEATURE | Optional private image/video attachments | REVIEW | MEDIUM | HIGH | D-059 | Security/storage/cost investigation first; no provider/schema selected. |
 | N36 | 2026-09-25 | 2026-09-28 | External import | IDEA | Madrasati/Noor official exports/API/files first | REVIEW | MEDIUM | HIGH | D-060 | Research only; compare constrained adapters and shared Preview with N12; no credentials/helper. |
-| N37 | 2026-09-27 | 2026-09-28 | Landing | UX | Marketing-led explanation/value proposition | IN_PROGRESS | MEDIUM | MEDIUM | 0349–0373; 0358 exploratory Preview | Work review active; choose final PO-approved design before a new selective Product candidate. |
+| N37 | 2026-09-27 | 2026-09-29 | Landing | UX | Marketing-led explanation/value proposition | PRODUCTION DEPLOYED / PO PRODUCTION VERIFICATION PENDING | MEDIUM | MEDIUM | 0389 Work; 0392 PO-approved Product Preview; 0394 exact Production promotion | PO verifies live landing; not CLOSED. |
 | N38 | 2026-09-27 | 2026-09-28 | Digits | UX | Consistent 0–9 numeral presentation/input; distinct from N08 | PO APPROVED — REVIEW / PLANNING | MEDIUM | MEDIUM | 2026-09-27 raw #02; 0375; related N08 | Broad presentation/input audit; review typography relationship without merging N08 or changing stored-data semantics. |
 | N39 | 2026-09-28 | 2026-09-28 | Student search | UX | Non-contiguous name tokens plus student/class quick actions | PO APPROVED — AWAITING IMPLEMENTATION / DESIGN AS NEEDED | MEDIUM | MEDIUM | 2026-09-28 #01; 0375; follow-up to CLOSED N19 | Separate scoped design/implementation ticket for token matching and فتح ملف الطالب / فتح فصل الطالب; preserve active scope, durable identity and context disambiguation. |
 | N41 | 2026-09-28 | 2026-09-28 | Teacher identity | UX | Teacher identity repetition and long-name/mobile abbreviation | PO APPROVED — WORK UX REVIEW REQUIRED | MEDIUM | MEDIUM | 2026-09-28 #03; 0375 | Work compares desktop sidebar/topbar/Home greeting and mobile topbar/Home; preserve clear identity access without preselecting which location to remove. |
@@ -85,7 +85,7 @@ Closure basis for N04/N05/N06/N07/N10/N11/N14/N19/N20/N21/N27/N28/N29 and N33 Ph
 
 ## N37 / N38 and Grades evidence boundary
 
-- **N37:** 0349–0357 isolated static concepts/public review; [public comparison](https://rakeezx-landing-review.pages.dev/) is separate from Product. 0358 branch `codex/n37-product-landing-z-0358`, SHA `c2f8f3ddcaf0f404afaa09918e9336c92cb3964e`, was exploratory Product Preview only and is not in main. Later 0360/0363/0367/0369 and 0371/0372 continued Work comparisons. Read-only 0374 observation: `review-0372/HANDOFF.md` exists; 0373 shortlist/new-concept work is in progress. Do not claim final 0373 tests/PO acceptance or final Product landing. Final Work approval and a separately selected Product implementation are still required.
+- **N37:** 0349–0357 isolated static concepts/public review; [public comparison](https://rakeezx-landing-review.pages.dev/) remains separate from Product. Exploratory 0358 branch `codex/n37-product-landing-z-0358`, SHA `c2f8f3ddcaf0f404afaa09918e9336c92cb3964e`, was not promoted. Subsequent Work comparisons culminated in final PO-approved 0389 outcome. Selective Product candidate 0392, branch `codex/n37-final-landing-0392`, SHA `59a8fcf9c80a3d64d2eecfcd6c0f80274f5bc139`, Preview `b1c1d075-2694-4ab1-9f83-12b200485ec2`, was PO-approved and fast-forwarded unchanged to Production in 0394; deployment `5b848eb3-1882-452c-a3aa-e1046a75334a`. Canonical desktop/mobile light/dark, OTP-sheet and isolated Demo smoke passed 7/7 with no observed console/page errors or unintended Product writes; canonical assets match the approved blobs. PO Production verification remains pending; N37 is not CLOSED. No footer/copyright/version or new Auth/data behavior added.
 - **N38:** PO-approved direction in 0375 targets consistent Western/Arabic digits `0 1 2 3 4 5 6 7 8 9` in presentation/input, rather than observed Arabic-Indic/Hindi-style numerals. No digit-wide implementation/acceptance evidence; keep it distinct from N08 font choice/licensing and preserve stored-data semantics.
 - **N46:** approved Grades presentation only. The rejected 0361/0362 row/selection redesigns are not the implementation source. Production SHA/deployment and concise user-facing outcome are in CHANGELOG; no scoring/model/store/Auth/Sync change was bundled.
 
