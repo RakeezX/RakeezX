@@ -398,7 +398,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
               const band = masteryBand(pct);
               const isChecked = bulkSelected.has(s.id);
               return html`
-                <div class="graderow grades-01c__direct-row ${isChecked ? 'is-selected' : ''}">
+                <div class="graderow grades-01c__direct-row ${auto ? 'is-auto' : ''} ${isChecked ? 'is-selected' : ''}">
                   ${!auto
                     ? html`
                         <input type="checkbox" class="noprint" data-act="toggle-student-bulk" data-id="${s.id}"
@@ -410,7 +410,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                   ${auto
                     ? html`
                         <span class="graderow__auto">
-                          <span class="badge ${band.badge}">
+                          <span class="badge ${band.badge}" dir="ltr">
                             <span class="tabular">${fmtNum(value)}</span> / <span class="tabular">${item.max}</span>
                           </span>
                         </span>
@@ -423,7 +423,8 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                                  data-fk="g-${s.id}-${item.id}"
                                  value="${value === null ? '' : fmtNum(value)}"
                                  placeholder="—" aria-label="درجة ${s.name} في ${item.name}">
-                          <span class="graderow__max tabular">/${item.max}</span>
+                          <span class="graderow__slash" aria-hidden="true">/</span>
+                          <span class="graderow__max tabular" dir="ltr">${item.max}</span>
                         </span>
                       `}
                 </div>

@@ -7702,3 +7702,29 @@
 .group-count-inline.is-on { background:var(--bg-elev); border-color:var(--brand-border); }
 .group-count-inline:focus-visible { outline:2px solid var(--action-focus-ring); outline-offset:-2px; }
 .group-count-inline::-webkit-inner-spin-button,.group-count-inline::-webkit-outer-spin-button { appearance:none; margin:0; }
+
+/* 0364: retain Product row; place only omitted-checkbox auto cells explicitly. */
+.grades-01c__direct-row.is-auto > .rollno { grid-column:2; grid-row:1; }
+.grades-01c__direct-row.is-auto > .graderow__name { grid-column:3; grid-row:1; }
+.grades-01c__direct-row.is-auto > .graderow__auto { grid-column:4; grid-row:1; }
+.grades-01c__direct-row .graderow__name { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
+.grades-01c__direct-row .graderow__in { direction:rtl; }
+.grades-01c__direct-row .graderow__slash,
+.grades-01c__direct-row .graderow__max,
+.grades-01c__direct-row .graderow__auto > .badge { direction:ltr; unicode-bidi:isolate; white-space:nowrap; }
+@media(max-width:640px) {
+  .grades-01c__direct-row { grid-template-columns:30px 32px minmax(0,1fr); }
+  .grades-01c__direct-row > input[type="checkbox"] { grid-column:1; grid-row:1; }
+  .grades-01c__direct-row > .rollno { display:inline-flex; grid-column:2; grid-row:1; }
+  .grades-01c__direct-row > .graderow__name,
+  .grades-01c__direct-row.is-auto > .graderow__name { grid-column:3; grid-row:1; }
+  .grades-01c__direct-row > .graderow__in,
+  .grades-01c__direct-row.is-auto > .graderow__auto { grid-column:3; grid-row:2; justify-self:end; }
+}
+
+/* 0365: automatic rows only, identity and score at the row edges. */
+.grades-01c__direct-row.is-auto { grid-template-columns:48px minmax(0,1fr) max-content; }
+.grades-01c__direct-row.is-auto > .rollno { grid-column:1; grid-row:1; }
+.grades-01c__direct-row.is-auto > .graderow__name { grid-column:2; grid-row:1; }
+.grades-01c__direct-row.is-auto > .graderow__auto { grid-column:3; grid-row:1; justify-self:end; }
+@media(max-width:640px) { .grades-01c__direct-row.is-auto { grid-template-columns:32px minmax(0,1fr) max-content; } }
