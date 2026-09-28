@@ -1,26 +1,26 @@
 # RAKEEZ X — Product ledger
 
-Reconciled 2026-09-28, PRODUCT-LEDGER-RECONCILIATION-0374. **Docs candidate — PO REVIEW PENDING; no implementation authorization.** Current Product release: `c1c33db41adc25c14204f570b86e359b3c747ffd`; Production `7d9f7c7c-dbef-4e3e-aa6c-8f29c37f55fb`.
+Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded by PRODUCT-LEDGER-RECONCILIATION-PO-UPDATE-0375. **Docs candidate — PO REVIEW PENDING; no implementation authorization.** Current Product release: `c1c33db41adc25c14204f570b86e359b3c747ffd`; Production `7d9f7c7c-dbef-4e3e-aa6c-8f29c37f55fb`.
 
 ## Active / new PO note index
 
-Verbatim wording and all dated note mappings are preserved in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). Open historical notes remain in the current table below; resolved notes remain in closed history. No notes were deleted or silently merged. These proposed classifications/priorities await PO review.
+Verbatim wording and all dated note mappings are preserved in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). Open historical notes remain in the current table below; resolved notes remain in closed history. No notes were deleted or silently merged. N38–N45 directions are PO-approved in 0375; the combined docs candidate remains pending PO review/integration. Direction approval is not implementation completion or execution authorization in this docs ticket.
 
 | Source | Current identity | Concern |
 | --- | --- | --- |
 | 2026-09-27 #01 | N37 | Landing value proposition — Work review active |
 | 2026-09-27 #02 | N38 | Numeric presentation — distinct from N08 typography |
-| 2026-09-28 #01 | N39 | Student-search token matching |
+| 2026-09-28 #01 | N39 | Student-search token matching and student/class quick actions — PO approved |
 | 2026-09-28 #02 | N40 | Teacher gender/title selection not saving |
 | 2026-09-28 #03 | N41 | Repeated teacher identity / abbreviation |
 | 2026-09-28 #04 | N42 | Settings information architecture |
 | 2026-09-28 #05 | N43 | Compact installation guidance |
-| 2026-09-28 #06 | N44 | Notifications |
+| 2026-09-28 #06 | N44 | Expandable notification framework — study approved |
 | 2026-09-28 #07 | N45 | Verification-email deliverability |
 
 ## Current / open / deferred work
 
-PRODUCT_LEDGER is status authority; [Decisions](DECISIONS.md) retains durable approved contracts, [Changelog](CHANGELOG.md) the material Production release history. N IDs are stable. Related items are not merged merely because they share a screen. Types: BUG/FEATURE/UX/TECH_DEBT/DOC/IDEA. Priority and risk are proposed triage, not execution authority. Status vocabulary retains INBOX/REVIEW/PLANNED/IN_PROGRESS/WAITING_PO/BLOCKED/DEFERRED/CLOSED/REJECTED/SUPERSEDED.
+PRODUCT_LEDGER is status authority; [Decisions](DECISIONS.md) retains durable approved contracts, [Changelog](CHANGELOG.md) the material Production release history. N IDs are stable. Related items are not merged merely because they share a screen. Types: BUG/FEATURE/UX/TECH_DEBT/DOC/IDEA. Priority and risk are triage, not execution authority; explicit 0375 priorities/directions are recorded for N38–N45. Their status cells include the exact PO decision qualifier; PO APPROVED approves direction, not completed implementation. Base status vocabulary retains INBOX/REVIEW/PLANNED/IN_PROGRESS/WAITING_PO/BLOCKED/DEFERRED/CLOSED/REJECTED/SUPERSEDED.
 
 CLOSED requires implementation, user-visible Preview and PO approval, Production deployment, and PO Production verification. Work/test/Preview success alone does not close an item. Escalate evidenced security, isolation, data-loss or Production failure immediately; no new Silent Beta blocker is inferred by this docs checkpoint.
 
@@ -50,14 +50,14 @@ CLOSED requires implementation, user-visible Preview and PO approval, Production
 | N35 | 2026-09-25 | 2026-09-28 | Feedback storage | FEATURE | Optional private image/video attachments | REVIEW | MEDIUM | HIGH | D-059 | Security/storage/cost investigation first; no provider/schema selected. |
 | N36 | 2026-09-25 | 2026-09-28 | External import | IDEA | Madrasati/Noor official exports/API/files first | REVIEW | MEDIUM | HIGH | D-060 | Research only; compare constrained adapters and shared Preview with N12; no credentials/helper. |
 | N37 | 2026-09-27 | 2026-09-28 | Landing | UX | Marketing-led explanation/value proposition | IN_PROGRESS | MEDIUM | MEDIUM | 0349–0373; 0358 exploratory Preview | Work review active; choose final PO-approved design before a new selective Product candidate. |
-| N38 | 2026-09-27 | 2026-09-28 | Digits | UX | Western/Arabic versus Indian digit consistency | REVIEW | MEDIUM | MEDIUM | 2026-09-27 raw #02; related N08 | Audit numeric presentation across inputs/text; separate from primary-font selection; no implementation evidence. |
-| N39 | 2026-09-28 | 2026-09-28 | Student search | UX | First + last tokens match a longer Arabic name | REVIEW | MEDIUM | MEDIUM | 2026-09-28 #01; follow-up to CLOSED N19 | Design/test token-aware matching: احمد الحازمي → احمد بن علي بن الحازمي; preserve durable IDs, distinct same names and active-only scope. |
-| N40 | 2026-09-28 | 2026-09-28 | Profile completion | BUG | معلم / معلمة selection appears not to work/save | REVIEW | HIGH | HIGH | 2026-09-28 #02; related CLOSED N21 | Synthetic reproduction of click, validation, persistence/reload; distinguish UI from profile/provisioning cause before fix. |
-| N41 | 2026-09-28 | 2026-09-28 | Teacher identity | UX | Repeated names and inconsistent mobile abbreviation | WAITING_PO | MEDIUM | MEDIUM | 2026-09-28 #03 | Work design for desktop/mobile placement and long-name abbreviation; preserve access to teacher hub. |
-| N42 | 2026-09-28 | 2026-09-28 | Settings | UX | Long settings page / tabs or clearer information architecture | WAITING_PO | MEDIUM | MEDIUM | 2026-09-28 #04 | Work inventory/IA proposal; preserve discoverability and existing settings behavior. |
-| N43 | 2026-09-28 | 2026-09-28 | Installation help | UX | Compact clearer interactive install instructions | WAITING_PO | MEDIUM | LOW | 2026-09-28 #05; related N15/N42 | Separate Work guidance design by platform; no icon/versioning or Settings IA scope merge. |
-| N44 | 2026-09-28 | 2026-09-28 | Notifications | IDEA | Explore a notification system | REVIEW | LOW | HIGH | 2026-09-28 #06 | Define use cases, local vs push, opt-in, privacy, delivery/load and offline behavior before architecture. |
-| N45 | 2026-09-28 | 2026-09-28 | Verification email | TECH_DEBT | Reduce spam/junk delivery | REVIEW | HIGH | HIGH | 2026-09-28 #07 | Read-only provider/DNS/delivery investigation; authenticate-mail evidence and safe test plan first; no Auth/DNS/provider mutation. |
+| N38 | 2026-09-27 | 2026-09-28 | Digits | UX | Consistent 0–9 numeral presentation/input; distinct from N08 | PO APPROVED — REVIEW / PLANNING | MEDIUM | MEDIUM | 2026-09-27 raw #02; 0375; related N08 | Broad presentation/input audit; review typography relationship without merging N08 or changing stored-data semantics. |
+| N39 | 2026-09-28 | 2026-09-28 | Student search | UX | Non-contiguous name tokens plus student/class quick actions | PO APPROVED — AWAITING IMPLEMENTATION / DESIGN AS NEEDED | MEDIUM | MEDIUM | 2026-09-28 #01; 0375; follow-up to CLOSED N19 | Separate scoped design/implementation ticket for token matching and فتح ملف الطالب / فتح فصل الطالب; preserve active scope, durable identity and context disambiguation. |
+| N40 | 2026-09-28 | 2026-09-28 | Profile completion | BUG | Likely معلم / معلمة selection/save onboarding bug | PO APPROVED — BUG INVESTIGATION REQUIRED | HIGH | HIGH | 2026-09-28 #02; 0375; related CLOSED N21 | Reproduce click/selection, visual state, save and restored value after reload/login; fix if reproduced in a separate ticket, with any schema/semantic change separately authorized. |
+| N41 | 2026-09-28 | 2026-09-28 | Teacher identity | UX | Teacher identity repetition and long-name/mobile abbreviation | PO APPROVED — WORK UX REVIEW REQUIRED | MEDIUM | MEDIUM | 2026-09-28 #03; 0375 | Work compares desktop sidebar/topbar/Home greeting and mobile topbar/Home; preserve clear identity access without preselecting which location to remove. |
+| N42 | 2026-09-28 | 2026-09-28 | Settings | UX | Shorter clearer Settings information architecture | PO APPROVED — WORK UX REVIEW REQUIRED | MEDIUM | MEDIUM | 2026-09-28 #04; 0375 | Work inventories desktop/mobile Settings; compare tabs, grouped sections, internal navigation or another structure; improve discoverability without locking solution to tabs. |
+| N43 | 2026-09-28 | 2026-09-28 | Installation help | UX | Compact device/browser-aware installation guide | PO APPROVED — WORK UX REVIEW + IMPLEMENTATION PLANNING | MEDIUM | LOW | 2026-09-28 #05; 0375; distinct N15/N42 | Work review and separate implementation plan: تثبيت ركيز على جهازك, native prompt where available, otherwise short manual guidance; no permanent oversized Settings block. |
+| N44 | 2026-09-28 | 2026-09-28 | Notifications | IDEA | Expandable categorized notification framework | PO APPROVED — RESEARCH / ARCHITECTURE STUDY REQUIRED | LOW | HIGH | 2026-09-28 #06; 0375 | Study use cases/channels, separate category preferences, optional marketing, permissions, local/server scheduling, delivery, abuse/noise and cost/complexity; no architecture chosen. |
+| N45 | 2026-09-28 | 2026-09-28 | Verification email | TECH_DEBT | Verification / OTP email Inbox deliverability | PO APPROVED — READ-ONLY DELIVERABILITY AUDIT REQUIRED | HIGH | HIGH | 2026-09-28 #07; 0375 | Read-only sending-provider/domain/SPF/DKIM/DMARC/reputation/content/bounce-spam/config audit where applicable; future DNS/provider changes need separate explicit authorization. |
 
 ## Closed scope history
 
@@ -85,8 +85,23 @@ Closure basis for N04/N05/N06/N07/N10/N11/N14/N19/N20/N21/N27/N28/N29 and N33 Ph
 ## N37 / N38 and Grades evidence boundary
 
 - **N37:** 0349–0357 isolated static concepts/public review; [public comparison](https://rakeezx-landing-review.pages.dev/) is separate from Product. 0358 branch `codex/n37-product-landing-z-0358`, SHA `c2f8f3ddcaf0f404afaa09918e9336c92cb3964e`, was exploratory Product Preview only and is not in main. Later 0360/0363/0367/0369 and 0371/0372 continued Work comparisons. Read-only 0374 observation: `review-0372/HANDOFF.md` exists; 0373 shortlist/new-concept work is in progress. Do not claim final 0373 tests/PO acceptance or final Product landing. Final Work approval and a separately selected Product implementation are still required.
-- **N38:** no digit-wide implementation/acceptance evidence. Keep it distinct from N08 font choice/licensing; any shared execution later requires explicit PO scope.
+- **N38:** PO-approved direction in 0375 targets consistent Western/Arabic digits `0 1 2 3 4 5 6 7 8 9` in presentation/input, rather than observed Arabic-Indic/Hindi-style numerals. No digit-wide implementation/acceptance evidence; keep it distinct from N08 font choice/licensing and preserve stored-data semantics.
 - **N46:** approved Grades presentation only. The rejected 0361/0362 row/selection redesigns are not the implementation source. Production SHA/deployment and concise user-facing outcome are in CHANGELOG; no scoring/model/store/Auth/Sync change was bundled.
+
+## PO-approved directions — 0375 / 2026-09-28
+
+The PO explicitly approved N38–N45 direction. The status/priority/next action is in the current table above; the contracts below preserve the decision detail. **Approval is not implementation completion. This docs ticket authorizes no Product, Work, provider/DNS, Auth or backend execution.** Future work needs a separately scoped ticket. No item was merged, closed or implemented by 0375.
+
+| Identity | Concise approved contract | Risk / planning boundary |
+| --- | --- | --- |
+| N38 | Review RAKEEZ broadly for inconsistent numerals. Target Western/Arabic digits `0 1 2 3 4 5 6 7 8 9` rather than the observed Arabic-Indic/Hindi-style input/presentation. Consider Thmanyah Sans relationship without merging N08. | MEDIUM: presentation/input consistency only; no stored-data semantic change. No implementation in this ticket. |
+| N39 | Meaningful non-contiguous name tokens: searching “احمد الحازمي” finds “احمد بن علي بن الحازمي”. Each student result adds “فتح ملف الطالب” and “فتح فصل الطالب”. Follow-up enhancement to CLOSED N19, not a reopening. | MEDIUM: preserve durable identities, distinct same-name students, active-roster scope and explicit teaching/class contexts; design destination selection where multiple contexts exist. |
+| N40 | Likely onboarding/profile-completion BUG; investigate click/selection state, visual-only state, persistence/save, restored value after reload/login and other causes. If reproduced, fix without changing profile/schema semantics unless separately authorized evidence requires a higher-risk ticket. | HIGH: synthetic reproduction first; do not change existing profile/provisioning semantics or private PO data. N21 presentation remains CLOSED. |
+| N41 | Review teacher name/identity across desktop sidebar, desktop topbar, Home greeting, mobile topbar and mobile Home. Reduce repetition while preserving a clear identity entry point; establish consistent long-name/mobile abbreviation. Work visually reviews the final treatment. | MEDIUM: do not predetermine which location is removed; preserve identity access and existing behavior. |
+| N42 | Review long Settings content and propose the best desktop/mobile information architecture: tabs, grouped sections, internal navigation or another clearer structure. Reduce page length/confusion and improve discoverability. | MEDIUM: tabs are an option, not a locked solution; preserve discoverability and existing settings semantics. |
+| N43 | Separate from N42, but visual coordination is allowed. Replace oversized/static explanation with compact, clear, possibly interactive guidance: “تثبيت ركيز على جهازك”; short device/browser-aware help where practical; native PWA install prompt when available, otherwise concise manual steps. Avoid a permanent large Settings area. | LOW: Work UX review plus implementation planning; respect platform/browser capabilities. No implementation here; N15 icon/versioning remains separate. |
+| N44 | Future expandable framework supports four categories: **operational teacher** (configurable pre-lesson, attendance/workflow, long-unsynced device and future schedule/calendar reminders); **account/service** (subscription expiry, account/service attention, important Sync/account actions); **RAKEEZ announcements** (features, important updates, service notices); **marketing/subscription offers** (discounts/offers). Users control categories separately where applicable; marketing/offers are optional, never forced. Potential channels: in-app center/bell, permitted push, and selected important account/service email. | HIGH: implementation priority LOW; preserve strategic direction. Study channels, category permission/preferences, delivery architecture, local-vs-server scheduling, abuse/noise prevention and cost/complexity before choosing architecture. Reduce teacher pressure; do not create notification noise. |
+| N45 | Improve confidence that verification/OTP email reaches Inbox instead of Spam/Junk. First step is read-only audit of sending provider, sender domain, SPF, DKIM, DMARC, sender reputation, message content/format, bounce/spam indicators and provider configuration, where applicable. | HIGH: no DNS/provider/Auth configuration mutation here; any future provider/DNS change requires separate explicit authorization. |
 
 ## Retained approved scope detail (2026-09-25)
 

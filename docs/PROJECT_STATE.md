@@ -1,6 +1,6 @@
 # RAKEEZ X — Current project state
 
-Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374, PO review pending. Short current snapshot; release history is in [Changelog](CHANGELOG.md).
+Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374 with PO direction update 0375, PO review pending. Short current snapshot; release history is in [Changelog](CHANGELOG.md).
 
 ## Production and stage
 
@@ -20,9 +20,9 @@ Last updated: 2026-09-28 (Asia/Riyadh); isolated docs checkpoint 0374, PO review
 ## Open and deferred direction
 
 - Remaining work follows the [Product Ledger](PRODUCT_LEDGER.md) and separate PO-selected tickets. N01 investigation, N03 profile design, N08 font comparison/licensing, N12 import design, N13 Work-only review, N15 platform icons, N16/N18 inventories, N22 Schedule UX, N30 path benchmark, N31 continuity, N34 feedback UX, N35 storage/security and N36 import research retain their existing dispositions.
-- N09 Mobile UX, N26 theme, N32 former-student lifecycle and N33 Phase 3 remain later/deferred directions. N23/N24 reports overhaul is LAST; N25 belongs to that future phase. N37 landing is active Work exploration; N38 digit consistency is REVIEW and distinct from N08. Proposed N39–N45 map all seven 2026-09-28 notes: search tokens, profile gender/title bug, teacher identity, Settings IA, install guidance, notifications and email deliverability. No implementation is authorized by this triage.
+- N09 Mobile UX, N26 theme, N32 former-student lifecycle and N33 Phase 3 remain later/deferred directions. N23/N24 reports overhaul is LAST; N25 belongs to that future phase. N37 landing is active Work exploration; N38 digit consistency remains distinct from N08. In 0375 the PO approved directions N38–N45: numeral presentation review/planning; search tokens plus student/class quick actions; profile gender/title bug reproduction; Work reviews for teacher identity, Settings IA and compact install guidance; categorized notifications study with optional marketing; and read-only verification-email deliverability audit. N39–N45 retain all seven 2026-09-28 note identities. Direction approval does not authorize implementation in this docs ticket; see the ledger for exact states, priorities and next actions.
 - **No active Recovery backlog**. Do not restore archived runtime or begin cleanup. No Product ticket, deployment, migration or Work mutation is authorized by this docs checkpoint.
 
-0374 is a local DOCS-ONLY candidate awaiting PO review; it has not been pushed/merged. Canonical reconciliation through 0346–0348 remains the integrated docs checkpoint. Later docs SHAs do not create a new Product release.
+0374/0375 is a local DOCS-ONLY candidate awaiting PO review; it has not been pushed/merged. Canonical reconciliation through 0346–0348 remains the integrated docs checkpoint. Later docs SHAs do not create a new Product release.
 
 Sources: PO Production verification in the corresponding ticket flows, reconciled/recorded in 0346; Grades verification in the 0370 flow explicitly confirmed in 0374; exact Git history and 0345/0370 provider/synthetic smoke evidence, with read-only current Cloudflare metadata checked in 0374; [Decisions](DECISIONS.md), [Governance](GOVERNANCE.md), [Current Architecture](CURRENT_ARCHITECTURE.md).
