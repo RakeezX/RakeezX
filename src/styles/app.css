@@ -1122,11 +1122,22 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 /* N47: offscreen decoration must not enlarge the profile scroll region. */
 [data-account-profile-required] > .first-run-orb { position: fixed; }
 @media (min-width: 700px) {
-  /* Override the later general .page spacing only for this full-viewport form. */
+  /* N47: density follows usable height, including browser chrome/zoom and keyboards. */
   .first-run-page[data-account-profile-required] {
-    padding-block: max(clamp(12px, 2dvh, 24px), env(safe-area-inset-top)) max(clamp(12px, 2dvh, 24px), env(safe-area-inset-bottom));
+    --profile-fit-gap: clamp(4px, calc((var(--visible-viewport-height, 100dvh) - 600px) / 15 + 4px), 18px);
+    padding-block: max(clamp(8px, var(--profile-fit-gap), 24px), env(safe-area-inset-top)) max(clamp(8px, var(--profile-fit-gap), 24px), env(safe-area-inset-bottom));
   }
-  [data-account-profile-required] .profile-completion { gap: clamp(12px, 2dvh, 18px); }
+  [data-account-profile-required] .profile-completion {
+    gap: var(--profile-fit-gap);
+    padding-block: clamp(12px, calc(var(--profile-fit-gap) + 8px), 28px);
+  }
+  [data-account-profile-required] .first-run-status__brand { line-height: 0; }
+  [data-account-profile-required] .first-run-eyebrow { margin-bottom: clamp(2px, calc(var(--profile-fit-gap) / 3), 6px); }
+  [data-account-profile-required] .first-run-status__copy p { margin-top: clamp(2px, calc(var(--profile-fit-gap) / 3), 6px); }
+  [data-account-profile-required] .field__label { margin-bottom: clamp(4px, calc(var(--profile-fit-gap) / 2), 8px); }
+  [data-account-profile-required] .field__hint { margin-top: clamp(4px, calc(var(--profile-fit-gap) / 2), 8px); }
+  [data-account-profile-required] .profile-completion input { padding-block: clamp(10px, calc(var(--profile-fit-gap) / 2 + 6px), 12px); }
+  [data-account-profile-required] .first-run-status__actions { gap: clamp(4px, calc(var(--profile-fit-gap) / 2), 9px); }
 }
 .sheet__head, .sheet__foot { flex-shrink: 0; }
 .sheet__body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 2px; }

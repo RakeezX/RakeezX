@@ -1,6 +1,6 @@
 import { test, chromium, webkit, expect } from '@playwright/test';
 import { createServer } from 'node:http';
-import { readFile,stat } from 'node:fs/promises';
+import { readFile,writeFile,stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
@@ -25,14 +25,16 @@ test.beforeAll(async()=>{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));host='http://127.0.0.1:'+server.address().port;
 });
 test.afterAll(async()=>{if(server.listening)await new Promise(r=>server.close(r));});
-const scenarios=[[1920,1080],[1440,900],[1366,768],[390,844],[320,740]].map(([width,height])=>({width,height}));
+const scenarios=[[1920,1080],[1440,900],[1440,800],[1366,768],[1366,720],[1280,700],[1024,650],[1280,600],[390,844],[320,740]].map(([width,height])=>({width,height}));
+// Effective CSS viewport and density equivalent to 1366x768 at 125%; not native browser zoom.
+scenarios.push({width:1092,height:614,deviceScaleFactor:1.25});
 function contract(profile,state,status){return {ownerId:OWNER,profileStatus:status,profile,access:{grantType:'beta_full',status:'active',source:'public_beta'},provisioning:{state,version:1,foundationHash:state==='READY'?'synthetic-n40-foundation':null}};}
 async function stateOf(page){return page.locator('[data-profile-form]').evaluateAll(nodes=>nodes.map(n=>{const s=getComputedStyle(n);return {value:n.dataset.profileForm,pressed:n.getAttribute('aria-pressed'),class:n.className,bg:s.backgroundColor,color:s.color,shadow:s.boxShadow};}));}
 for(const engine of ['chromium','webkit'])for(const config of scenarios){
-test('N47 '+engine+' '+config.width+'x'+config.height,async({},testInfo)=>{
+test('N47 '+engine+' '+config.width+'x'+config.height+(config.deviceScaleFactor?' 125%-equivalent':''),async({},testInfo)=>{
  const browser=await (engine==='chromium'?chromium:webkit).launch();
  try {
- const ctx=await browser.newContext({viewport:config,hasTouch:config.width<700,serviceWorkers:'block'});
+ const ctx=await browser.newContext({viewport:{width:config.width,height:config.height},deviceScaleFactor:config.deviceScaleFactor||1,hasTouch:config.width<700,serviceWorkers:'block'});
  const page=await ctx.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
  await ctx.routeWebSocket('**/*',ws=>ws.close());
@@ -55,10 +57,12 @@ test('N47 '+engine+' '+config.width+'x'+config.height,async({},testInfo)=>{
  await page.evaluate(t=>document.documentElement.dataset.theme=t,theme);
  const m=await geometry(page);snapshots.push({theme,...m});
  if(config.width>=700){
+ assert(m.document.scrollHeight<=m.document.clientHeight,'document has no vertical scroll');
  assert.equal(m.outer.scrollHeight,m.outer.clientHeight,'desktop must have no unused scroll range');
  assert(m.form.top>=0&&m.form.bottom<=config.height,'whole panel fits');
  assert.equal(m.form.scrollHeight,m.form.clientHeight,'form content is not internally clipped');
  assert(m.action.top>=0&&m.action.bottom<=config.height,'primary action is visible without scrolling');
+ assert(m.required.every(e=>e.height>0&&e.top>=0&&e.bottom<=config.height),'all required content is visible without scrolling');
  }else if(config.width===320){assert(m.outer.scrollHeight>m.outer.clientHeight,'genuinely tall mobile content remains scrollable');}
  assert(m.controls.every(c=>c.height>=44),'existing touch targets stay intact');
  await assertSelected(page,'feminine');
@@ -83,7 +87,7 @@ test('N47 '+engine+' '+config.width+'x'+config.height,async({},testInfo)=>{
  await page.evaluate(()=>{delete visualViewport.height;delete visualViewport.offsetTop;});
  await page.setViewportSize({width:config.width,height:360});await page.locator('[name=schoolName]').focus();
  await expect.poll(()=>visible(page,'[name=schoolName]',360)).toBe(true);
- await page.setViewportSize(config);
+ await page.setViewportSize({width:config.width,height:config.height});
  await expect.poll(()=>page.evaluate(()=>parseFloat(document.documentElement.style.getPropertyValue('--visible-viewport-height')))).toBe(config.height);
  assert.equal(await page.locator('[data-account-profile-required]').evaluate(e=>getComputedStyle(e).overflowY),'auto');
  }
@@ -91,15 +95,18 @@ test('N47 '+engine+' '+config.width+'x'+config.height,async({},testInfo)=>{
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  assert.equal(await page.locator('body').evaluate(e=>getComputedStyle(e).overflowY==='hidden'),false);
  assert.deepEqual(errors,[]);assert(!requests.some(p=>p.includes('complete_account_profile')));
- await testInfo.attach('N47-measurements',{body:JSON.stringify({engine,config,snapshots,errors,realBackendRequests:0},null,2),contentType:'application/json'});
+ const evidence=JSON.stringify({engine,config,snapshots,errors,realBackendRequests:0},null,2);
+ await writeFile(testInfo.outputPath('measurements.json'),evidence);
+ await testInfo.attach('N47-measurements',{body:evidence,contentType:'application/json'});
  await ctx.close();
  }finally{await browser.close();}
 });
 }
 async function geometry(page){return page.evaluate(()=>{
- const measure=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {top:r.top,bottom:r.bottom,height:r.height,clientHeight:e.clientHeight,scrollHeight:e.scrollHeight,scrollTop:e.scrollTop,paddingTop:s.paddingTop,paddingBottom:s.paddingBottom,gap:s.gap}};
+ const measure=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,clientHeight:e.clientHeight,scrollHeight:e.scrollHeight,scrollTop:e.scrollTop,paddingTop:s.paddingTop,paddingBottom:s.paddingBottom,gap:s.gap}};
  const outer=document.querySelector('[data-account-profile-required]'),form=document.querySelector('[data-account-profile-form]');
- return {viewport:{width:innerWidth,height:innerHeight,visibleHeight:visualViewport.height},outer:measure(outer),form:measure(form),action:measure(form.querySelector('[type=submit]')),controls:[...form.querySelectorAll('input,button')].map(measure)};
+ const doc=document.documentElement;
+ return {viewport:{width:innerWidth,height:innerHeight,visibleHeight:visualViewport.height,density:devicePixelRatio},document:{clientHeight:doc.clientHeight,scrollHeight:doc.scrollHeight,bodyScrollHeight:document.body.scrollHeight},outer:measure(outer),form:measure(form),action:measure(form.querySelector('[type=submit]')),controls:[...form.querySelectorAll('input,button')].map(measure),required:[...form.querySelectorAll('.first-run-status__brand,.first-run-status__copy,.field__label,.field__hint,input,button')].map(measure)};
 });}
 async function simulate(page,height){
  await page.evaluate(h=>{Object.defineProperty(visualViewport,'height',{configurable:true,value:h});Object.defineProperty(visualViewport,'offsetTop',{configurable:true,value:0});visualViewport.dispatchEvent(new Event('resize'));},height);
