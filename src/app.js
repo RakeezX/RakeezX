@@ -737,6 +737,7 @@ function renderInitialRestoreState(state, { error = null } = {}) {
 
 function renderFirstAccountProfile(contract) {
   const current = contract.profile ?? {};
+  let teacherForm = current.teacherForm === 'feminine' ? 'feminine' : 'masculine';
   render(app, html`
     <div class="page first-run-page" data-account-profile-required>
       <div class="first-run-orb first-run-orb--green" aria-hidden="true"></div>
@@ -756,8 +757,8 @@ function renderFirstAccountProfile(contract) {
           <span class="field__hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span></label>
         <div class="field"><span class="field__label">صفة المستخدم</span>
           <div class="segmented settings-teacher-form" role="group" aria-label="صفة المستخدم">
-            <button class="segmented__btn" type="button" data-profile-form="masculine" aria-pressed="true">معلم</button>
-            <button class="segmented__btn" type="button" data-profile-form="feminine" aria-pressed="false">معلمة</button>
+            <button class="segmented__btn ${teacherForm === 'masculine' ? 'is-on' : ''}" type="button" data-profile-form="masculine" aria-pressed="${String(teacherForm === 'masculine')}">معلم</button>
+            <button class="segmented__btn ${teacherForm === 'feminine' ? 'is-on' : ''}" type="button" data-profile-form="feminine" aria-pressed="${String(teacherForm === 'feminine')}">معلمة</button>
           </div></div>
         <label class="field"><span class="field__label">اسم المدرسة <small>اختياري</small></span>
           <input class="input" name="schoolName" value="${current.schoolName}" /></label>
@@ -769,11 +770,12 @@ function renderFirstAccountProfile(contract) {
       </form>
     </div>`);
   const form = app.querySelector('[data-account-profile-form]');
-  let teacherForm = current.teacherForm === 'feminine' ? 'feminine' : 'masculine';
   form.querySelectorAll('[data-profile-form]').forEach((button) => button.addEventListener('click', () => {
     teacherForm = button.dataset.profileForm;
     form.querySelectorAll('[data-profile-form]').forEach((choice) => {
-      choice.setAttribute('aria-pressed', String(choice.dataset.profileForm === teacherForm));
+      const selected = choice.dataset.profileForm === teacherForm;
+      choice.classList.toggle('is-on', selected);
+      choice.setAttribute('aria-pressed', String(selected));
     });
   }));
   form.elements.phone.addEventListener('input', (event) => {
