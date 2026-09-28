@@ -78,14 +78,15 @@ async function safe(page, evidence) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 }
 
-test('manual and automatic RTL geometry across widths and themes', async ({ page }, info) => {
+for (const theme of ['light', 'dark']) test(`manual and automatic RTL geometry across widths (${theme})`, async ({ page }, info) => {
   const evidence = await boot(page);
-  for (const theme of ['light', 'dark']) for (const width of [1440, 1024, 768, 390, 320]) {
+  for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(t => document.documentElement.dataset.theme = t, theme);
     for (const id of ['g-m20', 'g-m10', 'g-p', 'g-a']) {
       await page.locator(`[data-act=pick][data-id="${id}"]`).click();
       const auto = id === 'g-p' || id === 'g-a';
+      if (!auto) await page.locator('[data-act=toggle-student-bulk][data-id="g-s1"]').check();
       const rows = page.locator('.grades-01c__direct-row');
       await expect(rows).toHaveCount(4);
       for (const row of await rows.all()) {
@@ -93,7 +94,32 @@ test('manual and automatic RTL geometry across widths and themes', async ({ page
           const box = selector => { const r = el.querySelector(selector)?.getBoundingClientRect(); return r && { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width }; };
           return { checkbox: box('input[type=checkbox]'), roll: box('.rollno'), name: box('.graderow__name'), input: box('.gradein'), slash: box('.graderow__slash'), max: box('.graderow__max'), score: box('.graderow__auto'), columns: getComputedStyle(el).gridTemplateColumns };
         });
-        expect(geometry.roll.width).toBeGreaterThan(0);
+        expect(geometry.roll.width).toBe(34);
+        expect(geometry.roll.bottom - geometry.roll.top).toBe(34);
+        const centering = await row.locator('.rollno').evaluate(el => {
+          const badge = el.getBoundingClientRect();
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          const number = range.getBoundingClientRect();
+          return { x: Math.abs((number.left + number.right - badge.left - badge.right) / 2), y: Math.abs((number.top + number.bottom - badge.top - badge.bottom) / 2) };
+        });
+        expect(centering.x).toBeLessThanOrEqual(1);
+        // Font glyph bounds may differ from the centered line box by subpixels.
+        expect(centering.y).toBeLessThanOrEqual(2);
+        const unchanged = await row.evaluate(el => {
+          const rects = () => [el, ...el.children].map(node => {
+            const r = node.getBoundingClientRect();
+            return [r.x, r.y, r.width, r.height];
+          });
+          const centered = rects();
+          const rule = [...document.styleSheets].flatMap(sheet => [...sheet.cssRules]).find(rule =>
+            rule.selectorText === '.grades-01c__direct-row > .rollno' && rule.style.justifyContent === 'center');
+          const style = rule.style.cssText;
+          // Compare every row/child box with the unchanged 0366 alignment.
+          try { rule.style.cssText = ''; return JSON.stringify(centered) === JSON.stringify(rects()); }
+          finally { rule.style.cssText = style; }
+        });
+        expect(unchanged).toBe(true);
         expect(geometry.roll.left).toBeGreaterThanOrEqual(geometry.name.right - 1);
         if (auto) {
           expect(geometry.checkbox).toBeUndefined();

@@ -7728,3 +7728,6 @@
 .grades-01c__direct-row.is-auto > .graderow__name { grid-column:2; grid-row:1; }
 .grades-01c__direct-row.is-auto > .graderow__auto { grid-column:3; grid-row:1; justify-self:end; }
 @media(max-width:640px) { .grades-01c__direct-row.is-auto { grid-template-columns:32px minmax(0,1fr) max-content; } }
+
+/* 0368: center the number in the existing Grades badge, including flex rows. */
+.grades-01c__direct-row > .rollno { align-items:center; justify-content:center; }
