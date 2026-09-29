@@ -51,7 +51,7 @@ for(const [width,height]of sizes)for(const theme of ['light','dark'])test(`appro
  await expect(page.locator('.teacher-mini-hub-trigger__avatar')).toHaveText('ع ا');
  await expect(page.locator('.teacher-mini-hub-trigger__sub')).toHaveCount(0);
  await expect(page.locator('.hero__hello')).toContainText(desktop?'عبدالله المعبدي':'أستاذ');
- if(!desktop){await expect(page.locator('.home-greeting--compact')).not.toContainText('عبدالله');await expect(page.locator('.compact-identity')).toBeVisible();}
+ if(!desktop){await expect(page.locator('.home-greeting--compact')).toContainText('أستاذ عبدالله');await expect(page.locator('.home-greeting--compact')).not.toContainText('المعبدي');await expect(page.locator('.compact-identity')).toBeVisible();}
  else await expect(page.locator('.compact-identity')).toBeHidden();
  const quick=page.getByRole('button',{name:theme==='light'?'تفعيل الوضع الداكن':'تفعيل الوضع الفاتح'});
  const box=await quick.boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
@@ -77,6 +77,27 @@ for(const [width,height]of sizes)for(const theme of ['light','dark'])test(`appro
  await openHub(page);await page.locator('.sheet a[href="#/support"]').click();await expect(page).toHaveURL(/#\/support/);
  await page.goto('/#/teaching/synthetic');await expect(page.locator('.class-context-nav')).toBeVisible();await expect(page.locator('[data-act=open-teacher-mini-hub]')).toHaveCount(0);await expect(page.locator('[data-act=quick-theme]')).toHaveCount(0);await expect(page.locator('[data-app-status]')).toHaveCount(1);
  await safe(page,evidence);
+});
+test('N41 Home switches names at the existing 900px boundary',async({page})=>{
+ await page.setViewportSize({width:900,height:768});const evidence=await boot(page);
+ await expect(page.locator('.home-greeting--desktop')).toBeVisible();
+ await expect(page.locator('.home-greeting--desktop')).toContainText('أستاذ عبدالله المعبدي');
+ await expect(page.locator('.home-greeting--compact')).toBeHidden();
+ await page.setViewportSize({width:899,height:768});
+ await expect(page.locator('.home-greeting--desktop')).toBeHidden();
+ await expect(page.locator('.home-greeting--compact')).toBeVisible();
+ await expect(page.locator('.home-greeting--compact')).toContainText('أستاذ عبدالله');
+ await expect(page.locator('.home-greeting--compact')).not.toContainText('المعبدي');
+ expect(await storedName(page)).toBe(name);await safe(page,evidence);
+});
+test('N41 compact female greeting uses the first token only',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ const teacherName='  سارة  بنت أحمد  الحازمي  ';
+ const evidence=await boot(page,{teacherName,teacherForm:'feminine'});
+ await expect(page.locator('.home-greeting--compact')).toHaveText(/أستاذة سارة$/u);
+ await expect(page.locator('.home-greeting--desktop')).toContainText('أستاذة سارة الحازمي');
+ await expect(page.locator('.teacher-mini-hub-trigger__name')).toHaveText('سارة الحازمي');
+ expect(await storedName(page)).toBe(teacherName);await safe(page,evidence);
 });
 for(const system of ['light','dark'])test(`AUTO opposite persists / OS change ${system}`,async({page})=>{
  await page.emulateMedia({colorScheme:system});await page.setViewportSize({width:390,height:844});const evidence=await boot(page,{theme:'auto'});

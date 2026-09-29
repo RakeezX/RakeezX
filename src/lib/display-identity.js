@@ -1,6 +1,14 @@
 /** Presentation only; never writes the stored profile name. */
+function nameTokens(value) {
+  return String(value ?? '').trim().split(/\s+/u).filter(Boolean);
+}
+
+export function firstName(value) {
+  return nameTokens(value)[0] ?? '';
+}
+
 export function displayIdentity(value, fallback = 'المعلم') {
-  const tokens = String(value ?? '').trim().split(/\s+/u).filter(Boolean);
+  const tokens = nameTokens(value);
   if (!tokens.length) return { display: fallback, initials: 'م' };
   const first = tokens[0], last = tokens.at(-1);
   return {

@@ -6,7 +6,7 @@
  */
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
-import { displayIdentity } from '../lib/display-identity.js';
+import { displayIdentity, firstName } from '../lib/display-identity.js';
 import { APP_ICON_URL } from '../lib/brand.js';
 import { openStudentSearch } from '../lib/student-search-ui.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
@@ -23,10 +23,10 @@ const SUPPRESSION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 let sessionDismissed = false;
 
 export function homeGreeting(profile = {}, now = new Date(), { compact = false } = {}) {
-  const teacherName = displayIdentity(profile.teacherName, '').display;
+  const teacherName = compact ? firstName(profile.teacherName) : displayIdentity(profile.teacherName, '').display;
   const presentation = getAccountPresentation(profile.teacherForm);
   const morning = now.getHours() < 12;
-  if (compact) return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific}`;
+  if (compact) return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific}${teacherName ? ` ${teacherName}` : ''}`;
   if (!teacherName) return morning ? 'صباح الخير' : 'أهلاً بك';
   return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific} ${teacherName}`;
 }
