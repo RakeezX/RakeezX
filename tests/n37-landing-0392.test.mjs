@@ -11,9 +11,10 @@ function harness(signedIn) {
   const calls = [];
   const app = { querySelector: selector => ({ addEventListener: (_event, handler) => handlers.set(selector,handler) }) };
   const cloud = { session:signedIn?{}:null, user:signedIn?{id:'synthetic-owner'}:null, signOut: async()=>calls.push('logout') };
-  const mount = new Function('app','cloud','html','render','icon','brandLockup','WORKSPACE_NOT_READY','openMiniHubLoginSheet','requestDemo','location', `${gateSource}; return mountWorkspaceGate;`)(
+  const mount = new Function('app','cloud','html','render','icon','brandLockup','WORKSPACE_NOT_READY','mountEmailOtpController','requestDemo','location', `${gateSource}; return mountWorkspaceGate;`)(
     app,cloud,html,(target,template)=>target.markup=String(template),icon,()=>html`<span>brand</span>`,'WORKSPACE_NOT_READY',
-    options=>calls.push(['otp',options]),()=>calls.push('demo'),{reload:()=>calls.push('reload')});
+    (_root,_done,options) => { calls.push(['otp-mounted',options]); return {start:()=>calls.push('otp-start')}; },
+    ()=>calls.push('demo'),{reload:()=>calls.push('reload')});
   mount({authState:signedIn?'authenticated':'signed_out',reason:'synthetic-readiness'});
   return {app,calls,handlers};
 }
@@ -28,14 +29,14 @@ test('N37 leaves the signed-in fail-closed gate separate from landing presentati
   assert.equal(button.disabled,true);
   assert.deepEqual(calls,['logout','reload']);
 });
-test('N37 account CTA retains unified OTP reload-on-success contract',()=>{
+test('N37 account CTA starts the inline controller with existing reload-on-success contract',()=>{
   const {calls,handlers}=harness(false);
-  assert.deepEqual(calls,[]);
+  assert.deepEqual(calls,[['otp-mounted',{reloadOnSuccess:true,inline:true}]]);
   handlers.get('[data-workspace-login]')();
-  assert.deepEqual(calls,[['otp',{reloadOnSuccess:true}]]);
+  assert.deepEqual(calls,[['otp-mounted',{reloadOnSuccess:true,inline:true}],'otp-start']);
 });
 test('N37 Demo CTA retains request-before-reload order',()=>{
   const {calls,handlers}=harness(false);
   handlers.get('[data-workspace-demo]')();
-  assert.deepEqual(calls,['demo','reload']);
+  assert.deepEqual(calls,[['otp-mounted',{reloadOnSuccess:true,inline:true}],'demo','reload']);
 });

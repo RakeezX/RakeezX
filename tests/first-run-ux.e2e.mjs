@@ -81,7 +81,7 @@ test('signed-out first run uses the approved copy and remains responsive in ligh
   await context.close();
 });
 
-test('primary action opens the unified OTP surface with the pilot signup gate', async ({ browser }, testInfo) => {
+test('primary action uses inline unified OTP with the pilot signup gate', async ({ browser }, testInfo) => {
   const context = await browser.newContext({ serviceWorkers: 'block' });
   const page = await context.newPage();
   const requests = [];
@@ -96,19 +96,21 @@ test('primary action opens the unified OTP surface with the pilot signup gate', 
   });
   await page.goto(`${PREVIEW || host.url}/#/`);
   await page.locator('[data-workspace-login]').click();
-  const login = page.locator('.sheet-backdrop').last();
-  await expect(login.getByRole('dialog')).toBeVisible();
-  await expect(login.getByText('رَكيزة المعلم الرقمية', { exact: true })).toBeVisible();
+  const login = page.locator('.n56-auth');
+  await expect(login).toBeVisible();
+  await expect(page.locator('.sheet-backdrop')).toHaveCount(0);
+  await expect(page.locator('.n37-benefits')).toBeHidden();
+  await expect(page.locator('.n37-continuity')).toBeHidden();
   await expect(login.getByText('أدخل بريدك الإلكتروني لإرسال رمز التحقق.', { exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-email-entry.png'), fullPage: true });
   await login.locator('input[name="email"]').fill(' Existing@Example.Test ');
-  await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
+  await login.getByRole('button', { name: 'متابعة' }).click();
   expect(requests).toEqual([{ email: 'existing@example.test', create_user: true }]);
-  await expect(login.getByRole('heading', { name: 'أدخل رمز التحقق', exact: true })).toBeVisible();
+  await expect(login.getByRole('heading', { name: 'تحقق من بريدك', exact: true })).toBeVisible();
   await expect(login.locator('input[name="token"]')).toHaveAttribute('autocomplete', 'one-time-code');
   await expect(login.locator('[data-email-otp-resend]')).toBeDisabled();
   await expect(login.locator('[data-email-otp-resend]')).toContainText('إعادة الإرسال بعد');
-  await expect(login.getByRole('button', { name: 'تغيير الإيميل', exact: true })).toBeVisible();
+  await expect(login.getByRole('button', { name: 'تغيير البريد', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('first-run-otp.png'), fullPage: true });
   await context.close();
 });
@@ -123,13 +125,13 @@ test('secondary action hands off to the current isolated Demo runtime', async ({
   await page.goto(`${PREVIEW || host.url}/#/`);
   await page.locator('[data-workspace-demo]').focus();
   await page.keyboard.press('Space');
-  await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
+  await expect(page.getByRole('button', { name: /الخروج من التجربة/ })).toBeVisible();
   await expect(page.getByLabel('نظرة سريعة').getByText('8', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'الفصول', exact: true }).click();
   await expect(page.getByText('184', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'الخروج من الوضع التجريبي وتسجيل الدخول' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /الخروج من التجربة/ })).toBeVisible();
   await page.reload();
-  await expect(page.locator('[data-demo-indicator]:visible')).toContainText('الوضع التجريبي');
+  await expect(page.getByRole('button', { name: /الخروج من التجربة/ })).toBeVisible();
   await expect(page.getByText('184', { exact: true })).toBeVisible();
   expect(cloudRequests).toEqual([]);
   expect(errors).toEqual([]);

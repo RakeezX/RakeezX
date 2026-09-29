@@ -135,7 +135,7 @@ for (const [engine, launcher] of Object.entries({ chromium, webkit })) {
       } finally { await browser.close(); }
     });
   }
-  test(`${engine} N37 keyboard opens the unchanged real OTP sheet`, async () => {
+  test(`${engine} N56 first-run keyboard opens inline OTP entry`, async () => {
     const browser = await launcher.launch();
     try {
       const page = await browser.newPage();
@@ -145,10 +145,10 @@ for (const [engine, launcher] of Object.entries({ chromium, webkit })) {
       await expect(login).toBeFocused();
       await expect(login).toHaveCSS('outline-style','solid');
       await page.keyboard.press('Enter');
-      await expect(page.locator('.sheet-backdrop [role=dialog]')).toBeVisible();
-      await expect(page.locator('input[name=email]')).toBeVisible();
-      await expect(page.locator('input[name=email]')).toHaveAttribute('type','email');
-      await expect(page.locator('.sheet-backdrop .n37-landing')).toHaveCount(0);
+      await expect(page.locator('.sheet-backdrop [role=dialog]')).toHaveCount(0);
+      await expect(page.locator('.n56-auth input[name=email]')).toBeVisible();
+      await expect(page.locator('.n56-auth input[name=email]')).toHaveAttribute('type','email');
+      await expect(page.locator('.n37-benefits')).toBeHidden();
     } finally { await browser.close(); }
   });
 }
