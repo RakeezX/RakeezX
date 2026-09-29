@@ -115,6 +115,7 @@ for (const [name, launcher] of Object.entries({ chromium, webkit })) {
       await expect(token).toHaveValue('123456');
       await token.press('Enter');
       await expect(card.locator('[data-email-otp-feedback]')).toContainText('غير صحيح');
+      await expect(token).toHaveAttribute('aria-invalid', 'true');
       state.verifyFailure = 'otp_expired';
       await token.press('Enter');
       await expect(card.locator('[data-email-otp-feedback]')).toContainText('انتهت صلاحية');
@@ -123,7 +124,40 @@ for (const [name, launcher] of Object.entries({ chromium, webkit })) {
       await expect(email).toHaveValue('different@example.test');
       await expect(email).toBeFocused();
       await expect(token).toHaveValue('');
-      expect(errors).toEqual([]);
+      expect(errors).toEqual([
+        'Failed to load resource: the server responded with a status of 429 (Too Many Requests)',
+        'Failed to load resource: the server responded with a status of 403 (Forbidden)',
+        'Failed to load resource: the server responded with a status of 403 (Forbidden)',
+      ]);
+      await context.close();
+    } finally { await browser.close(); }
+  });
+
+  test(`${name}: resend rate limit shows feedback without invalidating the OTP or email`, async () => {
+    const browser = await launcher.launch();
+    try {
+      const context = await browser.newContext({ serviceWorkers: 'block' });
+      const page = await context.newPage();
+      await page.clock.install({ time: new Date('2026-09-29T12:00:00Z') });
+      const state = {};
+      const calls = await fixture(page, state);
+      const card = page.locator('.n56-auth');
+      await page.locator('[data-workspace-login]').click();
+      const email = card.locator('input[name=email]');
+      const token = card.locator('input[name=token]');
+      await email.fill('teacher@example.test');
+      await email.press('Enter');
+      await expect(card.locator('[data-email-otp-code-step]')).toBeVisible();
+      await expect(token).toHaveAttribute('aria-invalid', 'false');
+      await page.clock.runFor(60_000);
+      await expect(card.locator('[data-email-otp-resend]')).toBeEnabled();
+      state.sendFailure = 'rate';
+      await card.locator('[data-email-otp-resend]').click();
+      await expect(card.locator('[data-email-otp-feedback]')).toContainText('انتظر قليلًا');
+      await expect(card.locator('[data-email-otp-cooldown]')).toContainText('42 ثانية');
+      await expect(token).toHaveAttribute('aria-invalid', 'false');
+      await expect(email).toHaveAttribute('aria-invalid', 'false');
+      expect(calls.filter(call => call.path === '/auth/v1/otp')).toHaveLength(2);
       await context.close();
     } finally { await browser.close(); }
   });

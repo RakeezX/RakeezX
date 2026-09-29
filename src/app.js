@@ -950,7 +950,7 @@ function mountEmailOtpController(root, done, { reloadOnSuccess = false, inline =
       }
       const message = emailOtpFailureMessage(emailOtpFailureState(error, 'send'));
       toast(message, 'danger');
-      showFeedback(message, tokenInput);
+      showFeedback(message);
       updateCooldown();
     }
   });
