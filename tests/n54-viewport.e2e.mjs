@@ -187,13 +187,15 @@ for (const engine of ['chromium', 'webkit']) {
       await page.goto('/'); await page.locator('[data-demo-indicator]:visible').waitFor();
       const ids=await page.evaluate(async()=>{const s=await import('/src/store.js');return {teaching:s.teachings()[0].id,student:s.students(s.teachings()[0].id)[0].id};});
       const cases=[
-        ['calendar','/#/calendar','[data-act=add]','[name=label]'],
-        ['score-item',`/#/teaching/${ids.teaching}/items`,'[data-act=add]','[name=max]'],
+        // Route-specific controls wait for asynchronous view loading; a generic
+        // "add" selector can still belong to the previous hash-route view.
+        ['calendar','/#/calendar','button[aria-label="إضافة فترة أو استثناء"]','[name=label]'],
+        ['score-item',`/#/teaching/${ids.teaching}/items`,'button[aria-label="بند جديد"]','[name=max]'],
         ['roster-paste',`/#/teaching/${ids.teaching}/students`,'[data-act=import]','#names-box'],
         ['student-note',`/#/student/${ids.student}`,'[data-act=add-note]','#student-note-text'],
         ['timing-model','/#/schedule/times','[data-act=edit-times]','input[data-key=start]'],
-        ['class-create','/#/classes','[data-act=add]','[name=label]'],
-        ['student-create',`/#/teaching/${ids.teaching}/students`,'[data-act=add]','[name=name]'],
+        ['class-create','/#/classes','button[data-act=add]:has-text("إضافة فصل")','[name=label]'],
+        ['student-create',`/#/teaching/${ids.teaching}/students`,'button[aria-label="طالب جديد"]','[name=name]'],
         ['home-search','/#/','[data-act=student-search]','[data-student-query]'],
       ];
       for(const [name,url,trigger,field] of cases){
