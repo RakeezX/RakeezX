@@ -45,5 +45,13 @@
   <div id="modal-root"></div>
 
   <script type="module" src="src/app.js"></script>
+  <!-- 0411: opt-in local/branch-Preview geometry diagnostics only. -->
+  <script type="module">
+    if (new URLSearchParams(location.search).get('debugViewport') === '1'
+        && (/^[a-z0-9-]+\.rakeezx\.pages\.dev$/.test(location.hostname)
+            || ['localhost', '127.0.0.1'].includes(location.hostname))) {
+      import('./src/lib/viewport-diagnostic.js').then(({ installViewportDiagnostic }) => installViewportDiagnostic());
+    }
+  </script>
 </body>
 </html>
