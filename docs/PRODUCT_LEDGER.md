@@ -1,8 +1,26 @@
-# RAKEEZ X — Product ledger
+# ركيز X — سجل المنتج | Product Ledger
 
 Reconciled 2026-09-28 in 0374; PO directions N38–N45 recorded in 0375 and promoted to canonical main in 0377. The 0388 release/status record and 0390 PO closure follow-up are integrated into canonical main in 0390: N40/N47 CLOSED following PO Production verification after 0388; N45 read-only audit complete, remediation not yet authorized. Docs-only records do not create a Product release or authorize further implementation. N37 is CLOSED following PO Production verification completed after 0394 and explicitly confirmed in 0395; final outcome is recorded in closed history below. N42/N43 exact approved Preview candidate was promoted in 0399; both are CLOSED after PO Production verification completed after 0399 and explicitly confirmed/recorded in 0400. Current Product release: `6f0228e2e073f7ee742016a13c06efb3a297e670`; Production `75386d46-717e-4134-acdf-3ce668d77d40`.
 
-## Active / new PO note index
+## صندوق ملاحظات Product Owner الجديدة | New PO Notes Inbox
+
+اكتب الملاحظة الجديدة بنصها الأصلي تحت تاريخها ورقمها اليومي؛ لا تحتاج إلى تعيين N-ID. هذا الصندوق للملاحظات الجديدة غير المصنفة، وليس لحالات التذاكر المنجزة.
+
+عند التصنيف لاحقًا يُعيّن أو يُعاد استخدام N-ID ثابت، مع حفظ النص الأصلي في [سجل الملاحظات التاريخية](PRODUCT_LEDGER_HISTORY.md) حيث ينطبق. لا تُدمج أو تُحذف أي ملاحظة خام بصمت.
+
+مثال تنسيق فقط — ليس ملاحظات فعلية:
+
+```text
+### 2026-09-29
+- #01 — [نص الملاحظة كما كتبها Product Owner]
+- #02 — [ملاحظة أخرى]
+```
+
+_لا توجد ملاحظات جديدة غير مصنفة حاليًا._
+
+<a id="active--new-po-note-index"></a>
+
+## فهرس الملاحظات النشطة والجديدة | Active / New PO Note Index
 
 Verbatim wording and all dated note mappings are preserved in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). Open historical notes remain in the current table below; resolved notes remain in closed history. No notes were deleted or silently merged. N38–N45 directions are PO-approved in 0375; the approved 0374/0375 reconciliation was promoted to canonical main in 0377. Direction approval is not implementation completion or execution authorization in this docs ticket.
 
@@ -17,14 +35,32 @@ Verbatim wording and all dated note mappings are preserved in [Historical raw no
 | 2026-09-28 #05 | N43 | Compact installation guidance — CLOSED after PO Production verification |
 | 2026-09-28 #06 | N44 | Expandable notification framework — study approved |
 | 2026-09-28 #07 | N45 | Verification-email deliverability |
+| PO direction after 0398; Work 0398 → refinement 0401 | N48 | Global shell quick light/dark shortcut — distinct from N26; Work review active |
 
-## Current / open / deferred work
+<a id="current--open--deferred-work"></a>
+
+## العمل الحالي والمفتوح والمؤجل | Current / Open / Deferred Work
 
 PRODUCT_LEDGER is status authority; [Decisions](DECISIONS.md) retains durable approved contracts, [Changelog](CHANGELOG.md) the material Production release history. N IDs are stable. Related items are not merged merely because they share a screen. Types: BUG/FEATURE/UX/TECH_DEBT/DOC/IDEA. Priority and risk are triage, not execution authority; explicit 0375 priorities/directions are recorded for N38–N45. Their status cells include the exact PO decision qualifier; PO APPROVED approves direction, not completed implementation. Base status vocabulary retains INBOX/REVIEW/PLANNED/IN_PROGRESS/WAITING_PO/BLOCKED/DEFERRED/CLOSED/REJECTED/SUPERSEDED.
 
 CLOSED requires implementation, user-visible Preview and PO approval, Production deployment, and PO Production verification. Work/test/Preview success alone does not close an item. Escalate evidenced security, isolation, data-loss or Production failure immediately; no new Silent Beta blocker is inferred by this docs checkpoint.
 
-| ID | Added | Updated | Area | Type | Summary | Status | Priority | Risk | Lineage | Next action |
+معاني رموز الحالة (تبقى الرموز المعتمدة كما هي):
+
+| الرمز | المعنى |
+| --- | --- |
+| INBOX | وارد جديد |
+| REVIEW | قيد المراجعة |
+| PLANNED | مخطط |
+| IN_PROGRESS | قيد العمل |
+| WAITING_PO | بانتظار Product Owner |
+| BLOCKED | متوقف بعائق |
+| DEFERRED | مؤجل |
+| CLOSED | مغلق |
+| REJECTED | مرفوض |
+| SUPERSEDED | مستبدل/متجاوز |
+
+| ID | تاريخ الإضافة / Added | آخر تحديث / Updated | المجال / Area | النوع / Type | الملخص / Summary | الحالة / Status | الأولوية / Priority | المخاطر / Risk | المسار/المرجع / Lineage | الإجراء التالي / Next Action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | N01 | 2026-09-25 | 2026-09-28 | Scores | BUG | Distribution matching/review/add/repeat mismatch | REVIEW | HIGH | HIGH | Existing Clear-work investigation | Reproduce synthetically; separate matching semantics from review UX before approval. |
 | N02 | 2026-09-25 | 2026-09-28 | Demo parity | DOC | Permanent parity for shared user-facing capabilities | PLANNED | HIGH | MEDIUM | N02; Governance | Apply to each scoped Product ticket; no standalone completion claim. |
@@ -51,11 +87,18 @@ CLOSED requires implementation, user-visible Preview and PO approval, Production
 | N36 | 2026-09-25 | 2026-09-28 | External import | IDEA | Madrasati/Noor official exports/API/files first | REVIEW | MEDIUM | HIGH | D-060 | Research only; compare constrained adapters and shared Preview with N12; no credentials/helper. |
 | N38 | 2026-09-27 | 2026-09-28 | Digits | UX | Consistent 0–9 numeral presentation/input; distinct from N08 | PO APPROVED — REVIEW / PLANNING | MEDIUM | MEDIUM | 2026-09-27 raw #02; 0375; related N08 | Broad presentation/input audit; review typography relationship without merging N08 or changing stored-data semantics. |
 | N39 | 2026-09-28 | 2026-09-28 | Student search | UX | Non-contiguous name tokens plus student/class quick actions | PO APPROVED — AWAITING IMPLEMENTATION / DESIGN AS NEEDED | MEDIUM | MEDIUM | 2026-09-28 #01; 0375; follow-up to CLOSED N19 | Separate scoped design/implementation ticket for token matching and فتح ملف الطالب / فتح فصل الطالب; preserve active scope, durable identity and context disambiguation. |
-| N41 | 2026-09-28 | 2026-09-28 | Teacher identity | UX | Teacher identity repetition and long-name/mobile abbreviation | PO APPROVED — WORK UX REVIEW REQUIRED | MEDIUM | MEDIUM | 2026-09-28 #03; 0375 | Work compares desktop sidebar/topbar/Home greeting and mobile topbar/Home; preserve clear identity access without preselecting which location to remove. |
+| N41 | 2026-09-28 | 2026-09-28 | Teacher identity | UX | Teacher identity repetition and long-name/mobile abbreviation | PO APPROVED — FINAL WORK REFINEMENT / PO REVIEW PENDING | MEDIUM | MEDIUM | 2026-09-28 #03; 0375 | Complete final Work refinement 0401 after PO rejected the 0398 Mini Hub design while approving the broader identity direction; obtain PO Work review before a separate Product candidate. No Product implementation yet. |
 | N44 | 2026-09-28 | 2026-09-28 | Notifications | IDEA | Expandable categorized notification framework | PO APPROVED — RESEARCH / ARCHITECTURE STUDY REQUIRED | LOW | HIGH | 2026-09-28 #06; 0375 | Study use cases/channels, separate category preferences, optional marketing, permissions, local/server scheduling, delivery, abuse/noise and cost/complexity; no architecture chosen. |
 | N45 | 2026-09-28 | 2026-09-29 | Verification email | TECH_DEBT | Verification / OTP email Inbox deliverability | READ-ONLY DELIVERABILITY AUDIT COMPLETE / REMEDIATION NOT YET AUTHORIZED | HIGH | HIGH | 2026-09-28 #07; 0375; audit 0386; recorded 0388 | Actual Spam/Junk cause not proven. DMARC missing; new-account English confirmation versus Arabic returning-user OTP localization inconsistency established. Header/mailbox/reputation evidence remains unavailable. Separate explicit authorization required for DNS/provider/Auth/template remediation. |
+| N48 | 2026-09-29 (registered in 0402) | 2026-09-29 | Shell / Theme shortcut | UX | Quick light/dark appearance toggle in the global shell/topbar | PO APPROVED — WORK UX REVIEW / FINAL REFINEMENT ACTIVE | MEDIUM | LOW | PO direction after 0398 / Work 0398 → refinement 0401; registered 0402 | Complete Work 0401, PO review, then separate Product candidate. No Product implementation yet. |
 
-## Closed scope history
+### N48 — اتجاه معتمد / Approved direction (0398 → 0401)
+
+تحكم صغير وهادئ لتبديل المظهر في shell/topbar العام حيث يناسب؛ لا يظهر داخل سياق التدريس/الفصل وفق أحدث توجيه PO. يظهر القمر عندما يكون المظهر الفعلي فاتحًا، والشمس عندما يكون داكنًا. تبقى خيارات auto/light/dark الكاملة في Settings؛ إذا كان التفضيل المحفوظ auto، يختار التبديل اليدوي السريع المظهر الصريح المعاكس للمظهر الفعلي الحالي. N48 مستقل عن N26: لا إعادة تصميم للألوان ولا نموذج تخزين جديد. مراجعة Work نشطة مع N41؛ لا تنفيذ Product بعد.
+
+<a id="closed-scope-history"></a>
+
+## سجل البنود المغلقة | Closed Scope History
 
 N04/N10 are still separate source identities delivered together. N19's completed V1 search and N21's completed visual presentation remain CLOSED; separate N39 matching and the now-closed N40 selected-state bug do not reopen or broaden those accepted scopes. N33 is deliberately not in this table: only its delivered phases are CLOSED, and its overall direction remains OPEN.
 
@@ -83,13 +126,17 @@ N04/N10 are still separate source identities delivered together. N19's completed
 
 Closure basis for N04/N05/N06/N07/N10/N11/N14/N19/N20/N21/N27/N28/N29 and N33 Phases 1/2: corresponding promotion/PO Production-verification flows reconciled in 0346–0348, exact main ancestry and CHANGELOG releases. They are preserved, not newly closed by 0374. N46 is newly recorded CLOSED: accepted Work 0364/0365 → Product 0366/0368 → PO Preview approval → exact-SHA Production 0370 → PO Production verification explicitly confirmed in 0374. Documentation reconciliation itself is not the acceptance event.
 
-## N37 / N38 and Grades evidence boundary
+<a id="n37--n38-and-grades-evidence-boundary"></a>
+
+## حدود الأدلة لـ N37 / N38 والدرجات | Evidence Boundary
 
 - **N37:** 0349–0357 isolated static concepts/public review; [public comparison](https://rakeezx-landing-review.pages.dev/) remains separate from Product. Exploratory 0358 branch `codex/n37-product-landing-z-0358`, SHA `c2f8f3ddcaf0f404afaa09918e9336c92cb3964e`, was not promoted. Subsequent Work comparisons culminated in final PO-approved 0389 outcome. Selective Product candidate 0392, branch `codex/n37-final-landing-0392`, SHA `59a8fcf9c80a3d64d2eecfcd6c0f80274f5bc139`, Preview `b1c1d075-2694-4ab1-9f83-12b200485ec2`, was PO-approved and fast-forwarded unchanged to Production in 0394; deployment `5b848eb3-1882-452c-a3aa-e1046a75334a`. Canonical desktop/mobile light/dark, OTP-sheet and isolated Demo smoke passed 7/7 with no observed console/page errors or unintended Product writes; canonical assets match the approved blobs. PO Production verification completed after 0394 and was explicitly confirmed in 0395; N37 is CLOSED. Existing unified OTP, Demo entry and signed-in fail-closed workspace behavior are preserved; no Auth/data/Sync semantic change. Footer/copyright/version were not added and remain deferred separately.
 - **N38:** PO-approved direction in 0375 targets consistent Western/Arabic digits `0 1 2 3 4 5 6 7 8 9` in presentation/input, rather than observed Arabic-Indic/Hindi-style numerals. No digit-wide implementation/acceptance evidence; keep it distinct from N08 font choice/licensing and preserve stored-data semantics.
 - **N46:** approved Grades presentation only. The rejected 0361/0362 row/selection redesigns are not the implementation source. Production SHA/deployment and concise user-facing outcome are in CHANGELOG; no scoring/model/store/Auth/Sync change was bundled.
 
-## PO-approved directions — 0375 / 2026-09-28
+<a id="po-approved-directions--0375--2026-09-28"></a>
+
+## الاتجاهات المعتمدة من Product Owner | PO-Approved Directions — 0375 / 2026-09-28
 
 The PO explicitly approved N38–N45 direction. The status/priority/next action is in the current table above; the contracts below preserve the decision detail. **Approval is not implementation completion. This docs ticket authorizes no Product, Work, provider/DNS, Auth or backend execution.** Future work needs a separately scoped ticket. No item was merged, closed or implemented by 0375.
 
@@ -104,7 +151,9 @@ The PO explicitly approved N38–N45 direction. The status/priority/next action 
 | N44 | Future expandable framework supports four categories: **operational teacher** (configurable pre-lesson, attendance/workflow, long-unsynced device and future schedule/calendar reminders); **account/service** (subscription expiry, account/service attention, important Sync/account actions); **RAKEEZ announcements** (features, important updates, service notices); **marketing/subscription offers** (discounts/offers). Users control categories separately where applicable; marketing/offers are optional, never forced. Potential channels: in-app center/bell, permitted push, and selected important account/service email. | HIGH: implementation priority LOW; preserve strategic direction. Study channels, category permission/preferences, delivery architecture, local-vs-server scheduling, abuse/noise prevention and cost/complexity before choosing architecture. Reduce teacher pressure; do not create notification noise. |
 | N45 | Improve confidence that verification/OTP email reaches Inbox instead of Spam/Junk. First step is read-only audit of sending provider, sender domain, SPF, DKIM, DMARC, sender reputation, message content/format, bounce/spam indicators and provider configuration, where applicable. | HIGH: no DNS/provider/Auth configuration mutation here; any future provider/DNS change requires separate explicit authorization. |
 
-## Retained approved scope detail (2026-09-25)
+<a id="retained-approved-scope-detail-2026-09-25"></a>
+
+## تفاصيل النطاق المعتمدة والمحفوظة | Retained Approved Scope Detail (2026-09-25)
 
 The following durable contracts are retained verbatim from the prior ledger to preserve sub-concerns (including licensing, import/identity safety and N27 return copy). **They are scope references, not a second current-status table.** Current status/next action is exclusively in the tables above. N34–N36 came from the subsequent explicit PO directive rather than the raw Inbox. Existing Decisions are not rewritten by this checkpoint.
 
