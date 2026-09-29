@@ -1537,11 +1537,11 @@ export default {
                   ${icon('clock')} عرض وتعديل أوقات الحصص
                 </button>
                 <div class="timing-profile-card__actions-row">
-                  <button class="btn btn--sm btn--ghost" data-act="rename" data-id="${p.id}">
+                  <button class="btn btn--sm btn--ghost timing-profile-card__rename" data-act="rename" data-id="${p.id}">
                     ${icon('calendar')} تعديل الاسم وفترة سريان التوقيت
                   </button>
                   ${!isActive ? html`
-                    <button class="iconbtn iconbtn--xs text-danger" data-act="del-profile" data-id="${p.id}" aria-label="حذف الملف" title="حذف الملف">${icon('trash')}</button>
+                    <button class="iconbtn timing-profile-card__delete" data-act="del-profile" data-id="${p.id}" aria-label="حذف ملف التوقيت" title="حذف ملف التوقيت">${icon('trash')}</button>
                   ` : ''}
                 </div>
               </div>

@@ -21,6 +21,22 @@ import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingD
 import { repaint } from "../repaint.js";
 import { getAccountPresentation } from "../lib/account-profile.js";
 
+let equalHeightFrame = 0;
+let scheduleRoot = null;
+
+function equalizeVisibleSlots() {
+  if (!scheduleRoot?.isConnected) return;
+  const cards = [...scheduleRoot.querySelectorAll('.week .slot')].filter((card) => card.getClientRects().length);
+  for (const card of cards) card.style.height = '';
+  const height = Math.ceil(Math.max(0, ...cards.map((card) => card.getBoundingClientRect().height)));
+  if (height) for (const card of cards) card.style.height = `${height}px`;
+}
+
+function queueSlotEqualization() {
+  cancelAnimationFrame(equalHeightFrame);
+  equalHeightFrame = requestAnimationFrame(equalizeVisibleSlots);
+}
+
 const SHORT_GRADES = {
   1: "أول",
   2: "ثاني",
@@ -353,6 +369,21 @@ export default {
   title: () => "الجدول",
   subtitle: () => store.activeTerm()?.name ?? "",
   wide: true,
+
+  onMount(root) {
+    scheduleRoot = root;
+    window.addEventListener('resize', queueSlotEqualization);
+    queueSlotEqualization();
+  },
+  afterPaint(root) {
+    scheduleRoot = root;
+    queueSlotEqualization();
+  },
+  onUnmount() {
+    window.removeEventListener('resize', queueSlotEqualization);
+    cancelAnimationFrame(equalHeightFrame);
+    scheduleRoot = null;
+  },
 
   render() {
     const list = store.teachings();

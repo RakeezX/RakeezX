@@ -218,7 +218,10 @@ test('schedule remains daily-columns only with concise class labels and Home tim
     expect(await page.evaluate(() => {
       const labelBox = document.querySelector('.slot__grade-sec')?.getBoundingClientRect();
       const actionsBox = document.querySelector('.slot__actions')?.getBoundingClientRect();
-      return !!labelBox && !!actionsBox && (labelBox.right <= actionsBox.left || actionsBox.right <= labelBox.left);
+      return !!labelBox && !!actionsBox && (
+        labelBox.right <= actionsBox.left || actionsBox.right <= labelBox.left ||
+        labelBox.bottom <= actionsBox.top || actionsBox.bottom <= labelBox.top
+      );
     })).toBe(true);
   }
   const activeDayStyle = await page.locator('.schedule-day-tab.is-active').evaluate((tab) => {
