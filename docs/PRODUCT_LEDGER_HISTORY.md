@@ -109,3 +109,32 @@ The following block is byte-for-byte identical to the root Inbox captured for 03
 --
 
 ```
+
+## 2026-09-29 — triage 0404 / تصنيف ملاحظات PO
+
+All six notes were PO-approved in 0404. Only #02 + #04 were combined, by explicit PO approval, as N50. Every other note retains its separate identity; N52 is intentionally unallocated because N53/N54 identities were already established by the PO. This records direction, not implementation.
+
+| Source/date | Ledger identity | Disposition / lineage |
+| --- | --- | --- |
+| 2026-09-29 #01 | N49 | Offline Lease; separate high-risk architecture audit first |
+| 2026-09-29 #02 | N50 | Official holiday ranges; combined ONLY with #04 by explicit PO approval in 0404 |
+| 2026-09-29 #03 | N51 | Upcoming default; separate from N50 |
+| 2026-09-29 #04 | N50 | Central exception entry/calendar list UX; combined ONLY with #02 by explicit PO approval in 0404 |
+| 2026-09-29 #05 | N53 | System-wide modal/sheet fit; N47 stays CLOSED |
+| 2026-09-29 #06 | N54 | System-wide mobile keyboard resilience; N20 stays CLOSED |
+
+### Verbatim Inbox block / نص الوارد الأصلي
+
+The following block preserves the full local Inbox text captured before triage, including the PO instruction, date, note numbering, spelling, punctuation, line endings and trailing whitespace. SHA-256 of the block between the fences: `236759a83d21c06d53431df6685e1486fb0fa7f12ae561e53f1407eed7aff6a7`.
+
+```text
+**(الملاحظات ادناه، راجعها ورتبها وتاكد انك فهمتها، ولا تعدل او تتصرف فيها من راسك ممكن يغير الهدف المقصود منها، وفي اي نقطة غير واضحة راجعها معاي، واذا كان هناك تكرار تاكد مني قبل تدمج، وضع لها اولوية وخطة وراجعها معاي)**
+### 2026-09-29
+#01 لا ننسى موضوع كيف نسيطر على النسخ الاوفلاين ما تكون شغالة مدى الحياة، يكون لها فترة صلاحية و تتوقف عشان يجرب المستخدم يزامن مع حسابة، او يشترك.
+#02 الاجازات، ندمج الاجازات في بند واحد اذا كانت اكثر من يوم، ولا نضيف معاها نهاية الاسبوع. مثال اجازة اليوم الوطني هي يومين الاربعاء والخميس، ولكن مسجلة في ركيز 4 ايام اربعاء وخميس وجمعة وسبت، والجمعة والسبت تعتبر اجازة نهاية اسبوع. 
+#03 كمان في الاجازات بشكل افتراضي يفتح لك تبويب القادمة، عشان تطلع له اجازات الفترة القادمة فقط والمنقضية ما تاخذ مساحة من اول زيارة للصفحة، فقط ان اراد اختيار الكل او غيره. وش رايك؟
+#04 في الاجازات كذلك، في الجوال زر " + إضافة استثناء" ماخذ مساحة وسطر كامل تحت كل بند اجازة، وهذا اشوفه مزعج. نبغا نشيله ونخليه اما زر مركزي فوق بار الاجازات او بشكل هادئ وبسيط .. وش رايك؟
+#05 لاحظت عند اختلاف احجام الشاشات في بعض الاجهزة الكمبيوتر مثلاً الاصغر قليلاً، يظهر في بعض المربعات المنبثقة سكرول داون! وهذي غير مقبول نهائياً في ركيز. اي مربع المفترض يتكيف مع حجم الشاشة بدون سكرول داون، وهذي لاحظاتها للحين في مكانين 1 مركز المعلم 2 في مربع ابدا مع ركيز، نبغا جميع المربعات تتكيف مع حجم الشاشات اللي تسمح بذلك، لكن الجوالات او الصفحات الطويلة لها ظروفه المختلفة.
+#06 لاحظت في الايفون لمن اضغط على زر ابدا مع ركيز من الصفحة الاولى، ويظهر لي مربع ادخال الايميل ويفتح الكبيورد، تصير لخبطة وضغط واختفاء جزء من المربع وعدم ظهور مربع ادخال الايميل مع ثبات البار العلوي المكتوب فيه "ابدا مع ركيز" هذي نبغا ننتجاوزها في الجوالات الاندرويد والايفون، عند فتح الكبيورد، يكون فيه تكيف او طريقة تحكم افضل، شوف ايش الافضل تقنينا والاحدث عشان نطبقه هنا ونتجاوز هذي المشاكل في ركيز كامل.
+
+```
