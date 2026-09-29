@@ -6,6 +6,7 @@
  */
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
+import { displayIdentity } from '../lib/display-identity.js';
 import { APP_ICON_URL } from '../lib/brand.js';
 import { openStudentSearch } from '../lib/student-search-ui.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
@@ -21,10 +22,11 @@ const SUPPRESSION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 let sessionDismissed = false;
 
-export function homeGreeting(profile = {}, now = new Date()) {
-  const teacherName = String(profile.teacherName ?? '').trim();
+export function homeGreeting(profile = {}, now = new Date(), { compact = false } = {}) {
+  const teacherName = displayIdentity(profile.teacherName, '').display;
   const presentation = getAccountPresentation(profile.teacherForm);
   const morning = now.getHours() < 12;
+  if (compact) return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific}`;
   if (!teacherName) return morning ? 'صباح الخير' : 'أهلاً بك';
   return `${morning ? 'صباح الخير' : 'أهلاً'}، ${presentation.teacherHonorific} ${teacherName}`;
 }
@@ -300,7 +302,7 @@ export default {
       <!-- الهوية في غلاف التطبيق؛ يبدأ المحتوى بالترحيب والسياق اليومي فقط. -->
       <div class="hero home-hero">
         <div class="hero__main-row">
-          <div class="hero__hello">${homeGreeting(meta)}</div>
+          <div class="hero__hello">${store.getActiveWorkspace()?.type === 'demo' ? 'أهلاً بك في مساحة تجريبية' : html`<span class="home-greeting--desktop">${homeGreeting(meta)}</span><span class="home-greeting--compact">${homeGreeting(meta, new Date(), { compact: true })}</span>`}</div>
           <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${timingProfile}">
             <span class="compact-timing-pill__icon" aria-hidden="true">${icon(timingProfileIcon(timingProfile))}</span>
             <span>${timingProfile}</span>

@@ -30,7 +30,7 @@ export function syncOperationalPresentation(summary = { state: 'idle' }) {
   return { status, text, label, badge, help, canSync, summary };
 }
 
-export function renderSyncOperationalSection(summary) {
+export function renderSyncOperationalSection(summary, { compact = false } = {}) {
   const ui = syncOperationalPresentation(summary);
   const last = summary.lastSuccessfulSyncAt;
   const lastText = last && Number.isFinite(new Date(last).getTime())
@@ -47,9 +47,9 @@ export function renderSyncOperationalSection(summary) {
     : ui.label;
   const categories = ui.status === 'synced' ? [] : (summary.affectedCategories ?? []).map((key) => CATEGORIES[key]).filter(Boolean);
   return html`
-    <div class="mini-hub-sync__state">
+    <div class="mini-hub-sync__state ${compact ? 'center-sync-heading' : ''}">
       <span class="sync-dot sync-dot--${ui.status}" aria-hidden="true"></span>
-      <span class="fw-7 fs-sm">${firstSync ? 'بانتظار أول مزامنة' : 'حالة المزامنة'}</span>
+      <span class="fw-7 fs-sm">${compact ? 'حالة المزامنة:' : firstSync ? 'بانتظار أول مزامنة' : 'حالة المزامنة'}</span>
       <span class="badge ${ui.badge}">${firstSync ? 'محلي' : ui.text}</span>
     </div>
     <div class="mini-hub-sync__meta t-2 fs-xs">

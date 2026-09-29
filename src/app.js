@@ -3,6 +3,7 @@
  */
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
@@ -54,6 +55,8 @@ let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
 let initialRestoreAbortController = null;
 const scrollMemory = new Map();
+// Keep the destination icon current when AUTO follows a system palette change.
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => scheduleRender());
 
 const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
 const canMaterializeTodaySessions = () => isDemoWorkspace() || Boolean(cloud.session && cloud.user);
@@ -67,14 +70,6 @@ function isStandaloneMode() {
     document.referrer?.includes('android-app://'));
 }
 
-function teacherInitials(name) {
-  const clean = String(name ?? '').trim();
-  if (!clean || clean === 'المعلم' || clean === 'المعلمة' || clean === 'المعلّم' || clean === 'المعلّمة') return 'م';
-  const parts = clean.split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) return `${parts[0][0]} ${parts[1][0]}`;
-  return parts[0].slice(0, 2);
-}
-
 function getSyncState() {
   return syncOperationalPresentation(syncModule?.getSyncOperationalSummarySnapshot());
 }
@@ -82,29 +77,28 @@ function getSyncState() {
 function renderSidebarMiniHubTrigger() {
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);
-  const teacherName = profile.teacherName || presentation.teacherLabel;
-  const schoolName = profile.schoolName || '';
+  const identity = displayIdentity(profile.teacherName, presentation.teacherLabel);
+  const teacherName = identity.display;
   const syncInfo = getSyncState();
 
   if (isDemoWorkspace()) return html`
-    <button class="teacher-mini-hub-trigger" data-act="demo-login" aria-label="الخروج من الوضع التجريبي وتسجيل الدخول">
-      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">ع</div>
+    <button class="teacher-mini-hub-trigger" data-act="demo-login" aria-label="الخروج من التجربة">
+      <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">${icon('login')}</div>
       <div class="teacher-mini-hub-trigger__info">
-        <div class="teacher-mini-hub-trigger__name">مساحة تجريبية</div>
-        <div class="teacher-mini-hub-trigger__sub">بيانات خيالية</div>
+        <div class="teacher-mini-hub-trigger__name">الخروج من التجربة</div>
+        <div class="teacher-mini-hub-trigger__sub">بيانات تجريبية</div>
       </div>
       <div class="teacher-mini-hub-trigger__chev" aria-hidden="true">${icon('chev')}</div>
     </button>
   `;
 
   return html`
-    <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}">
+    <button class="teacher-mini-hub-trigger" data-act="open-teacher-mini-hub" data-sync-account-label="مركز ${presentation.teacherLabel}: ${teacherName}" aria-label="مركز ${presentation.teacherLabel}: ${teacherName}، ${syncInfo.text}">
       <div class="teacher-mini-hub-trigger__avatar" aria-hidden="true">
-        ${teacherInitials(teacherName)}
+        ${identity.initials}
       </div>
       <div class="teacher-mini-hub-trigger__info">
         <div class="teacher-mini-hub-trigger__name">${teacherName}</div>
-        ${schoolName ? html`<div class="teacher-mini-hub-trigger__sub">${schoolName}</div>` : ''}
       </div>
       <div class="teacher-mini-hub-trigger__sync" title="${syncInfo.text}">
         <span class="sync-dot sync-dot--${syncInfo.status}" data-sync-status aria-hidden="true"></span>
@@ -119,8 +113,8 @@ function renderSidebarMiniHubTrigger() {
 function renderTeacherMiniHubBody() {
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);
-  const teacherName = profile.teacherName || presentation.teacherLabel;
-  const schoolName = profile.schoolName || '';
+  const identity = displayIdentity(profile.teacherName, presentation.teacherLabel);
+  const teacherName = identity.display;
   const syncInfo = getSyncState();
   const isInstalled = isStandaloneMode();
   const hasInstallPrompt = typeof window !== 'undefined' && !!window.deferredInstallPrompt;
@@ -131,25 +125,14 @@ function renderTeacherMiniHubBody() {
   return html`
       <div class="mini-hub-sheet">
         <section class="mini-hub-surface" aria-label="مركز ${presentation.teacherLabel}">
-          <div class="mini-hub-identity">
-            <div class="mini-hub-avatar" aria-hidden="true">${teacherInitials(teacherName)}</div>
-            <div class="flex-1 min-w-0">
-              <div class="mini-hub-name">${teacherName}</div>
-              <div class="mini-hub-school t-3 fs-xs">${schoolName || (isLoggedIn ? 'حساب متصل' : 'سجل معلّم محلي')}</div>
-            </div>
-          </div>
-
-          <div class="mini-hub-account mini-hub-section">
-          <div class="mini-hub-account__row">
-            <div class="mini-hub-account__info">
-              <div class="mini-hub-account__title">الحساب</div>
-              ${demo
-                ? html`<div class="mini-hub-account__status">الوضع التجريبي</div>`
-                : authPending === 'logout'
-                ? html`<div class="mini-hub-account__status">جارٍ تسجيل الخروج...</div>`
-                : isLoggedIn
-                ? html`<div class="mini-hub-account__status truncate" dir="ltr">${cloud.user.email}</div>`
-                : html`<div class="mini-hub-account__status">${authPending === 'login' ? 'جارٍ تسجيل الدخول...' : 'غير مسجل الدخول'}</div>`}
+          <header class="center-identity">
+            <div class="mini-hub-identity">
+              <div class="mini-hub-avatar" aria-hidden="true">${demo ? icon('login') : identity.initials}</div>
+              <div class="flex-1 min-w-0">
+                <div class="mini-hub-name">${demo ? 'بيانات تجريبية' : teacherName}</div>
+                ${!demo && isLoggedIn ? html`<div class="mini-hub-account__status center-email" dir="ltr">${cloud.user.email}</div>` : ''}
+                ${!demo && (authPending || !isLoggedIn) ? html`<div class="mini-hub-account__status center-account-attention">${authPending === 'logout' ? 'جارٍ تسجيل الخروج...' : authPending === 'login' ? 'جارٍ تسجيل الدخول...' : 'غير مسجل الدخول'}</div>` : ''}
+              </div>
             </div>
             <div class="mini-hub-account__action">
               ${demo
@@ -160,38 +143,21 @@ function renderTeacherMiniHubBody() {
                 ? html`<button type="button" class="btn btn--xs btn--quiet" data-act="mini-hub-logout">تسجيل الخروج</button>`
                 : html`<div class="hstack gap-1 wrap"><button type="button" class="btn btn--xs btn--ghost" data-act="mini-hub-login">تسجيل الدخول</button><button type="button" class="btn btn--xs btn--quiet" data-act="demo-enter">جرّب ركيز</button></div>`}
             </div>
-          </div>
-          </div>
+          </header>
 
           ${demo ? html`<div class="mini-hub-sync mini-hub-section"><div class="t-3 fs-xs">بيانات تجريبية محلية فقط — لا مزامنة سحابية</div></div>` : html`
-            <div class="mini-hub-sync mini-hub-section" aria-live="polite">${renderSyncOperationalSection(syncInfo.summary)}</div>
+            <div class="mini-hub-sync mini-hub-section" aria-live="polite">${renderSyncOperationalSection(syncInfo.summary, { compact: true })}</div>
           `}
 
           <div class="mini-hub-pwa mini-hub-section">
-            <div class="mini-hub-pwa__copy">
-              <div class="fw-7 fs-sm">تطبيق رَكيز المعلم</div>
-          ${isInstalled
-            ? html`
-                <div class="mini-hub-installed">
-                  <span class="mini-hub-installed__icon" aria-hidden="true">${icon('check')}</span>
-                  <span class="mini-hub-installed__text">مثبت على هذا الجهاز</span>
-                </div>
-              `
-            : hasInstallPrompt
-            ? html`
-                <span class="t-3 fs-xs">متاح للتثبيت</span>
-              `
-            : html`
-                <span class="t-3 fs-xs">ثبّته للوصول السريع</span>
-              `}
-            </div>
-            ${!isInstalled ? html`
+            <div class="mini-hub-pwa__copy"><h3>تطبيق ركيز على هذا الجهاز</h3></div>
+            ${isInstalled ? html`<div class="mini-hub-installed"><span class="mini-hub-installed__icon" aria-hidden="true">${icon('check')}</span><span class="mini-hub-installed__text">مثبّت</span></div>` : html`
               <button class="btn btn--xs btn--ghost" data-act="${hasInstallPrompt ? 'mini-hub-pwa-install' : 'mini-hub-pwa-guide'}">
-                ${icon('download')} ${hasInstallPrompt ? 'تثبيت' : 'إرشادات'}
-              </button>
-            ` : ''}
+                ${icon('download')} ${hasInstallPrompt ? 'تثبيت ركيز' : 'إرشادات التثبيت'}
+              </button>`}
           </div>
 
+          <div class="hub-destinations">
           <a class="mini-hub-settings-link" href="#/settings" data-sheet-close>
             <span class="mini-hub-settings-link__icon" aria-hidden="true">${icon('settings')}</span>
             <span class="mini-hub-settings-link__copy"><b>الإعدادات</b><small>تخصيص التطبيق وإدارة البيانات</small></span>
@@ -202,6 +168,7 @@ function renderTeacherMiniHubBody() {
             <span class="mini-hub-settings-link__copy"><b>الدعم</b><small>تواصل مع فريق رَكيز المعلم</small></span>
             <span class="mini-hub-settings-link__chev" aria-hidden="true">${icon('chev')}</span>
           </a>
+          </div>
         </section>
       </div>
     `;
@@ -225,9 +192,22 @@ function openTeacherMiniHubSheet() {
   const sheet = openSheet({
     title: `مركز ${presentation.teacherLabel}`,
     body: renderTeacherMiniHubBody(),
-    onMount: (root) => { teacherMiniHubSheet = root; },
+    onMount: (root) => {
+      teacherMiniHubSheet = root;
+      root.classList.add('mini-hub-backdrop');
+      const position = () => {
+        const main = document.querySelector('.main')?.getBoundingClientRect();
+        root.style.setProperty('--mini-hub-main-left', `${main?.left ?? 0}px`);
+        root.style.setProperty('--mini-hub-main-width', `${main?.width ?? innerWidth}px`);
+      };
+      position();
+      window.addEventListener('resize', position);
+      root._removeHubPositionListener = () => window.removeEventListener('resize', position);
+    },
   });
+  const mounted = teacherMiniHubSheet;
   sheet.finally(() => {
+    mounted?._removeHubPositionListener?.();
     if (teacherMiniHubSheet?.isConnected === false) teacherMiniHubSheet = null;
   });
   return sheet;
@@ -290,7 +270,7 @@ function shell(path, params) {
         ${inTeaching && !/\/teaching\/[^/]+\/(attendance|grades)$/.test(path)
           ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
           : ''}
-        <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
+        ${!inTeaching ? html`<div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>` : ''}
       </nav>
       <main class="main">
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
@@ -318,16 +298,16 @@ function topbar(v, params) {
   const actions = v.topActions?.(params);
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);
-  const teacherName = profile.teacherName || presentation.teacherLabel;
+  const identity = displayIdentity(profile.teacherName, presentation.teacherLabel);
+  const teacherName = identity.display;
   const syncInfo = getSyncState();
   const isHome = currentPath() === '/';
   const isClassHub = /^\/teaching\/[^/]+$/.test(currentPath());
-  const isLoggedIn = !!(cloud.session && cloud.user);
   const demo = isDemoWorkspace();
-  const accountName = String(profile.teacherName ?? '').trim();
-  const homeAccountLabel = demo ? 'تجريبي' : isLoggedIn ? (accountName || 'إكمال الحساب') : 'تسجيل الدخول';
-  const homeAccountA11y = demo ? 'الوضع التجريبي، بيانات محلية' : isLoggedIn ? `${homeAccountLabel}، ${syncInfo.text}` : homeAccountLabel;
-
+  const inTeaching = currentPath().startsWith('/teaching/');
+  const dark = effectiveTheme(store.state.device?.theme, matchMedia('(prefers-color-scheme: dark)').matches) === 'dark';
+  const themeAction = dark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن';
+  const accountLabel = `مركز ${presentation.teacherLabel}: ${teacherName}`;
   return html`
     <header class="topbar ${isHome ? 'topbar--home' : ''} ${isClassHub ? 'topbar--class-hub' : ''}">
       ${backHref ? html`<a class="iconbtn" href="${backHref}" data-act="app-back" data-back-fallback="${backHref}" aria-label="رجوع">${icon('back')}</a>` : ''}
@@ -335,34 +315,20 @@ function topbar(v, params) {
         ${isHome ? html`
           <span class="mobile-brand">${brandLockup({ compact: true })}</span>
           <span class="topbar__page desktop-home-title">
-            <span class="topbar__title-row"><strong>${title}</strong>${demo ? html`<span class="demo-pill demo-pill--desktop" data-demo-indicator>الوضع التجريبي <small>· بيانات محلية</small></span>` : ''}</span>
+            <span class="topbar__title-row"><strong>${title}</strong></span>
           </span>
         ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
         ${actions ?? ''}
-        ${isHome && demo ? html`<span class="demo-pill demo-pill--mobile" data-demo-indicator>تجريبي</span>` : ''}
-        ${!isHome && demo ? html`<span class="demo-pill demo-pill--desktop" data-demo-indicator>الوضع التجريبي</span><span class="demo-pill demo-pill--mobile" data-demo-indicator>تجريبي</span>` : ''}
-        ${isHome ? html`
-          <button class="topbar__teacher-btn topbar__teacher-btn--home-account"
-                  data-act="${demo ? 'demo-login' : 'open-teacher-mini-hub'}"
-                  ${isLoggedIn ? html`data-sync-account-label="${homeAccountLabel}"` : ''}
-                  aria-label="${homeAccountA11y}"
-                  title="${isLoggedIn ? `${homeAccountLabel} — ${syncInfo.text}` : homeAccountLabel}">
-            <span class="topbar__account-icon" aria-hidden="true">${icon(isLoggedIn ? 'student' : 'login')}</span>
-            <span class="topbar__account-name">${homeAccountLabel}</span>
-            ${isLoggedIn ? html`<span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>` : ''}
-          </button>
-        ` : demo ? html`
-          <button class="btn btn--xs btn--quiet topbar__demo-login" data-act="demo-login" aria-label="الخروج من الوضع التجريبي وتسجيل الدخول">
-            ${icon('login')} تسجيل الدخول
-          </button>
-        ` : html`
-          <button class="topbar__teacher-btn" data-act="open-teacher-mini-hub" aria-label="مركز تحكم ${presentation.teacherLabel}: ${teacherName}">
-            <span class="topbar__teacher-avatar" aria-hidden="true">${teacherInitials(teacherName)}</span>
-            <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true" title="${syncInfo.text}"></span>
-          </button>
-        `}
+        ${!inTeaching ? html`
+          <button class="quick-theme" data-act="quick-theme" aria-label="${themeAction}" title="${themeAction}">${icon(dark ? 'sun' : 'moon')}</button>
+          ${demo ? html`<button class="topbar__teacher-btn explicit-demo-exit" data-act="demo-login" aria-label="الخروج من التجربة"><span class="demo-exit-copy"><strong>الخروج من التجربة</strong><small>بيانات تجريبية</small></span></button>` : html`
+          <button class="topbar__teacher-btn compact-identity" data-act="open-teacher-mini-hub" data-sync-account-label="${accountLabel}" aria-label="${accountLabel}، ${syncInfo.text}">
+            <span class="topbar__teacher-avatar" aria-hidden="true">${identity.initials}</span>
+            <span class="sync-dot sync-dot--${syncInfo.status} topbar__teacher-sync" data-sync-status aria-hidden="true"></span>
+          </button>`}
+        ` : ''}
       </div>
     </header>
   `;
@@ -407,7 +373,7 @@ function paintSyncStatus() {
     const focusKey = focused?.dataset.act;
     const focusHref = focused?.getAttribute('href');
     const focusSummary = focused?.tagName === 'SUMMARY';
-    render(section, renderSyncOperationalSection(syncInfo.summary));
+    render(section, renderSyncOperationalSection(syncInfo.summary, { compact: true }));
     section.querySelector('details').open = !!expanded;
     if (focusKey) section.querySelector(`[data-act="${focusKey}"]`)?.focus({ preventScroll: true });
     else if (focusHref === '#/support') section.querySelector('a[href="#/support"]')?.focus({ preventScroll: true });
@@ -1095,6 +1061,12 @@ const GLOBAL_ACTIONS = {
   'app-back': (el, event) => {
     event.preventDefault();
     backWithinApp(el.dataset.backFallback || el.getAttribute('href'));
+  },
+  'quick-theme': async () => {
+    const current = effectiveTheme(store.state.device?.theme, matchMedia('(prefers-color-scheme: dark)').matches);
+    await store.patchDevice({ theme: current === 'dark' ? 'light' : 'dark' });
+    store.applyTheme();
+    scheduleRender();
   },
   'open-teacher-mini-hub': () => openTeacherMiniHubSheet(),
   'demo-enter': () => {
