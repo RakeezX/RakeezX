@@ -1142,6 +1142,22 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .sheet__head, .sheet__foot { flex-shrink: 0; }
 .sheet__body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 2px; }
 .sheet__body input, .sheet__body textarea, .sheet__body select { scroll-margin-block: 16px; }
+/* N54: density only under mobile visual-viewport pressure (keyboard or zoom).
+   Keep title, branding, close and 44px actions; give the scroll body more room. */
+@media (max-width: 699px) {
+  /* Natural page scrolling needs enough range to expose its last control when
+     the keyboard covers layout space; remove the reserve on restoration. */
+  [data-viewport-compressed] .main {
+    padding-bottom: calc(var(--tap) + env(safe-area-inset-bottom) + var(--sp-6) + var(--visible-viewport-covered-bottom));
+  }
+  [data-viewport-compressed] .sheet {
+    --sheet-pressure-space: clamp(8px, calc((var(--visible-viewport-height) - 300px) / 18 + 8px), 20px);
+    padding-block: var(--sheet-pressure-space) calc(var(--sheet-pressure-space) + env(safe-area-inset-bottom));
+  }
+  [data-viewport-compressed] .sheet__head { margin-bottom: clamp(8px, var(--sheet-pressure-space), 16px); }
+  [data-viewport-compressed] .sheet__foot { margin-top: var(--sheet-pressure-space); }
+  [data-viewport-compressed] .first-run-auth .auth-brand { padding-bottom: var(--sheet-pressure-space); }
+}
 @media(max-width: 420px) {
   .profile-completion { min-height: 0; padding: 22px 18px; gap: 16px; border-radius: 22px; }
   [data-account-profile-required] { padding-block: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-bottom)); }
