@@ -59,6 +59,9 @@ const durationLabel = (startDate, endDate) => {
   return `${days} يومًا`;
 };
 
+const dayCountLabel = (days) =>
+  days === 0 ? '0 يوم' : days === 1 ? 'يوم واحد' : days === 2 ? 'يومان' : days <= 10 ? `${days} أيام` : `${days} يومًا`;
+
 const calendarTone = (kind) =>
   kind === 'remote' ? 'info' : kind === 'study' || kind === 'exam' || kind === 'event' ? 'ok' : 'warn';
 
@@ -80,7 +83,7 @@ const getRelativeStatus = (startDate, endDate, today) => {
   return { text: 'منقضية', tone: 'sunk' };
 };
 
-let activeFilter = 'all';
+let activeFilter = 'upcoming';
 
 /**
  * التحقق من اكتمال إعداد الفصول والتقويم للسنة قبل تفعيلها.
@@ -651,7 +654,7 @@ function newTermSheet(yearId, nextIndex) {
 function rangeSheet(existing = null) {
   const d = existing ?? { startDate: todayISO(), endDate: '', kind: 'holiday', label: '' };
   return openSheet({
-    title: existing ? 'تعديل الفترة' : 'فترة جديدة في التقويم',
+    title: existing ? 'تعديل الفترة' : 'إضافة استثناء محلي',
     body: html`
       <form id="range-form">
         <div class="field-row">
@@ -747,6 +750,10 @@ export default {
   title: () => 'التقويم الدراسي',
   subtitle: () => store.activeYear()?.label ?? '',
   topActions: () => null,
+  onUnmount() {
+    // A new route visit starts with upcoming holidays; repaint keeps the current choice.
+    activeFilter = 'upcoming';
+  },
 
   render() {
     const year = store.activeYear();
@@ -823,10 +830,7 @@ export default {
       <div class="cal-hero-strip">
         <div class="cal-hero-strip__identity">
           <div class="cal-hero-strip__meta-line">
-            <span class="badge badge--ok cal-hero-strip__badge">
-              ${icon('calendar')}
-              <span>التقويم المعتمد</span>
-            </span>
+            <span class="cal-hero-strip__eyebrow">التقويم المعتمد</span>
             <span class="cal-year-label t-3 fs-xs"><bdi class="fw-7">${year?.label ?? '1448–1449 هـ'}</bdi> · <bdi>${preset?.gregorianLabel ?? '2026–2027 م'}</bdi></span>
           </div>
 
@@ -840,7 +844,7 @@ export default {
         </div>
 
         <div class="cal-hero-strip__actions">
-          <button class="btn btn--primary" data-act="open-settings" aria-label="إعدادات التقويم والمنطقة">
+          <button class="btn btn--quiet" data-act="open-settings" aria-label="إعدادات التقويم والمنطقة">
             ${icon('settings')}
             <span>إعدادات التقويم والمنطقة</span>
           </button>
@@ -850,12 +854,9 @@ export default {
       <!-- رادار الزمن الدراسي (أين نحن الآن + المحطة القادمة) -->
       <div class="cal-radar-grid">
         <!-- بطاقة: نبض الفصل الدراسي الجاري -->
-        <div class="cal-card cal-card--pulse rakeez-accent-surface">
+        <div class="cal-card cal-card--pulse calendar-overview-card">
           <div class="cal-card__head">
-            <span class="cal-card__eyebrow">
-              <span class="cal-pulse-dot" aria-hidden="true"></span>
-              <span>أين نحن الآن؟</span>
-            </span>
+            <h2 class="cal-card__eyebrow">أين نحن الآن؟</h2>
             <span class="badge ${isInsideTerm1 || isInsideTerm2 ? 'badge--ok' : 'badge--info'}">
               ${isInsideTerm1
                 ? 'الفصل الدراسي الأول (نشط)'
@@ -879,7 +880,8 @@ export default {
 
           <!-- مسار التقدم "أنت هنا" -->
           <div class="cal-progress-box">
-            <div class="cal-progress-track">
+            <div class="cal-progress-now">أنت هنا · ${fmtDate(today, false)}</div>
+            <div class="cal-progress-track" role="progressbar" aria-label="التقدم الزمني للفصل" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPct}">
               <div class="cal-progress-fill" style="width: ${progressPct}%;"></div>
               <div
                 class="cal-progress-pin"
@@ -888,9 +890,8 @@ export default {
               ></div>
             </div>
             <div class="cal-progress-bounds">
-              <span>${currentTerm?.startDate ? fmtDate(currentTerm.startDate, false) : ''}</span>
-              <span class="fw-7 cal-progress-now">أنت هنا · ${fmtDate(today, false)}</span>
-              <span>${currentTerm?.endDate ? fmtDate(currentTerm.endDate, false) : ''}</span>
+              <span>بداية الفصل<br><strong>${currentTerm?.startDate ? fmtDate(currentTerm.startDate, false) : 'غير محددة'}</strong></span>
+              <span>نهاية الفصل<br><strong>${currentTerm?.endDate ? fmtDate(currentTerm.endDate, false) : 'غير محددة'}</strong></span>
             </div>
           </div>
 
@@ -909,19 +910,13 @@ export default {
               <div class="cal-metric__val"><bdi class="tabular">${progressPct}٪</bdi></div>
             </div>
           </div>
-          <div class="t-3 fs-xs mt-2" style="opacity: 0.85;">
-            * مؤشرات الأيام تقديرية محسوبة على أساس التقويم المعتمد واستثناءاته المحفوظة.
-          </div>
         </div>
 
         <!-- بطاقة: الإجازة القادمة -->
-        <div class="cal-card">
+        <div class="cal-card calendar-overview-card calendar-overview-card--next">
           <div>
             <div class="cal-card__head">
-              <span class="cal-card__eyebrow">
-                ${icon('clock', 'compact')}
-                <span>الإجازة القادمة</span>
-              </span>
+              <h2 class="cal-card__eyebrow">المحطة القادمة</h2>
               ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate
                 ? html`
                     <span
@@ -936,19 +931,22 @@ export default {
             ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate
               ? html`
                   <div class="cal-milestone-spotlight">
-                    <div class="cal-milestone-title">
-                      ${nextMilestone.label ||
-                      calendarLabel(nextMilestone.kind, CALENDAR_KIND[nextMilestone.kind])}
+                    <div class="cal-milestone-main">
+                      <div class="cal-milestone-date" aria-hidden="true">
+                        <strong>${parseParts(nextMilestone.startDate)?.day ?? ''}</strong>
+                        <small>${AR_MONTHS[(parseParts(nextMilestone.startDate)?.month ?? 1) - 1]}</small>
+                      </div>
+                      <div>
+                        <div class="cal-milestone-title">
+                          ${nextMilestone.label || calendarLabel(nextMilestone.kind, CALENDAR_KIND[nextMilestone.kind])}
+                        </div>
+                        <div class="cal-milestone-range">${fmtDateRange(nextMilestone.startDate, nextMilestone.endDate)}</div>
+                      </div>
                     </div>
                     <div class="cal-milestone-meta">
-                      <span class="fw-7">${fmtDateRange(nextMilestone.startDate, nextMilestone.endDate)}</span>
-                      <span>·</span>
                       <span>${durationLabel(nextMilestone.startDate, nextMilestone.endDate)}</span>
-                      <span>·</span>
-                      <span
-                        class="badge ${nextMilestone.source?.startsWith('preset:') ? 'badge--ok' : 'badge--warn'}"
-                      >
-                        ${nextMilestone.source?.startsWith('preset:') ? 'رسمي' : 'استثناء محلي'}
+                      <span>
+                        ${nextMilestone.source?.startsWith('preset:') ? 'رسمية معتمدة' : 'استثناء محلي'}
                       </span>
                     </div>
 
@@ -956,15 +954,15 @@ export default {
                     <div class="cal-milestone-affected">
                       ${nextMilestoneAffected.length > 0
                         ? html`
-                            <span class="badge badge--warn tabular">
+                            <span class="tabular">
                               ${nextMilestoneAffected.length} حصص متأثرة
                             </span>
                             <button
-                              class="btn btn--sm btn--quiet"
+                              class="cal-overview-link"
                               data-act="view-affected"
                               data-id="${nextMilestone.id}"
                             >
-                              ${icon('clock')} عرض الحصص المتأثرة
+                              عرض الحصص المتأثرة
                             </button>
                           `
                         : html`
@@ -975,9 +973,6 @@ export default {
                     </div>
                   </div>
 
-                  <p class="t-3 fs-xs mt-2">
-                    ${nextMilestone.kind === 'remote' ? 'فترة دراسة عن بُعد' : 'فترة إجازة مجدولة'}
-                  </p>
                 `
               : html`
                   <div class="empty py-3">
@@ -986,19 +981,6 @@ export default {
                 `}
           </div>
 
-          ${nextMilestone && nextMilestone.source.startsWith('preset:')
-            ? html`
-                <div class="mt-3">
-                  <button
-                    class="btn btn--sm btn--quiet btn--block"
-                    data-act="exception"
-                    data-id="${nextMilestone.id}"
-                  >
-                    ${icon('plus')} إضافة استثناء أو تمديد لهذه الإجازة
-                  </button>
-                </div>
-              `
-            : ''}
         </div>
       </div>
 
@@ -1009,7 +991,6 @@ export default {
             <h3 class="section__title">الفصول الدراسية</h3>
             <span class="t-3 fs-sm">حدود بداية ونهاية الفصول الدراسية وأيام التدريس</span>
           </div>
-          <span class="badge badge--brand">${terms.length} فصول معتمدة</span>
         </div>
 
         <div class="cal-terms-grid">
@@ -1040,7 +1021,7 @@ export default {
                 const estimatedTeachingDays = Math.max(0, termWeeks * 5 - holidayDaysCount);
 
                 return html`
-                  <div class="cal-term-card ${isCurrent ? 'is-active' : ''}">
+                  <div class="cal-term-card calendar-term-balanced ${isCurrent ? 'is-active' : ''}">
                     <div>
                       <div class="cal-term-card__head">
                         <span class="cal-term-card__name">${term.name}</span>
@@ -1058,30 +1039,24 @@ export default {
                       <div class="cal-term-dates mt-3">
                         <div class="cal-term-date-row">
                           <span class="cal-term-date-label">البداية</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.startDate, true) : '—'}</span>
+                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.startDate, false) : '—'}</span>
                         </div>
                         <div class="cal-term-date-row">
                           <span class="cal-term-date-label">النهاية</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.endDate, true) : '—'}</span>
-                        </div>
-                        <div class="cal-term-date-row">
-                          <span class="cal-term-date-label">المدى</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDateRange(term.startDate, term.endDate) : '—'}</span>
+                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.endDate, false) : '—'}</span>
                         </div>
                       </div>
 
                       <div class="cal-term-stats mt-3">
-                        <span>${termWeeks} أسبوعًا دراسيًا</span>
-                        <span>·</span>
-                        <span>${termHolidays.length} فترات إجازة (${holidayDaysCount} يومًا)</span>
-                        <span>·</span>
-                        <span>~${estimatedTeachingDays} يوم تدريس</span>
+                        <span><strong>${termWeeks}</strong> أسبوعًا</span>
+                        <span><strong>نحو ${estimatedTeachingDays}</strong> يوم تدريس</span>
+                        <span><strong>${termHolidays.length} فترات إجازة</strong><small>${dayCountLabel(holidayDaysCount)}</small></span>
                       </div>
                     </div>
 
                     <div class="pt-2">
                       <button
-                        class="btn btn--sm btn--quiet btn--block"
+                        class="cal-overview-link"
                         data-act="edit-term"
                         data-id="${term.id}"
                       >
@@ -1101,23 +1076,13 @@ export default {
             <h3 class="section__title">الإجازات والفترات الدراسية</h3>
             <span class="t-3 fs-sm">${ranges.length} فترات تشمل ${totalDaysCount} يومًا</span>
           </div>
-          <button class="btn btn--primary btn--sm" data-act="add" aria-label="إضافة فترة أو استثناء">
-            ${icon('plus')} إضافة فترة أو استثناء
+          <button class="btn btn--primary btn--sm" data-act="add" aria-label="إضافة استثناء">
+            ${icon('plus')} إضافة استثناء
           </button>
         </div>
 
         <!-- تبويبات التصفية السريعة -->
         <div class="cal-filters-row" role="group" aria-label="تصفية فترات التقويم">
-          <button
-            type="button"
-            class="cal-filter-btn ${activeFilter === 'all' ? 'is-active' : ''}"
-            data-act="filter"
-            data-filter="all"
-            aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
-          >
-            <span>الكل</span>
-            <span class="cal-filter-btn__count tabular">${ranges.length}</span>
-          </button>
           <button
             type="button"
             class="cal-filter-btn ${activeFilter === 'upcoming' ? 'is-active' : ''}"
@@ -1127,6 +1092,16 @@ export default {
           >
             <span>القادمة</span>
             <span class="cal-filter-btn__count tabular">${upcomingCount}</span>
+          </button>
+          <button
+            type="button"
+            class="cal-filter-btn ${activeFilter === 'all' ? 'is-active' : ''}"
+            data-act="filter"
+            data-filter="all"
+            aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
+          >
+            <span>الكل</span>
+            <span class="cal-filter-btn__count tabular">${ranges.length}</span>
           </button>
           <button
             type="button"
@@ -1159,13 +1134,6 @@ export default {
                     ? 'لم تُسجَّل أي استثناءات محلية بعد. جميع الفترات الحالية مطابقة للتقويم الرسمي.'
                     : 'لا توجد فترات مطابقة لهذا الاختيار.'}
                 </div>
-                ${activeFilter === 'exceptions'
-                  ? html`
-                      <button class="btn btn--quiet btn--sm" data-act="add">
-                        ${icon('plus')} إضافة استثناء لمدرستك
-                      </button>
-                    `
-                  : ''}
               </div>
             `
           : html`
@@ -1215,19 +1183,7 @@ export default {
                             <span class="badge badge--${relStatus.tone}">
                               ${relStatus.text}
                             </span>
-                            ${affectedCount > 0
-                              ? html`
-                                  <button
-                                    class="cal-affected-btn"
-                                    data-act="view-affected"
-                                    data-id="${range.id}"
-                                    title="عرض تفاصيل الحصص المتأثرة"
-                                  >
-                                    ${icon('clock')}
-                                    <span>${affectedCount} حصص متأثرة</span>
-                                  </button>
-                                `
-                              : ''}
+                            ${affectedCount > 0 ? html`<span class="cal-period-affected-count">${affectedCount} حصص متأثرة</span>` : ''}
                           </div>
 
                           <div class="cal-period-sub">
@@ -1254,17 +1210,14 @@ export default {
 
                       <!-- الإجراءات -->
                       <div class="cal-period-actions">
+                        <button
+                          class="cal-period-detail"
+                          data-act="view-affected"
+                          data-id="${range.id}"
+                          aria-label="تفاصيل ${range.label || calendarLabel(range.kind, meta)}"
+                        >${icon('chev')}</button>
                         ${isOfficial
-                          ? html`
-                              <button
-                                class="btn btn--sm btn--quiet"
-                                data-act="exception"
-                                data-id="${range.id}"
-                                title="إضافة استثناء محلي لهذه الإجازة"
-                              >
-                                ${icon('plus')} إضافة استثناء
-                              </button>
-                            `
+                          ? ''
                           : html`
                               <button
                                 class="iconbtn"
@@ -1292,19 +1245,14 @@ export default {
       </div>
 
       <!-- بطاقة الاعتماد الوزاري والتكامل عبر المملكة -->
-      <div class="cal-accreditation-card">
-        <div class="cal-accreditation-card__icon" aria-hidden="true">
-          ${icon('book')}
+      <details class="calendar-source-disclosure">
+        <summary>${icon('book')} مصدر التقويم والمنطقة</summary>
+        <div>
+          <strong>التقويم الدراسي المعتمد لوزارة التعليم</strong>
+          <p>${activeRegion.name} · ${activeRegion.subtitle}</p>
+          <p>تبقى الفترات الرسمية المرجعية محفوظة، وتُضاف الاستثناءات المحلية منفصلة عنها.</p>
         </div>
-        <div class="cal-accreditation-card__main">
-          <div class="cal-accreditation-card__title">
-            التقويم الدراسي المعتمد لوزارة التعليم · ${activeRegion.name}
-          </div>
-          <div class="cal-accreditation-card__desc">
-            نظام تقويم موحد ومرن مهيأ لإدارات التعليم بمناطق المملكة العربية السعودية. تُحفظ الفترات الرسمية المعتمدة لحماية دقة تقارير التنفيذ والغياب المدرسي، مع إمكانية إضافة وتعديل استثناءات خاصة بمدارسك دون المساس بالأصل الوزاري.
-          </div>
-        </div>
-      </div>
+      </details>
       </div>
     `;
   },

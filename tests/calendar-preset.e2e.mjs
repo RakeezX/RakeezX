@@ -8,6 +8,7 @@ test('Western Region preset is visible and its official holiday is skipped throu
   await page.waitForFunction(() => window.store);
   await expect(page.getByText('التقويم المعتمد', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'تقويم مكة المكرمة • المدينة المنورة • جدة • الطائف' })).toBeVisible();
+  await page.locator('.cal-filters-row').getByRole('button', { name: /الكل/ }).click();
   await expect(page.getByText('إجازة اليوم الوطني').first()).toBeVisible();
 
   await page.evaluate(async () => {
@@ -42,7 +43,8 @@ test('calendar dates, semantics, Settings editor, and archive navigation follow 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/calendar');
-  await expect(page.getByText('17 يناير – 1 يوليو 2027')).toBeVisible();
+  await expect(page.locator('.calendar-term-balanced').filter({ hasText: 'الفصل الدراسي الثاني' })).toBeVisible();
+  await page.locator('.cal-filters-row').getByRole('button', { name: /الكل/ }).click();
   const nationalDay = page.locator('.calendar-period').filter({ hasText: 'إجازة اليوم الوطني' });
   await expect(nationalDay.getByText('23 – 26 سبتمبر 2026')).toBeVisible();
   await expect(nationalDay.getByText('4 أيام', { exact: true })).toBeVisible();
