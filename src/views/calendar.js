@@ -653,6 +653,8 @@ function newTermSheet(yearId, nextIndex) {
 
 function rangeSheet(existing = null) {
   const d = existing ?? { startDate: todayISO(), endDate: '', kind: 'holiday', label: '' };
+  const officialHolidays = store.calendarRangesOf(store.activeYear()?.id)
+    .filter((range) => range.source?.startsWith('preset:') && !isTeachingDay(range.kind));
   return openSheet({
     title: existing ? 'تعديل الفترة' : 'إضافة استثناء محلي',
     body: html`
@@ -675,6 +677,17 @@ function rangeSheet(existing = null) {
             <option value="holiday" ${d.kind === 'holiday' ? 'selected' : ''}>إجازة / تعليق دراسة</option>
           </select>
         </label>
+        <div class="field" data-holiday-context style="${d.kind === 'holiday' ? '' : 'display:none'}">
+          <label class="field" for="holiday-reference">
+            <span class="field__label">اختر الإجازة</span>
+          </label>
+          <select class="select" id="holiday-reference" name="holidayReference">
+            <option value="">اختر الإجازة</option>
+            ${officialHolidays.map((range, index) => html`<option value="${index}">${range.label}</option>`)}
+            <option value="other" ${existing && d.kind === 'holiday' ? 'selected' : ''}>إجازة أخرى</option>
+          </select>
+          <p class="t-3 fs-xs" data-holiday-hint style="display:none"></p>
+        </div>
         <label class="field">
           <span class="field__label">الوصف أو اسم الإجازة *</span>
           <input
@@ -693,9 +706,32 @@ function rangeSheet(existing = null) {
       <button class="btn btn--primary" form="range-form">حفظ الفترة</button>
     `,
     onMount: (root, done) => {
+      const form = root.querySelector('#range-form');
+      const kind = form.elements.kind;
+      const reference = form.elements.holidayReference;
+      const context = form.querySelector('[data-holiday-context]');
+      const hint = form.querySelector('[data-holiday-hint]');
+      const label = form.elements.label;
+      kind.addEventListener('change', () => {
+        context.style.display = kind.value === 'holiday' ? '' : 'none';
+        hint.style.display = 'none';
+        reference.value = existing && kind.value === 'holiday' ? 'other' : '';
+      });
+      reference.addEventListener('change', () => {
+        const range = officialHolidays[Number(reference.value)];
+        if (reference.value === '' || reference.value === 'other' || !range) {
+          hint.style.display = 'none';
+          return;
+        }
+        hint.innerHTML = html`الإجازة المرجعية: ${fmtDateRange(range.startDate, range.endDate)}. حدّد تواريخ استثنائك.`.value;
+        hint.style.display = '';
+        if (!label.value.trim()) label.value = `استثناء ${range.label}`;
+      });
       root.querySelector('#range-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const f = new FormData(event.target);
+        if (f.get('kind') === 'holiday' && !f.get('holidayReference'))
+          return toast('اختر الإجازة أو إجازة أخرى.', 'danger');
         const startDate = String(f.get('startDate'));
         const endDate = String(f.get('endDate') || startDate);
         if (endDate < startDate)

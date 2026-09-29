@@ -35,6 +35,7 @@ test('Calendar keeps one exception entry, existing edit path, and balanced respo
   await expect(calendar(page).getByText('إضافة استثناء أو تمديد لهذه الإجازة')).toHaveCount(0);
   await calendar(page).getByRole('button', { name: 'إضافة استثناء', exact: true }).click();
   await expect(page.getByRole('dialog').getByText('إضافة استثناء محلي')).toBeVisible();
+  await page.getByRole('dialog').getByLabel('اختر الإجازة').selectOption('other');
   await page.getByRole('dialog').getByLabel('الوصف أو اسم الإجازة *').fill('إجازة اختبار محلية');
   await page.getByRole('dialog').getByRole('button', { name: 'حفظ الفترة' }).click();
   await filters(page).getByRole('button', { name: /استثناءات محلية/ }).click();
@@ -76,6 +77,76 @@ test('Calendar keeps one exception entry, existing edit path, and balanced respo
   await page.getByRole('dialog').getByRole('button', { name: 'احذف' }).click();
   await expect(calendar(page).locator('.cal-period-title', { hasText: 'إجازة اختبار محلية' })).toHaveCount(0);
   expect(errors).toEqual([]);
+});
+
+test('official holiday context guides a local exception without persisting a reference', async ({ page }) => {
+  await page.goto('/#/calendar');
+  const add = calendar(page).getByRole('button', { name: 'إضافة استثناء', exact: true });
+  await add.click();
+  const dialog = page.getByRole('dialog');
+  const reference = dialog.getByLabel('اختر الإجازة');
+  await expect(reference).toBeVisible();
+  await expect(reference.locator('option')).toContainText(['اختر الإجازة', 'إجازة اليوم الوطني']);
+  await reference.selectOption({ label: 'إجازة اليوم الوطني' });
+  await expect(dialog.getByText('الإجازة المرجعية:')).toBeVisible();
+  const officialBefore = await page.evaluate(async () => {
+    const store = await import('/src/store.js');
+    return store.calendarRangesOf().find((range) => range.label === 'إجازة اليوم الوطني');
+  });
+  await dialog.locator('[name="startDate"]').fill('2026-10-10');
+  await dialog.locator('[name="endDate"]').fill('2026-10-11');
+  await dialog.getByLabel('الوصف أو اسم الإجازة *').fill('استثناء تجريبي مستقل');
+  await dialog.getByRole('button', { name: 'حفظ الفترة' }).click();
+  await filters(page).getByRole('button', { name: /استثناءات محلية/ }).click();
+  await expect(calendar(page).locator('.cal-period-title', { hasText: 'استثناء تجريبي مستقل' })).toBeVisible();
+  const saved = await page.evaluate(async () => {
+    const store = await import('/src/store.js');
+    return {
+      official: store.calendarRangesOf().find((range) => range.label === 'إجازة اليوم الوطني'),
+      local: store.calendarRangesOf().find((range) => range.label === 'استثناء تجريبي مستقل'),
+    };
+  });
+  expect(saved.official).toEqual(officialBefore);
+  expect(saved.local.source).toBe('custom');
+  expect(saved.local.startDate).toBe('2026-10-10');
+  expect(saved.local.endDate).toBe('2026-10-11');
+  expect(saved.local).not.toHaveProperty('officialHolidayId');
+  expect(saved.local).not.toHaveProperty('referenceId');
+  await calendar(page).getByRole('button', { name: 'تعديل الفترة' }).click();
+  await expect(page.getByRole('dialog').getByLabel('اختر الإجازة')).toHaveValue('other');
+  await page.getByRole('dialog').getByRole('button', { name: 'إلغاء' }).click();
+  await add.click();
+  await dialog.getByLabel('نوع اليوم / الفترة').selectOption('study');
+  await expect(reference).toBeHidden();
+  await dialog.getByLabel('نوع اليوم / الفترة').selectOption('remote');
+  await expect(reference).toBeHidden();
+  await dialog.getByRole('button', { name: 'إلغاء' }).click();
+  await page.reload();
+  await filters(page).getByRole('button', { name: /استثناءات محلية/ }).click();
+  await expect(calendar(page).locator('.cal-period-title', { hasText: 'استثناء تجريبي مستقل' })).toBeVisible();
+});
+
+test('holiday reference selector works in local WebKit', async ({ baseURL }) => {
+  const browser = await webkit.launch();
+  try {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.goto(`${baseURL}/#/calendar`);
+    await calendar(page).getByRole('button', { name: 'إضافة استثناء', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    const reference = dialog.getByLabel('اختر الإجازة');
+    await reference.selectOption({ label: 'إجازة اليوم الوطني' });
+    await expect(dialog.getByText('الإجازة المرجعية:')).toBeVisible();
+    await dialog.getByLabel('نوع اليوم / الفترة').selectOption('remote');
+    await expect(reference).toBeHidden();
+    await dialog.getByLabel('نوع اليوم / الفترة').selectOption('holiday');
+    await reference.selectOption('other');
+    await expect(reference).toHaveValue('other');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+    await context.close();
+  } finally {
+    await browser.close();
+  }
 });
 
 test('Calendar remains accessible in Chromium and WebKit with light and dark surfaces', async ({ page }) => {
