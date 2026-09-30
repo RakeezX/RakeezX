@@ -33,6 +33,7 @@ export function homeGreeting(profile = {}, now = new Date(), { compact = false }
 
 export function homeSummaryMetrics(list, {
   today = todayISO(),
+  calendarDay = store.calendarDayFor(today),
   studentsFor = (teachingId) => store.students(teachingId),
   sessionsForDate = (date) => store.sessionsOn(date),
   attendanceFor = (sessionId) => store.attendanceIn(sessionId),
@@ -44,7 +45,7 @@ export function homeSummaryMetrics(list, {
     for (const student of studentsFor(teaching.id)) studentIds.add(student.id);
   }
 
-  const todaySessions = sessionsForDate(today).filter((session) =>
+  const todaySessions = (calendarDay && !isTeachingDay(calendarDay.kind) ? [] : sessionsForDate(today)).filter((session) =>
     teachingIds.has(session.teachingId) && !CANCELLED_SESSION_STATUSES.has(session.status)
   );
   const completedToday = todaySessions.filter((session) => completenessFor(session).state === 'completed').length;
@@ -275,7 +276,10 @@ export default {
     const today = todayISO();
     const meta = store.state.profile ?? {};
     const list = store.teachings();
-    const daySessions = store.sessionsOn(today);
+    const cal = store.calendarDayFor(today);
+    // Calendar controls today's operational view; persisted sessions remain historical evidence.
+    const nonTeachingToday = !!cal && !isTeachingDay(cal.kind);
+    const daySessions = nonTeachingToday ? [] : store.sessionsOn(today);
     const onboarding = homeOnboardingState(list, {
       studentsFor: (teachingId) => store.students(teachingId),
       slotsFor: (teachingId) => store.slotsOf(teachingId),
@@ -284,7 +288,6 @@ export default {
       ? selectTodayFocus(daySessions, { attendanceState: (session) => store.attendanceCompleteness(session).state })
       : null;
     const remainingSessions = focus ? daySessions.filter((session) => session.id !== focus.session.id) : daySessions;
-    const cal = store.calendarDayFor(today);
     const emptyCopy = todayEmptyCopy(list.some((teaching) => store.slotsOf(teaching.id).length > 0), today, cal);
     const pendingToday = remainingSessions.filter((session) =>
       !CANCELLED_SESSION_STATUSES.has(session.status) && store.attendanceCompleteness(session).state === 'pending'
@@ -446,7 +449,7 @@ export default {
 
       ${onboarding.state === 'A'
         ? html`<section class="section home-summary home-workspace-note" aria-label="إرشاد البدء"><p>ابدأ بفصلك الأول، وستتكوّن مؤشراتك اليومية تدريجيًا دون إعدادات معقدة.</p></section>`
-        : summary(list)}
+        : summary(list, cal)}
         </aside>
       </div>
 
@@ -483,8 +486,9 @@ export default {
 
 /* ---------- ملخّصات مبنية على بيانات حقيقية فقط ---------- */
 
-function summary(list) {
-  const metrics = homeSummaryMetrics(list);
+function summary(list, calendarDay) {
+  const nonTeachingToday = !!calendarDay && !isTeachingDay(calendarDay.kind);
+  const metrics = homeSummaryMetrics(list, { calendarDay });
   const progress = metrics.totalToday ? Math.round((metrics.completedToday / metrics.totalToday) * 100) : 0;
 
   return html`
@@ -505,10 +509,12 @@ function summary(list) {
         </div>
       </div>
       <div class="home-day-progress">
-        <div class="home-day-progress__copy"><span>تقدم اليوم</span><span class="tabular">${metrics.completedToday} من ${metrics.totalToday} حصص</span></div>
-        <div class="home-day-progress__track" role="progressbar" aria-label="تقدم حصص اليوم" aria-valuemin="0" aria-valuemax="${metrics.totalToday}" aria-valuenow="${metrics.completedToday}">
-          <span style="width:${progress}%"></span>
-        </div>
+        ${nonTeachingToday
+          ? html`<div class="home-day-progress__copy"><span>تقدم اليوم</span><span>لا حصص دراسية اليوم</span></div>`
+          : html`<div class="home-day-progress__copy"><span>تقدم اليوم</span><span class="tabular">${metrics.completedToday} من ${metrics.totalToday} حصص</span></div>
+            <div class="home-day-progress__track" role="progressbar" aria-label="تقدم حصص اليوم" aria-valuemin="0" aria-valuemax="${metrics.totalToday}" aria-valuenow="${metrics.completedToday}">
+              <span style="width:${progress}%"></span>
+            </div>`}
       </div>
     </section>
   `;

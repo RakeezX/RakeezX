@@ -45,3 +45,26 @@ test('Home summary binds class, unique student, weekly attendance, and daily pro
     totalToday: 2,
   });
 });
+
+test('Home daily progress follows non-teaching Calendar authority without changing weekly history', () => {
+  const session = { id: 'existing-session', teachingId: 'class-a', status: 'scheduled' };
+  const options = {
+    today: '2026-10-01',
+    studentsFor: () => [{ id: 'student-1' }],
+    sessionsForDate: (date) => date === '2026-10-01' ? [session] : [],
+    attendanceFor: () => [{ status: 'present' }],
+    completenessFor: () => ({ state: 'completed' }),
+  };
+  for (const kind of ['suspension', 'holiday', 'national']) {
+    const metrics = homeSummaryMetrics([{ id: 'class-a' }], { ...options, calendarDay: { kind } });
+    assert.equal(metrics.totalToday, 0, kind);
+    assert.equal(metrics.completedToday, 0, kind);
+    assert.equal(metrics.weeklyAttendance, 100, kind);
+    assert.equal(session.status, 'scheduled', kind);
+  }
+  for (const calendarDay of [null, { kind: 'remote' }]) {
+    const metrics = homeSummaryMetrics([{ id: 'class-a' }], { ...options, calendarDay });
+    assert.equal(metrics.totalToday, 1);
+    assert.equal(metrics.completedToday, 1);
+  }
+});
