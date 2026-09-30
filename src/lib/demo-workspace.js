@@ -7,13 +7,14 @@ import {
   DEFAULT_TIME_PROFILE_IDS, periodTime,
 } from '../models.js';
 import { projectSubitemScore } from './score-foundation.js';
+import { calendarPresetRecords, getCalendarPreset } from './calendar-presets.js';
 
 export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-session-v1';
 export const LEGACY_DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
 export const DEMO_PREPARING = 'preparing';
 export const DEMO_ACTIVE = 'active';
-export const DEMO_SEED_ID = 'demo:workspace-seed-v3';
-const PREVIOUS_DEMO_SEED_ID = 'demo:workspace-seed-v2';
+export const DEMO_SEED_ID = 'demo:workspace-seed-v4';
+const PREVIOUS_DEMO_SEED_IDS = ['demo:workspace-seed-v3', 'demo:workspace-seed-v2'];
 const FIXED_TIME = Date.parse('2026-09-01T06:00:00.000Z');
 const CLASS_PLAN = Object.freeze([
   { grade: 4, label: '1', students: 23, slots: [[0, 1], [2, 3]] },
@@ -71,15 +72,24 @@ export function clearLegacyDemoRequest(storage = globalThis.localStorage) {
 }
 
 export function createDemoDataset() {
-  const year = makeYear({ id: 'demo:year:1448', hijriStart: 1448, status: 'active', updatedAt: FIXED_TIME });
-  const term = makeTerm({ id: 'demo:term:1', yearId: year.id, index: 1, status: 'active', startDate: '2026-08-23', endDate: '2027-01-07', updatedAt: FIXED_TIME });
-  const pastTerm = makeTerm({ id: 'demo:term:past', yearId: year.id, index: 2, name: 'فصل تجريبي مكتمل', status: 'closed', startDate: '2026-01-01', endDate: '2026-05-31', updatedAt: FIXED_TIME });
+  const officialPreset = calendarPresetRecords(getCalendarPreset('general'));
+  const year = makeYear({ ...officialPreset.year, id: 'demo:year:1448', status: 'active', updatedAt: FIXED_TIME });
+  const term = makeTerm({ ...officialPreset.terms[0], id: 'demo:term:1', yearId: year.id, calendarId: 'demo:calendar:official', status: 'active', updatedAt: FIXED_TIME });
+  const secondTerm = makeTerm({ ...officialPreset.terms[1], id: 'demo:term:2', yearId: year.id, calendarId: 'demo:calendar:official', updatedAt: FIXED_TIME });
+  const pastTerm = makeTerm({ id: 'demo:term:past', yearId: year.id, index: 3, name: 'فصل تجريبي مكتمل', status: 'closed', startDate: '2026-01-01', endDate: '2026-05-31', updatedAt: FIXED_TIME });
   const subject = makeSubject({ id: 'demo:subject:digital', name: 'المهارات الرقمية', slug: 'demo-digital', updatedAt: FIXED_TIME });
   const timeProfiles = DEFAULT_TIME_PROFILES.map((profile, order) => makeTimeProfile({
     ...structuredClone(profile), order, updatedAt: FIXED_TIME,
   }));
   const timeProfile = timeProfiles.find((profile) => profile.id === DEFAULT_TIME_PROFILE_IDS.summer);
   const calendar = makeCalendar({ id: 'demo:calendar', yearId: year.id, label: 'التقويم التجريبي', updatedAt: FIXED_TIME });
+  const officialCalendar = makeCalendar({
+    id: 'demo:calendar:official', yearId: year.id, source: officialPreset.calendar.source,
+    label: officialPreset.calendar.label, presetId: officialPreset.calendar.presetId, updatedAt: FIXED_TIME,
+  });
+  const officialDays = officialPreset.calendarDays.map((day) => record({
+    ...day, id: `demo:calendar-day:${day.date}`, calendarId: officialCalendar.id, updatedAt: FIXED_TIME,
+  }));
   const sections = CLASS_PLAN.map((plan, index) => makeSection({
     id: `demo:section:${index + 1}`, yearId: year.id, grade: plan.grade,
     label: plan.label, name: `${plan.grade}/${plan.label}`,
@@ -200,9 +210,9 @@ export function createDemoDataset() {
   return {
     profile: [record({ id: 'profile', teacherName: 'معلم ركيز', schoolName: 'مدرسة ركيز التجريبية', phone: '', teacherForm: 'masculine', reportPrincipalName: 'مدير المدرسة', principalName: 'مدير المدرسة', activeTimeProfileId: timeProfile.id })],
     device: [record({ id: 'device', deviceId: 'demo-device', theme: 'light', activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: timeProfile.id, reportPrincipalName: 'مدير المدرسة', lastSyncAt: null, schemaVersion: 7 })],
-    meta: [record({ id: DEMO_SEED_ID, version: 3, seededAt: FIXED_TIME })],
-    years: [year], terms: [term, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
-    items, scoreSubitems, scoreSubitemCompletions, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
+    meta: [record({ id: DEMO_SEED_ID, version: 4, seededAt: FIXED_TIME })],
+    years: [year], terms: [term, secondTerm, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
+    items, scoreSubitems, scoreSubitemCompletions, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar, officialCalendar], calendarDays: officialDays,
     units: [], lessons: [], timeProfiles, notes, classRules, classGoals, classCharterSelections,
     groupArrangements, closedTermReports: [], assignments: [], submissions: [], outbox: [],
   };
@@ -212,13 +222,33 @@ export async function seedDemoWorkspace({ force = false } = {}) {
   if (db.getActiveDatabaseName() !== 'rakeezx-demo') throw new Error('Demo seed requires the isolated demo database');
   if (!force && await db.get('meta', DEMO_SEED_ID)) return { seeded: false };
   const snapshot = createDemoDataset();
-  if (!force && await db.get('meta', PREVIOUS_DEMO_SEED_ID)) {
+  if (!force && (await Promise.all(PREVIOUS_DEMO_SEED_IDS.map((id) => db.get('meta', id)))).some(Boolean)) {
     const additions = {};
     for (const [storeName, rows] of Object.entries(snapshot)) {
       if (!rows.length) continue;
       const existingIds = new Set((await db.getAll(storeName)).map((row) => row.id));
       const missing = rows.filter((row) => !existingIds.has(row.id));
       if (missing.length) additions[storeName] = missing;
+    }
+    const existingYear = await db.get('years', snapshot.years[0].id);
+    if (existingYear && !existingYear.calendarPresetId) {
+      additions.years = [{
+        ...existingYear,
+        calendarPresetId: snapshot.years[0].calendarPresetId,
+        calendarRegion: snapshot.years[0].calendarRegion,
+        gregorianLabel: snapshot.years[0].gregorianLabel,
+        startDate: existingYear.startDate ?? snapshot.years[0].startDate,
+        endOfYearVacationStart: existingYear.endOfYearVacationStart ?? snapshot.years[0].endOfYearVacationStart,
+        nextAcademicYearStart: existingYear.nextAcademicYearStart ?? snapshot.years[0].nextAcademicYearStart,
+      }];
+    }
+    const existingFirstTerm = await db.get('terms', snapshot.terms[0].id);
+    if (existingFirstTerm && !existingFirstTerm.calendarId &&
+        existingFirstTerm.startDate === snapshot.terms[0].startDate &&
+        existingFirstTerm.endDate === snapshot.terms[0].endDate) {
+      additions.terms = [...(additions.terms ?? []), {
+        ...existingFirstTerm, calendarId: snapshot.terms[0].calendarId,
+      }];
     }
     if (Object.keys(additions).length) await db.putAcross(additions);
     return { seeded: false, upgraded: true, students: snapshot.students.length, sections: snapshot.sections.length };

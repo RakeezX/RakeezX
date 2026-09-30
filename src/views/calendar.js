@@ -21,6 +21,7 @@ import {
   WESTERN_1448_1449_PRESET_ID,
 } from '../lib/calendar-presets.js';
 import { repaint } from '../repaint.js';
+import { officialRangeChoices } from '../lib/calendar-range-choices.js';
 
 const AR_MONTHS = [
   'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -267,8 +268,38 @@ function affectedSessionsSheet(range) {
             `}
       </div>
     `,
-    foot: html`<button class="btn btn--primary btn--block" data-sheet-close>إغلاق</button>`,
+    foot: html`
+      ${range.source === 'custom' ? html`
+        <button class="btn btn--ghost" data-range-edit>تعديل الاستثناء</button>
+        <button class="btn btn--ghost" data-range-remove>حذف الاستثناء</button>
+      ` : ''}
+      <button class="btn btn--primary" data-sheet-close>إغلاق</button>
+    `,
+    onMount: (root, done) => {
+      root.querySelector('[data-range-edit]')?.addEventListener('click', () => done('edit'));
+      root.querySelector('[data-range-remove]')?.addEventListener('click', () => done('remove'));
+    },
   });
+}
+
+async function editLocalCalendarRange(range) {
+  if (range.source !== 'custom') return;
+  const data = await rangeSheet(range);
+  if (!data) return;
+  await store.saveCalendarRange({ id: range.id, calendarId: range.calendarId, ...data });
+  toast('حُفظت تعديلات الفترة');
+}
+
+async function removeLocalCalendarRange(range) {
+  if (range.source !== 'custom') return;
+  if (!(await confirmSheet({
+    title: 'حذف هذه الفترة؟',
+    desc: 'سيُحذف هذا الاستثناء المحلي ولن يؤثر على التقويم الرسمي المعتمد.',
+    confirmLabel: 'احذف',
+    danger: true,
+  }))) return;
+  await store.removeCalendarRange(range.calendarId, range.id);
+  toast('حُذفت الفترة');
 }
 
 /**
@@ -653,89 +684,107 @@ function newTermSheet(yearId, nextIndex) {
 
 function rangeSheet(existing = null) {
   const d = existing ?? { startDate: todayISO(), endDate: '', kind: 'holiday', label: '' };
-  const officialHolidays = store.calendarRangesOf(store.activeYear()?.id)
-    .filter((range) => range.source?.startsWith('preset:') && !isTeachingDay(range.kind));
+  const officialHolidays = officialRangeChoices(store.calendarRangesOf(store.activeYear()?.id)
+    .filter((range) => range.source?.startsWith('preset:') && !isTeachingDay(range.kind)));
   return openSheet({
-    title: existing ? 'تعديل الفترة' : 'إضافة استثناء محلي',
+    title: existing ? 'تعديل الاستثناء' : 'إضافة استثناء للتقويم',
     body: html`
-      <form id="range-form">
-        <div class="field-row">
+      <form id="range-form" class="calendar-exception-form" novalidate>
+        <fieldset class="calendar-exception-types">
+          <legend>نوع الاستثناء</legend>
+          <div class="calendar-exception-options">
+            <label><input type="radio" name="kind" value="study" ${d.kind === 'study' ? 'checked' : ''} />دراسة حضورية</label>
+            <label><input type="radio" name="kind" value="remote" ${d.kind === 'remote' ? 'checked' : ''} />دراسة عن بُعد</label>
+            <label><input type="radio" name="kind" value="holiday" ${d.kind === 'holiday' ? 'checked' : ''} />إجازة / تعليق دراسة</label>
+          </div>
+        </fieldset>
+        <div class="calendar-exception-fields">
+          <div class="field" data-holiday-context ${d.kind === 'holiday' ? '' : 'hidden'}>
+            <label class="field" for="holiday-reference">
+              <span class="field__label">اختر الإجازة</span>
+            </label>
+            <select class="select" id="holiday-reference" name="holidayReference">
+              <option value="">اختر الإجازة</option>
+              ${officialHolidays.map((range, index) => html`<option value="${index}">${range.label} · ${fmtDateRange(range.startDate, range.endDate)}</option>`)}
+              <option value="other" ${existing && d.kind === 'holiday' ? 'selected' : ''}>إجازة أخرى</option>
+            </select>
+            <p class="calendar-exception-hint" data-holiday-hint hidden></p>
+          </div>
           <label class="field">
+            <span class="field__label">اسم الاستثناء *</span>
+            <input class="input" name="label" value="${d.label ?? ''}" placeholder="اكتب اسم الاستثناء" maxlength="80" required />
+          </label>
+          <div class="calendar-exception-dates">
+            <label class="field">
             <span class="field__label">من *</span>
             <input class="input tabular" name="startDate" type="date" value="${d.startDate}" required />
-          </label>
-          <label class="field">
+            </label>
+            <label class="field">
             <span class="field__label">إلى</span>
             <input class="input tabular" name="endDate" type="date" value="${d.endDate ?? ''}" />
-          </label>
+            </label>
+          </div>
+          <p class="calendar-exception-hint" data-type-hint></p>
+          <p class="calendar-exception-error" data-form-error role="alert" hidden></p>
         </div>
-        <label class="field">
-          <span class="field__label">نوع اليوم / الفترة</span>
-          <select class="select" name="kind">
-            <option value="study" ${d.kind === 'study' ? 'selected' : ''}>دراسة حضورية</option>
-            <option value="remote" ${d.kind === 'remote' ? 'selected' : ''}>دراسة عن بُعد</option>
-            <option value="holiday" ${d.kind === 'holiday' ? 'selected' : ''}>إجازة / تعليق دراسة</option>
-          </select>
-        </label>
-        <div class="field" data-holiday-context style="${d.kind === 'holiday' ? '' : 'display:none'}">
-          <label class="field" for="holiday-reference">
-            <span class="field__label">اختر الإجازة</span>
-          </label>
-          <select class="select" id="holiday-reference" name="holidayReference">
-            <option value="">اختر الإجازة</option>
-            ${officialHolidays.map((range, index) => html`<option value="${index}">${range.label}</option>`)}
-            <option value="other" ${existing && d.kind === 'holiday' ? 'selected' : ''}>إجازة أخرى</option>
-          </select>
-          <p class="t-3 fs-xs" data-holiday-hint style="display:none"></p>
-        </div>
-        <label class="field">
-          <span class="field__label">الوصف أو اسم الإجازة *</span>
-          <input
-            class="input"
-            name="label"
-            value="${d.label ?? ''}"
-            placeholder="مثال: إجازة مطولة خاصة، تعليق للأحوال الجوية..."
-            maxlength="80"
-            required
-          />
-        </label>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="range-form">حفظ الفترة</button>
+      <button class="btn btn--primary" form="range-form">${existing ? 'حفظ التعديل' : 'إضافة الاستثناء'}</button>
     `,
     onMount: (root, done) => {
       const form = root.querySelector('#range-form');
-      const kind = form.elements.kind;
       const reference = form.elements.holidayReference;
       const context = form.querySelector('[data-holiday-context]');
       const hint = form.querySelector('[data-holiday-hint]');
       const label = form.elements.label;
-      kind.addEventListener('change', () => {
-        context.style.display = kind.value === 'holiday' ? '' : 'none';
-        hint.style.display = 'none';
-        reference.value = existing && kind.value === 'holiday' ? 'other' : '';
-      });
+      const error = form.querySelector('[data-form-error]');
+      const showError = (message) => { error.textContent = message; error.hidden = !message; };
+      form.addEventListener('input', () => showError(''));
+      const kind = () => form.querySelector('input[name="kind"]:checked').value;
+      let generatedLabel = null;
+      const updateType = () => {
+        context.hidden = kind() !== 'holiday';
+        form.querySelector('[data-type-hint]').textContent = kind() === 'remote'
+          ? 'يوم تدريس عن بُعد، وفق توقيت عن بُعد الحالي.'
+          : kind() === 'study'
+          ? 'يوم تدريس حضوري، وفق التوقيت المعتاد.'
+          : 'ترك تاريخ النهاية فارغًا يعني يومًا واحدًا.';
+      };
+      form.querySelectorAll('input[name="kind"]').forEach((input) => input.addEventListener('change', () => {
+        if (kind() !== 'holiday' && label.value === generatedLabel) label.value = '';
+        if (kind() !== 'holiday') generatedLabel = null;
+        hint.hidden = true;
+        reference.value = existing && kind() === 'holiday' ? 'other' : '';
+        updateType();
+      }));
       reference.addEventListener('change', () => {
         const range = officialHolidays[Number(reference.value)];
         if (reference.value === '' || reference.value === 'other' || !range) {
-          hint.style.display = 'none';
+          hint.hidden = true;
+          if (label.value === generatedLabel) label.value = '';
+          generatedLabel = null;
           return;
         }
         hint.innerHTML = html`الإجازة المرجعية: ${fmtDateRange(range.startDate, range.endDate)}. حدّد تواريخ استثنائك.`.value;
-        hint.style.display = '';
-        if (!label.value.trim()) label.value = `استثناء ${range.label}`;
+        hint.hidden = false;
+        const nextGenerated = `استثناء ${range.label}`;
+        if (!label.value.trim() || label.value === generatedLabel) label.value = nextGenerated;
+        generatedLabel = nextGenerated;
       });
+      updateType();
       root.querySelector('#range-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const f = new FormData(event.target);
         if (f.get('kind') === 'holiday' && !f.get('holidayReference'))
-          return toast('اختر الإجازة أو إجازة أخرى.', 'danger');
+          return showError('اختر الإجازة أو إجازة أخرى.');
         const startDate = String(f.get('startDate'));
         const endDate = String(f.get('endDate') || startDate);
+        if (!String(f.get('label') ?? '').trim()) return showError('اكتب اسم الاستثناء.');
+        if (!startDate) return showError('حدّد تاريخ البداية.');
         if (endDate < startDate)
-          return toast('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.', 'danger');
+          return showError('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.');
         done({
           startDate,
           endDate,
@@ -797,7 +846,6 @@ export default {
     const preset = store.calendarPresetForYear(year?.id) ?? getCalendarPreset(store.state.device?.preferredEducationRegion);
     const ranges = store.calendarRangesOf(year?.id);
     const today = todayISO();
-    const totalDaysCount = ranges.reduce((n, range) => n + range.days.length, 0);
 
     const activeRegion = getSaudiEducationRegion(preset?.id ?? store.state.device?.preferredEducationRegion);
 
@@ -849,10 +897,6 @@ export default {
       : [];
 
     // 3. تصفية الفترات حسب التبويب
-    const officialCount = ranges.filter((r) => r.source.startsWith('preset:')).length;
-    const exceptionsCount = ranges.filter((r) => !r.source.startsWith('preset:')).length;
-    const upcomingCount = upcomingRanges.length;
-
     let filteredRanges = ranges;
     if (activeFilter === 'upcoming') filteredRanges = upcomingRanges;
     else if (activeFilter === 'official')
@@ -988,24 +1032,10 @@ export default {
 
                     <!-- تأثير الحصص على جدول المعلم -->
                     <div class="cal-milestone-affected">
-                      ${nextMilestoneAffected.length > 0
-                        ? html`
-                            <span class="tabular">
-                              ${nextMilestoneAffected.length} حصص متأثرة
-                            </span>
-                            <button
-                              class="cal-overview-link"
-                              data-act="view-affected"
-                              data-id="${nextMilestone.id}"
-                            >
-                              عرض الحصص المتأثرة
-                            </button>
-                          `
-                        : html`
-                            <span class="t-3 fs-xs">
-                              لا توجد حصص مجدولة في أيام التدريس المتزامنة مع هذه الفترة.
-                            </span>
-                          `}
+                      <span class="tabular">${nextMilestoneAffected.length} حصص متأثرة</span>
+                      <button class="cal-overview-link" data-act="view-affected" data-id="${nextMilestone.id}">
+                        عرض الحصص المتأثرة
+                      </button>
                     </div>
                   </div>
 
@@ -1110,7 +1140,6 @@ export default {
         <div class="section__head">
           <div>
             <h3 class="section__title">الإجازات والفترات الدراسية</h3>
-            <span class="t-3 fs-sm">${ranges.length} فترات تشمل ${totalDaysCount} يومًا</span>
           </div>
           <button class="btn btn--primary btn--sm" data-act="add" aria-label="إضافة استثناء">
             ${icon('plus')} إضافة استثناء
@@ -1118,7 +1147,7 @@ export default {
         </div>
 
         <!-- تبويبات التصفية السريعة -->
-        <div class="cal-filters-row" role="group" aria-label="تصفية فترات التقويم">
+        <div class="cal-filters-row holiday-filters" role="group" aria-label="تصفية فترات التقويم">
           <button
             type="button"
             class="cal-filter-btn ${activeFilter === 'upcoming' ? 'is-active' : ''}"
@@ -1127,7 +1156,6 @@ export default {
             aria-pressed="${activeFilter === 'upcoming' ? 'true' : 'false'}"
           >
             <span>القادمة</span>
-            <span class="cal-filter-btn__count tabular">${upcomingCount}</span>
           </button>
           <button
             type="button"
@@ -1137,7 +1165,6 @@ export default {
             aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
           >
             <span>الكل</span>
-            <span class="cal-filter-btn__count tabular">${ranges.length}</span>
           </button>
           <button
             type="button"
@@ -1147,7 +1174,6 @@ export default {
             aria-pressed="${activeFilter === 'official' ? 'true' : 'false'}"
           >
             <span>رسمية معتمدة</span>
-            <span class="cal-filter-btn__count tabular">${officialCount}</span>
           </button>
           <button
             type="button"
@@ -1157,29 +1183,27 @@ export default {
             aria-pressed="${activeFilter === 'exceptions' ? 'true' : 'false'}"
           >
             <span>استثناءات محلية</span>
-            <span class="cal-filter-btn__count tabular">${exceptionsCount}</span>
           </button>
         </div>
+        <p class="holiday-count" aria-live="polite">${filteredRanges.length} ${activeFilter === 'exceptions' ? 'استثناءات محلية' : activeFilter === 'upcoming' ? 'إجازات قادمة أو جارية' : 'فترات'}</p>
 
         <!-- قائمة الفترات -->
         ${filteredRanges.length === 0
           ? html`
-              <div class="card card--pad text-center py-6">
-                <div class="t-3 fs-sm mb-3">
-                  ${activeFilter === 'exceptions'
-                    ? 'لم تُسجَّل أي استثناءات محلية بعد. جميع الفترات الحالية مطابقة للتقويم الرسمي.'
-                    : 'لا توجد فترات مطابقة لهذا الاختيار.'}
-                </div>
+              <div class="holiday-list holiday-empty">
+                <h4>${activeFilter === 'upcoming' ? 'لا توجد إجازات قادمة' : 'لا توجد فترات بهذا الاختيار'}</h4>
+                <p>${activeFilter === 'upcoming' ? 'يمكنك مراجعة الكل أو إضافة استثناء.' : 'جرّب اختيارًا آخر من شريط التصفية.'}</p>
               </div>
             `
           : html`
-              <div class="cal-timeline-list">
+              <div class="cal-timeline-list holiday-list">
                 ${filteredRanges.map((range) => {
                   const meta = CALENDAR_KIND[range.kind] ?? CALENDAR_KIND.holiday;
                   const tone = calendarTone(range.kind);
                   const isOfficial = range.source.startsWith('preset:');
                   const relStatus = getRelativeStatus(range.startDate, range.endDate, today);
                   const isCurrentNow = relStatus.text === 'جارية الآن';
+                  const showRelative = activeFilter !== 'upcoming' || range.startDate <= today;
 
                   const startP = parseParts(range.startDate);
                   const endP = parseParts(range.endDate);
@@ -1191,89 +1215,24 @@ export default {
                       ? String(startP.day)
                       : '';
 
-                  const affectedCount = getAffectedSchedule(
-                    range.startDate,
-                    range.endDate
-                  ).length;
-
                   return html`
-                    <div
-                      class="cal-period-row calendar-period calendar-period--${tone} ${isCurrentNow
+                    <article
+                      class="cal-period-row holiday-row calendar-period calendar-period--${tone} ${isCurrentNow
                         ? 'cal-period-row--active'
                         : ''}"
                     >
-                      <div class="cal-period-top">
-                        <!-- بلاطة التاريخ -->
-                        <div class="cal-date-tile" aria-hidden="true">
-                          <span class="cal-date-tile__day">${dayDisplay}</span>
-                          <span class="cal-date-tile__month">${monthName}</span>
-                        </div>
-
-                        <!-- تفاصيل الفترة -->
-                        <div class="cal-period-info">
-                          <div class="cal-period-title-wrap">
-                            <span class="cal-period-title">${range.label || calendarLabel(range.kind, meta)}</span>
-                            <span class="badge ${isOfficial ? 'badge--ok' : 'badge--warn'}">
-                              ${isOfficial ? 'رسمي' : 'استثناء محلي'}
-                            </span>
-                            <span class="badge badge--${relStatus.tone}">
-                              ${relStatus.text}
-                            </span>
-                            ${affectedCount > 0 ? html`<span class="cal-period-affected-count">${affectedCount} حصص متأثرة</span>` : ''}
-                          </div>
-
-                          <div class="cal-period-sub">
-                            <span class="tabular">${fmtDateRange(range.startDate, range.endDate)}</span>
-                            <span>·</span>
-                            <span>${durationLabel(range.startDate, range.endDate)}</span>
-                            <span>·</span>
-                            <span>${calendarLabel(range.kind, meta)}</span>
-                          </div>
-
-                          <div
-                            class="cal-period-impact ${range.kind === 'remote'
-                              ? 'cal-period-impact--remote'
-                              : ''}"
-                          >
-                            ${!isTeachingDay(range.kind)
-                              ? 'إجازة معتمدة · تُستبعد الحصص من حساب الغياب والتقارير'
-                              : range.kind === 'remote'
-                              ? 'دراسة عن بُعد · تُحتسب الحصص كتعليم عن بُعد'
-                              : 'فترة دراسية حضورية'}
-                          </div>
-                        </div>
+                      <div class="cal-date-tile holiday-date" aria-hidden="true">
+                        <strong class="cal-date-tile__day">${dayDisplay}</strong>
+                        <small class="cal-date-tile__month">${monthName}${startP && endP && startP.month !== endP.month ? ` / ${AR_MONTHS[endP.month - 1]}` : ''}</small>
                       </div>
-
-                      <!-- الإجراءات -->
-                      <div class="cal-period-actions">
-                        <button
-                          class="cal-period-detail"
-                          data-act="view-affected"
-                          data-id="${range.id}"
-                          aria-label="تفاصيل ${range.label || calendarLabel(range.kind, meta)}"
-                        >${icon('chev')}</button>
-                        ${isOfficial
-                          ? ''
-                          : html`
-                              <button
-                                class="iconbtn"
-                                data-act="edit"
-                                data-id="${range.id}"
-                                aria-label="تعديل الفترة"
-                              >
-                                ${icon('edit')}
-                              </button>
-                              <button
-                                class="iconbtn text-danger"
-                                data-act="remove"
-                                data-id="${range.id}"
-                                aria-label="حذف الفترة"
-                              >
-                                ${icon('trash')}
-                              </button>
-                            `}
+                      <div class="cal-period-info holiday-info">
+                        <h4 class="cal-period-title">${range.label || calendarLabel(range.kind, meta)}</h4>
+                        <p>${durationLabel(range.startDate, range.endDate)} · ${range.kind === 'remote' ? 'دراسة عن بُعد' : range.kind === 'study' ? 'دراسة حضورية' : isOfficial ? 'إجازة معتمدة' : 'إجازة محلية'}${showRelative ? html`<span class="holiday-relative-inline"> · ${relStatus.text}</span>` : ''}</p>
+                        <span class="sr-only">${fmtDateRange(range.startDate, range.endDate)}</span>
                       </div>
-                    </div>
+                      ${showRelative ? html`<span class="holiday-state ${isCurrentNow ? 'current' : ''}">${relStatus.text}</span>` : ''}
+                      <button class="cal-period-detail holiday-detail" data-act="view-affected" data-id="${range.id}" aria-label="تفاصيل ${range.label || calendarLabel(range.kind, meta)}">${icon('chev')}</button>
+                    </article>
                   `;
                 })}
               </div>
@@ -1298,10 +1257,12 @@ export default {
       calendarSettingsSheet();
     },
 
-    'view-affected'(el) {
+    async 'view-affected'(el) {
       const range = store.calendarRangesOf().find((item) => item.id === el.dataset.id);
       if (!range) return;
-      affectedSessionsSheet(range);
+      const action = await affectedSessionsSheet(range);
+      if (action === 'edit') await editLocalCalendarRange(range);
+      if (action === 'remove') await removeLocalCalendarRange(range);
     },
 
     filter(el) {
@@ -1335,26 +1296,13 @@ export default {
     async edit(el) {
       const range = store.calendarRangesOf().find((item) => item.id === el.dataset.id);
       if (!range) return;
-      const data = await rangeSheet(range);
-      if (!data) return;
-      await store.saveCalendarRange({ id: range.id, calendarId: range.calendarId, ...data });
-      toast('حُفظت تعديلات الفترة');
+      await editLocalCalendarRange(range);
     },
 
     async remove(el) {
       const range = store.calendarRangesOf().find((item) => item.id === el.dataset.id);
       if (!range) return;
-      if (
-        !(await confirmSheet({
-          title: 'حذف هذه الفترة؟',
-          desc: 'سيُحذف هذا الاستثناء المحلي ولن يؤثر على التقويم الرسمي المعتمد.',
-          confirmLabel: 'احذف',
-          danger: true,
-        }))
-      )
-        return;
-      await store.removeCalendarRange(range.calendarId, range.id);
-      toast('حُذفت الفترة');
+      await removeLocalCalendarRange(range);
     },
 
     async 'edit-term'(el) {

@@ -1,10 +1,13 @@
+import 'fake-indexeddb/auto';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
   createDemoDataset, clearDemoRequest, demoRequestState, isDemoPreparing,
-  isDemoRequested, markDemoReady, requestDemo,
+  isDemoRequested, markDemoReady, requestDemo, seedDemoWorkspace,
 } from '../src/lib/demo-workspace.js';
+import * as db from '../src/lib/db.js';
+import { getCalendarPreset } from '../src/lib/calendar-presets.js';
 import { createSyncOwnershipGuard } from '../src/lib/sync-ownership.js';
 import { demoDescriptor } from '../src/lib/workspaces.js';
 import { DEFAULT_TIME_PROFILES } from '../src/models.js';
@@ -51,12 +54,38 @@ test('deterministic demo dataset is substantial, isolated, and excludes deferred
   assert.equal(first.assignments.length, 0);
   assert.equal(first.submissions.length, 0);
   assert.equal(first.outbox.length, 0);
+  assert.equal(first.years[0].calendarPresetId, getCalendarPreset('general').id);
+  assert.ok(first.terms.some((term) => term.name === 'الفصل الدراسي الثاني' && term.calendarId === 'demo:calendar:official'));
+  assert.equal(first.calendarDays.length, getCalendarPreset('general').holidays.reduce((count, holiday) => count + (Date.parse(holiday.endDate) - Date.parse(holiday.startDate)) / 86400000 + 1, 0));
+  assert.equal(new Set(first.calendarDays.map((day) => day.rangeId)).size, getCalendarPreset('general').holidays.length);
   const standardProfileIds = new Set(DEFAULT_TIME_PROFILES.map((profile) => profile.id));
   for (const rows of Object.values(first).filter(Array.isArray)) {
     for (const row of rows) {
       assert.ok(row.id === 'profile' || row.id === 'device' || standardProfileIds.has(row.id) || String(row.id).includes('demo:'), `unexpected demo id: ${row.id}`);
     }
   }
+});
+
+test('Demo v3 upgrades its official calendar without erasing local edits, and reset restores the preset', async () => {
+  db.selectDatabase('rakeezx-demo');
+  const sample = createDemoDataset();
+  const oldYear = { id: sample.years[0].id, hijriStart: 1448, status: 'active', updatedAt: 1, deleted: false };
+  const oldTerm = { id: sample.terms[0].id, yearId: oldYear.id, index: 1, name: 'الفصل الدراسي الأول', startDate: sample.terms[0].startDate, endDate: sample.terms[0].endDate, calendarId: null, updatedAt: 1, deleted: false };
+  const localDay = { id: 'demo:local-day', calendarId: 'demo:calendar', date: '2026-10-14', kind: 'holiday', label: 'إجازة تجريبية محلية', updatedAt: 2, deleted: false };
+  await db.writeAll({ meta: [{ id: 'demo:workspace-seed-v3', version: 3 }], years: [oldYear], terms: [oldTerm], calendars: [sample.calendars[0]], calendarDays: [localDay] }, 'replace');
+  const upgrade = await seedDemoWorkspace();
+  assert.equal(upgrade.upgraded, true);
+  assert.deepEqual(await db.get('calendarDays', localDay.id), localDay);
+  assert.equal((await db.get('years', oldYear.id)).calendarPresetId, getCalendarPreset('general').id);
+  assert.equal((await db.get('terms', oldTerm.id)).calendarId, 'demo:calendar:official');
+  assert.equal((await db.getAll('calendarDays')).filter((day) => day.calendarId === 'demo:calendar:official').length, sample.calendarDays.length);
+  assert.ok(await db.get('meta', 'demo:workspace-seed-v4'));
+  assert.deepEqual(await seedDemoWorkspace(), { seeded: false });
+  const reset = await seedDemoWorkspace({ force: true });
+  assert.equal(reset.seeded, true);
+  assert.equal(await db.get('calendarDays', localDay.id), undefined);
+  assert.equal((await db.getAll('calendarDays')).length, sample.calendarDays.length);
+  await db.closeDB();
 });
 
 test('demo roster, naming, timetable, and canonical timing profiles are realistic and consistent', () => {
