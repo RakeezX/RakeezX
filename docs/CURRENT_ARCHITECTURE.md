@@ -1,6 +1,6 @@
 # RAKEEZ X — current source architecture
 
-Calendar range lifecycle reconciled against repository source at `6d1d255aa4dfa51f44f95b841a5d88541e7a87be` on 2026-09-30; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
+Calendar range and suspension contracts reconciled against repository source at `0700d55331f1f66678ec236f5de8bad776a6d933` on 2026-10-01; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
 
 ## Authorities and entry points
 
@@ -17,7 +17,7 @@ Calendar range lifecycle reconciled against repository source at `6d1d255aa4dfa5
 
 ## Cloud, Sync, and bootstrap
 
-- Repository SQL lives in `supabase/migrations/`, through `20260930094421_calendar_day_active_identity.sql`. Applied migrations are immutable. The directory alone is **not** proof of live migration history; the latest Production head was verified in the N50 backend flow and recorded in [Project State](PROJECT_STATE.md).
+- Repository SQL lives in `supabase/migrations/`, through `20260930234353_calendar_suspension_kind.sql`. Applied migrations are immutable. The directory alone is **not** proof of live migration history; the latest Production head was verified in the 0446.1 backend flow and recorded in [Project State](PROJECT_STATE.md).
 - `src/lib/sync-v2.js` defines versioned entities, owner-bound outbox mutations, revisions, dependencies, and reconciliation. `src/lib/sync.js` orchestrates automatic/manual synchronization; `src/lib/cloud.js` maps client calls to authenticated Supabase endpoints/RPCs. No direct browser `service_role` path is allowed. Owner Guard and RLS remain mandatory.
 - New accounts must pass required profile and owner-bound provisioning (`src/lib/account-profile.js`, `account-provisioning.js`, app gate) before editable Home. Existing claimed accounts route only to their own local workspace.
 - `src/lib/initial-restore.js` supports `CORE_V2` with `CORE_V1` compatibility. It validates an owner-scoped manifest and consistent cloud snapshot before making a fresh local account workspace READY. Fresh offline clients do not invent an editable real workspace; previously verified claimed clients may continue locally offline.
@@ -36,7 +36,13 @@ Calendar range lifecycle reconciled against repository source at `6d1d255aa4dfa5
 
 - Modern custom exception range identity is reconstructed from the exact persisted day-ID structure; genuine legacy single-day rows remain independent identities. Range edit, move and delete queue explicit Sync V2 DELETE operations for removed days. Calendar range writes and their outbox changes are atomic.
 - The applied `20260930094421_calendar_day_active_identity` migration removed the old full `calendar_days` natural unique constraint. The active-only `calendar_days_active_natural_uniq` index enforces `(owner_id, calendar_id, date)` only where `deleted_at IS NULL`. Reusable-after-delete includes `calendar_days`: the same natural key may be used by a **new active row**, while the old tombstoned ID remains protected against stale-ID resurrection.
-- Official preset multi-day display identity is reconstructed only when the exact known preset source and definition, plus date/kind/label guards, match. No server `rangeId`, `rangeStart` or `rangeEnd` columns were added. Bug #04 is PO Production-verified and CLOSED; overall N50 remains OPEN for distinct suspension and remaining approved Work transfer.
+- Official preset multi-day display identity is reconstructed only when the exact known preset source and definition, plus date/kind/label guards, match. No server `rangeId`, `rangeStart` or `rangeEnd` columns were added. Bug #04 is PO Production-verified and CLOSED; its active-only uniqueness and tombstone lifecycle remain unchanged by suspension. Overall N50 remains OPEN for the remaining approved Work transfer.
+
+## Distinct Calendar suspension — N50 / 0446
+
+- `holiday` (إجازة) and `suspension` (تعليق دراسة) are distinct persisted Calendar kinds and both are non-teaching; `remote` remains teaching. The applied `20260930234353_calendar_suspension_kind` migration extends only the Calendar day kind constraint. The existing generic Sync V2 kind mapping and Backup/Restore preserve the distinct kind.
+- Session persistence still uses `cancelled_holiday` for Calendar non-teaching days; no new persisted session status, attendance state or range columns were added. Contextual teacher-facing presentation resolves the session's teaching → term → year Calendar day and labels a suspension as تعليق دراسة while retaining ordinary holiday/manual-session presentation otherwise.
+- Home/Today follows the current effective non-teaching Calendar day for operational presentation, suppressing current-day teaching obligations without deleting or rewriting historical sessions or attendance. Demo uses the same teaching predicate locally and does not gain Product cloud access. Suspension is PO Production-verified and CLOSED; the remaining WA-CALENDAR-0417 visual/UX transfer is unshipped and needs separate authorization.
 
 ## Offline shell and presentation
 

@@ -9,7 +9,7 @@ Canonical index for PO-approved Work outcomes that remain relevant to Product im
 | WA-REFINEMENT-0440-2 | N03, N08, N13, N34, N38, OTP email and Product entry | APPROVED by later PO decision in 0445 | VERIFIED: final 0440.2 handoff and prior 99 files | NOT_AUTHORIZED; N13 architecture requires separate decision | none / none | [Contract](work-approvals/WA-REFINEMENT-0440-2.md) |
 | WA-N53-N54-0434 | N53, N54 | APPROVED: N54 Option A | VERIFIED for Work files; N54 Product solution reopened | N53 NOT_AUTHORIZED; N54 BLOCKED | N54 attempted Product solution rejected / no Production | [Contract](work-approvals/WA-N53-N54-0434.md) |
 
-The 0443/0444 Production release closed **N50 Bug #04 only**. N50 overall, N51 and N55 remain open; the complete Calendar Work contract has not been shipped. Do not use the older suspension candidate based on `59164d1076d98bfffc82e9fc36382d72c447b505` without a new ticket and selective review against Product baseline `6d1d255aa4dfa51f44f95b841a5d88541e7a87be`.
+N50 Bug #04 closed after the 0443/0444 Production flow. The distinct suspension foundation closed separately after 0446.4 Production and PO verification in 0446.5. N50 overall, N51 and N55 remain open; the complete Calendar 0417 visual/UX contract has **not** shipped. Its remaining Product transfer is `NOT_AUTHORIZED` until a separate ticket selects that scope. Current Product baseline: `0700d55331f1f66678ec236f5de8bad776a6d933`.
 
 ## State and authority
 

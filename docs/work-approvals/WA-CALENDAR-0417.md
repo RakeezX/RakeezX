@@ -9,7 +9,7 @@
 | PO decision | N50/N51/N55 final Work outcome approved **after** the 0417 handoff; recorded in 0445. The handoff's earlier “PO REVIEW PENDING” is historical, not current status. |
 | WORK_APPROVAL / SOURCE_STATE | `APPROVED` / `VERIFIED` at registry creation; recheck [manifest](WA-CALENDAR-0417.manifest.json) before use |
 | Implementation authorization / state | No new Product ticket authorized by 0445 / `NOT_AUTHORIZED` for remaining Work scope. Overall N50/N51/N55 OPEN. |
-| Codex / Preview / Production | N50 Bug #04 range lifecycle shipped separately at `6d1d255aa4dfa51f44f95b841a5d88541e7a87be` and PO-verified CLOSED. Full 0417 visual contract and N51/N55: no completed Codex port, Preview or Production approval recorded. |
+| Codex / Preview / Production | N50 Bug #04 range lifecycle shipped separately at `6d1d255aa4dfa51f44f95b841a5d88541e7a87be` and PO-verified CLOSED. Distinct suspension foundation shipped separately at `0700d55331f1f66678ec236f5de8bad776a6d933` and PO-verified CLOSED. Full 0417 visual contract and N51/N55: no completed Codex port, Preview or Production approval recorded. |
 | Risk / device gate | N50 data correctness and suspension: HIGH; full Calendar cross-surface fidelity: MEDIUM/HIGH. Chromium/WebKit desktop/tablet/mobile evidence exists; no physical-device result claimed in 0417. Use a real device when later interaction scope requires it. |
 
 ## Exact accepted surfaces and behavior
@@ -22,7 +22,7 @@
 
 ## Interaction sequence and exclusions
 
-Calendar entry → current-term/next context → Holidays filter or central exception action → existing add/edit/delete/affected-session flow → return with focus/state intact. N50 data work must preserve exact range identity and Sync V2 lifecycle already shipped in Bug #04. A distinct persisted suspension type is required by the later PO decision; it remains pending and must be re-evaluated from current main. Official preset dates require independent source verification before data correction.
+Calendar entry → current-term/next context → Holidays filter or central exception action → existing add/edit/delete/affected-session flow → return with focus/state intact. N50 data work must preserve exact range identity and Sync V2 lifecycle already shipped in Bug #04. A distinct persisted suspension type was shipped separately in 0446; this does not complete the remaining 0417 visual/UX transfer. Official preset dates require independent source verification before data correction.
 
 Rejected/superseded: earlier heading `الإجازات` was superseded by `الإجازات والفترات الدراسية`; old unequal 1.5:1 top-card proportion was superseded by equal 0417 cards; repeated full-width exception actions, redundant detail buttons, automatically attached weekends, and a combined holiday/suspension type are not the approved outcome. Do not treat the 0417 handoff's pending line or older Work candidates as current approval.
 

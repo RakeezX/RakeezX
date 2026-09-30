@@ -69,6 +69,8 @@ Recorded 2026-09-25; reconciled 2026-09-27 under 0346. The date below is the **r
 
 0444 status reconciliation: N50 Bug #04, the Calendar range identity/CRUD/Sync lifecycle subset of D-063, is CLOSED after explicit PO Production verification of `6d1d255aa4dfa51f44f95b841a5d88541e7a87be`. Overall N50 remains OPEN for distinct suspension and the remaining approved Work 0417 / 0435 Product transfer. D-064/N51 and D-068/D-072/N55 remain open; this closure creates no new Product decision.
 
+0446.5 status reconciliation: D-063's historical “study safe representation of suspension later; no schema chosen” portion was superseded by the later explicit PO decision and shipped 0446 contract. `holiday` and `suspension` are distinct persisted non-teaching Calendar kinds; `remote` remains teaching. Suspension is CLOSED after PO Production verification of `0700d55331f1f66678ec236f5de8bad776a6d933`. Bug #04 remains CLOSED; overall N50 remains OPEN for the remaining WA-CALENDAR-0417 Product transfer. D-064/N51 and D-068/D-072/N55 remain open. This reconciliation adds no new Product decision.
+
 D-022 is retained verbatim as the historical offline-reopen contract. D-062 deliberately supersedes only its unlimited-duration aspect; the owner/fail-closed safeguards remain. This is a new approved direction, not evidence that current runtime already enforces a lease.
 
 Class Goal / Charter is present and closed by the 0304 PO review. No separate recovery decision or ticket is open for it.
