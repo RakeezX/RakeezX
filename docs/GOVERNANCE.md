@@ -4,13 +4,17 @@
 | --- | --- |
 | Product Owner | Product acceptance and final Production review |
 | ChatGPT | Product Manager, reviewer, ticket/documentation coordinator; never substitutes for PO approval |
-| Work | Active Visual/UX authority after PO approval; Work-Active is the held lab, isolated accepted Work outcomes are ported selectively |
+| Work | Visual/UX authority only for exact outcomes explicitly recorded as PO-approved in the [Work Approval Ledger](WORK_APPROVAL_LEDGER.md); Work-Active is the held lab |
 | Production/main | Runtime, data, and deployed-contract authority |
 | Codex | Selective Production implementation, tests, document mutations and Git |
 
 Google AI Studio is parked/backup, **not** the current active visual authority. An unapproved Work experiment is not yet golden. For user-visible work, distinguish PO Work-local approval, PO Cloudflare Preview approval, and PO Production verification; none is implied by the other.
 
-Never merge a Work branch wholesale. Compare its accepted visual outcome with current Production and port only missing approved changes. Archive is history, not a runtime source. Keep applied Supabase migrations immutable; introduce a new additive migration only under a separate authorized ticket.
+Never merge a Work branch wholesale. Compare its accepted visual outcome with current Production and port only missing approved changes. “Selective implementation” means selective **ticket scope**, not selective visual interpretation: within that scope, reproduce the **complete** approved UX/visual contract. Do not omit sub-surfaces, simplify hierarchy, retain an explicitly replaced old presentation, substitute interactions or copy only easy parts. Adapt technique/wiring only to preserve current Production runtime/data semantics. If those semantics genuinely conflict, stop and report `RUNTIME-CONFLICT` to the PO. Archive is history, not a runtime source. Keep applied Supabase migrations immutable; introduce a new additive migration only under a separate authorized ticket.
+
+For Work-derived Product work, read the [Work Approval Ledger](WORK_APPROVAL_LEDGER.md) and exact approval contract before coding. Verify its SHA-256 manifest against disk; `DRIFTED` or `UNRESOLVED` source stops implementation until PO/reviewer resolution. Prepare a surface/contract matrix with `MATCHED`, `GAP`, and `RUNTIME-CONFLICT`. Close every `GAP` before Preview; never silently accept a partial outcome. Work approval alone does not authorize Codex implementation, Preview, Production or CLOSED.
+
+Visual precedence: explicit PO contract in `docs/work-approvals/` → exact manifest-bound Work artifacts → approved screenshots/results → Work handoff prose → older chats/packages. Production/main remains higher authority for runtime/data semantics. A package absent from the registry must not be assumed approved; “FINAL CANDIDATE” alone is insufficient.
 
 Any Product change that affects the RAKEEZ user experience—features, design, presentation, interaction, usage flow, or functional behavior—must also be reflected in Demo whenever that capability logically applies there. Account-specific, authentication, cloud, Supabase, and private-user-data behavior that does not logically belong in Demo is exempt. This is the PO-approved N02 parity rule; it does not authorize a particular implementation.
 
@@ -33,6 +37,7 @@ Micro-Batches may group **2–3 related low/medium-risk items** for one selectiv
 - [Decisions](DECISIONS.md): durable approved Product/architecture decisions and supersessions.
 - [Recovery Ledger](RECOVERY_LEDGER.md): historical capability dispositions and explicit deferrals; no active Recovery backlog.
 - [Product Ledger](PRODUCT_LEDGER.md): raw PO notes, triage, current/future Product follow-ups.
+- [Work Approval Ledger](WORK_APPROVAL_LEDGER.md) and `work-approvals/`: index, explicit PO visual/UX contracts and frozen source manifests for still-relevant Work approvals; not runtime/data authority.
 - [Current Architecture](CURRENT_ARCHITECTURE.md): checked-in source contracts, with its audited SHA; recheck source after a later runtime change.
 - [Test Matrix](TEST_MATRIX.md): gates selected by change risk.
 - [Release Checklist](RELEASE_CHECKLIST.md): exact-SHA promotion/review steps.

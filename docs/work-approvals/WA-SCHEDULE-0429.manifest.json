@@ -1,0 +1,158 @@
+{
+  "approval_id": "WA-SCHEDULE-0429",
+  "package_root": "D:\\Abdullah Projects\\RakeezX-Work-Schedule-0429",
+  "generated_at": "2026-09-30T18:35:04+00:00",
+  "files": [
+    {
+      "path": "HANDOFF-0425.md",
+      "sha256": "02857065fe61a27777bf23b0ceec465be092792869a6785250ab64a571298fd0",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "HANDOFF-0429.md",
+      "sha256": "3d545c7876c1ff4eafe29485eac322c8bd0838e97a4052908185a6f1ae7b95a2",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "candidate.css",
+      "sha256": "4f1a273cd277996474db1d1b45c9aebbb5c197d2535e86bdb9acbf36667f2eac",
+      "role": "review_source"
+    },
+    {
+      "path": "evidence/0429/after-1440-dark.png",
+      "sha256": "8f03dcf6e53280195c3aba527e8521bf3fe8f738041fba473af986bed64d270b",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/after-1440-light.png",
+      "sha256": "8196ff05f33f98bc78154e5bb4a42c0c2f1e673f66d574a0d6b1eb7cd5696ee6",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/after-320-dark.png",
+      "sha256": "73965e85ba12fb54bcd18b96adf6f8d17b8771e3f3fb2b0331aeb4950df9909b",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/after-320-light.png",
+      "sha256": "c9a9909c58daabfa98830caa13202c839227b9547745ffe80075a17512119c7d",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/after-390-dark.png",
+      "sha256": "670652d01112e417fd170496ad89c0c5633b53e18d9e3c14c2f7806a17d32119",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/after-390-light.png",
+      "sha256": "9d77bf31bff7a04eb34ad9ed1bd1ad3be6cbe9717df6a0f25370d6405bee0596",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/0429/manifest.json",
+      "sha256": "ba6e435fd0503d0f0b5aa794336a723e0c7b4c8304fd97aa74fa4026ae9aa050",
+      "role": "evidence_result"
+    },
+    {
+      "path": "evidence/0429/results.json",
+      "sha256": "30701c964289066d96ffb62205d548e497458ac6fb52f3e909f9dca8a640b10c",
+      "role": "evidence_result"
+    },
+    {
+      "path": "evidence/A-1024-long.png",
+      "sha256": "27689ff9264f4738ea4b6b357c310e38977c733cda176307e833fde9551ef893",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/A-1180-dense.png",
+      "sha256": "40845509b53c1155bc78b3b6389f1ed48847a4f24fdfad89a3ff65d058ccc0ca",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/A-1440-mixed.png",
+      "sha256": "3b7bed66fc2c7c936dadca701500075522e53e59f3337745b3f2f26e2dcdcb6e",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/A-320-day.png",
+      "sha256": "b90517d9a2b91280fcdcccdb804ca4d9bf2efc10ebeb19de5b3fb6ff46e53e14",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/A-390-day.png",
+      "sha256": "31dbf5094f31098df11e07839dec08f4656a773d39abfe526fd335c41e40d013",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/measurements.json",
+      "sha256": "d6edfbadb6e105a84057ce586cfb2204e03c1ebf950667d52e8ce81c08952b77",
+      "role": "evidence_result"
+    },
+    {
+      "path": "evidence/results.json",
+      "sha256": "b3c73f8cb5e6dcded8cdab3d01bcd1c9d1053ceb21efbaf887deaeab84ddb183",
+      "role": "evidence_result"
+    },
+    {
+      "path": "gallery-0429.html",
+      "sha256": "653ff4fb64dcc301e9140d9e6dd368ce31d62f1672952f07955879e583403327",
+      "role": "review_source"
+    },
+    {
+      "path": "gallery.html",
+      "sha256": "e5f75158bbc20c1158d59aeb041af16034b9ce13476465cb04822366b76b37de",
+      "role": "review_source"
+    },
+    {
+      "path": "identity.css",
+      "sha256": "5dc3c10190e9403d0569ac51fff68d9286ecf9540e3899fbb305595b527e48cc",
+      "role": "review_source"
+    },
+    {
+      "path": "index.html",
+      "sha256": "2221632c375d9d50e618babed6c17827a4fc6c885d1481371fd2764de84e5c11",
+      "role": "review_source"
+    },
+    {
+      "path": "product-app.css",
+      "sha256": "69268c7249e6fb9de11ec8fdadb17895540541f3f62ca471db27b3986be14de8",
+      "role": "review_source"
+    },
+    {
+      "path": "product-components.css",
+      "sha256": "d959c1a172f47a7087230f00d266cb7499f4b41a88326f45f140c9314e40aca7",
+      "role": "review_source"
+    },
+    {
+      "path": "schedule.html",
+      "sha256": "c20af1582fda0533f9ad069cae337e16e6b13d5a3e502bf766a8259f8bd4ec2a",
+      "role": "review_source"
+    },
+    {
+      "path": "schedule.js",
+      "sha256": "6f7e454ae5b29f16915e2a6faed4736f79d94444c8ef1488eb7c70951b7df83a",
+      "role": "review_source"
+    },
+    {
+      "path": "surface.html",
+      "sha256": "f5f8ba76853376fed7631c23df15ffe6216447b3b9fb0ad5636129c86eff0c60",
+      "role": "review_source"
+    },
+    {
+      "path": "surfaces.css",
+      "sha256": "0cca6986f30c1ce3c728aba87e3f633787a7c92a30eefef09c8913869c701021",
+      "role": "review_source"
+    },
+    {
+      "path": "surfaces.js",
+      "sha256": "68cd3eba563422a4a599664755b367be9fe4fc26647f51999525dd622886b4c0",
+      "role": "review_source"
+    },
+    {
+      "path": "toolbar.js",
+      "sha256": "76c5084d54276aa1ffef004c7662610044c29cf115925d93ec022d1416c27df0",
+      "role": "review_source"
+    }
+  ],
+  "source_state": "VERIFIED"
+}

@@ -1,0 +1,183 @@
+{
+  "approval_id": "WA-CALENDAR-0417",
+  "package_root": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417",
+  "generated_at": "2026-09-30T18:35:04+00:00",
+  "files": [
+    {
+      "path": "FILES-ADDED.txt",
+      "sha256": "856efb8f4b2af4be3a117633eb257eada4be1107debb97ea8fbf44bf70bb30a9",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "HANDOFF-0417.md",
+      "sha256": "8fb39320dfbc3f7a5d6300c1d15e7b27faa4f66119964a5be703ccec680f0ed5",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "assets/header-dark-compact.svg",
+      "sha256": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+      "role": "review_source"
+    },
+    {
+      "path": "assets/header-dark-standard.svg",
+      "sha256": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+      "role": "review_source"
+    },
+    {
+      "path": "assets/header-light-compact.svg",
+      "sha256": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+      "role": "review_source"
+    },
+    {
+      "path": "assets/header-light-standard.svg",
+      "sha256": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-balance.css",
+      "sha256": "6e016405d9350624ba50b700748a4e5994aad657ab70253927fc55ccb68e060e",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-display-labels.js",
+      "sha256": "8852c78dc38734f00716304d907a33dd25ee4784e1c4ebf9b037b0607d91ec45",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-hybrid.css",
+      "sha256": "030bda8937af3e6b8d284019c3fdf31ba28d078e1e631419c58b390b8520534a",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-page-0416.js",
+      "sha256": "d4732fb9caf62a3b5ca1ad25fd1019745ff05b19f050ec1cdacadf259a632184",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-page.css",
+      "sha256": "01be05d436189d36e7782be5c82b723e96381cfb98206ef8062caf22fde20154",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-page.js",
+      "sha256": "d4732fb9caf62a3b5ca1ad25fd1019745ff05b19f050ec1cdacadf259a632184",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-polish.css",
+      "sha256": "aa9ab00caff1138903aa798e355511aab18be01b5d942fe19a5d93cf55f808e4",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-proportion.css",
+      "sha256": "0514e0214cf9197b388284c7ec1b0d10926d47611b35c556f2c199c2fd7a34ad",
+      "role": "review_source"
+    },
+    {
+      "path": "calendar-truth.js",
+      "sha256": "7e7c789c4d241add577f0a5da3e839820881fdce2a17e462f6dc6daacf129427",
+      "role": "review_source"
+    },
+    {
+      "path": "captures/0417-1024-dark.png",
+      "sha256": "23e56a9faf0f5dbafd66ce92857b5ae89c80a85f28812840a73431d411a9621a",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-1024-light.png",
+      "sha256": "dc89f7fdb59b2352b0be5c11d3c2bbaa1cc51df9e20cc74d1cfda3278312da83",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-1366-dark.png",
+      "sha256": "0687fe683b26ef30e897b12d5786a3e0f06d1e227a3d75dde8fc656bb3f7b2d5",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-1366-light.png",
+      "sha256": "84ae4a6ba55cfa4270cad45e933207df94628f58e466f10af842c21ff108ca00",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-1440-dark.png",
+      "sha256": "d5939b9ac1d28f3c5e3982c3f55cfe55ad2cc234d1f06f814869a9f684355e08",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-1440-light.png",
+      "sha256": "7cdb40c9a6fcde25263fd19f4e5de8d6a4907a0e4c4416fca5d7132a326f6a6a",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-320-dark.png",
+      "sha256": "04d552bdb9c4aba4a1cab59e06d8959622aafb51e6044d11a4f3495419c32c1e",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-320-light.png",
+      "sha256": "30e4bb5a51c78ee01c35035b88fe39980f0ba18c3c16b96ea614bdbdc0f8421c",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-390-dark.png",
+      "sha256": "45daca8251dc5069d7532378ee45bbc9736401357a1b5d123436a4c453c223ab",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-390-light.png",
+      "sha256": "e3c1979b8cea23e3600fc848299b997afb0e3bff33af71fba521f139c8325606",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-768-dark.png",
+      "sha256": "1887772cfd857f5e1e6f2c9c41b69fbba60d3389ad9cb50b6d04f00586392049",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "captures/0417-768-light.png",
+      "sha256": "3131b6bdf5b293c5bc356a644c56bb088528d309a8d5cfab224eb7a8aa264876",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "evidence/combined-gate.json",
+      "sha256": "4d7aab6a9889f54344478b88d964ce76e9b55888d8af9fa62df1394e9383aa15",
+      "role": "evidence_result"
+    },
+    {
+      "path": "evidence/gallery-smoke.json",
+      "sha256": "2d48569a4adb93d438a891bca63c12cee39619ba52258ab877496b8ec897ead8",
+      "role": "evidence_result"
+    },
+    {
+      "path": "evidence/verification.json",
+      "sha256": "19c671285f4b3c65e2839c814ed66912a93b33663d030045ff557ea0de5f06c6",
+      "role": "evidence_result"
+    },
+    {
+      "path": "fixtures.js",
+      "sha256": "1c2e9b3394af41b7f7ae090649d2936c67553a8f1bced7438fe319097e1e6f74",
+      "role": "review_source"
+    },
+    {
+      "path": "gallery.html",
+      "sha256": "1010c50206b73d967e77dfc803ecec671aced70d3c97a32e83cd293166a8915a",
+      "role": "review_source"
+    },
+    {
+      "path": "index.html",
+      "sha256": "53d2dea5945ee95006e963b585030ecaa1ada53fe06d664f8a5b6097033618ad",
+      "role": "review_source"
+    },
+    {
+      "path": "review.css",
+      "sha256": "122695f467ad490c53526de7d028ce256998cf6648adc01548113685aff0fbc3",
+      "role": "review_source"
+    },
+    {
+      "path": "review.js",
+      "sha256": "74f175cd513974eee0da6c39002c5d4f96c907ec5f1b8e3715670aa08a4adde6",
+      "role": "review_source"
+    }
+  ],
+  "source_state": "VERIFIED"
+}

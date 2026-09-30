@@ -1,0 +1,103 @@
+{
+  "approval_id": "WA-N53-N54-0434",
+  "package_root": "D:\\Abdullah Projects",
+  "generated_at": "2026-09-30T18:35:05+00:00",
+  "files": [
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/HANDOFF.md",
+      "sha256": "fd648914ab5b7f34712346ede59aebbe8a5722c565cdae25fd7d9b04484b4d4e",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/INVENTORY.md",
+      "sha256": "67f339a8e88eb1e80d55735b13b8f1da47c1bf43910e182b8f770974d3734ff2",
+      "role": "handoff_spec"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/app.js",
+      "sha256": "e4bfa1acca7d9bfec4d965a02ceea94b3c7d4e00198fce3845da7eb475c21154",
+      "role": "review_source"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/a-320x227.png",
+      "sha256": "3f0fc8dfb5ff805035b956d5f088c04c5bb6f7faa0aa4020f50933fe2a2aec16",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/a-390x350.png",
+      "sha256": "b0df51e227027e0ef91bf29b3ed704824771e8d3d8e201d11d4b0e5af3fc159f",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/a-desktop.png",
+      "sha256": "481dbc9d50dffcce3b8e750b854871a3aac843f97502faed24f40c6a3a703b03",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/b-320x227.png",
+      "sha256": "ef6962c0a296c8a9557c1547d1e049a7f35189c378825486cf1123720fba03aa",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/b-390x350.png",
+      "sha256": "ae1bc55cf02d874768cd635ac4a405b34457182d0894cb9daee84ec42f25eced",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/b-desktop.png",
+      "sha256": "e030595e9b888a9107c4be861dbf35f57bccb54ef5a10078e4200564f0802df5",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/current-320x227.png",
+      "sha256": "cf4e0ea7fe9655ab24f5ecaa2aeb22b3f50b36a4a2929cc0ed94114cdb1c5f65",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/form-confirm.png",
+      "sha256": "fb23e3ad05562c5187d7f12f1fa159b963adc9937064863b250f563effe418e8",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/form-list.png",
+      "sha256": "0c0bf7e7b23085466c362798ed38dbc76afa6e2e4a870ffc074aca8a165c0c05",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/form-long.png",
+      "sha256": "3eeeec213a90ebf097893bed346d6f1be7fe83b2c3920074066cd48d8a0c45e5",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/form-medium.png",
+      "sha256": "0c7950608ac0ab6a5962cf39e3c118ba32e4bfbbc04a1d16026daa029b0420b9",
+      "role": "approved_screenshot"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/evidence/results.json",
+      "sha256": "faea191485a1800c0654baedbe2e1e82f9a51994091f4f434c179a7bb3b2f877",
+      "role": "evidence_result"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/gallery.html",
+      "sha256": "f5a899f2151a778531f6c8a863b3079a8cebec56e304baa3727786718de8c9cd",
+      "role": "review_source"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/index.html",
+      "sha256": "b4933310fe6b7015312b99f14492618ce27859461094c46ed58aad5fbf4cc7b8",
+      "role": "review_source"
+    },
+    {
+      "path": "RakeezX-Work-Overnight-0430/n53-n54/style.css",
+      "sha256": "e2b45b1238ac85fb8fcb8199877486a20a7bb318d41d8eb5149fc0aaf8f451c9",
+      "role": "review_source"
+    },
+    {
+      "path": "RakeezX-Work-Refinement-0434/HANDOFF.md",
+      "sha256": "0c2046e55c2e081939933221c98bb294e9cbcf7624c989dba6ae6d0b7425d6c5",
+      "role": "handoff_spec"
+    }
+  ],
+  "source_state": "VERIFIED"
+}

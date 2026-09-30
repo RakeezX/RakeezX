@@ -2,6 +2,8 @@
 
 The Agent Bridge is a small internal CLI that packages exact, reviewable candidates outside Product repositories. It records hashes, approval, validation freshness, and resume evidence. It never promotes, pushes, deploys, applies migrations, or kills processes.
 
+For Work-derived tickets, [Work Approval Ledger](WORK_APPROVAL_LEDGER.md) and the exact `WORK_APPROVAL_ID` contract define **what must be built**. Agent Bridge/Git exact candidate records **what was built**; Preview/Production evidence records **what was shipped**. A Work-derived Bridge handoff should reference its `WORK_APPROVAL_ID` when one exists. Bridge approval/patch hashes do not replace PO Work approval, source-manifest freshness or the zero-GAP fidelity matrix.
+
 ## Handoff root
 
 Set `RAKEEZ_HANDOFF_ROOT` or pass `--root`. The Windows default is:
