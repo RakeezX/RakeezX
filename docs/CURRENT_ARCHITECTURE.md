@@ -1,6 +1,6 @@
 # RAKEEZ X — current source architecture
 
-Checked against repository source at `e3fed26523538a65978daf83d81805f8cb0a7cfe` on 2026-09-27. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
+Calendar range lifecycle reconciled against repository source at `6d1d255aa4dfa51f44f95b841a5d88541e7a87be` on 2026-09-30; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
 
 ## Authorities and entry points
 
@@ -17,7 +17,7 @@ Checked against repository source at `e3fed26523538a65978daf83d81805f8cb0a7cfe` 
 
 ## Cloud, Sync, and bootstrap
 
-- Repository SQL lives in `supabase/migrations/`, through `20260926115629_owner_sync_invalidation.sql`. Applied migrations are immutable. The directory is **not** proof of live migration history; query the approved Production metadata path before any schema claim or change.
+- Repository SQL lives in `supabase/migrations/`, through `20260930094421_calendar_day_active_identity.sql`. Applied migrations are immutable. The directory alone is **not** proof of live migration history; the latest Production head was verified in the N50 backend flow and recorded in [Project State](PROJECT_STATE.md).
 - `src/lib/sync-v2.js` defines versioned entities, owner-bound outbox mutations, revisions, dependencies, and reconciliation. `src/lib/sync.js` orchestrates automatic/manual synchronization; `src/lib/cloud.js` maps client calls to authenticated Supabase endpoints/RPCs. No direct browser `service_role` path is allowed. Owner Guard and RLS remain mandatory.
 - New accounts must pass required profile and owner-bound provisioning (`src/lib/account-profile.js`, `account-provisioning.js`, app gate) before editable Home. Existing claimed accounts route only to their own local workspace.
 - `src/lib/initial-restore.js` supports `CORE_V2` with `CORE_V1` compatibility. It validates an owner-scoped manifest and consistent cloud snapshot before making a fresh local account workspace READY. Fresh offline clients do not invent an editable real workspace; previously verified claimed clients may continue locally offline.
@@ -31,6 +31,12 @@ Checked against repository source at `e3fed26523538a65978daf83d81805f8cb0a7cfe` 
 - The source includes additive `20260926115629_owner_sync_invalidation.sql`. Production application was verified in the earlier backend ticket, not re-executed by this docs checkpoint. No-Web-Locks environments lack automatic remote wake-up but retain safe manual/reconnect convergence. Chromium/Edge/WebKit evidence is recorded; physical Safari/iOS was not available. Phase 3 broader store-level/incremental/full-pass optimization is deferred.
 - N27 removal readiness uses authoritative `summarizeSyncV2OperationalState` while preserving retained superseded evidence and fail-closed unsafe/owner states; lifecycle guards/tombstones remain. Approved return copy is “العودة”.
 - Micro-Batches 01–04 selectively delivered Quick Log/Schedule text treatments, calendar-aware Home empty states, viewport/form/profile/first-run UX, calm timed-session attendance warning/bulk confirmation and Today state hierarchy, safe subject default, active identity-aware Home search and eligible target-count grouping. Current helpers include `visible-viewport.js`, `session-start-ui.js`, `class-subject-default.js`, `student-search-ui.js` and `group-count-ui.js`. Auth, student/session identity and attendance/scoring semantics remain current Product contracts. See [Changelog](CHANGELOG.md) for release identities.
+
+## Calendar range identity and lifecycle — N50 Bug #04
+
+- Modern custom exception range identity is reconstructed from the exact persisted day-ID structure; genuine legacy single-day rows remain independent identities. Range edit, move and delete queue explicit Sync V2 DELETE operations for removed days. Calendar range writes and their outbox changes are atomic.
+- The applied `20260930094421_calendar_day_active_identity` migration removed the old full `calendar_days` natural unique constraint. The active-only `calendar_days_active_natural_uniq` index enforces `(owner_id, calendar_id, date)` only where `deleted_at IS NULL`. Reusable-after-delete includes `calendar_days`: the same natural key may be used by a **new active row**, while the old tombstoned ID remains protected against stale-ID resurrection.
+- Official preset multi-day display identity is reconstructed only when the exact known preset source and definition, plus date/kind/label guards, match. No server `rangeId`, `rangeStart` or `rangeEnd` columns were added. Bug #04 is PO Production-verified and CLOSED; overall N50 remains OPEN for distinct suspension and remaining approved Work transfer.
 
 ## Offline shell and presentation
 
