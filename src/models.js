@@ -277,13 +277,26 @@ export const CALENDAR_KIND = {
   event:    { label: 'فعالية',       teaching: true },
   remote:   { label: 'عن بُعد',      teaching: true },
   holiday:  { label: 'إجازة',        teaching: false },
+  suspension: { label: 'تعليق دراسة', teaching: false },
   national: { label: 'اليوم الوطني', teaching: false },
   founding: { label: 'يوم التأسيس',  teaching: false },
 };
-export const CALENDAR_KIND_ORDER = ['study', 'remote', 'holiday', 'national', 'founding', 'exam', 'event'];
+export const CALENDAR_KIND_ORDER = ['study', 'remote', 'holiday', 'suspension', 'national', 'founding', 'exam', 'event'];
 
 /** هل يوم بهذا التصنيف يُدرَّس فيه؟ */
 export const isTeachingDay = (kind) => CALENDAR_KIND[kind]?.teaching ?? true;
+
+/** Display-only Calendar context for the existing non-counting session status. */
+export function sessionCalendarPresentation(session, calendarDay) {
+  const base = SESSION_STATUS[session?.status] ?? SESSION_STATUS.scheduled;
+  if (session?.status !== 'cancelled_holiday' || calendarDay?.kind !== 'suspension') {
+    return { ...base, reason: session?.reason ?? '' };
+  }
+  const reason = /^إجازة(?:\s|$)/u.test(session.reason ?? '')
+    ? calendarDay.label || CALENDAR_KIND.suspension.label
+    : session.reason ?? '';
+  return { ...base, label: CALENDAR_KIND.suspension.label, reason };
+}
 
 /* ---------- ملفات توقيت الحصص ---------- */
 

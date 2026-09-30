@@ -18,8 +18,7 @@ function attendanceMeta(session) {
   return {
     completeness,
     meta: ATTENDANCE_COMPLETENESS[completeness.state]
-      ?? SESSION_STATUS[session.status]
-      ?? SESSION_STATUS.scheduled,
+      ?? store.sessionStatusPresentation(session),
   };
 }
 
@@ -66,7 +65,7 @@ function generationCard(teaching) {
       ${result
         ? result.futureOnly
           ? html`<p class="t-3 fs-sm mt-3">لا يتم إنشاء الحصص المستقبلية مسبقًا؛ ستظهر تلقائيًا حسب الجدول عند حلول تاريخها.</p>`
-          : html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة · تم تجاهل ${result.holidays} يوم إجازة${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}${result.futureClipped ? ' · تم إنشاء الحصص حتى اليوم فقط؛ الحصص المستقبلية تظهر تلقائيًا حسب الجدول.' : ''}</p>`
+          : html`<p class="t-3 fs-sm mt-3">تم إنشاء ${result.created} حصة · تم تجاوز ${result.existing} حصة موجودة${result.holidays > (result.suspensions ?? 0) ? ` · تم تجاهل ${result.holidays - (result.suspensions ?? 0)} يوم إجازة` : ''}${result.suspensions ? ` · تم تجاهل ${result.suspensions} يوم تعليق دراسة` : ''}${result.unavailable ? ` · ${result.unavailable} خانة بلا توقيت صالح` : ''}${result.futureClipped ? ' · تم إنشاء الحصص حتى اليوم فقط؛ الحصص المستقبلية تظهر تلقائيًا حسب الجدول.' : ''}</p>`
         : ''}
     </section>
   `;
@@ -108,8 +107,14 @@ export default {
       `;
     }
 
-    const tally = {};
-    for (const s of list) tally[s.status] = (tally[s.status] ?? 0) + 1;
+    const tally = new Map();
+    for (const s of list) {
+      const meta = store.sessionStatusPresentation(s);
+      const key = `${s.status}:${meta.label}`;
+      const entry = tally.get(key) ?? { status: s.status, meta, count: 0 };
+      entry.count++;
+      tally.set(key, entry);
+    }
     const executed = list.filter((s) => s.status === 'held').length;
     const countable = list.filter((s) => SESSION_STATUS[s.status]?.counts).length;
     const rate = countable ? Math.round((executed / countable) * 100) : null;
@@ -136,22 +141,22 @@ export default {
       </div>
 
       <div class="hstack gap-2 wrap session-status-legend mb-3" aria-label="ملخص حالات الحصص">
-        ${SESSION_STATUS_ORDER.filter((k) => tally[k]).map((k) => {
-          const m = SESSION_STATUS[k];
-          return html`<span class="badge ${m.tone ? 'badge--' + m.tone : ''}">
-            ${m.label} <span class="tabular">${tally[k]}</span>
+        ${[...tally.values()].sort((a, b) =>
+          SESSION_STATUS_ORDER.indexOf(a.status) - SESSION_STATUS_ORDER.indexOf(b.status)).map(({ meta, count }) => {
+          return html`<span class="badge ${meta.tone ? 'badge--' + meta.tone : ''}">
+            ${meta.label} <span class="tabular">${count}</span>
           </span>`;
         })}
       </div>
 
       <p class="t-3 fs-sm mb-3">
-        الإجازات الرسمية والحصص المجدولة التي لم يحن وقتها لا تدخل في نسبة التنفيذ،
+        الأيام غير الدراسية والحصص المجدولة التي لم يحن وقتها لا تدخل في نسبة التنفيذ،
         ولا تُسجَّل غيابًا على أحد.
       </p>
 
       <div class="list session-list">
         ${list.map((s) => {
-          const raw = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
+          const raw = store.sessionStatusPresentation(s);
           const { completeness, meta } = attendanceMeta(s);
           const memberIds = new Set(store.sessionRoster(s).members.map((student) => student.id));
           const records = store.attendanceIn(s.id).filter((record) => memberIds.has(record.studentId));
@@ -170,7 +175,7 @@ export default {
                 <span class="row__sub">
                   ${meta.label}
                   ${completeness.state !== 'excluded' && raw.label !== meta.label ? html` · ${raw.label}` : ''}
-                  ${s.reason ? html` · ${s.reason}` : ''}
+                  ${raw.reason ? html` · ${raw.reason}` : ''}
                   ${marked ? html` · <span class="tabular">${marked}</span> مرصود` : ''}
                   ${absents ? html` · <span class="tabular">${absents}</span> غياب` : ''}
                   ${lesson ? html` · ${lesson.name}` : ''}

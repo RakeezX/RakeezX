@@ -9,7 +9,7 @@ import { html, icon, toast, fmtNum, fmtPct, fmtDate, fmtDateRange, openSheet, co
 import * as store from '../store.js';
 import {
   itemScore, studentTotal, masteryBand, gradeLabel, sectionLabel,
-  ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS, SESSION_STATUS,
+  ATTENDANCE, ATTENDANCE_ORDER, ENROLLMENT_STATUS, STUDENT_STATUS,
 } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
@@ -307,7 +307,7 @@ export default {
                           ${fmtDate(event.date, false)}
                           <span class="badge">${contextKind(event)}</span>
                           ${eventContext(event).map((label) => html`<span class="badge">${label}</span> `)}
-                          ${event.session ? html`<span class="badge">${SESSION_STATUS[event.session.status]?.label ?? event.session.status}</span>` : ''}
+                          ${event.session ? html`<span class="badge">${store.sessionStatusPresentation(event.session).label}</span>` : ''}
                         </span>
                       </span>
                     </div>

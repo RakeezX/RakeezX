@@ -17,7 +17,7 @@ import {
   shareOrDownloadSchedule,
 } from "../lib/schedule-export.js";
 import * as store from "../store.js";
-import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, safeColor, gradeLabel } from "../models.js";
+import { WEEKDAYS, SCHOOL_WEEKDAYS, todayISO, weekday, sectionLabel, isTeachingDay, CALENDAR_KIND, safeColor, gradeLabel } from "../models.js";
 import { repaint } from "../repaint.js";
 import { getAccountPresentation } from "../lib/account-profile.js";
 
@@ -399,7 +399,7 @@ export default {
     let calStatusType = "info";
     if (calDay) {
       if (!isTeachingDay(calDay.kind)) {
-        calStatusText = `اليوم: ${calDay.label || "إجازة"}`;
+        calStatusText = `اليوم: ${calDay.label || CALENDAR_KIND[calDay.kind]?.label || "إجازة"}`;
         calStatusType = "warn";
       } else if (calDay.kind === "remote") {
         calStatusText = `اليوم: دراسة عن بُعد (${calDay.label || "توقيت مدمج"})`;

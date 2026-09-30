@@ -22,7 +22,7 @@ import {
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment, makeItem, makeScoreSubitem, makeScoreSubitemCompletion,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
-  periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend,
+  periodTime, periodNumbers, weekday, shiftDate, isTeachingDay, isWeekend, CALENDAR_KIND, sessionCalendarPresentation,
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
   normalizeSearchText, gradeLabel, itemScore, studentTotal
 } from './models.js';
@@ -1840,6 +1840,19 @@ export function calendarDayForYear(yearId, date) {
     .filter(({ day }) => day);
   // A local custom exception is intentionally more specific than a preset day.
   return matching.find(({ calendar }) => calendar.source === 'custom')?.day ?? matching[0]?.day ?? null;
+}
+
+/** Resolve a dated session through its teaching's term and year, including history. */
+export function sessionCalendarDay(session) {
+  const teaching = getTeaching(session?.teachingId)
+    ?? state.teachings.find((record) => record.id === session?.teachingId);
+  const term = getTerm(teaching?.termId)
+    ?? state.terms.find((record) => record.id === teaching?.termId);
+  return term ? calendarDayForYear(term.yearId, session.date) : null;
+}
+
+export function sessionStatusPresentation(session) {
+  return sessionCalendarPresentation(session, sessionCalendarDay(session));
 }
 
 /** المصدر الواحد لأهلية الحصة الاعتيادية؛ لا ينشئ بيانات. */
@@ -3704,12 +3717,13 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
   ));
   if (existing) return existing.deleted ? null : existing;
 
-  const day = calendarDayFor(date);
-  const holiday = day && !['study', 'exam', 'event'].includes(day.kind);
+  const tch = getTeaching(tchId);
+  const term = getTerm(tch?.termId);
+  const day = term ? calendarDayForYear(term.yearId, date) : calendarDayFor(date);
+  const holiday = day && !isTeachingDay(day.kind);
 
   // يُطبع وقت الحصة فيها الآن من الملف النشط. تغيير الملف لاحقًا لا يمسّها.
   const profile = activeTimeProfile();
-  const tch = getTeaching(tchId);
   if (tch && isTeachingArchived(tch)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
   const sec = tch ? getSection(tch.sectionId) : null;
   const t = timeFor(weekday(date), period, profile, sec?.grade, date);
@@ -3724,7 +3738,7 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
     endTime: t?.end ?? '',
     timeProfileId: profile?.id ?? null,
     status: holiday ? 'cancelled_holiday' : 'scheduled',
-    reason: holiday ? day.label || 'إجازة رسمية' : '',
+    reason: holiday ? day.label || CALENDAR_KIND[day.kind]?.label || 'إجازة رسمية' : '',
     ...extra,
   });
   await save({ sessions: [ses] });
@@ -3798,7 +3812,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   if (!startDate || !endDate || startDate > endDate) throw new Error('تحقق من نطاق التاريخ.');
   const today = todayISO();
   if (startDate > today) {
-    return { created: 0, existing: 0, holidays: 0, unavailable: 0, startDate, endDate, clipped: true, futureClipped: true, futureOnly: true };
+    return { created: 0, existing: 0, holidays: 0, suspensions: 0, unavailable: 0, startDate, endDate, clipped: true, futureClipped: true, futureOnly: true };
   }
   if (endDate < term.startDate || startDate > term.endDate) {
     throw new Error('النطاق المختار خارج تواريخ الفصل الدراسي الحالي.');
@@ -3817,6 +3831,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   let created = 0;
   let existing = 0;
   let holidays = 0;
+  let suspensions = 0;
   let unavailable = 0;
   let matchedSlotDays = 0;
   const pending = [];
@@ -3837,6 +3852,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
       const calendarDay = calendarDayForYear(year.id, date);
       if (!isSessionEligibleDate(date, { year, term })) {
         holidays++;
+        if (calendarDay?.kind === 'suspension') suspensions++;
       } else {
         const resolved = resolveProfile(profile, date, calendarDay);
         for (const slot of matchingSlots) {
@@ -3876,7 +3892,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     if (!ok) throw new Error('تعذّر حفظ الحصص المولّدة.');
   }
   return {
-    created, existing, holidays, unavailable,
+    created, existing, holidays, suspensions, unavailable,
     startDate: effectiveStart, endDate: effectiveEnd,
     clipped: effectiveStart !== startDate || effectiveEnd !== endDate,
     futureClipped,

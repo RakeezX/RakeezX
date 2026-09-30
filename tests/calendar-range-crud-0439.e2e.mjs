@@ -8,14 +8,14 @@ test('custom Calendar range edits, moves, deletes and recreates through the real
   let form = page.getByRole('dialog').locator('#range-form');
   await form.getByLabel('من *').fill('2026-10-05');
   await form.getByLabel('إلى').fill('2026-10-07');
-  await form.getByLabel('الوصف أو اسم الإجازة *').fill('اختبار 0439');
+  await form.getByLabel('الوصف أو اسم الفترة *').fill('اختبار 0439');
   await page.getByRole('dialog').getByRole('button', { name: 'حفظ الفترة' }).click();
   let row = page.locator('.calendar-period').filter({ hasText: 'اختبار 0439' });
   await expect(row).toHaveCount(1);
   await row.getByRole('button', { name: 'تعديل الفترة' }).click();
   form = page.getByRole('dialog').locator('#range-form');
   await form.getByLabel('إلى').fill('2026-10-06');
-  await form.getByLabel('الوصف أو اسم الإجازة *').fill('اختبار 0439 معدّل');
+  await form.getByLabel('الوصف أو اسم الفترة *').fill('اختبار 0439 معدّل');
   await page.getByRole('dialog').getByRole('button', { name: 'حفظ الفترة' }).click();
   await expect(page.locator('.calendar-period').filter({ hasText: 'اختبار 0439 معدّل' })).toHaveCount(1);
   await page.reload();
@@ -37,7 +37,7 @@ test('custom Calendar range edits, moves, deletes and recreates through the real
   form = page.getByRole('dialog').locator('#range-form');
   await form.getByLabel('من *').fill('2026-10-08');
   await form.getByLabel('إلى').fill('2026-10-08');
-  await form.getByLabel('الوصف أو اسم الإجازة *').fill('إعادة إنشاء 0439');
+  await form.getByLabel('الوصف أو اسم الفترة *').fill('إعادة إنشاء 0439');
   await page.getByRole('dialog').getByRole('button', { name: 'حفظ الفترة' }).click();
   await expect(page.locator('.calendar-period').filter({ hasText: 'إعادة إنشاء 0439' })).toHaveCount(1);
   expect(errors).toEqual([]);

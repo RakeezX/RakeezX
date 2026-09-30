@@ -14,7 +14,7 @@ import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 import { go } from '../router.js';
 import {
-  todayISO, shiftDate, gradeLabel, SESSION_STATUS, ATTENDANCE, WEEKDAYS, weekday, isTeachingDay, CALENDAR_KIND,
+  todayISO, shiftDate, gradeLabel, ATTENDANCE, WEEKDAYS, weekday, isTeachingDay, CALENDAR_KIND,
 } from '../models.js';
 
 const DISMISS_STORAGE_KEY = 'rakeezx_home_pwa_dismissed_at';
@@ -133,7 +133,7 @@ function todayEmptyCopy(hasSchedule, date, calendarDay) {
     text: 'بعد إعداد الجدول، ستظهر هنا حصص يومك.', action: 'إعداد الجدول', iconName: 'timetable',
   };
   if (calendarDay && !isTeachingDay(calendarDay.kind)) return {
-    kicker: 'إجازة', title: calendarDay.label || CALENDAR_KIND[calendarDay.kind]?.label || 'إجازة رسمية',
+    kicker: calendarDay.kind === 'suspension' ? 'تعليق دراسة' : 'إجازة', title: calendarDay.label || CALENDAR_KIND[calendarDay.kind]?.label || 'إجازة رسمية',
     text: 'لا توجد لديك حصص مجدولة اليوم. يمكنك مراجعة جدول الأسبوع.', action: 'عرض الجدول', iconName: 'calendar',
   };
   if ([5, 6].includes(weekday(date))) return {
@@ -157,7 +157,7 @@ export function todaySessionPresentation(session, completeness, now = new Date()
   const minutes = now.getHours() * 60 + now.getMinutes();
   const start = timeToMinutes(session.startTime);
   const end = timeToMinutes(session.endTime);
-  if (completeness.state === 'excluded') return { kind: 'neutral', label: (SESSION_STATUS[session.status] ?? SESSION_STATUS.scheduled).label };
+  if (completeness.state === 'excluded') return { kind: 'neutral', label: store.sessionStatusPresentation(session).label };
   if (start !== null && end !== null && start <= minutes && minutes < end) return { kind: 'current', label: 'الحصة الحالية' };
   if (completeness.state === 'completed' && completeness.due) return { kind: 'completed', label: 'تم رصد الحضور' };
   if (completeness.state === 'pending') return { kind: 'pending', label: completeness.recorded ? 'رصد الحضور غير مكتمل' : 'بانتظار رصد الحضور' };
@@ -391,7 +391,7 @@ export default {
                           ${marked && roster
                             ? html` · <span class="tabular">${marked}/${roster}</span> مرصود`
                             : ''}
-                          ${s.reason ? html` · ${s.reason}` : ''}
+                          ${store.sessionStatusPresentation(s).reason ? html` · ${store.sessionStatusPresentation(s).reason}` : ''}
                         </span>
                       </span>
                       <span class="row__end">

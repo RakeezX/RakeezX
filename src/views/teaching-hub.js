@@ -2,7 +2,7 @@
 
 import { html, icon, openSheet, toast, fmtPct, fmtTimeRange } from '../lib/dom.js';
 import * as store from '../store.js';
-import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, SESSION_STATUS, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
+import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, SECTION_COLORS, safeColor, normalizeSectionLabel } from '../models.js';
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
@@ -135,7 +135,7 @@ export default {
           ? html`
               <div class="list">
                 ${todaySessions.map((s) => {
-                  const m = SESSION_STATUS[s.status] ?? SESSION_STATUS.scheduled;
+                  const m = store.sessionStatusPresentation(s);
                   const marked = store.attendanceIn(s.id).length;
                   return html`
                     <a class="row" href="#/teaching/${tch.id}/attendance?session=${s.id}">

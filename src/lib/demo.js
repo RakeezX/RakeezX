@@ -1,11 +1,11 @@
 import * as db from './db.js';
 import * as store from '../store.js';
-import { uid, now, todayISO, shiftDate, weekday, makeSection, makeTeaching, makeStudent, makeEnrollment, makeSlot, makeSession, makeItem } from '../models.js';
+import { uid, now, todayISO, shiftDate, weekday, isTeachingDay, makeSection, makeTeaching, makeStudent, makeEnrollment, makeSlot, makeSession, makeItem } from '../models.js';
 
 const META_ID = 'demo:packages';
 export const DEMO_STUDENT_NAMES = ['أحمد محمد','محمد خالد','عبدالله سعد','عمر فهد','يوسف علي','خالد عبدالرحمن','سلمان ناصر','عبدالعزيز ماجد','فيصل أحمد','تركي صالح','مازن عمر','راكان بدر','زياد حسن','بدر فهد','ناصر سالم','وليد طارق','سعود إبراهيم','فهد منصور','حسن ياسر','أنس رامي','إياد سامي','معاذ عادل','لؤي كريم','ريان محمود'];
 const demoId = (packageId, type, index = '') => `demo:${packageId}:${type}${index === '' ? '' : `:${index}`}`;
-const teachingDay = (yearId, from, direction) => { let date=from; for(let i=0;i<45;i++,date=shiftDate(date,direction)){ const day=store.calendarDayForYear(yearId,date); if(weekday(date) < 5 && (!day || ['study','exam','event'].includes(day.kind))) return date; } return from; };
+const teachingDay = (yearId, from, direction) => { let date=from; for(let i=0;i<45;i++,date=shiftDate(date,direction)){ const day=store.calendarDayForYear(yearId,date); if(weekday(date) < 5 && (!day || isTeachingDay(day.kind))) return date; } return from; };
 
 export async function demoPackages() { return (await db.get('meta', META_ID))?.packages?.filter((p) => !p.deleted) ?? []; }
 export const isDemo = (record) => store.isLocalOnlyRecord(record);

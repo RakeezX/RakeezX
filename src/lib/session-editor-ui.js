@@ -78,7 +78,7 @@ export async function openSessionEditor(session, {
         ${EDITABLE_SESSION_STATUS_ORDER.map((key) => html`
           <button class="radiocard radiocard--btn ${session.status === key ? 'is-on' : ''}" data-pick="${key}">
             <span class="radiocard__body">
-              <span class="radiocard__title">${SESSION_STATUS[key].label}</span>
+              <span class="radiocard__title">${store.sessionStatusPresentation({ ...session, status: key }).label}</span>
               <span class="radiocard__hint">${SESSION_STATUS[key].counts ? countedHint : notCountedHint}</span>
             </span>
           </button>
@@ -103,7 +103,7 @@ export async function openSessionEditor(session, {
   if (!picked) return null;
   if (picked.type === 'status') {
     await store.setSessionStatus(session.id, picked.status, picked.reason);
-    toast(`الحصة: ${SESSION_STATUS[picked.status].label}`);
+    toast(`الحصة: ${store.sessionStatusPresentation({ ...session, status: picked.status, reason: picked.reason }).label}`);
     return { type: 'status', sessionId: session.id, status: picked.status };
   }
   if (!await confirmSessionDelete(session)) return null;

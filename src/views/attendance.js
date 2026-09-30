@@ -80,7 +80,7 @@ function renderSessionContext(teaching, session, sessions, status) {
         <span class="attendance-01c__status-pill ${status.tone ? `is-${status.tone}` : ''}">${status.label}</span>
         <span class="attendance-01c__meta">الحصة ${session.period}</span>
         ${session.startTime ? html`<span class="attendance-01c__meta"><bdi>${session.startTime}${session.endTime ? `–${session.endTime}` : ''}</bdi></span>` : ''}
-        ${session.reason ? html`<span class="attendance-01c__meta">${session.reason}</span>` : ''}
+        ${status.reason ? html`<span class="attendance-01c__meta">${status.reason}</span>` : ''}
       </div>` : ''}
     </section>`;
 }
@@ -134,7 +134,7 @@ export default {
     if (!roster.length) {
       return html`
         <div class="attendance-01c">
-        ${renderSessionContext(tch, ses, daySessions, SESSION_STATUS[ses.status] ?? SESSION_STATUS.scheduled)}
+        ${renderSessionContext(tch, ses, daySessions, store.sessionStatusPresentation(ses))}
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">أضف الطلاب أولًا</div>
@@ -144,7 +144,7 @@ export default {
       `;
     }
 
-    const meta = SESSION_STATUS[ses.status] ?? SESSION_STATUS.scheduled;
+    const meta = store.sessionStatusPresentation(ses);
     const isToday = date === todayISO();
     const rosterIds = new Set(roster.map((student) => student.id));
     const records = store.attendanceIn(ses.id).filter((record) => rosterIds.has(record.studentId));
@@ -175,7 +175,7 @@ export default {
               <div class="empty__icon">${icon('calendar')}</div>
               <div class="empty__title">${meta.label}</div>
               <div class="empty__text">
-                ${ses.reason || 'هذه الحصة لم تُنفَّذ'} — لا يُسجَّل حضور ولا غياب،
+                ${meta.reason || 'هذه الحصة لم تُنفَّذ'} — لا يُسجَّل حضور ولا غياب،
                 ولا تُحسب حصة فائتة.
               </div>
               <button class="btn btn--ghost" data-act="session-status">تغيير حالة الحصة</button>

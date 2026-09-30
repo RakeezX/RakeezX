@@ -30,9 +30,9 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
         as $$select id from auth.current_identity limit 1$$;`);
     const names = (await readdir(new URL('../supabase/migrations/', import.meta.url)))
       .filter((name) => name.endsWith('.sql')).sort();
-    assert.equal(names.at(-1), '20260930094421_calendar_day_active_identity.sql');
+    assert.equal(names.at(-1), '20260930234353_calendar_suspension_kind.sql');
     for (const name of names) await pg.exec((await readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')).replace(/^\uFEFF/, ''));
-    assert.equal(names.length, 36);
+    assert.equal(names.length, 37);
     const reusable = (await pg.query(`select rakeezx.sync_v2_natural_key_reusable_after_delete('calendar_days') calendar_days,
       rakeezx.sync_v2_natural_key_reusable_after_delete('sections') sections,
       rakeezx.sync_v2_natural_key_reusable_after_delete('slots') slots,
@@ -42,6 +42,24 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
       values ('year:0439','Synthetic',1448,1449,'active',1,'test')`);
     await pg.query(`insert into rakeezx.calendars(id,year_id,source,label,client_updated_at,device_id)
       values ($1,'year:0439','custom','Synthetic',1,'test')`, [CALENDAR]);
+    for (const [index, kind] of ['study', 'holiday', 'national', 'founding', 'exam', 'event', 'remote', 'suspension'].entries()) {
+      await pg.query(`insert into rakeezx.calendar_days
+        (id,owner_id,calendar_id,date,kind,label,client_updated_at,device_id)
+        values ($1,$2,$3,$4,$5,'kind check',1,'test')`,
+      [`kind:${kind}`, OWNER, CALENDAR, `2026-11-${String(index + 1).padStart(2, '0')}`, kind]);
+    }
+    await assert.rejects(pg.query(`insert into rakeezx.calendar_days
+      (id,owner_id,calendar_id,date,kind,label,client_updated_at,device_id)
+      values ('kind:unknown',$1,$2,'2026-11-20','unknown','invalid',1,'test')`,
+    [OWNER, CALENDAR]), /calendar_days_kind_check/);
+    const constraint = (await pg.query(`select pg_get_constraintdef(oid) definition from pg_constraint
+      where conrelid='rakeezx.calendar_days'::regclass and conname='calendar_days_kind_check'`)).rows[0].definition;
+    assert.match(constraint, /suspension/);
+    const activeIndex = (await pg.query(`select indexdef from pg_indexes
+      where schemaname='rakeezx' and tablename='calendar_days' and indexname='calendar_days_active_natural_uniq'`)).rows[0].indexdef;
+    assert.match(activeIndex, /deleted_at IS NULL/i);
+    assert.equal((await pg.query(`select relrowsecurity and relforcerowsecurity as protected
+      from pg_class where oid='rakeezx.calendar_days'::regclass`)).rows[0].protected, true);
 
     const mutate = async (recordId, mutationId, operation, patch = {}, baseRevision = 0, deviceId = 'device-a') =>
       (await pg.query(`select rakeezx.apply_sync_v2_mutation('calendar_days',$1,$2,$3,$4,$5::jsonb,$6,10) result`,
@@ -70,6 +88,24 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
     ]);
     assert.equal((await pg.query(`select count(*)::int count from pg_policies
       where schemaname='rakeezx' and tablename='calendar_days'`)).rows[0].count, 3);
+    const ownerB = '22222222-2222-4222-8222-222222222222';
+    await pg.query('insert into auth.users(id) values ($1)', [ownerB]);
+    await pg.query('update auth.current_identity set id=$1', [ownerB]);
+    await pg.query(`insert into rakeezx.years(id,label,hijri_start,hijri_end,status,client_updated_at,device_id)
+      values ('year:owner-b','Other owner',1448,1449,'active',1,'test')`);
+    await pg.query(`insert into rakeezx.calendars(id,year_id,source,label,client_updated_at,device_id)
+      values ('cal:owner-b','year:owner-b','custom','Other owner',1,'test')`);
+    await pg.query(`insert into rakeezx.calendar_days(id,calendar_id,date,kind,label,client_updated_at,device_id)
+      values ('day:owner-b','cal:owner-b','2026-11-21','suspension','Other owner',1,'test')`);
+    await pg.query('update auth.current_identity set id=$1', [OWNER]);
+    await pg.exec('set role authenticated');
+    try {
+      const visible = (await pg.query(`select id from rakeezx.calendar_days
+        where id in ('day:owner-b','kind:suspension') order by id`)).rows.map((row) => row.id);
+      assert.deepEqual(visible, ['kind:suspension']);
+    } finally {
+      await pg.exec('reset role');
+    }
 
     // Queue real Calendar writes while offline, then hand their durable outbox
     // to the real Sync V2 dispatcher against this disposable migrated server.
@@ -124,6 +160,15 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
       { date: '2026-10-07', tombstone: true },
       { date: '2026-10-08', tombstone: false },
     ]);
+    const suspensionId = await store.saveCalendarRange({ calendarId: CALENDAR,
+      startDate: '2026-10-09', kind: 'suspension', label: 'Synced suspension' });
+    const suspensionDay = store.calendarRangesOf(store.activeYear().id)
+      .find((range) => range.id === suspensionId).days[0];
+    assert.equal((await engine.dispatchPending()).acknowledged, 1);
+    assert.equal((await pg.query(`select kind from rakeezx.calendar_days where owner_id=$1 and id=$2`,
+      [OWNER, suspensionDay.id])).rows[0].kind, 'suspension');
+    const pulled = await transport.fetchRecords('calendar_days');
+    assert.equal(pulled.find((row) => row.id === suspensionDay.id)?.kind, 'suspension');
   } finally {
     store.closeChannel();
     await db.closeDB();

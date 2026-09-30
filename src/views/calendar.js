@@ -215,7 +215,9 @@ function affectedSessionsSheet(range) {
           </div>
           <div class="t-3 fs-xs mt-2 pt-2" style="border-top: 1px solid var(--border);">
             ${!isTeachingDay(range.kind)
-              ? 'تُستبعد حصص الإجازات الرسمية والاستثناءات المعتمدة تلقائيًا من سجل الغياب وحساب الدوام، دون احتسابها كغياب على الطلاب أو المعلم.'
+              ? range.kind === 'suspension'
+                ? 'تُستبعد حصص تعليق الدراسة من سجل الغياب وحساب الدوام، دون احتسابها كغياب على الطلاب أو المعلم.'
+                : 'تُستبعد حصص الإجازات الرسمية والاستثناءات المعتمدة تلقائيًا من سجل الغياب وحساب الدوام، دون احتسابها كغياب على الطلاب أو المعلم.'
               : range.kind === 'remote'
               ? 'تُدرج حصص هذه الفترة بنمط التعليم عن بُعد في السجلات المعتمدة.'
               : 'حصص دراسية معتمدة حضورياً.'}
@@ -669,11 +671,12 @@ function rangeSheet(existing = null) {
           <select class="select" name="kind">
             <option value="study" ${d.kind === 'study' ? 'selected' : ''}>دراسة حضورية</option>
             <option value="remote" ${d.kind === 'remote' ? 'selected' : ''}>دراسة عن بُعد</option>
-            <option value="holiday" ${d.kind === 'holiday' ? 'selected' : ''}>إجازة / تعليق دراسة</option>
+            <option value="holiday" ${d.kind === 'holiday' ? 'selected' : ''}>إجازة</option>
+            <option value="suspension" ${d.kind === 'suspension' ? 'selected' : ''}>تعليق دراسة</option>
           </select>
         </label>
         <label class="field">
-          <span class="field__label">الوصف أو اسم الإجازة *</span>
+          <span class="field__label">الوصف أو اسم الفترة *</span>
           <input
             class="input"
             name="label"
@@ -920,7 +923,7 @@ export default {
             <div class="cal-card__head">
               <span class="cal-card__eyebrow">
                 ${icon('clock', 'compact')}
-                <span>الإجازة القادمة</span>
+                <span>${nextMilestone?.kind === 'suspension' ? 'تعليق الدراسة القادم' : 'الإجازة القادمة'}</span>
               </span>
               ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate
                 ? html`
@@ -976,7 +979,7 @@ export default {
                   </div>
 
                   <p class="t-3 fs-xs mt-2">
-                    ${nextMilestone.kind === 'remote' ? 'فترة دراسة عن بُعد' : 'فترة إجازة مجدولة'}
+                    ${nextMilestone.kind === 'suspension' ? 'فترة تعليق دراسة مجدولة' : nextMilestone.kind === 'remote' ? 'فترة دراسة عن بُعد' : 'فترة إجازة مجدولة'}
                   </p>
                 `
               : html`
@@ -994,7 +997,7 @@ export default {
                     data-act="exception"
                     data-id="${nextMilestone.id}"
                   >
-                    ${icon('plus')} إضافة استثناء أو تمديد لهذه الإجازة
+                    ${icon('plus')} ${nextMilestone.kind === 'suspension' ? 'إضافة استثناء أو تمديد لتعليق الدراسة' : 'إضافة استثناء أو تمديد لهذه الإجازة'}
                   </button>
                 </div>
               `
@@ -1036,8 +1039,13 @@ export default {
                         r.endDate <= term.endDate
                     )
                   : [];
+                const termSuspensions = hasDates
+                  ? ranges.filter((r) => r.kind === 'suspension' && r.startDate && r.endDate &&
+                      r.startDate >= term.startDate && r.endDate <= term.endDate)
+                  : [];
                 const holidayDaysCount = termHolidays.reduce((n, r) => n + (r?.days?.length ?? 0), 0);
-                const estimatedTeachingDays = Math.max(0, termWeeks * 5 - holidayDaysCount);
+                const suspensionDaysCount = termSuspensions.reduce((n, r) => n + (r?.days?.length ?? 0), 0);
+                const estimatedTeachingDays = Math.max(0, termWeeks * 5 - holidayDaysCount - suspensionDaysCount);
 
                 return html`
                   <div class="cal-term-card ${isCurrent ? 'is-active' : ''}">
@@ -1074,6 +1082,7 @@ export default {
                         <span>${termWeeks} أسبوعًا دراسيًا</span>
                         <span>·</span>
                         <span>${termHolidays.length} فترات إجازة (${holidayDaysCount} يومًا)</span>
+                        ${termSuspensions.length ? html`<span>·</span><span>${termSuspensions.length} فترات تعليق دراسة (${suspensionDaysCount} يومًا)</span>` : ''}
                         <span>·</span>
                         <span>~${estimatedTeachingDays} يوم تدريس</span>
                       </div>
@@ -1244,7 +1253,9 @@ export default {
                               : ''}"
                           >
                             ${!isTeachingDay(range.kind)
-                              ? 'إجازة معتمدة · تُستبعد الحصص من حساب الغياب والتقارير'
+                              ? range.kind === 'suspension'
+                                ? 'تعليق دراسة · تُستبعد الحصص من حساب الغياب والتقارير'
+                                : 'إجازة معتمدة · تُستبعد الحصص من حساب الغياب والتقارير'
                               : range.kind === 'remote'
                               ? 'دراسة عن بُعد · تُحتسب الحصص كتعليم عن بُعد'
                               : 'فترة دراسية حضورية'}
