@@ -91,6 +91,30 @@ export const scoreSubitemCompletionId = (studentId, subitemId) => `ssc:${student
 export const groupArrangementId = (teachingId) => `group-arrangement:${teachingId}`;
 export const calendarId = (yId, source) => `cal:${yId}:${source}`;
 export const calendarDayId = (calId, date) => `cd:${calId}:${date}`;
+
+// Sync V2 persists Calendar day IDs but not local range metadata. The exact
+// calendar/date boundaries distinguish modern range IDs from legacy day IDs.
+export function calendarRangeIdentity(day) {
+  if (typeof day?.rangeId === 'string' && day.rangeId) return day.rangeId;
+  const calendarId = String(day?.calendarId ?? '');
+  const date = String(day?.date ?? '');
+  const id = String(day?.id ?? '');
+  const prefix = `cd:${calendarId}:`;
+  const suffix = `:${date}`;
+  if (calendarId && /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+      id.startsWith(prefix) && id.endsWith(suffix)) {
+    const middle = id.slice(prefix.length, -suffix.length);
+    if (middle) {
+      // A renewed day uses a new record ID while retaining its range key.
+      const renewed = middle.match(/^(.*):rev:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
+      return renewed?.[1] || middle;
+    }
+  }
+  return `legacy:${calendarId}:${id}`;
+}
+
+export const calendarRangeDayId = (calendarId, rangeId, date, renewalId = null) =>
+  `cd:${calendarId}:${rangeId}${renewalId ? `:rev:${renewalId}` : ''}:${date}`;
 export const submissionId = (studentId, assignmentId) => `sb:${studentId}:${assignmentId}`;
 export const closedTermReportId = (termId) => `ctr:${termId}:${uid()}`;
 

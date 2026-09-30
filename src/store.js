@@ -18,6 +18,7 @@ import {
 
 import {
   now, uid, todayISO, scoreId, scoreSubitemCompletionId, attendanceId, sessionId, enrollmentId, closedTermReportId, groupArrangementId,
+  calendarRangeIdentity, calendarRangeDayId,
   makeYear, makeTerm, makeSubject, makeSection, makeTeaching, makeEnrollment, makeItem, makeScoreSubitem, makeScoreSubitemCompletion,
   makeSession, makeSlot, makeCalendar, makeTimeProfile, makeProfile, makeDevice, makeNote, makeClassRule, makeGroupArrangement,
   defaultItemsFor, DEFAULT_ITEMS, DEFAULT_TIME_PROFILES, TERMS_PER_YEAR, termIndexes,
@@ -800,11 +801,18 @@ export async function save(batch, options = {}) {
   const undos = [];
   const changes = [];
   const proof = options[TEACHING_CREATION_PROOF];
+  const explicitDeletes = options.v2Deletes ?? {};
 
   for (const [storeName, records] of Object.entries(batch)) {
     if (!records?.length) continue;
     const previous = new Map((Array.isArray(state[storeName]) ? state[storeName] : [state[storeName]])
       .filter(Boolean).map((record) => [record.id, record]));
+    for (const id of explicitDeletes[storeName] ?? []) {
+      if (!records.some((record) => record.id === id && record.deleted) ||
+          !previous.has(id) || previous.get(id).deleted) {
+        throw new Error('Calendar range delete requires an active local record.');
+      }
+    }
     const prepared = records.map((record) => syncV2Record(storeName, record, {
       pendingCreate: !!SYNC_V2_SCHEMAS[storeName] && !previous.has(record.id),
     }));
@@ -815,6 +823,7 @@ export async function save(batch, options = {}) {
         (proof && (storeName === 'teachings' || storeName === 'items'))) continue;
     for (const record of prepared) {
       const prior = previous.get(record.id) ?? null;
+      const explicitDelete = explicitDeletes[storeName]?.includes(record.id) === true;
       if (storeName === 'enrollments' && !prior && record.status === 'active') {
         const entry = enrollmentCommandEntry('enroll', record);
         if (entry) outbox.push(entry);
@@ -823,8 +832,8 @@ export async function save(batch, options = {}) {
           ? Object.keys(SYNC_V2_SCHEMAS[storeName]?.fields ?? {}).filter((field) =>
             JSON.stringify(prior[field]) !== JSON.stringify(record[field]))
           : null;
-        const entry = outboxEntry(storeName, record, fields, 'put', prior);
-        if (entry && (entry.op === 'create' || entry.fields.length)) outbox.push(entry);
+        const entry = outboxEntry(storeName, record, fields, explicitDelete ? 'delete' : 'put', prior);
+        if (entry && (explicitDelete || entry.op === 'create' || entry.fields.length)) outbox.push(entry);
       }
     }
   }
@@ -4079,7 +4088,7 @@ export const removeCalendarDay = (id) => softDelete('calendarDays', id);
 export function calendarRangesOf(yearId = activeYear()?.id) {
   const groups = new Map();
   for (const calendar of calendarsOf(yearId)) for (const day of calendarDaysOf(calendar.id)) {
-    const key = day.rangeId ?? `legacy:${calendar.id}:${day.id}`;
+    const key = calendarRangeIdentity(day);
     const group = groups.get(key) ?? { id: key, calendarId: calendar.id, source: calendar.source, kind: day.kind, label: day.label, startDate: day.date, endDate: day.date, days: [] };
     group.startDate = group.startDate < day.date ? group.startDate : day.date;
     group.endDate = group.endDate > day.date ? group.endDate : day.date;
@@ -4093,18 +4102,42 @@ export async function saveCalendarRange({ id = uid(), calendarId, startDate, end
   if (endDate < startDate) throw new Error('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.');
   const calendar = state.calendars.find((item) => item.id === calendarId && !item.deleted);
   if (!calendar || calendar.source !== 'custom') throw new Error('لا يمكن تعديل الفترة الرسمية.');
-  const existing = live(state.calendarDays).filter((day) => day.calendarId === calendarId && day.rangeId === id);
+  const existing = live(state.calendarDays).filter((day) => day.calendarId === calendarId && calendarRangeIdentity(day) === id);
+  const existingByDate = new Map(existing.map((day) => [day.date, day]));
+  const allDays = state.calendarDays.filter((day) => day.calendarId === calendarId);
   const next = [];
-  for (let date = startDate; date <= endDate; date = shiftDate(date, 1)) next.push({ id: `cd:${calendarId}:${id}:${date}`, calendarId, date, kind, label, rangeId: id, rangeStart: startDate, rangeEnd: endDate, deleted: false, updatedAt: now() });
+  for (let date = startDate; date <= endDate; date = shiftDate(date, 1)) {
+    if (allDays.some((day) => day.date === date && !day.deleted && calendarRangeIdentity(day) !== id)) {
+      throw new Error('يوجد استثناء محلي آخر في هذا التاريخ. عدّل الفترة الموجودة أولًا.');
+    }
+    const retained = existingByDate.get(date);
+    const baseId = calendarRangeDayId(calendarId, id, date);
+    const dayId = retained?.id ?? (allDays.some((day) => day.id === baseId)
+      ? calendarRangeDayId(calendarId, id, date, uid()) : baseId);
+    if (retained && retained.kind === kind && retained.label === label &&
+        retained.rangeId === id && retained.rangeStart === startDate && retained.rangeEnd === endDate) {
+      next.push(retained);
+    } else {
+      next.push({ ...retained, id: dayId, calendarId, date, kind, label,
+        rangeId: id, rangeStart: startDate, rangeEnd: endDate, deleted: false, updatedAt: now() });
+    }
+  }
   const removed = existing.filter((day) => !next.some((item) => item.id === day.id)).map((day) => ({ ...day, deleted: true, updatedAt: now() }));
-  await save({ calendarDays: [...next, ...removed] });
+  const changed = next.filter((day) => existingByDate.get(day.date) !== day);
+  if (!await save({ calendarDays: [...changed, ...removed] }, {
+    v2Deletes: { calendarDays: removed.map((day) => day.id) },
+  })) throw new Error('تعذّر حفظ تعديلات الفترة. حاول مرة أخرى.');
   return id;
 }
 
 export async function removeCalendarRange(calendarId, rangeId) {
-  const days = live(state.calendarDays).filter((day) => day.calendarId === calendarId && day.rangeId === rangeId);
+  const calendar = state.calendars.find((item) => item.id === calendarId && !item.deleted);
+  if (!calendar || calendar.source !== 'custom') throw new Error('لا يمكن حذف الفترة الرسمية.');
+  const days = live(state.calendarDays).filter((day) => day.calendarId === calendarId && calendarRangeIdentity(day) === rangeId);
   if (!days.length) return;
-  await save({ calendarDays: days.map((day) => ({ ...day, deleted: true, updatedAt: now() })) });
+  if (!await save({ calendarDays: days.map((day) => ({ ...day, deleted: true, updatedAt: now() })) }, {
+    v2Deletes: { calendarDays: days.map((day) => day.id) },
+  })) throw new Error('تعذّر حذف الفترة. حاول مرة أخرى.');
 }
 
 export async function updateTermDates(termId, startDate, endDate) {

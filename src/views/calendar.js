@@ -1336,16 +1336,20 @@ export default {
       });
       if (!data) return;
       const calendar = await store.ensureCalendar();
-      await store.saveCalendarRange({ calendarId: calendar.id, ...data });
-      toast('أُضيف الاستثناء المحلي');
+      try {
+        await store.saveCalendarRange({ calendarId: calendar.id, ...data });
+        toast('أُضيف الاستثناء المحلي');
+      } catch (error) { toast(error.message, 'danger'); }
     },
 
     async add() {
       const data = await rangeSheet();
       if (!data) return;
       const cal = await store.ensureCalendar();
-      await store.saveCalendarRange({ calendarId: cal.id, ...data });
-      toast('أُضيفت الفترة إلى التقويم');
+      try {
+        await store.saveCalendarRange({ calendarId: cal.id, ...data });
+        toast('أُضيفت الفترة إلى التقويم');
+      } catch (error) { toast(error.message, 'danger'); }
     },
 
     async edit(el) {
@@ -1353,8 +1357,10 @@ export default {
       if (!range) return;
       const data = await rangeSheet(range);
       if (!data) return;
-      await store.saveCalendarRange({ id: range.id, calendarId: range.calendarId, ...data });
-      toast('حُفظت تعديلات الفترة');
+      try {
+        await store.saveCalendarRange({ id: range.id, calendarId: range.calendarId, ...data });
+        toast('حُفظت تعديلات الفترة');
+      } catch (error) { toast(error.message, 'danger'); }
     },
 
     async remove(el) {
@@ -1369,8 +1375,10 @@ export default {
         }))
       )
         return;
-      await store.removeCalendarRange(range.calendarId, range.id);
-      toast('حُذفت الفترة');
+      try {
+        await store.removeCalendarRange(range.calendarId, range.id);
+        toast('حُذفت الفترة');
+      } catch (error) { toast(error.message, 'danger'); }
     },
 
     async 'edit-term'(el) {
