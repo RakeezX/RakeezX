@@ -77,6 +77,20 @@ export const getCalendarPreset = (id = WESTERN_1448_1449_PRESET_ID) => {
   return CALENDAR_PRESETS.find((preset) => preset.id === id) ?? null;
 };
 
+// Canonical Sync rows omit local range metadata. Resolve official display
+// identity only from an exact known preset source and one matching definition.
+// Kind/label are guards against silently reinterpreting an older preset row.
+export function officialPresetRangeIdentity(calendar, day) {
+  if (!calendar?.source?.startsWith('preset:') || day?.calendarId !== calendar.id) return null;
+  const presetId = calendar.source.slice('preset:'.length);
+  const preset = CALENDAR_PRESETS.find((entry) => entry.id === presetId);
+  if (!preset || !/^\d{4}-\d{2}-\d{2}$/.test(day?.date ?? '')) return null;
+  const matches = preset.holidays.filter((holiday) =>
+    holiday.startDate <= day.date && day.date <= holiday.endDate &&
+    holiday.kind === day.kind && holiday.label === day.label);
+  return matches.length === 1 ? `${preset.id}:${matches[0].startDate}` : null;
+}
+
 /**
  * الخياران الوزاريان المعتمدان رسمياً لتقويم 1448–1449 هـ:
  * 1. تقويم جميع مناطق المملكة (ما عدا إدارات التعليم المستثناة)

@@ -26,7 +26,7 @@ import {
   sortStudents, sortByOrder, indexScores, groupBy, compareArabic, sectionLabel, normalizeSectionLabel,
   normalizeSearchText, gradeLabel, itemScore, studentTotal
 } from './models.js';
-import { calendarPresetRecords, getCalendarPreset, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
+import { calendarPresetRecords, getCalendarPreset, officialPresetRangeIdentity, WESTERN_1448_1449_PRESET_ID } from './lib/calendar-presets.js';
 import {
   builtinSubject, customSubjectSlug, findPersistedBuiltin, matchBuiltinSubject,
   normalizeSubjectName, subjectCatalogOptions, validateCustomSubjectName,
@@ -4088,7 +4088,9 @@ export const removeCalendarDay = (id) => softDelete('calendarDays', id);
 export function calendarRangesOf(yearId = activeYear()?.id) {
   const groups = new Map();
   for (const calendar of calendarsOf(yearId)) for (const day of calendarDaysOf(calendar.id)) {
-    const key = calendarRangeIdentity(day);
+    const key = calendar.source?.startsWith('preset:')
+      ? officialPresetRangeIdentity(calendar, day) ?? `legacy:${calendar.id}:${day.id}`
+      : calendarRangeIdentity(day);
     const group = groups.get(key) ?? { id: key, calendarId: calendar.id, source: calendar.source, kind: day.kind, label: day.label, startDate: day.date, endDate: day.date, days: [] };
     group.startDate = group.startDate < day.date ? group.startDate : day.date;
     group.endDate = group.endDate > day.date ? group.endDate : day.date;
