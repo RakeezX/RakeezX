@@ -3,12 +3,12 @@
 | Field | Contract |
 | --- | --- |
 | WORK_APPROVAL_ID | `WA-CALENDAR-0417` |
-| Product tickets | N50, N51, N55; N50 Bug #04 is a separately CLOSED subset |
+| Product tickets | N50, N51, N55; N50 Bug #04 and N50 suspension / 0446 are separately CLOSED subsets. Overall N50, N51 and N55 remain OPEN. |
 | Work package | `D:\Abdullah Projects\RakeezX-Work-Calendar-0417` |
 | Handoff/source | `HANDOFF-0417.md`; final `index.html`, `calendar-page.js`, `calendar-page-0416.js`, `calendar-page.css`, `calendar-proportion.css`, companion Calendar CSS/JS and `captures/` / `evidence/`; lineage 0409 → 0410 → 0412 → 0415 → 0416 → 0417 |
 | PO decision | N50/N51/N55 final Work outcome approved **after** the 0417 handoff; recorded in 0445. The handoff's earlier “PO REVIEW PENDING” is historical, not current status. |
 | WORK_APPROVAL / SOURCE_STATE | `APPROVED` / `VERIFIED` at registry creation; recheck [manifest](WA-CALENDAR-0417.manifest.json) before use |
-| Implementation authorization / state | No new Product ticket authorized by 0445 / `NOT_AUTHORIZED` for remaining Work scope. Overall N50/N51/N55 OPEN. |
+| Implementation authorization / state | Suspension / 0446 shipped separately and is CLOSED; remaining WA-CALENDAR-0417 Product scope is `NOT_AUTHORIZED`. Overall N50/N51/N55 remain OPEN. |
 | Codex / Preview / Production | N50 Bug #04 range lifecycle shipped separately at `6d1d255aa4dfa51f44f95b841a5d88541e7a87be` and PO-verified CLOSED. Distinct suspension foundation shipped separately at `0700d55331f1f66678ec236f5de8bad776a6d933` and PO-verified CLOSED. Full 0417 visual contract and N51/N55: no completed Codex port, Preview or Production approval recorded. |
 | Risk / device gate | N50 data correctness and suspension: HIGH; full Calendar cross-surface fidelity: MEDIUM/HIGH. Chromium/WebKit desktop/tablet/mobile evidence exists; no physical-device result claimed in 0417. Use a real device when later interaction scope requires it. |
 
