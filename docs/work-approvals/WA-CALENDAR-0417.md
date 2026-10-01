@@ -4,13 +4,21 @@
 | --- | --- |
 | WORK_APPROVAL_ID | `WA-CALENDAR-0417` |
 | Product tickets | N50, N51, N55; N50 Bug #04 and N50 suspension / 0446 are separately CLOSED subsets. Overall N50, N51 and N55 remain OPEN. |
-| Work package | `D:\Abdullah Projects\RakeezX-Work-Calendar-0417` |
+| Original Work package / lineage | `D:\Abdullah Projects\RakeezX-Work-Calendar-0417`; historical 0417 visual lineage, not the final implementation-ready freeze. |
 | Handoff/source | `HANDOFF-0417.md`; final `index.html`, `calendar-page.js`, `calendar-page-0416.js`, `calendar-page.css`, `calendar-proportion.css`, companion Calendar CSS/JS and `captures/` / `evidence/`; lineage 0409 → 0410 → 0412 → 0415 → 0416 → 0417 |
 | PO decision | N50/N51/N55 final Work outcome approved **after** the 0417 handoff; recorded in 0445. The handoff's earlier “PO REVIEW PENDING” is historical, not current status. |
-| WORK_APPROVAL / SOURCE_STATE | `APPROVED` / `VERIFIED` at registry creation; recheck [manifest](WA-CALENDAR-0417.manifest.json) before use |
+| WORK_APPROVAL / SOURCE_STATE | `APPROVED` / `VERIFIED`: original [0417 manifest](WA-CALENDAR-0417.manifest.json) 35/35; final Real-Product [accepted manifest](WA-CALENDAR-0417.accepted.json) verified, with 12/12 golden screenshots and 4/4 source files; accepted patch SHA-256 verified. |
 | Implementation authorization / state | Bug #04 and suspension / 0446 shipped separately and are CLOSED. Remaining Real-Product Integration is PO APPROVED / FROZEN / EXACT PATCH READY; Codex exact-patch certification is next. Overall N50/N51/N55 remain OPEN. |
 | Codex / Preview / Production | Bug #04 and suspension shipped separately and are PO-verified CLOSED. Remaining frozen patch: `D:\Abdullah Projects\RakeezX-Work-Calendar-0417-Product-Integration\review\freeze\CALENDAR-0417-ACCEPTED.patch`; SHA-256 `49584cdc8370203e3f7203b9f7b55dda1af3bccef441cce1cc542432cd7b26ea`. Full scope remains OPEN for Codex certification and later release review. |
 | Risk / device gate | N50 data correctness and suspension: HIGH; full Calendar cross-surface fidelity: MEDIUM/HIGH. Chromium/WebKit desktop/tablet/mobile evidence exists; no physical-device result claimed in 0417. Use a real device when later interaction scope requires it. |
+
+## Final Real-Product Integration freeze
+
+The final PO-approved visual authority for the remaining Calendar transfer is the Real-Product Integration package `D:\Abdullah Projects\RakeezX-Work-Calendar-0417-Product-Integration`. Its frozen Exact Accepted Patch is `review\freeze\CALENDAR-0417-ACCEPTED.patch` (SHA-256 `49584cdc8370203e3f7203b9f7b55dda1af3bccef441cce1cc542432cd7b26ea`). The frozen manifest is `review\freeze\CALENDAR-0417-ACCEPTED.json`, copied byte-for-byte as the [canonical accepted manifest](WA-CALENDAR-0417.accepted.json) (SHA-256 `188b14136a679a3fe50964ea9f153db06a0a90721b278a17b2fac2044ebc417a`). The patch remains in Work; it is not copied into docs.
+
+The final approved real-Product presentation has one calm unified Calendar identity bar, a subtle soft-green “التقويم المعتمد” badge, a slightly smaller region title and compact year line, a green Calendar settings action and green “أين نحن الآن؟” heading, and a clearer current-term state. At desktop widths, current and next-milestone cards are balanced 1:1; the next milestone has an elevated white date tile. Term start/end dates are centered with a divider and one RTL-left Edit action. The Holidays section uses “الإجازات والفترات الدراسية”, one central “إضافة استثناء”, four filters and four exception types. The official-holiday reference helper renders correctly. Calendar-owned sheets/forms use the real Product flows. The frozen golden evidence covers 1440/1366/1024/768/390/320 in light and dark.
+
+The original 0417 package remains historical visual lineage. The frozen Real-Product Integration is the implementation-ready visual authority. Preserve every original 0417 behavior/runtime boundary below; this registration does not authorize Product or Production changes.
 
 ## Exact accepted surfaces and behavior
 

@@ -136,11 +136,11 @@ Approval records direction only; no Product behavior is implemented or audited b
 
 Sources inspected read-only: Work `RakeezX-Work-Shell-0407/HANDOFF-0407.md` plus 0403/0405 lineage; Work `RakeezX-Work-Calendar-0410/HANDOFF-0410.md`; local ignored audit/0408/0411 handoffs and exact Git commits. Physical quantitative findings use explicit PO decisions in 0413; final Calendar Work 0417 and N56 Work 0419 were explicitly PO-approved afterward. Historical raw notes remain byte-identical in [History](PRODUCT_LEDGER_HISTORY.md); N52 remains unused.
 
-<a id="closed-scope-history"></a>
-
 ## Future architecture study — official Calendar catalog and admin publisher
 
 **DEFERRED / FUTURE.** Study a centrally managed, versioned official RAKEEZ Calendar catalog with separate regional calendars; safe admin Draft → Preview → Publish/rollback; and optional official-source monitoring. No architecture, schema, admin UI, scraper, runtime or Supabase change is selected or authorized here.
+
+<a id="closed-scope-history"></a>
 
 ## سجل البنود المغلقة | Closed Scope History
 
