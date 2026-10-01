@@ -33,6 +33,11 @@ test('frozen Calendar R2 presents the approved hierarchy across widths and theme
           direction: getComputedStyle(document.documentElement).direction,
           topHeights: top.map(rect => rect.height),
           topRows: top.map(rect => rect.y),
+          identity: {
+            badge: document.querySelector('.calendar-identity__meta .calendar-eyebrow').getBoundingClientRect().toJSON(),
+            year: document.querySelector('.calendar-identity__meta .calendar-year').getBoundingClientRect().toJSON(),
+            title: document.querySelector('.calendar-identity h1').getBoundingClientRect().toJSON(),
+          },
           undersized: controls.filter(el => { const r = el.getBoundingClientRect(); return r.width < 44 || r.height < 44; })
             .map(el => el.textContent.trim()),
         };
@@ -40,6 +45,9 @@ test('frozen Calendar R2 presents the approved hierarchy across widths and theme
       expect(geometry.overflow, `${width} ${theme} horizontal overflow`).toBe(false);
       expect(geometry.direction).toBe('rtl');
       expect(geometry.undersized, `${width} ${theme} actionable controls`).toEqual([]);
+      expect(geometry.identity.title.top, `${width} ${theme} region title below metadata`).toBeGreaterThanOrEqual(geometry.identity.badge.bottom);
+      expect(geometry.identity.title.top, `${width} ${theme} region title below dates`).toBeGreaterThanOrEqual(geometry.identity.year.bottom);
+      if (width >= 390) expect(Math.abs(geometry.identity.badge.top - geometry.identity.year.top), `${width} ${theme} identity metadata row`).toBeLessThanOrEqual(3);
       if (width >= 900) {
         expect(Math.abs(geometry.topHeights[0] - geometry.topHeights[1]), `${width} ${theme} top card height`).toBeLessThanOrEqual(2);
         expect(Math.abs(geometry.topRows[0] - geometry.topRows[1]), `${width} ${theme} top card alignment`).toBeLessThanOrEqual(2);
@@ -83,7 +91,8 @@ test('Demo Calendar renders locally without Product cloud traffic', async ({ pag
     await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
   }
   await page.waitForFunction(() => window.store?.state?.ready === true);
-  await page.goto('/#/calendar');
+  await page.getByRole('link', { name: 'التقويم', exact: true }).click();
+  await expect(page).toHaveURL(/#\/calendar$/);
   await expect(page.locator('.calendar-work-0417')).toBeVisible();
   await expect(page.locator('.calendar-identity h1')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'أين نحن الآن؟' })).toBeVisible();

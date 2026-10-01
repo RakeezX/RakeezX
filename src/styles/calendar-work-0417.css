@@ -143,6 +143,9 @@
 /* Final PO refinement: one calm Calendar identity bar and clearer current context. */
 .calendar-work-0417 .calendar-identity{background:var(--bg-elev);border:1px solid var(--border);border-radius:14px;padding:16px 20px;gap:20px}
 .calendar-work-0417 .calendar-identity__text{min-width:0}
+.calendar-work-0417 .calendar-identity__meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-bottom:6px}
+.calendar-work-0417 .calendar-identity__meta .calendar-eyebrow{margin:0;flex:none}
+.calendar-work-0417 .calendar-identity__meta .calendar-year{margin:0;min-width:0;color:var(--text-2)}
 .calendar-work-0417 .calendar-eyebrow{display:table;width:max-content;max-width:100%;padding:2px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-text);font-size:11px;font-weight:650;line-height:1.6}
 .calendar-work-0417 .calendar-identity h1{font-size:21px}
 .calendar-work-0417 .calendar-settings-action{padding:10px 14px;background:var(--action-primary);color:var(--action-primary-ink);font-weight:650;border-radius:10px}

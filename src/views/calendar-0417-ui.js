@@ -28,9 +28,11 @@ export function renderCalendar0417(data) {
     <div class="management-page calendar-management-page calendar-work-0417">
       <header class="calendar-identity">
         <div class="calendar-identity__text">
-          <p class="calendar-eyebrow">التقويم المعتمد</p>
+          <div class="calendar-identity__meta">
+            <p class="calendar-eyebrow">التقويم المعتمد</p>
+            <p class="calendar-year"><bdi dir="ltr">${displayYear}</bdi><span>·</span><bdi dir="ltr">${preset?.gregorianLabel ?? ''}</bdi></p>
+          </div>
           <h1>${activeRegion.shortName ?? activeRegion.name}</h1>
-          <p class="calendar-year"><bdi dir="ltr">${displayYear}</bdi><span>·</span><bdi dir="ltr">${preset?.gregorianLabel ?? ''}</bdi></p>
         </div>
         <button type="button" class="calendar-settings-action" data-act="open-settings">
           ${icon('settings')}<span>إعدادات التقويم والمنطقة</span>
