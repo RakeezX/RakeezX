@@ -7918,3 +7918,116 @@
   .mini-hub-backdrop .mini-hub-sync__meta { grid-row:3; }
   .mini-hub-backdrop .mini-hub-sync__details { grid-row:4; }
 }
+
+/* WA-CALENDAR-0417: Calendar-only presentation; existing data and actions stay authoritative. */
+.calendar-work-0448 { max-width:1180px; }
+.calendar-work-0448 button { min-height:44px; }
+.calendar-work-0448 .cal-hero-strip { padding:12px 0 18px; margin-bottom:18px; border:0; background:transparent; border-radius:0; box-shadow:none; }
+.calendar-work-0448 .cal-hero-strip__meta-line { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+.calendar-work-0448 .cal-hero-strip__badge { font-size:12px; color:var(--text-2); font-weight:600; }
+.calendar-work-0448 .cal-hero-strip__title { font-size:23px; font-weight:750; margin-block:5px 4px; }
+.calendar-work-0448 .cal-hero-strip__subtitle { display:none; }
+.calendar-work-0448 .cal-hero-strip__actions .btn { min-width:0; padding-inline:7px; background:transparent; border:0; color:var(--text-2); font-size:12px; }
+.calendar-work-0448 .cal-radar-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:stretch; margin-bottom:28px; }
+.calendar-work-0448 .cal-card { padding:20px; border:1px solid var(--border); border-radius:16px; background:var(--bg-elev); justify-content:space-between; min-width:0; }
+.calendar-work-0448 .cal-card--pulse { border-inline-start:1px solid var(--border); box-shadow:none; }
+.calendar-work-0448 .cal-card__head { margin-bottom:9px; align-items:flex-start; gap:12px; }
+.calendar-work-0448 .cal-card__eyebrow { color:var(--text); font-size:12px; }
+.calendar-work-0448 .cal-pulse-dot { display:none; }
+.calendar-work-0448 .cal-card__head .badge { border:0; background:var(--bg-sunk); color:var(--text-2); font-size:11px; white-space:normal; text-align:center; }
+.calendar-work-0448 .cal-card__title { font-size:22px; line-height:1.5; margin:9px 0; }
+.calendar-work-0448 .cal-progress-box { padding:13px 16px; margin:0 0 11px; background:var(--bg-sunk); border:1px solid var(--border); border-radius:12px; }
+.calendar-work-0448 .cal-progress-now { min-height:36px; text-align:center; color:var(--brand-text); font-size:12px; font-weight:700; }
+.calendar-work-0448 .cal-progress-track { height:5px; margin:5px 0 13px; }
+.calendar-work-0448 .cal-progress-pin { width:14px; height:14px; box-shadow:0 0 0 1px var(--brand-border); }
+.calendar-work-0448 .cal-progress-bounds { display:flex; justify-content:space-between; gap:12px; margin:0; }
+.calendar-work-0448 .cal-progress-bounds > span { display:grid; gap:3px; min-width:0; }
+.calendar-work-0448 .cal-progress-bounds > span:last-child { text-align:end; }
+.calendar-work-0448 .cal-progress-bounds small { font-size:11px; color:var(--text-2); }
+.calendar-work-0448 .cal-progress-bounds strong { color:var(--text); font-size:12px; font-weight:650; }
+.calendar-work-0448 .cal-metrics-row { margin:0; }
+.calendar-work-0448 .cal-metric { padding:8px; }
+.calendar-work-0448 .cal-metric__label { font-size:11px; }
+.calendar-work-0448 .cal-metric__val { font-size:17px; }
+.calendar-work-0448 .cal-milestone-spotlight { display:flex; flex-direction:column; justify-content:space-between; flex:1; margin:0; padding:20px; background:var(--bg-sunk); border:1px solid var(--border); border-radius:12px; }
+.calendar-work-0448 .cal-milestone-title-row { display:flex; align-items:center; gap:14px; min-width:0; }
+.calendar-work-0448 .cal-milestone-title { font-size:18px; min-width:0; }
+.calendar-work-0448 .cal-milestone-title small { display:block; font-size:12px; font-weight:400; color:var(--text-2); margin-top:3px; }
+.calendar-work-0448 .cal-milestone-meta { font-size:12px; margin-top:12px; }
+.calendar-work-0448 .cal-milestone-affected { margin-top:14px; padding-top:12px; border-top:1px solid var(--border); background:transparent; }
+.calendar-work-0448 .cal-milestone-affected .btn { border:0; background:transparent; color:var(--brand-text); min-height:44px; }
+.calendar-work-0448 .cal-terms-section .section__head,.calendar-work-0448 .cal-holidays-section .section__head { align-items:center; margin-bottom:12px; }
+.calendar-work-0448 .cal-terms-section .section__title,.calendar-work-0448 .cal-holidays-section .section__title { font-size:19px; }
+.calendar-work-0448 .cal-term-card { border-radius:14px; padding:18px; }
+.calendar-work-0448 .cal-term-card__head .badge { border:0; background:transparent; color:var(--text-2); padding:0; }
+.calendar-work-0448 .cal-term-card.is-active { border-color:var(--brand-border); box-shadow:inset 3px 0 var(--brand); }
+.calendar-work-0448 .cal-term-dates { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; padding:13px; text-align:center; }
+.calendar-work-0448 .cal-term-date-row { display:grid; justify-items:center; gap:4px; }
+.calendar-work-0448 .cal-term-date-row + .cal-term-date-row { border-inline-start:1px solid var(--border); }
+.calendar-work-0448 .cal-term-date-val { font-size:12px; }
+.calendar-work-0448 .cal-term-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; padding:12px 0 0; border:0; text-align:center; }
+.calendar-work-0448 .cal-term-stats > span { display:grid; align-content:start; gap:3px; padding-inline:7px; min-width:0; }
+.calendar-work-0448 .cal-term-stats > span + span { border-inline-start:1px solid var(--border); }
+.calendar-work-0448 .cal-term-stats strong { font-size:12px; line-height:1.5; color:var(--text); }
+.calendar-work-0448 .cal-term-stats small { font-size:11px; line-height:1.5; }
+.calendar-work-0448 .cal-term-edit { margin-top:13px; padding-top:8px; border-top:1px solid var(--border); }
+.calendar-work-0448 .cal-term-edit .btn { border:0; padding-inline:0; color:var(--brand-text); }
+.calendar-work-0448 .cal-filters-row { width:max-content; max-width:100%; min-height:0; gap:4px; margin:0 0 8px; padding:4px; background:var(--bg-elev); }
+.calendar-work-0448 .cal-filter-btn { min-height:44px; padding:8px 14px; border:0; border-radius:8px; background:transparent; font-size:12px; }
+.calendar-work-0448 .cal-filter-btn.is-active { background:var(--brand-soft); color:var(--brand-text); }
+.calendar-work-0448 .cal-filter-count { margin:3px 0 12px; color:var(--text-2); font-size:12px; }
+.calendar-work-0448 .cal-period-row { display:grid; grid-template-columns:minmax(0,1fr) 44px; gap:10px; padding:12px 18px; background:transparent; }
+.calendar-work-0448 .cal-period-row--active { border-inline-start:0; }
+.calendar-work-0448 .cal-period-top { display:flex; align-items:center; gap:14px; min-width:0; }
+.calendar-work-0448 .cal-date-tile { width:64px; height:64px; border:0; border-radius:12px; background:var(--bg-sunk); }
+.calendar-work-0448 .cal-date-tile__day { font-size:20px; }
+.calendar-work-0448 .cal-date-tile--range .cal-date-tile__day { font-size:16px; white-space:nowrap; }
+.calendar-work-0448 .cal-date-tile__month { font-size:10px; }
+.calendar-work-0448 .cal-period-title { font-size:14px; }
+.calendar-work-0448 .cal-period-sub { font-size:11px; gap:4px; }
+.calendar-work-0448 .cal-period-actions { margin:0; padding:0; border:0; }
+.calendar-work-0448 .cal-period-actions .iconbtn { min-width:44px; min-height:44px; }
+.calendar-work-0448 .cal-accreditation-card { display:block; border:0; border-top:1px solid var(--border); background:transparent; border-radius:0; padding:0; }
+.calendar-work-0448 .cal-accreditation-card summary { display:flex; align-items:center; gap:8px; min-height:44px; cursor:pointer; color:var(--text-2); font-size:12px; }
+.calendar-work-0448 .cal-accreditation-card summary svg { width:16px; height:16px; }
+.calendar-work-0448 .cal-accreditation-card summary svg:last-child { margin-inline-start:auto; }
+.calendar-work-0448 .cal-accreditation-card__main { font-size:12px; color:var(--text-2); line-height:1.8; }
+.cal-settings-tabs { display:flex; gap:4px; padding:4px; margin-bottom:16px; border-radius:10px; background:var(--bg-sunk); }
+.cal-settings-tabs button { flex:1; min-height:44px; border:0; border-radius:8px; background:transparent; color:var(--text-2); font:inherit; font-size:13px; cursor:pointer; }
+.cal-settings-tabs button[aria-pressed="true"] { background:var(--bg-elev); color:var(--brand-text); font-weight:700; }
+.cal-settings-body [hidden],.cal-holiday-choice[hidden] { display:none; }
+.cal-settings-body .cal-region-card { width:100%; text-align:start; font:inherit; cursor:pointer; }
+.cal-exception-form { display:grid; gap:16px; }
+.cal-exception-types { border:0; padding:0; margin:0; }
+.cal-exception-types legend { margin-bottom:8px; font-size:13px; font-weight:700; }
+.cal-exception-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.cal-exception-options label { display:flex; align-items:center; gap:8px; min-height:44px; padding:9px; border:1px solid var(--border); border-radius:10px; cursor:pointer; font-size:13px; }
+.cal-exception-options label:has(input:checked) { border-color:var(--brand-border); background:var(--brand-soft); }
+.cal-exception-options input { accent-color:var(--brand); }
+@media(min-width:900px) and (max-width:1199px) {
+  .calendar-work-0448 .cal-card { padding:16px; }
+}
+@media(max-width:899px) {
+  .calendar-work-0448 .cal-radar-grid { grid-template-columns:1fr; }
+  .calendar-work-0448 .cal-card { padding:16px; }
+}
+@media(max-width:599px) {
+  .calendar-work-0448 .cal-hero-strip { display:block; padding:0 0 16px; }
+  .calendar-work-0448 .cal-hero-strip__title { font-size:20px; }
+  .calendar-work-0448 .cal-hero-strip__actions .btn { width:auto; margin-top:8px; }
+  .calendar-work-0448 .cal-card__title { font-size:18px; }
+  .calendar-work-0448 .cal-metrics-row { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .calendar-work-0448 .cal-metric { grid-column:auto; padding:8px 3px; }
+  .calendar-work-0448 .cal-progress-bounds { display:flex; }
+  .calendar-work-0448 .cal-terms-section .section__head,.calendar-work-0448 .cal-holidays-section .section__head { flex-wrap:wrap; }
+  .calendar-work-0448 .cal-filters-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; }
+  .calendar-work-0448 .cal-period-row { grid-template-columns:minmax(0,1fr) 44px; padding:12px; }
+  .calendar-work-0448 .cal-period-actions { justify-content:stretch; }
+}
+@media(max-width:359px) {
+  .calendar-work-0448 .cal-term-stats strong { font-size:11px; }
+  .calendar-work-0448 .cal-date-tile { width:56px; }
+  .calendar-work-0448 .cal-date-tile--range .cal-date-tile__day { font-size:14px; }
+  .calendar-work-0448 .cal-period-top { gap:8px; }
+  .cal-exception-options { grid-template-columns:1fr; }
+}

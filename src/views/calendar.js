@@ -80,7 +80,7 @@ const getRelativeStatus = (startDate, endDate, today) => {
   return { text: 'منقضية', tone: 'sunk' };
 };
 
-let activeFilter = 'all';
+let activeFilter = 'upcoming';
 
 /**
  * التحقق من اكتمال إعداد الفصول والتقويم للسنة قبل تفعيلها.
@@ -184,7 +184,7 @@ export function getAffectedSchedule(startDate, endDate) {
 /**
  * نافذة استعراض الحصص والجلسات المتأثرة بالإجازة أو الفترة المحددة.
  */
-function affectedSessionsSheet(range) {
+async function affectedSessionsSheet(range) {
   const affected = getAffectedSchedule(range.startDate, range.endDate);
   const byDate = new Map();
   for (const item of affected) {
@@ -192,8 +192,8 @@ function affectedSessionsSheet(range) {
     byDate.get(item.date).push(item);
   }
 
-  return openSheet({
-    title: `الحصص المتأثرة · ${range.label || calendarLabel(range.kind, CALENDAR_KIND[range.kind])}`,
+  const action = await openSheet({
+    title: range.label || calendarLabel(range.kind, CALENDAR_KIND[range.kind]),
     desc: html`${fmtDateRange(range.startDate, range.endDate)} · ${durationLabel(range.startDate, range.endDate)}`,
     body: html`
       <div class="stack stack-3">
@@ -266,13 +266,38 @@ function affectedSessionsSheet(range) {
             `}
       </div>
     `,
-    foot: html`<button class="btn btn--primary btn--block" data-sheet-close>إغلاق</button>`,
+    foot: html`
+      ${!range.source?.startsWith('preset:') ? html`
+        <button class="btn btn--ghost" data-range-edit>تعديل الاستثناء</button>
+        <button class="btn btn--ghost" data-range-delete>حذف الاستثناء</button>
+      ` : ''}
+      <button class="btn btn--quiet" data-sheet-close>إغلاق</button>`,
+    onMount: (root, done) => {
+      root.querySelector('[data-range-edit]')?.addEventListener('click', () => done('edit'));
+      root.querySelector('[data-range-delete]')?.addEventListener('click', () => done('delete'));
+    },
   });
+  if (action === 'edit') {
+    const data = await rangeSheet(range);
+    if (!data) return;
+    try {
+      await store.saveCalendarRange({ id: range.id, calendarId: range.calendarId, ...data });
+      toast('حُفظت تعديلات الفترة');
+    } catch (error) { toast(error.message, 'danger'); }
+  } else if (action === 'delete' && await confirmSheet({
+    title: 'حذف هذه الفترة؟',
+    desc: 'سيُحذف هذا الاستثناء المحلي ولن يؤثر على التقويم الرسمي المعتمد.',
+    confirmLabel: 'احذف', danger: true,
+  })) {
+    try { await store.removeCalendarRange(range.calendarId, range.id); toast('حُذفت الفترة'); }
+    catch (error) { toast(error.message, 'danger'); }
+  }
 }
 
 /**
  * نافذة إدارة إعدادات التقويم والمنطقة التعليمية — مركزية داخل التقويم
  */
+let calendarSettingsTab = 'calendar';
 function calendarSettingsSheet(savedScrollTop = 0) {
   const year = store.activeYear();
   const yrs = store.years();
@@ -282,22 +307,27 @@ function calendarSettingsSheet(savedScrollTop = 0) {
   const activeRegion = getSaudiEducationRegion(preset?.id ?? store.state.device?.preferredEducationRegion);
 
   return openSheet({
-    title: 'إعدادات التقويم والزمن الدراسي',
-    desc: 'التحكم بالتقويم المعتمد والسنوات والفصول الدراسية وتواريخها',
+    title: 'إعدادات التقويم والمنطقة',
     body: html`
-      <div class="stack stack-4">
+      <nav class="cal-settings-tabs" aria-label="أقسام إعدادات التقويم">
+        ${[['calendar', 'التقويم'], ['years', 'السنوات'], ['terms', 'الفصول']].map(([key, label]) => html`
+          <button type="button" data-settings-tab="${key}" aria-pressed="${calendarSettingsTab === key}">${label}</button>
+        `)}
+      </nav>
+      <div class="stack stack-4 cal-settings-body">
         <!-- 1. اختيار التقويم المعتمد -->
-        <div>
+        <div data-settings-panel="calendar" ${calendarSettingsTab !== 'calendar' ? 'hidden' : ''}>
           <div class="section__title mb-2">التقويم المعتمد</div>
           <div class="cal-regions-grid">
             ${SAUDI_EDUCATION_REGIONS.map(
               (reg) => {
                 const isSelected = reg.id === activeRegion.id || reg.presetId === activeRegion.presetId;
                 return html`
-                  <div
+                  <button type="button"
                     class="cal-region-card ${isSelected ? 'is-active' : ''}"
                     data-act="set-region"
                     data-id="${reg.id}"
+                    aria-pressed="${isSelected}"
                   >
                     <div class="cal-region-card__head">
                       <span class="cal-region-card__name">${reg.name}</span>
@@ -311,7 +341,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
                     <div class="cal-region-card__coverage" dir="rtl">
                       ${reg.coverage.join(' • ')}
                     </div>
-                  </div>
+                  </button>
                 `;
               }
             )}
@@ -319,7 +349,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
         </div>
 
         <!-- 2. السنوات الدراسية -->
-        <div class="pt-3" style="border-top: 1px solid var(--border);">
+        <div data-settings-panel="years" ${calendarSettingsTab !== 'years' ? 'hidden' : ''}>
           <div class="hstack gap-2 mb-2">
             <span class="section__title">السنوات الدراسية</span>
             <div class="push">
@@ -360,7 +390,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
         </div>
 
         <!-- 3. الفصول الدراسية وتواريخها -->
-        <div class="pt-3" style="border-top: 1px solid var(--border);">
+        <div data-settings-panel="terms" ${calendarSettingsTab !== 'terms' ? 'hidden' : ''}>
           <div class="hstack gap-2 mb-2">
             <span class="section__title">الفصول الدراسية في ${year?.label ?? ''}</span>
             <div class="push">
@@ -404,6 +434,11 @@ function calendarSettingsSheet(savedScrollTop = 0) {
     `,
     foot: html`<button class="btn btn--primary btn--block" data-sheet-close>تم</button>`,
     onMount: (root) => {
+      root.querySelectorAll('[data-settings-tab]').forEach((button) => button.addEventListener('click', () => {
+        calendarSettingsTab = button.dataset.settingsTab;
+        root.querySelectorAll('[data-settings-tab]').forEach((tab) => tab.setAttribute('aria-pressed', String(tab === button)));
+        root.querySelectorAll('[data-settings-panel]').forEach((panel) => { panel.hidden = panel.dataset.settingsPanel !== calendarSettingsTab; });
+      }));
       const getScroll = () => root.querySelector('.sheet__body')?.scrollTop ?? 0;
       if (savedScrollTop > 0) requestAnimationFrame(() => {
         const body = root.querySelector('.sheet__body');
@@ -652,10 +687,32 @@ function newTermSheet(yearId, nextIndex) {
 
 function rangeSheet(existing = null) {
   const d = existing ?? { startDate: todayISO(), endDate: '', kind: 'holiday', label: '' };
+  const official = store.calendarRangesOf().filter((range) => range.source?.startsWith('preset:'));
   return openSheet({
-    title: existing ? 'تعديل الفترة' : 'فترة جديدة في التقويم',
+    title: existing ? 'تعديل الاستثناء' : 'إضافة استثناء للتقويم',
     body: html`
-      <form id="range-form">
+      <form id="range-form" class="cal-exception-form">
+        <fieldset class="cal-exception-types">
+          <legend>نوع الاستثناء</legend>
+          <div class="cal-exception-options">
+            ${[['study', 'دراسة حضورية'], ['remote', 'دراسة عن بُعد'], ['holiday', 'إجازة'], ['suspension', 'تعليق دراسة']].map(([kind, label]) => html`
+              <label><input type="radio" name="kind" value="${kind}" ${d.kind === kind ? 'checked' : ''}><span>${label}</span></label>
+            `)}
+          </div>
+        </fieldset>
+        <label class="field cal-holiday-choice">
+          <span class="field__label">اختر الإجازة</span>
+          <select class="select" name="holidayContext">
+            <option value="">اختر الإجازة</option>
+            ${official.map((range) => html`<option value="${range.id}">${range.label}</option>`)}
+            <option value="other" ${existing?.kind === 'holiday' ? 'selected' : ''}>إجازة أخرى</option>
+          </select>
+          <span class="field__hint cal-context-hint"></span>
+        </label>
+        <label class="field">
+          <span class="field__label">اسم الاستثناء *</span>
+          <input class="input" name="label" value="${d.label ?? ''}" placeholder="اكتب اسم الاستثناء" maxlength="80" required />
+        </label>
         <div class="field-row">
           <label class="field">
             <span class="field__label">من *</span>
@@ -666,44 +723,46 @@ function rangeSheet(existing = null) {
             <input class="input tabular" name="endDate" type="date" value="${d.endDate ?? ''}" />
           </label>
         </div>
-        <label class="field">
-          <span class="field__label">نوع اليوم / الفترة</span>
-          <select class="select" name="kind">
-            <option value="study" ${d.kind === 'study' ? 'selected' : ''}>دراسة حضورية</option>
-            <option value="remote" ${d.kind === 'remote' ? 'selected' : ''}>دراسة عن بُعد</option>
-            <option value="holiday" ${d.kind === 'holiday' ? 'selected' : ''}>إجازة</option>
-            <option value="suspension" ${d.kind === 'suspension' ? 'selected' : ''}>تعليق دراسة</option>
-          </select>
-        </label>
-        <label class="field">
-          <span class="field__label">الوصف أو اسم الفترة *</span>
-          <input
-            class="input"
-            name="label"
-            value="${d.label ?? ''}"
-            placeholder="مثال: إجازة مطولة خاصة، تعليق للأحوال الجوية..."
-            maxlength="80"
-            required
-          />
-        </label>
+        <p class="field__hint cal-type-hint"></p>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="range-form">حفظ الفترة</button>
+      <button class="btn btn--primary" form="range-form">${existing ? 'حفظ التعديل' : 'إضافة الاستثناء'}</button>
     `,
     onMount: (root, done) => {
+      const form = root.querySelector('#range-form');
+      const choice = form.elements.holidayContext;
+      const updateType = () => {
+        const kind = form.elements.kind.value;
+        root.querySelector('.cal-holiday-choice').hidden = kind !== 'holiday';
+        root.querySelector('.cal-type-hint').textContent = kind === 'remote'
+          ? 'يوم تدريس عن بُعد، وفق التوقيت الحالي.' : kind === 'study'
+            ? 'يوم تدريس حضوري، وفق التوقيت المعتاد.' : kind === 'suspension'
+              ? 'تعليق الدراسة خلال التواريخ المحددة.' : 'ترك تاريخ النهاية فارغًا يعني يومًا واحدًا.';
+      };
+      form.elements.kind.forEach((input) => input.addEventListener('change', updateType));
+      choice.addEventListener('change', () => {
+        const selected = official.find((range) => range.id === choice.value);
+        root.querySelector('.cal-context-hint').textContent = selected
+          ? `الإجازة المرجعية: ${fmtDateRange(selected.startDate, selected.endDate)}. حدّد تواريخ استثنائك.` : '';
+        if (selected) form.elements.label.value = `استثناء ${selected.label}`;
+      });
+      updateType();
       root.querySelector('#range-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const f = new FormData(event.target);
         const startDate = String(f.get('startDate'));
         const endDate = String(f.get('endDate') || startDate);
+        const kind = String(f.get('kind'));
+        if (kind === 'holiday' && !f.get('holidayContext'))
+          return toast('اختر الإجازة أو إجازة أخرى.', 'danger');
         if (endDate < startDate)
           return toast('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.', 'danger');
         done({
           startDate,
           endDate,
-          kind: String(f.get('kind')),
+          kind,
           label: String(f.get('label')).trim(),
         });
       });
@@ -750,6 +809,14 @@ export default {
   title: () => 'التقويم الدراسي',
   subtitle: () => store.activeYear()?.label ?? '',
   topActions: () => null,
+  onMount() {
+    // A new Calendar visit starts at upcoming periods; switching filters remains local to this visit.
+    activeFilter = 'upcoming';
+    repaint();
+  },
+  onUnmount() {
+    activeFilter = 'upcoming';
+  },
 
   render() {
     const year = store.activeYear();
@@ -821,20 +888,17 @@ export default {
       filteredRanges = ranges.filter((r) => !r.source.startsWith('preset:'));
 
     return html`
-      <div class="management-page calendar-management-page">
+      <div class="management-page calendar-management-page calendar-work-0448">
       <!-- شريط الهوية والتقويم المعتمد وإجراءات التحكم -->
       <div class="cal-hero-strip">
         <div class="cal-hero-strip__identity">
           <div class="cal-hero-strip__meta-line">
-            <span class="badge badge--ok cal-hero-strip__badge">
-              ${icon('calendar')}
-              <span>التقويم المعتمد</span>
-            </span>
+            <span class="cal-hero-strip__badge">التقويم المعتمد</span>
             <span class="cal-year-label t-3 fs-xs"><bdi class="fw-7">${year?.label ?? '1448–1449 هـ'}</bdi> · <bdi>${preset?.gregorianLabel ?? '2026–2027 م'}</bdi></span>
           </div>
 
           <h1 class="cal-hero-strip__title">
-            ${activeRegion.name}
+            ${activeRegion.name.replace(/^تقويم\s+/u, '')}
           </h1>
 
           <p class="cal-hero-strip__subtitle" dir="rtl">
@@ -843,7 +907,7 @@ export default {
         </div>
 
         <div class="cal-hero-strip__actions">
-          <button class="btn btn--primary" data-act="open-settings" aria-label="إعدادات التقويم والمنطقة">
+          <button class="btn btn--quiet" data-act="open-settings" aria-label="إعدادات التقويم والمنطقة">
             ${icon('settings')}
             <span>إعدادات التقويم والمنطقة</span>
           </button>
@@ -853,7 +917,7 @@ export default {
       <!-- رادار الزمن الدراسي (أين نحن الآن + المحطة القادمة) -->
       <div class="cal-radar-grid">
         <!-- بطاقة: نبض الفصل الدراسي الجاري -->
-        <div class="cal-card cal-card--pulse rakeez-accent-surface">
+        <div class="cal-card cal-card--pulse">
           <div class="cal-card__head">
             <span class="cal-card__eyebrow">
               <span class="cal-pulse-dot" aria-hidden="true"></span>
@@ -881,7 +945,8 @@ export default {
           </h2>
 
           <!-- مسار التقدم "أنت هنا" -->
-          <div class="cal-progress-box">
+          <div class="cal-progress-box" role="progressbar" aria-label="التقدم الزمني للفصل" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPct}">
+            <div class="cal-progress-now">أنت هنا · ${fmtDate(today, false)}</div>
             <div class="cal-progress-track">
               <div class="cal-progress-fill" style="width: ${progressPct}%;"></div>
               <div
@@ -891,9 +956,8 @@ export default {
               ></div>
             </div>
             <div class="cal-progress-bounds">
-              <span>${currentTerm?.startDate ? fmtDate(currentTerm.startDate, false) : ''}</span>
-              <span class="fw-7 cal-progress-now">أنت هنا · ${fmtDate(today, false)}</span>
-              <span>${currentTerm?.endDate ? fmtDate(currentTerm.endDate, false) : ''}</span>
+              <span><small>بداية الفصل</small><strong>${currentTerm?.startDate ? fmtDate(currentTerm.startDate, false) : 'غير محددة'}</strong></span>
+              <span><small>نهاية الفصل</small><strong>${currentTerm?.endDate ? fmtDate(currentTerm.endDate, false) : 'غير محددة'}</strong></span>
             </div>
           </div>
 
@@ -912,9 +976,6 @@ export default {
               <div class="cal-metric__val"><bdi class="tabular">${progressPct}٪</bdi></div>
             </div>
           </div>
-          <div class="t-3 fs-xs mt-2" style="opacity: 0.85;">
-            * مؤشرات الأيام تقديرية محسوبة على أساس التقويم المعتمد واستثناءاته المحفوظة.
-          </div>
         </div>
 
         <!-- بطاقة: الإجازة القادمة -->
@@ -923,7 +984,7 @@ export default {
             <div class="cal-card__head">
               <span class="cal-card__eyebrow">
                 ${icon('clock', 'compact')}
-                <span>${nextMilestone?.kind === 'suspension' ? 'تعليق الدراسة القادم' : 'الإجازة القادمة'}</span>
+                <span>المحطة القادمة</span>
               </span>
               ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate
                 ? html`
@@ -939,29 +1000,26 @@ export default {
             ${nextMilestone && nextMilestone.startDate && nextMilestone.endDate
               ? html`
                   <div class="cal-milestone-spotlight">
-                    <div class="cal-milestone-title">
-                      ${nextMilestone.label ||
-                      calendarLabel(nextMilestone.kind, CALENDAR_KIND[nextMilestone.kind])}
+                    <div class="cal-milestone-title-row">
+                      <span class="cal-date-tile" aria-hidden="true"><span class="cal-date-tile__day">${parseParts(nextMilestone.startDate)?.day ?? ''}</span><span class="cal-date-tile__month">${AR_MONTHS[(parseParts(nextMilestone.startDate)?.month ?? 1) - 1]}</span></span>
+                      <div class="cal-milestone-title">
+                        ${nextMilestone.label || calendarLabel(nextMilestone.kind, CALENDAR_KIND[nextMilestone.kind])}
+                        <small>${fmtDateRange(nextMilestone.startDate, nextMilestone.endDate)}</small>
+                      </div>
                     </div>
                     <div class="cal-milestone-meta">
-                      <span class="fw-7">${fmtDateRange(nextMilestone.startDate, nextMilestone.endDate)}</span>
-                      <span>·</span>
                       <span>${durationLabel(nextMilestone.startDate, nextMilestone.endDate)}</span>
                       <span>·</span>
-                      <span
-                        class="badge ${nextMilestone.source?.startsWith('preset:') ? 'badge--ok' : 'badge--warn'}"
-                      >
-                        ${nextMilestone.source?.startsWith('preset:') ? 'رسمي' : 'استثناء محلي'}
-                      </span>
+                      <span>${nextMilestone.kind === 'suspension' ? 'تعليق دراسة' : nextMilestone.kind === 'remote' ? 'دراسة عن بُعد' : nextMilestone.kind === 'study' ? 'دراسة حضورية' : 'إجازة'}</span>
+                      <span>·</span>
+                      <span>${nextMilestone.source?.startsWith('preset:') ? 'رسمية معتمدة' : 'استثناء محلي'}</span>
                     </div>
 
                     <!-- تأثير الحصص على جدول المعلم -->
                     <div class="cal-milestone-affected">
                       ${nextMilestoneAffected.length > 0
                         ? html`
-                            <span class="badge badge--warn tabular">
-                              ${nextMilestoneAffected.length} حصص متأثرة
-                            </span>
+                            <span class="tabular">${nextMilestoneAffected.length} حصص متأثرة</span>
                             <button
                               class="btn btn--sm btn--quiet"
                               data-act="view-affected"
@@ -978,9 +1036,6 @@ export default {
                     </div>
                   </div>
 
-                  <p class="t-3 fs-xs mt-2">
-                    ${nextMilestone.kind === 'suspension' ? 'فترة تعليق دراسة مجدولة' : nextMilestone.kind === 'remote' ? 'فترة دراسة عن بُعد' : 'فترة إجازة مجدولة'}
-                  </p>
                 `
               : html`
                   <div class="empty py-3">
@@ -989,30 +1044,16 @@ export default {
                 `}
           </div>
 
-          ${nextMilestone && nextMilestone.source.startsWith('preset:')
-            ? html`
-                <div class="mt-3">
-                  <button
-                    class="btn btn--sm btn--quiet btn--block"
-                    data-act="exception"
-                    data-id="${nextMilestone.id}"
-                  >
-                    ${icon('plus')} ${nextMilestone.kind === 'suspension' ? 'إضافة استثناء أو تمديد لتعليق الدراسة' : 'إضافة استثناء أو تمديد لهذه الإجازة'}
-                  </button>
-                </div>
-              `
-            : ''}
         </div>
       </div>
 
       <!-- الفصول الدراسية للعام -->
-      <div class="section mb-5">
+      <div class="section mb-5 cal-terms-section">
         <div class="section__head">
           <div>
             <h3 class="section__title">الفصول الدراسية</h3>
-            <span class="t-3 fs-sm">حدود بداية ونهاية الفصول الدراسية وأيام التدريس</span>
           </div>
-          <span class="badge badge--brand">${terms.length} فصول معتمدة</span>
+          <button class="btn btn--sm btn--quiet" data-act="add-term">${icon('plus')} إضافة فصل</button>
         </div>
 
         <div class="cal-terms-grid">
@@ -1054,9 +1095,9 @@ export default {
                         <span class="cal-term-card__name">${term.name}</span>
                         <span class="badge ${isCurrent ? 'badge--ok' : 'badge--sunk'}">
                           ${isCurrent
-                            ? 'الفصل الجاري • نشط'
+                            ? 'الجاري'
                             : hasDates && today < term.startDate
-                            ? 'الفصل القادم'
+                            ? 'القادم'
                             : hasDates
                             ? 'منتهٍ'
                             : 'غير محدد'}
@@ -1066,31 +1107,24 @@ export default {
                       <div class="cal-term-dates mt-3">
                         <div class="cal-term-date-row">
                           <span class="cal-term-date-label">البداية</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.startDate, true) : '—'}</span>
+                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.startDate, false) : '—'}</span>
                         </div>
                         <div class="cal-term-date-row">
                           <span class="cal-term-date-label">النهاية</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.endDate, true) : '—'}</span>
-                        </div>
-                        <div class="cal-term-date-row">
-                          <span class="cal-term-date-label">المدى</span>
-                          <span class="cal-term-date-val">${hasDates ? fmtDateRange(term.startDate, term.endDate) : '—'}</span>
+                          <span class="cal-term-date-val">${hasDates ? fmtDate(term.endDate, false) : '—'}</span>
                         </div>
                       </div>
 
                       <div class="cal-term-stats mt-3">
-                        <span>${termWeeks} أسبوعًا دراسيًا</span>
-                        <span>·</span>
-                        <span>${termHolidays.length} فترات إجازة (${holidayDaysCount} يومًا)</span>
-                        ${termSuspensions.length ? html`<span>·</span><span>${termSuspensions.length} فترات تعليق دراسة (${suspensionDaysCount} يومًا)</span>` : ''}
-                        <span>·</span>
-                        <span>~${estimatedTeachingDays} يوم تدريس</span>
+                        <span><strong>${termWeeks}</strong><small>أسبوعًا</small></span>
+                        <span><strong>نحو ${estimatedTeachingDays}</strong><small>يوم تدريس</small></span>
+                        <span><strong>${termHolidays.length} فترات إجازة${termSuspensions.length ? ` · ${termSuspensions.length} تعليق دراسة` : ''}</strong><small>${holidayDaysCount + suspensionDaysCount} يومًا</small></span>
                       </div>
                     </div>
 
-                    <div class="pt-2">
+                    <div class="cal-term-edit">
                       <button
-                        class="btn btn--sm btn--quiet btn--block"
+                        class="btn btn--sm btn--quiet"
                         data-act="edit-term"
                         data-id="${term.id}"
                       >
@@ -1104,29 +1138,18 @@ export default {
       </div>
 
       <!-- المخطط الزمني للفترات والإجازات -->
-      <div class="section">
+      <div class="section cal-holidays-section">
         <div class="section__head">
           <div>
             <h3 class="section__title">الإجازات والفترات الدراسية</h3>
-            <span class="t-3 fs-sm">${ranges.length} فترات تشمل ${totalDaysCount} يومًا</span>
           </div>
-          <button class="btn btn--primary btn--sm" data-act="add" aria-label="إضافة فترة أو استثناء">
-            ${icon('plus')} إضافة فترة أو استثناء
+          <button class="btn btn--primary btn--sm" data-act="add" aria-label="إضافة استثناء">
+            ${icon('plus')} إضافة استثناء
           </button>
         </div>
 
         <!-- تبويبات التصفية السريعة -->
         <div class="cal-filters-row" role="group" aria-label="تصفية فترات التقويم">
-          <button
-            type="button"
-            class="cal-filter-btn ${activeFilter === 'all' ? 'is-active' : ''}"
-            data-act="filter"
-            data-filter="all"
-            aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
-          >
-            <span>الكل</span>
-            <span class="cal-filter-btn__count tabular">${ranges.length}</span>
-          </button>
           <button
             type="button"
             class="cal-filter-btn ${activeFilter === 'upcoming' ? 'is-active' : ''}"
@@ -1135,8 +1158,14 @@ export default {
             aria-pressed="${activeFilter === 'upcoming' ? 'true' : 'false'}"
           >
             <span>القادمة</span>
-            <span class="cal-filter-btn__count tabular">${upcomingCount}</span>
           </button>
+          <button
+            type="button"
+            class="cal-filter-btn ${activeFilter === 'all' ? 'is-active' : ''}"
+            data-act="filter"
+            data-filter="all"
+            aria-pressed="${activeFilter === 'all' ? 'true' : 'false'}"
+          >الكل</button>
           <button
             type="button"
             class="cal-filter-btn ${activeFilter === 'official' ? 'is-active' : ''}"
@@ -1145,7 +1174,6 @@ export default {
             aria-pressed="${activeFilter === 'official' ? 'true' : 'false'}"
           >
             <span>رسمية معتمدة</span>
-            <span class="cal-filter-btn__count tabular">${officialCount}</span>
           </button>
           <button
             type="button"
@@ -1155,9 +1183,9 @@ export default {
             aria-pressed="${activeFilter === 'exceptions' ? 'true' : 'false'}"
           >
             <span>استثناءات محلية</span>
-            <span class="cal-filter-btn__count tabular">${exceptionsCount}</span>
           </button>
         </div>
+        <p class="cal-filter-count" aria-live="polite">${filteredRanges.length} ${activeFilter === 'exceptions' ? 'استثناءات محلية' : activeFilter === 'upcoming' ? 'فترات قادمة أو جارية' : 'فترات'}</p>
 
         <!-- قائمة الفترات -->
         ${filteredRanges.length === 0
@@ -1168,13 +1196,6 @@ export default {
                     ? 'لم تُسجَّل أي استثناءات محلية بعد. جميع الفترات الحالية مطابقة للتقويم الرسمي.'
                     : 'لا توجد فترات مطابقة لهذا الاختيار.'}
                 </div>
-                ${activeFilter === 'exceptions'
-                  ? html`
-                      <button class="btn btn--quiet btn--sm" data-act="add">
-                        ${icon('plus')} إضافة استثناء لمدرستك
-                      </button>
-                    `
-                  : ''}
               </div>
             `
           : html`
@@ -1189,12 +1210,9 @@ export default {
                   const startP = parseParts(range.startDate);
                   const endP = parseParts(range.endDate);
                   const monthName = startP ? AR_MONTHS[startP.month - 1] : '';
-                  const dayDisplay =
-                    startP && endP && range.startDate !== range.endDate
-                      ? `${startP.day}–${endP.day}`
-                      : startP
-                      ? String(startP.day)
-                      : '';
+                  const crossesMonth = Boolean(startP && endP && range.startDate.slice(0, 7) !== range.endDate.slice(0, 7));
+                  const dayDisplay = startP && endP && range.startDate !== range.endDate && !crossesMonth
+                    ? `${startP.day}–${endP.day}` : startP ? String(startP.day) : '';
 
                   const affectedCount = getAffectedSchedule(
                     range.startDate,
@@ -1209,91 +1227,30 @@ export default {
                     >
                       <div class="cal-period-top">
                         <!-- بلاطة التاريخ -->
-                        <div class="cal-date-tile" aria-hidden="true">
-                          <span class="cal-date-tile__day">${dayDisplay}</span>
+                        <div class="cal-date-tile ${range.startDate !== range.endDate && !crossesMonth ? 'cal-date-tile--range' : ''}" aria-hidden="true">
+                          <span class="cal-date-tile__day" dir="ltr">${dayDisplay}</span>
                           <span class="cal-date-tile__month">${monthName}</span>
                         </div>
 
                         <!-- تفاصيل الفترة -->
                         <div class="cal-period-info">
-                          <div class="cal-period-title-wrap">
-                            <span class="cal-period-title">${range.label || calendarLabel(range.kind, meta)}</span>
-                            <span class="badge ${isOfficial ? 'badge--ok' : 'badge--warn'}">
-                              ${isOfficial ? 'رسمي' : 'استثناء محلي'}
-                            </span>
-                            <span class="badge badge--${relStatus.tone}">
-                              ${relStatus.text}
-                            </span>
-                            ${affectedCount > 0
-                              ? html`
-                                  <button
-                                    class="cal-affected-btn"
-                                    data-act="view-affected"
-                                    data-id="${range.id}"
-                                    title="عرض تفاصيل الحصص المتأثرة"
-                                  >
-                                    ${icon('clock')}
-                                    <span>${affectedCount} حصص متأثرة</span>
-                                  </button>
-                                `
-                              : ''}
-                          </div>
+                          <div class="cal-period-title-wrap"><span class="cal-period-title">${range.label || calendarLabel(range.kind, meta)}</span></div>
 
                           <div class="cal-period-sub">
-                            <span class="tabular">${fmtDateRange(range.startDate, range.endDate)}</span>
-                            <span>·</span>
+                            ${crossesMonth ? html`<span>${fmtDateRange(range.startDate, range.endDate)}</span><span>·</span>` : ''}
                             <span>${durationLabel(range.startDate, range.endDate)}</span>
                             <span>·</span>
-                            <span>${calendarLabel(range.kind, meta)}</span>
+                            <span>${range.kind === 'remote' ? 'دراسة عن بُعد' : range.kind === 'study' ? 'دراسة حضورية' : range.kind === 'suspension' ? 'تعليق دراسة' : isOfficial ? 'إجازة معتمدة' : 'إجازة محلية'}</span>
+                            ${affectedCount ? html`<span>· ${affectedCount} حصص متأثرة</span>` : ''}
+                            ${isCurrentNow ? html`<span>· جارية الآن</span>` : ''}
                           </div>
-
-                          <div
-                            class="cal-period-impact ${range.kind === 'remote'
-                              ? 'cal-period-impact--remote'
-                              : ''}"
-                          >
-                            ${!isTeachingDay(range.kind)
-                              ? range.kind === 'suspension'
-                                ? 'تعليق دراسة · تُستبعد الحصص من حساب الغياب والتقارير'
-                                : 'إجازة معتمدة · تُستبعد الحصص من حساب الغياب والتقارير'
-                              : range.kind === 'remote'
-                              ? 'دراسة عن بُعد · تُحتسب الحصص كتعليم عن بُعد'
-                              : 'فترة دراسية حضورية'}
-                          </div>
+                          <span class="sr-only">${fmtDateRange(range.startDate, range.endDate)}</span>
                         </div>
                       </div>
 
                       <!-- الإجراءات -->
                       <div class="cal-period-actions">
-                        ${isOfficial
-                          ? html`
-                              <button
-                                class="btn btn--sm btn--quiet"
-                                data-act="exception"
-                                data-id="${range.id}"
-                                title="إضافة استثناء محلي لهذه الإجازة"
-                              >
-                                ${icon('plus')} إضافة استثناء
-                              </button>
-                            `
-                          : html`
-                              <button
-                                class="iconbtn"
-                                data-act="edit"
-                                data-id="${range.id}"
-                                aria-label="تعديل الفترة"
-                              >
-                                ${icon('edit')}
-                              </button>
-                              <button
-                                class="iconbtn text-danger"
-                                data-act="remove"
-                                data-id="${range.id}"
-                                aria-label="حذف الفترة"
-                              >
-                                ${icon('trash')}
-                              </button>
-                            `}
+                        <button class="iconbtn" data-act="view-affected" data-id="${range.id}" aria-label="تفاصيل ${range.label || calendarLabel(range.kind, meta)}${isOfficial ? '' : ' وتعديل الاستثناء'}">${icon('chev')}</button>
                       </div>
                     </div>
                   `;
@@ -1302,26 +1259,33 @@ export default {
             `}
       </div>
 
-      <!-- بطاقة الاعتماد الوزاري والتكامل عبر المملكة -->
-      <div class="cal-accreditation-card">
-        <div class="cal-accreditation-card__icon" aria-hidden="true">
-          ${icon('book')}
-        </div>
+      <details class="cal-accreditation-card">
+        <summary>${icon('book')} <span>مصدر التقويم والمنطقة</span> ${icon('chev')}</summary>
         <div class="cal-accreditation-card__main">
-          <div class="cal-accreditation-card__title">
-            التقويم الدراسي المعتمد لوزارة التعليم · ${activeRegion.name}
-          </div>
-          <div class="cal-accreditation-card__desc">
-            نظام تقويم موحد ومرن مهيأ لإدارات التعليم بمناطق المملكة العربية السعودية. تُحفظ الفترات الرسمية المعتمدة لحماية دقة تقارير التنفيذ والغياب المدرسي، مع إمكانية إضافة وتعديل استثناءات خاصة بمدارسك دون المساس بالأصل الوزاري.
-          </div>
+          <div class="cal-accreditation-card__title">التقويم الدراسي المعتمد لوزارة التعليم</div>
+          <p>${activeRegion.name} · ${activeRegion.subtitle}</p>
+          <p>${activeRegion.coverage?.join(' · ') ?? ''}</p>
+          <p>الفترات الرسمية المرجعية محفوظة، والاستثناءات المحلية منفصلة عنها.</p>
         </div>
-      </div>
+      </details>
       </div>
     `;
   },
 
   actions: {
+    async 'add-term'() {
+      const year = store.activeYear();
+      if (!year) return;
+      const nextIndex = Math.max(0, ...store.termsOf(year.id).map((term) => term.index ?? 0)) + 1;
+      const data = await newTermSheet(year.id, nextIndex);
+      if (!data) return;
+      const term = makeTerm({ yearId: year.id, ...data });
+      if (store.getTerm(term.id)) return toast('يوجد فصل دراسي بهذا الترتيب', 'danger');
+      try { await store.save({ terms: [term] }); toast('تمت إضافة فصل دراسي بنجاح'); }
+      catch (error) { toast(error.message, 'danger'); }
+    },
     'open-settings'() {
+      calendarSettingsTab = 'calendar';
       calendarSettingsSheet();
     },
 

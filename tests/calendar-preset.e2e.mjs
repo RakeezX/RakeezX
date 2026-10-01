@@ -7,7 +7,9 @@ test('Western Region preset is visible and its official holiday is skipped throu
   await page.goto('/#/calendar');
   await page.waitForFunction(() => window.store);
   await expect(page.getByText('التقويم المعتمد', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'تقويم مكة المكرمة • المدينة المنورة • جدة • الطائف' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'مكة المكرمة • المدينة المنورة • جدة • الطائف' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /القادمة/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'الكل', exact: true }).click();
   await expect(page.getByText('إجازة اليوم الوطني').first()).toBeVisible();
 
   await page.evaluate(async () => {
@@ -42,22 +44,25 @@ test('calendar dates, semantics, Settings editor, and archive navigation follow 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/calendar');
-  await expect(page.getByText('17 يناير – 1 يوليو 2027')).toBeVisible();
+  await expect(page.locator('.cal-term-card').filter({ hasText: 'الفصل الدراسي الثاني' })).toContainText('17 يناير 2027');
+  await expect(page.locator('.cal-term-card').filter({ hasText: 'الفصل الدراسي الثاني' })).toContainText('1 يوليو 2027');
+  await page.getByRole('button', { name: 'الكل', exact: true }).click();
   const nationalDay = page.locator('.calendar-period').filter({ hasText: 'إجازة اليوم الوطني' });
-  await expect(nationalDay.getByText('23 – 26 سبتمبر 2026')).toBeVisible();
-  await expect(nationalDay.getByText('4 أيام', { exact: true })).toBeVisible();
-  await expect(nationalDay.getByText('رسمي')).toBeVisible();
+  await expect(nationalDay).toContainText('23–26');
+  await expect(nationalDay).toContainText('4 أيام');
+  await expect(nationalDay).toContainText('إجازة معتمدة');
   await expect(nationalDay).toHaveClass(/calendar-period--warn/);
 
   await page.getByRole('button', { name: 'إعدادات التقويم والمنطقة' }).click();
-  await expect(page.getByRole('dialog').getByText('السنوات الدراسية', { exact: true })).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'الفصول', exact: true }).click();
+  await expect(page.getByRole('dialog').getByText('الفصول الدراسية في', { exact: false })).toBeVisible();
   await page.getByRole('dialog').locator('.cal-settings-term').filter({ hasText: 'الفصل الدراسي الأول' })
     .getByRole('button', { name: 'تعديل التواريخ' }).click();
   await expect(page.getByRole('dialog').getByLabel('من *')).toBeVisible();
   await expect(page.getByRole('dialog').getByLabel('إلى *')).toBeVisible();
   await expect(page.getByRole('dialog').getByLabel('الاسم')).toHaveCount(0);
   await page.getByRole('dialog').getByLabel('إغلاق').click();
-  await expect(page.getByRole('dialog').getByText('السنوات الدراسية', { exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('الفصول الدراسية في', { exact: false })).toBeVisible();
   await page.getByRole('dialog').getByRole('button', { name: 'تم', exact: true }).click();
 
   await page.goto('/#/settings');

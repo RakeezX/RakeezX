@@ -43,9 +43,9 @@ test('Calendar Academic Time Control Center view renders all key information cor
   assert.ok(rendered.includes('الأيام المنقضية'), 'Must include elapsed days metric');
   assert.ok(rendered.includes('نسبة الإنجاز الزمني'), 'Must include progress percentage');
 
-  // 3. الإجازة القادمة والصياغة السليمة
-  assert.ok(rendered.includes('الإجازة القادمة'), 'Must include next holiday card titled الإجازة القادمة');
-  assert.ok(rendered.includes('فترة إجازة مجدولة'), 'Must use approved body copy for scheduled holidays');
+  // 3. المحطة القادمة والصياغة السليمة
+  assert.ok(rendered.includes('المحطة القادمة'), 'Must include a separate next-milestone card');
+  assert.ok(rendered.includes('إجازة معتمدة'), 'Next milestone keeps the official holiday context without duplicate holiday copy');
 
   // 4. التبديل الحي بين التقويمين وتحديث العرض
   const { GENERAL_1448_1449_PRESET_ID } = await import('../src/lib/calendar-presets.js');
@@ -63,7 +63,8 @@ test('Calendar Academic Time Control Center view renders all key information cor
   // 5. المخطط الزمني للفترات والإجازات وأزرار التصفية
   assert.ok(rendered.includes('الإجازات والفترات الدراسية'), 'Must include periods section');
   assert.ok(rendered.includes('calendar-period'), 'Must include calendar-period class');
-  assert.ok(rendered.includes('إجازة اليوم الوطني'), 'Must include official holiday');
+  assert.ok(store.calendarRangesOf().some((range) => range.label === 'إجازة اليوم الوطني' && range.source?.startsWith('preset:')),
+    'Official holidays remain in the store even when the fresh upcoming filter omits elapsed dates');
   assert.ok(rendered.includes('cal-filter-btn'), 'Must include filter buttons');
   assert.ok(rendered.includes('رسمي'), 'Must distinguish official from local exceptions');
 });
@@ -93,8 +94,9 @@ test('affected preview includes sessions plus ungenerated slots only in their ow
   assert.deepEqual(affected.map(({ id, type }) => [id, type]), [['se:preview-current', 'session'], ['sl:preview-2', 'slot']]);
   assert.deepEqual(await db.getAll('sessions'), before, 'Preview must be read-only');
   const rendered = calendarView.render().value;
-  const nationalCard = rendered.split('class="cal-period-row calendar-period')[1];
-  assert.ok(nationalCard.includes('إجازة معتمدة · تُستبعد الحصص'), 'National Day uses Production non-study classification');
+  assert.ok(store.calendarRangesOf().some((range) => range.kind === 'national' && range.source?.startsWith('preset:')),
+    'National Day retains its official non-teaching kind even when the new upcoming filter hides past rows');
+  assert.ok(rendered.includes('data-filter="upcoming"'), 'Fresh Calendar view exposes the upcoming filter');
 });
 
 test('Calendar gracefully handles empty year without terms and validates activation', async () => {
