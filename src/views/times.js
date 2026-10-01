@@ -1429,7 +1429,6 @@ export default {
       <div class="management-page timing-profiles-page">
       <div class="timing-page-head">
         <div class="timing-page-head__identity">
-          <a class="timing-back" href="#/schedule">← الجدول الأسبوعي</a>
           <h1>ملفات توقيت الحصص</h1>
         </div>
         <button class="btn btn--sm btn--ghost" data-act="add-profile">${icon('plus')} ملف توقيت جديد</button>
