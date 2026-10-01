@@ -1,19 +1,20 @@
 import * as db from './db.js';
 import {
-  makeCalendar, makeEnrollment, makeGroupArrangement, makeItem, makeSection,
-  makeSession, makeSlot, makeStudent, makeSubject, makeTeaching, makeTerm,
+  makeEnrollment, makeGroupArrangement, makeItem, makeSection,
+  makeSession, makeSlot, makeStudent, makeSubject, makeTeaching,
   makeScoreSubitem, makeScoreSubitemCompletion,
-  makeTimeProfile, makeYear, scoreId, attendanceId, DEFAULT_TIME_PROFILES,
+  makeTimeProfile, scoreId, attendanceId, DEFAULT_TIME_PROFILES,
   DEFAULT_TIME_PROFILE_IDS, periodTime,
 } from '../models.js';
 import { projectSubitemScore } from './score-foundation.js';
+import { calendarPresetRecords, getCalendarPreset } from './calendar-presets.js';
 
 export const DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-session-v1';
 export const LEGACY_DEMO_ACTIVE_STORAGE_KEY = 'rakeezx-demo-active-v1';
 export const DEMO_PREPARING = 'preparing';
 export const DEMO_ACTIVE = 'active';
-export const DEMO_SEED_ID = 'demo:workspace-seed-v3';
-const PREVIOUS_DEMO_SEED_ID = 'demo:workspace-seed-v2';
+export const DEMO_SEED_ID = 'demo:workspace-seed-v4';
+const PREVIOUS_DEMO_SEED_IDS = ['demo:workspace-seed-v3', 'demo:workspace-seed-v2'];
 const FIXED_TIME = Date.parse('2026-09-01T06:00:00.000Z');
 const CLASS_PLAN = Object.freeze([
   { grade: 4, label: '1', students: 23, slots: [[0, 1], [2, 3]] },
@@ -41,6 +42,23 @@ const FAMILY_NAMES = Object.freeze([
 const SESSION_DATE_BY_WEEKDAY = Object.freeze({ 0: '2026-09-06', 1: '2026-09-07', 2: '2026-09-08', 3: '2026-09-09', 4: '2026-09-10' });
 
 const record = (value) => ({ updatedAt: FIXED_TIME, deleted: false, ...value });
+
+function demoCalendarReference() {
+  const official = calendarPresetRecords(getCalendarPreset());
+  // Keep stable Demo identities so existing sample classes and teachings retain
+  // their year/term references while their reference data comes from Product.
+  const year = { ...official.year, id: 'demo:year:1448', updatedAt: FIXED_TIME };
+  const calendar = { ...official.calendar, id: 'demo:calendar', yearId: year.id, updatedAt: FIXED_TIME };
+  const terms = official.terms.map((term) => ({
+    ...term, id: `demo:term:${term.index}`, yearId: year.id,
+    calendarId: calendar.id, updatedAt: FIXED_TIME,
+  }));
+  const calendarDays = official.calendarDays.map((day) => ({
+    ...day, id: `demo:calendar-day:${day.date}`, calendarId: calendar.id,
+    updatedAt: FIXED_TIME,
+  }));
+  return { year, terms, calendar, calendarDays };
+}
 
 export function demoRequestState(storage = globalThis.sessionStorage) {
   try { return storage?.getItem(DEMO_ACTIVE_STORAGE_KEY) ?? null; } catch { return null; }
@@ -71,15 +89,13 @@ export function clearLegacyDemoRequest(storage = globalThis.localStorage) {
 }
 
 export function createDemoDataset() {
-  const year = makeYear({ id: 'demo:year:1448', hijriStart: 1448, status: 'active', updatedAt: FIXED_TIME });
-  const term = makeTerm({ id: 'demo:term:1', yearId: year.id, index: 1, status: 'active', startDate: '2026-08-23', endDate: '2027-01-07', updatedAt: FIXED_TIME });
-  const pastTerm = makeTerm({ id: 'demo:term:past', yearId: year.id, index: 2, name: 'فصل تجريبي مكتمل', status: 'closed', startDate: '2026-01-01', endDate: '2026-05-31', updatedAt: FIXED_TIME });
+  const { year, terms, calendar, calendarDays } = demoCalendarReference();
+  const term = terms[0];
   const subject = makeSubject({ id: 'demo:subject:digital', name: 'المهارات الرقمية', slug: 'demo-digital', updatedAt: FIXED_TIME });
   const timeProfiles = DEFAULT_TIME_PROFILES.map((profile, order) => makeTimeProfile({
     ...structuredClone(profile), order, updatedAt: FIXED_TIME,
   }));
   const timeProfile = timeProfiles.find((profile) => profile.id === DEFAULT_TIME_PROFILE_IDS.summer);
-  const calendar = makeCalendar({ id: 'demo:calendar', yearId: year.id, label: 'التقويم التجريبي', updatedAt: FIXED_TIME });
   const sections = CLASS_PLAN.map((plan, index) => makeSection({
     id: `demo:section:${index + 1}`, yearId: year.id, grade: plan.grade,
     label: plan.label, name: `${plan.grade}/${plan.label}`,
@@ -200,9 +216,9 @@ export function createDemoDataset() {
   return {
     profile: [record({ id: 'profile', teacherName: 'معلم ركيز', schoolName: 'مدرسة ركيز التجريبية', phone: '', teacherForm: 'masculine', reportPrincipalName: 'مدير المدرسة', principalName: 'مدير المدرسة', activeTimeProfileId: timeProfile.id })],
     device: [record({ id: 'device', deviceId: 'demo-device', theme: 'light', activeYearId: year.id, activeTermId: term.id, activeTimeProfileId: timeProfile.id, reportPrincipalName: 'مدير المدرسة', lastSyncAt: null, schemaVersion: 7 })],
-    meta: [record({ id: DEMO_SEED_ID, version: 3, seededAt: FIXED_TIME })],
-    years: [year], terms: [term, pastTerm], subjects: [subject], sections, teachings, students, enrollments,
-    items, scoreSubitems, scoreSubitemCompletions, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays: [],
+    meta: [record({ id: DEMO_SEED_ID, version: 4, seededAt: FIXED_TIME })],
+    years: [year], terms, subjects: [subject], sections, teachings, students, enrollments,
+    items, scoreSubitems, scoreSubitemCompletions, scores, slots, sessions, sessionRosterSnapshots, attendance, logs, calendars: [calendar], calendarDays,
     units: [], lessons: [], timeProfiles, notes, classRules, classGoals, classCharterSelections,
     groupArrangements, closedTermReports: [], assignments: [], submissions: [], outbox: [],
   };
@@ -212,15 +228,24 @@ export async function seedDemoWorkspace({ force = false } = {}) {
   if (db.getActiveDatabaseName() !== 'rakeezx-demo') throw new Error('Demo seed requires the isolated demo database');
   if (!force && await db.get('meta', DEMO_SEED_ID)) return { seeded: false };
   const snapshot = createDemoDataset();
-  if (!force && await db.get('meta', PREVIOUS_DEMO_SEED_ID)) {
+  if (!force && (await Promise.all(PREVIOUS_DEMO_SEED_IDS.map((id) => db.get('meta', id)))).some(Boolean)) {
     const additions = {};
+    const legacyPastTermInUse = (await db.getAll('teachings')).some((row) => !row.deleted && row.termId === 'demo:term:past');
     for (const [storeName, rows] of Object.entries(snapshot)) {
+      if (['years', 'terms', 'calendars', 'calendarDays', 'meta'].includes(storeName)) continue;
       if (!rows.length) continue;
       const existingIds = new Set((await db.getAll(storeName)).map((row) => row.id));
       const missing = rows.filter((row) => !existingIds.has(row.id));
       if (missing.length) additions[storeName] = missing;
     }
-    if (Object.keys(additions).length) await db.putAcross(additions);
+    await db.applyBatch({
+      ...Object.fromEntries(Object.entries(additions).map(([name, rows]) => [name, { put: rows }])),
+      years: { put: snapshot.years },
+      terms: { put: snapshot.terms, remove: legacyPastTermInUse ? [] : ['demo:term:past'] },
+      calendars: { put: snapshot.calendars },
+      calendarDays: { put: snapshot.calendarDays },
+      meta: { put: snapshot.meta },
+    });
     return { seeded: false, upgraded: true, students: snapshot.students.length, sections: snapshot.sections.length };
   }
   await db.writeAll(snapshot, 'replace');
