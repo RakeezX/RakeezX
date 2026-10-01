@@ -76,7 +76,10 @@ test('server disable_signup still blocks the pilot Product gate', async () => {
 test('closed Product gate sends create_user false and unknown email remains a neutral failure', async () => {
   const source = await readFile(new URL('../src/lib/cloud.js', import.meta.url), 'utf8');
   const gatedSource = source.replace('export const NEW_ACCOUNT_SIGNUP_ENABLED = true;',
-    'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;');
+    'export const NEW_ACCOUNT_SIGNUP_ENABLED = false;')
+    // A data URL has no directory against which module imports can resolve.
+    .replace(/(['"])(\.\/[^'"]+\.js)\1/g, (_match, quote, specifier) =>
+      `${quote}${new URL(specifier, new URL('../src/lib/cloud.js', import.meta.url)).href}${quote}`);
   const gatedCloud = await import(`data:text/javascript,${encodeURIComponent(gatedSource)}`);
   let body;
   globalThis.fetch = async (_url, options) => {

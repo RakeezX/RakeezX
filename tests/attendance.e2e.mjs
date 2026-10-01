@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createAttendanceServer } from './helpers/attendance-server-fixture.mjs';
 
-test.use({ ...(process.env.RAKEEZX_ATTENDANCE_TEST_URL ? { baseURL: process.env.RAKEEZX_ATTENDANCE_TEST_URL } : {}) });
+test.use({ serviceWorkers: 'block', ...(process.env.RAKEEZX_ATTENDANCE_TEST_URL ? { baseURL: process.env.RAKEEZX_ATTENDANCE_TEST_URL } : {}) });
 
 const STORES = [
   'profile', 'years', 'terms', 'subjects', 'sections', 'teachings',
@@ -39,7 +39,8 @@ async function setupDevice(page, server) {
     ]),
   ));
   await page.goto('/');
-  await page.waitForFunction(() => window.store?.state.ready);
+  await page.waitForFunction(() => window.__syncModule && window.store?.state.ready);
+  await expect(page.locator('.page--home')).toBeVisible();
   await page.evaluate(async (canonical) => {
     const database = await import('/src/lib/db.js');
     const { decodeSyncV2Canonical } = await import('/src/lib/sync-v2.js');
@@ -51,7 +52,9 @@ async function setupDevice(page, server) {
     await database.clearStore('outbox');
   }, records);
   await installEngine(page);
-  await page.goto(ROUTE);
+  // Navigate the already initialized fixture through the app instead of
+  // restarting signed-out bootstrap with a deep link.
+  await page.evaluate((hash) => { location.hash = hash; }, ROUTE.slice(1));
   await expect(page.locator('.att-row')).toHaveCount(3);
 }
 
@@ -98,7 +101,10 @@ test('current Sync V2 attendance persists, acknowledges, and converges in both d
     expect(await page.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).length)).toBe(0);
 
     await page.reload();
+    await page.waitForFunction(() => window.__syncModule && window.store?.state.ready);
+    await expect(page.locator('.page')).toBeVisible();
     await installEngine(page);
+    await page.evaluate((hash) => { location.hash = hash; }, ROUTE.slice(1));
     await expectStates(page, initial);
 
     const peer = await peerContext.newPage();

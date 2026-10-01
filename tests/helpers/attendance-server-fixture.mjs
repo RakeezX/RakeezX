@@ -1,5 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
+import { installRealtimeFixture } from './realtime-server-fixture.mjs';
+import { SYNC_V2_SCHEMAS } from '../../src/lib/sync-v2.js';
 
 // Test-only PostgreSQL; never connects to Supabase or reads Production data.
 export async function createAttendanceServer() {
@@ -9,20 +11,16 @@ export async function createAttendanceServer() {
     create schema auth;
     create role authenticated;
     create role anon;
+    create role service_role;
     create table auth.users(id uuid primary key);
     insert into auth.users values ('${owner}');
     create function auth.uid() returns uuid language sql stable as $$select '${owner}'::uuid$$;
   `);
-  for (const name of [
-    '0001_core_schema.sql', '0002_indexes_triggers_rls.sql', '0003_hybrid_calendar.sql',
-    '0004_student_notes.sql', '0007_sections_active_normalized_identity.sql',
-    '0008_enrollment_membership_operations.sql', '0009_transfer_and_renumber_rosters.sql',
-    '0010_profile_report_principal_name.sql', '0011_session_roster_snapshots.sql',
-    '0012_sync_v2_server_protocol.sql', '0013_sync_v2_enrollment_commands.sql',
-    '0014_sync_v2_attendance_snapshot_commands.sql', '0015_sync_v2_lifecycle_commands.sql',
-    '0016_sync_v2_teaching_creation_commands.sql', '0017_sync_v2_bulk_attendance_commands.sql',
-  ]) {
-    await pg.exec((await readFile(new URL(`../../supabase/migrations/${name}`, import.meta.url), 'utf8')).replace(/^\uFEFF/, ''));
+  await installRealtimeFixture(pg);
+  const directory = new URL('../../supabase/migrations/', import.meta.url);
+  const migrations = (await readdir(directory)).sort().filter((name) => /^\d.*\.sql$/.test(name));
+  for (const name of migrations) {
+    await pg.exec((await readFile(new URL(name, directory), 'utf8')).replace(/^\uFEFF/, ''));
   }
   await pg.exec(`
     insert into rakeezx.profile(owner_id) values ('${owner}');
@@ -45,9 +43,10 @@ export async function createAttendanceServer() {
       values ('override-session','override-teaching','2026-09-06',1,'scheduled');
   `);
   const calls = [];
-  const readable = new Set(['profile','years','terms','subjects','sections','teachings','students','enrollments','sessions','attendance','session_roster_snapshots']);
+  const readable = new Set(Object.values(SYNC_V2_SCHEMAS).map((schema) => schema.entity));
   return {
     calls,
+    migrations,
     pg,
     async fetchRecords(entity) {
       if (!readable.has(entity)) return [];

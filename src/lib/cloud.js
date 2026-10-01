@@ -3,6 +3,9 @@
  * Zero-build, vanilla JS fetch wrapper for Auth and REST.
  */
 
+import { readCompleteTable } from './complete-read.js';
+import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
+
 export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
 const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
 export const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
@@ -14,6 +17,7 @@ export let session = null;
 export let user = null;
 let authRequired = false;
 let refreshInFlight = null;
+let authContextGeneration = 0;
 
 let mockBackend = null;
 export function setMockBackend(adapter) { mockBackend = adapter; }
@@ -49,6 +53,7 @@ export function openOwnerSyncChannel(options) {
 }
 
 export function setMockAuth(u, s) {
+  if (user?.id !== u?.id || !!session !== !!s) authContextGeneration++;
   user = u;
   session = s;
   authRequired = false;
@@ -118,6 +123,8 @@ async function responseFailure(response) {
 }
 
 function saveSession(data, { required = true } = {}) {
+  const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
+  if ((user?.id ?? null) !== (nextUserId ?? null) || !!session !== !!data?.access_token) authContextGeneration++;
   if (!data?.access_token) {
     session = null;
     user = null;
@@ -144,6 +151,12 @@ export async function refreshSession() {
   }
   const refreshToken = session.refresh_token;
   const previous = session;
+  const contextGeneration = authContextGeneration;
+  const assertRefreshContext = () => {
+    if (authContextGeneration !== contextGeneration) {
+      throw Object.assign(new Error('Authentication changed during refresh'), { code: 'AUTH_CONTEXT_CHANGED' });
+    }
+  };
   refreshInFlight = (async () => {
     let response;
     try {
@@ -156,8 +169,10 @@ export async function refreshSession() {
       error.code ??= 'AUTH_NETWORK';
       throw error;
     }
+    assertRefreshContext();
     if (!response.ok) {
       const failure = await responseFailure(response);
+      assertRefreshContext();
       if ([400, 401, 403].includes(response.status)) {
         saveSession(null);
         throw authError(failure.message);
@@ -165,6 +180,7 @@ export async function refreshSession() {
       throw failure;
     }
     const refreshed = await response.json();
+    assertRefreshContext();
     saveSession({ ...previous, ...refreshed, user: refreshed.user ?? previous.user ?? user });
     return session;
   })().finally(() => { refreshInFlight = null; });
@@ -194,17 +210,23 @@ async function sendRequest(path, options, isAuth) {
   });
 }
 
-export async function request(path, options = {}, isAuth = false) {
+export async function request(path, options = {}, isAuth = false, { responseMetadata = false, assertAccess = () => {} } = {}) {
+  assertAccess();
   if (!isAuth) await ensureFreshSession();
+  assertAccess();
   const attemptedToken = session?.access_token ?? null;
   let res = await sendRequest(path, options, isAuth);
+  assertAccess();
   if (!isAuth && [401, 403].includes(res.status)) {
     if (session?.refresh_token) {
       if (session.access_token === attemptedToken) await refreshSession();
+      assertAccess();
       res = await sendRequest(path, options, false);
+      assertAccess();
     }
     if ([401, 403].includes(res.status)) {
       const failure = await responseFailure(res);
+      assertAccess();
       saveSession(null);
       throw authError(failure.message);
     }
@@ -213,16 +235,18 @@ export async function request(path, options = {}, isAuth = false) {
     throw await responseFailure(res);
   }
   
-  if (res.status === 204) return null;
+  const result = (data) => responseMetadata ? { data, contentRange: res.headers.get('content-range') } : data;
+  if (res.status === 204) return result(null);
   
   const text = await res.text();
-  if (!text) return null;
+  assertAccess();
+  if (!text) return result(null);
   
   try {
-    return JSON.parse(text);
+    return result(JSON.parse(text));
   } catch (err) {
-    console.warn('[rakeezx cloud] Non-JSON response:', text);
-    return text;
+    if (!responseMetadata) console.warn('[rakeezx cloud] Non-JSON response:', text);
+    return result(text);
   }
 }
 
@@ -1173,16 +1197,26 @@ export async function fetchSectionCandidates({ yearId, grade }) {
 
 export async function fetchRecords(tableName) {
   if (mockBackend) return mockBackend.fetchRecords(tableName);
-  if (!user) throw new Error('Not authenticated');
-  const data = await request(`/${tableName}?owner_id=eq.${user.id}&select=*`, {
-    headers: {
-      'Accept': 'application/json',
-      'Accept-Profile': 'rakeezx'
+  if (!user?.id || !session) throw authError('Authentication required');
+  if (!/^[a-z_]+$/.test(String(tableName))) throw new Error('Invalid cloud table');
+  const ownerId = user.id;
+  const contextGeneration = authContextGeneration;
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  const assertAccess = () => {
+    if (!session || user?.id !== ownerId || authContextGeneration !== contextGeneration ||
+        runtimeSyncOwnershipGuard.getWorkspace() !== workspace) {
+      throw Object.assign(new Error('Cloud read account/workspace changed'), { code: 'CLOUD_READ_CONTEXT_CHANGED' });
     }
-  });
-  if (!data) return [];
-  if (!Array.isArray(data)) {
-    throw new Error(`Structural sync failed for ${tableName}: expected array, received ${typeof data}`);
-  }
-  return data;
+  };
+  const key = tableName === 'profile' ? 'owner_id' : 'id';
+  return readCompleteTable({ ownerId, key, assertAccess, fetchPage: async ({ offset, limit }) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
+    try {
+      return await request(`/${tableName}?owner_id=eq.${encodeURIComponent(ownerId)}&select=*&order=${key}.asc&limit=${limit}&offset=${offset}`, {
+        headers: { 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Prefer': 'count=exact' },
+        signal: controller.signal,
+      }, false, { responseMetadata: true, assertAccess });
+    } finally { clearTimeout(timeout); }
+  } });
 }
