@@ -1,12 +1,14 @@
 {
   "approvalId": "WA-CALENDAR-0417",
-  "status": "PO APPROVED / FROZEN / EXACT PATCH READY",
-  "frozen": true,
-  "reopenRequiresPO": true,
-  "productRuntimeBaseline": "0700d55331f1f66678ec236f5de8bad776a6d933",
-  "approvedPackage": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration",
-  "patchFile": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\freeze\\CALENDAR-0417-ACCEPTED.patch",
-  "patchSha256": "49584cdc8370203e3f7203b9f7b55dda1af3bccef441cce1cc542432cd7b26ea",
+  "status": "PO-APPROVED VISUAL OUTCOME / CURRENT-PRODUCT REBASE REFRESH / EXACT PATCH R2 READY",
+  "visualAuthority": "Existing PO-approved WA-CALENDAR-0417 real-Product visual outcome; transport refresh only, no new visual decision",
+  "package": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration-R2",
+  "currentProductBaseline": "c03045c570567c0377581b9041da7870a380d045",
+  "previousBaseline": "0700d55331f1f66678ec236f5de8bad776a6d933",
+  "previousPatch": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\freeze\\CALENDAR-0417-ACCEPTED.patch",
+  "previousPatchSha256": "49584cdc8370203e3f7203b9f7b55dda1af3bccef441cce1cc542432cd7b26ea",
+  "patch": "review/freeze/CALENDAR-0417-ACCEPTED-R2.patch",
+  "patchSha256": "129688ea6e51c4ba7237873b24b4f736bc934be5dfafac0e98cbc90e8e1c722e",
   "exactTouchedProductPaths": [
     "index.html",
     "src/styles/calendar-work-0417.css",
@@ -15,9 +17,9 @@
   ],
   "explicitAllowedFileList": [
     "index.html",
-    "src/views/calendar.js",
+    "src/styles/calendar-work-0417.css",
     "src/views/calendar-0417-ui.js",
-    "src/styles/calendar-work-0417.css"
+    "src/views/calendar.js"
   ],
   "explicitProtectedFileList": [
     "src/store.js",
@@ -26,76 +28,107 @@
     "src/lib/auth/**",
     "src/views/schedule.js",
     "src/views/times.js",
+    "src/styles/schedule-work-integration.css",
     "supabase/**",
     "supabase/migrations/**",
     "tests/**",
     "docs/**",
     "review/**"
   ],
-  "approvedRoutes": [
-    "#/calendar"
-  ],
-  "requiredViewports": [
-    1440,
-    1366,
-    1024,
-    768,
-    390,
-    320
-  ],
-  "requiredThemes": [
-    "light",
-    "dark"
-  ],
-  "goldenScreenshots": [
+  "finalTargetSourceSha256": {
+    "index.html": "5b9f60abb5cf47f9ad206ece70b52e6c03edc8491abf8edf6a7f0ddf0264f698",
+    "src/styles/calendar-work-0417.css": "1f0f333b5d4f35e2a0f6ac43ac1b50022ad374de01b6c95a4d128ba631821671",
+    "src/views/calendar-0417-ui.js": "5500ff587039d6082d35707e0164f78cfdc3648d585fd2cba70093eea6a8bf1f",
+    "src/views/calendar.js": "aaf40bd969c3d475f3b4e0e67bd6c3806674535a49afcfd3669a4bfe3f446920"
+  },
+  "calendarGoldenEvidence": [
     {
-      "path": "review/final-refinement/calendar-1440-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1440-light.png",
       "sha256": "2ce28c3d2ccd7bc85f6a5ef8edc7462c1663acf514397b36c77ddc17370ef98d"
     },
     {
-      "path": "review/final-refinement/calendar-1440-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1440-dark.png",
       "sha256": "e7fc5341da1c0cb57e72008f3a9f2079d1315780e9dca41ecc934b7cd907660c"
     },
     {
-      "path": "review/final-refinement/calendar-1366-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1366-light.png",
       "sha256": "0e2f5850352d6d86a962d311a36433bbc625e98ebef5c2ee16e310425fee852a"
     },
     {
-      "path": "review/final-refinement/calendar-1366-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1366-dark.png",
       "sha256": "b976d7fe9f5eb390af54df0969fab8feb8a53fd5ee583a68be6cc872e4c2b10e"
     },
     {
-      "path": "review/final-refinement/calendar-1024-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1024-light.png",
       "sha256": "8da7ee918914e378a127f69360dc39ebceeaa2ae7b473dad7a9b39c2a4d3a124"
     },
     {
-      "path": "review/final-refinement/calendar-1024-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-1024-dark.png",
       "sha256": "38fab83c8c446793eb9f61e7a6e82ae5ef63d00d24ff203f7c0c3b1b5eb4eec9"
     },
     {
-      "path": "review/final-refinement/calendar-768-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-768-light.png",
       "sha256": "b79856945fecdf96896ad792f616875bc88a8b0764f3e474031938f964eedd41"
     },
     {
-      "path": "review/final-refinement/calendar-768-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-768-dark.png",
       "sha256": "51487003d6f84eab27c05feee852f7eeaf26b82f7d7cf034b1f5cc0939602b34"
     },
     {
-      "path": "review/final-refinement/calendar-390-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-390-light.png",
       "sha256": "cabee25050ed6e51432064b9b6d0539d3a647b0fdbca89c133fa123f3da456aa"
     },
     {
-      "path": "review/final-refinement/calendar-390-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-390-dark.png",
       "sha256": "359c22061063fdb9691d8e6fba2de68ca00581d928eb3da5039a0412e1c70040"
     },
     {
-      "path": "review/final-refinement/calendar-320-light.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-320-light.png",
       "sha256": "471f160397cd32e05d20d45595edb9bbc04abc589db07721c4f57d1421454eb5"
     },
     {
-      "path": "review/final-refinement/calendar-320-dark.png",
+      "path": "D:\\Abdullah Projects\\RakeezX-Work-Calendar-0417-Product-Integration\\review\\final-refinement\\calendar-320-dark.png",
       "sha256": "89ef280245d43620a44970b0adbe9484e2022b093f37a7ba0e67c3651dbd52df"
     }
+  ],
+  "calendarR2Evidence": [
+    "review/evidence/calendar-1440-light-r2.png",
+    "review/evidence/calendar-1440-dark-r2.png",
+    "review/evidence/calendar-1366-light-r2.png",
+    "review/evidence/calendar-1366-dark-r2.png",
+    "review/evidence/calendar-1024-light-r2.png",
+    "review/evidence/calendar-1024-dark-r2.png",
+    "review/evidence/calendar-768-light-r2.png",
+    "review/evidence/calendar-768-dark-r2.png",
+    "review/evidence/calendar-390-light-r2.png",
+    "review/evidence/calendar-390-dark-r2.png",
+    "review/evidence/calendar-320-light-r2.png",
+    "review/evidence/calendar-320-dark-r2.png"
+  ],
+  "schedulePreservationEvidence": [
+    "review/evidence/schedule-1440-light-baseline.png",
+    "review/evidence/schedule-1440-light-r2.png",
+    "review/evidence/schedule-390-light-baseline.png",
+    "review/evidence/schedule-390-light-r2.png",
+    "review/evidence/schedule-320-light-baseline.png",
+    "review/evidence/schedule-320-light-r2.png",
+    "review/evidence/times-1440-light-baseline.png",
+    "review/evidence/times-1440-light-r2.png",
+    "review/evidence/times-390-light-baseline.png",
+    "review/evidence/times-390-light-r2.png",
+    "review/evidence/times-320-light-baseline.png",
+    "review/evidence/times-320-light-r2.png",
+    "review/evidence/timing-editor-390-baseline.png",
+    "review/evidence/timing-editor-390-r2.png",
+    "review/evidence/timing-editor-320-baseline.png",
+    "review/evidence/timing-editor-320-r2.png"
+  ],
+  "approvedRoutes": [
+    "#/calendar"
+  ],
+  "preservedRoutes": [
+    "#/schedule",
+    "#/schedule/times"
   ],
   "demoParityRequirement": "Same approved Calendar renderer, cards, filters and Calendar-owned forms in account-free Demo; local synthetic data, zero Product/Supabase requests and zero Product outbox work.",
   "runtimeInvariants": [
@@ -105,44 +138,27 @@
     "Affected sessions, attendance, Home, timing resolution, Owner Guard, Sync, outbox and Backup/Restore remain unchanged",
     "Real Product form validation and save/edit/delete handlers remain authoritative"
   ],
-  "finalSourceFiles": [
-    {
-      "path": "index.html",
-      "packageSourceSha256": "47a972a2a1cd496fb6042619e0e6d734e9c8385bace6362988b9352c86e1b3d8",
-      "acceptedPatchTargetSha256": "73cfdded0468bf1bb46f669bbbcbd62958ca85ddb9b682754e7ad54da1275db4",
-      "baselineSha256": "bedd6df0601e6f9a48e99dd980948c8815bcffebc62f4d4d2c88e9e29e167813"
-    },
-    {
-      "path": "src/views/calendar.js",
-      "packageSourceSha256": "7e2c8364521880c17839b36d4736f020f54ca73e98945d244e961dd3efd9c110",
-      "acceptedPatchTargetSha256": "aaf40bd969c3d475f3b4e0e67bd6c3806674535a49afcfd3669a4bfe3f446920",
-      "baselineSha256": "1e4188ef937c114eb0d3d51470f163e7d12d4ebaad7b53d5bfb1740e59ac4dc9"
-    },
-    {
-      "path": "src/views/calendar-0417-ui.js",
-      "packageSourceSha256": "e7258dffd459b8c60553db30027de7be11d555dcbbed5515dcf3c6d39b977700",
-      "acceptedPatchTargetSha256": "5500ff587039d6082d35707e0164f78cfdc3648d585fd2cba70093eea6a8bf1f",
-      "baselineSha256": null
-    },
-    {
-      "path": "src/styles/calendar-work-0417.css",
-      "packageSourceSha256": "2e5e8536c9e9319de8e698fab7b21227de067fc027ce87594e0bb2c08d94a8ef",
-      "acceptedPatchTargetSha256": "1f0f333b5d4f35e2a0f6ac43ac1b50022ad374de01b6c95a4d128ba631821671",
-      "baselineSha256": null
-    }
-  ],
+  "runtimeSafeAdaptation": "index.html adds the approved Calendar stylesheet after the shipped Schedule stylesheet; three Calendar source targets match the previous accepted patch byte-for-byte.",
   "reviewOnlyExclusions": [
-    "review/calendar-fixture.js injection omitted from index.html",
-    "46 standalone Work review-only CSS rules omitted"
+    "No fixture injection in Product index.html",
+    "No review/calendar-fixture.js in patch",
+    "No synthetic records, evidence, gallery, generated build or local server files in patch"
   ],
-  "lineEndingAdaptation": "Product patch targets CRLF like the baseline; package-source hashes record approved Work bytes separately.",
   "verification": {
-    "baselineCommitExists": true,
-    "gitApplyCheck": "PASS",
-    "appliedTargetByteMatch": "PASS",
-    "touchedPathAllowlist": "PASS",
+    "goldenSha256": "12/12 PASS",
+    "calendarPixelIdentity": "12/12 PASS",
+    "schedulePixelIdentity": "6/6 PASS",
+    "timingEditorPixelIdentity": "2/2 PASS",
+    "gitApplyCheckAgainstExactBaseline": "PASS",
+    "appliedTargetByteHashes": "4/4 PASS",
+    "touchedPathAllowlist": "4/4 PASS",
     "reviewFixtureExcluded": true,
-    "goldenFileCount": 12
+    "focusedBrowserCases": 24,
+    "pageOrConsoleErrors": 0,
+    "externalRequests": 0,
+    "horizontalOverflowCases": 0,
+    "undersizedCalendarButtons": 0,
+    "viteBuild": "PASS"
   },
-  "createdAtUtc": "2026-10-01T07:04:49.063055+00:00"
+  "createdAtUtc": "2026-10-01T08:49:34.377041+00:00"
 }
