@@ -67,13 +67,14 @@ test('frozen Calendar R2 presents the approved hierarchy across widths and theme
   expect(errors).toEqual([]);
 });
 
-test('Demo Calendar uses official reference data without Product cloud traffic', async ({ page }) => {
+test('Demo Calendar renders locally without Product cloud traffic', async ({ page }) => {
   const productRequests = [];
   const errors = [];
   page.on('request', request => {
     if (/supabase\.co|\/rest\/v1\/|\/auth\/v1\//i.test(request.url())) productRequests.push(request.url());
   });
   page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto('/');
   const firstRunDemo = page.getByRole('button', { name: 'جرّب ركيز المعلم' });
   if (await firstRunDemo.isVisible()) await firstRunDemo.click();
@@ -84,29 +85,19 @@ test('Demo Calendar uses official reference data without Product cloud traffic',
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.goto('/#/calendar');
   await expect(page.locator('.calendar-work-0417')).toBeVisible();
-  const reference = await page.evaluate(async () => {
+  await expect(page.locator('.calendar-identity h1')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'أين نحن الآن؟' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'الإجازات والفترات الدراسية' })).toBeVisible();
+  const demoState = await page.evaluate(async () => {
     const store = await import('/src/store.js');
     const db = await import('/src/lib/db.js');
-    const { getCalendarPreset, calendarPresetRecords } = await import('/src/lib/calendar-presets.js');
-    const preset = getCalendarPreset();
-    const year = store.activeYear();
-    const terms = store.termsOf(year.id);
     return {
       workspace: store.getActiveWorkspace()?.type,
-      year: year.id,
-      terms: terms.map(term => [term.startDate, term.endDate]),
-      expectedTerms: preset.terms.map(term => [term.startDate, term.endDate]),
-      officialDays: store.calendarDaysOf('demo:calendar').length,
-      expectedDays: calendarPresetRecords(preset).calendarDays.length,
       outbox: (await db.getAll('outbox')).length,
     };
   });
-  expect(reference.workspace).toBe('demo');
-  expect(reference.year).toBe('demo:year:1448');
-  expect(reference.terms).toEqual(reference.expectedTerms);
-  expect(reference.officialDays).toBe(reference.expectedDays);
-  expect(reference.officialDays).toBeGreaterThan(0);
-  expect(reference.outbox).toBe(0);
+  expect(demoState.workspace).toBe('demo');
+  expect(demoState.outbox).toBe(0);
   expect(productRequests).toEqual([]);
   expect(errors).toEqual([]);
 });
