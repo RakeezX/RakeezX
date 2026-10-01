@@ -1,6 +1,6 @@
 # RAKEEZ X — current source architecture
 
-Calendar range and suspension contracts reconciled against repository source at `0700d55331f1f66678ec236f5de8bad776a6d933` on 2026-10-01; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
+Calendar range, suspension, R2 presentation and Demo reference contracts reconciled against repository source at `95abecef88c4b05e5c963a2140cd622284f1c2eb` on 2026-10-01; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
 
 ## Authorities and entry points
 
@@ -36,13 +36,19 @@ Calendar range and suspension contracts reconciled against repository source at 
 
 - Modern custom exception range identity is reconstructed from the exact persisted day-ID structure; genuine legacy single-day rows remain independent identities. Range edit, move and delete queue explicit Sync V2 DELETE operations for removed days. Calendar range writes and their outbox changes are atomic.
 - The applied `20260930094421_calendar_day_active_identity` migration removed the old full `calendar_days` natural unique constraint. The active-only `calendar_days_active_natural_uniq` index enforces `(owner_id, calendar_id, date)` only where `deleted_at IS NULL`. Reusable-after-delete includes `calendar_days`: the same natural key may be used by a **new active row**, while the old tombstoned ID remains protected against stale-ID resurrection.
-- Official preset multi-day display identity is reconstructed only when the exact known preset source and definition, plus date/kind/label guards, match. No server `rangeId`, `rangeStart` or `rangeEnd` columns were added. Bug #04 is PO Production-verified and CLOSED; its active-only uniqueness and tombstone lifecycle remain unchanged by suspension. Overall N50 remains OPEN for the remaining approved Work transfer.
+- Official preset multi-day display identity is reconstructed only when the exact known preset source and definition, plus date/kind/label guards, match. No server `rangeId`, `rangeStart` or `rangeEnd` columns were added. Bug #04 is PO Production-verified and CLOSED; its active-only uniqueness and tombstone lifecycle remain unchanged by suspension. Overall N50 later CLOSED after the 0452.4 R2 transfer and PO Production verification.
 
 ## Distinct Calendar suspension — N50 / 0446
 
 - `holiday` (إجازة) and `suspension` (تعليق دراسة) are distinct persisted Calendar kinds and both are non-teaching; `remote` remains teaching. The applied `20260930234353_calendar_suspension_kind` migration extends only the Calendar day kind constraint. The existing generic Sync V2 kind mapping and Backup/Restore preserve the distinct kind.
 - Session persistence still uses `cancelled_holiday` for Calendar non-teaching days; no new persisted session status, attendance state or range columns were added. Contextual teacher-facing presentation resolves the session's teaching → term → year Calendar day and labels a suspension as تعليق دراسة while retaining ordinary holiday/manual-session presentation otherwise.
-- Home/Today follows the current effective non-teaching Calendar day for operational presentation, suppressing current-day teaching obligations without deleting or rewriting historical sessions or attendance. Demo uses the same teaching predicate locally and does not gain Product cloud access. Suspension is PO Production-verified and CLOSED; the remaining WA-CALENDAR-0417 visual/UX transfer is unshipped and needs separate authorization.
+- Home/Today follows the current effective non-teaching Calendar day for operational presentation, suppressing current-day teaching obligations without deleting or rewriting historical sessions or attendance. Demo uses the same teaching predicate locally and does not gain Product cloud access. Suspension is PO Production-verified and CLOSED; the remaining WA-CALENDAR-0417 visual/UX transfer later shipped in 0452.4.
+
+## Shipped Calendar R2 and Demo official references — 0452.4
+
+- The PO-verified R2 Calendar presents the calm identity/header, academic-year metadata, “أين نحن الآن؟” current-term timeline/progress, next milestone, balanced current/next cards, term cards and “الإجازات والفترات الدراسية” with four filters, fresh-entry القادمة default, central “إضافة استثناء” and four distinct exception types. Successful Calendar selection closes its settings sheet. These are shipped presentation/interaction contracts; existing Calendar switch runtime/data semantics remain in force.
+- For currently supported official Calendar references, Demo uses the shared built-in reference source while retaining one stable Demo-local year, two official terms, one Demo Calendar and stable year/term/calendar IDs. Western ↔ General selection persists across reload. Official days/holidays follow the selected reference without duplicating a canonical Product year; existing Demo students, Teachings, sessions and attendance remain. Demo Calendar actions cause no Product outbox writes or Product/Supabase traffic. This is scoped D-075 parity, not global future Product/Demo parity.
+- **D-076/N58 is PO-approved target behavior, NOT current runtime.** Stable academic identities through preset changes, official date updates, today-only session decisions, immutable history, account/year-synced preset selection, preset-scoped exceptions/customizations and teacher-controlled active-term activation require a separate HIGH-risk runtime/data foundation audit. Do not infer that current Production implements them.
 
 ## Offline shell and presentation
 
