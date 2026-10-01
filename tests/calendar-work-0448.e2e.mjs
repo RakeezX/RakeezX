@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test('fresh Calendar entry starts at upcoming; distinct exceptions use existing durable range actions', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.clock.setFixedTime(new Date('2026-10-01T09:00:00+03:00'));
   await page.goto('/#/calendar');
   await expect(page.locator('.cal-filter-btn[data-filter="upcoming"]')).toHaveAttribute('aria-pressed', 'true');
@@ -65,6 +66,7 @@ test('fresh Calendar entry starts at upcoming; distinct exceptions use existing 
 test('approved Calendar hierarchy stays responsive, RTL and operable across six widths in both themes', async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto('/#/calendar');
   await expect(page.locator('.cal-radar-grid .cal-card')).toHaveCount(2);
   for (const width of [1440, 1366, 1024, 768, 390, 320]) {
@@ -115,6 +117,7 @@ test('Demo Calendar uses the same exception UI without Product cloud access or o
   let cloudRequests = 0;
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.route('https://*.supabase.co/**', (route) => { cloudRequests += 1; return route.abort(); });
   await page.goto('/');
   const demo = page.getByRole('button', { name: 'جرّب ركيز', exact: true });
