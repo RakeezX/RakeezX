@@ -71,6 +71,53 @@ test('completeness persists and remains tied to the historical session after a r
   }
 });
 
+test('server seconds time marks an incomplete ended session due without changing records', async () => {
+  const f = await setup();
+  const session = { ...f.future, date: '2026-08-24', startTime: '07:15:00', endTime: '08:01:00' };
+  const before = structuredClone(session);
+  for (const time of ['09:33:00', '19:25:00']) {
+    const result = store.attendanceCompleteness(session, new Date(`2026-08-24T${time}`));
+    assert.deepEqual({ state: result.state, expected: result.expected, recorded: result.recorded }, { state: 'pending', expected: 2, recorded: 0 });
+  }
+  assert.equal(store.attendanceCompleteness(session, new Date('2026-08-24T08:00:59')).state, 'future');
+  assert.equal(store.attendanceCompleteness(session, new Date('2026-08-24T08:01:00')).state, 'pending');
+  assert.deepEqual(session, before);
+});
+
+test('supported minute, second and fractional end times preserve partial and complete attendance', async () => {
+  const f = await setup();
+  for (const [endTime, before, at] of [
+    ['08:01', '08:00:59', '08:01:00'],
+    ['08:01:00', '08:00:59', '08:01:00'],
+    ['08:01:00.250', '08:01:00.249', '08:01:00.250'],
+    ['08:01:00.250000', '08:01:00.249', '08:01:00.250'],
+  ]) {
+    const session = { ...f.past, date: '2026-08-24', endTime };
+    assert.equal(store.attendanceCompleteness(session, new Date(`2026-08-24T${before}`)).state, 'future', endTime);
+    assert.equal(store.attendanceCompleteness(session, new Date(`2026-08-24T${at}`)).state, 'pending', endTime);
+    assert.equal(store.attendanceCompleteness(session, new Date('2026-08-24T09:33:00')).state, 'pending', endTime);
+  }
+  await store.setAttendance(f.past.id, f.students[0].id, 'present');
+  const partial = store.attendanceCompleteness({ ...store.getSession(f.past.id), date: '2026-08-24', endTime: '08:01:00' }, new Date('2026-08-24T19:25:00'));
+  assert.equal(partial.state, 'pending');
+  assert.equal(partial.recorded, 1);
+  await store.fillAttendance(f.past.id, 'present');
+  const completed = store.attendanceCompleteness({ ...store.getSession(f.past.id), date: '2026-08-24', endTime: '08:01:00.250' }, new Date('2026-08-24T19:25:00'));
+  assert.equal(completed.state, 'completed');
+  assert.equal(completed.recorded, 2);
+});
+
+test('missing and invalid times retain existing fallback; excluded sessions remain excluded', async () => {
+  const f = await setup();
+  const base = { ...f.future, date: '2026-08-24' };
+  assert.equal(store.attendanceCompleteness({ ...base, endTime: '', startTime: '' }, new Date('2026-08-24T19:25:00')).state, 'future');
+  assert.equal(store.attendanceCompleteness({ ...base, endTime: '', startTime: '' }, new Date('2026-08-24T23:59:00')).state, 'pending');
+  assert.equal(store.attendanceCompleteness({ ...base, endTime: 'not-a-time' }, new Date('2026-08-24T19:25:00')).state, 'future');
+  for (const status of ['cancelled_holiday', 'cancelled', 'missed', 'postponed']) {
+    assert.equal(store.attendanceCompleteness({ ...base, endTime: '08:01:00', status }, new Date('2026-08-24T19:25:00')).state, 'excluded');
+  }
+});
+
 after(async () => {
   store.closeChannel();
   await db.closeDB();

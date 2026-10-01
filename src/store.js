@@ -1672,7 +1672,7 @@ export function attendanceCompleteness(ses, reference = new Date()) {
   const expected = roster.length;
   const completed = expected > 0 && records.length >= expected;
   const end = ses.endTime || ses.startTime || '23:59';
-  const dueAt = new Date(`${ses.date}T${end}:00`);
+  const dueAt = new Date(`${ses.date}T${end}`);
   const due = Number.isFinite(dueAt.getTime()) && reference.getTime() >= dueAt.getTime();
 
   if (completed) return { state: 'completed', completed, due, recorded: records.length, expected };
