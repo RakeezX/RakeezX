@@ -7,8 +7,8 @@
 | Handoff/source | `HANDOFF-0425.md`, `HANDOFF-0429.md`; `schedule.html`, `schedule.js`, `candidate.css` and `surface.html`, `surfaces.js`, `surfaces.css`; final `evidence/0429/` and relevant Option A captures |
 | PO decision / checkpoint | N22 **Option A — Global Dynamic Equal Height** and N57 Schedule-owned visual outcome including 0429 Timing Profile action polish; approved after the 0429 handoff and recorded in 0445. Its older N57 “PO FINAL POLISH REVIEW PENDING” line is superseded by this PO decision. |
 | WORK_APPROVAL / SOURCE_STATE | `APPROVED` / `VERIFIED` at registry creation; recheck [manifest](WA-SCHEDULE-0429.manifest.json) |
-| Implementation authorization / state | No new Product implementation ticket authorized by 0445 / `NOT_AUTHORIZED` |
-| Codex / Preview / Production | No completed port, Preview or Production approval recorded for this Work contract. |
+| Implementation authorization / state | `CLOSED` after 0449/0450 exact-patch certification and explicit PO Production verification. |
+| Codex / Preview / Production | Exact accepted patch transported/certified without Codex visual reimplementation; PO-approved Preview `773db0d2-5050-402a-9e84-2685019db6ad`; Production SHA `c03045c570567c0377581b9041da7870a380d045` / deployment `cecb5bb3-3812-4fd0-b5f3-24096f61c473`; PO Production verification complete. |
 | Risk / device gate | MEDIUM visual/responsive; preserve HIGH-risk timetable identity. Chromium/WebKit width/light/dark evidence exists; no physical-device test claimed. |
 
 ## Accepted surfaces and responsive behavior

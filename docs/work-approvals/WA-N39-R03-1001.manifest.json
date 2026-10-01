@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "ticket": "N39-R03-APPROVAL-FREEZE",
+  "packagePath": "D:\\Abdullah Projects\\RakeezX-Work-N39-R03-1001",
+  "productBaseline": "9b05180b6fb540a0a5e89c03bd7ab5ac05b2d97b",
+  "poApprovalStatus": "PO WORK APPROVED / FROZEN FOR LATER REGISTRATION",
+  "createdAtUtc": "2026-09-30T23:42:03.5522315Z",
+  "fileCount": 29,
+  "missingFileCount": 0,
+  "hashVerification": {
+    "result": "PASS",
+    "mismatchCount": 0,
+    "method": "Independent SHA-256 recomputation required after manifest creation"
+  },
+  "files": [
+    {
+      "path": "src/lib/student-search-ui.js",
+      "sha256": "337642d35aa499bb909d6e0d8ee910239bc4794cf2f9dc27d31e7554eb7cbaa4"
+    },
+    {
+      "path": "src/styles/components.css",
+      "sha256": "5be71cd1f296850391a30ce3ee0cdd41d06166b724f4d460cb2b35f300de2f93"
+    },
+    {
+      "path": "src/lib/student-search-n39-review.js",
+      "sha256": "6c433e3be9286a237c2d8adf8d58544d408cd6bec36037b07df38851831cb3c8"
+    },
+    {
+      "path": "src/lib/schedule-export.js",
+      "sha256": "1be21b03fc588ba0a0af445fd48e4697a5d4be344342dbd3792828b216159d50"
+    },
+    {
+      "path": "src/views/home.js",
+      "sha256": "774d730f0c98de31370dae3bbb6f988a3ca5666920bdb8bfa9413330e947877f"
+    },
+    {
+      "path": "index.html",
+      "sha256": "73ca1b2629688b383d373288ff578bcb13732f90290d55488039f940ae7d0fda"
+    },
+    {
+      "path": "review/HANDOFF-N39-R03.md",
+      "sha256": "874e4b57a781b33a65af21c35d7335af8e03f4ace4c1048a775f7ef7e081b05b"
+    },
+    {
+      "path": "review/APPROVAL-FREEZE-N39-R03.md",
+      "sha256": "f41e5039ecf74d3221e936a6a9642140942ff950dff9e8039c1a8b470dc3aa7e"
+    },
+    {
+      "path": "review/check-n39-r03.mjs",
+      "sha256": "89abddb4d48d42eb79a7e9e679a670a957a8ced1ee781a1ef8c911bd2c8a7d19"
+    },
+    {
+      "path": "review/verify-n39-r03.mjs",
+      "sha256": "b1eed2b6c60fd56b8033048ca3417800a80a33ab45f17400dff30cdf680e84ed"
+    },
+    {
+      "path": "review/evidence/r03/results.json",
+      "sha256": "f6686b007aed0788126a34ef5b931f7af38fc64aceccb4505f90153ec671df4f"
+    },
+    {
+      "path": "review-n39-r03/index.html",
+      "sha256": "7de0166f23b20cdf212ec72ff49424d13a41c8016d4996dc4bf21b1de70db7c6"
+    },
+    {
+      "path": "review/evidence/r03/one-subject-1440-light.png",
+      "sha256": "db0044b4a3293f9d6dfe2493522298562de5c96054a34e1b9100841faab7e0fe"
+    },
+    {
+      "path": "review/evidence/r03/one-subject-320-light.png",
+      "sha256": "5cc181f5145b66b59735fc21cb23d9720c473d862a2896c66df3729ac2eaf342"
+    },
+    {
+      "path": "review/evidence/r03/one-subject-390-light.png",
+      "sha256": "b248dee95b7d72c6781f6d397e1712484c3421f729a9e748433d54850772b9d1"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-1024-dark.png",
+      "sha256": "fddaa96d915ec179eea76d838b2a135da03ced764b1c58608ff564f9a78b89e9"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-1024-light.png",
+      "sha256": "e2298e66b4dd6951a82879937106c34bc639b9715fce8c893720eafc4aa7c65d"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-1440-dark.png",
+      "sha256": "d35ea548f5b8b1a4b4ab6dd9c3d5a410e533f1bb5e470f01d3d7cc7a4d263a15"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-1440-light.png",
+      "sha256": "2cc6a7b5d4566e84cb775a65fe6546ff42ad0b90b31fa5828b82166cfd0e2b28"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-320-dark.png",
+      "sha256": "f77d86d5ada58b2120233d8cefb000b165a203e180e72a44fe399324c9b21c96"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-320-light.png",
+      "sha256": "68dcef42fa84a672c4176fb4703a1148fb5aee4b4380007d8ae42bf8231ab7fc"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-390-dark.png",
+      "sha256": "2927aa6c4a70416f8e6eca4dcbbcbdeb1c808d2939d8ca9c45b885d4eca6ae8a"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-390-light.png",
+      "sha256": "4001ea9042957862c07de6670832018f7f25b5fea766ca72f5fd37c005cd9cec"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-768-dark.png",
+      "sha256": "292288c19f41d18e3611f53296c161c269db75dd1cb79993dc9a729f87826d6c"
+    },
+    {
+      "path": "review/evidence/r03/same-name-three-768-light.png",
+      "sha256": "91a7eb2072d8674d8ddaf2599700185cd233e55865b469517bf02b1e9a5d9d4f"
+    },
+    {
+      "path": "review/evidence/r03/three-subjects-320-scrolled-light.png",
+      "sha256": "d7cc669f4387c02d10ec9eadb7b6261f82f0efe02d29a4f118e6b1123c2b3006"
+    },
+    {
+      "path": "review/evidence/r03/two-subjects-long-name-1440-light.png",
+      "sha256": "a83cc6d9eae63ea08096f48cf0923e5bf3bf3c708ca9188512ff330f05d8227a"
+    },
+    {
+      "path": "review/evidence/r03/two-subjects-long-name-320-light.png",
+      "sha256": "279f56a282c8e481a112005c26e7c2ba999ec68f06f155b83c9be93d549c367b"
+    },
+    {
+      "path": "review/evidence/r03/two-subjects-long-name-390-light.png",
+      "sha256": "f75ced762e63abe716c4ad6f9244e7ba2783d0b6de1ab8a4a0fd35b0e723bb6e"
+    }
+  ]
+}

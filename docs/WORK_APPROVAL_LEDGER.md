@@ -4,12 +4,13 @@ Canonical index for PO-approved Work outcomes that remain relevant to Product im
 
 | WORK_APPROVAL_ID | Tickets | Work approval | Source state | Implementation | Preview / Production | Contract |
 | --- | --- | --- | --- | --- | --- | --- |
-| WA-CALENDAR-0417 | N50, N51, N55 | APPROVED after 0417 handoff | VERIFIED | NOT_AUTHORIZED for remaining scope | none for full Work contract / none | [Contract](work-approvals/WA-CALENDAR-0417.md) |
-| WA-SCHEDULE-0429 | N22, N57 | APPROVED: N22 Option A; N57 including 0429 polish | VERIFIED | NOT_AUTHORIZED | none / none | [Contract](work-approvals/WA-SCHEDULE-0429.md) |
+| WA-CALENDAR-0417 | N50, N51, N55 | PO APPROVED / FROZEN / EXACT PATCH READY | VERIFIED; patch SHA-256 `49584cdc8370203e3f7203b9f7b55dda1af3bccef441cce1cc542432cd7b26ea` | READY / awaiting Codex exact-patch certification for remaining scope | Bug #04/suspension separately CLOSED; remaining scope OPEN | [Contract](work-approvals/WA-CALENDAR-0417.md) |
+| WA-SCHEDULE-0429 | N22, N57 | APPROVED: N22 Option A; N57 including 0429 polish | VERIFIED | CLOSED after explicit PO Production verification | `c03045c570567c0377581b9041da7870a380d045` / `cecb5bb3-3812-4fd0-b5f3-24096f61c473` | [Contract](work-approvals/WA-SCHEDULE-0429.md) |
+| WA-N39-R03-1001 | N39 | PO WORK APPROVED / FROZEN | VERIFIED: 29/29 manifest hashes | NOT_STARTED / NOT_AUTHORIZED; Real-Product Integration next | none / none | [Contract](work-approvals/WA-N39-R03-1001.md) |
 | WA-REFINEMENT-0440-2 | N03, N08, N13, N34, N38, OTP email and Product entry | APPROVED by later PO decision in 0445 | VERIFIED: final 0440.2 handoff and prior 99 files | NOT_AUTHORIZED; N13 architecture requires separate decision | none / none | [Contract](work-approvals/WA-REFINEMENT-0440-2.md) |
 | WA-N53-N54-0434 | N53, N54 | APPROVED: N54 Option A | VERIFIED for Work files; N54 Product solution reopened | N53 NOT_AUTHORIZED; N54 BLOCKED | N54 attempted Product solution rejected / no Production | [Contract](work-approvals/WA-N53-N54-0434.md) |
 
-N50 Bug #04 closed after the 0443/0444 Production flow. The distinct suspension foundation closed separately after 0446.4 Production and PO verification in 0446.5. N50 overall, N51 and N55 remain open; the complete Calendar 0417 visual/UX contract has **not** shipped. Its remaining Product transfer is `NOT_AUTHORIZED` until a separate ticket selects that scope. Current Product baseline: `0700d55331f1f66678ec236f5de8bad776a6d933`.
+N50 Bug #04 and suspension / 0446 are separately CLOSED. Overall N50, N51 and N55 remain OPEN. Remaining Calendar 0417 Real-Product Integration is PO-approved/frozen/exact-patch ready for a separate Codex certification ticket. N22/N57 are CLOSED. Current Product baseline: `c03045c570567c0377581b9041da7870a380d045`.
 
 ## State and authority
 
@@ -19,4 +20,4 @@ N50 Bug #04 closed after the 0443/0444 Production flow. The distinct suspension 
 - Precedence for approved visual/interaction scope: explicit PO contract in `docs/work-approvals/` → exact manifest-bound Work artifacts → approved evidence screenshots/results → Work handoff prose → older chats/packages. Production/main outranks all of these for runtime/data semantics. A genuine conflict is `RUNTIME-CONFLICT` and needs a PO decision.
 - Before coding a Work-derived ticket, read this ledger and its exact contract; verify the manifest; build a surface/contract parity matrix labelled `MATCHED`, `GAP`, or `RUNTIME-CONFLICT`. Reduce every `GAP` to `MATCHED` before claiming Preview fidelity. Never silently accept a partial surface. Implementation technique may adapt to preserve Product semantics, but may not reinterpret or omit approved UX.
 
-These four entries are the initial active/relevant set, not a reconstruction of every historical closed Work ticket. Closed Production history remains in [Changelog](CHANGELOG.md) and Git. A package absent from this registry must not be assumed approved.
+These five entries are the active/relevant set, not a reconstruction of every historical closed Work ticket. Closed Production history remains in [Changelog](CHANGELOG.md) and Git. A package absent from this registry must not be assumed approved.
