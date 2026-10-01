@@ -14,6 +14,26 @@ import {
 } from '../scripts/build-brand-assets.mjs';
 
 const rootFile = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
+
+function installHandlerSources(source) {
+  return ['install', 'dismiss'].map(action => {
+    const pattern = new RegExp(`^    (?:async )?'home-pwa-${action}'\\([^)]*\\) \\{[\\s\\S]*?^    \\},`, 'gm');
+    const matches = [...source.matchAll(pattern)];
+    assert.equal(matches.length, 1, `home-pwa-${action} must be present exactly once`);
+    return matches[0][0];
+  });
+}
+
+test('install guard detects either handler drift and duplicates while ignoring unrelated actions', async () => {
+  const home = (await readFile(rootFile('src/views/home.js'), 'utf8')).replace(/\r\n/g, '\n');
+  const expected = installHandlerSources(home);
+  const equivalent = source => assert.deepEqual(installHandlerSources(source), expected);
+  equivalent(home.replace('  actions: {', "  actions: {\n    'unrelated-test-action': () => {},"));
+  assert.throws(() => equivalent(home.replace(expected[0], expected[0].replace('promptEvent.prompt();', 'promptEvent.prompt(/* changed */);'))), assert.AssertionError);
+  assert.throws(() => equivalent(home.replace(expected[1], expected[1].replace('dismissHomeInstallPrompt();', 'dismissHomeInstallPrompt(/* changed */);'))), assert.AssertionError);
+  assert.throws(() => equivalent(home + '\n' + expected[0]), /present exactly once/);
+  assert.throws(() => equivalent(home.replace(expected[1], '')), /present exactly once/);
+});
 const assetFile = (name) => rootFile(`assets/${name}`);
 const hash = (buffer) => createHash('sha256').update(buffer).digest('hex');
 const pngInfo = (buffer) => ({
@@ -198,9 +218,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   assert.match(cloudSource, /export async function stageScoreRestoreV2\(/,
     'versioned score restore uses a separate cloud transport');
   const home=await read('src/views/home.js'),oldHome=baseline('src/views/home.js');
-  const installActions = source => source.slice(source.indexOf('  actions:'),
-    source.indexOf('/* ----------', source.indexOf('  actions:')));
-  assert.equal(installActions(home),installActions(oldHome),
+  assert.deepEqual(installHandlerSources(home),installHandlerSources(oldHome),
     'install/dismiss actions remain identical despite later Home presentation changes');
   const rawWorker=await read('sw.js'),oldWorker=baseline('sw.js');
   const executableRevalidation = `          // Cloudflare may keep executable responses fresh in the browser HTTP

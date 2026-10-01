@@ -37,7 +37,7 @@ async function mockHttp(run, { tables = {}, cap = 73, intercept } = {}) {
     }
     const all = tables[entity] ?? [];
     const data = all.slice(offset, offset + Math.min(limit, cap));
-    return new Response(JSON.stringify(data), { status: 200, headers: {
+    return new Response(JSON.stringify(data), { status: offset + data.length < all.length ? 206 : 200, headers: {
       'Content-Type': 'application/json', 'Content-Range': data.length ? `${offset}-${offset + data.length - 1}/${all.length}` : `*/${all.length}`,
     } });
   };
@@ -194,3 +194,35 @@ test('Initial Restore rejects a capped incomplete page via its unchanged manifes
   const result = await acquireConsistentCoreSnapshot({ ownerId: OWNER, cloud: restoreCloud });
   assert.equal(result.snapshot.attendance.length, 6);
 });
+
+for (const during of ['page-body', 'refresh-body']) {
+  test(`logout while awaiting ${during} rejects the old read`, { skip: baseline }, async () => {
+    let began, release;
+    const started = new Promise(resolve => { began = resolve; });
+    const gate = new Promise(resolve => { release = resolve; });
+    await mockHttp(async () => {
+      if (during === 'refresh-body') cloud.setMockAuth({ id: OWNER },
+        { access_token: 'expired', refresh_token: 'synthetic', expires_at: 1 });
+      const pull = cloud.fetchRecords('attendance');
+      await started;
+      cloud.setMockAuth(null, null);
+      release();
+      await assert.rejects(pull, error => ['CLOUD_READ_CONTEXT_CHANGED', 'AUTH_CONTEXT_CHANGED'].includes(error.code));
+      assert.equal(cloud.user, null); assert.equal(cloud.session, null);
+    }, { tables: { attendance: rowsOf(150) }, intercept: ({ entity, offset }) => {
+      if (during === 'page-body' && offset === 73) {
+        const response = new Response(JSON.stringify(rowsOf(150).slice(73, 146)),
+          { status: 206, headers: { 'Content-Range': '73-145/150' } });
+        const read = response.text.bind(response);
+        response.text = async () => { began(); await gate; return read(); };
+        return response;
+      }
+      if (during === 'refresh-body' && entity === 'token') {
+        const response = new Response(JSON.stringify({ access_token: 'old-result', user: { id: OWNER } }));
+        const read = response.json.bind(response);
+        response.json = async () => { began(); await gate; return read(); };
+        return response;
+      }
+    } });
+  });
+}

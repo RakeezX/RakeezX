@@ -11,7 +11,8 @@ try {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   if (!ready) throw new Error('Dedicated test server did not start');
-  const child = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
+  const child = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test',
+    '--output', `test-results/playwright-0456-3-${port}`, ...process.argv.slice(2)], {
     cwd: root, stdio: 'inherit', env: { ...process.env, RAKEEZX_E2E_SERVER: 'external',
       RAKEEZX_E2E_BASE_URL: baseURL, RAKEEZX_ATTENDANCE_TEST_URL: baseURL },
   });

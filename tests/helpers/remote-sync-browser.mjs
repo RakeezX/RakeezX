@@ -5,6 +5,18 @@ const CLOUD_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co/rest/v1/';
 const AUTH_STORAGE_KEY = 'rakeezx-auth-v2-xl-rubcwjqktzzunrvuns';
 const AUTH_OWNER_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const CLAIM_ID = 'claim:automatic-sync-a';
+
+function completeReadResponse(route, records) {
+  const url = new URL(route.request().url());
+  const offset = Number(url.searchParams.get('offset') ?? 0);
+  const limit = Number(url.searchParams.get('limit') ?? 500);
+  const rows = records.map(row => ({ owner_id: AUTH_OWNER_ID, ...row }))
+    .sort((a, b) => String(a.id ?? a.owner_id).localeCompare(String(b.id ?? b.owner_id)));
+  const page = rows.slice(offset, offset + limit);
+  return route.fulfill({ status: offset + page.length < rows.length ? 206 : 200, json: page,
+    headers: { 'Access-Control-Expose-Headers': 'Content-Range', 'Range-Unit': 'items',
+      'Content-Range': page.length ? `${offset}-${offset + page.length - 1}/${rows.length}` : `*/${rows.length}` } });
+}
 const TABLES = ['years', 'calendars', 'calendar_days', 'terms', 'subjects', 'sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'time_profiles', 'slots', 'sessions', 'attendance', 'notes'];
 // Steady-state teacher fixture, not first-use calendar provisioning. Both
 // devices begin from the same acknowledged canonical foundation.
@@ -76,7 +88,7 @@ export function createCloud() {
               failNextProfileRead = false;
               return route.fulfill({ status: 503, json: { message: 'Synthetic transient failure' } });
             }
-            return route.fulfill({ json: profile ? [profile] : [] });
+            return completeReadResponse(route, profile ? [profile] : []);
           }
           if (nextProfileWrite) {
             const gate = nextProfileWrite; nextProfileWrite = null; gate.started(); await gate.wait;
@@ -169,7 +181,7 @@ export function createCloud() {
             gate.started();
             await gate.wait;
           }
-          return route.fulfill({ json: tables[table] ?? [] });
+          return completeReadResponse(route, tables[table] ?? []);
         }
         if (request.method() === 'POST') {
           const records = JSON.parse(request.postData() ?? '[]');

@@ -16,7 +16,7 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
   const server = await createAttendanceServer();
   const contexts = [];
   const requests = [], evidence = [], errors = [], external = [];
-  let cap = 10, failLater = false;
+  let cap = rosterSize === 37 ? 73 : 10, failLater = false;
   try {
     // Synthetic roster members; SQL times preserve the known label defect.
     await server.pg.exec(`update rakeezx.sessions set date='2026-10-01', start_time='07:31:00',end_time='08:01:00' where id='override-session';
@@ -25,6 +25,17 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
       await server.pg.query(`insert into rakeezx.students(id,name,status) values($1,$2,'active')`, [`student-${i}`, `Synthetic ${i}`]);
       await server.pg.query(`insert into rakeezx.enrollments(id,student_id,section_id,roll_no,status,start_date)
         values($1,$2,'override-section',$3,'active','2026-08-01')`, [`en-${i}`, `student-${i}`, i + 4]);
+    }
+    // Distinct historical dates share the same capped owner attendance table.
+    // Target-session completeness is produced only by the writer's real controls.
+    if (rosterSize === 37) {
+      for (let i = 0; i < 33; i++) {
+        const date = new Date(Date.UTC(2026, 7, 20 + i)).toISOString().slice(0, 10);
+        await server.pg.query(`insert into rakeezx.sessions(id,teaching_id,date,period,status,start_time,end_time)
+          values($1,'override-teaching',$2,3,'scheduled','07:15:00','08:01:00.250000')`, [`history-${i}`, date]);
+        await server.pg.query(`insert into rakeezx.attendance(id,session_id,student_id,teaching_id,date,status)
+          select $1 || ':' || id,$1,id,'override-teaching',$2,'present' from rakeezx.students`, [`history-${i}`, date]);
+      }
     }
     const initial = Object.fromEntries(await Promise.all(Object.entries(SYNC_V2_SCHEMAS).map(async ([store, schema]) =>
       [store, await server.fetchRecords(schema.entity)])));
@@ -84,7 +95,7 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
           [store, rows.map(row => decodeSyncV2Canonical(store, row))])), { queue: false });
         await window.store.patchDevice({ activeYearId: 'override-year', activeTermId: 'override-term' }, { queue: false });
         await db.clearStore('outbox');
-      }, initial);
+      }, { ...initial, attendance: label === 'reader' ? initial.attendance.slice(0, 7) : initial.attendance });
       await authenticate(page);
       return page;
     }
@@ -95,23 +106,28 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
       }, OWNER);
     }
     async function sync(page) {
-      return page.evaluate(async () => {
+      const began = performance.now(), before = requests.length;
+      const outcome = await page.evaluate(async () => {
         window.syntheticOnline = true;
         const result = await window.__syncModule.syncAll({ full: true });
         const summary = await window.__syncModule.getSyncOperationalSummary();
         window.syntheticOnline = false;
         return { result, summary };
       });
+      evidence.push({ stage: 'sync-http-observation', localMockElapsedMs: Math.round(performance.now() - began),
+        requests: requests.length - before, result: outcome.result, summary: outcome.summary });
+      return outcome;
     }
     async function counts(page, stage) {
       const data = await page.evaluate(async () => {
         const db = await import('/src/lib/db.js');
-        const persisted = (await db.getAll('attendance')).filter(r => r.sessionId === 'override-session' && !r.deleted);
+        const all = await db.getAll('attendance');
+        const persisted = all.filter(r => r.sessionId === 'override-session' && !r.deleted);
         const inMemory = window.store.attendanceIn('override-session');
         const derived = window.store.attendanceCompleteness(window.store.getSession('override-session'));
         return { persisted: persisted.length, inMemory: inMemory.length, recorded: derived.recorded,
           expected: derived.expected, state: derived.state, ids: persisted.map(r => r.id).sort(),
-          memoryIds: inMemory.map(r => r.id).sort() };
+          memoryIds: inMemory.map(r => r.id).sort(), totalPersisted: all.length, allIds: all.map(r => r.id).sort() };
       });
       expect(data.persisted).toBe(data.inMemory); expect(data.persisted).toBe(data.recorded);
       expect(data.ids).toEqual(data.memoryIds); evidence.push({ stage, ...data });
@@ -132,20 +148,35 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
     expect((await sync(writer)).result).toBe(true);
     expect((await sync(reader)).result).toBe(true);
     expect((await counts(reader, 'partial')).recorded).toBe(1);
+    const originalDevice = await reader.evaluate(() => window.store.state.device.deviceId);
     await attendance(reader);
     await expect(reader.locator('.att-pill')).toContainText(`1 من ${rosterSize}`);
+    await expect(reader.getByRole('status', { name: 'حالة الرصد: غير مكتمل' })).toBeVisible();
+    await reader.evaluate(() => { location.hash = '#/'; });
+    await expect(reader.locator('.today-focus')).toHaveAttribute('data-session-id', 'override-session');
+    await expect(reader.locator('.today-focus')).toContainText('رصد حضور معلّق');
+    await expect(reader.locator('.today-focus')).not.toContainText('قادمة');
+    expect((await counts(reader, 'ended-partial-label')).state).toBe('pending');
     await writer.locator('[data-act="fill-present"]').click();
     await expect(writer.locator('.att-pill')).toContainText(`${rosterSize} من ${rosterSize}`);
     await writer.locator('[data-act="set"][data-id="override-c"][data-status="absent"]').click();
     expect((await sync(writer)).result).toBe(true);
-    const canonical = await server.fetchRecords('attendance');
+    const canonical = (await server.fetchRecords('attendance')).filter(row => row.session_id === 'override-session');
     expect(canonical).toHaveLength(rosterSize);
     expect(server.calls.length).toBe(3); // record + fill + explicit change
     expect((await sync(reader)).summary.state).toBe('synced');
     const received = baseline ? 10 : rosterSize;
-    expect((await counts(reader, 'capped-complete')).recorded).toBe(received);
+    const recovered = await counts(reader, 'capped-complete');
+    expect(recovered.recorded).toBe(received);
+    expect(recovered.state).toBe('completed');
+    expect(recovered.ids).toEqual(canonical.map(row => row.id).sort());
+    expect(recovered.allIds).toEqual((await server.fetchRecords('attendance')).map(row => row.id).sort());
+    expect(await reader.evaluate(() => window.store.state.device.deviceId)).toBe(originalDevice);
+    expect(await reader.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).length)).toBe(0);
+    await attendance(reader);
     await expect(reader.locator('.att-pill')).toContainText(`${received} من ${rosterSize}`);
     await home(reader, received);
+    await expect(reader.locator('.home-session-row[data-session-id="override-session"]')).toContainText('تم رصد الحضور');
     if (baseline) await expect(reader.locator('.home-session-state')).toContainText('قادمة');
     expect((await sync(reader)).result).toBe(true);
     expect((await counts(reader, 'repeated')).recorded).toBe(received);
@@ -195,9 +226,10 @@ test(`two real browser clients (${rosterSize}, ${observation}): writer ACK, capp
       expect((await sync(reader)).summary.state).toBe('synced');
     }
     expect(errors).toEqual([]); expect(external).toEqual([]);
-    const output = new URL(`../artifacts/attendance-pull-0456-1/ui-${baseline ? 'baseline' : 'fixed'}-${rosterSize}.json`, import.meta.url);
-    await mkdir(new URL('../artifacts/attendance-pull-0456-1/', import.meta.url), { recursive: true });
-    await writeFile(output, JSON.stringify({ baseline, rosterSize, observation, migrations: server.migrations, evidence, requests }, null, 2));
+    const output = new URL(`../test-results/evidence/ATTENDANCE-INCIDENT-INTEGRATION-0456.3/ui-${rosterSize}.json`, import.meta.url);
+    await mkdir(new URL('../test-results/evidence/ATTENDANCE-INCIDENT-INTEGRATION-0456.3/', import.meta.url), { recursive: true });
+    await writeFile(output, JSON.stringify({ baseline, rosterSize, observation, httpMetadata: 'mocked PostgREST exact count/range',
+      canonicalTableRows: (await server.fetchRecords('attendance')).length, migrations: server.migrations, evidence, requests }, null, 2));
     await testInfo.attach('synthetic-count-evidence', { path: fileURLToPath(output), contentType: 'application/json' });
   } finally { for (const context of contexts) await context.close(); await server.close(); }
 });

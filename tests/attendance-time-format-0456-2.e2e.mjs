@@ -74,6 +74,10 @@ test('Demo Home and Sessions classify second-format ended periods without changi
     return ids;
   });
   await page.goto(host + '/#/');
+  await page.waitForFunction(async ids => {
+    const store = await import('/src/store.js');
+    return store.state.ready && ['completed', 'partial', 'pending', 'future'].every(kind => store.getSession(ids[kind]));
+  }, ids);
   const row = (kind) => page.locator(`.home-session-row[data-session-id="${ids[kind]}"]`);
   const snapshot = () => page.evaluate(async (ids) => {
     const db = await import('/src/lib/db.js');
