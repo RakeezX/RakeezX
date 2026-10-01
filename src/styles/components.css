@@ -7747,16 +7747,23 @@
 }
 /* MICRO-BATCH 04 — scoped search and group-count controls. */
 .home-student-search { min-height:44px; gap:6px; }
-.student-search-result { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:68px; padding:12px; margin-top:8px; border:1px solid var(--border); border-radius:14px; background:var(--bg-elev); color:var(--text); text-decoration:none; }
-.student-search-result > span { min-width:0; }
-.student-search-result strong { display:block; font-size:15px; line-height:1.65; overflow-wrap:anywhere; }
-.student-search-result small { display:block; margin-top:4px; color:var(--text-2); font-size:12px; line-height:1.6; }
-.student-search-result > svg { width:18px; height:18px; flex:none; color:var(--text-3); }
-.student-search-result:hover { background:var(--brand-soft); border-color:var(--brand-border); }
-.student-search-result:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
-.student-search-context { display:flex; align-items:center; gap:8px; min-height:44px; color:var(--text); text-decoration:none; }
-.student-search-context svg { width:18px; height:18px; flex:none; }
-.student-search-context:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+.student-search-result { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; min-width:0; padding:7px 36px 7px 12px; margin-top:8px; border:1px solid var(--border); border-radius:14px; background:var(--bg-elev); color:var(--text); }
+.student-search-result:hover { border-color:var(--brand-border); }
+.student-search-result:focus-within { border-color:var(--brand-border); }
+.student-search-result__profile { display:flex; flex:0 1 max-content; align-items:center; min-width:0; max-width:100%; min-height:44px; color:inherit; text-decoration:none; }
+.student-search-result__profile::after { content:""; position:absolute; inset:0; border-radius:14px; }
+.student-search-result__profile:focus-visible { outline:none; }
+.student-search-result__profile:focus-visible::after { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+.student-search-result__identity { display:flex; align-items:baseline; gap:8px; min-width:0; }
+.student-search-result__name { min-width:0; overflow-wrap:anywhere; font-size:15px; line-height:1.5; }
+.student-search-result__class { flex:none; color:var(--text-2); font-size:12px; line-height:1.45; }
+.student-search-result__chevron { position:absolute; inset-inline-end:12px; top:50%; display:inline-flex; color:var(--text-3); transform:translateY(-50%); }
+.student-search-result__chevron svg { width:17px; height:17px; }
+.student-search-result__rail { position:relative; z-index:1; flex:0 0 max-content; min-width:0; max-width:100%; pointer-events:none; }
+.student-search-result__rail-scroll { display:flex; align-items:center; gap:6px; min-width:0; overflow-x:auto; overscroll-behavior-inline:contain; scrollbar-width:thin; padding-block:2px; pointer-events:auto; }
+.student-search-chip { flex:none; display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:5px 10px; border:1px solid var(--border); border-radius:9px; color:var(--text); background:var(--bg-elev); font-size:12px; font-weight:650; line-height:1.4; white-space:nowrap; text-decoration:none; }
+.student-search-chip:hover { background:var(--brand-soft); border-color:var(--brand-border); }
+.student-search-chip:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:-3px; }
 .student-search__status { color:var(--text-2); font-size:13px; line-height:1.7; }
 .student-search .field { margin-bottom:12px; }
 .group-input-method { max-width:430px; }
@@ -7764,7 +7771,8 @@
 .group-input-method .segmented__btn { flex:1; min-height:44px; white-space:normal; line-height:1.5; }
 .group-count-input { max-width:160px; min-height:44px; }
 .group-count-summary { margin:0 0 14px; color:var(--text-2); font-size:13px; line-height:1.7; }
-@media(max-width:420px) { .student-search-result { padding:10px; }.student-search-result strong { font-size:14px; }.home-shortcuts .section__head { flex-wrap:wrap; gap:8px; }.group-input-method .segmented__btn { font-size:12px; } }
+@media(max-width:720px) { .student-search-result__rail { padding-top:1px; } }
+@media(max-width:420px) { .student-search-result { padding:7px 34px 7px 10px; }.student-search-result__name { font-size:14px; }.home-shortcuts .section__head { flex-wrap:wrap; gap:8px; }.group-input-method .segmented__btn { font-size:12px; } }
 /* 0339 — N28 only: ready group-count choices and optional custom field. */
 .group-count-choices { display:flex; width:100%; }
 .group-count-choices .segmented__btn { flex:1; min-width:44px; min-height:58px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:6px 4px; }
