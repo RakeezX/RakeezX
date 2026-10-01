@@ -1,6 +1,6 @@
 # RAKEEZ X — current source architecture
 
-Calendar range, suspension, R2 presentation and Demo reference contracts reconciled against repository source at `95abecef88c4b05e5c963a2140cd622284f1c2eb` on 2026-10-01; other sections retain their prior source audit. This describes **checked-in contracts**, not a fresh claim about live Cloudflare/Supabase state or real user data. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
+Attendance complete-read/time-classification and bounded worker precache contracts reconciled against exact deployed source `aef19fba3960e53bf4c3c76641a13a5069aad2c8` in 0456.5. Calendar range, suspension, R2 presentation and Demo reference contracts retain their prior source reconciliation at `95abecef88c4b05e5c963a2140cd622284f1c2eb`; other sections retain their prior audit. This describes **checked-in contracts**, separate from the PO-reported Production recovery checkpoint and unproven account-specific causality. For live status use [Project State](PROJECT_STATE.md) and provider evidence; for roles and precedence use [Governance](GOVERNANCE.md).
 
 ## Authorities and entry points
 
@@ -23,6 +23,12 @@ Calendar range, suspension, R2 presentation and Demo reference contracts reconci
 - `src/lib/initial-restore.js` supports `CORE_V2` with `CORE_V1` compatibility. It validates an owner-scoped manifest and consistent cloud snapshot before making a fresh local account workspace READY. Fresh offline clients do not invent an editable real workspace; previously verified claimed clients may continue locally offline.
 - `src/lib/curriculum-bootstrap.js` manages the separate, explicit units/lessons historical cloud bootstrap. Units/lessons are not silently part of Initial Restore's CORE_V1/V2 store lists. Assignments/submissions remain deferred and outside core restore.
 - `src/lib/score-foundation.js` and the 0033/0034 SQL lineage implement DIRECT and SUBITEM scoring contracts. Student lifecycle/removal uses guarded preview and owner-bound operations, not generic local deletion.
+
+## Attendance complete receipt and time classification — 0456
+
+- `src/lib/cloud.js` delegates authenticated owner-scoped `fetchRecords()` to `src/lib/complete-read.js`: stable key ordering, offset/limit pagination and `Prefer: count=exact` with response `Content-Range`. Coverage is checked before returning a table. Owner/identity, repeated page, malformed/missing range, changing total, page failure and account/workspace change fail closed. Bounds are 500 requested rows/page, 256 pages, 100,000 rows and a 30-second HTTP page timeout. Count/range coverage is **not snapshot atomicity** or a live-server performance guarantee.
+- Ordinary Sync can re-read complete tables for an already incomplete receiver, preserving the existing pending-write, retained-history and tombstone contracts. The fix neither fabricates attendance nor requires reset/re-entry. Disposable capped-table recovery tests cover these properties; the current PO Production recovery report is recorded separately in [Project State](PROJECT_STATE.md). It does not establish account-specific forensic causality or the exact recovery sequence.
+- `src/store.js` constructs attendance due time from the existing stored session date/time without appending an extra `:00`. Supported minute, second and fractional-second times produce ended incomplete/pending presentation rather than upcoming solely because parsing failed. Visible seconds formatting and Home clock-refresh behavior were not changed.
 
 ## Delivered scheduling, remote wake-up and UI contracts
 
@@ -52,7 +58,7 @@ Calendar range, suspension, R2 presentation and Demo reference contracts reconci
 
 ## Offline shell and presentation
 
-- `sw.js` currently names cache generation **`rakeezx-v33`**, precaches shell assets, and has update/fallback logic for offline boot. `manifest.webmanifest` declares install icons. Service-worker asset caching does not guarantee that an OS refreshes a previously installed launcher icon.
+- `sw.js` retains cache generation **`rakeezx-v33`** and `CACHE_PREFIX`. 0456 adds exactly ten existing local module URLs to `SHELL`, including the new complete-read dependency, without changing install/activate/fetch logic, network-first executable revalidation, skipWaiting/clients.claim, cache-generation cleanup, API/cross-origin exclusions or IndexedDB/account data. Synthetic normal-worker fresh-install and released-worker-update checks cover offline reopen, cached module responses and retained synthetic history/pending writes; public Demo smoke checks served worker/module bytes and Cache Storage. These do not prove the original mobile device update/recovery sequence. `manifest.webmanifest` declares install icons; asset caching does not guarantee an OS refreshes a previously installed launcher icon.
 - `src/styles/app.css` and `components.css` contain current Product CSS. Font stack is local/system fallback; no remote runtime font is required. Work provides the authority for a *new* visual choice after PO approval; held Work-Active is not permission to port unapproved experiments.
 - `src/views/reports.js` and `src/lib/report-print.js` provide A4 preview/printing and export paths. A visible UI or data claim still needs direct focused verification, not only source inspection.
 
