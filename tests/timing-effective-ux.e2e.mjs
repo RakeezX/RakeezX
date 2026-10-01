@@ -29,7 +29,7 @@ test('current Timing labels use the effective dated profile while the base remai
   await page.goto('/#/schedule');
   await expect(page.locator('.compact-timing-pill')).toContainText('توقيت رمضان الاختباري');
 
-  await page.getByRole('link', { name: 'تعديل أوقات الحصص' }).click();
+  await page.getByRole('link', { name: 'تعديل ملفات أوقات الحصص' }).click();
   await expect(page).toHaveURL(/#\/schedule\/times$/);
   const effective = page.locator('.timing-profile-card', { hasText: 'توقيت رمضان الاختباري' });
   const base = page.locator('.timing-profile-card', { hasText: 'التوقيت الصيفي الاختباري' });

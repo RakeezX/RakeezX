@@ -919,8 +919,8 @@ function editPeriodsSheet(profile) {
   };
 
   return openSheet({
-    title: `أوقات الحصص — ${p.name}`,
-    desc: 'عرض وتعديل فترات الحصص والفسحة المدرسية لهذا الملف.',
+    title: 'عرض وتعديل أوقات الحصص',
+    desc: `${p.name} · عرض وتعديل فترات الحصص والفسحة المدرسية لهذا الملف.`,
     body: renderSheetContent(),
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
@@ -1396,15 +1396,11 @@ function editPeriodsSheet(profile) {
 }
 
 export default {
-  title: () => 'أوقات الحصص',
-  subtitle: () => store.resolveProfile(store.activeTimeProfile(), todayISO())?.name ?? '',
+  title: () => 'الجدول',
+  subtitle: () => '',
   back: () => '#/schedule',
 
-  topActions: () => html`
-    <button class="btn btn--sm btn--primary timing-new-profile-action--header" data-act="add-profile">
-      ${icon('plus')} ملف توقيت جديد
-    </button>
-  `,
+  topActions: () => '',
 
   render() {
     const profiles = store.timeProfiles();
@@ -1431,15 +1427,18 @@ export default {
 
     return html`
       <div class="management-page timing-profiles-page">
-      <div class="timing-mobile-actions">
-        <button class="btn btn--primary" data-act="add-profile">${icon('plus')} ملف توقيت جديد</button>
+      <div class="timing-page-head">
+        <div class="timing-page-head__identity">
+          <a class="timing-back" href="#/schedule">← الجدول الأسبوعي</a>
+          <h1>ملفات توقيت الحصص</h1>
+        </div>
+        <button class="btn btn--sm btn--ghost" data-act="add-profile">${icon('plus')} ملف توقيت جديد</button>
       </div>
       <!-- يعرض التوقيت المطبق، والتبديل القادم عند وجوده، والأساسي عند اختلافه. -->
-      ${nextSwitch || currentResolved?.id !== active?.id ? html`
-        <div class="seasonal-activation-bar" role="status">
+      <div class="seasonal-activation-bar" role="status">
           <div class="seasonal-activation-bar__main">
             <div class="seasonal-activation-bar__item">
-              <span class="seasonal-activation-bar__label">التوقيت المطبق اليوم</span>
+              <span class="seasonal-activation-bar__label">التوقيت المطبق اليوم:</span>
               <strong class="seasonal-activation-bar__val">
                 <span aria-hidden="true">${icon(timingProfileIcon(currentResolved?.name))}</span>
                 <span>${currentResolved?.name || '—'}</span>
@@ -1463,7 +1462,6 @@ export default {
             ` : ''}
           </div>
         </div>
-      ` : ''}
 
       <!-- شبكة بطاقات ملفات التوقيت بنظام الإجرائين الصريحين -->
       <div class="timing-profiles-grid" aria-label="ملفات التوقيت">
@@ -1537,11 +1535,11 @@ export default {
                   ${icon('clock')} عرض وتعديل أوقات الحصص
                 </button>
                 <div class="timing-profile-card__actions-row">
-                  <button class="btn btn--sm btn--ghost" data-act="rename" data-id="${p.id}">
-                    ${icon('calendar')} تعديل الاسم وفترة سريان التوقيت
+                  <button class="btn btn--sm btn--ghost timing-profile-card__rename" data-act="rename" data-id="${p.id}">
+                    تعديل الاسم وفترة سريان التوقيت
                   </button>
                   ${!isActive ? html`
-                    <button class="iconbtn iconbtn--xs text-danger" data-act="del-profile" data-id="${p.id}" aria-label="حذف الملف" title="حذف الملف">${icon('trash')}</button>
+                    <button class="iconbtn timing-profile-card__delete" data-act="del-profile" data-id="${p.id}" aria-label="حذف ملف التوقيت" title="حذف ملف التوقيت">${icon('trash')}</button>
                   ` : ''}
                 </div>
               </div>

@@ -97,6 +97,24 @@ export function weeklySessionsLabel(value) {
 // A selection is kept only for the current visit. The first mobile view follows
 // the actual school day: today when it is teachable, otherwise the weekly view.
 let activeMobileDay = null;
+let equalizeFrame = 0;
+
+// N22 Option A: measure the natural height of every visible weekly slot,
+// then give those slots one shared height. This changes presentation only.
+function equalizeVisibleScheduleSlots() {
+  cancelAnimationFrame(equalizeFrame);
+  equalizeFrame = requestAnimationFrame(() => {
+    const week = document.querySelector('.page--schedule .week');
+    if (!week) return;
+    const slots = [...week.querySelectorAll('.slot')];
+    slots.forEach(slot => { slot.style.height = '';
+    });
+    const visible = slots.filter(slot => slot.getBoundingClientRect().width > 0);
+    if (!visible.length) return;
+    const height = Math.ceil(Math.max(...visible.map(slot => slot.getBoundingClientRect().height)));
+    visible.forEach(slot => { slot.style.height = `${height}px`; });
+  });
+}
 
 function scheduleExportPreview(model) {
   const presentation = getAccountPresentation(model.identity.teacherForm);
@@ -354,6 +372,18 @@ export default {
   subtitle: () => store.activeTerm()?.name ?? "",
   wide: true,
 
+  afterPaint: equalizeVisibleScheduleSlots,
+  onMount() {
+    window.addEventListener('resize', equalizeVisibleScheduleSlots);
+    document.fonts?.ready?.then(() => {
+      if (document.querySelector('.page--schedule')) equalizeVisibleScheduleSlots();
+    });
+  },
+  onUnmount() {
+    window.removeEventListener('resize', equalizeVisibleScheduleSlots);
+    cancelAnimationFrame(equalizeFrame);
+  },
+
   render() {
     const list = store.teachings();
     if (!list.length) {
@@ -429,7 +459,7 @@ export default {
           </button>
           <a class="btn btn--primary btn--sm schedule-head__times-btn" href="#/schedule/times">
             <span class="schedule-head__times-btn-icon" aria-hidden="true">${icon("sliders")}</span>
-            <span>تعديل أوقات الحصص</span>
+            <span>تعديل ملفات أوقات الحصص</span>
           </a>
         </div>
       </div>

@@ -1,0 +1,204 @@
+/* WA-SCHEDULE-0429 on the real Product DOM. Work review only. */
+
+/* N22 / N57: weekly schedule and card hierarchy. */
+.page--schedule .schedule-head{padding:14px 16px;border:1px solid var(--brand-border);border-radius:14px;background:color-mix(in srgb,var(--brand-soft) 23%,var(--bg-elev));gap:12px}
+.page--schedule .schedule-head__title{letter-spacing:-.025em}
+.page--schedule .schedule-head__title-group{gap:10px}
+.page--schedule .schedule-head__actions .btn--primary{box-shadow:none}
+.page--schedule .schedule-summary-bar{border-inline-start:3px solid var(--brand);box-shadow:none}
+.page--schedule .schedule-day-tab.is-active{box-shadow:none}
+.page--schedule .week__day{border-color:var(--border);box-shadow:none}
+.page--schedule .week__day.is-today{border-color:var(--brand-border);background:color-mix(in srgb,var(--brand-soft) 11%,var(--bg-elev))}
+.page--schedule .week__head{border-bottom:1px solid var(--border);padding-bottom:8px}
+.page--schedule .week__empty{color:var(--text-2)}
+.page--schedule .schedule-class-card{box-shadow:none;border-radius:11px}
+.page--schedule .schedule-class-card__foot{min-width:0}
+.page--schedule .schedule-class-card__sub{overflow-wrap:anywhere}
+.page--schedule .slot{box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch;gap:8px;padding:8px;background:var(--bg-elev);border-radius:9px;transition:background .15s ease,border-color .15s ease}
+.page--schedule .slot.is-current-slot{background:color-mix(in srgb,var(--brand-soft) 43%,var(--bg-elev));border-inline-start:3px solid var(--brand)}
+.page--schedule .slot__side-col{min-width:26px;background:var(--brand-soft);border-color:var(--brand-border)}
+.page--schedule .slot__main-col{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;gap:2px 4px;min-width:0}
+.page--schedule .slot__top-row{display:contents}
+.page--schedule .slot__grade-sec{grid-column:1/-1;grid-row:1;white-space:normal;align-items:start;font-size:13px;line-height:1.4}
+.page--schedule .slot__grade-sec strong{min-width:0;overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+.page--schedule .slot__grade-sec .sec-dot{margin-top:5px}
+.page--schedule .slot__subject-row{grid-column:1/-1;grid-row:2;min-width:0}
+.page--schedule .slot__subject{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere;line-height:1.45;font-size:13px}
+.page--schedule .slot__time-row{grid-column:1;grid-row:3;flex-wrap:wrap;justify-content:flex-start;gap:3px 6px;min-width:0}
+.page--schedule .slot__time{white-space:nowrap;font-size:11.5px;color:var(--text-2)}
+.page--schedule .slot__actions{grid-column:2;grid-row:3;align-self:end;margin-inline-start:0;gap:2px}
+.page--schedule .slot__actions .iconbtn{width:26px;height:26px;min-width:26px;min-height:26px;border:1px solid var(--border);background:var(--bg-elev)}
+.page--schedule .slot__actions .iconbtn svg{width:13px;height:13px}
+.page--schedule .slot__live{padding:1px 6px}
+.page--schedule .slot__actions .iconbtn:focus-visible,.page--schedule .schedule-day-tab:focus-visible{outline:3px solid var(--action-focus-ring);outline-offset:2px}
+
+@media(min-width:1440px){.page--schedule .week{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(min-width:769px) and (max-width:1439px){
+  .page--schedule .week{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .page--schedule .week__day:nth-child(-n+3){grid-column:span 2}
+  .page--schedule .week__day:nth-child(n+4){grid-column:span 3}
+}
+@media(min-width:900px) and (max-width:1000px){
+  .page--schedule .week{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .page--schedule .week__day:nth-child(n){grid-column:auto}
+  .page--schedule .week__day:last-child{grid-column:1/-1}
+}
+@media(max-width:768px){
+  .page--schedule .schedule-head{padding:10px;gap:8px}
+  .page--schedule .week{grid-template-columns:minmax(0,1fr)}
+  .page--schedule .week__day>.btn{min-height:44px}
+  .page--schedule .schedule-day-tab .tab-dot{display:inline-block;width:5px;height:5px;margin-inline-start:3px}
+  .page--schedule .schedule-day-tab{font-size:12px}
+  .page--schedule .slot__side-col{min-width:30px}
+  .page--schedule .slot__grade-sec{font-size:14px}
+  .page--schedule .slot__subject{font-size:13.5px}
+  .page--schedule .slot__actions{gap:4px}
+  .page--schedule .slot__actions .iconbtn{width:44px;height:44px;min-width:44px;min-height:44px}
+  .page--schedule .slot__actions .iconbtn svg{width:16px;height:16px}
+}
+@media(max-width:390px){
+  .page--schedule .schedule-day-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .page--schedule .schedule-day-tab{font-size:13px;min-height:44px}
+}
+@media(max-width:360px){
+  .page--schedule .slot{gap:6px;padding:8px}
+  .page--schedule .slot__main-col{column-gap:3px}
+  .page--schedule .slot__time{font-size:11px}
+}
+
+/* N57: Timing Profiles with Product's effective/base/seasonal truth. */
+.timing-profiles-page .timing-page-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px}
+.timing-profiles-page .timing-page-head h1{font-size:25px;letter-spacing:-.025em;margin:3px 0}
+.timing-profiles-page .timing-page-head p{color:var(--text-3);font-size:13px;margin:0}
+.timing-profiles-page .timing-back{display:inline-block;margin-bottom:5px;color:var(--text-2);font-size:12px}
+.timing-profiles-page .timing-eyebrow{display:block;color:var(--brand-text);font-size:11px;font-weight:750;letter-spacing:.02em}
+.timing-profiles-page .timing-page-head>.btn{min-height:44px}
+.timing-profiles-page .seasonal-activation-bar{margin-bottom:15px;background:var(--bg-elev);border:1px solid var(--brand-border);border-inline-start:4px solid var(--brand);border-radius:12px;box-shadow:none;padding:12px}
+.timing-profiles-page .seasonal-activation-bar__main{display:flex;gap:12px;flex-wrap:wrap}
+.timing-profiles-page .seasonal-activation-bar__item{min-width:180px;flex:1}
+.timing-profiles-page .seasonal-activation-bar__item:first-child{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.timing-profiles-page .seasonal-activation-bar__label{display:block;font-size:12px;color:var(--text-3)}
+.timing-profiles-page .seasonal-activation-bar__val{font-size:14px}
+.timing-profiles-page .seasonal-activation-bar__item:first-child .seasonal-activation-bar__val{display:inline-flex;align-items:center;gap:4px;color:var(--brand-text)}
+.timing-profiles-page .timing-profile-card{border-radius:12px;box-shadow:none;gap:11px}
+.timing-profiles-page .timing-profile-card.is-effective-profile{border:2px solid var(--brand);background:color-mix(in srgb,var(--brand-soft) 13%,var(--bg-elev));box-shadow:none}
+.timing-profiles-page .timing-profile-card.is-base-profile:not(.is-effective-profile){border-inline-start:3px solid var(--info)}
+.timing-profiles-page .timing-profile-card__title-wrap{min-width:0}
+.timing-profiles-page .timing-profile-card__name{white-space:normal}
+.timing-profiles-page .timing-profile-card__range{overflow-wrap:anywhere}
+.timing-profiles-page .timing-profile-card__specs{border:1px solid var(--border);background:var(--bg-sunk)}
+.timing-profiles-page .timing-profile-card__spec-item>span{color:var(--text-2)}
+.timing-profiles-page .timing-profile-card__specs strong{direction:auto}
+.timing-profiles-page .timing-profile-card__icon{background:var(--brand-soft);color:var(--brand-text)}
+.timing-profiles-page .timing-profile-card__actions{border-top:1px solid var(--border)}
+
+/* Exact 0429 action row; preserve Product's existing !isActive eligibility. */
+.timing-profiles-page .timing-profile-card__actions-row{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px;align-items:center;min-width:0;flex-wrap:nowrap}
+.timing-profiles-page .timing-profile-card__actions-row:not(:has(.timing-profile-card__delete)){grid-template-columns:minmax(0,1fr)}
+.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__rename{width:100%;min-width:0;min-height:44px;white-space:nowrap;justify-content:center;padding-inline:6px;overflow:visible;font-size:12.5px}
+.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__delete{display:grid;place-items:center;inline-size:44px;block-size:44px;min-inline-size:44px;min-block-size:44px;flex:none;border:1px solid var(--border);border-radius:9px;background:var(--bg-elev);color:color-mix(in srgb,var(--danger) 72%,var(--text-2));text-decoration:none}
+.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__delete:hover{border-color:var(--danger);color:var(--danger);background:var(--bg-sunk)}
+.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__delete svg{inline-size:18px;block-size:18px}
+.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__delete:focus-visible,.timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__rename:focus-visible{outline:3px solid var(--action-focus-ring);outline-offset:2px}
+@media(max-width:768px){.timing-profiles-page .timing-page-head{align-items:flex-start;flex-wrap:wrap}.timing-profiles-page .timing-page-head>.btn{min-height:44px}}
+@media(max-width:390px){
+  .timing-profiles-page .seasonal-activation-bar__item{min-width:0;flex-basis:100%}
+  .timing-profiles-page .timing-profile-card__actions-row .timing-profile-card__rename{font-size:12px;padding-inline:4px}
+}
+
+/* Only Schedule-owned real Product sheets. Keep shared sheet scrolling and focus behavior. */
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form){box-shadow:0 9px 28px #0002}
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head{border-inline-start:4px solid var(--brand);border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--brand-soft) 18%,var(--bg-elev));padding:18px 20px 13px}
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__title{font-size:21px;line-height:1.4}
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__body{padding:16px 20px}
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__foot{border-top:1px solid var(--border);background:var(--bg-elev);padding:12px 20px}
+.sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__foot .btn{min-height:44px}
+.sheet:has(#slot-form) .timepreview{border-color:var(--brand-border);background:color-mix(in srgb,var(--brand-soft) 12%,var(--bg-elev))}
+.sheet:has(#schedule-export-form) .schedule-export-option{border-radius:9px}
+.sheet:has(#schedule-export-form) .schedule-export-preview{border-color:var(--brand-border)}
+.sheet:has(#periods-sheet-inner) .models-bar{flex-wrap:wrap}
+.sheet:has(#periods-sheet-inner) .models-tab{min-height:44px}
+.sheet:has(#periods-sheet-inner) .timerow__range{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sheet:has(#periods-sheet-inner) .timerow--recess{flex-wrap:wrap}
+.sheet:has(#periods-sheet-inner) .generator-action-banner{flex-wrap:wrap}
+.sheet:has(#gen-form) #gen-recess-fields{border-color:var(--brand-border);background:color-mix(in srgb,var(--brand-soft) 12%,var(--bg-elev))}
+@media(max-width:768px){
+  .sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head,
+  .sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__body,
+  .sheet:has(#slot-form,#schedule-export-form,#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__foot{padding-inline:14px}
+}
+
+/* 0429 dense Timing editors: real forms and handlers, Work-approved visual grouping. */
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form){max-width:640px;padding:0}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head{margin:0;padding:17px 20px 12px;align-items:center}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head>div{min-width:0}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:750}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__title{font-size:20px;line-height:1.35}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__desc{font-size:12.5px;line-height:1.5;margin-top:3px}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head .iconbtn{width:44px;min-width:44px;height:44px;min-height:44px;flex:none}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__body{padding:16px 20px;min-height:0;overflow-y:auto}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__foot{margin:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--bg-elev)}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .field{min-width:0}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .field__label{margin-bottom:6px;color:var(--text-2)}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .input,
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .select{min-height:44px}
+
+/* Period/model editor: keep the two real time fields on the same row. */
+#periods-sheet-inner .models-bar{padding:6px;gap:8px;border-radius:10px}
+#periods-sheet-inner .models-bar__action-btn{width:44px;height:44px;min-width:44px;min-height:44px}
+#periods-sheet-inner .models-bar__action-btn svg{width:16px;height:16px}
+#periods-sheet-inner .models-tab{min-height:44px}
+#periods-sheet-inner .models-tab.is-active{color:var(--brand-ink)}
+#periods-sheet-inner .chips .chip{min-height:44px}
+#periods-sheet-inner #sheet-btn-add-p{min-height:44px}
+#periods-sheet-inner .generator-action-banner{gap:12px;padding:12px;border-radius:10px}
+#periods-sheet-inner .generator-action-banner__desc{font-size:12px;line-height:1.45;color:var(--text-2)}
+#periods-sheet-inner .generator-action-banner__btn{min-height:44px}
+#periods-sheet-inner #sheet-period-rows .timerow[data-row-period]{display:grid;grid-template-columns:32px minmax(0,1fr) 44px;gap:8px;padding:8px 10px;min-width:0}
+#periods-sheet-inner #sheet-period-rows .timerow__range{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0;direction:rtl}
+#periods-sheet-inner #sheet-period-rows .timerow__arrow{display:none}
+#periods-sheet-inner #sheet-period-rows .timerow__input-group{min-width:0}
+#periods-sheet-inner #sheet-period-rows .timerow__label{display:block;margin-bottom:4px;font-size:12px}
+#periods-sheet-inner .timerow--assembly .t-3{color:var(--text-2)}
+#periods-sheet-inner #sheet-period-rows .timerow__in{width:100%;min-width:0;min-height:44px}
+#periods-sheet-inner #sheet-period-rows [data-del-p]{width:44px;min-width:44px;height:44px;min-height:44px}
+#periods-sheet-inner .timerow--recess{padding:9px 10px;gap:8px}
+#periods-sheet-inner .recess-info{white-space:normal;flex-wrap:wrap;line-height:1.4}
+#periods-sheet-inner .recess-edit-btn,#periods-sheet-inner .recess-del-btn{width:44px;min-width:44px;height:44px;min-height:44px}
+
+/* Generation, recess and model forms retain every Product control and value. */
+#gen-form>.field-row.mt-2{grid-template-columns:repeat(3,minmax(0,1fr))}
+#gen-form .field-row{gap:12px}
+#gen-form>.mt-3:has(#gen-toggle-recess){padding:12px;border-color:var(--brand-border);border-radius:10px;background:color-mix(in srgb,var(--brand-soft) 12%,var(--bg-elev))}
+#gen-form #gen-toggle-recess{min-height:44px}
+#gen-form #gen-recess-fields{padding-top:2px}
+#recess-config-form .field-row,#edit-model-form .field-row,#add-model-form .field-row{gap:12px}
+#edit-model-form .grade-chip-label,#add-model-form .grade-chip-label{min-height:44px;padding:8px 10px}
+#edit-model-form .grades-stage-group,#add-model-form .grades-stage-group{padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sunk)}
+
+/* Keep the existing Product date field and picker handler, with one integrated icon. */
+#name-form .field-date-wrap{position:relative;min-width:0}
+#name-form .field-date-wrap>.input{padding-right:50px}
+#name-form .field-date-wrap>.field-date-trigger{position:absolute;right:2px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:44px;height:44px;border:0;background:transparent;color:var(--text-2)}
+#name-form .field-date-wrap>.field-date-trigger svg{width:18px;height:18px}
+#name-form .field-date-wrap>.input::-webkit-calendar-picker-indicator{opacity:0;width:0;margin:0;padding:0}
+
+/* Product's existing confirmation helper stays intact; only Timing-page presentation. */
+body:has(.timing-profiles-page) .sheet:has([data-confirm]){padding:0}
+body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head{margin:0;padding:18px 20px 13px;border-inline-start:4px solid var(--brand);border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--brand-soft) 18%,var(--bg-elev))}
+body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:750}
+body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head .iconbtn{min-width:44px;width:44px;min-height:44px;height:44px;flex:none}
+body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__foot{margin:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom))}
+
+@media(max-width:540px){
+  #gen-form>.field-row,#gen-form>.field-row.mt-2,#recess-config-form .field-row,#edit-model-form .field-row,#add-model-form .field-row{grid-template-columns:minmax(0,1fr)}
+  #periods-sheet-inner .generator-action-banner{align-items:stretch}
+}
+@media(max-width:390px){
+  .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head{padding:14px 14px 10px}
+  .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__body{padding:12px 14px}
+  .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__foot{padding-inline:14px}
+  #periods-sheet-inner #sheet-period-rows .timerow[data-row-period]{grid-template-columns:30px minmax(0,1fr) 44px;gap:5px;padding-inline:7px}
+  #periods-sheet-inner #sheet-period-rows .timerow__range{gap:5px}
+  body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head,body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__foot{padding-inline:14px}
+}
