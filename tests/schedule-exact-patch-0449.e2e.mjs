@@ -72,7 +72,8 @@ test('Demo Schedule and Timing remain local and open their real controls', async
     await page.getByRole('button', { name: 'جرّب ركيز', exact: true }).click();
   }
   await page.waitForFunction(() => window.store?.state?.ready === true);
-  await page.goto('/#/schedule');
+  await page.getByRole('navigation').getByRole('link', { name: 'الجدول', exact: true }).click();
+  await expect(page).toHaveURL(/#\/schedule$/);
   await expect(page.getByText('تعديل ملفات أوقات الحصص')).toBeVisible();
   await page.getByText('تعديل ملفات أوقات الحصص').click();
   await expect(page.getByRole('heading', { name: 'ملفات توقيت الحصص' })).toBeVisible();

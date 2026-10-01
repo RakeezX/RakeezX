@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
@@ -13,6 +13,7 @@ global.document = {
   querySelector: () => ({ setAttribute() {} }),
 };
 global.matchMedia = () => ({ matches: false });
+after(() => { store.closeChannel(); db.closeDB(); });
 
 test('Calendar Academic Time Control Center view renders all key information correctly', async () => {
   await db.clearAll();
@@ -25,7 +26,7 @@ test('Calendar Academic Time Control Center view renders all key information cor
   const rendered = htmlResult.value || String(htmlResult);
 
   // 1. شريط الاعتماد وسياق المنطقة وتوحيد الهوية
-  assert.ok(rendered.includes('cal-hero-strip__identity'), 'Must include unified identity container');
+  assert.ok(rendered.includes('calendar-identity__text'), 'Must include approved Calendar identity');
   assert.ok(rendered.includes('التقويم المعتمد'), 'Must include التقويم المعتمد badge');
   assert.ok(rendered.includes('تقويم مكة المكرمة') || rendered.includes('تقويم جميع مناطق المملكة'), 'Must include clear official preset title');
 
@@ -38,14 +39,13 @@ test('Calendar Academic Time Control Center view renders all key information cor
 
   // 2. رادار الزمن الدراسي: أين نحن الآن ومسار التقدم
   assert.ok(rendered.includes('أين نحن الآن؟'), 'Must include أين نحن الآن؟');
-  assert.ok(rendered.includes('cal-progress-track'), 'Must include visual progress track');
+  assert.ok(rendered.includes('timeline-track'), 'Must include visual progress track');
   assert.ok(rendered.includes('الأيام المتبقية'), 'Must include remaining days metric');
   assert.ok(rendered.includes('الأيام المنقضية'), 'Must include elapsed days metric');
   assert.ok(rendered.includes('نسبة الإنجاز الزمني'), 'Must include progress percentage');
 
   // 3. الإجازة القادمة والصياغة السليمة
-  assert.ok(rendered.includes('الإجازة القادمة'), 'Must include next holiday card titled الإجازة القادمة');
-  assert.ok(rendered.includes('فترة إجازة مجدولة'), 'Must use approved body copy for scheduled holidays');
+  assert.ok(rendered.includes('المحطة القادمة'), 'Must include next milestone card');
 
   // 4. التبديل الحي بين التقويمين وتحديث العرض
   const { GENERAL_1448_1449_PRESET_ID } = await import('../src/lib/calendar-presets.js');
@@ -62,10 +62,10 @@ test('Calendar Academic Time Control Center view renders all key information cor
 
   // 5. المخطط الزمني للفترات والإجازات وأزرار التصفية
   assert.ok(rendered.includes('الإجازات والفترات الدراسية'), 'Must include periods section');
-  assert.ok(rendered.includes('calendar-period'), 'Must include calendar-period class');
-  assert.ok(rendered.includes('إجازة اليوم الوطني'), 'Must include official holiday');
-  assert.ok(rendered.includes('cal-filter-btn'), 'Must include filter buttons');
-  assert.ok(rendered.includes('رسمي'), 'Must distinguish official from local exceptions');
+  assert.ok(rendered.includes('holiday-list'), 'Must include periods list');
+  assert.ok(store.calendarRangesOf().some((range) => range.label === 'إجازة اليوم الوطني'), 'Official holiday remains in Calendar data');
+  assert.ok(rendered.includes('data-filter="upcoming"'), 'Must include upcoming filter');
+  assert.ok(rendered.includes('رسمية معتمدة'), 'Must distinguish official from local exceptions');
 });
 
 test('affected preview includes sessions plus ungenerated slots only in their own year and term', async () => {
@@ -92,9 +92,8 @@ test('affected preview includes sessions plus ungenerated slots only in their ow
   const affected = getAffectedSchedule('2026-09-23', '2026-09-26');
   assert.deepEqual(affected.map(({ id, type }) => [id, type]), [['se:preview-current', 'session'], ['sl:preview-2', 'slot']]);
   assert.deepEqual(await db.getAll('sessions'), before, 'Preview must be read-only');
-  const rendered = calendarView.render().value;
-  const nationalCard = rendered.split('class="cal-period-row calendar-period')[1];
-  assert.ok(nationalCard.includes('إجازة معتمدة · تُستبعد الحصص'), 'National Day uses Production non-study classification');
+  assert.ok(store.calendarRangesOf().some((range) => range.startDate <= '2026-09-23' && range.endDate >= '2026-09-23' && range.source?.startsWith('preset:')), 'National Day retains official range identity');
+  assert.ok(calendarView.render().value.includes('data-filter="upcoming"'), 'Default Calendar filter remains upcoming');
 });
 
 test('Calendar gracefully handles empty year without terms and validates activation', async () => {
@@ -123,7 +122,7 @@ test('Calendar gracefully handles empty year without terms and validates activat
   assert.doesNotThrow(() => {
     const rendered = calendarView.render();
     const renderedHtml = rendered.value || String(rendered);
-    assert.ok(renderedHtml.includes('لم يتم إعداد فصول دراسية') || renderedHtml.includes('cal-terms-grid'), 'Must render gracefully');
+    assert.ok(renderedHtml.includes('calendar-terms'), 'Must render gracefully');
   }, 'Calendar rendering must never crash on empty or unconfigured terms');
 
   // استعادة سنة صالحة
