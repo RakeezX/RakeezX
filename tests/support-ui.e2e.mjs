@@ -153,6 +153,9 @@ test('Support discards another account draft while an intercepted request is awa
 test('Demo and signed-out Support navigation make no Product requests', async ({ page }) => {
   await page.goto('/');
   await waitForApp(page);
+  await page.locator('[data-act="open-teacher-mini-hub"]').filter({ visible: true }).first().click();
+  await page.locator('[data-act="demo-enter"]').click();
+  await page.waitForFunction(() => window.store?.state?.ready && window.store?.getActiveWorkspace()?.type === 'demo');
   expect(await page.evaluate(() => window.store?.getActiveWorkspace()?.type)).toBe('demo');
   const productRequests = [];
   page.on('request', (request) => {
