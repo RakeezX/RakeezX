@@ -182,7 +182,14 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   await openSupport(page);
   await authenticate(page);
 
-  const type = page.getByLabel('نوع الطلب');
+  const types = page.locator('.n34-support-choices [data-act="support-type"]');
+  await expect(types).toHaveCount(3);
+  await expect(page.locator('select[name="type"]')).toHaveCount(0);
+  const technical = page.locator('.n34-support-choices [data-type="technical"]');
+  const suggestion = page.locator('.n34-support-choices [data-type="suggestion"]');
+  const inquiry = page.locator('.n34-support-choices [data-type="inquiry"]');
+  await expect(technical).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('input[name="type"]')).toHaveValue('technical');
   const message = page.getByLabel('رسالتك');
   const submit = page.getByRole('button', { name: 'إرسال', exact: true });
 
@@ -193,7 +200,7 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   const preview = page.locator('#support-diagnostics-preview');
   await expect(preview).toBeVisible();
   const previewKeys = await preview.locator('[data-diagnostic-key]').evaluateAll((nodes) => nodes.map((node) => node.dataset.diagnosticKey));
-  const allowed = new Set(['appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone', 'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport', 'pwaStandalone', 'online', 'syncState', 'pendingMutations', 'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory']);
+  const allowed = new Set(['appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone', 'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport', 'pwaStandalone', 'online', 'syncState', 'pendingMutations', 'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate']);
   expect(previewKeys.length).toBeGreaterThan(5);
   expect(previewKeys.every((key) => allowed.has(key))).toBe(true);
   await expect(preview).not.toContainText(/طالب|فصل|رمز دخول|support-ui-token|#\/support/i);
@@ -206,12 +213,17 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   expect(payloads[0].type).toBe('technical');
   expect(payloads[0].message).toBe('أ');
   expect(payloads[0].diagnostics.routeCategory).toBe('support');
+  expect(payloads[0].diagnostics.routeTemplate).toBeUndefined();
   for (const key of ['pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount']) {
     expect(Number.isInteger(payloads[0].diagnostics[key]), `${key} must be a safe integer`).toBe(true);
   }
   expect(typeof payloads[0].diagnostics.actionableSyncIssue).toBe('boolean');
 
-  await type.selectOption('suggestion');
+  await suggestion.click();
+  await expect(suggestion).toHaveAttribute('aria-pressed', 'true');
+  await expect(technical).toHaveAttribute('aria-pressed', 'false');
+  await expect(inquiry).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('input[name="type"]')).toHaveValue('suggestion');
   await expect(disclosure).toBeVisible();
   await message.fill('ن'.repeat(4000));
   await submit.click();
@@ -221,7 +233,10 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   expect(payloads[1].diagnostics.routeCategory).toBe('support');
   expect(JSON.stringify(payloads[1].diagnostics)).not.toMatch(/token|student|class|owner|routePath|outbox/i);
 
-  await type.selectOption('inquiry');
+  await inquiry.click();
+  await expect(inquiry).toHaveAttribute('aria-pressed', 'true');
+  await expect(suggestion).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('input[name="type"]')).toHaveValue('inquiry');
   await expect(disclosure).toBeVisible();
   await message.fill('أحتاج مساعدة في استخدام الميزة.');
   failNext = true;
@@ -229,12 +244,38 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   await expect(page.getByRole('alert')).toContainText('تعذّر إرسال الطلب الآن');
   await expect(page.getByRole('alert')).not.toContainText('raw-secret-server-detail');
   expect(payloads.at(-1).type).toBe('inquiry');
+  failNext = false;
+  await submit.click();
+  await expect(page.locator('.support-result.is-success')).toContainText('تم إرسال طلبك بنجاح.');
+  expect(payloads.at(-1).type).toBe('inquiry');
 
   for (const payload of payloads) {
     expect(payload.diagnostics.routeCategory).toBe('support');
     expect(Object.keys(payload.diagnostics).every((key) => allowed.has(key))).toBe(true);
     expect(JSON.stringify(payload.diagnostics)).not.toMatch(/token|student|class|owner|routePath|outbox/i);
   }
+});
+
+test('captured origin is included as static route metadata in intercepted Support payload', async ({ page }) => {
+  const payloads = [];
+  await page.route(SUPPORT_ENDPOINT, async (route) => {
+    payloads.push(JSON.parse(route.request().postData() ?? '{}'));
+    await route.fulfill({ status: 201, body: '' });
+  });
+  await page.goto('/#/settings');
+  await waitForApp(page);
+  await authenticate(page);
+  await page.locator('a[href="#/support"]').filter({ visible: true }).first().click();
+  await expect(page).toHaveURL(/#\/support$/);
+  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
+  await expect(page.locator('[data-diagnostic-key="routeCategory"]')).toContainText('settings');
+  await expect(page.locator('[data-diagnostic-key="routeTemplate"]')).toContainText('/settings');
+  await page.getByLabel('رسالتك').fill('Synthetic only');
+  await page.getByRole('button', { name: 'إرسال', exact: true }).click();
+  await expect.poll(() => payloads.length).toBe(1);
+  expect(payloads[0].diagnostics.routeCategory).toBe('settings');
+  expect(payloads[0].diagnostics.routeTemplate).toBe('/settings');
+  expect(JSON.stringify(payloads[0].diagnostics)).not.toMatch(/owner|student|token|rawUrl|routePath|outbox/i);
 });
 
 test('Support remains accessible, focused, and overflow-free across responsive light/dark states', async ({ page }) => {
