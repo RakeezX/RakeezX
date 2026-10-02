@@ -9,6 +9,7 @@ import {
   formatRiyadhTime,
   resolveSupportContact,
   retryAt,
+  validateSupportRequest,
 } from '../supabase/functions/support-notification-worker/core.mjs';
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
@@ -179,6 +180,54 @@ test('email builder emits fixed Arabic-first presentation and ignores browser-su
   assert.match(result.payload.text, /بانتظار بيانات مرتبطة: 1/);
   assert.match(result.payload.text, /اختلافات تاريخية متصالحة: 4/);
   assert.doesNotMatch(result.payload.text, new RegExp(`a{13}`));
+});
+
+test('worker re-sanitizes safe origin pairs and formats only static metadata', () => {
+  const base = {
+    id: 'support:origin', type: 'technical', message: 'طلب تجريبي',
+    created_at: '2026-10-02T12:00:00.000Z',
+  };
+  const validate = (diagnostics) => validateSupportRequest({ ...base, diagnostics });
+  const attendance = validate({ routeCategory: 'classes', routeTemplate: '/teaching/:id/attendance' });
+  assert.deepEqual(attendance.request.diagnostics, { routeCategory: 'classes', routeTemplate: '/teaching/:id/attendance' });
+  const calendar = validate({ routeCategory: 'calendar', routeTemplate: '/calendar' });
+  assert.deepEqual(calendar.request.diagnostics, { routeCategory: 'calendar', routeTemplate: '/calendar' });
+  const direct = validate({ routeCategory: 'support' });
+  assert.deepEqual(direct.request.diagnostics, { routeCategory: 'support' });
+  const directEmail = buildNotificationEmail({ ...base, diagnostics: direct.request.diagnostics }, { to: 'internal@example.test' });
+  assert.match(directEmail.payload.text, /قسم التطبيق: الدعم/);
+  assert.doesNotMatch(directEmail.payload.text, /المسار:/);
+
+  const email = buildNotificationEmail({ ...base, diagnostics: attendance.request.diagnostics }, { to: 'internal@example.test' });
+  assert.equal(email.ok, true);
+  assert.match(email.payload.text, /قسم التطبيق: الفصول/);
+  assert.match(email.payload.text, /المسار: \/teaching\/:id\/attendance/);
+  const calendarEmail = buildNotificationEmail({ ...base, diagnostics: calendar.request.diagnostics }, { to: 'internal@example.test' });
+  assert.match(calendarEmail.payload.text, /قسم التطبيق: التقويم/);
+  assert.match(calendarEmail.payload.text, /المسار: \/calendar/);
+});
+
+test('worker drops mismatched and raw origin data without rejecting the request or leaking it to email', () => {
+  const base = { id: 'support:unsafe-origin', type: 'inquiry', message: 'Synthetic only', created_at: '2026-10-02T12:00:00.000Z' };
+  const attempts = [
+    { routeCategory: 'students', routeTemplate: '/teaching/:id/attendance' },
+    { routeCategory: 'classes', routeTemplate: '/teaching/private/attendance' },
+    { routeCategory: 'classes', routeTemplate: '/teaching/:id/attendance?token=secret' },
+    { routeCategory: 'calendar', routeTemplate: 'https://private.example/calendar' },
+    { routeCategory: 'invalid', routeTemplate: '/calendar' },
+    { routeCategory: 'support', routeTemplate: '/settings' },
+  ];
+  for (const diagnostics of attempts) {
+    const record = { ...base, diagnostics: { ...diagnostics, rawUrl: 'https://private.example/?token=secret', ownerId: OWNER } };
+    const validation = validateSupportRequest(record);
+    assert.equal(validation.ok, true);
+    assert.equal('routeTemplate' in validation.request.diagnostics, false);
+    assert.equal('routeCategory' in validation.request.diagnostics, diagnostics.routeCategory !== 'invalid');
+    const email = buildNotificationEmail(record, { to: 'internal@example.test' });
+    assert.equal(email.ok, true);
+    assert.doesNotMatch(email.payload.text, /private\.example|token=secret|teaching\/private|ownerId|11111111/);
+    assert.doesNotMatch(email.payload.text, /المسار:/);
+  }
 });
 
 test('email contact fallback and Riyadh time remain safe and human-readable', () => {

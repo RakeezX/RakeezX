@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { safeSupportOrigin, captureSupportOriginBeforeNavigation, enterSupportVisit, supportVisitOrigin, clearSupportOrigin } from '../src/lib/support-origin.js';
+import { SUPPORT_ROUTE_CATEGORIES as CLIENT_TEMPLATES, safeSupportOrigin, captureSupportOriginBeforeNavigation, enterSupportVisit, supportVisitOrigin, clearSupportOrigin } from '../src/lib/support-origin.js';
 import { sanitizeSupportDiagnostics } from '../src/lib/support.js';
-import { validateSupportRequest } from '../supabase/functions/support-notification-worker/core.mjs';
+import { SUPPORT_ROUTE_CATEGORIES as SERVER_TEMPLATES, validateSupportRequest, buildNotificationEmail } from '../supabase/functions/support-notification-worker/core.mjs';
 
 test('known routes resolve to static Support templates without parameters or queries', () => {
   const cases = [
@@ -51,20 +51,20 @@ test('final sanitizer accepts only paired known category/template and strips raw
     { routeCategory: 'students' });
 });
 
-test('existing notification worker intentionally drops the new template at its own allowlist', () => {
-  const validation = validateSupportRequest({
-    id: 'synthetic-support-request', type: 'technical', message: 'Synthetic only',
-    created_at: '2026-10-02T12:00:00.000Z',
-    diagnostics: { routeCategory: 'settings', routeTemplate: '/settings' },
-  });
-  assert.equal(validation.ok, true);
-  assert.equal(validation.request.diagnostics.routeCategory, 'settings');
-  assert.equal('routeTemplate' in validation.request.diagnostics, false);
-  const calendar = validateSupportRequest({
-    id: 'synthetic-calendar-request', type: 'technical', message: 'Synthetic only',
-    created_at: '2026-10-02T12:00:00.000Z',
-    diagnostics: { routeCategory: 'calendar', routeTemplate: '/calendar' },
-  });
-  assert.equal(calendar.ok, true);
-  assert.equal('routeCategory' in calendar.request.diagnostics, false);
+test('client, worker, and email retain the same exact safe origin for every approved route', () => {
+  assert.deepEqual(SERVER_TEMPLATES, CLIENT_TEMPLATES);
+  for (const [routeTemplate, routeCategory] of Object.entries(CLIENT_TEMPLATES)) {
+    const diagnostics = sanitizeSupportDiagnostics({ routeCategory, routeTemplate, rawUrl: '/private/secret' });
+    const record = {
+      id: 'support:synthetic', type: 'technical', message: 'Synthetic only',
+      created_at: '2026-10-02T12:00:00.000Z', diagnostics,
+    };
+    const validation = validateSupportRequest(record);
+    assert.equal(validation.ok, true);
+    assert.deepEqual(validation.request.diagnostics, { routeCategory, routeTemplate });
+    const email = buildNotificationEmail(record, { to: 'internal@example.test' });
+    assert.equal(email.ok, true);
+    assert.match(email.payload.text, new RegExp(`المسار: ${routeTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+    assert.doesNotMatch(email.payload.text, /private\/secret/);
+  }
 });

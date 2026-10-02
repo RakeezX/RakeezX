@@ -9,7 +9,7 @@ const DIAGNOSTIC_KEYS = new Set([
   'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport',
   'pwaStandalone', 'online', 'syncState', 'pendingMutations',
   'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount',
-  'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory',
+  'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate',
 ]);
 
 const FAILURE_CATEGORIES = new Set([
@@ -18,7 +18,41 @@ const FAILURE_CATEGORIES = new Set([
 ]);
 
 const SYNC_STATES = new Set(['idle', 'syncing', 'synced', 'pending', 'blocked', 'conflicted', 'rejected', 'offline', 'error', 'auth_required']);
-const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'settings', 'support', 'other']);
+const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'calendar', 'settings', 'support', 'other']);
+// Keep this explicit Edge allowlist aligned with the client foundation. Never accept route instances.
+export const SUPPORT_ROUTE_CATEGORIES = Object.freeze({
+  '/': 'home',
+  '/classes': 'classes',
+  '/teaching/:id': 'classes',
+  '/teaching/:id/class-rules': 'classes',
+  '/teaching/:id/students': 'classes',
+  '/teaching/:id/attendance': 'classes',
+  '/teaching/:id/quicklog': 'classes',
+  '/teaching/:id/grades': 'classes',
+  '/teaching/:id/items': 'classes',
+  '/teaching/:id/picker': 'classes',
+  '/teaching/:id/groups': 'classes',
+  '/teaching/:id/board': 'classes',
+  '/teaching/:id/sessions': 'classes',
+  '/teaching/:id/reports': 'classes',
+  '/student/:id': 'students',
+  '/schedule': 'schedule',
+  '/schedule/times': 'schedule',
+  '/curriculum': 'other',
+  '/reports': 'other',
+  '/reports/execution': 'other',
+  '/archive': 'other',
+  '/archive/former-students': 'other',
+  '/archive/year/:yearId/term/:termId/execution': 'other',
+  '/archive/year/:yearId/term/:termId': 'other',
+  '/calendar': 'calendar',
+  '/settings': 'settings',
+  '/settings/backup': 'settings',
+});
+const ROUTE_CATEGORY_LABELS = Object.freeze({
+  home: 'الرئيسية', classes: 'الفصول', students: 'الطلاب', schedule: 'الجدول',
+  calendar: 'التقويم', settings: 'الإعدادات', support: 'الدعم', other: 'قسم آخر',
+});
 const DEVICE_CATEGORIES = new Set(['mobile', 'tablet', 'desktop', 'other']);
 const BROWSERS = new Set(['chrome', 'edge', 'firefox', 'safari', 'other']);
 
@@ -83,6 +117,9 @@ function sanitizeDiagnostics(input) {
   }
   if (typeof input.actionableSyncIssue === 'boolean') output.actionableSyncIssue = input.actionableSyncIssue;
   if (ROUTE_CATEGORIES.has(input.routeCategory)) output.routeCategory = input.routeCategory;
+  if (typeof input.routeTemplate === 'string' &&
+      Object.hasOwn(SUPPORT_ROUTE_CATEGORIES, input.routeTemplate) &&
+      SUPPORT_ROUTE_CATEGORIES[input.routeTemplate] === output.routeCategory) output.routeTemplate = input.routeTemplate;
   return output;
 }
 
@@ -139,6 +176,8 @@ function formatDiagnosticLines(diagnostics) {
   if (typeof diagnostics.rejectedCount === 'number') lines.push(`لم يقبلها الخادم: ${diagnostics.rejectedCount}`);
   if (typeof diagnostics.historicalConflictCount === 'number') lines.push(`اختلافات تاريخية متصالحة: ${diagnostics.historicalConflictCount}`);
   if (typeof diagnostics.online === 'boolean') lines.push(`الاتصال: ${diagnostics.online ? 'متصل' : 'غير متصل'}`);
+  if (diagnostics.routeCategory) lines.push(`قسم التطبيق: ${ROUTE_CATEGORY_LABELS[diagnostics.routeCategory]}`);
+  if (diagnostics.routeTemplate) lines.push(`المسار: ${diagnostics.routeTemplate}`);
   return lines;
 }
 
