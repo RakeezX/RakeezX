@@ -296,6 +296,12 @@ function shell(path, params) {
       <nav class="tabbar" data-nav-scope="primary" aria-label="التنقل الرئيسي">
         ${bottom.map((it) => navLink(it, path, 'tabbar'))}
       </nav>
+      ${path === '/support' ? '' : html`<a class="n34-help-launcher" href="#/support" aria-label="المساعدة والتواصل" title="المساعدة والتواصل">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.7-.8L3.5 20l1-4.3a8.5 8.5 0 1 1 16-4.2Z"/>
+          <path d="M9.3 9.3a2.7 2.7 0 0 1 5.1 1.1c0 1.5-2.4 1.8-2.4 3.1M12 16.3h.01"/>
+        </svg>
+      </a>`}
     </div>
   `;
 }

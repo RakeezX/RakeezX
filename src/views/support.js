@@ -12,9 +12,9 @@ import { repaint } from '../repaint.js';
 export const SUPPORT_EMAIL = 'support@rakeezx.com';
 
 const REQUEST_TYPES = [
-  { value: 'technical', label: 'مشكلة تقنية' },
-  { value: 'suggestion', label: 'اقتراح' },
-  { value: 'inquiry', label: 'استفسار' },
+  { value: 'inquiry', label: 'أحتاج مساعدة', detail: 'سؤال أو استفسار' },
+  { value: 'suggestion', label: 'لدي فكرة أو اقتراح', detail: 'شارك ما يمكن تحسينه' },
+  { value: 'technical', label: 'وجدت مشكلة', detail: 'اشرح ما واجهته' },
 ];
 
 const DIAGNOSTIC_LABELS = Object.freeze({
@@ -189,26 +189,26 @@ export default {
     return html`<div class="management-page support-page">
       <header class="support-intro">
         <span class="support-intro__icon" aria-hidden="true">${icon('note')}</span>
-        <div><h2>كيف يمكننا مساعدتك؟</h2><p>اختر البريد المباشر أو أرسل طلبًا خاصًا من داخل التطبيق.</p></div>
+        <div><h2>كيف يمكننا مساعدتك؟</h2><p>أرسل طلبك من داخل ركيز، أو تواصل عبر البريد.</p></div>
       </header>
 
       <div class="support-layout">
         <section class="surface support-contact" aria-labelledby="support-contact-title">
           <div class="support-section-heading">
             <span class="support-section-heading__icon" aria-hidden="true">${icon('note')}</span>
-            <div><h3 id="support-contact-title">تواصل مباشر</h3><p>يمكنك التواصل معنا عبر بريد الدعم في أي وقت.</p></div>
+            <div><h3 id="support-contact-title">تفضّل البريد؟</h3><p>يمكنك التواصل عبر بريد الدعم.</p></div>
           </div>
           <a class="support-email" href="mailto:${SUPPORT_EMAIL}" dir="ltr">${SUPPORT_EMAIL}</a>
           <div class="support-contact__actions">
-            <a class="btn btn--primary" href="mailto:${SUPPORT_EMAIL}">${icon('note')} إرسال بريد</a>
-            <button class="btn btn--ghost" type="button" data-act="copy-support-email">${icon('note')} نسخ البريد</button>
+            <a class="btn btn--quiet" href="mailto:${SUPPORT_EMAIL}">${icon('note')} إرسال بريد</a>
+            <button class="btn btn--quiet" type="button" data-act="copy-support-email">${icon('note')} نسخ البريد</button>
           </div>
         </section>
 
         <section class="surface support-request" aria-labelledby="support-request-title">
           <div class="support-section-heading">
             <span class="support-section-heading__icon" aria-hidden="true">${icon('shield')}</span>
-            <div><h3 id="support-request-title">طلب دعم من داخل التطبيق</h3><p>يُرسل الطلب مباشرة وبشكل خاص إلى فريق الدعم.</p></div>
+            <div><h3 id="support-request-title">أرسل طلب دعم</h3><p>اختر نوع الرسالة، ثم اكتبها.</p></div>
           </div>
 
           ${!authenticated()
@@ -221,12 +221,12 @@ export default {
 
           <form class="support-form" data-submit="support-submit">
             <fieldset ${canSubmit ? '' : 'disabled'}>
-              <label class="field">
-                <span class="field__label">نوع الطلب</span>
-                <select class="select" name="type" data-change="support-type">
-                  ${REQUEST_TYPES.map((type) => html`<option value="${type.value}" ${draft.type === type.value ? 'selected' : ''}>${type.label}</option>`)}
-                </select>
-              </label>
+              <div class="n34-support-choices" role="group" aria-label="نوع رسالة الدعم">
+                ${REQUEST_TYPES.map((type) => html`<button type="button" class="n34-support-choice" data-act="support-type" data-type="${type.value}" aria-pressed="${draft.type === type.value ? 'true' : 'false'}">
+                  <strong>${type.label}</strong><small>${type.detail}</small>
+                </button>`)}
+              </div>
+              <input type="hidden" name="type" value="${draft.type}">
               <label class="field">
                 <span class="field__label">رسالتك</span>
                 <textarea class="textarea" name="message" rows="6" minlength="1" maxlength="4000" required
@@ -270,7 +270,12 @@ export default {
     },
 
     'support-type'(el) {
-      draft.type = el.value;
+      draft.type = el.dataset.type;
+      el.closest('.n34-support-choices')?.querySelectorAll('[data-type]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button === el));
+      });
+      const input = el.form?.querySelector('input[name="type"]');
+      if (input) input.value = draft.type;
     },
 
     'support-message'(el) {

@@ -5456,6 +5456,69 @@
   }
 }
 
+/* N34 approved launcher and existing Support page presentation. */
+.n34-help-launcher {
+  position: fixed;
+  z-index: 95;
+  inset-inline-end: 22px;
+  bottom: 22px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--border));
+  border-radius: 16px;
+  background: var(--bg-elev);
+  color: var(--brand-text);
+  box-shadow: 0 6px 20px rgb(12 54 49 / .16);
+  text-decoration: none;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.n34-help-launcher svg { width: 22px; height: 22px; }
+.n34-help-launcher:hover { transform: translateY(-2px); background: var(--brand-soft); border-color: var(--brand); box-shadow: 0 9px 23px rgb(12 54 49 / .19); }
+.n34-help-launcher:active { transform: translateY(0) scale(.97); }
+.n34-help-launcher:focus-visible { outline: 3px solid var(--info); outline-offset: 3px; }
+.support-page .support-layout { grid-template-columns: minmax(0, 1.42fr) minmax(220px, .78fr); }
+.support-page .support-request { order: -1; }
+.support-page .support-contact { padding: var(--sp-4); box-shadow: none; }
+.support-page .support-contact .support-section-heading__icon { width: 32px; height: 32px; }
+.support-page .support-contact .support-section-heading h3 { font-size: var(--fs-base); }
+.support-page .support-contact .support-email {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-block: var(--sp-3) var(--sp-2);
+  color: var(--brand-text);
+  font-size: 1rem;
+  text-align: center;
+}
+.support-page .support-contact .support-email:focus-visible {
+  outline: 3px solid var(--info);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+.support-page .support-contact__actions { gap: 6px; }
+.support-page .support-contact__actions .btn { min-height: 44px; padding-inline: 8px; font-size: var(--fs-sm); }
+.support-page .support-version-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px var(--sp-3);
+  color: var(--text-2);
+  text-align: start;
+}
+.n34-support-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.n34-support-choice { min-height: 76px; display: grid; align-content: center; gap: 3px; text-align: start; border: 1px solid var(--border); border-radius: 13px; background: var(--bg-elev); color: var(--text); padding: 12px; cursor: pointer; }
+.n34-support-choice:hover, .n34-support-choice[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); }
+.n34-support-choice:focus-visible { outline: 3px solid var(--info); outline-offset: 2px; }
+.n34-support-choice strong { font-size: 14px; }
+.n34-support-choice small { font-size: 11px; color: var(--text-2); }
+@media (max-width: 899px) { .n34-help-launcher { inset-inline-end: 14px; bottom: calc(74px + env(safe-area-inset-bottom)); } }
+@media (max-width: 700px) { .support-page .support-layout { grid-template-columns: minmax(0, 1fr); } .n34-support-choices { grid-template-columns: 1fr; } .n34-support-choice { min-height: 58px; grid-template-columns: 1fr auto; align-items: center; } .n34-support-choice small { justify-self: end; } }
+@media (max-width: 360px) { .n34-help-launcher { inset-inline-end: 10px; bottom: calc(70px + env(safe-area-inset-bottom)); } .support-page .support-contact__actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 @media (min-width: 1000px) {
   .settings-page {
     display: grid;
