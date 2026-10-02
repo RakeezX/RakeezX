@@ -167,6 +167,36 @@ test('Demo and signed-out Support navigation make no Product requests', async ({
   expect(productRequests).toEqual([]);
 });
 
+test('Teaching Attendance launcher captures only its static route in Demo', async ({ page }) => {
+  await page.goto('/');
+  await waitForApp(page);
+  await page.locator('[data-act="open-teacher-mini-hub"]').filter({ visible: true }).first().click();
+  await page.locator('[data-act="demo-enter"]').click();
+  await page.waitForFunction(() => window.store?.getActiveWorkspace()?.type === 'demo' && window.store?.teachings?.().length > 0);
+  const teachingId = await page.evaluate(() => window.store.teachings()[0].id);
+  await page.evaluate((id) => { location.hash = `#/teaching/${id}/attendance`; }, teachingId);
+  await expect(page).toHaveURL(/#\/teaching\/[^/]+\/attendance$/);
+  await expect(page.getByRole('heading', { name: 'الحضور اليوم', exact: true })).toBeVisible();
+  expect(await page.evaluate(async () => {
+    const { safeSupportOrigin } = await import('/src/lib/support-origin.js');
+    const { currentPath } = await import('/src/router.js');
+    return safeSupportOrigin(currentPath());
+  })).toEqual({ routeCategory: 'classes', routeTemplate: '/teaching/:id/attendance' });
+  const launcher = page.getByRole('link', { name: 'المساعدة والتواصل' });
+  await expect(launcher).toBeVisible();
+  await launcher.click();
+  await expect(page).toHaveURL(/#\/support$/);
+  await expect(page.getByRole('heading', { name: 'كيف يمكننا مساعدتك؟' })).toBeVisible();
+  const origin = await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    const store = await import('/src/store.js');
+    const { supportVisitOrigin } = await import('/src/lib/support-origin.js');
+    return supportVisitOrigin(`${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`);
+  });
+  expect(origin).toEqual({ routeCategory: 'classes', routeTemplate: '/teaching/:id/attendance' });
+  await expect(page.getByRole('button', { name: 'إرسال', exact: true })).toBeDisabled();
+});
+
 test('Support automatically attaches only safe diagnostics to all V1 request types and hides raw failures', async ({ page }) => {
   const payloads = [];
   let failNext = false;
@@ -264,6 +294,21 @@ test('captured origin is included as static route metadata in intercepted Suppor
   });
   await page.goto('/#/settings');
   await waitForApp(page);
+  await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    cloud.setMockBackend({
+      async fetchRecords() { return []; },
+      async applySyncV2Mutation(envelope) {
+        return {
+          mutationId: envelope.mutationId, entity: envelope.entity,
+          recordId: envelope.recordId, canonicalId: envelope.recordId,
+          outcome: 'applied', appliedGroups: Object.keys(envelope.patch ?? {}),
+          conflictedGroups: [], resultRevision: 1,
+          canonical: { id: envelope.recordId, ...(envelope.patch ?? {}), revision: 1, field_revisions: {}, deleted_at: null },
+        };
+      },
+    });
+  });
   await authenticate(page);
   await page.locator('a[href="#/support"]').filter({ visible: true }).first().click();
   await expect(page).toHaveURL(/#\/support$/);
