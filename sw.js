@@ -97,6 +97,7 @@ const SHELL = [
   './src/lib/student-lifecycle-ui.js',
   './src/lib/pristine-teaching.js',
   './src/lib/support.js',
+  './src/lib/support-origin.js',
   './src/lib/demo.js',
   './src/lib/demo-workspace.js',
   './src/lib/calendar-presets.js',

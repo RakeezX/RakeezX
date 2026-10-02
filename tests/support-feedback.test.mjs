@@ -86,7 +86,7 @@ test('support submission is authenticated, online-only, direct, and never carrie
       appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
       syncState: 'error', pendingMutations: 3, pendingCount: 3, failedCount: 1, blockedCount: 0,
       rejectedCount: 0, historicalConflictCount: 2, actionableSyncIssue: true,
-      routeCategory: 'settings', rawOutbox: [{ id: 'secret' }],
+      routeCategory: 'settings', routeTemplate: '/settings', rawOutbox: [{ id: 'secret' }],
     },
   });
   assert.match(result.id, /^support:/);
@@ -100,7 +100,7 @@ test('support submission is authenticated, online-only, direct, and never carrie
       appVersion: '1.0.0', buildSha: 'b'.repeat(40), buildTimestamp: '2026-09-08T12:00:00.000Z',
       timestamp: body.diagnostics.timestamp, syncState: 'error', pendingMutations: 3,
       pendingCount: 3, failedCount: 1, blockedCount: 0, rejectedCount: 0,
-      historicalConflictCount: 2, actionableSyncIssue: true, routeCategory: 'settings',
+      historicalConflictCount: 2, actionableSyncIssue: true, routeCategory: 'settings', routeTemplate: '/settings',
     },
   });
   assert.equal('owner_id' in body, false);

@@ -11,6 +11,7 @@ import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
+import { captureSupportOriginBeforeNavigation, clearSupportOrigin, enterSupportVisit } from './lib/support-origin.js';
 import { setRepaint } from './repaint.js';
 import { installSessionAutoTriggers } from './lib/session-auto.js';
 import { createWorkspaceRegistry, demoDescriptor } from './lib/workspaces.js';
@@ -60,6 +61,17 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 
 const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
 const canMaterializeTodaySessions = () => isDemoWorkspace() || Boolean(cloud.session && cloud.user);
+const supportAccountKey = () => `${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`;
+let lastSupportAccountKey = supportAccountKey();
+
+// Capture before the hash changes; the Support view itself never sees the prior route.
+document.addEventListener('click', (event) => {
+  const link = event.target.closest?.('a[href="#/support"]');
+  if (link && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey
+      && !event.shiftKey && !event.altKey && (!link.target || link.target === '_self') && !link.hasAttribute('download')) {
+    captureSupportOriginBeforeNavigation(currentPath(), supportAccountKey());
+  }
+}, true);
 
 /* ---------- حالة وتسميات المزامنة والتثبيت ---------- */
 
@@ -508,6 +520,8 @@ async function resolve() {
   view = mod.default;
   ctx = found;
 
+  if (found.route.path === '/support') enterSupportVisit(supportAccountKey());
+
   render(app, shell(found.path, found.params));
   mainEl = document.getElementById('main');
 
@@ -622,6 +636,9 @@ async function boot() {
     if (update?.render !== false) scheduleRender();
   });
   cloud.subscribe(() => {
+    const nextSupportAccountKey = supportAccountKey();
+    if (nextSupportAccountKey !== lastSupportAccountKey) clearSupportOrigin();
+    lastSupportAccountKey = nextSupportAccountKey;
     if (cloud.session && cloud.user && isDemoWorkspace()) {
       clearDemoRequest();
       store.deactivateWorkspace('authenticated-session-replaces-demo');

@@ -5,7 +5,8 @@ import { BUILD_META } from '../lib/build-meta.js';
 import { sanitizeSupportDiagnostics, submitSupportRequest } from '../lib/support.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
-import { currentPath } from '../router.js';
+import { clearSupportOrigin, supportVisitOrigin } from '../lib/support-origin.js';
+import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 
 export const SUPPORT_EMAIL = 'support@rakeezx.com';
@@ -40,6 +41,7 @@ const DIAGNOSTIC_LABELS = Object.freeze({
   actionableSyncIssue: 'توجد حالة مزامنة تحتاج متابعة',
   lastSuccessfulSyncAt: 'آخر مزامنة ناجحة',
   routeCategory: 'قسم التطبيق',
+  routeTemplate: 'الشاشة السابقة',
 });
 
 const initialDraft = () => ({
@@ -47,6 +49,7 @@ const initialDraft = () => ({
   submitting: false, success: false, error: '',
 });
 let draft = initialDraft();
+let draftAccountKey = null;
 let connectionHandler = null;
 
 const online = () => typeof navigator === 'undefined' || navigator.onLine !== false;
@@ -66,15 +69,7 @@ function browserDetails(userAgent = navigator.userAgent ?? '') {
   return { browser: 'other' };
 }
 
-function routeCategory(path = currentPath()) {
-  if (path === '/') return 'home';
-  if (path.startsWith('/classes') || path.startsWith('/teaching/')) return 'classes';
-  if (path.startsWith('/student')) return 'students';
-  if (path.startsWith('/schedule')) return 'schedule';
-  if (path.startsWith('/settings')) return 'settings';
-  if (path.startsWith('/support')) return 'support';
-  return 'other';
-}
+const supportAccountKey = () => `${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`;
 
 function pwaStandalone() {
   return !!(window.matchMedia?.('(display-mode: standalone)').matches ||
@@ -105,7 +100,7 @@ export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperatio
     historicalConflictCount: syncSummary.historicalConflictCount,
     actionableSyncIssue: syncSummary.actionableSyncIssue,
     lastSuccessfulSyncAt: syncSummary.lastSuccessfulSyncAt ?? sync.state.lastSyncedAt,
-    routeCategory: routeCategory(),
+    ...supportVisitOrigin(supportAccountKey()),
   });
 }
 
@@ -166,6 +161,7 @@ export default {
   back: () => '#/settings',
 
   onMount() {
+    draftAccountKey = supportAccountKey();
     connectionHandler = () => repaint();
     addEventListener('online', connectionHandler);
     addEventListener('offline', connectionHandler);
@@ -177,10 +173,17 @@ export default {
       removeEventListener('offline', connectionHandler);
     }
     connectionHandler = null;
+    clearSupportOrigin();
     draft = initialDraft();
+    draftAccountKey = null;
   },
 
   render() {
+    if (draftAccountKey !== null && draftAccountKey !== supportAccountKey()) {
+      draft = initialDraft();
+      draftAccountKey = supportAccountKey();
+      clearSupportOrigin();
+    }
     const canSubmit = authenticated() && online();
     const diagnostics = currentSafeSupportDiagnostics();
     return html`<div class="management-page support-page">
@@ -285,6 +288,7 @@ export default {
 
     async 'support-submit'(form) {
       if (draft.submitting) return;
+      const accountKey = supportAccountKey();
       const data = new FormData(form);
       draft.type = String(data.get('type') ?? draft.type);
       draft.message = String(data.get('message') ?? '');
@@ -298,17 +302,21 @@ export default {
       }
       try {
         const syncSummary = await sync.getSyncOperationalSummary();
+        if (supportAccountKey() !== accountKey) return;
         await submitSupportRequest({
           type: draft.type,
           message: draft.message,
           diagnostics: currentSafeSupportDiagnostics(syncSummary),
         });
+        if (supportAccountKey() !== accountKey) return;
         draft = { ...initialDraft(), success: true };
         toast('تم إرسال طلبك بنجاح.');
       } catch (error) {
+        if (supportAccountKey() !== accountKey) return;
         draft.error = friendlyError(error);
         draft.submitting = false;
       }
+      if (supportAccountKey() !== accountKey) return;
       repaint();
     },
   },

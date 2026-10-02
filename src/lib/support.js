@@ -6,10 +6,11 @@
  * diagnostics are reduced to this allowlist before they leave the browser.
  */
 import * as cloud from './cloud.js';
+import { SUPPORT_ROUTE_CATEGORIES } from './support-origin.js';
 
 const TYPES = new Set(['technical', 'suggestion', 'inquiry']);
 const SYNC_STATES = new Set(['idle', 'syncing', 'synced', 'pending', 'blocked', 'conflicted', 'rejected', 'offline', 'error', 'auth_required']);
-const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'settings', 'support', 'other']);
+const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'calendar', 'settings', 'support', 'other']);
 const DEVICE_CATEGORIES = new Set(['mobile', 'tablet', 'desktop', 'other']);
 const BROWSERS = new Set(['chrome', 'edge', 'firefox', 'safari', 'other']);
 const MAX_COUNT = 999_999;
@@ -49,6 +50,7 @@ export function sanitizeSupportDiagnostics(input = {}) {
   const browser = inputString(input.browser, 16)?.toLowerCase();
   const browserVersion = inputString(input.browserVersion, 24);
   const routeCategory = inputString(input.routeCategory, 16)?.toLowerCase();
+  const routeTemplate = inputString(input.routeTemplate, 96);
   const viewport = safeViewport(input.viewport);
   const syncState = inputString(input.syncState, 24)?.toLowerCase();
   const pendingMutations = safeCount(input.pendingMutations);
@@ -83,6 +85,8 @@ export function sanitizeSupportDiagnostics(input = {}) {
   if (typeof input.actionableSyncIssue === 'boolean') diagnostics.actionableSyncIssue = input.actionableSyncIssue;
   if (lastSuccessfulSyncAt) diagnostics.lastSuccessfulSyncAt = lastSuccessfulSyncAt;
   if (ROUTE_CATEGORIES.has(routeCategory)) diagnostics.routeCategory = routeCategory;
+  if (routeTemplate && Object.hasOwn(SUPPORT_ROUTE_CATEGORIES, routeTemplate)
+      && SUPPORT_ROUTE_CATEGORIES[routeTemplate] === diagnostics.routeCategory) diagnostics.routeTemplate = routeTemplate;
   return diagnostics;
 }
 

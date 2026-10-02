@@ -98,6 +98,58 @@ test('Support keeps direct email available while in-app submission reflects auth
   await expect(page.getByText('إرسال الطلب من داخل التطبيق يحتاج اتصالًا بالإنترنت.')).toHaveCount(0);
 });
 
+test('existing Support link captures only the static prior route and reload drops it', async ({ page }) => {
+  await openSupport(page);
+  await page.evaluate(() => { location.hash = '#/settings'; });
+  await expect(page.getByRole('heading', { name: 'الإعدادات' })).toBeVisible();
+  await page.locator('a[href="#/support"]').filter({ visible: true }).first().click();
+  await expect(page).toHaveURL(/#\/support$/);
+  const origin = await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    const store = await import('/src/store.js');
+    const { supportVisitOrigin } = await import('/src/lib/support-origin.js');
+    return supportVisitOrigin(`${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`);
+  });
+  expect(origin).toEqual({ routeCategory: 'settings', routeTemplate: '/settings' });
+  await page.reload();
+  await waitForApp(page);
+  const afterReload = await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    const store = await import('/src/store.js');
+    const { supportVisitOrigin } = await import('/src/lib/support-origin.js');
+    return supportVisitOrigin(`${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`);
+  });
+  expect(afterReload).toEqual({ routeCategory: 'support' });
+});
+
+test('Support discards another account draft while an intercepted request is awaited', async ({ page }) => {
+  let releaseRequest;
+  let requestStarted;
+  const started = new Promise((resolve) => { requestStarted = resolve; });
+  await page.route(SUPPORT_ENDPOINT, async (route) => {
+    requestStarted();
+    await new Promise((resolve) => { releaseRequest = resolve; });
+    await route.fulfill({ status: 201, body: '' });
+  });
+  await openSupport(page);
+  await authenticate(page);
+  await page.getByLabel('رسالتك').fill('old-account-draft');
+  await page.getByRole('button', { name: 'إرسال', exact: true }).click();
+  await started;
+  await page.evaluate(async () => {
+    const cloud = await import('/src/lib/cloud.js');
+    const { repaint } = await import('/src/repaint.js');
+    cloud.setMockAuth({ id: 'another-owner' }, { access_token: 'another-token' });
+    repaint();
+  });
+  releaseRequest();
+  await expect(page.getByLabel('رسالتك')).toHaveValue('');
+  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
+  await expect(page.locator('[data-diagnostic-key="routeCategory"]')).toContainText('support');
+  await expect(page.locator('[data-diagnostic-key="routeTemplate"]')).toHaveCount(0);
+  await expect(page.locator('.support-result.is-success')).toHaveCount(0);
+});
+
 test('Support automatically attaches only safe diagnostics to all V1 request types and hides raw failures', async ({ page }) => {
   const payloads = [];
   let failNext = false;
