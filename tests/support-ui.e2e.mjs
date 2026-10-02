@@ -150,6 +150,20 @@ test('Support discards another account draft while an intercepted request is awa
   await expect(page.locator('.support-result.is-success')).toHaveCount(0);
 });
 
+test('Demo and signed-out Support navigation make no Product requests', async ({ page }) => {
+  await page.goto('/');
+  await waitForApp(page);
+  expect(await page.evaluate(() => window.store?.getActiveWorkspace()?.type)).toBe('demo');
+  const productRequests = [];
+  page.on('request', (request) => {
+    if (/supabase\.co|\/rest\/v1\/|\/auth\/v1\/|\/functions\/v1\//.test(request.url())) productRequests.push(request.url());
+  });
+  await page.evaluate(() => { location.hash = '#/support'; });
+  await expect(page.getByRole('heading', { name: 'كيف يمكننا مساعدتك؟' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'إرسال', exact: true })).toBeDisabled();
+  expect(productRequests).toEqual([]);
+});
+
 test('Support automatically attaches only safe diagnostics to all V1 request types and hides raw failures', async ({ page }) => {
   const payloads = [];
   let failNext = false;
