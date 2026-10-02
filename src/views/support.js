@@ -17,35 +17,8 @@ const REQUEST_TYPES = [
   { value: 'technical', label: 'وجدت مشكلة', detail: 'اشرح ما واجهته' },
 ];
 
-const DIAGNOSTIC_LABELS = Object.freeze({
-  appVersion: 'إصدار التطبيق',
-  buildSha: 'معرّف البناء',
-  buildTimestamp: 'وقت البناء',
-  timestamp: 'وقت الإرسال',
-  timezone: 'المنطقة الزمنية',
-  deviceCategory: 'فئة الجهاز',
-  browser: 'المتصفح',
-  browserVersion: 'إصدار المتصفح',
-  mobile: 'واجهة جوال',
-  viewport: 'حجم العرض التقريبي',
-  pwaStandalone: 'وضع التطبيق المثبّت',
-  online: 'حالة الاتصال',
-  syncState: 'حالة المزامنة العامة',
-  pendingMutations: 'تغييرات قيد الانتظار',
-  failedMutations: 'تغييرات تعذّر إرسالها',
-  pendingCount: 'تغييرات بانتظار الرفع',
-  failedCount: 'تغييرات تعذّر إرسالها',
-  blockedCount: 'تغييرات تنتظر بيانات مرتبطة',
-  rejectedCount: 'تغييرات لم يقبلها الخادم',
-  historicalConflictCount: 'اختلافات تاريخية متصالحة',
-  actionableSyncIssue: 'توجد حالة مزامنة تحتاج متابعة',
-  lastSuccessfulSyncAt: 'آخر مزامنة ناجحة',
-  routeCategory: 'قسم التطبيق',
-  routeTemplate: 'الشاشة السابقة',
-});
-
 const initialDraft = () => ({
-  type: 'technical', message: '', previewDiagnostics: false,
+  type: 'technical', message: '',
   submitting: false, success: false, error: '',
 });
 let draft = initialDraft();
@@ -102,30 +75,6 @@ export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperatio
     lastSuccessfulSyncAt: syncSummary.lastSuccessfulSyncAt ?? sync.state.lastSyncedAt,
     ...supportVisitOrigin(supportAccountKey()),
   });
-}
-
-function diagnosticValue(key, value) {
-  if (key === 'viewport') return `${value.width} × ${value.height}`;
-  if (key === 'online') return value ? 'متصل' : 'غير متصل';
-  if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
-  if (key.endsWith('Timestamp') || key === 'timestamp' || key === 'lastSuccessfulSyncAt') {
-    return new Date(value).toLocaleString('ar-SA');
-  }
-  if (key === 'buildSha') return value.slice(0, 8);
-  return String(value);
-}
-
-function diagnosticsPreview(diagnostics) {
-  return html`<div class="support-diagnostics-preview" id="support-diagnostics-preview" aria-label="المعلومات التقنية المرفقة">
-    <dl>
-      ${Object.entries(diagnostics).map(([key, value]) => html`
-        <div data-diagnostic-key="${key}">
-          <dt>${DIAGNOSTIC_LABELS[key] ?? key}</dt>
-          <dd><bdi>${diagnosticValue(key, value)}</bdi></dd>
-        </div>
-      `)}
-    </dl>
-  </div>`;
 }
 
 function friendlyError(error) {
@@ -185,7 +134,6 @@ export default {
       clearSupportOrigin();
     }
     const canSubmit = authenticated() && online();
-    const diagnostics = currentSafeSupportDiagnostics();
     return html`<div class="management-page support-page">
       <header class="support-intro">
         <span class="support-intro__icon" aria-hidden="true">${icon('note')}</span>
@@ -237,11 +185,6 @@ export default {
               ${authenticated() ? html`
                 <div class="support-diagnostics">
                   <p class="support-diagnostics__disclosure">${icon('shield')}<span>سيُرفق اسم حسابك وبريده الإلكتروني لتمكين فريق الدعم من التواصل معك، إضافةً إلى معلومات تقنية عامة وآمنة، دون بيانات الطلاب أو كلمات المرور.</span></p>
-                  <button class="btn btn--sm btn--quiet support-diagnostics__preview-action" type="button"
-                    data-act="support-diagnostics-preview" aria-expanded="${draft.previewDiagnostics ? 'true' : 'false'}">
-                    ${draft.previewDiagnostics ? 'إخفاء المعلومات التقنية' : 'عرض المعلومات التقنية'}
-                  </button>
-                  ${draft.previewDiagnostics ? diagnosticsPreview(diagnostics) : ''}
                 </div>
               ` : ''}
             </fieldset>
@@ -284,11 +227,6 @@ export default {
       if (counter) counter.innerHTML = `<bdi>${draft.message.length}</bdi> / 4000`;
       const submit = el.form?.querySelector('button[type="submit"]');
       if (submit) submit.disabled = !authenticated() || !online() || !draft.message.trim() || draft.submitting;
-    },
-
-    'support-diagnostics-preview'() {
-      draft.previewDiagnostics = !draft.previewDiagnostics;
-      repaint();
     },
 
     async 'support-submit'(form) {

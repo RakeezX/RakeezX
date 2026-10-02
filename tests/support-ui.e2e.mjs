@@ -144,9 +144,8 @@ test('Support discards another account draft while an intercepted request is awa
   });
   releaseRequest();
   await expect(page.getByLabel('رسالتك')).toHaveValue('');
-  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
-  await expect(page.locator('[data-diagnostic-key="routeCategory"]')).toContainText('support');
-  await expect(page.locator('[data-diagnostic-key="routeTemplate"]')).toHaveCount(0);
+  await expect(page.getByText(CONTACT_DISCLOSURE)).toBeVisible();
+  await expect(page.locator('#support-diagnostics-preview')).toHaveCount(0);
   await expect(page.locator('.support-result.is-success')).toHaveCount(0);
 });
 
@@ -226,14 +225,9 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   const disclosure = page.getByText(CONTACT_DISCLOSURE);
   await expect(disclosure).toBeVisible();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
-  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
-  const preview = page.locator('#support-diagnostics-preview');
-  await expect(preview).toBeVisible();
-  const previewKeys = await preview.locator('[data-diagnostic-key]').evaluateAll((nodes) => nodes.map((node) => node.dataset.diagnosticKey));
+  await expect(page.getByRole('button', { name: /عرض المعلومات التقنية|إخفاء المعلومات التقنية/ })).toHaveCount(0);
+  await expect(page.locator('#support-diagnostics-preview, [data-diagnostic-key]')).toHaveCount(0);
   const allowed = new Set(['appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone', 'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport', 'pwaStandalone', 'online', 'syncState', 'pendingMutations', 'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount', 'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate']);
-  expect(previewKeys.length).toBeGreaterThan(5);
-  expect(previewKeys.every((key) => allowed.has(key))).toBe(true);
-  await expect(preview).not.toContainText(/طالب|فصل|رمز دخول|support-ui-token|#\/support/i);
 
   await expect(submit).toBeDisabled();
   await message.fill('أ');
@@ -282,6 +276,7 @@ test('Support automatically attaches only safe diagnostics to all V1 request typ
   for (const payload of payloads) {
     expect(payload.diagnostics.routeCategory).toBe('support');
     expect(Object.keys(payload.diagnostics).every((key) => allowed.has(key))).toBe(true);
+    expect(Object.keys(payload.diagnostics).length).toBeGreaterThan(5);
     expect(JSON.stringify(payload.diagnostics)).not.toMatch(/token|student|class|owner|routePath|outbox/i);
   }
 });
@@ -312,9 +307,8 @@ test('captured origin is included as static route metadata in intercepted Suppor
   await authenticate(page);
   await page.locator('a[href="#/support"]').filter({ visible: true }).first().click();
   await expect(page).toHaveURL(/#\/support$/);
-  await page.getByRole('button', { name: 'عرض المعلومات التقنية' }).click();
-  await expect(page.locator('[data-diagnostic-key="routeCategory"]')).toContainText('settings');
-  await expect(page.locator('[data-diagnostic-key="routeTemplate"]')).toContainText('/settings');
+  await expect(page.getByText(CONTACT_DISCLOSURE)).toBeVisible();
+  await expect(page.locator('#support-diagnostics-preview')).toHaveCount(0);
   await page.getByLabel('رسالتك').fill('Synthetic only');
   await page.getByRole('button', { name: 'إرسال', exact: true }).click();
   await expect.poll(() => payloads.length).toBe(1);
