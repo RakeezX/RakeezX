@@ -89,3 +89,6 @@
 - blob الاختبار 2387a41a9e9b772507ed4f90beb55a5acdb805ef مطابق baseline/candidate؛ app.js وsrc/views/schedule.js وsrc/styles/schedule-work-integration.css لم تتغير بينهما. لا يوجد تشغيل baseline مكافئ لهذه الحالة بعد؛ لا تصنيف Product regression أو test debt حتى قرار PM.
 - دليل المرشح محفوظ في worktree n58-otp-fix: artifacts/n58-calendar-client-0457-3/verification/2026-10-03T04-31-07-960Z-6388f443-f585-4328-9f93-7ca5d93390cc/local-sync-pwa.e2e.mjs؛ screenshot وtrace وlog. 65 ملف spec لاحق وStage E لم ينفذ؛ Heavy محررة.
 - المطلوب من PM: اختيار تدقيق baseline مكافئ وحدود test-only correction إن أثبت فشلًا مشتركًا/دين اختبار؛ أو إبقاء N58 YELLOW إن كان مرشحًا خاصًا. لا تعديل src أو Preview أو Production في هذا المسار. N53 MB01 GREEN مستقل وفق قرار PM 06:33.
+
+### N53 MB01 — حسم PM ونقل V3 مكتمل تقنيًا
+- طبق RAKEEZ Ops قرار PM 06:33 على رقعة MB01 فقط؛ أعيد بناء المرشح من main الحالي مع تطابق CSS الأساسي وFreeze، ثم نجحت بوابات الشجرة وPreview. انتقل CSS المحدد إلى main ‏f7199ec fast-forward، وأكد Cloudflare check والـ CSS المنشور وsmoke المقيد محتوى Production. التذكرة الآن PO PRODUCTION REVIEW PENDING وليست CLOSED؛ لا سلطة لـ MB02 أو باقي N53. N58 local-sync-pwa يبقى YELLOW منفصلًا.

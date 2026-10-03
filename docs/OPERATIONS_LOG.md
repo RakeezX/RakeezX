@@ -74,3 +74,7 @@
 ### N58 — إثبات tooling/path debt ثم توقف عند local-sync-pwa
 - زوج تشخيص متكافئ للحالة CORE_V2 الفاشلة: FAIL/FAIL بخطأ فتح IndexedDB. مع تصحيح test-only قصير المسار: PASS/PASS مرة واحدة لكل طرف. حُفظت logs وtraces وصور الفشل، وثبت الاختبار فقط في المرشح عند 70bb7fa.
 - استؤنفت ملفات spec غير المنفذة؛ نجح اثنان ثم فشل local-sync-pwa ‏1/4 في توقع عنوان Schedule قديم. توقف المسار YELLOW، و65 ملفا لاحقا وStage E لم ينفذ. حررت Heavy بعد حفظ الدليل وسجلت طلب PM؛ بقي N53 مستقلا.
+
+### N53 MB01 — النقل المحدد وPreview وProduction
+- بعد قرار PM، بُني المرشح f7199ec من main الحالي ونُقلت رقعة Work Freeze ذات السطرين فقط. اجتاز build و6/6 browser وPreview Cloudflare و6/6 smoke، ثم دُفع fast-forward إلى main بعد تحقق SHA. نجح Cloudflare check 111130402304 للـ SHA الكامل بعد الدفع؛ تطابق CSS على النطاقين العام والمخصص ونجح smoke Production ‏6/6 بلا بيانات خاصة. حقل environment الصريح غير متاح في check؛ لا ندعيه.
+- سجلت مراجعة Product Owner النهائية المطلوبة في PO_REVIEW_QUEUE؛ الحالة ليست CLOSED. حررت Heavy. N58 متوقف YELLOW عند local-sync-pwa دون Stage E.
