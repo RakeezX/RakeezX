@@ -9,7 +9,7 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE منذ 2026-10-03 05:53 UTC؛ أوقف RAKEEZ Ops تشغيل N58 بعد فشل مرشح خاص به في اختبار الاستعادة. لا توجد جلسة اختبار ثقيلة جارية.
+- Heavy execution owner: RAKEEZ Ops / N53 MB01 منذ 2026-10-03 05:57 UTC؛ بدأ التصديق الثقيل في worktree معزول n53-mb01-ops-0466 بعد تحرير N58. لا يُشغّل مسار ثقيل آخر حتى تحرير النافذة.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
