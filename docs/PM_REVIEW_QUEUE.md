@@ -108,3 +108,23 @@
 - baseline exact 430bc2e في worktree معزول نجح 4/4 بعد تصحيح test-only المأذون؛ سجل التشغيل handoff/n58-local-sync-baseline-corrected.log. candidate 9edc4178 مع test-only ‏13397b3 نجح 3/4 وفشل عند line 473 في الاختبار offline reload/reopen: بعد reload على #/settings لم يظهر .topbar__title، ولقطة الفشل تعرض boot فقط. نفس test blob المصحح 62943ae85887f9e6b7aea7bb58137c73dd30431f للطرفين.
 - الدليل candidate في artifacts/n58-calendar-client-0457-3/verification/2026-10-03T05-26-56-381Z-16a7b58a-6b10-4a9a-8ea0-7564b91d9668/local-sync-pwa.e2e.mjs داخل worktree n58-otp-fix: before/result/log/trace/screenshot. لا إعادة محاولة، لا تعديل Product، لا Stage E، و65 ملف spec بعده لم يبدأ.
 - المطلوب من PM: تدقيق trace/source قراءة فقط وتحديد هل boot المعلق بعد offline reload سببه مرشح Product أم فرق runner/PWA tooling، وحدود أي فحص إضافي. يبقى N58 YELLOW وفق شرط القرار السابق؛ N53/PO review مستقل.
+
+## PM WATCH DECISION — 2026-10-03 09:34 +03
+### N58 local-sync-pwa — TOOLING/HARNESS DEBT CONFIRMED / GREEN TO RESUME
+- نفذ PM تشخيصًا زوجيًا جديدًا دون تعديل Product: نفس تصحيح test-only لمسار #/schedule/times ثم تشغيل local-sync-pwa.e2e.mjs على baseline 430bc2e6d563924aeeeff37837f1732b2cde93eb وعلى candidate 9edc41788ecb4952c798131ffd8aed634e45ed08.
+- baseline مع runner/config الأصليين: 4/4 PASS في تشغيل واحد، 145.54 ثانية.
+- candidate شُغّل مرة واحدة بعد توحيد scripts/e2e-runner.mjs وplaywright.config.js مؤقتًا إلى bytes خط الأساس، مع بقاء Product candidate نفسه: 4/4 PASS في تشغيل واحد، 150.28 ثانية.
+- بعد التشخيص أُعيدت ملفات local-sync-pwa.e2e.mjs وrunner/config إلى حالتها الأصلية؛ status لتلك الملفات نظيف. لم يُعدّل src أو sw.js أو Schema/Supabase ولم يحدث Preview/Production.
+- التصنيف: الفشل السابق candidate-only عند offline reload ليس دليل Product regression؛ يختفي عند مساواة harness/config، لذلك هو TOOLING/HARNESS DEBT.
+- القرار: N58 يعود GREEN للتحقق المحلي. اعتبر local-sync-pwa Product-behavior PASS تحت harness المكافئ ولا تعِد تشغيله.
+- استأنف فقط 65 spec غير المنفذة ثم Stage E باستخدام harness مكافئ قصير ومحمي يمنع path/output artifacts من تغيير سلوك Chromium. لا تعِد أي PASS سابق.
+- إصلاح runner/output-safety يبقى test/tooling-only منفصلًا مع حفظ evidence retention وoutput safety ودون لمس Product runtime.
+- إذا ظهر baseline PASS / candidate FAIL جديد تحت harness مكافئ، أوقف N58 YELLOW عند ذلك الملف واحفظ الدليل بلا retry.
+- لا يحتاج PO لهذه الحالة.
+
+### N58 — microbatch-0327 بعد استئناف 65 ملفًا — YELLOW / قرار PM مطلوب
+- القرار السابق 2026-10-03 09:34 +03 سمح باستكمال الملفات بعد إثبات 4/4 لـ local-sync-pwa بإعداد baseline المتكافئ. في worktree RAKEEZ Ops المعزول، commit الاختبارات/الأداة فقط `9f33253a7d3d6c2523de24fc78b0f2f048596847` أعاد Vite إلى عملية منفصلة مع إبقاء مخرجات Playwright محروسة ومحفوظة. لا تغيير في `src/` ولا live Supabase.
+- أُثبتت النافذة الثقيلة FREE والمنفذ 5173 خاليًا قبل التشغيل. `manual.e2e.mjs` نجح 3/3. `microbatch-0327.e2e.mjs` توقف بنتيجة 4 PASS / 3 FAIL: مشاهد N06 friday وsaturday وholiday ترى العنوان «إجازة اليوم الوطني»؛ المتوقع في الأولين «لا توجد لديك حصص اليوم» وفي الثالث «اليوم الوطني». الفشل عند السطر 53، دون إعادة محاولة.
+- دليل التشغيل: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T07-22-25-213Z-fd1b4aed-f3ce-4985-adca-a6ba5d9326ae\`، وفيه before/result/log/screenshots/traces محفوظة. `tests/microbatch-0327.e2e.mjs` يختلف بين baseline وcandidate في مداخل Demo فقط، والتوقعات نفسها. `src/views/home.js` و`src/app.js` متطابقان؛ `src/lib/db.js` مختلف، ولا يثبت ذلك وحده سبب الفشل.
+- التقدم: 46 ملف spec مكتمل (45 سابقًا + manual)، microbatch-0327 جزئي 4/7، و63 ملفًا لم يبدأ؛ Stage E لم يُشغّل. النافذة الثقيلة أُطلقت والمنفذ 5173 خالٍ. لا Preview/Production ولا تعديل Product.
+- مطلوب PM: حدد فحص baseline/candidate متكافئًا أو مراجعة مصدر/trace محدودة لتصنيف الفرق. لا تُستأنف الملفات الـ63 أو Stage E ولا يُعدَّل `src/` قبل القرار. يستمر مسار N53 MB01 مستقلًا بانتظار مراجعة PO على Production.

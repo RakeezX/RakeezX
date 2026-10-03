@@ -4,12 +4,12 @@
 هذه اللوحة تشغيلية وليست بديلًا عن Product Ledger أو Git.
 
 ## الحالة العليا
-- remote main الحالي: f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ نقل N53 MB01 لسطرَي CSS فقط فوق e85deb8، بلا Schema/Auth/Sync أو بيانات حية. Cloudflare Pages check 111130402304 نجح لهذا SHA بعد دفع main؛ CSS على rakeezx.pages.dev وrakeezx.com مطابق للمرشح. حقل environment الصريح غير متاح في GitHub check، لذا يُذكر هذا القيد في سجل النشر.
+- remote main الحالي: 179c1ad21f62bc278a5ed112e60fdde5fd4c5fc8؛ ما بعد f7199ec هو checkpoints توثيقية لـ N58/PM فقط. Product/runtime المنشور يبقى f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ N53 MB01 نقل سطرَي CSS فقط بلا Schema/Auth/Sync أو بيانات حية.
 - Product/runtime على main: f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ التغيير الوحيد منذ e85deb8 هو CSS N53 MB01، وعقد runtime/data السابق محفوظ.
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE منذ 2026-10-03 05:30 UTC؛ توقف N58 وفق قاعدة PM بعد baseline PASS/candidate FAIL، ولا runner على 5173.
+- Heavy execution owner: FREE؛ PM حسم فشل local-sync-pwa كدين tooling/harness بعد paired equivalence PASS/PASS، وN58 مسموح له استئناف الـ65 spec غير المنفذة فقط.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
@@ -104,3 +104,15 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - قرار PM 08:15 +03 أجاز تصحيح test-only لتوقع OFFLINE_ROUTE_MATRIX عند #/schedule/times من أوقات الحصص إلى الجدول. test blob المصحح ‏62943ae85887f9e6b7aea7bb58137c73dd30431f متطابق baseline/candidate. baseline المعزول عند 430bc2e نجح 4/4 في تشغيل واحد، سجله handoff/n58-local-sync-baseline-corrected.log.
 - candidate في تشغيل واحد نجح 3/4 ثم فشل الاختبار نفسه عند line 473 بعد offline reload على #/settings: .topbar__title غير موجود، ولقطة الفشل تُظهر شاشة boot. الدليل محفوظ في artifacts/n58-calendar-client-0457-3/verification/2026-10-03T05-26-56-381Z-16a7b58a-6b10-4a9a-8ea0-7564b91d9668/local-sync-pwa.e2e.mjs؛ commit test-only ‏13397b3. لا retry ولا تغيير src.
 - وفق قاعدة PM baseline PASS/candidate FAIL أُوقف N58 YELLOW. من 111 ملف spec: 45 مغطاة، local-sync-pwa غير مكتمل، 65 لم تبدأ؛ Stage E/Preview/Production الخاصة بـN58 لم تنفذ. N53 MB01 على Production بانتظار مراجعة PO مستقلًا، ونافذة Heavy حرة.
+
+## PM WATCH CHECKPOINT — 2026-10-03 09:34 +03
+- N58: PM DECIDED / GREEN TO RESUME / NOT CERTIFIED.
+- local-sync-pwa نجح 4/4 على baseline و4/4 على candidate عندما توحد runner/config دون تغيير Product؛ التصنيف tooling/harness debt.
+- استأنف 65 spec غير المنفذة فقط ثم Stage E بحزمة اختبار مكافئة قصيرة ومحميّة؛ لا تعِد PASS السابقة.
+- N53 MB01 مستقل وما زال PO PRODUCTION REVIEW PENDING.
+
+## نقطة N58 — 2026-10-03 07:24 UTC
+- PM سمح GREEN باستكمال 65 ملفًا بعد إثبات local-sync-pwa 4/4 بإعداد متكافئ. أعيد حد عملية Vite في أداة الاختبار فقط (`9f33253`)، مع حفظ المخرجات.
+- `manual.e2e.mjs` 3/3 PASS؛ `microbatch-0327.e2e.mjs` 4/7 مع 3 إخفاقات في عناوين N06. توقف المسار YELLOW دون retry. 46 spec مكتمل، ملف واحد جزئي، 63 لم تبدأ، Stage E لم يُشغّل.
+- Heavy execution owner: FREE بعد توقف runner؛ المنفذ 5173 خالٍ. N53 MB01: PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING، وليس CLOSED.
+- القرار التالي: PM يفصل الفشل بمقارنة baseline/candidate أو تدقيق محدود. دليل التشغيل في طابور PM، ولا تغييرات Product أو live.

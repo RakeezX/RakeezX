@@ -82,3 +82,8 @@
 ### N58 — الزوج المصحح كشف فشلًا لاحقًا على المرشح فقط
 - تصحيح عنوان Schedule test-only وفق PM جعل baseline local-sync-pwa ينجح 4/4. المرشح فشل 3/4 في حالة offline reload عند #/settings: boot عالق بلا topbar. احتُفظ بالسجل وtrace والصورة، وثُبت تعديل الاختبار فقط في 13397b3. لا retry أو Product change.
 - توقف N58 YELLOW لحين PM؛ 65 ملف spec وStage E غير منفذة. حررت Heavy، وN53 MB01 ما زال بانتظار مراجعة PO على Production.
+
+### N58 — توقف مسار التحقق عند microbatch-0327، 2026-10-03 07:24 UTC
+- استُخدم قرار PM الجديد لاستكمال suffix البالغ 65 ملفًا بعد local-sync-pwa. أثبتت اللوحة FREE وخلو 5173. commit الأداة test-only `9f33253` حافظ على أدلة Playwright واستعاد فصل Vite كعملية مستقلة.
+- أول ملف `manual.e2e.mjs` PASS 3/3. الثاني `microbatch-0327.e2e.mjs` سجل 4 PASS و3 FAIL في مشاهد N06 friday/saturday/holiday عند عنوان بطاقة اليوم. حُفظت screenshots/traces/logs/result في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T07-22-25-213Z-fd1b4aed-f3ce-4985-adca-a6ba5d9326ae/` داخل worktree RAKEEZ Ops. لم تُعد المحاولة.
+- عُزل N58 كـ YELLOW ورفع سؤال PM مع الفروق المصدرية دون نسبة السبب إلى Product. 63 ملفًا وStage E لم يبدأوا. لم يتغير `src/`، ولا Preview/Production أو live Supabase. N53 MB01 ينتظر مراجعة PO على Production.
