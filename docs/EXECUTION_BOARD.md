@@ -4,18 +4,18 @@
 هذه اللوحة تشغيلية وليست بديلًا عن Product Ledger أو Git.
 
 ## الحالة العليا
-- remote main الحالي: a1d3df294461ec777cdf59c853103d98c69fd923؛ ما بعد f7199ec هو checkpoints توثيقية لـ N58/PM وإغلاق N53 MB01 فقط. Product/runtime المنشور يبقى f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ N53 MB01 نقل سطرَي CSS فقط بلا Schema/Auth/Sync أو بيانات حية.
+- remote main الحالي: 861006d5bfb30ed30125ff10a81110c0b2d89f7c؛ ما بعد f7199ec هو checkpoints توثيقية لـ N58/PM وإغلاق N53 MB01 فقط. Product/runtime المنشور يبقى f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ N53 MB01 نقل سطرَي CSS فقط بلا Schema/Auth/Sync أو بيانات حية.
 - Product/runtime على main: f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ التغيير الوحيد منذ e85deb8 هو CSS N53 MB01، وعقد runtime/data السابق محفوظ.
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE وفق آخر دليل مسجل؛ N58 لديه قرار PM أخضر أحدث عند 13:18 للحفاظ على N06 weekend UX بإصلاح presentation ضيق، ثم microbatch-0327 وبعده suffix المتبقي وStage E. لا يوجد دليل مكتوب أحدث على نتيجة التشغيل بعد القرار بعد.
+- Heavy execution owner: FREE وفق آخر checkpoint؛ N58 أنهى microbatch-0327 ‏7/7 ثم توقف YELLOW عند N29 selector drift في microbatch-0330. PM حسمه الآن كـbaseline test debt وأعاد lane إلى GREEN. Work MB02 أخذ scope محددًا أدناه.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | GREEN TO RESUME / NOT CERTIFIED | candidate 9edc4178؛ آخر checkpoint: 47 spec مكتمل + microbatch-0327 جزئي 5/7 | طبّق فقط إصلاح presentation الضيق المعتمد لـdefault weekend، ثم microbatch-0327 مرة واحدة؛ عند 7/7 أكمل 63 spec ثم Stage E؛ أي فشل جديد يعود YELLOW بلا retry | لا |
-| Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01؛ MB02 وبقية N53 مستقلان | لا |
-| Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
+| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate `9edc4178` + local Product presentation `011eccf` + test-only `b363943`؛ 50 spec مكتمل، microbatch-0344 جزئي، 60 لم تبدأ | PM يصنف فشل N19 سياق الطالب الثالث؛ لا retry ولا Stage E/Preview/Production | لا |
+| Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01 | لا |
+| Work | N53 MB02 | REVIEWED / NO CHANGE for viewport fit | سطحا «مواثيق جاهزة» و«تبديل الفصل»؛ 16/16 geometry آمنة على Product baseline، دليل `handoff/N53_MB02_WORK_REVIEW.md` | لا مرشح بصري ولا Freeze/transport؛ ملاحظة aria-current منفصلة للفرز | لا |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
 ## N58 — التفاصيل الحالية
 - Product-source parent: 3248f7d3847be949c08139b1d630d13f7306e701.
@@ -140,3 +140,7 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 ## نقطة N58 وWork — 2026-10-03 11:25 UTC
 - إصلاح Home الضيق المصرح لـN58 (`011eccf`) اجتاز microbatch-0327 ‏7/7. بدأ suffix بعد إثبات Heavy FREE، لكن microbatch-0330 أوقف N58 YELLOW بنتيجة 5/6 عند selector قديم لـN29؛ 48 ملفًا مكتملًا + واحد جزئي + 62 لم تبدأ = 111. Stage E لم يبدأ، وHeavy عاد FREE والمنفذ 5173 خالٍ. الأدلة وسؤال PM في الطابور.
 - N53 MB01 باقٍ CLOSED / PO PRODUCTION VERIFIED. فحص حزم Work N53 لم يجد scope صريحًا لـMB02؛ رُفع YELLOW إلى PM قبل أي تصميم. تدقيق N08 مستقل للقراءة فقط أكد بقاء بوابة الترخيص/التغليف offline وعدم تفويض Product.
+
+## نقطة N58 وMB02 — 2026-10-03 13:11 UTC
+- N29 test-only `b363943` اجتاز microbatch-0330 ‏6/6؛ microbatch-0335 ‏3/3. توقف N58 YELLOW في microbatch-0344 عند N19 ‏2/3: 3 سياقات للطالب مقابل 2 متوقعة؛ 50 spec مكتمل + واحد جزئي + 60 لم تبدأ، Stage E لم يبدأ. Heavy عاد FREE، ولا نشر N58.
+- مراجعة Work لـMB02 انتهت NO CHANGE ضمن viewport/scroll: 16/16 قياسًا وصورة، لا مرشح جديد ولا PO Work review مطلوب. ملاحظة aria-current منفصلة. N53 MB01 باقٍ CLOSED.

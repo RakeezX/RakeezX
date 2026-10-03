@@ -84,3 +84,13 @@ Supabase/schema/RLS/migrations، Auth/provisioning، Owner Guard، Sync architec
 - أعد قراءة PO_REVIEW_QUEUE.md فقط لمعرفة ما ينتظر PO؛ لا تعتبر غياب PO سببًا لإيقاف GREEN lanes الأخرى.
 - أي شيء يحتاج PO يضاف إلى PO_REVIEW_QUEUE بخطوات تجربة واضحة وعبارة اعتماد مقترحة.
 - لا تعتبر User-visible ticket CLOSED قبل PO Production verification.
+
+## PM Watchdog fallback
+Scheduled PM monitoring may be read-only if the execution environment blocks unattended file writes. A scheduled run must never claim that it recorded a PM decision unless the canonical file write is proven. If scheduled writes are blocked, the watchdog is monitoring-only.
+
+To avoid idling the project while PM writeback is unavailable, RAKEEZ Ops may self-resolve a case as GREEN without PM only when all of the following are proven from canonical/Git evidence:
+- the issue is test/tooling/harness debt or stale expectation against a later CLOSED/PO-verified Product contract;
+- relevant Product bytes or the authoritative later contract prove no new Product choice is being made;
+- the correction is test/tooling-only, or a narrowly bounded presentation preservation of an already CLOSED contract with no data/runtime semantic change;
+- no Auth/Owner Guard/Sync/schema/delete/restore/scoring/security/cross-account/live-high-risk mutation is involved.
+Otherwise keep the affected lane YELLOW, continue independent GREEN lanes, and wait for interactive PM review.

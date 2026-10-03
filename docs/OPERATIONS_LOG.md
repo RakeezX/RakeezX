@@ -100,3 +100,7 @@
 - commit Product المرشح المحلي `011eccf` غيّر شرط عرض Home بسطر واحد دون data/Sync/schema. نجح microbatch-0327 ‏7/7 مرة واحدة. بدأ suffix غير المنفذ بعد التحقق من نافذة Heavy.
 - توقف microbatch-0330 عند N29 selector drift بنتيجة 5 PASS / 1 FAIL؛ لا retry ولا استمرار 62 ملفًا أو Stage E. الأدلة في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T11-23-05-417Z-47c68b83-255c-4cd9-8f3a-f8cda19ff61b/` داخل worktree RAKEEZ Ops. أُعيد N58 YELLOW إلى PM؛ لا Preview/Production/live mutation.
 - فُحصت حزم Work N53 للبحث عن MB02 ولم يظهر scope صريح؛ رُفع YELLOW مستقل إلى PM بدل بناء تصميم تخميني. N53 MB01 يظل CLOSED. تدقيق N08 قراءة فقط أكد بوابة الرخصة وoffline PWA القائمة، بلا تعديل.
+
+### N58 وN53 MB02 — 2026-10-03 13:11 UTC
+- N58: التكييف test-only المصرح `b363943` نجح في microbatch-0330 ‏6/6، ثم microbatch-0335 ‏3/3. توقف microbatch-0344 ‏2/3 عند N19 بسبب عدد سياقات الطالب، مع حفظ الأدلة في worktree RAKEEZ Ops. لا إعادة ولا Stage E/Preview/Production. رُفع YELLOW إلى PM؛ Heavy FREE.
+- MB02: فحص Work-only على Product baseline لسطحي «مواثيق جاهزة» و«تبديل الفصل» عبر 16 حالة viewport/theme كان متماسكًا للتمرير والملاءمة؛ NO CHANGE ولا تصميم جديد. تقرير وصور وJSON في `handoff/N53_MB02_WORK_REVIEW.md` و`handoff/mb02-work-review-2026-10-03-stable/`. لوحظ `aria-current` باقتباسين حرفيين كتذكرة وصول منفصلة محتملة؛ لم يُعدل Product/Work أو تُحفظ بيانات.

@@ -171,3 +171,31 @@
 ### N53 MB02 — نطاق Work غير محدد في المصادر المفحوصة — YELLOW / PM
 - بعد إغلاق MB01 باعتماد PO، فُحصت قراءةً فقط حزم `RakeezX-Work-N53-CurrentProduct-0462` و`RakeezX-Work-N53-MB01-CurrentRefresh-0464` و`RakeezX-Work-Active` مع لوحة التنفيذ والعقد. لم يظهر تعريف صريح لحدود MB02 أو freeze/manifest له. إشارات “Micro-Batch 02 0330/0331” تخص N20/N21/N29 القديمة، وليست N53 MB02.
 - مطلوب PM: تحديد مصدر scope MB02 المعتمد قبل تكليف Work أو بناء تصميم؛ لا يُخترع نطاق ولا يبدأ Product transport. N53 MB01 يبقى CLOSED. بالتوازي دُقّق N08 قراءة فقط: Product Ledger يضعه WORK APPROVED / IMPLEMENTATION NOT AUTHORIZED مع بوابة رخصة وخط PWA offline؛ لم يُغيّر خط أو أصل.
+## PM WATCH DECISION — 2026-10-03 15:44 +03
+### N58 microbatch-0330 / N29 — BASELINE TEST DEBT CONFIRMED / GREEN TO RESUME
+- static baseline proof is sufficient: exact baseline `430bc2e6d563924aeeeff37837f1732b2cde93eb` has the same obsolete N29 assertions for `.welcome-option__title/.welcome-option__detail`, while the same baseline Product already renders N37/N56 landing actions as `[data-workspace-login] > strong/span` and `[data-workspace-demo] > strong/span`.
+- canonical release history is newer and authoritative: N37 and N56 are CLOSED / PO Production verified. N56 preserves the unified OTP path on the N37 landing; therefore the old N29 selector/typography assertions must not resurrect superseded presentation.
+- classification: BASELINE / TEST DEBT, not N58 Product regression.
+- allowed correction: test-only in `tests/microbatch-0330.e2e.mjs`. Bind the title/detail checks to the shipped `strong/span` DOM, use current shipped copy, preserve `n37-primary` prominence and all functional assertions for unified Email→OTP, Demo entry/isolation, RTL/overflow and cloud safety. Do not restore obsolete N29 font-size/class expectations and do not change Product code for this failure.
+- run `microbatch-0330.e2e.mjs` once on the N58 candidate under the protected equivalent harness. If 6/6 PASS, continue only the remaining 62 spec files then Stage E. First new failure => YELLOW with evidence, no retry.
+- no Preview/Production/live Supabase for N58. HIGH-RISK live mutation still requires explicit PO authorization.
+
+### N53 MB02 — WORK SCOPE DEFINED / GREEN TO START WORK REVIEW
+- PM reviewed the 0462 current inventory. MB02 is now a bounded Work-only review of two list-heavy, medium-risk, Demo-equivalent N53 surfaces that were explicitly marked later N53 and are outside the excluded Auth/Sync/score/attendance/restore/Calendar/Schedule/keyboard scopes:
+  1. `src/views/class-rules.js:443` — «مواثيق جاهزة» preset list.
+  2. `src/views/teaching-hub.js:221` — «تبديل الفصل» teaching-context list.
+- Goal: review viewport fit and scroll ownership only. Preserve all handlers, selection/context behavior and data semantics. Prefer the existing sheet-body scroll model; no shared `openSheet/confirmSheet` primitive change unless a separately evidenced GAP requires PM review.
+- Work should test current Product baseline at desktop normal/short height plus 390/320 mobile, light/dark. If the current behavior is already coherent, return NO CHANGE evidence rather than inventing a redesign.
+- any actual visual change is a new Work candidate and must go to PO Work review before Freeze/transport. No Product implementation authority is granted by this scope decision.
+
+### N58 — microbatch-0344 / N19 context count — YELLOW / قرار PM مطلوب
+- نفذ قرار PM 15:44 +03 كتعديل test-only لـN29 في `tests/microbatch-0330.e2e.mjs`، commit `b363943f058bb60775f3dc5de987a2e51be0dd47`. احتُفظ بتسلسل Email→OTP ودخول Demo/العزل وRTL/overflow وسلامة cloud. الملف نجح 6/6 مرة واحدة، ثم بدأ suffix 62 ملفًا تحت نافذة Heavy خالية.
+- `microbatch-0335.e2e.mjs` نجح 3/3. توقف `microbatch-0344.e2e.mjs` بنتيجة 2 PASS / 1 FAIL عند اختبار N19 في السطر 38: أول طالب باسم «محمد» لديه 3 عناصر `[data-student-result]` بدل 2 المتوقعين، بعد إعداد عدة سياقات. لم تُعد المحاولة ولم يبدأ suffix التالي.
+- مصدر الاختبار يختلف baseline/candidate فقط في تحقق Demo عند الإقلاع؛ `src/lib/student-search-ui.js` متطابق blob، لكن `src/store.js` و`src/lib/db.js` تغيرا في مرشح N58. لا يثبت هذا وحده دين اختبار أو regression. الدليل المحفوظ في `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T13-02-59-072Z-8365a7a7-643d-4bc7-bf28-25ed4df529b5\` وفيه before/result/log/screenshot/trace.
+- التقدم: 50 ملف spec مكتمل + microbatch-0344 جزئي + 60 لم تبدأ = 111؛ Stage E لم يبدأ. الإصلاح المحلي الوحيد في Product هو سطر عرض Home `011eccf` لحفظ عقد N06؛ لا Preview/Production/live Supabase لـN58.
+- مطلوب PM: تحديد تشخيص baseline/candidate متكافئ أو تدقيق مصدر محدود لتفسير عنصر السياق الثالث قبل أي test/Product edit أو استئناف. N58 يبقى YELLOW دون retry.
+
+### N53 MB02 — نتيجة Work-only review: NO CHANGE لملاءمة الشاشة والتمرير
+- فُتح السطحان المحددان من PM من عناصرهما الفعلية على Product baseline `861006d5bfb30ed30125ff10a81110c0b2d89f7c` في Demo بثمانية فصول: «مواثيق جاهزة» و«تبديل الفصل». فُحصا عند 1440×900 و1440×600 و390×844 و320×700 في light/dark: 16/16 حالات آمنة بعد انتهاء حركة النافذة، دون تمرير أفقي أو خروج الأزرار الختامية، مع تمرير داخل body عند الحاجة. جُرب اختيار ميثاق وتمكين الحفظ والتنقل إلى فصل آخر؛ لم تُحفظ بيانات.
+- الدليل: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\handoff\N53_MB02_WORK_REVIEW.md` و`handoff\mb02-work-review-2026-10-03-stable\result.json` مع 16 لقطة. لا مرشح بصري جديد ولا PO Work review/Freeze/transport لـMB02 الآن.
+- ملاحظة وصول منفصلة خارج نطاق الملاءمة: قيمة `aria-current` للرابط الحالي في قائمة الفصول هي `"page"` بعلامتي اقتباس حرفيتين رغم ظهور `is-current` والتنقل السليم. لم يُصلح Product؛ يفرزها PM كتذكرة وصول مستقلة إن لزم.
