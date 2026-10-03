@@ -216,3 +216,51 @@
 - الدليل: `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T14-22-57-432Z-131b1762-6236-455d-b0c3-4e00acb757da/microbatch-0344.e2e.mjs/` يحوي `before.json` و`result.json` و`stdout-stderr.log` وscreenshot وtrace. المنفذان 5173/5174 خاليان بعد الجولة.
 - وفق قرار PM المحدد «أول فشل جديد = YELLOW مع الدليل بلا retry»، توقف مسار N58. لم يُعد الاختبار ولم يبدأ أي من 60 ملفًا متبقيًا أو Stage E، ولم يُنشر candidate إلى Preview/Production أو live Supabase.
 - المطلوب من PM: حسم السماح بتصحيح توقع الروابط فقط إلى `#/teaching/${encodeURIComponent(ids.t1)}` و`ids.t2`، ثم تشغيل `microbatch-0344` مرة واحدة. إذا بلغ 3/3 PASS، استئناف الملفات الستين غير المشغّلة ثم Stage E حسب القرار السابق. يبقى N58 LOCAL-ONLY / NOT CERTIFIED إلى ذلك الحين.
+
+## PM STANDING DELEGATION — Workflow V3.1 / N58 certification — 2026-10-03 17:30 +03
+### microbatch-0344 teaching href — AUTO-GREEN / TEST-ONLY
+- الفشل الحالي يطابق D-078 AUTO-GREEN: Product الحالي في `src/lib/student-search-ui.js` يبني رابط teaching باستخدام `encodeURIComponent(teaching.id)`، بينما assertion المضاف في الجولة السابقة يقارن href غير مرمّز. لا Product choice ولا runtime/data semantic change.
+- صحح توقع الاختبار فقط إلى المسار المرمّز للـ`ids.t1` و`ids.t2` مع إبقاء فحوص بطاقة الطالب الواحدة، profile الواحد، سياقَي teaching، same-name identities، الاستبعادات، keyboard/responsive/navigation وcloud/RTL.
+- شغّل `microbatch-0344.e2e.mjs` مرة واحدة بعد التصحيح. إذا 3/3 PASS: يصبح 51 spec مكتملًا، ثم استأنف 60 spec غير المنفذة مباشرة ثم Stage E.
+
+### تفويض قائم لبقية N58 local certification
+- من الآن وحتى نهاية الـ60 spec + Stage E، أي فشل يثبت أنه Test/fixture/selector/copy/href-encoding/wait/harness/output-path/tooling debt مقابل عقد أحدث CLOSED/PO-verified أو Product bytes الحالية يدخل AUTO-GREEN مباشرة وفق D-078/RAKEEZ_OPS_CONTRACT V3.1؛ لا تنتظر PM.
+- يجوز test/tooling-only correction ثم تشغيل الملف المتأثر مرة واحدة لكل سبب مستقل والاستمرار فور PASS. الحد الأقصى 3 أسباب AUTO-GREEN مستقلة داخل spec واحد؛ السبب الرابع أو أي ambiguity/regression حقيقي = True YELLOW.
+- narrow local presentation preservation لعقد CLOSED مسموح فقط إذا لا يغير eligibility/persistence/Sync/schema/data semantics. أي توسع أو high-risk/live mutation لا يدخل التفويض.
+- Fast-Finish: لا side quests، لا إعادة PASS، ولا فتح ميزات CLOSED كتذاكر جديدة بسبب assertions قديمة. الملاحظات العرضية تسجل follow-up غير حاجب.
+- N58 يبقى LOCAL-ONLY / NOT CERTIFIED؛ لا Preview/Production/live Supabase حتى gate مستقل وتفويض PO المطلوب للفئة عالية المخاطر.
+
+
+## PM FAST-TRACK DIRECTIVE — D-079 — 2026-10-03
+### ابدأ فورًا: N03 + N08 + N38 بالتوازي
+- لا تنتظر اكتمال N58 لبدء أعمال القراءة، current-Product comparison، Work refresh، patch planning وmanifest verification لهذه الثلاثة.
+- أنشئ/استخدم **ثلاث lanes معزولة**؛ لا تجمع Product diffs في candidate واحد. كل N-ID يحتفظ بعقده، patchه، أدلته وقرار promotion مستقلًا، حتى لو تشاركت بعض فحوص النهاية.
+- baseline المرجعي: current `origin/main`; بعد `f7199ec1020b92bb3664b0a9b22c8fbcce46c662` كانت الحركة docs-only حتى checkpoint الحالي، لكن أعد التحقق من touched application-source paths قبل أي transport.
+- المصدر البصري المعتمد: `WA-REFINEMENT-0440-2` فقط، مع Current-Product Rebase Refresh على Work وفق Governance. لا تعيد التصميم من الصفر إذا بقي outcome نفسه.
+- **N03:** حافظ على Settings → بياناتك فقط، directory structured/searchable، required-for-profile-completion but nonblocking for general use، ولا onboarding أو automatic Calendar link. أولًا حدد هل يمكن التخزين داخل contract الحالي أم يحتاج schema. إن احتاج schema/Supabase، أكمل local candidate/tests/plan ثم توقف فقط عند exact live high-risk gate.
+- **N08:** احسم packaging/license أولًا؛ لا تنسخ raw font إلى registry ولا expose standalone reusable font. إذا وجد مسار compliant للأوفلاين/PWA، نفذ approved type scale على current Product ثم focused visual/build/offline gates.
+- **N38:** استخدم approved central adapter/flatpickr direction، ASCII 0–9، `YYYY-MM-DD` و`HH:mm`, Sunday first، normalize Arabic-Indic/Persian typing/paste، preserve stored semantics/min/max/validation، وأضف source guard. physical iPhone Safari + Android Chrome gates قبل closure.
+- **Heavy Window:** N58 يحتفظ بالأولوية لإنهاء certification الحالي. N03/N08/N38 يستطيعون التحضير الخفيف بالتوازي؛ عند FREE تدخل أكثر candidate جاهزية إلى focused browser/build gate، ثم التالي مباشرة.
+- **N33 Phase 3:** ابدأ read-only/measured baseline preparation الآن دون تغيير Sync runtime. بعد عبور N03/N08/N38 إلى main أو انتظار PO/device gate لا يستهلك Heavy، انتقل لتنفيذ Phase 3. live Sync mutation تبقى exact high-risk gate.
+- لا توسع scope إلى N13/N49/N54 أو `ARCHIVE_OLD_OPEN_ISSUES.md`. `ARCHIVE_OLD_OPEN_ISSUES.md` PARKED/HISTORICAL ولا يقود العمل.
+
+### OTP disposition
+- N56 unified OTP flow: CLOSED / PO Production verified.
+- OTP email 0458.8: CLOSED / PO Production verified.
+- leftover OTP Product-entry CSS: `PARKED / OPTIONAL / NO ACTIVE WORK` تحت D-079. لا تطلب PO ولا تنفذه إلا إذا أعاد PO فتحه صراحة.
+
+
+## PM OPERATING DIRECTIVE — D-080 Always-On 24/7 — 2026-10-03
+- لا توقف التشغيل لأن خطة اليوم اكتملت أو لأن التاريخ تغيّر. بعد كل PASS/CLOSED/parked gate، أعد قراءة Execution Board/Product Ledger واسحب أعلى بند eligible تالٍ فورًا.
+- استخدم capacity envelope المعتمد: حتى 3 Codex + 2 Work lanes معزولة، وCodex رابع read-only/prep عند سلامة الموارد. Heavy browser/build واحد وmain integration/promotion owner واحد.
+- لا تفتح lane mutation إضافية إذا touched Product files/domain contract تتداخل مع lane أخرى. عند overlap، serialise الأقل أولوية.
+- إذا low-value/low-priority issue صار time sink بلا تقدم مادي، سجله `PARK CANDIDATE` مع evidence وحرر السعة، واستمر على الأعلى. لا تحذف أو تغلقه من نفسك؛ disposition النهائي عند PM/PO عند الحاجة.
+- إذا lane تنتظر PO/device/external gate، استمر في lanes أخرى أو read-only/prep ذات قيمة مباشرة. لا يوجد planned idle طالما يوجد عمل آمن مؤهل.
+- `ARCHIVE_OLD_OPEN_ISSUES.md` تاريخي فقط ولا يقود التنفيذ. Work هو visual authority الحالي.
+
+### N58 / sync-operational-ui / تباين النص — TRUE YELLOW / مراجعة PM
+- بعد تفويض D-078/V3.1 نجح `microbatch-0344` بنسبة 3/3 على candidate المحلي، commit اختبار `74b4763`. اجتاز suffix 42 ملفًا إضافيًا؛ بقي 18 ملفًا غير مكتمل، منها `sync-operational-ui.e2e.mjs` الحالي. Stage E لم يبدأ. `student-lifecycle-ui` اجتاز 26/26 بعد تصحيح fixture فقط؛ لا تعديل Product في هذه الجولة.
+- في `sync-operational-ui.e2e.mjs` نجحت حالتان من ثلاث. صححت توقع النص المتقادم وحد الارتفاع ثلاث مرات ضمن AUTO-GREEN. بعد ذلك كشف axe تباينًا لونيًا خطيرًا في `.mini-hub-sync__meta > p > bdi`: النص `#565f64` على الخلفية `#0e1613`، النسبة 2.81:1 مقابل 4.5:1 المطلوبة للنص 12px. هذا فحص وصول فعلي، ولم يُعطَّل أو يُخفّض.
+- دليل الجولة الأخيرة: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T16-24-30-376Z-0f410863-9597-49b3-b5fb-9a8634097099\sync-operational-ui.e2e.mjs\` يحوي before/result/log/screenshot/trace. ملف Product `src/lib/sync-operational-ui.js` متطابق بين baseline `430bc2e6` وcandidate؛ الفشل قديم في Product الحالي، لكنه لا يصبح دين اختبار. نافذة Heavy خالية.
+- وفق سقف V3.1 بعد ثلاث محاولات AUTO-GREEN في الملف، توقّف N58 هنا True YELLOW. لا إعادة للاختبار، ولا بقية suffix أو Stage E أو Preview/Production/live Supabase قبل قرار PM. N58 LOCAL-ONLY / NOT CERTIFIED.
+- المطلوب من PM: تحديد إصلاح Product محلي محدود للتباين ومراجعة Work البصرية إن لزم، أو قرار محدد آخر. لا أغيّر ألوان Product بقرار منفرد تحت هذا المسار؛ يستمر العمل المستقل N03/N08/N38 حسب D-079/D-080 خارج نافذة Heavy.

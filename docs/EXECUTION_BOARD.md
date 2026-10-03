@@ -1,6 +1,6 @@
 # لوحة تشغيل RAKEEZ X — EXECUTION BOARD
 
-آخر لقطة تأسيسية: 2026-10-03 — Workflow V3.
+آخر لقطة تأسيسية: 2026-10-03 — Workflow V3.1.
 هذه اللوحة تشغيلية وليست بديلًا عن Product Ledger أو Git.
 
 ## الحالة العليا
@@ -9,14 +9,27 @@
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE وفق آخر evidence بعد توقف microbatch-0344؛ N58 صحح N29 test-only ونجح microbatch-0330 ‏6/6، ثم توقف 2/3 في N19 بسبب aggregate selector قديم. PM حسم N19 الآن كـbaseline test debt وأعاد lane إلى GREEN. Work MB02 أخذ scope محددًا أدناه.
+- Heavy execution owner: **N58 ACTIVE** وفق الفحص الحي 2026-10-03 19:14 +03؛ Vite + Playwright يعملان على `tests/student-lifecycle-ui.e2e.mjs` داخل `n58-otp-fix`. AUTO-GREEN استؤنف فعليًا بعد تنبيه Watchdog، ولا يوجد Heavy owner ثانٍ. Work MB02 يبقى REVIEWED / NO CHANGE.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | YELLOW / NOT CERTIFIED / LOCAL-ONLY | candidate `9edc4178` + Product presentation `011eccf` + test-only `5aaff1a`؛ 50 spec مكتمل؛ microbatch-0344: 2/3؛ 60 spec لم تبدأ | PM: حسم تصحيح توقع href المرمّز؛ لا retry ولا Stage E/Preview/Production قبل قرار أحدث | — |
+| Ko2 | N58 | TRUE YELLOW / LOCAL-ONLY / NOT CERTIFIED | 0344 3/3؛ suffix 42 ملفًا إضافيًا PASS؛ sync-operational-ui 2/3 مع axe contrast 2.81:1؛ 18 ملفًا غير مكتمل؛ Stage E لم يبدأ | PM: حسم إصلاح التباين البصري؛ لا N58 retry أو نشر قبل قرار أحدث | — |
 | Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01 | لا |
 | Work | N53 MB02 | REVIEWED / NO CHANGE for viewport fit | سطحا «مواثيق جاهزة» و«تبديل الفصل»؛ 16/16 geometry آمنة على Product baseline، دليل `handoff/N53_MB02_WORK_REVIEW.md` | لا مرشح بصري ولا Freeze/transport؛ ملاحظة aria-current منفصلة للفرز | لا |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
+| FT-A Codex | N03 | **ACTIVE / ISOLATED** | worktree `C:\Users\Abody\.codex\worktrees\n03-fasttrack-1003` @ `861006d`; Codex thread `01a1028a-b28e-7440-b6f1-aaa4106ab0fa` | current-Product data/storage audit + approved Work comparison; implement locally if no schema gate; static/light checks only while N58 owns Heavy | لاحقًا فقط إن لزم schema/live gate |
+| FT-B Codex | N08 | **ACTIVE / ISOLATED** | worktree `C:\Users\Abody\.codex\worktrees\n08-fasttrack-1003` @ `861006d`; Codex thread `01a1028a-c6ee-7171-a58d-4afbb556221b` | authoritative license/package audit + current-Product refresh; no raw font redistribution; static/light checks only until Heavy frees | لا، إلا إذا license route changes Product choice |
+| FT-C Codex | N38 | **ACTIVE / READ-ONLY PREP** | worktree `C:\Users\Abody\.codex\worktrees\n38-fasttrack-audit-1003` @ `861006d`; Codex thread `01a1028a-dd60-7b83-8ecf-4cb7829f13ef` | exact control/file inventory + overlap map + patch/test plan first; mutation waits only to avoid N03/shared-file collision; physical iPhone Safari + Android Chrome remain final gates | نعم فقط عند physical-device final review if needed |
+| NEXT | N33 Phase 3 | **QUEUED NEXT / CAPACITY RESERVED** | Phases 1/2 CLOSED؛ Phase 3 measured Sync performance work | لا يفتح كخامس Codex الآن؛ يبدأ read-only baseline فور تحرير إحدى N58/N03/N08/N38 lanes، ثم implementation بعد Fast Track؛ live Sync promotion remains exact high-risk gate | عند final live gate |
+
+## D-080 — Always-On 24/7 / Capacity الآن
+- لا توقف بنهاية اليوم أو اكتمال الخطة اليومية؛ أي lane ينتهي/يتوقف على gate خارجي يسحب بعده أعلى بند eligible فورًا.
+- السعة المصرح بها الآن: **3 Codex mutation/prep lanes + 2 Work lanes** بنطاقات معزولة، مع **Codex رابع read-only/measurement فقط** عند سلامة الموارد.
+- جهاز Abdullah-MSI: ~32GB RAM، 6 cores / 12 logical threads؛ لذلك **Heavy browser/build واحد فقط** و**main integration/promotion owner واحد فقط**.
+- التوزيع المستهدف: Codex#1=N58 certification؛ Codex#2=N03 implementation/data check؛ Codex#3=N08 packaging/implementation؛ Codex#4(read-only)=N33 baseline عند الحاجة. Work#1=N03 current-Product refresh؛ Work#2=N38 current-Product refresh. N38 Codex implementation prep يبدأ دون انتظار Heavy ويمكنه أخذ Codex lane فور تحريرها.
+- لا overlap في touched Product files/domain contracts بين mutation lanes. عند تعارض، serialise الأقل أولوية بدل المخاطرة.
+- low-value time sink => `PARK CANDIDATE` + evidence + استمرار بقية المصنع؛ التأجيل النهائي لبند يهم PO يراجع مع PM/PO.
+
 ## N58 — التفاصيل الحالية
 - Product-source parent: 3248f7d3847be949c08139b1d630d13f7306e701.
 - exact baseline المستخدم للاختبارات: 430bc2e6d563924aeeeff37837f1732b2cde93eb.
@@ -38,24 +51,38 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - التغيير الوحيد: حذف max-height:240px وoverflow-y:auto من .share-preview-box.
 - N34 Support CSS محفوظ؛ Work goldens 12/12 pixel+geometry identical؛ prior browser 24/24.
 - تدقيق RAKEEZ Ops القراءة فقط أكد HEAD `f712e01` وtracked diff في `src/styles/components.css` فقط، مطابقًا لنص patch Freeze وSHA-256 أعلاه. لا شهادة ثقيلة جديدة؛ remote main تحقق لـV3 docs لكنه يعاد التحقق منه عند ترقية N53. الترقية لا تبدأ قبل إثبات mutex.
-## ترتيب التنفيذ الافتراضي
-1. Ko2 يأخذ Heavy Window أولًا لإنهاء N58 local verification.
-2. عند تحريره، Ko1 يأخذ Heavy Window لإنهاء N53 MB01.
-3. N53 MB01: certification → internal Preview → إذا exact parity بلا drift → Production وفق V3 → PO_REVIEW_QUEUE.
-4. بعد تحرك main، Work يبدأ N53 MB02 فقط؛ لأنه تصميم جديد سيذهب إلى PO_REVIEW_QUEUE.
-5. أثناء انتظار PO، يمكن فتح read-only audits مستقلة منخفضة المخاطر من backlog بدل التوقف.
-6. N58 إذا اكتمل محليًا يبقى NOT PRODUCTION IMPLEMENTED؛ أي live high-risk step يحتاج RED/PO authorization.
+## ترتيب التنفيذ الافتراضي — D-079 Fast Track
+1. **N58**: إنهاء local certification أولًا داخل Heavy Window وفق V3.1، بلا side quests.
+2. **بالتوازي فورًا:** Work/Codex current-Product refresh مستقل لـ **N03 + N08 + N38** من WA-REFINEMENT-0440-2؛ لا تنتظر انتهاء N58 في الأعمال الخفيفة/المقارنة/إعداد exact patches.
+3. عند تحرير Heavy Window، تدخل N03/N08/N38 بالتتابع السريع إلى focused certification/Preview/transport حسب جاهزية كل lane؛ لا يُعاد تصميمها من الصفر ما دام approved outcome محفوظًا.
+4. **N33 Phase 3**: يبدأ baseline/read-only measurement بالتوازي، والتنفيذ يأتي مباشرة بعد N03/N08/N38.
+5. N53 المتبقي وN54 يعملان background فقط عندما لا يستهلكان سعة الـFast Track؛ N54 يبقى مرتبطًا ببوابة iPhone الحقيقية.
+6. أي live high-risk mutation يبقى عند exact gate الخاص به؛ لا يوقف ذلك المسارات الأخرى.
 
-## Backlog بعد المسارات الحالية
-- N53 remaining micro-batches: أولوية عالية بعد MB01.
-- N54: redesign جديد + physical iPhone gate.
-- N08: font/offline packaging + license gate.
-- N38: central date/time adapter coverage + physical iPhone/Android gates.
-- N03: profile/data semantics reconciliation قبل التنفيذ.
-- N13 Option C: high-risk architecture.
-- N49 Offline Lease: high-risk architecture audit.
-- OTP Product-entry CSS: منفصل، يحتاج disposition/PO عند إعادته.
-- N23/N24 Reports: LAST.
+## Backlog حسب أولوية PO الحالية
+### Fast Track
+- N03: Education Department — approved Work → current-Product refresh + selective implementation.
+- N08: Thmanyah Sans — approved Work → compliant offline packaging/license + selective implementation.
+- N38: central date/time/numeral adapter — approved Work → product-wide adapter/source guard + physical iPhone/Android gates.
+- N33 Phase 3: Sync performance — next after الثلاثة أعلاه؛ baseline measurement يبدأ بالتوازي.
+
+### Normal / بعد Fast Track
+- N53 remaining micro-batches.
+- N54 redesign + physical iPhone gate.
+- N01 scoring bug review.
+- N12 import, N13 Option C, N15 PWA icon policy, N17 docs reconciliation, N23/N24/N25 Reports LAST, N26 theme, N36 import research, N44 notifications, N49 Offline Lease.
+
+### Lowest priority per PO
+- N02 Demo parity كقاعدة مستمرة وليست مشروعًا مستقلًا.
+- N16 / N18 inventories.
+- N45 deliverability remediation.
+- N35 support attachments.
+- N32 former-student return.
+- N30 storage benchmark.
+
+### Parked / not active
+- `ARCHIVE_OLD_OPEN_ISSUES.md`: historical/stale pending future reconciliation؛ لا يقود التنفيذ الحالي.
+- OTP Product-entry CSS: optional/PARKED؛ N56 والـOTP email مغلقان بالفعل.
 
 ## نقطة N58 الجديدة — 2026-10-03 02:53 UTC
 - نجحت تصحيحات الاختبار فقط لـ Email OTP وHome Mobile وIA cleanup في خط الأساس والمرشح: 2/2 و3/3 و12/12. لم يتغير أي ملف Product في هذه التصحيحات.
@@ -147,3 +174,5 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 
 ## تحديث N58 — 2026-10-03 14:24 UTC
 - استؤنف المسار بعد قرار PM 16:10 +03؛ جولة microbatch-0344 الواحدة انتهت 2/3. فشل توقع href غير المرمّز بينما Product يرمّز معرف teaching عبر `encodeURIComponent`. توقف N58 YELLOW بلا إعادة تشغيل. Heavy Window خالٍ، ولا نشر أو تعديل Product. التفاصيل في PM_REVIEW_QUEUE.md ودليل الجولة المحفوظ.
+## تحديث N58 — 2026-10-03 16:26 UTC
+- انتهى تفويض AUTO-GREEN للملف عند فشل تباين النص في مركز المعلم (axe 2.81:1 مقابل 4.5:1). المسار True YELLOW، Heavy Window FREE. تستمر مسارات D-079 المستقلة N03/N08/N38 في أعمال القراءة والتحضير خارج Product المتداخل.

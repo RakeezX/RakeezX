@@ -115,3 +115,39 @@
 ### N58 — 2026-10-03 14:24 UTC
 - تم الاستئناف الفعلي بعد قرار PM الأخير: commit اختبار فقط `5aaff1a`، ثم تشغيل `microbatch-0344` مرة واحدة بحارس الأدلة؛ النتيجة 2 PASS / 1 FAIL. فشل N19 عند مقارنة teaching href غير المرمّز مع DOM المرمّز، والكود Product يستخدم `encodeURIComponent(teaching.id)`. دليل الجولة محفوظ تحت `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T14-22-57-432Z-131b1762-6236-455d-b0c3-4e00acb757da/` في worktree RAKEEZ Ops.
 - صُنّف المسار YELLOW التزامًا بقرار PM: لا retry، لا بقية 60 spec، لا Stage E، لا Preview/Production/live Supabase. المطلوب من PM قرار لتصحيح توقع الاختبار وحده ثم استئناف الجولة. المسارات المستقلة N53 MB01 CLOSED وMB02 NO CHANGE كما هي.
+
+### Workflow V3.1 — توسيع التفويض التشغيلي، 2026-10-03 17:30 +03
+- اعتمد Product Owner D-078 لتقليل انتظار PM مع إبقاء حدود Product/high-risk/Production. test/fixture/selector/copy/href-encoding/wait/harness/tooling debt الموثق مقابل عقد CLOSED/PO-verified أصبح AUTO-GREEN إلزاميًا؛ bounded Work NO CHANGE كذلك لا يحتاج PO. يسمح بثلاثة أسباب مستقلة داخل spec واحد قبل True YELLOW.
+- True YELLOW يحرر Heavy Window ويستمر في المسارات المستقلة، ويستخدم PM Hold Loop بقراءة PM_REVIEW_QUEUE كل 60 ثانية حتى 15 دقيقة إذا بقي agent حيًا؛ الـWatchdog الساعةي صار backstop فقط. انقطاع Desktop Commander/relay يعامل transport incident لا Product failure.
+- N58 أخذ standing delegation لبقية 60 spec + Stage E ضمن هذه الحدود. YELLOW الحالي في microbatch-0344 سببه توقع href غير مرمّز مقابل Product يستخدم encodeURIComponent؛ صُنّف AUTO-GREEN test-only. N58 يبقى LOCAL-ONLY / NOT CERTIFIED ولا Preview/Production/live Supabase دون السلطة عالية المخاطر المطلوبة.
+
+
+### D-079 — Fast Track جديد، 2026-10-03
+- Product Owner رفع أولوية N03/N08/N38 وطلب وصولها إلى main بأقرب وقت. الثلاثة لديهم Work outcome معتمد/موثق أصلًا في WA-REFINEMENT-0440-2؛ انتقلوا من NOT_AUTHORIZED إلى FAST-TRACK IMPLEMENTATION AUTHORIZED مع Current-Product refresh بدل إعادة التصميم من الصفر.
+- N03: Settings → بياناتك فقط؛ schema/Supabase إن لزم يبقى exact high-risk live gate. N08: gate الأساسي packaging/license للأوفلاين/PWA. N38: central date/time adapter + ASCII 0–9 مع physical iPhone Safari/Android Chrome gates.
+- N33 Phase 3 أصبح التالي مباشرة بعد الثلاثة؛ baseline/read-only measurement مسموح بالتوازي الآن، live Sync mutation تبقى gate عالية المخاطر.
+- أقل أولوية حاليًا: N02/N16/N18/N45/N35/N32/N30. N53/N54 لا يستهلكان سعة Fast Track إلا عند فراغها.
+- `ARCHIVE_OLD_OPEN_ISSUES.md` صُنّف PARKED/HISTORICAL pending reconciliation؛ لا يقود التشغيل، وWork هو المرجع البصري النشط لا Google.
+- N56 unified OTP وOTP email 0458.8 مغلقان Production. OTP Product-entry CSS المتبقي optional/PARKED ولا يوجد عمل نشط عليه.
+
+
+### D-080 — Always-On 24/7 + capacity scaling، 2026-10-03
+- Product Owner وجّه أن التشغيل لا يتوقف بنهاية خطة يوم أو تاريخ؛ بعد كل PASS/CLOSED/parked gate يسحب RAKEEZ Ops أعلى بند eligible تالٍ فورًا، مع استمرار المسارات المستقلة 24/7.
+- تم قياس الجهاز: ~31.9GB RAM، ~12.9GB free وقت القياس، Intel i7-8750H، 6 cores / 12 logical. اعتمد envelope افتراضي حتى 3 Codex + 2 Work معزولين، وCodex رابع read-only/prep عند سلامة الموارد؛ Heavy browser/build واحد وmain integration/promotion owner واحد.
+- إذا low-value ticket يستهلك وقتًا غير متناسب بلا تقدم، يسجل PARK CANDIDATE مع evidence ويحرر موارده؛ التأجيل النهائي لبند يهم PO يراجع مع PM/PO، ولا تتوقف بقية lanes.
+- `OPEN_ISSUES.md` أُعيدت تسميته فعليًا إلى `ARCHIVE_OLD_OPEN_ISSUES.md`، وأصبح أرشيفًا تاريخيًا واضحًا لا يقود التشغيل. كل المراجع الحية تُحدّث للاسم الجديد؛ Work هو المرجع البصري النشط.
+
+
+### D-080 dispatch recovery بعد Watchdog 18:44 — 2026-10-03 19:15 +03
+- تم التحقق أن تنبيه Watchdog كان صحيحًا وقت صدوره: N58 كان قد تأخر في التقاط AUTO-GREEN وN03/N08/N38 كانت READY بلا worktrees. بعد التنبيه استؤنف N58 فعليًا؛ الفحص الحي 19:14 أظهر Vite + Playwright يعملان على `tests/student-lifecycle-ui.e2e.mjs` داخل `n58-otp-fix`، لذلك Heavy Window مملوكة لـN58 وليست FREE.
+- PM أنشأ ثلاث worktrees معزولة من exact `origin/main=861006d`: `n03-fasttrack-1003`, `n08-fasttrack-1003`, `n38-fasttrack-audit-1003`؛ لم يُستخدم الجذر المحلي التاريخي المتسخ (`9b05180`, behind 53).
+- N03 Codex ACTIVE: thread `01a1028a-b28e-7440-b6f1-aaa4106ab0fa`; بدأ requirements/data-storage audit ومقارنة WA-REFINEMENT-0440-2، مع منع live/schema mutation وHeavy tests حاليًا.
+- N08 Codex ACTIVE: thread `01a1028a-c6ee-7171-a58d-4afbb556221b`; بدأ contract/license/package audit وCurrent-Product inspection، مع حظر raw-font redistribution وHeavy tests حاليًا.
+- N38 Codex ACTIVE READ-ONLY: thread `01a1028a-dd60-7b83-8ecf-4cb7829f13ef`; بدأ inventory/overlap/patch/test plan فقط لتجنب التعارض المحتمل مع N03 في Settings/shared paths.
+- محاولات CLI الأولية التي انتظرت stdin أوقفت قبل أي عمل أو mutation ثم أعيد إطلاق الجلسات بطريقة piped non-interactive؛ warning config عن `computer_use.windows.always_allowed_app_ids` غير حاجب. فشل `rg` الأولي في N03/N08/N38 تم تجاوزه باستخدام PowerShell/git ولم يوقف lanes.
+- N33 Phase 3 بقي `QUEUED NEXT / CAPACITY RESERVED`: لا يُفتح كخامس Codex بينما N58/N03/N08/N38 نشطة؛ يبدأ baseline read-only فور تحرير lane حسب D-080.
+- لا PO action الآن؛ لا Preview/Production/live Supabase أو main promotion نُفذ في هذا dispatch.
+
+### N58 — 2026-10-03 16:26 UTC
+- استؤنف الاعتماد المحلي وفق D-078: `microbatch-0344` 3/3، ثم 42 ملفًا إضافيًا PASS من suffix؛ `student-lifecycle-ui` 26/26 بعد إصلاحات fixture فقط. آخر ملف `sync-operational-ui` 2/3؛ فشل axe جاد في تباين نص بيانات المزامنة 2.81:1 مقابل 4.5:1. حفظ الحارس before/result/log/screenshot/trace تحت run `2026-10-03T16-24-30-376Z-0f410863-9597-49b3-b5fb-9a8634097099`.
+- توقف N58 True YELLOW بعد سقف ثلاث تصحيحات AUTO-GREEN للملف؛ 18 ملفًا لم يكتمل وStage E لم يبدأ. لا تعديل Product أو نشر أو live Supabase. المطلوب قرار PM بشأن علاج التباين، مع استمرار N03/N08/N38 المستقلة حسب D-079/D-080.
