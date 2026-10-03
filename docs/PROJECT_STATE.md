@@ -4,6 +4,8 @@ Last updated: 2026-10-03 (Asia/Riyadh); N34 PO Production verification and closu
 
 **0456.6 PO coordination update:** next-use attendance follow-up is explicitly NON-BLOCKING. Work continues now; no one-week project freeze. [Preserved follow-up, evidence and reactivation criteria](follow-ups/ATTENDANCE-0456-FOLLOW-UP.md). N58 read-only foundation audit is authorized; Product implementation is not.
 
+**Workflow V3 operating checkpoint (2026-10-03):** the PO-approved [RAKEEZ Ops Contract](RAKEEZ_OPS_CONTRACT.md) governs continuous lane coordination. [Execution Board](EXECUTION_BOARD.md), [Operations Log](OPERATIONS_LOG.md), and the [PO](PO_REVIEW_QUEUE.md)/[PM](PM_REVIEW_QUEUE.md) queues track current execution and decisions; Production/Git and live canonical files remain higher authority. Internal Preview is mandatory with standing conditional approval only for exact accepted Work parity. A docs-only commit does not change the Product release. Reverify each ticket's current Git/provider identity before promotion.
+
 ## Production and stage
 
 - **Silent Beta active**, signup remains silent; no marketing launch is authorized by this checkpoint. Unified email OTP, owner-bound provisioning/restore and offline-first contracts remain current.
