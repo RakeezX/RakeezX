@@ -47,3 +47,12 @@
 ### تحديث PM وتشخيص Git — متابعة GREEN
 - أعاد RAKEEZ Ops قراءة قرار PM الجديد؛ N58 Home يجوز استئنافه بعد تدقيق تطابق blobs وتصحيح test-only ضيق إذا ثبت دين الاختبار على baseline. بقيت 73 spec وStage E غير منفذة؛ لا يحتاج PO الآن.
 - نجح `git ls-remote` من Git CLI المحلي وأثبت أن remote main `f712e01d1540660559aa574dc975fd8cc0235ef2`. كشف فحص diff قبل الدفع أن فرع الوثائق الأول بُني خطأً من tracking ref محلي قديم؛ لم يحدث push. أُنشئ worktree معزول جديد مباشرة من SHA البعيد، وحُفظ الفرع الأول كدليل. العمل الحالي docs-only، والجذر وcredentials لم يُمسا. لم يتحقق skipped build أو مزامنة canonical docs بعد.
+
+### Workflow V3 — دمج وتزامن الملفات الكانونية
+- دُفعت أربعة commits docs-only `[CF-Pages-Skip]` بانتقال سريع من `f712e01` إلى `ed75e941b6ffef397af455d29ddf90136bb0100c` على main، وتأكد SHA في مستودع GitHub الجديد `RakeezX/RakeezX`. لم يُدفع الفرع التحضيري الخاطئ.
+- طابقت ملفات docs الخمسة القديمة محليًا blob `f712e01` قبل النسخ، ولم تكن الملفات الخمسة الجديدة موجودة. زُومنت الملفات العشرة من بايتات commit المنشور فقط، ثم طابق hash كل ملف blob الجديد. لم تُمس الملفات المتسخة الأخرى ولا credentials.
+- Cloudflare skipped build للـSHA الجديد غير مثبت؛ GitHub statuses/check-runs/deployments خالية. الحالة: دمج/مزامنة ناجحان، تحقق المزوّد YELLOW مستقل؛ لا يحتاج PO الآن ولا يعد Product release.
+
+### N58 — تدقيق Home Mobile قبل القياس الزوجي
+- Git blobs لملف الاختبار وملفات رسم Home المرتبطة مباشرة (`src/app.js` و`src/views/home.js` و`src/styles/components.css` و`src/lib/display-identity.js` و`src/lib/account-profile.js`) متطابقة بين baseline `430bc2e6` والمرشح `9edc4178`. الملف القديم يطلب صنف زر لا يصدره Product N41 المغلق؛ الفشل الثلاثي نفسه ظهر على النسختين.
+- جُهز تصحيح test-only في worktrees معزولة يحافظ على تحقق الحالة والمقاسات والوصول وفتح Mini Hub، ويستبدل توقع الاسم الظاهر في الزر بهوية N41 الحالية في aria-label والتحية. ملف الاختبار المصحح متطابق بايتًا على baseline والمرشح؛ لم يتغير Product. حُجزت النافذة الثقيلة مؤقتًا في اللوحة للقياس الزوجي مرة واحدة لكل نسخة.

@@ -14,12 +14,13 @@
 - الخيارات الآمنة: شغّل الملف المصحح مرة على baseline ومرة على المرشح بلا retry؛ إذا PASS/PASS أكمل 73 spec غير المنفذة ثم Stage E دون إعادة PASS gates. إذا baseline PASS/candidate FAIL أو تطلب الأمر Product change، أعد تصنيف lane YELLOW وسجل الأدلة ثم أعد قراءة هذه القائمة.
 - المسارات الأخرى التي استمرت أثناء الانتظار: تجهيز Workflow V3 docs-only في نسخة معزولة.
 
-### Workflow V3 docs — PM DECIDED / GREEN TO RESUME عبر Git CLI المحلي
+### Workflow V3 docs — دمج مكتمل / skipped build غير متحقق
 - المشكلة السابقة: GitHub connector السحابي أعاد 404، لكن PM تحقق من Git CLI المحلي. فحص RAKEEZ Ops عبر CLI المحلي أعاد remote main `f712e01d1540660559aa574dc975fd8cc0235ef2`.
 - ظهر عيب تحضير محلي قبل الدفع: clone أول استند إلى `origin/main` المحلي غير الصحيح وأظهر diff Product واسعًا؛ لم يُدفع شيء. أُنشئ worktree جديد مباشرة من SHA البعيد المؤكد وأعيدت مواءمة docs على ملفات main الحالية، مع حفظ الفرع الأول كدليل.
-- baseline/candidate: remote main `f712e01d1540660559aa574dc975fd8cc0235ef2` → فرع `codex/workflow-v3-docs-0466-corrected` في `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3-corrected`.
+- baseline/candidate: remote main `f712e01d1540660559aa574dc975fd8cc0235ef2` → `ed75e941b6ffef397af455d29ddf90136bb0100c` عبر فرع معزول `codex/workflow-v3-docs-0466-corrected`. GitHub أعلن نقل المستودع إلى `https://github.com/RakeezX/RakeezX.git`، وتأكد SHA الجديد في الموقع الجديد.
 - القرار: استخدم Git CLI من worktree نظيف معزول. أعد فحص diff والـremote قبل push؛ إذا فشل push بسبب auth/credential، أوقف docs lane YELLOW فقط دون تعديل root أو credentials، واستمر في المسارات المستقلة. لا يتطلب التشغيل مراسلة محادثات العمال القديمة.
-- ما لم يكتمل: push/merge، تحقق skipped build، مزامنة canonical docs المحلية.
+- المكتمل: push سريع غير قسري إلى main، ومزامنة الملفات الكانونية العشرة بعد مطابقة بايتات الملفات المحلية القديمة مع f712؛ hash كل ملف بعد النسخ طابق blob commit الجديد.
+- المتبقي YELLOW: إثبات Cloudflare Pages skipped build للـSHA الجديد؛ GitHub statuses/check-runs/deployments خالية ولم تُنتج دليل مزود. لا تعتبر docs commit Product release. لا توقف N58/N53 المستقلين.
 - المسارات الأخرى التي استمرت أثناء الانتظار: N58 local verification المعزول حتى أول إخفاق جديد.
 
 ## قالب
