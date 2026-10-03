@@ -91,3 +91,7 @@
 - طبق RAKEEZ Ops قرار PM 11:27 +03 كتعديل test-only بثلاثة أسطر (`cae8244`). شُغّل الملف مرة واحدة تحت نافذة ثقيلة خالية وrunner محروس: 5 PASS / 2 FAIL، نجح holiday وفشلت الجمعة والسبت عند عنوان «إجازة» المتوقع لهما «لا توجد لديك حصص اليوم».
 - حُفظت before/result/log/screenshots/traces في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T09-22-24-136Z-5d12177a-7c35-4174-b8dc-9ce1f9e62eea/` داخل worktree RAKEEZ Ops. تدقيق مصدر للقراءة فقط وجد تصنيف weekend الافتراضي holiday قبل عرض Home؛ رُفع حسم الدلالة إلى PM، ولم يُعد الاختبار.
 - العدد الصحيح من manifest: 47 مكتمل + ملف جزئي + 63 غير منفذ = 111. Stage E لم يبدأ. لا Product أو live mutation، وN53 MB01 ما زال بانتظار PO على Production.
+
+### N53 MB01 — اعتماد PO النهائي والإغلاق، 2026-10-03 10:22 UTC
+- ورد اعتماد Product Owner الصريح في الرسالة `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f`: «أعتمد N53 MB01 في Production». سُجلت النتيجة CLOSED / PO PRODUCTION VERIFIED لـMB01 وحده وفق RAKEEZ_OPS_CONTRACT.md.
+- اكتمل النقل والتحقق التقني قبل الاعتماد: Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`، Cloudflare check `111130402304` SUCCESS، CSS منشور مطابق. لا إعادة نشر Product أو تكرار اختبارات. MB02 وبقية N53 خارج الاعتماد، وN58 مستقل YELLOW بانتظار PM.

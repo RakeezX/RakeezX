@@ -14,7 +14,7 @@
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
 | Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only 13397b3؛ baseline 430bc2e | baseline local-sync-pwa مصحح 4/4، candidate مصحح 3/4 مع boot عالق بعد offline reload؛ PM يحدد فحص السبب، 65 spec وStage E لم تنفذ | لا |
-| Ko1 | N53 MB01 | PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING | f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ Cloudflare check 111130402304؛ Preview 7e144d3c | مراجعة PO للسطحين على Production؛ لا CLOSED قبل التحقق الصريح | نعم، مراجعة النتيجة النهائية |
+| Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01؛ MB02 وبقية N53 مستقلان | لا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
 ## N58 — التفاصيل الحالية
@@ -125,3 +125,8 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - تكييف الاختبار المصرح لـ microbatch-0327 في commit `cae8244` أنتج 5/7؛ نجح holiday، وفشل friday/saturday بعرض «إجازة» بعد نقلهما إلى 02/03 أكتوبر. أوقف المسار YELLOW بلا إعادة، وحفظت الأدلة في طابور PM.
 - manifest: 111 = 47 ملفًا مكتملًا + microbatch-0327 جزئي + 63 لم تبدأ؛ لا ملف مستبعد. Stage E لم يُشغّل. Heavy execution owner: FREE، والمنفذ 5173 خالٍ.
 - N53 MB01: PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING، وليس CLOSED. لا تغيير Product أو live في N58.
+
+## إغلاق N53 MB01 — 2026-10-03 10:22 UTC
+- Product Owner اعتمد صراحةً النتيجة على Production برسالة `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f`: «أعتمد N53 MB01 في Production». انتقل MB01 من PO PRODUCTION REVIEW PENDING إلى CLOSED / PO PRODUCTION VERIFIED وفق بند الإغلاق في عقد V3.
+- النشر والتحقق التقني السابقان باقيان: Product commit `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`، CSS blob `439bd1f5d04c79d3d937386d2549619a6a243724`، Cloudflare check `111130402304` SUCCESS ومطابقة محتوى rakeezx.com وrakeezx.pages.dev. لم يحدث نشر Product أو اختبار ثقيل جديد لأجل الإغلاق.
+- النطاق: MB01 فقط. MB02 وN53 الأوسع وN54 وN58 لم تُغلق بهذا الاعتماد. N58 ما زال YELLOW ينتظر حسم PM لمشهدي الجمعة والسبت؛ Heavy FREE.
