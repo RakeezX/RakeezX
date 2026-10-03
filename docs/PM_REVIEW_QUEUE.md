@@ -52,3 +52,34 @@
 ### تحديث دليل N58 وN53 — 2026-10-03 03:22 UTC
 - N58: الملف 43 من 111 ملف مواصفة، 42 قبله اكتملت، 68 بعده لم تبدأ؛ الملف الفاشل نفسه 4/5 حالات اختبار. اختبار initial-restore blob مطابق؛ runner المرشح مختلف عن baseline في scripts/e2e-runner.mjs وplaywright.config.js وscripts/playwright-output-safety.mjs. مسار persistent browser profile المرشح 238 حرفًا مقابل baseline 186؛ Default/Cookies يصل 254. احتمال Windows path/IndexedDB tooling غير مثبت. src/lib/db.js تغيّر أيضًا، لكن diff يخص writeAll لا openDB. يلزم PM اختيار مقارنة مكافئة/فحص واحد محدد دون إعادة الناجح أو نسبة الفشل إلى Product. الدليل المفصل في handoff/N58_INITIAL_RESTORE_REPRO.md في workspace RAKEEZ Ops.
 - N53: التباس تفويض Product قد يكون سجل WA-N53-N54-0434 أقدم من Freeze MB01 0462.1/0464؛ PM يحسم مرجع السلطة أولًا. لا طلب PO مستقل الآن، ولا ترقية main/Production. إن أكد PM غياب تفويض Product، ينقل سؤالا محددا إلى PO.
+
+## PM WATCH DECISION — 2026-10-03 06:33
+### N58 CORE_V2 — GREEN diagnostic authorized
+- لا يوجد دليل كافٍ على Product regression: ملف initial-restore مطابق بين baseline/candidate، بينما harness ومسار persistent profile مختلفان؛ المسار في candidate يقترب من حدود Windows/Chromium.
+- diff الحالي في src/lib/db.js يغيّر writeAll ولا يغيّر openDB؛ لا يبرر Product change قبل عزل harness.
+- نفّذ paired tooling-equivalence diagnostic واحدًا فقط، بلا retry وبلا Product change:
+  - baseline وcandidate في مسارين معزولين متساويي الطول قدر الإمكان تحت C:\Users\Abody\.codex\worktrees.
+  - نفس test-only harness/runner/output-safety bytes، ونفس Browser/Node/env، ونفس output-root shape القصير والمحمي.
+  - شغّل فقط حالة CORE_V2 receipt survives a disposable browser-profile restart مرة على كل طرف.
+- PASS/PASS: صنّف السابقة TOOLING/PATH DEBT، وثبّت تصحيح harness test-only ضيقًا يحافظ على output-safety/evidence، ثم استأنف من أول spec غير منفذ دون إعادة PASS السابق.
+- FAIL/FAIL بنفس UnknownError: يبقى tooling/test debt؛ source audit ثم تصحيح test-only واحد وpaired proof.
+- baseline PASS / candidate FAIL تحت بيئة متكافئة: أعد N58 إلى YELLOW؛ read-only trace فقط، ولا تعدّل src/schema/Supabase.
+- لا Stage E/Preview/Production قبل عودة lane إلى GREEN وإكمال البقية. لا يحتاج PO الآن.
+### N53 MB01 — PM decision on authority
+- WA-N53-N54-0434 records the pre-V3 general N53 state as NOT_AUTHORIZED.
+- Workflow V3 is newer standing PO authority for exact accepted low/medium-risk Work transport after technical Preview parity; for PM purposes it resolves the MB01 hold only.
+- This applies only to the frozen MB01 two-line CSS presentation change in .share-preview-box. It does not authorize MB02 or broader N53 work.
+- Rebuild the MB01 candidate from current remote main and verify the touched CSS base is unchanged from the Freeze baseline. Apply the exact patch only; any touched-source drift returns the lane to YELLOW.
+- Run the normal V3 exact-tree release checklist and focused gates on the rebuilt candidate. If parity remains exact with zero GAP/runtime conflict, continue under the standing V3 path.
+- Final user-visible closure still requires PO Production verification. No new PO decision is needed before MB01 unless drift, scope expansion, or a higher-risk condition appears.
+
+### Workflow V3 docs provider evidence
+- remote main is now 13de11b6e467ccaf275276c348ed275b7df183ed after docs-only checkpoints.
+- Cloudflare skipped-build proof remains unverified. A read-only Wrangler check could not authenticate in the non-interactive environment. This remains NON-BLOCKING and is not a Product release.
+
+
+## PM WATCH RECHECK — 2026-10-03 07:19
+- لا توجد حالة YELLOW جديدة تتطلب قرار PM إضافيًا.
+- N58: استمر فقط بالتشخيص الزوجي المكافئ المحدد في قرار 06:33.
+- N53 MB01: استمر فقط بإعادة البناء من current remote main وفق سلطة V3 المحددة في قرار 06:33؛ أي drift جديد يعيد YELLOW.
+- لا يحتاج PO الآن.

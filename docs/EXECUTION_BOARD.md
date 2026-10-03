@@ -9,11 +9,11 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE منذ 2026-10-03 03:14 UTC؛ اكتملت فحوص N53 المستقلة، وأوقف RAKEEZ Ops ترقية Product بسبب تعارض حالة التفويض في Work Approval Ledger.
+- Heavy execution owner: RAKEEZ Ops / N58 paired tooling-equivalence diagnostic منذ 2026-10-03 04:23 UTC؛ حجز مؤقت لفحص الحالة الفاشلة مرة واحدة على baseline ومرة على candidate بمسارين متساويين. لا runner آخر على 5173 قبل الحجز.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | انتظار قرار PM بشأن فشل CORE_V2 على المرشح فقط؛ 68 مواصفة لاحقة وStage E لم تنفذ | لا |
+| Ko2 | N58 | PM DECIDED / GREEN DIAGNOSTIC / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | نفّذ paired tooling-equivalence diagnostic واحدًا لحالة CORE_V2 وفق PM_REVIEW_QUEUE؛ لا Product change؛ ثم اتبع قواعد PASS/FAIL المنشورة | لا |
 | Ko1 | N53 MB01 | PREVIEW VERIFIED / PRODUCT PROMOTION HOLD | branch codex/n53-mb01-ops-0466 عند 6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Preview 4abc5d8a | PM يوفق سجل الاعتماد القديم مع Freeze الحالي ويحدد سلطة Product قبل main/Production؛ لا CLOSED | ليس الآن؛ PM أولًا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -74,3 +74,17 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - N58: من 111 **ملف مواصفة**، 42 ملفا مكتملًا، الملف 43 initial-restore فيه 4 حالات PASS و1 FAIL، ثم 68 ملفًا لم يبدأ. لا تخلط ملفات المواصفات بحالات الاختبار. لا runner يعمل ولا listener على 5173.
 - N58 read-only: ملف اختبار الاستعادة blob مطابق، لكن runner المرشح يغير مسار إخراج Playwright؛ طول ملف المتصفح الدائم 238 حرفًا مقابل 186 في baseline، وDefault/Cookies في المرشح 254. هذا احتمال tooling فقط، يحتاج فحص PM مكافئ قبل إعادة التشغيل. ملخص إعادة الإنتاج: handoff/N58_INITIAL_RESTORE_REPRO.md في workspace RAKEEZ Ops.
 - N53: تعارض سجل اعتماد قديم مقابل Freeze حديث يبقى في PM أولا؛ PO فقط إن أكد PM غياب Product authority. لا ترقية Product أثناء التحقق.
+
+## PM WATCH CHECKPOINT — 2026-10-03 06:33
+- remote main: 13de11b6e467ccaf275276c348ed275b7df183ed (docs-only checkpoint). Product/runtime remains 7ab424803127c9167b03cbd6bb5299468cb40b4c.
+- N58: PM decision posted. GREEN only for one paired tooling-equivalence diagnostic of the failing CORE_V2 persistent-profile case; no Product change. Equalize harness/path first. Result rules are in PM_REVIEW_QUEUE.md.
+- N53 MB01: authority hold resolved by the newer Workflow V3 standing PO authorization for this exact frozen two-line CSS transport only. Rebuild from current main, verify touched-source parity, then follow normal exact-tree V3 gates. Broader N53/MB02 remains outside this decision.
+- Workflow V3 docs: canonical files are live. Cloudflare skipped-build proof remains unverified/non-blocking; no Product release identity changed.
+- Product Owner action now: NONE. Notify PO only if a later RED condition appears or when a user-visible Production result is ready for final review.
+
+
+## PM WATCH RECHECK — 2026-10-03 07:19
+- لا يوجد YELLOW جديد بعد قرار 06:33؛ القراران الحاليان لـ N58 وN53 MB01 ما زالا ساريين.
+- remote main تحقق عند `13de11b6e467ccaf275276c348ed275b7df183ed`; Product/runtime لم يتغير.
+- Cloudflare skipped-build proof يبقى غير مثبت لكنه NON-BLOCKING ولا يغير هوية Product release.
+- Product Owner action: NONE.
