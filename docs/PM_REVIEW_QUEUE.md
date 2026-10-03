@@ -43,3 +43,8 @@
 - الدليل: tests/initial-restore.e2e.mjs blob 67eef655a23ca9d98ed4a9a3e2909f3415b9f3ec مطابق. في المرشح ظهر UnknownError: Internal error عند فتح قاعدة البيانات قبل ظهور .topbar__title في حالة CORE_V2 receipt survives a disposable browser-profile restart، line 130. سجلات وصورة وtrace محفوظة تحت artifacts/n58-calendar-client-0457-3/verification/2026-10-03T02-48-17-883Z-2532c19f-f583-48f0-bf79-1d5020c254c8/initial-restore.e2e.mjs في worktree المرشح؛ تشغيل baseline محفوظ في worktree n58-ia-corrected-baseline-0466.
 - ما لم يحدث: لا retry للمرشح، لا تعديل Product، لا Stage E ولا Preview/Production. المواصفات اللاحقة لم تنفذ.
 - قرار مطلوب من PM: تصنيف فشل قاعدة البيانات الخاص بالمرشح وخطة فحص/تصحيح محدودة قبل استئناف N58؛ لا يمد قرار Home السابق إذنا تلقائيا لتعديل اختبار الاستعادة أو Product. لا يتطلب قرار PO حاليا ما لم يفرض التحقيق تغييرا في السلوك أو النطاق أو البيانات.
+
+### N53 MB01 — تعارض مصدر التفويض قبل Product promotion — YELLOW
+- فرع النقل الانتقائي 6fe3de7 وPreview الفني نجحا؛ لم يتحرك main Product. Work Freeze 0462.1 و0464 يقول PO WORK-LOCAL APPROVED وREADY FOR SELECTIVE PRODUCT TRANSPORT، بينما canonical WORK_APPROVAL_LEDGER وWA-N53-N54-0434 يقولان N53 NOT_AUTHORIZED دون Product ticket مستقل.
+- المطلوب من PM: تحديد التذكرة/القرار الأحدث الذي يمنح سلطة Product لـ MB01، أو تأكيد عدم وجوده وإحالة طلب التفويض المحدد إلى PO. حتى تتضح السلطة يتوقف دفع CSS إلى main؛ يستمر العمل المستقل.
+- الدليل: branch codex/n53-mb01-ops-0466 ‏6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Cloudflare Preview check 111114370226 ناجح، 6/6 CSS smoke، Work 12/12 golden و24/24 browser، Product build و6/6 browser مجاور.

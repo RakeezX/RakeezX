@@ -61,3 +61,8 @@
 - أثبتت تصحيحات test-only الثلاثة عبور baseline والمرشح: OTP ‏2/2، Home ‏3/3، IA ‏12/12. التغييرات محصورة في tests؛ commits 8cc994b و9c423a4 وe97b567 في worktree معزول.
 - في متابعة المواصفات، نجح initial-restore-failure ‏1/1 ثم فشل initial-restore ‏1/5 على المرشح بسبب UnknownError أثناء فتح قاعدة البيانات في browser-profile restart. تشغيل baseline واحد لنفس المواصفة نجح 5/5، مع تطابق blob الاختبار. سُجل YELLOW في PM_REVIEW_QUEUE؛ المرشح NOT CERTIFIED وStage E NOT RUN.
 - حرر RAKEEZ Ops نافذة Heavy بعد توقف N58. الدليل محفوظ ولم تتغير ملفات Ko2 الأصلية أو بيانات Supabase الحية.
+
+### N53 MB01 — نقل معزول وPreview، دون ترقية Product
+- أُعيد التحقق من رقعة Work 0464 ومصادرها، ونُقلت إلى worktree مستقل دون تعديل Ko1. commit 6fe3de7 حذف تصريحَي CSS فقط. نجح البناء وفحوص المتصفح المجاورة 5/5 و1/1؛ نجح Cloudflare Preview للـ SHA نفسه، والـ CSS المنشور مطابق، وsmoke العرض 6/6.
+- عند مراجعة شرط التفويض في Release Checklist ظهر تعارض مع WORK_APPROVAL_LEDGER/WA-N53-N54-0434: N53 NOT_AUTHORIZED دون Product ticket مستقل، في حين Freeze الجديد Work-local approved. سُجل في PM وPO queue، ولم يُدفع Product إلى main. حررت نافذة Heavy. الحالة: PREVIEW VERIFIED / PRODUCT PROMOTION HOLD، وليست CLOSED.
+- تصحيح زمني: توقيتا N58 وبدء N53 في checkpoint السابق عُرضا خطأ كـ 05:53 و05:57 UTC؛ الصحيح تقريبا 02:53 و03:00 UTC، وصححت اللوحة الحالية.

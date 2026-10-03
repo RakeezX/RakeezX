@@ -9,12 +9,12 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: RAKEEZ Ops / N53 MB01 منذ 2026-10-03 05:57 UTC؛ بدأ التصديق الثقيل في worktree معزول n53-mb01-ops-0466 بعد تحرير N58. لا يُشغّل مسار ثقيل آخر حتى تحرير النافذة.
+- Heavy execution owner: FREE منذ 2026-10-03 03:14 UTC؛ اكتملت فحوص N53 المستقلة، وأوقف RAKEEZ Ops ترقية Product بسبب تعارض حالة التفويض في Work Approval Ledger.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
 | Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | انتظار قرار PM بشأن فشل CORE_V2 على المرشح فقط؛ 68 مواصفة لاحقة وStage E لم تنفذ | لا |
-| Ko1 | N53 MB01 | PRODUCT CANDIDATE PREPARED | branch codex/n53-mb01-product-0465 على f712e01... | ينتظر Heavy Window للتصديق ثم Preview داخلي ثم Production وفق V3 | لا |
+| Ko1 | N53 MB01 | PREVIEW VERIFIED / PRODUCT PROMOTION HOLD | branch codex/n53-mb01-ops-0466 عند 6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Preview 4abc5d8a | حل تعارض تفويض Product في Work Approval Ledger قبل main/Production؛ لا CLOSED | نعم إذا لم توجد سلطة Product أحدث موثقة |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
 ## N58 — التفاصيل الحالية
@@ -57,8 +57,14 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - OTP Product-entry CSS: منفصل، يحتاج disposition/PO عند إعادته.
 - N23/N24 Reports: LAST.
 
-## نقطة N58 الجديدة — 2026-10-03 05:53 UTC
+## نقطة N58 الجديدة — 2026-10-03 02:53 UTC
 - نجحت تصحيحات الاختبار فقط لـ Email OTP وHome Mobile وIA cleanup في خط الأساس والمرشح: 2/2 و3/3 و12/12. لم يتغير أي ملف Product في هذه التصحيحات.
 - بعد استئناف المواصفات المتبقية، نجح initial-restore-failure (1/1)، وفشل initial-restore (4/5) على المرشح عند أول فتح لملف متصفح دائم: UnknownError: Internal error أثناء فتح قاعدة البيانات، ولم تظهر .topbar__title. ملف الاختبار نفسه مطابق في Git بين baseline وcandidate (blob 67eef655a23ca9d98ed4a9a3e2909f3415b9f3ec).
 - تشغيل baseline واحد لنفس initial-restore نجح 5/5. الأثر محفوظ في artifacts/n58-calendar-client-0457-3/verification داخل worktree المرشح وworktree baseline. لا إعادة للمحاولة ولا تعديل Product؛ N58 متوقف YELLOW لحين قرار PM.
 - نافذة Heavy محررة الآن. N53 مستقل ويمكنه استخدام النافذة بعد التحقق من الحالة الأحدث وعدم وجود مالك آخر.
+
+## نقطة N53 MB01 — 2026-10-03 03:14 UTC
+- Freeze 0464: patch SHA-256 ‏95a80ed3bbbb09bc330fa53857fe7b506cf30d707f02fb2138078c5dad2bad98؛ CSS Product على main مطابق لقاعدة الرقعة. نُقلت إزالة السطرين فقط إلى worktree مستقل ثم فرع 6fe3de7؛ Ko1 الأصلي لم يُعدل.
+- تحقق Work السابق: goldens ‏12/12 pixel+geometry، Chromium ‏16/16، WebKit ‏8/8؛ تحققت hashes الرقعة والمقارنة وأدلة المتصفح. بناء Product نجح؛ اختبارا print-reports ‏5/5 وstudent-continuous-history ‏1/1؛ Preview Cloudflare check 111114370226 ناجح للـ SHA نفسه، ورابط النسخة https://4abc5d8a.rakeezx.pages.dev. ملف CSS المنشور يطابق Git blob ‏439bd1f5d04c79d3d937386d2549619a6a243724؛ smoke CSS ‏6/6 عبر 320/390/1440 وlight/dark مع RTL.
+- HOLD: docs/WORK_APPROVAL_LEDGER.md وWA-N53-N54-0434.md يذكران N53 NOT_AUTHORIZED دون Product ticket مستقل؛ Freeze 0462.1/0464 يذكر PO WORK-LOCAL APPROVED وREADY FOR SELECTIVE PRODUCT TRANSPORT. لم يُثبت تفويض Product مستقلا أو تحديث ledger. لا push لمرشح N53 إلى main ولا Production. راجع PM_REVIEW_QUEUE وPO_REVIEW_QUEUE.
+- نافذة Heavy محررة؛ N58 ما زال YELLOW مستقلا.
