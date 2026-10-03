@@ -9,11 +9,11 @@
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE وفق آخر checkpoint؛ N58 أنهى microbatch-0327 ‏7/7 ثم توقف YELLOW عند N29 selector drift في microbatch-0330. PM حسمه الآن كـbaseline test debt وأعاد lane إلى GREEN. Work MB02 أخذ scope محددًا أدناه.
+- Heavy execution owner: FREE وفق آخر evidence بعد توقف microbatch-0344؛ N58 صحح N29 test-only ونجح microbatch-0330 ‏6/6، ثم توقف 2/3 في N19 بسبب aggregate selector قديم. PM حسم N19 الآن كـbaseline test debt وأعاد lane إلى GREEN. Work MB02 أخذ scope محددًا أدناه.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate `9edc4178` + local Product presentation `011eccf` + test-only `b363943`؛ 50 spec مكتمل، microbatch-0344 جزئي، 60 لم تبدأ | PM يصنف فشل N19 سياق الطالب الثالث؛ لا retry ولا Stage E/Preview/Production | لا |
+| Ko2 | N58 | YELLOW / NOT CERTIFIED / LOCAL-ONLY | candidate `9edc4178` + Product presentation `011eccf` + test-only `5aaff1a`؛ 50 spec مكتمل؛ microbatch-0344: 2/3؛ 60 spec لم تبدأ | PM: حسم تصحيح توقع href المرمّز؛ لا retry ولا Stage E/Preview/Production قبل قرار أحدث | — |
 | Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01 | لا |
 | Work | N53 MB02 | REVIEWED / NO CHANGE for viewport fit | سطحا «مواثيق جاهزة» و«تبديل الفصل»؛ 16/16 geometry آمنة على Product baseline، دليل `handoff/N53_MB02_WORK_REVIEW.md` | لا مرشح بصري ولا Freeze/transport؛ ملاحظة aria-current منفصلة للفرز | لا |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -144,3 +144,6 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 ## نقطة N58 وMB02 — 2026-10-03 13:11 UTC
 - N29 test-only `b363943` اجتاز microbatch-0330 ‏6/6؛ microbatch-0335 ‏3/3. توقف N58 YELLOW في microbatch-0344 عند N19 ‏2/3: 3 سياقات للطالب مقابل 2 متوقعة؛ 50 spec مكتمل + واحد جزئي + 60 لم تبدأ، Stage E لم يبدأ. Heavy عاد FREE، ولا نشر N58.
 - مراجعة Work لـMB02 انتهت NO CHANGE ضمن viewport/scroll: 16/16 قياسًا وصورة، لا مرشح جديد ولا PO Work review مطلوب. ملاحظة aria-current منفصلة. N53 MB01 باقٍ CLOSED.
+
+## تحديث N58 — 2026-10-03 14:24 UTC
+- استؤنف المسار بعد قرار PM 16:10 +03؛ جولة microbatch-0344 الواحدة انتهت 2/3. فشل توقع href غير المرمّز بينما Product يرمّز معرف teaching عبر `encodeURIComponent`. توقف N58 YELLOW بلا إعادة تشغيل. Heavy Window خالٍ، ولا نشر أو تعديل Product. التفاصيل في PM_REVIEW_QUEUE.md ودليل الجولة المحفوظ.

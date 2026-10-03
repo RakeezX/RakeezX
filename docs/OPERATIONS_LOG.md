@@ -104,3 +104,14 @@
 ### N58 وN53 MB02 — 2026-10-03 13:11 UTC
 - N58: التكييف test-only المصرح `b363943` نجح في microbatch-0330 ‏6/6، ثم microbatch-0335 ‏3/3. توقف microbatch-0344 ‏2/3 عند N19 بسبب عدد سياقات الطالب، مع حفظ الأدلة في worktree RAKEEZ Ops. لا إعادة ولا Stage E/Preview/Production. رُفع YELLOW إلى PM؛ Heavy FREE.
 - MB02: فحص Work-only على Product baseline لسطحي «مواثيق جاهزة» و«تبديل الفصل» عبر 16 حالة viewport/theme كان متماسكًا للتمرير والملاءمة؛ NO CHANGE ولا تصميم جديد. تقرير وصور وJSON في `handoff/N53_MB02_WORK_REVIEW.md` و`handoff/mb02-work-review-2026-10-03-stable/`. لوحظ `aria-current` باقتباسين حرفيين كتذكرة وصول منفصلة محتملة؛ لم يُعدل Product/Work أو تُحفظ بيانات.
+
+
+### PM — حسم N58 microbatch-0344، 2026-10-03 16:10 +03
+- راجع PM فشل N19 الجديد بعد نجاح microbatch-0330 ‏6/6 وmicrobatch-0335 ‏3/3. `src/lib/student-search-ui.js` مطابق blob بين baseline والمرشح، وعقدا N19/N39 المغلقان يفرضان بطاقة durable student واحدة مع سياقات التدريس الصريحة.
+- سبب count=3 هو أن `[data-student-result]` يشمل رابط profile واحدًا ورابطَي teaching لسياقين؛ توقع count=2 قديم. صُنفت الحالة BASELINE TEST DEBT، وأجيز تصحيح test-only بنيوي في microbatch-0344 دون Product/db/data change.
+- N58 عاد GREEN TO RESUME / NOT CERTIFIED: 50 spec مكتملة + microbatch-0344 جزئي + 60 لم تبدأ. بعد 3/3 يكمل 60 فقط ثم Stage E. لا Preview/Production/live Supabase ولا حاجة لـPO.
+- N53 MB02 مستقل: Work review انتهى NO CHANGE لملاءمة viewport/scroll ‏16/16؛ لا PO review ولا Freeze/transport. ملاحظة aria-current تبقى follow-up وصول منفصلة غير حاجبة.
+
+### N58 — 2026-10-03 14:24 UTC
+- تم الاستئناف الفعلي بعد قرار PM الأخير: commit اختبار فقط `5aaff1a`، ثم تشغيل `microbatch-0344` مرة واحدة بحارس الأدلة؛ النتيجة 2 PASS / 1 FAIL. فشل N19 عند مقارنة teaching href غير المرمّز مع DOM المرمّز، والكود Product يستخدم `encodeURIComponent(teaching.id)`. دليل الجولة محفوظ تحت `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T14-22-57-432Z-131b1762-6236-455d-b0c3-4e00acb757da/` في worktree RAKEEZ Ops.
+- صُنّف المسار YELLOW التزامًا بقرار PM: لا retry، لا بقية 60 spec، لا Stage E، لا Preview/Production/live Supabase. المطلوب من PM قرار لتصحيح توقع الاختبار وحده ثم استئناف الجولة. المسارات المستقلة N53 MB01 CLOSED وMB02 NO CHANGE كما هي.
