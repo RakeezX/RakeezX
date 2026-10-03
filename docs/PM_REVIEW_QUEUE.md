@@ -103,3 +103,8 @@
 - بعد التصحيح: شغّل الملف المصحح مرة واحدة على baseline ومرة واحدة على candidate، بلا retry. PASS/PASS => استأنف فقط 65 spec غير المنفذة ثم Stage E دون إعادة PASS السابقة. baseline PASS/candidate FAIL => YELLOW جديد وتحليل read-only فقط.
 - ملاحظة تشغيلية: محاولة PM الأولى مررت مسار `tests/...` إلى runner فأنهى `No tests found` قبل تشغيل أي test؛ القياس المعتمد هو التشغيل الصحيح اللاحق باسم الملف فقط.
 - لا يحتاج PO لهذه الحالة.
+
+### N58 — نتيجة الزوج المصحح local-sync-pwa: baseline PASS / candidate FAIL — YELLOW
+- baseline exact 430bc2e في worktree معزول نجح 4/4 بعد تصحيح test-only المأذون؛ سجل التشغيل handoff/n58-local-sync-baseline-corrected.log. candidate 9edc4178 مع test-only ‏13397b3 نجح 3/4 وفشل عند line 473 في الاختبار offline reload/reopen: بعد reload على #/settings لم يظهر .topbar__title، ولقطة الفشل تعرض boot فقط. نفس test blob المصحح 62943ae85887f9e6b7aea7bb58137c73dd30431f للطرفين.
+- الدليل candidate في artifacts/n58-calendar-client-0457-3/verification/2026-10-03T05-26-56-381Z-16a7b58a-6b10-4a9a-8ea0-7564b91d9668/local-sync-pwa.e2e.mjs داخل worktree n58-otp-fix: before/result/log/trace/screenshot. لا إعادة محاولة، لا تعديل Product، لا Stage E، و65 ملف spec بعده لم يبدأ.
+- المطلوب من PM: تدقيق trace/source قراءة فقط وتحديد هل boot المعلق بعد offline reload سببه مرشح Product أم فرق runner/PWA tooling، وحدود أي فحص إضافي. يبقى N58 YELLOW وفق شرط القرار السابق؛ N53/PO review مستقل.

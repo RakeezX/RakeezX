@@ -9,11 +9,11 @@
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: RAKEEZ Ops / N58 corrected local-sync-pwa pair منذ 2026-10-03 05:22 UTC؛ baseline ثم candidate مرة واحدة، ولا runner آخر على 5173.
+- Heavy execution owner: FREE منذ 2026-10-03 05:30 UTC؛ توقف N58 وفق قاعدة PM بعد baseline PASS/candidate FAIL، ولا runner على 5173.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | PM DECIDED / GREEN TO RESUME | candidate 9edc4178 + test-only 70bb7fa؛ baseline 430bc2e | ثبت نفس فشل local-sync-pwa على baseline؛ تصحيح اختبار فقط ثم قياس baseline/candidate مرة لكل طرف، وبعد النجاح يكمل 65 spec وStage E | لا |
+| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only 13397b3؛ baseline 430bc2e | baseline local-sync-pwa مصحح 4/4، candidate مصحح 3/4 مع boot عالق بعد offline reload؛ PM يحدد فحص السبب، 65 spec وStage E لم تنفذ | لا |
 | Ko1 | N53 MB01 | PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING | f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ Cloudflare check 111130402304؛ Preview 7e144d3c | مراجعة PO للسطحين على Production؛ لا CLOSED قبل التحقق الصريح | نعم، مراجعة النتيجة النهائية |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -99,3 +99,8 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - الشجرة f7199ec: build PASS بعد استعادة Build Meta، print-reports ‏5/5، student-continuous-history ‏1/1، diff check PASS؛ Work goldens ‏12/12 وbrowser ‏24/24 مثبتة بالبصمات. Preview check 111130112489 SUCCESS للـ SHA نفسه، CSS مطابق، smoke ‏6/6. دفع main fast-forward فقط بعد فحص remote e85deb8.
 - بعد دفع main، Cloudflare Pages check 111130402304 SUCCESS على head_sha الكامل f7199ec وdeployment id ‏842cff93-1608-4f9c-bc00-0acd200ffc0c لمشروع rakeezx. CSS على rakeezx.pages.dev وrakeezx.com مطابق؛ smoke read-only في سياقات Chromium مؤقتة ‏6/6 عبر 320/390/1440 وlight/dark، RTL، دون بيانات خاصة. GitHub check لا يعرض حقل Production environment صراحة وWrangler غير مصرح؛ لا ندعي تحقق حقل المزود المفقود.
 - الحالة: PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING، لا CLOSED. نافذة Heavy حرة؛ N58 YELLOW مستقل و65 ملف spec لاحق وStage E لم ينفذ.
+
+## نقطة N58 الثالثة — 2026-10-03 05:30 UTC
+- قرار PM 08:15 +03 أجاز تصحيح test-only لتوقع OFFLINE_ROUTE_MATRIX عند #/schedule/times من أوقات الحصص إلى الجدول. test blob المصحح ‏62943ae85887f9e6b7aea7bb58137c73dd30431f متطابق baseline/candidate. baseline المعزول عند 430bc2e نجح 4/4 في تشغيل واحد، سجله handoff/n58-local-sync-baseline-corrected.log.
+- candidate في تشغيل واحد نجح 3/4 ثم فشل الاختبار نفسه عند line 473 بعد offline reload على #/settings: .topbar__title غير موجود، ولقطة الفشل تُظهر شاشة boot. الدليل محفوظ في artifacts/n58-calendar-client-0457-3/verification/2026-10-03T05-26-56-381Z-16a7b58a-6b10-4a9a-8ea0-7564b91d9668/local-sync-pwa.e2e.mjs؛ commit test-only ‏13397b3. لا retry ولا تغيير src.
+- وفق قاعدة PM baseline PASS/candidate FAIL أُوقف N58 YELLOW. من 111 ملف spec: 45 مغطاة، local-sync-pwa غير مكتمل، 65 لم تبدأ؛ Stage E/Preview/Production الخاصة بـN58 لم تنفذ. N53 MB01 على Production بانتظار مراجعة PO مستقلًا، ونافذة Heavy حرة.

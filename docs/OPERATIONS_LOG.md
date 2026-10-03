@@ -78,3 +78,7 @@
 ### N53 MB01 — النقل المحدد وPreview وProduction
 - بعد قرار PM، بُني المرشح f7199ec من main الحالي ونُقلت رقعة Work Freeze ذات السطرين فقط. اجتاز build و6/6 browser وPreview Cloudflare و6/6 smoke، ثم دُفع fast-forward إلى main بعد تحقق SHA. نجح Cloudflare check 111130402304 للـ SHA الكامل بعد الدفع؛ تطابق CSS على النطاقين العام والمخصص ونجح smoke Production ‏6/6 بلا بيانات خاصة. حقل environment الصريح غير متاح في check؛ لا ندعيه.
 - سجلت مراجعة Product Owner النهائية المطلوبة في PO_REVIEW_QUEUE؛ الحالة ليست CLOSED. حررت Heavy. N58 متوقف YELLOW عند local-sync-pwa دون Stage E.
+
+### N58 — الزوج المصحح كشف فشلًا لاحقًا على المرشح فقط
+- تصحيح عنوان Schedule test-only وفق PM جعل baseline local-sync-pwa ينجح 4/4. المرشح فشل 3/4 في حالة offline reload عند #/settings: boot عالق بلا topbar. احتُفظ بالسجل وtrace والصورة، وثُبت تعديل الاختبار فقط في 13397b3. لا retry أو Product change.
+- توقف N58 YELLOW لحين PM؛ 65 ملف spec وStage E غير منفذة. حررت Heavy، وN53 MB01 ما زال بانتظار مراجعة PO على Production.
