@@ -145,3 +145,29 @@
 - دليل التشغيل: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T09-22-24-136Z-5d12177a-7c35-4174-b8dc-9ce1f9e62eea\` مع before/result/log/screenshots/traces. لم تبدأ ملفات الـ63 التالية أو Stage E، ولا Preview/Production أو live Supabase.
 - محاسبة manifest المصححة: 111 ملفًا = 43 ملفًا في prefix حتى initial-restore (بما فيه نجاح CORE_V2 المركب الموثق) + interaction-focus وlegacy-claim-visible-action وlocal-sync-pwa وmanual = 47 ملفًا مكتملًا + microbatch-0327 جزئي + 63 لم تبدأ. لا ملف quarantined/deferred؛ كان العدد 46 في التقرير السابق خطأ حسابيًا.
 - مطلوب PM: حسم دلالة نهاية الأسبوع في N58: هل يعدّل توقع الاختبار إلى «إجازة» وفق resolver، أم يوجد خلل Product يستلزم مسارًا آخر؟ لا تكييف آخر ولا retry ولا استمرار suffix قبل قرار محدد. N53 MB01 مستقل ويظل PO PRODUCTION REVIEW PENDING.
+## PM WATCH DECISION — 2026-10-03 13:18 +03
+### N58 microbatch-0327 — PRESERVE N06 WEEKEND UX / NARROW PRODUCT MICRO-FIX AUTHORIZED / GREEN TO RESUME
+- D-033/N06 هو عقد Product مغلق ومتحقق في Production: الجمعة/السبت يستخدمان رسالة عطلة نهاية الأسبوع الودية، بينما الإجازة الرسمية المعروفة تعرض سياقها/اسمها.
+- D-076/N58 يضيف حقيقة التقويم الرسمية وأهلية اليوم، لكنه لا يلغي D-033 ولا يصرح بتحويل weekend الافتراضي إلى واجهة «إجازة».
+- سبب الفشل الحالي واضح: resolveCalendarDate يصنف weekend الافتراضي kind=holiday/source=default، وtodayEmptyCopy يستهلك non-teaching قبل فرع weekday؛ لذلك يظهر عنوان «إجازة» بدل رسالة نهاية الأسبوع.
+- القرار: لا تغيّر الاختبار ليتوقع «إجازة». أصلح العرض فقط في N58 candidate بحيث تبقى official/custom holiday/suspension ذات أولوية وتعرض سياقها، بينما default weekend يرجع إلى N06 rest-day copy. لا تغير eligibility أو Calendar persistence أو Sync/schema.
+- هذا إصلاح حفظ-عقد قائم، وليس UX جديدًا؛ لا يحتاج Work أو PO جديدًا.
+- شغّل microbatch-0327 مرة واحدة على candidate تحت harness المحمي، ومعه اختبار/فحص resolver المستهدف المناسب. إذا 7/7 PASS ولا regression: أكمل فقط 63 spec غير المنفذة ثم Stage E. أي فشل جديد = YELLOW بلا retry.
+- التغيير المسموح: أضيق تعديل Product presentation ممكن، ويفضل في todayEmptyCopy/أولوية العرض؛ أي توسع إلى data/runtime semantics يعيد YELLOW.
+- لا Preview/Production لـN58؛ فهو HIGH-RISK ويبقى local-only حتى اكتمال الشهادة وتفويض PO الحي.
+
+### تشغيل المسارات المستقلة — تصحيح استغلال السعة
+- N53 MB01 مغلق. ابدأ N53 MB02 في Work الآن إذا كان scope MB02 موثقًا صراحة في حزمة/عقد N53؛ ابنه من current Product baseline ولا تنفذ Product transport قبل PO Work approval.
+- إذا MB02 غير معرف بدقة في المصادر، سجّل YELLOW للـPM بدل اختراع scope، ثم شغّل read-only audit مستقل منخفض المخاطر من backlog.
+- لا تترك Work idle لمجرد أن N58 YELLOW؛ Heavy Window ينسق الاختبارات فقط، ولا يمنع التحضير/التصميم الخفيف المستقل.
+
+### N58 — microbatch-0330 / N29 selector drift — YELLOW / قرار PM مطلوب
+- وفق قرار PM 13:18 +03، عُدّل عرض Home في مرشح N58 بسطر واحد فقط (`src/views/home.js`، commit `011eccf03f3a4ef0a8a68d6ac834ff8c8dfb576f`) ليحافظ على نص N06 للـdefault weekend دون تغيير resolver أو eligibility أو persistence/Sync/schema. `microbatch-0327.e2e.mjs` نجح 7/7 مرة واحدة، ودليل التشغيل في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T11-22-16-790Z-4e0887bb-d063-46bd-9496-38511639a791/` داخل worktree RAKEEZ Ops.
+- بعد التأكد من Heavy FREE وخلو المنفذ 5173، بدأ suffix غير المنفذ. أول ملف `microbatch-0330.e2e.mjs` أوقف المسار بنتيجة 5 PASS / 1 FAIL: اختبار N29 عند السطر 70 لا يجد `.welcome-option__title` داخل `[data-workspace-login]`. لا retry ولا تشغيل الملفات التالية.
+- تدقيق قراءة فقط: `src/app.js` و`src/styles/app.css` متطابقان blob بين baseline `430bc2e6` والمرشح Product `9edc4178`. `src/app.js` يحتوي زر `[data-workspace-login]` بعنصرَي `<strong>/<span>` داخل واجهة N56، بينما الاختبار يطلب `.welcome-option__title/.welcome-option__detail` من الشكل السابق. test blob يختلف بين baseline/candidate فقط في تحقق مؤشر Demo اللاحق؛ لا يكفي هذا وحده لإثبات baseline PASS أو Product regression.
+- الأدلة المحفوظة: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T11-23-05-417Z-47c68b83-255c-4cd9-8f3a-f8cda19ff61b\` وفيه before/result/log/screenshot/trace. 48 ملف spec مكتمل، microbatch-0330 جزئي، 62 لم تبدأ = 111؛ Stage E لم يبدأ. لا Preview/Production أو live Supabase لـN58.
+- مطلوب PM: حدد فحص baseline متكافئًا أو تصحيح test-only محدودًا لـN29 وفق واجهة N56 الحالية، مع الحفاظ على تغطية التسلسل/OTP/Demo. لا تعديل اختبار أو Product إضافي قبل قرار محدد.
+
+### N53 MB02 — نطاق Work غير محدد في المصادر المفحوصة — YELLOW / PM
+- بعد إغلاق MB01 باعتماد PO، فُحصت قراءةً فقط حزم `RakeezX-Work-N53-CurrentProduct-0462` و`RakeezX-Work-N53-MB01-CurrentRefresh-0464` و`RakeezX-Work-Active` مع لوحة التنفيذ والعقد. لم يظهر تعريف صريح لحدود MB02 أو freeze/manifest له. إشارات “Micro-Batch 02 0330/0331” تخص N20/N21/N29 القديمة، وليست N53 MB02.
+- مطلوب PM: تحديد مصدر scope MB02 المعتمد قبل تكليف Work أو بناء تصميم؛ لا يُخترع نطاق ولا يبدأ Product transport. N53 MB01 يبقى CLOSED. بالتوازي دُقّق N08 قراءة فقط: Product Ledger يضعه WORK APPROVED / IMPLEMENTATION NOT AUTHORIZED مع بوابة رخصة وخط PWA offline؛ لم يُغيّر خط أو أصل.

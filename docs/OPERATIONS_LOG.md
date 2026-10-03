@@ -95,3 +95,8 @@
 ### N53 MB01 — اعتماد PO النهائي والإغلاق، 2026-10-03 10:22 UTC
 - ورد اعتماد Product Owner الصريح في الرسالة `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f`: «أعتمد N53 MB01 في Production». سُجلت النتيجة CLOSED / PO PRODUCTION VERIFIED لـMB01 وحده وفق RAKEEZ_OPS_CONTRACT.md.
 - اكتمل النقل والتحقق التقني قبل الاعتماد: Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`، Cloudflare check `111130402304` SUCCESS، CSS منشور مطابق. لا إعادة نشر Product أو تكرار اختبارات. MB02 وبقية N53 خارج الاعتماد، وN58 مستقل YELLOW بانتظار PM.
+
+### N58 — نجاح إصلاح نهاية الأسبوع ثم توقف N29، 2026-10-03 11:25 UTC
+- commit Product المرشح المحلي `011eccf` غيّر شرط عرض Home بسطر واحد دون data/Sync/schema. نجح microbatch-0327 ‏7/7 مرة واحدة. بدأ suffix غير المنفذ بعد التحقق من نافذة Heavy.
+- توقف microbatch-0330 عند N29 selector drift بنتيجة 5 PASS / 1 FAIL؛ لا retry ولا استمرار 62 ملفًا أو Stage E. الأدلة في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T11-23-05-417Z-47c68b83-255c-4cd9-8f3a-f8cda19ff61b/` داخل worktree RAKEEZ Ops. أُعيد N58 YELLOW إلى PM؛ لا Preview/Production/live mutation.
+- فُحصت حزم Work N53 للبحث عن MB02 ولم يظهر scope صريح؛ رُفع YELLOW مستقل إلى PM بدل بناء تصميم تخميني. N53 MB01 يظل CLOSED. تدقيق N08 قراءة فقط أكد بوابة الرخصة وoffline PWA القائمة، بلا تعديل.

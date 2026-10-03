@@ -4,16 +4,16 @@
 هذه اللوحة تشغيلية وليست بديلًا عن Product Ledger أو Git.
 
 ## الحالة العليا
-- remote main الحالي: 179c1ad21f62bc278a5ed112e60fdde5fd4c5fc8؛ ما بعد f7199ec هو checkpoints توثيقية لـ N58/PM فقط. Product/runtime المنشور يبقى f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ N53 MB01 نقل سطرَي CSS فقط بلا Schema/Auth/Sync أو بيانات حية.
+- remote main الحالي: a1d3df294461ec777cdf59c853103d98c69fd923؛ ما بعد f7199ec هو checkpoints توثيقية لـ N58/PM وإغلاق N53 MB01 فقط. Product/runtime المنشور يبقى f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ N53 MB01 نقل سطرَي CSS فقط بلا Schema/Auth/Sync أو بيانات حية.
 - Product/runtime على main: f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ التغيير الوحيد منذ e85deb8 هو CSS N53 MB01، وعقد runtime/data السابق محفوظ.
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE؛ PM حسم فشل local-sync-pwa كدين tooling/harness بعد paired equivalence PASS/PASS، وN58 مسموح له استئناف الـ65 spec غير المنفذة فقط.
+- Heavy execution owner: FREE وفق آخر دليل مسجل؛ N58 لديه قرار PM أخضر أحدث عند 13:18 للحفاظ على N06 weekend UX بإصلاح presentation ضيق، ثم microbatch-0327 وبعده suffix المتبقي وStage E. لا يوجد دليل مكتوب أحدث على نتيجة التشغيل بعد القرار بعد.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only 13397b3؛ baseline 430bc2e | baseline local-sync-pwa مصحح 4/4، candidate مصحح 3/4 مع boot عالق بعد offline reload؛ PM يحدد فحص السبب، 65 spec وStage E لم تنفذ | لا |
+| Ko2 | N58 | GREEN TO RESUME / NOT CERTIFIED | candidate 9edc4178؛ آخر checkpoint: 47 spec مكتمل + microbatch-0327 جزئي 5/7 | طبّق فقط إصلاح presentation الضيق المعتمد لـdefault weekend، ثم microbatch-0327 مرة واحدة؛ عند 7/7 أكمل 63 spec ثم Stage E؛ أي فشل جديد يعود YELLOW بلا retry | لا |
 | Ko1 | N53 MB01 | CLOSED / PO PRODUCTION VERIFIED | Product `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`؛ Cloudflare check `111130402304`؛ PO approval `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f` ‏2026-10-03 10:22 UTC | لا عمل متبقٍ لـMB01؛ MB02 وبقية N53 مستقلان | لا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -130,3 +130,13 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - Product Owner اعتمد صراحةً النتيجة على Production برسالة `Sentinel_e66eaa90c6e48191b2c0c9aaed7ae74f`: «أعتمد N53 MB01 في Production». انتقل MB01 من PO PRODUCTION REVIEW PENDING إلى CLOSED / PO PRODUCTION VERIFIED وفق بند الإغلاق في عقد V3.
 - النشر والتحقق التقني السابقان باقيان: Product commit `f7199ec1020b92bb3664b0a9b22c8fbcce46c662`، CSS blob `439bd1f5d04c79d3d937386d2549619a6a243724`، Cloudflare check `111130402304` SUCCESS ومطابقة محتوى rakeezx.com وrakeezx.pages.dev. لم يحدث نشر Product أو اختبار ثقيل جديد لأجل الإغلاق.
 - النطاق: MB01 فقط. MB02 وN53 الأوسع وN54 وN58 لم تُغلق بهذا الاعتماد. N58 ما زال YELLOW ينتظر حسم PM لمشهدي الجمعة والسبت؛ Heavy FREE.
+
+## PM CAPACITY CORRECTION — 2026-10-03 13:18 +03
+- تبين أن التشغيل لم يستغل التوازي كاملًا: N58 توقف YELLOW عند microbatch-0327 بينما Work بقي WAITING ولم يبدأ MB02، مع Heavy Window = FREE.
+- PM حسم YELLOW: حافظ على N06 weekend UX عبر narrow presentation micro-fix في N58 candidate، ثم 7/7 microbatch → 63 specs → Stage E إن نجح.
+- بالتوازي، Work يبدأ N53 MB02 فقط إذا scope موثق؛ وإلا يرفع YELLOW للـPM ويبدأ audit مستقل آمن بدل الانتظار.
+- Product Owner action: NONE.
+
+## نقطة N58 وWork — 2026-10-03 11:25 UTC
+- إصلاح Home الضيق المصرح لـN58 (`011eccf`) اجتاز microbatch-0327 ‏7/7. بدأ suffix بعد إثبات Heavy FREE، لكن microbatch-0330 أوقف N58 YELLOW بنتيجة 5/6 عند selector قديم لـN29؛ 48 ملفًا مكتملًا + واحد جزئي + 62 لم تبدأ = 111. Stage E لم يبدأ، وHeavy عاد FREE والمنفذ 5173 خالٍ. الأدلة وسؤال PM في الطابور.
+- N53 MB01 باقٍ CLOSED / PO PRODUCTION VERIFIED. فحص حزم Work N53 لم يجد scope صريحًا لـMB02؛ رُفع YELLOW إلى PM قبل أي تصميم. تدقيق N08 مستقل للقراءة فقط أكد بقاء بوابة الترخيص/التغليف offline وعدم تفويض Product.
