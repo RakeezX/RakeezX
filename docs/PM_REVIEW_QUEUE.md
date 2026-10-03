@@ -36,3 +36,10 @@
 
 ## متى تتحول إلى RED؟
 إذا كشف التحليل قرار Product جديدًا، فرقًا بصريًا ماديًا، أو خطر data/security/live high-risk.
+
+### N58 — فشل CORE_V2 عند فتح ملف متصفح دائم — YELLOW / ينتظر PM
+- الحالة: مرشح N58 لم يعتمد؛ أوقف المسار الثقيل وحرر نافذة Heavy.
+- baseline/candidate: baseline 430bc2e6d563924aeeeff37837f1732b2cde93eb نجح initial-restore.e2e.mjs ‏5/5 في تشغيل واحد؛ candidate 9edc41788ecb4952c798131ffd8aed634e45ed08 مع test-only e97b567 فشل 1/5 في تشغيل واحد، والباقي 4/5 ناجح.
+- الدليل: tests/initial-restore.e2e.mjs blob 67eef655a23ca9d98ed4a9a3e2909f3415b9f3ec مطابق. في المرشح ظهر UnknownError: Internal error عند فتح قاعدة البيانات قبل ظهور .topbar__title في حالة CORE_V2 receipt survives a disposable browser-profile restart، line 130. سجلات وصورة وtrace محفوظة تحت artifacts/n58-calendar-client-0457-3/verification/2026-10-03T02-48-17-883Z-2532c19f-f583-48f0-bf79-1d5020c254c8/initial-restore.e2e.mjs في worktree المرشح؛ تشغيل baseline محفوظ في worktree n58-ia-corrected-baseline-0466.
+- ما لم يحدث: لا retry للمرشح، لا تعديل Product، لا Stage E ولا Preview/Production. المواصفات اللاحقة لم تنفذ.
+- قرار مطلوب من PM: تصنيف فشل قاعدة البيانات الخاص بالمرشح وخطة فحص/تصحيح محدودة قبل استئناف N58؛ لا يمد قرار Home السابق إذنا تلقائيا لتعديل اختبار الاستعادة أو Product. لا يتطلب قرار PO حاليا ما لم يفرض التحقيق تغييرا في السلوك أو النطاق أو البيانات.

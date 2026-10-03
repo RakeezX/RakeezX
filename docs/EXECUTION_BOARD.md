@@ -9,11 +9,11 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: RAKEEZ Ops / N58 paired Home Mobile spec، حجز مؤقت عند 2026-10-03 02:36 UTC. تسليم Ko2 السابق حرر النافذة؛ لا listener على 5173 قبل الحجز، ولا browser runner آخر سجل مالكيته في اللوحة. لا تُشغّل heavy مستقلًا حتى يحرر RAKEEZ Ops الحجز هنا.
+- Heavy execution owner: FREE منذ 2026-10-03 05:53 UTC؛ أوقف RAKEEZ Ops تشغيل N58 بعد فشل مرشح خاص به في اختبار الاستعادة. لا توجد جلسة اختبار ثقيلة جارية.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | PM DECIDED / GREEN TO RESUME / NOT CERTIFIED | 9edc41788ecb4952c798131ffd8aed634e45ed08؛ تصحيح OTP test-only محلي 8cc994b50bc0c24354e4929d584662a734a264e5 | تدقيق blobs Home Mobile وفق PM؛ قياس زوجي بعد تصحيح test-only إن ثبت؛ 73 spec ثم Stage E | لا |
+| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | انتظار قرار PM بشأن فشل CORE_V2 على المرشح فقط؛ 68 مواصفة لاحقة وStage E لم تنفذ | لا |
 | Ko1 | N53 MB01 | PRODUCT CANDIDATE PREPARED | branch codex/n53-mb01-product-0465 على f712e01... | ينتظر Heavy Window للتصديق ثم Preview داخلي ثم Production وفق V3 | لا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -56,3 +56,9 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - N49 Offline Lease: high-risk architecture audit.
 - OTP Product-entry CSS: منفصل، يحتاج disposition/PO عند إعادته.
 - N23/N24 Reports: LAST.
+
+## نقطة N58 الجديدة — 2026-10-03 05:53 UTC
+- نجحت تصحيحات الاختبار فقط لـ Email OTP وHome Mobile وIA cleanup في خط الأساس والمرشح: 2/2 و3/3 و12/12. لم يتغير أي ملف Product في هذه التصحيحات.
+- بعد استئناف المواصفات المتبقية، نجح initial-restore-failure (1/1)، وفشل initial-restore (4/5) على المرشح عند أول فتح لملف متصفح دائم: UnknownError: Internal error أثناء فتح قاعدة البيانات، ولم تظهر .topbar__title. ملف الاختبار نفسه مطابق في Git بين baseline وcandidate (blob 67eef655a23ca9d98ed4a9a3e2909f3415b9f3ec).
+- تشغيل baseline واحد لنفس initial-restore نجح 5/5. الأثر محفوظ في artifacts/n58-calendar-client-0457-3/verification داخل worktree المرشح وworktree baseline. لا إعادة للمحاولة ولا تعديل Product؛ N58 متوقف YELLOW لحين قرار PM.
+- نافذة Heavy محررة الآن. N53 مستقل ويمكنه استخدام النافذة بعد التحقق من الحالة الأحدث وعدم وجود مالك آخر.

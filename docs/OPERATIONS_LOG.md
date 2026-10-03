@@ -56,3 +56,8 @@
 ### N58 — تدقيق Home Mobile قبل القياس الزوجي
 - Git blobs لملف الاختبار وملفات رسم Home المرتبطة مباشرة (`src/app.js` و`src/views/home.js` و`src/styles/components.css` و`src/lib/display-identity.js` و`src/lib/account-profile.js`) متطابقة بين baseline `430bc2e6` والمرشح `9edc4178`. الملف القديم يطلب صنف زر لا يصدره Product N41 المغلق؛ الفشل الثلاثي نفسه ظهر على النسختين.
 - جُهز تصحيح test-only في worktrees معزولة يحافظ على تحقق الحالة والمقاسات والوصول وفتح Mini Hub، ويستبدل توقع الاسم الظاهر في الزر بهوية N41 الحالية في aria-label والتحية. ملف الاختبار المصحح متطابق بايتًا على baseline والمرشح؛ لم يتغير Product. حُجزت النافذة الثقيلة مؤقتًا في اللوحة للقياس الزوجي مرة واحدة لكل نسخة.
+
+### N58 — توقف جديد في الاستعادة وفتح مسار N53 المستقل
+- أثبتت تصحيحات test-only الثلاثة عبور baseline والمرشح: OTP ‏2/2، Home ‏3/3، IA ‏12/12. التغييرات محصورة في tests؛ commits 8cc994b و9c423a4 وe97b567 في worktree معزول.
+- في متابعة المواصفات، نجح initial-restore-failure ‏1/1 ثم فشل initial-restore ‏1/5 على المرشح بسبب UnknownError أثناء فتح قاعدة البيانات في browser-profile restart. تشغيل baseline واحد لنفس المواصفة نجح 5/5، مع تطابق blob الاختبار. سُجل YELLOW في PM_REVIEW_QUEUE؛ المرشح NOT CERTIFIED وStage E NOT RUN.
+- حرر RAKEEZ Ops نافذة Heavy بعد توقف N58. الدليل محفوظ ولم تتغير ملفات Ko2 الأصلية أو بيانات Supabase الحية.
