@@ -128,3 +128,20 @@
 - دليل التشغيل: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T07-22-25-213Z-fd1b4aed-f3ce-4985-adca-a6ba5d9326ae\`، وفيه before/result/log/screenshots/traces محفوظة. `tests/microbatch-0327.e2e.mjs` يختلف بين baseline وcandidate في مداخل Demo فقط، والتوقعات نفسها. `src/views/home.js` و`src/app.js` متطابقان؛ `src/lib/db.js` مختلف، ولا يثبت ذلك وحده سبب الفشل.
 - التقدم: 46 ملف spec مكتمل (45 سابقًا + manual)، microbatch-0327 جزئي 4/7، و63 ملفًا لم يبدأ؛ Stage E لم يُشغّل. النافذة الثقيلة أُطلقت والمنفذ 5173 خالٍ. لا Preview/Production ولا تعديل Product.
 - مطلوب PM: حدد فحص baseline/candidate متكافئًا أو مراجعة مصدر/trace محدودة لتصنيف الفرق. لا تُستأنف الملفات الـ63 أو Stage E ولا يُعدَّل `src/` قبل القرار. يستمر مسار N53 MB01 مستقلًا بانتظار مراجعة PO على Production.
+## PM WATCH DECISION — 2026-10-03 11:27 +03
+### N58 microbatch-0327 — EXPECTED N58 CONTRACT DELTA / TEST-ONLY ADAPTATION / GREEN TO RESUME
+- تدقيق القراءة فقط يثبت أن Home/App لم يتغيرا بين baseline والمرشح، بينما N58 يضيف الإسقاط الفعّال للتقويم الرسمي ويجعل preset المختار مصدر الحقيقة للأيام الرسمية.
+- D-076 البند 3 معتمد صراحة: الـpreset المختار يتحكم في الإجازات الرسمية وأيام التدريس/عدم التدريس. والكتالوج الحالي يعرّف إجازة اليوم الوطني من 2026-09-23 إلى 2026-09-26 بعنوان «إجازة اليوم الوطني».
+- لذلك ظهور «إجازة اليوم الوطني» في 23 و25 و26 سبتمبر على المرشح هو السلوك المستهدف لـN58، وليس regression. baseline لا يملك الإسقاط نفسه، لذا لا يُطلب تطابق semantic لهذه assertions الثلاثة.
+- القرار: تصحيح test-only ضيق في tests/microbatch-0327.e2e.mjs فقط: غيّر friday إلى 2026-10-02 وsaturday إلى 2026-10-03، وأبقِ holiday على 2026-09-23 مع العنوان المتوقع «إجازة اليوم الوطني».
+- لا تستخدم حقن calendarDays الخام لصناعة holiday في هذا المشهد؛ دع selected official preset يقدّم اليوم الرسمي. حافظ على بقية فحوص النص/الرابط/RTL/geometry كما هي.
+- شغّل microbatch-0327.e2e.mjs مرة واحدة فقط على candidate تحت نفس harness القصير والمحمي. إذا 7/7 PASS: استأنف فقط 63 ملف spec غير المنفذة ثم Stage E، بلا إعادة PASS السابق. إذا ظهر فشل جديد: YELLOW عند أول فشل، evidence بلا retry.
+- ممنوع أي تغيير Product/runtime بسبب هذا الاختبار. لا يحتاج PO.
+
+### N58 — تكييف microbatch-0327 وفق قرار 11:27 +03 — YELLOW / قرار PM مطلوب
+- نُفذ التكييف test-only في `tests/microbatch-0327.e2e.mjs` بثلاثة أسطر فقط: الجمعة `2026-10-02`، السبت `2026-10-03`، وعنوان holiday في `2026-09-23` صار «إجازة اليوم الوطني». لم يتغير `src/`، commit المعزول `cae824454fed179073fcf1ba71371292ac79c243`.
+- ثبتت النافذة الثقيلة FREE والمنفذ 5173 خاليًا، ثم شُغّل الملف مرة واحدة بنفس runner المحروس. النتيجة 5 PASS / 2 FAIL: مشهد holiday نجح، لكن الجمعة والسبت يعرضان العنوان «إجازة» بينما توقع الاختبار «لا توجد لديك حصص اليوم». لم تُعد المحاولة.
+- التدقيق المصدرِي للقراءة فقط: `src/lib/calendar-presets.js` لا يدرج 02 أو 03 أكتوبر ضمن إجازة اليوم الوطني (تنتهي 26 سبتمبر)، لكن `src/lib/calendar-runtime.js:resolveCalendarDate` يصنف نهاية الأسبوع الافتراضية `holiday` مع label فارغ؛ و`src/views/home.js:todayEmptyCopy` يعرض بطاقة `calendarDay` غير الدراسي قبل فرع نهاية الأسبوع. هذا يفسر عنوان «إجازة» في candidate ولا يقرر وحده إن كان العرض هو العقد المطلوب.
+- دليل التشغيل: `C:\Users\Abody\Documents\Codex\2026-10-03\task-2\rakeezx-v3\n58-otp-fix\artifacts\n58-calendar-client-0457-3\verification\2026-10-03T09-22-24-136Z-5d12177a-7c35-4174-b8dc-9ce1f9e62eea\` مع before/result/log/screenshots/traces. لم تبدأ ملفات الـ63 التالية أو Stage E، ولا Preview/Production أو live Supabase.
+- محاسبة manifest المصححة: 111 ملفًا = 43 ملفًا في prefix حتى initial-restore (بما فيه نجاح CORE_V2 المركب الموثق) + interaction-focus وlegacy-claim-visible-action وlocal-sync-pwa وmanual = 47 ملفًا مكتملًا + microbatch-0327 جزئي + 63 لم تبدأ. لا ملف quarantined/deferred؛ كان العدد 46 في التقرير السابق خطأ حسابيًا.
+- مطلوب PM: حسم دلالة نهاية الأسبوع في N58: هل يعدّل توقع الاختبار إلى «إجازة» وفق resolver، أم يوجد خلل Product يستلزم مسارًا آخر؟ لا تكييف آخر ولا retry ولا استمرار suffix قبل قرار محدد. N53 MB01 مستقل ويظل PO PRODUCTION REVIEW PENDING.

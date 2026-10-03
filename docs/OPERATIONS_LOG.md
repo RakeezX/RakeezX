@@ -87,3 +87,7 @@
 - استُخدم قرار PM الجديد لاستكمال suffix البالغ 65 ملفًا بعد local-sync-pwa. أثبتت اللوحة FREE وخلو 5173. commit الأداة test-only `9f33253` حافظ على أدلة Playwright واستعاد فصل Vite كعملية مستقلة.
 - أول ملف `manual.e2e.mjs` PASS 3/3. الثاني `microbatch-0327.e2e.mjs` سجل 4 PASS و3 FAIL في مشاهد N06 friday/saturday/holiday عند عنوان بطاقة اليوم. حُفظت screenshots/traces/logs/result في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T07-22-25-213Z-fd1b4aed-f3ce-4985-adca-a6ba5d9326ae/` داخل worktree RAKEEZ Ops. لم تُعد المحاولة.
 - عُزل N58 كـ YELLOW ورفع سؤال PM مع الفروق المصدرية دون نسبة السبب إلى Product. 63 ملفًا وStage E لم يبدأوا. لم يتغير `src/`، ولا Preview/Production أو live Supabase. N53 MB01 ينتظر مراجعة PO على Production.
+### N58 — إخفاق نهاية الأسبوع بعد تكييف microbatch-0327، 2026-10-03 09:24 UTC
+- طبق RAKEEZ Ops قرار PM 11:27 +03 كتعديل test-only بثلاثة أسطر (`cae8244`). شُغّل الملف مرة واحدة تحت نافذة ثقيلة خالية وrunner محروس: 5 PASS / 2 FAIL، نجح holiday وفشلت الجمعة والسبت عند عنوان «إجازة» المتوقع لهما «لا توجد لديك حصص اليوم».
+- حُفظت before/result/log/screenshots/traces في `artifacts/n58-calendar-client-0457-3/verification/2026-10-03T09-22-24-136Z-5d12177a-7c35-4174-b8dc-9ce1f9e62eea/` داخل worktree RAKEEZ Ops. تدقيق مصدر للقراءة فقط وجد تصنيف weekend الافتراضي holiday قبل عرض Home؛ رُفع حسم الدلالة إلى PM، ولم يُعد الاختبار.
+- العدد الصحيح من manifest: 47 مكتمل + ملف جزئي + 63 غير منفذ = 111. Stage E لم يبدأ. لا Product أو live mutation، وN53 MB01 ما زال بانتظار PO على Production.

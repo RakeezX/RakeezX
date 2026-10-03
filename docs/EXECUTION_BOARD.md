@@ -116,3 +116,12 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - `manual.e2e.mjs` 3/3 PASS؛ `microbatch-0327.e2e.mjs` 4/7 مع 3 إخفاقات في عناوين N06. توقف المسار YELLOW دون retry. 46 spec مكتمل، ملف واحد جزئي، 63 لم تبدأ، Stage E لم يُشغّل.
 - Heavy execution owner: FREE بعد توقف runner؛ المنفذ 5173 خالٍ. N53 MB01: PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING، وليس CLOSED.
 - القرار التالي: PM يفصل الفشل بمقارنة baseline/candidate أو تدقيق محدود. دليل التشغيل في طابور PM، ولا تغييرات Product أو live.
+## PM WATCH CHECKPOINT — 2026-10-03 11:27 +03
+- N58 microbatch-0327: PM DECIDED / GREEN TO RESUME كتكييف test-only لعقد D-076؛ تواريخ weekend القديمة كانت داخل نطاق إجازة اليوم الوطني الرسمية في N58.
+- المطلوب: تصحيح الاختبار فقط ثم تشغيله مرة على candidate؛ 7/7 يسمح باستكمال 63 spec المتبقية ثم Stage E. لا Product change ولا retry.
+- N53 MB01 يبقى PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING؛ لا تغيير في طلب PO الحالي.
+
+## نقطة N58 — 2026-10-03 09:24 UTC
+- تكييف الاختبار المصرح لـ microbatch-0327 في commit `cae8244` أنتج 5/7؛ نجح holiday، وفشل friday/saturday بعرض «إجازة» بعد نقلهما إلى 02/03 أكتوبر. أوقف المسار YELLOW بلا إعادة، وحفظت الأدلة في طابور PM.
+- manifest: 111 = 47 ملفًا مكتملًا + microbatch-0327 جزئي + 63 لم تبدأ؛ لا ملف مستبعد. Stage E لم يُشغّل. Heavy execution owner: FREE، والمنفذ 5173 خالٍ.
+- N53 MB01: PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING، وليس CLOSED. لا تغيير Product أو live في N58.
