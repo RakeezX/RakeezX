@@ -92,3 +92,14 @@
 
 ### N53 MB01 — حسم PM ونقل V3 مكتمل تقنيًا
 - طبق RAKEEZ Ops قرار PM 06:33 على رقعة MB01 فقط؛ أعيد بناء المرشح من main الحالي مع تطابق CSS الأساسي وFreeze، ثم نجحت بوابات الشجرة وPreview. انتقل CSS المحدد إلى main ‏f7199ec fast-forward، وأكد Cloudflare check والـ CSS المنشور وsmoke المقيد محتوى Production. التذكرة الآن PO PRODUCTION REVIEW PENDING وليست CLOSED؛ لا سلطة لـ MB02 أو باقي N53. N58 local-sync-pwa يبقى YELLOW منفصلًا.
+
+## PM WATCH DECISION — 2026-10-03 08:15 +03
+### N58 local-sync-pwa — BASELINE TEST DEBT CONFIRMED / GREEN TO RESUME
+- PM شغّل `local-sync-pwa.e2e.mjs` مرة واحدة فقط على exact baseline `430bc2e6d563924aeeeff37837f1732b2cde93eb` من worktree `D:\Abdullah Projects\RakeezX\worktrees\n58-performance-baseline-0457-3`.
+- النتيجة baseline: 3 PASS / 1 FAIL، والفشل نفسه تمامًا في الحالة `one online load precaches every lazy route and supports offline reload and reopen` عند line 462: التوقع `أوقات الحصص` بينما `.topbar__title` يعرض `الجدول` على `#/schedule/times`.
+- source audit: `tests/local-sync-pwa.e2e.mjs` و`src/app.js` و`src/views/schedule.js` و`src/styles/schedule-work-integration.css` متطابقة بين baseline والمرشح. كذلك `src/views/times.js` في baseline يعرّف صراحة `title: () => 'الجدول'`، لذلك التوقع القديم ليس عقد Product الحالي.
+- التصنيف: BASELINE / TEST DEBT، وليس N58 Product regression.
+- القرار: مسموح تصحيح test-only ضيق في `OFFLINE_ROUTE_MATRIX` لتوقع `الجدول` لمسار `#/schedule/times` فقط، مع إبقاء فحوص URL/offline/toast وبقية مصفوفة المسارات كما هي. ممنوع أي تعديل `src/` أو behavior أو scope.
+- بعد التصحيح: شغّل الملف المصحح مرة واحدة على baseline ومرة واحدة على candidate، بلا retry. PASS/PASS => استأنف فقط 65 spec غير المنفذة ثم Stage E دون إعادة PASS السابقة. baseline PASS/candidate FAIL => YELLOW جديد وتحليل read-only فقط.
+- ملاحظة تشغيلية: محاولة PM الأولى مررت مسار `tests/...` إلى runner فأنهى `No tests found` قبل تشغيل أي test؛ القياس المعتمد هو التشغيل الصحيح اللاحق باسم الملف فقط.
+- لا يحتاج PO لهذه الحالة.

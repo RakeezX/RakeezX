@@ -9,11 +9,11 @@
 - Cloudflare Pages deployment المرصود بعد دفع main: 842cff93-1608-4f9c-bc00-0acd200ffc0c؛ check 111130402304 SUCCESS للـ SHA الكامل، وبيئة Production غير مسماة صراحة في واجهة check.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE منذ 2026-10-03 04:46 UTC؛ اكتمل فحص N53 والنشر والمشاهدة المقيدة، ولا runner على 5173.
+- Heavy execution owner: RAKEEZ Ops / N58 corrected local-sync-pwa pair منذ 2026-10-03 05:22 UTC؛ baseline ثم candidate مرة واحدة، ولا runner آخر على 5173.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only 70bb7fa؛ baseline 430bc2e | فشل local-sync-pwa في 1/4؛ PM يحدد تصنيفًا وخطوة مكافئة؛ 65 ملف spec لاحق لم يبدأ وStage E لم ينفذ | لا |
+| Ko2 | N58 | PM DECIDED / GREEN TO RESUME | candidate 9edc4178 + test-only 70bb7fa؛ baseline 430bc2e | ثبت نفس فشل local-sync-pwa على baseline؛ تصحيح اختبار فقط ثم قياس baseline/candidate مرة لكل طرف، وبعد النجاح يكمل 65 spec وStage E | لا |
 | Ko1 | N53 MB01 | PRODUCTION CONTENT VERIFIED / PO REVIEW PENDING | f7199ec1020b92bb3664b0a9b22c8fbcce46c662؛ Cloudflare check 111130402304؛ Preview 7e144d3c | مراجعة PO للسطحين على Production؛ لا CLOSED قبل التحقق الصريح | نعم، مراجعة النتيجة النهائية |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
