@@ -9,7 +9,7 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: FREE منذ 2026-10-03 04:34 UTC؛ توقف N58 عند فشل جديد في local-sync-pwa بعد نجاح فحص الاستعادة المزدوج، ولا runner على 5173.
+- Heavy execution owner: RAKEEZ Ops / N53 MB01 rebuild منذ 2026-10-03 04:37 UTC؛ نافذة واحدة لفحوص الشجرة الحالية وPreview بعد توقف N58، ولا runner آخر على 5173.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
