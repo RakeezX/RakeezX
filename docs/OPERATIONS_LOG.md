@@ -43,3 +43,7 @@
 ### N53 MB01 — تدقيق مستقل للمرشح فقط
 - فُحص worktree Ko1 قراءة فقط: HEAD ما زال `f712e01d1540660559aa574dc975fd8cc0235ef2`، والتعديل tracked الوحيد غير الملتزم به في `src/styles/components.css` يحذف سطري `max-height: 240px` و`overflow-y: auto` من `.share-preview-box`.
 - patch Work Freeze SHA-256 هو `95a80ed3bbbb09bc330fa53857fe7b506cf30d707f02fb2138078c5dad2bad98`، ومحتواه النصي يطابق diff المرشح. لم تُجرَ شهادة جديدة ولا Preview أو Production؛ remote main والنافذة الثقيلة غير متحققين. لا يحتاج PO الآن.
+
+### تحديث PM وتشخيص Git — متابعة GREEN
+- أعاد RAKEEZ Ops قراءة قرار PM الجديد؛ N58 Home يجوز استئنافه بعد تدقيق تطابق blobs وتصحيح test-only ضيق إذا ثبت دين الاختبار على baseline. بقيت 73 spec وStage E غير منفذة؛ لا يحتاج PO الآن.
+- نجح `git ls-remote` من Git CLI المحلي وأثبت أن remote main `f712e01d1540660559aa574dc975fd8cc0235ef2`. كشف فحص diff قبل الدفع أن فرع الوثائق الأول بُني خطأً من tracking ref محلي قديم؛ لم يحدث push. أُنشئ worktree معزول جديد مباشرة من SHA البعيد، وحُفظ الفرع الأول كدليل. العمل الحالي docs-only، والجذر وcredentials لم يُمسا. لم يتحقق skipped build أو مزامنة canonical docs بعد.

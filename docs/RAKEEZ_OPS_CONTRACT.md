@@ -80,5 +80,7 @@ Supabase/schema/RLS/migrations، Auth/provisioning، Owner Guard، Sync architec
 - لا clean/reset/delete للجذر التاريخي أو evidence.
 - لا whole-branch Work → Production؛ exact accepted diff فقط.
 - بعد كل milestone مادي: حدّث EXECUTION_BOARD وOPERATIONS_LOG بالعربي.
+- في بداية كل دورة تشغيل، وبعد تسجيل أي YELLOW، أعد قراءة PM_REVIEW_QUEUE.md قبل الانتظار؛ إذا وجد قرار PM أحدث فطبقه واستأنف lane وفقه.
+- أعد قراءة PO_REVIEW_QUEUE.md فقط لمعرفة ما ينتظر PO؛ لا تعتبر غياب PO سببًا لإيقاف GREEN lanes الأخرى.
 - أي شيء يحتاج PO يضاف إلى PO_REVIEW_QUEUE بخطوات تجربة واضحة وعبارة اعتماد مقترحة.
 - لا تعتبر User-visible ticket CLOSED قبل PO Production verification.
