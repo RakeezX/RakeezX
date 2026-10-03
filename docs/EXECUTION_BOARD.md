@@ -9,11 +9,11 @@
 - Production deployment الحالي: 8561963c-12cc-4139-8af7-63932ca25441.
 - N34: PO PRODUCTION VERIFIED / CLOSED.
 - Attendance 0456: OPEN / NON-BLOCKING follow-up.
-- Heavy execution owner: RAKEEZ Ops / N58 paired tooling-equivalence diagnostic منذ 2026-10-03 04:23 UTC؛ حجز مؤقت لفحص الحالة الفاشلة مرة واحدة على baseline ومرة على candidate بمسارين متساويين. لا runner آخر على 5173 قبل الحجز.
+- Heavy execution owner: FREE منذ 2026-10-03 04:34 UTC؛ توقف N58 عند فشل جديد في local-sync-pwa بعد نجاح فحص الاستعادة المزدوج، ولا runner على 5173.
 
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
-| Ko2 | N58 | PM DECIDED / GREEN DIAGNOSTIC / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | نفّذ paired tooling-equivalence diagnostic واحدًا لحالة CORE_V2 وفق PM_REVIEW_QUEUE؛ لا Product change؛ ثم اتبع قواعد PASS/FAIL المنشورة | لا |
+| Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only 70bb7fa؛ baseline 430bc2e | فشل local-sync-pwa في 1/4؛ PM يحدد تصنيفًا وخطوة مكافئة؛ 65 ملف spec لاحق لم يبدأ وStage E لم ينفذ | لا |
 | Ko1 | N53 MB01 | PREVIEW VERIFIED / PRODUCT PROMOTION HOLD | branch codex/n53-mb01-ops-0466 عند 6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Preview 4abc5d8a | PM يوفق سجل الاعتماد القديم مع Freeze الحالي ويحدد سلطة Product قبل main/Production؛ لا CLOSED | ليس الآن؛ PM أولًا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
@@ -88,3 +88,8 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - remote main تحقق عند `13de11b6e467ccaf275276c348ed275b7df183ed`; Product/runtime لم يتغير.
 - Cloudflare skipped-build proof يبقى غير مثبت لكنه NON-BLOCKING ولا يغير هوية Product release.
 - Product Owner action: NONE.
+
+## نقطة N58 الثانية — 2026-10-03 04:34 UTC
+- وفق قرار PM 06:33، استعمل RAKEEZ Ops worktrees قصيرة متساوية الطول في Temp مع bytes مطابقة لـ playwright.config.js وplaywright-output-safety.mjs وrunner تشخيصي، وNode/Chromium والبيئة نفسها. حالة CORE_V2 الدائمة فشلت على baseline والمرشح بخطأ IndexedDB نفسه؛ profile تحت output root بطول 207 يصل مسار LevelDB إلى 263+. تصحيح test-only ضيق استخدم mkdtemp داخل testInfo.project.outputDir؛ نجحت الحالة 1/1 على baseline و1/1 على المرشح بلا Product change. الأثر في handoff/n58-paired-proof داخل workspace RAKEEZ Ops؛ commit المرشح test-only ‏70bb7fa.
+- استؤنفت الملفات غير المنفذة فقط: interaction-focus ‏1/1 وlegacy-claim-visible-action ‏2/2 PASS؛ local-sync-pwa ‏3/4 ثم FAIL لأن الاختبار توقع عنوان أوقات الحصص بينما عرض التطبيق الجدول عند مسار schedule/times دون اتصال. test blob ‏2387a41a9e9b772507ed4f90beb55a5acdb805ef متطابق baseline/candidate؛ app.js وschedule.js وCSS Schedule لم تتغير بينهما. الأثر محفوظ في verification/2026-10-03T04-31-07-960Z-6388f443-f585-4328-9f93-7ca5d93390cc.
+- من 111 ملف spec: 42 مكتملًا سابقًا، initial-restore مغطى بـ 4 حالات ناجحة سابقًا والحالة الخامسة نجحت في proof مصحح على الطرفين، وملفان لاحقان PASS؛ local-sync-pwa غير مكتمل (3 PASS/1 FAIL)، و65 ملفًا بعده لم يبدأ. Stage E لم ينفذ. توقف N58 YELLOW وحررت Heavy؛ N53 مستقل GREEN وفق قرار PM.
