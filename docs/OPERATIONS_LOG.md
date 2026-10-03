@@ -39,3 +39,7 @@
 ### N58 — إثبات دين اختبار جديد وإيقاف محدد
 - في worktree معزول، صُحح اختبار Email OTP فقط ليستخدم زرّي N56 «متابعة» و«تحقق» وينتظر إعادة تحميل الصفحة بعد نجاح OTP. فشل انتقال الصفحة على baseline والمرشح قبل تصحيح الانتظار، ثم نجح السيناريوهان 2/2 على كل منهما بملف اختبار متطابق. حُفظ patch والقياسات؛ commit الاختبار المحلي `8cc994b` لم يُنقل إلى worktree Ko2 الأصلي.
 - من 80 spec المتبقية، اجتازت ستة ملفات متتابعة، ثم فشل `home-mobile-account.e2e.mjs` بحالاته الثلاث على baseline والمرشح بنفس توقع صنف Home قديم. بقيت 73 spec وStage E غير منفذة. الحالة: YELLOW / NOT CERTIFIED؛ يحتاج PM لتحديد تصحيح تغطية test-only محافظ على عقد UX، ولا يحتاج PO الآن.
+
+### N53 MB01 — تدقيق مستقل للمرشح فقط
+- فُحص worktree Ko1 قراءة فقط: HEAD ما زال `f712e01d1540660559aa574dc975fd8cc0235ef2`، والتعديل tracked الوحيد غير الملتزم به في `src/styles/components.css` يحذف سطري `max-height: 240px` و`overflow-y: auto` من `.share-preview-box`.
+- patch Work Freeze SHA-256 هو `95a80ed3bbbb09bc330fa53857fe7b506cf30d707f02fb2138078c5dad2bad98`، ومحتواه النصي يطابق diff المرشح. لم تُجرَ شهادة جديدة ولا Preview أو Production؛ remote main والنافذة الثقيلة غير متحققين. لا يحتاج PO الآن.
