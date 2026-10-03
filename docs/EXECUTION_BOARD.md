@@ -14,7 +14,7 @@
 | Lane | التذكرة | الحالة | المرجع الدقيق | الخطوة التالية | يحتاج PO الآن؟ |
 |---|---|---|---|---|---|
 | Ko2 | N58 | YELLOW / NOT CERTIFIED | candidate 9edc4178 + test-only e97b567؛ baseline 430bc2e | انتظار قرار PM بشأن فشل CORE_V2 على المرشح فقط؛ 68 مواصفة لاحقة وStage E لم تنفذ | لا |
-| Ko1 | N53 MB01 | PREVIEW VERIFIED / PRODUCT PROMOTION HOLD | branch codex/n53-mb01-ops-0466 عند 6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Preview 4abc5d8a | حل تعارض تفويض Product في Work Approval Ledger قبل main/Production؛ لا CLOSED | نعم إذا لم توجد سلطة Product أحدث موثقة |
+| Ko1 | N53 MB01 | PREVIEW VERIFIED / PRODUCT PROMOTION HOLD | branch codex/n53-mb01-ops-0466 عند 6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Preview 4abc5d8a | PM يوفق سجل الاعتماد القديم مع Freeze الحالي ويحدد سلطة Product قبل main/Production؛ لا CLOSED | ليس الآن؛ PM أولًا |
 | Work | N53 | WAITING | Freeze MB01 مكتمل؛ MB02 لم يبدأ | بعد تحرك main/إنهاء MB01 يبدأ MB02 كتصميم جديد | لاحقًا عند عرض MB02 |
 | Work/Product | N54 | BLOCKED | الحل السابق مرفوض على iPhone الحقيقي | redesign جديد لاحقًا | نعم عند وجود تصميم جديد |
 ## N58 — التفاصيل الحالية
@@ -68,3 +68,9 @@ C:\Users\Abody\.codex\worktrees\n53-mb01-product-0465\RakeezX
 - تحقق Work السابق: goldens ‏12/12 pixel+geometry، Chromium ‏16/16، WebKit ‏8/8؛ تحققت hashes الرقعة والمقارنة وأدلة المتصفح. بناء Product نجح؛ اختبارا print-reports ‏5/5 وstudent-continuous-history ‏1/1؛ Preview Cloudflare check 111114370226 ناجح للـ SHA نفسه، ورابط النسخة https://4abc5d8a.rakeezx.pages.dev. ملف CSS المنشور يطابق Git blob ‏439bd1f5d04c79d3d937386d2549619a6a243724؛ smoke CSS ‏6/6 عبر 320/390/1440 وlight/dark مع RTL.
 - HOLD: docs/WORK_APPROVAL_LEDGER.md وWA-N53-N54-0434.md يذكران N53 NOT_AUTHORIZED دون Product ticket مستقل؛ Freeze 0462.1/0464 يذكر PO WORK-LOCAL APPROVED وREADY FOR SELECTIVE PRODUCT TRANSPORT. لم يُثبت تفويض Product مستقلا أو تحديث ledger. لا push لمرشح N53 إلى main ولا Production. راجع PM_REVIEW_QUEUE وPO_REVIEW_QUEUE.
 - نافذة Heavy محررة؛ N58 ما زال YELLOW مستقلا.
+
+## تدقيق القرار والمواصفات — 2026-10-03 03:22 UTC
+- آخر قراءة للحزمة والنسخة canonical من PM_REVIEW_QUEUE وEXECUTION_BOARD وRAKEEZ_OPS_CONTRACT: لا قرار PM أحدث لـ N58 initial-restore أو N53 MB01. الحزمة PM آخر تعديل 02:19 UTC، والنسخة canonical بعد checkpoint 03:16 UTC؛ العقد متطابق مضمونا.
+- N58: من 111 **ملف مواصفة**، 42 ملفا مكتملًا، الملف 43 initial-restore فيه 4 حالات PASS و1 FAIL، ثم 68 ملفًا لم يبدأ. لا تخلط ملفات المواصفات بحالات الاختبار. لا runner يعمل ولا listener على 5173.
+- N58 read-only: ملف اختبار الاستعادة blob مطابق، لكن runner المرشح يغير مسار إخراج Playwright؛ طول ملف المتصفح الدائم 238 حرفًا مقابل 186 في baseline، وDefault/Cookies في المرشح 254. هذا احتمال tooling فقط، يحتاج فحص PM مكافئ قبل إعادة التشغيل. ملخص إعادة الإنتاج: handoff/N58_INITIAL_RESTORE_REPRO.md في workspace RAKEEZ Ops.
+- N53: تعارض سجل اعتماد قديم مقابل Freeze حديث يبقى في PM أولا؛ PO فقط إن أكد PM غياب Product authority. لا ترقية Product أثناء التحقق.

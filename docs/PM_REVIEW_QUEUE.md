@@ -48,3 +48,7 @@
 - فرع النقل الانتقائي 6fe3de7 وPreview الفني نجحا؛ لم يتحرك main Product. Work Freeze 0462.1 و0464 يقول PO WORK-LOCAL APPROVED وREADY FOR SELECTIVE PRODUCT TRANSPORT، بينما canonical WORK_APPROVAL_LEDGER وWA-N53-N54-0434 يقولان N53 NOT_AUTHORIZED دون Product ticket مستقل.
 - المطلوب من PM: تحديد التذكرة/القرار الأحدث الذي يمنح سلطة Product لـ MB01، أو تأكيد عدم وجوده وإحالة طلب التفويض المحدد إلى PO. حتى تتضح السلطة يتوقف دفع CSS إلى main؛ يستمر العمل المستقل.
 - الدليل: branch codex/n53-mb01-ops-0466 ‏6fe3de7850ada6169a678b02d1907dc9f89ef457؛ Cloudflare Preview check 111114370226 ناجح، 6/6 CSS smoke، Work 12/12 golden و24/24 browser، Product build و6/6 browser مجاور.
+
+### تحديث دليل N58 وN53 — 2026-10-03 03:22 UTC
+- N58: الملف 43 من 111 ملف مواصفة، 42 قبله اكتملت، 68 بعده لم تبدأ؛ الملف الفاشل نفسه 4/5 حالات اختبار. اختبار initial-restore blob مطابق؛ runner المرشح مختلف عن baseline في scripts/e2e-runner.mjs وplaywright.config.js وscripts/playwright-output-safety.mjs. مسار persistent browser profile المرشح 238 حرفًا مقابل baseline 186؛ Default/Cookies يصل 254. احتمال Windows path/IndexedDB tooling غير مثبت. src/lib/db.js تغيّر أيضًا، لكن diff يخص writeAll لا openDB. يلزم PM اختيار مقارنة مكافئة/فحص واحد محدد دون إعادة الناجح أو نسبة الفشل إلى Product. الدليل المفصل في handoff/N58_INITIAL_RESTORE_REPRO.md في workspace RAKEEZ Ops.
+- N53: التباس تفويض Product قد يكون سجل WA-N53-N54-0434 أقدم من Freeze MB01 0462.1/0464؛ PM يحسم مرجع السلطة أولًا. لا طلب PO مستقل الآن، ولا ترقية main/Production. إن أكد PM غياب تفويض Product، ينقل سؤالا محددا إلى PO.

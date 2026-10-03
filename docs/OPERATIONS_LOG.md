@@ -66,3 +66,7 @@
 - أُعيد التحقق من رقعة Work 0464 ومصادرها، ونُقلت إلى worktree مستقل دون تعديل Ko1. commit 6fe3de7 حذف تصريحَي CSS فقط. نجح البناء وفحوص المتصفح المجاورة 5/5 و1/1؛ نجح Cloudflare Preview للـ SHA نفسه، والـ CSS المنشور مطابق، وsmoke العرض 6/6.
 - عند مراجعة شرط التفويض في Release Checklist ظهر تعارض مع WORK_APPROVAL_LEDGER/WA-N53-N54-0434: N53 NOT_AUTHORIZED دون Product ticket مستقل، في حين Freeze الجديد Work-local approved. سُجل في PM وPO queue، ولم يُدفع Product إلى main. حررت نافذة Heavy. الحالة: PREVIEW VERIFIED / PRODUCT PROMOTION HOLD، وليست CLOSED.
 - تصحيح زمني: توقيتا N58 وبدء N53 في checkpoint السابق عُرضا خطأ كـ 05:53 و05:57 UTC؛ الصحيح تقريبا 02:53 و03:00 UTC، وصححت اللوحة الحالية.
+
+### تدقيق PM وتحديد إعادة إنتاج N58
+- أعيدت قراءة الحزمة وcanonical عند 03:22 UTC؛ لا قرار أحدث. أثبت العد: 42 ملف spec مكتمل، الملف 43 فيه 4 PASS/1 FAIL، 68 ملفا لم يبدأ. احتفظت بملف دليل مستقل لإعادة الإنتاج، دون تشغيل جديد.
+- كشف تدقيق runner فرق طول مسار persistent profile ‏238 مقابل 186 حرفا بين المرشح وخط الأساس؛ فرضية tooling لا تثبت السبب. نُقلت مسألة N53 من طلب PO مبدئي إلى PM أولًا لتمييز سجل قديم من غياب سلطة Product؛ لا Production push.
