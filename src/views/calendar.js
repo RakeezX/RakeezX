@@ -1,3 +1,4 @@
+import '../lib/rakeez-datetime.js';
 import { html, icon, openSheet, closeSheet, toast, confirmSheet, fmtDateRange, fmtDate } from '../lib/dom.js';
 import * as store from '../store.js';
 import {
@@ -620,11 +621,11 @@ function newTermSheet(yearId, nextIndex) {
         <div class="field-row">
           <label class="field">
             <span class="field__label">تاريخ البداية</span>
-            <input class="input tabular" name="startDate" type="date" />
+            <input class="input tabular" name="startDate" type="text" data-rakeez-datetime="date" />
           </label>
           <label class="field">
             <span class="field__label">تاريخ النهاية</span>
-            <input class="input tabular" name="endDate" type="date" />
+            <input class="input tabular" name="endDate" type="text" data-rakeez-datetime="date" />
           </label>
         </div>
       </form>
@@ -683,11 +684,11 @@ function rangeSheet(existing = null) {
         <div class="field-row">
           <label class="field">
             <span class="field__label">من *</span>
-            <input class="input tabular" name="startDate" type="date" value="${d.startDate}" required />
+            <input class="input tabular" name="startDate" type="text" data-rakeez-datetime="date" value="${d.startDate}" required />
           </label>
           <label class="field">
             <span class="field__label">إلى</span>
-            <input class="input tabular" name="endDate" type="date" value="${d.endDate ?? ''}" />
+            <input class="input tabular" name="endDate" type="text" data-rakeez-datetime="date" value="${d.endDate ?? ''}" />
           </label>
         </div>
         <p class="field__hint">ترك تاريخ النهاية فارغًا يعني يومًا واحدًا.</p>
@@ -753,11 +754,11 @@ function termSheet(term) {
         <div class="field-row">
           <label class="field">
             <span class="field__label">من *</span>
-            <input class="input tabular" name="startDate" type="date" value="${term.startDate ?? ''}" required />
+            <input class="input tabular" name="startDate" type="text" data-rakeez-datetime="date" value="${term.startDate ?? ''}" required />
           </label>
           <label class="field">
             <span class="field__label">إلى *</span>
-            <input class="input tabular" name="endDate" type="date" value="${term.endDate ?? ''}" required />
+            <input class="input tabular" name="endDate" type="text" data-rakeez-datetime="date" value="${term.endDate ?? ''}" required />
           </label>
         </div>
         <p class="field__hint">يجب ألا تتداخل تواريخ الفصول الدراسية.</p>

@@ -1,3 +1,4 @@
+import '../lib/rakeez-datetime.js';
 /** سجل حصص الإسناد: المنفّذة وغير المنفّذة وأسبابها. */
 
 import { html, icon, toast, fmtDate, fmtTimeRange } from '../lib/dom.js';
@@ -55,8 +56,8 @@ function generationCard(teaching) {
           ? html`
             <form data-submit="generate-sessions" class="stack stack-2">
               <div class="field-row">
-                <label class="field"><span class="field__label">من</span><input class="input tabular" name="startDate" type="date" min="${term.startDate}" max="${term.endDate}" value="${term.startDate}" required></label>
-                <label class="field"><span class="field__label">إلى</span><input class="input tabular" name="endDate" type="date" min="${term.startDate}" max="${term.endDate < todayISO() ? term.endDate : todayISO()}" value="${term.endDate < todayISO() ? term.endDate : todayISO()}" required></label>
+                <label class="field"><span class="field__label">من</span><input class="input tabular" name="startDate" type="text" data-rakeez-datetime="date" min="${term.startDate}" max="${term.endDate}" value="${term.startDate}" required></label>
+                <label class="field"><span class="field__label">إلى</span><input class="input tabular" name="endDate" type="text" data-rakeez-datetime="date" min="${term.startDate}" max="${term.endDate < todayISO() ? term.endDate : todayISO()}" value="${term.endDate < todayISO() ? term.endDate : todayISO()}" required></label>
               </div>
               <button class="btn btn--primary" type="submit">${icon('spark')} توليد الحصص</button>
             </form>
