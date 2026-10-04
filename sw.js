@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v33';
+const VERSION = 'rakeezx-v34';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -47,6 +47,11 @@ const SHELL = [
 
   './src/styles/app.css',
   './src/styles/components.css',
+  './src/styles/rakeez-datetime.css',
+
+  './src/vendor/flatpickr/flatpickr.min.css',
+  './src/vendor/flatpickr/flatpickr.min.js',
+  './src/vendor/flatpickr/ar.js',
 
   './src/app.js',
   './src/router.js',
@@ -55,6 +60,8 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/rakeez-datetime.js',
+  './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',
   './src/lib/db.js',
   './src/lib/export.js',

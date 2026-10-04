@@ -1,3 +1,4 @@
+import '../lib/rakeez-datetime.js';
 /**
  * إعداد أوقات الحصص — ملفات توقيت.
  *
@@ -226,11 +227,11 @@ function generateSheet(current = {}) {
         <div class="field-row">
           <label class="field">
             <span class="field__label">بداية الطابور الصباحي (إن وجد)</span>
-            <input class="input tabular timerow__in" name="assemblyStart" type="text" inputmode="numeric" maxlength="5" placeholder="06:45" value="${current.assemblyStart || '06:45'}" dir="ltr">
+            <input class="input tabular timerow__in" name="assemblyStart" type="text" data-rakeez-datetime="time" inputmode="numeric" maxlength="5" placeholder="06:45" value="${current.assemblyStart || '06:45'}" dir="ltr">
           </label>
           <label class="field">
             <span class="field__label">بداية الحصة الأولى *</span>
-            <input class="input tabular timerow__in" name="firstPeriodStart" type="text" inputmode="numeric" maxlength="5" placeholder="07:00" value="${current.firstPeriodStart || '07:00'}" required dir="ltr">
+            <input class="input tabular timerow__in" name="firstPeriodStart" type="text" data-rakeez-datetime="time" inputmode="numeric" maxlength="5" placeholder="07:00" value="${current.firstPeriodStart || '07:00'}" required dir="ltr">
           </label>
         </div>
 
@@ -395,21 +396,13 @@ function nameSheet(existing = null) {
           <label class="field">
             <span class="field__label">يسري من تاريخ (اختياري)</span>
             <div class="field-date-wrap">
-              <input class="input tabular" name="activeFrom" type="date" value="${existing?.activeFrom ?? ''}" lang="en" dir="ltr">
-              <button type="button" class="field-date-trigger" tabindex="-1" title="اختيار من التقويم" aria-label="اختيار من التقويم"
-                      onclick="const inp = this.previousElementSibling; inp.showPicker ? inp.showPicker() : inp.focus();">
-                ${icon('calendar')}
-              </button>
+              <input class="input tabular" name="activeFrom" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="planning" value="${existing?.activeFrom ?? ''}" lang="en" dir="ltr">
             </div>
           </label>
           <label class="field">
             <span class="field__label">إلى تاريخ (اختياري)</span>
             <div class="field-date-wrap">
-              <input class="input tabular" name="activeTo" type="date" value="${existing?.activeTo ?? ''}" lang="en" dir="ltr">
-              <button type="button" class="field-date-trigger" tabindex="-1" title="اختيار من التقويم" aria-label="اختيار من التقويم"
-                      onclick="const inp = this.previousElementSibling; inp.showPicker ? inp.showPicker() : inp.focus();">
-                ${icon('calendar')}
-              </button>
+              <input class="input tabular" name="activeTo" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="planning" value="${existing?.activeTo ?? ''}" lang="en" dir="ltr">
             </div>
           </label>
         </div>
@@ -870,7 +863,7 @@ function editPeriodsSheet(profile) {
                 <div class="timerow__range">
                   <div class="timerow__input-group">
                     <span class="timerow__label">البداية</span>
-                    <input class="input tabular timerow__in" type="text" inputmode="numeric" maxlength="5"
+                    <input class="input tabular timerow__in" type="text" data-rakeez-datetime="time" inputmode="numeric" maxlength="5"
                            dir="ltr" placeholder="00:00"
                            value="${t.start}" data-p="${t.period}" data-key="start"
                            aria-label="بداية الحصة ${t.period}">
@@ -878,7 +871,7 @@ function editPeriodsSheet(profile) {
                   <span class="timerow__arrow" aria-hidden="true">←</span>
                   <div class="timerow__input-group">
                     <span class="timerow__label">النهاية</span>
-                    <input class="input tabular timerow__in" type="text" inputmode="numeric" maxlength="5"
+                    <input class="input tabular timerow__in" type="text" data-rakeez-datetime="time" inputmode="numeric" maxlength="5"
                            dir="ltr" placeholder="00:00"
                            value="${t.end}" data-p="${t.period}" data-key="end"
                            aria-label="نهاية الحصة ${t.period}">

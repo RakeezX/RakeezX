@@ -120,7 +120,7 @@ test('canonical range renderer covers home, execution report, weekly schedule, a
   }, fixture);
   await page.goto('/#/schedule');
   await expect(page.getByRole('heading', { name: 'الجدول' })).toBeVisible();
-  await page.getByRole('tab', { name: 'الأحد', exact: true }).click();
+  await page.getByRole('tab', { name: /^الأحد(?: اليوم)?$/ }).click();
   await expectRTLRange(page, '07:00', '07:45');
   await expectRTLRange(page, '07:45', '08:30');
 

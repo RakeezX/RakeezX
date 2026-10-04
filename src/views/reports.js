@@ -1,3 +1,4 @@
+import '../lib/rakeez-datetime.js';
 /** تقارير الفصل: كشوف الطلاب والحضور والدرجات، للطباعة أو CSV. */
 
 import { html, icon, toast, fmtNum, fmtPct, fmtDate, fmtDateFull, openSheet } from '../lib/dom.js';
@@ -362,11 +363,11 @@ function attendanceReport(cls, report) {
     <div class="attendance-date-range noprint" aria-label="نطاق تاريخ كشف الحضور">
       <label class="field attendance-date-range__field">
         <span class="field__label">من:</span>
-        <input class="input date-field tabular" type="date" value="${filterStartDate}" data-change="filter-start">
+        <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" value="${filterStartDate}" data-change="filter-start">
       </label>
       <label class="field attendance-date-range__field">
         <span class="field__label">إلى:</span>
-        <input class="input date-field tabular" type="date" value="${filterEndDate}" data-change="filter-end">
+        <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" value="${filterEndDate}" data-change="filter-end">
       </label>
     </div>`;
 
