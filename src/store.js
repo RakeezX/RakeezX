@@ -1,3 +1,4 @@
+import { resolveCalendarRuntime, resolveCalendarDate, resolveTodayEligibility, resolveRecordedSessionPresentation } from './lib/calendar-runtime.js';
 /**
  * RAKEEZ X — المخزن: الحالة في الذاكرة + الحفظ في IndexedDB + الإشعار بالتغيير.
  *
@@ -8,7 +9,7 @@
 import * as db from './lib/db.js';
 import { getScoreFoundationCapability } from './lib/cloud.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
-import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
+import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, calendarDependencies } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
@@ -419,7 +420,9 @@ async function ensureFoundation() {
 
   if (!live(state.years).length) {
     const preset = calendarPresetRecords(getCalendarPreset());
-    push('years', preset.year);
+    // Provisioning remains unselected. An account/year selection is explicit.
+    const { calendarPresetId, ...unselectedYear } = preset.year;
+    push('years', unselectedYear);
     push('calendars', preset.calendar);
     preset.terms.forEach((term) => push('terms', term));
     preset.calendarDays.forEach((day) => push('calendarDays', day));
@@ -552,9 +555,9 @@ function syncV2Record(storeName, record, { pendingCreate = false } = {}) {
 
 function syncV2Dependencies(storeName, record) {
   const references = SYNC_V2_SCHEMAS[storeName]?.references ?? {};
-  return Object.entries(references)
+  return [...calendarDependencies(storeName, record), ...Object.entries(references)
     .filter(([field]) => record?.[field])
-    .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }));
+    .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }))];
 }
 
 function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
@@ -813,7 +816,17 @@ export async function save(batch, options = {}) {
         throw new Error('Calendar range delete requires an active local record.');
       }
     }
-    const prepared = records.map((record) => syncV2Record(storeName, record, {
+    const contextualRecords = storeName === 'sessions' ? records.map(record => {
+      if (previous.has(record.id) || record.calendarContext != null) return record;
+      const term = getTerm(getTeaching(record.teachingId)?.termId);
+      const calendar = term ? effectiveCalendar(term.yearId) : null;
+      if (!calendar) return record;
+      const day = resolveCalendarDate(calendar, record.date);
+      if (!day.ok) throw new Error(`Calendar context failed: ${day.reason}`);
+      return { ...record, calendarContext: { yearId: term.yearId, termId: term.id,
+        presetId: day.presetId, kind: day.kind, label: day.label, source: day.source } };
+    }) : records;
+    const prepared = contextualRecords.map((record) => syncV2Record(storeName, record, {
       pendingCreate: !!SYNC_V2_SCHEMAS[storeName] && !previous.has(record.id),
     }));
     writes[storeName] = prepared;
@@ -833,7 +846,16 @@ export async function save(batch, options = {}) {
             JSON.stringify(prior[field]) !== JSON.stringify(record[field]))
           : null;
         const entry = outboxEntry(storeName, record, fields, explicitDelete ? 'delete' : 'put', prior);
-        if (entry && (explicitDelete || entry.op === 'create' || entry.fields.length)) outbox.push(entry);
+        if (entry && storeName === 'calendars' && entry.op === 'create' && record.presetId && Object.keys(record.termDateOverrides ?? {}).length) {
+          // Natural-key adoption may return an existing empty Calendar. Keep the
+          // independent date intent as a dependent patch rather than losing it
+          // in the create receipt. Both entries share this data transaction.
+          const identity = { ...record, termDateOverrides: {} };
+          const create = outboxEntry(storeName, identity, null, 'create');
+          const dates = outboxEntry(storeName, record, ['termDateOverrides'], 'patch', identity);
+          dates.dependencies.push({ store: 'calendars', recordId: record.id, mutationId: create.mutationId, requiresServerRevision: true });
+          outbox.push(create, dates);
+        } else if (entry && (explicitDelete || entry.op === 'create' || entry.fields.length)) outbox.push(entry);
       }
     }
   }
@@ -1173,14 +1195,17 @@ export function applyTheme() {
 const live = (arr) => arr.filter((r) => !r.deleted);
 
 export const years = () => [...live(state.years)].sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
-export const activeYear = () =>
-  state.years.find((y) => y.id === state.device?.activeYearId && !y.deleted) ?? live(state.years)[0] ?? null;
+export const activeYear = () => {
+  const year = state.years.find(y => y.id === state.device?.activeYearId && !y.deleted) ?? live(state.years)[0];
+  return year ? effectiveYear(year.id) : null;
+};
 
 export const termsOf = (yId) =>
   live(state.terms).filter((t) => !yId || t.yearId === yId).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
-export const activeTerm = () =>
-  state.terms.find((t) => t.id === state.device?.activeTermId && !t.deleted) ??
-  termsOf(activeYear()?.id)[0] ?? null;
+export const activeTerm = () => {
+  const term = state.terms.find(t => t.id === state.device?.activeTermId && !t.deleted) ?? termsOf(activeYear()?.id)[0];
+  return term ? effectiveTerm(term.id) : null;
+};
 
 /** أرقام الفصول الدراسية المستعملة فعلًا في السنة النشطة — وإلا فإعداد المنتج. */
 export function activeTermIndexes() {
@@ -1822,11 +1847,47 @@ export const deleteTimeProfile = (id) => softDelete('timeProfiles', id);
 
 /* ---------- التقويم ---------- */
 
-export const calendarsOf = (yId) => live(state.calendars).filter((c) => c.yearId === yId);
+/** Detached runtime projection. Persistence continues to use raw state records. */
+export function effectiveCalendar(yearId, { year = getYear(yearId), terms = state.terms.filter(t => t.yearId === yearId), calendars = state.calendars } = {}) {
+  if (!year?.calendarPresetId) return null;
+  // Released Demo v3 retained this historical identity beside its replacement
+  // official second term. Keep that row/history raw, outside today's official
+  // projection; real account ambiguity remains fail-closed in the resolver.
+  if (activeWorkspace?.type === 'demo') terms = terms.filter(t => t.id !== 'demo:term:past');
+  return resolveCalendarRuntime({ year, terms, presetId: year.calendarPresetId,
+    customizations: calendars.filter(c => c.yearId === yearId && c.source === 'custom' && c.presetId).map(c => ({
+      yearId, presetId: c.presetId, deleted: c.deleted,
+      termDateOverrides: Object.entries(c.termDateOverrides ?? {}).map(([termId, pair]) => ({ termId, ...pair })),
+      exceptions: state.calendarDays.filter(d => d.calendarId === c.id).map(d => ({ ...d })),
+    })),
+  });
+}
+export function effectiveYear(id) {
+  const calendar = effectiveCalendar(id);
+  if (calendar && !calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
+  return calendar?.year ?? getYear(id);
+}
+export function effectiveTerm(id) {
+  const raw = getTerm(id), calendar = raw ? effectiveCalendar(raw.yearId) : null;
+  if (calendar && !calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
+  return calendar?.terms.find(t => t.id === id && !t.deleted) ?? raw;
+}
+export const effectiveTermsOf = yearId => termsOf(yearId).map(t => effectiveTerm(t.id));
+
+export const calendarsOf = yId => {
+  const calendar = effectiveCalendar(yId);
+  if (!calendar) return live(state.calendars).filter(c => c.yearId === yId);
+  if (!calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
+  return [...live(state.calendars).filter(c => c.yearId === yId && c.source === 'custom' && c.presetId === calendar.preset.id),
+    { id: `official:${yId}:${calendar.preset.id}`, yearId: yId, source: `preset:${calendar.preset.id}`, presetId: calendar.preset.id, projected: true }];
+};
 export const activeCalendar = () => calendarsOf(activeYear()?.id)[0] ?? null;
 
-export const calendarDaysOf = (calId) =>
-  live(state.calendarDays).filter((d) => d.calendarId === calId).sort((a, b) => (a.date < b.date ? -1 : 1));
+export const calendarDaysOf = calId => {
+  const official = state.years.map(y => calendarsOf(y.id).find(c => c.id === calId && c.projected)).find(Boolean);
+  if (official) return calendarPresetRecords(getCalendarPreset(official.presetId)).calendarDays.map(d => ({ ...d, calendarId: calId, id: `${calId}:${d.date}` }));
+  return live(state.calendarDays).filter(d => d.calendarId === calId).sort((a, b) => a.date.localeCompare(b.date));
+};
 
 /** تصنيف يوم معيّن في تقويم السنة النشطة — أو null إن لم يُدخل. */
 export function calendarDayFor(date) {
@@ -1835,6 +1896,12 @@ export function calendarDayFor(date) {
 
 /** يوم تقويم لسنة محددة — مهم عند عرض إسناد تاريخي لا يطابق السنة النشطة. */
 export function calendarDayForYear(yearId, date) {
+  const calendar = effectiveCalendar(yearId);
+  if (calendar) {
+    const day = resolveCalendarDate(calendar, date);
+    if (!day.ok) throw new Error(`Calendar date resolution failed: ${day.reason}`);
+    return day;
+  }
   const matching = calendarsOf(yearId)
     .map((calendar) => ({ calendar, day: live(state.calendarDays).find((d) => d.calendarId === calendar.id && d.date === date) }))
     .filter(({ day }) => day);
@@ -1852,12 +1919,19 @@ export function sessionCalendarDay(session) {
 }
 
 export function sessionStatusPresentation(session) {
+  const term = getTerm(getTeaching(session?.teachingId)?.termId);
+  if (session.calendarContext != null || getYear(term?.yearId)?.calendarPresetId) {
+    const presentation = resolveRecordedSessionPresentation(session);
+    if (!presentation.ok) throw new Error(`Recorded Calendar context invalid: ${presentation.reason}`);
+    return presentation;
+  }
   return sessionCalendarPresentation(session, sessionCalendarDay(session));
 }
 
 /** المصدر الواحد لأهلية الحصة الاعتيادية؛ لا ينشئ بيانات. */
 export function isSessionEligibleDate(date, { year = activeYear(), term = activeTerm() } = {}) {
   if (!date || !year || !term || term.yearId !== year.id) return false;
+  term = effectiveTerm(term.id) ?? term;
   if (!term.startDate || !term.endDate || date < term.startDate || date > term.endDate) return false;
   const day = calendarDayForYear(year.id, date);
   // التقويم الصريح يغلب عطلة نهاية الأسبوع الافتراضية.
@@ -1868,91 +1942,20 @@ export function isSessionEligibleDate(date, { year = activeYear(), term = active
 export { getCalendarPreset, WESTERN_1448_1449_PRESET_ID };
 
 export function calendarPresetForYear(yearId = activeYear()?.id) {
-  return getCalendarPreset(getYear(yearId)?.calendarPresetId);
+  const id = getYear(yearId)?.calendarPresetId;
+  return id ? getCalendarPreset(id) : null;
 }
 
 /** Applies a built-in template without replacing existing user calendar data. */
-export async function applyCalendarPreset(presetId = WESTERN_1448_1449_PRESET_ID, { activate = false } = {}) {
-  const preset = getCalendarPreset(presetId);
-  if (!preset) throw new Error('التقويم المعتمد غير متاح.');
-  const records = calendarPresetRecords(preset);
-  const existingYear = getYear(records.year.id);
-  if (!existingYear && state.years.some((year) => year.id === records.year.id && year.deleted)) {
-    return { ok: false, reason: 'year-deleted' };
+export async function applyCalendarPreset(presetId, { yearId } = {}) {
+  const year = getYear(yearId);
+  if (!year) return { ok: false, reason: 'existing-year-required' };
+  const calendar = effectiveCalendar(yearId, { year: { ...year, calendarPresetId: presetId } });
+  if (!calendar?.ok) return { ok: false, reason: calendar?.reason ?? 'unsupported-preset' };
+  if (year.calendarPresetId !== presetId && !await patch('years', yearId, { calendarPresetId: presetId })) {
+    throw new Error('تعذر حفظ إعدادات التقويم. حاول مرة أخرى.');
   }
-  const switching = existingYear?.calendarPresetId !== preset.id;
-  const timestamp = now();
-  const writes = {};
-  const queue = (collection, candidate) => {
-    const previous = state[collection].find((record) => record.id === candidate.id);
-    if (previous && Object.keys(candidate).every((key) => key === 'updatedAt' || candidate[key] === previous[key])) return;
-    (writes[collection] ??= []).push({ ...candidate, updatedAt: timestamp });
-  };
-  queue('years', {
-    ...(existingYear ?? records.year),
-    calendarPresetId: preset.id, calendarRegion: preset.regionLabel,
-    gregorianLabel: preset.gregorianLabel,
-    startDate: switching ? preset.academicYearStart : existingYear.startDate ?? preset.academicYearStart,
-    endOfYearVacationStart: preset.endOfYearVacationStart,
-    nextAcademicYearStart: preset.nextAcademicYearStart,
-  });
-
-  const currentTerms = termsOf(records.year.id);
-  const selectedTerms = [];
-  for (const presetTerm of records.terms) {
-    const term = currentTerms.find((record) => record.index === presetTerm.index);
-    if (!term && state.terms.some((record) => record.id === presetTerm.id && record.deleted)) {
-      return { ok: false, reason: 'term-deleted' };
-    }
-    // Retain persisted term IDs/status/metadata and custom date edits on refresh.
-    // The previously shipped official Western end date was June 30, not July 1.
-    const oldWesternEnd = !switching && preset.id === WESTERN_1448_1449_PRESET_ID &&
-      term?.index === 2 && term.calendarId === records.calendar.id && term.endDate === '2027-06-30';
-    const next = term ? {
-      ...term, calendarId: records.calendar.id,
-      startDate: switching || !term.startDate ? presetTerm.startDate : term.startDate,
-      endDate: switching || !term.endDate || oldWesternEnd ? presetTerm.endDate : term.endDate,
-    } : presetTerm;
-    selectedTerms.push(next);
-    queue('terms', next);
-  }
-
-  // Retirement is scoped by calendar ownership of this year, never by a global
-  // presetId filter. Custom calendars and other years are completely untouched.
-  const oldCalendars = state.calendars.filter((calendar) => calendar.yearId === records.year.id &&
-    calendar.source?.startsWith('preset:') && calendar.id !== records.calendar.id);
-  const oldIds = new Set(oldCalendars.map((calendar) => calendar.id));
-  const retire = (collection, record) => queue(collection, {
-    ...record, deleted: true, deletedAt: new Date(timestamp).toISOString(),
-  });
-  // A locally added extra term must not retain a pointer to a retired calendar.
-  for (const term of currentTerms) {
-    if (!selectedTerms.some((selected) => selected.id === term.id) && oldIds.has(term.calendarId)) {
-      queue('terms', { ...term, calendarId: records.calendar.id });
-    }
-  }
-  for (const calendar of oldCalendars.filter((record) => !record.deleted)) retire('calendars', calendar);
-  const selectedCalendar = state.calendars.find((record) => record.id === records.calendar.id);
-  queue('calendars', { ...selectedCalendar, ...records.calendar, deletedAt: undefined });
-  const expectedIds = new Set(records.calendarDays.map((day) => day.id));
-  for (const day of state.calendarDays.filter((record) => !record.deleted)) {
-    if (oldIds.has(day.calendarId) || (day.calendarId === records.calendar.id && !expectedIds.has(day.id))) {
-      retire('calendarDays', day);
-    }
-  }
-  for (const day of records.calendarDays) {
-    const previous = state.calendarDays.find((record) => record.id === day.id);
-    queue('calendarDays', { ...previous, ...day, deletedAt: undefined });
-  }
-  // Use Production's atomic data+outbox save and existing BroadcastChannel path.
-  if (Object.keys(writes).length && !(await save(writes))) throw new Error('تعذر حفظ إعدادات التقويم. حاول مرة أخرى.');
-  const preference = { preferredEducationRegion: preset.id };
-  if (activate) {
-    preference.activeYearId = records.year.id;
-    preference.activeTermId = currentTerms.find((term) => term.id === state.device.activeTermId)?.id ?? selectedTerms[0].id;
-  }
-  if (Object.entries(preference).some(([key, value]) => state.device[key] !== value)) await patchDevice(preference);
-  return { ok: true, applied: Object.values(writes).flat().length, year: getYear(records.year.id) };
+  return { ok: true, applied: year.calendarPresetId === presetId ? 0 : 1, year: effectiveYear(yearId) };
 }
 
 /* ---------- المنهج ---------- */
@@ -2356,9 +2359,31 @@ export async function createYear(data) {
   return y;
 }
 
+function customCalendarCandidate(yearId) {
+  const presetId = getYear(yearId)?.calendarPresetId;
+  const existing = state.calendars.find(c => c.yearId === yearId && c.source === 'custom' && (c.presetId ?? null) === (presetId ?? null));
+  if (existing?.deleted) throw new Error('Calendar scope is deleted.');
+  return existing ?? { ...makeCalendar({ yearId, source: 'custom' }),
+    ...(presetId ? { id: `cal:${yearId}:custom:${presetId}`, presetId, termDateOverrides: {} } : {}) };
+}
 export async function createTerm(data) {
-  const t = makeTerm(data);
-  await save({ terms: [t] });
+  const selected = getYear(data.yearId)?.calendarPresetId;
+  const hasDates = Boolean(data.startDate || data.endDate);
+  const t = makeTerm(selected ? { ...data, startDate: null, endDate: null } : data);
+  if (state.terms.some(term => term.id === t.id || (!term.deleted && term.yearId === t.yearId && term.index === t.index))) throw new Error('يوجد فصل دراسي بهذا الترتيب');
+  const batch = { terms: [t] };
+  if (selected && hasDates) {
+    const calendar = customCalendarCandidate(t.yearId);
+    const next = { ...calendar, termDateOverrides: { ...calendar.termDateOverrides, [t.id]: { startDate: data.startDate, endDate: data.endDate } }, updatedAt: now() };
+    const projection = effectiveCalendar(t.yearId, { terms: [...state.terms.filter(term => term.yearId === t.yearId), t], calendars: [...state.calendars.filter(c => c.id !== next.id), next] });
+    if (!projection.ok) throw new Error(`Invalid term dates: ${projection.reason}`);
+    batch.calendars = [next];
+  }
+  if (selected && !hasDates) {
+    const projection = effectiveCalendar(t.yearId, { terms: [...state.terms.filter(term => term.yearId === t.yearId), t] });
+    if (!projection.ok) throw new Error(`Invalid term identity: ${projection.reason}`);
+  }
+  if (!await save(batch)) throw new Error('تعذّر حفظ الفصل الدراسي.');
   return t;
 }
 
@@ -3747,6 +3772,8 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
 
 /** يولّد أغلفة حصص اليوم فقط من الجدول الحالي، من دون لمس الموجود أو tombstone. */
 export async function ensureSessionsForDate(date = todayISO()) {
+  const calendar = effectiveCalendar(activeYear()?.id);
+  if (calendar && !resolveTodayEligibility(calendar, { date, today: todayISO(), activeTermId: activeTerm()?.id }).eligible) return { created: 0, existing: 0, skipped: 0 };
   if (date !== todayISO() || !isSessionEligibleDate(date)) return { created: 0, existing: 0, skipped: 0 };
   const term = activeTerm();
   const year = activeYear();
@@ -3805,7 +3832,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
   const teaching = getTeaching(tchId);
   if (!teaching) throw new Error('الفصل غير موجود.');
   if (isTeachingArchived(teaching)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
-  const term = getTerm(teaching.termId);
+  const term = effectiveTerm(teaching.termId);
   const year = term ? getYear(term.yearId) : null;
   if (!term || !year) throw new Error('تعذّر تحديد السنة والفصل الدراسي لهذا الإسناد.');
   if (!term.startDate || !term.endDate) throw new Error('أدخل تاريخ بداية ونهاية الفصل الدراسي أولًا.');
@@ -4087,7 +4114,7 @@ export const removeSlot = (slotId) => softDelete('slots', slotId);
 export async function ensureCalendar(yId = activeYear()?.id, source = 'custom') {
   const existing = calendarsOf(yId).find((c) => c.source === source);
   if (existing) return existing;
-  const cal = makeCalendar({ yearId: yId, source });
+  const cal = source === 'custom' ? customCalendarCandidate(yId) : makeCalendar({ yearId: yId, source });
   await save({ calendars: [cal] });
   return cal;
 }
@@ -4162,8 +4189,16 @@ export async function updateTermDates(termId, startDate, endDate) {
   if (!startDate || !endDate) throw new Error('تاريخ البداية والنهاية مطلوبان.');
   if (endDate < startDate) throw new Error('تاريخ النهاية يجب أن يكون في نفس تاريخ البداية أو بعده.');
   const term = getTerm(termId); if (!term) throw new Error('الفصل الدراسي غير موجود.');
-  const overlaps = termsOf(term.yearId).some((other) => other.id !== term.id && other.startDate && other.endDate && startDate <= other.endDate && other.startDate <= endDate);
+  const overlaps = effectiveTermsOf(term.yearId).some((other) => other.id !== term.id && other.startDate && other.endDate && startDate <= other.endDate && other.startDate <= endDate);
   if (overlaps) throw new Error('يتداخل تاريخ هذا الفصل الدراسي مع فصل دراسي آخر. عدّل تاريخ البداية أو النهاية.');
+  if (getYear(term.yearId)?.calendarPresetId) {
+    const calendar = customCalendarCandidate(term.yearId);
+    const next = { ...calendar, termDateOverrides: { ...calendar.termDateOverrides, [term.id]: { startDate, endDate } }, updatedAt: now() };
+    const projection = effectiveCalendar(term.yearId, { calendars: [...state.calendars.filter(c => c.id !== next.id), next] });
+    if (!projection.ok) throw new Error(`Invalid term dates: ${projection.reason}`);
+    if (!await save({ calendars: [next] })) throw new Error('تعذّر حفظ تواريخ الفصل الدراسي.');
+    return effectiveTerm(term.id);
+  }
   return patch('terms', term.id, { startDate, endDate });
 }
 

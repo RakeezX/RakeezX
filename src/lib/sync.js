@@ -1,3 +1,4 @@
+import { encodeTermDateOverrides, decodeTermDateOverrides } from './sync-v2.js';
 import * as cloud from './cloud.js';
 import * as store from '../store.js';
 import * as db from './db.js';
@@ -948,6 +949,7 @@ const MAPPERS = {
   years: {
     toCloud: (rec) => ({
       id: rec.id,
+      ...(Object.hasOwn(rec, 'calendarPresetId') ? { calendar_preset_id: rec.calendarPresetId } : {}),
       label: rec.label,
       hijri_start: rec.hijriStart,
       hijri_end: rec.hijriEnd,
@@ -959,6 +961,7 @@ const MAPPERS = {
     }),
     fromCloud: (rec) => ({
       id: rec.id,
+      ...(Object.hasOwn(rec, 'calendar_preset_id') ? { calendarPresetId: rec.calendar_preset_id } : {}),
       label: rec.label,
       hijriStart: rec.hijri_start,
       hijriEnd: rec.hijri_end,
@@ -972,6 +975,8 @@ const MAPPERS = {
   calendars: {
     toCloud: (rec) => ({
       id: rec.id,
+      ...(rec.source === 'custom' && Object.hasOwn(rec, 'termDateOverrides') ? { term_date_overrides: encodeTermDateOverrides(rec.termDateOverrides) } : {}),
+      ...(rec.source === 'custom' && Object.hasOwn(rec, 'presetId') ? { preset_id: rec.presetId } : {}),
       year_id: rec.yearId,
       source: calendarSourceForCloud(rec.source),
       label: rec.label,
@@ -981,6 +986,8 @@ const MAPPERS = {
     }),
     fromCloud: (rec) => ({
       id: rec.id,
+      ...(Object.hasOwn(rec, 'term_date_overrides') ? { termDateOverrides: decodeTermDateOverrides(rec.term_date_overrides) } : {}),
+      ...(Object.hasOwn(rec, 'preset_id') ? { presetId: rec.preset_id } : {}),
       yearId: rec.year_id,
       source: calendarSourceFromCloud(rec),
       label: rec.label,
@@ -1258,6 +1265,7 @@ const MAPPERS = {
   sessions: {
     toCloud: (rec) => ({
       id: rec.id,
+      ...(Object.hasOwn(rec, 'calendarContext') ? { calendar_context: structuredClone(rec.calendarContext) } : {}),
       teaching_id: rec.teachingId,
       date: rec.date,
       period: rec.period,
@@ -1278,6 +1286,7 @@ const MAPPERS = {
     }),
     fromCloud: (rec) => ({
       id: rec.id,
+      ...(Object.hasOwn(rec, 'calendar_context') ? { calendarContext: structuredClone(rec.calendar_context) } : {}),
       teachingId: rec.teaching_id,
       date: rec.date,
       period: rec.period,
