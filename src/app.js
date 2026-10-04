@@ -3,6 +3,7 @@
  */
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { visibleLatinDigits } from './lib/visible-numerals.js';
 import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
@@ -313,8 +314,8 @@ function shell(path, params) {
 
 function topbar(v, params) {
   const backHref = v.back?.(params);
-  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'رَكيز المعلم';
-  const sub = v.subtitle?.(params);
+  const title = visibleLatinDigits(typeof v.title === 'function' ? v.title(params) : v.title ?? 'رَكيز المعلم');
+  const sub = visibleLatinDigits(v.subtitle?.(params));
   const actions = v.topActions?.(params);
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);

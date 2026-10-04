@@ -53,6 +53,7 @@ test('visible source has no native numeral literals or Arabic locale formatter w
   await visit(root);
   const inputDigitLines = {
     'models.js': /\.replace\(/,
+    'lib/dom.js': /\.replace\(/,
     'lib/account-profile.js': /\.replace\(/,
     'lib/avatar.js': /const clean =/,
     'lib/email-otp.js': /\.replace\(/,
@@ -70,7 +71,7 @@ test('visible source has no native numeral literals or Arabic locale formatter w
       const context = source.split('\n').slice(line - 1, line + 3).join('\n');
       assert.match(context, /numberingSystem:\s*['"]latn['"]|-u-nu-latn/, `${path}:${line} lacks latn`);
     }
-    if (path !== 'lib/dom.js' && path !== 'views/attendance.js') {
+    {
       for (const [index, line] of source.split('\n').entries()) {
         if (/^(?:\*|\/\/|\/\*|\*\/)/.test(line.trimStart())) continue;
         const code = line.split('//')[0];

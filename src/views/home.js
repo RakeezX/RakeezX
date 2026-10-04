@@ -6,6 +6,7 @@
  */
 
 import { html, icon, fmtDate, fmtPct, fmtTimeRange, toast, timingProfileIcon } from '../lib/dom.js';
+import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import { displayIdentity, firstName } from '../lib/display-identity.js';
 import { APP_ICON_URL } from '../lib/brand.js';
 import { openStudentSearch } from '../lib/student-search-ui.js';
@@ -258,7 +259,7 @@ function renderTodayFocus(focus) {
       <div class="today-focus__signal"><span>${content.eyebrow}</span><i aria-hidden="true"></i></div>
       <div class="today-focus__main">
         <div class="today-focus__title">${content.title}</div>
-        <div class="today-focus__class">${store.teachingLabel(teaching)}</div>
+        <div class="today-focus__class">${visibleLatinDigits(store.teachingLabel(teaching))}</div>
         <div class="today-focus__detail">الحصة ${session.period}${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</div>
         <div class="today-focus__state">${store.attendanceCompleteness(session).completed ? 'تم رصد الحضور' : content.detail}</div>
       </div>
@@ -388,7 +389,7 @@ export default {
                     <a class="row home-session-row is-session-${presentation.kind}" data-session-id="${s.id}" href="#/teaching/${s.teachingId}/attendance?session=${s.id}">
                       <span class="period">${s.period}</span>
                       <span class="row__main">
-                        <span class="row__title">${store.teachingLabel(tch)}</span>
+                        <span class="row__title">${visibleLatinDigits(store.teachingLabel(tch))}</span>
                         <span class="row__sub">
                           ${s.startTime ? html`<bdi dir="ltr">${fmtTimeRange(s.startTime, s.endTime)}</bdi>` : 'بدون وقت محدد'}
                           ${marked && roster

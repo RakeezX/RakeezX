@@ -120,7 +120,7 @@ test('reports render current historical data and edited section metadata without
 
   await page.locator('[data-act="tab"][data-tab="support"]').click();
   await expect(page.locator('.list')).toContainText('TEST Report C');
-  await expect(page.locator('.list')).toContainText('الدرجات دون ٥٠٪');
+  await expect(page.locator('.list')).toContainText('الدرجات دون 50٪');
 
   // Individual student report is a report view too: its current section label, scores, and dated attendance remain connected.
   await page.goto('/#/student/report-student-a?teaching=report-teaching-a');
