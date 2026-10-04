@@ -1,10 +1,20 @@
 import { test, expect } from '@playwright/test';
 
+async function enterProduct(page, route) {
+  await page.goto(route);
+  await page.waitForFunction(() => window.store?.state?.ready === true || Boolean(document.querySelector('[data-workspace-demo]')));
+  const demo = page.locator('[data-workspace-demo]');
+  if (await demo.isVisible()) {
+    await demo.click();
+    await page.evaluate((hash) => { location.hash = hash; }, route.slice(1));
+  }
+}
+
 test('Calendar planning picker shows only allowed years and selects a future date on mobile', async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/#/calendar');
+  await enterProduct(page, '/#/calendar');
   await page.getByRole('button', { name: 'إضافة استثناء' }).click();
   const input = page.locator('#range-form [name="startDate"]');
   await expect(input).toHaveAttribute('data-rakeez-date-scope', 'planning');
@@ -30,9 +40,9 @@ test('Calendar planning picker shows only allowed years and selects a future dat
 
 test('Attendance report picker hides future years and caps dates at today', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 740 });
-  await page.goto('/#/classes');
-  await page.waitForFunction(() => window.store?.state?.ready === true);
-  await page.evaluate(async () => {
+  await enterProduct(page, '/#/classes');
+  if (await page.evaluate(() => typeof window.store?.save === 'function')) {
+    await page.evaluate(async () => {
     await window.store.save({
       years: [{ id: 'n38-policy-year', name: 'N38 Year' }],
       terms: [{ id: 'n38-policy-term', yearId: 'n38-policy-year', name: 'N38 Term' }],
@@ -45,8 +55,13 @@ test('Attendance report picker hides future years and caps dates at today', asyn
       attendance: [{ id: 'n38-policy-attendance', studentId: 'n38-policy-student', sessionId: 'n38-policy-session', teachingId: 'n38-policy-teaching', date: '2026-08-02', status: 'present' }],
     });
     await window.store.patchDevice({ activeYearId: 'n38-policy-year', activeTermId: 'n38-policy-term' });
-  });
-  await page.goto('/#/teaching/n38-policy-teaching/reports');
+    });
+    await page.goto('/#/teaching/n38-policy-teaching/reports');
+  } else {
+    await page.evaluate(() => { location.hash = '#/reports'; });
+    await page.locator('.report-grade-group__summary').first().click();
+    await page.locator('.report-class-row').first().click();
+  }
   await page.locator('[data-act="tab"][data-tab="attendance"]').click();
   const inputs = page.locator('input[data-rakeez-date-scope="historical"]');
   await expect(inputs).toHaveCount(2);
