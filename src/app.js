@@ -6,6 +6,7 @@ import { html, render, icon, delegate, toast, openSheet, closeSheet } from './li
 import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
+import { ensureThmanyahFont } from './lib/thmanyah-font.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
@@ -34,6 +35,7 @@ import {
 } from './lib/email-otp.js';
 
 const app = document.getElementById('app');
+await ensureThmanyahFont();
 installVisibleViewport();
 
 window.addEventListener('beforeinstallprompt', (e) => {

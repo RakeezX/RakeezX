@@ -167,6 +167,7 @@ for (const width of [1280, 390]) {
         await page.evaluate(async theme => { await window.store.patchDevice({ theme }); window.store.applyTheme(); window.store.repaint(); }, theme);
         await page.goto(surface.route ?? '/#/teaching/print-teaching/reports');
         await page.reload();
+        await page.waitForFunction(() => window.store?.state?.ready);
         // Hash navigation does not await the lazy Student view; do not click
         // the previous report's Print control while that view is still loading.
         if (surface.route === '/#/student/print-student-0') await expect(page.locator('.student-profile-header')).toBeVisible();

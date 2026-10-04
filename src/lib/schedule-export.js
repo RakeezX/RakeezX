@@ -9,6 +9,7 @@
 import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, sectionLabel } from '../models.js';
 import { downloadBlob } from './export.js';
 import { getAccountPresentation } from './account-profile.js';
+import { ensureThmanyahFont, installThmanyahInDocument } from './thmanyah-font.js';
 
 export const SCHEDULE_PNG_WIDTH = 1600;
 export const SCHEDULE_PNG_HEIGHT = 1200;
@@ -156,15 +157,15 @@ function drawScheduleCanvas(ctx, model, width, height) {
   const margin = 70;
   ctx.textAlign = 'right';
   ctx.fillStyle = '#0f7655';
-  ctx.font = '800 24px "Segoe UI", Tahoma, Arial, sans-serif';
+  ctx.font = '700 24px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillText('رَكيز', width - margin, 40);
   const brandWidth = ctx.measureText('رَكيز').width;
-  ctx.font = '500 21px "Segoe UI", Tahoma, Arial, sans-serif';
+  ctx.font = '500 21px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillText('المعلم', width - margin - brandWidth - 8, 40);
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#12333b';
-  ctx.font = '700 42px Tahoma, Arial, sans-serif';
+  ctx.font = '700 42px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillText(model.title, width / 2, 78);
 
   const identityLines = [
@@ -173,7 +174,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
   ].filter(Boolean);
   const academicLine = [model.academic.year, model.academic.term].filter(Boolean).join(' · ');
   const metaLines = [...identityLines, academicLine, model.timing?.label].filter(Boolean);
-  ctx.font = '500 21px Tahoma, Arial, sans-serif';
+  ctx.font = '500 21px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillStyle = '#4a6268';
   metaLines.forEach((line, index) => ctx.fillText(line, width / 2, 126 + index * 29));
 
@@ -193,7 +194,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
 
   const dayX = gridLeft + gridWidth - dayColumnWidth;
   const xForPeriod = (periodIndex) => dayX - (periodIndex + 1) * periodWidth;
-  ctx.font = '700 24px Tahoma, Arial, sans-serif';
+  ctx.font = '700 24px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillStyle = '#12333b';
   ctx.textAlign = 'center';
   ctx.strokeRect(dayX, gridTop, dayColumnWidth, 66);
@@ -211,7 +212,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
     ctx.strokeStyle = '#cbd8da';
     ctx.strokeRect(dayX, y, dayColumnWidth, rowHeight);
     ctx.fillStyle = '#12333b';
-    ctx.font = '700 22px Tahoma, Arial, sans-serif';
+    ctx.font = '700 22px "Thmanyah Sans", Tahoma, Arial, sans-serif';
     ctx.fillText(day.label, dayX + dayColumnWidth / 2, y + rowHeight / 2);
 
     model.periods.forEach((unused, periodIndex) => {
@@ -221,10 +222,10 @@ function drawScheduleCanvas(ctx, model, width, height) {
       ctx.strokeRect(x, y, periodWidth, rowHeight);
       if (!cell?.teaching) return;
       ctx.fillStyle = '#12333b';
-      ctx.font = '700 19px Tahoma, Arial, sans-serif';
+      ctx.font = '700 19px "Thmanyah Sans", Tahoma, Arial, sans-serif';
       ctx.fillText(clippedText(ctx, cell.teaching.classLabel, periodWidth - 24), x + periodWidth / 2, y + rowHeight * 0.34);
       ctx.fillStyle = '#52696f';
-      ctx.font = '500 16px Tahoma, Arial, sans-serif';
+      ctx.font = '500 16px "Thmanyah Sans", Tahoma, Arial, sans-serif';
       const detail = [cell.teaching.subjectLabel, cell.time ? `\u2066${cell.time.start} – ${cell.time.end}\u2069` : '']
         .filter(Boolean).join(' · ');
       ctx.fillText(clippedText(ctx, detail, periodWidth - 24), x + periodWidth / 2, y + rowHeight * 0.68);
@@ -234,11 +235,12 @@ function drawScheduleCanvas(ctx, model, width, height) {
 }
 
 /** Render a deterministic 1600×1200 browser-local PNG Blob. */
-export function renderSchedulePng(model, {
+export async function renderSchedulePng(model, {
   width = SCHEDULE_PNG_WIDTH,
   height = SCHEDULE_PNG_HEIGHT,
   createCanvas = () => document.createElement('canvas'),
 } = {}) {
+  if (globalThis.document) await ensureThmanyahFont();
   const canvas = createCanvas();
   canvas.width = width;
   canvas.height = height;
@@ -285,9 +287,9 @@ export function schedulePrintDocument(model) {
 @page { size: A4 landscape; margin: 10mm; }
 * { box-sizing: border-box; }
 html { color-scheme: only light; background: #fff; }
-body { margin: 0; color: #162f35; background: #fff; font: 12px Tahoma, Arial, sans-serif; }
+body { margin: 0; color: #162f35; background: #fff; font: 12px "Thmanyah Sans", Tahoma, Arial, sans-serif; font-synthesis: none; }
 header { position: relative; display: grid; gap: 4px; margin-bottom: 18px; padding: 0 4px 10px; border-bottom: 1px solid #a9c9be; text-align: center; }
-.brand { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; color: #0f7655; font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-weight: 700; }
+.brand { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; color: #0f7655; font-family: "Thmanyah Sans", Tahoma, Arial, sans-serif; font-weight: 700; }
 .brand b { font-size: 15px; } .brand em { font-size: 13px; font-style: normal; font-weight: 500; }
 .brand small { color: #62757a; font-size: 9px; font-weight: 500; }
 h1 { margin: 0; font-size: 24px; }
@@ -319,7 +321,13 @@ export function openSchedulePrint(model, {
   printWindow.document.write(schedulePrintDocument(model));
   printWindow.document.close();
   printWindow.focus?.();
-  schedulePrint(() => printWindow.print());
+  schedulePrint(() => {
+    if (printWindow.document?.fonts) {
+      installThmanyahInDocument(printWindow.document).finally(() => printWindow.print());
+    } else {
+      printWindow.print();
+    }
+  });
   return printWindow;
 }
 

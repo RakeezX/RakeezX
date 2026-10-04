@@ -71,7 +71,7 @@
 .timing-profiles-page .timing-page-head h1{font-size:25px;letter-spacing:-.025em;margin:3px 0}
 .timing-profiles-page .timing-page-head p{color:var(--text-3);font-size:13px;margin:0}
 .timing-profiles-page .timing-back{display:inline-block;margin-bottom:5px;color:var(--text-2);font-size:12px}
-.timing-profiles-page .timing-eyebrow{display:block;color:var(--brand-text);font-size:11px;font-weight:750;letter-spacing:.02em}
+.timing-profiles-page .timing-eyebrow{display:block;color:var(--brand-text);font-size:11px;font-weight:700;letter-spacing:.02em}
 .timing-profiles-page .timing-page-head>.btn{min-height:44px}
 .timing-profiles-page .seasonal-activation-bar{margin-bottom:15px;background:var(--bg-elev);border:1px solid var(--brand-border);border-inline-start:4px solid var(--brand);border-radius:12px;box-shadow:none;padding:12px}
 .timing-profiles-page .seasonal-activation-bar__main{display:flex;gap:12px;flex-wrap:wrap}
@@ -132,7 +132,7 @@
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form){max-width:640px;padding:0}
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head{margin:0;padding:17px 20px 12px;align-items:center}
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head>div{min-width:0}
-.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:750}
+.sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:700}
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__title{font-size:20px;line-height:1.35}
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__desc{font-size:12.5px;line-height:1.5;margin-top:3px}
 .sheet:has(#name-form,#gen-form,#periods-sheet-inner,#recess-config-form,#edit-model-form,#add-model-form) .sheet__head .iconbtn{width:44px;min-width:44px;height:44px;min-height:44px;flex:none}
@@ -186,7 +186,7 @@
 /* Product's existing confirmation helper stays intact; only Timing-page presentation. */
 body:has(.timing-profiles-page) .sheet:has([data-confirm]){padding:0}
 body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head{margin:0;padding:18px 20px 13px;border-inline-start:4px solid var(--brand);border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--brand-soft) 18%,var(--bg-elev))}
-body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:750}
+body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head>div::before{content:'الجدول · أوقات الحصص';display:block;margin-bottom:3px;color:var(--brand-text);font-size:11px;font-weight:700}
 body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head .iconbtn{min-width:44px;width:44px;min-height:44px;height:44px;flex:none}
 body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__foot{margin:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom))}
 
