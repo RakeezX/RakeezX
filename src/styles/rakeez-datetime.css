@@ -62,9 +62,9 @@ input.rakeez-datetime--time {
 }
 /* RTL visual order: minute, hour, period; flatpickr keeps its hour/minute bindings. */
 .flatpickr-calendar .flatpickr-time { direction: rtl; }
-.flatpickr-calendar .flatpickr-time .flatpickr-minute { order: 0; }
+.flatpickr-calendar .flatpickr-time > .numInputWrapper:nth-child(3) { order: 0; }
 .flatpickr-calendar .flatpickr-time .flatpickr-time-separator { order: 1; }
-.flatpickr-calendar .flatpickr-time .flatpickr-hour { order: 2; }
+.flatpickr-calendar .flatpickr-time > .numInputWrapper:first-child { order: 2; }
 .flatpickr-calendar .flatpickr-time .flatpickr-am-pm { order: 3; }
 .flatpickr-calendar .flatpickr-time .flatpickr-am-pm {
   direction: rtl;

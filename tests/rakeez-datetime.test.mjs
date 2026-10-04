@@ -121,9 +121,10 @@ test('clock CSS places minute right of hour and the separate period at the left 
   const style = readFileSync(join(root, 'src/styles/rakeez-datetime.css'), 'utf8');
   const adapter = readFileSync(join(root, 'src/lib/rakeez-datetime.js'), 'utf8');
   assert.match(style, /\.flatpickr-calendar \.flatpickr-time\s*\{\s*direction: rtl;\s*\}/);
-  for (const [control, order] of [['minute', 0], ['time-separator', 1], ['hour', 2], ['am-pm', 3]]) {
-    assert.match(style, new RegExp(`\\.flatpickr-calendar \\.flatpickr-time \\.flatpickr-${control}\\s*\\{\\s*order: ${order};\\s*\\}`));
-  }
+  assert.match(style, /\.flatpickr-calendar \.flatpickr-time > \.numInputWrapper:nth-child\(3\)\s*\{\s*order: 0;\s*\}/);
+  assert.match(style, /\.flatpickr-calendar \.flatpickr-time \.flatpickr-time-separator\s*\{\s*order: 1;\s*\}/);
+  assert.match(style, /\.flatpickr-calendar \.flatpickr-time > \.numInputWrapper:first-child\s*\{\s*order: 2;\s*\}/);
+  assert.match(style, /\.flatpickr-calendar \.flatpickr-time \.flatpickr-am-pm\s*\{\s*order: 3;\s*\}/);
   assert.match(adapter, /dateFormat: kind === 'date' \? 'Y-m-d' : 'H:i'/);
   assert.match(adapter, /time_24hr: false/);
   assert.doesNotMatch(adapter, /\.hourElement\s*=|\.minuteElement\s*=/);
