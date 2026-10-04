@@ -119,9 +119,19 @@ test('date/time adapter imports and mounts from raw repository files offline', a
   await expect(amPm).toHaveText('صباحًا');
   const [hourBox, separatorBox, minuteBox, amPmBox] = await Promise.all(
     [hour, separator, minute, amPm].map((locator) => locator.boundingBox()));
-  expect(hourBox.x).toBeLessThan(separatorBox.x);
-  expect(separatorBox.x).toBeLessThan(minuteBox.x);
-  expect(minuteBox.x).toBeLessThan(amPmBox.x);
+  expect(minuteBox.x).toBeGreaterThan(separatorBox.x);
+  expect(separatorBox.x).toBeGreaterThan(hourBox.x);
+  expect(hourBox.x).toBeGreaterThan(amPmBox.x);
+  expect(hourBox.x).toBeGreaterThanOrEqual(amPmBox.x + amPmBox.width);
+  expect(minuteBox.x).toBeGreaterThanOrEqual(hourBox.x + hourBox.width);
+  expect(await hour.inputValue()).toMatch(/^[0-9]{2}$/);
+  expect(await minute.inputValue()).toMatch(/^[0-9]{2}$/);
+  expect(`${await hour.inputValue()}${await minute.inputValue()}`).not.toMatch(/[\u0660-\u0669\u06f0-\u06f9]/);
+  await amPm.click();
+  await expect(amPm).toHaveText('مساءً');
+  await expect(timeInput).toHaveValue('22:45');
+  await amPm.click();
+  await expect(timeInput).toHaveValue('10:45');
   await timeInput.fill('١٠:٣٠');
   await expect(timeInput).toHaveValue('10:30');
 

@@ -115,3 +115,18 @@ test('picker shows Arabic 12-hour periods and ASCII numeric subcontrols while ke
   assert.match(adapter, /select\.replaceChildren\(\.\.\.visible\.map/);
   assert.match(style, /\.rakeez-year-input-hidden\s*\{\s*display: none;/);
 });
+
+test('clock CSS places minute right of hour and the separate period at the left without changing bindings', () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const style = readFileSync(join(root, 'src/styles/rakeez-datetime.css'), 'utf8');
+  const adapter = readFileSync(join(root, 'src/lib/rakeez-datetime.js'), 'utf8');
+  assert.match(style, /\.flatpickr-calendar \.flatpickr-time\s*\{\s*direction: rtl;\s*\}/);
+  for (const [control, order] of [['minute', 0], ['time-separator', 1], ['hour', 2], ['am-pm', 3]]) {
+    assert.match(style, new RegExp(`\\.flatpickr-calendar \\.flatpickr-time \\.flatpickr-${control}\\s*\\{\\s*order: ${order};\\s*\\}`));
+  }
+  assert.match(adapter, /dateFormat: kind === 'date' \? 'Y-m-d' : 'H:i'/);
+  assert.match(adapter, /time_24hr: false/);
+  assert.doesNotMatch(adapter, /\.hourElement\s*=|\.minuteElement\s*=/);
+  assert.equal(validDateTimeValue('10:45', 'time'), true);
+  assert.equal(validDateTimeValue('22:45', 'time'), true);
+});

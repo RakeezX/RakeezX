@@ -79,7 +79,7 @@ test('Attendance report picker hides future years and caps dates at today', asyn
   await calendar.screenshot({ path: testInfo.outputPath('historical-320.png') });
 });
 
-test('RTL time picker keeps 10:45 in visual order and persists the selected time', async ({ page }, testInfo) => {
+test('RTL time picker shows minute, hour, period while preserving 10:45 and 22:45', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await enterProduct(page, '/#/schedule/times');
   await page.locator('[data-act="edit-times"]').first().click();
@@ -99,9 +99,19 @@ test('RTL time picker keeps 10:45 in visual order and persists the selected time
   await expect(input).toHaveValue('10:45');
   const [hourBox, separatorBox, minuteBox, amPmBox] = await Promise.all(
     [hour, separator, minute, amPm].map((locator) => locator.boundingBox()));
-  expect(hourBox.x).toBeLessThan(separatorBox.x);
-  expect(separatorBox.x).toBeLessThan(minuteBox.x);
-  expect(minuteBox.x).toBeLessThan(amPmBox.x);
+  expect(minuteBox.x).toBeGreaterThan(separatorBox.x);
+  expect(separatorBox.x).toBeGreaterThan(hourBox.x);
+  expect(hourBox.x).toBeGreaterThan(amPmBox.x);
+  expect(hourBox.x).toBeGreaterThanOrEqual(amPmBox.x + amPmBox.width);
+  expect(minuteBox.x).toBeGreaterThanOrEqual(hourBox.x + hourBox.width);
+  expect(await hour.inputValue()).toMatch(/^[0-9]{2}$/);
+  expect(await minute.inputValue()).toMatch(/^[0-9]{2}$/);
+  expect(`${await hour.inputValue()}${await minute.inputValue()}`).not.toMatch(/[\u0660-\u0669\u06f0-\u06f9]/);
+  await amPm.click();
+  await expect(amPm).toHaveText('مساءً');
+  await expect(input).toHaveValue('22:45');
+  await amPm.click();
+  await expect(input).toHaveValue('10:45');
   await clock.screenshot({ path: testInfo.outputPath('clock-1045-rtl.png') });
   await page.locator('#gen-form [name="assemblyStart"]').fill('');
   await page.locator('#gen-form button[type="submit"], .sheet:last-child button[form="gen-form"]').first().click();
