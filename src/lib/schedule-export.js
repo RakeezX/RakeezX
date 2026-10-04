@@ -10,6 +10,7 @@ import { SCHOOL_WEEKDAYS, WEEKDAYS, periodNumbers, periodTime, gradeLabel, secti
 import { downloadBlob } from './export.js';
 import { getAccountPresentation } from './account-profile.js';
 import { ensureThmanyahFont, installThmanyahInDocument } from './thmanyah-font.js';
+import { visibleLatinDigits } from './visible-numerals.js';
 
 export const SCHEDULE_PNG_WIDTH = 1600;
 export const SCHEDULE_PNG_HEIGHT = 1200;
@@ -31,12 +32,12 @@ export function compactScheduleClassLabel(section) {
   if (fullGrade && sectionName.startsWith(fullGrade)) {
     sectionName = sectionName.slice(fullGrade.length).replace(/^[\s/—–-]+/, '').trim();
   }
-  return shortGrade && sectionName ? `${shortGrade}/${sectionName}` : text(sectionLabel(section));
+  return visibleLatinDigits(shortGrade && sectionName ? `${shortGrade}/${sectionName}` : text(sectionLabel(section)));
 }
 
 export function compactScheduleSubjectLabel(name) {
   const label = text(name);
-  return label === 'المهارات الرقمية' ? 'رقمية' : label;
+  return visibleLatinDigits(label === 'المهارات الرقمية' ? 'رقمية' : label);
 }
 const positivePeriod = (value) => {
   const period = Number(value);
@@ -46,7 +47,7 @@ const positivePeriod = (value) => {
 function safeTime(profile, weekday, period, grade = null) {
   const timing = periodTime(profile, weekday, period, grade);
   if (!timing?.start || !timing?.end) return null;
-  return { start: text(timing.start), end: text(timing.end) };
+  return { start: visibleLatinDigits(text(timing.start)), end: visibleLatinDigits(text(timing.end)) };
 }
 
 /**
@@ -94,10 +95,10 @@ export function buildScheduleExportModel(source, {
 
   const identity = {};
   if (includeTeacherName && text(profile?.teacherName)) {
-    identity.teacherName = text(profile.teacherName);
+    identity.teacherName = visibleLatinDigits(text(profile.teacherName));
     identity.teacherForm = profile?.teacherForm === 'feminine' ? 'feminine' : 'masculine';
   }
-  if (includeSchoolName && text(profile?.schoolName)) identity.schoolName = text(profile.schoolName);
+  if (includeSchoolName && text(profile?.schoolName)) identity.schoolName = visibleLatinDigits(text(profile.schoolName));
 
   const days = dayNumbers.map((weekday, dayIndex) => ({
     weekday,
@@ -126,12 +127,12 @@ export function buildScheduleExportModel(source, {
     direction: 'rtl',
     identity,
     academic: {
-      year: text(year?.label),
-      term: text(term?.name),
+      year: visibleLatinDigits(text(year?.label)),
+      term: visibleLatinDigits(text(term?.name)),
     },
     timing: includeTimes && baseProfile ? {
-      name: text(baseProfile.name),
-      label: `التوقيت الأساسي: ${text(baseProfile.name)}`,
+      name: visibleLatinDigits(text(baseProfile.name)),
+      label: `التوقيت الأساسي: ${visibleLatinDigits(text(baseProfile.name))}`,
     } : null,
     periods: periods.map((period, index) => ({ period, order: index + 1 })),
     days,
@@ -139,7 +140,7 @@ export function buildScheduleExportModel(source, {
 }
 
 function clippedText(ctx, value, maxWidth) {
-  const original = text(value);
+  const original = visibleLatinDigits(text(value));
   if (!original || ctx.measureText(original).width <= maxWidth) return original;
   let output = original;
   while (output.length > 1 && ctx.measureText(`${output}…`).width > maxWidth) output = output.slice(0, -1);
@@ -166,7 +167,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#12333b';
   ctx.font = '700 42px "Thmanyah Sans", Tahoma, Arial, sans-serif';
-  ctx.fillText(model.title, width / 2, 78);
+  ctx.fillText(visibleLatinDigits(model.title), width / 2, 78);
 
   const identityLines = [
     model.identity.teacherName && `${presentation.teacherLabel}: ${model.identity.teacherName}`,
@@ -176,7 +177,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
   const metaLines = [...identityLines, academicLine, model.timing?.label].filter(Boolean);
   ctx.font = '500 21px "Thmanyah Sans", Tahoma, Arial, sans-serif';
   ctx.fillStyle = '#4a6268';
-  metaLines.forEach((line, index) => ctx.fillText(line, width / 2, 126 + index * 29));
+  metaLines.forEach((line, index) => ctx.fillText(visibleLatinDigits(line), width / 2, 126 + index * 29));
 
   const gridTop = 245;
   const gridLeft = margin;
@@ -213,7 +214,7 @@ function drawScheduleCanvas(ctx, model, width, height) {
     ctx.strokeRect(dayX, y, dayColumnWidth, rowHeight);
     ctx.fillStyle = '#12333b';
     ctx.font = '700 22px "Thmanyah Sans", Tahoma, Arial, sans-serif';
-    ctx.fillText(day.label, dayX + dayColumnWidth / 2, y + rowHeight / 2);
+    ctx.fillText(visibleLatinDigits(day.label), dayX + dayColumnWidth / 2, y + rowHeight / 2);
 
     model.periods.forEach((unused, periodIndex) => {
       const cell = day.periods[periodIndex];
@@ -255,7 +256,7 @@ export async function renderSchedulePng(model, {
   });
 }
 
-const escapeHtml = (value) => text(value)
+const escapeHtml = (value) => visibleLatinDigits(text(value))
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
   .replaceAll('>', '&gt;')

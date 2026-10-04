@@ -100,7 +100,7 @@ function yearSheet(existing = null) {
           <span class="field__label">بداية السنة الهجرية</span>
           <input class="input tabular" name="hijriStart" type="number" min="1300" max="1600"
                  value="${y.hijriStart || 1448}" required ${existing ? 'readonly' : ''}>
-          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل ١٤٤٨-١٤٤٩.</span>
+          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل 1448-1449.</span>
         </label>
         ${existing
           ? html`
@@ -209,7 +209,7 @@ function renderResultPanel(title, result) {
       </button>
       ${result.status === 'success' ? html`
         <div style="color: var(--brand); font-weight: bold; margin-top: 16px;">نجاح</div>
-        <div>آخر مزامنة: ${new Date(result.time).toLocaleTimeString('ar-SA')}</div>
+        <div>آخر مزامنة: ${new Date(result.time).toLocaleTimeString('ar-SA-u-nu-latn', { numberingSystem: 'latn' })}</div>
         ${result.stats ? html`
           <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
             ${Object.entries(result.stats).map(([k, v]) => html`
@@ -664,7 +664,7 @@ const settings = {
       let text = `--- ${payload.title} ---\n`;
       if (payload.status === 'success') {
         text += `الحالة: نجاح\n`;
-        text += `آخر مزامنة: ${new Date(payload.time).toLocaleTimeString('ar-SA')}\n`;
+        text += `آخر مزامنة: ${new Date(payload.time).toLocaleTimeString('ar-SA-u-nu-latn', { numberingSystem: 'latn' })}\n`;
         if (payload.stats) {
           for (const [k, v] of Object.entries(payload.stats)) {
             text += `${k}: ${v.pushed} ↑ / ${v.pulled} ↓\n`;

@@ -409,7 +409,7 @@ function paintSyncStatus() {
   for (const el of document.querySelectorAll('[data-sync-description]')) el.textContent = syncInfo.label;
   for (const el of document.querySelectorAll('[data-sync-time]')) {
     el.textContent = syncInfo.summary.lastSuccessfulSyncAt
-      ? new Date(syncInfo.summary.lastSuccessfulSyncAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
+      ? new Date(syncInfo.summary.lastSuccessfulSyncAt).toLocaleTimeString('ar-SA-u-nu-latn', { hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }) : '—';
   }
   for (const el of document.querySelectorAll('[data-sync-action]')) {
     el.disabled = !syncInfo.canSync;

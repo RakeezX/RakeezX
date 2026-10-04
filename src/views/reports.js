@@ -10,6 +10,7 @@ import { downloadCSV } from '../lib/export.js';
 import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
+import { visibleLatinDigits } from '../lib/visible-numerals.js';
 
 let tab = 'grades'; // roster | grades | attendance | support
 let sortKey = 'default'; // default | name | roll | score_desc | score_asc | absent_desc
@@ -19,7 +20,7 @@ let filterEndDate = '';
 let a4Preview = false;
 
 const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
-const safeName = (value) => String(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
+const safeName = (value) => visibleLatinDigits(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
 function identity(cls) {
   const snapshot = store.latestClosedTermReport(cls.termId);
@@ -87,7 +88,9 @@ export default {
     if (!roster.length && tab !== 'attendance') return html`
       <div class="empty"><div class="empty__icon">${icon('reports')}</div><div class="empty__title">لا بيانات بعد</div><a class="btn btn--primary" href="#/teaching/${cls.id}/students">${icon('plus')} كشف الطلاب</a></div>`;
 
-    const sortedRoster = sortRoster(roster, items, ctx);
+    const sortedRoster = sortRoster(roster, items, ctx).map((student) => ({
+      ...student, name: visibleLatinDigits(student.name), rollNo: student.rollNo == null ? student.rollNo : visibleLatinDigits(student.rollNo),
+    }));
     const datePeriod = tab === 'attendance'
       ? [filterStartDate && `من ${fmtDateFull(filterStartDate)}`, filterEndDate && `إلى ${fmtDateFull(filterEndDate)}`].filter(Boolean).join(' · ')
       : '';
@@ -349,6 +352,9 @@ function attendanceReport(cls, report) {
   if (filterEndDate) sessions = sessions.filter((session) => session.date <= filterEndDate);
   if (!sessions.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
 
+  const visibleStudents = report.students.map((student) => ({
+    ...student, name: visibleLatinDigits(student.name), rollNo: student.rollNo == null ? student.rollNo : visibleLatinDigits(student.rollNo),
+  }));
   const rosterFor = (session, studentId) => report.rosterBySession.get(session.id)?.members.find((student) => student.id === studentId) ?? null;
   const recordFor = (session, studentId) => report.attendanceBySession.get(session.id)?.get(studentId) ?? null;
   const tallyFor = (studentId) => {
@@ -374,7 +380,7 @@ function attendanceReport(cls, report) {
   if (attMode === 'brief') return html`
     ${filters}
     <div class="tablewrap print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>نسبة الحضور</th><th>حضور</th><th>تأخر</th><th>استئذان</th><th>غياب</th></tr></thead><tbody>
-      ${report.students.map((student) => {
+      ${visibleStudents.map((student) => {
         const tally = tallyFor(student.id); const total = Object.values(tally).reduce((sum, value) => sum + value, 0);
         const pct = total ? Math.round(((tally.present + tally.late) / total) * 100) : null;
         return html`<tr><td class="tabular">${student.rollNo ?? ''}</td><th><a href="#/student/${student.id}">${student.name}</a></th><td class="tabular fw-7">${pct === null ? '—' : `${pct}%`}</td><td class="tabular t-3">${tally.present || '—'}</td><td class="tabular t-3">${tally.late || '—'}</td><td class="tabular t-3">${tally.excused || '—'}</td><td class="tabular ${tally.absent ? 'fw-7 is-danger' : 't-3'}">${tally.absent || '—'}</td></tr>`;
@@ -385,7 +391,7 @@ function attendanceReport(cls, report) {
   const chunks = Array.from({ length: Math.ceil(sessions.length / CHUNK_SIZE) }, (_, index) => sessions.slice(index * CHUNK_SIZE, (index + 1) * CHUNK_SIZE));
   return html`${filters}<p class="t-3 fs-sm mb-3 noprint">${sessions.length} حصة مرصودة.</p>${chunks.map((chunk, chunkIndex) => html`
     <div class="report-chunk ${chunkIndex < chunks.length - 1 ? 'print-page-break' : ''}"><div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th class="gtable__sticky">الطالب</th>${chunk.map((session) => html`<th class="att-col">${fmtDate(session.date, false)} · ${session.period}</th>`)}${chunkIndex === chunks.length - 1 ? ATTENDANCE_ORDER.map((key) => html`<th>${ATTENDANCE[key].label}</th>`) : ''}</tr></thead><tbody>
-      ${report.students.map((student) => {
+      ${visibleStudents.map((student) => {
         const tally = tallyFor(student.id);
         return html`<tr><th class="gtable__sticky"><span class="gtable__roll tabular">${student.rollNo ?? ''}</span>${student.name}</th>${chunk.map((session) => {
           const member = rosterFor(session, student.id); const record = recordFor(session, student.id);
@@ -402,7 +408,7 @@ export function supportRows(roster, items, ctx) {
     const absents = ctx[s.id].attendance.filter((a) => !a.deleted && a.status === 'absent').length;
     const part = ctx[s.id].logs.filter((l) => !l.deleted && l.kind === 'participation').reduce((n, l) => n + l.delta, 0);
     const reasons = [];
-    if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون ٥٠٪');
+    if (total.pct !== null && total.pct < 50) reasons.push('الدرجات دون 50٪');
     if (absents >= 3) reasons.push(`${absents} غيابات`);
     if (part <= 0 && total.pct !== null && validItems.length > 0) reasons.push('لا مشاركة مرصودة');
     if (total.missing > 0 && validItems.length > 0 && total.missing === validItems.length) reasons.push('لم يُرصد له شيء');
@@ -423,6 +429,6 @@ export function supportRows(roster, items, ctx) {
 
 function supportReport(roster, items, ctx) {
   const rows = supportRows(roster, items, ctx);
-  if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون ٥٠٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
+  if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون 50٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
   return html`<div class="support-report-screen noprint"><p class="t-3 fs-sm mb-3">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span><span class="row__chev">${icon('chev', 'compact')}</span></span></a>`)}</div></div><div class="tablewrap print-tablewrap print-only support-report-print"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>مؤشرات الدعم</th><th>النسبة</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td>${row.reasons.join(' · ')}</td><td class="tabular">${fmtPct(row.total.pct)}</td></tr>`)}</tbody></table></div>`;
 }

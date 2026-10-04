@@ -4,6 +4,7 @@ import { html, raw, fmtDateFull } from './dom.js';
 import { todayISO } from '../models.js';
 import { getAccountPresentation } from './account-profile.js';
 import * as store from '../store.js';
+import { visibleLatinDigits } from './visible-numerals.js';
 
 export const isDemoOutput = () => store.getActiveWorkspace()?.type === 'demo';
 
@@ -18,7 +19,8 @@ export function markDemoExportRows(rows) {
 }
 
 export function markDemoSharedText(lines) {
-  return isDemoOutput() ? ['بيانات تجريبية', ...lines] : lines;
+  const visibleLines = lines.map(visibleLatinDigits);
+  return isDemoOutput() ? ['بيانات تجريبية', ...visibleLines] : visibleLines;
 }
 
 export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
@@ -38,7 +40,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
   ].filter(Boolean);
   const metadata = (items, className) => items.length ? html`
     <dl class="printhead__meta ${className}">
-      ${items.map(([label, value]) => html`<div><dt>${label}</dt><dd>${value}</dd></div>`)}
+      ${items.map(([label, value]) => html`<div><dt>${label}</dt><dd>${visibleLatinDigits(value)}</dd></div>`)}
     </dl>
   ` : '';
 
@@ -46,7 +48,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
     <header class="printhead print-report__header" dir="rtl">
       <div class="printhead__brand"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong><span>تقارير المعلم</span></div>
       ${demoOutputMarker()}
-      <h2 class="printhead__title">${title}</h2>
+      <h2 class="printhead__title">${visibleLatinDigits(title)}</h2>
       <div class="printhead__details">
         ${metadata(identity, 'printhead__meta--identity')}
         ${metadata(context, 'printhead__meta--context')}
@@ -76,8 +78,8 @@ export function reportSignatures({ profile, teacherLabel = null }) {
   const principal = resolvedReportPrincipalName(profile);
   return html`
     <footer class="print-signatures" dir="rtl">
-      <div><span>${teacherLabel ?? presentation.teacherSubjectLabel}</span>${profile?.teacherName ? html`<strong>${profile.teacherName}</strong>` : ''}</div>
-      ${principal ? html`<div><span>${presentation.schoolPrincipalLabel}</span><strong>${principal}</strong></div>` : ''}
+      <div><span>${teacherLabel ?? presentation.teacherSubjectLabel}</span>${profile?.teacherName ? html`<strong>${visibleLatinDigits(profile.teacherName)}</strong>` : ''}</div>
+      ${principal ? html`<div><span>${presentation.schoolPrincipalLabel}</span><strong>${visibleLatinDigits(principal)}</strong></div>` : ''}
     </footer>
   `;
 }
