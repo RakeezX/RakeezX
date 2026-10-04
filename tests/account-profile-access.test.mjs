@@ -30,8 +30,16 @@ const raw = (overrides = {}) => ({
 test('legacy profile defaults teacher form to masculine without changing access', () => {
   const contract = normalizeAccountContract(raw({ profile: { teacherName: 'معلم', phone: '', schoolName: '' } }), authUser);
   assert.equal(contract.profile.teacherForm, 'masculine');
+  assert.equal(contract.profile.educationDepartment, null);
   assert.equal(teacherAddress(contract.profile.teacherForm), 'أستاذ');
   assert.equal(contract.access.label, BETA_ACCESS_LABEL);
+  assert.equal(contract.profileStatus, PROFILE_STATUS.READY);
+});
+
+test('account contract exposes the durable department without changing provisioning status', () => {
+  const department = 'إدارة التعليم بمحافظة الطائف';
+  const contract = normalizeAccountContract(raw({ profile: { ...raw().profile, educationDepartment: department } }), authUser);
+  assert.equal(contract.profile.educationDepartment, department);
   assert.equal(contract.profileStatus, PROFILE_STATUS.READY);
 });
 

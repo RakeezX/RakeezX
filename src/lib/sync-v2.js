@@ -21,6 +21,7 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     entity: 'profile',
     fields: {
       teacherName: 'teacher_name', schoolName: 'school_name', phone: 'phone', teacherForm: 'teacher_form',
+      educationDepartment: 'education_department',
       reportPrincipalName: 'report_principal_name', activeTimeProfileId: 'active_time_profile_id',
     },
     references: { activeTimeProfileId: 'timeProfiles' },

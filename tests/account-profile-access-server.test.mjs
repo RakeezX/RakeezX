@@ -6,6 +6,7 @@ import { PGlite } from '@electric-sql/pglite';
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
 const migration = await fs.readFile(new URL('../supabase/migrations/0032_account_profile_access_foundation.sql', import.meta.url), 'utf8');
+const n03Migration = await fs.readFile(new URL('../supabase/migrations/20261003000000_n03_education_department.sql', import.meta.url), 'utf8');
 
 async function fixture() {
   const pg = new PGlite();
@@ -109,6 +110,35 @@ test('anon cannot read private account state or execute account RPCs', async () 
 test('Sync V2 profile map includes teacher form but not server readiness', async () => {
   const pg = await fixture();
   const map = (await pg.query(`select rakeezx.sync_v2_field_map('profile') value`)).rows[0].value;
+  assert.equal(map.teacher_form, 'teacher_form');
+  assert.equal('profile_status' in map, false);
+  await pg.close();
+});
+
+test('N03 additive migration preserves readiness, validates official names, and isolates owners', async () => {
+  const pg = await fixture();
+  await pg.exec(n03Migration);
+  const department = 'إدارة التعليم بمحافظة الطائف';
+  const before = (await asOwner(pg, A, 'select rakeezx.account_contract() result')).rows[0].result;
+  assert.equal(before.profile.educationDepartment, null);
+  assert.equal(before.profileStatus, 'READY');
+  assert.equal((await pg.query('select count(*)::int n from rakeezx.education_departments')).rows[0].n, 47);
+  await assert.rejects(() => asOwner(pg, A,
+    "update rakeezx.profile set education_department='غير رسمية'"), /foreign key/i);
+  await asOwner(pg, A, `update rakeezx.profile set education_department='${department}'`);
+  const own = (await asOwner(pg, A, 'select rakeezx.account_contract() result')).rows[0].result;
+  assert.equal(own.profile.educationDepartment, department);
+  assert.equal(own.profileStatus, 'READY');
+  await asOwner(pg, B, 'select rakeezx.provision_account_profile()');
+  const other = (await asOwner(pg, B, 'select rakeezx.account_contract() result')).rows[0].result;
+  assert.equal(other.profile.educationDepartment, null);
+  assert.equal((await asOwner(pg, B, 'select education_department from rakeezx.profile')).rows.length, 1);
+  await asOwner(pg, B, `update rakeezx.profile set education_department='${department}' where owner_id='${A}'`);
+  assert.equal((await asOwner(pg, A, 'select rakeezx.account_contract() result')).rows[0].result.profile.educationDepartment, department);
+  await asOwner(pg, A, 'update rakeezx.profile set education_department=null');
+  assert.equal((await asOwner(pg, A, 'select rakeezx.account_contract() result')).rows[0].result.profile.educationDepartment, null);
+  const map = (await pg.query("select rakeezx.sync_v2_field_map('profile') value")).rows[0].value;
+  assert.equal(map.education_department, 'education_department');
   assert.equal(map.teacher_form, 'teacher_form');
   assert.equal('profile_status' in map, false);
   await pg.close();

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { profileAttention } from '../src/lib/settings-profile-ui.js';
+import { EDUCATION_DEPARTMENTS } from '../src/lib/education-department-directory.js';
 import { installContext, installSteps } from '../src/lib/install-guide-ui.js';
 
-const profile = { teacherName: 'معلمة', phone: '0500000000' };
+const profile = { teacherName: 'معلمة', phone: '0500000000', educationDepartment: EDUCATION_DEPARTMENTS[0] };
 const contract = { profileStatus: 'READY', access: { label: 'الوصول التجريبي' }, provisioning: { state: 'READY' } };
 test('N42 healthy profile stays compact; existing required/invalid rules expose attention', () => {
   assert.equal(profileAttention({ profile, contract }), '');
@@ -18,6 +19,11 @@ test('N42 pending/unavailable/account attention remains discoverable; Demo exclu
     assert.equal(profileAttention({ profile, contract: { ...contract, ...patch } }), 'راجع حالة حسابك');
   }
   assert.equal(profileAttention({ profile, demo: true, pendingEmail: true, unavailable: true, contract: null }), '');
+});
+test('N03 directory selection is required for data completeness without changing account readiness', () => {
+  assert.equal(profileAttention({ profile: { ...profile, educationDepartment: null }, contract }), 'أكمل إدارة التعليم من بياناتك');
+  assert.equal(profileAttention({ profile: { ...profile, educationDepartment: 'غير رسمية' }, demo: true }), 'أكمل إدارة التعليم من بياناتك');
+  assert.equal(profileAttention({ profile, contract }), '');
 });
 const ua = {
   ios: 'Mozilla iPhone Safari/605.1', ipad: 'Mozilla Macintosh Safari/605.1',

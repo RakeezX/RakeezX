@@ -565,6 +565,30 @@ test('pull adopts an existing bootstrap identity and preserves a later local edi
   assert.equal((await client.engine.status()).state, 'synced');
 });
 
+test('N03 profile department survives offline queue, second device pull, and clearing', async (t) => {
+  const server = new MemoryV2Server();
+  const first = makeClient(server, 'n03-first');
+  const second = makeClient(server, 'n03-second');
+  t.after(() => { first.database.close(); second.database.close(); });
+  server.table('profile').set('profile', {
+    id: 'profile', teacher_name: 'Teacher', school_name: '', phone: '0500000000',
+    report_principal_name: '', education_department: null, revision: 1,
+    field_revisions: { teacher_name: 1, school_name: 1, phone: 1, report_principal_name: 1, education_department: 1 },
+    deleted_at: null, client_updated_at: 1,
+  });
+  await first.engine.pullStore('profile');
+  const chosen = 'إدارة التعليم بمحافظة الطائف';
+  await first.engine.commitMutation({ store: 'profile', recordId: 'profile', op: 'patch', patch: { educationDepartment: chosen } });
+  assert.equal((await first.database.getAll('outbox')).length, 1);
+  await first.engine.dispatchPending();
+  await second.engine.pullStore('profile');
+  assert.equal((await second.database.get('profile', 'profile')).educationDepartment, chosen);
+  await second.engine.commitMutation({ store: 'profile', recordId: 'profile', op: 'patch', patch: { educationDepartment: null } });
+  await second.engine.dispatchPending();
+  await first.engine.pullStore('profile');
+  assert.equal((await first.database.get('profile', 'profile')).educationDepartment, null);
+});
+
 test('stable default Timing Profile identities converge across concurrent and later devices', async (t) => {
   const server = new MemoryV2Server();
   const clients = ['timing-a', 'timing-b', 'timing-c'].map((label) => makeClient(server, label));

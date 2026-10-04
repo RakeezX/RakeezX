@@ -102,6 +102,7 @@ export function normalizeAccountContract(raw, authUser = cloud.user) {
       phone: String(raw.profile?.phone ?? ''),
       teacherForm: form,
       schoolName: String(raw.profile?.schoolName ?? ''),
+      educationDepartment: raw.profile?.educationDepartment ?? null,
     }),
     access,
   });

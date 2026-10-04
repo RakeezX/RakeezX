@@ -3,7 +3,8 @@
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
 import { brandLockup } from '../lib/brand.js';
 import { BUILD_META } from '../lib/build-meta.js';
-import { profileAttention } from '../lib/settings-profile-ui.js';
+import { educationDepartmentComplete, profileAttention } from '../lib/settings-profile-ui.js';
+import { EDUCATION_DEPARTMENTS, isOfficialEducationDepartment, searchEducationDepartments } from '../lib/education-department-directory.js';
 import { currentInstallContext, INSTALL_COPY, openInstallGuide } from '../lib/install-guide-ui.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
@@ -326,6 +327,28 @@ const settings = {
                 ${emailChangePending ? html`<span class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد</span>` : ''}
               </div>`}
             </div>
+            <div class="field settings-education-department" data-education-department>
+              <span class="field__label">إدارة التعليم</span>
+              <span class="field__hint">مطلوبة لإكمال بياناتك، ويمكنك استخدامها لاحقًا.</span>
+              <span class="settings-education-department__status" role="status" data-education-department-status>
+                ${educationDepartmentComplete(profile) ? m.educationDepartment : 'لم تُحدَّد إدارة التعليم بعد'}
+              </span>
+              <label class="field">
+                <span class="sr-only">ابحث عن إدارة التعليم</span>
+                <input class="input" type="search" autocomplete="off" placeholder="ابحث عن إدارة التعليم"
+                       aria-label="ابحث عن إدارة التعليم" aria-controls="education-department-options"
+                       data-input="education-department-search">
+              </label>
+              <div class="settings-education-department__options" id="education-department-options" aria-label="إدارات التعليم الرسمية">
+                ${EDUCATION_DEPARTMENTS.map((name, index) => html`<button class="btn btn--quiet" type="button"
+                  data-act="education-department-select" data-index="${index}"
+                  aria-pressed="${m.educationDepartment === name}">${name}</button>`)}
+              </div>
+              <div class="hstack gap-2 wrap">
+                <button class="btn btn--quiet btn--sm" type="button" data-act="education-department-clear">إكماله لاحقًا</button>
+                ${m.educationDepartment ? html`<button class="btn btn--quiet btn--sm" type="button" data-act="education-department-clear">إزالة الاختيار</button>` : ''}
+              </div>
+            </div>
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
               <span class="settings-account-summary__label">الوصول</span>
               <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
@@ -484,6 +507,27 @@ const settings = {
   },
 
   actions: {
+    'education-department-search'(el) {
+      const matches = new Set(searchEducationDepartments(EDUCATION_DEPARTMENTS, el.value));
+      const options = el.closest('[data-education-department]').querySelectorAll('[data-act="education-department-select"]');
+      for (const option of options) option.hidden = !matches.has(EDUCATION_DEPARTMENTS[Number(option.dataset.index)]);
+    },
+
+    async 'education-department-select'(el) {
+      const educationDepartment = EDUCATION_DEPARTMENTS[Number(el.dataset.index)];
+      if (!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, educationDepartment)) return;
+      if (await store.patchProfile({ educationDepartment })) {
+        toast('حُفظ');
+        repaint();
+      }
+    },
+
+    async 'education-department-clear'() {
+      if (await store.patchProfile({ educationDepartment: null })) {
+        toast('يمكنك إكماله لاحقًا');
+        repaint();
+      }
+    },
     async 'teacher-form'(el) {
       const teacherForm = el.dataset.val === 'feminine' ? 'feminine' : 'masculine';
       if (await store.patchProfile({ teacherForm })) {

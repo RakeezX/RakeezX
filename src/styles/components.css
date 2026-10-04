@@ -5001,6 +5001,11 @@
 .settings-profile[open] .settings-profile-edit .icon { transform: rotate(-90deg); }
 .settings-profile-attention { display: block; font-size: 13px; color: var(--info); margin-top: 4px; }
 .settings-profile-attention[hidden] { display: none; }
+.settings-education-department { display: grid; gap: 8px; }
+.settings-education-department__status { font-weight: 600; }
+.settings-education-department__options { display: grid; gap: 4px; max-height: 190px; overflow: auto; border: 1px solid var(--line, #888); border-radius: 10px; padding: 4px; }
+.settings-education-department__options button { text-align: start; white-space: normal; }
+.settings-education-department__options button[hidden] { display: none; }
 .settings-compact .settings-link-group { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elev); overflow: hidden; }
 .settings-compact .settings-destination { width: 100%; text-align: start; border: 0; border-radius: 0; background: transparent; color: var(--text); }
 .settings-compact .settings-destination + .settings-destination { border-top: 1px solid var(--border); }
