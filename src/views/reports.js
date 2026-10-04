@@ -143,6 +143,14 @@ export default {
           </label>
           ${tab === 'attendance'
             ? html`
+                <label class="field report-toolbar__date">
+                  <span class="field__label">من:</span>
+                  <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" lang="en" dir="ltr" inputmode="numeric" value="${filterStartDate}" data-change="filter-start">
+                </label>
+                <label class="field report-toolbar__date">
+                  <span class="field__label">إلى:</span>
+                  <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" lang="en" dir="ltr" inputmode="numeric" value="${filterEndDate}" data-change="filter-end">
+                </label>
                 <div class="segmented segmented--sm report-toolbar__mode" aria-label="تفصيل كشف الحضور">
                   <button class="segmented__btn ${attMode === 'brief' ? 'is-on' : ''}" data-act="att-mode" data-mode="brief">موجز</button>
                   <button class="segmented__btn ${attMode === 'detailed' ? 'is-on' : ''}" data-act="att-mode" data-mode="detailed">تفصيلي</button>
@@ -365,20 +373,7 @@ function attendanceReport(cls, report) {
     }
     return tally;
   };
-  const filters = html`
-    <div class="attendance-date-range noprint" aria-label="نطاق تاريخ كشف الحضور">
-      <label class="field attendance-date-range__field">
-        <span class="field__label">من:</span>
-        <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" value="${filterStartDate}" data-change="filter-start">
-      </label>
-      <label class="field attendance-date-range__field">
-        <span class="field__label">إلى:</span>
-        <input class="input date-field tabular" type="text" data-rakeez-datetime="date" data-rakeez-date-scope="historical" value="${filterEndDate}" data-change="filter-end">
-      </label>
-    </div>`;
-
   if (attMode === 'brief') return html`
-    ${filters}
     <div class="tablewrap print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>نسبة الحضور</th><th>حضور</th><th>تأخر</th><th>استئذان</th><th>غياب</th></tr></thead><tbody>
       ${visibleStudents.map((student) => {
         const tally = tallyFor(student.id); const total = Object.values(tally).reduce((sum, value) => sum + value, 0);
@@ -389,7 +384,7 @@ function attendanceReport(cls, report) {
 
   const CHUNK_SIZE = 12;
   const chunks = Array.from({ length: Math.ceil(sessions.length / CHUNK_SIZE) }, (_, index) => sessions.slice(index * CHUNK_SIZE, (index + 1) * CHUNK_SIZE));
-  return html`${filters}<p class="t-3 fs-sm mb-3 noprint">${sessions.length} حصة مرصودة.</p>${chunks.map((chunk, chunkIndex) => html`
+  return html`<p class="t-3 fs-sm mb-3 noprint">${sessions.length} حصة مرصودة.</p>${chunks.map((chunk, chunkIndex) => html`
     <div class="report-chunk ${chunkIndex < chunks.length - 1 ? 'print-page-break' : ''}"><div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th class="gtable__sticky">الطالب</th>${chunk.map((session) => html`<th class="att-col">${fmtDate(session.date, false)} · ${session.period}</th>`)}${chunkIndex === chunks.length - 1 ? ATTENDANCE_ORDER.map((key) => html`<th>${ATTENDANCE[key].label}</th>`) : ''}</tr></thead><tbody>
       ${visibleStudents.map((student) => {
         const tally = tallyFor(student.id);
