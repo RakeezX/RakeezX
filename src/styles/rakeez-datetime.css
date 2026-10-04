@@ -1,4 +1,4 @@
-@import 'flatpickr/dist/flatpickr.min.css';
+@import '../vendor/flatpickr/flatpickr.min.css';
 /* N38: only picker-owned controls and the flatpickr popup. */
 input.rakeez-datetime {
   direction: ltr;

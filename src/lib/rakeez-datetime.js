@@ -1,7 +1,9 @@
-import flatpickr from 'flatpickr';
-import { Arabic } from 'flatpickr/dist/l10n/ar.js';
+import '../vendor/flatpickr/flatpickr.min.js';
+import '../vendor/flatpickr/ar.js';
 import { normalizeDateTimeDigits, validDateTimeValue } from './rakeez-datetime-values.js';
 
+const flatpickr = globalThis.flatpickr;
+const Arabic = flatpickr.l10ns.ar;
 const locale = { ...Arabic, firstDayOfWeek: 0 };
 const selector = 'input[data-rakeez-datetime]';
 const instances = new Map();

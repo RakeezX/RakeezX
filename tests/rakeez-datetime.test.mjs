@@ -58,3 +58,19 @@ test('Product date/time controls use the central adapter and source guard', () =
     if (want.date || want.time) assert.match(source, /import '\.\.\/lib\/rakeez-datetime\.js'/, `${name} loads adapter`);
   }
 });
+
+test('N38 runtime uses repository-local browser assets and preloads them offline', () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const adapter = readFileSync(join(root, 'src/lib/rakeez-datetime.js'), 'utf8');
+  const style = readFileSync(join(root, 'src/styles/rakeez-datetime.css'), 'utf8');
+  const worker = readFileSync(join(root, 'sw.js'), 'utf8');
+  assert.doesNotMatch(adapter, /\b(?:import|from)\s*['"]flatpickr(?:\/|['"])/);
+  assert.doesNotMatch(style, /@import\s*['"]flatpickr(?:\/|['"])/);
+  for (const asset of ['flatpickr.min.js', 'ar.js', 'flatpickr.min.css']) {
+    assert.ok(readFileSync(join(root, 'src/vendor/flatpickr', asset)).length > 0, `${asset} is present`);
+    assert.match(worker, new RegExp(`\\./src/vendor/flatpickr/${asset.replace('.', '\\.')}['"]`));
+  }
+  assert.match(adapter, /import '\.\.\/vendor\/flatpickr\/flatpickr\.min\.js';\s*import '\.\.\/vendor\/flatpickr\/ar\.js';/);
+  assert.match(style, /@import '\.\.\/vendor\/flatpickr\/flatpickr\.min\.css';/);
+  assert.match(readFileSync(join(root, 'src/vendor/flatpickr/LICENSE.md'), 'utf8'), /MIT License/);
+});
