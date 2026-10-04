@@ -36,7 +36,7 @@ test.describe('Settings and install guidance', () => {
     await page.setViewportSize({ width, height });
     await simulateDevice(page);
     const evidence = await bootSettings(page);
-    await expect(page.locator('[data-settings-profile]')).not.toHaveAttribute('open');
+    await expect(page.locator('[data-settings-profile]')).toHaveAttribute('open', '');
     const measurements = [];
     for (const theme of ['light', 'dark']) {
       await page.locator(`[data-act="theme"][data-theme="${theme}"]`).click();
@@ -92,7 +92,9 @@ test.describe('Settings and install guidance', () => {
   test('N42 expand, persist profile/preferences, required/error discoverability, destinations', async ({ page }) => {
     const evidence = await bootSettings(page);
     const summary = page.locator('[data-settings-profile] summary');
-    await summary.focus(); await page.keyboard.press('Enter');
+    if (await page.locator('[data-settings-profile]').getAttribute('open') === null) {
+      await summary.focus(); await page.keyboard.press('Enter');
+    }
     await expect(page.locator('input[name="teacherName"]')).toBeVisible();
     await page.locator('input[name="schoolName"]').fill('مدرسة اختبار محلية');
     await page.locator('input[name="schoolName"]').blur();
@@ -107,7 +109,7 @@ test.describe('Settings and install guidance', () => {
     await page.locator('[data-act="sound"][data-val="off"]').click();
     await page.locator('[data-act="visual-fx"][data-val="off"]').click();
     await page.reload();
-    await page.locator('[data-settings-profile] summary').click();
+    if (await page.locator('[data-settings-profile]').getAttribute('open') === null) await page.locator('[data-settings-profile] summary').click();
     await expect(page.locator('input[name="schoolName"]')).toHaveValue('مدرسة اختبار محلية');
     await expect(page.locator('input[name="phone"]')).toHaveValue('0500000000');
     await expect(page.locator('[data-act="sound"][data-val="off"]')).toHaveAttribute('aria-pressed', 'true');
@@ -186,7 +188,7 @@ test.describe('Settings and install guidance', () => {
     const evidence = await bootDemoSettings(page);
     await expect(page.locator('[data-act="demo-reset"]')).toBeVisible();
     await expect(page.locator('[data-act="demo-exit"]')).toBeVisible();
-    await page.locator('[data-settings-profile] summary').click();
+    if (await page.locator('[data-settings-profile]').getAttribute('open') === null) await page.locator('[data-settings-profile] summary').click();
     await expect(page.locator('[data-account-email], [data-act="change-email"], [data-account-access]')).toHaveCount(0);
     await page.locator('[data-act="about-rakeez"]').click(); await expect(page.locator('[data-about-version]')).toBeVisible(); await page.keyboard.press('Escape');
     await manualGuide(page); await expect(page.locator('.visual-cards > li')).toHaveCount(3);

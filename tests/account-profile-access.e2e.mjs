@@ -83,7 +83,7 @@ test('Settings exposes polished profile controls and read-only account informati
   });
   await seedClaimedWorkspace(page);
   await page.goto('/#/settings');
-  await page.locator('[data-settings-profile] summary').click();
+  if (await page.locator('[data-settings-profile]').getAttribute('open') === null) await page.locator('[data-settings-profile] summary').click();
   await expect(page.locator('input[name="teacherName"]')).toHaveValue('معلمة الاختبار');
   await expect(page.getByText('اسم المعلمة', { exact: true })).toBeVisible();
   await expect(page.getByText(/اسم المديرة/, { exact: false })).toBeVisible();
@@ -95,9 +95,10 @@ test('Settings exposes polished profile controls and read-only account informati
   await expect(profileRows.nth(0)).toContainText('اسم المعلمة');
   await expect(profileRows.nth(0)).toContainText('صفة المستخدم');
   await expect(profileRows.nth(1)).toContainText('اسم المدرسة');
-  await expect(profileRows.nth(1)).toContainText('اسم المديرة');
+  await expect(profileRows.nth(1)).toContainText('إدارة التعليم');
+  await expect(profileRows.nth(2)).toContainText('اسم المديرة');
   await expect(profileRows.nth(2)).toContainText('رقم الجوال');
-  await expect(profileRows.nth(2)).toContainText('البريد الإلكتروني');
+  await expect(page.locator('.settings-email-field')).toContainText('البريد الإلكتروني');
   await expect(page.locator('input[name="phone"]')).toHaveValue('0500000000');
   await expect(page.getByRole('button', { name: 'معلمة', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'معلم', exact: true })).toHaveAttribute('aria-pressed', 'false');
@@ -141,7 +142,7 @@ test('Settings exposes polished profile controls and read-only account informati
   await phone.blur();
   await expect(phone).toHaveAttribute('aria-invalid', 'true');
   await page.reload();
-  await page.locator('[data-settings-profile] summary').click();
+  if (await page.locator('[data-settings-profile]').getAttribute('open') === null) await page.locator('[data-settings-profile] summary').click();
   await expect(phone).toHaveValue('0500000000');
 
   const beforeEmailChange = await page.evaluate(async () => ({

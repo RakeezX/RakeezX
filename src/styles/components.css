@@ -5001,11 +5001,19 @@
 .settings-profile[open] .settings-profile-edit .icon { transform: rotate(-90deg); }
 .settings-profile-attention { display: block; font-size: 13px; color: var(--info); margin-top: 4px; }
 .settings-profile-attention[hidden] { display: none; }
-.settings-education-department { display: grid; gap: 8px; }
-.settings-education-department__status { font-weight: 600; }
-.settings-education-department__options { display: grid; gap: 4px; max-height: 190px; overflow: auto; border: 1px solid var(--line, #888); border-radius: 10px; padding: 4px; }
-.settings-education-department__options button { text-align: start; white-space: normal; }
-.settings-education-department__options button[hidden] { display: none; }
+.settings-education-department { min-width: 0; }
+.settings-education-department__control { position: relative; min-width: 0; }
+.settings-education-department__control .input { width: 100%; min-height: 44px; padding-inline-end: 36px; cursor: pointer; text-overflow: ellipsis; }
+.settings-education-department__control .input:not([readonly]) { cursor: text; }
+.settings-education-department__control .input:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.settings-education-department__chevron { position: absolute; inset-inline-end: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-2); }
+.settings-education-department__popup { min-width: 0; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg-elev); box-shadow: var(--shadow-md); padding: 4px; }
+.settings-education-department__popup[hidden] { display: none; }
+.settings-education-department__options { display: grid; max-height: min(240px, 40vh); overflow-y: auto; overscroll-behavior: contain; }
+.settings-education-department__options [role="option"] { min-width: 0; min-height: 40px; padding: 9px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 400; line-height: 1.45; text-align: start; white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
+.settings-education-department__options [role="option"][hidden] { display: none; }
+.settings-education-department__options [role="option"].is-active, .settings-education-department__options [role="option"]:hover { background: var(--bg-sunk); }
+.settings-education-department__options [role="option"][aria-selected="true"] { box-shadow: inset 3px 0 var(--info); }
 .settings-compact .settings-link-group { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elev); overflow: hidden; }
 .settings-compact .settings-destination { width: 100%; text-align: start; border: 0; border-radius: 0; background: transparent; color: var(--text); }
 .settings-compact .settings-destination + .settings-destination { border-top: 1px solid var(--border); }

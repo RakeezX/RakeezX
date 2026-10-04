@@ -4,7 +4,7 @@ import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib
 import { brandLockup } from '../lib/brand.js';
 import { BUILD_META } from '../lib/build-meta.js';
 import { educationDepartmentComplete, profileAttention } from '../lib/settings-profile-ui.js';
-import { EDUCATION_DEPARTMENTS, isOfficialEducationDepartment, searchEducationDepartments } from '../lib/education-department-directory.js';
+import { EDUCATION_DEPARTMENTS, EDUCATION_DEPARTMENT_OPTIONS, isOfficialEducationDepartment, searchEducationDepartments } from '../lib/education-department-directory.js';
 import { currentInstallContext, INSTALL_COPY, openInstallGuide } from '../lib/install-guide-ui.js';
 import * as store from '../store.js';
 import * as cloud from '../lib/cloud.js';
@@ -32,6 +32,7 @@ let accountContractRequest = 0;
 let accountContractUnavailable = false;
 let requestedEmailChange = '';
 let removePhoneInputGuards = () => {};
+let removeDepartmentInteraction = () => {};
 
 function applyPhoneInsertion(input, rawText, event) {
   const current = normalizeSaudiMobile(input.value);
@@ -302,14 +303,35 @@ const settings = {
                        maxlength="80" autocomplete="organization" data-fk="schoolName"
                        data-change="save" placeholder="اسم المدرسة">
               </label>
+              <div class="field settings-education-department" data-education-department>
+                <label class="field__label" for="education-department-combobox">إدارة التعليم</label>
+                <div class="settings-education-department__control">
+                  <input class="input" id="education-department-combobox" type="text" role="combobox"
+                         aria-label="إدارة التعليم" aria-autocomplete="list" aria-expanded="false"
+                         aria-controls="education-department-options" autocomplete="off" readonly
+                         value="${educationDepartmentComplete(profile) ? m.educationDepartment : ''}"
+                         placeholder="اختر إدارة التعليم" data-fk="educationDepartment" data-education-department-combobox>
+                  <span class="settings-education-department__chevron" aria-hidden="true">${icon('chev')}</span>
+                </div>
+                <div class="settings-education-department__popup" data-education-department-popup hidden>
+                  <div class="settings-education-department__options" id="education-department-options"
+                       role="listbox" aria-label="إدارات التعليم الرسمية">
+                    ${EDUCATION_DEPARTMENT_OPTIONS.map(({ shortLabel, canonicalName }, index) => html`
+                      <div role="option" id="education-department-option-${index}"
+                           data-education-department-option data-index="${index}" tabindex="-1"
+                           aria-selected="${m.educationDepartment === canonicalName}">${shortLabel}</div>`)}
+                  </div>
+                </div>
+                ${educationDepartmentComplete(profile) ? '' : html`<span class="field__hint">مطلوبة لإكمال بياناتك، ويمكنك استخدامها لاحقًا.</span>`}
+              </div>
+            </div>
+            <div class="field-row settings-contact-row">
               <label class="field">
                 <span class="field__label">${presentation.principalNameLabel} <span class="t-3 fs-xs">(اختياري)</span></span>
                 <input class="input" name="reportPrincipalName" value="${m.reportPrincipalName ?? m.principalName ?? ''}"
                        maxlength="80" autocomplete="name" data-fk="reportPrincipalName"
                        data-change="save" placeholder="${presentation.schoolPrincipalLabel} للتقارير">
               </label>
-            </div>
-            <div class="field-row settings-contact-row">
               <label class="field">
                 <span class="field__label">رقم الجوال</span>
                 <input class="input" name="phone" value="${m.phone ?? ''}" required
@@ -318,7 +340,8 @@ const settings = {
                        aria-describedby="settings-phone-hint">
                 <span class="field__hint" id="settings-phone-hint">خاص ببيانات الحساب ولا يظهر للطلاب.</span>
               </label>
-              ${demo ? '' : html`<div class="field settings-email-field">
+            </div>
+            ${demo ? '' : html`<div class="field settings-email-field">
                 <span class="field__label">البريد الإلكتروني</span>
                 <div class="settings-email-line">
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
@@ -326,29 +349,6 @@ const settings = {
                 </div>
                 ${emailChangePending ? html`<span class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد</span>` : ''}
               </div>`}
-            </div>
-            <div class="field settings-education-department" data-education-department>
-              <span class="field__label">إدارة التعليم</span>
-              <span class="field__hint">مطلوبة لإكمال بياناتك، ويمكنك استخدامها لاحقًا.</span>
-              <span class="settings-education-department__status" role="status" data-education-department-status>
-                ${educationDepartmentComplete(profile) ? m.educationDepartment : 'لم تُحدَّد إدارة التعليم بعد'}
-              </span>
-              <label class="field">
-                <span class="sr-only">ابحث عن إدارة التعليم</span>
-                <input class="input" type="search" autocomplete="off" placeholder="ابحث عن إدارة التعليم"
-                       aria-label="ابحث عن إدارة التعليم" aria-controls="education-department-options"
-                       data-input="education-department-search">
-              </label>
-              <div class="settings-education-department__options" id="education-department-options" aria-label="إدارات التعليم الرسمية">
-                ${EDUCATION_DEPARTMENTS.map((name, index) => html`<button class="btn btn--quiet" type="button"
-                  data-act="education-department-select" data-index="${index}"
-                  aria-pressed="${m.educationDepartment === name}">${name}</button>`)}
-              </div>
-              <div class="hstack gap-2 wrap">
-                <button class="btn btn--quiet btn--sm" type="button" data-act="education-department-clear">إكماله لاحقًا</button>
-                ${m.educationDepartment ? html`<button class="btn btn--quiet btn--sm" type="button" data-act="education-department-clear">إزالة الاختيار</button>` : ''}
-              </div>
-            </div>
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
               <span class="settings-account-summary__label">الوصول</span>
               <span class="badge badge--quiet" role="status" aria-label="حالة الوصول" data-account-access>${accountContractUnavailable ? 'تعذر التحقق من حالة الوصول الآن' : accessLabel}</span>
@@ -451,6 +451,93 @@ const settings = {
   },
 
   afterPaint(root) {
+    removeDepartmentInteraction();
+    const department = root.querySelector('[data-education-department]');
+    const combo = department.querySelector('[data-education-department-combobox]');
+    const popup = department.querySelector('[data-education-department-popup]');
+    const options = [...department.querySelectorAll('[data-education-department-option]')];
+    let active = -1;
+    const visible = () => options.filter((option) => !option.hidden);
+    const setActive = (option) => {
+      options.forEach((item) => item.classList.toggle('is-active', item === option));
+      active = option ? Number(option.dataset.index) : -1;
+      if (option) {
+        combo.setAttribute('aria-activedescendant', option.id);
+        option.scrollIntoView({ block: 'nearest' });
+      } else combo.removeAttribute('aria-activedescendant');
+    };
+    const filter = () => {
+      const matches = new Set(searchEducationDepartments(EDUCATION_DEPARTMENT_OPTIONS, combo.value));
+      options.forEach((option) => { option.hidden = !matches.has(EDUCATION_DEPARTMENT_OPTIONS[Number(option.dataset.index)]); });
+      setActive(visible()[0] ?? null);
+    };
+    const close = () => {
+      popup.hidden = true;
+      combo.readOnly = true;
+      combo.setAttribute('aria-expanded', 'false');
+      combo.value = store.state.profile?.educationDepartment ?? '';
+      setActive(null);
+    };
+    const open = () => {
+      popup.hidden = false;
+      combo.readOnly = false;
+      combo.setAttribute('aria-expanded', 'true');
+      combo.value = '';
+      options.forEach((option) => { option.hidden = false; });
+      const selected = options.find((option) => option.getAttribute('aria-selected') === 'true');
+      setActive(selected ?? options[0]);
+      combo.focus();
+    };
+    const select = async (option) => {
+      const educationDepartment = EDUCATION_DEPARTMENT_OPTIONS[Number(option.dataset.index)]?.canonicalName;
+      if (!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, educationDepartment)) return;
+      if (await store.patchProfile({ educationDepartment })) {
+        toast('حُفظ');
+        close();
+        repaint();
+      }
+    };
+    const clickCombo = () => { if (popup.hidden) open(); };
+    const input = () => { if (!popup.hidden) filter(); };
+    const keydown = (event) => {
+      if (event.key === 'Escape' && !popup.hidden) { event.preventDefault(); close(); return; }
+      if (popup.hidden && ['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+        event.preventDefault(); open(); return;
+      }
+      if (popup.hidden) return;
+      const shown = visible();
+      if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        if (!shown.length) return;
+        const position = shown.findIndex((option) => Number(option.dataset.index) === active);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? shown.length - 1
+          : event.key === 'ArrowDown' ? (position + 1) % shown.length
+          : (position + shown.length - 1) % shown.length;
+        setActive(shown[next]);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const option = options[active];
+        if (option && !option.hidden) void select(option);
+      }
+    };
+    const clickOption = (event) => {
+      const option = event.target.closest('[data-education-department-option]');
+      if (option) void select(option);
+    };
+    const outside = (event) => { if (!department.contains(event.target) && !popup.hidden) close(); };
+    combo.addEventListener('click', clickCombo);
+    combo.addEventListener('input', input);
+    combo.addEventListener('keydown', keydown);
+    popup.addEventListener('click', clickOption);
+    document.addEventListener('pointerdown', outside);
+    removeDepartmentInteraction = () => {
+      combo.removeEventListener('click', clickCombo);
+      combo.removeEventListener('input', input);
+      combo.removeEventListener('keydown', keydown);
+      popup.removeEventListener('click', clickOption);
+      document.removeEventListener('pointerdown', outside);
+      removeDepartmentInteraction = () => {};
+    };
     removeProfileAttention();
     const details = root.querySelector('[data-settings-profile]');
     const notice = root.querySelector('[data-profile-attention]');
@@ -500,6 +587,7 @@ const settings = {
   },
 
   onUnmount() {
+    removeDepartmentInteraction();
     removeProfileAttention();
     profileExpanded = false;
     removePhoneInputGuards();
@@ -507,27 +595,6 @@ const settings = {
   },
 
   actions: {
-    'education-department-search'(el) {
-      const matches = new Set(searchEducationDepartments(EDUCATION_DEPARTMENTS, el.value));
-      const options = el.closest('[data-education-department]').querySelectorAll('[data-act="education-department-select"]');
-      for (const option of options) option.hidden = !matches.has(EDUCATION_DEPARTMENTS[Number(option.dataset.index)]);
-    },
-
-    async 'education-department-select'(el) {
-      const educationDepartment = EDUCATION_DEPARTMENTS[Number(el.dataset.index)];
-      if (!isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, educationDepartment)) return;
-      if (await store.patchProfile({ educationDepartment })) {
-        toast('حُفظ');
-        repaint();
-      }
-    },
-
-    async 'education-department-clear'() {
-      if (await store.patchProfile({ educationDepartment: null })) {
-        toast('يمكنك إكماله لاحقًا');
-        repaint();
-      }
-    },
     async 'teacher-form'(el) {
       const teacherForm = el.dataset.val === 'feminine' ? 'feminine' : 'masculine';
       if (await store.patchProfile({ teacherForm })) {
