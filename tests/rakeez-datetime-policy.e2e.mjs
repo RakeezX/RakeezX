@@ -123,3 +123,41 @@ test('RTL time picker shows minute, hour, period while preserving 10:45 and 22:4
   await page.locator('[data-act="edit-times"]').first().click();
   await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('10:45');
 });
+
+test.describe('Arabic desktop numerals', () => {
+  test.use({ locale: 'ar-SA', viewport: { width: 1440, height: 900 } });
+
+  test('time popup renders Western 0-9 digits in both numeric controls', async ({ page }, testInfo) => {
+    await enterProduct(page, '/#/schedule/times');
+    await page.locator('[data-act="edit-times"]').first().click();
+    await page.locator('#sheet-btn-gen').click();
+    const input = page.locator('#gen-form [name="firstPeriodStart"]');
+    await input.fill('07:30');
+    await input.press('Tab');
+    await input.click();
+    const clock = page.locator('.flatpickr-calendar.open .flatpickr-time');
+    const hour = clock.locator('.flatpickr-hour');
+    const minute = clock.locator('.flatpickr-minute');
+    await expect(input).toHaveValue('07:30');
+    await expect(hour).toHaveValue('07');
+    await expect(minute).toHaveValue('30');
+    await expect(hour).toHaveAttribute('type', 'text');
+    await expect(minute).toHaveAttribute('type', 'text');
+    await expect(hour).toHaveAttribute('inputmode', 'numeric');
+    await expect(minute).toHaveAttribute('inputmode', 'numeric');
+    await expect(hour).toHaveAttribute('lang', 'en');
+    await expect(minute).toHaveAttribute('lang', 'en');
+    await clock.screenshot({ path: testInfo.outputPath('desktop-ar-SA-time-0730.png') });
+    await hour.fill('١٠');
+    await hour.press('Tab');
+    await minute.fill('٤٥');
+    await minute.press('Tab');
+    await expect(hour).toHaveValue('10');
+    await expect(minute).toHaveValue('45');
+    await expect(input).toHaveValue('10:45');
+    const up = clock.locator('.numInputWrapper').nth(1).locator('.arrowUp');
+    await up.click();
+    await expect(minute).toHaveValue('46');
+    await expect(input).toHaveValue('10:46');
+  });
+});

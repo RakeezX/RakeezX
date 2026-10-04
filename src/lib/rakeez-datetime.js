@@ -97,6 +97,14 @@ export function mountDateTimeControl(input) {
     onReady: (_, __, instance) => {
       instance.calendarContainer.dir = 'rtl';
       instance.calendarContainer.lang = 'ar';
+      // Native number controls may paint Arabic-Indic glyphs for an Arabic
+      // browser locale even when their DOM values are ASCII and lang is en.
+      // Keep flatpickr's numeric parsing/steppers, but paint literal 0-9 text.
+      if (kind === 'time') for (const control of [instance.hourElement, instance.minuteElement]) {
+        control.type = 'text';
+        control.inputMode = 'numeric';
+        control.pattern = '[0-9]*';
+      }
       instance.calendarContainer.querySelectorAll('.numInput, .flatpickr-day').forEach(useAsciiPickerNumerals);
       if (kind === 'date') syncVisibleYears(instance, bounds);
       // Normalize edits before flatpickr reads a numeric subcontrol's input event.
