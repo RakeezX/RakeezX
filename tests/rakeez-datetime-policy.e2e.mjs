@@ -78,3 +78,38 @@ test('Attendance report picker hides future years and caps dates at today', asyn
   expect(box.x + box.width).toBeLessThanOrEqual(321);
   await calendar.screenshot({ path: testInfo.outputPath('historical-320.png') });
 });
+
+test('RTL time picker keeps 10:45 in visual order and persists the selected time', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await enterProduct(page, '/#/schedule/times');
+  await page.locator('[data-act="edit-times"]').first().click();
+  await page.locator('#sheet-btn-gen').click();
+  const input = page.locator('#gen-form [name="firstPeriodStart"]');
+  await input.click();
+  const clock = page.locator('.flatpickr-calendar.open .flatpickr-time');
+  const hour = clock.locator('.flatpickr-hour');
+  const separator = clock.locator('.flatpickr-time-separator');
+  const minute = clock.locator('.flatpickr-minute');
+  const amPm = clock.locator('.flatpickr-am-pm');
+  await hour.fill('10');
+  await hour.press('Tab');
+  await minute.fill('45');
+  await minute.press('Tab');
+  if (await amPm.textContent() !== 'صباحًا') await amPm.click();
+  await expect(input).toHaveValue('10:45');
+  const [hourBox, separatorBox, minuteBox, amPmBox] = await Promise.all(
+    [hour, separator, minute, amPm].map((locator) => locator.boundingBox()));
+  expect(hourBox.x).toBeLessThan(separatorBox.x);
+  expect(separatorBox.x).toBeLessThan(minuteBox.x);
+  expect(minuteBox.x).toBeLessThan(amPmBox.x);
+  await clock.screenshot({ path: testInfo.outputPath('clock-1045-rtl.png') });
+  await page.locator('#gen-form [name="assemblyStart"]').fill('');
+  await page.locator('#gen-form button[type="submit"], .sheet:last-child button[form="gen-form"]').first().click();
+  await expect(page.locator('.sheet')).toHaveCount(1);
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('10:45');
+  await page.locator('#sheet-btn-save-all').click();
+  await expect(page.locator('.sheet')).toHaveCount(0);
+  await page.reload();
+  await page.locator('[data-act="edit-times"]').first().click();
+  await expect(page.locator('.timerow__in[data-p="1"][data-key="start"]')).toHaveValue('10:45');
+});

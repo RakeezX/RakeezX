@@ -60,6 +60,12 @@ input.rakeez-datetime--time {
   font-variant-numeric: tabular-nums;
   direction: ltr;
 }
+/* Keep the clock token order HH:MM while its surrounding popup remains RTL. */
+.flatpickr-calendar .flatpickr-time { direction: ltr; }
+.flatpickr-calendar .flatpickr-time .flatpickr-am-pm {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
 .flatpickr-calendar .flatpickr-time .flatpickr-am-pm { width: 28%; white-space: nowrap; }
 @media (max-width: 360px) {
   .flatpickr-calendar { max-width: calc(100vw - 20px); }

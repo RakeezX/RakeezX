@@ -105,9 +105,23 @@ test('date/time adapter imports and mounts from raw repository files offline', a
     .toBe(await page.evaluate(() => new Date().toDateString()));
 
   const timeInput = page.locator('#raw-static-time');
+  await timeInput.fill('10:45');
+  await timeInput.press('Tab');
   await timeInput.click();
   const timeCalendar = page.locator('.flatpickr-calendar.open').filter({ has: page.locator('.flatpickr-time') });
   await expect(timeCalendar.locator('.flatpickr-am-pm')).toHaveText(/صباحًا|مساءً/);
+  const hour = timeCalendar.locator('.flatpickr-hour');
+  const separator = timeCalendar.locator('.flatpickr-time-separator');
+  const minute = timeCalendar.locator('.flatpickr-minute');
+  const amPm = timeCalendar.locator('.flatpickr-am-pm');
+  await expect(hour).toHaveValue('10');
+  await expect(minute).toHaveValue('45');
+  await expect(amPm).toHaveText('صباحًا');
+  const [hourBox, separatorBox, minuteBox, amPmBox] = await Promise.all(
+    [hour, separator, minute, amPm].map((locator) => locator.boundingBox()));
+  expect(hourBox.x).toBeLessThan(separatorBox.x);
+  expect(separatorBox.x).toBeLessThan(minuteBox.x);
+  expect(minuteBox.x).toBeLessThan(amPmBox.x);
   await timeInput.fill('١٠:٣٠');
   await expect(timeInput).toHaveValue('10:30');
 
