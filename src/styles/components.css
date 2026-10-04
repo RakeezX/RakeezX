@@ -5947,9 +5947,26 @@
 }
 
 .report-toolbar__field {
-  flex: 1 1 260px;
+  flex: 1 1 210px;
   min-width: 190px;
   margin: 0;
+}
+
+.report-toolbar__date {
+  flex: 0 1 145px;
+  min-width: 130px;
+  margin: 0;
+}
+
+.report-toolbar__date .field__label {
+  font-size: var(--fs-xs);
+}
+
+.report-toolbar__date .date-field {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  font-size: 13px;
 }
 
 .report-toolbar__mode,
@@ -6034,31 +6051,6 @@
 
 .report-results {
   margin-top: var(--sp-4);
-}
-
-.attendance-date-range {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-  max-width: 620px;
-  margin: 0 0 var(--sp-3);
-}
-
-.attendance-date-range__field {
-  min-width: 0;
-  margin: 0;
-}
-
-.attendance-date-range__field .field__label {
-  min-height: 20px;
-  margin-bottom: 5px;
-  font-size: var(--fs-xs);
-}
-
-.attendance-date-range__field .date-field {
-  width: 100%;
-  min-width: 0;
-  min-height: 44px;
 }
 
 .print-report__footer {
@@ -6386,6 +6378,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .report-toolbar__date {
+    flex: 1 1 145px;
+    min-width: 130px;
+  }
+
   .report-filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6428,9 +6425,8 @@
 }
 
 @media (max-width: 360px) {
-  .attendance-date-range {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-2);
+  .report-toolbar__date {
+    flex-basis: 100%;
   }
 }
 

@@ -17,6 +17,8 @@ import * as store from "../src/store.js";
 import reports from "../src/views/reports.js";
 import { supportRows } from "../src/views/reports.js";
 import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
+import { readFileSync } from 'node:fs';
+import { URL as NodeURL } from 'node:url';
 
 test("Reports Regression Suite", async (t) => {
   t.beforeEach(async () => {
@@ -112,4 +114,45 @@ test("Reports Regression Suite", async (t) => {
     reports.actions.sort({ value: 'roll' });
     assert.deepStrictEqual(supportRows([...roster].sort((a, b) => a.rollNo - b.rollNo), [item], ctx).map((row) => row.s.id), ['support-b', 'support-a']);
   });
+
+  await t.test('attendance dates stay in the toolbar and filter brief, detailed, and A4 output', async () => {
+    await store.save({ years: [{ id: 'y69', label: 'Y69' }] });
+    await store.save({ sections: [{ id: 'sec69', yearId: 'y69', label: 'A' }] });
+    await store.save({ teachings: [{ id: 'tch69', sectionId: 'sec69', subjectId: 'sub69', termId: 'term69' }] });
+    await store.save({ students: [{ id: 'std69', name: 'N69 Student', rollNo: 1 }] });
+    await store.save({ enrollments: [{ id: 'enr69', studentId: 'std69', sectionId: 'sec69', status: 'active' }] });
+    await store.save({ sessions: [
+      { id: 'ses69a', teachingId: 'tch69', date: '2026-08-01', period: 1 },
+      { id: 'ses69b', teachingId: 'tch69', date: '2026-08-02', period: 1 },
+    ] });
+    await store.save({ attendance: [
+      { id: 'att69a', studentId: 'std69', sessionId: 'ses69a', status: 'absent' },
+      { id: 'att69b', studentId: 'std69', sessionId: 'ses69b', status: 'present' },
+    ] });
+    reports.onMount();
+    reports.actions.tab({ dataset: { tab: 'attendance' } });
+    const render = () => String(reports.render({ id: 'tch69' }));
+    assert.match(render(), /class="field report-toolbar__date"[\s\S]*?data-change="filter-start"[\s\S]*?class="field report-toolbar__date"[\s\S]*?data-change="filter-end"[\s\S]*?report-toolbar__mode/);
+    assert.equal((render().match(/data-change="filter-start"/g) ?? []).length, 1);
+    assert.doesNotMatch(render(), /attendance-date-range/);
+    reports.actions['filter-start']({ value: '2026-08-02' });
+    reports.actions['filter-end']({ value: '2026-08-02' });
+    assert.match(render(), /value="2026-08-02" data-change="filter-start"/);
+    assert.match(render(), /value="2026-08-02" data-change="filter-end"/);
+    assert.match(render(), /<td class="tabular fw-7">100%<\/td>/);
+    reports.actions['att-mode']({ dataset: { mode: 'detailed' } });
+    assert.match(render(), /1 حصة مرصودة/);
+    reports.actions['toggle-a4']();
+    assert.match(render(), /aria-pressed="true"/);
+    assert.match(render(), /a4-preview-container/);
+  });
+});
+
+test('N69 toolbar source keeps the N38 input contract and mobile wrapping', () => {
+  const view = readFileSync(new NodeURL('../src/views/reports.js', import.meta.url), 'utf8');
+  const css = readFileSync(new NodeURL('../src/styles/components.css', import.meta.url), 'utf8');
+  assert.equal((view.match(/data-rakeez-date-scope="historical" lang="en" dir="ltr" inputmode="numeric"/g) ?? []).length, 2);
+  assert.doesNotMatch(view, /attendance-date-range/);
+  assert.match(css, /\.report-toolbar__date\s*\{[^}]*min-width: 130px/s);
+  assert.match(css, /@media \(max-width: 360px\)\s*\{\s*\.report-toolbar__date\s*\{\s*flex-basis: 100%/);
 });
