@@ -322,7 +322,7 @@ const settings = {
                            aria-selected="${m.educationDepartment === canonicalName}">${shortLabel}</div>`)}
                   </div>
                 </div>
-                ${educationDepartmentComplete(profile) ? '' : html`<span class="field__hint">مطلوبة لإكمال بياناتك، ويمكنك استخدامها لاحقًا.</span>`}
+                ${educationDepartmentComplete(profile) ? '' : html`<span class="field__hint">مطلوبة لإكمال بياناتك.</span>`}
               </div>
             </div>
             <div class="field-row settings-contact-row">
