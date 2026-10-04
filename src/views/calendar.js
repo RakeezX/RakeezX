@@ -552,7 +552,7 @@ function yearSheet(existing = null) {
             required
             ${existing ? 'readonly' : ''}
           />
-          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل ١٤٤٨-١٤٤٩ هـ.</span>
+          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل 1448-1449 هـ.</span>
         </label>
         ${existing
           ? html`

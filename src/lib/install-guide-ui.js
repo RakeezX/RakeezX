@@ -87,7 +87,7 @@ export function openInstallGuide(onNative) {
         <p>${INSTALL_COPY[state][1]}</p><button class="btn btn--primary" type="button" data-choose-device>اختر جهازك</button>${switcher}` : html`
         <div class="guide-context"><span>${DEVICES[device]} · ${device === 'ios' || device === 'mac' ? 'سفاري' : device === 'android' ? 'كروم' : browser === 'edge' ? 'إيدج' : 'كروم'}</span>
           ${device === 'windows' ? html`<label>المتصفح <select class="input" data-browser><option value="edge" ${browser === 'edge' ? 'selected' : ''}>إيدج</option><option value="chrome" ${browser === 'chrome' ? 'selected' : ''}>كروم</option></select></label>` : ''}</div>
-        <ol class="visual-cards" role="list">${installSteps(device, browser).map(([heading, text, kind, label], index) => html`<li class="visual-step"><div class="step-title"><span class="step-number" aria-hidden="true">${['١', '٢', '٣'][index]}</span><h3>${heading}</h3></div>${diagram(kind, label, device, browser)}<p>${text}</p></li>`)}</ol>
+      <ol class="visual-cards" role="list">${installSteps(device, browser).map(([heading, text, kind, label], index) => html`<li class="visual-step"><div class="step-title"><span class="step-number" aria-hidden="true">${index + 1}</span><h3>${heading}</h3></div>${diagram(kind, label, device, browser)}<p>${text}</p></li>`)}</ol>
         <p class="schematic-note">رسوم توضيحية؛ قد يختلف موضع الأزرار وأسماء الخيارات حسب إصدار المتصفح.</p>
         ${device === 'ios' ? html`<p class="small-hint">على آيباد قد يظهر ضمن «عرض المزيد»؛ وإذا غاب، ابحث عنه ضمن «تعديل الإجراءات».</p>` : device === 'android' ? html`<p class="small-hint">قد يظهر خيار «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» في إصدارات أخرى.</p>` : ''}${switcher}`).value;
     }

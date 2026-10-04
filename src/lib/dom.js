@@ -3,6 +3,8 @@
  * لا مكتبات خارجية — الملف كله أقل من كيلوبايتين بعد الضغط.
  */
 
+import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
+
 /* ---------- الهروب من HTML ---------- */
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
@@ -121,7 +123,7 @@ const initialFocusSelector = '[autofocus], input:not([disabled]), select:not([di
 
 /** يحوّل الإدخال العربي/الغربي إلى HH:mm غربي صالح دون تغيير ما يُخزَّن. */
 export function normalizeTimeDigits(value) {
-  let text = String(value ?? '').trim().replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit));
+  let text = normalizeDateTimeDigits(value).trim();
   text = text.replace(/[^0-9:]/g, '');
   const parts = text.split(':');
   if (parts.length >= 2) {
@@ -351,18 +353,24 @@ export const parentLink = (label, parentRoute) =>
   html`<a class="btn btn--quiet mt-3" href="#${parentRoute}" data-act="app-back" data-back-fallback="#${parentRoute}">${icon('back')} ${label}</a>`;
 
 /* ---------- تنسيق ---------- */
-/** يعرض رقمًا بلا كسور زائدة: 8.50 → 8.5 · 8.00 → 8 */
+/** Presentation only: accept clock times with optional seconds; leave other text legible. */
+export const fmtSessionTime = (value) => {
+  const visible = normalizeDateTimeDigits(value).trim();
+  const match = /^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d(?:\.\d+)?)?$/.exec(visible);
+  return match ? `${match[1].padStart(2, '0')}:${match[2]}` : visible;
+};
+
 /** نص نطاق وقت منطقي؛ العارض أدناه يعزله بصريًا داخل واجهات RTL. */
 export const formatTimeRange = (start, end) => {
-  const first = String(start ?? '').trim();
-  const last = String(end ?? '').trim();
+  const first = fmtSessionTime(start);
+  const last = fmtSessionTime(end);
   return first && last ? `${first} – ${last}` : first || last;
 };
 
 /** نطاق وقت موحّد: البداية أول عنصر RTL، وكل وقت يحافظ على قراءة HH:MM. */
 export const fmtTimeRange = (start, end) => {
-  const first = String(start ?? '').trim();
-  const last = String(end ?? '').trim();
+  const first = fmtSessionTime(start);
+  const last = fmtSessionTime(end);
   if (!first && !last) return '';
   return html`<span class="time-range"><span class="time-range__token" dir="ltr" data-time-token="start">${first}</span>${last ? html`<span class="time-range__dash" aria-hidden="true"> – </span><span class="time-range__token" dir="ltr" data-time-token="end">${last}</span>` : ''}</span>`;
 };

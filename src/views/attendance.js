@@ -6,7 +6,7 @@
  * وحصة لم تُنفَّذ لا تولّد سجلات حضور إطلاقًا، فلا تُحسب غيابًا على أحد.
  */
 
-import { html, icon, toast, fmtDate, openSheet } from '../lib/dom.js';
+import { html, icon, toast, fmtDate, fmtSessionTime, fmtTimeRange, openSheet } from '../lib/dom.js';
 import * as store from '../store.js';
 import { openSessionEditor } from '../lib/session-editor-ui.js';
 import { isBeforeScheduledStart } from '../lib/session-start-ui.js';
@@ -73,13 +73,13 @@ function renderSessionContext(teaching, session, sessions, status) {
         <div class="attendance-01c__session-switch" role="group" aria-label="حصص اليوم">
           ${sessions.map((entry) => html`<button class="attendance-01c__session-chip ${entry.id === session?.id ? 'is-active' : ''}"
             data-act="pick-session" data-id="${entry.id}" aria-pressed="${entry.id === session?.id}">
-            الحصة ${entry.period}${entry.startTime ? html` · <bdi>${entry.startTime}</bdi>` : ''}
+            الحصة ${entry.period}${entry.startTime ? html` · <bdi dir="ltr">${fmtSessionTime(entry.startTime)}</bdi>` : ''}
           </button>`)}
         </div>` : ''}
       ${session ? html`<div class="attendance-01c__session-meta">
         <span class="attendance-01c__status-pill ${status.tone ? `is-${status.tone}` : ''}">${status.label}</span>
         <span class="attendance-01c__meta">الحصة ${session.period}</span>
-        ${session.startTime ? html`<span class="attendance-01c__meta"><bdi>${session.startTime}${session.endTime ? `–${session.endTime}` : ''}</bdi></span>` : ''}
+        ${session.startTime ? html`<span class="attendance-01c__meta"><bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi></span>` : ''}
         ${status.reason ? html`<span class="attendance-01c__meta">${status.reason}</span>` : ''}
       </div>` : ''}
     </section>`;
@@ -305,7 +305,7 @@ export default {
         sessionId: activeSessionId ?? undefined,
         date: date ?? todayISO(),
       });
-      toast(saved ? 'حُفظت الملاحظة في سجل الطالب' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+      toast(saved ? 'حُفظت الملاحظة في سجل الطالب' : 'اكتب ملاحظة لا تتجاوز 1200 حرفًا', saved ? 'ok' : 'danger');
       repaint();
     },
     async set(el) {

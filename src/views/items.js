@@ -149,7 +149,7 @@ function itemSheet(classId, existing = null) {
           <span class="field__label">درجة لكل نقطة مشاركة</span>
           <input class="input tabular" name="perPoint" type="number" inputmode="decimal"
                  min="0.1" max="100" step="0.1" value="${it.perPoint ?? 1}">
-          <span class="field__hint">مثال: ١ يعني أن ٥ نقاط مشاركة = ٥ درجات، بحدّ أقصى الدرجة العظمى.</span>
+          <span class="field__hint">مثال: 1 يعني أن 5 نقاط مشاركة = 5 درجات، بحدّ أقصى الدرجة العظمى.</span>
         </label>
 
         <label class="field" data-when="attendance">
@@ -231,7 +231,7 @@ export default {
         <div class="empty">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود بعد</div>
-          <div class="empty__text">ابدأ بالقالب الجاهز (مجموعه ١٠٠) ثم عدّله، أو أنشئ بنودك من الصفر.</div>
+          <div class="empty__text">ابدأ بالقالب الجاهز (مجموعه 100) ثم عدّله، أو أنشئ بنودك من الصفر.</div>
           <div class="btn-row" style="justify-content:center">
             <button class="btn btn--primary" data-act="template">${icon('note')} القالب الجاهز</button>
             <button class="btn btn--ghost" data-act="add">${icon('plus')} بند جديد</button>

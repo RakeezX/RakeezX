@@ -4,6 +4,7 @@ import * as db from './db.js';
 import * as cloud from './cloud.js';
 import { todayISO } from '../models.js';
 import { assertScoreSnapshotInvariant } from './initial-restore.js';
+import { visibleLatinDigits } from './visible-numerals.js';
 
 
 /** معرّف المنتج التقني — يُكتب في كل نسخة احتياطية. */
@@ -43,7 +44,7 @@ export function downloadBlob(filename, blob) {
  * are useful for visual ordering. Keep Arabic Unicode intact, but never leak
  * presentation controls into a spreadsheet cell.
  */
-export const sanitizeExportText = (value) => String(value ?? '').replace(/[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]/g, '');
+export const sanitizeExportText = (value) => visibleLatinDigits(value).replace(/[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]/g, '');
 
 const cell = (v) => {
   const s = sanitizeExportText(v);

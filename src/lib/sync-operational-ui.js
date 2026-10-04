@@ -34,7 +34,7 @@ export function renderSyncOperationalSection(summary, { compact = false } = {}) 
   const ui = syncOperationalPresentation(summary);
   const last = summary.lastSuccessfulSyncAt;
   const lastText = last && Number.isFinite(new Date(last).getTime())
-    ? new Date(last).toLocaleString('ar-SA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'لم تتم بعد';
+    ? new Date(last).toLocaleString('ar-SA-u-nu-latn', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }) : 'لم تتم بعد';
   const firstSync = ['pending', 'idle'].includes(ui.status) && !last && summary.queuedCount > 0;
   const needsExplanation = ['error', 'blocked', 'rejected'].includes(ui.status);
   const countText = savedChanges(summary.queuedCount ?? 0);

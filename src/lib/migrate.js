@@ -231,7 +231,7 @@ export function migrateLegacyData(legacy) {
     out.sessions.push(ses);
   }
   if (sessionByKey.size) {
-    warn.push(`رُحّل ${sessionByKey.size} يومًا من الحضور إلى حصص برقم ١ — المخطط القديم لم يكن يسجّل رقم الحصة.`);
+  warn.push(`رُحّل ${sessionByKey.size} يومًا من الحضور إلى حصص برقم 1 — المخطط القديم لم يكن يسجّل رقم الحصة.`);
   }
 
   /* ---------- ١١. الحضور بمفتاح الحصة ---------- */
