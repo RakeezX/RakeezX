@@ -282,10 +282,7 @@ function shell(path, params) {
         <div class="sidebar__brand">${brandLockup()}</div>
         ${NAV.map((it) => html`${it.group ? html`<div class="sidebar__section-label">${it.group}</div>` : ''}${navLink(it, path, 'sidebar')}`)}
         <div class="sidebar__spacer"></div>
-        ${inTeaching && !/\/teaching\/[^/]+\/(attendance|grades)$/.test(path)
-          ? html`<a class="sidebar__item" href="#/classes">${icon('back')}<span>كل الفصول</span></a>`
-          : ''}
-        ${!inTeaching ? html`<div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>` : ''}
+        <div id="sidebar-mini-hub">${renderSidebarMiniHubTrigger()}</div>
       </nav>
       <main class="main">
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}

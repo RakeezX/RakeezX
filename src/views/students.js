@@ -12,6 +12,7 @@ import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
 let query = '';
+let formerOpen = false;
 
 /* ---------- تحليل الأسماء الملصوقة ---------- */
 
@@ -138,6 +139,17 @@ export default {
 
   onMount() {
     query = '';
+    formerOpen = false;
+  },
+
+  onUnmount() {
+    formerOpen = false;
+  },
+
+  afterPaint(root) {
+    root.querySelector('.former-students-section')?.addEventListener('toggle', (event) => {
+      formerOpen = event.currentTarget.open;
+    });
   },
 
   render(p) {
@@ -223,8 +235,12 @@ export default {
 
       ${former.length
         ? html`
-            <div class="section former-students-section">
-              <div class="section__head"><div class="section__title">غادروا هذه الشعبة</div></div>
+            <details class="section former-students-section" ${formerOpen ? 'open' : ''}>
+              <summary class="former-students-section__summary">
+                <span>طلاب غادروا هذا الفصل</span>
+                <span class="former-students-section__count tabular">${former.length}</span>
+                <span class="former-students-section__chev" aria-hidden="true">${icon('chev')}</span>
+              </summary>
               <div class="list">
                 ${former.map(
                   ({ e, s }) => html`
@@ -247,7 +263,7 @@ export default {
               <p class="t-3 fs-sm mt-3">
                 سجلّهم محفوظ كاملًا، ودرجاتهم في هذا الفصل تبقى في التقارير التاريخية.
               </p>
-            </div>
+            </details>
           `
         : ''}
 

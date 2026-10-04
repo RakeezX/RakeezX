@@ -4598,6 +4598,32 @@
   padding-top: var(--sp-4);
   border-top: 1px solid var(--border);
 }
+.former-students-section__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: 44px;
+  color: var(--text-2);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  list-style: none;
+}
+.former-students-section__summary::-webkit-details-marker { display: none; }
+.former-students-section__summary > :first-child { min-inline-size: 0; }
+.former-students-section__count {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 24px;
+  padding-inline: 6px;
+  border-radius: var(--r-sm);
+  background: var(--bg-sunk);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.former-students-section__chev { margin-inline-start: auto; transition: transform .2s ease; }
+.former-students-section[open] .former-students-section__chev { transform: rotate(90deg); }
+.former-students-section__summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.former-students-section > .list { margin-block-start: var(--sp-2); }
 
 /* ملف الطالب */
 .student-profile-management { min-height: 44px; flex-shrink: 0; background: var(--bg-elev); border-color: var(--brand-border); color: var(--text); }

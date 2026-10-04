@@ -81,6 +81,8 @@ for (const width of [320, 390, 1280]) for (const theme of ['light', 'dark']) {
     await openRoster(page, ids.tx);
     const former = page.locator('.former-students-section');
     await expect(former).toBeVisible();
+    await expect(former).not.toHaveAttribute('open');
+    await former.locator('summary').click();
     await expect(former).toContainText('طالب اختبار مغادر');
     await former.locator(`a[href="#/student/${ids.withdrawn}"]`).click();
     await expect(page.locator('.student-profile-header__name')).toHaveText('طالب اختبار مغادر');
