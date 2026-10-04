@@ -3,6 +3,7 @@
  */
 
 import { html, render, icon, delegate, toast, openSheet, closeSheet } from './lib/dom.js';
+import { visibleLatinDigits } from './lib/visible-numerals.js';
 import { displayIdentity, effectiveTheme } from './lib/display-identity.js';
 import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
@@ -313,8 +314,8 @@ function shell(path, params) {
 
 function topbar(v, params) {
   const backHref = v.back?.(params);
-  const title = typeof v.title === 'function' ? v.title(params) : v.title ?? 'رَكيز المعلم';
-  const sub = v.subtitle?.(params);
+  const title = visibleLatinDigits(typeof v.title === 'function' ? v.title(params) : v.title ?? 'رَكيز المعلم');
+  const sub = visibleLatinDigits(v.subtitle?.(params));
   const actions = v.topActions?.(params);
   const profile = store.state.profile ?? {};
   const presentation = getAccountPresentation(profile.teacherForm);
@@ -409,7 +410,7 @@ function paintSyncStatus() {
   for (const el of document.querySelectorAll('[data-sync-description]')) el.textContent = syncInfo.label;
   for (const el of document.querySelectorAll('[data-sync-time]')) {
     el.textContent = syncInfo.summary.lastSuccessfulSyncAt
-      ? new Date(syncInfo.summary.lastSuccessfulSyncAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
+      ? new Date(syncInfo.summary.lastSuccessfulSyncAt).toLocaleTimeString('ar-SA-u-nu-latn', { hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }) : '—';
   }
   for (const el of document.querySelectorAll('[data-sync-action]')) {
     el.disabled = !syncInfo.canSync;

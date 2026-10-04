@@ -68,7 +68,7 @@ const backupExportDate = (value) => {
   return Number.isFinite(stamp.getTime()) ? fmtDateFull(todayISO(stamp)) : '';
 };
 const actionTime = (value) => value ? new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
-  day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
+  day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', numberingSystem: 'latn',
 }).format(value) : '';
 
 const cloudPhaseStep = (phase) => ({

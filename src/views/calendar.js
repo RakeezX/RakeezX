@@ -23,6 +23,7 @@ import {
 } from '../lib/calendar-presets.js';
 import { repaint } from '../repaint.js';
 import { renderCalendar0417 } from './calendar-0417-ui.js';
+import { wireHijriYearInput } from '../lib/hijri-year-input.js';
 import { applyDemoCalendarPreset } from '../lib/demo-workspace.js';
 
 const AR_MONTHS = [
@@ -545,14 +546,17 @@ function yearSheet(existing = null) {
           <input
             class="input tabular"
             name="hijriStart"
-            type="number"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]{4}"
+            dir="ltr"
             min="1300"
             max="1600"
             value="${y.hijriStart || 1448}"
             required
             ${existing ? 'readonly' : ''}
           />
-          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل ١٤٤٨-١٤٤٩ هـ.</span>
+          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل 1448-1449 هـ.</span>
         </label>
         ${existing
           ? html`
@@ -585,6 +589,7 @@ function yearSheet(existing = null) {
       <button class="btn btn--primary" form="year-form" type="submit">حفظ</button>
     `,
     onMount: (root, done) => {
+      const readHijriYear = wireHijriYearInput(root);
       root.querySelectorAll('.segmented__btn').forEach((b) =>
         b.addEventListener('click', () => {
           root.querySelectorAll('.segmented__btn').forEach((x) => x.classList.remove('is-on'));
@@ -594,9 +599,11 @@ function yearSheet(existing = null) {
       );
       root.querySelector('#year-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
+        const hijriStart = readHijriYear();
+        if (hijriStart === null) return;
         const fd = new FormData(ev.target);
         done({
-          hijriStart: Number(fd.get('hijriStart')),
+          hijriStart,
           status: String(fd.get('status') ?? 'active'),
         });
       });

@@ -1,6 +1,7 @@
 /** التقارير — مدخل يختار الإسناد ثم يفتح تقاريره. */
 
 import { html, icon, fmtPct } from '../lib/dom.js';
+import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel } from '../models.js';
 
@@ -17,7 +18,7 @@ function classReportRow(tch) {
     <a class="report-class-row" href="#/teaching/${tch.id}/reports">
       <span class="report-class-row__icon" aria-hidden="true">${icon('reports')}</span>
       <span class="row__main">
-        <span class="row__title">${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}</span>
+        <span class="row__title">${visibleLatinDigits(`${sectionLabel(section) || ''} · ${store.getSubject(tch.subjectId)?.name ?? ''}`)}</span>
         <span class="row__sub">
           <span class="tabular">${roster.length}</span> طالبًا
           ${avg !== null ? html` · متوسط <span class="tabular">${fmtPct(avg)}</span>` : ''}

@@ -108,7 +108,7 @@ export default {
     const currentContext = !!tch && currentEnrollment?.sectionId === tch.sectionId &&
       store.activeTerm()?.id === tch.termId && !store.isTeachingArchived(tch);
     const noteTime = (note) => new Date(note.createdAt ?? note.updatedAt ?? Date.now())
-      .toLocaleTimeString('ar-SA', { hour: 'numeric', minute: '2-digit' });
+      .toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit', numberingSystem: 'latn' });
     const eventContext = (event) => {
       const parts = [];
       if (event.contextLabel) parts.push(event.contextLabel);
@@ -575,7 +575,7 @@ export default {
       });
       if (!data) return;
       const saved = await store.addStudentNote({ studentId: student.id, text: data.text, teachingId: teaching?.id ?? null });
-      toast(saved ? 'حُفظت الملاحظة' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+      toast(saved ? 'حُفظت الملاحظة' : 'اكتب ملاحظة لا تتجاوز 1200 حرفًا', saved ? 'ok' : 'danger');
     },
 
     async 'edit-note'(el) {
@@ -593,7 +593,7 @@ export default {
       });
       if (data === undefined || data === null) return;
       const saved = await store.editStudentNote(note.id, data);
-      toast(saved ? 'عُدّلت الملاحظة' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+      toast(saved ? 'عُدّلت الملاحظة' : 'اكتب ملاحظة لا تتجاوز 1200 حرفًا', saved ? 'ok' : 'danger');
     },
 
     async 'delete-note'(el) {

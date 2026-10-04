@@ -7,8 +7,8 @@ const dateTile = (start, end) => {
   if (!start) return { day: '—', month: '' };
   const [,, first] = start.split('-').map(Number);
   const [,, last] = (end || start).split('-').map(Number);
-  const month = new Date(start + 'T12:00:00').toLocaleDateString('ar-SA', { month: 'long', calendar: 'gregory' });
-  const endMonth = new Date((end || start) + 'T12:00:00').toLocaleDateString('ar-SA', { month: 'long', calendar: 'gregory' });
+  const month = new Date(start + 'T12:00:00').toLocaleDateString('ar-SA-u-nu-latn', { month: 'long', calendar: 'gregory', numberingSystem: 'latn' });
+  const endMonth = new Date((end || start) + 'T12:00:00').toLocaleDateString('ar-SA-u-nu-latn', { month: 'long', calendar: 'gregory', numberingSystem: 'latn' });
   return { day: start === end ? String(first) : first + '–' + last, month: month === endMonth ? month : month + ' / ' + endMonth };
 };
 const number = (value) => html`<bdi dir="ltr">${value}</bdi>`;

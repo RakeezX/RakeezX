@@ -4,6 +4,7 @@
  */
 
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
+import { wireVisibleNumberInputs } from './visible-numerals.js';
 
 /* ---------- الهروب من HTML ---------- */
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -42,6 +43,7 @@ export function html(strings, ...values) {
 /** يضع قالبًا داخل عنصر. */
 export function render(el, tpl) {
   el.innerHTML = tpl && tpl[RAW] ? tpl.value : String(tpl ?? '');
+  wireVisibleNumberInputs(el);
   return el;
 }
 
@@ -49,6 +51,7 @@ export function render(el, tpl) {
 export function toNode(tpl) {
   const t = document.createElement('template');
   t.innerHTML = (tpl && tpl[RAW] ? tpl.value : String(tpl ?? '')).trim();
+  wireVisibleNumberInputs(t.content);
   return t.content.firstElementChild;
 }
 

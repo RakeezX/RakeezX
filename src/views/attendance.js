@@ -7,6 +7,7 @@
  */
 
 import { html, icon, toast, fmtDate, fmtSessionTime, fmtTimeRange, openSheet } from '../lib/dom.js';
+import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { openSessionEditor } from '../lib/session-editor-ui.js';
 import { isBeforeScheduledStart } from '../lib/session-start-ui.js';
@@ -60,8 +61,8 @@ function renderSessionContext(teaching, session, sessions, status) {
       <div class="attendance-01c__context-top">
         <div class="attendance-01c__identity">
           <span class="attendance-01c__icon" aria-hidden="true">${icon('attendance')}</span>
-          <div><h2>حضور ${store.sectionLabel(section)}</h2>
-            <p>${subject?.name ?? ''}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
+          <div><h2>حضور ${visibleLatinDigits(store.sectionLabel(section))}</h2>
+            <p>${visibleLatinDigits(subject?.name ?? '')}${session ? ' · قائمة هذه الحصة المحفوظة' : ''}</p></div>
         </div>
         <div class="attendance-01c__context-actions">
           ${session ? html`<button class="btn btn--sm btn--ghost" data-act="session-status">${icon('edit')} تعديل حالة الحصة</button>` : ''}
@@ -73,12 +74,12 @@ function renderSessionContext(teaching, session, sessions, status) {
         <div class="attendance-01c__session-switch" role="group" aria-label="حصص اليوم">
           ${sessions.map((entry) => html`<button class="attendance-01c__session-chip ${entry.id === session?.id ? 'is-active' : ''}"
             data-act="pick-session" data-id="${entry.id}" aria-pressed="${entry.id === session?.id}">
-            الحصة ${entry.period}${entry.startTime ? html` · <bdi dir="ltr">${fmtSessionTime(entry.startTime)}</bdi>` : ''}
+            الحصة ${visibleLatinDigits(entry.period)}${entry.startTime ? html` · <bdi dir="ltr">${fmtSessionTime(entry.startTime)}</bdi>` : ''}
           </button>`)}
         </div>` : ''}
       ${session ? html`<div class="attendance-01c__session-meta">
         <span class="attendance-01c__status-pill ${status.tone ? `is-${status.tone}` : ''}">${status.label}</span>
-        <span class="attendance-01c__meta">الحصة ${session.period}</span>
+        <span class="attendance-01c__meta">الحصة ${visibleLatinDigits(session.period)}</span>
         ${session.startTime ? html`<span class="attendance-01c__meta"><bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi></span>` : ''}
         ${status.reason ? html`<span class="attendance-01c__meta">${status.reason}</span>` : ''}
       </div>` : ''}
@@ -90,7 +91,7 @@ export default {
   subtitle: (p) => {
     const ses = activeSessionId ? store.getSession(activeSessionId) : null;
     const d = date === todayISO() ? 'اليوم' : fmtDate(date);
-    return ses ? `${d} · الحصة ${ses.period}` : d;
+    return ses ? `${d} · الحصة ${visibleLatinDigits(ses.period)}` : d;
   },
   back: (p) => `#/teaching/${p.id}`,
 
@@ -305,7 +306,7 @@ export default {
         sessionId: activeSessionId ?? undefined,
         date: date ?? todayISO(),
       });
-      toast(saved ? 'حُفظت الملاحظة في سجل الطالب' : 'اكتب ملاحظة لا تتجاوز ١٢٠٠ حرفًا', saved ? 'ok' : 'danger');
+      toast(saved ? 'حُفظت الملاحظة في سجل الطالب' : 'اكتب ملاحظة لا تتجاوز 1200 حرفًا', saved ? 'ok' : 'danger');
       repaint();
     },
     async set(el) {

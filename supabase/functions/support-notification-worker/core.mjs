@@ -151,6 +151,7 @@ export function formatRiyadhTime(value) {
   if (!validTimestamp(value)) return '';
   return new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
     timeZone: 'Asia/Riyadh',
+    numberingSystem: 'latn',
     day: 'numeric',
     month: 'long',
     year: 'numeric',

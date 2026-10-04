@@ -14,6 +14,7 @@ import { makeYear, makeTerm, YEAR_STATUS, TERM_STATUS, TERM_NAMES, termIndexes }
 import { isSoundEnabled, setSoundEnabled } from '../lib/sound.js';
 import { isVisualEffectsEnabled, setVisualEffectsEnabled } from '../lib/effects.js';
 import { hasValidYearCalendarConfig } from './calendar.js';
+import { wireHijriYearInput } from '../lib/hijri-year-input.js';
 import { resolvedReportPrincipalName } from '../lib/report-print.js';
 import {
   BETA_ACCESS_LABEL, currentAccountContract, getAccountPresentation, isValidSaudiMobile, normalizeSaudiMobile,
@@ -98,9 +99,9 @@ function yearSheet(existing = null) {
       <form id="year-form">
         <label class="field">
           <span class="field__label">بداية السنة الهجرية</span>
-          <input class="input tabular" name="hijriStart" type="number" min="1300" max="1600"
+          <input class="input tabular" name="hijriStart" type="text" inputmode="numeric" pattern="[0-9]{4}" dir="ltr" min="1300" max="1600"
                  value="${y.hijriStart || 1448}" required ${existing ? 'readonly' : ''}>
-          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل ١٤٤٨-١٤٤٩.</span>
+          <span class="field__hint">تُسمّى السنة تلقائيًا، مثل 1448-1449.</span>
         </label>
         ${existing
           ? html`
@@ -127,6 +128,7 @@ function yearSheet(existing = null) {
       <button class="btn btn--primary" form="year-form" type="submit">حفظ</button>
     `,
     onMount: (root, done) => {
+      const readHijriYear = wireHijriYearInput(root);
       root.querySelectorAll('.segmented__btn').forEach((b) =>
         b.addEventListener('click', () => {
           root.querySelectorAll('.segmented__btn').forEach((x) => x.classList.remove('is-on'));
@@ -136,9 +138,11 @@ function yearSheet(existing = null) {
       );
       root.querySelector('#year-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
+        const hijriStart = readHijriYear();
+        if (hijriStart === null) return;
         const fd = new FormData(ev.target);
         done({
-          hijriStart: Number(fd.get('hijriStart')),
+          hijriStart,
           status: String(fd.get('status') ?? 'active'),
         });
       });
@@ -209,7 +213,7 @@ function renderResultPanel(title, result) {
       </button>
       ${result.status === 'success' ? html`
         <div style="color: var(--brand); font-weight: bold; margin-top: 16px;">نجاح</div>
-        <div>آخر مزامنة: ${new Date(result.time).toLocaleTimeString('ar-SA')}</div>
+        <div>آخر مزامنة: ${new Date(result.time).toLocaleTimeString('ar-SA-u-nu-latn', { numberingSystem: 'latn' })}</div>
         ${result.stats ? html`
           <div style="margin-top: var(--sp-1); display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 13px;">
             ${Object.entries(result.stats).map(([k, v]) => html`
@@ -664,7 +668,7 @@ const settings = {
       let text = `--- ${payload.title} ---\n`;
       if (payload.status === 'success') {
         text += `الحالة: نجاح\n`;
-        text += `آخر مزامنة: ${new Date(payload.time).toLocaleTimeString('ar-SA')}\n`;
+        text += `آخر مزامنة: ${new Date(payload.time).toLocaleTimeString('ar-SA-u-nu-latn', { numberingSystem: 'latn' })}\n`;
         if (payload.stats) {
           for (const [k, v] of Object.entries(payload.stats)) {
             text += `${k}: ${v.pushed} ↑ / ${v.pulled} ↓\n`;
