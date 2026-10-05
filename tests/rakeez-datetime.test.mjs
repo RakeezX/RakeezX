@@ -94,7 +94,7 @@ test('N38 runtime uses repository-local browser assets and preloads them offline
     assert.match(worker, new RegExp(`\\./src/vendor/flatpickr/${asset.replace('.', '\\.')}['"]`));
   }
   assert.match(adapter, /import '\.\.\/vendor\/flatpickr\/flatpickr\.min\.js';\s*import '\.\.\/vendor\/flatpickr\/ar\.js';/);
-  assert.match(style, /@import '\.\.\/vendor\/flatpickr\/flatpickr\.min\.css';/);
+  assert.match(style, /@import '(?:\.\.\/vendor|\/src\/vendor)\/flatpickr\/flatpickr\.min\.css';/);
   assert.match(readFileSync(join(root, 'src/vendor/flatpickr/LICENSE.md'), 'utf8'), /MIT License/);
 });
 
