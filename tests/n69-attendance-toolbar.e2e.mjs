@@ -48,16 +48,37 @@ test('attendance toolbar dates wrap cleanly and retain filtering at desktop, 390
       await expect(start).toHaveValue('2026-08-02');
       await expect(end).toHaveValue('2026-08-02');
       const geometry = await page.evaluate(() => {
-        const controls = [...document.querySelectorAll('.report-toolbar select, .report-toolbar input, .report-toolbar button')];
+        const controls = [
+          ['select[data-change="sort"]', 90],
+          ['input[data-change="filter-start"]', 90],
+          ['input[data-change="filter-end"]', 90],
+          ['button[data-mode="brief"]', 44],
+          ['button[data-mode="detailed"]', 44],
+          ['button[data-act="toggle-a4"]', 90],
+        ];
         return {
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-          clipped: controls.some((control) => {
+          unreachable: controls.flatMap(([selector, minWidth]) => {
+            const control = document.querySelector(`.report-toolbar ${selector}`);
+            if (!control) return [selector];
             const box = control.getBoundingClientRect();
-            return box.left < -1 || box.right > window.innerWidth + 1 || box.width < 90;
+            return box.left < -1 || box.right > window.innerWidth + 1 || box.width < minWidth || box.height <= 0
+              ? [selector]
+              : [];
           }),
         };
       });
-      expect(geometry).toEqual({ overflow: false, clipped: false });
+      expect(geometry).toEqual({ overflow: false, unreachable: [] });
+      for (const selector of [
+        '[data-change="sort"]',
+        '[data-change="filter-start"]',
+        '[data-change="filter-end"]',
+        '[data-mode="brief"]',
+        '[data-mode="detailed"]',
+        '[data-act="toggle-a4"]',
+      ]) {
+        await toolbar.locator(selector).click({ trial: true });
+      }
     }
   }
   expect(errors).toEqual([]);
