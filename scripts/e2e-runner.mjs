@@ -43,13 +43,15 @@ try {
   await waitForServer();
   const requestedSpecs = process.argv.slice(2);
   const specs = requestedSpecs.length ? requestedSpecs : (await readdir(TEST_DIR)).filter((name) => name.endsWith('.e2e.mjs')).sort();
+  const failedSpecs = [];
   for (const spec of specs) {
     // A fresh Playwright process per spec prevents module/fixture leakage and
     // Windows socket exhaustion. Playwright still creates an isolated browser
     // context and page for every test, with one worker and zero retries.
     const result = await run(PLAYWRIGHT, ['test', `tests/${spec}`], runnerEnv);
-    if (result.code !== 0) throw new Error(`E2E spec failed in its isolated Playwright process: ${spec}`);
+    if (result.code !== 0) failedSpecs.push(spec);
   }
+  if (failedSpecs.length) throw new Error(`E2E specs failed: ${failedSpecs.join(', ')}`);
 } finally {
   if (!server.killed && server.exitCode === null) {
     server.kill();
