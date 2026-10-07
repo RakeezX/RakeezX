@@ -40,6 +40,12 @@ function noteTeachingContext(student, requested) {
   return candidates.length === 1 ? candidates[0] : null;
 }
 
+export function studentManagementSuccessDestination(action, teaching, enrollmentSectionId, archived = false) {
+  if (action !== 'delete' && action !== 'end') return null;
+  return teaching && !archived && teaching.sectionId === enrollmentSectionId
+    ? `#/teaching/${teaching.id}/students` : '#/classes';
+}
+
 export default {
   title: (p) => store.getStudent(p.id)?.name ?? 'الطالب',
   subtitle: (p) => {
@@ -606,8 +612,13 @@ export default {
     },
 
     async manageStudent(el, ev, params) {
+      // Capture the originating Teaching before a successful command removes the active enrollment.
+      const enrollmentSectionId = store.activeEnrollment(params.id)?.sectionId;
+      const teaching = params.teaching ? store.getTeaching(params.teaching) : null;
+      const archived = teaching ? store.isTeachingArchived(teaching) : false;
       const result = await openStudentManagement(params.id);
-      if (result?.action === 'delete') location.hash = params.teaching ? `#/teaching/${params.teaching}/students` : '#/classes';
+      const destination = studentManagementSuccessDestination(result?.action, teaching, enrollmentSectionId, archived);
+      if (destination) location.hash = destination;
       else {
         // Restore to the current control after any runtime-triggered profile render.
         await new Promise(resolve => requestAnimationFrame(resolve));
