@@ -278,3 +278,52 @@ test('STALE PRECONDITION: session and attendance intent survive rejection withou
   assert.equal((await pg.query(`select count(*)::int n from rakeezx.attendance where id='stale-attendance'`)).rows[0].n,0);
   assert.equal((await db.getAll('outbox')).length,2);
 });
+
+test('OLD SELECTED-PRESET SESSION: locked rejection survives unrelated Sync, reload and candidate upgrade', async () => {
+  const client = new IsolatedIndexedDb('n58-old-session-rejection');
+  const sessionId = 'old-contextless-session';
+  const calls = [];
+  const transport = { applyMutation: async mutation => {
+    calls.push(structuredClone(mutation));
+    return mutate(mutation.entity,mutation.recordId,mutation.mutationId,mutation.operation,mutation.patch,mutation.baseRevision);
+  } };
+  const oldSender = createSyncV2Engine({database:client,transport});
+  try {
+    assert.ok((await pg.query("select calendar_preset_id from rakeezx.years where id='add-year'")).rows[0].calendar_preset_id);
+    const teaching=(await pg.query("select * from rakeezx.teachings where id='add-teaching'")).rows[0];
+    await client.applyBatch({teachings:{put:[decodeSyncV2Canonical('teachings',teaching)]}});
+    const serverBefore=(await pg.query('select id,calendar_context from rakeezx.sessions order by id')).rows;
+    const old=await oldSender.commitMutation({store:'sessions',recordId:sessionId,op:'create',
+      patch:{teachingId:'add-teaching',date:'2026-10-09',period:1}});
+    assert.equal(Object.hasOwn(old.mutation.patch,'calendar_context'),false,'old sender omitted creation-time provenance');
+    const rejected=await oldSender.dispatchPending();
+    assert.deepEqual(rejected,{attempted:1,acknowledged:0,failed:0,blocked:1});
+    const locked=(await client.getAll('outbox'))[0];
+    assert.equal(locked.state,'rejected');
+    assert.equal(locked.envelopeLocked,true);
+    assert.equal(locked.attemptCount,1);
+    assert.match(locked.lastError.message,/N58_SESSION_CONTEXT_REQUIRED/);
+    assert.equal(Object.hasOwn(locked.patch,'calendar_context'),false);
+    assert.equal((await oldSender.status()).state,'rejected');
+    assert.equal((await oldSender.status()).rejected,1);
+    assert.deepEqual((await pg.query('select id,calendar_context from rakeezx.sessions order by id')).rows,serverBefore);
+
+    await oldSender.commitMutation({store:'students',recordId:'old-session-unrelated-student',op:'create',patch:{name:'Unrelated synthetic'}});
+    const unrelated=await oldSender.dispatchPending();
+    assert.equal(unrelated.acknowledged,1);
+    assert.equal(unrelated.failed,0);
+    assert.equal((await pg.query("select count(*)::int n from rakeezx.students where id='old-session-unrelated-student'")).rows[0].n,1);
+    assert.deepEqual(await client.get('outbox',locked.id),locked,'unrelated success does not clear or alter rejection');
+    assert.equal((await oldSender.status()).rejected,1);
+
+    client.close(); // Reload the same durable fake IndexedDB with the candidate engine.
+    const upgraded=createSyncV2Engine({database:client,transport});
+    assert.deepEqual(await client.get('outbox',locked.id),locked);
+    assert.equal((await upgraded.status()).state,'rejected');
+    assert.equal((await upgraded.status()).rejected,1);
+    assert.deepEqual(await upgraded.dispatchPending(),{attempted:0,acknowledged:0,failed:0,blocked:1});
+    assert.deepEqual(await client.get('outbox',locked.id),locked,'upgrade neither retries nor invents context');
+    assert.equal(calls.filter(call=>call.recordId===sessionId).length,1);
+    assert.deepEqual((await pg.query('select id,calendar_context from rakeezx.sessions order by id')).rows,serverBefore);
+  } finally { client.close(); }
+});
