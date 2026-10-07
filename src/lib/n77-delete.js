@@ -1,6 +1,7 @@
 import { STORES } from './db.js';
 
 export const DELETE_RETRY_MESSAGE = 'يتطلب حذف الفصل اتصالًا بالإنترنت. تحقّق من الاتصال ثم أعد المحاولة؛ لم تتغير بياناتك.';
+export const DELETE_SERVER_UNAVAILABLE_MESSAGE = 'التحقق من الحذف على الخادم غير متاح مؤقتًا. لم تتغير بياناتك؛ أعد المحاولة لاحقًا.';
 export const DELETE_AMBIGUOUS_MESSAGE = 'تعذّر تأكيد نتيجة الحذف. اتصل بالإنترنت وأعد المحاولة؛ سيتحقق ركيز من العملية ويكملها بأمان.';
 export const DELETE_STALE_MESSAGE = 'تغيّرت بيانات الفصل. حدّث الصفحة ثم راجع نطاق الحذف وأعد المحاولة؛ لم تتغير بياناتك على هذا الجهاز.';
 

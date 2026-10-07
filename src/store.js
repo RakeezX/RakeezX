@@ -7,7 +7,7 @@
 
 import * as db from './lib/db.js';
 import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
-import { DELETE_RETRY_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
+import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
@@ -2638,7 +2638,7 @@ export async function previewDeleteTeaching(tchId) {
     return plan;
   } catch (error) {
     if (error.message === DELETE_STALE_MESSAGE) throw error;
-    throw new Error(DELETE_RETRY_MESSAGE);
+    throw new Error(globalThis.navigator?.onLine ? DELETE_SERVER_UNAVAILABLE_MESSAGE : DELETE_RETRY_MESSAGE);
   }
 }
 

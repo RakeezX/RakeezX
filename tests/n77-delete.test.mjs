@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { setMockAuth, setMockBackend } from '../src/lib/cloud.js';
-import { localDeleteWrites, validateDeletePlan, DELETE_STALE_MESSAGE } from '../src/lib/n77-delete.js';
+import { localDeleteWrites, validateDeletePlan, DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_STALE_MESSAGE } from '../src/lib/n77-delete.js';
 import { makeSection, makeTeaching } from '../src/models.js';
 
 const A = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -149,6 +149,36 @@ test('N77 stale server scope, offline entry and owner switch fail before destruc
   await assert.rejects(store.previewDeleteTeaching(t1.id), /يتطلب حذف الفصل اتصالًا/);
   assert.equal((await db.get('teachings', t1.id)).deleted, false);
   globalThis.navigator.onLine = true;
+});
+
+test('N77 preview distinguishes offline from unavailable server validation without local deletion', async () => {
+  await setup();
+  globalThis.navigator.onLine = false;
+  await assert.rejects(store.previewDeleteTeaching(t1.id), { message: DELETE_RETRY_MESSAGE });
+  globalThis.navigator.onLine = true;
+  setMockBackend({ n77DeleteTeaching: async () => {
+    throw Object.assign(new Error('Could not find the function rakeezx.n77_delete_teaching'), { code: 'PGRST202' });
+  } });
+  await assert.rejects(store.previewDeleteTeaching(t1.id), { message: DELETE_SERVER_UNAVAILABLE_MESSAGE });
+  setMockBackend({ n77DeleteTeaching: async () => { throw new Error('server unavailable'); } });
+  await assert.rejects(store.previewDeleteTeaching(t1.id), { message: DELETE_SERVER_UNAVAILABLE_MESSAGE });
+  for (const [name, id] of [['teachings', t1.id], ['sections', section.id], ['items', 'item:1']]) {
+    assert.equal((await db.get(name, id)).deleted, false);
+  }
+  assert.equal((await db.get('device', 'device')).n77DeleteIntent, undefined);
+});
+
+test('N77 preview rejects owner, workspace and stale scope before local deletion', async () => {
+  await setup();
+  setMockAuth({ id: B }, { access_token: 'b-token', user: { id: B } });
+  await assert.rejects(store.previewDeleteTeaching(t1.id), { message: DELETE_SERVER_UNAVAILABLE_MESSAGE });
+  setMockAuth({ id: A }, { access_token: 'a-token', user: { id: A } });
+  setMockBackend({ n77DeleteTeaching: async () => ({ ...plan(t1.id, 'teaching', 'f'), ownerId: B }) });
+  await assert.rejects(store.previewDeleteTeaching(t1.id), { message: DELETE_STALE_MESSAGE });
+  setMockBackend({ n77DeleteTeaching: async () => plan(t1.id, 'teaching', 'f') });
+  assert.deepEqual(await store.previewDeleteTeaching(t1.id), plan(t1.id, 'teaching', 'f'));
+  assert.equal((await db.get('teachings', t1.id)).deleted, false);
+  assert.equal((await db.get('device', 'device')).n77DeleteIntent, undefined);
 });
 
 test('N77 plan rejects foreign owner and stale scope before local writes', () => {
