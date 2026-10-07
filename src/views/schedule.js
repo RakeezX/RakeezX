@@ -14,6 +14,7 @@ import {
   createSchedulePngFile,
   openSchedulePrint,
   renderSchedulePng,
+  scheduleExportEligibility,
   shareOrDownloadSchedule,
 } from "../lib/schedule-export.js";
 import * as store from "../store.js";
@@ -199,16 +200,34 @@ function openScheduleExportSheet() {
           includeTimes: data.has('includeTimes'),
         });
       };
-      const refresh = () => render(preview, scheduleExportPreview(model()));
+      const refresh = () => {
+        const current = model();
+        const eligibility = scheduleExportEligibility(current);
+        render(preview, html`
+          ${eligibility === 'blank-template' ? html`<p class="t-3 fs-sm" role="status">الجدول بلا حصص مجدولة. يمكنك إخراج نموذج فارغ، أو إضافة الحصص ثم إعادة التصدير.</p>` : ''}
+          ${eligibility === 'no-periods' ? html`<p class="t-3 fs-sm" role="alert">لا توجد أعمدة حصص للجدول. أضف فترات في ملف التوقيت الأساسي ثم أعد التصدير.</p>` : ''}
+          ${scheduleExportPreview(current)}
+        `);
+      };
+      const checkedModel = () => {
+        const current = model();
+        if (scheduleExportEligibility(current) === 'no-periods') {
+          toast('لا توجد أعمدة حصص للجدول. أضف فترات في ملف التوقيت الأساسي ثم أعد التصدير.', 'danger');
+          return null;
+        }
+        return current;
+      };
       const busy = (active) => controls.forEach((button) => { button.disabled = active; });
       const probe = createSchedulePngFile(new Blob(['rakeezx'], { type: 'image/png' }));
       shareButton.hidden = !canShareScheduleFile(probe);
 
       form.addEventListener('change', refresh);
       pngButton.addEventListener('click', async () => {
+        const current = checkedModel();
+        if (!current) return;
         busy(true);
         try {
-          const blob = await renderSchedulePng(model());
+          const blob = await renderSchedulePng(current);
           downloadBlob('rakeezx-schedule.png', blob);
           toast('نُزّلت صورة الجدول');
         } catch (error) {
@@ -218,16 +237,20 @@ function openScheduleExportSheet() {
         }
       });
       printButton.addEventListener('click', () => {
+        const current = checkedModel();
+        if (!current) return;
         try {
-          openSchedulePrint(model());
+          openSchedulePrint(current);
         } catch (error) {
           toast(error?.message ?? 'تعذّرت طباعة الجدول.', 'danger');
         }
       });
       shareButton.addEventListener('click', async () => {
+        const current = checkedModel();
+        if (!current) return;
         busy(true);
         try {
-          const blob = await renderSchedulePng(model());
+          const blob = await renderSchedulePng(current);
           const result = await shareOrDownloadSchedule(blob);
           if (result.method === 'share') toast('فُتحت مشاركة الجدول');
           if (result.method === 'download') toast('المشاركة غير متاحة؛ نُزّلت صورة الجدول');

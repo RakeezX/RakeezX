@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('aggregate execution reports navigate, filter, persist, and stay responsive', async ({ page }) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto('/#/reports'); await page.waitForFunction(() => window.store);
+  await page.goto('/#/reports'); await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.evaluate(async () => {
     await window.store.save({
       years: [{ id: 'y:er', label: 'سنة اختبار' }], terms: [{ id: 'tm:er', yearId: 'y:er', name: 'الفصل الأول' }], subjects: [{ id: 'sub:er', name: 'اختبار رياضيات' }], sections: [{ id: 'sec:er', yearId: 'y:er', grade: 4, label: 'أ' }], teachings: [{ id: 'tch:er', sectionId: 'sec:er', subjectId: 'sub:er', termId: 'tm:er' }],

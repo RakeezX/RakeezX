@@ -22,6 +22,45 @@ let a4Preview = false;
 const reportTitle = () => ({ roster: 'كشف الطلاب', attendance: 'كشف الحضور', grades: 'كشف الدرجات', support: 'تقرير من يحتاج دعمًا' }[tab] ?? 'تقرير الفصل');
 const safeName = (value) => visibleLatinDigits(value ?? 'فصل').replace(/[\\/:*?"<>|]/g, '-');
 
+export function attendanceSessionsInRange(report, start = '', end = '') {
+  return report.sessions.filter((session) => (!start || session.date >= start) && (!end || session.date <= end));
+}
+
+export function attendanceHasRecords(report, sessions) {
+  return sessions.some((session) => (report.attendanceBySession.get(session.id)?.size ?? 0) > 0);
+}
+
+export function gradesHaveValues(roster, items, ctx) {
+  return items.some((item) => roster.some((student) => itemScore(item, ctx[student.id]) !== null));
+}
+
+export function supportHasIndicators(roster, items, ctx) {
+  return gradesHaveValues(roster, items, ctx) || roster.some((student) =>
+    ctx[student.id].attendance.some((record) => !record.deleted)
+    || ctx[student.id].logs.some((record) => !record.deleted && record.kind === 'participation'));
+}
+
+function emptyReportNotice(title, desc) {
+  return openSheet({ title, desc, foot: html`<button class="btn btn--primary" data-sheet-close>حسنًا</button>` });
+}
+
+export function supportEmptyMessage(hasIndicators) {
+  return hasIndicators
+    ? { title: 'لا يوجد طلاب تنطبق عليهم مؤشرات الدعم حاليًا', desc: 'راجع المؤشرات أو اختر فصلًا آخر.' }
+    : { title: 'لا توجد بيانات كافية لتحديد الطلاب الذين يحتاجون دعمًا', desc: 'ارصد الدرجات أو الحضور أو المشاركة أولًا.' };
+}
+
+function supportEmptyNotice(hasIndicators, allowBlankPrint = false) {
+  const { title, desc } = supportEmptyMessage(hasIndicators);
+  if (!allowBlankPrint) return emptyReportNotice(title, desc);
+  return openSheet({
+    title,
+    desc: `${desc} يمكنك طباعة التقرير فارغًا إذا أردت الاحتفاظ بنسخة ورقية.`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>العودة</button><button class="btn btn--primary" id="empty-support-print">طباعة التقرير فارغًا</button>`,
+    onMount: (root, done) => root.querySelector('#empty-support-print')?.addEventListener('click', () => done(true)),
+  });
+}
+
 function identity(cls) {
   const snapshot = store.latestClosedTermReport(cls.termId);
   const document = snapshot?.payload?.teachingDocuments?.find((entry) => entry.teaching?.id === cls.id);
@@ -197,7 +236,34 @@ export default {
     'filter-start'(el) { filterStartDate = el.value; repaint(); },
     'filter-end'(el) { filterEndDate = el.value; repaint(); },
 
-    async print() {
+    async print(el, ev, params) {
+      if (tab === 'attendance') {
+        const report = store.attendanceReportContext(params.id);
+        const sessions = attendanceSessionsInRange(report, filterStartDate, filterEndDate);
+        if (!sessions.length || !attendanceHasRecords(report, sessions)) {
+          await emptyReportNotice('لا يوجد حضور مرصود في الفترة المحددة', 'غيّر نطاق التاريخ أو ارصد الحضور أولًا.');
+          return;
+        }
+      } else {
+        const { roster, items, ctx } = store.teachingContext(params.id);
+        if (!roster.length) {
+          await emptyReportNotice('لا يوجد طلاب في هذا الفصل', 'أضف الطلاب أو اختر فصلًا آخر قبل إخراج الكشف.');
+          return;
+        }
+        if (tab === 'grades' && !gradesHaveValues(roster, items, ctx)) {
+          const proceed = await openSheet({
+            title: 'لا توجد درجات مرصودة لهذا الكشف',
+            desc: 'يمكنك طباعة كشف فارغ لتعبئته، أو العودة لرصد الدرجات.',
+            foot: html`<button class="btn btn--ghost" data-sheet-close>العودة</button><button class="btn btn--primary" id="blank-grade-print">طباعة كشف فارغ</button>`,
+            onMount: (root, done) => root.querySelector('#blank-grade-print')?.addEventListener('click', () => done(true)),
+          });
+          if (!proceed) return;
+        }
+        if (tab === 'support' && !supportRows(roster, items, ctx).length) {
+          const hasIndicators = supportHasIndicators(roster, items, ctx);
+          if (!await supportEmptyNotice(hasIndicators, hasIndicators)) return;
+        }
+      }
       const presentation = getAccountPresentation(store.state.profile?.teacherForm);
       const confirmed = await openSheet({
         title: 'تأكيد بيانات التقرير والطباعة',
@@ -240,8 +306,8 @@ export default {
       }, 50);
     },
 
-    async identity() {
-      return this.print();
+    async identity(el, ev, params) {
+      return this.print(el, ev, params);
     },
 
     async share(el, ev, params) {
@@ -312,15 +378,18 @@ export default {
       const { roster, items, ctx } = store.teachingContext(params.id);
       const safe = safeName(store.sectionLabel(historical?.section ?? store.getSection(cls?.sectionId)));
       if (tab === 'roster') {
+        if (!roster.length) { emptyReportNotice('لا يوجد طلاب في هذا الفصل', 'أضف الطلاب أو اختر فصلًا آخر قبل إخراج الكشف.'); return; }
         downloadCSV(`طلاب-${safe}.csv`, markDemoExportRows([['رقم الكشف', 'الطالب'], ...roster.map((s) => [s.rollNo ?? '', s.name])]));
         toast('نُزّل كشف الطلاب'); return;
       }
       if (tab === 'attendance') {
         const report = store.attendanceReportContext(params.id);
-        const rows = [['رقم الكشف', 'الطالب', ...report.sessions.map((session) => `${fmtDateFull(session.date)} · الحصة ${session.period}`), 'الغياب', 'التأخر']];
+        const sessions = attendanceSessionsInRange(report, filterStartDate, filterEndDate);
+        if (!sessions.length || !attendanceHasRecords(report, sessions)) { emptyReportNotice('لا يوجد حضور مرصود في الفترة المحددة', 'غيّر نطاق التاريخ أو ارصد الحضور أولًا.'); return; }
+        const rows = [['رقم الكشف', 'الطالب', ...sessions.map((session) => `${fmtDateFull(session.date)} · الحصة ${session.period}`), 'الغياب', 'التأخر']];
         for (const student of report.students) {
-          const records = report.sessions.map((session) => report.attendanceBySession.get(session.id)?.get(student.id) ?? null).filter(Boolean);
-          rows.push([student.rollNo ?? '', student.name, ...report.sessions.map((session) => {
+          const records = sessions.map((session) => report.attendanceBySession.get(session.id)?.get(student.id) ?? null).filter(Boolean);
+          rows.push([student.rollNo ?? '', student.name, ...sessions.map((session) => {
             const member = report.rosterBySession.get(session.id)?.members.some((candidate) => candidate.id === student.id);
             const record = report.attendanceBySession.get(session.id)?.get(student.id);
             return member && record ? ATTENDANCE[record.status].label : '';
@@ -333,6 +402,7 @@ export default {
         for (const row of supportRows(roster, items, ctx)) {
           rows.push([row.s.rollNo ?? '', row.s.name, row.total.pct === null ? '' : Math.round(row.total.pct), row.reasons.join(' · ')]);
         }
+        if (rows.length === 1) { supportEmptyNotice(supportHasIndicators(roster, items, ctx)); return; }
         downloadCSV(`دعم-${safe}.csv`, markDemoExportRows(rows)); toast('نُزّل تقرير من يحتاج دعمًا'); return;
       }
       const rows = [['رقم الكشف', 'الطالب', ...items.map((i) => `${i.name} (${i.max})`), 'المجموع', 'النسبة']];
@@ -340,6 +410,7 @@ export default {
         const total = studentTotal(items, ctx[s.id]);
         rows.push([s.rollNo ?? '', s.name, ...items.map((i) => { const value = itemScore(i, ctx[s.id]); return value === null ? '' : fmtNum(value); }), fmtNum(total.earned), total.pct === null ? '' : Math.round(total.pct)]);
       }
+      if (!gradesHaveValues(roster, items, ctx)) { emptyReportNotice('لا توجد درجات مرصودة لهذا الكشف', 'ارصد الدرجات أولًا، أو اطبع كشفًا فارغًا لتعبئته.'); return; }
       downloadCSV(`درجات-${safe}.csv`, markDemoExportRows(rows)); toast('نُزّل كشف الدرجات');
     },
   },
@@ -355,9 +426,7 @@ function gradesReport(roster, items, ctx) {
 }
 
 function attendanceReport(cls, report) {
-  let sessions = report.sessions;
-  if (filterStartDate) sessions = sessions.filter((session) => session.date >= filterStartDate);
-  if (filterEndDate) sessions = sessions.filter((session) => session.date <= filterEndDate);
+  const sessions = attendanceSessionsInRange(report, filterStartDate, filterEndDate);
   if (!sessions.length) return html`<div class="empty"><div class="empty__icon">${icon('attendance')}</div><div class="empty__title">لم يُرصد حضور بعد</div><a class="btn btn--primary noprint" href="#/teaching/${cls.id}/attendance">${icon('attendance')} ابدأ الرصد</a></div>`;
 
   const visibleStudents = report.students.map((student) => ({
@@ -424,6 +493,8 @@ export function supportRows(roster, items, ctx) {
 
 function supportReport(roster, items, ctx) {
   const rows = supportRows(roster, items, ctx);
-  if (!rows.length) return html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا أحد تحت المؤشرات</div><div class="empty__text">لا طالب درجته دون 50٪ ولا من تجاوز ثلاث غيابات.</div></div>`;
+  if (!rows.length) return supportHasIndicators(roster, items, ctx)
+    ? html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا يوجد طلاب تنطبق عليهم مؤشرات الدعم حاليًا</div></div>`
+    : html`<div class="empty"><div class="empty__icon">${icon('check')}</div><div class="empty__title">لا توجد بيانات كافية لتحديد الطلاب الذين يحتاجون دعمًا</div><div class="empty__text">ارصد الدرجات أو الحضور أو المشاركة أولًا.</div></div>`;
   return html`<div class="support-report-screen noprint"><p class="t-3 fs-sm mb-3">${rows.length} طالبًا تستدعي حالتهم نظرة.</p><div class="list">${rows.map((row) => html`<a class="row" href="#/student/${row.s.id}"><span class="rollno">${row.s.rollNo ?? '—'}</span><span class="row__main"><span class="row__title">${row.s.name}</span><span class="row__sub">${row.reasons.join(' · ')}</span></span><span class="row__end"><span class="badge ${masteryBand(row.total.pct).badge} tabular">${fmtPct(row.total.pct)}</span><span class="row__chev">${icon('chev', 'compact')}</span></span></a>`)}</div></div><div class="tablewrap print-tablewrap print-only support-report-print"><table class="gtable gtable--report"><thead><tr><th>#</th><th>الطالب</th><th>مؤشرات الدعم</th><th>النسبة</th></tr></thead><tbody>${rows.map((row) => html`<tr><td class="tabular">${row.s.rollNo ?? ''}</td><th>${row.s.name}</th><td>${row.reasons.join(' · ')}</td><td class="tabular">${fmtPct(row.total.pct)}</td></tr>`)}</tbody></table></div>`;
 }

@@ -139,6 +139,13 @@ export function buildScheduleExportModel(source, {
   };
 }
 
+/** Eligibility comes from the exact cells and columns sent to PNG/print. */
+export function scheduleExportEligibility(model) {
+  if (!model.periods.length) return 'no-periods';
+  if (!model.days.some((day) => day.periods.some((cell) => cell.teaching))) return 'blank-template';
+  return 'ready';
+}
+
 function clippedText(ctx, value, maxWidth) {
   const original = visibleLatinDigits(text(value));
   if (!original || ctx.measureText(original).width <= maxWidth) return original;

@@ -15,10 +15,42 @@ import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import reports from "../src/views/reports.js";
-import { supportRows } from "../src/views/reports.js";
+import { attendanceHasRecords, attendanceSessionsInRange, gradesHaveValues, supportEmptyMessage, supportHasIndicators, supportRows } from "../src/views/reports.js";
 import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 import { readFileSync } from 'node:fs';
 import { URL as NodeURL } from 'node:url';
+
+test('N25 eligibility uses exported grade cells and attendance range', () => {
+  const roster = [{ id: 'synthetic-student' }];
+  const items = [{ id: 'synthetic-item', max: 10 }];
+  const ctx = { 'synthetic-student': { scoresByItem: {}, automaticByItem: {}, attendance: [], logs: [] } };
+  assert.equal(gradesHaveValues(roster, items, ctx), false);
+  assert.equal(supportHasIndicators(roster, items, ctx), false);
+  ctx['synthetic-student'].scoresByItem['synthetic-item'] = { value: 0 };
+  assert.equal(gradesHaveValues(roster, items, ctx), true);
+  assert.equal(supportHasIndicators(roster, items, ctx), true);
+
+  const report = {
+    sessions: [{ id: 'outside', date: '2026-08-01' }, { id: 'inside', date: '2026-08-15' }],
+    attendanceBySession: new Map([['outside', new Map([['synthetic-student', { status: 'present' }]])], ['inside', new Map()]]),
+  };
+  const selected = attendanceSessionsInRange(report, '2026-08-10', '2026-08-20');
+  assert.deepEqual(selected.map((session) => session.id), ['inside']);
+  assert.equal(attendanceHasRecords(report, selected), false);
+  report.attendanceBySession.get('inside').set('synthetic-student', { status: 'absent' });
+  assert.equal(attendanceHasRecords(report, selected), true);
+});
+
+test('N25 support empty result explains the relevant correction', () => {
+  assert.deepEqual(supportEmptyMessage(false), {
+    title: 'لا توجد بيانات كافية لتحديد الطلاب الذين يحتاجون دعمًا',
+    desc: 'ارصد الدرجات أو الحضور أو المشاركة أولًا.',
+  });
+  assert.deepEqual(supportEmptyMessage(true), {
+    title: 'لا يوجد طلاب تنطبق عليهم مؤشرات الدعم حاليًا',
+    desc: 'راجع المؤشرات أو اختر فصلًا آخر.',
+  });
+});
 
 test("Reports Regression Suite", async (t) => {
   t.beforeEach(async () => {
@@ -140,6 +172,13 @@ test("Reports Regression Suite", async (t) => {
     assert.match(render(), /value="2026-08-02" data-change="filter-start"/);
     assert.match(render(), /value="2026-08-02" data-change="filter-end"/);
     assert.match(render(), /<td class="tabular fw-7">100%<\/td>/);
+    let csv = '';
+    const previousBlob = global.Blob;
+    global.Blob = class { constructor(parts) { csv = String(parts[0]); } };
+    try { reports.actions.csv(null, null, { id: 'tch69' }); } finally { global.Blob = previousBlob; }
+    assert.equal(csv.split(/\r?\n/)[0].split(',').length, 5);
+    assert.match(csv, /,0,0/);
+    assert.doesNotMatch(csv, /,1,0/);
     reports.actions['att-mode']({ dataset: { mode: 'detailed' } });
     assert.match(render(), /1 حصة مرصودة/);
     reports.actions['toggle-a4']();

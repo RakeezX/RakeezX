@@ -7,6 +7,7 @@ import {
   canShareScheduleFile,
   openSchedulePrint,
   renderSchedulePng,
+  scheduleExportEligibility,
   schedulePrintDocument,
   shareOrDownloadSchedule,
 } from '../src/lib/schedule-export.js';
@@ -56,6 +57,18 @@ function fixture() {
   };
   return { source, baseProfile, effectiveOverride };
 }
+
+test('N25 schedule eligibility preserves a grid template and blocks no columns', () => {
+  const { source } = fixture();
+  const model = buildScheduleExportModel(source);
+  assert.equal(scheduleExportEligibility(model), 'ready');
+  const blank = structuredClone(model);
+  blank.days.forEach((day) => day.periods.forEach((cell) => { cell.teaching = null; }));
+  assert.equal(scheduleExportEligibility(blank), 'blank-template');
+  blank.periods = [];
+  blank.days.forEach((day) => { day.periods = []; });
+  assert.equal(scheduleExportEligibility(blank), 'no-periods');
+});
 
 test('weekly export model uses only base recurring timing and retains empty slots', () => {
   const { source } = fixture();

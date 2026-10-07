@@ -25,6 +25,13 @@ const statusText = (key) => META[key]?.label ?? key;
 
 function scoped() { return store.executionReport({ yearId: yearId || store.activeYear()?.id, termId: termId || store.activeTerm()?.id }); }
 function filters(report) { return report.rows.filter((row) => (status === 'all' || row.completeness.state === status) && (teachingId === 'all' || row.teaching?.id === teachingId) && (!from || row.session.date >= from) && (!to || row.session.date <= to)); }
+function emptyExecutionNotice() {
+  return openSheet({
+    title: 'لا توجد حصص مطابقة للتقرير',
+    desc: 'غيّر الفصل الدراسي أو الحالة أو نطاق التاريخ ثم أعد المحاولة.',
+    foot: html`<button class="btn btn--primary" data-sheet-close>حسنًا</button>`,
+  });
+}
 function contextLabel(report) { return [from && `من ${fmtDate(from, false)}`, to && `إلى ${fmtDate(to, false)}`, status !== 'all' && statusText(status)].filter(Boolean).join(' · '); }
 function profile(report = null) {
   const saved = report?.snapshotIdentity?.profile;
@@ -61,6 +68,7 @@ export default {
   actions: {
     term(el) { termId = el.value; teachingId = 'all'; repaint(); }, status(el) { status = el.value; repaint(); }, teaching(el) { teachingId = el.value; repaint(); }, from(el) { from = el.value; repaint(); }, to(el) { to = el.value; repaint(); },
     async print() {
+      if (!filters(scoped()).length) { await emptyExecutionNotice(); return; }
       const presentation = getAccountPresentation(store.state.profile?.teacherForm);
       const confirmed = await openSheet({
         title: 'تأكيد بيانات التقرير والطباعة',
@@ -105,7 +113,7 @@ export default {
     async identity() {
       return this.print();
     },
-    csv() { const rows = filters(scoped()); const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', markDemoExportRows(out)); toast('نُزّل تقرير تنفيذ الحصص'); },
+    csv() { const rows = filters(scoped()); if (!rows.length) { emptyExecutionNotice(); return; } const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', markDemoExportRows(out)); toast('نُزّل تقرير تنفيذ الحصص'); },
   },
 };
 
