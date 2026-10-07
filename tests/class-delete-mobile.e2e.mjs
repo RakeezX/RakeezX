@@ -31,7 +31,7 @@ for (const viewport of [
     // Step 2: Proceed to confirm step
     await continueBtn.click();
     await expect(dialog.locator('.class-delete-confirm-box')).toBeVisible();
-    await expect(dialog.getByText('سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.')).toBeVisible();
+    await expect(dialog.getByText('سيتم حذف الفصل كاملًا وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.')).toBeVisible();
     await expect(dialog.getByText('الطلاب المرتبطون بفصول أو سجلات أخرى ستبقى بياناتهم الأخرى محفوظة.')).toBeVisible();
     await expect(dialog.getByRole('button', { name: 'تأكيد الحذف' })).toBeVisible();
 
