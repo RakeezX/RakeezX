@@ -1,0 +1,36 @@
+/* N73 V3: compact target selection and a quiet, collapsed impact review. */
+.n73-copy-review .sheet { max-width:640px; }
+.n73-selection-intro { margin:0 0 12px; color:var(--text-2); font-size:13px; }
+.n73-choices { display:grid; gap:8px; }
+.n73-choice { display:flex; align-items:center; gap:12px; min-height:60px; padding:12px; border:1px solid var(--border); border-radius:10px; cursor:pointer; }
+.n73-choice input,.n73-extra input { width:18px; height:18px; flex:none; accent-color:var(--brand); }
+.n73-choice strong,.n73-choice small { display:block; }
+.n73-choice small { margin-top:3px; font-size:12px; color:var(--text-3); }
+.n73-brief { display:grid; gap:14px; }
+.n73-brief strong { font-size:14px; }
+.n73-brief p { margin:5px 0; font-size:13px; }
+.n73-brief small,.n73-preview-note { font-size:12px; line-height:1.7; color:var(--text-3); }
+.n73-preview-note { margin:14px 0 0; }
+.n73-impact-details { margin-top:14px; border-top:1px solid var(--border); }
+.n73-impact-details summary { min-height:44px; padding:12px 0; cursor:pointer; font-size:13px; font-weight:700; }
+.n73-impact-class { padding:10px 0; border-top:1px solid var(--border); }
+.n73-impact-class h3 { font-size:13px; margin:0 0 8px; }
+.n73-impact-class p { font-size:12px; line-height:1.8; margin:6px 0; color:var(--text-2); }
+.n73-extra { padding:10px 0; }
+.n73-extra strong { font-size:13px; }
+.n73-extra label { display:flex; gap:10px; align-items:center; min-height:44px; font-size:13px; cursor:pointer; }
+.n73-copy-review .btn { min-height:44px; }
+.n73-copy-review .sheet__body { overflow-wrap:anywhere; }
+@media(max-width:540px) { .n73-copy-review .sheet__body { padding:14px; } .n73-copy-review .sheet__foot .btn--primary { flex:1; white-space:normal; } }
+
+/* Parent metadata and subitems each have one distinct action. */
+.grade-distribution-page .distribution-name { min-width:0; overflow-wrap:anywhere; }
+.grade-distribution-page .distribution-actions .btn { min-height:44px; }
+.grade-distribution-page .distribution-actions .iconbtn { min-width:44px; min-height:44px; }
+@media(max-width:640px) {
+ .grade-distribution-page .distribution-item { grid-template-columns:28px minmax(0,1fr) auto; }
+ .grade-distribution-page .distribution-item .mode-badge { grid-column:3; grid-row:1; }
+ .grade-distribution-page .distribution-actions { grid-column:2/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)) 44px; gap:4px; }
+ .grade-distribution-page .distribution-actions .btn { padding:8px; font-size:12px; white-space:normal; line-height:1.4; }
+ .grade-distribution-page .distribution-actions .iconbtn { width:44px; }
+}

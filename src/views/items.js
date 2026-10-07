@@ -10,6 +10,7 @@ import { makeItem, defaultItemsFor } from '../models.js';
 import { getScoreFoundationCapability } from '../lib/cloud.js';
 import { distributeAutomatically, scoreCents } from '../lib/score-foundation.js';
 import { repaint } from '../repaint.js';
+import { distributionPreview } from '../lib/work-n73-preview.js';
 
 let foundationAvailable = false;
 let foundationChecking = false;
@@ -249,8 +250,8 @@ export default {
     return html`<div class="classroom-tool-page grade-distribution-page distribution-01c">
       <section class="distribution-hero"><div><span class="eyebrow">${store.sectionLabel(section)} · ${cls.name}</span>
         <h1>توزيع الدرجات</h1><p>${items.length} بنود · المجموع ${total} درجة</p></div>
-        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
-          ${icon('classes')} تطبيق التوزيع على كل فصول المادة نفسها</button></section>
+        <button class="btn btn--ghost" data-act="n73-preview" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
+          ${icon('classes')} نسخ توزيع الدرجات إلى فصول أخرى</button></section>
       ${foundationChecking ? html`<p class="score-01c-capability" role="status">جارٍ التحقق من توفر مزامنة التوزيع…</p>` :
         !supportsFoundation() ? html`<p class="score-01c-capability" role="status">الدرجة المباشرة متاحة. العناصر الفرعية ونسخ التوزيع ينتظران تحديث الخادم.</p>` : ''}
       <section class="distribution-panel"><header class="distribution-head"><div><h2>بنود التقييم</h2>
@@ -266,12 +267,13 @@ export default {
             ${i.scoreMode !== 'subitems' && supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">عناصر فرعية</button>` : ''}
             <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''} aria-label="رفع ${i.name}">${icon('upload')}</button>
           </span></article>`)}</div></section>
-      <aside class="copy-note">${icon('check')}<p><strong>النسخ إلى الفصول الأخرى عملية واحدة مستقلة.</strong>
-        <span>ينسخ بنية البنود وإعداداتها فقط، ولا ينسخ درجات الطلاب أو حالاتهم.</span></p></aside>
+      <aside class="copy-note">${icon('check')}<p><strong>معاينة نسخ التوزيع إلى الفصول الأخرى.</strong>
+        <span>يمكنك مراجعة الأثر بصريًا؛ التطبيق معطل في هذه النسخة.</span></p></aside>
     </div>`;
   },
 
   actions: {
+    "n73-preview": distributionPreview,
     async configure(el) {
       if (!await requireFoundation()) return;
       const item = store.state.items.find((row) => row.id === el.dataset.id && !row.deleted);
@@ -300,75 +302,6 @@ export default {
       } catch (error) { toast(error.message || 'تعذر حفظ التوزيع', 'danger'); }
     },
 
-    async copy(el, ev, params) {
-      if (!await requireFoundation()) return;
-      const preview = store.previewScoreDistributionCopy(params.id);
-      if (!preview.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
-      const source = store.getTeaching(params.id);
-      const sourceSection = store.getSection(source.sectionId);
-      const selected = await openSheet({
-        title: 'تطبيق التوزيع على فصول المادة',
-        desc: 'عملية نسخ واحدة؛ تبقى الفصول مستقلة بعد التطبيق.',
-        body: html`<div class="copy-summary"><div><span>المصدر</span><strong>${store.sectionLabel(sourceSection)}</strong>
-          <small>${source.name}</small></div><div><span>التوزيع</span><strong>${store.items(params.id).length} بنود</strong>
-          <small>تُنسخ البنود والعناصر الفرعية فقط، دون درجات الطلاب.</small></div></div>
-          <fieldset class="target-list"><legend>الفصول المطابقة والمتاحة</legend>${preview.map((target) => html`
-            <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}" checked>
-              <span><strong>${store.sectionLabel(store.getSection(target.sectionId))}</strong><small>${source.name}</small></span></label>`)}</fieldset>
-          <aside class="review-callout"><strong>لن يتم تغيير درجات الطلاب الموجودة.</strong>
-            <p>لا تُنسخ درجات الطلاب أو اختيارات العناصر أو الإضافات اليدوية أو سجل أي طالب.</p></aside>`,
-        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" type="button" data-copy-next>مراجعة التطبيق</button>`,
-        onMount(root, done) {
-          const next = root.querySelector('[data-copy-next]');
-          const update = () => { next.disabled = !root.querySelector('[data-copy-target]:checked'); };
-          root.addEventListener('change', update);
-          next.addEventListener('click', () => done([...root.querySelectorAll('[data-copy-target]:checked')]
-            .map((input) => input.value)));
-          update();
-        },
-      });
-      if (!selected?.length) return;
-      const selectedSet = new Set(selected);
-      const review = preview.filter((target) => selectedSet.has(target.teachingId));
-      const choices = await openSheet({
-        title: 'مراجعة بنود الفصول المحددة',
-        desc: 'لا حذف ولا استبدال للدرجات أو البنود الحالية.',
-        body: html`<div class="conflict-list">${review.map((target) => html`<section class="target-review">
-          <h3>${store.sectionLabel(store.getSection(target.sectionId))}</h3>
-          ${target.items.map((item) => html`<div class="target-review__item">
-            <p><span class="review-status review-status--${item.kind === 'MISSING' ? 'add' : item.kind === 'EQUIVALENT' ? 'keep' : 'conflict'}">
-              ${item.kind === 'MISSING' ? 'سيتم إضافته' : item.kind === 'EQUIVALENT' ? 'موجود مسبقًا' : 'يوجد بند مختلف'}</span>
-              ${store.state.items.find((row) => row.id === item.sourceItemId)?.name ?? ''}</p>
-            ${item.kind === 'CONFLICTING' ? html`<fieldset class="safe-choices"><legend>معالجة هذا البند</legend>
-              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="keep" checked> الاحتفاظ بالبند الحالي</label>
-              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="add"> إضافة البند الجديد بشكل مستقل</label>
-            </fieldset>` : ''}</div>`)}</section>`)}</div>
-          <aside class="review-callout"><strong>كل فصل يبقى مستقلًا بعد النسخ.</strong>
-            <p>أي تعديل لاحق على المصدر لن ينتقل تلقائيًا إلى هذه الفصول.</p></aside>`,
-        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" type="button" data-copy-apply>تطبيق التوزيع</button>`,
-        onMount(root, done) {
-          root.querySelector('[data-copy-apply]').addEventListener('click', () => {
-            const result = {};
-            for (const target of review) for (const item of target.items) {
-              if (item.kind !== 'CONFLICTING') continue;
-              const choice = root.querySelector(`input[name="choice-${CSS.escape(target.teachingId)}-${CSS.escape(item.sourceItemId)}"]:checked`);
-              if (!choice) return;
-              result[`${target.teachingId}:${item.sourceItemId}`] = choice.value;
-            }
-            done(result);
-          });
-        },
-      });
-      if (!choices) return;
-      try {
-        const result = await store.applyScoreDistributionCopy(params.id, selected, choices);
-        toast(isDemo() ? `طُبّق التوزيع على ${selected.length} فصول محددة` :
-          `أُعدّ النسخ إلى ${selected.length} فصول محددة للمزامنة (${result.itemIds.length} بنود)`);
-        repaint();
-      } catch (error) { toast(error.message || 'تعذر نسخ التوزيع؛ لم تُطبّق تغييرات', 'danger'); }
-    },
     async add(el, ev, params) {
       const data = await itemSheet(params.id);
       if (!data) return;
