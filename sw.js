@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v35';
+const VERSION = 'rakeezx-v36';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -50,6 +50,7 @@ const SHELL = [
   './src/styles/schedule-work-integration.css',
   './src/styles/calendar-work-0417.css',
   './src/styles/rakeez-datetime.css',
+  './src/styles/work-n70.css',
 
   './src/vendor/flatpickr/flatpickr.min.css',
   './src/vendor/flatpickr/flatpickr.min.js',
@@ -131,6 +132,7 @@ const SHELL = [
   './src/views/sessions.js',
   './src/views/reports.js',
   './src/views/reports-index.js',
+  './src/views/cross-class-reports.js',
   './src/views/execution-report.js',
   './src/views/archive.js',
   './src/views/archive-detail.js',

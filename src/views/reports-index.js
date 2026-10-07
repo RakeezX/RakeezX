@@ -5,6 +5,7 @@ import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel } from '../models.js';
 
+
 const classCount = (count) => count === 1 ? 'فصل واحد' : count === 2 ? 'فصلان' : `${count} فصول`;
 
 function classReportRow(tch) {
@@ -84,17 +85,25 @@ export default {
         <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
           <div class="report-hub__head">
             <div>
-              <h2 class="report-hub__title" id="aggregate-reports-title">التقارير المجمّعة</h2>
-              <p class="report-hub__desc">صورة واحدة عن تنفيذ الحصص في جميع الفصول.</p>
+              <h2 class="report-hub__title" id="aggregate-reports-title">جميع الفصول</h2>
+              <p class="report-hub__desc">ثلاثة ملخصات للمتابعة، وتبقى تفاصيل كل فصل في تقاريره.</p>
             </div>
           </div>
           <a class="report-destination" href="#/reports/execution">
             <span class="report-destination__icon" aria-hidden="true">${icon('timetable')}</span>
             <span class="row__main">
-              <span class="row__title">ملخّص التنفيذ</span>
+              <span class="row__title" data-n70-destination>الحصص والحضور</span>
               <span class="row__sub">تنفيذ الحصص، اكتمال الحضور، وتصفية النتائج بحسب التاريخ والفصل والحالة.</span>
             </span>
             <span class="row__chev">${icon('chev')}</span>
+          </a>
+          <a class="report-destination n70-destination" href="#/reports/grades">
+            <span class="report-destination__icon" aria-hidden="true">${icon('grades')}</span>
+            <span class="row__main"><span class="row__title" data-n70-destination>الدرجات</span><span class="row__sub">ملخص الدرجات عبر الفصول، مع الوصول إلى الكشوف التفصيلية.</span></span><span class="row__chev">${icon('chev')}</span>
+          </a>
+          <a class="report-destination n70-destination" href="#/reports/followup">
+            <span class="report-destination__icon" aria-hidden="true">${icon('student')}</span>
+            <span class="row__main"><span class="row__title" data-n70-destination>طلاب يحتاجون متابعة</span><span class="row__sub">الطالب وفصله وسبب المتابعة من سجلات ركيز الحالية.</span></span><span class="row__chev">${icon('chev')}</span>
           </a>
         </section>
       </div>
