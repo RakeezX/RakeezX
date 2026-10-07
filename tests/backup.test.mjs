@@ -7,6 +7,7 @@ import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
 import { buildBackup, validateBackup, validateBackupIntegrity, restoreBackup } from "../src/lib/export.js";
 import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
+import { seedBackupRows } from "./helpers/seed-backup.mjs";
 
 test("Backup and Restore Suite", async (t) => {
   t.beforeEach(async () => {
@@ -56,7 +57,9 @@ test("Backup and Restore Suite", async (t) => {
     await db.clearAll();
     
     // 5. Actual Restore (merge)
-    const res = await restoreBackup(backup, "merge");
+    await assert.rejects(restoreBackup(backup, "merge"), (error) => error.code === "LOCAL_RESTORE_DISABLED");
+    assert.equal((await db.getAll('students')).length, 0);
+    await seedBackupRows(backup);
     
     // 6. store.init() and verify
     await store.init();
@@ -84,11 +87,11 @@ test("Backup and Restore Suite", async (t) => {
 
     const belowSupported = { app: "rakeezx", version: 2, data: { students: [{ id: "old", name: "Old" }] } };
     assert.equal(validateBackup(belowSupported).code, "UNSUPPORTED_BACKUP_VERSION");
-    await assert.rejects(restoreBackup(belowSupported), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
+    await assert.rejects(restoreBackup(belowSupported), (error) => error.code === "LOCAL_RESTORE_DISABLED");
 
     const future = { app: "rakeezx", version: 6, data: { students: [{ id: "future", name: "Future" }] } };
     assert.equal(validateBackup(future).code, "UNSUPPORTED_BACKUP_VERSION");
-    await assert.rejects(restoreBackup(future), (error) => error.code === "UNSUPPORTED_BACKUP_VERSION");
+    await assert.rejects(restoreBackup(future), (error) => error.code === "LOCAL_RESTORE_DISABLED");
 
     const parsed = JSON.parse(JSON.stringify(belowSupported));
     assert.equal(typeof parsed, "object", "JSON parsing only establishes that the file was read");

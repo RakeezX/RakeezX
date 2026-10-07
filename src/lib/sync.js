@@ -437,7 +437,8 @@ export async function syncAll({ full = true, remote = false } = {}) {
   if (restoreRunning || workspaceClaimRunning) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
-  if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
+  const lifecycleDevice = await db.get('device', 'device');
+  if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;

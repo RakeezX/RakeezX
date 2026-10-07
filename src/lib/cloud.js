@@ -790,6 +790,35 @@ export async function applySyncV2LifecycleCommand(envelope) {
   });
 }
 
+/** N77 server-authoritative preview and atomic Delete. Both calls are owner-bound RPCs. */
+export async function n77DeleteTeaching({ teachingId, sectionId, fingerprint = null, mutationId = null,
+  deviceId = null, commit = false }) {
+  const ownerId = user?.id;
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: ownerId });
+  if (!access.allowed || !ownerId || !session?.access_token || !globalThis.navigator?.onLine) {
+    throw Object.assign(new Error('N77 Delete requires a verified online account workspace'), { code: 'N77_OFFLINE_OR_OWNER' });
+  }
+  const assertAccess = () => {
+    if (user?.id !== ownerId || runtimeSyncOwnershipGuard.getWorkspace() !== workspace || !session?.access_token) {
+      throw Object.assign(new Error('N77 Delete account/workspace changed'), { code: 'N77_OWNER_CHANGED' });
+    }
+  };
+  await verifyCurrentAuthIdentity(ownerId);
+  assertAccess();
+  const input = { teachingId, sectionId, fingerprint, mutationId, deviceId, commit };
+  const result = mockBackend ? await mockBackend.n77DeleteTeaching(input)
+    : await request('/rpc/n77_delete_teaching', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+      body: JSON.stringify({ p_teaching_id: teachingId, p_expected_section_id: sectionId,
+        p_expected_fingerprint: fingerprint, p_mutation_id: mutationId, p_device_id: deviceId,
+        p_commit: commit }),
+    }, false, { assertAccess });
+  assertAccess();
+  return result;
+}
+
 /** Sync V2 section archive/reopen command transport. */
 export async function applySyncV2SectionLifecycleCommand(envelope) {
   if (mockBackend) {

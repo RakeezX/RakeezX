@@ -6,7 +6,8 @@ global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, 
 global.matchMedia = () => ({ matches: false });
 
 import { makeSession, todayISO } from '../src/models.js';
-import { buildBackup, restoreBackup } from '../src/lib/export.js';
+import { buildBackup } from '../src/lib/export.js';
+import { seedBackupRows } from './helpers/seed-backup.mjs';
 import { setMockBackend, setMockAuth } from '../src/lib/cloud.js';
 import { encodeSyncV2Patch, decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
 import * as sync from '../src/lib/sync.js';
@@ -106,7 +107,7 @@ test('dated student notes retain history, context, transfers, reloads, and backu
   const backup = await buildBackup();
   assert.equal(backup.data.notes.some((note) => note.id === second.id), true);
   await db.clearAll();
-  await restoreBackup(backup, 'replace');
+  await seedBackupRows(backup);
   await store.init();
   assert.equal(store.notesOf(student.id)[0].text, 'تحسن واضح في استخدام لوحة المفاتيح');
   assert.equal(store.getSection(section.id)?.id, section.id);

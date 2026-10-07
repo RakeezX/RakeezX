@@ -6,10 +6,12 @@
  */
 
 import * as db from './lib/db.js';
-import { getScoreFoundationCapability } from './lib/cloud.js';
+import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
+import { DELETE_RETRY_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
+import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
 import {
@@ -2218,16 +2220,19 @@ export function buildClosedTermReportPayload(termId) {
 }
 
 export function closedTermReports(termId) {
+  const scope = deletionScope(state, state);
   return live(state.closedTermReports).filter((record) => !termId || record.termId === termId)
-    .sort((a, b) => Number(b.version) - Number(a.version) || Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
+    .sort((a, b) => Number(b.version) - Number(a.version) || Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0))
+    .map((report) => visibleClosedTermReport(report, scope));
 }
 
 export const latestClosedTermReport = (termId) => closedTermReports(termId)[0] ?? null;
 
 export function closedTeachingReport(teachingId) {
+  if (deletionScope(state, state).deleted('teachings', teachingId)) return null;
   const teaching = getTeaching(teachingId) ?? state.teachings.find((record) => record.id === teachingId);
   const report = teaching ? latestClosedTermReport(teaching.termId) :
-    live(state.closedTermReports).find((candidate) => candidate.payload?.teachingDocuments?.some((doc) => doc.teaching?.id === teachingId));
+    closedTermReports().find((candidate) => candidate.payload?.teachingDocuments?.some((doc) => doc.teaching?.id === teachingId));
   return report?.payload?.teachingDocuments?.find((document) => document.teaching?.id === teachingId) ?? null;
 }
 
@@ -2590,84 +2595,108 @@ export async function reopenSection(secId) {
   return { ok: true, status: queued ? 'pending-server-validation' : 'already-pending' };
 }
 
-/** حذف إسناد: يحذف بنوده ودرجاته وحصصه — **ولا يمس الطلاب ولا الشعبة**. */
-export async function deleteTeaching(tchId) {
-  const evidence = teachingDeleteEvidence(tchId);
-  if (evidence.length) throw new Error('لا يمكن حذف الإسناد لأنه يحتوي على بيانات محفوظة. استخدم أرشفة الفصل.');
-  const itemIds = new Set(state.items.filter((i) => i.teachingId === tchId).map((i) => i.id));
-  const sessionIds = new Set(state.sessions.filter((s) => s.teachingId === tchId).map((s) => s.id));
-  return cascadeDelete(
-    {
-      teachings: (t) => t.id === tchId,
-      items: (i) => i.teachingId === tchId,
-      scores: (s) => itemIds.has(s.itemId),
-      slots: (s) => s.teachingId === tchId,
-      sessions: (s) => s.teachingId === tchId,
-      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
-      attendance: (a) => sessionIds.has(a.sessionId),
-      logs: (l) => l.teachingId === tchId,
-      classRules: (rule) => rule.teachingId === tchId,
-      classGoals: (goal) => goal.teachingId === tchId,
-      classCharterSelections: (selection) => selection.teachingId === tchId,
-      groupArrangements: (arrangement) => arrangement.teachingId === tchId,
-    },
-    { op: 'deleteTeaching', tchId },
-    { command: 'delete_teaching', store: 'teachings', targetId: tchId }
-  );
+function n77Context(tchId) {
+  const workspace = activeWorkspace;
+  const teaching = state.teachings.find((row) => row.id === tchId && !row.deleted);
+  if (!state.ready || workspace?.type !== 'account' || workspace.ownershipState !== 'claimed' ||
+      workspace.syncEligible !== true || !workspace.authUserId || !teaching ||
+      !state.sections.some((row) => row.id === teaching.sectionId && !row.deleted)) {
+    throw new Error(DELETE_STALE_MESSAGE);
+  }
+  if (!globalThis.navigator?.onLine) throw new Error(DELETE_RETRY_MESSAGE);
+  return { workspace, teaching, ownerId: workspace.authUserId };
 }
 
-/**
- * حذف فصل: عملية ذرية تُنهي الشعبة وكل بياناتها التعليمية، مع إبقاء الطالب
- * عندما تكون له علاقة مستقلة محفوظة خارج الفصل المحذوف.
- */
-export async function deleteClass(secId) {
-  const evidence = sectionDeleteEvidence(secId);
-  if (evidence.length) throw new Error('لا يمكن حذف الفصل لأنه يحتوي على بيانات محفوظة. استخدم الأرشفة بدلًا من الحذف.');
-  const sectionTeachings = live(state.teachings).filter((t) => t.sectionId === secId);
-  const teachingIds = new Set(sectionTeachings.map((t) => t.id));
-  const itemIds = new Set(live(state.items).filter((i) => teachingIds.has(i.teachingId)).map((i) => i.id));
-  const sessionIds = new Set(live(state.sessions).filter((s) => teachingIds.has(s.teachingId)).map((s) => s.id));
-  const targetEnrollment = (e) => !e.deleted && e.sectionId === secId;
-  const targetNote = (n) => teachingIds.has(n.teachingId) || sessionIds.has(n.sessionId);
-  const targetScore = (s) => itemIds.has(s.itemId);
-  const targetAttendance = (a) => sessionIds.has(a.sessionId) || teachingIds.has(a.teachingId);
-  const targetLog = (l) => teachingIds.has(l.teachingId) || sessionIds.has(l.sessionId);
-  const affectedStudentIds = new Set(live(state.enrollments).filter(targetEnrollment).map((e) => e.studentId));
+function n77CheckLocalScope(plan) {
+  const localIds = live(state.teachings).filter((row) => row.sectionId === plan.sectionId).map((row) => row.id);
+  if (plan.scope === 'section' ? localIds.length !== 1 || localIds[0] !== plan.selectedTeachingId
+    : localIds.length < 2 || !localIds.includes(plan.selectedTeachingId)) throw new Error(DELETE_STALE_MESSAGE);
+}
 
-  // A student remains if any relationship outside this class still gives their
-  // record a valid historical or active home. Deleted enrollments are retained
-  // history and deliberately count when they belong to another section.
-  const orphanStudentIds = new Set([...affectedStudentIds].filter((studentId) => {
-    const otherEnrollment = state.enrollments.some((e) => e.studentId === studentId && e.sectionId !== secId);
-    const otherNote = state.notes.some((n) => !n.deleted && n.studentId === studentId && !targetNote(n));
-    const otherScore = state.scores.some((s) => !s.deleted && s.studentId === studentId && !targetScore(s));
-    const otherAttendance = state.attendance.some((a) => !a.deleted && a.studentId === studentId && !targetAttendance(a));
-    const otherLog = state.logs.some((l) => !l.deleted && l.studentId === studentId && !targetLog(l));
-    return !(otherEnrollment || otherNote || otherScore || otherAttendance || otherLog);
-  }));
+async function clearRejectedN77Intent(mutationId) {
+  await db.applyBatch({ device: {} }, { allowStudentLifecycle: true, prepare: (current) => {
+    const device = current.device.find((row) => row.id === 'device');
+    return { device: { put: device?.n77DeleteIntent?.mutationId === mutationId
+      ? [{ ...device, n77DeleteIntent: null, updatedAt: now() }] : [], remove: [] } };
+  } });
+}
 
-  return cascadeDelete(
-    {
-      sections: (s) => s.id === secId,
-      teachings: (t) => teachingIds.has(t.id),
-      enrollments: targetEnrollment,
-      items: (i) => teachingIds.has(i.teachingId),
-      scores: (s) => targetScore(s) || orphanStudentIds.has(s.studentId),
-      slots: (s) => teachingIds.has(s.teachingId),
-      sessions: (s) => teachingIds.has(s.teachingId),
-      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
-      attendance: (a) => targetAttendance(a) || orphanStudentIds.has(a.studentId),
-      logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
-      notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
-      classRules: (rule) => teachingIds.has(rule.teachingId),
-      classGoals: (goal) => teachingIds.has(goal.teachingId),
-      classCharterSelections: (selection) => teachingIds.has(selection.teachingId),
-      groupArrangements: (arrangement) => teachingIds.has(arrangement.teachingId),
-      students: (s) => orphanStudentIds.has(s.id),
-    },
-    { op: 'deleteClass', secId },
-    { command: 'delete_class', store: 'sections', targetId: secId }
-  );
+export async function previewDeleteTeaching(tchId) {
+  const { teaching, ownerId } = n77Context(tchId);
+  const device = await db.get('device', 'device');
+  if (device?.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+  const pending = device?.n77DeleteIntent;
+  if (pending && (pending.ownerId !== ownerId || pending.selectedTeachingId !== tchId)) throw new Error(DELETE_STALE_MESSAGE);
+  if (!pending && (await db.getAll('outbox')).some((row) => row.state !== 'superseded')) {
+    throw new Error('أكمل مزامنة التغييرات المعلّقة قبل حذف الفصل، ثم أعد المحاولة.');
+  }
+  if (pending) return pending.plan;
+  try {
+    const plan = validateDeletePlan(await n77DeleteTeaching({ teachingId: tchId, sectionId: teaching.sectionId }),
+      { teachingId: tchId, sectionId: teaching.sectionId, ownerId });
+    n77CheckLocalScope(plan);
+    return plan;
+  } catch (error) {
+    if (error.message === DELETE_STALE_MESSAGE) throw error;
+    throw new Error(DELETE_RETRY_MESSAGE);
+  }
+}
+
+/** Server commit must succeed before any local Product row is marked deleted. */
+export async function deleteTeaching(tchId, plan) {
+  const { teaching, ownerId, workspace } = n77Context(tchId);
+  if ((await db.get('device', 'device'))?.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+  validateDeletePlan(plan, { teachingId: tchId, sectionId: teaching.sectionId, ownerId });
+  n77CheckLocalScope(plan);
+  let intent;
+  await db.applyBatch({ device: {}, outbox: {} }, { allowStudentLifecycle: true, prepare: (current) => {
+    const device = current.device.find((row) => row.id === 'device');
+    if (!device || device.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+    const existing = device.n77DeleteIntent;
+    if (existing && (existing.ownerId !== ownerId || existing.selectedTeachingId !== tchId ||
+        existing.plan.fingerprint !== plan.fingerprint)) throw new Error(DELETE_STALE_MESSAGE);
+    if (!existing && current.outbox.some((row) => row.state !== 'superseded')) {
+      throw new Error('أكمل مزامنة التغييرات المعلّقة قبل حذف الفصل، ثم أعد المحاولة.');
+    }
+    intent = existing ?? { ownerId, selectedTeachingId: tchId, plan, mutationId: uid(), deviceId: device.deviceId ?? uid() };
+    return { device: { put: [{ ...device, deviceId: intent.deviceId, n77DeleteIntent: intent, updatedAt: now() }], remove: [] } };
+  } });
+  let receipt;
+  try {
+    receipt = await n77DeleteTeaching({ teachingId: tchId, sectionId: teaching.sectionId,
+      fingerprint: plan.fingerprint, mutationId: intent.mutationId, deviceId: intent.deviceId, commit: true });
+  } catch (error) {
+    if (error?.code === 'N77_SCOPE_STALE' || error?.code === '22023') {
+      await clearRejectedN77Intent(intent.mutationId);
+      throw new Error(DELETE_STALE_MESSAGE);
+    }
+    throw new Error(DELETE_AMBIGUOUS_MESSAGE);
+  }
+  if (activeWorkspace !== workspace || receipt?.mutationId !== intent.mutationId || receipt?.ownerId !== ownerId ||
+      receipt?.fingerprint !== plan.fingerprint || receipt?.scope !== plan.scope ||
+      receipt?.sectionId !== plan.sectionId || receipt?.selectedTeachingId !== tchId ||
+      JSON.stringify(receipt?.teachingIds) !== JSON.stringify(plan.teachingIds) ||
+      !Array.isArray(receipt?.cascadeTeachingIds) || !receipt.cascadeTeachingIds.includes(tchId) ||
+      new Set(receipt.cascadeTeachingIds).size !== receipt.cascadeTeachingIds.length ||
+      receipt.cascadeTeachingIds.some((id) => state.teachings.some((row) => row.id === id && row.sectionId !== plan.sectionId))) {
+    throw new Error(DELETE_AMBIGUOUS_MESSAGE);
+  }
+  const names = db.STORES.filter((name) => !['profile', 'meta'].includes(name));
+  try {
+    await db.applyBatch(Object.fromEntries(names.map((name) => [name, {}])), {
+      allowStudentLifecycle: true, prepare: (current) => localDeleteWrites(current, receipt, now()),
+    });
+  } catch { throw new Error(DELETE_AMBIGUOUS_MESSAGE); }
+  const loaded = await Promise.all(COLLECTIONS.map((name) => db.getAll(name)));
+  COLLECTIONS.forEach((name, index) => { state[name] = loaded[index]; });
+  state.device = await db.get('device', 'device');
+  notify();
+  broadcast([{ store: 'teachings', id: tchId }, { store: 'sections', id: plan.sectionId }]);
+  return receipt;
+}
+
+export async function deleteClass() {
+  throw new Error('يجب اختيار المادة المراد حذفها ثم تأكيد النطاق الحالي من الخادم.');
 }
 
 /**
@@ -2675,16 +2704,7 @@ export async function deleteClass(secId) {
  * الحذف المرئي للفصل يستخدم deleteClass أعلاه.
  */
 export async function deleteSection(secId) {
-  for (const tch of live(state.teachings).filter((t) => t.sectionId === secId)) {
-    await deleteTeaching(tch.id);
-  }
-  return cascadeDelete(
-    {
-      sections: (s) => s.id === secId,
-      enrollments: (e) => e.sectionId === secId,
-    },
-    { op: 'deleteSection', secId }
-  );
+  throw new Error('يجب استخدام حذف الفصل المعتمد من الخادم.');
 }
 /* ---------- عمليات: الطلاب والانتساب ---------- */
 

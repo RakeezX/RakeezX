@@ -413,14 +413,20 @@ export default {
 
             const nextBtn = foot.querySelector('#class-delete-next-btn');
             if (nextBtn) {
-              nextBtn.addEventListener('click', () => {
+              nextBtn.addEventListener('click', async () => {
                 if (!selectedId) return;
-                renderStep2();
+                const selected = list.find((row) => row.id === selectedId);
+                try {
+                  const plan = isDemo(selected) ? null : await store.previewDeleteTeaching(selectedId);
+                  renderStep2(plan);
+                } catch (error) {
+                  toast(error.message || 'تعذّر التحقق من نطاق الحذف. أعد المحاولة عند توفر الاتصال.', 'warn');
+                }
               });
             }
           }
 
-          function renderStep2() {
+          function renderStep2(plan) {
             const selectedTch = list.find((t) => t.id === selectedId);
             const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
             const sub = selectedTch ? store.getSubject(selectedTch.subjectId) : null;
@@ -443,9 +449,9 @@ export default {
                   </div>
                   <div class="class-delete-row__sub">${sub?.name ?? ''}</div>
                 </div>
-                <p class="class-delete-confirm-box__consequence">
-                  سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.
-                </p>
+                <p class="class-delete-confirm-box__consequence">${plan?.scope === 'teaching'
+                  ? 'سيتم حذف هذه المادة وبياناتها من الفصل، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات. ستبقى المواد الأخرى والفصل وطلابه.'
+                  : 'سيتم حذف الفصل كاملًا وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.'}</p>
                 <p class="class-delete-confirm-box__note">
                   الطلاب المرتبطون بفصول أو سجلات أخرى ستبقى بياناتهم الأخرى محفوظة.
                 </p>
@@ -479,11 +485,11 @@ export default {
                 }
                 if (sec) {
                   try {
-                    await store.deleteClass(sec.id);
-                    toast('تم حذف الفصل');
+                    await store.deleteTeaching(selectedTch.id, plan);
+                    toast(plan.scope === 'teaching' ? 'تم حذف المادة من الفصل' : 'تم حذف الفصل');
                     repaint();
                   } catch (error) {
-                    toast(error.message || 'لا يمكن حذف فصل يحتوي على بيانات محفوظة.', 'warn');
+                    toast(error.message || 'تعذّر حذف الفصل. أعد المحاولة عند توفر الاتصال.', 'warn');
                   }
                 }
               });

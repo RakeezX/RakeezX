@@ -5,7 +5,8 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { CALENDAR_KIND, isTeachingDay, sessionCalendarPresentation, todayISO } from '../src/models.js';
 import { encodeSyncV2Patch, decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
-import { buildBackup, restoreBackup, validateBackupIntegrity } from '../src/lib/export.js';
+import { buildBackup, validateBackupIntegrity } from '../src/lib/export.js';
+import { seedBackupRows } from './helpers/seed-backup.mjs';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
@@ -39,7 +40,7 @@ test('suspension is distinct, non-teaching and remains distinct through reload, 
     const backup = await buildBackup({ sourceOwnerId: null });
     assert.equal((await validateBackupIntegrity(backup)).ok, true);
     await db.clearAll();
-    await restoreBackup(backup, 'replace');
+  await seedBackupRows(backup);
     store.state.ready = false;
     await store.init();
     assert.equal(store.calendarRangesOf().find((range) => range.id === suspensionId)?.kind, 'suspension');

@@ -5,7 +5,8 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { encodeSyncV2Patch, decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
 import { PGlite } from '@electric-sql/pglite';
-import { buildBackup, restoreBackup, validateBackupIntegrity } from '../src/lib/export.js';
+import { buildBackup, validateBackupIntegrity } from '../src/lib/export.js';
+import { seedBackupRows } from './helpers/seed-backup.mjs';
 import { calendarRangeIdentity } from '../src/models.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
@@ -190,7 +191,7 @@ test('official ranges reject edit/delete and backup/restore retains modern ident
     const backup = await buildBackup({ sourceOwnerId: null });
     assert.equal((await validateBackupIntegrity(backup)).ok, true);
     await db.clearAll();
-    await restoreBackup(backup, 'replace');
+  await seedBackupRows(backup);
     assert.equal((await db.getAll('calendarDays')).filter((day) => day.rangeId === id).length, 2);
   } finally {
     store.closeChannel();

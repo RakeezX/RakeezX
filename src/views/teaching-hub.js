@@ -6,6 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
+import { demoPackages, deleteDemoPackage, isDemo } from '../lib/demo.js';
 
 const TOOLS = (id) => [
   { href: `#/teaching/${id}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
@@ -235,23 +236,40 @@ export default {
       const sec = store.getSection(tch.sectionId);
       const sub = store.getSubject(tch.subjectId);
       const target = [sectionLabel(sec), sub?.name].filter(Boolean).join(' · ');
+      const demo = isDemo(tch);
+      let plan;
+      try { plan = demo ? null : await store.previewDeleteTeaching(params.id); }
+      catch (error) { toast(error.message || 'يتطلب الحذف اتصالًا بالإنترنت. أعد المحاولة لاحقًا.', 'warn'); return; }
       const ok = await openSheet({
         title: 'حذف الفصل',
         desc: target ? `إلغاء فصل ${target}` : undefined,
         body: html`
           <div class="delete-teaching-dialog">
             <div class="delete-teaching-dialog__badge">${icon('trash')} إجراء نهائي غير قابل للتراجع</div>
-            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>سيتم حذف بيانات هذا الفصل مثل بنود التقييم والدرجات والحصص والحضور والسجل.</p></div>
-            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--safe"><strong>بيانات الطلاب والشعبة</strong><p>الطلاب وانتسابهم للشعبة سيبقون كما هم دون أي تعديل أو حذف.</p></div>
+            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>${plan?.scope === 'teaching'
+              ? 'سيتم حذف هذه المادة وبياناتها من الفصل، بما في ذلك بنود التقييم والدرجات والحصص والحضور والسجل.'
+              : 'سيتم حذف الفصل كاملًا وبياناته المرتبطة، بما في ذلك بنود التقييم والدرجات والحصص والحضور والسجل.'}</p></div>
+            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--safe"><strong>ما سيبقى</strong><p>${plan?.scope === 'teaching'
+              ? 'ستبقى المواد الأخرى والفصل وطلابه.'
+              : 'ستبقى بيانات الطلاب المرتبطة بفصول أو سجلات أخرى.'}</p></div>
           </div>
         `,
         foot: html`<button class="btn btn--quiet" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-confirm>${icon('trash')} حذف الفصل</button>`,
         onMount: (root, done) => root.querySelector('[data-confirm]')?.addEventListener('click', () => done(true)),
       }).then((value) => value === true);
       if (!ok) return;
-      await store.deleteTeaching(params.id);
-      toast('حُذف الفصل');
-      go('/classes');
+      try {
+        if (demo) {
+          const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(tch.id));
+          if (!pkg || !(await deleteDemoPackage(pkg.packageId))) throw new Error('تعذّر حذف الفصل التجريبي.');
+          toast('حُذف الفصل التجريبي');
+          go('/classes');
+          return;
+        }
+        await store.deleteTeaching(params.id, plan);
+        toast(plan.scope === 'teaching' ? 'حُذفت المادة من الفصل' : 'حُذف الفصل');
+        go('/classes');
+      } catch (error) { toast(error.message || 'تعذّر الحذف. أعد المحاولة عند توفر الاتصال.', 'warn'); }
     },
     async 'edit-sec'(el, ev, params) {
       const tch = store.getTeaching(params.id);

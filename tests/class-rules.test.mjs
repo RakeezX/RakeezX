@@ -83,14 +83,14 @@ test('class rules validate, persist offline, queue generic V2 mutations, and pre
   assert.equal(await store.editClassRule(first.id, { text: 'x'.repeat(241) }), null);
 });
 
-test('class-rule evidence is preserved by archive and blocks destructive teaching/class deletion', async () => {
+test('class-rule evidence is preserved by archive while unvalidated local Delete fails closed', async () => {
   await fresh();
   const { section, teaching } = await teachingFixture();
   const rule = await store.addClassRule({ teachingId: teaching.id, iconKey: 'shield', text: 'نحافظ على الأدوات' });
   assert.ok(rule);
 
-  await assert.rejects(store.deleteTeaching(teaching.id), /بيانات محفوظة/);
-  await assert.rejects(store.deleteClass(section.id), /استخدم الأرشفة/);
+  await assert.rejects(store.deleteTeaching(teaching.id), /تغيّرت بيانات الفصل/);
+  await assert.rejects(store.deleteClass(section.id), /اختيار المادة/);
   await store.archiveSection(section.id);
   assert.equal(store.state.classRules.find((item) => item.id === rule.id)?.deleted, false);
   assert.equal(store.classRulesOf(teaching.id).length, 1);
@@ -100,7 +100,7 @@ test('class-rule evidence is preserved by archive and blocks destructive teachin
   const subject = await store.createSubject({ name: 'المهارات' });
   const nextTeaching = await store.createTeaching({ sectionId: nextSection.id, subjectId: subject.id });
   const nextRule = await store.addClassRule({ teachingId: nextTeaching.id, iconKey: 'users', text: 'نتعاون' });
-  await assert.rejects(store.deleteClass(nextSection.id), /استخدم الأرشفة/);
+  await assert.rejects(store.deleteClass(nextSection.id), /اختيار المادة/);
   assert.equal(store.state.classRules.find((item) => item.id === nextRule.id)?.deleted, false);
 });
 
