@@ -3,7 +3,8 @@
  * القالب الافتراضي مجموعه ١٠٠، لكن لا شيء يفرضه — عدّله كما تشاء.
  */
 
-import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
+import { html, icon, openSheet, confirmSheet, toast, render } from '../lib/dom.js';
+import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { makeItem, defaultItemsFor } from '../models.js';
 import { getScoreFoundationCapability } from '../lib/cloud.js';
@@ -28,12 +29,12 @@ function subitemEditor(item) {
   const rowMarkup = (row, index) => html`<div class="subitem-editor-row" data-subitem-row data-id="${row.id ?? ''}">
     <button class="drag-handle" type="button" data-move-up aria-label="رفع ${row.name}" ${index === 0 ? 'disabled' : ''}>⋮⋮</button>
     <label class="field"><span>اسم العنصر</span><input data-subitem-name maxlength="50" value="${row.name}" required></label>
-    <label class="field subitem-points"><span>الدرجة</span><input data-subitem-value type="number" min="0" step="0.01" value="${row.value}" ${distributionMode === 'auto' ? 'readonly' : ''}></label>
+    <label class="field subitem-points"><span>الدرجة</span><input data-subitem-value type="number" inputmode="decimal" min="0" step="0.01" value="${visibleLatinDigits(row.value)}" ${distributionMode === 'auto' ? 'readonly' : ''}></label>
     <button class="iconbtn" type="button" data-subitem-remove aria-label="حذف ${row.name}" ${rows.length === 1 ? 'disabled' : ''}>${icon('x')}</button>
   </div>`;
   return openSheet({
     title: 'العناصر الفرعية',
-    desc: `${item.name} · ${item.max} درجات`,
+    desc: `${item.name} · ${visibleLatinDigits(item.max)} درجات`,
     body: html`<div class="score-01c-editor">
       <div class="segmented subitem-mode" role="group" aria-label="طريقة توزيع درجات العناصر">
         <button type="button" class="segmented__btn" data-distribution="auto">توزيع تلقائي</button>
@@ -59,7 +60,7 @@ function subitemEditor(item) {
           const values = distributeAutomatically(item.max, rows.length);
           rows.forEach((row, index) => { row.value = values[index]; });
         }
-        list.innerHTML = rows.map(rowMarkup).join('');
+        render(list, html`${rows.map(rowMarkup)}`);
         root.querySelectorAll('[data-distribution]').forEach((button) => {
           const active = button.dataset.distribution === distributionMode;
           button.classList.toggle('is-on', active);
@@ -69,7 +70,7 @@ function subitemEditor(item) {
           ? 'يوزّع ركيز الدرجة العظمى بالتساوي، ويضع فرق التقريب في العنصر الأخير.'
           : 'حدّد درجة كل عنصر، وسيظهر أي فرق عن الدرجة العظمى.';
         const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
-        root.querySelector('[data-subitem-total]').textContent = `${total.toFixed(2)} / ${item.max}`;
+        root.querySelector('[data-subitem-total]').textContent = visibleLatinDigits(`${total.toFixed(2)} / ${item.max}`);
         root.querySelector('.subitem-total').classList.toggle('is-warning', distributionMode === 'manual' && Math.abs(total - item.max) > 0.001);
         root.querySelector('[data-subitem-warning]').textContent = distributionMode === 'manual' && Math.abs(total - item.max) > 0.001
           ? 'مجموع العناصر لا يطابق الدرجة العظمى.' : '';
@@ -87,6 +88,9 @@ function subitemEditor(item) {
           draw();
         } else if (button.hasAttribute('data-direct-mode')) done({ scoreMode: 'direct', subitems: [] });
         else if (button.hasAttribute('data-save-subitems')) {
+          if ([...list.querySelectorAll('[data-subitem-value]')].some((input) => !input.checkValidity())) {
+            toast('استخدم درجة موجبة بدقة منزلتين', 'danger'); return;
+          }
           read();
           if (rows.some((row) => !row.name || !Number.isFinite(row.value))) { toast('أكمل أسماء العناصر ودرجاتها', 'danger'); return; }
           try { rows.forEach((row) => scoreCents(row.value)); } catch { toast('استخدم درجة موجبة بدقة منزلتين', 'danger'); return; }
@@ -95,7 +99,7 @@ function subitemEditor(item) {
       });
       list.addEventListener('input', () => { if (distributionMode === 'manual') { read();
         const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
-        root.querySelector('[data-subitem-total]').textContent = `${total.toFixed(2)} / ${item.max}`;
+        root.querySelector('[data-subitem-total]').textContent = visibleLatinDigits(`${total.toFixed(2)} / ${item.max}`);
         root.querySelector('.subitem-total').classList.toggle('is-warning', Math.abs(total - item.max) > 0.001);
       } });
       draw();
