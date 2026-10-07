@@ -49,7 +49,7 @@ test('Calendar Academic Time Control Center view renders all key information cor
 
   // 4. التبديل الحي بين التقويمين وتحديث العرض
   const { GENERAL_1448_1449_PRESET_ID } = await import('../src/lib/calendar-presets.js');
-  await store.applyCalendarPreset(GENERAL_1448_1449_PRESET_ID);
+  await store.applyCalendarPreset(GENERAL_1448_1449_PRESET_ID, { yearId: store.activeYear().id });
   const generalRendered = String(calendarView.render()?.value || calendarView.render());
   assert.ok(generalRendered.includes('تقويم جميع مناطق المملكة'), 'Must render General preset title after switch');
   assert.ok(generalRendered.includes('جميع المناطق ما عدا إدارات التعليم المستثناة'), 'Must render General preset subtitle');

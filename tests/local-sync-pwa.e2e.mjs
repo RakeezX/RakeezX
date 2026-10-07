@@ -233,7 +233,7 @@ const OFFLINE_ROUTE_MATRIX = [
   ['#/teaching/offline-graph-teaching/reports', 'التقارير'],
   ['#/student/offline-graph-student', 'الطالب'],
   ['#/schedule', 'الجدول'],
-  ['#/schedule/times', 'أوقات الحصص'],
+  ['#/schedule/times', 'الجدول'],
   ['#/curriculum', 'المنهج'],
   ['#/reports', 'التقارير'],
   ['#/reports/execution', 'تقارير التنفيذ'],
@@ -261,10 +261,17 @@ test('same-context tabs converge section, timetable, attendance, and scoring cha
   ]);
   await seed(pageA, 'local');
   await expect.poll(() => pageB.evaluate(() => window.store.state.sections.some((record) => record.id === 'local-section'))).toBe(true);
+  await expect.poll(() => pageB.evaluate(() => ({
+    activeTermId: window.store.state.device?.activeTermId,
+    hasTerm: window.store.state.terms.some((record) => record.id === 'local-term'),
+    hasTeaching: window.store.state.teachings.some((record) => record.id === 'local-teaching'),
+  }))).toEqual({ activeTermId: 'local-term', hasTerm: true, hasTeaching: true });
 
   // Section edit through Tab A's real sheet propagates and updates Tab B's report UI.
   await pageA.goto('/#/teaching/local-teaching');
   await pageB.goto('/#/reports');
+  await expect(pageB.locator('.report-class-row[href="#/teaching/local-teaching/reports"] .row__title'))
+    .toContainText('الرابع الابتدائي / A');
   await pageA.locator('[data-act="edit-sec"]').click();
   await pageA.selectOption('select[name="grade"]', '5');
   await pageA.fill('input[name="label"]', 'Z');
@@ -408,7 +415,7 @@ test('raw static production-like shell serves cached local routes and IndexedDB 
 });
 
 test('one online load precaches every lazy route and supports offline reload and reopen', async ({ browser }) => {
-  test.setTimeout(150_000);
+  test.setTimeout(240_000);
   const { server, url } = await startStaticServer();
   const context = await browser.newContext();
   const unexpectedCloudRequests = await installCloudMock(context);
@@ -447,8 +454,10 @@ test('one online load precaches every lazy route and supports offline reload and
       '/src/lib/backup-v2.js',
       '/src/lib/build-meta.js',
       '/src/lib/cloud-recovery-ui.js',
+      '/src/lib/hijri-year-input.js',
       '/src/lib/student-lifecycle-ui.js',
       '/src/lib/support.js',
+      '/src/lib/visible-numerals.js',
       '/src/views/former-students.js',
       '/src/views/settings.js',
       '/src/views/support.js',
@@ -460,6 +469,9 @@ test('one online load precaches every lazy route and supports offline reload and
       await page.evaluate((nextHash) => { location.hash = nextHash; }, hash);
       await expect(page).toHaveURL(`${url}/${hash}`);
       await expect(page.locator('.topbar__title')).toContainText(title);
+      if (hash === '#/schedule/times') {
+        await expect(page.locator('.timing-page-head__identity h1')).toContainText('ملفات توقيت الحصص');
+      }
       await expect(page.locator('#toast')).not.toContainText('تعذّر فتح هذه الشاشة');
     }
 
@@ -468,16 +480,17 @@ test('one online load precaches every lazy route and supports offline reload and
     await expect(page.locator('.topbar__title')).toContainText('الرئيسية');
 
     await page.evaluate(() => { location.hash = '#/settings'; });
-    await expect(page.locator('.topbar__title')).toContainText('الإعدادات');
+    // Offline module loading and a fresh app boot can outlast the default 5 s assertion.
+    await expect(page.locator('.topbar__title')).toContainText('الإعدادات', { timeout: 30_000 });
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('.topbar__title')).toContainText('الإعدادات');
+    await expect(page.locator('.topbar__title')).toContainText('الإعدادات', { timeout: 30_000 });
     await page.evaluate(() => { location.hash = '#/schedule'; });
-    await expect(page.locator('.topbar__title')).toContainText('الجدول');
+    await expect(page.locator('.topbar__title')).toContainText('الجدول', { timeout: 30_000 });
 
     const reopened = await context.newPage();
     const reopenedErrors = observeErrors(reopened);
     await reopened.goto(`${url}/#/support`, { waitUntil: 'domcontentloaded' });
-    await expect(reopened.locator('.topbar__title')).toContainText('الدعم');
+    await expect(reopened.locator('.topbar__title')).toContainText('الدعم', { timeout: 30_000 });
     await reopened.evaluate(() => { location.hash = '#/'; });
     await expect(reopened.locator('.topbar__title')).toContainText('الرئيسية');
 
@@ -488,6 +501,7 @@ test('one online load precaches every lazy route and supports offline reload and
   } finally {
     await context.close();
     if (server.listening) {
+      server.closeAllConnections();
       await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     }
   }

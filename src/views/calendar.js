@@ -92,7 +92,7 @@ let settingsTab = 'calendar';
  */
 export function hasValidYearCalendarConfig(yearId) {
   if (!yearId) return false;
-  const terms = store.termsOf(yearId);
+  const terms = store.effectiveTermsOf(yearId);
   if (!terms || terms.length === 0) return false;
   return terms.every(
     (t) =>
@@ -110,7 +110,7 @@ export function hasValidYearCalendarConfig(yearId) {
 export function getAffectedSchedule(startDate, endDate) {
   if (!startDate || !endDate || startDate > endDate) return [];
   const year = store.activeYear();
-  const terms = store.termsOf(year?.id);
+  const terms = store.effectiveTermsOf(year?.id);
   const termIds = new Set(terms.map((t) => t.id));
 
   // أيام الدوام الأسبوعية (الأحد = 0 إلى الخميس = 4)
@@ -266,7 +266,7 @@ function affectedSessionsSheet(range) {
 function calendarSettingsSheet(savedScrollTop = 0) {
   const year = store.activeYear();
   const yrs = store.years();
-  const terms = store.termsOf(year?.id);
+  const terms = store.effectiveTermsOf(year?.id);
   const activeT = store.activeTerm();
   const preset = store.calendarPresetForYear(year?.id) ?? getCalendarPreset(store.state.device?.preferredEducationRegion);
   const activeRegion = getSaudiEducationRegion(preset?.id ?? store.state.device?.preferredEducationRegion);
@@ -325,7 +325,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
                       <div class="fw-7">${y.label}</div>
                       <div class="t-3 fs-xs">
                         ${YEAR_STATUS[y.status] ?? y.status} ·
-                        <span class="tabular">${store.termsOf(y.id).length}</span> فصول
+                        <span class="tabular">${store.effectiveTermsOf(y.id).length}</span> فصول
                       </div>
                     </div>
                     <div class="push hstack gap-1">
@@ -412,7 +412,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
           try {
             const result = store.getActiveWorkspace()?.type === 'demo'
               ? await applyDemoCalendarPreset(presetId)
-              : await store.applyCalendarPreset(presetId);
+              : await store.applyCalendarPreset(presetId, { yearId: year?.id });
             if (!result.ok) throw new Error('لا يمكن تطبيق التقويم على سنة أو فصل محذوف.');
           } catch (err) {
             toast(err.message || 'تعذر حفظ إعدادات التقويم.', 'danger');
@@ -463,7 +463,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
             return;
           }
           const scroll = getScroll();
-          const yTerms = store.termsOf(targetYearId);
+          const yTerms = store.effectiveTermsOf(targetYearId);
           await store.patchDevice({
             activeYearId: targetYearId,
             activeTermId: yTerms[0]?.id ?? null,
@@ -478,7 +478,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
       // استخدام فصل
       root.querySelectorAll('[data-act="use-term"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          const t = store.getTerm(btn.dataset.id);
+          const t = store.effectiveTerm(btn.dataset.id);
           if (!t || !t.startDate || !t.endDate) {
             toast('أكمل إعداد الفصول الدراسية لهذه السنة أولًا', 'warn');
             return;
@@ -504,7 +504,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
       root.querySelectorAll('[data-act="edit-term-in-settings"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const scroll = getScroll();
-          const term = store.getTerm(btn.dataset.id);
+          const term = store.effectiveTerm(btn.dataset.id);
           if (!term) return;
           closeSheet();
           const data = await termSheet(term);
@@ -520,14 +520,15 @@ function calendarSettingsSheet(savedScrollTop = 0) {
       root.querySelector('[data-act="add-term"]')?.addEventListener('click', async (e) => {
         const scroll = getScroll();
         const yId = e.currentTarget.dataset.year;
-        const existing = store.termsOf(yId);
+        const existing = store.effectiveTermsOf(yId);
         const nextIndex = Math.max(0, ...existing.map((t) => t.index ?? 0)) + 1;
         closeSheet();
         const data = await newTermSheet(yId, nextIndex);
         if (data) {
-          const t = makeTerm({ yearId: yId, ...data });
-          if (store.getTerm(t.id)) toast('يوجد فصل دراسي بهذا الترتيب', 'danger');
-          else { const ok = await store.save({ terms: [t] }); if (ok) { toast('تمت إضافة فصل دراسي بنجاح'); repaint(); } }
+          try {
+            await store.createTerm({ yearId: yId, ...data });
+            toast('تمت إضافة فصل دراسي بنجاح'); repaint();
+          } catch (err) { toast(err.message, 'danger'); }
         }
         calendarSettingsSheet(scroll);
       });
@@ -800,7 +801,7 @@ export default {
 
   render() {
     const year = store.activeYear();
-    const terms = store.termsOf(year?.id);
+    const terms = store.effectiveTermsOf(year?.id);
     const preset = store.calendarPresetForYear(year?.id) ?? getCalendarPreset(store.state.device?.preferredEducationRegion);
     const ranges = store.calendarRangesOf(year?.id);
     const today = todayISO();
@@ -951,7 +952,7 @@ export default {
     },
 
     async 'edit-term'(el) {
-      const term = store.getTerm(el.dataset.id);
+      const term = store.effectiveTerm(el.dataset.id);
       if (!term) return;
       const data = await termSheet(term);
       if (!data) return;

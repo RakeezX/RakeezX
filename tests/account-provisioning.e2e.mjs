@@ -34,9 +34,20 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   let state = null;
   let profileStatus = 'PENDING_PROFILE';
   let provisionCalls = 0;
+  let canonicalSnapshot = null;
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.context().route(`${SUPABASE_URL}/rest/v1/**`, (route) => route.fulfill({ json: [] }));
+  await page.context().route(`${SUPABASE_URL}/rest/v1/**`, (route) => {
+    const url = new URL(route.request().url());
+    const table = url.pathname.split('/').at(-1);
+    const rows = canonicalSnapshot?.[table] ?? [];
+    const offset = Number(url.searchParams.get('offset') ?? 0);
+    const limit = Number(url.searchParams.get('limit') ?? rows.length);
+    const pageRows = rows.slice(offset, offset + limit);
+    const range = pageRows.length ? `${offset}-${offset + pageRows.length - 1}/${rows.length}` : `*/${rows.length}`;
+    return route.fulfill({ json: pageRows, headers: { 'Content-Range': range,
+      'Access-Control-Expose-Headers': 'Content-Range' } });
+  });
   await page.context().route(`${SUPABASE_URL}/auth/v1/**`, (route) => route.fulfill({ json: SESSION.user }));
   await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/account_contract`, (route) => route.fulfill({ json: contract(state, profileStatus) }));
   await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_profile`, (route) => {
@@ -56,7 +67,8 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   await page.context().route(`${SUPABASE_URL}/rest/v1/rpc/provision_account_workspace`, (route) => {
     provisionCalls += 1;
     state = 'READY';
-    return route.fulfill({ json: { contract: contract(state, profileStatus), snapshot: snapshot() } });
+    canonicalSnapshot = snapshot();
+    return route.fulfill({ json: { contract: contract(state, profileStatus), snapshot: canonicalSnapshot } });
   });
   await page.context().route('**/__provisioning_fixture__', (route) => route.fulfill({
     contentType: 'text/html', body: '<!doctype html><title>fixture</title>',
