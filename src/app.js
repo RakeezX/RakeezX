@@ -9,6 +9,7 @@ import { brandLockup } from './lib/brand.js';
 import { installVisibleViewport } from './lib/visible-viewport.js';
 import { ensureThmanyahFont } from './lib/thmanyah-font.js';
 import { syncOperationalPresentation, renderSyncOperationalSection } from './lib/sync-operational-ui.js';
+import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib/sync-warning-policy.js';
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
@@ -58,6 +59,8 @@ let teacherMiniHubSheet = null;
 let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
 let initialRestoreAbortController = null;
+let recoveryCycle = startRecoveryCycle(Date.now());
+let warningTimer = null;
 const scrollMemory = new Map();
 // Keep the destination icon current when AUTO follows a system palette change.
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => scheduleRender());
@@ -87,6 +90,22 @@ function isStandaloneMode() {
 
 function getSyncState() {
   return syncOperationalPresentation(syncModule?.getSyncOperationalSummarySnapshot());
+}
+
+function getSyncWarning(summary) {
+  const result = presentSyncWarning(summary, recoveryCycle, Date.now());
+  recoveryCycle = result.cycle;
+  if (warningTimer) clearTimeout(warningTimer);
+  warningTimer = result.nextCheckAt === null ? null : setTimeout(() => {
+    warningTimer = null;
+    paintSyncStatus();
+  }, Math.max(0, result.nextCheckAt - Date.now()));
+  return result;
+}
+
+function onPresentationWake() {
+  recoveryCycle = wakeRecoveryCycle(recoveryCycle, Date.now(), { online: navigator.onLine !== false });
+  paintSyncStatus();
 }
 
 function renderSidebarMiniHubTrigger() {
@@ -273,7 +292,10 @@ function shell(path, params) {
   const inTeaching = path.startsWith('/teaching/') && params?.id;
   const bottom = NAV.filter((n) => n.primary);
   const syncInfo = getSyncState();
-  const showConnectionState = syncInfo.status === 'offline' || syncInfo.help;
+  const warning = getSyncWarning(syncInfo.summary);
+  const stripInfo = warning.status
+    ? syncOperationalPresentation({ ...syncInfo.summary, state: warning.status }) : syncInfo;
+  const showConnectionState = warning.strip;
 
   return html`
     <a class="skip-link" href="#main" data-act="skip-to-content">انتقل إلى المحتوى</a>
@@ -286,9 +308,9 @@ function shell(path, params) {
       </nav>
       <main class="main">
         ${inTeaching ? html`<div class="class-context-nav-bar"><nav class="class-context-nav" data-nav-scope="context" aria-label="تنقل الفصل">${teachingNav(params.id).map((it) => navLink(it, path, 'class-context-nav'))}</nav></div>` : ''}
-        <div class="app-status-strip ${showConnectionState ? `is-visible is-${syncInfo.status}` : ''}"
+        <div class="app-status-strip ${showConnectionState ? `is-visible is-${stripInfo.status}` : ''}"
              data-app-status role="status" aria-live="polite" aria-atomic="true">
-          ${icon('cloud')} <span data-app-status-text>${syncInfo.label}</span>
+          ${icon('cloud')} <span data-app-status-text>${syncInfo.summary.reasonCategory === 'workspace_ownership_blocked' ? syncInfo.summary.reasonLabel : stripInfo.label}</span>
           <a class="app-status-strip__support" href="#/support">تحتاج مساعدة؟</a>
         </div>
         <div id="main" tabindex="-1"></div>
@@ -380,9 +402,13 @@ function paintSyncStatus() {
   const syncInfo = getSyncState();
   const statusStrip = document.querySelector('[data-app-status]');
   if (statusStrip) {
-    const visible = syncInfo.status === 'offline' || syncInfo.help;
-    statusStrip.className = `app-status-strip${visible ? ` is-visible is-${syncInfo.status}` : ''}`;
-    statusStrip.querySelector('[data-app-status-text]')?.replaceChildren(syncInfo.label);
+    const warning = getSyncWarning(syncInfo.summary);
+    const stripInfo = warning.status
+      ? syncOperationalPresentation({ ...syncInfo.summary, state: warning.status }) : syncInfo;
+    statusStrip.className = `app-status-strip${warning.strip ? ` is-visible is-${stripInfo.status}` : ''}`;
+    statusStrip.querySelector('[data-app-status-text]')?.replaceChildren(
+      syncInfo.summary.reasonCategory === 'workspace_ownership_blocked' ? syncInfo.summary.reasonLabel : stripInfo.label
+    );
   }
   const section = teacherMiniHubSheet?.querySelector('.mini-hub-sync');
   if (section) {
@@ -657,6 +683,11 @@ async function boot() {
   if (syncModule) {
     syncModule.subscribe(() => { void refreshSyncOperationalUI(); });
   }
+  window.addEventListener('pageshow', onPresentationWake);
+  window.addEventListener('online', onPresentationWake);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') onPresentationWake();
+  });
   onNavigate(resolve);
   installSessionAutoTriggers({
     materialize: (date) => canMaterializeTodaySessions() ? store.ensureSessionsForDate(date) : null,
