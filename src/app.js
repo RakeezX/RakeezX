@@ -61,6 +61,12 @@ let workspaceRouting = null;
 let initialRestoreAbortController = null;
 let recoveryCycle = startRecoveryCycle(Date.now());
 let warningTimer = null;
+let stopSessionAutoTriggers = null;
+function cleanupSessionAutoTriggers() {
+  stopSessionAutoTriggers?.();
+  stopSessionAutoTriggers = null;
+}
+store.onWorkspaceDeactivation(cleanupSessionAutoTriggers);
 const scrollMemory = new Map();
 // Keep the destination icon current when AUTO follows a system palette change.
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => scheduleRender());
@@ -567,6 +573,7 @@ async function resolve() {
 /* ---------- الإقلاع ---------- */
 
 async function boot() {
+  cleanupSessionAutoTriggers();
   // تبويب آخر يرقّي القاعدة: أعد التحميل بدل العمل على مخطط قديم
   db.setVersionChangeHandler(() => {
     toast('حُدِّث التطبيق في نافذة أخرى — يُعاد التحميل');
@@ -668,6 +675,8 @@ async function boot() {
     if (update?.render !== false) scheduleRender();
   });
   cloud.subscribe(() => {
+    const workspace = store.getActiveWorkspace();
+    if (workspace?.type === 'account' && workspace.authUserId !== cloud.user?.id) cleanupSessionAutoTriggers();
     const nextSupportAccountKey = supportAccountKey();
     if (nextSupportAccountKey !== lastSupportAccountKey) clearSupportOrigin();
     lastSupportAccountKey = nextSupportAccountKey;
@@ -689,8 +698,14 @@ async function boot() {
     if (document.visibilityState === 'visible') onPresentationWake();
   });
   onNavigate(resolve);
-  installSessionAutoTriggers({
-    materialize: (date) => canMaterializeTodaySessions() ? store.ensureSessionsForDate(date) : null,
+  cleanupSessionAutoTriggers();
+  stopSessionAutoTriggers = installSessionAutoTriggers({
+    materialize: (date, signal) => !signal.aborted && canMaterializeTodaySessions()
+      ? store.ensureSessionsForDate(date, { signal }) : null,
+    repaint: scheduleRender,
+    getSessions: (date) => store.sessionsOn(date),
+    getCalendarDay: (date) => store.calendarDayFor(date),
+    subscribe: (refresh) => store.subscribe(refresh),
     onError: (err) => console.warn('[rakeezx sessions] automatic materialization failed:', err),
   });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);

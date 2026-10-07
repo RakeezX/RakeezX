@@ -139,6 +139,12 @@ function reportWriteError(err, context) {
 const TAB_ID = uid();
 let channel = null;
 let activeWorkspace = null;
+const workspaceDeactivationListeners = new Set();
+
+export function onWorkspaceDeactivation(fn) {
+  workspaceDeactivationListeners.add(fn);
+  return () => workspaceDeactivationListeners.delete(fn);
+}
 
 function broadcast(changes, { render = true } = {}) {
   if (!channel || !changes.length) return;
@@ -193,6 +199,7 @@ export function closeChannel() {
 }
 
 export function deactivateWorkspace(reason = 'workspace-not-ready') {
+  for (const fn of workspaceDeactivationListeners) fn();
   closeChannel();
   db.closeDB();
   activeWorkspace = null;
@@ -795,6 +802,7 @@ function revertMemory(storeName, records, undo) {
 
 /** يحفظ سجلات كاملة — للإنشاء والاستيراد الجماعي. للتعديل استعمل patch(). */
 export async function save(batch, options = {}) {
+  if (options.signal?.aborted) return false;
   if (options.queue !== false) assertOperationalWritesAllowed(batch);
   const writes = {};
   const outbox = [];
@@ -847,11 +855,13 @@ export async function save(batch, options = {}) {
   notify({ syncReady: false });
 
   try {
-    await db.putAcross(writes);
+    await db.putAcross(writes, { signal: options.signal });
+    if (options.signal?.aborted) return false;
     broadcast(changes);
     if (outbox.length) notify({ render: false });
     return true;
   } catch (err) {
+    if (options.signal?.aborted) return false;
     for (const [storeName, records, undo] of undos) revertMemory(storeName, records, undo);
     notify({ syncReady: false });
     reportWriteError(err, { op: 'save', stores: Object.keys(batch) });
@@ -3746,7 +3756,8 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
 }
 
 /** يولّد أغلفة حصص اليوم فقط من الجدول الحالي، من دون لمس الموجود أو tombstone. */
-export async function ensureSessionsForDate(date = todayISO()) {
+export async function ensureSessionsForDate(date = todayISO(), { signal } = {}) {
+  if (signal?.aborted) return { created: 0, existing: 0, skipped: 0 };
   if (date !== todayISO() || !isSessionEligibleDate(date)) return { created: 0, existing: 0, skipped: 0 };
   const term = activeTerm();
   const year = activeYear();
@@ -3775,7 +3786,9 @@ export async function ensureSessionsForDate(date = todayISO()) {
       }));
     }
   }
-  if (pending.length && !await save({ sessions: pending })) throw new Error('تعذّر حفظ الحصص التلقائية.');
+  if (signal?.aborted) return { created: 0, existing, skipped };
+  if (pending.length && !await save({ sessions: pending }, { signal }) && !signal?.aborted) throw new Error('تعذّر حفظ الحصص التلقائية.');
+  if (signal?.aborted) return { created: 0, existing, skipped };
   return { created: pending.length, existing, skipped };
 }
 

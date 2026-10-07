@@ -135,10 +135,10 @@ export async function putMany(store, records) {
 }
 
 /** كتابة ذرّية عبر عدة مخازن: { students: [...], scores: [...] } */
-export async function putAcross(batch) {
+export async function putAcross(batch, { signal } = {}) {
   const names = Object.keys(batch).filter((k) => batch[k]?.length);
   if (!names.length) return;
-  await applyBatch(Object.fromEntries(names.map((name) => [name, { put: batch[name] }])));
+  await applyBatch(Object.fromEntries(names.map((name) => [name, { put: batch[name] }])), { signal });
 }
 
 // The device checkpoint and Product write share a transaction, so a stale tab
@@ -302,20 +302,27 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
  * declares the scope; the synchronous callback builds writes from records read
  * inside that same transaction, so another tab cannot invalidate the snapshot.
  */
-export async function applyBatch(batch, { prepare, allowStudentLifecycle = false } = {}) {
+export async function applyBatch(batch, { prepare, allowStudentLifecycle = false, signal } = {}) {
   const names = Object.keys(batch).filter((n) => STORES.includes(n));
   if (!names.length) return;
   const db = await openDB();
+  if (signal?.aborted) return;
   return new Promise((resolve, reject) => {
     const tx = db.transaction([...new Set([...names, 'device'])], 'readwrite');
+    const abort = () => { try { tx.abort(); } catch { /* Transaction already settled. */ } };
+    signal?.addEventListener('abort', abort, { once: true });
     let failure;
     let writes = batch;
-    tx.oncomplete = () => resolve(writes);
+    tx.oncomplete = () => { signal?.removeEventListener('abort', abort); resolve(writes); };
     tx.onerror = (event) => { failure ??= event.target.error; };
-    tx.onabort = () => reject(failure ?? tx.lifecycleError ?? tx.error ?? new Error('أُلغيت العملية'));
+    tx.onabort = () => {
+      signal?.removeEventListener('abort', abort);
+      reject(failure ?? tx.lifecycleError ?? tx.error ?? new Error('أُلغيت العملية'));
+    };
 
     const write = (current) => {
       try {
+        if (signal?.aborted) { tx.abort(); return; }
         writes = prepare ? prepare(current) : batch;
         if (!writes || typeof writes !== 'object' || typeof writes.then === 'function') {
           throw new TypeError('applyBatch prepare must return a batch synchronously');
