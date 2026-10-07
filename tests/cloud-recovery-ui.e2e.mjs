@@ -3,14 +3,30 @@ import AxeBuilder from '@axe-core/playwright';
 import { mkdir } from 'node:fs/promises';
 import { STORES } from '../src/lib/db.js';
 import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
+import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 
 test.setTimeout(120_000);
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
+const SYNC_TABLES = new Set(SYNC_V2_STORES.map((name) => SYNC_V2_SCHEMAS[name].entity));
 
 async function seedClaimedOwner(page, ownerId = OWNER) {
+  await page.routeWebSocket(`${SUPABASE_URL.replace('https:', 'wss:')}/realtime/v1/websocket**`, () => {});
+  await page.route(`${SUPABASE_URL}/rest/v1/**`, (route) => {
+    const table = new URL(route.request().url()).pathname.split('/').at(-1);
+    if (route.request().method() !== 'GET' || !SYNC_TABLES.has(table)) return route.fallback();
+    return route.fulfill({ json: [], headers: {
+      'content-range': '*/0', 'access-control-expose-headers': 'Content-Range',
+    } });
+  });
   await page.route('**/__cloud_restore_fixture__', (route) => route.fulfill({ body: '<!doctype html><title>fixture</title>' }));
   await page.route(`${SUPABASE_URL}/auth/v1/user`, (route) => route.fulfill({ json: { id: ownerId, email: 'teacher@example.test' } }));
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/owner_sync_change_marker`, (route) =>
+    route.fulfill({ json: { protocol: 'OWNER_SIGNAL_V1', ownerId, revision: '1' } }));
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/get_curriculum_sync_bootstrap_status`, (route) =>
+    route.fulfill({ json: { protocolVersion: 1, state: 'NOT_STARTED', unitCount: 0, lessonCount: 0, conflicts: [] } }));
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/score_foundation_capability`, (route) =>
+    route.fulfill({ json: null }));
   await page.goto('/__cloud_restore_fixture__');
   await page.evaluate(async ({ ownerId, stores, authKey }) => {
     const result = (request) => new Promise((resolve, reject) => {
@@ -118,9 +134,6 @@ async function installHealthyCloud(page, { finalizeDelay = 0, serverStudents = [
     canonical.students = initialStudents;
     finalCanonical.students = reconciledStudents;
     window.__cloudRecoveryCalls = { stage: 0, finalize: 0 };
-    cloud.setMockAuth({ id: ownerId, email: 'teacher@example.test' }, {
-      access_token: 'test-token', user: { id: ownerId, email: 'teacher@example.test' },
-    });
     const stageRestore = async (envelope) => {
       window.__cloudRecoveryCalls.stage += 1;
       if (!Array.isArray(envelope.sourceManifest)) throw new Error('Missing canonical source manifest');
@@ -144,6 +157,23 @@ async function installHealthyCloud(page, { finalizeDelay = 0, serverStudents = [
       finalizeScoreRestoreV2: finalizeRestore,
     });
     await db.clearStore('outbox');
+    const sync = await import('/src/lib/sync.js');
+    // The persisted synthetic session can start a boot Sync before this mock is installed.
+    // Let that pass settle, then establish genuine full Sync V2 health on the fixture.
+    await sync.runWorkspaceClaimExclusive(async () => {});
+    cloud.setMockAuth({ id: ownerId, email: 'teacher@example.test' }, {
+      access_token: 'test-token', user: { id: ownerId, email: 'teacher@example.test' },
+    });
+    let healthy = await sync.syncAll({ full: true });
+    // The initial owner marker can arrive after the first full pull. A second
+    // real full pass must cover that observed revision before restore is ready.
+    if (healthy && sync.getRemoteSyncDiagnostics().pending) {
+      healthy = await sync.syncAll({ full: true });
+    }
+    if (!healthy || sync.state.status !== 'synced') {
+      const summary = await sync.getSyncOperationalSummary();
+      throw new Error(`Synthetic cloud fixture did not reach Sync V2 health: ${sync.state.status} (${sync.state.lastError ?? 'no error'}), remote=${JSON.stringify(sync.getRemoteSyncDiagnostics())}, summary=${JSON.stringify(summary)}`);
+    }
   }, { ownerId: OWNER, delay: finalizeDelay, initialStudents: serverStudents, reconciledStudents: finalStudents });
 }
 
@@ -297,8 +327,11 @@ test('Cloud Recovery review is responsive, RTL, accessible, and reduced-motion s
   await mkdir('test-results/cloud-recovery-ui', { recursive: true });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openBackup(page, { claimed: true });
-  await installHealthyCloud(page);
-  const payload = await createBackup(page);
+  await installHealthyCloud(page, { serverStudents: [{
+    id: 'cloud-ui:delete', name: 'طالب سيُحذف', note: '', status: 'active', revision: 1,
+    field_revisions: { name: 1, note: 1, status: 1 }, deleted_at: null,
+  }] });
+  const payload = await createBackup(page, OWNER, { withDeletion: true });
   await setCloudFile(page, payload);
   await page.getByRole('button', { name: 'متابعة إلى المعاينة السحابية' }).click();
   await expect(page.locator('.cloud-plan-summary')).toBeVisible();
