@@ -35,12 +35,15 @@ test('suspension status is contextual across session screens without changing at
   page.on('pageerror', (error) => errors.push(error.message));
   await page.clock.setFixedTime(new Date('2026-10-05T08:00:00'));
   await page.goto('/#/calendar');
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   const fixture = await page.evaluate(async () => {
     const store = await import('/src/store.js');
     const { weekday } = await import('/src/models.js');
     const year = store.activeYear();
+    const selection = await store.applyCalendarPreset('sa-western-1448-1449', { yearId: year.id });
+    if (!selection.ok) throw new Error('Calendar fixture could not select the official preset.');
     const calendar = await store.ensureCalendar(year.id, 'custom');
-    await store.saveCalendarRange({ calendarId: calendar.id, startDate: '2026-10-05',
+    const rangeId = await store.saveCalendarRange({ calendarId: calendar.id, startDate: '2026-10-05',
       kind: 'suspension', label: '' });
     const section = await store.createSection({ grade: 5, label: 'تعليق 0446' });
     const subject = await store.resolveSubjectSelection({ token: 'builtin:science' });
@@ -49,11 +52,14 @@ test('suspension status is contextual across session screens without changing at
     await store.addSlot(teaching.id, weekday('2026-10-05'), 1);
     const session = await store.ensureSession(teaching.id, '2026-10-05', 1);
     return { teachingId: teaching.id, sessionId: session.id, studentId: student.id,
+      calendarId: calendar.id, rangeId,
       status: session.status, completeness: store.attendanceCompleteness(session).state };
   });
   expect(fixture.status).toBe('cancelled_holiday');
   expect(fixture.completeness).toBe('excluded');
   await page.goto(`/#/teaching/${fixture.teachingId}/attendance?session=${fixture.sessionId}`);
+  await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   await expect(page.locator('.attendance-01c__status-pill')).toHaveText('تعليق دراسة');
   await expect(page.getByText('لا يُسجَّل حضور ولا غياب')).toBeVisible();
   await page.getByRole('button', { name: 'تعديل حالة الحصة' }).first().click();
@@ -71,9 +77,17 @@ test('suspension status is contextual across session screens without changing at
   await page.goto('/#/home');
   await expect(page.getByText('تعليق دراسة', { exact: true }).first()).toBeVisible();
   await page.goto('/#/schedule');
+  await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   await expect(page.getByText('اليوم: تعليق دراسة')).toBeVisible();
-  // A retained historical attendance record can coexist with a later Calendar
-  // correction. Its student-history status must use the same Calendar context.
+  // D-087 keeps the session's creation-time context after a later Calendar correction.
+  const recordedKind = await page.evaluate(async ({ calendarId, rangeId, sessionId }) => {
+    const store = await import('/src/store.js');
+    await store.removeCalendarRange(calendarId, rangeId);
+    return store.getSession(sessionId).calendarContext.kind;
+  }, fixture);
+  expect(recordedKind).toBe('suspension');
+  // A retained historical attendance record still uses that recorded context.
   await page.evaluate(async ({ teachingId, sessionId, studentId }) => {
     const store = await import('/src/store.js');
     await store.save({ attendance: [{ id: `at:0446:${sessionId}:${studentId}`,
@@ -81,6 +95,8 @@ test('suspension status is contextual across session screens without changing at
       deleted: false, updatedAt: Date.now() }] });
   }, fixture);
   await page.goto(`/#/student/${fixture.studentId}?teaching=${fixture.teachingId}`);
+  await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready === true);
   await page.locator('.student-attendance-history summary').click();
   await expect(page.locator('.student-history-row').filter({ hasText: 'تعليق دراسة' })).toHaveCount(1);
   expect(errors).toEqual([]);

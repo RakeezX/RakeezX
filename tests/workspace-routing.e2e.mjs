@@ -228,13 +228,15 @@ test('explicit logout hides claimed data and same-account login restores the sam
   expect(unexpectedSyncWarnings).toEqual([]);
 
   await page.locator('[data-workspace-login]').click();
-  const login = page.locator('.sheet-backdrop').last();
+  const login = page.locator('#first-run-inline-form');
+  await expect(login.locator('input[name="email"]')).toBeVisible();
   await login.locator('input[name="email"]').fill('a@example.test');
-  await login.getByRole('button', { name: 'إرسال رمز التحقق' }).click();
+  await login.getByRole('button', { name: 'متابعة' }).click();
+  await expect(login.locator('input[name="token"]')).toBeVisible();
   await login.locator('input[name="token"]').fill('123456');
   await Promise.all([
     page.waitForEvent('framenavigated'),
-    login.getByRole('button', { name: 'تحقق وتسجيل الدخول' }).click(),
+    login.getByRole('button', { name: 'تحقق' }).click(),
   ]);
   await expectReadyForA(page);
 });

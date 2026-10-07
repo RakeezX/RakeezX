@@ -134,7 +134,7 @@ function todayEmptyCopy(hasSchedule, date, calendarDay) {
     kicker: 'جدولك الأسبوعي', title: 'لم تُضف حصصك الأسبوعية بعد',
     text: 'بعد إعداد الجدول، ستظهر هنا حصص يومك.', action: 'إعداد الجدول', iconName: 'timetable',
   };
-  if (calendarDay && !isTeachingDay(calendarDay.kind)) return {
+  if (calendarDay && calendarDay.source !== 'default' && !isTeachingDay(calendarDay.kind)) return {
     kicker: calendarDay.kind === 'suspension' ? 'تعليق دراسة' : 'إجازة', title: calendarDay.label || CALENDAR_KIND[calendarDay.kind]?.label || 'إجازة رسمية',
     text: 'لا توجد لديك حصص مجدولة اليوم. يمكنك مراجعة جدول الأسبوع.', action: 'عرض الجدول', iconName: 'calendar',
   };

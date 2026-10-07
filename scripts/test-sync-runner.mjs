@@ -10,7 +10,7 @@ const BENCHMARK = 'benchmark.test.mjs';
 const BUILD_META = resolve(ROOT, 'src/generated/build-meta.generated.js');
 
 const runNodeTests = (files, label, env = process.env) => new Promise((resolveRun, reject) => {
-  const child = spawn(process.execPath, ['--test', ...files.map((file) => `tests/${file}`)], {
+  const child = spawn(process.execPath, ['--test', '--test-concurrency=1', ...files.map((file) => `tests/${file}`)], {
     cwd: ROOT,
     env,
     stdio: 'inherit',

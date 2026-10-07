@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v35';
+const VERSION = 'rakeezx-v36';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -64,6 +64,8 @@ const SHELL = [
   './src/lib/dom.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
+  './src/lib/visible-numerals.js',
+  './src/lib/hijri-year-input.js',
   './src/lib/brand.js',
   './src/lib/db.js',
   './src/lib/export.js',
@@ -76,6 +78,9 @@ const SHELL = [
   './src/lib/install-guide-ui.js',
   './src/lib/session-start-ui.js',
   './src/lib/settings-profile-ui.js',
+  './src/lib/education-department-directory.js',
+  './src/data/education-departments-2026-09-30.json',
+  './src/data/education-department-options-2026-09-30.json',
   './src/lib/student-search-ui.js',
   './src/lib/visible-viewport.js',
   './src/lib/email-otp.js',
@@ -112,6 +117,7 @@ const SHELL = [
   './src/lib/demo.js',
   './src/lib/demo-workspace.js',
   './src/lib/calendar-presets.js',
+  './src/lib/calendar-runtime.js',
   './src/lib/subject-catalog.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
