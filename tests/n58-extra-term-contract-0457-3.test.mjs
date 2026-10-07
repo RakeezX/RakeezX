@@ -282,6 +282,8 @@ test('STALE PRECONDITION: session and attendance intent survive rejection withou
 test('OLD SELECTED-PRESET SESSION: locked rejection survives unrelated Sync, reload and candidate upgrade', async () => {
   const client = new IsolatedIndexedDb('n58-old-session-rejection');
   const sessionId = 'old-contextless-session';
+  const yearId = 'probe-year';
+  const teachingId = 'old-session-teaching';
   const calls = [];
   const transport = { applyMutation: async mutation => {
     calls.push(structuredClone(mutation));
@@ -289,12 +291,21 @@ test('OLD SELECTED-PRESET SESSION: locked rejection survives unrelated Sync, rel
   } };
   const oldSender = createSyncV2Engine({database:client,transport});
   try {
-    assert.ok((await pg.query("select calendar_preset_id from rakeezx.years where id='add-year'")).rows[0].calendar_preset_id);
-    const teaching=(await pg.query("select * from rakeezx.teachings where id='add-teaching'")).rows[0];
+    await pg.exec(`reset role;
+      create or replace function auth.uid() returns uuid language sql stable as $$select '${OWNER}'::uuid$$;
+      set role authenticated;
+      insert into rakeezx.subjects(id,name,slug)
+      values('old-session-subject','Synthetic','old-session-subject');
+      insert into rakeezx.sections(id,year_id,grade,label,name)
+      values('old-session-section','${yearId}',4,'A','Synthetic');
+      insert into rakeezx.teachings(id,section_id,subject_id,term_id)
+      values('${teachingId}','old-session-section','old-session-subject','probe-t1');`);
+    assert.equal((await pg.query('select calendar_preset_id from rakeezx.years where id=$1',[yearId])).rows[0].calendar_preset_id,PRESET);
+    const teaching=(await pg.query('select * from rakeezx.teachings where id=$1',[teachingId])).rows[0];
     await client.applyBatch({teachings:{put:[decodeSyncV2Canonical('teachings',teaching)]}});
     const serverBefore=(await pg.query('select id,calendar_context from rakeezx.sessions order by id')).rows;
     const old=await oldSender.commitMutation({store:'sessions',recordId:sessionId,op:'create',
-      patch:{teachingId:'add-teaching',date:'2026-10-09',period:1}});
+      patch:{teachingId,date:'2026-10-09',period:1}});
     assert.equal(Object.hasOwn(old.mutation.patch,'calendar_context'),false,'old sender omitted creation-time provenance');
     const rejected=await oldSender.dispatchPending();
     assert.deepEqual(rejected,{attempted:1,acknowledged:0,failed:0,blocked:1});
