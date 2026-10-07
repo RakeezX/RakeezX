@@ -6,6 +6,8 @@
  * diagnostics are reduced to this allowlist before they leave the browser.
  */
 import * as cloud from './cloud.js';
+import * as db from './db.js';
+import * as store from '../store.js';
 import { SUPPORT_ROUTE_CATEGORIES } from './support-origin.js';
 
 const TYPES = new Set(['technical', 'suggestion', 'inquiry']);
@@ -14,6 +16,59 @@ const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'ca
 const DEVICE_CATEGORIES = new Set(['mobile', 'tablet', 'desktop', 'other']);
 const BROWSERS = new Set(['chrome', 'edge', 'firefox', 'safari', 'other']);
 const MAX_COUNT = 999_999;
+const REJECTED_CODES = new Set(['N58_SESSION_CONTEXT_REQUIRED', 'REJECTED_UNCLASSIFIED']);
+const REJECTED_AREAS = new Set(['sessions', 'other']);
+
+export function supportEnvironment(origin) {
+  return origin === 'https://rakeezx.com' ? 'production'
+    : /^https:\/\/[a-z0-9-]+\.rakeezx\.pages\.dev$/.test(origin) ? 'preview' : 'other';
+}
+
+/** Only claimed, owner-bound V2 rows may contribute to this read-only projection. */
+export function groupRejectedSyncErrors(outbox, { workspace, ownerId } = {}) {
+  if (workspace?.type !== 'account' || workspace.ownershipState !== 'claimed' ||
+      workspace.syncEligible !== true || !ownerId || workspace.authUserId !== ownerId ||
+      !Array.isArray(outbox)) return [];
+  const counts = new Map();
+  for (const row of outbox) {
+    if (row?.protocol !== 'v2' || row.state !== 'rejected' || row.ownerId !== ownerId) continue;
+    const code = row.store === 'sessions' && row.lastError?.code === '22023' &&
+      /^N58_SESSION_CONTEXT_REQUIRED\b/.test(row.lastError?.message ?? '')
+      ? 'N58_SESSION_CONTEXT_REQUIRED' : 'REJECTED_UNCLASSIFIED';
+    const area = code === 'N58_SESSION_CONTEXT_REQUIRED' && row.store === 'sessions' ? 'sessions' : 'other';
+    const key = `${code}:${area}`;
+    counts.set(key, Math.min(MAX_COUNT, (counts.get(key) ?? 0) + 1));
+  }
+  return [...counts].slice(0, 5).map(([key, count]) => {
+    const [code, area] = key.split(':');
+    return { code, area, count };
+  });
+}
+
+export async function currentRejectedSyncGroups() {
+  const workspace = store.getActiveWorkspace();
+  const ownerId = cloud.user?.id;
+  if (!cloud.session || !store.state.ready || !workspace?.databaseName) return [];
+  try {
+    const groups = groupRejectedSyncErrors(await db.getAll('outbox'), { workspace, ownerId });
+    return store.getActiveWorkspace() === workspace && cloud.user?.id === ownerId ? groups : [];
+  } catch {
+    return []; // Diagnostics must never prevent an otherwise valid Support request.
+  }
+}
+
+function safeRejectedGroups(value) {
+  if (!Array.isArray(value)) return null;
+  const groups = [];
+  for (const group of value.slice(0, 5)) {
+    if (!REJECTED_CODES.has(group?.code) || !REJECTED_AREAS.has(group?.area) ||
+        (group.code === 'N58_SESSION_CONTEXT_REQUIRED' && group.area !== 'sessions') ||
+        (group.code === 'REJECTED_UNCLASSIFIED' && group.area !== 'other') ||
+        !Number.isInteger(group.count) || group.count < 1 || group.count > MAX_COUNT) continue;
+    groups.push({ code: group.code, area: group.area, count: group.count });
+  }
+  return groups;
+}
 
 function inputString(value, max) {
   const text = String(value ?? '').trim();
@@ -64,6 +119,10 @@ export function sanitizeSupportDiagnostics(input = {}) {
 
   if (appVersion && /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(appVersion)) diagnostics.appVersion = appVersion;
   if (buildSha && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(buildSha)) diagnostics.buildSha = buildSha;
+  if (diagnostics.buildSha && ['content', 'git'].includes(input.buildShaKind)) diagnostics.buildShaKind = input.buildShaKind;
+  if (['production', 'preview', 'other'].includes(input.environment)) diagnostics.environment = input.environment;
+  const rejectedGroups = safeRejectedGroups(input.rejectedGroups);
+  if (rejectedGroups?.length) diagnostics.rejectedGroups = rejectedGroups;
   if (buildTimestamp) diagnostics.buildTimestamp = buildTimestamp;
   if (timestamp) diagnostics.timestamp = timestamp;
   if (timezone) diagnostics.timezone = timezone;

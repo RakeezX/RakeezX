@@ -2,7 +2,7 @@
 
 import { html, icon, toast } from '../lib/dom.js';
 import { BUILD_META } from '../lib/build-meta.js';
-import { sanitizeSupportDiagnostics, submitSupportRequest } from '../lib/support.js';
+import { currentRejectedSyncGroups, sanitizeSupportDiagnostics, submitSupportRequest, supportEnvironment } from '../lib/support.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
 import { clearSupportOrigin, supportVisitOrigin } from '../lib/support-origin.js';
@@ -49,14 +49,16 @@ function pwaStandalone() {
     navigator.standalone === true || document.referrer?.includes('android-app://'));
 }
 
-export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperationalSummarySnapshot?.() ?? {}) {
+export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperationalSummarySnapshot?.() ?? {}, rejectedGroups = []) {
   const width = window.innerWidth;
   const deviceCategory = width < 600 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
   const browser = browserDetails();
   return sanitizeSupportDiagnostics({
     appVersion: BUILD_META.appVersion,
     buildSha: BUILD_META.buildSha,
+    buildShaKind: BUILD_META.buildShaKind,
     buildTimestamp: BUILD_META.buildTimestamp,
+    environment: supportEnvironment(window.location?.origin),
     timestamp: new Date().toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     deviceCategory,
@@ -70,6 +72,7 @@ export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperatio
     failedCount: syncSummary.failedCount,
     blockedCount: syncSummary.blockedCount,
     rejectedCount: syncSummary.rejectedCount,
+    rejectedGroups,
     historicalConflictCount: syncSummary.historicalConflictCount,
     actionableSyncIssue: syncSummary.actionableSyncIssue,
     lastSuccessfulSyncAt: syncSummary.lastSuccessfulSyncAt ?? sync.state.lastSyncedAt,
@@ -246,10 +249,12 @@ export default {
       try {
         const syncSummary = await sync.getSyncOperationalSummary();
         if (supportAccountKey() !== accountKey) return;
+        const rejectedGroups = await currentRejectedSyncGroups();
+        if (supportAccountKey() !== accountKey) return;
         await submitSupportRequest({
           type: draft.type,
           message: draft.message,
-          diagnostics: currentSafeSupportDiagnostics(syncSummary),
+          diagnostics: currentSafeSupportDiagnostics(syncSummary, rejectedGroups),
         });
         if (supportAccountKey() !== accountKey) return;
         draft = { ...initialDraft(), success: true };
