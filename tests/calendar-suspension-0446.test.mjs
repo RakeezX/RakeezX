@@ -74,9 +74,10 @@ test('session presentation resolves the teaching year, and existing cancelled_ho
       kind: 'holiday', label: 'إجازة محلية' });
     const holiday = await store.ensureSession(teaching.id, '2026-10-06', 1);
     assert.equal(store.sessionStatusPresentation(holiday).label, 'إجازة رسمية');
-    await store.saveCalendarRange({ calendarId: calendar.id, startDate: '2026-10-07',
+    const remoteDate = todayISO() === '2026-10-07' ? '2026-10-08' : '2026-10-07';
+    await store.saveCalendarRange({ calendarId: calendar.id, startDate: remoteDate,
       kind: 'remote', label: 'تعليم عن بُعد' });
-    const remote = await store.ensureSession(teaching.id, '2026-10-07', 1);
+    const remote = await store.ensureSession(teaching.id, remoteDate, 1);
     assert.equal(remote.status, 'scheduled');
     await store.saveCalendarRange({ calendarId: calendar.id, startDate: todayISO(),
       kind: 'suspension', label: 'تعليق اليوم' });

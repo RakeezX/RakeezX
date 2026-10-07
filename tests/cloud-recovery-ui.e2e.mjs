@@ -1,12 +1,54 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir } from 'node:fs/promises';
+import { STORES } from '../src/lib/db.js';
+import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
 
 test.setTimeout(120_000);
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
 
-async function openBackup(page) {
+async function seedClaimedOwner(page, ownerId = OWNER) {
+  await page.route('**/__cloud_restore_fixture__', (route) => route.fulfill({ body: '<!doctype html><title>fixture</title>' }));
+  await page.route(`${SUPABASE_URL}/auth/v1/user`, (route) => route.fulfill({ json: { id: ownerId, email: 'teacher@example.test' } }));
+  await page.goto('/__cloud_restore_fixture__');
+  await page.evaluate(async ({ ownerId, stores, authKey }) => {
+    const result = (request) => new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const done = (tx) => new Promise((resolve, reject) => {
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+    });
+    const claimId = 'claim:cloud-recovery-ui';
+    const request = indexedDB.open('rakeezx', 7);
+    request.onupgradeneeded = () => stores.forEach((name) => {
+      if (!request.result.objectStoreNames.contains(name)) request.result.createObjectStore(name, { keyPath: 'id' });
+    });
+    const database = await result(request);
+    const tx = database.transaction('device', 'readwrite');
+    tx.objectStore('device').put({
+      id: 'device', deviceId: 'device:cloud-recovery-ui', schemaVersion: 7,
+      workspaceClaim: { version: 1, claimId, state: 'claimed', ownerId, origin: location.origin,
+        databaseName: 'rakeezx', deviceId: 'device:cloud-recovery-ui', evidenceHash: 'cloud-recovery-evidence',
+        createdAt: 100, updatedAt: 100 },
+    });
+    await done(tx);
+    database.close();
+    const { createWorkspaceRegistry } = await import('/src/lib/workspaces.js');
+    const registry = createWorkspaceRegistry();
+    await registry.registerLegacyClaim(ownerId, { claimId, evidenceHash: 'cloud-recovery-evidence' });
+    await registry.close();
+    localStorage.setItem(authKey, JSON.stringify({
+      access_token: 'cloud-recovery-test-token', refresh_token: 'cloud-recovery-refresh',
+      expires_at: 4_102_444_800, user: { id: ownerId, email: 'teacher@example.test' },
+    }));
+  }, { ownerId, stores: STORES, authKey: AUTH_STORAGE_KEY });
+  await page.unroute('**/__cloud_restore_fixture__');
+}
+
+async function openBackup(page, { claimed = false } = {}) {
+  if (claimed) await seedClaimedOwner(page);
   await page.goto('/#/settings/backup');
   await page.waitForFunction(() => window.store?.state?.ready === true);
   await expect(page.getByRole('heading', { name: 'البيانات والنسخ الاحتياطي' })).toBeVisible();
@@ -34,6 +76,23 @@ async function createBackup(page, sourceOwnerId = OWNER, { withDeletion = false 
     await db.clearStore('outbox');
     return buildBackup({ sourceOwnerId: ownerId, backupId: `cloud-ui-backup:${ownerId}` });
   }, { ownerId: sourceOwnerId, includeDeletion: withDeletion });
+}
+
+async function createIsolatedOwnerBackup(browser, ownerId) {
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await seedClaimedOwner(page, ownerId);
+    return await page.evaluate(async (sourceOwnerId) => {
+      const db = await import('/src/lib/db.js');
+      const { buildBackup } = await import('/src/lib/export.js');
+      await db.put('students', { id: `cloud-ui:${sourceOwnerId}`, name: 'synthetic B source',
+        status: 'active', deleted: false, updatedAt: 1, serverRevision: 0 });
+      return buildBackup({ sourceOwnerId, backupId: `cloud-ui-backup:${sourceOwnerId}` });
+    }, ownerId);
+  } finally {
+    await context.close();
+  }
 }
 
 async function setCloudFile(page, payload, name = 'rakeez-cloud-backup.json') {
@@ -64,15 +123,21 @@ async function installHealthyCloud(page, { finalizeDelay = 0, serverStudents = [
     });
     const stageRestore = async (envelope) => {
       window.__cloudRecoveryCalls.stage += 1;
-      return { backupHash: envelope.backupHash, stageHash: 'cloud-ui-stage-hash' };
+      if (!Array.isArray(envelope.sourceManifest)) throw new Error('Missing canonical source manifest');
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash, stageHash: 'cloud-ui-stage-hash' };
     };
     const finalizeRestore = async (envelope) => {
       window.__cloudRecoveryCalls.finalize += 1;
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
-      return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: finalCanonical };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash,
+        stageHash: envelope.expectedStageHash,
+        receipt: { restoreId: envelope.restoreId, status: 'finalized' } };
     };
     cloud.setMockBackend({
-      async fetchRecords(tableName) { return canonical[tableName] ?? []; },
+      async fetchOwnerSyncMarker() { return { protocol: 'OWNER_SIGNAL_V1', ownerId, revision: '1' }; },
+      async fetchRecords(tableName) {
+        return window.__cloudRecoveryCalls.finalize ? finalCanonical[tableName] ?? [] : canonical[tableName] ?? [];
+      },
       stageSyncV2Restore: stageRestore,
       finalizeSyncV2Restore: finalizeRestore,
       stageScoreRestoreV2: stageRestore,
@@ -128,7 +193,7 @@ test('ready Cloud Recovery previews six states, confirms counts, and reconciles 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-  await openBackup(page);
+  await openBackup(page, { claimed: true });
   const serverStudent = {
     id: 'cloud-ui:delete', name: 'طالب سيُحذف', note: '', status: 'active', revision: 1,
     field_revisions: { name: 1, note: 1, status: 1 }, deleted_at: null,
@@ -159,6 +224,12 @@ test('ready Cloud Recovery previews six states, confirms counts, and reconciles 
   await expect(page.locator('.cloud-restore-progress')).toContainText('تحديث هذا الجهاز بالنسخة النهائية');
   await expect(page.locator('.cloud-recovery-message.is-success')).toContainText('تمت استعادة بياناتك بنجاح');
   expect(await page.evaluate(() => window.__cloudRecoveryCalls)).toEqual({ stage: 1, finalize: 1 });
+  expect(await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    const record = await db.get('students', 'cloud-ui:delete');
+    return { deleted: record?.deleted, live: (await db.getAll('students'))
+      .some((student) => student.id === 'cloud-ui:delete' && !student.deleted) };
+  })).toEqual({ deleted: true, live: false });
   expect(errors).toEqual([]);
 });
 
@@ -166,21 +237,17 @@ test('blocked review cannot restore and finalized checkpoint resumes local recon
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-  await openBackup(page);
+  await openBackup(page, { claimed: true });
   await installHealthyCloud(page);
   const differentOwner = '22222222-2222-4222-8222-222222222222';
   await page.evaluate(async () => (await import('/src/lib/db.js')).put('students', {
-    id: 'cloud-ui:b-preserve', name: 'synthetic B', status: 'active', deleted: false, updatedAt: 1,
+    id: 'cloud-ui:a-preserve', name: 'synthetic A', status: 'active', deleted: false, updatedAt: 1,
   }));
+  const mismatched = await createIsolatedOwnerBackup(browser, differentOwner);
   const before = await page.evaluate(async () => {
     const db = await import('/src/lib/db.js');
     return { students: await db.getAll('students'), outbox: await db.getAll('outbox') };
   });
-  const sourceContext = await browser.newContext();
-  const sourcePage = await sourceContext.newPage();
-  await openBackup(sourcePage);
-  const mismatched = await createBackup(sourcePage, differentOwner);
-  await sourceContext.close();
   expect(mismatched.version).toBe(5);
   expect(mismatched.sourceOwnerId).toBe(differentOwner);
   await setCloudFile(page, mismatched, 'different-account.json');
@@ -229,7 +296,7 @@ test('Cloud Recovery review is responsive, RTL, accessible, and reduced-motion s
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await mkdir('test-results/cloud-recovery-ui', { recursive: true });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await openBackup(page);
+  await openBackup(page, { claimed: true });
   await installHealthyCloud(page);
   const payload = await createBackup(page);
   await setCloudFile(page, payload);
