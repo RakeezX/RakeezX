@@ -7936,6 +7936,9 @@
 .mini-hub-backdrop .sheet .mini-hub-sync__details summary{padding:4px 0;min-height:44px;font-size:12px;color:var(--text-2);gap:7px}
 .mini-hub-backdrop .sheet .mini-hub-sync__detail-content{padding:6px 0 0;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text-2)}
 .mini-hub-backdrop .sheet .mini-hub-sync__detail-content p{margin:5px 0}
+:root[data-theme="dark"] .mini-hub-backdrop .sheet .mini-hub-sync__meta p,
+:root[data-theme="dark"] .mini-hub-backdrop .sheet .mini-hub-sync__details summary,
+:root[data-theme="dark"] .mini-hub-backdrop .sheet .mini-hub-sync__detail-content{color:var(--text)}
 .mini-hub-backdrop .sheet .mini-hub-sync__categories span{background:var(--bg-elev);color:var(--text-2)}
 .mini-hub-backdrop .sheet .mini-hub-pwa{padding:0 2px;border:0;gap:12px;align-items:center}
 .mini-hub-backdrop .sheet .mini-hub-pwa__copy h3{font-size:14px;margin:0 0 2px;font-weight:700}

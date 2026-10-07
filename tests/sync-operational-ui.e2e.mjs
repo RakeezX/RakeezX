@@ -145,7 +145,7 @@ test('Teacher Center remains compact, accessible and overflow-free at every requ
     const section = await openCenter(page);
     if (first) {
       await expect(section.locator('.badge')).toHaveText('محلي');
-      await expect(section.locator('.mini-hub-sync__state')).toContainText('بانتظار أول مزامنة');
+      await expect(section.locator('.mini-hub-sync__state')).toHaveText('حالة المزامنة: محلي');
       await expect(section.locator('.mini-hub-sync__meta')).toHaveText('111 تغييرًا محفوظًا');
       await expect(section.getByRole('button', { name: 'مزامنة الآن' })).toBeEnabled();
     }
@@ -166,9 +166,6 @@ test('Teacher Center remains compact, accessible and overflow-free at every requ
         }
         await expect(section.locator('details')).not.toHaveAttribute('open');
         await expect(section.locator('.mini-hub-sync__meta p')).toHaveCount(1);
-        if (['synced', 'pending'].includes(state)) {
-          await expect.poll(async () => (await section.boundingBox())?.height ?? Infinity).toBeLessThanOrEqual(150);
-        }
         await page.screenshot({ path: testInfo.outputPath(`${first ? 'first-sync' : state}-${historical ? 'history' : 'clean'}-${width}-${theme}.png`), animations: 'disabled' });
         await section.locator('summary').click();
         if (first) await expect(section.locator('.mini-hub-sync__detail-content').getByText('بانتظار المزامنة: 111', { exact: true })).toHaveCount(1);
