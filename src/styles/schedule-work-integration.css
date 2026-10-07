@@ -202,3 +202,66 @@ body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__foot{margin:0
   #periods-sheet-inner #sheet-period-rows .timerow__range{gap:5px}
   body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__head,body:has(.timing-profiles-page) .sheet:has([data-confirm]) .sheet__foot{padding-inline:14px}
 }
+
+
+/* W1 — N59/N61, real Schedule and timing-editor routes. */
+.page--schedule .n59-load-summary { margin-block: 14px; padding: 0; overflow: hidden; border-inline-start: 3px solid var(--brand); }
+.page--schedule .n59-load-summary > .schedule-summary-bar { margin: 0; border: 0; border-radius: 0; padding: 12px 14px; list-style: none; cursor: pointer; gap: 10px; }
+.n59-load-summary > summary::-webkit-details-marker { display: none; }
+.n59-load-summary > summary:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: -3px; }
+.n59-load-summary__hint { display: inline-flex; align-items: center; gap: 5px; color: var(--text-3); font-size: 12px; white-space: nowrap; }
+.n59-load-summary__hint svg { width: 14px; height: 14px; transform: rotate(-90deg); }
+.n59-load-summary[open] .n59-load-summary__hint svg { transform: rotate(90deg); }
+.n59-load-summary__rows { border-block-start: 1px solid var(--border); padding-inline: 14px; }
+.n59-load-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; align-items: center; gap: 12px; padding-block: 10px; font-size: 13px; }
+.n59-load-row + .n59-load-row { border-block-start: 1px solid var(--border); }
+.n59-load-row__class { font-weight: 650; overflow-wrap: anywhere; }
+.n59-load-row__subject { color: var(--text-2); overflow-wrap: anywhere; }
+.n59-load-row__count { color: var(--text-2); white-space: nowrap; font-size: 12px; }
+.n61-day-controls { margin-block-end: 16px; }
+.n61-school-days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; padding: 4px; background: var(--bg-sunk); border: 1px solid var(--border); border-radius: 10px; }
+.n61-school-days .chip { justify-content: center; width: 100%; min-width: 0; min-height: 40px; padding: 5px 3px; border: 0; border-radius: 7px; font-size: 13px; white-space: nowrap; background: transparent; color: var(--text-2); }
+.n61-school-days .chip.is-on { background: var(--bg-elev); color: var(--brand-text); box-shadow: 0 1px 3px #0000000d; font-weight: 750; }
+.n61-school-days .chip:focus-visible, .n61-apply-link:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: 2px; }
+.n61-day-intent { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-top: 7px; font-size: 12px; color: var(--text-3); }
+.n61-apply-link { padding: 7px 0; background: transparent; border: 0; color: var(--info); font: inherit; cursor: pointer; text-align: start; }
+.n61-day-chooser { width: min(420px, 100%); }
+.n61-day-checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.n61-day-check { display: flex; align-items: center; gap: 9px; min-height: 46px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-sunk); cursor: pointer; font-size: 14px; }
+.n61-day-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--brand); }
+.n61-day-note { margin-block: 12px 0; color: var(--text-3); font-size: 12px; line-height: 1.7; }
+@media (max-width: 540px) {
+  .page--schedule .n59-load-summary > .schedule-summary-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 10px; gap: 8px; }
+  .page--schedule .n59-load-summary .schedule-summary-bar__stats { grid-column: 1 / -1; justify-content: space-between; flex-wrap: wrap; gap: 5px 10px; }
+  .page--schedule .n59-load-summary .schedule-summary-bar__classes { display: inline-flex; }
+  .page--schedule .n59-load-summary .schedule-summary-bar__item { font-size: 12px; }
+  .page--schedule .n59-load-summary .compact-timing-pill { justify-self: start; }
+  .n59-load-summary__hint { justify-self: end; }
+  .n59-load-summary__rows { padding-inline: 10px; }
+  .n59-load-row { grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; row-gap: 3px; font-size: 12px; }
+  .n59-load-row__subject { grid-column: 1; font-size: 11.5px; }
+  .n59-load-row__count { grid-column: 2; grid-row: 1 / 3; }
+  .n61-school-days { gap: 3px; padding: 3px; }
+  .n61-school-days .chip { min-height: 44px; font-size: 11.5px; padding-inline: 0; }
+  .n61-apply-link { min-height: 44px; }
+  .n61-timing-editor .sheet__body { padding-inline: 12px; }
+  .n61-day-chooser .sheet__foot { flex-wrap: wrap; }
+}
+
+/* W1 V2: grouped load disclosure and a separate opposite-edge profile. */
+.n59-load-summary .schedule-summary-bar { justify-content: space-between; }
+.n59-load-summary .compact-timing-pill { margin-inline-start: auto; flex-shrink: 0; }
+.n59-load-summary__hint { border: 1px solid var(--border); border-radius: 999px; padding: 5px 9px; white-space: nowrap; }
+.n61-dirty-dot { color: var(--brand); margin-inline-start: 3px; }
+.n61-dirty-dot[hidden] { display: none; }
+@media(max-width:600px) {
+ .n59-load-summary .schedule-summary-bar { align-items: flex-start; }
+ .n59-load-summary .schedule-summary-bar__stats { flex: 1; }
+ .n59-load-summary .compact-timing-pill { margin-inline-start: 8px; }
+}
+
+@media(max-width:600px) {
+ .page--schedule .n59-load-summary .schedule-summary-bar__stats { grid-column: 1; justify-content: flex-start; }
+ .page--schedule .n59-load-summary .compact-timing-pill { grid-column: 2; margin-inline-start: 0; }
+ .n59-load-summary .schedule-summary-bar__sep { display: none; }
+}

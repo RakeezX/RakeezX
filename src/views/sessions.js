@@ -86,18 +86,16 @@ export default {
     if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الحصص السابقة محفوظة، ولا يمكن توليد حصص تشغيلية جديدة.</div></div>`;
 
     const list = store.sessionsOf(tch.id);
-    const generator = generationCard(tch);
     const todaySummary = dailySummary(tch);
     if (!list.length) {
       return html`
         <div class="classroom-tool-page sessions-page">
-        ${generator}
         ${todaySummary}
         <div class="empty">
           <div class="empty__icon">${icon('session')}</div>
           <div class="empty__title">لا حصص مسجّلة</div>
           <div class="empty__text">
-            تُنشأ الحصة أول ما ترصد حضورها، أو تولّدها من جدولك الأسبوعي.
+            تُنشأ الحصة عند رصد حضورها من جدولك الأسبوعي.
           </div>
           <div class="btn-row" style="justify-content:center">
             <a class="btn btn--primary" href="#/teaching/${tch.id}/attendance">${icon('attendance')} افتح حصة</a>
@@ -124,7 +122,6 @@ export default {
 
     return html`
       <div class="classroom-tool-page sessions-page">
-      ${generator}
       ${todaySummary}
       <div class="grid grid--3 session-stats mb-3">
         <div class="stat">

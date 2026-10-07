@@ -9,6 +9,50 @@ import { html, render, icon, openSheet, confirmSheet, toast, fmtDateFull, fmtTim
 import * as store from '../store.js';
 import { WEEKDAYS, SCHOOL_WEEKDAYS, generateAdvancedPeriods, isValidRecessPosition, makeTimeProfile, recessPositions, todayISO, GRADE_CATALOG, uid } from '../models.js';
 import { repaint } from '../repaint.js';
+import { createDayTargets, applyToOtherSchoolDays, setTargetDaySelected, selectedTargetDays, hasSelectedTargetDifference } from '../lib/day-targeting.js';
+
+// Both manual editing and generation target the same existing day overrides.
+function chooseOtherTimingDays(currentDay, proposed, existingForDay) {
+  let targets = applyToOtherSchoolDays(createDayTargets(currentDay));
+  return openSheet({
+    title: 'تطبيق على أيام أخرى',
+    desc: `نسخ أوقات ${WEEKDAYS[currentDay]} إلى الأيام التي تختارها.`,
+    body: html`
+      <div class="n61-day-checklist" role="group" aria-label="الأيام المستهدفة">
+        ${SCHOOL_WEEKDAYS.filter(day => day !== currentDay).map(day => html`
+          <label class="n61-day-check">
+            <input type="checkbox" data-target-day="${day}" checked>
+            <span>${WEEKDAYS[day]}</span>
+          </label>
+        `)}
+      </div>
+      <p class="n61-day-note">تُحفظ الأوقات عند حفظ التغييرات. الأيام غير المحددة تحتفظ بأوقاتها.</p>
+    `,
+    foot: html`
+      <button class="btn btn--ghost" data-sheet-close>رجوع</button>
+      <button class="btn btn--primary" id="n61-confirm-targets">اعتماد الأيام المحددة</button>
+    `,
+    onMount(root, done) {
+      root.querySelector('.sheet').classList.add('n61-day-chooser');
+      root.querySelectorAll('[data-target-day]').forEach(input => {
+        input.addEventListener('change', () => {
+          targets = setTargetDaySelected(targets, Number(input.dataset.targetDay), input.checked);
+        });
+      });
+      root.querySelector('#n61-confirm-targets').addEventListener('click', async () => {
+        if (hasSelectedTargetDifference(targets, proposed, existingForDay)) {
+          const accepted = await confirmSheet({
+            title: 'استبدال أوقات الأيام المحددة؟',
+            desc: `بعض الأيام المحددة لها أوقات مختلفة. ستُستبدل بأوقات ${WEEKDAYS[currentDay]} عند الحفظ.`,
+            confirmLabel: 'اعتماد الاستبدال',
+          });
+          if (!accepted) return;
+        }
+        done(selectedTargetDays(targets));
+      });
+    },
+  });
+}
 
 /** توليد نص عربي منسق للصفوف لضمان عدم ظهور [object Object] */
 function formatGradesLabel(grades) {
@@ -221,7 +265,9 @@ function generateSheet(current = {}) {
 
   return openSheet({
     title: 'توليد أوقات الحصص تلقائيًا',
-    desc: 'أدخل معايير التوقيت لمدرستك وسيقوم النظام بحساب الحصص وتطبيقها فورًا.',
+    desc: current.weekday !== undefined
+      ? `توليد أوقات ${WEEKDAYS[current.weekday]}، ثم اختيار الأيام الأخرى إن رغبت.`
+      : 'أدخل معايير التوقيت لمدرستك لحساب أوقات الحصص.',
     body: html`
       <form id="gen-form">
         <div class="field-row">
@@ -281,7 +327,7 @@ function generateSheet(current = {}) {
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="gen-form" type="submit">توليد وتطبيق الأوقات</button>
+      <button class="btn btn--primary" form="gen-form" type="submit">توليد الأوقات</button>
     `,
     onMount: (root, done) => {
       const toggleBtn = root.querySelector('#gen-toggle-recess');
@@ -733,10 +779,13 @@ function editPeriodsSheet(profile) {
   // Save is still the sole point that writes this draft back to the store.
   const sourceProfile = store.getTimeProfile(profile.id) || profile;
   let p = structuredClone(sourceProfile);
-  let selectedDay = null; // null = all days
+  let selectedDay = SCHOOL_WEEKDAYS.includes(new Date().getDay()) ? new Date().getDay() : SCHOOL_WEEKDAYS[0];
   let models = getProfileModels(p);
+  const originalModels = JSON.stringify(models);
+
   let selectedModelId = models[0]?.id || 'default';
   let dayOverrides = { ...(p.overrides ?? {}) };
+  const dayBaselines = new Map();
 
   const parseTime = (str) => {
     const [h, m] = (str || '00:00').split(':').map(Number);
@@ -753,9 +802,34 @@ function editPeriodsSheet(profile) {
     return models.find(m => m.id === selectedModelId) || models[0];
   };
 
+  const ensureDayDraft = () => {
+    if (!dayBaselines.has(selectedDay)) {
+      const originalModel = getProfileModels(sourceProfile).find(model => model.id === selectedModelId)
+        || getProfileModels(sourceProfile)[0];
+      dayBaselines.set(selectedDay, {
+        periods: structuredClone(sourceProfile.overrides?.[String(selectedDay)] || originalModel.periods),
+        recess: structuredClone(sourceProfile.overrides?.recessByDay?.[String(selectedDay)] || originalModel),
+      });
+    }
+    if (!Array.isArray(dayOverrides[String(selectedDay)])) {
+      dayOverrides[String(selectedDay)] = getActiveModel().periods.map(period => ({ ...period }));
+    }
+  };
+
+  // Compare effective day drafts; merely visiting a day does not create a saved override.
+  const recessSnapshot = model => [model?.afterPeriod || 0, model?.recessDuration || model?.duration || 0,
+    model?.recessTransition || model?.transition || 0, model?.gap || 0];
+  const modifiedDays = () => SCHOOL_WEEKDAYS.filter(day => {
+    const before = dayBaselines.get(day);
+    if (!before || !Array.isArray(dayOverrides[String(day)])) return false;
+    return JSON.stringify(dayOverrides[String(day)]) !== JSON.stringify(before.periods)
+      || JSON.stringify(recessSnapshot(dayOverrides.recessByDay?.[String(day)] || before.recess)) !== JSON.stringify(recessSnapshot(before.recess));
+  });
+
   const renderSheetContent = () => {
     const currentModel = getActiveModel();
     selectedModelId = currentModel.id;
+    ensureDayDraft();
 
     const activePeriods = (selectedDay !== null && Array.isArray(dayOverrides[String(selectedDay)]))
       ? dayOverrides[String(selectedDay)]
@@ -787,29 +861,31 @@ function editPeriodsSheet(profile) {
           </div>
         </div>
 
-        <!-- إجراء التوليد التلقائي في الأعلى بوضوح كزر عملي بارز -->
-        <div class="generator-action-banner mb-3">
-          <div class="generator-action-banner__info">
-            <span class="generator-action-banner__title">توليد الأوقات آليًا</span>
-            <span class="generator-action-banner__desc">توزيع الحصص والفسحة المدرسية بدقة حسب معايير مدرستك</span>
-          </div>
-          <button type="button" class="btn btn--sm btn--primary generator-action-banner__btn" id="sheet-btn-gen">
-            ${icon('spark')} توليد وتطبيق الأوقات
-          </button>
-        </div>
-
         <!-- شريط استثناءات الأيام -->
-        <div class="field mb-3">
-          <div class="chips scroll-x">
-            <button type="button" class="chip ${selectedDay === null ? 'is-on' : ''}" data-day="">
-              كل الأيام (الافتراضي)
-            </button>
+        <div class="n61-day-controls">
+          <div class="n61-school-days" role="tablist" aria-label="أيام الدراسة">
             ${SCHOOL_WEEKDAYS.map(d => html`
-              <button type="button" class="chip ${selectedDay === d ? 'is-on' : ''}" data-day="${d}">
-                ${WEEKDAYS[d]}
+              <button type="button" class="chip ${selectedDay === d ? 'is-on' : ''}" data-day="${d}"
+                      role="tab" aria-selected="${selectedDay === d}" tabindex="${selectedDay === d ? '0' : '-1'}">
+                ${WEEKDAYS[d]}<span class="n61-dirty-dot" ${modifiedDays().includes(d) ? '' : 'hidden'} aria-label="تعديلات غير محفوظة">•</span>
               </button>
             `)}
           </div>
+          <div class="n61-day-intent">
+            <span id="n61-draft-status">عدّل الأيام ثم احفظ التغييرات معًا</span>
+            <button type="button" class="n61-apply-link" id="sheet-btn-apply-days">تطبيق هذه الأوقات على أيام أخرى…</button>
+          </div>
+        </div>
+
+        <!-- إجراء التوليد التلقائي في الأعلى بوضوح كزر عملي بارز -->
+        <div class="generator-action-banner mb-3">
+          <div class="generator-action-banner__info">
+            <span class="generator-action-banner__title">توليد أوقات ${WEEKDAYS[selectedDay]}</span>
+            <span class="generator-action-banner__desc">توزيع الحصص والفسحة المدرسية بدقة حسب معايير مدرستك</span>
+          </div>
+          <button type="button" class="btn btn--sm btn--primary generator-action-banner__btn" id="sheet-btn-gen">
+            ${icon('spark')} توليد الأوقات
+          </button>
         </div>
 
         <!-- الطابور الصباحي إن وجد -->
@@ -920,6 +996,41 @@ function editPeriodsSheet(profile) {
       <button class="btn btn--primary" id="sheet-btn-save-all">حفظ التغييرات</button>
     `,
     onMount: (root, done) => {
+      root.querySelector('.sheet').classList.add('n61-timing-editor');
+      const recessContent = (model) => ({
+        afterPeriod: Number(model.afterPeriod || 0),
+        recessDuration: Number(model.recessDuration || 0),
+        recessTransition: Number(model.recessTransition || 0),
+        gap: Number(model.gap || 0),
+      });
+      const applyDraftToOtherDays = async () => {
+        const model = getActiveModel();
+        const proposed = {
+          periods: structuredClone(dayOverrides[String(selectedDay)]),
+          recess: recessContent(dayOverrides.recessByDay?.[String(selectedDay)] || model),
+        };
+        const targets = await chooseOtherTimingDays(selectedDay, proposed, day => ({
+          periods: dayOverrides[String(day)] || model.periods,
+          recess: recessContent(dayOverrides.recessByDay?.[String(day)] || model),
+        }));
+        if (!targets) return;
+        for (const day of targets) {
+          if (day === selectedDay) continue;
+          if (!dayBaselines.has(day)) {
+            const originalModel = getProfileModels(sourceProfile).find(candidate => candidate.id === selectedModelId)
+              || getProfileModels(sourceProfile)[0];
+            dayBaselines.set(day, {
+              periods: structuredClone(sourceProfile.overrides?.[String(day)] || originalModel.periods),
+              recess: structuredClone(sourceProfile.overrides?.recessByDay?.[String(day)] || originalModel),
+            });
+          }
+          dayOverrides[String(day)] = structuredClone(proposed.periods);
+          dayOverrides.recessByDay = { ...(dayOverrides.recessByDay || {}),
+            [String(day)]: structuredClone(proposed.recess) };
+
+        }
+        refreshDOM();
+      };
       const attachListeners = () => {
         const currentModel = getActiveModel();
         const activePeriods = (selectedDay !== null && Array.isArray(dayOverrides[String(selectedDay)]))
@@ -1117,16 +1228,23 @@ function editPeriodsSheet(profile) {
         }
 
         // Days chips
-        root.querySelectorAll('.chips .chip').forEach(chip => {
+        root.querySelectorAll('.n61-school-days .chip').forEach(chip => {
           chip.addEventListener('click', () => {
-            const dStr = chip.dataset.day;
-            selectedDay = dStr === '' ? null : Number(dStr);
-            if (selectedDay !== null && !dayOverrides[String(selectedDay)]) {
-              dayOverrides[String(selectedDay)] = currentModel.periods.map(x => ({ ...x }));
-            }
+            selectedDay = Number(chip.dataset.day);
             refreshDOM();
           });
+          chip.addEventListener('keydown', event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            const index = SCHOOL_WEEKDAYS.indexOf(selectedDay);
+            selectedDay = event.key === 'Home' ? SCHOOL_WEEKDAYS[0]
+              : event.key === 'End' ? SCHOOL_WEEKDAYS.at(-1)
+              : SCHOOL_WEEKDAYS[(index + (event.key === 'ArrowLeft' ? 1 : -1) + SCHOOL_WEEKDAYS.length) % SCHOOL_WEEKDAYS.length];
+            refreshDOM();
+            root.querySelector(`[data-day="${selectedDay}"]`)?.focus();
+          });
         });
+        root.querySelector('#sheet-btn-apply-days').addEventListener('click', applyDraftToOtherDays);
 
         // Time inputs — ضمان تحويل الأرقام 0-9 مع التحقق
         root.querySelectorAll('.timerow__in').forEach(input => {
@@ -1144,6 +1262,7 @@ function editPeriodsSheet(profile) {
             const item = activePeriods.find(x => x.period === pNum);
             if (item) {
               item[key] = input.value;
+              updateDraftIndicators();
             }
           });
 
@@ -1155,6 +1274,7 @@ function editPeriodsSheet(profile) {
               const key = input.dataset.key;
               const item = activePeriods.find(x => x.period === pNum);
               if (item) item[key] = norm;
+              updateDraftIndicators();
             }
           });
         });
@@ -1294,6 +1414,7 @@ function editPeriodsSheet(profile) {
         if (btnGen) {
           btnGen.addEventListener('click', async () => {
             const cfg = await generateSheet({
+              weekday: selectedDay,
               count: activePeriods.length || 7,
               firstPeriodStart: activePeriods[0]?.start || '07:00',
               gap: reflowOptions.gap,
@@ -1314,7 +1435,7 @@ function editPeriodsSheet(profile) {
               p.overrides.config = cfg;
             }
             refreshDOM();
-            toast('وُلّدت الأوقات الجديدة بنجاح لهذا النموذج');
+            await applyDraftToOtherDays();
           });
         }
       };
@@ -1324,14 +1445,53 @@ function editPeriodsSheet(profile) {
         if (body) {
           render(body, renderSheetContent());
           attachListeners();
+          updateDraftIndicators();
         }
       };
 
+      const updateDraftIndicators = () => {
+        const days = modifiedDays();
+        root.querySelectorAll('.n61-school-days [data-day]').forEach(button => {
+          button.querySelector('.n61-dirty-dot').hidden = !days.includes(Number(button.dataset.day));
+        });
+        root.querySelector('#n61-draft-status').textContent = days.length
+          ? `${days.length} أيام معدلة · تُحفظ معًا` : 'عدّل الأيام ثم احفظ التغييرات معًا';
+      };
       attachListeners();
+      updateDraftIndicators();
+      const hasUnsavedChanges = () => modifiedDays().length > 0 || JSON.stringify(models) !== originalModels;
+      const guardUnload = event => {
+        if (!hasUnsavedChanges()) return;
+        event.preventDefault();
+        event.returnValue = '';
+      };
+      window.addEventListener('beforeunload', guardUnload);
+      const finish = () => {
+        window.removeEventListener('beforeunload', guardUnload);
+        done();
+      };
+      const guardClose = async event => {
+        if (root.inert) return;
+        const closing = event.type === 'keydown' ? event.key === 'Escape'
+          : event.target.closest('[data-sheet-close]') || event.target === root;
+        if (!closing) return;
+        if (!hasUnsavedChanges()) {
+          window.removeEventListener('beforeunload', guardUnload);
+          return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (await confirmSheet({ title: 'إغلاق دون حفظ؟', desc: 'لديك تعديلات غير محفوظة. يمكنك العودة وحفظ جميع الأيام معًا.', confirmLabel: 'تجاهل التعديلات' })) finish();
+      };
+      root.addEventListener('click', guardClose, true);
+      root.addEventListener('keydown', guardClose, true);
 
-      // Save all changes
+      // Keep the Product profile/override shapes and the existing single patch path.
       root.querySelector('#sheet-btn-save-all').addEventListener('click', async () => {
-        if (selectedDay === null) {
+        const overrides = { ...(p.overrides ?? {}) };
+        const update = { overrides };
+        // Explicit model-management changes retain the existing model save contract.
+        if (JSON.stringify(models) !== originalModels) {
           const allFlatPeriods = [];
           if (models.length === 1 && (!models[0].grades || models[0].grades.length === 0)) {
             allFlatPeriods.push(...models[0].periods.map(x => {
@@ -1339,49 +1499,36 @@ function editPeriodsSheet(profile) {
               return rest;
             }));
           } else {
-            for (const m of models) {
-              for (const pItem of m.periods) {
-                allFlatPeriods.push({
-                  ...pItem,
-                  grades: (m.grades && m.grades.length > 0) ? m.grades : undefined
-                });
+            for (const model of models) {
+              for (const period of model.periods) {
+                allFlatPeriods.push({ ...period, grades: model.grades?.length ? model.grades : undefined });
               }
             }
           }
-
-          p.overrides = p.overrides || {};
-          p.overrides.models = models.map(m => ({
-            id: m.id,
-            name: m.name,
-            grades: m.grades,
-            gradesLabel: m.gradesLabel,
-            afterPeriod: m.afterPeriod,
-            recessDuration: m.recessDuration,
-            recessTransition: m.recessTransition,
-            gap: m.gap,
-            periods: m.periods.map(x => ({ ...x }))
+          overrides.models = models.map(model => ({
+            id: model.id, name: model.name, grades: model.grades, gradesLabel: model.gradesLabel,
+            afterPeriod: model.afterPeriod, recessDuration: model.recessDuration,
+            recessTransition: model.recessTransition, gap: model.gap,
+            periods: model.periods.map(period => ({ ...period })),
           }));
-
-          await store.patch('timeProfiles', p.id, {
-            periods: allFlatPeriods.length ? allFlatPeriods : models[0].periods,
-            overrides: p.overrides
-          });
-        } else {
-          const overrides = { ...(p.overrides ?? {}) };
-          const dayPeriods = dayOverrides[String(selectedDay)];
+          update.periods = allFlatPeriods.length ? allFlatPeriods : models[0].periods;
+        }
+        // One save persists all modified day drafts through the existing patch API.
+        for (const day of modifiedDays()) {
+          const dayPeriods = dayOverrides[String(day)];
           if (Array.isArray(dayPeriods) && dayPeriods.length) {
-            overrides[String(selectedDay)] = dayPeriods;
-            if (dayOverrides.recessByDay?.[String(selectedDay)]) {
+            overrides[String(day)] = structuredClone(dayPeriods);
+            if (dayOverrides.recessByDay?.[String(day)]) {
               overrides.recessByDay = { ...(overrides.recessByDay || {}),
-                [String(selectedDay)]: dayOverrides.recessByDay[String(selectedDay)] };
+                [String(day)]: structuredClone(dayOverrides.recessByDay[String(day)]) };
             }
           } else {
-            delete overrides[String(selectedDay)];
+            delete overrides[String(day)];
           }
-          await store.patch('timeProfiles', p.id, { overrides });
         }
+        await store.patch('timeProfiles', p.id, update);
         toast('تم حفظ أوقات الحصص بنجاح');
-        done();
+        finish();
         repaint();
       });
     }

@@ -490,17 +490,19 @@ export default {
       <!-- شريط الملخص وشريط التوقيت: محاذاة متوازنة ومتباعدة بشكل احترافي -->
       ${slots.length
         ? html`
-            <div class="schedule-summary-bar surface surface--flat">
+            <details class="n59-load-summary surface surface--flat">
+              <summary class="schedule-summary-bar">
               <div class="schedule-summary-bar__stats">
                 <span class="schedule-summary-bar__item">
                   ${icon("timetable")}
-                  <span>إجمالي الحصص: <strong>${weeklySessionsText}</strong></span>
+                  <span><strong>${weeklySessionsText}</strong></span>
                 </span>
                 <span class="schedule-summary-bar__sep" aria-hidden="true">·</span>
                 <span class="schedule-summary-bar__item schedule-summary-bar__classes">
                   ${icon("classes")}
                   <span>الفصول المجدولة: <strong>${list.length} فصول</strong></span>
                 </span>
+                <span class="n59-load-summary__hint">تفاصيل الفصول ${icon("chev")}</span>
               </div>
               ${profile ? html`
                 <a class="compact-timing-pill" href="#/schedule/times" title="أوقات الحصص — ${profile.name}">
@@ -508,7 +510,20 @@ export default {
                   <span>${profile.name}</span>
                 </a>
               ` : ""}
-            </div>
+              </summary>
+              <div class="n59-load-summary__rows">
+                ${[...list].sort((a, b) => {
+                  const sa = store.getSection(a.sectionId), sb = store.getSection(b.sectionId);
+                  return Number(sa?.grade || 0) - Number(sb?.grade || 0)
+                    || new Intl.Collator('ar', { numeric: true }).compare(formatSectionDisplay(sa), formatSectionDisplay(sb));
+                }).map(t => {
+                  const sec = store.getSection(t.sectionId);
+                  const sub = store.getSubject(t.subjectId);
+                  return html`<div class="n59-load-row"><span class="n59-load-row__class">${gradeLabel(sec?.grade)} — ${formatSectionDisplay(sec)}</span><span class="n59-load-row__subject">${sub?.name || "مادة"}</span><span class="n59-load-row__count"><strong>${store.weeklyPeriods(t.id) || 0}</strong> حصص</span></div>`;
+                })}
+              </div>
+
+            </details>
           `
         : html`
             <div class="card card--pad mb-3 center">
@@ -523,35 +538,6 @@ export default {
 
       <!-- جدول الأعمدة اليومية -->
       ${renderColumnsLayout({ byDay, today, todayStr, baseProfile, nowMins, toMins, selectedMobileDay, todayIsTeachingDay })}
-
-      <!-- الحصص الأسبوعية لكل فصل: تصميم بطاقات مدمجة أنيقة بدل سطر ممتد -->
-      <div class="section">
-        <div class="section__head">
-          <div class="section__title">الحصص الأسبوعية لكل فصل</div>
-        </div>
-        <div class="schedule-classes-grid">
-          ${list.map((t) => {
-            const sec = store.getSection(t.sectionId);
-            const n = store.weeklyPeriods(t.id);
-            const sub = store.getSubject(t.subjectId);
-            return html`
-              <a class="schedule-class-card" href="#/teaching/${t.id}/sessions" style="--sec-color: ${safeColor(sec?.color)}">
-                <div class="schedule-class-card__head">
-                  <span class="sec-dot" aria-hidden="true"></span>
-                  <span class="schedule-class-card__title">${gradeLabel(sec?.grade)} — ${formatSectionDisplay(sec)}</span>
-                </div>
-                <div class="schedule-class-card__sub">${sub?.name || "مادة"}</div>
-                <div class="schedule-class-card__foot">
-                  <span class="schedule-class-card__count tabular">
-                    <strong>${n || 0}</strong> حصص أسبوعيًا
-                  </span>
-                  <span class="schedule-class-card__arrow" aria-hidden="true">${icon("chev")}</span>
-                </div>
-              </a>
-            `;
-          })}
-        </div>
-      </div>
 
       <p class="t-3 fs-sm mt-6 center">
         يوزّع الجدول حصصك الأسبوعية تلقائيًا، وتُنشأ حصص الحضور والتقييم المؤرخة منها في سجل كل فصل.
