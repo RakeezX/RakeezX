@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v36';
+const VERSION = 'rakeezx-v37';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -98,6 +98,7 @@ const SHELL = [
   './src/lib/initial-restore.js',
   './src/lib/curriculum-bootstrap.js',
   './src/lib/sync-operational-ui.js',
+  './src/lib/sync-warning-policy.js',
   './src/lib/avatar.js',
   './src/lib/backup-v2.js',
   './src/lib/build-meta.js',

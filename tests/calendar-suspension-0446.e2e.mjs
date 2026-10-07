@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test('Calendar saves a distinct suspension through the real form and presents it after reload', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  await page.clock.setFixedTime(new Date('2026-10-05T08:00:00'));
   await page.goto('/#/calendar');
   await page.getByRole('button', { name: 'إضافة استثناء' }).click();
   const form = page.getByRole('dialog').locator('#range-form');
