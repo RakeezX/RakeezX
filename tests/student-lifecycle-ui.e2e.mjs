@@ -83,6 +83,22 @@ test.beforeEach(async ({ page }) => {
   errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  await page.addInitScript(() => {
+    const NativeWebSocket = window.WebSocket;
+    window.WebSocket = class {
+      constructor(url) {
+        if (!String(url).includes('/realtime/v1/websocket')) return new NativeWebSocket(url);
+        queueMicrotask(() => this.onopen?.());
+      }
+      send(raw) {
+        const message = JSON.parse(raw);
+        if (message.event === 'phx_join' || message.event === 'heartbeat') queueMicrotask(() =>
+          this.onmessage?.({ data: JSON.stringify({ topic: message.topic, event: 'phx_reply',
+            ref: message.ref, payload: { status: 'ok' } }) }));
+      }
+      close() { this.onclose?.(); }
+    };
+  });
   await page.route('https://*.supabase.co/**', route => route.abort());
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async route => {
     const request = route.request();
@@ -93,10 +109,24 @@ test.beforeEach(async ({ page }) => {
         if (failReconciliation && backend.calls.length && endpoint === 'students') {
           await route.fulfill({ status: 503, json: { message: 'Synthetic reconciliation failure' } }); return;
         }
-        await route.fulfill({ json: await backend.fetchRecords(endpoint) }); return;
+        const rows = (await backend.fetchRecords(endpoint)).sort((a, b) =>
+          String(a[endpoint === 'profile' ? 'owner_id' : 'id']).localeCompare(String(b[endpoint === 'profile' ? 'owner_id' : 'id'])));
+        const url = new URL(request.url());
+        const offset = Number(url.searchParams.get('offset') ?? 0);
+        const limit = Number(url.searchParams.get('limit') ?? 500);
+        const pageRows = rows.slice(offset, offset + limit);
+        await route.fulfill({ json: pageRows, headers: {
+          'Access-Control-Expose-Headers': 'Content-Range',
+          'Content-Range': pageRows.length ? `${offset}-${offset + pageRows.length - 1}/${rows.length}` : `*/${rows.length}`,
+        } }); return;
       }
       const p = request.postDataJSON();
       let value;
+      if (endpoint === 'owner_sync_change_marker') {
+        await route.fulfill({ json: { protocol: 'OWNER_SIGNAL_V1', ownerId: OWNER,
+          revision: String(backend.calls.length + backend.operations.length + backend.enrollmentUpserts), updatedAt: null } });
+        return;
+      }
       if (endpoint === 'score_foundation_capability') {
         await route.fulfill({ status: 204 });
         return;
@@ -297,11 +327,12 @@ test('pristine delete uses the real authoritative command, no cascade or false e
   await expect(page.getByRole('status')).toContainText('تم حذف الطالب المضاف بالخطأ.');
   expect(backend.calls).toHaveLength(1);
   expect(backend.calls[0].command).toBe('delete_pristine');
-  await page.getByRole('button', { name: 'العودة للكشف' }).click();
+  await page.locator('[data-management="close"]').click();
   await expect(page).toHaveURL(new RegExp(`/teaching/${f.teaching}/students$`));
   await expect(page.locator('.roster-list a[href*="' + f.student + '"]')).toHaveCount(0);
   await expect(page.locator('.management-empty .empty__title')).toContainText('لا طلاب في');
   await page.reload();
+  await page.waitForFunction(() => window.store?.state?.ready);
   expect(await page.evaluate(id => window.store.getStudent(id), f.student)).toBeNull();
   expect((await pg.query(`select deleted_at from rakeezx.students where id=$1`, [f.student])).rows[0].deleted_at).toBeTruthy();
   expect(previews[0].outcome).toBe('delete_pristine');
@@ -330,15 +361,13 @@ for (const kind of ['attendance', 'scores', 'notes', 'logs', 'closed-term-report
     await expect(page.getByRole('status')).toContainText('تمت إزالة الطالب من الفصل مع الاحتفاظ بسجله السابق.');
     expect(await historicalData(page)).toEqual(before);
     expect(await page.evaluate(id => ({ student: window.store.getStudent(id).id, enrollment: window.store.activeEnrollment(id) }), f.student)).toEqual({ student: f.student, enrollment: null });
-    await page.getByRole('button', { name: 'العودة إلى ملف الطالب' }).click();
-    await expect(page.locator('.banner-closed')).toBeVisible();
+    await page.locator('[data-management="close"]').click();
+    await expect(page).toHaveURL(new RegExp(`/teaching/${f.teaching}/students$`));
+    await expect(page.locator('.roster-list a[href*="' + f.student + '"]')).toHaveCount(0);
     await page.reload();
-    await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
-    await expect(page.getByRole('dialog')).toContainText('انتهى الانتساب الحالي. السجل السابق متاح للعرض.');
-    await expect(page.getByRole('dialog').locator('[data-management="remove"], [data-management="transfer"]')).toHaveCount(0);
-    await expect(page.getByRole('dialog')).not.toContainText(/أعده للدراسة|استعادة الطالب|NOT_PRISTINE|membership-history/);
+    await expect(page).toHaveURL(new RegExp(`/teaching/${f.teaching}/students$`));
+    await expect(page.locator('.roster-list a[href*="' + f.student + '"]')).toHaveCount(0);
     expect(await historicalData(page)).toEqual(before);
-    await page.getByRole('button', { name: 'إغلاق', exact: true }).click();
     await page.goto('/#/archive');
     await page.getByRole('link', { name: 'الطلاب السابقون', exact: true }).click();
     const former = page.locator('.former-student-row');
@@ -346,6 +375,11 @@ for (const kind of ['attendance', 'scores', 'notes', 'logs', 'closed-term-report
     await expect(former).toContainText('انتهى في');
     await former.getByRole('link', { name: 'عرض سجل طالب اصطناعي', exact: true }).click();
     await expect(page.locator('.banner-closed')).toBeVisible();
+    await page.getByRole('button', { name: 'إدارة الطالب', exact: true }).click();
+    await expect(page.getByRole('dialog')).toContainText('انتهى الانتساب الحالي. السجل السابق متاح للعرض.');
+    await expect(page.getByRole('dialog').locator('[data-management="remove"], [data-management="transfer"]')).toHaveCount(0);
+    await expect(page.getByRole('dialog')).not.toContainText(/أعده للدراسة|استعادة الطالب|NOT_PRISTINE|membership-history/);
+    await page.getByRole('button', { name: 'إغلاق', exact: true }).click();
     expect(await historicalData(page)).toEqual(before);
     await expect(page.locator('[data-act="reinstate"]')).toHaveCount(0);
     await page.goto(`/#/teaching/${f.teaching}/students`);

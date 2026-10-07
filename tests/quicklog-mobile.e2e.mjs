@@ -69,6 +69,44 @@ test('Quick Log remains fully usable and RTL-safe across narrow mobile viewports
 
   expect(errors).toEqual([]);
 });
+
+test('long Arabic Quick Log names and both card actions remain reachable in RTL light and dark', async ({ page }, testInfo) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await seedQuickLog(page);
+  await page.evaluate(async () => {
+    const student = window.store.getStudent('ql-mobile-student-0');
+    await window.store.save({ students: [{ ...student,
+      name: 'عبد الرحمن بن محمد بن عبد العزيز الطويل الاسم المركب' }] });
+  });
+  for (const theme of ['light', 'dark']) {
+    await page.goto('/#/settings');
+    await page.locator(`[data-act="theme"][data-theme="${theme}"]`).click();
+    for (const width of [1440, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/#/teaching/ql-mobile-teaching/quicklog');
+      const card = page.locator('#ql-ql-mobile-student-0');
+      const name = card.locator('.qlcard__name');
+      await expect(name).toContainText('عبد الرحمن بن محمد');
+      await expect(card.locator('[data-act="plus"]')).toBeVisible();
+      await expect(card.locator('[data-act="minus"]')).toBeVisible();
+      const geometry = await card.evaluate((element) => {
+        const name = element.querySelector('.qlcard__name').getBoundingClientRect();
+        const card = element.getBoundingClientRect();
+        const actions = [...element.querySelectorAll('[data-act="plus"], [data-act="minus"]')]
+          .map(node => node.getBoundingClientRect());
+        return { documentFits: document.documentElement.scrollWidth <= innerWidth,
+          rtl: document.documentElement.dir === 'rtl',
+          nameFits: name.left >= card.left && name.right <= card.right,
+          actionsFit: actions.every(box => box.width >= 24 && box.height >= 24 &&
+            box.left >= card.left && box.right <= card.right && box.top >= card.top && box.bottom <= card.bottom) };
+      });
+      expect(geometry).toEqual({ documentFits: true, rtl: true, nameFits: true, actionsFit: true });
+      await page.screenshot({ path: testInfo.outputPath(`n83-${theme}-${width}.png`), fullPage: true });
+    }
+  }
+  expect(errors).toEqual([]);
+});
 test('Quick Log renders available students before absent and excused students without changing actions', async ({ page }) => {
   await page.goto('/#/classes');
   await page.waitForFunction(() => window.store?.state.ready);

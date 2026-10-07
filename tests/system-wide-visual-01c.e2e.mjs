@@ -26,7 +26,15 @@ async function enterDemo(page) {
   await page.goto('/');
   const action = page.getByRole('button', { name: 'جرّب ركيز', exact: true });
   if (!await action.isVisible().catch(() => false)) {
-    await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+    const login = page.getByRole('button', { name: 'تسجيل الدخول' });
+    if (await login.isVisible().catch(() => false)) await login.click();
+    else {
+      await page.locator('[data-act="open-teacher-mini-hub"]:visible').first().click();
+      await page.locator('[data-act="demo-enter"]').click();
+      await page.waitForFunction(() => window.store?.state?.ready &&
+        window.store?.getActiveWorkspace()?.type === 'demo');
+      return;
+    }
   }
   await action.click();
   await page.waitForFunction(() => window.store?.state?.ready &&
@@ -104,9 +112,20 @@ test('Distribution copy selects a subset and leaves unselected eligible class un
 test('Demo editor supports automatic and manual subitem allocation with reviewed recalculation', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await enterDemo(page);
-  await page.goto('/#/teaching/demo:teaching:1/items');
-  const row = page.locator('.distribution-item').filter({ hasText: 'واجب' });
-  await row.getByRole('button', { name: 'تحرير العناصر' }).click();
+  const target = await page.evaluate(async () => {
+    const s = window.store;
+    const teaching = s.state.teachings.find(entry => !entry.deleted && entry.termId === s.activeTerm()?.id);
+    if (!teaching) throw new Error('Synthetic Demo teaching unavailable');
+    const item = { id: 'demo:n81:editor-item', teachingId: teaching.id, name: 'واجب اختبار N81',
+      max: 10, scoreMode: 'subitems', distributionMode: 'manual', order: 99 };
+    const scoreSubitems = [1, 2, 3].map((number, index) => ({ id: `demo:n81:subitem:${number}`,
+      itemId: item.id, name: `عنصر ${number}`, value: [4, 3, 3][index], order: index }));
+    await s.save({ items: [item], scoreSubitems });
+    return { teachingId: teaching.id, itemId: item.id };
+  });
+  await page.goto(`/#/teaching/${target.teachingId}/items`);
+  const row = page.locator('.distribution-item').filter({ hasText: 'واجب اختبار N81' });
+  await row.getByRole('button', { name: 'تحرير العناصر' }).dispatchEvent('click');
   const editor = page.getByRole('dialog');
   await expect(editor.locator('[data-subitem-row]')).toHaveCount(3);
   await editor.getByRole('button', { name: 'توزيع تلقائي' }).click();
@@ -114,27 +133,39 @@ test('Demo editor supports automatic and manual subitem allocation with reviewed
   await assertMobileSheetFits(page, editor);
   await page.screenshot({ path: testInfo.outputPath('auto-editor-390.png'), fullPage: true });
   await editor.getByRole('button', { name: 'توزيع يدوي' }).click();
+  await editor.locator('[data-subitem-value]').nth(0).fill('1.234');
+  expect(await editor.locator('[data-subitem-value]').nth(0).evaluate(input => input.checkValidity())).toBe(false);
+  await editor.getByRole('button', { name: 'حفظ العناصر' }).click();
+  await expect(editor).toBeVisible();
   await editor.locator('[data-subitem-value]').nth(0).fill('4');
   await editor.locator('[data-subitem-value]').nth(1).fill('3');
   await editor.locator('[data-subitem-value]').nth(2).fill('3');
   await expect(editor.locator('[data-subitem-total]')).toHaveText('10.00 / 10');
+  await editor.getByRole('button', { name: 'توزيع تلقائي' }).click();
+  await editor.getByRole('button', { name: 'توزيع يدوي' }).click();
+  const visibleNumbers = await editor.locator('[data-subitem-value]').evaluateAll((inputs) => inputs.map((input) => input.value));
+  expect(visibleNumbers).toEqual(['3.33', '3.33', '3.34']);
+  expect(visibleNumbers.join('')).toMatch(/^[0-9.]+$/);
+  await editor.locator('[data-subitem-value]').nth(0).fill('4');
+  await editor.locator('[data-subitem-value]').nth(1).fill('3');
+  await editor.locator('[data-subitem-value]').nth(2).fill('3');
   await page.screenshot({ path: testInfo.outputPath('manual-editor-390.png'), fullPage: true });
   await editor.getByRole('button', { name: 'حفظ العناصر' }).click();
   const confirmation = page.getByRole('dialog');
   await expect(confirmation).toContainText('مراجعة تغيير توزيع الدرجات');
   await confirmation.getByRole('button', { name: 'تأكيد التغيير' }).click();
   await expect(confirmation).toHaveCount(0);
-  await expect.poll(() => page.evaluate(() => window.store.state.items
-    .find((entry) => entry.id === 'demo:item:1:1')?.distributionMode)).toBe('manual');
-  const updated = await page.evaluate(() => ({
-    item: window.store.state.items.find((entry) => entry.id === 'demo:item:1:1'),
-    values: window.store.scoreSubitemsOf('demo:item:1:1').map((entry) => entry.value),
-  }));
+  await expect.poll(() => page.evaluate(itemId => window.store.state.items
+    .find((entry) => entry.id === itemId)?.distributionMode, target.itemId)).toBe('manual');
+  const updated = await page.evaluate(itemId => ({
+    item: window.store.state.items.find((entry) => entry.id === itemId),
+    values: window.store.scoreSubitemsOf(itemId).map((entry) => entry.value),
+  }), target.itemId);
   expect(updated.item.distributionMode).toBe('manual');
   expect(updated.values).toEqual([4, 3, 3]);
   await page.reload();
   await expect(page.locator('.distribution-panel')).toBeVisible();
-  expect(await page.evaluate(() => window.store.scoreSubitemsOf('demo:item:1:1').map((entry) => entry.value))).toEqual([4, 3, 3]);
+  expect(await page.evaluate(itemId => window.store.scoreSubitemsOf(itemId).map((entry) => entry.value), target.itemId)).toEqual([4, 3, 3]);
   expect(await page.evaluate(async () => (await (await import('/src/lib/db.js')).getAll('outbox')).length)).toBe(0);
 });
 
