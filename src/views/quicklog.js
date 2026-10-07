@@ -188,9 +188,11 @@ export default {
                     <button class="qlcard__hit" data-act="plus" data-id="${s.id}"
                             aria-label="نقطة لـ ${s.name}">
                       <div class="qlcard__head">
-                        ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
+                        <div class="qlcard__meta">
+                          ${s.rollNo != null ? html`<span class="qlcard__roll tabular">${s.rollNo}</span>` : ''}
+                          ${statusBadge}
+                        </div>
                         <span class="qlcard__name">${s.name}</span>
-                        ${statusBadge}
                       </div>
                       <div class="qlcard__foot">
                         <span class="qlcard__score tabular">${c.total > 0 ? '+' : ''}${c.total}</span>
