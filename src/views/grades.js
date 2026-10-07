@@ -8,6 +8,7 @@ import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
 import { itemScore, studentTotal, masteryBand, normalizeSearchText } from '../models.js';
 import { repaint } from '../repaint.js';
+import { inlineQuickLog, recordInlineQuickLog, flushInlineQuickLogEffect } from '../lib/work-n84-inline.js';
 
 let mode = 'item';        // item | table
 let activeItemId = null;
@@ -191,7 +192,10 @@ export default {
     `;
   },
 
+  afterPaint: flushInlineQuickLogEffect,
+
   actions: {
+    'n84-log': recordInlineQuickLog,
     mode(el) {
       mode = el.dataset.mode;
       bulkSelected.clear();
@@ -410,6 +414,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                   ${auto
                     ? html`
                         <span class="graderow__auto">
+                          ${inlineQuickLog(item, s)}
                           <span class="badge ${band.badge}" dir="ltr">
                             <span class="tabular">${fmtNum(value)}</span> / <span class="tabular">${item.max}</span>
                           </span>
@@ -509,7 +514,7 @@ function tableMode(roster, items, ctx) {
                 ${items.map((i) => {
                   const v = itemScore(i, ctx[s.id]);
                   if (i.auto || i.scoreMode === 'subitems') {
-                    return html`<td class="is-auto tabular">${fmtNum(v)}</td>`;
+                    return html`<td class="is-auto tabular">${inlineQuickLog(i, s)}<span>${fmtNum(v)}</span></td>`;
                   }
                   return html`
                     <td>
