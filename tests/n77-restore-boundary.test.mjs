@@ -85,7 +85,7 @@ test('mixed immutable report is projected without rewriting its bytes or shared 
   const data = { sections: [{ id: 'section:shared' }], teachings: [
     { id: 'teaching:gone', sectionId: 'section:shared', deleted: true },
     { id: 'teaching:kept', sectionId: 'section:shared', deleted: false },
-  ] };
+  ], items: [{ id: 'item:gone', teachingId: 'teaching:gone' }] };
   const report = { id: 'report:immutable', payload: {
     teachingDocuments: [
       { teaching: { id: 'teaching:gone' }, section: { id: 'section:shared' }, membership: [] },
@@ -95,7 +95,12 @@ test('mixed immutable report is projected without rewriting its bytes or shared 
       { teaching: { id: 'teaching:gone' }, section: { id: 'section:shared' }, completeness: { state: 'completed' } },
       { teaching: { id: 'teaching:kept' }, section: { id: 'section:shared' }, completeness: { state: 'pending' } },
     ], counts: { generated: 2, completed: 1, pending: 1 }, sections: 1, students: 2, percentage: 50 },
-  } };
+  }, sourceManifest: [
+    { entity: 'teachings', id: 'teaching:gone', revision: 1 },
+    { entity: 'items', id: 'item:gone', revision: 1 },
+    { entity: 'teachings', id: 'teaching:kept', revision: 1 },
+    { entity: 'sections', id: 'section:shared', revision: 1 },
+  ] };
   const before = structuredClone(report);
   const visible = visibleClosedTermReport(report, deletionScope(data, data));
   assert.deepEqual(report, before);
@@ -103,6 +108,39 @@ test('mixed immutable report is projected without rewriting its bytes or shared 
   assert.deepEqual(visible.payload.executionDocument.counts,
     { generated: 1, completed: 0, pending: 1, future: 0, excluded: 0 });
   assert.equal(visible.payload.executionDocument.students, 1);
+  assert.deepEqual(visible.sourceManifest.map((entry) => entry.id), ['teaching:kept', 'section:shared']);
+  assert.equal(visibleClosedTermReport(visible, deletionScope(data, data)), visible);
+  const manifestOnly = { ...report, payload: { teachingDocuments: [report.payload.teachingDocuments[1]] } };
+  const manifestOnlyProjection = visibleClosedTermReport(manifestOnly, deletionScope(data, data));
+  assert.equal(manifestOnlyProjection.payload, manifestOnly.payload);
+  assert.deepEqual(manifestOnlyProjection.sourceManifest.map((entry) => entry.id),
+    ['teaching:kept', 'section:shared']);
+});
+
+test('a deleted Section is absent from projected manifest while active scope stays byte-for-byte visible', () => {
+  const data = { sections: [{ id: 'section:gone', deleted: true }, { id: 'section:kept', deleted: false }], teachings: [
+    { id: 'teaching:gone', sectionId: 'section:gone', deleted: false },
+    { id: 'teaching:kept', sectionId: 'section:kept', deleted: false },
+  ] };
+  const report = { id: 'report:sections', payload: { teachingDocuments: [
+    { teaching: { id: 'teaching:gone' }, section: { id: 'section:gone' } },
+    { teaching: { id: 'teaching:kept' }, section: { id: 'section:kept' } },
+  ] }, sourceManifest: [
+    { entity: 'sections', id: 'section:gone', revision: 2 },
+    { entity: 'teachings', id: 'teaching:gone', revision: 2 },
+    { entity: 'sections', id: 'section:kept', revision: 3 },
+    { entity: 'teachings', id: 'teaching:kept', revision: 3 },
+    { entity: 'students', id: 'student:shared', revision: 4 },
+  ] };
+  const before = structuredClone(report);
+  const projected = visibleClosedTermReport(report, deletionScope(data, data));
+  assert.deepEqual(report, before);
+  assert.deepEqual(projected.sourceManifest, before.sourceManifest.slice(2));
+  assert.deepEqual(projected.payload.teachingDocuments, [before.payload.teachingDocuments[1]]);
+  const active = { ...data, sections: data.sections.slice(1), teachings: data.teachings.slice(1) };
+  const activeReport = { id: 'report:active', payload: { teachingDocuments: [before.payload.teachingDocuments[1]] },
+    sourceManifest: before.sourceManifest.slice(2) };
+  assert.equal(visibleClosedTermReport(activeReport, deletionScope(active, active)), activeReport);
 });
 
 test('Product report and backup export suppress deleted snapshot scope while IndexedDB retains immutable bytes', async () => {
@@ -112,7 +150,11 @@ test('Product report and backup export suppress deleted snapshot scope while Ind
   await db.put('sections', { id: 'section:shared', yearId: 'year:x', deleted: false });
   await db.put('teachings', { id: 'teaching:gone', sectionId: 'section:shared', deleted: true });
   await db.put('teachings', { id: 'teaching:kept', sectionId: 'section:shared', deleted: false });
-  const original = { id: 'report:mixed', termId: 'term:x', deleted: false, payload: {
+  const original = { id: 'report:mixed', termId: 'term:x', deleted: false, sourceManifest: [
+    { entity: 'teachings', id: 'teaching:gone', revision: 1 },
+    { entity: 'teachings', id: 'teaching:kept', revision: 1 },
+    { entity: 'sections', id: 'section:shared', revision: 1 },
+  ], payload: {
     teachingDocuments: [
       { teaching: { id: 'teaching:gone' }, section: { id: 'section:shared' } },
       { teaching: { id: 'teaching:kept' }, section: { id: 'section:shared' } },
@@ -126,8 +168,13 @@ test('Product report and backup export suppress deleted snapshot scope while Ind
     const backup = await buildBackup({ sourceOwnerId: A });
     assert.deepEqual(backup.data.closedTermReports[0].payload.teachingDocuments
       .map((doc) => doc.teaching.id), ['teaching:kept']);
+    assert.deepEqual(backup.data.closedTermReports[0].sourceManifest.map((entry) => entry.id),
+      ['teaching:kept', 'section:shared']);
+    assert.deepEqual(store.latestClosedTermReport('term:x').sourceManifest.map((entry) => entry.id),
+      ['teaching:kept', 'section:shared']);
     assert.deepEqual((await db.get('closedTermReports', original.id)).payload.teachingDocuments,
       original.payload.teachingDocuments);
+    assert.deepEqual((await db.get('closedTermReports', original.id)).sourceManifest, original.sourceManifest);
   } finally {
     store.closeChannel();
     db.closeDB();

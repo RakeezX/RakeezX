@@ -1,4 +1,9 @@
 /** Read-only projection of server-authoritative N77 deletion ancestry. */
+import { SYNC_V2_SCHEMAS } from './sync-v2.js';
+
+const MANIFEST_STORES = new Map(Object.entries(SYNC_V2_SCHEMAS)
+  .map(([store, schema]) => [schema.entity, store]));
+
 const PARENTS = Object.freeze({
   teachings: [['sectionId', 'sections']],
   enrollments: [['sectionId', 'sections']],
@@ -65,6 +70,12 @@ export function deletionScope(backupData, serverData, { trustBackupTombstones = 
 export function visibleClosedTermReport(report, scope) {
   if (!report?.payload || !scope) return report;
   const payload = report.payload;
+  const sourceManifest = Array.isArray(report.sourceManifest) ? report.sourceManifest.filter((entry) => {
+    const store = MANIFEST_STORES.get(entry.entity);
+    return !store || !scope.deleted(store, entry.id);
+  }) : report.sourceManifest;
+  const manifestChanged = sourceManifest !== report.sourceManifest &&
+    sourceManifest.length !== report.sourceManifest.length;
   const teachingDocuments = (payload.teachingDocuments ?? []).filter((document) =>
     scope.has('teachings', document.teaching?.id) && scope.has('sections', document.section?.id) &&
     !scope.deleted('teachings', document.teaching?.id) && !scope.deleted('sections', document.section?.id));
@@ -80,16 +91,18 @@ export function visibleClosedTermReport(report, scope) {
       !scope.deleted('sections', row.section?.id));
     changed ||= teachings.length !== (executionDocument.teachings ?? []).length ||
       rows.length !== (executionDocument.rows ?? []).length;
-    if (!changed) return report;
-    const counts = { generated: rows.length, completed: 0, pending: 0, future: 0, excluded: 0 };
-    for (const row of rows) if (Object.hasOwn(counts, row.completeness?.state)) counts[row.completeness.state]++;
-    const eligible = counts.completed + counts.pending;
-    const sections = new Set(teachingDocuments.map((document) => document.section?.id).filter(Boolean));
-    const memberships = new Set(teachingDocuments.flatMap((document) => document.membership ?? [])
-      .filter((row) => row.status === 'active').map((row) => row.id));
-    executionDocument = { ...executionDocument, teachings, rows, counts, sections: sections.size,
-      students: memberships.size, percentage: eligible ? Math.round(counts.completed / eligible * 100) : null };
+    if (changed) {
+      const counts = { generated: rows.length, completed: 0, pending: 0, future: 0, excluded: 0 };
+      for (const row of rows) if (Object.hasOwn(counts, row.completeness?.state)) counts[row.completeness.state]++;
+      const eligible = counts.completed + counts.pending;
+      const sections = new Set(teachingDocuments.map((document) => document.section?.id).filter(Boolean));
+      const memberships = new Set(teachingDocuments.flatMap((document) => document.membership ?? [])
+        .filter((row) => row.status === 'active').map((row) => row.id));
+      executionDocument = { ...executionDocument, teachings, rows, counts, sections: sections.size,
+        students: memberships.size, percentage: eligible ? Math.round(counts.completed / eligible * 100) : null };
+    }
   }
-  if (!changed) return report;
-  return { ...report, payload: { ...payload, teachingDocuments, executionDocument } };
+  if (!changed && !manifestChanged) return report;
+  return { ...report, sourceManifest: manifestChanged ? sourceManifest : report.sourceManifest,
+    payload: changed ? { ...payload, teachingDocuments, executionDocument } : payload };
 }
