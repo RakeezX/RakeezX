@@ -41,7 +41,7 @@ function profile(report = null) {
 }
 
 export default {
-  title: () => 'تقارير التنفيذ', subtitle: () => (yearId ? store.getYear(yearId)?.label : store.activeYear()?.label) ?? '', back: () => archiveRoute ? '#/archive' : '#/reports', wide: true,
+  title: () => archiveRoute ? 'تقارير التنفيذ' : 'الحصص والحضور', subtitle: () => (yearId ? store.getYear(yearId)?.label : store.activeYear()?.label) ?? '', back: () => archiveRoute ? '#/archive' : '#/reports', wide: true,
   onMount(params = {}) { termId = params.termId ?? store.activeTerm()?.id ?? null; yearId = params.yearId ?? null; archiveRoute = !!params.termId; status = 'all'; teachingId = 'all'; from = ''; to = ''; },
   render() {
     const report = scoped(); const rows = filters(report); const selectedTerm = store.getTerm(termId) ?? store.activeTerm();
@@ -49,10 +49,10 @@ export default {
     return html`
       <article class="print-report print-report--execution report-workspace execution-report-page" dir="rtl">
         ${reportPageSetup()}
-        ${reportHeader({ title: 'تقرير تنفيذ الحصص', profile: profile(report), year: report.snapshotIdentity?.year?.label ?? store.getYear(yearId ?? selectedTerm?.yearId)?.label ?? store.activeYear()?.label ?? '', term: report.snapshotIdentity?.term?.name ?? selectedTerm?.name ?? '', period: contextLabel(report) })}
+        ${reportHeader({ title: archiveRoute ? 'تقرير تنفيذ الحصص' : 'تقرير الحصص والحضور', profile: profile(report), year: report.snapshotIdentity?.year?.label ?? store.getYear(yearId ?? selectedTerm?.yearId)?.label ?? store.activeYear()?.label ?? '', term: report.snapshotIdentity?.term?.name ?? selectedTerm?.name ?? '', period: contextLabel(report) })}
         <header class="report-workspace__head noprint">
-          <div><span class="report-workspace__eyebrow">تقرير مجمّع</span><h2>تنفيذ الحصص</h2><p>تابع اكتمال الرصد عبر الفصول والحصص المؤرخة.</p>${demoOutputMarker({ screenOnly: true })}</div>
-          <span class="badge tabular">${rows.length} نتيجة</span>
+          <div><span class="report-workspace__eyebrow">${archiveRoute ? 'تقرير مجمّع' : 'تقارير جميع الفصول'}</span><h2>${archiveRoute ? 'تنفيذ الحصص' : 'الحصص والحضور'}</h2><p>${archiveRoute ? 'تابع اكتمال الرصد عبر الفصول والحصص المؤرخة.' : 'استعرض الحصص وحالة رصد الحضور عبر الفصول، مع إمكانية التصفية والطباعة.'}</p>${demoOutputMarker({ screenOnly: true })}</div>
+          ${archiveRoute ? html`<span class="badge tabular">${rows.length} نتيجة</span>` : html`<div class="execution-report-head-actions"><span class="badge tabular">${rows.length} نتيجة</span><button class="btn btn--primary" data-act="print">${icon('print')} طباعة التقرير</button></div>`}
         </header>
         <div class="surface surface--flat report-filters noprint" aria-label="عوامل تصفية تقرير التنفيذ">
           <div class="field-row"><label class="field"><span class="field__label">الفصل الدراسي</span><select class="select" data-change="term" ${archiveRoute ? 'disabled' : ''}>${store.termsOf(yearId ?? store.activeYear()?.id).map((term) => html`<option value="${term.id}" ${term.id === termId ? 'selected' : ''}>${term.name}</option>`)}</select></label><label class="field"><span class="field__label">الحالة</span><select class="select" data-change="status"><option value="all">كل الحالات</option><option value="pending" ${status === 'pending' ? 'selected' : ''}>لم يُرصد الحضور</option><option value="completed" ${status === 'completed' ? 'selected' : ''}>تم رصد الحضور</option><option value="future" ${status === 'future' ? 'selected' : ''}>مجدولة</option></select></label></div>
@@ -62,7 +62,7 @@ export default {
         <section class="report-results"><div class="section__head noprint"><div class="section__title">تفاصيل الحصص</div><span class="t-3 fs-sm tabular">${rows.length} نتيجة</span></div>${!rows.length ? html`<div class="empty empty--compact"><div class="empty__title">${emptyTerm ? `لا توجد بيانات تنفيذ في ${selectedTerm?.name ?? 'الفصل الدراسي المحدد'}.` : 'لا توجد حصص مطابقة'}</div><div class="empty__text">${emptyTerm ? 'غيّر الفصل الدراسي أو عوامل التصفية لمراجعة فترة أخرى.' : 'غيّر عوامل التصفية أو نطاق التاريخ.'}</div></div>` : executionTable(rows)}</section>
         ${reportSignatures({ profile: profile(report) })}
         ${reportFooter()}
-        <div class="btn-row mt-6 noprint report-actions"><button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>
+        <div class="btn-row mt-6 noprint report-actions">${archiveRoute ? html`<button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button>` : ''}<button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>
       </article>`;
   },
   actions: {

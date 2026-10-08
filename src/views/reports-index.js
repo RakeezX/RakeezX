@@ -85,7 +85,7 @@ export default {
         <section class="surface surface--flat report-hub" aria-labelledby="aggregate-reports-title">
           <div class="report-hub__head">
             <div>
-              <h2 class="report-hub__title" id="aggregate-reports-title">جميع الفصول</h2>
+              <h2 class="report-hub__title" id="aggregate-reports-title">تقارير جميع الفصول</h2>
               <p class="report-hub__desc">ثلاثة ملخصات للمتابعة، وتبقى تفاصيل كل فصل في تقاريره.</p>
             </div>
           </div>

@@ -13,8 +13,12 @@
 .n70-report-table small { display:block; font-size:11px; color:var(--text-3); }
 .n70-person { font-weight:700; }
 .n70-reason { max-width:240px; }
+.execution-report-head-actions { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:12px; }
+.execution-report-head-actions .btn { white-space:nowrap; }
 @media(max-width:800px) { .n70-filters { grid-template-columns:repeat(2,minmax(0,1fr)); } .n70-search { grid-column:auto; } }
 @media(max-width:540px) {
+ .execution-report-page .report-workspace__head { flex-wrap:wrap; }
+ .execution-report-head-actions { justify-content:flex-start; }
  .n70-report-page .report-workspace__head { flex-wrap:wrap; gap:12px; }
  .n70-filters { padding:12px; gap:12px 8px; }
  .n70-report-table,.n70-report-table tbody { display:block; }
