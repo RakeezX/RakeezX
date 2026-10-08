@@ -249,9 +249,13 @@ export default {
         onMount: (root, done) => root.querySelector('[data-confirm]')?.addEventListener('click', () => done(true)),
       }).then((value) => value === true);
       if (!ok) return;
-      await store.deleteTeaching(params.id);
-      toast('حُذف الفصل');
-      go('/classes');
+      try {
+        await store.deleteTeaching(params.id);
+        toast('حُذف الفصل');
+        go('/classes');
+      } catch (error) {
+        toast(error.message || 'تعذّر حذف الفصل.', 'warn');
+      }
     },
     async 'edit-sec'(el, ev, params) {
       const tch = store.getTeaching(params.id);

@@ -2591,7 +2591,17 @@ export async function reopenSection(secId) {
 }
 
 /** حذف إسناد: يحذف بنوده ودرجاته وحصصه — **ولا يمس الطلاب ولا الشعبة**. */
+function requireSafeLegacyClassDelete() {
+  // D-120 rejects legacy queued Delete after this client has already cascaded locally.
+  // Only the isolated Demo workspace may use the old local-only path.
+  if (activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo') return;
+  throw Object.assign(new Error('حذف الفصل غير متاح في هذا الإصدار. حدّث ركيز ثم أعد المحاولة.'), {
+    code: 'N77_CLIENT_UPDATE_REQUIRED',
+  });
+}
+
 export async function deleteTeaching(tchId) {
+  requireSafeLegacyClassDelete();
   const evidence = teachingDeleteEvidence(tchId);
   if (evidence.length) throw new Error('لا يمكن حذف الإسناد لأنه يحتوي على بيانات محفوظة. استخدم أرشفة الفصل.');
   const itemIds = new Set(state.items.filter((i) => i.teachingId === tchId).map((i) => i.id));
@@ -2621,6 +2631,7 @@ export async function deleteTeaching(tchId) {
  * عندما تكون له علاقة مستقلة محفوظة خارج الفصل المحذوف.
  */
 export async function deleteClass(secId) {
+  requireSafeLegacyClassDelete();
   const evidence = sectionDeleteEvidence(secId);
   if (evidence.length) throw new Error('لا يمكن حذف الفصل لأنه يحتوي على بيانات محفوظة. استخدم الأرشفة بدلًا من الحذف.');
   const sectionTeachings = live(state.teachings).filter((t) => t.sectionId === secId);
@@ -2675,6 +2686,7 @@ export async function deleteClass(secId) {
  * الحذف المرئي للفصل يستخدم deleteClass أعلاه.
  */
 export async function deleteSection(secId) {
+  requireSafeLegacyClassDelete();
   for (const tch of live(state.teachings).filter((t) => t.sectionId === secId)) {
     await deleteTeaching(tch.id);
   }
