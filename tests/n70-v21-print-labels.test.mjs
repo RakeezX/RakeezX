@@ -35,7 +35,7 @@ test('N70 V2.1 normal and archive routes keep their distinct labels and print ac
     assert.match(hubMarkup, /id="aggregate-reports-title">تقارير جميع الفصول<\/h2>/);
     assert.ok(hubMarkup.indexOf('تقارير الفصول') < hubMarkup.indexOf('تقارير جميع الفصول'));
 
-    execution.onMount({ termId: 'ignored-dom-root' }, {});
+    execution.beforeRender({});
     const normal = String(execution.render());
     assert.equal(execution.title(), 'الحصص والحضور');
     assert.equal(execution.subtitle(), '1470–1471 هـ');
@@ -48,7 +48,7 @@ test('N70 V2.1 normal and archive routes keep their distinct labels and print ac
     assert.match(normal, /data-act="csv"/);
     assert.doesNotMatch(normal.match(/report-actions[\s\S]*?<\/div>/)?.[0] ?? '', /data-act="print"/);
 
-    execution.onMount({}, { yearId: year.id, termId: term.id });
+    execution.beforeRender({ yearId: year.id, termId: term.id });
     const archived = String(execution.render());
     assert.equal(execution.title(), 'تقارير التنفيذ');
     assert.equal(execution.subtitle(), '1470–1471 هـ');

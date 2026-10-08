@@ -557,6 +557,7 @@ async function resolve() {
 
   view = mod.default;
   ctx = found;
+  view.beforeRender?.(found.params);
 
   if (found.route.path === '/support') enterSupportVisit(supportAccountKey());
 

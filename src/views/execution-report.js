@@ -42,7 +42,7 @@ function profile(report = null) {
 
 export default {
   title: () => archiveRoute ? 'تقارير التنفيذ' : 'الحصص والحضور', subtitle: () => (yearId ? store.getYear(yearId)?.label : store.activeYear()?.label) ?? '', back: () => archiveRoute ? '#/archive' : '#/reports', wide: true,
-  onMount(_root, params = {}) { termId = params.termId ?? store.activeTerm()?.id ?? null; yearId = params.yearId ?? null; archiveRoute = !!params.termId; status = 'all'; teachingId = 'all'; from = ''; to = ''; },
+  beforeRender(params = {}) { termId = params.termId ?? store.activeTerm()?.id ?? null; yearId = params.yearId ?? null; archiveRoute = !!params.termId; status = 'all'; teachingId = 'all'; from = ''; to = ''; },
   render() {
     const report = scoped(); const rows = filters(report); const selectedTerm = store.getTerm(termId) ?? store.activeTerm();
     const emptyTerm = !report.teachings.length && !report.rows.length;
