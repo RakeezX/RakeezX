@@ -2,7 +2,7 @@ import '../lib/rakeez-datetime.js';
 /** تقارير التنفيذ المجمعة: بيانات الحصص المؤرخة فقط. */
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
-import { downloadCSV } from '../lib/export.js';
+import { downloadCSV, safeReportCSVText } from '../lib/export.js';
 import { demoOutputMarker, markDemoExportRows, reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
@@ -52,7 +52,7 @@ export default {
         ${reportHeader({ title: archiveRoute ? 'تقرير تنفيذ الحصص' : 'تقرير الحصص والحضور', profile: profile(report), year: report.snapshotIdentity?.year?.label ?? store.getYear(yearId ?? selectedTerm?.yearId)?.label ?? store.activeYear()?.label ?? '', term: report.snapshotIdentity?.term?.name ?? selectedTerm?.name ?? '', period: contextLabel(report) })}
         <header class="report-workspace__head noprint">
           <div><span class="report-workspace__eyebrow">${archiveRoute ? 'تقرير مجمّع' : 'تقارير جميع الفصول'}</span><h2>${archiveRoute ? 'تنفيذ الحصص' : 'الحصص والحضور'}</h2><p>${archiveRoute ? 'تابع اكتمال الرصد عبر الفصول والحصص المؤرخة.' : 'استعرض الحصص وحالة رصد الحضور عبر الفصول، مع إمكانية التصفية والطباعة.'}</p>${demoOutputMarker({ screenOnly: true })}</div>
-          ${archiveRoute ? html`<span class="badge tabular">${rows.length} نتيجة</span>` : html`<div class="execution-report-head-actions"><span class="badge tabular">${rows.length} نتيجة</span><button class="btn btn--primary" data-act="print">${icon('print')} طباعة التقرير</button></div>`}
+          ${archiveRoute ? html`<span class="badge tabular">${rows.length} نتيجة</span>` : html`<div class="execution-report-head-actions"><span class="badge tabular">${rows.length} نتيجة</span><button class="btn btn--primary" data-act="print">${icon('print')} طباعة التقرير</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>`}
         </header>
         <div class="surface surface--flat report-filters noprint" aria-label="عوامل تصفية تقرير التنفيذ">
           <div class="field-row"><label class="field"><span class="field__label">الفصل الدراسي</span><select class="select" data-change="term" ${archiveRoute ? 'disabled' : ''}>${store.termsOf(yearId ?? store.activeYear()?.id).map((term) => html`<option value="${term.id}" ${term.id === termId ? 'selected' : ''}>${term.name}</option>`)}</select></label><label class="field"><span class="field__label">الحالة</span><select class="select" data-change="status"><option value="all">كل الحالات</option><option value="pending" ${status === 'pending' ? 'selected' : ''}>لم يُرصد الحضور</option><option value="completed" ${status === 'completed' ? 'selected' : ''}>تم رصد الحضور</option><option value="future" ${status === 'future' ? 'selected' : ''}>مجدولة</option></select></label></div>
@@ -62,7 +62,7 @@ export default {
         <section class="report-results"><div class="section__head noprint"><div class="section__title">تفاصيل الحصص</div><span class="t-3 fs-sm tabular">${rows.length} نتيجة</span></div>${!rows.length ? html`<div class="empty empty--compact"><div class="empty__title">${emptyTerm ? `لا توجد بيانات تنفيذ في ${selectedTerm?.name ?? 'الفصل الدراسي المحدد'}.` : 'لا توجد حصص مطابقة'}</div><div class="empty__text">${emptyTerm ? 'غيّر الفصل الدراسي أو عوامل التصفية لمراجعة فترة أخرى.' : 'غيّر عوامل التصفية أو نطاق التاريخ.'}</div></div>` : executionTable(rows)}</section>
         ${reportSignatures({ profile: profile(report) })}
         ${reportFooter()}
-        <div class="btn-row mt-6 noprint report-actions">${archiveRoute ? html`<button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button>` : ''}<button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>
+        ${archiveRoute ? html`<div class="btn-row mt-6 noprint report-actions"><button class="btn btn--primary" data-act="print">${icon('print')} طباعة</button><button class="btn btn--ghost" data-act="csv">${icon('download')} تصدير CSV</button></div>` : ''}
       </article>`;
   },
   actions: {
@@ -113,7 +113,7 @@ export default {
     async identity() {
       return this.print();
     },
-    csv() { const rows = filters(scoped()); if (!rows.length) { emptyExecutionNotice(); return; } const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; out.push([fmtDate(row.session.date, false), sectionLabel(row.section), subject, row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', markDemoExportRows(out)); toast('نُزّل تقرير تنفيذ الحصص'); },
+    csv() { const rows = filters(scoped()); if (!rows.length) { emptyExecutionNotice(); return; } const out = [['التاريخ', 'الفصل', 'المادة', 'الحصة', 'الوقت', 'حالة التنفيذ', 'الحضور المرصود', 'الطلاب المتوقعون']]; for (const row of rows) { const subject = row.subject?.name ?? store.getSubject(row.teaching?.subjectId)?.name ?? ''; const section = sectionLabel(row.section); out.push([fmtDate(row.session.date, false), archiveRoute ? section : safeReportCSVText(section), archiveRoute ? subject : safeReportCSVText(subject), row.session.period, formatTimeRange(row.session.startTime, row.session.endTime), statusText(row.completeness.state), row.completeness.recorded || '', row.completeness.expected || '']); } downloadCSV('تنفيذ-الحصص.csv', markDemoExportRows(out)); toast('نُزّل تقرير تنفيذ الحصص'); },
   },
 };
 

@@ -46,6 +46,39 @@ test('N70 routes, class hierarchy, report reasons and filters use current Produc
     assert.match(grades, /طباعة التقرير/);
     assert.match(grades, /data-change="n70-grade"/);
     assert.match(grades, /data-change="n70-filter"/);
+    assert.equal((grades.match(/data-act="n70-csv"/g) || []).length, 1);
+
+    const originalCreate = URL.createObjectURL;
+    const originalRevoke = URL.revokeObjectURL;
+    let blob = null;
+    let filename = '';
+    URL.createObjectURL = (value) => { blob = value; return 'blob:n70-test'; };
+    URL.revokeObjectURL = () => {};
+    document.createElement = () => ({ style: {}, click() { filename = this.download; }, remove() {} });
+    document.body = { append() {} };
+    try {
+      crossClass.actions['n70-csv']();
+      assert.equal(filename, 'درجات-جميع-الفصول.csv');
+      const gradeCSV = await blob.text();
+      assert.deepEqual([...new Uint8Array(await blob.arrayBuffer()).slice(0, 3)], [0xef, 0xbb, 0xbf]);
+      assert.match(gradeCSV, /طالب الاختبار/);
+      assert.match(gradeCSV, /,2,10,20,/);
+      assert.doesNotMatch(gradeCSV, /n70-student|n70-teaching|n70-score/);
+
+      location.hash = '#/reports/followup';
+      crossClass.onMount();
+      crossClass.actions['n70-csv']();
+      assert.equal(filename, 'متابعة-الطلاب-جميع-الفصول.csv');
+      assert.match(await blob.text(), /الدرجات دون 50٪/);
+
+      blob = null;
+      crossClass.actions['n70-search']({ value: 'لا يوجد طالب' });
+      crossClass.actions['n70-csv']();
+      assert.equal(blob, null, 'zero visible rows must not download');
+    } finally {
+      URL.createObjectURL = originalCreate;
+      URL.revokeObjectURL = originalRevoke;
+    }
 
     location.hash = '#/reports/followup';
     crossClass.onMount();
@@ -55,6 +88,18 @@ test('N70 routes, class hierarchy, report reasons and filters use current Produc
     assert.match(followup, /n70-class/);
     crossClass.actions['n70-search']({ value: 'لا يوجد طالب' });
     assert.match(String(crossClass.render()), /لا نتائج مطابقة/);
+
+    store.deactivateWorkspace('n70-owner-switch');
+    await activateSyntheticAccountWorkspace({ ownerId: '22222222-2222-4222-8222-222222222222' });
+    await db.clearAll();
+    await store.init();
+    for (const route of ['grades', 'followup']) {
+      location.hash = `#/reports/${route}`;
+      crossClass.onMount();
+      const isolated = String(crossClass.render());
+      assert.match(isolated, /لا نتائج مطابقة/);
+      assert.doesNotMatch(isolated, /طالب الاختبار|n70-student/);
+    }
   } finally {
     store.closeChannel();
     await db.closeDB();

@@ -4,6 +4,8 @@ import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel, normalizeSearchText } from '../models.js';
 import { supportRows } from './reports.js';
 import { reportHeader, reportFooter, reportPageSetup, reportSignatures, demoOutputMarker } from '../lib/report-print.js';
+import { markDemoExportRows } from '../lib/report-print.js';
+import { downloadCSV, safeReportCSVText } from '../lib/export.js';
 
 // Read-only Work report pages; calculations and support reasons stay in Product helpers.
 let termId = null, grade = 'all', teachingId = 'all', filter = 'all', query = '';
@@ -26,6 +28,20 @@ function reportRows() {
       filter === 'missing' ? row.total.missing > 0 : row.total.pct !== null)
   ));
 }
+
+export function crossClassCSVRows(rows, isFollowup) {
+  const columns = isFollowup
+    ? ['الطالب', 'الفصل', 'المادة', 'النسبة', 'الدرجة المرصودة', 'المجموع المرصود', 'سبب المتابعة']
+    : ['الطالب', 'الفصل', 'المادة', 'الدرجة المرصودة', 'المجموع المرصود', 'النسبة', 'حالة الرصد'];
+  return [columns, ...rows.map(row => {
+    const graded = row.total.outOfGraded > 0;
+    const score = graded ? [row.total.earned, row.total.outOfGraded, row.total.pct] : ['', '', ''];
+    const identity = [safeReportCSVText(row.s.name), safeReportCSVText(row.section), safeReportCSVText(row.subject)];
+    return isFollowup
+      ? [...identity, score[2], score[0], score[1], safeReportCSVText(row.reasons.join(' · '))]
+      : [...identity, ...score, safeReportCSVText(row.total.missing ? `${row.total.missing} بنود غير مرصودة` : 'الرصد مكتمل')];
+  })];
+}
 export default {
   title: reportTitle,
   subtitle: () => 'جميع الفصول',
@@ -41,7 +57,7 @@ export default {
     return html`<article class="print-report report-workspace n70-report-page" dir="rtl" data-report-kind="${followup() ? 'followup' : 'grades'}">
       ${reportPageSetup()}
       ${reportHeader({ title: reportTitle(), profile: store.state.profile, year: store.activeYear()?.label, term: selectedTerm?.name, period: context })}
-      <header class="report-workspace__head noprint"><div><span class="report-workspace__eyebrow">جميع الفصول</span><h2>${reportTitle()}</h2><p>${followup() ? 'الطالب وفصله وسبب المتابعة من السجلات الحالية.' : 'راجع الدرجات المرصودة عبر الفصول دون تغيير حسابها.'}</p>${demoOutputMarker({screenOnly:true})}</div><button type="button" class="btn btn--primary" data-act="n70-print">${icon('print')} طباعة التقرير</button></header>
+      <header class="report-workspace__head noprint"><div><span class="report-workspace__eyebrow">جميع الفصول</span><h2>${reportTitle()}</h2><p>${followup() ? 'الطالب وفصله وسبب المتابعة من السجلات الحالية.' : 'راجع الدرجات المرصودة عبر الفصول دون تغيير حسابها.'}</p>${demoOutputMarker({screenOnly:true})}</div><div class="n70-head-actions"><button type="button" class="btn btn--primary" data-act="n70-print">${icon('print')} طباعة التقرير</button><button type="button" class="btn btn--ghost" data-act="n70-csv">${icon('download')} تصدير CSV</button></div></header>
       <section class="surface surface--flat n70-filters noprint" aria-label="عوامل تصفية التقرير">
         <label class="field"><span class="field__label">الفصل الدراسي</span><select class="select" data-change="n70-term">${store.termsOf(store.activeYear()?.id).map(t => html`<option value="${t.id}" ${t.id===term()?'selected':''}>${t.name}</option>`)}</select></label>
         <label class="field"><span class="field__label">الصف</span><select class="select" data-change="n70-grade"><option value="all">جميع الصفوف</option>${grades.map(g => html`<option value="${g}" ${String(g)===grade?'selected':''}>${gradeLabel(g)}</option>`)}</select></label>
@@ -62,5 +78,12 @@ export default {
     'n70-search'(el){query=el.value;repaint();},
     'n70-reset'(){grade='all';teachingId='all';filter='all';query='';repaint();},
     'n70-print'(){if(!reportRows().length){toast('لا نتائج للطباعة','warn');return;}window.print();},
+    'n70-csv'(){
+      const rows = reportRows();
+      if (!rows.length) { toast('لا نتائج للتصدير', 'warn'); return; }
+      const isFollowup = followup();
+      downloadCSV(isFollowup ? 'متابعة-الطلاب-جميع-الفصول.csv' : 'درجات-جميع-الفصول.csv', markDemoExportRows(crossClassCSVRows(rows, isFollowup)));
+      toast('نُزّل التقرير');
+    },
   },
 };

@@ -46,6 +46,14 @@ export function downloadBlob(filename, blob) {
  */
 export const sanitizeExportText = (value) => visibleLatinDigits(value).replace(/[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]/g, '');
 
+// Use on user-entered text in report CSVs only; keep the shared serializer's
+// behavior for existing unrelated exports. A leading apostrophe is text in
+// spreadsheet apps, even after whitespace/control characters before a formula.
+export function safeReportCSVText(value) {
+  const text = sanitizeExportText(value);
+  return /^[\s\u0000-\u001f\u007f]*[=+\-@]/u.test(text) ? `'${text}` : text;
+}
+
 const cell = (v) => {
   const s = sanitizeExportText(v);
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
