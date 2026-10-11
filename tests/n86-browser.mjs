@@ -29,6 +29,8 @@ try {
   await page.evaluate(async () => {
     const store = await import('/src/store.js');
     const { repaint } = await import('/src/repaint.js');
+    const { todayISO } = await import('/src/models.js');
+    const fixtureDate = todayISO();
     const s = store.state;
     Object.assign(s, {
       years: [{ id: 'n86:y', label: '1448-1449', status: 'active' }],
@@ -39,10 +41,10 @@ try {
       students: ['a', 'b', 'negative'].map(id => ({ id, name: id === 'negative' ? 'طالب سالب مخفي' : 'طالب اصطناعي متطابق الاسم', status: 'active', note: 'PRIVATE_NOTE', score: 98765 })),
       enrollments: ['a', 'b', 'negative'].map(id => ({ id, studentId: id, sectionId: id === 'a' ? 'a' : 'b', status: 'active', rollNo: 1 })),
       logs: [
-        { teachingId: 'a', studentId: 'a', kind: 'participation', date: '2026-10-11', delta: 3 },
-        { teachingId: 'b', studentId: 'b', kind: 'participation', date: '2026-10-11', delta: 5 },
-        { teachingId: 'b', studentId: 'negative', kind: 'participation', date: '2026-10-11', delta: -8 },
-        { teachingId: 'b', studentId: 'b', kind: 'behavior', date: '2026-10-11', delta: 2 },
+        { teachingId: 'a', studentId: 'a', kind: 'participation', date: fixtureDate, delta: 3 },
+        { teachingId: 'b', studentId: 'b', kind: 'participation', date: fixtureDate, delta: 5 },
+        { teachingId: 'b', studentId: 'negative', kind: 'participation', date: fixtureDate, delta: -8 },
+        { teachingId: 'b', studentId: 'b', kind: 'behavior', date: fixtureDate, delta: 2 },
       ],
     });
     s.device.activeYearId = 'n86:y'; s.device.activeTermId = 'n86:tm';
@@ -55,7 +57,7 @@ try {
   await page.locator('[data-audience="grade"]').click();
   await page.waitForFunction(() => document.querySelectorAll('.board__podium-card').length === 2);
   assert.deepEqual(await page.locator('.board__podium-points').allTextContents(), ['+5', '+3']);
-  assert.match(await page.locator('.board-context').innerText(), /تختلف فرص المشاركة/);
+  assert.match(await page.locator('.board-context-note').innerText(), /تختلف فرص المشاركة/);
   assert.doesNotMatch(await page.locator('.excellence-board-page').innerText(), /PRIVATE_|98765|طالب سالب مخفي/);
   assert.equal(await page.locator('.board__section').count(), 2);
   const outputDir = process.env.N86_ARTIFACT_DIR || 'test-results/n86';
