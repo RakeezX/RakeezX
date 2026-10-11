@@ -10,5 +10,5 @@
 @media(max-width:540px) {
  .grades-01c__direct-row.is-auto:has(.n84-inline) { grid-template-columns:24px minmax(0,1fr) max-content; gap:6px; padding:10px 8px; }
  .graderow__auto:has(.n84-inline) { gap:2px; }
- .graderow__auto:has(.n84-inline) .badge { padding-inline:5px; font-size:11px; }
+ .graderow__auto:has(.n84-inline) .badge { padding-inline:5px; font-size:12px; }
 }
