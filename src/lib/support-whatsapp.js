@@ -1,5 +1,6 @@
-/** N79: text-only, user-reviewed handoff. No request or media is sent by RAKEEZ. */
+/** N79: safe one-tap prefill. The user edits and sends inside WhatsApp. */
 import { sanitizeSupportDiagnostics } from './support.js';
+import { resolveSupportWhatsAppContact } from './support-public-config.js';
 
 const TYPE_LABELS = Object.freeze({
   inquiry: 'مساعدة أو استفسار',
@@ -22,19 +23,15 @@ const DIAGNOSTIC_LABELS = Object.freeze({
 });
 
 export function supportWhatsAppContact(value) {
-  const contact = String(value ?? '').trim();
-  // wa.me requires an international number with digits only. Reject placeholders and URLs.
-  return /^[1-9][0-9]{7,14}$/.test(contact) ? contact : null;
+  return resolveSupportWhatsAppContact(value);
 }
 
-export function supportWhatsAppMessage({ type, message = '', diagnostics = {} } = {}) {
-  const label = TYPE_LABELS[String(type ?? '')];
-  if (!label) throw new TypeError('Invalid support type');
-  const written = String(message ?? '').trim();
-  if (written.length > 4000) throw new TypeError('Support message is too long');
+export function supportWhatsAppMessage({ type, diagnostics = {} } = {}) {
+  const label = type == null ? null : TYPE_LABELS[String(type)];
+  if (type != null && !label) throw new TypeError('Invalid support type');
   const safe = sanitizeSupportDiagnostics(diagnostics);
-  const lines = ['طلب دعم ركيز', `نوع الطلب: ${label}`];
-  if (written) lines.push('', 'رسالة المستخدم:', written);
+  const lines = ['السلام عليكم، أحتاج مساعدتكم في ركيز.'];
+  if (label) lines.push(`نوع الطلب: ${label}`);
   lines.push('', 'معلومات تقنية عامة:');
   if (safe.environment) lines.push(`البيئة: ${{ production: 'الإنتاج', preview: 'المعاينة', other: 'أخرى' }[safe.environment]}`);
   if (safe.buildSha) {

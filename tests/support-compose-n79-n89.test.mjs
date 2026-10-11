@@ -9,7 +9,7 @@ const ownerId = '11111111-1111-4111-8111-111111111111';
 const otherId = '22222222-2222-4222-8222-222222222222';
 const workspace = { type: 'account', ownershipState: 'claimed', syncEligible: true, authUserId: ownerId };
 
-test('reviewed WhatsApp text and Edge email use the same bounded owner-safe diagnostic group', () => {
+test('safe WhatsApp text and local Edge email use the same bounded owner-safe diagnostic group', () => {
   const row = (owner, code, message) => ({ protocol: 'v2', state: 'rejected', ownerId: owner,
     store: 'sessions', lastError: { code, message }, patch: { studentName: 'PRIVATE_STUDENT' } });
   const rows = [row(ownerId, '22023', 'N58_SESSION_CONTEXT_REQUIRED SQL PRIVATE_SQL'),
@@ -34,13 +34,12 @@ test('reviewed WhatsApp text and Edge email use the same bounded owner-safe diag
   assert.deepEqual(groupRejectedSyncErrors(rows, { workspace: { ...workspace, authUserId: otherId }, ownerId }), []);
 });
 
-test('Support view prepares and reviews WhatsApp independently of in-app submission', async () => {
+test('Support direct handoff remains independent of in-app submission', async () => {
   const source = await readFile(new URL('../src/views/support.js', import.meta.url), 'utf8');
-  const review = source.split("async 'support-whatsapp-review'()")[1]?.split("'support-whatsapp-open'()")[0];
-  const open = source.split("'support-whatsapp-open'()")[1]?.split("'support-whatsapp-cancel'()")[0];
-  assert.ok(review && open);
-  assert.match(review, /currentRejectedSyncGroups\(\)/);
-  assert.match(review, /supportWhatsAppMessage/);
-  assert.match(open, /review\.accountKey !== supportAccountKey\(\)/);
-  assert.doesNotMatch(`${review}${open}`, /submitSupportRequest|mailto:|cloud\.request/);
+  const open = source.split("'support-whatsapp-open'()")[1]?.replace(/\/\/[^\n]*/g, '');
+  assert.ok(open);
+  assert.match(source, /currentRejectedSyncGroups\(\)/);
+  assert.match(open, /supportWhatsAppMessage/);
+  assert.match(open, /currentWhatsAppDiagnostics\(\)/);
+  assert.doesNotMatch(open, /await |draft\.message|submitSupportRequest|mailto:|cloud\.request/);
 });

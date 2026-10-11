@@ -5482,6 +5482,7 @@
 .n34-help-launcher:focus-visible { outline: 3px solid var(--info); outline-offset: 3px; }
 .support-page .support-layout { grid-template-columns: minmax(0, 1.42fr) minmax(220px, .78fr); }
 .support-page .support-request { order: -1; }
+.support-contact-rail { display: grid; gap: var(--sp-4); min-width: 0; }
 .support-page .support-contact { padding: var(--sp-4); box-shadow: none; }
 .support-page .support-contact .support-section-heading__icon { width: 32px; height: 32px; }
 .support-page .support-contact .support-section-heading h3 { font-size: var(--fs-base); }
@@ -5503,12 +5504,8 @@
 .support-page .support-contact__actions { gap: 6px; }
 .support-page .support-contact__actions .btn { min-height: 44px; padding-inline: 8px; font-size: var(--fs-sm); }
 .support-whatsapp { display: grid; gap: var(--sp-2); min-width: 0; }
-.support-whatsapp > .btn { min-height: 44px; justify-self: start; }
+.support-whatsapp > .btn { min-height: 44px; max-width: 100%; white-space: normal; justify-self: start; }
 .support-whatsapp__note { margin: 0; color: var(--text-2); font-size: var(--fs-sm); line-height: 1.55; }
-.support-whatsapp__review { display: grid; gap: var(--sp-3); min-width: 0; padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-sunk); }
-.support-whatsapp__review pre { margin: 0; padding: var(--sp-3); max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg-elev); color: var(--text); font: inherit; line-height: 1.6; }
-.support-whatsapp__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
-.support-whatsapp__actions .btn { min-height: 44px; max-width: 100%; white-space: normal; }
 .support-page .support-version-row {
   flex-direction: row;
   align-items: center;
