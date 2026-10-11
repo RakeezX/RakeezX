@@ -578,15 +578,27 @@
 /* ---------- لوحة التميز ---------- */
 .excellence-board-page .board-controls { flex-wrap: wrap; }
 .excellence-board-page .board-context { color: var(--text-2); font-size: 14px; line-height: 1.8; margin-block: var(--sp-3); }
-.excellence-board-page .board-context-note { display: block; color: var(--text-2); font-size: 12px; line-height: 1.5; }
-/* Keep the compact grade/subject/class count on one line; the fairness note remains below. */
+/* A single grade summary sentence below all controls. Smaller screens scroll just
+   this sentence sideways, retaining the complete readable text and no page overflow. */
 .excellence-board-page .board-context--grade {
   min-width: 0;
   max-width: 100%;
-  margin-block-end: 2px;
-  font-size: clamp(10.5px, 3.2vw, 14px);
-  letter-spacing: -0.12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
   white-space: nowrap;
+  font-size: clamp(12px, 1.4vw, 14px);
+  line-height: 1.7;
+  margin-block: var(--sp-3);
+}
+.excellence-board-page .board-context--grade:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.excellence-board-page .board-context-inline-note {
+  color: var(--text-3);
+  font-size: inherit;
 }
 .excellence-board-page .board__section { display: block; font-size: 14px; font-weight: 400; color: var(--text-2); }
 .excellence-board-page .board-controls button { min-height: 44px; }

@@ -65,17 +65,23 @@ try {
    await page.setViewportSize({width:viewport,height:900});
    const title=await page.evaluate(()=>{
      const line=document.querySelector('.board-context--grade');
-     const note=document.querySelector('.board-context-note');
-     const rect=line.getBoundingClientRect(), sub=note.getBoundingClientRect();
-     return {text:line.textContent.trim(),space:getComputedStyle(line).whiteSpace,
-       scroll:line.scrollWidth,client:line.clientWidth,
-       noteBelow:sub.top>=rect.bottom-1, noteText:note.textContent.trim()};
+     const note=line.querySelector('.board-context-inline-note');
+     const style=getComputedStyle(line),outer=document.documentElement.scrollWidth;
+     line.scrollLeft=0;
+     const before=line.scrollLeft;
+     line.scrollLeft=-100;
+     return {text:line.textContent.trim(),space:style.whiteSpace,
+       overflow:style.overflowX,scroll:line.scrollWidth,client:line.clientWidth,
+       before,after:line.scrollLeft,keyboard:line.tabIndex,
+       noteInline:note?.parentElement===line,wholePage:outer};
    });
-   assert.equal(title.text,'الخامس الابتدائي · المهارات الرقمية · 9 فصول');
-   assert.equal(title.space,'nowrap','summary must remain a single line');
-   assert.ok(title.scroll<=title.client+1,'summary must fit '+viewport+'px: '+JSON.stringify(title));
-   assert.equal(title.noteBelow,true,'note should be directly below summary');
-   assert.equal(title.noteText,'من الرصد السريع · تختلف فرص المشاركة بين الفصول');
+   assert.equal(title.text,'الخامس الابتدائي · المهارات الرقمية · 9 فصول - من الرصد السريع · تختلف فرص المشاركة بين الفصول');
+   assert.equal(title.space,'nowrap','both summary and explanation must stay on the SAME line');
+   assert.equal(title.noteInline,true,'explanation belongs to one paragraph');
+   assert.equal(title.overflow,'auto','narrow screens scroll ONLY the sentence');
+   assert.equal(title.keyboard,0,'keyboard users can access long single line');
+   if(title.scroll>title.client+2)assert.notEqual(title.after,title.before,'overflowed line must be scrollable');
+   assert.ok(title.wholePage<=viewport+1,'sentence must not overflow the page');
    const details=await page.locator('.board__podium-card').evaluateAll(cards=>cards.map(card=>{
      const rect=card.getBoundingClientRect();
      const place=card.querySelector('.board__podium-place');

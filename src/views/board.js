@@ -144,10 +144,9 @@ export default {
           ${icon('board')} ملء الشاشة
         </button>
       </div>
-      <p class="board-context ${useGrade ? 'board-context--grade' : ''}" role="status">${useGrade
-        ? html`${gradeLabel(store.getSection(cls.sectionId)?.grade)} · ${store.getSubject(cls.subjectId)?.name} · ${comparable.length} فصول`
+      <p class="board-context ${useGrade ? 'board-context--grade' : ''}" role="status" tabindex="${useGrade ? 0 : -1}">${useGrade
+        ? html`${gradeLabel(store.getSection(cls.sectionId)?.grade)} · ${store.getSubject(cls.subjectId)?.name} · ${comparable.length} فصول - <span class="board-context-inline-note">من الرصد السريع · تختلف فرص المشاركة بين الفصول</span>`
         : 'نقاط الرصد السريع للفصل الحالي.'}</p>
-      ${useGrade ? html`<small class="board-context-note">من الرصد السريع · تختلف فرص المشاركة بين الفصول</small>` : ''}
 
       ${!anyPoints
         ? html`
