@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v37';
+const VERSION = 'rakeezx-v38';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -50,6 +50,7 @@ const SHELL = [
   './src/styles/schedule-work-integration.css',
   './src/styles/calendar-work-0417.css',
   './src/styles/rakeez-datetime.css',
+  './src/styles/work-n82.css',
   './src/styles/work-n70.css',
   './src/styles/work-n84.css',
 
