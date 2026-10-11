@@ -10,7 +10,8 @@ import { getScoreFoundationCapability } from './lib/cloud.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
-import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
+import { distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
+import { distributionTargets, planDistribution } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -3345,7 +3346,7 @@ const scoreFoundationScope = () => ({
   students: {}, sections: {}, teachings: {}, terms: {}, outbox: {},
 });
 
-async function commitScoreFoundation(prepare) {
+async function commitScoreFoundation(prepare, extraScope = {}) {
   assertCloudRestoreWritable();
   const isolatedDemo = activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
   if (!isolatedDemo && (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
@@ -3359,7 +3360,7 @@ async function commitScoreFoundation(prepare) {
       throw new Error('Score foundation server capability is unavailable');
     }
   }
-  const committed = await db.applyBatch(scoreFoundationScope(), { prepare });
+  const committed = await db.applyBatch({ ...scoreFoundationScope(), ...extraScope }, { prepare });
   const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
     .flatMap(([name, operations]) => (operations.put ?? []).map((row) => ({ store: name, id: row.id })));
   await absorb(changes);
@@ -3638,101 +3639,34 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
   return result;
 }
 
-function eligibleScoreCopyTargets(current, sourceTeachingId) {
-  const source = current.teachings.find((row) => row.id === sourceTeachingId && !row.deleted);
-  const sourceSection = current.sections.find((row) => row.id === source?.sectionId && !row.deleted);
-  const sourceTerm = current.terms.find((row) => row.id === source?.termId && !row.deleted);
-  if (!source || !sourceSection || !sourceTerm || sourceTerm.yearId !== sourceSection.yearId) {
-    throw new Error('Source teaching boundary is unavailable');
-  }
-  return current.teachings.filter((teaching) => {
-    if (teaching.deleted || teaching.sectionId === source.sectionId ||
-        teaching.subjectId !== source.subjectId || teaching.termId !== source.termId) return false;
-    const section = current.sections.find((row) => row.id === teaching.sectionId && !row.deleted);
-    return section && section.yearId === sourceSection.yearId && section.grade === sourceSection.grade &&
-      section.status !== 'archived';
-  }).sort((a, b) => a.id.localeCompare(b.id));
+/** D119 remains Demo-only until an atomic server copy protocol is available. */
+export function supportsDistributionCopy() {
+  return activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
 }
-
 export function previewScoreDistributionCopy(sourceTeachingId) {
-  const current = state;
-  const targets = eligibleScoreCopyTargets(current, sourceTeachingId);
-  const incoming = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
-    .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-  return targets.map((teaching) => ({
-    teachingId: teaching.id, sectionId: teaching.sectionId,
-    items: incoming.map((item) => ({ sourceItemId: item.id, ...classifyIncomingItem(item,
-      current.scoreSubitems.filter((row) => row.itemId === item.id),
-      current.items.filter((row) => row.teachingId === teaching.id), current.scoreSubitems) })),
-  }));
+  return distributionTargets(state, sourceTeachingId, activeWorkspace?.authUserId ?? null)
+    .map(teaching => ({ teachingId: teaching.id, sectionId: teaching.sectionId }));
 }
-
-/** One-time definition copy. A conflict choice is "keep" or "add"; replacement is unsupported. */
-export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachingIds, conflictChoices = {}) {
-  if (!Array.isArray(targetTeachingIds) || !targetTeachingIds.length ||
-      targetTeachingIds.some((id) => typeof id !== 'string' || !id) ||
-      new Set(targetTeachingIds).size !== targetTeachingIds.length) {
-    throw new Error('Copy requires distinct selected target IDs');
-  }
-  const selected = [...targetTeachingIds].sort();
-  const expected = new Set(previewScoreDistributionCopy(sourceTeachingId).map((row) => row.teachingId));
-  if (selected.some((id) => !expected.has(id))) throw new Error('Copy target is not eligible');
-  let result;
-  await commitScoreFoundation((current) => {
-    const currentTargets = new Set(eligibleScoreCopyTargets(current, sourceTeachingId).map((row) => row.id));
-    if (selected.some((id) => !currentTargets.has(id))) throw new Error('Copy target changed');
-    const sourceItems = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
-      .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-    const clonedItems = [];
-    const clonedSubitems = [];
-    const entries = [];
-    const classifications = [];
-    for (const teachingId of selected) for (const source of sourceItems) {
-      const sourceDefinitions = current.scoreSubitems.filter((row) => row.itemId === source.id && !row.deleted);
-      const classification = classifyIncomingItem(source, sourceDefinitions,
-        current.items.filter((row) => row.teachingId === teachingId), current.scoreSubitems);
-      const key = `${teachingId}:${source.id}`;
-      const choice = classification.kind === 'CONFLICTING' ? conflictChoices[key] : null;
-      if (classification.kind === 'CONFLICTING' && !['keep', 'add'].includes(choice)) {
-        throw new Error(`Distribution conflict requires an explicit choice: ${key}`);
-      }
-      classifications.push({ teachingId, sourceItemId: source.id, kind: classification.kind, choice });
-      if (classification.kind === 'EQUIVALENT' || choice === 'keep') continue;
-      const item = syncV2Record('items', makeItem({
-        teachingId, name: source.name, max: source.max, order: source.order,
-        auto: source.auto, perPoint: source.perPoint, penalty: source.penalty,
-        unitId: source.unitId, lessonId: source.lessonId,
-        scoreMode: source.scoreMode ?? 'direct', distributionMode: source.distributionMode ?? null,
-        distributionVersion: 1, portabilityGroupId: null, distributionOriginId: source.id,
-      }), { pendingCreate: true });
-      clonedItems.push(item);
-      const subitemIds = {};
-      for (const definition of sourceDefinitions) {
-        const clone = syncV2Record('scoreSubitems', makeScoreSubitem({
-          itemId: item.id, name: definition.name, value: definition.value, order: definition.order,
-          distributionVersion: 1,
-        }), { pendingCreate: true });
-        clonedSubitems.push(clone);
-        subitemIds[definition.id] = clone.id;
-      }
-      const entry = syncV2CommandEntry({ store: 'items', recordId: item.id,
-        command: 'score:copy_definition',
-        patch: { sourceItemId: source.id, sourceRevision: source.serverRevision ?? 0,
-          targetTeachingId: teachingId, newItemId: item.id, subitemIds,
-          conflictChoice: classification.kind === 'MISSING' ? 'missing' : 'add' },
-        dependencies: [
-          { store: 'items', recordId: source.id, requiresServerRevision: true },
-          { store: 'teachings', recordId: teachingId, requiresServerRevision: true },
-          ...sourceDefinitions.map((row) => ({ store: 'scoreSubitems', recordId: row.id,
-            requiresServerRevision: true })),
-        ],
-      });
-      if (entry) entries.push(entry);
-    }
-    result = { classifications, itemIds: clonedItems.map((row) => row.id),
-      subitemIds: clonedSubitems.map((row) => row.id) };
-    return { items: { put: clonedItems }, scoreSubitems: { put: clonedSubitems }, outbox: { put: entries } };
+export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds, options = {}) {
+  return planDistribution(state, sourceTeachingId, targetTeachingIds, {
+    ...options, ownerId: activeWorkspace?.authUserId ?? null, id: uid,
   });
+}
+export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachingIds, {
+  expectedToken, removeItemIds = [], confirmed = false,
+} = {}) {
+  if (!supportsDistributionCopy()) throw new Error('نسخ التوزيع الجديد متاح في التجربة فقط حتى اكتمال المزامنة الآمنة.');
+  if (typeof expectedToken !== 'string') throw new Error('راجع التوزيع قبل التطبيق.');
+  let result;
+  await commitScoreFoundation(current => {
+    const plan = planDistribution(current, sourceTeachingId, targetTeachingIds, {
+      ownerId: activeWorkspace?.authUserId ?? null, removeItemIds, id: uid, stamp: now(),
+    });
+    if (plan.token !== expectedToken) throw new Error('تغيّر التوزيع أو الدرجات منذ المراجعة. افتح المراجعة من جديد.');
+    if (plan.requiresConfirmation && !confirmed) throw new Error('تغييرات الدرجات تتطلب تأكيد الأثر.');
+    result = { changedCount: plan.changedCount, targets: plan.targets };
+    return plan.writes;
+  }, { units: {}, lessons: {} });
   return result;
 }
 

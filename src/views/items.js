@@ -249,8 +249,9 @@ export default {
     return html`<div class="classroom-tool-page grade-distribution-page distribution-01c">
       <section class="distribution-hero"><div><span class="eyebrow">${store.sectionLabel(section)} · ${cls.name}</span>
         <h1>توزيع الدرجات</h1><p>${items.length} بنود · المجموع ${total} درجة</p></div>
-        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
-          ${icon('classes')} تطبيق التوزيع على كل فصول المادة نفسها</button></section>
+        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !store.supportsDistributionCopy() ? 'disabled' : ''}>
+          ${icon('classes')} نسخ توزيع الدرجات إلى فصول أخرى</button></section>
+      ${!store.supportsDistributionCopy() ? html`<p class="score-01c-capability" role="status">نسخ التوزيع الجديد متاح في التجربة حتى اكتمال المزامنة الآمنة.</p>` : ''}
       ${foundationChecking ? html`<p class="score-01c-capability" role="status">جارٍ التحقق من توفر مزامنة التوزيع…</p>` :
         !supportsFoundation() ? html`<p class="score-01c-capability" role="status">الدرجة المباشرة متاحة. العناصر الفرعية ونسخ التوزيع ينتظران تحديث الخادم.</p>` : ''}
       <section class="distribution-panel"><header class="distribution-head"><div><h2>بنود التقييم</h2>
@@ -261,9 +262,9 @@ export default {
           <span class="distribution-name"><strong>${i.name}</strong><small>${i.max} درجات</small></span>
           <span class="mode-badge ${i.scoreMode === 'subitems' ? 'mode-badge--sub' : i.auto ? 'mode-badge--auto' : 'mode-badge--direct'}">
             ${i.scoreMode === 'subitems' ? 'عناصر فرعية' : i.auto ? 'رصد آلي' : 'درجة مباشرة'}</span>
-          <span class="distribution-actions"><button class="btn btn--ghost" data-act="${i.scoreMode === 'subitems' ? 'configure' : 'edit'}" data-id="${i.id}">
-            ${icon('edit')} ${i.scoreMode === 'subitems' ? 'تحرير العناصر' : 'تحرير'}</button>
-            ${i.scoreMode !== 'subitems' && supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">عناصر فرعية</button>` : ''}
+          <span class="distribution-actions"><button class="btn btn--ghost" data-act="edit" data-id="${i.id}">
+            ${icon('edit')} تحرير</button>
+            ${supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">البنود الفرعية</button>` : ''}
             <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''} aria-label="رفع ${i.name}">${icon('upload')}</button>
           </span></article>`)}</div></section>
       <aside class="copy-note">${icon('check')}<p><strong>النسخ إلى الفصول الأخرى عملية واحدة مستقلة.</strong>
@@ -301,74 +302,79 @@ export default {
     },
 
     async copy(el, ev, params) {
-      if (!await requireFoundation()) return;
-      const preview = store.previewScoreDistributionCopy(params.id);
-      if (!preview.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
+      if (!store.supportsDistributionCopy()) { toast('متاح في التجربة حتى اكتمال المزامنة الآمنة.', 'warn'); return; }
+      const targets = store.previewScoreDistributionCopy(params.id);
       const source = store.getTeaching(params.id);
-      const sourceSection = store.getSection(source.sectionId);
-      const selected = await openSheet({
-        title: 'تطبيق التوزيع على فصول المادة',
-        desc: 'عملية نسخ واحدة؛ تبقى الفصول مستقلة بعد التطبيق.',
-        body: html`<div class="copy-summary"><div><span>المصدر</span><strong>${store.sectionLabel(sourceSection)}</strong>
-          <small>${source.name}</small></div><div><span>التوزيع</span><strong>${store.items(params.id).length} بنود</strong>
-          <small>تُنسخ البنود والعناصر الفرعية فقط، دون درجات الطلاب.</small></div></div>
-          <fieldset class="target-list"><legend>الفصول المطابقة والمتاحة</legend>${preview.map((target) => html`
-            <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}" checked>
-              <span><strong>${store.sectionLabel(store.getSection(target.sectionId))}</strong><small>${source.name}</small></span></label>`)}</fieldset>
-          <aside class="review-callout"><strong>لن يتم تغيير درجات الطلاب الموجودة.</strong>
-            <p>لا تُنسخ درجات الطلاب أو اختيارات العناصر أو الإضافات اليدوية أو سجل أي طالب.</p></aside>`,
+      if (!targets.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
+      const selection = await openSheet({
+        title: 'نسخ توزيع الدرجات إلى فصول أخرى',
+        desc: 'اختر الفصول ثم راجع الأثر. لا تُنسخ درجات الطلاب أو سجلاتهم.',
+        body: html`<fieldset class="target-list"><legend>الفصول المستهدفة</legend>${targets.map(target => html`
+          <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}">
+            <span>${store.sectionLabel(store.getSection(target.sectionId))}</span></label>`)}</fieldset>
+          <div data-copy-review aria-live="polite"></div>`,
         foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" type="button" data-copy-next>مراجعة التطبيق</button>`,
+          <button class="btn btn--primary" data-copy-apply disabled>تطبيق التوزيع</button>`,
         onMount(root, done) {
-          const next = root.querySelector('[data-copy-next]');
-          const update = () => { next.disabled = !root.querySelector('[data-copy-target]:checked'); };
-          root.addEventListener('change', update);
-          next.addEventListener('click', () => done([...root.querySelectorAll('[data-copy-target]:checked')]
-            .map((input) => input.value)));
-          update();
-        },
-      });
-      if (!selected?.length) return;
-      const selectedSet = new Set(selected);
-      const review = preview.filter((target) => selectedSet.has(target.teachingId));
-      const choices = await openSheet({
-        title: 'مراجعة بنود الفصول المحددة',
-        desc: 'لا حذف ولا استبدال للدرجات أو البنود الحالية.',
-        body: html`<div class="conflict-list">${review.map((target) => html`<section class="target-review">
-          <h3>${store.sectionLabel(store.getSection(target.sectionId))}</h3>
-          ${target.items.map((item) => html`<div class="target-review__item">
-            <p><span class="review-status review-status--${item.kind === 'MISSING' ? 'add' : item.kind === 'EQUIVALENT' ? 'keep' : 'conflict'}">
-              ${item.kind === 'MISSING' ? 'سيتم إضافته' : item.kind === 'EQUIVALENT' ? 'موجود مسبقًا' : 'يوجد بند مختلف'}</span>
-              ${store.state.items.find((row) => row.id === item.sourceItemId)?.name ?? ''}</p>
-            ${item.kind === 'CONFLICTING' ? html`<fieldset class="safe-choices"><legend>معالجة هذا البند</legend>
-              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="keep" checked> الاحتفاظ بالبند الحالي</label>
-              <label><input type="radio" name="choice-${target.teachingId}-${item.sourceItemId}" value="add"> إضافة البند الجديد بشكل مستقل</label>
-            </fieldset>` : ''}</div>`)}</section>`)}</div>
-          <aside class="review-callout"><strong>كل فصل يبقى مستقلًا بعد النسخ.</strong>
-            <p>أي تعديل لاحق على المصدر لن ينتقل تلقائيًا إلى هذه الفصول.</p></aside>`,
-        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-          <button class="btn btn--primary" type="button" data-copy-apply>تطبيق التوزيع</button>`,
-        onMount(root, done) {
-          root.querySelector('[data-copy-apply]').addEventListener('click', () => {
-            const result = {};
-            for (const target of review) for (const item of target.items) {
-              if (item.kind !== 'CONFLICTING') continue;
-              const choice = root.querySelector(`input[name="choice-${CSS.escape(target.teachingId)}-${CSS.escape(item.sourceItemId)}"]:checked`);
-              if (!choice) return;
-              result[`${target.teachingId}:${item.sourceItemId}`] = choice.value;
+          let plan = null;
+          let selected = [];
+          const apply = root.querySelector('[data-copy-apply]');
+          const review = root.querySelector('[data-copy-review]');
+          const refresh = () => {
+            selected = [...root.querySelectorAll('[data-copy-target]:checked')].map(input => input.value);
+            plan = null; apply.disabled = true;
+            if (!selected.length) { render(review, ''); return; }
+            try {
+              plan = store.reviewScoreDistributionCopy(params.id, selected);
+              render(review, html`<p>سيُطبّق توزيع ${store.sectionLabel(store.getSection(source.sectionId))}
+                على ${selected.map(id => store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))).join('، ')}.</p>
+                <p>${plan.changedCount} بنود ستتغيّر. تبقى الفصول مستقلة بعد النسخ.</p>
+                ${plan.targets.some(target => target.extras.length) ? html`<p>تبقى البنود الإضافية ودرجاتها؛ يمكنك مراجعة إزالتها في عرض الأثر.</p>` : ''}
+                <details><summary style="min-height:44px;cursor:pointer">عرض الأثر</summary>
+                  ${plan.targets.map(target => html`<section class="target-review"><h3>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}</h3>
+                    ${target.impact.map(item => html`<p>${item.name}: ${item.created ? 'بند جديد دون درجات الطلاب' : html`الحد الأعلى ${item.beforeMax} ← ${item.max}`}.
+                      ${item.affected ? html`تتغيّر درجات ${item.affected} طلاب. ${item.examples.map(example => html`${example.before ?? 'غير مرصود'} ← ${example.after ?? 'غير مرصود'} `)}` : ''}
+                      ${item.modeChanged ? 'تتغيّر طريقة الرصد؛ القيم اليدوية السابقة لن تحدد الدرجة الآلية، والانتقال إلى اليدوي يبدأ غير مرصود.' : ''}
+                      ${item.removedSubitems ? html`تُزال ${item.removedSubitems} بنود فرعية واختياراتها التابعة.` : ''}</p>`)}
+                    ${target.extras.map(extra => html`<label class="target-class"><input type="checkbox" data-copy-remove value="${extra.id}">
+                      <span>إزالة هذا البند: ${extra.name} (ودرَجاته واختياراته التابعة)</span></label>`)}</section>`)}
+                </details>`);
+              apply.disabled = false;
+            } catch (error) {
+              render(review, html`<p role="alert">${error.message}</p>
+                ${selected.map(id => html`<a href="#/items/${id}">فتح توزيع ${store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))}</a>`)}`);
             }
-            done(result);
+          };
+          root.addEventListener('change', event => { if (event.target.matches('[data-copy-target]')) refresh(); });
+          apply.addEventListener('click', () => {
+            if (!plan) return;
+            done({ selected, token: plan.token,
+              removeItemIds: [...root.querySelectorAll('[data-copy-remove]:checked')].map(input => input.value) });
           });
         },
       });
-      if (!choices) return;
+      if (!selection) return;
       try {
-        const result = await store.applyScoreDistributionCopy(params.id, selected, choices);
-        toast(isDemo() ? `طُبّق التوزيع على ${selected.length} فصول محددة` :
-          `أُعدّ النسخ إلى ${selected.length} فصول محددة للمزامنة (${result.itemIds.length} بنود)`);
+        const review = store.reviewScoreDistributionCopy(params.id, selection.selected, { removeItemIds: selection.removeItemIds });
+        if (review.token !== selection.token) throw new Error('تغيّر التوزيع منذ المراجعة. افتح المراجعة من جديد.');
+        if (review.requiresConfirmation && !await confirmSheet({
+          title: 'تأكيد أثر التوزيع',
+          desc: review.targets.map(target => {
+            const label = store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId));
+            const affected = target.impact.reduce((sum, item) => sum + item.affected, 0);
+            const removed = target.extras.filter(item => selection.removeItemIds.includes(item.id)).length;
+            return label + ': ' + affected + ' تغييرات درجات، ' + removed + ' بنود إضافية ستُحذف.';
+          }).join(' ') + ' تُطبّق الحدود وطرق الرصد المعروضة، وتُحذف اختيارات البنود الفرعية المُزالة. لا تُنسخ درجات المصدر.',
+          confirmLabel: 'تأكيد التطبيق',
+        })) return;
+        const result = await store.applyScoreDistributionCopy(params.id, selection.selected, {
+          expectedToken: selection.token, removeItemIds: selection.removeItemIds, confirmed: true,
+        });
+        toast(result.changedCount ? 'طُبّق التوزيع في التجربة' : 'التوزيع مطابق؛ لا تغييرات');
         repaint();
-      } catch (error) { toast(error.message || 'تعذر نسخ التوزيع؛ لم تُطبّق تغييرات', 'danger'); }
+      } catch (error) { toast(error.message || 'تعذر تطبيق التوزيع؛ لم تُحفظ تغييرات', 'danger'); }
     },
+
     async add(el, ev, params) {
       const data = await itemSheet(params.id);
       if (!data) return;
@@ -398,7 +404,7 @@ export default {
             <label class="field">
               <span class="field__label">الدرجة العظمى</span>
               <input class="input tabular" name="max" type="number" inputmode="decimal"
-                     min="1" max="1000" step="0.5" value="${it.max}" required>
+                     min="1" max="1000" step="0.5" value="${it.max}" ${it.scoreMode === 'subitems' ? 'readonly' : ''} required>
             </label>
             ${it.auto === 'participation'
               ? html`<label class="field">
@@ -427,7 +433,7 @@ export default {
             const name = String(fd.get('name') ?? '').trim();
             const max = Number(fd.get('max'));
             if (!name || !(max > 0)) return;
-            const patch = { name, max };
+            const patch = it.scoreMode === 'subitems' ? { name } : { name, max };
             if (fd.has('perPoint')) patch.perPoint = Number(fd.get('perPoint')) || 1;
             if (fd.has('penalty')) patch.penalty = Number(fd.get('penalty')) || 1;
             done(patch);
