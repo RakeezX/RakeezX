@@ -12,6 +12,7 @@ import { repaint } from '../repaint.js';
 let scope = 'term';   // term | today
 let kind = 'participation';
 let audience = 'class';
+const PODIUM_LABELS = ['المركز الأول', 'المركز الثاني', 'المركز الثالث'];
 
 /** Read only the mounted teacher workspace; never query other teachers or gradebooks. */
 export function gradeTeachings(cls, api = store) {
@@ -162,7 +163,7 @@ export default {
               ${ranked.slice(0, 3).map((r, i) => {
                 const milestones = boardMilestones(r);
                 return html`<article class="board__podium-card board__podium-card--${i + 1}">
-                  <span class="board__podium-place">${i + 1}</span>
+                  <span class="board__podium-place">${PODIUM_LABELS[i]}</span>
                   ${studentAvatar(r.s, 'sm')}
                   <strong class="board__podium-name">${r.s.name}${useGrade ? html`<small class="board__section">${r.sectionName}</small>` : ''}</strong>
                   <span class="board__podium-points tabular">+${r.pts}</span>

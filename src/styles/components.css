@@ -1371,17 +1371,19 @@
 .board__podium {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: end;
+  align-items: stretch;
   gap: var(--sp-3);
   margin-block: var(--sp-5);
 }
 .board__podium-card {
   display: flex;
+  box-sizing: border-box;
   min-width: 0;
-  min-height: 132px;
+  min-height: 202px;
+  height: 100%;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--sp-2);
   padding: var(--sp-3);
   border: 1px solid var(--brand-border);
@@ -1389,21 +1391,51 @@
   background: var(--brand-soft);
   text-align: center;
 }
-.board__podium-card--1 { min-height: 160px; }
+.board__podium-card--1 { border-color: var(--brand); }
 .board__podium-place,
 .board__podium-points { color: var(--brand-text); font-weight: 800; }
-.board__podium-place { font-size: 22px; }
+.board__podium-place {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5em;
+  max-width: 100%;
+  font-size: clamp(11px, 1.4vw, 15px);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
 .board__podium-points { font-size: 20px; }
-.board__podium-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.board__badges { display: flex; gap: var(--sp-2); color: var(--text-2); }
-.board__badges small { padding: 2px 7px; border-radius: var(--r-full); background: var(--bg-elev); }
+.board__podium-name {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 2.8em;
+  max-width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  white-space: normal;
+}
+.board__badges {
+  display: flex;
+  min-height: 28px;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--text-2);
+}
+.board__badges small { max-width: 100%; padding: 2px 7px; border-radius: var(--r-full); background: var(--bg-elev); }
 .board-context { margin-block: var(--sp-3); color: var(--text-2); line-height: var(--lh-relaxed); }
 
 @media (max-width: 420px) {
   .board__podium { gap: 6px; }
-  .board__podium-card { min-height: 112px; padding: var(--sp-2) 4px; gap: 6px; }
-  .board__podium-card--1 { min-height: 132px; }
-  .board__podium-name { font-size: var(--fs-sm); }
+  .board__podium-card { min-height: 186px; padding: var(--sp-2) 4px; gap: 5px; }
+  .board__podium-place { font-size: 11px; }
+  .board__podium-name { font-size: 12px; }
+  .board__badges small { font-size: 10px; padding: 1px 4px; }
 }
 
 .board__row {
