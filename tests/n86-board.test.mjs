@@ -32,6 +32,7 @@ function fixture() {
     logs: [
       { teachingId: 'a', studentId: 's1', kind: 'participation', date: '2026-10-11', delta: 2 },
       { teachingId: 'a', studentId: 's1', kind: 'participation', date: '2026-10-10', delta: 3 },
+      { teachingId: 'a', studentId: 's1', kind: 'behavior', date: '2026-10-11', delta: -3 },
       { teachingId: 'b', studentId: 's2', kind: 'participation', date: '2026-10-11', delta: 7 },
       { teachingId: 'b', studentId: 's1', kind: 'participation', date: '2026-10-11', delta: 100 },
       { teachingId: 'b', studentId: 's2', kind: 'behavior', date: '2026-10-11', delta: -2 },
@@ -77,7 +78,7 @@ test('real log sums retain distinct IDs, exclude removed membership and unrelate
   assert.doesNotMatch(JSON.stringify(rows), /PRIVATE_|98765/);
   assert.equal(JSON.stringify(store.state), before);
   assert.deepEqual(boardRanking(gradeTeachings(cls, api), 'participation', 'today', '2026-10-11', api, true).map(r => r.pts), [7, 2]);
-  assert.deepEqual(boardRanking(gradeTeachings(cls, api), 'behavior', 'today', '2026-10-11', api, true).map(r => r.pts), [0, -2]);
+  assert.deepEqual(boardRanking(gradeTeachings(cls, api), 'behavior', 'today', '2026-10-11', api, true).map(r => r.pts), [-2, -3]);
 });
 
 test('class ranking matches existing sum/order including negatives, today and behavior', () => {
@@ -98,4 +99,21 @@ test('board defaults to class, preserves controls and HTML escaping without grad
   assert.match(rendered, /data-audience="class" aria-pressed="true"/);
   assert.match(rendered, /data-act="fullscreen"/);
   assert.doesNotMatch(rendered, /PRIVATE_|98765/);
+});
+
+test('account workspace switch clears the first teacher projection before another teacher can render it', () => {
+  store.state.ready = false;
+  store.activateWorkspace({ type: 'account', ownershipState: 'claimed', authUserId: '77777777-7777-4777-8777-777777777777', databaseName: 'rakeezx-user-77777777777747778777777777777777', broadcastChannelName: 'n86-owner-a' });
+  try {
+    const cls = fixture();
+    assert.equal(gradeTeachings(cls).length, 2);
+    store.deactivateWorkspace();
+    store.activateWorkspace({ type: 'account', ownershipState: 'claimed', authUserId: '88888888-8888-4888-8888-888888888888', databaseName: 'rakeezx-user-88888888888848888888888888888888', broadcastChannelName: 'n86-owner-b' });
+    assert.deepEqual(store.state.logs, []);
+    assert.deepEqual(store.state.students, []);
+    assert.deepEqual(gradeTeachings(cls), []);
+    assert.match(String(board.render({ id: cls.id })), /فصل غير موجود/);
+  } finally {
+    store.deactivateWorkspace();
+  }
 });

@@ -28,6 +28,13 @@ try {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(base);
+  if (process.env.N86_PREVIEW_URL) await page.evaluate(async () => {
+    // Raw ESM Pages does not expose the development-only test hook. Attach it only
+    // inside this disposable browser context, after opening the synthetic Demo.
+    const store = await import('/src/store.js');
+    const { repaint } = await import('/src/repaint.js');
+    window.store = { ...store, repaint };
+  });
   await page.waitForFunction(() => window.store?.state.ready, { timeout: 30000 });
   await page.evaluate(() => {
     const s = window.store.state;
@@ -59,7 +66,8 @@ try {
   assert.match(await page.locator('.board-context').innerText(), /تختلف فرص المشاركة/);
   assert.doesNotMatch(await page.locator('.excellence-board-page').innerText(), /PRIVATE_|98765|طالب سالب مخفي/);
   assert.equal(await page.locator('.board__section').count(), 2);
-  await mkdir('test-results/n86', { recursive: true });
+  const outputDir = process.env.N86_ARTIFACT_DIR || 'test-results/n86';
+  await mkdir(outputDir, { recursive: true });
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     assert.equal(await page.evaluate(() => document.documentElement.dir), 'rtl');
@@ -67,7 +75,7 @@ try {
     for (const button of await page.locator('.board-controls button').all()) {
       const box = await button.boundingBox(); assert.ok(box && box.height >= 44, `44px control: ${await button.innerText()} / ${box?.height}`);
     }
-    await page.screenshot({ path: `test-results/n86/grade-${width}.png`, fullPage: true });
+    await page.screenshot({ path: `${outputDir}/grade-${width}.png`, fullPage: true });
   }
   await page.locator('[data-kind="behavior"]').click();
   await page.waitForFunction(() => document.querySelectorAll('.board__row').length === 1);
