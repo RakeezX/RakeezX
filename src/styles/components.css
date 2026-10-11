@@ -576,6 +576,16 @@
 }
 
 /* ---------- لوحة التميز ---------- */
+.excellence-board-page .board-controls { flex-wrap: wrap; }
+.excellence-board-page .board-context { color: var(--text-2); font-size: 14px; line-height: 1.8; margin-block: var(--sp-3); }
+.excellence-board-page .board__section { display: block; font-size: 14px; font-weight: 400; color: var(--text-2); }
+.excellence-board-page .board-controls button { min-height: 44px; }
+.excellence-board-page .segmented__btn:disabled { opacity: .55; cursor: default; }
+@media (max-width: 480px) {
+  .excellence-board-page .board-controls { gap: var(--sp-2); }
+  .excellence-board-page .board-controls .push { margin-inline-start: 0; }
+  .excellence-board-page .board__name { white-space: normal; overflow-wrap: anywhere; }
+}
 .board { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
 .board__row {
   display: flex; align-items: center; gap: var(--sp-3);
