@@ -1,0 +1,14 @@
+/* N84 isolated Work UI. N82 selector remains frozen. */
+.n84-inline { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }
+.n84-step { width:44px; height:44px; padding:12px; border:0; border-radius:8px; background:transparent; color:var(--text-2); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.n84-step--plus { color:var(--brand-text); background:var(--brand-soft); }
+.n84-step svg { width:16px; height:16px; }
+.n84-step:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:-2px; }
+.n84-step:disabled { opacity:.5; cursor:wait; }
+.graderow__auto:has(.n84-inline) { display:flex; gap:5px; align-items:center; }
+.grades-01c__direct-row.is-auto:has(.n84-inline) { grid-template-columns:32px minmax(0,1fr) max-content; }
+@media(max-width:540px) {
+ .grades-01c__direct-row.is-auto:has(.n84-inline) { grid-template-columns:24px minmax(0,1fr) max-content; gap:6px; padding:10px 8px; }
+ .graderow__auto:has(.n84-inline) { gap:2px; }
+ .graderow__auto:has(.n84-inline) .badge { padding-inline:5px; font-size:11px; }
+}
