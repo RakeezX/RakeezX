@@ -1318,6 +1318,10 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   .n56-auth__intro { margin-bottom: 9px; }
   .n56-auth__support { margin-top: 0; }
 }
+/* N85: keep the added attention list from expanding the single-column Home grid on 320px screens. */
+.home-stack { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.home-stack > * { min-width: 0; }
+.home-attention__row .row__main { min-width: 0; overflow-wrap: anywhere; }
 /* N85: make the current teaching action the clearest Home anchor. */
 .home-stack .today-focus { min-height: 194px; padding: clamp(20px, 3vw, 28px); }
 .home-stack .today-focus__class { font-size: clamp(25px, 3vw, 32px); line-height: 1.25; }
