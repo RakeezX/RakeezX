@@ -47,12 +47,15 @@ export function parseNames(text) {
 
 function fileImportSheet(secId) {
   let rows = null, preview = null, reading = 0;
+  // A single blank student-name column; Excel opens CSV with UTF-8 BOM correctly.
+  const sampleUrl = `data:text/csv;charset=utf-8,${encodeURIComponent('\uFEFFاسم الطالب\r\n')}`;
   return openSheet({
     title: 'استيراد الطلاب',
     desc: 'اختر ملف Excel أو CSV لمراجعة الأسماء قبل إضافتها.',
     body: html`
       <label class="field"><span class="field__label">ملف الطلاب</span>
         <input class="input" id="student-file" type="file" accept=".csv,.xlsx"></label>
+      <a class="field__hint" href="${sampleUrl}" download="نموذج-أسماء-الطلاب.csv">تنزيل نموذج الأسماء (CSV)</a>
       <div id="file-options" hidden>
         <label class="field"><span class="field__label">عمود الأسماء</span><select class="input" id="file-column"></select></label>
       </div>
