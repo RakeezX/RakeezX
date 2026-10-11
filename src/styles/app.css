@@ -1321,6 +1321,11 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 /* N85: keep the added attention list from expanding the single-column Home grid on 320px screens. */
 .home-stack { min-width: 0; grid-template-columns: minmax(0, 1fr); }
 .home-stack > * { min-width: 0; }
+/* Contain Home's nested grid tracks so pending sessions cannot set a 324px min-content width. */
+.home-stack .home-dashboard__primary,
+.home-stack .home-dashboard__aside { grid-template-columns: minmax(0, 1fr); }
+.home-stack .home-dashboard__primary > *,
+.home-stack .home-dashboard__aside > * { min-inline-size: 0; }
 .home-attention__row .row__main { min-width: 0; overflow-wrap: anywhere; }
 /* N85: make the current teaching action the clearest Home anchor. */
 .home-stack .today-focus { min-height: 194px; padding: clamp(20px, 3vw, 28px); }
