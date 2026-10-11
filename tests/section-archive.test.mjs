@@ -79,22 +79,24 @@ test('SECTION-ARCHIVE local lifecycle preserves evidence and excludes operationa
   assert.equal(await store.transferStudent(student.id, destination.id), null);
   await assert.rejects(store.withdrawStudent(student.id), /الفصل مؤرشف/);
   await assert.rejects(store.patch('sections', f.section.id, { status: 'active', archivedAt: null, archiveDate: null }), /أمر دورة الحياة/);
-  await assert.rejects(store.deleteClass(f.section.id), /استخدم الأرشفة/);
+  await assert.rejects(store.deleteClass(f.section.id), { code: 'N77_CLIENT_UPDATE_REQUIRED' });
   assert.equal((await db.getAll('outbox')).some((row) => row.command === 'lifecycle:archive_class'), true);
 });
 
-test('pristine shell deletion remains allowed but retained records block teaching and class deletes', async () => {
+test('P0 blocks legacy pristine and retained shell Delete before local mutation', async () => {
   await resetLocal();
   const pristine = await localFixture('pristine');
   assert.deepEqual(store.sectionDeleteEvidence(pristine.section.id), []);
-  assert.equal(await store.deleteClass(pristine.section.id), true);
-  assert.equal(store.getSection(pristine.section.id), null);
+  const before = await Promise.all(db.STORES.map((name) => db.getAll(name)));
+  await assert.rejects(store.deleteClass(pristine.section.id), { code: 'N77_CLIENT_UPDATE_REQUIRED' });
+  assert.deepEqual(await Promise.all(db.STORES.map((name) => db.getAll(name))), before);
+  assert.equal(store.getSection(pristine.section.id).id, pristine.section.id);
 
   await resetLocal();
   const retained = await localFixture('guarded');
   await store.save({ slots: [makeSlot({ id: 'slot:guarded', teachingId: retained.teaching.id, weekday: 0, period: 1 })] }, { queue: false });
-  await assert.rejects(store.deleteTeaching(retained.teaching.id), /بيانات محفوظة/);
-  await assert.rejects(store.deleteClass(retained.section.id), /استخدم الأرشفة/);
+  await assert.rejects(store.deleteTeaching(retained.teaching.id), { code: 'N77_CLIENT_UPDATE_REQUIRED' });
+  await assert.rejects(store.deleteClass(retained.section.id), { code: 'N77_CLIENT_UPDATE_REQUIRED' });
 });
 
 test('validated reopen remains archived offline, rejects conflicts, then adopts server authority', async () => {
