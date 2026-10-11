@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v38';
+const VERSION = 'rakeezx-v39';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -63,6 +63,8 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/student-import.js',
+  './src/lib/student-import-parsers.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',

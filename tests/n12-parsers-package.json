@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "esbuild": "0.25.12",
+    "papaparse": "5.7.0",
+    "read-excel-file": "9.3.12"
+  }
+}

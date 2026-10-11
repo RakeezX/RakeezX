@@ -10,6 +10,8 @@ import * as store from '../store.js';
 import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
+import { user } from '../lib/cloud.js';
+import { readStudentFile, previewStudentRows, importContext, confirmStudentImport } from '../lib/student-import.js';
 
 let query = '';
 let formerOpen = false;
@@ -42,6 +44,90 @@ export function parseNames(text) {
 }
 
 /* ---------- اللوحات ---------- */
+
+function fileImportSheet(secId) {
+  let rows = null, preview = null, reading = 0;
+  const labels = { new: 'جديد', existing: 'موجود', invalid: 'غير صالح', ambiguous: 'يحتاج مراجعة' };
+  return openSheet({
+    title: 'استيراد ملف الأسماء',
+    desc: 'CSV بترميز UTF-8 أو Excel (.xlsx)، حتى 300 طالب و1 ميجابايت. يُقرأ الملف على جهازك فقط. في Excel تُقرأ الورقة الأولى.',
+    body: html`
+      <label class="field"><span class="field__label">اختر ملفًا</span>
+        <input class="input" id="student-file" type="file" accept=".csv,.xlsx"></label>
+      <div id="file-options" hidden>
+        <label class="field"><span class="field__label">عمود اسم الطالب</span><select class="input" id="file-column"></select></label>
+        <label class="field"><span><input id="file-header" type="checkbox" checked> الصف الأول عناوين أعمدة</span></label>
+      </div>
+      <p class="field__hint">سيُستورد عمود الأسماء فقط. لن تُطبّق الدرجات أو الأعمدة الأخرى.</p>
+      <p class="field__hint">الأسماء الموجودة والمتكررة لن تُضاف. راجع الحالات المتشابهة يدويًا؛ يمكنك إضافة طالب مستقل من «طالب جديد».</p>
+      <p id="file-count" role="status" aria-live="polite">اختر ملفًا لمعاينته قبل الإضافة.</p>
+      <div id="file-preview" class="list"></div>
+    `,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--primary" id="file-confirm" disabled>تأكيد إضافة الأسماء الجديدة</button>`,
+    onMount(root, done) {
+      const input = root.querySelector('#student-file'), column = root.querySelector('#file-column');
+      const header = root.querySelector('#file-header'), go = root.querySelector('#file-confirm');
+      const count = root.querySelector('#file-count'), list = root.querySelector('#file-preview');
+      const refresh = () => {
+        preview = null;
+        go.disabled = true;
+        list.replaceChildren();
+        if (!rows) return;
+        try {
+          preview = previewStudentRows(rows, Number(column.value), header.checked, store.sectionRoster(secId));
+          count.textContent = Object.entries(preview.counts).map(([key, value]) => `${labels[key]}: ${value}`).join(' · ');
+          for (const entry of preview.entries) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.textContent = `الصف ${entry.row} · ${entry.name || 'بلا اسم'} · ${labels[entry.status]}`;
+            list.append(row);
+          }
+          go.disabled = !preview.names.length;
+          go.textContent = `تأكيد إضافة ${preview.names.length} طالبًا جديدًا`;
+        } catch {
+          count.textContent = 'الحد الأقصى 300 طالب. راجع الملف وعناوين الأعمدة.';
+        }
+      };
+      input.addEventListener('change', async () => {
+        const ticket = ++reading;
+        rows = null; refresh();
+        root.querySelector('#file-options').hidden = true;
+        const file = input.files[0];
+        if (!file) { count.textContent = 'اختر ملفًا لمعاينته.'; return; }
+        count.textContent = 'جارٍ قراءة الملف على جهازك…';
+        try {
+          const parsed = await readStudentFile(file);
+          if (ticket !== reading || !root.isConnected) return;
+          rows = parsed;
+          column.replaceChildren();
+          const width = Math.max(...rows.map((row) => row.length));
+          for (let index = 0; index < width; index++) {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `العمود ${index + 1} · ${String(rows[0][index] ?? '').slice(0, 80)}`;
+            column.append(option);
+          }
+          const nameColumn = rows[0].findIndex((cell) => /^(اسم الطالب|الاسم|اسم|student name|name)$/i.test(String(cell ?? '').trim()));
+          header.checked = nameColumn >= 0;
+          column.value = String(Math.max(0, nameColumn));
+          root.querySelector('#file-options').hidden = false;
+          refresh();
+        } catch {
+          if (ticket !== reading || !root.isConnected) return;
+          count.textContent = 'تعذّر قراءة الملف. استخدم CSV بترميز UTF-8 أو XLSX صالحًا ضمن الحدود، أو الصق الأسماء.';
+        }
+      });
+      column.addEventListener('change', refresh);
+      header.addEventListener('change', refresh);
+      go.addEventListener('click', () => {
+        if (go.disabled || !preview) return;
+        go.disabled = true;
+        done({ rows, column: Number(column.value), hasHeader: header.checked, preview });
+      });
+    },
+  });
+}
 
 function importSheet(secId) {
   const existing = new Set(store.sectionRoster(secId).map((s) => s.name.replace(/\s/g, '')));
@@ -133,6 +219,7 @@ export default {
   back: (p) => `#/teaching/${p.id}`,
 
   topActions: () => html`
+    <button class="btn btn--ghost" data-act="file-import" aria-label="استيراد ملف الأسماء">${icon('upload')} استيراد ملف</button>
     <button class="iconbtn" data-act="import" aria-label="لصق كشف">${icon('upload')}</button>
     <button class="iconbtn" data-act="add" aria-label="طالب جديد">${icon('plus')}</button>
   `,
@@ -168,6 +255,7 @@ export default {
           <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الشعبة'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
           <div class="btn-row" style="justify-content:center">
+            <button class="btn btn--ghost" data-act="file-import">${icon('upload')} استيراد ملف</button>
             <button class="btn btn--primary" data-act="import">${icon('upload')} لصق كشف الأسماء</button>
             <button class="btn btn--ghost" data-act="add">${icon('plus')} طالب واحد</button>
           </div>
@@ -273,6 +361,42 @@ export default {
   },
 
   actions: {
+    async 'file-import'(el, ev, params) {
+      const teaching = store.getTeaching(params.id);
+      if (!teaching || store.isTeachingArchived(teaching)) return;
+      const expectedContext = importContext(store.getActiveWorkspace(), teaching, user?.id);
+      if (!expectedContext) { toast('تحقق من الحساب قبل الاستيراد.', 'danger'); return; }
+      const data = await fileImportSheet(teaching.sectionId);
+      if (!data) return;
+      const current = store.getTeaching(params.id);
+      const currentContext = current && !store.isTeachingArchived(current) ? importContext(store.getActiveWorkspace(), current, user?.id) : null;
+      if (currentContext !== expectedContext) { toast('تغيّر الحساب أو الفصل. افتح المعاينة من جديد.', 'danger'); return; }
+      try {
+        const currentPreview = previewStudentRows(data.rows, data.column, data.hasHeader, store.sectionRoster(teaching.sectionId));
+        const before = store.sectionRoster(teaching.sectionId).length;
+        const result = await confirmStudentImport({ approved: true, preview: data.preview, currentPreview, expectedContext, currentContext,
+          write: async (names) => {
+            const controller = new AbortController();
+            const stop = store.onWorkspaceDeactivation(() => controller.abort());
+            try {
+              return await store.importStudents(teaching.sectionId, names, { signal: controller.signal, verifyCurrent(snapshot) {
+                const persistedTeaching = snapshot.teachings.find((row) => row.id === teaching.id);
+                if (importContext(store.getActiveWorkspace(), persistedTeaching, user?.id) !== expectedContext) throw new Error('IMPORT_CHANGED');
+                const activeIds = new Set(snapshot.enrollments.filter((row) => row.sectionId === teaching.sectionId && row.status === 'active' && !row.deleted).map((row) => row.studentId));
+                const roster = snapshot.students.filter((row) => activeIds.has(row.id) && !row.deleted);
+                const persistedPreview = previewStudentRows(data.rows, data.column, data.hasHeader, roster);
+                if (JSON.stringify(data.preview.entries) !== JSON.stringify(persistedPreview.entries)) throw new Error('IMPORT_CHANGED');
+              } });
+            } finally { stop(); }
+          } });
+        if (store.sectionRoster(teaching.sectionId).length - before !== result.added) {
+          toast('لم يُحفظ الاستيراد. راجع الكشف ثم أعد المحاولة.', 'danger'); return;
+        }
+        toast(`أُضيف ${result.added} طالبًا. لم تُطبّق درجات.`);
+      } catch {
+        toast('تعذّر الاستيراد بأمان أو تغيّر الكشف. راجع المعاينة من جديد.', 'danger');
+      }
+    },
     search(el) {
       query = el.value;
       repaint();

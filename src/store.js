@@ -2991,7 +2991,8 @@ export async function renameStudent(studentId, name) {
  * استيراد أسماء دفعة واحدة.
  * يعيد { added, skippedInvalid, skippedOverLimit } — فيعرف المعلّم ما لم يدخل ولماذا.
  */
-export async function importStudents(secId, names) {
+export async function importStudents(secId, names, { verifyCurrent, signal } = {}) {
+  if (signal?.aborted) throw new Error('IMPORT_CANCELLED');
   const clean = [];
   let skippedInvalid = 0;
 
@@ -3016,7 +3017,32 @@ export async function importStudents(secId, names) {
       makeEnrollment({ studentId: st.id, sectionId: secId, rollNo: ++roll, updatedAt: stamp })
     );
   }
-  if (students.length) await save({ students, enrollments });
+  if (students.length && verifyCurrent) {
+    // File import rechecks the confirmed preview against persisted rows inside
+    // the same transaction as student/enrollment/outbox creation. Another tab
+    // cannot slip a same-name student between the check and the write.
+    const committed = await db.applyBatch({ students: {}, enrollments: {}, sections: {}, teachings: {}, outbox: {} }, {
+      signal,
+      prepare(current) {
+        verifyCurrent(current);
+        assertOperationalWritesAllowed({ students, enrollments });
+        const section = current.sections.find((row) => row.id === secId && !row.deleted && row.status !== 'archived');
+        if (!section) throw new Error('IMPORT_CHANGED');
+        let next = nextRollNoFrom(current.enrollments, secId);
+        if (next + students.length - 1 > 999) throw new Error('IMPORT_LIMIT');
+        const nextStudents = students.map((row) => syncV2Record('students', row, { pendingCreate: true }));
+        const nextEnrollments = enrollments.map((row) => syncV2Record('enrollments', { ...row, rollNo: next++ }, { pendingCreate: true }));
+        const outbox = [
+          ...nextStudents.map((row) => outboxEntry('students', row, Object.keys(row), 'put', null)),
+          ...nextEnrollments.map((row) => outboxEntry('enrollments', row, Object.keys(row), 'put', null)),
+        ].filter(Boolean);
+        return { students: { put: nextStudents }, enrollments: { put: nextEnrollments }, outbox: { put: outbox } };
+      },
+    });
+    applyCommittedPuts(committed);
+  } else if (students.length && !(await save({ students, enrollments }))) {
+    throw new Error('IMPORT_WRITE_FAILED');
+  }
   return { added: students.length, skippedInvalid, skippedOverLimit };
 }
 
