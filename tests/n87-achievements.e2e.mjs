@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('teacher profile renders read-only evidence on desktop/mobile without changing records or share output', async ({ page }, testInfo) => {
+test('teacher profile renders read-only evidence on desktop/mobile with safe opt-in PNG and no record changes', async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.route('https://*.supabase.co/**', route => route.abort());
@@ -27,19 +27,54 @@ test('teacher profile renders read-only evidence on desktop/mobile without chang
   await expect(section.locator('[data-achievement="participation"]')).toBeVisible();
   await expect(section.locator('[data-achievement="scores"]')).toBeVisible();
   await expect(section).toContainText('للمعلم · للقراءة فقط');
-  await expect(section.locator('button, a')).toHaveCount(0);
+  await expect(section.locator('[data-act="share"]')).toHaveCount(1);
   const snapshot = await page.evaluate(() => JSON.stringify(window.store.state));
   await page.setViewportSize({ width: 1280, height: 900 });
   await section.scrollIntoViewIfNeeded();
   await page.screenshot({ path: testInfo.outputPath('n87-desktop.png'), fullPage: false });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await section.scrollIntoViewIfNeeded();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('n87-mobile.png'), fullPage: false });
-  expect(await page.evaluate(() => JSON.stringify(window.store.state))).toBe(snapshot);
-  await page.locator('.student-profile-actions [data-act="share"]').click();
-  await expect(page.locator('.share-preview-box')).not.toContainText('إنجازات من السجل');
-  await page.locator('[data-sheet-close]').last().click();
+
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await section.scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath('n87-' + width + '.png'), fullPage: false });
+    await section.locator('[data-act="share"]').click();
+    const editor = page.locator('.achievement-card-editor');
+    await expect(editor).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expect(editor.locator('[data-card-name]')).not.toBeChecked();
+    await expect(editor.locator('[data-card-field]:checked')).toHaveCount(0);
+    await expect(page.locator('[data-card-download]')).toBeDisabled();
+    await expect(editor.locator('[data-card-field="attendance"]')).toHaveCount(0);
+    await expect(editor.locator('a')).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const requests = [];
+    const observe = request => requests.push(request.url());
+    page.on('request', observe);
+    await editor.locator('[data-card-field="participation"]').check();
+    await expect(editor.locator('canvas')).not.toHaveAttribute('aria-label', new RegExp(fixture.name));
+    await expect(editor.locator('canvas')).toHaveAttribute('aria-label', /مشاركات إيجابية/);
+    await editor.locator('[data-card-confirm]').check();
+    await editor.locator('[data-card-name]').check();
+    await expect(editor.locator('[data-card-confirm]')).not.toBeChecked();
+    await expect(page.locator('[data-card-download]')).toBeDisabled();
+    await expect(editor.locator('canvas')).toHaveAttribute('aria-label', new RegExp(fixture.name));
+    await editor.locator('[data-card-name]').uncheck();
+    await editor.locator('[data-card-field="participation"]').uncheck();
+    await expect(editor.locator('[data-card-confirm]')).toBeDisabled();
+    await editor.locator('[data-card-field="scores"]').check();
+    await editor.locator('[data-card-confirm]').check();
+    const pending = page.waitForEvent('download');
+    await page.locator('[data-card-download]').click();
+    const download = await pending;
+    expect(download.suggestedFilename()).toBe('achievement-card.png');
+    await download.saveAs(testInfo.outputPath('n87-card-' + width + '.png'));
+    await expect(editor.locator('[data-card-confirm]')).not.toBeChecked();
+    expect(requests).toEqual([]);
+    page.off('request', observe);
+    expect(await page.evaluate(() => JSON.stringify(window.store.state))).toBe(snapshot);
+    await page.locator('[data-sheet-close]').last().click();
+  }
   await page.emulateMedia({ media: 'print' });
   await expect(section).toBeHidden();
   expect(errors).toEqual([]);

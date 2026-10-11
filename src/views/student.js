@@ -14,7 +14,7 @@ import {
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
 import { demoOutputMarker, markDemoSharedText } from '../lib/report-print.js';
-import { studentAchievements } from '../lib/student-achievements.js';
+import { studentAchievements, achievementCard, drawAchievementCard, achievementPng } from '../lib/student-achievements.js';
 const achievementsStyleUrl = new URL('../styles/student-achievements.css', import.meta.url).href;
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
@@ -67,7 +67,7 @@ export default {
   },
 
   topActions: () => html`
-    <button class="iconbtn noprint" data-act="share" aria-label="مشاركة الملخص">${icon('share')}</button>
+    <button class="iconbtn noprint" data-act="share" aria-label="بطاقة إنجاز">${icon('share')}</button>
     <button class="iconbtn noprint" data-act="print" aria-label="طباعة">${icon('print')}</button>
   `,
 
@@ -197,12 +197,14 @@ export default {
         <div class="section__head">
           <h2 class="section__title" id="student-achievements-title">إنجازات من السجل</h2>
           <span class="badge">للمعلم · للقراءة فقط</span>
+          <button class="btn btn--quiet" data-act="share">${icon('board')} بطاقة إنجاز</button>
         </div>
-        <p class="student-achievements__intro">حقائق من السجلات المتاحة، دون نقاط أو أوسمة إضافية. المشاركة والحضور يشملان كل السجل؛ الدرجات تخص الإسناد المعروض.</p>
+        <p class="student-achievements__intro">نحتفي بإنجازات موثّقة من السجلات المتاحة، دون نقاط إضافية أو ترتيب بين الطلاب. المشاركة والحضور يشملان كل السجل؛ الدرجات تخص الإسناد المعروض.</p>
         ${achievements.length ? html`
           <div class="student-achievements__grid">
             ${achievements.map((achievement) => html`
               <div class="card card--pad student-achievements__fact" data-achievement="${achievement.key}">
+                <div class="student-achievements__emblem">${icon(achievement.key === 'scores' ? 'board' : achievement.key === 'participation' ? 'star' : 'attendance', 'hero')}</div>
                 <div class="student-achievements__count tabular">${fmtNum(achievement.count)}</div>
                 <strong>${achievement.title}</strong>
                 <div class="student-achievements__detail">${achievement.detail}</div>
@@ -478,7 +480,7 @@ export default {
 
       <div class="section student-profile-actions noprint">
         <div class="btn-row student-profile-actions__row">
-          <button class="btn btn--primary" data-act="share">${icon('share')} مشاركة الملخص</button>
+          <button class="btn btn--primary" data-act="share">${icon('board')} بطاقة إنجاز</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
         </div>
       </div>
@@ -491,89 +493,86 @@ export default {
       const s = store.getStudent(params.id);
       if (!s) return;
       const tch = resolveTeaching(s, params.teaching);
-      const section = tch ? store.getSection(tch.sectionId) : null;
-      const items = tch ? store.items(tch.id) : [];
-      const gradeCtx = store.studentContext(s.id, tch?.id);
-      const studentHistory = store.studentHistory(s.id);
-      const total = studentTotal(items, gradeCtx);
-      const band = masteryBand(total.pct);
-
-      const tally = { present: 0, late: 0, excused: 0, absent: 0 };
-      for (const event of studentHistory.attendance) {
-        const status = event.record.status;
-        tally[status] = (tally[status] ?? 0) + 1;
-      }
-      const sessions = studentHistory.attendance.length;
-      const attendedPct = sessions ? Math.round(((tally.present + tally.late) / sessions) * 100) : null;
-
-      const part = studentHistory.logs.filter((event) => event.record.kind === 'participation');
-      const behav = studentHistory.logs.filter((event) => event.record.kind === 'behavior');
-      const partNet = part.reduce((n, event) => n + event.record.delta, 0);
-      const behavNet = behav.reduce((n, event) => n + event.record.delta, 0);
-
-      const textParts = [
-        `📊 ملخص أداء الطالب: ${s.name}`,
-        section ? `🏫 الشعبة: ${sectionLabel(section)}` : '',
-        tch ? `📚 المادة: ${store.getSubject(tch.subjectId)?.name ?? ''}` : '',
-        '━━━━━━━━━━━━━━━',
-        '📈 المستوى والدرجات:',
-        `• المجموع: ${fmtNum(total.earned)} من ${total.outOfAll} (${total.pct != null ? `${fmtPct(total.pct)}` : '—'})`,
-        band.label ? `• التقدير: ${band.label}` : '',
-        '',
-        '📅 سجل الحضور والمواظبة عبر جميع الفصول:',
-        `• الحصص المرصودة: ${sessions}`,
-        `• نسبة الحضور: ${attendedPct != null ? `${attendedPct}%` : '—'}`,
-        `• الغياب: ${tally.absent} | التأخر: ${tally.late} | الاستئذان: ${tally.excused}`,
-        '',
-        '⭐ التفاعل والمشاركة:',
-        `• نقاط المشاركة: ${partNet > 0 ? '+' : ''}${partNet}`,
-        `• نقاط السلوك: ${behavNet > 0 ? '+' : ''}${behavNet}`,
-        '━━━━━━━━━━━━━━━',
-        'تطبيق رَكيز المعلم',
-      ];
-
-      const summaryText = markDemoSharedText(textParts.filter(Boolean)).join('\n');
-
+      const input = {
+        studentId: s.id,
+        items: tch ? store.items(tch.id) : [],
+        gradeCtx: store.studentContext(s.id, tch?.id),
+        history: store.studentHistory(s.id),
+      };
+      const available = achievementCard(input, { selected: ['participation', 'scores'] }).evidence;
       await openSheet({
-        title: 'مشاركة ملخص الطالب',
-        desc: 'ملخص شامل ومباشر لتقديمه لولي الأمر أو الإدارة.',
+        title: 'بطاقة إنجاز',
+        desc: 'اختر ما يظهر في البطاقة وراجع الصورة قبل تنزيلها. تُنشأ محليًا دون رفع أو إرسال.',
         body: html`
-          <div class="share-preview-box">${summaryText}</div>
-          <div class="stack stack-2 mt-3">
-            <button class="btn btn--primary btn--block" id="btn-copy-summary">
-              ${icon('copy')} نسخ الملخص
-            </button>
-            <a class="btn btn--ghost btn--block" href="https://api.whatsapp.com/send?text=${encodeURIComponent(summaryText)}" target="_blank" rel="noopener">
-              ${icon('share')} إرسال عبر واتساب
-            </a>
-            ${navigator.share
-              ? html`
-                  <button class="btn btn--quiet btn--block" id="btn-native-share">
-                    ${icon('share')} مشاركة عبر النظام...
-                  </button>
-                `
-              : ''}
-          </div>
-        `,
-        foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>`,
-        onMount: (root, done) => {
-          root.querySelector('#btn-copy-summary')?.addEventListener('click', async () => {
+          <div class="achievement-card-editor" dir="rtl">
+            <fieldset class="achievement-card-options">
+              <legend>محتوى البطاقة — باختيارك فقط</legend>
+              <label><input type="checkbox" data-card-name> إظهار اسم الطالب (اختياري)</label>
+              ${available.map(fact => html`<label><input type="checkbox" data-card-field="${fact.key}">
+                ${fact.title} · ${fmtNum(fact.count)}<small>${fact.scope}</small></label>`)}
+              ${!available.length ? html`<p>لا توجد مشاركة إيجابية أو درجة كاملة موثّقة متاحة للبطاقة حاليًا.</p>` : ''}
+            </fieldset>
+            <canvas class="achievement-card-preview" aria-label="معاينة بطاقة الإنجاز المختارة" role="img"></canvas>
+            <p data-card-status role="status">اختر إنجازًا واحدًا على الأقل. الاسم مخفي افتراضيًا.</p>
+            <label class="achievement-card-consent"><input type="checkbox" data-card-confirm disabled>
+              راجعت البطاقة وأوافق على تنزيل المحتوى المختار</label>
+          </div>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
+          <button class="btn btn--primary" data-card-download disabled>${icon('download')} تنزيل PNG</button>`,
+        onMount: (root) => {
+          const canvas = root.querySelector('canvas');
+          const confirm = root.querySelector('[data-card-confirm]');
+          const download = root.querySelector('[data-card-download]');
+          const status = root.querySelector('[data-card-status]');
+          let card;
+          let busy = false;
+          const update = () => {
+            confirm.checked = false;
+            download.disabled = true;
+            card = achievementCard(input, {
+              selected: [...root.querySelectorAll('[data-card-field]:checked')].map(field => field.dataset.cardField),
+              includeName: root.querySelector('[data-card-name]').checked,
+              studentName: s.name,
+              demo: markDemoSharedText([]).length > 0,
+            });
+            confirm.disabled = !card.evidence.length;
             try {
-              await navigator.clipboard.writeText(summaryText);
-              toast('تم نسخ الملخص للحافظة', 'ok');
+              drawAchievementCard(canvas, card);
+              canvas.setAttribute('aria-label', [card.title, card.name, ...card.evidence.map(fact => `${fact.title}: ${fact.count} — ${fact.scope}`)].filter(Boolean).join('، '));
+              status.textContent = card.evidence.length ? 'هذه الصورة هي محتوى التنزيل. لا تشمل تفاصيل الحضور أو السجل الخاص.' : 'اختر إنجازًا واحدًا على الأقل. الاسم مخفي افتراضيًا.';
             } catch {
-              toast('تعذر النسخ التلقائي — حدد النص وانسخه يدويًا', 'danger');
+              confirm.disabled = true;
+              status.textContent = 'تعذرت معاينة الصورة في هذا المتصفح.';
+            }
+          };
+          root.querySelectorAll('[data-card-field], [data-card-name]').forEach(field => field.addEventListener('change', update));
+          confirm.addEventListener('change', () => { download.disabled = !confirm.checked || confirm.disabled || busy; });
+          download.addEventListener('click', async () => {
+            if (busy || download.disabled) return;
+            busy = true;
+            download.disabled = true;
+            const selectedCard = card;
+            let url;
+            try {
+              const blob = await achievementPng(canvas, selectedCard, confirm.checked);
+              if (!root.isConnected || selectedCard !== card || !confirm.checked) return;
+              url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = 'achievement-card.png';
+              link.click();
+              toast('تم تنزيل بطاقة الإنجاز محليًا', 'ok');
+            } catch {
+              toast('تعذر تنزيل الصورة — حاول مرة أخرى', 'danger');
+            } finally {
+              if (url) URL.revokeObjectURL(url);
+              busy = false;
+              confirm.checked = false;
+              download.disabled = true;
             }
           });
-
-          root.querySelector('#btn-native-share')?.addEventListener('click', async () => {
-            try {
-              await navigator.share({
-                title: `ملخص أداء الطالب ${s.name}`,
-                text: summaryText,
-              });
-            } catch {}
-          });
+          update();
+          document.fonts?.ready.then(() => { if (root.isConnected) update(); });
         },
       });
     },

@@ -15,7 +15,32 @@
   gap: 8px;
   min-width: 0;
   margin: 0;
+  border-block-start: 3px solid #b59650;
+  position: relative;
 }
+.student-achievements__emblem {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f4ead1;
+  color: #806324;
+}
+.student-profile-page [data-achievement="attendance"] { border-block-start-color: var(--text-2); }
+.student-profile-page [data-achievement="attendance"] .student-achievements__emblem {
+  background: var(--bg-2);
+  color: var(--text-2);
+}
+.student-achievements .section__head { flex-wrap: wrap; gap: 10px; }
+.achievement-card-editor { display: grid; gap: 16px; min-width: 0; }
+.achievement-card-options { margin: 0; padding: 14px; border: 1px solid var(--border); border-radius: 12px; min-width: 0; }
+.achievement-card-options legend { padding: 0 6px; font-weight: 700; }
+.achievement-card-options label, .achievement-card-consent { display: block; padding: 10px 0; line-height: 1.8; font-size: 14px; overflow-wrap: anywhere; }
+.achievement-card-options small { display: block; color: var(--text-2); font-size: 14px; }
+.achievement-card-options input, .achievement-card-consent input { width: 18px; height: 18px; vertical-align: middle; margin-inline-end: 8px; accent-color: #806324; }
+.achievement-card-preview { display: block; width: 100%; height: auto; max-width: 480px; margin-inline: auto; border-radius: 12px; }
+.achievement-card-editor p { font-size: 14px; line-height: 1.8; margin: 0; }
 .student-profile-page .student-achievements__count {
   color: var(--ok);
   font-size: 28px;
