@@ -2,7 +2,7 @@
 
 import { html, icon, toast } from '../lib/dom.js';
 import { BUILD_META } from '../lib/build-meta.js';
-import { currentRejectedSyncGroups, sanitizeSupportDiagnostics, submitSupportRequest, supportEnvironment } from '../lib/support.js';
+import { currentRejectedSyncGroups, sanitizeSupportDiagnostics, submitSupportRequest, supportEnvironment, currentSupportDeviceDetails, warmSupportDeviceDetails } from '../lib/support.js';
 import { supportWhatsAppContact, supportWhatsAppMessage, supportWhatsAppUrl } from '../lib/support-whatsapp.js';
 import { SUPPORT_WHATSAPP_CONTACT } from '../lib/support-public-config.js';
 import * as cloud from '../lib/cloud.js';
@@ -105,6 +105,7 @@ export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperatio
     timestamp: new Date().toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     deviceCategory,
+    ...currentSupportDeviceDetails(),
     ...browser,
     mobile: width < 600,
     viewport: { width: window.innerWidth, height: window.innerHeight },
@@ -159,6 +160,7 @@ export default {
     draftAccountKey = supportAccountKey();
     connectionHandler = () => { void refreshWhatsAppDiagnostics(); repaint(); };
     void refreshWhatsAppDiagnostics();
+    void warmSupportDeviceDetails();
     addEventListener('online', connectionHandler);
     addEventListener('offline', connectionHandler);
   },
@@ -210,8 +212,7 @@ export default {
             <div><h3 id="support-whatsapp-title">تواصل عبر واتساب</h3><p>مساعدة مباشرة من فريق ركيز.</p></div>
           </div>
           <button class="btn btn--quiet" type="button" data-act="support-whatsapp-open"
-            aria-describedby="support-whatsapp-disclosure" ${whatsappContact ? '' : 'disabled'}>تواصل عبر واتساب</button>
-          <p class="support-whatsapp__note" id="support-whatsapp-disclosure">واتساب خدمة خارجية؛ تُجهّز رسالة بمعلومات تقنية آمنة دون نص النموذج. يمكنك تعديلها وإرسالها بنفسك داخل واتساب.</p>
+            ${whatsappContact ? '' : 'disabled'}>${icon('whatsapp', 'inline')}<span>تواصل عبر الواتساب</span></button>
           ${!whatsappContact ? html`<p class="support-whatsapp__note" role="status">التواصل عبر واتساب غير متاح حاليًا؛ إعداد الرقم الرسمي غير صالح. يمكنك استخدام البريد.</p>` :
             !online() ? html`<p class="support-whatsapp__note" role="status">فتح واتساب يحتاج اتصالًا بالإنترنت. رسالتك في النموذج محفوظة هنا.</p>` : ''}
         </section>

@@ -14,6 +14,7 @@ const TYPES = new Set(['technical', 'suggestion', 'inquiry']);
 const SYNC_STATES = new Set(['idle', 'syncing', 'synced', 'pending', 'blocked', 'conflicted', 'rejected', 'offline', 'error', 'auth_required']);
 const ROUTE_CATEGORIES = new Set(['home', 'classes', 'students', 'schedule', 'calendar', 'settings', 'support', 'other']);
 const DEVICE_CATEGORIES = new Set(['mobile', 'tablet', 'desktop', 'other']);
+const OPERATING_SYSTEMS = new Set(['android', 'ios', 'ipados', 'windows', 'macos', 'linux', 'chromeos']);
 const BROWSERS = new Set(['chrome', 'edge', 'firefox', 'safari', 'other']);
 const MAX_COUNT = 999_999;
 const REJECTED_CODES = new Set(['N58_SESSION_CONTEXT_REQUIRED', 'REJECTED_UNCLASSIFIED']);
@@ -102,6 +103,9 @@ export function sanitizeSupportDiagnostics(input = {}) {
   const timestamp = safeTimestamp(input.timestamp);
   const timezone = inputString(input.timezone, 80);
   const deviceCategory = inputString(input.deviceCategory, 16)?.toLowerCase();
+  const operatingSystem = inputString(input.operatingSystem, 16)?.toLowerCase();
+  const operatingSystemVersion = inputString(input.operatingSystemVersion, 20);
+  const deviceModel = inputString(input.deviceModel, 40);
   const browser = inputString(input.browser, 16)?.toLowerCase();
   const browserVersion = inputString(input.browserVersion, 24);
   const routeCategory = inputString(input.routeCategory, 16)?.toLowerCase();
@@ -127,6 +131,11 @@ export function sanitizeSupportDiagnostics(input = {}) {
   if (timestamp) diagnostics.timestamp = timestamp;
   if (timezone) diagnostics.timezone = timezone;
   if (DEVICE_CATEGORIES.has(deviceCategory)) diagnostics.deviceCategory = deviceCategory;
+  if (OPERATING_SYSTEMS.has(operatingSystem)) diagnostics.operatingSystem = operatingSystem;
+  if (diagnostics.operatingSystem && operatingSystemVersion && /^\d{1,3}(?:\.\d{1,3}){0,3}$/.test(operatingSystemVersion)) diagnostics.operatingSystemVersion = operatingSystemVersion;
+  if (diagnostics.operatingSystem === 'android' && deviceModel &&
+      /^[A-Za-z][A-Za-z0-9 ._+()-]{1,39}$/.test(deviceModel) &&
+      !/^(?:K|wv|Mobile|Android|Linux|unknown)$/i.test(deviceModel)) diagnostics.deviceModel = deviceModel;
   if (BROWSERS.has(browser)) diagnostics.browser = browser;
   if (browserVersion && /^[0-9A-Za-z._ -]+$/.test(browserVersion)) diagnostics.browserVersion = browserVersion;
   if (typeof input.mobile === 'boolean') diagnostics.mobile = input.mobile;
@@ -147,6 +156,65 @@ export function sanitizeSupportDiagnostics(input = {}) {
   if (routeTemplate && Object.hasOwn(SUPPORT_ROUTE_CATEGORIES, routeTemplate)
       && SUPPORT_ROUTE_CATEGORIES[routeTemplate] === diagnostics.routeCategory) diagnostics.routeTemplate = routeTemplate;
   return diagnostics;
+}
+
+/** OS/model hints shared by in-app Support, WhatsApp and notification email. Never transmit raw UA. */
+const safeOsVersion = (value) => typeof value === 'string' && /^\d{1,3}(?:\.\d{1,3}){0,3}$/.test(value) ? value : null;
+const safeDeviceModel = (value) => {
+  const text = typeof value === 'string' ? value.trim() : '';
+  return /^[A-Za-z][A-Za-z0-9 ._+()-]{1,39}$/.test(text) &&
+    !/^(?:K|wv|Mobile|Android|Linux|unknown)$/i.test(text) ? text : null;
+};
+let cachedDeviceHints = null;
+export function detectSupportDevice({ userAgent = '', platform = '', maxTouchPoints = 0, highEntropy = {} } = {}) {
+  const ua = String(userAgent).slice(0, 600);
+  const plat = String(platform).slice(0, 80);
+  const ipad = /\biPad\b/i.test(ua) ||
+    ((/MacIntel/i.test(plat) || /\bMacintosh\b/i.test(ua)) && Number(maxTouchPoints) > 1);
+  let os = null;
+  if (ipad) os = 'ipados';
+  else if (/\bAndroid\b/i.test(ua) || /^Android$/i.test(plat)) os = 'android';
+  else if (/\biPhone\b|\biPod\b/i.test(ua) || /^iOS$/i.test(plat)) os = 'ios';
+  else if (/\bCrOS\b/i.test(ua) || /^Chrome OS$/i.test(plat)) os = 'chromeos';
+  else if (/\bWindows\b/i.test(ua) || /^Win/i.test(plat)) os = 'windows';
+  else if (/\bMacintosh\b|\bMac OS X\b/i.test(ua) || /^macOS$|^MacIntel$/i.test(plat)) os = 'macos';
+  else if (/\bLinux\b/i.test(ua) || /^Linux$/i.test(plat)) os = 'linux';
+  const result = {};
+  if (os) result.operatingSystem = os;
+  const reducedAndroid = /Android\s+10;\s*K\)/i.test(ua);
+  let version = null;
+  if (os === 'android' && !reducedAndroid) version = safeOsVersion(/\bAndroid\s+(\d+(?:\.\d+){0,2})/i.exec(ua)?.[1]);
+  if (os === 'ios' || os === 'ipados') {
+    version = safeOsVersion(/\b(?:iPhone )?OS\s+(\d+(?:[_\.]\d+){0,2})/i.exec(ua)?.[1]?.replaceAll('_', '.'));
+  }
+  // Windows platformVersion is not a Windows marketing release: do not claim 10/11.
+  if (['android', 'ios', 'ipados', 'macos'].includes(os)) version = safeOsVersion(highEntropy.platformVersion) ?? version;
+  if (version) result.operatingSystemVersion = version;
+  if (os === 'android') {
+    const uaModel = reducedAndroid ? null :
+      /\bAndroid\s+\d+(?:\.\d+)*;\s*([^;)]+?)(?:\s+Build\/[^)]*)?\)/i.exec(ua)?.[1];
+    const model = safeDeviceModel(highEntropy.model) ?? safeDeviceModel(uaModel);
+    if (model) result.deviceModel = model;
+  }
+  return result;
+}
+export function currentSupportDeviceDetails(nav = globalThis.navigator) {
+  if (!nav) return {};
+  return detectSupportDevice({
+    userAgent: nav.userAgent, platform: nav.userAgentData?.platform || nav.platform,
+    maxTouchPoints: nav.maxTouchPoints,
+    highEntropy: cachedDeviceHints?.owner === nav ? cachedDeviceHints.values : {},
+  });
+}
+/** Prime only supported optional hints asynchronously, never inside the WhatsApp click. */
+export async function warmSupportDeviceDetails(nav = globalThis.navigator) {
+  if (!nav?.userAgentData?.getHighEntropyValues) return;
+  try {
+    const hints = await nav.userAgentData.getHighEntropyValues(['platformVersion', 'model']);
+    if (nav === globalThis.navigator) cachedDeviceHints = { owner: nav, values: {
+      platformVersion: safeOsVersion(hints?.platformVersion), model: safeDeviceModel(hints?.model),
+    } };
+  } catch { /* Optional browser privacy hint not available. */ }
 }
 
 function supportError(code, message) {

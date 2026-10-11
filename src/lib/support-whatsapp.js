@@ -9,11 +9,10 @@ const TYPE_LABELS = Object.freeze({
 });
 
 const DIAGNOSTIC_LABELS = Object.freeze({
-  appVersion: 'إصدار التطبيق', buildTimestamp: 'وقت البناء',
-  timestamp: 'وقت إعداد الرسالة', timezone: 'المنطقة الزمنية',
+  appVersion: 'إصدار التطبيق',
   routeCategory: 'قسم التطبيق', routeTemplate: 'قالب الصفحة',
   deviceCategory: 'نوع الجهاز', browser: 'المتصفح', browserVersion: 'إصدار المتصفح',
-  mobile: 'واجهة جوال', viewport: 'حجم الشاشة التقريبي', pwaStandalone: 'تطبيق مثبت',
+  viewport: 'حجم الشاشة التقريبي',
   online: 'متصل بالإنترنت', syncState: 'حالة المزامنة',
   pendingMutations: 'عمليات معلقة', failedMutations: 'عمليات فاشلة',
   pendingCount: 'عناصر معلقة', failedCount: 'عناصر فاشلة',
@@ -39,6 +38,12 @@ export function supportWhatsAppMessage({ type, diagnostics = {} } = {}) {
       : safe.buildShaKind === 'git' ? 'إصدار Git' : 'البناء';
     lines.push(`${title}: ${safe.buildSha.slice(0, 12)}`);
   }
+  if (safe.operatingSystem) {
+    const system = { android: 'Android', ios: 'iOS', ipados: 'iPadOS', windows: 'Windows',
+      macos: 'macOS', linux: 'Linux', chromeos: 'ChromeOS' }[safe.operatingSystem];
+    lines.push(`النظام: ${system}${safe.operatingSystemVersion ? ` ${safe.operatingSystemVersion}` : ''}`);
+  }
+  if (safe.deviceModel) lines.push(`الطراز: ${safe.deviceModel}`);
   for (const [key, title] of Object.entries(DIAGNOSTIC_LABELS)) {
     if (!Object.hasOwn(safe, key)) continue;
     const value = key === 'viewport'

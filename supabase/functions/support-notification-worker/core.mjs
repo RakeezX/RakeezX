@@ -6,7 +6,8 @@ const TYPE_LABELS = Object.freeze({
 
 const DIAGNOSTIC_KEYS = new Set([
   'appVersion', 'buildSha', 'buildShaKind', 'buildTimestamp', 'environment', 'timestamp', 'timezone',
-  'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport',
+  'deviceCategory', 'operatingSystem', 'operatingSystemVersion', 'deviceModel',
+  'browser', 'browserVersion', 'mobile', 'viewport',
   'pwaStandalone', 'online', 'syncState', 'pendingMutations',
   'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount',
   'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate', 'rejectedGroups',
@@ -54,6 +55,7 @@ const ROUTE_CATEGORY_LABELS = Object.freeze({
   calendar: 'التقويم', settings: 'الإعدادات', support: 'الدعم', other: 'قسم آخر',
 });
 const DEVICE_CATEGORIES = new Set(['mobile', 'tablet', 'desktop', 'other']);
+const OPERATING_SYSTEMS = new Set(['android', 'ios', 'ipados', 'windows', 'macos', 'linux', 'chromeos']);
 const BROWSERS = new Set(['chrome', 'edge', 'firefox', 'safari', 'other']);
 
 export const DELIVERY_POLICY = Object.freeze({
@@ -114,6 +116,12 @@ function sanitizeDiagnostics(input) {
   addTimestamp('lastSuccessfulSyncAt');
   if (typeof input.timezone === 'string' && input.timezone.trim() && input.timezone.length <= 80) output.timezone = input.timezone.trim();
   if (DEVICE_CATEGORIES.has(input.deviceCategory)) output.deviceCategory = input.deviceCategory;
+  if (OPERATING_SYSTEMS.has(input.operatingSystem)) output.operatingSystem = input.operatingSystem;
+  if (output.operatingSystem && typeof input.operatingSystemVersion === 'string' &&
+      /^\d{1,3}(?:\.\d{1,3}){0,3}$/.test(input.operatingSystemVersion)) output.operatingSystemVersion = input.operatingSystemVersion;
+  if (output.operatingSystem === 'android' && typeof input.deviceModel === 'string' &&
+      /^[A-Za-z][A-Za-z0-9 ._+()-]{1,39}$/.test(input.deviceModel) &&
+      !/^(?:K|wv|Mobile|Android|Linux|unknown)$/i.test(input.deviceModel)) output.deviceModel = input.deviceModel;
   if (BROWSERS.has(input.browser)) output.browser = input.browser;
   if (typeof input.browserVersion === 'string' && input.browserVersion.length <= 24 && /^[0-9A-Za-z._ -]+$/.test(input.browserVersion)) output.browserVersion = input.browserVersion;
   for (const key of ['mobile', 'pwaStandalone', 'online']) if (typeof input[key] === 'boolean') output[key] = input[key];
@@ -176,6 +184,12 @@ function formatDiagnosticLines(diagnostics) {
   if (diagnostics.appVersion) lines.push(`الإصدار: ${diagnostics.appVersion}`);
   if (diagnostics.environment) lines.push(`البيئة: ${{ production: 'الإنتاج', preview: 'المعاينة', other: 'أخرى' }[diagnostics.environment]}`);
   if (diagnostics.buildSha) lines.push(`${diagnostics.buildShaKind === 'content' ? 'بصمة المحتوى' : diagnostics.buildShaKind === 'git' ? 'إصدار Git' : 'البناء'}: ${diagnostics.buildSha.slice(0, 12)}`);
+  if (diagnostics.operatingSystem) {
+    const system = { android: 'Android', ios: 'iOS', ipados: 'iPadOS', windows: 'Windows',
+      macos: 'macOS', linux: 'Linux', chromeos: 'ChromeOS' }[diagnostics.operatingSystem];
+    lines.push(`النظام: ${system}${diagnostics.operatingSystemVersion ? ` ${diagnostics.operatingSystemVersion}` : ''}`);
+  }
+  if (diagnostics.deviceModel) lines.push(`الطراز: ${diagnostics.deviceModel}`);
   if (diagnostics.deviceCategory) {
     const viewport = diagnostics.viewport ? ` — ${diagnostics.viewport.width}×${diagnostics.viewport.height}` : '';
     lines.push(`الجهاز: ${diagnostics.deviceCategory}${viewport}`);

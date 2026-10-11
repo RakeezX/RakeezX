@@ -18,7 +18,7 @@ function fixture({workspace=claimed(),user={id:OWNER},contact=SUPPORT_WHATSAPP_C
   const context=vm.createContext({html,icon:()=>'',toast:(...a)=>calls.toast.push(a),
     BUILD_META:{appVersion:'1.0.0',buildSha:'a'.repeat(64),buildShaKind:'content'},
     supportWhatsAppContact,supportWhatsAppMessage,supportWhatsAppUrl,SUPPORT_WHATSAPP_CONTACT:contact,
-    sanitizeSupportDiagnostics,supportEnvironment,
+    sanitizeSupportDiagnostics,supportEnvironment,currentSupportDeviceDetails:()=>({operatingSystem:'ios'}),warmSupportDeviceDetails:async()=>{},
     cloud:{user,session:user?{}:null},store:{state:{ready:true},getActiveWorkspace:()=>active},
     sync:{getSyncOperationalSummary:async()=>{calls.summary++;return summary;},
       getSyncOperationalSummarySnapshot:()=>({state:'rejected',pendingCount:999,rejectedCount:999}),
@@ -52,7 +52,8 @@ test('separate email-then-WhatsApp rail and synchronous one-click preserve draft
   const rendered=String(f.view.render());
   assert.match(rendered,/support-contact-rail[\s\S]*تفضّل البريد؟[\s\S]*support-whatsapp-title[\s\S]*support-request-title/);
   assert.doesNotMatch(rendered.match(/<form[\s\S]*?<\/form>/)[0],/support-whatsapp/);
-  assert.match(rendered,/واتساب خدمة خارجية[\s\S]*تعديلها وإرسالها بنفسك داخل واتساب/);
+  assert.doesNotMatch(rendered,/واتساب خدمة خارجية/);
+  assert.match(source,/icon\('whatsapp', 'inline'\)/);
   assert.match(rendered,/href="mailto:support@rakeezx.com"/);
   f.view.actions['support-whatsapp-open'](); // Check before microtasks: activation retained.
   assert.equal(f.calls.open.length,1);assert.equal(f.calls.open[0][0].split('?')[0],`https://wa.me/${OFFICIAL_SUPPORT_WHATSAPP}`);
