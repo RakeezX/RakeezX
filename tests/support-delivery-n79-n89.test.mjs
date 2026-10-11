@@ -32,16 +32,16 @@ test('raw entry reaches central config and new graph omission count is zero; fiv
 
 test('minimal SW generation change installs central config and preserves newer/unrelated caches in VM',async()=>{
   const sw=(await read('sw.js')).replaceAll('\r\n','\n'),old=base('sw.js').replaceAll('\r\n','\n');
-  assert.equal(sw,old.replace("const VERSION = 'rakeezx-v36';","const VERSION = 'rakeezx-v37';")
+  assert.equal(sw,old.replace("const VERSION = 'rakeezx-v36';","const VERSION = 'rakeezx-v38';")
     .replace("  './src/lib/support-whatsapp.js',","  './src/lib/support-whatsapp.js',\n  './src/lib/support-public-config.js',"));
-  const events={},added=[],deleted=[],keys=['rakeezx-v36','rakeezx-v37','rakeezx-v38','fixture-unrelated'];
+  const events={},added=[],deleted=[],keys=['rakeezx-v36','rakeezx-v37','rakeezx-v38','rakeezx-v39','fixture-unrelated'];
   const context=vm.createContext({URL,Request:class {constructor(url){this.url=url;}},console,
     self:{location:{origin:'https://fixture.test'},addEventListener:(name,fn)=>{events[name]=fn;},
       skipWaiting:async()=>{},clients:{claim:async()=>{}}},
-    caches:{open:async name=>{assert.equal(name,'rakeezx-v37');return {add:async req=>added.push(req.url)};},
+    caches:{open:async name=>{assert.equal(name,'rakeezx-v38');return {add:async req=>added.push(req.url)};},
       keys:async()=>keys,delete:async name=>deleted.push(name)},});
   vm.runInContext(sw,context);
   let wait;events.install({waitUntil:p=>{wait=p;}});await wait;
   assert.ok(added.includes('./src/lib/support-public-config.js'));assert.ok(added.includes('./src/lib/support-whatsapp.js'));
-  events.activate({waitUntil:p=>{wait=p;}});await wait;assert.deepEqual(deleted,['rakeezx-v36']);
+  events.activate({waitUntil:p=>{wait=p;}});await wait;assert.deepEqual(deleted,['rakeezx-v36','rakeezx-v37']);
 });
