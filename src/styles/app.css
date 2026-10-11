@@ -1318,3 +1318,19 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
   .n56-auth__intro { margin-bottom: 9px; }
   .n56-auth__support { margin-top: 0; }
 }
+/* N85: make the current teaching action the clearest Home anchor. */
+.home-stack .today-focus { min-height: 194px; padding: clamp(20px, 3vw, 28px); }
+.home-stack .today-focus__class { font-size: clamp(25px, 3vw, 32px); line-height: 1.25; }
+.home-stack .today-focus__detail { margin-top: 7px; font-size: 14px; }
+.home-attention { margin-block: 0 var(--sp-4); }
+.home-attention__list { overflow: hidden; border: 1px solid color-mix(in srgb, var(--warn) 24%, var(--border)); border-radius: var(--r-xl); background: var(--bg-elev); }
+.home-attention__row { min-height: 68px; border: 0; border-radius: 0; box-shadow: none; }
+.home-attention__row + .home-attention__row { border-block-start: 1px solid var(--border); }
+.home-attention__row .period { background: var(--warn-soft); color: var(--warn); }
+.home-attention__row .row__sub { white-space: normal; }
+@media (max-width: 520px) {
+  .home-stack .today-focus { min-height: 0; padding: var(--sp-4) var(--sp-3); }
+  .home-stack .today-focus__class { font-size: 25px; }
+  .home-attention__row { gap: 9px; padding-inline: 11px; }
+  .home-attention__row .row__end > svg { display: none; }
+}

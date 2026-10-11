@@ -200,6 +200,24 @@ export function selectTodayFocus(sessions, {
   return upcoming ? { kind: 'upcoming', session: upcoming.session } : null;
 }
 
+// Only surface attendance that is already due and still incomplete. Future
+// sessions are not needs-attention items until their scheduled end time.
+export function selectNeedsAttention(sessions, {
+  now = new Date(),
+  attendanceState = () => 'pending',
+  excludeSessionId = null,
+  limit = 2,
+} = {}) {
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  return (sessions ?? [])
+    .filter((session) => !CANCELLED_SESSION_STATUSES.has(session.status) && session.id !== excludeSessionId)
+    .map((session) => ({ session, end: timeToMinutes(session.endTime) }))
+    .filter(({ session, end }) => end !== null && end <= minutesNow && attendanceState(session) === 'pending')
+    .sort((a, b) => b.end - a.end)
+    .slice(0, Math.max(0, Math.min(2, limit)))
+    .map(({ session }) => session);
+}
+
 export function homeOnboardingState(teachings, {
   studentsFor = () => [],
   slotsFor = () => [],
@@ -270,6 +288,27 @@ function renderTodayFocus(focus) {
   `;
 }
 
+function renderNeedsAttention(sessions) {
+  if (!sessions.length) return '';
+  return html`
+    <section class="section home-attention" aria-labelledby="home-attention-title">
+      <div class="section__head"><h2 class="section__title" id="home-attention-title">يحتاج انتباهك</h2></div>
+      <div class="list home-attention__list">
+        ${sessions.map((session) => html`
+          <a class="row home-attention__row" href="#/teaching/${session.teachingId}/attendance?session=${session.id}" data-session-id="${session.id}">
+            <span class="period">${session.period}</span>
+            <span class="row__main">
+              <span class="row__title">${visibleLatinDigits(store.teachingLabel(store.getTeaching(session.teachingId)))}</span>
+              <span class="row__sub">انتهت الحصة ولم يكتمل رصد الحضور${session.startTime ? html` · <bdi dir="ltr">${fmtTimeRange(session.startTime, session.endTime)}</bdi>` : ''}</span>
+            </span>
+            <span class="row__end"><span class="home-session-state">متابعة الرصد</span>${icon('chev')}</span>
+          </a>
+        `)}
+      </div>
+    </section>
+  `;
+}
+
 export default {
   title: () => 'الرئيسية',
 
@@ -288,6 +327,12 @@ export default {
     const focus = onboarding.state === 'D'
       ? selectTodayFocus(daySessions, { attendanceState: (session) => store.attendanceCompleteness(session).state })
       : null;
+    const attentionItems = onboarding.state === 'D'
+      ? selectNeedsAttention(daySessions, {
+        attendanceState: (session) => store.attendanceCompleteness(session).state,
+        excludeSessionId: focus?.session.id,
+      })
+      : [];
     const remainingSessions = focus ? daySessions.filter((session) => session.id !== focus.session.id) : daySessions;
     const emptyCopy = todayEmptyCopy(list.some((teaching) => store.slotsOf(teaching.id).length > 0), today, cal);
     const pendingToday = remainingSessions.filter((session) =>
@@ -357,6 +402,8 @@ export default {
       ${renderOnboarding(onboarding)}
 
       ${renderTodayFocus(focus)}
+
+      ${renderNeedsAttention(attentionItems)}
 
       <!-- حصص اليوم -->
       <section class="section home-sessions" aria-labelledby="home-sessions-title">
