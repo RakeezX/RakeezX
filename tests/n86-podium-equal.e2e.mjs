@@ -38,8 +38,8 @@ try {
      years:[{id:'n86:y',label:'1448-1449',status:'active'}],
      terms:[{id:'n86:tm',yearId:'n86:y',name:'الفصل الدراسي الأول',status:'active'}],
      subjects:[{id:'n86:ds',name:'المهارات الرقمية'}],
-     sections:['a','b','c'].map((id,i)=>({id,grade:5,name:'خامس / '+(i+1),yearId:'n86:y',status:'active'})),
-     teachings:['a','b','c'].map(id=>({id,sectionId:id,subjectId:'n86:ds',termId:'n86:tm'})),
+     sections:['a','b','c','d','e','f','g','h','i'].map((id,i)=>({id,grade:5,name:'خامس / '+(i+1),yearId:'n86:y',status:'active'})),
+     teachings:['a','b','c','d','e','f','g','h','i'].map(id=>({id,sectionId:id,subjectId:'n86:ds',termId:'n86:tm'})),
      students:[
        {id:'a',name:'طالب تجريبي أول',status:'active'},
        {id:'b',name:'طالب تجريبي باسم أطول قليلًا للتحقق من ثبات البطاقات',status:'active'},
@@ -63,6 +63,19 @@ try {
  const expected=['المركز الأول','المركز الثاني','المركز الثالث'];
  for(const viewport of [320,390,768,1280]){
    await page.setViewportSize({width:viewport,height:900});
+   const title=await page.evaluate(()=>{
+     const line=document.querySelector('.board-context--grade');
+     const note=document.querySelector('.board-context-note');
+     const rect=line.getBoundingClientRect(), sub=note.getBoundingClientRect();
+     return {text:line.textContent.trim(),space:getComputedStyle(line).whiteSpace,
+       scroll:line.scrollWidth,client:line.clientWidth,
+       noteBelow:sub.top>=rect.bottom-1, noteText:note.textContent.trim()};
+   });
+   assert.equal(title.text,'الخامس الابتدائي · المهارات الرقمية · 9 فصول');
+   assert.equal(title.space,'nowrap','summary must remain a single line');
+   assert.ok(title.scroll<=title.client+1,'summary must fit '+viewport+'px: '+JSON.stringify(title));
+   assert.equal(title.noteBelow,true,'note should be directly below summary');
+   assert.equal(title.noteText,'من الرصد السريع · تختلف فرص المشاركة بين الفصول');
    const details=await page.locator('.board__podium-card').evaluateAll(cards=>cards.map(card=>{
      const rect=card.getBoundingClientRect();
      const place=card.querySelector('.board__podium-place');

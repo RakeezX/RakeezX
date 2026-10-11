@@ -144,7 +144,7 @@ export default {
           ${icon('board')} ملء الشاشة
         </button>
       </div>
-      <p class="board-context" role="status">${useGrade
+      <p class="board-context ${useGrade ? 'board-context--grade' : ''}" role="status">${useGrade
         ? html`${gradeLabel(store.getSection(cls.sectionId)?.grade)} · ${store.getSubject(cls.subjectId)?.name} · ${comparable.length} فصول`
         : 'نقاط الرصد السريع للفصل الحالي.'}</p>
       ${useGrade ? html`<small class="board-context-note">من الرصد السريع · تختلف فرص المشاركة بين الفصول</small>` : ''}

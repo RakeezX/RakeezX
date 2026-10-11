@@ -579,6 +579,15 @@
 .excellence-board-page .board-controls { flex-wrap: wrap; }
 .excellence-board-page .board-context { color: var(--text-2); font-size: 14px; line-height: 1.8; margin-block: var(--sp-3); }
 .excellence-board-page .board-context-note { display: block; color: var(--text-2); font-size: 12px; line-height: 1.5; }
+/* Keep the compact grade/subject/class count on one line; the fairness note remains below. */
+.excellence-board-page .board-context--grade {
+  min-width: 0;
+  max-width: 100%;
+  margin-block-end: 2px;
+  font-size: clamp(10.5px, 3.2vw, 14px);
+  letter-spacing: -0.12px;
+  white-space: nowrap;
+}
 .excellence-board-page .board__section { display: block; font-size: 14px; font-weight: 400; color: var(--text-2); }
 .excellence-board-page .board-controls button { min-height: 44px; }
 .excellence-board-page .segmented__btn:disabled { opacity: .55; cursor: default; }
