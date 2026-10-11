@@ -623,7 +623,8 @@ async function boot() {
       if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
       syncModule = await import('./lib/sync.js');
       syncModule.init();
-      await syncModule.getSyncOperationalSummary();
+      // init() already starts the read-only status scan. Do not wait for its
+      // outbox/record reads before painting this verified local workspace.
       if (import.meta.env?.DEV) window.__syncModule = syncModule;
     } catch (err) {
       if (err?.code === 'DEMO_SYNC_DISABLED') syncModule = null;
@@ -712,6 +713,7 @@ async function boot() {
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 
   await resolve();
+  if (syncModule) void refreshSyncOperationalUI();
   registerServiceWorker();
 }
 
