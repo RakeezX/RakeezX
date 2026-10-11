@@ -5,11 +5,11 @@ const TYPE_LABELS = Object.freeze({
 });
 
 const DIAGNOSTIC_KEYS = new Set([
-  'appVersion', 'buildSha', 'buildTimestamp', 'timestamp', 'timezone',
+  'appVersion', 'buildSha', 'buildShaKind', 'buildTimestamp', 'environment', 'timestamp', 'timezone',
   'deviceCategory', 'browser', 'browserVersion', 'mobile', 'viewport',
   'pwaStandalone', 'online', 'syncState', 'pendingMutations',
   'failedMutations', 'pendingCount', 'failedCount', 'blockedCount', 'rejectedCount',
-  'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate',
+  'historicalConflictCount', 'actionableSyncIssue', 'lastSuccessfulSyncAt', 'routeCategory', 'routeTemplate', 'rejectedGroups',
 ]);
 
 const FAILURE_CATEGORIES = new Set([
@@ -99,6 +99,16 @@ function sanitizeDiagnostics(input) {
   const addTimestamp = (key) => { if (DIAGNOSTIC_KEYS.has(key) && validTimestamp(input[key])) output[key] = new Date(input[key]).toISOString(); };
   if (typeof input.appVersion === 'string' && input.appVersion.length <= 40 && /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(input.appVersion)) output.appVersion = input.appVersion;
   if (typeof input.buildSha === 'string' && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(input.buildSha.toLowerCase())) output.buildSha = input.buildSha.toLowerCase();
+  if (output.buildSha && ['content', 'git'].includes(input.buildShaKind)) output.buildShaKind = input.buildShaKind;
+  if (['production', 'preview', 'other'].includes(input.environment)) output.environment = input.environment;
+  if (Array.isArray(input.rejectedGroups)) {
+    const groups = input.rejectedGroups.slice(0, 5).filter((group) =>
+      group && Number.isInteger(group.count) && group.count >= 1 && group.count <= 999999 &&
+      ((group.code === 'N58_SESSION_CONTEXT_REQUIRED' && group.area === 'sessions') ||
+       (group.code === 'REJECTED_UNCLASSIFIED' && group.area === 'other')))
+      .map((group) => ({ code: group.code, area: group.area, count: group.count }));
+    if (groups.length) output.rejectedGroups = groups;
+  }
   addTimestamp('buildTimestamp');
   addTimestamp('timestamp');
   addTimestamp('lastSuccessfulSyncAt');
@@ -164,7 +174,8 @@ export function formatRiyadhTime(value) {
 function formatDiagnosticLines(diagnostics) {
   const lines = [];
   if (diagnostics.appVersion) lines.push(`الإصدار: ${diagnostics.appVersion}`);
-  if (diagnostics.buildSha) lines.push(`البناء: ${diagnostics.buildSha.slice(0, 12)}`);
+  if (diagnostics.environment) lines.push(`البيئة: ${{ production: 'الإنتاج', preview: 'المعاينة', other: 'أخرى' }[diagnostics.environment]}`);
+  if (diagnostics.buildSha) lines.push(`${diagnostics.buildShaKind === 'content' ? 'بصمة المحتوى' : diagnostics.buildShaKind === 'git' ? 'إصدار Git' : 'البناء'}: ${diagnostics.buildSha.slice(0, 12)}`);
   if (diagnostics.deviceCategory) {
     const viewport = diagnostics.viewport ? ` — ${diagnostics.viewport.width}×${diagnostics.viewport.height}` : '';
     lines.push(`الجهاز: ${diagnostics.deviceCategory}${viewport}`);
@@ -175,6 +186,11 @@ function formatDiagnosticLines(diagnostics) {
   if (typeof diagnostics.failedCount === 'number') lines.push(`تعذّر إرسالها: ${diagnostics.failedCount}`);
   if (typeof diagnostics.blockedCount === 'number') lines.push(`بانتظار بيانات مرتبطة: ${diagnostics.blockedCount}`);
   if (typeof diagnostics.rejectedCount === 'number') lines.push(`لم يقبلها الخادم: ${diagnostics.rejectedCount}`);
+  for (const group of diagnostics.rejectedGroups ?? []) {
+    const label = group.code === 'N58_SESSION_CONTEXT_REQUIRED' ? 'يلزم سياق الحصة'
+      : 'رفض غير مصنّف';
+    lines.push(`سبب الرفض: ${label} (${group.code}) × ${group.count}${group.area === 'sessions' ? ' — الحصص' : ''}`);
+  }
   if (typeof diagnostics.historicalConflictCount === 'number') lines.push(`اختلافات تاريخية متصالحة: ${diagnostics.historicalConflictCount}`);
   if (typeof diagnostics.online === 'boolean') lines.push(`الاتصال: ${diagnostics.online ? 'متصل' : 'غير متصل'}`);
   if (diagnostics.routeCategory) lines.push(`قسم التطبيق: ${ROUTE_CATEGORY_LABELS[diagnostics.routeCategory]}`);

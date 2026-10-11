@@ -5502,6 +5502,13 @@
 }
 .support-page .support-contact__actions { gap: 6px; }
 .support-page .support-contact__actions .btn { min-height: 44px; padding-inline: 8px; font-size: var(--fs-sm); }
+.support-whatsapp { display: grid; gap: var(--sp-2); min-width: 0; }
+.support-whatsapp > .btn { min-height: 44px; justify-self: start; }
+.support-whatsapp__note { margin: 0; color: var(--text-2); font-size: var(--fs-sm); line-height: 1.55; }
+.support-whatsapp__review { display: grid; gap: var(--sp-3); min-width: 0; padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-sunk); }
+.support-whatsapp__review pre { margin: 0; padding: var(--sp-3); max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg-elev); color: var(--text); font: inherit; line-height: 1.6; }
+.support-whatsapp__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.support-whatsapp__actions .btn { min-height: 44px; max-width: 100%; white-space: normal; }
 .support-page .support-version-row {
   flex-direction: row;
   align-items: center;
@@ -5520,6 +5527,7 @@
 @media (max-width: 899px) { .n34-help-launcher { inset-inline-end: 14px; bottom: calc(74px + env(safe-area-inset-bottom)); } }
 @media (max-width: 700px) { .support-page .support-layout { grid-template-columns: minmax(0, 1fr); } .n34-support-choices { grid-template-columns: 1fr; } .n34-support-choice { min-height: 58px; grid-template-columns: 1fr auto; align-items: center; } .n34-support-choice small { justify-self: end; } }
 @media (max-width: 360px) { .n34-help-launcher { inset-inline-end: 10px; bottom: calc(70px + env(safe-area-inset-bottom)); } .support-page .support-contact__actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 360px) { .support-whatsapp > .btn, .support-whatsapp__actions .btn { width: 100%; } .support-whatsapp__actions { display: grid; grid-template-columns: minmax(0, 1fr); } }
 
 @media (min-width: 1000px) {
   .settings-page {

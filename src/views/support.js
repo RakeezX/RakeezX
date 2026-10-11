@@ -2,7 +2,8 @@
 
 import { html, icon, toast } from '../lib/dom.js';
 import { BUILD_META } from '../lib/build-meta.js';
-import { sanitizeSupportDiagnostics, submitSupportRequest } from '../lib/support.js';
+import { currentRejectedSyncGroups, sanitizeSupportDiagnostics, submitSupportRequest, supportEnvironment } from '../lib/support.js';
+import { supportWhatsAppContact, supportWhatsAppMessage, supportWhatsAppUrl } from '../lib/support-whatsapp.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
 import { clearSupportOrigin, supportVisitOrigin } from '../lib/support-origin.js';
@@ -10,6 +11,7 @@ import * as store from '../store.js';
 import { repaint } from '../repaint.js';
 
 export const SUPPORT_EMAIL = 'support@rakeezx.com';
+const whatsappContact = supportWhatsAppContact(import.meta.env?.VITE_RAKEEZ_SUPPORT_WHATSAPP_BUSINESS);
 
 const REQUEST_TYPES = [
   { value: 'inquiry', label: 'أحتاج مساعدة', detail: 'سؤال أو استفسار' },
@@ -20,6 +22,7 @@ const REQUEST_TYPES = [
 const initialDraft = () => ({
   type: 'technical', message: '',
   submitting: false, success: false, error: '',
+  whatsappReview: null, preparingWhatsApp: false,
 });
 let draft = initialDraft();
 let draftAccountKey = null;
@@ -49,14 +52,16 @@ function pwaStandalone() {
     navigator.standalone === true || document.referrer?.includes('android-app://'));
 }
 
-export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperationalSummarySnapshot?.() ?? {}) {
+export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperationalSummarySnapshot?.() ?? {}, rejectedGroups = []) {
   const width = window.innerWidth;
   const deviceCategory = width < 600 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
   const browser = browserDetails();
   return sanitizeSupportDiagnostics({
     appVersion: BUILD_META.appVersion,
     buildSha: BUILD_META.buildSha,
+    buildShaKind: BUILD_META.buildShaKind,
     buildTimestamp: BUILD_META.buildTimestamp,
+    environment: supportEnvironment(window.location?.origin),
     timestamp: new Date().toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     deviceCategory,
@@ -70,6 +75,7 @@ export function currentSafeSupportDiagnostics(syncSummary = sync.getSyncOperatio
     failedCount: syncSummary.failedCount,
     blockedCount: syncSummary.blockedCount,
     rejectedCount: syncSummary.rejectedCount,
+    rejectedGroups,
     historicalConflictCount: syncSummary.historicalConflictCount,
     actionableSyncIssue: syncSummary.actionableSyncIssue,
     lastSuccessfulSyncAt: syncSummary.lastSuccessfulSyncAt ?? sync.state.lastSyncedAt,
@@ -137,7 +143,7 @@ export default {
     return html`<div class="management-page support-page">
       <header class="support-intro">
         <span class="support-intro__icon" aria-hidden="true">${icon('note')}</span>
-        <div><h2>كيف يمكننا مساعدتك؟</h2><p>أرسل طلبك من داخل ركيز، أو تواصل عبر البريد.</p></div>
+        <div><h2>كيف يمكننا مساعدتك؟</h2><p>أرسل طلبك من داخل ركيز، أو تواصل عبر البريد أو واتساب عند توفره.</p></div>
       </header>
 
       <div class="support-layout">
@@ -191,6 +197,21 @@ export default {
             <button class="btn btn--primary support-submit" type="submit" ${canSubmit && draft.message.trim() && !draft.submitting ? '' : 'disabled'}>
               ${draft.submitting ? 'جارٍ الإرسال…' : 'إرسال'}
             </button>
+            <div class="support-whatsapp">
+              <button class="btn btn--quiet" type="button" data-act="support-whatsapp-review"
+                ${whatsappContact && canSubmit && !draft.submitting && !draft.preparingWhatsApp ? '' : 'disabled'}>مراجعة رسالة واتساب</button>
+              ${!whatsappContact ? html`<p class="support-whatsapp__note" role="status">التواصل عبر واتساب غير متاح حاليًا؛ لم يُضبط رقم ركيز الرسمي. يمكنك إرسال طلب داخل التطبيق أو استخدام البريد.</p>` :
+                html`<p class="support-whatsapp__note">واتساب خدمة خارجية. ستراجع النص قبل فتحها، ويمكنك إرفاق صورة أو فيديو بنفسك هناك. لن يرسل ركيز طلبًا آخر تلقائيًا.</p>`}
+              ${draft.whatsappReview ? html`<div class="support-whatsapp__review" role="region" aria-label="مراجعة رسالة واتساب">
+                <strong>راجع النص الذي سيُفتح في واتساب</strong>
+                <pre dir="auto">${draft.whatsappReview.text}</pre>
+                <div class="support-whatsapp__actions">
+                  <button class="btn btn--primary" type="button" data-act="support-whatsapp-open">فتح واتساب بهذه الرسالة</button>
+                  <button class="btn btn--quiet" type="button" data-act="support-whatsapp-cancel">إلغاء</button>
+                </div>
+                <p class="support-whatsapp__note">ستفتح محادثة ركيز الرسمية. راجع المرسل إليه والنص قبل الإرسال؛ الإرسال النهائي من داخل واتساب فقط.</p>
+              </div>` : ''}
+            </div>
           </form>
         </section>
       </div>
@@ -214,6 +235,8 @@ export default {
 
     'support-type'(el) {
       draft.type = el.dataset.type;
+      draft.whatsappReview = null;
+      el.closest('.support-form')?.querySelector('.support-whatsapp__review')?.remove();
       el.closest('.n34-support-choices')?.querySelectorAll('[data-type]').forEach((button) => {
         button.setAttribute('aria-pressed', String(button === el));
       });
@@ -223,6 +246,8 @@ export default {
 
     'support-message'(el) {
       draft.message = el.value;
+      draft.whatsappReview = null;
+      el.closest('.support-form')?.querySelector('.support-whatsapp__review')?.remove();
       const counter = el.form?.querySelector('[data-support-character-count]');
       if (counter) counter.innerHTML = `<bdi>${draft.message.length}</bdi> / 4000`;
       const submit = el.form?.querySelector('button[type="submit"]');
@@ -231,6 +256,7 @@ export default {
 
     async 'support-submit'(form) {
       if (draft.submitting) return;
+      draft.whatsappReview = null;
       const accountKey = supportAccountKey();
       const data = new FormData(form);
       draft.type = String(data.get('type') ?? draft.type);
@@ -246,10 +272,12 @@ export default {
       try {
         const syncSummary = await sync.getSyncOperationalSummary();
         if (supportAccountKey() !== accountKey) return;
+        const rejectedGroups = await currentRejectedSyncGroups();
+        if (supportAccountKey() !== accountKey) return;
         await submitSupportRequest({
           type: draft.type,
           message: draft.message,
-          diagnostics: currentSafeSupportDiagnostics(syncSummary),
+          diagnostics: currentSafeSupportDiagnostics(syncSummary, rejectedGroups),
         });
         if (supportAccountKey() !== accountKey) return;
         draft = { ...initialDraft(), success: true };
@@ -260,6 +288,42 @@ export default {
         draft.submitting = false;
       }
       if (supportAccountKey() !== accountKey) return;
+      repaint();
+    },
+
+    async 'support-whatsapp-review'() {
+      if (!whatsappContact || !authenticated() || !online() || draft.submitting || draft.preparingWhatsApp) return;
+      const accountKey = supportAccountKey();
+      const type = draft.type;
+      const message = draft.message;
+      draft.preparingWhatsApp = true;
+      try {
+        const summary = await sync.getSyncOperationalSummary();
+        if (supportAccountKey() !== accountKey || draft.type !== type || draft.message !== message) return;
+        const rejectedGroups = await currentRejectedSyncGroups();
+        if (supportAccountKey() !== accountKey || draft.type !== type || draft.message !== message) return;
+        draft.whatsappReview = { accountKey, type, message, text: supportWhatsAppMessage({
+          type, message, diagnostics: currentSafeSupportDiagnostics(summary, rejectedGroups),
+        }) };
+      } catch {
+        toast('تعذّر إعداد معلومات الدعم الآن. حاول مرة أخرى.', 'danger');
+      } finally {
+        draft.preparingWhatsApp = false;
+        if (supportAccountKey() === accountKey) repaint();
+      }
+    },
+
+    'support-whatsapp-open'() {
+      const review = draft.whatsappReview;
+      if (!review || review.accountKey !== supportAccountKey() ||
+          review.type !== draft.type || review.message !== draft.message ||
+          !whatsappContact || !authenticated() || !online() || draft.submitting) return;
+      const url = supportWhatsAppUrl(whatsappContact, review.text);
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    },
+
+    'support-whatsapp-cancel'() {
+      draft.whatsappReview = null;
       repaint();
     },
   },
