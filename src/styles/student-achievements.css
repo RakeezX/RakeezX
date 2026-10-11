@@ -1,0 +1,29 @@
+.student-profile-page .student-achievements__intro {
+  margin: 0 0 12px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.student-profile-page .student-achievements__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+}
+.student-profile-page .student-achievements__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+.student-profile-page .student-achievements__count {
+  color: var(--ok);
+  font-size: 28px;
+  font-weight: 700;
+}
+.student-profile-page .student-achievements__detail,
+.student-profile-page .student-achievements__source {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-2);
+}

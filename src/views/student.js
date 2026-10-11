@@ -14,6 +14,8 @@ import {
 import { studentAvatar } from '../lib/avatar.js';
 import { openStudentManagement } from '../lib/student-lifecycle-ui.js';
 import { demoOutputMarker, markDemoSharedText } from '../lib/report-print.js';
+import { studentAchievements } from '../lib/student-achievements.js';
+const achievementsStyleUrl = new URL('../styles/student-achievements.css', import.meta.url).href;
 
 /** الإسناد المعروض: المطلوب في الرابط، أو أول إسناد لشعبة الطالب الحالية. */
 function resolveTeaching(student, requested) {
@@ -92,6 +94,7 @@ export default {
     const logEvents = studentHistory.logs;
     const total = studentTotal(items, gradeCtx);
     const band = masteryBand(total.pct);
+    const achievements = studentAchievements({ studentId: s.id, history: studentHistory, items, gradeCtx });
 
     const tally = { present: 0, late: 0, excused: 0, absent: 0 };
     for (const event of attendanceEvents) {
@@ -136,6 +139,7 @@ export default {
 
     return html`
       <div class="management-page student-profile-page">
+      <link rel="stylesheet" href="${achievementsStyleUrl}">
       <div class="printhead">
         ${demoOutputMarker()}
         <div class="printhead__title">${s.name}</div>
@@ -188,6 +192,26 @@ export default {
             <span class="badge ${band.badge}">${band.label}</span>
           </div>`
         : ''}
+
+      <section class="section student-profile-section student-achievements noprint" aria-labelledby="student-achievements-title">
+        <div class="section__head">
+          <h2 class="section__title" id="student-achievements-title">إنجازات من السجل</h2>
+          <span class="badge">للمعلم · للقراءة فقط</span>
+        </div>
+        <p class="student-achievements__intro">حقائق من السجلات المتاحة، دون نقاط أو أوسمة إضافية. المشاركة والحضور يشملان كل السجل؛ الدرجات تخص الإسناد المعروض.</p>
+        ${achievements.length ? html`
+          <div class="student-achievements__grid">
+            ${achievements.map((achievement) => html`
+              <div class="card card--pad student-achievements__fact" data-achievement="${achievement.key}">
+                <div class="student-achievements__count tabular">${fmtNum(achievement.count)}</div>
+                <strong>${achievement.title}</strong>
+                <div class="student-achievements__detail">${achievement.detail}</div>
+                <div class="student-achievements__source">المصدر: ${achievement.source}</div>
+              </div>
+            `)}
+          </div>
+        ` : html`<div class="card card--pad t-3">لا توجد إنجازات موثّقة لعرضها بعد. تظهر هنا عند توفر رصد مشاركة إيجابية أو حضور أو درجة كاملة.</div>`}
+      </section>
 
       <!-- الدرجات -->
       <div class="section student-profile-section student-profile-current-grades">
