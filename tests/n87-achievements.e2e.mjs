@@ -27,7 +27,8 @@ test('teacher profile renders read-only evidence on desktop/mobile with safe opt
   await expect(section.locator('[data-achievement="participation"]')).toBeVisible();
   await expect(section.locator('[data-achievement="scores"]')).toBeVisible();
   await expect(section).toContainText('للمعلم · للقراءة فقط');
-  await expect(section.locator('[data-act="share"]')).toHaveCount(1);
+  await expect(section.locator('[data-act="share-achievement"]')).toHaveCount(1);
+  await expect(page.locator('.student-profile-actions [data-act="share"]')).toHaveCount(1);
   const snapshot = await page.evaluate(() => JSON.stringify(window.store.state));
   await page.setViewportSize({ width: 1280, height: 900 });
   await section.scrollIntoViewIfNeeded();
@@ -38,7 +39,7 @@ test('teacher profile renders read-only evidence on desktop/mobile with safe opt
     await section.scrollIntoViewIfNeeded();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: testInfo.outputPath('n87-' + width + '.png'), fullPage: false });
-    await section.locator('[data-act="share"]').click();
+    await section.locator('[data-act="share-achievement"]').click();
     const editor = page.locator('.achievement-card-editor');
     await expect(editor).toBeVisible();
     await page.evaluate(() => document.fonts.ready);

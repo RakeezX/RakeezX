@@ -67,7 +67,7 @@ export default {
   },
 
   topActions: () => html`
-    <button class="iconbtn noprint" data-act="share" aria-label="بطاقة إنجاز">${icon('share')}</button>
+    <button class="iconbtn noprint" data-act="share" aria-label="مشاركة الملخص">${icon('share')}</button>
     <button class="iconbtn noprint" data-act="print" aria-label="طباعة">${icon('print')}</button>
   `,
 
@@ -197,7 +197,7 @@ export default {
         <div class="section__head">
           <h2 class="section__title" id="student-achievements-title">إنجازات من السجل</h2>
           <span class="badge">للمعلم · للقراءة فقط</span>
-          <button class="btn btn--quiet" data-act="share">${icon('board')} بطاقة إنجاز</button>
+          <button class="btn btn--quiet" data-act="share-achievement">${icon('board')} بطاقة إنجاز</button>
         </div>
         <p class="student-achievements__intro">نحتفي بإنجازات موثّقة من السجلات المتاحة، دون نقاط إضافية أو ترتيب بين الطلاب. المشاركة والحضور يشملان كل السجل؛ الدرجات تخص الإسناد المعروض.</p>
         ${achievements.length ? html`
@@ -480,7 +480,7 @@ export default {
 
       <div class="section student-profile-actions noprint">
         <div class="btn-row student-profile-actions__row">
-          <button class="btn btn--primary" data-act="share">${icon('board')} بطاقة إنجاز</button>
+          <button class="btn btn--primary" data-act="share">${icon('board')} مشاركة الملخص</button>
           <button class="btn btn--ghost" data-act="print">${icon('print')} اطبع التقرير</button>
         </div>
       </div>
@@ -489,7 +489,7 @@ export default {
   },
 
   actions: {
-    async share(el, ev, params) {
+    async 'share-achievement'(el, ev, params) {
       const s = store.getStudent(params.id);
       if (!s) return;
       const tch = resolveTeaching(s, params.teaching);
@@ -573,6 +573,97 @@ export default {
           });
           update();
           document.fonts?.ready.then(() => { if (root.isConnected) update(); });
+        },
+      });
+    },
+
+    async share(el, ev, params) {
+      const s = store.getStudent(params.id);
+      if (!s) return;
+      const tch = resolveTeaching(s, params.teaching);
+      const section = tch ? store.getSection(tch.sectionId) : null;
+      const items = tch ? store.items(tch.id) : [];
+      const gradeCtx = store.studentContext(s.id, tch?.id);
+      const studentHistory = store.studentHistory(s.id);
+      const total = studentTotal(items, gradeCtx);
+      const band = masteryBand(total.pct);
+
+      const tally = { present: 0, late: 0, excused: 0, absent: 0 };
+      for (const event of studentHistory.attendance) {
+        const status = event.record.status;
+        tally[status] = (tally[status] ?? 0) + 1;
+      }
+      const sessions = studentHistory.attendance.length;
+      const attendedPct = sessions ? Math.round(((tally.present + tally.late) / sessions) * 100) : null;
+
+      const part = studentHistory.logs.filter((event) => event.record.kind === 'participation');
+      const behav = studentHistory.logs.filter((event) => event.record.kind === 'behavior');
+      const partNet = part.reduce((n, event) => n + event.record.delta, 0);
+      const behavNet = behav.reduce((n, event) => n + event.record.delta, 0);
+
+      const textParts = [
+        `📊 ملخص أداء الطالب: ${s.name}`,
+        section ? `🏫 الشعبة: ${sectionLabel(section)}` : '',
+        tch ? `📚 المادة: ${store.getSubject(tch.subjectId)?.name ?? ''}` : '',
+        '━━━━━━━━━━━━━━━',
+        '📈 المستوى والدرجات:',
+        `• المجموع: ${fmtNum(total.earned)} من ${total.outOfAll} (${total.pct != null ? `${fmtPct(total.pct)}` : '—'})`,
+        band.label ? `• التقدير: ${band.label}` : '',
+        '',
+        '📅 سجل الحضور والمواظبة عبر جميع الفصول:',
+        `• الحصص المرصودة: ${sessions}`,
+        `• نسبة الحضور: ${attendedPct != null ? `${attendedPct}%` : '—'}`,
+        `• الغياب: ${tally.absent} | التأخر: ${tally.late} | الاستئذان: ${tally.excused}`,
+        '',
+        '⭐ التفاعل والمشاركة:',
+        `• نقاط المشاركة: ${partNet > 0 ? '+' : ''}${partNet}`,
+        `• نقاط السلوك: ${behavNet > 0 ? '+' : ''}${behavNet}`,
+        '━━━━━━━━━━━━━━━',
+        'تطبيق رَكيز المعلم',
+      ];
+
+      const summaryText = markDemoSharedText(textParts.filter(Boolean)).join('\n');
+
+      await openSheet({
+        title: 'مشاركة ملخص الطالب',
+        desc: 'ملخص شامل ومباشر لتقديمه لولي الأمر أو الإدارة.',
+        body: html`
+          <div class="share-preview-box">${summaryText}</div>
+          <div class="stack stack-2 mt-3">
+            <button class="btn btn--primary btn--block" id="btn-copy-summary">
+              ${icon('copy')} نسخ الملخص
+            </button>
+            <a class="btn btn--ghost btn--block" href="https://api.whatsapp.com/send?text=${encodeURIComponent(summaryText)}" target="_blank" rel="noopener">
+              ${icon('share')} إرسال عبر واتساب
+            </a>
+            ${navigator.share
+              ? html`
+                  <button class="btn btn--quiet btn--block" id="btn-native-share">
+                    ${icon('share')} مشاركة عبر النظام...
+                  </button>
+                `
+              : ''}
+          </div>
+        `,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>`,
+        onMount: (root, done) => {
+          root.querySelector('#btn-copy-summary')?.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(summaryText);
+              toast('تم نسخ الملخص للحافظة', 'ok');
+            } catch {
+              toast('تعذر النسخ التلقائي — حدد النص وانسخه يدويًا', 'danger');
+            }
+          });
+
+          root.querySelector('#btn-native-share')?.addEventListener('click', async () => {
+            try {
+              await navigator.share({
+                title: `ملخص أداء الطالب ${s.name}`,
+                text: summaryText,
+              });
+            } catch {}
+          });
         },
       });
     },
