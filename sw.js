@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v38';
+const VERSION = 'rakeezx-v39';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -63,6 +63,9 @@ const SHELL = [
   './src/store.js',
   './src/models.js',
   './src/repaint.js',
+
+  './src/data/education-departments-2026-09-30.json',
+  './src/data/education-department-options-2026-09-30.json',
 
   './src/lib/dom.js',
   './src/lib/day-targeting.js',

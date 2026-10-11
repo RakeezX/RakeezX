@@ -7,6 +7,38 @@ import { runInNewContext } from 'node:vm';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const IMPORT_SPECIFIER = /(?:import(?:\s+[\s\S]*?\s+from\s+|\s*)|import\s*\()(['"])([^'"]+)\1/g;
+const DIRECTORY_JSON = [
+  'src/data/education-departments-2026-09-30.json',
+  'src/data/education-department-options-2026-09-30.json',
+];
+
+function assertExpectedOfflineJSONWarning(...args) {
+  assert.ok(['[sw] Background fetch failed', '[sw] Fetch error'].includes(args[0]),
+    `unexpected cache failure: ${args.join(' ')}`);
+  assert.ok(DIRECTORY_JSON.includes(new URL(args[1]).pathname.slice(1)));
+  assert.equal(args[2]?.message, 'synthetic offline');
+}
+
+function importedAssets(source, importer) {
+  return [...source.matchAll(IMPORT_SPECIFIER)]
+    .map((match) => match[2])
+    .filter((specifier) => specifier.startsWith('.'))
+    .map((specifier) => posix.normalize(posix.join(posix.dirname(importer), specifier)))
+    .filter((specifier) => /\.(?:js|json)$/.test(specifier));
+}
+
+test('route graph follows static JSON imports with import attributes', () => {
+  assert.deepEqual(importedAssets(`
+    import directory from '../data/education-departments-2026-09-30.json' with { type: 'json' };
+    import options from '../data/education-department-options-2026-09-30.json'
+      with { type: 'json' };
+    import { helper } from './helper.js';
+    import './side-effect.js';
+    const view = import('../views/settings.js');
+  `, 'src/lib/education-department-directory.js'), [
+    ...DIRECTORY_JSON, 'src/lib/helper.js', 'src/lib/side-effect.js', 'src/views/settings.js',
+  ]);
+});
 
 function shellEntries(source) {
   return [...source.match(/const SHELL = \[([\s\S]*?)\];/)[1].matchAll(/['"]([^'"]+)['"]/g)]
@@ -38,11 +70,8 @@ async function executableGraph(entry) {
     if (visited.has(normalized)) return;
     visited.add(normalized);
     const source = await readFile(resolve(ROOT, normalized), 'utf8');
-    const direct = [...source.matchAll(IMPORT_SPECIFIER)]
-      .map((match) => match[2])
-      .filter((specifier) => specifier.startsWith('.'))
-      .map((specifier) => posix.normalize(posix.join(posix.dirname(normalized), specifier)))
-      .filter((specifier) => specifier.endsWith('.js'));
+    // JSON is a terminal imported asset, not JavaScript to scan for imports.
+    const direct = normalized.endsWith('.json') ? [] : importedAssets(source, normalized);
     dependencies.set(normalized, direct);
     for (const dependency of direct) await visit(dependency);
   }
@@ -54,21 +83,24 @@ async function executableGraph(entry) {
 test('service worker precaches the complete executable route graph', async () => {
   const { visited, dependencies } = await executableGraph('src/app.js');
   const serviceWorker = await readFile(resolve(ROOT, 'sw.js'), 'utf8');
-  const cachedModules = new Set(
-    [...serviceWorker.matchAll(/['"](\.\/src\/[^'"]+\.js)['"]/g)]
-      .map((match) => match[1].slice(2)),
-  );
+  const cachedModules = new Set(shellEntries(serviceWorker).map((href) => href.slice(2)));
   const missing = [...visited].filter((module) => !cachedModules.has(module)).sort();
 
   assert.deepEqual(missing, [], `reachable modules missing from SHELL:\n${missing.join('\n')}`);
   assert.ok(visited.size >= 59, 'route graph unexpectedly shrank; review router/module coverage');
+  assert.deepEqual(dependencies.get('src/lib/education-department-directory.js'), DIRECTORY_JSON,
+    'both attributed JSON imports must remain in the audited closure');
+  for (const asset of DIRECTORY_JSON) {
+    assert.ok(visited.has(asset), `${asset} missing from import closure`);
+    assert.ok(cachedModules.has(asset), `${asset} is not precached`);
+  }
 
   const routedViews = dependencies.get('src/router.js') ?? [];
   assert.equal(routedViews.length, 30, 'every router entry must remain part of the audited graph');
   for (const view of routedViews) assert.ok(cachedModules.has(view), `${view} is not precached`);
 });
 
-test('fresh worker installation serves the five repaired shell dependencies offline without warming', async () => {
+test('fresh worker installation serves repaired JS and imported JSON offline without warming', async () => {
   const origin = 'https://offline-shell.test';
   const repaired = [
     'src/lib/day-targeting.js',
@@ -76,6 +108,7 @@ test('fresh worker installation serves the five repaired shell dependencies offl
     'src/lib/hijri-year-input.js',
     'src/lib/sync-warning-policy.js',
     'src/lib/visible-numerals.js',
+    ...DIRECTORY_JSON,
   ];
   const listeners = new Map();
   const entries = new Map();
@@ -83,7 +116,7 @@ test('fresh worker installation serves the five repaired shell dependencies offl
   const cache = {
     async add(request) {
       const path = new URL(request.url).pathname.slice(1);
-      // Only executable bytes are relevant to this bounded install/fetch fixture.
+      // Only imported source assets are relevant to this bounded install/fetch fixture.
       const body = path.startsWith('src/') ? await readFile(resolve(ROOT, path), 'utf8') : '';
       entries.set(key(request), new Response(body));
     },
@@ -104,7 +137,7 @@ test('fresh worker installation serves the five repaired shell dependencies offl
       constructor(input, options) { super(key(input), options); }
     },
     Response, URL,
-    console: { warn(...args) { assert.fail(`unexpected cache failure: ${args.join(' ')}`); } },
+    console: { warn: assertExpectedOfflineJSONWarning },
     async fetch() { networkAttempts += 1; throw new Error('synthetic offline'); },
   });
   let installation;
@@ -114,12 +147,16 @@ test('fresh worker installation serves the five repaired shell dependencies offl
 
   async function offlineResponse(path) {
     let response;
+    const background = [];
     listeners.get('fetch')({
       request: new Request(`${origin}/${path}`),
       respondWith(promise) { response = promise; },
+      waitUntil(promise) { background.push(promise); },
     });
     assert.ok(response, 'worker must handle the same-origin module');
-    return response;
+    const settled = await response;
+    await Promise.all(background);
+    return settled;
   }
   for (const path of repaired) {
     assert.ok(entries.has(`${origin}/${path}`), `${path} missing immediately after installation`);
@@ -133,12 +170,14 @@ test('fresh worker installation serves the five repaired shell dependencies offl
   assert.equal((await offlineResponse(repaired[0])).status, 504, 'a missing module remains a failure');
 });
 
-test('cold install and v37-to-v38 VM update precache linked CSS and protect newer/unrelated caches', async () => {
+test('cold install and v38-to-v39 VM update precache imported JSON and protect newer/unrelated caches', async () => {
   const origin = 'https://offline-shell.test';
   const source = await readFile(resolve(ROOT, 'sw.js'), 'utf8');
-  assert.match(source, /const VERSION = 'rakeezx-v38';/);
-  const oldSource = source.replace("const VERSION = 'rakeezx-v38';", "const VERSION = 'rakeezx-v37';")
-    .replace(/^[ \t]*'\.\/src\/styles\/work-n82\.css',[ \t]*\r?\n/m, '');
+  assert.match(source, /const VERSION = 'rakeezx-v39';/);
+  const oldSource = source.replace("const VERSION = 'rakeezx-v39';", "const VERSION = 'rakeezx-v38';")
+    .replace(/^[ \t]*'\.\/src\/data\/education-department(?:s|-options)-2026-09-30\.json',[ \t]*\r?\n/gm, '');
+  assert.equal(shellEntries(oldSource).length, 120, 'all predecessor shell entries must remain');
+  assert.equal(shellEntries(source).length, 122, 'only the two JSON registrations are added');
   const linked = await linkedStylesheets();
   const key = (request) => new URL(typeof request === 'string' ? request : request.url, `${origin}/`).href;
 
@@ -185,7 +224,7 @@ test('cold install and v37-to-v38 VM update precache linked CSS and protect newe
           constructor(input, options) { super(typeof input === 'string' ? key(input) : input, options); }
         },
         Response, URL,
-        console: { warn(...args) { assert.fail(`unexpected cache failure: ${args.join(' ')}`); } },
+        console: { warn: assertExpectedOfflineJSONWarning },
         async fetch() { networkAttempts += 1; throw new Error('synthetic offline'); },
       });
       return {
@@ -197,9 +236,16 @@ test('cold install and v37-to-v38 VM update precache linked CSS and protect newe
         },
         async offline(path) {
           let response;
-          listeners.get('fetch')({ request: new Request(key(path)), respondWith(promise) { response = promise; } });
+          const background = [];
+          listeners.get('fetch')({
+            request: new Request(key(path)),
+            respondWith(promise) { response = promise; },
+            waitUntil(promise) { background.push(promise); },
+          });
           assert.ok(response);
-          return response;
+          const settled = await response;
+          await Promise.all(background);
+          return settled;
         },
         get claims() { return claims; },
         get skipWaiting() { return skipWaiting; },
@@ -209,7 +255,7 @@ test('cold install and v37-to-v38 VM update precache linked CSS and protect newe
   }
 
   async function assertFullInstall(f) {
-    const entries = f.buckets.get('rakeezx-v38');
+    const entries = f.buckets.get('rakeezx-v39');
     const expected = shellEntries(source);
     assert.equal(entries.size, expected.length);
     for (const href of expected) {
@@ -228,23 +274,29 @@ test('cold install and v37-to-v38 VM update precache linked CSS and protect newe
   await assertFullInstall(fresh);
   await freshWorker.lifecycle('activate');
   assert.equal(freshWorker.claims, 1);
-  for (const href of linked) {
+  for (const href of [...linked, ...DIRECTORY_JSON]) {
     const response = await freshWorker.offline(href);
     assert.equal(response.status, 200);
     assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(resolve(ROOT, href)));
   }
-  fresh.buckets.get('rakeezx-v38').delete(key('./src/styles/work-n82.css'));
+  for (const asset of DIRECTORY_JSON) {
+    fresh.buckets.get('rakeezx-v39').delete(key(asset));
+    assert.equal((await freshWorker.offline(asset)).status, 504, 'missing imported JSON fails closed');
+  }
+  fresh.buckets.get('rakeezx-v39').delete(key('./src/styles/work-n82.css'));
   assert.equal((await freshWorker.offline('./src/styles/work-n82.css')).status, 504, 'missing CSS fails closed');
 
   const update = fixture();
   const old = update.worker(oldSource);
   await old.lifecycle('install');
   await old.lifecycle('activate');
-  assert.equal((await old.offline('./src/styles/work-n82.css')).status, 504, 'installed v37 reproduces missing CSS');
+  for (const asset of DIRECTORY_JSON) {
+    assert.equal((await old.offline(asset)).status, 504, 'installed v38 reproduces missing JSON');
+  }
   const unrelated = new Map([[key('/sentinel'), new Response('unrelated')]]);
   const newer = new Map([[key('/future'), new Response('future')]]);
   update.buckets.set('unrelated-synthetic', unrelated);
-  update.buckets.set('rakeezx-v39', newer);
+  update.buckets.set('rakeezx-v40', newer);
   update.buckets.set('rakeezx-vinvalid', new Map());
   update.buckets.set('rakeezx-v36', new Map());
   const next = update.worker(source);
@@ -252,20 +304,22 @@ test('cold install and v37-to-v38 VM update precache linked CSS and protect newe
   await next.lifecycle('install');
   assert.equal(update.networkAttempts, attemptsBeforeInstall, 'update must not warm runtime assets');
   await assertFullInstall(update);
-  assert.ok(update.buckets.has('rakeezx-v37'), 'old cache survives until new activation');
+  assert.ok(update.buckets.has('rakeezx-v38'), 'old cache survives until new activation');
   await old.offline('./src/lib/visible-numerals.js');
-  assert.ok(update.buckets.has('rakeezx-v38'), 'old worker must preserve installing newer cache');
+  assert.ok(update.buckets.has('rakeezx-v39'), 'old worker must preserve installing newer cache');
   await next.lifecycle('activate');
   assert.equal(next.claims, 1);
   assert.equal(next.skipWaiting, 1);
-  assert.ok(!update.buckets.has('rakeezx-v37'), 'activation removes old generation');
-  update.buckets.set('rakeezx-v37', new Map());
-  const response = await next.offline('./src/styles/work-n82.css');
-  assert.equal(response.status, 200);
-  assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(resolve(ROOT, 'src/styles/work-n82.css')));
-  assert.ok(!update.buckets.has('rakeezx-v37'), 'fetch cleans an old-worker recreated cache');
+  for (const generation of [36, 38]) assert.ok(!update.buckets.has(`rakeezx-v${generation}`), 'activation removes older generations');
+  update.buckets.set('rakeezx-v38', new Map());
+  for (const asset of [...linked, ...DIRECTORY_JSON]) {
+    const response = await next.offline(asset);
+    assert.equal(response.status, 200);
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(resolve(ROOT, asset)));
+  }
+  assert.ok(!update.buckets.has('rakeezx-v38'), 'fetch cleans an old-worker recreated cache');
   assert.equal(update.buckets.get('unrelated-synthetic'), unrelated);
-  assert.equal(update.buckets.get('rakeezx-v39'), newer);
+  assert.equal(update.buckets.get('rakeezx-v40'), newer);
   assert.ok(update.buckets.has('rakeezx-vinvalid'));
   assert.equal(await unrelated.get(key('/sentinel')).text(), 'unrelated');
   assert.equal(await newer.get(key('/future')).text(), 'future');
