@@ -45,18 +45,45 @@ export function boardRanking(teachings, selectedKind, timeScope, today, api = st
       if (!rows.has(student.id)) rows.set(student.id, {
         // Keep the projector projection names/avatars/points only, without private student fields.
         s: { id: student.id, name: student.name, rollNo: student.rollNo }, pts: 0,
-        sections: new Set(),
+        sections: new Set(), events: [],
       });
       rows.get(student.id).sections.add(api.getSection(teaching.sectionId)?.name ?? '');
     }
   }
   for (const log of api.state.logs) {
-    if (log.deleted || log.kind !== selectedKind || (timeScope !== 'term' && log.date !== today) ||
+    const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(log.date ?? '') ? Date.parse(`${log.date}T00:00:00Z`) : NaN;
+    if (log.deleted || log.kind !== selectedKind || Number.isNaN(parsedDate) ||
+        new Date(parsedDate).toISOString().slice(0, 10) !== log.date || (timeScope !== 'term' && log.date !== today) ||
         !members.get(log.teachingId)?.has(log.studentId) || !Number.isFinite(log.delta)) continue;
-    rows.get(log.studentId).pts += log.delta;
+    const row = rows.get(log.studentId);
+    row.pts += log.delta;
+    if (log.delta > 0) row.events.push({ date: log.date, delta: log.delta });
   }
   return [...rows.values()].map((row) => ({ ...row, sectionName: [...row.sections].filter(Boolean).join('، ') }))
     .sort((a, b) => b.pts - a.pts || (a.s.rollNo ?? 0) - (b.s.rollNo ?? 0));
+}
+
+/** Milestones use only dated positive QuickLog evidence; thin histories get no claim. */
+export function boardMilestones(row) {
+  const byDate = new Map();
+  for (const event of row.events ?? []) byDate.set(event.date, (byDate.get(event.date) ?? 0) + event.delta);
+  const dates = [...byDate.keys()].sort();
+  let streak = 0;
+  for (let i = dates.length - 1; i >= 0; i--) {
+    if (i < dates.length - 1) {
+      const gap = (Date.parse(`${dates[i + 1]}T00:00:00Z`) - Date.parse(`${dates[i]}T00:00:00Z`)) / 86400000;
+      if (gap !== 1) break;
+    }
+    streak++;
+  }
+  let improved = false;
+  if (dates.length >= 4) {
+    const split = Math.floor(dates.length / 2);
+    const before = dates.slice(0, split).reduce((sum, date) => sum + byDate.get(date), 0);
+    const after = dates.slice(split).reduce((sum, date) => sum + byDate.get(date), 0);
+    improved = after > before;
+  }
+  return { streak: streak >= 3 ? streak : 0, improved };
 }
 
 export default {
@@ -79,7 +106,7 @@ export default {
     const useGrade = audience === 'grade' && comparable.length > 0;
     const allRanked = boardRanking(useGrade ? comparable : [cls], kind, scope, todayISO(), store, useGrade);
     // A wider projector audience celebrates positive contributions without displaying negative standings.
-    const ranked = useGrade ? allRanked.filter((row) => row.pts > 0) : allRanked;
+    const ranked = allRanked.filter((row) => row.pts > 0);
     if (!ranked.length && !useGrade && !comparable.some((teaching) => store.students(teaching.id).length)) {
       return html`
         <div class="empty">
@@ -130,11 +157,23 @@ export default {
             </div>
           `
         : html`
+            <section class="board__podium" aria-label="\u0627\u0644\u0645\u0631\u0627\u062a\u0628 \u0627\u0644\u0623\u0648\u0644\u0649">
+              ${ranked.slice(0, 3).map((r, i) => {
+                const milestones = boardMilestones(r);
+                return html`<article class="board__podium-card board__podium-card--${i + 1}">
+                  <span class="board__podium-place">${i + 1}</span>
+                  ${studentAvatar(r.s, 'sm')}
+                  <strong class="board__podium-name">${r.s.name}${useGrade ? html`<small class="board__section">${r.sectionName}</small>` : ''}</strong>
+                  <span class="board__podium-points tabular">+${r.pts}</span>
+                  <span class="board__badges">${milestones.streak ? html`<small title="\u0633\u0644\u0633\u0644\u0629 \u0625\u064a\u062c\u0627\u0628\u064a\u0629 \u0645\u0633\u062c\u0644\u0629">✦ ${milestones.streak}</small>` : ''}${milestones.improved ? html`<small title="\u062a\u062d\u0633\u0646 \u0628\u0646\u0627\u0621\u064b \u0639\u0644\u0649 \u0641\u062a\u0631\u062a\u064a\u0646 \u0645\u0633\u062c\u0644\u062a\u064a\u0646">↑</small>` : ''}</span>
+                </article>`;
+              })}
+            </section>
             <ol class="board" aria-label="ترتيب التميز">
-              ${ranked.map(
+              ${ranked.slice(3).map(
                 (r, i) => html`
-                  <li class="board__row ${i < 3 && r.pts > 0 ? 'is-top' : ''}">
-                    <span class="board__rank"><span class="board__rank-mark tabular">${i + 1}</span></span>
+                  <li class="board__row">
+                    <span class="board__rank"><span class="board__rank-mark tabular">${i + 4}</span></span>
                     ${studentAvatar(r.s, 'xs')}
                     <span class="board__name">${r.s.name}${useGrade ? html`<small class="board__section">${r.sectionName}</small>` : ''}</span>
                     <span class="board__bar">

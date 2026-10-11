@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import board, { gradeTeachings, boardRanking } from '../src/views/board.js';
+import board, { gradeTeachings, boardRanking, boardMilestones } from '../src/views/board.js';
 import * as store from '../src/store.js';
 
 function fixture() {
@@ -89,6 +89,27 @@ test('class ranking matches existing sum/order including negatives, today and be
   for (const kind of ['participation', 'behavior']) for (const scope of ['today', 'term']) {
     assert.deepEqual(boardRanking([cls], kind, scope, '2026-10-11', api).map(r => [r.s.id, r.pts]), oldRanking(kind, scope).map(r => [r.s.id,r.pts]));
   }
+});
+
+test('milestones require dated positive evidence, a three-day streak, and two comparable periods', () => {
+  assert.deepEqual(boardMilestones({ events: [] }), { streak: 0, improved: false });
+  assert.deepEqual(boardMilestones({ events: [
+    { date: '2026-10-09', delta: 1 }, { date: '2026-10-10', delta: 2 }, { date: '2026-10-11', delta: 1 },
+  ] }), { streak: 3, improved: false });
+  assert.deepEqual(boardMilestones({ events: [
+    { date: '2026-10-01', delta: 1 }, { date: '2026-10-02', delta: 1 },
+    { date: '2026-10-03', delta: 3 }, { date: '2026-10-04', delta: 4 },
+  ] }), { streak: 4, improved: true });
+  assert.deepEqual(boardMilestones({ events: [
+    { date: '2026-10-01', delta: 2 }, { date: '2026-10-03', delta: 5 },
+  ] }), { streak: 0, improved: false });
+});
+
+test('board podium contains only positive contributions and never shows the lowest standings', () => {
+  fixture(); board.onMount();
+  const rendered = String(board.render({ id: 'a' }));
+  assert.match(rendered, /board__podium/);
+  assert.doesNotMatch(rendered, /inactive|removed/);
 });
 
 test('board defaults to class, preserves controls and HTML escaping without gradebook/history fields', () => {
