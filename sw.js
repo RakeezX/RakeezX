@@ -64,6 +64,11 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/day-targeting.js',
+  './src/lib/education-department-directory.js',
+  './src/lib/hijri-year-input.js',
+  './src/lib/sync-warning-policy.js',
+  './src/lib/visible-numerals.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',
