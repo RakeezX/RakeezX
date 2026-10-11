@@ -11,7 +11,7 @@ import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, s
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 import { user } from '../lib/cloud.js';
-import { readStudentFile, previewStudentRows, importContext, confirmStudentImport } from '../lib/student-import.js';
+import { readStudentFile, previewStudentRows, detectStudentNameColumn, isStudentNameHeader, importContext, confirmStudentImport } from '../lib/student-import.js';
 
 let query = '';
 let formerOpen = false;
@@ -47,46 +47,76 @@ export function parseNames(text) {
 
 function fileImportSheet(secId) {
   let rows = null, preview = null, reading = 0;
-  const labels = { new: 'جديد', existing: 'موجود', invalid: 'غير صالح', ambiguous: 'يحتاج مراجعة' };
   return openSheet({
-    title: 'استيراد ملف الأسماء',
-    desc: 'CSV بترميز UTF-8 أو Excel (.xlsx)، حتى 300 طالب و1 ميجابايت. يُقرأ الملف على جهازك فقط. في Excel تُقرأ الورقة الأولى.',
+    title: 'استيراد الطلاب',
+    desc: 'اختر ملف Excel أو CSV لمراجعة الأسماء قبل إضافتها.',
     body: html`
-      <label class="field"><span class="field__label">اختر ملفًا</span>
+      <label class="field"><span class="field__label">ملف الطلاب</span>
         <input class="input" id="student-file" type="file" accept=".csv,.xlsx"></label>
       <div id="file-options" hidden>
-        <label class="field"><span class="field__label">عمود اسم الطالب</span><select class="input" id="file-column"></select></label>
-        <label class="field"><span><input id="file-header" type="checkbox" checked> الصف الأول عناوين أعمدة</span></label>
+        <label class="field"><span class="field__label">عمود الأسماء</span><select class="input" id="file-column"></select></label>
       </div>
-      <p class="field__hint">سيُستورد عمود الأسماء فقط. لن تُطبّق الدرجات أو الأعمدة الأخرى.</p>
-      <p class="field__hint">الأسماء الموجودة والمتكررة لن تُضاف. راجع الحالات المتشابهة يدويًا؛ يمكنك إضافة طالب مستقل من «طالب جديد».</p>
-      <p id="file-count" role="status" aria-live="polite">اختر ملفًا لمعاينته قبل الإضافة.</p>
+      <p id="file-count" role="status" aria-live="polite">لن تُضاف أسماء قبل تأكيدك.</p>
       <div id="file-preview" class="list"></div>
+      <p class="field__hint">تُقرأ البيانات على جهازك فقط، ولا تُستورد الدرجات.</p>
     `,
     foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" id="file-confirm" disabled>تأكيد إضافة الأسماء الجديدة</button>`,
+      <button class="btn btn--primary" id="file-confirm" disabled hidden>إضافة الطلاب</button>`,
     onMount(root, done) {
       const input = root.querySelector('#student-file'), column = root.querySelector('#file-column');
-      const header = root.querySelector('#file-header'), go = root.querySelector('#file-confirm');
+      const go = root.querySelector('#file-confirm');
       const count = root.querySelector('#file-count'), list = root.querySelector('#file-preview');
       const refresh = () => {
         preview = null;
         go.disabled = true;
+        go.hidden = true;
+        go.style.display = 'none';
         list.replaceChildren();
         if (!rows) return;
         try {
-          preview = previewStudentRows(rows, Number(column.value), header.checked, store.sectionRoster(secId));
-          count.textContent = Object.entries(preview.counts).map(([key, value]) => `${labels[key]}: ${value}`).join(' · ');
-          for (const entry of preview.entries) {
-            const row = document.createElement('div');
-            row.className = 'row';
-            row.textContent = `الصف ${entry.row} · ${entry.name || 'بلا اسم'} · ${labels[entry.status]}`;
-            list.append(row);
+          preview = previewStudentRows(rows, Number(column.value), false, store.sectionRoster(secId));
+          const { new: added, existing, invalid, ambiguous } = preview.counts;
+          const exceptions = invalid + ambiguous;
+          count.textContent = !preview.entries.length ? 'لم نجد أسماء طلاب في العمود المحدد. اختر عمود الأسماء.'
+            : [added ? `${added} اسمًا جديدًا` : 'لا توجد أسماء جديدة',
+              existing ? `${existing} موجود مسبقًا` : '',
+              exceptions ? `${exceptions} يحتاج مراجعة` : ''].filter(Boolean).join(' • ');
+          const makeEntry = (entry) => {
+            const el = document.createElement('div');
+            el.className = 'row';
+            el.textContent = entry.name;
+            return el;
+          };
+          const candidates = preview.entries.filter((entry) => entry.status === 'new');
+          if (candidates.length) {
+            const title = document.createElement('strong');
+            title.textContent = 'الأسماء التي ستُضاف';
+            list.append(title, ...candidates.slice(0, 6).map(makeEntry));
+            if (candidates.length > 6) {
+              const details = document.createElement('details'), summary = document.createElement('summary');
+              summary.textContent = `عرض بقية الأسماء (${candidates.length - 6})`;
+              details.append(summary, ...candidates.slice(6).map(makeEntry));
+              list.append(details);
+            }
           }
-          go.disabled = !preview.names.length;
-          go.textContent = `تأكيد إضافة ${preview.names.length} طالبًا جديدًا`;
+          if (exceptions) {
+            const details = document.createElement('details'), summary = document.createElement('summary');
+            summary.textContent = `أسماء تحتاج مراجعة (${exceptions})`;
+            details.append(summary);
+            for (const entry of preview.entries.filter((item) => item.status === 'invalid' || item.status === 'ambiguous')) {
+              const el = document.createElement('div');
+              el.className = 'row';
+              el.textContent = `صف ${entry.row}: ${entry.name} — ${entry.status === 'invalid' ? 'اسم غير صالح' : 'اسم مكرر أو متشابه'}`;
+              details.append(el);
+            }
+            list.append(details);
+          }
+          go.disabled = !added;
+          go.hidden = !added;
+          go.style.display = added ? '' : 'none';
+          go.textContent = `إضافة ${added} طالبًا`;
         } catch {
-          count.textContent = 'الحد الأقصى 300 طالب. راجع الملف وعناوين الأعمدة.';
+          count.textContent = 'تعذّر معاينة الأسماء. راجع الملف أو اختر عمودًا آخر.';
         }
       };
       input.addEventListener('change', async () => {
@@ -102,16 +132,16 @@ function fileImportSheet(secId) {
           rows = parsed;
           column.replaceChildren();
           const width = Math.max(...rows.map((row) => row.length));
+          const nameColumn = detectStudentNameColumn(rows);
           for (let index = 0; index < width; index++) {
             const option = document.createElement('option');
             option.value = index;
-            option.textContent = `العمود ${index + 1} · ${String(rows[0][index] ?? '').slice(0, 80)}`;
+            const heading = rows.slice(0, 12).find((row) => isStudentNameHeader(row[index]))?.[index];
+            option.textContent = heading ? `${heading} (العمود ${index + 1})` : `العمود ${index + 1}`;
             column.append(option);
           }
-          const nameColumn = rows[0].findIndex((cell) => /^(اسم الطالب|الاسم|اسم|student name|name)$/i.test(String(cell ?? '').trim()));
-          header.checked = nameColumn >= 0;
-          column.value = String(Math.max(0, nameColumn));
-          root.querySelector('#file-options').hidden = false;
+          column.value = String(nameColumn);
+          root.querySelector('#file-options').hidden = width === 1;
           refresh();
         } catch {
           if (ticket !== reading || !root.isConnected) return;
@@ -119,11 +149,10 @@ function fileImportSheet(secId) {
         }
       });
       column.addEventListener('change', refresh);
-      header.addEventListener('change', refresh);
       go.addEventListener('click', () => {
         if (go.disabled || !preview) return;
         go.disabled = true;
-        done({ rows, column: Number(column.value), hasHeader: header.checked, preview });
+        done({ rows, column: Number(column.value), hasHeader: false, preview });
       });
     },
   });

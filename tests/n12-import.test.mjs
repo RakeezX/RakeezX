@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { parseCsv, previewStudentRows, readStudentFile, validateRows, validateXlsxArchive, importContext, confirmStudentImport } from '../src/lib/student-import.js';
+import { parseCsv, previewStudentRows, detectStudentNameColumn, isStudentNameHeader, readStudentFile, validateRows, validateXlsxArchive, importContext, confirmStudentImport } from '../src/lib/student-import.js';
 
 test('Arabic UTF-8 BOM, quoted commas, escaped quotes and multiline cells', () => {
   const rows = parseCsv('\uFEFFاسم الطالب,درجة\r\n"طالب، عربي",9\r\n"طالب ""اختبار""",8\r\n"طالب\nجديد",7');
@@ -13,7 +13,7 @@ test('Arabic UTF-8 BOM, quoted commas, escaped quotes and multiline cells', () =
 test('existing names and all repeated occurrences are never silently added', () => {
   const rows = [['الاسم'], ['سالم أحمد'], ['سالم  أحمد'], ['مُحمد علي'], ['طالب جديد'], ['123'], [null], ['=HYPERLINK("x")'], ['x'.repeat(81)], ['طالب\u202E']];
   const preview = previewStudentRows(rows, 0, true, [{ name: 'محمد علي' }]);
-  assert.deepEqual(preview.counts, { new: 1, existing: 1, ambiguous: 2, invalid: 5 });
+  assert.deepEqual(preview.counts, { new: 1, existing: 1, ambiguous: 2, invalid: 4 });
   assert.deepEqual(preview.names, ['طالب جديد']);
   assert.equal(previewStudentRows([['اسم مشترك']], 0, false, [{ name: 'اسم مشترك' }, { name: 'اسم مشترك' }]).counts.ambiguous, 1);
 });
@@ -22,6 +22,30 @@ test('explicit column and header choices; grade cells never enter names', () => 
   const rows = parseCsv('رقم;اسم الطالب;درجة\n1;طالب أول;10\n2;طالب ثان;8');
   assert.deepEqual(previewStudentRows(rows, 1, true, []).names, ['طالب أول', 'طالب ثان']);
   assert.equal(previewStudentRows([['طالب أول']], 0, false, []).counts.new, 1);
+});
+
+test('real-world Excel export with a second-row اسم الطالب/ة heading and many blank rows', () => {
+  const rows = [
+    ['الجهة التعليمية', '', 'الأسبوع'],
+    ['', 'اسم الطالب/ة', 'الدرجة'],
+    [1, '', ''],
+    [2, 'طالب تجريبي أول', 9],
+    [3, '', ''],
+    [4, 'طالب تجريبي ثان', 8],
+    ['', '', ''],
+    ['', 'اسم الطالب/ة', ''],
+    ['', '', ''],
+  ];
+  assert.equal(isStudentNameHeader('اسم الطالب/ة'), true);
+  assert.equal(isStudentNameHeader('اسم الطالب'), true);
+  assert.equal(detectStudentNameColumn(rows), 1);
+  const first = previewStudentRows(rows, 1, false, []);
+  assert.deepEqual(first.names, ['طالب تجريبي أول', 'طالب تجريبي ثان']);
+  assert.deepEqual(first.counts, { new: 2, existing: 0, ambiguous: 0, invalid: 0 });
+  assert.deepEqual(first.entries.map((entry) => entry.row), [4, 6]);
+  const repeated = previewStudentRows(rows, 1, false, first.names.map((name) => ({ name })));
+  assert.deepEqual(repeated.counts, { new: 0, existing: 2, invalid: 0, ambiguous: 0 });
+  assert.deepEqual(repeated.names, []);
 });
 
 test('bounded rows, cells and files; malformed CSV and invalid UTF-8 rejected', async () => {

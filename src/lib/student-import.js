@@ -79,27 +79,49 @@ const nameKey = (value) => String(value ?? '').normalize('NFC').replace(/[\s\u06
 const validName = (value) => typeof value === 'string' && value.replace(/\s+/g, ' ').trim().length >= 2 && value.replace(/\s+/g, ' ').trim().length <= 80 &&
   /\p{L}/u.test(value) && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\uFFFD\u200B-\u200F\u202A-\u202E\u2066-\u2069]/.test(value) && !/^[=+@-]/.test(value.trim());
 
+const headerKey = (value) => String(value ?? '').normalize('NFKC')
+  .replace(/[\s\u0640\u064B-\u065F\u0670\/\\_-]/g, '').toLowerCase();
+export const isStudentNameHeader = (value) => /^(?:اسم|الاسم|الأسماء|اسمالطالب|اسمالطالبة|اسمالطلاب|اسمالطالبات|اسماءالطلاب|name|studentname)$/.test(headerKey(value));
+
+// Official school exports often put the heading on the SECOND row after a title.
+// Detect it near the top rather than assuming row one is the only header.
+export function detectStudentNameColumn(rows) {
+  for (const row of rows.slice(0, 12)) {
+    const column = row.findIndex(isStudentNameHeader);
+    if (column >= 0) return column;
+  }
+  return 0;
+}
+
 export function previewStudentRows(rows, column, hasHeader, roster) {
-  const data = hasHeader ? rows.slice(1) : rows;
+  const heading = rows.findIndex((row, i) => i < 12 && isStudentNameHeader(row?.[column]));
+  const firstDataRow = heading >= 0 ? heading + 1 : hasHeader ? 1 : 0;
+  const data = rows.slice(firstDataRow);
   if (data.length > IMPORT_LIMITS.rows) fail();
   const existing = new Map(), seen = new Map();
   for (const student of roster) {
     const key = nameKey(student.name);
     existing.set(key, (existing.get(key) ?? 0) + 1);
   }
-  for (const row of data) {
-    if (!validName(row[column])) continue;
-    const key = nameKey(row[column]);
+  // Empty cells and repeated heading rows are layout, not invalid students.
+  const candidates = data.map((row, index) => {
+    const value = row[column];
+    const name = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+    return { row: firstDataRow + index + 1, name };
+  }).filter((entry) => entry.name && !isStudentNameHeader(entry.name));
+  for (const entry of candidates) {
+    if (!validName(entry.name)) continue;
+    const key = nameKey(entry.name);
     seen.set(key, (seen.get(key) ?? 0) + 1);
   }
   const counts = { new: 0, existing: 0, invalid: 0, ambiguous: 0 };
-  const entries = data.map((row, index) => {
-    const value = row[column];
-    const name = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
-    const key = nameKey(name);
-    const status = !validName(value) ? 'invalid' : (existing.get(key) > 1 || seen.get(key) > 1) ? 'ambiguous' : existing.has(key) ? 'existing' : 'new';
+  const entries = candidates.map((entry) => {
+    const key = nameKey(entry.name);
+    const status = !validName(entry.name) ? 'invalid'
+      : (existing.get(key) > 1 || seen.get(key) > 1) ? 'ambiguous'
+      : existing.has(key) ? 'existing' : 'new';
     counts[status]++;
-    return { row: index + (hasHeader ? 2 : 1), name, status };
+    return { ...entry, status };
   });
   return { counts, entries, names: entries.filter((entry) => entry.status === 'new').map((entry) => entry.name) };
 }
