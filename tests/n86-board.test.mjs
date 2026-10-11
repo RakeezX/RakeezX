@@ -118,6 +118,9 @@ test('board defaults to class, preserves controls and HTML escaping without grad
   const rendered = String(board.render({ id: 'a' }));
   assert.match(rendered, /&lt;script&gt;private&lt;\/script&gt;/);
   assert.match(rendered, /data-audience="class" aria-pressed="true"/);
+  assert.match(rendered, /الفصل الحالي/);
+  assert.match(rendered, /كل فصول الصف/);
+  assert.doesNotMatch(rendered, /شعب|فلا تعني النقاط مقارنة متكافئة|ليست درجات دراسية/);
   assert.match(rendered, /data-act="fullscreen"/);
   assert.doesNotMatch(rendered, /PRIVATE_|98765/);
 });

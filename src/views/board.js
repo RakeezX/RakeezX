@@ -5,7 +5,7 @@
 
 import { html, icon } from '../lib/dom.js';
 import * as store from '../store.js';
-import { todayISO } from '../models.js';
+import { todayISO, gradeLabel } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 
@@ -124,8 +124,8 @@ export default {
       <div class="classroom-tool-page excellence-board-page">
       <div class="classroom-toolbar board-controls">
         <div class="segmented" role="group" aria-label="نطاق الطلاب">
-          <button type="button" class="segmented__btn ${!useGrade ? 'is-on' : ''}" data-act="audience" data-audience="class" aria-pressed="${!useGrade}">الفصل</button>
-          <button type="button" class="segmented__btn ${useGrade ? 'is-on' : ''}" data-act="audience" data-audience="grade" aria-pressed="${useGrade}" ${!comparable.length ? html`disabled` : ''}>المستوى الدراسي</button>
+          <button type="button" class="segmented__btn ${!useGrade ? 'is-on' : ''}" data-act="audience" data-audience="class" aria-pressed="${!useGrade}">الفصل الحالي</button>
+          <button type="button" class="segmented__btn ${useGrade ? 'is-on' : ''}" data-act="audience" data-audience="grade" aria-pressed="${useGrade}" ${!comparable.length ? html`disabled` : ''}>كل فصول الصف</button>
         </div>
         <div class="segmented" role="group" aria-label="نوع التميز">
           <button type="button" class="segmented__btn ${kind === 'participation' ? 'is-on' : ''}"
@@ -144,15 +144,16 @@ export default {
         </button>
       </div>
       <p class="board-context" role="status">${useGrade
-        ? html`المستوى ${store.getSection(cls.sectionId)?.grade} · ${store.getSubject(cls.subjectId)?.name} · ${store.activeTerm()?.name} · ${comparable.length} شعب<br>نقاط الرصد السريع المسجلة فقط؛ تختلف فرص المشاركة بين الشعب، فلا تعني النقاط مقارنة متكافئة. ليست درجات دراسية.`
-        : html`نقاط الرصد السريع لهذا الفصل فقط.${!comparable.length ? ' نطاق المستوى متاح للإسنادات النشطة في السنة والفصل الدراسي الحاليين.' : ''}`}</p>
+        ? html`${gradeLabel(store.getSection(cls.sectionId)?.grade)} · ${store.getSubject(cls.subjectId)?.name} · ${comparable.length} فصول`
+        : 'نقاط الرصد السريع للفصل الحالي.'}</p>
+      ${useGrade ? html`<small class="board-context-note">من الرصد السريع · تختلف فرص المشاركة بين الفصول</small>` : ''}
 
       ${!anyPoints
         ? html`
             <div class="empty">
               <div class="empty__icon">${icon('spark')}</div>
             <div class="empty__title">${useGrade ? 'لا نقاط إيجابية بعد' : 'لا نقاط بعد'}</div>
-              <div class="empty__text">${useGrade ? 'تظهر هنا المساهمات الإيجابية المسجلة في شعب المستوى للمادة نفسها.' : 'ابدأ الرصد السريع في الحصة وستمتلئ اللوحة أمام طلابك.'}</div>
+              <div class="empty__text">${useGrade ? 'تظهر هنا المساهمات الإيجابية المسجلة في الصف للمادة نفسها.' : 'ابدأ الرصد السريع في الحصة وستمتلئ اللوحة أمام طلابك.'}</div>
               <a class="btn btn--primary" href="#/teaching/${cls.id}/quicklog">${icon('spark')} الرصد السريع</a>
             </div>
           `

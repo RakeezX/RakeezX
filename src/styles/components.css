@@ -578,6 +578,7 @@
 /* ---------- لوحة التميز ---------- */
 .excellence-board-page .board-controls { flex-wrap: wrap; }
 .excellence-board-page .board-context { color: var(--text-2); font-size: 14px; line-height: 1.8; margin-block: var(--sp-3); }
+.excellence-board-page .board-context-note { display: block; color: var(--text-2); font-size: 12px; line-height: 1.5; }
 .excellence-board-page .board__section { display: block; font-size: 14px; font-weight: 400; color: var(--text-2); }
 .excellence-board-page .board-controls button { min-height: 44px; }
 .excellence-board-page .segmented__btn:disabled { opacity: .55; cursor: default; }
