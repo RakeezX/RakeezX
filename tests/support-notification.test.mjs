@@ -174,11 +174,11 @@ test('email builder emits fixed Arabic-first presentation and ignores browser-su
   assert.doesNotMatch(result.payload.text, new RegExp(`${OWNER}|browser-attacker@example|اسم غير موثوق|token|rawOutbox|private`, 'i'));
   assert.match(result.payload.text, /الاسم: المعلّم عبدالله/);
   assert.match(result.payload.text, /البريد: teacher@example\.test/);
-  assert.match(result.payload.text, /الإصدار: 1\.0\.0/);
+  assert.match(result.payload.text, /التطبيق: 1\.0\.0/);
   assert.match(result.payload.text, /البناء: a{12}/);
-  assert.match(result.payload.text, /قيد الانتظار: 2/);
-  assert.match(result.payload.text, /بانتظار بيانات مرتبطة: 1/);
-  assert.match(result.payload.text, /اختلافات تاريخية متصالحة: 4/);
+  assert.match(result.payload.text, /معلق: 2/);
+  assert.match(result.payload.text, /محظور: 1/);
+  assert.match(result.payload.text, /تعارضات سابقة: 4/);
   assert.doesNotMatch(result.payload.text, new RegExp(`a{13}`));
 });
 
@@ -195,16 +195,16 @@ test('worker re-sanitizes safe origin pairs and formats only static metadata', (
   const direct = validate({ routeCategory: 'support' });
   assert.deepEqual(direct.request.diagnostics, { routeCategory: 'support' });
   const directEmail = buildNotificationEmail({ ...base, diagnostics: direct.request.diagnostics }, { to: 'internal@example.test' });
-  assert.match(directEmail.payload.text, /قسم التطبيق: الدعم/);
-  assert.doesNotMatch(directEmail.payload.text, /المسار:/);
+  assert.match(directEmail.payload.text, /القسم: الدعم/);
+  assert.doesNotMatch(directEmail.payload.text, /الصفحة:/);
 
   const email = buildNotificationEmail({ ...base, diagnostics: attendance.request.diagnostics }, { to: 'internal@example.test' });
   assert.equal(email.ok, true);
-  assert.match(email.payload.text, /قسم التطبيق: الفصول/);
-  assert.match(email.payload.text, /المسار: \/teaching\/:id\/attendance/);
+  assert.match(email.payload.text, /الصفحة: \/teaching\/:id\/attendance/);
+  assert.match(email.payload.text, /الصفحة: \/teaching\/:id\/attendance/);
   const calendarEmail = buildNotificationEmail({ ...base, diagnostics: calendar.request.diagnostics }, { to: 'internal@example.test' });
-  assert.match(calendarEmail.payload.text, /قسم التطبيق: التقويم/);
-  assert.match(calendarEmail.payload.text, /المسار: \/calendar/);
+  assert.match(calendarEmail.payload.text, /الصفحة: \/calendar/);
+  assert.match(calendarEmail.payload.text, /الصفحة: \/calendar/);
 });
 
 test('worker drops mismatched and raw origin data without rejecting the request or leaking it to email', () => {

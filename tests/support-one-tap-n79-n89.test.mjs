@@ -72,7 +72,7 @@ test('Demo, ownerless, unclaimed and mismatched owners use reduced safe diagnost
   for(const options of [{workspace:{type:'demo',databaseName:'fixture-demo'},user:null},{workspace:null,user:null},
     {workspace:{...claimed(),ownershipState:'unclaimed'}},{workspace:claimed(OTHER)}]) {
     const f=fixture(options);f.view.onMount();await f.flush();f.view.actions['support-whatsapp-open']();
-    assert.equal(f.calls.open.length,1);assert.match(f.text(),/نوع الجهاز: mobile/);
+    assert.equal(f.calls.open.length,1);assert.match(f.text(),/الجهاز: جوال/);
     assert.doesNotMatch(f.text(),/مزامنة|معلقة|مرفوضة|N58_|999|11111111|22222222/);
     assert.equal(f.calls.summary,0);assert.equal(f.calls.groups,0);assert.equal(f.calls.post.length,0);f.view.onUnmount();
   }
@@ -94,7 +94,7 @@ test('workspace switch discards old Sync immediately and refreshes only the new 
   f.setSummary({state:'synced',pendingCount:1,rejectedCount:0});f.setGroups([]);
   f.view.actions['support-whatsapp-open']();assert.doesNotMatch(f.text(),/N58_|معلقة: 3|مرفوضة: 6|999/);
   await f.flush();f.view.render();await f.flush();f.view.actions['support-whatsapp-open']();
-  assert.match(f.text(),/عناصر معلقة: 1/);assert.doesNotMatch(f.text(),/N58_|11111111|22222222|999/);await f.flush();f.view.onUnmount();
+  assert.match(f.text(),/معلق: 1/);assert.doesNotMatch(f.text(),/N58_|11111111|22222222|999/);await f.flush();f.view.onUnmount();
 });
 
 test('late async diagnostics cannot cross workspace switch or unmount',async()=>{

@@ -21,8 +21,8 @@ test('WhatsApp prefill reuses N89 allowlist and never includes raw form text', (
   assert.match(text, /نوع الطلب: مشكلة تقنية/);
   assert.doesNotMatch(text, /لا تعمل المزامنة/);
   assert.match(text, /^السلام عليكم/);
-  assert.match(text, /قالب الصفحة: \/student\/:id/);
-  assert.match(text, /عناصر معلقة: 2/);
+  assert.match(text, /الصفحة: \/student\/:id/);
+  assert.match(text, /معلق: 2/);
   assert.doesNotMatch(text, /private-|studentName|className|ownerId|accountId|recordId|rawProductData/);
   assert.equal(supportWhatsAppMessage({ type: 'suggestion' }).includes('رسالة المستخدم:'), false);
   assert.throws(() => supportWhatsAppMessage({ type: 'other' }), TypeError);

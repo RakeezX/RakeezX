@@ -179,37 +179,45 @@ export function formatRiyadhTime(value) {
   }).format(new Date(value));
 }
 
-function formatDiagnosticLines(diagnostics) {
-  const lines = [];
-  if (diagnostics.appVersion) lines.push(`الإصدار: ${diagnostics.appVersion}`);
-  if (diagnostics.environment) lines.push(`البيئة: ${{ production: 'الإنتاج', preview: 'المعاينة', other: 'أخرى' }[diagnostics.environment]}`);
-  if (diagnostics.buildSha) lines.push(`${diagnostics.buildShaKind === 'content' ? 'بصمة المحتوى' : diagnostics.buildShaKind === 'git' ? 'إصدار Git' : 'البناء'}: ${diagnostics.buildSha.slice(0, 12)}`);
-  if (diagnostics.operatingSystem) {
-    const system = { android: 'Android', ios: 'iOS', ipados: 'iPadOS', windows: 'Windows',
-      macos: 'macOS', linux: 'Linux', chromeos: 'ChromeOS' }[diagnostics.operatingSystem];
-    lines.push(`النظام: ${system}${diagnostics.operatingSystemVersion ? ` ${diagnostics.operatingSystemVersion}` : ''}`);
+
+const OS_LABELS = { android: 'Android', ios: 'iOS', ipados: 'iPadOS', windows: 'Windows', macos: 'macOS', linux: 'Linux', chromeos: 'ChromeOS' };
+const DEVICE_LABELS = { mobile: 'جوال', tablet: 'جهاز لوحي', desktop: 'كمبيوتر', other: 'جهاز آخر' };
+const SYNC_LABELS = { idle: 'خاملة', syncing: 'جارية', synced: 'مكتملة', pending: 'معلقة', blocked: 'محظورة', conflicted: 'تعارض', rejected: 'مرفوضة', offline: 'دون اتصال', error: 'خطأ', auth_required: 'يحتاج دخولًا' };
+function compactSupportLines(safe) {
+  const rows = [];
+  const add = (parts) => { const line = parts.filter(Boolean).join(' • '); if (line) rows.push(line); };
+  add([
+    safe.environment ? 'البيئة: ' + ({ production:'الإنتاج', preview:'المعاينة', other:'أخرى' }[safe.environment]) : '',
+    safe.appVersion ? 'التطبيق: ' + safe.appVersion : '',
+    safe.buildSha ? (safe.buildShaKind === 'content' ? 'البصمة: ' : safe.buildShaKind === 'git' ? 'Git: ' : 'البناء: ') + safe.buildSha.slice(0,12) : '',
+  ]);
+  add([
+    safe.operatingSystem ? 'النظام: ' + OS_LABELS[safe.operatingSystem] + (safe.operatingSystemVersion ? ' ' + safe.operatingSystemVersion : '') : '',
+    safe.deviceCategory ? 'الجهاز: ' + DEVICE_LABELS[safe.deviceCategory] : '',
+    safe.deviceModel ? 'الطراز: ' + safe.deviceModel : '',
+    safe.browser ? 'المتصفح: ' + safe.browser + (safe.browserVersion ? ' ' + safe.browserVersion.split('.')[0] : '') : '',
+  ]);
+  add([
+    safe.routeTemplate ? 'الصفحة: ' + safe.routeTemplate : safe.routeCategory ? 'القسم: ' + safe.routeCategory : '',
+    safe.viewport ? 'الشاشة: ' + safe.viewport.width + '×' + safe.viewport.height : '',
+    typeof safe.online === 'boolean' ? 'الاتصال: ' + (safe.online ? 'متصل' : 'غير متصل') : '',
+  ]);
+  add([
+    safe.syncState ? 'المزامنة: ' + SYNC_LABELS[safe.syncState] : '',
+    Number.isInteger(safe.pendingCount) ? 'معلق: ' + safe.pendingCount : '',
+    Number.isInteger(safe.failedCount) ? 'فاشل: ' + safe.failedCount : '',
+    Number.isInteger(safe.blockedCount) ? 'محظور: ' + safe.blockedCount : '',
+    Number.isInteger(safe.rejectedCount) ? 'مرفوض: ' + safe.rejectedCount : '',
+  ]);
+  add([
+    Number.isInteger(safe.historicalConflictCount) ? 'تعارضات سابقة: ' + safe.historicalConflictCount : '',
+    typeof safe.actionableSyncIssue === 'boolean' ? 'إجراء مطلوب: ' + (safe.actionableSyncIssue ? 'نعم' : 'لا') : '',
+    safe.lastSuccessfulSyncAt && safe.actionableSyncIssue ? 'آخر مزامنة: ' + safe.lastSuccessfulSyncAt : '',
+  ]);
+  for (const group of safe.rejectedGroups ?? []) {
+    rows.push('سبب الرفض: ' + (group.code === 'N58_SESSION_CONTEXT_REQUIRED' ? 'يلزم سياق الحصة' : 'رفض غير مصنف') + ' (' + group.code + ') × ' + group.count);
   }
-  if (diagnostics.deviceModel) lines.push(`الطراز: ${diagnostics.deviceModel}`);
-  if (diagnostics.deviceCategory) {
-    const viewport = diagnostics.viewport ? ` — ${diagnostics.viewport.width}×${diagnostics.viewport.height}` : '';
-    lines.push(`الجهاز: ${diagnostics.deviceCategory}${viewport}`);
-  }
-  if (diagnostics.browser) lines.push(`المتصفح: ${diagnostics.browser}${diagnostics.browserVersion ? ` ${diagnostics.browserVersion}` : ''}`);
-  if (diagnostics.syncState) lines.push(`المزامنة: ${diagnostics.syncState}`);
-  if (typeof diagnostics.pendingCount === 'number') lines.push(`قيد الانتظار: ${diagnostics.pendingCount}`);
-  if (typeof diagnostics.failedCount === 'number') lines.push(`تعذّر إرسالها: ${diagnostics.failedCount}`);
-  if (typeof diagnostics.blockedCount === 'number') lines.push(`بانتظار بيانات مرتبطة: ${diagnostics.blockedCount}`);
-  if (typeof diagnostics.rejectedCount === 'number') lines.push(`لم يقبلها الخادم: ${diagnostics.rejectedCount}`);
-  for (const group of diagnostics.rejectedGroups ?? []) {
-    const label = group.code === 'N58_SESSION_CONTEXT_REQUIRED' ? 'يلزم سياق الحصة'
-      : 'رفض غير مصنّف';
-    lines.push(`سبب الرفض: ${label} (${group.code}) × ${group.count}${group.area === 'sessions' ? ' — الحصص' : ''}`);
-  }
-  if (typeof diagnostics.historicalConflictCount === 'number') lines.push(`اختلافات تاريخية متصالحة: ${diagnostics.historicalConflictCount}`);
-  if (typeof diagnostics.online === 'boolean') lines.push(`الاتصال: ${diagnostics.online ? 'متصل' : 'غير متصل'}`);
-  if (diagnostics.routeCategory) lines.push(`قسم التطبيق: ${ROUTE_CATEGORY_LABELS[diagnostics.routeCategory]}`);
-  if (diagnostics.routeTemplate) lines.push(`المسار: ${diagnostics.routeTemplate}`);
-  return lines;
+  return rows;
 }
 
 export function buildNotificationEmail(record, { to, from = 'RAKEEZ Support <support@rakeezx.com>', contact = {} } = {}) {
@@ -222,7 +230,7 @@ export function buildNotificationEmail(record, { to, from = 'RAKEEZ Support <sup
   const reference = safeReference(request.id);
   const email = sanitizeAuthenticatedEmail(contact.email);
   const name = sanitizeDisplayName(contact.name);
-  const diagnosticLines = formatDiagnosticLines(request.diagnostics);
+  const diagnosticLines = compactSupportLines(request.diagnostics);
   return {
     ok: true,
     reference,

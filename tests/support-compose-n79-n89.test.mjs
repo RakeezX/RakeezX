@@ -27,7 +27,7 @@ test('safe WhatsApp text and local Edge email use the same bounded owner-safe di
   assert.deepEqual(edge.rejectedGroups, diagnostics.rejectedGroups);
   for (const text of [whatsapp, email]) {
     assert.match(text, /N58_SESSION_CONTEXT_REQUIRED\) × 1/);
-    assert.match(text, /بصمة المحتوى: a{12}/);
+    assert.match(text, /البصمة: a{12}/);
     assert.match(text, /البيئة: المعاينة/);
     assert.doesNotMatch(text, /PRIVATE_STUDENT|PRIVATE_SQL|PRIVATE_OTHER|11111111|22222222|إصدار Git/);
   }

@@ -71,10 +71,10 @@ test('environment and build kind label the actual metadata without claiming a Gi
   const record = { id: 'support:build', type: 'technical', message: 'Build question',
     created_at: '2026-10-08T00:00:00Z', diagnostics };
   const email = buildNotificationEmail(record, { to: 'support@example.test' });
-  assert.ok(email.payload.text.includes(`بصمة المحتوى: ${BUILD_META.buildSha.slice(0, 12)}`));
+  assert.ok(email.payload.text.includes(`البصمة: ${BUILD_META.buildSha.slice(0, 12)}`));
   assert.match(email.payload.text, /البيئة: الإنتاج/);
   assert.doesNotMatch(email.payload.text, /إصدار Git/);
   const git = buildNotificationEmail({ ...record, diagnostics: { ...diagnostics, buildShaKind: 'git', environment: 'preview' } }, { to: 'support@example.test' });
-  assert.ok(git.payload.text.includes(`إصدار Git: ${BUILD_META.buildSha.slice(0, 12)}`));
+  assert.ok(git.payload.text.includes(`Git: ${BUILD_META.buildSha.slice(0, 12)}`));
   assert.match(git.payload.text, /البيئة: المعاينة/);
 });
