@@ -83,7 +83,7 @@ test('class rules validate, persist offline, queue generic V2 mutations, and pre
   assert.equal(await store.editClassRule(first.id, { text: 'x'.repeat(241) }), null);
 });
 
-test('class-rule evidence is preserved by archive and blocks destructive teaching/class deletion', async () => {
+test('class-rule evidence is preserved by archive while unvalidated local Delete fails closed', async () => {
   await fresh();
   const { section, teaching } = await teachingFixture();
   const rule = await store.addClassRule({ teachingId: teaching.id, iconKey: 'shield', text: 'نحافظ على الأدوات' });

@@ -5,6 +5,7 @@ import * as cloud from '../src/lib/cloud.js';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { demoDescriptor } from '../src/lib/workspaces.js';
+import { createDemoPackage } from '../src/lib/demo.js';
 import { makeEnrollment, makeItem, makeSection, makeSession, makeStudent, makeTeaching } from '../src/models.js';
 
 globalThis.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
@@ -142,19 +143,18 @@ test('unmounted workspace Delete preserves A; switching to B cannot mutate A', a
   } finally { store.deactivateWorkspace('switch-test-done'); }
 });
 
-test('isolated Demo deletion still tombstones pristine Teaching/items and permits new immutable class identity', async () => {
+test('isolated Demo scoped deletion tombstones Teaching/items and permits new immutable class identity', async () => {
   try {
     store.activateWorkspace(demoDescriptor());
     await db.clearAll();
     await store.init();
-    const section = await store.createSection({ grade: 4, label: 'أ' });
-    const teaching = await store.createTeaching({ sectionId: section.id, subjectId: store.subjects()[0].id, termId: store.activeTerm().id });
+    const { section, teaching } = await createDemoPackage();
     const items = store.items(teaching.id);
-    assert.equal(await store.deleteClass(section.id), true);
+    assert.equal((await store.deleteDemoTeachingScope(teaching.id, section.id, 'section')).scope, 'section');
     assert.equal((await db.get('sections', section.id)).deleted, true);
     assert.equal((await db.get('teachings', teaching.id)).deleted, true);
     for (const item of items) assert.equal((await db.get('items', item.id)).deleted, true);
-    const replacement = await store.createSection({ grade: 4, label: 'ا' });
+    const replacement = await store.createSection({ grade: section.grade, label: section.label });
     assert.notEqual(replacement.id, section.id);
     assert.deepEqual(await db.getAll('outbox'), []);
   } finally { store.deactivateWorkspace('demo-p0-done'); }

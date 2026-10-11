@@ -12,10 +12,12 @@ import * as store from '../src/store.js';
 import { buildBackup, validateBackupIntegrity } from '../src/lib/export.js';
 import { previewCloudRestore, restoreBackupToCloud } from '../src/lib/backup-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 
 const OWNER_A = '11111111-1111-4111-8111-111111111111';
 const OWNER_B = '22222222-2222-4222-8222-222222222222';
 const auth = (id) => cloud.setMockAuth({ id }, { access_token: 'synthetic-only', user: { id } });
+const emptyServer = () => Object.fromEntries(SYNC_V2_STORES.map((name) => [name, []]));
 
 test('V5 backup from A cannot restore into B, including after B reload and retry', async () => {
   auth(OWNER_A);
@@ -42,7 +44,10 @@ test('V5 backup from A cannot restore into B, including after B reload and retry
   let stageCalls = 0;
   let finalizeCalls = 0;
   cloud.setMockBackend({ async fetchRecords() { return []; } });
-  const preview = await previewCloudRestore(backup);
+  const ownerVerifier = async () => OWNER_B;
+  const historyFetcher = async () => ({ ownerId: OWNER_B, revision: '0' });
+  const preview = await previewCloudRestore(backup, { ownerVerifier, historyFetcher,
+    sourceFetcher: async () => emptyServer() });
   assert.equal(preview.plan.ready, false);
   assert.equal(preview.plan.entries[0].reason, 'v5-owner-mismatch');
   const transport = {
@@ -51,7 +56,7 @@ test('V5 backup from A cannot restore into B, including after B reload and retry
   };
   const coordinator = { async assertCloudRestoreReady() {}, async runCloudRestoreExclusive(task) { return task(); } };
   const attempt = () => restoreBackupToCloud(backup, {
-    transport, coordinator, sourceFetcher: async () => ({}),
+    transport, coordinator, sourceFetcher: async () => emptyServer(), ownerVerifier, historyFetcher,
   });
   await assert.rejects(attempt(), (error) => error.code === 'RESTORE_REVIEW_REQUIRED' && !error.plan.ready);
   assert.deepEqual(await db.getAll('students'), beforeStudents);

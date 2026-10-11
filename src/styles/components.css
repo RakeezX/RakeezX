@@ -4487,6 +4487,11 @@
   padding: var(--sp-3) var(--sp-4);
 }
 
+.class-card__add-subject {
+  align-self: flex-start;
+  margin: 0 var(--sp-4) var(--sp-3);
+}
+
 .class-card__identity {
   align-items: center;
 }

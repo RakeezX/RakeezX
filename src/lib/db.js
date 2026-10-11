@@ -150,6 +150,9 @@ function guardStudentLifecycle(tx, run, allow = false) {
     if (read.result?.studentLifecycleResume) {
       tx.lifecycleError = Object.assign(new Error('Resume pending student lifecycle reconciliation first'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
       tx.abort();
+    } else if (read.result?.n77DeleteIntent) {
+      tx.lifecycleError = Object.assign(new Error('Resume pending N77 Delete before writing Product data'), { code: 'N77_DELETE_RESUME_REQUIRED' });
+      tx.abort();
     } else run();
   };
 }

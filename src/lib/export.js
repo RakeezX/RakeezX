@@ -4,6 +4,7 @@ import * as db from './db.js';
 import * as cloud from './cloud.js';
 import { todayISO } from '../models.js';
 import { assertScoreSnapshotInvariant } from './initial-restore.js';
+import { deletionScope, visibleClosedTermReport } from './restore-deletion-scope.js';
 import { visibleLatinDigits } from './visible-numerals.js';
 
 
@@ -122,8 +123,11 @@ export async function buildBackup({ sourceOwnerId = cloud.user?.id ?? null, back
   for (const store of db.STORES) {
     if (DEVICE_ONLY_STORES.includes(store)) continue;
     payload.data[store] = (await db.getAll(store)).filter((record) => !String(record.id ?? '').startsWith('demo:'));
-    payload.baselines[store] = payload.data[store].map(baselineFor);
   }
+  const deletedScope = deletionScope(payload.data, payload.data);
+  payload.data.closedTermReports = payload.data.closedTermReports.map((report) =>
+    visibleClosedTermReport(report, deletedScope));
+  for (const store of Object.keys(payload.data)) payload.baselines[store] = payload.data[store].map(baselineFor);
   assertScoreSnapshotInvariant(payload.data);
   payload.backupHash = await sha256Hex(backupHashInput(payload));
   return payload;
@@ -286,58 +290,11 @@ export async function validateBackupIntegrity(payload) {
   return { ...structural, integrity: 'verified' };
 }
 
-/**
- * يستورد نسخة احتياطية.
- * mode='merge'   يبقي ما عندك ويأخذ الأحدث لكل سجل (الآمن).
- * mode='replace' يمسح كل شيء ويضع النسخة مكانه.
- *
- * لا يُمسّ شيء قبل اجتياز التحقق، والكتابة كلها معاملة واحدة: إن فشل أي سجل
- * تراجعت المعاملة وبقيت البيانات كما كانت تمامًا.
- *
- * النسخ القديمة تُرحَّل إلى الشكل الجديد قبل الكتابة — فلا تدخل القاعدة
- * سجلات بشكل قديم ولا يعمل التطبيق بأسماء مخفية.
- */
-export async function restoreBackup(payload, mode = 'merge') {
-  const check = await validateBackupIntegrity(payload);
-  if (!check.ok) {
-    const err = new Error(check.errors.join('\n'));
-    err.name = 'BackupValidationError';
-    err.code = check.code ?? 'INVALID_BACKUP';
-    err.details = check;
-    throw err;
-  }
-
-  const hasSubitemData = payload.data.items?.some((row) => row.scoreMode === 'subitems') ||
-    payload.data.scoreSubitems?.length > 0 || payload.data.scoreSubitemCompletions?.length > 0;
-  if (hasSubitemData && mode !== 'replace') {
-    throw Object.assign(new Error('Subitem backup requires a reviewed atomic replacement'), {
-      code: 'SUBITEM_BACKUP_MERGE_UNSUPPORTED',
-    });
-  }
-  if (hasSubitemData && payload.version !== BACKUP_VERSION) {
-    throw Object.assign(new Error('Subitem backup requires the versioned provenance contract'), {
-      code: 'SUBITEM_BACKUP_VERSION_REQUIRED',
-    });
-  }
-
-  let source = payload.data;
-  const data = {};
-  const skipped = [];
-
-  for (const name of db.STORES) {
-    if (!Array.isArray(source[name])) continue;
-    // إعدادات الجهاز تُتجاهل مهما كان الوضع — الاستبدال يستبدل السجلات لا الجهاز
-    if (DEVICE_ONLY_STORES.includes(name)) {
-      if (source[name].length) skipped.push(name);
-      continue;
-    }
-    data[name] = source[name];
-  }
-
-  const written = await db.writeAll(data, mode === 'replace' ? 'replace' : 'merge', {
-    keep: DEVICE_ONLY_STORES,
+/** Legacy local restore cannot establish N77 server deletion ancestry. */
+export async function restoreBackup() {
+  throw Object.assign(new Error('Restore requires online same-owner server validation'), {
+    code: 'LOCAL_RESTORE_DISABLED',
   });
-  return { written, migration: null, skipped };
 }
 
 /** يقرأ ملفًا اختاره المستخدم ويحوّله كائنًا. */

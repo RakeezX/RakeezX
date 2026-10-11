@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v36';
+const VERSION = 'rakeezx-v37';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -63,6 +63,11 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/day-targeting.js',
+  './src/lib/education-department-directory.js',
+  './src/lib/hijri-year-input.js',
+  './src/lib/sync-warning-policy.js',
+  './src/lib/visible-numerals.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',
@@ -96,6 +101,8 @@ const SHELL = [
   './src/lib/sync-operational-ui.js',
   './src/lib/avatar.js',
   './src/lib/backup-v2.js',
+  './src/lib/n77-delete.js',
+  './src/lib/restore-deletion-scope.js',
   './src/lib/build-meta.js',
   './src/lib/cloud-recovery-ui.js',
   './src/lib/report-print.js',

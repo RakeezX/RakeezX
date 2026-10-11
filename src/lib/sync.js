@@ -437,7 +437,8 @@ export async function syncAll({ full = true, remote = false } = {}) {
   if (restoreRunning || workspaceClaimRunning) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
-  if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
+  const lifecycleDevice = await db.get('device', 'device');
+  if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;
@@ -1462,6 +1463,11 @@ const sameSectionIdentity = (local, remote) => local.yearId === remote.year_id &
   String(local.grade) === String(remote.grade) &&
   normalizeSectionLabel(local.label) === normalizeSectionLabel(remote.label);
 
+export function sectionKeyMatches(local, records) {
+  const matches = records.filter((remote) => sameSectionIdentity(local, remote));
+  return { matches, active: matches.filter((remote) => remote.deleted_at === null) };
+}
+
 function sectionReconciliationError(code, retryable, sectionId, candidateIds = []) {
   const message = code === 'SECTION_NATURAL_KEY_BLOCKED_BY_TOMBSTONE'
     ? 'هوية الفصل محجوزة بسجل محذوف سحابياً. لم تُغيّر بياناتك، وأُوقفت إعادة المحاولة التلقائية.'
@@ -1482,7 +1488,7 @@ async function reconcileSections(remoteRecords, sectionIds = null) {
     (!sectionIds || sectionIds.has(record.id)));
   const plans = [];
   for (const local of locals) {
-    const candidates = remoteRecords.filter((remote) => !remote.deleted_at && sameSectionIdentity(local, remote));
+    const candidates = sectionKeyMatches(local, remoteRecords).active;
     if (candidates.length > 1) {
       throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
         local.id, candidates.map((record) => record.id));
@@ -1551,8 +1557,7 @@ async function recoverSectionWriteConflict(payloads, originalError) {
         error.recovery = { reason: result.status };
         throw error;
       }
-      const matches = result.rows.filter((remote) => sameSectionIdentity(local, remote));
-      const active = matches.filter((remote) => remote.deleted_at === null);
+      const { matches, active } = sectionKeyMatches(local, result.rows);
       if (active.length > 1) {
         throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
           local.id, active.map((row) => row.id));
@@ -2139,6 +2144,9 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
 
   return { pushed: toPush.length, pulled: toUpdateLocal.length, known };
 }
+
+// Test entry for the retained pre-Sync-V2 collection path. Runtime callers use Sync V2.
+export { syncCollection as testOnlyLegacySyncCollection };
 
 /**
  * Phase 5B: Sync structural academic data.

@@ -7,7 +7,7 @@
  */
 
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
-import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
+import { createDemoPackage, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
   GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionLabel, normalizeSectionLabel
@@ -44,24 +44,25 @@ function subjectMenu(options, query = '') {
   `;
 }
 
-function sheet(existing = null) {
+function sheet(existing = null, targetSection = null) {
   const secs = store.sections();
   const options = store.subjectOptions();
   const autoColor = autoAssignSectionColor(secs);
-  const selectedOption = classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
-  const c = existing
+  const selectedOption = targetSection ? null : classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
+  const c = targetSection ?? (existing
     ? {
         grade: store.getSection(existing.sectionId)?.grade ?? 4,
         label: store.getSection(existing.sectionId)?.label ?? '1',
         color: store.getSection(existing.sectionId)?.color ?? SECTION_COLORS[0],
       }
-    : { grade: 4, label: '1', color: autoColor };
+    : { grade: 4, label: '1', color: autoColor });
 
   return openSheet({
-    title: existing ? 'تعديل الفصل' : 'فصل جديد',
-    desc: existing ? null : 'اختر الصف ورمز الفصل والمادة.',
+    title: targetSection ? 'إضافة مادة للفصل' : existing ? 'تعديل الفصل' : 'فصل جديد',
+    desc: targetSection ? `اختر المادة التي تدرّسها في ${sectionLabel(targetSection)}.` : existing ? null : 'اختر الصف ورمز الفصل والمادة.',
     body: html`
       <form id="tch-form" class="management-form class-form">
+        ${targetSection ? '' : html`
         <div class="field-row">
           <label class="field">
             <span class="field__label">الصف</span>
@@ -77,6 +78,7 @@ function sheet(existing = null) {
                    autocomplete="off" placeholder="1">
           </label>
         </div>
+        `}
 
         <div class="field subject-picker" data-subject-picker>
           <span class="field__label">المادة</span>
@@ -124,7 +126,7 @@ function sheet(existing = null) {
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" form="tch-form" type="submit">${existing ? 'حفظ' : 'إنشاء'}</button>
+      <button class="btn btn--primary" form="tch-form" type="submit">${targetSection ? 'إضافة المادة' : existing ? 'حفظ' : 'إنشاء'}</button>
     `,
     onMount: (root, done) => {
       const picker = root.querySelector('[data-subject-picker]');
@@ -184,11 +186,11 @@ function sheet(existing = null) {
       root.querySelector('#tch-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
-        const label = String(fd.get('label') ?? '').trim();
+        const label = targetSection?.label ?? String(fd.get('label') ?? '').trim();
         if (!label) return;
-        const grade = Number(fd.get('grade'));
+        const grade = targetSection?.grade ?? Number(fd.get('grade'));
         const yearId = existing ? store.getSection(existing.sectionId)?.yearId : store.activeYear()?.id;
-        const duplicate = store.sections(yearId).find((s) => !s.deleted && s.id !== existing?.sectionId &&
+        const duplicate = targetSection ? null : store.sections(yearId).find((s) => !s.deleted && s.id !== existing?.sectionId &&
           s.yearId === yearId && s.grade === grade && normalizeSectionLabel(s.label) === normalizeSectionLabel(label));
         if (duplicate) {
           toast(`هذا الفصل موجود مسبقًا (${gradeLabel(grade)} / ${duplicate.label})`, 'warn');
@@ -251,6 +253,11 @@ function renderClassCard(tch) {
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
+      ${store.isTermClosed(tch.termId) ? '' : html`
+        <button type="button" class="btn btn--ghost btn--sm class-card__add-subject" data-act="add-subject" data-section-id="${sec?.id ?? ''}">
+          ${icon('plus')} إضافة مادة
+        </button>
+      `}
     </div>
   `;
 }
@@ -280,7 +287,8 @@ export default {
       `;
     }
 
-    const totalStudents = list.reduce((n, t) => n + store.students(t.id).length, 0);
+    const sectionIds = [...new Set(list.map((teaching) => teaching.sectionId))];
+    const totalStudents = sectionIds.reduce((n, id) => n + store.sectionRoster(id).length, 0);
 
     return html`
       <div class="management-page classes-page">
@@ -293,7 +301,7 @@ export default {
       <div class="management-overview classes-overview mb-3" aria-label="ملخص الفصول">
         <div class="classes-overview__metric">
           <span class="classes-overview__label">عدد الفصول</span>
-          <strong class="classes-overview__value tabular">${list.length}</strong>
+          <strong class="classes-overview__value tabular">${sectionIds.length}</strong>
         </div>
         <div class="classes-overview__metric">
           <span class="classes-overview__label">عدد الطلاب</span>
@@ -313,6 +321,19 @@ export default {
   },
 
   actions: {
+    async 'add-subject'(el) {
+      const section = store.getSection(el.dataset.sectionId);
+      if (!section || store.isSectionArchived(section)) return;
+      const data = await sheet(null, section);
+      if (!data) return;
+      try {
+        await store.addSubjectToSection(section.id, data.subjectSelection);
+        toast('تمت إضافة المادة إلى الفصل');
+        repaint();
+      } catch (err) {
+        toast(err.message || 'تعذّرت إضافة المادة إلى الفصل', 'warn');
+      }
+    },
     async 'delete-class-flow'() {
       const list = store.teachings();
       if (!list.length) {
@@ -413,18 +434,27 @@ export default {
 
             const nextBtn = foot.querySelector('#class-delete-next-btn');
             if (nextBtn) {
-              nextBtn.addEventListener('click', () => {
+              nextBtn.addEventListener('click', async () => {
                 if (!selectedId) return;
-                renderStep2();
+                const selected = list.find((row) => row.id === selectedId);
+                try {
+                  const plan = isDemo(selected) ? null : await store.previewDeleteTeaching(selectedId);
+                  renderStep2(plan);
+                } catch (error) {
+                  toast(error.message || 'تعذّر التحقق من نطاق الحذف. أعد المحاولة عند توفر الاتصال.', 'warn');
+                }
               });
             }
           }
 
-          function renderStep2() {
+          function renderStep2(plan) {
             const selectedTch = list.find((t) => t.id === selectedId);
             const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
             const sub = selectedTch ? store.getSubject(selectedTch.subjectId) : null;
             const demo = selectedTch ? isDemo(selectedTch) : false;
+            const demoScope = demo && sec
+              ? (store.teachings(null).filter((teaching) => teaching.sectionId === sec.id).length > 1 ? 'teaching' : 'section')
+              : null;
 
             if (titleEl) titleEl.textContent = 'تأكيد حذف الفصل';
             if (descEl) descEl.textContent = 'إجراء يتطلب التأكيد قبل التنفيذ';
@@ -443,8 +473,13 @@ export default {
                   </div>
                   <div class="class-delete-row__sub">${sub?.name ?? ''}</div>
                 </div>
+
                 <p class="class-delete-confirm-box__consequence">
-                  سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.
+                  ${(demo ? demoScope : plan?.scope) === 'teaching'
+                    ? 'سيتم حذف مادة ' + (sub?.name ?? '') + ' فقط وبياناتها من هذا الفصل. سيبقى الفصل وطلابه والمواد الأخرى محفوظة.'
+                    : demo
+                      ? 'سيتم حذف الفصل التجريبي كاملًا وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.'
+                      : 'سيتم حذف الفصل وبياناته المرتبطة، بما في ذلك الحصص والحضور والدرجات والرصد والملاحظات.'}
                 </p>
                 <p class="class-delete-confirm-box__note">
                   الطلاب المرتبطون بفصول أو سجلات أخرى ستبقى بياناتهم الأخرى محفوظة.
@@ -469,21 +504,22 @@ export default {
               confirmBtn.addEventListener('click', async () => {
                 done(undefined);
                 if (demo) {
-                  const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(selectedTch?.id));
-                  if (pkg) {
-                    await deleteDemoPackage(pkg.packageId);
-                    toast('تم حذف الفصل التجريبي');
+                  try {
+                    await store.deleteDemoTeachingScope(selectedTch.id, sec.id, demoScope);
+                    toast(demoScope === 'teaching' ? 'تم حذف المادة التجريبية' : 'تم حذف الفصل التجريبي');
                     repaint();
-                    return;
+                  } catch (error) {
+                    toast(error.message || 'تعذّر حذف الفصل التجريبي.', 'warn');
                   }
+                  return;
                 }
                 if (sec) {
                   try {
-                    await store.deleteClass(sec.id);
-                    toast('تم حذف الفصل');
+                    await store.deleteTeaching(selectedTch.id, plan);
+                    toast(plan.scope === 'teaching' ? 'تم حذف المادة من الفصل' : 'تم حذف الفصل');
                     repaint();
                   } catch (error) {
-                    toast(error.message || 'لا يمكن حذف فصل يحتوي على بيانات محفوظة.', 'warn');
+                    toast(error.message || 'تعذّر حذف الفصل. أعد المحاولة عند توفر الاتصال.', 'warn');
                   }
                 }
               });
@@ -503,9 +539,18 @@ export default {
     async 'delete-demo'(el, ev) {
       ev?.preventDefault(); ev?.stopPropagation();
       const teaching = store.getTeaching(el.dataset.id);
-      const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(teaching?.id));
-      if (!pkg || !(await confirmSheet({ title: 'حذف الفصل التجريبي', desc: 'سيُحذف فقط الفصل التجريبي وبياناته المحلية.', confirmLabel: 'حذف الفصل التجريبي', danger: true }))) return;
-      await deleteDemoPackage(pkg.packageId); toast('تم حذف الفصل التجريبي'); repaint();
+      const section = teaching && store.getSection(teaching.sectionId);
+      if (!section) return;
+      const scope = store.teachings(null).filter((row) => row.sectionId === section.id).length > 1 ? 'teaching' : 'section';
+      const subject = store.getSubject(teaching.subjectId);
+      const desc = scope === 'teaching'
+        ? `سيُحذف فقط ${subject?.name ?? 'المادة المحددة'} وبياناتها. سيبقى الفصل وطلابه والمواد الأخرى.`
+        : 'سيُحذف الفصل التجريبي كاملًا وبياناته المحلية.';
+      if (!(await confirmSheet({ title: 'حذف الفصل التجريبي', desc, confirmLabel: 'تأكيد الحذف', danger: true }))) return;
+      try {
+        await store.deleteDemoTeachingScope(teaching.id, section.id, scope);
+        toast(scope === 'teaching' ? 'تم حذف المادة التجريبية' : 'تم حذف الفصل التجريبي'); repaint();
+      } catch (error) { toast(error.message || 'تعذّر حذف الفصل التجريبي.', 'warn'); }
     },
     async add() {
       const data = await sheet();

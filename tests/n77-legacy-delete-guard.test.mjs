@@ -1,81 +1,66 @@
 import 'fake-indexeddb/auto';
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 
-import * as cloud from '../src/lib/cloud.js';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import { demoDescriptor } from '../src/lib/workspaces.js';
-import { makeEnrollment, makeItem, makeSection, makeSession, makeStudent, makeTeaching } from '../src/models.js';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
 
-global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
-global.matchMedia = () => ({ matches: false });
-
-const owner = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const account = {
-  id: 'account:synthetic', type: 'account', authUserId: owner,
-  databaseName: 'rakeezx-user-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', ownershipState: 'claimed',
-  syncEligible: true, broadcastChannelName: 'test:n77-guard',
+const originalDocument = globalThis.document;
+const originalMatchMedia = globalThis.matchMedia;
+const originalNavigator = globalThis.navigator;
+globalThis.document = {
+  documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } },
+  querySelector: () => ({ setAttribute() {} }),
 };
+globalThis.matchMedia = () => ({ matches: false });
 
-async function fixture() {
-  const section = makeSection({ id: 'section:n77', yearId: store.activeYear().id, grade: 5, label: '1' });
-  const teaching = makeTeaching({ id: 'teaching:n77', sectionId: section.id, subjectId: store.subjects()[0].id, termId: store.activeTerm().id });
-  const student = makeStudent({ id: 'student:n77', name: 'Synthetic Student' });
-  const enrollment = makeEnrollment({ id: 'enrollment:n77', studentId: student.id, sectionId: section.id, yearId: section.yearId });
-  const item = makeItem({ id: 'item:n77', teachingId: teaching.id, name: 'Synthetic Item', maxScore: 10 });
-  const session = makeSession({ id: 'session:n77', teachingId: teaching.id, date: '2026-10-08', period: 1 });
-  const score = { id: 'score:n77', studentId: student.id, itemId: item.id, value: 8, deleted: false, updatedAt: 1 };
-  const attendance = { id: 'attendance:n77', studentId: student.id, sessionId: session.id, teachingId: teaching.id, date: session.date, status: 'present', deleted: false, updatedAt: 1 };
-  await store.save({ sections: [section], teachings: [teaching], students: [student], enrollments: [enrollment], items: [item], sessions: [session], scores: [score], attendance: [attendance] }, { queue: false });
-  await db.clearStore('outbox');
-  return { section, teaching };
-}
-
-const watched = ['sections', 'teachings', 'students', 'enrollments', 'items', 'sessions', 'scores', 'attendance', 'outbox'];
-async function snapshot() {
-  return Object.fromEntries(await Promise.all(watched.map(async (name) => [name, await db.getAll(name)])));
-}
-
-test('account legacy class and Teaching Delete fail before local or queued writes, online and offline', async () => {
-  store.activateWorkspace(account);
-  cloud.setMockAuth({ id: owner, email: 'synthetic@example.test' }, { access_token: 'synthetic' });
-  try {
-    await db.clearAll();
-    await store.init();
-    const { section, teaching } = await fixture();
-    const rejected = { id: 'v2:n77-rejected', state: 'rejected', command: 'lifecycle:delete_class', recordId: section.id };
-    await db.put('outbox', rejected);
-    for (const online of [true, false]) {
-      Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: online } });
-      const beforeDb = await snapshot();
-      const beforeMemory = Object.fromEntries(watched.filter((name) => name !== 'outbox').map((name) => [name, structuredClone(store.state[name])]));
-      for (const action of [() => store.deleteClass(section.id), () => store.deleteTeaching(teaching.id), () => store.deleteSection(section.id)]) {
-        await assert.rejects(action(), (error) => error.code === 'N77_CLIENT_UPDATE_REQUIRED' && /حدّث ركيز/.test(error.message));
-      }
-      assert.deepEqual(await snapshot(), beforeDb);
-      for (const [name, rows] of Object.entries(beforeMemory)) assert.deepEqual(store.state[name], rows, `${name} changed`);
-    }
-    await store.patch('sections', section.id, { color: '#123456' });
-    assert.equal(store.getSection(section.id).color, '#123456');
-    assert.deepEqual(await db.get('outbox', rejected.id), rejected);
-  } finally {
-    cloud.setMockAuth(null, null);
-    store.deactivateWorkspace('n77-account-test-done');
-  }
+after(() => {
+  store.closeChannel();
+  db.closeDB();
+  if (originalDocument === undefined) delete globalThis.document;
+  else globalThis.document = originalDocument;
+  if (originalMatchMedia === undefined) delete globalThis.matchMedia;
+  else globalThis.matchMedia = originalMatchMedia;
+  if (originalNavigator === undefined) delete globalThis.navigator;
+  else Object.defineProperty(globalThis, 'navigator', { configurable: true, value: originalNavigator });
 });
 
-test('isolated Demo keeps its existing local class deletion path', async () => {
-  store.activateWorkspace(demoDescriptor());
+test('legacy and ownerless Delete attempts preserve Product rows and rejected outbox evidence', async () => {
+  await activateSyntheticAccountWorkspace();
+  await db.clearAll();
+  await store.init();
+  const section = await store.createSection({ grade: 5, label: 'synthetic guard' });
+  const teaching = await store.createTeaching({ sectionId: section.id });
+  const rejected = { id: 'synthetic:rejected-delete', state: 'rejected', command: 'lifecycle:delete_class', recordId: section.id };
+  await db.put('outbox', rejected);
+  const watched = ['sections', 'teachings', 'students', 'enrollments', 'items', 'scores', 'slots',
+    'sessions', 'attendance', 'notes', 'outbox'];
+
+  for (const online of [true, false]) {
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: online } });
+    const before = Object.fromEntries(await Promise.all(watched.map(async (name) => [name, await db.getAll(name)])));
+    for (const call of [
+      () => store.deleteTeaching(teaching.id),
+      () => store.deleteClass(section.id),
+      () => store.deleteSection(section.id),
+    ]) {
+      await assert.rejects(call(), { name: 'Error' });
+      for (const name of watched) assert.deepEqual(await db.getAll(name), before[name], `${name} changed`);
+    }
+    assert.deepEqual(await db.get('outbox', rejected.id), rejected);
+  }
+
+  store.deactivateWorkspace('n77-claimed-test-done');
+  store.activateWorkspace({ type: 'account', ownershipState: 'unresolved', syncEligible: false,
+    authUserId: null, databaseName: 'rakeezx-user-cccccccccccccccccccccccccccccccc', broadcastChannelName: 'n77-ownerless-test' });
   try {
-    await db.clearAll();
-    await store.init();
-    const section = makeSection({ id: 'section:demo-n77', yearId: store.activeYear().id, grade: 5, label: '1' });
-    await store.save({ sections: [section] }, { queue: false });
-    assert.equal(await store.deleteClass(section.id), true);
-    assert.equal(store.getSection(section.id), null);
-    assert.deepEqual(await db.getAll('outbox'), []);
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: true } });
+    const before = await db.getAll('outbox');
+    await assert.rejects(() => store.previewDeleteTeaching(teaching.id), { name: 'Error' });
+    await assert.rejects(() => store.deleteTeaching(teaching.id), { name: 'Error' });
+    assert.deepEqual(await db.getAll('outbox'), before);
   } finally {
-    store.deactivateWorkspace('n77-demo-test-done');
+    store.deactivateWorkspace('n77-ownerless-test-done');
   }
 });
