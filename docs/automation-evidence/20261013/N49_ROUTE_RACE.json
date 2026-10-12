@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "ticketId": "N49",
+  "subtask": "stale-route-commit",
+  "baseCommit": "61a6e1498c5ef985cb4e947c72e56eb18581797d",
+  "changedPath": "src/app.js",
+  "before": {
+    "sha256": "53ccf1f74ebdf2181a6a2c0b999dae795a47ac82b34596755eea2aecd17b16f6",
+    "gitBlob": "9fb65a3a2a82390483532879d44ca3ba363b6bb4",
+    "bytes": 71212
+  },
+  "after": {
+    "sha256": "23c291864051ddc97d8670989eecf97e68535ff88b8cc87f36b815098846838c",
+    "gitBlob": "ffd7c614035abda9761081cae7ad04e3dd931a1c",
+    "bytes": 71523
+  },
+  "proof": {
+    "status": "PASS",
+    "proofKind": "Exact Product app resolve section, deterministic out-of-order async completions; no browser claim",
+    "beforeSha256": "53ccf1f74ebdf2181a6a2c0b999dae795a47ac82b34596755eea2aecd17b16f6",
+    "afterSha256": "23c291864051ddc97d8670989eecf97e68535ff88b8cc87f36b815098846838c",
+    "staleRouteModule": {
+      "before": {
+        "final": {
+          "name": "HOME",
+          "path": "/"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES",
+          "render:/",
+          "paint:HOME"
+        ],
+        "errors": 0,
+        "toasts": 0
+      },
+      "after": {
+        "final": {
+          "name": "GRADES",
+          "path": "/teaching/fixture/grades"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES"
+        ],
+        "errors": 0,
+        "toasts": 0
+      }
+    },
+    "staleSessionMaterialization": {
+      "before": {
+        "final": {
+          "name": "HOME",
+          "path": "/"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES",
+          "unmount:GRADES",
+          "render:/",
+          "paint:HOME"
+        ]
+      },
+      "after": {
+        "final": {
+          "name": "GRADES",
+          "path": "/teaching/fixture/grades"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES"
+        ]
+      }
+    },
+    "staleRouteFailure": {
+      "before": {
+        "final": {
+          "name": "GRADES",
+          "path": "/teaching/fixture/grades"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES"
+        ],
+        "errors": 1,
+        "toasts": 1
+      },
+      "after": {
+        "final": {
+          "name": "GRADES",
+          "path": "/teaching/fixture/grades"
+        },
+        "events": [
+          "render:/teaching/fixture/grades",
+          "paint:GRADES"
+        ],
+        "errors": 0,
+        "toasts": 0
+      }
+    },
+    "currentRouteFailureRetained": {
+      "errors": 1,
+      "toasts": 1
+    }
+  },
+  "nativeBrowserReuse": {
+    "result": "PASS",
+    "test": "account Product: durable offline browser restart,3/6 minute reminder/LIMITED,RTL reads/Backup/Export,renewal and tab/device isolation",
+    "durationSeconds": 10.7,
+    "totalSeconds": 11.7,
+    "source": "Root observed native rerun after route fix; identical resolve excerpt verified here",
+    "additionalBrowserSuiteRequired": false,
+    "previewAppSha256": "5d58e484d43131b01cae66976b3986d7c2edeb713c10074bd42f6c3a97a12bae",
+    "matchingResolveExcerptSha256": "b44823c075cd607f17fe56480d2b9ba9ba2bb27db4e7bb153e2f016d4892fbec",
+    "testTimeoutMs": 120000,
+    "testAssertionsChangedForRouteFix": false
+  },
+  "productionGuards": {
+    "offlineLeaseBlobUnchanged": "2fbd3b2d370b8b9c81748ced6d2b4425bf8e44f7",
+    "offlineLeaseSha256Unchanged": "29950624bb6eb330af3f7a482c15b5c26c6aa56d267a231bc1c076077762fb5e",
+    "previewImportAbsent": true,
+    "presentationIntervalMs": 30000,
+    "timing": "NORMAL through7days; REMINDER after7days; LIMITED at14days"
+  },
+  "result": "route_race_source_bound PASS",
+  "productionDeployed": false,
+  "poAccepted": false
+}
