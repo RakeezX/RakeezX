@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 function Json([string]$File) { [System.IO.File]::ReadAllText($File, [System.Text.Encoding]::UTF8) | ConvertFrom-Json }
 function Same-Birth($Process, $Owner) {
   return ($Process -and $Owner.createdAt -and [int]$Process.ProcessId -eq [int]$Owner.pid -and
-    $Process.CreationDate.ToUniversalTime().Ticks -eq ([DateTime]::Parse($Owner.createdAt)).ToUniversalTime().Ticks)
+    $Process.CreationDate.ToUniversalTime().Ticks -eq ([DateTime]$Owner.createdAt).ToUniversalTime().Ticks)
 }
 function Reap-Proven($Task, $Lease, $Processes) {
   $reap = $Task.lastWorkerReap
@@ -64,7 +64,7 @@ do {
   if ($OwnerToken -and $OwnerToken -ne $owner.token) { throw 'Requested lease token does not match the current owner' }
   if (Test-Path -LiteralPath $file) {
     $lease = Json $file
-    $ours = $lease.version -eq 2 -and $lease.taskId -eq $task.id -and $lease.activationId -eq $task.activationId -and $lease.owner.token -eq $owner.token -and $lease.owner.pid -eq $owner.pid -and $lease.owner.createdAt -eq $owner.createdAt
+    $ours = $lease.version -eq 2 -and $lease.taskId -eq $task.id -and $lease.activationId -eq $task.activationId -and $lease.owner.token -eq $owner.token -and $lease.owner.pid -eq $owner.pid -and $lease.owner.createdAt -and ([DateTime]$lease.owner.createdAt).ToUniversalTime().Ticks -eq ([DateTime]$owner.createdAt).ToUniversalTime().Ticks
     if ($ours) {
       if ($Action -eq 'release') { Remove-Item -LiteralPath $file -ErrorAction Stop; 'RELEASED ' + $Name } else { 'ALREADY OWNED ' + $Name }; exit 0
     }
