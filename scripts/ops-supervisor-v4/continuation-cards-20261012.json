@@ -146,41 +146,28 @@
       "scopeKey": "n13-existing-section-subject-and-safe-delete-routing",
       "activationId": "po-20261012-continuous",
       "dependsOn": [],
-      "priority": 65,
+      "priority": 0,
       "riskClass": "CRITICAL",
       "validationTier": "STANDARD",
       "executionMode": "synthetic",
-      "budgetMinutes": 90,
+      "budgetMinutes": 60,
       "idleMinutes": 15,
       "requiredChecks": [
-        "shared_section_subject_creation",
-        "shared_roster_subject_isolation",
-        "existing_owner_command_roundtrip",
-        "scope_aware_delete_preservation",
-        "product_ui_release_scope"
+        "n13_single_creation_form",
+        "n13_automatic_shared_section",
+        "n13_duplicate_without_false_success"
       ],
-      "objective": "Implement N13 against fresh current main using D-104 and the accepted Option C visual direction. Current source already supports one Section with multiple Teachings: store.createTeaching accepts an existing sectionId and queues the existing teaching-creation command; the deployed RPC validates auth.uid ownership of Section, Subject and Term and returns idempotent canonical receipts. The concrete UI gap is src/views/teachings.js add(), which always calls createSection before createTeaching. Add the bounded real-account-capable create/edit flow for selecting an existing active Section and adding a new subject Teaching without cloning the Section, students or enrollments. Keep existing immutable Teaching natural identity and independent teaching data. Reuse current safe deleteTeaching/deleteClass operations to route the single Delete Class action by current active-Teaching count with accurate scope copy; retain both existing retained-data blockers. Do not import N77's historical combined train, remove blockers, introduce destructive deletion, change database schema, or convert/merge existing class identities. N77's true destructive deletion remains its separate ticket. Return LOCAL_READY only for the actual Product paths after all required checks, or BLOCKED with the exact operation/contract gap; do not merely host the old Demo.\n\n2026-10-12 evening operational repair under the existing PO execution delegation: src/lib/sync-v2.js is now explicitly included. The previous blocker was our incomplete file scope, not absent PO permission. Resume the same saved session and candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d. In reconcileTeachingCreationReceipt, exclude retired local default items from reconciliation puts while preserving reference rewriting and atomic owner-scoped semantics. Reuse all unchanged checks; fix and run the retained canonical-adoption regression (five canonical items, no five retired duplicates). Do not rerun the already passed browser train unless materially changed. Preserve the historical two BLOCKED results; this materially corrected scope allows the repair now. No server schema or real-data changes are needed for this fix.",
+      "objective": "PO revision 2026-10-13: ordinary grade + section + subject creation; automatically reuse a matching active Section and roster, and reject a duplicate current-term subject without false success or writes. The implementation is ALREADY prepared at f8e2a5234e72b0af04174a4b33588c8e34f99d36 on base 833eb7221a32e5c863eb96273f7638ec15e59756 and fast-forwarded into this same assigned worktree. Consume the existing two-file candidate; do not rewrite it, repeat planning/review loops or rerun the old N13 suite. With the existing browser phase lease run ONLY: node node_modules/@playwright/test/cli.js test --config tests/n13-playwright.config.mjs --grep \"account single|same subject in a previous\". These two Product cases cover the three required checks below: ordinary form, shared Section/roster for another subject, and duplicate rejection including rapid submit/custom alias and previous-term allowance. Map actual assertions to the required check names; test collection, syntax or old receipts do not establish a browser PASS. Reuse unchanged historical architecture/Sync/deletion evidence. If the focused run shows a concrete new failure, make only its material scoped correction, preserve the actual failed evidence and rerun the affected case; no unchanged retry loop or broad audit. Preserve the existing store, Sync idempotency, schemas and all later Product changes. Finish/reuse an exact AI-labelled candidate commit and return the controller result JSON. Browser/environment blockers remain factual BLOCKED; do not claim LOCAL_READY without the required results. The independent publisher handles current-main integration and Production; no manual push/deploy. This PO revision is not acceptance or CLOSED.",
       "acceptance": [
-        "shared_section_subject_creation: PASS exercises the actual create/edit handlers and store commands for a second distinct subject in an existing active Section, a new Section's first subject, and duplicate same Section/Subject/Term attempts. Existing Section/student/enrollment IDs and counts stay unchanged when adding the subject; existing labels/colors are preserved unless explicitly edited. Invalid/archived/missing Section, mismatched term/year where forbidden by the existing contract, and missing subject fail before unintended persistence. Repeated or rapid confirmation does not create duplicate Teachings or default items.",
-        "shared_roster_subject_isolation: PASS uses an isolated account-mode Product workspace, not a Demo-only implementation branch. Two Teachings share the same roster/enrollment identities; one Section roster edit appears in both. Score items/grades, sessions/attendance, reports and Teaching context remain isolated. Existing grades/history and unrelated Sections are unchanged. Use the actual store/selectors and serializers, not a parallel toy data model.",
-        "existing_owner_command_roundtrip: PASS establishes the unchanged wire contract from store teaching-creation proof through outbox, sync-v2 canonical reconciliation and existing cloud RPC. Reuse current focused PGlite/native tests and exact unchanged-source evidence where valid; exercise changed paths with owner A/B at the local boundary, duplicate retries and reload/serialization. The inspected deployed RPC and its wrapper are saved in docs/automation-evidence/20261012/deployed-teaching-creation.readonly.json: auth.uid guard, owner-scoped references, lifecycle lock, natural-identity lock, immutable request envelope and canonical receipt. Any local test that needs additional migration fixtures must use the existing isolated harness; do not run SQL against Production. No fresh live Auth-admin A/B prerequisite is added solely because the GUI now uses this unchanged protocol. If an actual server-contract mismatch is found, name it and BLOCK before publication.",
-        "scope_aware_delete_preservation: PASS demonstrates that multiple active Teachings select only the chosen Teaching and preserve the Section, roster and other subject; the final active Teaching selects the existing full-Section action. Scope and consequence are recalculated at confirmation, and a changed scope must not silently expand. Current retained-data checks must continue to reject deletion without partial writes or queued destructive commands; pristine cases continue through the unchanged safe lifecycle operation. Do not remove evidence checks or call n77_delete_teaching in this card. This is N13 routing and confirmation, not certification or completion of N77.",
-        "product_ui_release_scope: PASS checks the actual Classes create/edit and confirmation UI at the materially affected mobile RTL and desktop sizes, with light/dark contrast and clear selected Section/subject. Keep ordinary teacher language and the existing design; do not expose Section/Teaching internals as user work. Inspect both account-capable wiring and Demo parity. Preserve N92/N91/N95/N84/N54 changes already on current main. Reuse existing unaffected shell/build evidence; no all-tests or historical browser train. A release receipt proves deployed source, not Product CLOSED."
+        "n13_single_creation_form: PASS لمسار الإنشاء الفعلي بنموذج واحد يحتوي اختيار الصف والفصل والمادة دون خيار منفصل جديد/موجود. عند عدم وجود الصف/الفصل في السنة الحالية يُنشأ Section واحد وTeaching واحد للمادة في الفصل الدراسي الحالي، مع بنود افتراضية مرة واحدة. يظهر نجاح الإنشاء فقط بعد النتيجة الجديدة الناجحة فعلاً. إثبات UI واحد محدود على عرض جوال RTL والسطح المتأثر يكفي؛ استخدم نفس DOM/handlers الحقيقية، لا صورة أو نموذج موازي.",
+        "n13_automatic_shared_section: PASS عند اختيار نفس الصف والفصل ومادة مختلفة: يعاد استخدام Section ID وStudent/Enrollment IDs نفسها، ويضاف Teaching واحد للمادة الجديدة فقط؛ لا ينسخ الطلاب أو التسجيلات ولا يغير أسماء/ألوان الفصل الموجود أو بيانات المادة الأولى. تستخدم المطابقة normalizeSectionLabel وهوية المادة الموجودين؛ تظل السنة الحالية والحالة النشطة وحدود المالك هي المرجع، ولا يُعاد استخدام Section مؤرشف أو تابع لسنة مختلفة عنوة. يعاد استخدام دليل العزل/Sync/الحذف السابق إذا لم يتغير مساره، ويختبر فقط الجزء الذي تغير فعلاً.",
+        "n13_duplicate_without_false_success: PASS عند محاولة إنشاء نفس الصف والفصل والمادة في الفصل الدراسي الحالي: تنبيه واضح مثل «هذا الفصل بهذه المادة موجود بالفعل في الفصل الدراسي الحالي.»؛ لا رسالة نجاح ولا إنشاء/زيادة جديدة في Teachings أو البنود أو Roster أو outbox. الضغط المتكرر أثناء الحفظ لا ينتج إلا إنشاء واحداً ولا نجاحاً ثانياً كاذباً. وجود المادة نفسها في فصل دراسي سابق لا يُعامل كتكرار في الحالي؛ يبقى retry لنفس أمر الإنشاء محفوظ الهوية/idempotent. افحص هذه الحدود في نفس fixture المحلية ذات النطاق المحدود، دون حسابات حقيقية أو بيانات طلاب."
       ],
       "allowedPaths": [
         "src/views/teachings.js",
-        "src/views/teaching-hub.js",
-        "src/store.js",
-        "src/lib/pristine-teaching.js",
-        "src/styles/components.css",
-        "tests/n13-*",
-        "tests/section-validation.test.mjs",
-        "tests/sections.test.mjs",
-        "tests/sync-v2-runtime.test.mjs",
-        "tests/sync-v2-server-protocol.test.mjs",
-        "src/lib/sync-v2.js"
+        "tests/n13-product.e2e.mjs"
       ],
-      "releaseAuthority": "PO 2026-10-12 continuous execution and scoped delivery delegation applies together with the named approved Product contract. Routine technical choices need no renewed approval. This card allows only isolated local/synthetic work and the normal Git/Cloudflare delivery after all required checks pass; it does not authorize real-account/real-student test changes, new live Auth/RLS/schema mutations, or an unbounded test train. A proven missing condition parks this card only. Keep the Product ticket OPEN until its actual acceptance outcome; a scoped delivery enters awaiting_po and releases the worker. D-104 architecture is approved; the Product Ledger expressly retains current Production blockers until N77 ships. No dependency on N77 is required to use the already deployed teaching-creation protocol and retain safe delete behavior.",
+      "releaseAuthority": "قرار PO المباشر الحالي يفوض تنفيذ تبسيط N13 ونشره عبر مسار التسليم الموجود؛ لا يلزم إذن جديد لهذا التعديل. تحقق محلي/اصطناعي محدود للحالات الثلاث ثم التسليم العادي إلى publisher. لا تغييرات schema/RPC/صلاحيات ولا اختبار على بيانات معلم أو طالب حقيقية. لا تعد تشغيل سلسلة فحوص N13 القديمة أو إصلاح الحذف أو Canonical Sync ما لم يثبت أن تعديل الإنشاء الحالي مسّه. يحتفظ الإصدار السابق وأدلته بهويتها التاريخية. النجاح الموثق للإصدار التكميلي ينتقل إلى awaiting_po؛ N13 يبقى مفتوحًا حتى قبول PO الصريح.",
       "sourceEvidence": {
         "inspectedSourceSha": "deb882f6aa481298667b25609bb4e045004d3207",
         "paths": [
@@ -200,6 +187,38 @@
           "src/lib/sync-v2.js"
         ],
         "previousCandidate": "59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d"
+      },
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "preparationAuthority": null,
+      "poRevision": {
+        "at": "2026-10-12T23:33:39.310Z",
+        "authority": "PO 2026-10-13 new creation flow; no acceptance/closure",
+        "previousPublishedSha": "63b2c1fc29361d6c4c1ac066a743efaf3f2e31b8",
+        "preparedCandidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+        "declaredBaseSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+        "branch": "ops/n13-simple-create-20261013",
+        "previousObjective": "Implement N13 against fresh current main using D-104 and the accepted Option C visual direction. Current source already supports one Section with multiple Teachings: store.createTeaching accepts an existing sectionId and queues the existing teaching-creation command; the deployed RPC validates auth.uid ownership of Section, Subject and Term and returns idempotent canonical receipts. The concrete UI gap is src/views/teachings.js add(), which always calls createSection before createTeaching. Add the bounded real-account-capable create/edit flow for selecting an existing active Section and adding a new subject Teaching without cloning the Section, students or enrollments. Keep existing immutable Teaching natural identity and independent teaching data. Reuse current safe deleteTeaching/deleteClass operations to route the single Delete Class action by current active-Teaching count with accurate scope copy; retain both existing retained-data blockers. Do not import N77's historical combined train, remove blockers, introduce destructive deletion, change database schema, or convert/merge existing class identities. N77's true destructive deletion remains its separate ticket. Return LOCAL_READY only for the actual Product paths after all required checks, or BLOCKED with the exact operation/contract gap; do not merely host the old Demo.\n\n2026-10-12 evening operational repair under the existing PO execution delegation: src/lib/sync-v2.js is now explicitly included. The previous blocker was our incomplete file scope, not absent PO permission. Resume the same saved session and candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d. In reconcileTeachingCreationReceipt, exclude retired local default items from reconciliation puts while preserving reference rewriting and atomic owner-scoped semantics. Reuse all unchanged checks; fix and run the retained canonical-adoption regression (five canonical items, no five retired duplicates). Do not rerun the already passed browser train unless materially changed. Preserve the historical two BLOCKED results; this materially corrected scope allows the repair now. No server schema or real-data changes are needed for this fix.",
+        "previousRequiredChecks": [
+          "shared_section_subject_creation",
+          "shared_roster_subject_isolation",
+          "existing_owner_command_roundtrip",
+          "scope_aware_delete_preservation",
+          "product_ui_release_scope"
+        ],
+        "previousAllowedPaths": [
+          "src/views/teachings.js",
+          "src/views/teaching-hub.js",
+          "src/store.js",
+          "src/lib/pristine-teaching.js",
+          "src/styles/components.css",
+          "tests/n13-*",
+          "tests/section-validation.test.mjs",
+          "tests/sections.test.mjs",
+          "tests/sync-v2-runtime.test.mjs",
+          "tests/sync-v2-server-protocol.test.mjs",
+          "src/lib/sync-v2.js"
+        ]
       }
     },
     {
