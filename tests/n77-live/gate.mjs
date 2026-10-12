@@ -70,7 +70,7 @@ export async function gate() {
     const assets=[];
     for(const file of ['index.html','src/lib/n77-delete.js','src/lib/restore-deletion-scope.js','src/lib/backup-v2.js',
       'src/lib/cloud.js','src/lib/db.js','src/lib/sync.js','src/store.js','src/views/teachings.js','src/styles/components.css','sw.js']) {
-      const r=await fetch(new URL(file,s.binding.previewUrl),{redirect:'error'});assert.equal(r.status,200,file);
+      const r=await fetch(new URL(file==='index.html'?'./':file,s.binding.previewUrl),{redirect:'error',signal:AbortSignal.timeout(15000)});assert.equal(r.status,200,file);
       const served=Buffer.from(await r.arrayBuffer()),expected=execFileSync('git',['show',candidate+':'+file],{cwd:repository,maxBuffer:5*1024*1024});
       assert.equal(hash(served),hash(expected),file);assets.push({file,sha256:hash(served)});
     }
