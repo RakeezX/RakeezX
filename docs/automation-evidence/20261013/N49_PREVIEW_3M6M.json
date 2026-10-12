@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "productId": "N49",
+  "environment": "Preview",
+  "preparedAt": "2026-10-12T23:37:00Z",
+  "branch": "preview/n49-3m6m-20261013",
+  "previousReleaseSha": "a0419c5718422209ebf62773ac83436a7f848061",
+  "policy": {
+    "normalThroughMs": 180000,
+    "reminderAfterMs": 180000,
+    "limitedFromMs": 360000,
+    "production": "7/14 days unchanged",
+    "writesInLimited": "Blocked, including Restore",
+    "readsInLimited": "Reading, export, and backup remain available",
+    "clockBasis": "Last trusted owner/workspace-bound GET /user verification"
+  },
+  "hashes": {
+    "offlineLeaseSha256": "181b542d439ca807ccbf9aa4af4fde8f343dddd36d3f8f695a4ac304bd367722",
+    "appBeforeSha256": "41b64b3cc7a6451bf0e6c3798705503b56d27502e25497cf81375b778b929645",
+    "appAfterSha256": "5d58e484d43131b01cae66976b3986d7c2edeb713c10074bd42f6c3a97a12bae",
+    "testSha256": "071c1a4718e458eaf16ba51723e2e352d49de622326112a97b8df9f8d3888e80"
+  },
+  "checks": [
+    {
+      "name": "module_boundaries_and_production_host_guard",
+      "status": "PASS",
+      "kind": "Exact source module, synthetic clock",
+      "evidence": "Local lease-proof.json; source file unchanged by route correction"
+    },
+    {
+      "name": "raw_production_keeps_7_14",
+      "status": "PASS",
+      "durationSeconds": 1.1,
+      "kind": "Native Chromium raw Production shell; source lease guard unchanged",
+      "finishedAt": "2026-10-12T23:21:26.1373795Z"
+    },
+    {
+      "name": "account_offline_restart_reminder_limited_restore_read_backup_export_renewal_isolation",
+      "status": "PASS",
+      "durationSeconds": 10.7,
+      "kind": "Native Chromium Product with intercepted synthetic Auth/Sync and advanced clock; not a six-minute wall-clock or fourteen-day soak",
+      "finishedAt": "2026-10-12T23:35:02.4851369Z",
+      "processPid": 3932,
+      "receiptPath": "artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-route-browser-run.json"
+    },
+    {
+      "name": "out_of_order_route_before_after",
+      "status": "PASS",
+      "kind": "Exact Product resolve function with controlled out-of-order module/session completion; current route errors preserved"
+    }
+  ],
+  "priorFailure": {
+    "status": "FAIL",
+    "timeoutMs": 120000,
+    "finishedAt": "2026-10-12T23:21:26.1373795Z",
+    "cause": "A stale HOME resolve completed after GRADES navigation and replaced the view; URL still pointed at GRADES. The unchanged score fill then waited for a removed input.",
+    "artifactPath": "artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser",
+    "preserved": true
+  },
+  "correction": {
+    "scope": [
+      "src/app.js"
+    ],
+    "description": "Only the latest matching navigation may unmount the current view and render after async session/module loading.",
+    "timeoutChanged": false,
+    "testAssertionsRemoved": false,
+    "leaseOrDataSemanticsChanged": false,
+    "ownedBrowserLeaseReleased": true
+  },
+  "productAcceptance": "Await explicit PO trial. Not CLOSED.",
+  "productionRouteFix": "Prepared separately; this Preview file contains Preview-only timing imports and is not a whole-file Production patch."
+}
