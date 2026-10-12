@@ -73,7 +73,7 @@ test('score-changing apply needs confirmation; stale DB scores abort all selecte
   assert.equal((await db.getAll('items')).some(row => row.teachingId === 't3'), false);
 });
 
-test('duplicate name, duplicate origin and many-to-one source mapping fail closed', async () => {
+test('duplicate name, duplicate origin and many-to-one mapping exclude only the affected target', async () => {
   for (const variant of ['name', 'origin', 'source']) {
     const rows = data();
     if (variant === 'source') rows.items.push({ ...rows.items[0], id: 'source2' });
@@ -81,8 +81,14 @@ test('duplicate name, duplicate origin and many-to-one source mapping fail close
     if (variant === 'origin') for (const row of rows.items.filter(row => row.teachingId === 't2' && row.name.trim() === 'Exam')) row.distributionOriginId = 'source';
     await fixture(rows);
     const before = await db.getAll('items');
-    assert.throws(() => store.reviewScoreDistributionCopy('t1', ['t2', 't3']), /مكرر/);
+    const review = store.reviewScoreDistributionCopy('t1', ['t2', 't3']);
+    assert.equal(review.excludedTargets[0].teachingId, 't2');
+    assert.match(review.excludedTargets[0].reason, /مكرر/);
+    assert.deepEqual(review.targets.map(row => row.teachingId), ['t3']);
     assert.deepEqual(await db.getAll('items'), before);
+    await store.applyReviewedScoreDistribution('t1', ['t2', 't3'], { expectedToken: review.token, confirmed: true });
+    assert.deepEqual((await db.getAll('items')).filter(row => row.teachingId === 't2'),
+      before.filter(row => row.teachingId === 't2'));
   }
 });
 

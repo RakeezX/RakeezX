@@ -109,7 +109,10 @@ export function distributionTargets(current, sourceId, ownerId = null) {
       target?.yearId === section.yearId && target.grade === section.grade && target.status !== 'archived' &&
       (!row.ownerId || row.ownerId === ownerId) && (!target.ownerId || target.ownerId === ownerId);
   }).sort((a, b) => {
-    const label = row => current.sections.find(sec => sec.id === row.sectionId)?.name ?? '';
+    const label = row => {
+      const section = current.sections.find(sec => sec.id === row.sectionId);
+      return String(section?.label ?? section?.name ?? '');
+    };
     return label(a).localeCompare(label(b), 'ar', { numeric: true }) || a.id.localeCompare(b.id);
   });
 }
@@ -248,9 +251,42 @@ export function planDistribution(current, sourceId, targetIds, { ownerId = null,
         live(rows).forEach(row => { owned(row, ownerId); put(store, { ...row, deleted: true }); });
       }
     }
-    targets.push({ teachingId: targetId, impact, extras: extras.map(row => ({ id: row.id, name: row.name })) });
+    targets.push({ teachingId: targetId, impact,
+      beforeTotal: targetItems.reduce((sum,row) => sum+Number(row.max),0),
+      afterTotal: sourceItems.reduce((sum,row) => sum+Number(row.max),0)+extras
+        .filter(row => !removeItemIds.includes(row.id)).reduce((sum,row) => sum+Number(row.max),0),
+      extras: extras.map(row => ({ id: row.id, name: row.name, affected: live(current.scores)
+        .filter(score => score.itemId === row.id && score.value != null).length })) });
   }
   if (new Set(removeItemIds).size !== removeItemIds.length || removeItemIds.some(itemId => !removable.has(itemId))) throw new Error('Removal must name an extra in a selected target');
   return { token: distributionToken(current, sourceId, targetIds), targets, writes, requiresConfirmation,
     changedCount: writes.items.put.length };
+}
+
+/** Match the server's per-target exclusion without relaxing any other guard. */
+export function planAcceptedDistribution(current, sourceId, targetIds, options = {}) {
+  const allowed = new Set(distributionTargets(current, sourceId, options.ownerId ?? null).map(row => row.id));
+  if (!Array.isArray(targetIds) || !targetIds.length || new Set(targetIds).size !== targetIds.length ||
+      targetIds.some(id => !allowed.has(id))) throw new Error('Choose distinct eligible targets');
+  const removals = options.removeItemIds ?? [];
+  if (new Set(removals).size !== removals.length || removals.some(id => !current.items.some(row => row.id === id &&
+      !row.deleted && targetIds.includes(row.teachingId)))) throw new Error('Removal must name an extra in a selected target');
+  const result = { token: distributionToken(current, sourceId, targetIds), targets: [], excludedTargets: [],
+    writes: Object.fromEntries(['items','scoreSubitems','scoreSubitemCompletions','scores'].map(name => [name,{put:[]}])),
+    requiresConfirmation: false, changedCount: 0 };
+  let sequence = 0;
+  const id = options.id ?? (() => `preview:${++sequence}`);
+  for (const target of targetIds) {
+    const removeItemIds = removals.filter(id => current.items.find(row => row.id === id)?.teachingId === target);
+    try {
+      const plan = planDistribution(current, sourceId, [target], { ...options, id, removeItemIds });
+      result.targets.push(...plan.targets); result.requiresConfirmation ||= plan.requiresConfirmation;
+      result.changedCount += plan.changedCount;
+      for (const [name,operations] of Object.entries(plan.writes)) result.writes[name].put.push(...operations.put);
+    } catch (error) {
+      if (!error.message.includes('مكرر') || removeItemIds.length) throw error;
+      result.excludedTargets.push({ teachingId: target, reason: error.message });
+    }
+  }
+  return result;
 }

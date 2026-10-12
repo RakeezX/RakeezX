@@ -99,7 +99,7 @@ try {
       await page.getByRole('button',{name:'تأكيد التطبيق',exact:true}).click();
       await page.waitForFunction(async()=> (await (await import('/src/lib/db.js')).get('items','demo:n73:extra'))?.deleted===true);
       assert.equal(await page.evaluate(async()=> (await (await import('/src/lib/db.js')).get('scores','demo:n73:extraScore')).deleted),true);
-      checks.push({name:'rendered_'+width,status:'PASS',evidence:'Fresh Demo actual HTTPS DOM/handlers/source CSS: natural order; no default targets/removals; collapsed review; persisted 23→20, valid18/extra4/source19; missing parents; separate metadata-only subitem-parent rename.'});
+      checks.push({name:'rendered_'+width,status:'PASS',evidence:'Fresh Demo actual application over HTTP(S), DOM/handlers/source CSS: natural order; no default targets/removals; collapsed review; persisted 23→20, valid18/extra4/source19; missing parents; separate metadata-only subitem-parent rename; deliberate extra removal.'});
     } finally {await context.close();}
   }
 } finally {await browser.close();if(server)await new Promise(resolve=>server.close(resolve));await writeFile(artifact+'/result.json',JSON.stringify({base,candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),

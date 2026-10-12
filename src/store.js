@@ -31,7 +31,7 @@ import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, tea
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, createSyncV2Engine } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
-import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents, distributionTargets, planDistribution } from './lib/score-foundation.js';
+import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents, distributionTargets, planAcceptedDistribution } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -3780,7 +3780,7 @@ async function requireDistributionAccount() {
 
 /** Demo uses the same bounded definition/score rules; accounts review server state. */
 export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds, { removeItemIds = [] } = {}) {
-  if (isDistributionDemo()) return planDistribution(state, sourceTeachingId, targetTeachingIds, {
+  if (isDistributionDemo()) return planAcceptedDistribution(state, sourceTeachingId, targetTeachingIds, {
     ownerId: null, removeItemIds, id: uid,
   });
   return (async () => {
@@ -3822,10 +3822,11 @@ export async function applyReviewedScoreDistribution(sourceTeachingId, targetTea
   if (isDistributionDemo()) {
     let result;
     await commitScoreFoundation(current => {
-      const plan = planDistribution(current, sourceTeachingId, targetTeachingIds, {
+      const plan = planAcceptedDistribution(current, sourceTeachingId, targetTeachingIds, {
         ownerId: null, removeItemIds, id: uid, stamp: now(),
       });
       if (plan.token !== expectedToken) throw new Error('تغيّر التوزيع أو الدرجات منذ المراجعة.');
+      if (!plan.targets.length) throw new Error('راجع البنود المكررة في الفصول المستهدفة قبل التطبيق.');
       if (plan.requiresConfirmation && !confirmed) throw new Error('تغييرات الدرجات تتطلب تأكيد الأثر.');
       result = { changedCount: plan.changedCount, targets: plan.targets };
       return plan.writes;
