@@ -30,6 +30,7 @@ export async function safeReceipt(s) {
     liveDeadline:new Date(Date.parse(s.issuedAt)+45*60*1000).toISOString(),
     events: s.events, liveObservations: s.liveObservations, retirementChecks: s.retirementChecks,
     gate: s.gate, disposition: s.disposition, disarmed: s.disarmed,
+    retainedProductObservation:s.retainedProductObservation,recoveryCandidate:s.recoveryCandidate,
     recovery: path.join(PRIVATE, 'state.tmp'), noProductionPublish: true };
   await fs.writeFile(path.join(PRIVATE, 'receipt.tmp'), JSON.stringify(receipt, null, 2));
   return receipt;
