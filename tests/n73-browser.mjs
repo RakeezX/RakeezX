@@ -3,9 +3,25 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { resolve, extname, sep } from 'node:path';
 import { openReadyServedDemo, makeIsolatedDemoContext } from './helpers/served-demo-readiness.mjs';
-const base=process.argv[2];
-assert.ok(/^https:\/\/[0-9a-f]{8}\.rakeezx\.pages\.dev\/?$/.test(base),'Exact immutable HTTPS application Preview required');
+let base=process.argv[2],server;
+if(base==='local') {
+  const root=resolve('.');
+  server=createServer(async(req,res)=>{
+    try {
+      const pathname=new URL(req.url,'http://127.0.0.1').pathname;
+      const file=resolve(root,pathname==='/'?'index.html':'.'+pathname);
+      if(!file.startsWith(root+sep)) throw new Error('Outside application root');
+      res.setHeader('Content-Type',{'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'}[extname(file)]??'application/octet-stream');
+      res.end(await readFile(file));
+    } catch {res.writeHead(404);res.end();}
+  });
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  base='http://127.0.0.1:'+server.address().port;
+} else assert.ok(/^https:\/\/[0-9a-f]{8}\.rakeezx\.pages\.dev\/?$/.test(base),'Exact immutable HTTPS application Preview required');
 const artifact='test-results/n73-browser';await mkdir(artifact,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const checks=[];
@@ -86,5 +102,5 @@ try {
       checks.push({name:'rendered_'+width,status:'PASS',evidence:'Fresh Demo actual HTTPS DOM/handlers/source CSS: natural order; no default targets/removals; collapsed review; persisted 23→20, valid18/extra4/source19; missing parents; separate metadata-only subitem-parent rename.'});
     } finally {await context.close();}
   }
-} finally {await browser.close();await writeFile(artifact+'/result.json',JSON.stringify({base,candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
+} finally {await browser.close();if(server)await new Promise(resolve=>server.close(resolve));await writeFile(artifact+'/result.json',JSON.stringify({base,candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   tree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),harnessHash:createHash('sha256').update(await (await import('node:fs/promises')).readFile(new URL(import.meta.url))).digest('hex'),checks},null,2));}
