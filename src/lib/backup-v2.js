@@ -321,7 +321,10 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
   }
   const decoded = Object.fromEntries(cloudStores.map((storeName) => {
     const rows = canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]
-      .map((row) => decodeSyncV2Canonical(storeName, row));
+      .map((row) => {
+        const canonical = decodeSyncV2Canonical(storeName, row);
+        return canonical ? { ...canonical, serverCanonical: clone(canonical) } : null;
+      });
     if (rows.some((row) => !row?.id) || new Set(rows.map((row) => row.id)).size !== rows.length) {
       throw new Error(`Restore server returned invalid canonical rows for ${storeName}`);
     }
