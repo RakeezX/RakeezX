@@ -42,7 +42,7 @@ const SYNCABLE_STORES = new Set([
   'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings',
   'students', 'enrollments', 'notes', 'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'logs',
   'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements',
-  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports'
+  'timeProfiles', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'closedTermReports', 'assignments', 'submissions'
 ]);
 const STRUCTURAL_STORES = new Set(['years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections', 'teachings', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements']);
 const STUDENT_STORES = new Set(['students', 'enrollments']);
@@ -62,6 +62,7 @@ let initialized = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
+let restorePreparing = false;
 let workspaceClaimRunning = false;
 const presentationSeverity = createSyncStatusSeverity();
 let presentationContextToken = null;
@@ -125,7 +126,7 @@ const remoteSync = createRemoteSync({
       && store.getActiveWorkspace()?.type === 'account'
       && store.getActiveWorkspace()?.authUserId === cloud.user?.id
       && store.getActiveWorkspace()?.ownershipState === 'claimed'
-      && !workspaceClaimRunning && !restoreRunning,
+      && !workspaceClaimRunning && !restorePreparing && !restoreRunning,
     online: isOnline(), visible: typeof document === 'undefined' || document.visibilityState === 'visible' }),
   getMarker: cloud.fetchOwnerSyncMarker,
   openChannel: cloud.openOwnerSyncChannel,
@@ -275,7 +276,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
+  if (restoreRunning || restorePreparing || workspaceClaimRunning || suppressAutoSchedule) return;
   if (!cloud.session || !cloud.user) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -380,9 +381,11 @@ async function runRequiredSync(stores, full) {
 }
 
 const SCORE_PROVENANCE_STORES = new Set(['scoreSubitems', 'scoreSubitemCompletions']);
+let unifiedRestoreOwner = null;
 
 function v2StoreAllowed(name, scoreDomainAvailable) {
-  return isCurriculumOrdinarySyncAllowed(name) &&
+  return (unifiedRestoreOwner === cloud.user?.id || isCurriculumOrdinarySyncAllowed(name)) &&
+    (unifiedRestoreOwner === cloud.user?.id || !['assignments', 'submissions'].includes(name)) &&
     (scoreDomainAvailable || !SCORE_PROVENANCE_STORES.has(name));
 }
 
@@ -462,11 +465,12 @@ function firstPullError(result) {
 }
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
-export async function syncAll({ full = true, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning) return false;
+export async function syncAll({ full = true, remote = false, forRestore = false } = {}) {
+  if (restoreRunning || workspaceClaimRunning || (restorePreparing && !forRestore)) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
-  if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
+  const recoveryDevice = await db.get('device', 'device');
+  if (recoveryDevice?.studentLifecycleResume || recoveryDevice?.cloudRestoreResume) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;
@@ -515,6 +519,8 @@ export async function syncAll({ full = true, remote = false } = {}) {
     // may use one pull. Manual/open/retry and mixed local work keep two pulls.
     const idleReceiver = remote && full && remoteCapture && snapshot.length === 0;
     const scoreDomainAvailable = await scoreDomainAvailableForSync();
+    const unifiedCapability = await cloud.getUnifiedRestoreCapability();
+    unifiedRestoreOwner = unifiedCapability?.protocol === 'N71_V1' ? cloud.user.id : null;
     const stores = v2StoresFor(snapshot, full, scoreDomainAvailable);
     const pull = await v2Engine.pullAll({ stores, scoreDomainSnapshot: scoreDomainAvailable,
       readConcurrency: idleReceiver ? 4 : 1 });
@@ -608,7 +614,7 @@ export async function syncAll({ full = true, remote = false } = {}) {
  * not consume or reinterpret pre-existing work; the teacher must let that work
  * synchronize (or resolve it) first.
  */
-export async function assertCloudRestoreReady() {
+export async function assertCloudRestoreReady({ resuming = false } = {}) {
   if (!cloud.session || !cloud.user) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
   if (!isOnline()) throw Object.assign(new Error('Cloud restore requires a network connection'), { code: 'OFFLINE' });
   if (restoreRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
@@ -616,10 +622,18 @@ export async function assertCloudRestoreReady() {
     throw Object.assign(new Error('Resume the pending student lifecycle command first'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
   }
   const before = await v2Engine.status();
-  if (before.state !== 'synced') throw Object.assign(new Error('Pending or unresolved Sync V2 work blocks restore'), {
+  const allOutbox = await db.getAll('outbox');
+  if (before.state !== 'synced' || allOutbox.some(row => row.state !== 'superseded')) throw Object.assign(new Error('Pending or unresolved Sync work blocks restore'), {
     code: 'RESTORE_OUTBOX_NOT_EMPTY', status: before,
   });
-  const healthy = await syncAll({ full: true });
+  if (resuming) {
+    // No Product pull may replace this device until the exact canonical finalize
+    // receipt is established. Probe authenticated service readiness without writes.
+    const capability = await cloud.getUnifiedRestoreCapability();
+    if (capability?.protocol !== 'N71_V1') throw Object.assign(new Error('Restore service is unavailable'), { code: 'RESTORE_SYNC_NOT_HEALTHY' });
+    return before;
+  }
+  const healthy = await syncAll({ full: true, forRestore: true });
   const after = await v2Engine.status();
   if (!healthy || after.state !== 'synced' || state.status !== 'synced') {
     throw Object.assign(new Error('Sync V2 is not healthy enough for cloud restore'), {
@@ -630,27 +644,37 @@ export async function assertCloudRestoreReady() {
 }
 
 /** Pause automatic sync and normal Product mutations around finalization/reconciliation. */
-export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true } = {}) {
-  if (restoreRunning || workspaceClaimRunning || autoRunning) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true, prepare = null } = {}) {
+  if (restoreRunning || restorePreparing || workspaceClaimRunning || (autoRunning && !prepare)) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
   remoteSync.stop();
   fullRequested = false;
   remoteRequested = false;
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
-  restoreRunning = true;
+  restorePreparing = true;
   suppressAutoSchedule = true;
   store.setCloudRestoreInProgress(true);
   setState({ status: 'syncing', lastError: null });
+  let completed = false;
   try {
-    return await task();
+    if (autoRunning) await new Promise(resolve => syncSettledWaiters.add(resolve));
+    // Preparation performs the existing owner/outbox/healthy-Sync gates while
+    // automatic passes are paused. It never stages or reconciles Product data.
+    if (prepare) await prepare();
+    restorePreparing = false;
+    restoreRunning = true;
+    const result = await task();
+    completed = true;
+    return result;
   } finally {
     store.setCloudRestoreInProgress(false);
     suppressAutoSchedule = false;
     restoreRunning = false;
+    restorePreparing = false;
     if (initialized) void remoteSync.refresh();
-    setState({ status: 'synced', lastError: null });
-    if (scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
+    setState({ status: completed ? 'synced' : isOnline() ? 'error' : 'offline' });
+    if (completed && scheduleAutomatic) scheduleAutomaticSync({ full: true, immediate: true });
   }
 }
 

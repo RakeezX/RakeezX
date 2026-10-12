@@ -28,11 +28,11 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   years: {
     entity: 'years',
-    fields: { label: 'label', hijriStart: 'hijri_start', hijriEnd: 'hijri_end', order: 'order', status: 'status' },
+    fields: { label: 'label', hijriStart: 'hijri_start', hijriEnd: 'hijri_end', order: 'order', status: 'status', calendarPresetId: 'calendar_preset_id' },
   },
   calendars: {
     entity: 'calendars',
-    fields: { yearId: 'year_id', source: 'source', label: 'label' },
+    fields: { yearId: 'year_id', source: 'source', label: 'label', presetId: 'preset_id', termDateOverrides: 'term_date_overrides' },
     references: { yearId: 'years' },
   },
   calendarDays: {
@@ -61,6 +61,16 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     entity: 'lessons',
     fields: { unitId: 'unit_id', name: 'name', order: 'order', plannedSessions: 'planned_sessions' },
     references: { unitId: 'units' },
+  },
+  assignments: {
+    entity: 'assignments',
+    fields: { teachingId: 'teaching_id', lessonId: 'lesson_id', itemId: 'item_id', title: 'title', assignedDate: 'assigned_date', dueDate: 'due_date', max: 'max' },
+    references: { teachingId: 'teachings', lessonId: 'lessons', itemId: 'items' },
+  },
+  submissions: {
+    entity: 'submissions',
+    fields: { studentId: 'student_id', assignmentId: 'assignment_id', status: 'status', score: 'score', note: 'note' },
+    references: { studentId: 'students', assignmentId: 'assignments' },
   },
   sections: {
     entity: 'sections',
@@ -122,11 +132,11 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
       scoreMode: 'score_mode', distributionMode: 'distribution_mode', portabilityGroupId: 'portability_group_id',
       distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id',
     },
-    references: { teachingId: 'teachings' },
+    references: { teachingId: 'teachings', unitId: 'units', lessonId: 'lessons' },
   },
   scoreSubitems: {
     entity: 'score_subitems',
-    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version' },
+    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id' },
     references: { itemId: 'items' },
   },
   scoreSubitemCompletions: {
@@ -160,9 +170,9 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: {
       teachingId: 'teaching_id', slotId: 'slot_id', timeProfileId: 'time_profile_id', date: 'date',
       period: 'period', startTime: 'start_time', endTime: 'end_time', status: 'status',
-      reason: 'reason', makeupForId: 'makeup_for_id', lessonId: 'lesson_id', note: 'note', homework: 'homework', covered: 'covered',
+      reason: 'reason', makeupForId: 'makeup_for_id', lessonId: 'lesson_id', note: 'note', homework: 'homework', covered: 'covered', calendarContext: 'calendar_context',
     },
-    references: { teachingId: 'teachings', slotId: 'slots', timeProfileId: 'timeProfiles', makeupForId: 'sessions' },
+    references: { teachingId: 'teachings', slotId: 'slots', timeProfileId: 'timeProfiles', makeupForId: 'sessions', lessonId: 'lessons' },
   },
   sessionRosterSnapshots: {
     entity: 'session_roster_snapshots',
@@ -198,6 +208,7 @@ const SAFE_FEATURE_CATEGORY = Object.freeze({
   timeProfiles: 'schedule', slots: 'schedule', sessions: 'schedule',
   sessionRosterSnapshots: 'attendance', attendance: 'attendance',
   closedTermReports: 'reports',
+  assignments: 'assessment', submissions: 'assessment',
 });
 
 const SAFE_REASON = Object.freeze({
@@ -269,6 +280,9 @@ function encodeFieldValue(store, field, value) {
     return 'moe';
   }
   if (store === 'classGoals' && ['startedAt', 'completedAt'].includes(field) && Number.isFinite(value)) {
+    return new Date(value).toISOString();
+  }
+  if (store === 'closedTermReports' && field === 'createdAt' && Number.isFinite(value)) {
     return new Date(value).toISOString();
   }
   return clone(value);

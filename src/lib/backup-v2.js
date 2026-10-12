@@ -4,8 +4,9 @@ import * as db from './db.js';
 import * as cloud from './cloud.js';
 import * as sync from './sync.js';
 import * as store from '../store.js';
-import { DEVICE_ONLY_STORES, validateBackupIntegrity } from './export.js';
+import { validateBackupIntegrity } from './export.js';
 import { assertScoreSnapshotInvariant } from './initial-restore.js';
+import { restoreSuppressionReason } from './restore-deletion-scope.js';
 import {
   SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch,
 } from './sync-v2.js';
@@ -15,9 +16,8 @@ export const RESTORE_CLASSIFICATIONS = Object.freeze([
 ]);
 
 const IMMUTABLE_STORES = new Set(['logs', 'sessionRosterSnapshots', 'closedTermReports']);
-// The deployed stage/finalize RPC contract predates curriculum Sync V2. Keep
-// that reachable flow byte-compatible until its separately versioned server
-// activation; Initial Restore uses the new full manifest RPC instead.
+// Retained only for durable checkpoints created by older clients. New restores
+// use the versioned full-domain N71 endpoints and never a local-only fallback.
 // Manifest arrays are order-sensitive at staging. Match the deployed server
 // helper rather than relying on object/property declaration order.
 const LEGACY_CLOUD_RESTORE_STORES = Object.freeze([
@@ -29,20 +29,31 @@ const LEGACY_CLOUD_RESTORE_STORES = Object.freeze([
 ]);
 const SCORE_CLOUD_RESTORE_STORES = Object.freeze([...LEGACY_CLOUD_RESTORE_STORES,
   'scoreSubitems', 'scoreSubitemCompletions']);
-const restoreStores = (version) => version === 5 ? SCORE_CLOUD_RESTORE_STORES : LEGACY_CLOUD_RESTORE_STORES;
+export const UNIFIED_RESTORE_PROTOCOL = 'N71_V1';
+export const PORTABLE_CLOUD_RESTORE_STORES = Object.freeze([
+  ...LEGACY_CLOUD_RESTORE_STORES.slice(0, 6), 'units', 'lessons',
+  ...LEGACY_CLOUD_RESTORE_STORES.slice(6), 'scoreSubitems', 'scoreSubitemCompletions',
+  'assignments', 'submissions',
+]);
+const restoreStores = (version, protocol = UNIFIED_RESTORE_PROTOCOL) => protocol === UNIFIED_RESTORE_PROTOCOL
+  ? PORTABLE_CLOUD_RESTORE_STORES : version === 5 ? SCORE_CLOUD_RESTORE_STORES : LEGACY_CLOUD_RESTORE_STORES;
 const RESTORE_STORE_ORDER = Object.freeze([
   'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings', 'students',
   'enrollments', 'timeProfiles', 'profile', 'items', 'slots', 'sessions', 'notes', 'classRules',
   'classCharterSelections', 'classGoals', 'groupArrangements',
   'scoreSubitems', 'scores', 'scoreSubitemCompletions', 'logs', 'sessionRosterSnapshots',
-  'attendance', 'closedTermReports',
+  'attendance', 'closedTermReports', 'assignments', 'submissions',
 ]);
-const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>
-  !SCORE_CLOUD_RESTORE_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));
+const LOCAL_ONLY_STORES = Object.freeze([]);
 const RESTORE_RESUME_VERSION = 1;
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);
 const clone = (value) => value == null ? value : structuredClone(value);
 const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+function assertRestoreOwner(ownerId) {
+  if (!cloud.session || cloud.user?.id !== ownerId) {
+    throw Object.assign(new Error('Restore account changed'), { code: 'RESTORE_OWNER_MISMATCH' });
+  }
+}
 
 function comparable(storeName, record) {
   if (!record) return null;
@@ -62,10 +73,6 @@ function recordMap(records) {
 function planRecord({ storeName, backupRecord, baseline, serverRecord,
   allowAuthoritativeRecreate = false, version = 4 }) {
   const identity = { store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id: backupRecord.id };
-  if ((storeName === 'items' && (backupRecord.unitId || backupRecord.lessonId)) ||
-      (storeName === 'sessions' && backupRecord.lessonId)) {
-    return { ...identity, classification: 'INVALID', reason: 'local-only-curriculum-reference' };
-  }
   if (serverRecord?.deleted && !backupRecord.deleted) {
     return { ...identity, classification: 'TOMBSTONED_SERVER', reason: 'server-tombstone' };
   }
@@ -127,14 +134,18 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
   };
 }
 
-export function canonicalRestoreManifest(serverData, { version = 4 } = {}) {
-  return restoreStores(version).flatMap((storeName) => [...(serverData[storeName] ?? [])]
+export function canonicalRestoreManifest(serverData, { version = 4, protocol = UNIFIED_RESTORE_PROTOCOL } = {}) {
+  const manifest = restoreStores(version, protocol).flatMap((storeName) => [...(serverData[storeName] ?? [])]
     .sort((left, right) => left.id.localeCompare(right.id)).map((row) => ({
     entity: SYNC_V2_SCHEMAS[storeName].entity,
     id: row.id,
     revision: Number(row.serverRevision ?? 0),
     deleted: row.deleted === true,
   })));
+  // A protocol sentinel binds shared stage/receipt identities without changing
+  // old endpoints or their manifest ordering. Legacy finalizers fail closed.
+  return protocol === UNIFIED_RESTORE_PROTOCOL
+    ? [...manifest, { entity: '__n71__', id: protocol, revision: 1, deleted: false }] : manifest;
 }
 
 /** Pure, deterministic three-way planner. It never reads or writes storage. */
@@ -163,6 +174,12 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
         if (!backupRecord) {
           entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
             classification: 'KEEP_SERVER', reason: 'server-only' });
+          continue;
+        }
+        const suppressed = restoreSuppressionReason(storeName, backupRecord, payload.data ?? {}, serverData);
+        if (suppressed) {
+          entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
+            classification: 'KEEP_SERVER', reason: suppressed });
           continue;
         }
         const planned = planRecord({ storeName, backupRecord, baseline: baselines.get(id), serverRecord,
@@ -206,9 +223,9 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
   };
 }
 
-export async function fetchCanonicalRestoreSource({ version = 4 } = {}) {
-  const canonical = await fetchCanonicalRestoreSnapshot({ version });
-  const pairs = restoreStores(version).map((storeName) => {
+export async function fetchCanonicalRestoreSource({ version = 4, protocol = UNIFIED_RESTORE_PROTOCOL } = {}) {
+  const canonical = await fetchCanonicalRestoreSnapshot({ version, protocol });
+  const pairs = restoreStores(version, protocol).map((storeName) => {
     const rows = canonical[SYNC_V2_SCHEMAS[storeName].entity];
     return [storeName, rows.map((row) => decodeSyncV2Canonical(storeName, row)).filter(Boolean)];
   });
@@ -216,8 +233,8 @@ export async function fetchCanonicalRestoreSource({ version = 4 } = {}) {
 }
 
 /** Fetch the complete current owner snapshot in the shape local reconciliation consumes. */
-export async function fetchCanonicalRestoreSnapshot({ version = 4 } = {}) {
-  const pairs = await Promise.all(restoreStores(version).map(async (storeName) => {
+export async function fetchCanonicalRestoreSnapshot({ version = 4, protocol = UNIFIED_RESTORE_PROTOCOL } = {}) {
+  const pairs = await Promise.all(restoreStores(version, protocol).map(async (storeName) => {
     const entity = SYNC_V2_SCHEMAS[storeName].entity;
     return [entity, await cloud.fetchRecords(entity)];
   }));
@@ -227,13 +244,14 @@ export async function fetchCanonicalRestoreSnapshot({ version = 4 } = {}) {
 export async function previewCloudRestore(payload) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) return { validation, plan: null };
-  if (!cloud.user || !cloud.session) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
-  const serverData = await fetchCanonicalRestoreSource({ version: payload.version });
-  return { validation, plan: planCloudRestore(payload, serverData, { ownerId: cloud.user.id }), serverData };
+  return sync.runCloudRestoreExclusive(async () => {
+    const serverData = await fetchCanonicalRestoreSource({ version: payload.version });
+    return { validation, plan: planCloudRestore(payload, serverData, { ownerId: cloud.user.id }), serverData };
+  }, { prepare: () => sync.assertCloudRestoreReady(), scheduleAutomatic: false });
 }
 
-export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null } = {}) {
-  const cloudStores = restoreStores(payload.version);
+export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null, protocol = UNIFIED_RESTORE_PROTOCOL } = {}) {
+  const cloudStores = restoreStores(payload.version, protocol);
   if (!canonicalRows || typeof canonicalRows !== 'object' || cloudStores.some((storeName) =>
     !Array.isArray(canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]))) {
     throw new Error('Restore server returned an incomplete canonical snapshot');
@@ -295,8 +313,9 @@ function validateResumeCheckpoint(checkpoint) {
   const valid = checkpoint?.version === RESTORE_RESUME_VERSION &&
     typeof checkpoint.restoreId === 'string' && checkpoint.restoreId &&
     typeof checkpoint.backupHash === 'string' && checkpoint.backupHash &&
-    typeof checkpoint.stageHash === 'string' && checkpoint.stageHash &&
-    ['staged', 'finalized'].includes(checkpoint.state) &&
+    ((checkpoint.state === 'staging' && checkpoint.protocol === UNIFIED_RESTORE_PROTOCOL && checkpoint.stageEnvelope) ||
+      (typeof checkpoint.stageHash === 'string' && checkpoint.stageHash)) &&
+    ['staging', 'staged', 'finalized'].includes(checkpoint.state) &&
     checkpoint.localData && typeof checkpoint.localData === 'object' && !Array.isArray(checkpoint.localData);
   if (!valid) throw Object.assign(new Error('Stored cloud restore resume state is invalid'), {
     code: 'INVALID_RESTORE_RESUME_STATE',
@@ -317,6 +336,7 @@ export async function getCloudRestoreResumeState() {
     restoreId: checkpoint.restoreId,
     backupHash: checkpoint.backupHash,
     backupVersion: checkpoint.backupVersion,
+    protocol: checkpoint.protocol ?? 'legacy',
     stageHash: checkpoint.stageHash,
     state: checkpoint.state,
     receipt: clone(checkpoint.receipt ?? null),
@@ -366,11 +386,19 @@ export async function resumeCloudRestore({
   canonicalFetcher = fetchCanonicalRestoreSnapshot,
   reconciler = reconcileCanonicalRestore,
 } = {}) {
-  const checkpoint = await resumeCheckpoint();
+  let checkpoint = await resumeCheckpoint();
   if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });
-  await coordinator.assertCloudRestoreReady();
+  if (checkpoint.ownerId && checkpoint.ownerId !== cloud.user?.id) {
+    throw Object.assign(new Error('Stored restore belongs to another account'), { code: 'RESTORE_OWNER_MISMATCH' });
+  }
   return coordinator.runCloudRestoreExclusive(async () => {
-    const finalize = checkpoint.backupVersion === 5
+    if (checkpoint.state === 'staging') {
+      const stage = await transport.stageUnifiedRestore(checkpoint.stageEnvelope);
+      checkpoint = await updateResumeCheckpoint(current => ({ ...current,
+        stageHash: stage.stageHash, state: 'staged' }));
+    }
+    if (checkpoint.ownerId) assertRestoreOwner(checkpoint.ownerId);
+    const finalize = checkpoint.protocol === UNIFIED_RESTORE_PROTOCOL ? transport.finalizeUnifiedRestore : checkpoint.backupVersion === 5
       ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
     if (typeof finalize !== 'function') throw new Error('Versioned score restore is unavailable');
     const result = await finalize({
@@ -381,15 +409,17 @@ export async function resumeCloudRestore({
     let finalized = checkpoint;
     try {
       finalized = await markFinalized(checkpoint, result.receipt);
-      const canonical = await canonicalFetcher({ version: finalized.backupVersion });
+      const protocol = finalized.protocol ?? 'legacy';
+      const canonical = await canonicalFetcher({ version: finalized.backupVersion, protocol });
+      if (checkpoint.ownerId) assertRestoreOwner(checkpoint.ownerId);
       await reconciler({ version: finalized.backupVersion, data: finalized.localData }, canonical,
-        { restoreId: finalized.restoreId });
+        { restoreId: finalized.restoreId, protocol });
       await clearResumeCheckpoint(finalized);
     } catch (error) {
       throw reconciliationRequired(error, finalized);
     }
     return { restoreId: finalized.restoreId, resumed: true, receipt: result.receipt };
-  });
+  }, { prepare: () => coordinator.assertCloudRestoreReady({ resuming: true }) });
 }
 
 /** Final cloud-aware restore. No UI calls this foundation yet. */
@@ -408,40 +438,49 @@ export async function restoreBackupToCloud(payload, {
       restore: await getCloudRestoreResumeState(),
     });
   }
-  await coordinator.assertCloudRestoreReady();
+  const ownerId = cloud.user?.id;
   return coordinator.runCloudRestoreExclusive(async () => {
     const serverData = await sourceFetcher({ version: payload.version });
-    const plan = planCloudRestore(payload, serverData, { ownerId: cloud.user.id });
+    assertRestoreOwner(ownerId);
+    const plan = planCloudRestore(payload, serverData, { ownerId });
     if (!plan.ready) throw Object.assign(new Error('Restore requires review'), { code: 'RESTORE_REVIEW_REQUIRED', plan });
-    const stageCall = payload.version === 5 ? transport.stageScoreRestoreV2 : transport.stageSyncV2Restore;
-    const finalizeCall = payload.version === 5 ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
+    const stageCall = transport.stageUnifiedRestore;
+    const finalizeCall = transport.finalizeUnifiedRestore;
     if (typeof stageCall !== 'function' || typeof finalizeCall !== 'function') {
-      throw Object.assign(new Error('Versioned score restore is unavailable'), { code: 'SCORE_RESTORE_UNAVAILABLE' });
+      throw Object.assign(new Error('Unified restore is unavailable'), { code: 'UNIFIED_RESTORE_UNAVAILABLE' });
     }
-    const stage = await stageCall({
+    const stageEnvelope = {
       restoreId, backupHash: payload.backupHash ?? `legacy-v3:${restoreId}`,
       backupVersion: payload.version, sourceManifest: plan.sourceManifest, operations: plan.operations,
-    });
+      sourceOwnerId: payload.sourceOwnerId ?? null,
+    };
     let checkpoint = await updateResumeCheckpoint(() => ({
       version: RESTORE_RESUME_VERSION,
+      protocol: UNIFIED_RESTORE_PROTOCOL,
+      ownerId,
       restoreId,
-      backupHash: stage.backupHash,
+      backupHash: stageEnvelope.backupHash,
       backupVersion: payload.version,
-      stageHash: stage.stageHash,
-      state: 'staged',
+      stageHash: null,
+      stageEnvelope,
+      state: 'staging',
       localData: resumeLocalData(payload),
       stagedAt: Date.now(),
     }));
+    const stage = await stageCall(stageEnvelope);
+    assertRestoreOwner(ownerId);
+    checkpoint = await updateResumeCheckpoint(current => ({ ...current, state: 'staged', stageHash: stage.stageHash }));
     const result = await finalizeCall({
       restoreId, backupHash: stage.backupHash, expectedStageHash: stage.stageHash,
     });
     try {
       checkpoint = await markFinalized(checkpoint, result.receipt);
+      assertRestoreOwner(ownerId);
       await reconciler(payload, result.canonical, { restoreId });
       await clearResumeCheckpoint(checkpoint);
     } catch (error) {
       throw reconciliationRequired(error, checkpoint);
     }
     return { restoreId, plan, receipt: result.receipt };
-  });
+  }, { prepare: () => coordinator.assertCloudRestoreReady() });
 }

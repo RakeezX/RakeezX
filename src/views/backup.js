@@ -4,7 +4,7 @@ import * as store from '../store.js';
 import * as db from '../lib/db.js';
 import * as cloud from '../lib/cloud.js';
 import * as sync from '../lib/sync.js';
-import { downloadBackup, restoreBackup, readJSONFile, validateBackup, validateBackupIntegrity } from '../lib/export.js';
+import { downloadBackup, readJSONFile, validateBackup, validateBackupIntegrity } from '../lib/export.js';
 import {
   getCloudRestoreResumeState, previewCloudRestore, restoreBackupToCloud, resumeCloudRestore,
 } from '../lib/backup-v2.js';
@@ -118,7 +118,7 @@ function renderValidationState() {
     ${structuralOk ? html`<div class="cloud-validation__item ${isV3 || validationOk ? 'is-complete' : cloudRecovery.validation ? 'is-error' : 'is-pending'}">
       ${isV3 || validationOk ? icon('check') : icon('shield')}
       <span><strong>${isV3 ? 'تحقق بنيوي لإصدار V3' : validationOk ? 'تم التحقق من سلامة النسخة' : cloudRecovery.validation ? 'تعذّر التحقق من سلامة النسخة' : 'جارٍ التحقق من سلامة النسخة…'}</strong>
-      <small>${isV3 ? 'لا يتضمن هذا الإصدار تحقق سلامة V4.' : cloudRecovery.validation && !validationOk ? cloudRecovery.validation.errors?.at(-1) : `نسخة V4 · ${cloudRecovery.validation?.total ?? cloudRecovery.structural?.total ?? 0} سجلًا`}</small></span>
+      <small>${isV3 ? 'لا يتضمن هذا الإصدار تحقق سلامة V4.' : cloudRecovery.validation && !validationOk ? cloudRecovery.validation.errors?.at(-1) : `نسخة V${cloudRecovery.payload?.version} · ${cloudRecovery.validation?.total ?? cloudRecovery.structural?.total ?? 0} سجلًا`}</small></span>
     </div>` : ''}
   </div>`;
 }
@@ -154,7 +154,7 @@ function renderPlanSummary(plan) {
         })}
       </div>
     </details>
-    <div class="cloud-local-only-note">${icon('device')}<span>بعض البيانات المحلية الخاصة بهذا الجهاز لا تدخل ضمن المقارنة السحابية.</span></div>`;
+    <div class="cloud-local-only-note">${icon('device')}<span>إعدادات الجهاز وسجل المزامنة لا يُستوردان من النسخة.</span></div>`;
 }
 
 function renderCloudError(error) {
@@ -203,7 +203,7 @@ function renderCloudFlow() {
   }
   const canPreview = cloudRecovery.payload && cloudRecovery.validation?.ok && !cloudRecovery.busy;
   return html`<section class="cloud-recovery-flow" aria-labelledby="cloud-flow-title">
-    <div class="cloud-recovery-flow__head"><div><span class="eyebrow">استعادة متقدمة</span><h3 id="cloud-flow-title">مراجعة النسخة قبل استعادتها</h3></div><button class="btn btn--quiet btn--sm" data-act="reset-cloud" ${cloudRecovery.busy ? html`disabled` : ''}>اختيار نسخة أخرى</button></div>
+    <div class="cloud-recovery-flow__head"><div><h3 id="cloud-flow-title">مراجعة النسخة قبل استعادتها</h3></div><button class="btn btn--quiet btn--sm" data-act="reset-cloud" ${cloudRecovery.busy ? html`disabled` : ''}>اختيار نسخة أخرى</button></div>
     ${renderCloudSteps()}
     ${renderValidationState()}
     ${renderCloudError(cloudRecovery.error)}
@@ -213,7 +213,7 @@ function renderCloudFlow() {
       ${cloudRecovery.plan ? html`
         <button class="btn btn--primary" data-act="confirm-cloud" ${!cloudRecovery.plan.ready || cloudRecovery.busy ? html`disabled aria-disabled="true"` : ''}>المتابعة إلى التأكيد</button>
         ${!cloudRecovery.plan.ready ? html`<span class="cloud-recovery-blocked-copy">وجود أي عنصر محظور يمنع الاستعادة كاملة.</span>` : ''}
-      ` : canPreview ? html`<button class="btn btn--info" data-act="preview-cloud">${icon('cloud')} متابعة إلى المعاينة السحابية</button>` : ''}
+      ` : canPreview ? html`<button class="btn btn--info" data-act="preview-cloud">${icon('cloud')} متابعة إلى المراجعة</button>` : ''}
     </div>
   </section>`;
 }
@@ -327,7 +327,7 @@ async function refreshLegacyClaimState() {
 
 function renderLegacyClaimSection() {
   const state = legacyClaimState;
-  if (state.phase === 'hidden') return '';
+  if (!state.pendingRecovery && state.phase !== 'blocked') return ''; // Contextual legacy recovery only.
   if (state.phase === 'claimed') return html`<section class="surface__section data-safety-section" aria-labelledby="legacy-claim-title">
     <div class="data-safety-section__head">
       <span class="data-safety-section__icon is-brand">${icon('shield')}</span>
@@ -447,7 +447,7 @@ export default {
     cloudResumeState = nextResume;
     cloudResumeError = nextResumeError;
     await refreshLegacyClaimState();
-    await refreshCurriculumBootstrapState();
+    // Separate curriculum bootstrap remains dormant; unified restore owns this path.
     repaint();
   },
   onUnmount() {
@@ -504,7 +504,7 @@ export default {
             <div class="data-safety-section__head">
               <span class="data-safety-section__icon is-brand">${icon('download')}</span>
               <div class="data-safety-section__copy"><h2 id="backup-create-title">إنشاء نسخة احتياطية</h2><p>تحمي الفصول والطلاب والحضور والدرجات وسجلات العمل في ملف واحد.</p></div>
-              <button class="btn btn--primary data-safety-section__action" data-act="export">${icon('download')} تنزيل نسخة</button>
+              <button class="btn btn--primary data-safety-section__action" data-act="export">${icon('download')} إنشاء نسخة احتياطية</button>
             </div>
             <div class="backup-action-status" role="status" aria-live="polite">
               <span class="backup-action-status__mark ${latestLocalAction ? 'is-complete' : ''}">${icon(latestLocalAction ? 'check' : 'clock')}</span>
@@ -512,23 +512,13 @@ export default {
             </div>
           </section>
           ${demo ? html`<section class="surface__section data-safety-section" data-demo-cloud-unavailable><div class="data-safety-section__copy"><h2>البيانات التجريبية محلية فقط</h2><p>الربط بالحساب والاستعادة السحابية غير متاحين في الوضع التجريبي.</p></div></section>` : renderLegacyClaimSection()}
-          ${demo ? '' : renderCurriculumBootstrapSection()}
           <section class="surface__section data-safety-section" aria-labelledby="restore-title">
-            <div class="data-safety-section__heading"><h2 id="restore-title">الاستعادة والاسترداد</h2><p>اختر المسار المناسب لمكان النسخة التي تريد استعادتها.</p></div>
-            <input type="file" id="restore-file" accept="application/json,.json" class="sr-only" data-change="file" aria-label="اختيار ملف نسخة احتياطية للاستعادة">
-            <input type="file" id="cloud-restore-file" accept="application/json,.json" class="sr-only" data-change="cloud-file" aria-label="اختيار ملف للاستعادة السحابية الآمنة">
-            <div class="recovery-paths">
-              <div class="recovery-path">
-                <span class="recovery-path__icon">${icon('device')}</span>
-                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>استعادة نسخة على هذا الجهاز</h3><span class="badge badge--ok">محلية</span></div><p>يقرأ رَكيز الملف ويتحقق منه، ثم يتيح الدمج أو الاستبدال على هذا الجهاز فقط. لا يستبدل بيانات السحابة.</p></div>
-                <button class="btn btn--ghost recovery-path__action" data-act="pick-file">${icon('upload')} اختيار ملف</button>
-              </div>
-              ${demo ? '' : html`<div class="recovery-path recovery-path--cloud" aria-describedby="cloud-recovery-note">
-                <span class="recovery-path__icon is-info">${icon('cloud')}</span>
-                <div class="recovery-path__copy"><div class="hstack gap-2 wrap"><h3>الاستعادة السحابية الآمنة</h3><span class="badge ${availability.badge}">${availability.label}</span></div><p id="cloud-recovery-note">تقارن النسخة ببيانات الحساب، وتمنع التنفيذ عند وجود تعارض، ثم تُحدّث هذا الجهاز بالنسخة النهائية.</p></div>
-                <button class="btn btn--info recovery-path__action" data-act="pick-cloud-file" ${cloudStartBlocked ? html`disabled aria-disabled="true"` : ''}>${icon('upload')} اختيار نسخة للمراجعة</button>
-              </div>`}
+            <div class="data-safety-section__head">
+              <span class="data-safety-section__icon is-info">${icon('upload')}</span>
+              <div class="data-safety-section__copy"><h2 id="restore-title">استعادة نسخة احتياطية</h2><p>تُراجع النسخة مع بيانات الحساب، ثم يُحدّث هذا الجهاز وتُزامن أجهزتك الأخرى بأمان.</p><span class="badge ${availability.badge}">${availability.label}</span></div>
+              <button class="btn btn--info data-safety-section__action" data-act="pick-cloud-file" ${cloudStartBlocked ? html`disabled aria-disabled="true"` : ''}>${icon('upload')} استعادة نسخة احتياطية</button>
             </div>
+            <input type="file" id="cloud-restore-file" accept="application/json,.json" class="sr-only" data-change="cloud-file" aria-label="اختيار نسخة احتياطية للاستعادة">
             ${renderCloudFlow()}
           </section>
           <details class="surface__section data-inventory">
@@ -669,12 +659,8 @@ export default {
         repaint();
       }
     },
-    'pick-file'() {
-      if (store.getActiveWorkspace()?.type === 'demo') return;
-      document.getElementById('restore-file')?.click();
-    },
     'pick-cloud-file'() {
-      if (cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
+      if (store.getActiveWorkspace()?.type === 'demo' || cloudRecovery.busy || cloudResumeState || cloudResumeError) return;
       document.getElementById('cloud-restore-file')?.click();
     },
     async 'cloud-file'(el) {
@@ -715,7 +701,6 @@ export default {
       if (cloudRecovery.busy || !cloudRecovery.payload || !cloudRecovery.validation?.ok || cloudResumeState || cloudResumeError) return;
       setCloudRecovery({ phase: 'previewing', busy: true, plan: null, error: null });
       try {
-        await sync.assertCloudRestoreReady();
         const preview = await previewCloudRestore(cloudRecovery.payload);
         if (!preview.plan) throw Object.assign(new Error('Cloud preview unavailable'), { code: preview.validation?.code ?? 'INVALID_BACKUP' });
         setCloudRecovery({ phase: 'review', busy: false, validation: preview.validation, plan: preview.plan, error: null });
@@ -740,7 +725,7 @@ export default {
           setCloudRecovery({ phase: 'review', busy: false, plan: error.plan, error: presentCloudError(error) });
           return;
         }
-        if (['LOCAL_RECONCILIATION_REQUIRED', 'CLOUD_RESTORE_RESUME_REQUIRED'].includes(error.code)) {
+        if ((await getCloudRestoreResumeState()) || ['LOCAL_RECONCILIATION_REQUIRED', 'CLOUD_RESTORE_RESUME_REQUIRED'].includes(error.code)) {
           await refreshResumeState();
           cloudRecovery = { ...cloudRecovery, phase: 'error', busy: false, error: presentCloudError(error) };
           repaint();
@@ -770,39 +755,6 @@ export default {
       cloudRecovery = emptyCloudRecovery();
       repaint();
       setTimeout(() => document.querySelector('[data-act="pick-cloud-file"]')?.focus({ preventScroll: true }), 0);
-    },
-    async file(el) {
-      store.assertLeaseWritable();
-      if (store.getActiveWorkspace()?.type === 'demo') return;
-      const file = el.files?.[0]; el.value = ''; if (!file) return;
-      let payload;
-      try { payload = await readJSONFile(file); } catch (err) { toast(err.message, 'danger'); return; }
-      let validation;
-      try { validation = await validateBackupIntegrity(payload); }
-      catch (err) { console.error(err); toast('تعذّر التحقق من النسخة الاحتياطية', 'danger'); return; }
-      if (!validation.ok) { toast(validation.errors.join('\n'), 'danger'); return; }
-      const counts = validation.total;
-      const validationSummary = validation.integrity === 'verified'
-        ? 'تمت قراءة الملف والتحقق من سلامة محتواه'
-        : 'تمت قراءة الملف واجتاز التحقق البنيوي لإصدار V3';
-      const mode = await openSheet({
-        title: 'استعادة نسخة على هذا الجهاز',
-        desc: `${validationSummary}: ${counts} سجلًا، صُدّر في ${backupExportDate(payload?.exportedAt) || 'تاريخ غير معروف'}.`,
-        body: html`<div class="recovery-review-note">${icon('device')}<span><strong>هذه استعادة محلية</strong><small>سيُطبّق اختيارك على سجل ركيز في هذا الجهاز.</small></span></div><div class="stack stack-2 mt-3"><button class="radiocard radiocard--btn" data-pick="merge" autofocus><span class="radiocard__body"><span class="radiocard__title">دمج السجلات <span class="badge badge--brand">موصى به</span></span><span class="radiocard__hint">يبقي ما على الجهاز ويأخذ الأحدث لكل سجل.</span></span></button><button class="radiocard radiocard--btn recovery-replace-option" data-pick="replace"><span class="radiocard__body"><span class="radiocard__title">استبدال كامل</span><span class="radiocard__hint">يمسح ما على هذا الجهاز ويضع محتوى النسخة مكانه. سيُطلب تأكيد إضافي.</span></span></button></div>`,
-        onMount: (root, done) => root.querySelectorAll('[data-pick]').forEach((button) => button.addEventListener('click', () => done(button.dataset.pick))),
-      });
-      if (!mode) return;
-      if (mode === 'replace') {
-        const ok = await confirmSheet({ title: 'استبدال كل البيانات؟', desc: 'كل ما على هذا الجهاز يُمسح ويحل محله ما في الملف. لا رجعة.', confirmLabel: 'استبدل', danger: true });
-        if (!ok) return;
-      }
-      try {
-        store.assertLeaseWritable();
-        const { written, migration } = await restoreBackup(payload, mode);
-        toast(migration ? `استُرجع ${written} سجلًا ورُحّل إلى شكل رَكيز المعلم — يُعاد التحميل` : `استُرجع ${written} سجلًا — يُعاد التحميل`);
-        if (migration?.warnings?.length) console.warn('[rakeezx] ملاحظات ترحيل النسخة:', migration.warnings);
-        setTimeout(() => location.reload(), 1100);
-      } catch (err) { console.error(err); toast(err.message ?? 'تعذّر الاسترجاع', 'danger'); }
     },
     async wipe() {
       store.assertLeaseWritable();

@@ -10,6 +10,9 @@ import * as db from '../src/lib/db.js';
 import * as cloud from '../src/lib/cloud.js';
 import * as store from '../src/store.js';
 import * as sync from '../src/lib/sync.js';
+import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
+const memory = new Map();
+globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: (key,value) => memory.set(key,String(value)), removeItem: key => memory.delete(key), key: i => [...memory.keys()][i], get length(){return memory.size;} };
 import {
   buildBackup, restoreBackup, sha256Hex, backupHashInput, validateBackup, validateBackupIntegrity,
 } from '../src/lib/export.js';
@@ -38,10 +41,14 @@ async function rehash(payload) {
 beforeEach(async () => {
   cloud.setMockBackend(null);
   cloud.setMockAuth({ id: OWNER }, { access_token: 'test', user: { id: OWNER } });
+  localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify(cloud.session));
   db.closeDB();
   await activateSyntheticAccountWorkspace({ ownerId: OWNER });
   await db.clearAll();
   await store.init();
+  const lease = runtimeOfflineLease();
+  lease.setContext(store.getActiveWorkspace(), OWNER);
+  await lease.renew(async () => ({ id: OWNER, source: 'supabase-auth-user', verifiedAt: Date.now() }));
 });
 
 afterEach(async () => {
@@ -166,7 +173,7 @@ test('V5 cloud restore selects versioned RPCs and reconciles complete canonical 
       derived_value: 3, manual_value: 5, value: 8, revision: 1, deleted_at: null }],
   });
   const transport = {
-    async stageScoreRestoreV2(envelope) {
+    async stageUnifiedRestore(envelope) {
       stageCalls++;
       assert.equal(envelope.backupVersion, 5);
       const entities = envelope.operations.map((row) => row.entity);
@@ -174,13 +181,13 @@ test('V5 cloud restore selects versioned RPCs and reconciles complete canonical 
       assert.ok(entities.indexOf('score_subitems') < entities.indexOf('score_subitem_completions'));
       return { backupHash: envelope.backupHash, stageHash: 'stage:v5' };
     },
-    async finalizeScoreRestoreV2() {
+    async finalizeUnifiedRestore() {
       finalizeCalls++;
       return { receipt: { status: 'finalized' }, canonical: canonicalRows };
     },
   };
   const coordinator = { async assertCloudRestoreReady() {},
-    async runCloudRestoreExclusive(action) { return action(); } };
+    async runCloudRestoreExclusive(action, {prepare} = {}) { await prepare?.(); return action(); } };
   await restoreBackupToCloud(backup, { transport, coordinator, sourceFetcher: async () => emptyServer() });
   assert.equal(stageCalls, 1);
   assert.equal(finalizeCalls, 1);
@@ -233,7 +240,8 @@ test('same-field conflict and server tombstone are never silently applied', asyn
   const tombstoneServer = emptyServer();
   tombstoneServer.students = [{ ...base.serverCanonical, deleted: true, serverRevision: 2 }];
   plan = planCloudRestore(payload, tombstoneServer, { ownerId: OWNER });
-  assert.equal(plan.entries.find((row) => row.id === base.id).classification, 'TOMBSTONED_SERVER');
+  assert.equal(plan.entries.find((row) => row.id === base.id).classification, 'KEEP_SERVER');
+  assert.equal(plan.entries.find((row) => row.id === base.id).reason, 'server-tombstone');
 });
 
 test('legacy cloud restore is safe only for a provably empty owner', () => {
@@ -252,8 +260,8 @@ test('cloud restore stages/finalizes once and reconciles only the returned canon
     baselines: { students: [{ id: 'student:new', revision: 0, value: null }] } });
   const calls = [];
   const transport = {
-    async stageSyncV2Restore(envelope) { calls.push(['stage', envelope]); return { backupHash: envelope.backupHash, stageHash: 'stage-hash' }; },
-    async finalizeSyncV2Restore(envelope) {
+    async stageUnifiedRestore(envelope) { calls.push(['stage', envelope]); return { backupHash: envelope.backupHash, stageHash: 'stage-hash' }; },
+    async finalizeUnifiedRestore(envelope) {
       calls.push(['finalize', envelope]);
       return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: { students: [] } };
     },
@@ -261,7 +269,7 @@ test('cloud restore stages/finalizes once and reconciles only the returned canon
   let exclusive = false;
   const coordinator = {
     async assertCloudRestoreReady() { calls.push(['ready']); },
-    async runCloudRestoreExclusive(task) { exclusive = true; try { return await task(); } finally { exclusive = false; } },
+    async runCloudRestoreExclusive(task, {prepare} = {}) { await prepare?.(); exclusive = true; try { return await task(); } finally { exclusive = false; } },
   };
   let reconciled = false;
   const result = await restoreBackupToCloud(backup, {
@@ -297,7 +305,7 @@ test('invalid hash is rejected before any stage write and pending writes are gua
 
 test('unsupported backup versions are rejected before cloud staging with a stable code', async () => {
   let staged = 0;
-  const transport = { async stageSyncV2Restore() { staged++; } };
+  const transport = { async stageUnifiedRestore() { staged++; } };
   const coordinator = {
     async assertCloudRestoreReady() { throw new Error('must not reach readiness'); },
   };
@@ -317,7 +325,7 @@ test('canonical reconciliation is atomic and quarantines late outbox work so it 
   await reconcileCanonicalRestore(payload, canonicalPayload({ students: [{ id: 'new', name: 'جديد', note: '', status: 'active', revision: 1, field_revisions: {}, deleted_at: null }] }), { restoreId: 'restore:late' });
   assert.equal(await db.get('students', 'old'), undefined);
   assert.equal((await db.get('students', 'new')).name, 'جديد');
-  assert.equal((await db.get('units', 'unit:a')).name, 'محلي');
+  assert.equal(await db.get('units', 'unit:a'), undefined, 'reconcile must use canonical units, never local backup fallback');
   assert.deepEqual(await db.getAll('outbox'), []);
   const device = await db.get('device', 'device');
   assert.equal(device.restoreQuarantinedOutbox[0].restoreId, 'restore:late');
@@ -340,11 +348,11 @@ test('a finalized restore resumes local reconciliation with the same identity an
   let finalizeCalls = 0;
   let serverMutations = 0;
   const transport = {
-    async stageSyncV2Restore(envelope) {
+    async stageUnifiedRestore(envelope) {
       stageCalls++;
       return { backupHash: envelope.backupHash, stageHash: 'resume-stage-hash' };
     },
-    async finalizeSyncV2Restore(envelope) {
+    async finalizeUnifiedRestore(envelope) {
       finalizeCalls++;
       assert.equal(envelope.restoreId, 'restore:resume');
       if (!finalized) { finalized = true; serverMutations++; }
@@ -353,7 +361,7 @@ test('a finalized restore resumes local reconciliation with the same identity an
   };
   const coordinator = {
     async assertCloudRestoreReady() {},
-    async runCloudRestoreExclusive(task) { return task(); },
+    async runCloudRestoreExclusive(task, {prepare} = {}) { await prepare?.(); return task(); },
   };
 
   await assert.rejects(restoreBackupToCloud(backup, {
@@ -363,7 +371,7 @@ test('a finalized restore resumes local reconciliation with the same identity an
 
   assert.deepEqual(await getCloudRestoreResumeState(), {
     restoreId: 'restore:resume', backupHash: backup.backupHash, backupVersion: 4,
-    stageHash: 'resume-stage-hash', state: 'finalized',
+    protocol: 'N71_V1', stageHash: 'resume-stage-hash', state: 'finalized',
     receipt: { restoreId: 'restore:resume', status: 'finalized' },
     stagedAt: (await getCloudRestoreResumeState()).stagedAt,
     finalizedAt: (await getCloudRestoreResumeState()).finalizedAt,
@@ -381,6 +389,6 @@ test('a finalized restore resumes local reconciliation with the same identity an
   assert.equal(finalizeCalls, 2);
   assert.equal(serverMutations, 1);
   assert.equal((await db.get('students', 'student:resume')).name, 'مستعاد');
-  assert.equal((await db.get('units', 'unit:resume')).name, 'وحدة محلية');
+  assert.equal(await db.get('units', 'unit:resume'), undefined, 'backup-only rows must never bypass canonical cloud');
   assert.equal(await getCloudRestoreResumeState(), null);
 });
