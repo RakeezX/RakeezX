@@ -1,0 +1,93 @@
+{
+  "observedAt": "2026-10-12T11:14:43.4503188Z",
+  "snapshotAt": "2026-10-12T11:14:41.368Z",
+  "exactControllerAlive": true,
+  "controllerPid": 2892,
+  "instanceId": "fd51b65b-39e4-40cc-871a-e1450e4340ff",
+  "schedulerState": "Running",
+  "schedulerEnabled": true,
+  "logonType": "Interactive",
+  "paused": false,
+  "stopPresent": false,
+  "stopRefillPresent": false,
+  "maxWorkers": 2,
+  "runningCount": 1,
+  "pendingCount": 7,
+  "awaitingPOCount": 4,
+  "tasks": [
+    {
+      "productId": "N92",
+      "status": "awaiting_po",
+      "lastFailure": null
+    },
+    {
+      "productId": "N91",
+      "status": "running",
+      "lastFailure": null
+    },
+    {
+      "productId": "N95",
+      "status": "awaiting_po",
+      "lastFailure": null
+    },
+    {
+      "productId": "N84",
+      "status": "awaiting_po",
+      "lastFailure": null
+    },
+    {
+      "productId": "N54",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N94",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N13",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N49",
+      "status": "awaiting_po",
+      "lastFailure": null
+    },
+    {
+      "productId": "N58",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N77",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N73",
+      "status": "pending",
+      "lastFailure": null
+    },
+    {
+      "productId": "N71",
+      "status": "pending",
+      "lastFailure": null
+    }
+  ],
+  "issues": [],
+  "deliveryInFlight": null,
+  "n49": {
+    "status": "awaiting_po",
+    "sessionId": "01a12faa-cde6-7c23-a021-796e1137b1a2",
+    "runnerPid": null,
+    "lastFileProgressAt": "2026-10-12T11:10:35.025Z",
+    "lastEventAt": "2026-10-12T11:11:45.255Z",
+    "heartbeatAt": "2026-10-12T11:11:43.2312806Z",
+    "watchdogIncident": null
+  },
+  "docsCommit": "d87f4d7f7daa94e3b3da28794079721790059aae",
+  "docsInstalled": "INSTALLED",
+  "workersStoppedByDocs": false
+}
