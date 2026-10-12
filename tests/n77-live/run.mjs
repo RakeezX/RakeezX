@@ -49,7 +49,7 @@ export async function prepare(previewUrl) {
     const quoted = "'" + PRIVATE.replaceAll("'","''") + "'";
     execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',
       "$ErrorActionPreference='Stop'; $n77Sid=[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value; " +
-      '& icacls '+quoted+' /inheritance:r /grant:r "${n77Sid}:(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" | Out-Null; if ($LASTEXITCODE -ne 0) { throw "PRIVATE_PROTECTION_FAILED" }'],{windowsHide:true});
+      '& icacls '+quoted+' /inheritance:r /grant:r "*${n77Sid}:(OI)(CI)F" "*S-1-5-18:(OI)(CI)F" | Out-Null; if ($LASTEXITCODE -ne 0) { throw "PRIVATE_PROTECTION_FAILED" }'],{windowsHide:true});
   }
   const now=Date.now(), source=await fs.readFile(path.join(ROOT,'src/lib/cloud.js'),'utf8');
   const publishableKey=source.match(/const PUBLISHABLE_KEY = '([^']+)';/)[1];
