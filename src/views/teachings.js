@@ -10,9 +10,12 @@ import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import {
-  GRADES, SECTION_COLORS, autoAssignSectionColor, gradeLabel, safeColor, todayISO, sectionLabel, normalizeSectionLabel
+  GRADES, SECTION_COLORS, autoAssignSectionColor, safeColor, todayISO, sectionLabel, normalizeSectionLabel
 } from '../models.js';
-import { normalizeSubjectName, validateCustomSubjectName } from '../lib/subject-catalog.js';
+import {
+  builtinSubject, customSubjectSlug, findPersistedBuiltin, matchBuiltinSubject,
+  normalizeSubjectName, validateCustomSubjectName,
+} from '../lib/subject-catalog.js';
 import { classSubjectDefault } from '../lib/class-subject-default.js';
 import { repaint } from '../repaint.js';
 
@@ -44,33 +47,48 @@ function subjectMenu(options, query = '') {
   `;
 }
 
+function matchingSection({ yearId, grade, label }) {
+  return store.sections(yearId).find(section => section.yearId === yearId &&
+    Number(section.grade) === Number(grade) && normalizeSectionLabel(section.label) === normalizeSectionLabel(label));
+}
+
+// Inspect the same subject identities as resolveSubjectSelection without saving
+// anything: a duplicate form submission must remain open and leave no outbox.
+function existingSubjectSelection({ token, customName = '' }) {
+  if (token.startsWith('subject:')) return store.getSubject(token.slice('subject:'.length));
+  const definition = token.startsWith('builtin:') ? builtinSubject(token.slice('builtin:'.length))
+    : token === 'custom' ? matchBuiltinSubject(customName) : null;
+  if (definition) return findPersistedBuiltin(store.subjects(), definition);
+  if (token !== 'custom') return null;
+  const normalized = normalizeSubjectName(customName);
+  return store.subjects().find(subject => normalizeSubjectName(subject.name) === normalized) ??
+    store.subjects().find(subject => subject.slug === customSubjectSlug(customName));
+}
+
+const duplicateTeaching = (sectionId, subjectId, termId) => sectionId && subjectId &&
+  store.teachings(termId).some(teaching => teaching.sectionId === sectionId && teaching.subjectId === subjectId);
+const DUPLICATE_TEACHING_MESSAGE = 'هذه المادة موجودة مسبقًا لهذا الصف والفصل في الفصل الدراسي الحالي.';
+
 function sheet(existing = null, selectedSectionId = '') {
   const secs = store.sections();
   const options = store.subjectOptions();
   const autoColor = autoAssignSectionColor(secs);
   const selectedOption = classSubjectDefault(options, store.state.teachings.filter(teaching => !store.isTeachingArchived(teaching)), store.teachings(), existing);
-  const c = existing
+  const selectedSection = store.getSection(selectedSectionId || existing?.sectionId);
+  const c = selectedSection
     ? {
-        grade: store.getSection(existing.sectionId)?.grade ?? 4,
-        label: store.getSection(existing.sectionId)?.label ?? '1',
-        color: store.getSection(existing.sectionId)?.color ?? SECTION_COLORS[0],
+        grade: selectedSection.grade,
+        label: selectedSection.label,
+        color: selectedSection.color,
       }
     : { grade: 4, label: '1', color: autoColor };
 
   return openSheet({
     title: selectedSectionId ? 'إضافة مادة للفصل' : existing ? 'تعديل الفصل' : 'فصل جديد',
-    desc: 'أنشئ فصلًا جديدًا أو أضف مادة لفصل موجود بنفس قائمة الطلاب.',
+    desc: 'اختر الصف والفصل والمادة. إذا كان الفصل موجودًا، تُضاف المادة بقائمة الطلاب نفسها.',
     body: html`
       <form id="tch-form" class="management-form class-form">
-        <label class="field">
-          <span class="field__label">الفصل</span>
-          <select class="select" name="sectionId">
-            <option value="">فصل جديد</option>
-            ${secs.map(sec => html`<option value="${sec.id}" ${sec.id === selectedSectionId ? 'selected' : ''}>${sectionLabel(sec)}</option>`)}
-          </select>
-          <span class="field__hint" data-section-hint>المادة الجديدة مستقلة في الدرجات والحصص والحضور، وتشترك في قائمة طلاب الفصل.</span>
-        </label>
-        <div class="field-row" data-new-section-fields>
+        <div class="field-row">
           <label class="field">
             <span class="field__label">الصف</span>
             <select class="select" name="grade">
@@ -135,15 +153,6 @@ function sheet(existing = null, selectedSectionId = '') {
       <button class="btn btn--primary" form="tch-form" type="submit">${existing ? 'حفظ' : 'إنشاء'}</button>
     `,
     onMount: (root, done) => {
-      const sectionSelect = root.querySelector('[name="sectionId"]');
-      const newFields = root.querySelector('[data-new-section-fields]');
-      const updateSectionFields = () => {
-        const shared = !!sectionSelect.value;
-        newFields.hidden = shared;
-        newFields.querySelectorAll('input, select').forEach(control => { control.disabled = shared; });
-      };
-      sectionSelect.addEventListener('change', updateSectionFields);
-      updateSectionFields();
       const picker = root.querySelector('[data-subject-picker]');
       const trigger = picker.querySelector('[data-subject-trigger]');
       const menu = picker.querySelector('[data-subject-menu]');
@@ -201,26 +210,24 @@ function sheet(existing = null, selectedSectionId = '') {
       root.querySelector('#tch-form').addEventListener('submit', (ev) => {
         ev.preventDefault();
         const fd = new FormData(ev.target);
-        const sectionId = String(fd.get('sectionId') ?? '');
         const term = store.activeTerm();
         const year = store.activeYear();
         if (!term || !year || term.yearId !== year.id || store.isTermClosed(term.id)) {
           toast('اختر سنة وفصلًا دراسيًا مفتوحًا من الإعدادات', 'warn');
           return;
         }
-        if (sectionId) {
-          try { store.validateTeachingContext(sectionId, term.id); }
+        const label = String(fd.get('label') ?? '').trim();
+        if (!label) return;
+        const grade = Number(fd.get('grade'));
+        if (selectedSection && Number(selectedSection.grade) === grade &&
+            normalizeSectionLabel(selectedSection.label) === normalizeSectionLabel(label)) {
+          try { store.validateTeachingContext(selectedSection.id, term.id); }
           catch (error) { toast(error.message, 'warn'); return; }
         }
-        const label = String(fd.get('label') ?? '').trim();
-        if (!sectionId && !label) return;
-        const grade = Number(fd.get('grade'));
-        const yearId = existing ? store.getSection(existing.sectionId)?.yearId : store.activeYear()?.id;
-        const duplicate = store.sections(yearId).find((s) => !s.deleted && s.id !== existing?.sectionId &&
-          s.yearId === yearId && s.grade === grade && normalizeSectionLabel(s.label) === normalizeSectionLabel(label));
-        if (!sectionId && duplicate) {
-          toast(`هذا الفصل موجود مسبقًا (${gradeLabel(grade)} / ${duplicate.label})`, 'warn');
-          return;
+        const section = matchingSection({ yearId: year.id, grade, label });
+        if (section) {
+          try { store.validateTeachingContext(section.id, term.id); }
+          catch (error) { toast(error.message, 'warn'); return; }
         }
         const subjectToken = String(fd.get('subjectToken') ?? '');
         const customSubjectName = String(fd.get('customSubjectName') ?? '');
@@ -237,12 +244,17 @@ function sheet(existing = null, selectedSectionId = '') {
           openMenu();
           return;
         }
+        const subjectSelection = { token: subjectToken, customName: customSubjectName };
+        if (duplicateTeaching(section?.id, existingSubjectSelection(subjectSelection)?.id, term.id)) {
+          toast(DUPLICATE_TEACHING_MESSAGE, 'warn');
+          return;
+        }
         done({
-          sectionId, termId: term.id, yearId: year.id,
+          sectionId: section?.id ?? '', termId: term.id, yearId: year.id,
           grade,
           label,
           color: String(fd.get('color') ?? autoColor ?? SECTION_COLORS[0]),
-          subjectSelection: { token: subjectToken, customName: customSubjectName },
+          subjectSelection,
         });
       });
     },
@@ -258,6 +270,7 @@ export async function addSubjectToClass(sectionId = '') {
   createBusy = true;
   try {
     const workspace = store.getActiveWorkspace();
+    if (sectionId) store.validateTeachingContext(sectionId);
     const data = await sheet(null, sectionId);
     if (!data) return;
     const year = store.activeYear();
@@ -272,9 +285,12 @@ export async function addSubjectToClass(sectionId = '') {
         store.activeTerm()?.id !== term.id || store.isTermClosed(term.id)) {
       throw new Error('تغيّر الفصل الدراسي. افتح النموذج مجددًا.');
     }
-    // Recheck after resolving a custom subject; never edit an existing class here.
-    const sec = data.sectionId ? store.validateTeachingContext(data.sectionId, term.id).section
-      : await store.createSection({ yearId: year.id, grade: data.grade, label: data.label,
+    // Recheck after subject resolution, including a class created while saving.
+    // Keep createTeaching idempotent for Sync retries; reject duplicate UI intent here.
+    let sec = data.sectionId ? store.validateTeachingContext(data.sectionId, term.id).section
+      : matchingSection(data);
+    if (duplicateTeaching(sec?.id, subject.id, term.id)) throw new Error(DUPLICATE_TEACHING_MESSAGE);
+    if (!sec) sec = await store.createSection({ yearId: year.id, grade: data.grade, label: data.label,
         name: `${data.grade}/${data.label}`, color: safeColor(data.color, autoAssignSectionColor(store.sections())) });
     await store.createTeaching({ sectionId: sec.id, subjectId: subject.id, termId: term.id });
     repaint();
