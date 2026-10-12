@@ -55,6 +55,11 @@ test('N71 actual application presents one backup and one restore, validates file
   await expect(page.getByText('تمت استعادة بياناتك بنجاح',{exact:true})).toBeVisible();
   expect(stages).toBe(1);expect(finalizes).toBe(1);expect(stageEnvelope.p_source_owner_id).toBe(file.sourceOwnerId);
   expect(await page.evaluate(async()=>{const db=await import('/src/lib/db.js');return (await db.get('students','n71-ui-student')).name;})).toBe('طالب النسخة');
+  const [restoredDownload]=await Promise.all([page.waitForEvent('download'),page.locator('[data-act="export"]').click()]);
+  const restoredChunks=[];for await(const chunk of await restoredDownload.createReadStream())restoredChunks.push(chunk);
+  const restoredBackup=JSON.parse(Buffer.concat(restoredChunks).toString('utf8'));
+  expect(await page.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),restoredBackup)).toMatchObject({ok:true});
+  expect(restoredBackup.baselines.students.find(row=>row.id==='n71-ui-student').value.name).toBe('طالب النسخة');
   await page.locator('[data-act="reset-cloud"]').click();
   await mkdir('coverage/n71-current',{recursive:true});
   for(const width of [390,1280]){
