@@ -2511,7 +2511,7 @@ export async function createSection(data) {
   if (existing) throw new Error(`هذا الفصل موجود مسبقًا (${gradeLabel(existing.grade)} / ${existing.label})`);
   
   const s = makeSection({ yearId, order: sections(yearId).length, ...data });
-  await save({ sections: [s] });
+  if (!(await save({ sections: [s] }))) throw new Error('تعذّر حفظ الفصل. حاول مرة أخرى.');
   return s;
 }
 
@@ -2535,22 +2535,63 @@ export async function editSection(id, data) {
   return updated;
 }
 
+/** Validate references before resolving a new subject or persisting a teaching. */
+export function validateTeachingContext(secId, tmId = activeTerm()?.id) {
+  const section = getSection(secId);
+  const term = getTerm(tmId);
+  if (!section) throw new Error('الفصل غير موجود. اختر فصلًا نشطًا.');
+  if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+  if (!term || !getYear(section.yearId) || section.yearId !== term.yearId) {
+    throw new Error('اختر فصلًا من السنة الدراسية الحالية.');
+  }
+  if (isTermClosed(term.id)) throw new Error('هذا الفصل الدراسي مغلق — البيانات للعرض فقط.');
+  return { section, term };
+}
+
+const pendingTeachingCreations = new Map();
+
 /** ينشئ إسنادًا تدريسيًا ومعه بنود التقييم الافتراضية. */
 export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }) {
-  if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
-  const term = tmId ?? activeTerm()?.id;
+  const { term: contextTerm } = validateTeachingContext(secId, tmId);
+  const term = contextTerm.id;
   const subject = subId ?? getSubject('sub:digital-skills')?.id ?? subjects()[0]?.id;
   if (!getSubject(subject)) throw new Error('اختر مادة صالحة للفصل.');
+  const key = JSON.stringify([activeWorkspace?.databaseName, secId, subject, term]);
+  if (pendingTeachingCreations.has(key)) return pendingTeachingCreations.get(key);
+  const existing = state.teachings.find((row) => row.sectionId === secId && row.subjectId === subject && row.termId === term);
+  if (existing?.deleted) throw new Error('لا يمكن إعادة إنشاء مادة محذوفة للفصل نفسه.');
+  if (existing) return existing;
   const tch = makeTeaching({
     sectionId: secId, subjectId: subject, termId: term,
     order: teachings(term).length,
   });
-  if (getTeaching(tch.id)) return getTeaching(tch.id);
   const defaults = defaultItemsFor(tch.id);
-  await save({ teachings: [tch], items: defaults }, {
+  const pending = save({ teachings: [tch], items: defaults }, {
     [TEACHING_CREATION_PROOF]: { version: 1, teaching: tch, items: defaults },
+  }).then((saved) => {
+    if (!saved) throw new Error('تعذّر حفظ مادة الفصل. حاول مرة أخرى.');
+    return getTeaching(tch.id);
   });
-  return tch;
+  pendingTeachingCreations.set(key, pending);
+  try { return await pending; }
+  finally { pendingTeachingCreations.delete(key); }
+}
+
+/** All live subjects on this class count, including subjects in another term. */
+export function classDeleteScope(tchId) {
+  const teaching = getTeaching(tchId);
+  if (!teaching || isTeachingArchived(teaching)) throw new Error('الفصل غير متاح للحذف.');
+  const section = getSection(teaching.sectionId);
+  if (!section) throw new Error('الفصل غير موجود.');
+  const ids = live(state.teachings).filter((row) => row.sectionId === section.id).map((row) => row.id).sort();
+  return { teachingId: tchId, sectionId: section.id, kind: ids.length > 1 ? 'subject' : 'class',
+    signature: JSON.stringify([section.id, tchId, ids]) };
+}
+
+export async function deleteClassFromTeaching(tchId, expectedSignature) {
+  const scope = classDeleteScope(tchId);
+  if (scope.signature !== expectedSignature) throw new Error('تغيّرت مواد الفصل. راجع نطاق الحذف وأكّد مجددًا.');
+  return scope.kind === 'subject' ? deleteTeaching(tchId) : deleteClass(scope.sectionId);
 }
 
 const pristineDefaultItem = (item, expected, index) => !item.deleted &&

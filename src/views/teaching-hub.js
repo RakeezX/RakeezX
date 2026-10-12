@@ -6,6 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
+import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
   { href: `#/teaching/${id}/class-rules`, icon: 'book', title: 'هدف وميثاق الصف', sub: 'الهدف الرئيسي والميثاق' },
@@ -32,7 +33,7 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
           </div>
         </div>
         <div class="class-hub-header__end">
-          <button class="iconbtn" data-act="edit-sec" aria-label="تعديل بيانات الشعبة" title="تعديل بيانات الشعبة">${icon('settings')}</button>
+          <button class="iconbtn" data-act="edit-sec" aria-label="تعديل الفصل" title="تعديل الفصل">${icon('settings')}</button>
         </div>
       </div>
       ${targetSession ? html`
@@ -230,28 +231,8 @@ export default {
       });
     },
     async delete(el, ev, params) {
-      const tch = store.getTeaching(params.id);
-      if (!tch) return;
-      const sec = store.getSection(tch.sectionId);
-      const sub = store.getSubject(tch.subjectId);
-      const target = [sectionLabel(sec), sub?.name].filter(Boolean).join(' · ');
-      const ok = await openSheet({
-        title: 'حذف الفصل',
-        desc: target ? `إلغاء فصل ${target}` : undefined,
-        body: html`
-          <div class="delete-teaching-dialog">
-            <div class="delete-teaching-dialog__badge">${icon('trash')} إجراء نهائي غير قابل للتراجع</div>
-            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--danger"><strong>ما سيتم حذفه</strong><p>سيتم حذف بيانات هذا الفصل مثل بنود التقييم والدرجات والحصص والحضور والسجل.</p></div>
-            <div class="delete-teaching-dialog__block delete-teaching-dialog__block--safe"><strong>بيانات الطلاب والشعبة</strong><p>الطلاب وانتسابهم للشعبة سيبقون كما هم دون أي تعديل أو حذف.</p></div>
-          </div>
-        `,
-        foot: html`<button class="btn btn--quiet" data-sheet-close>إلغاء</button><button class="btn btn--danger" data-confirm>${icon('trash')} حذف الفصل</button>`,
-        onMount: (root, done) => root.querySelector('[data-confirm]')?.addEventListener('click', () => done(true)),
-      }).then((value) => value === true);
-      if (!ok) return;
-      await store.deleteTeaching(params.id);
-      toast('حُذف الفصل');
-      go('/classes');
+      await teachingsView.actions['delete-class-flow'](el, ev, params);
+      if (!store.getTeaching(params.id)) go('/classes');
     },
     async 'edit-sec'(el, ev, params) {
       const tch = store.getTeaching(params.id);
@@ -263,6 +244,8 @@ export default {
         openSheet({
           title: 'تعديل الفصل',
           body: html`
+            <p class="field__hint">تعديل اسم الفصل ولونه يظهر في جميع مواده. الدرجات والحصص مستقلة لكل مادة.</p>
+            <button type="button" class="btn btn--quiet mb-3" data-add-subject>${icon('plus')} إضافة مادة أخرى لهذا الفصل</button>
             <form id="edit-sec-form">
               <div class="field-row">
                 <label class="field">
@@ -305,6 +288,7 @@ export default {
             <button class="btn btn--primary" form="edit-sec-form" type="submit">حفظ التغييرات</button>
           `,
           onMount: (root, done) => {
+            root.querySelector('[data-add-subject]').addEventListener('click', () => done({ addSubject: true }));
             const form = root.querySelector('#edit-sec-form');
             const preview = root.querySelector('#sec-color-preview');
             const toggleBtn = root.querySelector('#btn-toggle-color-picker');
@@ -350,6 +334,7 @@ export default {
       });
       
       if (!data) return;
+      if (data.addSubject) { await addSubjectToClass(sec.id); return; }
       try {
         await store.editSection(sec.id, data);
         toast('تم تعديل بيانات الفصل بنجاح');
