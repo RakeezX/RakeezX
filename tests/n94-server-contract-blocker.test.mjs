@@ -31,35 +31,37 @@ before(async () => {
 });
 after(async () => pg?.close());
 
-test('Product Sync and V5 restore omit N94 fields and teacher choice', () => {
+test('N94 resolves former Product Sync and V5 restore field loss', () => {
   const definition = { id: 'sub', itemId: 'item', name: 'Homework', value: 6,
     startDate: '2026-10-13', dueDate: '2026-10-14', latePoints: 2, createdAt: 1 };
   const completion = { id: 'ssc:student:sub', studentId: 'student', subitemId: 'sub',
     checked: true, completionState: 'late' };
   const patch = encodeSyncV2Patch('scoreSubitems', definition);
-  for (const key of ['start_date', 'due_date', 'late_points', 'created_at']) assert.ok(!(key in patch));
+  assert.equal(patch.start_date, definition.startDate); assert.equal(patch.due_date, definition.dueDate);
+  assert.equal(patch.late_points, 2); assert.ok(!('created_at' in patch), 'history stays outside generic Sync patches');
   assert.deepEqual(encodeSyncV2Patch('scoreSubitemCompletions', completion),
-    { student_id: 'student', subitem_id: 'sub', checked: true });
+    { student_id: 'student', subitem_id: 'sub', checked: true, completion_state: 'late' });
   const decoded = decodeSyncV2Canonical('scoreSubitems', { id: 'sub', item_id: 'item', value: 6,
     created_at: '2026-10-12T00:00:00Z', start_date: definition.startDate,
     due_date: definition.dueDate, late_points: 2, revision: 1 });
-  for (const key of ['createdAt', 'startDate', 'dueDate', 'latePoints']) assert.ok(!(key in decoded));
+  assert.equal(decoded.createdAt, Date.parse('2026-10-12T00:00:00Z'));
+  assert.equal(decoded.startDate, definition.startDate); assert.equal(decoded.dueDate, definition.dueDate); assert.equal(decoded.latePoints, 2);
   const restored = decodeSyncV2Canonical('scoreSubitemCompletions', {
     id: completion.id, student_id: 'student', subitem_id: 'sub', checked: true,
     completion_state: 'late', revision: 1 });
-  assert.ok(!('completionState' in restored));
+  assert.equal(restored.completionState, 'late');
   const plan = planCloudRestore({ version: 5, sourceOwnerId: OWNER,
     data: { scoreSubitems: [definition], scoreSubitemCompletions: [completion] } }, {}, { ownerId: OWNER });
   assert.equal(plan.ready, true);
-  assert.deepEqual(plan.operations.find((row) => row.entity === 'score_subitems').patch, patch);
-  assert.ok(!('completion_state' in plan.operations.find((row) => row.entity === 'score_subitem_completions').patch));
+  assert.deepEqual(plan.operations.find((row) => row.entity === 'score_subitems').patch, { ...patch, created_at: new Date(1).toISOString() });
+  assert.equal(plan.operations.find((row) => row.entity === 'score_subitem_completions').patch.completion_state, 'late');
   assert.equal(planCloudRestore({ version: 5, sourceOwnerId: OWNER, data: {} }, {},
     { ownerId: OTHER }).entries[0].reason, 'v5-owner-mismatch');
-  assert.throws(() => assertScoreSnapshotInvariant({
+  assert.equal(assertScoreSnapshotInvariant({
     items: [{ id: 'item', max: 10, scoreMode: 'subitems' }], students: [{ id: 'student' }],
     scoreSubitems: [definition], scoreSubitemCompletions: [completion],
     scores: [{ studentId: 'student', itemId: 'item', value: 2, derivedValue: 2, manualValue: null }],
-  }), { code: 'RESTORE_SCORE_PROVENANCE_INVALID' }, 'existing restore projection expects ordinary 6, not late 2');
+  }), true, 'restore now accepts the selected lower late points');
 });
 
 test('immutable score server has no N94 columns or completion-state RPC argument', async () => {

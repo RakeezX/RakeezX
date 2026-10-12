@@ -11,6 +11,8 @@
  *   - deleted حذف ناعم، لأن الحذف الصلب لا يمكن مزامنته.
  */
 
+import { normalizeSubitemDatesAndPoints } from './lib/score-foundation.js';
+
 /* ---------- أساسيات ---------- */
 
 export const uid = () =>
@@ -744,12 +746,14 @@ export const makeItem = (o = {}) => ({
 
 export const makeScoreSubitem = (o = {}) => ({
   ...base(),
+  createdAt: Object.hasOwn(o, 'createdAt') ? o.createdAt : now(),
   itemId: o.itemId,
   name: o.name ?? '',
   value: o.value ?? 0,
   order: o.order ?? 0,
   distributionVersion: o.distributionVersion ?? 1,
   ...o,
+  ...normalizeSubitemDatesAndPoints({ ...o, value: o.value ?? 0 }),
 });
 
 export const makeScoreSubitemCompletion = (o = {}) => ({

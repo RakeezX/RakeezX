@@ -59,6 +59,16 @@ function recordMap(records) {
   return new Map((records ?? []).map((row) => [row.id, row]));
 }
 
+// Creation history is restore-only; never expose created_at to generic patch APIs.
+function restorePatch(storeName, record) {
+  const patch = encodeSyncV2Patch(storeName, record);
+  if (storeName === 'scoreSubitems' && record.createdAt !== undefined) {
+    if (!Number.isFinite(record.createdAt) || record.createdAt <= 0) throw new Error('Invalid subitem creation history');
+    patch.created_at = new Date(record.createdAt).toISOString();
+  }
+  return patch;
+}
+
 function planRecord({ storeName, backupRecord, baseline, serverRecord,
   allowAuthoritativeRecreate = false, version = 4 }) {
   const identity = { store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id: backupRecord.id };
@@ -72,7 +82,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
   if (!serverRecord && allowAuthoritativeRecreate) {
     return { ...identity, classification: 'SAFE_APPLY',
       operation: backupRecord.deleted ? 'create_deleted' : 'create', baseRevision: 0,
-      patch: encodeSyncV2Patch(storeName, backupRecord),
+      patch: restorePatch(storeName, backupRecord),
       clientUpdatedAt: backupRecord.updatedAt ?? null };
   }
   if (!baseline?.value) {
@@ -85,7 +95,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
     if (serverRecord) return { ...identity, classification: 'CONFLICT', reason: 'identity-already-exists' };
     return {
       ...identity, classification: 'SAFE_APPLY', operation: 'create', baseRevision: 0,
-      patch: encodeSyncV2Patch(storeName, backupRecord), clientUpdatedAt: backupRecord.updatedAt ?? null,
+      patch: restorePatch(storeName, backupRecord), clientUpdatedAt: backupRecord.updatedAt ?? null,
     };
   }
   if (!serverRecord) return { ...identity, classification: 'INVALID', reason: 'baseline-row-missing-on-server' };

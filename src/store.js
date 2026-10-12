@@ -31,7 +31,8 @@ import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, tea
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
-import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
+import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
+  normalizeSubitemDatesAndPoints, nextSubitemCompletionState } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -3468,8 +3469,9 @@ const scoreFoundationScope = () => ({
   students: {}, sections: {}, teachings: {}, terms: {}, outbox: {},
 });
 
-async function commitScoreFoundation(prepare) {
+async function commitScoreFoundation(prepare, { n94 = false } = {}) {
   assertCloudRestoreWritable();
+  const commandWorkspace = activeWorkspace;
   const isolatedDemo = activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
   if (!isolatedDemo && (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
       !activeWorkspace.authUserId)) {
@@ -3481,8 +3483,13 @@ async function commitScoreFoundation(prepare) {
         capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
       throw new Error('Score foundation server capability is unavailable');
     }
+    if (n94 && capability?.n94SubitemVersion !== 1) throw new Error('N94 server capability is unavailable');
   }
-  const committed = await db.applyBatch(scoreFoundationScope(), { prepare });
+  if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+  const committed = await db.applyBatch(scoreFoundationScope(), { prepare(current) {
+    if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+    return prepare(current);
+  } });
   const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
     .flatMap(([name, operations]) => (operations.put ?? []).map((row) => ({ store: name, id: row.id })));
   await absorb(changes);
@@ -3546,7 +3553,11 @@ function preparedScore(current, item, studentId, completions, manualValue, stamp
 
 /** A checkbox and its local numeric projection commit in one IndexedDB transaction. */
 export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
-  if (typeof checked !== 'boolean') throw new TypeError('checked must be boolean');
+  const completionState = typeof checked === 'string' ? checked : null;
+  if (completionState ? !['unrecorded', 'late', 'regular'].includes(completionState) : typeof checked !== 'boolean') {
+    throw new TypeError('Invalid completion state');
+  }
+  if (completionState) checked = completionState !== 'unrecorded';
   const stamp = now();
   let result;
   await commitScoreFoundation((current) => {
@@ -3560,13 +3571,15 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
     if (prior?.deleted) throw new Error('A deleted completion identity cannot be resurrected');
     const completion = syncV2Record('scoreSubitemCompletions', makeScoreSubitemCompletion({
       ...(prior ?? {}), id, studentId, subitemId, checked, updatedAt: stamp,
+      completionState: completionState ?? (checked ? 'regular' : null),
     }), { pendingCreate: !prior });
     const completions = current.scoreSubitemCompletions.filter((row) => row.id !== id).concat(completion);
     const score = preparedScore(current, item, studentId, completions,
       current.scores.find((row) => row.studentId === studentId && row.itemId === item.id)?.manualValue ?? null, stamp);
     const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
       command: 'score:set_completion', stamp,
-      patch: { itemId: item.id, studentId, subitemId, checked },
+      patch: { itemId: item.id, studentId, subitemId, checked,
+        ...(completionState ? { completionState: checked ? completionState : null } : {}) },
       dependencies: [
         { store: 'items', recordId: item.id, requiresServerRevision: true },
         { store: 'students', recordId: studentId, requiresServerRevision: true },
@@ -3578,8 +3591,31 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
       scoreSubitemCompletions: { put: [completion] }, scores: { put: [score.record] },
       outbox: { put: entry ? [entry] : [] },
     };
-  });
+  }, { n94: Boolean(completionState) });
   return result;
+}
+
+// Serialize deliberate taps per workspace/student/subitem and suppress rapid duplicates.
+const subitemTaps = new Map();
+export async function cycleScoreSubitemCompletion(studentId, subitemId, { localDate = todayISO() } = {}) {
+  const workspace = activeWorkspace?.id;
+  const key = `${workspace}:${studentId}:${subitemId}`;
+  const priorTap = subitemTaps.get(key);
+  const clickStamp = Date.now();
+  if (priorTap && (priorTap.pending || clickStamp - priorTap.stamp < 350)) return priorTap.promise;
+  const tap = { pending: true, stamp: clickStamp };
+  tap.promise = (async () => {
+    try {
+      if (activeWorkspace?.id !== workspace) throw new Error('Workspace changed');
+      const definition = state.scoreSubitems.find((row) => row.id === subitemId && !row.deleted);
+      if (!definition) throw new Error('Subitem unavailable');
+      const completion = state.scoreSubitemCompletions.find((row) => row.studentId === studentId && row.subitemId === subitemId);
+      return await setScoreSubitemCompletion(studentId, subitemId,
+        nextSubitemCompletionState(definition, completion, localDate));
+    } finally { tap.pending = false; }
+  })();
+  subitemTaps.set(key, tap);
+  return tap.promise;
 }
 
 /** Explicit blank remains unrecorded; explicit numeric zero remains recorded. */
@@ -3621,7 +3657,8 @@ export function previewScoreConfiguration(itemId, proposed) {
       scoreCents(row.value);
       return row.value;
     });
-  const nextDefinitions = supplied.map((row, index) => ({ ...row, itemId, value: values[index], order: index }));
+  const nextDefinitions = supplied.map((row, index) => ({ ...row, itemId, value: values[index], order: index,
+    ...normalizeSubitemDatesAndPoints({ ...row, value: values[index] }) }));
   const priorIds = new Set(scoreSubitemsOf(itemId).map((row) => row.id));
   const keptIds = new Set(nextDefinitions.map((row) => row.id).filter(Boolean));
   const removedIds = [...priorIds].filter((id) => !keptIds.has(id));
@@ -3697,6 +3734,8 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       return syncV2Record('scoreSubitems', makeScoreSubitem({
         ...(old ?? {}), id: row.id, itemId, name: row.name,
         value: values[index], order: index, distributionVersion: (prior.distributionVersion ?? 1) + 1,
+        ...normalizeSubitemDatesAndPoints({ ...row, value: values[index] }),
+        createdAt: old ? old.createdAt : stamp,
         updatedAt: stamp,
       }), { pendingCreate: !old });
     });
@@ -3739,6 +3778,7 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       scoreMode: mode, distributionMode, max: maximum,
       subitems: mode === 'subitems' ? nextDefinitions.map((row) => ({
         id: row.id, name: row.name, value: row.value, order: row.order,
+        startDate: row.startDate, dueDate: row.dueDate, latePoints: row.latePoints,
       })) : [],
       ...(conversionStrategy ? { conversionStrategy } : {}),
     };
@@ -3757,7 +3797,7 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       items: { put: [item] }, scoreSubitems: { put: [...nextDefinitions, ...removed] },
       scores: { put: scoreWrites }, outbox: { put: entry ? [entry] : [] },
     };
-  });
+  }, { n94: supplied.some((row) => ['startDate', 'dueDate', 'latePoints'].some((field) => Object.hasOwn(row, field))) });
   return result;
 }
 
@@ -3833,6 +3873,7 @@ export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachin
       for (const definition of sourceDefinitions) {
         const clone = syncV2Record('scoreSubitems', makeScoreSubitem({
           itemId: item.id, name: definition.name, value: definition.value, order: definition.order,
+          startDate: definition.startDate ?? null, dueDate: definition.dueDate ?? null, latePoints: definition.latePoints ?? null,
           distributionVersion: 1,
         }), { pendingCreate: true });
         clonedSubitems.push(clone);

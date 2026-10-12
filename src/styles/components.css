@@ -8114,3 +8114,18 @@
 @media (max-width: 600px) { .offline-lease-notice { align-items: stretch; flex-direction: column; margin: .5rem; } }
 /* Existing class selection hides its immutable class identity fields. */
 .class-form [data-new-section-fields][hidden] { display: none; }
+.n94-definition-details { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.n94-definition-details input { min-height: 44px; width: 100%; min-width: 0; }
+.n94-definition-details small { grid-column: 1 / -1; color: var(--text-3); }
+@media (max-width: 480px) { .n94-definition-details { grid-template-columns: minmax(0,1fr); } }
+.n94-completion { min-height: 44px; min-width: 44px; text-align: start; border: 1px solid currentColor; font: inherit; }
+.grades-01c__subitem.n94-completion { border-radius: 11px; max-inline-size: 100%; padding: 0; }
+.grades-01c__subitem.n94-completion span { display: grid; gap: 3px; background: transparent; border: 0; }
+.grades-01c__subitem.n94-completion b { display: block; block-size: auto; background: transparent; }
+.n94-completion--unrecorded { color: #475569; background: #f1f5f9; }
+.n94-completion--late { color: #92400e; background: #fef3c7; }
+.n94-completion--regular { color: #166534; background: #dcfce7; }
+[data-theme="dark"] .n94-completion--unrecorded { color: #e2e8f0; background: #334155; }
+[data-theme="dark"] .n94-completion--late { color: #fde68a; background: #451a03; }
+[data-theme="dark"] .n94-completion--regular { color: #bbf7d0; background: #14532d; }
+.n94-completion:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: 3px; }

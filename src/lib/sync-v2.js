@@ -126,12 +126,13 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   scoreSubitems: {
     entity: 'score_subitems',
-    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version' },
+    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version',
+      startDate: 'start_date', dueDate: 'due_date', latePoints: 'late_points' },
     references: { itemId: 'items' },
   },
   scoreSubitemCompletions: {
     entity: 'score_subitem_completions',
-    fields: { studentId: 'student_id', subitemId: 'subitem_id', checked: 'checked' },
+    fields: { studentId: 'student_id', subitemId: 'subitem_id', checked: 'checked', completionState: 'completion_state' },
     references: { studentId: 'students', subitemId: 'scoreSubitems' },
   },
   scores: {
@@ -310,13 +311,19 @@ export function decodeSyncV2Canonical(store, row) {
   for (const [localField, serverField] of Object.entries(schema.fields)) {
     if (hasOwn(row, serverField)) record[localField] = decodeFieldValue(store, localField, row[serverField], row);
   }
+  if (store === 'scoreSubitems') {
+    record.startDate ??= null;
+    record.dueDate ??= null;
+    record.latePoints = record.latePoints == null ? null : Number(record.latePoints);
+  }
+  if (store === 'scoreSubitemCompletions') record.completionState ??= record.checked ? 'regular' : null;
   if (store === 'sections') {
     record.status ??= 'active';
     record.archivedAt ??= null;
     record.archiveDate ??= null;
   }
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
-  if (store === 'classRules' && row.created_at) {
+  if (['classRules', 'scoreSubitems'].includes(store) && row.created_at) {
     const createdAt = Date.parse(row.created_at);
     if (Number.isFinite(createdAt)) record.createdAt = createdAt;
   }
@@ -1674,7 +1681,8 @@ export function createSyncV2Engine({
               deviceId: mutation.deviceId, command: mutation.command.slice('score:'.length),
               itemId: mutation.patch.itemId, studentId: mutation.patch.studentId,
               subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
-              manualValue: mutation.patch.manualValue ?? null });
+              manualValue: mutation.patch.manualValue ?? null,
+              ...(Object.hasOwn(mutation.patch, 'completionState') ? { completionState: mutation.patch.completionState } : {}) });
           await reconcileScoreDomainReceipt(mutation, receipt);
           result.acknowledged++;
         } catch (error) {

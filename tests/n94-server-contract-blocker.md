@@ -1,5 +1,12 @@
 # N94 bounded dependency evidence
 
+Historical diagnostic result from run 47c4d463-384f-4785-b8b4-93c8b627959d.
+Superseded by the explicitly expanded server authority in run
+5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf. The candidate history remains preserved;
+current component/deployment evidence is in `tests/n94/`. The first diagnostic
+test now verifies that the current Product normalizers resolve the original
+loss; its remaining SQL tests intentionally exercise the old immutable baseline.
+
 Task: continuous-n94-subitem-late-scoring-20261012
 
 Run: 47c4d463-384f-4785-b8b4-93c8b627959d
