@@ -1,0 +1,18 @@
+{
+  "status": "ACTIVATED",
+  "commit": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+  "startedAt": "2026-10-12T10:46:04.895Z",
+  "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/followup-activation-2026-10-12T10-46-04-894Z",
+  "liveActionsPerformed": 0,
+  "priorWorkerAbsence": "EXACT_PRIOR_WORKERS_ABSENT",
+  "n91": {
+    "taskId": "v6-n91-mobile-card-titles-20261012",
+    "status": "pending",
+    "sessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024",
+    "candidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd"
+  },
+  "addedTaskId": "continuous-n58-fresh-live-20261012",
+  "ownedPauseRemoved": true,
+  "finishedAt": "2026-10-12T10:46:07.098Z"
+}
+

@@ -1,0 +1,107 @@
+{
+  "status": "INSTALLED",
+  "startedAt": "2026-10-12T11:04:20.495Z",
+  "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/completion-install-2026-10-12T11-04-20-494Z",
+  "files": [
+    "scripts/ops-supervisor-v4/controller.mjs",
+    "scripts/ops-supervisor-v4/worker-policy.txt",
+    "scripts/ops-supervisor-v4/resource-lease.ps1",
+    "scripts/ops-supervisor-v4/CONTROLLER_README.md",
+    "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/manifest.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/n71-continuation-card.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/n73-continuation-card.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/n77-continuation-card.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/n93-research-task.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/triage-all-27.json",
+    "scripts/ops-supervisor-v4/backlog-final-audit/validation.json"
+  ],
+  "workerStopCommandsIssued": false,
+  "workerSurvival": "AWAITING_NATIVE_OBSERVATION",
+  "stopResult": "EXACT_CONTROLLER_STOPPED; WORKER_STOP_COMMANDS=0",
+  "previousController": {
+    "pid": 24120,
+    "instanceId": "f8c2d12f-351c-42d1-9c74-857802b74760",
+    "createdAt": "2026-10-12T10:43:54.0085890Z",
+    "startedAt": "2026-10-12T10:43:54.765Z",
+    "runtime": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4",
+    "script": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\controller.mjs"
+  },
+  "baseSha": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+  "previousOpsBase": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+  "commit": "537a9935172df8d7a10d455ff14341e50051f79c",
+  "installedAt": "2026-10-12T11:04:34.934Z",
+  "changes": [
+    {
+      "repoPath": "scripts/ops-supervisor-v4/controller.mjs",
+      "beforeSha256": "f4a4e60efa53bd78cd25f8f3645b026f2b1416eacc345316af9895456548eb9e",
+      "afterSha256": "0ccfc6458e84857e707ff3e35300ced17a954a3448aa9ffe7fd9c1dee40ef34f"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/worker-policy.txt",
+      "beforeSha256": "e1a35b2413a731449430e465513703f5e658efb357dfdab6e04d4148869dcd48",
+      "afterSha256": "7454c0add58e2c6597c8cabc9d167defbac91b5a85ddd3d74fde32370f7d6def"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/resource-lease.ps1",
+      "beforeSha256": "7d7fc656720ed924dc37df96bbd9def175b95a3988c66654e554f298779bee39",
+      "afterSha256": "8d5d471094d4bc0b3506193d409856d38e65aa11565dfdafad4fa8a11fb162d5"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/CONTROLLER_README.md",
+      "beforeSha256": "5b591f44e6165c900c23d3d52cbaf0382f00b98bc02ad3b83b2f9a4fb0a2d93e",
+      "afterSha256": "199ad51a5c6ebfa67a78d9459ff981600aee890c05965c4102cdfca592428168"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+      "beforeSha256": null,
+      "afterSha256": "64b67f8b590e6ff1a37073e24547c3eb037dda791b8a7d10c5d06ff92c09205c"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+      "beforeSha256": null,
+      "afterSha256": "3c90b9f2f111106148dd918c4db679290de0eed0a1dca2449157718bc34f292e"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/manifest.json",
+      "beforeSha256": null,
+      "afterSha256": "1ce53e4587a4c855966c43a424778c46fb4da1d6e066558c95abb7a3b2e4787e"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/n71-continuation-card.json",
+      "beforeSha256": null,
+      "afterSha256": "d217c3c8959bbece56e322630d10c48f5c5a4fba2530157ac46d3d74cc29b436"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/n73-continuation-card.json",
+      "beforeSha256": null,
+      "afterSha256": "cdc11933a40b48036116ca773fcccd945c0dd663baec08fd09e4456260d29698"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/n77-continuation-card.json",
+      "beforeSha256": null,
+      "afterSha256": "cf03859504de405b719406fb2e05cdfe0f086c32cc7a06e91cfed730b9fe3bdf"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/n93-research-task.json",
+      "beforeSha256": null,
+      "afterSha256": "5390ee0da267f36aa049736cf1d7d5bbc50cc9ddde161a0a5fe3f0dcaff7aff8"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/triage-all-27.json",
+      "beforeSha256": null,
+      "afterSha256": "972ea9eedbe62f62728eef32a4293e50c2c3cf22dea340d0f77cb46107f705a8"
+    },
+    {
+      "repoPath": "scripts/ops-supervisor-v4/backlog-final-audit/validation.json",
+      "beforeSha256": null,
+      "afterSha256": "c0c4b98ca4ee916a12a5486f0f3c6f5d842c2fa2374be5188b7b7291e092af49"
+    }
+  ],
+  "schedulerRecovery": "Running",
+  "controllerStopped": true,
+  "finishedAt": "2026-10-12T11:04:36.452Z",
+  "ownedPauseRemoved": true
+}
+

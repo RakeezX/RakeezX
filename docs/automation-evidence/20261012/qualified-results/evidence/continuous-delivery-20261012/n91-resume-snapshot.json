@@ -1,0 +1,249 @@
+{
+  "id": "v6-n91-mobile-card-titles-20261012",
+  "productId": "N91",
+  "activationId": "po-20261012-continuous",
+  "riskClass": "STANDARD",
+  "validationTier": "STANDARD",
+  "executionMode": "synthetic",
+  "budgetMinutes": 45,
+  "idleMinutes": 15,
+  "requiredChecks": [
+    "responsive_layout",
+    "card_navigation"
+  ],
+  "priority": 2,
+  "scopeKey": "n91-class-tool-card-mobile",
+  "dependsOn": [
+    "v6-n92-delete-copy-20261012"
+  ],
+  "objective": "Fix clipped class-tool-card titles in src/styles/components.css on narrow iPhone/mobile widths using wrapping and a grid that adapts to available space, preserving the readable full tool names without ellipsis.",
+  "acceptance": [
+    "At 320, 360, 390 and 430 CSS-pixel RTL widths, all class tool names are visible and cards do not overflow horizontally.",
+    "Use two columns or one column as space permits; at most a small approximately 1px font reduction only if needed for readability.",
+    "Do not remove cards, necessary content, handlers or Product behavior. Use a targeted synthetic mobile layout proof, with a browser lease only for its browser/server phase."
+  ],
+  "allowedPaths": [
+    "src/styles/components.css"
+  ],
+  "releaseAuthority": "Product Owner's 2026-10-12 continuous delivery authorization, specifically N91 responsive class-tool titles; deploy the scoped frontend correction and await PO review. Use synthetic browser data, with no real student or teacher data mutation.",
+  "workflowVersion": 5,
+  "status": "running",
+  "implementationFailures": 0,
+  "infrastructureRetries": 0,
+  "createdAt": "2026-10-12T09:33:36.933Z",
+  "updatedAt": "2026-10-12T10:21:38.377Z",
+  "baseSha": "4a2c023d01caf4695fcf4eabe81974888544360d",
+  "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\v6-n91-mobile-card-titles-20261012",
+  "worktreePrepared": true,
+  "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\v6-n91-mobile-card-titles-20261012",
+  "attempt": {
+    "runId": "2c96f4e1-06cf-434d-9ac5-edea0d33ce34",
+    "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\attempt.json",
+    "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\result.json",
+    "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\events.jsonl",
+    "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\stderr.txt",
+    "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\checkpoint.json",
+    "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\wrapper.stdout.txt",
+    "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\wrapper.stderr.txt",
+    "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\wrapper-launch.json",
+    "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\broker.stdout.txt",
+    "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\broker.stderr.txt",
+    "startedAt": "2026-10-12T10:20:50.826Z"
+  },
+  "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\v6-n91-mobile-card-titles-20261012\\2c96f4e1-06cf-434d-9ac5-edea0d33ce34\\result.json",
+  "runnerPid": 31832,
+  "runnerCreatedAt": "2026-10-12T10:20:50.9148960Z",
+  "lastModelError": null,
+  "ownedProcesses": [
+    {
+      "pid": 15296,
+      "createdAt": "2026-10-12T10:20:50.8334390Z",
+      "name": "node.exe",
+      "parentPid": 12860,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 31832,
+      "createdAt": "2026-10-12T10:20:50.9148960Z",
+      "name": "powershell.exe",
+      "parentPid": 15296,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 31856,
+      "createdAt": "2026-10-12T10:20:51.6899910Z",
+      "name": "codex.exe",
+      "parentPid": 31832,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 14964,
+      "createdAt": "2026-10-12T10:20:50.9287560Z",
+      "name": "conhost.exe",
+      "parentPid": 31832,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 17104,
+      "createdAt": "2026-10-12T10:20:51.6979050Z",
+      "name": "conhost.exe",
+      "parentPid": 31856,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 2316,
+      "createdAt": "2026-10-12T10:20:52.0709260Z",
+      "name": "node_repl.exe",
+      "parentPid": 31856,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 17188,
+      "createdAt": "2026-10-12T10:20:52.0793960Z",
+      "name": "node.exe",
+      "parentPid": 31856,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 11560,
+      "createdAt": "2026-10-12T10:20:52.0795550Z",
+      "name": "conhost.exe",
+      "parentPid": 2316,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 11828,
+      "createdAt": "2026-10-12T10:20:52.0869760Z",
+      "name": "conhost.exe",
+      "parentPid": 17188,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 18060,
+      "createdAt": "2026-10-12T10:20:52.2024970Z",
+      "name": "node_repl.exe",
+      "parentPid": 17188,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 9464,
+      "createdAt": "2026-10-12T10:20:58.6873140Z",
+      "name": "codex-code-mode-host.exe",
+      "parentPid": 31856,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 30340,
+      "createdAt": "2026-10-12T10:20:58.6946030Z",
+      "name": "conhost.exe",
+      "parentPid": 9464,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 20148,
+      "createdAt": "2026-10-12T10:21:02.0464980Z",
+      "name": "node.exe",
+      "parentPid": 18060,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 26128,
+      "createdAt": "2026-10-12T10:21:02.0569360Z",
+      "name": "node.exe",
+      "parentPid": 18060,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 10492,
+      "createdAt": "2026-10-12T10:21:03.9678010Z",
+      "name": "codex.exe",
+      "parentPid": 18060,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 33076,
+      "createdAt": "2026-10-12T10:21:37.1247230Z",
+      "name": "pwsh.exe",
+      "parentPid": 31856,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    },
+    {
+      "pid": 15512,
+      "createdAt": "2026-10-12T10:21:37.1534690Z",
+      "name": "conhost.exe",
+      "parentPid": 33076,
+      "observedAt": "2026-10-12T10:21:38.377Z"
+    }
+  ],
+  "watchdogIncident": null,
+  "eventLogIssue": null,
+  "checkpointIssue": null,
+  "lastProgressScanAt": "2026-10-12T10:21:32.169Z",
+  "lastFileProgressAt": "2026-10-12T10:20:56.913Z",
+  "lastEventAt": "2026-10-12T10:21:32.426Z",
+  "progressFingerprint": "3300e1fcf17b923de559c060032f74c41fec5242c82d65ef5147276d985d57f5",
+  "lastWorkerReap": {
+    "activationId": "po-20261012-continuous",
+    "runId": "3a8d3bdc-41fb-44ab-8b90-09a630f22fce",
+    "verifiedAbsentAt": "2026-10-12T10:10:47.505Z",
+    "exactAbsence": true,
+    "owners": [
+      {
+        "pid": 21800,
+        "createdAt": "2026-10-12T10:09:48.0723280Z"
+      },
+      {
+        "pid": 3376,
+        "createdAt": "2026-10-12T10:09:48.1464590Z"
+      },
+      {
+        "pid": 20500,
+        "createdAt": "2026-10-12T10:09:48.9561690Z"
+      },
+      {
+        "pid": 29416,
+        "createdAt": "2026-10-12T10:09:48.1595300Z",
+        "name": "conhost.exe",
+        "parentPid": 3376,
+        "observedAt": "2026-10-12T10:10:41.612Z"
+      },
+      {
+        "pid": 32856,
+        "createdAt": "2026-10-12T10:09:48.9637850Z",
+        "name": "conhost.exe",
+        "parentPid": 20500,
+        "observedAt": "2026-10-12T10:10:41.612Z"
+      }
+    ]
+  },
+  "brokerPid": 15296,
+  "brokerCreatedAt": "2026-10-12T10:20:50.8334390Z",
+  "bootstrapRecovery": {
+    "at": "2026-10-12T10:09:36.618Z",
+    "fixCommit": "4a2c023d01caf4695fcf4eabe81974888544360d",
+    "previousRunId": "68206995-4b79-44f4-8ef2-3a7be5633e7d",
+    "originalBaseSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+    "reason": "Actual Windows Scheduler comparison proved PowerShell DETACHED_PROCESS skips script; detached Node helper preserves child after parent exit. No Codex session existed and no implementation is repeated.",
+    "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/before-broker-install-2026-10-12T10-09-36-057Z"
+  },
+  "probingClass": null,
+  "retryAt": null,
+  "wrapperExit": null,
+  "sessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024",
+  "heartbeatAt": "2026-10-12T10:21:36.4943200Z",
+  "lastTurnCompletedAt": "2026-10-12T10:10:41.611Z",
+  "failureClass": "environment",
+  "lastFailure": "RESOLVED environment fault: PowerShell 7 JSON timestamps lost precision/UTC in the shared browser lease. The canonical resourceLeaseScript now compares exact UTC ticks and passed real PS5.1/PS7 acquire, reacquire, release and wrong-birth rejection. Resume your exact saved session and candidate 466bb11d6e83096a226d5e76f66949c9665a85bd; finish only the missing synthetic mobile browser proof at 320/360/390/430 RTL widths and card navigation, with an owned lease. Do not rewrite or rebuild the already committed CSS unless the actual browser proof exposes a scoped defect. Use the supplied canonical resourceLeaseScript path, not an older worktree copy.",
+  "lastFailureAt": "2026-10-12T10:10:47.506Z",
+  "environmentRepair": {
+    "at": "2026-10-12T10:20:44.357Z",
+    "commit": "8e2d4800396996be43868a71057412afccd2150b",
+    "previousRunId": "3a8d3bdc-41fb-44ab-8b90-09a630f22fce",
+    "preservedCandidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+    "preservedSessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024",
+    "previousFailure": "The resource lease script rejected browser lease acquisition because it could not verify the exact worker process.",
+    "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/before-lease-install-2026-10-12T10-20-44-332Z"
+  },
+  "productRecordKey": "po-20261012-continuous:running:::RESOLVED environment fault: PowerShell 7 JSON timestamps lost precision/UTC in the shared browser lease. The canonical resourceLeaseScript now compares exact UTC ticks and passed real PS5.1/PS7 acquire, reacquire, release and wrong-birth rejection. Resume your exact saved session and candidate 466bb11d6e83096a226d5e76f66949c9665a85bd; finish only the missing synthetic mobile browser proof at 320/360/390/430 RTL widths and card navigation, with an owned lease. Do not rewrite or rebuild the already committed CSS unless the actual browser proof exposes a scoped defect. Use the supplied canonical resourceLeaseScript path, not an older worktree copy."
+}
+

@@ -1,0 +1,11 @@
+{
+  "id": "6acac5b657f481919a49d42cfed56fd1",
+  "title": "رَكيز — حصيلة التسليم وتنبيه التعطل",
+  "is_enabled": true,
+  "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Riyadh:20261012T140000\nRRULE:FREQ=HOURLY;INTERVAL=1\nEND:VEVENT",
+  "default_timezone": "Asia/Riyadh",
+  "updated_at": "2026-10-12T10:21:15.584301+00:00",
+  "role": "Read-only verified Production and actionable incident reporting; local controller and Windows Scheduler own execution.",
+  "next_run_time": null
+}
+

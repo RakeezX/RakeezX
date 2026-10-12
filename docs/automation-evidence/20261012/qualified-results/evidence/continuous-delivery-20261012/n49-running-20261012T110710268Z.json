@@ -1,0 +1,194 @@
+{
+  "id": "continuous-n49-durable-offline-lease-20261012",
+  "productId": "N49",
+  "scopeKey": "n49-trusted-owner-durable-local-lease",
+  "activationId": "po-20261012-continuous",
+  "dependsOn": [],
+  "priority": 70,
+  "riskClass": "CRITICAL",
+  "validationTier": "STANDARD",
+  "executionMode": "synthetic",
+  "budgetMinutes": 120,
+  "idleMinutes": 20,
+  "requiredChecks": [
+    "trusted_owner_renewal",
+    "durable_lease_clock_restart",
+    "limited_mutation_boundary",
+    "account_workspace_isolation",
+    "product_offline_ui_and_delivery"
+  ],
+  "objective": "Implement the complete bounded N49 client lease runtime from D-092/D-103 on fresh current main. This is more than a threshold edit: current source has no durable lease. It does have an authoritative verifyCurrentAuthIdentity(expectedOwnerId), which performs actual Supabase GET /user and rejects a returned owner mismatch, an existing verified workspace registry/claim/restore/provisioning boundary, and central store write/command guards. Reuse these existing contracts to establish a durable local owner/workspace-bound receipt and age state, renew only after the authoritative verification succeeds for the still-current account/workspace, and enforce it in real Product write paths. The API currently returns locally observed verifiedAt; do not describe it as a server-signed receipt or authoritative server clock. Normal offline restart with a valid receipt remains editable. Day 0 through day 7 has no warning; after day 7 show a calm nonblocking reminder; at 14 days enter LIMITED until trusted renewal. Invalid/corrupt receipt, wrong owner/workspace or clear clock rollback fails closed. LIMITED preserves permitted viewing, Backup and Export and existing data, while blocking new Product edits. Renewal is independent of full Sync success, pending outbox or transient network errors. No new server API/schema/RLS/Auth policy or Auth-admin account provisioning is required for this scoped implementation. Return LOCAL_READY only after the real integration passes every check, otherwise BLOCKED with the precise missing trust/persistence operation; never label a synthetic response as live verification.",
+  "acceptance": [
+    "trusted_owner_renewal: PASS integrates the real existing verifyCurrentAuthIdentity path as the only authority for renewal and checks its unchanged network source. Cached session/user objects, access-token refresh alone, Sync status/success, navigator.onLine and N95 status text never renew the lease. The receipt binds the actual verified owner, workspace identity and database/claim generation, and is committed only if those still match after async verification. Concurrent account switch, rejected/401/wrong-owner response, offline request and timeout cannot mint or extend a receipt. A successful trusted verification can renew despite blocked/pending outbox or transient Sync failure. Use deterministic local HTTP boundary fixtures plus exact source identity for the unchanged official /user verification; this is client evidence, not a claim of a live A/B call.",
+    "durable_lease_clock_restart: PASS exercises the actual durable storage adapter and reader, not an in-memory-only clock helper: valid receipt survives complete module/browser restart and permits normal offline editing; reminder and LIMITED boundaries exactly follow D-103; missing/malformed/wrong-version/truncated/nonfinite/future-conflicting receipt and clear rollback of observed time fail closed. Persist sufficient monotonic/high-water evidence to detect clear backward clock changes across normal restarts without treating every restart as tampering. A later wall-clock change must not silently reset the age. Local checksum/integrity checks must not be called server signatures or proof against arbitrary malicious script/DB control. If expiry can be bypassed merely by the normal restart path, block the candidate. Trusted renewal may recover a valid same-owner workspace without resetting Product data.",
+    "limited_mutation_boundary: PASS hits the actual store mutation and command-enqueue boundaries for representative grade/attendance/roster/config edits and automatic materialization, plus any separate dedicated command path discovered in the bounded write inventory. In LIMITED/invalid state, no new Product row/outbox mutation occurs before the guard, with clear UI feedback; viewing, safe Backup and Export remain usable. Existing queued envelopes keep their identities and prior data is neither deleted nor relabeled. Any permitted sync reconciliation is kept distinct from new teacher edits and does not renew the lease. Do not gate only toolbar buttons, block all read access, silently discard writes or add a fake pass-through exception.",
+    "account_workspace_isolation: PASS uses two isolated account-mode Product workspaces and two tab/device contexts with real registry/claim/restore/provisioning readers. A receipt from A, another DB/workspace or an older incompatible generation never authorizes B. Explicit sign-out/account switch revokes edit authority without deleting prior Product data; a stale async verification result and stale tab cannot reauthorize the wrong owner. Fresh/unverified/ambiguous workspace stays under the existing D-022 fail-closed boundary. An ordinary offline restart with valid same-owner cached identity and receipt remains usable; it must not depend on completing remote refresh or draining outbox. Relevant unchanged owner/serializer tests may be reused; a fresh live Auth-admin fixture is not an automatic prerequisite for reusing an unchanged Auth protocol.",
+    "product_offline_ui_and_delivery: PASS verifies actual account-capable UI for normal/reminder/LIMITED, offline complete restart, renewal and read/Backup/Export access, with readable calm Arabic RTL controls. Preview test thresholds of approximately 2/5 minutes are explicitly isolated to the authorized test origin/build and cannot become active on rakeezx.com through a persisted user preference or arbitrary query flag. Production remains 7/14 days. New imported runtime modules are included in the existing static shell/cache closure and served correctly; preserve source-compatible N95 display and existing owner gates. Run one bounded affected browser phase under its lease and only changed-path checks; no all-tests or repeated full build. A zero-Product-code/demo-only candidate is not completion."
+  ],
+  "allowedPaths": [
+    "src/lib/offline-lease.js",
+    "src/lib/workspaces.js",
+    "src/lib/workspace-routing.js",
+    "src/lib/workspace-claim.js",
+    "src/lib/account-provisioning.js",
+    "src/lib/initial-restore.js",
+    "src/lib/sync-ownership.js",
+    "src/lib/cloud.js",
+    "src/lib/db.js",
+    "src/lib/sync.js",
+    "src/store.js",
+    "src/app.js",
+    "src/models.js",
+    "src/views/backup.js",
+    "src/styles/components.css",
+    "sw.js",
+    "tests/n49-*",
+    "tests/workspace-routing.test.mjs",
+    "tests/workspace-routing.e2e.mjs",
+    "tests/sync-ownership.test.mjs",
+    "tests/helpers/synthetic-workspace.mjs"
+  ],
+  "releaseAuthority": "PO 2026-10-12 continuous execution and scoped delivery delegation applies together with the named approved Product contract. Routine technical choices need no renewed approval. This card allows only isolated local/synthetic work and the normal Git/Cloudflare delivery after all required checks pass; it does not authorize real-account/real-student test changes, new live Auth/RLS/schema mutations, or an unbounded test train. A proven missing condition parks this card only. Keep the Product ticket OPEN until its actual acceptance outcome; a scoped delivery enters awaiting_po and releases the worker. D-092/D-103 approve the client behavior and final 7/14-day timing. This bounded card reuses the present authoritative Auth endpoint and existing workspace identity; if implementation actually requires a new privileged server trust protocol, return the specific gap instead of inventing one or declaring a mock sufficient.",
+  "sourceEvidence": {
+    "inspectedSourceSha": "deb882f6aa481298667b25609bb4e045004d3207",
+    "paths": [
+      "src/lib/cloud.js:verifyCurrentAuthIdentity",
+      "src/lib/workspaces.js:createWorkspaceRegistry",
+      "src/lib/workspace-routing.js:resolveWorkspaceForBoot",
+      "src/lib/sync-ownership.js:createSyncOwnershipGuard",
+      "src/store.js:assertCloudRestoreWritable,assertOperationalWritesAllowed",
+      "src/app.js:boot,cloud.subscribe"
+    ],
+    "finding": "Authoritative owner verification and durable workspace registry exist; durable lease, clock receipt and LIMITED integration must be implemented locally."
+  },
+  "workflowVersion": 5,
+  "status": "running",
+  "implementationFailures": 0,
+  "infrastructureRetries": 0,
+  "createdAt": "2026-10-12T10:21:02.222Z",
+  "updatedAt": "2026-10-12T11:07:10.268Z",
+  "baseSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+  "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n49-durable-offline-lease-20261012",
+  "worktreePrepared": true,
+  "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n49-durable-offline-lease-20261012",
+  "attempt": {
+    "runId": "39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2",
+    "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\attempt.json",
+    "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\result.json",
+    "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\events.jsonl",
+    "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\stderr.txt",
+    "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\checkpoint.json",
+    "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\wrapper.stdout.txt",
+    "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\wrapper.stderr.txt",
+    "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\wrapper-launch.json",
+    "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\broker.stdout.txt",
+    "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\broker.stderr.txt",
+    "startedAt": "2026-10-12T10:31:24.107Z"
+  },
+  "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\result.json",
+  "runnerPid": 17772,
+  "runnerCreatedAt": "2026-10-12T10:31:24.1947530Z",
+  "brokerPid": 22076,
+  "brokerCreatedAt": "2026-10-12T10:31:24.1135460Z",
+  "probingClass": null,
+  "retryAt": null,
+  "lastModelError": null,
+  "ownedProcesses": [
+    {
+      "pid": 22076,
+      "createdAt": "2026-10-12T10:31:24.1135460Z",
+      "name": "node.exe",
+      "parentPid": 12860,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 17772,
+      "createdAt": "2026-10-12T10:31:24.1947530Z",
+      "name": "powershell.exe",
+      "parentPid": 22076,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 31064,
+      "createdAt": "2026-10-12T10:31:25.1386820Z",
+      "name": "codex.exe",
+      "parentPid": 17772,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 1984,
+      "createdAt": "2026-10-12T10:31:24.2117370Z",
+      "name": "conhost.exe",
+      "parentPid": 17772,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 12456,
+      "createdAt": "2026-10-12T10:31:25.1463520Z",
+      "name": "conhost.exe",
+      "parentPid": 31064,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 4276,
+      "createdAt": "2026-10-12T10:31:25.6797020Z",
+      "name": "node.exe",
+      "parentPid": 31064,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 33352,
+      "createdAt": "2026-10-12T10:31:25.6854930Z",
+      "name": "node_repl.exe",
+      "parentPid": 31064,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 19448,
+      "createdAt": "2026-10-12T10:31:25.6867970Z",
+      "name": "conhost.exe",
+      "parentPid": 4276,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 16968,
+      "createdAt": "2026-10-12T10:31:25.6950510Z",
+      "name": "conhost.exe",
+      "parentPid": 33352,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 17216,
+      "createdAt": "2026-10-12T10:31:25.8067380Z",
+      "name": "node_repl.exe",
+      "parentPid": 4276,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 27028,
+      "createdAt": "2026-10-12T10:31:35.8636180Z",
+      "name": "codex-code-mode-host.exe",
+      "parentPid": 31064,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    },
+    {
+      "pid": 28820,
+      "createdAt": "2026-10-12T10:31:35.8719820Z",
+      "name": "conhost.exe",
+      "parentPid": 27028,
+      "observedAt": "2026-10-12T11:07:10.268Z"
+    }
+  ],
+  "watchdogIncident": null,
+  "eventLogIssue": null,
+  "checkpointIssue": null,
+  "wrapperExit": null,
+  "lastProgressScanAt": "2026-10-12T11:07:04.359Z",
+  "lastFileProgressAt": "2026-10-12T11:06:29.202Z",
+  "lastEventAt": "2026-10-12T11:06:25.552Z",
+  "progressFingerprint": "56ec3445231c35d9c7f9e030927c989d82e6eef499d3263e903abd54676e000a",
+  "sessionId": "01a12faa-cde6-7c23-a021-796e1137b1a2",
+  "heartbeatAt": "2026-10-12T11:07:10.0735024Z",
+  "productRecordKey": "po-20261012-continuous:running:::"
+}
+

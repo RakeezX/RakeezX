@@ -1,0 +1,15 @@
+Verified local PostgreSQL capability for the current N71/N73 card
+Observed read-only on Abdullah-MSI, 2026-10-12. This supplement supplies machine paths, not a new Product scope, approval gate, or historical PASS for the current candidate.
+
+The existing native Windows PostgreSQL components are present:
+- C:\Users\Abody\Projects\RakeezX\artifacts\n77-native-pg17\package\native\bin\postgres.exe
+- C:\Users\Abody\Projects\RakeezX\artifacts\n77-native-pg17\package\native\bin\initdb.exe
+- C:\Users\Abody\Projects\RakeezX\artifacts\n77-native-pg17\package\native\bin\pg_ctl.exe
+- C:\Users\Abody\Projects\RakeezX\artifacts\n77-native-pg17\client\node_modules\pg\lib\index.js
+- C:\Users\Abody\Projects\RakeezX\artifacts\n77-native-pg17\package\dist\index.js (exports binary paths postgres/initdb/pg_ctl; it is not an EmbeddedPostgres wrapper).
+
+The retained package is @embedded-postgres/windows-x64 17.6.0-beta.15. REPORT.md in that artifact directory records prior native PostgreSQL 17.6 use, not execution of this card. A new run was not performed during discovery. Docker is installed but its daemon was not running; no Docker startup or download is necessary merely to obtain these existing components.
+
+Build only the focused owner/atomicity/compatibility harness required by your current card, using these binaries and pg client with a new owned disposable cluster and unused loopback port. Keep credentials/data/logs within the card's ignored artifacts. Start and stop only that owned server, clean its synthetic cluster in finally, and preserve the retained shared binaries. Inspect the old harness for syntax if useful; do not run artifacts\n77-native-pg17\load.mjs unchanged: it binds an old N77 candidate and migration hash and recreates its own n77cert database. Do not repeat all historical checks just because a prior report listed them.
+
+Several old tests search for an EmbeddedPostgres wrapper under test-results\postgres-concurrency\node_modules\embedded-postgres\dist\index.js; those searched locations were absent. Do not label PostgreSQL unavailable based only on those paths, PATH, or Docker. Adapt the focused harness to the available components. Your exact current SQL/native result and actual provider application/readback must still satisfy the activated card; an old report or a committed SQL file does not establish a current live migration.

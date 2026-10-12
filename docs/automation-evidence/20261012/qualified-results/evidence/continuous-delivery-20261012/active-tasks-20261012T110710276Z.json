@@ -1,0 +1,102 @@
+{
+  "version": 6,
+  "at": "2026-10-12T11:07:10.276Z",
+  "controllerPid": 2892,
+  "instanceId": "fd51b65b-39e4-40cc-871a-e1450e4340ff",
+  "activationId": "po-20261012-continuous",
+  "controllerAlive": true,
+  "processInventoryKnown": true,
+  "paused": false,
+  "maxWorkers": 2,
+  "runningCount": 1,
+  "pendingCount": 8,
+  "awaitingPOCount": 3,
+  "active": [
+    {
+      "id": "continuous-n49-durable-offline-lease-20261012",
+      "productId": "N49",
+      "status": "running",
+      "runnerPid": 17772,
+      "sessionId": "01a12faa-cde6-7c23-a021-796e1137b1a2"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "v6-n92-delete-copy-20261012",
+      "productId": "N92",
+      "status": "awaiting_po",
+      "retryAt": null,
+      "nextDeliveryAt": "2026-10-12T09:54:48.455Z",
+      "lastFailure": null
+    },
+    {
+      "id": "v6-n91-mobile-card-titles-20261012",
+      "productId": "N91",
+      "status": "pending",
+      "retryAt": null,
+      "lastFailure": null
+    },
+    {
+      "id": "continuous-n95-sync-status-severity-20261012",
+      "productId": "N95",
+      "status": "awaiting_po",
+      "retryAt": null,
+      "nextDeliveryAt": "2026-10-12T10:30:56.942Z",
+      "lastFailure": null
+    },
+    {
+      "id": "continuous-n84-quicklog-completion-20261012",
+      "productId": "N84",
+      "status": "awaiting_po",
+      "retryAt": null,
+      "nextDeliveryAt": "2026-10-12T10:34:56.023Z",
+      "lastFailure": null
+    },
+    {
+      "id": "continuous-n54-keyboard-compression-20261012",
+      "productId": "N54",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n94-subitem-late-scoring-20261012",
+      "productId": "N94",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n13-existing-section-subject-20261012",
+      "productId": "N13",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n49-durable-offline-lease-20261012",
+      "productId": "N49",
+      "status": "running",
+      "retryAt": null
+    },
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n77-real-delete-20261012",
+      "productId": "N77",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n73-real-distribution-20261012",
+      "productId": "N73",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n71-unified-restore-20261012",
+      "productId": "N71",
+      "status": "pending"
+    }
+  ],
+  "deliveryInFlight": null,
+  "lastDeliveryProgress": null,
+  "idleReason": null,
+  "issues": []
+}
+

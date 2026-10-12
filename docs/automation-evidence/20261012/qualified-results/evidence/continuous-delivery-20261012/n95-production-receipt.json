@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "ticketId": "N95",
+  "taskId": "continuous-n95-sync-status-severity-20261012",
+  "candidateSha": "2f14e9318789015d885c8dce67047a6e36337637",
+  "baseSha": "8e2d4800396996be43868a71057412afccd2150b",
+  "publishedSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+  "productionUrl": "https://rakeezx.com",
+  "at": "2026-10-12T10:31:13.247Z",
+  "status": "deployed",
+  "retryable": false,
+  "state": "DEPLOYED_AWAITING_PO",
+  "productionDeployed": true,
+  "verifiedAt": "2026-10-12T10:31:13.247Z",
+  "repository": "RakeezX/RakeezX",
+  "targetBranch": "main",
+  "deploymentId": "8fbfa54c-5e36-4fc2-adac-998fa4438255",
+  "previewUrl": "https://8fbfa54c.rakeezx.pages.dev",
+  "providerStatus": "SUCCESS",
+  "provider": {
+    "checkRunId": "114769432602",
+    "headSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAt": "2026-10-12T10:31:05Z",
+    "completedAt": "2026-10-12T10:31:05Z",
+    "headBranch": null,
+    "deploymentId": "8fbfa54c-5e36-4fc2-adac-998fa4438255",
+    "previewUrl": "https://8fbfa54c.rakeezx.pages.dev",
+    "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/8fbfa54c-5e36-4fc2-adac-998fa4438255"
+  },
+  "currentMainSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+  "binding": {
+    "candidateSha": "2f14e9318789015d885c8dce67047a6e36337637",
+    "declaredBaseSha": "8e2d4800396996be43868a71057412afccd2150b",
+    "mainAtPreparation": "8e2d4800396996be43868a71057412afccd2150b",
+    "integrationSha": "2f14e9318789015d885c8dce67047a6e36337637",
+    "publishedSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+    "candidateAncestorOfPublished": true,
+    "previousMainAncestorOfPublished": true,
+    "mainContainsPublished": true,
+    "checkHeadShaMatches": true,
+    "kind": "candidate-fast-forward"
+  },
+  "build": {
+    "status": "passed",
+    "startedAt": "2026-10-12T10:30:14.418Z",
+    "completedAt": "2026-10-12T10:30:18.875Z",
+    "integrationSha": "2f14e9318789015d885c8dce67047a6e36337637",
+    "publishedSha": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+    "kind": "standard-build",
+    "validationTier": "STANDARD",
+    "reusedVerifiedBuildSha": null,
+    "generatedPathsChanged": [
+      "src/generated/build-meta.generated.js"
+    ],
+    "commands": [
+      {
+        "command": "node.exe",
+        "args": [
+          "scripts/generate-build-meta.mjs"
+        ]
+      },
+      {
+        "command": "node.exe",
+        "args": [
+          "node_modules/vite/bin/vite.js",
+          "build"
+        ]
+      }
+    ]
+  },
+  "changedPaths": [
+    "src/lib/sync-operational-ui.js",
+    "src/lib/sync-status-severity.js",
+    "src/lib/sync.js",
+    "tests/n95-sync-status-severity.test.mjs"
+  ],
+  "sourceOnlyPaths": [
+    "tests/n95-sync-status-severity.test.mjs"
+  ],
+  "changedAssets": [
+    "src/lib/sync-operational-ui.js",
+    "src/lib/sync-status-severity.js",
+    "src/lib/sync.js"
+  ],
+  "productSourceChangeObserved": true,
+  "evidence": {
+    "immutable": {
+      "origin": "https://8fbfa54c.rakeezx.pages.dev",
+      "checkedAt": "2026-10-12T10:31:08.239Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/lib/sync-operational-ui.js",
+          "urlPath": "src/lib/sync-operational-ui.js",
+          "statusCode": 200,
+          "expectedSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+          "observedSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+          "bytes": 7185,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/lib/sync-status-severity.js",
+          "urlPath": "src/lib/sync-status-severity.js",
+          "statusCode": 200,
+          "expectedSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+          "observedSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+          "bytes": 3562,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/lib/sync.js",
+          "urlPath": "src/lib/sync.js",
+          "statusCode": 200,
+          "expectedSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+          "observedSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+          "bytes": 105758,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "bytes": 2971,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "66f3a62f91b652619472cb646c5ad90cb8bf05abb1916266c9d83a384a802428",
+          "observedSha256": "66f3a62f91b652619472cb646c5ad90cb8bf05abb1916266c9d83a384a802428",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    },
+    "production": {
+      "origin": "https://rakeezx.com",
+      "checkedAt": "2026-10-12T10:31:09.046Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/lib/sync-operational-ui.js",
+          "urlPath": "src/lib/sync-operational-ui.js",
+          "statusCode": 200,
+          "expectedSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+          "observedSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+          "bytes": 7185,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/lib/sync-status-severity.js",
+          "urlPath": "src/lib/sync-status-severity.js",
+          "statusCode": 200,
+          "expectedSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+          "observedSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+          "bytes": 3562,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/lib/sync.js",
+          "urlPath": "src/lib/sync.js",
+          "statusCode": 200,
+          "expectedSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+          "observedSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+          "bytes": 105758,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "b7786d4453ce86fa07f53baad6aeea6dbbeea500e9456e1af65a769d58b25bbc",
+          "bytes": 3909,
+          "deleted": false,
+          "verified": true,
+          "normalization": "cloudflare-jsd-v1",
+          "normalizedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "normalizedBytes": 2971,
+          "removedProviderBytes": 938,
+          "removedSha256": "c5f6a373d7645bd47d043fdad19ad7ec3abf18ab94bafcd5c243ef20fd5d715e"
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "66f3a62f91b652619472cb646c5ad90cb8bf05abb1916266c9d83a384a802428",
+          "observedSha256": "66f3a62f91b652619472cb646c5ad90cb8bf05abb1916266c9d83a384a802428",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    }
+  },
+  "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n95-sync-status-severity-20261012\\integration-2f14e9318789-1-bc06e00f",
+  "pushRecovered": false,
+  "poPersonallyTested": false,
+  "closed": false
+}
+

@@ -1,0 +1,84 @@
+{
+  "version": 6,
+  "at": "2026-10-12T10:21:38.387Z",
+  "controllerPid": 12860,
+  "instanceId": "a0596a20-479a-43b6-9aaf-cc18dee675c9",
+  "activationId": "po-20261012-continuous",
+  "controllerAlive": true,
+  "processInventoryKnown": true,
+  "paused": false,
+  "maxWorkers": 2,
+  "runningCount": 2,
+  "pendingCount": 4,
+  "awaitingPOCount": 1,
+  "active": [
+    {
+      "id": "v6-n91-mobile-card-titles-20261012",
+      "productId": "N91",
+      "status": "running",
+      "runnerPid": 31832,
+      "sessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024"
+    },
+    {
+      "id": "continuous-n84-quicklog-completion-20261012",
+      "productId": "N84",
+      "status": "running",
+      "runnerPid": 8712,
+      "sessionId": "01a12fa1-66ac-77b3-8129-d3ec884369f4"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "v6-n92-delete-copy-20261012",
+      "productId": "N92",
+      "status": "awaiting_po",
+      "retryAt": null,
+      "nextDeliveryAt": "2026-10-12T09:54:48.455Z",
+      "lastFailure": null
+    },
+    {
+      "id": "v6-n91-mobile-card-titles-20261012",
+      "productId": "N91",
+      "status": "running",
+      "retryAt": null,
+      "lastFailure": "RESOLVED environment fault: PowerShell 7 JSON timestamps lost precision/UTC in the shared browser lease. The canonical resourceLeaseScript now compares exact UTC ticks and passed real PS5.1/PS7 acquire, reacquire, release and wrong-birth rejection. Resume your exact saved session and candidate 466bb11d6e83096a226d5e76f66949c9665a85bd; finish only the missing synthetic mobile browser proof at 320/360/390/430 RTL widths and card navigation, with an owned lease. Do not rewrite or rebuild the already committed CSS unless the actual browser proof exposes a scoped defect. Use the supplied canonical resourceLeaseScript path, not an older worktree copy."
+    },
+    {
+      "id": "continuous-n95-sync-status-severity-20261012",
+      "productId": "N95",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n84-quicklog-completion-20261012",
+      "productId": "N84",
+      "status": "running",
+      "retryAt": null
+    },
+    {
+      "id": "continuous-n54-keyboard-compression-20261012",
+      "productId": "N54",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n94-subitem-late-scoring-20261012",
+      "productId": "N94",
+      "status": "pending"
+    },
+    {
+      "id": "continuous-n49-durable-offline-lease-20261012",
+      "productId": "N49",
+      "status": "pending"
+    }
+  ],
+  "deliveryInFlight": null,
+  "lastDeliveryProgress": null,
+  "idleReason": null,
+  "issues": [
+    {
+      "code": "PRODUCT_INELIGIBLE",
+      "taskId": "continuous-n13-existing-section-subject-20261012",
+      "reason": "AMBIGUOUS_PRODUCT_ROW"
+    }
+  ]
+}
+

@@ -1,0 +1,34 @@
+{
+  "status": "ACTIVATED",
+  "commit": "537a9935172df8d7a10d455ff14341e50051f79c",
+  "manifestSha256": "1ce53e4587a4c855966c43a424778c46fb4da1d6e066558c95abb7a3b2e4787e",
+  "startedAt": "2026-10-12T11:06:17.730Z",
+  "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/backlog-activation-2026-10-12T11-06-17-730Z-aa9771ed-3a77-433a-baca-1fff061e718a",
+  "queueWrites": 0,
+  "workerStopCommandsIssued": false,
+  "catalogWriteVerified": true,
+  "runtimePromptSupplement": {
+    "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+    "sha256": "939028711072602386ef02dc61fda60092873682ecb7059ca9feb82bd8b727bb",
+    "taskIds": [
+      "continuous-n73-real-distribution-20261012",
+      "continuous-n71-unified-restore-20261012"
+    ]
+  },
+  "catalogBeforeSha256": "118b04efb20dd758770bb593fe643457d89ae757911f2e653bb6f71ff4b2b376",
+  "addedTaskIds": [
+    "continuous-n77-real-delete-20261012",
+    "continuous-n73-real-distribution-20261012",
+    "continuous-n71-unified-restore-20261012"
+  ],
+  "catalogAfterSha256": "3bfdffc2a87dc39991266627706792a6b83f3894887181674ddffdac02fdc9fb",
+  "controller": {
+    "pid": 2892,
+    "instanceId": "fd51b65b-39e4-40cc-871a-e1450e4340ff",
+    "pausedAt": "2026-10-12T11:06:23.256Z"
+  },
+  "ownedPauseRemoved": true,
+  "pauseStillPresent": false,
+  "finishedAt": "2026-10-12T11:06:23.797Z"
+}
+

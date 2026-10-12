@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-12T11:05:56.5110724Z",
+  "operation": "browser status",
+  "runtimeRootArgumentSupplied": false,
+  "scriptPath": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\resource-lease.ps1",
+  "scriptSha256": "8d5d471094d4bc0b3506193d409856d38e65aa11565dfdafad4fa8a11fb162d5",
+  "taskPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\continuous-n49-durable-offline-lease-20261012.json",
+  "exitCode": 0,
+  "output": "FREE",
+  "leaseMutation": false
+}
+

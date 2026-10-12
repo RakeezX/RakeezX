@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "ticketId": "N92",
+  "taskId": "v6-n92-delete-copy-20261012",
+  "candidateSha": "a183ffdbf2d821896811da3d92322eafb15f33a8",
+  "baseSha": "deb882f6aa481298667b25609bb4e045004d3207",
+  "publishedSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+  "productionUrl": "https://rakeezx.com",
+  "at": "2026-10-12T09:55:03.631Z",
+  "status": "deployed",
+  "retryable": false,
+  "state": "DEPLOYED_AWAITING_PO",
+  "productionDeployed": true,
+  "verifiedAt": "2026-10-12T09:55:03.631Z",
+  "repository": "RakeezX/RakeezX",
+  "targetBranch": "main",
+  "deploymentId": "1ea59d1f-a0be-40e0-a84b-7a68f6aad104",
+  "previewUrl": "https://1ea59d1f.rakeezx.pages.dev",
+  "providerStatus": "SUCCESS",
+  "provider": {
+    "checkRunId": "114756497588",
+    "headSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAt": "2026-10-12T09:54:37Z",
+    "completedAt": "2026-10-12T09:54:37Z",
+    "headBranch": null,
+    "deploymentId": "1ea59d1f-a0be-40e0-a84b-7a68f6aad104",
+    "previewUrl": "https://1ea59d1f.rakeezx.pages.dev",
+    "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/1ea59d1f-a0be-40e0-a84b-7a68f6aad104"
+  },
+  "currentMainSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+  "binding": {
+    "candidateSha": "a183ffdbf2d821896811da3d92322eafb15f33a8",
+    "declaredBaseSha": "deb882f6aa481298667b25609bb4e045004d3207",
+    "mainAtPreparation": "dd9251fb43a8d54adca8722df3a6b397cb84888f",
+    "integrationSha": "fa1ae77f3b0f07f53629a379e20cd2434fe6f94d",
+    "publishedSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+    "candidateAncestorOfPublished": true,
+    "previousMainAncestorOfPublished": true,
+    "mainContainsPublished": true,
+    "checkHeadShaMatches": true,
+    "kind": "merge"
+  },
+  "build": {
+    "status": "passed",
+    "startedAt": "2026-10-12T09:54:07.282Z",
+    "completedAt": "2026-10-12T09:54:09.106Z",
+    "integrationSha": "fa1ae77f3b0f07f53629a379e20cd2434fe6f94d",
+    "publishedSha": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+    "kind": "metadata-only",
+    "validationTier": "FAST",
+    "reusedVerifiedBuildSha": null,
+    "generatedPathsChanged": [
+      "src/generated/build-meta.generated.js"
+    ],
+    "commands": [
+      {
+        "command": "node.exe",
+        "args": [
+          "scripts/generate-build-meta.mjs"
+        ]
+      }
+    ]
+  },
+  "changedPaths": [
+    "src/lib/student-lifecycle-ui.js"
+  ],
+  "sourceOnlyPaths": [],
+  "changedAssets": [
+    "src/lib/student-lifecycle-ui.js"
+  ],
+  "productSourceChangeObserved": true,
+  "evidence": {
+    "immutable": {
+      "origin": "https://1ea59d1f.rakeezx.pages.dev",
+      "checkedAt": "2026-10-12T09:54:58.923Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/lib/student-lifecycle-ui.js",
+          "urlPath": "src/lib/student-lifecycle-ui.js",
+          "statusCode": 200,
+          "expectedSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+          "observedSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+          "bytes": 15903,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "bytes": 2971,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "b1894e8f8328275f147d04ebed46c0bda023b1d4ad31e7daa61516b1fc125aeb",
+          "observedSha256": "b1894e8f8328275f147d04ebed46c0bda023b1d4ad31e7daa61516b1fc125aeb",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    },
+    "production": {
+      "origin": "https://rakeezx.com",
+      "checkedAt": "2026-10-12T09:54:59.622Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/lib/student-lifecycle-ui.js",
+          "urlPath": "src/lib/student-lifecycle-ui.js",
+          "statusCode": 200,
+          "expectedSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+          "observedSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+          "bytes": 15903,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "55334edad7e1c5bc8872433f8a350956800ac9839df57dfb32cf53a98b845d30",
+          "bytes": 3909,
+          "deleted": false,
+          "verified": true,
+          "normalization": "cloudflare-jsd-v1",
+          "normalizedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "normalizedBytes": 2971,
+          "removedProviderBytes": 938,
+          "removedSha256": "7bb45c5230a2e9bf528e1182fec4fcff213d45dabc7c49eca90199ae83641110"
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "b1894e8f8328275f147d04ebed46c0bda023b1d4ad31e7daa61516b1fc125aeb",
+          "observedSha256": "b1894e8f8328275f147d04ebed46c0bda023b1d4ad31e7daa61516b1fc125aeb",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    }
+  },
+  "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\v6-n92-delete-copy-20261012\\integration-a183ffdbf2d8-1-0f790513",
+  "pushRecovered": false,
+  "poPersonallyTested": false,
+  "closed": false
+}
+

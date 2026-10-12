@@ -1,0 +1,298 @@
+{
+  "fixtureOnly": true,
+  "noCodex": true,
+  "noProductChanges": true,
+  "deviceId": "5c8691d9-5fa5-4f8d-bd3d-02c7edecfa29",
+  "sourceRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96",
+  "observation": {
+    "parentExitCheck": {
+      "at": "2026-10-12T10:01:52.8834379Z",
+      "taskState": "Ready",
+      "lastTaskResult": 0,
+      "processes": [],
+      "parentPid": 33712,
+      "childPid": 9008,
+      "expectedSecondMarkerMissing": true
+    }
+  },
+  "files": [
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\BOOTSTRAP_CONTEXT_RESULT.json",
+      "data": {
+        "fixtureOnly": true,
+        "noCodex": true,
+        "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+        "nodeVersion": "v24.19.0",
+        "parentPid": 12340,
+        "pid": 8908,
+        "runtime": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96",
+        "opsRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4",
+        "startedAt": "2026-10-12T09:59:41.345Z",
+        "cases": [
+          {
+            "id": "minimal-detached-true-hidden-true-files",
+            "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-NonInteractive",
+              "-ExecutionPolicy",
+              "RemoteSigned",
+              "-Command",
+              "[System.IO.File]::WriteAllText('C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\minimal-detached-true-hidden-true-files\\minimal-marker.txt', 'MINIMAL_OK'); [Console]::Out.WriteLine('MINIMAL_OK'); exit 0"
+            ],
+            "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+            "detached": true,
+            "windowsHide": true,
+            "stdio": "files",
+            "at": "2026-10-12T09:59:41.346Z",
+            "pid": 12368,
+            "exitCode": 0,
+            "signal": null,
+            "exitedAt": "2026-10-12T09:59:41.473Z",
+            "stdoutBytes": 0,
+            "stderrBytes": 0,
+            "stdout": "",
+            "stderr": "",
+            "reachedScript": false,
+            "finishedAt": "2026-10-12T09:59:41.475Z"
+          },
+          {
+            "id": "minimal-detached-false-hidden-true-files",
+            "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-NonInteractive",
+              "-ExecutionPolicy",
+              "RemoteSigned",
+              "-Command",
+              "[System.IO.File]::WriteAllText('C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\minimal-detached-false-hidden-true-files\\minimal-marker.txt', 'MINIMAL_OK'); [Console]::Out.WriteLine('MINIMAL_OK'); exit 0"
+            ],
+            "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+            "detached": false,
+            "windowsHide": true,
+            "stdio": "files",
+            "at": "2026-10-12T09:59:41.476Z",
+            "pid": 28600,
+            "exitCode": 0,
+            "signal": null,
+            "exitedAt": "2026-10-12T09:59:41.798Z",
+            "stdoutBytes": 12,
+            "stderrBytes": 0,
+            "stdout": "MINIMAL_OK\r\n",
+            "stderr": "",
+            "minimalMarker": "MINIMAL_OK",
+            "reachedScript": true,
+            "finishedAt": "2026-10-12T09:59:41.800Z"
+          },
+          {
+            "id": "wrapper-detached-true-hidden-true-files",
+            "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-NonInteractive",
+              "-ExecutionPolicy",
+              "RemoteSigned",
+              "-File",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1",
+              "-TaskFile",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\wrapper-detached-true-hidden-true-files\\task.json",
+              "-AttemptFile",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\wrapper-detached-true-hidden-true-files\\attempt.json"
+            ],
+            "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+            "detached": true,
+            "windowsHide": true,
+            "stdio": "files",
+            "at": "2026-10-12T09:59:41.803Z",
+            "pid": 29756,
+            "exitCode": 0,
+            "signal": null,
+            "exitedAt": "2026-10-12T09:59:41.921Z",
+            "stdoutBytes": 0,
+            "stderrBytes": 0,
+            "stdout": "",
+            "stderr": "",
+            "reachedScript": false,
+            "finishedAt": "2026-10-12T09:59:41.922Z"
+          },
+          {
+            "id": "wrapper-detached-false-hidden-true-files",
+            "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-NonInteractive",
+              "-ExecutionPolicy",
+              "RemoteSigned",
+              "-File",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\run-task.ps1",
+              "-TaskFile",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\wrapper-detached-false-hidden-true-files\\task.json",
+              "-AttemptFile",
+              "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\wrapper-detached-false-hidden-true-files\\attempt.json"
+            ],
+            "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+            "detached": false,
+            "windowsHide": true,
+            "stdio": "files",
+            "at": "2026-10-12T09:59:41.925Z",
+            "pid": 27024,
+            "exitCode": 1,
+            "signal": null,
+            "exitedAt": "2026-10-12T09:59:42.883Z",
+            "stdoutBytes": 0,
+            "stderrBytes": 0,
+            "stdout": "",
+            "stderr": "",
+            "checkpoint": {
+              "version": 1,
+              "taskId": "wrapper-detached-false-hidden-true-files",
+              "activationId": "bootstrap-fixture-only",
+              "runId": "3d10699b-ee04-4931-9c58-e1678661d84e",
+              "runnerPid": 27024,
+              "runnerCreatedAt": "2026-10-12T09:59:41.9285930Z",
+              "codexPid": null,
+              "codexCreatedAt": null,
+              "sessionId": null,
+              "startedAt": "2026-10-12T09:59:42.7772152Z",
+              "heartbeatAt": "2026-10-12T09:59:42.8412129Z",
+              "status": "wrapper_error",
+              "codexExitedAt": null,
+              "finishedAt": "2026-10-12T09:59:42.8272524Z",
+              "exitCode": 1,
+              "error": "Configured tested Codex executable is missing"
+            },
+            "reachedScript": true,
+            "finishedAt": "2026-10-12T09:59:42.885Z"
+          }
+        ],
+        "status": "COMPLETE",
+        "finishedAt": "2026-10-12T09:59:42.886Z"
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\parent-exit\\PARENT_EXIT.json",
+      "data": {
+        "fixtureOnly": true,
+        "noCodex": true,
+        "parentPid": 33712,
+        "parentStartedAt": "2026-10-12T10:01:26.089Z",
+        "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "RemoteSigned",
+          "-Command",
+          "$ErrorActionPreference='Stop'; $born=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o'); $entry=@{pid=$PID;birth=$born;at=[DateTime]::UtcNow.ToString('o')}|ConvertTo-Json -Compress; [IO.File]::WriteAllText('C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\parent-exit\\CHILD_STARTED.json',$entry); Start-Sleep -Seconds 4; [IO.File]::WriteAllText('C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\parent-exit\\CHILD_FINISHED.json',(@{pid=$PID;birth=$born;at=[DateTime]::UtcNow.ToString('o');survivedParentExit=$true}|ConvertTo-Json -Compress)); exit 0"
+        ],
+        "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+        "detached": false,
+        "windowsHide": true,
+        "stdio": "files",
+        "childPid": 9008,
+        "childStarted": {
+          "pid": 9008,
+          "at": "2026-10-12T10:01:26.4038709Z",
+          "birth": "2026-10-12T10:01:26.0929505Z"
+        },
+        "parentExitAt": "2026-10-12T10:01:26.539Z",
+        "exitsAfterObservedChildStart": true
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\parent-exit\\CHILD_STARTED.json",
+      "data": {
+        "pid": 9008,
+        "at": "2026-10-12T10:01:26.4038709Z",
+        "birth": "2026-10-12T10:01:26.0929505Z"
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\PARENT_EXIT.json",
+      "data": {
+        "fixtureOnly": true,
+        "noCodex": true,
+        "parentPid": 28792,
+        "parentStartedAt": "2026-10-12T10:05:47.358Z",
+        "executable": "C:\\Program Files\\nodejs\\node.exe",
+        "args": [
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\worker-broker.mjs",
+          "--task",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\task.json",
+          "--attempt",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\attempt.json",
+          "--powershell",
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "--wrapper",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\fixture-wrapper.ps1",
+          "--cwd",
+          "C:\\Users\\Abody\\Projects\\RakeezX"
+        ],
+        "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+        "detachedBroker": true,
+        "brokerPid": 30588,
+        "childStarted": {
+          "pid": 2596,
+          "at": "2026-10-12T10:05:47.8945916Z",
+          "birth": "2026-10-12T10:05:47.4290148Z"
+        },
+        "parentExitAt": "2026-10-12T10:05:47.924Z",
+        "exitsAfterObservedChildStart": true
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\CHILD_FINISHED.json",
+      "data": {
+        "pid": 2596,
+        "survivedParentExit": true,
+        "at": "2026-10-12T10:05:51.9243183Z",
+        "birth": "2026-10-12T10:05:47.4290148Z"
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\wrapper-launch.json",
+      "data": {
+        "version": 1,
+        "taskId": "broker-survival-fixture",
+        "activationId": "bootstrap-fixture-only",
+        "runId": "60bc586b-69f7-4222-907d-2009c3efcebc",
+        "brokerPid": 30588,
+        "brokerStartedAt": "2026-10-12T10:05:47.422Z",
+        "status": "exited",
+        "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "RemoteSigned",
+          "-File",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\fixture-wrapper.ps1",
+          "-TaskFile",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\task.json",
+          "-AttemptFile",
+          "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\attempt.json"
+        ],
+        "cwd": "C:\\Users\\Abody\\Projects\\RakeezX",
+        "wrapperPid": 2596,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\wrapper.stdout.txt",
+        "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\broker-parent-exit\\wrapper.stderr.txt",
+        "exitedAt": "2026-10-12T10:05:51.949Z",
+        "finishedAt": "2026-10-12T10:05:51.949Z"
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\bootstrap-context-7cf52a96\\CLEANUP.json",
+      "data": {
+        "at": "2026-10-12T10:07:19.7144134Z",
+        "taskName": "RAKEEZ-BootstrapProbe-7cf52a96",
+        "removed": true,
+        "lastTaskResult": 0,
+        "fixtureProcessesRemaining": [],
+        "factoryTaskUntouched": true
+      }
+    }
+  ]
+}

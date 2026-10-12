@@ -1,0 +1,265 @@
+{
+  "fixtureOnly": true,
+  "noCodex": true,
+  "noProduct": true,
+  "sourceDevice": "5c8691d9-5fa5-4f8d-bd3d-02c7edecfa29",
+  "typeAndTicksProbe": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Process started with PID 16012 (shell: C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe)\nInitial output:\n{\"engine\":\"5.1.26100.9549\",\"pid\":12860,\"rawBirth\":\"2026-10-12T10:09:45.8875350Z\",\"jsonValueType\":\"System.String\",\"jsonValueString\":\"2026-10-12T10:09:45.8875350Z\",\"oldParseTicks\":639273965858875350,\"castTicks\":639273965858875350,\"literalTicks\":639273965858875350,\"cimTicks\":639273965858875350,\"processPresent\":true,\"commandLine\":\"\\\"C:\\\\Program Files\\\\nodejs\\\\node.exe\\\" C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX\\\\scripts\\\\ops-supervisor-v4\\\\controller.mjs --repo C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX --runtime C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX\\\\artifacts\\\\ops-supervisor-v4 --instance-id a0596a20-479a-43b6-9aaf-cc18dee675c9\",\"containsController\":true,\"containsRuntime\":true}\r\n"
+          },
+          {
+            "type": "text",
+            "text": "\n[executed on device: Abdullah-MSI (5c8691d9-5fa5-4f8d-bd3d-02c7edecfa29)]"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Process started with PID 22636 (shell: C:\\Users\\Abody\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe)\nInitial output:\n{\"engine\":\"7.6.6\",\"pid\":12860,\"rawBirth\":\"2026-10-12T10:09:45.8875350Z\",\"jsonValueType\":\"System.DateTime\",\"jsonValueString\":\"10/12/2026 10:09:45\",\"oldParseTicks\":639273857850000000,\"castTicks\":639273965858875350,\"literalTicks\":639273965858875350,\"cimTicks\":639273965858875350,\"processPresent\":true,\"commandLine\":\"\\\"C:\\\\Program Files\\\\nodejs\\\\node.exe\\\" C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX\\\\scripts\\\\ops-supervisor-v4\\\\controller.mjs --repo C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX --runtime C:\\\\Users\\\\Abody\\\\Projects\\\\RakeezX\\\\artifacts\\\\ops-supervisor-v4 --instance-id a0596a20-479a-43b6-9aaf-cc18dee675c9\",\"containsController\":true,\"containsRuntime\":true}\r\n"
+          },
+          {
+            "type": "text",
+            "text": "\n[executed on device: Abdullah-MSI (5c8691d9-5fa5-4f8d-bd3d-02c7edecfa29)]"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "files": [
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\NATIVE_LEASE_DATE_RESULT.json",
+      "data": {
+        "fixtureOnly": true,
+        "noCodex": true,
+        "noProduct": true,
+        "startedAt": "2026-10-12T10:16:24.141Z",
+        "engines": [
+          {
+            "engineName": "ps5",
+            "engine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "ownerPid": 21440,
+            "checks": [
+              {
+                "name": "acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ACQUIRED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "repeat-acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ALREADY OWNED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "release",
+                "code": 0,
+                "signal": null,
+                "stdout": "RELEASED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "wrong-birth-one-tick-refused",
+                "expectedBirth": "2026-10-12T10:16:24.1492980Z",
+                "presentedBirth": "2026-10-12T10:16:24.1492981Z",
+                "code": 1,
+                "signal": null,
+                "stdout": "",
+                "stderr": "Exact worker process not verified\r\nAt C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735\r\nb083d\\resource-lease.ps1:36 char:238\r\n+ ... sk.attempt.specPath)*\") { throw 'Exact worker process not verified' }\r\n+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (Exact worker process not verified:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : Exact worker process not verified\r\n \r\n"
+              }
+            ],
+            "owner": {
+              "runnerCreatedAt": "2026-10-12T10:16:24.1492980Z",
+              "commandLine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps5\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps5\\queue\\fixture.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps5\\attempts\\attempt.json",
+              "runId": "9bde9c99-91d5-458b-9377-530c554d02f6",
+              "runnerPid": 21440,
+              "taskId": "lease-date-ps5",
+              "engine": "5.1.26100.9549"
+            },
+            "passed": true,
+            "ownerExit": {
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          },
+          {
+            "engineName": "ps7",
+            "engine": "C:\\Users\\Abody\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe",
+            "ownerPid": 13492,
+            "checks": [
+              {
+                "name": "acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ACQUIRED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "repeat-acquire",
+                "code": 3,
+                "signal": null,
+                "stdout": "BUSY browser; the recorded owner must finish or be factually recovered\r\n",
+                "stderr": ""
+              }
+            ],
+            "owner": {
+              "engine": "7.6.6",
+              "commandLine": "C:\\Users\\Abody\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps7\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps7\\queue\\fixture.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime\\ps7\\attempts\\attempt.json",
+              "runId": "16af2c71-1894-46cf-b726-1ff003388e85",
+              "runnerCreatedAt": "2026-10-12T10:16:28.4591450Z",
+              "runnerPid": 13492,
+              "taskId": "lease-date-ps7"
+            },
+            "ownerExit": {
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          }
+        ],
+        "status": "FAIL",
+        "error": "Error: repeat-acquire failed: {\"code\":3,\"signal\":null,\"stdout\":\"BUSY browser; the recorded owner must finish or be factually recovered\\r\\n\",\"stderr\":\"\"}\n    at assert (file:///C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/native-probes/lease-date-735b083d/native-lease-fixture.mjs:15:61)\n    at file:///C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/native-probes/lease-date-735b083d/native-lease-fixture.mjs:62:9",
+        "finishedAt": "2026-10-12T10:16:30.972Z"
+      }
+    },
+    {
+      "sourcePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\NATIVE_LEASE_DATE_RESULT.json",
+      "data": {
+        "fixtureOnly": true,
+        "noCodex": true,
+        "noProduct": true,
+        "startedAt": "2026-10-12T10:17:37.022Z",
+        "engines": [
+          {
+            "engineName": "ps5",
+            "engine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "ownerPid": 29580,
+            "checks": [
+              {
+                "name": "acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ACQUIRED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "repeat-acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ALREADY OWNED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "release",
+                "code": 0,
+                "signal": null,
+                "stdout": "RELEASED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "wrong-birth-one-tick-refused",
+                "expectedBirth": "2026-10-12T10:17:37.0300050Z",
+                "presentedBirth": "2026-10-12T10:17:37.0300051Z",
+                "code": 1,
+                "signal": null,
+                "stdout": "",
+                "stderr": "Exact worker process not verified\r\nAt C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735\r\nb083d\\resource-lease.ps1:36 char:238\r\n+ ... sk.attempt.specPath)*\") { throw 'Exact worker process not verified' }\r\n+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (Exact worker process not verified:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : Exact worker process not verified\r\n \r\n"
+              }
+            ],
+            "owner": {
+              "runnerCreatedAt": "2026-10-12T10:17:37.0300050Z",
+              "commandLine": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps5\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps5\\queue\\fixture.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps5\\attempts\\attempt.json",
+              "runId": "7c3a9b8d-123b-4ecb-8c8e-ff2d37095cd7",
+              "runnerPid": 29580,
+              "taskId": "lease-date-ps5",
+              "engine": "5.1.26100.9549"
+            },
+            "passed": true,
+            "ownerExit": {
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          },
+          {
+            "engineName": "ps7",
+            "engine": "C:\\Users\\Abody\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe",
+            "ownerPid": 12536,
+            "checks": [
+              {
+                "name": "acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ACQUIRED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "repeat-acquire",
+                "code": 0,
+                "signal": null,
+                "stdout": "ALREADY OWNED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "release",
+                "code": 0,
+                "signal": null,
+                "stdout": "RELEASED browser\r\n",
+                "stderr": ""
+              },
+              {
+                "name": "wrong-birth-one-tick-refused",
+                "expectedBirth": "2026-10-12T10:17:41.0931120Z",
+                "presentedBirth": "2026-10-12T10:17:41.0931121Z",
+                "code": 1,
+                "signal": null,
+                "stdout": "",
+                "stderr": "\u001b[31;1mException: \u001b[0mC:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\resource-lease.ps1:36\u001b[0m\r\n\u001b[31;1m\u001b[0m\u001b[36;1mLine |\u001b[0m\r\n\u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m  36 | \u001b[0m ? sk.attempt.specPath)*\") { \u001b[36;1mthrow 'Exact worker process not verified'\u001b[0m }\u001b[0m\r\n\u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m     | \u001b[31;1m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\u001b[0m\r\n\u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mExact worker process not verified\u001b[0m\r\n"
+              }
+            ],
+            "owner": {
+              "engine": "7.6.6",
+              "taskId": "lease-date-ps7",
+              "runId": "52fa52b9-219a-46d8-9c7e-288e0a11868c",
+              "commandLine": "C:\\Users\\Abody\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps7\\run-task.ps1 -TaskFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps7\\queue\\fixture.json -AttemptFile C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\cutover\\20261012-continuous\\native-probes\\lease-date-735b083d\\runtime-final\\ps7\\attempts\\attempt.json",
+              "runnerCreatedAt": "2026-10-12T10:17:41.0931120Z",
+              "runnerPid": 12536
+            },
+            "passed": true,
+            "ownerExit": {
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          }
+        ],
+        "status": "PASS",
+        "finishedAt": "2026-10-12T10:17:45.316Z"
+      }
+    }
+  ],
+  "notes": [
+    "The initial one-line candidate passed PS5.1 but failed PS7 repeated acquire. The final two-line candidate passed all eight native assertions.",
+    "Raw type/ticks probe output preserves full Int64 decimal values as text; do not coerce them through JavaScript Number.",
+    "Reap-Proven ownerRecorded compares timestamps both parsed from JSON by the same engine; its process survival checks use the corrected Same-Birth function."
+  ]
+}

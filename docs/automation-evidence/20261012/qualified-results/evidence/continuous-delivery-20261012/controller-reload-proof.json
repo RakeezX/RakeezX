@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Actual controller reload: surviving Codex worker and exact-session adoption",
+  "installationReportedByOperator": {
+    "commit": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+    "installedAt": "2026-10-12T10:43:52.644Z",
+    "finishedAt": "2026-10-12T10:43:54.182Z",
+    "stoppedControllerPid": 12860
+  },
+  "observations": {
+    "beforeObservedAt": "2026-10-12T10:37:57.8672649Z",
+    "afterObservedAt": "2026-10-12T10:45:16.4459964Z"
+  },
+  "controller": {
+    "before": {
+      "pid": 12860,
+      "instanceId": "a0596a20-479a-43b6-9aaf-cc18dee675c9",
+      "createdAt": "2026-10-12T10:09:45.8875350Z",
+      "startedAt": "2026-10-12T10:09:46.865Z",
+      "runtime": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4",
+      "script": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\controller.mjs"
+    },
+    "after": {
+      "pid": 24120,
+      "instanceId": "f8c2d12f-351c-42d1-9c74-857802b74760",
+      "createdAt": "2026-10-12T10:43:54.0085890Z",
+      "startedAt": "2026-10-12T10:43:54.765Z",
+      "runtime": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4",
+      "script": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\controller.mjs"
+    },
+    "changed": true
+  },
+  "worker": {
+    "taskId": "continuous-n49-durable-offline-lease-20261012",
+    "beforeCheckpoint": {
+      "version": 1,
+      "taskId": "continuous-n49-durable-offline-lease-20261012",
+      "activationId": "po-20261012-continuous",
+      "runId": "39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2",
+      "runnerPid": 17772,
+      "runnerCreatedAt": "2026-10-12T10:31:24.1947530Z",
+      "codexPid": 31064,
+      "codexCreatedAt": "2026-10-12T10:31:25.1386820Z",
+      "sessionId": "01a12faa-cde6-7c23-a021-796e1137b1a2",
+      "startedAt": "2026-10-12T10:31:25.0543743Z",
+      "heartbeatAt": "2026-10-12T10:37:53.8943105Z",
+      "status": "running",
+      "codexExitedAt": null,
+      "finishedAt": null,
+      "exitCode": null,
+      "error": null
+    },
+    "afterCheckpoint": {
+      "version": 1,
+      "taskId": "continuous-n49-durable-offline-lease-20261012",
+      "activationId": "po-20261012-continuous",
+      "runId": "39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2",
+      "runnerPid": 17772,
+      "runnerCreatedAt": "2026-10-12T10:31:24.1947530Z",
+      "codexPid": 31064,
+      "codexCreatedAt": "2026-10-12T10:31:25.1386820Z",
+      "sessionId": "01a12faa-cde6-7c23-a021-796e1137b1a2",
+      "startedAt": "2026-10-12T10:31:25.0543743Z",
+      "heartbeatAt": "2026-10-12T10:45:12.9297525Z",
+      "status": "running",
+      "codexExitedAt": null,
+      "finishedAt": null,
+      "exitCode": null,
+      "error": null
+    },
+    "sameAttempt": true,
+    "sameSession": true,
+    "nativeProcesses": [
+      {
+        "before": {
+          "pid": 22076,
+          "parentPid": 12860,
+          "name": "node.exe",
+          "createdAt": "2026-10-12T10:31:24.1135460Z"
+        },
+        "after": {
+          "pid": 22076,
+          "parentPid": 12860,
+          "name": "node.exe",
+          "createdAt": "2026-10-12T10:31:24.1135460Z"
+        },
+        "exactPidAndBirthMatch": true
+      },
+      {
+        "before": {
+          "pid": 17772,
+          "parentPid": 22076,
+          "name": "powershell.exe",
+          "createdAt": "2026-10-12T10:31:24.1947530Z"
+        },
+        "after": {
+          "pid": 17772,
+          "parentPid": 22076,
+          "name": "powershell.exe",
+          "createdAt": "2026-10-12T10:31:24.1947530Z"
+        },
+        "exactPidAndBirthMatch": true
+      },
+      {
+        "before": {
+          "pid": 31064,
+          "parentPid": 17772,
+          "name": "codex.exe",
+          "createdAt": "2026-10-12T10:31:25.1386820Z"
+        },
+        "after": {
+          "pid": 31064,
+          "parentPid": 17772,
+          "name": "codex.exe",
+          "createdAt": "2026-10-12T10:31:25.1386820Z"
+        },
+        "exactPidAndBirthMatch": true
+      }
+    ],
+    "allOriginalProcessesSurvived": true,
+    "adoptedByNewController": true,
+    "postReloadOwnedProcesses": [
+      {
+        "pid": 22076,
+        "createdAt": "2026-10-12T10:31:24.1135460Z",
+        "name": "node.exe",
+        "parentPid": 12860,
+        "observedAt": "2026-10-12T10:45:12.466Z"
+      },
+      {
+        "pid": 17772,
+        "createdAt": "2026-10-12T10:31:24.1947530Z",
+        "name": "powershell.exe",
+        "parentPid": 22076,
+        "observedAt": "2026-10-12T10:45:12.466Z"
+      },
+      {
+        "pid": 31064,
+        "createdAt": "2026-10-12T10:31:25.1386820Z",
+        "name": "codex.exe",
+        "parentPid": 17772,
+        "observedAt": "2026-10-12T10:45:12.466Z"
+      }
+    ]
+  },
+  "progress": {
+    "appendOnlyObservation": {
+      "observedAt": "2026-10-12T10:47:50.9661699Z",
+      "baselineByteOffset": 576702,
+      "baselineObservedAt": "2026-10-12T10:45:16.4459964Z",
+      "currentBytes": 590568,
+      "logLastWriteAt": "2026-10-12T10:47:40.6277482Z",
+      "completedEvents": [
+        {
+          "type": "item.completed",
+          "id": "item_52",
+          "itemType": "agent_message",
+          "status": null,
+          "exitCode": null,
+          "changedPaths": []
+        },
+        {
+          "type": "item.completed",
+          "id": "item_53",
+          "itemType": "file_change",
+          "status": "completed",
+          "exitCode": null,
+          "changedPaths": [
+            "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n49-durable-offline-lease-20261012\\sw.js",
+            "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n49-durable-offline-lease-20261012\\tests\\n49-browser.config.mjs",
+            "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n49-durable-offline-lease-20261012\\tests\\n49-product.e2e.mjs"
+          ]
+        },
+        {
+          "type": "item.completed",
+          "id": "item_54",
+          "itemType": "command_execution",
+          "status": "failed",
+          "exitCode": 1,
+          "changedPaths": []
+        },
+        {
+          "type": "item.completed",
+          "id": "item_55",
+          "itemType": "command_execution",
+          "status": "completed",
+          "exitCode": 0,
+          "changedPaths": []
+        },
+        {
+          "type": "item.completed",
+          "id": "item_56",
+          "itemType": "agent_message",
+          "status": null,
+          "exitCode": null,
+          "changedPaths": []
+        },
+        {
+          "type": "item.completed",
+          "id": "item_57",
+          "itemType": "command_execution",
+          "status": "failed",
+          "exitCode": 1,
+          "changedPaths": []
+        }
+      ]
+    },
+    "newWorkStrictlyAfterPostReloadBaseline": true,
+    "ticketTestStatusIsSeparate": {
+      "state": "N49 still in implementation; no delivery acceptance asserted",
+      "leaseInvocationFailure": {
+        "eventId": "item_54",
+        "exitCode": 1,
+        "error": "PowerShell parameter default: Split-Path PSScriptRoot was empty when RuntimeRoot was omitted",
+        "recoveredAtEvent": "item_55",
+        "recovery": "Same attempt acquired browser lease successfully with explicit RuntimeRoot",
+        "recoveryExitCode": 0
+      },
+      "browserSuite": {
+        "eventId": "item_57",
+        "exitCode": 1,
+        "failedTests": 2,
+        "errors": [
+          "Dynamic import of local test server /src/lib/account-provisioning.js failed",
+          "REMINDER assertion received NORMAL after test clock advance"
+        ],
+        "interpretation": "Actual product/fixture checks are not yet passing; this does not invalidate proof that the original worker survived and continued work."
+      }
+    },
+    "heartbeatIsNotSoleEvidence": true,
+    "controllerLastEventAt": "2026-10-12T10:44:56.714Z",
+    "logLastWriteAt": "2026-10-12T10:45:15.3539207Z",
+    "logBytes": 576702,
+    "completedSourceInspectionCommandsObserved": [
+      {
+        "eventId": "item_48",
+        "status": "completed",
+        "exitCode": 0,
+        "commandPreview": "\"C:\\\\Users\\\\Abody\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe\" -Command \"Get-Content src/views/grades.js | Select-String -Pattern 'data-(act|change)|input' | Select-Object -First 20; Get-Content src/views/students.js | Select-String -Pattern 'data-(act|change)|rename' | Select-Object -First 20; Get-Content src/views/cross-class-reports.js | Select-String -Pattern 'data-act|csv' | Select-Object -First 15; Get-Content src/router.js | Select-String -Pattern 'backup|grades|cross' -Context 0,1; Get-Content sw.js | Select-Object -Skip 157 -Firs"
+      },
+      {
+        "eventId": "item_49",
+        "status": "completed",
+        "exitCode": 0,
+        "commandPreview": "\"C:\\\\Users\\\\Abody\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe\" -Command \"Select-String sw.js -Pattern 'sync-warning|visible-numerals|sync-status|fonts'; Get-Content index.html -TotalCount 55; Get-Content src/lib/thmanyah-font.js -TotalCount 50; Get-Content src/views/grades.js | Select-String -Pattern 'async score|score\\\\(el' -Context 0,24\""
+      },
+      {
+        "eventId": "item_50",
+        "status": "completed",
+        "exitCode": 0,
+        "commandPreview": "\"C:\\\\Users\\\\Abody\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe\" -Command \"@'\nimport fs from 'node:fs'; import path from 'node:path';\nconst sw=fs.readFileSync('sw.js','utf8'); const visited=new Set();\nfunction visit(file){ if(visited.has(file)||\"'!fs.existsSync(file))return; visited.add(file);const text=fs.readFileSync(file,'\"'utf8');for(const m of text.matchAll(/(?:from\\\\s*|import\\\\s*\\\\(\\\\s*)['\\\"](\\\\.\\\\.?\\\\/[\"'^'\"'\\\"]+)['\\\"]/g)){visit(path.posix.normalize(path.posix.join(path.posix.dirname(file),m[1])));}}\nvisit('src/app.js'); for(const fi"
+      },
+      {
+        "eventId": "item_51",
+        "status": "completed",
+        "exitCode": 0,
+        "commandPreview": "\"C:\\\\Users\\\\Abody\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\pwsh.exe\" -Command \"Select-String tests/account-provisioning.test.mjs -Pattern 'version|v51|v50' -Context 0,2; Get-Content scripts/generate-build-meta.mjs -TotalCount 115\""
+      }
+    ],
+    "timestampLimit": "Codex JSONL entries do not each contain a wall-clock timestamp; the controller event timestamp and filesystem mtime are reported separately. No per-command execution time is invented.",
+    "stderrEmpty": true
+  },
+  "queue": {
+    "snapshotAt": "2026-10-12T10:45:12.475Z",
+    "newControllerPid": 24120,
+    "runningCount": 1,
+    "pendingCount": 3,
+    "awaitingPOCount": 3,
+    "publisherIdle": true,
+    "n13Admitted": true,
+    "issues": []
+  },
+  "productRecords": {
+    "observedAt": "2026-10-12T10:45:16.4459964Z",
+    "rows": [
+      {
+        "id": "N84",
+        "updatedDate": "2026-10-12",
+        "status": "WAITING_PO - PRODUCTION VERIFIED"
+      },
+      {
+        "id": "N92",
+        "updatedDate": "2026-10-12",
+        "status": "WAITING_PO - PRODUCTION VERIFIED"
+      },
+      {
+        "id": "N95",
+        "updatedDate": "2026-10-12",
+        "status": "WAITING_PO - PRODUCTION VERIFIED"
+      }
+    ],
+    "allThreeProductionStatusesWritten": true,
+    "scope": "Actual ASCII status/date cells and empty current issues confirm the record update outcome; this certificate does not claim instrumented proof of which internal fallback branch ran."
+  },
+  "sourcePaths": {
+    "active": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\ACTIVE_TASKS.json",
+    "controllerIdentity": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\CONTROLLER_IDENTITY.json",
+    "n49Queue": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\continuous-n49-durable-offline-lease-20261012.json",
+    "n49Checkpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\checkpoint.json",
+    "n49Events": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\events.jsonl",
+    "n49Stderr": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n49-durable-offline-lease-20261012\\39bca96d-b838-4b6b-b77b-8d1d6ea1e5f2\\stderr.txt",
+    "productLedger": "C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md"
+  },
+  "limits": [
+    "Read-only observation only; no process was started/stopped by this observer except its own read-only PowerShell inventory commands.",
+    "No Codex session resumed or recreated during observation.",
+    "This demonstrates survival and adoption for this actual reload, not a 24-hour soak test.",
+    "This is an operations recovery receipt, not a production delivery receipt for N49."
+  ],
+  "status": "PASS"
+}

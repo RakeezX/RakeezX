@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "ticketId": "N84",
+  "taskId": "continuous-n84-quicklog-completion-20261012",
+  "candidateSha": "f0f9a693a8cbcca101ecce947279df55568df892",
+  "baseSha": "8e2d4800396996be43868a71057412afccd2150b",
+  "publishedSha": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+  "productionUrl": "https://rakeezx.com",
+  "at": "2026-10-12T10:35:11.614Z",
+  "status": "deployed",
+  "retryable": false,
+  "state": "DEPLOYED_AWAITING_PO",
+  "productionDeployed": true,
+  "verifiedAt": "2026-10-12T10:35:11.614Z",
+  "repository": "RakeezX/RakeezX",
+  "targetBranch": "main",
+  "deploymentId": "f0aaeff2-5c3c-4910-8239-55ec7266f28b",
+  "previewUrl": "https://f0aaeff2.rakeezx.pages.dev",
+  "providerStatus": "SUCCESS",
+  "provider": {
+    "checkRunId": "114770691408",
+    "headSha": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAt": "2026-10-12T10:34:43Z",
+    "completedAt": "2026-10-12T10:34:43Z",
+    "headBranch": null,
+    "deploymentId": "f0aaeff2-5c3c-4910-8239-55ec7266f28b",
+    "previewUrl": "https://f0aaeff2.rakeezx.pages.dev",
+    "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/f0aaeff2-5c3c-4910-8239-55ec7266f28b"
+  },
+  "currentMainSha": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+  "binding": {
+    "candidateSha": "f0f9a693a8cbcca101ecce947279df55568df892",
+    "declaredBaseSha": "8e2d4800396996be43868a71057412afccd2150b",
+    "mainAtPreparation": "b0834e785ccc7f2bcb50a20b812498f6687690c7",
+    "integrationSha": "35bfa86cfe81709651803ddc7efd6e6ad166d404",
+    "publishedSha": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+    "candidateAncestorOfPublished": true,
+    "previousMainAncestorOfPublished": true,
+    "mainContainsPublished": true,
+    "checkHeadShaMatches": true,
+    "kind": "merge"
+  },
+  "build": {
+    "status": "passed",
+    "startedAt": "2026-10-12T10:34:19.077Z",
+    "completedAt": "2026-10-12T10:34:21.786Z",
+    "integrationSha": "35bfa86cfe81709651803ddc7efd6e6ad166d404",
+    "publishedSha": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+    "kind": "standard-build",
+    "validationTier": "STANDARD",
+    "reusedVerifiedBuildSha": null,
+    "generatedPathsChanged": [
+      "src/generated/build-meta.generated.js"
+    ],
+    "commands": [
+      {
+        "command": "node.exe",
+        "args": [
+          "scripts/generate-build-meta.mjs"
+        ]
+      },
+      {
+        "command": "node.exe",
+        "args": [
+          "node_modules/vite/bin/vite.js",
+          "build"
+        ]
+      }
+    ]
+  },
+  "changedPaths": [
+    "src/views/grades.js",
+    "tests/n84-inline-quicklog.test.mjs",
+    "tests/n84-product-browser.mjs",
+    "tests/n84-release-scope.test.mjs"
+  ],
+  "sourceOnlyPaths": [
+    "tests/n84-inline-quicklog.test.mjs",
+    "tests/n84-product-browser.mjs",
+    "tests/n84-release-scope.test.mjs"
+  ],
+  "changedAssets": [
+    "src/views/grades.js"
+  ],
+  "productSourceChangeObserved": true,
+  "evidence": {
+    "immutable": {
+      "origin": "https://f0aaeff2.rakeezx.pages.dev",
+      "checkedAt": "2026-10-12T10:35:07.566Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/views/grades.js",
+          "urlPath": "src/views/grades.js",
+          "statusCode": 200,
+          "expectedSha256": "255292508bc62e7680786cf4142eed79a9633752f2ce64539c4f128bab5ec7eb",
+          "observedSha256": "255292508bc62e7680786cf4142eed79a9633752f2ce64539c4f128bab5ec7eb",
+          "bytes": 29075,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "bytes": 2971,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "9b153d138ce708acede510411e03ff4c2d3bf2dae249a1a41fa0a3a581be5733",
+          "observedSha256": "9b153d138ce708acede510411e03ff4c2d3bf2dae249a1a41fa0a3a581be5733",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    },
+    "production": {
+      "origin": "https://rakeezx.com",
+      "checkedAt": "2026-10-12T10:35:07.921Z",
+      "passed": true,
+      "assets": [
+        {
+          "repoPath": "src/views/grades.js",
+          "urlPath": "src/views/grades.js",
+          "statusCode": 200,
+          "expectedSha256": "255292508bc62e7680786cf4142eed79a9633752f2ce64539c4f128bab5ec7eb",
+          "observedSha256": "255292508bc62e7680786cf4142eed79a9633752f2ce64539c4f128bab5ec7eb",
+          "bytes": 29075,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "index.html",
+          "urlPath": "index.html",
+          "statusCode": 200,
+          "expectedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "observedSha256": "c57d12900492b0d9b53fa3ff7c349243497ebcc6cbae540f91062c9f5af2c74f",
+          "bytes": 3909,
+          "deleted": false,
+          "verified": true,
+          "normalization": "cloudflare-jsd-v1",
+          "normalizedSha256": "969f68b4e445e94a17502f4344aff369761bc34448e3c12ac878e164ab72320f",
+          "normalizedBytes": 2971,
+          "removedProviderBytes": 938,
+          "removedSha256": "0f5e4ada909f7fa6890c8be7e821fec1bdbf20321579f4731c468d21c9ebb17c"
+        },
+        {
+          "repoPath": "sw.js",
+          "urlPath": "sw.js",
+          "statusCode": 200,
+          "expectedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "observedSha256": "6e1d1a8e2ca4768241c647b0c1dc1e4b98a37fe4db8181665a7f479ae93bfd4b",
+          "bytes": 9584,
+          "deleted": false,
+          "verified": true
+        },
+        {
+          "repoPath": "src/generated/build-meta.generated.js",
+          "urlPath": "src/generated/build-meta.generated.js",
+          "statusCode": 200,
+          "expectedSha256": "9b153d138ce708acede510411e03ff4c2d3bf2dae249a1a41fa0a3a581be5733",
+          "observedSha256": "9b153d138ce708acede510411e03ff4c2d3bf2dae249a1a41fa0a3a581be5733",
+          "bytes": 358,
+          "deleted": false,
+          "verified": true
+        }
+      ]
+    }
+  },
+  "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n84-quicklog-completion-20261012\\integration-f0f9a693a8cb-1-8ef0b2a4",
+  "pushRecovered": false,
+  "poPersonallyTested": false,
+  "closed": false
+}
+
