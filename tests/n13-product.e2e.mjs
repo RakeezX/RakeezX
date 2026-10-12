@@ -37,7 +37,8 @@ async function createFirst(page) {
   });
 }
 
-test('account create/edit handlers share existing roster without cloning class or changing its label/color; duplicate rapid submit', async ({ page }) => {
+test('account single create form reuses roster; duplicate current-term subject stays open without writes; rapid submit', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await account(page);
   const first = await createFirst(page);
   const before = await page.evaluate(async first => {
@@ -46,8 +47,11 @@ test('account create/edit handlers share existing roster without cloning class o
     return Object.fromEntries(await Promise.all(['sections', 'students', 'enrollments'].map(async name => [name, await db.getAll(name)])));
   }, first);
   let dialog = await openCreate(page);
-  await dialog.locator('[name="sectionId"]').selectOption(first.section);
-  await expect(dialog.locator('[name="label"]')).toBeHidden();
+  await expect(dialog.locator('[name="sectionId"]')).toHaveCount(0);
+  await expect(dialog.locator('[name="grade"]')).toBeVisible();
+  await expect(dialog.locator('[name="label"]')).toBeVisible();
+  await dialog.locator('[name="grade"]').selectOption('4');
+  await dialog.locator('[name="label"]').fill('ا'); // Same normalized class label.
   await pickSubject(dialog, 'العلوم');
   await dialog.locator('form').evaluate(form => { form.requestSubmit(); form.requestSubmit(); });
   await expect(dialog).toHaveCount(0);
@@ -56,12 +60,33 @@ test('account create/edit handlers share existing roster without cloning class o
     const db = await import('/src/lib/db.js');
     return Object.fromEntries(await Promise.all(['sections', 'students', 'enrollments'].map(async name => [name, await db.getAll(name)])));
   })).toEqual(before);
+  const beforeDuplicate = await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    return Object.fromEntries(await Promise.all(db.STORES.map(async name => [name, await db.getAll(name)])));
+  });
   dialog = await openCreate(page);
-  await dialog.locator('[name="sectionId"]').selectOption(first.section);
+  await dialog.locator('[name="label"]').fill('أ');
   await pickSubject(dialog, 'العلوم');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
-  await expect(dialog).toHaveCount(0);
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#toast')).toContainText('هذه المادة موجودة مسبقًا');
+  expect(await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    return Object.fromEntries(await Promise.all(db.STORES.map(async name => [name, await db.getAll(name)])));
+  })).toEqual(beforeDuplicate);
+  // A custom alias for the same built-in subject must also remain read-only.
+  await dialog.locator('[data-subject-trigger]').click();
+  await dialog.locator('[data-subject-custom]').click();
+  await dialog.locator('[name="customSubjectName"]').fill('علوم');
+  await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#toast')).toContainText('هذه المادة موجودة مسبقًا');
+  expect(await page.evaluate(async () => {
+    const db = await import('/src/lib/db.js');
+    return Object.fromEntries(await Promise.all(db.STORES.map(async name => [name, await db.getAll(name)])));
+  })).toEqual(beforeDuplicate);
   expect(await page.evaluate(() => window.store.teachings().length)).toBe(2);
+  await dialog.getByRole('button', { name: 'إلغاء', exact: true }).click();
   await page.locator(`a[href="#/teaching/${first.teaching}"]`).click();
   await page.locator('[data-act="edit-sec"]').click();
   dialog = page.getByRole('dialog');
@@ -71,7 +96,9 @@ test('account create/edit handlers share existing roster without cloning class o
   await page.locator('[data-act="edit-sec"]').click();
   await page.getByRole('button', { name: 'إضافة مادة أخرى لهذا الفصل' }).click();
   dialog = page.getByRole('dialog');
-  await expect(dialog.locator('[name="sectionId"]')).toHaveValue(first.section);
+  await expect(dialog.locator('[name="sectionId"]')).toHaveCount(0);
+  await expect(dialog.locator('[name="grade"]')).toHaveValue('4');
+  await expect(dialog.locator('[name="label"]')).toHaveValue('ب');
   await pickSubject(dialog, 'البدنية');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
   await expect(dialog).toHaveCount(0);
@@ -81,6 +108,34 @@ test('account create/edit handlers share existing roster without cloning class o
     return { sectionCount: s.sections().length, teachingCount: s.teachings().length, label: s.getSection(first.section).label,
       rosterCounts: s.teachings().map(t => s.students(t.id).length), items: s.teachings().map(t => s.items(t.id).length) };
   }, first)).toEqual({ sectionCount: 1, teachingCount: 3, label: 'ب', rosterCounts: [1, 1, 1], items: [5, 5, 5] });
+});
+
+test('same subject in a previous term permits creation only in the current term on the same class', async ({ page }) => {
+  await account(page);
+  const first = await createFirst(page);
+  const previous = await page.evaluate(async () => {
+    const s = window.store;
+    const term = s.activeTerm();
+    const next = s.termsOf(term.yearId).find(candidate => candidate.id !== term.id && !s.isTermClosed(candidate.id));
+    if (!next) throw new Error('Synthetic fixture needs its second open term.');
+    await s.patchDevice({ activeTermId: next.id });
+    await s.save({ terms: [{ ...term, status: 'closed' }] }, { queue: false });
+    (await import('/src/repaint.js')).repaint();
+    return term.id;
+  });
+  const dialog = await openCreate(page);
+  await dialog.locator('[name="label"]').fill('أ');
+  await pickSubject(dialog, 'العربية');
+  await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.store.teachings().length)).toBe(1);
+  expect(await page.evaluate(({ first, previous }) => {
+    const s = window.store;
+    return { sections: s.sections().length, oldTeaching: s.teachings(previous)[0].id,
+      newSection: s.teachings()[0].sectionId, newSubject: s.teachings()[0].subjectId,
+      newItems: s.items(s.teachings()[0].id).length };
+  }, { first, previous })).toEqual({ sections: 1, oldTeaching: first.teaching,
+    newSection: first.section, newSubject: first.subject, newItems: 5 });
 });
 
 test('delete confirmation rechecks scope, prevents silent expansion and preserves retained data', async ({ page }) => {
@@ -127,11 +182,12 @@ test('actual Classes/create/edit/confirmation UI at mobile RTL and desktop, ligh
     await page.evaluate(async theme => { await window.store.patchDevice({ theme }); window.store.applyTheme(); }, theme);
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     let dialog = await openCreate(page);
-    await dialog.locator('[name="sectionId"]').selectOption(first.section);
+    await expect(dialog.locator('[name="sectionId"]')).toHaveCount(0);
+    await dialog.locator('[name="label"]').fill('أ');
     await pickSubject(dialog, 'العلوم');
     await expect(dialog.locator('[data-subject-selected]')).toHaveText('العلوم');
-    await expect(dialog.locator('[name="sectionId"] option:checked')).toContainText('أ');
-    await expect(dialog.locator('[name="grade"]')).toBeHidden();
+    await expect(dialog.locator('[name="label"]')).toHaveValue('أ');
+    await expect(dialog.locator('[name="grade"]')).toBeVisible();
     expect(await page.evaluate(() => ({ rtl: document.documentElement.dir, fit: document.documentElement.scrollWidth <= innerWidth + 1 }))).toEqual({ rtl: 'rtl', fit: true });
     await page.screenshot({ path: testInfo.outputPath(`create-${width}-${theme}.png`), animations: 'disabled' });
     await dialog.getByRole('button', { name: 'إلغاء', exact: true }).click();
@@ -161,7 +217,7 @@ test('actual Classes/create/edit/confirmation UI at mobile RTL and desktop, ligh
   });
   const demoFirst = await createFirst(page);
   const dialog = await openCreate(page);
-  await dialog.locator('[name="sectionId"]').selectOption(demoFirst.section);
+  await dialog.locator('[name="label"]').fill('أ');
   await pickSubject(dialog, 'العلوم');
   await dialog.getByRole('button', { name: 'إنشاء', exact: true }).click();
   await expect(dialog).toHaveCount(0);
