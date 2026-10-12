@@ -1,0 +1,26 @@
+{
+  "kind": "N54_NATIVE_LONG_PATH_PREPARATION",
+  "at": "2026-10-12T20:50:25.945Z",
+  "historicalMain": "b5e83107222833f5e74530a73355734d8477bd03",
+  "historicalPathLength": 149,
+  "ownedProbePath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\probes\\probe-longpaths-b9e83353xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "scope": "Disposable exact historical main checkout only; no candidate edits, build, push, deployment or live data",
+  "legacyJournalUnchanged": true,
+  "standardWindowsCheckout": {
+    "exitCode": 128,
+    "filenameTooLong": true,
+    "stderr": "Preparing worktree (detached HEAD b5e8310)\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/active-tasks-20261012T102138387Z.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/active-tasks-20261012T104850239Z.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/active-tasks-20261012T110710276Z.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/automations-current-proof.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/completion-activation-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/completion-install-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/continuation-activation-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/controller-reload-proof.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/followup-activation-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/lease-default-path-proof.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n49-production-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n49-running-20261012T110710268Z.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n49-worker-result.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n84-production-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n91-hosted-proof-pending-snapshot.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n91-resume-snapshot.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n92-production-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/n95-production-receipt.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/native-bootstrap-evidence.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/native-lease-date-evidence.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/native-postgres-capability-20261012.txt: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/operational-state-20261012T111443Z.json: Filename too long\nerror: unable to create file docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/report-automation-receipt.json: Filename too long\nfatal: Could not reset index file to revision 'HEAD'.\n"
+  },
+  "commandScopedLongpaths": {
+    "exitCode": 0,
+    "stderr": null
+  },
+  "longestPath": {
+    "relative": "docs/automation-evidence/20261012/qualified-results/evidence/continuous-delivery-20261012/native-postgres-capability-20261012.txt",
+    "fullLength": 279,
+    "exists": true
+  },
+  "result": "REPRODUCED_AND_RESOLVED",
+  "ownedProbeRemoved": true,
+  "finishedAt": "2026-10-12T20:50:28.120Z"
+}
