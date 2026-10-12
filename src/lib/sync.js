@@ -6,6 +6,7 @@ import { createSyncV2Engine, SYNC_V2_STORES } from './sync-v2.js';
 import { ownershipBlockedError, runtimeSyncOwnershipGuard } from './sync-ownership.js';
 import { isCurriculumOrdinarySyncAllowed } from './curriculum-bootstrap.js';
 import { createRemoteSync, browserRemoteLeadership } from './remote-sync.js';
+import { createSyncStatusSeverity, projectSyncStatusSeverity } from './sync-status-severity.js';
 
 export const state = {
   lastError: null,
@@ -62,6 +63,21 @@ let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
 let workspaceClaimRunning = false;
+const presentationSeverity = createSyncStatusSeverity();
+let presentationContextToken = null;
+function bindPresentationContext() {
+  const workspace = store.getActiveWorkspace();
+  const token = presentationSeverity.bind(cloud.session && cloud.user && workspace
+    ? JSON.stringify([cloud.user.id, workspace.databaseName, workspace.authUserId]) : null);
+  if (token !== presentationContextToken) {
+    presentationContextToken = token;
+    if (operationalSummaryCache.state === 'synced') {
+      operationalSummaryCache = Object.freeze({ ...operationalSummaryCache, state: 'pending',
+        lastSuccessfulSyncAt: null, cloudSyncHealthy: false });
+    }
+  }
+  return token;
+}
 const syncSettledWaiters = new Set();
 const v2Engine = createSyncV2Engine({
   ownershipGuard: runtimeSyncOwnershipGuard,
@@ -144,6 +160,11 @@ function assertCloudOwnership(operation = 'pull') {
 
 function coordinatorOperationalState(durable) {
   if (store.state.device?.studentLifecycleResume) return 'error';
+  if (durable.failedCount > 0) return 'error';
+  if (durable.rejectedCount > 0) return 'rejected';
+  if (state.status === 'blocked') return 'blocked';
+  if (cloud.authStatus?.().state === 'auth_required' || state.status === 'auth_required') return 'auth_required';
+  if (presentationSeverity.snapshot().hardFailure) return 'error';
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
@@ -182,7 +203,9 @@ function normalizeDurableSummary(durable = {}) {
   };
 }
 
-function cacheOperationalSummary(durable) {
+function cacheOperationalSummary(durable, expectedToken = null) {
+  const token = bindPresentationContext();
+  if (expectedToken && expectedToken !== token) return getSyncOperationalSummarySnapshot();
   const normalized = normalizeDurableSummary(durable);
   const currentState = coordinatorOperationalState(normalized);
   const reason = COORDINATOR_REASON[currentState] ?? [normalized.reasonCategory, normalized.reasonLabel];
@@ -208,18 +231,24 @@ function cacheOperationalSummary(durable) {
     localWorkSaved: true,
     cloudSyncHealthy: currentState === 'synced' && !normalized.actionableSyncIssue,
     safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume,
+    presentationSeverity: Object.freeze(presentationSeverity.snapshot()),
   });
-  return operationalSummaryCache;
+  return projectSyncStatusSeverity(operationalSummaryCache);
 }
 
 /** Fresh privacy-safe Sync health; never returns records, identities, patches, receipts, or raw errors. */
 export async function getSyncOperationalSummary() {
-  return cacheOperationalSummary(await v2Engine.status());
+  const token = bindPresentationContext();
+  return cacheOperationalSummary(await v2Engine.status(), token);
 }
 
 /** Synchronous last-known projection for existing render/diagnostic paths. */
 export function getSyncOperationalSummarySnapshot() {
-  return operationalSummaryCache;
+  bindPresentationContext();
+  // Rebind synchronously before any render; an old cache cannot certify a new
+  // account, and an async status read is still responsible for durable truth.
+  return projectSyncStatusSeverity({ ...operationalSummaryCache,
+    presentationSeverity: presentationSeverity.snapshot() });
 }
 
 async function pendingOutbox() {
@@ -471,6 +500,8 @@ export async function syncAll({ full = true, remote = false } = {}) {
   if (autoTimer) clearTimeout(autoTimer);
   autoTimer = null;
   autoRunning = true;
+  const presentationToken = bindPresentationContext();
+  let presentationErrors = null;
   remoteSync.beginSync();
   suppressAutoSchedule = true;
   setState({ lastError: null });
@@ -492,6 +523,7 @@ export async function syncAll({ full = true, remote = false } = {}) {
       return false;
     }
     const pullError = firstPullError(pull);
+    if (pullError) presentationErrors = pull.failures.map((failure) => failure.error);
     if (pullError) throw pullError;
     const pushed = await v2Engine.dispatchPending();
     madeProgress = pushed.acknowledged > 0;
@@ -516,6 +548,7 @@ export async function syncAll({ full = true, remote = false } = {}) {
       return false;
     }
     const postPullError = firstPullError(postPull);
+    if (postPullError) presentationErrors = postPull.failures.map((failure) => failure.error);
     if (postPullError) throw postPullError;
     // Never acknowledge the later marker: it may represent a write after an
     // earlier store was read. It requests trailing work, even if Broadcast was
@@ -530,8 +563,10 @@ export async function syncAll({ full = true, remote = false } = {}) {
     state.lastSyncedAt = lastSyncedAt;
     retryAttempt = 0;
     retryScheduled = false;
+    bindPresentationContext();
+    presentationSeverity.succeeded(presentationToken);
     setState({ status: v2Status.state, lastError: null });
-    cacheOperationalSummary(v2Status);
+    cacheOperationalSummary(v2Status, presentationToken);
     if (remoteCapture) remoteSync.afterFullSync(remoteCapture, true);
     if (remoteSync.diagnostics().pending) setState({ status: 'pending' });
     return true;
@@ -540,6 +575,8 @@ export async function syncAll({ full = true, remote = false } = {}) {
     failed = true;
     console.warn('[rakeezx sync] Automatic sync failed:', err);
     const needsAuth = cloud.isAuthRequiredError?.(err) || cloud.authStatus?.().state === 'auth_required';
+    bindPresentationContext();
+    presentationSeverity.failed(presentationToken, needsAuth ? [] : presentationErrors ?? [err]);
     setState({ status: needsAuth ? 'auth_required' : (isOnline() ? 'error' : 'offline'), lastError: err.message });
     return false;
   } finally {
@@ -549,7 +586,7 @@ export async function syncAll({ full = true, remote = false } = {}) {
     notify();
     try {
       const v2Status = await v2Engine.status();
-      cacheOperationalSummary(v2Status);
+      cacheOperationalSummary(v2Status, presentationToken);
       if (failed && cloud.authStatus?.().state !== 'auth_required') {
         rerunRequested = false;
         scheduleRetry();
@@ -658,6 +695,7 @@ export async function runWorkspaceClaimExclusive(task, { scheduleAutomatic = fal
  * if the logout request itself fails.
  */
 export async function suspendForWorkspaceDeactivation() {
+  presentationSeverity.clear();
   remoteSync.stop();
   fullRequested = false;
   remoteRequested = false;
@@ -716,10 +754,12 @@ export function init() {
   initialized = true;
   void getSyncOperationalSummary().catch(() => {});
   store.subscribe((_state, update) => {
+    bindPresentationContext();
     void remoteSync.refresh();
     if (!suppressAutoSchedule && update.syncReady) scheduleAutomaticSync();
   });
   cloud.subscribe(() => {
+    bindPresentationContext();
     void remoteSync.refresh();
     if (cloud.session && cloud.user) scheduleAutomaticSync({ full: true, immediate: true });
     else if (!cloud.session) {

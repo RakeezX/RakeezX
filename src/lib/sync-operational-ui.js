@@ -1,5 +1,6 @@
 /** Presentation only: all operational truth comes from the Production summary. */
 import { html, icon } from './dom.js';
+import { projectSyncStatusSeverity } from './sync-status-severity.js';
 
 const STATES = Object.freeze({
   synced: ['متزامن', 'بياناتك الحالية متزامنة مع السحابة.', 'badge--brand'],
@@ -21,9 +22,14 @@ function savedChanges(count) {
   return `${count} ${count >= 3 && count <= 10 ? 'تغييرات محفوظة' : 'تغييرًا محفوظًا'}`;
 }
 
-export function syncOperationalPresentation(summary = { state: 'idle' }) {
+export function syncOperationalPresentation(summary = { state: 'idle' }, now = Date.now()) {
+  summary = projectSyncStatusSeverity(summary, now);
   const status = Object.hasOwn(STATES, summary.state) ? summary.state : 'idle';
-  const [text, label, badge] = STATES[status];
+  let [text, label, badge] = STATES[status];
+  if (status === 'pending' && summary.presentationSeverity?.transient) {
+    text = 'بانتظار المزامنة';
+    label = 'لم تتأكد المزامنة مع السحابة بعد. سنحاول مرة أخرى.';
+  }
   const help = summary.actionableSyncIssue === true && ['error', 'blocked', 'rejected'].includes(status);
   // No retryability flag exists for rejected work: do not advertise retry as its remedy.
   const canSync = ['synced', 'pending', 'error', 'blocked'].includes(status) && !summary.automaticSyncActive;
@@ -32,6 +38,7 @@ export function syncOperationalPresentation(summary = { state: 'idle' }) {
 
 export function renderSyncOperationalSection(summary, { compact = false } = {}) {
   const ui = syncOperationalPresentation(summary);
+  summary = ui.summary;
   const last = summary.lastSuccessfulSyncAt;
   const lastText = last && Number.isFinite(new Date(last).getTime())
     ? new Date(last).toLocaleString('ar-SA-u-nu-latn', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }) : 'لم تتم بعد';
@@ -40,6 +47,7 @@ export function renderSyncOperationalSection(summary, { compact = false } = {}) 
   const countText = savedChanges(summary.queuedCount ?? 0);
   const secondary = ui.status === 'synced' ? `آخر مزامنة: ${lastText}`
     : firstSync ? countText
+    : ui.status === 'pending' && summary.presentationSeverity?.transient ? ui.label
     : ['pending', 'syncing'].includes(ui.status) ? countText
     : ui.status === 'idle' && summary.queuedCount > 0 ? `${countText} بانتظار أول مزامنة`
     : ui.status === 'error' ? `${summary.localWorkSaved ? 'بياناتك محفوظة على هذا الجهاز. ' : ''}${summary.automaticRetryActive ? 'سنحاول المزامنة مرة أخرى.' : 'أعد المزامنة أو تواصل مع الدعم.'}`
