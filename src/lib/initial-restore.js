@@ -10,6 +10,7 @@ import { projectSubitemScore, scoreCents, normalizeSubitemDatesAndPoints } from 
 
 export const CORE_RESTORE_PROTOCOL = 'CORE_V1';
 export const SCORE_RESTORE_PROTOCOL = 'CORE_V2';
+export const PORTABLE_RESTORE_DOMAIN = 'N71_V1';
 export const CORE_RESTORE_PAGE_SIZE = 500;
 export const CORE_RESTORE_MAX_ATTEMPTS = 3;
 export const CORE_V1_STORES = Object.freeze([
@@ -22,8 +23,11 @@ export const CORE_V1_ENTITIES = Object.freeze(CORE_V1_STORES.map((store) => SYNC
 export const CORE_V2_STORES = Object.freeze([...CORE_V1_STORES, 'scoreSubitems', 'scoreSubitemCompletions']);
 export const CORE_V2_ENTITIES = Object.freeze(CORE_V2_STORES.map((store) => SYNC_V2_SCHEMAS[store].entity));
 
-const FULL_RESTORE_ENTITIES = new Set([...CORE_V2_ENTITIES, 'units', 'lessons']);
-const RESTORE_STORES = (protocol) => protocol === SCORE_RESTORE_PROTOCOL ? CORE_V2_STORES : CORE_V1_STORES;
+export const PORTABLE_INITIAL_RESTORE_STORES = Object.freeze([...CORE_V2_STORES, 'units', 'lessons', 'assignments', 'submissions']);
+export const PORTABLE_INITIAL_RESTORE_ENTITIES = Object.freeze(PORTABLE_INITIAL_RESTORE_STORES.map(store => SYNC_V2_SCHEMAS[store].entity));
+const FULL_RESTORE_ENTITIES = new Set(PORTABLE_INITIAL_RESTORE_ENTITIES);
+const RESTORE_STORES = (protocol, portable = false) => portable ? PORTABLE_INITIAL_RESTORE_STORES :
+  protocol === SCORE_RESTORE_PROTOCOL ? CORE_V2_STORES : CORE_V1_STORES;
 const clone = (value) => value == null ? value : structuredClone(value);
 const stableManifest = (rows) => [...rows].sort((a, b) =>
   `${a.entity}\0${a.id}`.localeCompare(`${b.entity}\0${b.id}`));
@@ -36,15 +40,17 @@ function assertNotAborted(signal) {
   if (signal?.aborted) throw fail('RESTORE_ABORTED', 'Initial Restore was cancelled');
 }
 
-export function filterCoreRestoreManifest(input, { protocol = CORE_RESTORE_PROTOCOL } = {}) {
+export function filterCoreRestoreManifest(input, { protocol = CORE_RESTORE_PROTOCOL, portable = false } = {}) {
   if (!Array.isArray(input)) throw fail('RESTORE_MANIFEST_INVALID', 'Restore manifest must be an array');
   const seen = new Set();
   const core = [];
   for (const row of input) {
+    if (portable && row?.entity === '__n71__' &&
+        row.id === 'N71_V1' && row.revision === 1 && row.deleted === false) continue;
     if (!row || typeof row !== 'object' || !FULL_RESTORE_ENTITIES.has(row.entity)) {
       throw fail('RESTORE_MANIFEST_INVALID', 'Restore manifest contains an unexpected entity');
     }
-    if (!(protocol === SCORE_RESTORE_PROTOCOL ? CORE_V2_ENTITIES : CORE_V1_ENTITIES).includes(row.entity)) {
+    if (!RESTORE_STORES(protocol, portable).map(store => SYNC_V2_SCHEMAS[store].entity).includes(row.entity)) {
       if (protocol === CORE_RESTORE_PROTOCOL &&
           ['score_subitems', 'score_subitem_completions'].includes(row.entity)) {
         throw fail('RESTORE_PROTOCOL_REQUIRED', 'Subitem workspace requires CORE_V2');
@@ -65,8 +71,8 @@ export function filterCoreRestoreManifest(input, { protocol = CORE_RESTORE_PROTO
   return stableManifest(core);
 }
 
-export function manifestForCanonicalSnapshot(snapshot, { protocol = CORE_RESTORE_PROTOCOL } = {}) {
-  return stableManifest(RESTORE_STORES(protocol).flatMap((store) => (snapshot[store] ?? []).map((record) => ({
+export function manifestForCanonicalSnapshot(snapshot, { protocol = CORE_RESTORE_PROTOCOL, portable = false } = {}) {
+  return stableManifest(RESTORE_STORES(protocol, portable).flatMap((store) => (snapshot[store] ?? []).map((record) => ({
     entity: SYNC_V2_SCHEMAS[store].entity, id: record.id,
     revision: Number(record.serverRevision), deleted: record.deleted === true,
   }))));
@@ -84,6 +90,13 @@ export function assertScoreSnapshotInvariant(snapshot) {
   const completions = snapshot.scoreSubitemCompletions ?? [];
   const scores = new Map((snapshot.scores ?? []).filter((row) => !row.deleted)
     .map((row) => [`${row.studentId}\0${row.itemId}`, row]));
+  for (const score of scores.values()) {
+    const item = items.get(score.itemId);
+    if (item && !item.deleted && score.value != null &&
+        (scoreCents(score.value) < 0 || scoreCents(score.value) > scoreCents(item.max))) {
+      throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Score exceeds its current target maximum');
+    }
+  }
   for (const item of items.values()) {
     if (!item.deleted && item.scoreMode === 'subitems' &&
         !definitions.some((row) => row.itemId === item.id && !row.deleted)) {
@@ -154,9 +167,9 @@ function validateCanonicalRow(entity, row, ownerId) {
 }
 
 export async function fetchCoreSnapshot({ ownerId, cloud = cloudDefault, pageSize = CORE_RESTORE_PAGE_SIZE,
-  protocol = CORE_RESTORE_PROTOCOL, signal } = {}) {
+  protocol = CORE_RESTORE_PROTOCOL, portable = false, signal } = {}) {
   const snapshot = {};
-  for (const store of RESTORE_STORES(protocol)) {
+  for (const store of RESTORE_STORES(protocol, portable)) {
     const entity = SYNC_V2_SCHEMAS[store].entity;
     const rows = [];
     const seen = new Set();
@@ -181,21 +194,21 @@ export async function fetchCoreSnapshot({ ownerId, cloud = cloudDefault, pageSiz
 }
 
 export async function acquireConsistentCoreSnapshot({ ownerId, cloud = cloudDefault, attempts = CORE_RESTORE_MAX_ATTEMPTS,
-  protocol = CORE_RESTORE_PROTOCOL, signal } = {}) {
+  protocol = CORE_RESTORE_PROTOCOL, portable = false, signal } = {}) {
   let lastError = null;
-  const readManifest = protocol === SCORE_RESTORE_PROTOCOL
+  const readManifest = portable ? cloud.getUnifiedRestoreManifest.bind(cloud) : protocol === SCORE_RESTORE_PROTOCOL
     ? cloud.getScoreRestoreManifestV2.bind(cloud) : cloud.getSyncV2RestoreManifestFull.bind(cloud);
   for (let attempt = 1; attempt <= attempts; attempt++) {
     try {
       assertNotAborted(signal);
-      const m1 = filterCoreRestoreManifest(await readManifest({ signal }), { protocol });
+      const m1 = filterCoreRestoreManifest(await readManifest({ signal }), { protocol, portable });
       if (!m1.length) return { status: 'provisioning_required', manifest: m1, attempt };
-      const snapshot = await fetchCoreSnapshot({ ownerId, cloud, protocol, signal });
-      if (!manifestsEqual(manifestForCanonicalSnapshot(snapshot, { protocol }), m1)) {
+      const snapshot = await fetchCoreSnapshot({ ownerId, cloud, protocol, portable, signal });
+      if (!manifestsEqual(manifestForCanonicalSnapshot(snapshot, { protocol, portable }), m1)) {
         throw fail('RESTORE_SNAPSHOT_MISMATCH', 'Restore data does not match its manifest');
       }
       if (protocol === SCORE_RESTORE_PROTOCOL) assertScoreSnapshotInvariant(snapshot);
-      const m2 = filterCoreRestoreManifest(await readManifest({ signal }), { protocol });
+      const m2 = filterCoreRestoreManifest(await readManifest({ signal }), { protocol, portable });
       if (!manifestsEqual(m1, m2)) throw fail('RESTORE_CONCURRENT_CHANGE', 'Restore manifest changed');
       return { status: 'ready', manifest: m1, snapshot, attempt };
     } catch (error) {
@@ -229,11 +242,16 @@ export async function runInitialRestore({
   if (capability && (capability.scoreDomainVersion !== 1 || capability.restoreProtocol !== SCORE_RESTORE_PROTOCOL)) {
     throw fail('RESTORE_PROTOCOL_UNSUPPORTED', 'Server score restore protocol is unsupported');
   }
-  const protocol = capability ? SCORE_RESTORE_PROTOCOL : CORE_RESTORE_PROTOCOL;
+  const domainCapability = await cloud.getUnifiedRestoreCapability?.();
+  let portable = domainCapability?.protocol === PORTABLE_RESTORE_DOMAIN;
+  let protocol = capability ? SCORE_RESTORE_PROTOCOL : CORE_RESTORE_PROTOCOL;
   const databaseName = await accountWorkspaceDatabaseName(ownerId, { cryptoProvider });
   const matches = await registry.findByAuthUserId(ownerId);
   if (matches.length > 1) throw fail('WORKSPACE_REGISTRY_MISMATCH', 'Ambiguous account workspace');
   let pending = matches[0] ?? null;
+  // Finish an older interrupted Initial Restore with its original receipt binding.
+  if (pending?.ownershipState === 'restoring' &&
+      [CORE_RESTORE_PROTOCOL, SCORE_RESTORE_PROTOCOL].includes(pending.restore?.protocol)) protocol = pending.restore.protocol;
   if (pending?.ownershipState === 'claimed') {
     return { status: 'ready', workspace: (await resolveWorkspace({ type: 'account', authUserId: ownerId }, { registry, cryptoProvider })).workspace };
   }
@@ -263,7 +281,7 @@ export async function runInitialRestore({
 
   let acquired;
   try {
-    acquired = await acquireConsistentCoreSnapshot({ ownerId, cloud, protocol, signal });
+    acquired = await acquireConsistentCoreSnapshot({ ownerId, cloud, protocol, portable, signal });
   } catch (error) {
     if (pending?.restore?.restoreId && error?.code !== 'RESTORE_ABORTED') {
       await registry.updateAccountRestore(ownerId, pending.restore.restoreId, {
@@ -273,8 +291,12 @@ export async function runInitialRestore({
     throw error;
   }
   if (acquired.status === 'provisioning_required') return acquired;
-  const manifestJSON = JSON.stringify(acquired.manifest);
-  const manifestHash = await sha256(manifestJSON, cryptoProvider);
+  let manifestHash = await sha256(JSON.stringify(acquired.manifest), cryptoProvider);
+  if (pending && portable && pending.restore.manifestHash !== manifestHash) {
+    const legacy = await acquireConsistentCoreSnapshot({ ownerId, cloud, protocol, portable: false, signal });
+    const legacyHash = await sha256(JSON.stringify(legacy.manifest), cryptoProvider);
+    if (legacyHash === pending.restore.manifestHash) { acquired = legacy; manifestHash = legacyHash; portable = false; }
+  }
   const restoreId = pending?.restore?.restoreId ?? cryptoProvider?.randomUUID?.() ?? uid();
   pending = pending ?? await registry.beginAccountRestore(ownerId, {
     protocol, restoreId, manifestHash, phase: 'RESTORING',
