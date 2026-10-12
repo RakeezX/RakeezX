@@ -47,10 +47,21 @@ async function boot(browser,s,context) {
   assert.equal(await p.evaluate(()=>window.__n77Store.getActiveWorkspace().authUserId),s.accounts.find(a=>a.slot===context[0]).id);
   return {context:c,page:p};
 }
-async function flush(p) {
+export async function flush(p) {
   const r=await p.evaluate(async()=>{
     const sync=await import('/src/lib/sync.js');const db=await import('/src/lib/db.js');
-    const ok=await sync.syncAll({full:true});return {ok,state:sync.displayState(),outbox:await db.getAll('outbox')};
+    let result;
+    for(let attempt=0;attempt<3;attempt++) {
+      // The public coordinator returns false for an overlapping pass. Settle
+      // owned background work before requiring our own acknowledged full pass.
+      await sync.suspendForWorkspaceDeactivation();
+      const ok=await sync.syncAll({full:true});
+      const busy=!ok&&sync.displayState().status==='syncing';
+      await sync.suspendForWorkspaceDeactivation();
+      result={ok,state:sync.displayState(),outbox:await db.getAll('outbox')};
+      if(ok||!busy)break;
+    }
+    return result;
   });
   assert.equal(r.ok,true,JSON.stringify(r));assert.equal(r.outbox.length,0,JSON.stringify(r));
 }
@@ -107,9 +118,11 @@ export async function gate() {
         mutationId:ids.mutations[['t1','t2','outside'][i]],deviceId,teachingId:ids.teachings[i],
         sectionId:i===2?ids.outsideSection:ids.section,subjectId:i===1?ids.secondSubject:ids.subjectId,
         termId:ids.termId,order:i,itemIds:ids.itemIds[i],clientUpdatedAt:Date.now()});
-      for(let i=0;i<2;i++)await cloud.applySyncV2EnrollmentCommand({mutationId:ids.mutations[i?'outsideEnroll':'enroll'],deviceId,
+      // Current N13 permits one active membership per student. The student's
+      // outside Teaching score, rather than a second enrollment, shares identity.
+      for(let i=0;i<ids.enrollments.length;i++)await cloud.applySyncV2EnrollmentCommand({mutationId:ids.mutations.enroll,deviceId,
         command:'enroll',payload:{studentId:ids.student,sourceEnrollmentId:null,destinationEnrollmentId:ids.enrollments[i],
-          destinationSectionId:i?ids.outsideSection:ids.section,date:'2026-10-13',note:''},clientUpdatedAt:Date.now()});
+          destinationSectionId:ids.section,date:'2026-10-13',note:''},clientUpdatedAt:Date.now()});
     },ids);await flush(p);
     await p.evaluate(async ids=>{
       const s=window.__n77Store,models=await import('/src/models.js');
@@ -167,7 +180,7 @@ export async function gate() {
     assert.ok(selectedAfter.scores.find(r=>r.id===ids.scoreIds[0]).deleted_at);
     assert.ok(selectedAfter.notes.find(r=>r.id===ids.note).deleted_at);
     for(const [entity,unchangedIds]of Object.entries({sections:[ids.outsideSection],teachings:[ids.teachings[2]],
-      items:ids.itemIds[2],scores:[ids.scoreIds[2]],enrollments:[ids.enrollments[1]],students:[ids.student]}))
+      items:ids.itemIds[2],scores:[ids.scoreIds[2]],students:[ids.student]}))
       assert.deepEqual(selectedAfter[entity].filter(r=>unchangedIds.includes(r.id)),staleBefore[entity].filter(r=>unchangedIds.includes(r.id)),entity);
     mark('Product_DOM_selected_Teaching_receipt_and_independent_after',{receipt,selectedAfter});await checkpoint(s);
     const retry=await p.evaluate(async r=> (await import('/src/lib/cloud.js')).n77DeleteTeaching({teachingId:r.selectedTeachingId,sectionId:r.sectionId,
@@ -196,7 +209,9 @@ export async function gate() {
     const finalAfter=await serverObservation(p,s);
     assert.ok(finalAfter.sections.find(r=>r.id===ids.section).deleted_at);
     assert.equal(finalAfter.sections.find(r=>r.id===ids.outsideSection).deleted_at,null);
-    assert.equal(finalAfter.students[0].deleted_at,null);assert.equal(finalAfter.enrollments.find(r=>r.id===ids.enrollments[1]).deleted_at,null);
+    assert.equal(finalAfter.students[0].deleted_at,null);
+    assert.ok(finalAfter.enrollments.find(r=>r.id===ids.enrollments[0]).deleted_at);
+    assert.equal(finalAfter.scores.find(r=>r.id===ids.scoreIds[2]).deleted_at,null);
     mark('Product_DOM_final_Section_shared_student_outside_preserved',finalAfter);
     await flush(A2.page);assert.equal(await A2.page.evaluate(id=>window.__n77Store.getSection(id),ids.section),null);
     await p.screenshot({path:path.join(PRIVATE,'Product-final.tmp'),type:'png'});
