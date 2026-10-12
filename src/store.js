@@ -28,10 +28,10 @@ const db = new Proxy(rawDB, { get(target, name) {
 } });
 import { getScoreFoundationCapability } from './lib/cloud.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
-import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
+import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, createSyncV2Engine } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
-import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
+import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents, distributionTargets, planDistribution } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -3425,6 +3425,7 @@ export const scoreSubitemsOf = (itemId) => sortByOrder(live(state.scoreSubitems)
 const scoreFoundationScope = () => ({
   items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {},
   students: {}, sections: {}, teachings: {}, terms: {}, outbox: {},
+  units: {}, lessons: {}, logs: {}, attendance: {},
 });
 
 async function commitScoreFoundation(prepare) {
@@ -3737,6 +3738,11 @@ function eligibleScoreCopyTargets(current, sourceTeachingId) {
 }
 
 export function previewScoreDistributionCopy(sourceTeachingId) {
+  return distributionTargets(state, sourceTeachingId, activeWorkspace?.authUserId ?? null)
+    .map(teaching => ({ teachingId: teaching.id, sectionId: teaching.sectionId }));
+}
+
+export function previewLegacyScoreDistributionCopy(sourceTeachingId) {
   const current = state;
   const targets = eligibleScoreCopyTargets(current, sourceTeachingId);
   const incoming = current.items.filter((row) => row.teachingId === sourceTeachingId && !row.deleted)
@@ -3747,6 +3753,104 @@ export function previewScoreDistributionCopy(sourceTeachingId) {
       current.scoreSubitems.filter((row) => row.itemId === item.id),
       current.items.filter((row) => row.teachingId === teaching.id), current.scoreSubitems) })),
   }));
+}
+
+const reviewedDistributions = new Map();
+const distributionReviewKey = (source, targets, removals) => JSON.stringify([
+  activeWorkspace?.databaseName, source, [...targets].sort(), [...removals].sort(),
+]);
+const isDistributionDemo = () => activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
+
+async function requireDistributionAccount() {
+  assertCloudRestoreWritable(); assertLeaseWritable();
+  if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
+      cloud.user?.id !== activeWorkspace.authUserId || !cloud.session || globalThis.navigator?.onLine === false) {
+    throw new Error('اتصل بالإنترنت وسجّل الدخول لمراجعة توزيع الفصول.');
+  }
+  const ownership = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: cloud.user.id });
+  if (!ownership.allowed) throw new Error('تعذّر التحقق من ملكية مساحة العمل.');
+  const capability = await cloud.getScoreDistributionCapability();
+  if (capability?.distributionApplyVersion !== 2 || capability?.protocol !== 'N73_D119_V2') {
+    throw new Error('خادم نسخ التوزيع يحتاج إلى تحديث. النسخ السابق ما زال متاحًا.');
+  }
+  if ((await db.getAll('outbox')).some(row => row.protocol === 'v2' && !['superseded'].includes(row.state))) {
+    throw new Error('أكمل مزامنة التغييرات الحالية قبل مراجعة التوزيع.');
+  }
+}
+
+/** Demo uses the same bounded definition/score rules; accounts review server state. */
+export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds, { removeItemIds = [] } = {}) {
+  if (isDistributionDemo()) return planDistribution(state, sourceTeachingId, targetTeachingIds, {
+    ownerId: null, removeItemIds, id: uid,
+  });
+  return (async () => {
+    await requireDistributionAccount();
+    const owner = cloud.user.id, workspace = activeWorkspace.databaseName;
+    const plan = await cloud.planScoreDistribution({ planId: uid(), sourceTeachingId, targetTeachingIds, removeItemIds });
+    if (cloud.user?.id !== owner || activeWorkspace?.databaseName !== workspace ||
+        plan?.protocol !== 'N73_D119_V2' || !Array.isArray(plan.targets) || !plan.token || !plan.planId) {
+      throw new Error('تعذّر التحقق من مراجعة التوزيع.');
+    }
+    reviewedDistributions.set(distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds), plan);
+    return plan;
+  })();
+}
+
+async function applyReviewedCommand(command, recordId, patch) {
+  const engine = createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
+    currentAuthenticatedUserId: () => cloud.user?.id ?? null });
+  const queued = await engine.queueCommand({ store: 'items', recordId, command, patch });
+  const result = await engine.dispatchPending({ onlyMutationId: queued.mutationId });
+  if (result.acknowledged !== 1) {
+    const pending = await db.get('outbox', queued.id);
+    throw new Error(pending?.state === 'rejected'
+      ? 'تغيّر التوزيع أو تعذّر قبول التطبيق؛ راجع التغييرات قبل المحاولة الجديدة.'
+      : 'تعذّر تأكيد التطبيق. طلبك محفوظ للمزامنة وإعادة المحاولة الآمنة.');
+  }
+  const changes = [];
+  for (const store of ['items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores']) {
+    changes.push(...(await db.getAll(store)).map(row => ({ store, id: row.id })));
+  }
+  await absorb(changes); broadcast(changes);
+}
+
+/** No optimistic account writes: a durable command adopts one canonical receipt. */
+export async function applyReviewedScoreDistribution(sourceTeachingId, targetTeachingIds, {
+  expectedToken, removeItemIds = [], confirmed = false,
+} = {}) {
+  if (typeof expectedToken !== 'string') throw new Error('راجع التوزيع قبل التطبيق.');
+  if (isDistributionDemo()) {
+    let result;
+    await commitScoreFoundation(current => {
+      const plan = planDistribution(current, sourceTeachingId, targetTeachingIds, {
+        ownerId: null, removeItemIds, id: uid, stamp: now(),
+      });
+      if (plan.token !== expectedToken) throw new Error('تغيّر التوزيع أو الدرجات منذ المراجعة.');
+      if (plan.requiresConfirmation && !confirmed) throw new Error('تغييرات الدرجات تتطلب تأكيد الأثر.');
+      result = { changedCount: plan.changedCount, targets: plan.targets };
+      return plan.writes;
+    });
+    return result;
+  }
+  await requireDistributionAccount();
+  const key = distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds);
+  const plan = reviewedDistributions.get(key);
+  if (!plan || plan.token !== expectedToken) throw new Error('راجع التوزيع قبل التطبيق.');
+  if (plan.requiresConfirmation && !confirmed) throw new Error('تغييرات الدرجات تتطلب تأكيد الأثر.');
+  await applyReviewedCommand('score:distribution_apply', sourceTeachingId, { planId: plan.planId,
+    token: plan.token, confirmed });
+  reviewedDistributions.delete(key);
+  return { changedCount: plan.changedCount, targets: plan.targets, excludedTargets: plan.excludedTargets };
+}
+
+export async function renameScoreParent(itemId, name) {
+  const item = state.items.find(row => row.id === itemId && !row.deleted);
+  const trimmed = String(name ?? '').trim();
+  if (!item || !trimmed || trimmed.length > 50) throw new Error('تحقق من اسم البند.');
+  if (isDistributionDemo()) return patch('items', itemId, { name: trimmed });
+  await requireDistributionAccount();
+  await applyReviewedCommand('score:rename', itemId, { itemId, name: trimmed, revision: item.serverRevision });
+  return true;
 }
 
 /** One-time definition copy. A conflict choice is "keep" or "add"; replacement is unsupported. */

@@ -19,6 +19,7 @@ import {
 } from '../src/lib/backup-v2.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { renewSyntheticLease } from './n73-live/local-env.mjs';
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
 const emptyServer = () => Object.fromEntries(SYNC_V2_STORES.map((name) => [name, []]));
@@ -42,6 +43,7 @@ beforeEach(async () => {
   await activateSyntheticAccountWorkspace({ ownerId: OWNER });
   await db.clearAll();
   await store.init();
+  await renewSyntheticLease(OWNER);
 });
 
 afterEach(async () => {
@@ -79,7 +81,8 @@ test('V5 backup survives disposable wipe/replace with mixed direct and SUBITEM p
         distributionMode: 'manual', portabilityGroupId: null },
     ],
     scoreSubitems: [
-      { id: 'sub:three', itemId: 'item:sub', name: 'three', value: 3, order: 0 },
+      { id: 'sub:three', itemId: 'item:sub', name: 'three', value: 3, order: 0,
+        distributionOriginId: 'source:sub:three', createdAt: 123, startDate: null, dueDate: null, latePoints: null },
       { id: 'sub:deleted', itemId: 'item:sub', name: 'old', value: 2, order: 1, deleted: true },
     ],
     scoreSubitemCompletions: [
