@@ -6,7 +6,7 @@ import * as cloud from '../src/lib/cloud.js';
 import * as store from '../src/store.js';
 import * as sync from '../src/lib/sync.js';
 import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
-import { buildBackup, DEVICE_ONLY_STORES } from '../src/lib/export.js';
+import { buildBackup, DEVICE_ONLY_STORES, validateBackupIntegrity } from '../src/lib/export.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES, createSyncV2Engine } from '../src/lib/sync-v2.js';
 import { PORTABLE_CLOUD_RESTORE_STORES, planCloudRestore, restoreBackupToCloud, resumeCloudRestore, getCloudRestoreResumeState } from '../src/lib/backup-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
@@ -49,6 +49,9 @@ test('every portable store has the same manifest/stage/finalize/reconcile/ordina
   await resumeCloudRestore({transport,coordinator,canonicalFetcher:async()=>canonical});
   assert.deepEqual(calls[0],calls[1]);assert.equal(await getCloudRestoreResumeState(),null);
   for(const name of Object.keys(rows))assert.equal((await db.getAll(name)).length,1);
+  const immediateExport=await buildBackup({sourceOwnerId:OWNER});
+  assert.equal((await validateBackupIntegrity(immediateExport)).ok,true,'Canonical reconcile must export a valid V5 backup before another ordinary Sync');
+  for(const name of Object.keys(rows))assert.ok(immediateExport.baselines[name][0].value);
   const manifest=filterCoreRestoreManifest([...Object.entries(canonical).flatMap(([entity,list])=>list.map(row=>({entity,id:row.id,revision:1,deleted:false}))),{entity:'__n71__',id:'N71_V1',revision:1,deleted:false}],{protocol:SCORE_RESTORE_PROTOCOL,portable:true});
   assert.deepEqual(manifest,manifestForCanonicalSnapshot(Object.fromEntries(await Promise.all(portable.map(async name=>[name,await db.getAll(name)]))),{protocol:SCORE_RESTORE_PROTOCOL,portable:true}));
   const reads=[];const engine=createSyncV2Engine({transport:{async fetchRecords(entity){reads.push(entity);return canonical[entity];}}});

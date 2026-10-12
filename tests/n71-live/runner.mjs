@@ -22,7 +22,7 @@ const load=async()=>JSON.parse(await fs.readFile(stateFile,'utf8'));
 const evidence=async state=>{await fs.mkdir('coverage/n71-current',{recursive:true});
   await fs.writeFile('coverage/n71-current/live-result.json',JSON.stringify({taskId:TASK,runId:RUN,candidateSha:state.candidateSha,
     phase:state.phase,checks:state.checks,cleanup:state.cleanup,error:state.error},null,2));};
-const publicError=error=>({name:error?.name,code:error?.code??null,message:String(error?.message??error).slice(0,400)});
+const publicError=error=>({name:error?.name,code:error?.code??null,message:String(error?.message??error).slice(0,400),stack:String(error?.stack??'').split('\n').slice(0,8).join('\n')});
 function check(state,name,evidence){state.checks.push({name,status:'PASS',evidence});}
 async function wire(endpoint,body,headers={}) {
   const response=await fetch(url+endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
@@ -168,12 +168,17 @@ async function run(){
     const a=await login(state,browser,'A','A1',true);pages.push(a);
     const b=await login(state,browser,'B','B1',true);pages.push(b);
     const seed=await payload(a.page,state.fixture);await restore(a.page,seed,'n71:'+RUN+':seed');
-    const exported=await payload(a.page);for(const name of Object.keys(exported.data))assert.ok(exported.data[name].length>0,`Domain ${name} has no portable fixture`);
+    const exported=await payload(a.page);
+    const exportedValidation=await a.page.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),exported);
+    assert.equal(exportedValidation.ok,true,'Immediate full-domain export invalid: '+JSON.stringify(exportedValidation));
+    for(const name of Object.keys(exported.data))assert.ok(exported.data[name].length>0,`Domain ${name} has no portable fixture`);
     check(state,'full_domain_export','Actual authenticated client export contains nonempty records in every portable Product store; current calendar foundation and mixed score provenance retained');
     const changed=await payload(a.page,{}, {store:'students',id:state.productIds.student,patch:{note:'after canonical restore'}});
     assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before restore boundary');
-    const preview=await a.page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),changed);assert.equal(preview.plan.ready,true);
-    const wrong=await b.page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),changed);assert.equal(wrong.plan.ready,false);
+    const preview=await a.page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),changed);
+    assert.equal(preview.validation.ok,true,JSON.stringify(preview.validation));assert.equal(preview.plan?.ready,true);
+    const wrong=await b.page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),changed);
+    assert.equal(wrong.validation.ok,true,JSON.stringify(wrong.validation));assert.equal(wrong.plan?.ready,false);
     const forbidden=await b.page.evaluate(async owner=>{const c=await import('/src/lib/cloud.js');const response=await fetch(c.SUPABASE_URL+'/rest/v1/rpc/n71_restore_manifest',
       {method:'POST',headers:{apikey:'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_',Authorization:'Bearer '+c.session.access_token,
         'Content-Type':'application/json','Accept-Profile':'rakeezx','Content-Profile':'rakeezx'},body:JSON.stringify({p_owner:owner})});
