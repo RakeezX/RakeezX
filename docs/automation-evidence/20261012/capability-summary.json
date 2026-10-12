@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "observedOn": "2026-10-12",
+  "readOnlyInvestigation": true,
+  "modelTurnsStarted": 0,
+  "project": {
+    "name": "RakeezX Main",
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "region": "ap-south-1",
+    "observedStatus": "ACTIVE_HEALTHY",
+    "productSchema": "rakeezx",
+    "sourceSha": "deb882f6aa481298667b25609bb4e045004d3207"
+  },
+  "finding": "The current local Codex runtime already exposes an enabled and callable Supabase app. The prior generic missing-connector/database-deploy blocker is stale. Auth-admin fixture provisioning is not exposed as a direct connector tool, but a bounded protected server-side adapter is supported by existing Edge Function deployment and official Auth Admin APIs.",
+  "exactChecks": [
+    {
+      "check": "codex mcp list --json, projected to names only",
+      "result": {
+        "serverCount": 3,
+        "names": [
+          "codex_app",
+          "cua_repl",
+          "node_repl"
+        ]
+      },
+      "meaning": "Static list does not enumerate the dynamic codex_apps connector surface."
+    },
+    {
+      "check": "Actual local codex app-server --help",
+      "result": "Supports --stdio and schema generation; used --stdio without changing config."
+    },
+    {
+      "check": "initialize + initialized; mcpServerStatus/list {detail:toolsAndAuthOnly,limit:100}",
+      "result": {
+        "serverCount": 4,
+        "codexAppsToolCount": 513,
+        "supabaseToolCount": 29,
+        "nextCursor": false
+      },
+      "meaning": "Supabase tool names are present in the worker's real local app-server runtime."
+    },
+    {
+      "check": "app/installed {forceRefresh:false}",
+      "result": {
+        "installedApps": 19,
+        "supabaseAppId": "asdk_app_69d3e5ee6a708191baa733f7b8931995",
+        "enabled": true,
+        "callable": true
+      }
+    },
+    {
+      "check": "app/read {appIds:[known installed Supabase app ID],includeTools:true}",
+      "result": {
+        "apply_migration": {
+          "isEnabled": true,
+          "isReadOnly": false
+        },
+        "execute_sql": {
+          "isEnabled": true,
+          "isReadOnly": false
+        },
+        "deploy_edge_function": {
+          "isEnabled": true,
+          "isReadOnly": false
+        }
+      },
+      "meaning": "Effective tools are exposed/enabled, not proof that a mutation was attempted or completed."
+    },
+    {
+      "check": "app/list catalog metadata",
+      "result": {
+        "status": "UNAVAILABLE",
+        "code": -32603
+      },
+      "meaning": "General catalog read error; direct app/read, installed state and tool inventory succeeded independently."
+    },
+    {
+      "check": "Probe completion",
+      "result": {
+        "exitCode": 0,
+        "runtimeSeconds": 2.93
+      },
+      "meaning": "Only own temporary app-server child was closed; no thread/start, turn/start, tools/call, config change or auth output."
+    },
+    {
+      "check": "Supabase connector list_projects/list_migrations/list_edge_functions",
+      "result": "Read-only calls succeeded for the active named project; relevant applied migrations and the existing support worker were observed."
+    },
+    {
+      "check": "Metadata-only SQL privilege query",
+      "query": "SELECT current_user, session_user, current_setting('transaction_read_only') AS transaction_read_only, has_schema_privilege(current_user,'public','CREATE') AS can_create_in_public, has_database_privilege(current_user,current_database(),'CREATE') AS can_create_schema;",
+      "result": {
+        "current_user": "postgres",
+        "session_user": "postgres",
+        "transaction_read_only": "off",
+        "can_create_in_public": true,
+        "can_create_schema": true
+      },
+      "meaning": "Authenticated database metadata access and role privileges. No DDL/DML or Auth mutation tested."
+    },
+    {
+      "check": "pg_proc metadata and bounded pg_get_functiondef on the teaching creation wrapper and its delegate",
+      "result": "Actual deployed source reads succeeded. See deployed-teaching-creation.readonly.json. No Product RPC was invoked and no data rows were read."
+    },
+    {
+      "check": "Get-Command supabase -ErrorAction SilentlyContinue",
+      "result": "No Supabase CLI in PATH",
+      "meaning": "Not a blocker because the current local Codex connector exposes the official service operations already."
+    },
+    {
+      "check": "Tracked source reads pinned to sourceSha",
+      "result": "N13 createTeaching, deleteTeaching/deleteClass and UI add flow; N49 authoritative /user verifier, registry, workspace routing, cloud subscription and store/command write boundaries inspected."
+    }
+  ],
+  "directConnectorToolBoundary": {
+    "availableAndEnabled": [
+      "apply_migration",
+      "execute_sql",
+      "deploy_edge_function",
+      "list_migrations",
+      "list_edge_functions",
+      "get_edge_function",
+      "get_publishable_keys",
+      "search_docs"
+    ],
+    "notPresentInObservedInventory": [
+      "get_api_keys",
+      "Auth admin createUser",
+      "Auth admin getUserById",
+      "Auth admin listUsers",
+      "Auth admin deleteUser",
+      "invoke_edge_function",
+      "set_secret",
+      "delete_edge_function"
+    ],
+    "keysInspection": "Names/schema only. get_publishable_keys is public/anon keys only and was not invoked. No project secret, environment value, vault value, credential file or Auth session JSON was read or output.",
+    "furtherProofNeeded": "A future service mutation must still show the exact scoped operation and real receipt. Introspection alone does not prove its success."
+  },
+  "deployedMetadata": {
+    "migrationsObserved": [
+      "0016 sync_v2_teaching_creation_commands",
+      "0023 sync_v2_backup_restore",
+      "0031 curriculum_sync_v2",
+      "0032 account_profile_access_foundation",
+      "0033 score_subitem_foundation",
+      "0034 score_subitem_guard_acl_hardening",
+      "20260924003436 beta_new_account_provisioning",
+      "20260924173929 security_definer_direct_execute_hardening",
+      "20260926115629 owner_sync_invalidation",
+      "20261005052506 n58_calendar_persistence",
+      "20261005052526 n58_extra_term_compatibility",
+      "20261005052550 n58_effective_scope_revalidation",
+      "20261007230123 n77_server_validated_delete"
+    ],
+    "functionPresence": [
+      {
+        "name": "apply_sync_v2_teaching_creation_command",
+        "evidence": "Source inspected: auth.uid guard; owner lifecycle lock; delegate checks each referenced owner record, locks natural identity, guards retry envelope and stores canonical result."
+      },
+      {
+        "name": "apply_score_distribution_copy_command",
+        "evidence": "Metadata: existing single-target signature including source item/revision and target Teaching. This does not certify D-119 multi-target grade-preserving apply."
+      },
+      {
+        "name": "n77_delete_teaching",
+        "evidence": "Metadata: existing server RPC with expected Section/fingerprint, mutation/device and commit flag. Presence is not proof of the current client's receipt, stale-device and restore behavior."
+      },
+      {
+        "name": "n58_guard_calendar_contract / n58_restore_creating_year",
+        "evidence": "Metadata present; authenticated execution not granted for these internal helper functions."
+      },
+      {
+        "name": "canonical restore/stage/finalize/manifest and score v2 functions",
+        "evidence": "Metadata present; complete domain coverage and failure/retry behavior not established by name inspection."
+      }
+    ],
+    "edgeFunctions": [
+      {
+        "name": "support-notification-worker",
+        "version": 7,
+        "status": "ACTIVE",
+        "verify_jwt": false,
+        "purpose": "Existing N34-specific worker; do not repurpose for Auth-admin fixture setup or claim it implements N44/N78."
+      }
+    ]
+  },
+  "newlyEligible": [
+    {
+      "productId": "N13",
+      "reason": "Real store/server protocol already supports existing Section + new Teaching; current add UI always creates a Section. A client integration/routing card can use the unchanged server contract and current retained-data blockers."
+    },
+    {
+      "productId": "N49",
+      "reason": "The authoritative Auth identity verifier, durable owner/workspace registry and write boundaries exist. A durable local lease must still be implemented; it can reuse those contracts without a new privileged server API. This is not merely a threshold edit."
+    }
+  ],
+  "stillSeparate": {
+    "authFixtures": "D-087 authorizes exactly two disposable synthetic A/B accounts and purpose-created N58 fixtures; authorization persists. No account/session was created in this investigation. Its scope does not automatically authorize unrelated real-account reads or Product admin roles.",
+    "n78": "Initial trusted administrator identity and exact server-owned role/permission policy remain unestablished; GitHub ADMIN and possession of SQL access are not an application admin contract.",
+    "productionAcceptance": "No Product status, runtime queue, worker activation or deployment was changed by this follow-up."
+  },
+  "proposedD087Adapter": {
+    "status": "Documented feasible implementation proposal; no function deployed and no credentials created.",
+    "scope": "One temporary operations function on the existing project, exactly one predeclared D-087 run and two preallocated UUIDs. No Product-wide admin UI, new project, branch, subscription, Auth policy or user role changes.",
+    "secureInvocation": "The executor generates a high-entropy per-run capability and fixture credentials into a private local file before any service operation. Only the capability hash, short expiry, run identity and two fixed fixture IDs/emails appear in function source. Handler requires POST, exact request shape and valid capability proof before any admin work, rejects arbitrary target/role fields, enforces a short server-time expiry and returns only scoped status/IDs. Supabase's custom-auth pattern permits verify_jwt=false only because handler authentication is implemented; the body must never treat any public/ordinary user key as administrator authority.",
+    "serverCredential": "Read SUPABASE_SECRET_KEYS.default, or the documented legacy SUPABASE_SERVICE_ROLE_KEY, only inside the Edge Function to construct the official admin client. Return only whether configuration exists during the protected read-only capability probe. Never retrieve, echo, forward or persist the server key outside the server.",
+    "fixedIdentityRecovery": "Official current AdminUserAttributes includes id and the Auth server accepts an explicit UUID at create time. Preallocate A/B IDs in the private manifest, then call getUserById only for those exact IDs before create/retry. An existing ID must match the server-owned run marker and fixed synthetic identity; otherwise stop without updating/deleting it. This avoids listing unrelated Auth users and recovers a lost post-create response without creating extra accounts.",
+    "operations": "Use official auth.admin.createUser with the two fixed IDs, strong locally generated passwords, normal authenticated role, email_confirm as required for the synthetic test and server-owned run markers. No SQL inserts into auth.users/identities, manufactured JWTs, policy toggles or contact with real users. Local runner signs into these two accounts through the normal Auth API and keeps sessions out of model/log/repo output. Execute only authorized N58 fixture scenarios under one live-mutation owner.",
+    "disposition": "Inspect exact before/after and fixture ownership through the manifest. Delete only the two proven run accounts and their authorized disposable fixtures through the official scoped API when the chosen disposition requires it. Redeploy this new operations function to deny-all after completion if deletion is unavailable in the connector; TTL already prevents late use. Preserve a nonsecret receipt with exact IDs, count, outcome and disposition. Do not modify support-notification-worker.",
+    "nextConcreteAction": "Prepare and locally verify the small protected handler and private runner, then root can use enabled deploy_edge_function for this exact scope. First perform a protected configuration-only probe plus unauthenticated/wrong-capability rejection. Only after that real capability succeeds perform the already authorized D-087 A/B work. A failure reports the exact function/auth capability instead of restoring a generic missing-Supabase blocker.",
+    "costBoundary": "Uses existing installed connector and Supabase project; no paid OpenAI API fallback or new subscription/configuration. Existing service quotas still apply; no assertion of unlimited or zero metered usage."
+  },
+  "sources": [
+    {
+      "url": "https://learn.chatgpt.com/docs/app-server",
+      "topic": "Read-only installed app/tool metadata APIs; local CLI was checked first."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/ai-tools/mcp",
+      "topic": "Official connector/tool feature groups."
+    },
+    {
+      "url": "https://supabase.com/docs/reference/javascript/auth-admin-createuser",
+      "topic": "Auth admin createUser is server-only."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/functions/secrets",
+      "topic": "Default server-injected secret and service-role environment variables."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/functions/auth",
+      "topic": "User/secret/custom authentication and handler responsibility."
+    },
+    {
+      "url": "https://github.com/supabase/supabase-js/blob/master/packages/core/auth-js/src/lib/types.ts",
+      "topic": "Official current AdminUserAttributes.id and server-owned app metadata."
+    },
+    {
+      "url": "https://github.com/supabase/auth/blob/master/internal/api/admin.go",
+      "topic": "Official Auth admin create accepts explicit UUID; exact-ID recovery design."
+    }
+  ]
+}

@@ -78,6 +78,40 @@ test('captured pre-checkpoint bootstrap error becomes factual environment failur
   assert.deepEqual(s.launches.map(value => value.taskId), ['n92', 'n91']);
 });
 
+test('a broker exit code zero without a first wrapper checkpoint is preserved and cannot count as work', async t => {
+  const s = await fixture(t); await s.add(card()); await s.tick(); let task = await s.get('n92');
+  await writeJson(task.attempt.wrapperLaunchPath, { taskId: task.id, activationId: task.activationId, runId: task.attempt.runId,
+    status: 'exited', exitCode: 0, signal: null, error: null, finishedAt: new Date(s.time + 1000).toISOString() });
+  s.time += 91000; await s.tick(); task = await s.get('n92');
+  assert.equal(task.status, 'blocked'); assert.equal(task.failureClass, 'environment');
+  assert.equal(task.wrapperExit.exitCode, 0); assert.equal(task.wrapperExit.signal, null);
+  assert.match(task.lastFailure, /"exitCode":0/); assert.equal(s.publishes.length, 0);
+});
+
+test('recovery adopts the bound broker and descendants; watchdog includes its birth identity and excludes PID reuse', async t => {
+  const stops = [];
+  const s = await fixture(t, { fingerprint: async () => 'unchanged', terminate: async identities => {
+    stops.push(identities); s.processes = s.processes.filter(row => !identities.some(owner => identityMatches(row, owner)));
+    return { owners: identities, results: identities.map(owner => ({ pid: owner.pid, stopped: true })) };
+  } });
+  await s.add(card('n92', { executionMode: 'local', budgetMinutes: 1 })); await s.tick(); let task = await s.get('n92');
+  const born = new Date(s.time).toISOString(); task.runnerPid = null; task.brokerPid = 900; task.brokerCreatedAt = null;
+  await writeJson(path.join(s.runtime, 'queue', task.id + '.json'), task);
+  const broker = { pid: 900, parentPid: 1, name: 'node.exe', createdAt: born,
+    commandLine: `node worker-broker.mjs --task ${path.join(s.runtime, 'queue', task.id + '.json')} --attempt ${task.attempt.specPath}` };
+  const wrapper = { pid: 901, parentPid: 900, name: 'powershell.exe', createdAt: born,
+    commandLine: `powershell run-task.ps1 ${path.join(s.runtime, 'queue', task.id + '.json')} ${task.attempt.specPath}` };
+  const unrelated = { pid: 999, parentPid: 1, name: 'node.exe', createdAt: born, commandLine: 'other application' };
+  s.processes = [broker, wrapper, unrelated]; s.controller = await s.restart(); await s.tick(); task = await s.get('n92');
+  assert.equal(task.brokerCreatedAt, born); assert.equal(task.runnerPid, 901); assert.equal(s.launches.length, 1);
+  assert.deepEqual(task.ownedProcesses.map(owner => owner.pid).sort(), [900, 901]);
+  assert.deepEqual(workerProcesses({ ...task, __file: path.join(s.runtime, 'queue', task.id + '.json'), ownedProcesses: [] }, null,
+    [{ ...broker, createdAt: new Date(s.time + 1000).toISOString() }]), []);
+  s.time += 91000; await s.tick(); await s.tick(); task = await s.get('n92');
+  assert.deepEqual(stops[0].map(owner => owner.pid).sort(), [900, 901]); assert.equal(s.processes[0].pid, 999);
+  assert.equal(task.lastWorkerReap.exactAbsence, true); assert(task.lastWorkerReap.owners.some(owner => owner.pid === 900 && owner.createdAt === born));
+});
+
 test('pause marker keeps a fresh heartbeat and resumes without restarting the daemon', async t => {
   const s = await fixture(t); await s.add(card());
   await fs.writeFile(path.join(s.runtime, 'STOP-REFILL'), 'fixture pause'); await s.tick();

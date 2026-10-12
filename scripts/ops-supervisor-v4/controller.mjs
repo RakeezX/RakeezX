@@ -64,6 +64,13 @@ export function workerProcesses(task, checkpoint, processes) {
   const attempt = task.attempt;
   if (!attempt) return [];
   const found = new Map();
+  const broker = processes.find(p => (!task.brokerPid || p.pid === task.brokerPid) && /^node\.exe$/i.test(p.name)
+    && normalize(p.commandLine).includes('worker-broker.mjs')
+    && normalize(p.commandLine).includes(normalize(task.__file))
+    && normalize(p.commandLine).includes(normalize(attempt.specPath))
+    && timestamp(p.createdAt) >= timestamp(attempt.startedAt) - 5000
+    && (!task.brokerCreatedAt || identityMatches(p, { pid: task.brokerPid, createdAt: task.brokerCreatedAt })));
+  if (broker) found.set(broker.pid, broker);
   const runnerId = checkpoint?.runnerPid ?? task.runnerPid;
   const runner = processes.find(p => (!runnerId || p.pid === runnerId) && /^(powershell|pwsh)\.exe$/i.test(p.name)
     && normalize(p.commandLine).includes('run-task.ps1')
@@ -311,7 +318,7 @@ export class Controller {
       task.retryAt = task.status === 'retry_wait' ? new Date(this.clock() + 5000).toISOString() : null;
     }
     if (options.delivery) task.deliveryRepair = options.delivery;
-    task.runnerPid = null; task.runnerCreatedAt = null; task.ownedProcesses = [];
+    task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
     await this.save(task); await this.event(task.status, { taskId: task.id, type, message: clean(message), retryAt: task.retryAt });
   }
   async scopedProgress(task) {
@@ -363,7 +370,8 @@ export class Controller {
     const owners = [...(task.ownedProcesses ?? []),
       ...(checkpoint?.runnerPid ? [{ pid: checkpoint.runnerPid, createdAt: checkpoint.runnerCreatedAt }] : []),
       ...(checkpoint?.codexPid ? [{ pid: checkpoint.codexPid, createdAt: checkpoint.codexCreatedAt }] : []),
-      ...(task.runnerPid && task.runnerCreatedAt ? [{ pid: task.runnerPid, createdAt: task.runnerCreatedAt }] : [])]
+      ...(task.runnerPid && task.runnerCreatedAt ? [{ pid: task.runnerPid, createdAt: task.runnerCreatedAt }] : []),
+      ...(task.brokerPid && task.brokerCreatedAt ? [{ pid: task.brokerPid, createdAt: task.brokerCreatedAt }] : [])]
       .filter(owner => owner.pid && owner.createdAt);
     task.lastWorkerReap = { activationId: task.activationId, runId: task.attempt.runId, verifiedAbsentAt: this.now(), exactAbsence: true,
       owners: [...new Map(owners.map(owner => [`${owner.pid}:${owner.createdAt}`, owner])).values()] };
@@ -425,7 +433,8 @@ export class Controller {
       sessionId: task.sessionId ?? null, readOnly: task.readOnly === true,
       outputPath: path.join(directory, 'result.json'), jsonlPath: path.join(directory, 'events.jsonl'), stderrPath: path.join(directory, 'stderr.txt'),
       checkpointPath: path.join(directory, 'checkpoint.json'), promptPath: path.join(directory, 'prompt.txt'), schemaPath: path.join(this.runtime, 'worker-result.schema.json'),
-      wrapperStdoutPath: path.join(directory, 'wrapper.stdout.txt'), wrapperStderrPath: path.join(directory, 'wrapper.stderr.txt') };
+      wrapperStdoutPath: path.join(directory, 'wrapper.stdout.txt'), wrapperStderrPath: path.join(directory, 'wrapper.stderr.txt'),
+      wrapperLaunchPath: path.join(directory, 'wrapper-launch.json'), brokerStdoutPath: path.join(directory, 'broker.stdout.txt'), brokerStderrPath: path.join(directory, 'broker.stderr.txt') };
     let policy = ''; try { policy = await fs.readFile(path.join(this.scripts, 'worker-policy.txt'), 'utf8'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
     let supplemental = '';
     if (task.promptPath) supplemental = await fs.readFile(path.resolve(this.runtime, task.promptPath), 'utf8');
@@ -445,22 +454,25 @@ export class Controller {
     await fs.writeFile(spec.promptPath, prompt, 'utf8');
     const specPath = path.join(directory, 'attempt.json'); await writeJson(specPath, spec);
     task.attempt = { runId, specPath, outputPath: spec.outputPath, jsonlPath: spec.jsonlPath, stderrPath: spec.stderrPath, checkpointPath: spec.checkpointPath,
-      wrapperStdoutPath: spec.wrapperStdoutPath, wrapperStderrPath: spec.wrapperStderrPath, startedAt: this.now() };
-    task.resultPath = spec.outputPath; task.status = 'running'; task.runnerPid = null; task.runnerCreatedAt = null;
+      wrapperStdoutPath: spec.wrapperStdoutPath, wrapperStderrPath: spec.wrapperStderrPath, wrapperLaunchPath: spec.wrapperLaunchPath,
+      brokerStdoutPath: spec.brokerStdoutPath, brokerStderrPath: spec.brokerStderrPath, startedAt: this.now() };
+    task.resultPath = spec.outputPath; task.status = 'running'; task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null;
     task.probingClass = OUTAGE.has(task.failureClass) ? task.failureClass : null; task.retryAt = null; task.lastModelError = null; task.ownedProcesses = [];
-    task.watchdogIncident = null; task.eventLogIssue = null; task.checkpointIssue = null; task.lastProgressScanAt = null;
+    task.watchdogIncident = null; task.eventLogIssue = null; task.checkpointIssue = null; task.wrapperExit = null; task.lastProgressScanAt = null;
     task.lastFileProgressAt = this.now(); task.lastEventAt = null; task.progressFingerprint = null;
     await this.save(task); // The identity and retry checkpoint exist before spawn.
     try {
-      let pid;
+      let pid, broker = false;
       if (this.launchAdapter) pid = await this.launchAdapter(task, spec, this);
       else {
-        const child = await spawnDetachedLogged(this.config.controller.powershellPath ?? POWERSHELL,
-          ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'RemoteSigned', '-File', path.join(this.scripts, 'run-task.ps1'), '-TaskFile', task.__file, '-AttemptFile', specPath],
-          { cwd: this.repo, stdoutPath: spec.wrapperStdoutPath, stderrPath: spec.wrapperStderrPath });
-        pid = child.pid;
+        const child = await spawnDetachedLogged(process.execPath,
+          [path.join(this.scripts, 'worker-broker.mjs'), '--task', task.__file, '--attempt', specPath,
+            '--powershell', this.config.controller.powershellPath ?? POWERSHELL, '--wrapper', path.join(this.scripts, 'run-task.ps1'), '--cwd', this.repo],
+          { cwd: this.repo, stdoutPath: spec.brokerStdoutPath, stderrPath: spec.brokerStderrPath });
+        pid = child.pid; broker = true;
       }
-      task.runnerPid = pid; await this.save(task); await this.event('worker_launched', { taskId: task.id, runId, pid, sessionId: task.sessionId ?? null });
+      if (broker) task.brokerPid = pid; else task.runnerPid = pid;
+      await this.save(task); await this.event('worker_launched', { taskId: task.id, runId, pid, broker, sessionId: task.sessionId ?? null });
     } catch (error) { await this.failure(task, 'Worker launch failed: ' + error.message, 'environment'); }
   }
   async reconcile(task, processes) {
@@ -479,6 +491,8 @@ export class Controller {
     }
     const live = workerProcesses(task, checkpoint, processes);
     if (live.length) {
+      const broker = live.find(p => /^node\.exe$/i.test(p.name) && normalize(p.commandLine).includes('worker-broker.mjs') && normalize(p.commandLine).includes(normalize(task.attempt.specPath)));
+      if (broker) { task.brokerPid = broker.pid; task.brokerCreatedAt = broker.createdAt; }
       const runner = live.find(p => /^(powershell|pwsh)\.exe$/i.test(p.name) && normalize(p.commandLine).includes(normalize(task.attempt.specPath)));
       task.runnerPid = checkpoint?.runnerPid ?? runner?.pid ?? task.runnerPid; task.runnerCreatedAt = checkpoint?.runnerCreatedAt ?? runner?.createdAt ?? task.runnerCreatedAt;
       task.ownedProcesses = live.map(p => ({ pid: p.pid, createdAt: p.createdAt, name: p.name, parentPid: p.parentPid, observedAt: this.now() }));
@@ -502,7 +516,7 @@ export class Controller {
       try {
         const receipt = await this.validate(task, result);
         task.candidateSha = receipt.candidateSha; task.validationReceipt = receipt; task.status = 'delivery';
-        task.deliveryQueuedAt = this.now(); task.nextDeliveryAt = this.now(); task.runnerPid = null; task.runnerCreatedAt = null; task.ownedProcesses = [];
+        task.deliveryQueuedAt = this.now(); task.nextDeliveryAt = this.now(); task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
         task.failureClass = null; task.probingClass = null; task.lastFailure = null; task.infrastructureRetries = 0;
         await writeJson(path.join(this.runtime, 'results', task.id + '.json'), receipt); await this.save(task);
         await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId });
@@ -513,7 +527,17 @@ export class Controller {
     if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
     if (!checkpoint && task.attempt?.wrapperStderrPath) {
       const captured = [];
-      for (const [label, file] of [['stderr', task.attempt.wrapperStderrPath], ['stdout', task.attempt.wrapperStdoutPath]]) {
+      if (task.attempt.wrapperLaunchPath) {
+        try {
+          const launch = await readJson(task.attempt.wrapperLaunchPath);
+          if (launch && launch.taskId === task.id && launch.runId === task.attempt.runId && launch.activationId === task.activationId) {
+            task.wrapperExit = { runId: launch.runId, status: launch.status, exitCode: launch.exitCode, signal: launch.signal, error: launch.error, at: launch.finishedAt ?? null };
+            captured.push(`Wrapper launch receipt: ${JSON.stringify(task.wrapperExit)}`);
+          } else if (launch) captured.push('Wrapper launch receipt identity mismatch');
+        } catch (error) { captured.push('Wrapper launch receipt could not be read: ' + error.message); }
+      }
+      for (const [label, file] of [['stderr', task.attempt.wrapperStderrPath], ['stdout', task.attempt.wrapperStdoutPath], ['broker stderr', task.attempt.brokerStderrPath]]) {
+        if (!file) continue;
         try { const text = (await fs.readFile(file, 'utf8')).slice(-16000).trim(); if (text) captured.push(`${label}: ${text}`); }
         catch (error) { if (error.code !== 'ENOENT') captured.push(`${label} could not be read: ${error.message}`); }
       }
