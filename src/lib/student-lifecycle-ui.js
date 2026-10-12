@@ -120,7 +120,7 @@ export async function openStudentManagement(studentId) {
           checkpoint = null;
           if (response.ok) {
             result = { action }; stage = 'success';
-            message = action === 'delete' ? 'تم حذف الطالب المضاف بالخطأ.' : 'تمت إزالة الطالب من الفصل مع الاحتفاظ بسجله السابق.';
+            message = action === 'delete' ? 'تم حذف الطالب بنجاح.' : 'تمت إزالة الطالب من الفصل مع الاحتفاظ بسجله السابق.';
           } else if (action === 'delete' && response.code === 'NOT_PRISTINE') { preservedConfirmation(); }
           else { stage = 'error'; message = friendlyStudentLifecycleError(response.code); }
         } catch (error) {
