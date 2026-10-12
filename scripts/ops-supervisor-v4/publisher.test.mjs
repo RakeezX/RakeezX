@@ -13,6 +13,10 @@ const output = value => ({ code: 0, stdout: Buffer.from(JSON.stringify(value)), 
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 // Literal provider output captured by the parent during the live read-only check.
 const jsdFixture = (await fs.readFile(new URL('./fixtures/cloudflare-jsd.html', import.meta.url), 'utf8')).replace(/\n$/, '');
+const missingCommitFixture = JSON.parse(await fs.readFile(new URL('./fixtures/github-checks-missing-commit-422.json', import.meta.url), 'utf8'));
+const missingCommitResponse = sha => ({ code: missingCommitFixture.code,
+  stdout: Buffer.from(missingCommitFixture.stdout.replaceAll(missingCommitFixture.queriedSha, sha)),
+  stderr: Buffer.from(missingCommitFixture.stderr.replaceAll(missingCommitFixture.queriedSha, sha)) });
 const indexMetadata = { repoPath: 'index.html', urlPath: 'index.html', statusCode: 200, server: 'cloudflare', contentType: 'text/html; charset=utf-8' };
 
 async function fixture(t) {
@@ -137,6 +141,127 @@ test('FAST publication verifies exact source, preserves dirty canonical, and reu
   const pushes = f.calls.filter(c => c.command === 'git' && c.args[0] === 'push');
   assert.equal(pushes[0].args.at(-1), `${result.publishedSha}:refs/heads/main`);
   assert.ok(pushes.every(c => !c.args.some(a => a.includes('--force') || a.startsWith('+'))));
+});
+
+test('the actual GitHub unknown-local-commit 422 is allowed only for the exact prepush SHA', async t => {
+  const f = await fixture(t);
+  let missingReads = 0;
+  const run = async (command, args, options) => {
+    if (command === 'gh' && args[0] === 'api' && f.counts.pushCount === 0) {
+      const sha = args.find(arg => arg.startsWith('repos/')).match(/\/commits\/([a-f0-9]{40})\//)[1];
+      missingReads++;
+      return missingCommitResponse(sha);
+    }
+    return f.dependencies.run(command, args, options);
+  };
+  const result = await publishCandidate(f.opts, { ...f.dependencies, run });
+  assert.equal(result.status, 'deployed', JSON.stringify(result));
+  assert.equal(missingReads, 1);
+  assert.equal(f.counts.buildCount, 1); assert.equal(f.counts.pushCount, 1);
+  await f.assertCanonicalPreserved();
+});
+
+test('one provider precheck outage resumes the durable built stage without another build or worktree', async t => {
+  const f = await fixture(t);
+  const journalFile = path.join(f.opts.stateDir, `${f.candidate}.journal.json`);
+  let outage = true;
+  const run = async (command, args, options) => {
+    if (outage && command === 'gh' && args[0] === 'api') {
+      outage = false;
+      const saved = JSON.parse(await fs.readFile(journalFile));
+      assert.equal(saved.stage, 'built');
+      assert.equal(saved.build.status, 'passed');
+      assert.equal(saved.build.publishedSha, saved.publishedSha);
+      assert.ok(saved.assets.some(asset => asset.repoPath === 'src/view.js' && asset.sha256));
+      return { code: 1, stdout: Buffer.from('{"message":"Service Unavailable","status":"503"}'), stderr: Buffer.from('gh: Service Unavailable (HTTP 503)') };
+    }
+    return f.dependencies.run(command, args, options);
+  };
+  const first = await publishCandidate(f.opts, { ...f.dependencies, run });
+  assert.equal(first.status, 'pending'); assert.equal(first.errorCode, 'CHECKS_UNAVAILABLE');
+  assert.equal(f.counts.pushCount, 0); assert.equal(f.counts.buildCount, 1);
+  const built = JSON.parse(await fs.readFile(journalFile));
+  assert.equal(built.stage, 'built'); assert.equal(built.prepareAttempt, 1);
+  const result = await publishCandidate(f.opts, { ...f.dependencies, run });
+  assert.equal(result.status, 'deployed', JSON.stringify(result));
+  assert.equal(f.counts.buildCount, 1); assert.equal(f.counts.pushCount, 1);
+  assert.equal(result.publishedSha, built.publishedSha);
+  assert.equal(result.integrationWorktree, built.worktree);
+  assert.equal(f.calls.filter(call => call.command === 'git' && call.args.includes('worktree') && call.args.includes('add')).length, 1);
+  await f.assertCanonicalPreserved();
+});
+
+test('an unrelated 422 or a missing different SHA remains a retryable precheck failure without rebuilding', async t => {
+  for (const kind of ['different-sha', 'other-message']) {
+    const f = await fixture(t);
+    const run = async (command, args, options) => {
+      if (command === 'gh' && args[0] === 'api') {
+        if (kind === 'different-sha') return missingCommitResponse('f'.repeat(40));
+        return { code: 1, stdout: Buffer.from('{"message":"Validation Failed","status":"422"}'), stderr: Buffer.from('gh: Validation Failed (HTTP 422)') };
+      }
+      return f.dependencies.run(command, args, options);
+    };
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await publishCandidate(f.opts, { ...f.dependencies, run });
+      assert.equal(result.status, 'pending', kind);
+      assert.equal(result.errorCode, 'CHECKS_UNAVAILABLE', kind);
+    }
+    assert.equal(f.counts.buildCount, 1); assert.equal(f.counts.pushCount, 0);
+    const saved = JSON.parse(await fs.readFile(path.join(f.opts.stateDir, `${f.candidate}.journal.json`)));
+    assert.equal(saved.stage, 'built'); assert.equal(saved.prepareAttempt, 1);
+    await f.assertCanonicalPreserved();
+  }
+});
+
+test('a backed-up legacy REMOTE_CHURN prepush journal can deliberately reprepare once while retaining old worktrees', async t => {
+  const f = await fixture(t);
+  const run = async (command, args, options) => command === 'gh' && args[0] === 'api'
+    ? { code: 1, stdout: Buffer.from('{"message":"Service Unavailable","status":"503"}'), stderr: Buffer.from('gh: Service Unavailable (HTTP 503)') }
+    : f.dependencies.run(command, args, options);
+  assert.equal((await publishCandidate(f.opts, { ...f.dependencies, run })).status, 'pending');
+  const journalFile = path.join(f.opts.stateDir, `${f.candidate}.journal.json`);
+  const legacy = JSON.parse(await fs.readFile(journalFile));
+  const retainedWorktree = legacy.worktree;
+  Object.assign(legacy, { stage: 'blocked', prepareAttempt: 3, errorCode: 'REMOTE_CHURN', message: 'Legacy precheck exhausted attempts' });
+  for (const field of ['build', 'assets', 'changedPaths', 'sourceOnlyPaths', 'publishedSha', 'builtAt']) delete legacy[field];
+  assert.equal(legacy.pushIntentAt, undefined);
+  await fs.writeFile(journalFile, JSON.stringify(legacy));
+  const backup = path.join(f.opts.stateDir, 'legacy-prepush-recovery-backup.json');
+  await fs.copyFile(journalFile, backup);
+  for (let ordinal = 1; ordinal <= 3; ordinal++) {
+    const retained = path.join(f.opts.stateDir, `integration-${f.candidate.slice(0, 12)}-${ordinal}`);
+    await fs.mkdir(retained); await fs.writeFile(path.join(retained, 'retained-evidence.txt'), 'Do not delete or reuse');
+  }
+  // This is the explicit one-time journal correction described in RECOVERY.md,
+  // not automatic permission to reset genuine conflicts or push failures.
+  legacy.stage = 'reprepare'; legacy.prepareAttempt = 0;
+  delete legacy.errorCode; delete legacy.message; delete legacy.errorDetails;
+  await fs.writeFile(journalFile, JSON.stringify(legacy));
+  const result = await publishCandidate(f.opts, f.dependencies);
+  assert.equal(result.status, 'deployed', JSON.stringify(result));
+  assert.equal(f.counts.buildCount, 2); // One legacy build, one necessary rebuilt receipt.
+  assert.equal(f.counts.pushCount, 1);
+  assert.notEqual(result.integrationWorktree, retainedWorktree);
+  assert.ok((await fs.stat(retainedWorktree)).isDirectory());
+  assert.equal(JSON.parse(await fs.readFile(backup)).errorCode, 'REMOTE_CHURN');
+  await f.assertCanonicalPreserved();
+});
+
+test('the missing-commit 422 is never accepted as an empty check list after push', async t => {
+  const f = await fixture(t);
+  const run = async (command, args, options) => {
+    if (command === 'gh' && args[0] === 'api' && f.counts.pushCount > 0) {
+      const sha = args.find(arg => arg.startsWith('repos/')).match(/\/commits\/([a-f0-9]{40})\//)[1];
+      return missingCommitResponse(sha);
+    }
+    return f.dependencies.run(command, args, options);
+  };
+  const first = await publishCandidate(f.opts, { ...f.dependencies, run });
+  assert.equal(first.status, 'pending'); assert.equal(first.errorCode, 'CHECKS_UNAVAILABLE');
+  assert.equal(f.counts.buildCount, 1); assert.equal(f.counts.pushCount, 1);
+  const recovered = await publishCandidate(f.opts, f.dependencies);
+  assert.equal(recovered.status, 'deployed', JSON.stringify(recovered));
+  assert.equal(f.counts.buildCount, 1); assert.equal(f.counts.pushCount, 1);
 });
 
 test('crash after accepted push and before push journal confirmation never publishes again', async t => {

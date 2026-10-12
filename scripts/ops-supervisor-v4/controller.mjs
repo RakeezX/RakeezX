@@ -37,6 +37,18 @@ export function runCommand(command, args, options = {}) {
     child.once('close', code => { clearTimeout(timer); if (timedOut || size > 8 * 1024 * 1024) reject(new Error(timedOut ? 'Command timed out' : 'Command output limit')); else resolve({ code, stdout, stderr }); });
   });
 }
+export async function spawnDetachedLogged(command, args, options) {
+  let stdout, stderr;
+  try {
+    stdout = await fs.open(options.stdoutPath, 'wx');
+    stderr = await fs.open(options.stderrPath, 'wx');
+    // Child-owned file handles survive controller restarts; pipes would not.
+    const child = spawn(command, args, { cwd: options.cwd, shell: false, windowsHide: true, detached: true,
+      stdio: ['ignore', stdout.fd, stderr.fd] });
+    await new Promise((resolve, reject) => { child.once('error', reject); child.once('spawn', resolve); });
+    child.unref(); return child;
+  } finally { await Promise.all([stdout?.close(), stderr?.close()]); }
+}
 const POWERSHELL = process.env.SystemRoot ? path.join(process.env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe') : 'powershell.exe';
 const INVENTORY = "@(Get-CimInstance Win32_Process -ErrorAction Stop | ForEach-Object { [pscustomobject]@{pid=[int]$_.ProcessId;parentPid=[int]$_.ParentProcessId;name=$_.Name;commandLine=$_.CommandLine;createdAt=$_.CreationDate.ToUniversalTime().ToString('o')} }) | ConvertTo-Json -Compress -Depth 3";
 export async function windowsInventory(command = runCommand, powershell = POWERSHELL) {
@@ -412,7 +424,8 @@ export class Controller {
       model: task.model ?? lane.model ?? this.config.defaultModel, effort: task.effort ?? lane.effort ?? this.config.defaultEffort ?? 'medium',
       sessionId: task.sessionId ?? null, readOnly: task.readOnly === true,
       outputPath: path.join(directory, 'result.json'), jsonlPath: path.join(directory, 'events.jsonl'), stderrPath: path.join(directory, 'stderr.txt'),
-      checkpointPath: path.join(directory, 'checkpoint.json'), promptPath: path.join(directory, 'prompt.txt'), schemaPath: path.join(this.runtime, 'worker-result.schema.json') };
+      checkpointPath: path.join(directory, 'checkpoint.json'), promptPath: path.join(directory, 'prompt.txt'), schemaPath: path.join(this.runtime, 'worker-result.schema.json'),
+      wrapperStdoutPath: path.join(directory, 'wrapper.stdout.txt'), wrapperStderrPath: path.join(directory, 'wrapper.stderr.txt') };
     let policy = ''; try { policy = await fs.readFile(path.join(this.scripts, 'worker-policy.txt'), 'utf8'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
     let supplemental = '';
     if (task.promptPath) supplemental = await fs.readFile(path.resolve(this.runtime, task.promptPath), 'utf8');
@@ -431,7 +444,8 @@ export class Controller {
     ].filter(Boolean).join('\n\n');
     await fs.writeFile(spec.promptPath, prompt, 'utf8');
     const specPath = path.join(directory, 'attempt.json'); await writeJson(specPath, spec);
-    task.attempt = { runId, specPath, outputPath: spec.outputPath, jsonlPath: spec.jsonlPath, stderrPath: spec.stderrPath, checkpointPath: spec.checkpointPath, startedAt: this.now() };
+    task.attempt = { runId, specPath, outputPath: spec.outputPath, jsonlPath: spec.jsonlPath, stderrPath: spec.stderrPath, checkpointPath: spec.checkpointPath,
+      wrapperStdoutPath: spec.wrapperStdoutPath, wrapperStderrPath: spec.wrapperStderrPath, startedAt: this.now() };
     task.resultPath = spec.outputPath; task.status = 'running'; task.runnerPid = null; task.runnerCreatedAt = null;
     task.probingClass = OUTAGE.has(task.failureClass) ? task.failureClass : null; task.retryAt = null; task.lastModelError = null; task.ownedProcesses = [];
     task.watchdogIncident = null; task.eventLogIssue = null; task.checkpointIssue = null; task.lastProgressScanAt = null;
@@ -441,10 +455,10 @@ export class Controller {
       let pid;
       if (this.launchAdapter) pid = await this.launchAdapter(task, spec, this);
       else {
-        const child = spawn(this.config.controller.powershellPath ?? POWERSHELL,
+        const child = await spawnDetachedLogged(this.config.controller.powershellPath ?? POWERSHELL,
           ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'RemoteSigned', '-File', path.join(this.scripts, 'run-task.ps1'), '-TaskFile', task.__file, '-AttemptFile', specPath],
-          { cwd: this.repo, shell: false, windowsHide: true, detached: true, stdio: 'ignore' });
-        pid = await new Promise((resolve, reject) => { child.once('error', reject); child.once('spawn', () => resolve(child.pid)); }); child.unref();
+          { cwd: this.repo, stdoutPath: spec.wrapperStdoutPath, stderrPath: spec.wrapperStderrPath });
+        pid = child.pid;
       }
       task.runnerPid = pid; await this.save(task); await this.event('worker_launched', { taskId: task.id, runId, pid, sessionId: task.sessionId ?? null });
     } catch (error) { await this.failure(task, 'Worker launch failed: ' + error.message, 'environment'); }
@@ -497,6 +511,14 @@ export class Controller {
     }
     if (result?.state === 'BLOCKED') { await this.failure(task, result.blocker || result.summary, result.blockerType); return; }
     if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
+    if (!checkpoint && task.attempt?.wrapperStderrPath) {
+      const captured = [];
+      for (const [label, file] of [['stderr', task.attempt.wrapperStderrPath], ['stdout', task.attempt.wrapperStdoutPath]]) {
+        try { const text = (await fs.readFile(file, 'utf8')).slice(-16000).trim(); if (text) captured.push(`${label}: ${text}`); }
+        catch (error) { if (error.code !== 'ENOENT') captured.push(`${label} could not be read: ${error.message}`); }
+      }
+      await this.failure(task, 'PowerShell wrapper exited before its first checkpoint. ' + (captured.join('\n') || 'Captured wrapper stdout/stderr contain no startup diagnostic.'), 'environment'); return;
+    }
     let stderr = ''; try { stderr = (await fs.readFile(task.attempt.stderrPath, 'utf8')).slice(-16000); } catch (error) { if (error.code !== 'ENOENT') throw error; }
     const errorText = task.lastModelError || checkpoint?.error || stderr || malformed;
     if (errorText) { await this.failure(task, errorText); return; }

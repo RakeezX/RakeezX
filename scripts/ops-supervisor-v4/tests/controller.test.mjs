@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { Controller, readJson, writeJson, workerProcesses, identityMatches, verifiedDeployment, watchdogReason, runCommand } from '../controller.mjs';
+import { Controller, readJson, writeJson, workerProcesses, identityMatches, verifiedDeployment, watchdogReason, runCommand, spawnDetachedLogged } from '../controller.mjs';
 
 const BASE = '1'.repeat(40), CANDIDATE = '2'.repeat(40), PUBLISHED = '3'.repeat(40), HASH = 'a'.repeat(64);
 const SESSION = '76e0262b-7806-411a-a5df-64c155092901';
@@ -49,6 +49,34 @@ async function fixture(t, extraAdapters = {}) {
   };
   return state;
 }
+
+test('detached wrapper retains actual bootstrap stdout/stderr after parent file handles close', { timeout: 5000 }, async t => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'rakeez-bootstrap-test-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const stdoutPath = path.join(directory, 'wrapper.stdout.txt'), stderrPath = path.join(directory, 'wrapper.stderr.txt');
+  const child = await spawnDetachedLogged(process.execPath, ['-e', "process.stdout.write('fixture startup stdout\\n');process.stderr.write('fixture bootstrap error\\n');process.exitCode=19"],
+    { cwd: directory, stdoutPath, stderrPath });
+  child.ref();
+  t.after(() => { if (child.exitCode === null && child.signalCode === null) child.kill(); });
+  const code = child.exitCode ?? await new Promise(resolve => child.once('close', resolve));
+  assert.equal(code, 19);
+  assert.equal(await fs.readFile(stdoutPath, 'utf8'), 'fixture startup stdout\n');
+  assert.equal(await fs.readFile(stderrPath, 'utf8'), 'fixture bootstrap error\n');
+});
+
+test('captured pre-checkpoint bootstrap error becomes factual environment failure after owned process absence', async t => {
+  const s = await fixture(t); await s.add(card()); await s.tick();
+  let task = await s.get('n92');
+  assert(task.attempt.wrapperStdoutPath.endsWith('wrapper.stdout.txt'));
+  await fs.writeFile(task.attempt.wrapperStderrPath, "Resolve-Path : Cannot find path 'fixture-missing-path' because it does not exist.\n");
+  await s.tick(); assert.equal((await s.get('n92')).status, 'running', 'startup grace remains unchanged');
+  await s.add(card('n91')); s.time += 91000; await s.tick(); task = await s.get('n92');
+  assert.equal(task.status, 'blocked'); assert.equal(task.failureClass, 'environment');
+  assert.match(task.lastFailure, /before its first checkpoint/); assert.match(task.lastFailure, /stderr: Resolve-Path/);
+  assert.equal(task.infrastructureRetries ?? 0, 0); assert.equal(task.implementationFailures ?? 0, 0);
+  assert.equal((await s.get('n91')).status, 'running');
+  assert.deepEqual(s.launches.map(value => value.taskId), ['n92', 'n91']);
+});
 
 test('pause marker keeps a fresh heartbeat and resumes without restarting the daemon', async t => {
   const s = await fixture(t); await s.add(card());

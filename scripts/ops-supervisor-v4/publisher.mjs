@@ -335,7 +335,16 @@ export async function publishCandidate(options, dependencies = {}) {
       const result = await execute('gh', ['api', '--method', 'GET', `repos/${repository}/commits/${sha}/check-runs?per_page=100`,
         '-H', 'Accept: application/vnd.github+json', '-H', 'X-GitHub-Api-Version: 2022-11-28'], { cwd: opts.cwd, signal: opts.signal, timeoutMs: 30000 });
       if (result.code !== 0) {
-        if (allowMissing && /\b404\b/.test(asText({ stdout: result.stderr }))) return [];
+        if (allowMissing) {
+          const stderr = asText({ stdout: result.stderr });
+          if (/\bHTTP 404\b/.test(stderr)) return [];
+          // GitHub returns this specific 422 before a local commit has ever
+          // reached the repository. Other 422s and another SHA are failures.
+          let body;
+          try { body = json(asText(result)); } catch { /* Keep the failure. */ }
+          if (/\bHTTP 422\b/.test(stderr) && String(body?.status) === '422'
+              && body.message === `No commit found for SHA: ${sha}`) return [];
+        }
         throw new DeliveryError('CHECKS_UNAVAILABLE', 'GitHub provider checks are temporarily unavailable', true);
       }
       const response = json(asText(result));
@@ -360,7 +369,9 @@ export async function publishCandidate(options, dependencies = {}) {
       if (!await ancestor(opts.baseSha, current)) throw new DeliveryError('REMOTE_BASE_DIVERGED', 'Remote main no longer contains the declared base');
       const ordinal = (journal?.prepareAttempt ?? 0) + 1;
       if (ordinal > 3) throw new DeliveryError('REMOTE_CHURN', 'Main changed during three integration attempts; retain the candidate and retry deliberately');
-      const worktree = path.join(opts.stateDir, `integration-${opts.candidateSha.slice(0, 12)}-${ordinal}`);
+      // A deliberate legacy-journal recovery may reset the bounded attempt
+      // counter; retained previous worktrees must never collide or be reused.
+      const worktree = path.join(opts.stateDir, `integration-${opts.candidateSha.slice(0, 12)}-${ordinal}-${randomUUID().slice(0, 8)}`);
       const candidateContained = await ancestor(opts.candidateSha, current);
       const currentContained = await ancestor(current, opts.candidateSha);
       const startSha = candidateContained ? current : currentContained ? opts.candidateSha : current;
@@ -438,14 +449,26 @@ export async function publishCandidate(options, dependencies = {}) {
       journal.changedPaths = changed;
       journal.sourceOnlyPaths = changed.filter(file => !assetMap.has(file));
       journal.assets = assets;
-      journal.preexistingCheckRunIds = (await checkRuns(journal.publishedSha, true)).map(c => String(c.id));
-      journal.stage = 'prepared'; journal.preparedAt = now();
+      // Persist successful build and exact assets before an external API read.
+      // An outage here resumes the precheck, without rebuilding or consuming
+      // another integration attempt while main has not changed.
+      journal.stage = 'built'; journal.builtAt = now();
       await writeJson(journalFile, journal);
     } else if (journal.stage === 'preparing') {
       // A crash during build/merge has not pushed anything. A fresh isolated
       // worktree avoids trusting a half-written build or rerunning a merge in place.
       journal.stage = 'reprepare'; await writeJson(journalFile, journal);
       return finish({ status: 'pending', retryable: true, retryAfterSeconds: 1, errorCode: 'PREPARATION_INTERRUPTED', message: 'Resume preparation in a fresh isolated worktree' });
+    }
+    if (journal.stage === 'built') {
+      if (!SHA.test(journal.publishedSha ?? '') || journal.build?.status !== 'passed'
+          || journal.build.publishedSha !== journal.publishedSha || !Array.isArray(journal.assets)
+          || journal.assets.length === 0 || !Array.isArray(journal.changedPaths)) {
+        throw new DeliveryError('BUILT_JOURNAL_INVALID', 'Saved built stage lacks complete build and source evidence');
+      }
+      journal.preexistingCheckRunIds = (await checkRuns(journal.publishedSha, true)).map(c => String(c.id));
+      journal.stage = 'prepared'; journal.preparedAt = now();
+      await writeJson(journalFile, journal);
     }
     if (journal.stage === 'prepared') {
       current = await fetchMain();
