@@ -610,6 +610,7 @@ export default {
       }
     },
     async 'bootstrap-curriculum'() {
+      store.assertLeaseWritable();
       if (curriculumBootstrap.phase === 'busy' || !latestVerifiedBackup || !cloud.session || !cloud.user) return;
       const workspace = runtimeSyncOwnershipGuard.getWorkspace();
       const expectedOwnerId = String(cloud.user.id ?? '').trim().toLowerCase();
@@ -626,6 +627,7 @@ export default {
         onMount: (root, done) => root.querySelector('[data-curriculum-confirm]')?.addEventListener('click', () => done(true)),
       });
       if (confirmed !== true) return;
+      store.assertLeaseWritable();
       curriculumBootstrap = { ...curriculumBootstrap, phase: 'busy', error: null };
       repaint();
       try {
@@ -722,9 +724,11 @@ export default {
       }
     },
     async 'confirm-cloud'() {
+      store.assertLeaseWritable();
       if (cloudRecovery.busy || !cloudRecovery.payload || !cloudRecovery.plan?.ready || cloudResumeState || cloudResumeError) return;
       const confirmed = await cloudRestoreConfirmation(cloudRecovery.plan);
       if (!confirmed) return;
+      store.assertLeaseWritable();
       setCloudRecovery({ phase: 'restoring', busy: true, error: null });
       try {
         const result = await restoreBackupToCloud(cloudRecovery.payload);
@@ -768,6 +772,7 @@ export default {
       setTimeout(() => document.querySelector('[data-act="pick-cloud-file"]')?.focus({ preventScroll: true }), 0);
     },
     async file(el) {
+      store.assertLeaseWritable();
       if (store.getActiveWorkspace()?.type === 'demo') return;
       const file = el.files?.[0]; el.value = ''; if (!file) return;
       let payload;
@@ -792,6 +797,7 @@ export default {
         if (!ok) return;
       }
       try {
+        store.assertLeaseWritable();
         const { written, migration } = await restoreBackup(payload, mode);
         toast(migration ? `استُرجع ${written} سجلًا ورُحّل إلى شكل رَكيز المعلم — يُعاد التحميل` : `استُرجع ${written} سجلًا — يُعاد التحميل`);
         if (migration?.warnings?.length) console.warn('[rakeezx] ملاحظات ترحيل النسخة:', migration.warnings);
@@ -799,12 +805,14 @@ export default {
       } catch (err) { console.error(err); toast(err.message ?? 'تعذّر الاسترجاع', 'danger'); }
     },
     async wipe() {
+      store.assertLeaseWritable();
       const pendingOutbox = await db.getAll('outbox');
       const pendingWarning = pendingOutbox.length ? ` ${LOCAL_RESET_COPY.pendingWarning}` : '';
       const ok = await confirmSheet({ title: LOCAL_RESET_COPY.title, desc: `${LOCAL_RESET_COPY.description}${pendingWarning}`, confirmLabel: LOCAL_RESET_COPY.confirmLabel, danger: true });
       if (!ok) return;
       const again = await confirmSheet({ title: LOCAL_RESET_COPY.finalTitle, desc: LOCAL_RESET_COPY.finalDescription, confirmLabel: LOCAL_RESET_COPY.finalConfirmLabel, danger: true });
       if (!again) return;
+      store.assertLeaseWritable();
       await db.clearAll(); location.reload();
     },
   },

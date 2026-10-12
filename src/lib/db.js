@@ -49,6 +49,9 @@ export const STORES = [
 
 let _db = null;
 let onVersionChange = null;
+let productWriteGuard = null;
+export function setProductWriteGuard(guard) { productWriteGuard = guard; }
+function checkProductWrite(device) { productWriteGuard?.(device); }
 
 export function selectDatabase(databaseName) {
   const name = String(databaseName ?? '').trim();
@@ -123,34 +126,35 @@ export async function get(store, id) {
   return req(db.transaction(store, 'readonly').objectStore(store).get(id));
 }
 
-export async function put(store, record) {
-  await applyBatch({ [store]: { put: [record] } });
+export async function put(store, record, options = {}) {
+  await applyBatch({ [store]: { put: [record] } }, options);
   return record;
 }
 
-export async function putMany(store, records) {
+export async function putMany(store, records, options = {}) {
   if (!records.length) return records;
-  await applyBatch({ [store]: { put: records } });
+  await applyBatch({ [store]: { put: records } }, options);
   return records;
 }
 
 /** كتابة ذرّية عبر عدة مخازن: { students: [...], scores: [...] } */
-export async function putAcross(batch, { signal } = {}) {
+export async function putAcross(batch, { signal, productWrite = false } = {}) {
   const names = Object.keys(batch).filter((k) => batch[k]?.length);
   if (!names.length) return;
-  await applyBatch(Object.fromEntries(names.map((name) => [name, { put: batch[name] }])), { signal });
+  await applyBatch(Object.fromEntries(names.map((name) => [name, { put: batch[name] }])), { signal, productWrite });
 }
 
 // The device checkpoint and Product write share a transaction, so a stale tab
 // cannot write between the lifecycle safety check and the actual disk commit.
-function guardStudentLifecycle(tx, run, allow = false) {
-  if (allow) return run();
+function guardStudentLifecycle(tx, run, allow = false, productWrite = false) {
   const read = tx.objectStore('device').get('device');
   read.onsuccess = () => {
-    if (read.result?.studentLifecycleResume) {
+    try { if (productWrite) checkProductWrite(read.result); }
+    catch (error) { tx.lifecycleError = error; tx.abort(); return; }
+    if (!allow && read.result?.studentLifecycleResume) {
       tx.lifecycleError = Object.assign(new Error('Resume pending student lifecycle reconciliation first'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
       tx.abort();
-    } else run();
+    } else run(read.result);
   };
 }
 
@@ -162,7 +166,7 @@ function guardStudentLifecycle(tx, run, allow = false) {
  * الفرق بين «عدّل الملاحظة» و«اكتب السجل كله بنسختي منه»: الثاني يدهس تعديلًا
  * كتبه تبويب آخر (أو جهاز آخر لاحقًا) بين قراءتنا وكتابتنا.
  */
-export async function patchMany(store, edits, outboxFor = null, stamp = Date.now()) {
+export async function patchMany(store, edits, outboxFor = null, stamp = Date.now(), { productWrite = false } = {}) {
   if (!edits.length) return [];
   const db = await openDB();
   const scope = [...new Set(outboxFor ? [store, 'outbox', 'device'] : [store, 'device'])];
@@ -172,25 +176,29 @@ export async function patchMany(store, edits, outboxFor = null, stamp = Date.now
     const os = tx.objectStore(store);
     const ob = outboxFor ? tx.objectStore('outbox') : null;
     const results = [];
+    let guardDevice;
 
     const write = () => { for (const edit of edits) {
       const getReq = os.get(edit.id);
       getReq.onsuccess = () => {
-        const current = getReq.result ?? edit.create ?? null;
-        if (!current) return;
-        const next = { ...current, ...edit.changes, id: edit.id, updatedAt: stamp };
-        os.put(next);
-        results.push(next);
+        try {
+          if (productWrite) checkProductWrite(guardDevice);
+          const current = getReq.result ?? edit.create ?? null;
+          if (!current) return;
+          const next = { ...current, ...edit.changes, id: edit.id, updatedAt: stamp };
+          os.put(next);
+          results.push(next);
 
-        if (!ob) return;
-        const entry = outboxFor(next, Object.keys(edit.changes));
-        if (!entry) return;
-        const obReq = ob.get(entry.id);
-        obReq.onsuccess = () => ob.put(mergeOutbox(obReq.result, entry));
+          if (!ob) return;
+          const entry = outboxFor(next, Object.keys(edit.changes));
+          if (!entry) return;
+          const obReq = ob.get(entry.id);
+          obReq.onsuccess = () => ob.put(mergeOutbox(obReq.result, entry));
+        } catch (error) { tx.lifecycleError = error; tx.abort(); }
       };
     } };
     if (store === 'device') write();
-    else guardStudentLifecycle(tx, write);
+    else guardStudentLifecycle(tx, (device) => { guardDevice = device; write(); }, false, productWrite);
 
     tx.oncomplete = () => resolve(results);
     tx.onerror = () => reject(tx.error);
@@ -212,7 +220,7 @@ function mergeOutbox(prev, next) {
  * حذف ناعم متتالٍ: يقرأ السجلات من القرص (لا من الذاكرة) ويعلّمها محذوفة،
  * في معاملة واحدة.
  */
-export async function markDeleted(predicates, stamp = Date.now(), outboxFor = null) {
+export async function markDeleted(predicates, stamp = Date.now(), outboxFor = null, { productWrite = false } = {}) {
   const names = Object.keys(predicates).filter((n) => STORES.includes(n));
   if (!names.length) return { count: 0, touched: {} };
   const db = await openDB();
@@ -223,24 +231,27 @@ export async function markDeleted(predicates, stamp = Date.now(), outboxFor = nu
     const touched = {};
     let count = 0;
 
-    guardStudentLifecycle(tx, () => { for (const name of names) {
+    guardStudentLifecycle(tx, (device) => { for (const name of names) {
       const os = tx.objectStore(name);
       const all = os.getAll();
       all.onsuccess = () => {
-        const hit = all.result.filter((r) => !r.deleted && predicates[name](r));
-        touched[name] = hit.map((r) => r.id);
-        for (const r of hit) {
-          const next = { ...r, deleted: true, updatedAt: stamp };
-          os.put(next);
-          const entry = outboxFor?.(name, next);
-          if (entry) {
-            const previous = outbox.get(entry.id);
-            previous.onsuccess = () => outbox.put(mergeOutbox(previous.result, entry));
+        try {
+          if (productWrite) checkProductWrite(device);
+          const hit = all.result.filter((r) => !r.deleted && predicates[name](r));
+          touched[name] = hit.map((r) => r.id);
+          for (const r of hit) {
+            const next = { ...r, deleted: true, updatedAt: stamp };
+            os.put(next);
+            const entry = outboxFor?.(name, next);
+            if (entry) {
+              const previous = outbox.get(entry.id);
+              previous.onsuccess = () => outbox.put(mergeOutbox(previous.result, entry));
+            }
+            count++;
           }
-          count++;
-        }
+        } catch (error) { tx.lifecycleError = error; tx.abort(); }
       };
-    } });
+    } }, false, productWrite);
 
     tx.oncomplete = () => resolve({ count, touched });
     tx.onerror = () => reject(tx.error);
@@ -261,7 +272,7 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
     const tx = db.transaction(STORES, 'readwrite');
     let written = 0;
 
-    guardStudentLifecycle(tx, () => { if (mode === 'replace') {
+    guardStudentLifecycle(tx, (device) => { if (mode === 'replace') {
       // `keep` تُستثنى من المسح: إعدادات الجهاز تبقى ملك الجهاز حتى في الاستبدال
       for (const name of STORES) {
         if (keep.includes(name)) continue;
@@ -279,17 +290,20 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
         const os = tx.objectStore(name);
         const all = os.getAll();
         all.onsuccess = () => {
-          const existing = new Map(all.result.map((r) => [r.id, r]));
-          for (const r of data[name]) {
-            const cur = existing.get(r.id);
-            if (!cur || (r.updatedAt ?? 0) >= (cur.updatedAt ?? 0)) {
-              os.put(r);
-              written++;
+          try {
+            checkProductWrite(device);
+            const existing = new Map(all.result.map((r) => [r.id, r]));
+            for (const r of data[name]) {
+              const cur = existing.get(r.id);
+              if (!cur || (r.updatedAt ?? 0) >= (cur.updatedAt ?? 0)) {
+                os.put(r);
+                written++;
+              }
             }
-          }
+          } catch (error) { tx.lifecycleError = error; tx.abort(); }
         };
       }
-    } });
+    } }, false, true);
 
     tx.oncomplete = () => resolve(written);
     tx.onerror = () => reject(tx.error);
@@ -302,7 +316,7 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
  * declares the scope; the synchronous callback builds writes from records read
  * inside that same transaction, so another tab cannot invalidate the snapshot.
  */
-export async function applyBatch(batch, { prepare, allowStudentLifecycle = false, signal } = {}) {
+export async function applyBatch(batch, { prepare, allowStudentLifecycle = false, signal, productWrite = false } = {}) {
   const names = Object.keys(batch).filter((n) => STORES.includes(n));
   if (!names.length) return;
   const db = await openDB();
@@ -312,6 +326,7 @@ export async function applyBatch(batch, { prepare, allowStudentLifecycle = false
     const abort = () => { try { tx.abort(); } catch { /* Transaction already settled. */ } };
     signal?.addEventListener('abort', abort, { once: true });
     let failure;
+    let guardDevice;
     let writes = batch;
     tx.oncomplete = () => { signal?.removeEventListener('abort', abort); resolve(writes); };
     tx.onerror = (event) => { failure ??= event.target.error; };
@@ -327,6 +342,13 @@ export async function applyBatch(batch, { prepare, allowStudentLifecycle = false
         if (!writes || typeof writes !== 'object' || typeof writes.then === 'function') {
           throw new TypeError('applyBatch prepare must return a batch synchronously');
         }
+        // Dedicated online lifecycle creates a device checkpoint before its RPC.
+        // Reconciliation of an existing checkpoint remains a separate operation.
+        const priorCheckpoint = guardDevice?.studentLifecycleResume;
+        const nextCheckpoint = writes.device?.put?.find((row) => row.id === 'device')?.studentLifecycleResume;
+        if (nextCheckpoint && !priorCheckpoint) checkProductWrite(guardDevice);
+        const newEnvelope = writes.outbox?.put?.some((row) => !current?.outbox?.some((prior) => prior.id === row.id));
+        if (newEnvelope || productWrite) checkProductWrite(guardDevice);
         for (const [name, operations] of Object.entries(writes)) {
           if (!names.includes(name)) throw new Error(`applyBatch: store outside transaction scope: ${name}`);
           const os = tx.objectStore(name);
@@ -341,19 +363,20 @@ export async function applyBatch(batch, { prepare, allowStudentLifecycle = false
       }
     };
 
-    const start = () => {
-    if (!prepare) return write();
-    const current = {};
-    let pending = names.length;
-    for (const name of names) {
-      const read = tx.objectStore(name).getAll();
-      read.onsuccess = () => {
-        current[name] = read.result;
-        if (--pending === 0) write(current);
-      };
-    }
+    const start = (device) => {
+      guardDevice = device;
+      if (!prepare && !batch.outbox?.put?.length) return write();
+      const current = {};
+      let pending = names.length;
+      for (const name of names) {
+        const read = tx.objectStore(name).getAll();
+        read.onsuccess = () => {
+          current[name] = read.result;
+          if (--pending === 0) write(current);
+        };
+      }
     };
-    guardStudentLifecycle(tx, start, allowStudentLifecycle || names.every((name) => name === 'device'));
+    guardStudentLifecycle(tx, start, allowStudentLifecycle || names.every((name) => name === 'device'), productWrite);
   });
 }
 

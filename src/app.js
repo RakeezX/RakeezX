@@ -13,6 +13,7 @@ import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
+import { LEASE_STORAGE_PREFIX } from './lib/offline-lease.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { captureSupportOriginBeforeNavigation, clearSupportOrigin, enterSupportVisit } from './lib/support-origin.js';
 import { setRepaint } from './repaint.js';
@@ -72,7 +73,7 @@ const scrollMemory = new Map();
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => scheduleRender());
 
 const isDemoWorkspace = () => store.getActiveWorkspace()?.type === 'demo';
-const canMaterializeTodaySessions = () => isDemoWorkspace() || Boolean(cloud.session && cloud.user);
+const canMaterializeTodaySessions = () => store.getOfflineLeaseStatus().editable && (isDemoWorkspace() || Boolean(cloud.session && cloud.user));
 const supportAccountKey = () => `${cloud.user?.id ?? 'signed-out'}|${store.getActiveWorkspace()?.databaseName ?? 'unresolved'}`;
 let lastSupportAccountKey = supportAccountKey();
 
@@ -508,7 +509,7 @@ function paint() {
     }
     render(
       mainEl,
-      html`${topbar(view, ctx.params)}
+      html`${topbar(view, ctx.params)}${renderOfflineLease()}
         <div class="page ${view.wide ? 'page--wide' : ''} ${currentPath() === '/' ? 'page--home' : currentPath() === '/schedule' ? 'page--schedule' : ''} ${currentPath().startsWith('/teaching/') ? 'page--class-workspace' : ''}">${view.render(ctx.params)}</div>`
     );
   } catch (err) {
@@ -528,6 +529,22 @@ function paint() {
   }
   restoreFocus(snap);
   view.afterPaint?.(mainEl, ctx.params);
+}
+
+function renderOfflineLease() {
+  const lease = store.getOfflineLeaseStatus();
+  if (!['REMINDER', 'LIMITED'].includes(lease.state)) return '';
+  return html`<aside class="offline-lease-notice" dir="rtl" role="status" data-offline-lease="${lease.state}">
+    <div><strong>${lease.state === 'LIMITED' ? 'بياناتك متاحة للعرض' : 'تذكير بالتحقق من الحساب'}</strong>
+      <p>${lease.state === 'LIMITED' ? 'للعودة إلى التعديل، اتصل بالإنترنت وتحقق من حسابك. يمكنك تنزيل نسخة احتياطية وتصدير بياناتك.' : 'يمكنك متابعة العمل دون اتصال. تحقق من حسابك عند توفر الإنترنت لتجديد مدة التعديل.'}</p></div>
+    <button class="btn btn--ghost" data-act="renew-offline-lease">التحقق من الحساب</button>
+  </aside>`;
+}
+
+async function renewLeaseInBackground() {
+  if (store.getActiveWorkspace()?.type !== 'account') return;
+  try { await store.renewOfflineLease(); scheduleRender(); }
+  catch { /* Network failures leave the durable receipt and Product rows intact. */ }
 }
 
 /* ---------- تبديل الشاشة ---------- */
@@ -618,6 +635,7 @@ async function boot() {
     store.activateWorkspace(workspaceRouting.workspace);
     if (workspaceRouting.workspace.type === 'demo') await seedDemoWorkspace({ force: demoPreparing });
     await store.init();
+    void renewLeaseInBackground();
     // Dynamic import to prevent sync syntax errors from permanently blocking the app shell
     try {
       if (isDemoWorkspace()) throw Object.assign(new Error('Demo workspace has no cloud sync'), { code: 'DEMO_SYNC_DISABLED' });
@@ -662,7 +680,14 @@ async function boot() {
         get: (_t, key) => {
           const camelKey = typeof key === 'string' ? key.replace(/-([a-z0-9])/g, (_, letter) => letter.toUpperCase()) : key;
           const fn = a?.[key] ?? a?.[camelKey] ?? globals[key] ?? globals[camelKey];
-          return typeof fn === 'function' ? (el, ev) => fn(el, ev, ctx?.params ?? {}) : undefined;
+          return typeof fn === 'function' ? async (el, ev) => {
+            try { return await fn(el, ev, ctx?.params ?? {}); }
+            catch (error) {
+              if (error?.code === 'OFFLINE_LEASE_LIMITED') { toast(error.message, 'warn'); scheduleRender(); return; }
+              console.error('[rakeezx] Action failed', error);
+              toast(error?.message || 'تعذّر تنفيذ الإجراء', 'danger');
+            }
+          } : undefined;
         },
       }
     );
@@ -672,13 +697,18 @@ async function boot() {
   delegate(document.getElementById('modal-root'), handlers);
 
   setRepaint(scheduleRender);
-  store.onWriteError(() => toast('تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
+  store.onWriteError((error) => toast(error?.code === 'OFFLINE_LEASE_LIMITED' ? error.message : 'تعذّر الحفظ — لم يُسجَّل التعديل', 'danger'));
   store.subscribe((_state, update) => {
     if (update?.render !== false) scheduleRender();
   });
   cloud.subscribe(() => {
     const workspace = store.getActiveWorkspace();
     if (workspace?.type === 'account' && workspace.authUserId !== cloud.user?.id) cleanupSessionAutoTriggers();
+    if (workspace?.type === 'account' && cloud.user?.id && workspace.authUserId !== cloud.user.id) {
+      store.deactivateWorkspace('authenticated-account-workspace-mismatch');
+      location.reload();
+      return;
+    }
     const nextSupportAccountKey = supportAccountKey();
     if (nextSupportAccountKey !== lastSupportAccountKey) clearSupportOrigin();
     lastSupportAccountKey = nextSupportAccountKey;
@@ -696,6 +726,28 @@ async function boot() {
   }
   window.addEventListener('pageshow', onPresentationWake);
   window.addEventListener('online', onPresentationWake);
+  window.addEventListener('online', renewLeaseInBackground);
+  window.addEventListener('storage', (event) => {
+    if (event.key === cloud.AUTH_STORAGE_KEY && store.getActiveWorkspace()?.type === 'account') {
+      let nextOwner = null;
+      try { nextOwner = JSON.parse(event.newValue || 'null')?.user?.id; } catch {}
+      if (nextOwner !== store.getActiveWorkspace().authUserId) {
+        store.deactivateWorkspace('peer-account-context-changed');
+        location.reload();
+        return;
+      }
+    }
+    if (event.key === cloud.AUTH_STORAGE_KEY || event.key?.startsWith(LEASE_STORAGE_PREFIX) && !event.key.includes(':clock:')) {
+      store.getOfflineLeaseStatus(); scheduleRender();
+    }
+  });
+  window.addEventListener('pagehide', () => { store.getOfflineLeaseStatus(); });
+  let leasePresentation = store.getOfflineLeaseStatus().state;
+  const leaseTimer = setInterval(() => {
+    const next = store.getOfflineLeaseStatus().state;
+    if (next !== leasePresentation) { leasePresentation = next; scheduleRender(); }
+  }, 30000);
+  store.onWorkspaceDeactivation(() => clearInterval(leaseTimer));
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') onPresentationWake();
   });
@@ -1216,6 +1268,12 @@ function mountWorkspaceGate(routing) {
 
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
+  'renew-offline-lease': async (el) => {
+    el.disabled = true;
+    try { await store.renewOfflineLease(); toast('تم التحقق من الحساب، يمكنك متابعة التعديل'); scheduleRender(); }
+    catch { toast('لم يكتمل التحقق. تبقى بياناتك محفوظة؛ أعد المحاولة عند توفر اتصال مستقر.', 'warn'); }
+    finally { el.disabled = false; }
+  },
   'skip-to-content': (_el, event) => {
     event.preventDefault();
     document.getElementById('main')?.focus();

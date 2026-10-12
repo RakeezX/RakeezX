@@ -1,4 +1,5 @@
 import { LEGACY_WORKSPACE_DB_NAME } from './workspaces.js';
+import { runtimeOfflineLease } from './offline-lease.js';
 
 export const SYNC_OWNERSHIP_BLOCKED = 'SYNC_OWNERSHIP_BLOCKED';
 
@@ -153,4 +154,18 @@ export function ownershipBlockedError(access) {
 // Normal Production remains on the exact, ownerless legacy compatibility path.
 // A later workspace-activation ticket will replace this context only after a
 // persisted registry descriptor has been verified and its DB selected.
-export const runtimeSyncOwnershipGuard = createSyncOwnershipGuard();
+const runtimeOwnerGuard = createSyncOwnershipGuard();
+let leaseWriteGuard = null;
+export function setLeaseWriteGuard(guard) { leaseWriteGuard = guard; }
+export function assertNewProductWrite() {
+  if (runtimeOwnerGuard.getWorkspace().type === 'account') {
+    leaseWriteGuard?.();
+    runtimeOfflineLease().assertWritable();
+  }
+}
+export const runtimeSyncOwnershipGuard = Object.freeze({ ...runtimeOwnerGuard,
+  bindNewCommand(command) {
+    assertNewProductWrite();
+    return runtimeOwnerGuard.bindNewCommand(command);
+  },
+});

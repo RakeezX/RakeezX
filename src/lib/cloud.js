@@ -4,7 +4,8 @@
  */
 
 import { readCompleteTable } from './complete-read.js';
-import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
+import { runtimeSyncOwnershipGuard, assertNewProductWrite } from './sync-ownership.js';
+import { revokeOwnerLeases } from './offline-lease.js';
 
 export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
 const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
@@ -122,8 +123,16 @@ async function responseFailure(response) {
   return error;
 }
 
+function persistedAuthOwner() {
+  try { return JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || 'null')?.user?.id ?? null; }
+  catch { return null; }
+}
+
 function saveSession(data, { required = true } = {}) {
   const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
+  const priorPersistedOwner = persistedAuthOwner();
+  if (priorPersistedOwner && priorPersistedOwner !== nextUserId) revokeOwnerLeases(priorPersistedOwner);
+  if (user?.id && user.id !== nextUserId) revokeOwnerLeases(user.id);
   if ((user?.id ?? null) !== (nextUserId ?? null) || !!session !== !!data?.access_token) authContextGeneration++;
   if (!data?.access_token) {
     session = null;
@@ -151,9 +160,10 @@ export async function refreshSession() {
   }
   const refreshToken = session.refresh_token;
   const previous = session;
+  const expectedOwnerId = user?.id;
   const contextGeneration = authContextGeneration;
   const assertRefreshContext = () => {
-    if (authContextGeneration !== contextGeneration) {
+    if (authContextGeneration !== contextGeneration || persistedAuthOwner() !== expectedOwnerId) {
       throw Object.assign(new Error('Authentication changed during refresh'), { code: 'AUTH_CONTEXT_CHANGED' });
     }
   };
@@ -307,15 +317,29 @@ export async function verifyEmailOtp(email, token) {
  * sufficient for this operation.
  */
 export async function verifyCurrentAuthIdentity(expectedOwnerId) {
+  const contextGeneration = authContextGeneration;
   const expected = String(expectedOwnerId ?? '').trim().toLowerCase();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(expected)) {
     throw Object.assign(new Error('A valid expected Auth user ID is required'), { code: 'INVALID_AUTH_USER_ID' });
   }
   await ensureFreshSession();
   if (!session?.access_token) throw authError('Authentication required');
-  const verified = await request('/user', { method: 'GET' }, true);
+  let verified;
+  try {
+    verified = await request('/user', { method: 'GET' }, true);
+  } catch (error) {
+    if ([401, 403].includes(error?.status) && contextGeneration === authContextGeneration && user?.id === expected && persistedAuthOwner() === expected) {
+      saveSession(null);
+    }
+    throw error;
+  }
+  const persistedOwner = persistedAuthOwner();
+  if (contextGeneration !== authContextGeneration || user?.id !== expected || !session?.access_token || persistedOwner !== expected) {
+    throw Object.assign(new Error('Authentication changed during owner verification'), { code: 'AUTH_CONTEXT_CHANGED' });
+  }
   const actual = String(verified?.id ?? '').trim().toLowerCase();
   if (actual !== expected) {
+    revokeOwnerLeases(expected);
     throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
       code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
     });
@@ -352,14 +376,16 @@ export async function updateCurrentUserEmail(email) {
 }
 
 export async function signOut() {
-  if (session?.access_token) {
+  const priorToken = session?.access_token;
+  // Revoke immediately, including while an offline logout request is pending.
+  saveSession(null, { required: false });
+  if (priorToken) {
     try {
-      await request('/logout', { method: 'POST' }, true);
+      await request('/logout', { method: 'POST', headers: { Authorization: `Bearer ${priorToken}` } }, true);
     } catch (e) {
       console.warn('[rakeezx cloud] Logout request failed, clearing local session anyway', e);
     }
   }
-  saveSession(null, { required: false });
 }
 
 export async function fetchProfile() {
@@ -568,6 +594,7 @@ export async function getCurriculumSyncBootstrapStatus() {
 
 /** Atomic, same-owner historical curriculum contribution. */
 export async function contributeCurriculumSyncBootstrap(envelope) {
+  assertNewProductWrite();
   if (mockBackend) {
     if (typeof mockBackend.contributeCurriculumSyncBootstrap !== 'function') {
       throw new Error('Mock backend does not implement curriculum bootstrap contribution RPC');
@@ -962,6 +989,7 @@ export async function getScoreDomainSnapshot() {
 
 /** Stage a hash-bound restore plan. This RPC never changes domain rows. */
 export async function stageSyncV2Restore(envelope) {
+  assertNewProductWrite();
   if (mockBackend) {
     if (typeof mockBackend.stageSyncV2Restore !== 'function') throw new Error('Mock backend does not implement restore staging RPC');
     return mockBackend.stageSyncV2Restore(envelope);
@@ -1002,6 +1030,7 @@ export async function finalizeSyncV2Restore(envelope) {
 
 /** V5-only restore RPCs: the deployed V3/V4 stage/finalize contract is unchanged. */
 export async function stageScoreRestoreV2(envelope) {
+  assertNewProductWrite();
   if (mockBackend) {
     if (typeof mockBackend.stageScoreRestoreV2 !== 'function') throw new Error('Mock backend lacks V5 staging');
     return mockBackend.stageScoreRestoreV2(envelope);

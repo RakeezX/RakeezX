@@ -75,6 +75,9 @@ function accountDescriptor(record, key) {
     databaseName: record.databaseName,
     ownershipState: 'claimed',
     syncEligible: true,
+    // Stable claim/restore/provisioning identity, not mutable registry updatedAt.
+    leaseGeneration: JSON.stringify([record.createdAt, record.claimId ?? null,
+      record.restoreReceipt ?? null, record.provisioningReceipt ?? null]),
     broadcastChannelName: legacyInPlace ? LEGACY_BROADCAST_CHANNEL_NAME : accountChannelName(key),
     ...(legacyInPlace ? { workspaceKind: 'legacy-in-place', claimId: record.claimId } : {}),
     ...(record.workspaceKind === 'account-provisioned' ? { workspaceKind: 'account-provisioned' } : {}),
