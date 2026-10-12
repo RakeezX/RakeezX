@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v52';
+const VERSION = 'rakeezx-v53';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -109,6 +109,8 @@ const SHELL = [
   './src/lib/sync-operational-ui.js',
   './src/lib/avatar.js',
   './src/lib/backup-v2.js',
+  './src/lib/n77-delete.js',
+  './src/lib/restore-deletion-scope.js',
   './src/lib/build-meta.js',
   './src/lib/cloud-recovery-ui.js',
   './src/lib/report-print.js',
