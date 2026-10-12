@@ -7,8 +7,9 @@ This page preserves user notes and acceptance context. The automatic block lists
 
 | التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
 | --- | --- | --- | --- | --- | --- |
-| N49 | Production 7/14 days unchanged; separate 3/6-minute Preview available for PO trial; browser checks PARTIAL_FAIL_BROWSER_TIMEOUT: Product-account test timed out at 120 seconds; raw Production 7/14-day test passed in 1.1 seconds; overall browser run FAIL | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
-| N13 | Fixed canonical-item duplication and committed the completed scoped candidate. Historical blocked evidence preserved. No push, deployment, live mutation or queue/status edits. | [Production](https://rakeezx.com/) | 63b2c1fc29361d6c4c1ac066a743efaf3f2e31b8 | 2026-10-12T20:57:01.603Z | continuous-n13-existing-section-subject-20261012 |
+| N49 | Production 7/14 days unchanged; separate 3/6-minute Preview available for PO trial; browser checks PASS: Product-account case passed in 10.7 seconds after fixing the stale HOME route overwrite; unchanged raw Production 7/14-day case retains its 1.1-second PASS. Prior 120-second failure is retained as fixed history; timeout and assertions were unchanged | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
+| N91 | Existing AI candidate preserved. Repaired hosted-app harness passed both required checks. Full receipt: artifacts/ops-supervisor-v4/attempts/v6-n91-mobile-card-titles-20261012/a8e2b83e-507f-40e9-9bb0-d243887c9510/evidence/N91_HOSTED_APP_PROOF.json. | [Production](https://rakeezx.com/) | 61a6e1498c5ef985cb4e947c72e56eb18581797d | 2026-10-12T23:37:12.020Z | v6-n91-mobile-card-titles-20261012 |
+| N13 | WAITING_PO / REVISION DEPLOYED; single creation form and duplicate rejection verified in Production | [Production](https://rakeezx.com/) | a516ced605cf016848841b0bc021d4e5acdfa41f | 2026-10-12T23:38:52.495Z | continuous-n13-existing-section-subject-20261012 |
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
@@ -16,9 +17,9 @@ This page preserves user notes and acceptance context. The automatic block lists
 <!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->
 ## Current PO decisions — 2026-10-13
 
-N96 and N54 are explicitly accepted/CLOSED. N13 remains OPEN for the requested single grade/section/subject form and current-term duplicate rejection; its prior release does not accept this revision.
+N96 and N54 are explicitly accepted/CLOSED. N13 requested single grade/section/subject revision is verified in Production at `a516ced605cf016848841b0bc021d4e5acdfa41f` (2026-10-12T23:38:52.495Z). WAITING_PO / REVISION DEPLOYED; no PO acceptance or closure is claimed.
 
-N49 test Preview: [https://2304c981.rakeezx.pages.dev](https://2304c981.rakeezx.pages.dev). Release `a0419c5718422209ebf62773ac83436a7f848061`; source `ed2b49ae1fe7c3981e894e2f809a702640af3f2d`. Normal through 3 minutes, editable reminder after 3 minutes, read-only from 6 minutes. Reading/export/backup remain available; Restore and other writes are blocked. Production stays 7/14 days. Provider SUCCESS; module-boundary PASS; browser checks PARTIAL_FAIL_BROWSER_TIMEOUT: Product-account test timed out at 120 seconds; raw Production 7/14-day test passed in 1.1 seconds; overall browser run FAIL. This is for PO trial, not closure.
+N49 test Preview: [https://b5a7820d.rakeezx.pages.dev](https://b5a7820d.rakeezx.pages.dev). Release `3cc1f1f3c29c083c88cc80dd51060f07f783599d`; source `2b434fac6646bd04404077f2a97b9780846fc2b7`. Normal through 3 minutes, editable reminder after 3 minutes, read-only from 6 minutes. Reading/export/backup remain available; Restore and other writes are blocked. Production stays 7/14 days. Provider SUCCESS; module-boundary PASS; browser checks PASS: Product-account case passed in 10.7 seconds after fixing the stale HOME route overwrite; unchanged raw Production 7/14-day case retains its 1.1-second PASS. Prior 120-second failure is retained as fixed history; timeout and assertions were unchanged. This is for PO trial, not closure.
 
 N77 deletion is high priority after N13/N49. Deferred tickets stay deferred. See `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`; native queue closure is confirmed by a later controller snapshot.
 <!-- END RAKEEZ PO DECISIONS 20261013 -->

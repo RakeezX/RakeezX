@@ -4,7 +4,7 @@
 
 Sole canonical lifecycle/status authority for fully CLOSED Product outcomes and their PO Production verification. Active/current tickets and PO Inbox are in [Active Product Ledger](PRODUCT_LEDGER.md); raw wording/source mapping remains in [Historical raw notes](PRODUCT_LEDGER_HISTORY.md). References to work outside a closed scope are historical context, not an active-ticket status decision here.
 
-Current PO decisions (2026-10-13): N96 and N54 explicitly accepted/CLOSED; N13 remains OPEN for the requested simpler creation flow. N49 has a separate 3/6-minute Preview for PO trial; Production retains 7/14 days. N77 has high priority after N13/N49. Later releases require their own delivery receipts.
+Current PO decisions (2026-10-13): N96 and N54 explicitly accepted/CLOSED; N13 requested revision is verified in Production and WAITING_PO (not CLOSED). N49 has a separate 3/6-minute Preview for PO trial; Production retains 7/14 days. N77 has high priority after N13/N49. Later releases require their own delivery receipts.
 
 ## Closed attendance incident 0456
 

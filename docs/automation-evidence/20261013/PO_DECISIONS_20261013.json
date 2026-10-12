@@ -50,29 +50,87 @@
     "N49Preview": {
       "environment": "Preview",
       "branch": "preview/n49-3m6m-20261013",
-      "url": "https://2304c981.rakeezx.pages.dev",
-      "releaseSha": "a0419c5718422209ebf62773ac83436a7f848061",
-      "sourceSha": "ed2b49ae1fe7c3981e894e2f809a702640af3f2d",
-      "cloudflareDeploymentId": "2304c981-7969-4625-903b-1d209bcaa6e4",
-      "githubCheckRunId": 115047600930,
+      "url": "https://b5a7820d.rakeezx.pages.dev",
+      "releaseSha": "3cc1f1f3c29c083c88cc80dd51060f07f783599d",
+      "sourceSha": "2b434fac6646bd04404077f2a97b9780846fc2b7",
+      "cloudflareDeploymentId": "b5a7820d-f63f-46f6-b374-d1b17337b6f5",
+      "githubCheckRunId": 115055664016,
       "providerConclusion": "success",
       "moduleBoundaryChecks": "PASS",
-      "browserChecks": "PARTIAL_FAIL_BROWSER_TIMEOUT",
+      "browserChecks": "PASS",
       "browserEvidence": {
-        "finishedAt": "2026-10-12T23:21:26.1373795Z",
-        "overall": "FAIL",
-        "productAccountTest": "TIMEOUT_120000MS",
-        "rawProduction7And14Days": "PASS_1.1SEC",
-        "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser"
+        "finishedAt": "2026-10-12T23:35:02.4851369Z",
+        "overall": "PASS_WITH_UNCHANGED_PRODUCTION_CASE_REUSED",
+        "productAccountTest": "PASS_10.7SEC",
+        "totalSeconds": 11.7,
+        "timeoutMs": 120000,
+        "rawProduction7And14Days": "PASS_1.1SEC_REUSED",
+        "rawProductionCaseChanged": false,
+        "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-route-browser",
+        "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-route-browser-run.json",
+        "priorFailure": {
+          "finishedAt": "2026-10-12T23:21:26.1373795Z",
+          "overall": "FAIL",
+          "productAccountTest": "TIMEOUT_120000MS",
+          "rawProduction7And14Days": "PASS_1.1SEC",
+          "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser",
+          "disposition": "FIXED_STALE_HOME_ROUTE_COMMIT",
+          "correction": "Actual route-generation guard; test and timeout unchanged"
+        }
       },
       "normalThroughMs": 180000,
       "reminderAfterMs": 180000,
       "limitedFromMs": 360000,
-      "productionThresholds": "7/14 days unchanged"
+      "productionThresholds": "7/14 days unchanged",
+      "servedAssets": {
+        "src/app.js": "5d58e484d43131b01cae66976b3986d7c2edeb713c10074bd42f6c3a97a12bae",
+        "src/lib/offline-lease.js": "181b542d439ca807ccbf9aa4af4fde8f343dddd36d3f8f695a4ac304bd367722"
+      },
+      "servedVerified": true,
+      "poAccepted": false
+    },
+    "N13Revision": {
+      "taskId": "continuous-n13-existing-section-subject-20261012",
+      "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+      "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+      "verifiedAt": "2026-10-12T23:38:52.495Z",
+      "productionDeployed": true,
+      "state": "WAITING_PO / REVISION DEPLOYED",
+      "poAccepted": false
     }
   },
   "previousNativeApplicationRecord": {
     "queueClosureAndUpdatedCards": "PENDING_NATIVE_INSTALL",
     "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record"
-  }
+  },
+  "deliveryHistory": [
+    {
+      "key": "N49Preview",
+      "record": {
+        "environment": "Preview",
+        "branch": "preview/n49-3m6m-20261013",
+        "url": "https://2304c981.rakeezx.pages.dev",
+        "releaseSha": "a0419c5718422209ebf62773ac83436a7f848061",
+        "sourceSha": "ed2b49ae1fe7c3981e894e2f809a702640af3f2d",
+        "cloudflareDeploymentId": "2304c981-7969-4625-903b-1d209bcaa6e4",
+        "githubCheckRunId": 115047600930,
+        "providerConclusion": "success",
+        "moduleBoundaryChecks": "PASS",
+        "browserChecks": "PARTIAL_FAIL_BROWSER_TIMEOUT",
+        "browserEvidence": {
+          "finishedAt": "2026-10-12T23:21:26.1373795Z",
+          "overall": "FAIL",
+          "productAccountTest": "TIMEOUT_120000MS",
+          "rawProduction7And14Days": "PASS_1.1SEC",
+          "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser"
+        },
+        "normalThroughMs": 180000,
+        "reminderAfterMs": 180000,
+        "limitedFromMs": 360000,
+        "productionThresholds": "7/14 days unchanged"
+      },
+      "supersededBy": "3cc1f1f3c29c083c88cc80dd51060f07f783599d",
+      "disposition": "Prior browser failure retained; real route defect fixed and retested"
+    }
+  ]
 }
