@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "frozenOn": "2026-10-12",
+  "sourceDirectory": "tmp/rakeez_ops_apply/backlog-final-audit",
+  "proposedRepositoryDirectory": "scripts/ops-supervisor-v4/backlog-final-audit",
+  "noActivation": true,
+  "productCardFiles": [
+    "n77-continuation-card.json",
+    "n73-continuation-card.json",
+    "n71-continuation-card.json"
+  ],
+  "notForProductCatalog": [
+    "n93-research-task.json"
+  ],
+  "files": [
+    {
+      "path": "evidence.latest.readonly.json",
+      "bytes": 57915,
+      "sha256": "64b67f8b590e6ff1a37073e24547c3eb037dda791b8a7d10c5d06ff92c09205c"
+    },
+    {
+      "path": "evidence.readonly.json",
+      "bytes": 86972,
+      "sha256": "3c90b9f2f111106148dd918c4db679290de0eed0a1dca2449157718bc34f292e"
+    },
+    {
+      "path": "n71-continuation-card.json",
+      "bytes": 11487,
+      "sha256": "d217c3c8959bbece56e322630d10c48f5c5a4fba2530157ac46d3d74cc29b436"
+    },
+    {
+      "path": "n73-continuation-card.json",
+      "bytes": 11103,
+      "sha256": "cdc11933a40b48036116ca773fcccd945c0dd663baec08fd09e4456260d29698"
+    },
+    {
+      "path": "n77-continuation-card.json",
+      "bytes": 10624,
+      "sha256": "cf03859504de405b719406fb2e05cdfe0f086c32cc7a06e91cfed730b9fe3bdf"
+    },
+    {
+      "path": "n93-research-task.json",
+      "bytes": 3980,
+      "sha256": "5390ee0da267f36aa049736cf1d7d5bbc50cc9ddde161a0a5fe3f0dcaff7aff8"
+    },
+    {
+      "path": "triage-all-27.json",
+      "bytes": 18490,
+      "sha256": "972ea9eedbe62f62728eef32a4293e50c2c3cf22dea340d0f77cb46107f705a8"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 980,
+      "sha256": "c0c4b98ca4ee916a12a5486f0f3c6f5d842c2fa2374be5188b7b7291e092af49"
+    }
+  ]
+}

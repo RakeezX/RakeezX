@@ -1,0 +1,1889 @@
+{
+  "version": 1,
+  "observedOn": "2026-10-12",
+  "readOnly": true,
+  "noActivation": true,
+  "observedMain": "540fdf0b053d199b08ceb8fcfbde83453266afe3",
+  "canonicalLedger": {
+    "path": "C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md",
+    "sha256": "65dcdfa4bc989ad1af43036738f613a49005f46fd92b5c144012d137f5f82103",
+    "lifecycleRows": [
+      {
+        "id": "N09",
+        "line": 114,
+        "title": "Later page-by-page density/hierarchy audit",
+        "state": "DEFERRED",
+        "priority": "LOW",
+        "risk": "MEDIUM",
+        "references": "D-037"
+      },
+      {
+        "id": "N13",
+        "line": 115,
+        "title": "One logical Section/class with one shared roster and multiple independent subject Teachings",
+        "state": "LOCAL GATE QUALIFIED / COMBINED PREVIEW PUBLISHED / LIVE-SECURITY-SYNC-RESTORE-DEVICE-SERVED-PO GATES OPEN",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "D-040; D-104; WA-REFINEMENT-0440-2"
+      },
+      {
+        "id": "N18",
+        "line": 116,
+        "title": "Broader D: project inventory / future storage hygiene",
+        "state": "DEFERRED - FUTURE HYGIENE / NO CURRENT ACTION",
+        "priority": "LOW",
+        "risk": "HIGH",
+        "references": "D-044; D-112; SSD cutover 20261005"
+      },
+      {
+        "id": "N23",
+        "line": 117,
+        "title": "Footer/signatures alignment",
+        "state": "DEFERRED",
+        "priority": "MEDIUM",
+        "risk": "MEDIUM",
+        "references": "D-048; synthetic audit"
+      },
+      {
+        "id": "N24",
+        "line": 118,
+        "title": "Report/print/PDF/export design overhaul",
+        "state": "DEFERRED",
+        "priority": "MEDIUM",
+        "risk": "MEDIUM",
+        "references": "D-048"
+      },
+      {
+        "id": "N26",
+        "line": 119,
+        "title": "Later low-cost light/dark comfort refinement",
+        "state": "DEFERRED",
+        "priority": "LOW",
+        "risk": "LOW",
+        "references": "D-050"
+      },
+      {
+        "id": "N32",
+        "line": 120,
+        "title": "Optional former-student return preserving identity/history",
+        "state": "DEFERRED - FUTURE / DO NOT SPEND CURRENT CAPACITY",
+        "priority": "LOW",
+        "risk": "HIGH",
+        "references": "D-057; D-111"
+      },
+      {
+        "id": "N35",
+        "line": 121,
+        "title": "Optional private image/video attachments inside RAKEEZ",
+        "state": "DEFERRED - REVISIT WHEN PRODUCT SCALE JUSTIFIES STORAGE/COST",
+        "priority": "LOW",
+        "risk": "HIGH",
+        "references": "D-059; D-109; N34 CLOSED; N79 interim WhatsApp path"
+      },
+      {
+        "id": "N36",
+        "line": 122,
+        "title": "Direct user-initiated Madrasati/Noor Helper/Extension feeding N12 Preview",
+        "state": "LOCAL PRIVATE MV3 HELPER PROTOTYPE VERIFIED 8/8 / OFFICIAL TEACHER DOM GATE OPEN",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "D-060; D-094; N36 research; N12/N36 roadmap"
+      },
+      {
+        "id": "N44",
+        "line": 123,
+        "title": "Full notification foundation with in-app center, Web Push, channel-aware rules and RAKEEZ Admin publishing module",
+        "state": "LOCAL SYNTHETIC N44 CENTER DEMO READY / REAL EVENTS-PUSH-ADMIN FOUNDATION STILL BLOCKED; NOT PRODUCTION",
+        "priority": "LOW",
+        "risk": "HIGH",
+        "references": "2026-09-28 #06; 0375; D-107; D-108/N78; support-notification-worker audit"
+      },
+      {
+        "id": "N49",
+        "line": 124,
+        "title": "Valid lease keeps offline editing through normal restart; Production reminder at 7 days and LIMITED at 14 days since last trusted verification",
+        "state": "PO V1 BEHAVIOR + PRODUCTION THRESHOLDS APPROVED / FROZEN - HIGH-RISK ARCHITECTURE/IMPLEMENTATION GATES PENDING",
+        "priority": "HIGH",
+        "risk": "HIGH",
+        "references": "2026-09-29 #01; D-062 historical; D-092; D-103; N49 architecture audit"
+      },
+      {
+        "id": "N54",
+        "line": 125,
+        "title": "System-wide keyboard resilience under severe viewport compression",
+        "state": "PO WORK APPROVED — OPTION A; PRODUCT SOLUTION REOPENED / BLOCKED",
+        "priority": "HIGH",
+        "risk": "MEDIUM",
+        "references": "2026-09-29 #06; D-066 + D-067; WA-N53-N54-0434; 0408/0411; PO physical findings 0413"
+      },
+      {
+        "id": "N58",
+        "line": 126,
+        "title": "Stable identities, effective official dates, today-only session eligibility, account-synced preset choice and teacher-controlled term activation",
+        "state": "LIVE SYNTHETIC A-B AUTHORIZED / OCT11 SKIP BEFORE PROVISIONING - SECURE AUTH ADMIN API MISSING / NO ACCOUNTS OR FIXTURES / HIGH GATES OPEN",
+        "priority": "HIGH",
+        "risk": "HIGH",
+        "references": "D-076; D-078; D-087; 0457; Workflow V3.1"
+      },
+      {
+        "id": "N64",
+        "line": 131,
+        "title": "Email sent during user email-change flow still needs presentation/content refinement",
+        "state": "PO APPROVED DIRECTION — DEFERRED / LAST PRIORITY",
+        "priority": "LOW",
+        "risk": "MEDIUM",
+        "references": "2026-10-04 #01; current Secure Email Change flow"
+      },
+      {
+        "id": "N71",
+        "line": 132,
+        "title": "Simplify backup/restore to one Backup action and one unified Cloud-first Restore flow while preserving recovery safety",
+        "state": "PO WORK V3 APPROVED / FROZEN - HIGH-RISK CODEX IMPLEMENTATION PENDING",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "D-089; D-099; 2026-10-04 #08; backup.js; backup-v2.js"
+      },
+      {
+        "id": "N72",
+        "line": 133,
+        "title": "Dedicated later comprehensive iPhone/Safari quality sweep after current backlog is reduced",
+        "state": "PO APPROVED DIRECTION — DEFERRED DEDICATED LANE",
+        "priority": "LOW",
+        "risk": "MEDIUM",
+        "references": "D-089; 2026-10-04 #09; D-086; related but not merged with N09/N54"
+      },
+      {
+        "id": "N73",
+        "line": 134,
+        "title": "Apply complete source distribution to explicitly selected target classes, preserving target grades wherever valid and keeping extra target items unless removal is explicitly selected",
+        "state": "D-119 PREVIEW VERIFIED (c961f28) / DEMO-ONLY IMPLEMENTATION — NOT ELIGIBLE FOR PRODUCTION; OWNER-SYNC-SCORE SERVER GATES OPEN",
+        "priority": "HIGH",
+        "risk": "HIGH",
+        "references": "D-119 (supersedes D-098 N73 V1); D-105; D-102/N01 regression; 2026-10-04 #10 part 1"
+      },
+      {
+        "id": "N77",
+        "line": 135,
+        "title": "Explicit Delete is online-only and server-validated, removes the selected live class/subject scope without forcing Archive, and preserves anti-resurrection evidence",
+        "state": "CURRENT-MAIN RESTRICTED LOCAL DEMO ONLY; HISTORICAL COMBINED PREVIEW SEPARATE / SERVER-OWNER-SYNC-RESTORE GATES OPEN — NO PRODUCTION",
+        "priority": "HIGH",
+        "risk": "HIGH",
+        "references": "D-104; D-106; D-113; D-114; deleteClass/deleteTeaching; closed_term_reports"
+      },
+      {
+        "id": "N78",
+        "line": 136,
+        "title": "RAKEEZ Admin: secure internal management console for Product-wide administrative control and future modules",
+        "state": "PO PLATFORM DIRECTION APPROVED / FROZEN - HIGH-RISK AUTHORIZATION/AUDIT ARCHITECTURE + WORK DESIGN PENDING",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "D-108; N44/D-107; future Calendar publisher study; N34 Support lineage"
+      },
+      {
+        "id": "N84",
+        "line": 138,
+        "title": "Add calm inline +/- controls beside each student for Quick-Log-backed automatic score items in Gradebook",
+        "state": "IN_PROGRESS - IMPLEMENTING",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "PO note 2026-10-05 #05; current Gradebook auto items + Quick Log"
+      },
+      {
+        "id": "N88",
+        "line": 139,
+        "title": "Future simple student access to assignments/projects/tests, progress, achievements and later submissions",
+        "state": "DEFERRED - FUTURE PRODUCT EPIC / NO CURRENT CAPACITY",
+        "priority": "LOW",
+        "risk": "HIGH",
+        "references": "PO note 2026-10-05 #10; N87; deferred assignments/submissions stores"
+      },
+      {
+        "id": "N90",
+        "line": 140,
+        "title": "Optional N12 V2: explicit grade-column mapping from CSV/XLSX to existing gradebook items or deliberately created named items with teacher-confirmed maxima",
+        "state": "DEFERRED - OPTIONAL N12 V2 / NOT IMPLEMENTED",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "N12 V1 CLOSED; D-039; D-093; PO accepted V1 names-only 2026-10-11"
+      },
+      {
+        "id": "N91",
+        "line": 142,
+        "title": "بطاقات أدوات الفصل على الشاشات الصغيرة والجوال والآيفون تختفي أجزاء منها أو يُقص النص",
+        "state": "BLOCKED - SEE CURRENT CONTROLLER RECEIPT",
+        "priority": "HIGH",
+        "risk": "MEDIUM",
+        "references": "Note 2026-10-06 #01 received 2026-10-12; linked OPEN-DEFERRED N72; CLOSED N76/N53/N67"
+      },
+      {
+        "id": "N92",
+        "line": 143,
+        "title": "رسالة نجاح حذف الطالب الذي لا سجل تعليمي محفوظًا له تكون تم حذف الطالب بنجاح",
+        "state": "WAITING_PO - PRODUCTION VERIFIED",
+        "priority": "LOW",
+        "risk": "LOW",
+        "references": "Note 2026-10-06 #02 received 2026-10-12; src/lib/student-lifecycle-ui.js; related CLOSED N80; separate class-delete N77"
+      },
+      {
+        "id": "N93",
+        "line": 144,
+        "title": "دراسة تمثيل فترتي الرصد الأولى والثانية في نور ضمن كل فصل دراسي في ركيز",
+        "state": "PO SCOPE CLARIFIED - GRADES ONLY / NO DUPLICATE CLASSES-STUDENTS-ITEMS / OFFICIAL POLICY STUDY",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "Note 2026-10-06 #03 received 2026-10-12; related OPEN N84/N73; N90 deferred; Ministry/Noor current policy must be verified before data contract"
+      },
+      {
+        "id": "N94",
+        "line": 145,
+        "title": "تاريخ إنشاء تلقائي وبداية يحددها المعلم ولو مستقبلية، وموعد تسليم اختياري ودرجة بديلة اختيارية للتأخر وتمييز الطالب المتأخر في الكشف",
+        "state": "PO TAP-CYCLE 3 STATES + DISTINCT COLORS APPROVED / OPTIONAL START + LATE GRADE + EXCUSE OVERRIDE / IMPLEMENTATION PAUSED",
+        "priority": "MEDIUM",
+        "risk": "HIGH",
+        "references": "Note 2026-10-06 #04 received 2026-10-12; related OPEN N84, deferred N88; scoreSubitems and scoreSubitemCompletions models"
+      },
+      {
+        "id": "N95",
+        "line": 146,
+        "title": "لا يظهر تنبيه المزامنة الأحمر سريعًا للأعطال العابرة؛ يتطلب فشلًا مستمرًا أو سببًا مؤكدًا مع توضيح الحالة",
+        "state": "IN_PROGRESS - IMPLEMENTING",
+        "priority": "HIGH",
+        "risk": "HIGH",
+        "references": "Note 2026-10-06 #05 received 2026-10-12; related CLOSED N68/N33/N89 and OPEN N49"
+      }
+    ],
+    "countMethod": "Only rows whose first column is an exact N-ID and second column is a creation date. Exclude later supplemental-note/source tables with repeated N-IDs. DEFERRED is read from the status column, not a substring elsewhere in a row."
+  },
+  "runtime": {
+    "at": "2026-10-12T10:39:59.195Z",
+    "catalogActivation": {
+      "activationId": "po-20261012-continuous",
+      "expandedAt": "2026-10-12T10:21:01.315Z",
+      "sourceFile": "C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/continuation-cards-20261012.json",
+      "sourceSha256": "23cc979a707008055091e6a34cc8e4298f1cd8d0856e071bf3c2afe79d2eb6bf"
+    },
+    "currentActivationId": "po-20261012-continuous",
+    "catalogTasks": [
+      {
+        "id": "v6-n92-delete-copy-20261012",
+        "productId": "N92",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "v6-n91-mobile-card-titles-20261012",
+        "productId": "N91",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n95-sync-status-severity-20261012",
+        "productId": "N95",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n84-quicklog-completion-20261012",
+        "productId": "N84",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n54-keyboard-compression-20261012",
+        "productId": "N54",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n94-subitem-late-scoring-20261012",
+        "productId": "N94",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n13-existing-section-subject-20261012",
+        "productId": "N13",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n49-durable-offline-lease-20261012",
+        "productId": "N49",
+        "activationId": "po-20261012-continuous"
+      }
+    ],
+    "queue": [
+      {
+        "id": "continuous-n49-durable-offline-lease-20261012",
+        "productId": "N49",
+        "status": "running",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n54-keyboard-compression-20261012",
+        "productId": "N54",
+        "status": "pending",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n84-quicklog-completion-20261012",
+        "productId": "N84",
+        "status": "awaiting_po",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n94-subitem-late-scoring-20261012",
+        "productId": "N94",
+        "status": "pending",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "continuous-n95-sync-status-severity-20261012",
+        "productId": "N95",
+        "status": "awaiting_po",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "v6-n91-mobile-card-titles-20261012",
+        "productId": "N91",
+        "status": "blocked",
+        "activationId": "po-20261012-continuous"
+      },
+      {
+        "id": "v6-n92-delete-copy-20261012",
+        "productId": "N92",
+        "status": "awaiting_po",
+        "activationId": "po-20261012-continuous"
+      }
+    ],
+    "issues": [
+      {
+        "code": "PRODUCT_INELIGIBLE",
+        "taskId": "continuous-n13-existing-section-subject-20261012",
+        "reason": "AMBIGUOUS_PRODUCT_ROW"
+      },
+      {
+        "code": "PRODUCT_RECORD_UPDATE_FAILED",
+        "taskId": "continuous-n95-sync-status-severity-20261012",
+        "message": "EPERM: operation not permitted, rename 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md.12860.e511dba6-15e9-4415-bbfe-1b82c700e7cf.tmp' -> 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md'"
+      },
+      {
+        "code": "PRODUCT_RECORD_UPDATE_FAILED",
+        "taskId": "continuous-n84-quicklog-completion-20261012",
+        "message": "EPERM: operation not permitted, rename 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md.12860.d87dec0d-3478-42e4-98a6-a9dfc495fb68.tmp' -> 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md'"
+      },
+      {
+        "code": "PRODUCT_RECORD_UPDATE_FAILED",
+        "taskId": "continuous-n49-durable-offline-lease-20261012",
+        "message": "EPERM: operation not permitted, rename 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md.12860.23606d39-a544-472b-86ab-a44c29f14176.tmp' -> 'C:\\Users\\Abody\\Projects\\RakeezX\\docs\\PRODUCT_LEDGER.md'"
+      }
+    ],
+    "ledgerLag": "At this read N84/N95 runtime awaiting_po, but their older Ledger rows still IN_PROGRESS due the observed EPERM record-write issue. Do not enqueue duplicates."
+  },
+  "decisionSections": [
+    {
+      "line": 186,
+      "text": "## D-089 — 2026-10-04 PO note batch N64–N73 — 2026-10-05\n- PO approved the Product directions for N64–N73 as classified in the active Product Ledger, with N64 explicitly last priority and N72 explicitly deferred to a dedicated later iPhone/Safari lane.\n- N65/N66/N67 form an eligible low-risk micro-batch: collapse former-students history, remove redundant «كل الفصول» contextual link, and keep Desktop Mini Hub visible inside teaching routes. Each N-ID keeps separate acceptance/evidence; D-086 responsive coverage applies.\n- N68 is approved as a presentation-gate fix only. Do not alter Sync scheduling/outbox semantics or suppress durable rejected/blocked/failed/Auth/ownership/data-risk conditions. Normal wake/reconnect recovery should remain quiet in Mini Hub until stable failure is proven.\n- N69 is approved: attendance-report date range moves into the main toolbar as calm compact `من:` / `إلى:` controls; desktop may be one row, compact mobile may wrap naturally. Do not preserve the current bulky date-box treatment.\n- N70 direction approved: Work must show three integrated Reports-page IA variants; PO selects before Freeze/Production implementation.\n- N71 simplification direction approved: backup creation + restore are primary; rare legacy/bootstrap/inventory details use conditional/progressive disclosure. Safety-critical restore/owner semantics are not removed by this UX ticket.\n- N73 is the Product feature ticket only: simplify and repair «تطبيق التوزيع على كل الفصول» so teachers can choose exact source items, see exact target status, avoid duplicate-origin traps, and never silently move student grades.\n"
+    },
+    {
+      "line": 240,
+      "text": "## D-094 — N36 direct official-source Helper/Extension direction — 2026-10-05\n- Future N36 direction is a direct, user-initiated Madrasati/Noor Helper/Extension feeding the same N12 Preview and explicit confirmation. Official file-based exports remain N12 source adapters. PDF is only an optional fallback if a verified official format warrants it.\n- Never request or store credentials or OTP and never run background surveillance. Candidate data may include teacher information, classes, rosters, schedule and grades only where genuinely accessible and verified for the source/session. Keep source provenance, owner isolation, privacy review and high-risk adapter/extension gates.\n- This is direction for verified design and research; it does not approve a specific browser extension, collection method, private-data access, Product implementation or deployment.\n"
+    },
+    {
+      "line": 285,
+      "text": "## D-099 - N71 unified Cloud-first backup restore contract - 2026-10-06\n- PO approved and froze the N71 V1 Product behavior: the normal user-facing page has one backup action and one restore action. Technical recovery topology is not presented as user choices.\n- Backup remains one action: create/download a versioned backup file. The backup contract continues to exclude device/runtime-only stores such as device, meta, and outbox.\n- Restore is one action: choose a backup file, validate it, show only the necessary safe review/confirmation, then execute the canonical account restore Cloud-first. After the cloud result is finalized, reconcile the current device to that canonical result and let ordinary Sync converge other verified devices.\n- Normal users do not choose Local vs Cloud restore, Merge vs Replace, Curriculum Bootstrap, Legacy Workspace Claim, or Reconcile. Those are implementation/recovery mechanisms, not Product concepts.\n- Do not implement this by using the current local restoreBackup() and assuming ordinary Sync will upload the restored snapshot. Current local restore writes IndexedDB through db.writeAll() without generating the versioned outbox intent needed to make that restored snapshot authoritative in the cloud.\n- Reuse and extend the existing versioned Cloud Restore foundation rather than inventing a third restore system. Preserve owner checks, integrity/version validation, safe plan/review, conflict blocking, staged/finalized receipt semantics, resume-after-interruption, score/subitem invariants, lifecycle guards, and fail-closed behavior.\n- The target restore scope is every user/Product data domain represented by the portable backup contract, with no silent omission. The backup file must contain all RAKEEZ user data needed to reconstruct Product state; only intentionally device/runtime-only state such as device, meta, outbox and ephemeral runtime receipts is excluded. Unified Cloud-first restore must apply every backed-up Product domain to the canonical account/cloud outcome, explicitly including curriculum units/lessons and any other Product stores present in the backup contract, including currently deferred domains such as assignments/submissions if they contain user data, then reconcile the current device to that exact canonical result so normal Sync converges other verified devices.\n- device, meta, outbox, local runtime receipts and other intentionally device-scoped state remain excluded from portable backup/restore and are reconstructed/reconciled by the runtime.\n- Legacy Workspace Claim is not a normal Settings feature. Keep it dormant/internal and surface it only for a proven legacy-workspace recovery state until a separate read-only retirement audit proves no supported user still needs it; only then may the mechanism be removed.\n- Curriculum Bootstrap/Reconcile is not a normal Settings feature. Keep it internal only while required by the current units/lessons sync gate. Once the unified restore path safely owns curriculum restoration/provisioning, retire the separate user-facing/bootstrap recovery path if its gate can be removed without data or ownership risk.\n- Signed-out, wrong-owner, offline, unhealthy-Sync, unresolved-outbox, or interrupted-restore states must fail closed or request the prerequisite needed by the same unified restore flow. Do not silently fall back to a divergent local-only restore that could later conflict with the account.\n- The V1 page should remain simple: إنشاء نسخة احتياطية and استعادة نسخة احتياطية, plus only contextual status/error/recovery messaging when actually needed. No advanced-mode menu is required for the normal user.\n- N71 remains HIGH-RISK for implementation because restore semantics, owner isolation, Sync convergence, curriculum data, deletion/tombstone handling, and interruption recovery are safety-critical. This decision approves Product behavior only; no migration, runtime, Supabase, schema, live data, Preview, or Production action is authorized by this docs record.\n\n"
+    },
+    {
+      "line": 373,
+      "text": "## D-107 - N44 notification foundation and secure admin publisher - 2026-10-06\n- PO approves a complete reusable notification foundation rather than a deliberately crippled first version. Complete foundation does not mean every notification uses every channel; each notification type has its own appropriate channel rules.\n- User-facing foundation includes an in-app notification bell/center with unread/read/dismiss semantics, expiry and deduplication; actionable notifications use deep links to the relevant RAKEEZ surface.\n- Device delivery foundation includes real Web Push subscriptions per verified account/device. Pre-lesson reminders are considered useful only when they can reach the teacher through OS/device notification delivery while RAKEEZ is not open; an in-app-only reminder is insufficient.\n- Support scheduling and multi-device delivery. Notification generation/delivery must be idempotent and must avoid duplicate/noisy fan-out when the same logical event is processed more than once.\n- Retain the four product categories: operational teacher; account/service; RAKEEZ announcements; marketing/subscription offers. Category/channel preferences are separate where applicable. Marketing/offers are optional/opt-in. Critical account, security, ownership, data-protection or action-required notices may be non-optional but must remain calm and narrowly scoped.\n- Email is part of the available channel toolkit for message types that justify it; it is not a default duplicate channel for ordinary operational reminders.\n- Add a separate internal **RAKEEZ Admin Publisher** surface for authorized operators. It is not shown in normal teacher navigation and is not secured merely by hiding a route.\n- Admin Publisher capabilities: draft; preview; test-send to the operator; choose audience (all users, selected users, and an extensible future segment model); choose category and allowed channels; title/body; optional deep link/action; send now or schedule; expiry; cancel a not-yet-sent scheduled publication where safe; and inspect bounded delivery outcome/status.\n- Publishing to all users is represented as one server-side publication/campaign. The client must not enumerate all users or hold service-role credentials; a server-authorized worker/fan-out resolves eligible recipients, preferences and registered devices.\n- Admin authorization must be enforced server-side through an explicit privileged identity/allowlist/role contract. Current Product schema does not provide a general admin-role foundation, so implementation requires a separate HIGH-risk Auth/authorization architecture gate. Client-side visibility checks are never sufficient.\n- Current `support-notification-worker` is specific to N34 support email delivery and is not the N44 admin publisher. Reuse shared operational patterns only where safe; do not overload that worker into a general broadcast authority.\n- This decision freezes Product behavior/direction only. It authorizes no live schema/RLS/Auth/provider/service-role/Push credential change, no mass notification send, and no Production rollout before architecture, security, privacy, abuse/noise, cost and device compatibility gates.\n\n"
+    },
+    {
+      "line": 388,
+      "text": "## D-108 - RAKEEZ Admin general management platform - 2026-10-06\n- PO approves **RAKEEZ Admin** as the single private administrative management platform for RAKEEZ rather than creating unrelated one-off admin pages for each capability.\n- RAKEEZ Admin is separate from normal teacher navigation and Product UX. An admin route being hidden is not security; every privileged read/write/action must be server-authorized.\n- Build the foundation once: explicit administrator identity/role or tightly controlled allowlist, server-enforced authorization, least-privilege module permissions, secure session/access checks, and an audit trail for sensitive administrative actions.\n- High-impact operations should support review/confirmation and, where appropriate, draft/preview/publish, test mode, scheduling, rollback/cancel-before-apply or other domain-specific safeguards. The exact safeguard depends on the module.\n- The platform is modular. **Notifications/N44 is the first approved module** and owns campaign composition/publishing UI while N44 retains notification semantics, recipient/channel rules, delivery, preferences, Web Push and fan-out behavior.\n- Future RAKEEZ Admin modules may include: official Calendar catalog/publisher; subscriptions/plans/entitlements; users/accounts; Support operations; RAKEEZ announcements/content; feature/config controls; and other Product administration raised later by the PO.\n- The PO's intent is broad administrative readiness, but this does **not** create blanket unrestricted mutation authority. RAKEEZ Admin must not become a generic raw-database editor, must never expose service-role credentials to the browser, and must not bypass Product invariants, RLS/Owner Guard, lifecycle, privacy or audit protections.\n- Each module retains its own domain contract, authorization scope, validation, destructive-action safeguards and release gates. A module touching Auth, billing, RLS/schema, private user data, Sync/lifecycle or destructive operations remains HIGH/CRITICAL as applicable and requires its own explicit implementation authority.\n- User/account administration should expose only the minimum data needed for the approved operation. Do not provide casual browsing of private teacher/student Product data merely because an administrator exists.\n- The future official Calendar admin publisher, if pursued, belongs inside RAKEEZ Admin, but D-108 does not approve the Calendar catalog schema/source-monitoring/runtime itself; that remains separately scoped/deferred.\n- Existing N34 `support-notification-worker` remains a support-email delivery worker, not a general admin backend. Shared infrastructure may be reused only after security review.\n- This decision freezes Product/platform direction only. It authorizes no live admin account, Auth role, allowlist, schema/RLS, service-role exposure, billing integration, private-data access, mass notification, deployment or Production mutation.\n\n"
+    },
+    {
+      "line": 444,
+      "text": "## D-113 - N77 simplified delete vs immutable closed-term reports - 2026-10-07\n- PO approved the simplest N77 path: Archive is not part of explicit Delete and no new Archive complexity is added for N77.\n- Explicit Delete removes the selected live Teaching/Section scope and its current user-visible operational data under D-106. Shared students/data outside the deleted scope survive.\n- Immutable closed_term_reports snapshots are a deliberate exception to physical destructive cascade. Do not split, rewrite, supersede or delete a mixed term snapshot merely because one Teaching/Section was explicitly deleted.\n- Such snapshots may remain stored internally as historical technical truth. Their retained bytes do not mean the deleted Teaching/Section remains active Product data.\n- Any Product surface, export, restore or convergence path that consumes a retained closed-term snapshot must suppress deleted Teaching/Section scope using durable deletion evidence and must never resurrect that scope.\n- Minimal tombstones/receipts remain allowed for anti-resurrection, idempotency and safe retry.\n- This refinement resolves the only N77 Product ambiguity found by the 2026-10-07 cascade audit. It supersedes the earlier requirement to physically remove every report-supporting row when that row is an immutable mixed closed-term snapshot.\n- N77 remains CRITICAL because live lifecycle/Sync/data-loss semantics are involved. No live SQL/schema/data mutation is authorized until the exact high-risk gate is reached.\n\n"
+    },
+    {
+      "line": 455,
+      "text": "## D-114 - N77 online-only server-validated destructive delete - 2026-10-07\n- PO approved the final N77 initiation rule: explicit destructive Delete is online-only and server-validated.\n- A device must not perform any local destructive delete while offline or before trusted server validation succeeds.\n- The Delete action remains understandable in the UI. If the device is offline or validation cannot complete, RAKEEZ leaves data unchanged and shows a calm message that deletion requires an internet connection, with retry after connectivity returns.\n- On Delete, the server revalidates the authenticated owner/workspace and the current canonical Section/Teaching relationships before deriving scope. Multiple active Teachings means selected Teaching only; final/only Teaching means whole Section/class.\n- Scope is derived from current server truth, not potentially stale local state. If server state changed and safe scope cannot be established, fail closed and require refresh/retry; never broaden a delete silently.\n- Once validated, the destructive lifecycle command is atomic/fail-closed and cascades the approved live Product scope under D-106/D-113. Shared identities/data outside the validated scope survive.\n- Offline/stale devices converge afterward through tombstones/receipts and must not resurrect deleted scope. Offline initiation and queued destructive Delete are explicitly out of scope for N77 V1.\n- D-113 still applies: immutable mixed closed-term snapshots are not rewritten/split/deleted merely for Delete and remain internal historical artifacts suppressed for deleted scope.\n- This resolves the remaining N77 Product ambiguity and authorizes isolated CRITICAL implementation/certification only. It does not authorize live schema/data mutation or Production promotion before the existing high-risk gates."
+    },
+    {
+      "line": 495,
+      "text": "## D-119 - N73 simple full-distribution copy with safe optional extra-item removal - 2026-10-07\n- PO APPROVED and FROZE N73 V2 Product contract in `N73_SIMPLIFIED_DISTRIBUTION_V2.md`. This supersedes the conflicting N73 V1/D-098 three-state no-update/no-delete behavior; D-102 N01 regression obligations and D-105 parent edit safety remain. Previous N73 Work V2 is historical and NOT an implementation candidate for the copy workflow.\n- Simplify the regular teacher flow to source class → select target classes → compact review → apply. Copy the whole distribution definition; update matching target items in place, create missing, avoid duplicates. Do not expose internal matching states/provenance or separate bulk modes.\n- Target-only recorded manual score values stay where valid. On maximum reduction, values above new maximum are clamped in persisted score records (23/25→20/20), not display-only. Manual/auto changes use the target's own logs and never copy scores from source. Subitem/completion and owner/Sync correctness are HIGH-risk gates.\n- Extra target items and their scores **remain untouched by default**. Under collapsed `عرض الأثر`, an unchecked checkbox `إزالة هذا البند` for each extra item allows explicit deletion after warning/confirmation. Keeping extras means full identity is not exact; this is accepted Product behavior.\n- Truly ambiguous duplicate names/origin matches fail closed for the affected target with a clear explanation and a direct link to fix that target's items. No guesses or accidental deletion.\n- Compact RTL mobile treatment and one parent `تحرير` + one `البنود الفرعية` action. No clutter or unnecessary review steps. Work is authorized to produce real-UI V3 candidate; Codex may start isolated pure planning/invariants and safe implementation lanes now. Preview/Production/high-risk live mutation and CLOSED remain subject to separate gates.\n"
+    },
+    {
+      "line": 503,
+      "text": "### D-119 implementation clarification (same PO approval, not a separate decision) - 2026-10-07\n- Current PO approval: N73 new simpler contract is APPROVED FOR IMPLEMENTATION. It supersedes the D-098 three-state/no-update contract and the old Work N73 V2 candidate; preserve D-102/N01 idempotency regression and D-105 natural class order and metadata-only parent rename.\n- Teacher chooses one reference class and one or more eligible target classes. No target is selected by default. Apply its parent distribution items, complete subitems, maximums and automatic/manual configuration. Target student grades/events are NEVER copied from the source class.\n- A uniquely and safely matched existing target item is reconciled to the reference definition. Preserve target students' scores/completions where compatible; never erase scores merely to simplify matching. If a score exceeds the new maximum, cap at the new maximum (e.g. 23/25 -> 20/20), showing the effect before final confirmation. Other in-range numeric scores remain unchanged.\n- If an existing manual item becomes automatic, show the data-effect warning and derive the new score exclusively from that target class's own matching Quick Log/other authoritative records, not the source class or an invented value. No direct auto-score overwrite outside the existing scoring projection contract.\n- Reference items missing in the target are created without source students' grades; target automatic items derive only from target-side events. Repeated applications must be idempotent: no duplicate parent/subitem/origin creation.\n- Extra target items absent from the reference are KEPT with all existing target student grades by default. Display: «نشاط صفي — غير موجود في رابع 1»; «سيبقى هذا البند ودرجات طلابه كما هي.»; unchecked option «إزالة هذا البند». Unchecked is the default, including reentry into the flow. Deletion is an explicit teacher choice, not a side effect of synchronization.\n- If teacher selects removal, show the affected item's student-grade impact in the final review and require a distinct deliberate confirmation before any destructive commit. Never silently discard grades, and never transform an implicit unchecked state into consent.\n- Preview is concise: reference, targets, total before/after, changes affecting grade interpretation; «عرض الأثر» initially collapsed. Avoid the old three-state technical workflow. Warnings appear only when an actual significant change requires attention.\n- If multiple same-named target items or ambiguous identity/origin prevent a safe match, stop the ambiguous portion and direct the teacher to resolve the duplicate in target item settings. Do not guess a match, automatically create a duplicate, or quietly overwrite a different item.\n- Parent rename remains available with/without subitems, metadata-only, preserving parent/subitem IDs, order, completions, scores and Sync lineage. Targets use natural class order. N01 duplicate-origin regression remains covered within N73, not a new lane.\n- Codex owns actual high-risk score/source-match/atomic update/delete/Sync implementation; Work-Active owns only the integrated real RAKEEZ UI, not a standalone mock. No N73 Product/live mutation, SQL/Supabase write or Production promotion is authorized without its own gates.\n- Lean execution rule: smallest isolated N73 slice, existing primitives first, tests proportional to risk. Prefer focused score-cap, manual-to-auto, explicit-extra-delete/keep, idempotency, failure/retry and owner isolation gates; reuse proven unchanged evidence and avoid broad duplicate suites, speculative framework work, and feature inflation.\n- N73 HOLD is removed for this D-119 contract only. All old N73 Work candidates remain historical; any new N73 Work lane must not edit approved frozen W1/N82/N70/N84/N71 surfaces.\n"
+    },
+    {
+      "line": 518,
+      "text": "## D-120 - N77 explicit high-risk completion authorization - 2026-10-08\n- PO explicitly authorized PM to undertake all steps necessary to deliver and finish N77, including the previously held live Supabase migration and bounded synthetic live verification, provided the already-approved D-104/D-106/D-113/D-114 deletion/owner/Sync/data-loss safeguards pass. This decision does not change N77 Product behavior.\n- Live Supabase target is the verified production project RakeezX Main (xlrubcwjqktzzunrvuns). Read-only checks on 2026-10-08 confirmed the old lifecycle RPC exists and N77 migration/function/guard do not yet exist.\n- Authorize applying only the exact reviewed additive N77 server-validated delete migration when a current-main N77 client candidate, exact SQL hash/schema checks, disposable native Postgres owner A/B/atomicity tests, client receipts/anti-resurrection and scoped recovery plan are certified. Applied migrations remain immutable. Stop on unexpected drift, unsafe compatibility, failed security/Sync tests, or live test mutation outside named disposable synthetic records. No raw Product/private account data mutations are authorized.\n- Authorized live test operations are limited to identified disposable synthetic account A/B IDs and purpose-created classes, Teachings, students and descendants, with before/after checks and safe disposition. No unrelated schema/Auth/ownership/restore changes.\n- Final Cloudflare Preview PO review, exact Production promotion, PO Production verification and CLOSED evidence remain mandatory for user-visible N77. This is not an authorization to skip HIGH/CRITICAL gates.\n"
+    }
+  ],
+  "currentSource": [
+    {
+      "path": "src/views/backup.js",
+      "blob": "e46519a584346532b778c1b703f4e9a25d5cf132",
+      "lines": [
+        {
+          "line": 5,
+          "text": "import * as cloud from '../lib/cloud.js';"
+        },
+        {
+          "line": 6,
+          "text": "import * as sync from '../lib/sync.js';"
+        },
+        {
+          "line": 7,
+          "text": "import { downloadBackup, restoreBackup, readJSONFile, validateBackup, validateBackupIntegrity } from '../lib/export.js';"
+        },
+        {
+          "line": 8,
+          "text": "import {"
+        },
+        {
+          "line": 9,
+          "text": "  getCloudRestoreResumeState, previewCloudRestore, restoreBackupToCloud, resumeCloudRestore,"
+        },
+        {
+          "line": 10,
+          "text": "} from '../lib/backup-v2.js';"
+        },
+        {
+          "line": 11,
+          "text": "import {"
+        },
+        {
+          "line": 12,
+          "text": "  CLOUD_RECOVERY_STATE_META, cloudRecoveryErrorPresentation,"
+        },
+        {
+          "line": 661,
+          "text": "          phase: error?.code === 'CURRICULUM_BOOTSTRAP_CONFLICT' ? 'conflict' : 'failed',"
+        },
+        {
+          "line": 662,
+          "text": "          status: error?.result ?? status,"
+        },
+        {
+          "line": 663,
+          "text": "          error: error?.code === 'CURRICULUM_BOOTSTRAP_BACKUP_REQUIRED'"
+        },
+        {
+          "line": 664,
+          "text": "            ? 'نزّل نسخة احتياطية حديثة أولًا.'"
+        },
+        {
+          "line": 665,
+          "text": "            : 'لم تتغير بيانات المنهج. أعد المحاولة عند توفر اتصال مستقر.',"
+        },
+        {
+          "line": 666,
+          "text": "        };"
+        },
+        {
+          "line": 728,
+          "text": "      setCloudRecovery({ phase: 'restoring', busy: true, error: null });"
+        },
+        {
+          "line": 729,
+          "text": "      try {"
+        },
+        {
+          "line": 730,
+          "text": "        const result = await restoreBackupToCloud(cloudRecovery.payload);"
+        },
+        {
+          "line": 731,
+          "text": "        cloudResumeState = null;"
+        },
+        {
+          "line": 732,
+          "text": "        cloudResumeError = null;"
+        },
+        {
+          "line": 733,
+          "text": "        setCloudRecovery({ phase: 'success', busy: false, result, plan: result.plan });"
+        },
+        {
+          "line": 734,
+          "text": "      } catch (error) {"
+        },
+        {
+          "line": 735,
+          "text": "        if (error.code === 'RESTORE_REVIEW_REQUIRED' && error.plan) {"
+        },
+        {
+          "line": 736,
+          "text": "          setCloudRecovery({ phase: 'review', busy: false, plan: error.plan, error: presentCloudError(error) });"
+        },
+        {
+          "line": 737,
+          "text": "          return;"
+        },
+        {
+          "line": 738,
+          "text": "        }"
+        },
+        {
+          "line": 739,
+          "text": "        if (['LOCAL_RECONCILIATION_REQUIRED', 'CLOUD_RESTORE_RESUME_REQUIRED'].includes(error.code)) {"
+        },
+        {
+          "line": 740,
+          "text": "          await refreshResumeState();"
+        },
+        {
+          "line": 741,
+          "text": "          cloudRecovery = { ...cloudRecovery, phase: 'error', busy: false, error: presentCloudError(error) };"
+        },
+        {
+          "line": 742,
+          "text": "          repaint();"
+        },
+        {
+          "line": 793,
+          "text": "      }"
+        },
+        {
+          "line": 794,
+          "text": "      try {"
+        },
+        {
+          "line": 795,
+          "text": "        const { written, migration } = await restoreBackup(payload, mode);"
+        },
+        {
+          "line": 796,
+          "text": "        toast(migration ? `استُرجع ${written} سجلًا ورُحّل إلى شكل رَكيز المعلم — يُعاد التحميل` : `استُرجع ${written} سجلًا — يُعاد التحميل`);"
+        },
+        {
+          "line": 797,
+          "text": "        if (migration?.warnings?.length) console.warn('[rakeezx] ملاحظات ترحيل النسخة:', migration.warnings);"
+        },
+        {
+          "line": 798,
+          "text": "        setTimeout(() => location.reload(), 1100);"
+        }
+      ]
+    },
+    {
+      "path": "src/lib/backup-v2.js",
+      "blob": "195e56ffd614a2751d973a8b6bfa741e8f0f90b1",
+      "lines": [
+        {
+          "line": 11,
+          "text": "} from './sync-v2.js';"
+        },
+        {
+          "line": 12,
+          "text": ""
+        },
+        {
+          "line": 13,
+          "text": "export const RESTORE_CLASSIFICATIONS = Object.freeze(["
+        },
+        {
+          "line": 14,
+          "text": "  'SAFE_APPLY', 'KEEP_SERVER', 'CONFLICT', 'TOMBSTONED_SERVER', 'INVALID',"
+        },
+        {
+          "line": 15,
+          "text": "]);"
+        },
+        {
+          "line": 16,
+          "text": ""
+        },
+        {
+          "line": 21,
+          "text": "// Manifest arrays are order-sensitive at staging. Match the deployed server"
+        },
+        {
+          "line": 22,
+          "text": "// helper rather than relying on object/property declaration order."
+        },
+        {
+          "line": 23,
+          "text": "const LEGACY_CLOUD_RESTORE_STORES = Object.freeze(["
+        },
+        {
+          "line": 24,
+          "text": "  'profile', 'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'sections',"
+        },
+        {
+          "line": 25,
+          "text": "  'teachings', 'students', 'enrollments', 'notes', 'classRules',"
+        },
+        {
+          "line": 26,
+          "text": "  'classCharterSelections', 'classGoals', 'groupArrangements', 'items', 'scores',"
+        },
+        {
+          "line": 28,
+          "text": "  'attendance', 'closedTermReports',"
+        },
+        {
+          "line": 29,
+          "text": "]);"
+        },
+        {
+          "line": 30,
+          "text": "const SCORE_CLOUD_RESTORE_STORES = Object.freeze([...LEGACY_CLOUD_RESTORE_STORES,"
+        },
+        {
+          "line": 31,
+          "text": "  'scoreSubitems', 'scoreSubitemCompletions']);"
+        },
+        {
+          "line": 32,
+          "text": "const restoreStores = (version) => version === 5 ? SCORE_CLOUD_RESTORE_STORES : LEGACY_CLOUD_RESTORE_STORES;"
+        },
+        {
+          "line": 33,
+          "text": "const RESTORE_STORE_ORDER = Object.freeze(["
+        },
+        {
+          "line": 34,
+          "text": "  'years', 'calendars', 'calendarDays', 'terms', 'subjects', 'units', 'lessons', 'sections', 'teachings', 'students',"
+        },
+        {
+          "line": 35,
+          "text": "  'enrollments', 'timeProfiles', 'profile', 'items', 'slots', 'sessions', 'notes', 'classRules',"
+        },
+        {
+          "line": 36,
+          "text": "  'classCharterSelections', 'classGoals', 'groupArrangements',"
+        },
+        {
+          "line": 39,
+          "text": "]);"
+        },
+        {
+          "line": 40,
+          "text": "const LOCAL_ONLY_STORES = Object.freeze(db.STORES.filter((name) =>"
+        },
+        {
+          "line": 41,
+          "text": "  !SCORE_CLOUD_RESTORE_STORES.includes(name) && !DEVICE_ONLY_STORES.includes(name)));"
+        },
+        {
+          "line": 42,
+          "text": "const RESTORE_RESUME_VERSION = 1;"
+        },
+        {
+          "line": 43,
+          "text": "const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value ?? {}, key);"
+        },
+        {
+          "line": 44,
+          "text": "const clone = (value) => value == null ? value : structuredClone(value);"
+        },
+        {
+          "line": 45,
+          "text": "const equal = (left, right) => JSON.stringify(left) === JSON.stringify(right);"
+        },
+        {
+          "line": 182,
+          "text": "  entries.sort((left, right) => `${left.entity}\\u0000${left.id}\\u0000${left.classification}`"
+        },
+        {
+          "line": 183,
+          "text": "    .localeCompare(`${right.entity}\\u0000${right.id}\\u0000${right.classification}`));"
+        },
+        {
+          "line": 184,
+          "text": "  const counts = Object.fromEntries(RESTORE_CLASSIFICATIONS.map((name) =>"
+        },
+        {
+          "line": 185,
+          "text": "    [name, entries.filter((entry) => entry.classification === name).length]));"
+        },
+        {
+          "line": 186,
+          "text": "  return {"
+        },
+        {
+          "line": 187,
+          "text": "    backupHash: payload.backupHash ?? null,"
+        },
+        {
+          "line": 191,
+          "text": "    operations: entries.filter((entry) => entry.classification === 'SAFE_APPLY')"
+        },
+        {
+          "line": 192,
+          "text": "      .sort((left, right) => {"
+        },
+        {
+          "line": 193,
+          "text": "        const leftRank = RESTORE_STORE_ORDER.indexOf(left.store);"
+        },
+        {
+          "line": 194,
+          "text": "        const rightRank = RESTORE_STORE_ORDER.indexOf(right.store);"
+        },
+        {
+          "line": 195,
+          "text": "        const leftDelete = left.operation === 'delete';"
+        },
+        {
+          "line": 196,
+          "text": "        const rightDelete = right.operation === 'delete';"
+        },
+        {
+          "line": 197,
+          "text": "        if (leftDelete !== rightDelete) return leftDelete ? 1 : -1;"
+        },
+        {
+          "line": 293,
+          "text": ""
+        },
+        {
+          "line": 294,
+          "text": "function validateResumeCheckpoint(checkpoint) {"
+        },
+        {
+          "line": 295,
+          "text": "  const valid = checkpoint?.version === RESTORE_RESUME_VERSION &&"
+        },
+        {
+          "line": 296,
+          "text": "    typeof checkpoint.restoreId === 'string' && checkpoint.restoreId &&"
+        },
+        {
+          "line": 297,
+          "text": "    typeof checkpoint.backupHash === 'string' && checkpoint.backupHash &&"
+        },
+        {
+          "line": 298,
+          "text": "    typeof checkpoint.stageHash === 'string' && checkpoint.stageHash &&"
+        },
+        {
+          "line": 300,
+          "text": "    checkpoint.localData && typeof checkpoint.localData === 'object' && !Array.isArray(checkpoint.localData);"
+        },
+        {
+          "line": 301,
+          "text": "  if (!valid) throw Object.assign(new Error('Stored cloud restore resume state is invalid'), {"
+        },
+        {
+          "line": 302,
+          "text": "    code: 'INVALID_RESTORE_RESUME_STATE',"
+        },
+        {
+          "line": 303,
+          "text": "  });"
+        },
+        {
+          "line": 304,
+          "text": "  return checkpoint;"
+        },
+        {
+          "line": 305,
+          "text": "}"
+        },
+        {
+          "line": 329,
+          "text": "  return updateResumeCheckpoint((current) => {"
+        },
+        {
+          "line": 330,
+          "text": "    if (!current || current.restoreId !== checkpoint.restoreId || current.stageHash !== checkpoint.stageHash) {"
+        },
+        {
+          "line": 331,
+          "text": "      throw Object.assign(new Error('Cloud restore resume identity changed'), { code: 'RESTORE_RESUME_IDENTITY_MISMATCH' });"
+        },
+        {
+          "line": 332,
+          "text": "    }"
+        },
+        {
+          "line": 333,
+          "text": "    return { ...current, state: 'finalized', receipt: clone(receipt), finalizedAt: Date.now() };"
+        },
+        {
+          "line": 334,
+          "text": "  });"
+        },
+        {
+          "line": 339,
+          "text": "    if (!current) return null;"
+        },
+        {
+          "line": 340,
+          "text": "    if (current.restoreId !== checkpoint.restoreId || current.stageHash !== checkpoint.stageHash) {"
+        },
+        {
+          "line": 341,
+          "text": "      throw Object.assign(new Error('Cloud restore resume identity changed'), { code: 'RESTORE_RESUME_IDENTITY_MISMATCH' });"
+        },
+        {
+          "line": 342,
+          "text": "    }"
+        },
+        {
+          "line": 343,
+          "text": "    return null;"
+        },
+        {
+          "line": 344,
+          "text": "  });"
+        },
+        {
+          "line": 358,
+          "text": ""
+        },
+        {
+          "line": 359,
+          "text": "/**"
+        },
+        {
+          "line": 360,
+          "text": " * Explicitly resume the exact staged/finalized restore. Finalize is receipt-idempotent;"
+        },
+        {
+          "line": 361,
+          "text": " * the fresh canonical fetch avoids replacing local state with an older receipt snapshot."
+        },
+        {
+          "line": 362,
+          "text": " */"
+        },
+        {
+          "line": 363,
+          "text": "export async function resumeCloudRestore({"
+        },
+        {
+          "line": 368,
+          "text": "} = {}) {"
+        },
+        {
+          "line": 369,
+          "text": "  const checkpoint = await resumeCheckpoint();"
+        },
+        {
+          "line": 370,
+          "text": "  if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });"
+        },
+        {
+          "line": 371,
+          "text": "  await coordinator.assertCloudRestoreReady();"
+        },
+        {
+          "line": 372,
+          "text": "  return coordinator.runCloudRestoreExclusive(async () => {"
+        },
+        {
+          "line": 373,
+          "text": "    const finalize = checkpoint.backupVersion === 5"
+        },
+        {
+          "line": 374,
+          "text": "      ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;"
+        },
+        {
+          "line": 375,
+          "text": "    if (typeof finalize !== 'function') throw new Error('Versioned score restore is unavailable');"
+        },
+        {
+          "line": 376,
+          "text": "    const result = await finalize({"
+        },
+        {
+          "line": 377,
+          "text": "      restoreId: checkpoint.restoreId,"
+        },
+        {
+          "line": 378,
+          "text": "      backupHash: checkpoint.backupHash,"
+        },
+        {
+          "line": 384,
+          "text": "      const canonical = await canonicalFetcher({ version: finalized.backupVersion });"
+        },
+        {
+          "line": 385,
+          "text": "      await reconciler({ version: finalized.backupVersion, data: finalized.localData }, canonical,"
+        },
+        {
+          "line": 386,
+          "text": "        { restoreId: finalized.restoreId });"
+        },
+        {
+          "line": 387,
+          "text": "      await clearResumeCheckpoint(finalized);"
+        },
+        {
+          "line": 388,
+          "text": "    } catch (error) {"
+        },
+        {
+          "line": 389,
+          "text": "      throw reconciliationRequired(error, finalized);"
+        },
+        {
+          "line": 390,
+          "text": "    }"
+        },
+        {
+          "line": 391,
+          "text": "    return { restoreId: finalized.restoreId, resumed: true, receipt: result.receipt };"
+        },
+        {
+          "line": 392,
+          "text": "  });"
+        },
+        {
+          "line": 393,
+          "text": "}"
+        },
+        {
+          "line": 394,
+          "text": ""
+        },
+        {
+          "line": 395,
+          "text": "/** Final cloud-aware restore. No UI calls this foundation yet. */"
+        },
+        {
+          "line": 396,
+          "text": "export async function restoreBackupToCloud(payload, {"
+        },
+        {
+          "line": 397,
+          "text": "  restoreId = globalThis.crypto.randomUUID(),"
+        },
+        {
+          "line": 398,
+          "text": "  transport = cloud,"
+        },
+        {
+          "line": 399,
+          "text": "  coordinator = sync,"
+        },
+        {
+          "line": 405,
+          "text": "  if (await resumeCheckpoint()) {"
+        },
+        {
+          "line": 406,
+          "text": "    throw Object.assign(new Error('A prior cloud restore must be resumed before starting another'), {"
+        },
+        {
+          "line": 407,
+          "text": "      code: 'CLOUD_RESTORE_RESUME_REQUIRED',"
+        },
+        {
+          "line": 408,
+          "text": "      restore: await getCloudRestoreResumeState(),"
+        },
+        {
+          "line": 409,
+          "text": "    });"
+        },
+        {
+          "line": 410,
+          "text": "  }"
+        },
+        {
+          "line": 413,
+          "text": "    const serverData = await sourceFetcher({ version: payload.version });"
+        },
+        {
+          "line": 414,
+          "text": "    const plan = planCloudRestore(payload, serverData, { ownerId: cloud.user.id });"
+        },
+        {
+          "line": 415,
+          "text": "    if (!plan.ready) throw Object.assign(new Error('Restore requires review'), { code: 'RESTORE_REVIEW_REQUIRED', plan });"
+        },
+        {
+          "line": 416,
+          "text": "    const stageCall = payload.version === 5 ? transport.stageScoreRestoreV2 : transport.stageSyncV2Restore;"
+        },
+        {
+          "line": 417,
+          "text": "    const finalizeCall = payload.version === 5 ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;"
+        },
+        {
+          "line": 418,
+          "text": "    if (typeof stageCall !== 'function' || typeof finalizeCall !== 'function') {"
+        },
+        {
+          "line": 419,
+          "text": "      throw Object.assign(new Error('Versioned score restore is unavailable'), { code: 'SCORE_RESTORE_UNAVAILABLE' });"
+        },
+        {
+          "line": 420,
+          "text": "    }"
+        },
+        {
+          "line": 421,
+          "text": "    const stage = await stageCall({"
+        },
+        {
+          "line": 422,
+          "text": "      restoreId, backupHash: payload.backupHash ?? `legacy-v3:${restoreId}`,"
+        },
+        {
+          "line": 424,
+          "text": "    });"
+        },
+        {
+          "line": 425,
+          "text": "    let checkpoint = await updateResumeCheckpoint(() => ({"
+        },
+        {
+          "line": 426,
+          "text": "      version: RESTORE_RESUME_VERSION,"
+        },
+        {
+          "line": 427,
+          "text": "      restoreId,"
+        },
+        {
+          "line": 428,
+          "text": "      backupHash: stage.backupHash,"
+        },
+        {
+          "line": 429,
+          "text": "      backupVersion: payload.version,"
+        }
+      ]
+    },
+    {
+      "path": "src/lib/cloud.js",
+      "blob": "20ccb6e658e29d786213127728c17b8c358998b8",
+      "lines": [
+        {
+          "line": 615,
+          "text": "  if (mockBackend) return mockBackend.getSyncV2RestoreManifestFull({ signal });"
+        },
+        {
+          "line": 616,
+          "text": "  if (!user) throw authError('Authentication required');"
+        },
+        {
+          "line": 617,
+          "text": "  return request('/rpc/sync_v2_restore_manifest_full', {"
+        },
+        {
+          "line": 618,
+          "text": "    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 619,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 620,
+          "text": "    body: JSON.stringify({ p_owner: user.id }), signal,"
+        },
+        {
+          "line": 630,
+          "text": "  }"
+        },
+        {
+          "line": 631,
+          "text": "  if (!user) throw authError('Authentication required');"
+        },
+        {
+          "line": 632,
+          "text": "  return request('/rpc/sync_v2_restore_manifest_score_v2', {"
+        },
+        {
+          "line": 633,
+          "text": "    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 634,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 635,
+          "text": "    body: JSON.stringify({ p_owner: user.id }), signal,"
+        },
+        {
+          "line": 924,
+          "text": "  }"
+        },
+        {
+          "line": 925,
+          "text": "  if (!user) throw new Error('Not authenticated');"
+        },
+        {
+          "line": 926,
+          "text": "  return request('/rpc/apply_score_distribution_copy_command', {"
+        },
+        {
+          "line": 927,
+          "text": "    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 928,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 929,
+          "text": "    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,"
+        },
+        {
+          "line": 964,
+          "text": "export async function stageSyncV2Restore(envelope) {"
+        },
+        {
+          "line": 965,
+          "text": "  if (mockBackend) {"
+        },
+        {
+          "line": 966,
+          "text": "    if (typeof mockBackend.stageSyncV2Restore !== 'function') throw new Error('Mock backend does not implement restore staging RPC');"
+        },
+        {
+          "line": 967,
+          "text": "    return mockBackend.stageSyncV2Restore(envelope);"
+        },
+        {
+          "line": 968,
+          "text": "  }"
+        },
+        {
+          "line": 969,
+          "text": "  if (!user) throw new Error('Not authenticated');"
+        },
+        {
+          "line": 970,
+          "text": "  return request('/rpc/stage_sync_v2_restore', {"
+        },
+        {
+          "line": 971,
+          "text": "    method: 'POST',"
+        },
+        {
+          "line": 972,
+          "text": "    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 973,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 982,
+          "text": "}"
+        },
+        {
+          "line": 983,
+          "text": ""
+        },
+        {
+          "line": 984,
+          "text": "/** Atomically finalize one staged restore and return the complete canonical owner state. */"
+        },
+        {
+          "line": 985,
+          "text": "export async function finalizeSyncV2Restore(envelope) {"
+        },
+        {
+          "line": 986,
+          "text": "  if (mockBackend) {"
+        },
+        {
+          "line": 987,
+          "text": "    if (typeof mockBackend.finalizeSyncV2Restore !== 'function') throw new Error('Mock backend does not implement restore finalization RPC');"
+        },
+        {
+          "line": 988,
+          "text": "    return mockBackend.finalizeSyncV2Restore(envelope);"
+        },
+        {
+          "line": 989,
+          "text": "  }"
+        },
+        {
+          "line": 990,
+          "text": "  if (!user) throw new Error('Not authenticated');"
+        },
+        {
+          "line": 991,
+          "text": "  return request('/rpc/finalize_sync_v2_restore', {"
+        },
+        {
+          "line": 992,
+          "text": "    method: 'POST',"
+        },
+        {
+          "line": 993,
+          "text": "    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 994,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 1008,
+          "text": "  }"
+        },
+        {
+          "line": 1009,
+          "text": "  if (!user) throw new Error('Not authenticated');"
+        },
+        {
+          "line": 1010,
+          "text": "  return request('/rpc/stage_sync_v2_restore_score_v2', {"
+        },
+        {
+          "line": 1011,
+          "text": "    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 1012,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 1013,
+          "text": "    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,"
+        },
+        {
+          "line": 1023,
+          "text": "  }"
+        },
+        {
+          "line": 1024,
+          "text": "  if (!user) throw new Error('Not authenticated');"
+        },
+        {
+          "line": 1025,
+          "text": "  return request('/rpc/finalize_sync_v2_restore_score_v2', {"
+        },
+        {
+          "line": 1026,
+          "text": "    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',"
+        },
+        {
+          "line": 1027,
+          "text": "      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },"
+        },
+        {
+          "line": 1028,
+          "text": "    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,"
+        }
+      ]
+    },
+    {
+      "path": "src/lib/db.js",
+      "blob": "f12f9a954f3ccaff81705527ab21de7bcc66a382",
+      "lines": [
+        {
+          "line": 43,
+          "text": "  'groupArrangements', // ترتيب مجموعات مخصص واحد متزامن لكل إسناد"
+        },
+        {
+          "line": 44,
+          "text": "  'closedTermReports', // حقيقة تقارير فصل مغلق — سجلات مكتملة غير قابلة للتعديل"
+        },
+        {
+          "line": 45,
+          "text": "  'assignments',   // الواجبات — النموذج جاهز، بلا واجهة بعد"
+        },
+        {
+          "line": 46,
+          "text": "  'submissions',   // التسليمات — النموذج جاهز، بلا واجهة بعد"
+        },
+        {
+          "line": 47,
+          "text": "  'outbox',        // تغييرات تنتظر المزامنة"
+        },
+        {
+          "line": 48,
+          "text": "];"
+        },
+        {
+          "line": 49,
+          "text": ""
+        }
+      ]
+    },
+    {
+      "path": "src/store.js",
+      "blob": "a1b66e60110385e174dca2bde1546c2e9eda6997",
+      "lines": [
+        {
+          "line": 44,
+          "text": "  'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores', 'slots', 'sessions', 'sessionRosterSnapshots', 'attendance', 'logs',"
+        },
+        {
+          "line": 45,
+          "text": "  'calendars', 'calendarDays', 'units', 'lessons', 'timeProfiles',"
+        },
+        {
+          "line": 46,
+          "text": "  'notes', 'classRules', 'classGoals', 'classCharterSelections', 'groupArrangements', 'assignments', 'submissions',"
+        },
+        {
+          "line": 47,
+          "text": "  'closedTermReports',"
+        },
+        {
+          "line": 48,
+          "text": "];"
+        },
+        {
+          "line": 49,
+          "text": ""
+        },
+        {
+          "line": 83,
+          "text": "  if (cloudRestoreInProgress) {"
+        },
+        {
+          "line": 84,
+          "text": "    throw Object.assign(new Error('استعادة النسخة السحابية قيد التنفيذ. انتظر اكتمالها قبل التعديل.'), {"
+        },
+        {
+          "line": 85,
+          "text": "      code: 'CLOUD_RESTORE_IN_PROGRESS',"
+        },
+        {
+          "line": 86,
+          "text": "    });"
+        },
+        {
+          "line": 87,
+          "text": "  }"
+        },
+        {
+          "line": 88,
+          "text": "}"
+        },
+        {
+          "line": 699,
+          "text": "  } else if (storeName === 'notes') {"
+        },
+        {
+          "line": 700,
+          "text": "    teachingId = record.teachingId ?? recordFrom('sessions', record.sessionId, pending)?.teachingId ?? null;"
+        },
+        {
+          "line": 701,
+          "text": "  } else if (storeName === 'assignments') {"
+        },
+        {
+          "line": 702,
+          "text": "    teachingId = record.teachingId ?? null;"
+        },
+        {
+          "line": 703,
+          "text": "  } else if (storeName === 'submissions') {"
+        },
+        {
+          "line": 704,
+          "text": "    const assignment = recordFrom('assignments', record.assignmentId, pending);"
+        },
+        {
+          "line": 705,
+          "text": "    teachingId = assignment?.teachingId ?? null;"
+        },
+        {
+          "line": 706,
+          "text": "  }"
+        },
+        {
+          "line": 707,
+          "text": "  const teaching = recordFrom('teachings', teachingId, pending);"
+        },
+        {
+          "line": 1348,
+          "text": "export const scoresOf = (studentId) => live(state.scores).filter((s) => s.studentId === studentId);"
+        },
+        {
+          "line": 1349,
+          "text": ""
+        },
+        {
+          "line": 1350,
+          "text": "function portableGroup(item) {"
+        },
+        {
+          "line": 1351,
+          "text": "  return item && !item.deleted && item.scoreMode !== 'subitems' &&"
+        },
+        {
+          "line": 1352,
+          "text": "    typeof item.portabilityGroupId === 'string' && item.portabilityGroupId.trim()"
+        },
+        {
+          "line": 1353,
+          "text": "    ? item.portabilityGroupId : null;"
+        },
+        {
+          "line": 1359,
+          "text": ""
+        },
+        {
+          "line": 1360,
+          "text": "/** Historical name/max similarity is never authority to reuse or edit a score. */"
+        },
+        {
+          "line": 1361,
+          "text": "function portableGradeScore(studentId, item) {"
+        },
+        {
+          "line": 1362,
+          "text": "  const direct = scoreForItem(studentId, item?.id);"
+        },
+        {
+          "line": 1363,
+          "text": "  if (direct) return direct;"
+        },
+        {
+          "line": 1364,
+          "text": ""
+        },
+        {
+          "line": 1365,
+          "text": "  const group = portableGroup(item);"
+        },
+        {
+          "line": 1366,
+          "text": "  const teaching = getTeaching(item?.teachingId);"
+        },
+        {
+          "line": 1367,
+          "text": "  if (!group || !teaching || item.auto) return null;"
+        },
+        {
+          "line": 1368,
+          "text": "  if (items(teaching.id).filter((candidate) => portableGroup(candidate) === group).length !== 1) return null;"
+        },
+        {
+          "line": 1369,
+          "text": ""
+        },
+        {
+          "line": 1370,
+          "text": "  // لا نعرض درجة من شعبة لم ينتسب إليها الطالب قط، حتى لو صادف أنها تحمل"
+        },
+        {
+          "line": 1371,
+          "text": "  // مادة وبندًا بالاسم نفسيهما."
+        },
+        {
+          "line": 1385,
+          "text": "        getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;"
+        },
+        {
+          "line": 1386,
+          "text": "    const matches = items(sourceTeaching.id)"
+        },
+        {
+          "line": 1387,
+          "text": "      .filter((candidate) => !candidate.auto && portableGroup(candidate) === group);"
+        },
+        {
+          "line": 1388,
+          "text": "    if (matches.length !== 1) continue;"
+        },
+        {
+          "line": 1389,
+          "text": "    const score = scoreForItem(studentId, matches[0].id);"
+        },
+        {
+          "line": 1390,
+          "text": "    if (score) candidates.push(score);"
+        },
+        {
+          "line": 1395,
+          "text": ""
+        },
+        {
+          "line": 1396,
+          "text": "/** سياق درجات يدوي قابل للنقل من دون نسخ سجلات الدرجات. */"
+        },
+        {
+          "line": 1397,
+          "text": "function portableScoresByItem(studentId, tchId) {"
+        },
+        {
+          "line": 1398,
+          "text": "  const directScores = indexScores(scoresOf(studentId));"
+        },
+        {
+          "line": 1399,
+          "text": "  const out = Object.create(null);"
+        },
+        {
+          "line": 1400,
+          "text": "  for (const item of items(tchId)) {"
+        },
+        {
+          "line": 1401,
+          "text": "    const score = directScores[item.id] ?? portableGradeScore(studentId, item);"
+        },
+        {
+          "line": 1402,
+          "text": "    if (score) out[item.id] = score;"
+        },
+        {
+          "line": 1403,
+          "text": "  }"
+        },
+        {
+          "line": 1404,
+          "text": "  return out;"
+        },
+        {
+          "line": 1437,
+          "text": "function compatibleAutomaticTeachingIds(studentId, item) {"
+        },
+        {
+          "line": 1438,
+          "text": "  const teaching = getTeaching(item?.teachingId);"
+        },
+        {
+          "line": 1439,
+          "text": "  const group = portableGroup(item);"
+        },
+        {
+          "line": 1440,
+          "text": "  const key = automaticItemKey(item);"
+        },
+        {
+          "line": 1441,
+          "text": "  if (!teaching || !key) return null;"
+        },
+        {
+          "line": 1442,
+          "text": "  if (!group) return new Set([teaching.id]);"
+        },
+        {
+          "line": 1443,
+          "text": ""
+        },
+        {
+          "line": 1444,
+          "text": "  const targetMatches = items(teaching.id).filter((candidate) =>"
+        },
+        {
+          "line": 1445,
+          "text": "    portableGroup(candidate) === group);"
+        },
+        {
+          "line": 1446,
+          "text": "  if (targetMatches.length !== 1 || automaticItemKey(targetMatches[0]) !== key) return null;"
+        },
+        {
+          "line": 1447,
+          "text": ""
+        },
+        {
+          "line": 1448,
+          "text": "  const targetSection = getSection(teaching.sectionId);"
+        },
+        {
+          "line": 1460,
+          "text": "        getSection(sourceTeaching.sectionId)?.yearId !== targetSection.yearId ||"
+        },
+        {
+          "line": 1461,
+          "text": "        getSection(sourceTeaching.sectionId)?.grade !== targetSection.grade) continue;"
+        },
+        {
+          "line": 1462,
+          "text": "    const sameItem = items(sourceTeaching.id).filter((candidate) => portableGroup(candidate) === group);"
+        },
+        {
+          "line": 1463,
+          "text": "    if (!sameItem.length) continue;"
+        },
+        {
+          "line": 1464,
+          "text": "    if (sameItem.length !== 1 || automaticItemKey(sameItem[0]) !== key) return null;"
+        },
+        {
+          "line": 1465,
+          "text": "    teachingIds.add(sourceTeaching.id);"
+        },
+        {
+          "line": 1472,
+          "text": " * درجات أو حضورًا أو رصدًا جديدًا. لكل بند نطاقه كي لا تختلط إعدادات مختلفة."
+        },
+        {
+          "line": 1473,
+          "text": " */"
+        },
+        {
+          "line": 1474,
+          "text": "function portableAutomaticByItem(studentId, tchId) {"
+        },
+        {
+          "line": 1475,
+          "text": "  const out = Object.create(null);"
+        },
+        {
+          "line": 1476,
+          "text": "  for (const item of items(tchId).filter((candidate) => candidate.auto)) {"
+        },
+        {
+          "line": 1477,
+          "text": "    const teachingIds = compatibleAutomaticTeachingIds(studentId, item);"
+        },
+        {
+          "line": 2039,
+          "text": "  for (const s of roster) {"
+        },
+        {
+          "line": 2040,
+          "text": "    ctx[s.id] = {"
+        },
+        {
+          "line": 2041,
+          "text": "      scoresByItem: portableScoresByItem(s.id, tchId),"
+        },
+        {
+          "line": 2042,
+          "text": "      automaticByItem: portableAutomaticByItem(s.id, tchId),"
+        },
+        {
+          "line": 2043,
+          "text": "      attendance: attByStudent[s.id] ?? [],"
+        },
+        {
+          "line": 2044,
+          "text": "      logs: logsByStudent[s.id] ?? [],"
+        },
+        {
+          "line": 2045,
+          "text": "      classHasParticipation,"
+        },
+        {
+          "line": 2266,
+          "text": "  const inTeaching = (r) => !tchId || r.teachingId === tchId;"
+        },
+        {
+          "line": 2267,
+          "text": "  return {"
+        },
+        {
+          "line": 2268,
+          "text": "    scoresByItem: tchId ? portableScoresByItem(studentId, tchId) : indexScores(scoresOf(studentId)),"
+        },
+        {
+          "line": 2269,
+          "text": "    automaticByItem: tchId ? portableAutomaticByItem(studentId, tchId) : Object.create(null),"
+        },
+        {
+          "line": 2270,
+          "text": "    attendance: attendanceOf(studentId).filter(inTeaching),"
+        },
+        {
+          "line": 2271,
+          "text": "    logs: logsOf(studentId).filter(inTeaching),"
+        },
+        {
+          "line": 2272,
+          "text": "    classHasParticipation: tchId"
+        },
+        {
+          "line": 2490,
+          "text": "  const sessionRows = state.sessions.filter((row) => row.teachingId === tchId);"
+        },
+        {
+          "line": 2491,
+          "text": "  const sessionIds = new Set(sessionRows.map((row) => row.id));"
+        },
+        {
+          "line": 2492,
+          "text": "  const assignmentRows = state.assignments.filter((row) => row.teachingId === tchId);"
+        },
+        {
+          "line": 2493,
+          "text": "  const assignmentIds = new Set(assignmentRows.map((row) => row.id));"
+        },
+        {
+          "line": 2494,
+          "text": "  const evidence = [];"
+        },
+        {
+          "line": 2495,
+          "text": "  const exactDefaults = Number(teaching.serverRevision ?? 0) <= 1 && itemRows.length === DEFAULT_ITEMS.length &&"
+        },
+        {
+          "line": 2510,
+          "text": "  check('class-charter-selection', state.classCharterSelections.filter((row) => row.teachingId === tchId));"
+        },
+        {
+          "line": 2511,
+          "text": "  check('group-arrangement', state.groupArrangements.filter((row) => row.teachingId === tchId));"
+        },
+        {
+          "line": 2512,
+          "text": "  check('assignments', assignmentRows);"
+        },
+        {
+          "line": 2513,
+          "text": "  check('submissions', state.submissions.filter((row) => assignmentIds.has(row.assignmentId)));"
+        },
+        {
+          "line": 2514,
+          "text": "  return [...new Set(evidence)];"
+        },
+        {
+          "line": 2515,
+          "text": "}"
+        },
+        {
+          "line": 2516,
+          "text": ""
+        },
+        {
+          "line": 3312,
+          "text": "  // عندما توجد درجة واحدة متوافقة في شعبة سابقة، نحدّث سجلها نفسه بدل صنع"
+        },
+        {
+          "line": 3313,
+          "text": "  // سجل ثانٍ للبند الموازي. أما البند المختلف أو الغامض فيبدأ غير مرصود هنا."
+        },
+        {
+          "line": 3314,
+          "text": "  const existing = portableGradeScore(studentId, item);"
+        },
+        {
+          "line": 3315,
+          "text": "  const id = existing?.id ?? scoreId(studentId, itemId);"
+        },
+        {
+          "line": 3316,
+          "text": "  const targetItemId = existing?.itemId ?? itemId;"
+        },
+        {
+          "line": 3317,
+          "text": "  return patch('scores', id, { value: clampScore(value, itemId), deleted: false }, {"
+        }
+      ]
+    }
+  ],
+  "protocolMetadata": {
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "queryKind": "pg_catalog function/table metadata only, no Product/Auth records, invocation or mutation",
+    "rows": [
+      {
+        "kind": "product_table",
+        "name": "lessons",
+        "arguments": null,
+        "definition": null
+      },
+      {
+        "kind": "product_table",
+        "name": "units",
+        "arguments": null,
+        "definition": null
+      },
+      {
+        "kind": "restore_helper",
+        "name": "apply_score_distribution_copy_command",
+        "arguments": "p_mutation_id text, p_device_id text, p_source_item_id text, p_source_revision bigint, p_target_teaching_id text, p_new_item_id text, p_subitem_ids jsonb, p_conflict_choice text",
+        "definition": "SOURCE_LONG_MD5:7c125fbb33aaaa4d43b6373b913b1aa1"
+      },
+      {
+        "kind": "restore_helper",
+        "name": "n77_delete_teaching",
+        "arguments": "p_teaching_id text, p_expected_section_id text, p_expected_fingerprint text, p_mutation_id text, p_device_id text, p_commit boolean",
+        "definition": "SOURCE_LONG_MD5:f4f022e2dee405b6824545f6ab784ff2"
+      },
+      {
+        "kind": "restore_helper",
+        "name": "sync_v2_restore_entities",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION rakeezx.sync_v2_restore_entities()\n RETURNS text[]\n LANGUAGE sql\n IMMUTABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select array['profile','years','calendars','calendar_days','terms','subjects','sections','teachings',\n    'students','enrollments','notes','class_rules','class_charter_selections','class_goals','group_arrangements',\n    'items','scores','logs','time_profiles','slots','sessions','session_roster_snapshots','attendance','closed_term_reports']::text[];\n$function$\n"
+      },
+      {
+        "kind": "restore_helper",
+        "name": "sync_v2_restore_entities_full",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION rakeezx.sync_v2_restore_entities_full()\n RETURNS text[]\n LANGUAGE sql\n IMMUTABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n  select array['profile','years','calendars','calendar_days','terms','subjects','units','lessons',\r\n    'sections','teachings','students','enrollments','notes','class_rules','class_charter_selections',\r\n    'class_goals','group_arrangements','items','scores','logs','time_profiles','slots','sessions',\r\n    'session_roster_snapshots','attendance','closed_term_reports']::text[];\r\n$function$\n"
+      },
+      {
+        "kind": "restore_helper",
+        "name": "sync_v2_restore_entities_score_v2",
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION rakeezx.sync_v2_restore_entities_score_v2()\n RETURNS text[]\n LANGUAGE sql\n IMMUTABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select pg_catalog.array_append(pg_catalog.array_append(\n    rakeezx.sync_v2_restore_entities_full(),'score_subitems'),'score_subitem_completions');\n$function$\n"
+      }
+    ]
+  },
+  "n77HistoricalReference": {
+    "candidate": "514b6ab4537f0fb72c183c1afcd039ab683e6a2b",
+    "base": "a42f4f8fbaf497009d4df2b4ce25b053c046dd27",
+    "changedPaths": [
+      "src/generated/build-meta.generated.js",
+      "src/lib/backup-v2.js",
+      "src/lib/cloud.js",
+      "src/lib/db.js",
+      "src/lib/export.js",
+      "src/lib/n77-delete.js",
+      "src/lib/restore-deletion-scope.js",
+      "src/lib/sync.js",
+      "src/store.js",
+      "src/styles/components.css",
+      "src/views/backup.js",
+      "src/views/teaching-hub.js",
+      "src/views/teachings.js",
+      "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+      "sw.js",
+      "tests/backup.test.mjs",
+      "tests/class-rules.test.mjs",
+      "tests/cloud-recovery-owner-isolation.test.mjs",
+      "tests/helpers/seed-backup.mjs",
+      "tests/n13-deleted-key-overlap.test.mjs",
+      "tests/n13-demo-delete-scope.test.mjs",
+      "tests/n13-demo-product-action.test.mjs",
+      "tests/n13-n77-legacy-adapter-convergence.test.mjs",
+      "tests/n13-n77-overlap-receipt.test.mjs",
+      "tests/n13-shared-section-creation.test.mjs",
+      "tests/n13-shared-section-server.test.mjs",
+      "tests/n77-delete.test.mjs",
+      "tests/n77-legacy-delete-guard.test.mjs",
+      "tests/n77-legacy-pre-cascade-guard.test.mjs",
+      "tests/n77-p0-reload-isolation.test.mjs",
+      "tests/n77-restore-boundary.test.mjs",
+      "tests/notes.test.mjs",
+      "tests/offline-route-graph.test.mjs",
+      "tests/section-archive.test.mjs",
+      "tests/section-validation.test.mjs",
+      "tests/v2-backup-restore.test.mjs"
+    ],
+    "n77SpecificFiles": [
+      "src/lib/n77-delete.js",
+      "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+      "tests/n13-n77-legacy-adapter-convergence.test.mjs",
+      "tests/n13-n77-overlap-receipt.test.mjs",
+      "tests/n77-delete.test.mjs",
+      "tests/n77-legacy-delete-guard.test.mjs",
+      "tests/n77-legacy-pre-cascade-guard.test.mjs",
+      "tests/n77-p0-reload-isolation.test.mjs",
+      "tests/n77-restore-boundary.test.mjs"
+    ],
+    "restrictedDemoCandidate": {
+      "sha": "cc60574fa30eea2cb6e3cee5511abda5bcb64de8",
+      "summary": "commit cc60574fa30eea2cb6e3cee5511abda5bcb64de8\nAuthor:     RAKEEZ Ops AI <ai-assistant@local.invalid>\nAuthorDate: Mon Oct 12 08:43:57 2026 +0300\nCommit:     RAKEEZ Ops AI <ai-assistant@local.invalid>\nCommitDate: Mon Oct 12 08:43:57 2026 +0300\n\n    feat(n77): preview-only fail-closed delete boundary on current main\n\n src/lib/n77-delete-preview.js     | 24 ++++++++++\n src/views/teachings.js            | 47 +++++---------------\n sw.js                             |  3 +-\n tests/n77-delete-preview.test.mjs | 94 +++++++++++++++++++++++++++++++++++++++\n 4 files changed, 132 insertions(+), 36 deletions(-)",
+      "paths": [
+        "src/lib/n77-delete-preview.js",
+        "src/views/teachings.js",
+        "sw.js",
+        "tests/n77-delete-preview.test.mjs"
+      ]
+    }
+  },
+  "closedIdentityCrossCheck": {
+    "exactClosedTableIds": 59,
+    "additionalExplicitClosedIds": [
+      "N04",
+      "N10",
+      "N20",
+      "N46",
+      "N47",
+      "N62",
+      "N63"
+    ],
+    "totalClosedNIdentities": 66,
+    "intentionallyUnusedId": "N52",
+    "unscopedHistoricalReference": "N75",
+    "note": "N75 occurs only as a separate/out-of-scope reference in N69 closure lines; no active lifecycle row, decision section, follow-up/card or acceptance contract was found. Do not invent an activation from that reference."
+  }
+}

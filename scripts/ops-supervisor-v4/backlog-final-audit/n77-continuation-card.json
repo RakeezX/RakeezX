@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "purpose": "Independent source card for root review/admission. This file performs no activation, service write, account creation, migration or publication.",
+  "tasks": [
+    {
+      "id": "continuous-n77-real-delete-20261012",
+      "productId": "N77",
+      "scopeKey": "n77-current-server-delete-owner-sync-restore",
+      "activationId": "po-20261012-continuous",
+      "priority": 100,
+      "dependsOn": [
+        "N13"
+      ],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "D120",
+      "budgetMinutes": 150,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n77_fresh_candidate_preview",
+        "n77_scope_atomicity_contract",
+        "n77_live_server_owner_scope",
+        "n77_live_convergence_restore",
+        "n77_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N77",
+        "liveAuthorizationRef": "D120",
+        "authoritySource": "D-120 explicitly authorizes N77 completion, its exact migration and bounded synthetic A/B verification. Current 2026-10-12 PO continuous delivery authority removes routine PM/Preview waiting; D-104/D-106/D-113/D-114 safeguards remain.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n77-preview/continuous-n77-real-delete-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n77-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N77 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n77-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes.",
+          "migration": {
+            "operation": "read_only_verify_existing",
+            "appliedVersion": "20261007230123",
+            "sourceFile": "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+            "scope": "Already applied once. Verify live n77_delete_teaching signature/source against the immutable reviewed source. Do not apply/reapply/reset/edit it or another migration. If its exact source is absent from main, only add the historical byte-identical file. Drift or a needed server change is a precise preserved-candidate blocker, not permission to broaden D120."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair."
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n77",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories."
+        }
+      },
+      "objective": "Finish the real online-only delete feature on fresh main. Selectively reconcile historical combined candidate 514b6ab4537f0fb72c183c1afcd039ab683e6a2b against current N13 and later changes; do not promote restricted Demo cc60574fa30eea2cb6e3cee5511abda5bcb64de8 or replace whole files. Connect the already deployed n77_delete_teaching RPC to the Product action, durable receipt handling, stale-device convergence and restore/export suppression. This card owns the fresh A/B harness and task-specific fixture preparation; these are implementation work, not an external Auth blocker.",
+      "acceptance": [
+        "n77_fresh_candidate_preview: PASS records fresh origin/main/candidate/tree, actual changed paths and committed harness, then exact successful Cloudflare Preview identity/served Product assets. Preserve current N13 creation, N49 owner lease, N58 calendar and all shipped scoring/UI work. Reuse unchanged historical focused/native/browser evidence only with exact relevant source bindings; no broad test rerun.",
+        "n77_scope_atomicity_contract: PASS proves no local destructive mutation offline/before server validation; server-derived selected-Teaching vs final-Section scope; stale fingerprint failure with no scope broadening; atomic failure/idempotent retry; shared identities outside scope preserved. Check the unchanged deployed RPC/source rather than reapplying its migration. Mixed immutable closed-term report bytes remain unchanged and deleted scope is suppressed, under D113/D114.",
+        "n77_live_server_owner_scope: PASS comes from the current Preview's real authenticated client on only the predeclared synthetic A/B closure. Cover selected Teaching with another active Teaching preserved, final Teaching/Section scope, stale-scope denial, actual B-owner denial and unchanged A rows after denial. Obtain server receipt and independent before/after observations for exact IDs; a network error or Demo mock is not denial/atomicity proof.",
+        "n77_live_convergence_restore: PASS shows A2's stale local view converges through real receipts/tombstones, retry remains idempotent, and a task-created stale backup/report path cannot resurrect the deleted scope while outside-scope data survives. Use the current ordinary versioned restore contract; do not alter restore architecture as a shortcut. Preserve source-identical native mixed-snapshot evidence and run only materially changed boundaries.",
+        "n77_fixture_disposition: PASS includes the deterministic finally/recovery and actual exact-pair retention, session/token evidence plus both deny-all function proofs specified by preparationAuthority. Keep run-bound credentials/bundles only in ignored private artifacts. Any missing actual gate returns precise BLOCKED with candidate and same-run recovery reference; Auth provisioning or historical gates alone never yield LOCAL_READY."
+      ],
+      "allowedPaths": [
+        "src/lib/backup-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/export.js",
+        "src/lib/n77-delete.js",
+        "src/lib/n77-delete-preview.js",
+        "src/lib/restore-deletion-scope.js",
+        "src/lib/sync.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "src/views/backup.js",
+        "src/views/teaching-hub.js",
+        "src/views/teachings.js",
+        "sw.js",
+        "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+        "supabase/functions/ops-n77-fixture/**",
+        "supabase/functions/ops-n77-retire/**",
+        "tests/n77-*",
+        "tests/n77-live/**",
+        "tests/n13-n77-*.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/section-archive.test.mjs",
+        "tests/section-validation.test.mjs"
+      ],
+      "releaseAuthority": "D120 + PO-20261012 continuous Product completion/deployment. Only named preparation operations are worker-authorized; main/Production stays publisher-only. No renewed routine PM approval. Keep N77 OPEN/awaiting_po for real Product acceptance; a failed card must not stop unrelated work.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N77",
+        "decisions": [
+          "D104",
+          "D106",
+          "D113",
+          "D114",
+          "D120"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "historicalCandidate": "514b6ab4537f0fb72c183c1afcd039ab683e6a2b",
+        "historicalBase": "a42f4f8fbaf497009d4df2b4ce25b053c046dd27",
+        "combinedManifest": "docs/follow-ups/N13_N77_SEALED_COMBINED_PREVIEW_20261011_101211.md",
+        "observedRpc": "rakeezx.n77_delete_teaching(text,text,text,text,text,boolean)",
+        "observedRpcSourceMd5": "f4f022e2dee405b6824545f6ab784ff2"
+      }
+    }
+  ]
+}

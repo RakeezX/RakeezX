@@ -2,11 +2,15 @@ param(
   [Parameter(Mandatory=$true)][ValidateSet('browser','integration','live-mutation')][string]$Name,
   [Parameter(Mandatory=$true)][ValidateSet('acquire','release','status','reap')][string]$Action,
   [Parameter(Mandatory=$true)][string]$TaskFile,
-  [string]$RuntimeRoot = (Join-Path (Split-Path (Split-Path $PSScriptRoot)) 'artifacts\ops-supervisor-v4'),
+  [string]$RuntimeRoot = '',
   [ValidateRange(0,90)][int]$WaitSeconds = 30,
   [string]$OwnerToken = ''
 )
 $ErrorActionPreference = 'Stop'
+# Parameter defaults run before PSScriptRoot is populated in the observed Windows PowerShell host.
+if ([string]::IsNullOrWhiteSpace($RuntimeRoot)) {
+  $RuntimeRoot = Join-Path (Split-Path (Split-Path $PSScriptRoot)) 'artifacts\ops-supervisor-v4'
+}
 function Json([string]$File) { [System.IO.File]::ReadAllText($File, [System.Text.Encoding]::UTF8) | ConvertFrom-Json }
 function Same-Birth($Process, $Owner) {
   return ($Process -and $Owner.createdAt -and [int]$Process.ProcessId -eq [int]$Owner.pid -and

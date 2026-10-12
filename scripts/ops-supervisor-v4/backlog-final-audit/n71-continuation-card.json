@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "purpose": "Independent source card for root review/admission. This file performs no activation, service write, account creation, migration or publication.",
+  "tasks": [
+    {
+      "id": "continuous-n71-unified-restore-20261012",
+      "productId": "N71",
+      "scopeKey": "n71-portable-cloud-first-all-domains",
+      "activationId": "po-20261012-continuous",
+      "priority": 120,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+      "budgetMinutes": 180,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n71_fresh_candidate_preview",
+        "n71_portable_domain_coverage",
+        "n71_server_restore_binding",
+        "n71_live_restore_owner_resume",
+        "n71_live_convergence_no_resurrection",
+        "n71_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N71",
+        "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+        "authoritySource": "Current PO instruction to implement/finish the backlog and deploy under continuous automation, preserving approved D099. D099 alone was a Product behavior approval; the later continuous execution authority supplies this narrowly scoped implementation/service phase.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n71-preview/continuous-n71-unified-restore-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n71-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N71 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n71-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes.",
+          "migration": {
+            "operation": "apply_migration_if_required",
+            "maxNewMigrations": 1,
+            "name": "n71_unified_restore",
+            "sourceFileSuffix": "_n71_unified_restore.sql",
+            "scope": "Only the exact committed and hash-certified additive extension of existing versioned restore/manifest/stage/finalize/receipt and portable Product domains. Existing applied migrations stay immutable. Native owner/atomicity/compatibility certification precedes one connector application and live read-back. No destructive real-account restore, general RLS/Auth-policy change, reset/truncate or unrelated feature schema. Deferred assignments/submissions support is limited to preserving their portable records, not N88 UI/portal."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair."
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n71",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories."
+        }
+      },
+      "objective": "Implement the already approved one Backup/one unified Cloud-first Restore page and its complete data path. Reuse existing versioned cloud restore, not local db.writeAll plus hoped-for Sync. Current client restore-store selection omits units/lessons; live full/score-v2 server helpers include them. Assignments/submissions exist in the portable local model but no live tables were observed: build the necessary narrowly scoped backup/restore support when records exist, without implementing deferred N88 features. This is concrete protocol/client work with fixed behavior, not missing permission or a new architecture project.",
+      "acceptance": [
+        "n71_fresh_candidate_preview: PASS binds the exact fresh main/candidate/tree/harness and successful immutable Preview/served assets. Present only إنشاء نسخة احتياطية and استعادة نسخة احتياطية with necessary contextual review/recovery. Remove normal Local/Cloud/Merge/Replace/Bootstrap/Claim choices; retain dormant conditional legacy mechanisms until their actual retirement proof.",
+        "n71_portable_domain_coverage: PASS creates an explicit mapping from actual db.STORES/portable backup through cloud manifest, stage, finalize, local reconcile and normal Sync. Cover every backed-up Product domain with no silent omission, including nonempty units/lessons and assignments/submissions. Exclude only declared device/runtime state. A domain unsupported by a current endpoint is implementation work for this card, not successful omission or silent local fallback. Preserve scoring, calendar provenance, deletion/tombstone and owner fields already on main.",
+        "n71_server_restore_binding: PASS certifies existing compatible full/score-v2 primitives and only the exact required additive extension. If no migration is needed, prove deployed source/ACL/domain compatibility; if needed, record exact SQL/native evidence, apply once, and read back the real version/functions/ACL. Preserve old clients and existing receipt identities. Merely committing SQL is not a Supabase deployment.",
+        "n71_live_restore_owner_resume: PASS uses only the exact synthetic A/B closure and real authenticated client: full-domain portable export, validation/review, canonical cloud finalize, actual interrupted stage/finalize resume and idempotent receipt reuse. Wrong owner, signed-out/offline, unhealthy Sync and unresolved outbox fail closed with no divergent local-only restore. B cannot read/restore A. Limit interruption to one declared synthetic mutation boundary and reuse unchanged focused evidence.",
+        "n71_live_convergence_no_resurrection: PASS proves A1 reconciles only after canonical finalize and A2 converges to the same stored Product state using ordinary Sync. Preserve live deletion evidence/immutable closed-term suppression, valid target scores and current calendar identities; restore cannot resurrect deleted scope. Verify only affected current boundaries with one deterministic harness, not the entire historical sync/browser suite.",
+        "n71_fixture_disposition: PASS requires actual same-pair retention/session evidence plus both deny-all source/410 proofs from preparationAuthority. Implement finally/recovery before first provisioning; preserve exact candidate and private same-run state on interruption. Never label local-only restore, UI-only simplification or incomplete cleanup LOCAL_READY."
+      ],
+      "allowedPaths": [
+        "src/views/backup.js",
+        "src/lib/backup-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/initial-restore.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/restore-deletion-scope.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n71_unified_restore.sql",
+        "supabase/functions/ops-n71-fixture/**",
+        "supabase/functions/ops-n71-retire/**",
+        "tests/n71-*",
+        "tests/n71-live/**",
+        "tests/backup-flow.e2e.mjs",
+        "tests/backup.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/v2-backup-restore-server.test.mjs",
+        "tests/core-v2-restore-reload.test.mjs"
+      ],
+      "releaseAuthority": "PO-20261012 continuous execution/deployment under the fixed D099 contract. Named additive service/fixture preparation only; Product main/Production exclusively publisher-owned. No renewed routine approval and no real-account restore. Preserve other tasks and park only this task on a concrete failed gate.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N71",
+        "decisions": [
+          "D089",
+          "D099"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "currentClient": "src/lib/backup-v2.js",
+        "currentPage": "src/views/backup.js",
+        "deployedHelpers": [
+          "rakeezx.sync_v2_restore_entities",
+          "rakeezx.sync_v2_restore_entities_full",
+          "rakeezx.sync_v2_restore_entities_score_v2"
+        ],
+        "observedTablesPresent": [
+          "units",
+          "lessons"
+        ],
+        "observedTablesAbsent": [
+          "assignments",
+          "submissions"
+        ],
+        "observationLimit": "Metadata only; no actual user/Product rows or backups inspected."
+      }
+    }
+  ]
+}

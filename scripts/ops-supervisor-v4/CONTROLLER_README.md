@@ -69,3 +69,9 @@ A UI rendering check uses the actual application DOM, source CSS and handlers on
 The N58 continuation card includes the existing D-087 synthetic authority and a precise `preparationAuthority` for its current candidate Preview branch and two run-bound temporary functions. Only that named preparation/disposition scope is delegated to the worker. Product main/Production publication remains with the publisher. Read `capabilities/d087/README.md` before that phase; complete the real candidate/harness first, and never treat account provisioning or expiry as live-gate/disarm success.
 
 During the observed run, N95 reached verified Production `b0834e785ccc7f2bcb50a20b812498f6687690c7` at 2026-10-12T10:31:13.247Z and N84 reached `540fdf0b053d199b08ceb8fcfbde83453266afe3` at 2026-10-12T10:35:11.614Z. Both completed through the automatic worker/publisher path and released capacity for following work. These are actual publication observations, not a 24/7 duration claim or personal PO acceptance.
+
+## Explicit service preparation on further Product cards
+
+The worker prompt recognizes a preparation scope only when its productId and liveAuthorizationRef match the activated card and its kind is scoped_preview_and_fixture_ops. It permits only the named Preview, service and fixture operations in that card; main and Product publication stay with the publisher. N58/D087 is the installed first example. A card that requires a server update must carry the exact contract and a required check for the actual applied operation; a Git migration file alone never proves it reached the service.
+
+Resolve the optional RuntimeRoot default in the body of resource-lease.ps1, after script scope is available. The running N49 worker exposed an empty PSScriptRoot during parameter-default evaluation and recovered itself using its explicit canonical runtime path. This correction retains every existing lease/process identity check.

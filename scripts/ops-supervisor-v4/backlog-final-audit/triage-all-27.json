@@ -1,0 +1,372 @@
+{
+  "version": 1,
+  "preparedAt": "2026-10-12T10:51:48.221Z",
+  "readOnly": true,
+  "noActivation": true,
+  "currentMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+  "ledgerSha256": "4e047e286338764b862ddc5482bde3e3a0f935b553daad6292fffefb3efe506a",
+  "counts": {
+    "currentLifecycleRows": 27,
+    "nonDeferred": 16,
+    "deferred": 11,
+    "alreadyInCurrentActivation": 9,
+    "deliveredAwaitingPo": 3,
+    "coveredRemainingWork": 6,
+    "remainingOutsideCurrentActivation": 7,
+    "newFullProductSourceCards": 3,
+    "independentResearchTask": 1,
+    "privateArtifact": 1,
+    "foundationalDependencies": 2
+  },
+  "countMethod": "Only rows with exact N-ID and ISO creation date in cell 2. DEFERRED is tested only in status. 16 is the number of nondeferred lifecycle rows, not the number of tickets still requiring implementation.",
+  "readiness": {
+    "readyAdditionalProductIds": [
+      "N77",
+      "N73",
+      "N71"
+    ],
+    "readyAdditionalResearchIds": [
+      "N93"
+    ],
+    "fullProductExternalValueOrFoundation": [
+      "N36",
+      "N44",
+      "N78"
+    ],
+    "noMissingDesignDecisionIdentified": [
+      "N71",
+      "N73",
+      "N77"
+    ],
+    "explicitDeferredIds": [
+      "N09",
+      "N18",
+      "N23",
+      "N24",
+      "N26",
+      "N32",
+      "N35",
+      "N64",
+      "N72",
+      "N88",
+      "N90"
+    ]
+  },
+  "operationalNotes": [
+    "The actual 10:51:48 queue/catalog contains all nine current cards including N58; earlier 10:39 evidence contained eight. Do not cite the earlier snapshot as proof of N58 admission.",
+    "N92/N84/N95 are awaiting_po and release capacity; approval is not a prerequisite for starting the next card.",
+    "The source cards use matching preparationAuthority.productId/liveAuthorizationRef. They need the root's now-prepared generic scoped prompt exception; this bundle activates nothing.",
+    "N71/N73 lack necessary implementation, not user permission. Current PO execution authority is explicitly distinguished from the older behavior-only decisions.",
+    "N36/N44/N78 have useful owned preparatory work; they are not closed/deferred. No complete Product card is fabricated from a partial artifact/architecture result.",
+    "A deferred ticket is not automatically eligible merely because the queue later empties. No hourly PM/model polling or new orchestration layer is proposed."
+  ],
+  "historicalIdentityCrossCheck": {
+    "closedNIdentities": 66,
+    "intentionallyUnused": "N52",
+    "unscopedHistoricalReference": "N75",
+    "note": "N75 appears only as a historical outside-scope reference, without active row/acceptance contract. Do not invent a task or re-open closed tickets."
+  },
+  "rows": [
+    {
+      "productId": "N09",
+      "ledgerLine": 114,
+      "title": "تدقيق كثافة الصفحات لاحقًا",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "لا تشغيل الآن؛ يبقى مسارًا مؤجلًا مستقلًا.",
+      "source": "docs/PRODUCT_LEDGER.md:114"
+    },
+    {
+      "productId": "N13",
+      "ledgerLine": 115,
+      "title": "فصل واحد وقائمة طلاب مشتركة مع عدة مواد",
+      "classification": "covered_existing",
+      "ledgerStatus": "LOCAL GATE QUALIFIED / COMBINED PREVIEW PUBLISHED / LIVE-SECURITY-SYNC-RESTORE-DEVICE-SERVED-PO GATES OPEN",
+      "queueStatus": "pending",
+      "currentTaskId": "continuous-n13-existing-section-subject-20261012",
+      "nextConcreteAction": "البطاقة الحالية pending؛ تنفيذ إضافة مادة إلى Section القائمة. لا تكرر المرشح التاريخي.",
+      "source": "docs/PRODUCT_LEDGER.md:115"
+    },
+    {
+      "productId": "N18",
+      "ledgerLine": 116,
+      "title": "جرد D: وتخفيف التخزين",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED - FUTURE HYGIENE / NO CURRENT ACTION",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "لا جرد أو حذف واسع الآن؛ مؤجل بنص صريح.",
+      "source": "docs/PRODUCT_LEDGER.md:116"
+    },
+    {
+      "productId": "N23",
+      "ledgerLine": 117,
+      "title": "محاذاة التذييل والتواقيع",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "يبقى مؤجلًا لمرحلة التقارير مع استقلال هويته.",
+      "source": "docs/PRODUCT_LEDGER.md:117"
+    },
+    {
+      "productId": "N24",
+      "ledgerLine": 118,
+      "title": "تصميم التقارير والطباعة والتصدير",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مرحلة لاحقة أخيرة؛ لا تشغيل تلقائي الآن.",
+      "source": "docs/PRODUCT_LEDGER.md:118"
+    },
+    {
+      "productId": "N26",
+      "ledgerLine": 119,
+      "title": "راحة الوضعين الفاتح والداكن",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مقارنة تصميم لاحقة؛ لا تغيير لوحة الألوان الآن.",
+      "source": "docs/PRODUCT_LEDGER.md:119"
+    },
+    {
+      "productId": "N32",
+      "ledgerLine": 120,
+      "title": "عودة طالب سابق بهويته وتاريخه",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED - FUTURE / DO NOT SPEND CURRENT CAPACITY",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مؤجل صراحة؛ لا إنفاق السعة الحالية على دورة حياة جديدة.",
+      "source": "docs/PRODUCT_LEDGER.md:120"
+    },
+    {
+      "productId": "N35",
+      "ledgerLine": 121,
+      "title": "مرفقات الصور والفيديو الخاصة",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED - REVISIT WHEN PRODUCT SCALE JUSTIFIES STORAGE/COST",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مؤجل لتبرير حجم الاستخدام والتكلفة؛ لا تخزين جديد الآن.",
+      "source": "docs/PRODUCT_LEDGER.md:121"
+    },
+    {
+      "productId": "N36",
+      "ledgerLine": 122,
+      "title": "إضافة متصفح خاصة لالتقاط أسماء من مصدر رسمي",
+      "classification": "external_artifact",
+      "ledgerStatus": "LOCAL PRIVATE MV3 HELPER PROTOTYPE VERIFIED 8/8 / OFFICIAL TEACHER DOM GATE OPEN",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "يمكن تفويض تثبيت/فتح popup في profile اصطناعي مملوك وتوثيق صلاحياته. ما بقي لإثبات المصدر: DOM رسمي راهن من مصدر مشروع؛ الأدلة الحالية لا توفره. النتيجة artifact receipt منفصل، لا نشر موقع أو إغلاق N36.",
+      "source": "docs/PRODUCT_LEDGER.md:122"
+    },
+    {
+      "productId": "N44",
+      "ledgerLine": 123,
+      "title": "التنبيهات الفعلية وWeb Push والنشر الإداري",
+      "classification": "foundation_dependency",
+      "ledgerStatus": "LOCAL SYNTHETIC N44 CENTER DEMO READY / REAL EVENTS-PUSH-ADMIN FOUNDATION STILL BLOCKED; NOT PRODUCTION",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "المركز الاصطناعي الحالي لا ينجزها. يلزم تكامل N78 server authorization، مخزن الاشتراكات/التفضيلات، توليد الأحداث وجدولة/fan-out واختبار جهاز مملوك. يمكن تفويض عقد التنفيذ والتصميم التقني الآن؛ لا حاجة لقرار شكلي من PO، ولا تُسمّى Demo مكتملة.",
+      "source": "docs/PRODUCT_LEDGER.md:123"
+    },
+    {
+      "productId": "N49",
+      "ledgerLine": 124,
+      "title": "صلاحية العمل دون اتصال 7/14 يومًا",
+      "classification": "covered_existing",
+      "ledgerStatus": "IN_PROGRESS - IMPLEMENTING",
+      "queueStatus": "running",
+      "currentTaskId": "continuous-n49-durable-offline-lease-20261012",
+      "nextConcreteAction": "العامل الحالي running؛ استكمال إصلاحه واختباره المحدد بنفس الجلسة، دون تذكرة مكررة.",
+      "source": "docs/PRODUCT_LEDGER.md:124"
+    },
+    {
+      "productId": "N54",
+      "ledgerLine": 125,
+      "title": "مقاومة ضغط لوحة المفاتيح والنوافذ الصغيرة",
+      "classification": "covered_existing",
+      "ledgerStatus": "PO WORK APPROVED — OPTION A; PRODUCT SOLUTION REOPENED / BLOCKED",
+      "queueStatus": "pending",
+      "currentTaskId": "continuous-n54-keyboard-compression-20261012",
+      "nextConcreteAction": "البطاقة الحالية pending؛ حل Product Option A وحفظ الفرق بين المحاكاة ودليل الجهاز الفعلي.",
+      "source": "docs/PRODUCT_LEDGER.md:125"
+    },
+    {
+      "productId": "N58",
+      "ledgerLine": 126,
+      "title": "السياق والتقويم والتحقق الحقيقي A/B",
+      "classification": "covered_existing",
+      "ledgerStatus": "LIVE SYNTHETIC A-B AUTHORIZED / OCT11 SKIP BEFORE PROVISIONING - SECURE AUTH ADMIN API MISSING / NO ACCOUNTS OR FIXTURES / HIGH GATES OPEN",
+      "queueStatus": "pending",
+      "currentTaskId": "continuous-n58-fresh-live-20261012",
+      "nextConcreteAction": "أصبحت pending في الكتالوج الفعلي. وحدة D087 جاهزة؛ النص القديم عن فقد Auth admin متقادم. المرشح والحاضنة والتحقق الحي عمل البطاقة، لم يثبت تنفيذه في هذا الجرد.",
+      "source": "docs/PRODUCT_LEDGER.md:126"
+    },
+    {
+      "productId": "N64",
+      "ledgerLine": 131,
+      "title": "تحسين رسالة تغيير البريد",
+      "classification": "deferred",
+      "ledgerStatus": "PO APPROVED DIRECTION — DEFERRED / LAST PRIORITY",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مؤجل لآخر الأولويات؛ لا تغيير سلوك Auth.",
+      "source": "docs/PRODUCT_LEDGER.md:131"
+    },
+    {
+      "productId": "N71",
+      "ledgerLine": 132,
+      "title": "نسخ واستعادة Cloud-first موحدة لكل البيانات المحمولة",
+      "classification": "eligible_implementation",
+      "ledgerStatus": "PO WORK V3 APPROVED / FROZEN - HIGH-RISK CODEX IMPLEMENTATION PENDING",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "بطاقة كاملة جديدة: تمديد البروتوكول الموجود وربط الواجهة/Sync. العقد D099 ثابت؛ نقص البروتوكول عمل تنفيذي، وليس إذنًا مفقودًا. source: n71-continuation-card.json.",
+      "source": "docs/PRODUCT_LEDGER.md:132"
+    },
+    {
+      "productId": "N72",
+      "ledgerLine": 133,
+      "title": "مسح iPhone/Safari الشامل",
+      "classification": "deferred",
+      "ledgerStatus": "PO APPROVED DIRECTION — DEFERRED DEDICATED LANE",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "مسار لاحق مستقل؛ لا يؤخر إصلاح N91 الحالي.",
+      "source": "docs/PRODUCT_LEDGER.md:133"
+    },
+    {
+      "productId": "N73",
+      "ledgerLine": 134,
+      "title": "نسخ التوزيع الكامل مع حفظ درجات الهدف",
+      "classification": "eligible_implementation",
+      "ledgerStatus": "D-119 PREVIEW VERIFIED (c961f28) / DEMO-ONLY IMPLEMENTATION — NOT ELIGIBLE FOR PRODUCTION; OWNER-SYNC-SCORE SERVER GATES OPEN",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "بطاقة كاملة جديدة: بروتوكول حساب حقيقي وخطة/تطبيق آمن متعدد الأهداف بدل Demo-only. العقد D119 ثابت؛ لا قرار تصميم مفقود. source: n73-continuation-card.json.",
+      "source": "docs/PRODUCT_LEDGER.md:134"
+    },
+    {
+      "productId": "N77",
+      "ledgerLine": 135,
+      "title": "حذف الفصل/المادة بعد تحقق الخادم",
+      "classification": "eligible_implementation",
+      "ledgerStatus": "CURRENT-MAIN RESTRICTED LOCAL DEMO ONLY; HISTORICAL COMBINED PREVIEW SEPARATE / SERVER-OWNER-SYNC-RESTORE GATES OPEN — NO PRODUCTION",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "بطاقة كاملة جديدة تعتمد N13؛ ربط RPC المنشورة والتحقق الحي المحدود تحت D120. migration الموجودة immutable ولا تُعاد. source: n77-continuation-card.json.",
+      "source": "docs/PRODUCT_LEDGER.md:135"
+    },
+    {
+      "productId": "N78",
+      "ledgerLine": 136,
+      "title": "منصة الإدارة الخاصة والتفويض والتدقيق",
+      "classification": "foundation_dependency",
+      "ledgerStatus": "PO PLATFORM DIRECTION APPROVED / FROZEN - HIGH-RISK AUTHORIZATION/AUDIT ARCHITECTURE + WORK DESIGN PENDING",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "يمكن تفويض تصميم وتنفيذ أساس التفويض الخادمي/audit والوحدات المغلقة افتراضيًا الآن. القيمة التشغيلية غير المحددة فعليًا: هوية/allowlist أول مدير Product المخول، لا صلاحية GitHub. لا ننشئ هوية امتياز أو نعتبر route مخفية أساسًا آمنًا. N44 أول وحدة، وليس متصفحًا لبيانات المعلمين.",
+      "source": "docs/PRODUCT_LEDGER.md:136"
+    },
+    {
+      "productId": "N84",
+      "ledgerLine": 138,
+      "title": "ضبط درجات Quick Log من الكشف",
+      "classification": "delivered_awaiting_po",
+      "ledgerStatus": "WAITING_PO - PRODUCTION VERIFIED",
+      "queueStatus": "awaiting_po",
+      "currentTaskId": "continuous-n84-quicklog-completion-20261012",
+      "nextConcreteAction": "Production verified وawaiting_po؛ لا عمل جديد ولا إعادة الصف بسبب مرجع تاريخي.",
+      "source": "docs/PRODUCT_LEDGER.md:138"
+    },
+    {
+      "productId": "N88",
+      "ledgerLine": 139,
+      "title": "بوابة الطالب والواجبات المستقبلية",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED - FUTURE PRODUCT EPIC / NO CURRENT CAPACITY",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "ملحمة مؤجلة؛ حفظ بيانات قديمة ضمن N71 لا يفعّل ميزات N88.",
+      "source": "docs/PRODUCT_LEDGER.md:139"
+    },
+    {
+      "productId": "N90",
+      "ledgerLine": 140,
+      "title": "استيراد أعمدة الدرجات N12 V2",
+      "classification": "deferred",
+      "ledgerStatus": "DEFERRED - OPTIONAL N12 V2 / NOT IMPLEMENTED",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "اختياري مؤجل؛ N12 names-only مغلقة ولا يعاد فتحها.",
+      "source": "docs/PRODUCT_LEDGER.md:140"
+    },
+    {
+      "productId": "N91",
+      "ledgerLine": 142,
+      "title": "قص عناوين أدوات الفصل على الجوال",
+      "classification": "covered_existing",
+      "ledgerStatus": "BLOCKED - SEE CURRENT CONTROLLER RECEIPT",
+      "queueStatus": "pending",
+      "currentTaskId": "v6-n91-mobile-card-titles-20261012",
+      "nextConcreteAction": "آخر queue أعادها pending للتصحيح المحدد؛ صف Ledger القديم blocked لا يبرر بطاقة مكررة.",
+      "source": "docs/PRODUCT_LEDGER.md:142"
+    },
+    {
+      "productId": "N92",
+      "ledgerLine": 143,
+      "title": "صياغة نجاح حذف الطالب",
+      "classification": "delivered_awaiting_po",
+      "ledgerStatus": "WAITING_PO - PRODUCTION VERIFIED",
+      "queueStatus": "awaiting_po",
+      "currentTaskId": "v6-n92-delete-copy-20261012",
+      "nextConcreteAction": "Production verified وawaiting_po؛ منجزة تقنيًا ضمن الكتالوج.",
+      "source": "docs/PRODUCT_LEDGER.md:143"
+    },
+    {
+      "productId": "N93",
+      "ledgerLine": 144,
+      "title": "معنى فترتي الرصد الرسميتين في نور",
+      "classification": "eligible_research",
+      "ledgerStatus": "PO SCOPE CLARIFIED - GRADES ONLY / NO DUPLICATE CLASSES-STUDENTS-ITEMS / OFFICIAL POLICY STUDY",
+      "queueStatus": null,
+      "currentTaskId": null,
+      "nextConcreteAction": "بحث رسمي محدود يمكن البدء به دون PO: snapshot تراكمي أم قيم مستقلة، مع بيان اختلاف المرحلة/المادة. تقرير مستقل؛ current controller لا يدعم research_receipt. source: n93-research-task.json.",
+      "source": "docs/PRODUCT_LEDGER.md:144"
+    },
+    {
+      "productId": "N94",
+      "ledgerLine": 145,
+      "title": "حالة تسليم متأخر ودرجة اختيارية ودورة 3 نقرات",
+      "classification": "covered_existing",
+      "ledgerStatus": "PO TAP-CYCLE 3 STATES + DISTINCT COLORS APPROVED / OPTIONAL START + LATE GRADE + EXCUSE OVERRIDE / IMPLEMENTATION PAUSED",
+      "queueStatus": "pending",
+      "currentTaskId": "continuous-n94-subitem-late-scoring-20261012",
+      "nextConcreteAction": "بطاقتها pending وتعتمد N84 التي أصبحت awaiting_po؛ لا تبعية N88 مصطنعة.",
+      "source": "docs/PRODUCT_LEDGER.md:145"
+    },
+    {
+      "productId": "N95",
+      "ledgerLine": 146,
+      "title": "عدم تضخيم عطل Sync العابر",
+      "classification": "delivered_awaiting_po",
+      "ledgerStatus": "WAITING_PO - PRODUCTION VERIFIED",
+      "queueStatus": "awaiting_po",
+      "currentTaskId": "continuous-n95-sync-status-severity-20261012",
+      "nextConcreteAction": "Production verified وawaiting_po؛ لا تكرار تنفيذ بسبب أثر سابق في السجل.",
+      "source": "docs/PRODUCT_LEDGER.md:146"
+    }
+  ],
+  "sourceEvidence": [
+    "evidence.latest.readonly.json",
+    "evidence.readonly.json"
+  ]
+}

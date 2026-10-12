@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "checkedOn": "2026-10-12",
+  "kind": "source-json-consistency",
+  "status": "PASS",
+  "checks": [
+    "Valid JSON and one explicit Product task per continuation file",
+    "Matching productId/liveAuthorizationRef in scoped preparationAuthority",
+    "Required check names exactly match acceptance PASS prefixes",
+    "27 unique lifecycle rows with classifications summing to 27",
+    "Research task excluded from Product catalog and has no tasks array",
+    "Named service/project/fixture scope; no broad src/supabase allowlist"
+  ],
+  "counts": {
+    "productSourceCards": 3,
+    "requiredAcceptanceChecks": [
+      5,
+      6,
+      6
+    ],
+    "currentLifecycleRows": 27,
+    "nonDeferredRows": 16,
+    "deferredRows": 11
+  },
+  "notPerformed": [
+    "Product tests",
+    "Provider writes",
+    "Auth account creation",
+    "Schema migration",
+    "Queue/catalog activation",
+    "Deployment"
+  ],
+  "latestReadOnlyRuntimeAt": "2026-10-12T10:51:48.221Z"
+}

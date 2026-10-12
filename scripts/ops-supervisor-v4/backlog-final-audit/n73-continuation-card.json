@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "purpose": "Independent source card for root review/admission. This file performs no activation, service write, account creation, migration or publication.",
+  "tasks": [
+    {
+      "id": "continuous-n73-real-distribution-20261012",
+      "productId": "N73",
+      "scopeKey": "n73-d119-account-atomic-distribution",
+      "activationId": "po-20261012-continuous",
+      "priority": 110,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+      "budgetMinutes": 180,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n73_fresh_candidate_preview",
+        "n73_distribution_score_contract",
+        "n73_server_protocol_binding",
+        "n73_live_owner_atomic_retry",
+        "n73_live_device_convergence",
+        "n73_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N73",
+        "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+        "authoritySource": "Current PO instruction to implement/finish the backlog and deploy under continuous automation, with approved D119/D105/D102 Product scope. D119 alone was a behavior approval; this reference explicitly identifies the later execution authority. Live effects remain confined to the named additive protocol and synthetic closure.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n73-preview/continuous-n73-real-distribution-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n73-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N73 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n73-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes.",
+          "migration": {
+            "operation": "apply_migration",
+            "maxNewMigrations": 1,
+            "name": "n73_distribution_apply",
+            "sourceFileSuffix": "_n73_distribution_apply.sql",
+            "scope": "Only the task's exact committed, hash-certified additive D119 distribution command/receipt schema and narrowly scoped owner guards. Certify the same SQL on disposable native Postgres first, then apply once via the existing connector and read back function/ACL/version binding. Preserve existing score:copy_definition compatibility. No real-account backfill, general RLS/Auth-policy change, reset, truncate or unrelated schema action."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair."
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n73",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories."
+        }
+      },
+      "objective": "Turn approved D119 into the real account workflow, using the small UI/planner delta from c961f28b8eccbb9b2a425a7b6b89ca3c1d6130a1 only where it still matches fresh main. The old candidate explicitly supports only rakeezx-demo; do not ship that restriction over current live score:copy_definition. Implement the missing trusted multi-target plan/apply protocol and client receipt/Sync integration, preserving current scoring and any already-shipped N84/N94 fields. Protocol design and scoped certification are work owned by this card; no missing Product design decision was found.",
+      "acceptance": [
+        "n73_fresh_candidate_preview: PASS binds fresh base/candidate/tree/harness to an exact successful immutable Cloudflare Preview and affected source assets. Normal flow is source class, explicitly selected targets (none selected by default), compact review and apply, with impact details collapsed. Preserve natural class order and D105 parent metadata-only edit.",
+        "n73_distribution_score_contract: PASS covers full definition/subitem matching; unique matches update in place, missing items are created, repeated apply creates no duplicate origin. Keep valid target manual scores and persistently cap only over-maximum scores; manual-to-auto uses only target events. Keep extra items/scores by default and require the specific unchecked removal option plus deliberate impact confirmation. Ambiguous matches fail closed for the affected target. Preserve late/subitem metadata already on main.",
+        "n73_server_protocol_binding: PASS records the exact additive migration source/hash, focused native owner/atomicity result, one actual provider application and read-back RPC/ACL/version binding. The deployed single-item/single-target apply_score_distribution_copy_command is not D119 proof. Validate the selected plan against fresh server revisions, then atomically apply its accepted target operations; expose any excluded ambiguous target in review. Keep old clients working until the replacement is certified.",
+        "n73_live_owner_atomic_retry: PASS uses real authenticated A/B and the exact synthetic IDs: B cannot read/apply to A; stale plan or injected bounded failure causes no partial accepted-plan mutation; retry is idempotent. Demonstrate persisted cap, compatible target score preservation, target-only auto projection, keep-default and explicit synthetic extra removal. No source grades copied and no real teacher data touched.",
+        "n73_live_device_convergence: PASS shows A2 receives the actual canonical items/subitems/completions/scores and deletion receipts after apply, including stale retry without duplicate or resurrection. Backup/restore serializers preserve relevant changed fields. Use focused current contract tests and one deterministic live harness; no full historical suite or repeated source-identical builds.",
+        "n73_fixture_disposition: PASS requires actual exact-pair disposition and both final deny-all proofs from preparationAuthority, with durable finally/recovery prepared before Authcreate. Missing live/provider/cleanup proof means precise BLOCKED and preserved candidate, never a Demo LOCAL_READY."
+      ],
+      "allowedPaths": [
+        "src/lib/score-foundation.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/backup-v2.js",
+        "src/lib/initial-restore.js",
+        "src/store.js",
+        "src/views/items.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n73_distribution_apply.sql",
+        "supabase/functions/ops-n73-fixture/**",
+        "supabase/functions/ops-n73-retire/**",
+        "tests/n73-*",
+        "tests/n73-live/**",
+        "tests/score-foundation-local.test.mjs",
+        "tests/score-foundation-server.test.mjs",
+        "tests/v2-backup-restore.test.mjs"
+      ],
+      "releaseAuthority": "PO-20261012 continuous execution/deployment under D119/D105/D102; no renewed routine PM/Preview hold. Worker may only use the named preparation operations and synthetic plan. Product main/Production is publisher-only. No mass/real-data operation; stop only this card on concrete unsafe drift.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N73",
+        "decisions": [
+          "D119",
+          "D105",
+          "D102"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "approvedContract": "docs/N73_SIMPLIFIED_DISTRIBUTION_V2.md",
+        "historicalCandidate": "c961f28b8eccbb9b2a425a7b6b89ca3c1d6130a1",
+        "historicalImplementationCommit": "1b1f9a8f28f098acb4cc248a4e0453ddb424475b",
+        "historicalImplementationPaths": [
+          "src/lib/score-foundation.js",
+          "src/store.js",
+          "src/views/items.js",
+          "tests/n73-account-gate.test.mjs",
+          "tests/n73-d119.test.mjs"
+        ],
+        "observedRpcSourceMd5": "7c125fbb33aaaa4d43b6373b913b1aa1"
+      }
+    }
+  ]
+}

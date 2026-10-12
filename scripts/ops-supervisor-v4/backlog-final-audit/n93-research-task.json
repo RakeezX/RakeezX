@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "notForProductCatalog": true,
+  "reason": "The current controller routes every LOCAL_READY to Git/Cloudflare delivery; research_receipt has no separate completion path. Run this independently and retain N93's Product lifecycle instead of manufacturing a Product commit.",
+  "task": {
+    "id": "research-n93-noor-period-semantics-20261012",
+    "productId": "N93",
+    "title": "فترتا الرصد في نور: snapshot تراكمي أم قيم مستقلة؟",
+    "outcome": "research_receipt",
+    "executionMode": "local",
+    "liveMutation": false,
+    "budgetMinutes": 45,
+    "objective": "Verify the present official Ministry/Noor meaning of first and second student-grade reporting periods inside the same academic term, then produce one evidence-backed RAKEEZ data/UX recommendation within the PO's fixed no-duplicate-identities scope. This is authorized research work; no new Product schema, Noor write, credential request or paid tool.",
+    "sourceLinks": [
+      {
+        "url": "https://moe.gov.sa/ar/aboutus/aboutministry/RPRLibrary/الإجراءات%20التنفيذية%20للائحة%20تقويم%20الطالب%202025م.pdf",
+        "knownHistoricalFinding": "Rule 3-14 says results notification occurs twice per academic period; this alone does not prove two independent current score fields."
+      },
+      {
+        "url": "https://noor.moe.gov.sa/OnlineHelp/Arabic/4/الخدمات_والبيانات/كشف_درجات_أعمال_السنة.htm",
+        "knownHistoricalFinding": "Official online help discusses subperiod recording within a term; verify applicability/current labels instead of assuming the 1448H screen."
+      },
+      {
+        "path": "docs/PRODUCT_LEDGER.md",
+        "line": 144,
+        "scope": "N93 actual PO clarification: grades only, same term, no duplicate classes/students/items."
+      }
+    ],
+    "method": "Start with current official public procedures, teacher guides and official screen examples. Record publication/effective year and applicable school stage/grade/subject. Distinguish notification/checkpoint timing from independent entry fields, and recorded period grades from cumulative totals. Community/screenshots may locate sources but cannot establish policy alone. Do not enter private teacher/student accounts or collect identifiable student records.",
+    "acceptance": [
+      "Cite exact official page/section and dates for the current model; mark old guidance as historical and conflicts unresolved unless a newer applicable source resolves them.",
+      "Compare two specific models only: immutable first checkpoint plus later cumulative value, versus independently recorded period values. State which the current official evidence supports for each applicable scope, or that the evidence is insufficient.",
+      "Keep existing Section/student/item identity and avoid double summation; state the minimal fields or snapshot rule justified by the evidence, without implementing a generic grades framework.",
+      "Deliver a concise Arabic report plus machine-readable claims/source/effect-date matrix. Status is CONTRACT_READY only if semantics are supported; otherwise EVIDENCE_GAP names the exact missing screen labels/grade/subject evidence and the next concrete source needed. Neither status is automatic N93 Product closure."
+    ],
+    "outputFiles": [
+      "N93_OFFICIAL_PERIOD_FINDINGS.json",
+      "N93_OFFICIAL_PERIOD_REPORT.md"
+    ],
+    "remainingQuestion": "Do current applicable Noor entry screens treat period one/two as cumulative checkpoints or independent stored values? Existing public preliminary evidence proves two reporting moments only.",
+    "constraints": [
+      "Read-only official research; no database/Auth/provider mutation",
+      "No automatic write to Noor",
+      "No Product LOCAL_READY or dummy deployment",
+      "No credentials/OTP/private student data in output"
+    ]
+  }
+}
