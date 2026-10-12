@@ -29,7 +29,7 @@ export async function safeReceipt(s) {
     issuedAt: s.issuedAt, expiresAt: s.expiresAt, functions: s.functions,
     liveDeadline:new Date(Date.parse(s.issuedAt)+45*60*1000).toISOString(),
     events: s.events, liveObservations: s.liveObservations, retirementChecks: s.retirementChecks,
-    gate: s.gate, disposition: s.disposition, disarmed: s.disarmed,
+    gate: s.gate, disposition: s.disposition, disarmed: s.disarmed, disarmEndpoints:s.disarmEndpoints,
     retainedProductObservation:s.retainedProductObservation,recoveryCandidate:s.recoveryCandidate,
     recovery: path.join(PRIVATE, 'state.tmp'), noProductionPublish: true };
   await fs.writeFile(path.join(PRIVATE, 'receipt.tmp'), JSON.stringify(receipt, null, 2));
@@ -61,10 +61,10 @@ export async function prepare(previewUrl) {
   ids.teachings=[ids.section+'|'+subjectId+'|'+termId,ids.section+'|'+ids.secondSubject+'|'+termId,
     ids.outsideSection+'|'+subjectId+'|'+termId].map(id=>'tch:'+id);
   ids.itemIds=ids.teachings.map(()=>Array.from({length:5},()=>randomUUID()));
-  ids.enrollments=[ids.section,ids.outsideSection].map(section=>'en:'+ids.student+':'+section);
+  ids.enrollments=[ids.section].map(section=>'en:'+ids.student+':'+section);
   ids.scoreIds=ids.itemIds.map(items=>'sc:'+ids.student+':'+items[1]);
   ids.termId=termId;ids.subjectId=subjectId;ids.yearId='y:1448-1449';
-  ids.mutations=Object.fromEntries(['t1','t2','outside','enroll','outsideEnroll','stale','ownerDenied'].map(n=>[n,'n77:'+randomUUID()]));
+  ids.mutations=Object.fromEntries(['t1','t2','outside','enroll','stale','ownerDenied'].map(n=>[n,'n77:'+randomUUID()]));
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:fixtureEmail(RUN_ID,slot),password:'N77!aA1'+proof()}));
   const files=git('ls-files','src','sw.js').split('\n').map(p=>({path:p,blob:git('rev-parse',`HEAD:${p}`)}));
   const binding={candidateSha,baseSha,treeSha:git('rev-parse','HEAD^{tree}'),previewUrl,
@@ -126,11 +126,18 @@ async function authPost(s,grant,body) {
 export async function operation(op,mode='provision') {
   const s=await readState();
   if(op==='confirm-disarmed') {
-    for(const name of Object.values(s.functions)) {
-      const r=await fetch(`${URL}/functions/v1/${name}`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000)});
-      if(r.status!==410||(await r.json()).errorCode!=='N77_CLOSED')throw fail('DISARM_PENDING');
+    const endpoints=[];
+    for(const [mode,name] of Object.entries(s.functions)) {
+      for(const authorized of [false,true]) {
+        const r=await fetch(`${URL}/functions/v1/${name}`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+          ...(authorized?{headers:{'content-type':'application/json','x-n77-capability':s.capabilities[mode]},
+            body:JSON.stringify({operation:'probe'})}:{})});
+        const code=(await r.json()).errorCode;
+        if(r.status!==410||code!=='N77_CLOSED')throw fail('DISARM_PENDING');
+        endpoints.push({name,authorized,status:r.status,code,at:new Date().toISOString()});
+      }
     }
-    s.disarmed=true;await saveState(s);await safeReceipt(s);return true;
+    s.disarmEndpoints=endpoints;s.disarmed=true;await saveState(s);await safeReceipt(s);return true;
   }
   if(op==='probe') {
     const data=await call(s,mode,'probe');if(!data.configured)throw fail('ADMIN_CONFIGURATION_UNAVAILABLE');

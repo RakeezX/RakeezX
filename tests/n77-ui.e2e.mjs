@@ -1,6 +1,28 @@
 import {test,expect} from '@playwright/test';
 import {createCloud,authenticated} from './helpers/remote-sync-browser.mjs';
+import {flush} from './n77-live/gate.mjs';
 const owner='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+test('N77 harness waits for an overlapping actual Sync pass',async({page})=>{
+  const transport=createCloud();await authenticated(page,transport);
+  await page.route('https://*.supabase.co/auth/v1/user',r=>r.fulfill({json:{id:owner}}));
+  await page.goto('/#/classes');
+  await page.waitForFunction(async()=> (await import('/src/store.js')).state.ready);
+  await page.evaluate(async()=>{
+    await (await import('/src/lib/sync.js')).suspendForWorkspaceDeactivation();
+    await (await import('/src/store.js')).renewOfflineLease();
+  });
+  const held=transport.holdNextTableRead('sections',page);
+  await page.evaluate(()=>{window.__n77Background=import('/src/lib/sync.js').then(sync=>sync.syncAll({full:true}));});
+  await held.started;
+  let settled=false;
+  const draining=flush(page).finally(()=>{settled=true;});
+  try {
+    await new Promise(resolve=>setTimeout(resolve,200));
+    expect(settled).toBe(false);
+  } finally {held.release();}
+  await draining;
+  expect(await page.evaluate(()=>window.__n77Background)).toBe(true);
+});
 test('actual Product dialog consumes server scope and receipt before local deletion',async({page})=>{
   const transport=createCloud();await authenticated(page,transport);
   await page.addInitScript(()=>addEventListener('DOMContentLoaded',async()=>{
