@@ -4,7 +4,11 @@
 This page preserves user notes and acceptance context. The automatic block lists only delivery with observed Production evidence; use the task's delivery receipt and [Product ledgers](PRODUCT_LEDGER.md) for status. `awaiting_po` releases execution capacity immediately, so review does not delay the next eligible ticket. Local/Preview results are not published acceptance items.
 
 <!-- BEGIN RAKEEZ CONTINUOUS DELIVERY -->
-The delivery recorder maintains verified published items here. Consult `artifacts/ops-supervisor-v4/ACTIVE_TASKS.json`, the relevant `queue/*.json` and delivery receipt for current evidence; absence from an unrefreshed page is not a status decision.
+
+| التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
+| --- | --- | --- | --- | --- | --- |
+| N49 | مهلة العمل دون اتصال: تذكير بعد تجاوز 7 أيام ووضع قراءة فقط عند 14 يومًا؛ منشور ومتحقق، ينتظر قبول PO | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
+
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
 

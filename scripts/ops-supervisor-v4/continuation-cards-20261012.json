@@ -159,7 +159,7 @@
         "scope_aware_delete_preservation",
         "product_ui_release_scope"
       ],
-      "objective": "Implement N13 against fresh current main using D-104 and the accepted Option C visual direction. Current source already supports one Section with multiple Teachings: store.createTeaching accepts an existing sectionId and queues the existing teaching-creation command; the deployed RPC validates auth.uid ownership of Section, Subject and Term and returns idempotent canonical receipts. The concrete UI gap is src/views/teachings.js add(), which always calls createSection before createTeaching. Add the bounded real-account-capable create/edit flow for selecting an existing active Section and adding a new subject Teaching without cloning the Section, students or enrollments. Keep existing immutable Teaching natural identity and independent teaching data. Reuse current safe deleteTeaching/deleteClass operations to route the single Delete Class action by current active-Teaching count with accurate scope copy; retain both existing retained-data blockers. Do not import N77's historical combined train, remove blockers, introduce destructive deletion, change database schema, or convert/merge existing class identities. N77's true destructive deletion remains its separate ticket. Return LOCAL_READY only for the actual Product paths after all required checks, or BLOCKED with the exact operation/contract gap; do not merely host the old Demo.",
+      "objective": "Implement N13 against fresh current main using D-104 and the accepted Option C visual direction. Current source already supports one Section with multiple Teachings: store.createTeaching accepts an existing sectionId and queues the existing teaching-creation command; the deployed RPC validates auth.uid ownership of Section, Subject and Term and returns idempotent canonical receipts. The concrete UI gap is src/views/teachings.js add(), which always calls createSection before createTeaching. Add the bounded real-account-capable create/edit flow for selecting an existing active Section and adding a new subject Teaching without cloning the Section, students or enrollments. Keep existing immutable Teaching natural identity and independent teaching data. Reuse current safe deleteTeaching/deleteClass operations to route the single Delete Class action by current active-Teaching count with accurate scope copy; retain both existing retained-data blockers. Do not import N77's historical combined train, remove blockers, introduce destructive deletion, change database schema, or convert/merge existing class identities. N77's true destructive deletion remains its separate ticket. Return LOCAL_READY only for the actual Product paths after all required checks, or BLOCKED with the exact operation/contract gap; do not merely host the old Demo.\n\n2026-10-12 evening operational repair under the existing PO execution delegation: src/lib/sync-v2.js is now explicitly included. The previous blocker was our incomplete file scope, not absent PO permission. Resume the same saved session and candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d. In reconcileTeachingCreationReceipt, exclude retired local default items from reconciliation puts while preserving reference rewriting and atomic owner-scoped semantics. Reuse all unchanged checks; fix and run the retained canonical-adoption regression (five canonical items, no five retired duplicates). Do not rerun the already passed browser train unless materially changed. Preserve the historical two BLOCKED results; this materially corrected scope allows the repair now. No server schema or real-data changes are needed for this fix.",
       "acceptance": [
         "shared_section_subject_creation: PASS exercises the actual create/edit handlers and store commands for a second distinct subject in an existing active Section, a new Section's first subject, and duplicate same Section/Subject/Term attempts. Existing Section/student/enrollment IDs and counts stay unchanged when adding the subject; existing labels/colors are preserved unless explicitly edited. Invalid/archived/missing Section, mismatched term/year where forbidden by the existing contract, and missing subject fail before unintended persistence. Repeated or rapid confirmation does not create duplicate Teachings or default items.",
         "shared_roster_subject_isolation: PASS uses an isolated account-mode Product workspace, not a Demo-only implementation branch. Two Teachings share the same roster/enrollment identities; one Section roster edit appears in both. Score items/grades, sessions/attendance, reports and Teaching context remain isolated. Existing grades/history and unrelated Sections are unchanged. Use the actual store/selectors and serializers, not a parallel toy data model.",
@@ -177,7 +177,8 @@
         "tests/section-validation.test.mjs",
         "tests/sections.test.mjs",
         "tests/sync-v2-runtime.test.mjs",
-        "tests/sync-v2-server-protocol.test.mjs"
+        "tests/sync-v2-server-protocol.test.mjs",
+        "src/lib/sync-v2.js"
       ],
       "releaseAuthority": "PO 2026-10-12 continuous execution and scoped delivery delegation applies together with the named approved Product contract. Routine technical choices need no renewed approval. This card allows only isolated local/synthetic work and the normal Git/Cloudflare delivery after all required checks pass; it does not authorize real-account/real-student test changes, new live Auth/RLS/schema mutations, or an unbounded test train. A proven missing condition parks this card only. Keep the Product ticket OPEN until its actual acceptance outcome; a scoped delivery enters awaiting_po and releases the worker. D-104 architecture is approved; the Product Ledger expressly retains current Production blockers until N77 ships. No dependency on N77 is required to use the already deployed teaching-creation protocol and retain safe delete behavior.",
       "sourceEvidence": {
@@ -191,6 +192,14 @@
         "serverProjectId": "xlrubcwjqktzzunrvuns",
         "serverEvidence": "docs/automation-evidence/20261012/deployed-teaching-creation.readonly.json",
         "historicalCombinedCandidateUse": "Reference only; not the source to cherry-pick wholesale."
+      },
+      "operationalRecovery": {
+        "reason": "Missing required local reconciliation path in system-authored card",
+        "at": "2026-10-12T20:48:42.107Z",
+        "addedPaths": [
+          "src/lib/sync-v2.js"
+        ],
+        "previousCandidate": "59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d"
       }
     },
     {
