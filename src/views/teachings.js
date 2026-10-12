@@ -496,10 +496,22 @@ export default {
             }
           }
 
-          function renderStep2() {
+          async function renderStep2() {
+            const requestedId = selectedId;
+            const next = foot.querySelector('#class-delete-next-btn');
+            if (next) next.disabled = true;
             let scope;
-            try { scope = store.classDeleteScope(selectedId); }
+            let plan;
+            try {
+              scope = store.classDeleteScope(selectedId);
+              if (!isDemo(store.getTeaching(selectedId))) {
+                plan = await store.previewDeleteTeaching(selectedId);
+                scope.kind = plan.scope === 'teaching' ? 'subject' : 'class';
+              }
+            }
             catch (error) { toast(error.message, 'warn'); done(undefined); return; }
+            if (!root.isConnected) return;
+            if (requestedId !== selectedId) { renderStep2(); return; }
             const selectedTch = store.getTeaching(selectedId);
             const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
             const sub = selectedTch ? store.getSubject(selectedTch.subjectId) : null;
@@ -524,12 +536,12 @@ export default {
                 </div>
                 <p class="class-delete-confirm-box__consequence">
                   ${scope.kind === 'subject'
-                    ? 'سيتم حذف هذه المادة فقط من الفصل. سيبقى الفصل وقائمة طلابه والمواد الأخرى كما هي.'
-                    : 'هذه آخر مادة للفصل. سيتم حذف الفصل كاملًا مع بنود التقييم الافتراضية.'}
+                    ? 'سيتم حذف هذه المادة وبياناتها فقط من الفصل، بما في ذلك الدرجات والحصص والحضور والملاحظات. سيبقى الفصل وطلابه والمواد الأخرى.'
+                    : 'هذه آخر مادة للفصل. سيتم حذف الفصل كاملًا وبياناته المرتبطة، بما في ذلك الدرجات والحصص والحضور والملاحظات.'}
                 </p>
                 <p class="class-delete-confirm-box__note">
                   ${demo && scope.kind === 'class' ? 'سيُحذف الفصل التجريبي وبياناته المحلية فقط.'
-                    : 'إذا كان الفصل يحتوي على بيانات محفوظة، فلن يتم الحذف. يمكنك أرشفة الفصل من الإعدادات.'}
+                    : 'ستبقى بيانات الطلاب المرتبطة بفصول أو سجلات أخرى محفوظة. يتطلب الحذف اتصالًا بالإنترنت والتحقق من النطاق على الخادم.'}
                 </p>
               </div>
             `.value;
@@ -557,21 +569,13 @@ export default {
                     renderStep2();
                     return;
                   }
-                  const pkg = demo && scope.kind === 'class'
-                    ? (await demoPackages()).find(item => item.owned.teachings.includes(selectedId)) : null;
-                  // Package lookup is asynchronous: repeat the scope check before mutation.
-                  if (store.classDeleteScope(selectedId).signature !== scope.signature) {
-                    toast('تغيّرت مواد الفصل. راجع نطاق الحذف وأكّد مجددًا.', 'warn');
-                    renderStep2();
-                    return;
-                  }
-                  if (pkg) await deleteDemoPackage(pkg.packageId);
-                  else await store.deleteClassFromTeaching(selectedId, scope.signature);
+                  if (demo) await store.deleteDemoTeachingScope(selectedId, scope.sectionId, scope.kind === 'subject' ? 'teaching' : 'section');
+                  else await store.deleteTeaching(selectedId, plan);
                   done(true);
                   toast(scope.kind === 'subject' ? 'تم حذف المادة من الفصل' : 'تم حذف الفصل');
                   repaint();
                 } catch (error) {
-                  toast(error.message || 'لا يمكن حذف فصل يحتوي على بيانات محفوظة.', 'warn');
+                  toast(error.message || 'تعذّر حذف الفصل. أعد المحاولة عند توفر الاتصال.', 'warn');
                   confirmBtn.disabled = false;
                 }
               });
