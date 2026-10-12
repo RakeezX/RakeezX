@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n49-route-race-20261013",
+      "productId": "N49",
+      "activationId": "po-20261012-continuous",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "budgetMinutes": 15,
+      "idleMinutes": 5,
+      "priority": 3,
+      "scopeKey": "n49-stale-route-commit",
+      "dependsOn": [],
+      "requiredChecks": [
+        "route_race_source_bound"
+      ],
+      "allowedPaths": [
+        "src/app.js",
+        "docs/automation-evidence/20261013/N49_ROUTE_RACE.json"
+      ],
+      "objective": "Deliver the already prepared Production route-generation correction through the existing controller and sole publisher. One normal controller worker is required to consume this candidate and return honest source-bound results; no extra review worker or reimplementation. Use the fresh worktree/base assigned by the controller. Fetch refs/heads/ops/n49-route-race-20261013 using --no-write-fetch-head, verify the remote branch is exactly cc2ecc890b9d397505d362ecaed4d8e52ede9a0f, verify its parent 61a6e1498c5ef985cb4e947c72e56eb18581797d and exact two changed paths, then cherry-pick only this commit onto the assigned current base. Do not set the runtime base to the older prepared parent or copy the whole old/Preview app. The candidate already fixes an observed delayed HOME resolve repainting HOME over visible GRADES while the URL remains on grades. Keep its request-generation/current-URL guards across the existing asynchronous waits. Verify the exact app and evidence blob identities, or if unrelated current app lines have advanced, preserve them and bind the unchanged resolve excerpt to its recorded proof. If the affected resolve logic itself changed, record the concrete drift; do not overwrite it with an old full source or call the old proof current. Reuse the existing deterministic actual-source PASS and observed native N49 Product first-case PASS (10.7s, total 11.7s, unchanged 120000ms timeout and assertions) for the identical affected excerpt. Only route_race_source_bound is required. No extra browser suite, Vite build, planning train, rewrite or routine review is needed for this source-only guard. Preserve Production 7/14-day lease behavior and 30000ms presentation interval; the accelerated 3/6-minute Preview branch must not enter main. Produce/reuse the exact AI-labelled two-path current-base candidate and return the controller's supplied result schema with actual taskId/runId, worktree/base/candidate and source-bound check evidence. The existing publisher owns integration, Production and served-source verification. This scoped fix does not constitute N49 PO acceptance or closure.",
+      "acceptance": [
+        "route_race_source_bound: verify the prepared commit's two paths, app blob ffd7c614035abda9761081cae7ad04e3dd931a1c and evidence blob c0a0101b726a1ec71f897ed05574806d31b3ad03. Read the committed N49_ROUTE_RACE.json. Its actual-source deterministic before/after evidence reproduces stale HOME before, preserves current GRADES after, covers delayed session materialization and retains current route errors. Bind the candidate's resolve excerpt, from the existing screen-change marker to boot marker, to SHA256 b44823c075cd607f17fe56480d2b9ba9ba2bb27db4e7bb153e2f016d4892fbec. Record current candidate/app SHA even if unrelated lines differ; historical full-file hashes remain historical. Missing or changed relevant proof cannot be reported PASS.",
+        "Reuse the observed native N49 Product first-case PASS (10.7s, total 11.7s) because its changed resolve excerpt has the same SHA256. Its original 120000ms timeout and assertions were preserved. Browser collection, source syntax or HTTP success alone are not that native PASS. Do not rerun unchanged browser or build suites.",
+        "Scope is src/app.js plus docs/automation-evidence/20261013/N49_ROUTE_RACE.json. Keep offline-lease unchanged (Production 7/14 days) and app presentation interval 30000ms. Deliver via the sole publisher and verify served app source through its existing receipt. N49 remains open for PO acceptance; do not alter or close its original awaiting_po card or deploy the 3/6-minute Preview."
+      ],
+      "releaseAuthority": "Direct PO instructions of 2026-10-12/13 authorize diagnosing and correcting work-stopping problems and completing normal Product delivery without repeated routine approval. This is the observed routing defect found during the requested N49 Preview, separately prepared for normal Production. One controller worker may consume the prepared candidate under existing limits and return source-bound results. No real data/Auth/schema/Sync-policy/lease-threshold changes, additional review worker or manual parallel publisher.",
+      "preparedSource": {
+        "baseCommit": "61a6e1498c5ef985cb4e947c72e56eb18581797d",
+        "appBeforeSha256": "53ccf1f74ebdf2181a6a2c0b999dae795a47ac82b34596755eea2aecd17b16f6",
+        "appAfterSha256": "23c291864051ddc97d8670989eecf97e68535ff88b8cc87f36b815098846838c",
+        "evidenceFile": "docs/automation-evidence/20261013/N49_ROUTE_RACE.json",
+        "alreadyImplemented": true,
+        "branch": "ops/n49-route-race-20261013",
+        "candidateSha": "cc2ecc890b9d397505d362ecaed4d8e52ede9a0f",
+        "appBeforeBlob": "9fb65a3a2a82390483532879d44ca3ba363b6bb4",
+        "appAfterBlob": "ffd7c614035abda9761081cae7ad04e3dd931a1c",
+        "evidenceBlob": "c0a0101b726a1ec71f897ed05574806d31b3ad03",
+        "resolveExcerptSha256": "b44823c075cd607f17fe56480d2b9ba9ba2bb27db4e7bb153e2f016d4892fbec",
+        "controllerWorkerRequired": true,
+        "additionalReviewWorkerRequired": false
+      },
+      "liveMutation": false,
+      "liveAuthorizationRef": null
+    }
+  ]
+}
