@@ -100,6 +100,7 @@ test.beforeEach(async ({ page }) => {
     };
   });
   await page.route('https://*.supabase.co/**', route => route.abort());
+  await page.route(`${SUPABASE_URL}/auth/v1/user`, route => route.fulfill({ json: { id: OWNER } }));
   await page.route(`${SUPABASE_URL}/rest/v1/**`, async route => {
     const request = route.request();
     const endpoint = new URL(request.url()).pathname.split('/').pop();
@@ -190,6 +191,77 @@ test('finalized lifecycle receipt finishes local reconciliation without another 
   expect(errors.filter(error => !error.includes('503'))).toEqual([]);
 });
 test.afterEach(async () => { await pg?.close(); });
+
+test('N96 held deletion and reconciliation stay neutral until explicit return to originating roster', async ({ page }, testInfo) => {
+  let releaseRpc, releaseReconcile, rpcEntered, reconcileEntered;
+  const rpcGate = new Promise(resolve => { releaseRpc = resolve; });
+  const reconcileGate = new Promise(resolve => { releaseReconcile = resolve; });
+  const rpcStarted = new Promise(resolve => { rpcEntered = resolve; });
+  const reconcileStarted = new Promise(resolve => { reconcileEntered = resolve; });
+  await page.route(`${SUPABASE_URL}/rest/v1/rpc/apply_student_lifecycle_command`, async route => {
+    rpcEntered(); await rpcGate; await route.fallback();
+  });
+  await page.route(`${SUPABASE_URL}/rest/v1/students*`, async route => {
+    if (backend.calls.length) { reconcileEntered(); await reconcileGate; }
+    await route.fallback();
+  });
+  try {
+    await profile(page);
+    const originalUrl = page.url();
+    let navigations = 0;
+    page.on('framenavigated', frame => { if (frame === page.mainFrame()) navigations++; });
+    await page.evaluate(() => {
+      window.__n96 = { violations: [], samples: 0 };
+      const observe = (records = []) => {
+        const strip = document.querySelector('[data-app-status]');
+        window.__n96.samples++;
+        for (const record of records) {
+          if (record.target === strip && /\bis-visible\b/.test(record.oldValue ?? '') && /\bis-error\b/.test(record.oldValue ?? '')) {
+            window.__n96.violations.push(record.oldValue);
+          }
+        }
+        if (strip?.classList.contains('is-visible') && strip.classList.contains('is-error')) {
+          window.__n96.violations.push(strip.className);
+        }
+      };
+      window.__n96Observer = new MutationObserver(observe);
+      window.__n96Observer.observe(document.body, { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class'], childList: true });
+      observe();
+    });
+    await confirmDelete(page);
+    await rpcStarted;
+    for (const phase of ['rpc', 'reconciliation']) {
+      const result = await page.evaluate(async id => {
+        const summary = await window.__syncModule.getSyncOperationalSummary();
+        let editError;
+        try { await window.store.renameStudent(id, 'Forbidden concurrent edit'); } catch (error) { editError = error.code; }
+        const mapper = await import('/src/lib/sync-operational-ui.js');
+        return { summary, editError, badge: mapper.syncOperationalPresentation(summary).badge };
+      }, f.student);
+      expect(result.summary).toMatchObject({ state: 'syncing', studentLifecycleInFlight: true,
+        cloudSyncHealthy: false, safeToContinueUnrelatedWork: false });
+      expect(result.badge).toBe('badge--neutral');
+      expect(result.editError).toBe('LIFECYCLE_RESUME_REQUIRED');
+      await expect(page.locator('[data-app-status]')).not.toHaveClass(/is-visible.*is-error/);
+      expect(page.url()).toBe(originalUrl);
+      await page.screenshot({ path: testInfo.outputPath(`n96-held-${phase}.png`) });
+      await testInfo.attach(`n96-${phase}`, { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
+      if (phase === 'rpc') { releaseRpc(); await reconcileStarted; }
+    }
+    releaseReconcile();
+    await expect(page.getByRole('dialog')).toContainText('تم حذف الطالب بنجاح.');
+    expect(page.url()).toBe(originalUrl);
+    expect(navigations).toBe(0);
+    const interval = await page.evaluate(() => { window.__n96Observer.disconnect(); return window.__n96; });
+    expect(interval.violations).toEqual([]);
+    expect(interval.samples).toBeGreaterThan(0);
+    await testInfo.attach('n96-whole-interval', { body: JSON.stringify(interval), contentType: 'application/json' });
+    await page.getByRole('button', { name: 'العودة', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`#/teaching/${f.teaching}/students$`));
+    expect(backend.calls).toHaveLength(1);
+    expect(errors).toEqual([]);
+  } finally { releaseRpc(); releaseReconcile(); }
+});
 
 async function profile(page, name = 'طالب اصطناعي') {
   await page.goto(`/#/student/${f.student}?teaching=${f.teaching}`);
