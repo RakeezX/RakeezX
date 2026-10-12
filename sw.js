@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v51';
+const VERSION = 'rakeezx-v52';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -51,6 +51,7 @@ const SHELL = [
   './src/styles/calendar-work-0417.css',
   './src/styles/rakeez-datetime.css',
   './src/styles/work-n70.css',
+  './src/styles/work-n82.css',
 
   './src/vendor/flatpickr/flatpickr.min.css',
   './src/vendor/flatpickr/flatpickr.min.js',
@@ -63,6 +64,15 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/visible-numerals.js',
+  './src/lib/sync-status-severity.js',
+  './src/lib/sync-warning-policy.js',
+  './src/lib/student-achievements.js',
+  './src/lib/day-targeting.js',
+  './src/lib/hijri-year-input.js',
+  './src/lib/education-department-directory.js',
+  './src/data/education-departments-2026-09-30.json',
+  './src/data/education-department-options-2026-09-30.json',
   './src/lib/student-import.js',
   './src/lib/student-import-parsers.js',
   './src/lib/rakeez-datetime.js',
@@ -88,6 +98,7 @@ const SHELL = [
   './src/lib/sync-v2.js',
   './src/lib/score-foundation.js',
   './src/lib/sync-ownership.js',
+  './src/lib/offline-lease.js',
   './src/lib/workspaces.js',
   './src/lib/workspace-claim.js',
   './src/lib/workspace-routing.js',

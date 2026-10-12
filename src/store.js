@@ -5,13 +5,34 @@
  * ليُرفع لاحقًا عند تفعيل المزامنة السحابية.
  */
 
-import * as db from './lib/db.js';
+import * as rawDB from './lib/db.js';
+import * as cloud from './lib/cloud.js';
+import { runtimeOfflineLease, leaseWriteError } from './lib/offline-lease.js';
+// Only store-originated Product writes use this wrapper. Canonical Sync
+// reconciliation uses the raw adapter and cannot mint lease evidence.
+const productMutators = new Set(['put', 'putMany', 'putAcross', 'patchMany', 'markDeleted', 'applyBatch']);
+const db = new Proxy(rawDB, { get(target, name) {
+  if (!productMutators.has(name)) return target[name];
+  return (...args) => {
+    const deviceOnly = ['put', 'putMany', 'patchMany'].includes(name) && args[0] === 'device' ||
+      ['putAcross', 'applyBatch'].includes(name) && Object.keys(args[0]).every((key) => key === 'device');
+    if (!deviceOnly) assertLeaseWritable();
+    const optionIndex = name === 'patchMany' ? 4 : name === 'markDeleted' ? 3 : ['put', 'putMany'].includes(name) ? 2 : 1;
+    if (!deviceOnly) {
+      // Fill omitted default arguments without changing their defaults.
+      if (name === 'patchMany' && args.length < 4) args[3] = Date.now();
+      args[optionIndex] = { ...args[optionIndex], productWrite: true };
+    }
+    return target[name](...args);
+  };
+} });
 import { getScoreFoundationCapability } from './lib/cloud.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch } from './lib/sync-v2.js';
-import { runtimeSyncOwnershipGuard } from './lib/sync-ownership.js';
+import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
+import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents } from './lib/score-foundation.js';
-import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel } from './lib/workspaces.js';
+import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
 } from './lib/curriculum-bootstrap.js';
@@ -68,7 +89,8 @@ export function setWorkspaceClaimInProgress(active) {
   workspaceClaimInProgress = active === true;
 }
 
-function assertCloudRestoreWritable() {
+function assertCloudRestoreWritable({ lease = true } = {}) {
+  if (lease) assertLeaseWritable();
   if (!state.ready && !workspaceInitializationInProgress) {
     throw Object.assign(new Error('Workspace is not ready for Product writes'), { code: 'WORKSPACE_NOT_READY' });
   }
@@ -139,6 +161,59 @@ function reportWriteError(err, context) {
 const TAB_ID = uid();
 let channel = null;
 let activeWorkspace = null;
+function leaseOwner() {
+  if (activeWorkspace?.type !== 'account') return null;
+  try {
+    const persisted = JSON.parse(localStorage.getItem(cloud.AUTH_STORAGE_KEY) || 'null');
+    return cloud.session && persisted?.access_token && persisted?.user?.id === cloud.user?.id ? cloud.user.id : null;
+  } catch { return null; }
+}
+function updateLeaseContext() {
+  runtimeOfflineLease().setContext(activeWorkspace, leaseOwner());
+}
+export function getOfflineLeaseStatus() {
+  updateLeaseContext();
+  return runtimeOfflineLease().observe();
+}
+export function assertLeaseWritable(device) {
+  if (activeWorkspace?.type !== 'account') return;
+  updateLeaseContext();
+  runtimeOfflineLease().assertWritable();
+  if (device) {
+    const generation = JSON.parse(activeWorkspace.leaseGeneration);
+    const claim = generation[1], restore = generation[2], provision = generation[3];
+    if (claim && (device.workspaceClaim?.claimId !== claim || device.workspaceClaim?.ownerId !== activeWorkspace.authUserId) ||
+        restore && (device.initialRestoreReceipt?.restoreId !== restore.restoreId || device.initialRestoreReceipt?.manifestHash !== restore.manifestHash) ||
+        provision && device.accountProvisioningReceipt?.foundationHash !== provision.foundationHash) {
+      runtimeOfflineLease().invalidate('workspace-generation-mismatch');
+      throw leaseWriteError();
+    }
+  }
+}
+export async function renewOfflineLease() {
+  updateLeaseContext();
+  const workspace = activeWorkspace;
+  const result = await runtimeOfflineLease().renew(async (owner) => {
+    const verified = await cloud.verifyCurrentAuthIdentity(owner);
+    const registry = createWorkspaceRegistry();
+    let routing;
+    try { routing = await resolveWorkspaceForBoot({ authUser: cloud.user, registry }); }
+    finally { await registry.close(); }
+    if (routing.status !== 'ready' || routing.workspace.leaseGeneration !== workspace.leaseGeneration ||
+        routing.workspace.id !== workspace.id || routing.workspace.databaseName !== workspace.databaseName) {
+      throw Object.assign(new Error('Workspace changed during verification'), { code: 'OFFLINE_LEASE_LIMITED' });
+    }
+    return verified;
+  }, {
+    isCurrent: () => activeWorkspace === workspace && leaseOwner() === workspace.authUserId,
+  });
+  notify({ syncReady: false });
+  return result;
+}
+// Recheck after asynchronous DB open and inside the durable transaction.
+rawDB.setProductWriteGuard(assertLeaseWritable);
+setLeaseWriteGuard(assertLeaseWritable);
+cloud.subscribe(() => { updateLeaseContext(); });
 const workspaceDeactivationListeners = new Set();
 
 export function onWorkspaceDeactivation(fn) {
@@ -175,6 +250,7 @@ export function activateWorkspace(workspace) {
   db.selectDatabase(workspace.databaseName);
   runtimeSyncOwnershipGuard.setWorkspace(workspace);
   activeWorkspace = Object.freeze({ ...workspace });
+  updateLeaseContext();
   resetCurriculumOrdinarySyncAccess();
   closeChannel();
   if (typeof BroadcastChannel === 'function') {
@@ -203,6 +279,7 @@ export function deactivateWorkspace(reason = 'workspace-not-ready') {
   closeChannel();
   db.closeDB();
   activeWorkspace = null;
+  updateLeaseContext();
   resetCurriculumOrdinarySyncAccess();
   runtimeSyncOwnershipGuard.setWorkspace({ type: 'unresolved', ownershipState: 'unresolved', reason });
   state.ready = false;
@@ -337,7 +414,7 @@ export async function init() {
     const hadProfile = await db.get('profile', 'profile');
     const hadMeta = await db.get('meta', 'meta');
 
-    await splitMetaIfNeeded();
+    if (getOfflineLeaseStatus().editable) await splitMetaIfNeeded();
 
     const [profile, device, ...loaded] = await Promise.all([
       db.get('profile', 'profile'),
@@ -352,7 +429,7 @@ export async function init() {
     });
     initializeCurriculumSyncGate({ workspace: activeWorkspace, device: state.device });
 
-    if (!device?.studentLifecycleResume) {
+    if (!device?.studentLifecycleResume && getOfflineLeaseStatus().editable) {
       await normalizeSectionLifecycle();
       await ensureFoundation();
       await migrateLegacyGroupArrangements();
@@ -709,7 +786,7 @@ function sectionForOperationalRecord(storeName, record, pending = null) {
 }
 
 function assertOperationalWritesAllowed(batch) {
-  assertCloudRestoreWritable();
+  assertCloudRestoreWritable({ lease: Object.keys(batch ?? {}).some((name) => name !== 'device') });
   for (const [storeName, records] of Object.entries(batch ?? {})) {
     for (const record of records ?? []) {
       const parent = record.studentId ? recordFrom('students', record.studentId, batch) : null;
@@ -802,6 +879,7 @@ function revertMemory(storeName, records, undo) {
 
 /** يحفظ سجلات كاملة — للإنشاء والاستيراد الجماعي. للتعديل استعمل patch(). */
 export async function save(batch, options = {}) {
+  assertLeaseWritable();
   if (options.signal?.aborted) return false;
   if (options.queue !== false) assertOperationalWritesAllowed(batch);
   const writes = {};
@@ -1027,6 +1105,7 @@ export async function adoptPristineTeachingIdentity({ fromTeachingId, canonicalT
  * أحدث نسخة موجودة.
  */
 export async function patch(storeName, id, changes, create = null, options = {}) {
+  if (storeName !== 'device') assertLeaseWritable();
   // profile و device سجلان مفردان لا مصفوفتان — ولا يدخل device في الصادر أبدًا
   const singleton = storeName === 'profile' || storeName === 'device';
   const arr = state[storeName];
@@ -2240,6 +2319,7 @@ export function closedTermReportState(termId) {
 }
 
 export async function queueClosedTermReport({ termId, supersedesId = null } = {}) {
+  assertLeaseWritable();
   const term = getTerm(termId);
   if (!term) throw new Error('الفصل الدراسي غير موجود.');
   const existing = closedTermReports(termId);
@@ -3221,11 +3301,13 @@ export async function previewStudentRemoval(studentId, sourceEnrollmentId, sourc
 }
 
 export async function deletePristineStudent(studentId) {
+  assertLeaseWritable();
   const { executeStudentLifecycle } = await import('./lib/student-lifecycle.js');
   return executeStudentLifecycle('delete_pristine', { studentId });
 }
 
 export async function endStudentEnrollment(studentId, sourceEnrollmentId, { sourceRevision, note = '', date } = {}) {
+  assertLeaseWritable();
   if (date !== undefined) throw Object.assign(new Error('Server-dated immediate ending only'), { code: 'IMMEDIATE_ONLY' });
   const { executeStudentLifecycle } = await import('./lib/student-lifecycle.js');
   return executeStudentLifecycle('end_enrollment', { studentId, sourceEnrollmentId, sourceRevision, note });
@@ -4022,6 +4104,7 @@ export async function deleteSession(sesId) {
 
 /** يضبط حضور طالب في حصة. لا يُنشأ حضور إلا لحصة قائمة. */
 export async function setAttendance(sesId, studentId, status) {
+  assertLeaseWritable();
   const ses = getSession(sesId);
   if (!ses) return null;
   const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp) => {
@@ -4053,6 +4136,7 @@ export async function setAttendance(sesId, studentId, status) {
 
 /** يرصد كل الطلاب غير المرصودين في حصة بحالة واحدة. */
 export async function fillAttendance(sesId, status = 'present') {
+  assertLeaseWritable();
   const ses = getSession(sesId);
   if (!ses) return 0;
   const mutation = await mutateSnapshotAttendance(sesId, (members, existing, session, stamp) => {

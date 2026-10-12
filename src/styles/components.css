@@ -8105,3 +8105,8 @@
 @media(max-width:360px) {
   .page--home .home-shortcuts .tile__title { font-size:10px; }
 }
+/* N49: a calm account reminder, independent of Sync status. */
+.offline-lease-notice { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: .75rem 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-elev); }
+.offline-lease-notice p { margin: .3rem 0 0; line-height: 1.7; }
+.offline-lease-notice .btn { flex-shrink: 0; }
+@media (max-width: 600px) { .offline-lease-notice { align-items: stretch; flex-direction: column; margin: .5rem; } }
