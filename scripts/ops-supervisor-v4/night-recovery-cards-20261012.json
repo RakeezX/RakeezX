@@ -1,0 +1,939 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "createdAt": "2026-10-12T21:26:05.858020Z",
+  "authority": "Existing PO continuous implementation/delivery delegation plus the 2026-10-12 request to repair the operating system and continue open tickets. These are exact existing-card revisions, not new Product approvals or imported historical work.",
+  "precedence": "For the five matching active task IDs only, this file is the latest installed operational card source. Earlier source bundles and failed receipts remain immutable history. Current user instructions and Product contracts remain authoritative.",
+  "tasks": [
+    {
+      "id": "v6-n91-mobile-card-titles-20261012",
+      "productId": "N91",
+      "activationId": "po-20261012-continuous",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "budgetMinutes": 45,
+      "idleMinutes": 15,
+      "requiredChecks": [
+        "responsive_layout",
+        "card_navigation"
+      ],
+      "priority": 2,
+      "scopeKey": "n91-class-tool-card-mobile",
+      "dependsOn": [
+        "v6-n92-delete-copy-20261012"
+      ],
+      "objective": "Fix clipped class-tool-card titles in src/styles/components.css on narrow iPhone/mobile widths using wrapping and a grid that adapts to available space, preserving the readable full tool names without ellipsis.\n\nContinue this exact saved session and candidate; the previous browser denial remains in the historical result. Do not reopen, recreate or proxy the rejected temporary file, and do not use an alternate route to that file. The permitted separate target is the actual immutable HTTPS Rakeez application https://645cd923.rakeezx.pages.dev. Under your existing browser phase lease run the installed source-bound harness C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/proofs/n91/hosted-mobile-proof.mjs with --url https://645cd923.rakeezx.pages.dev --module-root C:/Users/Abody/Projects/RakeezX --out an owned current-attempt evidence directory. The harness uses the actual Product DOM/CSS/handlers and fresh Demo contexts, blocks external/Auth/REST and all writes, and emits N91_HOSTED_APP_PROOF.json. It does not use the denied file. Reuse candidate 466bb11d6e83096a226d5e76f66949c9665a85bd; do not redo its CSS without a real scoped failure. Handwritten lookalike pages and source assertions cannot satisfy responsive_layout/card_navigation. Record the actual harness result, release your lease and return the existing final schema. This is approved completion work; no routine user/PM confirmation or blanket suite is needed.\n\n2026-10-12 material recovery under existing PO delegation: the hosted HTTPS proof reached the correct route but compared the whole h1 including its nested subtitle. The canonical hosted-mobile-proof.mjs now removes only the direct subtitle from a detached clone, keeps exact title equality, records the reached hash/title, and retains all existing source/owner/transport/timeout checks. Read docs/automation-evidence/20261012/NIGHT_RECOVERY_20261012.json. Preserve candidate 466bb11d6e83096a226d5e76f66949c9665a85bd and exact saved session. Complete the previously interrupted actual approved HTTPS app proof; no Product CSS rewrite or recreation/reopening/proxy of the earlier denied local file. Existing four-width layout evidence remains historical PASS, while all eight navigation cases still require the actual repaired harness result. Do not claim the syntax-only operator check was browser PASS. The controller owns delivery.",
+      "acceptance": [
+        "At 320, 360, 390 and 430 CSS-pixel RTL widths, all class tool names are visible and cards do not overflow horizontally.",
+        "Use two columns or one column as space permits; at most a small approximately 1px font reduction only if needed for readability.",
+        "Do not remove cards, necessary content, handlers or Product behavior. Use a targeted synthetic mobile layout proof, with a browser lease only for its browser/server phase.",
+        "responsive_layout and card_navigation must cite the actual source-bound hosted-app receipt. Chromium widths are synthetic browser evidence, not a claim of physical iPhone/Safari acceptance."
+      ],
+      "allowedPaths": [
+        "src/styles/components.css"
+      ],
+      "releaseAuthority": "Product Owner's 2026-10-12 continuous delivery authorization, specifically N91 responsive class-tool titles; deploy the scoped frontend correction and await PO review. Use synthetic browser data, with no real student or teacher data mutation.",
+      "hostedProofRecovery": {
+        "at": "2026-10-12T10:46:07.089Z",
+        "commit": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "previousRunId": "2c96f4e1-06cf-434d-9ac5-edea0d33ce34",
+        "preservedSessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024",
+        "preservedCandidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+        "previousFailure": "Browser policy denied navigation to the synthetic local proof file and prohibited workarounds to reach that same proof.",
+        "proofSource": "C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/proofs/n91/hosted-mobile-proof.mjs",
+        "previewUrl": "https://645cd923.rakeezx.pages.dev",
+        "backup": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/followup-activation-2026-10-12T10-46-04-894Z"
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Source-confirmed hosted-app heading predicate defect corrected without weakening exact title/source/route checks; interrupted navigation proof can resume on the same candidate.",
+        "previousRunId": "af9220ee-5f1e-4b53-a2d8-a33ee90ff67b",
+        "preservedCandidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "scopeKey": "n58-fresh-calendar-runtime-and-authorized-live-ab",
+      "activationId": "po-20261012-continuous",
+      "priority": 90,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "D087",
+      "budgetMinutes": 120,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "fresh_candidate_scope_and_preview",
+        "n58_targeted_contracts",
+        "n58_live_a_session_and_a2_restore",
+        "n58_live_context_rejection",
+        "n58_live_b_owner_isolation",
+        "n58_live_preset_context_preservation",
+        "d087_retention_and_disarm"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N58",
+        "liveAuthorizationRef": "D087",
+        "git": {
+          "repository": "Existing RakeezX origin configured at C:\\Users\\Abody\\Projects\\RakeezX",
+          "remote": "origin",
+          "branchPrefix": "ops/n58-d087-preview/continuous-n58-fresh-live-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact committed current candidate SHA",
+          "scope": "Push only the current task's reconciled candidate to its recorded named Preview branch; no force, branch deletion, main push, merge to main or Product Production deployment.",
+          "sourceBinding": "Fresh observed origin/main ancestor + candidate/tree/harness blob + Cloudflare immutable Preview check-run head SHA; never reuse the historical Preview as current proof."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "newFunctionCount": 2,
+          "sourceDirectory": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087",
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-d087-<first20(runId without hyphens)>",
+              "allowedProtectedOperations": [
+                "probe",
+                "inspect",
+                "ensure"
+              ],
+              "target": "Only the exact new function name and two Auth UUIDs in this run's saved manifest."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-d087-retire-<first20(runId without hyphens)>",
+              "allowedProtectedOperations": [
+                "probe",
+                "inspect",
+                "revoke",
+                "retire"
+              ],
+              "target": "Only the same exact saved pair; this companion is deployed and protected-probed before the first Auth create."
+            }
+          ],
+          "finalDeployment": "Redeploy only those same two exact new names to the canonical closed-entry.ts. Read source/configuration and verify both 410 D087_CLOSED responses. No unrelated or pre-existing function mutation.",
+          "authentication": "verify_jwt=false only for the two protected handlers; independent hashed 256-bit run capabilities, 90-minute expiry, server-side existing environment. Do not retrieve/export service keys or alter Auth policies.",
+          "fixtureContract": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\fixture-contract.json",
+          "retentionOnly": "Retain the exact declared synthetic closure. Global sign-out attempts + exact fixed bans + actual token denial and residual-expiry evidence; no hard/soft-delete, general user listing, Product service-role writes or guard bypass.",
+          "migrations": "Existing applied N58 migrations are immutable evidence. Do not apply/reapply/reset migrations, change RLS/schema, or manufacture auth.users via SQL."
+        },
+        "execution": "Preparation exceptions apply only to the above current Preview branch and exact D087 ops function/fixture scope. Acquire the existing live-mutation and browser leases only for their actual phases. Product main/Production remains exclusively the independent publisher. Never broaden policy/allowed directories or edit controller/queue/runtime state."
+      },
+      "objective": "Continue the actual unfinished N58 implementation on fresh current main, complete its real client/PostgREST A/B gate under existing D-087, and return a publishable Product candidate. Read the canonical module README/fixture contract and exact D-087 addendum first. Reconcile the preserved commits 2b6e14cd2985c5836173137eab8badb75125c0c6, 485828751af07544606ca27619228bd831620872, a6d380db8de1e3c937a51ba8993659557db53deb and 4efaf2c7bb9112af931112f72ccf8a6c4a3744f2 using an isolated worktree. The delta covers eleven src paths plus sw.js; it is not on main. Preserve subsequent work in store/export/home/CSS/sw and all other current Product behavior; never replace those whole files from the old candidate. Reuse the existing focused contracts/selectors, implement one deterministic authenticated A1/A2/B1 harness, and only then provision/use/dispose the two exact new fixtures. Import the prepared Auth module from its canonical absolute path, not a stale application checkout. This is work owned by the activated card; no additional routine PM/user confirmation is required. Missing candidate/harness code is implementation work, not an external capability blocker. Auth provisioning by itself is not Product completion.\n\nResume the exact saved session and candidate; do not recreate the N58 implementation or deterministic harness. The original private-state.mjs passed the native Windows operator probe at 2026-10-12T20:50:29Z with protected current-user/SYSTEM ACL and zero other allowed identities; no ACL helper change is authorized or needed from that evidence. The runtime owner installs the narrowly scoped .gitignore prerequisite and matching README/manifest. Confirm that canonical private state is ignored and untracked, then check private preparation once from this worker's actual launch context before generating any credentials. If the historical PRIVATE_ACL_REQUIRED recurs, identify the actual tempfile/PowerShell context and resolve its ordinary local setup within existing authority; do not classify a generic error as new Auth permission or weaken ACL checks. Preserve and reconcile the existing candidate against actual main movement; refresh binding/Preview receipts according to real source changes and binding freshness, reusing unchanged checks. The exact tests/cloud-recovery-owner-isolation.test.mjs path is included only if its current affected test still needs an owner-B N49 lease fixture before store.save. Keep the Product guard enabled, maintain both owners' isolation, zero cross-owner transport and B-owned outbox assertions, and do not run an unrelated suite. Continue the existing two-new-synthetic-account D087 gate with the cleanup-only standby, deadline, retained closure and explicit final disarm; local preparation does not equal live acceptance. The controller owns queue/session state and the independent publisher owns Product delivery.",
+      "acceptance": [
+        "fresh_candidate_scope_and_preview: PASS records the actual freshly reconciled candidate/base/tree, exact changed paths, committed live harness blob, current relevant source bindings and successful Cloudflare check-run head SHA/immutable Preview byte proof. Six N58 source files matched the old base and calendar-runtime.js was absent at observed main 8e2d480; five common files had later work. Preserve that later work including N92/N91 and whatever subsequent cards have actually shipped. Use a normal push only to preparationAuthority.git's exact task Preview branch. Never push main. Write a nonsecret preparation receipt and candidate-binding.json before prepare. If current main advances across a materially affected N58/owner/Sync path, reconcile the actual delta and rebind the candidate before live fixture creation; do not certify the old Preview.",
+        "n58_targeted_contracts: PASS covers only the changed N58 resolver/persistence/owner/legacy-session paths with the existing focused test files and actual current client serializers/store integration. Preserve immutable calendar_context, owner/workspace/preset/selectionRevision checks, selected-year/calendar retention, extra-term contracts and the old rejected-session regression. Keep the already applied three migration sources byte-identical and record their observed server mapping rather than reapplying them. The previous local/Demo Playwright test explicitly asserts zero Supabase/Auth requests: reuse its selectors where useful but never relabel it live. A bounded preparation check of the new deterministic live harness must establish correct private state, timeout, finally/recovery and endpoint use before it is allowed to create accounts. Do not run the whole historical browser/sync suite, add real students, or repeat full builds without a changed-source reason.",
+        "n58_live_a_session_and_a2_restore: PASS comes from one deterministic harness using the fresh candidate's ordinary authenticated client and real PostgREST. Exactly three owned contexts A1/A2/B1 and exactly two newly saved run-marked Auth UUIDs are allowed. Before the first Auth create, deploy/read back both canonical function bundles and protected-probe the cleanup-only standby. Reuse exact private IDs across retry. A1 creates only the fixed contract's ordinary A foundation and minimal empty Section/Teaching/five item/session closure; A2 restores the same A workspace through the ordinary client. Use actual current eligible Saudi date and server-acknowledged selection revision. Persist the real successful session mutation envelope/receipt plus A2 owner-bound restore/convergence proof. No service-role Product seeding, manufactured RPC success, Demo substitution, frozen fake clock, additional account or test-user reuse. Keep passwords/JWTs/refresh tokens private and absent from model output, traces, screenshots, command arguments and Git.",
+        "n58_live_context_rejection: PASS attempts only the two declared new denied session IDs/mutation IDs under the real authenticated client boundary: contextless legacy and stale selection revision after the declared preset switch. Record the exact rejection code and independently establish zero new session/receipt for each declared ID under its owner. Preserve the six historical rejected outbox envelopes and all previous sessions without replay or relabeling. A network failure is not a successful rejection. Do not broaden the fixture closure to make a test pass.",
+        "n58_live_b_owner_isolation: PASS uses B's real authenticated session to read/attempt the precisely declared A-owned objects through the existing application/API contract, verifies denied access/mutation and independently verifies A remains unchanged. B has no Product foundation unless a concrete existing protocol requires it; the reviewed closure currently requires Auth only. Never read existing users' private rows or use a service-role query as proof of B's access.",
+        "n58_live_preset_context_preservation: PASS demonstrates General to Western selection with actual acknowledged revisions, preservation of the already-created session's immutable calendar_context, and convergence in A2. Selection only patches the existing year; no custom calendar/day scope is needed beyond the fixed foundation. No historical sessions, students, attendance or grades are edited. Receipt evidence identifies the exact candidate, run, UUIDs, successful/denied mutations and observed expected results.",
+        "d087_retention_and_disarm: PASS requires actual completed disposition and both final deny-all source/endpoint proofs. The single deterministic harness must call the predeployed cleanup-only companion directly in finally for scoped global sign-out, fixed bans, independent same-ID/marker rereads, actual password/refresh denial and closure of only its three owned contexts, then durably write the nonsecret receipt and closed bundles. Use a live-work deadline no longer than 45 minutes after prepare and reserve at least 15 minutes for finally, within both 90-minute capabilities. The already-running cleanup path must not depend on another model turn or an MCP redeploy; implement that small integration before provisioning. Sign-out acknowledgment, refresh-token denial and residual access-JWT expiry are distinct evidence; user_banned alone is not proof that sessions were deleted. Retain the exact run-marked fixtures because the existing N58 hard-delete guard forbids removal; do not try soft-delete or change guards. Explicitly redeploy the same two function names to closed-entry.ts through the connector, read back source, and verify both D087_CLOSED responses. If Codex quota/connector/device failure interrupts final redeploy, persist DISARM_PENDING and the names/IDs/candidate; do not claim guaranteed disarm or LOCAL_READY. If process/device loss prevents finally and expiry passes, preserve the same run with CAPABILITY_EXPIRED_CLEANUP_PENDING for a bounded cleanup-only recovery of that same pair under D-087. Do not create another pair or silently extend provisioning. A failed cleanup/disarm or gate parks only N58 with an exact BLOCKED reason and preserved candidate/private recovery reference."
+      ],
+      "allowedPaths": [
+        "src/lib/backup-v2.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/db.js",
+        "src/lib/demo-workspace.js",
+        "src/lib/export.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "src/views/calendar.js",
+        "src/views/home.js",
+        "sw.js",
+        "supabase/migrations/20261004070000_n58_calendar_persistence.sql",
+        "supabase/migrations/20261004070001_n58_extra_term_compatibility.sql",
+        "supabase/migrations/20261004070002_n58_effective_scope_revalidation.sql",
+        "tests/n58-*",
+        "tests/calendar-runtime-0457-1.test.mjs",
+        "tests/calendar-preset.test.mjs",
+        "tests/calendar-r2-0452.e2e.mjs",
+        "tests/calendar-range-server-0439.test.mjs",
+        "tests/calendar-suspension-0446.e2e.mjs",
+        "tests/calendar-view.test.mjs",
+        "tests/demo-calendar-official-0452-3.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/account-provisioning.e2e.mjs",
+        "tests/local-sync-pwa.e2e.mjs",
+        "tests/sync-operational-ui.e2e.mjs",
+        "tests/workspace-routing.e2e.mjs",
+        "tests/helpers/isolated-indexed-db.mjs",
+        "scripts/e2e-runner.mjs",
+        "scripts/test-sync-runner.mjs",
+        "tests/cloud-recovery-owner-isolation.test.mjs"
+      ],
+      "releaseAuthority": "The Product Owner's 2026-10-12 continuous automation/deployment authority supersedes routine PM/Preview waiting for this scoped Product continuation. D087 supplies the precise existing two-new-synthetic-account and fixture-operation authority; no renewed approval request is needed for that same scope. Only preparationAuthority's named Preview and fixture operations may be performed by the worker. All Product main/Production delivery is performed by the independent publisher after LOCAL_READY and actual required checks. Preserve real owner data, existing Auth/RLS/Sync semantics and all unrelated work. The Product ticket stays OPEN/awaiting_po until its real acceptance; Auth capability proof or local-only tests are not N58 closure. Failure of this card does not stop other tickets.",
+      "runtimeDependencies": {
+        "canonicalModule": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\run.mjs",
+        "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087",
+        "mustExistBeforeProvision": [
+          "fresh committed Product/harness candidate",
+          "verified immutable Preview/source receipt",
+          "current fixed fixture/schema/source bindings",
+          "one deterministic private harness with durable finally/recovery",
+          "both new protected function deployments and cleanup standby probe"
+        ],
+        "actualRemainingWork": "Fresh integration and live harness are deliberately assigned here; no external Auth permission/key acquisition blocker is asserted.",
+        "sourceBindingInput": "The harness author writes candidate-binding.json per canonical README. It records actual current origin/main/candidate/tree/harness Git blobs and preparation receipt SHA256. The module rejects stale base or changed fixed foundation/migration source."
+      },
+      "sourceEvidence": {
+        "historicalCandidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+        "historicalBase": "3970e39",
+        "observedMain": "8e2d4800396996be43868a71057412afccd2150b",
+        "comparison": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-main-comparison.readonly.json",
+        "authority": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\authority.readonly.json",
+        "guard": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-current-guard.readonly.json",
+        "liveGateExecuted": false,
+        "nativePrivatePreflight": "docs/automation-evidence/20261012/NIGHT_RECOVERY_20261012.json#n58NativePreflight"
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Install the missing narrow canonical private-state ignore rule and README/manifest binding; actual unchanged Windows ACL helper passed native preflight. Include only the affected owner-B N49 lease fixture path. Live acceptance remains pending.",
+        "previousRunId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+        "preservedCandidateSha": "4946aac123772a1cf43d01792631743a4fb7413e",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n71-unified-restore-20261012",
+      "productId": "N71",
+      "scopeKey": "n71-portable-cloud-first-all-domains",
+      "activationId": "po-20261012-continuous",
+      "priority": 120,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+      "budgetMinutes": 180,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n71_fresh_candidate_preview",
+        "n71_portable_domain_coverage",
+        "n71_server_restore_binding",
+        "n71_live_restore_owner_resume",
+        "n71_live_convergence_no_resurrection",
+        "n71_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N71",
+        "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+        "authoritySource": "Current PO instruction to implement/finish the backlog and deploy under continuous automation, preserving approved D099. D099 alone was a Product behavior approval; the later continuous execution authority supplies this narrowly scoped implementation/service phase. CORRECTED CONTINUATION: Existing PO-20261012 continuous implementation/deployment authorization covers this specific corrected verification phase. It supersedes the old card's procedural prohibition on a replacement pair for this phase only; no renewed PO approval is required. Exactly one fresh A/B pair is permitted after the concrete correction is ready. Preserve every previous pair, private manifest, retained Product closure and deny-all function. Never unban, reuse credentials/IDs, reprovision or rearm an old pair/function. No real account, real student data, messages, service-role Product seeding, Auth policy change or widened Product scope.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n71-preview/continuous-n71-unified-restore-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n71-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N71 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n71-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly one fresh synthetic A/B pair for correctedVerificationPhase; use the current controller runId and the original purpose/owner/data boundaries below. Old IDs and functions in retiredPair stay excluded. Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes. The fresh phase also excludes all exact IDs and names in correctedVerificationPhase.retiredPair; use official admin APIs and existing reviewed primitives only.",
+          "migration": {
+            "operation": "verify_existing_only",
+            "maxNewMigrations": 0,
+            "name": "n71_unified_restore",
+            "appliedVersion": "20261012140116",
+            "sourceFile": "supabase/migrations/20261012163000_n71_unified_restore.sql",
+            "sourceSha256": "7be97437e9b4e8cde3d55b4b341d51a8e863486f7ea482e25d5bf05883db2aed",
+            "scope": "Read current migration history, exact required function/domain/ACL binding and retained source evidence. Preserve and reuse the already applied migration. No reapplication or new migration is authorized by this corrected proof phase."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair. This rule is scoped to the one fresh pair of correctedVerificationPhase; its explicit authorization above is not a request to revive the retired pair. Preserve previous disposition proofs unchanged.",
+          "correctedVerificationPhase": {
+            "version": 1,
+            "phase": "n71-corrected-live-proof-20261012",
+            "priorCandidateSha": "aa333cd9be7a5735608b3e07added378d9d52066",
+            "maxNewPairs": 1,
+            "accountsPerPair": 2,
+            "runIdBinding": "Use the next controller-created attempt runId; exact saved Codex session/worktree continue. The fixture phase gets a new private manifest and its own run-bound names.",
+            "retiredPair": {
+              "runId": "fc77ae70-4cfa-4d2e-98ba-89232fe3c4f4",
+              "accountIds": [
+                "abe77dab-0cc0-4de6-bc26-e98b12b68c58",
+                "60412ae3-b4e5-4386-bffd-d103c8316ed2"
+              ],
+              "functionNames": [
+                "ops-n71-fixture-fc77ae704cfa4d2e98ba",
+                "ops-n71-retire-fc77ae704cfa4d2e98ba"
+              ],
+              "proof": "coverage/n71-current/live-result.json and disposition-source.json"
+            },
+            "startCondition": "Complete the concrete local/service correction, retained evidence checks and deterministic finally/recovery before issuing the new 90-minute capabilities. Provision only after both independently protected functions are deployed and verified.",
+            "failureDisposition": "Record the exact failing stage/HTTP or SQL code and preserve the candidate. Finally retire/disarm this phase. No unban, same-phase replacement pair or missing-PO-permission fiction."
+          }
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n71",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories.",
+          "harnessBinding": "Remove reliance on prior literal run IDs/function names by passing the current runId or using an explicitly recorded runtime-derived copy. Bind candidate, source tree, current runId and exact harness SHA before provision. Use a new private subdirectory under the existing task privateStateRoot and a distinct per-run evidence subdirectory; never overwrite prior manifests or receipts. Retain the proven Windows PowerShell 7 private-directory helper when needed; do not rerun the known PS5.1 module failure or relax ACL checks. No extra framework, general API integration or new global configuration."
+        }
+      },
+      "objective": "Continue the existing corrected N71 candidate aa333cd9be7a5735608b3e07added378d9d52066 in the same worktree/session. The prior live failure was missing serverCanonical baselines during canonical reconcile; this candidate already fixes it. Reuse the matching Preview, 30-store coverage, focused/native checks and applied-SQL evidence. Complete the remaining authenticated owner/resume and actual A2/no-resurrection gates using the one explicitly authorized fresh pair. Preserve Product source unless a new concrete failure proves a narrowly scoped repair necessary; do not reimplement the approved restore model. Original Product contract: Implement the already approved one Backup/one unified Cloud-first Restore page and its complete data path. Reuse existing versioned cloud restore, not local db.writeAll plus hoped-for Sync. Current client restore-store selection omits units/lessons; live full/score-v2 server helpers include them. Assignments/submissions exist in the portable local model but no live tables were observed: build the necessary narrowly scoped backup/restore support when records exist, without implementing deferred N88 features. This is concrete protocol/client work with fixed behavior, not missing permission or a new architecture project.",
+      "acceptance": [
+        "n71_fresh_candidate_preview: PASS binds the exact fresh main/candidate/tree/harness and successful immutable Preview/served assets. Present only �묟� 뫦� ������ and ���㟧� 뫦� ������ with necessary contextual review/recovery. Remove normal Local/Cloud/Merge/Replace/Bootstrap/Claim choices; retain dormant conditional legacy mechanisms until their actual retirement proof.",
+        "n71_portable_domain_coverage: PASS creates an explicit mapping from actual db.STORES/portable backup through cloud manifest, stage, finalize, local reconcile and normal Sync. Cover every backed-up Product domain with no silent omission, including nonempty units/lessons and assignments/submissions. Exclude only declared device/runtime state. A domain unsupported by a current endpoint is implementation work for this card, not successful omission or silent local fallback. Preserve scoring, calendar provenance, deletion/tombstone and owner fields already on main.",
+        "n71_server_restore_binding: PASS certifies existing compatible full/score-v2 primitives and only the exact required additive extension. If no migration is needed, prove deployed source/ACL/domain compatibility; if needed, record exact SQL/native evidence, apply once, and read back the real version/functions/ACL. Preserve old clients and existing receipt identities. Merely committing SQL is not a Supabase deployment.",
+        "n71_live_restore_owner_resume: PASS uses only the exact synthetic A/B closure and real authenticated client: full-domain portable export, validation/review, canonical cloud finalize, actual interrupted stage/finalize resume and idempotent receipt reuse. Wrong owner, signed-out/offline, unhealthy Sync and unresolved outbox fail closed with no divergent local-only restore. B cannot read/restore A. Limit interruption to one declared synthetic mutation boundary and reuse unchanged focused evidence.",
+        "n71_live_convergence_no_resurrection: PASS proves A1 reconciles only after canonical finalize and A2 converges to the same stored Product state using ordinary Sync. Preserve live deletion evidence/immutable closed-term suppression, valid target scores and current calendar identities; restore cannot resurrect deleted scope. Verify only affected current boundaries with one deterministic harness, not the entire historical sync/browser suite.",
+        "n71_fixture_disposition: PASS requires actual same-pair retention/session evidence plus both deny-all source/410 proofs from preparationAuthority. Implement finally/recovery before first provisioning; preserve exact candidate and private same-run state on interruption. Never label local-only restore, UI-only simplification or incomplete cleanup LOCAL_READY.",
+        "Corrected continuation: old pair fc77ae70-4cfa-4d2e-98ba-89232fe3c4f4 remains permanently retired. One fresh pair, new current-run private manifest/functions and full cleanup/disarm are explicitly authorized. A blanket reading of the previous no-replacement sentence is superseded for this phase.",
+        "n71_live_restore_owner_resume: finish the real owner matrix and lost-stage-acknowledgement/same-identity resume with the corrected serverCanonical baseline. Preserve zero mutation on denied requests; verify immediate export remains valid. Reuse existing source-identical checks; successful native/Preview results alone do not satisfy this live gate.",
+        "n71_live_convergence_no_resurrection: actually finish A2 Initial Restore/ordinary Sync across portable domains and the declared synthetic tombstone/closed-term/provenance cases. Complete disposition for the NEW pair before LOCAL_READY; retain the OLD pair evidence independently."
+      ],
+      "allowedPaths": [
+        "src/views/backup.js",
+        "src/lib/backup-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/initial-restore.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/restore-deletion-scope.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n71_unified_restore.sql",
+        "supabase/functions/ops-n71-fixture/**",
+        "supabase/functions/ops-n71-retire/**",
+        "tests/n71-*",
+        "tests/n71-live/**",
+        "tests/backup-flow.e2e.mjs",
+        "tests/backup.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/v2-backup-restore-server.test.mjs",
+        "tests/core-v2-restore-reload.test.mjs"
+      ],
+      "releaseAuthority": "PO-20261012 continuous execution/deployment under the fixed D099 contract. Named additive service/fixture preparation only; Product main/Production exclusively publisher-owned. No renewed routine approval and no real-account restore. Preserve other tasks and park only this task on a concrete failed gate. Corrected-phase execution is covered by the existing user authorization: one fresh pair under preparationAuthority.correctedVerificationPhase, preserving the old pair retired. No renewed PO permission is required for this bounded correction and proof.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N71",
+        "decisions": [
+          "D089",
+          "D099"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "currentClient": "src/lib/backup-v2.js",
+        "currentPage": "src/views/backup.js",
+        "deployedHelpers": [
+          "rakeezx.sync_v2_restore_entities",
+          "rakeezx.sync_v2_restore_entities_full",
+          "rakeezx.sync_v2_restore_entities_score_v2"
+        ],
+        "observedTablesPresent": [
+          "units",
+          "lessons"
+        ],
+        "observedTablesAbsent": [
+          "assignments",
+          "submissions"
+        ],
+        "observationLimit": "Metadata only; no actual user/Product rows or backups inspected.",
+        "correctedContinuation": {
+          "currentCandidate": "aa333cd9be7a5735608b3e07added378d9d52066",
+          "correctedParent": "98cc2aa8e350e221519d7a2c1e88fc8c1786817f",
+          "correction": "serverCanonical baselines preserved during reconcile",
+          "remainingRequiredChecks": [
+            "n71_live_restore_owner_resume",
+            "n71_live_convergence_no_resurrection"
+          ],
+          "retiredPairEvidence": "coverage/n71-current/live-result.json and disposition-source.json",
+          "reconciledEvidence": "coverage/n71-current/reconciliation-4b597653-6f1c-42a5-b5ad-0724834ec0aa.json"
+        }
+      },
+      "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Saved candidate fixed canonical restore reconciliation. Existing authority now explicitly covers one fresh bounded corrected proof phase, retaining and excluding the retired pair/functions; no new migration or implementation replay.",
+        "previousRunId": "4b597653-6f1c-42a5-b5ad-0724834ec0aa",
+        "preservedCandidateSha": "aa333cd9be7a5735608b3e07added378d9d52066",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n73-real-distribution-20261012",
+      "productId": "N73",
+      "scopeKey": "n73-d119-account-atomic-distribution",
+      "activationId": "po-20261012-continuous",
+      "priority": 110,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+      "budgetMinutes": 180,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n73_fresh_candidate_preview",
+        "n73_distribution_score_contract",
+        "n73_server_protocol_binding",
+        "n73_live_owner_atomic_retry",
+        "n73_live_device_convergence",
+        "n73_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N73",
+        "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+        "authoritySource": "Current PO instruction to implement/finish the backlog and deploy under continuous automation, with approved D119/D105/D102 Product scope. D119 alone was a behavior approval; this reference explicitly identifies the later execution authority. Live effects remain confined to the named additive protocol and synthetic closure. CORRECTED CONTINUATION: Existing PO-20261012 continuous implementation/deployment authorization covers this specific corrected verification phase. It supersedes the old card's procedural prohibition on a replacement pair for this phase only; no renewed PO approval is required. Exactly one fresh A/B pair is permitted after the concrete correction is ready. Preserve every previous pair, private manifest, retained Product closure and deny-all function. Never unban, reuse credentials/IDs, reprovision or rearm an old pair/function. No real account, real student data, messages, service-role Product seeding, Auth policy change or widened Product scope.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n73-preview/continuous-n73-real-distribution-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n73-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N73 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n73-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly one fresh synthetic A/B pair for correctedVerificationPhase; use the current controller runId and the original purpose/owner/data boundaries below. Old IDs and functions in retiredPair stay excluded. Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes. The fresh phase also excludes all exact IDs and names in correctedVerificationPhase.retiredPair; use official admin APIs and existing reviewed primitives only.",
+          "migration": {
+            "operation": "apply_migration_if_required",
+            "maxNewMigrations": 1,
+            "name": "n73_distribution_error_contract",
+            "sourceFileSuffix": "_n73_distribution_error_contract.sql",
+            "alreadyAppliedMigration": {
+              "name": "n73_distribution_apply",
+              "version": "20261012130249",
+              "sourceFile": "supabase/migrations/20261012120000_n73_distribution_apply.sql",
+              "sha256": "dc25d62af8363149b046053fc5c841b140d222513c0f3913c023db6f0248c12f",
+              "immutable": true
+            },
+            "functions": [
+              {
+                "signature": "rakeezx.apply_score_distribution_plan(text,text,text,text,boolean)",
+                "observedPriorBodyMd5": "3c8da9d39fe5827b2a29f3d0f63ef5bd",
+                "manualErrorSites": [
+                  "Distribution plan expired or changed",
+                  "Distribution changed since review",
+                  "Distribution operation unavailable"
+                ]
+              },
+              {
+                "signature": "rakeezx.rename_score_item(text,text,text,bigint,text)",
+                "observedPriorBodyMd5": "995951fd8b362819e302f71afa2c180e",
+                "manualErrorSites": [
+                  "Item changed since review"
+                ]
+              }
+            ],
+            "scope": "One new additive corrective migration only: CREATE OR REPLACE the two exact existing function bodies, replacing their four deliberately raised business-conflict SQLSTATE 40001 values with PT409. Preserve signatures, owner guards, search_path, security attributes, ACL, locks, operation ordering, atomicity and receipts; no other schema, row, general Auth/RLS or existing migration change.",
+            "beforeApply": "Read actual current function definitions/ACL and migration history first. Bind the existing source and the exact new correction with hashes. If the same correction is already applied and bodies/ACL match, reuse its evidence without applying again. If current bodies differ from the recorded parent beyond the same correction, report exact drift before an overwrite; do not reset or edit applied migration history.",
+            "certification": "Before the single connector application, run the existing narrow native owner/atomicity/rollback verification against the exact corrected bodies and assert SQLSTATE PT409 for the deliberately stale plan. Read back both definitions/ACL and actual migration version after application. Existing migration already applied once stays untouched."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair. This rule is scoped to the one fresh pair of correctedVerificationPhase; its explicit authorization above is not a request to revive the retired pair. Preserve previous disposition proofs unchanged.",
+          "correctedVerificationPhase": {
+            "version": 1,
+            "phase": "n73-corrected-live-proof-20261012",
+            "priorCandidateSha": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+            "maxNewPairs": 1,
+            "accountsPerPair": 2,
+            "runIdBinding": "Use the next controller-created attempt runId; exact saved Codex session/worktree continue. The fixture phase gets a new private manifest and its own run-bound names.",
+            "retiredPair": {
+              "runId": "0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e",
+              "accountIds": [
+                "268f2d00-92a1-4c6d-a2a1-ef94a45a43c9",
+                "2f507c7e-8c11-4207-94d7-595eeccc2677"
+              ],
+              "functionNames": [
+                "ops-n73-fixture-0892c4c09a0e4c6bb1ee",
+                "ops-n73-retire-0892c4c09a0e4c6bb1ee"
+              ],
+              "proof": "test-results/n73-final-evidence.json and n73-disarm-binding.json"
+            },
+            "startCondition": "Complete the concrete local/service correction, retained evidence checks and deterministic finally/recovery before issuing the new 90-minute capabilities. Provision only after both independently protected functions are deployed and verified.",
+            "failureDisposition": "Record the exact failing stage/HTTP or SQL code and preserve the candidate. Finally retire/disarm this phase. No unban, same-phase replacement pair or missing-PO-permission fiction."
+          }
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n73",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories.",
+          "harnessBinding": "Remove reliance on prior literal run IDs/function names by passing the current runId or using an explicitly recorded runtime-derived copy. Bind candidate, source tree, current runId and exact harness SHA before provision. Use a new private subdirectory under the existing task privateStateRoot and a distinct per-run evidence subdirectory; never overwrite prior manifests or receipts. Retain the proven Windows PowerShell 7 private-directory helper when needed; do not rerun the known PS5.1 module failure or relax ACL checks. No extra framework, general API integration or new global configuration."
+        }
+      },
+      "objective": "Continue the existing N73 candidate 0c2a3871b9a0f1032802a4e30e3e9896741ba39d in the same worktree/session. Fix the identified RPC error contract before another live run: business staleness is deliberately raised as 40001, which the documented PostgREST14 path retries internally; the prior live request hit the 15-second client deadline. Add only the small SQL correction specified in preparationAuthority, preserving the original applied migration and existing Product work; update the stale-plan assertions to native PT409 and actual HTTP409/code PT409. The 15-second request deadline stays unchanged and no timeout is accepted as proof of rejection. Then use the one authorized fresh pair to finish accepted apply/idempotent retry and A2 convergence after proving stale rejection has zero writes. The original Product contract remains: Turn approved D119 into the real account workflow, using the small UI/planner delta from c961f28b8eccbb9b2a425a7b6b89ca3c1d6130a1 only where it still matches fresh main. The old candidate explicitly supports only rakeezx-demo; do not ship that restriction over current live score:copy_definition. Implement the missing trusted multi-target plan/apply protocol and client receipt/Sync integration, preserving current scoring and any already-shipped N84/N94 fields. Protocol design and scoped certification are work owned by this card; no missing Product design decision was found.",
+      "acceptance": [
+        "n73_fresh_candidate_preview: PASS binds fresh base/candidate/tree/harness to an exact successful immutable Cloudflare Preview and affected source assets. Normal flow is source class, explicitly selected targets (none selected by default), compact review and apply, with impact details collapsed. Preserve natural class order and D105 parent metadata-only edit.",
+        "n73_distribution_score_contract: PASS covers full definition/subitem matching; unique matches update in place, missing items are created, repeated apply creates no duplicate origin. Keep valid target manual scores and persistently cap only over-maximum scores; manual-to-auto uses only target events. Keep extra items/scores by default and require the specific unchecked removal option plus deliberate impact confirmation. Ambiguous matches fail closed for the affected target. Preserve late/subitem metadata already on main.",
+        "n73_server_protocol_binding: PASS records the exact additive migration source/hash, focused native owner/atomicity result, one actual provider application and read-back RPC/ACL/version binding. The deployed single-item/single-target apply_score_distribution_copy_command is not D119 proof. Validate the selected plan against fresh server revisions, then atomically apply its accepted target operations; expose any excluded ambiguous target in review. Keep old clients working until the replacement is certified.",
+        "n73_live_owner_atomic_retry: PASS uses real authenticated A/B and the exact synthetic IDs: B cannot read/apply to A; stale plan or injected bounded failure causes no partial accepted-plan mutation; retry is idempotent. Demonstrate persisted cap, compatible target score preservation, target-only auto projection, keep-default and explicit synthetic extra removal. No source grades copied and no real teacher data touched.",
+        "n73_live_device_convergence: PASS shows A2 receives the actual canonical items/subitems/completions/scores and deletion receipts after apply, including stale retry without duplicate or resurrection. Backup/restore serializers preserve relevant changed fields. Use focused current contract tests and one deterministic live harness; no full historical suite or repeated source-identical builds.",
+        "n73_fixture_disposition: PASS requires actual exact-pair disposition and both final deny-all proofs from preparationAuthority, with durable finally/recovery prepared before Authcreate. Missing live/provider/cleanup proof means precise BLOCKED and preserved candidate, never a Demo LOCAL_READY.",
+        "Corrected continuation: old pair 0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e stays permanently retired; its two endpoints remain deny-all. Exactly one fresh pair for the corrected phase is authorized by the current user instruction, with new run-bound manifest/functions and complete disposition. Do not request PO approval for this already-authorized phase.",
+        "n73_server_protocol_binding: supplement the already applied N73 migration with ONLY the two-function PT409 corrective migration described in preparationAuthority. Check actual source/migration history before any apply, native-certify the correction, then read back exact deployed definitions/ACL/version. Do not edit/reapply 20261012120000_n73_distribution_apply.sql or broaden service scope.",
+        "n73_live_owner_atomic_retry: update tests/n73-live/run.mjs stale-plan assertion from code 40001 to status 409 AND code PT409; keep the 15000ms AbortSignal deadline. Preserve exact endpoint/stage, elapsed time, status and public error code in diagnostic evidence without tokens or passwords. A timeout/network abort must remain an explicit failed gate. Assert actual unchanged target/domain state and no receipt, then finish accepted apply, lost-acknowledgement retry and idempotence.",
+        "n73_live_device_convergence and n73_fixture_disposition: finish the existing actual A2 canonical data/tombstone/backup cases and the new pair retirement/disarm. Reuse unchanged contract/Preview evidence only where source/tree/harness bindings still match; bind any small new repair commit as a descendant of the retained candidate. No full historical suite or repeated source-identical build."
+      ],
+      "allowedPaths": [
+        "src/lib/score-foundation.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/backup-v2.js",
+        "src/lib/initial-restore.js",
+        "src/store.js",
+        "src/views/items.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n73_distribution_apply.sql",
+        "supabase/functions/ops-n73-fixture/**",
+        "supabase/functions/ops-n73-retire/**",
+        "tests/n73-*",
+        "tests/n73-live/**",
+        "tests/score-foundation-local.test.mjs",
+        "tests/score-foundation-server.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "supabase/migrations/*_n73_distribution_error_contract.sql"
+      ],
+      "releaseAuthority": "PO-20261012 continuous execution/deployment under D119/D105/D102; no renewed routine PM/Preview hold. Worker may only use the named preparation operations and synthetic plan. Product main/Production is publisher-only. No mass/real-data operation; stop only this card on concrete unsafe drift. Corrected-phase execution is covered by the existing user authorization: one fresh pair under preparationAuthority.correctedVerificationPhase, preserving the old pair retired. No renewed PO permission is required for this bounded correction and proof.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N73",
+        "decisions": [
+          "D119",
+          "D105",
+          "D102"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "approvedContract": "docs/N73_SIMPLIFIED_DISTRIBUTION_V2.md",
+        "historicalCandidate": "c961f28b8eccbb9b2a425a7b6b89ca3c1d6130a1",
+        "historicalImplementationCommit": "1b1f9a8f28f098acb4cc248a4e0453ddb424475b",
+        "historicalImplementationPaths": [
+          "src/lib/score-foundation.js",
+          "src/store.js",
+          "src/views/items.js",
+          "tests/n73-account-gate.test.mjs",
+          "tests/n73-d119.test.mjs"
+        ],
+        "observedRpcSourceMd5": "7c125fbb33aaaa4d43b6373b913b1aa1",
+        "correctedContinuation": {
+          "currentCandidate": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+          "retiredPairEvidence": "test-results/n73-final-evidence.json and n73-disarm-binding.json",
+          "sourceSites": [
+            "supabase/migrations/20261012120000_n73_distribution_apply.sql:285,292,308,349",
+            "tests/n73-live/run.mjs:31,209",
+            "tests/n73-native.mjs:89",
+            "src/lib/sync-v2.js:1291-1294"
+          ],
+          "officialFailureMode": "https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b",
+          "officialHttpErrors": "https://docs.postgrest.org/en/stable/references/errors.html",
+          "evidenceReadAt": "2026-10-12",
+          "certainty": "The code deliberately uses 40001 and the actual live request timed out at the client. The official provider describes exactly this failure mode; the running project PostgREST version/retry trace was not independently established by this read-only file diagnosis.",
+          "backendObservation": {
+            "source": "Coordinator read-only pg_stat_activity metadata, reported 2026-10-12",
+            "nonIdleAuthenticatorCallsForAffectedFunctions": 0,
+            "functions": [
+              "apply_score_distribution_plan",
+              "rename_score_item"
+            ],
+            "limitation": "Momentary observation only; does not reconstruct the prior request retry trace. No backend termination or project restart is required by this observation."
+          }
+        }
+      },
+      "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Source-confirmed deliberate SQLSTATE 40001 conflicts match the official PostgREST retry failure mode. Authorize one additive PT409 correction for only the two named function bodies and a fresh bounded proof phase. Preserve the original applied migration, deadline, old retired pair and all true assertions.",
+        "previousRunId": "0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e",
+        "preservedCandidateSha": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n94-subitem-late-scoring-20261012",
+      "productId": "N94",
+      "scopeKey": "n94-subitem-dates-persisted-late-score",
+      "activationId": "po-20261012-continuous",
+      "dependsOn": [
+        "N84"
+      ],
+      "priority": 60,
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "budgetMinutes": 120,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "subitem_dates_and_points",
+        "completion_tap_cycle",
+        "scoring_preservation",
+        "owner_sync_backup",
+        "product_ui_release_scope"
+      ],
+      "objective": "After N84 is deployed/awaiting PO, implement the approved N94 subitem dates and persisted late-scoring behavior on fresh current main in actual Product items/Gradebook. Begin by tracing scoreSubitems and scoreSubitemCompletions through the existing db/store, outbox/Sync normalizers and Backup/Restore paths; the known consumers are listed in allowedPaths. Reuse the existing ordinary value as regularPoints compatibility instead of silently creating a competing maximum. Preserve existing records and owner contracts. Store immutable automatic createdAt separately from optional teacher startDate; an empty startDate means immediate start, and a supplied dueDate cannot precede a supplied startDate. dueDate is optional, and optional latePoints defaults to ordinary points and stays within the existing lower bound through regularPoints. After the app's existing local-date due boundary, deliberate taps cycle unrecorded -> late -> regular/accepted excuse -> unrecorded. Before that boundary or with no dueDate, retain unrecorded <-> regular. Persist the teacher's selected state per student/subitem; time passage, timezone/device-clock change, due-date edits or grade recalculation must not silently reinterpret an existing record. A late click is a teacher-selected label, not proof of actual submittedAt. Display calm distinct gray/amber/green states with text and symbols, plus the actual points even when regular and late points are equal. Preserve N84 Quick Log controls and existing automatic/manual/attendance score semantics. Implement the missing server work in this same card: one new additive migration and only the named N94 score RPC/Sync/Restore changes in preparationAuthority. Preserve applied migration files. Candidate 7503cfcfef06f9bd96ad1bbe14bf96111381085d contains diagnostics only; retain that history, reuse useful diagnostics and continue the existing session on the controller-selected current main. Those diagnostic PASS results are not feature acceptance. New nullable fields and explicit legacy fallbacks must preserve existing creation timestamps, checked records and numeric grades without real-account backfill or broad recalculation. Implement the selected state through actual client commands, atomic server projection/receipts, canonical Sync, definition copy and owner-bound Backup/Restore. Preserve legacy command/replay compatibility and gate the new command on its actual deployed capability. Return LOCAL_READY only after the five existing named checks pass, including exact migration deployment/source binding in owner_sync_backup. Missing implementation is owned work; only observed service/tool failure, incompatible live schema drift or a genuinely unsafe conflict is a precise BLOCKED condition for N94 alone. No mock-server success or Demo-only completion.",
+      "acceptance": [
+        "subitem_dates_and_points: PASS exercises actual model/form validation and normalization for immutable createdAt, optional blank/future startDate, optional dueDate, due-before-start rejection, ordinary-value compatibility, missing latePoints fallback, equal/lower allowed latePoints and rejection above regular points or below the existing allowed lower bound. Preserve existing subitem records without resetting their creation/history or requiring a new field to read legacy data. Reuse the application's established date convention; do not add an unrelated calendar policy.",
+        "completion_tap_cycle: PASS exercises the real completion command and deterministic clock/date fixtures: after due date the three deliberate taps create late, then regular/accepted-excuse, then unrecorded; before due or without a due date use the existing two-state cycle. Rapid/replayed events retain the existing idempotency rules. Reload, clock changes, due-date edits and score refresh preserve the saved teacher-selected state rather than inferring a new state from timestamp. No health/excuse details or fabricated submittedAt are stored.",
+        "scoring_preservation: PASS demonstrates the real grade calculation uses the selected ordinary/late points, honors existing subitem/parent bounds, preserves legacy grades and unrelated students/items, and retains N84 Quick Log projection plus manual/attendance behavior. Explain the result if ordinary and late points are equal. Targeted source-identical scoring evidence may be reused; only affected changed scoring paths need a fresh run. No full historical shell/global suite.",
+        "owner_sync_backup: PASS covers actual encoders/decoders, command/outbox/replay/reconciliation and V5/initial-restore invariants for startDate, dueDate, latePoints, immutable createdAt and saved teacher state. Exercise the exact new SQL on disposable native PostgreSQL with synthetic A/B identities/roles: wrong owner and generic-write bypass are denied; mutation replay, canonical receipt adoption and interrupted/retried restore do not duplicate, lose or relabel state; lower/equal late points produce matching materialized scores. Preserve old backups and legacy checked records through explicit regular/unrecorded defaults; preserve existing records, grades, manual bounds, owner guards and definition-copy semantics. Generic JSON round trips and success mocks are insufficient. Before LOCAL_READY, record the one migration's exact filename/hash, local SQL result, actual apply_migration receipt, live migration-history entry and read-back columns/constraints/allowed function signatures/source hashes/ACL/capability binding. Verify old signatures still exist and unrelated grants/guards are unchanged. Read live metadata only: 0 Auth IDs and 0 live Product fixtures. Executed SQL/client behavior plus deployed identity is component evidence, not a claimed live end-user A/B session.",
+        "product_ui_release_scope: PASS verifies actual Product items and Gradebook wiring for mobile RTL and light/dark: gray with —/غير مرصود, amber with clock/متأخر, green with check/عادي or مقبول بعذر; accessible distinction cannot depend on color alone. Show actual selected points even when values coincide, concise date/point controls and practical touch targets; do not use red for late or green as Sync proof. The candidate must use real account-capable code paths, preserve N84 and existing sound/effects policy, remain within this card, and introduce only the scoped N94 server contract, with no unrelated student portal/N88 work. Use the browser lease only for the bounded browser/server phase. Product CLOSED remains the later actual acceptance outcome."
+      ],
+      "allowedPaths": [
+        "src/store.js",
+        "src/views/items.js",
+        "src/views/grades.js",
+        "src/lib/db.js",
+        "src/lib/backup-v2.js",
+        "src/lib/demo-workspace.js",
+        "src/lib/export.js",
+        "src/lib/initial-restore.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/styles/grades.css",
+        "src/styles/components.css",
+        "tests/n94-*",
+        "src/models.js",
+        "src/lib/score-foundation.js",
+        "src/lib/cloud.js",
+        "supabase/migrations/*_n94_subitem_dates_late_scoring.sql",
+        "tests/n94/**"
+      ],
+      "releaseAuthority": "The approved N94 refinement recorded on 2026-10-12 and current PO continuous implementation/deployment delegation cover the complete feature, including the named additive schema/RPC/Sync/Restore work needed to persist it. PO-20261012-continuous/N94 identifies existing execution authority; it is not a new Product acceptance or approval request. Worker operations are limited to the named immutable Preview push and one certified service migration/read-back. Product main/Production is publisher-only. Create 0 live Auth IDs and 0 live Product fixtures; no real-account backfill, bulk grade rewrite, general RLS/Auth change or destructive data operation. Actual PO acceptance remains later; this revision supersedes the automation-authored local-only restriction and preserves its history.",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N94",
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N94",
+        "liveAuthorizationRef": "PO-20261012-continuous/N94",
+        "authoritySource": "Existing PO N94 refinement in docs/PRODUCT_LEDGER.md, including the explicit third-tap decision on 2026-10-12, plus current continuous completion/deployment delegation. This revision removes the automation-authored local-only restriction and asserts no new acceptance.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n94-preview/continuous-n94-subitem-late-scoring-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this card's exact candidate to its recorded immutable Cloudflare Preview branch; bind successful check head SHA and affected served assets. No force, main push, merge, branch deletion or worker Production deployment."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newAuthIds": 0,
+          "liveProductFixtureCount": 0,
+          "newEdgeFunctions": 0,
+          "migration": {
+            "operation": "apply_migration",
+            "maxNewMigrations": 1,
+            "name": "n94_subitem_dates_late_scoring",
+            "sourceFileSuffix": "_n94_subitem_dates_late_scoring.sql",
+            "allowedTables": [
+              {
+                "name": "rakeezx.score_subitems",
+                "change": "Add only optional start_date date, due_date date and late_points numeric with due/start ordering and 0 <= effective late_points <= value constraints. Retain value as ordinary points and existing created_at as immutable history."
+              },
+              {
+                "name": "rakeezx.score_subitem_completions",
+                "change": "Add only optional completion_state text with explicit regular/late semantics and legacy checked compatibility; unrecorded remains compatible with checked=false. Preserve IDs, ownership, uniqueness, revisions, timestamps and existing rows."
+              }
+            ],
+            "allowedExistingFunctionSignatures": [
+              "rakeezx.sync_v2_field_map(text)",
+              "rakeezx.guard_subitem_definition_write()",
+              "rakeezx.recompute_subitem_score(uuid,text,text,text)",
+              "rakeezx.apply_score_subitem_command(text,text,text,text,text,text,boolean,numeric)",
+              "rakeezx.apply_score_configuration_command(text,text,text,bigint,jsonb)",
+              "rakeezx.apply_score_distribution_copy_command(text,text,text,bigint,text,text,jsonb,text)",
+              "rakeezx.score_foundation_capability()",
+              "rakeezx.assert_score_provenance_consistent(uuid)",
+              "rakeezx.stage_sync_v2_restore_score_v2(text,text,integer,jsonb,jsonb)",
+              "rakeezx.finalize_sync_v2_restore_score_v2(text,text,text)"
+            ],
+            "allowedNewFunctionSignatures": [
+              "rakeezx.apply_score_subitem_command_n94(text,text,text,text,text,text,text,numeric)"
+            ],
+            "newCommandParameters": "p_mutation_id text, p_device_id text, p_command text, p_item_id text, p_student_id text, p_subitem_id text, p_completion_state text, p_manual_value numeric. A distinct RPC expresses teacher state without ambiguous overload of the boolean endpoint.",
+            "scope": "Change only necessary listed bodies, the N94 field-map branches, and exact new-function EXECUTE ACL. Preserve other entity branches and RLS/owner/write/replay guards; no general policy/grant repair. Preserve old callable signatures, old receipt request-envelope replay and existing capability keys/version compatibility; add an explicit N94 capability instead of treating scoreDomainVersion=1 as proof. The new RPC uses the same authenticated owner-bound command path, explicit authorization and fixed/empty search_path; no client service_role. created_at is not generically editable: restore may preserve validated creation history on record creation but must not rewrite an existing record's creation timestamp.",
+            "preparation": "Inspect actual applied history and exact listed live signatures/columns/ACL first. Use the available supported Supabase migration command to create one new file. Certify its exact SQL and legacy-snapshot/owner/retry behavior on disposable native PostgreSQL. Applied 0033/0034 and historical migrations are immutable. Keep the additive deployment backward compatible with current ordinary scoring before the N94 frontend is published.",
+            "application": "Apply the certified SQL once via the existing connector to this project, transactionally with a bounded lock timeout; no live exploratory DDL/DML. If the response is ambiguous, inspect history and exact definitions before retrying, never blindly reapply or invent a second migration. Refresh only the provider schema cache by its documented mechanism if the named new RPC requires it.",
+            "prohibitedDataEffects": "No Auth inserts/updates/deletes, live synthetic accounts, Product fixture seeding, existing-row backfill, deletion, truncate/reset, bulk score recalculation or rewriting previous dates/grades. Legacy fallbacks must work without a data rewrite."
+          },
+          "verification": {
+            "operation": "execute_sql",
+            "mode": "read-only",
+            "scope": "Only migration history and catalog metadata for the two named tables/constraints and listed function arguments/bodies/ACL/N94 capability. Capture hashes/binding, no Auth/profile/student row contents or keys. Deployed metadata is contract proof, not a live user-session test."
+          }
+        },
+        "execution": {
+          "leases": "Use the existing live-mutation lease only for the single migration window and required read-back; browser lease only for owned HTTPS Product Preview/Demo validation. Release each after its phase; do not reserve it while coding. No live fixture/Auth phase.",
+          "localPostgres": "Existing native PostgreSQL 17: C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin; existing pg client: C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/client/node_modules/pg/lib/index.js. Disposable isolated test data only. Docker is not a prerequisite.",
+          "deadline": "Certify locally before acquiring the SQL lease. Use bounded transaction/lock waits and a durable source/hash/application receipt, releasing the owned phase lease in finally. Resolve ambiguous results by read-back with the same candidate and exact migration, not duplicate application.",
+          "publication": "Only publisher may update main/Production. Named service actions are preparation; all five checks must pass before LOCAL_READY. Do not alter controller, queue, policy or global configuration."
+        }
+      },
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N94",
+        "ledgerObservedLine": 144,
+        "architecture": "docs/CURRENT_ARCHITECTURE.md",
+        "observedMain": "f23abc0e850f38024102821d1406c4e160152c0b",
+        "observedAt": "2026-10-12T20:54:38.131Z",
+        "priorTaskPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\continuous-n94-subitem-late-scoring-20261012.json",
+        "priorResultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n94-subitem-late-scoring-20261012\\47c4d463-384f-4785-b8b4-93c8b627959d\\result.json",
+        "priorRunId": "47c4d463-384f-4785-b8b4-93c8b627959d",
+        "priorCandidateSha": "7503cfcfef06f9bd96ad1bbe14bf96111381085d",
+        "preservedSessionId": "01a12fe2-49fc-7f51-a6f1-2e3b92fe66cd",
+        "priorBlocker": "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE: score_subitems lacks start_date, due_date and late_points; apply_score_configuration_command discards them. apply_score_subitem_command accepts p_checked boolean without persisted late/regular state. Existing server scoring and Product Sync/Restore cannot retain N94 semantics.",
+        "priorCandidateKind": "Two diagnostics only; 4/4 diagnostic PASS proves an old contract limitation, not implemented feature or deployment.",
+        "contractSources": [
+          "supabase/migrations/0033_score_subitem_foundation.sql",
+          "supabase/migrations/0034_score_subitem_guard_acl_hardening.sql",
+          "src/lib/score-foundation.js",
+          "src/lib/cloud.js",
+          "src/lib/sync-v2.js",
+          "src/lib/backup-v2.js",
+          "src/lib/initial-restore.js",
+          "src/models.js"
+        ],
+        "liveGateExecutedByThisPreparation": false
+      },
+      "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "The former local-only card omitted the server fields/protocol that the already-approved Product behavior requires. Its bounded named additive migration/RPC scope is now supplied; previous diagnostic work is preserved and is not feature acceptance.",
+        "previousRunId": "47c4d463-384f-4785-b8b4-93c8b627959d",
+        "preservedCandidateSha": "7503cfcfef06f9bd96ad1bbe14bf96111381085d",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n77-real-delete-20261012",
+      "productId": "N77",
+      "scopeKey": "n77-current-server-delete-owner-sync-restore",
+      "activationId": "po-20261012-continuous",
+      "priority": 1,
+      "dependsOn": [
+        "continuous-n13-existing-section-subject-20261012"
+      ],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "D120",
+      "budgetMinutes": 150,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n77_fresh_candidate_preview",
+        "n77_scope_atomicity_contract",
+        "n77_live_server_owner_scope",
+        "n77_live_convergence_restore",
+        "n77_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N77",
+        "liveAuthorizationRef": "D120",
+        "authoritySource": "D-120 explicitly authorizes N77 completion, its exact migration and bounded synthetic A/B verification. Current 2026-10-12 PO continuous delivery authority removes routine PM/Preview waiting; D-104/D-106/D-113/D-114 safeguards remain.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n77-preview/continuous-n77-real-delete-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n77-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N77 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n77-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding. This amendment permits exactly one new pair after the recorded retired run, conditional on the material source and run-binding corrections above; it does not rearm or reuse old identities.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes.",
+          "migration": {
+            "operation": "read_only_verify_existing",
+            "appliedVersion": "20261007230123",
+            "sourceFile": "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+            "scope": "Already applied once. Verify live n77_delete_teaching signature/source against the immutable reviewed source. Do not apply/reapply/reset/edit it or another migration. If its exact source is absent from main, only add the historical byte-identical file. Drift or a needed server change is a precise preserved-candidate blocker, not permission to broaden D120."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair.",
+          "materialContinuation": {
+            "authoritySource": "PO 2026-10-13 requests high-priority class deletion after N13/N49 and delegates diagnosis and repair of all blockers. The existing D120 synthetic-fixture scope is retained; this material continuation permits one new exact pair after the source/run-binding correction.",
+            "previousRunId": "a853d8e6-0577-4fa3-9af2-ad473c8bb673",
+            "previousPairDisposition": "RETIRED_BANNED; both previous functions are deny-all/410 per the preserved result",
+            "previousRecoveryPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/n77/a853d8e6-0577-4fa3-9af2-ad473c8bb673/private/state.tmp",
+            "maximumAdditionalPairs": 1,
+            "accountCount": 2,
+            "contexts": [
+              "A1",
+              "A2",
+              "B1"
+            ],
+            "fixtureRunBinding": "First new controller attempt UUID after this material amendment; explicit validated input, durably saved and reused for recovery. Never the retired UUID, --last, or an implicit new pair.",
+            "conditionsBeforeAuthCreate": [
+              "Retired disposition and source-bound correction evidence remain available; never unban/rearm them.",
+              "Candidate includes committed Sync-overlap and one-active-enrollment repair; unchanged assertions remain strict.",
+              "Current main/N13 changes are reconciled and exact candidate/Preview/source bindings are saved.",
+              "No live default points to the retired run; all operations bind to the new exact saved fixture run.",
+              "Before-write new pair/closure manifest and protected cleanup companion are prepared and probed."
+            ],
+            "unchangedLimits": {
+              "liveMinutes": 45,
+              "cleanupReserveMinutes": 15,
+              "capabilityMinutes": 90
+            },
+            "retiredPairReuseAllowed": false,
+            "migrationChangeAllowed": false,
+            "timeoutIncreaseAllowed": false,
+            "laterRetry": "Recover the allocated exact pair/state; no third pair or silent new fixture phase."
+          }
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n77",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories."
+        }
+      },
+      "objective": "Finish the real online-only delete feature on fresh main. Selectively reconcile historical combined candidate 514b6ab4537f0fb72c183c1afcd039ab683e6a2b against current N13 and later changes; do not promote restricted Demo cc60574fa30eea2cb6e3cee5511abda5bcb64de8 or replace whole files. Connect the already deployed n77_delete_teaching RPC to the Product action, durable receipt handling, stale-device convergence and restore/export suppression. This card owns the fresh A/B harness and task-specific fixture preparation; these are implementation work, not an external Auth blocker.\n\n2026-10-13 PO continuation: N77 is priority 1, immediately after the new N13 creation-form correction (priority 0); N49 Preview is a separate operator path and is not a fake Production queue dependency. Reuse candidate 179abdf3ce6c33f06fa4f77026887ba1b491b5c2 and the exact saved session. Its final commit already fixes the observed background-Sync collision and the obsolete two-active-enrollment fixture. Do not reimplement the Delete feature or repeat its 78 unchanged affected/native checks. Reconcile with actual current main, including the latest N13 ordinary grade/section/subject form, without reverting N13 or copying whole old files. Fresh Preview identity/served assets must bind any resulting current candidate.\n\nBefore provisioning, remove the hardcoded retired RUN_ID a853d8e6-0577-4fa3-9af2-ad473c8bb673 from tests/n77-live/run.mjs as a live default. Bind the harness explicitly to the first newly activated continuation attempt UUID supplied by the controller, verify taskId/activationId against its attempt record, and durably retain that fixture-run binding for same-pair recovery. The flush-only test must remain importable without live/private-state initialization. A missing, invalid or mismatched live binding fails before preparation or writes; never fall back to the retired UUID, the latest arbitrary session, or a newly generated replacement pair. Route all manifest/function names, markers, private state, prepare/gate/retire/disarm operations through the same explicit binding. A later implementation retry must recover this saved fixture run, not allocate another pair.\n\nAfter the corrected Sync/enrollment source and current run binding are verified locally, the PO-authorized continuation permits exactly one additional fresh synthetic A/B pair under the existing D120 operations and unchanged 45-minute live / 15-minute cleanup reserve / 90-minute capability bounds. Preserve the old run directory, accounts, ban state, historical receipt and both deny-all functions unchanged. Predeclare the new exact two UUIDs and Product closure, predeploy/probe its cleanup companion before Auth create, then execute the existing deterministic finally/recovery. Keep full-success and empty-outbox assertions; do not increase timeouts, accept network errors as denials, remove gates, bypass Auth/RLS, or modify/reapply the immutable migration. Complete the current Preview real-client selected/final deletion, exact receipts, stale-scope denial, owner isolation, A2 convergence and ordinary stale-backup restore suppression. Record actual exact-pair disposition and source plus both 410 endpoint proofs. A new factual failure preserves candidate/evidence and same-pair recovery; it does not authorize another pair. The controller owns main/Production delivery after all five actual named gates pass.",
+      "acceptance": [
+        "n77_fresh_candidate_preview: PASS records fresh origin/main/candidate/tree, actual changed paths and committed harness, then exact successful Cloudflare Preview identity/served Product assets. Preserve current N13 creation, N49 owner lease, N58 calendar and all shipped scoring/UI work. Reuse unchanged historical focused/native/browser evidence only with exact relevant source bindings; no broad test rerun.",
+        "n77_scope_atomicity_contract: PASS proves no local destructive mutation offline/before server validation; server-derived selected-Teaching vs final-Section scope; stale fingerprint failure with no scope broadening; atomic failure/idempotent retry; shared identities outside scope preserved. Check the unchanged deployed RPC/source rather than reapplying its migration. Mixed immutable closed-term report bytes remain unchanged and deleted scope is suppressed, under D113/D114.",
+        "n77_live_server_owner_scope: PASS comes from the current Preview's real authenticated client on only the predeclared synthetic A/B closure. Cover selected Teaching with another active Teaching preserved, final Teaching/Section scope, stale-scope denial, actual B-owner denial and unchanged A rows after denial. Obtain server receipt and independent before/after observations for exact IDs; a network error or Demo mock is not denial/atomicity proof.",
+        "n77_live_convergence_restore: PASS shows A2's stale local view converges through real receipts/tombstones, retry remains idempotent, and a task-created stale backup/report path cannot resurrect the deleted scope while outside-scope data survives. Use the current ordinary versioned restore contract; do not alter restore architecture as a shortcut. Preserve source-identical native mixed-snapshot evidence and run only materially changed boundaries.",
+        "n77_fixture_disposition: PASS includes the deterministic finally/recovery and actual exact-pair retention, session/token evidence plus both deny-all function proofs specified by preparationAuthority. Keep run-bound credentials/bundles only in ignored private artifacts. Any missing actual gate returns precise BLOCKED with candidate and same-run recovery reference; Auth provisioning or historical gates alone never yield LOCAL_READY.",
+        "Continuation admission: all old result evidence stays historical. Resolve the hardcoded fixture run binding locally before Auth preparation; preserve the corrected strict Sync/full-outbox assertions and one-active-enrollment fixture. Reuse the unchanged source-bound overlap regression if its actual evidence matches; otherwise run only that focused regression before provisioning. A missing real live gate remains FAIL/NOT_RUN, never inferred from local or Preview PASS."
+      ],
+      "allowedPaths": [
+        "src/lib/backup-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/export.js",
+        "src/lib/n77-delete.js",
+        "src/lib/n77-delete-preview.js",
+        "src/lib/restore-deletion-scope.js",
+        "src/lib/sync.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "src/views/backup.js",
+        "src/views/teaching-hub.js",
+        "src/views/teachings.js",
+        "sw.js",
+        "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+        "supabase/functions/ops-n77-fixture/**",
+        "supabase/functions/ops-n77-retire/**",
+        "tests/n77-*",
+        "tests/n77-live/**",
+        "tests/n13-n77-*.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/section-archive.test.mjs",
+        "tests/section-validation.test.mjs"
+      ],
+      "releaseAuthority": "D120 + PO-20261012 continuous Product completion/deployment. Only named preparation operations are worker-authorized; main/Production stays publisher-only. No renewed routine PM approval. Keep N77 OPEN/awaiting_po for real Product acceptance; a failed card must not stop unrelated work. PO 2026-10-13 material continuation includes the one additional exact synthetic A/B phase described in preparationAuthority; no renewed routine PM/user approval is required for it.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N77",
+        "decisions": [
+          "D104",
+          "D106",
+          "D113",
+          "D114",
+          "D120"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "historicalCandidate": "514b6ab4537f0fb72c183c1afcd039ab683e6a2b",
+        "historicalBase": "a42f4f8fbaf497009d4df2b4ce25b053c046dd27",
+        "combinedManifest": "docs/follow-ups/N13_N77_SEALED_COMBINED_PREVIEW_20261011_101211.md",
+        "observedRpc": "rakeezx.n77_delete_teaching(text,text,text,text,text,boolean)",
+        "observedRpcSourceMd5": "f4f022e2dee405b6824545f6ab784ff2",
+        "materialContinuation": {
+          "reviewedAt": "2026-10-13",
+          "baseSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+          "preservedCandidateSha": "179abdf3ce6c33f06fa4f77026887ba1b491b5c2",
+          "harnessFixParentSha": "ce96d2081dc6c74ce5390cb4ab1767fddcbe1292",
+          "harnessFixCommitSha": "179abdf3ce6c33f06fa4f77026887ba1b491b5c2",
+          "harnessFixPaths": [
+            "tests/n77-live/gate.mjs",
+            "tests/n77-live/run.mjs",
+            "tests/n77-ui.e2e.mjs"
+          ],
+          "gateBlobSha": "c112aca23f660bf9d7c6b4009be21cd3cb5eff37",
+          "runBlobSha": "4bbb7195fe00d1c1d0b33409d4a34aa28b1415ef",
+          "previewUrl": "https://2f78cb9c.rakeezx.pages.dev/",
+          "previousResultRunId": "a853d8e6-0577-4fa3-9af2-ad473c8bb673",
+          "sourceVerifiedThroughGitHub": true,
+          "newLiveOperationsPerformedByReview": false
+        }
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T23:31:49.096275+00:00",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "GitHub-verified candidate 179abdf3ce6c33f06fa4f77026887ba1b491b5c2 commits a real harness repair: drain overlapping background Sync before requiring an acknowledged full pass and an empty outbox, and honor one active enrollment while preserving the shared student through an outside-scope score. The remaining live gates were not executed to completion. Resume must additionally replace the hardcoded retired run binding before one explicitly bounded fresh A/B phase; the old pair and disarmed functions remain retired. This is a material continuation, not an unchanged retry.",
+        "previousRunId": "a853d8e6-0577-4fa3-9af2-ad473c8bb673",
+        "preservedSessionId": "01a131e8-c45a-7b81-b19e-6e3809bcfcdf",
+        "preservedCandidateSha": "179abdf3ce6c33f06fa4f77026887ba1b491b5c2",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    }
+  ]
+}
