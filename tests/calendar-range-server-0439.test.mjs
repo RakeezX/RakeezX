@@ -30,9 +30,9 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
         as $$select id from auth.current_identity limit 1$$;`);
     const names = (await readdir(new URL('../supabase/migrations/', import.meta.url)))
       .filter((name) => name.endsWith('.sql')).sort();
-    assert.equal(names.at(-1), '20260930234353_calendar_suspension_kind.sql');
+    assert.equal(names.at(-1), '20261004070002_n58_effective_scope_revalidation.sql');
     for (const name of names) await pg.exec((await readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')).replace(/^\uFEFF/, ''));
-    assert.equal(names.length, 37);
+    assert.equal(names.length, 41);
     const reusable = (await pg.query(`select rakeezx.sync_v2_natural_key_reusable_after_delete('calendar_days') calendar_days,
       rakeezx.sync_v2_natural_key_reusable_after_delete('sections') sections,
       rakeezx.sync_v2_natural_key_reusable_after_delete('slots') slots,

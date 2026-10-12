@@ -81,27 +81,7 @@ const demoPastTermReferenced = (teachings, reports) => [teachings, reports].some
 export async function applyDemoCalendarPreset(presetId) {
   if (store.getActiveWorkspace()?.type !== 'demo' || db.getActiveDatabaseName() !== 'rakeezx-demo' ||
       !store.state.ready) throw new Error('التقويم التجريبي غير جاهز.');
-  const reference = demoCalendarReference(presetId);
-  const timestamp = Date.now();
-  const officialDays = selectedDemoOfficialDays(reference, store.state.calendarDays);
-  const expectedIds = new Set(officialDays.map((day) => day.id));
-  const pastTerm = store.state.terms.find((term) => term.id === DEMO_PAST_TERM_ID && !term.deleted);
-  const pastTermUnused = pastTerm && !demoPastTermReferenced(store.state.teachings, store.state.closedTermReports);
-  const writes = {
-    years: [{ ...(store.getYear(DEMO_YEAR_ID) ?? {}), ...reference.year, updatedAt: timestamp }],
-    terms: [...reference.terms.map((term) => ({ ...store.state.terms.find((row) => row.id === term.id),
-      ...term, updatedAt: timestamp })), ...(pastTermUnused ? [{ ...pastTerm, deleted: true,
-      deletedAt: new Date(timestamp).toISOString(), updatedAt: timestamp }] : [])],
-    calendars: [{ ...store.state.calendars.find((row) => row.id === DEMO_CALENDAR_ID),
-      ...reference.calendar, updatedAt: timestamp }],
-    calendarDays: [...retiredDemoOfficialDays(store.state.calendarDays, expectedIds, timestamp),
-      ...officialDays.map((day) => ({ ...day, updatedAt: timestamp }))],
-    device: [{ ...store.state.device, preferredEducationRegion: reference.preset.id, updatedAt: timestamp }],
-  };
-  if (!(await store.save(writes, { queue: false }))) throw new Error('تعذر حفظ إعدادات التقويم. حاول مرة أخرى.');
-  // save() persists device in the same transaction but only mirrors collection arrays in memory.
-  store.state.device = writes.device[0];
-  return { ok: true, year: store.getYear(DEMO_YEAR_ID) };
+  return store.applyCalendarPreset(presetId, { yearId: DEMO_YEAR_ID });
 }
 
 export function demoRequestState(storage = globalThis.sessionStorage) {

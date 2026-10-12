@@ -105,8 +105,10 @@ test('Demo Calendar keeps official reference, local identities and history throu
       workspace: store.getActiveWorkspace()?.type,
       years: store.years().map(({ id }) => id),
       terms: store.termsOf('demo:year:1448').map(({ id, startDate, endDate }) => [id, startDate, endDate]),
-      calendars: store.calendarsOf('demo:year:1448').map(({ id }) => id),
-      officialDays: store.calendarDaysOf('demo:calendar').filter((day) => day.presetId).length,
+      calendars: store.state.calendars.filter(({ yearId, deleted }) => yearId === 'demo:year:1448' && !deleted).map(({ id }) => id),
+      projectedOfficial: store.calendarsOf('demo:year:1448').filter(({ projected }) => projected).map(({ presetId }) => presetId),
+      officialDays: store.calendarsOf('demo:year:1448').filter(({ projected }) => projected)
+        .flatMap(({ id }) => store.calendarDaysOf(id)).filter((day) => day.presetId).length,
       selected: store.getYear('demo:year:1448')?.calendarPresetId,
       history: Object.fromEntries(['students', 'teachings', 'sections', 'scores', 'sessions', 'attendance']
         .map((name) => [name, store.state[name].map(({ id, updatedAt }) => [id, updatedAt])])),
@@ -135,6 +137,7 @@ test('Demo Calendar keeps official reference, local identities and history throu
     expect(current.years).toEqual(original.years);
     expect(current.terms.map(([id]) => id)).toEqual(original.terms.map(([id]) => id));
     expect(current.calendars).toEqual(original.calendars);
+    expect(current.projectedOfficial).toEqual([region]);
     expect(current.selected).toBe(region);
     expect(current.officialDays).toBeGreaterThan(0);
     expect(current.history).toEqual(original.history);

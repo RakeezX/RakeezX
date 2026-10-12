@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "taskId": "continuous-n58-fresh-live-20261012",
+  "runId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+  "baseSha": "b5e83107222833f5e74530a73355734d8477bd03",
+  "preservedCommits": [
+    "2b6e14cd2985c5836173137eab8badb75125c0c6",
+    "485828751af07544606ca27619228bd831620872",
+    "a6d380db8de1e3c937a51ba8993659557db53deb",
+    "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2"
+  ],
+  "reconciliation": "Selective patches; preserved current N49 owner/lease DB/store guards, later export/Home/CSS work and SW generation/assets. Only added runtime dependency and v53.",
+  "localContracts": {
+    "status": "PASS",
+    "tests": 118,
+    "fail": 0,
+    "log": "tests/n58-targeted-0338c38c.tap"
+  },
+  "renderedUi": {
+    "status": "PASS",
+    "url": "http://127.0.0.1:5173",
+    "spec": "tests/n58-client-controls-0457-3.e2e.mjs",
+    "tests": 2,
+    "scope": "Fresh synthetic local and Demo; actual application DOM/handlers/CSS; G/W/G, term scopes, retained history, 1440/390/320 light/dark RTL; zero Supabase/Auth requests; NOT live"
+  },
+  "authPreparation": {
+    "harnessTests": 10,
+    "canonicalTests": {
+      "pass": 18,
+      "fail": 5,
+      "errorCode": "PRIVATE_ACL_REQUIRED",
+      "platform": "Windows"
+    },
+    "privatePreflight": {
+      "status": "FAIL",
+      "errorCode": "PRIVATE_PATH_GIT_CHECK_FAILED",
+      "exactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/d087/0338c38c-c28e-41c3-b807-75ea70b28291/private/state.json",
+      "gitCheckIgnoreExit": 1,
+      "repeatedCheckExit": 1
+    },
+    "authAccountsCreated": 0,
+    "functionsDeployed": 0,
+    "fixtureOperations": 0
+  },
+  "migrations": [
+    {
+      "path": "supabase/migrations/20261004070000_n58_calendar_persistence.sql",
+      "observedServerVersion": "20261005052506",
+      "historicalBlob": "1b88ae22bdc5e4e12ec4aa5a64e3d19799fa89e0",
+      "candidateBlob": "1b88ae22bdc5e4e12ec4aa5a64e3d19799fa89e0",
+      "reapplied": false
+    },
+    {
+      "path": "supabase/migrations/20261004070001_n58_extra_term_compatibility.sql",
+      "observedServerVersion": "20261005052526",
+      "historicalBlob": "92c33ab320f65618499e8ee2353e430266f16bf9",
+      "candidateBlob": "92c33ab320f65618499e8ee2353e430266f16bf9",
+      "reapplied": false
+    },
+    {
+      "path": "supabase/migrations/20261004070002_n58_effective_scope_revalidation.sql",
+      "observedServerVersion": "20261005052550",
+      "historicalBlob": "fb0f9ce833acfc0668b472635298079bdf408699",
+      "candidateBlob": "fb0f9ce833acfc0668b472635298079bdf408699",
+      "reapplied": false
+    }
+  ],
+  "ancillaryHistoricalFixture": {
+    "file": "tests/cloud-recovery-owner-isolation.test.mjs",
+    "status": "FAIL",
+    "reason": "Existing fixture lacks N49 lease evidence; OFFLINE_LEASE_LIMITED at store.save. Path outside card edit scope; Product guard preserved."
+  },
+  "liveGate": "NOT_RUN",
+  "retentionAndDisarm": "NOT_RUN: no live capabilities or fixtures created",
+  "production": "NOT_RUN",
+  "currentLeaseGuards": {
+    "status": "PASS",
+    "spec": "tests/n49-runtime.test.mjs",
+    "tests": 5,
+    "note": "Full affected file run after selective pattern revealed fixture ordering dependency; protects actual current lease/store/DB/command/Backup boundary."
+  }
+}

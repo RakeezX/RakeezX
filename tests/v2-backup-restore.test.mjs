@@ -19,6 +19,18 @@ import {
 } from '../src/lib/backup-v2.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
+
+// N49 is now part of the current baseline. These disposable local fixtures
+// need normal owner-bound lease evidence; keep the Product write guard enabled.
+const leaseStorage = new Map();
+globalThis.localStorage = {
+  get length() { return leaseStorage.size; },
+  key: index => [...leaseStorage.keys()][index] ?? null,
+  getItem: key => leaseStorage.get(key) ?? null,
+  setItem: (key, value) => leaseStorage.set(key, String(value)),
+  removeItem: key => leaseStorage.delete(key),
+};
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
 const emptyServer = () => Object.fromEntries(SYNC_V2_STORES.map((name) => [name, []]));
@@ -38,10 +50,15 @@ async function rehash(payload) {
 beforeEach(async () => {
   cloud.setMockBackend(null);
   cloud.setMockAuth({ id: OWNER }, { access_token: 'test', user: { id: OWNER } });
+  localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify(cloud.session));
   db.closeDB();
   await activateSyntheticAccountWorkspace({ ownerId: OWNER });
   await db.clearAll();
   await store.init();
+  store.getOfflineLeaseStatus();
+  await runtimeOfflineLease().renew(async () => ({
+    id: OWNER, source: 'supabase-auth-user', verifiedAt: Date.now(),
+  }));
 });
 
 afterEach(async () => {
@@ -67,6 +84,60 @@ test('V5 export is hash-bound with canonical baseline while V3 remains locally r
   assert.equal(validateBackup(legacy).ok, true);
   await restoreBackup(legacy, 'replace');
   assert.equal((await db.get('students', 'legacy:a')).name, 'قديم');
+});
+
+test('N58 V4/V5 local roundtrips preserve selection/scopes/context; omission differs from explicit removal', async () => {
+  const context={yearId:'n58-year',termId:'n58-term',presetId:'sa-general-1448-1449',kind:'study',source:'preset'};
+  const rows={
+    years:[canonical({id:'n58-year',label:'Synthetic',hijriStart:1448,hijriEnd:1449,calendarPresetId:'sa-general-1448-1449',updatedAt:10})],
+    calendars:[canonical({id:'n58-cal',yearId:'n58-year',source:'custom',presetId:'sa-general-1448-1449',termDateOverrides:{'n58-term':{startDate:'2027-07-01',endDate:'2027-07-10'}},updatedAt:10})],
+    sessions:[canonical({id:'n58-session',teachingId:'n58-teaching',date:'2026-10-01',period:1,calendarContext:context,updatedAt:10})],
+  };
+  for(const [name,records] of Object.entries(rows)) await db.putMany(name,records);
+  const full=await buildBackup({sourceOwnerId:OWNER,backupId:'n58-roundtrip'});
+  assert.deepEqual(full.data.calendars.find(r=>r.id==='n58-cal').termDateOverrides,rows.calendars[0].termDateOverrides);
+  for(const version of [4,5]) {
+    const backup=structuredClone(full);backup.version=version;await rehash(backup);
+    // Actual disposable fresh local database, not just a decoder comparison.
+    await db.clearAll();await restoreBackup(backup,'replace');
+    for(const [name,records] of Object.entries(rows)) {
+      const restored=await db.get(name,records[0].id);
+      for(const field of ['calendarPresetId','presetId','termDateOverrides','calendarContext'])
+        if(Object.hasOwn(records[0],field)) assert.deepEqual(restored[field],records[0][field]);
+    }
+    const omitted=structuredClone(backup);
+    for(const records of Object.values(omitted.data)) for(const row of records) {
+      for(const field of ['calendarPresetId','presetId','termDateOverrides','calendarContext']) delete row[field];
+      row.updatedAt=20;
+    }
+    await rehash(omitted);
+    for(const mode of ['merge','replace']) {
+      await restoreBackup(omitted,mode);
+      assert.equal((await db.get('years','n58-year')).calendarPresetId,rows.years[0].calendarPresetId);
+      assert.deepEqual((await db.get('calendars','n58-cal')).termDateOverrides,rows.calendars[0].termDateOverrides);
+      assert.deepEqual((await db.get('sessions','n58-session')).calendarContext,context);
+    }
+    const explicit=structuredClone(backup);
+    Object.assign(explicit.data.years.find(r=>r.id==='n58-year'),{calendarPresetId:null,updatedAt:30});
+    Object.assign(explicit.data.calendars.find(r=>r.id==='n58-cal'),{termDateOverrides:{},updatedAt:30});
+    Object.assign(explicit.data.sessions.find(r=>r.id==='n58-session'),{calendarContext:null,updatedAt:30});
+    await rehash(explicit);await restoreBackup(explicit,'merge');
+    assert.equal((await db.get('years','n58-year')).calendarPresetId,null);
+    assert.deepEqual((await db.get('calendars','n58-cal')).termDateOverrides,{});
+    assert.equal((await db.get('sessions','n58-session')).calendarContext,null);
+  }
+});
+
+test('N58 cloud planning preserves omitted fields and emits explicit override removal without private bypass', async () => {
+  const base=canonical({id:'n58-plan',yearId:'n58-year',source:'custom',presetId:'sa-general-1448-1449',termDateOverrides:{'n58-term':{startDate:'2027-07-01',endDate:'2027-07-10'}},updatedAt:1});
+  const payload={app:'rakeezx',version:5,backupId:'n58-plan',sourceOwnerId:OWNER,exportedAt:'2026-10-02T00:00:00Z',data:{calendars:[structuredClone(base)]},baselines:{calendars:[{id:base.id,revision:1,fieldRevisions:base.fieldRevisions,value:base.serverCanonical}]}};
+  const server=emptyServer();server.calendars=[base.serverCanonical];
+  delete payload.data.calendars[0].presetId;delete payload.data.calendars[0].termDateOverrides;
+  await rehash(payload);assert.equal(planCloudRestore(payload,server,{ownerId:OWNER}).operations.length,0);
+  payload.data.calendars[0].termDateOverrides={};await rehash(payload);
+  const plan=planCloudRestore(payload,server,{ownerId:OWNER});
+  assert.equal(plan.ready,true);assert.deepEqual(plan.operations[0].patch,{term_date_overrides:{}});
+  assert.equal(JSON.stringify(plan).includes('n58_restore'),false);
 });
 
 test('V5 backup survives disposable wipe/replace with mixed direct and SUBITEM provenance', async () => {

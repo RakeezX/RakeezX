@@ -28,11 +28,11 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   years: {
     entity: 'years',
-    fields: { label: 'label', hijriStart: 'hijri_start', hijriEnd: 'hijri_end', order: 'order', status: 'status' },
+    fields: { label: 'label', hijriStart: 'hijri_start', hijriEnd: 'hijri_end', order: 'order', status: 'status', calendarPresetId: 'calendar_preset_id' },
   },
   calendars: {
     entity: 'calendars',
-    fields: { yearId: 'year_id', source: 'source', label: 'label' },
+    fields: { yearId: 'year_id', source: 'source', label: 'label', presetId: 'preset_id', termDateOverrides: 'term_date_overrides' },
     references: { yearId: 'years' },
   },
   calendarDays: {
@@ -160,7 +160,7 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
     fields: {
       teachingId: 'teaching_id', slotId: 'slot_id', timeProfileId: 'time_profile_id', date: 'date',
       period: 'period', startTime: 'start_time', endTime: 'end_time', status: 'status',
-      reason: 'reason', makeupForId: 'makeup_for_id', lessonId: 'lesson_id', note: 'note', homework: 'homework', covered: 'covered',
+      calendarContext: 'calendar_context', reason: 'reason', makeupForId: 'makeup_for_id', lessonId: 'lesson_id', note: 'note', homework: 'homework', covered: 'covered',
     },
     references: { teachingId: 'teachings', slotId: 'slots', timeProfileId: 'timeProfiles', makeupForId: 'sessions' },
   },
@@ -261,7 +261,20 @@ function normalizeRevision(value) {
   return Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
 }
 
+export function encodeTermDateOverrides(value) {
+  if (value == null) return value;
+  return Object.fromEntries(Object.entries(value).map(([id, pair]) => [id, {
+    start_date: pair.startDate, end_date: pair.endDate,
+  }]));
+}
+export function decodeTermDateOverrides(value) {
+  if (value == null) return value;
+  return Object.fromEntries(Object.entries(value).map(([id, pair]) => [id, {
+    startDate: pair.start_date, endDate: pair.end_date,
+  }]));
+}
 function encodeFieldValue(store, field, value) {
+  if (store === 'calendars' && field === 'termDateOverrides') return encodeTermDateOverrides(value);
   if (store === 'sessionRosterSnapshots' && field === 'capturedAt' && Number.isFinite(value)) {
     return new Date(value).toISOString();
   }
@@ -275,6 +288,7 @@ function encodeFieldValue(store, field, value) {
 }
 
 function decodeFieldValue(store, field, value, row) {
+  if (store === 'calendars' && field === 'termDateOverrides') return decodeTermDateOverrides(value);
   if (store === 'sessionRosterSnapshots' && field === 'capturedAt') {
     const parsed = Date.parse(value);
     return Number.isFinite(parsed) ? parsed : 0;
@@ -295,6 +309,11 @@ export function encodeSyncV2Patch(store, localPatch = {}) {
   const schema = schemaFor(store);
   const patch = {};
   for (const [localField, serverField] of Object.entries(schema.fields)) {
+    // Released official projections carry a local presetId, but N58 scope
+    // authority belongs only to custom Calendars. Preserve that local metadata
+    // without serializing it as a new server-owned scope during bootstrap.
+    if (store === 'calendars' && hasOwn(localPatch, 'source') && localPatch.source !== 'custom' &&
+        ['presetId', 'termDateOverrides'].includes(localField)) continue;
     if (hasOwn(localPatch, localField)) patch[serverField] = encodeFieldValue(store, localField, localPatch[localField]);
   }
   if (store === 'profile' && !hasOwn(localPatch, 'reportPrincipalName') && hasOwn(localPatch, 'principalName')) {
@@ -359,13 +378,21 @@ function uniqueDependencies(dependencies) {
   });
 }
 
+export function calendarDependencies(store, record) {
+  if (store === 'calendars') return Object.keys(record.termDateOverrides ?? {}).map(recordId => ({ store: 'terms', recordId, requiresServerRevision: true }));
+  if (store === 'sessions' && record.calendarContext) return [
+    { store: 'years', recordId: record.calendarContext.yearId, requiresServerRevision: true, calendarPresetId: record.calendarContext.presetId },
+    { store: 'terms', recordId: record.calendarContext.termId, requiresServerRevision: true },
+  ];
+  return [];
+}
 function mutationScope(store) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
-  return [...new Set([store, 'outbox', 'device', ...Object.values(references)])];
+  return [...new Set([store, 'outbox', 'device', ...Object.values(references), ...(store === 'calendars' ? ['terms'] : store === 'sessions' ? ['years','terms'] : [])])];
 }
 
 function inferredDependencies(store, record, current, supplied) {
-  const dependencies = [...(supplied ?? [])];
+  const dependencies = [...(supplied ?? []), ...calendarDependencies(store, record)];
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   for (const [field, parentStore] of Object.entries(references)) {
     const parentId = record[field];
@@ -511,10 +538,24 @@ function pushUniquePut(batch, record) {
   else batch.put.push(record);
 }
 
+function rewriteCalendarReferences(store, record, targetStore, oldId, newId) {
+  let next = record;
+  if (store === 'calendars' && targetStore === 'terms' && hasOwn(record.termDateOverrides ?? {}, oldId)) {
+    const overrides = { ...record.termDateOverrides, [newId]: clone(record.termDateOverrides[oldId]) };
+    delete overrides[oldId]; next = { ...next, termDateOverrides: overrides };
+  }
+  const field = targetStore === 'years' ? 'yearId' : targetStore === 'terms' ? 'termId' : null;
+  if (store === 'sessions' && field && record.calendarContext?.[field] === oldId) {
+    next = { ...next, calendarContext: { ...record.calendarContext, [field]: newId } };
+  }
+  return next;
+}
 function rewriteReferenceRecord(store, record, targetStore, oldId, newId) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   let changed = false;
-  const next = { ...record };
+  const nested = rewriteCalendarReferences(store, record, targetStore, oldId, newId);
+  changed = nested !== record;
+  const next = { ...nested };
   for (const [field, parentStore] of Object.entries(references)) {
     if (parentStore === targetStore && next[field] === oldId) {
       next[field] = newId;
@@ -599,6 +640,16 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
     }
   }
 
+  const nestedLocal = rewriteCalendarReferences(mutation.store, localPatch, targetStore, oldId, newId);
+  const decodedServer = mutation.store === 'calendars' && hasOwn(serverPatch, 'term_date_overrides')
+    ? { termDateOverrides: decodeTermDateOverrides(serverPatch.term_date_overrides) }
+    : mutation.store === 'sessions' && hasOwn(serverPatch, 'calendar_context') ? { calendarContext: serverPatch.calendar_context } : {};
+  const nestedServer = rewriteCalendarReferences(mutation.store, decodedServer, targetStore, oldId, newId);
+  if (nestedLocal !== localPatch || nestedServer !== decodedServer) {
+    if (mutation.envelopeLocked) return { ...mutation, state: 'blocked', blockedReason: 'canonical-reference-remap-after-dispatch' };
+    Object.assign(localPatch, nestedLocal);
+    Object.assign(serverPatch, encodeSyncV2Patch(mutation.store, nestedServer)); changed = true;
+  }
   const dependencies = (mutation.dependencies ?? []).map((dependency) => {
     if (dependency.store === targetStore && dependency.recordId === oldId) {
       changed = true;
@@ -843,12 +894,20 @@ export function createSyncV2Engine({
 
   async function markAttempt(mutation) {
     let locked = mutation;
-    await database.applyBatch({ outbox: {} }, {
+    await database.applyBatch({ outbox: {}, years: {} }, {
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        let patch = existing.patch;
+        if (!existing.envelopeLocked && existing.op === 'create' && existing.store === 'sessions' && patch.calendar_context) {
+          const year = current.years.find(row => row.id === patch.calendar_context.yearId);
+          const canonical = year?.serverCanonical ?? year;
+          const revision = normalizeRevision(canonical?.fieldRevisions?.calendar_selection);
+          if (!revision || canonical.calendarPresetId !== patch.calendar_context.presetId) throw new Error('Calendar selection acknowledgement is required.');
+          patch = { ...patch, calendar_context: { ...patch.calendar_context, selectionRevision: revision } };
+        }
         locked = {
-          ...existing,
+          ...existing, patch,
           state: 'pending',
           envelopeLocked: true,
           attemptCount: (existing.attemptCount ?? 0) + 1,
@@ -1166,6 +1225,15 @@ export function createSyncV2Engine({
       if (parent.deleted && !deletingThisSession) return { state: 'rejected', reason: 'dependency-deleted' };
       if (dependency.requiresServerRevision && normalizeRevision(parent.serverRevision) === 0) {
         return { state: 'blocked', reason: 'dependency-not-authoritative' };
+      }
+      if (dependency.calendarPresetId) {
+        const pendingSelection = rows.find(row => row.store === 'years' &&
+          [row.recordId, row.serverRecordId].includes(dependency.recordId) && hasOwn(row.patch ?? {}, 'calendar_preset_id'));
+        if (pendingSelection) return { state: 'blocked', reason: pendingSelection.state === 'failed' ? 'dependency-failed' : 'calendar-selection-pending' };
+        const canonical = parent.serverCanonical ?? parent;
+        if (canonical.calendarPresetId !== dependency.calendarPresetId || normalizeRevision(canonical.fieldRevisions?.calendar_selection) === 0) {
+          return { state: 'blocked', reason: 'calendar-selection-precondition' };
+        }
       }
       const createMutation = rows.find((row) => row.store === dependency.store &&
         (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId) && row.op === 'create');

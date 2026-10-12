@@ -1,3 +1,4 @@
+import { resolveCalendarRuntime } from '../src/lib/calendar-runtime.js';
 import 'fake-indexeddb/auto';
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -32,11 +33,15 @@ function assertReference(actual, presetId) {
   assert.deepEqual(actual.years.map((row) => row.id), ['demo:year:1448']);
   assert.equal(actual.years[0].calendarPresetId, presetId);
   assert.deepEqual(actual.terms.map((row) => row.id), ['demo:term:1', 'demo:term:2']);
-  assert.deepEqual(actual.terms.map((row) => [row.startDate, row.endDate]),
+  const projection = resolveCalendarRuntime({year:actual.years[0],terms:actual.terms,presetId});
+  assert.equal(projection.ok,true);
+  assert.deepEqual(projection.terms.map((row) => [row.startDate, row.endDate]),
     reference.terms.map((row) => [row.startDate, row.endDate]));
   assert.deepEqual(actual.calendars.map((row) => row.id), ['demo:calendar']);
-  assert.equal(actual.calendars[0].source, `preset:${presetId}`);
-  assert.equal(actual.days.length, reference.calendarDays.length);
+  // Official rows remain historical bytes; selection drives the read projection.
+  if (store.state.ready) assert.equal(store.calendarsOf(actual.years[0].id).find(c=>c.projected).source, `preset:${presetId}`);
+  if (store.state.ready) assert.equal(store.calendarDaysOf(store.calendarsOf(actual.years[0].id).find(c=>c.projected).id).length,reference.calendarDays.length);
+  else assert.equal(actual.days.length,reference.calendarDays.length);
   assert.equal(actual.days.some((row) => row.date === '2026-09-23' && row.kind === 'national'), true);
   assert.equal(actual.outbox.length, 0);
 }
@@ -71,7 +76,8 @@ test('fresh and upgraded Demo use official Calendar data with stable local ident
       GENERAL_1448_1449_PRESET_ID, WESTERN_1448_1449_PRESET_ID]) {
       assert.equal((await applyDemoCalendarPreset(presetId)).ok, true);
       assertReference(await counts(), presetId);
-      assert.equal(store.state.device.preferredEducationRegion, presetId);
+      assert.equal(store.getYear('demo:year:1448').calendarPresetId,presetId);
+      assert.equal(store.state.device.preferredEducationRegion,WESTERN_1448_1449_PRESET_ID, 'device preference is not selection authority');
       for (const name of historicalStores) assert.deepEqual(await db.getAll(name), historyBefore[name], name);
     }
 
@@ -101,6 +107,9 @@ test('upgrading a Demo retains a legacy term referenced by historical teaching',
     assert.equal((await db.get('terms', 'demo:term:past')).deleted, false);
     assert.equal((await db.get('teachings', old.teachings[0].id)).termId, 'demo:term:past');
     assert.equal((await db.getAll('terms')).filter((term) => !term.deleted).length, 3);
+    await store.init();
+    assert.equal(store.effectiveCalendar('demo:year:1448').ok,true);
+    assert.equal(store.effectiveTerm('demo:term:past').id,'demo:term:past');
   } finally {
     store.closeChannel();
     store.deactivateWorkspace('demo-calendar-history-test-done');

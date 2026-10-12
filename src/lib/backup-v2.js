@@ -93,7 +93,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
   const before = comparable(storeName, baseline.value);
   const local = comparable(storeName, backupRecord);
   const remote = comparable(storeName, serverRecord);
-  const fields = Object.keys(local);
+  const fields = Object.keys(local).filter(field => ['calendarPresetId','presetId','termDateOverrides','calendarContext'].includes(field) ? hasOwn(backupRecord, field) : true);
   const localChanged = fields.filter((field) => !equal(local[field], before[field]));
   const serverChanged = fields.filter((field) => !equal(remote[field], before[field]));
   if (!localChanged.length) return { ...identity, classification: 'KEEP_SERVER', reason: 'backup-unchanged' };

@@ -336,6 +336,7 @@ export async function restoreBackup(payload, mode = 'merge') {
 
   const written = await db.writeAll(data, mode === 'replace' ? 'replace' : 'merge', {
     keep: DEVICE_ONLY_STORES,
+    preserveOmittedFields: { years: ['calendarPresetId'], calendars: ['presetId','termDateOverrides'], sessions: ['calendarContext'] },
   });
   return { written, migration: null, skipped };
 }

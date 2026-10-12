@@ -264,7 +264,7 @@ export async function markDeleted(predicates, stamp = Date.now(), outboxFor = nu
  * في وضع الاستبدال يقع المسح والكتابة معًا: إن فشل أي سجل تراجعت المعاملة
  * كاملة وبقيت البيانات كما كانت — لا حالة جزئية.
  */
-export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
+export async function writeAll(data, mode = 'merge', { keep = [], preserveOmittedFields = {} } = {}) {
   const names = STORES.filter((s) => Array.isArray(data[s]));
   const db = await openDB();
 
@@ -272,38 +272,30 @@ export async function writeAll(data, mode = 'merge', { keep = [] } = {}) {
     const tx = db.transaction(STORES, 'readwrite');
     let written = 0;
 
-    guardStudentLifecycle(tx, (device) => { if (mode === 'replace') {
-      // `keep` تُستثنى من المسح: إعدادات الجهاز تبقى ملك الجهاز حتى في الاستبدال
+    guardStudentLifecycle(tx, (device) => {
       for (const name of STORES) {
-        if (keep.includes(name)) continue;
-        tx.objectStore(name).clear();
+        if (mode === 'replace' && !keep.includes(name) && !names.includes(name)) tx.objectStore(name).clear();
       }
       for (const name of names) {
-        const os = tx.objectStore(name);
-        for (const r of data[name]) {
-          os.put(r);
-          written++;
-        }
-      }
-    } else {
-      for (const name of names) {
-        const os = tx.objectStore(name);
-        const all = os.getAll();
+        const os = tx.objectStore(name), all = os.getAll();
         all.onsuccess = () => {
           try {
             checkProductWrite(device);
-            const existing = new Map(all.result.map((r) => [r.id, r]));
-            for (const r of data[name]) {
-              const cur = existing.get(r.id);
-              if (!cur || (r.updatedAt ?? 0) >= (cur.updatedAt ?? 0)) {
-                os.put(r);
-                written++;
+            const existing = new Map(all.result.map(r => [r.id, r]));
+            if (mode === 'replace' && !keep.includes(name)) os.clear();
+            for (const record of data[name]) {
+              const cur = existing.get(record.id);
+              if (mode !== 'replace' && cur && (record.updatedAt ?? 0) < (cur.updatedAt ?? 0)) continue;
+              const next = { ...record };
+              for (const field of preserveOmittedFields[name] ?? []) {
+                if (!Object.hasOwn(record, field) && cur && Object.hasOwn(cur, field)) next[field] = structuredClone(cur[field]);
               }
+              os.put(next); written++;
             }
           } catch (error) { tx.lifecycleError = error; tx.abort(); }
         };
       }
-    } }, false, true);
+    }, false, true);
 
     tx.oncomplete = () => resolve(written);
     tx.onerror = () => reject(tx.error);
