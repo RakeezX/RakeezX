@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "receivedAt": "2026-10-12T22:15:33Z",
+  "receivedAtLocal": "2026-10-13T01:15:33+03:00",
+  "source": "Direct PO instructions in the current ChatGPT conversation",
+  "accepted": [
+    {
+      "productId": "N96",
+      "taskId": "continuous-n96-student-delete-sync-flash-20261012",
+      "publishedSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+      "quote": "N96 اعتمد اغلق."
+    },
+    {
+      "productId": "N54",
+      "taskId": "continuous-n54-keyboard-compression-20261012",
+      "publishedSha": "f23abc0e850f38024102821d1406c4e160152c0b",
+      "quote": "N54 فيه تحسن واضح في فتح الكبيورد ومربعات النص في الايفون. اعتمد اغلق.",
+      "deviceEvidence": "PO reports actual iPhone keyboard and text-field improvement"
+    }
+  ],
+  "projectInstructionsPoConfirmedUpdated": true,
+  "requests": {
+    "N13": "PO 2026-10-13 01:15 Asia/Riyadh: replace the additional new/existing selector with the ordinary grade/section/subject form; automatically reuse the active matching Section and its roster for another subject. Same grade/section/subject/current term must show a clear already-exists warning, keep the form open, and write nothing; no false success. Preserve Sync command idempotency and previous-term behavior. Prior release `63b2c1fc29361d6c4c1ac066a743efaf3f2e31b8` was published but this revision is not yet accepted.",
+    "N49": "PO 2026-10-13 01:15 Asia/Riyadh requested a separate HTTPS Preview: NORMAL through 180000ms, editable REMINDER strictly after 180000ms, LIMITED at 360000ms. Reading, export and backup remain available; every write including Restore is blocked. Production retains 7/14 days. This request alone is not evidence that Preview was deployed or tested.",
+    "N77": "PO 2026-10-13 01:15 Asia/Riyadh gives deletion high priority immediately after N13/N49. Native controller snapshot 2026-10-12T22:55:33.783Z: latest real-delete attempt is BLOCKED; the worker reports harness corrections committed and locally checked, but its exact synthetic pair is retired and both functions disarmed. Preserve that disposition, inspect the concrete result, and continue through the existing bounded capability after a material correction. No claim of Product delivery or closure."
+  },
+  "deferred": "Remain deferred until current open tickets finish and PO triage",
+  "gitHubAccess": {
+    "verifiedAt": "2026-10-12T22:51:28Z",
+    "repository": "RakeezX/RakeezX",
+    "readAndAdminPushPermissionsObserved": true
+  },
+  "nativeApplication": {
+    "queueClosureAndUpdatedCards": "PENDING_NATIVE_INSTALL",
+    "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record"
+  },
+  "evidence": {
+    "controllerSnapshotAt": "2026-10-12T22:55:33.783Z",
+    "controllerAlive": true,
+    "runningCount": 0,
+    "pendingCount": 0,
+    "idleReason": "NO_ACTIVATED_PENDING_CARDS"
+  },
+  "noProductCodeChange": true
+}

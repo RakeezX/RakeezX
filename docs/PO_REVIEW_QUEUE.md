@@ -7,7 +7,10 @@ This page preserves user notes and acceptance context. The automatic block lists
 
 | التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
 | --- | --- | --- | --- | --- | --- |
-| N49 | مهلة العمل دون اتصال: تذكير بعد تجاوز 7 أيام ووضع قراءة فقط عند 14 يومًا؛ منشور ومتحقق، ينتظر قبول PO | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
+| N49 | Production: تذكير بعد تجاوز 7 أيام وقراءة فقط عند 14 يومًا؛ طلب PO رابط Preview مستقل بمهلتي 3 و6 دقائق، لم يُسلم بعد | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
+
+
+PO update — 2026-10-13 01:15 Asia/Riyadh: N96 and N54 explicitly accepted/CLOSED. N13 remains OPEN for a single grade/section/subject form and current-term duplicate rejection; its earlier published version is not acceptance of this revision. N77 has high priority after N13 and N49. Deferred tickets remain deferred. See `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`.
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
