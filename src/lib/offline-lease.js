@@ -8,12 +8,25 @@ const DAY = 86400000;
 const ROLLBACK_TOLERANCE = 120000;
 const production = Object.freeze({ reminder: 7 * DAY, limited: 14 * DAY });
 
+// N49 Preview artifact: preview/n49-3m6m-20261013. This source variant is
+// deployed only to that branch. Main keeps the original 7/14-day source.
+const preview = Object.freeze({ reminder: 180000, limited: 360000 });
+export function isOfflineLeasePreview() {
+  const { protocol, hostname } = globalThis.location ?? {};
+  return protocol === 'https:' && (
+    hostname === 'preview-n49-3m6m-20261013.rakeezx.pages.dev' ||
+    /^[a-f0-9]{8}\.rakeezx\.pages\.dev$/.test(hostname ?? '')
+  );
+}
+
 export function leaseThresholds() {
-  // Only a compiled test build on the explicitly bounded loopback origin.
-  // No query string or persisted preference participates in this decision.
+  // The branch-specific raw ESM asset is itself the Preview build marker.
+  // Production hosts, query strings and preferences cannot enable this mode.
+  if (isOfflineLeasePreview()) return preview;
+  // The existing isolated browser fixture exercises the same short thresholds.
   return import.meta.env?.MODE === 'n49-test' &&
     globalThis.location?.hostname === '127.0.0.1'
-    ? { reminder: 120000, limited: 300000 } : production;
+    ? preview : production;
 }
 
 export function workspaceLeaseBinding(workspace) {

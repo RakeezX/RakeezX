@@ -87,7 +87,7 @@ const snapshot = (page) => page.evaluate(async () => {
   return Object.fromEntries(await Promise.all(db.STORES.map(async (name) => [name, await db.getAll(name)])));
 });
 
-test('account Product: durable offline browser restart, 2/5 minute reminder/LIMITED, RTL reads/Backup/Export, renewal and tab/device isolation', async ({}, testInfo) => {
+test('account Product: durable offline browser restart, 3/6 minute reminder/LIMITED, RTL reads/Backup/Export, renewal and tab/device isolation', async ({}, testInfo) => {
   const preview = await serve(true);
   const profile = await mkdtemp(path.join(os.tmpdir(), 'rakeez-n49-owned-profile-'));
   let context, secondDevice;
@@ -125,15 +125,27 @@ test('account Product: durable offline browser restart, 2/5 minute reminder/LIMI
     const grade = page.locator('input[data-change="score"]').first();
     await expect(grade).toBeVisible(); await grade.fill('6'); await grade.blur();
     await expect.poll(() => page.evaluate(async () => (await import('/src/lib/db.js')).getAll('scores').then((rows) => rows[0]?.value))).toBe(6);
-    // Exact reminder boundary: 2 minutes still has no warning, then reminder only.
-    await page.clock.setFixedTime(START + 120000); expect((await status(page)).state).toBe('NORMAL');
-    await page.clock.setFixedTime(START + 120001); await repaint(page);
+    // Exact reminder boundary: 3 minutes still has no warning, then reminder only.
+    await page.clock.setFixedTime(START + 180000); expect((await status(page)).state).toBe('NORMAL');
+    await page.clock.setFixedTime(START + 180001); await repaint(page);
     await expect(page.locator('[data-offline-lease="REMINDER"]')).toBeVisible();
     expect((await status(page)).editable).toBe(true);
     await page.screenshot({ path: testInfo.outputPath('reminder-desktop.png'), fullPage: true });
-    await page.clock.setFixedTime(START + 300000); await repaint(page);
+    await page.clock.setFixedTime(START + 359999);
+    expect((await status(page)).state).toBe('REMINDER');
+    expect((await status(page)).editable).toBe(true);
+    await page.clock.setFixedTime(START + 360000); await repaint(page);
     await expect(page.locator('[data-offline-lease="LIMITED"]')).toBeVisible();
     const before = await snapshot(page);
+    // Both cloud Restore entry points must stop before any provider request or write.
+    expect(await page.evaluate(async () => {
+      const cloud = await import('/src/lib/cloud.js');
+      return Promise.all(['stageSyncV2Restore', 'stageScoreRestoreV2'].map(async (name) => {
+        try { await cloud[name]({}); return 'unexpected-success'; }
+        catch (error) { return error.code; }
+      }));
+    })).toEqual(['OFFLINE_LEASE_LIMITED', 'OFFLINE_LEASE_LIMITED']);
+    expect(await snapshot(page)).toEqual(before);
     await grade.fill('9'); await grade.blur();
     await expect(page.locator('#toast')).toContainText('يلزم التحقق');
     expect(await snapshot(page)).toEqual(before);
@@ -156,7 +168,7 @@ test('account Product: durable offline browser restart, 2/5 minute reminder/LIMI
     await expect(page.locator('[data-offline-lease="LIMITED"]')).toBeVisible();
     const beforeRenewal = await snapshot(page);
     // A second tab sharing storage cannot bypass LIMITED by a fresh module.
-    const staleTab = await context.newPage(); await staleTab.clock.setFixedTime(START + 300000);
+    const staleTab = await context.newPage(); await staleTab.clock.setFixedTime(START + 360000);
     await staleTab.goto(preview.url + '/'); await ready(staleTab);
     expect((await status(staleTab)).editable).toBe(false);
     await staleTab.close();
@@ -169,7 +181,7 @@ test('account Product: durable offline browser restart, 2/5 minute reminder/LIMI
     // Device B has an independent account-capable Product DB and no A authority.
     secondDevice = await chromium.launch();
     const deviceContext = await secondDevice.newContext({ serviceWorkers: 'block' }); await mock(deviceContext, () => false, B);
-    const devicePage = await deviceContext.newPage(); await devicePage.clock.setFixedTime(START + 300000);
+    const devicePage = await deviceContext.newPage(); await devicePage.clock.setFixedTime(START + 360000);
     await seed(devicePage, preview.url, [B]); await devicePage.goto(preview.url + '/'); await ready(devicePage);
     expect((await status(devicePage)).editable).toBe(false);
     const receiptA = await page.evaluate((key) => localStorage.getItem(key), leaseKey);
@@ -207,11 +219,11 @@ test('account Product: durable offline browser restart, 2/5 minute reminder/LIMI
     // Persist a high-water observation, then restart the complete browser with
     // the wall clock clearly behind it. Ordinary restart cannot reset age.
     const beforeRollback = await snapshot(page);
-    await page.clock.setFixedTime(START + 300000 + 86400000); await status(page);
+    await page.clock.setFixedTime(START + 360000 + 86400000); await status(page);
     await context.close(); context = null;
     context = await launch(); await mock(context, () => canVerify); await context.setOffline(true);
     page = await context.newPage(); page.on('pageerror', (error) => pageErrors.push(error.message));
-    await page.clock.setFixedTime(START + 300000);
+    await page.clock.setFixedTime(START + 360000);
     await page.goto(preview.url + '/#/settings/backup'); await ready(page);
     expect((await status(page)).reason).toBe('clock-rollback');
     expect(await snapshot(page)).toEqual(beforeRollback);
@@ -242,7 +254,7 @@ test('raw Production shell keeps 7/14 days despite query and persisted Preview p
     await page.goto(production.url + '/?n49TestMode=1'); await ready(page);
     await expect.poll(async () => (await status(page)).state).toBe('NORMAL');
     canVerify = false;
-    await page.clock.setFixedTime(START + 300000);
+    await page.clock.setFixedTime(START + 360000);
     expect((await status(page)).state).toBe('NORMAL');
     await page.clock.setFixedTime(START + 7 * 86400000);
     expect((await status(page)).state).toBe('NORMAL');

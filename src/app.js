@@ -13,7 +13,7 @@ import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
-import { LEASE_STORAGE_PREFIX } from './lib/offline-lease.js';
+import { LEASE_STORAGE_PREFIX, isOfflineLeasePreview } from './lib/offline-lease.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { captureSupportOriginBeforeNavigation, clearSupportOrigin, enterSupportVisit } from './lib/support-origin.js';
 import { setRepaint } from './repaint.js';
@@ -746,7 +746,7 @@ async function boot() {
   const leaseTimer = setInterval(() => {
     const next = store.getOfflineLeaseStatus().state;
     if (next !== leasePresentation) { leasePresentation = next; scheduleRender(); }
-  }, 30000);
+  }, isOfflineLeasePreview() ? 1000 : 30000);
   store.onWorkspaceDeactivation(() => clearInterval(leaseTimer));
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') onPresentationWake();
