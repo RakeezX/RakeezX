@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "verifiedOn": "2026-10-12",
+  "sdk": {
+    "specifier": "npm:@supabase/supabase-js@2.117.3",
+    "version": "2.117.3",
+    "commit": "4d23055805ce2cf853686b704cfaec1a701d29c6",
+    "releaseUrl": "https://github.com/supabase/supabase-js/releases/tag/v2.117.3",
+    "npmIntegrity": "sha512-K+f8PimXDunPWQ63CKRXaF5pbVPJxmfw5ryAnh0s9S9PkwcuqBjiSpIaqpF7KLDljeYwXIL85ST8QxaO0+XuvA==",
+    "sources": [
+      "https://raw.githubusercontent.com/supabase/supabase-js/4d23055805ce2cf853686b704cfaec1a701d29c6/packages/core/auth-js/src/GoTrueAdminApi.ts",
+      "https://raw.githubusercontent.com/supabase/supabase-js/4d23055805ce2cf853686b704cfaec1a701d29c6/packages/core/auth-js/src/lib/types.ts",
+      "https://raw.githubusercontent.com/supabase/supabase-js/4d23055805ce2cf853686b704cfaec1a701d29c6/packages/core/auth-js/src/lib/fetch.ts",
+      "https://raw.githubusercontent.com/supabase/supabase-js/4d23055805ce2cf853686b704cfaec1a701d29c6/packages/core/auth-js/src/lib/constants.ts"
+    ],
+    "lock": "No dependency installation or Deno cache operation was performed; no fabricated deno.lock. Entry version/direct SDK package source pinned. Actual provider bundling remains an activation check."
+  },
+  "authServerReference": {
+    "commit": "ce9a8eee0cc042be8c7a42981a7ddae631e41d91",
+    "deployedBuildClaim": false,
+    "sources": [
+      "https://raw.githubusercontent.com/supabase/auth/ce9a8eee0cc042be8c7a42981a7ddae631e41d91/internal/api/admin.go",
+      "https://raw.githubusercontent.com/supabase/auth/ce9a8eee0cc042be8c7a42981a7ddae631e41d91/internal/models/user.go",
+      "https://raw.githubusercontent.com/supabase/auth/ce9a8eee0cc042be8c7a42981a7ddae631e41d91/internal/api/token.go",
+      "https://raw.githubusercontent.com/supabase/auth/ce9a8eee0cc042be8c7a42981a7ddae631e41d91/internal/tokens/service.go",
+      "https://raw.githubusercontent.com/supabase/auth/ce9a8eee0cc042be8c7a42981a7ddae631e41d91/internal/api/logout.go"
+    ]
+  },
+  "methods": {
+    "getUserById": "GET /auth/v1/admin/users/{uuid}; only 404+user_not_found is absent",
+    "createUser": "POST /auth/v1/admin/users; explicit id,email,password,email_confirm,app_metadata",
+    "getUser": "GET /auth/v1/user with real user JWT; must match fixed fixture owner and marker",
+    "globalSignOut": "POST /auth/v1/logout?scope=global using actual user JWT; does not invalidate old access JWT",
+    "ban": "PUT /auth/v1/admin/users/{uuid} body {ban_duration:'876000h'}; fresh exact GET must confirm banned_until; ban itself does not revoke sessions",
+    "delete": "not exposed by this implementation"
+  },
+  "docs": [
+    "https://supabase.com/docs/guides/functions/secrets",
+    "https://supabase.com/docs/guides/functions/auth",
+    "https://supabase.com/docs/reference/javascript/auth-admin-createuser",
+    "https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid",
+    "https://supabase.com/docs/guides/auth/signout"
+  ],
+  "changelog": {
+    "requested": "https://supabase.com/changelog.md",
+    "fallbackRead": "https://supabase.com/changelog",
+    "relevantCheck": "Current hosted Auth admin methods verified against pinned SDK/server source; no changelog entry requiring a schema/Auth-policy/gateway change for this scoped implementation. No self-hosted upgrades, OAuth client changes or new server framework introduced."
+  }
+}

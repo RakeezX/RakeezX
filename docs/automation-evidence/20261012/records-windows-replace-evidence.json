@@ -1,0 +1,27 @@
+{
+  "fixtureOnly": true,
+  "noDeviceMutation": true,
+  "nativePowerShellExecuted": false,
+  "createdAt": "2026-10-12T10:40:45.693459+00:00",
+  "observedProductionFailure": "Root observed fs.rename(temp, existing docs/PRODUCT_LEDGER.md) return EPERM on Windows for N95/N84/N49.",
+  "command": "node --test --test-name-pattern='Windows EPERM' product-records.test.mjs",
+  "result": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 113.510245
+  },
+  "assertions": [
+    "Injected EPERM on the existing dated N13 row reaches one encoded .NET File.Replace fallback and preserves the exact historical Product note.",
+    "Generated PowerShell rechecks the SHA-256 of before ahead of File.Replace; source contains no ACL, global execution-policy, Bypass, or destination-removal commands.",
+    "Concurrent Product edit during failed rename is detected by the second before comparison; native fallback is not invoked and the edit remains exact.",
+    "Temporary files are removed on success and refusal."
+  ],
+  "limits": [
+    "Child-process invocation is stubbed in this Linux fixture; it does not itself prove the native .NET operation on Windows.",
+    "The same three-argument File.Replace pattern already succeeded in the root-operated Windows installers; installation and actual runtime record synchronization remain owned by root.",
+    "The former N13 2-test regression results remain historical evidence; no broader Product or controller suite was rerun for this followup."
+  ],
+  "moduleSha256": "888e03622c4736084e264c24e8b6be7b537581a6473bfca6bb4342745e82847b"
+}

@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "frozenOn": "2026-10-12",
+  "activationPerformed": false,
+  "installRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087",
+  "implementationSha256": "a6f29f9aa071ac7bad5dd585af5657f42eec879ca09a6bdd8dc257a47925f1e5",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 12592,
+      "sha256": "ce44eea32bffdb10c495e053318f0d81cc2b0dac112c18311c05ce4dfc9487e1"
+    },
+    {
+      "path": "closed-entry.ts",
+      "bytes": 384,
+      "sha256": "8a488bf9414c8063e93ef57a67323d70098a0edc4261594b3f719c7d3eae5e9e"
+    },
+    {
+      "path": "edge-entry.ts",
+      "bytes": 1517,
+      "sha256": "701e6ca90882e7a306080fe24c414f5732ed25b738676ed24db365ca586a21e4"
+    },
+    {
+      "path": "evidence/authority.readonly.json",
+      "bytes": 7414,
+      "sha256": "0d36b2adeed4d1bf74e956508990231dbb296d3481feb6ea09439263e84832c3"
+    },
+    {
+      "path": "evidence/live-schema.readonly.json",
+      "bytes": 18618,
+      "sha256": "053da7b81dc3dce66d71d90e7dfc49d1b3679b70773d65c8a68b0bd84f27c410"
+    },
+    {
+      "path": "evidence/n58-candidate-sources.json",
+      "bytes": 100685,
+      "sha256": "1d143a9d5c88c614ad01274650fb19fae03ebc9ca04640a1b9f680a4e8767754"
+    },
+    {
+      "path": "evidence/n58-current-guard.readonly.json",
+      "bytes": 12348,
+      "sha256": "ae32e14220ae115d21ebcd54bf2ed4f909e88cb38b105b8c1760ba89e99b7b60"
+    },
+    {
+      "path": "evidence/n58-foundation-sources.json",
+      "bytes": 44774,
+      "sha256": "e27158f4fa3db3afde09e47a47bf9afc4f1a619c039370ed5fcbe0a8c1b0e93d"
+    },
+    {
+      "path": "evidence/n58-main-comparison.readonly.json",
+      "bytes": 13088,
+      "sha256": "3836a63701d9322245ea234f7a38a80844cee37bee19e62dc993f9196cf9db59"
+    },
+    {
+      "path": "fixture-contract.json",
+      "bytes": 15556,
+      "sha256": "91c12bf31930c46ca30e55f124f66dd4c7125ed9cd4730d2b4c2549c219fa21a"
+    },
+    {
+      "path": "handler-core.mjs",
+      "bytes": 13820,
+      "sha256": "04756298828c9f261225eb03369afeebb98c134dec3e641f2f3b1e10101e1af2"
+    },
+    {
+      "path": "handler.test.mjs",
+      "bytes": 14990,
+      "sha256": "293fde1278a84cb02376134712c33ceaffc6e9d45a21bfb3368fb6a76d88c501"
+    },
+    {
+      "path": "private-state.mjs",
+      "bytes": 5620,
+      "sha256": "ff8e90682482439f2401d70a64fa0db566cd6d0e498726a583e7376c93296de5"
+    },
+    {
+      "path": "run.mjs",
+      "bytes": 28922,
+      "sha256": "eee2f2d677f28b7b7db65dc9349426491cad464bcb63278dd3c3fa4b2f98f445"
+    },
+    {
+      "path": "runner.test.mjs",
+      "bytes": 15352,
+      "sha256": "c8e38f87511f32eb7e6e03f9e8d50faa45efb81a67adbcf6e7b4302cd332efc1"
+    },
+    {
+      "path": "source-pins.json",
+      "bytes": 3352,
+      "sha256": "36f2ba79c27ea1fcbd0e25ffba450a1a3a2d2c014ae6d430b5ad409b54d92557"
+    }
+  ],
+  "testResult": {
+    "command": "node --test handler.test.mjs runner.test.mjs",
+    "node": "v24.19.0",
+    "pass": 23,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 912.019824,
+    "mode": "local mocks only; no network/SDK installation/Deno compile/deploy/live fixture mutation"
+  },
+  "companionCard": {
+    "path": "../n58-continuation-card.json",
+    "sha256": "de5ec062dba5d29c23f86b6b8d9e0092d2c9d02db12d34fed984f3e88aeb98fe",
+    "taskId": "continuous-n58-fresh-live-20261012",
+    "priority": 90
+  },
+  "notes": [
+    "Copy all listed paths with their relative structure; source/pins/contracts and required evidence are runtime inputs.",
+    "No private run manifest or real credential was generated.",
+    "The prepared two-endpoint cleanup companion removes the need for an MCP/model redeploy before Auth disposition. Explicit deny-all redeploy is still a separate action with DISARM_PENDING recovery if interrupted.",
+    "Fresh Product integration and deterministic live harness remain assigned work in the separate card; no N58 live success is claimed."
+  ]
+}

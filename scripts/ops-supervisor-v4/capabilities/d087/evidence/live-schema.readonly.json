@@ -1,0 +1,433 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "observedAt": "2026-10-12",
+  "readOnly": true,
+  "reads": [
+    {
+      "kind": "foreign_keys",
+      "rows": [
+        {
+          "conname": "identities_user_id_fkey",
+          "source_table": "auth.identities",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "mfa_factors_user_id_fkey",
+          "source_table": "auth.mfa_factors",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "mfa_recovery_code_sets_user_id_fkey",
+          "source_table": "auth.mfa_recovery_code_sets",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "oauth_authorizations_user_id_fkey",
+          "source_table": "auth.oauth_authorizations",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "oauth_consents_user_id_fkey",
+          "source_table": "auth.oauth_consents",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "one_time_tokens_user_id_fkey",
+          "source_table": "auth.one_time_tokens",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "scim_users_user_id_fkey",
+          "source_table": "auth.scim_users",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "conname": "sessions_user_id_fkey",
+          "source_table": "auth.sessions",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "webauthn_challenges_user_id_fkey",
+          "source_table": "auth.webauthn_challenges",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "webauthn_credentials_user_id_fkey",
+          "source_table": "auth.webauthn_credentials",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "account_access_grants_granted_by_fkey",
+          "source_table": "rakeezx.account_access_grants",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (granted_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "conname": "account_access_grants_owner_id_fkey",
+          "source_table": "rakeezx.account_access_grants",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "attendance_owner_id_fkey",
+          "source_table": "rakeezx.attendance",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "calendar_days_owner_id_fkey",
+          "source_table": "rakeezx.calendar_days",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "calendars_owner_id_fkey",
+          "source_table": "rakeezx.calendars",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "calendars_owner_id_year_id_fkey",
+          "source_table": "rakeezx.calendars",
+          "target_table": "rakeezx.years",
+          "definition": "FOREIGN KEY (owner_id, year_id) REFERENCES rakeezx.years(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "class_charter_selections_owner_id_fkey",
+          "source_table": "rakeezx.class_charter_selections",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "class_goals_owner_id_fkey",
+          "source_table": "rakeezx.class_goals",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "class_rules_owner_id_fkey",
+          "source_table": "rakeezx.class_rules",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "closed_term_reports_owner_id_fkey",
+          "source_table": "rakeezx.closed_term_reports",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "curriculum_sync_bootstraps_owner_id_fkey",
+          "source_table": "rakeezx.curriculum_sync_bootstraps",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "enrollments_owner_id_fkey",
+          "source_table": "rakeezx.enrollments",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "group_arrangements_owner_id_fkey",
+          "source_table": "rakeezx.group_arrangements",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "items_owner_id_fkey",
+          "source_table": "rakeezx.items",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "items_owner_id_lesson_id_fkey",
+          "source_table": "rakeezx.items",
+          "target_table": "rakeezx.lessons",
+          "definition": "FOREIGN KEY (owner_id, lesson_id) REFERENCES rakeezx.lessons(owner_id, id) ON DELETE SET NULL (lesson_id)"
+        },
+        {
+          "conname": "items_owner_id_teaching_id_fkey",
+          "source_table": "rakeezx.items",
+          "target_table": "rakeezx.teachings",
+          "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "items_owner_id_unit_id_fkey",
+          "source_table": "rakeezx.items",
+          "target_table": "rakeezx.units",
+          "definition": "FOREIGN KEY (owner_id, unit_id) REFERENCES rakeezx.units(owner_id, id) ON DELETE SET NULL (unit_id)"
+        },
+        {
+          "conname": "lessons_owner_id_fkey",
+          "source_table": "rakeezx.lessons",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "logs_owner_id_fkey",
+          "source_table": "rakeezx.logs",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "n58_restore_transactions_owner_id_fkey",
+          "source_table": "rakeezx.n58_restore_transactions",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "notes_owner_id_fkey",
+          "source_table": "rakeezx.notes",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "owner_sync_changes_owner_id_fkey",
+          "source_table": "rakeezx.owner_sync_changes",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "profile_owner_id_fkey",
+          "source_table": "rakeezx.profile",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "score_domain_receipts_owner_id_fkey",
+          "source_table": "rakeezx.score_domain_receipts",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "score_subitem_completions_owner_id_fkey",
+          "source_table": "rakeezx.score_subitem_completions",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "score_subitems_owner_id_fkey",
+          "source_table": "rakeezx.score_subitems",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "scores_owner_id_fkey",
+          "source_table": "rakeezx.scores",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sections_owner_id_fkey",
+          "source_table": "rakeezx.sections",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sections_owner_id_year_id_fkey",
+          "source_table": "rakeezx.sections",
+          "target_table": "rakeezx.years",
+          "definition": "FOREIGN KEY (owner_id, year_id) REFERENCES rakeezx.years(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "session_roster_snapshots_owner_id_fkey",
+          "source_table": "rakeezx.session_roster_snapshots",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "session_roster_snapshots_owner_id_session_id_fkey",
+          "source_table": "rakeezx.session_roster_snapshots",
+          "target_table": "rakeezx.sessions",
+          "definition": "FOREIGN KEY (owner_id, session_id) REFERENCES rakeezx.sessions(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "session_roster_snapshots_owner_id_teaching_id_fkey",
+          "source_table": "rakeezx.session_roster_snapshots",
+          "target_table": "rakeezx.teachings",
+          "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sessions_owner_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sessions_owner_id_lesson_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "rakeezx.lessons",
+          "definition": "FOREIGN KEY (owner_id, lesson_id) REFERENCES rakeezx.lessons(owner_id, id) ON DELETE SET NULL (lesson_id)"
+        },
+        {
+          "conname": "sessions_owner_id_makeup_for_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "rakeezx.sessions",
+          "definition": "FOREIGN KEY (owner_id, makeup_for_id) REFERENCES rakeezx.sessions(owner_id, id) ON DELETE SET NULL (makeup_for_id)"
+        },
+        {
+          "conname": "sessions_owner_id_slot_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "rakeezx.slots",
+          "definition": "FOREIGN KEY (owner_id, slot_id) REFERENCES rakeezx.slots(owner_id, id) ON DELETE SET NULL (slot_id)"
+        },
+        {
+          "conname": "sessions_owner_id_teaching_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "rakeezx.teachings",
+          "definition": "FOREIGN KEY (owner_id, teaching_id) REFERENCES rakeezx.teachings(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sessions_owner_id_time_profile_id_fkey",
+          "source_table": "rakeezx.sessions",
+          "target_table": "rakeezx.time_profiles",
+          "definition": "FOREIGN KEY (owner_id, time_profile_id) REFERENCES rakeezx.time_profiles(owner_id, id) ON DELETE SET NULL (time_profile_id)"
+        },
+        {
+          "conname": "slots_owner_id_fkey",
+          "source_table": "rakeezx.slots",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "student_lifecycle_receipts_owner_id_fkey",
+          "source_table": "rakeezx.student_lifecycle_receipts",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "students_owner_id_fkey",
+          "source_table": "rakeezx.students",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "subjects_owner_id_fkey",
+          "source_table": "rakeezx.subjects",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "support_requests_owner_id_fkey",
+          "source_table": "rakeezx.support_requests",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sync_mutation_receipts_owner_id_fkey",
+          "source_table": "rakeezx.sync_mutation_receipts",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sync_restore_receipts_owner_id_fkey",
+          "source_table": "rakeezx.sync_restore_receipts",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "sync_restore_stages_owner_id_fkey",
+          "source_table": "rakeezx.sync_restore_stages",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "teachings_owner_id_fkey",
+          "source_table": "rakeezx.teachings",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "teachings_owner_id_section_id_fkey",
+          "source_table": "rakeezx.teachings",
+          "target_table": "rakeezx.sections",
+          "definition": "FOREIGN KEY (owner_id, section_id) REFERENCES rakeezx.sections(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "teachings_owner_id_subject_id_fkey",
+          "source_table": "rakeezx.teachings",
+          "target_table": "rakeezx.subjects",
+          "definition": "FOREIGN KEY (owner_id, subject_id) REFERENCES rakeezx.subjects(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "teachings_owner_id_term_id_fkey",
+          "source_table": "rakeezx.teachings",
+          "target_table": "rakeezx.terms",
+          "definition": "FOREIGN KEY (owner_id, term_id) REFERENCES rakeezx.terms(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "terms_calendar_fk",
+          "source_table": "rakeezx.terms",
+          "target_table": "rakeezx.calendars",
+          "definition": "FOREIGN KEY (owner_id, calendar_id) REFERENCES rakeezx.calendars(owner_id, id) ON DELETE SET NULL (calendar_id)"
+        },
+        {
+          "conname": "terms_owner_id_fkey",
+          "source_table": "rakeezx.terms",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "terms_owner_id_year_id_fkey",
+          "source_table": "rakeezx.terms",
+          "target_table": "rakeezx.years",
+          "definition": "FOREIGN KEY (owner_id, year_id) REFERENCES rakeezx.years(owner_id, id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "time_profiles_owner_id_fkey",
+          "source_table": "rakeezx.time_profiles",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "units_owner_id_fkey",
+          "source_table": "rakeezx.units",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "years_owner_id_fkey",
+          "source_table": "rakeezx.years",
+          "target_table": "auth.users",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ]
+    },
+    {
+      "kind": "migrations",
+      "rows": [
+        {
+          "version": "20260924003436",
+          "name": "beta_new_account_provisioning",
+          "statement_md5": "950064594d341f5cae7efc0656406e19"
+        },
+        {
+          "version": "20261005052506",
+          "name": "n58_calendar_persistence",
+          "statement_md5": "21e92a0addaf48b9266bdad4e60dc073"
+        },
+        {
+          "version": "20261005052526",
+          "name": "n58_extra_term_compatibility",
+          "statement_md5": "4e83aee6893f368a12b8ce7f15d16f40"
+        },
+        {
+          "version": "20261005052550",
+          "name": "n58_effective_scope_revalidation",
+          "statement_md5": "0845ebab082abb0534492b9e27b3a6a4"
+        }
+      ]
+    }
+  ]
+}

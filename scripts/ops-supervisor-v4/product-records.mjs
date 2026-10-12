@@ -1,7 +1,8 @@
 /** Product records are receipts of a transition, never another execution gate. */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import childProcess from 'node:child_process';
 
 const BEGIN = '<!-- BEGIN RAKEEZ CONTINUOUS DELIVERY -->';
 const END = '<!-- END RAKEEZ CONTINUOUS DELIVERY -->';
@@ -25,16 +26,47 @@ function rowsFor(text, productId) {
   const expression = new RegExp('^\\|\\s*' + productId + '\\s*\\|');
   return linesOf(text).filter(line => expression.test(line));
 }
+function activeStatusRowsFor(text, productId) {
+  // Retained approval tables repeat N IDs but are not dated lifecycle rows.
+  const date = /^\d{4}-\d{2}-\d{2}$/;
+  return rowsFor(text, productId).filter(line => {
+    const columns = line.split('|');
+    return columns.length >= 13 && date.test(columns[2].trim())
+      && date.test(columns[3].trim()) && Boolean(columns[7].trim());
+  });
+}
 export async function inspectProductEligibility(repoRoot, productId) {
   if (!/^N\d+$/.test(productId)) return { eligible: false, reason: 'INVALID_PRODUCT_ID' };
   const closed = await read(path.join(repoRoot, 'docs', 'PRODUCT_LEDGER_CLOSED.md'), true);
   if (rowsFor(closed, productId).length) return { eligible: false, closed: true, reason: 'CLOSED', status: 'CLOSED' };
   const open = await read(path.join(repoRoot, 'docs', 'PRODUCT_LEDGER.md'));
-  const rows = rowsFor(open, productId);
+  const rows = activeStatusRowsFor(open, productId);
   if (rows.length !== 1) return { eligible: false, reason: rows.length ? 'AMBIGUOUS_PRODUCT_ROW' : 'PRODUCT_NOT_IN_ACTIVE_LEDGER' };
   const status = rows[0].split('|')[7]?.trim() ?? '';
   if (/\b(?:CLOSED|DEFERRED|REJECTED|SUPERSEDED)\b/i.test(status)) return { eligible: false, reason: status, status };
   return { eligible: true, status };
+}
+
+async function replaceExistingWindows(file, temporary, before, after) {
+  // A failed rename can leave time for an editor to save: recheck before replacing.
+  if (await read(file) !== before) throw new Error('PRODUCT_RECORD_CHANGED_CONCURRENTLY: ' + path.basename(file));
+  const literal = value => "'" + value.replaceAll("'", "''") + "'";
+  const expected = createHash('sha256').update(before, 'utf8').digest('hex');
+  const script = [
+    "$ErrorActionPreference = 'Stop'",
+    '$target = ' + literal(file),
+    '$source = ' + literal(temporary),
+    "if (-not [IO.File]::Exists($target)) { throw 'PRODUCT_RECORD_TARGET_MISSING' }",
+    '$sha = [Security.Cryptography.SHA256]::Create()',
+    "try { $actual = [BitConverter]::ToString($sha.ComputeHash([IO.File]::ReadAllBytes($target))).Replace('-', '').ToLowerInvariant() } finally { $sha.Dispose() }",
+    'if ($actual -cne ' + literal(expected) + ') { throw ' + literal('PRODUCT_RECORD_CHANGED_CONCURRENTLY: ' + path.basename(file)) + ' }',
+    '[IO.File]::Replace($source, $target, [NullString]::Value)',
+  ].join('\n');
+  const powershell = path.win32.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+  await new Promise((resolve, reject) => childProcess.execFile(powershell,
+    ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')],
+    { windowsHide: true, timeout: 10000, maxBuffer: 65536 }, error => error ? reject(error) : resolve()));
+  if (await read(file) !== after) throw new Error('PRODUCT_RECORD_REPLACE_VERIFY_FAILED: ' + path.basename(file));
 }
 
 async function compareAndWrite(file, before, after) {
@@ -43,7 +75,11 @@ async function compareAndWrite(file, before, after) {
   try {
     await fs.writeFile(temporary, after, { flag: 'wx' });
     if (await read(file, true) !== before) throw new Error('PRODUCT_RECORD_CHANGED_CONCURRENTLY: ' + path.basename(file));
-    await fs.rename(temporary, file);
+    try { await fs.rename(temporary, file); }
+    catch (error) {
+      if (process.platform !== 'win32' || !['EPERM', 'EACCES', 'EBUSY'].includes(error.code)) throw error;
+      await replaceExistingWindows(file, temporary, before, after);
+    }
     return true;
   } finally { await fs.rm(temporary, { force: true }); }
 }
@@ -60,7 +96,7 @@ export async function recordProductTransition({ repoRoot, task, receipt = task.d
   }
   const ledgerPath = path.join(repoRoot, 'docs', 'PRODUCT_LEDGER.md');
   const before = await read(ledgerPath);
-  const rows = rowsFor(before, task.productId);
+  const rows = activeStatusRowsFor(before, task.productId);
   if (rows.length !== 1) throw new Error('PRODUCT_ROW_CHANGED');
   const row = rows[0], columns = row.split('|');
   if (columns.length < 13) throw new Error('PRODUCT_TABLE_SCHEMA_CHANGED');
@@ -89,3 +125,4 @@ export async function recordProductTransition({ repoRoot, task, receipt = task.d
   }
   return { recorded: true, ledgerChanged, reviewChanged };
 }
+

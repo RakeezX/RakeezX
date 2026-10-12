@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "purpose": "One concrete continuation card for root review/admission; this staging file activates nothing and does not modify existing manifests/catalog/state.",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "scopeKey": "n58-fresh-calendar-runtime-and-authorized-live-ab",
+      "activationId": "po-20261012-continuous",
+      "priority": 90,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "D087",
+      "budgetMinutes": 120,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "fresh_candidate_scope_and_preview",
+        "n58_targeted_contracts",
+        "n58_live_a_session_and_a2_restore",
+        "n58_live_context_rejection",
+        "n58_live_b_owner_isolation",
+        "n58_live_preset_context_preservation",
+        "d087_retention_and_disarm"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N58",
+        "liveAuthorizationRef": "D087",
+        "git": {
+          "repository": "Existing RakeezX origin configured at C:\\Users\\Abody\\Projects\\RakeezX",
+          "remote": "origin",
+          "branchPrefix": "ops/n58-d087-preview/continuous-n58-fresh-live-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact committed current candidate SHA",
+          "scope": "Push only the current task's reconciled candidate to its recorded named Preview branch; no force, branch deletion, main push, merge to main or Product Production deployment.",
+          "sourceBinding": "Fresh observed origin/main ancestor + candidate/tree/harness blob + Cloudflare immutable Preview check-run head SHA; never reuse the historical Preview as current proof."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "newFunctionCount": 2,
+          "sourceDirectory": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087",
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-d087-<first20(runId without hyphens)>",
+              "allowedProtectedOperations": [
+                "probe",
+                "inspect",
+                "ensure"
+              ],
+              "target": "Only the exact new function name and two Auth UUIDs in this run's saved manifest."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-d087-retire-<first20(runId without hyphens)>",
+              "allowedProtectedOperations": [
+                "probe",
+                "inspect",
+                "revoke",
+                "retire"
+              ],
+              "target": "Only the same exact saved pair; this companion is deployed and protected-probed before the first Auth create."
+            }
+          ],
+          "finalDeployment": "Redeploy only those same two exact new names to the canonical closed-entry.ts. Read source/configuration and verify both 410 D087_CLOSED responses. No unrelated or pre-existing function mutation.",
+          "authentication": "verify_jwt=false only for the two protected handlers; independent hashed 256-bit run capabilities, 90-minute expiry, server-side existing environment. Do not retrieve/export service keys or alter Auth policies.",
+          "fixtureContract": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\fixture-contract.json",
+          "retentionOnly": "Retain the exact declared synthetic closure. Global sign-out attempts + exact fixed bans + actual token denial and residual-expiry evidence; no hard/soft-delete, general user listing, Product service-role writes or guard bypass.",
+          "migrations": "Existing applied N58 migrations are immutable evidence. Do not apply/reapply/reset migrations, change RLS/schema, or manufacture auth.users via SQL."
+        },
+        "execution": "Preparation exceptions apply only to the above current Preview branch and exact D087 ops function/fixture scope. Acquire the existing live-mutation and browser leases only for their actual phases. Product main/Production remains exclusively the independent publisher. Never broaden policy/allowed directories or edit controller/queue/runtime state."
+      },
+      "objective": "Continue the actual unfinished N58 implementation on fresh current main, complete its real client/PostgREST A/B gate under existing D-087, and return a publishable Product candidate. Read the canonical module README/fixture contract and exact D-087 addendum first. Reconcile the preserved commits 2b6e14cd2985c5836173137eab8badb75125c0c6, 485828751af07544606ca27619228bd831620872, a6d380db8de1e3c937a51ba8993659557db53deb and 4efaf2c7bb9112af931112f72ccf8a6c4a3744f2 using an isolated worktree. The delta covers eleven src paths plus sw.js; it is not on main. Preserve subsequent work in store/export/home/CSS/sw and all other current Product behavior; never replace those whole files from the old candidate. Reuse the existing focused contracts/selectors, implement one deterministic authenticated A1/A2/B1 harness, and only then provision/use/dispose the two exact new fixtures. Import the prepared Auth module from its canonical absolute path, not a stale application checkout. This is work owned by the activated card; no additional routine PM/user confirmation is required. Missing candidate/harness code is implementation work, not an external capability blocker. Auth provisioning by itself is not Product completion.",
+      "acceptance": [
+        "fresh_candidate_scope_and_preview: PASS records the actual freshly reconciled candidate/base/tree, exact changed paths, committed live harness blob, current relevant source bindings and successful Cloudflare check-run head SHA/immutable Preview byte proof. Six N58 source files matched the old base and calendar-runtime.js was absent at observed main 8e2d480; five common files had later work. Preserve that later work including N92/N91 and whatever subsequent cards have actually shipped. Use a normal push only to preparationAuthority.git's exact task Preview branch. Never push main. Write a nonsecret preparation receipt and candidate-binding.json before prepare. If current main advances across a materially affected N58/owner/Sync path, reconcile the actual delta and rebind the candidate before live fixture creation; do not certify the old Preview.",
+        "n58_targeted_contracts: PASS covers only the changed N58 resolver/persistence/owner/legacy-session paths with the existing focused test files and actual current client serializers/store integration. Preserve immutable calendar_context, owner/workspace/preset/selectionRevision checks, selected-year/calendar retention, extra-term contracts and the old rejected-session regression. Keep the already applied three migration sources byte-identical and record their observed server mapping rather than reapplying them. The previous local/Demo Playwright test explicitly asserts zero Supabase/Auth requests: reuse its selectors where useful but never relabel it live. A bounded preparation check of the new deterministic live harness must establish correct private state, timeout, finally/recovery and endpoint use before it is allowed to create accounts. Do not run the whole historical browser/sync suite, add real students, or repeat full builds without a changed-source reason.",
+        "n58_live_a_session_and_a2_restore: PASS comes from one deterministic harness using the fresh candidate's ordinary authenticated client and real PostgREST. Exactly three owned contexts A1/A2/B1 and exactly two newly saved run-marked Auth UUIDs are allowed. Before the first Auth create, deploy/read back both canonical function bundles and protected-probe the cleanup-only standby. Reuse exact private IDs across retry. A1 creates only the fixed contract's ordinary A foundation and minimal empty Section/Teaching/five item/session closure; A2 restores the same A workspace through the ordinary client. Use actual current eligible Saudi date and server-acknowledged selection revision. Persist the real successful session mutation envelope/receipt plus A2 owner-bound restore/convergence proof. No service-role Product seeding, manufactured RPC success, Demo substitution, frozen fake clock, additional account or test-user reuse. Keep passwords/JWTs/refresh tokens private and absent from model output, traces, screenshots, command arguments and Git.",
+        "n58_live_context_rejection: PASS attempts only the two declared new denied session IDs/mutation IDs under the real authenticated client boundary: contextless legacy and stale selection revision after the declared preset switch. Record the exact rejection code and independently establish zero new session/receipt for each declared ID under its owner. Preserve the six historical rejected outbox envelopes and all previous sessions without replay or relabeling. A network failure is not a successful rejection. Do not broaden the fixture closure to make a test pass.",
+        "n58_live_b_owner_isolation: PASS uses B's real authenticated session to read/attempt the precisely declared A-owned objects through the existing application/API contract, verifies denied access/mutation and independently verifies A remains unchanged. B has no Product foundation unless a concrete existing protocol requires it; the reviewed closure currently requires Auth only. Never read existing users' private rows or use a service-role query as proof of B's access.",
+        "n58_live_preset_context_preservation: PASS demonstrates General to Western selection with actual acknowledged revisions, preservation of the already-created session's immutable calendar_context, and convergence in A2. Selection only patches the existing year; no custom calendar/day scope is needed beyond the fixed foundation. No historical sessions, students, attendance or grades are edited. Receipt evidence identifies the exact candidate, run, UUIDs, successful/denied mutations and observed expected results.",
+        "d087_retention_and_disarm: PASS requires actual completed disposition and both final deny-all source/endpoint proofs. The single deterministic harness must call the predeployed cleanup-only companion directly in finally for scoped global sign-out, fixed bans, independent same-ID/marker rereads, actual password/refresh denial and closure of only its three owned contexts, then durably write the nonsecret receipt and closed bundles. Use a live-work deadline no longer than 45 minutes after prepare and reserve at least 15 minutes for finally, within both 90-minute capabilities. The already-running cleanup path must not depend on another model turn or an MCP redeploy; implement that small integration before provisioning. Sign-out acknowledgment, refresh-token denial and residual access-JWT expiry are distinct evidence; user_banned alone is not proof that sessions were deleted. Retain the exact run-marked fixtures because the existing N58 hard-delete guard forbids removal; do not try soft-delete or change guards. Explicitly redeploy the same two function names to closed-entry.ts through the connector, read back source, and verify both D087_CLOSED responses. If Codex quota/connector/device failure interrupts final redeploy, persist DISARM_PENDING and the names/IDs/candidate; do not claim guaranteed disarm or LOCAL_READY. If process/device loss prevents finally and expiry passes, preserve the same run with CAPABILITY_EXPIRED_CLEANUP_PENDING for a bounded cleanup-only recovery of that same pair under D-087. Do not create another pair or silently extend provisioning. A failed cleanup/disarm or gate parks only N58 with an exact BLOCKED reason and preserved candidate/private recovery reference."
+      ],
+      "allowedPaths": [
+        "src/lib/backup-v2.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/db.js",
+        "src/lib/demo-workspace.js",
+        "src/lib/export.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "src/views/calendar.js",
+        "src/views/home.js",
+        "sw.js",
+        "supabase/migrations/20261004070000_n58_calendar_persistence.sql",
+        "supabase/migrations/20261004070001_n58_extra_term_compatibility.sql",
+        "supabase/migrations/20261004070002_n58_effective_scope_revalidation.sql",
+        "tests/n58-*",
+        "tests/calendar-runtime-0457-1.test.mjs",
+        "tests/calendar-preset.test.mjs",
+        "tests/calendar-r2-0452.e2e.mjs",
+        "tests/calendar-range-server-0439.test.mjs",
+        "tests/calendar-suspension-0446.e2e.mjs",
+        "tests/calendar-view.test.mjs",
+        "tests/demo-calendar-official-0452-3.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/account-provisioning.e2e.mjs",
+        "tests/local-sync-pwa.e2e.mjs",
+        "tests/sync-operational-ui.e2e.mjs",
+        "tests/workspace-routing.e2e.mjs",
+        "tests/helpers/isolated-indexed-db.mjs",
+        "scripts/e2e-runner.mjs",
+        "scripts/test-sync-runner.mjs"
+      ],
+      "releaseAuthority": "The Product Owner's 2026-10-12 continuous automation/deployment authority supersedes routine PM/Preview waiting for this scoped Product continuation. D087 supplies the precise existing two-new-synthetic-account and fixture-operation authority; no renewed approval request is needed for that same scope. Only preparationAuthority's named Preview and fixture operations may be performed by the worker. All Product main/Production delivery is performed by the independent publisher after LOCAL_READY and actual required checks. Preserve real owner data, existing Auth/RLS/Sync semantics and all unrelated work. The Product ticket stays OPEN/awaiting_po until its real acceptance; Auth capability proof or local-only tests are not N58 closure. Failure of this card does not stop other tickets.",
+      "runtimeDependencies": {
+        "canonicalModule": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\run.mjs",
+        "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087",
+        "mustExistBeforeProvision": [
+          "fresh committed Product/harness candidate",
+          "verified immutable Preview/source receipt",
+          "current fixed fixture/schema/source bindings",
+          "one deterministic private harness with durable finally/recovery",
+          "both new protected function deployments and cleanup standby probe"
+        ],
+        "actualRemainingWork": "Fresh integration and live harness are deliberately assigned here; no external Auth permission/key acquisition blocker is asserted.",
+        "sourceBindingInput": "The harness author writes candidate-binding.json per canonical README. It records actual current origin/main/candidate/tree/harness Git blobs and preparation receipt SHA256. The module rejects stale base or changed fixed foundation/migration source."
+      },
+      "sourceEvidence": {
+        "historicalCandidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+        "historicalBase": "3970e39",
+        "observedMain": "8e2d4800396996be43868a71057412afccd2150b",
+        "comparison": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-main-comparison.readonly.json",
+        "authority": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\authority.readonly.json",
+        "guard": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-current-guard.readonly.json",
+        "liveGateExecuted": false
+      }
+    }
+  ]
+}

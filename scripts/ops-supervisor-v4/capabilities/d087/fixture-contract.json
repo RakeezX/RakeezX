@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "kind": "d087_nonsecret_fixture_contract",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "schema": "rakeezx",
+  "activationPending": true,
+  "authority": {
+    "reference": "docs/DECISIONS.md D-087 addendum 2026-10-08; docs/follow-ups/N58_LIVE_SYNTHETIC_AB_GATE_20261008.md; current 2026-10-12 resume",
+    "interpretation": "D-087 delegates safe disposition of exactly the purpose-created synthetic fixture scope and requires preservation of necessary anti-resurrection evidence; it does not prescribe hard deletion or authorize bypassing retention guards. Retaining the exact new fixture IDs with verified fixed account bans, global sign-out attempts and token denial/expiry evidence is the scoped disposition prepared here. This is an explicit interpretation for root review, not a claim that the document says 'retain' verbatim.",
+    "noAdditionalPermissionRequestForSameScope": true,
+    "retentionInterpretationReviewed": "Root reviewed the exact D-087 source and accepted this bounded retention disposition on 2026-10-12; activation remains pending the actual prepared N58 gate."
+  },
+  "binding": {
+    "candidateSha": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+    "treeSha": "3810f1f9355c28d95eece826beb7bda93ec889b2",
+    "previewUrl": "https://c09ef926.rakeezx.pages.dev",
+    "currentMainObservedDuringPreparation": "3eb897dc9fdc760ee035156ca681f02bfab8d979",
+    "freshCandidateRequiredBeforeActivation": true,
+    "historicalReferenceOnly": true,
+    "liveCandidateInput": "prepare requires a separate fresh candidate-binding.json with current origin/main base, committed live harness Git blob and current preparation receipt hash. The runner checks the actual candidate tree and unchanged fixed foundation/migration source blobs. Historical Preview is never the default live target."
+  },
+  "auth": {
+    "count": 2,
+    "slots": [
+      "A",
+      "B"
+    ],
+    "id": "two fresh UUIDv4 values allocated and durably saved locally before any request; never regenerated on retry",
+    "emailPattern": "d087-<runId without hyphens>-<a|b>@example.invalid",
+    "normalRole": "authenticated",
+    "metadataPath": "app_metadata.d087",
+    "metadataFields": [
+      "version",
+      "purpose",
+      "runId",
+      "slot"
+    ],
+    "emailConfirmed": true,
+    "noEmailOtpOrInvitation": true,
+    "contexts": [
+      "A1",
+      "A2",
+      "B1"
+    ],
+    "authUsersNonInternalTriggersObserved": 0
+  },
+  "fixtureOwners": {
+    "A": "normal new-account application foundation and one empty Teaching/session test closure",
+    "B": "Auth only: isolation calls under the real B session need no Product foundation; do not provision B's workspace merely to test owner denial"
+  },
+  "foundationA": {
+    "via": "Existing authenticated provision_account_profile/complete_account_profile/begin_account_provisioning/provision_account_workspace only; no server-role Product seeding",
+    "rows": [
+      {
+        "table": "profile",
+        "count": 1,
+        "key": "owner_id=A",
+        "value": "explicit synthetic non-contact profile; exact current required profile fields in private gate input"
+      },
+      {
+        "table": "account_access_grants",
+        "count": 1,
+        "key": "owner_id=A,grant_type=beta_full",
+        "via": "existing account provisioning function only; never assign another role"
+      },
+      {
+        "table": "years",
+        "count": 1,
+        "ids": [
+          "y:1448-1449"
+        ]
+      },
+      {
+        "table": "calendars",
+        "count": 1,
+        "ids": [
+          "cal:y:1448-1449:preset:sa-western-1448-1449"
+        ],
+        "note": "Existing provisioning canonicalizes source to moe and leaves N58 preset selection null initially."
+      },
+      {
+        "table": "terms",
+        "count": 2,
+        "ids": [
+          "tm:y:1448-1449:1",
+          "tm:y:1448-1449:2"
+        ]
+      },
+      {
+        "table": "subjects",
+        "count": 1,
+        "ids": [
+          "sub:digital-skills"
+        ]
+      },
+      {
+        "table": "time_profiles",
+        "count": 4,
+        "ids": [
+          "time-profile:default:summer",
+          "time-profile:default:winter",
+          "time-profile:default:ramadan",
+          "time-profile:default:hybrid"
+        ]
+      },
+      {
+        "table": "calendar_days",
+        "count": 66,
+        "ids": [
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-09-23",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-09-24",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-09-25",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-09-26",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-10-25",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-20",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-21",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-22",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-23",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-24",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-25",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-26",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-27",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2026-11-28",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-08",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-09",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-10",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-11",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-12",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-13",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-14",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-15",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-01-16",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-19",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-20",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-21",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-22",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-26",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-27",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-02-28",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-01",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-02",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-03",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-04",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-05",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-06",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-07",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-08",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-09",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-10",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-11",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-12",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-03-13",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-04-30",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-01",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-02",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-03",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-04",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-05",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-06",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-07",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-08",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-09",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-10",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-11",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-12",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-13",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-14",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-15",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-16",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-17",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-18",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-19",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-20",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-21",
+          "cd:cal:y:1448-1449:preset:sa-western-1448-1449:2027-05-22"
+        ]
+      }
+    ],
+    "totalRowsIncludingProfileAndGrant": 77,
+    "note": "These 66 calendar days and four timing profiles are the normal enforced new-account foundation, not copied Demo/student/test seed. Candidate decoding and deployed provisioning require the exact foundation shape. Use it once for A; A2 uses ordinary Initial Restore of that same A account."
+  },
+  "sessionClosureA": {
+    "allocateBeforeProductWrites": true,
+    "rows": [
+      {
+        "table": "sections",
+        "count": 1,
+        "id": "sec:<new fixture UUID>",
+        "attributes": {
+          "yearId": "y:1448-1449",
+          "grade": 4,
+          "label": "D087",
+          "name": "D087 synthetic A"
+        }
+      },
+      {
+        "table": "teachings",
+        "count": 1,
+        "id": "tch:<sectionId>|sub:digital-skills|tm:y:1448-1449:1",
+        "via": "unchanged apply_sync_v2_teaching_creation_command through the candidate's owner-bound client"
+      },
+      {
+        "table": "items",
+        "count": 5,
+        "ids": "five preallocated UUIDs recorded before the Teaching command",
+        "note": "The current Teaching creation RPC requires exactly five empty default item definitions. No student scores, grades, logs, attendance or subitems are created or edited."
+      },
+      {
+        "table": "sessions",
+        "count": 1,
+        "id": "se:<teachingId>:<current eligible local date>:1",
+        "attributes": {
+          "slotId": null,
+          "timeProfileId": null,
+          "lessonId": null
+        },
+        "note": "Existing client session command/create path, real authenticated upload/receipt; calendar_context supplied by the current candidate's resolver at creation time."
+      },
+      {
+        "table": "session_roster_snapshots",
+        "maximum": 1,
+        "id": "srs:<successful sessionId>",
+        "members": [],
+        "note": "Only if the unchanged client captures its normal empty roster; never seed a student to force a snapshot."
+      }
+    ],
+    "presetChanges": {
+      "yearId": "y:1448-1449",
+      "first": "sa-general-1448-1449",
+      "second": "sa-western-1448-1449",
+      "newCustomCalendars": 0,
+      "newCalendarDaysBeyondFoundation": 0,
+      "note": "Candidate applyCalendarPreset patches the existing year selection only. Use observed acknowledged field_revisions.calendar_selection, never guessed revisions."
+    },
+    "deniedSessionAttempts": [
+      {
+        "reason": "contextless legacy",
+        "id": "se:<teachingId>:<same date>:2",
+        "expectedCreatedRows": 0,
+        "expectedReceipts": 0
+      },
+      {
+        "reason": "stale selection revision after switch",
+        "id": "se:<teachingId>:<same date>:3",
+        "expectedCreatedRows": 0,
+        "expectedReceipts": 0
+      }
+    ],
+    "sideEffects": {
+      "sync_mutation_receipts": "Only exact preallocated mutation IDs of successful A operations; keep server receipts and compare canonical bindings.",
+      "owner_sync_changes": "Normal trigger metadata only for the declared exact new A rows; record resulting sequence range from own account evidence. No global feed read.",
+      "accountBMutations": "Only exact denied access/mutation attempts against A-owned IDs; no new B Product rows expected."
+    }
+  },
+  "requiredLiveChecks": [
+    "candidate_and_schema_binding",
+    "exact_synthetic_identities",
+    "a_real_client_session_receipt",
+    "a_second_context_restore_convergence",
+    "contextless_legacy_rejected_no_receipt",
+    "stale_revision_rejected_no_receipt",
+    "b_cannot_read_or_edit_a",
+    "preset_switch_preserves_context"
+  ],
+  "forbidden": [
+    "Auth SQL user insertion",
+    "service-role Product writes",
+    "arbitrary SQL or URLs in the handler",
+    "general user listing",
+    "existing accounts or their records",
+    "students",
+    "enrollments",
+    "scores",
+    "score_subitems",
+    "attendance",
+    "logs",
+    "support requests",
+    "historical rejected outbox replay",
+    "RLS/schema/migration/Auth-policy changes",
+    "new project or billing changes"
+  ],
+  "disposition": {
+    "strategy": "retain_exact_synthetic_fixture_closure_and_ban_two_run_marked_accounts",
+    "knownHardDeleteGuard": true,
+    "knownGuardCodes": [
+      "N58_SELECTED_YEAR_RETIREMENT_BLOCKED",
+      "N58_CALENDAR_HARD_DELETE_BLOCKED"
+    ],
+    "liveGuardSourceMd5": "03cb2970a0c300cde20b4f0a17314c8d",
+    "hardDelete": "not attempted",
+    "softDelete": "not implemented",
+    "banDuration": "876000h",
+    "globalSignOut": "separate operation, using a server-verified fixture user access JWT; record result independently",
+    "banVerification": "fresh exact admin GET, unchanged app_metadata.d087 and future banned_until; do not resend a relative ban if already verified",
+    "accessJwt": "Existing JWT remains potentially usable until its exp; record maximum issued fixture token expiry and close only the three owned contexts.",
+    "tokenDenial": "Private password sign-in should return user_banned; prior refresh tokens should return refresh_token_not_found/refresh_token_already_used or user_banned, with exact response code and no token data in public receipt.",
+    "finalFunction": "Two new operations functions (provision and predeployed cleanup-only companion) redeployed to closed-entry.ts; verify both exact denied endpoints and provider source metadata. If MCP/model is unavailable this is DISARM_PENDING, even after safe Auth retention.",
+    "successLabel": "RETAINED_BANNED with actual per-account sign-out/token evidence; never CLEAN, DELETED, Product CLOSED or N58 Production"
+  },
+  "execution": {
+    "scope": "root-reviewed bounded operations job outside Product catalog",
+    "maxMinutes": 90,
+    "maxMutationRetries": 2,
+    "noLiveActionsPerformed": true,
+    "currentImplementation": "Handler provisions/verifies/revokes/retires only Auth fixtures. Runner does no Product mutation and does not claim the separate N58 client/browser gate executed.",
+    "cleanupPreparation": "Deploy and protected-probe the separate cleanup-only companion before allowing any Auth create. Actual sign-out/ban/token-denial finally runs directly via Node HTTP without an MCP/model redeploy step. Both capabilities expire after 90 minutes; explicit deny-all redeploy/source verification remains a separate final step, not guaranteed by expiry.",
+    "remainingOwnedWork": "Build the fresh N58 integration and a deterministic single A1/A2/B1 live harness before provisioning. No accounts are created just to prove Auth capability."
+  }
+}

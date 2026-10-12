@@ -61,3 +61,11 @@ Recorded native evidence on 2026-10-12 is separate from that suite:
 These receipts prove the specified startup, resume and publication cases. They do not constitute a 24/7 soak, physical-device acceptance or automatic Product closure. Check additional scenarios only when the affected behavior requires them. Current evidence is under `artifacts/ops-supervisor-v4/{attempts,results,delivery}` and `controller-events.jsonl`.
 
 The controller does not automatically resolve a real Product/data authorization blocker, delete unknown leases, buy extra quota, reset a worktree, force-push main or claim real-device/user acceptance. Those conditions are kept on the affected card, while routine PM handoffs and waiting for the chat are removed from execution.
+
+## Supported UI proof and authorized fixture preparation
+
+A UI rendering check uses the actual application DOM, source CSS and handlers on an allowed HTTP(S) target. Handwritten lookalike pages and source-string assertions cannot satisfy rendered-behavior checks. Respect the browser tool’s URL/security decision. N91 has a separate immutable HTTPS application Preview and a source-bound, fresh-Demo-only harness in `proofs/n91/`; it neither reopens nor proxies the rejected local file.
+
+The N58 continuation card includes the existing D-087 synthetic authority and a precise `preparationAuthority` for its current candidate Preview branch and two run-bound temporary functions. Only that named preparation/disposition scope is delegated to the worker. Product main/Production publication remains with the publisher. Read `capabilities/d087/README.md` before that phase; complete the real candidate/harness first, and never treat account provisioning or expiry as live-gate/disarm success.
+
+During the observed run, N95 reached verified Production `b0834e785ccc7f2bcb50a20b812498f6687690c7` at 2026-10-12T10:31:13.247Z and N84 reached `540fdf0b053d199b08ceb8fcfbde83453266afe3` at 2026-10-12T10:35:11.614Z. Both completed through the automatic worker/publisher path and released capacity for following work. These are actual publication observations, not a 24/7 duration claim or personal PO acceptance.

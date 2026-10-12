@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "observedAt": "2026-10-12",
+  "method": "Read-only git object comparison; no checkout, fetch, test, Product write or deployment",
+  "candidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+  "base": "3970e39",
+  "main": "8e2d4800396996be43868a71057412afccd2150b",
+  "files": [
+    {
+      "path": "scripts/e2e-runner.mjs",
+      "base": "64a1b763e85bb7cedc79f92106f11b9c4b1357dc",
+      "candidate": "b87b728460394ef8b632a4f736a59ab5a901d3e4",
+      "main": "64a1b763e85bb7cedc79f92106f11b9c4b1357dc"
+    },
+    {
+      "path": "scripts/test-sync-runner.mjs",
+      "base": "d31d93c7f869246400b4b6508fd7f2cbce9ef39d",
+      "candidate": "8015261a9d3823a224df5e626d6f34b98370a8c9",
+      "main": "d31d93c7f869246400b4b6508fd7f2cbce9ef39d"
+    },
+    {
+      "path": "src/lib/backup-v2.js",
+      "base": "195e56ffd614a2751d973a8b6bfa741e8f0f90b1",
+      "candidate": "ccd5da96982ffa0f4e7d7c3e1215537057bfddeb",
+      "main": "195e56ffd614a2751d973a8b6bfa741e8f0f90b1"
+    },
+    {
+      "path": "src/lib/calendar-runtime.js",
+      "base": null,
+      "candidate": "5e1dd9086e659bc17a9c337051226910b7b5cff8",
+      "main": null
+    },
+    {
+      "path": "src/lib/db.js",
+      "base": "f12f9a954f3ccaff81705527ab21de7bcc66a382",
+      "candidate": "9032bb0dfa9d2cae34c51814f3b9a8a6f9897370",
+      "main": "f12f9a954f3ccaff81705527ab21de7bcc66a382"
+    },
+    {
+      "path": "src/lib/demo-workspace.js",
+      "base": "6380512b1ef326cb2be20ffabda2dd10ad20a269",
+      "candidate": "b589c1f48ed9ec491f3727d624cf4ed89d5f45e4",
+      "main": "6380512b1ef326cb2be20ffabda2dd10ad20a269"
+    },
+    {
+      "path": "src/lib/export.js",
+      "base": "0e75e8f8c2fb3d8c6111e29122296938a22c25b6",
+      "candidate": "1f9a1faf09d120408b297816529c8160ce360003",
+      "main": "0a32a2355eb22440bc8aafa846842b696e92b08f"
+    },
+    {
+      "path": "src/lib/sync-v2.js",
+      "base": "4eee991aae3575ccbba8e79ce9262cab9c648088",
+      "candidate": "c5b03db150ffe14c6f98c197b5e755cb2b2a2dd7",
+      "main": "4eee991aae3575ccbba8e79ce9262cab9c648088"
+    },
+    {
+      "path": "src/lib/sync.js",
+      "base": "f545f1aa8ee1279dc29459fe7254fd808aef407f",
+      "candidate": "3d96063a7d482f27c8be66304ad01d896ae74cdc",
+      "main": "f545f1aa8ee1279dc29459fe7254fd808aef407f"
+    },
+    {
+      "path": "src/store.js",
+      "base": "2f9be5fcc4f6b7233f9fc32a83e45e669831909d",
+      "candidate": "171940c6e2fe758eee77729f551fc189403687f8",
+      "main": "a1b66e60110385e174dca2bde1546c2e9eda6997"
+    },
+    {
+      "path": "src/styles/components.css",
+      "base": "151b2152b625cf37e055cd684515b3ed5fba8302",
+      "candidate": "50585f938a2fa6b7551f1608ec30f9cee01a950e",
+      "main": "ad566335185f70ef0b6e0057f6f0f992df1bc1dc"
+    },
+    {
+      "path": "src/views/calendar.js",
+      "base": "39bdb0f2a60937d9cfbf14423bae01eb33ed4f46",
+      "candidate": "cc76c60e7ebf66f5243203f975b5cd38f2087f21",
+      "main": "39bdb0f2a60937d9cfbf14423bae01eb33ed4f46"
+    },
+    {
+      "path": "src/views/home.js",
+      "base": "8c6e1ee08c30b9ae57f990037c6fd99be8f39ac8",
+      "candidate": "099ad435993edc4eabc8a88069acea28371fc743",
+      "main": "1b77aa75ed3c0c87d84f142d2f4c62afa6240a4a"
+    },
+    {
+      "path": "supabase/migrations/20261004070000_n58_calendar_persistence.sql",
+      "base": null,
+      "candidate": "1b88ae22bdc5e4e12ec4aa5a64e3d19799fa89e0",
+      "main": null
+    },
+    {
+      "path": "supabase/migrations/20261004070001_n58_extra_term_compatibility.sql",
+      "base": null,
+      "candidate": "92c33ab320f65618499e8ee2353e430266f16bf9",
+      "main": null
+    },
+    {
+      "path": "supabase/migrations/20261004070002_n58_effective_scope_revalidation.sql",
+      "base": null,
+      "candidate": "fb0f9ce833acfc0668b472635298079bdf408699",
+      "main": null
+    },
+    {
+      "path": "sw.js",
+      "base": "5fc42d0e041c6769692a89e1178d6391a4ae0f12",
+      "candidate": "ff8d4d2b5da1a01f3b926bbb39c5f1e64787f2a0",
+      "main": "d707a8565493fdb3270801d9ec2db049f03952d0"
+    },
+    {
+      "path": "tests/account-provisioning.e2e.mjs",
+      "base": "589c7742067370e6a2964999b73d659d8f70a8f3",
+      "candidate": "2130da547197774e3440544956e88b5d7d84ff4d",
+      "main": "589c7742067370e6a2964999b73d659d8f70a8f3"
+    },
+    {
+      "path": "tests/calendar-preset.test.mjs",
+      "base": "d38821de86789f119606d7b9a56d16b5e5a49023",
+      "candidate": "f998a761419a72451438555291d65634d0425b86",
+      "main": "d38821de86789f119606d7b9a56d16b5e5a49023"
+    },
+    {
+      "path": "tests/calendar-r2-0452.e2e.mjs",
+      "base": "29630c5b49896a89e8c4e3e1c4930bed71c02d16",
+      "candidate": "5a3cdde6c258d776b45e4fed44c98528120ed7a0",
+      "main": "29630c5b49896a89e8c4e3e1c4930bed71c02d16"
+    },
+    {
+      "path": "tests/calendar-range-server-0439.test.mjs",
+      "base": "08c69527fa7ca18017f58ba94b1720338ca397f3",
+      "candidate": "c062416d874fc9bcc689a32b2763380cb41ffe52",
+      "main": "08c69527fa7ca18017f58ba94b1720338ca397f3"
+    },
+    {
+      "path": "tests/calendar-runtime-0457-1.test.mjs",
+      "base": null,
+      "candidate": "ef51384d7168ef4d69973793597e4c822e579a6f",
+      "main": null
+    },
+    {
+      "path": "tests/calendar-suspension-0446.e2e.mjs",
+      "base": "5435404119c0d10178c87d24d3b40808820c67b5",
+      "candidate": "1791811919faa2de3d059cf1cddc9145b9248925",
+      "main": "5435404119c0d10178c87d24d3b40808820c67b5"
+    },
+    {
+      "path": "tests/calendar-view.test.mjs",
+      "base": "8ff6c6db373eac00f29a55c9b07d362897ec759a",
+      "candidate": "6123173973f184fe939ec8543544f512fdf6c636",
+      "main": "8ff6c6db373eac00f29a55c9b07d362897ec759a"
+    },
+    {
+      "path": "tests/demo-calendar-official-0452-3.test.mjs",
+      "base": "713b64ad0577162f3e127783d3df1978711b771b",
+      "candidate": "4f8552a584ac528afb677aef7d846cbe140c6529",
+      "main": "713b64ad0577162f3e127783d3df1978711b771b"
+    },
+    {
+      "path": "tests/helpers/isolated-indexed-db.mjs",
+      "base": null,
+      "candidate": "030787f2a5cae09b371ee46e688695e544f30064",
+      "main": null
+    },
+    {
+      "path": "tests/local-sync-pwa.e2e.mjs",
+      "base": "2387a41a9e9b772507ed4f90beb55a5acdb805ef",
+      "candidate": "f35e543206a2df38d928daa84181cf6e387c73ad",
+      "main": "2387a41a9e9b772507ed4f90beb55a5acdb805ef"
+    },
+    {
+      "path": "tests/n58-bootstrap-compat-0457-3.test.mjs",
+      "base": null,
+      "candidate": "2961b2cc20fb2f2ddbe5f57f398509b2916950ac",
+      "main": null
+    },
+    {
+      "path": "tests/n58-calendar-persistence-server-0457-2.test.mjs",
+      "base": null,
+      "candidate": "3f297291e99e949a12513610d762d0267470b32e",
+      "main": null
+    },
+    {
+      "path": "tests/n58-client-controls-0457-3.e2e.mjs",
+      "base": null,
+      "candidate": "390c0b5d0e45aa207b7a816ab11bf55c117d3982",
+      "main": null
+    },
+    {
+      "path": "tests/n58-extra-term-contract-0457-3.test.mjs",
+      "base": null,
+      "candidate": "e3f41867d3e4d780e687d396ade60f285898b02e",
+      "main": null
+    },
+    {
+      "path": "tests/sync-operational-ui.e2e.mjs",
+      "base": "c12c525b1416790669ad1e402476604f869db030",
+      "candidate": "cb892628c33fc932b4028875d985bfcb8971d9ee",
+      "main": "c12c525b1416790669ad1e402476604f869db030"
+    },
+    {
+      "path": "tests/v2-backup-restore.test.mjs",
+      "base": "0000dd439e92dbaae890e59b6e1234b3c52f1c61",
+      "candidate": "c9353af367bb0711ec184229f8f5eb2aa6da0ec8",
+      "main": "0000dd439e92dbaae890e59b6e1234b3c52f1c61"
+    },
+    {
+      "path": "tests/workspace-routing.e2e.mjs",
+      "base": "5268cb0209112092a7a1c6cff918e78623615af9",
+      "candidate": "a141733821bdf08c528c75a8649ebb1374b2196a",
+      "main": "5268cb0209112092a7a1c6cff918e78623615af9"
+    }
+  ],
+  "productFiles": [
+    {
+      "path": "src/lib/backup-v2.js",
+      "base": "195e56ffd614a2751d973a8b6bfa741e8f0f90b1",
+      "candidate": "ccd5da96982ffa0f4e7d7c3e1215537057bfddeb",
+      "main": "195e56ffd614a2751d973a8b6bfa741e8f0f90b1",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/lib/calendar-runtime.js",
+      "base": null,
+      "candidate": "5e1dd9086e659bc17a9c337051226910b7b5cff8",
+      "main": null,
+      "classification": "N58_new_file_absent"
+    },
+    {
+      "path": "src/lib/db.js",
+      "base": "f12f9a954f3ccaff81705527ab21de7bcc66a382",
+      "candidate": "9032bb0dfa9d2cae34c51814f3b9a8a6f9897370",
+      "main": "f12f9a954f3ccaff81705527ab21de7bcc66a382",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/lib/demo-workspace.js",
+      "base": "6380512b1ef326cb2be20ffabda2dd10ad20a269",
+      "candidate": "b589c1f48ed9ec491f3727d624cf4ed89d5f45e4",
+      "main": "6380512b1ef326cb2be20ffabda2dd10ad20a269",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/lib/export.js",
+      "base": "0e75e8f8c2fb3d8c6111e29122296938a22c25b6",
+      "candidate": "1f9a1faf09d120408b297816529c8160ce360003",
+      "main": "0a32a2355eb22440bc8aafa846842b696e92b08f",
+      "classification": "requires_scoped_integration_with_newer_main_changes"
+    },
+    {
+      "path": "src/lib/sync-v2.js",
+      "base": "4eee991aae3575ccbba8e79ce9262cab9c648088",
+      "candidate": "c5b03db150ffe14c6f98c197b5e755cb2b2a2dd7",
+      "main": "4eee991aae3575ccbba8e79ce9262cab9c648088",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/lib/sync.js",
+      "base": "f545f1aa8ee1279dc29459fe7254fd808aef407f",
+      "candidate": "3d96063a7d482f27c8be66304ad01d896ae74cdc",
+      "main": "f545f1aa8ee1279dc29459fe7254fd808aef407f",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/store.js",
+      "base": "2f9be5fcc4f6b7233f9fc32a83e45e669831909d",
+      "candidate": "171940c6e2fe758eee77729f551fc189403687f8",
+      "main": "a1b66e60110385e174dca2bde1546c2e9eda6997",
+      "classification": "requires_scoped_integration_with_newer_main_changes"
+    },
+    {
+      "path": "src/styles/components.css",
+      "base": "151b2152b625cf37e055cd684515b3ed5fba8302",
+      "candidate": "50585f938a2fa6b7551f1608ec30f9cee01a950e",
+      "main": "ad566335185f70ef0b6e0057f6f0f992df1bc1dc",
+      "classification": "requires_scoped_integration_with_newer_main_changes"
+    },
+    {
+      "path": "src/views/calendar.js",
+      "base": "39bdb0f2a60937d9cfbf14423bae01eb33ed4f46",
+      "candidate": "cc76c60e7ebf66f5243203f975b5cd38f2087f21",
+      "main": "39bdb0f2a60937d9cfbf14423bae01eb33ed4f46",
+      "classification": "N58_delta_missing_unchanged_base"
+    },
+    {
+      "path": "src/views/home.js",
+      "base": "8c6e1ee08c30b9ae57f990037c6fd99be8f39ac8",
+      "candidate": "099ad435993edc4eabc8a88069acea28371fc743",
+      "main": "1b77aa75ed3c0c87d84f142d2f4c62afa6240a4a",
+      "classification": "requires_scoped_integration_with_newer_main_changes"
+    },
+    {
+      "path": "sw.js",
+      "base": "5fc42d0e041c6769692a89e1178d6391a4ae0f12",
+      "candidate": "ff8d4d2b5da1a01f3b926bbb39c5f1e64787f2a0",
+      "main": "d707a8565493fdb3270801d9ec2db049f03952d0",
+      "classification": "requires_scoped_integration_with_newer_main_changes"
+    }
+  ],
+  "historicalCommitSequence": [
+    "2b6e14c",
+    "4858287",
+    "a6d380d",
+    "4efaf2c"
+  ],
+  "sourceDiffStat": "src/lib/backup-v2.js        |   2 +-\n src/lib/calendar-runtime.js | 217 ------------------------------------\n src/lib/db.js               |  36 +++---\n src/lib/demo-workspace.js   |  22 +++-\n src/lib/export.js           |   9 +-\n src/lib/sync-v2.js          |  84 ++------------\n src/lib/sync.js             |   9 --\n src/store.js                | 265 +++++++++++++++++++++-----------------------\n src/styles/components.css   | 110 +++++++++++++++++-\n src/views/calendar.js       |  29 +++--\n src/views/home.js           |  49 +++++++-\n sw.js                       |  15 ++-\n 12 files changed, 364 insertions(+), 483 deletions(-)",
+  "harness": {
+    "path": "tests/n58-client-controls-0457-3.e2e.mjs",
+    "blob": "390c0b5d0e45aa207b7a816ab11bf55c117d3982",
+    "evidence": [
+      "line38 iterates synthetic local and Demo",
+      "line43 fixes 2026-10-02 clock",
+      "line42 collects Supabase /rest/v1 and /auth/v1 requests",
+      "line94 requires requests=[]"
+    ],
+    "reuse": "UI selectors and expected preset behavior only; no authenticated live A/B gate exists in this file"
+  },
+  "remainingWork": [
+    "Integrate the preserved N58 delta on current main and bind exact new candidate + immutable Preview assets without overwriting newer home/CSS/sw/store/export changes.",
+    "Add a bounded real A1/A2/B1 browser/client harness using the exact new synthetic identities and minimum fixture closure; ordinary client foundation and PostgREST Sync, no service-role Product seeding.",
+    "Use existing D-087 authority and prepared Auth module only after that harness and candidate are ready; execute exact checks and retention separately from Product delivery."
+  ],
+  "requiresNewUserPermission": false,
+  "liveN58GateExecuted": false
+}

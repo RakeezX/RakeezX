@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "taskId": "v6-n91-mobile-card-titles-20261012",
+  "candidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+  "approvedOrigin": "https://645cd923.rakeezx.pages.dev",
+  "providerBinding": {
+    "source": "Root observed the actual GitHub check and Cloudflare preview before authorizing this hosted-app test",
+    "branch": "preview/n91-mobile-title-20261012",
+    "deploymentId": "645cd923-bac8-4526-9a06-f376b0bf54ab",
+    "githubCheckRunId": 114767891126,
+    "headSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "sourceAssets": [
+    {
+      "path": "src/styles/components.css",
+      "sha256": "8675fc9a5f45600a8a4ce7900b94f89597ffc67544944a43843bf0688a0e00e9",
+      "bytes": 317122
+    },
+    {
+      "path": "src/views/teaching-hub.js",
+      "sha256": "1957dc059ab8caffe501c43b13d97070e3867da627a76fcd098aa587a7aa863f",
+      "bytes": 19860
+    }
+  ]
+}
