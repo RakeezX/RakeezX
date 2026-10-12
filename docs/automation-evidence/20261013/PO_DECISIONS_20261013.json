@@ -31,8 +31,12 @@
     "readAndAdminPushPermissionsObserved": true
   },
   "nativeApplication": {
-    "queueClosureAndUpdatedCards": "PENDING_NATIVE_INSTALL",
-    "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record"
+    "queueClosureAndUpdatedCards": "Consult native install receipt and a subsequent controller snapshot; no queue writes are performed by this record",
+    "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record",
+    "mechanism": "GUARDED_CANONICAL_LEDGER_INSTALL",
+    "queueWrites": false,
+    "controllerObservation": "REQUIRED_AFTER_INSTALL",
+    "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/po-decisions-20261013-install-receipt.json"
   },
   "evidence": {
     "controllerSnapshotAt": "2026-10-12T22:55:33.783Z",
@@ -41,5 +45,34 @@
     "pendingCount": 0,
     "idleReason": "NO_ACTIVATED_PENDING_CARDS"
   },
-  "noProductCodeChange": true
+  "noProductCodeChange": true,
+  "deliveries": {
+    "N49Preview": {
+      "environment": "Preview",
+      "branch": "preview/n49-3m6m-20261013",
+      "url": "https://2304c981.rakeezx.pages.dev",
+      "releaseSha": "a0419c5718422209ebf62773ac83436a7f848061",
+      "sourceSha": "ed2b49ae1fe7c3981e894e2f809a702640af3f2d",
+      "cloudflareDeploymentId": "2304c981-7969-4625-903b-1d209bcaa6e4",
+      "githubCheckRunId": 115047600930,
+      "providerConclusion": "success",
+      "moduleBoundaryChecks": "PASS",
+      "browserChecks": "PARTIAL_FAIL_BROWSER_TIMEOUT",
+      "browserEvidence": {
+        "finishedAt": "2026-10-12T23:21:26.1373795Z",
+        "overall": "FAIL",
+        "productAccountTest": "TIMEOUT_120000MS",
+        "rawProduction7And14Days": "PASS_1.1SEC",
+        "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser"
+      },
+      "normalThroughMs": 180000,
+      "reminderAfterMs": 180000,
+      "limitedFromMs": 360000,
+      "productionThresholds": "7/14 days unchanged"
+    }
+  },
+  "previousNativeApplicationRecord": {
+    "queueClosureAndUpdatedCards": "PENDING_NATIVE_INSTALL",
+    "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record"
+  }
 }
