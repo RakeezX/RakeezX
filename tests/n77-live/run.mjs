@@ -7,7 +7,7 @@ import { buildAccountFoundationDefaults } from '../../src/lib/account-provisioni
 import { canonical, sha256, fixtureEmail, fixtureMarker, validateManifest, PROJECT_ID, PURPOSE, WINDOW_MS }
   from '../../supabase/functions/ops-n77-fixture/handler-core.mjs';
 
-export const RUN_ID = 'c01776d4-5e12-48bc-96c3-f8e1369bfd59';
+export const RUN_ID = 'a853d8e6-0577-4fa3-9af2-ad473c8bb673';
 export const TASK_ID = 'continuous-n77-real-delete-20261012';
 export const PRIVATE = `C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/n77/${RUN_ID}/private`;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
