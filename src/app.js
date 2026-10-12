@@ -549,8 +549,11 @@ async function renewLeaseInBackground() {
 
 /* ---------- تبديل الشاشة ---------- */
 
+let resolveGeneration = 0;
 async function resolve() {
+  const generation = ++resolveGeneration;
   const path = currentPath();
+  const isCurrent = () => generation === resolveGeneration && path === currentPath();
   const found = match(path);
 
   if (!found) {
@@ -559,19 +562,22 @@ async function resolve() {
   }
 
   if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
-
-  if (ctx) scrollMemory.set(ctx.path, window.scrollY);
-  view?.onUnmount?.();
+  if (!isCurrent()) return;
 
   let mod;
   try {
     mod = await found.route.load();
   } catch (err) {
+    if (!isCurrent()) return;
     console.error('[rakeezx] تعذّر تحميل الشاشة', err);
     toast('تعذّر فتح هذه الشاشة', 'danger');
     return;
   }
 
+  // A slower boot/previous route must not overwrite newer navigation.
+  if (!isCurrent()) return;
+  if (ctx) scrollMemory.set(ctx.path, window.scrollY);
+  view?.onUnmount?.();
   view = mod.default;
   ctx = found;
   view.beforeRender?.(found.params);
