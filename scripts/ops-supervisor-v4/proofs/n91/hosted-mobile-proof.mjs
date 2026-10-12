@@ -186,10 +186,22 @@ try {
         result.navigation.push(observation);
         await page.locator(`${cardSelector}[href="${tool.href}"]`).tap();
         await page.waitForURL(url => url.origin === origin && url.hash === tool.href);
-        await page.waitForFunction(expected => document.querySelector('.topbar__title')?.textContent.trim() === expected, tool.title);
+        observation.observedHash = new URL(page.url()).hash;
+        const heading = await page.waitForFunction(expected => {
+          const node = document.querySelector('.topbar__title');
+          if (!node) return false;
+          // app.js nests the optional .topbar__sub inside the heading.
+          // Remove only that known subtitle from a detached clone; keep exact title equality.
+          const titleNode = node.cloneNode(true);
+          titleNode.querySelector(':scope > .topbar__sub')?.remove();
+          const title = titleNode.textContent.trim();
+          return title === expected ? { title, fullText: node.textContent.trim(),
+            subtitle: node.querySelector(':scope > .topbar__sub')?.textContent.trim() ?? null } : false;
+        }, tool.title);
+        observation.heading = await heading.jsonValue();
+        await heading.dispose();
         await page.locator('.class-hub').waitFor({ state: 'detached' });
         assert.equal(await page.locator('.empty--error').count(), 0, `Error route ${tool.route}`);
-        observation.observedHash = new URL(page.url()).hash;
         observation.demo = await assertDemo(page); observation.state = 'PASS';
         await page.goto(hubUrl, { waitUntil: 'domcontentloaded' });
         await page.locator(cardSelector).first().waitFor({ state: 'visible' });
@@ -199,7 +211,12 @@ try {
       sample.state = 'FAIL'; sample.error = String(error.stack ?? error);
       if (sample.layoutStatus !== 'PASS') sample.layoutStatus = 'FAIL';
       const currentNavigation = result.navigation.find(n => n.state === 'RUNNING');
-      if (currentNavigation) { currentNavigation.state = 'FAIL'; currentNavigation.error = String(error.message ?? error); }
+      if (currentNavigation) {
+        currentNavigation.state = 'FAIL'; currentNavigation.error = String(error.message ?? error);
+        currentNavigation.observedHash = new URL(page.url()).hash;
+        currentNavigation.observedHeadingOnFailure = await page.locator('.topbar__title')
+          .textContent({ timeout: 1_000 }).catch(() => null);
+      }
       result.errors.push(`${width}: ${error.message ?? error}`);
       await page.screenshot({ path: path.join(output, `n91-failure-${width}.png`), fullPage: true }).catch(() => {});
     } finally { await context.close(); }
@@ -218,3 +235,4 @@ finally {
     resultPath: path.join(output, 'N91_HOSTED_APP_PROOF.json'), errors: result.errors }));
   process.exitCode = result.status === 'PASS' ? 0 : 1;
 }
+

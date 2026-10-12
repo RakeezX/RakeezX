@@ -148,6 +148,17 @@ Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { ge
 globalThis.fetch = () => { throw new Error('Real network forbidden in N95 synthetic tests'); };
 after(() => { cloud.setMockAuth(null, null); cloud.setMockBackend(null); store.closeChannel(); db.closeDB(); });
 
+// Durable failure fixtures are persisted test inputs, not new Product commands.
+// Seed through the native synthetic DB; do not mint edit/lease authority.
+async function seedOutbox(row) {
+  const handle = await db.openDB();
+  await new Promise((resolve, reject) => {
+    const tx = handle.transaction('outbox', 'readwrite');
+    tx.objectStore('outbox').put(row);
+    tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+  });
+}
+
 test('transient_status / fatal_visibility / owner_reset: actual synthetic coordinator and lifecycle events', async (t) => {
   t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 1_000_000 });
   await activateSyntheticAccountWorkspace();
@@ -197,11 +208,11 @@ test('transient_status / fatal_visibility / owner_reset: actual synthetic coordi
   assert.equal(await sync.syncAll(), true);
   failure = transport();
   assert.equal(await sync.syncAll(), false);
-  await db.put('outbox', { id: 'n95-failed', protocol: 'v2', state: 'failed', store: 'students', recordId: 'synthetic', sequence: 1 });
+  await seedOutbox({ id: 'n95-failed', protocol: 'v2', state: 'failed', store: 'students', recordId: 'synthetic', sequence: 1 });
   await sync.getSyncOperationalSummary();
   assert.equal(ui().status, 'error');
   await db.clearStore('outbox');
-  await db.put('outbox', { id: 'n95-rejected', protocol: 'v2', state: 'rejected', store: 'students', recordId: 'synthetic', sequence: 1 });
+  await seedOutbox({ id: 'n95-rejected', protocol: 'v2', state: 'rejected', store: 'students', recordId: 'synthetic', sequence: 1 });
   await sync.getSyncOperationalSummary();
   assert.equal(ui().status, 'rejected');
   assert.equal(ui().help, true);

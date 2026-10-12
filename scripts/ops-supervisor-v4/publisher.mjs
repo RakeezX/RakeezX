@@ -305,8 +305,23 @@ export async function publishCandidate(options, dependencies = {}) {
     unlock = await lock(path.join(opts.stateDir, '.publisher.lock'));
     journalFile = path.join(opts.stateDir, `${opts.candidateSha}.journal.json`);
     const git = async (args, cwd = opts.cwd, allowFailure = false) => {
-      const result = await execute('git', args, { cwd, signal: opts.signal, timeoutMs: 120000 });
-      if (result.code !== 0 && !allowFailure) throw new DeliveryError('GIT_FAILED', asText({ stdout: result.stderr }) || `Git operation failed (${args[0]})`, true);
+      // These calls materialize/read the isolated checkout. Scope the Windows
+      // long-path setting to each command; never change Git or OS configuration.
+      const integrationFilesystem = args.includes('worktree') || cwd === journal?.worktree;
+      const commandArgs = (dependencies.platform ?? process.platform) === 'win32' && integrationFilesystem
+        ? ['-c', 'core.longpaths=true', ...args] : args;
+      const result = await execute('git', commandArgs, { cwd, signal: opts.signal, timeoutMs: 120000 });
+      if (result.code !== 0 && !allowFailure) {
+        let first = 0;
+        while (args[first] === '-c') first += 2;
+        const operation = args[first] === 'worktree' ? `worktree ${args[first + 1]}` : args[first];
+        const stderr = cleanMessage(asText({ stdout: result.stderr }));
+        // A local checkout/build-preparation error needs its actual cause
+        // retained. Recreating the same checkout is not evidence of main churn.
+        const localPreparationFailure = integrationFilesystem && journal?.stage === 'preparing';
+        throw new DeliveryError('GIT_FAILED', stderr || `Git operation failed (${operation})`, !localPreparationFailure,
+          { operation, exitCode: result.code, stderr });
+      }
       return result;
     };
     const identity = ['-c', 'user.name=RAKEEZ Ops AI', '-c', 'user.email=ai-assistant@local.invalid'];
@@ -368,7 +383,7 @@ export async function publishCandidate(options, dependencies = {}) {
     if (!journal || journal.stage === 'reprepare') {
       if (!await ancestor(opts.baseSha, current)) throw new DeliveryError('REMOTE_BASE_DIVERGED', 'Remote main no longer contains the declared base');
       const ordinal = (journal?.prepareAttempt ?? 0) + 1;
-      if (ordinal > 3) throw new DeliveryError('REMOTE_CHURN', 'Main changed during three integration attempts; retain the candidate and retry deliberately');
+      if (ordinal > 3) throw new DeliveryError('PREPARATION_RETRIES_EXHAUSTED', 'Integration preparation did not complete within three attempts; inspect the retained journal before retrying');
       // A deliberate legacy-journal recovery may reset the bounded attempt
       // counter; retained previous worktrees must never collide or be reused.
       const worktree = path.join(opts.stateDir, `integration-${opts.candidateSha.slice(0, 12)}-${ordinal}-${randomUUID().slice(0, 8)}`);

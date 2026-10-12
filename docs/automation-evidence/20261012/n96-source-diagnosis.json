@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "productId": "N96",
+  "title": "منع وميض خطأ المزامنة أثناء تنفيذ حذف الطالب الجاري",
+  "preparedOn": "2026-10-12",
+  "readOnly": true,
+  "userObservation": "PO reports about one second of a red Sync warning behind the final confirmation during successful deletion of a student with no educational history, followed by roster navigation. N95 original is separately accepted.",
+  "evidenceStatus": {
+    "userReport": true,
+    "browserReproductionPerformed": false,
+    "liveStudentsTouched": false,
+    "deviceMutations": 0,
+    "sourceDiagnosis": "High-confidence causal path in the actual current source; timing and the user's exact installed-browser asset version were not independently recorded."
+  },
+  "observedMain": "b5e83107222833f5e74530a73355734d8477bd03",
+  "inventoryAt": "2026-10-12T20:36:51.298Z",
+  "productionAssets": {
+    "base": "b5e83107222833f5e74530a73355734d8477bd03",
+    "at": "2026-10-12T20:38:48.056Z",
+    "production": "https://rakeezx.com",
+    "results": [
+      {
+        "path": "src/lib/sync-status-severity.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 3562,
+        "expectedSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+        "actualSha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72",
+        "matches": true
+      },
+      {
+        "path": "src/lib/sync-operational-ui.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 7185,
+        "expectedSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+        "actualSha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab",
+        "matches": true
+      },
+      {
+        "path": "src/lib/student-lifecycle-ui.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 15903,
+        "expectedSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+        "actualSha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74",
+        "matches": true
+      },
+      {
+        "path": "src/lib/student-lifecycle.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 14230,
+        "expectedSha256": "e5f5aa630f4b1463c0e2573b91967660b983b7a49c03c4f09093094b5bdc2ef4",
+        "actualSha256": "e5f5aa630f4b1463c0e2573b91967660b983b7a49c03c4f09093094b5bdc2ef4",
+        "matches": true
+      },
+      {
+        "path": "src/lib/sync.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 105758,
+        "expectedSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+        "actualSha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602",
+        "matches": true
+      },
+      {
+        "path": "src/store.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 212621,
+        "expectedSha256": "2523ed7eb4cd4edcdf00b7d03642ad37de4115dfc09145a817d322d46e367712",
+        "actualSha256": "2523ed7eb4cd4edcdf00b7d03642ad37de4115dfc09145a817d322d46e367712",
+        "matches": true
+      },
+      {
+        "path": "sw.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 10029,
+        "expectedSha256": "c2e3c25e388b77b2755d88fe774b6966b0c96702fa2ffa63e527e1bcaedeedca",
+        "actualSha256": "c2e3c25e388b77b2755d88fe774b6966b0c96702fa2ffa63e527e1bcaedeedca",
+        "matches": true
+      },
+      {
+        "path": "src/generated/build-meta.generated.js",
+        "httpStatus": 200,
+        "contentType": "application/javascript",
+        "bytes": 358,
+        "expectedSha256": "456bf15e566b89ad4d5ba1da0ea2bfe3c5564b627f8429ca4dc991b092cc933f",
+        "actualSha256": "456bf15e566b89ad4d5ba1da0ea2bfe3c5564b627f8429ca4dc991b092cc933f",
+        "matches": true
+      }
+    ]
+  },
+  "finding": "A normal, live, protected student-lifecycle command is treated as an interrupted/unsafe Sync recovery. The durable checkpoint exists before the RPC by design, and the existing exclusive lock makes safeToContinueUnrelatedWork=false. Both are currently interpreted as immediate display failure without a distinction for a currently running operation.",
+  "sourceChain": [
+    {
+      "path": "src/lib/student-lifecycle.js",
+      "lines": "213-236",
+      "fact": "executeStudentLifecycle persists the exact studentLifecycleResume checkpoint, updates store.state.device, then calls confirmAndReconcile. A checkpoint here does not by itself mean a failure."
+    },
+    {
+      "path": "src/lib/student-lifecycle.js",
+      "lines": "174-205",
+      "fact": "confirmAndReconcile executes the authoritative RPC and canonical reconciliation inside runStudentLifecycleExclusive."
+    },
+    {
+      "path": "src/lib/sync.js",
+      "lines": "161-174; 631-658; 718-720",
+      "fact": "coordinatorOperationalState returns error immediately when studentLifecycleResume exists. The lifecycle wrapper uses runCloudRestoreExclusive, which sets restoreRunning=true and emits syncing before awaiting the task."
+    },
+    {
+      "path": "src/lib/sync.js",
+      "lines": "205-237",
+      "fact": "The operational summary sets safeToContinueUnrelatedWork=false while restoreRunning or the checkpoint remains; this accurately protects concurrent writes."
+    },
+    {
+      "path": "src/lib/sync-status-severity.js",
+      "lines": "59-78",
+      "fact": "safeToContinueUnrelatedWork=false is classified as fatal error immediately, bypassing the 90-second transient-transport presentation logic."
+    },
+    {
+      "path": "src/lib/sync-warning-policy.js",
+      "lines": "18-32",
+      "fact": "The same safe=false condition is treated as durable warning evidence; the policy returns strip=true and upgrades a non-error state to error. This is a second presentation decision, not a server failure."
+    },
+    {
+      "path": "src/app.js",
+      "lines": "408-427; 469-481; 724-726",
+      "fact": "Sync notifications refresh the read-only summary and paint the status strip while the student sheet stays open. This accounts for a banner behind the ongoing confirmation."
+    },
+    {
+      "path": "src/lib/student-lifecycle.js",
+      "lines": "143-169",
+      "fact": "Successful canonical reconcile clears the checkpoint and refreshes Product state; the exclusive wrapper then releases its lock and schedules ordinary Sync."
+    },
+    {
+      "path": "src/views/student.js",
+      "lines": "728-740",
+      "fact": "After openStudentManagement resolves successfully, the action intentionally assigns location.hash to the preserved Teaching's roster (or classes fallback). No location.reload is present in this delete action; a full page reload was not observed."
+    }
+  ],
+  "minimalFix": {
+    "objective": "Represent a currently running, context-bound student lifecycle operation as neutral in-progress presentation. Preserve the checkpoint, all write exclusions, RPC/owner semantics, reconciliation, scheduling and resume behavior. A leftover checkpoint after completion/failure/reload must still require immediate visible recovery.",
+    "requiredProductionPaths": [
+      "src/lib/sync.js",
+      "src/lib/sync-status-severity.js",
+      "src/lib/sync-warning-policy.js"
+    ],
+    "conditionalPath": "src/lib/student-lifecycle.js only if passing a precise existing checkpoint identity into the existing exclusive wrapper is needed; no change to command, receipt or reconciliation semantics.",
+    "presentationContract": "Track live operation lifetime internally, bound to the current owner/workspace and exact active checkpoint/operation. Expose only privacy-safe status metadata, not owner IDs, mutation envelopes or raw records. While that exact operation is active and no independent hard error exists, present syncing/pending neutrally with cloudSyncHealthy=false. Keep safeToContinueUnrelatedWork=false and the existing Product write guard unchanged.",
+    "policyReason": "sync-warning-policy really consumes the same unsafe boolean and currently emits strip=true/status=error even if the incoming state is syncing. A projector-only change may be re-projected later by app.js, but it still leaves a contradictory warning decision. Reuse the same explicit in-flight predicate in this existing policy; no new banner, timer, framework or UI surface is needed.",
+    "hardPrecedence": "Durable failed/rejected/blocked work, revoked Auth, wrong owner/workspace, genuine hard failure, unknown unsafe state and checkpoint without a matching live operation retain their existing immediate visibility. The in-flight exception expires synchronously in finally and on owner/workspace change. It is not a grace period or blanket suppression while any sheet is open.",
+    "unchangedByScope": [
+      "90-second transport policy and retry cadence",
+      "safeToContinueUnrelatedWork truth and write prohibition",
+      "Student deletion eligibility, SQL, Auth and server receipts",
+      "N92 approved success copy",
+      "StudentManagementSuccessDestination and ordinary roster navigation",
+      "Real teacher/student records"
+    ]
+  },
+  "validationPlan": {
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "validationTier": "STANDARD",
+    "suggestedBudgetMinutes": 45,
+    "suggestedIdleMinutes": 12,
+    "requiredChecks": [
+      "student_lifecycle_inflight_presentation",
+      "student_lifecycle_recovery_visibility",
+      "student_delete_confirmation_navigation"
+    ],
+    "checks": [
+      {
+        "name": "student_lifecycle_inflight_presentation",
+        "scope": "Use the real current coordinator/lifecycle client with the existing synthetic backend. Hold the RPC response or reconciliation behind a deterministic promise barrier. While the exact checkpoint and live exclusive operation are active, assert neutral summary/badge, no error status strip, cloudSyncHealthy=false, safeToContinueUnrelatedWork=false and Product edits still blocked. Do not solve by adding a sleep or changing retries."
+      },
+      {
+        "name": "student_lifecycle_recovery_visibility",
+        "scope": "On the same focused harness, fail/interrupt the operation so its durable checkpoint remains but no live operation does; assert immediate visible recovery/error. Preserve the existing N95 hard-category assertions for failed/rejected work, Auth/owner and generic unsafe state, including context change. No full project suite."
+      },
+      {
+        "name": "student_delete_confirmation_navigation",
+        "scope": "One bounded existing student-lifecycle browser case on real Product DOM with synthetic intercepted backend only: preview -> confirm -> held request -> successful receipt/reconcile -> success copy -> explicit Return -> expected originating roster. Observe the strip continuously during the held phase. Confirm no document reload or premature navigation. Reuse the existing navigation unit test. No live student deletion or new A/B Auth provisioning."
+      }
+    ],
+    "existingHarnesses": [
+      "tests/n95-sync-status-severity.test.mjs",
+      "tests/student-lifecycle-client.test.mjs",
+      "tests/student-lifecycle-ui.e2e.mjs",
+      "tests/helpers/student-lifecycle-server.mjs",
+      "tests/student-management-navigation.test.mjs"
+    ],
+    "limitation": "Existing N95 tests explicitly cover an orphan synthetic checkpoint and generic safe=false, but do not cover a checkpoint inside a genuine in-flight lifecycle. Add that missing distinction; do not weaken the orphan test. Browser/native fixture setup may reuse the already installed local PostgreSQL capability; no Docker or paid service is required."
+  },
+  "suggestedAllowedPaths": [
+    "src/lib/sync.js",
+    "src/lib/sync-status-severity.js",
+    "src/lib/sync-warning-policy.js",
+    "src/lib/student-lifecycle.js",
+    "sw.js",
+    "tests/n96-*",
+    "tests/n95-sync-status-severity.test.mjs",
+    "tests/student-lifecycle-client.test.mjs",
+    "tests/student-lifecycle-ui.e2e.mjs",
+    "tests/student-management-navigation.test.mjs"
+  ],
+  "sourceFiles": [
+    {
+      "path": "src/lib/sync-status-severity.js",
+      "blob": "be6f87ea524b52ff8f377c46de3da840484513cf",
+      "sha256": "9e037f334d1007da97e16f7de86669663ed4346c7171497d618b6d70feab9f72"
+    },
+    {
+      "path": "src/lib/sync-operational-ui.js",
+      "blob": "729975fdde14b2c931efaecc25498cfc4a568899",
+      "sha256": "c9c6ea6166818804906b5fa36fa608e0b07ce55300e81d381219b8b521cb43ab"
+    },
+    {
+      "path": "src/lib/student-lifecycle-ui.js",
+      "blob": "03204a33834468483e6e9f998a65f2e7e238d261",
+      "sha256": "dd1b5b0f6df2d4694ab8d8759db4ccf8cef6891c0e09aa467509a270c8a2ff74"
+    },
+    {
+      "path": "src/lib/student-lifecycle.js",
+      "blob": "0a3cd7da08ef224983dca58f9219115809199c13",
+      "sha256": "e5f5aa630f4b1463c0e2573b91967660b983b7a49c03c4f09093094b5bdc2ef4"
+    },
+    {
+      "path": "src/lib/sync.js",
+      "blob": "5e5352c36a664c75c3f328f3450ea2a75a34dcf4",
+      "sha256": "fa25e6e7c6aaabf860a79686d0e153c754152504b3c17c778311c1e758260602"
+    },
+    {
+      "path": "src/store.js",
+      "blob": "977d0f8053e842f19c4d9696501416948a4bfdc9",
+      "sha256": "2523ed7eb4cd4edcdf00b7d03642ad37de4115dfc09145a817d322d46e367712"
+    },
+    {
+      "path": "src/views/students.js",
+      "blob": "acb16ee6e6c3dc98e37aea79efc9f16c85fb5d75",
+      "sha256": "a4b62573b9e8dc82cb1f45edf4feb4dc1c8dd8b472f9b96607a5fa3ea6e3a0ff"
+    },
+    {
+      "path": "src/app.js",
+      "blob": "9fb65a3a2a82390483532879d44ca3ba363b6bb4",
+      "sha256": "53ccf1f74ebdf2181a6a2c0b999dae795a47ac82b34596755eea2aecd17b16f6"
+    },
+    {
+      "path": "src/views/student.js",
+      "blob": "1abbfa4e8d44a7d8349580a708ee3031b1691ecd",
+      "sha256": "d38faadf2e43d5d704e7451cd682cd2536daf938b07a83b55174bc7f35834c0e"
+    },
+    {
+      "path": "src/lib/sync-warning-policy.js",
+      "blob": "57e84b3a9115a8eba22e3eaeadd5f8876d61879a",
+      "sha256": "cb21321971927de55bfd95c628aaad02070f8c944c33c043f596fd8d4b6a37f7"
+    },
+    {
+      "path": "tests/n95-sync-status-severity.test.mjs",
+      "blob": "eb34c16f4a5686ed020b5c8be9019a8799a13f7f",
+      "sha256": "1e632efa7545cc57a34ffe3bbfb114947d8b885e6824e220e6ed2eef9338776b"
+    },
+    {
+      "path": "tests/student-lifecycle-client.test.mjs",
+      "blob": "5000156f57c1fd1baaef819849bc4948f822282a",
+      "sha256": "36b0f43ace37cc721fd1759928673c770697ab40901f51d7acb63e250745430a"
+    },
+    {
+      "path": "tests/student-lifecycle-ui.e2e.mjs",
+      "blob": "d7a20f514246d9673e41f00124feeeb5bc154e24",
+      "sha256": "95cb264435275a07310f705b76d7d88858eec4f2c3b9443a1f796d50815ada61"
+    },
+    {
+      "path": "tests/student-management-navigation.test.mjs",
+      "blob": "b887f5d6096530ab47cf1b22617304958322ec44",
+      "sha256": "56b6b0f2613745dbcea5a6334ca37448a5dbb5ce30f4390815b5d8dcfa5edad4"
+    }
+  ]
+}

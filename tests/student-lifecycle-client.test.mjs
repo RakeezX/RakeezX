@@ -9,9 +9,20 @@ import * as sync from '../src/lib/sync.js';
 import * as cloud from '../src/lib/cloud.js';
 import { getStudentLifecycleResumeState, resumeStudentLifecycle, localPristineBlocker, executeStudentLifecycle } from '../src/lib/student-lifecycle.js';
 import { lifecycleServer, academicFixture, LifecycleBackend, OWNER } from './helpers/student-lifecycle-server.mjs';
+import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
+import { syncOperationalPresentation } from '../src/lib/sync-operational-ui.js';
+import { presentSyncWarning } from '../src/lib/sync-warning-policy.js';
 
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
+const storage = new Map();
+global.localStorage = { get length() { return storage.size; }, key: index => [...storage.keys()][index],
+  getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, String(value)), removeItem: key => storage.delete(key) };
+global.fetch = async url => {
+  assert.equal(String(url), `${cloud.SUPABASE_URL}/auth/v1/user`, 'No real network in synthetic lifecycle tests');
+  return new Response(JSON.stringify({ id: OWNER }), { status: 200 });
+};
 let pg, backend;
 before(async () => { pg = await lifecycleServer({ migration32: true }); backend = new LifecycleBackend(pg); cloud.setMockBackend(backend); });
 after(async () => { cloud.setMockBackend(null); cloud.setMockAuth(null, null); store.closeChannel(); db.closeDB(); await pg?.close(); });
@@ -19,9 +30,17 @@ after(async () => { cloud.setMockBackend(null); cloud.setMockAuth(null, null); s
 async function device(factory = new IDBFactory()) {
   db.closeDB(); global.indexedDB = factory;
   cloud.setMockAuth({ id: OWNER }, { access_token: 'synthetic' });
+  localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify({ access_token: 'synthetic', user: { id: OWNER } }));
+  await activateSyntheticAccountWorkspace({ ownerId: OWNER });
+  if (!await db.get('profile', 'profile')) await db.put('profile', { id: 'profile', serverRevision: 1, teacherName: 'Synthetic teacher' });
+  if (!await db.get('device', 'device')) await db.put('device', { id: 'device', deviceId: 'synthetic-device' });
   await store.init();
+  // This client fixture mounts an already resolved synthetic workspace; boot
+  // provisioning is outside its scope. Still obtain actual intercepted Auth proof.
+  store.getOfflineLeaseStatus();
+  await runtimeOfflineLease().renew(cloud.verifyCurrentAuthIdentity);
   assert.equal(await sync.syncAll({ full: true }), true);
-  assert.equal((await db.getAll('outbox')).length, 0);
+  assert.equal((await sync.getSyncOperationalSummary()).queuedCount, 0);
   return factory;
 }
 
@@ -33,6 +52,124 @@ test('local-only submissions and retained/deleted evidence block pristine deleti
     assert.equal(localPristineBlocker({ ...base, [name]: [{ studentId, value: 0, deleted: true }] }, studentId), name);
   }
   assert.equal(localPristineBlocker({ ...base, closedTermReports: [{ payload: { roster: [{ id: studentId }] } }] }, studentId), 'closedTermReports');
+});
+
+const barrier = () => {
+  let enter, release;
+  return { entered: new Promise(resolve => { enter = resolve; }),
+    wait: new Promise(resolve => { release = resolve; }), enter: () => enter(), release: () => release() };
+};
+
+function assertNeutral(summary) {
+  assert.equal(summary.studentLifecycleInFlight, true);
+  assert.equal(summary.state, 'syncing');
+  assert.equal(summary.cloudSyncHealthy, false);
+  assert.equal(summary.safeToContinueUnrelatedWork, false);
+  assert.equal(syncOperationalPresentation(summary).badge, 'badge--neutral');
+  assert.equal(presentSyncWarning(summary, null, Date.now()).strip, false);
+}
+
+test('N96 student_lifecycle_inflight_presentation: actual RPC and reconciliation barriers preserve write exclusion', async () => {
+  const f = await academicFixture(pg, 'n96-inflight');
+  await device();
+  const rpc = barrier(), reconciliation = barrier();
+  const apply = backend.applyStudentLifecycleCommand, fetch = backend.fetchRecords;
+  let reconciling = false;
+  backend.applyStudentLifecycleCommand = async function(envelope) {
+    rpc.enter(); await rpc.wait;
+    const result = await apply.call(this, envelope); reconciling = true; return result;
+  };
+  backend.fetchRecords = async function(table) {
+    if (reconciling && table === 'students') { reconciliation.enter(); await reconciliation.wait; }
+    return fetch.call(this, table);
+  };
+  const observed = [];
+  const unsubscribe = sync.subscribe(() => {
+    if (store.state.device?.studentLifecycleResume) observed.push(sync.getSyncOperationalSummarySnapshot());
+  });
+  const operation = store.deletePristineStudent(f.student);
+  try {
+    await rpc.entered;
+    assertNeutral(await sync.getSyncOperationalSummary());
+    assertNeutral(sync.getSyncOperationalSummarySnapshot());
+    await assert.rejects(store.renameStudent(f.student, 'Forbidden edit'), { code: 'LIFECYCLE_RESUME_REQUIRED' });
+    await assert.rejects(db.put('notes', { id: 'n96-forbidden', studentId: f.student }), { code: 'LIFECYCLE_RESUME_REQUIRED' });
+    rpc.release(); await reconciliation.entered;
+    assert.ok((await db.get('device', 'device')).studentLifecycleResume.result);
+    assertNeutral(await sync.getSyncOperationalSummary());
+    assertNeutral(sync.getSyncOperationalSummarySnapshot());
+    reconciliation.release();
+    assert.equal((await operation).ok, true);
+    assert.equal(sync.getSyncOperationalSummarySnapshot().studentLifecycleInFlight, false);
+    assert.equal((await sync.getSyncOperationalSummary()).safeToContinueUnrelatedWork, true);
+    assert.ok(observed.length > 0);
+    observed.forEach(assertNeutral);
+  } finally { rpc.release(); reconciliation.release(); unsubscribe(); backend.applyStudentLifecycleCommand = apply; backend.fetchRecords = fetch; }
+});
+
+test('N96 student_lifecycle_recovery_visibility: failed live scope immediately exposes orphan recovery', async () => {
+  for (const phase of ['rpc', 'reconciliation']) {
+    const f = await academicFixture(pg, `n96-fail-${phase}`);
+    await device();
+    const held = barrier(), apply = backend.applyStudentLifecycleCommand, fetch = backend.fetchRecords;
+    let reconciling = false;
+    backend.applyStudentLifecycleCommand = async function(envelope) {
+      if (phase === 'rpc') { held.enter(); await held.wait; throw new TypeError('Failed to fetch'); }
+      const result = await apply.call(this, envelope); reconciling = true; return result;
+    };
+    backend.fetchRecords = async function(table) {
+      if (reconciling && table === 'students') { held.enter(); await held.wait; throw new TypeError('Failed to fetch'); }
+      return fetch.call(this, table);
+    };
+    const operation = store.deletePristineStudent(f.student);
+    const rejected = assert.rejects(operation, /Failed to fetch/);
+    try {
+      await held.entered; assertNeutral(await sync.getSyncOperationalSummary());
+      held.release(); await rejected;
+      assert.ok((await db.get('device', 'device')).studentLifecycleResume);
+      for (const summary of [sync.getSyncOperationalSummarySnapshot(), await sync.getSyncOperationalSummary()]) {
+        assert.equal(summary.studentLifecycleInFlight, false);
+        assert.equal(summary.state, 'error');
+        assert.equal(summary.safeToContinueUnrelatedWork, false);
+        assert.equal(presentSyncWarning(summary, null, Date.now()).strip, true);
+      }
+    } finally { held.release(); backend.applyStudentLifecycleCommand = apply; backend.fetchRecords = fetch; }
+    assert.equal((await resumeStudentLifecycle()).ok, true);
+  }
+});
+
+test('N96 context change, changed checkpoint and generic restore cannot borrow a live lifecycle exception', async () => {
+  await device();
+  const checkpoint = { ownerId: OWNER, envelope: { mutationId: 'n96-context' } };
+  store.state.device.studentLifecycleResume = checkpoint;
+  const held = barrier();
+  const operation = sync.runStudentLifecycleExclusive(async () => { held.enter(); await held.wait; },
+    { ownerId: OWNER, mutationId: 'n96-context' });
+  try {
+    await held.entered; assertNeutral(await sync.getSyncOperationalSummary());
+    store.state.device.studentLifecycleResume = { ...checkpoint, envelope: { mutationId: 'different' } };
+    assert.equal(sync.getSyncOperationalSummarySnapshot().state, 'error');
+    store.state.device.studentLifecycleResume = checkpoint;
+    cloud.setMockAuth({ id: '22222222-2222-4222-8222-222222222222' }, { access_token: 'synthetic' });
+    assert.equal(sync.getSyncOperationalSummarySnapshot().studentLifecycleInFlight, false);
+    cloud.setMockAuth({ id: OWNER }, { access_token: 'synthetic' });
+    assert.equal(sync.getSyncOperationalSummarySnapshot().state, 'error', 'return to original owner does not revive expired scope');
+    held.release(); await operation;
+    assert.equal(sync.getSyncOperationalSummarySnapshot().state, 'error', 'stale completion cannot quiet checkpoint');
+    await sync.runCloudRestoreExclusive(async () => {
+      assert.equal(sync.getSyncOperationalSummarySnapshot().state, 'error');
+    }, { scheduleAutomatic: false });
+    const workspace = store.getActiveWorkspace();
+    const changed = barrier();
+    const workspaceOperation = sync.runStudentLifecycleExclusive(async () => { changed.enter(); await changed.wait; },
+      { ownerId: OWNER, mutationId: 'n96-context' });
+    await changed.entered;
+    store.activateWorkspace({ ...workspace, authUserId: '22222222-2222-4222-8222-222222222222' });
+    assert.equal(sync.getSyncOperationalSummarySnapshot().studentLifecycleInFlight, false);
+    store.activateWorkspace(workspace);
+    changed.release(); await workspaceOperation;
+    assert.equal(sync.getSyncOperationalSummarySnapshot().state, 'error');
+  } finally { held.release(); delete store.state.device.studentLifecycleResume; }
 });
 
 test('end enrollment preserves the interval after reload and converges to two independent devices', async () => {
@@ -67,7 +204,7 @@ test('offline/auth/pending work cannot perform destructive lifecycle writes', as
   await device();
   const before = structuredClone(await db.get('students', f.student));
   cloud.setMockAuth(null, null);
-  await assert.rejects(store.deletePristineStudent(f.student), { code: 'AUTH_REQUIRED' });
+  await assert.rejects(executeStudentLifecycle('delete_pristine', { studentId: f.student }), { code: 'AUTH_REQUIRED' });
   cloud.setMockAuth({ id: OWNER }, { access_token: 'synthetic' });
   Object.defineProperty(global.navigator, 'onLine', { value: false, configurable: true });
   await assert.rejects(store.deletePristineStudent(f.student), { code: 'OFFLINE' });

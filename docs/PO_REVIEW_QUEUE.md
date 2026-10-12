@@ -4,9 +4,24 @@
 This page preserves user notes and acceptance context. The automatic block lists only delivery with observed Production evidence; use the task's delivery receipt and [Product ledgers](PRODUCT_LEDGER.md) for status. `awaiting_po` releases execution capacity immediately, so review does not delay the next eligible ticket. Local/Preview results are not published acceptance items.
 
 <!-- BEGIN RAKEEZ CONTINUOUS DELIVERY -->
-The delivery recorder maintains verified published items here. Consult `artifacts/ops-supervisor-v4/ACTIVE_TASKS.json`, the relevant `queue/*.json` and delivery receipt for current evidence; absence from an unrefreshed page is not a status decision.
+
+| التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
+| --- | --- | --- | --- | --- | --- |
+| N49 | Production 7/14 days unchanged; separate 3/6-minute Preview available for PO trial; browser checks PARTIAL_FAIL_BROWSER_TIMEOUT: Product-account test timed out at 120 seconds; raw Production 7/14-day test passed in 1.1 seconds; overall browser run FAIL | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
+| N13 | Fixed canonical-item duplication and committed the completed scoped candidate. Historical blocked evidence preserved. No push, deployment, live mutation or queue/status edits. | [Production](https://rakeezx.com/) | 63b2c1fc29361d6c4c1ac066a743efaf3f2e31b8 | 2026-10-12T20:57:01.603Z | continuous-n13-existing-section-subject-20261012 |
+
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
+
+<!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->
+## Current PO decisions — 2026-10-13
+
+N96 and N54 are explicitly accepted/CLOSED. N13 remains OPEN for the requested single grade/section/subject form and current-term duplicate rejection; its prior release does not accept this revision.
+
+N49 test Preview: [https://2304c981.rakeezx.pages.dev](https://2304c981.rakeezx.pages.dev). Release `a0419c5718422209ebf62773ac83436a7f848061`; source `ed2b49ae1fe7c3981e894e2f809a702640af3f2d`. Normal through 3 minutes, editable reminder after 3 minutes, read-only from 6 minutes. Reading/export/backup remain available; Restore and other writes are blocked. Production stays 7/14 days. Provider SUCCESS; module-boundary PASS; browser checks PARTIAL_FAIL_BROWSER_TIMEOUT: Product-account test timed out at 120 seconds; raw Production 7/14-day test passed in 1.1 seconds; overall browser run FAIL. This is for PO trial, not closure.
+
+N77 deletion is high priority after N13/N49. Deferred tickets stay deferred. See `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`; native queue closure is confirmed by a later controller snapshot.
+<!-- END RAKEEZ PO DECISIONS 20261013 -->
 
 ## Preserved user notes and historical review context — not dispatch instructions
 

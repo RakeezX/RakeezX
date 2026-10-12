@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import 'fake-indexeddb/auto';
 import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
-import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { n13Account } from './n13-fixture.mjs';
 
 const originalDocument = globalThis.document;
 const originalMatchMedia = globalThis.matchMedia;
@@ -19,7 +19,7 @@ globalThis.document = {
 globalThis.matchMedia = () => ({ matches: false });
 
 beforeEach(async () => {
-  await activateSyntheticAccountWorkspace();
+  await n13Account();
   await db.clearAll();
   await store.init();
   for (const name of Object.keys(store.state)) if (Array.isArray(store.state[name])) store.state[name] = [];
@@ -62,7 +62,7 @@ test('different labels/grades/years are allowed; edit validation uses the edited
   await assert.rejects(store.editSection(a.id, { grade:4, label:'2' }), /موجود مسبق/);
 });
 
-test('Production true delete tombstones section/teaching/items and allows recreation with fresh immutable IDs', async () => {
+test('pristine safe delete tombstones section/teaching/items and allows recreation with fresh immutable IDs', async () => {
   const a = await store.createSection({ grade:4, label:'أ' });
   const teaching = await store.createTeaching({ sectionId:a.id, subjectId:'subject:test', termId:'term:test' });
   const itemIds = store.items(teaching.id).map((item) => item.id);
