@@ -1127,10 +1127,13 @@ export function createSyncV2Engine({
       const role = (item) => `${item.name}|${item.auto ?? ''}|${item.max}|${item.perPoint ?? 1}|${item.penalty ?? 1}`;
       const canonByRole = new Map(items.map((item) => [role(item), item]));
       const mappings = [[mutation.recordId, teaching.id, 'teachings'], ...localItems.map((item) => [item.id, canonByRole.get(role(item))?.id, 'items'])].filter(([, to]) => to);
+      const retiredItemIds = new Set(mappings.filter(([from, to, store]) => store === 'items' && from !== to).map(([from]) => from));
       const rewritten = current.outbox.filter((row) => row.id !== mutation.id).map((row) => mappings.reduce((next, [from, to, store]) => rewriteMutationReferences(next, store, from, to), row));
       for (const [from, to, store] of mappings) {
         if (from !== to) writes[store].remove.push(from);
         for (const candidateStore of SYNC_V2_STORES) for (const record of current[candidateStore]) {
+          // Retired defaults are replaced by the receipt, not re-put with a new Teaching reference.
+          if (candidateStore === 'items' && retiredItemIds.has(record.id)) continue;
           const next = rewriteReferenceRecord(candidateStore, record, store, from, to);
           if (next !== record) pushUniquePut(writes[candidateStore], next);
         }
