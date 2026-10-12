@@ -110,7 +110,17 @@ export async function call(s,mode,operation,slot,extra={}) {
 async function authPost(s,grant,body) {
   const r=await fetch(`${URL}/auth/v1/token?grant_type=${grant}`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
     headers:{apikey:s.publishableKey,'content-type':'application/json','x-supabase-api-version':'2024-01-01'},body:JSON.stringify(body)});
-  return {status:r.status,data:await r.json()};
+  const data=await r.json();
+  data.code??=data.error_code;
+  if(data.access_token) {
+    // GoTrue may omit expires_at. JWT exp records the residual access window
+    // only; the authenticated user and server marker establish identity.
+    try {
+      const expires=JSON.parse(Buffer.from(data.access_token.split('.')[1],'base64url').toString('utf8')).exp;
+      if(Number.isInteger(expires))data.expires_at=expires;
+    }catch{ /* Received tokens are still persisted before validation/recovery. */ }
+  }
+  return {status:r.status,data};
 }
 export async function operation(op,mode='provision') {
   const s=await readState();
@@ -138,6 +148,7 @@ export async function operation(op,mode='provision') {
       // Preserve received tokens before validation, so finally can retire an uncertain response.
       if(data.access_token)s.tokens[context]={...data,ownerVerified:false};await saveState(s);
       if(status!==200||data.user?.id!==a.id||canonical(data.user.app_metadata?.n77)!==canonical(fixtureMarker({runId:RUN_ID},a.slot)))throw fail('AUTH_SESSION_OWNER_NOT_VERIFIED');
+      if(!Number.isInteger(data.expires_at)||data.expires_at<=Date.now()/1000)throw fail('TOKEN_EXPIRY_UNAVAILABLE');
       s.tokens[context].ownerVerified=true;
       s.events.push({context,ownerId:a.id,sessionIssued:true,accessJwtExpiry:new Date(data.expires_at*1000).toISOString()});await saveState(s);
     }
