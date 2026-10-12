@@ -409,7 +409,7 @@ export default {
                 <p>${plan.changedCount} بنود ستتغيّر. تبقى الفصول مستقلة بعد النسخ.</p>
                 ${plan.targets.map(target => target.beforeTotal != null ? html`<p>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}: المجموع ${target.beforeTotal} ← ${target.afterTotal} درجة.</p>` : '')}
                 ${(plan.excludedTargets ?? []).map(target => html`<p role="alert">${target.reason}
-                  <a href="#/items/${target.teachingId}">فتح توزيع الفصل المستهدف</a> · لن يُطبّق عليه التوزيع.</p>`)}
+                  <a href="#/teaching/${target.teachingId}/items">فتح توزيع الفصل المستهدف</a> · لن يُطبّق عليه التوزيع.</p>`)}
                 ${plan.requiresConfirmation ? html`<p>يؤثر هذا التوزيع في درجات أو طريقة رصد محفوظة؛ يلزم تأكيد الأثر قبل التطبيق.</p>` : ''}
                 ${plan.targets.some(target => target.extras.length) ? html`<p>تبقى البنود الإضافية ودرجاتها؛ يمكنك مراجعة إزالتها في عرض الأثر.</p>` : ''}
                 <details><summary style="min-height:44px;cursor:pointer">عرض الأثر</summary>
@@ -426,7 +426,7 @@ export default {
             } catch (error) {
               if (version !== requestVersion || !root.isConnected) return;
               render(review, html`<p role="alert">${error.message}</p>
-                ${selected.map(id => html`<a href="#/items/${id}">فتح توزيع ${store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))}</a>`)}`);
+                ${selected.map(id => html`<a href="#/teaching/${id}/items">فتح توزيع ${store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))}</a>`)}`);
             }
           };
           root.addEventListener('change', event => { if (event.target.matches('[data-copy-target]')) refresh(); });

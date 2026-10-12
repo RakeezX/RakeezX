@@ -36,7 +36,7 @@ try {
         for(const [name,rows] of Object.entries({sections,teachings,students,items,scoreSubitems:subs,scores,scoreSubitemCompletions:completions})) await db.putMany(name,rows);
         await s.refreshSyncedState();return {source:teachings[0].id,target:teachings[1].id};
       });
-      await page.goto(base+'/#/items/'+ids.source);await page.locator('[data-act="copy"]').click();
+      await page.goto(base+'/#/teaching/'+ids.source+'/items');await page.locator('[data-act="copy"]').click();
       assert.equal(await page.locator('[data-copy-target]:checked').count(),0);
       assert.equal(await page.locator('[data-copy-apply]').isDisabled(),true);
       const targetOrder=await page.locator('[data-copy-target]').evaluateAll(rows=>rows.filter(r=>r.value.startsWith('demo:n73:')).map(r=>r.value));
@@ -59,7 +59,7 @@ try {
           source:(await db.get('scores','demo:n73:sourceScore')).value,items:(await db.getAll('items')).filter(r=>r.teachingId==='demo:n73:t10')};
       });
       assert.equal(outcome.cap,20);assert.equal(outcome.valid,18);assert.equal(outcome.extra,4);assert.equal(outcome.source,19);assert.equal(outcome.items.length,2);
-      await page.goto(base+'/#/items/'+ids.target);
+      await page.goto(base+'/#/teaching/'+ids.target+'/items');
       const parent=page.locator('[data-act="edit"][data-id="demo:n73:targetSub"]');assert.equal(await parent.count(),1);
       assert.equal(await page.locator('[data-act="configure"][data-id="demo:n73:targetSub"]').count(),1);
       const before=await page.evaluate(async()=>{
@@ -71,7 +71,7 @@ try {
       await page.waitForFunction(async()=> (await (await import('/src/lib/db.js')).get('items','demo:n73:targetSub'))?.name==='Renamed Parts');
       const after=await page.evaluate(async()=>{const db=await import('/src/lib/db.js');return {subs:await db.getAll('scoreSubitems'),scores:await db.getAll('scores'),completions:await db.getAll('scoreSubitemCompletions')};});
       assert.deepEqual(after,before);
-      await page.goto(base+'/#/items/'+ids.source);await page.locator('[data-act="copy"]').click();
+      await page.goto(base+'/#/teaching/'+ids.source+'/items');await page.locator('[data-act="copy"]').click();
       assert.equal(await page.locator('[data-copy-target]:checked').count(),0);
       await page.locator('[data-copy-target][value="demo:n73:t2"]').check();
       await page.waitForFunction(()=>!document.querySelector('[data-copy-apply]').disabled);
