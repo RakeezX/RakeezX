@@ -1,0 +1,25 @@
+{
+  "version": 5,
+  "defaultWorkers": 1,
+  "maxWorkers": 1,
+  "maxActiveFamilies": 2,
+  "paidPlanner": false,
+  "defaultModel": "gpt-6-luna",
+  "defaultEffort": "medium",
+  "models": {
+    "FAST": { "model": "gpt-6-luna", "effort": "medium" },
+    "STANDARD": { "model": "gpt-6-luna", "effort": "medium" },
+    "SENSITIVE": { "model": "gpt-6.1-sol", "effort": "medium" },
+    "CRITICAL": { "model": "gpt-6.1-sol", "effort": "high" }
+  },
+  "maxSameBlockerAttempts": 2,
+  "controller": {
+    "activationId": "po-20261012-continuous",
+    "repoRoot": "C:\\Users\\Abody\\Projects\\RakeezX",
+    "codexPath": "C:\\Users\\Abody\\AppData\\Local\\OpenAI\\Codex\\bin\\2e5e00daee91c61d\\codex.exe",
+    "repository": "RakeezX/RakeezX",
+    "remote": "origin",
+    "branch": "main",
+    "productionUrl": "https://rakeezx.com"
+  }
+}

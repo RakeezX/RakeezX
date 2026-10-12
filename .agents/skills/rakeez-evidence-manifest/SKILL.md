@@ -1,10 +1,10 @@
 ---
 name: rakeez-evidence-manifest
-description: Produce a compact, non-sensitive RAKEEZ X ticket evidence manifest from exact Git identity and supplied verification results. Use for candidate or release handoff.
+description: Record one compact exact-scope result without repeated global seals.
 ---
 
-# Evidence manifest
+Return final JSON using the runner's supplied schema and exact `taskId`/`runId`. Include `state` (`LOCAL_READY`, `BLOCKED` or `NO_CHANGE`), `candidateSha`, `baseSha`, `worktreePath`, `changedPaths`, `checks` as `{name,status,evidence}` records, `summary`, `blockerType`, `blocker` and `nextAction`. Use actual full Git SHAs where available and schema-permitted nulls otherwise; never invent a field's evidence. The runner writes `resultPath`.
 
-Run `node scripts/rakeez.mjs evidence --ticket <ticket-id> --base <40-hex-sha> --candidate <40-hex-sha> [--input <safe-results.json>]`. The helper writes ignored `test-results/evidence/<ticket-id>/manifest.json` and `manifest.md` with sorted changed files and migration scope.
+Do not edit queue status or write DEPLOYED from the worker. The controller binds the candidate and the adapter records actual provider/served Production evidence; only that permits runtime `awaiting_po`, which releases capacity without Product closure. Do not convert SKIP into PASS, emulation into physical-device proof or Preview into Production.
 
-Supply only allowlisted test counts/status, build status, Preview/deployment identity, blocker codes, approvals, and Production verification state. The helper rejects extra fields; do not put secrets, tokens, student names, private Product rows, or raw logs in the input or manifest. A manifest records evidence; it does not turn an unrun check into PASS or authorize promotion.
+Link existing affected evidence; do not make a new report per probe or repeat immutable logs. Exclude secrets, real private rows and raw UA. Use no separate audit worker, global ref seals or unrelated worktree hashes. Follow `docs/RAKEEZ_OPS_CONTRACT.md` for acceptance and authority.

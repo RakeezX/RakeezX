@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "purpose": "Examples for the already authorized first two Product proofs. Append further scoped eligible cards to the existing catalog under the same activation; do not replace unrelated historical records.",
+  "tasks": [
+    {
+      "id": "v6-n92-delete-copy-20261012",
+      "productId": "N92",
+      "activationId": "po-20261012-continuous",
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "requiredChecks": ["scope", "syntax"],
+      "priority": 1,
+      "scopeKey": "n92-delete-success-copy",
+      "objective": "Only in the confirmed successful delete_pristine branch, replace تم حذف الطالب المضاف بالخطأ with تم حذف الطالب بنجاح in src/lib/student-lifecycle-ui.js.",
+      "acceptance": [
+        "Confirmed successful delete_pristine shows تم حذف الطالب بنجاح.",
+        "Confirmation text, recorded-student behavior, deletion semantics and Sync are unchanged.",
+        "A syntax check and one exact scoped source assertion establish the copy change; no blanket suite or worker Vite build."
+      ],
+      "allowedPaths": ["src/lib/student-lifecycle-ui.js"],
+      "releaseAuthority": "Product Owner's 2026-10-12 continuous delivery authorization, specifically N92 scoped success copy; deploy this scoped frontend correction through the controller and then await PO review. No live data mutation."
+    },
+    {
+      "id": "v6-n91-mobile-card-titles-20261012",
+      "productId": "N91",
+      "activationId": "po-20261012-continuous",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "budgetMinutes": 45,
+      "idleMinutes": 15,
+      "requiredChecks": ["responsive_layout", "card_navigation"],
+      "priority": 2,
+      "scopeKey": "n91-class-tool-card-mobile",
+      "dependsOn": ["v6-n92-delete-copy-20261012"],
+      "objective": "Fix clipped class-tool-card titles in src/styles/components.css on narrow iPhone/mobile widths using wrapping and a grid that adapts to available space, preserving the readable full tool names without ellipsis.",
+      "acceptance": [
+        "At 320, 360, 390 and 430 CSS-pixel RTL widths, all class tool names are visible and cards do not overflow horizontally.",
+        "Use two columns or one column as space permits; at most a small approximately 1px font reduction only if needed for readability.",
+        "Do not remove cards, necessary content, handlers or Product behavior. Use a targeted synthetic mobile layout proof, with a browser lease only for its browser/server phase."
+      ],
+      "allowedPaths": ["src/styles/components.css"],
+      "releaseAuthority": "Product Owner's 2026-10-12 continuous delivery authorization, specifically N91 responsive class-tool titles; deploy the scoped frontend correction and await PO review. Use synthetic browser data, with no real student or teacher data mutation."
+    }
+  ]
+}

@@ -1,31 +1,7 @@
-# RAKEEZ X — Phase 5D Closeout Status
+# RAKEEZ — live status entry
 
-**Current phase:** Phase 5D — user-accepted release candidate; merge decision pending.
+For current Product status, read [the active ledger](docs/PRODUCT_LEDGER.md) and [closed ledger](docs/PRODUCT_LEDGER_CLOSED.md). For current work, read `artifacts/ops-supervisor-v4/ACTIVE_TASKS.json` and only the relevant `queue/*.json`; inspect their timestamps and actual controller/worker identity when diagnosing liveness.
 
-## USER MANUAL VERIFIED — latest Cloudflare Preview
+Operating authority and continuation are in [RAKEEZ_OPS_CONTRACT.md](docs/RAKEEZ_OPS_CONTRACT.md) and [PROJECT_INSTRUCTIONS.md](docs/PROJECT_INSTRUCTIONS.md). `start-ops.ps1` launches the current controller; verify its live state and checkpoint instead of launching a legacy supervisor or resuming a ticket from this document.
 
-- Production/preview boot and main navigation.
-- Section editing and canonical grade selection.
-- Timetable slot editing, old-position release, and duplicate-time protection.
-- Timing profiles, attendance, scoring, reports, reload, and persistence.
-- General Phase 5D behavior.
-
-## AUTOMATED VERIFIED — 2026-08-24
-
-- `npm run test:sync`: 73 passed, 0 failed, 0 skipped.
-- `npm run test:e2e`: 55 passed, 0 failed, 0 skipped.
-- `npm run test:all`: 128 passing checks, 0 failed, 0 skipped.
-- Raw static production boot: passed with and without service worker registration; fatal page errors: 0.
-- Stress: 62,337 mixed records in 29.6s with normal IndexedDB/BroadcastChannel cleanup.
-
-## Deferred non-blocking visual polish
-
-- Timing-profile recess row visual refinement. This is not a Phase 5D blocker and was not user-accepted as final visual polish.
-
-## Merge status
-
-- `main` is an ancestor of `preview/phase-5d`; the future merge is expected to be a clean fast-forward.
-- No merge, tag, or Phase 6 work has been performed.
-
-Ready for user merge decision: YES
-Ready to merge main automatically: NO
+This file is a pointer, not a dated status report. It carries no phase, current main SHA, worker count, completion total or STOP state. Process existence and heartbeat are not delivery evidence; use the task receipt and observed provider/served result. `awaiting_po` preserves review while releasing execution capacity.

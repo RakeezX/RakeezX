@@ -1,181 +1,44 @@
-# RAKEEZ Ops — عقد التشغيل V3.1
+# RAKEEZ — one continuous delivery loop
 
-هذا الملف هو المرجع التشغيلي لـ RAKEEZ Ops. لا يخمّن حالة المشروع من الذاكرة أو المحادثات القديمة.
-يقرأ دائمًا الملفات الكانونية الحية في D:\Abdullah Projects\RakeezX\docs ثم يتحقق من Git وProduction/worktrees والأدلة ذات الصلة.
+**Authority: PO instruction, 2026-10-12 11:44 Asia/Riyadh.** Apply the corrected automation, replace conflicting operating instructions and start eligible tickets using the existing PC, ChatGPT Pro and Desktop Commander Pro. This replaces the 08:54 temporary hold, mandatory PM handoffs, ownership-until-CLOSED, blanket audits and obsolete time windows. It does not change Product requirements, grant new real-data authority or override tool/managed security policy. Later PO stop instructions still apply.
 
-## الأدوار
-- Product Owner: صاحب قرار المنتج النهائي. يتدخل أساسًا في ملاحظة/قرار Product جديد، اعتماد تصميم جديد عند الحاجة، واعتماد النتيجة النهائية في Production.
-- ChatGPT / PM: يضع السياسة، يراجع الحالات غير المحسومة، ويصنّف الأدلة والمخاطر.
-- RAKEEZ Ops: مدير التشغيل المستمر؛ ينسق Work/Codex، يحدّث اللوحات، ويستمر دون انتظار PO عندما تسمح القواعد.
-- Work: Visual/UX Lab؛ مرجع النتيجة البصرية المعتمدة فقط.
-- Codex: تنفيذ Product والاختبارات وGit/runtime/data.
-- Production/main: المرجع النهائي للـruntime/data semantics.
+## Select and finish useful work
 
-## قاعدة المصادر
-الأولوية: Production/Git + الملفات الكانونية الحية → Work Freeze المعتمد → evidence/tests → Execution Board → المحادثات كمرجع ثانوي.
-أي تعارض مع ذاكرة أو محادثة قديمة يُحسم للمصدر الأعلى والأحدث.
-المحادثات المسماة Codex1 / Codex2 / Work: Refresh انتقالية وليست مصدر سلطة.
+- `controller.mjs` is the sole dispatcher and recovery owner. `start-ops.ps1` launches it; `run-task.ps1` runs a Codex session; the delivery adapter performs authorized Git/provider operations. Old supervisor/refill/planner paths are retained as history and are not launched in parallel.
+- Read `artifacts/ops-supervisor-v4/workflow-v5.json`: `controller.activationId` defines the current activation. Admit only explicitly activated eligible cards with that `activationId`, Product ID, observable outcome, bounded paths and release authority. Exclude CLOSED, deferred and externally blocked scope. Reuse an existing valid candidate first; do not replay old completed cards or create filler.
+- Start with `maxWorkers=1` while the delivery cycle is being proved, then use 2 for independent work after successful verification; the controller reads this setting without restart. Keep shared integration/Production serial. A helper must solve a concrete problem within the cap, not create another review stage.
+- The same workflow implements, verifies the affected result, prepares a meaningful Preview when needed, delivers the authorized candidate and checks the served result. Ordinary technical/UX choices and eligible releases already delegated by the PO need no fresh PM approval or conversation turn.
 
-## Projects المعتمدة للتشغيل
-- Codex Project: **Codex - RakeezX**
-  - repo: **Abody808/rakeezx**
-  - local path: **D:\Abdullah Projects\RakeezX**
-  - active tasks الحالية: **Codex1** و **Codex2**
-- Work Project: **Work - RAKEEZ X UX**
-  - active visual workspace/repo: **RakeezX-Work-Active**
-  - active Work path: **D:\Abdullah Projects\RakeezX-Work-Active**
-  - Product reference path: **D:\Abdullah Projects\RakeezX**
-  - active task الحالية: **Work: Refresh**
-- أي tasks أخرى ظاهرة داخل المشروعين تعتبر historical/inactive حتى يعاد تفعيلها صراحة أو ينشئ RAKEEZ Ops task جديدًا مرتبطًا بتذكرة حالية.
-## Workflow V3
-1. PO يطرح الملاحظة/الفكرة؛ تُحوّل لتذكرة صغيرة واضحة.
-2. إذا احتاجت تصميمًا جديدًا: Work يبني النتيجة على Product حقيقي قدر الإمكان؛ PO يراجع التصميم مرة واحدة.
-3. بعد الاعتماد: Work يجمد exact patch/manifest/goldens.
-4. Codex ينقل exact accepted diff فقط ويحافظ على Production semantics.
-5. Preview يبقى بوابة تقنية إلزامية.
-6. في الحالات المطابقة تمامًا للـFreeze وبدون drift مادي، يسري Standing Conditional Preview Approval الذي منحه PO عبر Workflow V3؛ لا تُطلب مراجعة يدوية ثانية للـPreview.
-7. إذا ظهر أي فرق بصري مادي أو GAP أو RUNTIME-CONFLICT، يوضع في PO_REVIEW_QUEUE ولا يُروّج تلقائيًا.
-8. بعد نجاح gates والـPreview، يمكن نشر low/medium-risk exact transport إلى Production وفق تفويض V3 القائم.
-9. النتيجة المرئية تبقى PO PRODUCTION REVIEW PENDING حتى يراجعها PO في Production؛ بعدها فقط CLOSED.
-10. البنود عالية المخاطر لا تستفيد من التفويض التلقائي للنشر الحي؛ يلزم تفويض PO صريح لكل live mutation.
+## States and continuation
 
-## High Risk
-Supabase/schema/RLS/migrations، Auth/provisioning، Owner Guard، Sync architecture، delete/restore/student lifecycle، Backup/Restore، scoring/data-loss/cross-account semantics.
-يمكن إنجاز التحليل والتنفيذ والاختبارات محليًا دون PO، لكن أي live mutation لهذه الفئة = RED.
-## درجات القرار
-### GREEN — يكمل تلقائيًا
-- القراءة والتدقيق والمقارنة.
-- worktrees نظيفة وأدلة واختبارات متناسبة.
-- test/harness debt إذا ثبت على baseline وبقي الإصلاح test-only دون تخفيف العقد.
-- transport-only Work refresh المطابق pixel/geometry.
-- exact accepted Work transport منخفض/متوسط المخاطر.
-- internal Preview والفحوص الآلية.
-- docs-only checkpoints.
-- استمرار المسارات المستقلة عند تعطل تذكرة أخرى.
+| Runtime state | Required next action |
+| --- | --- |
+| `pending` | Start when dependencies, authority and capacity permit. |
+| `running` | Implement and save the specific session/candidate and useful progress. |
+| `delivery` | Complete the authorized delivery through the adapter; do not wait for a chat handoff. |
+| `awaiting_po` | Keep verified delivery visible for acceptance; release capacity and start the next eligible ticket. |
+| `blocked` | Name the factual blocker, evidence and condition for retry; continue independent eligible tickets. |
+| `retry_wait` | Wait for the recorded retry condition/time; preserve progress and avoid paid polling. |
 
-### YELLOW — PM review
-- فشل مشترك غير مصنف بعد.
-- تعارض أدلة/حالة لا يغير Product مباشرة.
-- احتمال baseline debt لم يثبت بعد.
-- مشكلة tooling أو test debt تحتاج تحليلًا.
-يسجلها في PM_REVIEW_QUEUE، يوقف التذكرة فقط، ويكمل المسارات الأخرى.
+`awaiting_po` requires observed Production evidence tied to the candidate/integrated revision and the changed behavior/assets. Local PASS, Preview, exit 0 or a receipt label alone is insufficient. Product CLOSED additionally needs actual PO acceptance or a truthful recorded acceptance within an existing PO delegation; never claim PO personally tested, or close an umbrella for one sub-fix. A failed delivery stays actionable rather than being reported as shipped.
 
-### RED — PO required
-- قرار Product جديد أو تغيير scope.
-- تصميم/UX جديد يحتاج اختيارًا.
-- فرق بصري مادي عن Freeze المعتمد.
-- live High-Risk mutation.
-- خطر data loss/security/cross-account.
-- حذف/تنظيف evidence/worktrees/archive.
-- main movement/divergence غير متوقع قبل promotion.
-## قواعد التشغيل المستمر
-- لا Agent يرسل يدويًا إلى محادثة Agent أخرى. التنسيق عبر RAKEEZ Ops + الملفات/الأدلة.
-- لا تعتمد على بقاء نافذة محادثة مفتوحة.
-- Ko1/Ko2 أسماء lanes منطقية؛ المهمة/worktree/evidence أهم من اسم المحادثة.
-- Heavy browser/build له مالك واحد في كل لحظة، مسجل في EXECUTION_BOARD.
-- لا تقتل عمليات Agent آخر.
-- لا تعيد PASS gates بلا سبب.
-- عند أول فشل جديد: احفظ evidence وصنفه؛ لا retry loop.
-- Demo parity مطلوبة حيث يوجد equivalent منطقي.
-- لا clean/reset/delete للجذر التاريخي أو evidence.
-- لا whole-branch Work → Production؛ exact accepted diff فقط.
-- بعد كل milestone مادي: حدّث EXECUTION_BOARD وOPERATIONS_LOG بالعربي.
-- في بداية كل دورة تشغيل، وبعد تسجيل أي YELLOW، أعد قراءة PM_REVIEW_QUEUE.md قبل الانتظار؛ إذا وجد قرار PM أحدث فطبقه واستأنف lane وفقه.
-- أعد قراءة PO_REVIEW_QUEUE.md فقط لمعرفة ما ينتظر PO؛ لا تعتبر غياب PO سببًا لإيقاف GREEN lanes الأخرى.
-- أي شيء يحتاج PO يضاف إلى PO_REVIEW_QUEUE بخطوات تجربة واضحة وعبارة اعتماد مقترحة.
-- لا تعتبر User-visible ticket CLOSED قبل PO Production verification.
+## Verification and recovery
 
-## PM Watchdog fallback
-Scheduled PM monitoring may be read-only if the execution environment blocks unattended file writes. A scheduled run must never claim that it recorded a PM decision unless the canonical file write is proven. If scheduled writes are blocked, the watchdog is monitoring-only.
+- Read only the task, its Product contract and affected files. Run checks able to catch defects from that change. Copy/icons/spacing: inspect the result and syntax/build only when relevant. Data-sensitive changes retain the affected owner/scoring/Sync/failure/recovery checks; a sensitive parent ticket does not automatically require every unrelated suite for a text-only sub-fix.
+- Reuse evidence while its relevant code, inputs and dependencies are unchanged. No global Git-ref freeze, all-worktree census, repeated unchanged Preview, nightly blanket audit or PM re-review of the same evidence. Correct a demonstrably wrong test against the Product contract; never turn a real failure into PASS.
+- At the second recurrence of the same blocker without new evidence, stop that retry loop. Park a ticket-specific blocker; pause dispatch for an actual shared access outage, exhausted quota, later PO stop or data/security hazard. Save the session ID and checkpoint, then resume that specific session when useful; never use a global `--last` across workers. No quota reset or new paid account.
+- Preserve candidate/base and owned resources; unrelated branch/doc changes are not a failure. Before promotion check actual main movement and the affected integration diff. Do not reset dirty canonical work, copy an entire worktree into Production or deploy unrelated changes.
+- Keep the controller alive during `STOP`/`STOP-REFILL`; honor both for new admissions. Safe active work drains. Restart recovery verifies process identity, completed steps and provider state before repeating operations. Heartbeat alone is not progress or proof of delivery.
 
-To avoid idling the project while PM writeback is unavailable, RAKEEZ Ops may self-resolve a case as GREEN without PM only when all of the following are proven from canonical/Git evidence:
-- the issue is test/tooling/harness debt or stale expectation against a later CLOSED/PO-verified Product contract;
-- relevant Product bytes or the authoritative later contract prove no new Product choice is being made;
-- the correction is test/tooling-only, or a narrowly bounded presentation preservation of an already CLOSED contract with no data/runtime semantic change;
-- no Auth/Owner Guard/Sync/schema/delete/restore/scoring/security/cross-account/live-high-risk mutation is involved.
-Otherwise keep the affected lane YELLOW, continue independent GREEN lanes, and wait for interactive PM review.
+## Authority and data
 
-## Workflow V3.1 — Accelerated Autonomous Execution
-اعتمد Product Owner هذا التوسيع في 2026-10-03 لخفض زمن انتظار YELLOW مع الحفاظ على حدود Product/Production الحالية. V3.1 لا يمنح RAKEEZ Ops سلطة Product جديدة، بل يحوّل فئات آمنة متكررة من PM-wait إلى AUTO-GREEN موثق.
+- Routine local code and synthetic Preview preparation may proceed within the activated card. Production delivery must name applicable authority and stay within it. Deploying code that enables writes, deletes or new access is a live behavior change even if the agent does not manually edit a record.
+- No real student/teacher mutation, new Auth/RLS/schema, applied-migration rewrite, irreversible migration, secret extraction, real email/WhatsApp send or destructive Delete/Restore without matching authority. N77's applied migration is immutable; N58's bounded synthetic approvals and historical Outbox restrictions remain. Preserve identity, history, owner isolation, Sync and scoring contracts; use the diagnostic allowlist.
+- Use phase leases for browser/integration/live mutation. Release only owned resources after cleanup; never delete an unknown lock or kill an unrelated process. An actual policy/tool refusal is recorded and resolved through an authorized route, not hidden with ACL, global config or safety-rule edits.
+- Use the existing runner's approved explicit permissions and configured models at Standard speed. No blanket administrator elevation, Fast/priority override or extra paid planning/review workers.
 
-### AUTO-GREEN إلزامي قبل إنشاء YELLOW
-على RAKEEZ Ops أن يحسم الحالة ذاتيًا ولا يرفعها إلى PM عندما تثبت جميع الشروط التالية:
-- عقد Product أحدث ومغلق/PO-verified أو Product bytes الحالية يحددان السلوك المطلوب دون حاجة لاختيار Product جديد.
-- السبب Test/fixture/selector/copy/href-encoding/wait/timing/harness/output-path/tooling debt، أو narrow presentation preservation لعقد CLOSED.
-- التصحيح لا يخفف التغطية ولا يحذف assertion وظيفيًا؛ بل يربطه بالعقد المنشور الحالي.
-- لا Auth/Owner Guard/Sync/schema/delete/restore/scoring/security/cross-account أو live high-risk mutation.
-- لا يوجد فرق بصري مادي جديد أو scope expansion.
+## Record and operate
 
-ضمن AUTO-GREEN يجوز لـRAKEEZ Ops مباشرة:
-- تعديل tests/fixtures/selectors/copy expectations/href encoding/waits وtest tooling/harness/temp-output paths.
-- توحيد harness المكافئ بين baseline/candidate عندما يكون فرق الأداة هو سبب القياس.
-- تطبيق narrow local-only presentation micro-fix يحفظ عقدًا CLOSED إذا كان السبب والمخرج محددين بلا تغيير data/runtime semantics.
-- تشغيل الملف المتأثر مرة واحدة بعد كل سبب مستقل مصحح، ثم استئناف suffix غير المنفذ فور PASS.
-- تسجيل AUTO-GREEN والسبب والدليل في PM_REVIEW_QUEUE/EXECUTION_BOARD/OPERATIONS_LOG دون انتظار PM.
+The worker returns the supplied final JSON schema with matching taskId/runId and LOCAL_READY/BLOCKED/NO_CHANGE. It records the exact candidate/base, worktree, changed paths, actual checks and blocker; it does not edit queue status or claim adapter delivery. The controller records provider/served evidence separately. `queue/*.json` owns runtime state; `ACTIVE_TASKS.json` is its live summary. Update Product ledgers only at genuine lifecycle transitions; keep raw Product notes and historical evidence intact. The useful metrics are verified deliveries, time waiting for intervention and rework, not worker-done counts.
 
-حد منع الدوران: يسمح بحد أقصى **3 أسباب AUTO-GREEN مستقلة داخل ملف spec واحد** أثناء نفس مسار الشهادة. ظهور سبب رابع، أو أي نتيجة غير حاسمة، يحول الملف إلى True YELLOW ويوقف الملف فقط. لا retry لنفس السبب بلا تغيير مبرر.
-
-### Fast-Finish discipline
-- أثناء certification suffix لا تفتح side quest بسبب فشل في ميزة CLOSED. افحص فقط ما يكفي لتصنيف السبب وربطه بالعقد الحالي.
-- الملاحظات العرضية غير الحاجبة تُسجل follow-up مستقلًا ولا توسع التذكرة الحالية.
-- لا تعِد ملفات PASS، ولا تعِد gates السابقة، ولا تبنِ Product workaround لاختبار قديم.
-- بعد PASS للملف المتوقف، أكمل مباشرة الملفات غير المنفذة ثم Stage التالي المصرح به.
-
-### Work NO CHANGE
-إذا كان PM/العقد قد حدد Work review bounded بوضوح، وأثبت Work أن السطح الحالي متماسك دون تغيير بصري مطلوب، فيجوز لـRAKEEZ Ops تسجيل **REVIEWED / NO CHANGE** وإنهاء ذلك micro-review دون PO Work review أو Freeze/transport. أي تغيير بصري فعلي يبقى خاضعًا لـPO Work approval.
-
-### True YELLOW — PM Hold Loop
-إذا لم تنطبق AUTO-GREEN:
-1. احفظ evidence وسجل YELLOW وحرر Heavy Window فورًا.
-2. استمر في أي lane مستقل GREEN بدل تجميد المصنع.
-3. لمدة تصل إلى **15 دقيقة**، أعد قراءة PM_REVIEW_QUEUE.md قراءة فقط كل **60 ثانية** دون حجز Heavy Window أو إبقاء browser/build processes لأجل الانتظار.
-4. إذا ظهر قرار PM أحدث ومطابق للحالة، طبقه واستأنف فورًا.
-5. إذا لم يظهر قرار خلال 15 دقيقة، يصبح المسار affected lane فقط `PARKED-YELLOW / PM PENDING` وتستمر المسارات المستقلة. الـRAKEEZ Watchdog الساعةي يبقى backstop لا قناة handshake أساسية.
-6. إذا كانت بيئة agent لا تسمح ببقاء Hold Loop حيًا، لا تدّع الانتظار؛ في أول دورة لاحقة اقرأ PM_REVIEW_QUEUE قبل أي عمل آخر واستأنف مباشرة إن وُجد القرار.
-
-### انقطاع الجهاز/قناة الربط
-- فقد اتصال Desktop Commander/relay مؤقتًا هو **transport incident** وليس Product YELLOW ولا فشل Product.
-- لا تغيّر حالة التذكرة بسبب الانقطاع وحده، ولا تعِد اختبارًا انتهى، ولا تفترض data loss.
-- احفظ آخر checkpoint المتاح. عند عودة الاتصال أعد قراءة الملفات الكانونية وPM/PO queues وGit/evidence، ثم استأنف من آخر خطوة GREEN مثبتة.
-- إذا كان الانقطاع يمنع حفظ evidence لعملية جارية، توقف بأمان وسجّل عدم اكتمال القياس عند عودة الاتصال؛ لا تدّع PASS/FAIL غير مثبت.
-
-### الحدود التي لا يغيرها V3.1
-- أي Product choice جديد، scope جديد، design/UX جديد، material drift، live high-risk mutation، schema/Supabase/RLS، Auth/provisioning، Owner Guard، Sync architecture، delete/restore/student lifecycle، scoring/data-loss/security/cross-account، حذف evidence/worktrees/archive، أو main divergence غير متوقع = تبقى YELLOW/RED حسب العقد السابق ولا تدخل AUTO-GREEN.
-- N58 عالي المخاطر يبقى local-only حتى اكتمال certification؛ أي Preview/Production/live mutation له يحتاج السلطة المحددة سابقًا ولا يستفيد من AUTO-GREEN للنشر.
-- كل User-visible Production result يبقى بحاجة PO Production verification قبل CLOSED.
-
-
-## Always-On 24/7 + Capacity Scaling — D-080
-- التشغيل مستمر على مدار 24 ساعة ما دام يوجد عمل مؤهل وآمن. التاريخ/خطة اليوم هي target للتقدم وليست سببًا للتوقف. بعد PASS/CLOSED أو توقف lane على external/PO/device gate، اسحب أعلى بند eligible تالٍ فورًا.
-- لا يوجد مفهوم «انتهى عمل اليوم» داخل RAKEEZ Ops. إذا أُنجزت الخطة مبكرًا، أكمل من ترتيب الأولوية الكانوني دون انتظار اليوم التالي.
-- إذا ticket منخفض/متوسط الأولوية بدأ يستهلك وقتًا غير متناسب بلا تقدم مادي، لا توسع التحقيق إلى side quest. سجل `PARK CANDIDATE` مع السبب والدليل، حرر موارده، وواصل البنود الأعلى. الإرجاء النهائي للبند الذي يهم PO يُحسم PM/PO؛ ترشيحه للإرجاء لا يوقف بقية المصنع.
-
-### سعة التشغيل الافتراضية
-- الهدف التشغيلي عند توفر scopes مستقلة: حتى **3 Codex lanes + 2 Work lanes** في الوقت نفسه للأعمال المعزولة/الخفيفة.
-- يجوز **Codex lane رابع** للـread-only audit / measurement / test-prep / docs preparation عندما الموارد سليمة ولا يشارك touched paths مع mutation lane.
-- على جهاز Abdullah-MSI المرجع الحالي: 32GB RAM تقريبًا، 6 cores / 12 logical threads. لذلك يبقى **Heavy browser/build window واحد فقط** في كل لحظة ما لم يثبت لاحقًا بقياس أن توسيعه لا يضر الاستقرار.
-- **Main integration/promotion owner واحد فقط** في كل لحظة. لا push/merge/promotion متزامن من lane ثانية.
-
-### شروط فتح lane إضافية
-افتح lane جديدة تلقائيًا فقط عندما:
-1. scope/ticket مستقل وله N-ID أو bounded PM scope واضح؛
-2. worktree/branch/evidence path مستقل؛
-3. لا يوجد overlap في touched Product files أو shared runtime contract مع mutation lane أخرى؛
-4. لا يعتمد نجاحه على نتيجة غير محسومة من lane أخرى؛
-5. لا يحتاج نفس Heavy Window الآن، أو يمكنه إنجاز تحضير مفيد حتى يحين دوره؛
-6. لا توجد علامة resource contention أو flakiness ناتجة من التوازي.
-
-إذا حصل overlap أو ضغط موارد: لا تقتل عمليات غيرك ولا تدمج lanes؛ جمّد lane الأقل أولوية عند checkpoint نظيف وأكمل الأعلى.
-
-### ترتيب سحب العمل عند توفر سعة
-1. P0/RED recovery أو data/security regression مثبت.
-2. active certification/release lane قريب من الإغلاق.
-3. D-079 Fast Track: N03/N08/N38 ثم N33.
-4. بقية البنود العادية حسب Product Ledger/Execution Board.
-5. low priority/read-only prep فقط إذا لا يزاحم ما سبق.
-6. archive/parked لا يُفتح تلقائيًا.
-
-### منع الفراغ التشغيلي
-- إذا كل mutation lanes متوقفة على PO/device/external gate، شغّل فورًا independent read-only audit، Work refresh، test prep، baseline measurement أو documentation reconciliation يخدم أعلى ticket تالٍ.
-- إذا لا يوجد أي عمل آمن مؤهل فعلًا، سجل السبب المحدد؛ لا تصنع feature أو scope جديدًا فقط لإبقاء agents مشغولين.
-- RAKEEZ Watchdog هو backstop فقط؛ RAKEEZ Ops نفسه مسؤول عن dispatch الفوري بعد كل milestone ولا ينتظر الدورة الساعةية.
+Windows runs `start-ops.ps1` under the existing Abody account after logon, with one instance and unlimited task duration. Recovery is independent of the ChatGPT conversation. This does not promise execution before Windows logon or unlimited Pro inference. The runtime records idle/pause/retry reasons; silence or an empty queue must not be presented as productive work.

@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "preparedOn": "2026-10-12",
+  "activationPending": true,
+  "purpose": "Finite, evidence-based continuation of the existing RAKEEZ queue. This file changes no Product status and activates no worker.",
+  "source": {
+    "canonicalLedger": "docs/PRODUCT_LEDGER.md",
+    "readOnlySnapshot": "tmp/rakeez_ops_apply/live-inputs.txt",
+    "currentRows": 27,
+    "explicitlyDeferredRows": 11,
+    "nonDeferredRows": 16,
+    "assignedElsewhere": ["N92", "N91", "N95", "N84", "N54"],
+    "remainingNonDeferredIds": ["N13", "N36", "N44", "N49", "N58", "N71", "N73", "N77", "N78", "N93", "N94"],
+    "excludedDeferredIds": ["N09", "N18", "N23", "N24", "N26", "N32", "N35", "N64", "N72", "N88", "N90"],
+    "authorityContext": "Use the current PO 2026-10-12 continuous-delivery delegation for routine technical choices and eligible scoped releases. Historical discussion-only wording is not a reason to re-request already granted authority. Existing genuine data/owner/Auth/schema boundaries still apply. N58 D-087 already authorizes its two disposable A/B accounts; its recorded blocker is capability, not missing permission.",
+    "freshCapabilityEvidence": "Parent reports a current-main read-only Cloudflare/Git observation PASS on all five immutable and all five Production assets, with strict index.html JSD normalization. Historical GitHub:443 denial is not a current blocker.",
+    "n94PathEvidence": "Parent read current main and located scoreSubitems/completions consumers in src/store.js; src/views/grades.js and items.js; src/lib/db.js, backup-v2.js, demo-workspace.js, export.js, initial-restore.js, sync-v2.js and sync.js. This proves relevant paths, not server acceptance of new fields."
+  },
+  "classificationCounts": {
+    "eligibleimplementation": 1,
+    "dependencyblocked": 8,
+    "studyonly": 1,
+    "externalartifact": 1
+  },
+  "queuePolicy": {
+    "readyWhenDependencyCompletes": ["continuous-n94-subitem-late-scoring-20261012"],
+    "admissionInstruction": "Only tasks in the tasks array are prepared Product execution cards. Root sets the current activationId after review of this concrete card; the controller then waits for N84 awaiting_po/closed. Do not auto-admit blocked, study-only or external-artifact rows. The controller has no generic capability gate or research/artifact delivery lane, so placing those rows in its catalog would misroute them to Product publication.",
+    "dependencySemantics": "dependsOn accepts a task ID or Product ID whose runtime status is awaiting_po or closed. PO review itself does not reserve a worker or delivery lane. A blocked dependency holds only dependent cards; unrelated cards continue.",
+    "stopScope": "A missing capability, material affected-check failure or ambiguous Product contract parks only that card with a named condition and preserves the candidate. Never mark a required gate PASS from a Demo or an unavailable service.",
+    "quotaPolicy": "Keep the existing controller usage-pause/resume behavior, finite runtime budgets, bounded same-blocker retries and saved Codex sessions. No paid API fallback, unlimited-use assumption, repeated planning worker or continuous re-study. Change a dependencyblocked classification only when new concrete evidence arrives.",
+    "whenCatalogExhausts": "Emit the remaining named capability/policy blockers and explicit no-eligible-ready-work state. Do not manufacture cosmetic/doc/umbrella-closing cards to keep workers busy, reopen deferred work, or label the factory productive while no eligible work is running.",
+    "closurePolicy": "Product IDs remain independent and OPEN until their actual acceptance contract is satisfied. A scoped implementation, private artifact, local study or hosted Demo does not close its umbrella ticket. Production delivery enters awaiting_po and releases capacity."
+  },
+  "capabilities": [
+    {
+      "id": "LOCAL_GIT_NODE_SYNTHETIC_BROWSER",
+      "kind": "execution",
+      "status": "available_from_parent_evidence",
+      "meaning": "Isolated Git worktrees, Node checks and the existing shared synthetic browser lane on the local machine; acquire leases only for owned browser/server/integration phases."
+    },
+    {
+      "id": "GITHUB_CLOUDFLARE_STATIC_DELIVERY",
+      "kind": "delivery",
+      "status": "verified_by_parent_live_observation",
+      "meaning": "Existing GitHub origin/main and Cloudflare Pages integration can bind commits to provider checks and served static assets. This grants no Supabase or Auth-admin capability."
+    },
+    {
+      "id": "SUPABASE_AUTH_ADMIN_DISPOSABLE_AB",
+      "kind": "privileged_service_access",
+      "status": "last_observed_unavailable_2026-10-11_current_recheck_pending",
+      "meaning": "A protected server-side Auth admin path that can create and dispose only the already authorized synthetic A/B users, without exposing a service credential to the worker prompt, logs, browser or repository.",
+      "evidence": "N58 explicitly records secure Auth admin API unavailable, zero accounts or fixtures created. Existing D-087 permission persists; do not ask for it again.",
+      "sourceUrl": "https://supabase.com/docs/reference/javascript/auth-admin-createuser"
+    },
+    {
+      "id": "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS",
+      "kind": "authenticated_test_context",
+      "status": "not_established_in_supplied_snapshot",
+      "meaning": "Usable synthetic A and B user sessions for the exact authorized project, plus isolated stale-client contexts and known fixture cleanup/disposition. SQL-admin access or a Demo workspace is not a substitute for exercising authenticated owner restrictions and actual Sync."
+    },
+    {
+      "id": "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE",
+      "kind": "service_state_and_scoped_deployment",
+      "status": "not_verified_in_current_activation",
+      "meaning": "Read the actual deployed schema, migrations and relevant RPCs first. If a card needs a new server contract, require the existing authorized migration/deploy route, exact scoped authority and rollback/disposition; never rewrite an applied migration or assume Cloudflare main deploy also applies SQL."
+    },
+    {
+      "id": "SUPABASE_TRUSTED_OWNER_LEASE",
+      "kind": "implemented_protocol",
+      "status": "current_implementation_not_inspected_in_this_snapshot",
+      "meaning": "Existing authoritative same-owner/workspace verification and a durable tamper-aware lease/receipt contract independent of full Sync. This must be established before N49 can be scoped as a client-only change."
+    },
+    {
+      "id": "SUPABASE_ATOMIC_DISTRIBUTION_APPLY",
+      "kind": "implemented_protocol",
+      "status": "missing_or_uncertified_per_N73",
+      "meaning": "Owner-checked atomic multi-target definition application with target-grade preservation/clamping and idempotent Sync; no source-student grade copying and no Demo-only branch as Product implementation."
+    },
+    {
+      "id": "SUPABASE_ATOMIC_DELETE_RECEIPT",
+      "kind": "implemented_protocol",
+      "status": "uncertified_for_current_main_per_N77",
+      "meaning": "Online server-derived Section/Teaching deletion scope, atomic validated deletion receipt, durable tombstones and stale-device/restore anti-resurrection behavior."
+    },
+    {
+      "id": "SUPABASE_CANONICAL_RESTORE_ALL_DOMAINS",
+      "kind": "implemented_protocol",
+      "status": "implementation_and_domain_coverage_unproved_per_N71",
+      "meaning": "Versioned Cloud-first restore covering every backed-up Product domain, ownership and atomic failure/retry behavior, followed by local and other-device convergence."
+    },
+    {
+      "id": "ADMIN_IDENTITY_ROLE_POLICY",
+      "kind": "product_authorization_contract",
+      "status": "unresolved_per_N78",
+      "meaning": "Named initial admin identity/allowlist or server-owned roles, module permissions, session enforcement and sensitive-action audit contract. Do not infer administrator status from editable user metadata or teacher navigation."
+    },
+    {
+      "id": "NOTIFICATION_REAL_EVENT_PUSH_DELIVERY",
+      "kind": "service_and_device_delivery",
+      "status": "unconnected_per_N44",
+      "meaning": "Actual event adapters, owner-scoped notification storage, per-device opt-in Web Push subscription/delivery path and authorized admin publication through N78. Existing N34 support worker is not this foundation."
+    },
+    {
+      "id": "N36_PRIVATE_EXTENSION_AND_OFFICIAL_DOM",
+      "kind": "external_artifact_verification",
+      "status": "prototype_exists_official_source_and_install_not_verified",
+      "meaning": "A private local Chrome MV3 install/popup smoke plus a user-initiated, legitimately accessible teacher-page DOM verification with minimized/redacted fixtures. No credentials, OTP handling, background observation or public store release is implied."
+    },
+    {
+      "id": "NOOR_CURRENT_REPORTING_PERIOD_SOURCE",
+      "kind": "official_policy_artifact",
+      "status": "not_verified_for_current_applicable_grade_subject",
+      "meaning": "Current official teacher grade-entry labels and approved subject/grade distribution proving whether the two reporting moments are snapshots/cumulative values or independently recorded fields. Two notifications per term alone cannot settle that data contract."
+    }
+  ],
+  "tickets": [
+    {
+      "productId": "N13",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The shared Section/multiple Teachings design has a substantial qualified historical combined candidate, but its live owner/Sync/restore evidence is still absent. A current restricted N77 revision and an older combined Preview are different sources. Copying the historical train is not a current-main implementation proof.",
+      "dependsOnProducts": [],
+      "relatedProducts": ["N77"],
+      "requiredCapabilities": ["SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE"],
+      "conditionalCapabilitiesIfReusingCombinedDeleteChanges": ["SUPABASE_ATOMIC_DELETE_RECEIPT"],
+      "nextConcreteAction": "Use the sealed 514b6ab4537f0fb72c183c1afcd039ab683e6a2b combined manifest only as a reuse reference. Once the named service/test capabilities exist, reconcile only the bounded Section/Teaching patch against fresh main; run changed owner/shared-roster/subject-isolation and relevant stale/restore scenarios, retaining unchanged evidence by exact source identity. N13 is not automatically blocked on completing N77: an independent N13 release must retain the existing fail-closed Production delete behavior. If the combined delete changes are carried, their actual N77 server/receipt gates apply to that candidate. Preserve separate N13 and N77 outcomes.",
+      "existingEvidence": ["docs/follow-ups/N13_N77_SEALED_COMBINED_PREVIEW_20261011_101211.md", "https://2297acd3.rakeezx.pages.dev/"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N36",
+      "classification": "externalartifact",
+      "riskClass": "SENSITIVE",
+      "reason": "A private names-only MV3 helper already exists with eight synthetic checks. Its remaining useful deliverable is a verified private extension and official teacher-source adapter evidence, not a RAKEEZ Production code push.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["N36_PRIVATE_EXTENSION_AND_OFFICIAL_DOM"],
+      "nextConcreteAction": "Locate f66b3c3b6605c58e974b2352a2e17900459696cb and its recorded artifact; reuse its parser tests. Perform one private unpacked-install/popup smoke when a compatible browser lane is available, then verify the names-column capture against an authorized actual teacher DOM without storing student identities in the repository. Retain the manual TSV/CSV-to-N12 Preview path and explicit user confirmation. Package the private artifact and state the official-source limitation; do not wire this to the Product publisher or publicly release the extension.",
+      "existingEvidence": ["artifacts/ops-supervisor-v4/results/v5-n36-official-names-helper-20261012.json", "f66b3c3b6605c58e974b2352a2e17900459696cb"],
+      "productionEligibleNow": false,
+      "queueAdmission": "external_artifact_lane_not_supported_by_current_controller"
+    },
+    {
+      "productId": "N44",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The current local notification center is synthetic, unconnected to actual events, Push, owner storage or publisher/admin. Shipping its UI would not implement the agreed notification foundation.",
+      "dependsOnProducts": ["N78"],
+      "requiredCapabilities": ["ADMIN_IDENTITY_ROLE_POLICY", "NOTIFICATION_REAL_EVENT_PUSH_DELIVERY", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS"],
+      "nextConcreteAction": "After N78's concrete server authorization contract exists, define one real permitted notification event and its owner/device delivery path, retention/expiry/deduplication and channel rules; wire the existing center to that path and verify it before adding campaigns. Keep marketing opt-in and critical notices actionable. Do not spend another worker merely rehosting the unconnected center or close the full foundation from one shell.",
+      "existingEvidence": ["artifacts/ops-supervisor-v4/results/v5-n44-demo-current-main-20261012.json", "D-107", "D-108"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N49",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The seven-day reminder/fourteen-day LIMITED behavior is fixed, but this snapshot does not establish the present trusted owner-verification/receipt contract. Treating any Sync success or editable clock value as a trusted renewal could weaken ownership protection.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["SUPABASE_TRUSTED_OWNER_LEASE"],
+      "conditionalCapabilitiesIfOwnerProtocolChangesOrRemainsUnproved": ["SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE"],
+      "nextConcreteAction": "Perform one bounded read of the current lease, trusted-owner verification and receipt consumers, and the N49 architecture audit. If an unchanged authoritative protocol already supplies durable owner/workspace-bound renewal, prepare a narrowly scoped client/runtime card for 7/14-day thresholds with deterministic clock/corrupt-receipt/wrong-owner/restart checks; no admin privilege is required just to read that code. If the protocol itself is absent, name its exact missing server operation and scope that implementation before release. Keep N95's status display independent: its transient UI state must not renew this lease.",
+      "existingEvidence": ["D-092", "D-103", "docs/PRODUCT_LEDGER.md"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_until_current_trusted_protocol_is_established"
+    },
+    {
+      "productId": "N58",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The recorded October 11 live attempt stopped before any provisioning because a secure Auth admin API was missing. Prior local/native tests exist and should not be repeated just because the service capability was absent.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["SUPABASE_AUTH_ADMIN_DISPOSABLE_AB", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE"],
+      "authorizationAlreadyPresent": "D-087: two new disposable A/B users and its defined synthetic validation scope. Preserve this permission; do not request it again or broaden it to real users.",
+      "nextConcreteAction": "Check whether the existing authenticated local service/MCP route can perform the already authorized protected Auth-admin operation without exposing a key. If available, provision the exact disposable A/B fixture with cleanup/receipt, refresh candidate 4efaf2c7bb9112af931112f72ccf8a6c4a3744f2 against current main, and execute only the still-unproved actual owner/preset-revision/immutable-calendar-context/old-client Sync cases. Preserve all six historical rejected Outbox events. If capability remains absent, record that one named blocker without another paid model retry.",
+      "existingEvidence": ["4efaf2c7bb9112af931112f72ccf8a6c4a3744f2", "docs/follow-ups/SURGE_20261011_CONTROLLED_PM_RELEASE_HANDOFF.md"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N71",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The approved simple Backup/Restore UI cannot safely replace the existing paths before all Product domains and canonical Cloud-first restore semantics are implemented and verified. A smaller UI alone could hide missing data or a divergent local-only outcome.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["SUPABASE_CANONICAL_RESTORE_ALL_DOMAINS", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE"],
+      "nextConcreteAction": "Read the existing approved V3 work contract and inventory only the actual backup/restore domain mappings, including curriculum and any populated deferred Product stores. Define a single versioned round-trip fixture and the exact missing canonical restore operation; reuse already correct serializers. Implement a real Cloud-first protocol under its scoped authority before replacing the user-facing actions. Keep offline/signed-out restore waiting truthfully and keep legacy internal claim/bootstrap until safe retirement is demonstrated.",
+      "existingEvidence": ["D-099", "src/lib/backup-v2.js", "src/lib/initial-restore.js"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N73",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "The inspected candidate explicitly allows only rakeezx-demo. Deploying it would disable the existing real-account definition-copy flow rather than deliver D-119 to users. More Demo clicking cannot resolve this blocker.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["SUPABASE_ATOMIC_DISTRIBUTION_APPLY", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS"],
+      "nextConcreteAction": "Preserve the existing live score:copy_definition behavior. Reuse the approved D-119 review UI and pure mapping engine only after defining/implementing the trusted owner-checked atomic multi-target server operation. Verify target marks retained/clamped on lower maxima, extras retained unless explicitly removed, ambiguous names rejected, auto grades derived from target logs, retry idempotency and no source-student grade copying; then connect actual Product workspaces and verify Sync before eligible deployment.",
+      "existingEvidence": ["artifacts/ops-supervisor-v4/results/pm-n73-preview-verified-20261012.json", "https://96195b5e.rakeezx.pages.dev/", "c961f28", "D-119"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N77",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "Current-main cc60574fa30eea2cb6e3cee5511abda5bcb64de8 is restricted to local Demo. The exact current deletion path has not proved server-derived scope, atomic receipt, owner isolation, or stale/restore anti-resurrection.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["SUPABASE_ATOMIC_DELETE_RECEIPT", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE"],
+      "nextConcreteAction": "Read the already applied immutable migration 20261007230123 and actual current RPC/receipt path without rewriting it. Resolve the precise gap between current candidate and trusted server scope; use disposable A/B plus stale-client and backup fixtures to demonstrate no offline/local destructive mutation before approval, correct subject-only versus final-Section deletion, preserved unrelated/shared students and durable anti-resurrection. Reconcile N13 only through explicit source integration; old combined Preview proof must not certify this different revision.",
+      "existingEvidence": ["artifacts/ops-supervisor-v4/results/pm-n77-external-gates-20261012.json", "cc60574fa30eea2cb6e3cee5511abda5bcb64de8", "20261007230123", "D-113", "D-114"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N78",
+      "classification": "dependencyblocked",
+      "riskClass": "CRITICAL",
+      "reason": "A secure admin foundation requires an actual server-owned identity/role or allowlist policy and privileged operations path. The current record approves the platform direction but does not define these concrete permissions; an admin-looking page cannot provide them.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["ADMIN_IDENTITY_ROLE_POLICY", "SUPABASE_SCHEMA_AND_DEPLOY_SCOPE", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS"],
+      "nextConcreteAction": "Resolve the named initial administrator and least-privilege N44 publish/read/audit permissions against existing Auth capabilities; document the concrete server enforcement and audit contract. Then implement that foundation as a real bounded module with denied-teacher/unauthenticated cases before adding the private shell. No raw database editor, client-side authority or service credential in frontend code; no artificial shell-only card that closes N78.",
+      "existingEvidence": ["D-108", "docs/PRODUCT_LEDGER.md"],
+      "productionEligibleNow": false,
+      "queueAdmission": "hold_this_ticket_only"
+    },
+    {
+      "productId": "N93",
+      "classification": "studyonly",
+      "riskClass": "SENSITIVE",
+      "reason": "The official current reporting-period data meaning is unresolved. The supplied older official references support reporting moments but are not evidence for two independent current score fields or totals. Coding a guessed schema would risk double-counting or duplicating identities.",
+      "dependsOnProducts": [],
+      "requiredCapabilities": ["NOOR_CURRENT_REPORTING_PERIOD_SOURCE"],
+      "nextConcreteAction": "Obtain one current official, minimized teacher grade-entry screen/field specification and applicable subject/grade distribution, then compare against the official rule and online help already cited. Produce a bounded decision artifact choosing supported snapshot/cumulative versus separately recorded semantics, or state exactly which field evidence is absent. Keep one student/class/item identity and no automatic write to Noor. Only after that concrete contract is established should a Product implementation card exist.",
+      "existingEvidence": ["docs/PRODUCT_LEDGER.md"],
+      "policySourcePointersFromLedger": ["https://moe.gov.sa/ar/aboutus/aboutministry/RPRLibrary/الإجراءات%20التنفيذية%20للائحة%20تقويم%20الطالب%202025م.pdf", "https://noor.moe.gov.sa/OnlineHelp/Arabic/4/الخدمات_والبيانات/كشف_درجات_أعمال_السنة.htm"],
+      "productionEligibleNow": false,
+      "queueAdmission": "study_artifact_only_no_product_publish_card"
+    },
+    {
+      "productId": "N94",
+      "classification": "eligibleimplementation",
+      "riskClass": "SENSITIVE",
+      "reason": "The current PO row fixes the creation/start/due dates, ordinary/late points, persisted per-student states and tap cycles. Relevant actual Product paths are identified. A bounded implementation can start after N84, provided it stays within existing owner/Sync/backup contracts and proves field preservation; new server schema requirements are an explicit card-local blocker, not an assumed available capability.",
+      "dependsOnProducts": ["N84"],
+      "requiredCapabilities": ["LOCAL_GIT_NODE_SYNTHETIC_BROWSER", "GITHUB_CLOUDFLARE_STATIC_DELIVERY"],
+      "conditionalCapabilitiesIfExistingTransportCannotPreserveFields": ["SUPABASE_SCHEMA_AND_DEPLOY_SCOPE", "SUPABASE_DISPOSABLE_OWNER_AB_SESSIONS"],
+      "nextConcreteAction": "Use the prepared continuous-n94-subitem-late-scoring-20261012 card after N84 reaches awaiting_po or closed. Read actual model/normalizer/outbox/restore paths first, then implement the real Product change and affected checks. If an RPC, server normalizer, RLS or schema change is required, preserve the candidate and report that exact dependency before LOCAL_READY; never produce a Demo-only surrogate or a source-only PASS.",
+      "existingEvidence": ["docs/PRODUCT_LEDGER.md", "src/store.js", "src/views/items.js", "src/views/grades.js"],
+      "productionEligibleNow": false,
+      "productionEligibilityAfter": "N84 dependency satisfied and all five named affected checks on the actual candidate pass; the controller then independently proves exact deployment/source identity.",
+      "queueAdmission": "prepared_card_waiting_for_activation_and_N84"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "continuous-n94-subitem-late-scoring-20261012",
+      "productId": "N94",
+      "scopeKey": "n94-subitem-dates-persisted-late-score",
+      "activationId": null,
+      "dependsOn": ["N84"],
+      "priority": 60,
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "budgetMinutes": 90,
+      "idleMinutes": 15,
+      "requiredChecks": ["subitem_dates_and_points", "completion_tap_cycle", "scoring_preservation", "owner_sync_backup", "product_ui_release_scope"],
+      "objective": "After N84 is deployed/awaiting PO, implement the approved N94 subitem dates and persisted late-scoring behavior on fresh current main in actual Product items/Gradebook. Begin by tracing scoreSubitems and scoreSubitemCompletions through the existing db/store, outbox/Sync normalizers and Backup/Restore paths; the known consumers are listed in allowedPaths. Reuse the existing ordinary value as regularPoints compatibility instead of silently creating a competing maximum. Preserve existing records and owner contracts. Store immutable automatic createdAt separately from optional teacher startDate; an empty startDate means immediate start, and a supplied dueDate cannot precede a supplied startDate. dueDate is optional, and optional latePoints defaults to ordinary points and stays within the existing lower bound through regularPoints. After the app's existing local-date due boundary, deliberate taps cycle unrecorded -> late -> regular/accepted excuse -> unrecorded. Before that boundary or with no dueDate, retain unrecorded <-> regular. Persist the teacher's selected state per student/subitem; time passage, timezone/device-clock change, due-date edits or grade recalculation must not silently reinterpret an existing record. A late click is a teacher-selected label, not proof of actual submittedAt. Display calm distinct gray/amber/green states with text and symbols, plus the actual points even when regular and late points are equal. Preserve N84 Quick Log controls and existing automatic/manual/attendance score semantics. Return LOCAL_READY only after every named required check establishes actual Product-path behavior and release scope; if backend field support, ownership, Sync or restore cannot be established without new server work/authority, return BLOCKED naming that exact condition and preserve the candidate. No mock-server success, Demo-only branch or unchanged code disguised as completion.",
+      "acceptance": [
+        "subitem_dates_and_points: PASS exercises actual model/form validation and normalization for immutable createdAt, optional blank/future startDate, optional dueDate, due-before-start rejection, ordinary-value compatibility, missing latePoints fallback, equal/lower allowed latePoints and rejection above regular points or below the existing allowed lower bound. Preserve existing subitem records without resetting their creation/history or requiring a new field to read legacy data. Reuse the application's established date convention; do not add an unrelated calendar policy.",
+        "completion_tap_cycle: PASS exercises the real completion command and deterministic clock/date fixtures: after due date the three deliberate taps create late, then regular/accepted-excuse, then unrecorded; before due or without a due date use the existing two-state cycle. Rapid/replayed events retain the existing idempotency rules. Reload, clock changes, due-date edits and score refresh preserve the saved teacher-selected state rather than inferring a new state from timestamp. No health/excuse details or fabricated submittedAt are stored.",
+        "scoring_preservation: PASS demonstrates the real grade calculation uses the selected ordinary/late points, honors existing subitem/parent bounds, preserves legacy grades and unrelated students/items, and retains N84 Quick Log projection plus manual/attendance behavior. Explain the result if ordinary and late points are equal. Targeted source-identical scoring evidence may be reused; only affected changed scoring paths need a fresh run. No full historical shell/global suite.",
+        "owner_sync_backup: PASS traces and tests the actual existing owner guard and serialization/normalization/outbox/reconciliation paths for the new fields/state, with synthetic A/B identities at the existing local boundary; wrong owner/workspace must be denied without mutation, and retry/reload must not duplicate completion. Establish that Backup/Restore retains all new fields and per-student choices along with older backups' defaults. A generic JSON round trip that bypasses Product normalizers is insufficient. If the actual deployed server/RPC would strip or reject a field, or its acceptance cannot be established from the existing immutable server contract, report BLOCKED with SUPABASE_SCHEMA_AND_DEPLOY_SCOPE and the exact operation; local Demo or a success mock cannot authorize release. Do not alter or apply schema/RLS/Auth/migrations or create real account/student records in this card.",
+        "product_ui_release_scope: PASS verifies actual Product items and Gradebook wiring for mobile RTL and light/dark: gray with —/غير مرصود, amber with clock/متأخر, green with check/عادي or مقبول بعذر; accessible distinction cannot depend on color alone. Show actual selected points even when values coincide, concise date/point controls and practical touch targets; do not use red for late or green as Sync proof. The candidate must use real account-capable code paths, preserve N84 and existing sound/effects policy, remain within this card, and introduce no new server contract or unrelated student portal/N88 work. Use the browser lease only for the bounded browser/server phase. Product CLOSED remains the later actual acceptance outcome."
+      ],
+      "allowedPaths": [
+        "src/store.js",
+        "src/views/items.js",
+        "src/views/grades.js",
+        "src/lib/db.js",
+        "src/lib/backup-v2.js",
+        "src/lib/demo-workspace.js",
+        "src/lib/export.js",
+        "src/lib/initial-restore.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/styles/grades.css",
+        "src/styles/components.css",
+        "tests/n94-*"
+      ],
+      "releaseAuthority": "The approved N94 Product contract plus PO 2026-10-12 continuous execution delegation authorize this scoped implementation and affected synthetic validation, followed by eligible Product delivery only when existing owner/Sync/Backup/Restore/scoring semantics and all required checks hold. Routine UI/technical choices do not require another approval. This card does not grant new Auth/RLS/schema/live server mutation or test edits to real students/accounts. Any necessary new high-risk server contract is a named BLOCKED dependency for N94 only. Do not treat old discussion/paused wording as a new confirmation requirement when the current delegation already covers this scope."
+    }
+  ],
+  "externalReferences": [
+    {
+      "url": "https://supabase.com/docs/reference/javascript/auth-admin-createuser",
+      "consultedOn": "2026-10-12",
+      "supports": "Auth admin createUser is server-side; a service credential must not be exposed to a browser. This is distinct from general Supabase project access."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/ai-tools/mcp",
+      "consultedOn": "2026-10-12",
+      "supports": "MCP capabilities are scoped/feature-dependent; listed database/project/development tools are not evidence that protected Auth user provisioning exists in this particular connected session. No paid branch or new provider purchase is proposed."
+    }
+  ]
+}

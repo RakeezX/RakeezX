@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "activationPending": true,
+  "source": "Current Product Ledger snapshot in tmp/rakeez_ops_apply/live-inputs.txt, with PO 2026-10-12 11:44 delegation and the parent's explicit required-check/N54 release clarification.",
+  "activationInstruction": "Root fills the current controller.activationId and remaining runtime fields after the N92/N91 delivery proof; null activationId deliberately prevents admission before that. Do not carry over an old cwd/worktreePath/baseSha. Start each from freshly verified main and use the N84 SHA only as a scoped reuse reference.",
+  "tasks": [
+    {
+      "id": "continuous-n95-sync-status-severity-20261012",
+      "productId": "N95",
+      "scopeKey": "n95-sync-status-presentation",
+      "activationId": null,
+      "priority": 30,
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "requiredChecks": [
+        "transient_status",
+        "fatal_visibility",
+        "owner_reset"
+      ],
+      "objective": "On a fresh current-main worktree, fix N95's demonstrated first-transient-failure red Sync indicator in the actual Product status presentation. Read the N95 row and only the relevant sync-operational-ui.js consumers plus sync.js status projections. Keep a positively identified transient transport failure with durable.failedCount===0 quiet/neutral and truthfully pending; do not label it synced. Use 90 seconds of sustained failure plus at least two distinct failed Sync attempts as the initial technical severity threshold under the new delegation, with an injected/fake clock for tests rather than waiting. Repeated renders, pageshow, visibilitychange or reconnect events are not additional failed attempts. Successful authoritative Sync clears this presentation state promptly. Preserve immediate actionable owner/Auth/server-rejected/durable/data-loss errors. Keep retry scheduling, Sync I/O, outbox, writes, authorization and recovery behavior unchanged; sync.js edits, if needed, are limited to read-only presentation metadata/projection. Implement a real bounded fix, not another design study. Return LOCAL_READY only when all named required checks PASS with actual or valid reused evidence; otherwise retain the useful candidate and return BLOCKED for the exact unresolved condition.",
+      "acceptance": [
+        "transient_status: PASS must demonstrate the real Product status mapper plus a deterministic clock sequence: first positively identified transport failure stays neutral/pending; offline is honestly offline; red escalation occurs only after >=90 seconds AND >=2 distinct failed attempts; repeated UI/lifecycle events do not advance the attempt count; authoritative success recovers promptly. Never show a false synced/success state. Test pageshow/visibilitychange and offline-online transitions without changing the existing retry delays or issuing real account traffic.",
+        "fatal_visibility: PASS must demonstrate immediate visible/actionable handling of actual owner mismatch, revoked/failed Auth, server-rejected operations, any durable failed outbox entry and unrecoverable restore/data-loss errors. Unknown failure categories retain their existing severity until positively classified as transient. Verify the diff does not modify syncAll retry scheduling, queue persistence, authorization, write behavior or recovery, and do not suppress diagnostics to obtain a quiet badge.",
+        "owner_reset: PASS must demonstrate that timing/attempt state belongs to the current owner/workspace and is cleared/rebound on logout or context switch; owner B never inherits owner A's quiet window or failure count. Reload/resume and stale callbacks cannot hide a hard error or manufacture successful Sync. Use synthetic identities only, with no new Auth/RLS/schema/migration or real teacher/student edits."
+      ],
+      "allowedPaths": [
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync.js",
+        "src/styles/components.css",
+        "tests/n95-*"
+      ],
+      "releaseAuthority": "PO 2026-10-12 11:44 Asia/Riyadh authorizes the corrected automation and routine technical decisions, including this bounded presentation fix and eligible reversible UI Production after the required affected checks. The 90-second/two-attempt choice is a technical implementation choice, not a previously PO-tested threshold. No change to the Sync retry engine, durable failures, ownership/Auth rules, real records, backend schema or high-risk data contract is granted. If the fix requires such a change, return BLOCKED inside N95 with the specific missing scope/authority; independent cards continue."
+    },
+    {
+      "id": "continuous-n84-quicklog-completion-20261012",
+      "productId": "N84",
+      "scopeKey": "n84-quicklog-inline-grades",
+      "activationId": null,
+      "priority": 40,
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "requiredChecks": [
+        "scoring_bounds",
+        "owner_sync",
+        "release_scope"
+      ],
+      "objective": "Finish the actual Product Quick-Log-backed inline +/- Gradebook feature from a fresh current-main worktree. First inspect the bounded existing candidate e1f76343dd7b1e92786e7c66c95b296e1b3a0944 and its result artifacts/ops-supervisor-v4/results/v5-n84-quicklog-candidate-20261012.json; port only its relevant approved patch onto the new base, retaining valid unchanged evidence. The old candidate's historical base and Preview are not the current source; do not copy its old worktree, metadata, unrelated shell changes or complete branch blindly. For participation/behavior automatic items, invoke the same existing Quick Log domain command and normal projection as Quick Log itself; never write a materialized automatic score directly. Exclude attendance-derived items and preserve manual-score behavior and D-086 effects policy. Use compact controls on the student's existing row and inspect the actual Product Gradebook wiring, not a Demo-only prototype. Complete the named scoring/owner/Sync/release-scope checks. If an affected ownership/Sync behavior remains unproved or genuinely required live authority is absent, preserve the candidate and return BLOCKED for N84 only; do not return LOCAL_READY as a substitute for release eligibility.",
+      "acceptance": [
+        "scoring_bounds: PASS must demonstrate one intentional +/- action invokes exactly the existing Quick Log command/event semantics and the normal grade projection, honors the existing zero/max/step bounds, survives reload without duplicate/lost events, leaves manual scores unchanged, and never exposes these controls on attendance-derived automatic items. Reuse the prior 8/8 evidence only where its actual source/dependencies/inputs still match; run the affected changed paths once rather than repeating historical shell/global suites.",
+        "owner_sync: PASS must exercise the affected actual ownership guard and outbox/Sync integration with authorized synthetic fixtures: permitted owner updates only the intended student/item, foreign owner or stale/wrong workspace is denied without mutation, projection is derived from its matching log, reload/retry does not duplicate or lose the operation, and persistence/reconciliation retain existing semantics. A visible Demo click or mocked success alone is insufficient. Distinguish reused/local synthetic evidence from any actually performed hosted or live-owner verification. If the required path cannot be checked without currently absent real-account authorization, return BLOCKED naming that exact remaining gate, not a generic whole-project audit.",
+        "release_scope: PASS must establish that the candidate is integrated from the fresh declared base, the real Product Gradebook uses the same approved Quick Log path (not a Demo-only branch), the changed paths remain within this card, and no direct automatic-score write, Auth/RLS/schema/migration, new Sync engine or real-record operation was introduced. Inspect mobile RTL at the affected widths, compact single-row layout, touch targets around 44px where practical and unchanged sound/effects policy. Routine eligible release uses the current delegation only after actual affected evidence; a historical Preview, source-only prototype or unmet scoring/owner/Sync condition must never be promoted."
+      ],
+      "allowedPaths": [
+        "src/views/grades.js",
+        "src/lib/quicklog*",
+        "src/styles/grades.css",
+        "tests/n84-*"
+      ],
+      "releaseAuthority": "Existing PO-approved N84 Quick Log direction plus PO 2026-10-12 11:44 execution delegation authorizes reuse, scoped implementation, affected synthetic verification and eligible Product delivery. It does not authorize changing real student/grade records during testing, new Auth/RLS/schema/migrations, bypassing owner/Sync/scoring failures, or deploying a Demo prototype. Any genuine remaining high-risk release authority or unverifiable affected owner/Sync behavior is a BLOCKED condition for this card alone; never invent A/B approval or report a pending gate as PASS."
+    },
+    {
+      "id": "continuous-n54-keyboard-compression-20261012",
+      "productId": "N54",
+      "scopeKey": "n54-mobile-keyboard-compression",
+      "activationId": null,
+      "priority": 50,
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "requiredChecks": [
+        "keyboard_reproduction",
+        "viewport_recovery"
+      ],
+      "objective": "Implement the approved N54 Option A against a fresh current-main worktree. Read only D-066/D-067, the relevant WA-N53-N54-0434 approved Option A excerpt and N54's 0413 physical findings before patching the shared form/sheet primitives. Reproduce the actual signed-out landing -> ابدأ مع ركيز -> email sheet -> focused input failure in a real browser with a controlled visual-viewport/keyboard-compression fixture: the reported normal visible height was about 562px and compressed height about 227px at scale 1; the old 215px sheet with 61px header and 44px footer left only about 76px usable body. Those are PO-reported prior measurements, not a new device test. Fix the non-crushing header/body/footer composition and natural form scrolling/focus lifecycle rather than merely repeating the old scroll-to-input helper. Do not re-promote rejected 0408 or diagnostic-only 0411. A reproducible realistic browser/WebKit/viewport case with an observed corrected result can support the new reversible UI release under current delegation; lack of a physical iPhone alone does not block the factory or create a new mandatory gate. Mark the physical-device check NOT_RUN when absent. If the actual defect cannot be reproduced or remains unresolved, return BLOCKED for this card with precise reproduction/evidence and continue independent tickets.",
+      "acceptance": [
+        "keyboard_reproduction: PASS requires an actual Product-route/form reproduction before the fix and an observed correction on the new candidate, using a realistic automated WebKit or browser visual-viewport fixture at normal and severe compressed heights (about 562px and 227px, scale 1) and representative mobile RTL widths. The focused input, necessary labels, close action and primary action must remain readable and reachable through a coherent form surface; fixed chrome must not recreate the unusable tiny body. Preserve normal text/input readability and touch behavior; do not hide required controls, shrink text to manufacture PASS, assume Safari auto-zoom caused the defect, or count source inspection alone as reproduction.",
+        "viewport_recovery: PASS must cover repeated focus/blur, keyboard open/close, resize/orientation and restored viewport on the affected shared sheet, plus one other representative shared modal/input surface such as OTP/profile using synthetic data without sending OTP/email or changing an account. No stuck offsets, clipped content, lost input/focus, blocked close/back action or desktop regression. Match the approved Option A rather than a new unapproved visual design. Record browser/device and viewport conditions honestly; physical iPhone NOT_RUN is informative and is not a required PASS. Never claim the older 0408/0411 candidates are accepted or close N20/N54 from an emulated check alone."
+      ],
+      "allowedPaths": [
+        "src/lib/dom.js",
+        "src/lib/*keyboard*.js",
+        "src/lib/*viewport*.js",
+        "src/styles/components.css",
+        "src/styles/app.css",
+        "tests/n54-*"
+      ],
+      "releaseAuthority": "PO-approved N54 Option A and the current PO 2026-10-12 11:44 delegation authorize a new bounded reversible UI fix, realistic affected browser/viewport verification and eligible Production with honest physical-device NOT_RUN and later PO review. This supersedes using absent physical iPhone access as an automatic factory-wide hold for a demonstrably fixed reversible UI candidate; it does not validate rejected 0408/0411, fabricate device testing or grant Product CLOSED. An unreproduced/unfixed defect, genuine new design choice or required Auth/data behavior change is BLOCKED within N54 only. No actual credentials, OTP/email send, real account edits or data-path changes."
+    }
+  ]
+}
+

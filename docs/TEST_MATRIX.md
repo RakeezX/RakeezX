@@ -1,19 +1,15 @@
-# Risk-based verification matrix
+# RAKEEZ — verify the behavior changed
 
-Select the highest applicable class after inspecting the diff. Run focused checks first; record actual pass/fail/skip counts. Use existing `scripts/test-sync-runner.mjs`, `scripts/e2e-runner.mjs`, `scripts/regression-gate.mjs`, and Build Meta tooling rather than duplicating them.
-
-| Class | Required evidence before candidate handoff |
+| Changed risk | Affected verification |
 | --- | --- |
-| `DOC/COPY` | Relevant content/contract check and `git diff --check`; build only if bundled copy changes. |
-| `VISUAL` | Affected browser spec, real viewport/RTL/light-dark/accessibility check, build with normal Build Meta restoration, diff check; no runtime suite unless behavior changed. |
-| `LOCALIZED_RUNTIME` | Affected unit/integration tests, directly affected browser flow, build/Build Meta, diff check; add neighboring domain regression where the call path overlaps. |
-| `CRITICAL_DATA_AUTH_SYNC` | Synthetic owner/isolation and failure-path tests, affected Sync/Auth/data suites, disposable server integration when applicable, browser/offline/reload, one bounded canonical gate for significant changes, build/Build Meta, diff check. Never use real data to manufacture a pass. |
-| `PRODUCTION` | Exact local/remote SHA and fast-forward ancestry, reused exact-tree test evidence, deployment metadata (environment, status, SHA), bounded non-destructive live smoke. No automatic test rerun or deployment without ticket authorization. |
+| Copy/icon/spacing | Inspect the actual changed result and its branch; syntax/diff check if relevant. No new suite, full-platform sweep or separate auditor. A surrounding Delete/Sync feature does not by itself make a copy-only edit a data mutation. |
+| Ordinary behavior | Existing focused happy/error/privacy checks plus the affected visible flow when useful. Build once on the final candidate when delivery needs it. |
+| Data/scoring | Changed invariants, negative path, owner isolation, persistence and relevant Sync/recovery; reuse unaffected evidence. |
+| Auth/RLS/Delete/Restore/other critical data behavior | Preserve the applicable authorization, A/B owner, atomicity, stale-client, data-loss and recovery checks. Synthetic and live permissions remain distinct. |
+| Delivery | Correct candidate/integration/provider/environment binding plus a bounded non-destructive served check. HTTP 200 or content metadata alone is insufficient. |
 
-Within `CRITICAL_DATA_AUTH_SYNC`, select the affected contract explicitly: unified email OTP and both signup gates; profile/access and owner-bound provisioning; account routing/Owner Guard; CORE_V2 restore with CORE_V1 compatibility; outbox/Sync convergence; SECURITY DEFINER ACL/RLS; or score/attendance/lifecycle data paths. A new-account or Silent Beta change requires synthetic A/B isolation and fail-closed fresh-device/account-switch evidence. Use disposable server/Auth infrastructure for mutations; Production account evidence is read-only unless the ticket explicitly authorizes more.
+For responsive changes, inspect the affected widths/RTL/theme in one combined run. Use actual Safari/device verification when the defect depends on that browser/device; do not claim Chromium emulation proves an iPhone. For a label edit, do not invent a device gate.
 
-`node scripts/rakeez.mjs preflight --base <sha> --candidate <sha> [--expect-main <sha>]` checks identity, migration immutability, dirty tree, and diff. It is read-only; PASS here does not replace the selected tests. `regression-gate.mjs` already runs Sync, browser, build, restores checked-in Build Meta, and checks the diff. Run it once when required, not as a debugging loop.
+For hosted RAKEEZ Demo, reuse `tests/helpers/served-demo-readiness.mjs`: isolated browser context, private-account network blocked, `.boot` detached and store/roster ready; never rely on development-only `window.store` or attach to a personal browser profile. The approved worker configuration has a separate capability proof; do not automatically route every CIM/Git/browser step to PM based on an old sandbox failure. If an actual denial recurs, record its current evidence and required capability without weakening ownership guards.
 
-For any user-visible ticket, browser verification means the real control/action/result, relevant reload/persistence, and console/runtime checks. A Product Owner review is still required before CLOSED.
-
-For an unrelated failure, compare against the unchanged baseline under equivalent inputs before calling it a candidate Product regression. Proven baseline test/harness debt may be corrected in the test layer when the ticket allows it; do not waive unexplained failures, alter thresholds, or count skipped tests as passed. Keep one bounded final gate rather than repeated repair-loop runs.
+Fix a test/harness mismatch against the Product contract inside the same task and rerun the affected part once. At the second same blocker without new evidence, record it and move independent work forward. Preserve real failures and label skipped/emulated checks honestly. Do not repeat an unchanged PASS or a global refs/worktrees/history audit. See [the operating contract](RAKEEZ_OPS_CONTRACT.md).

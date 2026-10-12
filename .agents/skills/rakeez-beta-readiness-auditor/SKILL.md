@@ -1,12 +1,8 @@
 ---
 name: rakeez-beta-readiness-auditor
-description: Audit a fresh RAKEEZ X account's Beta readiness with synthetic identities, classifying each journey stage without enabling signup or altering real user data.
+description: Use only for explicitly scoped fresh-account or security journeys, not every UI ticket.
 ---
 
-# Fresh-account Beta audit
+Read `docs/RAKEEZ_OPS_CONTRACT.md`, the affected row of `docs/TEST_MATRIX.md` and the named fresh-account/security contract. Use only authorized disposable synthetic accounts; never real user records. Exercise the affected journey and distinguish intentionally empty from broken. Preserve owner isolation, account switch/logout, persistence and recovery checks when the change can affect them.
 
-Use an authorized disposable account and isolated browser/storage. Observe the real flow for signup/auth, OTP, profile, provisioning, defaults, class, students, schedule, attendance, scores, logout/login, second-device restore, and account isolation. Record action, observed result, persistence/reload where relevant, and runtime errors; avoid inventing a pass from code inspection alone.
-
-Classify each stage as `PROVISIONED`, `EMPTY_BY_DESIGN`, `BROKEN`, `MISSING`, or `SECURITY_RISK`. Distinguish an intentionally empty workspace from a failed bootstrap. Treat cross-account exposure or lost data as fail-closed and stop.
-
-Do not enable signup, create Production users, change Auth policy, or access Product Owner data unless a separate ticket explicitly authorizes that action. Use [TEST_MATRIX](../../../docs/TEST_MATRIX.md) for proportional automated coverage.
+Return the precise defect/evidence to the same task owner; do not add a mandatory Beta audit or PM gate for copy/icons/unrelated CSS. Reuse unchanged evidence and stop the same failed loop after two attempts without new information. Follow the runner receipt schema; do not declare Production or Product CLOSED from synthetic PASS.
