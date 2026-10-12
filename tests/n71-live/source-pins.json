@@ -1,0 +1,1 @@
+{"sdk":"@supabase/supabase-js@2.117.3","sourceCommit":"4d23055805ce2cf853686b704cfaec1a701d29c6","adminMethods":["createUser","getUserById","updateUserById","signOut"],"authMethods":["getUser"],"adaptation":"Reviewed D087 exact-pair handler primitives; N71 purpose, IDs, capabilities and function names are independent."}

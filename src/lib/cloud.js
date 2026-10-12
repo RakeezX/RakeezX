@@ -1188,6 +1188,53 @@ export async function stageScoreRestoreV2(envelope) {
   });
 }
 
+export async function getUnifiedRestoreCapability() {
+  if (mockBackend) return mockBackend.getUnifiedRestoreCapability?.() ?? null;
+  try { return await request('/rpc/n71_restore_capability', {
+    method: 'POST', headers: { 'Content-Type': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
+  }); } catch (error) {
+    if (error.status === 404 || error.code === 'PGRST202') return null;
+    throw error;
+  }
+}
+
+export async function getUnifiedRestoreManifest({ signal } = {}) {
+  if (mockBackend) return mockBackend.getUnifiedRestoreManifest();
+  return request('/rpc/n71_restore_manifest', {
+    method: 'POST', signal, headers: { 'Content-Type': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
+  });
+}
+
+export async function stageUnifiedRestore(envelope) {
+  assertNewProductWrite();
+  if (mockBackend) {
+    if (!mockBackend.stageUnifiedRestore) throw new Error('Unified staging unavailable');
+    return mockBackend.stageUnifiedRestore(envelope);
+  }
+  return request('/rpc/stage_n71_restore', {
+    method: 'POST', headers: { 'Content-Type': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,
+      p_backup_version: envelope.backupVersion, p_source_manifest: envelope.sourceManifest,
+      p_operations: envelope.operations, p_source_owner_id: envelope.sourceOwnerId }),
+  });
+}
+
+export async function finalizeUnifiedRestore(envelope) {
+  if (mockBackend) {
+    if (!mockBackend.finalizeUnifiedRestore) throw new Error('Unified finalization unavailable');
+    return mockBackend.finalizeUnifiedRestore(envelope);
+  }
+  return request('/rpc/finalize_n71_restore', {
+    method: 'POST', headers: { 'Content-Type': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_restore_id: envelope.restoreId, p_backup_hash: envelope.backupHash,
+      p_expected_stage_hash: envelope.expectedStageHash }),
+  });
+}
+
 export async function finalizeScoreRestoreV2(envelope) {
   if (mockBackend) {
     if (typeof mockBackend.finalizeScoreRestoreV2 !== 'function') throw new Error('Mock backend lacks V5 finalization');
