@@ -1,3 +1,5 @@
+Current PO priority update 2026-10-13: N73 accepted/CLOSED; optional target-mark preservation tracked as N100 pending details. N23/N24/N64/N88/N90 are reopened for work AFTER the pre-existing unfinished tickets; N78 is re-deferred. This supersedes old deferred flags for those five only. No new deferred worker is admitted by this record.
+
 # Current PO acceptance — 2026-10-13 08:27
 
 PO acceptance 2026-10-13 08:27 Asia/Riyadh: N77 CLOSED. Loading-circle correction accepted/CLOSED as a subtask only; N71 unified restore remains OPEN. N91/N13/N49 remain CLOSED. This record does not alter runtime code or Product data.
@@ -13,9 +15,8 @@ This page preserves user notes and acceptance context. The automatic block lists
 | --- | --- | --- | --- | --- | --- |
 | N98 | Preserved the implementation and corrected the N98 synthetic test fixture’s missing shipped migration without weakening assertions. All current affected checks pass. No push or deployment performed. | [Production](https://rakeezx.com/) | c3283c4b092d35fbaff0b7d4f97a3cf4e94e7893 | 2026-10-13T02:42:42.845Z | continuous-n98-default-alphabetical-roster-20261013 |
 | N97 | Serialized class deletion against Sync and added truthful resume verification. Genuine failures remain visible. Candidate committed locally; no push, deployment or real-data mutation. | [Production](https://rakeezx.com/) | 0064d57f2f968951453b4ee10519897c1f4293c2 | 2026-10-13T02:52:30.413Z | continuous-n97-delete-resume-sync-status-20261013 |
-| N94 | Completed N94 refinements and corrected both scope blockers. Offline shell now includes the new assets, and date coverage recognizes the two approved controls. Committed locally; no push, deployment or queue edits. | [Production](https://rakeezx.com/) | 778fa7d3afe6bd145ef31763aea53dc5b4fcd1a5 | 2026-10-13T04:03:25.259Z | continuous-n94-compact-picker-names-20261013 |
 | N99 | Implemented minimal public Umami events, privacy safeguards and public notice. No push, deployment, real collector events or dashboard observation. | [Production](https://rakeezx.com/) | f59bbe13f04a43e8f9829f670dee7ad0adcbc3ad | 2026-10-13T05:12:12.783Z | continuous-n99-umami-minimal-public-20261013 |
-| N73 | AI-identified candidate reconciled with fresh main; N94 compatibility and all six gates passed. Operational deviations are recorded: an incorrect Preview branch suffix remains retained, and a native lease-launch defect was corrected with owned resources cleaned. No Product publication performed. | [Production](https://rakeezx.com/) | 41d76e8c1923f31daaf3690eba15943327acaa1c | 2026-10-13T05:53:33.238Z | continuous-n73-real-distribution-20261012 |
+| N94 | Implemented and locally committed the N94 grade toolbar and quick-log surface changes. Commit is labeled AI; no push or deployment performed. | [Production](https://rakeezx.com/) | 2acea62277012d738e9e15b9e6d24e413b6ee0c4 | 2026-10-13T07:55:46.731Z | continuous-n94-grade-strip-controls-20261013 |
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
