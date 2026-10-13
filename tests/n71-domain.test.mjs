@@ -74,3 +74,29 @@ test('deleted parent and immutable closed-term scopes suppress backup-only desce
     assert.ok(plan.entries.filter(row=>['a','s','teaching'].includes(row.id)).every(row=>row.classification==='KEEP_SERVER'));
   }
 });
+
+test('invalid live child deletion closure fails before reconcile; child-first tombstones preserve the canonical outcome',async()=>{
+  // Reproduce the observed assignment/submission boundary without weakening
+  // the actual canonical ancestry guard or adding deferred cascade behavior.
+  await db.put('students',{id:'local-witness',name:'Unchanged until canonical closure is valid'});
+  const canonical=Object.fromEntries(PORTABLE_CLOUD_RESTORE_STORES.map(name=>[SYNC_V2_SCHEMAS[name].entity,[]]));
+  canonical.assignments=[{id:'parent',owner_id:OWNER,revision:2,deleted_at:'2026-10-13T08:00:00Z',title:'Synthetic',assigned_date:'2026-10-12',max:10}];
+  canonical.submissions=[{id:'child',owner_id:OWNER,revision:1,deleted_at:null,assignment_id:'parent',student_id:'student',status:'pending',score:null}];
+  canonical.students=[{id:'student',owner_id:OWNER,revision:1,deleted_at:null,name:'Canonical synthetic'}];
+  const options={expectedOwnerId:OWNER,verifyOwner:async()=>OWNER};
+  await assert.rejects(reconcileCanonicalRestore({version:5,data:{}},canonical,options),{code:'RESTORE_CANONICAL_DELETED_DESCENDANT'});
+  assert.equal((await db.get('students','local-witness')).name,'Unchanged until canonical closure is valid');
+  canonical.submissions[0]={...canonical.submissions[0],revision:2,deleted_at:'2026-10-13T07:59:59Z'};
+  await reconcileCanonicalRestore({version:5,data:{}},canonical,options);
+  assert.equal((await db.get('assignments','parent')).deleted,true);
+  assert.equal((await db.get('submissions','child')).deleted,true);
+  assert.equal((await db.get('students','student')).name,'Canonical synthetic');
+  const restored=await buildBackup({sourceOwnerId:OWNER});
+  assert.equal((await validateBackupIntegrity(restored)).ok,true);
+  const server=Object.fromEntries(PORTABLE_CLOUD_RESTORE_STORES.map(name=>[name,[]]));
+  server.assignments=[{id:'parent',deleted:true}];server.submissions=[{id:'child',assignmentId:'parent',deleted:true}];
+  const stale={version:5,sourceOwnerId:OWNER,data:{assignments:[{id:'parent',deleted:false}],submissions:[{id:'child',assignmentId:'parent',studentId:'student',deleted:false}]},baselines:{}};
+  const plan=planCloudRestore(stale,server,{ownerId:OWNER,ownerHistoryRevision:'1'});
+  assert.equal(plan.ready,true);assert.equal(plan.operations.length,0);
+  assert.ok(plan.entries.every(entry=>entry.classification==='KEEP_SERVER'));
+});
