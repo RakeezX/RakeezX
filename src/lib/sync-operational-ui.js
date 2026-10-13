@@ -29,6 +29,9 @@ export function syncOperationalPresentation(summary = { state: 'idle' }, now = D
   if (status === 'pending' && summary.presentationSeverity?.transient) {
     text = 'بانتظار المزامنة';
     label = 'لم تتأكد المزامنة مع السحابة بعد. سنحاول مرة أخرى.';
+  } else if (status === 'pending' && summary.presentationSeverity?.awaitingVerification && !summary.queuedCount) {
+    text = 'بانتظار التحقق من المزامنة';
+    label = 'نتحقق من أحدث بيانات السحابة. لم تتأكد المزامنة بعد.';
   }
   const help = summary.actionableSyncIssue === true && ['error', 'blocked', 'rejected'].includes(status);
   // No retryability flag exists for rejected work: do not advertise retry as its remedy.
@@ -48,6 +51,7 @@ export function renderSyncOperationalSection(summary, { compact = false } = {}) 
   const secondary = ui.status === 'synced' ? `آخر مزامنة: ${lastText}`
     : firstSync ? countText
     : ui.status === 'pending' && summary.presentationSeverity?.transient ? ui.label
+    : ui.status === 'pending' && summary.presentationSeverity?.awaitingVerification && !summary.queuedCount ? ui.label
     : ['pending', 'syncing'].includes(ui.status) ? countText
     : ui.status === 'idle' && summary.queuedCount > 0 ? `${countText} بانتظار أول مزامنة`
     : ui.status === 'error' ? `${summary.localWorkSaved ? 'بياناتك محفوظة على هذا الجهاز. ' : ''}${summary.automaticRetryActive ? 'سنحاول المزامنة مرة أخرى.' : 'أعد المزامنة أو تواصل مع الدعم.'}`

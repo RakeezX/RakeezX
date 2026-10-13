@@ -1,5 +1,5 @@
 /** Presentation state only. Sync and its retry timers remain the source of truth. */
-import { isStudentLifecycleInFlight } from './sync-status-severity.js';
+import { isProtectedLifecycleInFlight } from './sync-status-severity.js';
 export const OFFLINE_LIVENESS_MS = 8_000;
 export const FAILED_RECOVERY_STABLE_MS = 1_200;
 export const WAKE_COALESCE_MS = 1_500;
@@ -16,7 +16,7 @@ export function wakeRecoveryCycle(cycle, now, { online = true } = {}) {
 }
 
 export function presentSyncWarning(summary, cycle, now) {
-  if (isStudentLifecycleInFlight(summary)) {
+  if (isProtectedLifecycleInFlight(summary)) {
     return { cycle, quiet: false, strip: false, status: 'syncing', nextCheckAt: null };
   }
   const state = summary?.state ?? 'idle';

@@ -63,6 +63,8 @@ let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
 let liveStudentLifecycle = null;
+let liveClassDeletion = null;
+let classDeletionReserved = false;
 let workspaceClaimRunning = false;
 const presentationSeverity = createSyncStatusSeverity();
 let presentationContextToken = null;
@@ -72,6 +74,7 @@ function bindPresentationContext() {
     ? JSON.stringify([cloud.user.id, workspace.databaseName, workspace.authUserId]) : null);
   if (token !== presentationContextToken) {
     liveStudentLifecycle = null;
+    liveClassDeletion = null;
     presentationContextToken = token;
     if (operationalSummaryCache.state === 'synced') {
       operationalSummaryCache = Object.freeze({ ...operationalSummaryCache, state: 'pending',
@@ -166,8 +169,8 @@ function coordinatorOperationalState(durable) {
   if (state.status === 'blocked') return 'blocked';
   if (cloud.authStatus?.().state === 'auth_required' || state.status === 'auth_required') return 'auth_required';
   if (presentationSeverity.snapshot().hardFailure) return 'error';
-  if (studentLifecycleInFlight() && durable.blockedCount === 0) return 'syncing';
-  if (store.state.device?.studentLifecycleResume) return 'error';
+  if ((studentLifecycleInFlight() || classDeletionInFlight()) && durable.blockedCount === 0) return 'syncing';
+  if (store.state.device?.studentLifecycleResume || store.state.device?.n77DeleteIntent) return 'error';
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
@@ -185,6 +188,18 @@ function studentLifecycleInFlight() {
     cloudOwnershipAccess('pull').allowed && !store.state.device?.cloudRestoreResume &&
     (!checkpoint || (checkpoint.ownerId === liveStudentLifecycle.ownerId &&
       checkpoint.envelope?.mutationId === liveStudentLifecycle.mutationId));
+}
+
+function classDeletionInFlight() {
+  const checkpoint = store.state.device?.n77DeleteIntent;
+  return !!liveClassDeletion && restoreRunning && !!cloud.session &&
+    cloud.user?.id === liveClassDeletion.ownerId &&
+    presentationContextToken === liveClassDeletion.contextToken &&
+    cloudOwnershipAccess('pull').allowed && !store.state.device?.cloudRestoreResume &&
+    !store.state.device?.studentLifecycleResume &&
+    (!checkpoint || (checkpoint.ownerId === liveClassDeletion.ownerId &&
+      checkpoint.selectedTeachingId === liveClassDeletion.teachingId &&
+      checkpoint.mutationId === liveClassDeletion.mutationId));
 }
 
 function normalizeDurableSummary(durable = {}) {
@@ -243,8 +258,9 @@ function cacheOperationalSummary(durable, expectedToken = null) {
       (normalized.blockedCount > 0 && !autoRunning) || (normalized.failedCount > 0 && !retryScheduled),
     localWorkSaved: true,
     cloudSyncHealthy: currentState === 'synced' && !normalized.actionableSyncIssue,
-    safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume,
+    safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume && !store.state.device?.n77DeleteIntent,
     studentLifecycleInFlight: studentLifecycleInFlight(),
+    classDeletionInFlight: classDeletionInFlight(),
     presentationSeverity: Object.freeze(presentationSeverity.snapshot()),
   });
   return projectSyncStatusSeverity(operationalSummaryCache);
@@ -288,7 +304,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
   if (!cloud.session || !cloud.user) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -327,7 +343,7 @@ function retryDelay() {
 }
 
 function scheduleRetry() {
-  if (workspaceClaimRunning) return;
+  if (classDeletionReserved || workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -346,6 +362,8 @@ function scheduleRetry() {
 }
 
 async function scheduleResumeSync() {
+  presentationSeverity.verifying(bindPresentationContext());
+  notify();
   if (workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
@@ -356,7 +374,7 @@ async function scheduleResumeSync() {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
   const pending = await pendingOutbox();
   const stale = !state.lastSyncedAt || Date.now() - state.lastSyncedAt >= RESUME_STALE_MS;
-  if (pending.length || stale) scheduleAutomaticSync({ full: stale, immediate: true });
+  if (pending.length || stale || presentationSeverity.snapshot().awaitingVerification) scheduleAutomaticSync({ full: true, immediate: true });
 }
 
 function failedResult(name) {
@@ -476,10 +494,12 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning) return false;
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
   const lifecycleDevice = await db.get('device', 'device');
+  // Reservation can be acquired while the asynchronous checkpoint read yields.
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) return false;
   if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
@@ -744,6 +764,46 @@ export async function runStudentLifecycleExclusive(task, identity) {
     }, { scheduleAutomatic: initialized });
   } finally {
     if (liveStudentLifecycle === live) liveStudentLifecycle = null;
+  }
+}
+
+/** Drain a pass before creating the N77 checkpoint that excludes normal writes. */
+export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) {
+    throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  }
+  const contextToken = bindPresentationContext();
+  classDeletionReserved = true;
+  remoteSync.stop();
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  rerunRequested = false;
+  try {
+    if (autoRunning) await new Promise(resolve => syncSettledWaiters.add(resolve));
+    if (bindPresentationContext() !== contextToken || cloud.user?.id !== ownerId || !cloud.session) {
+      throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
+    }
+    assertCloudOwnership('pull');
+    liveClassDeletion = { ownerId, teachingId, contextToken };
+    presentationSeverity.verifying(contextToken);
+    return await runCloudRestoreExclusive(() => task(intent => {
+      if (intent.ownerId !== ownerId || intent.selectedTeachingId !== teachingId || !intent.mutationId ||
+          bindPresentationContext() !== contextToken || !liveClassDeletion) {
+        throw new Error('Class deletion checkpoint identity mismatch');
+      }
+      liveClassDeletion.mutationId = intent.mutationId;
+    }), { scheduleAutomatic: false });
+  } catch (error) {
+    bindPresentationContext();
+    presentationSeverity.failed(contextToken, [error]);
+    throw error;
+  } finally {
+    liveClassDeletion = null;
+    classDeletionReserved = false;
+    // A delete receipt is not a fresh complete pull, even when its queue is empty.
+    if (initialized) scheduleAutomaticSync({ full: true, immediate: true });
+    notify();
   }
 }
 

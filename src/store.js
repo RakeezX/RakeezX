@@ -2855,6 +2855,17 @@ export async function previewDeleteTeaching(tchId) {
 /** Server commit must succeed before any local Product row is marked deleted. */
 export async function deleteTeaching(tchId, plan) {
   if (!plan) throwLegacyDeleteUpdateRequired();
+  assertLeaseWritable();
+  const { ownerId } = n77Context(tchId);
+  const { runClassDeletionExclusive } = await import('./lib/sync.js');
+  return runClassDeletionExclusive(async bindCheckpoint => {
+    try { return await executeDeleteTeaching(tchId, plan, bindCheckpoint); }
+    finally { state.device = await db.get('device', 'device'); notify(); }
+  }, { ownerId, teachingId: tchId });
+}
+
+async function executeDeleteTeaching(tchId, plan, bindCheckpoint) {
+  if (!plan) throwLegacyDeleteUpdateRequired();
   const { teaching, ownerId, workspace } = n77Context(tchId);
   if ((await db.get('device', 'device'))?.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
   validateDeletePlan(plan, { teachingId: tchId, sectionId: teaching.sectionId, ownerId });
@@ -2872,6 +2883,9 @@ export async function deleteTeaching(tchId, plan) {
     intent = existing ?? { ownerId, selectedTeachingId: tchId, plan, mutationId: uid(), deviceId: device.deviceId ?? uid() };
     return { device: { put: [{ ...device, deviceId: intent.deviceId, n77DeleteIntent: intent, updatedAt: now() }], remove: [] } };
   } });
+  bindCheckpoint(intent);
+  state.device = await db.get('device', 'device');
+  notify();
   let receipt;
   try {
     receipt = await n77DeleteTeaching({ teachingId: tchId, sectionId: teaching.sectionId,
