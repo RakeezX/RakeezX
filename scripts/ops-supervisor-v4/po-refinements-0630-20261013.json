@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "authority": "Direct PO follow-up 2026-10-13: N77 conditional preservation wording; N94 established date picker, compact completion cells and parent-derived names. Existing continuous delivery and two-worker/Standard limits apply.",
+  "tasks": [
+    {
+      "id": "continuous-n77-final-class-wording-20261013",
+      "productId": "N77",
+      "activationId": "po-20261012-continuous",
+      "priority": 0,
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "scopeKey": "n77-conditional-final-class-copy",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "objective": "Correct misleading N77 copy after PO noticed the final-class confirmation unconditionally says student records in other classes remain. Final Teaching of one Section is not automatically the final Section of the entire account. Inspect current server scope and render copy valid even when this is the user's last class, without extra server requests or changing Delete semantics. Reuse the already shipped compact confirmation and its focused render test; do not rebuild the workflow.",
+      "allowedPaths": ["src/views/teachings.js", "tests/n77-confirmation-copy.test.mjs", "tests/n77-final-class-copy.test.mjs"],
+      "requiredChecks": ["n77_final_class_truthful_copy"],
+      "acceptance": [
+        "Use an honest conditional preservation sentence such as إن وُجدت للطلاب سجلات في فصول أخرى، فلن تتأثر. Never assert other classes exist or that all student history/identity is erased. No need to compute a misleading count by grade. Retain clear subject-only vs last-Teaching/whole-Section consequences and local Demo distinction.",
+        "One main scope-specific title, class/subject identity and concise consequence. Keep online requirement and irreversibility in short separate sentence: يتطلب الحذف اتصالًا بالإنترنت، ولا يمكن التراجع عنه. Preserve Back/Confirm handlers, stale-scope guard and actual server revalidation.",
+        "Verify actual existing confirmation rendering for single account class, another class present, subject-only and Demo. Reuse prior unaffected handler/atomicity evidence. No live deletes/Auth/SQL/migrations, no broad suite, no full worker build for a string-only edit. Return source-bound focused result; publisher performs actual delivery."
+      ],
+      "releaseAuthority": "Direct PO N77 wording correction and standing authorized Production delivery through the sole controller/publisher. This is not PO acceptance of all N77, not permission for real account deletion or any new service operation. Keep N77 open/awaiting_po after verified release."
+    },
+    {
+      "id": "continuous-n94-compact-picker-names-20261013",
+      "productId": "N94",
+      "activationId": "po-20261012-continuous",
+      "priority": 1,
+      "riskClass": "STANDARD",
+      "scopeKey": "n94-compact-presentation-dates-names",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "objective": "Implement the latest PO N94 UI refinements on fresh main, preserving the already delivered N94 offline fix and N98 default ordering. Use the existing approved Rakeez date/time adapter, compact one-line completion cells with one quiet shared legend, and smart default names for newly added subitems based on their parent. These changes replace prior verbose visible cell-label guidance, not scoring/owner/offline semantics. Do not create a second date picker or revise the approved central date policy.",
+      "allowedPaths": ["src/views/items.js", "src/views/grades.js", "src/styles/grades.css", "src/lib/subitem-default-name.js", "tests/n94-ui-*", "tests/n94-subitem-names.test.mjs"],
+      "requiredChecks": ["n94_approved_date_controls", "n94_compact_cells_legend", "n94_parent_derived_names"],
+      "acceptance": [
+        "Reuse src/lib/rakeez-datetime.js adapter and rakeez-datetime-values.js rules as-is. Current fields use type=date without the adapter; change them to the established type=text/data-rakeez-datetime=date/data-rakeez-date-scope=planning convention. Existing central adapter mounts dynamic sheets. Keep dates optional, preserve stored ISO values and createdAt, reject due-before-start, keep planning bounds/product floor and 0-9 digits. Read the relevant existing usage/tests; no new picker, custom year policy or implicit current-date default.",
+        "Completion cells show a compact single-line subitem name plus concise actual points when useful, gray/amber/green status, and at most a tiny existing symbol. Remove repeated visible long text such as عادي / مقبول بعذر and غير مرصود from every cell. Provide one quiet shared legend near the subitem area: gray غير مرصود, amber متأخر, green عادي/بعذر. Preserve descriptive screen-reader names/title/keyboard support so state is not color-only to assistive technology. No stacked multiline verbose status, no horizontal overflow at 320/390px RTL, calm light/dark behavior. Preserve deliberate tap cycles and selected-state/score values.",
+        "New default names derive from normalized parent intent: الواجبات/الواجب/واجبات/واجب -> واجب1, واجب2; المشاريع/المشروع/مشاريع/مشروع -> مشروع1, مشروع2. Handle whitespace/diacritics for recognition without changing stored user labels. For unknown parent names keep a readable parent-name+sequence fallback, not a guessed singular. Select the next unused positive suffix for that parent. Never overwrite a user-edited draft name or rename previously saved subitems, IDs, grades or histories. Use the rule for the first newly created draft and add-another row.",
+        "Use actual dynamic form/Gradebook rendering on synthetic app fixtures and small focused naming/date assertions. Read shared date module and scoring contracts but do not edit unlisted core files or run live data fixtures. Reuse unchanged scoring, Sync, migrations and offline tests unless this UI change materially affects them. No required full historical suite."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 UI correction plus existing N38/N94 and continuous release delegation. Local Product UI code and synthetic verification only; no database backfill, student mutation, schema/Auth/RLS change or migration replay. Sole publisher handles Production; N94 remains open until actual acceptance."
+    }
+  ]
+}

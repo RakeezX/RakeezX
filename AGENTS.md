@@ -16,3 +16,6 @@ Authority: the PO's 2026-10-12 11:44 Asia/Riyadh instruction to apply the correc
 - The 08:54 hold is superseded by the 11:44 resume authority; a later PO stop remains binding. Historical V4/V5 procedures, expired cutoffs and stale worktree prompts cannot restore a superseded workflow.
 
 Product status: `docs/PRODUCT_LEDGER.md` and `docs/PRODUCT_LEDGER_CLOSED.md`. Runtime: `artifacts/ops-supervisor-v4/queue/*.json`; `ACTIVE_TASKS.json` there is its live summary. Launcher: `scripts/ops-supervisor-v4/start-ops.ps1`; controller: `controller.mjs` in the same directory.
+
+## Approved Product date controls — PO reaffirmed 2026-10-13
+For every new or edited date/time input, reuse src/lib/rakeez-datetime.js and rakeez-datetime-values.js with the existing data-rakeez-datetime and appropriate data-rakeez-date-scope attributes. Preserve the central planning/historical/session bounds, optional values, stored ISO semantics and 0–9 digits. Do not introduce a competing picker or native-only field where the approved adapter applies. Read the existing implementation instead of hardcoding a new date policy.
