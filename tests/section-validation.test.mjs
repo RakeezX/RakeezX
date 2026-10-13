@@ -62,18 +62,12 @@ test('different labels/grades/years are allowed; edit validation uses the edited
   await assert.rejects(store.editSection(a.id, { grade:4, label:'2' }), /موجود مسبق/);
 });
 
-test('pristine safe delete tombstones section/teaching/items and allows recreation with fresh immutable IDs', async () => {
+test('unvalidated direct Delete leaves section, Teaching and items intact', async () => {
   const a = await store.createSection({ grade:4, label:'أ' });
   const teaching = await store.createTeaching({ sectionId:a.id, subjectId:'subject:test', termId:'term:test' });
   const itemIds = store.items(teaching.id).map((item) => item.id);
-  await store.deleteClass(a.id);
-  assert.equal((await db.get('sections', a.id)).deleted, true);
-  assert.equal((await db.get('teachings', teaching.id)).deleted, true);
-  for (const id of itemIds) assert.equal((await db.get('items', id)).deleted, true);
-  const recreated = await store.createSection({ grade:4, label:'ا' });
-  assert.notEqual(recreated.id, a.id);
-  const edited = await store.createSection({ grade:5, label:'else' });
-  await store.deleteClass(recreated.id);
-  await store.editSection(edited.id, { grade:4, label:'إ' });
-  assert.equal(store.getSection(edited.id).label, 'إ');
+  await assert.rejects(store.deleteClass(a.id), { code: 'N77_CLIENT_UPDATE_REQUIRED' });
+  assert.equal((await db.get('sections', a.id)).deleted, false);
+  assert.equal((await db.get('teachings', teaching.id)).deleted, false);
+  for (const id of itemIds) assert.equal((await db.get('items', id)).deleted, false);
 });
