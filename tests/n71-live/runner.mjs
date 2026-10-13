@@ -280,8 +280,13 @@ async function run(){
     // Ordinary authenticated Sync makes deletion canonical before restoring stale export.
     assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before deletion boundary');
     await a.page.evaluate(async ids=>{const c=await import('/src/lib/cloud.js');const db=await import('/src/lib/db.js');
-      const row=await db.get('assignments',ids.deletedAssignment);
-      await c.applySyncV2Mutation({entity:'assignments',recordId:row.id,mutationId:ids.deletedAssignment+':delete',deviceId:'n71-synthetic',baseRevision:row.serverRevision,patch:{},operation:'delete',clientUpdatedAt:Date.now()});
+      // Preserve a valid canonical deletion closure. Portable storage does not
+      // imply an N88 assignment cascade: retire this purpose-created child first.
+      for(const [entity,recordId]of [['submissions',ids.deletedSubmission],['assignments',ids.deletedAssignment]]){
+        const row=await db.get(entity,recordId);
+        if(!row||row.deleted)throw Error('Synthetic deletion fixture lacks its exact live canonical row');
+        await c.applySyncV2Mutation({entity,recordId,mutationId:recordId+':delete',deviceId:'n71-synthetic',baseRevision:row.serverRevision,patch:{},operation:'delete',clientUpdatedAt:Date.now()});
+      }
       await(await import('/src/lib/sync.js')).syncAll({full:true});},state.productIds);await ready(a.page);
     const stale=structuredClone(exported);stale.data.items.push({id:state.productIds.closedChild,teachingId:state.productIds.teaching,name:'N71 suppressed',max:10,deleted:false,updatedAt:1});
     // The current closed term itself is immutable; add a teaching referring to it to test backup-only descendant suppression.
@@ -302,6 +307,7 @@ async function run(){
         ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
     await ready(a.page);await ready(a2.page);assert.deepEqual(await snapshot(a2.page),await snapshot(a.page));
     const final=await snapshot(a.page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
+    assert.ok(final.submissions.find(r=>r.id===state.productIds.deletedSubmission).deleted);
     assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
     check(state,'convergence_no_resurrection','Fresh A2 Initial Restore and ordinary Sync converge across every portable domain; tombstone, immutable closed-term scope, score provenance and current calendar identities retained');
     state.retainedClosure={ownerId:state.accounts[0].id,counts:Object.fromEntries(Object.entries(final).map(([name,rows])=>[name,rows.length])),canonicalSha256:hash(canonical(final)),verifiedAt:new Date().toISOString()};
