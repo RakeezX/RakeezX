@@ -91,8 +91,9 @@ async function prepare(preview,candidate){
   const card=JSON.parse(await fs.readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+TASK+'.json','utf8'));
   assert.equal(card.attempt.runId,RUN);assert.equal(card.productId,'N71');
   assert.equal(card.liveAuthorizationRef,card.preparationAuthority.liveAuthorizationRef);
-  const retired=card.preparationAuthority.supabase.correctedVerificationPhase.retiredPair;
-  assert.notEqual(RUN,retired.runId);assert.ok(!Object.values(names).some(name=>retired.functionNames.includes(name)));
+  const verification=card.preparationAuthority.supabase.correctedVerificationPhase;
+  const retiredPairs=[verification,...(card.preparationAuthority.supabase.previousVerificationPhases??[])].map(phase=>phase.retiredPair);
+  for(const retired of retiredPairs){assert.notEqual(RUN,retired.runId);assert.ok(!Object.values(names).some(name=>retired.functionNames.includes(name)));}
   const target=new URL(preview);assert.equal(target.protocol,'https:');assert.ok(target.hostname.endsWith('.pages.dev'));
   try{await fs.access(stateFile);throw Error('Same-run private state already exists; use recovery, never provision another pair');}
   catch(error){if(error.code!=='ENOENT')throw error;}
@@ -101,9 +102,10 @@ async function prepare(preview,candidate){
   await exec(process.env.N71_PWSH??'pwsh.exe',['-NoProfile','-File','tests/n71-live/protect-new-directory.ps1','-Directory',root,'-RunId',RUN],{windowsHide:true});
   const ignored=await exec('git',['-C','C:/Users/Abody/Projects/RakeezX','check-ignore',stateFile],{windowsHide:true});assert.ok(ignored.stdout.trim());
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:fixtureEmail(RUN,slot),password:'N71!aA1'+randomBytes(32).toString('base64url')}));
-  assert.ok(accounts.every(account=>!retired.accountIds.includes(account.id)));
+  assert.ok(accounts.every(account=>retiredPairs.every(retired=>!retired.accountIds.includes(account.id))));
   const state={version:1,taskId:TASK,runId:RUN,projectId:PROJECT_ID,purpose:PURPOSE,baseSha:BASE,candidateSha:candidate,
     treeSha:await git('rev-parse','HEAD^{tree}'),harnessBlob:await git('rev-parse','HEAD:tests/n71-live/runner.mjs'),preview,
+    verificationPhase:verification.phase,excludedPairs:retiredPairs.map(({runId,accountIds,functionNames})=>({runId,accountIds,functionNames})),
     phase:'PREPARING',accounts,productIds:fixtureIds(RUN),sessions:[],revocations:{},checks:[],cleanup:[]};
   await save(state);
   const browser=await chromium.launch();
@@ -208,6 +210,8 @@ async function run(){
       {headers:{apikey:key,Authorization:'Bearer '+bSession.access_token,'Accept-Profile':'rakeezx'},signal:AbortSignal.timeout(15000)});
     assert.equal(ownerResponse.status,200);assert.deepEqual(await ownerResponse.json(),[]);
     check(state,'owner_isolation','B review rejects A backup and B bearer cannot read A portable rows; owner-bound manifest denied='+forbidden.status);
+    const guardManifest=await a.page.evaluate(async()=>await(await import('/src/lib/cloud.js')).getUnifiedRestoreManifest());
+    let forbiddenStages=0;const stageMonitor=req=>{if(req.url().endsWith('/rpc/stage_n71_restore'))forbiddenStages++;};a.page.on('request',stageMonitor);
     await a.context.setOffline(true);const offline=await denied(a.page,changed,['OFFLINE']);await a.context.setOffline(false);await ready(a.page);
     await a.page.route('**/rpc/n71_restore_capability',route=>route.abort('failed'));
     const unhealthy=await denied(a.page,changed,['RESTORE_SYNC_NOT_HEALTHY']);
@@ -215,7 +219,9 @@ async function run(){
     await a.page.evaluate(async()=>{const db=await import('/src/lib/db.js');await db.put('outbox',{id:'n71:guard-only',protocol:'v2',store:'students',state:'rejected',sequence:1});});
     const outbox=await denied(a.page,changed,['RESTORE_OUTBOX_NOT_EMPTY']);await a.page.evaluate(async()=>await(await import('/src/lib/db.js')).remove('outbox','n71:guard-only'));
     await a.page.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true}));await ready(a.page);
-    check(state,'fail_closed','Offline='+offline+'; unhealthy Sync='+unhealthy+'; unresolved outbox='+outbox+'; no staging by those attempts');
+    a.page.off('request',stageMonitor);assert.equal(forbiddenStages,0,'Denied attempts must not stage');
+    assert.deepEqual(await a.page.evaluate(async()=>await(await import('/src/lib/cloud.js')).getUnifiedRestoreManifest()),guardManifest,'Denied requests changed canonical source');
+    check(state,'fail_closed','Offline='+offline+'; unhealthy Sync='+unhealthy+'; unresolved outbox='+outbox+'; zero stage requests and unchanged canonical manifest');
     const a2=await login(state,browser,'A','A2');pages.push(a2);
     assert.equal(await a2.page.evaluate(async id=>(await(await import('/src/lib/db.js')).get('students',id))?.note,state.productIds.student),'before restore','A2 canonical student missing before the mutation boundary');
     // This is the one declared synthetic interruption: server stages, its response is lost.
@@ -264,6 +270,8 @@ async function run(){
     const final=await snapshot(a.page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
     assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
     check(state,'convergence_no_resurrection','Fresh A2 Initial Restore and ordinary Sync converge across every portable domain; tombstone, immutable closed-term scope, score provenance and current calendar identities retained');
+    state.retainedClosure={ownerId:state.accounts[0].id,counts:Object.fromEntries(Object.entries(final).map(([name,rows])=>[name,rows.length])),canonicalSha256:hash(canonical(final)),verifiedAt:new Date().toISOString()};
+    await fs.writeFile(path.join(evidenceRoot,'retained-closure.json'),JSON.stringify(state.retainedClosure,null,2));
     await a.page.goto(state.preview+'/#/settings/backup');assert.equal(await a.page.locator('[data-act="export"]').count(),1);assert.equal(await a.page.locator('[data-act="pick-cloud-file"]').count(),1);
     await a.page.screenshot({path:path.join(evidenceRoot,'live-ui.png'),fullPage:true});
     state.phase='LIVE_VERIFIED';await save(state);
