@@ -534,9 +534,9 @@ function paint() {
 function renderOfflineLease() {
   const lease = store.getOfflineLeaseStatus();
   if (!['REMINDER', 'LIMITED'].includes(lease.state)) return '';
-  return html`<aside class="offline-lease-notice" dir="rtl" role="status" data-offline-lease="${lease.state}">
-    <div><strong>${lease.state === 'LIMITED' ? 'بياناتك متاحة للعرض' : 'تذكير بالتحقق من الحساب'}</strong>
-      <p>${lease.state === 'LIMITED' ? 'للعودة إلى التعديل، اتصل بالإنترنت وتحقق من حسابك. يمكنك تنزيل نسخة احتياطية وتصدير بياناتك.' : 'يمكنك متابعة العمل دون اتصال. تحقق من حسابك عند توفر الإنترنت لتجديد مدة التعديل.'}</p></div>
+  return html`<aside class="offline-lease-notice noprint" dir="rtl" role="status" data-offline-lease="${lease.state}">
+    <div><strong>${lease.state === 'LIMITED' ? 'وضع القراءة فقط' : 'تذكير بالاتصال'}</strong>
+      <p>${lease.state === 'LIMITED' ? 'يمكنك العرض والتصدير وتنزيل نسخة احتياطية. لاستئناف التعديل، اتصل بالإنترنت واضغط «التحقق من الحساب».' : 'يمكنك متابعة العمل. اتصل بالإنترنت قريبًا واضغط «التحقق من الحساب» لتستمر في التعديل.'}</p></div>
     <button class="btn btn--ghost" data-act="renew-offline-lease">التحقق من الحساب</button>
   </aside>`;
 }
