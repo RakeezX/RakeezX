@@ -2,29 +2,38 @@
 // template, live Auth identity, service fixture, proxy, or success backend mock.
 import assert from 'node:assert/strict';
 import { chromium } from '@playwright/test';
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { makeIsolatedDemoContext, openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
+import { execFileSync } from 'node:child_process';
+import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 
 const base = process.env.N94_PREVIEW_URL;
 assert.ok(base && new URL(base).protocol === 'https:', 'Use the named immutable HTTPS Product Preview');
 const directory = 'test-results/n94/5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf';
 await mkdir(directory, { recursive: true });
 const evidence = { url: base, candidateSha: process.env.N94_CANDIDATE_SHA, checks: [], assets: [], screenshots: [] };
+assert.match(evidence.candidateSha, /^[a-f0-9]{40}$/);
 const browser = await chromium.launch({ headless: true });
-let context;
+let context, page;
 try {
-  context = await makeIsolatedDemoContext(browser);
-  const page = await context.newPage();
+  // The existing readiness helper is reused. Its context helper installs
+  // `preparing` on EVERY load (intentional fixture reset), so a persistence test
+  // sets that request once instead of reseeding on reload.
+  context = await browser.newContext({viewport:{width:390,height:844},locale:'ar-SA',timezoneId:'Asia/Riyadh',serviceWorkers:'block'});
+  await context.route('https://*.supabase.co/**',route=>route.abort());
+  page = await context.newPage();
   const errors = []; page.on('pageerror', (error) => errors.push(error.message));
   await page.clock.setFixedTime(new Date('2026-10-13T06:00:00Z'));
+  await page.goto(new URL(base).origin);
+  await page.evaluate(()=>sessionStorage.setItem('rakeezx-demo-session-v1','preparing'));
+  await page.reload();
   await openReadyServedDemo(page, base);
   // Source binding is additional evidence; UI PASS below uses the real DOM.
   for (const path of ['src/views/items.js', 'src/views/grades.js', 'src/store.js', 'src/styles/components.css', 'src/lib/score-foundation.js']) {
     const response = await context.request.get(new URL(path, base).href);
     assert.equal(response.status(), 200);
-    const served = await response.body(), local = await readFile(path);
+    const served = await response.body(), local = execFileSync('git', ['show', `${evidence.candidateSha}:${path}`]);
     const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
     // Cloudflare serves the repository's source bytes, not a re-created fixture.
     assert.equal(digest(served), digest(local), `${path}: served candidate byte binding`);
@@ -56,8 +65,21 @@ try {
   const second = dialog.locator('[data-subitem-row]').nth(1);
   await second.locator('[data-subitem-due]').fill('2026-10-12');
   await second.locator('[data-subitem-late]').fill(String(fixture.definitions[1].value));
+  evidence.formLayouts=[];
+  for(const width of [390,320]) for(const theme of ['light','dark']) {
+    await page.setViewportSize({width,height:844});
+    await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
+    const fields=await dialog.locator('.n94-definition-details input').evaluateAll(inputs=>inputs.map(input=>{
+      const r=input.getBoundingClientRect();return {height:r.height,width:r.width,left:r.left,right:r.right};
+    }));
+    assert.ok(fields.every(r=>r.height>=44&&r.width>=44&&r.left>=0&&r.right<=width));
+    const screenshot=`items-form-${theme}-${width}.png`;await page.screenshot({path:join(directory,screenshot),fullPage:true});
+    evidence.formLayouts.push({width,theme,fields,screenshot});
+  }
+  evidence.editorInputs = await dialog.locator('[data-subitem-row]').evaluateAll(rows=>rows.map(row=>Object.fromEntries([...row.querySelectorAll('input')].map(input=>[input.outerHTML,input.value]))));
   await dialog.locator('[data-save-subitems]').click();
   await page.getByRole('button', { name: 'تأكيد التغيير', exact: true }).click();
+  await page.locator('#toast').filter({ hasText: 'حُفظ توزيع العناصر' }).waitFor();
   await page.waitForFunction(async (fixture) => {
     const store=await import('/src/store.js');
     return store.scoreSubitemsOf(fixture.itemId)[0].dueDate === '2026-10-12';
@@ -65,6 +87,7 @@ try {
   const saved = await page.evaluate(async (fixture) => {
     const store=await import('/src/store.js');return store.scoreSubitemsOf(fixture.itemId);
   }, fixture);
+  evidence.savedDefinitions = saved;
   for (let i=0;i<fixture.definitions.length;i++) assert.equal(saved[i].createdAt,fixture.definitions[i].createdAt);
   assert.equal(saved[0].startDate,null);assert.equal(saved[0].latePoints,latePoints);
   evidence.checks.push('actual_items_sheet_validation_and_immutable_creation');
@@ -132,11 +155,13 @@ try {
     const store=await import('/src/store.js');return store.items(fixture.teachingId).filter(row=>row.auto).map(row=>({id:row.id,auto:row.auto}));
   },fixture);
   for(const item of automatic){await page.locator(`[data-act="pick"][data-id="${item.id}"]`).click();
+    await page.waitForFunction(id=>document.querySelector(`[data-act="pick"][data-id="${id}"]`)?.getAttribute('aria-selected')==='true',item.id);
     assert.equal(await page.locator('[data-act="n84-log"]').count()>0,item.auto==='participation');}
   assert.deepEqual(errors,[]);
   evidence.checks.push('n84_controls_and_no_application_errors');
   console.log(JSON.stringify({checks:evidence.checks,screenshots:evidence.screenshots.length,sourceAssets:evidence.assets.length}));
 } finally {
+  await page?.screenshot({path:join(directory,'last-ui-state.png'),fullPage:true});
   await context?.close();await browser.close();
   await writeFile(join(directory,'product-ui-result.json'),JSON.stringify(evidence,null,2));
 }
