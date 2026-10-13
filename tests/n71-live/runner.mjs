@@ -9,21 +9,24 @@ import { chromium } from '@playwright/test';
 import { canonical, fixtureEmail, PURPOSE, PROJECT_ID } from '../../supabase/functions/ops-n71-fixture/handler-core.mjs';
 import { fixtureIds, portableFixture } from './fixture.mjs';
 const exec=promisify(execFile);
-const TASK='continuous-n71-unified-restore-20261012',RUN='fc77ae70-4cfa-4d2e-98ba-89232fe3c4f4';
+const TASK='continuous-n71-unified-restore-20261012',RUN=process.env.N71_RUN_ID;
+assert.match(RUN??'',/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,'Pass the activated run through N71_RUN_ID');
 const BASE='b5e83107222833f5e74530a73355734d8477bd03';
 const root=path.resolve('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/n71',RUN);
 const stateFile=path.join(root,'.env.n71-state');
 const url=`https://${PROJECT_ID}.supabase.co`,key='sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
-const names={provision:'ops-n71-fixture-fc77ae704cfa4d2e98ba',cleanup:'ops-n71-retire-fc77ae704cfa4d2e98ba'};
+const suffix=RUN.replaceAll('-','').slice(0,20);
+const names={provision:'ops-n71-fixture-'+suffix,cleanup:'ops-n71-retire-'+suffix};
+const evidenceRoot=path.resolve('coverage/n71-live',RUN);
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const git=async(...args)=>(await exec('git',args,{windowsHide:true})).stdout.trim();
 const save=async state=>{await fs.writeFile(stateFile+'.tmp',JSON.stringify(state,null,2));await fs.rename(stateFile+'.tmp',stateFile);};
-const load=async()=>JSON.parse(await fs.readFile(stateFile,'utf8'));
-const evidence=async state=>{await fs.mkdir('coverage/n71-current',{recursive:true});
-  await fs.writeFile('coverage/n71-current/live-result.json',JSON.stringify({taskId:TASK,runId:RUN,candidateSha:state.candidateSha,
-    phase:state.phase,checks:state.checks,cleanup:state.cleanup,error:state.error},null,2));};
+const load=async()=>{const state=JSON.parse(await fs.readFile(stateFile,'utf8'));assert.equal(state.runId,RUN);return state;};
+const evidence=async state=>{await fs.mkdir(evidenceRoot,{recursive:true});
+  await fs.writeFile(path.join(evidenceRoot,'live-result.json'),JSON.stringify({taskId:TASK,runId:RUN,candidateSha:state.candidateSha,
+    phase:state.phase,checks:state.checks,cleanup:state.cleanup,error:state.error,diagnostics:state.diagnostics},null,2));};
 const publicError=error=>({name:error?.name,code:error?.code??null,message:String(error?.message??error).slice(0,400),stack:String(error?.stack??'').split('\n').slice(0,8).join('\n')});
-function check(state,name,evidence){state.checks.push({name,status:'PASS',evidence});}
+function check(state,name,evidence){state.checks.push({name,status:'PASS',evidence});console.log(JSON.stringify({check:name,status:'PASS',evidence}));}
 async function wire(endpoint,body,headers={}) {
   const response=await fetch(url+endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
     headers:{'content-type':'application/json',apikey:key,...headers},body:JSON.stringify(body)});
@@ -85,17 +88,24 @@ async function retire(state,pages=[]) {
 }
 async function prepare(preview,candidate){
   assert.match(candidate??'',/^[a-f0-9]{40}$/);assert.equal(await git('rev-parse','HEAD'),candidate);
+  const card=JSON.parse(await fs.readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+TASK+'.json','utf8'));
+  assert.equal(card.attempt.runId,RUN);assert.equal(card.productId,'N71');
+  assert.equal(card.liveAuthorizationRef,card.preparationAuthority.liveAuthorizationRef);
+  const retired=card.preparationAuthority.supabase.correctedVerificationPhase.retiredPair;
+  assert.notEqual(RUN,retired.runId);assert.ok(!Object.values(names).some(name=>retired.functionNames.includes(name)));
   const target=new URL(preview);assert.equal(target.protocol,'https:');assert.ok(target.hostname.endsWith('.pages.dev'));
   try{await fs.access(stateFile);throw Error('Same-run private state already exists; use recovery, never provision another pair');}
   catch(error){if(error.code!=='ENOENT')throw error;}
   await fs.mkdir(path.dirname(root),{recursive:true});await fs.mkdir(root);
   // This is a new directory, before any secret is written; no ACL refusal is bypassed.
-  await exec('powershell.exe',['-NoProfile','-File','tests/n71-live/protect-new-directory.ps1','-Directory',root],{windowsHide:true});
+  await exec(process.env.N71_PWSH??'pwsh.exe',['-NoProfile','-File','tests/n71-live/protect-new-directory.ps1','-Directory',root,'-RunId',RUN],{windowsHide:true});
   const ignored=await exec('git',['-C','C:/Users/Abody/Projects/RakeezX','check-ignore',stateFile],{windowsHide:true});assert.ok(ignored.stdout.trim());
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:fixtureEmail(RUN,slot),password:'N71!aA1'+randomBytes(32).toString('base64url')}));
+  assert.ok(accounts.every(account=>!retired.accountIds.includes(account.id)));
   const state={version:1,taskId:TASK,runId:RUN,projectId:PROJECT_ID,purpose:PURPOSE,baseSha:BASE,candidateSha:candidate,
     treeSha:await git('rev-parse','HEAD^{tree}'),harnessBlob:await git('rev-parse','HEAD:tests/n71-live/runner.mjs'),preview,
     phase:'PREPARING',accounts,productIds:fixtureIds(RUN),sessions:[],revocations:{},checks:[],cleanup:[]};
+  await save(state);
   const browser=await chromium.launch();
   try{
     const context=await browser.newContext({serviceWorkers:'block'}),page=await context.newPage();await page.goto(preview);
@@ -121,8 +131,10 @@ async function bundles(){const state=await load();const core=await fs.readFile('
   return Promise.all(['provision','cleanup'].map(async mode=>({name:names[mode],entrypoint_path:'index.ts',verify_jwt:false,
     files:[{name:'index.ts',content:await fs.readFile(`supabase/functions/ops-n71-${mode==='provision'?'fixture':'retire'}/index.ts`,'utf8')},
       {name:'handler-core.mjs',content:core},{name:'run-manifest.mjs',content:'export default '+JSON.stringify(state.manifests[mode])+';'}]})));}
-async function ready(page){await page.waitForFunction(async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account';},null,{timeout:120000});
-  await page.waitForFunction(async()=>{const s=await import('/src/lib/sync.js');return s.displayState().detailStatus==='synced';},null,{timeout:120000});}
+async function ready(page){await page.waitForFunction(async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return s.state.ready===true&&s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account'&&s.getActiveWorkspace()?.ownershipState==='claimed';},null,{timeout:120000});
+  // The initial outbox scan may report "synced" before a full Product pull.
+  // Require an actual completed pass, not that presentation status alone.
+  await page.waitForFunction(async()=>{const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return s.displayState().detailStatus==='synced'&&Number(s.state.lastSyncedAt)>0&&store.state.device?.lastSyncAt===s.state.lastSyncedAt;},null,{timeout:120000});}
 async function login(state,browser,slot,label,provision=false){
   const context=await browser.newContext({serviceWorkers:'block',baseURL:state.preview});const page=await context.newPage();
   const account=state.accounts.find(a=>a.slot===slot);await page.goto(state.preview);
@@ -141,7 +153,14 @@ async function login(state,browser,slot,label,provision=false){
     await c.completeAccountProfile({teacherName:'N71 synthetic fixture',phone:'0500000000',teacherForm:'masculine',schoolName:'N71 synthetic'});
     await c.beginAccountProvisioning();await c.provisionAccountWorkspace(defaults);
   },state.foundation[slot]);}
-  await page.reload();await ready(page);return {page,context,slot,label};
+  await page.reload();await ready(page);
+  if(label==='A2'){
+    const checkpoint=await page.evaluate(async()=>{const db=await import('/src/lib/db.js');const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return {databaseName:db.getActiveDatabaseName(),workspace:store.getActiveWorkspace(),receipt:await db.readInitialRestoreReceipt(),lastSyncedAt:s.state.lastSyncedAt,counts:Object.fromEntries(await Promise.all(db.STORES.filter(name=>!['device','meta','outbox'].includes(name)).map(async name=>[name,(await db.getAll(name)).length])))};});
+    state.a2Checkpoint=checkpoint;await save(state);
+    assert.equal(checkpoint.receipt?.ownerId,account.id,'A2 must finish owner-bound Initial Restore');
+    assert.equal(checkpoint.receipt?.protocol,'CORE_V2');
+  }
+  return {page,context,slot,label};
 }
 async function payload(page,extra={},changes=null){return page.evaluate(async({extra,changes})=>{
   const e=await import('/src/lib/export.js');const c=await import('/src/lib/cloud.js');const payload=await e.buildBackup({sourceOwnerId:c.user.id});
@@ -197,19 +216,27 @@ async function run(){
     const outbox=await denied(a.page,changed,['RESTORE_OUTBOX_NOT_EMPTY']);await a.page.evaluate(async()=>await(await import('/src/lib/db.js')).remove('outbox','n71:guard-only'));
     await a.page.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true}));await ready(a.page);
     check(state,'fail_closed','Offline='+offline+'; unhealthy Sync='+unhealthy+'; unresolved outbox='+outbox+'; no staging by those attempts');
+    const a2=await login(state,browser,'A','A2');pages.push(a2);
+    assert.equal(await a2.page.evaluate(async id=>(await(await import('/src/lib/db.js')).get('students',id))?.note,state.productIds.student),'before restore','A2 canonical student missing before the mutation boundary');
     // This is the one declared synthetic interruption: server stages, its response is lost.
-    let interrupted=false,stageReceipt,stageEnvelope;
+    let interrupted=false,stageReceipt,stageEnvelope,stageFailure;
+    state.phase='STAGE_INTERRUPTION_INTENT';await save(state);
     await a.page.route('**/rpc/stage_n71_restore',async route=>{assert.equal(interrupted,false);interrupted=true;stageEnvelope=route.request().postDataJSON();
-      const response=await route.fetch();assert.equal(response.status(),200);stageReceipt=await response.json();await route.abort('failed');});
+      try{const response=await route.fetch();stageReceipt=await response.json();assert.equal(response.status(),200,JSON.stringify(stageReceipt));}
+      catch(error){stageFailure=error;}finally{await route.abort('failed');}});
     let lost=false;try{await restore(a.page,changed,'n71:'+RUN+':resume');}catch{lost=true;}assert.equal(lost,true);assert.equal(interrupted,true);
     await a.page.unroute('**/rpc/stage_n71_restore');
+    if(stageFailure)throw stageFailure;
     const before=await a.page.evaluate(async id=>{const db=await import('/src/lib/db.js');return {student:await db.get('students',id),resume:await(await import('/src/lib/backup-v2.js')).getCloudRestoreResumeState()};},state.productIds.student);
     assert.equal(before.student.note,'before restore');assert.equal(before.resume.state,'staging');
     state.restoreEnvelope=stageEnvelope;state.restoreStageReceipt=stageReceipt;state.phase='STAGED_INTERRUPTED';await save(state);
     const resumed=await a.page.evaluate(async()=>await(await import('/src/lib/backup-v2.js')).resumeCloudRestore());
     assert.equal(await a.page.evaluate(async id=>(await(await import('/src/lib/db.js')).get('students',id)).note,state.productIds.student),'after canonical restore');
-    const receipt=await a.page.evaluate(async({envelope,stage})=>await(await import('/src/lib/cloud.js')).finalizeUnifiedRestore({restoreId:envelope.p_restore_id,backupHash:envelope.p_backup_hash,stageHash:stage.stageHash}),{envelope:stageEnvelope,stage:stageReceipt});
+    const receipt=await a.page.evaluate(async({envelope,stage})=>await(await import('/src/lib/cloud.js')).finalizeUnifiedRestore({restoreId:envelope.p_restore_id,backupHash:envelope.p_backup_hash,expectedStageHash:stage.stageHash}),{envelope:stageEnvelope,stage:stageReceipt});
     assert.equal(receipt.receipt.status,'finalized');assert.equal(receipt.restoreId,stageEnvelope.p_restore_id);
+    assert.deepEqual(receipt.receipt,resumed.receipt);
+    const resumedExport=await payload(a.page);
+    assert.equal(await a.page.evaluate(async p=>(await(await import('/src/lib/export.js')).validateBackupIntegrity(p)).ok,resumedExport),true);
     check(state,'owner_resume','Actual staged transaction survives lost acknowledgement; local state waits for canonical finalize; exact same stage/finalize identity resumes and finalized receipt reused');
     // Ordinary authenticated Sync makes deletion canonical before restoring stale export.
     assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before deletion boundary');
@@ -229,7 +256,7 @@ async function run(){
     assert.equal(suppression.plan.ready,true);assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.deletedAssignment&&e.reason==='server-tombstone'));
     assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.closedChild&&e.reason==='closed-term-scope'));
     await restore(a.page,stale,'n71:'+RUN+':suppression');
-    const a2=await login(state,browser,'A','A2');pages.push(a2);
+    assert.equal(await a2.page.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true})),true,'A2 ordinary Sync must complete');
     const snapshot=async page=>page.evaluate(async()=>{const db=await import('/src/lib/db.js');const e=await import('/src/lib/export.js');const v2=await import('/src/lib/sync-v2.js');
       return Object.fromEntries(await Promise.all(db.STORES.filter(s=>!e.DEVICE_ONLY_STORES.includes(s)).map(async name=>[name,(await db.getAll(name)).map(row=>({id:row.id,deleted:row.deleted===true,revision:row.serverRevision,
         ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
@@ -238,9 +265,11 @@ async function run(){
     assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
     check(state,'convergence_no_resurrection','Fresh A2 Initial Restore and ordinary Sync converge across every portable domain; tombstone, immutable closed-term scope, score provenance and current calendar identities retained');
     await a.page.goto(state.preview+'/#/settings/backup');assert.equal(await a.page.locator('[data-act="export"]').count(),1);assert.equal(await a.page.locator('[data-act="pick-cloud-file"]').count(),1);
-    await a.page.screenshot({path:'coverage/n71-current/live-ui.png',fullPage:true});
+    await a.page.screenshot({path:path.join(evidenceRoot,'live-ui.png'),fullPage:true});
     state.phase='LIVE_VERIFIED';await save(state);
-  }catch(error){primaryError=error;state.error=publicError(error);await save(state);}
+  }catch(error){primaryError=error;state.error=publicError(error);
+    state.diagnostics=await Promise.all(pages.map(async({page,label})=>{try{return {label,...await page.evaluate(async()=>{const db=await import('/src/lib/db.js');const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return {databaseName:db.getActiveDatabaseName(),ready:store.state.ready,workspace:store.getActiveWorkspace(),initialRestoreReceipt:await db.readInitialRestoreReceipt(),sync:s.displayState(),lastSyncedAt:s.state.lastSyncedAt,restoreUiState:document.querySelector('[data-initial-restore-state]')?.dataset.initialRestoreState,counts:Object.fromEntries(await Promise.all(db.STORES.map(async name=>[name,(await db.getAll(name)).length])))};})};}catch{return {label,unavailable:true};}}));
+    await save(state);}
   finally{
     try{await retire(state,pages);}catch(error){state.phase='RETIRE_PENDING';state.cleanupError=publicError(error);await save(state);await evidence(state);primaryError??=error;}
     await browser.close();
