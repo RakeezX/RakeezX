@@ -6,7 +6,7 @@ import fs from 'node:fs/promises';
 // checks delayed Sync ordering; it is deliberately not a rendered/live PASS.
 const source = await fs.readFile(new URL('./runner.mjs', import.meta.url), 'utf8');
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-const functionSource = (name, next) => source.slice(source.indexOf(`async function ${name}(`), source.indexOf(`async function ${next}(`));
+const functionSource = (name, next) => source.slice(source.indexOf(`async function ${name}(`), source.indexOf(`async function ${next}(`)).replace(/^export /gm,'');
 const readySource = functionSource('ready', 'login');
 const loginSource = functionSource('login', 'payload');
 const execute = (fn, modules, argument, document = { readyState: 'complete', querySelector: () => null }) => new AsyncFunction('load', 'argument', 'document',
@@ -20,8 +20,9 @@ function synthetic({ owner = 'A', protocol = 'CORE_V2' } = {}) {
   let polls = 0, reads = 0;
   const modules = { '/src/lib/sync.js': sync, '/src/store.js': store, '/src/lib/cloud.js': cloud,
     '/src/lib/db.js': { getActiveDatabaseName: () => 'synthetic-A', STORES: ['students'],
+      get: async () => ({id:'canonical-student'}),
       readInitialRestoreReceipt: async () => { reads++; assert.equal(sync.state.lastSyncedAt, 123); assert.equal(store.state.device.lastSyncAt, 123); return { ownerId: owner, protocol }; },
-      getAll: async () => [{ id: 'canonical-student' }] } };
+      getAll: async name => name==='outbox'?[]:[{ id: 'canonical-student' }] } };
   const page = { goto: async () => {}, reload: async () => {},
     evaluate: (fn, arg) => execute(fn, modules, arg),
     waitForFunction: async (fn, argument) => {
@@ -39,14 +40,15 @@ function synthetic({ owner = 'A', protocol = 'CORE_V2' } = {}) {
       throw Error('Synthetic readiness timeout');
     } };
   const browser = { newContext: async () => ({ newPage: async () => page }) };
-  const login = new AsyncFunction('assert', 'storeSession', 'save',
-    `${readySource}\n${loginSource}\nreturn login;`)(assert, async () => {}, async () => {});
+  const poll = async (page,fn,arg) => (await page.waitForFunction(fn,arg)).jsonValue();
+  const login = new AsyncFunction('assert', 'storeSession', 'save','pollDocument',
+    `${readySource}\n${loginSource}\nreturn login;`)(assert, async () => {}, async () => {},poll);
   return { browser, login, polls: () => polls, reads: () => reads };
 }
 
 test('A2 waits through presentation-only Sync and incomplete device checkpoint', async () => {
   const h = synthetic();
-  const state = { preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A', email: 'synthetic', password: 'synthetic' }] };
+  const state = { productIds:{student:'canonical-student'}, preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A', email: 'synthetic', password: 'synthetic' }] };
   await (await h.login)(state, h.browser, 'A', 'A2');
   assert.equal(h.polls(), 4);
   assert.equal(h.reads(), 1);
@@ -56,7 +58,7 @@ test('A2 waits through presentation-only Sync and incomplete device checkpoint',
 test('A2 rejects another owner or incompatible Initial Restore receipt', async () => {
   for (const options of [{ owner: 'B' }, { protocol: 'CORE_V1' }]) {
     const h = synthetic(options);
-    await assert.rejects((await h.login)({ preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A' }] }, h.browser, 'A', 'A2'), /Synthetic readiness timeout/);
+    await assert.rejects((await h.login)({ productIds:{student:'canonical-student'}, preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A' }] }, h.browser, 'A', 'A2'), /Synthetic readiness timeout/);
   }
 });
 
@@ -68,8 +70,8 @@ test('A2 checkpoint survives automatic reload and rejects state changed during r
   const modules = { '/src/lib/sync.js': sync, '/src/store.js': store,
     '/src/lib/db.js': { getActiveDatabaseName: () => workspace?.databaseName ?? 'rakeezx', STORES: ['students'],
       readInitialRestoreReceipt: async () => ({ ownerId: 'A', protocol: 'CORE_V2' }),
-      getAll: async () => { reads++; if (reads === 1) workspace = { ...workspace }; return [{ id: 'canonical-student' }]; } } };
-  const checkpoint = await new AsyncFunction(`${functionSource('ownerCheckpoint', 'login')}\nreturn ownerCheckpoint;`)();
+      getAll: async name => { if(name==='outbox')return [];reads++; if (reads === 1) workspace = { ...workspace }; return [{ id: 'canonical-student' }]; } } };
+  const checkpoint = await new AsyncFunction('pollDocument',`${functionSource('ownerCheckpoint', 'login')}\nreturn ownerCheckpoint;`)(async(page,fn,arg)=>(await page.waitForFunction(fn,arg)).jsonValue());
   const page = { waitForFunction: async (fn, owner) => {
     assert.equal(await execute(fn, modules, owner, document), false, 'Reload document has no authority');
     assert.equal(reads, 0);

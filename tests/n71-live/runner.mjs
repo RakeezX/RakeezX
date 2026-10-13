@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 import { canonical, fixtureEmail, PURPOSE, PROJECT_ID } from '../../supabase/functions/ops-n71-fixture/handler-core.mjs';
 import { fixtureIds, portableFixture } from './fixture.mjs';
@@ -133,14 +134,23 @@ async function bundles(){const state=await load();const core=await fs.readFile('
   return Promise.all(['provision','cleanup'].map(async mode=>({name:names[mode],entrypoint_path:'index.ts',verify_jwt:false,
     files:[{name:'index.ts',content:await fs.readFile(`supabase/functions/ops-n71-${mode==='provision'?'fixture':'retire'}/index.ts`,'utf8')},
       {name:'handler-core.mjs',content:core},{name:'run-manifest.mjs',content:'export default '+JSON.stringify(state.manifests[mode])+';'}]})));}
-async function ready(page){await page.waitForFunction(async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return document.readyState==='complete'&&!document.querySelector('[data-initial-restore-state]')&&s.state.ready===true&&s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account'&&s.getActiveWorkspace()?.ownershipState==='claimed';},null,{timeout:120000});
+async function pollDocument(page,predicate,argument,{timeout=120000}={}){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    try{const value=await page.evaluate(predicate,argument);if(value)return value;}
+    catch(error){if(!/Execution context was destroyed|Cannot find context with specified id/.test(String(error?.message)))throw error;}
+    await page.waitForTimeout(50);
+  }
+  throw Object.assign(new Error('Timeout waiting for a stable owner-bound document checkpoint'),{code:'N71_CHECKPOINT_TIMEOUT'});
+}
+async function ready(page){await pollDocument(page,async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return document.readyState==='complete'&&!document.querySelector('[data-initial-restore-state]')&&s.state.ready===true&&s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account'&&s.getActiveWorkspace()?.ownershipState==='claimed';},null,{timeout:120000});
   // The initial outbox scan may report "synced" before a full Product pull.
   // Require an actual completed pass, not that presentation status alone.
-  await page.waitForFunction(async()=>{const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return s.displayState().detailStatus==='synced'&&Number(s.state.lastSyncedAt)>0&&store.state.device?.lastSyncAt===s.state.lastSyncedAt;},null,{timeout:120000});}
-async function ownerCheckpoint(page,ownerId){
+  await pollDocument(page,async()=>{const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return s.displayState().detailStatus==='synced'&&Number(s.state.lastSyncedAt)>0&&store.state.device?.lastSyncAt===s.state.lastSyncedAt;},null,{timeout:120000});}
+export async function ownerCheckpoint(page,ownerId,{studentId=null,timeout=120000}={}){
   // Initial Restore automatically reloads after finalization. A predicate in
   // the preceding document cannot authorize reads in the replacement document.
-  const handle=await page.waitForFunction(async expectedOwner=>{
+  return pollDocument(page,async ({expectedOwner,studentId})=>{
     const db=await import('/src/lib/db.js');const sync=await import('/src/lib/sync.js');const store=await import('/src/store.js');
     const workspace=store.getActiveWorkspace(),databaseName=db.getActiveDatabaseName(),lastSyncedAt=sync.state.lastSyncedAt;
     if(document.readyState!=='complete'||document.querySelector('[data-initial-restore-state]')||!store.state.ready||
@@ -149,12 +159,14 @@ async function ownerCheckpoint(page,ownerId){
       sync.displayState().detailStatus!=='synced')return false;
     const receipt=await db.readInitialRestoreReceipt();
     if(receipt?.ownerId!==expectedOwner||receipt?.protocol!=='CORE_V2')return false;
+    if((await db.getAll('outbox')).length)return false;
+    const targetStudent=studentId?await db.get('students',studentId):null;
+    if(studentId&&!targetStudent)return false;
     const counts=Object.fromEntries(await Promise.all(db.STORES.filter(name=>!['device','meta','outbox'].includes(name)).map(async name=>[name,(await db.getAll(name)).length])));
     if(!store.state.ready||store.getActiveWorkspace()!==workspace||db.getActiveDatabaseName()!==databaseName||
       sync.state.lastSyncedAt!==lastSyncedAt||document.querySelector('[data-initial-restore-state]'))return false;
-    return {databaseName,workspace,receipt,lastSyncedAt,counts};
-  },ownerId,{timeout:120000});
-  try{return await handle.jsonValue();}finally{await handle.dispose();}
+    return {databaseName,workspace,receipt,lastSyncedAt,counts,targetStudent};
+  },{expectedOwner:ownerId,studentId},{timeout});
 }
 async function login(state,browser,slot,label,provision=false){
   const context=await browser.newContext({serviceWorkers:'block',baseURL:state.preview});const page=await context.newPage();
@@ -176,7 +188,7 @@ async function login(state,browser,slot,label,provision=false){
   },state.foundation[slot]);}
   await page.reload();await ready(page);
   if(label==='A2'){
-    const checkpoint=await ownerCheckpoint(page,account.id);
+    const checkpoint=await ownerCheckpoint(page,account.id,{studentId:state.productIds.student});
     state.a2Checkpoint=checkpoint;await save(state);
     assert.equal(checkpoint.receipt?.ownerId,account.id,'A2 must finish owner-bound Initial Restore');
     assert.equal(checkpoint.receipt?.protocol,'CORE_V2');
@@ -242,7 +254,7 @@ async function run(){
     assert.deepEqual(await a.page.evaluate(async()=>await(await import('/src/lib/cloud.js')).getUnifiedRestoreManifest()),guardManifest,'Denied requests changed canonical source');
     check(state,'fail_closed','Offline='+offline+'; unhealthy Sync='+unhealthy+'; unresolved outbox='+outbox+'; zero stage requests and unchanged canonical manifest');
     const a2=await login(state,browser,'A','A2');pages.push(a2);
-    assert.equal(await a2.page.evaluate(async id=>(await(await import('/src/lib/db.js')).get('students',id))?.note,state.productIds.student),'before restore','A2 canonical student missing before the mutation boundary');
+    assert.equal(state.a2Checkpoint.targetStudent?.note,'before restore','A2 canonical student missing before the mutation boundary');
     // This is the one declared synthetic interruption: server stages, its response is lost.
     let interrupted=false,stageReceipt,stageEnvelope,stageFailure;
     state.phase='STAGE_INTERRUPTION_INTENT';await save(state);
@@ -305,9 +317,11 @@ async function run(){
   if(primaryError)process.exitCode=1;
 }
 async function recovery(){const state=await load();assert.equal(await git('rev-parse','HEAD'),state.candidateSha);await retire(state);console.log(JSON.stringify({phase:state.phase}));}
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
 const [mode,arg,candidate]=process.argv.slice(2);
 if(mode==='prepare')await prepare(arg,candidate);
 else if(mode==='bundles')console.log(JSON.stringify(await bundles()));
 else if(mode==='run')await run();
 else if(mode==='recover')await recovery();
 else throw Error('Use prepare/bundles/run/recover; never create a replacement pair');
+}
