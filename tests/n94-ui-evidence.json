@@ -1,0 +1,331 @@
+{
+  "taskId": "continuous-n94-compact-picker-names-20261013",
+  "runId": "30ab4451-bcd8-4511-a128-e29ae089fbf8",
+  "baseSha": "c431ed52ef253aadd591935bc7ffe1228155eb2f",
+  "recordedAt": "2026-10-13T03:50:48.388Z",
+  "source": [
+    {
+      "path": "src/views/items.js",
+      "sha256": "0d5af0e9fe879193ae5589bd86c56df1fc940c4e6b89d87d17acfb1d2279568e"
+    },
+    {
+      "path": "src/views/grades.js",
+      "sha256": "5b0fe554a99bed35188c51793fa02842e576a54ca413c48ea12583b6189d6220"
+    },
+    {
+      "path": "src/styles/grades.css",
+      "sha256": "5a53a9bb0cc0afd78ba5bf69daddfe3627ae826b80a782e13719db8d736a7022"
+    },
+    {
+      "path": "src/lib/subitem-default-name.js",
+      "sha256": "d198ff80fee8745c447f4baddadfcc238ed860acea31804f599b12580dfc9eee"
+    },
+    {
+      "path": "tests/n94-subitem-names.test.mjs",
+      "sha256": "0c26137d4bc0feefab0a0eca69ffb2ac6ba2cd28f6fb3248a7c426949b443284"
+    },
+    {
+      "path": "tests/n94-ui-refinements.mjs",
+      "sha256": "3e302a78bb39030ec115093027b0bfa1a34b0bda99cf415986a5609436881f53"
+    },
+    {
+      "path": "tests/n94-ui-offline-shell.mjs",
+      "sha256": "692d1ba6fc5f54e0539076c33f94829b7815bafaa76736fa9dd34ac06eabec4f"
+    }
+  ],
+  "ui": {
+    "base": "http://127.0.0.1:59828",
+    "checks": [
+      "n94_parent_derived_names",
+      "n94_approved_date_controls",
+      "n94_compact_cells_legend"
+    ],
+    "layouts": [
+      {
+        "state": "unrecorded",
+        "width": 320,
+        "theme": "light",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(71, 85, 105)",
+        "background": "rgb(241, 245, 249)",
+        "overflow": false,
+        "screenshot": "unrecorded-light-320.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 320,
+        "theme": "dark",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(226, 232, 240)",
+        "background": "rgb(51, 65, 85)",
+        "overflow": false,
+        "screenshot": "unrecorded-dark-320.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 390,
+        "theme": "light",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(71, 85, 105)",
+        "background": "rgb(241, 245, 249)",
+        "overflow": false,
+        "screenshot": "unrecorded-light-390.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 390,
+        "theme": "dark",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(226, 232, 240)",
+        "background": "rgb(51, 65, 85)",
+        "overflow": false,
+        "screenshot": "unrecorded-dark-390.png"
+      },
+      {
+        "state": "late",
+        "width": 320,
+        "theme": "light",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 12.5◷\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(146, 64, 14)",
+        "background": "rgb(254, 243, 199)",
+        "overflow": false,
+        "screenshot": "late-light-320.png"
+      },
+      {
+        "state": "late",
+        "width": 320,
+        "theme": "dark",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 12.5◷\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(253, 230, 138)",
+        "background": "rgb(69, 26, 3)",
+        "overflow": false,
+        "screenshot": "late-dark-320.png"
+      },
+      {
+        "state": "late",
+        "width": 390,
+        "theme": "light",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 12.5◷\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(146, 64, 14)",
+        "background": "rgb(254, 243, 199)",
+        "overflow": false,
+        "screenshot": "late-light-390.png"
+      },
+      {
+        "state": "late",
+        "width": 390,
+        "theme": "dark",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 12.5◷\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ◷ متأخر · 2.5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(253, 230, 138)",
+        "background": "rgb(69, 26, 3)",
+        "overflow": false,
+        "screenshot": "late-dark-390.png"
+      },
+      {
+        "state": "regular",
+        "width": 320,
+        "theme": "light",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 15✓\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(22, 101, 52)",
+        "background": "rgb(220, 252, 231)",
+        "overflow": false,
+        "screenshot": "regular-light-320.png"
+      },
+      {
+        "state": "regular",
+        "width": 320,
+        "theme": "dark",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 15✓\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(187, 247, 208)",
+        "background": "rgb(20, 83, 45)",
+        "overflow": false,
+        "screenshot": "regular-dark-320.png"
+      },
+      {
+        "state": "regular",
+        "width": 390,
+        "theme": "light",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 15✓\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(22, 101, 52)",
+        "background": "rgb(220, 252, 231)",
+        "overflow": false,
+        "screenshot": "regular-light-390.png"
+      },
+      {
+        "state": "regular",
+        "width": 390,
+        "theme": "dark",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 15✓\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: ✓ عادي / مقبول بعذر · 5 درجات",
+        "whiteSpace": "nowrap",
+        "color": "rgb(187, 247, 208)",
+        "background": "rgb(20, 83, 45)",
+        "overflow": false,
+        "screenshot": "regular-dark-390.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 320,
+        "theme": "light",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(71, 85, 105)",
+        "background": "rgb(241, 245, 249)",
+        "overflow": false,
+        "screenshot": "unrecorded-light-320.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 320,
+        "theme": "dark",
+        "left": 162.5,
+        "right": 299,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(226, 232, 240)",
+        "background": "rgb(51, 65, 85)",
+        "overflow": false,
+        "screenshot": "unrecorded-dark-320.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 390,
+        "theme": "light",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(71, 85, 105)",
+        "background": "rgb(241, 245, 249)",
+        "overflow": false,
+        "screenshot": "unrecorded-light-390.png"
+      },
+      {
+        "state": "unrecorded",
+        "width": 390,
+        "theme": "dark",
+        "left": 197.5,
+        "right": 365,
+        "height": 46,
+        "text": "\n                مشروع 1—\n              ",
+        "label": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "title": "مشروع 1 للطالب إبراهيم ناصر التميمي: — غير مرصود",
+        "whiteSpace": "nowrap",
+        "color": "rgb(226, 232, 240)",
+        "background": "rgb(51, 65, 85)",
+        "overflow": false,
+        "screenshot": "unrecorded-dark-390.png"
+      }
+    ],
+    "directory": "C:\\Users\\Abody\\AppData\\Local\\Temp\\rakeez-n94-ui-30ab4451"
+  },
+  "offline": {
+    "base": "http://127.0.0.1:52228",
+    "requests": [],
+    "cached": {
+      "src/views/items.js": true,
+      "src/lib/subitem-default-name.js": false,
+      "src/styles/grades.css": false
+    },
+    "offlineItemsRendered": false,
+    "text": "انتقل إلى المحتوى\nالفصول\nالفصل الدراسي الأول\nالخروج من التجربة\nبيانات تجريبية\nعدد الفصول\n8\nعدد الطلاب\n184\nالرابع الابتدائي / 1\nحصة اليوم\nالمهارات الرقمية\n23\nطالبًا\nتجريبي\nالرابع الابتدائي / 2\nالمهارات الرقمية\n25\nطالبًا\nتجريبي\nالخامس الابتدائي / 1\nالمهارات الرقمية\n21\nطالبًا\nتجريبي\nالخامس الابتدائي / 2\nحصة اليوم\nالمهارات الرقمية\n24\nطالبًا\nتجريبي\nالسادس الابتدائي / 1\nالمهارات الرقمية\n22\nطالبًا\nتجريبي\nالرابع الابتدائي / 3\nالمهارات الرقمية\n23\nطالبًا\nتجريبي\nالخامس الابتدائي / 3\nالمهارات الرقمية\n21\nطالبًا\nتجريبي\nالسادس الابتدائي / 2\nحصة اليوم\nالمهارات الرقمية\n25\nطالبًا\nتجريبي\nإضافة فصل\nإضافة فصل تجريبي\nحذف فصل\nالرئيسية\nالفصول\nالجدول\nالتقارير\nالتقويم"
+  },
+  "focusedNames": "node --test tests/n94-subitem-names.test.mjs: 2/2 PASS",
+  "syntax": "node --check src/views/items.js and src/views/grades.js: PASS",
+  "dateCoverageGuard": {
+    "status": "FAIL",
+    "command": "node --test --test-name-pattern='Product date/time controls use the central adapter' tests/rakeez-datetime.test.mjs",
+    "evidence": "items.js date coverage: actual 2, expected 0; existing coverage map predates these approved controls"
+  },
+  "blocker": {
+    "missingPaths": [
+      "sw.js",
+      "tests/rakeez-datetime.test.mjs"
+    ],
+    "reason": "New name module and grades stylesheet absent from SW shell; fresh first offline items visit fails. Central date-control coverage expects zero item controls, now two approved planning controls. Both scoped repairs are outside activated allowedPaths.",
+    "retryCondition": "Approved maintenance helper extends inactive card with these exact paths, preserving candidate/base/worktree/session; controller resumes same session for shell entries and date coverage map update plus affected checks."
+  },
+  "resources": "Synthetic contexts/browser and test HTTP servers closed in finally; owned browser lease released.",
+  "reuse": "Scoring/Sync/migrations/owner core unchanged; prior tests/n94-offline-evidence.json retained. New offline shell regression is explicitly FAIL."
+}

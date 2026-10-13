@@ -48,6 +48,7 @@ test('each date scope intersects the Product floor with its existing bounds', ()
 
 const viewDir = fileURLToPath(new URL('../src/views/', import.meta.url));
 const expected = new Map([
+  ['items.js', { date: 2, time: 0 }],
   ['calendar.js', { date: 6, time: 0 }],
   ['sessions.js', { date: 2, time: 0 }],
   ['reports.js', { date: 2, time: 0 }],

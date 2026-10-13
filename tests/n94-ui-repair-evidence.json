@@ -1,0 +1,65 @@
+{
+  "taskId": "continuous-n94-compact-picker-names-20261013",
+  "runId": "17eb9f87-b4d5-4643-acc3-1e87bb23a69f",
+  "baseSha": "c431ed52ef253aadd591935bc7ffe1228155eb2f",
+  "previousCandidate": "deaf545b3662e3a4364c3bd22ac344412eea2af1",
+  "recordedAt": "2026-10-13T04:01:56.033Z",
+  "correction": "Added naming module and grades stylesheet to existing SW shell, advanced shell generation v53 to v54, and set existing items.js coverage to two approved date controls. Central policy and genuine assertions unchanged.",
+  "reused": {
+    "manifest": "tests/n94-ui-evidence.json",
+    "runId": "30ab4451-bcd8-4511-a128-e29ae089fbf8",
+    "unchangedSourcesVerified": [
+      "src/views/items.js",
+      "src/views/grades.js",
+      "src/styles/grades.css",
+      "src/lib/subitem-default-name.js",
+      "tests/n94-subitem-names.test.mjs",
+      "tests/n94-ui-refinements.mjs"
+    ],
+    "checks": [
+      "n94_approved_date_controls",
+      "n94_compact_cells_legend",
+      "n94_parent_derived_names"
+    ],
+    "note": "Prior manifest records historical failures; the corrected checks below supersede those failures for this candidate."
+  },
+  "sources": [
+    {
+      "path": "sw.js",
+      "sha256": "645a35aaa1d31932eeecfd39967dac942304c3380d1b03fba6ae60c33d859e5f"
+    },
+    {
+      "path": "tests/rakeez-datetime.test.mjs",
+      "sha256": "c9dd0334cdbdfaa838309a370f2d02d0738381c0233792f027d78f46f2c85570"
+    },
+    {
+      "path": "tests/n94-ui-offline-shell.mjs",
+      "sha256": "dbb8641da4fe26c03cf4992a1b2fa6278d12725bb61eba0ecf66a0be4e446c15"
+    }
+  ],
+  "offline": {
+    "base": "http://127.0.0.1:61966",
+    "requests": [],
+    "cached": {
+      "src/views/items.js": true,
+      "src/lib/subitem-default-name.js": true,
+      "src/styles/grades.css": true
+    },
+    "offlineItemsRendered": true,
+    "text": "انتقل إلى المحتوى\nالفصل\nالطلاب\nالحضور\nكشف الدرجات\nتوزيع الدرجات\nالرابع الابتدائي / 1 ·\nتوزيع الدرجات\n\n4 بنود · المجموع 60 درجة\n\nتطبيق التوزيع على كل فصول المادة نفسها\nبنود التقييم\nإضافة بند\n1\nواجب\n10 درجات\nعناصر فرعية\nتحرير العناصر\n2\nمشروع\n20 درجات\nعناصر فرعية\nتحرير العناصر\n3\nاختبار قصير\n20 درجات\nدرجة مباشرة\nتحرير\nعناصر فرعية\n4\nمشاركة\n10 درجات\nرصد آلي\nتحرير\nعناصر فرعية\n\nالنسخ إلى الفصول الأخرى عملية واحدة مستقلة.\nينسخ بنية البنود وإعداداتها فقط، ولا ينسخ درجات الطلاب أو حالاتهم.\n\nالرئيسية\nالفصول\nالجدول\nالتقارير\nالتقويم",
+    "offlinePickerMounted": true,
+    "offlineCellDisplay": "flex",
+    "status": "PASS"
+  },
+  "dateCoverageGuard": {
+    "status": "PASS",
+    "command": "node --test --test-name-pattern='Product date/time controls use the central adapter' tests/rakeez-datetime.test.mjs",
+    "evidence": "1/1 focused test passed; central adapter, exact control counts and existing scope assertions retained."
+  },
+  "syntax": {
+    "status": "PASS",
+    "evidence": "node --check sw.js; node --check tests/n94-ui-offline-shell.mjs; git diff --check"
+  },
+  "resources": "Test contexts, browser and HTTP servers closed in finally; owned browser phase lease released.",
+  "blocker": null
+}
