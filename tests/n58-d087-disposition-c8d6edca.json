@@ -1,0 +1,782 @@
+{
+  "version": 1,
+  "taskId": "continuous-n58-fresh-live-20261012",
+  "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+  "executedCandidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+  "liveGate": "FAIL",
+  "originalException": "LIVE_GATE_FAILED; no raw browser exception was saved",
+  "observedState": {
+    "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+    "candidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+    "observedAt": "2026-10-13T01:46:32.045Z",
+    "session": "existing A1; no login/refresh/mutation",
+    "profileStatus": "READY",
+    "provisioningState": "PROVISIONING_REQUIRED",
+    "grantType": "beta_full",
+    "counts": {
+      "profile": 1,
+      "years": 0,
+      "calendars": 0,
+      "terms": 0,
+      "sections": 0,
+      "teachings": 0,
+      "items": 0,
+      "sessions": 0
+    },
+    "receiptCount": 0
+  },
+  "disposition": {
+    "status": "RETAINED_BANNED",
+    "accounts": [
+      {
+        "operation": "revoke",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:02.888Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      {
+        "operation": "retire",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.306Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:03.167Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "operation": "revoke",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.956Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      {
+        "operation": "retire",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:04.629Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:04.499Z",
+        "verifiedBy": "exact_auth_admin_get"
+      }
+    ],
+    "fixtures": "retained_exact_contract",
+    "globalSignOut": "see_per_account_evidence",
+    "residualAccessUntil": "2026-10-13T02:38:54.000Z"
+  },
+  "disarm": {
+    "version": 1,
+    "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+    "executedCandidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+    "open": [
+      {
+        "mode": "provision",
+        "name": "ops-d087-c8d6edca98b5496daaf8",
+        "version": 1,
+        "id": "9792c1ae-b053-4b73-8edb-efec043213af",
+        "verify_jwt": false,
+        "ezbr_sha256": "bd8c2452362b4d34a962cda1d54ff543fec714fabc9543a488dd24efe9736b39",
+        "files": [
+          "index.ts",
+          "handler-core.mjs",
+          "run-manifest.mjs"
+        ],
+        "sourceMatches": true
+      },
+      {
+        "mode": "cleanup-only",
+        "name": "ops-d087-retire-c8d6edca98b5496daaf8",
+        "version": 1,
+        "id": "f25530b3-428e-4c0d-8ead-214f97df18a4",
+        "verify_jwt": false,
+        "ezbr_sha256": "2ca3471fed6a00b0cd9a60ed14bdf96da41a35ba8d9f3ade69aca8118c4cc624",
+        "files": [
+          "index.ts",
+          "handler-core.mjs",
+          "run-manifest.mjs"
+        ],
+        "sourceMatches": true
+      }
+    ],
+    "closed": [
+      {
+        "name": "ops-d087-c8d6edca98b5496daaf8",
+        "version": 2,
+        "id": "9792c1ae-b053-4b73-8edb-efec043213af",
+        "ezbr_sha256": "fe7f2fe6018200c0a7ea34501066c7269565e65e2496e5b956f35300b41790d9",
+        "sourceMatches": true,
+        "files": [
+          "index.ts"
+        ]
+      },
+      {
+        "name": "ops-d087-retire-c8d6edca98b5496daaf8",
+        "version": 2,
+        "id": "f25530b3-428e-4c0d-8ead-214f97df18a4",
+        "ezbr_sha256": "979847fdb27c574e40884fdc073726125adb3a8abccbccc2434e3cf710466175",
+        "sourceMatches": true,
+        "files": [
+          "index.ts"
+        ]
+      }
+    ],
+    "endpointProof": [
+      {
+        "name": "ops-d087-c8d6edca98b5496daaf8",
+        "status": 410,
+        "errorCode": "D087_CLOSED",
+        "verifiedBy": "canonical confirm-disarmed"
+      },
+      {
+        "name": "ops-d087-retire-c8d6edca98b5496daaf8",
+        "status": 410,
+        "errorCode": "D087_CLOSED",
+        "verifiedBy": "canonical confirm-disarmed"
+      }
+    ],
+    "liveProductAccepted": false
+  },
+  "receipt": {
+    "version": 1,
+    "kind": "d087_capability_receipt",
+    "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+    "projectId": "xlrubcwjqktzzunrvuns",
+    "candidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+    "previewUrl": "https://2d32533b.rakeezx.pages.dev",
+    "functionName": "ops-d087-c8d6edca98b5496daaf8",
+    "cleanupFunctionName": "ops-d087-retire-c8d6edca98b5496daaf8",
+    "candidatePreparation": {
+      "version": 1,
+      "purpose": "N58-D087",
+      "projectId": "xlrubcwjqktzzunrvuns",
+      "candidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+      "treeSha": "c46806123cb4da1cd2985c58e2402d193ba052d7",
+      "baseSha": "5fb778db4a411bb517a21eb3eb2662a776ac97a6",
+      "previewUrl": "https://2d32533b.rakeezx.pages.dev",
+      "preparedAt": "2026-10-13T01:36:31.801Z",
+      "harnessPath": "tests/n58-live-d087.e2e.mjs",
+      "harnessBlob": "d9386c7b69b661a2694df3fa342c0d9c9727b82a",
+      "preparationReceiptSha256": "5d57e6a4e7ba3d5e4a493dee524af022a5a2adb095e3eff7ade126e19bf85aca"
+    },
+    "implementationSha256": "a6f29f9aa071ac7bad5dd585af5657f42eec879ca09a6bdd8dc257a47925f1e5",
+    "fixtureContractSha256": "53cc23d9c3efb84334947349699d0429e8a10018db7b060d671d17a2fd678150",
+    "issuedAt": "2026-10-13T01:36:54.569Z",
+    "expiresAt": "2026-10-13T03:06:54.569Z",
+    "fixtureAuthIds": [
+      {
+        "slot": "A",
+        "id": "fa5f1adc-1205-423a-b1c3-033dbffee256"
+      },
+      {
+        "slot": "B",
+        "id": "54850367-5ca9-42ea-875f-a28e9052500d"
+      }
+    ],
+    "fixtureIds": {
+      "A": {
+        "sectionId": "sec:e7537584-313d-49fb-8d89-0b4a325fb48d",
+        "teachingId": "tch:sec:e7537584-313d-49fb-8d89-0b4a325fb48d|sub:digital-skills|tm:y:1448-1449:1",
+        "termId": "tm:y:1448-1449:1",
+        "subjectId": "sub:digital-skills",
+        "itemIds": [
+          "8cbda726-11f8-4087-bbbc-c8bf331ca84c",
+          "16b02069-12bf-463d-9b78-3cb0ea37d4fe",
+          "2e378785-1b6d-40e0-bf21-976e8a0a8846",
+          "9fa7240b-5ddc-46ca-a00b-55da7f7f3b6a",
+          "7c273f66-e57d-4184-955e-2b6f99a78354"
+        ],
+        "date": "2026-10-13",
+        "successSessionId": "se:tch:sec:e7537584-313d-49fb-8d89-0b4a325fb48d|sub:digital-skills|tm:y:1448-1449:1:2026-10-13:1",
+        "legacyDeniedSessionId": "se:tch:sec:e7537584-313d-49fb-8d89-0b4a325fb48d|sub:digital-skills|tm:y:1448-1449:1:2026-10-13:2",
+        "staleDeniedSessionId": "se:tch:sec:e7537584-313d-49fb-8d89-0b4a325fb48d|sub:digital-skills|tm:y:1448-1449:1:2026-10-13:3",
+        "snapshotId": "srs:se:tch:sec:e7537584-313d-49fb-8d89-0b4a325fb48d|sub:digital-skills|tm:y:1448-1449:1:2026-10-13:1",
+        "mutationIds": {
+          "section": "d087:1dad9a2e-276f-4410-9426-b5d913d66898",
+          "teaching": "d087:81e1f872-3c06-406a-baa4-4a92ee70f05e",
+          "selectGeneral": "d087:247559e9-df22-4d12-81bf-e7c303b36eda",
+          "session": "d087:d97a4f3e-63a1-4a25-8890-7cb30fb95dc9",
+          "legacyDenied": "d087:112f3058-3cc9-4fd8-a9f3-27869bcac5b8",
+          "switchWestern": "d087:885276d5-48cf-447f-8c0f-51c1b2e93300",
+          "staleDenied": "d087:98c40a2f-a520-4f79-b3e8-82005138047e",
+          "bDenied": "d087:6518141b-0517-44ed-873d-08f716ac8db1"
+        },
+        "factoryIds": {
+          "section": "473567a9-26b7-4c2b-90c2-54b331d446c0",
+          "teaching": "6df927b4-9a1d-4e41-83dc-1f3644de4838",
+          "session": "a90f44e9-4d43-4e32-a96f-7b8e23c4b2c5"
+        }
+      }
+    },
+    "events": [
+      {
+        "operation": "probe",
+        "mode": "provision",
+        "manifestSha256": "445419aa582528ffe3b2ee0468e5920fb06e68bdc7152b25f249a4be9dddad9f",
+        "observedAt": "2026-10-13T01:38:15.374Z",
+        "configured": true
+      },
+      {
+        "operation": "probe",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:38:18.671Z",
+        "configured": true
+      },
+      {
+        "operation": "ensure",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "provision",
+        "manifestSha256": "445419aa582528ffe3b2ee0468e5920fb06e68bdc7152b25f249a4be9dddad9f",
+        "observedAt": "2026-10-13T01:38:51.982Z",
+        "state": "provisioned",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "operation": "ensure",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "provision",
+        "manifestSha256": "445419aa582528ffe3b2ee0468e5920fb06e68bdc7152b25f249a4be9dddad9f",
+        "observedAt": "2026-10-13T01:38:52.652Z",
+        "state": "provisioned",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "context": "A1",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "status": "private_session_saved",
+        "expiresAt": "2026-10-13T02:38:53.000Z"
+      },
+      {
+        "context": "A2",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "status": "private_session_saved",
+        "expiresAt": "2026-10-13T02:38:54.000Z"
+      },
+      {
+        "context": "B1",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "status": "private_session_saved",
+        "expiresAt": "2026-10-13T02:38:54.000Z"
+      },
+      {
+        "operation": "probe",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:01.050Z",
+        "configured": true
+      },
+      {
+        "operation": "revoke",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:02.888Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      {
+        "operation": "retire",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.306Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:03.167Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "operation": "revoke",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.956Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      {
+        "operation": "retire",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:04.629Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:04.499Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "operation": "inspect",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:06.044Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:03.167Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "operation": "inspect",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:06.390Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:04.499Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      {
+        "slot": "A",
+        "check": "password_signin_denied",
+        "status": 400,
+        "authCode": "user_banned",
+        "pass": true
+      },
+      {
+        "slot": "A",
+        "context": "A1",
+        "check": "refresh_denied",
+        "status": 400,
+        "authCode": "refresh_token_not_found",
+        "pass": true,
+        "provesSessionRevocation": true
+      },
+      {
+        "slot": "A",
+        "context": "A2",
+        "check": "refresh_denied",
+        "status": 400,
+        "authCode": "refresh_token_not_found",
+        "pass": true,
+        "provesSessionRevocation": true
+      },
+      {
+        "slot": "B",
+        "check": "password_signin_denied",
+        "status": 400,
+        "authCode": "user_banned",
+        "pass": true
+      },
+      {
+        "slot": "B",
+        "context": "B1",
+        "check": "refresh_denied",
+        "status": 400,
+        "authCode": "refresh_token_not_found",
+        "pass": true,
+        "provesSessionRevocation": true
+      },
+      {
+        "operation": "disarm_endpoint_verified",
+        "at": "2026-10-13T01:40:02.505Z"
+      }
+    ],
+    "observations": {
+      "probe:-": {
+        "operation": "probe",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:01.050Z",
+        "configured": true
+      },
+      "ensure:A": {
+        "operation": "ensure",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "provision",
+        "manifestSha256": "445419aa582528ffe3b2ee0468e5920fb06e68bdc7152b25f249a4be9dddad9f",
+        "observedAt": "2026-10-13T01:38:51.982Z",
+        "state": "provisioned",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "ensure:B": {
+        "operation": "ensure",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "provision",
+        "manifestSha256": "445419aa582528ffe3b2ee0468e5920fb06e68bdc7152b25f249a4be9dddad9f",
+        "observedAt": "2026-10-13T01:38:52.652Z",
+        "state": "provisioned",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "revoke:A": {
+        "operation": "revoke",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:02.888Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      "retire:A": {
+        "operation": "retire",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.306Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:03.167Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "revoke:B": {
+        "operation": "revoke",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:03.956Z",
+        "state": "sign_out_acknowledged",
+        "refreshRevocation": "not_proven_by_acknowledgment"
+      },
+      "retire:B": {
+        "operation": "retire",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:04.629Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:04.499Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "inspect:A": {
+        "operation": "inspect",
+        "slot": "A",
+        "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:06.044Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:03.167Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "inspect:B": {
+        "operation": "inspect",
+        "slot": "B",
+        "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+        "mode": "cleanup-only",
+        "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+        "observedAt": "2026-10-13T01:39:06.390Z",
+        "state": "retained_banned",
+        "bannedUntil": "2126-09-19T01:39:04.499Z",
+        "verifiedBy": "exact_auth_admin_get"
+      },
+      "token-denial:A": [
+        {
+          "slot": "A",
+          "check": "password_signin_denied",
+          "status": 400,
+          "authCode": "user_banned",
+          "pass": true
+        },
+        {
+          "slot": "A",
+          "context": "A1",
+          "check": "refresh_denied",
+          "status": 400,
+          "authCode": "refresh_token_not_found",
+          "pass": true,
+          "provesSessionRevocation": true
+        },
+        {
+          "slot": "A",
+          "context": "A2",
+          "check": "refresh_denied",
+          "status": 400,
+          "authCode": "refresh_token_not_found",
+          "pass": true,
+          "provesSessionRevocation": true
+        }
+      ],
+      "token-denial:B": [
+        {
+          "slot": "B",
+          "check": "password_signin_denied",
+          "status": 400,
+          "authCode": "user_banned",
+          "pass": true
+        },
+        {
+          "slot": "B",
+          "context": "B1",
+          "check": "refresh_denied",
+          "status": 400,
+          "authCode": "refresh_token_not_found",
+          "pass": true,
+          "provesSessionRevocation": true
+        }
+      ]
+    },
+    "gate": {
+      "status": "FAILED_DISARMED",
+      "deadline": "2026-10-13T02:21:54.569Z",
+      "errorCode": "LIVE_GATE_FAILED",
+      "cleanup": [
+        {
+          "operation": "close_owned_contexts",
+          "status": "PASS"
+        },
+        {
+          "operation": "probe",
+          "status": "PASS",
+          "result": {
+            "operation": "probe",
+            "mode": "cleanup-only",
+            "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+            "observedAt": "2026-10-13T01:39:01.050Z",
+            "configured": true
+          }
+        },
+        {
+          "operation": "retire",
+          "status": "PASS",
+          "result": {
+            "status": "RETAINED_BANNED_TOKEN_CHECK_PENDING",
+            "accounts": [
+              {
+                "operation": "revoke",
+                "slot": "A",
+                "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+                "mode": "cleanup-only",
+                "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+                "observedAt": "2026-10-13T01:39:02.888Z",
+                "state": "sign_out_acknowledged",
+                "refreshRevocation": "not_proven_by_acknowledgment"
+              },
+              {
+                "operation": "retire",
+                "slot": "A",
+                "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+                "mode": "cleanup-only",
+                "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+                "observedAt": "2026-10-13T01:39:03.306Z",
+                "state": "retained_banned",
+                "bannedUntil": "2126-09-19T01:39:03.167Z",
+                "verifiedBy": "exact_auth_admin_get"
+              },
+              {
+                "operation": "revoke",
+                "slot": "B",
+                "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+                "mode": "cleanup-only",
+                "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+                "observedAt": "2026-10-13T01:39:03.956Z",
+                "state": "sign_out_acknowledged",
+                "refreshRevocation": "not_proven_by_acknowledgment"
+              },
+              {
+                "operation": "retire",
+                "slot": "B",
+                "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+                "mode": "cleanup-only",
+                "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+                "observedAt": "2026-10-13T01:39:04.629Z",
+                "state": "retained_banned",
+                "bannedUntil": "2126-09-19T01:39:04.499Z",
+                "verifiedBy": "exact_auth_admin_get"
+              }
+            ],
+            "fixtures": "retained_exact_contract",
+            "globalSignOut": "see_per_account_evidence",
+            "residualAccessUntil": "2026-10-13T02:38:54.000Z"
+          }
+        },
+        {
+          "operation": "inspect",
+          "status": "PASS",
+          "result": [
+            {
+              "operation": "inspect",
+              "slot": "A",
+              "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+              "mode": "cleanup-only",
+              "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+              "observedAt": "2026-10-13T01:39:06.044Z",
+              "state": "retained_banned",
+              "bannedUntil": "2126-09-19T01:39:03.167Z",
+              "verifiedBy": "exact_auth_admin_get"
+            },
+            {
+              "operation": "inspect",
+              "slot": "B",
+              "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+              "mode": "cleanup-only",
+              "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+              "observedAt": "2026-10-13T01:39:06.390Z",
+              "state": "retained_banned",
+              "bannedUntil": "2126-09-19T01:39:04.499Z",
+              "verifiedBy": "exact_auth_admin_get"
+            }
+          ]
+        },
+        {
+          "operation": "verify-denial",
+          "status": "PASS",
+          "result": {
+            "status": "RETAINED_BANNED",
+            "checks": [
+              {
+                "slot": "A",
+                "check": "password_signin_denied",
+                "status": 400,
+                "authCode": "user_banned",
+                "pass": true
+              },
+              {
+                "slot": "A",
+                "context": "A1",
+                "check": "refresh_denied",
+                "status": 400,
+                "authCode": "refresh_token_not_found",
+                "pass": true,
+                "provesSessionRevocation": true
+              },
+              {
+                "slot": "A",
+                "context": "A2",
+                "check": "refresh_denied",
+                "status": 400,
+                "authCode": "refresh_token_not_found",
+                "pass": true,
+                "provesSessionRevocation": true
+              },
+              {
+                "slot": "B",
+                "check": "password_signin_denied",
+                "status": 400,
+                "authCode": "user_banned",
+                "pass": true
+              },
+              {
+                "slot": "B",
+                "context": "B1",
+                "check": "refresh_denied",
+                "status": 400,
+                "authCode": "refresh_token_not_found",
+                "pass": true,
+                "provesSessionRevocation": true
+              }
+            ]
+          }
+        },
+        {
+          "operation": "closed_bundles",
+          "status": "PASS"
+        }
+      ],
+      "functionDisarm": "Both canonical closed-entry sources and 410 D087_CLOSED endpoints verified",
+      "failureObservation": {
+        "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+        "candidateSha": "c8a23f493f8f8789ff91a031a22077f0b1ccd3d5",
+        "observedAt": "2026-10-13T01:46:32.045Z",
+        "session": "existing A1; no login/refresh/mutation",
+        "profileStatus": "READY",
+        "provisioningState": "PROVISIONING_REQUIRED",
+        "grantType": "beta_full",
+        "counts": {
+          "profile": 1,
+          "years": 0,
+          "calendars": 0,
+          "terms": 0,
+          "sections": 0,
+          "teachings": 0,
+          "items": 0,
+          "sessions": 0
+        },
+        "receiptCount": 0
+      }
+    },
+    "disposition": {
+      "status": "RETAINED_BANNED",
+      "accounts": [
+        {
+          "operation": "revoke",
+          "slot": "A",
+          "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+          "mode": "cleanup-only",
+          "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+          "observedAt": "2026-10-13T01:39:02.888Z",
+          "state": "sign_out_acknowledged",
+          "refreshRevocation": "not_proven_by_acknowledgment"
+        },
+        {
+          "operation": "retire",
+          "slot": "A",
+          "fixtureAuthId": "fa5f1adc-1205-423a-b1c3-033dbffee256",
+          "mode": "cleanup-only",
+          "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+          "observedAt": "2026-10-13T01:39:03.306Z",
+          "state": "retained_banned",
+          "bannedUntil": "2126-09-19T01:39:03.167Z",
+          "verifiedBy": "exact_auth_admin_get"
+        },
+        {
+          "operation": "revoke",
+          "slot": "B",
+          "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+          "mode": "cleanup-only",
+          "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+          "observedAt": "2026-10-13T01:39:03.956Z",
+          "state": "sign_out_acknowledged",
+          "refreshRevocation": "not_proven_by_acknowledgment"
+        },
+        {
+          "operation": "retire",
+          "slot": "B",
+          "fixtureAuthId": "54850367-5ca9-42ea-875f-a28e9052500d",
+          "mode": "cleanup-only",
+          "manifestSha256": "8df0858251c8ea76f9a230fc606a62725bd5e6faf37b0f9b58a2a3c792c8f942",
+          "observedAt": "2026-10-13T01:39:04.629Z",
+          "state": "retained_banned",
+          "bannedUntil": "2126-09-19T01:39:04.499Z",
+          "verifiedBy": "exact_auth_admin_get"
+        }
+      ],
+      "fixtures": "retained_exact_contract",
+      "globalSignOut": "see_per_account_evidence",
+      "residualAccessUntil": "2026-10-13T02:38:54.000Z"
+    },
+    "disarmed": true,
+    "privateStateReference": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087\\c8d6edca-98b5-496d-aaf8-d15d40addc0f\\private\\state.json",
+    "noProductClosure": true,
+    "noProductionPublish": true
+  },
+  "subsequentPreparation": {
+    "live": false,
+    "passed": 10,
+    "onboardingRenderedHTTP": {
+      "target": "http://127.0.0.1:5173/",
+      "passed": 1,
+      "actualApplication": true,
+      "syntheticBackend": true
+    },
+    "repairs": [
+      "receipt query orders by mutation_id, not absent id column",
+      "wait for mounted app and matching ready owner",
+      "persist safe stage/status evidence and private exceptions"
+    ]
+  },
+  "retryCondition": "No replay, unban or replacement pair under this completed disposition; controller must activate an explicitly scoped permitted continuation before another live gate."
+}

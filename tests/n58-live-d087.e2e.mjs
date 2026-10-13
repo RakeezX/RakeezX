@@ -209,7 +209,7 @@ async function installBoundary(context, label, state, signal, evidence, violatio
   });
 }
 
-async function sessionInto(page, state, label) {
+export async function sessionInto(page, state, label) {
   const token = state.tokens[label], owner = state.accounts.find(a => a.slot === CONTEXTS[label]);
   assert.equal(token.ownerVerified, true);
   // Real password login was performed once by canonical sign-in and saved
@@ -223,7 +223,11 @@ async function sessionInto(page, state, label) {
 }
 
 async function mounted(page, owner) {
-  await page.waitForFunction(async () => (await import('/src/store.js')).state.ready, null, { timeout: 45000 });
+  await page.locator('#main').waitFor({ state: 'visible', timeout: 45000 });
+  await page.waitForFunction(async owner => {
+    const s = await import('/src/store.js');
+    return s.state.ready && s.getActiveWorkspace()?.authUserId === owner;
+  }, owner, { timeout: 45000 });
   return page.evaluate(async owner => {
     const s = await import('/src/store.js'), c = await import('/src/lib/cloud.js');
     const db = await import('/src/lib/db.js'), v2 = await import('/src/lib/sync-v2.js');
@@ -276,9 +280,12 @@ async function choose(page, preset, mutationId) {
   assert.equal(year.calendarPresetId, preset); assert.ok(year.fieldRevisions.calendar_selection > 0);
   return year;
 }
-async function ownerRows(page, entity) {
+export async function ownerRows(page, entity) {
   return page.evaluate(async entity => {
     const c = await import('/src/lib/cloud.js');
+    // Receipts use mutation_id, unlike the Product entities' id column.
+    if (entity === 'sync_mutation_receipts') return c.request('/sync_mutation_receipts?owner_id=eq.' +
+      encodeURIComponent(c.user.id) + '&select=*&order=mutation_id.asc', { headers: { 'Accept-Profile': 'rakeezx' } });
     return c.fetchRestoreEntityPage(entity);
   }, entity);
 }
@@ -309,22 +316,30 @@ async function rejectSession(page, fixture, originalEnvelope, kind) {
 async function runClientGate(state, signal, saveEvidence, owned) {
   const { chromium } = await import('@playwright/test');
   owned.browser = await chromium.launch();
-  const pages = {}, receipts = [], violations = [];
+  const pages = {}, receipts = [], violations = [], network = [];
+  owned.diagnostic = { stage: 'OPEN_CONTEXTS', receipts, violations, network };
+  const stage = async value => { owned.diagnostic.stage = value; await saveEvidence({ lastStage: value, receipts, violations, network }); };
   const A = state.accounts[0].id, f = state.fixtureIds.A;
   for (const label of Object.keys(CONTEXTS)) {
     const context = await owned.browser.newContext({ serviceWorkers: 'block', timezoneId: 'Asia/Riyadh', viewport: { width: 390, height: 844 } });
     owned.contexts.push(context);
     await installBoundary(context, label, state, signal, receipts, violations);
+    context.on('response', response => { const u = new URL(response.url());
+      if (u.origin === `https://${PROJECT}.supabase.co`) network.push({ context: label, endpoint: u.pathname, status: response.status() });
+    });
     pages[label] = await context.newPage(); pages[label].setDefaultTimeout(15000);
     await pages[label].goto(state.previewUrl, { waitUntil: 'domcontentloaded' });
   }
+  await stage('A1_PROFILE');
   const a = pages.A1;
   await sessionInto(a, state, 'A1'); await a.reload();
   await a.locator('[data-account-profile-form]').waitFor();
   await a.locator('[name="teacherName"]').fill('D087 synthetic A');
   await a.locator('[name="phone"]').fill('0500000001');
   await a.getByRole('button', { name: 'متابعة', exact: true }).click();
+  await stage('A1_FOUNDATION_MOUNT');
   const bindingA = await mounted(a, A);
+  await stage('A1_FOUNDATION_READ');
   const contract = await json(path.join(CANONICAL, 'fixture-contract.json'));
   const foundation = {};
   for (const row of contract.foundationA.rows) {
@@ -337,11 +352,15 @@ async function runClientGate(state, signal, saveEvidence, owned) {
   const access = await a.evaluate(() => window.__n58Gate.c.getAccountContract());
   assert.equal(access.access.grantType, 'beta_full');
   for (const entity of ['students', 'enrollments', 'scores', 'attendance', 'logs']) assert.deepEqual(await ownerRows(a, entity), []);
+  await stage('A1_GENERAL');
   await a.getByRole('link', { name: 'التقويم', exact: true }).click();
   const general = await choose(a, G, f.mutationIds.selectGeneral);
+  await stage('A1_SECTION');
   await allocateAction(a, [f.factoryIds.section, f.mutationIds.section], 'section', f); await dispatch(a);
+  await stage('A1_TEACHING');
   await allocateAction(a, [f.factoryIds.teaching, ...f.itemIds, f.mutationIds.teaching], 'teaching', f); await dispatch(a);
   assert.equal(await a.evaluate(date => window.__n58Gate.s.isSessionEligibleDate(date), f.date), true);
+  await stage('A1_SESSION');
   await allocateAction(a, [f.factoryIds.session, f.mutationIds.session], 'session', f); await dispatch(a);
   const successful = receipts.find(r => r.envelope.p_mutation_id === f.mutationIds.session);
   assert.equal(successful?.httpStatus, 200); assert.equal(successful.receipt.outcome, 'applied');
@@ -352,14 +371,18 @@ async function runClientGate(state, signal, saveEvidence, owned) {
   assert.ok(serverReceipts.some(r => r.mutation_id === f.mutationIds.session));
   await saveEvidence({ bindingA, foundationCounts: Object.fromEntries(Object.entries(foundation).map(([k, rows]) => [k, rows.length])), general,
     successful, session, serverReceipts });
+  await stage('LEGACY_REJECTION');
   const legacy = await rejectSession(a, f, successful.envelope, 'legacyDenied');
+  await stage('A2_RESTORE');
   const a2 = pages.A2; await sessionInto(a2, state, 'A2'); await a2.reload();
   const restoreA2 = await mounted(a2, A);
   assert.ok(restoreA2.device.initialRestoreReceipt?.ownerId === A);
   const restored = await a2.evaluate(async id => window.__n58Gate.db.get('sessions', id), f.successSessionId);
   assert.deepEqual(restored.calendarContext, session.calendar_context);
+  await stage('WESTERN_SWITCH');
   const western = await choose(a, W, f.mutationIds.switchWestern);
   assert.ok(western.fieldRevisions.calendar_selection > general.fieldRevisions.calendar_selection);
+  await stage('STALE_REJECTION');
   const stale = await rejectSession(a, f, successful.envelope, 'staleDenied');
   const afterSwitch = (await ownerRows(a, 'sessions')).find(r => r.id === f.successSessionId);
   assert.deepEqual(afterSwitch, session);
@@ -367,6 +390,7 @@ async function runClientGate(state, signal, saveEvidence, owned) {
   const convergence = await a2.evaluate(async id => ({ year: await window.__n58Gate.db.get('years', 'y:1448-1449'), session: await window.__n58Gate.db.get('sessions', id) }), f.successSessionId);
   assert.equal(convergence.year.calendarPresetId, W); assert.equal(convergence.year.fieldRevisions.calendar_selection, western.fieldRevisions.calendar_selection);
   assert.deepEqual(convergence.session.calendarContext, session.calendar_context);
+  await stage('B_ISOLATION');
   const beforeB = {};
   for (const entity of ['years', 'calendars', 'terms', 'sections', 'teachings', 'items', 'sessions']) beforeB[entity] = await ownerRows(a, entity);
   const b = pages.B1; await sessionInto(b, state, 'B1'); // No reload/Profile/Provisioning for B.
@@ -384,6 +408,7 @@ async function runClientGate(state, signal, saveEvidence, owned) {
   assert.ok(isolation.reads.every(r => r.rows.length === 0)); assert.equal(isolation.receipt.outcome, 'not_found'); assert.deepEqual(isolation.ownProfile, []);
   const afterB = {}; for (const entity of Object.keys(beforeB)) afterB[entity] = await ownerRows(a, entity);
   assert.deepEqual(afterB, beforeB);
+  await stage('FINAL_CLOSURE');
   const finalCounts = {};
   for (const entity of ['sections', 'teachings', 'items', 'sessions', 'session_roster_snapshots', 'students', 'enrollments', 'scores', 'attendance', 'logs']) finalCounts[entity] = (await ownerRows(a, entity)).length;
   assert.equal(finalCounts.sections, 1); assert.equal(finalCounts.teachings, 1); assert.equal(finalCounts.items, 5); assert.equal(finalCounts.sessions, 1);
@@ -430,8 +455,20 @@ export async function runGate(privateDir, { recoveryOnly = false } = {}) {
     assert.ok(state.cleanupStandbyVerifiedAt && state.phase === 'provision' && !state.cleanupStartedAt);
     assert.equal(state.gate.status, 'NOT_RUN'); // Retry is cleanup-only; never a second Product sequence.
     return await executeLifecycle({ operate,
-      work: async signal => runClientGate(await secure.readPrivateState(REPO, privateDir), signal,
-        evidence => journal({ evidence: { ...(state.gate.evidence ?? {}), ...evidence } }).then(() => Object.assign(state.gate, { evidence: { ...(state.gate.evidence ?? {}), ...evidence } })), owned),
+      work: async signal => {
+        try {
+          await runClientGate(await secure.readPrivateState(REPO, privateDir), signal,
+            evidence => journal({ evidence: { ...(state.gate.evidence ?? {}), ...evidence } }).then(() => Object.assign(state.gate, { evidence: { ...(state.gate.evidence ?? {}), ...evidence } })), owned);
+        } catch (error) {
+          // Raw browser exception remains private; never expose evaluator arguments.
+          await fs.writeFile(path.join(privateDir, 'gate-error.json'), JSON.stringify({
+            stage: owned.diagnostic?.stage, name: error.name, message: error.message, stack: error.stack,
+          }), { mode: 0o600 });
+          await journal({ evidence: { ...(state.gate.evidence ?? {}), ...(owned.diagnostic ?? {}),
+            failedStage: owned.diagnostic?.stage ?? 'BROWSER_START', exceptionName: error.name } });
+          throw fail('N58_' + (owned.diagnostic?.stage ?? 'BROWSER_START') + '_FAILED');
+        }
+      },
       close, journal, bundles, deadline: liveDeadline(state) });
   } finally { await lock.close(); await fs.unlink(path.join(privateDir, 'GATE_RUNNING.lock')); }
 }

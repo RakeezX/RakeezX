@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { sessionInto, ownerRows } from './n58-live-d087.e2e.mjs';
 test.use({ serviceWorkers: 'block' });
 
-import { AUTH_STORAGE_KEY, SUPABASE_URL } from '../src/lib/cloud.js';
+import { SUPABASE_URL } from '../src/lib/cloud.js';
 import { buildAccountFoundationDefaults } from '../src/lib/account-provisioning.js';
 import { encodeSyncV2Patch } from '../src/lib/sync-v2.js';
 
@@ -40,6 +41,10 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   await page.context().route(`${SUPABASE_URL}/rest/v1/**`, (route) => {
     const url = new URL(route.request().url());
     const table = url.pathname.split('/').at(-1);
+    if (table === 'sync_mutation_receipts') {
+      expect(url.searchParams.get('owner_id')).toBe('eq.' + OWNER);
+      expect(url.searchParams.get('order')).toBe('mutation_id.asc');
+    }
     const rows = canonicalSnapshot?.[table] ?? [];
     const offset = Number(url.searchParams.get('offset') ?? 0);
     const limit = Number(url.searchParams.get('limit') ?? rows.length);
@@ -70,13 +75,11 @@ test('fresh authenticated owner completes profile and provisions once before Hom
     canonicalSnapshot = snapshot();
     return route.fulfill({ json: { contract: contract(state, profileStatus), snapshot: canonicalSnapshot } });
   });
-  await page.context().route('**/__provisioning_fixture__', (route) => route.fulfill({
-    contentType: 'text/html', body: '<!doctype html><title>fixture</title>',
-  }));
-  await page.goto('/__provisioning_fixture__');
-  await page.evaluate(({ key, session }) => localStorage.setItem(key, JSON.stringify(session)),
-    { key: AUTH_STORAGE_KEY, session: SESSION });
   await page.goto('/');
+  await sessionInto(page, { accounts: [{ slot: 'A', id: OWNER, email: SESSION.user.email }],
+    tokens: { A1: { ownerVerified: true, accessToken: SESSION.access_token, refreshToken: SESSION.refresh_token,
+      expiresAt: new Date(SESSION.expires_at * 1000).toISOString() } } }, 'A1');
+  await page.reload();
   await expect(page.locator('[data-account-profile-required]')).toBeVisible();
   await expect(page.locator('[data-workspace-gate]')).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
