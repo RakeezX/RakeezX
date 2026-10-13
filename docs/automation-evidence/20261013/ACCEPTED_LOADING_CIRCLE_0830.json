@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-13T05:56:06.904Z",
+  "taskId": "continuous-n71-onboarding-spinner-20261013",
+  "productId": "N71",
+  "outcome": "loading-circle-only",
+  "state": "CLOSED_BY_EXPLICIT_PO_ACCEPTANCE",
+  "publishedSha": "1574d54e59cb4248e24657396499f395dae6568a",
+  "verifiedAt": "2026-10-13T05:03:38.563Z",
+  "poReportedActualSuccess": true,
+  "parentProductClosed": false,
+  "runtimeQueueClosed": false
+}
