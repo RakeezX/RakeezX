@@ -6,23 +6,45 @@ import { randomBytes, randomUUID, createHash } from 'node:crypto';
 import { buildAccountFoundationDefaults } from '../../src/lib/account-provisioning.js';
 import { canonical, sha256, fixtureEmail, fixtureMarker, validateManifest, PROJECT_ID, PURPOSE, WINDOW_MS }
   from '../../supabase/functions/ops-n77-fixture/handler-core.mjs';
+import {loadBinding,STATE_ROOT,TASK_ID} from './binding.mjs';
 
-export const RUN_ID = 'a853d8e6-0577-4fa3-9af2-ad473c8bb673';
-export const TASK_ID = 'continuous-n77-real-delete-20261012';
-export const PRIVATE = `C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/n77/${RUN_ID}/private`;
+export {TASK_ID};
+export let RUN_ID, PRIVATE;
+let controllerBinding;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../..');
 const URL = `https://${PROJECT_ID}.supabase.co`;
 const proof = () => randomBytes(32).toString('base64url');
 const git = (...args) => execFileSync('git', args, { cwd: ROOT, windowsHide: true, encoding: 'utf8' }).trim();
 const fail = code => Object.assign(new Error(code), { safeCode: code });
-export async function readState() { return JSON.parse(await fs.readFile(path.join(PRIVATE, 'state.tmp'), 'utf8')); }
+export async function bindRun(runId=process.env.RAKEEZX_N77_FIXTURE_RUN_ID) {
+  if(controllerBinding) {
+    if(runId!==undefined && runId!==RUN_ID)throw fail('FIXTURE_RUN_REBIND_FORBIDDEN');
+    return controllerBinding;
+  }
+  controllerBinding=await loadBinding(runId);RUN_ID=controllerBinding.fixtureRunId;
+  PRIVATE=STATE_ROOT+'/'+RUN_ID+'/private';return controllerBinding;
+}
+async function assertStateBinding(s) {
+  await bindRun();
+  if(s.runId!==RUN_ID || canonical(s.controllerBinding)!==canonical(controllerBinding))throw fail('STATE_BINDING_MISMATCH');
+  const suffix=RUN_ID.replaceAll('-','').slice(0,20);
+  if(s.projectId!==PROJECT_ID || s.purpose!==PURPOSE ||
+    s.functions?.provision!=='ops-n77-fixture-'+suffix || s.functions?.['cleanup-only']!=='ops-n77-retire-'+suffix)
+    throw fail('STATE_FUNCTION_BINDING_MISMATCH');
+}
+export async function readState() {
+  await bindRun();const s=JSON.parse(await fs.readFile(path.join(PRIVATE, 'state.tmp'), 'utf8'));
+  await assertStateBinding(s);return s;
+}
 export async function saveState(s) {
+  await assertStateBinding(s);
   const file = path.join(PRIVATE, 'state.tmp'), temp = file + '.write.tmp';
   await fs.writeFile(temp, JSON.stringify(s, null, 2), { mode: 0o600 }); await fs.rename(temp, file);
 }
 export async function safeReceipt(s) {
-  const receipt = { runId: RUN_ID, taskId: TASK_ID, candidate: s.binding,
+  await assertStateBinding(s);
+  const receipt = { runId: RUN_ID, taskId: TASK_ID, controllerBinding, candidate: s.binding,
     identities: s.accounts.map(({ id, slot }) => ({ id, slot })), fixtureIds: s.fixtureIds,
     retainedClosure:{profileId:'profile',foundation:Object.fromEntries(Object.entries(s.foundation??{}).map(([k,v])=>[k,v.map(r=>r.id)])),
       expectedEffects:s.expectedEffects},
@@ -36,6 +58,7 @@ export async function safeReceipt(s) {
   return receipt;
 }
 export async function prepare(previewUrl) {
+  await bindRun();
   if (!/^https:\/\/[a-f0-9]{8}\.rakeezx\.pages\.dev\/?$/.test(previewUrl)) throw fail('EXACT_PREVIEW_REQUIRED');
   if (git('status','--porcelain','--untracked-files=no')) throw fail('COMMITTED_CANDIDATE_REQUIRED');
   const candidateSha = git('rev-parse','HEAD'), baseSha = git('rev-parse','origin/main');
@@ -69,7 +92,7 @@ export async function prepare(previewUrl) {
   const files=git('ls-files','src','sw.js').split('\n').map(p=>({path:p,blob:git('rev-parse',`HEAD:${p}`)}));
   const binding={candidateSha,baseSha,treeSha:git('rev-parse','HEAD^{tree}'),previewUrl,
     harnessBlob:git('rev-parse','HEAD:tests/n77-live/gate.mjs'),changedPaths:git('diff','--name-only',baseSha,candidateSha).split('\n'),files};
-  const s={runId:RUN_ID,projectId:PROJECT_ID,purpose:PURPOSE,binding,
+  const s={runId:RUN_ID,controllerBinding,projectId:PROJECT_ID,purpose:PURPOSE,binding,
     issuedAt:new Date(now).toISOString(),expiresAt:new Date(now+WINDOW_MS).toISOString(),
     capabilities:{provision:proof(),'cleanup-only':proof()},accounts,fixtureIds:ids,publishableKey,
     implementationSha256:await sha256(await fs.readFile(path.join(ROOT,'supabase/functions/ops-n77-fixture/handler-core.mjs'),'utf8')),
@@ -81,6 +104,7 @@ export async function prepare(previewUrl) {
   await saveState(s);await safeReceipt(s);return {prepared:true,privateState:path.join(PRIVATE,'state.tmp'),binding};
 }
 export async function manifest(s,mode) {
+  await assertStateBinding(s);
   return validateManifest({version:1,purpose:PURPOSE,projectId:PROJECT_ID,runId:RUN_ID,mode,
     issuedAt:s.issuedAt,expiresAt:s.expiresAt,capabilitySha256:await sha256(s.capabilities[mode]),
     implementationSha256:s.implementationSha256,fixtureContractSha256:s.fixtureContractSha256,
@@ -95,6 +119,7 @@ export async function bundle(mode,closed=false) {
   return {project_id:PROJECT_ID,name:s.functions[mode],entrypoint_path:'index.ts',verify_jwt:false,files};
 }
 export async function call(s,mode,operation,slot,extra={}) {
+  await assertStateBinding(s);
   if(Date.now()>=Date.parse(s.expiresAt))throw fail('CAPABILITY_EXPIRED');
   const key=[mode,operation,slot].join(':');
   if ((s.operations[key]?.attempts??0)>=2) throw fail('SECOND_UNCHANGED_BLOCKER');
@@ -200,7 +225,7 @@ export async function recordGate(result) {const s=await readState();s.gate=resul
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
   const [command,arg]=process.argv.slice(2);
   try {
-    const r=command==='prepare'?await prepare(arg):command==='bundle'?await bundle(arg):command==='closed-bundle'?await bundle(arg,true):
+    const r=command==='admit'?await bindRun():command==='prepare'?await prepare(arg):command==='bundle'?await bundle(arg):command==='closed-bundle'?await bundle(arg,true):
       command==='receipt'?await safeReceipt(await readState()):await operation(command,arg);
     process.stdout.write(JSON.stringify(r)+'\n');
   }catch(e){process.stdout.write(JSON.stringify({ok:false,errorCode:e.safeCode??'N77_OPERATION_FAILED'})+'\n');process.exitCode=1;}
