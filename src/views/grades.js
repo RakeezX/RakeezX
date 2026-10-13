@@ -6,7 +6,7 @@
 
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { itemScore, studentTotal, masteryBand, normalizeSearchText } from '../models.js';
+import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster } from '../models.js';
 import { repaint } from '../repaint.js';
 import * as db from '../lib/db.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
@@ -70,7 +70,8 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الدرجات محفوظة، ولا يمكن تعديلها من مسار العمل النشط.</div></div>`;
 
-    const { roster, items, ctx } = store.teachingContext(cls.id);
+    const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
+    const roster = displayRoster(activeRoster);
     const distributionAction = html`<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a>`;
 
     if (!roster.length) {
@@ -122,7 +123,7 @@ export default {
       const normalized = normalizeSearchText(query);
       processedRoster = processedRoster.filter((student) =>
         normalizeSearchText(student.name).includes(normalized) ||
-        normalizeSearchText(student.rollNo ?? '').includes(normalized));
+        normalizeSearchText(student.displayNo ?? '').includes(normalized));
     }
 
     // الترتيب
@@ -431,7 +432,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                                ${isChecked ? 'checked' : ''} aria-label="تحديد ${s.name}">
                       `
                     : ''}
-                  <span class="rollno">${s.rollNo ?? '—'}</span>
+                  <span class="rollno">${s.displayNo ?? '—'}</span>
                   <span class="graderow__name"><strong>${s.name}</strong><small>${value === null ? 'لم تُرصد الدرجة' : 'تم الرصد'}</small></span>
                   ${auto
                     ? html`
@@ -476,7 +477,7 @@ function subitemMode(roster, ctx, item) {
         const manual = score?.manualValue ?? null;
         const warning = scoreValidation.get(`${student.id}:${item.id}`);
         return html`<article class="grades-01c__subscore-row">
-          <div class="grades-01c__student"><span class="rollno tabular">${student.rollNo ?? '—'}</span>
+          <div class="grades-01c__student"><span class="rollno tabular">${student.displayNo ?? '—'}</span>
             <span><strong>${student.name}</strong><small>${final === null ? 'غير مرصود' : 'تم الرصد'}</small></span></div>
           <div class="grades-01c__subitems" role="group" aria-label="عناصر ${item.name} للطالب ${student.name}">
             ${definitions.map((definition) => {
@@ -537,7 +538,7 @@ function tableMode(roster, items, ctx) {
             return html`
               <tr>
                 <th class="gtable__sticky">
-                  <span class="gtable__roll tabular">${s.rollNo ?? ''}</span>
+                  <span class="gtable__roll tabular">${s.displayNo ?? ''}</span>
                   <a href="#/student/${s.id}">${s.name}</a>
                 </th>
                 ${items.map((i) => {
