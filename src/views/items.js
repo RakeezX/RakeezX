@@ -16,6 +16,7 @@ import '../lib/rakeez-datetime.js';
 let foundationAvailable = false;
 let foundationChecking = false;
 let distributionAvailable = false;
+let preservationAvailable = false;
 const isDemo = () => store.getActiveWorkspace()?.type === 'demo';
 const supportsFoundation = () => isDemo() || foundationAvailable;
 
@@ -296,10 +297,12 @@ export default {
   onMount() {
     foundationAvailable = false;
     distributionAvailable = false;
+    preservationAvailable = false;
     foundationChecking = !isDemo();
     if (isDemo()) return;
     Promise.all([getScoreFoundationCapability(), getScoreDistributionCapability().catch(() => null)]).then(([capability, distribution]) => {
       distributionAvailable = distribution?.distributionApplyVersion === 2 && distribution?.protocol === 'N73_D119_V2';
+      preservationAvailable = distributionAvailable && distribution?.targetPreservationVersion === 1;
       foundationAvailable = capability?.scoreDomainVersion === 1 &&
         capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
         capability?.copyDomainVersion === 1;
@@ -398,8 +401,8 @@ export default {
         desc: 'اختر الفصول ثم راجع الأثر. لا تُنسخ درجات الطلاب أو سجلاتهم.',
         body: html`<fieldset class="safe-choices"><legend>طريقة النسخ</legend>
           <label><input type="radio" name="copy-mode" data-copy-mode value="definitions" checked> نسخ التوزيع فقط</label>
-          <label><input type="radio" name="copy-mode" data-copy-mode value="preserve-target"> نسخ مع حفظ سجلات الفصل الهدف</label>
-          <p>درجات المصدر لا تُنسخ. حفظ الهدف متاح للبنود المتطابقة في طريقة الرصد والحد الأعلى وترتيب العناصر ونقاطها، حتى إن اختلفت أسماؤها.</p>
+          <label><input type="radio" name="copy-mode" data-copy-mode value="preserve-target" ${isDemo() || preservationAvailable ? '' : 'disabled'}> نسخ مع حفظ سجلات الفصل الهدف</label>
+          <p>${isDemo() || preservationAvailable ? 'درجات المصدر لا تُنسخ. حفظ الهدف متاح للبنود المتطابقة في طريقة الرصد والحد الأعلى وترتيب العناصر ونقاطها، حتى إن اختلفت أسماؤها.' : 'حفظ سجلات الفصل الهدف يحتاج إلى تحديث الخادم. نسخ التوزيع فقط ما زال متاحًا ولا ينسخ درجات المصدر.'}</p>
         </fieldset><fieldset class="target-list"><legend>الفصول المستهدفة</legend>${targets.map(target => html`
           <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}">
             <span>${store.sectionLabel(store.getSection(target.sectionId))}</span></label>`)}</fieldset>
