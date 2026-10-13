@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const maleNames = ['أحمد محمد','محمد خالد','عبدالله سعد','عمر فهد','يوسف علي','خالد عبدالرحمن','سلمان ناصر','عبدالعزيز ماجد','تركي وليد','فهد عادل','ناصر إبراهيم','سعد راشد','ماجد حسن','راكان بدر','زياد طارق','أنس سامي','بدر منصور','وليد صالح','ياسر عوض','فيصل حمد','ريان عبدالمجيد','حسن جابر','علي ناصر','معتز فؤاد','سامي يوسف','طارق مازن','إبراهيم سالم','خليل سلطان','جابر عمر','منصور فهد'];
+import { seed } from './n24-fixture.mjs';
 
 function errorsFor(page) {
   const errors = [];
@@ -13,27 +13,6 @@ function errorsFor(page) {
 }
 async function downloadText(download) { const stream = await download.createReadStream(); let text = ''; for await (const chunk of stream) text += chunk; return text; }
 
-async function seed(page) {
-  await page.evaluate(async (names) => {
-    const students = names.map((name, index) => ({ id: `print-student-${index}`, name, status: 'active' }));
-    const enrollments = students.map((student, index) => ({ id: `print-enrollment-${index}`, studentId: student.id, sectionId: 'print-section', status: 'active', rollNo: index + 1 }));
-    const attendance = students.map((student, index) => ({ id: `print-attendance-${index}`, studentId: student.id, sessionId: 'print-session', teachingId: 'print-teaching', date: '2026-08-20', status: index % 5 === 0 ? 'absent' : index % 3 === 0 ? 'late' : 'present' }));
-    await window.store.save({
-      profile: [{ id: 'profile', teacherName: 'معلمة تجريبية', teacherForm: 'feminine', schoolName: 'مدرسة تجريبية' }],
-      years: [{ id: 'print-year', label: '1448-1449' }], terms: [{ id: 'print-term', yearId: 'print-year', name: 'الفصل الأول' }],
-      subjects: [{ id: 'print-subject', name: 'الرياضيات' }], sections: [{ id: 'print-section', yearId: 'print-year', grade: 5, label: '1', name: 'الخامس / 1' }],
-      teachings: [{ id: 'print-teaching', sectionId: 'print-section', subjectId: 'print-subject', termId: 'print-term' }],
-      students, enrollments,
-      items: [{ id: 'print-item', teachingId: 'print-teaching', name: 'اختبار قصير', max: 10 }, { id: 'print-participation', teachingId: 'print-teaching', name: 'المشاركة', max: 5, auto: 'participation', perPoint: 1 }],
-      scores: [{ id: 'print-score', studentId: 'print-student-0', itemId: 'print-item', value: 8 }],
-      logs: [{ id: 'print-log', studentId: 'print-student-0', teachingId: 'print-teaching', kind: 'participation', delta: 2, date: '2026-08-20' }],
-      slots: [{ id: 'print-slot', teachingId: 'print-teaching', weekday: 0, period: 1 }],
-      sessions: [{ id: 'print-session', teachingId: 'print-teaching', slotId: 'print-slot', date: '2026-08-20', weekday: 0, period: 1, startTime: '07:00', endTime: '07:45' }], attendance,
-    });
-    await window.store.patchDevice({ activeYearId: 'print-year', activeTermId: 'print-term', reportPrincipalName: '' });
-    window.store.repaint();
-  }, maleNames);
-}
 
 // Inspect real descendants, not just the white body (which masked this bug).
 async function printPalette(page) {

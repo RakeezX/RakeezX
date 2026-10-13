@@ -7394,6 +7394,166 @@
   margin-inline: auto;
 }
 
+/* N24: one calm document hierarchy; reports retain their own data layouts. */
+.print-report .print-report__header {
+  padding: 0 0 12px;
+  text-align: start;
+  border-color: #8eafa4;
+}
+.print-report .printhead__top {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 8px;
+}
+.print-report .printhead__title { margin: 0; flex: 1 1 220px; }
+.print-report .printhead__brand {
+  position: static;
+  display: block;
+  flex: none;
+  font-size: 12px;
+}
+.print-report .printhead__top .demo-output-marker { margin: 0; }
+.print-report .printhead__details { gap: 5px; }
+.print-report .printhead__meta {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.print-report .printhead__meta div { flex-wrap: wrap; min-width: 0; }
+.print-report .printhead__meta dt { color: #465b60; }
+.print-report .printhead__meta dd { overflow-wrap: anywhere; }
+.report-workspace .gtable--report thead th {
+  white-space: normal;
+  min-width: 48px;
+  line-height: 1.5;
+}
+.report-workspace .gtable--report tbody th {
+  white-space: normal;
+  min-width: 180px;
+  max-width: 360px;
+  text-align: start;
+  line-height: 1.6;
+}
+.report-workspace .gtable--report th,
+.report-workspace .gtable--report td { padding: 9px 12px; }
+.a4-sheet .report-closing,
+.print-report .report-closing { break-inside: avoid; }
+.report-workspace .report-ending-row { display: none; }
+.a4-sheet .report-ending-row { display: table-row !important; }
+.a4-sheet .grades-report-screen { display: none !important; }
+.a4-sheet .grades-report-print { display: block !important; }
+.report-workspace .report-table-ending > tr:first-child > th,
+.report-workspace .report-table-ending > tr:first-child > td { border-block-start: 1px solid var(--border); }
+.report-workspace .report-ending-row > td {
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.report-workspace .report-ending-row .report-closing { text-align: start; }
+.a4-sheet .report-closing .print-signatures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 24px;
+}
+.a4-sheet .print-signatures > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  border-top: 1px solid #777;
+  padding-top: 8px;
+  overflow-wrap: anywhere;
+}
+.a4-sheet .report-closing .print-report__footer {
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #bbb;
+  color: #444;
+  font-size: 10px;
+}
+@media screen and (max-width: 540px) {
+  .report-workspace__head { flex-wrap: wrap; }
+  .report-workspace__head > div { min-width: 0; }
+  .report-workspace__head h2,
+  .report-workspace__head p { overflow-wrap: anywhere; }
+  .report-workspace .report-tabs { display: flex; flex-wrap: wrap; }
+  .report-workspace .report-tabs .segmented__btn { flex: 1 1 40%; white-space: normal; }
+  .report-workspace .report-toolbar__field { min-width: 0; flex-basis: 100%; }
+  .report-workspace .report-toolbar__date { min-width: 0; flex: 1 1 100px; }
+  .report-workspace .a4-sheet { padding: 16px; }
+  .report-workspace .a4-preview-banner { flex-wrap: wrap; gap: 8px; }
+}
+@media print {
+  body:has(.print-report) .n34-help-launcher { display: none !important; }
+  .print-report .print-report__header {
+    margin: 0 0 4mm;
+    padding: 0 0 3mm;
+  }
+  .print-report .printhead__top { margin-bottom: 2mm; }
+  .print-report .printhead__title { font-size: 15pt; }
+  .print-report .printhead__brand { font-size: 9pt; }
+  .print-report .printhead__meta { font-size: 9pt; gap: 1mm 5mm; }
+  .print-report .printhead__meta dt { color: #444; }
+  .print-report .printhead__meta dd { color: #111; }
+  .report-workspace .gtable--report { font-size: 9pt; }
+  .report-workspace .gtable--report th,
+  .report-workspace .gtable--report td {
+    padding: 1mm 2mm !important;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    max-width: none;
+    color: #111 !important;
+    border-color: #999 !important;
+  }
+  .report-workspace .gtable--report tbody th { width: 28%; }
+  .print-report--roster .gtable--report tbody th { width: auto; }
+  .print-report--roster .gtable--report tr > :first-child { width: 10mm; }
+  .report-workspace .gtable--report thead th { min-width: 0; font-size: 9pt; color: #111 !important; }
+  .report-workspace .gtable__max { font-size: 8pt; }
+  .print-report--grades .gtable--report thead th:nth-last-child(-n+2) { white-space: nowrap; }
+  .report-workspace .gtable--report thead { display: table-header-group; }
+  .report-workspace .print-tablewrap { break-inside: auto; page-break-inside: auto; }
+  .report-workspace .report-chunk { margin-bottom: 0; }
+  .report-workspace .report-chunk:not(.print-page-break) { break-after: avoid-page; }
+  .report-workspace .gtable--report tr { break-inside: avoid; }
+  .report-workspace .report-table-ending { break-inside: avoid; page-break-inside: avoid; }
+  .report-workspace .report-ending-row { display: table-row !important; }
+  .report-workspace .report-ending-row > td {
+    border: 0 !important;
+    padding: 0 !important;
+    white-space: normal;
+  }
+  .report-workspace .report-closing { margin-top: 6mm; break-inside: avoid; break-before: avoid-page; }
+  .report-workspace .report-chunk + .report-closing { margin-top: 4mm; }
+  .report-workspace .report-closing .print-signatures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 18mm;
+    margin: 0;
+    font-size: 10pt;
+  }
+  .report-workspace .print-signatures > div {
+    min-width: 0;
+    gap: 2mm;
+    padding-top: 2mm;
+    overflow-wrap: anywhere;
+  }
+  .report-workspace .report-closing .print-report__footer {
+    margin-top: 4mm;
+    padding-top: 2mm;
+    font-size: 8pt;
+    color: #444;
+  }
+}
+
 /* Work 0274 mobile fidelity wins over earlier feature-scoped Home refinements. */
 @media screen and (max-width: 899px) {
   .topbar--home { min-height: 62px; gap: 12px; padding: 7px 12px; padding-block-start: calc(7px + env(safe-area-inset-top)); }
