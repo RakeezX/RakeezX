@@ -5,11 +5,9 @@ import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readState, saveState, safeReceipt, recordGate, PRIVATE, TASK_ID } from './run.mjs';
+import {phaseLease} from './lease.mjs';
 
-const card='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/'+TASK_ID+'.json';
-const lease='C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1';
-const phase=action=>execFileSync('powershell.exe',['-NoProfile','-File',lease,'-Name','browser','-Action',action,
-  '-TaskFile',card,'-WaitSeconds','0'],{windowsHide:true,encoding:'utf8'}).trim();
+const phase=action=>phaseLease('browser',action);
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const repository=path.resolve('C:/Users/Abody/Projects/RakeezX/.worktrees/'+TASK_ID);
 const observed=[];

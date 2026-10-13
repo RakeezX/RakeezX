@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {validateBinding,TASK_ID,TASK_FILE} from './n77-live/binding.mjs';
+import {phaseLease} from './n77-live/lease.mjs';
 
 const runId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const previousRunId='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
@@ -35,4 +36,13 @@ test('flush-only import has no live binding; missing live input fails before ini
   assert.equal(imported.status,0,imported.stderr);
   const denied=spawnSync(process.execPath,['tests/n77-live/run.mjs','prepare','https://00000000.rakeezx.pages.dev'],{env,encoding:'utf8',windowsHide:true});
   assert.equal(denied.status,1);assert.equal(JSON.parse(denied.stdout).errorCode,'EXPLICIT_FIXTURE_RUN_REQUIRED');
+});
+test('lease sharing race retries only the same verifier; second failure and ownership denial stop work',()=>{
+  let calls=0;
+  const sharing=()=>Object.assign(new Error('sharing'),{stderr:'checkpoint.json: being used by another process'});
+  assert.equal(phaseLease('browser','acquire',()=>{if(++calls===1)throw sharing();return 'ACQUIRED browser';}),'ACQUIRED browser');
+  assert.equal(calls,2);calls=0;
+  assert.throws(()=>phaseLease('browser','acquire',()=>{calls++;throw sharing();}));assert.equal(calls,2);calls=0;
+  assert.throws(()=>phaseLease('browser','acquire',()=>{calls++;throw Object.assign(new Error('owner'),{stderr:'Exact worker process not verified'});}));
+  assert.equal(calls,1);
 });
