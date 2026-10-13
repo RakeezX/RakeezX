@@ -135,7 +135,16 @@ export function watchdogReason(task, clock) {
 }
 // A completed worker can report downstream Product/fixture authentication,
 // not a Codex-login outage: model-runtime failures have no completed result.
+export function exhaustedLiveFixture(result) {
+  if (result?.state !== 'BLOCKED') return false;
+  const reason = String(result.blocker ?? '');
+  return /(?:pair|fixture)/i.test(reason) && /(?:phase|same-phase|maxNewPairs|sole pair|single pair)/i.test(reason)
+    && /(?:consumed|exhausted)/i.test(reason) && /(?:retired|forbidden|not permitted|no .*replacement)/i.test(reason);
+}
+
 export function workerBlockerClass(result) {
+  // A preserved real failure remains blocked; a new worker cannot replenish a retired one-pair phase.
+  if (exhaustedLiveFixture(result)) return 'external';
   return result?.blockerType === 'auth' ? 'external' : result?.blockerType;
 }
 export function classifyFailure(message, explicit = null) {
