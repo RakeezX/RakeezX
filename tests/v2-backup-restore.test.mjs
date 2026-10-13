@@ -88,18 +88,18 @@ test('V5 backup survives disposable wipe/replace with mixed direct and SUBITEM p
     ],
     scoreSubitems: [
       { id: 'sub:three', itemId: 'item:sub', name: 'three', value: 3, order: 0,
-        distributionOriginId: 'source:sub:three', createdAt: 123, startDate: null, dueDate: null, latePoints: null },
+        distributionOriginId: 'source:sub:three', createdAt: 123, startDate: '2026-10-01', dueDate: '2026-10-02', latePoints: 1 },
       { id: 'sub:deleted', itemId: 'item:sub', name: 'old', value: 2, order: 1, deleted: true },
     ],
     scoreSubitemCompletions: [
-      { id: 'completion:three', studentId: 'student:one', subitemId: 'sub:three', checked: true },
+      { id: 'completion:three', studentId: 'student:one', subitemId: 'sub:three', checked: true, completionState: 'late' },
       { id: 'completion:deleted', studentId: 'student:missing', subitemId: 'sub:deleted',
         checked: true, deleted: true },
     ],
     scores: [
       { id: 'score:direct', studentId: 'student:one', itemId: 'item:direct', value: 7 },
       { id: 'score:sub', studentId: 'student:one', itemId: 'item:sub',
-        derivedValue: 3, manualValue: 5, value: 8 },
+        derivedValue: 1, manualValue: 5, value: 6 },
       { id: 'score:zero', studentId: 'student:missing', itemId: 'item:sub',
         derivedValue: 0, manualValue: 0, value: 0 },
     ],

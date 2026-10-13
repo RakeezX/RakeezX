@@ -8,7 +8,7 @@ import { securePrivateDirectory, writePrivateState, readPrivateState, withPrivat
 import { buildAccountFoundationDefaults } from '../../src/lib/account-provisioning.js';
 import { device } from './device.mjs';
 import { itemScore } from '../../src/models.js';
-import { decodeSyncV2Canonical } from '../../src/lib/sync-v2.js';
+import { decodeSyncV2Canonical, encodeSyncV2Patch } from '../../src/lib/sync-v2.js';
 
 // Every invocation must name the same controller-created run, including recovery.
 export const runId=process.argv.find(arg=>arg.startsWith('--run-id='))?.slice(9);
@@ -286,12 +286,17 @@ async function run() {
     assert.equal(backup.data.scoreSubitems.find(r=>r.id===i.targetSub).distributionOriginId,i.sourceSub);
     assert.equal(backup.data.scoreSubitems.find(r=>r.id===i.targetSub).latePoints,1);
     assert.equal(backup.data.scoreSubitemCompletions.find(r=>r.id===i.completion).completionState,'late');
-    await actor2.database.clearAll();await restoreBackup(backup,'replace');
-    assert.equal((await actor2.database.get('scoreSubitems',i.targetSub)).distributionOriginId,i.sourceSub);
-    assert.equal((await actor2.database.get('scoreSubitems',i.targetSub)).dueDate,'2026-10-02');
-    assert.equal((await actor2.database.get('scoreSubitemCompletions',i.completion)).completionState,'late');
+    await assert.rejects(()=>restoreBackup(backup,'replace'),error=>error.code==='LOCAL_RESTORE_DISABLED');
+    const serialized=JSON.parse(JSON.stringify(backup));
+    for(const [storeName,id,expected] of [['scoreSubitems',i.targetSub,{distributionOriginId:i.sourceSub,dueDate:'2026-10-02',latePoints:1}],
+      ['scoreSubitemCompletions',i.completion,{completionState:'late'}]]) {
+      const row=serialized.data[storeName].find(r=>r.id===id);
+      const decoded=decodeSyncV2Canonical(storeName,{id,...encodeSyncV2Patch(storeName,row)});
+      for(const [key,value] of Object.entries(expected)) assert.equal(decoded[key],value);
+    }
+    assert.equal(serialized.data.items.find(r=>r.id===i.extra).deleted,true);
     assert.equal((await actor2.database.get('items',i.extra)).deleted,true);
-    report('live_device_convergence_and_backup','Actual Sync engine A2 adopts canonical parents/subitems/completions/scores; explicit deletion receipt and subsequent stale edit converge to tombstones without resurrection; V5 backup/local restore preserves origins and deletions.');
+    report('live_device_convergence_and_backup','Actual A2 Sync converges canonical data and tombstones without resurrection. V5 backup plus actual field serializers preserve origins/dates/late state; N77 legacy local restore remains denied. Focused current restore contract covers canonical reconciliation.');
     state.status='CHECKS_COMPLETE';await save();
   } catch(error) {state.failure=safe(error);await save();throw error;}
   finally {
