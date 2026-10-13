@@ -238,7 +238,7 @@ export class Controller {
   async loadConfig() {
     const config = await readJson(this.configPath);
     if (!config?.controller?.activationId || !ID.test(config.controller.activationId)) throw new Error('An explicit valid controller.activationId is required');
-    if (![1, 2].includes(Number(config.maxWorkers))) throw new Error('maxWorkers must be 1 or 2');
+    if (![1, 2, 3].includes(Number(config.maxWorkers))) throw new Error('maxWorkers must be 1, 2 or 3');
     if (!config.controller.codexPath && !this.testOnly) throw new Error('controller.codexPath must name the tested Codex executable');
     if (!this.testOnly && !await exists(config.controller.codexPath)) throw new Error('Configured Codex executable is unavailable; no new workers started');
     if (config.controller.repoRoot) this.repo = path.resolve(config.controller.repoRoot);

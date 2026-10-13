@@ -102,16 +102,23 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
   insist(task.status === 'blocked' && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
   insist(task.lastWorkerReap?.exactAbsence === true && task.lastWorkerReap.activationId === activationId && task.lastWorkerReap.runId === e.lastRunId && Array.isArray(task.lastWorkerReap.owners) && task.lastWorkerReap.owners.length > 0, 'No exact owned-process absence proof: ' + e.id);
   insist(result.taskId === e.id && result.runId === e.lastRunId && result.state === 'BLOCKED' && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
-  insist(equalPath(result.worktreePath, task.worktreePath) && result.baseSha === task.baseSha, 'Result worktree/base mismatch: ' + e.id);
-  insist(task.candidateSha == null || task.candidateSha === e.candidateSha, 'Queue candidate differs from result: ' + e.id);
+  insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
+  const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
+  if (savedBinding) {
+    insist(GIT_SHA.test(e.queuedBaseSha ?? '') && GIT_SHA.test(e.queuedCandidateSha ?? '') && GIT_SHA.test(e.baseSha ?? ''), 'Incomplete reviewed queued/result binding: ' + e.id);
+    insist(task.baseSha === e.queuedBaseSha && task.candidateSha === e.queuedCandidateSha && result.baseSha === e.baseSha, 'Reviewed queued/result preimage changed: ' + e.id);
+  } else {
+    insist(result.baseSha === task.baseSha, 'Result base mismatch: ' + e.id);
+    insist(task.candidateSha == null || task.candidateSha === e.candidateSha, 'Queue candidate differs from result: ' + e.id);
+  }
   if (e.worktreePath) insist(equalPath(task.worktreePath, e.worktreePath), 'Expected worktree changed');
-  if (e.baseSha) insist(task.baseSha === e.baseSha, 'Expected base changed');
+  if (e.baseSha && !savedBinding) insist(task.baseSha === e.baseSha, 'Expected base changed');
   return true;
 }
 export function revisedTask(task, update, commit, at) {
   const saved = structuredClone(task);
-  const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: update.expected.candidateSha, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
-  Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
+  const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: update.expected.candidateSha, previousQueuedCandidateSha: task.candidateSha, previousQueuedBaseSha: task.baseSha, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
+  Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, baseSha: update.expected.baseSha ?? task.baseSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
   return saved;
 }
 
@@ -197,6 +204,13 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     noLinks(task.worktreePath);
     insist(git(['rev-parse', 'HEAD'], task.worktreePath) === update.expected.candidateSha, 'Worktree HEAD differs from preserved candidate: ' + task.id);
     insist(!git(['status', '--porcelain=v1', '--untracked-files=no'], task.worktreePath), 'Candidate has tracked uncommitted changes: ' + task.id);
+    if (update.expected.queuedBaseSha !== undefined) {
+      const remoteMain = git(['ls-remote', '--heads', 'origin', 'refs/heads/main']).split(/\s+/)[0];
+      insist(GIT_SHA.test(remoteMain), 'Published main binding missing');
+      git(['merge-base', '--is-ancestor', update.expected.queuedBaseSha, result.baseSha], task.worktreePath);
+      git(['merge-base', '--is-ancestor', result.baseSha, remoteMain], task.worktreePath);
+      git(['merge-base', '--is-ancestor', result.baseSha, result.candidateSha], task.worktreePath);
+    }
     const owners = task.lastWorkerReap.owners, alive = inventory(owners.map(p => p.pid));
     for (const saved of owners) insist(!alive.some(p => p.pid === saved.pid && utcTicks(p.createdAt) === utcTicks(saved.createdAt)), 'An owned worker process remains alive: ' + task.id);
     return { file, raw, task, resultSha256: sha256(resultBytes), candidateSha: result.candidateSha };
