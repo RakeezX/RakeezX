@@ -4,18 +4,20 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {withNativeRestore} from './n71-live/native-fixture.mjs';
-import {ownerCheckpoint,payload,restore,suppressionSequence} from './n71-live/runner.mjs';
+import {ownerCheckpoint,ordinarySyncCheckpoint,payload,restore,suppressionSequence} from './n71-live/runner.mjs';
 import {fixtureIds,portableFixture} from './n71-live/fixture.mjs';
 import {createCloud} from './helpers/remote-sync-browser.mjs';
 import {AUTH_STORAGE_KEY,SUPABASE_URL} from '../src/lib/cloud.js';
 import {SYNC_V2_SCHEMAS} from '../src/lib/sync-v2.js';
 import {buildAccountFoundationDefaults} from '../src/lib/account-provisioning.js';
 const run=process.env.N71_RUN_ID;
+const evidenceRoot=`coverage/n71-live/${run}${process.env.N71_EVIDENCE_SUBDIR?'/'+process.env.N71_EVIDENCE_SUBDIR:''}`;
 const existing=await fs.readFile(new URL('./initial-restore.e2e.mjs',import.meta.url),'utf8');
 const auth=existing.slice(existing.indexOf('async function installAuth('),existing.indexOf('async function installRestoreCloud('));
 const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
 test('complete valid deletion graph reaches canonical reconcile and ordinary A2 equality',async({browser,page})=>{
  test.setTimeout(150000);
+ await fs.mkdir(evidenceRoot,{recursive:true});
  const files=['src/lib/backup-v2.js','src/lib/cloud.js','src/lib/initial-restore.js','src/lib/sync.js','src/lib/sync-v2.js','src/lib/restore-deletion-scope.js','src/store.js','src/lib/export.js','src/lib/score-foundation.js','tests/n71-live/fixture.mjs','tests/n71-live/runner.mjs','tests/n71-live/native-fixture.mjs','tests/n71-valid-deletion.e2e.mjs'];
  const sourceHashes=Object.fromEntries(await Promise.all(files.map(async file=>[file,createHash('sha256').update((await fs.readFile(file,'utf8')).replaceAll('\r\n','\n')).digest('hex')])));
  await withNativeRestore(async(pg,owner)=>{
@@ -32,7 +34,7 @@ test('complete valid deletion graph reaches canonical reconcile and ordinary A2 
   await pg.query('select rakeezx.provision_account_workspace($1)',[JSON.stringify(foundation)]);
   const session={access_token:'initial-restore-access',refresh_token:'initial-restore-refresh',expires_at:4102444800,user:{id:owner,email:'restore@example.test'}};
   const installAuth=await new AsyncFunction('AUTH_STORAGE_KEY','SUPABASE_URL','session',auth+'\nreturn installAuth;')(AUTH_STORAGE_KEY,SUPABASE_URL,session);
-  const calls=[];
+  const calls=[];let syncGate;
   const setup=async target=>{
    await target.route('https://**',route=>route.abort());
    await target.routeWebSocket('wss://*.supabase.co/**',socket=>socket.close());
@@ -46,6 +48,7 @@ test('complete valid deletion graph reaches canonical reconcile and ordinary A2 
      }else{
       assert.ok(Object.values(SYNC_V2_SCHEMAS).some(s=>s.entity===name),'Unexpected table '+name);
       assert.equal(request.method(),'GET');
+      if(syncGate?.page===target&&name==='students'){const gate=syncGate;syncGate=null;gate.started();await gate.wait;}
       // Match PostgREST's SQL JSON encoding (date strings and numeric bigint),
       // rather than node-pg's Date/int8 driver representation.
       const all=(await pg.query(`select to_jsonb(t) result from rakeezx."${name}" t where owner_id=$1 order by ${name==='profile'?'owner_id':'id'}`,[owner])).rows.map(r=>r.result);
@@ -90,7 +93,24 @@ test('complete valid deletion graph reaches canonical reconcile and ordinary A2 
    assert.equal(denial,'RESTORE_CANONICAL_DELETED_DESCENDANT');
    assert.equal(await page.evaluate(async id=>(await(await import('/src/lib/db.js')).get('assignments',id)).deleted,ids.deletedAssignment),false);
    await pg.query('rollback to savepoint invalid_graph;commit');
-   const final=await suppressionSequence(page,second,{productIds:ids,foundation:{A:foundation},liveDeadline:new Date(Date.now()+90000).toISOString()},exported);
+   const sequenceState={ownerId:owner,productIds:ids,foundation:{A:foundation},liveDeadline:new Date(Date.now()+90000).toISOString()};
+   const final=await suppressionSequence(page,second,sequenceState,exported,{beforeA2Pull:async()=>{
+    let started,release;const pending=new Promise(r=>{started=r;}),wait=new Promise(r=>{release=r;});
+    syncGate={page:second,started,wait};
+    await second.evaluate(async()=>{window.__n71RealPull=(await import('/src/lib/sync.js')).syncAll({full:true});});
+    await Promise.race([pending,new Promise((_,reject)=>setTimeout(()=>reject(Error('Actual background Sync did not reach the held student read')),10000))]);
+    setTimeout(release,500);
+   }});
+   assert.equal(sequenceState.a2ConvergenceCheckpoint.directResult,false,'Reproduce the actual busy Sync false return');
+   assert.ok(sequenceState.a2ConvergenceCheckpoint.checkpoint.lastSyncedAt>sequenceState.a2ConvergenceCheckpoint.before);
+   await assert.rejects(ordinarySyncCheckpoint(second,'99999999-9999-4999-8999-999999999999',{studentId:ids.student,timeout:300}),/owner checkpoint mismatch/);
+   const savedDevice=await second.evaluate(async()=>await(await import('/src/lib/db.js')).get('device','device'));
+   await second.evaluate(async device=>{delete device.initialRestoreReceipt;await(await import('/src/lib/db.js')).put('device',device);},structuredClone(savedDevice));
+   await assert.rejects(ordinarySyncCheckpoint(second,owner,{studentId:ids.student,timeout:300}),/owner-bound Initial Restore receipt/);
+   await second.evaluate(async device=>await(await import('/src/lib/db.js')).put('device',device),savedDevice);
+   await second.evaluate(async()=>await(await import('/src/lib/db.js')).put('outbox',{id:'n71:busy:rejected',protocol:'v2',store:'students',state:'rejected',sequence:1}));
+   await assert.rejects(ordinarySyncCheckpoint(second,owner,{studentId:ids.student,timeout:300}),/unresolved local work/);
+   await second.evaluate(async()=>await(await import('/src/lib/db.js')).remove('outbox','n71:busy:rejected'));
    const a=await payload(page),a2=await payload(second);
    assert.equal(await page.evaluate(async p=>(await(await import('/src/lib/export.js')).validateBackupIntegrity(p)).ok,a),true);
    const a2Validation=await second.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),a2);
@@ -98,8 +118,8 @@ test('complete valid deletion graph reaches canonical reconcile and ordinary A2 
    assert.deepEqual(a2.data,a.data);assert.deepEqual(a2.baselines,a.baselines);
    assert.equal(final.scoreSubitems.find(r=>r.id===ids.subitem).createdAt,fixture.scoreSubitems[0].createdAt);
    await page.goto('/#/settings/backup');await expect(page.locator('[data-act="export"]')).toBeVisible();
-   await page.screenshot({path:`coverage/n71-live/${run}/valid-deletion-ui.png`,fullPage:true});
-   await fs.writeFile(`coverage/n71-live/${run}/valid-deletion-preflight.json`,JSON.stringify({runId:run,status:'PASS',actualApp:true,nativeSql:true,sharedLiveSequence:true,sourceHashes,invalidGraphDenial:denial,calls,counts:Object.fromEntries(Object.entries(final).map(([s,r])=>[s,r.length])),createdAt:fixture.scoreSubitems[0].createdAt,grades:final.scores,observedAt:new Date().toISOString()},null,2));
+   await page.screenshot({path:evidenceRoot+'/valid-deletion-ui.png',fullPage:true});
+   await fs.writeFile(evidenceRoot+'/valid-deletion-preflight.json',JSON.stringify({runId:run,status:'PASS',actualApp:true,nativeSql:true,sharedLiveSequence:true,sourceHashes,busySyncCheckpoint:sequenceState.a2ConvergenceCheckpoint,invalidGraphDenial:denial,calls,counts:Object.fromEntries(Object.entries(final).map(([s,r])=>[s,r.length])),createdAt:fixture.scoreSubitems[0].createdAt,grades:final.scores,observedAt:new Date().toISOString()},null,2));
   }finally{await secondContext.close();}
  });
 });
