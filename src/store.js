@@ -2572,10 +2572,12 @@ export async function createTeaching({ sectionId: secId, subjectId: subId, termI
   if (!getSubject(subject)) throw new Error('اختر مادة صالحة للفصل.');
   const key = JSON.stringify([activeWorkspace?.databaseName, secId, subject, term]);
   if (pendingTeachingCreations.has(key)) return pendingTeachingCreations.get(key);
-  const existing = state.teachings.find((row) => row.sectionId === secId && row.subjectId === subject && row.termId === term);
-  if (existing?.deleted) throw new Error('لا يمكن إعادة إنشاء مادة محذوفة للفصل نفسه.');
+  const existing = live(state.teachings).find((row) => row.sectionId === secId && row.subjectId === subject && row.termId === term);
   if (existing) return existing;
   const tch = makeTeaching({
+    // A deliberate create is a new generation, never the retired natural ID.
+    // Pending/local retries reuse this row; the server converges active duplicates.
+    id: `tch:${uid()}`,
     sectionId: secId, subjectId: subject, termId: term,
     order: teachings(term).length,
   });
