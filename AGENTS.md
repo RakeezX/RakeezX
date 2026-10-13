@@ -19,3 +19,6 @@ Product status: `docs/PRODUCT_LEDGER.md` and `docs/PRODUCT_LEDGER_CLOSED.md`. Ru
 
 ## Approved Product date controls — PO reaffirmed 2026-10-13
 For every new or edited date/time input, reuse src/lib/rakeez-datetime.js and rakeez-datetime-values.js with the existing data-rakeez-datetime and appropriate data-rakeez-date-scope attributes. Preserve the central planning/historical/session bounds, optional values, stored ISO semantics and 0–9 digits. Do not introduce a competing picker or native-only field where the approved adapter applies. Read the existing implementation instead of hardcoding a new date policy.
+
+## Isolated local browser checks
+Local-only synthetic UI checks may use the canonical `isolated-local-browser.mjs` helper without reserving the shared live-browser lease: fresh owned contexts, loopback-only, no credentials/personal profiles/Service Workers and bounded cleanup. Live account/Sync/Service Worker/remote checks retain the existing shared phase lease and exact authority. Read `worker-policy.txt` for the narrow eligibility. Do not confuse a successful isolation proof with Product acceptance.

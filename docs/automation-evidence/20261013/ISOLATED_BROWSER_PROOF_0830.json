@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-13T05:43:06.134Z",
+  "kind": "synthetic_browser_engine_isolation_not_Product_acceptance",
+  "personalProfilesUsed": false,
+  "externalNetworkRequests": 0,
+  "pass": 2,
+  "fail": 0,
+  "contexts": 3,
+  "parallelChecks": 2,
+  "status": "PASS",
+  "ownedResourcesClosed": true,
+  "elapsedMs": 590,
+  "policyValidation": "three focused cases verify loopback-only identity and rejection of live/private work",
+  "scope": "Operational helper; no Product release/real account test. Global lease is retained for live flows.",
+  "defaultUserProfileReused": false
+}
