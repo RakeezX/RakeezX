@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "status": "REVIEWED_NATIVE_CHECK_PASSED_BEFORE_OFFLINE_INSTALL",
+  "taskId": "offline-controller-queue-recovery-20261013",
+  "activationId": "po-20261012-continuous",
+  "mainBefore": "74aaa6ab16f2286350e2c954a478b4c9c751d01f",
+  "files": [
+    {
+      "path": "scripts/ops-supervisor-v4/controller.mjs",
+      "before": "0ccfc6458e84857e707ff3e35300ced17a954a3448aa9ffe7fd9c1dee40ef34f",
+      "after": "208399d7fa77a6c9da9a2d5c7b2f82f3b846d5ced54bde7a0f729b0a6f92491e"
+    },
+    {
+      "path": "tests/ops-controller-atomic-write.test.mjs",
+      "before": null,
+      "after": "41e982e9079087a8e69884a4cad5e96defa6de00828682c81bfc7441f2a4f895"
+    },
+    {
+      "path": "tests/ops-controller-base-recovery.test.mjs",
+      "before": null,
+      "after": "6d5bde2513af1e04f66459b9069322ef6df4489bfad02f72bc00f7be94a3ffa3"
+    }
+  ],
+  "nativeCheck": {
+    "status": "PASS",
+    "platform": "win32",
+    "exitCode": 0,
+    "tests": 16,
+    "pass": 16,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "startedAt": "2026-10-13T01:11:58.865Z",
+    "completedAt": "2026-10-13T01:12:14.889Z",
+    "testPaths": [
+      "tests/ops-controller-atomic-write.test.mjs",
+      "tests/ops-controller-base-recovery.test.mjs"
+    ],
+    "fileSha256": {
+      "scripts/ops-supervisor-v4/controller.mjs": "208399d7fa77a6c9da9a2d5c7b2f82f3b846d5ced54bde7a0f729b0a6f92491e",
+      "tests/ops-controller-atomic-write.test.mjs": "41e982e9079087a8e69884a4cad5e96defa6de00828682c81bfc7441f2a4f895",
+      "tests/ops-controller-base-recovery.test.mjs": "6d5bde2513af1e04f66459b9069322ef6df4489bfad02f72bc00f7be94a3ffa3"
+    },
+    "receiptPath": "native-focused-tests.txt",
+    "receiptSha256": "566c6781b6b1c52fa47bd90e7302ad08305e7869c647615692480d1393780af5",
+    "sourceUnchanged": true,
+    "error": null
+  },
+  "observedDeadController": {
+    "pid": 5220,
+    "instanceId": "09cf3c98-c598-485d-861f-c816fcbc7bc1",
+    "createdAt": "2026-10-13T01:10:03.3908160Z",
+    "startedAt": "2026-10-13T01:10:04.643Z",
+    "runtime": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4",
+    "script": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\controller.mjs"
+  },
+  "observedRenameFailure": {
+    "at": "2026-10-13T01:10:06.118Z",
+    "instanceId": "09cf3c98-c598-485d-861f-c816fcbc7bc1",
+    "type": "tick_failed",
+    "message": "EPERM: operation not permitted, rename 'C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\continuous-n13-existing-section-subject-20261012.json.5220.8f29b6bd-49ad-4eb3-a827-832299f9444b.tmp' -> 'C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\queue\\continuous-n13-existing-section-subject-20261012.json'"
+  },
+  "schedulerAction": {
+    "execute": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "arguments": "-NoLogo -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -WindowStyle Hidden -File \"C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\start-ops.ps1\" -RepoRoot \"C:\\Users\\Abody\\Projects\\RakeezX\" -RuntimeRoot \"C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\" -NodePath \"C:\\Program Files\\nodejs\\node.exe\"",
+    "workingDirectory": "C:\\Users\\Abody\\Projects\\RakeezX"
+  },
+  "schedulerDefinitionSha256": "38493e9390f98257aff7db18788ca3392b8dc4c6af8b0fddff15c00fa7c1f16c",
+  "preservedCompletedCandidates": [
+    {
+      "id": "continuous-n77-real-delete-20261012",
+      "sessionId": "01a131e8-c45a-7b81-b19e-6e3809bcfcdf",
+      "runId": "6b53e77c-7893-4f59-abba-4a6d0197b2ba",
+      "resultSha256": "037d478f7e8a9ced3327508ca7c556995a0bca9fac1d2b82a4d32be008b73b07",
+      "status": "retry_wait",
+      "exactWorkerAbsenceReverified": true,
+      "ownersChecked": 12,
+      "recordedAbsentAt": "2026-10-13T00:50:05.523Z"
+    },
+    {
+      "id": "continuous-n94-subitem-late-scoring-20261012",
+      "sessionId": "01a12fe2-49fc-7f51-a6f1-2e3b92fe66cd",
+      "runId": "5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf",
+      "resultSha256": "3e2d56867e9b84cdb4c2f18582026925705c1592865701feba52cc1db2629ea1",
+      "status": "retry_wait",
+      "exactWorkerAbsenceReverified": true,
+      "ownersChecked": 8,
+      "recordedAbsentAt": "2026-10-13T00:23:21.523Z"
+    }
+  ],
+  "reviewedInstallManifestSha256": "94e2df742c46b26ca8b28f233dd52fc35d9e4da94e7041e9058faa5b1d124c45",
+  "observedCauses": {
+    "repeatedDeadController": {
+      "from": "2026-10-13T00:30:38.318Z",
+      "through": "2026-10-13T01:10:06.118Z",
+      "cause": "EPERM while replacing the N13 queue JSON; scheduler repeatedly starts a controller that exits at this write"
+    },
+    "fileHolder": {
+      "evidence": "Windows Restart Manager queried the exact N13 queue path and returned only this child; exact Get-Process birth matched",
+      "name": "node.exe",
+      "pid": 26596,
+      "createdAt": "2026-10-10T22:22:27.5160605Z",
+      "parentPid": 1088,
+      "parentCreatedAt": "2026-10-10T22:21:33.6449042Z",
+      "provider": "Desktop Commander",
+      "installedVersion": "0.2.52",
+      "partialReadLeakMechanismProven": false,
+      "childOnlyRestartAtThisEvidencePoint": "NOT_PERFORMED"
+    },
+    "completedCandidateRejection": "Saved LOCAL_READY N77 and N94 reported a later merged published-main base than the old queue base; complete candidate and evidence bytes are preserved"
+  },
+  "repairScope": [
+    "Finite retry of the same atomic rename",
+    "Private temp cleanup preserves the original error",
+    "A failed awaiting_po closure records QUEUE_WRITE_FAILED and leaves memory/disk unchanged while tick continues",
+    "A reported candidate base may advance only with exact identity, clean HEAD, current published-main ancestry, allowed diff and passing saved evidence",
+    "Recover exact saved base-mismatch LOCAL_READY results through the ordinary reconciliation and delivery path after re-verifying worker absence"
+  ],
+  "finalRuntimeReceipt": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/offline-controller-queue-recovery-20261013-receipt.json",
+  "deploymentOrInstallSuccessNotClaimedByThisPreinstallEvidence": true
+}
