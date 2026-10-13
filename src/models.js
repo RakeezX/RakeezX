@@ -929,14 +929,25 @@ const collator = new Intl.Collator('ar', { numeric: true, sensitivity: 'base' })
 
 export const compareArabic = (a, b) => collator.compare(a ?? '', b ?? '');
 
-/** ترتيب الطلاب: برقم الكشف إن وُجد، وإلا أبجديًا. */
+/** Default Arabic order; identity resolves equal names independently of input order. */
 export function sortStudents(students) {
   return [...students].sort((a, b) => {
-    const ar = a.rollNo ?? Infinity;
-    const br = b.rollNo ?? Infinity;
-    if (ar !== br) return ar - br;
-    return collator.compare(a.name, b.name);
+    const byName = compareArabic(a.name, b.name);
+    if (byName) return byName;
+    const left = String(a.id ?? a.enrollmentId ?? '');
+    const right = String(b.id ?? b.enrollmentId ?? '');
+    return left < right ? -1 : left > right ? 1 : 0;
   });
+}
+
+/** Read-only numbering from the complete active roster, before view filters/sorts.
+ * Historical members outside that roster retain their saved number.
+ */
+export function displayRoster(students, activeRoster = students) {
+  const numbers = new Map(sortStudents(activeRoster).map((student, index) => [student.id, index + 1]));
+  return sortStudents(students).map((student) => ({
+    ...student, displayNo: numbers.get(student.id) ?? student.rollNo ?? null,
+  }));
 }
 
 export const sortByOrder = (arr) =>
