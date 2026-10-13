@@ -1,0 +1,26 @@
+import {test,expect} from '@playwright/test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {bootSettings} from './helpers/settings-0397.mjs';
+import {backupUiCheckpoint} from './n71-live/runner.mjs';
+test('N71 final UI checkpoint waits for actual account document and backup controls',async({page})=>{
+  const {errors}=await bootSettings(page);
+  await backupUiCheckpoint(page,'/#/settings/backup');
+  let release;const gate=new Promise(resolve=>{release=resolve;});
+  let held=false;const hold=async route=>{held=true;await gate;await route.fallback();};
+  await page.route('**/src/app.js',hold);
+  await page.reload({waitUntil:'commit'});
+  await expect.poll(()=>held).toBe(true);
+  const premature=await page.locator('[data-act="export"]').count();assert.equal(premature,0);
+  let completed=false;const pending=backupUiCheckpoint(page).then(()=>{completed=true;});
+  await new Promise(resolve=>setTimeout(resolve,150));assert.equal(completed,false);
+  release();await page.unroute('**/src/app.js',hold);await pending;
+  await expect(page.locator('[data-act="export"]')).toHaveText('إنشاء نسخة احتياطية');
+  await expect(page.locator('[data-act="pick-cloud-file"]')).toHaveText('استعادة نسخة احتياطية');
+  const ownership=await page.evaluate(async()=>{const s=await import('/src/store.js'),c=await import('/src/lib/cloud.js');return {ready:s.state.ready,workspace:s.getActiveWorkspace(),owner:c.user?.id};});
+  assert.equal(ownership.ready,true);assert.equal(ownership.workspace.type,'account');assert.equal(ownership.workspace.ownershipState,'claimed');assert.equal(ownership.workspace.authUserId,ownership.owner);
+  const root='coverage/n71-live/'+process.env.N71_RUN_ID;await fs.mkdir(root,{recursive:true});
+  await page.screenshot({path:root+'/navigation-ui.png',fullPage:true});
+  await fs.writeFile(root+'/navigation-checkpoint.json',JSON.stringify({runId:process.env.N71_RUN_ID,status:'PASS',actualApp:true,priorImmediateCount:premature,waitedForVisibleControls:true,ownership,errors,observedAt:new Date().toISOString()},null,2));
+  expect(errors).toEqual([]);
+});

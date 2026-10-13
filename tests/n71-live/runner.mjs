@@ -283,6 +283,16 @@ export async function suppressionSequence(page,secondPage,state,exported,{before
     assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
     return final;
 }
+export async function backupUiCheckpoint(page,target){
+  if(target)await page.goto(target);
+  // Navigation completion precedes asynchronous account boot and view rendering.
+  for(const action of ['export','pick-cloud-file']){
+    const control=page.locator(`[data-act="${action}"]`);
+    await control.waitFor({state:'visible',timeout:120000});
+    assert.equal(await control.count(),1);
+  }
+  assert.equal(await page.locator('[data-act="pick-file"],[data-act="bootstrap-curriculum"],[data-act="claim-legacy-workspace"],[data-pick]').count(),0);
+}
 async function run(){
   const state=await load();assert.equal(await git('rev-parse','HEAD'),state.candidateSha);
   assert.equal(state.phase,'PREDEPLOY_REQUIRED','Use same-state recovery rather than re-running fixture setup');
@@ -359,7 +369,7 @@ async function run(){
     check(state,'convergence_no_resurrection','Fresh A2 Initial Restore and ordinary Sync converge across every portable domain; tombstone, immutable closed-term scope, score provenance and current calendar identities retained');
     state.retainedClosure={ownerId:state.accounts[0].id,counts:Object.fromEntries(Object.entries(final).map(([name,rows])=>[name,rows.length])),canonicalSha256:hash(canonical(final)),verifiedAt:new Date().toISOString()};
     await fs.writeFile(path.join(evidenceRoot,'retained-closure.json'),JSON.stringify(state.retainedClosure,null,2));
-    await a.page.goto(state.preview+'/#/settings/backup');assert.equal(await a.page.locator('[data-act="export"]').count(),1);assert.equal(await a.page.locator('[data-act="pick-cloud-file"]').count(),1);
+    await backupUiCheckpoint(a.page,state.preview+'/#/settings/backup');
     await a.page.screenshot({path:path.join(evidenceRoot,'live-ui.png'),fullPage:true});
     state.phase='LIVE_VERIFIED';await save(state);
   }catch(error){primaryError=error;state.error=publicError(error);
