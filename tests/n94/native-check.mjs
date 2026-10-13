@@ -198,6 +198,7 @@ try {
     const realNow = Date.now; let syntheticNow = realNow(); Date.now = () => syntheticNow;
     try {
       for (const [expected, points] of [['late',2],['regular',6],['unrecorded',null]]) {
+        await new Promise((done) => setTimeout(done, 360));
         syntheticNow += 400;
         const [a,b] = await Promise.all([store.cycleScoreSubitemCompletion('student','sub',{ localDate:'2030-01-03' }),store.cycleScoreSubitemCompletion('student','sub',{ localDate:'2030-01-03' })]);
         assert.equal(a.completion.id,b.completion.id); assert.equal(subitemCompletionState(a.completion),expected);
@@ -208,6 +209,7 @@ try {
         assert.equal(subitemCompletionState(store.state.scoreSubitemCompletions.find((row)=>row.subitemId==='sub')),expected);
       }
       syntheticNow += 400;
+      await new Promise((done) => setTimeout(done, 360));
       await store.cycleScoreSubitemCompletion('student','sub',{ localDate:'2030-01-02' });
       assert.equal(subitemCompletionState(store.state.scoreSubitemCompletions.find((row)=>row.subitemId==='sub')),'regular');
       await engine.dispatchPending();
@@ -218,6 +220,17 @@ try {
       await store.refreshSyncedState();
       assert.equal(subitemCompletionState(store.state.scoreSubitemCompletions.find((row)=>row.subitemId==='sub')),'regular');
       assert.equal(nextSubitemCompletionState({value:6},null,'2099-01-01'),'regular');
+      await config('no-due',7,[{id:'sub',name:'Homework',value:6,startDate:null,dueDate:null,latePoints:null}]);
+      assert.deepEqual((await engine.pullAll({stores:['scores'],scoreDomainSnapshot:true})).failures,[]);
+      await store.refreshSyncedState();
+      for(const expected of ['unrecorded','regular']) {
+        await new Promise((done)=>setTimeout(done,360));
+        const result=await store.cycleScoreSubitemCompletion('student','sub',{localDate:'2099-01-01'});
+        assert.equal(subitemCompletionState(result.completion),expected);
+        assert.equal(result.derivedValue,expected==='regular'?6:0);
+        assert.equal((await engine.dispatchPending()).acknowledged,1);
+        await store.refreshSyncedState();
+      }
       await store.setScoreSubitemCompletion('student','sub','unrecorded');
       const priorOutbox = await db.getAll('outbox');
       const priorCompletions = await db.getAll('scoreSubitemCompletions');

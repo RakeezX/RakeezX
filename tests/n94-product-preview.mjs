@@ -74,7 +74,7 @@ try {
   const equalButton = () => page.locator(`[data-act="subitem-completion"][data-student="${fixture.studentId}"][data-subitem="${fixture.definitions[1].id}"]`);
   await button().waitFor();
   let clock = Date.parse('2026-10-13T06:00:00Z');
-  const advance = async () => { clock += 500;await page.clock.setFixedTime(clock); };
+  const advance = async () => { clock += 500;await page.clock.setFixedTime(clock);await page.waitForTimeout(400); };
   const state = async () => page.evaluate(async (fixture) => {
     const store=await import('/src/store.js');const db=await import('/src/lib/db.js');
     const rows=(await db.getAll('scoreSubitemCompletions')).filter(row=>row.studentId===fixture.studentId&&row.subitemId===fixture.definitions[0].id);

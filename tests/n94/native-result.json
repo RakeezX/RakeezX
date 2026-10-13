@@ -34,12 +34,12 @@
     "sha256": "a08ead00360b9cfa4144467751dfa0c4fb620d47e6f303f0b9ca9a1392fdc595"
   },
   "native": {
-    "port": 58309,
+    "port": 57001,
     "version": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit"
   },
   "cleanup": {
     "serverStopped": true,
-    "clusterRetained": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n94-subitem-late-scoring-20261012\\test-results\\n94\\5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf\\owned-cluster-gxS7UE",
+    "clusterRetained": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n94-subitem-late-scoring-20261012\\test-results\\n94\\5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf\\owned-cluster-xNjtyk",
     "reason": "Prior recursive removal was rejected: blocked by policy. No alternate deletion surface used; stopped synthetic data remains in ignored test-results."
   },
   "functions": [

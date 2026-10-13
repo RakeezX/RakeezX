@@ -3601,7 +3601,7 @@ export async function cycleScoreSubitemCompletion(studentId, subitemId, { localD
   const workspace = activeWorkspace?.id;
   const key = `${workspace}:${studentId}:${subitemId}`;
   const priorTap = subitemTaps.get(key);
-  const clickStamp = Date.now();
+  const clickStamp = performance.now();
   if (priorTap && (priorTap.pending || clickStamp - priorTap.stamp < 350)) return priorTap.promise;
   const tap = { pending: true, stamp: clickStamp };
   tap.promise = (async () => {
