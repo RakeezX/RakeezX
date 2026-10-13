@@ -72,7 +72,7 @@ cloud.subscribe(() => {
 window.addEventListener('storage', event => {
   if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) marketing.stop();
 });
-window.addEventListener('pagehide', () => marketing.stop());
+window.addEventListener('pagehide', () => marketing.stop({ preserveCampaign: true }));
 window.addEventListener('offline', () => marketing.stop());
 let initialRestoreAbortController = null;
 let recoveryCycle = startRecoveryCycle(Date.now());
@@ -1161,6 +1161,7 @@ function mountEmailOtpController(root, done, { reloadOnSuccess = false, inline =
 }
 
 function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
+  marketing.stop();
   teacherMiniHubAuthPending = 'login';
   refreshTeacherMiniHubSheet();
   let cleanupLoginSheet = () => {};
@@ -1215,6 +1216,7 @@ function openMiniHubLoginSheet({ reloadOnSuccess = false } = {}) {
 
 function mountWorkspaceGate(routing) {
   const signedOut = routing.authState === 'signed_out' || !cloud.session || !cloud.user;
+  if (routing.authState === 'signed_out') marketing.capturePublicEntry();
   render(app, html`
     <div class="page ${signedOut ? 'n37-landing-gate' : ''}" data-workspace-gate data-workspace-code="${WORKSPACE_NOT_READY}" data-workspace-reason="${routing.reason}">
       ${signedOut ? html`
