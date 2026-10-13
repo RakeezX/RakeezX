@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n71-unified-restore-20261012",
+      "productId": "N71",
+      "scopeKey": "n71-portable-cloud-first-all-domains",
+      "activationId": "po-20261012-continuous",
+      "priority": -10,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "requiredChecks": [
+        "n71_fresh_candidate_preview",
+        "n71_portable_domain_coverage",
+        "n71_server_restore_binding",
+        "n71_live_restore_owner_resume",
+        "n71_live_convergence_no_resurrection",
+        "n71_fixture_disposition",
+        "n71_actual_app_document_checkpoint",
+        "n71_valid_deletion_graph_full_preflight"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N71",
+        "liveAuthorizationRef": "PO-20261012-continuous/N71-D099",
+        "authoritySource": "Latest direct PO request after the12:10 status explicitly prioritizes completing N71 and resolving its final verification blocker rather than parking the same work again. The existing N71 D099 bounded synthetic service/release authority is applied to ONE final post-correction phase, not an unbounded pool: candidate90fa74d now deletes the purpose-created submission before its assignment, fixing the actual RESTORE_CANONICAL_DELETED_DESCENDANT failure. The last actual authenticated owner/isolation/lost-ack/resume and native creation-history readback already PASS and remain preserved. The material remaining gate is complete ordinary A2 convergence and anti-resurrection with a VALID child-first deletion graph. All previous accounts/functions/manifests remain retired and immutable; no N58 denied query/action, user account or real student mutation is authorized.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n71-preview/continuous-n71-unified-restore-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n71-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N71 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n71-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "One new purpose-created synthetic A/B pair ONLY for n71-valid-deletion-closure-final-20261013-1210 after the full materially corrected local scenario passes. No user-owned account or real student data; no N58 fixture/action. Old phases/accounts/functions remain immutable and excluded.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes. The fresh phase also excludes all exact IDs and names in correctedVerificationPhase.retiredPair; use official admin APIs and existing reviewed primitives only.",
+          "migration": {
+            "operation": "verify_existing_only",
+            "maxNewMigrations": 0,
+            "scope": "N71 unified restore20261012140116 and creation-history correction20261013075936 are already applied and have source/ACL/native proof. Verify exact existing binding only where reconciliation affects it; NEVER replay either migration or modify its historical file. No new migration, schema, RLS, Auth-policy or existing-user backfill in this phase."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair. This rule is scoped to the one fresh pair of correctedVerificationPhase; its explicit authorization above is not a request to revive the retired pair. Preserve previous disposition proofs unchanged.",
+          "correctedVerificationPhase": {
+            "version": 1,
+            "phase": "n71-valid-deletion-closure-final-20261013-1210",
+            "authoritySource": "Latest direct PO request after the12:10 status explicitly prioritizes completing N71 and resolving its final verification blocker rather than parking the same work again. The existing N71 D099 bounded synthetic service/release authority is applied to ONE final post-correction phase, not an unbounded pool: candidate90fa74d now deletes the purpose-created submission before its assignment, fixing the actual RESTORE_CANONICAL_DELETED_DESCENDANT failure. The last actual authenticated owner/isolation/lost-ack/resume and native creation-history readback already PASS and remain preserved. The material remaining gate is complete ordinary A2 convergence and anti-resurrection with a VALID child-first deletion graph. All previous accounts/functions/manifests remain retired and immutable; no N58 denied query/action, user account or real student mutation is authorized.",
+            "priorCandidateSha": "90fa74dcdd75399c61d0d38794a95967cf1fa186",
+            "maxNewPairs": 1,
+            "accountsPerPair": 2,
+            "runIdBinding": "One immutable phase manifest bound to the first new controller attempt after activation. A restart/retry cannot renew maxNewPairs. Preserve the saved pair/state for bounded continuation until final disposal; never create a second pair in this phase.",
+            "retiredPair": {
+              "runId": "eac6bb16-dfe9-4d72-bafe-866e21ebe767",
+              "accountIds": [
+                "d819a214-74ea-462a-8992-0ac9b96975aa",
+                "91841ae1-3035-4c92-9875-845b2d0a7070"
+              ],
+              "functionNames": [
+                "ops-n71-fixture-eac6bb16dfe94d72bafe",
+                "ops-n71-retire-eac6bb16dfe94d72bafe"
+              ],
+              "proof": "coverage/n71-live/eac6bb16-dfe9-4d72-bafe-866e21ebe767; read sanitized exact retired identities/disposition before provisioning and include them in the new manifest exclusion"
+            },
+            "alsoExcludePriorPhases": true,
+            "startCondition": "Full actual-code local/native suppression→canonical reconcile→A2 equality preflight with child-first VALID deletion graph and unchanged anti-resurrection rules. Verify the corrected branch truly reaches the former failure boundary and negative invalid-parent-only fixture still fails. Exact candidate+Preview and protected cleanup ready before first Auth create. Prior unrelated PASS checks reused, not repeated blindly.",
+            "failureDisposition": "Preserve precise cause/stage and source. Deterministic exact-pair global sign-out/ban/password+refresh denial, retained closure, same-run functions deny-all/410. No previously retired reactivation, credential reuse, replacement pair, authentic user restore or permission/security-policy changes."
+          },
+          "previousVerificationPhases": [
+            {
+              "version": 1,
+              "phase": "n71-corrected-live-proof-20261012",
+              "priorCandidateSha": "aa333cd9be7a5735608b3e07added378d9d52066",
+              "maxNewPairs": 1,
+              "accountsPerPair": 2,
+              "runIdBinding": "Use the next controller-created attempt runId; exact saved Codex session/worktree continue. The fixture phase gets a new private manifest and its own run-bound names.",
+              "retiredPair": {
+                "runId": "fc77ae70-4cfa-4d2e-98ba-89232fe3c4f4",
+                "accountIds": [
+                  "abe77dab-0cc0-4de6-bc26-e98b12b68c58",
+                  "60412ae3-b4e5-4386-bffd-d103c8316ed2"
+                ],
+                "functionNames": [
+                  "ops-n71-fixture-fc77ae704cfa4d2e98ba",
+                  "ops-n71-retire-fc77ae704cfa4d2e98ba"
+                ],
+                "proof": "coverage/n71-current/live-result.json and disposition-source.json"
+              },
+              "startCondition": "Complete the concrete local/service correction, retained evidence checks and deterministic finally/recovery before issuing the new 90-minute capabilities. Provision only after both independently protected functions are deployed and verified.",
+              "failureDisposition": "Record the exact failing stage/HTTP or SQL code and preserve the candidate. Finally retire/disarm this phase. No unban, same-phase replacement pair or missing-PO-permission fiction."
+            },
+            {
+              "version": 1,
+              "phase": "n71-owner-bound-a2-proof-20261013-0830",
+              "authoritySource": "Current PO 2026-10-13 instruction expressly asks to resolve technical blockers and complete existing open work. Within already approved N71 D099 unified restore and prior bounded A/B proof authority, activate ONE distinct post-harness-correction verification phase. The material candidate79c4c28 fixes the actual observed A2 readiness race: require completed ordinary Sync and owner-bound Initial Restore receipt before reading its canonical seeded student; repair expectedStageHash retry binding. This phase does not change Product behavior or grant general Auth administration, real account access, extra subscriptions, applied SQL or N58 operations.",
+              "priorCandidateSha": "79c4c284fdcb9075460fab48a0adebb13a5ad3cd",
+              "maxNewPairs": 1,
+              "accountsPerPair": 2,
+              "runIdBinding": "Bind once to the next controller-created attempt of this task after activation and save in a new phase manifest. All resumption uses that same run and exact two new IDs; next retry does not renew this allowance.",
+              "retiredPair": {
+                "runId": "0af04b9c-5ee5-40ce-9805-15e2fb92511e",
+                "accountIds": [
+                  "51aded91-7ccf-4e04-bfec-c910ce194fde",
+                  "b753880e-e943-4dc4-991b-3ec547f79b69"
+                ],
+                "functionNames": [
+                  "ops-n71-fixture-0af04b9c5ee540ce9805",
+                  "ops-n71-retire-0af04b9c5ee540ce9805"
+                ],
+                "proof": "coverage/n71-live/0af04b9c-5ee5-40ce-9805-15e2fb92511e/disposition-source.json"
+              },
+              "alsoExcludePriorPhases": true,
+              "startCondition": "First certify the corrected delayed-Sync/owner-bound A2 readiness and expectedStageHash path locally on current source, bind exact clean candidate and meaningful Preview, then deploy/probe both independently protected short-lived task functions before first official Auth create.",
+              "failureDisposition": "Save precise stage/HTTP/code. Deterministic finally retires exact identities and disarms functions without hard-delete bypass; preserve all historic failure evidence. No unban/rearm/replacement pair or claim Product success from local-only proof."
+            },
+            {
+              "version": 1,
+              "phase": "n71-stable-document-proof-0920-20261013",
+              "authoritySource": "Direct PO 2026-10-13 09:20 continuation orders correcting observed operating weaknesses and finishing open work. Existing D099 restore/service authority is limited here to one distinct post-document-checkpoint correction verification phase. Concrete candidate2bcc2bd fixes the actual observed read-after-reload race by acquiring owner/database/receipt/data together in one live document checkpoint. Before any new live provisioning, an ACTUAL application synthetic delayed/reload scenario must prove this exact fixed runner checkpoint; the previous four pure assertions alone do not meet this preflight. No old account is reactivated and no N58 denied operation is attempted.",
+              "priorCandidateSha": "2bcc2bde9997319fde3abc2ee1e55bef3b2d6b1d",
+              "maxNewPairs": 1,
+              "accountsPerPair": 2,
+              "runIdBinding": "Bind once to the next controller attempt in a new immutable phase manifest. All continuation uses the same saved pair and phase; a new process/run ID cannot renew the allowance.",
+              "retiredPair": {
+                "runId": "8e934818-53fb-452b-8899-9ef87137a04e",
+                "accountIds": [
+                  "c2cf6b6d-9c5b-471a-bf53-ff921e69125b",
+                  "f05ce8b8-d5f8-4522-a948-a97b7b380017"
+                ],
+                "functionNames": [
+                  "ops-n71-fixture-8e93481853fb452b8899",
+                  "ops-n71-retire-8e93481853fb452b8899"
+                ],
+                "proof": "coverage/n71-live/8e934818-53fb-452b-8899-9ef87137a04e/endpoint-disposition.json"
+              },
+              "alsoExcludePriorPhases": true,
+              "startCondition": "Reconcile actual latest published main and preserve N73 owner fix. Run the real app/runner preflight with delayed Sync, document replacement and wrong-owner/no-receipt negatives, without stubbing the checkpoint result or account guard. Bind exact stable current source and immutable Preview; predeploy/probe independent cleanup companion before first Auth create. Only after this material correction is genuinely proved may the single new pair be created.",
+              "failureDisposition": "Capture exact browser document/owner/database/receipt/stage boundary. Retire exact pair and disarm both functions in deterministic finally. No unban, old pair reuse, same-phase replacement or repeated live attempt without material new evidence. Stop after two equivalent cause failures rather than burning quota."
+            }
+          ]
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n71",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories.",
+          "harnessBinding": "Remove reliance on prior literal run IDs/function names by passing the current runId or using an explicitly recorded runtime-derived copy. Bind candidate, source tree, current runId and exact harness SHA before provision. Use a new private subdirectory under the existing task privateStateRoot and a distinct per-run evidence subdirectory; never overwrite prior manifests or receipts. Retain the proven Windows PowerShell 7 private-directory helper when needed; do not rerun the known PS5.1 module failure or relax ACL checks. No extra framework, general API integration or new global configuration."
+        }
+      },
+      "objective": "FINISH N71, not another status-only reconciliation. Resume the exact saved session and candidate90fa74dcdd75399c61d0d38794a95967cf1fa186. Latest direct PO request after the12:10 status explicitly prioritizes completing N71 and resolving its final verification blocker rather than parking the same work again. The existing N71 D099 bounded synthetic service/release authority is applied to ONE final post-correction phase, not an unbounded pool: candidate90fa74d now deletes the purpose-created submission before its assignment, fixing the actual RESTORE_CANONICAL_DELETED_DESCENDANT failure. The last actual authenticated owner/isolation/lost-ack/resume and native creation-history readback already PASS and remain preserved. The material remaining gate is complete ordinary A2 convergence and anti-resurrection with a VALID child-first deletion graph. All previous accounts/functions/manifests remain retired and immutable; no N58 denied query/action, user account or real student mutation is authorized.\n\nPHASE A — before any cloud Auth/function provisioning: inspect only the actual last failure and current runner/fixture graph, then execute the ENTIRE previously failing suppression path using actual app code and disposable local/native data. Prove child-first submissions→assignments deletion, stale restore plan, canonical finalize/reconcile, fresh A2 pull/export equality, preserved grades/createdAt and suppressed closed-term descendants. A regex/syntax test, mock return value or copied predicate does not meet this preflight. Reuse the existing real app checkpoint/native fixtures and execute their real code; fix ordinary test-data errors locally before consuming live allowance. Check the same sequence and data dependencies that the live runner will execute, not just one line. Keep original failure receipt.\n\nPHASE B — only after concrete full-path preflight passes: reconcile the candidate with the actual observed remote main (not the old local main branch), retain all N73/N94/N97/N98/N99 and N77 production changes and the existing N49 policy, build only if affected, and bind exact candidate/tree/harness/immutable Preview. Create at most the one fresh synthetic A/B pair permitted below; preserve every previous retired pair and deny-all endpoint. Use existing reviewed handler, independently ready cleanup companion, run-bound manifest and deadlines. Complete the actual missing convergence/no-resurrection gate using the corrected VALID deletion graph and ordinary authenticated Sync. Reuse prior passing source-identical owner/resume/domain evidence; if reconciliation changes its relevant code, rerun only the affected part. Never merely mark the old failure PASS.\n\nPHASE C — dispose exact temporary pair deterministically and disarm both same-run endpoints, return all original named checks with the real outcome and candidate. If all PASS, return LOCAL_READY promptly and let the existing sole publisher integrate and verify Production; do not leave local readiness waiting for this chat. No manual worker, PM review gate, new scheduler, deployment shortcut or migration replay.\n\nIf local preflight fails, diagnose its concrete cause while still LOCAL; do not create accounts until it passes. If a live attempt fails, use the exact saved still-valid phase only for correction within its original safety/time limits and original identities; always run owned finally/cleanup on termination. Never revive a disposed pair or mint a replacement automatically. Record a real provider/tool denial honestly rather than route around it. No broad proof loop; a source-identical repeated failure without new correction is not progress.",
+      "acceptance": [
+        "n71_fresh_candidate_preview: PASS binds the exact fresh main/candidate/tree/harness and successful immutable Preview/served assets. Present only �묟� 뫦� ������ and ���㟧� 뫦� ������ with necessary contextual review/recovery. Remove normal Local/Cloud/Merge/Replace/Bootstrap/Claim choices; retain dormant conditional legacy mechanisms until their actual retirement proof.",
+        "n71_portable_domain_coverage: PASS creates an explicit mapping from actual db.STORES/portable backup through cloud manifest, stage, finalize, local reconcile and normal Sync. Cover every backed-up Product domain with no silent omission, including nonempty units/lessons and assignments/submissions. Exclude only declared device/runtime state. A domain unsupported by a current endpoint is implementation work for this card, not successful omission or silent local fallback. Preserve scoring, calendar provenance, deletion/tombstone and owner fields already on main.",
+        "n71_server_restore_binding: PASS certifies existing compatible full/score-v2 primitives and only the exact required additive extension. If no migration is needed, prove deployed source/ACL/domain compatibility; if needed, record exact SQL/native evidence, apply once, and read back the real version/functions/ACL. Preserve old clients and existing receipt identities. Merely committing SQL is not a Supabase deployment.",
+        "n71_live_restore_owner_resume: PASS uses only the exact synthetic A/B closure and real authenticated client: full-domain portable export, validation/review, canonical cloud finalize, actual interrupted stage/finalize resume and idempotent receipt reuse. Wrong owner, signed-out/offline, unhealthy Sync and unresolved outbox fail closed with no divergent local-only restore. B cannot read/restore A. Limit interruption to one declared synthetic mutation boundary and reuse unchanged focused evidence.",
+        "n71_live_convergence_no_resurrection: PASS proves A1 reconciles only after canonical finalize and A2 converges to the same stored Product state using ordinary Sync. Preserve live deletion evidence/immutable closed-term suppression, valid target scores and current calendar identities; restore cannot resurrect deleted scope. Verify only affected current boundaries with one deterministic harness, not the entire historical sync/browser suite.",
+        "n71_fixture_disposition: PASS requires actual same-pair retention/session evidence plus both deny-all source/410 proofs from preparationAuthority. Implement finally/recovery before first provisioning; preserve exact candidate and private same-run state on interruption. Never label local-only restore, UI-only simplification or incomplete cleanup LOCAL_READY.",
+        "Corrected continuation: old pair fc77ae70-4cfa-4d2e-98ba-89232fe3c4f4 remains permanently retired. One fresh pair, new current-run private manifest/functions and full cleanup/disarm are explicitly authorized. A blanket reading of the previous no-replacement sentence is superseded for this phase.",
+        "n71_live_restore_owner_resume: finish the real owner matrix and lost-stage-acknowledgement/same-identity resume with the corrected serverCanonical baseline. Preserve zero mutation on denied requests; verify immediate export remains valid. Reuse existing source-identical checks; successful native/Preview results alone do not satisfy this live gate.",
+        "n71_live_convergence_no_resurrection: actually finish A2 Initial Restore/ordinary Sync across portable domains and the declared synthetic tombstone/closed-term/provenance cases. Complete disposition for the NEW pair before LOCAL_READY; retain the OLD pair evidence independently.",
+        "Actual app+runner preflight is required for the corrected document checkpoint before this one live phase; compare explicit current-main SHA and preserve original failed evidence. No replacing Product/account guards with fixture shortcuts.",
+        "This phase requires the complete actual-code valid-deletion suppression/reconcile/A2 preflight before live provisioning, not just syntax or an isolated rewritten predicate. All original owner/grades/history/no-resurrection checks stay in force. Existing server migration/history is unchanged; no additional migration allowance."
+      ],
+      "allowedPaths": [
+        "src/views/backup.js",
+        "src/lib/backup-v2.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/initial-restore.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/restore-deletion-scope.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n71_unified_restore.sql",
+        "supabase/functions/ops-n71-fixture/**",
+        "supabase/functions/ops-n71-retire/**",
+        "tests/n71-*",
+        "tests/n71-live/**",
+        "tests/backup-flow.e2e.mjs",
+        "tests/backup.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "tests/v2-backup-restore-server.test.mjs",
+        "tests/core-v2-restore-reload.test.mjs",
+        "supabase/migrations/*_n71_restore_creation_history.sql"
+      ],
+      "releaseAuthority": "Latest direct PO request after the12:10 status explicitly prioritizes completing N71 and resolving its final verification blocker rather than parking the same work again. The existing N71 D099 bounded synthetic service/release authority is applied to ONE final post-correction phase, not an unbounded pool: candidate90fa74d now deletes the purpose-created submission before its assignment, fixing the actual RESTORE_CANONICAL_DELETED_DESCENDANT failure. The last actual authenticated owner/isolation/lost-ack/resume and native creation-history readback already PASS and remain preserved. The material remaining gate is complete ordinary A2 convergence and anti-resurrection with a VALID child-first deletion graph. All previous accounts/functions/manifests remain retired and immutable; no N58 denied query/action, user account or real student mutation is authorized. Product release remains through the sole controller publisher after genuine complete checks. This activates a single bounded materially corrected N71 verification, not permission for repeated phase resets or N58 denied operations. N71 awaits PO after verified delivery; do not falsely close from local-only evidence.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N71",
+        "decisions": [
+          "D089",
+          "D099"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "currentClient": "src/lib/backup-v2.js",
+        "currentPage": "src/views/backup.js",
+        "deployedHelpers": [
+          "rakeezx.sync_v2_restore_entities",
+          "rakeezx.sync_v2_restore_entities_full",
+          "rakeezx.sync_v2_restore_entities_score_v2"
+        ],
+        "observedTablesPresent": [
+          "units",
+          "lessons"
+        ],
+        "observedTablesAbsent": [
+          "assignments",
+          "submissions"
+        ],
+        "observationLimit": "Metadata only; no actual user/Product rows or backups inspected.",
+        "correctedContinuation": {
+          "currentCandidate": "aa333cd9be7a5735608b3e07added378d9d52066",
+          "correctedParent": "98cc2aa8e350e221519d7a2c1e88fc8c1786817f",
+          "correction": "serverCanonical baselines preserved during reconcile",
+          "remainingRequiredChecks": [
+            "n71_live_restore_owner_resume",
+            "n71_live_convergence_no_resurrection"
+          ],
+          "retiredPairEvidence": "coverage/n71-current/live-result.json and disposition-source.json",
+          "reconciledEvidence": "coverage/n71-current/reconciliation-4b597653-6f1c-42a5-b5ad-0724834ec0aa.json"
+        }
+      },
+      "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Saved candidate fixed canonical restore reconciliation. Existing authority now explicitly covers one fresh bounded corrected proof phase, retaining and excluding the retired pair/functions; no new migration or implementation replay.",
+        "previousRunId": "4b597653-6f1c-42a5-b5ad-0724834ec0aa",
+        "preservedCandidateSha": "aa333cd9be7a5735608b3e07added378d9d52066",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    }
+  ]
+}
