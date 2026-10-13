@@ -944,6 +944,18 @@ export async function applyScoreSubitemCommand(envelope) {
     return mockBackend.applyScoreSubitemCommand(envelope);
   }
   if (!user) throw authError('Authentication required');
+  if (Object.hasOwn(envelope, 'completionState')) {
+    const capability = await getScoreFoundationCapability();
+    if (capability?.n94SubitemVersion !== 1) throw new Error('N94 server capability is unavailable');
+    return request('/rpc/apply_score_subitem_command_n94', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+      body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+        p_command: envelope.command, p_item_id: envelope.itemId, p_student_id: envelope.studentId,
+        p_subitem_id: envelope.subitemId ?? null, p_completion_state: envelope.completionState,
+        p_manual_value: envelope.manualValue ?? null }),
+    });
+  }
   return request('/rpc/apply_score_subitem_command', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
       'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },

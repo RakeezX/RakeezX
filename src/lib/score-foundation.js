@@ -11,6 +11,45 @@ export function scoreCents(value, { allowBlank = false } = {}) {
 
 export const fromScoreCents = (cents) => cents === null ? null : cents / 100;
 
+/** Teacher dates use the application's YYYY-MM-DD local-calendar convention. */
+export function normalizeSubitemDatesAndPoints(row) {
+  scoreCents(row.value);
+  const date = (input) => {
+    if (input == null || input === '') return null;
+    if (typeof input !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(input) ||
+        !Number.isFinite(Date.parse(input)) || new Date(input).toISOString().slice(0, 10) !== input) {
+      throw new RangeError('استخدم تاريخًا صحيحًا');
+    }
+    return input;
+  };
+  const startDate = date(row.startDate), dueDate = date(row.dueDate);
+  if (startDate && dueDate && dueDate < startDate) throw new RangeError('موعد التسليم لا يسبق البداية');
+  const latePoints = row.latePoints == null || row.latePoints === '' ? null : Number(row.latePoints);
+  if (latePoints !== null && scoreCents(latePoints) > scoreCents(row.value)) {
+    throw new RangeError('درجة التأخر لا تزيد على الدرجة العادية');
+  }
+  return { startDate, dueDate, latePoints };
+}
+
+export function subitemCompletionState(row) {
+  if (!row || row.deleted || row.checked !== true) return 'unrecorded';
+  return row.completionState === 'late' ? 'late' : 'regular';
+}
+
+export function subitemSelectedPoints(definition, completion) {
+  const state = subitemCompletionState(completion);
+  if (state === 'unrecorded') return null;
+  return state === 'late' ? definition.latePoints ?? definition.value : definition.value;
+}
+
+// Time chooses only the NEXT deliberate action; saved records are never inferred.
+export function nextSubitemCompletionState(definition, completion, localDate) {
+  const state = subitemCompletionState(completion);
+  const overdue = definition.dueDate && localDate > definition.dueDate;
+  if (overdue) return { unrecorded: 'late', late: 'regular', regular: 'unrecorded' }[state];
+  return state === 'unrecorded' ? 'regular' : 'unrecorded';
+}
+
 export function distributeAutomatically(maximum, count) {
   const total = scoreCents(maximum);
   if (!Number.isSafeInteger(count) || count < 1) throw new RangeError('At least one subitem is required');
@@ -27,11 +66,11 @@ export function projectSubitemScore(item, definitions, completions, manualInput,
   const maximum = scoreCents(item.max);
   const active = definitions.filter((row) => !row.deleted && (!item.id || row.itemId === item.id) &&
     (!ownerId || !row.ownerId || row.ownerId === ownerId));
-  const selected = new Set(completions.filter((row) => (!studentId || row.studentId === studentId) &&
+  const selected = new Map(completions.filter((row) => (!studentId || row.studentId === studentId) &&
     (!ownerId || !row.ownerId || row.ownerId === ownerId) && !row.deleted && row.checked === true &&
-    active.some((definition) => definition.id === row.subitemId)).map((row) => row.subitemId));
+    active.some((definition) => definition.id === row.subitemId)).map((row) => [row.subitemId, row]));
   const derivedCents = Math.min(maximum, active.filter((row) => selected.has(row.id))
-    .reduce((sum, row) => sum + scoreCents(row.value), 0));
+    .reduce((sum, row) => sum + Math.min(scoreCents(row.value), scoreCents(subitemSelectedPoints(row, selected.get(row.id)))), 0));
   const requestedManual = scoreCents(manualInput, { allowBlank: true });
   const acceptedManual = requestedManual === null ? null : Math.min(requestedManual, Math.max(0, maximum - derivedCents));
   const recorded = selected.size > 0 || requestedManual !== null;
@@ -50,7 +89,8 @@ export function scoreDefinitionSignature(item, subitems = []) {
     unitId: item.unitId ?? null, lessonId: item.lessonId ?? null,
     scoreMode: item.scoreMode ?? 'direct', distributionMode: item.distributionMode ?? null,
     subitems: subitems.filter((row) => !row.deleted).sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))
-      .map((row) => ({ name: row.name, value: row.value, order: row.order })),
+      .map((row) => ({ name: row.name, value: row.value, order: row.order,
+        startDate: row.startDate ?? null, dueDate: row.dueDate ?? null, latePoints: row.latePoints ?? null })),
   });
 }
 

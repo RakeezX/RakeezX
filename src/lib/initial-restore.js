@@ -6,7 +6,7 @@ import {
   normalizeAuthUserId, resolveWorkspace,
 } from './workspaces.js';
 import { makeDevice, uid } from '../models.js';
-import { projectSubitemScore, scoreCents } from './score-foundation.js';
+import { projectSubitemScore, scoreCents, normalizeSubitemDatesAndPoints } from './score-foundation.js';
 
 export const CORE_RESTORE_PROTOCOL = 'CORE_V1';
 export const SCORE_RESTORE_PROTOCOL = 'CORE_V2';
@@ -92,8 +92,17 @@ export function assertScoreSnapshotInvariant(snapshot) {
   }
   for (const definition of definitions) {
     if (!items.has(definition.itemId)) throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Subitem parent is missing');
+    try { normalizeSubitemDatesAndPoints(definition); }
+    catch { throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Invalid subitem dates or points'); }
+    if (definition.createdAt !== undefined && (!Number.isFinite(definition.createdAt) || definition.createdAt <= 0)) {
+      throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Invalid subitem creation history');
+    }
   }
   for (const completion of completions) {
+    if (completion.completionState != null &&
+        (!completion.checked || !['regular', 'late'].includes(completion.completionState))) {
+      throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Invalid selected completion state');
+    }
     if (!students.has(completion.studentId) ||
         !definitions.some((row) => row.id === completion.subitemId)) {
       throw fail('RESTORE_SCORE_PROVENANCE_INVALID', 'Completion reference is missing');

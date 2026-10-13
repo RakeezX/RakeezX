@@ -12,6 +12,7 @@ import * as db from '../lib/db.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
+import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
 
 let mode = 'item';        // item | table
 let activeItemId = null;
@@ -344,8 +345,10 @@ export default {
     },
 
     async 'subitem-completion'(el) {
+      if (el.disabled || el.dataset.workspace !== store.getActiveWorkspace()?.id) return;
+      el.disabled = true;
       try {
-        const result = await store.setScoreSubitemCompletion(el.dataset.student, el.dataset.subitem, el.checked);
+        const result = await store.cycleScoreSubitemCompletion(el.dataset.student, el.dataset.subitem);
         scoreValidation.delete(`${el.dataset.student}:${result.score.itemId}`);
       } catch (error) {
         toast(error?.message || 'تعذر حفظ حالة العنصر', 'danger');
@@ -467,8 +470,8 @@ function subitemMode(roster, ctx, item) {
       ${roster.length === 0 ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>` : roster.map((student) => {
         const score = ctx[student.id].scoresByItem[item.id] ?? null;
         const final = itemScore(item, ctx[student.id]);
-        const checked = new Set(store.state.scoreSubitemCompletions.filter((row) =>
-          row.studentId === student.id && row.checked && !row.deleted).map((row) => row.subitemId));
+        const completions = new Map(store.state.scoreSubitemCompletions.filter((row) =>
+          row.studentId === student.id && !row.deleted).map((row) => [row.subitemId, row]));
         const derived = score?.derivedValue ?? 0;
         const manual = score?.manualValue ?? null;
         const warning = scoreValidation.get(`${student.id}:${item.id}`);
@@ -476,12 +479,19 @@ function subitemMode(roster, ctx, item) {
           <div class="grades-01c__student"><span class="rollno tabular">${student.rollNo ?? '—'}</span>
             <span><strong>${student.name}</strong><small>${final === null ? 'غير مرصود' : 'تم الرصد'}</small></span></div>
           <div class="grades-01c__subitems" role="group" aria-label="عناصر ${item.name} للطالب ${student.name}">
-            ${definitions.map((definition) => html`<label class="grades-01c__subitem">
-              <input type="checkbox" data-change="subitem-completion" data-student="${student.id}"
-                data-subitem="${definition.id}" ${checked.has(definition.id) ? 'checked' : ''}
-                aria-label="${definition.name} للطالب ${student.name}">
-              <span>${definition.name}<b class="tabular">${fmtNum(definition.value)}</b></span>
-            </label>`)}</div>
+            ${definitions.map((definition) => {
+              const completion = completions.get(definition.id);
+              const selected = subitemCompletionState(completion);
+              const label = { unrecorded: '— غير مرصود', late: '◷ متأخر', regular: '✓ عادي / مقبول بعذر' }[selected];
+              const points = subitemSelectedPoints(definition, completion);
+              return html`<button type="button" class="grades-01c__subitem n94-completion n94-completion--${selected}"
+                data-act="subitem-completion" data-workspace="${store.getActiveWorkspace()?.id}"
+                data-student="${student.id}" data-subitem="${definition.id}"
+                aria-label="${definition.name} للطالب ${student.name}: ${label}${points === null ? '' : ` · ${fmtNum(points)} درجات`}"
+                aria-pressed="${selected !== 'unrecorded'}">
+                <span>${definition.name}<b>${label}</b><small class="tabular">${points === null ? '—' : fmtNum(points)} / ${fmtNum(definition.value)}</small></span>
+              </button>`;
+            })}</div>
           <div class="grades-01c__equation" aria-label="ملخص درجة ${student.name}">
             <span class="grades-01c__metric"><small>العناصر</small><b class="tabular">${fmtNum(derived)}</b></span><i aria-hidden="true">+</i>
             <label class="grades-01c__manual-field"><small>يدوي</small><input class="grades-01c__manual tabular" type="text" inputmode="decimal"
