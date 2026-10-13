@@ -7,9 +7,7 @@ This page preserves user notes and acceptance context. The automatic block lists
 
 | التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
 | --- | --- | --- | --- | --- | --- |
-| N49 | Production 7/14 days unchanged; separate 3/6-minute Preview available for PO trial; browser checks PASS: Product-account case passed in 10.7 seconds after fixing the stale HOME route overwrite; unchanged raw Production 7/14-day case retains its 1.1-second PASS. Prior 120-second failure is retained as fixed history; timeout and assertions were unchanged | [Production](https://rakeezx.com/) | c96d187050073e412dd729edfd7ecf0bd2711d60 | 2026-10-12T11:13:35.149Z | continuous-n49-durable-offline-lease-20261012 |
 | N91 | Existing AI candidate preserved. Repaired hosted-app harness passed both required checks. Full receipt: artifacts/ops-supervisor-v4/attempts/v6-n91-mobile-card-titles-20261012/a8e2b83e-507f-40e9-9bb0-d243887c9510/evidence/N91_HOSTED_APP_PROOF.json. | [Production](https://rakeezx.com/) | 61a6e1498c5ef985cb4e947c72e56eb18581797d | 2026-10-12T23:37:12.020Z | v6-n91-mobile-card-titles-20261012 |
-| N13 | WAITING_PO / REVISION DEPLOYED; single creation form and duplicate rejection verified in Production | [Production](https://rakeezx.com/) | a516ced605cf016848841b0bc021d4e5acdfa41f | 2026-10-12T23:38:52.495Z | continuous-n13-existing-section-subject-20261012 |
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
@@ -17,11 +15,11 @@ This page preserves user notes and acceptance context. The automatic block lists
 <!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->
 ## Current PO decisions — 2026-10-13
 
-N96 and N54 are explicitly accepted/CLOSED. N13 requested single grade/section/subject revision is verified in Production at `a516ced605cf016848841b0bc021d4e5acdfa41f` (2026-10-12T23:38:52.495Z). WAITING_PO / REVISION DEPLOYED; no PO acceptance or closure is claimed.
+N13 is CLOSED. Exact verified Production release `a516ced605cf016848841b0bc021d4e5acdfa41f`; candidate `f8e2a5234e72b0af04174a4b33588c8e34f99d36`. PO reported improvement and accepted closure when technically ready. The requested single creation form, shared roster and duplicate-without-writes outcome passed all three required checks. N77 deletion remains independent.
 
-N49 test Preview: [https://b5a7820d.rakeezx.pages.dev](https://b5a7820d.rakeezx.pages.dev). Release `3cc1f1f3c29c083c88cc80dd51060f07f783599d`; source `2b434fac6646bd04404077f2a97b9780846fc2b7`. Normal through 3 minutes, editable reminder after 3 minutes, read-only from 6 minutes. Reading/export/backup remain available; Restore and other writes are blocked. Production stays 7/14 days. Provider SUCCESS; module-boundary PASS; browser checks PASS: Product-account case passed in 10.7 seconds after fixing the stale HOME route overwrite; unchanged raw Production 7/14-day case retains its 1.1-second PASS. Prior 120-second failure is retained as fixed history; timeout and assertions were unchanged. This is for PO trial, not closure.
+N49 is CLOSED. Exact verified Production release `df1715a822fe37f15f5b25d288db75c2d391b895`; candidate `8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf`. PO reported a successful personal 3/6-minute Preview trial at 03:07 Asia/Riyadh on 2026-10-13. The remaining screen wording and printed student-table correction now passed its own actual-app check and Production delivery, satisfying the separate delegated technical closure condition. Production stays at 7/14 days.
 
-N77 deletion is high priority after N13/N49. Deferred tickets stay deferred. See `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`; native queue closure is confirmed by a later controller snapshot.
+N96 and N54 remain previously accepted/CLOSED. N91 remains available for PO review. N77 has high priority; deferred tickets stay deferred. Full prior notes, user feedback, delivery evidence and the bounded unattended-work/Scheduler observation are retained in `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`. The observed work interval proves local progress without chat calls; it does not establish uninterrupted 24-hour operation. The controller observes canonical closure; this document operation does not write queue state.
 <!-- END RAKEEZ PO DECISIONS 20261013 -->
 
 ## Preserved user notes and historical review context — not dispatch instructions

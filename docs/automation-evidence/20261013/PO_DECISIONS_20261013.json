@@ -16,6 +16,109 @@
       "publishedSha": "f23abc0e850f38024102821d1406c4e160152c0b",
       "quote": "N54 فيه تحسن واضح في فتح الكبيورد ومربعات النص في الايفون. اعتمد اغلق.",
       "deviceEvidence": "PO reports actual iPhone keyboard and text-field improvement"
+    },
+    {
+      "productId": "N13",
+      "taskId": "continuous-n13-existing-section-subject-20261012",
+      "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+      "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+      "verifiedAt": "2026-10-12T23:38:52.495Z",
+      "runId": "1d32e6b3-a88e-45e5-aa94-2981effa8d8e",
+      "checks": [
+        {
+          "name": "n13_single_creation_form",
+          "status": "PASS",
+          "evidence": "Focused actual-application browser case passed at 390px: visible grade/section fields, subject selection, no separate existing/new selector, successful first Teaching creation and five defaults per Teaching."
+        },
+        {
+          "name": "n13_automatic_shared_section",
+          "status": "PASS",
+          "evidence": "Normalized أ/ا matching reused the Section. Exact Section/student/enrollment snapshots remained unchanged; another subject added one Teaching with five defaults."
+        },
+        {
+          "name": "n13_duplicate_without_false_success",
+          "status": "PASS",
+          "evidence": "Duplicate subject and custom alias showed a warning and kept the form open; all database stores including outbox remained identical. Rapid submit and previous-term allowance passed. Required focused command completed 2/2 PASS."
+        }
+      ],
+      "requiredAssets": {
+        "src/views/teachings.js": "721da13d8d24dd8572d3bd076c83519be488b3201ab0f927bf5b5abd5a2f3642"
+      },
+      "provider": {
+        "checkRunId": "115055739508",
+        "headSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-12T23:38:24Z",
+        "completedAt": "2026-10-12T23:38:24Z",
+        "headBranch": null,
+        "deploymentId": "b4be113e-9474-43aa-8ec8-693b2e7d4e08",
+        "previewUrl": "https://b4be113e.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/b4be113e-9474-43aa-8ec8-693b2e7d4e08"
+      },
+      "binding": {
+        "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+        "declaredBaseSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+        "mainAtPreparation": "61a6e1498c5ef985cb4e947c72e56eb18581797d",
+        "integrationSha": "9b67479cb7bceb426eff3117ba9b5e0fdd81ccf1",
+        "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "merge"
+      },
+      "technicalConditionMet": true,
+      "acceptanceKind": "PO_ACCEPTED_WITH_REPORTED_IMPROVEMENT",
+      "decisionDate": "2026-10-13",
+      "authorityDescription": "Direct PO instruction on 2026-10-13: PO reported N13 improvement and accepted closure when technically ready. PO personally reported the N49 accelerated 3/6-minute Preview trial successful at 03:07 Asia/Riyadh and delegated closure after the remaining screen-wording and print-only correction is technically successful and actually delivered. The new wording/print correction has technical acceptance; no separate personal retest of that new fix is reported."
+    },
+    {
+      "productId": "N49",
+      "taskId": "continuous-n49-po-copy-print-20261013",
+      "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+      "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+      "verifiedAt": "2026-10-13T00:22:13.607Z",
+      "runId": "d6c43f7f-62d5-495f-8886-e947efdafbab",
+      "checks": [
+        {
+          "name": "n49_copy_print_render",
+          "status": "PASS",
+          "evidence": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/attempts/continuous-n49-po-copy-print-20261013/d6c43f7f-62d5-495f-8886-e947efdafbab/copy-print-evidence/n49-copy-print-render.json. Both actual-app HTTP cases passed: notices visible on screen, hidden in print, طالب ألف report preserved, notices restored on screen. Receipt binds both source hashes, unchanged fixture and CSS. Initial CRLF mismatch diagnosed and corrected locally to exact committed LF bytes; proof script SHA verified."
+        }
+      ],
+      "requiredAssets": {
+        "src/app.js": "c967ee081e4945e135751d3eb471971a2c62e5a2f4d1cc773f4dd15b43f22f7a",
+        "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86"
+      },
+      "provider": {
+        "checkRunId": "115067393865",
+        "headSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-13T00:21:39Z",
+        "completedAt": "2026-10-13T00:21:39Z",
+        "headBranch": null,
+        "deploymentId": "53832a93-8e1d-466a-b28f-bcb2fe4662eb",
+        "previewUrl": "https://53832a93.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/53832a93-8e1d-466a-b28f-bcb2fe4662eb"
+      },
+      "binding": {
+        "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+        "declaredBaseSha": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+        "mainAtPreparation": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+        "integrationSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+        "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "candidate-fast-forward"
+      },
+      "technicalConditionMet": true,
+      "acceptanceKind": "PO_DELEGATED_TECHNICAL_ACCEPTANCE_OF_COPY_PRINT",
+      "decisionDate": "2026-10-13",
+      "authorityDescription": "Direct PO instruction on 2026-10-13: PO reported N13 improvement and accepted closure when technically ready. PO personally reported the N49 accelerated 3/6-minute Preview trial successful at 03:07 Asia/Riyadh and delegated closure after the remaining screen-wording and print-only correction is technically successful and actually delivered. The new wording/print correction has technical acceptance; no separate personal retest of that new fix is reported."
     }
   ],
   "projectInstructionsPoConfirmedUpdated": true,
@@ -31,12 +134,11 @@
     "readAndAdminPushPermissionsObserved": true
   },
   "nativeApplication": {
-    "queueClosureAndUpdatedCards": "Consult native install receipt and a subsequent controller snapshot; no queue writes are performed by this record",
-    "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record",
     "mechanism": "GUARDED_CANONICAL_LEDGER_INSTALL",
     "queueWrites": false,
+    "catalogWrites": false,
     "controllerObservation": "REQUIRED_AFTER_INSTALL",
-    "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/po-decisions-20261013-install-receipt.json"
+    "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/po-technical-closure-20261013-receipt.json"
   },
   "evidence": {
     "controllerSnapshotAt": "2026-10-12T22:55:33.783Z",
@@ -87,7 +189,20 @@
         "src/lib/offline-lease.js": "181b542d439ca807ccbf9aa4af4fde8f343dddd36d3f8f695a4ac304bd367722"
       },
       "servedVerified": true,
-      "poAccepted": false
+      "poReportedTrialSuccess": true,
+      "poAcceptanceScope": "Reported success of the 3/6-minute lease behavior; new wording/print correction has separate technical acceptance",
+      "userFeedback": {
+        "reportedSuccess": true,
+        "reportedAtLocal": "2026-10-13 03:07 Asia/Riyadh",
+        "previewUrl": "https://b5a7820d.rakeezx.pages.dev",
+        "testedBehavior": "Personal trial of normal offline work through 3 minutes, editable reminder after 3 minutes and read-only at 6 minutes",
+        "remainingRequest": "Clarify reminder/LIMITED and write-denial wording; exclude notices from printing while preserving the report",
+        "newCopyPrintFixPersonalRetest": "NOT_REPORTED; technical completion and closure delegated",
+        "productionDays": {
+          "reminder": 7,
+          "limited": 14
+        }
+      }
     },
     "N13Revision": {
       "taskId": "continuous-n13-existing-section-subject-20261012",
@@ -95,8 +210,104 @@
       "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
       "verifiedAt": "2026-10-12T23:38:52.495Z",
       "productionDeployed": true,
-      "state": "WAITING_PO / REVISION DEPLOYED",
-      "poAccepted": false
+      "state": "CLOSED / PO ACCEPTED",
+      "poAccepted": true,
+      "productId": "N13",
+      "runId": "1d32e6b3-a88e-45e5-aa94-2981effa8d8e",
+      "checks": [
+        {
+          "name": "n13_single_creation_form",
+          "status": "PASS",
+          "evidence": "Focused actual-application browser case passed at 390px: visible grade/section fields, subject selection, no separate existing/new selector, successful first Teaching creation and five defaults per Teaching."
+        },
+        {
+          "name": "n13_automatic_shared_section",
+          "status": "PASS",
+          "evidence": "Normalized أ/ا matching reused the Section. Exact Section/student/enrollment snapshots remained unchanged; another subject added one Teaching with five defaults."
+        },
+        {
+          "name": "n13_duplicate_without_false_success",
+          "status": "PASS",
+          "evidence": "Duplicate subject and custom alias showed a warning and kept the form open; all database stores including outbox remained identical. Rapid submit and previous-term allowance passed. Required focused command completed 2/2 PASS."
+        }
+      ],
+      "requiredAssets": {
+        "src/views/teachings.js": "721da13d8d24dd8572d3bd076c83519be488b3201ab0f927bf5b5abd5a2f3642"
+      },
+      "provider": {
+        "checkRunId": "115055739508",
+        "headSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-12T23:38:24Z",
+        "completedAt": "2026-10-12T23:38:24Z",
+        "headBranch": null,
+        "deploymentId": "b4be113e-9474-43aa-8ec8-693b2e7d4e08",
+        "previewUrl": "https://b4be113e.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/b4be113e-9474-43aa-8ec8-693b2e7d4e08"
+      },
+      "binding": {
+        "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+        "declaredBaseSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+        "mainAtPreparation": "61a6e1498c5ef985cb4e947c72e56eb18581797d",
+        "integrationSha": "9b67479cb7bceb426eff3117ba9b5e0fdd81ccf1",
+        "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "merge"
+      },
+      "technicalConditionMet": true,
+      "acceptanceKind": "PO_ACCEPTED_WITH_REPORTED_IMPROVEMENT"
+    },
+    "N49ProductionCopyPrint": {
+      "productId": "N49",
+      "taskId": "continuous-n49-po-copy-print-20261013",
+      "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+      "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+      "verifiedAt": "2026-10-13T00:22:13.607Z",
+      "runId": "d6c43f7f-62d5-495f-8886-e947efdafbab",
+      "checks": [
+        {
+          "name": "n49_copy_print_render",
+          "status": "PASS",
+          "evidence": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/attempts/continuous-n49-po-copy-print-20261013/d6c43f7f-62d5-495f-8886-e947efdafbab/copy-print-evidence/n49-copy-print-render.json. Both actual-app HTTP cases passed: notices visible on screen, hidden in print, طالب ألف report preserved, notices restored on screen. Receipt binds both source hashes, unchanged fixture and CSS. Initial CRLF mismatch diagnosed and corrected locally to exact committed LF bytes; proof script SHA verified."
+        }
+      ],
+      "requiredAssets": {
+        "src/app.js": "c967ee081e4945e135751d3eb471971a2c62e5a2f4d1cc773f4dd15b43f22f7a",
+        "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86"
+      },
+      "provider": {
+        "checkRunId": "115067393865",
+        "headSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-13T00:21:39Z",
+        "completedAt": "2026-10-13T00:21:39Z",
+        "headBranch": null,
+        "deploymentId": "53832a93-8e1d-466a-b28f-bcb2fe4662eb",
+        "previewUrl": "https://53832a93.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/53832a93-8e1d-466a-b28f-bcb2fe4662eb"
+      },
+      "binding": {
+        "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+        "declaredBaseSha": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+        "mainAtPreparation": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+        "integrationSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+        "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "candidate-fast-forward"
+      },
+      "technicalConditionMet": true,
+      "acceptanceKind": "PO_DELEGATED_TECHNICAL_ACCEPTANCE_OF_COPY_PRINT",
+      "state": "CLOSED / PO DELEGATED TECHNICAL ACCEPTANCE",
+      "poAccepted": true,
+      "productionDeployed": true
     }
   },
   "previousNativeApplicationRecord": {
@@ -131,6 +342,414 @@
       },
       "supersededBy": "3cc1f1f3c29c083c88cc80dd51060f07f783599d",
       "disposition": "Prior browser failure retained; real route defect fixed and retested"
+    },
+    {
+      "key": "N13Revision",
+      "record": {
+        "taskId": "continuous-n13-existing-section-subject-20261012",
+        "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+        "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "verifiedAt": "2026-10-12T23:38:52.495Z",
+        "productionDeployed": true,
+        "state": "WAITING_PO / REVISION DEPLOYED",
+        "poAccepted": false
+      },
+      "supersededBy": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+      "disposition": "Previous acceptance state retained; explicit PO closure condition now satisfied"
+    },
+    {
+      "key": "N49Preview",
+      "record": {
+        "environment": "Preview",
+        "branch": "preview/n49-3m6m-20261013",
+        "url": "https://b5a7820d.rakeezx.pages.dev",
+        "releaseSha": "3cc1f1f3c29c083c88cc80dd51060f07f783599d",
+        "sourceSha": "2b434fac6646bd04404077f2a97b9780846fc2b7",
+        "cloudflareDeploymentId": "b5a7820d-f63f-46f6-b374-d1b17337b6f5",
+        "githubCheckRunId": 115055664016,
+        "providerConclusion": "success",
+        "moduleBoundaryChecks": "PASS",
+        "browserChecks": "PASS",
+        "browserEvidence": {
+          "finishedAt": "2026-10-12T23:35:02.4851369Z",
+          "overall": "PASS_WITH_UNCHANGED_PRODUCTION_CASE_REUSED",
+          "productAccountTest": "PASS_10.7SEC",
+          "totalSeconds": 11.7,
+          "timeoutMs": 120000,
+          "rawProduction7And14Days": "PASS_1.1SEC_REUSED",
+          "rawProductionCaseChanged": false,
+          "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-route-browser",
+          "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-route-browser-run.json",
+          "priorFailure": {
+            "finishedAt": "2026-10-12T23:21:26.1373795Z",
+            "overall": "FAIL",
+            "productAccountTest": "TIMEOUT_120000MS",
+            "rawProduction7And14Days": "PASS_1.1SEC",
+            "artifactPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-preview-3m6m-browser",
+            "disposition": "FIXED_STALE_HOME_ROUTE_COMMIT",
+            "correction": "Actual route-generation guard; test and timeout unchanged"
+          }
+        },
+        "normalThroughMs": 180000,
+        "reminderAfterMs": 180000,
+        "limitedFromMs": 360000,
+        "productionThresholds": "7/14 days unchanged",
+        "servedAssets": {
+          "src/app.js": "5d58e484d43131b01cae66976b3986d7c2edeb713c10074bd42f6c3a97a12bae",
+          "src/lib/offline-lease.js": "181b542d439ca807ccbf9aa4af4fde8f343dddd36d3f8f695a4ac304bd367722"
+        },
+        "servedVerified": true,
+        "poAccepted": false
+      },
+      "disposition": "Pre-trial acceptance state retained; actual PO trial success now recorded"
+    }
+  ],
+  "previousManualReviewBlocks": [
+    "<!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->\n## Current PO decisions — 2026-10-13\n\nN96 and N54 are explicitly accepted/CLOSED. N13 requested single grade/section/subject revision is verified in Production at `a516ced605cf016848841b0bc021d4e5acdfa41f` (2026-10-12T23:38:52.495Z). WAITING_PO / REVISION DEPLOYED; no PO acceptance or closure is claimed.\n\nN49 test Preview: [https://b5a7820d.rakeezx.pages.dev](https://b5a7820d.rakeezx.pages.dev). Release `3cc1f1f3c29c083c88cc80dd51060f07f783599d`; source `2b434fac6646bd04404077f2a97b9780846fc2b7`. Normal through 3 minutes, editable reminder after 3 minutes, read-only from 6 minutes. Reading/export/backup remain available; Restore and other writes are blocked. Production stays 7/14 days. Provider SUCCESS; module-boundary PASS; browser checks PASS: Product-account case passed in 10.7 seconds after fixing the stale HOME route overwrite; unchanged raw Production 7/14-day case retains its 1.1-second PASS. Prior 120-second failure is retained as fixed history; timeout and assertions were unchanged. This is for PO trial, not closure.\n\nN77 deletion is high priority after N13/N49. Deferred tickets stay deferred. See `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`; native queue closure is confirmed by a later controller snapshot.\n<!-- END RAKEEZ PO DECISIONS 20261013 -->"
+  ],
+  "userFeedbackHistory": [],
+  "userFeedback": {
+    "N13": {
+      "reportedImprovement": true,
+      "acceptedClosureWhenTechnicallyReady": true,
+      "source": "Direct PO feedback on 2026-10-13, as supplied by root; concise factual summary, not a verbatim quotation"
+    },
+    "N49Preview": {
+      "reportedSuccess": true,
+      "reportedAtLocal": "2026-10-13 03:07 Asia/Riyadh",
+      "previewUrl": "https://b5a7820d.rakeezx.pages.dev",
+      "testedBehavior": "Personal trial of normal offline work through 3 minutes, editable reminder after 3 minutes and read-only at 6 minutes",
+      "remainingRequest": "Clarify reminder/LIMITED and write-denial wording; exclude notices from printing while preserving the report",
+      "newCopyPrintFixPersonalRetest": "NOT_REPORTED; technical completion and closure delegated",
+      "productionDays": {
+        "reminder": 7,
+        "limited": 14
+      }
+    }
+  },
+  "continuityObservationHistory": [],
+  "continuityObservation": {
+    "schemaVersion": 1,
+    "kind": "immutable_read_only_continuity_observation",
+    "observedThroughUtc": "2026-10-13T00:13:38.850Z",
+    "provenance": {
+      "nativeFacts": "Root agent read-only native observations reported at 00:11:28Z and 00:13:38.850Z; this supporting agent made no Desktop Commander calls.",
+      "sourceAudit": "Four exact native source files supplied by root; hashes below bind this observation to those saved copies.",
+      "snapshot": "tmp/po-acceptance-20261013/native/ACTIVE_TASKS.json"
+    },
+    "unattendedObservationWindow": {
+      "fromUtc": "2026-10-12T23:58:15Z",
+      "toUtc": "2026-10-13T00:08:01Z",
+      "rootChatOrDesktopCommanderCallsInsideWindow": 0,
+      "callAbsenceEvidence": "Root-reported conversation/tool-call boundary, not inferred from task heartbeat.",
+      "actualWorkInsideWindow": [
+        {
+          "kind": "file_write",
+          "pathWithinN94Worktree": "tests/n94/native-check.mjs",
+          "lastWriteTimeUtc": "2026-10-12T23:58:58.377Z"
+        },
+        {
+          "kind": "file_write",
+          "pathWithinN94Worktree": "tests/n94/native-result.json",
+          "lastWriteTimeUtc": "2026-10-13T00:00:01.013Z"
+        },
+        {
+          "kind": "git_commit",
+          "sha": "7bb671564c6468a84adc910e250fd6e11030a50c",
+          "committedAtUtc": "2026-10-13T00:00:02Z",
+          "nativeOffsetTimestamp": "2026-10-13T03:00:02+03:00",
+          "subject": "AI: keep N94 tap debounce independent of device clock"
+        }
+      ],
+      "conclusion": "Actual N94 implementation and local evidence production continued after the chat stopped issuing tools.",
+      "notEstablished": [
+        "A finish-to-next-ticket handoff inside this window",
+        "A production delivery inside this window",
+        "Uninterrupted 24-hour operation or recovery from every failure"
+      ],
+      "discardedEvidence": "An earlier empty file-modification query mixed local and UTC times and is invalid; it is not used here."
+    },
+    "controllerSnapshot": {
+      "atUtc": "2026-10-13T00:08:28.236Z",
+      "controllerPid": 18556,
+      "instanceId": "8fd10e7f-2d1e-455f-b15a-e0e181809582",
+      "activationId": "po-20261012-continuous",
+      "controllerAlive": true,
+      "processInventoryKnown": true,
+      "paused": false,
+      "maxWorkers": 2,
+      "runningCount": 1,
+      "pendingTickets": [
+        "N77",
+        "N58",
+        "N73",
+        "N71"
+      ],
+      "activeTicket": "N94",
+      "runnerPid": 29152,
+      "sessionId": "01a12fe2-49fc-7f51-a6f1-2e3b92fe66cd",
+      "deliveryInFlight": null,
+      "lastDeliveredMainSha": "ba28be41eac0890a0b700dd42502b3d394fe8296",
+      "lastDeliveryProgressAtUtc": "2026-10-12T23:54:55.495Z",
+      "caution": "Heartbeat and snapshot update timestamps establish liveness, not useful work; the separate commit and file times above establish progress."
+    },
+    "schedulerOwnership": {
+      "observedAtUtc": "2026-10-13T00:13:38.850Z",
+      "taskName": "RAKEEZ-Continuous-Delivery",
+      "runningInstances": 1,
+      "instanceState": 4,
+      "instanceGuid": "092637B0-73EB-41C0-9790-F8E522EA9FAA",
+      "enginePid": 10544,
+      "controllerParentPid": 10544,
+      "currentAction": "powershell",
+      "launcherParentPid": 2144,
+      "launcherParentName": "svchost.exe",
+      "conclusion": "The registered Scheduled Task owns the current controller through its actual PowerShell parent; this is not merely an unrelated manually running controller.",
+      "settingsObserved": {
+        "multipleInstances": "IgnoreNew",
+        "executionTimeLimit": "PT0S",
+        "restartCount": 3,
+        "restartInterval": "PT1M",
+        "allowHardTerminate": false,
+        "logonType": "InteractiveToken",
+        "runLevel": "Limited"
+      },
+      "lastRunTimeUtc": "2026-10-13T00:05:02Z",
+      "lastTaskResult": {
+        "decimal": 2147946720,
+        "hex": "0x800710E0",
+        "win32Code": 4320,
+        "symbol": "ERROR_REQUEST_REFUSED",
+        "description": "The operator or administrator has refused the request.",
+        "specificCause": "Unconfirmed. IgnoreNew while an instance runs is a possible refused-launch explanation; the code alone does not prove it or a permission failure."
+      },
+      "operationalLogEnabled": false,
+      "eventLimitation": "No historical Event 322 or other event was available to attribute this result; the operational log is disabled.",
+      "recoveryRestartIndicatedByCurrentEvidence": false
+    },
+    "codeBackedAutonomy": [
+      {
+        "source": "start-ops.ps1",
+        "finding": "The Scheduled Task action waits for the local controller process lifetime."
+      },
+      {
+        "source": "controller.mjs",
+        "finding": "A local five-second loop imports activated cards, reconciles workers, collects publication results and admits eligible pending or due-retry cards."
+      },
+      {
+        "source": "controller.mjs / worker-broker.mjs",
+        "finding": "A detached Node broker with file output handles owns a non-detached PowerShell runner; no chat request is required to keep these processes running."
+      },
+      {
+        "source": "run-task.ps1",
+        "finding": "Local Codex exec/resume receives a complete prompt once, stdin closes, and approval_policy=never is set. The wrapper waits and writes checkpoints without conversation input."
+      },
+      {
+        "source": "controller.mjs",
+        "finding": "Verified delivery enters awaiting_po and frees worker capacity; owner review is not a global gate on admitting the next eligible card."
+      },
+      {
+        "source": "audited four-file scope",
+        "finding": "No dependency on an open ChatGPT conversation or Desktop Commander RPC is present in dispatch, reconciliation or publication scheduling. This does not remove the need for the PC, network and the worker service credentials."
+      }
+    ],
+    "materialLimits": [
+      {
+        "kind": "current_admission_gate",
+        "finding": "Active N94 overlaps the admitted allowedPaths of N77, N58, N73 and N71, including src/store.js. scopesOverlap prevents each from starting while N94 is running or delivering despite maxWorkers=2."
+      },
+      {
+        "kind": "confirmed_watchdog_policy_gap",
+        "finding": "watchdogReason and scopedProgress exclude an entire local card when liveMutation or liveAuthorizationRef is present, or resourceClass is live-mutation. N94 has live authorization, so its budget/idle settings do not currently bound a silent whole-task stall. This is a policy gap, not evidence that the observed N94 worker is stalled."
+      },
+      {
+        "kind": "catalog_scope",
+        "finding": "Automatic intake is limited to activated catalog cards. It does not invent executable cards for every open ledger ticket or revise an already existing blocked/awaiting card automatically."
+      },
+      {
+        "kind": "failure_recovery_scope",
+        "finding": "Quota/auth/network failures use saved retry delays. Environment/external failures and a second implementation failure remain blocked rather than being automatically repaired without a new decision."
+      },
+      {
+        "kind": "scheduler_recovery_scope",
+        "finding": "IgnoreNew and recurrence can avoid duplicate controllers and recover an exited launcher. They do not restart a still-running hung worker. InteractiveToken requires the configured user logon session."
+      }
+    ],
+    "watchdogFollowUpBoundary": {
+      "applied": false,
+      "activeWorkerInterrupted": false,
+      "safeObservationalScope": "Measure scoped progress and record overdue/stalled observations for live-authorized local cards while preserving the existing stopOwned exclusions.",
+      "automaticRecoveryRequirement": "A later termination/resume change needs exact task/run/PID/birth ownership plus coordinated live-phase/recovery ownership. A lease-free observation alone is not an atomic fence against a worker acquiring the live lease immediately afterward.",
+      "limitation": "Observation alone improves visibility; it must not be represented as automatic stall recovery."
+    },
+    "primaryReferences": [
+      "https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--4000-5999-",
+      "https://learn.microsoft.com/en-us/windows/win32/api/taskschd/ne-taskschd-task_instances_policy"
+    ],
+    "sourceSha256": {
+      "tmp/po-acceptance-20261013/native/ops/controller.mjs": "0ccfc6458e84857e707ff3e35300ced17a954a3448aa9ffe7fd9c1dee40ef34f",
+      "tmp/po-acceptance-20261013/native/ops/start-ops.ps1": "f48b50ef98c34d0c025254e8be2d01adc4658a7e9f9eda1b1f327d564e5e840b",
+      "tmp/po-acceptance-20261013/native/ops/worker-broker.mjs": "ace55c8837bff83b93b441843daecc3a876ffd699e29cea0a29513d81cf38de9",
+      "tmp/po-acceptance-20261013/native/ops/run-task.ps1": "ba8f446b274b744217d12afda177a6dfdfe4aa6a3aaa26992a0fbc8eab21dd2d",
+      "tmp/po-acceptance-20261013/native/ACTIVE_TASKS.json": "479cc3d90fb8e08dde15354f14d21a6eee65d80588bb766ad6c78504dcd4a0bf"
+    }
+  },
+  "continuityObservationSourceSha256": "e98007474810b88415476183b24f072fe11f6b8ce9f714a210b1fc601c847ced",
+  "continuityPostObservationHistory": [],
+  "continuityPostObservation": {
+    "observedAtUtc": "2026-10-13T00:24:11Z",
+    "source": "Root actual read-only Automations task peek",
+    "existingHourlyChatGPTAutomation": {
+      "taskId": "6acac5b657f481919a49d42cfed56fd1",
+      "isEnabled": true,
+      "lastRunTimeUtc": "2026-10-13T00:00:23.040579Z",
+      "updatedAtUtc": "2026-10-13T00:00:45.687473Z"
+    },
+    "ordering": {
+      "N94CommitSha": "7bb671564c6468a84adc910e250fd6e11030a50c",
+      "N94CommitAtUtc": "2026-10-13T00:00:02Z",
+      "commitPrecededRecordedHourlyWakeBySeconds": 21.040579,
+      "rootLastCallBeforeObservationWindowUtc": "2026-10-12T23:58:15Z"
+    },
+    "conclusion": "The observed N94 commit preceded the recorded hourly automation wake by about 21 seconds, within the root-reported no-call interval. That later wake does not explain this earlier worker commit. This supplements the bounded continuity evidence; it does not claim continuous 24-hour operation."
+  },
+  "technicalAcceptanceHistory": [],
+  "latestTechnicalAcceptance": {
+    "decisionDate": "2026-10-13",
+    "authorityDescription": "Direct PO instruction on 2026-10-13: PO reported N13 improvement and accepted closure when technically ready. PO personally reported the N49 accelerated 3/6-minute Preview trial successful at 03:07 Asia/Riyadh and delegated closure after the remaining screen-wording and print-only correction is technically successful and actually delivered. The new wording/print correction has technical acceptance; no separate personal retest of that new fix is reported.",
+    "products": [
+      {
+        "productId": "N13",
+        "taskId": "continuous-n13-existing-section-subject-20261012",
+        "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+        "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+        "verifiedAt": "2026-10-12T23:38:52.495Z",
+        "runId": "1d32e6b3-a88e-45e5-aa94-2981effa8d8e",
+        "checks": [
+          {
+            "name": "n13_single_creation_form",
+            "status": "PASS",
+            "evidence": "Focused actual-application browser case passed at 390px: visible grade/section fields, subject selection, no separate existing/new selector, successful first Teaching creation and five defaults per Teaching."
+          },
+          {
+            "name": "n13_automatic_shared_section",
+            "status": "PASS",
+            "evidence": "Normalized أ/ا matching reused the Section. Exact Section/student/enrollment snapshots remained unchanged; another subject added one Teaching with five defaults."
+          },
+          {
+            "name": "n13_duplicate_without_false_success",
+            "status": "PASS",
+            "evidence": "Duplicate subject and custom alias showed a warning and kept the form open; all database stores including outbox remained identical. Rapid submit and previous-term allowance passed. Required focused command completed 2/2 PASS."
+          }
+        ],
+        "requiredAssets": {
+          "src/views/teachings.js": "721da13d8d24dd8572d3bd076c83519be488b3201ab0f927bf5b5abd5a2f3642"
+        },
+        "provider": {
+          "checkRunId": "115055739508",
+          "headSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-10-12T23:38:24Z",
+          "completedAt": "2026-10-12T23:38:24Z",
+          "headBranch": null,
+          "deploymentId": "b4be113e-9474-43aa-8ec8-693b2e7d4e08",
+          "previewUrl": "https://b4be113e.rakeezx.pages.dev",
+          "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/b4be113e-9474-43aa-8ec8-693b2e7d4e08"
+        },
+        "binding": {
+          "candidateSha": "f8e2a5234e72b0af04174a4b33588c8e34f99d36",
+          "declaredBaseSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+          "mainAtPreparation": "61a6e1498c5ef985cb4e947c72e56eb18581797d",
+          "integrationSha": "9b67479cb7bceb426eff3117ba9b5e0fdd81ccf1",
+          "publishedSha": "a516ced605cf016848841b0bc021d4e5acdfa41f",
+          "candidateAncestorOfPublished": true,
+          "previousMainAncestorOfPublished": true,
+          "mainContainsPublished": true,
+          "checkHeadShaMatches": true,
+          "kind": "merge"
+        },
+        "technicalConditionMet": true,
+        "acceptanceKind": "PO_ACCEPTED_WITH_REPORTED_IMPROVEMENT"
+      },
+      {
+        "productId": "N49",
+        "taskId": "continuous-n49-po-copy-print-20261013",
+        "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+        "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+        "verifiedAt": "2026-10-13T00:22:13.607Z",
+        "runId": "d6c43f7f-62d5-495f-8886-e947efdafbab",
+        "checks": [
+          {
+            "name": "n49_copy_print_render",
+            "status": "PASS",
+            "evidence": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/attempts/continuous-n49-po-copy-print-20261013/d6c43f7f-62d5-495f-8886-e947efdafbab/copy-print-evidence/n49-copy-print-render.json. Both actual-app HTTP cases passed: notices visible on screen, hidden in print, طالب ألف report preserved, notices restored on screen. Receipt binds both source hashes, unchanged fixture and CSS. Initial CRLF mismatch diagnosed and corrected locally to exact committed LF bytes; proof script SHA verified."
+          }
+        ],
+        "requiredAssets": {
+          "src/app.js": "c967ee081e4945e135751d3eb471971a2c62e5a2f4d1cc773f4dd15b43f22f7a",
+          "src/lib/offline-lease.js": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86"
+        },
+        "provider": {
+          "checkRunId": "115067393865",
+          "headSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-10-13T00:21:39Z",
+          "completedAt": "2026-10-13T00:21:39Z",
+          "headBranch": null,
+          "deploymentId": "53832a93-8e1d-466a-b28f-bcb2fe4662eb",
+          "previewUrl": "https://53832a93.rakeezx.pages.dev",
+          "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/53832a93-8e1d-466a-b28f-bcb2fe4662eb"
+        },
+        "binding": {
+          "candidateSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+          "declaredBaseSha": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+          "mainAtPreparation": "ff21bf787b03a7189193c2c34c957dea3137f2af",
+          "integrationSha": "8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf",
+          "publishedSha": "df1715a822fe37f15f5b25d288db75c2d391b895",
+          "candidateAncestorOfPublished": true,
+          "previousMainAncestorOfPublished": true,
+          "mainContainsPublished": true,
+          "checkHeadShaMatches": true,
+          "kind": "candidate-fast-forward"
+        },
+        "technicalConditionMet": true,
+        "acceptanceKind": "PO_DELEGATED_TECHNICAL_ACCEPTANCE_OF_COPY_PRINT"
+      }
+    ],
+    "userFeedback": {
+      "N13": {
+        "reportedImprovement": true,
+        "acceptedClosureWhenTechnicallyReady": true,
+        "source": "Direct PO feedback on 2026-10-13, as supplied by root; concise factual summary, not a verbatim quotation"
+      },
+      "N49Preview": {
+        "reportedSuccess": true,
+        "reportedAtLocal": "2026-10-13 03:07 Asia/Riyadh",
+        "previewUrl": "https://b5a7820d.rakeezx.pages.dev",
+        "testedBehavior": "Personal trial of normal offline work through 3 minutes, editable reminder after 3 minutes and read-only at 6 minutes",
+        "remainingRequest": "Clarify reminder/LIMITED and write-denial wording; exclude notices from printing while preserving the report",
+        "newCopyPrintFixPersonalRetest": "NOT_REPORTED; technical completion and closure delegated",
+        "productionDays": {
+          "reminder": 7,
+          "limited": 14
+        }
+      }
+    },
+    "productionN49Days": {
+      "reminder": 7,
+      "limited": 14
+    }
+  },
+  "nativeApplicationHistory": [
+    {
+      "queueClosureAndUpdatedCards": "Consult native install receipt and a subsequent controller snapshot; no queue writes are performed by this record",
+      "reason": "Device is intermittently reachable; no queue closure claimed by this repository-only record",
+      "mechanism": "GUARDED_CANONICAL_LEDGER_INSTALL",
+      "queueWrites": false,
+      "controllerObservation": "REQUIRED_AFTER_INSTALL",
+      "receiptPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/po-decisions-20261013-install-receipt.json"
     }
   ]
 }
