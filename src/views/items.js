@@ -224,8 +224,9 @@ export default {
     foundationAvailable = false;
     foundationChecking = !isDemo();
     if (isDemo()) return;
-    getScoreFoundationCapability().then((capability) => {
-      foundationAvailable = capability?.scoreDomainVersion === 1 &&
+    const workspace = store.getActiveWorkspace();
+    getScoreFoundationCapability({ workspace, allowOffline: true }).then((capability) => {
+      foundationAvailable = store.getActiveWorkspace() === workspace && capability?.scoreDomainVersion === 1 &&
         capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
           capability?.copyDomainVersion === 1 && capability?.n94SubitemVersion === 1;
     }).catch(() => { foundationAvailable = false; }).finally(() => {

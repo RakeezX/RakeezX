@@ -210,6 +210,9 @@ export async function renewOfflineLease() {
   }, {
     isCurrent: () => activeWorkspace === workspace && leaseOwner() === workspace.authUserId,
   });
+  // Establish real score support while online, even before the first subitem
+  // edit. Failure does not revoke an otherwise valid ordinary offline lease.
+  try { await getScoreFoundationCapability({ workspace }); } catch {}
   notify({ syncReady: false });
   return result;
 }
@@ -644,13 +647,18 @@ function syncV2Dependencies(storeName, record) {
     .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }));
 }
 
-function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
+function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], priorCommands = [], baseRevision = 0, stamp = now() }) {
   assertCloudRestoreWritable();
   if (activeWorkspace?.type === 'demo') return null;
   if (isLocalOnlyRecord({ id: recordId, ...commandPatch }) ||
       dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
   const mutationId = uid();
   const canonicalId = recordId;
+  // Definitions and student decisions share one score domain. A later edit
+  // must not overtake a completion whose acknowledgement failed (or vice versa).
+  const preceding = String(command).startsWith('score:') && commandPatch.itemId
+    ? priorCommands.filter(row => String(row.command ?? '').startsWith('score:') &&
+      row.patch?.itemId === commandPatch.itemId).sort((a, b) => b.sequence - a.sequence)[0] : null;
   return runtimeSyncOwnershipGuard.bindNewCommand({
     id: `v2:${mutationId}`,
     protocol: 'v2', mutationId, deviceId: syncV2DeviceId(), store,
@@ -660,7 +668,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
     op: 'command', command, baseRevision: Number(baseRevision) || 0,
     patch: structuredClone(commandPatch), localPatch: {},
     fields: Object.keys(commandPatch).sort(), groups: [],
-    dependencies: structuredClone(dependencies),
+    dependencies: structuredClone([...dependencies, ...(preceding ? [{ mutationId: preceding.mutationId }] : [])]),
     sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
     state: 'pending', attemptCount: 0, envelopeLocked: false,
     lastError: null, blockedReason: null,
@@ -3608,7 +3616,7 @@ async function commitScoreFoundation(prepare, { n94 = false } = {}) {
     throw new Error('Score foundation requires a claimed account workspace');
   }
   if (!isolatedDemo) {
-    const capability = await getScoreFoundationCapability();
+    const capability = await getScoreFoundationCapability({ workspace: commandWorkspace, allowOffline: true });
     if (capability?.scoreDomainVersion !== 1 || capability?.restoreProtocol !== 'CORE_V2' ||
         capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
       throw new Error('Score foundation server capability is unavailable');
@@ -3616,8 +3624,10 @@ async function commitScoreFoundation(prepare, { n94 = false } = {}) {
     if (n94 && capability?.n94SubitemVersion !== 1) throw new Error('N94 server capability is unavailable');
   }
   if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+  assertCloudRestoreWritable();
   const committed = await db.applyBatch(scoreFoundationScope(), { prepare(current) {
     if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+    assertCloudRestoreWritable();
     return prepare(current);
   } });
   const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
@@ -3710,12 +3720,18 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
       current.scores.find((row) => row.studentId === studentId && row.itemId === item.id)?.manualValue ?? null, stamp);
     const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
       command: 'score:set_completion', stamp,
+      priorCommands: current.outbox,
       patch: { itemId: item.id, studentId, subitemId, checked,
         ...(completionState ? { completionState: checked ? completionState : null } : {}) },
       dependencies: [
         { store: 'items', recordId: item.id, requiresServerRevision: true },
         { store: 'students', recordId: studentId, requiresServerRevision: true },
-        { store: 'scoreSubitems', recordId: subitemId, requiresServerRevision: true },
+        // A queued configure command establishes this server identity before
+        // completion via the explicit command chain. A later offline edit can
+        // keep its optimistic local definition at revision zero meanwhile.
+        { store: 'scoreSubitems', recordId: subitemId, requiresServerRevision:
+          !current.outbox.some(row => row.command === 'score:configure' && row.patch?.itemId === item.id &&
+            row.patch?.payload?.subitems?.some(definition => definition.id === subitemId)) },
       ],
     });
     result = { completion, score: score.record, ...score.projection };
@@ -3764,6 +3780,7 @@ export async function setScoreManualContribution(studentId, itemId, manualInput)
       requested === null ? null : requested / 100, stamp);
     const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
       command: 'score:set_manual', stamp,
+      priorCommands: current.outbox,
       patch: { itemId, studentId, manualValue: score.record.manualValue },
       dependencies: [
         { store: 'items', recordId: itemId, requiresServerRevision: true },
@@ -3916,6 +3933,7 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
     };
     const entry = syncV2CommandEntry({ store: 'items', recordId: itemId,
       command: 'score:configure', stamp,
+      priorCommands: current.outbox,
       patch: { itemId, expectedVersion, payload: configuration },
       dependencies: [
         { store: 'teachings', recordId: item.teachingId, requiresServerRevision: true },

@@ -420,7 +420,7 @@ function v2StoreAllowed(name, scoreDomainAvailable) {
 async function scoreDomainAvailableForSync() {
   let capability;
   try {
-    capability = await cloud.getScoreFoundationCapability();
+    capability = await cloud.getScoreFoundationCapability({ workspace: store.getActiveWorkspace() });
   } catch (error) {
     if (Number(error?.status) === 404 || error?.code === 'PGRST202') return false;
     throw error;
