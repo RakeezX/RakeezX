@@ -7,7 +7,8 @@ This page preserves user notes and acceptance context. The automatic block lists
 
 | التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
 | --- | --- | --- | --- | --- | --- |
-| N91 | Existing AI candidate preserved. Repaired hosted-app harness passed both required checks. Full receipt: artifacts/ops-supervisor-v4/attempts/v6-n91-mobile-card-titles-20261012/a8e2b83e-507f-40e9-9bb0-d243887c9510/evidence/N91_HOSTED_APP_PROOF.json. | [Production](https://rakeezx.com/) | 61a6e1498c5ef985cb4e947c72e56eb18581797d | 2026-10-12T23:37:12.020Z | v6-n91-mobile-card-titles-20261012 |
+| N77 | All five required gates passed after reconciliation with current main. Old pairs and functions remain retired. Evidence directory: C:\Users\Abody\Projects\RakeezX\artifacts\ops-supervisor-v4\capabilities\n77\6b53e77c-7893-4f59-abba-4a6d0197b2ba\private. Historical lease-call incident and its fail-closed correction are recorded. No main or Production publication performed. | [Production](https://rakeezx.com/) | 76c07ea52c4fe8185181e62cae6506f3dc76cdbd | 2026-10-13T01:22:35.392Z | continuous-n77-real-delete-20261012 |
+| N94 | Implemented and verified N94, including persisted teacher state and one certified additive service migration. Final immutable Preview is source-bound. Main/Production were not published; queue/status files were untouched. Stopped synthetic test directories were retained following the recorded deletion denial. | [Production](https://rakeezx.com/) | 5fb778db4a411bb517a21eb3eb2662a776ac97a6 | 2026-10-13T01:23:58.328Z | continuous-n94-subitem-late-scoring-20261012 |
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
@@ -50,3 +51,6 @@ The five new notes have been preserved verbatim in [Product Ledger History](PROD
 | N95 — credible red Sync warnings | PO reported repeated red warnings when leaving/re-entering app or internet toggles. Verified code cause: `syncAll` catch sets `error` after first transient exception; `coordinatorOperationalState()` propagates error before durable failed evidence; UI maps error to `badge--danger` immediately, while retries are scheduled at 2/4/8/16/30 seconds. CLOSED N68 handles only some resume flashes; N95 is wider severity policy. | Proposed **UI-only severity hysteresis**: quiet retrying/local-save signal for transient reconnect/offline, red only for confirmed sustained impact (initial study estimate 90–120s + >=2 meaningful failed attempts, NOT approved threshold); confirmed server rejection, owner/auth failures and data-loss/recovery hazards shown immediately with actionable detail. Keep real Sync retry/data truth unchanged. |
 
 No implied mergers, no new Product implementation permissions, and no reversal of earlier completed N33/N68/N80 tickets.
+
+
+Latest PO feedback 2026-10-13 04:52 Asia/Riyadh: N91 is expressly accepted and CLOSED. N77 and N94 follow-ups, N97 sync status, and N98 alphabetical roster have entered the current controller catalog. N24 report-design note is retained without activating deferred work. See docs/automation-evidence/20261013/PO_FEEDBACK_0452.md.

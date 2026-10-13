@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n77-confirmation-copy-20261013",
+      "productId": "N77",
+      "activationId": "po-20261012-continuous",
+      "priority": 0,
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "objective": "Remove redundant wording from N77 subject/final-class confirmation. The PO tested about eight deletions and requested cleaner wording. This is a copy-only follow-up, not acceptance of N77 or permission to rerun live deletion. Preserve selection, scope guards and handlers.",
+      "allowedPaths": [
+        "src/views/teachings.js",
+        "tests/n77-confirmation-copy.test.mjs"
+      ],
+      "requiredChecks": [
+        "n77_confirmation_copy_render"
+      ],
+      "acceptance": [
+        "Keep one scope-specific title, selected class/subject identity, concise consequence and Back/Confirm controls. Remove redundant subtitle إجراء يتطلب التأكيد قبل التنفيذ, badge تنبيه تأكيد and أنت على وشك حذف. Avoid an empty subtitle gap and restore the normal subtitle on Back.",
+        "Suggested subject consequence: ستُحذف هذه المادة ودرجاتها وحصصها وحضورها وملاحظاتها. سيبقى الفصل وطلابه وبقية المواد. Final-class consequence: هذه آخر مادة في الفصل؛ سيُحذف الفصل ودرجاته وحصصه وحضوره وملاحظاته. Preserve the warning that student records in other classes remain where relevant. Replace server jargon with يتطلب الحذف اتصالًا بالإنترنت. Keep a concise irreversible warning without repeated headings.",
+        "One focused synthetic render check for both scopes, Back, identity and unchanged confirmation/guards. No live deletion, SQL, full Vite build or historical suite. Preserve N13 simplified creation."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 correction and Production delivery delegation, through controller/publisher only. No real-account changes, Auth/SQL/RLS, migration replay, additional paid tool, worker tree or dispatcher. Local synthetic checks only; awaiting_po after verified delivery."
+    },
+    {
+      "id": "continuous-n98-default-alphabetical-roster-20261013",
+      "productId": "N98",
+      "activationId": "po-20261012-continuous",
+      "priority": 2,
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 40,
+      "idleMinutes": 12,
+      "objective": "Make default roster order Arabic-alphabetical and display contiguous updated numbers automatically across existing class lists. Independent of user filters. Ahmad1,Bandar2,Khalid3 plus Hatim becomes Ahmad1,Bandar2,Hatim3,Khalid4.",
+      "allowedPaths": [
+        "src/models.js",
+        "src/views/students.js",
+        "src/views/grades.js",
+        "src/views/attendance.js",
+        "src/views/reports.js",
+        "src/lib/export.js",
+        "tests/n98-*"
+      ],
+      "requiredChecks": [
+        "n98_default_order_identity",
+        "n98_existing_views_numbering"
+      ],
+      "acceptance": [
+        "Inspect sortStudents in models.js; it currently prioritizes stored rollNo before Arabic name. Use existing Arabic collator and deterministic ties. Derive default display numbering from the complete active roster. Do not change student/enrollment IDs, grade links, stored names or historical records; no real-account backfill.",
+        "Preserve explicit user-selected filters/sorts and saved preferences. Existing legacy rollNo must not force append order in normal default view. Roster, grades, attendance and reports must number the same students consistently. No database writes/outbox flood merely to renumber presentation.",
+        "Focused checks for the four-name example, old roll numbers, same-name/diacritic stable identities, add/rename/remove and actual affected view/report rendering. Inspect store.studentsOf and consumers read-only. Prefer shared model fix; report any genuinely needed additional path without weakening tests."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 default-order and renumbering request authorizes scoped presentation correction and Production delivery through controller/publisher. No live data mutation, identity rewrite, SQL/Auth/RLS or additional paid worker. Synthetic tests; awaiting_po after verified delivery."
+    },
+    {
+      "id": "continuous-n94-offline-subitems-20261013",
+      "productId": "N94",
+      "activationId": "po-20261012-continuous",
+      "priority": 3,
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 50,
+      "idleMinutes": 12,
+      "objective": "Fix actual-account subitem creation/editing/completion offline Failed to fetch. Offline-first writes must work within a valid same-owner N49 lease and sync later, preserving N94 scoring/late-state contract.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/lib/cloud.js",
+        "src/lib/score-foundation.js",
+        "src/lib/db.js",
+        "src/lib/sync.js",
+        "src/views/items.js",
+        "src/views/grades.js",
+        "tests/n94-offline-*"
+      ],
+      "requiredChecks": [
+        "n94_offline_atomic_outbox",
+        "n94_capability_owner_lease",
+        "n94_offline_ui_reconnect"
+      ],
+      "acceptance": [
+        "Published source commitScoreFoundation awaits getScoreFoundationCapability before each local db.applyBatch; cloud.js implements that call as an RPC. Correct this network prerequisite using actual verified owner/workspace-bound capability and the trusted lease. Do not manufacture server capability or weaken initial unverified/incompatible-account guards.",
+        "Previously verified account: offline and after offline reload, definitions and deliberate completion taps commit locally with correct projected score and idempotent ordered outbox commands. Reconnect converges once without duplicates/loss. Preserve createdAt/startDate/dueDate/latePoints, ordinary/late/unrecorded decisions and old grades.",
+        "Wrong owner/workspace, expired14day lease, real rejection and read-only/restore guards remain fail-closed. Class Delete and cloud Restore stay online-only. No SQL/schema/Auth or real teacher edits. Expected offline use must not expose raw Failed to fetch.",
+        "Use focused command/outbox/owner tests and actual UI on synthetic offline/reload/reconnect fixtures; label simulated backend evidence honestly. Reuse unchanged scoring evidence and do not rerun migration suite. Wait for current N73 shared files through controller scope coordination."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 bug-fix and existing offline-first/N49/N94 contracts authorize local code and synthetic proof plus scoped Production delivery through publisher. No SQL/Auth/RLS changes, migration replay, real-account mutation or fresh live fixtures; preserve all data guards."
+    },
+    {
+      "id": "continuous-n97-delete-resume-sync-status-20261013",
+      "productId": "N97",
+      "activationId": "po-20261012-continuous",
+      "priority": 4,
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 50,
+      "idleMinutes": 12,
+      "objective": "Diagnose/fix incorrect red Sync errors after successful class deletion, two distinct class deletes on two devices and iPhone resume before fresh pull. Follow up CLOSED N95/N96 without reopening them; preserve genuine failures and anti-resurrection.",
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync-operational-ui.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "src/lib/n77-delete.js",
+        "src/store.js",
+        "src/app.js",
+        "tests/n97-*",
+        "tests/sync-operational-ui.e2e.mjs"
+      ],
+      "requiredChecks": [
+        "n97_source_cause_and_reproduction",
+        "n97_delete_resume_status",
+        "n97_real_errors_preserved"
+      ],
+      "acceptance": [
+        "Keep observations separate: successful deletes sometimes flash red; two devices deleting different classes show error; iPhone resumes with stale red until pull. Screenshot has resolved-conflict count7; later pasted details27. Historical repaired conflicts are not active failure. Identify actual source cause and reproduce synthetic current account-capable behavior.",
+        "Inspect coordinator presentationSeverity lifecycle, unresolved queues, persisted hardFailure and class-deletion in-flight checkpoints. N96 special handling covers student lifecycle only. Correct status/freshness instead of simply extending90second delay or hiding all errors. Calm pending/verification must not falsely claim Synced.",
+        "Test selected-subject/final-class completion, two independent device contexts deleting distinct scopes and resume/pull. Owner/Auth/storage rejection and actual failed/rejected outbox remain actionable. Keep exact receipts, strict queue assertions, tombstones and no resurrection. Do not change online-only deletion.",
+        "No actual teacher/student deletion or applied SQL/Auth/RLS change. Use existing synthetic current-app coordinator/browser fixtures and focused tests. Network abort is not successful server rejection. Document whether reproduction matches PO symptom and any remaining uncertainty."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 diagnosis/correction and Production delivery delegation. Use controller and single publisher; only synthetic tests and frontend/coordinator correction. No real data mutation, migration replay, fresh live Auth fixtures or suppression of genuine safety errors; awaiting_po after verified delivery."
+    }
+  ]
+}
