@@ -9,12 +9,13 @@ const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 const functionSource = (name, next) => source.slice(source.indexOf(`async function ${name}(`), source.indexOf(`async function ${next}(`));
 const readySource = functionSource('ready', 'login');
 const loginSource = functionSource('login', 'payload');
-const execute = (fn, modules, argument) => new AsyncFunction('load', 'argument',
-  `return (${fn.toString().replaceAll('import(', 'load(')})(argument)`)(async name => modules[name], argument);
+const execute = (fn, modules, argument, document = { readyState: 'complete', querySelector: () => null }) => new AsyncFunction('load', 'argument', 'document',
+  `return (${fn.toString().replaceAll('import(', 'load(')})(argument)`)(async name => modules[name], argument, document);
 
 function synthetic({ owner = 'A', protocol = 'CORE_V2' } = {}) {
   const sync = { state: { lastSyncedAt: 0 }, displayState: () => ({ detailStatus: 'synced' }) };
-  const store = { state: { ready: true, device: { lastSyncAt: 0 } }, getActiveWorkspace: () => ({ authUserId: 'A', type: 'account', ownershipState: 'claimed' }) };
+  const workspace = { authUserId: 'A', type: 'account', ownershipState: 'claimed', databaseName: 'synthetic-A' };
+  const store = { state: { ready: true, device: { lastSyncAt: 0 } }, getActiveWorkspace: () => workspace };
   const cloud = { user: { id: 'A' }, session: { user: { id: 'A' } }, signIn: async () => {} };
   let polls = 0, reads = 0;
   const modules = { '/src/lib/sync.js': sync, '/src/store.js': store, '/src/lib/cloud.js': cloud,
@@ -23,11 +24,12 @@ function synthetic({ owner = 'A', protocol = 'CORE_V2' } = {}) {
       getAll: async () => [{ id: 'canonical-student' }] } };
   const page = { goto: async () => {}, reload: async () => {},
     evaluate: (fn, arg) => execute(fn, modules, arg),
-    waitForFunction: async fn => {
+    waitForFunction: async (fn, argument) => {
       for (let i = 0; i < 8; i++) {
-        if (await execute(fn, modules)) return;
+        const value = await execute(fn, modules, argument);
+        if (value) return { jsonValue: async () => value, dispose: async () => {} };
         polls++;
-        assert.equal(reads, 0, 'Canonical receipt read before completed Sync');
+        if (argument == null) assert.equal(reads, 0, 'Canonical receipt read before completed Sync');
         // An early presentation-only synced status, then an incomplete device
         // timestamp, must both keep the actual runner predicate pending.
         if (polls === 2) sync.state.lastSyncedAt = 123;
@@ -54,8 +56,31 @@ test('A2 waits through presentation-only Sync and incomplete device checkpoint',
 test('A2 rejects another owner or incompatible Initial Restore receipt', async () => {
   for (const options of [{ owner: 'B' }, { protocol: 'CORE_V1' }]) {
     const h = synthetic(options);
-    await assert.rejects((await h.login)({ preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A' }] }, h.browser, 'A', 'A2'), assert.AssertionError);
+    await assert.rejects((await h.login)({ preview: 'https://synthetic.invalid', accounts: [{ slot: 'A', id: 'A' }] }, h.browser, 'A', 'A2'), /Synthetic readiness timeout/);
   }
+});
+
+test('A2 checkpoint survives automatic reload and rejects state changed during reads', async () => {
+  let workspace = null, gate = true, reads = 0;
+  const document = { readyState: 'complete', querySelector: () => gate ? {} : null };
+  const sync = { state: { lastSyncedAt: 123 }, displayState: () => ({ detailStatus: 'synced' }) };
+  const store = { state: { ready: true, device: { lastSyncAt: 123 } }, getActiveWorkspace: () => workspace };
+  const modules = { '/src/lib/sync.js': sync, '/src/store.js': store,
+    '/src/lib/db.js': { getActiveDatabaseName: () => workspace?.databaseName ?? 'rakeezx', STORES: ['students'],
+      readInitialRestoreReceipt: async () => ({ ownerId: 'A', protocol: 'CORE_V2' }),
+      getAll: async () => { reads++; if (reads === 1) workspace = { ...workspace }; return [{ id: 'canonical-student' }]; } } };
+  const checkpoint = await new AsyncFunction(`${functionSource('ownerCheckpoint', 'login')}\nreturn ownerCheckpoint;`)();
+  const page = { waitForFunction: async (fn, owner) => {
+    assert.equal(await execute(fn, modules, owner, document), false, 'Reload document has no authority');
+    assert.equal(reads, 0);
+    workspace = { authUserId: 'A', type: 'account', ownershipState: 'claimed', databaseName: 'synthetic-A' };
+    gate = false;
+    assert.equal(await execute(fn, modules, owner, document), false, 'Workspace changed while snapshot was read');
+    const value = await execute(fn, modules, owner, document);
+    return { jsonValue: async () => value, dispose: async () => {} };
+  } };
+  assert.equal((await checkpoint(page, 'A')).counts.students, 1);
+  assert.equal(reads, 2);
 });
 
 test('receipt retry passes the exact expectedStageHash to the real runner call', async () => {

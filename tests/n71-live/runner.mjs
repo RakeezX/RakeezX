@@ -133,10 +133,29 @@ async function bundles(){const state=await load();const core=await fs.readFile('
   return Promise.all(['provision','cleanup'].map(async mode=>({name:names[mode],entrypoint_path:'index.ts',verify_jwt:false,
     files:[{name:'index.ts',content:await fs.readFile(`supabase/functions/ops-n71-${mode==='provision'?'fixture':'retire'}/index.ts`,'utf8')},
       {name:'handler-core.mjs',content:core},{name:'run-manifest.mjs',content:'export default '+JSON.stringify(state.manifests[mode])+';'}]})));}
-async function ready(page){await page.waitForFunction(async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return s.state.ready===true&&s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account'&&s.getActiveWorkspace()?.ownershipState==='claimed';},null,{timeout:120000});
+async function ready(page){await page.waitForFunction(async()=>{const s=await import('/src/store.js');const c=await import('/src/lib/cloud.js');return document.readyState==='complete'&&!document.querySelector('[data-initial-restore-state]')&&s.state.ready===true&&s.getActiveWorkspace()?.authUserId===c.user?.id&&s.getActiveWorkspace()?.type==='account'&&s.getActiveWorkspace()?.ownershipState==='claimed';},null,{timeout:120000});
   // The initial outbox scan may report "synced" before a full Product pull.
   // Require an actual completed pass, not that presentation status alone.
   await page.waitForFunction(async()=>{const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return s.displayState().detailStatus==='synced'&&Number(s.state.lastSyncedAt)>0&&store.state.device?.lastSyncAt===s.state.lastSyncedAt;},null,{timeout:120000});}
+async function ownerCheckpoint(page,ownerId){
+  // Initial Restore automatically reloads after finalization. A predicate in
+  // the preceding document cannot authorize reads in the replacement document.
+  const handle=await page.waitForFunction(async expectedOwner=>{
+    const db=await import('/src/lib/db.js');const sync=await import('/src/lib/sync.js');const store=await import('/src/store.js');
+    const workspace=store.getActiveWorkspace(),databaseName=db.getActiveDatabaseName(),lastSyncedAt=sync.state.lastSyncedAt;
+    if(document.readyState!=='complete'||document.querySelector('[data-initial-restore-state]')||!store.state.ready||
+      workspace?.authUserId!==expectedOwner||workspace?.ownershipState!=='claimed'||workspace?.type!=='account'||
+      databaseName!==workspace.databaseName||!(Number(lastSyncedAt)>0)||store.state.device?.lastSyncAt!==lastSyncedAt||
+      sync.displayState().detailStatus!=='synced')return false;
+    const receipt=await db.readInitialRestoreReceipt();
+    if(receipt?.ownerId!==expectedOwner||receipt?.protocol!=='CORE_V2')return false;
+    const counts=Object.fromEntries(await Promise.all(db.STORES.filter(name=>!['device','meta','outbox'].includes(name)).map(async name=>[name,(await db.getAll(name)).length])));
+    if(!store.state.ready||store.getActiveWorkspace()!==workspace||db.getActiveDatabaseName()!==databaseName||
+      sync.state.lastSyncedAt!==lastSyncedAt||document.querySelector('[data-initial-restore-state]'))return false;
+    return {databaseName,workspace,receipt,lastSyncedAt,counts};
+  },ownerId,{timeout:120000});
+  try{return await handle.jsonValue();}finally{await handle.dispose();}
+}
 async function login(state,browser,slot,label,provision=false){
   const context=await browser.newContext({serviceWorkers:'block',baseURL:state.preview});const page=await context.newPage();
   const account=state.accounts.find(a=>a.slot===slot);await page.goto(state.preview);
@@ -157,7 +176,7 @@ async function login(state,browser,slot,label,provision=false){
   },state.foundation[slot]);}
   await page.reload();await ready(page);
   if(label==='A2'){
-    const checkpoint=await page.evaluate(async()=>{const db=await import('/src/lib/db.js');const s=await import('/src/lib/sync.js');const store=await import('/src/store.js');return {databaseName:db.getActiveDatabaseName(),workspace:store.getActiveWorkspace(),receipt:await db.readInitialRestoreReceipt(),lastSyncedAt:s.state.lastSyncedAt,counts:Object.fromEntries(await Promise.all(db.STORES.filter(name=>!['device','meta','outbox'].includes(name)).map(async name=>[name,(await db.getAll(name)).length])))};});
+    const checkpoint=await ownerCheckpoint(page,account.id);
     state.a2Checkpoint=checkpoint;await save(state);
     assert.equal(checkpoint.receipt?.ownerId,account.id,'A2 must finish owner-bound Initial Restore');
     assert.equal(checkpoint.receipt?.protocol,'CORE_V2');
