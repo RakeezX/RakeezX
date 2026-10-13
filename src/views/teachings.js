@@ -438,7 +438,10 @@ export default {
 
           function renderStep1() {
             if (titleEl) titleEl.textContent = 'حذف فصل';
-            if (descEl) descEl.textContent = 'اختر الفصل الذي ترغب في حذفه من القائمة:';
+            if (descEl) {
+              descEl.hidden = false;
+              descEl.textContent = 'اختر الفصل الذي ترغب في حذفه من القائمة:';
+            }
 
             container.innerHTML = html`
               <div class="class-delete-select-list" id="class-delete-select-list">
@@ -518,14 +521,10 @@ export default {
             const demo = selectedTch ? isDemo(selectedTch) : false;
 
             if (titleEl) titleEl.textContent = scope.kind === 'subject' ? 'تأكيد حذف المادة من الفصل' : 'تأكيد حذف الفصل كاملًا';
-            if (descEl) descEl.textContent = 'إجراء يتطلب التأكيد قبل التنفيذ';
+            if (descEl) descEl.hidden = true;
 
             container.innerHTML = html`
               <div class="class-delete-confirm-box">
-                <div class="class-delete-confirm-box__badge">
-                  ${icon('alert')} تنبيه تأكيد
-                </div>
-                <div class="t-danger fw-7 fs-sm">أنت على وشك حذف:</div>
                 <div class="class-delete-confirm-box__card">
                   <div class="hstack gap-2 align-center mb-1">
                     <span class="class-delete-row__dot" style="background:${safeColor(sec?.color)}" aria-hidden="true"></span>
@@ -536,12 +535,12 @@ export default {
                 </div>
                 <p class="class-delete-confirm-box__consequence">
                   ${scope.kind === 'subject'
-                    ? 'سيتم حذف هذه المادة وبياناتها فقط من الفصل، بما في ذلك الدرجات والحصص والحضور والملاحظات. سيبقى الفصل وطلابه والمواد الأخرى.'
-                    : 'هذه آخر مادة للفصل. سيتم حذف الفصل كاملًا وبياناته المرتبطة، بما في ذلك الدرجات والحصص والحضور والملاحظات.'}
+                    ? 'ستُحذف هذه المادة ودرجاتها وحصصها وحضورها وملاحظاتها. سيبقى الفصل وطلابه وبقية المواد.'
+                    : 'هذه آخر مادة في الفصل؛ سيُحذف الفصل ودرجاته وحصصه وحضوره وملاحظاته.'}
                 </p>
                 <p class="class-delete-confirm-box__note">
                   ${demo && scope.kind === 'class' ? 'سيُحذف الفصل التجريبي وبياناته المحلية فقط.'
-                    : 'ستبقى بيانات الطلاب المرتبطة بفصول أو سجلات أخرى محفوظة. يتطلب الحذف اتصالًا بالإنترنت والتحقق من النطاق على الخادم.'}
+                    : 'ستبقى سجلات الطلاب في الفصول الأخرى محفوظة. يتطلب الحذف اتصالًا بالإنترنت. لا يمكن التراجع عن الحذف.'}
                 </p>
               </div>
             `.value;
