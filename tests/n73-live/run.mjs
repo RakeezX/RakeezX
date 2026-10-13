@@ -116,7 +116,7 @@ async function prepare() {
   state={version:1,kind:'n73-private-run',runId,accounts,passwords,capabilities,manifests,defaults,ids,foundationIds,closure,
     sessions:{},checks:[],status:'PREPARED',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
     tree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),harnessSha256:hash(await readFile(new URL(import.meta.url))),diagnostics:[],
-    base:'b5e83107222833f5e74530a73355734d8477bd03',expectedEffects:'Only declared pair and Product IDs; caps, compatible target scores, target-only auto projection, source definitions, explicit extra tombstones.'};
+    base:execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim(),expectedEffects:'Only declared pair and Product IDs; caps, compatible target scores, target-only auto projection, source definitions, explicit extra tombstones.'};
   await save();
   console.log(JSON.stringify({runId,status:state.status,candidate:state.candidate,expiresAt,accounts:accounts.map(a=>({slot:a.slot,id:a.id})),names}));
 }
