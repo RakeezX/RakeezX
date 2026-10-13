@@ -19,6 +19,19 @@ export async function readJson(file, fallback = null) {
   try { return parse(await fs.readFile(file, 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return fallback; throw error; }
 }
+export async function replaceWindowsFile(temporary, file, {platform=process.platform, execute=runCommand}={}) {
+  if (platform !== 'win32' || path.dirname(temporary) !== path.dirname(file)) return false;
+  const destination = await fs.lstat(file).catch(error => { if(error.code === 'ENOENT')return null;throw error; });
+  if (!destination?.isFile() || destination.isSymbolicLink()) return false;
+  const previous = createHash('sha256').update(await fs.readFile(file)).digest('hex');
+  const expected = createHash('sha256').update(await fs.readFile(temporary)).digest('hex');
+  const literal = value => "'"+String(value).replaceAll("'","''")+"'";
+  const command = "$ErrorActionPreference='Stop';$target="+literal(file)+";$temp="+literal(temporary)+";if((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -ne '"+previous+"'){throw 'Concurrent destination change'};[IO.File]::Replace($temp,$target,[NullString]::Value)";
+  const result = await execute('C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe',['-NoProfile','-NonInteractive','-Command',command],{timeoutMs:10000});
+  if (result.code !== 0) return false;
+  if (createHash('sha256').update(await fs.readFile(file)).digest('hex') !== expected) throw Error('Native replacement readback differs');
+  return true;
+}
 export async function writeJson(file, value) {
   await fs.mkdir(path.dirname(file), { recursive: true });
   const temporary = `${file}.${process.pid}.${randomUUID()}.tmp`;
@@ -33,7 +46,12 @@ export async function writeJson(file, value) {
       catch (error) {
         // Windows readers may briefly deny replacement. Keep the same bytes
         // and atomic rename; a persistent lock remains an explicit failure.
-        if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= backoff.length) throw error;
+        if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code)) throw error;
+        if (attempt >= backoff.length) {
+          // Native atomic replace preserves the destination ACL and never deletes the target first.
+          if (await replaceWindowsFile(temporary,file)) { ownsTemporary=false;break; }
+          throw error;
+        }
         await new Promise(resolve => setTimeout(resolve, backoff[attempt]));
       }
     }
@@ -822,9 +840,27 @@ export class Controller {
     } else { task.status = 'blocked'; task.failureClass = 'external'; task.lastFailure = clean(`${receipt.errorCode}: ${receipt.message}`); task.deliveryOwner = null; }
     await this.save(task); await this.event(task.status === 'awaiting_po' ? 'production_verified' : 'delivery_state', { taskId: task.id, status: task.status, publishedSha: receipt.publishedSha, code: receipt.errorCode });
   }
+  async persistSnapshot(summary) {
+    const primary=path.join(this.runtime,'ACTIVE_TASKS.json');
+    try {
+      await writeJson(primary,summary);
+      if(this.summaryWriteFailure) await this.event('summary_write_recovered',{previousCode:this.summaryWriteFailure.code});
+      this.summaryWriteFailure=null;
+    } catch(error) {
+      if(!['EPERM','EACCES','EBUSY'].includes(error.code))throw error;
+      // Queue records remain authoritative. A locked DISPLAY summary must not kill productive workers' coordinator.
+      const diagnostic={code:'PRIMARY_SUMMARY_WRITE_FAILED',errorCode:error.code,message:'Primary snapshot could not be atomically replaced; fresh fallback snapshot is available.'};
+      const fallback={...summary,primarySnapshotWritable:false,snapshotPath:'ACTIVE_TASKS.fallback.json',issues:[...summary.issues,diagnostic]};
+      await writeJson(path.join(this.runtime,'ACTIVE_TASKS.fallback.json'),fallback);
+      if(!this.summaryWriteFailure || this.clock()-timestamp(this.summaryWriteFailure.at)>60000) {
+        this.summaryWriteFailure={code:error.code,at:this.now()};
+        await this.event('primary_summary_write_failed',{errorCode:error.code,fallback:'ACTIVE_TASKS.fallback.json',authoritativeQueuePreserved:true});
+      }
+    }
+  }
   async snapshot(paused, inventoryKnown = true) {
     const active = this.jobs.filter(t => ['running', 'delivery'].includes(t.status));
-    await writeJson(path.join(this.runtime, 'ACTIVE_TASKS.json'), { version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
+    await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
       maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
       blockedCount: this.jobs.filter(t => t.status === 'blocked').length, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
