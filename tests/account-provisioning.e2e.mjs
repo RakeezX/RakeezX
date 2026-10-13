@@ -96,6 +96,7 @@ test('fresh authenticated owner completes profile and provisions once before Hom
   // Finish mocked startup Sync before navigation tears down its in-flight requests.
   await expect.poll(() => page.evaluate(() => window.__syncModule?.displayState().status)).toBe('synced');
   expect(provisionCalls).toBe(1);
+  expect(await ownerRows(page, 'sync_mutation_receipts')).toEqual([]);
   await page.reload();
   await expect(page.locator('#main')).toBeVisible();
   expect(provisionCalls).toBe(1);
