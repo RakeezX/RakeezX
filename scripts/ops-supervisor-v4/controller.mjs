@@ -177,6 +177,24 @@ export function verifiedDeployment(task, receipt, productionUrl = 'https://rakee
           && asset.normalization === 'cloudflare-jsd-v1' && asset.normalizedSha256 === asset.expectedSha256))));
 }
 
+export function validatePublishedEvidence(task, result, reference, productionUrl = 'https://rakeezx.com') {
+  const proof = task.evidenceOnly;
+  if (task.completionMode !== 'record_published_evidence' || !proof?.acceptanceAuthority || task.liveMutation || task.liveAuthorizationRef
+    || !['local','synthetic'].includes(task.executionMode) || proof.referenceTaskId !== reference?.id
+    || reference.id === task.id || reference.productId !== task.productId || reference.activationId !== task.activationId
+    || !['awaiting_po','closed'].includes(reference.status) || !verifiedDeployment(reference, reference.deliveryReceipt, productionUrl)
+    || proof.referencePublishedSha !== reference.deliveryReceipt.publishedSha) throw new Error('Verified existing Product reference and exact evidence-only authority required');
+  if (!['pending','blocked'].includes(task.status) || task.runnerPid || task.brokerPid || result?.state !== 'LOCAL_READY'
+    || result.taskId !== task.id || result.runId !== task.attempt?.runId || result.candidateSha !== task.candidateSha
+    || result.baseSha !== task.baseSha || normalize(result.worktreePath) !== normalize(task.worktreePath)
+    || !SHA.test(result.candidateSha ?? '') || !result.changedPaths?.length
+    || !task.allowedPaths?.length || !task.allowedPaths.every(p => /^docs\/automation-evidence\/\d{8}\/[a-zA-Z0-9_-]+\.(md|json)$/.test(p))
+    || !result.changedPaths.every(p => task.allowedPaths.includes(p))) throw new Error('Evidence-only exact identity or document scope mismatch');
+  if (!task.requiredChecks?.length || !task.requiredChecks.every(name => result.checks?.some(c => c.name === name && c.status === 'PASS'))
+    || result.checks.some(c => c.status !== 'PASS') || result.blockerType !== 'none' || result.blocker) throw new Error('Incomplete verification cannot be accepted');
+  return true;
+}
+
 export const RESULT_SCHEMA = {
   type: 'object', additionalProperties: false,
   required: ['taskId', 'runId', 'state', 'candidateSha', 'baseSha', 'worktreePath', 'changedPaths', 'checks', 'summary', 'blockerType', 'blocker', 'nextAction'],
@@ -480,6 +498,37 @@ export class Controller {
     await this.save(next); Object.assign(task, next);
     await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId, recoveredSavedResult: Boolean(recovery) });
   }
+  async completePublishedEvidence(task, processes) {
+    const reference = this.jobs.find(t => t.id === task.evidenceOnly?.referenceTaskId);
+    const original = await fs.readFile(task.attempt.outputPath), result = parse(original);
+    validatePublishedEvidence(task, result, reference, this.config.controller.productionUrl);
+    const reap = task.lastWorkerReap;
+    if (!reap?.exactAbsence || reap.activationId !== task.activationId || reap.runId !== task.attempt.runId
+      || !reap.owners?.length || reap.owners.some(o => processes.some(p => identityMatches(p,o)))) throw new Error('Completed evidence worker absence must be proven');
+    if (!this.testOnly) {
+      const run = async args => { const r = await this.command('git', args, {cwd:task.worktreePath}); if(r.code !== 0) throw new Error('Evidence source binding failed: '+args[0]); return r.stdout.trim(); };
+      if (await run(['rev-parse','HEAD']) !== result.candidateSha || await run(['status','--porcelain=v1','--untracked-files=no'])) throw new Error('Evidence candidate must remain exact and clean');
+      const paths = (await run(['diff','--name-only',result.baseSha,result.candidateSha])).split(/\r?\n/).filter(Boolean);
+      if (paths.length !== result.changedPaths.length || !paths.every(p => result.changedPaths.includes(p))) throw new Error('Actual evidence diff differs');
+      await run(['fetch','--no-tags','origin','main']);
+      const currentMain = (await run(['ls-remote','--heads','origin','refs/heads/main'])).split(/\s+/)[0];
+      if (!SHA.test(currentMain)) throw new Error('Current published main unavailable');
+      await run(['merge-base','--is-ancestor',result.candidateSha,currentMain]);
+      await run(['merge-base','--is-ancestor',reference.deliveryReceipt.publishedSha,currentMain]);
+      for (const p of paths) if (await run(['rev-parse',result.candidateSha+':'+p]) !== await run(['rev-parse',currentMain+':'+p])) throw new Error('Published evidence document changed: '+p);
+    }
+    if (!original.equals(await fs.readFile(task.attempt.outputPath))) throw new Error('Original verification result changed');
+    const completion = {version:1,kind:'published-evidence-only',taskId:task.id,productId:task.productId,runId:result.runId,
+      evidenceCandidateSha:result.candidateSha,referenceTaskId:reference.id,referencePublishedSha:reference.deliveryReceipt.publishedSha,
+      acceptedAt:this.now(),acceptanceAuthority:task.evidenceOnly.acceptanceAuthority,checks:result.checks,
+      originalResultSha256:createHash('sha256').update(original).digest('hex'),newProductDeployment:false,productTicketClosed:false};
+    await writeJson(path.join(this.runtime,'results',task.id+'.verification.json'),completion);
+    const next = {...task,status:'closed',verificationReceipt:completion,closedFromTechnicalEvidenceAt:this.now(),lastFailure:null,failureClass:null,deliveryOwner:null,retryAt:null};
+    await this.save(next); Object.assign(task,next);
+    // Re-render the reference Product's truthful state; do not close the parent ticket.
+    reference.productRecordKey = null; await this.save(reference);
+    await this.event('evidence_verified',{taskId:task.id,evidenceCandidateSha:result.candidateSha,referencePublishedSha:completion.referencePublishedSha,newProductDeployment:false});
+  }
   savedBaseMismatch(task) {
     return ['retry_wait', 'blocked'].includes(task.status) && task.failureClass === 'implementation'
       && task.lastFailure === 'Candidate validation: Candidate identity/base/worktree mismatch' && Boolean(task.attempt?.runId);
@@ -769,11 +818,11 @@ export class Controller {
     await writeJson(path.join(this.runtime, 'ACTIVE_TASKS.json'), { version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
       maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
-      pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
+      blockedCount: this.jobs.filter(t => t.status === 'blocked').length, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
       active: active.map(t => ({ id: t.id, productId: t.productId, status: t.status, runnerPid: t.runnerPid, sessionId: t.sessionId, candidateSha: t.candidateSha })),
       tasks: this.jobs.map(t => ({ id: t.id, productId: t.productId, status: t.status, retryAt: t.retryAt, nextDeliveryAt: t.nextDeliveryAt, lastFailure: t.lastFailure })),
       deliveryInFlight: this.deliveryInFlight, lastDeliveryProgress: this.progress,
-      idleReason: paused ? 'PAUSED_BY_MARKER' : !inventoryKnown ? 'PROCESS_INVENTORY_UNAVAILABLE' : active.length ? null : this.jobs.some(t => t.status === 'pending') ? 'PENDING_ELIGIBILITY' : this.jobs.some(t => t.status === 'retry_wait') ? 'WAITING_SAVED_RETRY' : 'NO_ACTIVATED_PENDING_CARDS',
+      idleReason: paused ? 'PAUSED_BY_MARKER' : !inventoryKnown ? 'PROCESS_INVENTORY_UNAVAILABLE' : active.length ? null : this.jobs.some(t => t.status === 'pending') ? 'PENDING_ELIGIBILITY' : this.jobs.some(t => t.status === 'retry_wait') ? 'WAITING_SAVED_RETRY' : this.jobs.some(t => t.status === 'blocked') ? 'BLOCKED_ACTIVATED_WORK' : 'NO_ACTIVATED_PENDING_CARDS',
       issues: this.issues });
   }
   async tick() {
@@ -829,6 +878,11 @@ export class Controller {
           continue;
         }
         if (!task.releaseAuthority || task.liveMutation && !task.liveAuthorizationRef) { await this.failure(task, 'This card lacks its precise release/data authority', 'external'); continue; }
+        if (task.completionMode === 'record_published_evidence') {
+          try { await this.completePublishedEvidence(task, processes); }
+          catch (error) { await this.failure(task, 'Evidence verification: '+clean(error.message), 'environment'); }
+          continue;
+        }
         if (this.savedBaseMismatch(task)) {
           try { await this.recoverSavedBaseMismatch(task, processes); }
           catch (error) { this.issues.push({ code: 'SAVED_BASE_RECOVERY_DEFERRED', taskId: task.id, message: clean(error.message) }); }

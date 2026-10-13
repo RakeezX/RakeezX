@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-13T06:35:30.156Z",
+  "scope": "N73 client owner-preflight correction and operational proof-only recovery",
+  "N73": {
+    "sourceObserved": "cfe7c2144a8269adad617aeca37ea652fda53e01",
+    "cause": "requireDistributionAccount invokes dispatch ownership check without a command; valid account fails command-owner-missing",
+    "taskId": "continuous-n73-owner-preflight-20261013",
+    "userDataRead": false,
+    "userDataMutated": false,
+    "complete": false
+  },
+  "recovery": {
+    "purpose": "Accept an already committed unchanged documentation-only verification tied to an independently proven Product release. No new Product deployment or parent closure.",
+    "normalProductionValidatorUnchanged": true,
+    "workerResultNeverRewritten": true,
+    "tests": {
+      "controller": 12,
+      "maintenance": 7
+    },
+    "newWorkerCallsRequired": 0,
+    "oldDeniedCombinedClosurePatchReused": false
+  },
+  "reporting": {
+    "blockedCountAdded": true,
+    "idleBlockerDistinguished": true
+  },
+  "status": "PREPARED_NOT_INSTALLED",
+  "sources": [
+    "https://playwright.dev/docs/browser-contexts",
+    "https://playwright.dev/docs/test-assertions",
+    "https://playwright.dev/docs/best-practices"
+  ]
+}
