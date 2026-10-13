@@ -629,7 +629,7 @@ export class Controller {
       } catch (error) { await this.failure(task, 'Candidate validation: ' + error.message); }
       return;
     }
-    if (result?.state === 'BLOCKED') { await this.failure(task, result.blocker || result.summary, workerBlockerClass(result)); return; }
+    if (result?.state === 'BLOCKED') { if (await this.recognizeResourceWait(task, result, processes)) return; await this.failure(task, result.blocker || result.summary, workerBlockerClass(result)); return; }
     if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
     if (!checkpoint && task.attempt?.wrapperStderrPath) {
       const captured = [];
@@ -654,6 +654,51 @@ export class Controller {
     if (errorText) { await this.failure(task, errorText); return; }
     if (!checkpoint?.finishedAt) { await this.failure(task, 'Owned worker processes exited before a final response; recover the same session and worktree', 'network'); return; }
     await this.failure(task, `Worker exit ${checkpoint.exitCode} without the required final JSON`);
+  }
+  async recognizeResourceWait(task, result, processes) {
+    // A real named phase lease is a scheduling condition, never a provider/Auth denial.
+    if (result?.state !== 'BLOCKED' || result.taskId !== task.id || result.runId !== task.attempt?.runId
+      || !['external', 'environment', 'implementation'].includes(result.blockerType)
+      || result.checks?.some(c => c.status === 'FAIL')
+      || !/browser (?:phase )?lease is held by another active task/i.test(result.blocker ?? '')) return false;
+    if (!task.lastWorkerReap?.exactAbsence || task.lastWorkerReap.runId !== result.runId
+      || workerProcesses(task, null, processes).length || task.lastWorkerReap.owners?.some(o => processes.some(p => identityMatches(p, o)))) return false;
+    if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha
+      || normalize(result.worktreePath) !== normalize(task.worktreePath)
+      || !result.changedPaths?.every(f => allowed(f, task.allowedPaths))) return false;
+    const evidence = (result.checks ?? []).map(c => c.evidence).join(' ');
+    const ownerMatch = /owned by task ([a-z0-9._-]+) \(token ([a-f0-9-]{36})\)/i.exec(evidence);
+    if (!ownerMatch) return false;
+    const holder = this.jobs.find(t => t.id === ownerMatch[1] && t.activationId === task.activationId && t.attempt?.runId === ownerMatch[2]);
+    if (!holder || holder.id === task.id) return false;
+    const lease = await readJson(path.join(this.runtime, 'leases', 'browser.json'));
+    if (lease && (lease.version !== 2 || lease.taskId !== holder.id || lease.activationId !== task.activationId
+      || lease.owner?.type !== 'worker' || lease.owner.token !== holder.attempt.runId)) return false;
+    if (!this.testOnly) {
+      const head = await this.command('git', ['rev-parse', 'HEAD'], { cwd: task.worktreePath });
+      const dirty = await this.command('git', ['status', '--porcelain=v1', '--untracked-files=no'], { cwd: task.worktreePath });
+      if (head.code !== 0 || head.stdout.trim() !== result.candidateSha || dirty.code !== 0 || dirty.stdout.trim()) return false;
+    }
+    task.candidateSha = result.candidateSha;
+    task.resourceWait = { name: 'browser', runId: result.runId, holderTaskId: holder.id, holderRunId: holder.attempt.runId, observedAt: this.now() };
+    task.status = 'retry_wait'; task.failureClass = 'resource'; task.retryAt = null;
+    task.lastFailure = result.blocker; task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
+    await this.save(task); await this.event('resource_wait', { taskId: task.id, ...task.resourceWait }); return true;
+  }
+  async resolveResourceWaits(processes) {
+    for (const task of this.jobs.filter(t => t.status === 'blocked' && !t.resourceWait)) {
+      if (!/browser (?:phase )?lease is held by another active task/i.test(task.lastFailure ?? '')) continue;
+      const result = task.attempt ? await readJson(task.attempt.outputPath) : null;
+      await this.recognizeResourceWait(task, result, processes);
+    }
+    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && t.failureClass === 'resource' && t.resourceWait)) {
+      if (task.resourceWait.runId !== task.attempt?.runId || task.resourceWait.name !== 'browser') continue;
+      if (await exists(path.join(this.runtime, 'leases', 'browser.json'))) continue;
+      const wait = task.resourceWait;
+      task.resourceWaitHistory = [...(task.resourceWaitHistory ?? []), { ...wait, releasedAt: this.now() }];
+      task.resourceWait = null; task.status = 'pending'; task.retryAt = null; task.failureClass = null;
+      await this.save(task); await this.event('resource_available', { taskId: task.id, name: wait.name, preservedSessionId: task.sessionId });
+    }
   }
   async lease(task, name, action, token = null) {
     const result = await this.command(this.config.controller.powershellPath ?? POWERSHELL,
@@ -748,6 +793,7 @@ export class Controller {
       catch (error) { this.issues.push({ code: 'RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
     }
     await this.reapFinishedLeases();
+    await this.resolveResourceWaits(processes);
     for (const task of this.jobs.filter(t => t.status === 'awaiting_po')) {
       const eligibility = await this.eligibility(task);
       if (eligibility.closed === true) {
@@ -768,7 +814,7 @@ export class Controller {
         }
       }
       const active = this.jobs.filter(t => t.status === 'running');
-      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && timestamp(t.retryAt) <= this.clock() || this.savedBaseMismatch(t));
+      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && !t.resourceWait && timestamp(t.retryAt) <= this.clock() || this.savedBaseMismatch(t));
       for (const task of candidates) {
         if (active.length >= Number(this.config.maxWorkers)) break;
         const outage = this.jobs.filter(t => OUTAGE.has(t.failureClass) && t.status === 'retry_wait' || t.status === 'running' && OUTAGE.has(t.probingClass));
