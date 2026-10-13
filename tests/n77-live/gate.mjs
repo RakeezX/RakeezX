@@ -99,6 +99,19 @@ export async function gate() {
     const A1=await boot(browser,s,'A1');contexts.push(A1.context);
     const B1=await boot(browser,s,'B1');contexts.push(B1.context);
     const p=A1.page;
+    await p.route('https://xlrubcwjqktzzunrvuns.supabase.co/rest/v1/rpc/n77_delete_teaching',async route=>{
+      const envelope=route.request().postDataJSON();
+      if(envelope.p_commit) {
+        assert.ok(s.fixtureIds.teachings.slice(0,2).includes(envelope.p_teaching_id));
+        assert.equal(envelope.p_expected_section_id,s.fixtureIds.section);
+        // Observe the Product handler's own durable mutation identity before
+        // forwarding the real, unchanged request; never fabricate a receipt.
+        s.prewriteDeletionEnvelopes??=[];
+        s.prewriteDeletionEnvelopes.push({envelope,at:new Date().toISOString()});
+        await checkpoint(s);
+      }
+      await route.continue();
+    });
     const foundation=await p.evaluate(()=>({year:window.__n77Store.activeYear()?.id,term:window.__n77Store.activeTerm()?.id,subjects:window.__n77Store.subjects().map(r=>r.id)}));
     assert.equal(foundation.year,s.fixtureIds.yearId);assert.equal(foundation.term,s.fixtureIds.termId);assert.ok(foundation.subjects.includes(s.fixtureIds.subjectId));
     mark('ordinary_foundation',foundation);
@@ -136,7 +149,7 @@ export async function gate() {
     await A2.page.evaluate(async ids=>{const m=await import('/src/models.js');await window.__n77Store.save({
       assignments:[m.makeAssignment({id:ids.assignment,teachingId:ids.teachings[0]})],
       submissions:[m.makeSubmission({id:ids.submission,assignmentId:ids.assignment,studentId:ids.student})]});},ids);
-    const staleBackup=await A2.page.evaluate(async()=> (await import('/src/lib/export.js')).buildBackup());
+    const staleBackup=await A2.page.evaluate(async backupId=> (await import('/src/lib/export.js')).buildBackup({backupId}),ids.backupId);
     await fs.writeFile(path.join(PRIVATE,'stale-backup.tmp'),JSON.stringify(staleBackup));
     await A2.context.setOffline(true);
     const localBefore=await A2.page.evaluate(()=>structuredClone(window.__n77Store.state.teachings));
@@ -191,10 +204,10 @@ export async function gate() {
     assert.equal(await A2.page.evaluate(id=>window.__n77Store.getTeaching(id),ids.teachings[0]),null);
     assert.ok(await A2.page.evaluate(id=>!!window.__n77Store.getTeaching(id),ids.teachings[2]));
     mark('A2_stale_view_real_tombstone_convergence',{deleted:ids.teachings[0],survivor:ids.teachings[2]});
-    const restored=await A2.page.evaluate(async backup=>{
+    const restored=await A2.page.evaluate(async({backup,restoreId})=>{
       const restore=await import('/src/lib/backup-v2.js');const preview=await restore.previewCloudRestore(backup);
-      const result=await restore.restoreBackupToCloud(backup);return {preview:preview.plan,result};
-    },staleBackup);
+      const result=await restore.restoreBackupToCloud(backup,{restoreId});return {preview:preview.plan,result};
+    },{backup:staleBackup,restoreId:ids.restoreId});
     assert.equal(restored.preview.operations.some(r=>r.recordId===ids.teachings[0]||ids.itemIds[0].includes(r.recordId)),false);
     assert.equal(await A2.page.evaluate(id=>window.__n77Store.getTeaching(id),ids.teachings[0]),null);
     assert.ok(await A2.page.evaluate(id=>!!window.__n77Store.getTeaching(id),ids.teachings[2]));

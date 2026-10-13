@@ -51,6 +51,7 @@ export async function safeReceipt(s) {
     issuedAt: s.issuedAt, expiresAt: s.expiresAt, functions: s.functions,
     liveDeadline:new Date(Date.parse(s.issuedAt)+45*60*1000).toISOString(),
     events: s.events, liveObservations: s.liveObservations, retirementChecks: s.retirementChecks,
+    prewriteDeletionEnvelopes:s.prewriteDeletionEnvelopes,
     gate: s.gate, disposition: s.disposition, disarmed: s.disarmed, disarmEndpoints:s.disarmEndpoints,
     retainedProductObservation:s.retainedProductObservation,recoveryCandidate:s.recoveryCandidate,
     recovery: path.join(PRIVATE, 'state.tmp'), noProductionPublish: true };
@@ -86,6 +87,7 @@ export async function prepare(previewUrl) {
   ids.itemIds=ids.teachings.map(()=>Array.from({length:5},()=>randomUUID()));
   ids.enrollments=[ids.section].map(section=>'en:'+ids.student+':'+section);
   ids.scoreIds=ids.itemIds.map(items=>'sc:'+ids.student+':'+items[1]);
+  ids.backupId=randomUUID();ids.restoreId=randomUUID();
   ids.termId=termId;ids.subjectId=subjectId;ids.yearId='y:1448-1449';
   ids.mutations=Object.fromEntries(['t1','t2','outside','enroll','stale','ownerDenied'].map(n=>[n,'n77:'+randomUUID()]));
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:fixtureEmail(RUN_ID,slot),password:'N77!aA1'+proof()}));
