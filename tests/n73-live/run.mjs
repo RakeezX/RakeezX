@@ -206,11 +206,11 @@ async function run() {
       await rpc(A,'apply_score_configuration_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_item_id:parent,p_expected_version:1,
         p_payload:{scoreMode:'subitems',distributionMode:'manual',max:parent===i.missing?6:20,subitems:[{id:sub,name:'Part',value,startDate:'2026-10-01',dueDate:'2026-10-02',latePoints:1}],conversionStrategy:'retain-as-manual'}});
     }
-    const completion=await rpc(A,'apply_score_subitem_state_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',
-      p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:i.targetSub,p_state:'late'});
+    const completion=await rpc(A,'apply_score_subitem_command_n94',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_command:'set_completion',
+      p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:i.targetSub,p_completion_state:'late',p_manual_value:null});
     assert.equal(completion.completion.id,i.completion);
-    for(const [student,selectedState] of [[i.students[1],'regular'],[i.students[2],null]]) await rpc(A,'apply_score_subitem_state_command',{
-      p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_item_id:target[2],p_student_id:student,p_subitem_id:i.targetSub,p_state:selectedState});
+    for(const [student,selectedState] of [[i.students[1],'regular'],[i.students[2],null]]) await rpc(A,'apply_score_subitem_command_n94',{
+      p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_command:'set_completion',p_item_id:target[2],p_student_id:student,p_subitem_id:i.targetSub,p_completion_state:selectedState,p_manual_value:null});
     await rpc(A,'apply_score_subitem_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_command:'set_manual',
       p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:null,p_checked:null,p_manual_value:2});
     for(const [id,t,delta] of [[i.sourceLog,i.teachings[0],9],[i.targetLog,i.teachings[1],2]]) {
