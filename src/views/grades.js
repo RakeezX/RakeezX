@@ -55,6 +55,13 @@ export default {
   wide: true,
 
   onMount() {
+    if (!document.getElementById('n94-grades-style')) {
+      const style = document.createElement('link');
+      style.id = 'n94-grades-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/grades.css', import.meta.url).href;
+      document.head.append(style);
+    }
     mode = 'item';
     activeItemId = null;
     sortKey = 'default';
@@ -468,6 +475,11 @@ function subitemMode(roster, ctx, item) {
   return html`
     <section class="grades-01c__subscore" aria-label="رصد العناصر الفرعية">
       <div class="grades-01c__provenance-key">العناصر الفرعية <span>+</span> الإضافة اليدوية <span>=</span> الدرجة النهائية</div>
+      <div class="n94-completion-legend" aria-label="دليل حالات العناصر الفرعية">
+        <span><i class="n94-completion--unrecorded" aria-hidden="true"></i>غير مرصود</span>
+        <span><i class="n94-completion--late" aria-hidden="true"></i>متأخر</span>
+        <span><i class="n94-completion--regular" aria-hidden="true"></i>عادي/بعذر</span>
+      </div>
       ${roster.length === 0 ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>` : roster.map((student) => {
         const score = ctx[student.id].scoresByItem[item.id] ?? null;
         const final = itemScore(item, ctx[student.id]);
@@ -485,12 +497,13 @@ function subitemMode(roster, ctx, item) {
               const selected = subitemCompletionState(completion);
               const label = { unrecorded: '— غير مرصود', late: '◷ متأخر', regular: '✓ عادي / مقبول بعذر' }[selected];
               const points = subitemSelectedPoints(definition, completion);
+              const description = `${definition.name} للطالب ${student.name}: ${label}${points === null ? '' : ` · ${fmtNum(points)} درجات`}`;
               return html`<button type="button" class="grades-01c__subitem n94-completion n94-completion--${selected}"
                 data-act="subitem-completion" data-workspace="${store.getActiveWorkspace()?.id}"
                 data-student="${student.id}" data-subitem="${definition.id}"
-                aria-label="${definition.name} للطالب ${student.name}: ${label}${points === null ? '' : ` · ${fmtNum(points)} درجات`}"
+                aria-label="${description}" title="${description}"
                 aria-pressed="${selected !== 'unrecorded'}">
-                <span>${definition.name}<b>${label}</b><small class="tabular">${points === null ? '—' : fmtNum(points)} / ${fmtNum(definition.value)}</small></span>
+                <span class="n94-cell-line" aria-hidden="true"><span class="n94-cell-name">${definition.name}</span>${points === null ? '' : html`<small class="tabular">${fmtNum(points)}</small>`}<i>${{ unrecorded: '—', late: '◷', regular: '✓' }[selected]}</i></span>
               </button>`;
             })}</div>
           <div class="grades-01c__equation" aria-label="ملخص درجة ${student.name}">

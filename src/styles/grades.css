@@ -1,0 +1,17 @@
+/* Compact N94 cells retain the established state palette and focus treatment. */
+.grades-01c__subitem.n94-completion .n94-cell-line {
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 5px; padding: 5px 8px; min-inline-size: 0; min-block-size: 44px;
+  white-space: nowrap; text-align: start;
+}
+.grades-01c__subitem.n94-completion .n94-cell-name {
+  display: block; min-inline-size: 0; min-block-size: 0; padding: 0;
+  overflow: hidden; text-overflow: ellipsis; flex: 1; font-size: inherit;
+}
+.n94-cell-line small, .n94-cell-line i { flex: none; font-size: inherit; font-style: normal; }
+.n94-completion-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--text-3); font-size: 11px; padding: 4px 0; }
+.n94-completion-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.n94-completion-legend i { inline-size: 8px; block-size: 8px; border: 1px solid currentColor; border-radius: 50%; }
+@media (max-width: 600px) {
+  .grades-01c__subitems { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
