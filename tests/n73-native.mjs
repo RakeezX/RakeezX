@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:net';
@@ -8,7 +8,9 @@ import { pathToFileURL } from 'node:url';
 
 const shared = 'C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17';
 const { default: pg } = await import(pathToFileURL(shared + '/client/node_modules/pg/lib/index.js'));
-const artifact = path.resolve('test-results/n73-native-ff45046cc4f8');
+const runId=process.argv.find(arg=>arg.startsWith('--run-id='))?.slice(9);
+assert.match(runId??'',/^[0-9a-f-]{36}$/);
+const artifact = path.resolve('test-results/n73-native-'+runId.replaceAll('-','').slice(0,20));
 const cluster = path.join(artifact, 'cluster');
 assert.ok(cluster.startsWith(path.resolve('test-results') + path.sep));
 await mkdir(artifact, { recursive: true });
@@ -27,6 +29,12 @@ const OTHER = 'b7300000-0000-4000-8000-000000000002';
 const migration = '20261012120000_n73_distribution_apply.sql';
 const sql = await readFile('supabase/migrations/' + migration, 'utf8');
 const hash = createHash('sha256').update(sql).digest('hex');
+assert.equal(hash,'dc25d62af8363149b046053fc5c841b140d222513c0f3913c023db6f0248c12f');
+const correction='20261013090000_n73_distribution_error_contract.sql';
+const correctedSql=await readFile('supabase/migrations/'+correction,'utf8');
+const correctionHash=createHash('sha256').update(correctedSql).digest('hex');
+const binding={runId,candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),tree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),harnessSha256:createHash('sha256').update(await readFile(new URL(import.meta.url))).digest('hex')};
+let correctedFunctions;
 try {
   run('initdb', ['-D', cluster, '-U', 'postgres', '--auth=trust', '--encoding=UTF8', '--no-locale']);
   run('pg_ctl', ['-D', cluster, '-l', path.join(artifact, 'server.log'), '-o', `-h 127.0.0.1 -p ${port}`, '-w', 'start']);
@@ -49,6 +57,17 @@ try {
     await q((await readFile('supabase/migrations/' + name, 'utf8')).replace(/^\uFEFF/, ''));
   }
   await q(sql);
+  const routines=()=>q(`select p.oid::regprocedure::text signature,md5(p.prosrc) body_md5,p.prosrc,pg_get_functiondef(p.oid) definition,p.proacl::text acl,p.prosecdef,p.proconfig from pg_proc p where p.oid in ('rakeezx.apply_score_distribution_plan(text,text,text,text,boolean)'::regprocedure,'rakeezx.rename_score_item(text,text,text,bigint,text)'::regprocedure) order by signature`);
+  const parentFunctions=(await routines()).rows;
+  assert.deepEqual(parentFunctions.map(row=>row.body_md5),['3c8da9d39fe5827b2a29f3d0f63ef5bd','995951fd8b362819e302f71afa2c180e']);
+  await q(correctedSql);
+  correctedFunctions=(await routines()).rows;
+  for(let index=0;index<2;index++) {
+    const prior=parentFunctions[index],next=correctedFunctions[index];
+    assert.equal(next.prosrc,prior.prosrc.replaceAll("errcode='40001'","errcode='PT409'"));
+    for(const key of ['signature','acl','prosecdef','proconfig']) assert.deepEqual(next[key],prior[key]);
+  }
+  record('exact_two_function_correction',`${correction}; SHA256 ${correctionHash}; only four conflict SQLSTATEs changed; exact bodies, ACL, security and search_path preserved.`);
   record('native_exact_migration', `PostgreSQL ${(await q('show server_version')).rows[0].server_version}; ${migration}; SHA256 ${hash}`);
   await q(`insert into rakeezx.years(id,label,hijri_start,hijri_end) values('y','Synthetic',1450,1451);
     insert into rakeezx.terms(id,year_id,name,"index") values('term','y','Synthetic',1);
@@ -86,9 +105,11 @@ try {
   record('owner_A_B', 'Authenticated B cannot select A items/plans or apply A plan. No A mutation.');
   await q("update rakeezx.scores set value=22 where id='targetScore'");
   const staleBefore = await state();
-  await assert.rejects(() => apply(first,'stale'), /since review/);
+  await assert.rejects(() => apply(first,'stale'), error=>error.code==='PT409'&&/since review/.test(error.message));
   assert.deepEqual(await state(), staleBefore);
-  record('stale_whole_plan_atomic', 'A changed target score rejects all accepted target operations, including target 3 creations.');
+  assert.equal((await q("select count(*)::int n from rakeezx.score_domain_receipts where mutation_id='stale'")).rows[0].n,0);
+  await assert.rejects(()=>apply({...first,token:'wrong'},'wrong-token'),error=>error.code==='PT409');
+  record('stale_whole_plan_atomic', 'Native PT409 for changed target score and wrong token; all accepted operations roll back, domain unchanged and no stale receipt.');
   const second = await plan('current',['t2','t3','t4']);
   await q(`create function rakeezx.n73_test_failure() returns trigger language plpgsql as $$
       begin if new.device_id='fail' then raise exception 'bounded synthetic failure'; end if; return new; end $$;
@@ -139,6 +160,9 @@ try {
   const item = (await q("select * from rakeezx.items where id='target'")).rows[0];
   await rpc('rename_score_item',['rename','native','target',item.revision,'Renamed parent']);
   const renameAfter = await state();
+  await assert.rejects(()=>rpc('rename_score_item',['stale-rename','native','target',item.revision,'Rejected rename']),error=>error.code==='PT409');
+  assert.deepEqual(await state(),renameAfter);
+  assert.equal((await q("select count(*)::int n from rakeezx.score_domain_receipts where mutation_id='stale-rename'")).rows[0].n,0);
   for (const entity of ['scores','score_subitems','score_subitem_completions']) assert.deepEqual(renameAfter[entity],renameBefore[entity]);
   assert.equal((await q("select distribution_version from rakeezx.items where id='target'")).rows[0].distribution_version,item.distribution_version);
   record('subitem_identity_and_metadata_only_rename', 'Unique subitem matches retain target IDs and checked completions; manual 2 + derived 5 remains 7; parent rename never changes scores, subitems, completions or distribution version.');
@@ -159,5 +183,5 @@ try {
   await client?.end();
   if (started) run('pg_ctl', ['-D', cluster, '-w', '-m', 'fast', 'stop']);
   await rm(cluster, { recursive: true, force: true });
-  await writeFile(path.join(artifact,'result.json'), JSON.stringify({ migration, hash, checks, ownedServerStopped: true, ownedClusterRemoved: true }, null, 2));
+  await writeFile(path.join(artifact,'result.json'), JSON.stringify({ ...binding,migration, hash,correction,correctionHash,correctedFunctions, checks, ownedServerStopped: true, ownedClusterRemoved: true }, null, 2));
 }

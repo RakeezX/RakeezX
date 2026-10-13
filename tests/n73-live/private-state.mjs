@@ -46,7 +46,7 @@ async function windowsAcl(dir, create) {
     "$n73Acl=Get-Acl -LiteralPath $n73Path; $n73Bad=@($n73Acl.Access | Where-Object { $_.AccessControlType -eq 'Allow' -and $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -notin @($n73Sid,'S-1-5-18') }); " +
     "if(-not $n73Acl.AreAccessRulesProtected -or $n73Bad.Count -ne 0){throw 'ACL'}; Write-Output 'PRIVATE_ACL_OK'";
   try {
-    const r = await exec('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true });
+    const r = await exec('pwsh.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true });
     if (r.stdout.trim() !== 'PRIVATE_ACL_OK') throw fail('PRIVATE_ACL_REQUIRED');
   } catch { throw fail('PRIVATE_ACL_REQUIRED'); }
 }

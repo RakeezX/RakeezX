@@ -10,7 +10,10 @@ import { device } from './device.mjs';
 import { itemScore } from '../../src/models.js';
 import { decodeSyncV2Canonical } from '../../src/lib/sync-v2.js';
 
-export const runId='ff45046c-c4f8-41e2-a5b6-782b75c57cb8';
+// Every invocation must name the same controller-created run, including recovery.
+export const runId=process.argv.find(arg=>arg.startsWith('--run-id='))?.slice(9);
+assert.match(runId??'',/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+assert.notEqual(runId,'0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e','Retired phase cannot be rearmed');
 const repo='C:/Users/Abody/Projects/RakeezX';
 const privateDir=path.join(repo,'artifacts/ops-supervisor-v4/capabilities/n73',runId,'private');
 const project='xlrubcwjqktzzunrvuns', base='https://'+project+'.supabase.co';
@@ -21,18 +24,31 @@ const prefix='n73:'+runId.replaceAll('-','')+':';
 const hash=v=>createHash('sha256').update(v).digest('hex');
 const artifact=path.resolve('test-results/n73-live-'+suffix);
 const fail=(message,code)=>Object.assign(new Error(message),{code});
-const safe=(error)=>({code:error?.code??error?.safeCode??'N73_HARNESS_FAILED',message:String(error?.message??'failure').slice(0,600)});
+const safe=(error)=>({code:error?.code??error?.safeCode??'N73_HARNESS_FAILED',message:String(error?.message??'failure').slice(0,600),diagnostic:error?.diagnostic??null});
 let state;
 let cleanupInProgress=false;
 async function save() { await writePrivateState(privateDir,state); }
 async function request(url,{token=null,body,method=body?'POST':'GET',headers={}}={}) {
   if(state?.liveStartedAt && !cleanupInProgress && (Date.now()-Date.parse(state.liveStartedAt)>45*60000 ||
       Date.now()>Date.parse(state.manifests.retire.expiresAt)-15*60000)) throw fail('N73 live work deadline reached; cleanup only','N73_LIVE_DEADLINE');
-  const response=await fetch(url,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{apikey:key,
-    ...(token?{Authorization:'Bearer '+token}:{}),'Content-Type':'application/json',...headers},...(body?{body:JSON.stringify(body)}:{})});
-  const result=await response.json().catch(()=>null);
-  if(!response.ok) throw Object.assign(fail(`HTTP ${response.status} ${result?.errorCode??result?.code??'REQUEST_REJECTED'}`,result?.errorCode??result?.code??'HTTP_'+response.status),{status:response.status});
-  return result;
+  const started=performance.now(),endpoint=new URL(url).pathname;
+  const diagnostic={stage:body?.operation??endpoint.split('/').at(-1),endpoint,method,status:null,code:null,elapsedMs:null};
+  try {
+    const response=await fetch(url,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{apikey:key,
+      ...(token?{Authorization:'Bearer '+token}:{}),'Content-Type':'application/json',...headers},...(body?{body:JSON.stringify(body)}:{})});
+    const result=await response.json().catch(()=>null);
+    Object.assign(diagnostic,{elapsedMs:Math.round(performance.now()-started),status:response.status,code:result?.errorCode??result?.code??null});
+    state.diagnostics??=[];state.diagnostics.push(diagnostic);await save();
+    if(!response.ok) throw Object.assign(fail(`HTTP ${response.status} ${diagnostic.code??'REQUEST_REJECTED'}`,diagnostic.code??'HTTP_'+response.status),{status:response.status,diagnostic});
+    return result;
+  } catch(error) {
+    if(!error.diagnostic) {
+      Object.assign(diagnostic,{elapsedMs:Math.round(performance.now()-started),code:error.name==='TimeoutError'?'N73_REQUEST_TIMEOUT':'N73_NETWORK_ABORT'});
+      state.diagnostics??=[];state.diagnostics.push(diagnostic);await save();
+      throw Object.assign(fail(diagnostic.code,diagnostic.code),{diagnostic});
+    }
+    throw error;
+  }
 }
 async function fn(role,operation,extra={}) {
   return request(base+'/functions/v1/'+names[role],{body:{version:1,runId,operation,...extra},
@@ -71,6 +87,7 @@ const report=(name,evidence)=>{state.checks.push({name,status:'PASS',evidence});
 async function prepare() {
   await securePrivateDirectory(repo,privateDir,{create:true});
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:`n73-${runId.replaceAll('-','')}-${slot.toLowerCase()}@example.invalid`}));
+  for(const account of accounts) assert.ok(!['268f2d00-92a1-4c6d-a2a1-ef94a45a43c9','2f507c7e-8c11-4207-94d7-595eeccc2677'].includes(account.id));
   const passwords=Object.fromEntries(accounts.map(a=>[a.slot,'N73!aA1'+randomBytes(32).toString('base64url')]));
   const capabilities={provision:randomBytes(32).toString('base64url'),retire:randomBytes(32).toString('base64url')};
   const defaults=structuredClone(buildAccountFoundationDefaults()); defaults.calendarDays=defaults.calendarDays.slice(0,1);
@@ -98,6 +115,7 @@ async function prepare() {
   }
   state={version:1,kind:'n73-private-run',runId,accounts,passwords,capabilities,manifests,defaults,ids,foundationIds,closure,
     sessions:{},checks:[],status:'PREPARED',candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
+    tree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),harnessSha256:hash(await readFile(new URL(import.meta.url))),diagnostics:[],
     base:'b5e83107222833f5e74530a73355734d8477bd03',expectedEffects:'Only declared pair and Product IDs; caps, compatible target scores, target-only auto projection, source definitions, explicit extra tombstones.'};
   await save();
   console.log(JSON.stringify({runId,status:state.status,candidate:state.candidate,expiresAt,accounts:accounts.map(a=>({slot:a.slot,id:a.id})),names}));
@@ -144,6 +162,7 @@ async function run() {
   const actors=[];
   try {
     assert.equal(execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),state.candidate);
+    assert.equal(hash(await readFile(new URL(import.meta.url))),state.harnessSha256);
     assert.equal(state.status,'PREPARED');
     const provision=await fn('provision','probe'),retire=await fn('retire','probe');
     assert.ok(provision.configured&&retire.configured);
@@ -205,10 +224,15 @@ async function run() {
     assert.deepEqual(await table(A,'scores'),before);
     report('live_owner_A_B_and_ambiguous_exclusion','Real authenticated B cannot read A items, plan or apply; two accepted targets and one explicitly excluded duplicate target.');
     await generic(A,'scores',i.capScore,{value:22},'patch',before.find(row=>row.id===i.capScore).revision);
-    const staleBefore=await table(A,'items');
-    await assert.rejects(()=>rpc(A,'apply_score_distribution_plan',{p_mutation_id:randomUUID(),p_device_id:'A1',p_plan_id:p.planId,p_token:p.token,p_confirmed:true}),error=>error.code==='40001');
-    assert.deepEqual(await table(A,'items'),staleBefore);
-    report('live_stale_whole_plan_atomic','A score revision change rejects the reviewed multi-target plan before any accepted target mutation.');
+    const domain=async()=>Object.fromEntries(await Promise.all(['items','score_subitems','score_subitem_completions','scores'].map(async name=>[name,await table(A,name)])));
+    const receipts=()=>request(base+'/rest/v1/score_domain_receipts?owner_id=eq.'+A.user.id+'&select=mutation_id,request_envelope,result&order=mutation_id.asc&limit=1000',
+      {token:A.access_token,headers:{'Accept-Profile':'rakeezx'}});
+    const staleBefore=await domain(),receiptsBefore=await receipts(),staleMutation=randomUUID();
+    await assert.rejects(()=>rpc(A,'apply_score_distribution_plan',{p_mutation_id:staleMutation,p_device_id:'A1',p_plan_id:p.planId,p_token:p.token,p_confirmed:true}),error=>error.status===409&&error.code==='PT409');
+    assert.deepEqual(await domain(),staleBefore);
+    assert.deepEqual(await receipts(),receiptsBefore);
+    assert.ok(!(await receipts()).some(row=>row.mutation_id===staleMutation));
+    report('live_stale_whole_plan_atomic','Actual HTTP 409 / PT409 rejects a score-stale plan within the unchanged 15000ms deadline; all canonical domain rows and receipts remain exactly unchanged.');
     const fresh=await plan(i.teachings.slice(1));
     const transport=backend(A);let lost=false;
     const original=transport.applyScoreDistributionPlan;
@@ -263,7 +287,7 @@ async function run() {
     for(const actor of actors) await actor.close();
     await cleanup();await save();await mkdir(artifact,{recursive:true});
     await writeFile(path.join(artifact,'result.json'),JSON.stringify({runId,candidate:state.candidate,status:state.status,accounts:state.accounts.map(a=>({slot:a.slot,id:a.id})),
-      ids:state.ids,checks:state.checks,failure:state.failure??null,disposition:state.disposition},null,2));
+      tree:state.tree,harnessSha256:state.harnessSha256,ids:state.ids,checks:state.checks,diagnostics:state.diagnostics,failure:state.failure??null,disposition:state.disposition},null,2));
   }
 }
 
