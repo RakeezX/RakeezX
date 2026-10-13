@@ -20,3 +20,15 @@
   .n94-completion-legend { flex: 1 1 190px; gap: 4px 9px; }
   .grades-01c__subitems { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* N90 local review; keep the grade matrix scroll inside its own container. */
+.grade-transfer { width:100%; min-width:0; padding:12px; border:1px solid var(--border); border-radius:12px; }
+.grade-transfer { overflow:hidden; }
+.grade-transfer summary { cursor:pointer; font-weight:700; }
+.grade-transfer label { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
+.grade-transfer select,.grade-transfer input:not([type=checkbox]) { max-width:100%; min-width:0; }
+.grade-transfer__mapping { display:grid; gap:8px; }
+.grade-transfer fieldset { min-width:0; margin:8px 0; }
+.grade-transfer__scroll { max-width:100%; overflow:auto; }
+.grade-transfer table { width:100%; border-collapse:collapse; }
+.grade-transfer th,.grade-transfer td { padding:8px; border-bottom:1px solid var(--border); }
+.grade-transfer p { white-space:normal; overflow-wrap:anywhere; }
