@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n94-compact-picker-names-20261013",
+      "productId": "N94",
+      "activationId": "po-20261012-continuous",
+      "priority": 1,
+      "riskClass": "STANDARD",
+      "scopeKey": "n94-compact-presentation-dates-names",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 12,
+      "objective": "Implement the latest PO N94 UI refinements on fresh main, preserving the already delivered N94 offline fix and N98 default ordering. Use the existing approved Rakeez date/time adapter, compact one-line completion cells with one quiet shared legend, and smart default names for newly added subitems based on their parent. These changes replace prior verbose visible cell-label guidance, not scoring/owner/offline semantics. Do not create a second date picker or revise the approved central date policy.\n\nMATERIAL SCOPE CORRECTION 2026-10-13: sw.js and tests/rakeez-datetime.test.mjs are now explicitly included. Cache the new naming module and existing grades stylesheet using the current shell convention and update only the stale items.js date-control coverage expectation from zero to two. Preserve the central picker policy and all genuine assertions. Resume the saved implementation/candidate; no need to redo the UI or name logic. This fixes an operator-authored scope omission, not a new Product decision.",
+      "allowedPaths": [
+        "src/views/items.js",
+        "src/views/grades.js",
+        "src/styles/grades.css",
+        "src/lib/subitem-default-name.js",
+        "tests/n94-ui-*",
+        "tests/n94-subitem-names.test.mjs",
+        "sw.js",
+        "tests/rakeez-datetime.test.mjs"
+      ],
+      "requiredChecks": [
+        "n94_approved_date_controls",
+        "n94_compact_cells_legend",
+        "n94_parent_derived_names"
+      ],
+      "acceptance": [
+        "Reuse src/lib/rakeez-datetime.js adapter and rakeez-datetime-values.js rules as-is. Current fields use type=date without the adapter; change them to the established type=text/data-rakeez-datetime=date/data-rakeez-date-scope=planning convention. Existing central adapter mounts dynamic sheets. Keep dates optional, preserve stored ISO values and createdAt, reject due-before-start, keep planning bounds/product floor and 0-9 digits. Read the relevant existing usage/tests; no new picker, custom year policy or implicit current-date default.",
+        "Completion cells show a compact single-line subitem name plus concise actual points when useful, gray/amber/green status, and at most a tiny existing symbol. Remove repeated visible long text such as عادي / مقبول بعذر and غير مرصود from every cell. Provide one quiet shared legend near the subitem area: gray غير مرصود, amber متأخر, green عادي/بعذر. Preserve descriptive screen-reader names/title/keyboard support so state is not color-only to assistive technology. No stacked multiline verbose status, no horizontal overflow at 320/390px RTL, calm light/dark behavior. Preserve deliberate tap cycles and selected-state/score values.",
+        "New default names derive from normalized parent intent: الواجبات/الواجب/واجبات/واجب -> واجب1, واجب2; المشاريع/المشروع/مشاريع/مشروع -> مشروع1, مشروع2. Handle whitespace/diacritics for recognition without changing stored user labels. For unknown parent names keep a readable parent-name+sequence fallback, not a guessed singular. Select the next unused positive suffix for that parent. Never overwrite a user-edited draft name or rename previously saved subitems, IDs, grades or histories. Use the rule for the first newly created draft and add-another row.",
+        "Use actual dynamic form/Gradebook rendering on synthetic app fixtures and small focused naming/date assertions. Read shared date module and scoring contracts but do not edit unlisted core files or run live data fixtures. Reuse unchanged scoring, Sync, migrations and offline tests unless this UI change materially affects them. No required full historical suite.",
+        "N94 completion requires new module/stylesheet offline shell inclusion and actual approved date-control coverage. The two exact paths now in allowedPaths remove the prior artificial scope blocker. Preserve all existing checks and use only affected reruns."
+      ],
+      "releaseAuthority": "Direct PO 2026-10-13 UI correction plus existing N38/N94 and continuous release delegation. Local Product UI code and synthetic verification only; no database backfill, student mutation, schema/Auth/RLS change or migration replay. Sole publisher handles Production; N94 remains open until actual acceptance."
+    }
+  ]
+}

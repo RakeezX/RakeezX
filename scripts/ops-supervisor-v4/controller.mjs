@@ -22,8 +22,28 @@ export async function readJson(file, fallback = null) {
 export async function writeJson(file, value) {
   await fs.mkdir(path.dirname(file), { recursive: true });
   const temporary = `${file}.${process.pid}.${randomUUID()}.tmp`;
-  try { await fs.writeFile(temporary, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' }); await fs.rename(temporary, file); }
-  finally { await fs.rm(temporary, { force: true }); }
+  let handle, ownsTemporary = false;
+  try {
+    handle = await fs.open(temporary, 'wx'); ownsTemporary = true;
+    await handle.writeFile(JSON.stringify(value, null, 2) + '\n');
+    await handle.close(); handle = null;
+    const backoff = [50, 100, 200, 400, 800];
+    for (let attempt = 0; ; attempt++) {
+      try { await fs.rename(temporary, file); ownsTemporary = false; break; }
+      catch (error) {
+        // Windows readers may briefly deny replacement. Keep the same bytes
+        // and atomic rename; a persistent lock remains an explicit failure.
+        if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= backoff.length) throw error;
+        await new Promise(resolve => setTimeout(resolve, backoff[attempt]));
+      }
+    }
+  } catch (error) {
+    try { await handle?.close(); } catch { /* Preserve the write/rename error. */ }
+    if (ownsTemporary) {
+      try { await fs.rm(temporary, { force: true }); } catch { /* Only our temp; never mask the original failure. */ }
+    }
+    throw error;
+  }
 }
 async function exists(file) { try { await fs.access(file); return true; } catch (error) { if (error.code === 'ENOENT') return false; throw error; } }
 export function runCommand(command, args, options = {}) {
@@ -112,6 +132,11 @@ export function watchdogReason(task, clock) {
   const progressAt = Math.max(timestamp(task.attempt?.startedAt), timestamp(task.lastEventAt), timestamp(task.lastFileProgressAt));
   if (Number.isFinite(idle) && idle > 0 && clock - progressAt > idle * 60000) return `No JSON event or scoped-file progress for ${idle} minutes`;
   return null;
+}
+// A completed worker can report downstream Product/fixture authentication,
+// not a Codex-login outage: model-runtime failures have no completed result.
+export function workerBlockerClass(result) {
+  return result?.blockerType === 'auth' ? 'external' : result?.blockerType;
 }
 export function classifyFailure(message, explicit = null) {
   if (OUTAGE.has(explicit) || ['implementation', 'external', 'environment'].includes(explicit)) return explicit;
@@ -213,7 +238,7 @@ export class Controller {
   async loadConfig() {
     const config = await readJson(this.configPath);
     if (!config?.controller?.activationId || !ID.test(config.controller.activationId)) throw new Error('An explicit valid controller.activationId is required');
-    if (![1, 2].includes(Number(config.maxWorkers))) throw new Error('maxWorkers must be 1 or 2');
+    if (![1, 2, 3].includes(Number(config.maxWorkers))) throw new Error('maxWorkers must be 1, 2 or 3');
     if (!config.controller.codexPath && !this.testOnly) throw new Error('controller.codexPath must name the tested Codex executable');
     if (!this.testOnly && !await exists(config.controller.codexPath)) throw new Error('Configured Codex executable is unavailable; no new workers started');
     if (config.controller.repoRoot) this.repo = path.resolve(config.controller.repoRoot);
@@ -405,19 +430,78 @@ export class Controller {
   }
   async validate(task, result) {
     if (this.validateAdapter) return this.validateAdapter(task, result, this);
-    if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha || normalize(result.worktreePath) !== normalize(task.worktreePath)) throw new Error('Candidate identity/base/worktree mismatch');
+    if (result.taskId !== task.id || !task.attempt?.runId || result.runId !== task.attempt.runId || result.state !== 'LOCAL_READY'
+      || !SHA.test(task.baseSha ?? '') || !SHA.test(result.baseSha ?? '') || !SHA.test(result.candidateSha ?? '')
+      || normalize(result.worktreePath) !== normalize(task.worktreePath)) throw new Error('Candidate identity/base/worktree mismatch');
     if (!Array.isArray(result.checks) || !result.checks.some(c => c.status === 'PASS') || result.checks.some(c => c.status === 'FAIL')) throw new Error('An affected check must pass and no recorded check may fail');
     const missing = (task.requiredChecks ?? []).filter(name => !result.checks.some(check => check.name === name && check.status === 'PASS'));
     if (missing.length) throw new Error('Required affected checks have not passed: ' + missing.join(', '));
     const git = async args => { const r = await this.command('git', args, { cwd: task.worktreePath }); if (r.code !== 0) throw new Error(clean(r.stderr || r.stdout)); return r.stdout.trim(); };
     if (await git(['rev-parse', 'HEAD']) !== result.candidateSha) throw new Error('Receipt is not the actual candidate HEAD');
-    await git(['merge-base', '--is-ancestor', task.baseSha, result.candidateSha]);
-    if (await git(['status', '--porcelain', '--untracked-files=no'])) throw new Error('Candidate has uncommitted tracked changes; retain them and finish the commit');
-    const changed = (await git(['diff', '--name-only', '-z', '--no-renames', task.baseSha, result.candidateSha, '--'])).split('\0').filter(Boolean);
+    const advancesBase = result.baseSha !== task.baseSha;
+    if (advancesBase) await git(['merge-base', '--is-ancestor', task.baseSha, result.baseSha]);
+    await git(['merge-base', '--is-ancestor', result.baseSha, result.candidateSha]);
+    if (await git(['status', '--porcelain', advancesBase ? '--untracked-files=all' : '--untracked-files=no'])) throw new Error('Candidate has uncommitted changes; retain them and finish the commit');
+    const changed = (await git(['diff', '--name-only', '-z', '--no-renames', result.baseSha, result.candidateSha, '--'])).split('\0').filter(Boolean);
     if (!changed.length) throw new Error('No code change in the candidate');
     const escaped = changed.filter(file => !allowed(file, task.allowedPaths ?? []));
     if (escaped.length) throw new Error('Changed paths outside this approved card: ' + escaped.join(', '));
-    return { ...result, changedPaths: changed, hostValidatedAt: this.now() };
+    let baseAdvance = null;
+    if (advancesBase) {
+      if (!Array.isArray(result.changedPaths) || result.changedPaths.some(p => typeof p !== 'string')
+        || JSON.stringify([...result.changedPaths].sort()) !== JSON.stringify([...changed].sort())) throw new Error('Advanced-base receipt does not match the actual changed paths');
+      const remote = this.config?.controller?.remote ?? 'origin', branch = this.config?.controller?.branch ?? 'main';
+      if (!/^[A-Za-z0-9._-]+$/.test(remote) || !/^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(branch) || branch.includes('..')) throw new Error('Invalid target ref');
+      const ref = `refs/heads/${branch}`, rows = (await git(['ls-remote', '--heads', remote, ref])).split(/\r?\n/).filter(Boolean);
+      const [publishedMainSha, observedRef] = (rows[0] ?? '').split(/\s+/);
+      if (rows.length !== 1 || !SHA.test(publishedMainSha ?? '') || observedRef !== ref) throw new Error('Published main could not be verified for the advanced base');
+      // Fetch only the full SHA just observed on the configured published branch.
+      // No checkout, merge, worker launch, Product test, or service mutation occurs.
+      await git(['fetch', '--no-tags', '--no-write-fetch-head', remote, publishedMainSha]);
+      await git(['merge-base', '--is-ancestor', result.baseSha, publishedMainSha]);
+      if (await git(['rev-parse', 'HEAD']) !== result.candidateSha || await git(['status', '--porcelain', '--untracked-files=all'])) throw new Error('Candidate changed while its published base was verified');
+      baseAdvance = { kind: 'published-main-base-advance', from: task.baseSha, to: result.baseSha,
+        taskId: task.id, runId: task.attempt.runId, candidateSha: result.candidateSha, publishedMainSha, remote, branch, verifiedAt: this.now() };
+    }
+    // Override any worker-supplied field: only the host can attest this advance.
+    return { ...result, changedPaths: changed, hostValidatedAt: this.now(), baseAdvance };
+  }
+  async acceptCandidate(task, receipt, recovery = null) {
+    const at = this.now(), next = { ...task, candidateSha: receipt.candidateSha, baseSha: receipt.baseSha,
+      validationReceipt: receipt, status: 'delivery', deliveryQueuedAt: at, nextDeliveryAt: at, retryAt: null,
+      runnerPid: null, runnerCreatedAt: null, brokerPid: null, brokerCreatedAt: null, ownedProcesses: [],
+      failureClass: null, probingClass: null, lastFailure: null, infrastructureRetries: 0, productRecordKey: null };
+    if (receipt.baseAdvance) next.baseAdvanceHistory = [...(task.baseAdvanceHistory ?? []), { ...receipt.baseAdvance,
+      previousCandidateSha: task.candidateSha ?? null, previousStatus: task.status, previousFailure: task.lastFailure ?? null,
+      previousFailureAt: task.lastFailureAt ?? null, previousImplementationFailures: Number(task.implementationFailures ?? 0),
+      recovery, originalAttemptPreserved: true }];
+    if (recovery) next.implementationFailures = Math.max(0, Number(task.implementationFailures ?? 0) - 1);
+    await writeJson(path.join(this.runtime, 'results', task.id + '.json'), receipt);
+    await this.save(next); Object.assign(task, next);
+    await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId, recoveredSavedResult: Boolean(recovery) });
+  }
+  savedBaseMismatch(task) {
+    return ['retry_wait', 'blocked'].includes(task.status) && task.failureClass === 'implementation'
+      && task.lastFailure === 'Candidate validation: Candidate identity/base/worktree mismatch' && Boolean(task.attempt?.runId);
+  }
+  async recoverSavedBaseMismatch(task, processes) {
+    // Called only after ordinary scope, dependency, eligibility and authority gates.
+    // Never turn this saved attempt into running or launch/stop any process.
+    const reap = task.lastWorkerReap;
+    if (!reap?.exactAbsence || reap.runId !== task.attempt.runId || reap.activationId !== task.activationId
+      || !Array.isArray(reap.owners) || !reap.owners.length || reap.owners.some(o => !o.pid || !o.createdAt)) throw new Error('Saved worker absence identity is incomplete');
+    const checkpoint = await readJson(task.attempt.checkpointPath);
+    if (!checkpoint || checkpoint.taskId !== task.id || checkpoint.runId !== task.attempt.runId || !checkpoint.finishedAt
+      || task.checkpointIssue || task.eventLogIssue || task.watchdogIncident
+      || checkpoint.sessionId && task.sessionId && checkpoint.sessionId !== task.sessionId) throw new Error('Saved completed attempt identity is inconsistent');
+    if (workerProcesses({ ...task, ownedProcesses: [...(task.ownedProcesses ?? []), ...reap.owners] }, checkpoint, processes).length) throw new Error('An exact saved attempt process is still active');
+    const original = await fs.readFile(task.attempt.outputPath), result = parse(original);
+    const receipt = await this.validate(task, result);
+    if (!receipt.baseAdvance) throw new Error('Saved result is not a verified published-main base advance');
+    if (!original.equals(await fs.readFile(task.attempt.outputPath))) throw new Error('Saved result changed during validation');
+    await this.acceptCandidate(task, receipt, { kind: 'saved-base-mismatch-result', verifiedAt: this.now(), runId: task.attempt.runId,
+      originalResultSha256: createHash('sha256').update(original).digest('hex'), priorWorkerAbsence: reap,
+      removedMetadataFailureCount: 1, workerLaunches: 0, productTestsRun: 0, serviceMutations: 0 });
   }
   async launch(task) {
     if (await this.paused()) return;
@@ -480,6 +564,27 @@ export class Controller {
       await this.save(task); await this.event('worker_launched', { taskId: task.id, runId, pid, broker, sessionId: task.sessionId ?? null });
     } catch (error) { await this.failure(task, 'Worker launch failed: ' + error.message, 'environment'); }
   }
+  async isolateCompletedAuthBlocker(task, processes) {
+    if (task.status !== 'retry_wait' || task.failureClass !== 'auth' || !task.attempt?.runId) return false;
+    const checkpoint = await readJson(task.attempt.checkpointPath);
+    const result = await readJson(task.attempt.outputPath);
+    if (!checkpoint?.finishedAt || checkpoint.taskId !== task.id || checkpoint.runId !== task.attempt.runId
+      || checkpoint.sessionId && task.sessionId && checkpoint.sessionId !== task.sessionId
+      || result?.taskId !== task.id || result.runId !== task.attempt.runId
+      || result.state !== 'BLOCKED' || result.blockerType !== 'auth') return false;
+    if (workerProcesses(task, checkpoint, processes).length) return false;
+    const reason = result.blocker || result.summary;
+    if (!reason || clean(reason) !== task.lastFailure) return false;
+    task.failureReclassificationHistory = [...(task.failureReclassificationHistory ?? []), {
+      at: this.now(), runId: task.attempt.runId, from: 'auth', to: 'external',
+      reason: 'Completed worker downstream authentication blocker is task-scoped, not a Codex runtime outage',
+      originalFailure: task.lastFailure, originalRetryAt: task.retryAt,
+      originalInfrastructureRetries: task.infrastructureRetries, resultPath: task.attempt.outputPath,
+    }];
+    await this.failure(task, reason, 'external');
+    await this.event('task_auth_blocker_isolated', { taskId: task.id, runId: task.attempt.runId });
+    return true;
+  }
   async reconcile(task, processes) {
     let checkpoint = null;
     try { checkpoint = task.attempt ? await readJson(task.attempt.checkpointPath) : null; }
@@ -520,15 +625,11 @@ export class Controller {
     if (result?.state === 'LOCAL_READY') {
       try {
         const receipt = await this.validate(task, result);
-        task.candidateSha = receipt.candidateSha; task.validationReceipt = receipt; task.status = 'delivery';
-        task.deliveryQueuedAt = this.now(); task.nextDeliveryAt = this.now(); task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
-        task.failureClass = null; task.probingClass = null; task.lastFailure = null; task.infrastructureRetries = 0;
-        await writeJson(path.join(this.runtime, 'results', task.id + '.json'), receipt); await this.save(task);
-        await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId });
+        await this.acceptCandidate(task, receipt);
       } catch (error) { await this.failure(task, 'Candidate validation: ' + error.message); }
       return;
     }
-    if (result?.state === 'BLOCKED') { await this.failure(task, result.blocker || result.summary, result.blockerType); return; }
+    if (result?.state === 'BLOCKED') { if (await this.recognizeResourceWait(task, result, processes)) return; await this.failure(task, result.blocker || result.summary, workerBlockerClass(result)); return; }
     if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
     if (!checkpoint && task.attempt?.wrapperStderrPath) {
       const captured = [];
@@ -553,6 +654,51 @@ export class Controller {
     if (errorText) { await this.failure(task, errorText); return; }
     if (!checkpoint?.finishedAt) { await this.failure(task, 'Owned worker processes exited before a final response; recover the same session and worktree', 'network'); return; }
     await this.failure(task, `Worker exit ${checkpoint.exitCode} without the required final JSON`);
+  }
+  async recognizeResourceWait(task, result, processes) {
+    // A real named phase lease is a scheduling condition, never a provider/Auth denial.
+    if (result?.state !== 'BLOCKED' || result.taskId !== task.id || result.runId !== task.attempt?.runId
+      || !['external', 'environment', 'implementation'].includes(result.blockerType)
+      || result.checks?.some(c => c.status === 'FAIL')
+      || !/browser (?:phase )?lease is held by another active task/i.test(result.blocker ?? '')) return false;
+    if (!task.lastWorkerReap?.exactAbsence || task.lastWorkerReap.runId !== result.runId
+      || workerProcesses(task, null, processes).length || task.lastWorkerReap.owners?.some(o => processes.some(p => identityMatches(p, o)))) return false;
+    if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha
+      || normalize(result.worktreePath) !== normalize(task.worktreePath)
+      || !result.changedPaths?.every(f => allowed(f, task.allowedPaths))) return false;
+    const evidence = (result.checks ?? []).map(c => c.evidence).join(' ');
+    const ownerMatch = /owned by task ([a-z0-9._-]+) \(token ([a-f0-9-]{36})\)/i.exec(evidence);
+    if (!ownerMatch) return false;
+    const holder = this.jobs.find(t => t.id === ownerMatch[1] && t.activationId === task.activationId && t.attempt?.runId === ownerMatch[2]);
+    if (!holder || holder.id === task.id) return false;
+    const lease = await readJson(path.join(this.runtime, 'leases', 'browser.json'));
+    if (lease && (lease.version !== 2 || lease.taskId !== holder.id || lease.activationId !== task.activationId
+      || lease.owner?.type !== 'worker' || lease.owner.token !== holder.attempt.runId)) return false;
+    if (!this.testOnly) {
+      const head = await this.command('git', ['rev-parse', 'HEAD'], { cwd: task.worktreePath });
+      const dirty = await this.command('git', ['status', '--porcelain=v1', '--untracked-files=no'], { cwd: task.worktreePath });
+      if (head.code !== 0 || head.stdout.trim() !== result.candidateSha || dirty.code !== 0 || dirty.stdout.trim()) return false;
+    }
+    task.candidateSha = result.candidateSha;
+    task.resourceWait = { name: 'browser', runId: result.runId, holderTaskId: holder.id, holderRunId: holder.attempt.runId, observedAt: this.now() };
+    task.status = 'retry_wait'; task.failureClass = 'resource'; task.retryAt = null;
+    task.lastFailure = result.blocker; task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
+    await this.save(task); await this.event('resource_wait', { taskId: task.id, ...task.resourceWait }); return true;
+  }
+  async resolveResourceWaits(processes) {
+    for (const task of this.jobs.filter(t => t.status === 'blocked' && !t.resourceWait)) {
+      if (!/browser (?:phase )?lease is held by another active task/i.test(task.lastFailure ?? '')) continue;
+      const result = task.attempt ? await readJson(task.attempt.outputPath) : null;
+      await this.recognizeResourceWait(task, result, processes);
+    }
+    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && t.failureClass === 'resource' && t.resourceWait)) {
+      if (task.resourceWait.runId !== task.attempt?.runId || task.resourceWait.name !== 'browser') continue;
+      if (await exists(path.join(this.runtime, 'leases', 'browser.json'))) continue;
+      const wait = task.resourceWait;
+      task.resourceWaitHistory = [...(task.resourceWaitHistory ?? []), { ...wait, releasedAt: this.now() }];
+      task.resourceWait = null; task.status = 'pending'; task.retryAt = null; task.failureClass = null;
+      await this.save(task); await this.event('resource_available', { taskId: task.id, name: wait.name, preservedSessionId: task.sessionId });
+    }
   }
   async lease(task, name, action, token = null) {
     const result = await this.command(this.config.controller.powershellPath ?? POWERSHELL,
@@ -638,14 +784,25 @@ export class Controller {
     let processes;
     try { processes = await this.inventory(); }
     catch (error) { this.issues.push({ code: 'PROCESS_INVENTORY_UNAVAILABLE', message: clean(error.message) }); await this.snapshot(paused, false); return; }
+    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && t.failureClass === 'auth')) {
+      try { await this.isolateCompletedAuthBlocker(task, processes); }
+      catch (error) { this.issues.push({ code: 'SCOPED_AUTH_RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
+    }
     for (const task of this.jobs.filter(t => t.status === 'running')) {
       try { await this.reconcile(task, processes); }
       catch (error) { this.issues.push({ code: 'RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
     }
     await this.reapFinishedLeases();
+    await this.resolveResourceWaits(processes);
     for (const task of this.jobs.filter(t => t.status === 'awaiting_po')) {
       const eligibility = await this.eligibility(task);
-      if (eligibility.closed === true) { task.status = 'closed'; task.closedFromCanonicalAt = this.now(); await this.save(task); }
+      if (eligibility.closed === true) {
+        const closed = { ...task, status: 'closed', closedFromCanonicalAt: this.now() };
+        try { await this.save(closed); Object.assign(task, closed); }
+        catch (error) {
+          this.issues.push({ code: 'QUEUE_WRITE_FAILED', taskId: task.id, operation: 'close_from_canonical', errorCode: error.code ?? null, message: clean(error.message) });
+        }
+      }
     }
     if (!paused) {
       if (!this.deliveryInFlight) {
@@ -657,7 +814,7 @@ export class Controller {
         }
       }
       const active = this.jobs.filter(t => t.status === 'running');
-      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && timestamp(t.retryAt) <= this.clock());
+      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && !t.resourceWait && timestamp(t.retryAt) <= this.clock() || this.savedBaseMismatch(t));
       for (const task of candidates) {
         if (active.length >= Number(this.config.maxWorkers)) break;
         const outage = this.jobs.filter(t => OUTAGE.has(t.failureClass) && t.status === 'retry_wait' || t.status === 'running' && OUTAGE.has(t.probingClass));
@@ -672,6 +829,11 @@ export class Controller {
           continue;
         }
         if (!task.releaseAuthority || task.liveMutation && !task.liveAuthorizationRef) { await this.failure(task, 'This card lacks its precise release/data authority', 'external'); continue; }
+        if (this.savedBaseMismatch(task)) {
+          try { await this.recoverSavedBaseMismatch(task, processes); }
+          catch (error) { this.issues.push({ code: 'SAVED_BASE_RECOVERY_DEFERRED', taskId: task.id, message: clean(error.message) }); }
+          continue;
+        }
         await this.launch(task); if (task.status === 'running') active.push(task);
       }
     }

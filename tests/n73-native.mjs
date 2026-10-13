@@ -35,6 +35,10 @@ const correctedSql=await readFile('supabase/migrations/'+correction,'utf8');
 const correctionHash=createHash('sha256').update(correctedSql).digest('hex');
 const binding={runId,candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),tree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),harnessSha256:createHash('sha256').update(await readFile(new URL(import.meta.url))).digest('hex')};
 let correctedFunctions;
+const compatibility='20261013083000_n73_n94_compatibility.sql';
+const compatibilitySql=await readFile('supabase/migrations/'+compatibility,'utf8');
+const compatibilityHash=createHash('sha256').update(compatibilitySql).digest('hex');
+let compatibleFunctions;
 try {
   run('initdb', ['-D', cluster, '-U', 'postgres', '--auth=trust', '--encoding=UTF8', '--no-locale']);
   run('pg_ctl', ['-D', cluster, '-l', path.join(artifact, 'server.log'), '-o', `-h 127.0.0.1 -p ${port}`, '-w', 'start']);
@@ -57,6 +61,9 @@ try {
     await q((await readFile('supabase/migrations/' + name, 'utf8')).replace(/^\uFEFF/, ''));
   }
   await q(sql);
+  await q('alter function rakeezx.sync_v2_field_map(text) rename to sync_v2_field_map_before_n71');
+  // Load only the shipped dependency this compatibility correction protects.
+  await q(await readFile('supabase/migrations/20261012234116_n94_subitem_dates_late_scoring.sql','utf8'));
   const routines=()=>q(`select p.oid::regprocedure::text signature,md5(p.prosrc) body_md5,p.prosrc,pg_get_functiondef(p.oid) definition,p.proacl::text acl,p.prosecdef,p.proconfig from pg_proc p where p.oid in ('rakeezx.apply_score_distribution_plan(text,text,text,text,boolean)'::regprocedure,'rakeezx.rename_score_item(text,text,text,bigint,text)'::regprocedure) order by signature`);
   const parentFunctions=(await routines()).rows;
   assert.deepEqual(parentFunctions.map(row=>row.body_md5),['3c8da9d39fe5827b2a29f3d0f63ef5bd','995951fd8b362819e302f71afa2c180e']);
@@ -68,6 +75,19 @@ try {
     for(const key of ['signature','acl','prosecdef','proconfig']) assert.deepEqual(next[key],prior[key]);
   }
   record('exact_two_function_correction',`${correction}; SHA256 ${correctionHash}; only four conflict SQLSTATEs changed; exact bodies, ACL, security and search_path preserved.`);
+  const compatRoutines=()=>q(`select p.oid::regprocedure::text signature,md5(p.prosrc) body_md5,pg_get_functiondef(p.oid) definition,p.proacl::text acl,p.prosecdef,p.proconfig from pg_proc p where p.oid in ('rakeezx.n73_build_distribution(text,text[],text[])'::regprocedure,'rakeezx.sync_v2_field_map(text)'::regprocedure) order by signature`);
+  const priorCompat=(await compatRoutines()).rows;
+  await q(compatibilitySql);compatibleFunctions=(await compatRoutines()).rows;
+  for(let index=0;index<2;index++) for(const key of ['signature','acl','prosecdef','proconfig']) assert.deepEqual(compatibleFunctions[index][key],priorCompat[index][key]);
+  const fieldMap=async entity=>(await q('select rakeezx.sync_v2_field_map($1) fields',[entity])).rows[0].fields;
+  for(const field of ['distribution_origin_id','start_date','due_date','late_points']) assert.equal((await fieldMap('score_subitems'))[field],'configuration');
+  assert.equal((await fieldMap('score_subitem_completions')).completion_state,'state');
+  for(const entity of ['items','scores','assignments','submissions','years']) {
+    const beforeMap=(await q('select rakeezx.sync_v2_field_map_before_n71($1) fields',[entity])).rows[0].fields;
+    if(['assignments','submissions'].includes(entity)) assert.ok((await fieldMap(entity))!==null);
+    else assert.deepEqual(await fieldMap(entity),beforeMap);
+  }
+  record('compatibility_source_ACL_and_map',`${compatibility}; SHA256 ${compatibilityHash}; current delegation retained, approved origin/date/state mappings present, ACL/security/search_path unchanged.`);
   record('native_exact_migration', `PostgreSQL ${(await q('show server_version')).rows[0].server_version}; ${migration}; SHA256 ${hash}`);
   await q(`insert into rakeezx.years(id,label,hijri_start,hijri_end) values('y','Synthetic',1450,1451);
     insert into rakeezx.terms(id,year_id,name,"index") values('term','y','Synthetic',1);
@@ -179,9 +199,30 @@ try {
   assert.equal((await rpc('score_distribution_capability',[])).distributionApplyVersion,2);
   await q("set role authenticated; update rakeezx.items set name='Compatible DIRECT edit' where id='amb1'; reset role");
   record('old_clients_and_ACL', 'Existing copy command and copyDomainVersion=1 still work; v2 exposed only to authenticated; helpers denied.');
+  await q(`begin; select set_config('rakeezx.score_domain_write','on',true);
+    insert into rakeezx.students(id,name) values('unmarked','Synthetic Unmarked');
+    insert into rakeezx.items(id,teaching_id,name,max,"order",score_mode,distribution_mode) values
+      ('late-source','t1','Late definition',10,2,'subitems','manual'),('late-target','t2','Late definition',10,2,'subitems','manual');
+    insert into rakeezx.score_subitems(id,item_id,name,value,"order",start_date,due_date,late_points) values
+      ('late-source-sub','late-source','Part',5,0,'2026-10-01','2026-10-02',1),('late-target-sub','late-target','Part',6,0,null,null,4);
+    insert into rakeezx.score_subitem_completions(id,student_id,subitem_id,checked,completion_state) values
+      ('late-c','student','late-target-sub',true,'late'),('regular-c','student2','late-target-sub',true,'regular'),('unmarked-c','unmarked','late-target-sub',false,null);
+    insert into rakeezx.scores(id,student_id,item_id,value,manual_value,derived_value) values
+      ('late-score','student','late-target',6,2,4),('regular-score','student2','late-target',6,null,6),('unmarked-score','unmarked','late-target',null,null,0);commit;`);
+  const lateReview=await plan('late-review',['t2']);const lateReceipt=await apply(lateReview,'late-apply');
+  assert.deepEqual(await apply(lateReview,'late-apply'),lateReceipt);
+  const lateScores=(await q("select id,value,manual_value,derived_value from rakeezx.scores where item_id='late-target' order by id")).rows;
+  assert.deepEqual(lateScores.map(r=>[r.id,r.value,r.manual_value,r.derived_value]),[
+    ['late-score','3.00','2.00','1.00'],['regular-score','5.00',null,'5.00'],['unmarked-score',null,null,'0.00']]);
+  const lateSub=(await q("select to_jsonb(d) row from rakeezx.score_subitems d where id='late-target-sub'")).rows[0].row;
+  assert.equal(lateSub.distribution_origin_id,'late-source-sub');assert.equal(lateSub.start_date,'2026-10-01');assert.equal(lateSub.due_date,'2026-10-02');assert.equal(lateSub.late_points,1);
+  assert.deepEqual((await q("select completion_state from rakeezx.score_subitem_completions where subitem_id='late-target-sub' order by id")).rows.map(r=>r.completion_state),['late','regular',null]);
+  assert.equal((await q("select value from rakeezx.scores where id='sourceScore'")).rows[0].value,'19.00');
+  const lateRepeat=await plan('late-repeat',['t2']);assert.equal(lateRepeat.changedCount,0);
+  record('late_normal_unmarked_target_and_retry','Actual corrected plan/apply gives target late 1 + manual 2 = 3, regular 5, unmarked NULL; dates/origin/state persist, source grade unchanged, exact retry identical and repeat no duplicate.');
 } finally {
   await client?.end();
   if (started) run('pg_ctl', ['-D', cluster, '-w', '-m', 'fast', 'stop']);
   await rm(cluster, { recursive: true, force: true });
-  await writeFile(path.join(artifact,'result.json'), JSON.stringify({ ...binding,migration, hash,correction,correctionHash,correctedFunctions, checks, ownedServerStopped: true, ownedClusterRemoved: true }, null, 2));
+  await writeFile(path.join(artifact,'result.json'), JSON.stringify({ ...binding,migration, hash,correction,correctionHash,correctedFunctions,compatibility,compatibilityHash,compatibleFunctions, checks, ownedServerStopped: true, ownedClusterRemoved: true }, null, 2));
 }

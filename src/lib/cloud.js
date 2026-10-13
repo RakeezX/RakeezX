@@ -5,7 +5,7 @@
 
 import { readCompleteTable } from './complete-read.js';
 import { runtimeSyncOwnershipGuard, assertNewProductWrite } from './sync-ownership.js';
-import { revokeOwnerLeases } from './offline-lease.js';
+import { revokeOwnerLeases, runtimeOfflineLease, workspaceLeaseBinding } from './offline-lease.js';
 
 export const SUPABASE_URL = 'https://xlrubcwjqktzzunrvuns.supabase.co';
 const PUBLISHABLE_KEY = 'sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
@@ -131,8 +131,14 @@ function persistedAuthOwner() {
 function saveSession(data, { required = true } = {}) {
   const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
   const priorPersistedOwner = persistedAuthOwner();
-  if (priorPersistedOwner && priorPersistedOwner !== nextUserId) revokeOwnerLeases(priorPersistedOwner);
-  if (user?.id && user.id !== nextUserId) revokeOwnerLeases(user.id);
+  if (priorPersistedOwner && priorPersistedOwner !== nextUserId) {
+    revokeOwnerLeases(priorPersistedOwner);
+    revokeScoreCapabilities(priorPersistedOwner);
+  }
+  if (user?.id && user.id !== nextUserId) {
+    revokeOwnerLeases(user.id);
+    revokeScoreCapabilities(user.id);
+  }
   if ((user?.id ?? null) !== (nextUserId ?? null) || !!session !== !!data?.access_token) authContextGeneration++;
   if (!data?.access_token) {
     session = null;
@@ -340,6 +346,7 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   const actual = String(verified?.id ?? '').trim().toLowerCase();
   if (actual !== expected) {
     revokeOwnerLeases(expected);
+    revokeScoreCapabilities(expected);
     throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
       code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
     });
@@ -817,6 +824,35 @@ export async function applySyncV2LifecycleCommand(envelope) {
   });
 }
 
+/** N77 server-authoritative preview and atomic Delete. Both calls are owner-bound RPCs. */
+export async function n77DeleteTeaching({ teachingId, sectionId, fingerprint = null, mutationId = null,
+  deviceId = null, commit = false }) {
+  const ownerId = user?.id;
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: ownerId });
+  if (!access.allowed || !ownerId || !session?.access_token || !globalThis.navigator?.onLine) {
+    throw Object.assign(new Error('N77 Delete requires a verified online account workspace'), { code: 'N77_OFFLINE_OR_OWNER' });
+  }
+  const assertAccess = () => {
+    if (user?.id !== ownerId || runtimeSyncOwnershipGuard.getWorkspace() !== workspace || !session?.access_token) {
+      throw Object.assign(new Error('N77 Delete account/workspace changed'), { code: 'N77_OWNER_CHANGED' });
+    }
+  };
+  await verifyCurrentAuthIdentity(ownerId);
+  assertAccess();
+  const input = { teachingId, sectionId, fingerprint, mutationId, deviceId, commit };
+  const result = mockBackend ? await mockBackend.n77DeleteTeaching(input)
+    : await request('/rpc/n77_delete_teaching', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+      body: JSON.stringify({ p_teaching_id: teachingId, p_expected_section_id: sectionId,
+        p_expected_fingerprint: fingerprint, p_mutation_id: mutationId, p_device_id: deviceId,
+        p_commit: commit }),
+    }, false, { assertAccess });
+  assertAccess();
+  return result;
+}
+
 /** Sync V2 section archive/reopen command transport. */
 export async function applySyncV2SectionLifecycleCommand(envelope) {
   if (mockBackend) {
@@ -915,6 +951,18 @@ export async function applyScoreSubitemCommand(envelope) {
     return mockBackend.applyScoreSubitemCommand(envelope);
   }
   if (!user) throw authError('Authentication required');
+  if (Object.hasOwn(envelope, 'completionState')) {
+    const capability = await getScoreFoundationCapability();
+    if (capability?.n94SubitemVersion !== 1) throw new Error('N94 server capability is unavailable');
+    return request('/rpc/apply_score_subitem_command_n94', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+      body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+        p_command: envelope.command, p_item_id: envelope.itemId, p_student_id: envelope.studentId,
+        p_subitem_id: envelope.subitemId ?? null, p_completion_state: envelope.completionState,
+        p_manual_value: envelope.manualValue ?? null }),
+    });
+  }
   return request('/rpc/apply_score_subitem_command', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
       'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
@@ -960,16 +1008,86 @@ export async function applyScoreDistributionCopyCommand(envelope) {
   });
 }
 
-export async function getScoreFoundationCapability() {
-  if (mockBackend) {
-    if (typeof mockBackend.getScoreFoundationCapability !== 'function') return null;
-    return mockBackend.getScoreFoundationCapability();
+const SCORE_CAPABILITY_PREFIX = 'rakeezx-score-capability-v1:';
+const SCORE_CAPABILITY_MAX_AGE = 14 * 86400000;
+function revokeScoreCapabilities(ownerId) {
+  for (let index = localStorage.length - 1; index >= 0; index--) {
+    const key = localStorage.key(index);
+    if (!key?.startsWith(SCORE_CAPABILITY_PREFIX)) continue;
+    try {
+      if (JSON.parse(JSON.parse(localStorage.getItem(key)).binding)[0] === ownerId) localStorage.removeItem(key);
+    } catch { localStorage.removeItem(key); }
   }
-  if (!user) return null;
-  return request('/rpc/score_foundation_capability', {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
-      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
-  });
+}
+const scoreCapabilityCompatible = (value) => value?.scoreDomainVersion === 1 &&
+  value?.restoreProtocol === 'CORE_V2' && value?.backupVersion === 5 && value?.copyDomainVersion === 1;
+function capabilityChecksum(body) {
+  let hash = 2166136261;
+  for (const char of JSON.stringify(body)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return (hash >>> 0).toString(16);
+}
+const offlineCapabilityError = () => Object.assign(new Error(
+  'يلزم الاتصال للتحقق من دعم البنود الفرعية لهذا الحساب، ثم يمكنك تعديلها دون اتصال.'
+), { code: 'SCORE_CAPABILITY_UNVERIFIED' });
+
+/** Cache actual RPC evidence only. It is local evidence, never a server grant.
+ * Sync/renewal may refresh it online; only local commands opt into fallback.
+ */
+export async function getScoreFoundationCapability({ workspace, allowOffline = false } = {}) {
+  const binding = workspaceLeaseBinding(workspace);
+  const owner = user?.id, generation = authContextGeneration;
+  const key = binding ? SCORE_CAPABILITY_PREFIX + workspace.id : null;
+  const assertContext = () => {
+    if (binding && (owner !== workspace.authUserId || user?.id !== owner || !session?.access_token ||
+        persistedAuthOwner() !== owner || generation !== authContextGeneration)) {
+      throw Object.assign(new Error('Score capability owner changed'), { code: 'AUTH_CONTEXT_CHANGED' });
+    }
+  };
+  const cached = () => {
+    assertContext();
+    if (!binding) throw offlineCapabilityError();
+    runtimeOfflineLease().assertWritable();
+    try {
+      const { checksum, ...receipt } = JSON.parse(localStorage.getItem(key) || 'null');
+      const age = Date.now() - receipt.verifiedAt;
+      if (receipt.version === 1 && receipt.binding === binding && checksum === capabilityChecksum(receipt) &&
+          Number.isFinite(receipt.verifiedAt) && receipt.verifiedAt > 0 && age >= 0 &&
+          age < SCORE_CAPABILITY_MAX_AGE && scoreCapabilityCompatible(receipt.capability)) return receipt.capability;
+    } catch {}
+    throw offlineCapabilityError();
+  };
+  assertContext();
+  if (allowOffline && globalThis.navigator?.onLine === false) return cached();
+  let capability;
+  try {
+    capability = mockBackend ? await mockBackend.getScoreFoundationCapability?.() ?? null
+      : !user ? null : await request('/rpc/score_foundation_capability', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+          'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: '{}',
+      }, false, { assertAccess: assertContext });
+  } catch (error) {
+    assertContext();
+    // Only fetch transport failure permits fallback. HTTP/Auth/RPC rejections
+    // invalidate prior evidence and must never be hidden by an offline receipt.
+    if (error instanceof TypeError && !error.status && !error.code) {
+      if (allowOffline) return cached();
+    } else if (owner) revokeScoreCapabilities(owner);
+    throw error;
+  }
+  assertContext();
+  if (key) {
+    if (scoreCapabilityCompatible(capability)) {
+      const body = { version: 1, binding, verifiedAt: Date.now(), capability };
+      // A storage failure must not pretend evidence survived a reload. The
+      // current online response remains valid for this command.
+      try { localStorage.setItem(key, JSON.stringify({ ...body, checksum: capabilityChecksum(body) })); } catch {}
+    } else localStorage.removeItem(key);
+  } else if (owner && (!scoreCapabilityCompatible(capability) || capability?.n94SubitemVersion !== 1)) {
+    // Online command checks without a workspace must also retire stale owner
+    // evidence when the server no longer supports the cached protocol.
+    revokeScoreCapabilities(owner);
+  }
+  return capability;
 }
 
 async function distributionRPC(name, body, mockMethod, envelope) {

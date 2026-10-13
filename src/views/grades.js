@@ -6,12 +6,13 @@
 
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
-import { itemScore, studentTotal, masteryBand, normalizeSearchText } from '../models.js';
+import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster } from '../models.js';
 import { repaint } from '../repaint.js';
 import * as db from '../lib/db.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
+import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
 
 let mode = 'item';        // item | table
 let activeItemId = null;
@@ -54,6 +55,13 @@ export default {
   wide: true,
 
   onMount() {
+    if (!document.getElementById('n94-grades-style')) {
+      const style = document.createElement('link');
+      style.id = 'n94-grades-style';
+      style.rel = 'stylesheet';
+      style.href = new URL('../styles/grades.css', import.meta.url).href;
+      document.head.append(style);
+    }
     mode = 'item';
     activeItemId = null;
     sortKey = 'default';
@@ -69,7 +77,8 @@ export default {
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">الدرجات محفوظة، ولا يمكن تعديلها من مسار العمل النشط.</div></div>`;
 
-    const { roster, items, ctx } = store.teachingContext(cls.id);
+    const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
+    const roster = displayRoster(activeRoster);
     const distributionAction = html`<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a>`;
 
     if (!roster.length) {
@@ -121,7 +130,7 @@ export default {
       const normalized = normalizeSearchText(query);
       processedRoster = processedRoster.filter((student) =>
         normalizeSearchText(student.name).includes(normalized) ||
-        normalizeSearchText(student.rollNo ?? '').includes(normalized));
+        normalizeSearchText(student.displayNo ?? '').includes(normalized));
     }
 
     // الترتيب
@@ -344,8 +353,10 @@ export default {
     },
 
     async 'subitem-completion'(el) {
+      if (el.disabled || el.dataset.workspace !== store.getActiveWorkspace()?.id) return;
+      el.disabled = true;
       try {
-        const result = await store.setScoreSubitemCompletion(el.dataset.student, el.dataset.subitem, el.checked);
+        const result = await store.cycleScoreSubitemCompletion(el.dataset.student, el.dataset.subitem);
         scoreValidation.delete(`${el.dataset.student}:${result.score.itemId}`);
       } catch (error) {
         toast(error?.message || 'تعذر حفظ حالة العنصر', 'danger');
@@ -428,7 +439,7 @@ function itemMode(roster, items, ctx, item, fullRoster) {
                                ${isChecked ? 'checked' : ''} aria-label="تحديد ${s.name}">
                       `
                     : ''}
-                  <span class="rollno">${s.rollNo ?? '—'}</span>
+                  <span class="rollno">${s.displayNo ?? '—'}</span>
                   <span class="graderow__name"><strong>${s.name}</strong><small>${value === null ? 'لم تُرصد الدرجة' : 'تم الرصد'}</small></span>
                   ${auto
                     ? html`
@@ -464,24 +475,37 @@ function subitemMode(roster, ctx, item) {
   return html`
     <section class="grades-01c__subscore" aria-label="رصد العناصر الفرعية">
       <div class="grades-01c__provenance-key">العناصر الفرعية <span>+</span> الإضافة اليدوية <span>=</span> الدرجة النهائية</div>
+      <div class="n94-completion-legend" aria-label="دليل حالات العناصر الفرعية">
+        <span><i class="n94-completion--unrecorded" aria-hidden="true"></i>غير مرصود</span>
+        <span><i class="n94-completion--late" aria-hidden="true"></i>متأخر</span>
+        <span><i class="n94-completion--regular" aria-hidden="true"></i>عادي/بعذر</span>
+      </div>
       ${roster.length === 0 ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>` : roster.map((student) => {
         const score = ctx[student.id].scoresByItem[item.id] ?? null;
         const final = itemScore(item, ctx[student.id]);
-        const checked = new Set(store.state.scoreSubitemCompletions.filter((row) =>
-          row.studentId === student.id && row.checked && !row.deleted).map((row) => row.subitemId));
+        const completions = new Map(store.state.scoreSubitemCompletions.filter((row) =>
+          row.studentId === student.id && !row.deleted).map((row) => [row.subitemId, row]));
         const derived = score?.derivedValue ?? 0;
         const manual = score?.manualValue ?? null;
         const warning = scoreValidation.get(`${student.id}:${item.id}`);
         return html`<article class="grades-01c__subscore-row">
-          <div class="grades-01c__student"><span class="rollno tabular">${student.rollNo ?? '—'}</span>
+          <div class="grades-01c__student"><span class="rollno tabular">${student.displayNo ?? '—'}</span>
             <span><strong>${student.name}</strong><small>${final === null ? 'غير مرصود' : 'تم الرصد'}</small></span></div>
           <div class="grades-01c__subitems" role="group" aria-label="عناصر ${item.name} للطالب ${student.name}">
-            ${definitions.map((definition) => html`<label class="grades-01c__subitem">
-              <input type="checkbox" data-change="subitem-completion" data-student="${student.id}"
-                data-subitem="${definition.id}" ${checked.has(definition.id) ? 'checked' : ''}
-                aria-label="${definition.name} للطالب ${student.name}">
-              <span>${definition.name}<b class="tabular">${fmtNum(definition.value)}</b></span>
-            </label>`)}</div>
+            ${definitions.map((definition) => {
+              const completion = completions.get(definition.id);
+              const selected = subitemCompletionState(completion);
+              const label = { unrecorded: '— غير مرصود', late: '◷ متأخر', regular: '✓ عادي / مقبول بعذر' }[selected];
+              const points = subitemSelectedPoints(definition, completion);
+              const description = `${definition.name} للطالب ${student.name}: ${label}${points === null ? '' : ` · ${fmtNum(points)} درجات`}`;
+              return html`<button type="button" class="grades-01c__subitem n94-completion n94-completion--${selected}"
+                data-act="subitem-completion" data-workspace="${store.getActiveWorkspace()?.id}"
+                data-student="${student.id}" data-subitem="${definition.id}"
+                aria-label="${description}" title="${description}"
+                aria-pressed="${selected !== 'unrecorded'}">
+                <span class="n94-cell-line" aria-hidden="true"><span class="n94-cell-name">${definition.name}</span>${points === null ? '' : html`<small class="tabular">${fmtNum(points)}</small>`}<i>${{ unrecorded: '—', late: '◷', regular: '✓' }[selected]}</i></span>
+              </button>`;
+            })}</div>
           <div class="grades-01c__equation" aria-label="ملخص درجة ${student.name}">
             <span class="grades-01c__metric"><small>العناصر</small><b class="tabular">${fmtNum(derived)}</b></span><i aria-hidden="true">+</i>
             <label class="grades-01c__manual-field"><small>يدوي</small><input class="grades-01c__manual tabular" type="text" inputmode="decimal"
@@ -527,7 +551,7 @@ function tableMode(roster, items, ctx) {
             return html`
               <tr>
                 <th class="gtable__sticky">
-                  <span class="gtable__roll tabular">${s.rollNo ?? ''}</span>
+                  <span class="gtable__roll tabular">${s.displayNo ?? ''}</span>
                   <a href="#/student/${s.id}">${s.name}</a>
                 </th>
                 ${items.map((i) => {

@@ -1,0 +1,66 @@
+{
+  "taskId": "continuous-n13-existing-section-subject-20261012",
+  "runId": "7b97f940-2a77-4045-8c94-04b6045c587c",
+  "baseSha": "b5e83107222833f5e74530a73355734d8477bd03",
+  "priorCandidateSha": "59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d",
+  "state": "LOCAL_READY",
+  "syntheticOnly": true,
+  "history": [
+    {
+      "runId": "1f9fb9ff-83b1-422e-96af-736cc32898b2",
+      "state": "BLOCKED",
+      "evidence": "tests/n13-evidence.json remains unchanged"
+    },
+    {
+      "runId": "6b760d7e-8da2-4bff-84b2-ca591eb97381",
+      "state": "BLOCKED",
+      "evidence": "Historical runner result preserved; no queue/attempt files edited"
+    }
+  ],
+  "repair": "In the existing atomic Teaching receipt reconciliation, exclude only mapped retired default item rows from reference-rewrite puts. Their canonical replacements come from the unchanged owner-scoped RPC receipt. Reference/outbox rewrite and envelope-lock guards remain intact.",
+  "sources": {
+    "src/store.js": "8d75486639cc4d7dccb2fd72e2a78f7231d18ef7",
+    "src/views/teachings.js": "d9243f7e8ee67dbe297c6c5af00c253e20ec15f4",
+    "src/views/teaching-hub.js": "529393d5f8a8decf15ca3c5210063a66514cae28",
+    "src/styles/components.css": "86f957ff43928c1f1fcf7f9ee4eca4209c8099b8",
+    "src/lib/sync-v2.js": "16ccb4204c5e38202d2ba0a078adc1bdce44cf69",
+    "src/lib/cloud.js": "05717f00de1452a42cd302622fe9d5a3bbebea21",
+    "docs/automation-evidence/20261012/deployed-teaching-creation.readonly.json": "f9399f6a9d4f4fabc9c7bbf2cb723ed593086fa7",
+    "tests/n13-owner-roundtrip.test.mjs": "3478b5300641c0172bc5fd43fa36e3ecb33b5500"
+  },
+  "checks": [
+    {
+      "name": "shared_section_subject_creation",
+      "status": "PASS",
+      "evidence": "Reused from saved candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d; affected store/view/CSS source unchanged. 17/17 focused store/section tests; actual Product create/edit handlers and rapid duplicate submissions PASS in n13-product.e2e.mjs."
+    },
+    {
+      "name": "shared_roster_subject_isolation",
+      "status": "PASS",
+      "evidence": "Reused from saved candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d; affected store/view/CSS source unchanged. n13-store.test.mjs: claimed account workspace, shared roster edits and IDs; independent scores, attendance, report contexts; actual Sync V2 encode/decode and backup/reload."
+    },
+    {
+      "name": "existing_owner_command_roundtrip",
+      "status": "PASS",
+      "evidence": "node --test tests/n13-owner-roundtrip.test.mjs: 4/4 PASS using the existing isolated PGlite harness. Deployed RPC/wrapper definitions match; immutable lost-response/reload retry, owner B/no-Auth/local mismatch, and canonical adoption pass. Exactly five canonical items remain; all retired local item IDs are absent. Pending grade value and score/session references survive. Locked request envelope is unchanged and blocked from unsafe dispatch."
+    },
+    {
+      "name": "scope_aware_delete_preservation",
+      "status": "PASS",
+      "evidence": "Reused from saved candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d; affected store/view/CSS source unchanged. Account store and actual UI: subject-only vs final-class routing, scope-change reconfirmation, retained roster/tombstone blockers and pristine lifecycle. No N77 operation."
+    },
+    {
+      "name": "product_ui_release_scope",
+      "status": "PASS",
+      "evidence": "Reused from saved candidate 59def8e6af28c0b1ab0bdd1f3f62784d9bb8a13d; affected store/view/CSS source unchanged. npx playwright test -c tests/n13-playwright.config.mjs: 3/3 PASS, actual index.html and Product handlers/source CSS via http://127.0.0.1:5193, fresh synthetic contexts; 390px RTL/1280px create/edit/delete light/dark renders inspected; Demo parity."
+    }
+  ],
+  "verification": {
+    "syntax": "node --check src/lib/sync-v2.js and tests/n13-owner-roundtrip.test.mjs PASS",
+    "diff": "git diff --check PASS",
+    "browser": "Unchanged actual application UI evidence reused; no browser/Preview train repeated",
+    "resources": "No browser, HTTP server, integration or live-mutation phase started. Isolated in-process PGlite and IndexedDB handles closed by test cleanup."
+  },
+  "blocker": null,
+  "delivery": "No push, deploy, live mutation, schema changes, or queue/status edits. Independent controller owns publication and served evidence."
+}

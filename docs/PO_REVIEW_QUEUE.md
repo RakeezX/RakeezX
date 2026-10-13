@@ -4,9 +4,24 @@
 This page preserves user notes and acceptance context. The automatic block lists only delivery with observed Production evidence; use the task's delivery receipt and [Product ledgers](PRODUCT_LEDGER.md) for status. `awaiting_po` releases execution capacity immediately, so review does not delay the next eligible ticket. Local/Preview results are not published acceptance items.
 
 <!-- BEGIN RAKEEZ CONTINUOUS DELIVERY -->
-The delivery recorder maintains verified published items here. Consult `artifacts/ops-supervisor-v4/ACTIVE_TASKS.json`, the relevant `queue/*.json` and delivery receipt for current evidence; absence from an unrefreshed page is not a status decision.
+
+| التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
+| --- | --- | --- | --- | --- | --- |
+| N77 | All five required gates passed after reconciliation with current main. Old pairs and functions remain retired. Evidence directory: C:\Users\Abody\Projects\RakeezX\artifacts\ops-supervisor-v4\capabilities\n77\6b53e77c-7893-4f59-abba-4a6d0197b2ba\private. Historical lease-call incident and its fail-closed correction are recorded. No main or Production publication performed. | [Production](https://rakeezx.com/) | 76c07ea52c4fe8185181e62cae6506f3dc76cdbd | 2026-10-13T01:22:35.392Z | continuous-n77-real-delete-20261012 |
+| N94 | Implemented and verified N94, including persisted teacher state and one certified additive service migration. Final immutable Preview is source-bound. Main/Production were not published; queue/status files were untouched. Stopped synthetic test directories were retained following the recorded deletion denial. | [Production](https://rakeezx.com/) | 5fb778db4a411bb517a21eb3eb2662a776ac97a6 | 2026-10-13T01:23:58.328Z | continuous-n94-subitem-late-scoring-20261012 |
+
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
+
+<!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->
+## Current PO decisions — 2026-10-13
+
+N13 is CLOSED. Exact verified Production release `a516ced605cf016848841b0bc021d4e5acdfa41f`; candidate `f8e2a5234e72b0af04174a4b33588c8e34f99d36`. PO reported improvement and accepted closure when technically ready. The requested single creation form, shared roster and duplicate-without-writes outcome passed all three required checks. N77 deletion remains independent.
+
+N49 is CLOSED. Exact verified Production release `df1715a822fe37f15f5b25d288db75c2d391b895`; candidate `8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf`. PO reported a successful personal 3/6-minute Preview trial at 03:07 Asia/Riyadh on 2026-10-13. The remaining screen wording and printed student-table correction now passed its own actual-app check and Production delivery, satisfying the separate delegated technical closure condition. Production stays at 7/14 days.
+
+N96 and N54 remain previously accepted/CLOSED. N91 remains available for PO review. N77 has high priority; deferred tickets stay deferred. Full prior notes, user feedback, delivery evidence and the bounded unattended-work/Scheduler observation are retained in `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`. The observed work interval proves local progress without chat calls; it does not establish uninterrupted 24-hour operation. The controller observes canonical closure; this document operation does not write queue state.
+<!-- END RAKEEZ PO DECISIONS 20261013 -->
 
 ## Preserved user notes and historical review context — not dispatch instructions
 
@@ -36,3 +51,6 @@ The five new notes have been preserved verbatim in [Product Ledger History](PROD
 | N95 — credible red Sync warnings | PO reported repeated red warnings when leaving/re-entering app or internet toggles. Verified code cause: `syncAll` catch sets `error` after first transient exception; `coordinatorOperationalState()` propagates error before durable failed evidence; UI maps error to `badge--danger` immediately, while retries are scheduled at 2/4/8/16/30 seconds. CLOSED N68 handles only some resume flashes; N95 is wider severity policy. | Proposed **UI-only severity hysteresis**: quiet retrying/local-save signal for transient reconnect/offline, red only for confirmed sustained impact (initial study estimate 90–120s + >=2 meaningful failed attempts, NOT approved threshold); confirmed server rejection, owner/auth failures and data-loss/recovery hazards shown immediately with actionable detail. Keep real Sync retry/data truth unchanged. |
 
 No implied mergers, no new Product implementation permissions, and no reversal of earlier completed N33/N68/N80 tickets.
+
+
+Latest PO feedback 2026-10-13 04:52 Asia/Riyadh: N91 is expressly accepted and CLOSED. N77 and N94 follow-ups, N97 sync status, and N98 alphabetical roster have entered the current controller catalog. N24 report-design note is retained without activating deferred work. See docs/automation-evidence/20261013/PO_FEEDBACK_0452.md.

@@ -93,7 +93,7 @@ async function prepare() {
   const defaults=structuredClone(buildAccountFoundationDefaults()); defaults.calendarDays=defaults.calendarDays.slice(0,1);
   const ids={sections:[1,2,10,11].map(n=>prefix+'s'+n),teachings:[1,2,10,11].map(n=>prefix+'t'+n),
     defaults:[1,2,10,11].map(n=>Array.from({length:5},(_,i)=>prefix+'t'+n+'-default'+i)),
-    students:[prefix+'student1',prefix+'student2'],extra:prefix+'extra',extraScore:prefix+'extra-score',duplicate:prefix+'duplicate',
+    students:[prefix+'student1',prefix+'student2',prefix+'student3'],extra:prefix+'extra',extraScore:prefix+'extra-score',duplicate:prefix+'duplicate',
     sourceScore:prefix+'source-score',capScore:prefix+'cap-score',validScore:prefix+'valid-score',manualAutoScore:prefix+'manual-auto-score',
     sourceSub:prefix+'source-sub',targetSub:prefix+'target-sub',completion:prefix+'target-completion',
     sourceLog:prefix+'source-log',targetLog:prefix+'target-log',missing:prefix+'missing',missingSub:prefix+'missing-sub'};
@@ -204,11 +204,13 @@ async function run() {
     }
     for(const [parent,sub,value] of [[source[2],i.sourceSub,3],[target[2],i.targetSub,5],[i.missing,i.missingSub,6]]) {
       await rpc(A,'apply_score_configuration_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_item_id:parent,p_expected_version:1,
-        p_payload:{scoreMode:'subitems',distributionMode:'manual',max:parent===i.missing?6:20,subitems:[{id:sub,name:'Part',value}],conversionStrategy:'retain-as-manual'}});
+        p_payload:{scoreMode:'subitems',distributionMode:'manual',max:parent===i.missing?6:20,subitems:[{id:sub,name:'Part',value,startDate:'2026-10-01',dueDate:'2026-10-02',latePoints:1}],conversionStrategy:'retain-as-manual'}});
     }
-    const completion=await rpc(A,'apply_score_subitem_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_command:'set_completion',
-      p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:i.targetSub,p_checked:true,p_manual_value:null});
+    const completion=await rpc(A,'apply_score_subitem_state_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',
+      p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:i.targetSub,p_state:'late'});
     assert.equal(completion.completion.id,i.completion);
+    for(const [student,selectedState] of [[i.students[1],'regular'],[i.students[2],null]]) await rpc(A,'apply_score_subitem_state_command',{
+      p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_item_id:target[2],p_student_id:student,p_subitem_id:i.targetSub,p_state:selectedState});
     await rpc(A,'apply_score_subitem_command',{p_mutation_id:randomUUID(),p_device_id:prefix+'A1',p_command:'set_manual',
       p_item_id:target[2],p_student_id:i.students[0],p_subitem_id:null,p_checked:null,p_manual_value:2});
     for(const [id,t,delta] of [[i.sourceLog,i.teachings[0],9],[i.targetLog,i.teachings[1],2]]) {
@@ -253,8 +255,13 @@ async function run() {
     const logs=(await table(A,'logs')).filter(r=>r.teaching_id===i.teachings[1]).map(r=>decodeSyncV2Canonical('logs',r));
     assert.equal(itemScore(auto,{logs,classHasParticipation:true}),2);
     const targetSub=await actor2.database.get('scoreSubitems',i.targetSub);assert.equal(targetSub.distributionOriginId,i.sourceSub);
-    assert.equal((await actor2.database.get('scoreSubitemCompletions',i.completion)).checked,true);
-    const targetSubScore=(await actor2.database.getAll('scores')).find(r=>r.itemId===target[2]);assert.equal(targetSubScore.value,5);assert.equal(targetSubScore.manualValue,2);
+    assert.equal(targetSub.startDate,'2026-10-01');assert.equal(targetSub.dueDate,'2026-10-02');assert.equal(targetSub.latePoints,1);
+    assert.equal((await actor2.database.get('scoreSubitemCompletions',i.completion)).completionState,'late');
+    const targetSubScores=(await actor2.database.getAll('scores')).filter(r=>r.itemId===target[2]);
+    const targetSubScore=targetSubScores.find(r=>r.studentId===i.students[0]);assert.equal(targetSubScore.value,3);assert.equal(targetSubScore.manualValue,2);
+    assert.equal(targetSubScores.find(r=>r.studentId===i.students[1]).value,3);
+    assert.equal(targetSubScores.find(r=>r.studentId===i.students[2]).value,null);
+    report('live_late_regular_unmarked_roundtrip','Actual A2 receives dates, latePoints=1 and stable origin; target late+manual=3, regular=3, unmarked=NULL; explicit completion states retained.');
     report('live_cap_preserve_auto_and_idempotent_retry','Persisted cap=20, compatible score=18 and extra=4 retained; source grade=19 unchanged; target-only participation projects 2 rather than source 9; lost-receipt retry adopts one canonical result.');
     const repeat=await plan(i.teachings.slice(1));assert.equal(repeat.changedCount,0);
     const itemsBeforeRepeat=await table(A,'items');
@@ -277,8 +284,12 @@ async function run() {
     const {buildBackup,restoreBackup,validateBackupIntegrity}=await import('../../src/lib/export.js');
     const backup=await buildBackup({sourceOwnerId:A.user.id});assert.equal((await validateBackupIntegrity(backup)).ok,true);
     assert.equal(backup.data.scoreSubitems.find(r=>r.id===i.targetSub).distributionOriginId,i.sourceSub);
+    assert.equal(backup.data.scoreSubitems.find(r=>r.id===i.targetSub).latePoints,1);
+    assert.equal(backup.data.scoreSubitemCompletions.find(r=>r.id===i.completion).completionState,'late');
     await actor2.database.clearAll();await restoreBackup(backup,'replace');
     assert.equal((await actor2.database.get('scoreSubitems',i.targetSub)).distributionOriginId,i.sourceSub);
+    assert.equal((await actor2.database.get('scoreSubitems',i.targetSub)).dueDate,'2026-10-02');
+    assert.equal((await actor2.database.get('scoreSubitemCompletions',i.completion)).completionState,'late');
     assert.equal((await actor2.database.get('items',i.extra)).deleted,true);
     report('live_device_convergence_and_backup','Actual Sync engine A2 adopts canonical parents/subitems/completions/scores; explicit deletion receipt and subsequent stale edit converge to tombstones without resurrection; V5 backup/local restore preserves origins and deletions.');
     state.status='CHECKS_COMPLETE';await save();

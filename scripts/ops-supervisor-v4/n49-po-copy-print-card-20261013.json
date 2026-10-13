@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n49-po-copy-print-20261013",
+      "productId": "N49",
+      "activationId": "po-20261012-continuous",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "budgetMinutes": 20,
+      "idleMinutes": 5,
+      "priority": 0,
+      "scopeKey": "n49-po-reminder-wording-print",
+      "dependsOn": [],
+      "requiredChecks": [
+        "n49_copy_print_render"
+      ],
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/offline-lease.js"
+      ],
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "objective": "Complete the PO's immediate N49 reminder/LIMITED wording and print-only correction using the already prepared two-source commit. One normal existing controller worker consumes it; no additional reviewer or reimplementation. Use the controller's assigned fresh base/worktree. Fetch refs/heads/ops/n49-po-copy-print-20261013 with --no-write-fetch-head; require branch commit bd933f01712e34816ee041c9c06d94f7b18a6b8c, parent ba28be41eac0890a0b700dd42502b3d394fe8296 and exactly src/app.js plus src/lib/offline-lease.js. Cherry-pick that commit onto the assigned current base; do not replace the worktree with its older base or use the accelerated Preview branch. The changes are user-facing reminder/LIMITED and write-denial text, and the existing noprint class on the notice. All lease logic, write/Restore restrictions, owner/Sync/storage behavior and 7/14-day Production thresholds are unchanged. Under the existing browser phase lease run only the installed source-bound script C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-copy-print-proof.mjs with the assigned isolated worktree and an owned current-attempt evidence directory as its two arguments. Verify the supplied script SHA before that run. This single actual-app proof reuses the existing N49 synthetic fixture setup without registering/rerunning the functional suite; it shows each reminder/LIMITED notice on screen, hides it in print, keeps the real student report table visible and restores the notice on return to screen. The proof is currently PENDING, not inherited PASS. Record its actual n49-copy-print-render.json and map PASS only after both cases pass. A source mismatch or real rendering failure requires its specific scoped diagnosis, not a fabricated PASS, broad suite or unchanged retry loop. No extra build/review/planning train is needed. Return the controller's result schema with the actual taskId/runId, candidate, assigned base and worktree. The sole publisher owns current-main integration, ordinary Production delivery and served-source verification. The PO authorized N49 closure conditionally after this technical correction succeeds; leave canonical closure to the operator/controller after the exact new delivery receipt.",
+      "acceptance": [
+        "n49_copy_print_render: the one installed native actual-app rendering proof passes both REMINDER after 7 days and LIMITED at 14 days. The notice is visible with the clarified copy on screen, absent in print/PDF, and the student report containing طالب ألف remains visible/printable; the notice returns with screen media. The receipt must bind both current Product source hashes and unchanged N49 fixture. No test collection, old Preview/route proof or syntax-only result satisfies this check.",
+        "Only app.js reminder/LIMITED text and its existing noprint class, plus offline-lease.js write-denial message, are changed. Preserve Production 604800000ms reminder and 1209600000ms LIMITED thresholds, all functional guards and existing 30000ms presentation interval. The 3/6-minute Preview is separate and must not enter main.",
+        "Publish the current-base candidate through the existing sole publisher and verify the served app.js/offline-lease.js identities. Preserve all earlier N49 receipts; an earlier lease or route release does not prove this copy/print correction. Do not edit queue status or close original N49 cards from the worker."
+      ],
+      "releaseAuthority": "Direct PO instruction on 2026-10-13 authorizes the immediate N49 screen wording/printing correction and normal Production delivery, with conditional closure after technical success. This narrow text/print presentation task makes no live data/Auth/schema/lease-policy change. Routine technical steps need no further user approval. One existing controller worker and sole publisher are authorized; no parallel publisher or extra review worker.",
+      "preparedSource": {
+        "baseCommit": "ba28be41eac0890a0b700dd42502b3d394fe8296",
+        "branch": "ops/n49-po-copy-print-20261013",
+        "candidateSha": "bd933f01712e34816ee041c9c06d94f7b18a6b8c",
+        "alreadyImplemented": true,
+        "controllerWorkerRequired": true,
+        "additionalReviewWorkerRequired": false,
+        "files": [
+          {
+            "path": "src/app.js",
+            "before": {
+              "bytes": 71523,
+              "sha256": "23c291864051ddc97d8670989eecf97e68535ff88b8cc87f36b815098846838c",
+              "gitBlobSha": "ffd7c614035abda9761081cae7ad04e3dd931a1c"
+            },
+            "after": {
+              "bytes": 71534,
+              "sha256": "c967ee081e4945e135751d3eb471971a2c62e5a2f4d1cc773f4dd15b43f22f7a",
+              "gitBlobSha": "48fe3f4cbdacca3265b18a8dbda71d2ab8d34edf"
+            }
+          },
+          {
+            "path": "src/lib/offline-lease.js",
+            "before": {
+              "bytes": 9118,
+              "sha256": "29950624bb6eb330af3f7a482c15b5c26c6aa56d267a231bc1c076077762fb5e",
+              "gitBlobSha": "2fbd3b2d370b8b9c81748ced6d2b4425bf8e44f7"
+            },
+            "after": {
+              "bytes": 9102,
+              "sha256": "38c3b732d3bddfedf35d4b1cee7d8d8a41413b095d55f1920b9bcb9cab2d1e86",
+              "gitBlobSha": "ba307f3677afe68981d79388f02ee017a6049565"
+            }
+          }
+        ],
+        "proofPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/cutover/20261012-continuous/n49-copy-print-proof.mjs",
+        "proofSha256": "8c0a123110148d0db41be2c5150943c249817649ee71a9058f212a300e071bbf",
+        "proofStateAtAdmission": "PENDING_NATIVE_RUN",
+        "unchangedChecks": {
+          "productionReminderMs": 604800000,
+          "productionLimitedMs": 1209600000,
+          "restoreAndAllWritesRestricted": true,
+          "onlyLeaseErrorStringChanged": true,
+          "stylesheetSha256": "0efd4fdf67665026584abfd64f8939b6dab3dab578a335c304d1fa238bdccc58",
+          "existingBrowserTestSha256": "2c3c1276a43bfec269a51a325cd2c337cb8a49a3aa1707ba576fe85a5d589c3a"
+        }
+      }
+    }
+  ]
+}

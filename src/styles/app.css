@@ -930,7 +930,7 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .first-run-welcome__actions .btn { min-height: 48px; font-weight: var(--fw-bold); }
 .first-run-status { display: grid; justify-items: center; gap: var(--sp-4); min-height: min(470px, calc(100dvh - 48px)); text-align: center; }
 .first-run-status__brand { position: relative; z-index: 1; width: min(100%, 210px); }
-.first-run-status__spinner { width: 64px; height: 64px; border: 4px solid var(--brand-soft); border-block-start-color: var(--brand); border-radius: 50%; animation: spin .9s linear infinite; }
+.first-run-status__spinner { width: 64px; height: 64px; border: 4px solid var(--brand-soft); border-block-start-color: var(--brand); border-radius: 50%; animation: first-run-status-spinner-rotate .9s linear infinite; }
 .first-run-status__icon { display: grid; place-items: center; width: 60px; height: 60px; border-radius: var(--r-xl); background: var(--brand-soft); color: var(--brand-text); }
 .first-run-status__icon svg { width: 30px; height: 30px; }
 .first-run-status--error .first-run-status__icon { background: var(--danger-soft); color: var(--danger); }
@@ -977,6 +977,8 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .first-run-status__spinner { animation: none; }
 }
+
+@keyframes first-run-status-spinner-rotate { to { transform: rotate(360deg); } }
 
 /* ---------- 12. الطبقة المنبثقة ---------- */
 .sheet-backdrop {
@@ -1143,6 +1145,22 @@ a { color: var(--brand-text); text-underline-offset: 3px; }
 .sheet__head, .sheet__foot { flex-shrink: 0; }
 .sheet__body { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 2px; }
 .sheet__body input, .sheet__body textarea, .sheet__body select { scroll-margin-block: 16px; }
+/* N54 approved Option A: the form, header and actions share the available
+   mobile viewport. No fixed chrome or second, crushed body scroll region. */
+.sheet.sheet--page {
+  height: var(--visible-viewport-height, 100dvh);
+  max-height: var(--visible-viewport-height, 100dvh);
+  max-width: none;
+  border-radius: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-padding-block: 12px;
+  animation: none;
+}
+.sheet--page > .sheet__head,
+.sheet--page > .sheet__body,
+.sheet--page > .sheet__foot { flex: none; }
+.sheet--page > .sheet__body { overflow: visible; }
 @media(max-width: 420px) {
   .profile-completion { min-height: 0; padding: 22px 18px; gap: 16px; border-radius: 22px; }
   [data-account-profile-required] { padding-block: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-bottom)); }

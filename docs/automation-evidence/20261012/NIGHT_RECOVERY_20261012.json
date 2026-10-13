@@ -1,0 +1,303 @@
+{
+  "version": 1,
+  "preparedAt": "2026-10-12T23:32:56.460424+00:00",
+  "status": "REVIEWED_FOR_GUARDED_INSTALL_NOT_A_PRODUCT_PASS",
+  "snapshotAt": "2026-10-12T21:07:37.519Z",
+  "closedByExplicitPoAcceptance": [
+    "N92",
+    "N95",
+    "N84"
+  ],
+  "newVerifiedProductDeliveries": {
+    "N54": {
+      "publishedSha": "f23abc0e850f38024102821d1406c4e160152c0b",
+      "verifiedAt": "2026-10-12T20:54:55.516Z"
+    },
+    "N13": {
+      "publishedSha": "63b2c1fc29361d6c4c1ac066a743efaf3f2e31b8",
+      "verifiedAt": "2026-10-12T20:57:01.603Z"
+    },
+    "N96": {
+      "publishedSha": "833eb7221a32e5c863eb96273f7638ec15e59756",
+      "verifiedAt": "2026-10-12T20:58:06.761Z"
+    }
+  },
+  "n58NativePreflight": {
+    "kind": "n58-private-acl-preflight",
+    "at": "2026-10-12T20:50:29.986Z",
+    "platform": "win32",
+    "networkCalls": 0,
+    "authIdentitiesCreated": 0,
+    "secretsWritten": 0,
+    "nativeResult": "PASS",
+    "moduleSha256": "ff8e90682482439f2401d70a64fa0db566cd6d0e498726a583e7376c93296de5",
+    "moduleResult": "PASS",
+    "diagnostic": {
+      "stage": "complete",
+      "success": true,
+      "languageMode": "FullLanguage",
+      "beforeProtected": false,
+      "beforeExplicitOtherAllowCount": 0,
+      "icaclsExitCode": 0,
+      "afterProtected": true,
+      "afterOtherAllowCount": 0,
+      "currentUserAllowCount": 1,
+      "systemAllowCount": 1
+    },
+    "ownedProbeRemoved": true
+  },
+  "n91HarnessCorrection": {
+    "candidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+    "origin": "https://645cd923.rakeezx.pages.dev",
+    "expectedInstalledSha256": "e74ade2919af45d058a46489e2203304af9ef878152f9c806c820a80c240dd61",
+    "diagnosis": {
+      "confidence": "Source-confirmed predicate defect; no new browser reproduction performed.",
+      "cause": "The harness compares the entire .topbar__title.textContent.trim() with the tool name. In the exact candidate app.js places the optional .topbar__sub span inside that same h1, so textContent includes both title and subtitle. class-rules supplies a section label as its subtitle. All eight destination views declare subtitles.",
+      "observed": "The existing current-attempt receipt reports PASS layout at all four widths and a 12000 ms timeout at installed harness line 189 on the first navigation. The URL predicate precedes this assertion and resolved. The worker's saved result describes the failure screenshot as the goal/charter page; this preparation did not rerun or inspect a new browser.",
+      "notEstablished": "No CSS regression or broken card handler was established. The other seven navigation checks remain unexecuted in the existing receipt.",
+      "sources": [
+        {
+          "path": "src/app.js",
+          "candidateLines": "340–367",
+          "finding": "Title and nested span.topbar__sub are rendered inside h1.topbar__title; subtitle is not part of the tool title."
+        },
+        {
+          "path": "src/views/class-rules.js",
+          "candidateLines": "290–295",
+          "finding": "title='هدف وميثاق الصف'; subtitle returns sectionLabel(store.getSection(teaching?.sectionId))."
+        },
+        {
+          "path": "src/router.js",
+          "candidateLines": "7–17",
+          "finding": "The eight teaching-tool hashes load the expected view modules."
+        }
+      ],
+      "expectedTitles": [
+        {
+          "path": "src/views/class-rules.js",
+          "source": [
+            {
+              "line": 291,
+              "text": "  title: 'هدف وميثاق الصف',"
+            },
+            {
+              "line": 292,
+              "text": "  subtitle: (p) => {"
+            }
+          ]
+        },
+        {
+          "path": "src/views/quicklog.js",
+          "source": [
+            {
+              "line": 60,
+              "text": "  title: () => 'الرصد السريع',"
+            },
+            {
+              "line": 61,
+              "text": "  subtitle: (p) => `${KIND_LABEL[kind]} · ${store.getTeaching(p.id)?.name ?? ''}`,"
+            }
+          ]
+        },
+        {
+          "path": "src/views/picker.js",
+          "source": [
+            {
+              "line": 57,
+              "text": "  title: () => 'القرعة',"
+            },
+            {
+              "line": 58,
+              "text": "  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',"
+            }
+          ]
+        },
+        {
+          "path": "src/views/groups.js",
+          "source": [
+            {
+              "line": 131,
+              "text": "  title: () => 'المجموعات',"
+            },
+            {
+              "line": 132,
+              "text": "  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',"
+            }
+          ]
+        },
+        {
+          "path": "src/views/board.js",
+          "source": [
+            {
+              "line": 91,
+              "text": "  title: () => 'لوحة التميز',"
+            },
+            {
+              "line": 92,
+              "text": "  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',"
+            }
+          ]
+        },
+        {
+          "path": "src/views/sessions.js",
+          "source": [
+            {
+              "line": 76,
+              "text": "  title: () => 'الحصص',"
+            },
+            {
+              "line": 77,
+              "text": "  subtitle: (p) => {"
+            }
+          ]
+        },
+        {
+          "path": "src/views/reports.js",
+          "source": [
+            {
+              "line": 106,
+              "text": "  title: () => 'التقارير',"
+            },
+            {
+              "line": 107,
+              "text": "  subtitle: (p) => store.getTeaching(p.id)?.name ?? store.closedTeachingReport(p.id)?.teaching?.name ?? '',"
+            }
+          ]
+        },
+        {
+          "path": "src/views/items.js",
+          "source": [
+            {
+              "line": 203,
+              "text": "  title: () => 'توزيع الدرجات',"
+            },
+            {
+              "line": 204,
+              "text": "  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',"
+            }
+          ]
+        }
+      ]
+    },
+    "patch": {
+      "scope": "Harness navigation assertion and its evidence fields only.",
+      "behavior": "Clone the rendered h1, remove only its direct .topbar__sub child from that detached clone, and require exact remaining title equality. Do not alter the live DOM. Record the verified heading/full text/subtitle and reached hash; preserve a failed navigation's current heading as diagnosis evidence.",
+      "preserved": [
+        "Exact approved HTTPS origin and candidate",
+        "Existing stylesheet and teaching-hub source hash gates",
+        "Fresh Demo workspace and zero-outbox guard",
+        "GET/HEAD-only same-origin request policy and blocked Auth/REST/WebSockets",
+        "Four widths and all eight link taps",
+        "12-second assertion timeout",
+        "Previous rejected-file boundary; no reopening, recreation or proxy"
+      ],
+      "validation": {
+        "command": "node --check tmp/rakeez_ops_apply/n91-heading-predicate-fix/hosted-mobile-proof.mjs",
+        "exitCode": 0,
+        "kind": "Syntax only; no harness, browser, worker, CSS edit, device file edit, or ticket mutation performed."
+      }
+    }
+  },
+  "materialRecoveries": [
+    {
+      "expected": {
+        "id": "v6-n91-mobile-card-titles-20261012",
+        "status": "blocked",
+        "sessionId": "01a12f97-06c9-7d72-b13d-fe93268ba024",
+        "lastRunId": "af9220ee-5f1e-4b53-a2d8-a33ee90ff67b",
+        "candidateSha": "466bb11d6e83096a226d5e76f66949c9665a85bd",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\v6-n91-mobile-card-titles-20261012",
+        "baseSha": "4a2c023d01caf4695fcf4eabe81974888544360d"
+      },
+      "materialReason": "Source-confirmed hosted-app heading predicate defect corrected without weakening exact title/source/route checks; interrupted navigation proof can resume on the same candidate."
+    },
+    {
+      "expected": {
+        "id": "continuous-n58-fresh-live-20261012",
+        "status": "blocked",
+        "sessionId": "01a12ff6-5285-71b0-a1c6-9593b6947427",
+        "lastRunId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+        "candidateSha": "4946aac123772a1cf43d01792631743a4fb7413e",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n58-fresh-live-20261012",
+        "baseSha": "b5e83107222833f5e74530a73355734d8477bd03"
+      },
+      "materialReason": "Install the missing narrow canonical private-state ignore rule and README/manifest binding; actual unchanged Windows ACL helper passed native preflight. Include only the affected owner-B N49 lease fixture path. Live acceptance remains pending."
+    },
+    {
+      "expected": {
+        "id": "continuous-n71-unified-restore-20261012",
+        "status": "blocked",
+        "sessionId": "01a13035-9ab2-7e60-a075-b49e92b512bf",
+        "lastRunId": "4b597653-6f1c-42a5-b5ad-0724834ec0aa",
+        "candidateSha": "aa333cd9be7a5735608b3e07added378d9d52066",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n71-unified-restore-20261012",
+        "baseSha": "b5e83107222833f5e74530a73355734d8477bd03"
+      },
+      "materialReason": "Saved candidate fixed canonical restore reconciliation. Existing authority now explicitly covers one fresh bounded corrected proof phase, retaining and excluding the retired pair/functions; no new migration or implementation replay."
+    },
+    {
+      "expected": {
+        "id": "continuous-n73-real-distribution-20261012",
+        "status": "blocked",
+        "sessionId": "01a1300c-3300-7cb1-9a67-9c74c6008159",
+        "lastRunId": "0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e",
+        "candidateSha": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n73-real-distribution-20261012",
+        "baseSha": "b5e83107222833f5e74530a73355734d8477bd03"
+      },
+      "materialReason": "Source-confirmed deliberate SQLSTATE 40001 conflicts match the official PostgREST retry failure mode. Authorize one additive PT409 correction for only the two named function bodies and a fresh bounded proof phase. Preserve the original applied migration, deadline, old retired pair and all true assertions."
+    },
+    {
+      "expected": {
+        "id": "continuous-n94-subitem-late-scoring-20261012",
+        "status": "blocked",
+        "sessionId": "01a12fe2-49fc-7f51-a6f1-2e3b92fe66cd",
+        "lastRunId": "47c4d463-384f-4785-b8b4-93c8b627959d",
+        "candidateSha": "7503cfcfef06f9bd96ad1bbe14bf96111381085d",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n94-subitem-late-scoring-20261012",
+        "baseSha": "b5e83107222833f5e74530a73355734d8477bd03"
+      },
+      "materialReason": "The former local-only card omitted the server fields/protocol that the already-approved Product behavior requires. Its bounded named additive migration/RPC scope is now supplied; previous diagnostic work is preserved and is not feature acceptance."
+    },
+    {
+      "expected": {
+        "id": "continuous-n77-real-delete-20261012",
+        "status": "blocked",
+        "sessionId": "01a131e8-c45a-7b81-b19e-6e3809bcfcdf",
+        "lastRunId": "a853d8e6-0577-4fa3-9af2-ad473c8bb673",
+        "candidateSha": "179abdf3ce6c33f06fa4f77026887ba1b491b5c2",
+        "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n77-real-delete-20261012",
+        "baseSha": "833eb7221a32e5c863eb96273f7638ec15e59756"
+      },
+      "materialReason": "GitHub-verified candidate 179abdf3ce6c33f06fa4f77026887ba1b491b5c2 commits a real harness repair: drain overlapping background Sync before requiring an acknowledged full pass and an empty outbox, and honor one active enrollment while preserving the shared student through an outside-scope score. The remaining live gates were not executed to completion. Resume must additionally replace the hardcoded retired run binding before one explicitly bounded fresh A/B phase; the old pair and disarmed functions remain retired. This is a material continuation, not an unchanged retry."
+    }
+  ],
+  "n73PrimarySource": "https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b",
+  "n73ReadOnlyServiceInspection": {
+    "nonIdleAffectedAuthenticatorBackends": 0,
+    "backendTerminationPerformed": false,
+    "historicalServerRetryTraceProven": false
+  },
+  "maintenance": {
+    "existingAutomationId": "6acac5b657f481919a49d42cfed56fd1",
+    "cadence": "hourly",
+    "newProductDispatcher": false,
+    "helper": "scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs",
+    "chatgptProjectUiUpdated": false,
+    "soak24HoursProven": false,
+    "installationReceipt": "artifacts/ops-supervisor-v4/cutover/20261012-continuous/maintenance receipt for this payload"
+  },
+  "deferred": "Do not activate. Triage after the current open work is finished.",
+  "originalPreparedAt": "2026-10-12T21:26:05.858020Z",
+  "latestPoDecisions": {
+    "acceptedClosed": [
+      "N54",
+      "N96"
+    ],
+    "nativeClosureObserved": true,
+    "installedDocumentationCommit": "d7d3171b745ba708e484e455b60116998c5945d1",
+    "N13": "PO revision requested; prepared two-file candidate f8e2a5234e72b0af04174a4b33588c8e34f99d36 requires focused native browser evidence and later Product delivery",
+    "N49": "Separate Preview a0419c5718422209ebf62773ac83436a7f848061 deployed; route race found during first browser case, correction pending native rerun; Production thresholds remain 7/14 days",
+    "N77": "High priority after revised N13 reaches verified Production; one bounded material continuation, retired fixtures remain retired"
+  }
+}

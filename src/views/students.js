@@ -7,7 +7,7 @@
 
 import { html, icon, openSheet, toast, fmtPct, fmtDateFull } from '../lib/dom.js';
 import * as store from '../store.js';
-import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText } from '../models.js';
+import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText, displayRoster } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 import { user } from '../lib/cloud.js';
@@ -277,7 +277,8 @@ export default {
     if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">كشف الطلاب محفوظ للعرض التاريخي ولا يقبل تعديلات تشغيلية.</div></div>`;
     const section = store.getSection(tch.sectionId);
 
-    const { roster, items, ctx } = store.teachingContext(tch.id);
+    const { roster: activeRoster, items, ctx } = store.teachingContext(tch.id);
+    const roster = displayRoster(activeRoster);
 
     if (!roster.length) {
       return html`
@@ -298,7 +299,7 @@ export default {
 
     const q = normalizeSearchText(query);
     const shown = q ? roster.filter((s) => normalizeSearchText(s.name).includes(q) ||
-      (s.rollNo != null && normalizeSearchText(s.rollNo).includes(q))) : roster;
+      (s.displayNo != null && normalizeSearchText(s.displayNo).includes(q))) : roster;
     const former = store
       .enrollmentsIn(section.id)
       .filter((e) => e.status !== 'active')
@@ -330,7 +331,7 @@ export default {
                 const absents = absenceCount(ctx[s.id].attendance);
                 return html`
                   <div class="row roster-row">
-                    <span class="rollno" aria-label="رقم الكشف ${s.rollNo ?? 'غير محدد'}">${s.rollNo ?? '—'}</span>
+                    <span class="rollno" aria-label="رقم الكشف ${s.displayNo ?? 'غير محدد'}">${s.displayNo ?? '—'}</span>
                     ${studentAvatar(s, 'sm')}
                     <a class="row__main" href="#/student/${s.id}?teaching=${tch.id}">
                       <span class="row__title">${s.name}</span>

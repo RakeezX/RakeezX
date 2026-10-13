@@ -1,6 +1,19 @@
 /** Presentation metadata only; no timers, persistence, records or Sync decisions. */
 export const TRANSIENT_SEVERITY_MS = 90_000;
 
+// Only the coordinator can attest a matching live, context-bound operation.
+// Unknown unsafe states and independent failure evidence remain fail-closed.
+export function isStudentLifecycleInFlight(summary) {
+  return summary?.studentLifecycleInFlight === true && isProtectedLifecycleInFlight(summary);
+}
+
+export function isProtectedLifecycleInFlight(summary) {
+  return (summary?.studentLifecycleInFlight === true || summary?.classDeletionInFlight === true) && summary.state === 'syncing' &&
+    summary.reasonCategory === 'sync_in_progress' && summary.safeToContinueUnrelatedWork === false &&
+    !['failedCount', 'rejectedCount', 'blockedCount'].some(key => summary[key] > 0) &&
+    !summary.presentationSeverity?.hardFailure && !summary.presentationSeverity?.authRequired;
+}
+
 export function isTransientTransportFailure(error) {
   // Exact browser fetch failures only. HTTP/Auth/ownership/storage errors and
   // arbitrary messages mentioning a network are deliberately not retry proof.
@@ -32,6 +45,9 @@ export function createSyncStatusSeverity({ now = () => Date.now() } = {}) {
       return epoch;
     },
     clear() { context = null; reset(); },
+    verifying(token) {
+      if (token === epoch && context) awaitingVerification = true;
+    },
     failed(token, errors) {
       if (token !== epoch || !context) return;
       if (!errors.length || !errors.every(isTransientTransportFailure)) {
@@ -58,6 +74,7 @@ export function createSyncStatusSeverity({ now = () => Date.now() } = {}) {
 }
 
 export function projectSyncStatusSeverity(summary, now = Date.now()) {
+  if (isProtectedLifecycleInFlight(summary)) return { ...summary, cloudSyncHealthy: false };
   const fatalState = summary.failedCount > 0 ? 'error'
     : summary.rejectedCount > 0 ? 'rejected'
     : summary.reasonCategory === 'workspace_ownership_blocked' ? 'blocked'

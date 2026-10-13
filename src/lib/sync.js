@@ -62,6 +62,9 @@ let initialized = false;
 let retryAttempt = 0;
 let retryScheduled = false;
 let restoreRunning = false;
+let liveStudentLifecycle = null;
+let liveClassDeletion = null;
+let classDeletionReserved = false;
 let workspaceClaimRunning = false;
 const presentationSeverity = createSyncStatusSeverity();
 let presentationContextToken = null;
@@ -70,6 +73,8 @@ function bindPresentationContext() {
   const token = presentationSeverity.bind(cloud.session && cloud.user && workspace
     ? JSON.stringify([cloud.user.id, workspace.databaseName, workspace.authUserId]) : null);
   if (token !== presentationContextToken) {
+    liveStudentLifecycle = null;
+    liveClassDeletion = null;
     presentationContextToken = token;
     if (operationalSummaryCache.state === 'synced') {
       operationalSummaryCache = Object.freeze({ ...operationalSummaryCache, state: 'pending',
@@ -159,12 +164,13 @@ function assertCloudOwnership(operation = 'pull') {
 }
 
 function coordinatorOperationalState(durable) {
-  if (store.state.device?.studentLifecycleResume) return 'error';
   if (durable.failedCount > 0) return 'error';
   if (durable.rejectedCount > 0) return 'rejected';
   if (state.status === 'blocked') return 'blocked';
   if (cloud.authStatus?.().state === 'auth_required' || state.status === 'auth_required') return 'auth_required';
   if (presentationSeverity.snapshot().hardFailure) return 'error';
+  if ((studentLifecycleInFlight() || classDeletionInFlight()) && durable.blockedCount === 0) return 'syncing';
+  if (store.state.device?.studentLifecycleResume || store.state.device?.n77DeleteIntent) return 'error';
   if (autoRunning) return 'syncing';
   if (!cloud.session || !cloud.user) return cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle';
   if (!isOnline()) return 'offline';
@@ -172,6 +178,28 @@ function coordinatorOperationalState(durable) {
   if (state.status === 'error' && durable.failedCount === 0) return 'error';
   if (remoteSync.diagnostics().pending) return 'pending';
   return durable.state;
+}
+
+function studentLifecycleInFlight() {
+  const checkpoint = store.state.device?.studentLifecycleResume;
+  return !!liveStudentLifecycle && restoreRunning && !!cloud.session &&
+    cloud.user?.id === liveStudentLifecycle.ownerId &&
+    presentationContextToken === liveStudentLifecycle.contextToken &&
+    cloudOwnershipAccess('pull').allowed && !store.state.device?.cloudRestoreResume &&
+    (!checkpoint || (checkpoint.ownerId === liveStudentLifecycle.ownerId &&
+      checkpoint.envelope?.mutationId === liveStudentLifecycle.mutationId));
+}
+
+function classDeletionInFlight() {
+  const checkpoint = store.state.device?.n77DeleteIntent;
+  return !!liveClassDeletion && restoreRunning && !!cloud.session &&
+    cloud.user?.id === liveClassDeletion.ownerId &&
+    presentationContextToken === liveClassDeletion.contextToken &&
+    cloudOwnershipAccess('pull').allowed && !store.state.device?.cloudRestoreResume &&
+    !store.state.device?.studentLifecycleResume &&
+    (!checkpoint || (checkpoint.ownerId === liveClassDeletion.ownerId &&
+      checkpoint.selectedTeachingId === liveClassDeletion.teachingId &&
+      checkpoint.mutationId === liveClassDeletion.mutationId));
 }
 
 function normalizeDurableSummary(durable = {}) {
@@ -230,7 +258,9 @@ function cacheOperationalSummary(durable, expectedToken = null) {
       (normalized.blockedCount > 0 && !autoRunning) || (normalized.failedCount > 0 && !retryScheduled),
     localWorkSaved: true,
     cloudSyncHealthy: currentState === 'synced' && !normalized.actionableSyncIssue,
-    safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume,
+    safeToContinueUnrelatedWork: !restoreRunning && !store.state.device?.studentLifecycleResume && !store.state.device?.n77DeleteIntent,
+    studentLifecycleInFlight: studentLifecycleInFlight(),
+    classDeletionInFlight: classDeletionInFlight(),
     presentationSeverity: Object.freeze(presentationSeverity.snapshot()),
   });
   return projectSyncStatusSeverity(operationalSummaryCache);
@@ -247,8 +277,7 @@ export function getSyncOperationalSummarySnapshot() {
   bindPresentationContext();
   // Rebind synchronously before any render; an old cache cannot certify a new
   // account, and an async status read is still responsible for durable truth.
-  return projectSyncStatusSeverity({ ...operationalSummaryCache,
-    presentationSeverity: presentationSeverity.snapshot() });
+  return cacheOperationalSummary(operationalSummaryCache);
 }
 
 async function pendingOutbox() {
@@ -275,7 +304,7 @@ async function acknowledgeOutbox(snapshot) {
 }
 
 function scheduleAutomaticSync({ full = false, immediate = false, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning || suppressAutoSchedule) return;
   if (!cloud.session || !cloud.user) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -314,7 +343,7 @@ function retryDelay() {
 }
 
 function scheduleRetry() {
-  if (workspaceClaimRunning) return;
+  if (classDeletionReserved || workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
   if (!ownership.allowed) {
@@ -333,6 +362,8 @@ function scheduleRetry() {
 }
 
 async function scheduleResumeSync() {
+  presentationSeverity.verifying(bindPresentationContext());
+  notify();
   if (workspaceClaimRunning) return;
   if (!cloud.session || !cloud.user || !isOnline()) return;
   const ownership = cloudOwnershipAccess('pull');
@@ -343,7 +374,7 @@ async function scheduleResumeSync() {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
   const pending = await pendingOutbox();
   const stale = !state.lastSyncedAt || Date.now() - state.lastSyncedAt >= RESUME_STALE_MS;
-  if (pending.length || stale) scheduleAutomaticSync({ full: stale, immediate: true });
+  if (pending.length || stale || presentationSeverity.snapshot().awaitingVerification) scheduleAutomaticSync({ full: true, immediate: true });
 }
 
 function failedResult(name) {
@@ -389,7 +420,7 @@ function v2StoreAllowed(name, scoreDomainAvailable) {
 async function scoreDomainAvailableForSync() {
   let capability;
   try {
-    capability = await cloud.getScoreFoundationCapability();
+    capability = await cloud.getScoreFoundationCapability({ workspace: store.getActiveWorkspace() });
   } catch (error) {
     if (Number(error?.status) === 404 || error?.code === 'PGRST202') return false;
     throw error;
@@ -463,10 +494,13 @@ function firstPullError(result) {
 
 /** Sync V2 runtime coordinator; V1 category implementations below are retained as dead legacy only. */
 export async function syncAll({ full = true, remote = false } = {}) {
-  if (restoreRunning || workspaceClaimRunning) return false;
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) return false;
   // An ambiguous/finalized lifecycle receipt must be resumed, not overwritten
   // by automatic pulls or followed by a new destructive command.
-  if ((await db.get('device', 'device'))?.studentLifecycleResume) return false;
+  const lifecycleDevice = await db.get('device', 'device');
+  // Reservation can be acquired while the asynchronous checkpoint read yields.
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) return false;
+  if (lifecycleDevice?.studentLifecycleResume || lifecycleDevice?.n77DeleteIntent) return false;
   if (!cloud.session || !cloud.user) {
     setState({ status: cloud.authStatus?.().state === 'auth_required' ? 'auth_required' : 'idle' });
     return false;
@@ -715,8 +749,62 @@ export function resumeAfterWorkspaceDeactivationFailure() {
   }
 }
 
-export function runStudentLifecycleExclusive(task) {
-  return runCloudRestoreExclusive(task, { scheduleAutomatic: initialized });
+export async function runStudentLifecycleExclusive(task, identity) {
+  const contextToken = bindPresentationContext();
+  const checkpoint = store.state.device?.studentLifecycleResume;
+  const live = identity?.ownerId === cloud.user?.id && identity?.mutationId &&
+    checkpoint?.ownerId === identity.ownerId && checkpoint?.envelope?.mutationId === identity.mutationId
+    ? { ...identity, contextToken } : null;
+  // Set before the wrapper's first notification; no records/IDs enter the summary.
+  if (!restoreRunning && !workspaceClaimRunning && !autoRunning) liveStudentLifecycle = live;
+  try {
+    return await runCloudRestoreExclusive(async () => {
+      try { return await task(); }
+      finally { if (liveStudentLifecycle === live) liveStudentLifecycle = null; }
+    }, { scheduleAutomatic: initialized });
+  } finally {
+    if (liveStudentLifecycle === live) liveStudentLifecycle = null;
+  }
+}
+
+/** Drain a pass before creating the N77 checkpoint that excludes normal writes. */
+export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
+  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) {
+    throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  }
+  const contextToken = bindPresentationContext();
+  classDeletionReserved = true;
+  remoteSync.stop();
+  if (autoTimer) clearTimeout(autoTimer);
+  autoTimer = null;
+  retryScheduled = false;
+  rerunRequested = false;
+  try {
+    if (autoRunning) await new Promise(resolve => syncSettledWaiters.add(resolve));
+    if (bindPresentationContext() !== contextToken || cloud.user?.id !== ownerId || !cloud.session) {
+      throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
+    }
+    assertCloudOwnership('pull');
+    liveClassDeletion = { ownerId, teachingId, contextToken };
+    presentationSeverity.verifying(contextToken);
+    return await runCloudRestoreExclusive(() => task(intent => {
+      if (intent.ownerId !== ownerId || intent.selectedTeachingId !== teachingId || !intent.mutationId ||
+          bindPresentationContext() !== contextToken || !liveClassDeletion) {
+        throw new Error('Class deletion checkpoint identity mismatch');
+      }
+      liveClassDeletion.mutationId = intent.mutationId;
+    }), { scheduleAutomatic: false });
+  } catch (error) {
+    bindPresentationContext();
+    presentationSeverity.failed(contextToken, [error]);
+    throw error;
+  } finally {
+    liveClassDeletion = null;
+    classDeletionReserved = false;
+    // A delete receipt is not a fresh complete pull, even when its queue is empty.
+    if (initialized) scheduleAutomaticSync({ full: true, immediate: true });
+    notify();
+  }
 }
 
 async function syncV2Category(name) {
@@ -1502,6 +1590,11 @@ const sameSectionIdentity = (local, remote) => local.yearId === remote.year_id &
   String(local.grade) === String(remote.grade) &&
   normalizeSectionLabel(local.label) === normalizeSectionLabel(remote.label);
 
+export function sectionKeyMatches(local, records) {
+  const matches = records.filter((remote) => sameSectionIdentity(local, remote));
+  return { matches, active: matches.filter((remote) => remote.deleted_at === null) };
+}
+
 function sectionReconciliationError(code, retryable, sectionId, candidateIds = []) {
   const message = code === 'SECTION_NATURAL_KEY_BLOCKED_BY_TOMBSTONE'
     ? 'هوية الفصل محجوزة بسجل محذوف سحابياً. لم تُغيّر بياناتك، وأُوقفت إعادة المحاولة التلقائية.'
@@ -1522,7 +1615,7 @@ async function reconcileSections(remoteRecords, sectionIds = null) {
     (!sectionIds || sectionIds.has(record.id)));
   const plans = [];
   for (const local of locals) {
-    const candidates = remoteRecords.filter((remote) => !remote.deleted_at && sameSectionIdentity(local, remote));
+    const candidates = sectionKeyMatches(local, remoteRecords).active;
     if (candidates.length > 1) {
       throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
         local.id, candidates.map((record) => record.id));
@@ -1591,8 +1684,7 @@ async function recoverSectionWriteConflict(payloads, originalError) {
         error.recovery = { reason: result.status };
         throw error;
       }
-      const matches = result.rows.filter((remote) => sameSectionIdentity(local, remote));
-      const active = matches.filter((remote) => remote.deleted_at === null);
+      const { matches, active } = sectionKeyMatches(local, result.rows);
       if (active.length > 1) {
         throw sectionReconciliationError('SECTION_IDENTITY_AMBIGUOUS_REMOTE_DUPLICATES', false,
           local.id, active.map((row) => row.id));
@@ -2179,6 +2271,9 @@ async function syncCollection(storeName, tableName, context = { requiredIds: new
 
   return { pushed: toPush.length, pulled: toUpdateLocal.length, known };
 }
+
+// Test entry for the retained pre-Sync-V2 collection path. Runtime callers use Sync V2.
+export { syncCollection as testOnlyLegacySyncCollection };
 
 /**
  * Phase 5B: Sync structural academic data.

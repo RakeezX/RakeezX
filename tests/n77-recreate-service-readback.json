@@ -1,0 +1,109 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "authority": "PO-20261013-N77-explicit-recreation",
+  "migration": {
+    "version": "20261013045630",
+    "name": "n77_recreate_fresh_identity"
+  },
+  "applyResult": {
+    "success": true
+  },
+  "sourceSha256": "47ce838f603aaa99606dd5fc7946430e56938afb8d8de857397c873ff1c5cbaa",
+  "nativeCertification": {
+    "version": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+    "migrationSha256": "47ce838f603aaa99606dd5fc7946430e56938afb8d8de857397c873ff1c5cbaa",
+    "functionSha256": "71e1073faf86f872cfd5a71c60dfb6d3110e7d45b5a90065076cf4600044dfaa",
+    "aclBefore": "{postgres=X/postgres,authenticated=X/postgres}",
+    "deleteFunctionUnchanged": true
+  },
+  "before": {
+    "functions": [
+      {
+        "name": "apply_sync_v2_teaching_creation_command",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "definitionSha256": "56f121b568ab98f695fc4258c65bca9e11860c866b23702a91f800b75dcd7321"
+      },
+      {
+        "name": "apply_sync_v2_teaching_creation_command_before_student_0029",
+        "acl": "{postgres=X/postgres}",
+        "definitionSha256": "d7bd00860db5a7f4ef6157935e4be11f3ca8e6a81cd372a6ccb6d8b6da825de2"
+      },
+      {
+        "name": "n77_delete_teaching",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "definitionSha256": "72d6ea1536f352c501dc05d524da44a7be8ac5b04a2c9e3a3f03bfe8ac780da0"
+      }
+    ],
+    "indexes": [
+      {
+        "name": "teachings_pkey",
+        "definition": "CREATE UNIQUE INDEX teachings_pkey ON rakeezx.teachings USING btree (owner_id, id)"
+      },
+      {
+        "name": "teachings_natural_uniq",
+        "definition": "CREATE UNIQUE INDEX teachings_natural_uniq ON rakeezx.teachings USING btree (owner_id, section_id, subject_id, term_id)"
+      },
+      {
+        "name": "teachings_sync_idx",
+        "definition": "CREATE INDEX teachings_sync_idx ON rakeezx.teachings USING btree (owner_id, updated_at)"
+      },
+      {
+        "name": "teachings_term_idx",
+        "definition": "CREATE INDEX teachings_term_idx ON rakeezx.teachings USING btree (owner_id, term_id)"
+      },
+      {
+        "name": "teachings_section_idx",
+        "definition": "CREATE INDEX teachings_section_idx ON rakeezx.teachings USING btree (owner_id, section_id)"
+      }
+    ],
+    "naturalConstraint": "UNIQUE (owner_id, section_id, subject_id, term_id)"
+  },
+  "after": {
+    "functions": [
+      {
+        "name": "apply_sync_v2_teaching_creation_command",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "definitionSha256": "71e1073faf86f872cfd5a71c60dfb6d3110e7d45b5a90065076cf4600044dfaa"
+      },
+      {
+        "name": "apply_sync_v2_teaching_creation_command_before_student_0029",
+        "acl": "{postgres=X/postgres}",
+        "definitionSha256": "d7bd00860db5a7f4ef6157935e4be11f3ca8e6a81cd372a6ccb6d8b6da825de2"
+      },
+      {
+        "name": "n77_delete_teaching",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "definitionSha256": "72d6ea1536f352c501dc05d524da44a7be8ac5b04a2c9e3a3f03bfe8ac780da0"
+      }
+    ],
+    "indexes": [
+      {
+        "name": "teachings_pkey",
+        "definition": "CREATE UNIQUE INDEX teachings_pkey ON rakeezx.teachings USING btree (owner_id, id)"
+      },
+      {
+        "name": "teachings_sync_idx",
+        "definition": "CREATE INDEX teachings_sync_idx ON rakeezx.teachings USING btree (owner_id, updated_at)"
+      },
+      {
+        "name": "teachings_term_idx",
+        "definition": "CREATE INDEX teachings_term_idx ON rakeezx.teachings USING btree (owner_id, term_id)"
+      },
+      {
+        "name": "teachings_section_idx",
+        "definition": "CREATE INDEX teachings_section_idx ON rakeezx.teachings USING btree (owner_id, section_id)"
+      },
+      {
+        "name": "teachings_natural_uniq",
+        "definition": "CREATE UNIQUE INDEX teachings_natural_uniq ON rakeezx.teachings USING btree (owner_id, section_id, subject_id, term_id) WHERE (deleted_at IS NULL)"
+      }
+    ],
+    "naturalConstraint": null
+  },
+  "currentFunction": {
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+    "name": "apply_sync_v2_teaching_creation_command",
+    "definition": "CREATE OR REPLACE FUNCTION rakeezx.apply_sync_v2_teaching_creation_command(p_mutation_id text, p_device_id text, p_teaching_id text, p_section_id text, p_subject_id text, p_term_id text, p_order integer, p_item_ids jsonb DEFAULT '[]'::jsonb, p_client_updated_at bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_owner uuid := auth.uid(); v_receipt rakeezx.sync_mutation_receipts%rowtype;\n  v_section rakeezx.sections%rowtype; v_teaching rakeezx.teachings%rowtype; v_envelope jsonb; v_result jsonb; v_items jsonb;\n  v_defaults jsonb := '[\n    {\"name\":\"المشاركة والتفاعل\",\"max\":10,\"auto\":\"participation\",\"perPoint\":1,\"penalty\":1},\n    {\"name\":\"الواجبات\",\"max\":10,\"auto\":null,\"perPoint\":1,\"penalty\":1},\n    {\"name\":\"الأنشطة والمشاريع\",\"max\":20,\"auto\":null,\"perPoint\":1,\"penalty\":1},\n    {\"name\":\"الاختبارات القصيرة\",\"max\":20,\"auto\":null,\"perPoint\":1,\"penalty\":1},\n    {\"name\":\"الاختبار النهائي\",\"max\":40,\"auto\":null,\"perPoint\":1,\"penalty\":1}\n  ]'::jsonb;\n  v_index integer; v_default jsonb; v_item_id text;\nbegin\n  if v_owner is null then raise exception using errcode='42501', message='Authentication required'; end if;\n  if coalesce(p_mutation_id,'')='' or coalesce(p_device_id,'')='' or coalesce(p_teaching_id,'')='' or\n    coalesce(p_section_id,'')='' or coalesce(p_subject_id,'')='' or coalesce(p_term_id,'')='' or\n    p_order is null or jsonb_typeof(p_item_ids) <> 'array' or jsonb_array_length(p_item_ids) <> 5 then\n    raise exception using errcode='22023', message='Invalid Sync V2 teaching creation command';\n  end if;\n  perform rakeezx.lock_student_lifecycle(v_owner);\n  v_envelope := jsonb_build_object('mutationId',p_mutation_id,'deviceId',p_device_id,'teachingId',p_teaching_id,\n    'sectionId',p_section_id,'subjectId',p_subject_id,'termId',p_term_id,'order',p_order,'itemIds',p_item_ids,'clientUpdatedAt',p_client_updated_at);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':sync-v2:'||p_mutation_id,0));\n  select * into v_receipt from rakeezx.sync_mutation_receipts where owner_id=v_owner and mutation_id=p_mutation_id;\n  if found then if v_receipt.request_envelope is distinct from v_envelope then raise exception using errcode='22023',message='Mutation ID was reused with a different request'; end if; return v_receipt.result; end if;\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':teaching:'||p_section_id||':'||p_subject_id||':'||p_term_id,0));\n  select * into v_section from rakeezx.sections where owner_id=v_owner and id=p_section_id and deleted_at is null for update;\n  if not found then raise exception using errcode='22023',message='Teaching section is unavailable'; end if;\n  if v_section.status<>'active' or not exists(select 1 from rakeezx.years where owner_id=v_owner and id=v_section.year_id and deleted_at is null and status<>'archived') then\n    raise exception using errcode='22023',message='Teaching year or section is unavailable'; end if;\n  perform 1 from rakeezx.subjects where owner_id=v_owner and id=p_subject_id and deleted_at is null for update;\n  if not found then raise exception using errcode='22023',message='Teaching subject is unavailable'; end if;\n  perform 1 from rakeezx.terms where owner_id=v_owner and id=p_term_id and year_id=v_section.year_id and status<>'closed' and deleted_at is null for update;\n  if not found then raise exception using errcode='22023',message='Teaching term is unavailable'; end if;\n  -- Receipt replay above is exact; a new command cannot name a retired identity.\n  if exists(select 1 from rakeezx.teachings where owner_id=v_owner and id=p_teaching_id and deleted_at is not null) then\n    raise exception using errcode='22023',message='Teaching tombstone cannot be recreated'; end if;\n  if exists(select 1 from rakeezx.teachings where owner_id=v_owner and id=p_teaching_id and\n    (section_id<>p_section_id or subject_id<>p_subject_id or term_id<>p_term_id)) then\n    raise exception using errcode='22023',message='Teaching identity scope mismatch'; end if;\n  select * into v_teaching from rakeezx.teachings where owner_id=v_owner and deleted_at is null and section_id=p_section_id and subject_id=p_subject_id and term_id=p_term_id for update;\n  if not found then\n    insert into rakeezx.teachings(owner_id,id,section_id,subject_id,term_id,\"order\",client_updated_at,device_id)\n      values(v_owner,p_teaching_id,p_section_id,p_subject_id,p_term_id,p_order,p_client_updated_at,p_device_id) returning * into v_teaching;\n  end if;\n  for v_index in 0..4 loop\n    v_default := v_defaults->v_index; v_item_id := p_item_ids->>v_index;\n    if coalesce(v_item_id,'')='' then raise exception using errcode='22023',message='Invalid default item identity'; end if;\n    if not exists (select 1 from rakeezx.items where owner_id=v_owner and teaching_id=v_teaching.id and \"order\"=v_index and deleted_at is null) then\n      insert into rakeezx.items(owner_id,id,teaching_id,name,max,\"order\",auto,per_point,penalty,client_updated_at,device_id)\n      values(v_owner,v_item_id,v_teaching.id,v_default->>'name',(v_default->>'max')::integer,v_index,\n        v_default->>'auto',(v_default->>'perPoint')::integer,(v_default->>'penalty')::integer,p_client_updated_at,p_device_id);\n    end if;\n  end loop;\n  select coalesce(jsonb_agg(to_jsonb(i) order by i.\"order\"),'[]'::jsonb) into v_items from rakeezx.items i where owner_id=v_owner and teaching_id=v_teaching.id and deleted_at is null;\n  v_result:=jsonb_build_object('mutationId',p_mutation_id,'outcome','applied','canonicalTeaching',to_jsonb(v_teaching),'items',v_items);\n  insert into rakeezx.sync_mutation_receipts(owner_id,mutation_id,entity,record_id,device_id,base_revision,operation,client_updated_at,request_patch,request_envelope,outcome,applied_groups,conflicted_groups,result)\n    values(v_owner,p_mutation_id,'teachings',p_teaching_id,p_device_id,0,'create_teaching',p_client_updated_at,'{}'::jsonb,v_envelope,'applied',array['__create__']::text[],array[]::text[],v_result);\n  return v_result;\nend; $function$\n"
+  },
+  "readbackSourceMatch": true
+}

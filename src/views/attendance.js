@@ -13,7 +13,7 @@ import { openSessionEditor } from '../lib/session-editor-ui.js';
 import { isBeforeScheduledStart } from '../lib/session-start-ui.js';
 import {
   ATTENDANCE, ATTENDANCE_ORDER, SESSION_STATUS,
-  todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText,
+  todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText, displayRoster,
 } from '../models.js';
 import { repaint } from '../repaint.js';
 
@@ -131,7 +131,7 @@ export default {
     `;
 
     const rosterInfo = store.sessionRoster(ses);
-    const roster = rosterInfo.members;
+    const roster = displayRoster(rosterInfo.members, store.students(tch.id));
     if (!roster.length) {
       return html`
         <div class="attendance-01c">
@@ -159,7 +159,7 @@ export default {
 
     const q = normalizeSearchText(query);
     const shownRoster = q
-      ? roster.filter((s) => normalizeSearchText(s.name).includes(q) || (s.rollNo != null && normalizeSearchText(s.rollNo).includes(q)))
+      ? roster.filter((s) => normalizeSearchText(s.name).includes(q) || (s.displayNo != null && normalizeSearchText(s.displayNo).includes(q)))
       : roster;
 
     return html`
@@ -227,8 +227,8 @@ export default {
                       const notesCount = store.notesOf(s.id).length;
                       return html`
                         <div class="att-row attendance-01c__row ${status ? '' : 'is-unmarked'}">
-                          <span class="rollno">${s.rollNo ?? '—'}</span>
-                          <span class="att-row__name"><strong>${s.name}</strong><small>الرقم ${s.rollNo ?? '—'}</small></span>
+                          <span class="rollno">${s.displayNo ?? '—'}</span>
+                          <span class="att-row__name"><strong>${s.name}</strong><small>الرقم ${s.displayNo ?? '—'}</small></span>
                           <button class="att-row__note ${notesCount > 0 ? 'has-notes' : ''}"
                                   data-act="quick-note" data-id="${s.id}"
                                   title="${notesCount > 0 ? `ملاحظات الطالب (${notesCount})` : 'إضافة ملاحظة سريعة'}"

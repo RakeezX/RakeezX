@@ -1,0 +1,84 @@
+{
+  "taskId": "continuous-n94-offline-subitems-20261013",
+  "runId": "7cecbb0c-ada9-4b84-a3ea-5dc9b470178b",
+  "baseSha": "0064d57f2f968951453b4ee10519897c1f4293c2",
+  "recordedAt": "2026-10-13T03:06:40.1950420Z",
+  "checks": [
+    {
+      "name": "n94_offline_atomic_outbox",
+      "status": "PASS",
+      "command": "node --test tests/n94-offline-commands.test.mjs",
+      "evidence": "3/3 focused tests: atomic configure/completion/projected score, ordered mutation dependencies, reload, lost acknowledgement replay and convergence on simulated backend."
+    },
+    {
+      "name": "n94_capability_owner_lease",
+      "status": "PASS",
+      "command": "node --test tests/n94-offline-commands.test.mjs",
+      "evidence": "Unverified/corrupt/incompatible/expired capability, wrong owner/workspace/generation, 14-day lease expiry, real RPC refusal, Auth switch/logout and restore race fail closed."
+    },
+    {
+      "name": "n49_affected_boundaries",
+      "status": "PASS",
+      "command": "node --test --test-name-pattern=\"authoritative local HTTP boundary|real registry/provisioning/restore readers\" tests/n49-runtime.test.mjs",
+      "evidence": "2/2 existing affected HTTP identity, lease, registry, restore, command and Backup checks."
+    }
+  ],
+  "ui": {
+    "name": "n94_offline_ui_reconnect",
+    "status": "PASS",
+    "base": "http://127.0.0.1:60360",
+    "backend": "simulated command receipts; no live SQL/Auth/RLS",
+    "checks": [
+      "actual_account_offline_create_edit_reload_deliberate_three_states_old_grade",
+      "actual_HTTP_command_dispatch_reconnect_simulated_backend_once_no_loss_duplicates"
+    ],
+    "source": [
+      {
+        "path": "src/store.js",
+        "sha256": "140e01079d375ff5f4088de9e07cc4011e0af029a3ddce381401fdc983461b1c"
+      },
+      {
+        "path": "src/lib/cloud.js",
+        "sha256": "8e40dc68349fbca45a54207fc2122423bf3e4d2697bfda9e351926d9f7c89c49"
+      },
+      {
+        "path": "src/views/items.js",
+        "sha256": "78aa632bc06bfb5c376ab94dc3bdd0d3c005d09e3ff1a502fb9550965f884f84"
+      },
+      {
+        "path": "src/views/grades.js",
+        "sha256": "a720d4a73ad244b1fb2b6f662c5ded77952458cd443fc1e4df8bbb5a873965ba"
+      },
+      {
+        "path": "src/styles/components.css",
+        "sha256": "ef14a156777bd371e9f0db650437338b679d42742b25888740e8e4c43338ba7a"
+      }
+    ],
+    "convergence": [
+      {
+        "attempted": 6,
+        "acknowledged": 6,
+        "failed": 0,
+        "blocked": 0
+      }
+    ],
+    "queuedMutationIds": [
+      "10ce81ee-ad94-4365-bf22-581711d6cc0c",
+      "ae101d6e-a870-4715-9f7e-71dde048dea5",
+      "8f863b9d-7739-441a-b3a5-ef35eb39d87b",
+      "e1031334-c0b1-43dd-8968-82a4faf7525f",
+      "c2d657ba-f8d5-46b1-ac10-b7055fdcee93",
+      "7c82c6fc-e976-4fe0-86ec-4c7c8db6b2b1"
+    ],
+    "appliedMutationIds": [
+      "10ce81ee-ad94-4365-bf22-581711d6cc0c",
+      "ae101d6e-a870-4715-9f7e-71dde048dea5",
+      "8f863b9d-7739-441a-b3a5-ef35eb39d87b",
+      "e1031334-c0b1-43dd-8968-82a4faf7525f",
+      "c2d657ba-f8d5-46b1-ac10-b7055fdcee93",
+      "7c82c6fc-e976-4fe0-86ec-4c7c8db6b2b1"
+    ],
+    "artifactDirectory": "C:\\Users\\Abody\\AppData\\Local\\Temp\\rakeez-n94-offline-7cecbb0c"
+  },
+  "cleanup": "Fresh browser context/browser closed and HTTP server closed in finally; owned browser lease released; server port no longer listening."
+}

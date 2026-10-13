@@ -127,12 +127,13 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   scoreSubitems: {
     entity: 'score_subitems',
-    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id' },
+    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id',
+      startDate: 'start_date', dueDate: 'due_date', latePoints: 'late_points' },
     references: { itemId: 'items' },
   },
   scoreSubitemCompletions: {
     entity: 'score_subitem_completions',
-    fields: { studentId: 'student_id', subitemId: 'subitem_id', checked: 'checked' },
+    fields: { studentId: 'student_id', subitemId: 'subitem_id', checked: 'checked', completionState: 'completion_state' },
     references: { studentId: 'students', subitemId: 'scoreSubitems' },
   },
   scores: {
@@ -311,13 +312,19 @@ export function decodeSyncV2Canonical(store, row) {
   for (const [localField, serverField] of Object.entries(schema.fields)) {
     if (hasOwn(row, serverField)) record[localField] = decodeFieldValue(store, localField, row[serverField], row);
   }
+  if (store === 'scoreSubitems') {
+    record.startDate ??= null;
+    record.dueDate ??= null;
+    record.latePoints = record.latePoints == null ? null : Number(record.latePoints);
+  }
+  if (store === 'scoreSubitemCompletions') record.completionState ??= record.checked ? 'regular' : null;
   if (store === 'sections') {
     record.status ??= 'active';
     record.archivedAt ??= null;
     record.archiveDate ??= null;
   }
   if (store === 'profile') record.principalName = record.reportPrincipalName ?? '';
-  if (store === 'classRules' && row.created_at) {
+  if (['classRules', 'scoreSubitems'].includes(store) && row.created_at) {
     const createdAt = Date.parse(row.created_at);
     if (Number.isFinite(createdAt)) record.createdAt = createdAt;
   }
@@ -1130,10 +1137,13 @@ export function createSyncV2Engine({
       const role = (item) => `${item.name}|${item.auto ?? ''}|${item.max}|${item.perPoint ?? 1}|${item.penalty ?? 1}`;
       const canonByRole = new Map(items.map((item) => [role(item), item]));
       const mappings = [[mutation.recordId, teaching.id, 'teachings'], ...localItems.map((item) => [item.id, canonByRole.get(role(item))?.id, 'items'])].filter(([, to]) => to);
+      const retiredItemIds = new Set(mappings.filter(([from, to, store]) => store === 'items' && from !== to).map(([from]) => from));
       const rewritten = current.outbox.filter((row) => row.id !== mutation.id).map((row) => mappings.reduce((next, [from, to, store]) => rewriteMutationReferences(next, store, from, to), row));
       for (const [from, to, store] of mappings) {
         if (from !== to) writes[store].remove.push(from);
         for (const candidateStore of SYNC_V2_STORES) for (const record of current[candidateStore]) {
+          // Retired defaults are replaced by the receipt, not re-put with a new Teaching reference.
+          if (candidateStore === 'items' && retiredItemIds.has(record.id)) continue;
           const next = rewriteReferenceRecord(candidateStore, record, store, from, to);
           if (next !== record) pushUniquePut(writes[candidateStore], next);
         }
@@ -1716,7 +1726,8 @@ export function createSyncV2Engine({
               deviceId: mutation.deviceId, command: mutation.command.slice('score:'.length),
               itemId: mutation.patch.itemId, studentId: mutation.patch.studentId,
               subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
-              manualValue: mutation.patch.manualValue ?? null });
+              manualValue: mutation.patch.manualValue ?? null,
+              ...(Object.hasOwn(mutation.patch, 'completionState') ? { completionState: mutation.patch.completionState } : {}) });
           if (mutation.command === 'score:distribution_apply') await reconcileDistributionReceipt(mutation, receipt);
           else await reconcileScoreDomainReceipt(mutation, receipt);
           result.acknowledged++;

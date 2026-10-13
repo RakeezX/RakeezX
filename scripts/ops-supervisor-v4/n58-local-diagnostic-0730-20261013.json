@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "scopeKey": "n58-fresh-calendar-runtime-and-authorized-live-ab",
+      "activationId": "po-20261012-continuous",
+      "priority": -2,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": "D087",
+      "budgetMinutes": 25,
+      "idleMinutes": 12,
+      "requiredChecks": [
+        "fresh_candidate_scope_and_preview",
+        "n58_targeted_contracts",
+        "n58_live_a_session_and_a2_restore",
+        "n58_live_context_rejection",
+        "n58_live_b_owner_isolation",
+        "n58_live_preset_context_preservation",
+        "d087_retention_and_disarm",
+        "n58_current_source_local_diagnostic"
+      ],
+      "preparationAuthority": {
+        "kind": "local-synthetic-diagnostic-only",
+        "networkOperations": false,
+        "realAccountReads": false,
+        "realAccountWrites": false,
+        "fixtureCreation": false,
+        "providerCalls": false,
+        "publication": false
+      },
+      "objective": "Dedicated N58 LOCAL-ONLY task under the latest PO request. Resume the exact saved session/worktree and preserve candidate 1c24f51482a6b54b9f8cc39bcba5a8b47f46310a. This task does NOT retry the denied live continuation and does NOT create, reactivate or read accounts, retrieve private state, call Supabase, deploy functions or mutate the original six historical events. Work exclusively on source and synthetic test inputs. The parent remains unclosed until actual remaining gates are met.\nMaterial new inputs: PO now confirms the original test account reads Synced in Edge at07:26 and Chrome normal/incognito at07:29. Record this as user observation, not proof of six historical outbox envelopes repaired. The saved candidate remains based on an older main and its local preparation assumed a different onboarding/capability state. Compare the exact preserved onboarding request/response contract and task fixture contract against current main source READ-ONLY; identify the specific deterministic mismatch that could leave PROVISIONING_REQUIRED with profile READY and zero foundation, or state honestly if source alone cannot establish it. Do not reread archives or rerun the prior unchanged2/2 as new progress.\nUse the existing tests/n58-live-d087.e2e.mjs and preparation tests; permitted writes are only tests/n58-* in this existing worktree. A small additional synthetic fixture/reproduction is useful only if it tests a concrete uncovered transition or request shape. Never emulate a service success and call it live PASS. Do not merge current main or edit Product sources in this diagnostic phase, so N77 and spinner workers can run independently. Save one short structured local diagnostic receipt with source hashes, new finding or remaining missing evidence, exact minimal repair proposal and preserved live-gate status. No extra reviewers or fresh agent tree.\nThe previous live steps were denied by tool safety and remain denied; do not run them through a terminal, connector, separate agent or automation. No replay/unban/new pair/old private-state use. Finish this bounded diagnostic once, preserving candidate and session. Return BLOCKED with blockerType external and the actual unfulfilled live gates; do not claim LOCAL_READY, deploy, or close N58 from this local phase. This is useful independent diagnosis, not a workaround for the rejected operations.",
+      "acceptance": [
+        "Preserve all original N58 Product and live-gate acceptance requirements. This local phase authorizes only scoped diagnostic test/evidence files, not Product or cloud operations.",
+        "Honor current PO synced observations without claiming historical data repair. Preserve prior failed evidence, banned pair and exact session.",
+        "One bounded current-source comparison and only a new concrete synthetic reproduction if warranted; no paid loop repeating old checks. Actual missing live verification remains NOT_RUN/FAIL and must not become PASS."
+      ],
+      "allowedPaths": [
+        "tests/n58-*"
+      ],
+      "releaseAuthority": "No publication authorized from this local-only diagnostic phase. Existing Product acceptance checks remain required and unchanged. Controller preserves the final local result as a factual external blocker; original live N58 release authority is not expanded.",
+      "runtimeDependencies": {
+        "canonicalModule": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\run.mjs",
+        "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087",
+        "mustExistBeforeProvision": [
+          "fresh committed Product/harness candidate",
+          "verified immutable Preview/source receipt",
+          "current fixed fixture/schema/source bindings",
+          "one deterministic private harness with durable finally/recovery",
+          "both new protected function deployments and cleanup standby probe"
+        ],
+        "actualRemainingWork": "Fresh integration and live harness are deliberately assigned here; no external Auth permission/key acquisition blocker is asserted.",
+        "sourceBindingInput": "The harness author writes candidate-binding.json per canonical README. It records actual current origin/main/candidate/tree/harness Git blobs and preparation receipt SHA256. The module rejects stale base or changed fixed foundation/migration source."
+      },
+      "sourceEvidence": {
+        "historicalCandidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+        "historicalBase": "3970e39",
+        "observedMain": "8e2d4800396996be43868a71057412afccd2150b",
+        "comparison": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-main-comparison.readonly.json",
+        "authority": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\authority.readonly.json",
+        "guard": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-current-guard.readonly.json",
+        "liveGateExecuted": false,
+        "nativePrivatePreflight": "docs/automation-evidence/20261012/NIGHT_RECOVERY_20261012.json#n58NativePreflight"
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Install the missing narrow canonical private-state ignore rule and README/manifest binding; actual unchanged Windows ACL helper passed native preflight. Include only the affected owner-B N49 lease fixture path. Live acceptance remains pending.",
+        "previousRunId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+        "preservedCandidateSha": "4946aac123772a1cf43d01792631743a4fb7413e",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    }
+  ]
+}

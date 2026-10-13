@@ -26,12 +26,15 @@ const db = new Proxy(rawDB, { get(target, name) {
     return target[name](...args);
   };
 } });
-import { getScoreFoundationCapability } from './lib/cloud.js';
+import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
+import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
+import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
 import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, createSyncV2Engine } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
-import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents, distributionTargets, planAcceptedDistribution } from './lib/score-foundation.js';
+import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
+  distributionTargets, planAcceptedDistribution, normalizeSubitemDatesAndPoints, nextSubitemCompletionState } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -207,6 +210,9 @@ export async function renewOfflineLease() {
   }, {
     isCurrent: () => activeWorkspace === workspace && leaseOwner() === workspace.authUserId,
   });
+  // Establish real score support while online, even before the first subitem
+  // edit. Failure does not revoke an otherwise valid ordinary offline lease.
+  try { await getScoreFoundationCapability({ workspace }); } catch {}
   notify({ syncReady: false });
   return result;
 }
@@ -429,7 +435,7 @@ export async function init() {
     });
     initializeCurriculumSyncGate({ workspace: activeWorkspace, device: state.device });
 
-    if (!device?.studentLifecycleResume && getOfflineLeaseStatus().editable) {
+    if (!device?.studentLifecycleResume && !device?.n77DeleteIntent && getOfflineLeaseStatus().editable) {
       await normalizeSectionLifecycle();
       await ensureFoundation();
       await migrateLegacyGroupArrangements();
@@ -641,13 +647,18 @@ function syncV2Dependencies(storeName, record) {
     .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }));
 }
 
-function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], baseRevision = 0, stamp = now() }) {
+function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], priorCommands = [], baseRevision = 0, stamp = now() }) {
   assertCloudRestoreWritable();
   if (activeWorkspace?.type === 'demo') return null;
   if (isLocalOnlyRecord({ id: recordId, ...commandPatch }) ||
       dependencies.some((dependency) => String(dependency.recordId ?? '').startsWith('demo:'))) return null;
   const mutationId = uid();
   const canonicalId = recordId;
+  // Definitions and student decisions share one score domain. A later edit
+  // must not overtake a completion whose acknowledgement failed (or vice versa).
+  const preceding = String(command).startsWith('score:') && commandPatch.itemId
+    ? priorCommands.filter(row => String(row.command ?? '').startsWith('score:') &&
+      row.patch?.itemId === commandPatch.itemId).sort((a, b) => b.sequence - a.sequence)[0] : null;
   return runtimeSyncOwnershipGuard.bindNewCommand({
     id: `v2:${mutationId}`,
     protocol: 'v2', mutationId, deviceId: syncV2DeviceId(), store,
@@ -657,7 +668,7 @@ function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}
     op: 'command', command, baseRevision: Number(baseRevision) || 0,
     patch: structuredClone(commandPatch), localPatch: {},
     fields: Object.keys(commandPatch).sort(), groups: [],
-    dependencies: structuredClone(dependencies),
+    dependencies: structuredClone([...dependencies, ...(preceding ? [{ mutationId: preceding.mutationId }] : [])]),
     sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
     state: 'pending', attemptCount: 0, envelopeLocked: false,
     lastError: null, blockedReason: null,
@@ -2297,16 +2308,19 @@ export function buildClosedTermReportPayload(termId) {
 }
 
 export function closedTermReports(termId) {
+  const scope = deletionScope(state, state);
   return live(state.closedTermReports).filter((record) => !termId || record.termId === termId)
-    .sort((a, b) => Number(b.version) - Number(a.version) || Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
+    .sort((a, b) => Number(b.version) - Number(a.version) || Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0))
+    .map((report) => visibleClosedTermReport(report, scope));
 }
 
 export const latestClosedTermReport = (termId) => closedTermReports(termId)[0] ?? null;
 
 export function closedTeachingReport(teachingId) {
+  if (deletionScope(state, state).deleted('teachings', teachingId)) return null;
   const teaching = getTeaching(teachingId) ?? state.teachings.find((record) => record.id === teachingId);
   const report = teaching ? latestClosedTermReport(teaching.termId) :
-    live(state.closedTermReports).find((candidate) => candidate.payload?.teachingDocuments?.some((doc) => doc.teaching?.id === teachingId));
+    closedTermReports().find((candidate) => candidate.payload?.teachingDocuments?.some((doc) => doc.teaching?.id === teachingId));
   return report?.payload?.teachingDocuments?.find((document) => document.teaching?.id === teachingId) ?? null;
 }
 
@@ -2511,7 +2525,7 @@ export async function createSection(data) {
   if (existing) throw new Error(`هذا الفصل موجود مسبقًا (${gradeLabel(existing.grade)} / ${existing.label})`);
   
   const s = makeSection({ yearId, order: sections(yearId).length, ...data });
-  await save({ sections: [s] });
+  if (!(await save({ sections: [s] }))) throw new Error('تعذّر حفظ الفصل. حاول مرة أخرى.');
   return s;
 }
 
@@ -2535,22 +2549,66 @@ export async function editSection(id, data) {
   return updated;
 }
 
+/** Validate references before resolving a new subject or persisting a teaching. */
+export function validateTeachingContext(secId, tmId = activeTerm()?.id) {
+  const section = getSection(secId);
+  const term = getTerm(tmId);
+  if (!section) throw new Error('الفصل غير موجود. اختر فصلًا نشطًا.');
+  if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
+  if (!term || !getYear(section.yearId) || section.yearId !== term.yearId) {
+    throw new Error('اختر فصلًا من السنة الدراسية الحالية.');
+  }
+  if (isTermClosed(term.id)) throw new Error('هذا الفصل الدراسي مغلق — البيانات للعرض فقط.');
+  return { section, term };
+}
+
+const pendingTeachingCreations = new Map();
+
 /** ينشئ إسنادًا تدريسيًا ومعه بنود التقييم الافتراضية. */
 export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }) {
-  if (isSectionArchived(secId)) throw new Error(ARCHIVED_SECTION_WRITE_MESSAGE);
-  const term = tmId ?? activeTerm()?.id;
+  const { term: contextTerm } = validateTeachingContext(secId, tmId);
+  const term = contextTerm.id;
   const subject = subId ?? getSubject('sub:digital-skills')?.id ?? subjects()[0]?.id;
   if (!getSubject(subject)) throw new Error('اختر مادة صالحة للفصل.');
+  const key = JSON.stringify([activeWorkspace?.databaseName, secId, subject, term]);
+  if (pendingTeachingCreations.has(key)) return pendingTeachingCreations.get(key);
+  const existing = live(state.teachings).find((row) => row.sectionId === secId && row.subjectId === subject && row.termId === term);
+  if (existing) return existing;
   const tch = makeTeaching({
+    // A deliberate create is a new generation, never the retired natural ID.
+    // Pending/local retries reuse this row; the server converges active duplicates.
+    id: `tch:${uid()}`,
     sectionId: secId, subjectId: subject, termId: term,
     order: teachings(term).length,
   });
-  if (getTeaching(tch.id)) return getTeaching(tch.id);
   const defaults = defaultItemsFor(tch.id);
-  await save({ teachings: [tch], items: defaults }, {
+  const pending = save({ teachings: [tch], items: defaults }, {
     [TEACHING_CREATION_PROOF]: { version: 1, teaching: tch, items: defaults },
+  }).then((saved) => {
+    if (!saved) throw new Error('تعذّر حفظ مادة الفصل. حاول مرة أخرى.');
+    return getTeaching(tch.id);
   });
-  return tch;
+  pendingTeachingCreations.set(key, pending);
+  try { return await pending; }
+  finally { pendingTeachingCreations.delete(key); }
+}
+
+/** All live subjects on this class count, including subjects in another term. */
+export function classDeleteScope(tchId) {
+  const teaching = getTeaching(tchId);
+  if (!teaching || isTeachingArchived(teaching)) throw new Error('الفصل غير متاح للحذف.');
+  const section = getSection(teaching.sectionId);
+  if (!section) throw new Error('الفصل غير موجود.');
+  const ids = live(state.teachings).filter((row) => row.sectionId === section.id).map((row) => row.id).sort();
+  return { teachingId: tchId, sectionId: section.id, kind: ids.length > 1 ? 'subject' : 'class',
+    signature: JSON.stringify([section.id, tchId, ids]) };
+}
+
+export async function deleteClassFromTeaching(tchId, expectedSignature) {
+  const scope = classDeleteScope(tchId);
+  if (scope.signature !== expectedSignature) throw new Error('تغيّرت مواد الفصل. راجع نطاق الحذف وأكّد مجددًا.');
+  if (activeWorkspace?.type === 'demo') return deleteDemoTeachingScope(tchId, scope.sectionId, scope.kind === 'subject' ? 'teaching' : 'section');
+  throwLegacyDeleteUpdateRequired();
 }
 
 const pristineDefaultItem = (item, expected, index) => !item.deleted &&
@@ -2670,84 +2728,217 @@ export async function reopenSection(secId) {
   return { ok: true, status: queued ? 'pending-server-validation' : 'already-pending' };
 }
 
-/** حذف إسناد: يحذف بنوده ودرجاته وحصصه — **ولا يمس الطلاب ولا الشعبة**. */
-export async function deleteTeaching(tchId) {
-  const evidence = teachingDeleteEvidence(tchId);
-  if (evidence.length) throw new Error('لا يمكن حذف الإسناد لأنه يحتوي على بيانات محفوظة. استخدم أرشفة الفصل.');
-  const itemIds = new Set(state.items.filter((i) => i.teachingId === tchId).map((i) => i.id));
-  const sessionIds = new Set(state.sessions.filter((s) => s.teachingId === tchId).map((s) => s.id));
-  return cascadeDelete(
-    {
-      teachings: (t) => t.id === tchId,
-      items: (i) => i.teachingId === tchId,
-      scores: (s) => itemIds.has(s.itemId),
-      slots: (s) => s.teachingId === tchId,
-      sessions: (s) => s.teachingId === tchId,
-      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
-      attendance: (a) => sessionIds.has(a.sessionId),
-      logs: (l) => l.teachingId === tchId,
-      classRules: (rule) => rule.teachingId === tchId,
-      classGoals: (goal) => goal.teachingId === tchId,
-      classCharterSelections: (selection) => selection.teachingId === tchId,
-      groupArrangements: (arrangement) => arrangement.teachingId === tchId,
-    },
-    { op: 'deleteTeaching', tchId },
-    { command: 'delete_teaching', store: 'teachings', targetId: tchId }
-  );
+function n77Context(tchId) {
+  const workspace = activeWorkspace;
+  const teaching = state.teachings.find((row) => row.id === tchId && !row.deleted);
+  if (!state.ready || workspace?.type !== 'account' || workspace.ownershipState !== 'claimed' ||
+      workspace.syncEligible !== true || !workspace.authUserId || !teaching ||
+      !state.sections.some((row) => row.id === teaching.sectionId && !row.deleted)) {
+    throw new Error(DELETE_STALE_MESSAGE);
+  }
+  if (!globalThis.navigator?.onLine) throw new Error(DELETE_RETRY_MESSAGE);
+  return { workspace, teaching, ownerId: workspace.authUserId };
 }
 
-/**
- * حذف فصل: عملية ذرية تُنهي الشعبة وكل بياناتها التعليمية، مع إبقاء الطالب
- * عندما تكون له علاقة مستقلة محفوظة خارج الفصل المحذوف.
- */
-export async function deleteClass(secId) {
-  const evidence = sectionDeleteEvidence(secId);
-  if (evidence.length) throw new Error('لا يمكن حذف الفصل لأنه يحتوي على بيانات محفوظة. استخدم الأرشفة بدلًا من الحذف.');
-  const sectionTeachings = live(state.teachings).filter((t) => t.sectionId === secId);
-  const teachingIds = new Set(sectionTeachings.map((t) => t.id));
-  const itemIds = new Set(live(state.items).filter((i) => teachingIds.has(i.teachingId)).map((i) => i.id));
-  const sessionIds = new Set(live(state.sessions).filter((s) => teachingIds.has(s.teachingId)).map((s) => s.id));
-  const targetEnrollment = (e) => !e.deleted && e.sectionId === secId;
-  const targetNote = (n) => teachingIds.has(n.teachingId) || sessionIds.has(n.sessionId);
-  const targetScore = (s) => itemIds.has(s.itemId);
-  const targetAttendance = (a) => sessionIds.has(a.sessionId) || teachingIds.has(a.teachingId);
-  const targetLog = (l) => teachingIds.has(l.teachingId) || sessionIds.has(l.sessionId);
-  const affectedStudentIds = new Set(live(state.enrollments).filter(targetEnrollment).map((e) => e.studentId));
 
-  // A student remains if any relationship outside this class still gives their
-  // record a valid historical or active home. Deleted enrollments are retained
-  // history and deliberately count when they belong to another section.
-  const orphanStudentIds = new Set([...affectedStudentIds].filter((studentId) => {
-    const otherEnrollment = state.enrollments.some((e) => e.studentId === studentId && e.sectionId !== secId);
-    const otherNote = state.notes.some((n) => !n.deleted && n.studentId === studentId && !targetNote(n));
-    const otherScore = state.scores.some((s) => !s.deleted && s.studentId === studentId && !targetScore(s));
-    const otherAttendance = state.attendance.some((a) => !a.deleted && a.studentId === studentId && !targetAttendance(a));
-    const otherLog = state.logs.some((l) => !l.deleted && l.studentId === studentId && !targetLog(l));
-    return !(otherEnrollment || otherNote || otherScore || otherAttendance || otherLog);
-  }));
+function n77CheckLocalScope(plan) {
+  const localIds = live(state.teachings).filter((row) => row.sectionId === plan.sectionId).map((row) => row.id);
+  if (plan.scope === 'section' ? localIds.length !== 1 || localIds[0] !== plan.selectedTeachingId
+    : localIds.length < 2 || !localIds.includes(plan.selectedTeachingId)) throw new Error(DELETE_STALE_MESSAGE);
+}
 
-  return cascadeDelete(
-    {
-      sections: (s) => s.id === secId,
-      teachings: (t) => teachingIds.has(t.id),
-      enrollments: targetEnrollment,
-      items: (i) => teachingIds.has(i.teachingId),
-      scores: (s) => targetScore(s) || orphanStudentIds.has(s.studentId),
-      slots: (s) => teachingIds.has(s.teachingId),
-      sessions: (s) => teachingIds.has(s.teachingId),
-      sessionRosterSnapshots: (s) => sessionIds.has(s.sessionId),
-      attendance: (a) => targetAttendance(a) || orphanStudentIds.has(a.studentId),
-      logs: (l) => targetLog(l) || orphanStudentIds.has(l.studentId),
-      notes: (n) => targetNote(n) || orphanStudentIds.has(n.studentId),
-      classRules: (rule) => teachingIds.has(rule.teachingId),
-      classGoals: (goal) => teachingIds.has(goal.teachingId),
-      classCharterSelections: (selection) => teachingIds.has(selection.teachingId),
-      groupArrangements: (arrangement) => teachingIds.has(arrangement.teachingId),
-      students: (s) => orphanStudentIds.has(s.id),
+
+/** Demo has no server owner. Recheck the confirmed scope and cascade in one local transaction. */
+export async function deleteDemoTeachingScope(tchId, expectedSectionId, expectedScope) {
+  if (activeWorkspace?.type !== 'demo' || db.getActiveDatabaseName() !== 'rakeezx-demo')
+    throw new Error('حذف الفصل التجريبي متاح في مساحة التجربة فقط.');
+  if (!['teaching', 'section'].includes(expectedScope)) throw new Error('نطاق الحذف غير صالح.');
+  const stamp = now();
+  let scope;
+  const committed = await db.applyBatch(Object.fromEntries(db.STORES.map((name) => [name, {}])), {
+    prepare(current) {
+      const active = (name) => current[name].filter((row) => !row.deleted);
+      const selected = active('teachings').find((row) => row.id === tchId);
+      const section = active('sections').find((row) => row.id === expectedSectionId);
+      if (!selected || !section || selected.sectionId !== section.id ||
+          !isLocalOnlyRecord(selected) || !isLocalOnlyRecord(section))
+        throw new Error('تغيّر الفصل التجريبي. حدّث القائمة وأعد المحاولة.');
+      const siblings = active('teachings').filter((row) => row.sectionId === section.id);
+      const actualScope = siblings.length === 1 ? 'section' : 'teaching';
+      if (actualScope !== expectedScope) throw new Error('تغيّر نطاق الحذف. راجعه ثم أعد التأكيد.');
+      const teachingIds = new Set(actualScope === 'section' ? siblings.map((row) => row.id) : [tchId]);
+      const ids = (name, predicate) => new Set(active(name).filter(predicate).map((row) => row.id));
+      const itemIds = ids('items', (row) => teachingIds.has(row.teachingId));
+      const subitemIds = ids('scoreSubitems', (row) => itemIds.has(row.itemId));
+      const sessionIds = ids('sessions', (row) => teachingIds.has(row.teachingId));
+      const assignmentIds = ids('assignments', (row) => teachingIds.has(row.teachingId));
+      const targets = {
+        teachings: (row) => teachingIds.has(row.id),
+        items: (row) => teachingIds.has(row.teachingId),
+        scoreSubitems: (row) => itemIds.has(row.itemId),
+        scoreSubitemCompletions: (row) => subitemIds.has(row.subitemId),
+        scores: (row) => itemIds.has(row.itemId),
+        slots: (row) => teachingIds.has(row.teachingId),
+        sessions: (row) => teachingIds.has(row.teachingId),
+        sessionRosterSnapshots: (row) => sessionIds.has(row.sessionId) || teachingIds.has(row.teachingId),
+        attendance: (row) => sessionIds.has(row.sessionId) || teachingIds.has(row.teachingId),
+        logs: (row) => teachingIds.has(row.teachingId) || sessionIds.has(row.sessionId),
+        notes: (row) => teachingIds.has(row.teachingId) || sessionIds.has(row.sessionId),
+        classRules: (row) => teachingIds.has(row.teachingId),
+        classGoals: (row) => teachingIds.has(row.teachingId),
+        classCharterSelections: (row) => teachingIds.has(row.teachingId),
+        groupArrangements: (row) => teachingIds.has(row.teachingId),
+        assignments: (row) => teachingIds.has(row.teachingId),
+        submissions: (row) => assignmentIds.has(row.assignmentId),
+      };
+      if (actualScope === 'section') {
+        targets.sections = (row) => row.id === section.id;
+        targets.enrollments = (row) => row.sectionId === section.id;
+        const enrolled = ids('enrollments', targets.enrollments);
+        const studentIds = new Set(active('enrollments').filter((row) => enrolled.has(row.id)).map((row) => row.studentId));
+        const orphanStudentIds = new Set([...studentIds].filter((studentId) =>
+          !current.enrollments.some((enrollment) => enrollment.studentId === studentId && enrollment.sectionId !== section.id) &&
+          !['scores', 'attendance', 'logs', 'notes', 'submissions'].some((name) =>
+            active(name).some((record) => record.studentId === studentId && !targets[name](record)))));
+        targets.students = (row) => orphanStudentIds.has(row.id);
+        for (const name of ['scores', 'attendance', 'logs', 'notes', 'submissions']) {
+          const inScope = targets[name];
+          targets[name] = (row) => inScope(row) || orphanStudentIds.has(row.studentId);
+        }
+      }
+      const writes = {};
+      const removed = {};
+      for (const [name, predicate] of Object.entries(targets)) {
+        const rows = active(name).filter(predicate);
+        if (rows.length) {
+          writes[name] = { put: rows.map((row) => ({ ...row, deleted: true, updatedAt: stamp })) };
+          removed[name] = new Set(rows.map((row) => row.id));
+        }
+      }
+      const manifest = current.meta.find((row) => row.id === 'demo:packages');
+      if (manifest) writes.meta = { put: [{ ...manifest, updatedAt: stamp,
+        packages: (manifest.packages ?? []).map((pkg) => ({ ...pkg,
+          owned: Object.fromEntries(Object.entries(pkg.owned ?? {}).map(([name, values]) =>
+            [name, values.filter((id) => !removed[name]?.has(id))])) }))
+          .filter((pkg) => pkg.owned.sections?.length || pkg.owned.teachings?.length) }] };
+      scope = actualScope;
+      return writes;
     },
-    { op: 'deleteClass', secId },
-    { command: 'delete_class', store: 'sections', targetId: secId }
-  );
+  });
+  const changes = Object.entries(committed).flatMap(([name, operations]) =>
+    (operations.put ?? []).map((row) => ({ store: name, id: row.id })));
+  await absorb(changes);
+  broadcast(changes);
+  return { scope };
+}
+
+
+async function clearRejectedN77Intent(mutationId) {
+  await db.applyBatch({ device: {} }, { allowStudentLifecycle: true, prepare: (current) => {
+    const device = current.device.find((row) => row.id === 'device');
+    return { device: { put: device?.n77DeleteIntent?.mutationId === mutationId
+      ? [{ ...device, n77DeleteIntent: null, updatedAt: now() }] : [], remove: [] } };
+  } });
+}
+
+export async function previewDeleteTeaching(tchId) {
+  const { teaching, ownerId } = n77Context(tchId);
+  const device = await db.get('device', 'device');
+  if (device?.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+  const pending = device?.n77DeleteIntent;
+  if (pending && (pending.ownerId !== ownerId || pending.selectedTeachingId !== tchId)) throw new Error(DELETE_STALE_MESSAGE);
+  if (!pending && (await db.getAll('outbox')).some((row) => row.state !== 'superseded')) {
+    throw new Error('أكمل مزامنة التغييرات المعلّقة قبل حذف الفصل، ثم أعد المحاولة.');
+  }
+  if (pending) return pending.plan;
+  try {
+    const plan = validateDeletePlan(await n77DeleteTeaching({ teachingId: tchId, sectionId: teaching.sectionId }),
+      { teachingId: tchId, sectionId: teaching.sectionId, ownerId });
+    n77CheckLocalScope(plan);
+    return plan;
+  } catch (error) {
+    if (error.message === DELETE_STALE_MESSAGE) throw error;
+    throw new Error(globalThis.navigator?.onLine ? DELETE_SERVER_UNAVAILABLE_MESSAGE : DELETE_RETRY_MESSAGE);
+  }
+}
+
+/** Server commit must succeed before any local Product row is marked deleted. */
+export async function deleteTeaching(tchId, plan) {
+  if (!plan) throwLegacyDeleteUpdateRequired();
+  assertLeaseWritable();
+  const { ownerId } = n77Context(tchId);
+  const { runClassDeletionExclusive } = await import('./lib/sync.js');
+  return runClassDeletionExclusive(async bindCheckpoint => {
+    try { return await executeDeleteTeaching(tchId, plan, bindCheckpoint); }
+    finally { state.device = await db.get('device', 'device'); notify(); }
+  }, { ownerId, teachingId: tchId });
+}
+
+async function executeDeleteTeaching(tchId, plan, bindCheckpoint) {
+  if (!plan) throwLegacyDeleteUpdateRequired();
+  const { teaching, ownerId, workspace } = n77Context(tchId);
+  if ((await db.get('device', 'device'))?.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+  validateDeletePlan(plan, { teachingId: tchId, sectionId: teaching.sectionId, ownerId });
+  n77CheckLocalScope(plan);
+  let intent;
+  await db.applyBatch({ device: {}, outbox: {} }, { allowStudentLifecycle: true, prepare: (current) => {
+    const device = current.device.find((row) => row.id === 'device');
+    if (!device || device.studentLifecycleResume) throw new Error(DELETE_STALE_MESSAGE);
+    const existing = device.n77DeleteIntent;
+    if (existing && (existing.ownerId !== ownerId || existing.selectedTeachingId !== tchId ||
+        existing.plan.fingerprint !== plan.fingerprint)) throw new Error(DELETE_STALE_MESSAGE);
+    if (!existing && current.outbox.some((row) => row.state !== 'superseded')) {
+      throw new Error('أكمل مزامنة التغييرات المعلّقة قبل حذف الفصل، ثم أعد المحاولة.');
+    }
+    intent = existing ?? { ownerId, selectedTeachingId: tchId, plan, mutationId: uid(), deviceId: device.deviceId ?? uid() };
+    return { device: { put: [{ ...device, deviceId: intent.deviceId, n77DeleteIntent: intent, updatedAt: now() }], remove: [] } };
+  } });
+  bindCheckpoint(intent);
+  state.device = await db.get('device', 'device');
+  notify();
+  let receipt;
+  try {
+    receipt = await n77DeleteTeaching({ teachingId: tchId, sectionId: teaching.sectionId,
+      fingerprint: plan.fingerprint, mutationId: intent.mutationId, deviceId: intent.deviceId, commit: true });
+  } catch (error) {
+    if (error?.code === 'N77_SCOPE_STALE' || error?.code === '22023') {
+      await clearRejectedN77Intent(intent.mutationId);
+      throw new Error(DELETE_STALE_MESSAGE);
+    }
+    throw new Error(DELETE_AMBIGUOUS_MESSAGE);
+  }
+  if (activeWorkspace !== workspace || receipt?.outcome !== 'deleted' || receipt?.mutationId !== intent.mutationId || receipt?.ownerId !== ownerId ||
+      receipt?.fingerprint !== plan.fingerprint || receipt?.scope !== plan.scope ||
+      receipt?.sectionId !== plan.sectionId || receipt?.selectedTeachingId !== tchId ||
+      JSON.stringify(receipt?.teachingIds) !== JSON.stringify(plan.teachingIds) ||
+      !Array.isArray(receipt?.cascadeTeachingIds) || !receipt.cascadeTeachingIds.includes(tchId) ||
+      (plan.scope === 'teaching' && (receipt.cascadeTeachingIds.length !== 1 || receipt.cascadeTeachingIds[0] !== tchId)) ||
+      new Set(receipt.cascadeTeachingIds).size !== receipt.cascadeTeachingIds.length ||
+      receipt.cascadeTeachingIds.some((id) => state.teachings.some((row) => row.id === id && row.sectionId !== plan.sectionId))) {
+    throw new Error(DELETE_AMBIGUOUS_MESSAGE);
+  }
+  const names = db.STORES.filter((name) => !['profile', 'meta'].includes(name));
+  try {
+    await db.applyBatch(Object.fromEntries(names.map((name) => [name, {}])), {
+      allowStudentLifecycle: true, prepare: (current) => localDeleteWrites(current, receipt, now()),
+    });
+  } catch { throw new Error(DELETE_AMBIGUOUS_MESSAGE); }
+  const loaded = await Promise.all(COLLECTIONS.map((name) => db.getAll(name)));
+  COLLECTIONS.forEach((name, index) => { state[name] = loaded[index]; });
+  state.device = await db.get('device', 'device');
+  notify();
+  broadcast([{ store: 'teachings', id: tchId }, { store: 'sections', id: plan.sectionId }]);
+  return receipt;
+}
+
+function throwLegacyDeleteUpdateRequired() {
+  throw Object.assign(new Error('حذف الفصل غير متاح في هذا الإصدار. حدّث ركيز ثم أعد المحاولة.'), {
+    code: 'N77_CLIENT_UPDATE_REQUIRED',
+  });
+}
+
+export async function deleteClass() {
+  throwLegacyDeleteUpdateRequired();
 }
 
 /**
@@ -2755,16 +2946,7 @@ export async function deleteClass(secId) {
  * الحذف المرئي للفصل يستخدم deleteClass أعلاه.
  */
 export async function deleteSection(secId) {
-  for (const tch of live(state.teachings).filter((t) => t.sectionId === secId)) {
-    await deleteTeaching(tch.id);
-  }
-  return cascadeDelete(
-    {
-      sections: (s) => s.id === secId,
-      enrollments: (e) => e.sectionId === secId,
-    },
-    { op: 'deleteSection', secId }
-  );
+  throwLegacyDeleteUpdateRequired();
 }
 /* ---------- عمليات: الطلاب والانتساب ---------- */
 
@@ -3428,21 +3610,29 @@ const scoreFoundationScope = () => ({
   units: {}, lessons: {}, logs: {}, attendance: {},
 });
 
-async function commitScoreFoundation(prepare) {
+async function commitScoreFoundation(prepare, { n94 = false } = {}) {
   assertCloudRestoreWritable();
+  const commandWorkspace = activeWorkspace;
   const isolatedDemo = activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
   if (!isolatedDemo && (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
       !activeWorkspace.authUserId)) {
     throw new Error('Score foundation requires a claimed account workspace');
   }
   if (!isolatedDemo) {
-    const capability = await getScoreFoundationCapability();
+    const capability = await getScoreFoundationCapability({ workspace: commandWorkspace, allowOffline: true });
     if (capability?.scoreDomainVersion !== 1 || capability?.restoreProtocol !== 'CORE_V2' ||
         capability?.backupVersion !== 5 || capability?.copyDomainVersion !== 1) {
       throw new Error('Score foundation server capability is unavailable');
     }
+    if (n94 && capability?.n94SubitemVersion !== 1) throw new Error('N94 server capability is unavailable');
   }
-  const committed = await db.applyBatch(scoreFoundationScope(), { prepare });
+  if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+  assertCloudRestoreWritable();
+  const committed = await db.applyBatch(scoreFoundationScope(), { prepare(current) {
+    if (activeWorkspace !== commandWorkspace) throw new Error('Score command workspace changed');
+    assertCloudRestoreWritable();
+    return prepare(current);
+  } });
   const changes = Object.entries(committed).filter(([name]) => name !== 'outbox')
     .flatMap(([name, operations]) => (operations.put ?? []).map((row) => ({ store: name, id: row.id })));
   await absorb(changes);
@@ -3506,7 +3696,11 @@ function preparedScore(current, item, studentId, completions, manualValue, stamp
 
 /** A checkbox and its local numeric projection commit in one IndexedDB transaction. */
 export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
-  if (typeof checked !== 'boolean') throw new TypeError('checked must be boolean');
+  const completionState = typeof checked === 'string' ? checked : null;
+  if (completionState ? !['unrecorded', 'late', 'regular'].includes(completionState) : typeof checked !== 'boolean') {
+    throw new TypeError('Invalid completion state');
+  }
+  if (completionState) checked = completionState !== 'unrecorded';
   const stamp = now();
   let result;
   await commitScoreFoundation((current) => {
@@ -3515,22 +3709,32 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
     if (!item || !current.students.some((row) => row.id === studentId && !row.deleted)) {
       throw new Error('Subitem or student is unavailable');
     }
-    const id = scoreSubitemCompletionId(studentId, subitemId);
-    const prior = current.scoreSubitemCompletions.find((row) => row.id === id);
+    const matches = current.scoreSubitemCompletions.filter((row) => row.studentId === studentId && row.subitemId === subitemId);
+    if (matches.length > 1) throw new Error('Conflicting completion identities require reconciliation');
+    const prior = matches[0];
+    const id = prior?.id ?? scoreSubitemCompletionId(studentId, subitemId);
     if (prior?.deleted) throw new Error('A deleted completion identity cannot be resurrected');
     const completion = syncV2Record('scoreSubitemCompletions', makeScoreSubitemCompletion({
       ...(prior ?? {}), id, studentId, subitemId, checked, updatedAt: stamp,
+      completionState: completionState ?? (checked ? 'regular' : null),
     }), { pendingCreate: !prior });
     const completions = current.scoreSubitemCompletions.filter((row) => row.id !== id).concat(completion);
     const score = preparedScore(current, item, studentId, completions,
       current.scores.find((row) => row.studentId === studentId && row.itemId === item.id)?.manualValue ?? null, stamp);
     const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
       command: 'score:set_completion', stamp,
-      patch: { itemId: item.id, studentId, subitemId, checked },
+      priorCommands: current.outbox,
+      patch: { itemId: item.id, studentId, subitemId, checked,
+        ...(completionState ? { completionState: checked ? completionState : null } : {}) },
       dependencies: [
         { store: 'items', recordId: item.id, requiresServerRevision: true },
         { store: 'students', recordId: studentId, requiresServerRevision: true },
-        { store: 'scoreSubitems', recordId: subitemId, requiresServerRevision: true },
+        // A queued configure command establishes this server identity before
+        // completion via the explicit command chain. A later offline edit can
+        // keep its optimistic local definition at revision zero meanwhile.
+        { store: 'scoreSubitems', recordId: subitemId, requiresServerRevision:
+          !current.outbox.some(row => row.command === 'score:configure' && row.patch?.itemId === item.id &&
+            row.patch?.payload?.subitems?.some(definition => definition.id === subitemId)) },
       ],
     });
     result = { completion, score: score.record, ...score.projection };
@@ -3538,8 +3742,31 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
       scoreSubitemCompletions: { put: [completion] }, scores: { put: [score.record] },
       outbox: { put: entry ? [entry] : [] },
     };
-  });
+  }, { n94: Boolean(completionState) });
   return result;
+}
+
+// Serialize deliberate taps per workspace/student/subitem and suppress rapid duplicates.
+const subitemTaps = new Map();
+export async function cycleScoreSubitemCompletion(studentId, subitemId, { localDate = todayISO() } = {}) {
+  const workspace = activeWorkspace?.id;
+  const key = `${workspace}:${studentId}:${subitemId}`;
+  const priorTap = subitemTaps.get(key);
+  const clickStamp = performance.now();
+  if (priorTap && (priorTap.pending || clickStamp - priorTap.stamp < 350)) return priorTap.promise;
+  const tap = { pending: true, stamp: clickStamp };
+  tap.promise = (async () => {
+    try {
+      if (activeWorkspace?.id !== workspace) throw new Error('Workspace changed');
+      const definition = state.scoreSubitems.find((row) => row.id === subitemId && !row.deleted);
+      if (!definition) throw new Error('Subitem unavailable');
+      const completion = state.scoreSubitemCompletions.find((row) => row.studentId === studentId && row.subitemId === subitemId);
+      return await setScoreSubitemCompletion(studentId, subitemId,
+        nextSubitemCompletionState(definition, completion, localDate));
+    } finally { tap.pending = false; }
+  })();
+  subitemTaps.set(key, tap);
+  return tap.promise;
 }
 
 /** Explicit blank remains unrecorded; explicit numeric zero remains recorded. */
@@ -3556,6 +3783,7 @@ export async function setScoreManualContribution(studentId, itemId, manualInput)
       requested === null ? null : requested / 100, stamp);
     const entry = syncV2CommandEntry({ store: 'scores', recordId: score.record.id,
       command: 'score:set_manual', stamp,
+      priorCommands: current.outbox,
       patch: { itemId, studentId, manualValue: score.record.manualValue },
       dependencies: [
         { store: 'items', recordId: itemId, requiresServerRevision: true },
@@ -3581,7 +3809,8 @@ export function previewScoreConfiguration(itemId, proposed) {
       scoreCents(row.value);
       return row.value;
     });
-  const nextDefinitions = supplied.map((row, index) => ({ ...row, itemId, value: values[index], order: index }));
+  const nextDefinitions = supplied.map((row, index) => ({ ...row, itemId, value: values[index], order: index,
+    ...normalizeSubitemDatesAndPoints({ ...row, value: values[index] }) }));
   const priorIds = new Set(scoreSubitemsOf(itemId).map((row) => row.id));
   const keptIds = new Set(nextDefinitions.map((row) => row.id).filter(Boolean));
   const removedIds = [...priorIds].filter((id) => !keptIds.has(id));
@@ -3657,6 +3886,8 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       return syncV2Record('scoreSubitems', makeScoreSubitem({
         ...(old ?? {}), id: row.id, itemId, name: row.name,
         value: values[index], order: index, distributionVersion: (prior.distributionVersion ?? 1) + 1,
+        ...normalizeSubitemDatesAndPoints({ ...row, value: values[index] }),
+        createdAt: old ? old.createdAt : stamp,
         updatedAt: stamp,
       }), { pendingCreate: !old });
     });
@@ -3699,11 +3930,13 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       scoreMode: mode, distributionMode, max: maximum,
       subitems: mode === 'subitems' ? nextDefinitions.map((row) => ({
         id: row.id, name: row.name, value: row.value, order: row.order,
+        startDate: row.startDate, dueDate: row.dueDate, latePoints: row.latePoints,
       })) : [],
       ...(conversionStrategy ? { conversionStrategy } : {}),
     };
     const entry = syncV2CommandEntry({ store: 'items', recordId: itemId,
       command: 'score:configure', stamp,
+      priorCommands: current.outbox,
       patch: { itemId, expectedVersion, payload: configuration },
       dependencies: [
         { store: 'teachings', recordId: item.teachingId, requiresServerRevision: true },
@@ -3717,7 +3950,7 @@ export async function applyConfirmedScoreConfiguration(itemId, proposed, {
       items: { put: [item] }, scoreSubitems: { put: [...nextDefinitions, ...removed] },
       scores: { put: scoreWrites }, outbox: { put: entry ? [entry] : [] },
     };
-  });
+  }, { n94: supplied.some((row) => ['startDate', 'dueDate', 'latePoints'].some((field) => Object.hasOwn(row, field))) });
   return result;
 }
 
@@ -3897,6 +4130,7 @@ export async function applyScoreDistributionCopy(sourceTeachingId, targetTeachin
       for (const definition of sourceDefinitions) {
         const clone = syncV2Record('scoreSubitems', makeScoreSubitem({
           itemId: item.id, name: definition.name, value: definition.value, order: definition.order,
+          startDate: definition.startDate ?? null, dueDate: definition.dueDate ?? null, latePoints: definition.latePoints ?? null,
           distributionVersion: 1,
         }), { pendingCreate: true });
         clonedSubitems.push(clone);

@@ -8,8 +8,10 @@ import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { makeItem, defaultItemsFor } from '../models.js';
 import { getScoreFoundationCapability, getScoreDistributionCapability } from '../lib/cloud.js';
-import { distributeAutomatically, scoreCents } from '../lib/score-foundation.js';
+import { distributeAutomatically, scoreCents, normalizeSubitemDatesAndPoints } from '../lib/score-foundation.js';
 import { repaint } from '../repaint.js';
+import { defaultSubitemName } from '../lib/subitem-default-name.js';
+import '../lib/rakeez-datetime.js';
 
 let foundationAvailable = false;
 let foundationChecking = false;
@@ -25,12 +27,18 @@ async function requireFoundation() {
 
 function subitemEditor(item) {
   const original = store.scoreSubitemsOf(item.id);
-  const rows = original.length ? original.map((row) => ({ ...row })) : [{ name: 'عنصر 1', value: item.max }];
+  const rows = original.length ? original.map((row) => ({ ...row })) : [{ name: defaultSubitemName(item.name), value: item.max }];
   let distributionMode = item.distributionMode ?? 'auto';
   const rowMarkup = (row, index) => html`<div class="subitem-editor-row" data-subitem-row data-id="${row.id ?? ''}">
     <button class="drag-handle" type="button" data-move-up aria-label="رفع ${row.name}" ${index === 0 ? 'disabled' : ''}>⋮⋮</button>
     <label class="field"><span>اسم العنصر</span><input data-subitem-name maxlength="50" value="${row.name}" required></label>
     <label class="field subitem-points"><span>الدرجة</span><input data-subitem-value type="number" inputmode="decimal" min="0" step="0.01" value="${visibleLatinDigits(row.value)}" ${distributionMode === 'auto' ? 'readonly' : ''}></label>
+    <div class="n94-definition-details">
+      <label class="field"><span>البداية (اختياري)</span><input data-subitem-start type="text" data-rakeez-datetime="date" data-rakeez-date-scope="planning" value="${row.startDate ?? ''}" aria-label="بداية ${row.name}"></label>
+      <label class="field"><span>التسليم (اختياري)</span><input data-subitem-due type="text" data-rakeez-datetime="date" data-rakeez-date-scope="planning" value="${row.dueDate ?? ''}" aria-label="تسليم ${row.name}"></label>
+      <label class="field"><span>درجة التأخر (اختياري)</span><input data-subitem-late type="number" inputmode="decimal" min="0" max="${row.value}" step="0.01" value="${row.latePoints == null ? '' : visibleLatinDigits(row.latePoints)}" placeholder="${visibleLatinDigits(row.value)}" aria-label="درجة تأخر ${row.name}"></label>
+      <small>بداية فارغة: يبدأ مباشرة · درجة تأخر فارغة: الدرجة العادية${Number.isFinite(row.createdAt) ? ` · أنشئ ${new Date(row.createdAt).toLocaleDateString('ar-SA')}` : ''}</small>
+    </div>
     <button class="iconbtn" type="button" data-subitem-remove aria-label="حذف ${row.name}" ${rows.length === 1 ? 'disabled' : ''}>${icon('x')}</button>
   </div>`;
   return openSheet({
@@ -54,6 +62,10 @@ function subitemEditor(item) {
         list.querySelectorAll('[data-subitem-row]').forEach((element, index) => {
           rows[index].name = element.querySelector('[data-subitem-name]').value.trim();
           rows[index].value = Number(element.querySelector('[data-subitem-value]').value);
+          rows[index].startDate = element.querySelector('[data-subitem-start]').value || null;
+          rows[index].dueDate = element.querySelector('[data-subitem-due]').value || null;
+          const lateInput = element.querySelector('[data-subitem-late]').value;
+          rows[index].latePoints = lateInput === '' ? null : Number(lateInput);
         });
       };
       const draw = () => {
@@ -80,7 +92,7 @@ function subitemEditor(item) {
         const button = event.target.closest('button');
         if (!button) return;
         if (button.dataset.distribution) { read(); distributionMode = button.dataset.distribution; draw(); }
-        else if (button.hasAttribute('data-subitem-add')) { read(); rows.push({ name: `عنصر ${rows.length + 1}`, value: 0 }); draw(); }
+        else if (button.hasAttribute('data-subitem-add')) { read(); rows.push({ name: defaultSubitemName(item.name, rows), value: 0 }); draw(); }
         else if (button.hasAttribute('data-subitem-remove')) {
           read(); if (rows.length > 1) rows.splice([...list.children].indexOf(button.closest('[data-subitem-row]')), 1); draw();
         } else if (button.hasAttribute('data-move-up')) {
@@ -89,12 +101,14 @@ function subitemEditor(item) {
           draw();
         } else if (button.hasAttribute('data-direct-mode')) done({ scoreMode: 'direct', subitems: [] });
         else if (button.hasAttribute('data-save-subitems')) {
-          if ([...list.querySelectorAll('[data-subitem-value]')].some((input) => !input.checkValidity())) {
+          if ([...list.querySelectorAll('input')].some((input) => !input.checkValidity())) {
             toast('استخدم درجة موجبة بدقة منزلتين', 'danger'); return;
           }
           read();
           if (rows.some((row) => !row.name || !Number.isFinite(row.value))) { toast('أكمل أسماء العناصر ودرجاتها', 'danger'); return; }
           try { rows.forEach((row) => scoreCents(row.value)); } catch { toast('استخدم درجة موجبة بدقة منزلتين', 'danger'); return; }
+          try { rows.forEach((row) => normalizeSubitemDatesAndPoints(row)); }
+          catch (error) { toast(error.message, 'danger'); return; }
           done({ scoreMode: 'subitems', distributionMode, subitems: rows });
         }
       });
