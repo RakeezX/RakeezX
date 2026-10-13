@@ -11,6 +11,7 @@ import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2Attendanc
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 import { projectSubitemScore, scoreCents } from './score-foundation.js';
+import { applyScoreDistributionPlan, renameScoreItem } from './cloud.js';
 import { createSyncOwnershipGuard, ownershipBlockedError, SYNC_OWNERSHIP_BLOCKED } from './sync-ownership.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -126,7 +127,7 @@ export const SYNC_V2_SCHEMAS = Object.freeze({
   },
   scoreSubitems: {
     entity: 'score_subitems',
-    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version',
+    fields: { itemId: 'item_id', name: 'name', value: 'value', order: 'order', distributionVersion: 'distribution_version', distributionOriginId: 'distribution_origin_id',
       startDate: 'start_date', dueDate: 'due_date', latePoints: 'late_points' },
     references: { itemId: 'items' },
   },
@@ -632,6 +633,8 @@ function defaultTransport() {
     applyScoreSubitemCommand,
     applyScoreConfigurationCommand,
     applyScoreDistributionCopyCommand,
+    applyScoreDistributionPlan,
+    renameScoreItem,
     getScoreDomainSnapshot,
     fetchRecords: (entity) => fetchRecords(entity),
   };
@@ -1305,7 +1308,7 @@ export function createSyncV2Engine({
     if (receipt?.mutationId !== mutation.mutationId) {
       throw new Error('Score domain receipt mutationId mismatch');
     }
-    const configuration = ['score:configure', 'score:copy_definition'].includes(mutation.command);
+    const configuration = ['score:configure', 'score:copy_definition', 'score:rename'].includes(mutation.command);
     const score = configuration ? null : decodeSyncV2Canonical('scores', receipt.score);
     const completion = receipt.completion
       ? decodeSyncV2Canonical('scoreSubitemCompletions', receipt.completion) : null;
@@ -1351,13 +1354,49 @@ export function createSyncV2Engine({
     });
   }
 
-  async function dispatchPending({ maxMutations = Infinity } = {}) {
+  async function reconcileDistributionReceipt(mutation, receipt) {
+    const entries = [['items', 'items'], ['scoreSubitems', 'score_subitems'],
+      ['scoreSubitemCompletions', 'score_subitem_completions'], ['scores', 'scores']];
+    if (receipt?.mutationId !== mutation.mutationId || receipt?.planId !== mutation.patch.planId ||
+        receipt?.protocol !== 'N73_D119_V2') throw new Error('Distribution receipt binding mismatch');
+    const owner = currentAuthenticatedUserId();
+    const access = ownershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: owner, command: mutation });
+    if (!access.allowed) throw ownershipBlockedError(access);
+    const canonical = Object.fromEntries(entries.map(([store, entity]) => {
+      const rows = receipt[entity];
+      if (!Array.isArray(rows) || rows.some(row => row.owner_id !== owner || !row.id || !normalizeRevision(row.revision)) ||
+          new Set(rows.map(row => row.id)).size !== rows.length) throw new Error('Distribution receipt owner or row mismatch');
+      return [store, rows.map(row => decodeSyncV2Canonical(store, row))];
+    }));
+    await database.applyBatch({ items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {}, outbox: {} }, {
+      prepare(current) {
+        if (owner !== currentAuthenticatedUserId()) throw new Error('Distribution owner changed');
+        const result = { outbox: { remove: [mutation.id] } };
+        for (const [store] of entries) result[store] = { put: canonical[store].map(row => {
+          const prior = current[store].find(local => local.id === row.id);
+          // A later local command remains an overlay. The canonical tombstone
+          // always wins and cannot be resurrected by that stale command.
+          const later = current.outbox.some(command => command.id !== mutation.id && command.sequence > mutation.sequence &&
+            command.state !== 'rejected' && (command.store === store && command.recordId === row.id ||
+              command.patch?.itemId === (store === 'items' ? row.id : row.itemId)));
+          if (later && prior && !row.deleted) return { ...prior, serverRevision: row.serverRevision,
+            fieldRevisions: row.fieldRevisions, serverCanonical: canonicalSnapshot(row) };
+          const next = { ...(prior ?? {}), ...row, serverCanonical: canonicalSnapshot(row) };
+          delete next.syncCreatePending; return next;
+        }) };
+        return result;
+      },
+    });
+  }
+
+  async function dispatchPending({ maxMutations = Infinity, onlyMutationId = null } = {}) {
     await recoverRejectedScoreCreates();
     const snapshot = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
     const stoppedKeys = new Set();
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
     for (const original of snapshot) {
+      if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
       if (result.attempted >= maxMutations) break;
       const ownership = ownershipGuard.cloudAccess({
         operation: 'dispatch',
@@ -1666,7 +1705,13 @@ export function createSyncV2Engine({
         const mutation = await markAttempt(live);
         result.attempted++;
         try {
-          const receipt = mutation.command === 'score:copy_definition'
+          const receipt = mutation.command === 'score:distribution_apply'
+            ? await transport.applyScoreDistributionPlan({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, ...clone(mutation.patch) })
+            : mutation.command === 'score:rename'
+            ? await transport.renameScoreItem({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, ...clone(mutation.patch) })
+            : mutation.command === 'score:copy_definition'
             ? await transport.applyScoreDistributionCopyCommand({ mutationId: mutation.mutationId,
               deviceId: mutation.deviceId, sourceItemId: mutation.patch.sourceItemId,
               sourceRevision: mutation.patch.sourceRevision,
@@ -1683,7 +1728,8 @@ export function createSyncV2Engine({
               subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
               manualValue: mutation.patch.manualValue ?? null,
               ...(Object.hasOwn(mutation.patch, 'completionState') ? { completionState: mutation.patch.completionState } : {}) });
-          await reconcileScoreDomainReceipt(mutation, receipt);
+          if (mutation.command === 'score:distribution_apply') await reconcileDistributionReceipt(mutation, receipt);
+          else await reconcileScoreDomainReceipt(mutation, receipt);
           result.acknowledged++;
         } catch (error) {
           if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);

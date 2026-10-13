@@ -1090,6 +1090,31 @@ export async function getScoreFoundationCapability({ workspace, allowOffline = f
   return capability;
 }
 
+async function distributionRPC(name, body, mockMethod, envelope) {
+  if (mockBackend) {
+    if (typeof mockBackend[mockMethod] !== 'function') throw new Error(`Mock backend lacks ${mockMethod}`);
+    return mockBackend[mockMethod](envelope);
+  }
+  if (!user) throw authError('Authentication required');
+  return request(`/rpc/${name}`, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+      'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' }, body: JSON.stringify(body) });
+}
+
+export const getScoreDistributionCapability = () => distributionRPC('score_distribution_capability', {}, 'getScoreDistributionCapability', {});
+export const planScoreDistribution = (envelope) => distributionRPC('plan_score_distribution', {
+  p_plan_id: envelope.planId, p_source: envelope.sourceTeachingId,
+  p_targets: envelope.targetTeachingIds, p_remove: envelope.removeItemIds ?? [],
+}, 'planScoreDistribution', envelope);
+export const applyScoreDistributionPlan = (envelope) => distributionRPC('apply_score_distribution_plan', {
+  p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
+  p_plan_id: envelope.planId, p_token: envelope.token, p_confirmed: envelope.confirmed === true,
+}, 'applyScoreDistributionPlan', envelope);
+export const renameScoreItem = (envelope) => distributionRPC('rename_score_item', {
+  p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId, p_item_id: envelope.itemId,
+  p_revision: envelope.revision, p_name: envelope.name,
+}, 'renameScoreItem', envelope);
+
 /** Owner-scoped, statement-consistent score components and materialized totals. */
 export async function getScoreDomainSnapshot() {
   if (mockBackend) {

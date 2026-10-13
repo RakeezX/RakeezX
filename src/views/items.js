@@ -7,7 +7,7 @@ import { html, icon, openSheet, confirmSheet, toast, render } from '../lib/dom.j
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
 import * as store from '../store.js';
 import { makeItem, defaultItemsFor } from '../models.js';
-import { getScoreFoundationCapability } from '../lib/cloud.js';
+import { getScoreFoundationCapability, getScoreDistributionCapability } from '../lib/cloud.js';
 import { distributeAutomatically, scoreCents, normalizeSubitemDatesAndPoints } from '../lib/score-foundation.js';
 import { repaint } from '../repaint.js';
 import { defaultSubitemName } from '../lib/subitem-default-name.js';
@@ -15,6 +15,7 @@ import '../lib/rakeez-datetime.js';
 
 let foundationAvailable = false;
 let foundationChecking = false;
+let distributionAvailable = false;
 const isDemo = () => store.getActiveWorkspace()?.type === 'demo';
 const supportsFoundation = () => isDemo() || foundationAvailable;
 
@@ -143,7 +144,7 @@ function itemSheet(classId, existing = null) {
         <label class="field">
           <span class="field__label">الدرجة العظمى</span>
           <input class="input tabular" name="max" type="number" inputmode="decimal"
-                 min="1" max="1000" step="0.5" value="${it.max}" required>
+                 min="1" max="1000" step="0.5" value="${it.max}" ${it.scoreMode === 'subitems' ? 'readonly' : ''} required>
         </label>
 
         <div class="field">
@@ -213,111 +214,9 @@ function itemSheet(classId, existing = null) {
   });
 }
 
-export default {
-  title: () => 'توزيع الدرجات',
-  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
-  back: (p) => `#/teaching/${p.id}`,
-
-  topActions: () => html`
-    <button class="iconbtn" data-act="add" aria-label="بند جديد">${icon('plus')}</button>
-  `,
-
-  onMount() {
-    foundationAvailable = false;
-    foundationChecking = !isDemo();
-    if (isDemo()) return;
-    const workspace = store.getActiveWorkspace();
-    getScoreFoundationCapability({ workspace, allowOffline: true }).then((capability) => {
-      foundationAvailable = store.getActiveWorkspace() === workspace && capability?.scoreDomainVersion === 1 &&
-        capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
-          capability?.copyDomainVersion === 1 && capability?.n94SubitemVersion === 1;
-    }).catch(() => { foundationAvailable = false; }).finally(() => {
-      foundationChecking = false;
-      repaint();
-    });
-  },
-
-  render(p) {
-    const cls = store.getTeaching(p.id);
-    if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
-    if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">بنود الدرجات محفوظة ولا يمكن تعديلها.</div></div>`;
-
-    const items = store.items(cls.id);
-    const total = items.reduce((n, i) => n + i.max, 0);
-
-    if (!items.length) {
-      return html`
-        <div class="empty">
-          <div class="empty__icon">${icon('note')}</div>
-          <div class="empty__title">لا بنود بعد</div>
-          <div class="empty__text">ابدأ بالقالب الجاهز (مجموعه 100) ثم عدّله، أو أنشئ بنودك من الصفر.</div>
-          <div class="btn-row" style="justify-content:center">
-            <button class="btn btn--primary" data-act="template">${icon('note')} القالب الجاهز</button>
-            <button class="btn btn--ghost" data-act="add">${icon('plus')} بند جديد</button>
-          </div>
-        </div>
-      `;
-    }
-
-    const section = store.getSection(cls.sectionId);
-    const targets = store.previewScoreDistributionCopy(cls.id);
-    return html`<div class="classroom-tool-page grade-distribution-page distribution-01c">
-      <section class="distribution-hero"><div><span class="eyebrow">${store.sectionLabel(section)} · ${cls.name}</span>
-        <h1>توزيع الدرجات</h1><p>${items.length} بنود · المجموع ${total} درجة</p></div>
-        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
-          ${icon('classes')} تطبيق التوزيع على كل فصول المادة نفسها</button></section>
-      ${foundationChecking ? html`<p class="score-01c-capability" role="status">جارٍ التحقق من توفر مزامنة التوزيع…</p>` :
-        !supportsFoundation() ? html`<p class="score-01c-capability" role="status">الدرجة المباشرة متاحة. العناصر الفرعية ونسخ التوزيع ينتظران تحديث الخادم.</p>` : ''}
-      <section class="distribution-panel"><header class="distribution-head"><div><h2>بنود التقييم</h2>
-        <p>الدرجة المباشرة تبقى بسيطة، ويمكن تفعيل العناصر الفرعية لأي بند.</p></div>
-        <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة بند</button></header>
-        <div class="distribution-list">${items.map((i, idx) => html`<article class="distribution-item">
-          <span class="distribution-order">${idx + 1}</span>
-          <span class="distribution-name"><strong>${i.name}</strong><small>${i.max} درجات</small></span>
-          <span class="mode-badge ${i.scoreMode === 'subitems' ? 'mode-badge--sub' : i.auto ? 'mode-badge--auto' : 'mode-badge--direct'}">
-            ${i.scoreMode === 'subitems' ? 'عناصر فرعية' : i.auto ? 'رصد آلي' : 'درجة مباشرة'}</span>
-          <span class="distribution-actions"><button class="btn btn--ghost" data-act="${i.scoreMode === 'subitems' ? 'configure' : 'edit'}" data-id="${i.id}">
-            ${icon('edit')} ${i.scoreMode === 'subitems' ? 'تحرير العناصر' : 'تحرير'}</button>
-            ${i.scoreMode !== 'subitems' && supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">عناصر فرعية</button>` : ''}
-            <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''} aria-label="رفع ${i.name}">${icon('upload')}</button>
-          </span></article>`)}</div></section>
-      <aside class="copy-note">${icon('check')}<p><strong>النسخ إلى الفصول الأخرى عملية واحدة مستقلة.</strong>
-        <span>ينسخ بنية البنود وإعداداتها فقط، ولا ينسخ درجات الطلاب أو حالاتهم.</span></p></aside>
-    </div>`;
-  },
-
-  actions: {
-    async configure(el) {
+async function legacyCopy(el, ev, params) {
       if (!await requireFoundation()) return;
-      const item = store.state.items.find((row) => row.id === el.dataset.id && !row.deleted);
-      if (!item) return;
-      const proposed = await subitemEditor(item);
-      if (!proposed) return;
-      proposed.max = item.max;
-      let preview;
-      try { preview = store.previewScoreConfiguration(item.id, proposed); }
-      catch (error) { toast(error.message, 'danger'); return; }
-      const conversion = item.scoreMode === 'direct' && proposed.scoreMode === 'subitems' &&
-        store.state.scores.some((row) => row.itemId === item.id && row.value !== null && !row.deleted);
-      const approved = await confirmSheet({
-        title: 'مراجعة تغيير توزيع الدرجات',
-        desc: `قد تتغير درجات ${preview.affectedStudentCount} طالبًا. ${preview.usedDeletedSubitems.length ? `ستُحذف ${preview.usedDeletedSubitems.length} عناصر مستخدمة. ` : ''}${conversion ? 'الدرجات المباشرة الحالية ستبقى كإضافة يدوية، ولن تضيع. ' : ''}راجِع النتيجة قبل التأكيد.`,
-        confirmLabel: 'تأكيد التغيير',
-      });
-      if (!approved) return;
-      try {
-        await store.applyConfirmedScoreConfiguration(item.id, proposed, {
-          expectedVersion: preview.expectedVersion, confirmed: true,
-          ...(conversion ? { conversionStrategy: 'retain-as-manual' } : {}),
-        });
-        toast('حُفظ توزيع العناصر');
-        repaint();
-      } catch (error) { toast(error.message || 'تعذر حفظ التوزيع', 'danger'); }
-    },
-
-    async copy(el, ev, params) {
-      if (!await requireFoundation()) return;
-      const preview = store.previewScoreDistributionCopy(params.id);
+      const preview = store.previewLegacyScoreDistributionCopy(params.id);
       if (!preview.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
       const source = store.getTeaching(params.id);
       const sourceSection = store.getSection(source.sectionId);
@@ -383,7 +282,199 @@ export default {
           `أُعدّ النسخ إلى ${selected.length} فصول محددة للمزامنة (${result.itemIds.length} بنود)`);
         repaint();
       } catch (error) { toast(error.message || 'تعذر نسخ التوزيع؛ لم تُطبّق تغييرات', 'danger'); }
+    }
+
+export default {
+  title: () => 'توزيع الدرجات',
+  subtitle: (p) => store.getTeaching(p.id)?.name ?? '',
+  back: (p) => `#/teaching/${p.id}`,
+
+  topActions: () => html`
+    <button class="iconbtn" data-act="add" aria-label="بند جديد">${icon('plus')}</button>
+  `,
+
+  onMount() {
+    foundationAvailable = false;
+    distributionAvailable = false;
+    foundationChecking = !isDemo();
+    if (isDemo()) return;
+    Promise.all([getScoreFoundationCapability(), getScoreDistributionCapability().catch(() => null)]).then(([capability, distribution]) => {
+      distributionAvailable = distribution?.distributionApplyVersion === 2 && distribution?.protocol === 'N73_D119_V2';
+      foundationAvailable = capability?.scoreDomainVersion === 1 &&
+        capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
+        capability?.copyDomainVersion === 1;
+    }).catch(() => { foundationAvailable = false; }).finally(() => {
+      foundationChecking = false;
+      repaint();
+    });
+  },
+
+  render(p) {
+    const cls = store.getTeaching(p.id);
+    if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
+    if (store.isTeachingArchived(cls)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">بنود الدرجات محفوظة ولا يمكن تعديلها.</div></div>`;
+
+    const items = store.items(cls.id);
+    const total = items.reduce((n, i) => n + i.max, 0);
+
+    if (!items.length) {
+      return html`
+        <div class="empty">
+          <div class="empty__icon">${icon('note')}</div>
+          <div class="empty__title">لا بنود بعد</div>
+          <div class="empty__text">ابدأ بالقالب الجاهز (مجموعه 100) ثم عدّله، أو أنشئ بنودك من الصفر.</div>
+          <div class="btn-row" style="justify-content:center">
+            <button class="btn btn--primary" data-act="template">${icon('note')} القالب الجاهز</button>
+            <button class="btn btn--ghost" data-act="add">${icon('plus')} بند جديد</button>
+          </div>
+        </div>
+      `;
+    }
+
+    const section = store.getSection(cls.sectionId);
+    const targets = store.previewScoreDistributionCopy(cls.id);
+    return html`<div class="classroom-tool-page grade-distribution-page distribution-01c">
+      <section class="distribution-hero"><div><span class="eyebrow">${store.sectionLabel(section)} · ${cls.name}</span>
+        <h1>توزيع الدرجات</h1><p>${items.length} بنود · المجموع ${total} درجة</p></div>
+        <button class="btn btn--ghost" data-act="copy" ${!targets.length || !supportsFoundation() ? 'disabled' : ''}>
+          ${icon('classes')} نسخ توزيع الدرجات إلى فصول أخرى</button></section>
+      ${foundationChecking ? html`<p class="score-01c-capability" role="status">جارٍ التحقق من توفر مزامنة التوزيع…</p>` :
+        !supportsFoundation() ? html`<p class="score-01c-capability" role="status">الدرجة المباشرة متاحة. العناصر الفرعية ونسخ التوزيع ينتظران تحديث الخادم.</p>` : ''}
+      <section class="distribution-panel"><header class="distribution-head"><div><h2>بنود التقييم</h2>
+        <p>الدرجة المباشرة تبقى بسيطة، ويمكن تفعيل العناصر الفرعية لأي بند.</p></div>
+        <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة بند</button></header>
+        <div class="distribution-list">${items.map((i, idx) => html`<article class="distribution-item">
+          <span class="distribution-order">${idx + 1}</span>
+          <span class="distribution-name"><strong>${i.name}</strong><small>${i.max} درجات</small></span>
+          <span class="mode-badge ${i.scoreMode === 'subitems' ? 'mode-badge--sub' : i.auto ? 'mode-badge--auto' : 'mode-badge--direct'}">
+            ${i.scoreMode === 'subitems' ? 'عناصر فرعية' : i.auto ? 'رصد آلي' : 'درجة مباشرة'}</span>
+          <span class="distribution-actions"><button class="btn btn--ghost" data-act="edit" data-id="${i.id}">
+            ${icon('edit')} تحرير</button>
+            ${supportsFoundation() ? html`<button class="btn btn--ghost" data-act="configure" data-id="${i.id}">البنود الفرعية</button>` : ''}
+            <button class="iconbtn" data-act="up" data-id="${i.id}" ${idx === 0 ? 'disabled' : ''} aria-label="رفع ${i.name}">${icon('upload')}</button>
+          </span></article>`)}</div></section>
+      <aside class="copy-note">${icon('check')}<p><strong>النسخ إلى الفصول الأخرى عملية واحدة مستقلة.</strong>
+        <span>ينسخ بنية البنود وإعداداتها فقط، ولا ينسخ درجات الطلاب أو حالاتهم.</span></p></aside>
+    </div>`;
+  },
+
+  actions: {
+    async configure(el) {
+      if (!await requireFoundation()) return;
+      const item = store.state.items.find((row) => row.id === el.dataset.id && !row.deleted);
+      if (!item) return;
+      const proposed = await subitemEditor(item);
+      if (!proposed) return;
+      proposed.max = item.max;
+      let preview;
+      try { preview = store.previewScoreConfiguration(item.id, proposed); }
+      catch (error) { toast(error.message, 'danger'); return; }
+      const conversion = item.scoreMode === 'direct' && proposed.scoreMode === 'subitems' &&
+        store.state.scores.some((row) => row.itemId === item.id && row.value !== null && !row.deleted);
+      const approved = await confirmSheet({
+        title: 'مراجعة تغيير توزيع الدرجات',
+        desc: `قد تتغير درجات ${preview.affectedStudentCount} طالبًا. ${preview.usedDeletedSubitems.length ? `ستُحذف ${preview.usedDeletedSubitems.length} عناصر مستخدمة. ` : ''}${conversion ? 'الدرجات المباشرة الحالية ستبقى كإضافة يدوية، ولن تضيع. ' : ''}راجِع النتيجة قبل التأكيد.`,
+        confirmLabel: 'تأكيد التغيير',
+      });
+      if (!approved) return;
+      try {
+        await store.applyConfirmedScoreConfiguration(item.id, proposed, {
+          expectedVersion: preview.expectedVersion, confirmed: true,
+          ...(conversion ? { conversionStrategy: 'retain-as-manual' } : {}),
+        });
+        toast('حُفظ توزيع العناصر');
+        repaint();
+      } catch (error) { toast(error.message || 'تعذر حفظ التوزيع', 'danger'); }
     },
+
+    async copy(el, ev, params) {
+      if (!isDemo() && !distributionAvailable) return legacyCopy(el, ev, params);
+      if (!supportsFoundation()) { toast('متاح في التجربة حتى اكتمال المزامنة الآمنة.', 'warn'); return; }
+      const targets = store.previewScoreDistributionCopy(params.id);
+      const source = store.getTeaching(params.id);
+      if (!targets.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
+      const selection = await openSheet({
+        title: 'نسخ توزيع الدرجات إلى فصول أخرى',
+        desc: 'اختر الفصول ثم راجع الأثر. لا تُنسخ درجات الطلاب أو سجلاتهم.',
+        body: html`<fieldset class="target-list"><legend>الفصول المستهدفة</legend>${targets.map(target => html`
+          <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}">
+            <span>${store.sectionLabel(store.getSection(target.sectionId))}</span></label>`)}</fieldset>
+          <div data-copy-review aria-live="polite"></div>`,
+        foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+          <button class="btn btn--primary" data-copy-apply disabled>تطبيق التوزيع</button>`,
+        onMount(root, done) {
+          let plan = null;
+          let selected = [];
+          let requestVersion = 0;
+          const apply = root.querySelector('[data-copy-apply]');
+          const review = root.querySelector('[data-copy-review]');
+          const refresh = async () => {
+            const version = ++requestVersion;
+            selected = [...root.querySelectorAll('[data-copy-target]:checked')].map(input => input.value);
+            const requested = [...selected];
+            plan = null; apply.disabled = true;
+            if (!selected.length) { render(review, ''); return; }
+            try {
+              const incoming = await store.reviewScoreDistributionCopy(params.id, requested);
+              if (version !== requestVersion || !root.isConnected) return;
+              plan = incoming;
+              render(review, html`<p>سيُطبّق توزيع ${store.sectionLabel(store.getSection(source.sectionId))}
+                على ${selected.map(id => store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))).join('، ')}.</p>
+                <p>${plan.changedCount} بنود ستتغيّر. تبقى الفصول مستقلة بعد النسخ.</p>
+                ${plan.targets.map(target => target.beforeTotal != null ? html`<p>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}: المجموع ${target.beforeTotal} ← ${target.afterTotal} درجة.</p>` : '')}
+                ${(plan.excludedTargets ?? []).map(target => html`<p role="alert">${target.reason}
+                  <a href="#/teaching/${target.teachingId}/items">فتح توزيع الفصل المستهدف</a> · لن يُطبّق عليه التوزيع.</p>`)}
+                ${plan.requiresConfirmation ? html`<p>يؤثر هذا التوزيع في درجات أو طريقة رصد محفوظة؛ يلزم تأكيد الأثر قبل التطبيق.</p>` : ''}
+                ${plan.targets.some(target => target.extras.length) ? html`<p>تبقى البنود الإضافية ودرجاتها؛ يمكنك مراجعة إزالتها في عرض الأثر.</p>` : ''}
+                <details><summary style="min-height:44px;cursor:pointer">عرض الأثر</summary>
+                  ${plan.targets.map(target => html`<section class="target-review"><h3>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}</h3>
+                    ${target.impact.map(item => html`<p>${item.name}: ${item.created ? 'بند جديد دون درجات الطلاب' : html`الحد الأعلى ${item.beforeMax} ← ${item.max}`}.
+                      ${item.affected ? html`تتغيّر درجات ${item.affected} طلاب. ${item.examples.map(example => html`${example.before ?? 'غير مرصود'} ← ${example.after ?? 'غير مرصود'} `)}` : ''}
+                      ${item.modeChanged ? 'تتغيّر طريقة الرصد؛ القيم اليدوية السابقة لن تحدد الدرجة الآلية، والانتقال إلى اليدوي يبدأ غير مرصود.' : ''}
+                      ${item.removedSubitems ? html`تُزال ${item.removedSubitems} بنود فرعية واختياراتها التابعة.` : ''}</p>`)}
+                    ${target.extras.map(extra => html`<p>${extra.name} — غير موجود في الفصل المصدر. سيبقى هذا البند ودرجات طلابه كما هي.</p>
+                      <label class="target-class"><input type="checkbox" data-copy-remove value="${extra.id}">
+                      <span>إزالة هذا البند: ${extra.name} (ودرَجاته واختياراته التابعة)</span></label>`)}</section>`)}
+                </details>`);
+              apply.disabled = !plan.targets.length;
+            } catch (error) {
+              if (version !== requestVersion || !root.isConnected) return;
+              render(review, html`<p role="alert">${error.message}</p>
+                ${selected.map(id => html`<a href="#/teaching/${id}/items">فتح توزيع ${store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))}</a>`)}`);
+            }
+          };
+          root.addEventListener('change', event => { if (event.target.matches('[data-copy-target]')) refresh(); });
+          apply.addEventListener('click', () => {
+            if (!plan) return;
+            done({ selected, token: plan.token,
+              removeItemIds: [...root.querySelectorAll('[data-copy-remove]:checked')].map(input => input.value) });
+          });
+        },
+      });
+      if (!selection) return;
+      try {
+        const review = await store.reviewScoreDistributionCopy(params.id, selection.selected, { removeItemIds: selection.removeItemIds });
+        if (review.token !== selection.token) throw new Error('تغيّر التوزيع منذ المراجعة. افتح المراجعة من جديد.');
+        if (review.requiresConfirmation && !await confirmSheet({
+          title: 'تأكيد أثر التوزيع',
+          desc: review.targets.map(target => {
+            const label = store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId));
+            const affected = target.impact.reduce((sum, item) => sum + item.affected, 0);
+            const removed = target.extras.filter(item => selection.removeItemIds.includes(item.id)).length;
+            return label + ': ' + affected + ' تغييرات درجات، ' + removed + ' بنود إضافية ستُحذف. ' +
+              target.extras.filter(item => selection.removeItemIds.includes(item.id))
+                .map(item => item.name + ' (' + (item.affected ?? 0) + ' درجات طلاب محفوظة)').join('، ');
+          }).join(' ') + ' تُطبّق الحدود وطرق الرصد المعروضة، وتُحذف اختيارات البنود الفرعية المُزالة. لا تُنسخ درجات المصدر.',
+          confirmLabel: 'تأكيد التطبيق',
+        })) return;
+        const result = await store.applyReviewedScoreDistribution(params.id, selection.selected, {
+          expectedToken: selection.token, removeItemIds: selection.removeItemIds, confirmed: true,
+        });
+        toast(result.changedCount ? 'طُبّق التوزيع على الفصول المحددة' : 'التوزيع مطابق؛ لا تغييرات');
+        repaint();
+      } catch (error) { toast(error.message || 'تعذر تطبيق التوزيع؛ لم تُحفظ تغييرات', 'danger'); }
+    },
+
     async add(el, ev, params) {
       const data = await itemSheet(params.id);
       if (!data) return;
@@ -413,7 +504,7 @@ export default {
             <label class="field">
               <span class="field__label">الدرجة العظمى</span>
               <input class="input tabular" name="max" type="number" inputmode="decimal"
-                     min="1" max="1000" step="0.5" value="${it.max}" required>
+                     min="1" max="1000" step="0.5" value="${it.max}" ${it.scoreMode === 'subitems' ? 'readonly' : ''} required>
             </label>
             ${it.auto === 'participation'
               ? html`<label class="field">
@@ -442,7 +533,7 @@ export default {
             const name = String(fd.get('name') ?? '').trim();
             const max = Number(fd.get('max'));
             if (!name || !(max > 0)) return;
-            const patch = { name, max };
+            const patch = it.scoreMode === 'subitems' || max === it.max ? { name } : { name, max };
             if (fd.has('perPoint')) patch.perPoint = Number(fd.get('perPoint')) || 1;
             if (fd.has('penalty')) patch.penalty = Number(fd.get('penalty')) || 1;
             done(patch);
@@ -467,7 +558,9 @@ export default {
         return;
       }
 
-      if (await store.patch('items', it.id, data)) toast('حُفظ');
+      if (Object.keys(data).length === 1 && data.name && (isDemo() || distributionAvailable)) {
+        if (await store.renameScoreParent(it.id, data.name)) toast('حُفظ');
+      } else if (await store.patch('items', it.id, data)) toast('حُفظ');
     },
 
     async up(el, ev, params) {

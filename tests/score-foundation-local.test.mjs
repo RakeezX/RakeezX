@@ -10,6 +10,7 @@ import { activateSyntheticAccountWorkspace, SYNTHETIC_WORKSPACE_OWNER } from './
 import { makeEnrollment, makeItem, makeSection, makeStudent, makeSubject,
   makeTeaching, makeTerm, makeYear } from '../src/models.js';
 import { distributeAutomatically, projectSubitemScore } from '../src/lib/score-foundation.js';
+import { renewSyntheticLease } from './n73-live/local-env.mjs';
 
 global.document = {
   documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } },
@@ -26,6 +27,7 @@ before(async () => {
 async function fixture() {
   await db.clearAll();
   await store.init();
+  await renewSyntheticLease(SYNTHETIC_WORKSPACE_OWNER);
   const year = makeYear({ id: 'score-foundation:year' });
   const term = makeTerm({ id: 'score-foundation:term', yearId: year.id });
   const subject = makeSubject({ id: 'score-foundation:subject' });
