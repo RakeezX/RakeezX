@@ -1,0 +1,40 @@
+{
+    "version":  1,
+    "activationId":  "po-20261012-continuous",
+    "tasks":  [
+                  {
+                      "id":  "continuous-n36-private-browser-package-20261013",
+                      "productId":  "N36",
+                      "activationId":  "po-20261012-continuous",
+                      "priority":  1,
+                      "scopeKey":  "n36-private-extension-popup-check",
+                      "riskClass":  "STANDARD",
+                      "executionMode":  "local",
+                      "liveMutation":  false,
+                      "budgetMinutes":  35,
+                      "idleMinutes":  10,
+                      "objective":  "Implement the latest explicit PO correction to N36: the helper must cover useful teacher name, school name, principal name, classes, student names and weekly timetable, not just student names. This is new local capability work, not another run of the already successful names-only popup/CSV test. Resume the exact saved session and candidate; preserve the current names-only mode and its existing N12 CSV compatibility. Expand the PRIVATE extension itself with clearly labeled category selection, local structured preview and a versioned local JSON bundle for the other categories. Reuse the old helper/parser/selection code rather than start a replacement project. No public distribution or Rakeez-account write is performed in this phase.\nImplement only explicit user-click extraction from the currently selected visible page content or deliberately pasted visible table. The code supports collecting one selected category/page at a time with user-reviewed staging in extension session memory; it never navigates/crawls school pages, reads cookies/passwords/OTP/tokens/localStorage/network traffic or silently accesses tabs. Teacher/school/principal fields require an explicitly chosen visible label/value rather than guessing a person role. Timetable rows carry explicit weekday, period/time, class and subject; ambiguous labels or missing mapping remain visibly unresolved, not invented. Student category is names and classroom context only, not national IDs/contact details/grades. Use schema bounds, duplicate detection and provenance category, but omit full page URLs or HTML. No analytics, cloud transport, background service or new broad host permissions.\nActual browser extension test runs in a NEW OWNED temporary profile against synthetic local HTML only. Exercise category selection, teacher/school/principal preview, classroom/name table, weekday/period timetable preview, cancellation and edit invalidation, names-only CSV compatibility, and the JSON envelope containing only the exact user-selected categories. A local profile used for this synthetic test is not the user Chrome profile. Never contact Madrasati/Noor or attach to the current personal browser in this implementation phase; the earlier unavailable/denied official-page path is not being retried.\nPackage an updated private ZIP excluding tests/secrets and record the exact file hashes. Explain how the teacher will install and press Extract/Preview without DevTools commands. The actual official homepage/roster/timetable DOM and real Rakeez metadata/timetable commit integration are STILL UNVERIFIED, not simulated as PASS. Keep their acceptance gates visible. Final result is BLOCKED/external with the newly completed local capabilities and the precise official-page/integration requirements; do not return LOCAL_READY because the generic publisher must not publish a private extension or close N36 from this subset. End once this new bounded capability is complete, not an indefinite review loop.",
+                      "allowedPaths":  [
+                                           "extensions/rakeez-teacher-import-helper/**",
+                                           "tests/n36-*.mjs",
+                                           "docs/automation-evidence/20261014/N36_EXPANDED_EXTRACTION.md"
+                                       ],
+                      "requiredChecks":  [
+                                             "n36_real_private_extension_popup",
+                                             "n36_names_only_download_to_n12_preview",
+                                             "n36_clean_private_package",
+                                             "n36_official_teacher_surface",
+                                             "n36_explicit_multi_category_extraction",
+                                             "n36_actual_popup_category_preview",
+                                             "n36_no_private_background_capture"
+                                         ],
+                      "acceptance":  [
+                                         "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+                                         "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+                                         "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+                                         "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release."
+                                     ],
+                      "releaseAuthority":  "Latest PO explicitly requests the broader N36 helper using prior code. This phase authorizes only local private extension feature implementation and synthetic browser proof; no public publishing, school-account read/write, credential extraction or actual account import. Return the truthful remaining official surface/integration blocker; normal controller retains ownership."
+                  }
+              ]
+}
