@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 const candidateSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-const ui=JSON.parse(await readFile(new URL('./product-ui-result.json',import.meta.url),'utf8'));
+const ui=JSON.parse(await readFile('test-results/n94/5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf/product-ui-result.json','utf8'));
 assert.equal(ui.checks.length,3);assert.equal(ui.formLayouts.length,4);assert.equal(ui.screenshots.length,12);
 const changed=execFileSync('git',['diff','--name-only',ui.candidateSha,candidateSha,'--','src','supabase/migrations'],{encoding:'utf8'}).trim();
 assert.equal(changed,'','Do not reuse changed Product or migration evidence');

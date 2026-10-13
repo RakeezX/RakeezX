@@ -45,7 +45,9 @@ try {
     const definitions = store.scoreSubitemsOf(item.id);
     const student = store.teachingContext(item.teachingId).roster.find((row) =>
       !store.state.scoreSubitemCompletions.some((completion) => completion.studentId === row.id && completion.subitemId === definitions[0].id && completion.checked));
+    const legacy = store.state.scoreSubitemCompletions.find(row=>row.subitemId===definitions[0].id&&row.checked&&!row.deleted);
     return { itemId: item.id, teachingId: item.teachingId, studentId: student.id,
+      legacyStudentId:legacy.studentId,legacyCompletionId:legacy.id,
       definitions: definitions.map((row) => ({ id: row.id, value: row.value, createdAt: row.createdAt })) };
   });
   assert.ok(fixture.definitions.length >= 2);
@@ -96,6 +98,14 @@ try {
   const button = () => page.locator(`[data-act="subitem-completion"][data-student="${fixture.studentId}"][data-subitem="${fixture.definitions[0].id}"]`);
   const equalButton = () => page.locator(`[data-act="subitem-completion"][data-student="${fixture.studentId}"][data-subitem="${fixture.definitions[1].id}"]`);
   await button().waitFor();
+  const legacyButton=()=>page.locator(`[data-act="subitem-completion"][data-student="${fixture.legacyStudentId}"][data-subitem="${fixture.definitions[0].id}"]`);
+  await page.waitForFunction(({fixture})=>document.querySelector(`[data-student="${fixture.legacyStudentId}"][data-subitem="${fixture.definitions[0].id}"]`)?.classList.contains('n94-completion--regular'),{fixture});
+  await legacyButton().click();
+  await page.waitForFunction(({fixture})=>document.querySelector(`[data-student="${fixture.legacyStudentId}"][data-subitem="${fixture.definitions[0].id}"]`)?.classList.contains('n94-completion--unrecorded'),{fixture});
+  const legacyRows=await page.evaluate(async(fixture)=>{
+    const db=await import('/src/lib/db.js');return (await db.getAll('scoreSubitemCompletions')).filter(row=>row.studentId===fixture.legacyStudentId&&row.subitemId===fixture.definitions[0].id);
+  },fixture);
+  assert.equal(legacyRows.length,1);assert.equal(legacyRows[0].id,fixture.legacyCompletionId);assert.equal(legacyRows[0].checked,false);
   let clock = Date.parse('2026-10-13T06:00:00Z');
   const advance = async () => { clock += 500;await page.clock.setFixedTime(clock);await page.waitForTimeout(400); };
   const state = async () => page.evaluate(async (fixture) => {

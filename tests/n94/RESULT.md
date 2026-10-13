@@ -5,8 +5,9 @@ Task `continuous-n94-subitem-late-scoring-20261012`; run
 `7503cfcfef06f9bd96ad1bbe14bf96111381085d` remains in history. Work resumed by
 merging the then-current controller main `61a6e1498c5ef985cb4e947c72e56eb18581797d`
 into that history (original card base `b5e83107222833f5e74530a73355734d8477bd03`).
-The Product implementation is `7bb671564c6468a84adc910e250fd6e11030a50c`;
-subsequent harness/evidence-only changes do not change its Product bytes.
+The exact current candidate is returned by the runner result. Current rendered
+evidence is recorded in the ignored per-run `product-ui-result.json`; the final
+binding script refuses to reuse it across any changed Product/migration bytes.
 
 ## Behavior
 
@@ -17,6 +18,8 @@ blank late points follows ordinary points. Existing creation history is retained
 not accepted as an editable configuration field. New definitions have automatic
 creation timestamps; canonical decode carries the server timestamp. Legacy
 checked completions remain regular; unchecked remain unrecorded, without backfill.
+Local edits retain the existing completion identity, including older Demo IDs;
+duplicate identities require reconciliation rather than a silent extra record.
 
 Only deliberate taps choose a state. After the local-calendar due day they cycle
 unrecorded → late → regular/accepted excuse → unrecorded; otherwise they toggle
@@ -81,12 +84,15 @@ remains source-identical. The N71 map branches and fallback are retained.
 Live metadata only: zero Auth IDs created, zero Product fixtures, no row contents
 read. `deployment.json` records read-back/catalog evidence and comparisons.
 
-Rendered UI/source evidence is bound to the successful Cloudflare check at
+Historical rendered UI/source evidence is bound to the successful Cloudflare check at
 `7bb671564c6468a84adc910e250fd6e11030a50c`, immutable Preview
 `https://d6040109.rakeezx.pages.dev`. The source hashes in
-`product-ui-result.json` are exact Git-object hashes (Windows CRLF is not an
-implementation difference). Further commits only correct the harness/save its
-evidence; reuse rendered evidence while those Product bytes remain identical.
+the historical `product-ui-result.json` are exact Git-object hashes (Windows
+CRLF is not an implementation difference). The legacy-completion identity fix
+requires a fresh Product render; its current output is stored at
+`test-results/n94/5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf/product-ui-result.json`.
+`bind-final-preview.mjs` binds that current render to the final provider head and
+actual served assets and refuses reuse if any Product/migration file differs.
 Only the authorized immutable Preview branches were pushed. Main/Production
 integration and served Production verification belong to the publisher; this
 record does not claim Product CLOSED or Production delivery.

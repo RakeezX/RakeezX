@@ -3566,8 +3566,10 @@ export async function setScoreSubitemCompletion(studentId, subitemId, checked) {
     if (!item || !current.students.some((row) => row.id === studentId && !row.deleted)) {
       throw new Error('Subitem or student is unavailable');
     }
-    const id = scoreSubitemCompletionId(studentId, subitemId);
-    const prior = current.scoreSubitemCompletions.find((row) => row.id === id);
+    const matches = current.scoreSubitemCompletions.filter((row) => row.studentId === studentId && row.subitemId === subitemId);
+    if (matches.length > 1) throw new Error('Conflicting completion identities require reconciliation');
+    const prior = matches[0];
+    const id = prior?.id ?? scoreSubitemCompletionId(studentId, subitemId);
     if (prior?.deleted) throw new Error('A deleted completion identity cannot be resurrected');
     const completion = syncV2Record('scoreSubitemCompletions', makeScoreSubitemCompletion({
       ...(prior ?? {}), id, studentId, subitemId, checked, updatedAt: stamp,
