@@ -27,6 +27,7 @@ const db = new Proxy(rawDB, { get(target, name) {
   };
 } });
 import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
+import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
@@ -34,7 +35,7 @@ import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, createSyncV2
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
-  distributionTargets, planAcceptedDistribution, normalizeSubitemDatesAndPoints, nextSubitemCompletionState } from './lib/score-foundation.js';
+  distributionTargets, normalizeSubitemDatesAndPoints, nextSubitemCompletionState } from './lib/score-foundation.js';
 import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
@@ -3989,12 +3990,12 @@ export function previewLegacyScoreDistributionCopy(sourceTeachingId) {
 }
 
 const reviewedDistributions = new Map();
-const distributionReviewKey = (source, targets, removals) => JSON.stringify([
-  activeWorkspace?.databaseName, source, [...targets].sort(), [...removals].sort(),
+const distributionReviewKey = (source, targets, removals, mode) => JSON.stringify([
+  activeWorkspace?.databaseName, source, [...targets].sort(), [...removals].sort(), mode,
 ]);
 const isDistributionDemo = () => activeWorkspace?.type === 'demo' && activeWorkspace.databaseName === 'rakeezx-demo';
 
-async function requireDistributionAccount() {
+async function requireDistributionAccount(mode = 'definitions') {
   assertCloudRestoreWritable(); assertLeaseWritable();
   if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
       cloud.user?.id !== activeWorkspace.authUserId || !cloud.session || globalThis.navigator?.onLine === false) {
@@ -4008,25 +4009,29 @@ async function requireDistributionAccount() {
   if (capability?.distributionApplyVersion !== 2 || capability?.protocol !== 'N73_D119_V2') {
     throw new Error('خادم نسخ التوزيع يحتاج إلى تحديث. النسخ السابق ما زال متاحًا.');
   }
+  if (mode === 'preserve-target' && capability?.targetPreservationVersion !== 1) {
+    throw new Error('حفظ سجلات الفصل الهدف يحتاج إلى تحديث الخادم.');
+  }
   if ((await db.getAll('outbox')).some(row => row.protocol === 'v2' && !['superseded'].includes(row.state))) {
     throw new Error('أكمل مزامنة التغييرات الحالية قبل مراجعة التوزيع.');
   }
 }
 
 /** Demo uses the same bounded definition/score rules; accounts review server state. */
-export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds, { removeItemIds = [] } = {}) {
-  if (isDistributionDemo()) return planAcceptedDistribution(state, sourceTeachingId, targetTeachingIds, {
-    ownerId: null, removeItemIds, id: uid,
+export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds, { removeItemIds = [], mode = 'definitions' } = {}) {
+  if (!DISTRIBUTION_MODES.includes(mode)) throw new Error('Invalid distribution mode');
+  if (isDistributionDemo()) return planScoreDistributionCopy(state, sourceTeachingId, targetTeachingIds, {
+    ownerId: null, removeItemIds, mode, id: uid,
   });
   return (async () => {
-    await requireDistributionAccount();
+    await requireDistributionAccount(mode);
     const owner = cloud.user.id, workspace = activeWorkspace.databaseName;
-    const plan = await cloud.planScoreDistribution({ planId: uid(), sourceTeachingId, targetTeachingIds, removeItemIds });
+    const plan = await cloud.planScoreDistribution({ planId: uid(), sourceTeachingId, targetTeachingIds, removeItemIds, mode });
     if (cloud.user?.id !== owner || activeWorkspace?.databaseName !== workspace ||
-        plan?.protocol !== 'N73_D119_V2' || !Array.isArray(plan.targets) || !plan.token || !plan.planId) {
+        plan?.protocol !== 'N73_D119_V2' || (mode === 'preserve-target' && plan.mode !== mode) || !Array.isArray(plan.targets) || !plan.token || !plan.planId) {
       throw new Error('تعذّر التحقق من مراجعة التوزيع.');
     }
-    reviewedDistributions.set(distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds), plan);
+    reviewedDistributions.set(distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds, mode), plan);
     return plan;
   })();
 }
@@ -4051,14 +4056,15 @@ async function applyReviewedCommand(command, recordId, patch) {
 
 /** No optimistic account writes: a durable command adopts one canonical receipt. */
 export async function applyReviewedScoreDistribution(sourceTeachingId, targetTeachingIds, {
-  expectedToken, removeItemIds = [], confirmed = false,
+  expectedToken, removeItemIds = [], confirmed = false, mode = 'definitions',
 } = {}) {
   if (typeof expectedToken !== 'string') throw new Error('راجع التوزيع قبل التطبيق.');
+  if (!DISTRIBUTION_MODES.includes(mode)) throw new Error('Invalid distribution mode');
   if (isDistributionDemo()) {
     let result;
     await commitScoreFoundation(current => {
-      const plan = planAcceptedDistribution(current, sourceTeachingId, targetTeachingIds, {
-        ownerId: null, removeItemIds, id: uid, stamp: now(),
+      const plan = planScoreDistributionCopy(current, sourceTeachingId, targetTeachingIds, {
+        ownerId: null, removeItemIds, mode, id: uid, stamp: now(),
       });
       if (plan.token !== expectedToken) throw new Error('تغيّر التوزيع أو الدرجات منذ المراجعة.');
       if (!plan.targets.length) throw new Error('راجع البنود المكررة في الفصول المستهدفة قبل التطبيق.');
@@ -4068,8 +4074,8 @@ export async function applyReviewedScoreDistribution(sourceTeachingId, targetTea
     });
     return result;
   }
-  await requireDistributionAccount();
-  const key = distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds);
+  await requireDistributionAccount(mode);
+  const key = distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds, mode);
   const plan = reviewedDistributions.get(key);
   if (!plan || plan.token !== expectedToken) throw new Error('راجع التوزيع قبل التطبيق.');
   if (plan.requiresConfirmation && !confirmed) throw new Error('تغييرات الدرجات تتطلب تأكيد الأثر.');
