@@ -156,7 +156,7 @@ export default {
       <style>
 /* N84 isolated Work UI. N82 selector remains frozen. */
 .n84-inline { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }
-.n84-step { width:44px; height:44px; padding:12px; border:0; border-radius:8px; background:transparent; color:var(--text-2); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.n84-step { width:44px; height:44px; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg-sunk); color:var(--text-2); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
 .n84-step--plus { color:var(--brand-text); background:var(--brand-soft); }
 .n84-step svg { width:16px; height:16px; }
 .n84-step:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:-2px; }
@@ -474,11 +474,13 @@ function subitemMode(roster, ctx, item) {
   const definitions = store.scoreSubitemsOf(item.id);
   return html`
     <section class="grades-01c__subscore" aria-label="رصد العناصر الفرعية">
-      <div class="grades-01c__provenance-key">العناصر الفرعية <span>+</span> الإضافة اليدوية <span>=</span> الدرجة النهائية</div>
-      <div class="n94-completion-legend" aria-label="دليل حالات العناصر الفرعية">
+      <div class="n94-subscore-toolbar">
+        <div class="grades-01c__provenance-key">العناصر الفرعية <span aria-hidden="true">+</span> الإضافة اليدوية <span aria-hidden="true">=</span> الدرجة النهائية</div>
+        <div class="n94-completion-legend" aria-label="دليل حالات العناصر الفرعية">
         <span><i class="n94-completion--unrecorded" aria-hidden="true"></i>غير مرصود</span>
         <span><i class="n94-completion--late" aria-hidden="true"></i>متأخر</span>
         <span><i class="n94-completion--regular" aria-hidden="true"></i>عادي/بعذر</span>
+        </div>
       </div>
       ${roster.length === 0 ? html`<div class="empty"><div class="empty__title">لا يوجد طلاب مطابقين للتصفية</div></div>` : roster.map((student) => {
         const score = ctx[student.id].scoresByItem[item.id] ?? null;
@@ -557,7 +559,7 @@ function tableMode(roster, items, ctx) {
                 ${items.map((i) => {
                   const v = itemScore(i, ctx[s.id]);
                   if (i.auto || i.scoreMode === 'subitems') {
-                    return html`<td class="is-auto tabular">${inlineQuickLog(i, s)}<span>${fmtNum(v)}</span></td>`;
+                    return html`<td class="is-auto tabular"><span>${fmtNum(v)}</span></td>`;
                   }
                   return html`
                     <td>
