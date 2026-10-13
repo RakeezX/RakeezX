@@ -93,6 +93,13 @@ async function prepare(preview,candidate){
   assert.equal(card.attempt.runId,RUN);assert.equal(card.productId,'N71');
   assert.equal(card.liveAuthorizationRef,card.preparationAuthority.liveAuthorizationRef);
   const verification=card.preparationAuthority.supabase.correctedVerificationPhase;
+  const preflight=JSON.parse(await fs.readFile(path.join(evidenceRoot,'valid-deletion-preflight.json'),'utf8'));
+  assert.equal(preflight.status,'PASS');assert.equal(preflight.runId,RUN);
+  assert.equal(preflight.sharedLiveSequence,true);assert.equal(preflight.nativeSql,true);
+  for(const [file,digest]of Object.entries(preflight.sourceHashes))assert.equal(hash((await fs.readFile(file,'utf8')).replaceAll('\r\n','\n')),digest,'Preflight source changed: '+file);
+  const phaseBinding=path.join(path.dirname(root),'phase-'+verification.phase+'.json');
+  try{const previous=JSON.parse(await fs.readFile(phaseBinding,'utf8'));throw Error('Verification phase already bound to '+previous.runId+'; resume its saved pair, never create again');}
+  catch(error){if(error.code!=='ENOENT')throw error;}
   const retiredPairs=[verification,...(card.preparationAuthority.supabase.previousVerificationPhases??[])].map(phase=>phase.retiredPair);
   for(const retired of retiredPairs){assert.notEqual(RUN,retired.runId);assert.ok(!Object.values(names).some(name=>retired.functionNames.includes(name)));}
   const target=new URL(preview);assert.equal(target.protocol,'https:');assert.ok(target.hostname.endsWith('.pages.dev'));
@@ -108,6 +115,7 @@ async function prepare(preview,candidate){
     treeSha:await git('rev-parse','HEAD^{tree}'),harnessBlob:await git('rev-parse','HEAD:tests/n71-live/runner.mjs'),preview,
     verificationPhase:verification.phase,excludedPairs:retiredPairs.map(({runId,accountIds,functionNames})=>({runId,accountIds,functionNames})),
     phase:'PREPARING',accounts,productIds:fixtureIds(RUN),sessions:[],revocations:{},checks:[],cleanup:[]};
+  await fs.writeFile(phaseBinding,JSON.stringify({version:1,phase:verification.phase,runId:RUN,candidateSha:candidate,accountIds:accounts.map(a=>a.id),functionNames:Object.values(names),createdAt:new Date().toISOString()},null,2),{flag:'wx'});
   await save(state);
   const browser=await chromium.launch();
   try{
@@ -195,17 +203,52 @@ async function login(state,browser,slot,label,provision=false){
   }
   return {page,context,slot,label};
 }
-async function payload(page,extra={},changes=null){return page.evaluate(async({extra,changes})=>{
+export async function payload(page,extra={},changes=null){return page.evaluate(async({extra,changes})=>{
   const e=await import('/src/lib/export.js');const c=await import('/src/lib/cloud.js');const payload=await e.buildBackup({sourceOwnerId:c.user.id});
   for(const [name,rows]of Object.entries(extra))payload.data[name]=[...(payload.data[name]??[]),...rows];
   if(changes){const row=payload.data[changes.store].find(row=>row.id===changes.id);Object.assign(row,changes.patch);}
   payload.backupHash=await e.sha256Hex(e.backupHashInput(payload));return payload;
 },{extra,changes});}
-async function restore(page,backup,id){return page.evaluate(async({backup,id})=>{const b=await import('/src/lib/backup-v2.js');
+export async function restore(page,backup,id){return page.evaluate(async({backup,id})=>{const b=await import('/src/lib/backup-v2.js');
   const preview=await b.previewCloudRestore(backup);if(!preview.validation.ok||!preview.plan.ready)throw Error('Restore review rejected: '+JSON.stringify(preview.plan?.counts??preview.validation));
   return b.restoreBackupToCloud(backup,{restoreId:id});},{backup,id});}
 async function denied(page,backup,expected){const code=await page.evaluate(async backup=>{try{await(await import('/src/lib/backup-v2.js')).previewCloudRestore(backup);return 'UNEXPECTED_SUCCESS';}catch(e){return e.code??e.message;}},backup);
   assert.ok(expected.includes(code),`Expected fail-closed ${expected.join(',')}; observed ${code}`);return code;}
+export async function suppressionSequence(page,secondPage,state,exported){
+    // Ordinary authenticated Sync makes deletion canonical before restoring stale export.
+    assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before deletion boundary');
+    await page.evaluate(async ids=>{const c=await import('/src/lib/cloud.js');const db=await import('/src/lib/db.js');
+      // Preserve a valid canonical deletion closure. Portable storage does not
+      // imply an N88 assignment cascade: retire this purpose-created child first.
+      for(const [entity,recordId]of [['submissions',ids.deletedSubmission],['assignments',ids.deletedAssignment]]){
+        const row=await db.get(entity,recordId);
+        if(!row||row.deleted)throw Error('Synthetic deletion fixture lacks its exact live canonical row');
+        await c.applySyncV2Mutation({entity,recordId,mutationId:recordId+':delete',deviceId:'n71-synthetic',baseRevision:row.serverRevision,patch:{},operation:'delete',clientUpdatedAt:Date.now()});
+      }
+      await(await import('/src/lib/sync.js')).syncAll({full:true});},state.productIds);await ready(page);
+    const stale=structuredClone(exported);stale.data.items.push({id:state.productIds.closedChild,teachingId:state.productIds.teaching,name:'N71 suppressed',max:10,deleted:false,updatedAt:1});
+    // The current closed term itself is immutable; add a teaching referring to it to test backup-only descendant suppression.
+    stale.data.teachings.push({id:state.productIds.closedChild+':teaching',sectionId:state.productIds.section,subjectId:state.foundation.A.subjects[0].id,termId:state.productIds.closedTerm,deleted:false,updatedAt:1});
+    stale.data.items.at(-1).teachingId=state.productIds.closedChild+':teaching';
+    await page.evaluate(async p=>{const e=await import('/src/lib/export.js');p.backupHash=await e.sha256Hex(e.backupHashInput(p));return p;},stale).then(p=>Object.assign(stale,p));
+    // Preserve the restored non-overlapping student value while exercising stale deletion scope.
+    stale.data.students.find(r=>r.id===state.productIds.student).note='after canonical restore';
+    stale.backupHash=await page.evaluate(async p=>{const e=await import('/src/lib/export.js');return e.sha256Hex(e.backupHashInput(p));},stale);
+    const suppression=await page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),stale);
+    assert.equal(suppression.plan.ready,true);assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.deletedAssignment&&e.reason==='server-tombstone'));
+    assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.closedChild&&e.reason==='closed-term-scope'));
+    await restore(page,stale,'n71:'+RUN+':suppression');
+    assert.equal(await secondPage.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true})),true,'A2 ordinary Sync must complete');
+    const snapshot=async page=>page.evaluate(async()=>{const db=await import('/src/lib/db.js');const e=await import('/src/lib/export.js');const v2=await import('/src/lib/sync-v2.js');
+      return Object.fromEntries(await Promise.all(db.STORES.filter(s=>!e.DEVICE_ONLY_STORES.includes(s)).map(async name=>[name,(await db.getAll(name)).map(row=>({id:row.id,deleted:row.deleted===true,revision:row.serverRevision,
+        ...(name==='scoreSubitems'?{createdAt:row.createdAt}:{}),
+        ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
+    await ready(page);await ready(secondPage);assert.deepEqual(await snapshot(secondPage),await snapshot(page));
+    const final=await snapshot(page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
+    assert.ok(final.submissions.find(r=>r.id===state.productIds.deletedSubmission).deleted);
+    assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
+    return final;
+}
 async function run(){
   const state=await load();assert.equal(await git('rev-parse','HEAD'),state.candidateSha);
   assert.equal(state.phase,'PREDEPLOY_REQUIRED','Use same-state recovery rather than re-running fixture setup');
@@ -277,38 +320,8 @@ async function run(){
     const resumedExport=await payload(a.page);
     assert.equal(await a.page.evaluate(async p=>(await(await import('/src/lib/export.js')).validateBackupIntegrity(p)).ok,resumedExport),true);
     check(state,'owner_resume','Actual staged transaction survives lost acknowledgement; local state waits for canonical finalize; exact same stage/finalize identity resumes and finalized receipt reused');
-    // Ordinary authenticated Sync makes deletion canonical before restoring stale export.
     assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before deletion boundary');
-    await a.page.evaluate(async ids=>{const c=await import('/src/lib/cloud.js');const db=await import('/src/lib/db.js');
-      // Preserve a valid canonical deletion closure. Portable storage does not
-      // imply an N88 assignment cascade: retire this purpose-created child first.
-      for(const [entity,recordId]of [['submissions',ids.deletedSubmission],['assignments',ids.deletedAssignment]]){
-        const row=await db.get(entity,recordId);
-        if(!row||row.deleted)throw Error('Synthetic deletion fixture lacks its exact live canonical row');
-        await c.applySyncV2Mutation({entity,recordId,mutationId:recordId+':delete',deviceId:'n71-synthetic',baseRevision:row.serverRevision,patch:{},operation:'delete',clientUpdatedAt:Date.now()});
-      }
-      await(await import('/src/lib/sync.js')).syncAll({full:true});},state.productIds);await ready(a.page);
-    const stale=structuredClone(exported);stale.data.items.push({id:state.productIds.closedChild,teachingId:state.productIds.teaching,name:'N71 suppressed',max:10,deleted:false,updatedAt:1});
-    // The current closed term itself is immutable; add a teaching referring to it to test backup-only descendant suppression.
-    stale.data.teachings.push({id:state.productIds.closedChild+':teaching',sectionId:state.productIds.section,subjectId:state.foundation.A.subjects[0].id,termId:state.productIds.closedTerm,deleted:false,updatedAt:1});
-    stale.data.items.at(-1).teachingId=state.productIds.closedChild+':teaching';
-    await a.page.evaluate(async p=>{const e=await import('/src/lib/export.js');p.backupHash=await e.sha256Hex(e.backupHashInput(p));return p;},stale).then(p=>Object.assign(stale,p));
-    // Preserve the restored non-overlapping student value while exercising stale deletion scope.
-    stale.data.students.find(r=>r.id===state.productIds.student).note='after canonical restore';
-    stale.backupHash=await a.page.evaluate(async p=>{const e=await import('/src/lib/export.js');return e.sha256Hex(e.backupHashInput(p));},stale);
-    const suppression=await a.page.evaluate(async p=>(await import('/src/lib/backup-v2.js')).previewCloudRestore(p),stale);
-    assert.equal(suppression.plan.ready,true);assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.deletedAssignment&&e.reason==='server-tombstone'));
-    assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.closedChild&&e.reason==='closed-term-scope'));
-    await restore(a.page,stale,'n71:'+RUN+':suppression');
-    assert.equal(await a2.page.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true})),true,'A2 ordinary Sync must complete');
-    const snapshot=async page=>page.evaluate(async()=>{const db=await import('/src/lib/db.js');const e=await import('/src/lib/export.js');const v2=await import('/src/lib/sync-v2.js');
-      return Object.fromEntries(await Promise.all(db.STORES.filter(s=>!e.DEVICE_ONLY_STORES.includes(s)).map(async name=>[name,(await db.getAll(name)).map(row=>({id:row.id,deleted:row.deleted===true,revision:row.serverRevision,
-        ...(name==='scoreSubitems'?{createdAt:row.createdAt}:{}),
-        ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
-    await ready(a.page);await ready(a2.page);assert.deepEqual(await snapshot(a2.page),await snapshot(a.page));
-    const final=await snapshot(a.page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
-    assert.ok(final.submissions.find(r=>r.id===state.productIds.deletedSubmission).deleted);
-    assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
+    const final=await suppressionSequence(a.page,a2.page,state,exported);
     check(state,'convergence_no_resurrection','Fresh A2 Initial Restore and ordinary Sync converge across every portable domain; tombstone, immutable closed-term scope, score provenance and current calendar identities retained');
     state.retainedClosure={ownerId:state.accounts[0].id,counts:Object.fromEntries(Object.entries(final).map(([name,rows])=>[name,rows.length])),canonicalSha256:hash(canonical(final)),verifiedAt:new Date().toISOString()};
     await fs.writeFile(path.join(evidenceRoot,'retained-closure.json'),JSON.stringify(state.retainedClosure,null,2));
