@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v56';
+const VERSION = 'rakeezx-v57';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -76,6 +76,9 @@ const SHELL = [
   './src/data/education-department-options-2026-09-30.json',
   './src/lib/student-import.js',
   './src/lib/student-import-parsers.js',
+  './src/lib/grade-transfer.js',
+  './src/lib/grade-transfer-parsers.js',
+  './src/lib/grade-transfer-export.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',

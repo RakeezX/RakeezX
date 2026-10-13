@@ -11,7 +11,7 @@ import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2Attendanc
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 import { projectSubitemScore, scoreCents } from './score-foundation.js';
-import { applyScoreDistributionPlan, renameScoreItem } from './cloud.js';
+import { applyScoreDistributionPlan, renameScoreItem, applyReviewedGradeImport } from './cloud.js';
 import { createSyncOwnershipGuard, ownershipBlockedError, SYNC_OWNERSHIP_BLOCKED } from './sync-ownership.js';
 
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -648,6 +648,7 @@ function defaultTransport() {
     applyScoreConfigurationCommand,
     applyScoreDistributionCopyCommand,
     applyScoreDistributionPlan,
+    applyReviewedGradeImport,
     renameScoreItem,
     getScoreDomainSnapshot,
     fetchRecords: (entity) => fetchRecords(entity),
@@ -762,6 +763,9 @@ export function createSyncV2Engine({
     await database.applyBatch({ outbox: {}, device: {} }, {
       prepare(current) {
         const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
+        if (command === 'score:grade_import' && current.outbox.some(row => row.state !== 'superseded')) {
+          throw new Error('أكمل المزامنة قبل تأكيد استيراد الدرجات.');
+        }
         const deviceId = deviceRecord?.deviceId || makeId();
         const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
         queued = ownershipGuard.bindNewCommand({
@@ -1371,11 +1375,27 @@ export function createSyncV2Engine({
   async function reconcileDistributionReceipt(mutation, receipt) {
     const entries = [['items', 'items'], ['scoreSubitems', 'score_subitems'],
       ['scoreSubitemCompletions', 'score_subitem_completions'], ['scores', 'scores']];
-    if (receipt?.mutationId !== mutation.mutationId || receipt?.planId !== mutation.patch.planId ||
-        receipt?.protocol !== 'N73_D119_V2') throw new Error('Distribution receipt binding mismatch');
+    const gradeImport = mutation.command === 'score:grade_import';
+    if (receipt?.mutationId !== mutation.mutationId || (gradeImport
+      ? receipt?.protocol !== 'N90_REVIEWED_V1' || receipt?.teachingId !== mutation.patch.batch.teachingId
+      : receipt?.planId !== mutation.patch.planId || receipt?.protocol !== 'N73_D119_V2')) throw new Error('Distribution receipt binding mismatch');
     const owner = currentAuthenticatedUserId();
     const access = ownershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: owner, command: mutation });
     if (!access.allowed) throw ownershipBlockedError(access);
+    if (gradeImport) {
+      const cells = mutation.patch.batch.cells;
+      const itemIds = new Set(cells.map(c => c.itemId));
+      const expectedScores = new Map(cells.map(c => [c.scoreId ?? `sc:${c.studentId}:${c.itemId}`, c]));
+      if (!Array.isArray(receipt.items) || receipt.items.length !== itemIds.size || receipt.items.some(i =>
+        !itemIds.has(i.id) || i.teaching_id !== mutation.patch.batch.teachingId || i.score_mode !== 'direct' || i.auto != null ||
+        Number(i.max) !== cells.find(c => c.itemId === i.id).max) ||
+        !Array.isArray(receipt.scores) || receipt.scores.length !== cells.length || receipt.scores.some(s => {
+          const c = expectedScores.get(s.id);
+          return !c || s.student_id !== c.studentId || s.item_id !== c.itemId || Number(s.value) !== c.value || s.deleted_at != null;
+        }) || receipt.score_subitems?.length !== 0 || receipt.score_subitem_completions?.length !== 0) {
+        throw new Error('Grade import receipt scope mismatch');
+      }
+    }
     const canonical = Object.fromEntries(entries.map(([store, entity]) => {
       const rows = receipt[entity];
       if (!Array.isArray(rows) || rows.some(row => row.owner_id !== owner || !row.id || !normalizeRevision(row.revision)) ||
@@ -1388,6 +1408,9 @@ export function createSyncV2Engine({
         const result = { outbox: { remove: [mutation.id] } };
         for (const [store] of entries) result[store] = { put: canonical[store].map(row => {
           const prior = current[store].find(local => local.id === row.id);
+          // A lost acknowledgement can arrive after a later canonical pull.
+          // The exact saved receipt must not regress that newer local revision.
+          if (gradeImport && prior && normalizeRevision(prior.serverRevision) > row.serverRevision) return prior;
           // A later local command remains an overlay. The canonical tombstone
           // always wins and cannot be resurrected by that stale command.
           const later = current.outbox.some(command => command.id !== mutation.id && command.sequence > mutation.sequence &&
@@ -1692,6 +1715,9 @@ export function createSyncV2Engine({
         const liveRows = sortMutations(await database.getAll('outbox'));
         const live = liveRows.find((row) => row.id === original.id);
         if (!live) continue;
+        if (live.command === 'score:grade_import' && liveRows.some(row => row.id !== live.id && row.state !== 'superseded')) {
+          await markDependencyBlock(live, 'grade-import-outbox-not-clean'); result.blocked++; continue;
+        }
         const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));
         if (readiness.state === 'blocked') {
           await markDependencyBlock(live, readiness.reason); stoppedKeys.add(live.logicalRecordKey);
@@ -1719,7 +1745,10 @@ export function createSyncV2Engine({
         const mutation = await markAttempt(live);
         result.attempted++;
         try {
-          const receipt = mutation.command === 'score:distribution_apply'
+          const receipt = mutation.command === 'score:grade_import'
+            ? await transport.applyReviewedGradeImport({ mutationId: mutation.mutationId,
+              deviceId: mutation.deviceId, ownerId: mutation.ownerId, batch: clone(mutation.patch.batch) })
+            : mutation.command === 'score:distribution_apply'
             ? await transport.applyScoreDistributionPlan({ mutationId: mutation.mutationId,
               deviceId: mutation.deviceId, ...clone(mutation.patch) })
             : mutation.command === 'score:rename'
@@ -1742,7 +1771,7 @@ export function createSyncV2Engine({
               subitemId: mutation.patch.subitemId ?? null, checked: mutation.patch.checked ?? null,
               manualValue: mutation.patch.manualValue ?? null,
               ...(Object.hasOwn(mutation.patch, 'completionState') ? { completionState: mutation.patch.completionState } : {}) });
-          if (mutation.command === 'score:distribution_apply') await reconcileDistributionReceipt(mutation, receipt);
+          if (['score:distribution_apply', 'score:grade_import'].includes(mutation.command)) await reconcileDistributionReceipt(mutation, receipt);
           else await reconcileScoreDomainReceipt(mutation, receipt);
           result.acknowledged++;
         } catch (error) {

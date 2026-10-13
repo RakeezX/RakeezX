@@ -13,6 +13,9 @@ import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
+import { readGradeFile } from '../lib/grade-transfer-parsers.js';
+import { isTransferItem } from '../lib/grade-transfer.js';
+import { exportGradeCsv, downloadGradeCsv } from '../lib/grade-transfer-export.js';
 
 let mode = 'item';        // item | table
 let activeItemId = null;
@@ -22,6 +25,94 @@ let bulkSelected = new Set();
 let bulkScoreVal = '';
 let query = '';
 const scoreValidation = new Map();
+let transfer = { rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+
+function transferPanel(teachingId) {
+  const { items } = store.teachingContext(teachingId);
+  const review = transfer.review;
+  const opts = transfer.rows?.[0] ?? [];
+  return html`<details class="grade-transfer noprint" data-grade-transfer ${transfer.rows || transfer.message || transfer.recovery.length ? 'open' : ''}>
+    <summary>استيراد وتصدير الدرجات</summary>
+    <p>CSV أو XLSX، الورقة الأولى فقط، والصف الأول عناوين الأعمدة، حتى 300 طالب و1 MB. المعاينة محلية؛ الفراغ لا يغيّر الدرجة. البنود الآلية والفرعية للقراءة فقط.</p>
+    <label>ملف الدرجات <input class="input" type="file" accept=".csv,.xlsx" data-change="grade-file" ${transfer.busy ? 'disabled' : ''}></label>
+    ${transfer.rows ? html`<p data-grade-file-name>${transfer.fileName}</p><div class="grade-transfer__mapping">
+      <label>عمود اسم الطالب <select class="input" data-grade-name data-change="grade-mapping"><option value="-1">اختر صراحة</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      <label>معرف ركيز الثابت (اختياري) <select class="input" data-grade-id data-change="grade-mapping"><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      ${opts.map((v,c) => {
+        const m = transfer.mappings[c] ?? { kind: 'ignore' };
+        return html`<fieldset data-grade-column="${c}"><legend>${c+1}: ${v}</legend>
+          <select class="input" data-grade-kind data-change="grade-mapping" ${[transfer.nameColumn,transfer.idColumn].includes(c) ? 'disabled' : ''}>
+            <option value="ignore" ${m.kind === 'ignore' ? 'selected' : ''}>تجاهل</option>
+            ${items.filter(isTransferItem).map(i => html`<option value="${i.id}" ${m.itemId === i.id ? 'selected' : ''}>${i.name} — العظمى ${i.max}</option>`)}
+            <option value="new" ${m.kind === 'new' ? 'selected' : ''}>إنشاء بند يدوي مسمّى صراحة</option>
+          </select>
+          ${m.kind === 'new' ? html`<label>اسم البند <input class="input" data-grade-new-name maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
+            <label>العظمى <input class="input" data-grade-new-max inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label>
+            <label><input type="checkbox" data-grade-new-confirm data-change="grade-mapping" ${m.confirmed ? 'checked' : ''}> أؤكد إنشاء هذا البند بهذه العظمى</label>` : ''}
+        </fieldset>`;
+      })}
+      <button class="btn" data-act="grade-review" ${transfer.busy ? 'disabled' : ''}>معاينة ومراجعة المطابقة</button>
+      <button class="btn" data-act="grade-cancel" ${transfer.busy ? 'disabled' : ''}>إلغاء</button>
+    </div>` : ''}
+    ${review ? html`<div data-grade-review><p>إضافات ${review.additions}، استبدالات ${review.overwrites}، دون تغيير ${review.unchanged}، مرفوض ${review.rejected.length}.</p>
+      <div class="grade-transfer__scroll"><table><thead><tr><th>صف</th><th>الطالب / المعرف</th><th>البند / العظمى</th><th>الحالي ← المقترح</th></tr></thead><tbody>
+        ${review.entries.map(e => html`<tr><td>${e.row}</td><td>${e.student} / ${e.studentId}</td><td>${e.item} / ${e.max}</td><td>${e.old ?? 'فارغ'} ← ${e.value ?? 'لا تغيير'}</td></tr>`)}
+      </tbody></table></div>
+      ${review.rejected.map(e => html`<p role="alert">صف ${e.row}: ${e.reason}</p>`)}
+      <p>كل صف ملتبس أو مرفوض يمنع الدفعة كاملة. لا تنشأ بنود أو درجات قبل التأكيد.</p>
+      <label><input type="checkbox" data-grade-match-confirm> راجعت هوية كل طالب والدرجات والبنود الجديدة</label>
+      ${review.overwrites ? html`<label><input type="checkbox" data-grade-overwrite-confirm> أوافق صراحة على استبدال ${review.overwrites} درجة بالقيم المعروضة</label>` : ''}
+      <button class="btn btn--primary" data-act="grade-confirm" ${transfer.busy || review.rejected.length || !review.cells.length ? 'disabled' : ''}>تأكيد الدفعة كاملة</button>
+    </div>` : ''}
+    ${transfer.message ? html`<p role="status">${transfer.message}</p>` : ''}
+    ${transfer.recovery.map(r => html`<p role="alert">طلب محفوظ: ${r.mutationId} — ${r.state === 'rejected' ? 'مرفوض، يلزم تصحيح سبب الرفض قبل دفعة جديدة' : 'لم يتأكد الإيصال بعد؛ أعد الطلب نفسه فقط'}
+      ${r.state !== 'rejected' ? html`<button class="btn" data-act="grade-retry" data-mutation="${r.mutationId}" ${transfer.busy ? 'disabled' : ''}>استعادة إيصال الطلب نفسه</button>`
+        : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
+    <fieldset><legend>بنود التصدير (القيم الحالية، دون تحويل فترات)</legend>${items.map(i => html`<label><input type="checkbox" data-grade-export-item value="${i.id}" checked> ${i.name} / ${i.max}</label>`)}</fieldset>
+    <button class="btn" data-act="grade-export">تصدير درجات CSV</button>
+    <button class="btn" data-act="grade-noor-export">مراجعة للرصد في نور CSV</button>
+    <p>ملف نور مساعدة للرصد اليدوي، وليس قالب رفع رسمي. توافق القالب الرسمي غير متحقق (NOT_VERIFIED). لا تسجيل دخول أو رفع تلقائي. لا يتوفر كاتب XLSX مدقق، لذلك التصدير CSV.</p>
+  </details>`;
+}
+
+function readTransferMappings(root) {
+  transfer.nameColumn = Number(root.querySelector('[data-grade-name]').value);
+  transfer.idColumn = Number(root.querySelector('[data-grade-id]').value);
+  transfer.mappings = [...root.querySelectorAll('[data-grade-column]')].map((el,c) => {
+    const value = el.querySelector('[data-grade-kind]').value;
+    if (value === 'ignore') return { kind: 'ignore' };
+    if (value !== 'new') return { kind: 'existing', itemId: value };
+    const prior = transfer.mappings[c];
+    return { kind: 'new', id: prior?.kind === 'new' ? prior.id : crypto.randomUUID(), name: el.querySelector('[data-grade-new-name]')?.value ?? '',
+      max: el.querySelector('[data-grade-new-max]')?.value ?? '', confirmed: el.querySelector('[data-grade-new-confirm]')?.checked ?? false };
+  });
+}
+
+async function transferConfirm(el, retry = false) {
+  const root = el.closest('[data-grade-transfer]');
+  const current = transfer;
+  if (transfer.busy) return;
+  if (!retry && (!root.querySelector('[data-grade-match-confirm]')?.checked || transfer.review?.overwrites && !root.querySelector('[data-grade-overwrite-confirm]')?.checked)) {
+    toast('أكد مراجعة هوية الطلاب واستبدال الدرجات أولًا', 'danger'); return;
+  }
+  const overwriteConfirmed = root.querySelector('[data-grade-overwrite-confirm]')?.checked ?? false;
+  transfer.busy = true; repaint();
+  try {
+    if (retry) await store.retryGradeImport(el.dataset.mutation);
+    else await store.confirmGradeImport(transfer.review, { approved: true, overwriteConfirmed });
+    current.rows = null; current.review = null; current.message = 'تم تأكيد الدفعة كاملة بإيصال الخادم.';
+  } catch (error) { current.message = error.message; }
+  finally { current.busy = false; if (transfer === current) { current.recovery = await store.gradeImportRecovery(); repaint(); } }
+}
+
+function transferExport(el, ev, params) {
+  const root = el.closest('[data-grade-transfer]'), selected = new Set([...root.querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value));
+  if (!selected.size) { toast('اختر بنود التصدير', 'danger'); return; }
+  const context = store.teachingContext(params.id), teaching = store.getTeaching(params.id);
+  const noorReview = el.dataset.act === 'grade-noor-export';
+  downloadGradeCsv(exportGradeCsv({ ...context, items: context.items.filter(i => selected.has(i.id)), className: store.sectionLabel(store.getSection(teaching.sectionId)),
+    subject: store.state.subjects.find(s => s.id === teaching.subjectId)?.name, term: store.state.terms.find(t => t.id === teaching.termId)?.name, noorReview }), noorReview);
+}
 
 const AUTO_NOTE = {
   participation: 'يُحسب آليًا من الرصد السريع — لا يُدخل يدويًا.',
@@ -70,6 +161,9 @@ export default {
     bulkScoreVal = '';
     query = '';
     scoreValidation.clear();
+    transfer = { rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+    const current = transfer;
+    store.gradeImportRecovery().then(rows => { if (transfer === current) { transfer.recovery = rows; repaint(); } });
   },
 
   render(p) {
@@ -83,7 +177,7 @@ export default {
 
     if (!roster.length) {
       return html`
-        <div class="grades-page-head noprint">${distributionAction}</div>
+        <div class="grades-page-head noprint">${distributionAction}</div>${transferPanel(cls.id)}
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">أضف الطلاب أولًا</div>
@@ -94,7 +188,7 @@ export default {
 
     if (!items.length) {
       return html`
-        <div class="grades-page-head noprint">${distributionAction}</div>
+        <div class="grades-page-head noprint">${distributionAction}</div>${transferPanel(cls.id)}
         <div class="empty">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود تقييم</div>
@@ -179,6 +273,7 @@ export default {
           الجدول
         </button>
       </div>${distributionAction}</div>
+      ${transferPanel(cls.id)}
       ${mode === 'item' ? html`<div class="grades-01c__item-tabs" role="tablist" aria-label="بنود التقييم">
         ${items.map((item) => html`<button class="grades-01c__item-tab ${item.id === activeItemId ? 'is-active' : ''}"
           data-act="pick" data-id="${item.id}" role="tab" aria-selected="${item.id === activeItemId}">
@@ -223,6 +318,37 @@ export default {
   afterPaint: flushInlineQuickLogEffect,
 
   actions: {
+    async 'grade-file'(el) {
+      const current = transfer;
+      const file = el.files?.[0];
+      if (!file || current.busy) return;
+      current.busy = true; current.rows = null; current.review = null; current.message = 'جار قراءة الملف محليًا…'; repaint();
+      try {
+        const rows = await readGradeFile(file);
+        if (transfer !== current) return;
+        transfer.rows = rows; transfer.fileName = file.name; transfer.mappings = rows[0].map(() => ({ kind: 'ignore' })); transfer.nameColumn = -1; transfer.idColumn = -1; transfer.review = null; transfer.message = '';
+      } catch (error) { if (transfer === current) { transfer.rows = null; transfer.review = null; transfer.message = 'تعذّر قراءة الملف: ' + error.message; } }
+      finally { current.busy = false; if (transfer === current) repaint(); }
+    },
+    'grade-mapping'(el) { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = null; repaint(); },
+    'grade-review'(el, ev, params) {
+      try { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = store.reviewGradeImport(params.id, transfer); transfer.message = ''; }
+      catch (error) { transfer.review = null; transfer.message = 'راجع الأعمدة والبنود والعظمى: ' + error.message; }
+      repaint();
+    },
+    'grade-cancel'() { transfer.rows = null; transfer.review = null; transfer.message = 'أُلغي الاستيراد دون تغيير الدرجات.'; repaint(); },
+    'grade-confirm': el => transferConfirm(el),
+    'grade-retry': el => transferConfirm(el, true),
+    async 'grade-retire'(el) {
+      const confirmed = el.closest('[data-grade-transfer]').querySelector('[data-grade-retire-confirm]')?.checked;
+      if (!confirmed) { toast('أكد إلغاء الطلب المرفوض وحفظ سبب الرفض أولًا', 'danger'); return; }
+      const current = transfer;
+      try { await store.retireRejectedGradeImport(el.dataset.mutation, true); current.review = null; current.message = 'حُفظ الرفض وأُلغي الطلب المرفوض. أكمل المزامنة ثم راجع ملفك من جديد.'; }
+      catch (error) { current.message = error.message; }
+      if (transfer === current) { current.recovery = await store.gradeImportRecovery(); repaint(); }
+    },
+    'grade-export': transferExport,
+    'grade-noor-export': transferExport,
     'n84-log': recordInlineQuickLog,
     mode(el) {
       mode = el.dataset.mode;

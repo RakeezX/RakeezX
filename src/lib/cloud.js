@@ -1116,6 +1116,26 @@ export const renameScoreItem = (envelope) => distributionRPC('rename_score_item'
   p_revision: envelope.revision, p_name: envelope.name,
 }, 'renameScoreItem', envelope);
 
+export const getGradeImportCapability = () => distributionRPC('reviewed_grade_import_capability', {}, 'getGradeImportCapability', {});
+export async function applyReviewedGradeImport(envelope) {
+  const ownerId = envelope.ownerId, databaseName = runtimeSyncOwnershipGuard.getWorkspace().databaseName;
+  const assertAccess = () => {
+    runtimeOfflineLease().assertWritable();
+    const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: user?.id, command: { ownerId } });
+    if (!access.allowed || user?.id !== ownerId || !session || runtimeSyncOwnershipGuard.getWorkspace().databaseName !== databaseName) throw new Error('Grade import owner changed');
+    if (globalThis.navigator?.onLine === false) throw new Error('Grade import confirmation requires online Sync');
+  };
+  assertAccess();
+  if (mockBackend) {
+    if (typeof mockBackend.applyReviewedGradeImport !== 'function') throw new Error('Mock backend lacks applyReviewedGradeImport');
+    const receipt = await mockBackend.applyReviewedGradeImport(envelope); assertAccess(); return receipt;
+  }
+  return request('/rpc/apply_reviewed_grade_import', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
+    body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId, p_batch: envelope.batch }),
+  }, false, { assertAccess });
+}
+
 /** Owner-scoped, statement-consistent score components and materialized totals. */
 export async function getScoreDomainSnapshot() {
   if (mockBackend) {

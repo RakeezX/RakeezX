@@ -28,6 +28,7 @@ const db = new Proxy(rawDB, { get(target, name) {
 } });
 import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
 import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js';
+import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
@@ -4043,14 +4044,72 @@ async function applyReviewedCommand(command, recordId, patch) {
   const result = await engine.dispatchPending({ onlyMutationId: queued.mutationId });
   if (result.acknowledged !== 1) {
     const pending = await db.get('outbox', queued.id);
-    throw new Error(pending?.state === 'rejected'
-      ? 'تغيّر التوزيع أو تعذّر قبول التطبيق؛ راجع التغييرات قبل المحاولة الجديدة.'
-      : 'تعذّر تأكيد التطبيق. طلبك محفوظ للمزامنة وإعادة المحاولة الآمنة.');
+    throw new Error(command === 'score:grade_import'
+      ? pending?.state === 'rejected' ? 'رُفضت دفعة الدرجات كاملة؛ راجع البنود والدرجات الحالية قبل طلب جديد.'
+        : 'لم يتأكد إيصال دفعة الدرجات. الطلب محفوظ بنفس هويته لاستعادة الإيصال بأمان.'
+      : pending?.state === 'rejected' ? 'تغيّر التوزيع أو تعذّر قبول التطبيق؛ راجع التغييرات قبل المحاولة الجديدة.'
+        : 'تعذّر تأكيد التطبيق. طلبك محفوظ للمزامنة وإعادة المحاولة الآمنة.');
   }
   const changes = [];
   for (const store of ['items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores']) {
     changes.push(...(await db.getAll(store)).map(row => ({ store, id: row.id })));
   }
+  await absorb(changes); broadcast(changes);
+}
+
+export function reviewGradeImport(teachingId, input) {
+  const teaching = getTeaching(teachingId), term = activeTerm();
+  if (!teaching || isTeachingArchived(teaching) || teaching.termId !== term?.id || term.status !== 'active') throw new Error('اختر تدريسًا حيًا في الفصل الدراسي الحالي.');
+  const { roster, items } = teachingContext(teachingId);
+  return reviewGradeTransfer({ ...input, roster, items, scores: state.scores, teaching, term,
+    ownerId: activeWorkspace?.authUserId, databaseName: activeWorkspace?.databaseName });
+}
+
+export async function confirmGradeImport(review, { overwriteConfirmed = false, approved = false } = {}) {
+  if (!approved) return false;
+  assertCloudRestoreWritable(); assertLeaseWritable();
+  if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
+    review.ownerId !== cloud.user?.id || activeWorkspace.authUserId !== review.ownerId ||
+    review.databaseName !== activeWorkspace.databaseName || !cloud.session || globalThis.navigator?.onLine === false ||
+    activeTerm()?.id !== review.termId) throw new Error('تأكيد الاستيراد يحتاج حساب المالك واتصالًا ومزامنة نظيفة.');
+  const ownership = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: cloud.user.id });
+  if (!ownership.allowed) throw new Error('تعذّر التحقق من ملكية مساحة العمل.');
+  const batch = gradeCommand(review, overwriteConfirmed);
+  const capability = await cloud.getGradeImportCapability();
+  // Recheck after asynchronous preflight. Dispatch itself guards the bound command.
+  assertLeaseWritable();
+  if (review.ownerId !== cloud.user?.id || activeWorkspace?.databaseName !== review.databaseName || activeTerm()?.id !== review.termId ||
+    capability?.protocol !== 'N90_REVIEWED_V1' || capability?.version !== 1) throw new Error('قدرة استيراد الدرجات غير متاحة.');
+  await applyReviewedCommand('score:grade_import', review.teachingId, { batch });
+  return true;
+}
+
+export async function gradeImportRecovery() {
+  return (await db.getAll('outbox')).filter(row => row.command === 'score:grade_import' && row.state !== 'superseded');
+}
+
+export async function retireRejectedGradeImport(mutationId, confirmed = false) {
+  if (!confirmed) return false;
+  assertCloudRestoreWritable(); assertLeaseWritable();
+  await db.applyBatch({ outbox: {} }, { prepare(current) {
+    const row = current.outbox.find(r => r.command === 'score:grade_import' && r.mutationId === mutationId);
+    if (!row || row.state !== 'rejected') throw new Error('لا يجوز إلغاء طلب قد يكون طُبّق؛ استعد إيصال الطلب نفسه.');
+    const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: cloud.user?.id, command: row });
+    if (!access.allowed) throw new Error('تعذّر التحقق من ملكية الطلب المرفوض.');
+    return { outbox: { put: [{ ...row, state: 'superseded', supersededAt: now(), recoveryReason: 'n90-explicit-rejected-disposition' }] } };
+  } });
+  return true;
+}
+
+export async function retryGradeImport(mutationId) {
+  assertCloudRestoreWritable(); assertLeaseWritable();
+  const pending = (await gradeImportRecovery()).find(row => row.mutationId === mutationId);
+  if (!pending || pending.state === 'rejected') throw new Error('الطلب مرفوض؛ احتفظ بالمراجعة وصحّح سبب الرفض قبل طلب جديد.');
+  const engine = createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard, currentAuthenticatedUserId: () => cloud.user?.id ?? null });
+  const result = await engine.dispatchPending({ onlyMutationId: mutationId });
+  if (result.acknowledged !== 1) throw new Error('لم يصل الإيصال بعد. الطلب نفسه محفوظ، دون إنشاء دفعة جديدة.');
+  const changes = (await db.getAll('scores')).map(row => ({ store: 'scores', id: row.id }));
+  changes.push(...(await db.getAll('items')).map(row => ({ store: 'items', id: row.id })));
   await absorb(changes); broadcast(changes);
 }
 
