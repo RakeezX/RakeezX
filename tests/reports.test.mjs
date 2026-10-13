@@ -14,11 +14,24 @@ import test from "node:test";
 import assert from "node:assert";
 import * as db from "../src/lib/db.js";
 import * as store from "../src/store.js";
+import * as cloud from '../src/lib/cloud.js';
+import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
 import reports from "../src/views/reports.js";
 import { attendanceHasRecords, attendanceSessionsInRange, gradesHaveValues, supportEmptyMessage, supportHasIndicators, supportRows } from "../src/views/reports.js";
 import { activateSyntheticAccountWorkspace } from "./helpers/synthetic-workspace.mjs";
 import { readFileSync } from 'node:fs';
 import { URL as NodeURL } from 'node:url';
+
+// The account fixture must carry a verified synthetic lease, just like writes
+// in the application. Keep the real guard and its initial negative check.
+global.localStorage = new class {
+  values = new Map();
+  get length() { return this.values.size; }
+  key(i) { return [...this.values.keys()][i] ?? null; }
+  getItem(k) { return this.values.get(k) ?? null; }
+  setItem(k,v) { this.values.set(k,String(v)); }
+  removeItem(k) { this.values.delete(k); }
+};
 
 test('N25 eligibility uses exported grade cells and attendance range', () => {
   const roster = [{ id: 'synthetic-student' }];
@@ -58,6 +71,18 @@ test("Reports Regression Suite", async (t) => {
     await activateSyntheticAccountWorkspace();
     await db.clearAll();
     await store.init();
+    const owner = store.getActiveWorkspace().authUserId;
+    localStorage.values.clear();
+    localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify({access_token:'synthetic-report-token',refresh_token:'synthetic',expires_at:4102444800,user:{id:owner}}));
+    await cloud.init();
+    assert.equal(store.getOfflineLeaseStatus().editable, false);
+    await assert.rejects(store.save({students:[]}), {code:'OFFLINE_LEASE_LIMITED'});
+    const originalFetch = global.fetch;
+    try {
+      global.fetch = async () => new Response(JSON.stringify({id:owner}), {status:200});
+      await runtimeOfflineLease().renew(() => cloud.verifyCurrentAuthIdentity(owner));
+    } finally { global.fetch = originalFetch; }
+    assert.equal(store.getOfflineLeaseStatus().editable, true);
     await store.patchDevice({ lastSyncAt: 0, activeTimeProfileId: null });
   });
 

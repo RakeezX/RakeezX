@@ -7,7 +7,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER, displayRoster,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportFooter, reportHeader, reportIdentitySheet, reportPageSetup, reportSignatures, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
@@ -143,15 +143,13 @@ export default {
     const header = reportHeader({ title: reportTitle(), ...identity(cls), period: datePeriod });
     const widePrint = tab === 'grades' || (tab === 'attendance' && attMode === 'detailed');
 
-    const reportContent = html`
-      ${header}
+    const reportBody = html`
       ${tab === 'roster' ? rosterReport(sortedRoster) : ''}
       ${tab === 'grades' ? gradesReport(sortedRoster, items, ctx) : ''}
       ${tab === 'attendance' ? attendanceReport(cls, attendance) : ''}
       ${tab === 'support' ? supportReport(sortedRoster, items, ctx) : ''}
-      ${reportSignatures({ profile: identity(cls).profile })}
-      ${reportFooter()}
     `;
+    const reportContent = html`${header}${reportWithClosing(reportBody, { profile: identity(cls).profile })}`;
 
     return html`
       <article class="print-report print-report--${tab} ${widePrint ? 'print-report--wide' : ''} report-workspace" dir="rtl">
@@ -429,8 +427,24 @@ function rosterReport(roster) {
 }
 
 function gradesReport(roster, items, ctx) {
-  const totalMax = items.reduce((n, i) => n + i.max, 0);
-  return html`<div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th class="gtable__sticky">الطالب</th>${items.map((i) => html`<th>${i.name}<span class="gtable__max tabular">${i.max}</span></th>`)}<th>المجموع<span class="gtable__max tabular">${totalMax}</span></th><th>النسبة</th></tr></thead><tbody>${roster.map((s) => { const total = studentTotal(items, ctx[s.id]); const band = masteryBand(total.pct); return html`<tr><td class="tabular t-3">${(s.displayNo ?? s.rollNo) ?? ''}</td><th class="gtable__sticky"><a href="#/student/${s.id}">${s.name}</a></th>${items.map((i) => { const value = itemScore(i, ctx[s.id]); return html`<td class="tabular ${value === null ? 't-3' : ''}">${value === null ? '—' : fmtNum(value)}</td>`; })}<td class="tabular fw-7">${fmtNum(total.earned)}</td><td><span class="badge ${band.badge} tabular">${fmtPct(total.pct)}</span></td></tr>`; })}</tbody></table></div>`;
+  const table = gradesTable(roster, items, ctx);
+  // Keep the screen/CSV's full scope; paper can split columns without shrinking
+  // Arabic headings or losing selected items. Totals always use all items.
+  const columnsPerPage = 5;
+  if (items.length <= columnsPerPage) return table;
+  const chunks = Array.from({ length: Math.ceil(items.length / columnsPerPage) },
+    (_, index) => items.slice(index * columnsPerPage, (index + 1) * columnsPerPage));
+  return html`<div class="grades-report-screen noprint">${table}</div>
+    <div class="grades-report-print print-only">${chunks.map((chunk, index) => html`
+      <div class="report-chunk ${index < chunks.length - 1 ? 'print-page-break' : ''}">
+        ${gradesTable(roster, chunk, ctx, items)}
+      </div>`)}
+    </div>`;
+}
+
+function gradesTable(roster, items, ctx, allItems = items) {
+  const totalMax = allItems.reduce((n, i) => n + i.max, 0);
+  return html`<div class="tablewrap scroll-x print-tablewrap"><table class="gtable gtable--report"><thead><tr><th>#</th><th class="gtable__sticky">الطالب</th>${items.map((i) => html`<th>${i.name}<span class="gtable__max tabular">${i.max}</span></th>`)}<th>المجموع<span class="gtable__max tabular">${totalMax}</span></th><th>النسبة</th></tr></thead><tbody>${roster.map((s) => { const total = studentTotal(allItems, ctx[s.id]); const band = masteryBand(total.pct); return html`<tr><td class="tabular t-3">${(s.displayNo ?? s.rollNo) ?? ''}</td><th class="gtable__sticky"><a href="#/student/${s.id}">${s.name}</a></th>${items.map((i) => { const value = itemScore(i, ctx[s.id]); return html`<td class="tabular ${value === null ? 't-3' : ''}">${value === null ? '—' : fmtNum(value)}</td>`; })}<td class="tabular fw-7">${fmtNum(total.earned)}</td><td><span class="badge ${band.badge} tabular">${fmtPct(total.pct)}</span></td></tr>`; })}</tbody></table></div>`;
 }
 
 function attendanceReport(cls, report) {

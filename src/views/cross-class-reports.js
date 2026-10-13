@@ -3,7 +3,7 @@ import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel, normalizeSearchText } from '../models.js';
 import { supportRows } from './reports.js';
-import { reportHeader, reportFooter, reportPageSetup, reportSignatures, demoOutputMarker } from '../lib/report-print.js';
+import { reportHeader, reportWithClosing, reportPageSetup, demoOutputMarker } from '../lib/report-print.js';
 import { markDemoExportRows } from '../lib/report-print.js';
 import { downloadCSV, safeReportCSVText } from '../lib/export.js';
 
@@ -66,8 +66,8 @@ export default {
         <label class="field n70-search"><span class="field__label">بحث عن طالب</span><input class="input" type="search" data-input="n70-search" data-fk="n70-search" value="${query}" placeholder="اسم الطالب" aria-label="بحث عن طالب"></label><button class="btn btn--ghost n70-reset" data-act="n70-reset">مسح التصفية</button>
       </section>
       <section class="report-results"><div class="section__head noprint"><h3 class="section__title">${followup()?'قائمة المتابعة':'كشف الدرجات'}</h3><span class="t-3 fs-sm tabular" data-n70-count>${rows.length} نتيجة</span></div>
-        ${rows.length ? html`<table class="n70-report-table"><thead><tr><th>الطالب</th><th>الفصل</th><th>المادة</th><th>الدرجة المرصودة</th><th>${followup()?'سبب المتابعة':'حالة الرصد'}</th></tr></thead><tbody>${rows.map(row => html`<tr class="n70-record" data-teaching="${row.teaching.id}"><td class="n70-person"><a href="#/student/${row.s.id}">${row.s.name}</a></td><td class="n70-class"><a href="#/teaching/${row.teaching.id}/reports">${row.section}</a></td><td class="n70-subject">${row.subject}</td><td class="n70-score"><strong class="tabular">${fmtPct(row.total.pct)}</strong><small class="tabular">${fmtNum(row.total.earned)} / ${fmtNum(row.total.outOfGraded)}</small></td><td class="n70-reason">${followup()?row.reasons.join(' · '):row.total.missing ? `${row.total.missing} بنود غير مرصودة` : 'الرصد مكتمل'}</td></tr>`)}</tbody></table>` : html`<div class="empty empty--compact"><div class="empty__title">لا نتائج مطابقة</div><div class="empty__text">غيّر عوامل التصفية أو البحث لعرض نتائج أخرى.</div></div>`}
-      </section>${reportSignatures({profile:store.state.profile})}${reportFooter()}
+        ${reportWithClosing(rows.length ? html`<table class="n70-report-table"><thead><tr><th>الطالب</th><th>الفصل</th><th>المادة</th><th>الدرجة المرصودة</th><th>${followup()?'سبب المتابعة':'حالة الرصد'}</th></tr></thead><tbody>${rows.map(row => html`<tr class="n70-record" data-teaching="${row.teaching.id}"><td class="n70-person"><a href="#/student/${row.s.id}">${row.s.name}</a></td><td class="n70-class"><a href="#/teaching/${row.teaching.id}/reports">${row.section}</a></td><td class="n70-subject">${row.subject}</td><td class="n70-score"><strong class="tabular">${fmtPct(row.total.pct)}</strong><small class="tabular">${fmtNum(row.total.earned)} / ${fmtNum(row.total.outOfGraded)}</small></td><td class="n70-reason">${followup()?row.reasons.join(' · '):row.total.missing ? `${row.total.missing} بنود غير مرصودة` : 'الرصد مكتمل'}</td></tr>`)}</tbody></table>` : html`<div class="empty empty--compact"><div class="empty__title">لا نتائج مطابقة</div><div class="empty__text">غيّر عوامل التصفية أو البحث لعرض نتائج أخرى.</div></div>`, {profile:store.state.profile})}
+      </section>
     </article>`;
   },
   actions: {
