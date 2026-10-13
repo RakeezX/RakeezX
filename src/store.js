@@ -4000,7 +4000,9 @@ async function requireDistributionAccount() {
       cloud.user?.id !== activeWorkspace.authUserId || !cloud.session || globalThis.navigator?.onLine === false) {
     throw new Error('اتصل بالإنترنت وسجّل الدخول لمراجعة توزيع الفصول.');
   }
-  const ownership = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: cloud.user.id });
+  // Eligibility reads have no command. The Sync engine separately validates
+  // dispatch against the exact owner-bound durable command before transport.
+  const ownership = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: cloud.user.id });
   if (!ownership.allowed) throw new Error('تعذّر التحقق من ملكية مساحة العمل.');
   const capability = await cloud.getScoreDistributionCapability();
   if (capability?.distributionApplyVersion !== 2 || capability?.protocol !== 'N73_D119_V2') {
