@@ -17,3 +17,19 @@ Store inspected read-only: this revision has `store.students(teachingId)`/`secti
 - Syntax checks for all five affected source files and `git diff --check`: PASS.
 
 Browser lease acquired for the HTTP application check and released after Playwright closed its browser context/server. No push, deployment, queue/status mutation, real account access, or external messages performed. Controller/publisher owns integration and served Production evidence.
+
+
+## Resumed attempt: 75f02b4b-6e0d-4130-a81a-75dc01f22497
+
+The saved candidate 4e3b80c22016a676452f734f555e0dfacda4111c and all Product source changes were preserved. The prior validator rejected its recorded failed check. The original failure above remains historical FAIL; it is not relabelled as PASS.
+
+Concrete diagnosis in a temporary N98-scoped fixture found the sole remaining outbox envelope was profile bootstrap, rejected with `Field is not allowed for this sync entity: education_department` (SQLSTATE 22023), before transfer was exercised. The legacy lifecycle helper omits the already-shipped `20261003000000_n03_education_department.sql` migration.
+
+Correction: `tests/n98-transfer-sync.test.mjs` reuses the existing lifecycle helper and retains all assertions from `student-transfer-roll-safety.test.mjs`. In its disposable PGlite database only, it additionally loads that existing immutable migration, verifies the profile field map, and verifies N98 projection leaves student/enrollment/grade/attendance/outbox tables unchanged. It does not change the legacy test, migration files, Product code, Auth, RLS, or any live service. No assertion was weakened, rejected envelope discarded, or failed result overwritten.
+
+- Corrected scoped transfer/Sync check: 4/4 PASS, including empty outbox after both full Sync calls, two atomic transfer receipts/operations, no generic enrollment upserts, sequential rosters and stable student-linked history.
+- Combined current checks: `node --test tests/n98-default-order.test.mjs tests/n98-transfer-sync.test.mjs tests/session-roster-snapshot.test.mjs tests/closed-term-report.test.mjs`: 14/14 PASS.
+- Rendered-UI evidence from the original attempt is reused: the five Product source files, UI test, application dependencies and synthetic inputs are unchanged. No repeat browser/server phase was needed and no new lease/process was acquired.
+- New test syntax and `git diff --check`: PASS.
+
+The legacy test itself still has its omitted-migration fixture; this attempt does not claim it passed. The corrected N98 fixture now exercises its same safeguards successfully under the shipped profile protocol. Both candidate commits are preserved. No push, deployment, or queue/status edit performed.
