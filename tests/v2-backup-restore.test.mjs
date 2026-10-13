@@ -1,3 +1,4 @@
+import { n77Account } from './n77-fixture.mjs';
 import 'fake-indexeddb/auto';
 import test, { after, afterEach, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -19,20 +20,13 @@ import {
 } from '../src/lib/backup-v2.js';
 import { SYNC_V2_SCHEMAS, SYNC_V2_STORES } from '../src/lib/sync-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
-import { runtimeOfflineLease } from '../src/lib/offline-lease.js';
-
-// N49 is now part of the current baseline. These disposable local fixtures
-// need normal owner-bound lease evidence; keep the Product write guard enabled.
-const leaseStorage = new Map();
-globalThis.localStorage = {
-  get length() { return leaseStorage.size; },
-  key: index => [...leaseStorage.keys()][index] ?? null,
-  getItem: key => leaseStorage.get(key) ?? null,
-  setItem: (key, value) => leaseStorage.set(key, String(value)),
-  removeItem: key => leaseStorage.delete(key),
-};
+import { seedBackupRows } from './n77-fixture.mjs';
 
 const OWNER = '11111111-1111-4111-8111-111111111111';
+const ownerVerifier = async () => OWNER;
+const historyFetcher = async () => ({ ownerId: OWNER, revision: '0' });
+const testReconciler = (payload, canonicalRows, options) =>
+  reconcileCanonicalRestore(payload, canonicalRows, { ...options, verifyOwner: ownerVerifier });
 const emptyServer = () => Object.fromEntries(SYNC_V2_STORES.map((name) => [name, []]));
 const canonicalPayload = (overrides = {}) => Object.fromEntries(SYNC_V2_STORES.map((name) => [
   SYNC_V2_SCHEMAS[name].entity, overrides[name] ?? [],
@@ -50,15 +44,10 @@ async function rehash(payload) {
 beforeEach(async () => {
   cloud.setMockBackend(null);
   cloud.setMockAuth({ id: OWNER }, { access_token: 'test', user: { id: OWNER } });
-  localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify(cloud.session));
   db.closeDB();
-  await activateSyntheticAccountWorkspace({ ownerId: OWNER });
+  await n77Account(OWNER);
   await db.clearAll();
   await store.init();
-  store.getOfflineLeaseStatus();
-  await runtimeOfflineLease().renew(async () => ({
-    id: OWNER, source: 'supabase-auth-user', verifiedAt: Date.now(),
-  }));
 });
 
 afterEach(async () => {
@@ -82,11 +71,11 @@ test('V5 export is hash-bound with canonical baseline while V3 remains locally r
   const legacy = { app: 'rakeezx', version: 3, exportedAt: new Date().toISOString(),
     data: { students: [{ id: 'legacy:a', name: 'قديم', updatedAt: 1, deleted: false }] } };
   assert.equal(validateBackup(legacy).ok, true);
-  await restoreBackup(legacy, 'replace');
-  assert.equal((await db.get('students', 'legacy:a')).name, 'قديم');
+  await assert.rejects(restoreBackup(legacy, 'replace'), (error) => error.code === 'LOCAL_RESTORE_DISABLED');
+  assert.equal(await db.get('students', 'legacy:a'), undefined);
 });
 
-test('N58 V4/V5 local roundtrips preserve selection/scopes/context; omission differs from explicit removal', async () => {
+test('N58 V4/V5 export and scoped persistence preserve context without enabling legacy local Restore', async () => {
   const context={yearId:'n58-year',termId:'n58-term',presetId:'sa-general-1448-1449',kind:'study',source:'preset'};
   const rows={
     years:[canonical({id:'n58-year',label:'Synthetic',hijriStart:1448,hijriEnd:1449,calendarPresetId:'sa-general-1448-1449',updatedAt:10})],
@@ -99,7 +88,8 @@ test('N58 V4/V5 local roundtrips preserve selection/scopes/context; omission dif
   for(const version of [4,5]) {
     const backup=structuredClone(full);backup.version=version;await rehash(backup);
     // Actual disposable fresh local database, not just a decoder comparison.
-    await db.clearAll();await restoreBackup(backup,'replace');
+    await db.clearAll();await seedBackupRows(backup);
+    await assert.rejects(restoreBackup(backup,'replace'), e => e.code === 'LOCAL_RESTORE_DISABLED');
     for(const [name,records] of Object.entries(rows)) {
       const restored=await db.get(name,records[0].id);
       for(const field of ['calendarPresetId','presetId','termDateOverrides','calendarContext'])
@@ -112,7 +102,7 @@ test('N58 V4/V5 local roundtrips preserve selection/scopes/context; omission dif
     }
     await rehash(omitted);
     for(const mode of ['merge','replace']) {
-      await restoreBackup(omitted,mode);
+      await db.writeAll(omitted.data,mode,{keep:['device','meta','outbox'],preserveOmittedFields:{years:['calendarPresetId'],calendars:['presetId','termDateOverrides'],sessions:['calendarContext']}});
       assert.equal((await db.get('years','n58-year')).calendarPresetId,rows.years[0].calendarPresetId);
       assert.deepEqual((await db.get('calendars','n58-cal')).termDateOverrides,rows.calendars[0].termDateOverrides);
       assert.deepEqual((await db.get('sessions','n58-session')).calendarContext,context);
@@ -121,7 +111,7 @@ test('N58 V4/V5 local roundtrips preserve selection/scopes/context; omission dif
     Object.assign(explicit.data.years.find(r=>r.id==='n58-year'),{calendarPresetId:null,updatedAt:30});
     Object.assign(explicit.data.calendars.find(r=>r.id==='n58-cal'),{termDateOverrides:{},updatedAt:30});
     Object.assign(explicit.data.sessions.find(r=>r.id==='n58-session'),{calendarContext:null,updatedAt:30});
-    await rehash(explicit);await restoreBackup(explicit,'merge');
+    await rehash(explicit);await db.writeAll(explicit.data,'merge',{preserveOmittedFields:{years:['calendarPresetId'],calendars:['presetId','termDateOverrides'],sessions:['calendarContext']}});
     assert.equal((await db.get('years','n58-year')).calendarPresetId,null);
     assert.deepEqual((await db.get('calendars','n58-cal')).termDateOverrides,{});
     assert.equal((await db.get('sessions','n58-session')).calendarContext,null);
@@ -174,8 +164,8 @@ test('V5 backup survives disposable wipe/replace with mixed direct and SUBITEM p
   assert.equal(backup.data.scoreSubitems.length, 2);
   await db.clearAll();
   await assert.rejects(restoreBackup(backup, 'merge'),
-    (error) => error.code === 'SUBITEM_BACKUP_MERGE_UNSUPPORTED');
-  await restoreBackup(backup, 'replace');
+    (error) => error.code === 'LOCAL_RESTORE_DISABLED');
+  await seedBackupRows(backup);
   for (const [storeName, records] of Object.entries(rows)) {
     assert.deepEqual((await db.getAll(storeName)).sort((a, b) => a.id.localeCompare(b.id)),
       records.sort((a, b) => a.id.localeCompare(b.id)));
@@ -205,13 +195,15 @@ for (const mode of ['direct', 'subitems']) {
     const backup = await buildBackup({ sourceOwnerId: OWNER, backupId: `backup:v5:${mode}` });
     assert.equal((await validateBackupIntegrity(backup)).ok, true);
     await db.clearAll();
-    await restoreBackup(backup, 'replace');
+    await seedBackupRows(backup);
     for (const [name, records] of Object.entries(rows)) assert.deepEqual(await db.getAll(name), records);
     assert.equal((await db.get('scores', 'single:score')).value, mode === 'direct' ? 0 : 3);
   });
 }
 
 test('V5 cloud restore selects versioned RPCs and reconciles complete canonical provenance', async () => {
+  await db.put('sections', { id: 'v5:section', grade: 1, label: 'A' });
+  await db.put('teachings', { id: 'v5:teaching', sectionId: 'v5:section' });
   await db.put('students', { id: 'v5:student', name: 'synthetic' });
   await db.put('items', { id: 'v5:item', teachingId: 'v5:teaching', name: 'assessment',
     max: 10, scoreMode: 'subitems', distributionMode: 'manual', distributionVersion: 1 });
@@ -225,6 +217,8 @@ test('V5 cloud restore selects versioned RPCs and reconciles complete canonical 
   let stageCalls = 0;
   let finalizeCalls = 0;
   const canonicalRows = canonicalPayload({
+    sections: [{ id: 'v5:section', grade: 1, label: 'A', revision: 1, deleted_at: null }],
+    teachings: [{ id: 'v5:teaching', section_id: 'v5:section', revision: 1, deleted_at: null }],
     students: [{ id: 'v5:student', name: 'synthetic', revision: 1, deleted_at: null }],
     items: [{ id: 'v5:item', teaching_id: 'v5:teaching', name: 'assessment', max: 10,
       score_mode: 'subitems', distribution_mode: 'manual', distribution_version: 1,
@@ -243,16 +237,19 @@ test('V5 cloud restore selects versioned RPCs and reconciles complete canonical 
       const entities = envelope.operations.map((row) => row.entity);
       assert.ok(entities.indexOf('items') < entities.indexOf('score_subitems'));
       assert.ok(entities.indexOf('score_subitems') < entities.indexOf('score_subitem_completions'));
-      return { backupHash: envelope.backupHash, stageHash: 'stage:v5' };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash, stageHash: 'stage:v5' };
     },
-    async finalizeScoreRestoreV2() {
+    async finalizeScoreRestoreV2(envelope) {
       finalizeCalls++;
-      return { receipt: { status: 'finalized' }, canonical: canonicalRows };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash,
+        stageHash: envelope.expectedStageHash,
+        receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: canonicalRows };
     },
   };
   const coordinator = { async assertCloudRestoreReady() {},
     async runCloudRestoreExclusive(action) { return action(); } };
-  await restoreBackupToCloud(backup, { transport, coordinator, sourceFetcher: async () => emptyServer() });
+  await restoreBackupToCloud(backup, { transport, coordinator, sourceFetcher: async () => emptyServer(),
+    canonicalFetcher: async () => canonicalRows, ownerVerifier, historyFetcher, reconciler: testReconciler });
   assert.equal(stageCalls, 1);
   assert.equal(finalizeCalls, 1);
   assert.equal((await db.get('scores', 'v5:score')).value, 8);
@@ -266,11 +263,11 @@ test('V5 empty-owner recovery retains tombstones but rejects another owner', () 
       serverRevision: 4, updatedAt: 1 }] },
     baselines: { students: [{ id: 'v5:deleted-student', value: { id: 'v5:deleted-student' },
       revision: 4 }] } };
-  const plan = planCloudRestore(payload, emptyServer(), { ownerId: OWNER });
+  const plan = planCloudRestore(payload, emptyServer(), { ownerId: OWNER, ownerHistoryRevision: '0' });
   assert.equal(plan.ready, true);
   assert.equal(plan.operations[0].operation, 'create_deleted');
   const wrongOwner = planCloudRestore(payload, emptyServer(), {
-    ownerId: '22222222-2222-4222-8222-222222222222' });
+    ownerId: '22222222-2222-4222-8222-222222222222', ownerHistoryRevision: '0' });
   assert.equal(wrongOwner.ready, false);
   assert.equal(wrongOwner.entries[0].reason, 'v5-owner-mismatch');
 });
@@ -309,7 +306,7 @@ test('same-field conflict and server tombstone are never silently applied', asyn
 
 test('legacy cloud restore is safe only for a provably empty owner', () => {
   const legacy = { app: 'rakeezx', version: 3, data: { students: [{ id: 'legacy:a', name: 'قديم', deleted: false }] } };
-  assert.equal(planCloudRestore(legacy, emptyServer(), { ownerId: OWNER }).ready, true);
+  assert.equal(planCloudRestore(legacy, emptyServer(), { ownerId: OWNER, ownerHistoryRevision: '0' }).ready, true);
   const occupied = emptyServer();
   occupied.students = [{ id: 'server:a', name: 'حالي', deleted: false, serverRevision: 1 }];
   const unsafe = planCloudRestore(legacy, occupied, { ownerId: OWNER });
@@ -323,10 +320,12 @@ test('cloud restore stages/finalizes once and reconciles only the returned canon
     baselines: { students: [{ id: 'student:new', revision: 0, value: null }] } });
   const calls = [];
   const transport = {
-    async stageSyncV2Restore(envelope) { calls.push(['stage', envelope]); return { backupHash: envelope.backupHash, stageHash: 'stage-hash' }; },
+    async stageSyncV2Restore(envelope) { calls.push(['stage', envelope]); return { restoreId: envelope.restoreId, backupHash: envelope.backupHash, stageHash: 'stage-hash' }; },
     async finalizeSyncV2Restore(envelope) {
       calls.push(['finalize', envelope]);
-      return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: { students: [] } };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash,
+        stageHash: envelope.expectedStageHash,
+        receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical: { students: [] } };
     },
   };
   let exclusive = false;
@@ -337,6 +336,7 @@ test('cloud restore stages/finalizes once and reconciles only the returned canon
   let reconciled = false;
   const result = await restoreBackupToCloud(backup, {
     restoreId: 'restore:a', transport, coordinator, sourceFetcher: async () => emptyServer(),
+    canonicalFetcher: async () => ({ students: [] }), ownerVerifier, historyFetcher,
     reconciler: async () => { assert.equal(exclusive, true); reconciled = true; },
   });
   assert.equal(result.receipt.status, 'finalized');
@@ -385,7 +385,7 @@ test('canonical reconciliation is atomic and quarantines late outbox work so it 
   await db.put('students', { id: 'old', name: 'قديم' });
   await db.put('device', { id: 'device', theme: 'light' });
   await db.put('outbox', { id: 'pending', protocol: 'v2', state: 'pending' });
-  await reconcileCanonicalRestore(payload, canonicalPayload({ students: [{ id: 'new', name: 'جديد', note: '', status: 'active', revision: 1, field_revisions: {}, deleted_at: null }] }), { restoreId: 'restore:late' });
+  await testReconciler(payload, canonicalPayload({ students: [{ id: 'new', name: 'جديد', note: '', status: 'active', revision: 1, field_revisions: {}, deleted_at: null }] }), { restoreId: 'restore:late' });
   assert.equal(await db.get('students', 'old'), undefined);
   assert.equal((await db.get('students', 'new')).name, 'جديد');
   assert.equal((await db.get('units', 'unit:a')).name, 'محلي');
@@ -413,13 +413,15 @@ test('a finalized restore resumes local reconciliation with the same identity an
   const transport = {
     async stageSyncV2Restore(envelope) {
       stageCalls++;
-      return { backupHash: envelope.backupHash, stageHash: 'resume-stage-hash' };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash, stageHash: 'resume-stage-hash' };
     },
     async finalizeSyncV2Restore(envelope) {
       finalizeCalls++;
       assert.equal(envelope.restoreId, 'restore:resume');
       if (!finalized) { finalized = true; serverMutations++; }
-      return { receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash,
+        stageHash: envelope.expectedStageHash,
+        receipt: { restoreId: envelope.restoreId, status: 'finalized' }, canonical };
     },
   };
   const coordinator = {
@@ -429,6 +431,7 @@ test('a finalized restore resumes local reconciliation with the same identity an
 
   await assert.rejects(restoreBackupToCloud(backup, {
     restoreId: 'restore:resume', transport, coordinator, sourceFetcher: async () => emptyServer(),
+    canonicalFetcher: async () => canonical, ownerVerifier, historyFetcher,
     reconciler: async () => { throw new Error('TEST local quota failure'); },
   }), (error) => error.code === 'LOCAL_RECONCILIATION_REQUIRED' && error.restore.restoreId === 'restore:resume');
 
@@ -444,7 +447,7 @@ test('a finalized restore resumes local reconciliation with the same identity an
   }), (error) => error.code === 'CLOUD_RESTORE_RESUME_REQUIRED');
 
   const resumed = await resumeCloudRestore({
-    transport, coordinator, canonicalFetcher: async () => canonical,
+    transport, coordinator, canonicalFetcher: async () => canonical, ownerVerifier, reconciler: testReconciler,
   });
   assert.equal(resumed.restoreId, 'restore:resume');
   assert.equal(resumed.resumed, true);
@@ -453,5 +456,43 @@ test('a finalized restore resumes local reconciliation with the same identity an
   assert.equal(serverMutations, 1);
   assert.equal((await db.get('students', 'student:resume')).name, 'مستعاد');
   assert.equal((await db.get('units', 'unit:resume')).name, 'وحدة محلية');
+  assert.equal(await getCloudRestoreResumeState(), null);
+});
+
+test('missing finalize receipt leaves Product unchanged and exact retry reconciles once', async () => {
+  const backup = await rehash({ app: 'rakeezx', version: 4, backupId: 'receipt-missing',
+    sourceOwnerId: OWNER, exportedAt: 'x',
+    data: { students: [{ id: 'student:receipt', name: 'recovered', deleted: false }] },
+    baselines: { students: [{ id: 'student:receipt', revision: 0, value: null }] } });
+  let finalizations = 0;
+  const transport = {
+    async stageSyncV2Restore(envelope) { return { restoreId: envelope.restoreId,
+      backupHash: envelope.backupHash, stageHash: 'receipt-stage' }; },
+    async finalizeSyncV2Restore(envelope) {
+      finalizations++;
+      if (finalizations === 1) return { restoreId: envelope.restoreId,
+        backupHash: envelope.backupHash, stageHash: envelope.expectedStageHash,
+        receipt: null, canonical: canonicalPayload() };
+      return { restoreId: envelope.restoreId, backupHash: envelope.backupHash,
+        stageHash: envelope.expectedStageHash,
+        receipt: { restoreId: envelope.restoreId, status: 'finalized' },
+        canonical: canonicalPayload({ students: [{ id: 'student:receipt', name: 'recovered',
+          revision: 1, deleted_at: null }] }) };
+    },
+  };
+  const coordinator = { async assertCloudRestoreReady() {},
+    async runCloudRestoreExclusive(action) { return action(); } };
+  await assert.rejects(restoreBackupToCloud(backup, { restoreId: 'restore:receipt', transport,
+    coordinator, sourceFetcher: async () => emptyServer(), ownerVerifier, historyFetcher,
+    canonicalFetcher: async () => canonicalPayload(),
+    reconciler: testReconciler }), (error) => error.code === 'LOCAL_RECONCILIATION_REQUIRED' &&
+      error.cause?.code === 'RESTORE_RECEIPT_INVALID');
+  assert.equal(await db.get('students', 'student:receipt'), undefined);
+  assert.equal((await getCloudRestoreResumeState()).state, 'staged');
+  await resumeCloudRestore({ transport, coordinator, ownerVerifier,
+    canonicalFetcher: async () => canonicalPayload({ students: [{ id: 'student:receipt',
+      name: 'recovered', revision: 1, deleted_at: null }] }), reconciler: testReconciler });
+  assert.equal((await db.get('students', 'student:receipt')).name, 'recovered');
+  assert.equal(finalizations, 2);
   assert.equal(await getCloudRestoreResumeState(), null);
 });

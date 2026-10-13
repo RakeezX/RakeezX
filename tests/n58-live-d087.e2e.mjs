@@ -11,7 +11,7 @@ import { randomUUID, randomBytes, createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
-export const TASK_RUN = '0338c38c-c28e-41c3-b807-75ea70b28291';
+export const TASK_RUN = 'c8d6edca-98b5-496d-aaf8-d15d40addc0f';
 export const CANONICAL = 'C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/capabilities/d087';
 export const PROJECT = 'xlrubcwjqktzzunrvuns';
 const REPO = 'C:/Users/Abody/Projects/RakeezX';
@@ -20,6 +20,12 @@ const exec = promisify(execFile);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const fail = code => Object.assign(new Error(code), { safeCode: code });
 const safeCode = error => /^[A-Z][A-Z0-9_]{2,80}$/.test(error?.safeCode ?? '') ? error.safeCode : 'LIVE_GATE_FAILED';
+// Windows PowerShell 5 cannot load Security from inherited PowerShell 7 modules.
+// Confine this ordinary module resolution repair to this Node process and children.
+if (process.platform === 'win32') process.env.PSModulePath = [
+  path.join(process.env.WINDIR, 'System32/WindowsPowerShell/v1.0/Modules'),
+  path.join(process.env.ProgramFiles, 'WindowsPowerShell/Modules'),
+].join(';');
 const loadModule = name => import(pathToFileURL(path.join(CANONICAL, name)).href);
 const json = async file => JSON.parse(await fs.readFile(file, 'utf8'));
 const git = async (...args) => (await exec('git', ['-C', ROOT, ...args], { windowsHide: true })).stdout.trim();

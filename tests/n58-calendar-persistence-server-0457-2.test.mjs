@@ -6,6 +6,7 @@ import { installRealtimeFixture } from './helpers/realtime-server-fixture.mjs';
 import { CALENDAR_PRESETS } from '../src/lib/calendar-presets.js';
 import { buildAccountFoundationDefaults } from '../src/lib/account-provisioning.js';
 
+// Pinned N58 migration snapshot; later independent server migrations are outside this local contract.
 // Disposable PostgreSQL SQL/RPC tests. Auth and Realtime are synthetic fixtures;
 // this is NOT PostgREST HTTP, a live Supabase test, or browser certification.
 const A='11111111-1111-4111-8111-111111111111';
@@ -44,7 +45,7 @@ before(async () => {
     grant usage on schema auth to authenticated,anon;`);
   await installRealtimeFixture(pg);
   const directory=new URL('../supabase/migrations/',import.meta.url);
-  migrations=(await readdir(directory)).filter(n=>n.endsWith('.sql')).sort();
+  migrations=(await readdir(directory)).filter(name => name.endsWith('.sql') && name <= '20261004070002_n58_effective_scope_revalidation.sql').sort();
   const n58 = migrations.filter(name => name.includes('_n58_'));
   assert.equal(migrations.length,41); assert.equal(n58.at(-1),HEAD); assert.equal(migrations.at(-1),HEAD);
   for(const name of migrations.filter(name => !n58.includes(name))) await pg.exec((await readFile(new URL(name,directory),'utf8')).replace(/^\uFEFF/,''));

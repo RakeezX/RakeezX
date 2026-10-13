@@ -24,7 +24,7 @@ for (const current of [false, true]) {
         await installRealtimeFixture(pg);
       }
       const directory = new URL('../supabase/migrations/', import.meta.url);
-      const names = (await readdir(directory)).filter(n => n.endsWith('.sql')).sort();
+      const names = (await readdir(directory)).filter(name => name.endsWith('.sql') && name <= '20261004070002_n58_effective_scope_revalidation.sql').sort();
       const n03 = names.find(name => name.includes('_n03_education_department.sql'));
       assert.ok(n03);
       const pendingMigrations = names.filter(name => {

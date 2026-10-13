@@ -7,8 +7,8 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 12592,
-      "sha256": "ce44eea32bffdb10c495e053318f0d81cc2b0dac112c18311c05ce4dfc9487e1"
+      "bytes": 16005,
+      "sha256": "86eeab8c359c602067735ed69c386931c8bd0d608493d290b4f093716adf58f9"
     },
     {
       "path": "closed-entry.ts",
@@ -105,6 +105,6 @@
     "Copy all listed paths with their relative structure; source/pins/contracts and required evidence are runtime inputs.",
     "No private run manifest or real credential was generated.",
     "The prepared two-endpoint cleanup companion removes the need for an MCP/model redeploy before Auth disposition. Explicit deny-all redeploy is still a separate action with DISARM_PENDING recovery if interrupted.",
-    "Fresh Product integration and deterministic live harness remain assigned work in the separate card; no N58 live success is claimed."
+    "Product reconciliation and deterministic harness are preserved in candidate 4946aac123772a1cf43d01792631743a4fb7413e; exact-session continuation, private prerequisite and live acceptance remain distinct. The 2026-10-12 native private-storage probe passed without changing the helper; no N58 live success is claimed."
   ]
 }

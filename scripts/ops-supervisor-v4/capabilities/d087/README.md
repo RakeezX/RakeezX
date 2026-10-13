@@ -1,6 +1,6 @@
-# D-087 Auth fixture capability — prepared, not activated
+# D-087 Auth fixture capability — installed; N58 live gate pending
 
-This directory contains a narrowly scoped Auth fixture capability for the existing N58 live A/B gate. No functions were deployed, accounts created, Product rows changed, real sessions opened, or live N58 checks executed during preparation.
+This installed directory contains the narrowly scoped capability for the existing N58 live A/B gate. The saved Product attempt completed candidate reconciliation and a deterministic harness but stopped before Auth preparation. No functions or Auth fixtures were created in that attempt; live Product acceptance remains unproved.
 
 The installed module path is:
 
@@ -8,7 +8,15 @@ The installed module path is:
 
 Install the complete manifest-listed directory in Git, including its contract, source pins and required source evidence. The N58 worktree imports this canonical module by absolute path. Do not copy an old application tree into the current worktree or modify canonical runtime/queue files.
 
-## What is established, and what remains work
+## Current recovery point — 2026-10-12 20:50:29 UTC
+
+The existing module passed the native Windows private-storage probe without an ACL code change: moduleResult PASS, nativeResult PASS, FullLanguage, protected ACL, zero other allowed identities, one current-user grant and one SYSTEM grant. The operator removed the owned empty probe repository. The probe made no network/Auth call and wrote no credentials. Its observed private-state.mjs SHA256 was ff8e90682482439f2401d70a64fa0db566cd6d0e498726a583e7376c93296de5. This establishes that the current helper works in the tested operator context; it does not certify the old worker's tempfile context or any live N58 acceptance.
+
+Preserve candidate 4946aac123772a1cf43d01792631743a4fb7413e and Codex session 01a12ff6-5285-71b0-a1c6-9593b6947427 from attempt 0338c38c-c28e-41c3-b807-75ea70b28291. The recorded base was b5e83107222833f5e74530a73355734d8477bd03 and the verified Preview was https://d7c4f16c.rakeezx.pages.dev. Reconcile actual current-main changes and refresh the source/Preview binding when necessary; do not recreate the preserved implementation or replay unchanged tests. The controller owns exact-session continuation.
+
+The repository must install the narrow private ignore rule below. Then check private storage once from the intended worker context before creating credentials. Do not weaken or replace the ACL helper because of the historical generic error. Keep the existing two-account D087 scope, independent cleanup companion, retained fixture closure and explicit disarm requirements.
+
+## Historical preparation facts
 
 The real capability inventory found official Supabase connector tools for SQL, migration and Edge Function operations in the existing signed-in Codex environment. It did not expose a direct Auth-admin tool or a key retrieval tool. This implementation uses the documented server-side Auth SDK inside two purpose-created protected Edge Functions. It never extracts or returns a service key.
 
@@ -16,7 +24,7 @@ Read-only Git comparison at main 8e2d4800396996be43868a71057412afccd2150b showed
 
 The existing n58-client-controls browser file deliberately runs local/Demo scenarios, fixes the clock and asserts that no Supabase/Auth requests occurred. Its selectors are reusable. It is not the required live gate.
 
-The continuation card must first integrate the preserved four-commit N58 delta on fresh main and implement one bounded real A1/A2/B1 browser/client harness. Only after that code, current candidate/schema evidence and an immutable Preview are ready should it prepare and use the two accounts. These are implementation tasks under the existing authority, not a request for another user approval.
+The original preparation assigned fresh integration and a bounded A1/A2/B1 harness to the continuation card. Those implementation steps were saved in the candidate above. Resume that work and finish only the remaining reconciliation/private preparation/live gate. The current candidate/schema binding and immutable Preview must be valid before using the two accounts. Repair of these ordinary preparation prerequisites is within the existing authority.
 
 ## Scope and source binding
 
@@ -61,7 +69,7 @@ The runner checks the actual Git base/tree/harness objects and unchanged critica
 
 The N58 card owns the single harness and all following steps. The operator/worker uses the existing resource lease only during the live/function/browser phase. Neither a new scheduler nor a general privileged user-management interface is needed.
 
-1. Complete fresh main integration and the deterministic harness first. Its finally/recovery path must be ready before provisioning. Preserve an exact candidate and local receipt on every failure.
+1. Resume the preserved candidate and deterministic harness; reconcile only actual intervening main changes. Its finally/recovery path and current source binding must be ready before provisioning. Preserve the exact candidate and local receipt on every failure.
 2. Explicitly run prepare with the canonical repo and candidate-binding path. This allocates the run ID, two Auth IDs, exact Product fixture IDs, passwords and two independent capability values once, and saves them before any request. Nothing is printed except safe paths/IDs/status.
 3. Render both provision and cleanup-only bundles. Deploy both new function names through the existing official connector, with verify_jwt=false only for these self-authenticating handlers. No global Auth configuration or secret extraction occurs.
 4. Read the two deployed source/configuration records. Run protected probe for provision and probe-standby for cleanup-only. Provision refuses to create anything before the cleanup companion has been verified. The standby probe does not end provisioning.
@@ -86,7 +94,7 @@ Private state is restricted to an already-ignored directory:
 
     artifacts/ops-supervisor-v4/capabilities/d087/<run UUID>/private
 
-No ignore rule or allowed directory is added. On Windows the runner creates a protected ACL for the current SID and SYSTEM; on POSIX it requires 0700/0600. The Windows ACL branch is prepared source, not a claim of a live Windows test.
+The repository must explicitly ignore /artifacts/ops-supervisor-v4/capabilities/d087/*/private/ before preparation. This protects state, temporary writes and owned browser/session files inside private while public receipts outside it stay trackable. The runner still rejects tracked, unignored, out-of-scope or linked private paths and does not change ignore rules or allowed directories itself. On Windows it requires a protected current-user/SYSTEM ACL; on POSIX it requires 0700/0600. The native Windows helper passed the probe recorded above without modification. Verify the intended worker context once after the repository prerequisite is installed; do not treat an old generic PRIVATE_ACL_REQUIRED as permanent lack of permission.
 
 The same saved UUIDs and intent survive a lost create response. Only exact Auth 404 plus user_not_found permits creation. Every create and ban is independently reread. Mutations have at most one attempt plus two explicit retries. Sign-in with an uncertain result is not blindly retried. A process crash leaves RUNNING.lock as evidence; remove only that scoped stale lock after proving the recorded process is gone.
 
@@ -100,7 +108,11 @@ Do not remove the private recovery material while disposition or disarm is pendi
 
 ## Validation and limits
 
-The final local check ran both test files: **23 passed, 0 failed, 0 skipped**. Tests cover unauthorized/expired/out-of-scope requests, wrong identity markers, exact create/ban response recovery, token owner verification, separate revocation/denial meaning, private path/lock safety, missing cleanup standby, redacted receipts/bundles, fresh candidate binding and no blind sign-in retry.
+The historical preparation mock run recorded 23 passed, 0 failed and 0 skipped. The saved Product worker later recorded 18 passed and 5 failures at runner.test.mjs:23, the shared private-directory setup under os.tmpdir(). That worker launched Node through WindowsApps pwsh.exe; all failures occurred before the tests' mock Auth operations, in about 0.6–0.73 seconds each. Neither the tests nor the helper set a timeout there. The generic catch suppressed the underlying native error, so the evidence does not establish a timeout or actual policy denial.
+
+The 20:50:29 native probe passed using the approved runtime/probes parent. Check the original private-path test once in the intended worker context. If it fails, compare the actual tempfile parent and child PowerShell environment before choosing a bounded preparation fix. Do not rerun all Product suites, edit the ACL helper speculatively, or call a filesystem preflight live Product PASS.
+
+The source tests cover authorization boundaries, exact create/ban response recovery, owner verification, private path/lock safety, cleanup standby and redacted evidence. The original tests/cloud-recovery-owner-isolation.test.mjs separately lacks the current N49 lease fixture before its final store.save. The N58 card may include that exact test path for the needed fixture repair, retaining owner-mismatch, zero cross-owner transport and owned-outbox assertions. Reuse the existing synthetic lease setup; do not disable the Product lease guard or broaden real-data authority.
 
 The package is pinned to npm:@supabase/supabase-js@2.117.3 and its immutable release/source commit in source-pins.json. No SDK installation, Deno cache, package download, provider compilation or live function invocation occurred here; no deno.lock was invented. Provider bundling and actual runtime configuration are checked before accounts are created. No broad repository test train is requested.
 

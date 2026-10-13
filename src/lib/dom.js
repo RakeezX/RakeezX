@@ -5,6 +5,7 @@
 
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
 import { wireVisibleNumberInputs } from './visible-numerals.js';
+import { syncSheetViewport } from './visible-viewport.js';
 
 /* ---------- الهروب من HTML ---------- */
 const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -245,6 +246,7 @@ export function openSheet({ title, desc, body, foot, onMount }) {
     sheetStack.push(entry);
     (document.getElementById('modal-root') ?? document.body).append(backdrop);
     onMount?.(backdrop, entry.done);
+    syncSheetViewport(backdrop.querySelector('.sheet'));
 
     if (!backdrop.contains(document.activeElement)) {
       (backdrop.querySelector(initialFocusSelector) ?? backdrop.querySelector(focusableSelector) ?? backdrop.querySelector('.sheet'))

@@ -201,7 +201,7 @@ async function confirmAndReconcile(checkpoint) {
       } });
     }
     return reconcile(checkpoint);
-  });
+  }, { ownerId: checkpoint.ownerId, mutationId: checkpoint.envelope.mutationId });
 }
 
 export async function resumeStudentLifecycle() {

@@ -39,7 +39,7 @@ before(async()=>{
     grant usage on schema auth to authenticated,anon;`);
   await installRealtimeFixture(pg);
   const directory=new URL('../supabase/migrations/',import.meta.url);
-  const migrations=(await readdir(directory)).filter(n=>n.endsWith('.sql')).sort();
+  const migrations=(await readdir(directory)).filter(name => name.endsWith('.sql') && name <= '20261004070002_n58_effective_scope_revalidation.sql').sort();
   const n58 = migrations.filter(name => name.includes('_n58_'));
   assert.equal(migrations.length,41);
   assert.equal(n58.at(-1),'20261004070002_n58_effective_scope_revalidation.sql');

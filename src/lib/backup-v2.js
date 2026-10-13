@@ -6,6 +6,8 @@ import * as sync from './sync.js';
 import * as store from '../store.js';
 import { DEVICE_ONLY_STORES, validateBackupIntegrity } from './export.js';
 import { assertScoreSnapshotInvariant } from './initial-restore.js';
+import { deletionScope, visibleClosedTermReport } from './restore-deletion-scope.js';
+import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
 import {
   SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch,
 } from './sync-v2.js';
@@ -59,6 +61,16 @@ function recordMap(records) {
   return new Map((records ?? []).map((row) => [row.id, row]));
 }
 
+// Creation history is restore-only; never expose created_at to generic patch APIs.
+function restorePatch(storeName, record) {
+  const patch = encodeSyncV2Patch(storeName, record);
+  if (storeName === 'scoreSubitems' && record.createdAt !== undefined) {
+    if (!Number.isFinite(record.createdAt) || record.createdAt <= 0) throw new Error('Invalid subitem creation history');
+    patch.created_at = new Date(record.createdAt).toISOString();
+  }
+  return patch;
+}
+
 function planRecord({ storeName, backupRecord, baseline, serverRecord,
   allowAuthoritativeRecreate = false, version = 4 }) {
   const identity = { store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id: backupRecord.id };
@@ -72,7 +84,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
   if (!serverRecord && allowAuthoritativeRecreate) {
     return { ...identity, classification: 'SAFE_APPLY',
       operation: backupRecord.deleted ? 'create_deleted' : 'create', baseRevision: 0,
-      patch: encodeSyncV2Patch(storeName, backupRecord),
+      patch: restorePatch(storeName, backupRecord),
       clientUpdatedAt: backupRecord.updatedAt ?? null };
   }
   if (!baseline?.value) {
@@ -85,7 +97,7 @@ function planRecord({ storeName, backupRecord, baseline, serverRecord,
     if (serverRecord) return { ...identity, classification: 'CONFLICT', reason: 'identity-already-exists' };
     return {
       ...identity, classification: 'SAFE_APPLY', operation: 'create', baseRevision: 0,
-      patch: encodeSyncV2Patch(storeName, backupRecord), clientUpdatedAt: backupRecord.updatedAt ?? null,
+      patch: restorePatch(storeName, backupRecord), clientUpdatedAt: backupRecord.updatedAt ?? null,
     };
   }
   if (!serverRecord) return { ...identity, classification: 'INVALID', reason: 'baseline-row-missing-on-server' };
@@ -138,12 +150,22 @@ export function canonicalRestoreManifest(serverData, { version = 4 } = {}) {
 }
 
 /** Pure, deterministic three-way planner. It never reads or writes storage. */
-export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
+export function planCloudRestore(payload, serverData, { ownerId = null, ownerHistoryRevision = null } = {}) {
   const cloudStores = restoreStores(payload.version);
+  if (cloudStores.some((name) => !Array.isArray(serverData?.[name]) ||
+      new Set(serverData[name].map((row) => row.id)).size !== serverData[name].length)) {
+    throw Object.assign(new Error('Server restore snapshot is incomplete or duplicated'), {
+      code: 'RESTORE_SERVER_SNAPSHOT_INVALID',
+    });
+  }
   const entries = [];
   const legacy = payload.version === 3;
   const ownerHasRows = cloudStores.some((name) => (serverData[name] ?? []).length > 0);
-  if (payload.version === 5 && payload.sourceOwnerId !== ownerId) {
+  const emptyOwnerProven = !ownerHasRows && String(ownerHistoryRevision) === '0';
+  const deletedScope = deletionScope(payload.data, serverData, { trustBackupTombstones: emptyOwnerProven });
+  if (!ownerHasRows && !emptyOwnerProven) {
+    entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'missing-empty-owner-authority' });
+  } else if (payload.version === 5 && payload.sourceOwnerId !== ownerId) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'v5-owner-mismatch' });
   } else if (legacy && ownerHasRows) {
     entries.push({ store: '*', entity: '*', id: '*', classification: 'INVALID', reason: 'legacy-backup-requires-empty-owner' });
@@ -162,11 +184,35 @@ export function planCloudRestore(payload, serverData, { ownerId = null } = {}) {
         const serverRecord = serverRows.get(id);
         if (!backupRecord) {
           entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
-            classification: 'KEEP_SERVER', reason: 'server-only' });
+            classification: storeName !== 'closedTermReports' && !serverRecord.deleted &&
+              deletedScope.isDeleted(storeName, serverRecord) ? 'INVALID' : 'KEEP_SERVER',
+            reason: storeName !== 'closedTermReports' && !serverRecord.deleted &&
+              deletedScope.isDeleted(storeName, serverRecord) ? 'server-live-deleted-descendant' : 'server-only' });
           continue;
         }
+        if (storeName === 'closedTermReports' && serverRecord) {
+          const projected = visibleClosedTermReport(serverRecord, deletedScope);
+          entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
+            classification: equal(backupRecord.payload, serverRecord.payload) ||
+              equal(backupRecord.payload, projected.payload) ? 'KEEP_SERVER' : 'INVALID',
+            reason: 'immutable-server-snapshot' });
+          continue;
+        }
+        if (storeName !== 'closedTermReports') {
+          if (deletedScope.unresolved(storeName, backupRecord)) {
+            entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
+              classification: 'INVALID', reason: 'missing-deletion-ancestry' });
+            continue;
+          }
+          if (deletedScope.isDeleted(storeName, backupRecord)) {
+            entries.push({ store: storeName, entity: SYNC_V2_SCHEMAS[storeName].entity, id,
+              classification: serverRecord && !serverRecord.deleted ? 'INVALID' : 'KEEP_SERVER',
+              reason: serverRecord && !serverRecord.deleted ? 'server-live-deleted-descendant' : 'n77-deleted-scope' });
+            continue;
+          }
+        }
         const planned = planRecord({ storeName, backupRecord, baseline: baselines.get(id), serverRecord,
-          allowAuthoritativeRecreate: payload.version === 5 && !ownerHasRows,
+          allowAuthoritativeRecreate: payload.version === 5 && emptyOwnerProven,
           version: payload.version });
         const item = storeName === 'items' ? backupRecord :
           (storeName === 'scores' ? (payload.data?.items ?? []).find((row) => row.id === backupRecord.itemId) : null);
@@ -224,15 +270,39 @@ export async function fetchCanonicalRestoreSnapshot({ version = 4 } = {}) {
   return Object.fromEntries(pairs);
 }
 
-export async function previewCloudRestore(payload) {
+export async function previewCloudRestore(payload, {
+  ownerVerifier = assertRestoreOwner,
+  historyFetcher = cloud.fetchOwnerSyncMarker,
+  sourceFetcher = fetchCanonicalRestoreSource,
+} = {}) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) return { validation, plan: null };
   if (!cloud.user || !cloud.session) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
-  const serverData = await fetchCanonicalRestoreSource({ version: payload.version });
-  return { validation, plan: planCloudRestore(payload, serverData, { ownerId: cloud.user.id }), serverData };
+  const expectedOwnerId = await ownerVerifier();
+  const marker = await historyFetcher();
+  if (!marker || marker.ownerId !== expectedOwnerId) {
+    throw Object.assign(new Error('Owner history authority unavailable'), { code: 'RESTORE_OWNER_HISTORY_MISSING' });
+  }
+  const serverData = await sourceFetcher({ version: payload.version });
+  return { validation, plan: planCloudRestore(payload, serverData,
+    { ownerId: expectedOwnerId, ownerHistoryRevision: marker.revision }), serverData };
 }
 
-export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null } = {}) {
+async function assertRestoreOwner(expectedOwnerId = cloud.user?.id) {
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace();
+  if (!expectedOwnerId || workspace?.type !== 'account' || !['claimed', 'restoring'].includes(workspace.ownershipState) ||
+      workspace.authUserId !== expectedOwnerId || globalThis.navigator?.onLine === false) {
+    throw Object.assign(new Error('Online claimed owner is required for restore'), { code: 'RESTORE_OWNER_NOT_VALIDATED' });
+  }
+  await cloud.verifyCurrentAuthIdentity(expectedOwnerId);
+  if (cloud.user?.id !== expectedOwnerId || runtimeSyncOwnershipGuard.getWorkspace() !== workspace) {
+    throw Object.assign(new Error('Restore owner changed'), { code: 'RESTORE_OWNER_CHANGED' });
+  }
+  return expectedOwnerId;
+}
+
+export async function reconcileCanonicalRestore(payload, canonicalRows, { restoreId = null,
+  expectedOwnerId = cloud.user?.id, verifyOwner = assertRestoreOwner } = {}) {
   const cloudStores = restoreStores(payload.version);
   if (!canonicalRows || typeof canonicalRows !== 'object' || cloudStores.some((storeName) =>
     !Array.isArray(canonicalRows[SYNC_V2_SCHEMAS[storeName].entity]))) {
@@ -247,9 +317,34 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
     return [storeName, rows];
   }));
   if (payload.version === 5) assertScoreSnapshotInvariant(decoded);
+  await verifyOwner(expectedOwnerId);
+  const localOnly = Object.fromEntries(await Promise.all(LOCAL_ONLY_STORES.map(async (name) =>
+    [name, payload.data?.[name] ?? await db.getAll(name)])));
+  const scopeForDeleted = deletionScope({ ...decoded, ...localOnly }, decoded);
+  for (const name of cloudStores) {
+    if (name === 'closedTermReports') continue;
+    if (decoded[name].some((row) => !row.deleted && scopeForDeleted.isDeleted(name, row))) {
+      throw Object.assign(new Error('Canonical restore contains a live deleted-scope descendant'), {
+        code: 'RESTORE_CANONICAL_DELETED_DESCENDANT',
+      });
+    }
+  }
+  for (const name of LOCAL_ONLY_STORES) {
+    if (localOnly[name].some((row) => scopeForDeleted.unresolved(name, row))) {
+      throw Object.assign(new Error('Local restore data has unresolved deletion ancestry'), {
+        code: 'RESTORE_DELETION_AUTHORITY_MISSING',
+      });
+    }
+  }
   const scope = Object.fromEntries([...cloudStores, ...LOCAL_ONLY_STORES, 'device', 'outbox'].map((name) => [name, {}]));
   await db.applyBatch(scope, {
     prepare(current) {
+      if (LOCAL_ONLY_STORES.some((name) => !Array.isArray(payload.data?.[name]) &&
+          !equal(current[name], localOnly[name]))) {
+        throw Object.assign(new Error('Local restore data changed during validation'), {
+          code: 'RESTORE_LOCAL_ONLY_CHANGED',
+        });
+      }
       return Object.fromEntries(Object.keys(scope).map((name) => {
         if (name === 'outbox') return [name, { remove: current.outbox.map((row) => row.id), put: [] }];
         if (name === 'device') {
@@ -261,7 +356,8 @@ export async function reconcileCanonicalRestore(payload, canonicalRows, { restor
             { restoreId, capturedAt: Date.now(), entries: clone(current.outbox) },
           ] }] }];
         }
-        const next = cloudStores.includes(name) ? decoded[name] : (payload.data?.[name] ?? current[name]);
+        const next = cloudStores.includes(name) ? decoded[name] :
+          (payload.data?.[name] ?? current[name]).filter((row) => !scopeForDeleted.isDeleted(name, row));
         return [name, { remove: current[name].map((row) => row.id), put: next }];
       }));
     },
@@ -345,7 +441,7 @@ async function clearResumeCheckpoint(checkpoint) {
 }
 
 function reconciliationRequired(error, checkpoint) {
-  return Object.assign(new Error('Cloud restore finalized; local reconciliation must be resumed'), {
+  return Object.assign(new Error('Cloud restore must be resumed before local reconciliation'), {
     code: 'LOCAL_RECONCILIATION_REQUIRED',
     cause: error,
     restore: {
@@ -354,6 +450,16 @@ function reconciliationRequired(error, checkpoint) {
       stageHash: checkpoint.stageHash,
     },
   });
+}
+
+function assertRestoreReceipt(result, checkpoint) {
+  if (result?.restoreId !== checkpoint.restoreId || result.backupHash !== checkpoint.backupHash ||
+      result.stageHash !== checkpoint.stageHash || result.receipt?.restoreId !== checkpoint.restoreId ||
+      result.receipt.status !== 'finalized') {
+    throw Object.assign(new Error('Restore finalization receipt is missing or mismatched'), {
+      code: 'RESTORE_RECEIPT_INVALID',
+    });
+  }
 }
 
 /**
@@ -365,30 +471,34 @@ export async function resumeCloudRestore({
   coordinator = sync,
   canonicalFetcher = fetchCanonicalRestoreSnapshot,
   reconciler = reconcileCanonicalRestore,
+  ownerVerifier = assertRestoreOwner,
 } = {}) {
   const checkpoint = await resumeCheckpoint();
   if (!checkpoint) throw Object.assign(new Error('No cloud restore is waiting to resume'), { code: 'NO_RESTORE_TO_RESUME' });
   await coordinator.assertCloudRestoreReady();
+  const expectedOwnerId = await ownerVerifier();
   return coordinator.runCloudRestoreExclusive(async () => {
     const finalize = checkpoint.backupVersion === 5
       ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
     if (typeof finalize !== 'function') throw new Error('Versioned score restore is unavailable');
-    const result = await finalize({
-      restoreId: checkpoint.restoreId,
-      backupHash: checkpoint.backupHash,
-      expectedStageHash: checkpoint.stageHash,
-    });
     let finalized = checkpoint;
     try {
+      const result = await finalize({
+        restoreId: checkpoint.restoreId,
+        backupHash: checkpoint.backupHash,
+        expectedStageHash: checkpoint.stageHash,
+      });
+      assertRestoreReceipt(result, checkpoint);
       finalized = await markFinalized(checkpoint, result.receipt);
       const canonical = await canonicalFetcher({ version: finalized.backupVersion });
+      await ownerVerifier(expectedOwnerId);
       await reconciler({ version: finalized.backupVersion, data: finalized.localData }, canonical,
-        { restoreId: finalized.restoreId });
+        { restoreId: finalized.restoreId, expectedOwnerId });
       await clearResumeCheckpoint(finalized);
+      return { restoreId: finalized.restoreId, resumed: true, receipt: result.receipt };
     } catch (error) {
       throw reconciliationRequired(error, finalized);
     }
-    return { restoreId: finalized.restoreId, resumed: true, receipt: result.receipt };
   });
 }
 
@@ -398,7 +508,10 @@ export async function restoreBackupToCloud(payload, {
   transport = cloud,
   coordinator = sync,
   sourceFetcher = fetchCanonicalRestoreSource,
+  canonicalFetcher = fetchCanonicalRestoreSnapshot,
   reconciler = reconcileCanonicalRestore,
+  ownerVerifier = assertRestoreOwner,
+  historyFetcher = cloud.fetchOwnerSyncMarker,
 } = {}) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) throw Object.assign(new Error(validation.errors.join('\n')), { code: validation.code ?? 'INVALID_BACKUP' });
@@ -409,9 +522,15 @@ export async function restoreBackupToCloud(payload, {
     });
   }
   await coordinator.assertCloudRestoreReady();
+  const expectedOwnerId = await ownerVerifier();
   return coordinator.runCloudRestoreExclusive(async () => {
+    const marker = await historyFetcher();
+    if (!marker || marker.ownerId !== expectedOwnerId) {
+      throw Object.assign(new Error('Owner history authority unavailable'), { code: 'RESTORE_OWNER_HISTORY_MISSING' });
+    }
     const serverData = await sourceFetcher({ version: payload.version });
-    const plan = planCloudRestore(payload, serverData, { ownerId: cloud.user.id });
+    const plan = planCloudRestore(payload, serverData,
+      { ownerId: expectedOwnerId, ownerHistoryRevision: marker.revision });
     if (!plan.ready) throw Object.assign(new Error('Restore requires review'), { code: 'RESTORE_REVIEW_REQUIRED', plan });
     const stageCall = payload.version === 5 ? transport.stageScoreRestoreV2 : transport.stageSyncV2Restore;
     const finalizeCall = payload.version === 5 ? transport.finalizeScoreRestoreV2 : transport.finalizeSyncV2Restore;
@@ -422,6 +541,12 @@ export async function restoreBackupToCloud(payload, {
       restoreId, backupHash: payload.backupHash ?? `legacy-v3:${restoreId}`,
       backupVersion: payload.version, sourceManifest: plan.sourceManifest, operations: plan.operations,
     });
+    if (stage?.restoreId !== restoreId || typeof stage.stageHash !== 'string' || !stage.stageHash ||
+        stage.backupHash !== (payload.backupHash ?? `legacy-v3:${restoreId}`)) {
+      throw Object.assign(new Error('Restore stage receipt is missing or mismatched'), {
+        code: 'RESTORE_STAGE_INVALID',
+      });
+    }
     let checkpoint = await updateResumeCheckpoint(() => ({
       version: RESTORE_RESUME_VERSION,
       restoreId,
@@ -432,16 +557,19 @@ export async function restoreBackupToCloud(payload, {
       localData: resumeLocalData(payload),
       stagedAt: Date.now(),
     }));
-    const result = await finalizeCall({
-      restoreId, backupHash: stage.backupHash, expectedStageHash: stage.stageHash,
-    });
     try {
+      const result = await finalizeCall({
+        restoreId, backupHash: stage.backupHash, expectedStageHash: stage.stageHash,
+      });
+      assertRestoreReceipt(result, checkpoint);
       checkpoint = await markFinalized(checkpoint, result.receipt);
-      await reconciler(payload, result.canonical, { restoreId });
+      const canonical = await canonicalFetcher({ version: payload.version });
+      await ownerVerifier(expectedOwnerId);
+      await reconciler(payload, canonical, { restoreId, expectedOwnerId });
       await clearResumeCheckpoint(checkpoint);
+      return { restoreId, plan, receipt: result.receipt };
     } catch (error) {
       throw reconciliationRequired(error, checkpoint);
     }
-    return { restoreId, plan, receipt: result.receipt };
   });
 }

@@ -534,9 +534,9 @@ function paint() {
 function renderOfflineLease() {
   const lease = store.getOfflineLeaseStatus();
   if (!['REMINDER', 'LIMITED'].includes(lease.state)) return '';
-  return html`<aside class="offline-lease-notice" dir="rtl" role="status" data-offline-lease="${lease.state}">
-    <div><strong>${lease.state === 'LIMITED' ? 'بياناتك متاحة للعرض' : 'تذكير بالتحقق من الحساب'}</strong>
-      <p>${lease.state === 'LIMITED' ? 'للعودة إلى التعديل، اتصل بالإنترنت وتحقق من حسابك. يمكنك تنزيل نسخة احتياطية وتصدير بياناتك.' : 'يمكنك متابعة العمل دون اتصال. تحقق من حسابك عند توفر الإنترنت لتجديد مدة التعديل.'}</p></div>
+  return html`<aside class="offline-lease-notice noprint" dir="rtl" role="status" data-offline-lease="${lease.state}">
+    <div><strong>${lease.state === 'LIMITED' ? 'وضع القراءة فقط' : 'تذكير بالاتصال'}</strong>
+      <p>${lease.state === 'LIMITED' ? 'يمكنك العرض والتصدير وتنزيل نسخة احتياطية. لاستئناف التعديل، اتصل بالإنترنت واضغط «التحقق من الحساب».' : 'يمكنك متابعة العمل. اتصل بالإنترنت قريبًا واضغط «التحقق من الحساب» لتستمر في التعديل.'}</p></div>
     <button class="btn btn--ghost" data-act="renew-offline-lease">التحقق من الحساب</button>
   </aside>`;
 }
@@ -549,8 +549,11 @@ async function renewLeaseInBackground() {
 
 /* ---------- تبديل الشاشة ---------- */
 
+let resolveGeneration = 0;
 async function resolve() {
+  const generation = ++resolveGeneration;
   const path = currentPath();
+  const isCurrent = () => generation === resolveGeneration && path === currentPath();
   const found = match(path);
 
   if (!found) {
@@ -559,19 +562,22 @@ async function resolve() {
   }
 
   if (canMaterializeTodaySessions()) await store.ensureSessionsForDate();
-
-  if (ctx) scrollMemory.set(ctx.path, window.scrollY);
-  view?.onUnmount?.();
+  if (!isCurrent()) return;
 
   let mod;
   try {
     mod = await found.route.load();
   } catch (err) {
+    if (!isCurrent()) return;
     console.error('[rakeezx] تعذّر تحميل الشاشة', err);
     toast('تعذّر فتح هذه الشاشة', 'danger');
     return;
   }
 
+  // A slower boot/previous route must not overwrite newer navigation.
+  if (!isCurrent()) return;
+  if (ctx) scrollMemory.set(ctx.path, window.scrollY);
+  view?.onUnmount?.();
   view = mod.default;
   ctx = found;
   view.beforeRender?.(found.params);

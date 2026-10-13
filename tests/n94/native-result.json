@@ -1,0 +1,87 @@
+{
+  "checks": [
+    {
+      "name": "additive_legacy_snapshot_and_receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "subitem_dates_and_points",
+      "status": "PASS"
+    },
+    {
+      "name": "atomic_selected_state_replay_and_bounds",
+      "status": "PASS"
+    },
+    {
+      "name": "owner_acl_generic_bypass_and_immutable_creation",
+      "status": "PASS"
+    },
+    {
+      "name": "definition_copy_dates_points_without_student_state",
+      "status": "PASS"
+    },
+    {
+      "name": "completion_tap_cycle_owner_outbox_reload_and_reconciliation",
+      "status": "PASS"
+    },
+    {
+      "name": "backup_restore_creation_legacy_defaults_and_interrupted_retry",
+      "status": "PASS"
+    }
+  ],
+  "migration": {
+    "filename": "20261012234116_n94_subitem_dates_late_scoring.sql",
+    "sha256": "a08ead00360b9cfa4144467751dfa0c4fb620d47e6f303f0b9ca9a1392fdc595"
+  },
+  "native": {
+    "port": 65407,
+    "version": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit"
+  },
+  "cleanup": {
+    "serverStopped": true,
+    "clusterRetained": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n94-subitem-late-scoring-20261012\\test-results\\n94\\5d423f2e-0d7a-4af4-8f75-7a8bfe3f6edf\\owned-cluster-28jlVR",
+    "reason": "Prior recursive removal was rejected: blocked by policy. No alternate deletion surface used; stopped synthetic data remains in ignored test-results."
+  },
+  "functions": [
+    {
+      "signature": "rakeezx.apply_score_configuration_command(text,text,text,bigint,jsonb)",
+      "source_md5": "214f34a464d8942364a57827a63a711b"
+    },
+    {
+      "signature": "rakeezx.apply_score_distribution_copy_command(text,text,text,bigint,text,text,jsonb,text)",
+      "source_md5": "74ee1ccf7dc2ca130fe949a1a2293f48"
+    },
+    {
+      "signature": "rakeezx.apply_score_subitem_command(text,text,text,text,text,text,boolean,numeric)",
+      "source_md5": "202df6b869feaa6338fc1ef697b0696c"
+    },
+    {
+      "signature": "rakeezx.apply_score_subitem_command_n94(text,text,text,text,text,text,text,numeric)",
+      "source_md5": "f1812b7b60c623c5b21a3276fcc732af"
+    },
+    {
+      "signature": "rakeezx.assert_score_provenance_consistent(uuid)",
+      "source_md5": "ef62c12618155c9432569aa4b56ece71"
+    },
+    {
+      "signature": "rakeezx.guard_subitem_definition_write()",
+      "source_md5": "502dbc275a6c52797c8bf4b138804200"
+    },
+    {
+      "signature": "rakeezx.recompute_subitem_score(uuid,text,text,text)",
+      "source_md5": "2dea62692b8cf2a1177f4c8be9dc63b5"
+    },
+    {
+      "signature": "rakeezx.score_foundation_capability()",
+      "source_md5": "ac2c850776ef2234da69e5ad5cdd37eb"
+    },
+    {
+      "signature": "rakeezx.stage_sync_v2_restore_score_v2(text,text,integer,jsonb,jsonb)",
+      "source_md5": "1aad1a5a3712d798b512586c02f208ff"
+    },
+    {
+      "signature": "rakeezx.sync_v2_field_map(text)",
+      "source_md5": "4ed19e83a079dc9d748915184bda8169"
+    }
+  ]
+}

@@ -22,8 +22,28 @@ export async function readJson(file, fallback = null) {
 export async function writeJson(file, value) {
   await fs.mkdir(path.dirname(file), { recursive: true });
   const temporary = `${file}.${process.pid}.${randomUUID()}.tmp`;
-  try { await fs.writeFile(temporary, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' }); await fs.rename(temporary, file); }
-  finally { await fs.rm(temporary, { force: true }); }
+  let handle, ownsTemporary = false;
+  try {
+    handle = await fs.open(temporary, 'wx'); ownsTemporary = true;
+    await handle.writeFile(JSON.stringify(value, null, 2) + '\n');
+    await handle.close(); handle = null;
+    const backoff = [50, 100, 200, 400, 800];
+    for (let attempt = 0; ; attempt++) {
+      try { await fs.rename(temporary, file); ownsTemporary = false; break; }
+      catch (error) {
+        // Windows readers may briefly deny replacement. Keep the same bytes
+        // and atomic rename; a persistent lock remains an explicit failure.
+        if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= backoff.length) throw error;
+        await new Promise(resolve => setTimeout(resolve, backoff[attempt]));
+      }
+    }
+  } catch (error) {
+    try { await handle?.close(); } catch { /* Preserve the write/rename error. */ }
+    if (ownsTemporary) {
+      try { await fs.rm(temporary, { force: true }); } catch { /* Only our temp; never mask the original failure. */ }
+    }
+    throw error;
+  }
 }
 async function exists(file) { try { await fs.access(file); return true; } catch (error) { if (error.code === 'ENOENT') return false; throw error; } }
 export function runCommand(command, args, options = {}) {
@@ -405,19 +425,78 @@ export class Controller {
   }
   async validate(task, result) {
     if (this.validateAdapter) return this.validateAdapter(task, result, this);
-    if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha || normalize(result.worktreePath) !== normalize(task.worktreePath)) throw new Error('Candidate identity/base/worktree mismatch');
+    if (result.taskId !== task.id || !task.attempt?.runId || result.runId !== task.attempt.runId || result.state !== 'LOCAL_READY'
+      || !SHA.test(task.baseSha ?? '') || !SHA.test(result.baseSha ?? '') || !SHA.test(result.candidateSha ?? '')
+      || normalize(result.worktreePath) !== normalize(task.worktreePath)) throw new Error('Candidate identity/base/worktree mismatch');
     if (!Array.isArray(result.checks) || !result.checks.some(c => c.status === 'PASS') || result.checks.some(c => c.status === 'FAIL')) throw new Error('An affected check must pass and no recorded check may fail');
     const missing = (task.requiredChecks ?? []).filter(name => !result.checks.some(check => check.name === name && check.status === 'PASS'));
     if (missing.length) throw new Error('Required affected checks have not passed: ' + missing.join(', '));
     const git = async args => { const r = await this.command('git', args, { cwd: task.worktreePath }); if (r.code !== 0) throw new Error(clean(r.stderr || r.stdout)); return r.stdout.trim(); };
     if (await git(['rev-parse', 'HEAD']) !== result.candidateSha) throw new Error('Receipt is not the actual candidate HEAD');
-    await git(['merge-base', '--is-ancestor', task.baseSha, result.candidateSha]);
-    if (await git(['status', '--porcelain', '--untracked-files=no'])) throw new Error('Candidate has uncommitted tracked changes; retain them and finish the commit');
-    const changed = (await git(['diff', '--name-only', '-z', '--no-renames', task.baseSha, result.candidateSha, '--'])).split('\0').filter(Boolean);
+    const advancesBase = result.baseSha !== task.baseSha;
+    if (advancesBase) await git(['merge-base', '--is-ancestor', task.baseSha, result.baseSha]);
+    await git(['merge-base', '--is-ancestor', result.baseSha, result.candidateSha]);
+    if (await git(['status', '--porcelain', advancesBase ? '--untracked-files=all' : '--untracked-files=no'])) throw new Error('Candidate has uncommitted changes; retain them and finish the commit');
+    const changed = (await git(['diff', '--name-only', '-z', '--no-renames', result.baseSha, result.candidateSha, '--'])).split('\0').filter(Boolean);
     if (!changed.length) throw new Error('No code change in the candidate');
     const escaped = changed.filter(file => !allowed(file, task.allowedPaths ?? []));
     if (escaped.length) throw new Error('Changed paths outside this approved card: ' + escaped.join(', '));
-    return { ...result, changedPaths: changed, hostValidatedAt: this.now() };
+    let baseAdvance = null;
+    if (advancesBase) {
+      if (!Array.isArray(result.changedPaths) || result.changedPaths.some(p => typeof p !== 'string')
+        || JSON.stringify([...result.changedPaths].sort()) !== JSON.stringify([...changed].sort())) throw new Error('Advanced-base receipt does not match the actual changed paths');
+      const remote = this.config?.controller?.remote ?? 'origin', branch = this.config?.controller?.branch ?? 'main';
+      if (!/^[A-Za-z0-9._-]+$/.test(remote) || !/^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(branch) || branch.includes('..')) throw new Error('Invalid target ref');
+      const ref = `refs/heads/${branch}`, rows = (await git(['ls-remote', '--heads', remote, ref])).split(/\r?\n/).filter(Boolean);
+      const [publishedMainSha, observedRef] = (rows[0] ?? '').split(/\s+/);
+      if (rows.length !== 1 || !SHA.test(publishedMainSha ?? '') || observedRef !== ref) throw new Error('Published main could not be verified for the advanced base');
+      // Fetch only the full SHA just observed on the configured published branch.
+      // No checkout, merge, worker launch, Product test, or service mutation occurs.
+      await git(['fetch', '--no-tags', '--no-write-fetch-head', remote, publishedMainSha]);
+      await git(['merge-base', '--is-ancestor', result.baseSha, publishedMainSha]);
+      if (await git(['rev-parse', 'HEAD']) !== result.candidateSha || await git(['status', '--porcelain', '--untracked-files=all'])) throw new Error('Candidate changed while its published base was verified');
+      baseAdvance = { kind: 'published-main-base-advance', from: task.baseSha, to: result.baseSha,
+        taskId: task.id, runId: task.attempt.runId, candidateSha: result.candidateSha, publishedMainSha, remote, branch, verifiedAt: this.now() };
+    }
+    // Override any worker-supplied field: only the host can attest this advance.
+    return { ...result, changedPaths: changed, hostValidatedAt: this.now(), baseAdvance };
+  }
+  async acceptCandidate(task, receipt, recovery = null) {
+    const at = this.now(), next = { ...task, candidateSha: receipt.candidateSha, baseSha: receipt.baseSha,
+      validationReceipt: receipt, status: 'delivery', deliveryQueuedAt: at, nextDeliveryAt: at, retryAt: null,
+      runnerPid: null, runnerCreatedAt: null, brokerPid: null, brokerCreatedAt: null, ownedProcesses: [],
+      failureClass: null, probingClass: null, lastFailure: null, infrastructureRetries: 0, productRecordKey: null };
+    if (receipt.baseAdvance) next.baseAdvanceHistory = [...(task.baseAdvanceHistory ?? []), { ...receipt.baseAdvance,
+      previousCandidateSha: task.candidateSha ?? null, previousStatus: task.status, previousFailure: task.lastFailure ?? null,
+      previousFailureAt: task.lastFailureAt ?? null, previousImplementationFailures: Number(task.implementationFailures ?? 0),
+      recovery, originalAttemptPreserved: true }];
+    if (recovery) next.implementationFailures = Math.max(0, Number(task.implementationFailures ?? 0) - 1);
+    await writeJson(path.join(this.runtime, 'results', task.id + '.json'), receipt);
+    await this.save(next); Object.assign(task, next);
+    await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId, recoveredSavedResult: Boolean(recovery) });
+  }
+  savedBaseMismatch(task) {
+    return ['retry_wait', 'blocked'].includes(task.status) && task.failureClass === 'implementation'
+      && task.lastFailure === 'Candidate validation: Candidate identity/base/worktree mismatch' && Boolean(task.attempt?.runId);
+  }
+  async recoverSavedBaseMismatch(task, processes) {
+    // Called only after ordinary scope, dependency, eligibility and authority gates.
+    // Never turn this saved attempt into running or launch/stop any process.
+    const reap = task.lastWorkerReap;
+    if (!reap?.exactAbsence || reap.runId !== task.attempt.runId || reap.activationId !== task.activationId
+      || !Array.isArray(reap.owners) || !reap.owners.length || reap.owners.some(o => !o.pid || !o.createdAt)) throw new Error('Saved worker absence identity is incomplete');
+    const checkpoint = await readJson(task.attempt.checkpointPath);
+    if (!checkpoint || checkpoint.taskId !== task.id || checkpoint.runId !== task.attempt.runId || !checkpoint.finishedAt
+      || task.checkpointIssue || task.eventLogIssue || task.watchdogIncident
+      || checkpoint.sessionId && task.sessionId && checkpoint.sessionId !== task.sessionId) throw new Error('Saved completed attempt identity is inconsistent');
+    if (workerProcesses({ ...task, ownedProcesses: [...(task.ownedProcesses ?? []), ...reap.owners] }, checkpoint, processes).length) throw new Error('An exact saved attempt process is still active');
+    const original = await fs.readFile(task.attempt.outputPath), result = parse(original);
+    const receipt = await this.validate(task, result);
+    if (!receipt.baseAdvance) throw new Error('Saved result is not a verified published-main base advance');
+    if (!original.equals(await fs.readFile(task.attempt.outputPath))) throw new Error('Saved result changed during validation');
+    await this.acceptCandidate(task, receipt, { kind: 'saved-base-mismatch-result', verifiedAt: this.now(), runId: task.attempt.runId,
+      originalResultSha256: createHash('sha256').update(original).digest('hex'), priorWorkerAbsence: reap,
+      removedMetadataFailureCount: 1, workerLaunches: 0, productTestsRun: 0, serviceMutations: 0 });
   }
   async launch(task) {
     if (await this.paused()) return;
@@ -520,11 +599,7 @@ export class Controller {
     if (result?.state === 'LOCAL_READY') {
       try {
         const receipt = await this.validate(task, result);
-        task.candidateSha = receipt.candidateSha; task.validationReceipt = receipt; task.status = 'delivery';
-        task.deliveryQueuedAt = this.now(); task.nextDeliveryAt = this.now(); task.runnerPid = null; task.runnerCreatedAt = null; task.brokerPid = null; task.brokerCreatedAt = null; task.ownedProcesses = [];
-        task.failureClass = null; task.probingClass = null; task.lastFailure = null; task.infrastructureRetries = 0;
-        await writeJson(path.join(this.runtime, 'results', task.id + '.json'), receipt); await this.save(task);
-        await this.event('candidate_ready', { taskId: task.id, candidateSha: task.candidateSha, sessionId: task.sessionId });
+        await this.acceptCandidate(task, receipt);
       } catch (error) { await this.failure(task, 'Candidate validation: ' + error.message); }
       return;
     }
@@ -645,7 +720,13 @@ export class Controller {
     await this.reapFinishedLeases();
     for (const task of this.jobs.filter(t => t.status === 'awaiting_po')) {
       const eligibility = await this.eligibility(task);
-      if (eligibility.closed === true) { task.status = 'closed'; task.closedFromCanonicalAt = this.now(); await this.save(task); }
+      if (eligibility.closed === true) {
+        const closed = { ...task, status: 'closed', closedFromCanonicalAt: this.now() };
+        try { await this.save(closed); Object.assign(task, closed); }
+        catch (error) {
+          this.issues.push({ code: 'QUEUE_WRITE_FAILED', taskId: task.id, operation: 'close_from_canonical', errorCode: error.code ?? null, message: clean(error.message) });
+        }
+      }
     }
     if (!paused) {
       if (!this.deliveryInFlight) {
@@ -657,7 +738,7 @@ export class Controller {
         }
       }
       const active = this.jobs.filter(t => t.status === 'running');
-      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && timestamp(t.retryAt) <= this.clock());
+      const candidates = this.jobs.filter(t => t.status === 'pending' || t.status === 'retry_wait' && timestamp(t.retryAt) <= this.clock() || this.savedBaseMismatch(t));
       for (const task of candidates) {
         if (active.length >= Number(this.config.maxWorkers)) break;
         const outage = this.jobs.filter(t => OUTAGE.has(t.failureClass) && t.status === 'retry_wait' || t.status === 'running' && OUTAGE.has(t.probingClass));
@@ -672,6 +753,11 @@ export class Controller {
           continue;
         }
         if (!task.releaseAuthority || task.liveMutation && !task.liveAuthorizationRef) { await this.failure(task, 'This card lacks its precise release/data authority', 'external'); continue; }
+        if (this.savedBaseMismatch(task)) {
+          try { await this.recoverSavedBaseMismatch(task, processes); }
+          catch (error) { this.issues.push({ code: 'SAVED_BASE_RECOVERY_DEFERRED', taskId: task.id, message: clean(error.message) }); }
+          continue;
+        }
         await this.launch(task); if (task.status === 'running') active.push(task);
       }
     }

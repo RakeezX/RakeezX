@@ -4,9 +4,23 @@
 This page preserves user notes and acceptance context. The automatic block lists only delivery with observed Production evidence; use the task's delivery receipt and [Product ledgers](PRODUCT_LEDGER.md) for status. `awaiting_po` releases execution capacity immediately, so review does not delay the next eligible ticket. Local/Preview results are not published acceptance items.
 
 <!-- BEGIN RAKEEZ CONTINUOUS DELIVERY -->
-The delivery recorder maintains verified published items here. Consult `artifacts/ops-supervisor-v4/ACTIVE_TASKS.json`, the relevant `queue/*.json` and delivery receipt for current evidence; absence from an unrefreshed page is not a status decision.
+
+| التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
+| --- | --- | --- | --- | --- | --- |
+| N91 | Existing AI candidate preserved. Repaired hosted-app harness passed both required checks. Full receipt: artifacts/ops-supervisor-v4/attempts/v6-n91-mobile-card-titles-20261012/a8e2b83e-507f-40e9-9bb0-d243887c9510/evidence/N91_HOSTED_APP_PROOF.json. | [Production](https://rakeezx.com/) | 61a6e1498c5ef985cb4e947c72e56eb18581797d | 2026-10-12T23:37:12.020Z | v6-n91-mobile-card-titles-20261012 |
+
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
+
+<!-- BEGIN RAKEEZ PO DECISIONS 20261013 -->
+## Current PO decisions — 2026-10-13
+
+N13 is CLOSED. Exact verified Production release `a516ced605cf016848841b0bc021d4e5acdfa41f`; candidate `f8e2a5234e72b0af04174a4b33588c8e34f99d36`. PO reported improvement and accepted closure when technically ready. The requested single creation form, shared roster and duplicate-without-writes outcome passed all three required checks. N77 deletion remains independent.
+
+N49 is CLOSED. Exact verified Production release `df1715a822fe37f15f5b25d288db75c2d391b895`; candidate `8d44d3a5fbedae0fbcd3f894bca9d9fc4c4350cf`. PO reported a successful personal 3/6-minute Preview trial at 03:07 Asia/Riyadh on 2026-10-13. The remaining screen wording and printed student-table correction now passed its own actual-app check and Production delivery, satisfying the separate delegated technical closure condition. Production stays at 7/14 days.
+
+N96 and N54 remain previously accepted/CLOSED. N91 remains available for PO review. N77 has high priority; deferred tickets stay deferred. Full prior notes, user feedback, delivery evidence and the bounded unattended-work/Scheduler observation are retained in `docs/automation-evidence/20261013/PO_DECISIONS_20261013.json`. The observed work interval proves local progress without chat calls; it does not establish uninterrupted 24-hour operation. The controller observes canonical closure; this document operation does not write queue state.
+<!-- END RAKEEZ PO DECISIONS 20261013 -->
 
 ## Preserved user notes and historical review context — not dispatch instructions
 

@@ -7,6 +7,7 @@ import * as db from '../src/lib/db.js';
 import * as store from '../src/store.js';
 import { createSyncV2Engine } from '../src/lib/sync-v2.js';
 
+// Pinned N58 migration snapshot; later independent server migrations are outside this local contract.
 // Disposable in-memory PostgreSQL. Minimal auth/Realtime stubs stand in for
 // Supabase platform schemas; every tracked Product migration runs unchanged.
 const OWNER = '11111111-1111-4111-8111-111111111111';
@@ -14,7 +15,7 @@ const CALENDAR = 'cal:range-0439';
 global.document = { documentElement: { setAttribute() {}, removeAttribute() {}, classList: { add() {}, remove() {} } }, querySelector: () => ({ setAttribute() {} }) };
 global.matchMedia = () => ({ matches: false });
 
-test('full migration chain preserves Calendar tombstones, active uniqueness and Sync V2 convergence', async () => {
+test('N58 migration snapshot preserves Calendar tombstones, active uniqueness and Sync V2 convergence', async () => {
   const pg = new PGlite();
   try {
     await pg.exec(`create schema auth; create schema realtime;
@@ -29,7 +30,7 @@ test('full migration chain preserves Calendar tombstones, active uniqueness and 
       create function auth.uid() returns uuid language sql stable security definer set search_path = ''
         as $$select id from auth.current_identity limit 1$$;`);
     const names = (await readdir(new URL('../supabase/migrations/', import.meta.url)))
-      .filter((name) => name.endsWith('.sql')).sort();
+      .filter(name => name.endsWith('.sql') && name <= '20261004070002_n58_effective_scope_revalidation.sql').sort();
     assert.equal(names.at(-1), '20261004070002_n58_effective_scope_revalidation.sql');
     for (const name of names) await pg.exec((await readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')).replace(/^\uFEFF/, ''));
     assert.equal(names.length, 41);

@@ -1,0 +1,358 @@
+{
+  "url": "https://d6040109.rakeezx.pages.dev",
+  "candidateSha": "7bb671564c6468a84adc910e250fd6e11030a50c",
+  "checks": [
+    "actual_items_sheet_validation_and_immutable_creation",
+    "actual_gradebook_three_states_points_equal_points_reload_mobile_rtl_light_dark_contrast",
+    "n84_controls_and_no_application_errors"
+  ],
+  "assets": [
+    {
+      "path": "src/views/items.js",
+      "sha256": "38301a4ec52d5180c4fbe78f1c1fc9921d77319cb1e07a45b7572bfe5fdfe7b1"
+    },
+    {
+      "path": "src/views/grades.js",
+      "sha256": "fbc128473248ad020ce0e562a49647ccc576c86102bcb7af1ebde84efaf58542"
+    },
+    {
+      "path": "src/store.js",
+      "sha256": "d2029284fd646a5af8c3be7695420cf52f0a9b08805422c33172022b43b9fb58"
+    },
+    {
+      "path": "src/styles/components.css",
+      "sha256": "ef14a156777bd371e9f0db650437338b679d42742b25888740e8e4c43338ba7a"
+    },
+    {
+      "path": "src/lib/score-foundation.js",
+      "sha256": "36ed2e241bd4d87759641d9095ff5a49f27f9cc3737b24b6a7a1dc1a895f7970"
+    }
+  ],
+  "screenshots": [
+    "unrecorded-light-390.png",
+    "unrecorded-dark-390.png",
+    "unrecorded-light-320.png",
+    "unrecorded-dark-320.png",
+    "late-light-390.png",
+    "late-dark-390.png",
+    "late-light-320.png",
+    "late-dark-320.png",
+    "regular-light-390.png",
+    "regular-dark-390.png",
+    "regular-light-320.png",
+    "regular-dark-320.png"
+  ],
+  "formLayouts": [
+    {
+      "width": 390,
+      "theme": "light",
+      "fields": [
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        }
+      ],
+      "screenshot": "items-form-light-390.png"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "fields": [
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        },
+        {
+          "height": 44,
+          "width": 338,
+          "left": 26,
+          "right": 364
+        }
+      ],
+      "screenshot": "items-form-dark-390.png"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "fields": [
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        }
+      ],
+      "screenshot": "items-form-light-320.png"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "fields": [
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        },
+        {
+          "height": 44,
+          "width": 268,
+          "left": 26,
+          "right": 294
+        }
+      ],
+      "screenshot": "items-form-dark-320.png"
+    }
+  ],
+  "editorInputs": [
+    {
+      "<input data-subitem-name=\"\" maxlength=\"50\" value=\"مشروع 1\" required=\"\" style=\"\">": "مشروع 1",
+      "<input data-subitem-value=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" step=\"0.01\" value=\"5\" dir=\"ltr\" style=\"\">": "5",
+      "<input data-subitem-start=\"\" type=\"date\" value=\"\" aria-label=\"بداية مشروع 1\" style=\"\">": "",
+      "<input data-subitem-due=\"\" type=\"date\" value=\"\" aria-label=\"تسليم مشروع 1\" style=\"\">": "2026-10-12",
+      "<input data-subitem-late=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" max=\"5\" step=\"0.01\" value=\"\" placeholder=\"5\" aria-label=\"درجة تأخر مشروع 1\" dir=\"ltr\" style=\"\">": "2.5"
+    },
+    {
+      "<input data-subitem-name=\"\" maxlength=\"50\" value=\"مشروع 2\" required=\"\" style=\"\">": "مشروع 2",
+      "<input data-subitem-value=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" step=\"0.01\" value=\"5\" dir=\"ltr\" style=\"\">": "5",
+      "<input data-subitem-start=\"\" type=\"date\" value=\"\" aria-label=\"بداية مشروع 2\" style=\"\">": "",
+      "<input data-subitem-due=\"\" type=\"date\" value=\"\" aria-label=\"تسليم مشروع 2\" style=\"\">": "2026-10-12",
+      "<input data-subitem-late=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" max=\"5\" step=\"0.01\" value=\"\" placeholder=\"5\" aria-label=\"درجة تأخر مشروع 2\" dir=\"ltr\" style=\"\">": "5"
+    },
+    {
+      "<input data-subitem-name=\"\" maxlength=\"50\" value=\"مشروع 3\" required=\"\" style=\"\">": "مشروع 3",
+      "<input data-subitem-value=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" step=\"0.01\" value=\"10\" dir=\"ltr\" style=\"\">": "10",
+      "<input data-subitem-start=\"\" type=\"date\" value=\"\" aria-label=\"بداية مشروع 3\" style=\"\">": "",
+      "<input data-subitem-due=\"\" type=\"date\" value=\"\" aria-label=\"تسليم مشروع 3\" style=\"\">": "",
+      "<input data-subitem-late=\"\" type=\"text\" inputmode=\"decimal\" min=\"0\" max=\"10\" step=\"0.01\" value=\"\" placeholder=\"10\" aria-label=\"درجة تأخر مشروع 3\" dir=\"ltr\" style=\"\">": ""
+    }
+  ],
+  "savedDefinitions": [
+    {
+      "id": "demo:subitem:2:1",
+      "updatedAt": 1791871200000,
+      "deleted": false,
+      "createdAt": 1791871200000,
+      "itemId": "demo:item:1:2",
+      "name": "مشروع 1",
+      "value": 5,
+      "order": 0,
+      "distributionVersion": 2,
+      "startDate": null,
+      "dueDate": "2026-10-12",
+      "latePoints": 2.5
+    },
+    {
+      "id": "demo:subitem:2:2",
+      "updatedAt": 1791871200000,
+      "deleted": false,
+      "createdAt": 1791871200000,
+      "itemId": "demo:item:1:2",
+      "name": "مشروع 2",
+      "value": 5,
+      "order": 1,
+      "distributionVersion": 2,
+      "startDate": null,
+      "dueDate": "2026-10-12",
+      "latePoints": 5
+    },
+    {
+      "id": "demo:subitem:2:3",
+      "updatedAt": 1791871200000,
+      "deleted": false,
+      "createdAt": 1791871200000,
+      "itemId": "demo:item:1:2",
+      "name": "مشروع 3",
+      "value": 10,
+      "order": 2,
+      "distributionVersion": 2,
+      "startDate": null,
+      "dueDate": null,
+      "latePoints": null
+    }
+  ]
+}

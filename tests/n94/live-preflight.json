@@ -1,0 +1,296 @@
+{
+  "observedAt": "2026-10-12T23:38:32.294Z",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "functions": [
+    {
+      "signature": "rakeezx.apply_score_configuration_command(text,text,text,bigint,jsonb)",
+      "arguments": "p_mutation_id text, p_device_id text, p_item_id text, p_expected_version bigint, p_payload jsonb",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.apply_score_configuration_command(p_mutation_id text, p_device_id text, p_item_id text, p_expected_version bigint, p_payload jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_owner uuid:=auth.uid(); v_envelope jsonb; v_receipt rakeezx.score_domain_receipts%rowtype;\n  v_item rakeezx.items%rowtype; v_mode text; v_distribution text; v_max numeric(6,2);\n  v_definition jsonb; v_id text; v_name text; v_value numeric(6,2); v_order integer;\n  v_count integer; v_position integer:=0; v_total_cents bigint; v_each bigint;\n  v_ids text[]:='{}'::text[]; v_student text; v_result jsonb; v_scores jsonb:='[]'::jsonb;\nbegin\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\n  if coalesce(p_mutation_id,'')='' or char_length(p_mutation_id)>200 or\n     coalesce(p_device_id,'')='' or char_length(p_device_id)>200 or\n     coalesce(p_item_id,'')='' or p_expected_version is null or p_expected_version<1 or\n     p_payload is null or pg_catalog.jsonb_typeof(p_payload)<>'object' or\n     pg_catalog.jsonb_typeof(p_payload->'subitems')<>'array' then\n    raise exception using errcode='22023',message='Invalid score configuration envelope';\n  end if;\n  v_envelope:=pg_catalog.jsonb_build_object('deviceId',p_device_id,'itemId',p_item_id,\n    'expectedVersion',p_expected_version,'payload',p_payload);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(\n    v_owner::text||':score-domain-receipt:'||p_mutation_id,0));\n  select * into v_receipt from rakeezx.score_domain_receipts\n    where owner_id=v_owner and mutation_id=p_mutation_id;\n  if found then\n    if v_receipt.request_envelope is distinct from v_envelope then\n      raise exception using errcode='22023',message='Score mutation ID reused with different content';\n    end if;\n    return v_receipt.result;\n  end if;\n  select * into v_item from rakeezx.items where owner_id=v_owner and id=p_item_id\n    and deleted_at is null for update;\n  if not found or v_item.distribution_version<>p_expected_version then\n    raise exception using errcode='40001',message='Score configuration revision changed';\n  end if;\n  v_mode:=p_payload->>'scoreMode';\n  v_distribution:=p_payload->>'distributionMode';\n  if (p_payload->>'max')::numeric is distinct from\n      pg_catalog.round((p_payload->>'max')::numeric,2) then\n    raise exception using errcode='22023',message='Score maximum requires two-decimal precision';\n  end if;\n  v_max:=(p_payload->>'max')::numeric(6,2);\n  v_count:=pg_catalog.jsonb_array_length(p_payload->'subitems');\n  if v_mode is null or v_mode not in ('direct','subitems') or v_max is null or v_max<=0 or\n     (v_mode='subitems' and (v_distribution is null or v_distribution not in ('auto','manual') or v_count<1 or v_count>200)) or\n     (v_mode='direct' and v_count<>0) then\n    raise exception using errcode='22023',message='Invalid score configuration';\n  end if;\n  if v_item.score_mode='direct' and v_mode='subitems' and exists(\n    select 1 from rakeezx.scores where owner_id=v_owner and item_id=p_item_id\n      and deleted_at is null and value is not null\n  ) and (p_payload->>'conversionStrategy') is distinct from 'retain-as-manual' then\n    raise exception using errcode='22023',message='Direct scores require reviewed conversion';\n  end if;\n  perform pg_catalog.set_config('rakeezx.score_domain_write','on',true);\n  if v_item.score_mode='direct' and v_mode='subitems' then\n    update rakeezx.scores set manual_value=value,derived_value=0\n      where owner_id=v_owner and item_id=p_item_id and deleted_at is null;\n  end if;\n  update rakeezx.items set max=v_max,score_mode=v_mode,\n    distribution_mode=case when v_mode='subitems' then v_distribution else null end,\n    portability_group_id=case when v_mode='subitems' then null else portability_group_id end,\n    distribution_version=p_expected_version+1,device_id=p_device_id\n    where owner_id=v_owner and id=p_item_id returning * into v_item;\n  if v_mode='direct' then\n    update rakeezx.scores set manual_value=null,derived_value=null,device_id=p_device_id\n      where owner_id=v_owner and item_id=p_item_id and deleted_at is null;\n  else\n    v_total_cents:=pg_catalog.round(v_max*100)::bigint;\n    v_each:=v_total_cents/v_count;\n    for v_definition in select value from pg_catalog.jsonb_array_elements(p_payload->'subitems') loop\n      v_position:=v_position+1;\n      v_id:=v_definition->>'id'; v_name:=v_definition->>'name';\n      if coalesce(v_id,'')='' or char_length(v_id)>240 or coalesce(v_name,'')='' or\n         v_id=any(v_ids) or pg_catalog.jsonb_typeof(v_definition)<>'object' then\n        raise exception using errcode='22023',message='Invalid or duplicate subitem identity';\n      end if;\n      v_ids:=pg_catalog.array_append(v_ids,v_id);\n      v_order:=v_position-1;\n      if v_distribution='auto' then\n        v_value:=(case when v_position=v_count then v_total_cents-v_each*(v_count-1)\n          else v_each end)::numeric/100;\n      else\n        if (v_definition->>'value')::numeric is distinct from\n            pg_catalog.round((v_definition->>'value')::numeric,2) then\n          raise exception using errcode='22023',message='Subitem value requires two-decimal precision';\n        end if;\n        v_value:=(v_definition->>'value')::numeric(6,2);\n        if v_value is null or v_value<0 then\n          raise exception using errcode='22023',message='Invalid manual subitem value';\n        end if;\n      end if;\n      if exists(select 1 from rakeezx.score_subitems where owner_id=v_owner and id=v_id\n        and (item_id<>p_item_id or deleted_at is not null)) then\n        raise exception using errcode='22023',message='Subitem identity is unavailable';\n      end if;\n      insert into rakeezx.score_subitems(owner_id,id,item_id,name,value,\"order\",distribution_version,device_id)\n        values(v_owner,v_id,p_item_id,v_name,v_value,v_order,p_expected_version+1,p_device_id)\n        on conflict(owner_id,id) do update set name=excluded.name,value=excluded.value,\n          \"order\"=excluded.\"order\",distribution_version=excluded.distribution_version,device_id=excluded.device_id;\n    end loop;\n    update rakeezx.score_subitems set deleted_at=pg_catalog.clock_timestamp(),device_id=p_device_id\n      where owner_id=v_owner and item_id=p_item_id and deleted_at is null and not(id=any(v_ids));\n    for v_student in\n      select distinct student_id from rakeezx.scores\n        where owner_id=v_owner and item_id=p_item_id and deleted_at is null\n      union\n      select distinct c.student_id from rakeezx.score_subitem_completions c\n        join rakeezx.score_subitems d on d.owner_id=c.owner_id and d.id=c.subitem_id\n        where c.owner_id=v_owner and d.item_id=p_item_id and c.checked and c.deleted_at is null\n    loop\n      v_scores:=v_scores||pg_catalog.jsonb_build_array(\n        rakeezx.recompute_subitem_score(v_owner,p_item_id,v_student,p_device_id));\n    end loop;\n  end if;\n  v_result:=pg_catalog.jsonb_build_object('mutationId',p_mutation_id,\n    'item',pg_catalog.to_jsonb(v_item),'scores',v_scores,\n    'subitems',(select coalesce(pg_catalog.jsonb_agg(pg_catalog.to_jsonb(d) order by d.\"order\",d.id),'[]'::jsonb)\n      from rakeezx.score_subitems d where d.owner_id=v_owner and d.item_id=p_item_id));\n  insert into rakeezx.score_domain_receipts(owner_id,mutation_id,request_envelope,result)\n    values(v_owner,p_mutation_id,v_envelope,v_result);\n  return v_result;\nend; $function$\n",
+      "source_md5": "27e72a39d6dbf641fa67fe7f2f5ba774",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.apply_score_distribution_copy_command(text,text,text,bigint,text,text,jsonb,text)",
+      "arguments": "p_mutation_id text, p_device_id text, p_source_item_id text, p_source_revision bigint, p_target_teaching_id text, p_new_item_id text, p_subitem_ids jsonb, p_conflict_choice text",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.apply_score_distribution_copy_command(p_mutation_id text, p_device_id text, p_source_item_id text, p_source_revision bigint, p_target_teaching_id text, p_new_item_id text, p_subitem_ids jsonb, p_conflict_choice text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_owner uuid:=auth.uid(); v_envelope jsonb; v_receipt rakeezx.score_domain_receipts%rowtype;\n  v_source rakeezx.items%rowtype; v_source_teaching rakeezx.teachings%rowtype;\n  v_target rakeezx.teachings%rowtype; v_source_section rakeezx.sections%rowtype;\n  v_target_section rakeezx.sections%rowtype; v_definition rakeezx.score_subitems%rowtype;\n  v_mapping jsonb; v_new_subitem text; v_new_item rakeezx.items%rowtype;\n  v_subitems jsonb; v_result jsonb; v_count integer;\nbegin\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\n  if coalesce(p_mutation_id,'')='' or pg_catalog.char_length(p_mutation_id)>200 or\n     coalesce(p_device_id,'')='' or coalesce(p_source_item_id,'')='' or\n     coalesce(p_target_teaching_id,'')='' or coalesce(p_new_item_id,'')='' or\n     p_source_revision is null or p_source_revision<1 or\n     pg_catalog.jsonb_typeof(p_subitem_ids)<>'object' or\n     coalesce(p_conflict_choice,'') not in ('missing','add') then\n    raise exception using errcode='22023',message='Invalid distribution copy envelope';\n  end if;\n  v_envelope:=pg_catalog.jsonb_build_object('deviceId',p_device_id,'sourceItemId',p_source_item_id,\n    'sourceRevision',p_source_revision,'targetTeachingId',p_target_teaching_id,\n    'newItemId',p_new_item_id,'subitemIds',p_subitem_ids,'conflictChoice',p_conflict_choice);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(\n    v_owner::text||':score-domain-receipt:'||p_mutation_id,0));\n  select * into v_receipt from rakeezx.score_domain_receipts\n    where owner_id=v_owner and mutation_id=p_mutation_id;\n  if found then\n    if v_receipt.request_envelope is distinct from v_envelope then\n      raise exception using errcode='22023',message='Copy mutation ID reused with different content'; end if;\n    return v_receipt.result;\n  end if;\n  select * into v_source from rakeezx.items where owner_id=v_owner and id=p_source_item_id\n    and deleted_at is null for update;\n  select * into v_target from rakeezx.teachings where owner_id=v_owner\n    and id=p_target_teaching_id and deleted_at is null for update;\n  if v_source.id is null or v_target.id is null or v_source.revision<>p_source_revision then\n    raise exception using errcode='40001',message='Copy source or target is stale'; end if;\n  select * into v_source_teaching from rakeezx.teachings where owner_id=v_owner\n    and id=v_source.teaching_id and deleted_at is null;\n  select * into v_source_section from rakeezx.sections where owner_id=v_owner\n    and id=v_source_teaching.section_id and deleted_at is null;\n  select * into v_target_section from rakeezx.sections where owner_id=v_owner\n    and id=v_target.section_id and deleted_at is null;\n  if v_source_teaching.id is null or v_source_section.id is null or v_target_section.id is null or\n     v_source_section.status='archived' or v_target_section.status='archived' or\n     v_source_teaching.id=v_target.id or v_source_section.id=v_target_section.id or\n     v_source_teaching.subject_id<>v_target.subject_id or\n     v_source_teaching.term_id<>v_target.term_id or\n     v_source_section.year_id<>v_target_section.year_id or\n     v_source_section.grade<>v_target_section.grade then\n    raise exception using errcode='22023',message='Copy crosses an academic boundary'; end if;\n  if exists(select 1 from rakeezx.items where owner_id=v_owner and id=p_new_item_id) then\n    raise exception using errcode='22023',message='Destination item identity already exists'; end if;\n  if p_conflict_choice='missing' and exists(select 1 from rakeezx.items where owner_id=v_owner\n    and teaching_id=v_target.id and name=v_source.name and deleted_at is null) then\n    raise exception using errcode='40001',message='Destination classification changed'; end if;\n  select count(*) into v_count from rakeezx.score_subitems where owner_id=v_owner\n    and item_id=v_source.id and deleted_at is null;\n  if (v_source.score_mode='subitems' and\n      (v_count=0 or (select count(*) from pg_catalog.jsonb_object_keys(p_subitem_ids))<>v_count)) or\n     (v_source.score_mode<>'subitems' and\n       (select count(*) from pg_catalog.jsonb_object_keys(p_subitem_ids))<>0) then\n    raise exception using errcode='22023',message='Copy subitem mapping is incomplete'; end if;\n  perform pg_catalog.set_config('rakeezx.score_domain_write','on',true);\n  insert into rakeezx.items(owner_id,id,teaching_id,name,max,\"order\",auto,per_point,penalty,\n    unit_id,lesson_id,score_mode,distribution_mode,distribution_version,\n    distribution_origin_id,portability_group_id,device_id)\n    values(v_owner,p_new_item_id,v_target.id,v_source.name,v_source.max,v_source.\"order\",v_source.auto,\n      v_source.per_point,v_source.penalty,v_source.unit_id,v_source.lesson_id,v_source.score_mode,\n      v_source.distribution_mode,1,v_source.id,null,p_device_id)\n    returning * into v_new_item;\n  for v_definition in select * from rakeezx.score_subitems where owner_id=v_owner\n      and item_id=v_source.id and deleted_at is null order by \"order\",id loop\n    v_mapping:=p_subitem_ids->v_definition.id;\n    v_new_subitem:=p_subitem_ids->>v_definition.id;\n    if pg_catalog.jsonb_typeof(v_mapping)<>'string' or coalesce(v_new_subitem,'')='' or\n       pg_catalog.char_length(v_new_subitem)>240 or exists(select 1 from rakeezx.score_subitems\n         where owner_id=v_owner and id=v_new_subitem) then\n      raise exception using errcode='22023',message='Copy subitem identity is invalid'; end if;\n    insert into rakeezx.score_subitems(owner_id,id,item_id,name,value,\"order\",distribution_version,device_id)\n      values(v_owner,v_new_subitem,p_new_item_id,v_definition.name,v_definition.value,\n        v_definition.\"order\",1,p_device_id);\n  end loop;\n  select coalesce(pg_catalog.jsonb_agg(pg_catalog.to_jsonb(d) order by d.\"order\",d.id),'[]'::jsonb)\n    into v_subitems from rakeezx.score_subitems d where d.owner_id=v_owner and d.item_id=p_new_item_id;\n  v_result:=pg_catalog.jsonb_build_object('mutationId',p_mutation_id,\n    'item',pg_catalog.to_jsonb(v_new_item),'subitems',v_subitems,'scores','[]'::jsonb);\n  insert into rakeezx.score_domain_receipts(owner_id,mutation_id,request_envelope,result)\n    values(v_owner,p_mutation_id,v_envelope,v_result);\n  return v_result;\nend; $function$\n",
+      "source_md5": "7c125fbb33aaaa4d43b6373b913b1aa1",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.apply_score_subitem_command(text,text,text,text,text,text,boolean,numeric)",
+      "arguments": "p_mutation_id text, p_device_id text, p_command text, p_item_id text, p_student_id text, p_subitem_id text DEFAULT NULL::text, p_checked boolean DEFAULT NULL::boolean, p_manual_value numeric DEFAULT NULL::numeric",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.apply_score_subitem_command(p_mutation_id text, p_device_id text, p_command text, p_item_id text, p_student_id text, p_subitem_id text DEFAULT NULL::text, p_checked boolean DEFAULT NULL::boolean, p_manual_value numeric DEFAULT NULL::numeric)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_owner uuid:=auth.uid(); v_envelope jsonb; v_receipt rakeezx.score_domain_receipts%rowtype;\n  v_item rakeezx.items%rowtype; v_completion rakeezx.score_subitem_completions%rowtype;\n  v_score jsonb; v_result jsonb;\nbegin\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\n  if coalesce(p_mutation_id,'')='' or char_length(p_mutation_id)>200 or\n     coalesce(p_device_id,'')='' or char_length(p_device_id)>200 or\n     p_command not in ('set_completion','set_manual') or\n     coalesce(p_item_id,'')='' or coalesce(p_student_id,'')='' or\n     (p_command='set_completion' and (p_subitem_id is null or p_checked is null)) or\n     (p_command='set_manual' and (p_subitem_id is not null or p_checked is not null)) or\n     (p_manual_value is not null and (p_manual_value<0 or p_manual_value>9999.99 or\n       p_manual_value<>pg_catalog.round(p_manual_value,2))) then\n    raise exception using errcode='22023',message='Invalid score domain command';\n  end if;\n  v_envelope:=pg_catalog.jsonb_build_object('deviceId',p_device_id,'command',p_command,\n    'itemId',p_item_id,'studentId',p_student_id,'subitemId',p_subitem_id,\n    'checked',p_checked,'manualValue',p_manual_value);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(\n    v_owner::text||':score-domain-receipt:'||p_mutation_id,0));\n  select * into v_receipt from rakeezx.score_domain_receipts\n    where owner_id=v_owner and mutation_id=p_mutation_id;\n  if found then\n    if v_receipt.request_envelope is distinct from v_envelope then\n      raise exception using errcode='22023',message='Score mutation ID reused with different content';\n    end if;\n    return v_receipt.result;\n  end if;\n  -- The item row serializes completion, manual and definition changes across devices.\n  select * into v_item from rakeezx.items where owner_id=v_owner and id=p_item_id\n    and deleted_at is null for update;\n  if not found or v_item.score_mode<>'subitems' or not exists(\n    select 1 from rakeezx.students where owner_id=v_owner and id=p_student_id and deleted_at is null\n  ) then raise exception using errcode='22023',message='Score item or student unavailable'; end if;\n  perform pg_catalog.set_config('rakeezx.score_domain_write','on',true);\n  if p_command='set_completion' then\n    if not exists(select 1 from rakeezx.score_subitems where owner_id=v_owner and id=p_subitem_id\n      and item_id=p_item_id and deleted_at is null) then\n      raise exception using errcode='22023',message='Subitem unavailable';\n    end if;\n    insert into rakeezx.score_subitem_completions(owner_id,id,student_id,subitem_id,checked,device_id)\n      values(v_owner,'ssc:'||p_student_id||':'||p_subitem_id,p_student_id,p_subitem_id,p_checked,p_device_id)\n      on conflict(owner_id,id) do update set checked=excluded.checked,device_id=excluded.device_id\n        where rakeezx.score_subitem_completions.deleted_at is null\n      returning * into v_completion;\n    if not found then raise exception using errcode='22023',message='Deleted completion cannot be resurrected'; end if;\n  else\n    -- The requested amount is provisional until the authoritative projection clamps it.\n    insert into rakeezx.scores(owner_id,id,student_id,item_id,manual_value,device_id)\n      values(v_owner,'sc:'||p_student_id||':'||p_item_id,p_student_id,p_item_id,p_manual_value,p_device_id)\n      on conflict(owner_id,id) do update set manual_value=excluded.manual_value,device_id=excluded.device_id;\n  end if;\n  v_score:=rakeezx.recompute_subitem_score(v_owner,p_item_id,p_student_id,p_device_id);\n  v_result:=pg_catalog.jsonb_build_object('mutationId',p_mutation_id,'itemId',p_item_id,\n    'studentId',p_student_id,'score',v_score,'completion',\n    case when p_command='set_completion' then pg_catalog.to_jsonb(v_completion) else null end);\n  insert into rakeezx.score_domain_receipts(owner_id,mutation_id,request_envelope,result)\n    values(v_owner,p_mutation_id,v_envelope,v_result);\n  return v_result;\nend; $function$\n",
+      "source_md5": "2937507d8de248672915518ef3ce546f",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.assert_score_provenance_consistent(uuid)",
+      "arguments": "p_owner uuid",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.assert_score_provenance_consistent(p_owner uuid)\n RETURNS void\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if exists(\n    select 1 from rakeezx.items i where i.owner_id=p_owner and i.deleted_at is null\n      and i.score_mode='subitems' and not exists(\n        select 1 from rakeezx.score_subitems d where d.owner_id=i.owner_id\n          and d.item_id=i.id and d.deleted_at is null)) then\n    raise exception using errcode='22023',message='Subitem item has no definitions';\n  end if;\n  if exists(\n    select 1 from rakeezx.score_subitem_completions c\n    join rakeezx.score_subitems d on d.owner_id=c.owner_id and d.id=c.subitem_id\n    where c.owner_id=p_owner and c.deleted_at is null and d.deleted_at is null and c.checked\n      and not exists(select 1 from rakeezx.scores s where s.owner_id=c.owner_id\n        and s.student_id=c.student_id and s.item_id=d.item_id and s.deleted_at is null)) then\n    raise exception using errcode='22023',message='Checked completion has no materialized score';\n  end if;\n  if exists(\n    select 1 from rakeezx.scores s\n    join rakeezx.items i on i.owner_id=s.owner_id and i.id=s.item_id\n    cross join lateral (\n      select least(i.max,coalesce(sum(d.value) filter(where c.checked and c.deleted_at is null\n        and d.deleted_at is null),0)) derived,\n        count(*) filter(where c.checked and c.deleted_at is null and d.deleted_at is null)>0 recorded\n      from rakeezx.score_subitems d\n      left join rakeezx.score_subitem_completions c on c.owner_id=d.owner_id\n        and c.subitem_id=d.id and c.student_id=s.student_id\n      where d.owner_id=s.owner_id and d.item_id=s.item_id\n    ) projection\n    where s.owner_id=p_owner and s.deleted_at is null and i.deleted_at is null\n      and i.score_mode='subitems' and (\n        s.derived_value is distinct from projection.derived or\n        (s.manual_value is not null and (s.manual_value<0 or s.manual_value>i.max-projection.derived)) or\n        s.value is distinct from (case when projection.recorded or s.manual_value is not null\n          then projection.derived+coalesce(s.manual_value,0) else null end)\n      )) then\n    raise exception using errcode='22023',message='Subitem score provenance diverged';\n  end if;\nend; $function$\n",
+      "source_md5": "7c847d715ee64f932da1eac73d12b781",
+      "acl": "{postgres=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.finalize_sync_v2_restore_score_v2(text,text,text)",
+      "arguments": "p_restore_id text, p_backup_hash text, p_expected_stage_hash text",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.finalize_sync_v2_restore_score_v2(p_restore_id text, p_backup_hash text, p_expected_stage_hash text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n      declare v_owner uuid:=auth.uid(); v_result jsonb; v_calendar record; v_year record;\r\n      begin\r\n        if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\r\n        perform rakeezx.lock_student_lifecycle(v_owner);\r\n        insert into rakeezx.n58_restore_transactions values(v_owner,pg_catalog.txid_current(),p_restore_id);\r\n        v_result:=rakeezx.finalize_sync_v2_restore_score_v2_before_n58(p_restore_id,p_backup_hash,p_expected_stage_hash);\r\n        for v_year in select y.* from rakeezx.years y where y.owner_id=v_owner\r\n          and y.calendar_preset_id is not null and rakeezx.n58_restore_creating_year(v_owner,y.id) loop\r\n          if (select count(*) from rakeezx.terms t where t.owner_id=v_owner and t.year_id=v_year.id\r\n            and t.\"index\" in (1,2) and t.deleted_at is null)<>2 then\r\n            raise exception using errcode='22023',message='N58_EXISTING_TERMS_REQUIRED'; end if;\r\n        end loop;\r\n        -- Calendar->term FK ordering requires calendars before terms. Validate\r\n        -- fresh-year override references AFTER all checked restore operations;\r\n        -- any error rolls back the domain rows AND the existing receipt.\r\n        for v_calendar in select c.* from rakeezx.calendars c where c.owner_id=v_owner\r\n          and rakeezx.n58_restore_creating_year(v_owner,c.year_id) loop\r\n          perform rakeezx.n58_validate_overrides(v_owner,v_calendar.year_id,v_calendar.preset_id,v_calendar.term_date_overrides);\r\n        end loop;\r\n        delete from rakeezx.n58_restore_transactions where owner_id=v_owner and transaction_id=pg_catalog.txid_current();\r\n        return v_result;\r\n      end; $function$\n",
+      "source_md5": "fcafe2b416227e71a1cca3b5580d4f8d",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.guard_subitem_definition_write()",
+      "arguments": "",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.guard_subitem_definition_write()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if pg_catalog.current_setting('rakeezx.score_domain_write',true) is distinct from 'on' then\n    if tg_table_name='items' then\n      if new.score_mode='subitems' or (tg_op='UPDATE' and old.score_mode='subitems') then\n        raise exception using errcode='42501',message='Subitem configuration requires atomic score domain command';\n      end if;\n    else\n      raise exception using errcode='42501',message='Subitem mutation requires atomic score domain command';\n    end if;\n  end if;\n  return new;\nend; $function$\n",
+      "source_md5": "5579781d91f3e8862110d7fc2c706158",
+      "acl": "{postgres=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.recompute_subitem_score(uuid,text,text,text)",
+      "arguments": "p_owner uuid, p_item text, p_student text, p_device text",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.recompute_subitem_score(p_owner uuid, p_item text, p_student text, p_device text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_max numeric(6,2); v_derived numeric(6,2); v_sum numeric; v_manual numeric(6,2);\n  v_recorded boolean; v_exists boolean; v_score rakeezx.scores%rowtype;\nbegin\n  select max into v_max from rakeezx.items where owner_id=p_owner and id=p_item and\n    score_mode='subitems' and deleted_at is null;\n  if v_max is null then raise exception using errcode='22023',message='Subitem parent unavailable'; end if;\n  select coalesce(sum(d.value),0),count(*)>0 into v_sum,v_recorded\n    from rakeezx.score_subitem_completions c\n    join rakeezx.score_subitems d on d.owner_id=c.owner_id and d.id=c.subitem_id\n    where c.owner_id=p_owner and c.student_id=p_student and c.checked and c.deleted_at is null\n      and d.item_id=p_item and d.deleted_at is null;\n  v_derived:=least(v_max,v_sum);\n  select * into v_score from rakeezx.scores where owner_id=p_owner and student_id=p_student\n    and item_id=p_item for update;\n  v_exists:=found;\n  v_manual:=case when v_score.manual_value is null then null\n    else least(greatest(v_score.manual_value,0),greatest(v_max-v_derived,0)) end;\n  perform pg_catalog.set_config('rakeezx.score_domain_write','on',true);\n  if v_exists then\n    update rakeezx.scores set derived_value=v_derived,manual_value=v_manual,\n      value=case when v_recorded or v_manual is not null then v_derived+coalesce(v_manual,0) else null end,\n      device_id=p_device where owner_id=p_owner and id=v_score.id returning * into v_score;\n  else\n    insert into rakeezx.scores(owner_id,id,student_id,item_id,derived_value,manual_value,value,device_id)\n      values(p_owner,'sc:'||p_student||':'||p_item,p_student,p_item,v_derived,v_manual,\n        case when v_recorded or v_manual is not null then v_derived+coalesce(v_manual,0) else null end,p_device)\n      returning * into v_score;\n  end if;\n  return pg_catalog.to_jsonb(v_score);\nend; $function$\n",
+      "source_md5": "7c4fdd9839ecc5de8d3a8401fc2e3df9",
+      "acl": "{postgres=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.score_foundation_capability()",
+      "arguments": "",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.score_foundation_capability()\n RETURNS jsonb\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select pg_catalog.jsonb_build_object('scoreDomainVersion',1,'restoreProtocol','CORE_V2',\n    'backupVersion',5,'copyDomainVersion',1);\n$function$\n",
+      "source_md5": "508edfb2258124ceb832da29ffdc51ef",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.stage_sync_v2_restore_score_v2(text,text,integer,jsonb,jsonb)",
+      "arguments": "p_restore_id text, p_backup_hash text, p_backup_version integer, p_source_manifest jsonb, p_operations jsonb",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.stage_sync_v2_restore_score_v2(p_restore_id text, p_backup_hash text, p_backup_version integer, p_source_manifest jsonb, p_operations jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_owner uuid:=auth.uid(); v_existing rakeezx.sync_restore_stages%rowtype;\n  v_operation jsonb; v_entity text; v_id text; v_action text; v_patch jsonb;\n  v_allowed jsonb; v_row jsonb; v_stage_hash text;\nbegin\n  if v_owner is null then raise exception using errcode='42501',message='Authentication required'; end if;\n  if coalesce(p_restore_id,'')='' or pg_catalog.char_length(p_restore_id)>200 or\n     p_backup_hash !~ '^[a-f0-9]{64}$' or p_backup_version<>5 or\n     pg_catalog.jsonb_typeof(p_source_manifest)<>'array' or\n     pg_catalog.jsonb_typeof(p_operations)<>'array' then\n    raise exception using errcode='22023',message='Invalid V5 restore envelope';\n  end if;\n  if p_source_manifest is distinct from rakeezx.sync_v2_backup_manifest_score_v2(v_owner) then\n    raise exception using errcode='40001',message='Canonical source changed before V5 staging';\n  end if;\n  if pg_catalog.jsonb_array_length(p_operations)>10000 or exists(select 1 from (\n    select value->>'entity' entity,value->>'recordId' record_id,count(*) n\n    from pg_catalog.jsonb_array_elements(p_operations) group by 1,2 having count(*)>1\n  ) duplicates) then\n    raise exception using errcode='22023',message='Invalid V5 operation set';\n  end if;\n  for v_operation in select value from pg_catalog.jsonb_array_elements(p_operations) loop\n    v_entity:=v_operation->>'entity'; v_id:=v_operation->>'recordId';\n    v_action:=v_operation->>'operation'; v_patch:=coalesce(v_operation->'patch','{}'::jsonb);\n    if not(v_entity=any(pg_catalog.array_append(pg_catalog.array_append(\n      rakeezx.sync_v2_restore_entities(),'score_subitems'),'score_subitem_completions'))) or\n      coalesce(v_id,'')='' or pg_catalog.char_length(v_id)>240 or\n      v_action not in ('create','create_deleted','patch','delete') or\n      pg_catalog.jsonb_typeof(v_patch)<>'object' or\n      (v_action='delete' and v_patch<>'{}'::jsonb) then\n      raise exception using errcode='22023',message='Invalid V5 restore operation';\n    end if;\n    if v_entity='profile' and v_id<>'profile' then\n      raise exception using errcode='22023',message='Invalid V5 profile identity'; end if;\n    v_allowed:=case when v_entity='closed_term_reports' then\n      '{\"term_id\":1,\"year_id\":1,\"version\":1,\"supersedes_id\":1,\"source_manifest\":1,\"payload\":1,\"state\":1,\"created_at\":1}'::jsonb\n      else rakeezx.sync_v2_field_map(v_entity) end;\n    if v_allowed is null or exists(select 1 from pg_catalog.jsonb_object_keys(v_patch) f\n      where not(v_allowed ? f)) then\n      raise exception using errcode='22023',message='Unsupported V5 restore field'; end if;\n    if v_entity='profile' then\n      select pg_catalog.to_jsonb(t) into v_row from rakeezx.profile t where owner_id=v_owner;\n    else\n      execute pg_catalog.format('select pg_catalog.to_jsonb(t) from rakeezx.%I t where owner_id=$1 and id=$2',v_entity)\n        into v_row using v_owner,v_id;\n    end if;\n    if (v_action in ('create','create_deleted') and\n      (v_row is not null or coalesce((v_operation->>'baseRevision')::bigint,0)<>0)) or\n       (v_action not in ('create','create_deleted') and\n         (v_row is null or (v_row->>'deleted_at') is not null or\n       (v_row->>'revision')::bigint<>coalesce((v_operation->>'baseRevision')::bigint,-1))) then\n      raise exception using errcode='40001',message='V5 restore operation is stale'; end if;\n    if v_action not in ('create','create_deleted') and\n      (v_entity in ('score_subitems','score_subitem_completions') or\n       (v_entity='items' and v_row->>'score_mode'='subitems') or\n       (v_entity='scores' and exists(select 1 from rakeezx.items i where i.owner_id=v_owner\n         and i.id=v_row->>'item_id' and i.score_mode='subitems'))) then\n      raise exception using errcode='22023',message='Subitem domain restore change requires explicit review';\n    end if;\n  end loop;\n  v_stage_hash:=pg_catalog.md5(p_backup_hash||':'||p_source_manifest::text||':'||p_operations::text);\n  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':restore:'||p_restore_id,0));\n  select * into v_existing from rakeezx.sync_restore_stages where owner_id=v_owner and restore_id=p_restore_id;\n  if found then\n    if (v_existing.backup_hash,v_existing.backup_version,v_existing.stage_hash) is distinct from\n       (p_backup_hash,p_backup_version,v_stage_hash) then\n      raise exception using errcode='22023',message='V5 restore ID reused'; end if;\n    return pg_catalog.jsonb_build_object('restoreId',p_restore_id,'backupHash',p_backup_hash,\n      'stageHash',v_stage_hash,'state',v_existing.state);\n  end if;\n  insert into rakeezx.sync_restore_stages(owner_id,restore_id,backup_hash,backup_version,\n    stage_hash,source_manifest,operations)\n    values(v_owner,p_restore_id,p_backup_hash,5,v_stage_hash,p_source_manifest,p_operations);\n  return pg_catalog.jsonb_build_object('restoreId',p_restore_id,'backupHash',p_backup_hash,\n    'stageHash',v_stage_hash,'state','staged');\nend; $function$\n",
+      "source_md5": "87e73f2c585024db100de62775eddc63",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.sync_v2_field_map(text)",
+      "arguments": "p_entity text",
+      "source": "CREATE OR REPLACE FUNCTION rakeezx.sync_v2_field_map(p_entity text)\n RETURNS jsonb\n LANGUAGE sql\n IMMUTABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nselect case p_entity\nwhen 'assignments' then '{\"teaching_id\":\"identity\",\"lesson_id\":\"identity\",\"item_id\":\"identity\",\"title\":\"content\",\"assigned_date\":\"dates\",\"due_date\":\"dates\",\"max\":\"grading\"}'::jsonb\nwhen 'submissions' then '{\"student_id\":\"identity\",\"assignment_id\":\"identity\",\"status\":\"content\",\"score\":\"content\",\"note\":\"content\"}'::jsonb\nelse rakeezx.sync_v2_field_map_before_n71(p_entity) end;\n$function$\n",
+      "source_md5": "89d5bfb0343538a814afe068e880875d",
+      "acl": "{postgres=X/postgres}",
+      "security_definer": true,
+      "configuration": [
+        "search_path=\"\""
+      ]
+    }
+  ],
+  "history": {
+    "migrations": [
+      {
+        "version": "0001",
+        "name": "core_schema"
+      },
+      {
+        "version": "0002",
+        "name": "indexes_triggers_rls"
+      },
+      {
+        "version": "0003",
+        "name": "hybrid_calendar"
+      },
+      {
+        "version": "0004",
+        "name": "student_notes"
+      },
+      {
+        "version": "0007",
+        "name": "sections_active_normalized_identity"
+      },
+      {
+        "version": "0008",
+        "name": "enrollment_membership_operations"
+      },
+      {
+        "version": "0009",
+        "name": "transfer_and_renumber_rosters"
+      },
+      {
+        "version": "0010",
+        "name": "profile_report_principal_name"
+      },
+      {
+        "version": "0011",
+        "name": "session_roster_snapshots"
+      },
+      {
+        "version": "0012",
+        "name": "sync_v2_server_protocol"
+      },
+      {
+        "version": "0013",
+        "name": "sync_v2_enrollment_commands"
+      },
+      {
+        "version": "0014",
+        "name": "sync_v2_attendance_snapshot_commands"
+      },
+      {
+        "version": "0015",
+        "name": "sync_v2_lifecycle_commands"
+      },
+      {
+        "version": "0016",
+        "name": "sync_v2_teaching_creation_commands"
+      },
+      {
+        "version": "0017",
+        "name": "sync_v2_bulk_attendance_commands"
+      },
+      {
+        "version": "0018",
+        "name": "profile_active_time_profile"
+      },
+      {
+        "version": "0019",
+        "name": "class_rules"
+      },
+      {
+        "version": "0020",
+        "name": "support_requests"
+      },
+      {
+        "version": "0021",
+        "name": "section_archive_lifecycle"
+      },
+      {
+        "version": "0022",
+        "name": "closed_term_reports"
+      },
+      {
+        "version": "0023",
+        "name": "sync_v2_backup_restore"
+      },
+      {
+        "version": "0024",
+        "name": "class_goal_runtime"
+      },
+      {
+        "version": "0025",
+        "name": "group_arrangements"
+      },
+      {
+        "version": "0026",
+        "name": "session_delete"
+      },
+      {
+        "version": "0027",
+        "name": "support_notification_outbox"
+      },
+      {
+        "version": "0028",
+        "name": "support_notification_contact_identity"
+      },
+      {
+        "version": "0029",
+        "name": "student_lifecycle_safety"
+      },
+      {
+        "version": "0030",
+        "name": "student_removal_preview"
+      },
+      {
+        "version": "0031",
+        "name": "curriculum_sync_v2"
+      },
+      {
+        "version": "0032",
+        "name": "account_profile_access_foundation"
+      },
+      {
+        "version": "0033",
+        "name": "score_subitem_foundation"
+      },
+      {
+        "version": "0034",
+        "name": "score_subitem_guard_acl_hardening"
+      },
+      {
+        "version": "20260924003436",
+        "name": "beta_new_account_provisioning"
+      },
+      {
+        "version": "20260924173929",
+        "name": "security_definer_direct_execute_hardening"
+      },
+      {
+        "version": "20260926115629",
+        "name": "owner_sync_invalidation"
+      },
+      {
+        "version": "20260930094421",
+        "name": "calendar_day_active_identity"
+      },
+      {
+        "version": "20260930234353",
+        "name": "calendar_suspension_kind"
+      },
+      {
+        "version": "20261004022154",
+        "name": "n03_education_department"
+      },
+      {
+        "version": "20261005052506",
+        "name": "n58_calendar_persistence"
+      },
+      {
+        "version": "20261005052526",
+        "name": "n58_extra_term_compatibility"
+      },
+      {
+        "version": "20261005052550",
+        "name": "n58_effective_scope_revalidation"
+      },
+      {
+        "version": "20261007230123",
+        "name": "n77_server_validated_delete"
+      },
+      {
+        "version": "20261012130249",
+        "name": "n73_distribution_apply"
+      },
+      {
+        "version": "20261012140116",
+        "name": "n71_unified_restore"
+      }
+    ]
+  }
+}

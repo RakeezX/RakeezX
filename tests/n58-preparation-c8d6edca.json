@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "taskId": "continuous-n58-fresh-live-20261012",
+  "runId": "c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+  "baseSha": "5fb778db4a411bb517a21eb3eb2662a776ac97a6",
+  "savedCandidate": "4946aac123772a1cf43d01792631743a4fb7413e",
+  "checks": {
+    "privatePreparation": {
+      "status": "PASS",
+      "credentialsGenerated": false,
+      "helperSha256": "ff8e90682482439f2401d70a64fa0db566cd6d0e498726a583e7376c93296de5",
+      "repair": "child Windows PowerShell 5 module search path only; no ACL helper change",
+      "ignored": true,
+      "untracked": true
+    },
+    "focusedContracts": {
+      "status": "PASS",
+      "evidenceDirectory": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/attempts/continuous-n58-fresh-live-20261012/c8d6edca-98b5-496d-aaf8-d15d40addc0f",
+      "details": "84 initial focused passes; 35 failed migration cases repaired to explicit immutable N58 snapshot and passed; owner recovery repaired and passed; current N49 5 passed. Reuse unchanged successful cases."
+    },
+    "capabilityMockPreparation": {
+      "status": "PASS",
+      "passed": 23,
+      "failed": 0,
+      "live": false
+    },
+    "renderedUI": {
+      "status": "PASS",
+      "target": "http://127.0.0.1:5173/",
+      "command": "node scripts/e2e-runner.mjs n58-client-controls-0457-3.e2e.mjs",
+      "passed": 2,
+      "live": false,
+      "authRequests": 0,
+      "ownedResourcesClosed": true
+    },
+    "preservedMain": {
+      "status": "PASS",
+      "details": "Merged current main; N77 legacy local Restore remains disabled; current N13/N77/N94 owner/Sync/grade guards retained."
+    }
+  },
+  "liveGate": "NOT_RUN"
+}

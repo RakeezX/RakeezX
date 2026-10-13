@@ -1,0 +1,51 @@
+{
+  "taskId": "continuous-n13-existing-section-subject-20261012",
+  "runId": "1f9fb9ff-83b1-422e-96af-736cc32898b2",
+  "baseSha": "b5e83107222833f5e74530a73355734d8477bd03",
+  "state": "BLOCKED",
+  "syntheticOnly": true,
+  "sources": {
+    "src/store.js": "8d75486639cc4d7dccb2fd72e2a78f7231d18ef7",
+    "src/views/teachings.js": "d9243f7e8ee67dbe297c6c5af00c253e20ec15f4",
+    "src/views/teaching-hub.js": "529393d5f8a8decf15ca3c5210063a66514cae28",
+    "src/styles/components.css": "86f957ff43928c1f1fcf7f9ee4eca4209c8099b8",
+    "src/lib/sync-v2.js": "4eee991aae3575ccbba8e79ce9262cab9c648088",
+    "src/lib/cloud.js": "05717f00de1452a42cd302622fe9d5a3bbebea21",
+    "docs/automation-evidence/20261012/deployed-teaching-creation.readonly.json": "f9399f6a9d4f4fabc9c7bbf2cb723ed593086fa7"
+  },
+  "checks": [
+    {
+      "name": "shared_section_subject_creation",
+      "status": "PASS",
+      "evidence": "17/17 focused store/section tests; actual Product create/edit handlers and rapid duplicate submissions PASS in n13-product.e2e.mjs."
+    },
+    {
+      "name": "shared_roster_subject_isolation",
+      "status": "PASS",
+      "evidence": "n13-store.test.mjs: claimed account workspace, shared roster edits and IDs; independent scores, attendance, report contexts; actual Sync V2 encode/decode and backup/reload."
+    },
+    {
+      "name": "existing_owner_command_roundtrip",
+      "status": "FAIL",
+      "evidence": "Native isolated PGlite harness: deployed RPC/wrapper bodies match saved read-only definitions; same-owner lost-response/reload retry PASS; owner B/no-Auth/local mismatch PASS. Canonical Teaching/default-ID adoption FAIL reproduced twice: 10 local items instead of the 5 canonical items."
+    },
+    {
+      "name": "scope_aware_delete_preservation",
+      "status": "PASS",
+      "evidence": "Account store and actual UI: subject-only vs final-class routing, scope-change reconfirmation, retained roster/tombstone blockers and pristine lifecycle. No N77 operation."
+    },
+    {
+      "name": "product_ui_release_scope",
+      "status": "PASS",
+      "evidence": "npx playwright test -c tests/n13-playwright.config.mjs: 3/3 PASS, actual index.html and Product handlers/source CSS via http://127.0.0.1:5193, fresh synthetic contexts; 390px RTL/1280px create/edit/delete light/dark renders inspected; Demo parity."
+    }
+  ],
+  "blocker": {
+    "type": "implementation",
+    "path": "src/lib/sync-v2.js",
+    "function": "reconcileTeachingCreationReceipt",
+    "details": "On a natural-key retry whose canonical Teaching and item IDs differ from local IDs, local default items are marked for removal but also re-put by the Teaching-reference rewrite. db.applyBatch removes before putting. Result: five old local plus five canonical grading items. Server receipt remains correct with five items. This unchanged source path is outside the activated allowedPaths.",
+    "retryCondition": "Scope and fix canonical receipt reconciliation in src/lib/sync-v2.js, then pass the retained n13-owner-roundtrip canonical adoption regression before publication."
+  },
+  "resources": "Browser phase lease acquired and released with matching run token; Playwright closed owned browser/Vite; port 5193 has no listener. No push/deploy, live mutation, schema change, or queue/status edits."
+}

@@ -30,7 +30,7 @@ function checksum(value) {
 const seal = (body) => JSON.stringify({ ...body, checksum: checksum(body) });
 const limited = (reason) => ({ state: 'LIMITED', editable: false, reason, age: null });
 export const leaseWriteError = () => Object.assign(new Error(
-  'يلزم التحقق من الحساب للمتابعة في التعديل. يمكنك عرض بياناتك وتنزيل نسخة احتياطية وتصديرها.'
+  'يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.'
 ), { code: OFFLINE_LEASE_LIMITED });
 
 export function revokeOwnerLeases(ownerId, storage = globalThis.localStorage) {

@@ -12,10 +12,17 @@ import * as store from '../src/store.js';
 import { buildBackup, validateBackupIntegrity } from '../src/lib/export.js';
 import { previewCloudRestore, restoreBackupToCloud } from '../src/lib/backup-v2.js';
 import { activateSyntheticAccountWorkspace } from './helpers/synthetic-workspace.mjs';
+import { n13Account } from './n13-fixture.mjs';
+import { SYNC_V2_STORES, SYNC_V2_SCHEMAS } from '../src/lib/sync-v2.js';
 
+// Install storage before the first workspace creates its lease controller.
+const values = new Map();
+globalThis.localStorage = { get length() { return values.size; }, key: i => [...values.keys()][i] ?? null,
+  getItem: key => values.get(key) ?? null, setItem: (key,value) => values.set(key,String(value)), removeItem: key => values.delete(key) };
 const OWNER_A = '11111111-1111-4111-8111-111111111111';
 const OWNER_B = '22222222-2222-4222-8222-222222222222';
-const auth = (id) => cloud.setMockAuth({ id }, { access_token: 'synthetic-only', user: { id } });
+const auth = id => { const session = { access_token: 'synthetic-only', user: { id } };
+  localStorage.setItem(cloud.AUTH_STORAGE_KEY, JSON.stringify(session)); cloud.setMockAuth(session.user, session); };
 
 test('V5 backup from A cannot restore into B, including after B reload and retry', async () => {
   auth(OWNER_A);
@@ -42,7 +49,13 @@ test('V5 backup from A cannot restore into B, including after B reload and retry
   let stageCalls = 0;
   let finalizeCalls = 0;
   cloud.setMockBackend({ async fetchRecords() { return []; } });
-  const preview = await previewCloudRestore(backup);
+  const ownerVerifier = async () => {
+    assert.equal(cloud.user.id, OWNER_B);
+    assert.equal(store.getActiveWorkspace().authUserId, OWNER_B);
+    return OWNER_B;
+  };
+  const historyFetcher = async () => ({ ownerId: OWNER_B, revision: '0' });
+  const preview = await previewCloudRestore(backup, { ownerVerifier, historyFetcher });
   assert.equal(preview.plan.ready, false);
   assert.equal(preview.plan.entries[0].reason, 'v5-owner-mismatch');
   const transport = {
@@ -51,7 +64,7 @@ test('V5 backup from A cannot restore into B, including after B reload and retry
   };
   const coordinator = { async assertCloudRestoreReady() {}, async runCloudRestoreExclusive(task) { return task(); } };
   const attempt = () => restoreBackupToCloud(backup, {
-    transport, coordinator, sourceFetcher: async () => ({}),
+    transport, coordinator, ownerVerifier, historyFetcher, sourceFetcher: async () => Object.fromEntries(SYNC_V2_STORES.map(name => [name, []])),
   });
   await assert.rejects(attempt(), (error) => error.code === 'RESTORE_REVIEW_REQUIRED' && !error.plan.ready);
   assert.deepEqual(await db.getAll('students'), beforeStudents);
@@ -71,6 +84,10 @@ test('V5 backup from A cannot restore into B, including after B reload and retry
   assert.deepEqual(await db.getAll('outbox'), beforeOutbox);
   assert.equal(await db.get('students', 'a:student'), undefined);
   assert.deepEqual([stageCalls, finalizeCalls], [0, 0]);
+  // Establish the existing owner-B N49 fixture; keep the Product guard enabled.
+  await n13Account(OWNER_B);
+  assert.equal(store.getActiveWorkspace().authUserId, OWNER_B);
+  assert.equal(store.getOfflineLeaseStatus().editable, true);
   await store.save({ years: [{ id: 'b:year', label: 'synthetic B', hijriStart: 1450,
     hijriEnd: 1451, status: 'active' }] });
   const bOutbox = await db.getAll('outbox');

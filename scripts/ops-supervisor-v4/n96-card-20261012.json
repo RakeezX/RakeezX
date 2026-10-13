@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "authority": "PO 2026-10-12 23:35 Asia/Riyadh",
+  "tasks": [
+    {
+      "id": "continuous-n96-student-delete-sync-flash-20261012",
+      "productId": "N96",
+      "scopeKey": "n96-active-student-lifecycle-presentation",
+      "activationId": "po-20261012-continuous",
+      "priority": 3,
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "requiredChecks": [
+        "student_lifecycle_inflight_presentation",
+        "student_lifecycle_recovery_visibility",
+        "student_delete_confirmation_navigation"
+      ],
+      "objective": "Implement the PO-reported followup to accepted N95: a red Sync warning flashes behind the student deletion dialog while deleting a student without records successfully. Read docs/automation-evidence/20261012/n96-source-diagnosis.json and the affected real Product code. Current executeStudentLifecycle deliberately saves studentLifecycleResume BEFORE the RPC; runStudentLifecycleExclusive uses restoreRunning, while coordinatorOperationalState and both severity/warning policies treat the checkpoint and safeToContinueUnrelatedWork=false as failure. Distinguish the exact context-bound live student lifecycle operation from an interrupted/orphan checkpoint. During that live operation, with no independent hard error, expose honest neutral in-progress presentation, cloudSyncHealthy=false, and preserve safeToContinueUnrelatedWork=false and all existing write exclusions. Expire the exception on completion/failure/context change. Reuse the same predicate in severity and warning policy; do not merely delay the warning or treat every modal as safe. Preserve RPC/deletion eligibility, Auth/owner semantics, durable checkpoint/reconciliation/retry behavior, N92 success copy, N95 90-second/two-attempt transport policy and existing roster navigation. No real student/account traffic or live deletion. A precise identity argument to the existing lifecycle wrapper is allowed if necessary; do not redesign lifecycle semantics. Use the existing actual Product synthetic harness, not a lookalike page. Return the worker schema with actual evidence; the controller owns Production publication.",
+      "acceptance": [
+        "student_lifecycle_inflight_presentation: In the real coordinator/lifecycle harness, hold the existing synthetic RPC or reconciliation at a deterministic promise barrier. The matching live operation with checkpoint shows neutral pending/syncing and no red strip; cloudSyncHealthy remains false, safeToContinueUnrelatedWork remains false and concurrent Product edits remain blocked. Observe the whole interval, not only final success. No sleep/grace timer or retry engine change.",
+        "student_lifecycle_recovery_visibility: Fail/interrupt the same operation leaving a checkpoint; after live scope ends, recovery/error remains immediately visible. Preserve the existing N95 assertions for revoked Auth, wrong owner/workspace, durable failed/rejected work and unknown unsafe states, including context switch and stale completion. Do not weaken the existing orphan-checkpoint assertion. Reuse unaffected evidence, run only the affected regression checks.",
+        "student_delete_confirmation_navigation: One bounded actual Product browser case with synthetic intercepted backend: preview, confirm, held deletion/reconcile, success, explicit return and originating roster. Observe no false red during the held operation, preserve the approved success copy and intentional navigation, and record actual browser evidence. No real deletion, full project browser suite, mandatory physical iPhone or paid service. Existing harness/setup fixes within the listed paths are routine authorized work, not a new PO gate."
+      ],
+      "allowedPaths": [
+        "src/lib/sync.js",
+        "src/lib/sync-status-severity.js",
+        "src/lib/sync-warning-policy.js",
+        "src/lib/student-lifecycle.js",
+        "sw.js",
+        "tests/n96-*",
+        "tests/n95-sync-status-severity.test.mjs",
+        "tests/sync-warning-policy.test.mjs",
+        "tests/student-lifecycle-client.test.mjs",
+        "tests/student-lifecycle-ui.e2e.mjs",
+        "tests/student-management-navigation.test.mjs",
+        "tests/helpers/student-lifecycle-server.mjs"
+      ],
+      "releaseAuthority": "PO 2026-10-12 23:35 Asia/Riyadh explicitly requests fixing this residual flash and separately accepts N95 closure; earlier continuous execution/delivery delegation remains active. Authorizes bounded reversible presentation implementation, exact synthetic affected proof and normal Git/Cloudflare Production publication. No changes to real records, applied migrations, deletion contract, Auth/RLS or actual write guards. Ordinary harness/setup problems are to be fixed under this authority; do not invent a new PO handoff.",
+      "sourceEvidence": {
+        "observedMain": "b5e83107222833f5e74530a73355734d8477bd03",
+        "diagnosis": "docs/automation-evidence/20261012/n96-source-diagnosis.json",
+        "closedOriginal": "N95",
+        "liveDeletionPerformedDuringDiagnosis": false
+      }
+    }
+  ]
+}
