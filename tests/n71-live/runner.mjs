@@ -223,6 +223,8 @@ async function run(){
     const exported=await payload(a.page);
     const exportedValidation=await a.page.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),exported);
     assert.equal(exportedValidation.ok,true,'Immediate full-domain export invalid: '+JSON.stringify(exportedValidation));
+    assert.equal(exported.data.scoreSubitems.find(r=>r.id===state.productIds.subitem).createdAt,
+      state.fixture.scoreSubitems[0].createdAt,'Canonical restore must preserve N94 creation history');
     for(const name of Object.keys(exported.data))assert.ok(exported.data[name].length>0,`Domain ${name} has no portable fixture`);
     check(state,'full_domain_export','Actual authenticated client export contains nonempty records in every portable Product store; current calendar foundation and mixed score provenance retained');
     const changed=await payload(a.page,{}, {store:'students',id:state.productIds.student,patch:{note:'after canonical restore'}});
@@ -296,6 +298,7 @@ async function run(){
     assert.equal(await a2.page.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true})),true,'A2 ordinary Sync must complete');
     const snapshot=async page=>page.evaluate(async()=>{const db=await import('/src/lib/db.js');const e=await import('/src/lib/export.js');const v2=await import('/src/lib/sync-v2.js');
       return Object.fromEntries(await Promise.all(db.STORES.filter(s=>!e.DEVICE_ONLY_STORES.includes(s)).map(async name=>[name,(await db.getAll(name)).map(row=>({id:row.id,deleted:row.deleted===true,revision:row.serverRevision,
+        ...(name==='scoreSubitems'?{createdAt:row.createdAt}:{}),
         ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
     await ready(a.page);await ready(a2.page);assert.deepEqual(await snapshot(a2.page),await snapshot(a.page));
     const final=await snapshot(a.page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
