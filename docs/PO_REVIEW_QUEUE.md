@@ -1,3 +1,5 @@
+Current PO decisions 2026-10-13 11:16 Asia/Riyadh: N94/N97/N98 and the +/- surface correction accepted/CLOSED. N93 temporarily DEFERRED. N73 stays CLOSED; N100 records agreed label-only target-mark preservation with copied start/due dates, not a delivered change. N78 stays deferred for a small open-source study. Finish the previously unfinished work before N23/N24/N64/N88/N90.
+
 Current PO priority update 2026-10-13: N73 accepted/CLOSED; optional target-mark preservation tracked as N100 pending details. N23/N24/N64/N88/N90 are reopened for work AFTER the pre-existing unfinished tickets; N78 is re-deferred. This supersedes old deferred flags for those five only. No new deferred worker is admitted by this record.
 
 # Current PO acceptance — 2026-10-13 08:27
@@ -13,10 +15,7 @@ This page preserves user notes and acceptance context. The automatic block lists
 
 | التذكرة | النتيجة المنشورة | الموقع | Git SHA | التحقق UTC | بطاقة التنفيذ |
 | --- | --- | --- | --- | --- | --- |
-| N98 | Preserved the implementation and corrected the N98 synthetic test fixture’s missing shipped migration without weakening assertions. All current affected checks pass. No push or deployment performed. | [Production](https://rakeezx.com/) | c3283c4b092d35fbaff0b7d4f97a3cf4e94e7893 | 2026-10-13T02:42:42.845Z | continuous-n98-default-alphabetical-roster-20261013 |
-| N97 | Serialized class deletion against Sync and added truthful resume verification. Genuine failures remain visible. Candidate committed locally; no push, deployment or real-data mutation. | [Production](https://rakeezx.com/) | 0064d57f2f968951453b4ee10519897c1f4293c2 | 2026-10-13T02:52:30.413Z | continuous-n97-delete-resume-sync-status-20261013 |
-| N99 | Implemented minimal public Umami events, privacy safeguards and public notice. No push, deployment, real collector events or dashboard observation. | [Production](https://rakeezx.com/) | f59bbe13f04a43e8f9829f670dee7ad0adcbc3ad | 2026-10-13T05:12:12.783Z | continuous-n99-umami-minimal-public-20261013 |
-| N94 | Implemented and locally committed the N94 grade toolbar and quick-log surface changes. Commit is labeled AI; no push or deployment performed. | [Production](https://rakeezx.com/) | 2acea62277012d738e9e15b9e6d24e413b6ee0c4 | 2026-10-13T07:55:46.731Z | continuous-n94-grade-strip-controls-20261013 |
+| N99 | Aligned the public landing event name to campaign_landing, preserved old per-tab dedupe behavior, and documented the historical event boundary. Local candidate is committed; publishing and Production verification remain with the controller. | [Production](https://rakeezx.com/) | 192df49cd7b1bb263f15a9448c2dcb1d7dd30563 | 2026-10-13T08:21:55.239Z | continuous-n99-campaign-event-contract-20261013 |
 
 <!-- END RAKEEZ CONTINUOUS DELIVERY -->
 <!-- END RAKEEZ OPERATING POINTER -->
