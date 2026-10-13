@@ -419,9 +419,9 @@ test('missing finalize receipt leaves Product unchanged and exact retry reconcil
     baselines: { students: [{ id: 'student:receipt', revision: 0, value: null }] } });
   let finalizations = 0;
   const transport = {
-    async stageSyncV2Restore(envelope) { return { restoreId: envelope.restoreId,
+    async stageUnifiedRestore(envelope) { return { restoreId: envelope.restoreId,
       backupHash: envelope.backupHash, stageHash: 'receipt-stage' }; },
-    async finalizeSyncV2Restore(envelope) {
+    async finalizeUnifiedRestore(envelope) {
       finalizations++;
       if (finalizations === 1) return { restoreId: envelope.restoreId,
         backupHash: envelope.backupHash, stageHash: envelope.expectedStageHash,

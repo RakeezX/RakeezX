@@ -1,0 +1,31 @@
+import 'fake-indexeddb/auto';
+import test,{after} from 'node:test';
+import assert from 'node:assert/strict';
+import * as db from '../src/lib/db.js';
+import * as store from '../src/store.js';
+import * as sync from '../src/lib/sync.js';
+import * as cloud from '../src/lib/cloud.js';
+import {n77Account} from './n77-fixture.mjs';
+globalThis.document={documentElement:{setAttribute(){},removeAttribute(){},classList:{add(){},remove(){}}},querySelector:()=>null};
+globalThis.matchMedia=()=>({matches:false});
+const values=new Map();globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k)};
+Object.defineProperty(globalThis,'navigator',{configurable:true,value:{onLine:true}});
+after(()=>{db.closeDB();store.closeChannel();});
+test('N71 preparing restore excludes N77 Delete before either mutation begins',async()=>{
+ let release;const waiting=new Promise(resolve=>{release=resolve;});
+ let deletes=0,restores=0;
+ const restore=sync.runCloudRestoreExclusive(async()=>{restores++;},{prepare:()=>waiting,scheduleAutomatic:false});
+ await assert.rejects(sync.runClassDeletionExclusive(async()=>{deletes++;},{ownerId:'11111111-1111-4111-8111-111111111111',teachingId:'synthetic'}),{code:'SYNC_BUSY'});
+ release();await restore;assert.equal(deletes,0);assert.equal(restores,1);
+});
+test('N77 own reserved command remains admitted while a competing restore is rejected',async()=>{
+ const owner='11111111-1111-4111-8111-111111111111';
+ cloud.setMockAuth({id:owner},{access_token:'synthetic',user:{id:owner}});
+ localStorage.setItem(cloud.AUTH_STORAGE_KEY,JSON.stringify(cloud.session));
+ await n77Account(owner);await store.init();
+ let release,entered;const waiting=new Promise(resolve=>{release=resolve;});const enteredTask=new Promise(resolve=>{entered=resolve;});
+ let mutations=0;const deletion=sync.runClassDeletionExclusive(async()=>{mutations++;entered();await waiting;},{ownerId:owner,teachingId:'synthetic'});
+ await enteredTask;
+ await assert.rejects(sync.runCloudRestoreExclusive(async()=>{mutations++;},{prepare:async()=>{},scheduleAutomatic:false}),{code:'SYNC_BUSY'});
+ release();await deletion;assert.equal(mutations,1);
+});

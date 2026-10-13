@@ -285,18 +285,21 @@ export async function previewCloudRestore(payload, {
   ownerVerifier = assertRestoreOwner,
   historyFetcher = cloud.fetchOwnerSyncMarker,
   sourceFetcher = fetchCanonicalRestoreSource,
+  coordinator = sync,
 } = {}) {
   const validation = await validateBackupIntegrity(payload);
   if (!validation.ok) return { validation, plan: null };
   if (!cloud.user || !cloud.session) throw Object.assign(new Error('Authentication required'), { code: 'AUTH_REQUIRED' });
-  const expectedOwnerId = await ownerVerifier();
-  const marker = await historyFetcher();
-  if (!marker || marker.ownerId !== expectedOwnerId) {
-    throw Object.assign(new Error('Owner history authority unavailable'), { code: 'RESTORE_OWNER_HISTORY_MISSING' });
-  }
-  const serverData = await sourceFetcher({ version: payload.version });
-  return { validation, plan: planCloudRestore(payload, serverData,
-    { ownerId: expectedOwnerId, ownerHistoryRevision: marker.revision }), serverData };
+  return coordinator.runCloudRestoreExclusive(async () => {
+    const expectedOwnerId = await ownerVerifier();
+    const marker = await historyFetcher();
+    if (!marker || marker.ownerId !== expectedOwnerId) {
+      throw Object.assign(new Error('Owner history authority unavailable'), { code: 'RESTORE_OWNER_HISTORY_MISSING' });
+    }
+    const serverData = await sourceFetcher({ version: payload.version });
+    return { validation, plan: planCloudRestore(payload, serverData,
+      { ownerId: expectedOwnerId, ownerHistoryRevision: marker.revision }), serverData };
+  }, { prepare: () => coordinator.assertCloudRestoreReady(), scheduleAutomatic: false });
 }
 
 async function assertRestoreOwner(expectedOwnerId = cloud.user?.id) {

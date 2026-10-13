@@ -6,14 +6,20 @@ test('N71 actual application presents one backup and one restore, validates file
   const { errors }=await bootSettings(page);
   await page.route('**/rpc/n71_restore_capability',route=>route.fulfill({json:{protocol:'N71_V1'}}));
   await page.route('**/rpc/score_foundation_capability',route=>route.fulfill({json:null}));
+  await page.route('**/rpc/owner_sync_change_marker',route=>route.fulfill({json:{protocol:'OWNER_SIGNAL_V1',ownerId:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',revision:'0',updatedAt:null}}));
   await page.evaluate(async()=>{
     const db=await import('/src/lib/db.js');const profile=await db.get('profile','profile');
     await db.put('profile',{...profile,serverCanonical:{...profile},fieldRevisions:{}});
   });
   await page.goto('/#/settings/backup');
   // Exact-count responses are required by the existing complete-read helper.
-  await page.route('**/rest/v1/**',route=>route.request().method()==='GET'
-    ? route.fulfill({json:[],headers:{'Content-Range':'*/0','Access-Control-Expose-Headers':'Content-Range'}}) : route.fallback());
+  let finalized=false;let canonical={};
+  await page.route('**/rest/v1/**',route=>{
+    if(route.request().method()!=='GET')return route.fallback();
+    const entity=new URL(route.request().url()).pathname.split('/').at(-1);
+    const rows=finalized?canonical[entity]??[]:[];
+    return route.fulfill({json:rows,headers:{'Content-Range':rows.length?`0-${rows.length-1}/${rows.length}`:'*/0','Access-Control-Expose-Headers':'Content-Range'}});
+  });
   await expect(page.locator('[data-act="export"]')).toHaveText('إنشاء نسخة احتياطية');
   await expect(page.locator('[data-act="pick-cloud-file"]')).toHaveText('استعادة نسخة احتياطية');
   await expect(page.locator('[data-act="pick-file"],[data-act="bootstrap-curriculum"],[data-act="claim-legacy-workspace"],[data-pick]')).toHaveCount(0);
@@ -41,14 +47,14 @@ test('N71 actual application presents one backup and one restore, validates file
   await expect(page.locator('.cloud-recovery-message.is-error')).toBeVisible();
   await expect(page.locator('[data-act="confirm-cloud"]')).toHaveCount(0);
   await page.context().setOffline(false);
-  await page.waitForFunction(async prior=>{const sync=await import('/src/lib/sync.js');return sync.displayState().detailStatus==='synced'&&sync.state.lastSyncedAt>prior;},priorSync);
+  await expect.poll(()=>page.evaluate(async prior=>{const sync=await import('/src/lib/sync.js');return sync.displayState().detailStatus==='synced'&&sync.state.lastSyncedAt>prior;},priorSync)).toBe(true);
   await page.locator('[data-act="preview-cloud"]').click();
   await expect(page.locator('[data-act="confirm-cloud"]')).toBeEnabled();
   let stages=0,finalizes=0;let stageEnvelope;
-  const canonical=await page.evaluate(async()=>{const {SYNC_V2_SCHEMAS}=await import('/src/lib/sync-v2.js');return Object.fromEntries(Object.values(SYNC_V2_SCHEMAS).map(schema=>[schema.entity,[]]));});
-  canonical.students=[{id:'n71-ui-student',name:'طالب النسخة',status:'active',revision:1,deleted_at:null}];
-  await page.route('**/rpc/stage_n71_restore',route=>{stages++;stageEnvelope=route.request().postDataJSON();return route.fulfill({json:{backupHash:stageEnvelope.p_backup_hash,stageHash:'n71-ui-stage'}});});
-  await page.route('**/rpc/finalize_n71_restore',route=>{finalizes++;return route.fulfill({json:{protocol:'N71_V1',receipt:{status:'finalized'},canonical}});});
+  canonical=await page.evaluate(async()=>{const {SYNC_V2_SCHEMAS}=await import('/src/lib/sync-v2.js');return Object.fromEntries(Object.values(SYNC_V2_SCHEMAS).map(schema=>[schema.entity,[]]));});
+  canonical.students=[{id:'n71-ui-student',owner_id:file.sourceOwnerId,name:'طالب النسخة',status:'active',revision:1,deleted_at:null}];
+  await page.route('**/rpc/stage_n71_restore',route=>{stages++;stageEnvelope=route.request().postDataJSON();return route.fulfill({json:{restoreId:stageEnvelope.p_restore_id,backupHash:stageEnvelope.p_backup_hash,stageHash:'n71-ui-stage'}});});
+  await page.route('**/rpc/finalize_n71_restore',route=>{finalizes++;finalized=true;return route.fulfill({json:{restoreId:stageEnvelope.p_restore_id,backupHash:stageEnvelope.p_backup_hash,stageHash:'n71-ui-stage',protocol:'N71_V1',receipt:{restoreId:stageEnvelope.p_restore_id,status:'finalized'},canonical}});});
   await page.locator('[data-act="confirm-cloud"]').click();
   await expect(page.locator('[data-cloud-confirm]')).toBeVisible();
   await page.locator('[data-cloud-confirm]').click();
@@ -61,11 +67,12 @@ test('N71 actual application presents one backup and one restore, validates file
   expect(await page.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),restoredBackup)).toMatchObject({ok:true});
   expect(restoredBackup.baselines.students.find(row=>row.id==='n71-ui-student').value.name).toBe('طالب النسخة');
   await page.locator('[data-act="reset-cloud"]').click();
-  await mkdir('coverage/n71-current',{recursive:true});
+  const evidenceRoot=process.env.N71_RUN_ID?`coverage/n71-live/${process.env.N71_RUN_ID}`:'coverage/n71-current';
+  await mkdir(evidenceRoot,{recursive:true});
   for(const width of [390,1280]){
     await page.setViewportSize({width,height:844});
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
-    await page.screenshot({path:`coverage/n71-current/ui-${width}.png`,fullPage:true});
+    await page.screenshot({path:`${evidenceRoot}/ui-${width}.png`,fullPage:true});
   }
   expect(errors).toEqual([]);
 });
