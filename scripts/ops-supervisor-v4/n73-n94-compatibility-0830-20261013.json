@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n73-real-distribution-20261012",
+      "productId": "N73",
+      "scopeKey": "n73-d119-account-atomic-distribution",
+      "activationId": "po-20261012-continuous",
+      "priority": 0,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+      "budgetMinutes": 180,
+      "idleMinutes": 20,
+      "requiredChecks": [
+        "n73_fresh_candidate_preview",
+        "n73_distribution_score_contract",
+        "n73_server_protocol_binding",
+        "n73_live_owner_atomic_retry",
+        "n73_live_device_convergence",
+        "n73_fixture_disposition"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "version": 1,
+        "productId": "N73",
+        "liveAuthorizationRef": "PO-20261012-continuous/N73-D119",
+        "authoritySource": "Current PO instruction to implement/finish the backlog and deploy under continuous automation, with approved D119/D105/D102 Product scope. D119 alone was a behavior approval; this reference explicitly identifies the later execution authority. Live effects remain confined to the named additive protocol and synthetic closure. CORRECTED CONTINUATION: Existing PO-20261012 continuous implementation/deployment authorization covers this specific corrected verification phase. It supersedes the old card's procedural prohibition on a replacement pair for this phase only; no renewed PO approval is required. Exactly one fresh A/B pair is permitted after the concrete correction is ready. Preserve every previous pair, private manifest, retained Product closure and deny-all function. Never unban, reuse credentials/IDs, reprovision or rearm an old pair/function. No real account, real student data, messages, service-role Product seeding, Auth policy change or widened Product scope. PO 2026-10-13 08:27 requests removal of all technical blockers and completion of the open work. Existing D119/N94 and continuous service/release authority covers correcting the objectively wrong late-score computation and missing origin/date/completion field mappings. The previous card restricted SQL to an already completed PT409 patch, an operator-authored scope omission. This update permits one narrow ADDITIVE compatibility migration; no Product behavior redesign, new Auth permission, replacement pair allowance, prior migration replay or N58 live operation.",
+        "git": {
+          "remote": "origin",
+          "branchPrefix": "ops/n73-preview/continuous-n73-real-distribution-20261012-",
+          "branchSuffix": "first 12 hex characters of the exact fresh candidate SHA",
+          "scope": "Normal push of this task's current candidate to the recorded Preview branch only. No force, main push, branch deletion, merge or Production deployment. Bind current base/candidate/tree/harness and Cloudflare check-run head SHA."
+        },
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "schema": "rakeezx",
+          "newFunctionCount": 2,
+          "functions": [
+            {
+              "role": "provision",
+              "nameTemplate": "ops-n73-fixture-<first20(runId without hyphens)>",
+              "scope": "Only the two new immutable UUIDs and exact N73 run marker in a private manifest; protected probe/inspect/ensure."
+            },
+            {
+              "role": "cleanup-only",
+              "nameTemplate": "ops-n73-retire-<first20(runId without hyphens)>",
+              "scope": "Only the same two saved UUIDs/markers; protected probe/inspect/global-sign-out/ban. Deployed and protected-probed before first Auth create."
+            }
+          ],
+          "fixtureScope": "Exactly one fresh synthetic A/B pair for correctedVerificationPhase; use the current controller runId and the original purpose/owner/data boundaries below. Old IDs and functions in retiredPair stay excluded. Exactly two newly created synthetic accounts A/B; A1/A2/B1 owned contexts; minimal ordinary account foundation and only the card's declared purpose-created Product IDs. Save complete IDs, expected effects and retained closure before writes. No existing real account, third-party message, imported real roster or service-role Product seeding.",
+          "authBoundary": "Adapt only the reviewed D087 source primitives/official SDK pin into this task's own small handler/runner. Never reuse D087/N58 accounts, tokens, manifest, function names or frozen purpose. Use current official Auth admin API in protected server code; no key extraction, SQL Auth inserts or global Auth policy changes. Both independent run capabilities expire within 90 minutes. The fresh phase also excludes all exact IDs and names in correctedVerificationPhase.retiredPair; use official admin APIs and existing reviewed primitives only.",
+          "migration": {
+            "operation": "apply_migration_if_required",
+            "maxNewMigrations": 1,
+            "name": "n73_n94_compatibility",
+            "sourceFileSuffix": "_n73_n94_compatibility.sql",
+            "alreadyApplied": {
+              "operation": "apply_migration_if_required",
+              "maxNewMigrations": 1,
+              "name": "n73_distribution_error_contract",
+              "sourceFileSuffix": "_n73_distribution_error_contract.sql",
+              "alreadyAppliedMigration": {
+                "name": "n73_distribution_apply",
+                "version": "20261012130249",
+                "sourceFile": "supabase/migrations/20261012120000_n73_distribution_apply.sql",
+                "sha256": "dc25d62af8363149b046053fc5c841b140d222513c0f3913c023db6f0248c12f",
+                "immutable": true
+              },
+              "functions": [
+                {
+                  "signature": "rakeezx.apply_score_distribution_plan(text,text,text,text,boolean)",
+                  "observedPriorBodyMd5": "3c8da9d39fe5827b2a29f3d0f63ef5bd",
+                  "manualErrorSites": [
+                    "Distribution plan expired or changed",
+                    "Distribution changed since review",
+                    "Distribution operation unavailable"
+                  ]
+                },
+                {
+                  "signature": "rakeezx.rename_score_item(text,text,text,bigint,text)",
+                  "observedPriorBodyMd5": "995951fd8b362819e302f71afa2c180e",
+                  "manualErrorSites": [
+                    "Item changed since review"
+                  ]
+                }
+              ],
+              "scope": "One new additive corrective migration only: CREATE OR REPLACE the two exact existing function bodies, replacing their four deliberately raised business-conflict SQLSTATE 40001 values with PT409. Preserve signatures, owner guards, search_path, security attributes, ACL, locks, operation ordering, atomicity and receipts; no other schema, row, general Auth/RLS or existing migration change.",
+              "beforeApply": "Read actual current function definitions/ACL and migration history first. Bind the existing source and the exact new correction with hashes. If the same correction is already applied and bodies/ACL match, reuse its evidence without applying again. If current bodies differ from the recorded parent beyond the same correction, report exact drift before an overwrite; do not reset or edit applied migration history.",
+              "certification": "Before the single connector application, run the existing narrow native owner/atomicity/rollback verification against the exact corrected bodies and assert SQLSTATE PT409 for the deliberately stale plan. Read back both definitions/ACL and actual migration version after application. Existing migration already applied once stays untouched."
+            },
+            "functions": [
+              {
+                "signature": "rakeezx.n73_build_distribution(text,text[],text[])",
+                "scope": "Preserve D119 target existing grades and clamp semantics while honoring the current N94 explicit completion_state and late_points/regular value, optional start/due/late fields and stable origin mapping. No copy of source student scores."
+              },
+              {
+                "signature": "rakeezx.sync_v2_field_map(text)",
+                "scope": "Preserve the current full applied field-map/delegation chain, add only missing approved N73 origin and N94 subitem dates/late/state fields so changes survive decode/Sync/backup. No recursive wrapper or removal of unrelated/newer mappings."
+              }
+            ],
+            "scope": "Read exact current definitions and applied migration inventory before source construction. Use a new transactional additive correction only for the two named existing functions, preserving signatures, owner locks, ACL, search_path, receipts, server revision and idempotency contracts. Applied N73 PT409 correction and N94 migration remain immutable. No real account/student mutations, no broad Auth/RLS/schema repair, no existing data rewrite.",
+            "beforeApply": "Bind actual definitions and scopes with hashes. If an identical correction is already applied and verified, reuse it. If current dependencies differ, adapt the corrected code to preserve those live semantics; never overwrite unrelated changes.",
+            "certification": "Native disposable PostgreSQL must exercise actual late/normal/unmarked target records, unchanged unrelated grades, current-map origin/date/state roundtrip, real stale PT409 rollback and exact idempotent retry before the single service migration. Then read back source/ACL/history and preserve the evidence. An ambiguous application response is reconciled through history, never blindly applied again."
+          },
+          "finalDisposition": "Direct deterministic finally calls the predeployed cleanup companion for the exact pair: global sign-out, verified fixed bans, password/refresh denial and residual access-JWT expiry recorded separately. Retain any exact synthetic foundation protected by existing guards; no hard/soft-delete bypass. Redeploy only the same two new functions to deny-all and verify source plus actual 410 endpoints. DISARM_PENDING or expired-cleanup-pending is BLOCKED with same run/candidate; never silently create another pair. This rule is scoped to the one fresh pair of correctedVerificationPhase; its explicit authorization above is not a request to revive the retired pair. Preserve previous disposition proofs unchanged.",
+          "correctedVerificationPhase": {
+            "version": 1,
+            "phase": "n73-corrected-live-proof-20261012",
+            "priorCandidateSha": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+            "maxNewPairs": 1,
+            "accountsPerPair": 2,
+            "runIdBinding": "Use the next controller-created attempt runId; exact saved Codex session/worktree continue. The fixture phase gets a new private manifest and its own run-bound names.",
+            "retiredPair": {
+              "runId": "0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e",
+              "accountIds": [
+                "268f2d00-92a1-4c6d-a2a1-ef94a45a43c9",
+                "2f507c7e-8c11-4207-94d7-595eeccc2677"
+              ],
+              "functionNames": [
+                "ops-n73-fixture-0892c4c09a0e4c6bb1ee",
+                "ops-n73-retire-0892c4c09a0e4c6bb1ee"
+              ],
+              "proof": "test-results/n73-final-evidence.json and n73-disarm-binding.json"
+            },
+            "startCondition": "Complete the concrete local/service correction, retained evidence checks and deterministic finally/recovery before issuing the new 90-minute capabilities. Provision only after both independently protected functions are deployed and verified.",
+            "failureDisposition": "Record the exact failing stage/HTTP or SQL code and preserve the candidate. Finally retire/disarm this phase. No unban, same-phase replacement pair or missing-PO-permission fiction."
+          }
+        },
+        "execution": {
+          "leases": "Use existing live-mutation lease for actual service/fixture writes and browser lease only for owned browser phases. Release after the actual phase; do not reserve either while writing local code.",
+          "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\n73",
+          "deadline": "Implement the single deterministic harness and finally/recovery before provisioning. At most 45 minutes of live work, reserve at least 15 minutes for cleanup within the 90-minute capability. If total card budget is reached, stop at a safe durable checkpoint; never abandon created accounts or kill an active mutation.",
+          "publication": "Service operations above are preparation only. LOCAL_READY requires all actual named checks PASS, including service disposition. Product main/Production is exclusively the publisher. Do not edit controller/queue/policies or broaden allowed directories.",
+          "harnessBinding": "Remove reliance on prior literal run IDs/function names by passing the current runId or using an explicitly recorded runtime-derived copy. Bind candidate, source tree, current runId and exact harness SHA before provision. Use a new private subdirectory under the existing task privateStateRoot and a distinct per-run evidence subdirectory; never overwrite prior manifests or receipts. Retain the proven Windows PowerShell 7 private-directory helper when needed; do not rerun the known PS5.1 module failure or relax ACL checks. No extra framework, general API integration or new global configuration."
+        }
+      },
+      "objective": "Resolve the concrete N73/N94 blocker, then complete the existing accepted distribution workflow. Resume exact saved session 01a1300c-3300-7cb1-9a67-9c74c6008159 and candidate bdb598cd262b4465e118daa8fed956468cdaef1a. PO 2026-10-13 08:27 requests removal of all technical blockers and completion of the open work. Existing D119/N94 and continuous service/release authority covers correcting the objectively wrong late-score computation and missing origin/date/completion field mappings. The previous card restricted SQL to an already completed PT409 patch, an operator-authored scope omission. This update permits one narrow ADDITIVE compatibility migration; no Product behavior redesign, new Auth permission, replacement pair allowance, prior migration replay or N58 live operation.\nReconcile actual remote/main and only materially affected files: current N94 date picker/compact names/offline semantics, N98 alphabetical ordering and N77 fresh-identity recreation MUST survive. Do not copy old whole shared files over main. Reuse unchanged PT409 correction, retired-pair cleanup and successful scoped checks; do not repeat the earlier unchanged blocked run or applied migrations.\nThe latest known real N94 state cannot be summed as regular values when completion_state=late. Fix this in the bounded builder and preserve the current field map end to end. Certify locally before cloud preparation. The existing correctedVerificationPhase authorized fresh A/B pair is still uncreated according to the last exact result; this update grants zero additional pairs. Verify its unused disposition from existing sanitized phase receipts before provisioning. Use that still-unconsumed allowance only if true, bind one durable runId and deterministic cleanup; never recycle prior retired accounts or borrow N58/N71 identities. If consumed/denied, preserve and report rather than inventing another allowance.\nContinue actual owner/atomic retry/A2 gates under the already approved bounded phase; only the sole publisher delivers Product after all retained required checks actually pass. No global human-review hold or extra review agent. Missing ordinary harness paths needed by this correction can be identified specifically; do not silently widen data scope.",
+      "acceptance": [
+        "n73_fresh_candidate_preview: PASS binds fresh base/candidate/tree/harness to an exact successful immutable Cloudflare Preview and affected source assets. Normal flow is source class, explicitly selected targets (none selected by default), compact review and apply, with impact details collapsed. Preserve natural class order and D105 parent metadata-only edit.",
+        "n73_distribution_score_contract: PASS covers full definition/subitem matching; unique matches update in place, missing items are created, repeated apply creates no duplicate origin. Keep valid target manual scores and persistently cap only over-maximum scores; manual-to-auto uses only target events. Keep extra items/scores by default and require the specific unchecked removal option plus deliberate impact confirmation. Ambiguous matches fail closed for the affected target. Preserve late/subitem metadata already on main.",
+        "n73_server_protocol_binding: PASS records the exact additive migration source/hash, focused native owner/atomicity result, one actual provider application and read-back RPC/ACL/version binding. The deployed single-item/single-target apply_score_distribution_copy_command is not D119 proof. Validate the selected plan against fresh server revisions, then atomically apply its accepted target operations; expose any excluded ambiguous target in review. Keep old clients working until the replacement is certified.",
+        "n73_live_owner_atomic_retry: PASS uses real authenticated A/B and the exact synthetic IDs: B cannot read/apply to A; stale plan or injected bounded failure causes no partial accepted-plan mutation; retry is idempotent. Demonstrate persisted cap, compatible target score preservation, target-only auto projection, keep-default and explicit synthetic extra removal. No source grades copied and no real teacher data touched.",
+        "n73_live_device_convergence: PASS shows A2 receives the actual canonical items/subitems/completions/scores and deletion receipts after apply, including stale retry without duplicate or resurrection. Backup/restore serializers preserve relevant changed fields. Use focused current contract tests and one deterministic live harness; no full historical suite or repeated source-identical builds.",
+        "n73_fixture_disposition: PASS requires actual exact-pair disposition and both final deny-all proofs from preparationAuthority, with durable finally/recovery prepared before Authcreate. Missing live/provider/cleanup proof means precise BLOCKED and preserved candidate, never a Demo LOCAL_READY.",
+        "Corrected continuation: old pair 0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e stays permanently retired; its two endpoints remain deny-all. Exactly one fresh pair for the corrected phase is authorized by the current user instruction, with new run-bound manifest/functions and complete disposition. Do not request PO approval for this already-authorized phase.",
+        "n73_server_protocol_binding: supplement the already applied N73 migration with ONLY the two-function PT409 corrective migration described in preparationAuthority. Check actual source/migration history before any apply, native-certify the correction, then read back exact deployed definitions/ACL/version. Do not edit/reapply 20261012120000_n73_distribution_apply.sql or broaden service scope.",
+        "n73_live_owner_atomic_retry: update tests/n73-live/run.mjs stale-plan assertion from code 40001 to status 409 AND code PT409; keep the 15000ms AbortSignal deadline. Preserve exact endpoint/stage, elapsed time, status and public error code in diagnostic evidence without tokens or passwords. A timeout/network abort must remain an explicit failed gate. Assert actual unchanged target/domain state and no receipt, then finish accepted apply, lost-acknowledgement retry and idempotence.",
+        "n73_live_device_convergence and n73_fixture_disposition: finish the existing actual A2 canonical data/tombstone/backup cases and the new pair retirement/disarm. Reuse unchanged contract/Preview evidence only where source/tree/harness bindings still match; bind any small new repair commit as a descendant of the retained candidate. No full historical suite or repeated source-identical build.",
+        "Late completion target grades reflect N94 selected state and points; unmarked remains unmarked; normal remains regular. Date and origin/state mapping survive actual roundtrip, while D119 no-source-grade-copy and current target-grade clamping remain intact.",
+        "Existing PT409 migration is already applied; this phase adds only verified N73/N94 compatibility and consumes at most the still-unused original corrected phase allowance. No replacement or retired account reuse."
+      ],
+      "allowedPaths": [
+        "src/lib/score-foundation.js",
+        "src/lib/cloud.js",
+        "src/lib/db.js",
+        "src/lib/sync-v2.js",
+        "src/lib/sync.js",
+        "src/lib/backup-v2.js",
+        "src/lib/initial-restore.js",
+        "src/store.js",
+        "src/views/items.js",
+        "src/styles/components.css",
+        "sw.js",
+        "supabase/migrations/*_n73_distribution_apply.sql",
+        "supabase/functions/ops-n73-fixture/**",
+        "supabase/functions/ops-n73-retire/**",
+        "tests/n73-*",
+        "tests/n73-live/**",
+        "tests/score-foundation-local.test.mjs",
+        "tests/score-foundation-server.test.mjs",
+        "tests/v2-backup-restore.test.mjs",
+        "supabase/migrations/*_n73_distribution_error_contract.sql",
+        "supabase/migrations/*_n73_n94_compatibility.sql"
+      ],
+      "releaseAuthority": "PO-20261012 continuous execution/deployment under D119/D105/D102; no renewed routine PM/Preview hold. Worker may only use the named preparation operations and synthetic plan. Product main/Production is publisher-only. No mass/real-data operation; stop only this card on concrete unsafe drift. Corrected-phase execution is covered by the existing user authorization: one fresh pair under preparationAuthority.correctedVerificationPhase, preserving the old pair retired. No renewed PO permission is required for this bounded correction and proof. PO 2026-10-13 08:27 requests removal of all technical blockers and completion of the open work. Existing D119/N94 and continuous service/release authority covers correcting the objectively wrong late-score computation and missing origin/date/completion field mappings. The previous card restricted SQL to an already completed PT409 patch, an operator-authored scope omission. This update permits one narrow ADDITIVE compatibility migration; no Product behavior redesign, new Auth permission, replacement pair allowance, prior migration replay or N58 live operation.",
+      "sourceEvidence": {
+        "ledger": "docs/PRODUCT_LEDGER.md#N73",
+        "decisions": [
+          "D119",
+          "D105",
+          "D102"
+        ],
+        "readOnlyEvidence": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.readonly.json",
+        "latestInventory": "scripts/ops-supervisor-v4/backlog-final-audit/evidence.latest.readonly.json",
+        "observedMain": "4bbf8078529358543fcd65732fc7b5b8eaf2fae1",
+        "liveGateExecutedByThisPreparation": false,
+        "approvedContract": "docs/N73_SIMPLIFIED_DISTRIBUTION_V2.md",
+        "historicalCandidate": "c961f28b8eccbb9b2a425a7b6b89ca3c1d6130a1",
+        "historicalImplementationCommit": "1b1f9a8f28f098acb4cc248a4e0453ddb424475b",
+        "historicalImplementationPaths": [
+          "src/lib/score-foundation.js",
+          "src/store.js",
+          "src/views/items.js",
+          "tests/n73-account-gate.test.mjs",
+          "tests/n73-d119.test.mjs"
+        ],
+        "observedRpcSourceMd5": "7c125fbb33aaaa4d43b6373b913b1aa1",
+        "correctedContinuation": {
+          "currentCandidate": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+          "retiredPairEvidence": "test-results/n73-final-evidence.json and n73-disarm-binding.json",
+          "sourceSites": [
+            "supabase/migrations/20261012120000_n73_distribution_apply.sql:285,292,308,349",
+            "tests/n73-live/run.mjs:31,209",
+            "tests/n73-native.mjs:89",
+            "src/lib/sync-v2.js:1291-1294"
+          ],
+          "officialFailureMode": "https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b",
+          "officialHttpErrors": "https://docs.postgrest.org/en/stable/references/errors.html",
+          "evidenceReadAt": "2026-10-12",
+          "certainty": "The code deliberately uses 40001 and the actual live request timed out at the client. The official provider describes exactly this failure mode; the running project PostgREST version/retry trace was not independently established by this read-only file diagnosis.",
+          "backendObservation": {
+            "source": "Coordinator read-only pg_stat_activity metadata, reported 2026-10-12",
+            "nonIdleAuthenticatorCallsForAffectedFunctions": 0,
+            "functions": [
+              "apply_score_distribution_plan",
+              "rename_score_item"
+            ],
+            "limitation": "Momentary observation only; does not reconstruct the prior request retry trace. No backend termination or project restart is required by this observation."
+          }
+        }
+      },
+      "promptPath": "cutover/20261012-continuous/native-postgres-capability-20261012.txt",
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Source-confirmed deliberate SQLSTATE 40001 conflicts match the official PostgREST retry failure mode. Authorize one additive PT409 correction for only the two named function bodies and a fresh bounded proof phase. Preserve the original applied migration, deadline, old retired pair and all true assertions.",
+        "previousRunId": "0892c4c0-9a0e-4c6b-b1ee-ab3e085ac52e",
+        "preservedCandidateSha": "0c2a3871b9a0f1032802a4e30e3e9896741ba39d",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    }
+  ]
+}
