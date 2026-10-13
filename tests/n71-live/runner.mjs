@@ -214,7 +214,30 @@ export async function restore(page,backup,id){return page.evaluate(async({backup
   return b.restoreBackupToCloud(backup,{restoreId:id});},{backup,id});}
 async function denied(page,backup,expected){const code=await page.evaluate(async backup=>{try{await(await import('/src/lib/backup-v2.js')).previewCloudRestore(backup);return 'UNEXPECTED_SUCCESS';}catch(e){return e.code??e.message;}},backup);
   assert.ok(expected.includes(code),`Expected fail-closed ${expected.join(',')}; observed ${code}`);return code;}
-export async function suppressionSequence(page,secondPage,state,exported){
+export async function ordinarySyncCheckpoint(page,ownerId,{studentId,timeout=120000}={}){
+  const request=await page.evaluate(async expectedOwner=>{
+    const c=await import('/src/lib/cloud.js'),s=await import('/src/lib/sync.js'),store=await import('/src/store.js'),db=await import('/src/lib/db.js');
+    const workspace=store.getActiveWorkspace(),device=await db.get('device','device');
+    if(c.user?.id!==expectedOwner||workspace?.authUserId!==expectedOwner||workspace?.ownershipState!=='claimed'||
+      db.getActiveDatabaseName()!==workspace.databaseName)throw Error('N71 ordinary Sync owner checkpoint mismatch');
+    const receipt=await db.readInitialRestoreReceipt();
+    if(receipt?.ownerId!==expectedOwner||receipt?.protocol!=='CORE_V2')throw Error('N71 ordinary Sync lacks its owner-bound Initial Restore receipt');
+    if((await db.getAll('outbox')).length||device?.cloudRestoreResume||device?.studentLifecycleResume||device?.n77DeleteIntent)
+      throw Error('N71 ordinary Sync has unresolved local work');
+    const before=s.state.lastSyncedAt??0,directResult=await s.syncAll({full:true});
+    const detailStatus=s.displayState().detailStatus;
+    if(!directResult&&detailStatus!=='syncing')throw Error('N71 ordinary Sync refused: '+detailStatus);
+    return {before,directResult,detailStatus};
+  },ownerId);
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    const checkpoint=await ownerCheckpoint(page,ownerId,{studentId,timeout:Math.max(1,deadline-Date.now())});
+    if(checkpoint.lastSyncedAt>request.before)return {...request,checkpoint};
+    await page.waitForTimeout(50);
+  }
+  throw Error('N71 ordinary Sync did not complete a new owner-bound pass');
+}
+export async function suppressionSequence(page,secondPage,state,exported,{beforeA2Pull=async()=>{}}={}){
     // Ordinary authenticated Sync makes deletion canonical before restoring stale export.
     assert.ok(Date.now()<Date.parse(state.liveDeadline),'Live deadline reached before deletion boundary');
     await page.evaluate(async ids=>{const c=await import('/src/lib/cloud.js');const db=await import('/src/lib/db.js');
@@ -238,7 +261,8 @@ export async function suppressionSequence(page,secondPage,state,exported){
     assert.equal(suppression.plan.ready,true);assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.deletedAssignment&&e.reason==='server-tombstone'));
     assert.ok(suppression.plan.entries.some(e=>e.id===state.productIds.closedChild&&e.reason==='closed-term-scope'));
     await restore(page,stale,'n71:'+RUN+':suppression');
-    assert.equal(await secondPage.evaluate(async()=>await(await import('/src/lib/sync.js')).syncAll({full:true})),true,'A2 ordinary Sync must complete');
+    await beforeA2Pull();
+    state.a2ConvergenceCheckpoint=await ordinarySyncCheckpoint(secondPage,state.ownerId??state.accounts?.[0]?.id,{studentId:state.productIds.student});
     const snapshot=async page=>page.evaluate(async()=>{const db=await import('/src/lib/db.js');const e=await import('/src/lib/export.js');const v2=await import('/src/lib/sync-v2.js');
       return Object.fromEntries(await Promise.all(db.STORES.filter(s=>!e.DEVICE_ONLY_STORES.includes(s)).map(async name=>[name,(await db.getAll(name)).map(row=>({id:row.id,deleted:row.deleted===true,revision:row.serverRevision,
         ...(name==='scoreSubitems'?{createdAt:row.createdAt}:{}),
