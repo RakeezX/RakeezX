@@ -13,6 +13,7 @@ import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
+import { createMarketingAnalytics, MARKETING_PRIVACY_NOTICE } from './lib/marketing-analytics.js';
 import { LEASE_STORAGE_PREFIX } from './lib/offline-lease.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { captureSupportOriginBeforeNavigation, clearSupportOrigin, enterSupportVisit } from './lib/support-origin.js';
@@ -59,6 +60,20 @@ let syncModule = null;
 let teacherMiniHubSheet = null;
 let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
+let marketingAuthSettled = false;
+const marketing = createMarketingAnalytics({ eligible: () =>
+  marketingAuthSettled && cloud.authStatus().state === 'signed_out' && !cloud.session && !cloud.user &&
+  localStorage.getItem(cloud.AUTH_STORAGE_KEY) === null &&
+  (!store.getActiveWorkspace() || isDemoWorkspace())
+});
+cloud.subscribe(() => {
+  if (cloud.session || cloud.user || cloud.authStatus().state !== 'signed_out') marketing.stop();
+});
+window.addEventListener('storage', event => {
+  if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) marketing.stop();
+});
+window.addEventListener('pagehide', () => marketing.stop());
+window.addEventListener('offline', () => marketing.stop());
 let initialRestoreAbortController = null;
 let recoveryCycle = startRecoveryCycle(Date.now());
 let warningTimer = null;
@@ -607,7 +622,11 @@ async function boot() {
   try {
     // Restore the cached identity immediately, but never make the local shell
     // depend on a refresh request that Android may suspend while backgrounded.
+    // Any pre-existing identity, including malformed/expired credentials, is excluded.
+    if (localStorage.getItem(cloud.AUTH_STORAGE_KEY) !== null) marketing.stop();
     await cloud.init({ waitForRefresh: false });
+    marketingAuthSettled = true;
+    if (cloud.session || cloud.user || cloud.authStatus().state !== 'signed_out') marketing.stop();
     clearLegacyDemoRequest();
     if (cloud.session && cloud.user) clearDemoRequest();
     const registry = createWorkspaceRegistry();
@@ -771,6 +790,9 @@ async function boot() {
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', store.applyTheme);
 
   await resolve();
+  if (isDemoWorkspace() && isDemoRequested() && store.state.ready && document.querySelector('.layout')) {
+    marketing.track('demo_started');
+  }
   if (syncModule) void refreshSyncOperationalUI();
   registerServiceWorker();
 }
@@ -1248,6 +1270,7 @@ function mountWorkspaceGate(routing) {
             <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true">${icon('refresh')}</span><div><strong>كل شيء يتحدّث ويتزامن</strong><span>تلقائيًا عند رجوع الإنترنت</span></div></div>
             <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h13v10H3V4Zm3 14h7m-4-4v4m9-9h4v11h-4V9Z"/></svg></span><div><strong>مساحتك معك</strong><span>من أي جهاز بعد تسجيل الدخول</span></div></div>
           </div>
+          <details class="t-3 fs-xs" data-marketing-privacy><summary>قياس الزيارات والخصوصية</summary><p>${MARKETING_PRIVACY_NOTICE}</p><a href="https://umami.is/terms" target="_blank" rel="noopener noreferrer">شروط Umami ومعالجة البيانات</a></details>
         </main>
       ` : html`
         <div class="empty" role="status">
@@ -1259,8 +1282,16 @@ function mountWorkspaceGate(routing) {
       `}
     </div>
   `);
+  // Two frames allow the actual public landing to paint. Account entry can cancel first.
+  if (routing.authState === 'signed_out' && location.pathname === '/' && ['', '#/'].includes(location.hash)) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const landing = app.querySelector('.n37-landing');
+      if (location.pathname === '/' && ['', '#/'].includes(location.hash) &&
+          landing?.isConnected && landing.getBoundingClientRect().width > 0) marketing.track('landing_view');
+    }));
+  }
   const inlineOtp = signedOut ? mountEmailOtpController(app, () => {}, { reloadOnSuccess: true, inline: true }) : null;
-  app.querySelector('[data-workspace-login]')?.addEventListener('click', () => inlineOtp.start());
+  app.querySelector('[data-workspace-login]')?.addEventListener('click', () => { marketing.stop(); inlineOtp.start(); });
   app.querySelector('[data-workspace-demo]')?.addEventListener('click', () => {
     requestDemo();
     location.reload();
