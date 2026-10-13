@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v53';
+const VERSION = 'rakeezx-v54';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -47,6 +47,7 @@ const SHELL = [
 
   './src/styles/app.css',
   './src/styles/components.css',
+  './src/styles/grades.css',
   './src/styles/schedule-work-integration.css',
   './src/styles/calendar-work-0417.css',
   './src/styles/rakeez-datetime.css',
@@ -97,6 +98,7 @@ const SHELL = [
   './src/lib/owner-invalidation-channel.js',
   './src/lib/sync-v2.js',
   './src/lib/score-foundation.js',
+  './src/lib/subitem-default-name.js',
   './src/lib/sync-ownership.js',
   './src/lib/offline-lease.js',
   './src/lib/workspaces.js',
