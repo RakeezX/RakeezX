@@ -12,7 +12,6 @@ import { fixtureIds, portableFixture } from './fixture.mjs';
 const exec=promisify(execFile);
 const TASK='continuous-n71-unified-restore-20261012',RUN=process.env.N71_RUN_ID;
 assert.match(RUN??'',/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,'Pass the activated run through N71_RUN_ID');
-const BASE='b5e83107222833f5e74530a73355734d8477bd03';
 const root=path.resolve('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/capabilities/n71',RUN);
 const stateFile=path.join(root,'.env.n71-state');
 const url=`https://${PROJECT_ID}.supabase.co`,key='sb_publishable_FDprbV07fAZhT0E6npNldQ_PINQE6l_';
@@ -111,7 +110,9 @@ async function prepare(preview,candidate){
   const ignored=await exec('git',['-C','C:/Users/Abody/Projects/RakeezX','check-ignore',stateFile],{windowsHide:true});assert.ok(ignored.stdout.trim());
   const accounts=['A','B'].map(slot=>({slot,id:randomUUID(),email:fixtureEmail(RUN,slot),password:'N71!aA1'+randomBytes(32).toString('base64url')}));
   assert.ok(accounts.every(account=>retiredPairs.every(retired=>!retired.accountIds.includes(account.id))));
-  const state={version:1,taskId:TASK,runId:RUN,projectId:PROJECT_ID,purpose:PURPOSE,baseSha:BASE,candidateSha:candidate,
+  const baseSha=await git('merge-base','HEAD','origin/main');
+  assert.equal(baseSha,await git('rev-parse','origin/main'),'Reconcile observed remote main before preparation');
+  const state={version:1,taskId:TASK,runId:RUN,projectId:PROJECT_ID,purpose:PURPOSE,baseSha,candidateSha:candidate,
     treeSha:await git('rev-parse','HEAD^{tree}'),harnessBlob:await git('rev-parse','HEAD:tests/n71-live/runner.mjs'),preview,
     verificationPhase:verification.phase,excludedPairs:retiredPairs.map(({runId,accountIds,functionNames})=>({runId,accountIds,functionNames})),
     phase:'PREPARING',accounts,productIds:fixtureIds(RUN),sessions:[],revocations:{},checks:[],cleanup:[]};
@@ -268,6 +269,15 @@ export async function suppressionSequence(page,secondPage,state,exported,{before
         ...(name==='scoreSubitems'?{createdAt:row.createdAt}:{}),
         ...Object.fromEntries(Object.keys(v2.SYNC_V2_SCHEMAS[name].fields).map(f=>[f,row[f]??null]))})).sort((a,b)=>a.id.localeCompare(b.id))])));});
     await ready(page);await ready(secondPage);assert.deepEqual(await snapshot(secondPage),await snapshot(page));
+    const a1Export=await payload(page),a2Export=await payload(secondPage);
+    for(const [document,backup]of [[page,a1Export],[secondPage,a2Export]]){
+      const validation=await document.evaluate(async p=>(await import('/src/lib/export.js')).validateBackupIntegrity(p),backup);
+      assert.equal(validation.ok,true,JSON.stringify(validation));
+    }
+    assert.deepEqual(a2Export.data,a1Export.data,'A2 portable Product data differs');
+    assert.deepEqual(a2Export.baselines,a1Export.baselines,'A2 canonical baselines differ');
+    state.a2PortableEquality={dataSha256:hash(canonical(a1Export.data)),baselinesSha256:hash(canonical(a1Export.baselines)),
+      stores:Object.keys(a1Export.data),validExports:true,verifiedAt:new Date().toISOString()};
     const final=await snapshot(page);assert.ok(final.assignments.find(r=>r.id===state.productIds.deletedAssignment).deleted);
     assert.ok(final.submissions.find(r=>r.id===state.productIds.deletedSubmission).deleted);
     assert.ok(!final.items.some(r=>r.id===state.productIds.closedChild));assert.equal(final.scores.find(r=>r.id===state.productIds.directScore).value,7);
