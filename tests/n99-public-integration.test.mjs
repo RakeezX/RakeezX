@@ -74,8 +74,8 @@ test('n99_public_integration: painted public landing, successful ordinary Demo, 
   const f = await fixture();
   try {
     await f.page.goto('/?email=private@example.test&utm_campaign=student-secret'); await gate(f.page);
-    assert.deepEqual(f.events.map(e => e.body), [exact('landing_view')]);
-    assert.deepEqual(await f.page.evaluate(() => window.__n99Dispatch), [{ name: 'landing_view',
+    assert.deepEqual(f.events.map(e => e.body), [exact('campaign_landing')]);
+    assert.deepEqual(await f.page.evaluate(() => window.__n99Dispatch), [{ name: 'campaign_landing',
       credentials: 'omit', referrerPolicy: 'no-referrer', landing: true, layout: false }]);
     for (const e of f.events) { assert.equal(e.headers.referer, undefined); assert.equal(e.headers.cookie, undefined); }
     assert.match(await f.page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /connect-src 'self'.*https:\/\/cloud\.umami\.is$/);
@@ -85,7 +85,7 @@ test('n99_public_integration: painted public landing, successful ordinary Demo, 
     await f.page.screenshot({ path: 'tests/n99-landing-desktop.png', fullPage: true });
     await f.page.locator('[data-workspace-demo]').click();
     await f.page.locator('.layout').waitFor(); await settle(f.page);
-    assert.deepEqual(f.events.map(e => e.body), [exact('landing_view'), exact('demo_started')]);
+    assert.deepEqual(f.events.map(e => e.body), [exact('campaign_landing'), exact('demo_started')]);
     assert.equal((await f.page.evaluate(() => window.__n99Dispatch))[0].layout, true);
     const ready = await openReadyServedDemo(f.page, f.origin);
     assert.equal(ready.ready, true); assert.ok(ready.students > 100);
@@ -108,7 +108,20 @@ test('failed ordinary Demo initialization has zero demo event', async () => {
     await f.page.goto('/'); await gate(f.page);
     await f.page.locator('[data-workspace-demo]').click();
     await f.page.locator('.empty--error').waitFor(); await settle(f.page);
-    assert.deepEqual(f.events.map(e => e.body), [exact('landing_view')]);
+    assert.deepEqual(f.events.map(e => e.body), [exact('campaign_landing')]);
+  } finally { await f.context.close(); }
+});
+
+test('an old landing marker suppresses the renamed event in the actual app trigger', async () => {
+  const f = await fixture({ init: () => sessionStorage.setItem('rakeezx-marketing-landing_view', 'true') });
+  try {
+    await f.page.goto('/'); await gate(f.page);
+    assert.deepEqual(f.events, []);
+    await f.page.locator('[data-workspace-demo]').click();
+    await f.page.locator('.layout').waitFor(); await settle(f.page);
+    assert.deepEqual(f.events.map(e => e.body), [exact('demo_started')]);
+    assert.equal(await f.page.evaluate(() => sessionStorage.getItem('rakeezx-marketing-landing_view')), 'true');
+    assert.equal(await f.page.evaluate(() => sessionStorage.getItem('rakeezx-marketing-campaign_landing')), null);
   } finally { await f.context.close(); }
 });
 
@@ -162,7 +175,7 @@ test('blocked collector leaves Demo/login operational, pending send aborted on a
     assert.equal(await f.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await f.page.screenshot({ path: 'tests/n99-landing-mobile.png', fullPage: true });
     await f.page.locator('[data-workspace-demo]').click(); await f.page.locator('.layout').waitFor(); await settle(f.page);
-    assert.deepEqual(f.events.map(e => e.body), [exact('landing_view'), exact('demo_started')]);
+    assert.deepEqual(f.events.map(e => e.body), [exact('campaign_landing'), exact('demo_started')]);
     assert.equal(await f.page.locator('#toast').innerText(), ''); assert.deepEqual(f.errors, []);
   } finally { await f.context.close(); }
   const login = await fixture({ init: () => {

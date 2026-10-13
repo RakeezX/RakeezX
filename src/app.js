@@ -1287,7 +1287,7 @@ function mountWorkspaceGate(routing) {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const landing = app.querySelector('.n37-landing');
       if (location.pathname === '/' && ['', '#/'].includes(location.hash) &&
-          landing?.isConnected && landing.getBoundingClientRect().width > 0) marketing.track('landing_view');
+          landing?.isConnected && landing.getBoundingClientRect().width > 0) marketing.track('campaign_landing');
     }));
   }
   const inlineOtp = signedOut ? mountEmailOtpController(app, () => {}, { reloadOnSuccess: true, inline: true }) : null;

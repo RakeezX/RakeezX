@@ -1,6 +1,6 @@
 // First-party, two-event public measurement. No provider script or identity API.
 export const MARKETING_COLLECTOR = 'https://cloud.umami.is/api/send';
-const EVENTS = Object.freeze(['landing_view', 'demo_started']);
+const EVENTS = Object.freeze(['campaign_landing', 'demo_started']);
 const PREFIX = 'rakeezx-marketing-';
 
 export function createMarketingAnalytics({
@@ -10,7 +10,7 @@ export function createMarketingAnalytics({
 } = {}) {
   let stopped = false;
   const pending = new Set();
-  const seen = { landing_view: false, demo_started: false };
+  const seen = { campaign_landing: false, demo_started: false };
 
   function allowed() {
     const { location, navigator } = environment;
@@ -25,7 +25,8 @@ export function createMarketingAnalytics({
     try {
       if (!EVENTS.includes(name) || !allowed() || seen[name]) return;
       const storage = environment.sessionStorage;
-      if (!storage || storage.getItem(PREFIX + name) === 'true') return;
+      if (!storage || storage.getItem(PREFIX + name) === 'true' ||
+          (name === 'campaign_landing' && storage.getItem(PREFIX + 'landing_view') === 'true')) return;
       storage.setItem(PREFIX + name, 'true');
       if (storage.getItem(PREFIX + name) !== 'true') return;
       seen[name] = true; // At most one attempt; no outbox or retry, even on failure.
