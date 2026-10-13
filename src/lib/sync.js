@@ -65,6 +65,7 @@ let restoreRunning = false;
 let liveStudentLifecycle = null;
 let liveClassDeletion = null;
 let classDeletionReserved = false;
+let reservedClassDeletionTask = null;
 let restorePreparing = false;
 let workspaceClaimRunning = false;
 const presentationSeverity = createSyncStatusSeverity();
@@ -675,7 +676,7 @@ export async function assertCloudRestoreReady({ resuming = false } = {}) {
 
 /** Pause automatic sync and normal Product mutations around finalization/reconciliation. */
 export async function runCloudRestoreExclusive(task, { scheduleAutomatic = true, prepare = null } = {}) {
-  if (restoreRunning || restorePreparing || workspaceClaimRunning || (autoRunning && !prepare)) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
+  if ((classDeletionReserved && task !== reservedClassDeletionTask) || restoreRunning || restorePreparing || workspaceClaimRunning || (autoRunning && !prepare)) throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   if (typeof task !== 'function') throw new TypeError('Cloud restore task is required');
   remoteSync.stop();
   fullRequested = false;
@@ -789,7 +790,7 @@ export async function runStudentLifecycleExclusive(task, identity) {
 
 /** Drain a pass before creating the N77 checkpoint that excludes normal writes. */
 export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
-  if (classDeletionReserved || restoreRunning || workspaceClaimRunning) {
+  if (classDeletionReserved || restoreRunning || restorePreparing || workspaceClaimRunning) {
     throw Object.assign(new Error('Synchronization is already running'), { code: 'SYNC_BUSY' });
   }
   const contextToken = bindPresentationContext();
@@ -807,19 +808,21 @@ export async function runClassDeletionExclusive(task, { ownerId, teachingId }) {
     assertCloudOwnership('pull');
     liveClassDeletion = { ownerId, teachingId, contextToken };
     presentationSeverity.verifying(contextToken);
-    return await runCloudRestoreExclusive(() => task(intent => {
+    reservedClassDeletionTask = () => task(intent => {
       if (intent.ownerId !== ownerId || intent.selectedTeachingId !== teachingId || !intent.mutationId ||
           bindPresentationContext() !== contextToken || !liveClassDeletion) {
         throw new Error('Class deletion checkpoint identity mismatch');
       }
       liveClassDeletion.mutationId = intent.mutationId;
-    }), { scheduleAutomatic: false });
+    });
+    return await runCloudRestoreExclusive(reservedClassDeletionTask, { scheduleAutomatic: false });
   } catch (error) {
     bindPresentationContext();
     presentationSeverity.failed(contextToken, [error]);
     throw error;
   } finally {
     liveClassDeletion = null;
+    reservedClassDeletionTask = null;
     classDeletionReserved = false;
     // A delete receipt is not a fresh complete pull, even when its queue is empty.
     if (initialized) scheduleAutomaticSync({ full: true, immediate: true });
