@@ -83,6 +83,7 @@ const SHELL = [
   './src/lib/export.js',
   './src/lib/migrate.js',
   './src/lib/cloud.js',
+  './src/lib/marketing-analytics.js',
   './src/lib/class-subject-default.js',
   './src/lib/complete-read.js',
   './src/lib/display-identity.js',
