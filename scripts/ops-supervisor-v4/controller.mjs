@@ -133,6 +133,11 @@ export function watchdogReason(task, clock) {
   if (Number.isFinite(idle) && idle > 0 && clock - progressAt > idle * 60000) return `No JSON event or scoped-file progress for ${idle} minutes`;
   return null;
 }
+// A completed worker can report downstream Product/fixture authentication,
+// not a Codex-login outage: model-runtime failures have no completed result.
+export function workerBlockerClass(result) {
+  return result?.blockerType === 'auth' ? 'external' : result?.blockerType;
+}
 export function classifyFailure(message, explicit = null) {
   if (OUTAGE.has(explicit) || ['implementation', 'external', 'environment'].includes(explicit)) return explicit;
   const text = String(message ?? '');
@@ -559,6 +564,27 @@ export class Controller {
       await this.save(task); await this.event('worker_launched', { taskId: task.id, runId, pid, broker, sessionId: task.sessionId ?? null });
     } catch (error) { await this.failure(task, 'Worker launch failed: ' + error.message, 'environment'); }
   }
+  async isolateCompletedAuthBlocker(task, processes) {
+    if (task.status !== 'retry_wait' || task.failureClass !== 'auth' || !task.attempt?.runId) return false;
+    const checkpoint = await readJson(task.attempt.checkpointPath);
+    const result = await readJson(task.attempt.outputPath);
+    if (!checkpoint?.finishedAt || checkpoint.taskId !== task.id || checkpoint.runId !== task.attempt.runId
+      || checkpoint.sessionId && task.sessionId && checkpoint.sessionId !== task.sessionId
+      || result?.taskId !== task.id || result.runId !== task.attempt.runId
+      || result.state !== 'BLOCKED' || result.blockerType !== 'auth') return false;
+    if (workerProcesses(task, checkpoint, processes).length) return false;
+    const reason = result.blocker || result.summary;
+    if (!reason || clean(reason) !== task.lastFailure) return false;
+    task.failureReclassificationHistory = [...(task.failureReclassificationHistory ?? []), {
+      at: this.now(), runId: task.attempt.runId, from: 'auth', to: 'external',
+      reason: 'Completed worker downstream authentication blocker is task-scoped, not a Codex runtime outage',
+      originalFailure: task.lastFailure, originalRetryAt: task.retryAt,
+      originalInfrastructureRetries: task.infrastructureRetries, resultPath: task.attempt.outputPath,
+    }];
+    await this.failure(task, reason, 'external');
+    await this.event('task_auth_blocker_isolated', { taskId: task.id, runId: task.attempt.runId });
+    return true;
+  }
   async reconcile(task, processes) {
     let checkpoint = null;
     try { checkpoint = task.attempt ? await readJson(task.attempt.checkpointPath) : null; }
@@ -603,7 +629,7 @@ export class Controller {
       } catch (error) { await this.failure(task, 'Candidate validation: ' + error.message); }
       return;
     }
-    if (result?.state === 'BLOCKED') { await this.failure(task, result.blocker || result.summary, result.blockerType); return; }
+    if (result?.state === 'BLOCKED') { await this.failure(task, result.blocker || result.summary, workerBlockerClass(result)); return; }
     if (result?.state === 'NO_CHANGE') { await this.failure(task, result.summary || 'No scoped change; requires reconciliation', 'external'); return; }
     if (!checkpoint && task.attempt?.wrapperStderrPath) {
       const captured = [];
@@ -713,6 +739,10 @@ export class Controller {
     let processes;
     try { processes = await this.inventory(); }
     catch (error) { this.issues.push({ code: 'PROCESS_INVENTORY_UNAVAILABLE', message: clean(error.message) }); await this.snapshot(paused, false); return; }
+    for (const task of this.jobs.filter(t => t.status === 'retry_wait' && t.failureClass === 'auth')) {
+      try { await this.isolateCompletedAuthBlocker(task, processes); }
+      catch (error) { this.issues.push({ code: 'SCOPED_AUTH_RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }
+    }
     for (const task of this.jobs.filter(t => t.status === 'running')) {
       try { await this.reconcile(task, processes); }
       catch (error) { this.issues.push({ code: 'RECONCILE_FAILED', taskId: task.id, message: clean(error.message) }); }

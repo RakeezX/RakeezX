@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-13T02:21:52.802Z",
+  "problem": "Completed worker downstream auth blocker was incorrectly treated as global Codex outage",
+  "observedTaskId": "continuous-n58-fresh-live-20261012",
+  "observedRunId": "3da67e33-be75-4742-add1-3118f6dd2a45",
+  "checks": {
+    "tests": 10,
+    "pass": 10,
+    "fail": 0,
+    "sourceHash": "5e60c95ba3cfe936bbffc4e982102a85c346ec9182316793761b05d322eefb3c",
+    "tapHash": "baed830e345861ec7275a6f14b319287b82e4b3f9524777f8245227e92cd59ef"
+  },
+  "preserves": [
+    "original result bytes and candidate",
+    "retired test accounts and endpoints",
+    "real Codex runtime auth/quota circuit",
+    "exact active worker identity"
+  ],
+  "changes": [
+    "completed worker auth becomes task-scoped external blocker",
+    "exact saved finished auth result reclassified by sole controller without worker replay"
+  ],
+  "installationNotYetClaimed": true
+}
