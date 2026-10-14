@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 const shared='C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17';
 const {default:pg}=await import(pathToFileURL(shared+'/client/node_modules/pg/lib/index.js'));
-const artifact=path.resolve(process.argv.includes('--browser-only') ? 'test-results/n90-native-browser' : 'test-results/n90-native'),cluster=path.join(artifact,'cluster');
+const artifact=path.resolve(process.argv.includes('--progressive') ? 'test-results/n90-progressive-native' : process.argv.includes('--browser-only') ? 'test-results/n90-native-browser' : 'test-results/n90-native'),cluster=path.join(artifact,'cluster');
 await mkdir(artifact,{recursive:true});
 const socket=createServer();await new Promise(r=>socket.listen(0,'127.0.0.1',r));const port=socket.address().port;await new Promise(r=>socket.close(r));
 const run=(name,args)=>{const r=spawnSync(shared+'/package/native/bin/'+name+'.exe',args,{encoding:'utf8',windowsHide:true,timeout:30000});if(r.status!==0)throw Error(r.stderr||r.error||r.stdout);};
@@ -83,7 +83,7 @@ try {
   await q('set role anon');await assert.rejects(()=>apply('anon',n),e=>e.code==='42501');await q('reset role');
   record('native_source_ACL','Exact SQL SHA256 '+sha256+'; both new functions security definer/search_path empty; execute authenticated only; reused existing owner receipt ACL/RLS.');
   }
-  if(process.argv.includes('--browser') || process.argv.includes('--browser-only')) checks.push(...await (await import('./n90-browser.mjs')).browserFlow({q,owner:OWNER}));
+  if(process.argv.includes('--browser') || process.argv.includes('--browser-only')) checks.push(...await (await import(process.argv.includes('--progressive') ? './n90-progressive-browser.mjs' : './n90-browser.mjs')).browserFlow({q,owner:OWNER}));
 } finally {
   await client?.end();if(started)run('pg_ctl',['-D',cluster,'-w','-m','fast','stop']);
   assert.ok(cluster.startsWith(path.resolve('test-results')+path.sep));await rm(cluster,{recursive:true,force:true});

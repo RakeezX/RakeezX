@@ -3,6 +3,38 @@ import { gradeNumber } from './grade-transfer-parsers.js';
 export const gradeNameKey = value => String(value ?? '').normalize('NFC').replace(/[\s\u0640\u064B-\u065F\u0670]/g, '').toLowerCase();
 export const isTransferItem = item => !item.deleted && !item.auto && (item.scoreMode ?? 'direct') === 'direct';
 
+// Suggestions are exact and unique; the final review remains the write boundary.
+export function suggestGradeMappings(headers, items) {
+  const key = value => String(value ?? '').normalize('NFC').trim();
+  const keys = headers.map(key), counts = new Map();
+  keys.forEach(k => counts.set(k, (counts.get(k) ?? 0) + 1));
+  const uniqueColumn = labels => {
+    const found = keys.flatMap((k,c) => labels.includes(k) ? [c] : []);
+    return found.length === 1 && counts.get(keys[found[0]]) === 1 ? found[0] : -1;
+  };
+  const nameColumn = uniqueColumn(['اسم الطالب']), idColumn = uniqueColumn(['معرف الطالب']);
+  const metadata = new Set(['الفصل', 'المادة', 'الفصل الدراسي', 'نوع الملف']);
+  const reasons = [], targets = [];
+  const live = items.filter(i => !i.deleted && Number(i.serverRevision) > 0);
+  const mappings = keys.map((k,c) => {
+    if (c === nameColumn || c === idColumn) { reasons[c] = 'identity'; return {kind:'ignore'}; }
+    if (metadata.has(k)) { reasons[c] = 'metadata'; return {kind:'ignore'}; }
+    const matches = live.filter(i => k === key(i.name) || k === key(`${i.name} (العظمى ${i.max})`));
+    if (counts.get(k) === 1 && matches.length === 1) {
+      const item = matches[0];
+      if (!isTransferItem(item)) { reasons[c] = 'readonly'; return {kind:'ignore'}; }
+      targets[c] = item.id;
+      return {kind:'existing',itemId:item.id};
+    }
+    reasons[c] = 'exception'; return {kind:'ignore'};
+  });
+  // Two different headers pointing at one item are ambiguous as well.
+  targets.forEach((id,c) => {
+    if (targets.filter(t => t === id).length > 1) { mappings[c] = {kind:'ignore'}; reasons[c] = 'exception'; }
+  });
+  return {nameColumn,idColumn,mappings,reasons};
+}
+
 /** Explicit mappings only. Rejected rows block the entire review, never a partial batch. */
 export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings, roster, items, scores, teaching, term, ownerId, databaseName }) {
   if (!teaching || teaching.deleted || !term || term.deleted || teaching.termId !== term.id || term.status === 'closed' ||
@@ -40,13 +72,13 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
   for (const r of resolved) if (r.student) frequencies.set(r.student.id, (frequencies.get(r.student.id) ?? 0) + 1);
   const entries = [], cells = [], rejected = []; let unchanged = 0, additions = 0, overwrites = 0;
   for (const r of resolved) {
-    if (!r.student || frequencies.get(r.student.id) !== 1) { rejected.push({ row: r.index, reason: r.student ? 'طالب مكرر في الملف' : r.reason }); continue; }
+    if (!r.student || frequencies.get(r.student.id) !== 1) { rejected.push({ row: r.index, student: String(r.row[nameColumn] ?? ''), reason: r.student ? 'طالب مكرر في الملف' : r.reason }); continue; }
     for (const { column, item } of selected) {
       let value;
       try { value = gradeNumber(r.row[column]); if (value !== null && value > Number(item.max)) throw new Error(); }
-      catch { rejected.push({ row: r.index, reason: 'درجة غير صالحة أو تتجاوز الحد: ' + item.name }); continue; }
+      catch { rejected.push({ row: r.index, student: r.student.name, item: item.name, value: String(r.row[column] ?? ''), max: item.max, reason: 'درجة غير صالحة أو تتجاوز العظمى؛ صحّح الملف أو راجع المطابقة' }); continue; }
       const previous = scores.find(s => s.studentId === r.student.id && s.itemId === item.id);
-      if (previous?.deleted || previous && !(Number(previous.serverRevision) > 0)) { rejected.push({ row: r.index, reason: 'سجل درجة غير متاح' }); continue; }
+      if (previous?.deleted || previous && !(Number(previous.serverRevision) > 0)) { rejected.push({ row: r.index, student: r.student.name, reason: 'سجل درجة غير متاح: ' + item.name }); continue; }
       const old = previous?.value == null ? null : Number(previous.value);
       entries.push({ row: r.index, student: r.student.name, studentId: r.student.id, item: item.name, max: item.max, old, value });
       if (value === null || value === old) { unchanged++; continue; }
