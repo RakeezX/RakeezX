@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "scopeKey": "n58-fresh-calendar-runtime-and-authorized-live-ab",
+      "activationId": "po-20261012-continuous",
+      "priority": 4,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": "D087",
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "requiredChecks": [
+        "fresh_candidate_scope_and_preview",
+        "n58_targeted_contracts",
+        "n58_live_a_session_and_a2_restore",
+        "n58_live_context_rejection",
+        "n58_live_b_owner_isolation",
+        "n58_live_preset_context_preservation",
+        "d087_retention_and_disarm",
+        "n58_current_source_local_diagnostic",
+        "n58_current_main_actual_app"
+      ],
+      "preparationAuthority": {
+        "kind": "local-code-and-disposable-native-only",
+        "providerCalls": false,
+        "realAccountReads": false,
+        "realAccountWrites": false,
+        "newAuthAccounts": 0,
+        "liveFixtures": 0,
+        "migrations": 0,
+        "publication": false
+      },
+      "objective": "Resume exact saved session 01a12ff6-5285-71b0-a1c6-9593b6947427 and candidate 441c93d23747e9892d9c477a0496c92e4a76ee16. Latest PO14October explicitly orders fixing N58. A new concrete CODE defect was established: the saved N58 candidate is based before accepted N98 and its models.js would revert alphabetical roster/display numbering if promoted wholesale. Latest N71/N100/N90 service/schema/boot behavior also changed since that candidate. This phase implements the missing selective reconciliation on current source and actual local app/native tests, rather than repeating the old diagnostic or attempting a new live pair/private account SQL.\nRead current remote/main safely and merge only actual N58 semantics onto its current base; preserve the old candidate as an ancestor/evidence. Never use stale local main or restore whole older shared files. Specifically keep accepted N98 alphabetical ordering/displayRoster, N77 generation/tombstone rules, N100 automatic-copy changes if already published, N90 grade-transfer command and current N71 restore domains. Use the latest current source of shared files, layering only N58 calendar_context/preset/selection/effective-term logic. No new product concept or global calendar recalculation.\nFix and certify real APP behavior locally: two owner-bound isolated local browser contexts backed by disposable native PostgreSQL using actual current service definitions from source, switch calendar presets back/forth, keep stable session/term identities and immutable past calendar_context, admit only today-eligible sessions, reject contextless/stale selection at the actual function boundary, and verify local A2 convergence plus wrong-owner rejection. Reuse N71 existing correct app/Sync wait/checkpoint helpers rather than copying the known old harness races. A local role/context is not a live Supabase account; label it honestly. Run only affected current-source tests, not the old unchanged2/2 diagnosis as new progress.\nNo calls to Supabase/Cloudflare/Auth endpoints, no new or reactivated account pair, no private user data, no old six-event replay/wipe, no applied migrations, no Production or hosted Preview. Preserve every old live FAIL/NOT_RUN and cleanup proof. Do not bypass the actual earlier denied private SQL or live-pair operation via this worker. Finish with exact corrected source/base/commit and local actual-app evidence; return BLOCKED/external only for the still-unperformed live acceptance gates. Do not claim overall N58 ready/closed or publish from this explicitly local phase. This is implementation of a diagnosed source-integration defect, not another planning/review round.",
+      "acceptance": [
+        "Preserve all original N58 Product and live-gate acceptance requirements. This local phase authorizes only scoped diagnostic test/evidence files, not Product or cloud operations.",
+        "Honor current PO synced observations without claiming historical data repair. Preserve prior failed evidence, banned pair and exact session.",
+        "One bounded current-source comparison and only a new concrete synthetic reproduction if warranted; no paid loop repeating old checks. Actual missing live verification remains NOT_RUN/FAIL and must not become PASS.",
+        "Current-source correction must not revert N98 or later delivered service/Sync behavior. Real app/native local scenarios prove repaired code without claiming the denied live gate has passed. Original live requirements remain unfulfilled until independently satisfied."
+      ],
+      "allowedPaths": [
+        "src/store.js",
+        "src/models.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/calendar-presets.js",
+        "src/lib/calendar-ranges.js",
+        "src/lib/session-provenance.js",
+        "src/lib/session-auto-triggers.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/backup-v2.js",
+        "src/views/calendar.js",
+        "tests/n58-*",
+        "docs/automation-evidence/20261014/N58_CURRENT_SOURCE_REPAIR.md"
+      ],
+      "releaseAuthority": "Local N58 code reconciliation/testing only under latest direct repair request; no live service/account action or publication is authorized by this phase. All original Product/live acceptance gates remain, with honest saved evidence. Latest PO14October explicitly orders fixing N58. A new concrete CODE defect was established: the saved N58 candidate is based before accepted N98 and its models.js would revert alphabetical roster/display numbering if promoted wholesale. Latest N71/N100/N90 service/schema/boot behavior also changed since that candidate. This phase implements the missing selective reconciliation on current source and actual local app/native tests, rather than repeating the old diagnostic or attempting a new live pair/private account SQL.",
+      "runtimeDependencies": {
+        "canonicalModule": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\run.mjs",
+        "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087",
+        "mustExistBeforeProvision": [
+          "fresh committed Product/harness candidate",
+          "verified immutable Preview/source receipt",
+          "current fixed fixture/schema/source bindings",
+          "one deterministic private harness with durable finally/recovery",
+          "both new protected function deployments and cleanup standby probe"
+        ],
+        "actualRemainingWork": "Fresh integration and live harness are deliberately assigned here; no external Auth permission/key acquisition blocker is asserted.",
+        "sourceBindingInput": "The harness author writes candidate-binding.json per canonical README. It records actual current origin/main/candidate/tree/harness Git blobs and preparation receipt SHA256. The module rejects stale base or changed fixed foundation/migration source."
+      },
+      "sourceEvidence": {
+        "historicalCandidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+        "historicalBase": "3970e39",
+        "observedMain": "8e2d4800396996be43868a71057412afccd2150b",
+        "comparison": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-main-comparison.readonly.json",
+        "authority": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\authority.readonly.json",
+        "guard": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-current-guard.readonly.json",
+        "liveGateExecuted": false,
+        "nativePrivatePreflight": "docs/automation-evidence/20261012/NIGHT_RECOVERY_20261012.json#n58NativePreflight"
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Install the missing narrow canonical private-state ignore rule and README/manifest binding; actual unchanged Windows ACL helper passed native preflight. Include only the affected owner-B N49 lease fixture path. Live acceptance remains pending.",
+        "previousRunId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+        "preservedCandidateSha": "4946aac123772a1cf43d01792631743a4fb7413e",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    }
+  ]
+}
