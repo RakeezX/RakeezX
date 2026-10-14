@@ -1,0 +1,9 @@
+{
+  "runId": "ef502f1b-29ef-496e-8611-21d74fda045e",
+  "base": "a256a1cce6f0368a1a4dbe3dc24ead677cfaf0d5",
+  "saved": "9603682900001d29ad8ccdb95d7ce26c5357a2f9",
+  "cases": [],
+  "scope": "LOCAL synthetic read-only upgrade; no hosted/service acceptance",
+  "status": "FAIL",
+  "error": "page.evaluate: Error: A resolved workspace is required before store initialization\n    at Module.activateWorkspace (http://127.0.0.1:4199/src/store.js:251:25)\n    at eval (eval at evaluate (:311:30), <anonymous>:25:7)\n    at async <anonymous>:337:30"
+}

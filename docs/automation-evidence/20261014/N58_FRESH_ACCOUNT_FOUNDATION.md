@@ -42,3 +42,7 @@ Unchanged prior nine-protocol/60-contract evidence is retained in the preserved 
 Preserved broad hosted N58 gates remain: A session/A2 restore **FAIL**, hosted context rejection **NOT_RUN**, B owner isolation **NOT_RUN**, hosted preset-context preservation **NOT_RUN**. Prior retired hosted identities/disposition and original hosted histories remain untouched. This card authorizes neither a replacement hosted pair nor publication/service administration. Local service application proves only the disposable local stack, not hosted capability identity.
 
 Retain this exact candidate/session for a separately authorized hosted/service capability and acceptance phase, with its precise fixture and data permissions, followed by the independent controller/publisher's authorized delivery path. Do not repeat unchanged local checks merely to restate these external gates; do not enable the Production calendar switch or declare N58/Product CLOSED from this correction.
+
+## Exact-session continuation
+
+Run `ef502f1b-29ef-496e-8611-21d74fda045e` resumes this candidate under the later activated limited-release card. The operator's existing-service identity readback removes the prior delivery-preparation endpoint for the first-use compatibility correction only. See [limited release and upgrade evidence](N58_FIRST_USE_RELEASE.md). All original failures and outstanding full N58 gates above remain historical evidence; this continuation does not relabel them PASS or recover retained account commands.

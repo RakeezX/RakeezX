@@ -1299,13 +1299,18 @@ export function applyTheme() {
 const live = (arr) => arr.filter((r) => !r.deleted);
 
 export const years = () => [...live(state.years)].sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
-export const activeYear = () =>
-  state.years.find((y) => y.id === state.device?.activeYearId && !y.deleted) ?? live(state.years)[0] ?? null;
+export const activeYear = () => {
+  const year = state.years.find((y) => y.id === state.device?.activeYearId && !y.deleted) ?? live(state.years)[0] ?? null;
+  const status = calendarReadStatus(year?.id);
+  // Display-only warning in existing year subtitles. Raw records and identities
+  // remain authoritative; this is not a repaired/effective foundation.
+  return year && !status.ok ? { ...year, label: `${year.label} — ${status.warning}` } : year;
+};
 
 export const termsOf = (yId) =>
-  live(state.terms).filter((t) => !yId || t.yearId === yId).map(t => effectiveTerm(t.id)).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  live(state.terms).filter((t) => !yId || t.yearId === yId).map(t => calendarTermForRead(t)).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 export const activeTerm = () =>
-  effectiveTerm(state.terms.find((t) => t.id === state.device?.activeTermId && !t.deleted)?.id) ??
+  calendarTermForRead(state.terms.find((t) => t.id === state.device?.activeTermId && !t.deleted)) ??
   termsOf(activeYear()?.id)[0] ?? null;
 
 /** أرقام الفصول الدراسية المستعملة فعلًا في السنة النشطة — وإلا فإعداد المنتج. */
@@ -1968,6 +1973,16 @@ export function effectiveYear(id) {
   if (calendar && !calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
   return calendar?.year ?? getYear(id);
 }
+export function calendarReadStatus(yearId) {
+  const calendar = effectiveCalendar(yearId);
+  return calendar && !calendar.ok ? { ok: false, reason: calendar.reason,
+    warning: 'بيانات التقويم غير مكتملة؛ المعروض من السجلات المحفوظة، وإنشاء الحصص متوقف حتى التحقق.' } : { ok: true };
+}
+function calendarTermForRead(term) {
+  if (!term) return null;
+  const calendar = effectiveCalendar(term.yearId);
+  return calendar?.ok ? calendar.terms.find(t => t.id === term.id && !t.deleted) ?? term : term;
+}
 export function effectiveTerm(id) {
   const raw = getTerm(id), calendar = raw ? effectiveCalendar(raw.yearId) : null;
   if (calendar && !calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
@@ -1977,8 +1992,7 @@ export const effectiveTermsOf = yearId => termsOf(yearId).map(t => effectiveTerm
 
 export const calendarsOf = yId => {
   const calendar = effectiveCalendar(yId);
-  if (!calendar) return live(state.calendars).filter(c => c.yearId === yId);
-  if (!calendar.ok) throw new Error(`Calendar resolution failed: ${calendar.reason}`);
+  if (!calendar?.ok) return live(state.calendars).filter(c => c.yearId === yId);
   return [...live(state.calendars).filter(c => c.yearId === yId && c.source === 'custom' && c.presetId === calendar.preset.id),
     { id: `official:${yId}:${calendar.preset.id}`, yearId: yId, source: `preset:${calendar.preset.id}`, presetId: calendar.preset.id, projected: true }];
 };
@@ -1998,7 +2012,7 @@ export function calendarDayFor(date) {
 /** يوم تقويم لسنة محددة — مهم عند عرض إسناد تاريخي لا يطابق السنة النشطة. */
 export function calendarDayForYear(yearId, date) {
   const calendar = effectiveCalendar(yearId);
-  if (calendar) {
+  if (calendar?.ok) {
     const day = resolveCalendarDate(calendar, date);
     if (!day.ok) throw new Error(`Calendar date resolution failed: ${day.reason}`);
     return day;
@@ -2017,6 +2031,8 @@ function selectedCalendarDay(year, date) {
   // Exact native legacy exception: genuinely unselected years need no context.
   // A pending removal of an acknowledged selection is not that exception.
   if (year.calendarPresetId == null && canonical.calendarPresetId == null) return null;
+  const projection = effectiveCalendar(year.id, { year });
+  if (!projection?.ok) throw new Error('بيانات التقويم غير مكتملة؛ تعذّر تحديد تقويم الحصة.');
   const preset = getCalendarPreset(year.calendarPresetId);
   if (!preset || preset.id !== year.calendarPresetId || preset.hijriStart !== year.hijriStart ||
       preset.hijriEnd !== year.hijriEnd) throw new Error('تعذّر تحديد التقويم المعتمد للحصة.');
@@ -2065,6 +2081,8 @@ export function sessionStatusPresentation(session) {
 /** المصدر الواحد لأهلية الحصة الاعتيادية؛ لا ينشئ بيانات. */
 export function isSessionEligibleDate(date, { year = activeYear(), term = activeTerm() } = {}) {
   if (!date || !year || !term || term.yearId !== year.id) return false;
+  const calendar = effectiveCalendar(year.id, { year });
+  if (calendar && !calendar.ok) return false;
   term = effectiveTerm(term.id) ?? term;
   if (!term.startDate || !term.endDate || date < term.startDate || date > term.endDate) return false;
   const day = selectedCalendarDay(year, date) ?? calendarDayForYear(year.id, date);

@@ -1,0 +1,149 @@
+{
+  "runId": "ef502f1b-29ef-496e-8611-21d74fda045e",
+  "base": "a256a1cce6f0368a1a4dbe3dc24ead677cfaf0d5",
+  "saved": "9603682900001d29ad8ccdb95d7ce26c5357a2f9",
+  "cases": [
+    {
+      "kind": "populated",
+      "savedError": null,
+      "originalPageErrors": [],
+      "reading": {
+        "status": {
+          "ok": true
+        },
+        "ranges": 7,
+        "terms": [
+          "tm:y:1448-1449:1",
+          "tm:y:1448-1449:2"
+        ],
+        "eligible": true,
+        "presentation": [
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "recorded",
+            "calendarContext": {
+              "yearId": "y:1448-1449",
+              "termId": "tm:y:1448-1449:1",
+              "presetId": "sa-general-1448-1449",
+              "selectionRevision": 7,
+              "kind": "remote",
+              "source": "custom",
+              "label": "Recorded earlier"
+            }
+          },
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "unrecorded",
+            "calendarContext": null
+          }
+        ]
+      },
+      "checkpointUnchanged": true,
+      "beforeSha256": "1b3d9f701c719313fc88d89e9acf752f355130ebdff4fb0acededbfb938f71dc",
+      "afterSha256": "1b3d9f701c719313fc88d89e9acf752f355130ebdff4fb0acededbfb938f71dc",
+      "actualHoldCSS": true,
+      "owner": "a5800000-0000-4000-8000-000000000011",
+      "database": "rakeezx-user-f9ef428f0d90d4760e24da933df526d7",
+      "retainedOutbox": 0
+    },
+    {
+      "kind": "populated-legacy-overlap",
+      "savedError": "Calendar resolution failed: overlapping-term-bounds",
+      "originalPageErrors": [
+        {
+          "documentPhase": "saved",
+          "message": "Calendar date resolution failed: invalid-calendar"
+        }
+      ],
+      "reading": {
+        "status": {
+          "ok": false,
+          "reason": "overlapping-term-bounds",
+          "warning": "بيانات التقويم غير مكتملة؛ المعروض من السجلات المحفوظة، وإنشاء الحصص متوقف حتى التحقق."
+        },
+        "ranges": 7,
+        "terms": [
+          "tm:y:1448-1449:1",
+          "tm:y:1448-1449:2",
+          "legacy:extra"
+        ],
+        "eligible": false,
+        "presentation": [
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "recorded",
+            "calendarContext": {
+              "yearId": "y:1448-1449",
+              "termId": "tm:y:1448-1449:1",
+              "presetId": "sa-general-1448-1449",
+              "selectionRevision": 7,
+              "kind": "remote",
+              "source": "custom",
+              "label": "Recorded earlier"
+            }
+          },
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "unrecorded",
+            "calendarContext": null
+          }
+        ]
+      },
+      "checkpointUnchanged": true,
+      "beforeSha256": "25a9980ef0745d3e5353a56af0b6cd359d7f9ea283ccbc1d70ee47ecc9b8ff0c",
+      "afterSha256": "25a9980ef0745d3e5353a56af0b6cd359d7f9ea283ccbc1d70ee47ecc9b8ff0c",
+      "actualHoldCSS": true,
+      "owner": "a5800000-0000-4000-8000-000000000012",
+      "database": "rakeezx-user-b80dd061b17656c605c36dd28378f3c9",
+      "retainedOutbox": 0
+    },
+    {
+      "kind": "rejected-missing-term",
+      "savedError": "Calendar resolution failed: missing-official-term",
+      "originalPageErrors": [
+        {
+          "documentPhase": "saved",
+          "message": "Calendar date resolution failed: invalid-calendar"
+        }
+      ],
+      "reading": {
+        "status": {
+          "ok": false,
+          "reason": "missing-official-term",
+          "warning": "بيانات التقويم غير مكتملة؛ المعروض من السجلات المحفوظة، وإنشاء الحصص متوقف حتى التحقق."
+        },
+        "ranges": 7,
+        "terms": [
+          "tm:y:1448-1449:1"
+        ],
+        "eligible": false,
+        "presentation": []
+      },
+      "checkpointUnchanged": true,
+      "beforeSha256": "1246c8535ba159b4a784bedf1c7f34d891a7d7fc7a52d25f7590f1e8c71f79fd",
+      "afterSha256": "1246c8535ba159b4a784bedf1c7f34d891a7d7fc7a52d25f7590f1e8c71f79fd",
+      "actualHoldCSS": true,
+      "owner": "a5800000-0000-4000-8000-000000000013",
+      "database": "rakeezx-user-a8e52df831474089bec26a2aca51cd40",
+      "retainedOutbox": 65
+    }
+  ],
+  "scope": "LOCAL synthetic read-only upgrade; no hosted/service acceptance",
+  "status": "PASS"
+}
