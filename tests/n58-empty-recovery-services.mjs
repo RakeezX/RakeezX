@@ -103,7 +103,19 @@ export async function withOfficialServices({ runId, appOrigin, deadlineAt=Date.n
     identities.restVersion=await docker(['exec',prefix+'-rest','postgrest','--version']);
     // PostgreSQL is used for schema setup only; protocol scenario receives no SQL API.
     await client.end();client=null;
-    return await work({authUrl,restUrl,anonKey:token(secret),identities,migrations,ports});
+    // LOCAL test instrumentation only: no arbitrary SQL/credentials leave this helper.
+    const connect = async () => { const c=new pg.Client({host:'127.0.0.1',port:ports.pg,user:'postgres',password,database:'postgres',query_timeout:30000});await c.connect();return c; };
+    const inspectAtomic = async () => { const c=await connect();try {
+      return { functions:(await c.query(`select p.oid::regprocedure::text signature,md5(p.prosrc) body_md5,p.prosecdef,p.proconfig,p.proacl::text acl from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='rakeezx' and (p.proname like '%n58%foundation%' or p.proname in ('lock_student_lifecycle','n58_repair_expected','n58_repair_snapshot')) order by signature`)).rows,
+       locks:(await c.query(`select c.relname,t.tgenabled,pg_get_triggerdef(t.oid) definition from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname='rakeezx' and t.tgname='00_student_lifecycle_statement_lock' order by c.relname`)).rows,
+       receipt:(await c.query(`select relrowsecurity,relforcerowsecurity,relacl::text acl from pg_class where oid='rakeezx.n58_foundation_repair_receipts'::regclass`)).rows };
+    }finally{await c.end();}};
+    const withOwnerLock = async (owner,work) => { const c=await connect();try {await c.query('begin');await c.query('select rakeezx.lock_student_lifecycle($1)',[owner]);return await work(async()=>{await c.query('select pg_stat_clear_snapshot()');return (await c.query(`select count(*)::integer count from pg_stat_activity where wait_event='advisory'`)).rows[0].count;});}finally{await c.query('rollback');await c.end();}};
+    const withTermFailure = async work => { const c=await connect();try {
+      await c.query(`create function rakeezx.n58_local_test_fail() returns trigger language plpgsql as $$begin if new."index"=2 then raise exception 'LOCAL_INJECTED_TERM_FAILURE'; end if;return new;end$$;create trigger n58_local_test_fail before insert on rakeezx.terms for each row execute function rakeezx.n58_local_test_fail()`);
+      return await work();
+    }finally{await c.query('drop trigger if exists n58_local_test_fail on rakeezx.terms;drop function if exists rakeezx.n58_local_test_fail()');await c.end();}};
+    return await work({authUrl,restUrl,anonKey:token(secret),identities,migrations,ports,inspectAtomic,withOwnerLock,withTermFailure});
   } finally {
     await client?.end().catch(()=>{});
     for(const name of containers.reverse())try{

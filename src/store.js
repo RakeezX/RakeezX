@@ -1,4 +1,5 @@
 import { resolveCalendarRuntime, resolveCalendarDate, resolveRecordedSessionPresentation } from './lib/calendar-runtime.js';
+import { reviewFoundationRepair, confirmFoundationRepair, resumeFoundationRepair } from './lib/calendar-recovery.js';
 /**
  * RAKEEZ X — المخزن: الحالة في الذاكرة + الحفظ في IndexedDB + الإشعار بالتغيير.
  *
@@ -4868,6 +4869,15 @@ export async function undoLastLog(studentId, kind, date = todayISO()) {
 export async function reviewRejectedSessionRepairs() {
   return createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
     currentAuthenticatedUserId: () => cloud.user?.id ?? null }).reviewSessionRepairs();
+}
+export const reviewCalendarFoundationRepair = reviewFoundationRepair;
+export async function confirmCalendarFoundationRepair(plan, acknowledged) {
+  const result = await confirmFoundationRepair(plan, acknowledged);
+  await refreshSyncedState(); notify(); return result;
+}
+export async function resumeCalendarFoundationRepair() {
+  const result = await resumeFoundationRepair();
+  await refreshSyncedState(); notify(); return result;
 }
 export async function confirmRejectedSessionRepairs(plan, selectedIds, confirmed = false) {
   const ids = await createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,

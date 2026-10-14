@@ -1,3 +1,5 @@
+> Historical record of run 8ce51596-fd43-4453-bab9-fd05e8c13020. Its unsafe-design result is preserved below and is outside current release checks. Current atomic implementation and certification are recorded in N58_ATOMIC_FOUNDATION_REPAIR.md.
+
 # N58 reviewed empty-account recovery — bounded blocker
 
 AI-authored evidence for task `continuous-n58-empty-account-reviewed-recovery-20261014`, run `8ce51596-fd43-4453-bab9-fd05e8c13020`.

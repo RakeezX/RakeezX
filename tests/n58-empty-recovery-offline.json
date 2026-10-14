@@ -1,0 +1,14 @@
+{
+  "runId": "79f2600c-16c3-4f27-9092-8c1aedd2f9cc",
+  "url": "http://127.0.0.1:57643",
+  "scope": "Fresh synthetic Demo offline Calendar read; no account/hosted acceptance",
+  "cached": true,
+  "result": {
+    "ready": true,
+    "ranges": 7,
+    "calendar": true,
+    "outbox": 0,
+    "css": true
+  },
+  "status": "PASS"
+}
