@@ -237,6 +237,18 @@ export function observeUnchangedParity(task,receipt,at) {
   return task.parityWait.count>=2&&Date.parse(at)-Date.parse(task.parityWait.firstAt)>=60000;
 }
 
+export function pendingPathCorrection(task,patch,activationId,at) {
+  if(task?.scopeCorrections?.some(x=>x.id===patch?.id))return null;
+  if(!task||task.status!=='pending'||task.attempt||task.sessionId||task.worktreePath||task.candidateSha||task.runnerPid||task.brokerPid)return null;
+  if(task.id!==patch.taskId||task.productId!==patch.productId||task.activationId!==activationId||patch.activationId!==activationId
+    ||!ID.test(patch.id??'')||typeof patch.reason!=='string'||patch.reason.length<20
+    ||createHash('sha256').update(task.objective).digest('hex')!==patch.objectiveSha256
+    ||createHash('sha256').update(JSON.stringify(task.allowedPaths)).digest('hex')!==patch.allowedPathsSha256
+    ||!Array.isArray(patch.addPaths)||!patch.addPaths.length||patch.addPaths.some(p=>!/^src\/[a-zA-Z0-9_./-]+\.(js|css|html)$|^tests\/[a-zA-Z0-9_./-]+\.(mjs|js)$/.test(p)||p.includes('..')||p.includes('//')))
+    throw Error('Pending source-path correction identity/scope invalid');
+  return {...task,allowedPaths:[...new Set([...task.allowedPaths,...patch.addPaths])],scopeCorrections:[...(task.scopeCorrections??[]),{id:patch.id,at,addPaths:patch.addPaths,reason:patch.reason}]};
+}
+
 export const RESULT_SCHEMA = {
   type: 'object', additionalProperties: false,
   required: ['taskId', 'runId', 'state', 'candidateSha', 'baseSha', 'worktreePath', 'changedPaths', 'checks', 'summary', 'blockerType', 'blocker', 'nextAction'],
@@ -319,6 +331,12 @@ export class Controller {
   }
   async importCatalog() {
     const catalog = await readJson(path.join(this.runtime, 'intake-catalog.json'), { tasks: [] });
+    for(const patch of catalog.pendingPathCorrections??[]) {
+      const task=this.jobs.find(t=>t.id===patch.taskId);
+      try { const updated=pendingPathCorrection(task,patch,this.config.controller.activationId,this.now());
+        if(updated){await this.save(updated);Object.assign(task,updated);await this.event('pending_source_path_corrected',{taskId:task.id,correctionId:patch.id,addPaths:patch.addPaths});}
+      }catch(error){this.issues.push({code:'PENDING_PATH_CORRECTION_FAILED',taskId:patch.taskId,message:clean(error.message)});}
+    }
     if (!this.noteReadAt || this.clock() - this.noteReadAt >= 60000) {
       try { this.noteCache = await readApprovedNotes(this.repo,this.config.controller.activationId); }
       catch(error) { this.noteCache={cards:[],openProducts:[],issues:[{code:'NOTES_READ_FAILED',message:clean(error.message)}]}; }
