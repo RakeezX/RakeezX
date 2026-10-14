@@ -2017,12 +2017,26 @@ export function calendarPresetForYear(yearId = activeYear()?.id) {
   return getCalendarPreset(getYear(yearId)?.calendarPresetId);
 }
 
+// N58 temporary containment. Remove only through an explicitly authorized
+// delivery after the calendar/Sync fix is verified; bootstrap/read are separate.
+export const CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD = true;
+export const CALENDAR_PRESET_SWITCH_HOLD_MESSAGE = 'تغيير التقويم متوقف مؤقتًا لمعالجة المزامنة. يمكنك متابعة العمل بالتقويم الحالي.';
+
 /** Applies a built-in template without replacing existing user calendar data. */
 export async function applyCalendarPreset(presetId = WESTERN_1448_1449_PRESET_ID, { activate = false } = {}) {
   const preset = getCalendarPreset(presetId);
   if (!preset) throw new Error('التقويم المعتمد غير متاح.');
   const records = calendarPresetRecords(preset);
   const existingYear = getYear(records.year.id);
+  const selectedYear = existingYear ?? activeYear();
+  if (CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD && selectedYear?.calendarPresetId) {
+    if (selectedYear.calendarPresetId !== preset.id) {
+      return { ok: false, reason: 'calendar-switch-temporary-hold', message: CALENDAR_PRESET_SWITCH_HOLD_MESSAGE };
+    }
+    // An identical request during the pause must not refresh records/preferences
+    // or activate another year/term. Existing calendar data remains authoritative.
+    return { ok: true, applied: 0, year: selectedYear };
+  }
   if (!existingYear && state.years.some((year) => year.id === records.year.id && year.deleted)) {
     return { ok: false, reason: 'year-deleted' };
   }

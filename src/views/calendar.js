@@ -283,6 +283,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
         <!-- 1. اختيار التقويم المعتمد -->
         <div data-settings-panel="calendar" ${settingsTab === 'calendar' ? '' : 'hidden'}>
           <div class="section__title mb-2">التقويم المعتمد</div>
+          ${store.CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD ? html`<p id="calendar-switch-hold" class="t-3 fs-sm mb-2">${store.CALENDAR_PRESET_SWITCH_HOLD_MESSAGE}</p>` : ''}
           <div class="cal-regions-grid">
             ${SAUDI_EDUCATION_REGIONS.map(
               (reg) => {
@@ -292,6 +293,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
                     class="cal-region-card ${isSelected ? 'is-active' : ''}"
                     data-act="set-region"
                     data-id="${reg.id}"
+                    ${store.CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD ? html`disabled aria-disabled="true" aria-describedby="calendar-switch-hold" style="opacity:0.65;cursor:not-allowed"` : ''}
                     aria-pressed="${isSelected}"
                     aria-label="${reg.shortName}، ${reg.subtitle}"
                   >
@@ -406,6 +408,12 @@ function calendarSettingsSheet(savedScrollTop = 0) {
       // اختيار التقويم المعتمد
       root.querySelectorAll('[data-act="set-region"]').forEach((btn) => {
         btn.addEventListener('click', async () => {
+          // Also contain an already-open sheet or a dispatched stale click,
+          // including Demo, before either command or the success presentation.
+          if (store.CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD) {
+            toast(store.CALENDAR_PRESET_SWITCH_HOLD_MESSAGE, 'info');
+            return;
+          }
           const regId = btn.dataset.id;
           const reg = getSaudiEducationRegion(regId);
           const presetId = reg.presetId || reg.id;
@@ -413,7 +421,7 @@ function calendarSettingsSheet(savedScrollTop = 0) {
             const result = store.getActiveWorkspace()?.type === 'demo'
               ? await applyDemoCalendarPreset(presetId)
               : await store.applyCalendarPreset(presetId);
-            if (!result.ok) throw new Error('لا يمكن تطبيق التقويم على سنة أو فصل محذوف.');
+            if (!result.ok) throw new Error(result.message || 'لا يمكن تطبيق التقويم على سنة أو فصل محذوف.');
           } catch (err) {
             toast(err.message || 'تعذر حفظ إعدادات التقويم.', 'danger');
             return;
