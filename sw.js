@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v62';
+const VERSION = 'rakeezx-v63';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -61,6 +61,7 @@ const SHELL = [
   './src/vendor/flatpickr/ar.js',
 
   './src/app.js',
+  './src/lib/app-update.js',
   './src/router.js',
   './src/store.js',
   './src/models.js',
@@ -191,7 +192,13 @@ self.addEventListener('install', (event) => {
       const cache = await caches.open(VERSION);
       // The version-bound copy engine is required for the store's import graph.
       // Never activate a shell that cannot provide its matching offline engine.
-      await cache.add(new Request('./src/lib/score-distribution-copy.js?n100=automatic-safe-v1', { cache: 'reload' }));
+      await Promise.all([
+        './src/lib/score-distribution-copy.js?n100=automatic-safe-v1',
+        './src/lib/app-update.js',
+        './src/app.js',
+        './src/store.js',
+        './src/views/calendar.js',
+      ].map(url => cache.add(new Request(url, { cache: 'reload' }))));
       // ملف واحد مفقود يجب ألا يفشل التثبيت كله
       await Promise.all(
         SHELL.map((url) =>
@@ -253,7 +260,10 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         await cleanOldCaches;
         try {
-          return await cacheResponse('./index.html', await fetch(request));
+          const response = await fetch(new Request(request, { cache: 'reload' }));
+          // Keep both navigation fallback keys at the same refreshed release.
+          if (!response.redirected) await cacheResponse('./', response);
+          return await cacheResponse('./index.html', response);
         } catch (err) {
           try {
             return await cachedNavigationFallback();
