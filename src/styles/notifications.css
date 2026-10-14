@@ -1,0 +1,17 @@
+/* Calm hierarchy from the manifest-verified prototype, using shell tokens. */
+.n44-center { max-width: 680px; margin: 0 auto; min-width: 0; }
+.n44-heading, .n44-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.n44-count { font-size: 14px; }
+.n44-note { font-size: 13px; line-height: 1.8; margin-block: 12px 18px; }
+.n44-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.n44-item { border: 1px solid var(--border); border-radius: 14px; padding: 16px; min-width: 0; overflow-wrap: anywhere; }
+.n44-item--unread { border-inline-start: 4px solid var(--action-primary); }
+.n44-item h2 { margin: 0; font-size: 18px; }
+.n44-item p { margin-block: 10px; line-height: 1.7; }
+.n44-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.n44-actions .btn { min-height: 44px; white-space: normal; }
+.n44-empty { padding-block: 24px; text-align: center; line-height: 1.8; }
+.n44-bell { position: relative; flex-shrink: 0; min-width: 44px; min-height: 44px; }
+.n44-bell-count { position: absolute; inset-block-start: 0; inset-inline-end: -2px; border-radius: 10px; padding: 0 4px; background: var(--action-primary); color: var(--action-on-primary, #fff); font-size: 11px; line-height: 18px; }
+.n44-center :is(button, a):focus-visible, .n44-bell:focus-visible { outline: 3px solid var(--action-primary); outline-offset: 3px; }
+@media (max-width: 480px) { .n44-item { padding: 12px; } .n44-actions { gap: 4px; } }

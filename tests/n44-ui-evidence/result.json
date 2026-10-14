@@ -1,0 +1,80 @@
+{
+  "taskId": "continuous-n44-live-inapp-center-20261014",
+  "runId": "1e17c449-0207-46e1-8e56-baa2b7d99280",
+  "checks": [
+    {
+      "name": "n44_actual_account_event_generation",
+      "status": "PASS",
+      "evidence": "Actual registered synthetic account boot + runtime ownership guard; 3 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return."
+    },
+    {
+      "name": "n44_safe_navigation_no_sensitive_leak",
+      "status": "PASS",
+      "evidence": "Actual handler rechecks deleted child before navigation; allowlisted lesson opens exact session; storage contains IDs/timestamps only; unchanged outbox; read-only banner intact; deactivation/logout clear private DOM synchronously; B receives independent unread state."
+    },
+    {
+      "name": "n44_owner_read_dismiss_expiry",
+      "status": "PASS",
+      "evidence": "Actual read/dismiss handlers persist over reload and resume without duplicates; exact lesson end and local due-day expiry recalculated, quiet empty state; A/B independent, synchronous clearing; pure bounded/clock/storage failure checks also 5/5 PASS."
+    },
+    {
+      "name": "n44_real_ui_offline_boot",
+      "status": "PASS",
+      "evidence": "Real SW precached all 5 new dependencies before offline reload; actual account/DB/provisioning receipt verified together in reloaded document; center and source stylesheet load with network offline."
+    }
+  ],
+  "screenshots": [
+    "tests/n44-ui-evidence/center-320.png",
+    "tests/n44-ui-evidence/center-390.png",
+    "tests/n44-ui-evidence/center-1280.png",
+    "tests/n44-ui-evidence/quiet-empty.png",
+    "tests/n44-ui-evidence/offline-reload.png"
+  ],
+  "lease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:52555",
+  "checkpoint": {
+    "owner": "a4400000-0000-4000-8000-000000000001",
+    "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
+    "receipt": {
+      "ownerId": "a4400000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "foundationHash": "n44-synthetic-foundation"
+    },
+    "targets": [
+      "n44-cancelled",
+      "n44-foreign-session",
+      "n44-history-session",
+      "n44-past",
+      "n44-session"
+    ]
+  },
+  "cached": {
+    "src/lib/notification-center.js": true,
+    "src/lib/notification-events.js": true,
+    "src/lib/notification-state.js": true,
+    "src/views/notifications.js": true,
+    "src/styles/notifications.css": true
+  },
+  "offlineCheckpoint": {
+    "owner": "a4400000-0000-4000-8000-000000000001",
+    "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
+    "receipt": {
+      "ownerId": "a4400000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "foundationHash": "n44-synthetic-foundation"
+    },
+    "targets": [
+      "n44-cancelled",
+      "n44-foreign-session",
+      "n44-history-session",
+      "n44-past",
+      "n44-session"
+    ]
+  },
+  "blockedExternalOrigins": [
+    "https://xlrubcwjqktzzunrvuns.supabase.co"
+  ],
+  "pageErrors": [],
+  "status": "PASS",
+  "release": "RELEASED browser"
+}

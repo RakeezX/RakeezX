@@ -1,0 +1,35 @@
+{
+  "sourceCandidateSha": "a3072e44faf0332b3d50a11ec55d1168ca978c71",
+  "unchangedFromPreservedCandidate": true,
+  "runId": "1e17c449-0207-46e1-8e56-baa2b7d99280",
+  "files": [
+    {
+      "path": "src/app.js",
+      "sha256": "5d07d2773691e944455957317d96dad62947eb4b898c5f7c2a3676561689ac23"
+    },
+    {
+      "path": "sw.js",
+      "sha256": "e4edf909b05f0f354fd054da32cedd703c370c653121552214596ebcba8219f6"
+    },
+    {
+      "path": "src/lib/notification-center.js",
+      "sha256": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3"
+    },
+    {
+      "path": "src/lib/notification-events.js",
+      "sha256": "92666f2fc9c88833f19cce97c67c8d933548bfe4ca0b66c23d63b811885cef98"
+    },
+    {
+      "path": "src/lib/notification-state.js",
+      "sha256": "ac784d89107d84590a8b1e241ee01c64038c3816d6437b95a6b354e969ea117d"
+    },
+    {
+      "path": "src/views/notifications.js",
+      "sha256": "91048d6abb015333b778421c9e95f593b7bdd4612d49dbdb169de294123ecc01"
+    },
+    {
+      "path": "src/styles/notifications.css",
+      "sha256": "928d13e9f8f2ae24e50ecb73cad500657024e7e12bb34f3b45d727f82800876d"
+    }
+  ]
+}
