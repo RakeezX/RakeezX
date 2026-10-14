@@ -82,9 +82,8 @@ test('n99_campaign_survives_demo_navigation: painted landing, URL cleanup, real 
       credentials: 'omit', referrerPolicy: 'no-referrer', landing: true, layout: false }]);
     for (const e of f.events) { assert.equal(e.headers.referer, undefined); assert.equal(e.headers.cookie, undefined); }
     assert.match(await f.page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /connect-src 'self'.*https:\/\/cloud\.umami\.is$/);
-    await f.page.locator('[data-marketing-privacy] summary').click();
-    assert.match(await f.page.locator('[data-marketing-privacy]').innerText(), /IP.*الولايات المتحدة وألمانيا/);
-    assert.match(await f.page.locator('[data-marketing-privacy]').innerText(), /utm_source.*utm_content/);
+    assert.equal(await f.page.locator('[data-marketing-privacy]').count(), 0);
+    assert.doesNotMatch(await f.page.locator('body').innerText(), /قياس الزيارات والخصوصية|شروط Umami ومعالجة البيانات/);
     assert.equal(await f.page.locator('.n37-message').evaluate(e => getComputedStyle(e).direction), 'rtl');
     await f.page.screenshot({ path: 'tests/n99-campaign-desktop.png', fullPage: true });
     // Actual Demo click now reloads an internal URL without any campaign query.
@@ -139,6 +138,8 @@ test('authenticated account uses existing synthetic helper, zero analytics throu
   const f = await fixture();
   try {
     const { errors } = await bootSettings(f.page);
+    assert.equal(await f.page.locator('[data-marketing-privacy]').count(), 0);
+    assert.doesNotMatch(await f.page.locator('body').innerText(), /قياس الزيارات والخصوصية|شروط Umami ومعالجة البيانات/);
     await settle(f.page); assert.equal(f.events.length, 0); assert.deepEqual(errors, []);
     assert.equal(await f.page.evaluate(async () => (await import('/src/store.js')).getActiveWorkspace().type), 'account');
     await f.page.goto('/#/reports'); await f.page.locator('.layout').waitFor();
@@ -190,7 +191,8 @@ test('blocked collector leaves Demo/login operational, pending send aborted on a
   const f = await fixture({ blocked: true, viewport: { width: 390, height: 844 } });
   try {
     await f.page.goto('/'); await gate(f.page);
-    await f.page.locator('[data-marketing-privacy] summary').click();
+    assert.equal(await f.page.locator('[data-marketing-privacy]').count(), 0);
+    assert.doesNotMatch(await f.page.locator('body').innerText(), /قياس الزيارات والخصوصية|شروط Umami ومعالجة البيانات/);
     assert.equal(await f.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await f.page.screenshot({ path: 'tests/n99-campaign-mobile.png', fullPage: true });
     await f.page.locator('[data-workspace-demo]').click(); await f.page.locator('.layout').waitFor(); await settle(f.page);

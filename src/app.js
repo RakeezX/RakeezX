@@ -13,7 +13,7 @@ import { startRecoveryCycle, wakeRecoveryCycle, presentSyncWarning } from './lib
 import * as store from './store.js';
 import * as db from './lib/db.js';
 import * as cloud from './lib/cloud.js';
-import { createMarketingAnalytics, MARKETING_PRIVACY_NOTICE } from './lib/marketing-analytics.js';
+import { createMarketingAnalytics } from './lib/marketing-analytics.js';
 import { LEASE_STORAGE_PREFIX } from './lib/offline-lease.js';
 import { match, currentPath, onNavigate, go, backWithinApp } from './router.js';
 import { captureSupportOriginBeforeNavigation, clearSupportOrigin, enterSupportVisit } from './lib/support-origin.js';
@@ -1372,7 +1372,6 @@ function mountWorkspaceGate(routing) {
             <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true">${icon('refresh')}</span><div><strong>كل شيء يتحدّث ويتزامن</strong><span>تلقائيًا عند رجوع الإنترنت</span></div></div>
             <div class="n37-continuity__item"><span class="n37-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h13v10H3V4Zm3 14h7m-4-4v4m9-9h4v11h-4V9Z"/></svg></span><div><strong>مساحتك معك</strong><span>من أي جهاز بعد تسجيل الدخول</span></div></div>
           </div>
-          <details class="t-3 fs-xs" data-marketing-privacy><summary>قياس الزيارات والخصوصية</summary><p>${MARKETING_PRIVACY_NOTICE}</p><a href="https://umami.is/terms" target="_blank" rel="noopener noreferrer">شروط Umami ومعالجة البيانات</a></details>
         </main>
       ` : html`
         <div class="empty" role="status">
