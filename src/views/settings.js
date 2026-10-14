@@ -31,7 +31,15 @@ let profileExpanded = false;
 let removeProfileAttention = () => {};
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
-let requestedEmailChange = '';
+// Presentation only: never persisted, and discarded when the rendered owner changes.
+let emailChangeView = { ownerId: null, sending: false, pending: '', error: '', sheetOpen: false };
+function currentEmailChangeView() {
+  const ownerId = cloud.user?.id ?? null;
+  if (emailChangeView.ownerId !== ownerId) {
+    emailChangeView = { ownerId, sending: false, pending: '', error: '', sheetOpen: false };
+  }
+  return emailChangeView;
+}
 let removePhoneInputGuards = () => {};
 let removeDepartmentInteraction = () => {};
 
@@ -54,7 +62,7 @@ function applyPhoneInsertion(input, rawText, event) {
   }
 }
 
-function emailChangeSheet(currentEmail) {
+function emailChangeSheet(currentEmail, submit) {
   return openSheet({
     title: 'تغيير البريد الإلكتروني',
     desc: 'سيبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد من البريدين الحالي والجديد.',
@@ -66,14 +74,17 @@ function emailChangeSheet(currentEmail) {
                  inputmode="email" dir="ltr" required autofocus>
         </label>
         <div class="field__error" role="alert" data-email-change-error hidden></div>
+        <div class="field__hint" role="status" data-email-change-sending hidden>جارٍ إرسال طلب تغيير البريد… يمكنك إغلاق النافذة ومتابعة استخدام الإعدادات.</div>
       </form>
     `,
     foot: html`
       <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
       <button class="btn btn--primary" type="submit" form="email-change-form">تأكيد التغيير</button>
     `,
-    onMount: (root, done) => root.querySelector('#email-change-form')?.addEventListener('submit', (event) => {
+    onMount: (root, done) => root.querySelector('#email-change-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const button = root.querySelector('button[type="submit"]');
+      if (button.disabled) return;
       const input = event.currentTarget.elements.newEmail;
       const result = validateAuthEmailChange(input.value, currentEmail);
       const error = root.querySelector('[data-email-change-error]');
@@ -86,7 +97,20 @@ function emailChangeSheet(currentEmail) {
         input.focus();
         return;
       }
-      done(result.email);
+      error.hidden = true;
+      input.removeAttribute('aria-invalid');
+      button.disabled = true;
+      input.disabled = true;
+      button.textContent = 'جارٍ الإرسال…';
+      root.querySelector('[data-email-change-sending]').hidden = false;
+      const message = await submit(result.email);
+      if (!message) { done(result.email); return; }
+      error.textContent = message;
+      error.hidden = false;
+      root.querySelector('[data-email-change-sending]').hidden = true;
+      button.disabled = false;
+      input.disabled = false;
+      button.textContent = 'إعادة المحاولة';
     }),
   });
 }
@@ -251,7 +275,8 @@ const settings = {
     const activeT = store.activeTerm();
     const accountContract = currentAccountContract();
     const accountEmail = accountContract?.email ?? cloud.user?.email ?? '';
-    const pendingEmail = String(cloud.user?.new_email ?? requestedEmailChange ?? '').trim().toLowerCase();
+    const emailView = currentEmailChangeView();
+    const pendingEmail = String(cloud.user?.new_email || emailView.pending || '').trim().toLowerCase();
     const emailChangePending = Boolean(pendingEmail && pendingEmail !== String(accountEmail).trim().toLowerCase());
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
     const presentation = getAccountPresentation(teacherForm);
@@ -349,9 +374,8 @@ const settings = {
                 <span class="field__label">البريد الإلكتروني</span>
                 <div class="settings-email-line">
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
-                  ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email">تعديل</button>` : ''}
+                  ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
-                ${emailChangePending ? html`<span class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد</span>` : ''}
               </div>`}
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
               <span class="settings-account-summary__label">الوصول</span>
@@ -360,6 +384,9 @@ const settings = {
           </form>
           </div>
         </details>
+        ${!demo && emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
+        ${!demo && emailChangePending ? html`<p class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد. أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>` : ''}
+        ${!demo && emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
       </div>
 
 
@@ -610,20 +637,35 @@ const settings = {
     async 'change-email'() {
       const currentEmail = currentAccountContract()?.email ?? cloud.user?.email ?? '';
       if (!currentEmail || !cloud.user?.id) return;
-      const nextEmail = await emailChangeSheet(currentEmail);
-      if (!nextEmail) return;
+      const view = currentEmailChangeView();
+      if (view.sending || view.sheetOpen) return;
       const ownerId = cloud.user.id;
+      view.sheetOpen = true;
       try {
-        const updated = await cloud.updateCurrentUserEmail(nextEmail);
-        if (updated.id !== ownerId) {
-          throw Object.assign(new Error('Auth owner changed unexpectedly'), { code: 'AUTH_OWNER_MISMATCH' });
-        }
-        requestedEmailChange = updated.new_email || nextEmail;
-        toast('طلب تغيير البريد قيد التأكيد', 'info');
-        repaint();
-      } catch (error) {
-        toast(error?.message || 'تعذر طلب تغيير البريد الإلكتروني', 'danger');
-      }
+        await emailChangeSheet(currentEmail, async (nextEmail) => {
+          if (currentEmailChangeView() !== view || cloud.user?.id !== ownerId) return '';
+          if (view.sending) return 'جارٍ إرسال الطلب السابق.';
+          view.sending = true;
+          view.error = '';
+          repaint();
+          try {
+            const updated = await cloud.updateCurrentUserEmail(nextEmail);
+            if (updated.id !== ownerId) {
+              throw Object.assign(new Error('Auth owner changed unexpectedly'), { code: 'AUTH_OWNER_MISMATCH' });
+            }
+            if (currentEmailChangeView() !== view) return '';
+            view.pending = updated.new_email || nextEmail;
+            return '';
+          } catch (error) {
+            if (currentEmailChangeView() !== view) return '';
+            view.error = error?.message || 'تعذر طلب تغيير البريد الإلكتروني. حاول مرة أخرى.';
+            return view.error;
+          } finally {
+            view.sending = false;
+            if (currentEmailChangeView() === view) repaint();
+          }
+        });
+      } finally { view.sheetOpen = false; }
     },
 
     'phone-input'(el) {
