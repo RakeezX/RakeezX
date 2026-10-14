@@ -3,7 +3,7 @@ import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { studentTotal, sectionLabel, gradeLabel, normalizeSearchText } from '../models.js';
 import { supportRows } from './reports.js';
-import { reportHeader, reportWithClosing, reportPageSetup, demoOutputMarker } from '../lib/report-print.js';
+import { reportHeader, reportWithClosing, reportPageSetup, printReport, demoOutputMarker } from '../lib/report-print.js';
 import { markDemoExportRows } from '../lib/report-print.js';
 import { downloadCSV, safeReportCSVText } from '../lib/export.js';
 
@@ -77,7 +77,7 @@ export default {
     'n70-filter'(el){filter=el.value;repaint();},
     'n70-search'(el){query=el.value;repaint();},
     'n70-reset'(){grade='all';teachingId='all';filter='all';query='';repaint();},
-    'n70-print'(){if(!reportRows().length){toast('لا نتائج للطباعة','warn');return;}window.print();},
+    'n70-print'(){if(!reportRows().length){toast('لا نتائج للطباعة','warn');return;}printReport(reportTitle());},
     'n70-csv'(){
       const rows = reportRows();
       if (!rows.length) { toast('لا نتائج للتصدير', 'warn'); return; }
