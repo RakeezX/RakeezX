@@ -214,6 +214,23 @@ export function normalizeCloudflareIndex(bytes, metadata) {
     removedSha256: hash(removed), providerTransforms: providers };
 }
 
+export function describeProviderTailMismatch(bytes) {
+  const text = Buffer.from(bytes).toString('utf8');
+  const tags = [...text.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].filter(x => x[1].includes('static.cloudflareinsights.com/beacon.min.js'));
+  const description = { jsdMarkers: text.split('window.__CF$cv$params').length-1, beaconTags: tags.length };
+  if (tags.length !== 1) return description;
+  const t = tags[0], attrs = Object.fromEntries([...t[1].matchAll(/(?:^|\s)([\w:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].map(x=>[x[1],x[2]??x[3]??true]));
+  const pinned = Object.fromEntries([...CF_ANALYTICS_20261014.matchAll(/(?:^|\s)([\w:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].map(x=>[x[1],x[2]??x[3]??true]));
+  let config=null,expected=null;try{config=JSON.parse(attrs['data-cf-beacon']);expected=JSON.parse(pinned['data-cf-beacon']);}catch{}
+  const suffix=text.slice(t.index+t[0].length,text.lastIndexOf('</body>'));
+  return {...description, beaconBytes:Buffer.byteLength(t[0]), beaconSha256:hash(Buffer.from(t[0])),attributeNames:Object.keys(attrs).sort(),
+    srcPinned:attrs.src===pinned.src,integrityPinned:attrs.integrity===pinned.integrity,sitePinned:!!config&&config.token===expected?.token,
+    type:attrs.type==='module'?'module':attrs.type===undefined?'absent':'other',defer:attrs.defer===true,crossOrigin:attrs.crossorigin==='anonymous',inlineBytes:Buffer.byteLength(t[2]),
+    configKeys:config&&typeof config==='object'?Object.keys(config).filter(k=>/^[a-z_]{1,30}$/i.test(k)).sort():[],
+    configTypes:config&&typeof config==='object'?Object.fromEntries(Object.entries(config).filter(([k])=>/^[a-z_]{1,30}$/i.test(k)).map(([k,v])=>[k,v===null?'null':Array.isArray(v)?'array':typeof v])):{},
+    trailingWhitespaceOnly:/^\s*$/.test(suffix),trailingWhitespaceBytes:Buffer.byteLength(suffix)};
+}
+
 async function verifyOrigin(origin, assets, publishedSha, fetcher, signal) {
   const results = [];
   // At most four HTTP reads at once; bodies and log output are never persisted.
@@ -239,6 +256,7 @@ async function verifyOrigin(origin, assets, publishedSha, fetcher, signal) {
         deleted: asset.deleted, verified: asset.deleted ? (gone || fallback) : response.status === 200
           && (observedSha256 === asset.sha256 || normalized?.normalizedSha256 === asset.sha256),
         ...normalized,
+        ...(asset.repoPath === 'index.html' && response.status === 200 && !normalized && observedSha256 !== asset.sha256 ? { providerShape: describeProviderTailMismatch(bytes) } : {}),
         ...(fallback ? { deletionResponse: 'current-index-fallback' } : {}) };
     }));
     results.push(...batch);
