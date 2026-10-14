@@ -290,7 +290,7 @@ function renderTeacherMiniHubBody() {
           </header>
 
           ${demo ? html`<div class="mini-hub-sync mini-hub-section"><div class="t-3 fs-xs">بيانات تجريبية محلية فقط — لا مزامنة سحابية</div></div>` : html`
-            <div class="mini-hub-sync mini-hub-section" aria-live="polite">${renderSyncOperationalSection(syncInfo.summary, { compact: true })}</div>
+            <div class="mini-hub-sync mini-hub-section" aria-live="polite">${renderRepairableSyncSection(syncInfo.summary)}</div>
           `}
 
           <div class="mini-hub-pwa mini-hub-section">
@@ -509,6 +509,60 @@ function restoreFocus(snap) {
 }
 
 /** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
+function renderRepairableSyncSection(summary) {
+  return html`${renderSyncOperationalSection(summary, { compact: true })}
+    ${summary.rejectedCount > 0 ? html`<button class="btn btn--sm btn--quiet" data-act="review-session-repair">مراجعة وإصلاح الحصص المرفوضة</button>` : ''}`;
+}
+
+async function openSessionRepairReview() {
+  const plan = await store.reviewRejectedSessionRepairs();
+  return openSheet({ title: 'مراجعة وإصلاح الحصص المرفوضة',
+    desc: 'السياق الأصلي غير محفوظ. راجع كل حصة وأكّد التقويم كتَصحيح صريح، لا كسياق أصلي موثّق.',
+    body: html`<div data-session-repair-review>
+      <p>حدّد فقط حصص البلاغ الحالي. الطلبات التاريخية الستة مستثناة؛ لا تحدّدها. لن نختار أي طلب تلقائيًا.</p>
+      ${!plan.entries.length ? html`<p>لا توجد حصص مؤهلة لهذا الإصلاح في الحساب الحالي.</p>` : ''}
+      ${plan.entries.map((entry, index) => html`<section class="card p-3">
+        <p><bdi>${entry.date}</bdi> — الحصة <bdi>${entry.period}</bdi> — ${entry.classLabel || 'تعذّر توثيق الفصل'}</p>
+        <p>وقت الطلب: <bdi>${Number.isFinite(new Date(entry.queuedAt).getTime()) ? new Date(entry.queuedAt).toISOString() : 'غير موثّق'}</bdi></p>
+        <p>معرّف الطلب: <bdi>${entry.mutationId}</bdi></p>
+        ${entry.status === 'review' ? html`
+          <p>${entry.yearLabel} — ${entry.termLabel} — ${entry.presetLabel}</p>
+          <p>اليوم: ${entry.context.kind === 'study' ? 'دراسي' : entry.context.kind === 'remote' ? 'عن بُعد' : 'إجازة'} — ${entry.context.label}</p>
+          <p>مصدر التصحيح: التقويم الحالي لهذه السنة، مراجعة اختيار <bdi>${entry.context.selectionRevision}</bdi>. السياق وقت الإنشاء غير قابل للتحقق.</p>
+          <label><input type="checkbox" data-repair-entry="${index}"> هذه من حصص البلاغ الحالي؛ أؤكد السنة والفصل وتقويم اليوم أعلاه كتَصحيح.</label>`
+          : html`<p>${entry.reason}</p>`}
+      </section>`)}
+      <p data-repair-message role="status"></p>
+      <button class="btn btn--sm btn--quiet" data-retry-session-repairs>مزامنة واستعادة إيصالات التصحيح</button>
+      <a href="#/support" data-sheet-close>المساعدة في طلب متوقف</a>
+    </div>`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" data-confirm-session-repair>تأكيد تصحيح المحدد</button>`,
+    onMount(root) {
+      root.querySelector('[data-retry-session-repairs]').addEventListener('click', async (event) => {
+        event.currentTarget.disabled = true;
+        try {
+          if (!syncModule) throw Error('المزامنة غير متوفرة حاليًا.');
+          await syncModule.syncAll({ full: true });
+          root.querySelector('[data-repair-message]').textContent = 'حُدّثت حالة المزامنة؛ أغلق المراجعة وافتحها لعرض الإيصالات أو سبب التوقف.';
+          await refreshSyncOperationalUI();
+        } catch (error) { root.querySelector('[data-repair-message]').textContent = error.message; }
+        finally { event.currentTarget.disabled = false; }
+      });
+      const button = root.querySelector('[data-confirm-session-repair]');
+      button.addEventListener('click', async () => {
+        const ids = [...root.querySelectorAll('[data-repair-entry]:checked')].map(el => plan.entries[Number(el.dataset.repairEntry)].originalId);
+        button.disabled = true;
+        try {
+          await store.confirmRejectedSessionRepairs(plan, ids, true);
+          root.querySelector('[data-repair-message]').textContent = 'حُفظ طلب التصحيح. لم يتأكد الإصلاح بعد؛ ينتظر إيصال الخادم والمصالحة المحلية. أعد المزامنة لاستعادة الطلب نفسه عند انقطاع الاتصال.';
+          root.querySelectorAll('[data-repair-entry]').forEach(el => { el.disabled = true; });
+          await refreshSyncOperationalUI();
+        } catch (error) { root.querySelector('[data-repair-message]').textContent = error.message; button.disabled = false; }
+      });
+    },
+  });
+}
+
 function paintSyncStatus() {
   const syncInfo = getSyncState();
   const statusStrip = document.querySelector('[data-app-status]');
@@ -528,7 +582,7 @@ function paintSyncStatus() {
     const focusKey = focused?.dataset.act;
     const focusHref = focused?.getAttribute('href');
     const focusSummary = focused?.tagName === 'SUMMARY';
-    render(section, renderSyncOperationalSection(syncInfo.summary, { compact: true }));
+    render(section, renderRepairableSyncSection(syncInfo.summary));
     section.querySelector('details').open = !!expanded;
     if (focusKey) section.querySelector(`[data-act="${focusKey}"]`)?.focus({ preventScroll: true });
     else if (focusHref === '#/support') section.querySelector('a[href="#/support"]')?.focus({ preventScroll: true });
@@ -1481,6 +1535,9 @@ const GLOBAL_ACTIONS = {
       teacherMiniHubAuthPending = null;
       if (store.state.ready) refreshTeacherMiniHubSheet({ focusAccountAction: true });
     }
+  },
+  'review-session-repair': async () => {
+    try { await openSessionRepairReview(); } catch (error) { toast(error.message, 'danger'); }
   },
   'mini-hub-sync-now': async (el) => {
     if (!syncModule) {

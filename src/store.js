@@ -4815,3 +4815,15 @@ export async function undoLastLog(studentId, kind, date = todayISO()) {
   await patch('logs', last.id, { deleted: true });
   return true;
 }
+
+// Explicit UI entry; the engine revalidates owner, evidence and parents transactionally.
+export async function reviewRejectedSessionRepairs() {
+  return createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
+    currentAuthenticatedUserId: () => cloud.user?.id ?? null }).reviewSessionRepairs();
+}
+export async function confirmRejectedSessionRepairs(plan, selectedIds, confirmed = false) {
+  const ids = await createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
+    currentAuthenticatedUserId: () => cloud.user?.id ?? null }).confirmSessionRepairs(plan, selectedIds, confirmed);
+  notify();
+  return ids;
+}

@@ -6,6 +6,7 @@
  * that V2C can wire into runtime store actions after the server cutover.
  */
 
+import { REPAIR_PROTOCOL, REPAIR_STORES, repairAuditId, repairSnapshot, buildSessionRepairPlan, sessionRepairEntry } from './session-recovery.js';
 import * as databaseDefault from './db.js';
 import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, applyScoreSubitemCommand, applyScoreConfigurationCommand, applyScoreDistributionCopyCommand, getScoreDomainSnapshot, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
@@ -689,6 +690,87 @@ export function createSyncV2Engine({
 } = {}) {
   if (!database?.applyBatch || !database?.getAll) throw new Error('Sync V2 requires a transactional database adapter');
 
+  function repairOwner() {
+    const workspace = ownershipGuard.getWorkspace();
+    const access = ownershipGuard.cloudAccess({ operation: 'read', authenticatedUserId: currentAuthenticatedUserId() });
+    if (workspace?.type !== 'account' || !access.allowed) throw ownershipBlockedError(access);
+    return workspace.authUserId;
+  }
+  async function reviewSessionRepairs() {
+    const ownerId = repairOwner();
+    const current = Object.fromEntries(await Promise.all(REPAIR_STORES.map(async name => [name, await database.getAll(name)])));
+    if (repairOwner() !== ownerId) throw Error('Repair owner changed');
+    return buildSessionRepairPlan(current, ownerId);
+  }
+  async function confirmSessionRepairs(plan, selectedIds, confirmed = false) {
+    if (!confirmed || plan?.protocol !== REPAIR_PROTOCOL || !Array.isArray(selectedIds) || !selectedIds.length ||
+        new Set(selectedIds).size !== selectedIds.length) throw Error('يلزم تحديد كل حصة وتأكيد التصحيح.');
+    const ownerId = repairOwner();
+    if (plan.ownerId !== ownerId) throw Error('Repair owner changed');
+    const ids = [];
+    await database.applyBatch(Object.fromEntries(REPAIR_STORES.map(name => [name, {}])), { prepare(current) {
+      if (repairOwner() !== ownerId) throw Error('Repair owner changed');
+      const writes = { outbox: operationBatch() };
+      let sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0);
+      for (const originalId of selectedIds) {
+        const reviewed = plan.entries.find(e => e.originalId === originalId && e.status === 'review');
+        const original = current.outbox.find(x => x.id === originalId);
+        if (!reviewed || !original) throw Error('المراجعة غير صالحة؛ افتحها مجددًا.');
+        const audit = current.outbox.find(x => x.id === repairAuditId(originalId));
+        if (audit) {
+          if (audit.ownerId !== ownerId || repairSnapshot(audit.review) !== reviewed.fingerprint) throw Error('Repair binding mismatch');
+          ids.push(audit.replacementMutationId); continue;
+        }
+        const fresh = sessionRepairEntry(current, original, ownerId);
+        if (fresh.status !== 'review' || fresh.fingerprint !== reviewed.fingerprint) throw Error('تغيّرت الحصة أو التقويم؛ افتح المراجعة مجددًا.');
+        const access = ownershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: currentAuthenticatedUserId(), command: original });
+        if (!access.allowed) throw ownershipBlockedError(access);
+        const localPatch = Object.fromEntries(Object.keys(SYNC_V2_SCHEMAS.sessions.fields)
+          .filter(key => hasOwn(fresh.evidence.session, key)).map(key => [key, clone(fresh.evidence.session[key])]));
+        localPatch.calendarContext = clone(fresh.context);
+        const mutationId = makeId(), stamp = now();
+        const replacement = ownershipGuard.bindNewCommand({ id: `v2:${mutationId}`, protocol: 'v2', mutationId,
+          ownerId, deviceId: original.deviceId, store: 'sessions', entity: 'sessions', recordId: original.recordId,
+          serverRecordId: original.recordId, canonicalId: original.recordId, logicalRecordKey: original.logicalRecordKey,
+          op: 'create', baseRevision: 0, patch: encodeSyncV2Patch('sessions', localPatch), localPatch,
+          fields: Object.keys(encodeSyncV2Patch('sessions', localPatch)).sort(), groups: [],
+          dependencies: inferredDependencies('sessions', localPatch, current, []), sequence: ++sequence,
+          clientUpdatedAt: original.clientUpdatedAt, queuedAt: stamp, state: 'pending', attemptCount: 0,
+          envelopeLocked: false, lastError: null, blockedReason: null, sessionRepairOf: original.id });
+        writes.outbox.put.push(replacement, { id: repairAuditId(original.id), protocol: REPAIR_PROTOCOL, ownerId,
+          original: clone(original), review: clone(fresh.evidence), replacementMutationId: mutationId,
+          state: 'pending', correction: true, confirmedAt: stamp });
+        ids.push(mutationId);
+      }
+      return writes;
+    }});
+    return ids;
+  }
+  function linkedSessionRepair(original, rows) {
+    const audit = rows.find(x => x.id === repairAuditId(original.id));
+    return audit?.protocol === REPAIR_PROTOCOL && audit.ownerId === original.ownerId &&
+      repairSnapshot(audit.original) === repairSnapshot(original) && rows.some(x => x.sessionRepairOf === original.id &&
+        x.mutationId === audit.replacementMutationId && x.ownerId === original.ownerId && x.state !== 'rejected');
+  }
+  async function checkSessionRepairBeforeSend(mutation) {
+    const rows = await database.getAll('outbox');
+    const audit = rows.find(x => x.id === repairAuditId(mutation.sessionRepairOf));
+    const original = rows.find(x => x.id === mutation.sessionRepairOf);
+    if (!audit || audit.replacementMutationId !== mutation.mutationId || !original || !linkedSessionRepair(original, rows))
+      throw Error('Repair audit binding missing');
+    if (repairOwner() !== mutation.ownerId) throw Error('Repair owner changed');
+    // A locked request may already have committed. Replay its identical identity for receipt recovery.
+    if (mutation.envelopeLocked) return;
+    const current = Object.fromEntries(await Promise.all(REPAIR_STORES.map(async name => [name, await database.getAll(name)])));
+    current.outbox = current.outbox.filter(x => x.id !== audit.id && x.id !== mutation.id);
+    const fresh = sessionRepairEntry(current, original, mutation.ownerId);
+    if (fresh.status !== 'review' || fresh.fingerprint !== repairSnapshot(audit.review)) throw Error('تغيّر مصدر التصحيح؛ لم يُرسل الطلب.');
+    const serverRows = await transport.fetchRecords('sessions');
+    if (repairOwner() !== mutation.ownerId) throw Error('Repair owner changed');
+    if (serverRows.some(x => x.id === mutation.serverRecordId || x.teaching_id === mutation.patch.teaching_id &&
+        x.date === mutation.patch.date && x.period === mutation.patch.period)) throw Error('توجد حصة أو علامة حذف بالخادم؛ يلزم التحقق دون استبدالها.');
+  }
+
   async function ensureDeviceId() {
     let resolved;
     await database.applyBatch({ device: {} }, {
@@ -893,13 +975,25 @@ export function createSyncV2Engine({
     return queueCommand({ store:'attendance', recordId:`fill:${sessionId}`, command:'attendance:fill', patch:{ sessionId,status,studentIds:[...studentIds] }, groups:['status'], dependencies: uniqueDependencies([{ store:'sessions',recordId:sessionId,requiresServerRevision:true }, ...studentIds.map((recordId)=>({store:'students',recordId,requiresServerRevision:true}))]) });
   }
 
-  async function markAttempt(mutation) {
+  async function markAttempt(mutation, expectedWorkspace = null) {
     let locked = mutation;
     const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
-    await database.applyBatch(contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
+    await database.applyBatch(mutation.sessionRepairOf ? Object.fromEntries(REPAIR_STORES.map(name => [name, {}])) : contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        if (existing.sessionRepairOf) {
+          if (repairOwner() !== existing.ownerId || expectedWorkspace && ownershipGuard.getWorkspace() !== expectedWorkspace) throw Error('Repair owner/workspace changed');
+          const audit = current.outbox.find(x => x.id === repairAuditId(existing.sessionRepairOf));
+          const original = current.outbox.find(x => x.id === existing.sessionRepairOf);
+          if (!original || !linkedSessionRepair(original, current.outbox) || audit?.replacementMutationId !== existing.mutationId)
+            throw Error('Repair audit changed');
+          if (!existing.envelopeLocked) {
+            const reduced = { ...current, outbox: current.outbox.filter(x => x.id !== existing.id && x.id !== audit.id) };
+            const fresh = sessionRepairEntry(reduced, original, existing.ownerId);
+            if (fresh.status !== 'review' || fresh.fingerprint !== repairSnapshot(audit.review)) throw Error('Repair source changed');
+          }
+        }
         let patch = existing.patch;
         if (!existing.envelopeLocked && existing.op === 'create' && existing.store === 'sessions' && patch.calendar_context) {
           const year = current.years.find(row => row.id === patch.calendar_context.yearId);
@@ -958,7 +1052,7 @@ export function createSyncV2Engine({
     });
   }
 
-  async function reconcileReceipt(mutation, result) {
+  async function reconcileReceipt(mutation, result, expectedWorkspace = null) {
     const resultMutationId = result?.mutationId;
     if (resultMutationId !== mutation.mutationId) throw new Error('Sync V2 receipt mutationId mismatch');
     if (['years', 'terms'].includes(mutation.store) && ownershipGuard.getWorkspace()?.type === 'account') {
@@ -967,6 +1061,14 @@ export function createSyncV2Engine({
       if (!access.allowed || result.canonical?.owner_id !== mutation.ownerId)
         throw new Error('Calendar dependency receipt owner mismatch');
     }
+    if (mutation.sessionRepairOf && (result.outcome !== 'applied' || result.canonical?.owner_id !== mutation.ownerId ||
+        result.canonicalId !== mutation.serverRecordId || result.canonical?.id !== mutation.serverRecordId ||
+        result.canonical?.deleted_at != null || !(result.resultRevision > 0) ||
+        Object.entries(mutation.patch).some(([key, value]) => {
+          const comparable = v => ['start_time', 'end_time'].includes(key) && /^\d{2}:\d{2}$/.test(v) ? `${v}:00` : v;
+          return repairSnapshot(comparable(result.canonical?.[key])) !== repairSnapshot(comparable(value));
+        })))
+      throw Error('Repair receipt is incompatible; original rejection retained');
     const canonical = decodeSyncV2Canonical(mutation.store, result.canonical);
     const canonicalId = result.canonicalId || canonical?.id || mutation.serverRecordId;
     const sourceId = mutation.recordId;
@@ -1037,6 +1139,16 @@ export function createSyncV2Engine({
 
         if (canonicalId !== sourceId) writes[mutation.store].remove.push(sourceId);
         pushUniquePut(writes[mutation.store], next);
+        if (mutation.sessionRepairOf) {
+          if (repairOwner() !== mutation.ownerId || ownershipGuard.getWorkspace() !== expectedWorkspace) throw Error('Repair owner/workspace changed');
+          const audit = current.outbox.find(x => x.id === repairAuditId(mutation.sessionRepairOf));
+          const original = current.outbox.find(x => x.id === mutation.sessionRepairOf);
+          if (!audit || !original || audit.replacementMutationId !== mutation.mutationId ||
+              repairSnapshot(audit.original) !== repairSnapshot(original)) throw Error('Repair evidence changed');
+          pushUniquePut(writes.outbox, { ...original, state: 'superseded', supersededByMutationId: mutation.mutationId,
+            recoveryReason: REPAIR_PROTOCOL, supersededAt: stamp });
+          pushUniquePut(writes.outbox, { ...audit, state: 'verified', receipt: clone(result), reconciledAt: stamp });
+        }
         writes.outbox.remove.push(mutation.id);
         for (const row of rebasedOutbox) {
           const previous = current.outbox.find((candidate) => candidate.id === row.id);
@@ -1249,7 +1361,7 @@ export function createSyncV2Engine({
         if (canonical.calendarPresetId !== dependency.calendarPresetId || normalizeRevision(canonical.fieldRevisions?.calendar_selection) === 0)
           return { state: 'blocked', reason: 'calendar-selection-precondition' };
       }
-      const createMutation = rows.find((row) => row.store === dependency.store &&
+      const createMutation = rows.find((row) => row.state !== 'superseded' && row.store === dependency.store &&
         (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId) && row.op === 'create');
       if (createMutation?.state === 'rejected') return { state: 'rejected', reason: 'dependency-rejected' };
       if (createMutation) {
@@ -1479,7 +1591,8 @@ export function createSyncV2Engine({
 
   async function dispatchPending({ maxMutations = Infinity, onlyMutationId = null } = {}) {
     await recoverRejectedScoreCreates();
-    const snapshot = sortMutations((await database.getAll('outbox')).filter((row) => row.protocol === 'v2'));
+    const allRows = await database.getAll('outbox');
+    const snapshot = sortMutations(allRows.filter((row) => row.protocol === 'v2'));
     const stoppedKeys = new Set();
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
@@ -1487,6 +1600,7 @@ export function createSyncV2Engine({
       if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
       if (result.attempted >= maxMutations) break;
       if (original.state === 'rejected') {
+        if (linkedSessionRepair(original, allRows)) { result.blocked++; continue; }
         stoppedKeys.add(original.logicalRecordKey);
         result.blocked++;
         continue;
@@ -1867,13 +1981,31 @@ export function createSyncV2Engine({
         continue;
       }
 
-      const mutation = await markAttempt(live);
+      const repairWorkspace = live.sessionRepairOf ? ownershipGuard.getWorkspace() : null;
+      const repairContextCurrent = () => !repairWorkspace || ownershipGuard.getWorkspace() === repairWorkspace &&
+        currentAuthenticatedUserId() === live.ownerId;
+      if (live.sessionRepairOf) {
+        try { await checkSessionRepairBeforeSend(live); }
+        catch (error) {
+          if (repairContextCurrent()) await markDependencyBlock(live, error.message);
+          result.blocked++; continue;
+        }
+      }
+      let mutation;
+      try { mutation = await markAttempt(live, repairWorkspace); }
+      catch (error) {
+        if (!live.sessionRepairOf) throw error;
+        if (repairContextCurrent()) await markDependencyBlock(live, error.message);
+        result.blocked++; continue;
+      }
       result.attempted++;
       try {
         const receipt = await transport.applyMutation(mutationEnvelope(mutation));
-        await reconcileReceipt(mutation, receipt);
+        if (!repairContextCurrent()) { result.blocked++; continue; }
+        await reconcileReceipt(mutation, receipt, repairWorkspace);
         result.acknowledged++;
       } catch (error) {
+        if (!repairContextCurrent()) { result.blocked++; continue; }
         if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error);
         else await markFailure(mutation, error);
         stoppedKeys.add(mutation.logicalRecordKey);
@@ -2155,6 +2287,8 @@ export function createSyncV2Engine({
     queueFillAttendanceCommand,
     dispatchPending,
     recoverRejectedScoreCreates,
+    reviewSessionRepairs,
+    confirmSessionRepairs,
     reconcilePull,
     pullStore,
     pullAll,
