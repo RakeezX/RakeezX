@@ -1,7 +1,8 @@
 # N101 confirmed-context prevention — local candidate evidence
 
 Task: continuous-n101-confirmed-context-prevention-20261014
-Run: b5cb864d-2289-478a-a29e-c331c45e4f24
+Run: 9575aa17-c90e-423a-aaec-bd444ecc0cea
+Original proof run: b5cb864d-2289-478a-a29e-c331c45e4f24
 Base: ae581ea2b48ec45beb73c7249ab941edbcbf14ab
 Observed origin/main: 1fc460c33699199c3defeb1e8eec205e85dd9fc5; its only movement since this base is an unrelated ops card. No Product source drift or whole-file N58 promotion.
 
@@ -32,7 +33,7 @@ SHA-256: 6581de6fe626f9901d8ba4e28fe9eede1917e445dec1d727e14d6f35136f83e7. Basel
 
 Normalized final Product source hashes: store.js e7e3e9be79498c584c808f758f0df7d3932d18ecd6e02d34f9de92083f183f55; sync-v2.js 758b39e119b9b3541ce8bfaf58559fc158ca8c896fd4dea7ced1dce8be3eb7d3.
 
-Focused node checks: **27/27 PASS** (n101-context-local.test, calendar-preset, session-auto, session-auto-lifecycle, sessions-generator). Earlier affected session/Sync client run: **56/56 PASS**, reused for unchanged generic Sync cases. Syntax for all four changed JS test/Product files, git diff --check, existing shell coverage and unchanged boot-source assertions PASS. No full Vite build or new global suite.
+Original candidate focused node checks: **27/27 PASS** (n101-context-local.test, calendar-preset, session-auto, session-auto-lifecycle, sessions-generator). Earlier affected session/Sync client run: **56/56 PASS**, reused for unchanged generic Sync cases. Syntax for all four changed JS test/Product files, git diff --check, existing shell coverage and unchanged boot-source assertions PASS. No full Vite build or new global suite.
 
 ## Preserved failures and limitations
 
@@ -41,3 +42,20 @@ An earlier broad calendar-reader change failed existing null/default and unscope
 The initial expanded sync-v2-runtime run did not complete: its existing synthetic environment lacked localStorage and left automatic retry timers running. Only the two identified owned node processes were stopped; that expanded run is not counted as PASS. Native authenticated UI/ownership evidence and the focused completed runs above provide this card's affected gates. Earlier native harness failures (private absorb API, BASE route precedence, numeric versus IndexedDB lexical ordering, and checking a slot before its session transaction completed) were corrected; the four-session timing failure is retained in test-results/n101-context-fixed-1791948913917.json. Subsequent reports use distinct filenames.
 
 The canonical isolated browser helper validated this running local task and bounded its fresh contexts. Unique owned loopback Vite/PG servers stopped, both contexts closed, disposable cluster removed in finally. No shared live-browser phase, external requests, real accounts/data, queue/status writes, unknown-process cleanup, push or deploy. Service Worker execution was deliberately blocked; its existing registration warnings do not constitute offline-cache certification.
+
+## Continued session: concrete harness correction
+
+The previous candidate **316fcae87326e052d6f90f42159e99381311f589** is preserved as this continuation's parent. Its final result was rejected by candidate validation: "An affected check must pass and no recorded check may fail." That result included the historical grouped FAIL named legacy_harness_limitations despite the native Product gates passing. The original result and failure evidence remain unchanged; they are not relabeled PASS.
+
+This continuation repairs both identified fixture defects inside allowed tests/n101-context-*.mjs:
+
+- n101-context-calendar.test.mjs reuses **all three** existing Calendar view cases and their original assertions. Its only fixture difference is providing the missing synthetic foreign year/term. This exercises the original affected-preview case with a valid parent chain instead of merely classifying the old failure. The original canonical test file is untouched; an invalid missing-parent create continues to fail closed in n101-context-local.test.mjs. The earlier duplicate valid-parent preview test was replaced with these existing three cases.
+- n101-context-runtime.test.mjs reuses the two existing affected claimed-owner/store and automatic/manual Sync owner tests without changing their assertions or generic backend. It supplies a disposable browser-compatible localStorage fixture and awaits the existing sync.suspendForWorkspaceDeactivation() in teardown before closing the DB/channel. No force-exit, removed assertion, mocked capability grant, disabled guard or Product change. The incorrect-owner paths still make zero backend reads/writes and keep owner-bound commands/attemptCount intact; switching to the correct owner drains them successfully.
+
+Command: node --test --test-timeout=15000 tests/n101-context-runtime.test.mjs tests/n101-context-calendar.test.mjs tests/n101-context-local.test.mjs
+
+Actual result: **6 tests, 6 PASS, 0 FAIL, 0 cancelled/skipped**, natural exit 0 in 1702.9178ms. The original expanded runtime run was incomplete; this completed bounded replacement certifies its affected owner cases after the concrete storage/lifecycle repair. The old failures remain in the preceding historical section, not in this continuation's active check set.
+
+The old base/native reports' exact SHA-256 values above and every recorded source hash were read back and verified. All src Product files are unchanged from 316fcae87326e052d6f90f42159e99381311f589. Required checks n101_context_required_reproduced, n101_context_revision_wire_and_ack, and n101_history_owner_rejected_entries_unchanged are therefore reused with their original actual-app/native evidence. No repeat browser, Preview, native cluster or fixture provisioning. Syntax for the three corrected test files and git diff --check PASS.
+
+Existing rejected-intent recovery remains **STILL_PENDING**. No queue/status change, Product publication, live operation or Product closure. The current active check set has no failed/unrun gate; the historical grouped FAIL has a recorded material correction and new completed proof, rather than an unchanged retry.
