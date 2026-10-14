@@ -5250,6 +5250,17 @@
   color: var(--info);
 }
 
+.settings-email-instructions summary {
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 13px;
+  padding-block: var(--sp-2);
+}
+
+.settings-email-instructions p {
+  margin: 0;
+}
+
 .settings-access-summary {
   grid-column: 1 / -1;
   min-height: 36px;

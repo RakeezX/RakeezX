@@ -27,7 +27,9 @@ const THEMES = [
   { v: 'dark',  label: 'داكن',       icon: 'moon' },
 ];
 
-let profileExpanded = false;
+// null applies the initial attention default; later paints respect the user's choice.
+let profileExpanded = null;
+let emailInstructionsExpanded = false;
 let removeProfileAttention = () => {};
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
@@ -283,6 +285,7 @@ const settings = {
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
     const demo = store.getActiveWorkspace()?.type === 'demo';
     const attention = profileAttention({ profile, demo, pendingEmail: emailChangePending, unavailable: accountContractUnavailable, contract: accountContract });
+    profileExpanded ??= Boolean(attention);
     const install = currentInstallContext();
 
     return html`
@@ -300,7 +303,7 @@ const settings = {
         </div>
       ` : ''}
       <div class="section settings-section settings-section--identity">
-        <details class="settings-profile card" data-settings-profile ${profileExpanded || attention ? 'open' : ''}>
+        <details class="settings-profile card" data-settings-profile ${profileExpanded ? 'open' : ''}>
           <summary class="settings-profile-summary">
             <span class="row__icon">${icon('student')}</span>
             <span class="row__main"><span class="row__title">بياناتك</span><span class="row__sub">${m.teacherName || 'بيانات الحساب والتقارير'}</span><span class="settings-profile-attention" data-profile-attention role="status" ${attention ? '' : 'hidden'}>${attention}</span></span>
@@ -371,11 +374,20 @@ const settings = {
               </label>
             </div>
             ${demo ? '' : html`<div class="field settings-email-field">
-                <span class="field__label">البريد الإلكتروني</span>
+                <span class="field__label">البريد الإلكتروني الحالي</span>
                 <div class="settings-email-line">
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
+                ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
+                ${emailChangePending ? html`
+                  <p class="field__hint settings-email-pending" role="status" data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</p>
+                  <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
+                    <summary>كيف أكمل تأكيد البريد؟</summary>
+                    <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
+                  </details>
+                ` : ''}
+                ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
               </div>`}
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
               <span class="settings-account-summary__label">الوصول</span>
@@ -384,9 +396,6 @@ const settings = {
           </form>
           </div>
         </details>
-        ${!demo && emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-        ${!demo && emailChangePending ? html`<p class="field__hint settings-email-pending" role="status" data-email-change-pending>طلب تغيير البريد قيد التأكيد. أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>` : ''}
-        ${!demo && emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
       </div>
 
 
@@ -585,9 +594,16 @@ const settings = {
     };
     const toggle = () => { revealError(); profileExpanded = details.open; };
     details.addEventListener('toggle', toggle);
+    const instructions = root.querySelector('[data-email-change-instructions]');
+    const toggleInstructions = () => { emailInstructionsExpanded = instructions.open; };
+    instructions?.addEventListener('toggle', toggleInstructions);
     const observer = new MutationObserver(revealError);
     observer.observe(details, { subtree: true, attributes: true, attributeFilter: ['aria-invalid'] });
-    removeProfileAttention = () => { observer.disconnect(); details.removeEventListener('toggle', toggle); };
+    removeProfileAttention = () => {
+      observer.disconnect();
+      details.removeEventListener('toggle', toggle);
+      instructions?.removeEventListener('toggle', toggleInstructions);
+    };
     removePhoneInputGuards();
     const phone = root.querySelector('input[name="phone"]');
     const beforeInput = (event) => {
@@ -620,7 +636,8 @@ const settings = {
   onUnmount() {
     removeDepartmentInteraction();
     removeProfileAttention();
-    profileExpanded = false;
+    profileExpanded = null;
+    emailInstructionsExpanded = false;
     removePhoneInputGuards();
     accountContractRequest += 1;
   },
