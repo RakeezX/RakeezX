@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "study": "N36 lesson preparation and annual teacher portfolio",
+  "asOf": "2026-10-14",
+  "scope": "source-grounded documentation only; no feature implementation, provider operation, or live account access",
+  "sourceFiles": {
+    "models": "src/models.js",
+    "store": "src/store.js",
+    "reports": "src/views/reports.js",
+    "datetime": ["src/lib/rakeez-datetime.js", "src/lib/rakeez-datetime-values.js"]
+  },
+  "lessonLifecycle": [
+    {
+      "stage": "planned_timetable_slot",
+      "current": true,
+      "source": "src/models.js:769-775; src/store.js:1854-1869",
+      "fields": ["id", "teachingId", "weekday", "period"],
+      "proves": "recurring planned time only",
+      "doesNotProve": ["dated class", "preparation", "conducted lesson"]
+    },
+    {
+      "stage": "dated_session",
+      "current": true,
+      "source": "src/models.js:783-800; src/models.js:258-274",
+      "fields": ["teachingId", "date", "period", "slotId", "startTime", "endTime", "timeProfileId", "status", "lessonId", "note", "homework", "covered"],
+      "proves": "dated operational session record and its explicit status",
+      "doesNotProve": ["preparation approval", "provider save", "strategy used"]
+    },
+    {
+      "stage": "lesson_preparation_draft",
+      "current": false,
+      "proposedFields": ["id", "teachingId", "lessonId", "sessionId", "stage", "grade", "subjectId", "curriculumEditionId", "yearId", "regionId", "termId", "weekKey", "providerRef", "version", "content", "status", "createdAt", "updatedAt"],
+      "classification": "teacher-entered",
+      "source": "src/models.js:822-840; no current preparation model"
+    },
+    {
+      "stage": "teacher_approved_preparation",
+      "current": false,
+      "proposedFields": ["approvedVersion", "approvedContentHash", "approvedAt", "approvedByTeacherIdentity"],
+      "classification": "teacher-confirmed",
+      "source": "no current approval state in src/models.js preparation/session fields"
+    },
+    {
+      "stage": "provider_save_receipt",
+      "current": false,
+      "proposedFields": ["provider", "providerRecordRef", "submittedVersion", "contentHash", "accepted", "receiptAt", "idempotencyKey", "retryState"],
+      "classification": "externally-confirmed only from actual provider response",
+      "source": "no current provider receipt model; this study authorizes no provider write"
+    },
+    {
+      "stage": "lesson_conducted_confirmation",
+      "current": false,
+      "proposedFields": ["sessionId", "confirmedByTeacherIdentity", "conductedAt", "reflectionRef", "strategyUseConfirmation"],
+      "classification": "teacher-confirmed; strategy evidence separately identified",
+      "source": "session status exists at src/models.js:783-800 but no dedicated teacher confirmation/evidence record"
+    }
+  ],
+  "identityMapping": [
+    {"concept": "year", "currentField": "years.id / term.yearId", "coverage": "present", "source": "src/models.js:82-83,632-644,646-660"},
+    {"concept": "term", "currentField": "terms.id / teachings.termId", "coverage": "present", "source": "src/models.js:83,646-660,689-697"},
+    {"concept": "subject", "currentField": "subjects.id/slug; teachings.subjectId", "coverage": "present; join by ID", "source": "src/models.js:84,663-672,689-697"},
+    {"concept": "stage_and_grade", "currentField": "sections.grade", "coverage": "grade present; distinct stage field absent", "source": "src/models.js:674-687"},
+    {"concept": "curriculum_lesson", "currentField": "units.subjectId/grade/termIndex → lessons.unitId/id", "coverage": "present; edition and region absent", "source": "src/models.js:822-840"},
+    {"concept": "region", "currentField": null, "coverage": "absent in scoped models", "source": "src/models.js:632-840"},
+    {"concept": "curriculum_edition", "currentField": null, "coverage": "absent in scoped models", "source": "src/models.js:822-840"},
+    {"concept": "week", "currentField": null, "coverage": "not a preparation/week entity; derive only with explicit term/calendar context", "source": "src/models.js:646-660,803-820"},
+    {"concept": "provider_reference", "currentField": null, "coverage": "absent for lesson/preparation", "source": "src/models.js:822-840"}
+  ],
+  "portfolioSections": [
+    {"section": "teacher_school_principal", "classification": "auto-derived from teacher-entered profile", "source": "src/models.js:583-599; src/views/reports.js:127-155", "fields": ["teacherName", "schoolName", "reportPrincipalName", "principalName", "phone", "educationDepartment"], "missingData": "show غير مسجل; profile is not externally verified"},
+    {"section": "teaching_load_and_timetable", "classification": "auto-derived planned records", "source": "src/models.js:632-696,769-775; src/store.js:1854-1869", "fields": ["yearId", "termId", "sectionId", "grade", "subjectId", "teachingId", "weekday", "period"], "missingData": "empty means no recorded assignment/slot; never assert classes conducted"},
+    {"section": "lesson_preparation_and_delivery", "classification": "future teacher-entered plus separate externally-confirmed receipt", "source": "src/models.js:783-800,822-840", "fields": ["lessonId", "sessionId", "status", "providerReceipt (proposed)", "conductedConfirmation (proposed)"], "missingData": "no prep/approval/receipt/delivery evidence model currently"},
+    {"section": "assessments_projects_participation", "classification": "auto-derived recorded student/class evidence", "source": "src/models.js:720-745,890-924,974-1005; src/store.js:1509-1512", "fields": ["items", "unitId", "lessonId", "scores", "assignments", "submissions", "logs"], "missingData": "preserve missing scores/submissions as missing; not teacher achievement"},
+    {"section": "attendance", "classification": "auto-derived recorded attendance", "source": "src/store.js:1509-1512,1610-1625; src/views/reports.js:133-150,245-250", "fields": ["sessionId", "studentId", "status"], "missingData": "no records means no recorded attendance, not perfect attendance"},
+    {"section": "reports", "classification": "auto-derived versioned report", "source": "src/models.js:875-888; src/store.js:2187-2214,2365-2376; src/views/reports.js:111-155", "fields": ["termId", "yearId", "version", "supersedesId", "sourceManifest", "report snapshots"], "missingData": "show empty state; preserve superseded versions and source linkage"},
+    {"section": "parent_contact_proof", "classification": "unavailable; future externally-confirmed accepted-send only", "source": "no accepted-send receipt in scoped current models/store", "fields": [], "missingData": "do not derive from phone, note, or prepared message"},
+    {"section": "manual_certificates_photos_reflection", "classification": "unavailable today; future teacher-entered, unverified", "source": "no teacher portfolio attachment/certificate/reflection model; student note is distinct at src/models.js:842-853", "fields": [], "missingData": "no fabricated course, certificate, photo, reflection, source, or timestamp"}
+  ],
+  "exportPolicy": {
+    "yearScope": "one explicit yearId by default",
+    "deduplication": "stable source evidence ID plus source/version; changed versions remain traceable and superseded",
+    "redactByDefault": ["student names", "per-student grades", "attendance detail", "phone numbers", "parent recipients", "private notes", "attachment URLs"],
+    "emptyState": "لا توجد بيانات مسجلة / لم يُضف بعد",
+    "noFabrication": true
+  },
+  "designCasesOnly": ["Arabic", "English", "mathematics", "Quran", "digital skills", "kindergarten"],
+  "validationBoundary": "Document/source validation only; not a runtime, UI, Tahdiri completeness, or provider acceptance claim."
+}
