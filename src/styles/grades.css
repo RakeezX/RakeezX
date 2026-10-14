@@ -1,4 +1,7 @@
 /* Compact N94 cells retain the established state palette and focus treatment. */
+.target-review > summary { cursor: pointer; font-weight: 700; }
+.target-review > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
+.target-review__subitem { display: block; margin-inline-start: 12px; color: var(--text-2); }
 .grades-01c__subitem.n94-completion .n94-cell-line {
   display: flex; align-items: center; justify-content: flex-start;
   gap: 5px; padding: 5px 8px; min-inline-size: 0; min-block-size: 44px;

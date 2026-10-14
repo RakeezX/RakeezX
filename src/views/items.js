@@ -423,19 +423,35 @@ export default {
               const incoming = await store.reviewScoreDistributionCopy(params.id, requested, { mode: requestedMode });
               if (version !== requestVersion || !root.isConnected) return;
               plan = incoming;
+              const unchangedCount = plan.targets.reduce((count, target) => count + target.impact.filter(item => item.unchanged).length, 0);
+              const protectedCount = plan.targets.reduce((count, target) => count + target.impact.filter(item => item.retained).length, 0);
               render(review, html`<p>مراجعة النسخ من ${store.sectionLabel(store.getSection(source.sectionId))}
-                إلى ${selected.map(id => store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))).join('، ')}.</p>
-                <p>${plan.changedCount} بنود ستتغيّر. تبقى الفصول مستقلة بعد النسخ.</p>
-                ${plan.targets.map(target => target.beforeTotal != null ? html`<p>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}: المجموع ${target.beforeTotal} ← ${target.afterTotal} درجة.</p>` : '')}
+                إلى ${selected.length} فصول مستهدفة. ${plan.changedCount} تغييرات آمنة؛ تبقى الفصول مستقلة ولا تُنسخ درجات المصدر.</p>
+                ${unchangedCount ? html`<p>${unchangedCount} بنود مطابقة مخفية من التفاصيل.</p>` : ''}
+                ${protectedCount ? html`<p role="status">${protectedCount} بنود محمية أو متعارضة ستبقى كما هي؛ تفاصيلها متاحة لكل فصل.</p>` : ''}
                 ${(plan.excludedTargets ?? []).map(target => html`<p role="alert">${target.reason}
                   <a href="#/teaching/${target.teachingId}/items">فتح توزيع الفصل المستهدف</a> · لن يُطبّق عليه التوزيع.</p>`)}
                 ${plan.targets.some(target => target.extras.length) ? html`<p>تبقى البنود الإضافية ودرجاتها كما هي.</p>` : ''}
                 <div class="copy-impact">
-                  ${plan.targets.map(target => html`<section class="target-review"><h3>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}</h3>
-                    ${target.impact.map(item => html`<p>${item.name}: ${item.retained ? html`بقي كما هو — ${item.reason}` : item.unchanged ? 'مطابق؛ تبقى سجلاته كما هي' : item.created ? 'إضافة بند دون درجات الطلاب' : 'تحديث التعريف والأسماء والتواريخ؛ تبقى سجلاته محفوظة'}.
-                      ${!item.retained && item.beforeMax != null && Number(item.beforeMax) !== Number(item.max) ? html`الحد الأعلى ${item.beforeMax} ← ${item.max}.` : ''}
-                      ${(item.subitems ?? []).map(sub => html`<span style="display:block">${sub.name} · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi></span>`)}</p>`)}
-                    ${target.extras.map(extra => html`<p>${extra.name} — بقي هذا البند ودرجات طلابه كما هي.</p>`)}</section>`)}
+                  ${plan.targets.map(target => {
+                    const label = store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId));
+                    const changed = target.impact.filter(item => !item.unchanged);
+                    const warnings = changed.filter(item => item.retained || (item.beforeMax != null && Number(item.beforeMax) !== Number(item.max)) ||
+                      (item.subitems ?? []).some(sub => {
+                        const prior = sub.targetId && store.state.scoreSubitems.find(row => row.id === sub.targetId && !row.deleted);
+                        return sub.clearsStartDate || sub.clearsDueDate || (!!prior?.startDate && !sub.startDate) || (!!prior?.dueDate && !sub.dueDate);
+                      }));
+                    return html`<details class="target-review"><summary>${label} · ${changed.length} تغييرات${warnings.length ? ` · ${warnings.length} تنبيهات` : ''}</summary>
+                      ${changed.map(item => html`<p>${item.name}: ${item.retained ? html`بقي كما هو — ${item.reason}` : item.created ? 'إضافة بند دون درجات الطلاب' : 'تحديث التعريف والأسماء والتواريخ؛ تبقى سجلاته محفوظة'}.
+                        ${item.beforeMax != null && Number(item.beforeMax) !== Number(item.max) ? html`<strong>الحد الأعلى ${item.beforeMax} ← ${item.max}.</strong>` : ''}
+                        ${(item.subitems ?? []).map(sub => {
+                          const prior = sub.targetId && store.state.scoreSubitems.find(row => row.id === sub.targetId && !row.deleted);
+                          const clearsStartDate = !!prior?.startDate && !sub.startDate;
+                          const clearsDueDate = !!prior?.dueDate && !sub.dueDate;
+                          return html`<span class="target-review__subitem">${sub.name}${sub.startDate || sub.dueDate ? html` · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi>` : ''}${clearsStartDate || clearsDueDate ? html` · <strong>سيُمسح تاريخ ${clearsStartDate && clearsDueDate ? 'البداية والاستحقاق' : clearsStartDate ? 'البداية' : 'الاستحقاق'}.</strong>` : ''}</span>`;
+                        })}</p>`)}
+                    </details>`;
+                  })}
                 </div>`);
               apply.disabled = !plan.targets.length || !plan.changedCount;
             } catch (error) {
