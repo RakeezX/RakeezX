@@ -27,7 +27,9 @@ const db = new Proxy(rawDB, { get(target, name) {
   };
 } });
 import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js';
-import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js';
+// Bind the copy protocol to its module identity. A previous offline/HTTP cache
+// must not supply the two-mode engine to the automatic-safe account entry.
+import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js?n100=automatic-safe-v1';
 import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
