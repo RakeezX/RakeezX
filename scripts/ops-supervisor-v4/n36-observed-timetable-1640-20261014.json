@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -30,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "objective": "Resume same session 01a13461-ef85-7c53-add1-1eba2c19dace with completed candidate 783d277ba29842ed1a246396eb750fa872f57776. While the previous run finished, operator actually opened the authorized official timetable and copied only header plus ONE lesson card using native visible Elements inspection. Source now proves an empty first header followed by Arabic ordinal الحصة الأولى..الثامنة; current row startsالأحد; actual card is a>div.schedule-card.done>div.title>i+h2(subject), followed by small(class). Old parser requires headerاليوم/numericperiods and explicit field labels and therefore cannot parse this real page. Exact sanitized source in N36_ACTUAL_TIMETABLE_DOM_1640.md. This is a newly observed concrete remaining extraction bug, not repeating previous gateway/roster checks.\nRead canonical docs/automation-evidence/20261014/N36_ACTUAL_TIMETABLE_DOM_1640.md and the prior browser-links evidence. Change only the actual visible timetable adapter and affected tests/package. Keep private version0.4.4 as the same not-yet-delivered candidate; stable current is still0.4.3. Do not reset or repeat the completed7page/gateway/Name/SchoolId proof; use previous byte-identical receipts and test the changed source module's one-start mixed run.\nParse actual table shape: empty first TH only accepted when following headers map uniquely to ordinal periods and row-first cells are recognized weekdays. Normalize الأولى/الثانية/الثالثة/الرابعة/الخامسة/السادسة/السابعة/الثامنة (and explicit other known period labels) to1..8 without assuming column left/right screen coordinates. In each actual lesson card read title h2 as subject and small as class, not decorative status text; class/value can wrap, text is trimmed safely. Empty TD remains no lesson. Account for colSpan using the existing contract, and never visit the enclosing preparation link. Multiple different cards/ambiguous class or subject in a slot => precise unresolved category, not silent choice. No hypothetical times if only period exists; keep optional time missing in exported schema. Do not derive attendance or done lesson status from preparation icon.\nDemonstrate before old parser fails/after actual extension collects intended weekday-period-class-subject rows with real observed header/card hierarchy and synthetic values, plus one-start mixed roster+gateway proof and empty/merged/ambiguous cell cases. No real school account access by worker and no network/API/POST/hidden iframe. No new Auth/Migration/Rakeez data writes or retry of prior denied report command. Existing rejected evidence-report write remains FAIL history; record results in existing bounded JSON receipt/README if permitted, no equivalent write via alternate tool. Do not let inability to write the long report trigger a pointless source redo.\nGenerate exact final runtime19-file manifest against stable0.4.3 and source/ZIP hashes, retain old candidate and completed tests. Do not update stable user's folder or Chrome profile. Operator will apply the verified package and perform the actual authorized visible-account test rather than ask PO for another screenshot. Whole N36 account-save remains unimplemented; do not declare full closure or automatic cloud save. Return exact scoped result with local actual timetable proof and remaining official/account gates.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_GATEWAY_DASHBOARD.md",
+        "docs/automation-evidence/20261014/N36_SOURCE_ADAPTER_AND_STABLE_PACKAGE.md",
+        "docs/automation-evidence/20261014/N36_PRESENTATION_INVARIANT_ENTRY.md",
+        "docs/automation-evidence/20261014/N36_OBSERVED_ENTRY_ROLE_LINK_SPLIT.md",
+        "docs/automation-evidence/20261014/N36_OBSERVED_PAGINATION_AND_QUERY.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_ROUTE_AND_PAGER_FIX.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed",
+        "n36_actual_screenshot_shapes",
+        "n36_gateway_card_binding_and_multischool",
+        "n36_actual_dashboard_labels_no_role_suffix",
+        "n36_uploaded_reference_roster_shapes",
+        "n36_complete_pagination_and_dynamic_timetable",
+        "n36_real_failure_markup_reproduction",
+        "n36_entry_markup_invariance",
+        "n36_exact_041_observed_entry_failures",
+        "n36_role_not_dependent_on_read_link_classification",
+        "n36_numeric_pager_complete_or_explicitly_incomplete",
+        "n36_exact_rejected_route_diagnostic_no_values",
+        "n36_operator_observed_gateway_and_schoolid_routes",
+        "n36_actual_sr_only_ellipsis_svg_pager",
+        "n36_real_shaped_ordinal_timetable"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched.",
+        "Latest real screenshots supersede the old assumption that an active teacher always has a teacher-suffixed greeting. Normal parent-oriented gateway chrome and principal metadata are not a conflicting ACTIVE role; all true explicit role/login/origin/data restrictions remain. No real identifiers in fixtures.",
+        "Entry correction is separately reproduced against the supplied screenshot semantics and latest0.4.0diagnostics; no actual private-page proof from local success. Source capture must be exact and arbitrary layouts must not gain access from a teacher name alone."
+      ],
+      "releaseAuthority": "Current explicit PO permitted actual browser inspection; new official visible timetable DOM is now documented. This worker phase implements only that remaining local parser and final private package. No service/write/real-profile access, no retry of denied operations. While the previous run finished, operator actually opened the authorized official timetable and copied only header plus ONE lesson card using native visible Elements inspection. Source now proves an empty first header followed by Arabic ordinal الحصة الأولى..الثامنة; current row startsالأحد; actual card is a>div.schedule-card.done>div.title>i+h2(subject), followed by small(class). Old parser requires headerاليوم/numericperiods and explicit field labels and therefore cannot parse this real page. Exact sanitized source in N36_ACTUAL_TIMETABLE_DOM_1640.md. This is a newly observed concrete remaining extraction bug, not repeating previous gateway/roster checks."
+    }
+  ]
+}
