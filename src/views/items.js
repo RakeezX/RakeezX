@@ -437,11 +437,19 @@ export default {
                     const label = store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId));
                     const changed = target.impact.filter(item => !item.unchanged);
                     const warnings = changed.filter(item => item.retained || (item.beforeMax != null && Number(item.beforeMax) !== Number(item.max)) ||
-                      (item.subitems ?? []).some(sub => sub.clearsStartDate || sub.clearsDueDate));
+                      (item.subitems ?? []).some(sub => {
+                        const prior = sub.targetId && store.state.scoreSubitems.find(row => row.id === sub.targetId && !row.deleted);
+                        return sub.clearsStartDate || sub.clearsDueDate || (!!prior?.startDate && !sub.startDate) || (!!prior?.dueDate && !sub.dueDate);
+                      }));
                     return html`<details class="target-review"><summary>${label} · ${changed.length} تغييرات${warnings.length ? ` · ${warnings.length} تنبيهات` : ''}</summary>
                       ${changed.map(item => html`<p>${item.name}: ${item.retained ? html`بقي كما هو — ${item.reason}` : item.created ? 'إضافة بند دون درجات الطلاب' : 'تحديث التعريف والأسماء والتواريخ؛ تبقى سجلاته محفوظة'}.
                         ${item.beforeMax != null && Number(item.beforeMax) !== Number(item.max) ? html`<strong>الحد الأعلى ${item.beforeMax} ← ${item.max}.</strong>` : ''}
-                        ${(item.subitems ?? []).map(sub => html`<span class="target-review__subitem">${sub.name}${sub.startDate || sub.dueDate ? html` · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi>` : ''}${sub.clearsStartDate || sub.clearsDueDate ? html` · <strong>سيُمسح تاريخ ${sub.clearsStartDate && sub.clearsDueDate ? 'البداية والاستحقاق' : sub.clearsStartDate ? 'البداية' : 'الاستحقاق'}.</strong>` : ''}</span>`)}</p>`)}
+                        ${(item.subitems ?? []).map(sub => {
+                          const prior = sub.targetId && store.state.scoreSubitems.find(row => row.id === sub.targetId && !row.deleted);
+                          const clearsStartDate = !!prior?.startDate && !sub.startDate;
+                          const clearsDueDate = !!prior?.dueDate && !sub.dueDate;
+                          return html`<span class="target-review__subitem">${sub.name}${sub.startDate || sub.dueDate ? html` · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi>` : ''}${clearsStartDate || clearsDueDate ? html` · <strong>سيُمسح تاريخ ${clearsStartDate && clearsDueDate ? 'البداية والاستحقاق' : clearsStartDate ? 'البداية' : 'الاستحقاق'}.</strong>` : ''}</span>`;
+                        })}</p>`)}
                     </details>`;
                   })}
                 </div>`);
