@@ -71,7 +71,7 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(card && expected && ID.test(card.id ?? '') && card.activationId === payload.activationId, 'Invalid activated source card');
     insist(!taskIds.has(card.id) && !allowed.includes(card.id), 'Duplicate or active card update'); taskIds.add(card.id);
     insist(Object.keys(card).every(key => !RUNTIME_KEYS.has(key)), 'Source card contains runtime state: ' + card.id);
-    insist(expected.id === card.id && expected.status === 'blocked' && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? ''), 'Expected exact blocked session/run/candidate: ' + card.id);
+    insist(expected.id === card.id && (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? ''), 'Expected exact blocked session/run/candidate: ' + card.id);
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
     insist(typeof materialReason === 'string' && materialReason.trim().length >= 15, 'A concrete material repair is required');
   }
@@ -99,10 +99,19 @@ export function reviewedPreimageMatches(actual, reviewed) {
 export function verifyInactiveIdentity(task, result, update, activationId) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
-  insist(task.status === 'blocked' && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
+  insist(task.status === e.status && (task.status === 'blocked' || task.status === 'delivery' && update.card.completionMode === 'deferred_by_po') && task.sessionId === e.sessionId && task.attempt?.runId === e.lastRunId && !task.runnerPid && !task.brokerPid, 'Task is no longer the exact inactive attempt: ' + e.id);
   insist(task.lastWorkerReap?.exactAbsence === true && task.lastWorkerReap.activationId === activationId && task.lastWorkerReap.runId === e.lastRunId && Array.isArray(task.lastWorkerReap.owners) && task.lastWorkerReap.owners.length > 0, 'No exact owned-process absence proof: ' + e.id);
   const evidenceOnly = update.card.completionMode === 'record_published_evidence' && e.resultState === 'LOCAL_READY' && result.state === 'LOCAL_READY' && !update.card.liveMutation && !update.card.liveAuthorizationRef && update.card.evidenceOnly?.acceptanceAuthority && result.changedPaths?.length && result.changedPaths.every(p => /^docs\/automation-evidence\/\d{8}\/[a-zA-Z0-9_-]+\.(md|json)$/.test(p) && update.card.allowedPaths.includes(p)) && update.card.requiredChecks?.length && update.card.requiredChecks.every(name => result.checks?.some(c => c.name === name && c.status === 'PASS')) && result.checks.every(c => c.status === 'PASS') && result.blockerType === 'none' && !result.blocker;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  const poDeferred = update.card.completionMode === 'deferred_by_po' && update.card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS' && update.card.productId === 'N58' && update.card.id === 'continuous-n58-empty-account-reviewed-recovery-20261014' && update.card.deferralReason?.length >= 20 && ['LOCAL_READY','BLOCKED'].includes(result.state);
+  const d = task.deliveryReceipt, proof = update.card.verificationRepair;
+  const deliveryRecheck = update.card.completionMode === 'recheck_existing_publication' && result.state === 'LOCAL_READY'
+    && e.resultState === 'LOCAL_READY' && !update.card.liveMutation && !update.card.liveAuthorizationRef
+    && d?.errorCode === 'SOURCE_PARITY_PENDING' && d.status === 'pending' && d.candidateSha === e.candidateSha
+    && d.publishedSha === proof?.publishedSha && sha256(bytes(d)) === proof?.priorReceiptSha256
+    && SHA256.test(proof?.reviewedFixtureSha256 ?? '') && proof?.reason?.length >= 20
+    && d.provider?.conclusion === 'success' && d.provider?.headSha === d.publishedSha && d.evidence?.immutable?.passed === true
+    && result.checks?.every(x => x.status === 'PASS') && update.card.requiredChecks?.every(name => result.checks.some(x => x.name === name && x.status === 'PASS'));
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || poDeferred) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -120,6 +129,15 @@ export function revisedTask(task, update, commit, at) {
   const saved = structuredClone(task);
   const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: update.expected.candidateSha, previousQueuedCandidateSha: task.candidateSha, previousQueuedBaseSha: task.baseSha, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
   Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, baseSha: update.expected.baseSha ?? task.baseSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
+  if (update.card.completionMode === 'recheck_existing_publication') {
+    saved.status = 'delivery'; saved.nextDeliveryAt = at; saved.lastFailure = null;
+    saved.sourceParityHistory = [...(task.sourceParityHistory ?? []), { at, reason: update.materialReason, receipt: structuredClone(task.deliveryReceipt) }];
+    saved.sourceParityState = null;
+  }
+  if (update.card.completionMode === 'deferred_by_po') {
+    insist(typeof update.card.deferralReason === 'string' && update.card.deferralReason.length >= 20, 'Explicit PO deferral reason required');
+    saved.status = 'blocked'; saved.lastFailure = 'DEFERRED_BY_PO: ' + update.card.deferralReason; saved.failureClass = 'external';
+  }
   return saved;
 }
 
