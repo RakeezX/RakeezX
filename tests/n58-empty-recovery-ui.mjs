@@ -57,6 +57,23 @@ try {
     await server.close();phase='current';await startServer();await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForFunction(async owner=>{const s=await import('/src/store.js'),c=await import('/src/lib/cloud.js');return s.state.ready&&c.user?.id===owner&&s.getActiveWorkspace()?.authUserId===owner;},a.user.id);
     const before=await checkpoint(page),review=await page.evaluate(()=>(import('/src/store.js')).then(s=>s.reviewCalendarFoundationRepair()));assert.equal(review.status,'review',JSON.stringify(review));
+    if(process.env.N58_RECOVERY_OWNER_ONLY==='1') {
+     const count=receipt.calls.length;
+     const negative=await page.evaluate(async review=>{
+      const s=await import('/src/store.js'),c=await import('/src/lib/cloud.js'),d=await import('/src/lib/db.js'),saved=c.session;
+      const results=[];
+      for(const [plan,ack] of [[review,false],[{...review,ownerId:'b5800000-0000-4000-8000-000000000001'},true],[{...review,fingerprint:'altered'},true]]) {
+       try {await s.confirmCalendarFoundationRepair(plan,ack);results.push('UNEXPECTED_SUCCESS');}catch(e){results.push(e.message);}
+      }
+      // Negative authenticated-owner entry fixture, preserving the actual A
+      // workspace/lease/restore guard. No transport acceptance is mocked.
+      c.setMockAuth({id:'b5800000-0000-4000-8000-000000000001'},saved);
+      try {await s.reviewCalendarFoundationRepair();results.push('UNEXPECTED_SUCCESS');}catch(e){results.push(e.message);}finally{c.setMockAuth(saved.user,saved);}
+      return {results,audits:(await d.getAll('outbox')).filter(r=>r.protocol==='N58_EMPTY_V1').length};
+     },review);
+     assert.ok(negative.results.every(r=>r!=='UNEXPECTED_SUCCESS'));assert.equal(negative.audits,0);assert.equal(receipt.calls.length,count);
+     const after=await checkpoint(page);assert.deepEqual(after.rows.outbox,before.rows.outbox);receipt.checks.push({testCase,negative,before,after,status:'PASS'});continue;
+    }
     const open=async()=>{await page.locator('[data-act="open-teacher-mini-hub"]:visible').first().click();await page.locator('[data-act="review-calendar-repair"]').click();await page.locator('[data-calendar-repair-review]').waitFor();};
     await open();assert.ok(await page.locator('[data-calendar-repair-confirm]').isDisabled());
     const metrics=await page.locator('[data-calendar-repair-review]').evaluate(el=>({text:el.textContent,width:el.getBoundingClientRect().width,font:getComputedStyle(el).fontFamily,viewport:innerWidth,css:!!document.querySelector('link[href*="app.css"]')}));assert.ok(metrics.width<=testCase.width);assert.ok(metrics.css);assert.ok(!metrics.text.includes('ستة'));
@@ -87,5 +104,5 @@ try {
   }
  });receipt.completed=true;
 }catch(error){receipt.problem={message:error.message,stack:error.stack};process.exitCode=1;}
-finally{await browser?.close();await server?.close();await fs.writeFile('tests/n58-empty-recovery-ui.json',JSON.stringify(receipt,null,2)+'\n');}
+finally{await browser?.close();await server?.close();await fs.writeFile(process.env.N58_RECOVERY_OWNER_ONLY==='1'?'tests/n58-empty-recovery-entry-negative.json':'tests/n58-empty-recovery-ui.json',JSON.stringify(receipt,null,2)+'\n');}
 console.log(JSON.stringify({completed:receipt.completed,checks:receipt.checks.map(c=>({width:c.testCase.width,status:c.status})),problem:receipt.problem}));
