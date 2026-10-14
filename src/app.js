@@ -146,6 +146,7 @@ let ctx = null;
 let mainEl = null;
 let syncModule = null;
 let teacherMiniHubSheet = null;
+let teacherMiniHubDone = null;
 let teacherMiniHubAuthPending = null;
 let workspaceRouting = null;
 let marketingAuthSettled = false;
@@ -336,8 +337,9 @@ function openTeacherMiniHubSheet() {
   const sheet = openSheet({
     title: `مركز ${presentation.teacherLabel}`,
     body: renderTeacherMiniHubBody(),
-    onMount: (root) => {
+    onMount: (root, done) => {
       teacherMiniHubSheet = root;
+      teacherMiniHubDone = done;
       root.classList.add('mini-hub-backdrop');
       const position = () => {
         const main = document.querySelector('.main')?.getBoundingClientRect();
@@ -352,7 +354,7 @@ function openTeacherMiniHubSheet() {
   const mounted = teacherMiniHubSheet;
   sheet.finally(() => {
     mounted?._removeHubPositionListener?.();
-    if (teacherMiniHubSheet?.isConnected === false) teacherMiniHubSheet = null;
+    if (teacherMiniHubSheet === mounted) { teacherMiniHubSheet = null; teacherMiniHubDone = null; }
   });
   return sheet;
 }
@@ -509,58 +511,133 @@ function restoreFocus(snap) {
 }
 
 /** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
+// Only the current account's read-only repair plan can expose this entry.
+let sessionRepairEligibility = null;
+let sessionRepairReviewDone = null;
+let sessionRepairOpening = false;
+let repairSupportFocus = false;
+function sessionRepairWorkspace() {
+  const workspace = store.getActiveWorkspace();
+  return workspace?.type === 'account' && workspace.authUserId === cloud.user?.id ? workspace : null;
+}
+const retryableSessionRepair = entry => !!entry.replacementMutationId && ['pending', 'failed'].includes(entry.status);
+function currentSessionRepairPlan(plan, workspace) {
+  return !!workspace && sessionRepairWorkspace() === workspace && plan?.ownerId === workspace.authUserId;
+}
+store.onWorkspaceDeactivation(() => {
+  sessionRepairEligibility = null;
+  sessionRepairReviewDone?.();
+});
+async function refreshSessionRepairEligibility() {
+  const workspace = sessionRepairWorkspace();
+  sessionRepairEligibility = null;
+  if (!workspace) return;
+  try {
+    const plan = await store.reviewRejectedSessionRepairs();
+    if (currentSessionRepairPlan(plan, workspace)) {
+      sessionRepairEligibility = { workspace, available: plan.entries.some(entry => entry.status === 'review' || retryableSessionRepair(entry)) };
+    }
+  } catch { /* Fail closed for this repair entry; preserve generic Sync diagnostics. */ }
+}
 function renderRepairableSyncSection(summary) {
+  const available = sessionRepairEligibility?.workspace === sessionRepairWorkspace() && sessionRepairEligibility?.available;
   return html`${renderSyncOperationalSection(summary, { compact: true })}
-    ${summary.rejectedCount > 0 ? html`<button class="btn btn--sm btn--quiet" data-act="review-session-repair">مراجعة وإصلاح الحصص المرفوضة</button>` : ''}`;
+    ${available ? html`<button class="btn btn--sm btn--quiet" data-act="review-session-repair">مراجعة وإصلاح الحصص المرفوضة</button>` : ''}`;
 }
 
 async function openSessionRepairReview() {
-  const plan = await store.reviewRejectedSessionRepairs();
+  if (sessionRepairOpening || sessionRepairReviewDone) return;
+  sessionRepairOpening = true;
+  const workspace = sessionRepairWorkspace();
+  let plan;
+  try {
+    plan = await store.reviewRejectedSessionRepairs();
+    if (!currentSessionRepairPlan(plan, workspace)) return;
+  } finally { sessionRepairOpening = false; }
+  const reviewable = plan.entries.some(entry => entry.status === 'review');
+  const reviewedPlan = plan;
   return openSheet({ title: 'مراجعة وإصلاح الحصص المرفوضة',
-    desc: 'السياق الأصلي غير محفوظ. راجع كل حصة وأكّد التقويم كتَصحيح صريح، لا كسياق أصلي موثّق.',
+    desc: reviewable ? 'راجع سياق كل حصة قبل تأكيد التصحيح. السياق الأصلي غير محفوظ؛ التصحيح يعتمد على التقويم الحالي.' : undefined,
     body: html`<div data-session-repair-review>
-      <p>حدّد فقط حصص البلاغ الحالي. الطلبات التاريخية الستة مستثناة؛ لا تحدّدها. لن نختار أي طلب تلقائيًا.</p>
+      ${reviewable ? html`<p>حدّد الحصص التي تريد تصحيحها بعد مراجعة السنة والفصل واليوم. لن نختار أي حصة تلقائيًا.</p>` : ''}
       ${!plan.entries.length ? html`<p>لا توجد حصص مؤهلة لهذا الإصلاح في الحساب الحالي.</p>` : ''}
       ${plan.entries.map((entry, index) => html`<section class="card p-3">
         <p><bdi>${entry.date}</bdi> — الحصة <bdi>${entry.period}</bdi> — ${entry.classLabel || 'تعذّر توثيق الفصل'}</p>
         <p>وقت الطلب: <bdi>${Number.isFinite(new Date(entry.queuedAt).getTime()) ? new Date(entry.queuedAt).toISOString() : 'غير موثّق'}</bdi></p>
-        <p>معرّف الطلب: <bdi>${entry.mutationId}</bdi></p>
         ${entry.status === 'review' ? html`
           <p>${entry.yearLabel} — ${entry.termLabel} — ${entry.presetLabel}</p>
           <p>اليوم: ${entry.context.kind === 'study' ? 'دراسي' : entry.context.kind === 'remote' ? 'عن بُعد' : 'إجازة'} — ${entry.context.label}</p>
-          <p>مصدر التصحيح: التقويم الحالي لهذه السنة، مراجعة اختيار <bdi>${entry.context.selectionRevision}</bdi>. السياق وقت الإنشاء غير قابل للتحقق.</p>
-          <label><input type="checkbox" data-repair-entry="${index}"> هذه من حصص البلاغ الحالي؛ أؤكد السنة والفصل وتقويم اليوم أعلاه كتَصحيح.</label>`
+          <label><input type="checkbox" data-repair-entry="${index}"> أؤكد السنة والفصل وتقويم اليوم أعلاه كتَصحيح لهذه الحصة.</label>`
           : html`<p>${entry.reason}</p>`}
       </section>`)}
       <p data-repair-message role="status"></p>
-      <button class="btn btn--sm btn--quiet" data-retry-session-repairs>مزامنة واستعادة إيصالات التصحيح</button>
-      <a href="#/support" data-sheet-close>المساعدة في طلب متوقف</a>
+      <button class="btn btn--sm btn--quiet" data-retry-session-repairs ${plan.entries.some(retryableSessionRepair) ? '' : 'hidden'} style="${plan.entries.some(retryableSessionRepair) ? '' : 'display:none'}">استعادة إيصال التصحيح</button>
+      <a href="#/support" data-repair-support>المساعدة في طلب متوقف</a>
     </div>`,
-    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" data-confirm-session-repair>تأكيد تصحيح المحدد</button>`,
-    onMount(root) {
-      root.querySelector('[data-retry-session-repairs]').addEventListener('click', async (event) => {
-        event.currentTarget.disabled = true;
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>${reviewable ? html`<button class="btn btn--primary" data-confirm-session-repair disabled>تأكيد تصحيح المحدد</button>` : ''}`,
+    onMount(root, done) {
+      sessionRepairReviewDone = done;
+      let confirming = false, confirmed = false, retrying = false;
+      const button = root.querySelector('[data-confirm-session-repair]');
+      const retry = root.querySelector('[data-retry-session-repairs]');
+      const message = root.querySelector('[data-repair-message]');
+      const updateRetryVisibility = () => {
+        retry.hidden = !plan.entries.some(retryableSessionRepair);
+        retry.style.display = retry.hidden ? 'none' : '';
+      };
+      const selectedIds = () => [...root.querySelectorAll('[data-repair-entry]:checked')].map(el => reviewedPlan.entries[Number(el.dataset.repairEntry)].originalId);
+      const updateConfirm = () => { if (button) button.disabled = confirming || confirmed || retrying || !currentSessionRepairPlan(plan, workspace) || !selectedIds().length; };
+      root.addEventListener('change', updateConfirm);
+      root.querySelector('[data-repair-support]').addEventListener('click', event => {
+        event.preventDefault();
+        done();
+        teacherMiniHubDone?.();
+        repairSupportFocus = true;
+        const alreadySupport = currentPath() === '/support';
+        go('/support');
+        if (alreadySupport) void resolve();
+      });
+      retry.addEventListener('click', async () => {
+        if (retrying || confirming || !currentSessionRepairPlan(plan, workspace) || !plan.entries.some(retryableSessionRepair)) return;
+        retrying = true; retry.disabled = true; retry.textContent = 'جارٍ استعادة الإيصال...'; updateConfirm();
+        const pendingIds = plan.entries.filter(retryableSessionRepair).map(entry => entry.originalId);
         try {
           if (!syncModule) throw Error('المزامنة غير متوفرة حاليًا.');
-          await syncModule.syncAll({ full: true });
-          root.querySelector('[data-repair-message]').textContent = 'حُدّثت حالة المزامنة؛ أغلق المراجعة وافتحها لعرض الإيصالات أو سبب التوقف.';
+          const ok = await syncModule.syncAll({ full: true });
+          if (!currentSessionRepairPlan(plan, workspace) || !root.isConnected) return;
+          const nextPlan = await store.reviewRejectedSessionRepairs();
+          if (!currentSessionRepairPlan(nextPlan, workspace) || !root.isConnected) return;
+          plan = nextPlan;
+          message.textContent = !ok ? 'تعذرت المزامنة. لم يتأكد اكتمال التصحيح؛ الطلب نفسه محفوظ.'
+            : pendingIds.every(id => plan.entries.some(entry => entry.originalId === id && entry.status === 'verified'))
+              ? 'تأكد اكتمال التصحيح بإيصال الخادم والمصالحة المحلية.'
+              : 'حُدّثت حالة المزامنة؛ لم يتأكد اكتمال التصحيح بعد. أغلق المراجعة وافتحها لعرض الحالة الحالية.';
+          updateRetryVisibility();
           await refreshSyncOperationalUI();
-        } catch (error) { root.querySelector('[data-repair-message]').textContent = error.message; }
-        finally { event.currentTarget.disabled = false; }
+        } catch (error) { if (root.isConnected && currentSessionRepairPlan(plan, workspace)) message.textContent = error.message; }
+        finally { retrying = false; retry.disabled = false; retry.textContent = 'استعادة إيصال التصحيح'; updateConfirm(); }
       });
-      const button = root.querySelector('[data-confirm-session-repair]');
-      button.addEventListener('click', async () => {
-        const ids = [...root.querySelectorAll('[data-repair-entry]:checked')].map(el => plan.entries[Number(el.dataset.repairEntry)].originalId);
-        button.disabled = true;
+      button?.addEventListener('click', async () => {
+        const ids = selectedIds();
+        if (confirming || confirmed || retrying || !ids.length || !currentSessionRepairPlan(plan, workspace)) return;
+        confirming = true; updateConfirm();
         try {
-          await store.confirmRejectedSessionRepairs(plan, ids, true);
-          root.querySelector('[data-repair-message]').textContent = 'حُفظ طلب التصحيح. لم يتأكد الإصلاح بعد؛ ينتظر إيصال الخادم والمصالحة المحلية. أعد المزامنة لاستعادة الطلب نفسه عند انقطاع الاتصال.';
+          await store.confirmRejectedSessionRepairs(reviewedPlan, ids, true);
+          confirmed = true;
+          if (!root.isConnected || !currentSessionRepairPlan(plan, workspace)) return;
+          message.textContent = 'حُفظ طلب التصحيح. لم يتأكد الإصلاح بعد؛ ينتظر إيصال الخادم والمصالحة المحلية.';
           root.querySelectorAll('[data-repair-entry]').forEach(el => { el.disabled = true; });
+          const nextPlan = await store.reviewRejectedSessionRepairs();
+          if (currentSessionRepairPlan(nextPlan, workspace) && root.isConnected) {
+            plan = nextPlan;
+            updateRetryVisibility();
+          }
           await refreshSyncOperationalUI();
-        } catch (error) { root.querySelector('[data-repair-message]').textContent = error.message; button.disabled = false; }
+        } catch (error) { if (root.isConnected && currentSessionRepairPlan(plan, workspace)) message.textContent = error.message; }
+        finally { confirming = false; updateConfirm(); }
       });
     },
-  });
+  }).finally(() => { sessionRepairReviewDone = null; });
 }
 
 function paintSyncStatus() {
@@ -631,6 +708,7 @@ async function refreshSyncOperationalUI() {
     do {
       syncSummaryRefreshAgain = false;
       await syncModule.getSyncOperationalSummary();
+      await refreshSessionRepairEligibility();
       paintSyncStatus();
     } while (syncSummaryRefreshAgain);
   })();
@@ -748,6 +826,10 @@ async function resolve() {
 
   paint();
   view.onMount?.(mainEl, found.params);
+  if (repairSupportFocus && found.path === '/support') {
+    repairSupportFocus = false;
+    mainEl.focus({ preventScroll: true });
+  }
 
   const y = scrollMemory.get(found.path);
   window.scrollTo({ top: y ?? 0, behavior: 'instant' });
