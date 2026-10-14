@@ -27,6 +27,10 @@ import {
 } from './lib/demo-workspace.js';
 import { runInitialRestore } from './lib/initial-restore.js';
 import { runAccountProvisioning } from './lib/account-provisioning.js';
+import { createNotificationCenter, notificationScope, updateNotificationCenter, notificationSnapshot } from './lib/notification-center.js';
+import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './lib/notification-events.js';
+import { readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
+import { renderNotificationCenter, renderNotificationBell } from './views/notifications.js';
 import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
 import {
   EMAIL_OTP_LENGTH,
@@ -41,6 +45,90 @@ import {
 const app = document.getElementById('app');
 await ensureThmanyahFont();
 installVisibleViewport();
+const notificationStyles = document.createElement('link');
+notificationStyles.rel = 'stylesheet';
+notificationStyles.href = new URL('./styles/notifications.css', import.meta.url).href;
+document.head.append(notificationStyles);
+
+let notificationContext = null;
+let notificationState = createNotificationCenter(null);
+let notificationSheet = null;
+let notificationSheetDone = null;
+let notificationTimer = null;
+function clearNotificationUI() {
+  notificationContext = null;
+  notificationState = createNotificationCenter(null);
+  if (notificationTimer !== null) clearTimeout(notificationTimer);
+  notificationTimer = null;
+  // Remove private rendered content synchronously, before reload/restore/network work.
+  notificationSheet?.querySelector('.sheet__body')?.replaceChildren();
+  notificationSheetDone?.();
+  notificationSheet = null;
+  notificationSheetDone = null;
+  document.querySelectorAll('.n44-bell').forEach(el => el.remove());
+}
+function observeNotifications() {
+  const now = Date.now();
+  const context = currentNotificationContext(store, cloud);
+  if (notificationScope(context) !== notificationState.scope) {
+    clearNotificationUI();
+    notificationState = createNotificationCenter(context);
+    notificationState.preferences = readNotificationPreferences(context, now);
+  }
+  notificationContext = context;
+  notificationState = updateNotificationCenter(notificationState, context,
+    { type: 'receive', events: currentNotificationEvents(store, context, now) }, now);
+  if (notificationSheet?.isConnected) {
+    const active = notificationSheet.contains(document.activeElement) ? document.activeElement : null;
+    const action = active?.dataset.act, id = active?.dataset.id;
+    render(notificationSheet.querySelector('.sheet__body'), renderNotificationCenter(notificationState, context, now));
+    if (action && id) notificationSheet.querySelector(`[data-act="${CSS.escape(action)}"][data-id="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+  }
+  if (notificationTimer !== null) clearTimeout(notificationTimer);
+  notificationTimer = null;
+  if (context) {
+    const nextExpiry = Math.min(...notificationState.items.map(item => item.expiresAt), now + 60000);
+    notificationTimer = setTimeout(scheduleRender, Math.max(1, nextExpiry - now));
+  }
+  return notificationSnapshot(notificationState, context, now);
+}
+function openNotifications() {
+  observeNotifications();
+  if (!notificationContext || notificationSheet?.isConnected) return;
+  const promise = openSheet({ title: 'الإشعارات', body: renderNotificationCenter(notificationState, notificationContext, Date.now()),
+    onMount: (root, done) => { notificationSheet = root; notificationSheetDone = done; } });
+  const mounted = notificationSheet;
+  promise.finally(() => { if (notificationSheet === mounted) { notificationSheet = null; notificationSheetDone = null; } });
+}
+function actOnNotification(el, type) {
+  observeNotifications();
+  const context = notificationContext, now = Date.now();
+  if (!context) return;
+  const destination = type === 'open' ? notificationDestination(store, context, el.dataset.id, now) : null;
+  notificationState = updateNotificationCenter(notificationState, context,
+    { type: type === 'dismiss' ? 'dismiss' : 'read', id: el.dataset.id }, now);
+  writeNotificationPreferences(notificationState, context, now);
+  if (type === 'open' && destination && match(destination)) {
+    notificationSheetDone?.();
+    go(destination);
+  }
+  scheduleRender();
+}
+store.onWorkspaceDeactivation(clearNotificationUI);
+cloud.subscribe(() => { if (!currentNotificationContext(store, cloud)) clearNotificationUI(); });
+window.addEventListener('storage', event => {
+  if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) {
+    if (!currentNotificationContext(store, cloud)) clearNotificationUI();
+  }
+  if (event.key?.startsWith(NOTIFICATION_STORAGE_PREFIX)) {
+    notificationState.preferences = readNotificationPreferences(currentNotificationContext(store, cloud), Date.now());
+  }
+  scheduleRender();
+});
+window.addEventListener('pageshow', () => scheduleRender());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') scheduleRender();
+});
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -382,6 +470,7 @@ function topbar(v, params) {
         ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
+        ${notificationContext ? renderNotificationBell(notificationSnapshot(notificationState, notificationContext, Date.now()).unread) : ''}
         ${actions ?? ''}
         ${!inTeaching ? html`
           <button class="quick-theme" data-act="quick-theme" aria-label="${themeAction}" title="${themeAction}">${icon(dark ? 'sun' : 'moon')}</button>
@@ -516,6 +605,7 @@ function scheduleRender() {
 
 function paint() {
   if (!view || !ctx || !mainEl) return;
+  observeNotifications();
   const snap = captureFocus();
   try {
     const hubEl = document.getElementById('sidebar-mini-hub');
@@ -1307,6 +1397,10 @@ function mountWorkspaceGate(routing) {
 
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
+  'n44-center': openNotifications,
+  'n44-read': el => actOnNotification(el, 'read'),
+  'n44-dismiss': el => actOnNotification(el, 'dismiss'),
+  'n44-open': el => actOnNotification(el, 'open'),
   'renew-offline-lease': async (el) => {
     el.disabled = true;
     try { await store.renewOfflineLease(); toast('تم التحقق من الحساب، يمكنك متابعة التعديل'); scheduleRender(); }
