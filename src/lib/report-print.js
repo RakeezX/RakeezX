@@ -75,6 +75,19 @@ export function reportPageSetup({ wide = false } = {}) {
     .print-report .printhead__meta dd { min-width: 0; overflow-wrap: anywhere; }
     @media print {
       @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; }
+      /* The browser's own decorations have no margin area to occupy. Clone
+         INNER spacing on every fragment, including continuation table pages.
+         Engines without fragment cloning retain the working page margins. */
+      @supports (box-decoration-break: clone) {
+        @page { margin: 0; }
+        @page :first { margin: 0; }
+        body .print-report {
+          box-sizing: border-box;
+          padding: ${wide ? '10mm' : '12mm'} !important;
+          box-decoration-break: clone;
+          -webkit-box-decoration-break: clone;
+        }
+      }
       .print-report .printhead__meta { gap: 2mm 5mm; }
       .printhead__timestamp { font-size: 8pt; }
       .print-signatures > div { text-align: center; justify-items: center; }

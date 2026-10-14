@@ -1,4 +1,29 @@
-# N24 clean print / filename — scoped candidate, BLOCKED
+# N24 clean print / filename — current scoped result LOCAL_READY
+
+## Resumed run: corrected native-decoration proof
+
+Run: `b7cd10ca-9035-4e44-bdd6-8b6b866cab7e`. Preserved first candidate `35b4ccc54d926360e024495087f5778eaba0519b` and original base `432f815bc83e2bce4b419bc05b36759be1e2a242`. The first-attempt failure below remains historical evidence, not the current acceptance result.
+
+The materially different correction fixes a specific test-template defect. [Chromium's native header/footer template](https://raw.githubusercontent.com/chromium/chromium/main/components/printing/resources/print_header_footer_template_page.html) tests `.text` elements for intersection with the page content area and hides them. The first-attempt custom templates omitted `.text`, so they did not model the default browser-decoration behavior. The [renderer also distinguishes its native default templates](https://raw.githubusercontent.com/chromium/chromium/main/components/printing/renderer/print_render_frame_helper.cc) from custom templates. The new proof covers both default class conventions and the browser's unmodified native templates, with `displayHeaderFooter:true` in every case. Original failed PDFs are untouched; no earlier FAIL was relabelled.
+
+The shared setup now uses zero page/first-page margins only when standard `box-decoration-break:clone` is supported, with 10mm landscape / 12mm portrait **inner** spacing cloned onto every page fragment. Engines without that CSS feature retain the original page margins. No browser preferences, global print options, data calculations or network PDF service changed. The actual print/confirmation action remains the existing single action.
+
+Calibration ran **before** enabling the new geometry: the corrected marked templates displayed all URL/title/date sentinels on every page in 11-page landscape and 7-page portrait reports. Native default templates likewise displayed URL/title and their numeric date. This proves the test can detect decorations instead of supplying empty/disabled templates.
+
+| Current required check | Result | Evidence |
+| --- | --- | --- |
+| `n24_responsive_metadata_top_brand_link` | PASS — Chromium 151.0.7922.34 | Actual screen preview metadata for grades/roster and screen controls for all five reports at 320/390; all five print-media headers passed value overflow and child containment checks. Execution/cross headers retain their existing print-only screen behavior. Native enabled-decoration A4 PDFs were also generated from 320/390 contexts for landscape grades and portrait roster. Both anchors remain the exact root URL and both are represented in PDF URI annotations. |
+| `n24_browser_headers_enabled_suppressed` | PASS — Chromium | Marked default-convention templates and browser-native unmodified templates: URL/title/date sentinels/default numeric date absent from **all 88 candidate pages**, including first/middle/last. Original enabled controls are positive. No `displayHeaderFooter:false`, PDF stripping, white masks or altered templates that force hiding were used. |
+| `n24_report_filename_restored_after_print` | PASS — Chromium | Reused unchanged cancellation/exception/sanitization/route-title evidence from first candidate. New actual print actions on all five surfaces again emitted the same distinct local-creation-date filenames once and restored the original title. |
+| `n24_multipage_values_margins_preserved` | PASS — Chromium | 220 synthetic students; original IDs, calculated totals, row text and CSV snapshots match on all five surfaces. Every candidate page has safe text bounds, table/header/footer painted bounds, repeated table heading and root URI annotations. Both marked and native paths checked; first/middle/last marked pages rendered and visually compared with retained before/control evidence. Additional A4 PDFs from 320/390 contexts protect the mobile print entry. |
+
+Page counts are unchanged: grades 11, roster 7, execution 2, cross-grades 12, cross-followup 12 per template path. Checks use every word, not an edge-region filter. Painted table/header/footer bounds are checked separately from the existing full-sheet **white** paper background. All text remains within at least about 8mm landscape / 10mm portrait printer-safe bounds; the nominal inner spacing is 10/12mm. Signatures/footer remain with the final data row. First-attempt screen, filename, sort/data and CSV evidence is reused where source is unchanged.
+
+Commands: `node tests/n24-native-decoration.mjs control b7cd10ca-9035-4e44-bdd6-8b6b866cab7e`; `candidate` and `metadata` with that same explicit run ID; runtime Python `tests/n24-native-pdf.py`, then `--metadata` to append only the new mobile PDF checks without repeating unchanged candidate/control proofs. Local output: `test-results/n24-native/{control,candidate,metadata}/`, `proof.json` and their `data.json` records. Fresh contexts and bounded loopback servers use the canonical isolated helper and close in `finally`. JavaScript/Python syntax and scoped diff checks pass.
+
+WebKit report certification remains **NOT_RUN**: reused first-attempt actual-app `.boot` timeout (30000ms). Its unchanged boot failure was not retried. This is Chromium proof, not universal-browser or physical-printer certification. No startup dependency or offline shell path changed. No push, deployment, queue/status or real-data mutation occurred. The controller/publisher owns delivery and served-source evidence; LOCAL_READY is not Product acceptance.
+
+## Historical first attempt — retained BLOCKED result
 
 Task: `continuous-n24-clean-print-filename-20261014`  
 Run: `138e1001-c8a6-4c59-af07-b05af5d0bfb6`  
