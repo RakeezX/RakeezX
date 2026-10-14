@@ -7,7 +7,7 @@ import {
   itemScore, studentTotal, masteryBand, ATTENDANCE, ATTENDANCE_ORDER, displayRoster,
 } from '../models.js';
 import { downloadCSV } from '../lib/export.js';
-import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoExportRows, markDemoSharedText, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, printReport, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import { getAccountPresentation } from '../lib/account-profile.js';
 import { visibleLatinDigits } from '../lib/visible-numerals.js';
@@ -307,7 +307,7 @@ export default {
       repaint();
 
       setTimeout(() => {
-        window.print();
+        printReport(reportTitle());
       }, 50);
     },
 

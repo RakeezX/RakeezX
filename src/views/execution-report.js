@@ -3,7 +3,7 @@ import '../lib/rakeez-datetime.js';
 
 import { html, icon, fmtDate, fmtTimeRange, formatTimeRange, toast, openSheet } from '../lib/dom.js';
 import { downloadCSV, safeReportCSVText } from '../lib/export.js';
-import { demoOutputMarker, markDemoExportRows, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
+import { demoOutputMarker, markDemoExportRows, reportWithClosing, reportHeader, reportIdentitySheet, reportPageSetup, printReport, prePrintConfirmationSheet, resolvedReportPrincipalName } from '../lib/report-print.js';
 import { repaint } from '../repaint.js';
 import * as store from '../store.js';
 import { sectionLabel } from '../models.js';
@@ -105,7 +105,7 @@ export default {
       repaint();
 
       setTimeout(() => {
-        window.print();
+        printReport(archiveRoute ? 'تقرير تنفيذ الحصص' : 'تقرير الحصص والحضور');
       }, 50);
     },
     async identity() {

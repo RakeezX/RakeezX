@@ -46,7 +46,7 @@ export function reportHeader({ title, profile, year, term, section, subject, per
     <header class="printhead print-report__header" dir="rtl">
       <div class="printhead__top">
         <h2 class="printhead__title">${visibleLatinDigits(title)}</h2>
-        <div class="printhead__brand"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong></div>
+        <div class="printhead__brand"><a href="https://rakeezx.com/" target="_blank" rel="noopener noreferrer"><strong>رَكيز <em class="brand-wordmark-secondary">المعلم</em></strong></a></div>
         ${demoOutputMarker()}
       </div>
       <div class="printhead__details">
@@ -64,12 +64,43 @@ export function reportPageSetup({ wide = false } = {}) {
     .printhead__top { position: relative; text-align: center; }
     .printhead__title { text-align: center; }
     .printhead__timestamp { margin-top: 3px; color: #718287; font-size: 9px; text-align: left; }
+    .print-report .printhead__brand a { color: inherit; text-decoration: none; }
+    .print-report .printhead__title { min-width: 0; overflow-wrap: anywhere; }
+    .print-report .printhead__meta {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+      gap: 6px clamp(8px, 2vw, 24px); width: 100%;
+    }
+    .print-report .printhead__meta > div { display: flex; justify-content: center; align-items: baseline; gap: 4px 8px; }
+    .print-report .printhead__meta dt { flex: 0 0 auto; }
+    .print-report .printhead__meta dd { min-width: 0; overflow-wrap: anywhere; }
     @media print {
       @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; }
+      .print-report .printhead__meta { gap: 2mm 5mm; }
       .printhead__timestamp { font-size: 8pt; }
       .print-signatures > div { text-align: center; justify-items: center; }
     }
   </style>`);
+}
+
+/** The print dialog uses the document title for its suggested PDF filename.
+ * Use the local creation day, never a student's identity or report date range.
+ */
+export function reportFilename(title, date = todayISO()) {
+  const safe = String(title || 'تقرير').replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().replace(/[. ]+$/g, '');
+  return `${safe || 'تقرير'} - ركيز المعلم - ${date}`;
+}
+
+export function printReport(title) {
+  const originalTitle = document.title;
+  const printTitle = reportFilename(title);
+  const restore = () => {
+    window.removeEventListener('afterprint', restore);
+    // An asynchronous print dialog may outlive a route/title change.
+    if (document.title === printTitle) document.title = originalTitle;
+  };
+  document.title = printTitle;
+  window.addEventListener('afterprint', restore, { once: true });
+  try { window.print(); } catch (error) { restore(); throw error; }
 }
 
 export function reportFooter() {
