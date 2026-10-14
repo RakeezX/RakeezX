@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -30,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "objective": "Resume exact saved session 01a13461-ef85-7c53-add1-1eba2c19dace and candidate f213089342e8af8a95c3b64042c700cf7a449ab8. New direct PO authorization allowed inspection of the actual signed-in Chrome page. Operator used native visible Chrome actions, copied only link shapes and the numeric pager element, and observed three exact platform href families plus the actual sr-only/current/ellipsis/SVG markup. This resolves unknown Name/SchoolId query keys and the exact PAGINATION_MISMATCH cause; it is not another guessed variation of the same synthetic fixture. See canonical docs/automation-evidence/20261014/N36_ACTUAL_BROWSER_LINKS_1600.md.\nImplement the precise missing platform contracts in our extension, no wholesale competitor code or broad allowlist. Current user expressly authorizes normal teacher navigation from his own visible school card. The actual homepage href is /Dashboards/Schools/ChangeUserTypeToTeacherFromParent/<32hex>?Name=<school-label-text>. This specific same-origin switch to the ALREADY ENTITLED teacher card is now an authorized session-role selection, not an unknown admin action. Permit it ONLY when produced by the unique visible selected school card with الدور:معلم and الصفحة الرئيسية, with exact source href retained. Never allow other ChangeUserType paths or forge role IDs/Name. Preserve deny guards for login/logout/admin/edit/delete/save/send/grade and all unrelated query fields. Pass an explicit bounded gateway context to navigation validation if needed rather than a global exception. Handle the transient redirect/loading state without re-dispatching the role switch.\nObserved normal read hrefs: /SchoolManagment/Actions/MyStudents?SchoolId=<32hex> and /SchoolSchedule/Schedule/TeacherSchedule?SchoolId=<32hex>, plus existing /SchoolManagmentReports/StudentInfo/ClassStudentInfo/<32hex>?page=N. Add only these families and field contracts, bind SchoolId to the observed selected school/current teaching context and do not remove or guess query values. Number/Name query validation is per route, duplicates/secrets/foreignorigin invalid. Remove internal contradiction where one validator accepts a path another rejects. Role discovery must still not be inferred from source URL alone. No direct /save/API/anti-CSRF/hidden-profile access.\nFix the actual copied pager structure in the evidence file: li.page-item.active contains a.page-link.rounded WITHOUT href with numeral1 PLUS span.sr-only '(current)'. The current code sees1(current), fails number(), has no URL?page, and emits MISMATCH. Read the numeric active child while retaining its enclosing active ownership; do not delete screen-reader accessibility text from the source. Numeric ellipsis a href?page=6 has text...; textless SVG arrows have href?page=2. Interpret actual page hrefs rather than requiring rel/next words. The first previous-arrow LI is disabled; next is the final LI. Prove current/next/end and7-page coverage, not max-visible-number guessed total. Keep filters/IDs/path identical, reject same URL/repeated page/missing middle/changed school, and only complete a series at an actual terminal with all required pages visited. Reproduce0.4.3 exact actual-markup failure BEFORE after-fix success. Preserve old fulfilled tests where their code is unchanged; do not repeat dozens of unrelated entry tests.\nSchool title on the gateway is h5, visible in the supplied content, and principal is labelled قادة المدرسة. Preserve those fields on entering the teacher dashboard, without converting principal metadata into an admin-role error. When starting on teacher dashboard, use visible school badge and unique school column only where unambiguous, and collect only requested school/name fields (not phone/email/guardian/IDs). Classes may be derived from the complete uniquely parsed roster. Keep limits explicit; do not silently truncate a large roster as complete. Timetable's actual href is known; its live DOM has NOT yet been inspected, so don't invent its labels or claim it tested on the real portal. If the existing uploaded timetable reference reveals a specific compatible visible layout, implement it with sourced provenance and clear incomplete output otherwise.\nKeep shared schema and stable update approach. Run owned local extension tests for exact actual gateway selection, query-preservation,7-page real-shaped pagination, unknown/duplicate/foreign/wrong-role guards and no background capture. Package private0.4.4 with exact final candidate/19-file update manifest against current0.4.3. Do not touch user's n36-current directory, Chrome profile or actual school data from the worker. Operator will run final visible-account validation separately under the user's latest permission after your local proof. Do not declare full official compatibility or N36 CLOSED until those actual checks and the still-unimplemented Rakeez account-save contract are satisfied. No new Auth/SQL/service/real Rakeez writes, no previously denied account-apply or N90 service operations in this task.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_GATEWAY_DASHBOARD.md",
+        "docs/automation-evidence/20261014/N36_SOURCE_ADAPTER_AND_STABLE_PACKAGE.md",
+        "docs/automation-evidence/20261014/N36_PRESENTATION_INVARIANT_ENTRY.md",
+        "docs/automation-evidence/20261014/N36_OBSERVED_ENTRY_ROLE_LINK_SPLIT.md",
+        "docs/automation-evidence/20261014/N36_OBSERVED_PAGINATION_AND_QUERY.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_ROUTE_AND_PAGER_FIX.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed",
+        "n36_actual_screenshot_shapes",
+        "n36_gateway_card_binding_and_multischool",
+        "n36_actual_dashboard_labels_no_role_suffix",
+        "n36_uploaded_reference_roster_shapes",
+        "n36_complete_pagination_and_dynamic_timetable",
+        "n36_real_failure_markup_reproduction",
+        "n36_entry_markup_invariance",
+        "n36_exact_041_observed_entry_failures",
+        "n36_role_not_dependent_on_read_link_classification",
+        "n36_numeric_pager_complete_or_explicitly_incomplete",
+        "n36_exact_rejected_route_diagnostic_no_values",
+        "n36_operator_observed_gateway_and_schoolid_routes",
+        "n36_actual_sr_only_ellipsis_svg_pager"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched.",
+        "Latest real screenshots supersede the old assumption that an active teacher always has a teacher-suffixed greeting. Normal parent-oriented gateway chrome and principal metadata are not a conflicting ACTIVE role; all true explicit role/login/origin/data restrictions remain. No real identifiers in fixtures.",
+        "Entry correction is separately reproduced against the supplied screenshot semantics and latest0.4.0diagnostics; no actual private-page proof from local success. Source capture must be exact and arbitrary layouts must not gain access from a teacher name alone."
+      ],
+      "releaseAuthority": "Current explicit PO authorizes live browser inspection and normal same-account teacher navigation for this N36 debugging. Operator observed exact routes and pagination. This worker implements/tests only the bounded private adapter and package, with the specific already-entitled teacher-card session selection (not arbitrary role grants). Existing full account-save and official end-to-end acceptance gates stay intact. New direct PO authorization allowed inspection of the actual signed-in Chrome page. Operator used native visible Chrome actions, copied only link shapes and the numeric pager element, and observed three exact platform href families plus the actual sr-only/current/ellipsis/SVG markup. This resolves unknown Name/SchoolId query keys and the exact PAGINATION_MISMATCH cause; it is not another guessed variation of the same synthetic fixture. See canonical docs/automation-evidence/20261014/N36_ACTUAL_BROWSER_LINKS_1600.md."
+    }
+  ]
+}
