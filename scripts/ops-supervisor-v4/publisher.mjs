@@ -408,7 +408,7 @@ export async function publishCandidate(options, dependencies = {}) {
         productionUrl: opts.productionUrl, candidateSha: opts.candidateSha, baseSha: opts.baseSha, currentMainAtPreparation: current,
         worktree, prepareAttempt: ordinal, stage: 'preparing', createdAt: journal?.createdAt ?? now(), preparationStartedAt: now(),
         integrationKind: candidateContained ? 'already-contained' : currentContained ? 'candidate-fast-forward' : 'merge',
-        candidateWasAlreadyOnMain: candidateContained };
+        candidateWasAlreadyOnMain: candidateContained, preservedPublications: journal?.preservedPublications ?? [] };
       await writeJson(journalFile, journal);
       await git(['-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'worktree', 'add', '--detach', worktree, startSha]);
       if (!candidateContained && !currentContained) {
@@ -526,6 +526,19 @@ export async function publishCandidate(options, dependencies = {}) {
       await dependencies.afterPush?.(journal); // Test crash point, never configured by the controller.
     }
     if (journal.stage !== 'pushed') throw new DeliveryError('JOURNAL_STAGE_INVALID', 'Unexpected saved delivery stage');
+    // A paused, already-pushed candidate can be an ancestor of a newer real release.
+    // Do not compare today's domain forever against yesterday's parent bytes.
+    if (current !== journal.publishedSha) {
+      if (!await ancestor(journal.publishedSha,current) || !await ancestor(opts.candidateSha,current))
+        throw new DeliveryError('REMOTE_PUBLICATION_REMOVED','New main lacks the saved candidate/publication');
+      journal.preservedPublications = [...(journal.preservedPublications ?? []), {
+        publishedSha: journal.publishedSha, previousVerificationAttempts: journal.verificationAttempts ?? 0,
+        assets: journal.assets, advancedTo: current, observedAt: now(), reason: 'saved-publication-superseded-on-main'
+      }];
+      journal.stage = 'reprepare'; await writeJson(journalFile,journal);
+      return finish({status:'pending',retryable:true,retryAfterSeconds:1,errorCode:'PUBLISHED_MAIN_ADVANCED',
+        message:'Saved candidate is retained on newer main; rebind exact assets instead of repeating obsolete hashes'});
+    }
     const rawChecks = await checkRuns(journal.publishedSha);
     const checks = rawChecks.map(c => parseProviderCheck(c, { publishedSha: journal.publishedSha, pagesProject: opts.pagesProject, providerAppId: opts.providerAppId }))
       .filter(Boolean).filter(c => !c.headBranch || c.headBranch === opts.branch)
