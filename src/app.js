@@ -513,6 +513,8 @@ function restoreFocus(snap) {
 /** مزامنة الحالة تغيّر مؤشرات صغيرة فقط؛ لا تستبدل الشاشة النشطة أو تركيزها. */
 // Only the current account's read-only repair plan can expose this entry.
 let sessionRepairEligibility = null;
+let calendarRepairEligibility = null;
+let calendarRepairDone = null;
 let sessionRepairReviewDone = null;
 let sessionRepairOpening = false;
 let repairSupportFocus = false;
@@ -526,6 +528,8 @@ function currentSessionRepairPlan(plan, workspace) {
 }
 store.onWorkspaceDeactivation(() => {
   sessionRepairEligibility = null;
+  calendarRepairEligibility = null;
+  calendarRepairDone?.();
   sessionRepairReviewDone?.();
 });
 async function refreshSessionRepairEligibility() {
@@ -542,7 +546,52 @@ async function refreshSessionRepairEligibility() {
 function renderRepairableSyncSection(summary) {
   const available = sessionRepairEligibility?.workspace === sessionRepairWorkspace() && sessionRepairEligibility?.available;
   return html`${renderSyncOperationalSection(summary, { compact: true })}
+    ${calendarRepairEligibility?.workspace === sessionRepairWorkspace() && calendarRepairEligibility.plan?.status === 'blocked' && calendarRepairEligibility.plan?.hasGroup ? html`<p class="fs-xs">إصلاح التقويم متوقف: ${calendarRepairEligibility.plan.reason}</p>` : ''}
+    ${calendarRepairEligibility?.workspace === sessionRepairWorkspace() && ['review','pending'].includes(calendarRepairEligibility.plan?.status) ? html`<button class="btn btn--sm btn--quiet" data-act="review-calendar-repair">مراجعة إصلاح تهيئة التقويم</button>` : ''}
     ${available ? html`<button class="btn btn--sm btn--quiet" data-act="review-session-repair">مراجعة وإصلاح الحصص المرفوضة</button>` : ''}`;
+}
+
+async function refreshCalendarRepairEligibility() {
+  const workspace = sessionRepairWorkspace();calendarRepairEligibility = null;if (!workspace) return;
+  try { const plan = await store.reviewCalendarFoundationRepair();
+    if (currentSessionRepairPlan(plan, workspace)) calendarRepairEligibility = {workspace,plan};
+  } catch { /* Preserve the ordinary Sync warning; no empty confirmation control. */ }
+}
+async function openCalendarRepairReview() {
+  if (calendarRepairDone) return;
+  const workspace = sessionRepairWorkspace();
+  let plan = await store.reviewCalendarFoundationRepair();
+  if (!currentSessionRepairPlan(plan, workspace)) return;
+  return openSheet({title:'مراجعة إصلاح تهيئة التقويم',
+    body:html`<div data-calendar-repair-review>
+      ${plan.status === 'review' ? html`<p>${plan.yearLabel} — ${plan.regionLabel}</p><p>سيُصلح إعداد السنة والفصلين ويُثبت هذا التقويم للحساب الفارغ. ستبقى الطلبات والأخطاء الأصلية محفوظة، وسيظل تبديل المنطقة معلقًا.</p><label><input type="checkbox" data-calendar-repair-ack> أؤكد السنة والمنطقة وأوافق على إصلاح التهيئة أعلاه.</label>` : html`<p>${plan.reason}</p>`}
+      <p role="status" data-calendar-repair-message></p>
+      <button class="btn btn--quiet" data-calendar-repair-retry ${plan.status === 'pending' ? '' : 'hidden'} style="${plan.status === 'pending' ? '' : 'display:none'}">استعادة إيصال إصلاح التقويم</button>
+      <a href="#/support" data-calendar-repair-support>تحتاج مساعدة؟</a></div>`,
+    foot:html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>${plan.status === 'review' ? html`<button class="btn btn--primary" data-calendar-repair-confirm disabled>تأكيد إصلاح التقويم</button>` : ''}`,
+    onMount(root,done) {
+      calendarRepairDone = done;let busy = false,submitted = false;
+      const button=root.querySelector('[data-calendar-repair-confirm]'),retry=root.querySelector('[data-calendar-repair-retry]'),message=root.querySelector('[data-calendar-repair-message]');
+      const update=()=>{if(button)button.disabled=busy||submitted||!root.querySelector('[data-calendar-repair-ack]')?.checked||!currentSessionRepairPlan(plan,workspace);retry.disabled=busy;};
+      root.addEventListener('change',update);
+      root.querySelector('[data-calendar-repair-support]').addEventListener('click',e=>{e.preventDefault();done();teacherMiniHubDone?.();repairSupportFocus=true;go('/support');});
+      const send=async resume=>{
+        if(busy||!currentSessionRepairPlan(plan,workspace)||!resume&&!root.querySelector('[data-calendar-repair-ack]')?.checked)return;
+        busy=true;update();message.textContent='جارٍ التحقق من الحساب وإصلاح التهيئة…';
+        try {
+          if(resume)await store.resumeCalendarFoundationRepair();else await store.confirmCalendarFoundationRepair(plan,true);
+          submitted=true;if(root.isConnected&&currentSessionRepairPlan(plan,workspace)){message.textContent='تأكد إصلاح تهيئة التقويم بإيصال الخادم. تبديل المنطقة ما زال معلقًا.';retry.hidden=true;retry.style.display='none';}
+        }catch(error){
+          if(root.isConnected&&currentSessionRepairPlan(plan,workspace)){
+            message.textContent=error.message;
+            const next=await store.reviewCalendarFoundationRepair().catch(()=>null);
+            if(next?.status==='pending'){submitted=true;plan=next;retry.hidden=false;retry.style.display='';message.textContent+=' الطلب محفوظ؛ استعد الإيصال نفسه دون تكرار الإصلاح.';}
+          }
+        }finally{busy=false;update();await refreshSyncOperationalUI();}
+      };
+      button?.addEventListener('click',()=>send(false));retry.addEventListener('click',()=>send(true));
+    },
+  }).finally(()=>{calendarRepairDone=null;});
 }
 
 async function openSessionRepairReview() {
@@ -709,6 +758,7 @@ async function refreshSyncOperationalUI() {
       syncSummaryRefreshAgain = false;
       await syncModule.getSyncOperationalSummary();
       await refreshSessionRepairEligibility();
+      await refreshCalendarRepairEligibility();
       paintSyncStatus();
     } while (syncSummaryRefreshAgain);
   })();
@@ -1620,6 +1670,9 @@ const GLOBAL_ACTIONS = {
   },
   'review-session-repair': async () => {
     try { await openSessionRepairReview(); } catch (error) { toast(error.message, 'danger'); }
+  },
+  'review-calendar-repair': async () => {
+    try { await openCalendarRepairReview(); } catch(error) { toast(error.message,'danger'); }
   },
   'mini-hub-sync-now': async (el) => {
     if (!syncModule) {

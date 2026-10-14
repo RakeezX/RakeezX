@@ -582,6 +582,22 @@ export async function applySyncV2Mutation(envelope) {
   });
 }
 
+// N58: ordinary authenticated owner RPCs. No privileged key or arbitrary owner.
+async function n58FoundationRPC(name, body, command = null) {
+  const workspace = runtimeSyncOwnershipGuard.getWorkspace(), ownerId = user?.id;
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: command ? 'dispatch' : 'read', authenticatedUserId: ownerId, command });
+  if (!access.allowed || workspace.type !== 'account') throw Error('N58 repair owner/workspace unavailable');
+  if (command) assertNewProductWrite();
+  const result = await request('/rpc/' + name, { method: 'POST', headers: {
+    'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx',
+  }, body: JSON.stringify(body) });
+  if (user?.id !== ownerId || runtimeSyncOwnershipGuard.getWorkspace() !== workspace) throw Error('N58 repair owner/workspace changed');
+  return result;
+}
+export const reviewEmptyFoundation = request => n58FoundationRPC('review_n58_empty_foundation', { p_request: request });
+export const applyEmptyFoundation = (repairId, plan) => n58FoundationRPC('apply_n58_empty_foundation',
+  { p_repair_id: repairId, p_plan: plan }, { ownerId: plan?.ownerId });
+
 /** Owner-derived curriculum bootstrap status. Domain rows are never returned here. */
 export async function getCurriculumSyncBootstrapStatus() {
   if (mockBackend) {

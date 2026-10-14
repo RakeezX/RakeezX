@@ -1,0 +1,701 @@
+{
+  "taskId": "continuous-n58-empty-account-reviewed-recovery-20261014",
+  "runId": "79f2600c-16c3-4f27-9092-8c1aedd2f9cc",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "sqlPath": "supabase/migrations/20261014203000_n58_atomic_empty_foundation_repair.sql",
+  "sqlSha256": "99cf05f33d1d19c1694a859a84072a25fb0faeffb346a031464542abb96bfb67",
+  "application": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"success\":true}"
+      }
+    ],
+    "isError": false
+  },
+  "appliedMigration": {
+    "version": "20261014174527",
+    "name": "n58_atomic_empty_foundation_repair"
+  },
+  "functions": [
+    {
+      "signature": "rakeezx.apply_n58_empty_foundation(text,jsonb)",
+      "body_md5": "4dd6c547ed2be8b9e91fe9c62f5288c6",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+      "body_md5": "a6284ed21c86f1cafcac2d4d84a5fadc",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.lock_student_lifecycle(uuid)",
+      "body_md5": "de3fb7821244d83ebc0be45b0247ce22",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.n58_guard_calendar_contract()",
+      "body_md5": "6fc9fcdf35f78d0ae295fe61a833f70d",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.n58_repair_expected(text)",
+      "body_md5": "5c1a5efec8d0949a7356ef2e1ec758af",
+      "prosecdef": false,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.n58_repair_snapshot(uuid,text)",
+      "body_md5": "5d1a91b8285247f3d8de536b7a1f47e9",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "signature": "rakeezx.review_n58_empty_foundation(jsonb)",
+      "body_md5": "44595b5d49d5f9c23a1afd6067635d7a",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ],
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    }
+  ],
+  "receiptTable": [
+    {
+      "relrowsecurity": true,
+      "relforcerowsecurity": true,
+      "acl": "{postgres=arwdDxtm/postgres}"
+    }
+  ],
+  "historyBefore": [
+    {
+      "version": "0001",
+      "name": "core_schema"
+    },
+    {
+      "version": "0002",
+      "name": "indexes_triggers_rls"
+    },
+    {
+      "version": "0003",
+      "name": "hybrid_calendar"
+    },
+    {
+      "version": "0004",
+      "name": "student_notes"
+    },
+    {
+      "version": "0007",
+      "name": "sections_active_normalized_identity"
+    },
+    {
+      "version": "0008",
+      "name": "enrollment_membership_operations"
+    },
+    {
+      "version": "0009",
+      "name": "transfer_and_renumber_rosters"
+    },
+    {
+      "version": "0010",
+      "name": "profile_report_principal_name"
+    },
+    {
+      "version": "0011",
+      "name": "session_roster_snapshots"
+    },
+    {
+      "version": "0012",
+      "name": "sync_v2_server_protocol"
+    },
+    {
+      "version": "0013",
+      "name": "sync_v2_enrollment_commands"
+    },
+    {
+      "version": "0014",
+      "name": "sync_v2_attendance_snapshot_commands"
+    },
+    {
+      "version": "0015",
+      "name": "sync_v2_lifecycle_commands"
+    },
+    {
+      "version": "0016",
+      "name": "sync_v2_teaching_creation_commands"
+    },
+    {
+      "version": "0017",
+      "name": "sync_v2_bulk_attendance_commands"
+    },
+    {
+      "version": "0018",
+      "name": "profile_active_time_profile"
+    },
+    {
+      "version": "0019",
+      "name": "class_rules"
+    },
+    {
+      "version": "0020",
+      "name": "support_requests"
+    },
+    {
+      "version": "0021",
+      "name": "section_archive_lifecycle"
+    },
+    {
+      "version": "0022",
+      "name": "closed_term_reports"
+    },
+    {
+      "version": "0023",
+      "name": "sync_v2_backup_restore"
+    },
+    {
+      "version": "0024",
+      "name": "class_goal_runtime"
+    },
+    {
+      "version": "0025",
+      "name": "group_arrangements"
+    },
+    {
+      "version": "0026",
+      "name": "session_delete"
+    },
+    {
+      "version": "0027",
+      "name": "support_notification_outbox"
+    },
+    {
+      "version": "0028",
+      "name": "support_notification_contact_identity"
+    },
+    {
+      "version": "0029",
+      "name": "student_lifecycle_safety"
+    },
+    {
+      "version": "0030",
+      "name": "student_removal_preview"
+    },
+    {
+      "version": "0031",
+      "name": "curriculum_sync_v2"
+    },
+    {
+      "version": "0032",
+      "name": "account_profile_access_foundation"
+    },
+    {
+      "version": "0033",
+      "name": "score_subitem_foundation"
+    },
+    {
+      "version": "0034",
+      "name": "score_subitem_guard_acl_hardening"
+    },
+    {
+      "version": "20260924003436",
+      "name": "beta_new_account_provisioning"
+    },
+    {
+      "version": "20260924173929",
+      "name": "security_definer_direct_execute_hardening"
+    },
+    {
+      "version": "20260926115629",
+      "name": "owner_sync_invalidation"
+    },
+    {
+      "version": "20260930094421",
+      "name": "calendar_day_active_identity"
+    },
+    {
+      "version": "20260930234353",
+      "name": "calendar_suspension_kind"
+    },
+    {
+      "version": "20261004022154",
+      "name": "n03_education_department"
+    },
+    {
+      "version": "20261005052506",
+      "name": "n58_calendar_persistence"
+    },
+    {
+      "version": "20261005052526",
+      "name": "n58_extra_term_compatibility"
+    },
+    {
+      "version": "20261005052550",
+      "name": "n58_effective_scope_revalidation"
+    },
+    {
+      "version": "20261007230123",
+      "name": "n77_server_validated_delete"
+    },
+    {
+      "version": "20261012130249",
+      "name": "n73_distribution_apply"
+    },
+    {
+      "version": "20261012140116",
+      "name": "n71_unified_restore"
+    },
+    {
+      "version": "20261012235209",
+      "name": "n94_subitem_dates_late_scoring"
+    },
+    {
+      "version": "20261013020136",
+      "name": "n73_distribution_error_contract"
+    },
+    {
+      "version": "20261013045630",
+      "name": "n77_recreate_fresh_identity"
+    },
+    {
+      "version": "20261013054114",
+      "name": "n73_n94_compatibility"
+    },
+    {
+      "version": "20261013075936",
+      "name": "n71_restore_creation_history"
+    },
+    {
+      "version": "20261013105436",
+      "name": "n100_preserve_target_marks"
+    },
+    {
+      "version": "20261013122332",
+      "name": "n90_reviewed_grade_import"
+    },
+    {
+      "version": "20261014001558",
+      "name": "n100_automatic_safe_copy"
+    }
+  ],
+  "historyAfter": [
+    {
+      "version": "0001",
+      "name": "core_schema"
+    },
+    {
+      "version": "0002",
+      "name": "indexes_triggers_rls"
+    },
+    {
+      "version": "0003",
+      "name": "hybrid_calendar"
+    },
+    {
+      "version": "0004",
+      "name": "student_notes"
+    },
+    {
+      "version": "0007",
+      "name": "sections_active_normalized_identity"
+    },
+    {
+      "version": "0008",
+      "name": "enrollment_membership_operations"
+    },
+    {
+      "version": "0009",
+      "name": "transfer_and_renumber_rosters"
+    },
+    {
+      "version": "0010",
+      "name": "profile_report_principal_name"
+    },
+    {
+      "version": "0011",
+      "name": "session_roster_snapshots"
+    },
+    {
+      "version": "0012",
+      "name": "sync_v2_server_protocol"
+    },
+    {
+      "version": "0013",
+      "name": "sync_v2_enrollment_commands"
+    },
+    {
+      "version": "0014",
+      "name": "sync_v2_attendance_snapshot_commands"
+    },
+    {
+      "version": "0015",
+      "name": "sync_v2_lifecycle_commands"
+    },
+    {
+      "version": "0016",
+      "name": "sync_v2_teaching_creation_commands"
+    },
+    {
+      "version": "0017",
+      "name": "sync_v2_bulk_attendance_commands"
+    },
+    {
+      "version": "0018",
+      "name": "profile_active_time_profile"
+    },
+    {
+      "version": "0019",
+      "name": "class_rules"
+    },
+    {
+      "version": "0020",
+      "name": "support_requests"
+    },
+    {
+      "version": "0021",
+      "name": "section_archive_lifecycle"
+    },
+    {
+      "version": "0022",
+      "name": "closed_term_reports"
+    },
+    {
+      "version": "0023",
+      "name": "sync_v2_backup_restore"
+    },
+    {
+      "version": "0024",
+      "name": "class_goal_runtime"
+    },
+    {
+      "version": "0025",
+      "name": "group_arrangements"
+    },
+    {
+      "version": "0026",
+      "name": "session_delete"
+    },
+    {
+      "version": "0027",
+      "name": "support_notification_outbox"
+    },
+    {
+      "version": "0028",
+      "name": "support_notification_contact_identity"
+    },
+    {
+      "version": "0029",
+      "name": "student_lifecycle_safety"
+    },
+    {
+      "version": "0030",
+      "name": "student_removal_preview"
+    },
+    {
+      "version": "0031",
+      "name": "curriculum_sync_v2"
+    },
+    {
+      "version": "0032",
+      "name": "account_profile_access_foundation"
+    },
+    {
+      "version": "0033",
+      "name": "score_subitem_foundation"
+    },
+    {
+      "version": "0034",
+      "name": "score_subitem_guard_acl_hardening"
+    },
+    {
+      "version": "20260924003436",
+      "name": "beta_new_account_provisioning"
+    },
+    {
+      "version": "20260924173929",
+      "name": "security_definer_direct_execute_hardening"
+    },
+    {
+      "version": "20260926115629",
+      "name": "owner_sync_invalidation"
+    },
+    {
+      "version": "20260930094421",
+      "name": "calendar_day_active_identity"
+    },
+    {
+      "version": "20260930234353",
+      "name": "calendar_suspension_kind"
+    },
+    {
+      "version": "20261004022154",
+      "name": "n03_education_department"
+    },
+    {
+      "version": "20261005052506",
+      "name": "n58_calendar_persistence"
+    },
+    {
+      "version": "20261005052526",
+      "name": "n58_extra_term_compatibility"
+    },
+    {
+      "version": "20261005052550",
+      "name": "n58_effective_scope_revalidation"
+    },
+    {
+      "version": "20261007230123",
+      "name": "n77_server_validated_delete"
+    },
+    {
+      "version": "20261012130249",
+      "name": "n73_distribution_apply"
+    },
+    {
+      "version": "20261012140116",
+      "name": "n71_unified_restore"
+    },
+    {
+      "version": "20261012235209",
+      "name": "n94_subitem_dates_late_scoring"
+    },
+    {
+      "version": "20261013020136",
+      "name": "n73_distribution_error_contract"
+    },
+    {
+      "version": "20261013045630",
+      "name": "n77_recreate_fresh_identity"
+    },
+    {
+      "version": "20261013054114",
+      "name": "n73_n94_compatibility"
+    },
+    {
+      "version": "20261013075936",
+      "name": "n71_restore_creation_history"
+    },
+    {
+      "version": "20261013105436",
+      "name": "n100_preserve_target_marks"
+    },
+    {
+      "version": "20261013122332",
+      "name": "n90_reviewed_grade_import"
+    },
+    {
+      "version": "20261014001558",
+      "name": "n100_automatic_safe_copy"
+    },
+    {
+      "version": "20261014174527",
+      "name": "n58_atomic_empty_foundation_repair"
+    }
+  ],
+  "ownerLocksBefore": [
+    {
+      "relname": "assignments",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "attendance",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "calendar_days",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "calendars",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "class_charter_selections",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "class_goals",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "class_rules",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "closed_term_reports",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "enrollments",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "group_arrangements",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "items",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "lessons",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "logs",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "notes",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "profile",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "scores",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "sections",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "session_roster_snapshots",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "sessions",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "slots",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "students",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "subjects",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "submissions",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "sync_mutation_receipts",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "teachings",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "terms",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "time_profiles",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "units",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    },
+    {
+      "relname": "years",
+      "tgenabled": "O",
+      "tgtype": 30,
+      "function": "rakeezx.lock_student_lifecycle_statement()"
+    }
+  ],
+  "checks": {
+    "exactServiceBodiesAndACL": true,
+    "receiptRLSAndACL": true,
+    "originalHistoryUnchanged": true,
+    "exactlyOneNamedMigration": true
+  },
+  "realAccountReads": 0,
+  "realAccountWrites": 0,
+  "recoveryInvocations": 0
+}

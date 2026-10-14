@@ -1,0 +1,2282 @@
+{
+  "runId": "79f2600c-16c3-4f27-9092-8c1aedd2f9cc",
+  "checks": [
+    {
+      "name": "atomic_apply_receipt_replay_owner_and_acl",
+      "status": "PASS"
+    },
+    {
+      "name": "legitimate_later_content_and_completed_replay",
+      "status": "PASS"
+    },
+    {
+      "name": "section_before_lock_no_write_rejection",
+      "status": "PASS"
+    },
+    {
+      "name": "changed_academic_snapshot_no_write",
+      "status": "PASS"
+    },
+    {
+      "name": "partial_failure_rollback",
+      "status": "PASS"
+    },
+    {
+      "name": "owner_mutex_serializes_ordinary_section_and_atomic_apply",
+      "status": "PASS"
+    }
+  ],
+  "calls": [
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+        "request": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+        },
+        "protocol": "N58_EMPTY_V1",
+        "snapshot": {
+          "terms": [],
+          "years": [],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "p_plan": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "request": {
+            "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+        "protocol": "N58_EMPTY_V1",
+        "repairId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "canonical": {
+          "terms": [
+            {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            }
+          ],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "planDigest": "9a048f4f870d68b260ce44bdd7d4e1229867b94129af29b62e32b31d40d56288",
+        "mutationReceipts": [
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:year",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "label",
+              "order",
+              "status",
+              "identity"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:1",
+            "canonical": {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term1",
+            "canonicalId": "tm:y:1448-1449:1",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:2",
+            "canonical": {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term2",
+            "canonicalId": "tm:y:1448-1449:2",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:select",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "calendar_selection"
+            ],
+            "resultRevision": 2,
+            "conflictedGroups": []
+          }
+        ]
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "p_plan": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "request": {
+            "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+        "protocol": "N58_EMPTY_V1",
+        "repairId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "canonical": {
+          "terms": [
+            {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            }
+          ],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "planDigest": "9a048f4f870d68b260ce44bdd7d4e1229867b94129af29b62e32b31d40d56288",
+        "mutationReceipts": [
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:year",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "label",
+              "order",
+              "status",
+              "identity"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:1",
+            "canonical": {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term1",
+            "canonicalId": "tm:y:1448-1449:1",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:2",
+            "canonical": {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term2",
+            "canonicalId": "tm:y:1448-1449:2",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:select",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "calendar_selection"
+            ],
+            "resultRevision": 2,
+            "conflictedGroups": []
+          }
+        ]
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "p_plan": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "request": {
+            "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920",
+          "extra": true
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "P0001",
+        "details": null,
+        "hint": null,
+        "message": "N58_REPAIR_ID_REUSED"
+      }
+    },
+    {
+      "owner": "f2f65b25-6db7-4d38-8859-5510d8bc8e10",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "p_plan": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "request": {
+            "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "P0001",
+        "details": null,
+        "hint": null,
+        "message": "N58_REPAIR_INVALID_PLAN"
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "sections",
+        "p_record_id": "sec:4b905237-057e-4343-ad71-bde307845b26",
+        "p_mutation_id": "2db86623-f163-430c-825f-8b3da2ff34dc",
+        "p_device_id": "8924201c-6823-4b77-b533-92472341a7d9",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "grade": 4,
+          "label": "أ",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archived_at": null,
+          "archive_date": null
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "sections",
+        "outcome": "applied",
+        "recordId": "sec:4b905237-057e-4343-ad71-bde307845b26",
+        "canonical": {
+          "id": "sec:4b905237-057e-4343-ad71-bde307845b26",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "grade": 4,
+          "label": "أ",
+          "order": 0,
+          "status": "active",
+          "year_id": "y:1448-1449",
+          "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "revision": 1,
+          "device_id": "8924201c-6823-4b77-b533-92472341a7d9",
+          "created_at": "2026-10-14T17:27:07.110679+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:07.110679+00:00",
+          "archived_at": null,
+          "archive_date": null,
+          "field_revisions": {
+            "name": 1,
+            "color": 1,
+            "order": 1,
+            "identity": 1,
+            "lifecycle": 1
+          },
+          "client_updated_at": null
+        },
+        "mutationId": "2db86623-f163-430c-825f-8b3da2ff34dc",
+        "canonicalId": "sec:4b905237-057e-4343-ad71-bde307845b26",
+        "appliedGroups": [
+          "name",
+          "color",
+          "identity",
+          "order",
+          "lifecycle"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "p_plan": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "request": {
+            "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "7634de19-0e54-47ff-9480-694112c681ba"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+        "protocol": "N58_EMPTY_V1",
+        "repairId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+        "canonical": {
+          "terms": [
+            {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            }
+          ],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "planDigest": "9a048f4f870d68b260ce44bdd7d4e1229867b94129af29b62e32b31d40d56288",
+        "mutationReceipts": [
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:year",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "label",
+              "order",
+              "status",
+              "identity"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:1",
+            "canonical": {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term1",
+            "canonicalId": "tm:y:1448-1449:1",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:2",
+            "canonical": {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 1,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:term2",
+            "canonicalId": "tm:y:1448-1449:2",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+              "revision": 2,
+              "device_id": "4709097f-4c1b-4e47-a37d-ea6cff9270f5",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:06.956553+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:06.956553+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            },
+            "mutationId": "4709097f-4c1b-4e47-a37d-ea6cff9270f5:select",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "calendar_selection"
+            ],
+            "resultRevision": 2,
+            "conflictedGroups": []
+          }
+        ]
+      }
+    },
+    {
+      "owner": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "7d12c1dc-3aa3-46fa-8423-bc104bdedfe0",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "9ff4cdde-382c-40fd-bbed-8c3e30e10613",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "22023",
+        "details": "sections",
+        "hint": null,
+        "message": "N58_REPAIR_ACCOUNT_NOT_EMPTY"
+      }
+    },
+    {
+      "owner": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "0ba1285e-2980-4ec9-90c5-5dbfe28177dc",
+        "p_device_id": "b4e95795-c692-42f5-97c8-72a1e76edbde",
+        "p_base_revision": 0,
+        "p_patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "1448–1449 هـ",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+          "revision": 1,
+          "device_id": "b4e95795-c692-42f5-97c8-72a1e76edbde",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T17:27:07.327025+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:07.327025+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 1,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 1
+          },
+          "client_updated_at": null,
+          "calendar_preset_id": null
+        },
+        "mutationId": "0ba1285e-2980-4ec9-90c5-5dbfe28177dc",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "label",
+          "order",
+          "status",
+          "identity"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "adc8f2a2-d74d-4f49-b61a-0f5bd1aa794e",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+        "request": {
+          "ownerId": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "rootMutationId": "adc8f2a2-d74d-4f49-b61a-0f5bd1aa794e"
+        },
+        "protocol": "N58_EMPTY_V1",
+        "snapshot": {
+          "terms": [],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+              "revision": 1,
+              "device_id": "b4e95795-c692-42f5-97c8-72a1e76edbde",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:07.327025+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:07.327025+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "snapshotDigest": "d7ba5eeff8a1de5b3c9c814d3c5c7602d059852703158fb0ea9755655881546d"
+      }
+    },
+    {
+      "owner": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "sections",
+        "p_record_id": "sec:9779347d-62a7-4fd4-8c8c-a09e8cdc53aa",
+        "p_mutation_id": "9bc66e80-d79f-4ed4-8a26-b172b1e05f13",
+        "p_device_id": "904827bc-76a1-4657-9fa8-a1f25ae07613",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "grade": 4,
+          "label": "أ",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archived_at": null,
+          "archive_date": null
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "sections",
+        "outcome": "applied",
+        "recordId": "sec:9779347d-62a7-4fd4-8c8c-a09e8cdc53aa",
+        "canonical": {
+          "id": "sec:9779347d-62a7-4fd4-8c8c-a09e8cdc53aa",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "grade": 4,
+          "label": "أ",
+          "order": 0,
+          "status": "active",
+          "year_id": "y:1448-1449",
+          "owner_id": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+          "revision": 1,
+          "device_id": "904827bc-76a1-4657-9fa8-a1f25ae07613",
+          "created_at": "2026-10-14T17:27:07.373735+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:07.373735+00:00",
+          "archived_at": null,
+          "archive_date": null,
+          "field_revisions": {
+            "name": 1,
+            "color": 1,
+            "order": 1,
+            "identity": 1,
+            "lifecycle": 1
+          },
+          "client_updated_at": null
+        },
+        "mutationId": "9bc66e80-d79f-4ed4-8a26-b172b1e05f13",
+        "canonicalId": "sec:9779347d-62a7-4fd4-8c8c-a09e8cdc53aa",
+        "appliedGroups": [
+          "name",
+          "color",
+          "identity",
+          "order",
+          "lifecycle"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "5ff37d32-f3da-44c9-8a70-e950da254ca5",
+        "p_plan": {
+          "ownerId": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+          "request": {
+            "ownerId": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "adc8f2a2-d74d-4f49-b61a-0f5bd1aa794e"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [
+              {
+                "id": "y:1448-1449",
+                "label": "1448–1449 هـ",
+                "order": 1448,
+                "status": "active",
+                "owner_id": "3aa1241d-186e-428b-9c6f-8b5aa564915d",
+                "revision": 1,
+                "device_id": "b4e95795-c692-42f5-97c8-72a1e76edbde",
+                "hijri_end": 1449,
+                "created_at": "2026-10-14T17:27:07.327025+00:00",
+                "deleted_at": null,
+                "updated_at": "2026-10-14T17:27:07.327025+00:00",
+                "hijri_start": 1448,
+                "field_revisions": {
+                  "label": 1,
+                  "order": 1,
+                  "status": 1,
+                  "identity": 1,
+                  "calendar_selection": 1
+                },
+                "client_updated_at": null,
+                "calendar_preset_id": null
+              }
+            ],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "d7ba5eeff8a1de5b3c9c814d3c5c7602d059852703158fb0ea9755655881546d"
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "22023",
+        "details": "sections",
+        "hint": null,
+        "message": "N58_REPAIR_ACCOUNT_NOT_EMPTY"
+      }
+    },
+    {
+      "owner": "96312191-d675-4b7f-9927-198e9b74e206",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "9120e61a-29ce-4743-8966-cf8026f9831e",
+        "p_device_id": "37b2079b-d2de-4788-b31c-5c73812cf434",
+        "p_base_revision": 0,
+        "p_patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "1448–1449 هـ",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "96312191-d675-4b7f-9927-198e9b74e206",
+          "revision": 1,
+          "device_id": "37b2079b-d2de-4788-b31c-5c73812cf434",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T17:27:07.560475+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:07.560475+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 1,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 1
+          },
+          "client_updated_at": null,
+          "calendar_preset_id": null
+        },
+        "mutationId": "9120e61a-29ce-4743-8966-cf8026f9831e",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "label",
+          "order",
+          "status",
+          "identity"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "96312191-d675-4b7f-9927-198e9b74e206",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "96312191-d675-4b7f-9927-198e9b74e206",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "47a385d2-f5cf-4889-a7db-1eaa5960b834",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "96312191-d675-4b7f-9927-198e9b74e206",
+        "request": {
+          "ownerId": "96312191-d675-4b7f-9927-198e9b74e206",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "rootMutationId": "47a385d2-f5cf-4889-a7db-1eaa5960b834"
+        },
+        "protocol": "N58_EMPTY_V1",
+        "snapshot": {
+          "terms": [],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "96312191-d675-4b7f-9927-198e9b74e206",
+              "revision": 1,
+              "device_id": "37b2079b-d2de-4788-b31c-5c73812cf434",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:07.560475+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:07.560475+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "snapshotDigest": "2de9e1b78e7fe650792fdf6f41bf311a46317e6126bb18a6c71bdbd0e254b1fe"
+      }
+    },
+    {
+      "owner": "96312191-d675-4b7f-9927-198e9b74e206",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "91cbfdb3-e7c4-4fa3-8938-31552d8db452",
+        "p_device_id": "4806fe14-29fa-4217-afa0-b0cc6967b1c5",
+        "p_base_revision": 1,
+        "p_patch": {
+          "label": "Custom label"
+        },
+        "p_operation": "patch",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "Custom label",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "96312191-d675-4b7f-9927-198e9b74e206",
+          "revision": 2,
+          "device_id": "4806fe14-29fa-4217-afa0-b0cc6967b1c5",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T17:27:07.560475+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:07.607123+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 2,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 1
+          },
+          "client_updated_at": null,
+          "calendar_preset_id": null
+        },
+        "mutationId": "91cbfdb3-e7c4-4fa3-8938-31552d8db452",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "label"
+        ],
+        "resultRevision": 2,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "96312191-d675-4b7f-9927-198e9b74e206",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "8b9f8566-e3d2-4557-a22c-c457ea80e918",
+        "p_plan": {
+          "ownerId": "96312191-d675-4b7f-9927-198e9b74e206",
+          "request": {
+            "ownerId": "96312191-d675-4b7f-9927-198e9b74e206",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "47a385d2-f5cf-4889-a7db-1eaa5960b834"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [
+              {
+                "id": "y:1448-1449",
+                "label": "1448–1449 هـ",
+                "order": 1448,
+                "status": "active",
+                "owner_id": "96312191-d675-4b7f-9927-198e9b74e206",
+                "revision": 1,
+                "device_id": "37b2079b-d2de-4788-b31c-5c73812cf434",
+                "hijri_end": 1449,
+                "created_at": "2026-10-14T17:27:07.560475+00:00",
+                "deleted_at": null,
+                "updated_at": "2026-10-14T17:27:07.560475+00:00",
+                "hijri_start": 1448,
+                "field_revisions": {
+                  "label": 1,
+                  "order": 1,
+                  "status": 1,
+                  "identity": 1,
+                  "calendar_selection": 1
+                },
+                "client_updated_at": null,
+                "calendar_preset_id": null
+              }
+            ],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "2de9e1b78e7fe650792fdf6f41bf311a46317e6126bb18a6c71bdbd0e254b1fe"
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "P0001",
+        "details": null,
+        "hint": null,
+        "message": "N58_REPAIR_CUSTOM_YEAR"
+      }
+    },
+    {
+      "owner": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "2b08a152-819a-4d71-8adb-71dd789fa76e",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+        "request": {
+          "ownerId": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "rootMutationId": "2b08a152-819a-4d71-8adb-71dd789fa76e"
+        },
+        "protocol": "N58_EMPTY_V1",
+        "snapshot": {
+          "terms": [],
+          "years": [],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+      }
+    },
+    {
+      "owner": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "a2187d77-9f41-45d0-b41a-0a7ce75fc042",
+        "p_plan": {
+          "ownerId": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+          "request": {
+            "ownerId": "86b07fb7-c53e-4974-9862-1118d59cf72d",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "2b08a152-819a-4d71-8adb-71dd789fa76e"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "89d6a59f62cca86e7d321566dc8e6345c91b7448bfa4a98749a2884b45983920"
+        }
+      },
+      "status": 400,
+      "result": {
+        "code": "P0001",
+        "details": null,
+        "hint": null,
+        "message": "LOCAL_INJECTED_TERM_FAILURE"
+      }
+    },
+    {
+      "owner": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "b2cccd09-13d9-4de7-8f24-caff5410b8dc",
+        "p_device_id": "2b062860-2b6a-4055-9181-cca75ecb077c",
+        "p_base_revision": 0,
+        "p_patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "1448–1449 هـ",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+          "revision": 1,
+          "device_id": "2b062860-2b6a-4055-9181-cca75ecb077c",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T17:27:08.090772+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:08.090772+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 1,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 1
+          },
+          "client_updated_at": null,
+          "calendar_preset_id": null
+        },
+        "mutationId": "b2cccd09-13d9-4de7-8f24-caff5410b8dc",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "label",
+          "order",
+          "status",
+          "identity"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "owner": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+      "name": "review_n58_empty_foundation",
+      "body": {
+        "p_request": {
+          "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "rootMutationId": "49f0b63e-02c0-4111-ab42-d732378789f0",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+        "request": {
+          "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+          "version": "N58_EMPTY_V1",
+          "presetId": "sa-western-1448-1449",
+          "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "rootMutationId": "49f0b63e-02c0-4111-ab42-d732378789f0"
+        },
+        "protocol": "N58_EMPTY_V1",
+        "snapshot": {
+          "terms": [],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 1,
+              "device_id": "2b062860-2b6a-4055-9181-cca75ecb077c",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:08.090772+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:08.090772+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 1
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": null
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "snapshotDigest": "6c2ac65732d34822166a4563c6553048d549ab651eb2de3e3f3a891031b9a328"
+      }
+    },
+    {
+      "owner": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+      "name": "apply_n58_empty_foundation",
+      "body": {
+        "p_repair_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+        "p_plan": {
+          "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+          "request": {
+            "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+            "version": "N58_EMPTY_V1",
+            "presetId": "sa-western-1448-1449",
+            "originalDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "rootMutationId": "49f0b63e-02c0-4111-ab42-d732378789f0"
+          },
+          "protocol": "N58_EMPTY_V1",
+          "snapshot": {
+            "terms": [],
+            "years": [
+              {
+                "id": "y:1448-1449",
+                "label": "1448–1449 هـ",
+                "order": 1448,
+                "status": "active",
+                "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+                "revision": 1,
+                "device_id": "2b062860-2b6a-4055-9181-cca75ecb077c",
+                "hijri_end": 1449,
+                "created_at": "2026-10-14T17:27:08.090772+00:00",
+                "deleted_at": null,
+                "updated_at": "2026-10-14T17:27:08.090772+00:00",
+                "hijri_start": 1448,
+                "field_revisions": {
+                  "label": 1,
+                  "order": 1,
+                  "status": 1,
+                  "identity": 1,
+                  "calendar_selection": 1
+                },
+                "client_updated_at": null,
+                "calendar_preset_id": null
+              }
+            ],
+            "calendars": [],
+            "calendarDays": []
+          },
+          "snapshotDigest": "6c2ac65732d34822166a4563c6553048d549ab651eb2de3e3f3a891031b9a328"
+        }
+      },
+      "status": 200,
+      "result": {
+        "ownerId": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+        "protocol": "N58_EMPTY_V1",
+        "repairId": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+        "canonical": {
+          "terms": [
+            {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 1,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "created_at": "2026-10-14T17:27:08.145805+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 1,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "created_at": "2026-10-14T17:27:08.145805+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            }
+          ],
+          "years": [
+            {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 2,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:08.090772+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            }
+          ],
+          "calendars": [],
+          "calendarDays": []
+        },
+        "planDigest": "4ed2c97dd5cd1a555ab91ccc8b4215b5c60e8e96cabe0240166f624b79f20b50",
+        "mutationReceipts": [
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:1",
+            "canonical": {
+              "id": "tm:y:1448-1449:1",
+              "name": "الفصل الدراسي الأول",
+              "index": 1,
+              "status": "active",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-01-07",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 1,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "created_at": "2026-10-14T17:27:08.145805+00:00",
+              "deleted_at": null,
+              "start_date": "2026-08-30",
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e:term1",
+            "canonicalId": "tm:y:1448-1449:1",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "terms",
+            "outcome": "applied",
+            "recordId": "tm:y:1448-1449:2",
+            "canonical": {
+              "id": "tm:y:1448-1449:2",
+              "name": "الفصل الدراسي الثاني",
+              "index": 2,
+              "status": "upcoming",
+              "year_id": "y:1448-1449",
+              "end_date": "2027-07-01",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 1,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "created_at": "2026-10-14T17:27:08.145805+00:00",
+              "deleted_at": null,
+              "start_date": "2027-01-17",
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "calendar_id": null,
+              "field_revisions": {
+                "name": 1,
+                "dates": 1,
+                "status": 1,
+                "calendar": 1,
+                "identity": 1
+              },
+              "client_updated_at": null
+            },
+            "mutationId": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e:term2",
+            "canonicalId": "tm:y:1448-1449:2",
+            "appliedGroups": [
+              "name",
+              "identity",
+              "status",
+              "dates",
+              "calendar"
+            ],
+            "resultRevision": 1,
+            "conflictedGroups": []
+          },
+          {
+            "entity": "years",
+            "outcome": "applied",
+            "recordId": "y:1448-1449",
+            "canonical": {
+              "id": "y:1448-1449",
+              "label": "1448–1449 هـ",
+              "order": 1448,
+              "status": "active",
+              "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+              "revision": 2,
+              "device_id": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e",
+              "hijri_end": 1449,
+              "created_at": "2026-10-14T17:27:08.090772+00:00",
+              "deleted_at": null,
+              "updated_at": "2026-10-14T17:27:08.145805+00:00",
+              "hijri_start": 1448,
+              "field_revisions": {
+                "label": 1,
+                "order": 1,
+                "status": 1,
+                "identity": 1,
+                "calendar_selection": 2
+              },
+              "client_updated_at": null,
+              "calendar_preset_id": "sa-western-1448-1449"
+            },
+            "mutationId": "7f0a6adc-e111-4b29-9e4e-5a7d732bd62e:select",
+            "canonicalId": "y:1448-1449",
+            "appliedGroups": [
+              "calendar_selection"
+            ],
+            "resultRevision": 2,
+            "conflictedGroups": []
+          }
+        ]
+      }
+    },
+    {
+      "owner": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+      "name": "apply_sync_v2_mutation",
+      "body": {
+        "p_entity": "sections",
+        "p_record_id": "sec:75bc2154-74f7-4825-9ec0-d670fb1f59b5",
+        "p_mutation_id": "61cf0a44-d63d-49a7-9a43-abbf70775cb9",
+        "p_device_id": "005797f7-d558-4809-8d5a-dd5457e9e4e1",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "grade": 4,
+          "label": "أ",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archived_at": null,
+          "archive_date": null
+        },
+        "p_operation": "create",
+        "p_client_updated_at": null
+      },
+      "status": 200,
+      "result": {
+        "entity": "sections",
+        "outcome": "applied",
+        "recordId": "sec:75bc2154-74f7-4825-9ec0-d670fb1f59b5",
+        "canonical": {
+          "id": "sec:75bc2154-74f7-4825-9ec0-d670fb1f59b5",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "grade": 4,
+          "label": "أ",
+          "order": 0,
+          "status": "active",
+          "year_id": "y:1448-1449",
+          "owner_id": "88788a71-fa4b-4af3-93a8-f6eee84d5872",
+          "revision": 1,
+          "device_id": "005797f7-d558-4809-8d5a-dd5457e9e4e1",
+          "created_at": "2026-10-14T17:27:08.164907+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T17:27:08.164907+00:00",
+          "archived_at": null,
+          "archive_date": null,
+          "field_revisions": {
+            "name": 1,
+            "color": 1,
+            "order": 1,
+            "identity": 1,
+            "lifecycle": 1
+          },
+          "client_updated_at": null
+        },
+        "mutationId": "61cf0a44-d63d-49a7-9a43-abbf70775cb9",
+        "canonicalId": "sec:75bc2154-74f7-4825-9ec0-d670fb1f59b5",
+        "appliedGroups": [
+          "name",
+          "color",
+          "identity",
+          "order",
+          "lifecycle"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    }
+  ],
+  "hostedCalls": 0,
+  "identities": {
+    "images": {
+      "postgres": "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+      "auth": "supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b",
+      "rest": "postgrest/postgrest@sha256:d155c6718ed9a9f990d159a2ab7c0a3f16944dbb6d0a0344557421042acfe0df",
+      "mail": "axllent/mailpit@sha256:6abc8e633df15eaf785cfcf38bae48e66f64beecdc03121e249d0f9ec15f0707"
+    },
+    "versions": {
+      "postgres": "17.6",
+      "auth": "v2.197.0",
+      "rest": "v16.4",
+      "mail": "v1.27.8"
+    },
+    "postgres": [
+      "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94"
+    ],
+    "auth": [
+      "supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b",
+      "public.ecr.aws/supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b"
+    ],
+    "rest": [
+      "postgrest/postgrest@sha256:d155c6718ed9a9f990d159a2ab7c0a3f16944dbb6d0a0344557421042acfe0df"
+    ],
+    "mail": [
+      "axllent/mailpit@sha256:6abc8e633df15eaf785cfcf38bae48e66f64beecdc03121e249d0f9ec15f0707"
+    ],
+    "authHealth": {
+      "version": "v2.197.0",
+      "name": "GoTrue",
+      "description": "GoTrue is a user registration and authentication API"
+    },
+    "postgresVersion": "PostgreSQL 17.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit",
+    "protocolFunctions": [
+      {
+        "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+        "body_md5": "a6284ed21c86f1cafcac2d4d84a5fadc"
+      },
+      {
+        "signature": "rakeezx.n58_guard_calendar_contract()",
+        "body_md5": "6fc9fcdf35f78d0ae295fe61a833f70d"
+      },
+      {
+        "signature": "rakeezx.provision_account_workspace(jsonb)",
+        "body_md5": "a641c556c736f72b63d1e0cb203e1e1e"
+      }
+    ],
+    "restVersion": "PostgREST 16.4"
+  },
+  "migrations": {
+    "0001_core_schema.sql": "dae5eba346bd8607a6d07bc75d587f61256440256e675e1e4221e8d4709833a7",
+    "0002_indexes_triggers_rls.sql": "7d901d310ffd35f8caed9d2479e503f3e1c08e3a310735abfe27e430b54ebdb2",
+    "0003_hybrid_calendar.sql": "09245a2531f42726392e5b38012c7fec1c4388ee076a43f77eceb3a9a90981aa",
+    "0004_student_notes.sql": "b93d17bf51d0fef3eaae2d4f1b3b79a1c0fb4bfde37eab78810a4b44580a8341",
+    "0007_sections_active_normalized_identity.sql": "086cd1e7a20e93c0b5d35592342ad62e846664dc408895c691a2b0fb85d62913",
+    "0008_enrollment_membership_operations.sql": "9f31b2521dbe16598d9eeed40043ecdd7cb53a6655cbb7abacc65dc5cd4c231e",
+    "0009_transfer_and_renumber_rosters.sql": "0db0a79bc9d6547e53467403ce34de4a17c0a08501fe06fc4a9f9e4feb9c2ed7",
+    "0010_profile_report_principal_name.sql": "542a7547f04462de416fdc43f55525a2e7cb7ea8882908ca50873d2f42146ff8",
+    "0011_session_roster_snapshots.sql": "735025e8c5ad3398934a809254c49c259202e5693c5831a5e13ce0762ce68ba8",
+    "0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078",
+    "0013_sync_v2_enrollment_commands.sql": "3d60cf3eee8a5c373aacb6e96f4362a55f34a147958a685056bb0fd861df61a7",
+    "0014_sync_v2_attendance_snapshot_commands.sql": "e247c2e50e32788820952b25305c9e7c06aaa6e2748c881cf279ca951a0a79f5",
+    "0015_sync_v2_lifecycle_commands.sql": "93a8c3d48ae7196fd2da8951424f73041d0e0052eb8cd88ed9baa86dffc606d3",
+    "0016_sync_v2_teaching_creation_commands.sql": "758debba75e8bf74ed2bcb087f5412b0d588adf046e3d4beb474422664178ccc",
+    "0017_sync_v2_bulk_attendance_commands.sql": "03fd7bf7d75d264d9227702b04d22562f717147b5ecb5ad63a4307b23ee7997e",
+    "0018_profile_active_time_profile.sql": "e6b9f5ec17668f96d750d6045dced7bd81e7ed4c7c09c6e6b775bfbae4e29d18",
+    "0019_class_rules.sql": "a2e7dcc3dbeddca2b5e7fdfbb73179c8f1bffa18d6637938e437bbae3c42143c",
+    "0020_support_requests.sql": "f4e86836721f54c53daccf1d49426a4e67aaa94bae19cd961361b3b59a2c981e",
+    "0021_section_archive_lifecycle.sql": "ce0584229c5a65cbd3bf47955c5b28f8a4c9ce2c43eafa4c79ca55c971d0c78f",
+    "0022_closed_term_reports.sql": "1fa117aa9038e229fa7a52d32c4bb4f13b2a3a730af19ac1b57127d2ec6248a5",
+    "0023_sync_v2_backup_restore.sql": "36bcc72376fcbd4414916ab92ecc2bc8b778dbf441002cca1d1722973e491228",
+    "0024_class_goal_runtime.sql": "b32317e638597f5ce99ab5f33e5fc81fa5d35e54e5d5809e74da795cb5a4e513",
+    "0025_group_arrangements.sql": "5980c644b27d4efa0b4b845ad8ed17ff96452e1a68145a6f0ce725d0b86984b3",
+    "0026_session_delete.sql": "a40a1583b8f1188fa448d2392e9ea5651353c17763ddbe769ae4cc55419f976f",
+    "0027_support_notification_outbox.sql": "3431ba9bc604cec8a5f0699ed2e90be25f0f04c999289b405df69bf73fd83443",
+    "0028_support_notification_contact_identity.sql": "ee0b1bc362b6cc4c165f8b07b0b7ef41cf5e47944c8cd59769e24439c43534fd",
+    "0029_student_lifecycle_safety.sql": "97abeb52cbeb4da99ef97a688c190010e419465e5152ee0e16b21bea9ef458ec",
+    "0030_student_removal_preview.sql": "a368b7e343884a9406eda26206e13ecb36107cb70dd14525ce5dfbe778d68d4d",
+    "0031_curriculum_sync_v2.sql": "413de00b6efdbf7a5eb6d77d20d5d131468895889d0aa019af899873a3ebd82f",
+    "0032_account_profile_access_foundation.sql": "ee87bb15bc4f0512473d87877bc7edf37526ca5862b6714e0e2ed84a86357485",
+    "0033_score_subitem_foundation.sql": "fe5bf1fb779113e555de349515ff5cd3753808c236a7b4ba1f5e9c99927967eb",
+    "0034_score_subitem_guard_acl_hardening.sql": "8f01c090d9f1b23563e162c1f77490ab3441b072a275033980c1b778e438f4da",
+    "20260924003436_beta_new_account_provisioning.sql": "96c8fa6c815c32fce57ff5ef612b57e4a527d448e0e349a6694d8bd1071ca2dd",
+    "20260924173929_security_definer_direct_execute_hardening.sql": "42cb34fced760e1d812e788fbf8185343dc33f1a2fad663e4a2906b7732490ae",
+    "20260926115629_owner_sync_invalidation.sql": "97d61cb94438fa605a71ffee55b1281426257cf01e144dde39ddd9d94bd615db",
+    "20260930094421_calendar_day_active_identity.sql": "d1af7db82a3fc11de7b73a6562071230425554e8bc08a5ac9c4d0f55bb4c7541",
+    "20260930234353_calendar_suspension_kind.sql": "2605dccc72de9bc4488850a32e3cda7ae1606ef88dd7ebc87f5183beb10886db",
+    "20261003000000_n03_education_department.sql": "821ff5c3e4529819419d0bb23b801ca26b616143c988a3778f69619e52b17aa4",
+    "20261004070000_n58_calendar_persistence.sql": "e330bbb554d86bdce73f5e702daa8f45624b1ee19de45ed74403db062855fe06",
+    "20261004070001_n58_extra_term_compatibility.sql": "7b8b811076ee330f805cc179c8eba01e0b9ca6c95d34a6369d3d83ec270ba8f8",
+    "20261004070002_n58_effective_scope_revalidation.sql": "0ce6aa76f12bbab7e9438e91a78064e66a24baa14b3f8597a55196385ffe19e6",
+    "20261007230123_n77_server_validated_delete.sql": "ce91d362c7b75788646b818db2fe37eb954f8b8b8b81dea69e3c89aa585caa8e",
+    "20261012120000_n73_distribution_apply.sql": "dc25d62af8363149b046053fc5c841b140d222513c0f3913c023db6f0248c12f",
+    "20261012163000_n71_unified_restore.sql": "7be97437e9b4e8cde3d55b4b341d51a8e863486f7ea482e25d5bf05883db2aed",
+    "20261012234116_n94_subitem_dates_late_scoring.sql": "a08ead00360b9cfa4144467751dfa0c4fb620d47e6f303f0b9ca9a1392fdc595",
+    "20261013045630_n77_recreate_fresh_identity.sql": "47ce838f603aaa99606dd5fc7946430e56938afb8d8de857397c873ff1c5cbaa",
+    "20261013083000_n73_n94_compatibility.sql": "ad66218845a2ee3795f4b71aa7364bf0f35365ee8dff6c8ddef68356374a4f00",
+    "20261013090000_n73_distribution_error_contract.sql": "3450a3c3b11b8c0ad5212b5558bb4cdb629f6fe5533c3f424f18dc36cd627e44",
+    "20261013101500_n100_preserve_target_marks.sql": "a682af80aa8d12e34601ab2113c0ffaaf3b849b8eddff2ac63612679d8b4540f",
+    "20261013110000_n71_restore_creation_history.sql": "6508d5a66b575532b29f1d976900260b20115f2d8959f1f1cc34a06738009a9b",
+    "20261013122332_n90_reviewed_grade_import.sql": "f645d975c379dd5ab02e339624d9ae7815eb586abcbe99497152bc97c177f4ed",
+    "n100Baseline": "d13f3c80fe2f1ddc4c2cd9936ced3a9dd08cc28ca0e15e3679ee74adae8b6a88",
+    "20261014090000_n100_automatic_safe_copy.sql": "42aeb3f90c55924a93e5bd8394a1638a0d8bee99a25576299d3fb126980e09dd",
+    "20261014203000_n58_atomic_empty_foundation_repair.sql": "3cbdaa710a1eae24024eba5d650fb8d51457aa2b4d436c8b118d866c0d9a3e89"
+  },
+  "schema": {
+    "functions": [
+      {
+        "signature": "rakeezx.apply_n58_empty_foundation(text,jsonb)",
+        "body_md5": "4dd6c547ed2be8b9e91fe9c62f5288c6",
+        "prosecdef": true,
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+      },
+      {
+        "signature": "rakeezx.lock_student_lifecycle(uuid)",
+        "body_md5": "de3fb7821244d83ebc0be45b0247ce22",
+        "prosecdef": true,
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres}"
+      },
+      {
+        "signature": "rakeezx.n58_repair_expected(text)",
+        "body_md5": "5c1a5efec8d0949a7356ef2e1ec758af",
+        "prosecdef": false,
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres}"
+      },
+      {
+        "signature": "rakeezx.n58_repair_snapshot(uuid,text)",
+        "body_md5": "5d1a91b8285247f3d8de536b7a1f47e9",
+        "prosecdef": true,
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres}"
+      },
+      {
+        "signature": "rakeezx.review_n58_empty_foundation(jsonb)",
+        "body_md5": "44595b5d49d5f9c23a1afd6067635d7a",
+        "prosecdef": true,
+        "proconfig": [
+          "search_path=\"\""
+        ],
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+      }
+    ],
+    "locks": [
+      {
+        "relname": "assignments",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.assignments FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "attendance",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.attendance FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "calendar_days",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.calendar_days FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "calendars",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.calendars FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "class_charter_selections",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.class_charter_selections FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "class_goals",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.class_goals FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "class_rules",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.class_rules FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "closed_term_reports",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.closed_term_reports FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "enrollments",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.enrollments FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "group_arrangements",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.group_arrangements FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "items",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.items FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "lessons",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.lessons FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "logs",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.logs FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "notes",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.notes FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "profile",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.profile FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "scores",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.scores FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "sections",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sections FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "session_roster_snapshots",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.session_roster_snapshots FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "sessions",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sessions FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "slots",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.slots FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "students",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.students FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "subjects",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.subjects FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "submissions",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.submissions FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "sync_mutation_receipts",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.sync_mutation_receipts FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "teachings",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.teachings FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "terms",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.terms FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "time_profiles",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.time_profiles FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "units",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.units FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      },
+      {
+        "relname": "years",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER \"00_student_lifecycle_statement_lock\" BEFORE INSERT OR DELETE OR UPDATE ON rakeezx.years FOR EACH STATEMENT EXECUTE FUNCTION rakeezx.lock_student_lifecycle_statement()"
+      }
+    ],
+    "receipt": [
+      {
+        "relrowsecurity": true,
+        "relforcerowsecurity": true,
+        "acl": "{postgres=arwdDxtm/postgres}"
+      }
+    ]
+  },
+  "lockedWaiters": 2,
+  "completed": true
+}

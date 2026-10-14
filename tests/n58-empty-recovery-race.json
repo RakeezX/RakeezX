@@ -1,0 +1,2700 @@
+{
+  "runId": "8ce51596-fd43-4453-bab9-fd05e8c13020",
+  "sourceSha": "8103557323ae7e342d615c4844268e8d48a71465",
+  "scope": "ordinary Sync cannot atomically enforce empty-account repair eligibility",
+  "hostedCalls": 0,
+  "calls": [
+    {
+      "actor": "repair-device",
+      "envelope": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "8174c0d4-98d0-4640-8223-cbcc2aeb68f7",
+        "p_device_id": "d9e0f842-83f9-4ea6-90d8-dbde87ca41d9",
+        "p_base_revision": 0,
+        "p_patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": 1791997111451
+      },
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "1448–1449 هـ",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+          "revision": 1,
+          "device_id": "d9e0f842-83f9-4ea6-90d8-dbde87ca41d9",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T16:58:31.489169+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T16:58:31.489169+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 1,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 1
+          },
+          "client_updated_at": 1791997111451,
+          "calendar_preset_id": null
+        },
+        "mutationId": "8174c0d4-98d0-4640-8223-cbcc2aeb68f7",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "label",
+          "order",
+          "status",
+          "identity"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "actor": "repair-device",
+      "envelope": {
+        "p_entity": "terms",
+        "p_record_id": "tm:y:1448-1449:1",
+        "p_mutation_id": "638d71bf-ce46-4e07-8c13-4b8079ee5ec0",
+        "p_device_id": "e50f0bba-a162-4bba-96e8-4770b04037ad",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 1,
+          "name": "الفصل الدراسي الأول",
+          "start_date": "2026-08-30",
+          "end_date": "2027-01-07",
+          "status": "active"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": 1791997111451
+      },
+      "result": {
+        "entity": "terms",
+        "outcome": "applied",
+        "recordId": "tm:y:1448-1449:1",
+        "canonical": {
+          "id": "tm:y:1448-1449:1",
+          "name": "الفصل الدراسي الأول",
+          "index": 1,
+          "status": "active",
+          "year_id": "y:1448-1449",
+          "end_date": "2027-01-07",
+          "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+          "revision": 1,
+          "device_id": "e50f0bba-a162-4bba-96e8-4770b04037ad",
+          "created_at": "2026-10-14T16:58:31.521813+00:00",
+          "deleted_at": null,
+          "start_date": "2026-08-30",
+          "updated_at": "2026-10-14T16:58:31.521813+00:00",
+          "calendar_id": null,
+          "field_revisions": {
+            "name": 1,
+            "dates": 1,
+            "status": 1,
+            "calendar": 1,
+            "identity": 1
+          },
+          "client_updated_at": 1791997111451
+        },
+        "mutationId": "638d71bf-ce46-4e07-8c13-4b8079ee5ec0",
+        "canonicalId": "tm:y:1448-1449:1",
+        "appliedGroups": [
+          "name",
+          "identity",
+          "status",
+          "dates",
+          "calendar"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "actor": "repair-device",
+      "envelope": {
+        "p_entity": "terms",
+        "p_record_id": "tm:y:1448-1449:2",
+        "p_mutation_id": "a1159c8b-ffc6-4bb9-8e4d-9dff1328f90b",
+        "p_device_id": "d1e7ca98-0824-475a-8faf-fb4795151951",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 2,
+          "name": "الفصل الدراسي الثاني",
+          "start_date": "2027-01-17",
+          "end_date": "2027-07-01",
+          "status": "upcoming"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": 1791997111451
+      },
+      "result": {
+        "entity": "terms",
+        "outcome": "applied",
+        "recordId": "tm:y:1448-1449:2",
+        "canonical": {
+          "id": "tm:y:1448-1449:2",
+          "name": "الفصل الدراسي الثاني",
+          "index": 2,
+          "status": "upcoming",
+          "year_id": "y:1448-1449",
+          "end_date": "2027-07-01",
+          "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+          "revision": 1,
+          "device_id": "d1e7ca98-0824-475a-8faf-fb4795151951",
+          "created_at": "2026-10-14T16:58:31.559399+00:00",
+          "deleted_at": null,
+          "start_date": "2027-01-17",
+          "updated_at": "2026-10-14T16:58:31.559399+00:00",
+          "calendar_id": null,
+          "field_revisions": {
+            "name": 1,
+            "dates": 1,
+            "status": 1,
+            "calendar": 1,
+            "identity": 1
+          },
+          "client_updated_at": 1791997111451
+        },
+        "mutationId": "a1159c8b-ffc6-4bb9-8e4d-9dff1328f90b",
+        "canonicalId": "tm:y:1448-1449:2",
+        "appliedGroups": [
+          "name",
+          "identity",
+          "status",
+          "dates",
+          "calendar"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "actor": "other-device",
+      "envelope": {
+        "p_entity": "sections",
+        "p_record_id": "sec:9774ac92-8442-4033-bdcd-d53aa10b7a14",
+        "p_mutation_id": "9b81f40d-0d77-4eb5-8aae-dae6268eb4fc",
+        "p_device_id": "2cf1b7a9-82aa-4e4c-9b6d-afd50ac33dd7",
+        "p_base_revision": 0,
+        "p_patch": {
+          "year_id": "y:1448-1449",
+          "grade": 4,
+          "label": "أ",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "order": 0,
+          "status": "active",
+          "archived_at": null,
+          "archive_date": null
+        },
+        "p_operation": "create",
+        "p_client_updated_at": 1791997111891
+      },
+      "status": 200,
+      "result": {
+        "entity": "sections",
+        "outcome": "applied",
+        "recordId": "sec:9774ac92-8442-4033-bdcd-d53aa10b7a14",
+        "canonical": {
+          "id": "sec:9774ac92-8442-4033-bdcd-d53aa10b7a14",
+          "name": "4/أ",
+          "color": "#0d9488",
+          "grade": 4,
+          "label": "أ",
+          "order": 0,
+          "status": "active",
+          "year_id": "y:1448-1449",
+          "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+          "revision": 1,
+          "device_id": "2cf1b7a9-82aa-4e4c-9b6d-afd50ac33dd7",
+          "created_at": "2026-10-14T16:58:31.899252+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T16:58:31.899252+00:00",
+          "archived_at": null,
+          "archive_date": null,
+          "field_revisions": {
+            "name": 1,
+            "color": 1,
+            "order": 1,
+            "identity": 1,
+            "lifecycle": 1
+          },
+          "client_updated_at": 1791997111891
+        },
+        "mutationId": "9b81f40d-0d77-4eb5-8aae-dae6268eb4fc",
+        "canonicalId": "sec:9774ac92-8442-4033-bdcd-d53aa10b7a14",
+        "appliedGroups": [
+          "name",
+          "color",
+          "identity",
+          "order",
+          "lifecycle"
+        ],
+        "resultRevision": 1,
+        "conflictedGroups": []
+      }
+    },
+    {
+      "actor": "repair-device",
+      "envelope": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "2fcba33c-091e-4da8-97cb-1a49dfab8f39",
+        "p_device_id": "19b34a65-f99c-48a9-8d4a-e0edce9e3cad",
+        "p_base_revision": 1,
+        "p_patch": {
+          "calendar_preset_id": "sa-western-1448-1449"
+        },
+        "p_operation": "patch",
+        "p_client_updated_at": 1791997111451
+      },
+      "result": {
+        "entity": "years",
+        "outcome": "applied",
+        "recordId": "y:1448-1449",
+        "canonical": {
+          "id": "y:1448-1449",
+          "label": "1448–1449 هـ",
+          "order": 1448,
+          "status": "active",
+          "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+          "revision": 2,
+          "device_id": "19b34a65-f99c-48a9-8d4a-e0edce9e3cad",
+          "hijri_end": 1449,
+          "created_at": "2026-10-14T16:58:31.489169+00:00",
+          "deleted_at": null,
+          "updated_at": "2026-10-14T16:58:31.971236+00:00",
+          "hijri_start": 1448,
+          "field_revisions": {
+            "label": 1,
+            "order": 1,
+            "status": 1,
+            "identity": 1,
+            "calendar_selection": 2
+          },
+          "client_updated_at": 1791997111451,
+          "calendar_preset_id": "sa-western-1448-1449"
+        },
+        "mutationId": "2fcba33c-091e-4da8-97cb-1a49dfab8f39",
+        "canonicalId": "y:1448-1449",
+        "appliedGroups": [
+          "calendar_selection"
+        ],
+        "resultRevision": 2,
+        "conflictedGroups": []
+      }
+    }
+  ],
+  "sourceHashes": {
+    "src/store.js": "b1f2b352b4dd5e89bf87cabca4d55070f3a0bb50a7f7ab2fdc65134fee305c46",
+    "src/lib/sync-v2.js": "f08ecaf8d032e18157b6e161f215285addf98db7638685aba8fec0149e1594b4",
+    "src/lib/cloud.js": "e6a02b5b5595c9370022a4eedb66a9b6662df0f882d18cb1c20b378de8e40ffb",
+    "src/lib/calendar-runtime.js": "685a5802c775ea45775565ec85d593648b207efbb1d61d800a739c58efe15108"
+  },
+  "reusedRejection": {
+    "artifactSha256": "af314c81c2653a07b9d897c3d8855c3c544f9ad19c5e08369f6c195e6b4209ef",
+    "first": {
+      "timing": "before-sync",
+      "envelope": {
+        "p_entity": "years",
+        "p_record_id": "y:1448-1449",
+        "p_mutation_id": "d505ab39-b852-45cb-b00a-6d4e25ea2f08",
+        "p_device_id": "845e27c0-d6c7-4193-8dc9-052ea0e4267f",
+        "p_base_revision": 0,
+        "p_patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active",
+          "calendar_preset_id": "sa-western-1448-1449"
+        },
+        "p_operation": "create",
+        "p_client_updated_at": 1791993272164
+      },
+      "status": 400,
+      "result": {
+        "code": "22023",
+        "details": null,
+        "hint": null,
+        "message": "N58_EXISTING_TERMS_REQUIRED"
+      }
+    }
+  },
+  "identities": {
+    "images": {
+      "postgres": "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+      "auth": "supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b",
+      "rest": "postgrest/postgrest@sha256:d155c6718ed9a9f990d159a2ab7c0a3f16944dbb6d0a0344557421042acfe0df",
+      "mail": "axllent/mailpit@sha256:6abc8e633df15eaf785cfcf38bae48e66f64beecdc03121e249d0f9ec15f0707"
+    },
+    "versions": {
+      "postgres": "17.6",
+      "auth": "v2.197.0",
+      "rest": "v16.4",
+      "mail": "v1.27.8"
+    },
+    "postgres": [
+      "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94"
+    ],
+    "auth": [
+      "supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b",
+      "public.ecr.aws/supabase/gotrue@sha256:1736a63078f5922b198c4cbe50f80ab9a2d3b54fe8b7b6cfb2e9dc5dbbc12c6b"
+    ],
+    "rest": [
+      "postgrest/postgrest@sha256:d155c6718ed9a9f990d159a2ab7c0a3f16944dbb6d0a0344557421042acfe0df"
+    ],
+    "mail": [
+      "axllent/mailpit@sha256:6abc8e633df15eaf785cfcf38bae48e66f64beecdc03121e249d0f9ec15f0707"
+    ],
+    "authHealth": {
+      "version": "v2.197.0",
+      "name": "GoTrue",
+      "description": "GoTrue is a user registration and authentication API"
+    },
+    "postgresVersion": "PostgreSQL 17.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit",
+    "protocolFunctions": [
+      {
+        "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+        "body_md5": "a6284ed21c86f1cafcac2d4d84a5fadc"
+      },
+      {
+        "signature": "rakeezx.n58_guard_calendar_contract()",
+        "body_md5": "6fc9fcdf35f78d0ae295fe61a833f70d"
+      },
+      {
+        "signature": "rakeezx.provision_account_workspace(jsonb)",
+        "body_md5": "a641c556c736f72b63d1e0cb203e1e1e"
+      }
+    ],
+    "restVersion": "PostgREST 16.4"
+  },
+  "migrations": {
+    "0001_core_schema.sql": "dae5eba346bd8607a6d07bc75d587f61256440256e675e1e4221e8d4709833a7",
+    "0002_indexes_triggers_rls.sql": "7d901d310ffd35f8caed9d2479e503f3e1c08e3a310735abfe27e430b54ebdb2",
+    "0003_hybrid_calendar.sql": "09245a2531f42726392e5b38012c7fec1c4388ee076a43f77eceb3a9a90981aa",
+    "0004_student_notes.sql": "b93d17bf51d0fef3eaae2d4f1b3b79a1c0fb4bfde37eab78810a4b44580a8341",
+    "0007_sections_active_normalized_identity.sql": "086cd1e7a20e93c0b5d35592342ad62e846664dc408895c691a2b0fb85d62913",
+    "0008_enrollment_membership_operations.sql": "9f31b2521dbe16598d9eeed40043ecdd7cb53a6655cbb7abacc65dc5cd4c231e",
+    "0009_transfer_and_renumber_rosters.sql": "0db0a79bc9d6547e53467403ce34de4a17c0a08501fe06fc4a9f9e4feb9c2ed7",
+    "0010_profile_report_principal_name.sql": "542a7547f04462de416fdc43f55525a2e7cb7ea8882908ca50873d2f42146ff8",
+    "0011_session_roster_snapshots.sql": "735025e8c5ad3398934a809254c49c259202e5693c5831a5e13ce0762ce68ba8",
+    "0012_sync_v2_server_protocol.sql": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078",
+    "0013_sync_v2_enrollment_commands.sql": "3d60cf3eee8a5c373aacb6e96f4362a55f34a147958a685056bb0fd861df61a7",
+    "0014_sync_v2_attendance_snapshot_commands.sql": "e247c2e50e32788820952b25305c9e7c06aaa6e2748c881cf279ca951a0a79f5",
+    "0015_sync_v2_lifecycle_commands.sql": "93a8c3d48ae7196fd2da8951424f73041d0e0052eb8cd88ed9baa86dffc606d3",
+    "0016_sync_v2_teaching_creation_commands.sql": "758debba75e8bf74ed2bcb087f5412b0d588adf046e3d4beb474422664178ccc",
+    "0017_sync_v2_bulk_attendance_commands.sql": "03fd7bf7d75d264d9227702b04d22562f717147b5ecb5ad63a4307b23ee7997e",
+    "0018_profile_active_time_profile.sql": "e6b9f5ec17668f96d750d6045dced7bd81e7ed4c7c09c6e6b775bfbae4e29d18",
+    "0019_class_rules.sql": "a2e7dcc3dbeddca2b5e7fdfbb73179c8f1bffa18d6637938e437bbae3c42143c",
+    "0020_support_requests.sql": "f4e86836721f54c53daccf1d49426a4e67aaa94bae19cd961361b3b59a2c981e",
+    "0021_section_archive_lifecycle.sql": "ce0584229c5a65cbd3bf47955c5b28f8a4c9ce2c43eafa4c79ca55c971d0c78f",
+    "0022_closed_term_reports.sql": "1fa117aa9038e229fa7a52d32c4bb4f13b2a3a730af19ac1b57127d2ec6248a5",
+    "0023_sync_v2_backup_restore.sql": "36bcc72376fcbd4414916ab92ecc2bc8b778dbf441002cca1d1722973e491228",
+    "0024_class_goal_runtime.sql": "b32317e638597f5ce99ab5f33e5fc81fa5d35e54e5d5809e74da795cb5a4e513",
+    "0025_group_arrangements.sql": "5980c644b27d4efa0b4b845ad8ed17ff96452e1a68145a6f0ce725d0b86984b3",
+    "0026_session_delete.sql": "a40a1583b8f1188fa448d2392e9ea5651353c17763ddbe769ae4cc55419f976f",
+    "0027_support_notification_outbox.sql": "3431ba9bc604cec8a5f0699ed2e90be25f0f04c999289b405df69bf73fd83443",
+    "0028_support_notification_contact_identity.sql": "ee0b1bc362b6cc4c165f8b07b0b7ef41cf5e47944c8cd59769e24439c43534fd",
+    "0029_student_lifecycle_safety.sql": "97abeb52cbeb4da99ef97a688c190010e419465e5152ee0e16b21bea9ef458ec",
+    "0030_student_removal_preview.sql": "a368b7e343884a9406eda26206e13ecb36107cb70dd14525ce5dfbe778d68d4d",
+    "0031_curriculum_sync_v2.sql": "413de00b6efdbf7a5eb6d77d20d5d131468895889d0aa019af899873a3ebd82f",
+    "0032_account_profile_access_foundation.sql": "ee87bb15bc4f0512473d87877bc7edf37526ca5862b6714e0e2ed84a86357485",
+    "0033_score_subitem_foundation.sql": "fe5bf1fb779113e555de349515ff5cd3753808c236a7b4ba1f5e9c99927967eb",
+    "0034_score_subitem_guard_acl_hardening.sql": "8f01c090d9f1b23563e162c1f77490ab3441b072a275033980c1b778e438f4da",
+    "20260924003436_beta_new_account_provisioning.sql": "96c8fa6c815c32fce57ff5ef612b57e4a527d448e0e349a6694d8bd1071ca2dd",
+    "20260924173929_security_definer_direct_execute_hardening.sql": "42cb34fced760e1d812e788fbf8185343dc33f1a2fad663e4a2906b7732490ae",
+    "20260926115629_owner_sync_invalidation.sql": "97d61cb94438fa605a71ffee55b1281426257cf01e144dde39ddd9d94bd615db",
+    "20260930094421_calendar_day_active_identity.sql": "d1af7db82a3fc11de7b73a6562071230425554e8bc08a5ac9c4d0f55bb4c7541",
+    "20260930234353_calendar_suspension_kind.sql": "2605dccc72de9bc4488850a32e3cda7ae1606ef88dd7ebc87f5183beb10886db",
+    "20261003000000_n03_education_department.sql": "821ff5c3e4529819419d0bb23b801ca26b616143c988a3778f69619e52b17aa4",
+    "20261004070000_n58_calendar_persistence.sql": "e330bbb554d86bdce73f5e702daa8f45624b1ee19de45ed74403db062855fe06",
+    "20261004070001_n58_extra_term_compatibility.sql": "7b8b811076ee330f805cc179c8eba01e0b9ca6c95d34a6369d3d83ec270ba8f8",
+    "20261004070002_n58_effective_scope_revalidation.sql": "0ce6aa76f12bbab7e9438e91a78064e66a24baa14b3f8597a55196385ffe19e6",
+    "20261007230123_n77_server_validated_delete.sql": "ce91d362c7b75788646b818db2fe37eb954f8b8b8b81dea69e3c89aa585caa8e",
+    "20261012120000_n73_distribution_apply.sql": "dc25d62af8363149b046053fc5c841b140d222513c0f3913c023db6f0248c12f",
+    "20261012163000_n71_unified_restore.sql": "7be97437e9b4e8cde3d55b4b341d51a8e863486f7ea482e25d5bf05883db2aed",
+    "20261012234116_n94_subitem_dates_late_scoring.sql": "a08ead00360b9cfa4144467751dfa0c4fb620d47e6f303f0b9ca9a1392fdc595",
+    "20261013045630_n77_recreate_fresh_identity.sql": "47ce838f603aaa99606dd5fc7946430e56938afb8d8de857397c873ff1c5cbaa",
+    "20261013083000_n73_n94_compatibility.sql": "ad66218845a2ee3795f4b71aa7364bf0f35365ee8dff6c8ddef68356374a4f00",
+    "20261013090000_n73_distribution_error_contract.sql": "3450a3c3b11b8c0ad5212b5558bb4cdb629f6fe5533c3f424f18dc36cd627e44",
+    "20261013101500_n100_preserve_target_marks.sql": "a682af80aa8d12e34601ab2113c0ffaaf3b849b8eddff2ac63612679d8b4540f",
+    "20261013110000_n71_restore_creation_history.sql": "6508d5a66b575532b29f1d976900260b20115f2d8959f1f1cc34a06738009a9b",
+    "20261013122332_n90_reviewed_grade_import.sql": "f645d975c379dd5ab02e339624d9ae7815eb586abcbe99497152bc97c177f4ed",
+    "n100Baseline": "d13f3c80fe2f1ddc4c2cd9936ced3a9dd08cc28ca0e15e3679ee74adae8b6a88",
+    "20261014090000_n100_automatic_safe_copy.sql": "42aeb3f90c55924a93e5bd8394a1638a0d8bee99a25576299d3fb126980e09dd"
+  },
+  "boot": {
+    "owner": "de5810d7-d47c-46c8-bdec-30d85568a894",
+    "workspace": {
+      "id": "account:97dd0d142ce2698848e7382dfd05b678",
+      "type": "account",
+      "authUserId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+      "databaseName": "rakeezx-user-97dd0d142ce2698848e7382dfd05b678",
+      "ownershipState": "claimed",
+      "syncEligible": true,
+      "leaseGeneration": "[1791997111337,null,{\"protocol\":\"CORE_V2\",\"restoreId\":\"a533c929-c705-4ec0-9f37-503c92f9910a\",\"manifestHash\":\"f303f732927e1b126ab19ac85da1272a15e92e06e91eae00fde0240b23765dfd\",\"completedAt\":1791997111339},null]",
+      "broadcastChannelName": "rakeezx-data:account:97dd0d142ce2698848e7382dfd05b678"
+    },
+    "database": "rakeezx-user-97dd0d142ce2698848e7382dfd05b678",
+    "restore": {
+      "protocol": "CORE_V2",
+      "restoreId": "a533c929-c705-4ec0-9f37-503c92f9910a",
+      "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+      "manifestHash": "f303f732927e1b126ab19ac85da1272a15e92e06e91eae00fde0240b23765dfd",
+      "completedAt": 1791997111339
+    }
+  },
+  "originalFailure": {
+    "message": "N58_EXISTING_TERMS_REQUIRED",
+    "code": "22023"
+  },
+  "before": {
+    "checkpoint": {
+      "owner": "de5810d7-d47c-46c8-bdec-30d85568a894",
+      "workspace": {
+        "id": "account:97dd0d142ce2698848e7382dfd05b678",
+        "type": "account",
+        "authUserId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "databaseName": "rakeezx-user-97dd0d142ce2698848e7382dfd05b678",
+        "ownershipState": "claimed",
+        "syncEligible": true,
+        "leaseGeneration": "[1791997111337,null,{\"protocol\":\"CORE_V2\",\"restoreId\":\"a533c929-c705-4ec0-9f37-503c92f9910a\",\"manifestHash\":\"f303f732927e1b126ab19ac85da1272a15e92e06e91eae00fde0240b23765dfd\",\"completedAt\":1791997111339},null]",
+        "broadcastChannelName": "rakeezx-data:account:97dd0d142ce2698848e7382dfd05b678"
+      },
+      "database": "rakeezx-user-97dd0d142ce2698848e7382dfd05b678",
+      "restore": {
+        "protocol": "CORE_V2",
+        "restoreId": "a533c929-c705-4ec0-9f37-503c92f9910a",
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "manifestHash": "f303f732927e1b126ab19ac85da1272a15e92e06e91eae00fde0240b23765dfd",
+        "completedAt": 1791997111339
+      }
+    },
+    "local": {
+      "sections": [],
+      "teachings": [],
+      "students": [],
+      "enrollments": [],
+      "sessions": [],
+      "slots": [],
+      "scores": [],
+      "attendance": [],
+      "items": [],
+      "scoreSubitems": [],
+      "scoreSubitemCompletions": [],
+      "notes": [],
+      "assignments": [],
+      "submissions": []
+    },
+    "remote": {
+      "sections": [],
+      "teachings": [],
+      "students": [],
+      "enrollments": [],
+      "sessions": [],
+      "slots": [],
+      "scores": [],
+      "attendance": [],
+      "items": [],
+      "scoreSubitems": [],
+      "scoreSubitemCompletions": [],
+      "notes": [],
+      "assignments": [],
+      "submissions": []
+    },
+    "outbox": [
+      {
+        "id": "v2:09b402c3-4d9f-4017-baac-b5b2ad466264",
+        "protocol": "v2",
+        "mutationId": "09b402c3-4d9f-4017-baac-b5b2ad466264",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "terms",
+        "entity": "terms",
+        "recordId": "tm:y:1448-1449:2",
+        "serverRecordId": "tm:y:1448-1449:2",
+        "canonicalId": "tm:y:1448-1449:2",
+        "logicalRecordKey": "terms:tm:y:1448-1449:2",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 2,
+          "name": "الفصل الدراسي الثاني",
+          "start_date": "2027-01-17",
+          "end_date": "2027-07-01",
+          "status": "upcoming"
+        },
+        "localPatch": {
+          "yearId": "y:1448-1449",
+          "calendarId": null,
+          "index": 2,
+          "name": "الفصل الدراسي الثاني",
+          "startDate": "2027-01-17",
+          "endDate": "2027-07-01",
+          "status": "upcoming"
+        },
+        "fields": [
+          "calendar_id",
+          "end_date",
+          "index",
+          "name",
+          "start_date",
+          "status",
+          "year_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "years",
+            "recordId": "y:1448-1449",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111441001,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:0b82cac6-17cb-4223-bed3-b01347969a57",
+        "protocol": "v2",
+        "mutationId": "0b82cac6-17cb-4223-bed3-b01347969a57",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:hybrid",
+        "serverRecordId": "time-profile:default:hybrid",
+        "canonicalId": "time-profile:default:hybrid",
+        "logicalRecordKey": "timeProfiles:time-profile:default:hybrid",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت المدمج",
+          "order": 3,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:30"
+            },
+            {
+              "period": 2,
+              "start": "07:30",
+              "end": "08:00"
+            },
+            {
+              "period": 3,
+              "start": "08:00",
+              "end": "08:30"
+            },
+            {
+              "period": 4,
+              "start": "08:30",
+              "end": "09:00"
+            },
+            {
+              "period": 5,
+              "start": "09:00",
+              "end": "09:30"
+            },
+            {
+              "period": 6,
+              "start": "09:30",
+              "end": "10:00"
+            },
+            {
+              "period": 7,
+              "start": "10:00",
+              "end": "10:30"
+            },
+            {
+              "period": 8,
+              "start": "10:30",
+              "end": "11:00"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "hybrid",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 30,
+              "count": 8,
+              "recess": {
+                "enabled": false
+              }
+            },
+            "remote": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:30"
+              },
+              {
+                "period": 2,
+                "start": "07:30",
+                "end": "08:00"
+              },
+              {
+                "period": 3,
+                "start": "08:00",
+                "end": "08:30"
+              },
+              {
+                "period": 4,
+                "start": "08:30",
+                "end": "09:00"
+              },
+              {
+                "period": 5,
+                "start": "09:00",
+                "end": "09:30"
+              },
+              {
+                "period": 6,
+                "start": "09:30",
+                "end": "10:00"
+              },
+              {
+                "period": 7,
+                "start": "10:00",
+                "end": "10:30"
+              },
+              {
+                "period": 8,
+                "start": "10:30",
+                "end": "11:00"
+              }
+            ]
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت المدمج",
+          "order": 3,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:30"
+            },
+            {
+              "period": 2,
+              "start": "07:30",
+              "end": "08:00"
+            },
+            {
+              "period": 3,
+              "start": "08:00",
+              "end": "08:30"
+            },
+            {
+              "period": 4,
+              "start": "08:30",
+              "end": "09:00"
+            },
+            {
+              "period": 5,
+              "start": "09:00",
+              "end": "09:30"
+            },
+            {
+              "period": 6,
+              "start": "09:30",
+              "end": "10:00"
+            },
+            {
+              "period": 7,
+              "start": "10:00",
+              "end": "10:30"
+            },
+            {
+              "period": 8,
+              "start": "10:30",
+              "end": "11:00"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "hybrid",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 30,
+              "count": 8,
+              "recess": {
+                "enabled": false
+              }
+            },
+            "remote": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:30"
+              },
+              {
+                "period": 2,
+                "start": "07:30",
+                "end": "08:00"
+              },
+              {
+                "period": 3,
+                "start": "08:00",
+                "end": "08:30"
+              },
+              {
+                "period": 4,
+                "start": "08:30",
+                "end": "09:00"
+              },
+              {
+                "period": 5,
+                "start": "09:00",
+                "end": "09:30"
+              },
+              {
+                "period": 6,
+                "start": "09:30",
+                "end": "10:00"
+              },
+              {
+                "period": 7,
+                "start": "10:00",
+                "end": "10:30"
+              },
+              {
+                "period": 8,
+                "start": "10:30",
+                "end": "11:00"
+              }
+            ]
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111445000,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:20b996b9-7012-4d96-9be5-8a5693c0dd66",
+        "protocol": "v2",
+        "mutationId": "20b996b9-7012-4d96-9be5-8a5693c0dd66",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:ramadan",
+        "serverRecordId": "time-profile:default:ramadan",
+        "canonicalId": "time-profile:default:ramadan",
+        "logicalRecordKey": "timeProfiles:time-profile:default:ramadan",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "توقيت رمضان",
+          "order": 2,
+          "periods": [
+            {
+              "period": 1,
+              "start": "09:00",
+              "end": "09:35"
+            },
+            {
+              "period": 2,
+              "start": "09:35",
+              "end": "10:10"
+            },
+            {
+              "period": 3,
+              "start": "10:10",
+              "end": "10:45"
+            },
+            {
+              "period": 4,
+              "start": "10:45",
+              "end": "11:20"
+            },
+            {
+              "period": 5,
+              "start": "11:20",
+              "end": "11:55"
+            },
+            {
+              "period": 6,
+              "start": "11:55",
+              "end": "12:30"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "ramadan",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "09:00",
+              "periodDuration": 35,
+              "count": 6,
+              "recess": {
+                "enabled": false
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "توقيت رمضان",
+          "order": 2,
+          "periods": [
+            {
+              "period": 1,
+              "start": "09:00",
+              "end": "09:35"
+            },
+            {
+              "period": 2,
+              "start": "09:35",
+              "end": "10:10"
+            },
+            {
+              "period": 3,
+              "start": "10:10",
+              "end": "10:45"
+            },
+            {
+              "period": 4,
+              "start": "10:45",
+              "end": "11:20"
+            },
+            {
+              "period": 5,
+              "start": "11:20",
+              "end": "11:55"
+            },
+            {
+              "period": 6,
+              "start": "11:55",
+              "end": "12:30"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "ramadan",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "09:00",
+              "periodDuration": 35,
+              "count": 6,
+              "recess": {
+                "enabled": false
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111444001,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:3d969b44-7459-4264-bf83-934b486d1dfa",
+        "protocol": "v2",
+        "mutationId": "3d969b44-7459-4264-bf83-934b486d1dfa",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "subjects",
+        "entity": "subjects",
+        "recordId": "sub:digital-skills",
+        "serverRecordId": "sub:digital-skills",
+        "canonicalId": "sub:digital-skills",
+        "logicalRecordKey": "subjects:sub:digital-skills",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "المهارات الرقمية",
+          "slug": "digital-skills"
+        },
+        "localPatch": {
+          "name": "المهارات الرقمية",
+          "slug": "digital-skills"
+        },
+        "fields": [
+          "name",
+          "slug"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111443000,
+        "clientUpdatedAt": 1791997111443,
+        "queuedAt": 1791997111443,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:6249acb7-5b63-4307-9ed0-d06b5255ba00",
+        "protocol": "v2",
+        "mutationId": "6249acb7-5b63-4307-9ed0-d06b5255ba00",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "terms",
+        "entity": "terms",
+        "recordId": "tm:y:1448-1449:1",
+        "serverRecordId": "tm:y:1448-1449:1",
+        "canonicalId": "tm:y:1448-1449:1",
+        "logicalRecordKey": "terms:tm:y:1448-1449:1",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 1,
+          "name": "الفصل الدراسي الأول",
+          "start_date": "2026-08-30",
+          "end_date": "2027-01-07",
+          "status": "active"
+        },
+        "localPatch": {
+          "yearId": "y:1448-1449",
+          "calendarId": null,
+          "index": 1,
+          "name": "الفصل الدراسي الأول",
+          "startDate": "2026-08-30",
+          "endDate": "2027-01-07",
+          "status": "active"
+        },
+        "fields": [
+          "calendar_id",
+          "end_date",
+          "index",
+          "name",
+          "start_date",
+          "status",
+          "year_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "years",
+            "recordId": "y:1448-1449",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111441000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:a1e1516f-cc5a-4ef2-b6ab-e3013f0a6dc5",
+        "protocol": "v2",
+        "mutationId": "a1e1516f-cc5a-4ef2-b6ab-e3013f0a6dc5",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:summer",
+        "serverRecordId": "time-profile:default:summer",
+        "canonicalId": "time-profile:default:summer",
+        "logicalRecordKey": "timeProfiles:time-profile:default:summer",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت الصيفي",
+          "order": 0,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:45"
+            },
+            {
+              "period": 2,
+              "start": "07:45",
+              "end": "08:30"
+            },
+            {
+              "period": 3,
+              "start": "08:55",
+              "end": "09:40",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "08:30",
+              "end": "09:15"
+            },
+            {
+              "period": 4,
+              "start": "09:40",
+              "end": "10:25"
+            },
+            {
+              "period": 5,
+              "start": "10:25",
+              "end": "11:10"
+            },
+            {
+              "period": 6,
+              "start": "11:10",
+              "end": "11:55"
+            },
+            {
+              "period": 7,
+              "start": "11:55",
+              "end": "12:40"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "summer",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "06:45",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 5,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت الصيفي",
+          "order": 0,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:45"
+            },
+            {
+              "period": 2,
+              "start": "07:45",
+              "end": "08:30"
+            },
+            {
+              "period": 3,
+              "start": "08:55",
+              "end": "09:40",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "08:30",
+              "end": "09:15"
+            },
+            {
+              "period": 4,
+              "start": "09:40",
+              "end": "10:25"
+            },
+            {
+              "period": 5,
+              "start": "10:25",
+              "end": "11:10"
+            },
+            {
+              "period": 6,
+              "start": "11:10",
+              "end": "11:55"
+            },
+            {
+              "period": 7,
+              "start": "11:55",
+              "end": "12:40"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "summer",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "06:45",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 5,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111443001,
+        "clientUpdatedAt": 1791997111443,
+        "queuedAt": 1791997111443,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:af5f3d9d-326f-4c0e-a103-08c19d248283",
+        "protocol": "v2",
+        "mutationId": "af5f3d9d-326f-4c0e-a103-08c19d248283",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "years",
+        "entity": "years",
+        "recordId": "y:1448-1449",
+        "serverRecordId": "y:1448-1449",
+        "canonicalId": "y:1448-1449",
+        "logicalRecordKey": "years:y:1448-1449",
+        "op": "patch",
+        "baseRevision": 0,
+        "patch": {
+          "calendar_preset_id": "sa-western-1448-1449"
+        },
+        "localPatch": {
+          "calendarPresetId": "sa-western-1448-1449"
+        },
+        "fields": [
+          "calendar_preset_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "terms",
+            "recordId": "tm:y:1448-1449:1",
+            "requiresServerRevision": true
+          },
+          {
+            "store": "terms",
+            "recordId": "tm:y:1448-1449:2",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111442000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:b7e514b6-718c-49b8-8f15-4082386e36db",
+        "protocol": "v2",
+        "mutationId": "b7e514b6-718c-49b8-8f15-4082386e36db",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "years",
+        "entity": "years",
+        "recordId": "y:1448-1449",
+        "serverRecordId": "y:1448-1449",
+        "canonicalId": "y:1448-1449",
+        "logicalRecordKey": "years:y:1448-1449",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "localPatch": {
+          "label": "1448–1449 هـ",
+          "hijriStart": 1448,
+          "hijriEnd": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "fields": [
+          "hijri_end",
+          "hijri_start",
+          "label",
+          "order",
+          "status"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111440000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:fc8e7c0a-0e46-49ff-b763-c1c091c921d8",
+        "protocol": "v2",
+        "mutationId": "fc8e7c0a-0e46-49ff-b763-c1c091c921d8",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:winter",
+        "serverRecordId": "time-profile:default:winter",
+        "canonicalId": "time-profile:default:winter",
+        "logicalRecordKey": "timeProfiles:time-profile:default:winter",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت الشتوي",
+          "order": 1,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:30",
+              "end": "08:15"
+            },
+            {
+              "period": 2,
+              "start": "08:15",
+              "end": "09:00"
+            },
+            {
+              "period": 3,
+              "start": "09:20",
+              "end": "10:05",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "09:00",
+              "end": "09:45"
+            },
+            {
+              "period": 4,
+              "start": "10:05",
+              "end": "10:50"
+            },
+            {
+              "period": 5,
+              "start": "10:50",
+              "end": "11:35"
+            },
+            {
+              "period": 6,
+              "start": "11:35",
+              "end": "12:20"
+            },
+            {
+              "period": 7,
+              "start": "12:20",
+              "end": "13:05"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "winter",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "07:15",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:30",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 0,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت الشتوي",
+          "order": 1,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:30",
+              "end": "08:15"
+            },
+            {
+              "period": 2,
+              "start": "08:15",
+              "end": "09:00"
+            },
+            {
+              "period": 3,
+              "start": "09:20",
+              "end": "10:05",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "09:00",
+              "end": "09:45"
+            },
+            {
+              "period": 4,
+              "start": "10:05",
+              "end": "10:50"
+            },
+            {
+              "period": 5,
+              "start": "10:50",
+              "end": "11:35"
+            },
+            {
+              "period": 6,
+              "start": "11:35",
+              "end": "12:20"
+            },
+            {
+              "period": 7,
+              "start": "12:20",
+              "end": "13:05"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "winter",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "07:15",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:30",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 0,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111444000,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      }
+    ]
+  },
+  "selection": {
+    "entity": "years",
+    "outcome": "applied",
+    "recordId": "y:1448-1449",
+    "canonical": {
+      "id": "y:1448-1449",
+      "label": "1448–1449 هـ",
+      "order": 1448,
+      "status": "active",
+      "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+      "revision": 2,
+      "device_id": "19b34a65-f99c-48a9-8d4a-e0edce9e3cad",
+      "hijri_end": 1449,
+      "created_at": "2026-10-14T16:58:31.489169+00:00",
+      "deleted_at": null,
+      "updated_at": "2026-10-14T16:58:31.971236+00:00",
+      "hijri_start": 1448,
+      "field_revisions": {
+        "label": 1,
+        "order": 1,
+        "status": 1,
+        "identity": 1,
+        "calendar_selection": 2
+      },
+      "client_updated_at": 1791997111451,
+      "calendar_preset_id": "sa-western-1448-1449"
+    },
+    "mutationId": "2fcba33c-091e-4da8-97cb-1a49dfab8f39",
+    "canonicalId": "y:1448-1449",
+    "appliedGroups": [
+      "calendar_selection"
+    ],
+    "resultRevision": 2,
+    "conflictedGroups": []
+  },
+  "after": {
+    "years": [
+      {
+        "id": "y:1448-1449",
+        "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "label": "1448–1449 هـ",
+        "hijri_start": 1448,
+        "hijri_end": 1449,
+        "order": 1448,
+        "status": "active",
+        "created_at": "2026-10-14T16:58:31.489169+00:00",
+        "updated_at": "2026-10-14T16:58:31.971236+00:00",
+        "client_updated_at": 1791997111451,
+        "device_id": "19b34a65-f99c-48a9-8d4a-e0edce9e3cad",
+        "deleted_at": null,
+        "revision": 2,
+        "field_revisions": {
+          "label": 1,
+          "order": 1,
+          "status": 1,
+          "identity": 1,
+          "calendar_selection": 2
+        },
+        "calendar_preset_id": "sa-western-1448-1449"
+      }
+    ],
+    "sections": [
+      {
+        "id": "sec:9774ac92-8442-4033-bdcd-d53aa10b7a14",
+        "owner_id": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "year_id": "y:1448-1449",
+        "grade": 4,
+        "label": "أ",
+        "name": "4/أ",
+        "color": "#0d9488",
+        "order": 0,
+        "created_at": "2026-10-14T16:58:31.899252+00:00",
+        "updated_at": "2026-10-14T16:58:31.899252+00:00",
+        "client_updated_at": 1791997111891,
+        "device_id": "2cf1b7a9-82aa-4e4c-9b6d-afd50ac33dd7",
+        "deleted_at": null,
+        "revision": 1,
+        "field_revisions": {
+          "name": 1,
+          "color": 1,
+          "order": 1,
+          "identity": 1,
+          "lifecycle": 1
+        },
+        "status": "active",
+        "archived_at": null,
+        "archive_date": null
+      }
+    ],
+    "outbox": [
+      {
+        "id": "v2:09b402c3-4d9f-4017-baac-b5b2ad466264",
+        "protocol": "v2",
+        "mutationId": "09b402c3-4d9f-4017-baac-b5b2ad466264",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "terms",
+        "entity": "terms",
+        "recordId": "tm:y:1448-1449:2",
+        "serverRecordId": "tm:y:1448-1449:2",
+        "canonicalId": "tm:y:1448-1449:2",
+        "logicalRecordKey": "terms:tm:y:1448-1449:2",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 2,
+          "name": "الفصل الدراسي الثاني",
+          "start_date": "2027-01-17",
+          "end_date": "2027-07-01",
+          "status": "upcoming"
+        },
+        "localPatch": {
+          "yearId": "y:1448-1449",
+          "calendarId": null,
+          "index": 2,
+          "name": "الفصل الدراسي الثاني",
+          "startDate": "2027-01-17",
+          "endDate": "2027-07-01",
+          "status": "upcoming"
+        },
+        "fields": [
+          "calendar_id",
+          "end_date",
+          "index",
+          "name",
+          "start_date",
+          "status",
+          "year_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "years",
+            "recordId": "y:1448-1449",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111441001,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:0b82cac6-17cb-4223-bed3-b01347969a57",
+        "protocol": "v2",
+        "mutationId": "0b82cac6-17cb-4223-bed3-b01347969a57",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:hybrid",
+        "serverRecordId": "time-profile:default:hybrid",
+        "canonicalId": "time-profile:default:hybrid",
+        "logicalRecordKey": "timeProfiles:time-profile:default:hybrid",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت المدمج",
+          "order": 3,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:30"
+            },
+            {
+              "period": 2,
+              "start": "07:30",
+              "end": "08:00"
+            },
+            {
+              "period": 3,
+              "start": "08:00",
+              "end": "08:30"
+            },
+            {
+              "period": 4,
+              "start": "08:30",
+              "end": "09:00"
+            },
+            {
+              "period": 5,
+              "start": "09:00",
+              "end": "09:30"
+            },
+            {
+              "period": 6,
+              "start": "09:30",
+              "end": "10:00"
+            },
+            {
+              "period": 7,
+              "start": "10:00",
+              "end": "10:30"
+            },
+            {
+              "period": 8,
+              "start": "10:30",
+              "end": "11:00"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "hybrid",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 30,
+              "count": 8,
+              "recess": {
+                "enabled": false
+              }
+            },
+            "remote": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:30"
+              },
+              {
+                "period": 2,
+                "start": "07:30",
+                "end": "08:00"
+              },
+              {
+                "period": 3,
+                "start": "08:00",
+                "end": "08:30"
+              },
+              {
+                "period": 4,
+                "start": "08:30",
+                "end": "09:00"
+              },
+              {
+                "period": 5,
+                "start": "09:00",
+                "end": "09:30"
+              },
+              {
+                "period": 6,
+                "start": "09:30",
+                "end": "10:00"
+              },
+              {
+                "period": 7,
+                "start": "10:00",
+                "end": "10:30"
+              },
+              {
+                "period": 8,
+                "start": "10:30",
+                "end": "11:00"
+              }
+            ]
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت المدمج",
+          "order": 3,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:30"
+            },
+            {
+              "period": 2,
+              "start": "07:30",
+              "end": "08:00"
+            },
+            {
+              "period": 3,
+              "start": "08:00",
+              "end": "08:30"
+            },
+            {
+              "period": 4,
+              "start": "08:30",
+              "end": "09:00"
+            },
+            {
+              "period": 5,
+              "start": "09:00",
+              "end": "09:30"
+            },
+            {
+              "period": 6,
+              "start": "09:30",
+              "end": "10:00"
+            },
+            {
+              "period": 7,
+              "start": "10:00",
+              "end": "10:30"
+            },
+            {
+              "period": 8,
+              "start": "10:30",
+              "end": "11:00"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "hybrid",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 30,
+              "count": 8,
+              "recess": {
+                "enabled": false
+              }
+            },
+            "remote": [
+              {
+                "period": 1,
+                "start": "07:00",
+                "end": "07:30"
+              },
+              {
+                "period": 2,
+                "start": "07:30",
+                "end": "08:00"
+              },
+              {
+                "period": 3,
+                "start": "08:00",
+                "end": "08:30"
+              },
+              {
+                "period": 4,
+                "start": "08:30",
+                "end": "09:00"
+              },
+              {
+                "period": 5,
+                "start": "09:00",
+                "end": "09:30"
+              },
+              {
+                "period": 6,
+                "start": "09:30",
+                "end": "10:00"
+              },
+              {
+                "period": 7,
+                "start": "10:00",
+                "end": "10:30"
+              },
+              {
+                "period": 8,
+                "start": "10:30",
+                "end": "11:00"
+              }
+            ]
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111445000,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:20b996b9-7012-4d96-9be5-8a5693c0dd66",
+        "protocol": "v2",
+        "mutationId": "20b996b9-7012-4d96-9be5-8a5693c0dd66",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:ramadan",
+        "serverRecordId": "time-profile:default:ramadan",
+        "canonicalId": "time-profile:default:ramadan",
+        "logicalRecordKey": "timeProfiles:time-profile:default:ramadan",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "توقيت رمضان",
+          "order": 2,
+          "periods": [
+            {
+              "period": 1,
+              "start": "09:00",
+              "end": "09:35"
+            },
+            {
+              "period": 2,
+              "start": "09:35",
+              "end": "10:10"
+            },
+            {
+              "period": 3,
+              "start": "10:10",
+              "end": "10:45"
+            },
+            {
+              "period": 4,
+              "start": "10:45",
+              "end": "11:20"
+            },
+            {
+              "period": 5,
+              "start": "11:20",
+              "end": "11:55"
+            },
+            {
+              "period": 6,
+              "start": "11:55",
+              "end": "12:30"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "ramadan",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "09:00",
+              "periodDuration": 35,
+              "count": 6,
+              "recess": {
+                "enabled": false
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "توقيت رمضان",
+          "order": 2,
+          "periods": [
+            {
+              "period": 1,
+              "start": "09:00",
+              "end": "09:35"
+            },
+            {
+              "period": 2,
+              "start": "09:35",
+              "end": "10:10"
+            },
+            {
+              "period": 3,
+              "start": "10:10",
+              "end": "10:45"
+            },
+            {
+              "period": 4,
+              "start": "10:45",
+              "end": "11:20"
+            },
+            {
+              "period": 5,
+              "start": "11:20",
+              "end": "11:55"
+            },
+            {
+              "period": 6,
+              "start": "11:55",
+              "end": "12:30"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "ramadan",
+              "gap": 0,
+              "assembly": {
+                "enabled": false
+              },
+              "firstPeriodStart": "09:00",
+              "periodDuration": 35,
+              "count": 6,
+              "recess": {
+                "enabled": false
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111444001,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:3d969b44-7459-4264-bf83-934b486d1dfa",
+        "protocol": "v2",
+        "mutationId": "3d969b44-7459-4264-bf83-934b486d1dfa",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "subjects",
+        "entity": "subjects",
+        "recordId": "sub:digital-skills",
+        "serverRecordId": "sub:digital-skills",
+        "canonicalId": "sub:digital-skills",
+        "logicalRecordKey": "subjects:sub:digital-skills",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "المهارات الرقمية",
+          "slug": "digital-skills"
+        },
+        "localPatch": {
+          "name": "المهارات الرقمية",
+          "slug": "digital-skills"
+        },
+        "fields": [
+          "name",
+          "slug"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111443000,
+        "clientUpdatedAt": 1791997111443,
+        "queuedAt": 1791997111443,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:6249acb7-5b63-4307-9ed0-d06b5255ba00",
+        "protocol": "v2",
+        "mutationId": "6249acb7-5b63-4307-9ed0-d06b5255ba00",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "terms",
+        "entity": "terms",
+        "recordId": "tm:y:1448-1449:1",
+        "serverRecordId": "tm:y:1448-1449:1",
+        "canonicalId": "tm:y:1448-1449:1",
+        "logicalRecordKey": "terms:tm:y:1448-1449:1",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "year_id": "y:1448-1449",
+          "calendar_id": null,
+          "index": 1,
+          "name": "الفصل الدراسي الأول",
+          "start_date": "2026-08-30",
+          "end_date": "2027-01-07",
+          "status": "active"
+        },
+        "localPatch": {
+          "yearId": "y:1448-1449",
+          "calendarId": null,
+          "index": 1,
+          "name": "الفصل الدراسي الأول",
+          "startDate": "2026-08-30",
+          "endDate": "2027-01-07",
+          "status": "active"
+        },
+        "fields": [
+          "calendar_id",
+          "end_date",
+          "index",
+          "name",
+          "start_date",
+          "status",
+          "year_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "years",
+            "recordId": "y:1448-1449",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111441000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:a1e1516f-cc5a-4ef2-b6ab-e3013f0a6dc5",
+        "protocol": "v2",
+        "mutationId": "a1e1516f-cc5a-4ef2-b6ab-e3013f0a6dc5",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:summer",
+        "serverRecordId": "time-profile:default:summer",
+        "canonicalId": "time-profile:default:summer",
+        "logicalRecordKey": "timeProfiles:time-profile:default:summer",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت الصيفي",
+          "order": 0,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:45"
+            },
+            {
+              "period": 2,
+              "start": "07:45",
+              "end": "08:30"
+            },
+            {
+              "period": 3,
+              "start": "08:55",
+              "end": "09:40",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "08:30",
+              "end": "09:15"
+            },
+            {
+              "period": 4,
+              "start": "09:40",
+              "end": "10:25"
+            },
+            {
+              "period": 5,
+              "start": "10:25",
+              "end": "11:10"
+            },
+            {
+              "period": 6,
+              "start": "11:10",
+              "end": "11:55"
+            },
+            {
+              "period": 7,
+              "start": "11:55",
+              "end": "12:40"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "summer",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "06:45",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 5,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت الصيفي",
+          "order": 0,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:00",
+              "end": "07:45"
+            },
+            {
+              "period": 2,
+              "start": "07:45",
+              "end": "08:30"
+            },
+            {
+              "period": 3,
+              "start": "08:55",
+              "end": "09:40",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "08:30",
+              "end": "09:15"
+            },
+            {
+              "period": 4,
+              "start": "09:40",
+              "end": "10:25"
+            },
+            {
+              "period": 5,
+              "start": "10:25",
+              "end": "11:10"
+            },
+            {
+              "period": 6,
+              "start": "11:10",
+              "end": "11:55"
+            },
+            {
+              "period": 7,
+              "start": "11:55",
+              "end": "12:40"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "summer",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "06:45",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:00",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 5,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111443001,
+        "clientUpdatedAt": 1791997111443,
+        "queuedAt": 1791997111443,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:af5f3d9d-326f-4c0e-a103-08c19d248283",
+        "protocol": "v2",
+        "mutationId": "af5f3d9d-326f-4c0e-a103-08c19d248283",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "years",
+        "entity": "years",
+        "recordId": "y:1448-1449",
+        "serverRecordId": "y:1448-1449",
+        "canonicalId": "y:1448-1449",
+        "logicalRecordKey": "years:y:1448-1449",
+        "op": "patch",
+        "baseRevision": 0,
+        "patch": {
+          "calendar_preset_id": "sa-western-1448-1449"
+        },
+        "localPatch": {
+          "calendarPresetId": "sa-western-1448-1449"
+        },
+        "fields": [
+          "calendar_preset_id"
+        ],
+        "groups": [],
+        "dependencies": [
+          {
+            "store": "terms",
+            "recordId": "tm:y:1448-1449:1",
+            "requiresServerRevision": true
+          },
+          {
+            "store": "terms",
+            "recordId": "tm:y:1448-1449:2",
+            "requiresServerRevision": true
+          }
+        ],
+        "sequence": 1791997111442000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:b7e514b6-718c-49b8-8f15-4082386e36db",
+        "protocol": "v2",
+        "mutationId": "b7e514b6-718c-49b8-8f15-4082386e36db",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "years",
+        "entity": "years",
+        "recordId": "y:1448-1449",
+        "serverRecordId": "y:1448-1449",
+        "canonicalId": "y:1448-1449",
+        "logicalRecordKey": "years:y:1448-1449",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "label": "1448–1449 هـ",
+          "hijri_start": 1448,
+          "hijri_end": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "localPatch": {
+          "label": "1448–1449 هـ",
+          "hijriStart": 1448,
+          "hijriEnd": 1449,
+          "order": 1448,
+          "status": "active"
+        },
+        "fields": [
+          "hijri_end",
+          "hijri_start",
+          "label",
+          "order",
+          "status"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111440000,
+        "clientUpdatedAt": 1791997111438,
+        "queuedAt": 1791997111438,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      },
+      {
+        "id": "v2:fc8e7c0a-0e46-49ff-b763-c1c091c921d8",
+        "protocol": "v2",
+        "mutationId": "fc8e7c0a-0e46-49ff-b763-c1c091c921d8",
+        "deviceId": "952828c3-4233-4987-9481-86a1e0bf4d8d",
+        "store": "timeProfiles",
+        "entity": "time_profiles",
+        "recordId": "time-profile:default:winter",
+        "serverRecordId": "time-profile:default:winter",
+        "canonicalId": "time-profile:default:winter",
+        "logicalRecordKey": "timeProfiles:time-profile:default:winter",
+        "op": "create",
+        "baseRevision": 0,
+        "patch": {
+          "name": "التوقيت الشتوي",
+          "order": 1,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:30",
+              "end": "08:15"
+            },
+            {
+              "period": 2,
+              "start": "08:15",
+              "end": "09:00"
+            },
+            {
+              "period": 3,
+              "start": "09:20",
+              "end": "10:05",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "09:00",
+              "end": "09:45"
+            },
+            {
+              "period": 4,
+              "start": "10:05",
+              "end": "10:50"
+            },
+            {
+              "period": 5,
+              "start": "10:50",
+              "end": "11:35"
+            },
+            {
+              "period": 6,
+              "start": "11:35",
+              "end": "12:20"
+            },
+            {
+              "period": 7,
+              "start": "12:20",
+              "end": "13:05"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "winter",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "07:15",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:30",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 0,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "active_from": null,
+          "active_to": null
+        },
+        "localPatch": {
+          "name": "التوقيت الشتوي",
+          "order": 1,
+          "periods": [
+            {
+              "period": 1,
+              "start": "07:30",
+              "end": "08:15"
+            },
+            {
+              "period": 2,
+              "start": "08:15",
+              "end": "09:00"
+            },
+            {
+              "period": 3,
+              "start": "09:20",
+              "end": "10:05",
+              "grades": [
+                4
+              ]
+            },
+            {
+              "period": 3,
+              "start": "09:00",
+              "end": "09:45"
+            },
+            {
+              "period": 4,
+              "start": "10:05",
+              "end": "10:50"
+            },
+            {
+              "period": 5,
+              "start": "10:50",
+              "end": "11:35"
+            },
+            {
+              "period": 6,
+              "start": "11:35",
+              "end": "12:20"
+            },
+            {
+              "period": 7,
+              "start": "12:20",
+              "end": "13:05"
+            }
+          ],
+          "overrides": {
+            "config": {
+              "type": "winter",
+              "gap": 0,
+              "assembly": {
+                "enabled": true,
+                "start": "07:15",
+                "duration": 15
+              },
+              "firstPeriodStart": "07:30",
+              "periodDuration": 45,
+              "count": 7,
+              "recess": {
+                "enabled": true,
+                "duration": 20,
+                "transition": 0,
+                "rules": [
+                  {
+                    "grades": [
+                      4
+                    ],
+                    "afterPeriod": 2
+                  },
+                  {
+                    "grades": [
+                      5,
+                      6
+                    ],
+                    "afterPeriod": 3
+                  }
+                ]
+              }
+            }
+          },
+          "activeFrom": null,
+          "activeTo": null
+        },
+        "fields": [
+          "active_from",
+          "active_to",
+          "name",
+          "order",
+          "overrides",
+          "periods"
+        ],
+        "groups": [],
+        "dependencies": [],
+        "sequence": 1791997111444000,
+        "clientUpdatedAt": 1791997111444,
+        "queuedAt": 1791997111444,
+        "state": "pending",
+        "attemptCount": 0,
+        "envelopeLocked": false,
+        "lastError": null,
+        "blockedReason": null,
+        "ownerId": "de5810d7-d47c-46c8-bdec-30d85568a894",
+        "bootstrap": true
+      }
+    ]
+  },
+  "counterexampleConfirmed": true,
+  "hold": true
+}

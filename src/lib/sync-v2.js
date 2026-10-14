@@ -741,6 +741,8 @@ export function createSyncV2Engine({
     if (workspace?.type !== 'account' || !access.allowed) throw ownershipBlockedError(access);
     return workspace.authUserId;
   }
+  const pendingFoundationGroup = (rows, mutation) => rows.some(a => a.protocol === 'N58_EMPTY_V1' &&
+    a.state !== 'verified' && a.ownerId === mutation?.ownerId && a.review?.originals?.some(r => r.id === mutation.id));
   async function reviewSessionRepairs() {
     const ownerId = repairOwner();
     const current = Object.fromEntries(await Promise.all(REPAIR_STORES.map(async name => [name, await database.getAll(name)])));
@@ -1027,6 +1029,7 @@ export function createSyncV2Engine({
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        if (pendingFoundationGroup(current.outbox, existing)) throw Object.assign(Error('Atomic calendar repair owns this request'), { code: 'N58_REPAIR_PENDING' });
         if (existing.sessionRepairOf) {
           if (repairOwner() !== existing.ownerId || expectedWorkspace && ownershipGuard.getWorkspace() !== expectedWorkspace) throw Error('Repair owner/workspace changed');
           const audit = current.outbox.find(x => x.id === repairAuditId(existing.sessionRepairOf));
@@ -1068,6 +1071,7 @@ export function createSyncV2Engine({
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        if (pendingFoundationGroup(current.outbox, existing)) return { outbox: operationBatch() };
         return {
           outbox: {
             put: [{
@@ -1092,6 +1096,7 @@ export function createSyncV2Engine({
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        if (pendingFoundationGroup(current.outbox, existing)) return { outbox: operationBatch() };
         return { outbox: { put: [{ ...existing, state: 'blocked', blockedReason: reason }], remove: [] } };
       },
     });
@@ -1421,6 +1426,7 @@ export function createSyncV2Engine({
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        if (pendingFoundationGroup(current.outbox, existing)) return { outbox: operationBatch() };
         return {
           outbox: {
             put: [{
@@ -1642,6 +1648,9 @@ export function createSyncV2Engine({
     const result = { attempted: 0, acknowledged: 0, failed: 0, blocked: 0 };
 
     for (const original of snapshot) {
+      // Pending atomic N58 repairs own only their exact reviewed group. Preserve
+      // those envelopes unchanged until the stored receipt is reconciled.
+      if (pendingFoundationGroup(await database.getAll('outbox'), original)) { result.blocked++; continue; }
       if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
       if (result.attempted >= maxMutations) break;
       if (original.state === 'rejected') {
@@ -2039,6 +2048,7 @@ export function createSyncV2Engine({
       let mutation;
       try { mutation = await markAttempt(live, repairWorkspace); }
       catch (error) {
+        if (error.code === 'N58_REPAIR_PENDING') { result.blocked++; continue; }
         if (!live.sessionRepairOf) throw error;
         if (repairContextCurrent()) await markDependencyBlock(live, error.message);
         result.blocked++; continue;
@@ -2063,11 +2073,16 @@ export function createSyncV2Engine({
 
   async function reconcilePull(store, rows) {
     schemaFor(store);
+    if (['years','terms','calendars','calendarDays'].includes(store) && (await database.getAll('outbox')).some(a =>
+        a.protocol === 'N58_EMPTY_V1' && a.state !== 'verified' && a.ownerId === currentAuthenticatedUserId())) return;
     const canonicalRows = Array.isArray(rows) ? rows : [];
     await database.applyBatch({ [store]: {}, outbox: {} }, {
       prepare(current) {
         const recordWrites = operationBatch();
         const outboxWrites = operationBatch();
+        if (['years','terms','calendars','calendarDays'].includes(store) && current.outbox.some(a =>
+            a.protocol === 'N58_EMPTY_V1' && a.state !== 'verified' && a.ownerId === currentAuthenticatedUserId()))
+          return { [store]: recordWrites, outbox: outboxWrites };
         let workingOutbox = current.outbox;
         for (const row of canonicalRows) {
           const canonical = decodeSyncV2Canonical(store, row);

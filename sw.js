@@ -68,6 +68,7 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/calendar-recovery.js',
   './src/lib/teacher-setup-import.js',
   './src/lib/notification-center.js',
   './src/lib/notification-events.js',
