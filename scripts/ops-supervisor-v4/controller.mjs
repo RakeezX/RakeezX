@@ -777,8 +777,9 @@ export class Controller {
     // A real named phase lease is a scheduling condition, never a provider/Auth denial.
     if (result?.state !== 'BLOCKED' || result.taskId !== task.id || result.runId !== task.attempt?.runId
       || !['external', 'environment', 'implementation'].includes(result.blockerType)
-      || result.checks?.some(c => c.status === 'FAIL')
-      || !/browser (?:phase )?lease is held by another active task/i.test(result.blocker ?? '')) return false;
+      || result.checks?.some(c => c.status === 'FAIL' && !(
+        !(task.requiredChecks??[]).includes(c.name) && /_browser_phase_lease$/.test(c.name??'') && /BUSY browser; the recorded owner must finish or be factually recovered/.test(c.evidence??'')))
+      || !/browser (?:phase )?lease (?:is held by another active task|remained owned elsewhere)/i.test(result.blocker ?? '')) return false;
     if (!task.lastWorkerReap?.exactAbsence || task.lastWorkerReap.runId !== result.runId
       || workerProcesses(task, null, processes).length || task.lastWorkerReap.owners?.some(o => processes.some(p => identityMatches(p, o)))) return false;
     if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha
@@ -786,10 +787,20 @@ export class Controller {
       || !result.changedPaths?.every(f => allowed(f, task.allowedPaths))) return false;
     const evidence = (result.checks ?? []).map(c => c.evidence).join(' ');
     const ownerMatch = /owned by task ([a-z0-9._-]+) \(token ([a-f0-9-]{36})\)/i.exec(evidence);
-    if (!ownerMatch) return false;
-    const holder = this.jobs.find(t => t.id === ownerMatch[1] && t.activationId === task.activationId && t.attempt?.runId === ownerMatch[2]);
-    if (!holder || holder.id === task.id) return false;
     const lease = await readJson(path.join(this.runtime, 'leases', 'browser.json'));
+    const namedAcquisitionFailure=(result.checks??[]).some(c=>c.status==='FAIL' && !(task.requiredChecks??[]).includes(c.name)
+      && /_browser_phase_lease$/.test(c.name??'') && /BUSY browser; the recorded owner must finish or be factually recovered/.test(c.evidence??''));
+    let holder;
+    if(ownerMatch) holder=this.jobs.find(t=>t.id===ownerMatch[1]&&t.activationId===task.activationId&&t.attempt?.runId===ownerMatch[2]);
+    else {
+      // Read actual lease identity, never infer ownership from untrusted prose or treat Product FAIL as success.
+      if(!namedAcquisitionFailure || lease?.version!==2 || lease.resource!=='browser' || lease.activationId!==task.activationId || lease.owner?.type!=='worker')return false;
+      holder=this.jobs.find(t=>t.id===lease.taskId&&t.activationId===task.activationId&&t.status==='running'&&t.attempt?.runId===lease.owner.token);
+      const ticks=value=>{const m=/^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,7}))?(Z|[+-]\d\d:\d\d)$/.exec(value??'');if(!m||!Number.isFinite(Date.parse(m[1]+m[3])))return null;return BigInt(Date.parse(m[1]+m[3]))*10000n+BigInt((m[2]??'').padEnd(7,'0'));};
+      const ownerBirth=ticks(lease.owner.createdAt);
+      if(!holder || ownerBirth===null || !processes.some(p=>p.pid===lease.owner.pid&&ticks(p.createdAt)===ownerBirth))return false;
+    }
+    if (!holder || holder.id === task.id) return false;
     if (lease && (lease.version !== 2 || lease.taskId !== holder.id || lease.activationId !== task.activationId
       || lease.owner?.type !== 'worker' || lease.owner.token !== holder.attempt.runId)) return false;
     if (!this.testOnly) {
@@ -805,7 +816,7 @@ export class Controller {
   }
   async resolveResourceWaits(processes) {
     for (const task of this.jobs.filter(t => t.status === 'blocked' && !t.resourceWait)) {
-      if (!/browser (?:phase )?lease is held by another active task/i.test(task.lastFailure ?? '')) continue;
+      if (!/browser (?:phase )?lease (?:is held by another active task|remained owned elsewhere)/i.test(task.lastFailure ?? '')) continue;
       const result = task.attempt ? await readJson(task.attempt.outputPath) : null;
       await this.recognizeResourceWait(task, result, processes);
     }
