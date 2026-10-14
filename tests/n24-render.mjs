@@ -11,8 +11,8 @@ const onlyScopes=process.argv[2]==='scopes';
 const onlyWide=process.argv[2]==='wide';
 const onlySurface=['grades','detailed','roster','execution'].includes(process.argv[2])?process.argv[2]:null;
 const phase=onlyMobile||onlyScopes||onlyWide||onlySurface?'after':process.argv[2] ?? 'after', root=resolve('.'), output=`test-results/n24-alignment-${phase}`;
-const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n24-report-alignment-20261014.json';
-const runId='ff5398d7-5978-4777-b41f-999a2f91e740';
+const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n24-screen-print-metadata-20261014.json';
+const runId='360afd3e-7b6f-4d7f-98ae-90c245666b2f';
 const server=createServer(async(req,res)=>{
   try {
     const pathname=new URL(req.url,'http://127.0.0.1').pathname;
@@ -50,6 +50,26 @@ try {
     if(surface.tab)await page.locator(`[data-act="tab"][data-tab="${surface.tab}"]`).click();
     if(surface.detailed)await page.locator('[data-act="att-mode"][data-mode="detailed"]').click();
     await page.evaluate(()=>document.fonts.ready);
+    if (['grades','detailed'].includes(surface.name)) {
+      const preview = page.locator('[data-act="toggle-a4"]');
+      await preview.click();
+      const alignment = await page.locator('.a4-sheet').evaluate(root => {
+        const rect = selector => { const r=root.querySelector(selector).getBoundingClientRect(); return {left:r.left,right:r.right,center:(r.left+r.right)/2}; };
+        const title=rect('.printhead__title'), header=rect('.printhead__top'), timestamp=rect('.printhead__timestamp');
+        const metadata=[...root.querySelectorAll('.printhead__meta')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,center:(r.left+r.right)/2};});
+        const cards=[...root.querySelectorAll('.report-closing .print-signatures > div')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,center:(r.left+r.right)/2,text:el.textContent.trim()};});
+        const footer=root.querySelector('.report-closing .print-report__footer'); const fr=footer.getBoundingClientRect();
+        const link=footer.querySelector('a');
+        return {title,header,timestamp,metadata,cards,footer:{center:(fr.left+fr.right)/2,textAlign:getComputedStyle(footer).textAlign,href:link?.getAttribute('href')},headerText:root.querySelector('.printhead__details').innerText};
+      });
+      assert.ok(Math.abs(alignment.title.center-alignment.header.center)<3,'centered preview title');
+      assert.ok(alignment.timestamp.left < alignment.header.left+8,'left aligned print date in existing details row');
+      assert.ok(alignment.metadata.every(m=>Math.abs(m.center-alignment.header.center)<4),'centered balanced metadata groups');
+      assert.ok(alignment.cards.length>=1 && alignment.cards.every(c=>Math.abs(c.center-(c.left+c.right)/2)<1 && c.text.length>0),'centered screen preview signature cards');
+      assert.equal(alignment.footer.href,'https://rakeezx.com/'); assert.equal(alignment.footer.textAlign,'center');
+      assert.match(alignment.headerText,/المدرسة/); assert.match(alignment.headerText,/الرياضيات/);
+      await page.locator('[data-act="toggle-a4"]').click();
+    }
     const data=await page.evaluate(async()=>{
       const store=await import('/src/store.js');
       const {studentTotal}=await import('/src/models.js');
@@ -78,6 +98,18 @@ try {
     assert.equal(await page.locator('.report-workspace__head').isVisible(),false);
     assert.equal(await page.locator('.report-filters:visible,.report-toolbar:visible,.report-actions:visible').count(),0);
     assert.equal(await page.locator('.print-report button:visible,.print-report input:visible,.print-report select:visible,.n34-help-launcher:visible,.app-status-strip:visible').count(),0);
+    if (['grades','detailed'].includes(surface.name)) {
+      const printLayout=await page.locator('.report-document').evaluate(root=>({
+        title:getComputedStyle(root.querySelector('.printhead__title')).textAlign,
+        timestamp:getComputedStyle(root.querySelector('.printhead__timestamp')).textAlign,
+        signatures:[...root.querySelectorAll('.report-closing .print-signatures > div')].map(el=>getComputedStyle(el).textAlign),
+        footer:getComputedStyle(root.querySelector('.report-closing .print-report__footer')).textAlign,
+        href:root.querySelector('.report-closing .print-report__footer a')?.href,
+      }));
+      assert.equal(printLayout.title,'center'); assert.ok(['left','start'].includes(printLayout.timestamp));
+      assert.ok(printLayout.signatures.length && printLayout.signatures.every(v=>v==='center'));
+      assert.equal(printLayout.footer,'center'); assert.equal(printLayout.href,'https://rakeezx.com/');
+    }
     if(phase==='after') {
       assert.equal(await page.locator('.printhead__date').count(),0);
       assert.equal(await page.locator('.print-report__footer').count(),1);
@@ -131,7 +163,7 @@ try {
     await seed(page,{count:8,long:true,sessions:16,distinct:true});
     await page.goto(url+'/#/teaching/print-teaching/reports');await readySurface(page,{tab:'grades'});
     await page.locator('[data-change="sort"]').selectOption('roll');
-    const links=await page.locator('.report-document tbody a').evaluateAll(els=>els.map(el=>el.getAttribute('href')));
+    const links=await page.locator('.report-document tbody a[href^="#/"]').evaluateAll(els=>els.map(el=>el.getAttribute('href')));
     assert.deepEqual(links,Array.from({length:8},(_,i)=>`#/student/print-student-${i}`));
     assert.equal(await page.locator('.report-document input,.report-document button').count(),0);
     await page.locator('[data-act="tab"][data-tab="attendance"]').click();
@@ -173,6 +205,13 @@ try {
      // reachability after the responsive app's scheduled repaint.
      await page.locator('[data-act="print"],[data-act="n70-print"]').last().click({trial:true});
      assert.equal(await page.locator('[data-act="print"],[data-act="n70-print"]').last().isVisible(),true);
+     if(width===390&&surface.name==='grades') {
+       await page.locator('[data-act="toggle-a4"]').click();
+       const footer=await page.locator('.a4-sheet .print-report__footer').evaluate(el=>({justify:getComputedStyle(el).justifyContent,href:el.querySelector('a')?.href}));
+       assert.equal(footer.justify,'center'); assert.equal(footer.href,'https://rakeezx.com/');
+       await page.screenshot({path:output+'/390-grades-a4-preview.png',fullPage:false});
+       await page.locator('[data-act="toggle-a4"]').click();
+     }
      await page.screenshot({path:output+'/'+width+'-'+surface.name+'.png',fullPage:false});
      console.log('PASS mobile '+width+' '+surface.name);
     }

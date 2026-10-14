@@ -63,7 +63,7 @@ export function reportPageSetup({ wide = false } = {}) {
   return raw(`<style data-report-page-size>
     .printhead__top { position: relative; text-align: center; }
     .printhead__title { text-align: center; }
-    .printhead__timestamp { margin-top: 3px; color: #718287; font-size: 9px; text-align: center; }
+    .printhead__timestamp { margin-top: 3px; color: #718287; font-size: 9px; text-align: left; }
     @media print {
       @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; }
       .printhead__timestamp { font-size: 8pt; }
@@ -75,7 +75,7 @@ export function reportPageSetup({ wide = false } = {}) {
 export function reportFooter() {
   return html`
     <div class="print-report__footer" dir="rtl">
-      <span>رَكيز المعلم</span>
+      <a href="https://rakeezx.com/" target="_blank" rel="noopener noreferrer">رَكيز المعلم</a>
     </div>
   `;
 }
