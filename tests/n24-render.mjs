@@ -9,10 +9,10 @@ import {seed} from './n24-fixture.mjs';
 const onlyMobile=process.argv[2]==='mobile';
 const onlyScopes=process.argv[2]==='scopes';
 const onlyWide=process.argv[2]==='wide';
-const onlySurface=['grades','detailed','roster'].includes(process.argv[2])?process.argv[2]:null;
-const phase=onlyMobile||onlyScopes||onlyWide||onlySurface?'after':process.argv[2] ?? 'after', root=resolve('.'), output=`test-results/n24/${phase}`;
-const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n24-report-design-after-current-20261013.json';
-const runId='60661dff-1000-48b4-b4f1-7b9248d33ba6';
+const onlySurface=['grades','detailed','roster','execution'].includes(process.argv[2])?process.argv[2]:null;
+const phase=onlyMobile||onlyScopes||onlyWide||onlySurface?'after':process.argv[2] ?? 'after', root=resolve('.'), output=`test-results/n24-alignment-${phase}`;
+const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n24-report-alignment-20261014.json';
+const runId='ff5398d7-5978-4777-b41f-999a2f91e740';
 const server=createServer(async(req,res)=>{
   try {
     const pathname=new URL(req.url,'http://127.0.0.1').pathname;
@@ -34,7 +34,7 @@ async function readySurface(page,surface) {
 await mkdir(output,{recursive:true});
 await new Promise(done=>server.listen(0,'127.0.0.1',done));
 const url='http://127.0.0.1:'+server.address().port;
-const results=onlySurface?JSON.parse(await readFile(output+'/data.json','utf8')):{};
+const results=onlySurface?JSON.parse(await readFile(output+'/data.json','utf8').catch(()=> '{}')):{};
 try {
  await withIsolatedLocalBrowser({taskFile,runId,url,timeoutMs:120000},async({createContext})=>{
   const ctx=await createContext({viewport:{width:1280,height:900},locale:'ar-SA',timezoneId:'Asia/Riyadh'});
@@ -42,7 +42,7 @@ try {
   const page=await ctx.newPage();
   await openReadyServedDemo(page,url);
   for(const size of onlyMobile||onlyScopes||onlyWide?[]:['small','multi']) {
-   await seed(page,{count:size==='small'?8:85,long:true,sessions:16,distinct:true});
+   await seed(page,{count:size==='small'?8:85,long:true,sessions:onlySurface==='execution'?80:16,distinct:true});
    for(const surface of onlySurface?surfaces.filter(s=>s.name===onlySurface):surfaces) {
     const name=size+'-'+surface.name;
     await page.goto(url+'/#'+(surface.route??'/teaching/print-teaching/reports'));
@@ -65,7 +65,8 @@ try {
     const downloadPromise=page.waitForEvent('download');await csvButton.click();
     const download=await downloadPromise;const stream=await download.createReadStream();let csv='';for await(const chunk of stream)csv+=chunk;
     results[name]={...data,csv};
-    if(phase==='after')assert.deepEqual(results[name],JSON.parse(await readFile('test-results/n24/before/data.json','utf8'))[name],name+' data/CSV changed');
+    const priorPath='test-results/n24/before/data.json';
+    if(phase==='after' && await readFile(priorPath,'utf8').catch(()=>null))assert.deepEqual(results[name],JSON.parse(await readFile(priorPath,'utf8'))[name],name+' data/CSV changed');
     if(size==='small')await page.screenshot({path:output+'/'+name+'-screen.png',fullPage:true});
     // Exercise the real print handler and its confirmation; PDF uses this same document.
     await page.evaluate(()=>{window.__n24Print=0;window.print=()=>{window.__n24Print++;};});

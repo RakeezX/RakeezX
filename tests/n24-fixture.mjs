@@ -21,7 +21,7 @@ export async function seed(page, { count = 30, long = false, sessions = 1, disti
       sessions: [{ id: 'print-session', teachingId: 'print-teaching', slotId: 'print-slot', date: '2026-08-20', weekday: 0, period: 1, startTime: '07:00', endTime: '07:45' }], attendance,
     });
     if (sessions > 1 || distinct) {
-      const dated = Array.from({length:sessions}, (_,i) => ({id:`print-session-${i}`, teachingId:'print-teaching', slotId:'print-slot', date:`2026-08-${String(i+1).padStart(2,'0')}`, weekday:i%7, period:1, startTime:'07:00', endTime:'07:45'}));
+      const dated = Array.from({length:sessions}, (_,i) => ({id:`print-session-${i}`, teachingId:'print-teaching', slotId:'print-slot', date:new Date(Date.UTC(2026,7,i+1)).toISOString().slice(0,10), weekday:i%7, period:1, startTime:'07:00', endTime:'07:45'}));
       await store.save({
         sessions: dated,
         attendance: dated.flatMap((session,j) => students.map((student,i) => ({id:`print-att-${j}-${i}`,studentId:student.id,sessionId:session.id,teachingId:'print-teaching',date:session.date,status:['present','late','absent','excused'][(i+j)%4]}))),

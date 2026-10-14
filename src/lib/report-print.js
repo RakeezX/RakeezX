@@ -24,9 +24,7 @@ export function markDemoSharedText(lines) {
 }
 
 export function reportHeader({ title, profile, year, term, section, subject, period, printedOn = todayISO() }) {
-  const presentation = getAccountPresentation(profile?.teacherForm);
   const identity = [
-    profile?.teacherName && [presentation.teacherLabel, profile.teacherName],
     profile?.schoolName && ['المدرسة', profile.schoolName],
   ].filter(Boolean);
   const context = [
@@ -52,8 +50,9 @@ export function reportHeader({ title, profile, year, term, section, subject, per
         ${demoOutputMarker()}
       </div>
       <div class="printhead__details">
-        ${metadata([...identity, ...academic, ['تاريخ الطباعة', fmtDateFull(printedOn)]], 'printhead__meta--identity')}
+        ${metadata([...identity, ...academic], 'printhead__meta--identity')}
         ${metadata(context, 'printhead__meta--context')}
+        <div class="printhead__timestamp">تاريخ الطباعة: ${visibleLatinDigits(fmtDateFull(printedOn))}</div>
       </div>
     </header>
   `;
@@ -61,7 +60,16 @@ export function reportHeader({ title, profile, year, term, section, subject, per
 
 /** Keeps the browser's native print/save-PDF output aligned with the report width. */
 export function reportPageSetup({ wide = false } = {}) {
-  return raw(`<style data-report-page-size>@media print { @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; } }</style>`);
+  return raw(`<style data-report-page-size>
+    .printhead__top { position: relative; text-align: center; }
+    .printhead__title { text-align: center; }
+    .printhead__timestamp { margin-top: 3px; color: #718287; font-size: 9px; text-align: center; }
+    @media print {
+      @page { size: A4 ${wide ? 'landscape' : 'portrait'}; margin: ${wide ? '10mm' : '12mm'}; }
+      .printhead__timestamp { font-size: 8pt; }
+      .print-signatures > div { text-align: center; justify-items: center; }
+    }
+  </style>`);
 }
 
 export function reportFooter() {
