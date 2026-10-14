@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-live-inapp-center-20261014",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": 5,
+      "scopeKey": "n44-account-local-notifications",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "objective": "Deliver the useful actual IN-APP slice of N44 now, authorized by PO's 'اللي تشوفه مناسب سويه', instead of another disconnected notification Demo. Reuse current notification center model/renderer from the preserved prototype at .worktrees/v5-n44-demo-current-main-20261012 after verifying its sourceManifest, not its old app branch. Connect a calm bell/notification center to actual current teacher-owned in-app state: upcoming/current lesson and dated subitems due soon, using existing eligibility/date/clock contracts. Support read/unread, dismiss ordinary notices, expiry/dedup and safe in-app deep links. No made-up notification feed. If no actionable current event, show a quiet empty state. No external Push service, WhatsApp/email send, marketing, public/admin publishing or new database schema is enabled in this slice.",
+      "allowedPaths": [
+        "src/lib/notification-center.js",
+        "src/lib/notification-events.js",
+        "src/lib/notification-state.js",
+        "src/views/notifications.js",
+        "src/styles/notifications.css",
+        "src/app.js",
+        "sw.js",
+        "tests/n44-*",
+        "docs/automation-evidence/20261014/N44_INAPP_CENTER.md"
+      ],
+      "requiredChecks": [
+        "n44_actual_account_event_generation",
+        "n44_owner_read_dismiss_expiry",
+        "n44_safe_navigation_no_sensitive_leak",
+        "n44_real_ui_offline_boot"
+      ],
+      "acceptance": [
+        "Actual teacher app bell/center accessible at desktop/mobile, list generated from existing current account workspace only. No fake Demo events in real accounts. Names/text are escaped. A lesson reminder expires when its actual eligible time/day passes, not generated across unrelated terms or from stale selected calendars; due date rules reuse current product logic. App resume/time change recalculates without duplicate unread inflation. Do not replace N97 Sync severity with speculative error notices.",
+        "Read/dismiss state stores only bounded event IDs/timestamps per exact owner/workspace/device in a first-party namespace. Never store source tokens, grade/student lists or use an unauthenticated/global namespace; on logout/owner switch clear rendered state before any asynchronous work. Local read preference is explicitly per-device, not silently advertised as synced. Storage failure is nonblocking. Do not bypass read-only data guards or insert notification records into unknown existing stores. Critical account/data-protection banners elsewhere remain visible and unsuppressible; do not create a misleading global mute.",
+        "Allowlisted internal links only, checked against current live item/class ownership/deletion before navigation. No arbitrary URL from source data. Use existing shell/fonts/icons, simple calm hierarchy and320/390px layout; no extra category toggles until a category actually exists. No unsolicited browser permission prompt. Explain OS-level push/reminders while the app is closed are a later uncompleted N44 slice, never claim this local center sends push.",
+        "Test actual app DOM/store source events, owner switch, deleted target, duplicate/read/dismiss/expiry, no notifications from unknown account or across users, and offline shell/reload. Synthetic local transport only, no live accounts/SQL/provider work. Reuse the old pure model evidence only for byte-identical parts; test new actual integration, not another isolated Demo. Add all new startup dependencies to sw.js and verify they load offline. The complete N44 umbrella remains open for Push and admin publishing; this scope delivers a real useful subset without claiming full completion."
+      ],
+      "releaseAuthority": "Current explicit PO authorizes selecting and implementing a suitable N44 approach. This card limits release to teacher-owned in-app derived events and per-device state, no new cross-account data access, real external messaging, Auth/RLS/schema or paid service. Sole publisher delivers verified frontend; record remaining Push/admin scope honestly."
+    }
+  ]
+}
