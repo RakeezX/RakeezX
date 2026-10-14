@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n100-quiet-copy-review-20261014",
+      "productId": "N100",
+      "activationId": "po-20261012-continuous",
+      "priority": -4,
+      "scopeKey": "n100-copy-review-presentation",
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
+      "objective": "Latest PO confirms automatic distribution works and requests a quiet compact review when many target classes exist. Keep one short source/target count and changed-item summary, hide unchanged items and full subitem/date lists by default, and make per-class details expandable. The sample verbose fifth1→fifth9 output should not list identical parents or repeated undefined dates in the default panel. No mode choices return. Do not change the already fixed automatic-safe protocol, mapping, preservation, server planning or confirmation semantics.\nAt02:51:15Z direct invocation of the existing pure validateLocalBrowserTask with canonical absolute taskFile and the actual stored worktree passed exactly. The reported path mismatch is not a defective helper/permission: source and task normalize to the SAME canonical .worktrees path. Correct the invocation, do not modify/disable guards or request permission again.\nResume the saved candidate dd016f20745fef9d1132357d2e74cbfe6882542b and same session. In the actual active next attempt use absolute taskFile C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n100-quiet-copy-review-20261014.json and the new RUN_ID supplied by the controller, plus your actual local server origin. Read current runId only; never pass the attempt.json as TaskFile or a relative .worktrees path. The helper reads its own genuine running card; the operator proof used an in-memory status solely to validate the inactive path without launching a browser. Do not repeat that override for actual execution. Run the missing real UI at390/1280 for1/20targets/conflict with current app handlers; keep required check names exact. Reuse saved source changes and syntax proof, no code rewrite or new feature.",
+      "allowedPaths": [
+        "src/views/items.js",
+        "src/styles/items.css",
+        "src/styles/grades.css",
+        "tests/n100-quiet-review*.mjs",
+        "docs/automation-evidence/20261014/N100_QUIET_REVIEW.md"
+      ],
+      "requiredChecks": [
+        "n100_compact_actual_many_class_review",
+        "n100_protected_conflicts_remain_visible",
+        "n100_confirm_semantics_unchanged"
+      ],
+      "acceptance": [
+        "Default review remains small for1and20targets: clear source, number of target classes, safe changes and preservation statement. At most one collapsed row/card per target; do not expand the entire target roster of items. Common unchanged100→100 totals and identical items are not repeated. Child dates/points stay available under details, omit empty البداية/الاستحقاقغيرمحدد boilerplate unless needed to disclose a real clearing change.",
+        "Conflicts, excluded targets, changed maxima/cleared dates or required destructive-impact warnings may not be hidden as success. Existing protected conflicts remain clearly counted and individually inspectable; auto-copy still never transfers source marks. User can expand details with keyboard/accessible details control and confirm/cancel with the same handler/plan token.",
+        "Use actual current app/store response and review DOM at390/1280px with synthetic1and20target plans plus conflict. Preserve original preview data structures and server contract; no SQL/Auth/real accounts, copying into user's classes or fresh service tests. Reuse unchanged algorithm proof, inspect focused screenshots; sole publisher handles verified deployment."
+      ],
+      "releaseAuthority": "Current direct PO requests quieter copy review after successful real test. Routine presentation change only, no grade/identity behavior changes or implicit N100 closure before the new result."
+    }
+  ]
+}
