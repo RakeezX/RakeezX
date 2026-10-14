@@ -1,9 +1,12 @@
 import {
   LEGACY_WORKSPACE_DB_NAME,
+  accountWorkspaceDatabaseName,
+  accountWorkspaceKey,
   createWorkspaceRegistry,
   detectWorkspaceDatabase,
   normalizeAuthUserId,
   resolveWorkspace,
+  validRestoreReceipt,
 } from './workspaces.js';
 
 export const WORKSPACE_NOT_READY = 'WORKSPACE_NOT_READY';
@@ -183,13 +186,34 @@ export async function resolveWorkspaceForBoot({
   }
 
   if (authenticatedUserId) {
+    const ownerRecords = (records ?? []).filter(record => record?.authUserId === authenticatedUserId);
+    const key = await accountWorkspaceKey(authenticatedUserId, { cryptoProvider });
+    const ownName = await accountWorkspaceDatabaseName(authenticatedUserId, { cryptoProvider });
+    if (ownerRecords.length > 1) return notReady('ambiguous-account-workspace', { authState: 'authenticated' });
+    const ownerRecord = ownerRecords[0];
+    if (ownerRecord && (ownerRecord.id !== `account:${key}` || ownerRecord.type !== 'account' ||
+        ownerRecord.databaseName !== (ownerRecord.workspaceKind === 'legacy-in-place' ? LEGACY_WORKSPACE_DB_NAME : ownName) ||
+        !['claimed', 'restoring', 'provisioning'].includes(ownerRecord.ownershipState))) {
+      return notReady('account-registry-mismatch', { authState: 'authenticated' });
+    }
+    if ((records ?? []).some(record => record.databaseName === ownName && record.authUserId !== authenticatedUserId)) {
+      return notReady('account-registry-mismatch', { authState: 'authenticated' });
+    }
     const provisioningForOwner = (records ?? []).filter((record) => record?.type === 'account' &&
       record.authUserId === authenticatedUserId && record.ownershipState === 'provisioning');
-    if (provisioningForOwner.length) return notReady('account-provisioning-pending', { authState: 'authenticated' });
+    if (provisioningForOwner.length) return notReady(ownerRecord.workspaceKind === 'account-provisioned'
+      ? 'account-provisioning-pending' : 'account-registry-mismatch', { authState: 'authenticated' });
     const pendingForOwner = (records ?? []).filter((record) => record?.type === 'account' &&
       record.authUserId === authenticatedUserId && record.ownershipState === 'restoring');
     if (pendingForOwner.length > 1) return notReady('ambiguous-account-workspace', { authState: 'authenticated' });
     if (pendingForOwner.length === 1) {
+      const checkpoint = ownerRecord.restore;
+      if (ownerRecord.workspaceKind !== 'account-initial-restore' ||
+          !['CORE_V1', 'CORE_V2'].includes(checkpoint?.protocol) ||
+          typeof checkpoint.restoreId !== 'string' || !checkpoint.restoreId ||
+          typeof checkpoint.manifestHash !== 'string' || !checkpoint.manifestHash) {
+        return notReady('account-registry-mismatch', { authState: 'authenticated' });
+      }
       return notReady('initial-restore-pending', {
         authState: 'authenticated', restorePhase: pendingForOwner[0].restore?.phase ?? 'RESTORE_FAILED',
       });
@@ -205,7 +229,14 @@ export async function resolveWorkspaceForBoot({
         let presence;
         try { presence = await detectDatabase(workspace.databaseName, { indexedDBFactory }); }
         catch (error) { return notReady('workspace-metadata-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
-        if (presence?.status !== 'known' || presence.exists !== true) {
+        if (presence?.status !== 'known') return notReady('workspace-database-presence-unknown', { authState: 'authenticated' });
+        if (presence.exists !== true) {
+          const evidence = ownerRecord.workspaceKind === 'account-provisioned'
+            ? ownerRecord.provisioningReceipt?.ownerId === authenticatedUserId &&
+              ownerRecord.provisioningReceipt?.contractVersion === 1 &&
+              typeof ownerRecord.provisioningReceipt?.foundationHash === 'string' && !!ownerRecord.provisioningReceipt.foundationHash
+            : validRestoreReceipt({ ...ownerRecord.restoreReceipt, ownerId: ownerRecord.restoreReceipt?.ownerId ?? authenticatedUserId }, authenticatedUserId);
+          if (evidence) return notReady('initial-restore-recovery-required', { authState: 'authenticated' });
           return notReady('claimed-workspace-database-missing', { authState: 'authenticated' });
         }
         if (workspace.workspaceKind === 'account-provisioned') {
@@ -218,7 +249,7 @@ export async function resolveWorkspaceForBoot({
           const receipt = metadata?.receipt;
           const registryReceipt = records.find((record) => record.id === workspace.id)?.provisioningReceipt;
           if (metadata?.status !== 'read' || receipt?.ownerId !== authenticatedUserId ||
-              receipt?.contractVersion !== 1 || !receipt?.foundationHash ||
+              receipt?.contractVersion !== 1 || typeof receipt?.foundationHash !== 'string' || !receipt.foundationHash ||
               registryReceipt?.ownerId !== authenticatedUserId || registryReceipt?.contractVersion !== 1 ||
               registryReceipt?.foundationHash !== receipt.foundationHash) {
             return notReady('account-provisioning-receipt-mismatch', { authState: 'authenticated' });
@@ -230,8 +261,9 @@ export async function resolveWorkspaceForBoot({
         catch (error) { return notReady('restore-receipt-unavailable', { authState: 'authenticated', cause: error?.code ?? error?.name ?? null }); }
         const receipt = metadata?.receipt;
         const registryReceipt = records.find((record) => record.id === workspace.id)?.restoreReceipt;
-        if (metadata?.status !== 'read' || !['CORE_V1', 'CORE_V2'].includes(receipt?.protocol) ||
+        if (metadata?.status !== 'read' || !validRestoreReceipt(receipt, authenticatedUserId) ||
             receipt?.ownerId !== authenticatedUserId ||
+            !validRestoreReceipt({ ...registryReceipt, ownerId: registryReceipt?.ownerId ?? authenticatedUserId }, authenticatedUserId) ||
             !registryReceipt || receipt.protocol !== registryReceipt.protocol ||
             !receipt.restoreId || receipt.restoreId !== registryReceipt.restoreId ||
             !receipt.manifestHash || receipt.manifestHash !== registryReceipt.manifestHash ||
@@ -259,10 +291,13 @@ export async function resolveWorkspaceForBoot({
       return ready(workspace, 'claimed-account');
     }
 
-    // A registry record for another owner is enough to reject before touching
-    // that owner's Product database.
+    if (ownerRecord || !['legacy-workspace-unclaimed', 'account-workspace-not-registered'].includes(resolution.reason)) {
+      return notReady(resolution.reason, { authState: 'authenticated' });
+    }
+    // An unrelated legacy claim excludes the legacy DB, not this account's
+    // deterministic workspace. Never read the other owner's Product metadata.
     if (claimedLegacyRecords.length) {
-      return notReady('authenticated-account-workspace-mismatch', { authState: 'authenticated' });
+      return notReady('initial-restore-required', { authState: 'authenticated' });
     }
 
     if (legacyPresence?.status !== 'known') {

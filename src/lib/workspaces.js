@@ -49,6 +49,13 @@ export async function accountWorkspaceDatabaseName(authUserId, options = {}) {
   return `rakeezx-user-${await accountWorkspaceKey(authUserId, options)}`;
 }
 
+export function validRestoreReceipt(receipt, ownerId = receipt?.ownerId) {
+  return ['CORE_V1', 'CORE_V2'].includes(receipt?.protocol) &&
+    receipt?.ownerId === ownerId && typeof receipt?.restoreId === 'string' && !!receipt.restoreId &&
+    typeof receipt?.manifestHash === 'string' && !!receipt.manifestHash &&
+    Number.isFinite(receipt?.completedAt) && receipt.completedAt > 0;
+}
+
 function unresolved(reason) {
   return Object.freeze({ status: 'unresolved', reason, workspace: null });
 }
@@ -293,6 +300,21 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const key = await accountWorkspaceKey(normalized, options);
     const id = accountRecordId(key);
     const databaseName = `rakeezx-user-${key}`;
+    const recovery = options.recoveryRecord;
+    if (recovery) {
+      const presence = await detectWorkspaceDatabase(databaseName, { indexedDBFactory });
+      const receipt = recovery.restoreReceipt;
+      const provisioning = recovery.provisioningReceipt;
+      const validEvidence = recovery.workspaceKind === 'account-provisioned'
+        ? provisioning?.ownerId === normalized && provisioning?.contractVersion === 1 &&
+          typeof provisioning?.foundationHash === 'string' && !!provisioning.foundationHash
+        : validRestoreReceipt({ ...receipt, ownerId: receipt?.ownerId ?? normalized }, normalized);
+      if (presence.status !== 'known' || presence.exists || !validEvidence ||
+          recovery.type !== 'account' || recovery.authUserId !== normalized || recovery.id !== id ||
+          recovery.databaseName !== databaseName || recovery.ownershipState !== 'claimed') {
+        throw Object.assign(new Error('Missing storage recovery evidence is invalid'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+      }
+    }
     if (!checkpoint || !['CORE_V1', 'CORE_V2'].includes(checkpoint.protocol) || typeof checkpoint.restoreId !== 'string' ||
         !checkpoint.restoreId || typeof checkpoint.manifestHash !== 'string' || !checkpoint.manifestHash) {
       throw Object.assign(new Error('Invalid Initial Restore checkpoint'), { code: 'INVALID_INITIAL_RESTORE_CHECKPOINT' });
@@ -302,18 +324,22 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const committed = transactionDone(tx);
     const store = tx.objectStore(WORKSPACE_REGISTRY_STORE);
     const records = await requestResult(store.getAll());
-    if (records.some((record) => record.authUserId === normalized && record.id !== id)) {
+    if (records.some((record) => (record.authUserId === normalized || record.databaseName === databaseName) && record.id !== id)) {
       tx.abort();
       await committed.catch(() => {});
       throw Object.assign(new Error('Auth user has ambiguous workspace registrations'), { code: 'AMBIGUOUS_ACCOUNT_WORKSPACE' });
     }
     const existing = records.find((record) => record.id === id);
-    if (existing?.ownershipState === 'claimed') {
+    if (recovery && JSON.stringify(existing) !== JSON.stringify(recovery)) {
+      tx.abort(); await committed.catch(() => {});
+      throw Object.assign(new Error('Recovery registry changed'), { code: 'WORKSPACE_REGISTRY_MISMATCH' });
+    }
+    if (existing?.ownershipState === 'claimed' && !recovery) {
       tx.abort();
       await committed.catch(() => {});
       throw Object.assign(new Error('Account workspace is already ready'), { code: 'WORKSPACE_ALREADY_READY' });
     }
-    if (existing && (existing.type !== 'account' || existing.authUserId !== normalized ||
+    if (existing && !recovery && (existing.type !== 'account' || existing.authUserId !== normalized ||
         existing.databaseName !== databaseName || existing.ownershipState !== 'restoring' ||
         existing.restore?.restoreId !== checkpoint.restoreId ||
         existing.restore?.protocol !== checkpoint.protocol)) {
@@ -327,6 +353,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const record = {
       id, type: 'account', authUserId: normalized, databaseName,
       ownershipState: 'restoring', workspaceKind: 'account-initial-restore',
+      ...(recovery || existing?.recoveryEvidence ? { recoveryEvidence: recovery ?? existing.recoveryEvidence } : {}),
       restore: {
         protocol: checkpoint.protocol, restoreId: checkpoint.restoreId,
         manifestHash: checkpoint.manifestHash,
@@ -393,6 +420,7 @@ export function createWorkspaceRegistry({ indexedDBFactory = globalThis.indexedD
     const record = {
       id, type: 'account', authUserId: normalized,
       databaseName: `rakeezx-user-${key}`, ownershipState: 'claimed',
+      ...(existing.recoveryEvidence ? { recoveryEvidence: existing.recoveryEvidence } : {}),
       restoreReceipt: {
         protocol: receipt.protocol, restoreId: receipt.restoreId,
         manifestHash: receipt.manifestHash, completedAt: receipt.completedAt,

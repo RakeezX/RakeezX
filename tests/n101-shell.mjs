@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import {resolve,extname,sep} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {chromium} from '@playwright/test';
+const lease=JSON.parse((await readFile('C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/leases/browser.json','utf8')).replace(/^\uFEFF/,''));
+assert.equal(lease.taskId,'continuous-n101-account-switch-bootstrap-20261014');assert.equal(lease.owner.token,'8ed6a66e-4769-4cfc-8846-e214b28cdba9');
+const root=resolve('.');let current=false,browser,context,timer;
+const oldWorker=execFileSync('git',['show','24dbfed57644dbed13ecd1b77064dff98ed7b0fe:sw.js'],{encoding:'utf8'});
+const oldRouting=execFileSync('git',['show','24dbfed57644dbed13ecd1b77064dff98ed7b0fe:src/lib/workspace-routing.js'],{encoding:'utf8'});
+const server=createServer(async(req,res)=>{try{
+ const pathname=new URL(req.url,'http://localhost').pathname;
+ const file=resolve(root,pathname==='/'?'index.html':'.'+decodeURIComponent(pathname));
+ if(!file.startsWith(root+sep))throw Error('outside root');
+ res.setHeader('Content-Type',{'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webmanifest':'application/manifest+json'}[extname(file)]??'application/octet-stream');
+ res.setHeader('Cache-Control','no-store');
+ res.end(!current&&pathname==='/sw.js'?oldWorker:!current&&pathname==='/src/lib/workspace-routing.js'?oldRouting:await readFile(file));
+}catch{res.writeHead(404).end();}});
+await new Promise(done=>server.listen(0,'127.0.0.1',done));const origin='http://127.0.0.1:'+server.address().port;
+try{
+ browser=await chromium.launch({headless:true});timer=setTimeout(()=>browser.close(),90000);timer.unref();
+ context=await browser.newContext({viewport:{width:1280,height:844},serviceWorkers:'allow'});
+ await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort('blockedbyclient'));
+ const page=await context.newPage();await page.goto(origin+'/');
+ await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
+ if(!await page.evaluate(()=>!!navigator.serviceWorker.controller))await page.reload();
+ const old=await page.evaluate(async()=>({keys:await caches.keys(),source:await (await (await caches.open('rakeezx-v58')).match('/src/lib/workspace-routing.js')).text()}));
+ assert.ok(old.keys.includes('rakeezx-v58'));assert.ok(old.source.includes("notReady('authenticated-account-workspace-mismatch'"));
+ current=true;
+ await page.evaluate(async()=>{const changed=new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));await (await navigator.serviceWorker.getRegistration()).update();await changed;});
+ await page.reload();await page.locator('[data-workspace-login]').waitFor();
+ const routing=await readFile('src/lib/workspace-routing.js','utf8');
+ const result=await page.evaluate(async()=>({keys:await caches.keys(),source:await(await fetch('/src/lib/workspace-routing.js')).text(),shell:!!document.querySelector('[data-workspace-login]')}));
+ assert.ok(result.keys.includes('rakeezx-v59'));assert.ok(!result.keys.includes('rakeezx-v58'));assert.equal(result.source,routing);assert.equal(result.shell,true);
+ const dependencies=await page.evaluate(async()=>{const cache=await caches.open('rakeezx-v59');return Promise.all(['/src/app.js','/src/lib/db.js','/src/lib/workspaces.js','/src/lib/workspace-routing.js','/src/lib/initial-restore.js','/src/lib/account-provisioning.js'].map(async file=>({file,present:!!await cache.match(file)})));});
+ assert.ok(dependencies.every(d=>d.present));
+ await context.setOffline(true);await page.reload();await page.locator('[data-workspace-login]').waitFor();
+ const cached=await page.evaluate(async()=>({source:await(await fetch('/src/lib/workspace-routing.js')).text(),keys:await caches.keys()}));assert.equal(cached.source,routing);assert.ok(cached.keys.includes('rakeezx-v59'));
+ console.log('PASS n101_app_shell_release: actual v58 to v59 Service Worker controller update, old cache removed, exact new boot source/dependencies cached and served offline');
+}finally{clearTimeout(timer);if(context)await context.close();if(browser)await browser.close();await new Promise((r,j)=>server.close(e=>e?j(e):r()));}
