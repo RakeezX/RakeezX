@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-empty-account-reviewed-recovery-20261014",
+      "productId": "N58",
+      "activationId": "po-20261012-continuous",
+      "priority": -95,
+      "scopeKey": "n58-empty-account-academic-recovery",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261014-N58-REPAIR-TWO-EMPTY-ACCOUNTS",
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "objective": "Resume the SAME session 01a13b56-395f-7451-84a0-80235cb98089 from candidate 9f7413ea87dc558fe92a9780a879701ed697f004. New real LOCAL protocol counterexample n58-empty-recovery-race proves another same-owner device can populate the account between empty reads and calendar selection. The initial client-only approach cannot satisfy the accepted recovery contract. Production metadata-only read finds no repair/recovery routine; lock_student_lifecycle exists and uses owner-scoped transaction advisory lock, shared by ordinary mutation entry. Implement one narrowly scoped additive atomic repair capability instead of repeating the failed client-only check; preserve the counterexample as failed old design evidence.\nFirst read the existing race receipt, current main46a9cedcbc3f9f95280e33bb950fbc18285225a5 and its corrected first-use source; do not restore the older2ec foundation. First-use provider and all changed Product assets succeeded but index parity remains separately unverified; do not repeat forbidden public HTML inspection or claim the whole release accepted.\nComplete the reviewed recovery implementation using a narrowly scoped server transaction plus UI from the existing card. One additive migration maximum: new owner-scoped review/apply functions and only if necessary one RLS-protected repair receipt table. Use auth.uid, exact plan revision/digest, stable year/term IDs, and normal existing write guards. Acquire the EXISTING per-owner transaction lock before rechecking all relevant account emptiness and expected canonical foundation in the SAME transaction as the repair. Verify relevant normal section/teaching/student/restore/create paths use the same serialization, rather than assuming an advisory lock protects a writer that never takes it. No cross-account/global table lock, broad lock rewrite, privileged browser key, Auth trigger alteration or permission expansion. If a needed normal endpoint does not participate, stop with exact evidence instead of making an unsafe claim or widening unrelated routines.\nReject any school content/tombstones/custom history or stale plan before writes. Repeated repairID with exact matching input returns the stored completed receipt before any new apply; changed input/owner is rejected. Execute only the reviewed ordinary foundation operation order within the one transaction, preserving original server receipts/tombstones and normal N58 guards. Rollback all changes on partial error. Never disable RLS/triggers or delete original rejected entries. After a verified receipt the frontend reconciles canonical rows and marks ONLY exact old reviewed operations superseded with retained audit—not originally applied. Unrelated failures stay visible. A timeout recovers the same command, not a new ID.\nProve the recorded counterexample is prevented: section creation just before the lock causes no-write rejection; attempted interleaving while locked serializes correctly; legitimate later section creation is not an error. Owner B, changed academic snapshot, request replay/mismatch, lost response/restart and partial-failure rollback through official LOCAL Auth/PostgREST/PostgreSQL plus actual UI must pass. Do not count the prior unsafe-design test as current PASS; retain it in an explicit historical section outside current release check results. No paid planning reviewer or old9/60suite rerun.\nOne exact migration may be applied only after all local checks, schema/ACL diff and exact SQL hash are recorded, using a genuinely available sanctioned management tool within this N58 scope. Do not probe an absent CLI MCP, configure a new service, scrape credentials or attempt the previous N90 connection-handoff workaround. When management is not available to this worker, commit the fully certified SQL+client and write N58_ATOMIC_FOUNDATION_REPAIR.md with exact migration name/hash/path/required readback and return BLOCKED solely for that scoped service handoff. The operator can then apply the reviewed operation once with the existing connected Supabase tool and resume THIS session with proof; the generic Git publisher cannot apply SQL. No LOCAL_READY until the service prerequisite is actually completed/read back.\nNo real user rows, profiles, account creation, messages or recovery execution from the worker. Local synthetic data only; do not repeat/reactivate any denied hosted pair or old6session operations. Hold staystrue and full N58 re-enablement/closure remains pending. If an actual tool refusal occurs, preserve it and do not route around it.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/lib/sync-v2.js",
+        "src/lib/calendar-recovery.js",
+        "src/lib/sync-operational-ui.js",
+        "src/app.js",
+        "src/views/calendar.js",
+        "src/lib/calendar-runtime.js",
+        "sw.js",
+        "tests/n58-empty-recovery-*.mjs",
+        "tests/n58-empty-recovery-*.json",
+        "docs/automation-evidence/20261014/N58_EMPTY_ACCOUNT_RECOVERY.md",
+        "src/lib/cloud.js",
+        "supabase/migrations/*_n58_atomic_empty_foundation_repair.sql",
+        "docs/automation-evidence/20261014/N58_ATOMIC_FOUNDATION_REPAIR.md"
+      ],
+      "requiredChecks": [
+        "n58_existing_empty_rejected_account_review",
+        "n58_reviewed_academic_repair_actual_protocol",
+        "n58_repair_idempotent_lost_ack_and_owner",
+        "n58_no_school_data_or_custom_history_repair",
+        "n58_calendar_hold_and_old_failures_retained",
+        "n58_atomic_other_device_race_and_receipt",
+        "n58_atomic_sql_scope_and_service_binding"
+      ],
+      "acceptance": [
+        "Before offering or committing the plan prove current owner/initial-restore context and the account's emptiness from existing owner-filtered fetch/restore APIs, not only empty visible UI. Both local and authoritative account state must contain no class/student/enrollment/session/slot/grade/attendance content or its tombstones; a changed owner, other-device additions, ambiguous year/term IDs, customized academic records or unrelated dependency leaves the plan blocked. Do not query private accounts from the worker or use management SQL. Never turn a name-only empty fixture into proof of remote emptiness.",
+        "Build an audit-bound plan from exact preserved failed year/group envelopes and current canonical foundation, using stable existing IDs. Verify default year/term identities against the known release that created them; no arbitrary dates/presets/parent invention. Preserve raw prior data and failure snapshots. After explicit confirmation, submit the corrected unselected year (only when truly absent), both ordinary terms as required, and acknowledged selection in the tested order, then obtain canonical readback. Do not send a changed payload under an old mutation ID. Use one persistent repair identity and linked replacement commands so repeat click/restart/lost response reuses the SAME requests rather than duplicating. Existing session repair machinery can inform audit ownership but must not be reused with a wrong entity.",
+        "Obsolete materialized OFFICIAL calendar/day commands may be classified as superseded only after canonical year/term/selection evidence and a verified equivalent read projection prove the reviewed intended state. Keep original envelopes/failure reasons in retained audit; never label them originally applied or discard data to make counters green. Unknown/custom date/calendar commands, existing recorded sessions, and the retired historic six/session records are excluded, not modified. A partially acknowledged repair remains pending/actionable and retains a recovery path; the warning clears only for the precisely verified resolved group. Unrelated failures remain red.",
+        "Show one concise calendar-specific repair entry only for an eligible existing group, not a generic magic repair button. Review/cancel do zero writes; confirm disabled without explicit acknowledgement; while pending show a clear state; support closes the sheet and actually navigates. No technical historic-six wording for new users. Keep independent ordinary app use and support working. If no eligible plan exists, show its actual reason without empty confirm/retry controls.",
+        "Reproduce actual old-source rejection first, then prove repaired account converges via official LOCAL Auth/PostgREST/Postgres with current metadata-matched function bodies. Cases: before-first-sync/after-partial-sync, original65-like rejected+blocked group (do not fabricate identical counts), cancellation, lost first/middle/final acknowledgement, retry/restart, altered plan, owner switch, remote populated-account race and custom-history exclusion. Inspect actual390/1280DOM and persisted snapshots. Reuse unchanged foundation proof; test only new recovery paths. No broad suite/paid reviewer or unowned browser process.",
+        "The direct user request authorizes this precise current-account recovery behavior and normal frontend delivery, not operating on their real accounts from the worker. Only the one precisely scoped additive capability in preparationAuthority is allowed after exact local certification. The previous separate-request race is retained as evidence. Return LOCAL_READY only after exact atomic capability certification/application/readback, or preserve the local candidate with a precise pending service handoff. Full N58 hosted feature gates and re-enabling calendar selection remain separate outstanding requirements; no automatic umbrella closure.",
+        "The one migration must be non-destructive, fail on unexpected existing definition drift, preserve original migration history and restrict execution to the authenticated owner. Validate every creation path used by the race, request size/ID/preimage limits, fixed search_path and RLS/ACL; no service-role in frontend. Full raw original diagnostics and the prior race result remain preserved. No user is asked to clear the browser to perform recovery."
+      ],
+      "releaseAuthority": "Latest PO explicitly demands recovery/completion for TWO EMPTY accounts and delegates routine technical execution. This material correction extends only the prior client-only recovery phase to ONE narrowly scoped atomic server capability required by the proved concurrency defect, with local certification, exact service readback and normal publisher release. It does not authorize direct real account repair, Auth/RLS bypass, new hosted accounts, old rejected private operations, broader access or lifting the calendar-switch hold. An actual new tool denial remains binding.",
+      "preparationAuthority": {
+        "kind": "n58-atomic-empty-foundation-recovery",
+        "supabase": {
+          "projectId": "xlrubcwjqktzzunrvuns",
+          "newAuthIds": 0,
+          "liveFixtureCount": 0,
+          "realAccountReads": false,
+          "realAccountWrites": false,
+          "migration": {
+            "maxNewMigrations": 1,
+            "name": "n58_atomic_empty_foundation_repair",
+            "scope": "Only additive owner-scoped empty-academic-foundation review/apply and necessary receipt persistence. Existing N58 guards, original tables/IDs, Auth/RLS behavior and lifecycle mutex remain intact. No data backfill or real recovery invocation. Native exact-SQL proof must precede one sanctioned application and source/ACL/history readback."
+          }
+        }
+      }
+    }
+  ]
+}
