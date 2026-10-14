@@ -381,13 +381,22 @@ function uniqueDependencies(dependencies) {
   });
 }
 
-function mutationScope(store) {
-  const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
-  return [...new Set([store, 'outbox', 'device', ...Object.values(references)])];
+export function calendarDependencies(store, record, op = 'create') {
+  if (store !== 'sessions' || op !== 'create' || !record.calendarContext) return [];
+  return [
+    { store: 'years', recordId: record.calendarContext.yearId, requiresServerRevision: true,
+      calendarPresetId: record.calendarContext.presetId },
+    { store: 'terms', recordId: record.calendarContext.termId, requiresServerRevision: true },
+  ];
 }
 
-function inferredDependencies(store, record, current, supplied) {
-  const dependencies = [...(supplied ?? [])];
+function mutationScope(store) {
+  const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
+  return [...new Set([store, 'outbox', 'device', ...Object.values(references), ...(store === 'sessions' ? ['years', 'terms'] : [])])];
+}
+
+function inferredDependencies(store, record, current, supplied, op = 'create') {
+  const dependencies = [...calendarDependencies(store, record, op), ...(supplied ?? [])];
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   for (const [field, parentStore] of Object.entries(references)) {
     const parentId = record[field];
@@ -537,6 +546,11 @@ function rewriteReferenceRecord(store, record, targetStore, oldId, newId) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   let changed = false;
   const next = { ...record };
+  const contextField = targetStore === 'years' ? 'yearId' : targetStore === 'terms' ? 'termId' : null;
+  if (store === 'sessions' && record.syncCreatePending && contextField && record.calendarContext?.[contextField] === oldId) {
+    next.calendarContext = { ...record.calendarContext, [contextField]: newId };
+    changed = true;
+  }
   for (const [field, parentStore] of Object.entries(references)) {
     if (parentStore === targetStore && next[field] === oldId) {
       next[field] = newId;
@@ -548,6 +562,8 @@ function rewriteReferenceRecord(store, record, targetStore, oldId, newId) {
 
 function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
   if (mutation?.protocol !== 'v2') return mutation;
+  // Failed historical intents are evidence, never a repair/replay target.
+  if (mutation.state === 'rejected') return mutation;
   let changed = false;
   const next = { ...mutation };
   const localPatch = { ...(mutation.localPatch ?? {}) };
@@ -621,6 +637,14 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
     }
   }
 
+  const contextField = targetStore === 'years' ? 'yearId' : targetStore === 'terms' ? 'termId' : null;
+  if (mutation.store === 'sessions' && mutation.op === 'create' && contextField) {
+    for (const [patch, field] of [[localPatch, 'calendarContext'], [serverPatch, 'calendar_context']]) {
+      if (patch[field]?.[contextField] !== oldId) continue;
+      if (mutation.envelopeLocked) return { ...mutation, state: 'blocked', blockedReason: 'canonical-reference-remap-after-dispatch' };
+      patch[field] = { ...patch[field], [contextField]: newId }; changed = true;
+    }
+  }
   const dependencies = (mutation.dependencies ?? []).map((dependency) => {
     if (dependency.store === targetStore && dependency.recordId === oldId) {
       changed = true;
@@ -712,7 +736,7 @@ export function createSyncV2Engine({
           : encodeSyncV2Patch(store, op === 'create' ? next : patch);
         const resolvedDependencies = op === 'delete'
           ? uniqueDependencies(dependencies)
-          : inferredDependencies(store, next, current, dependencies);
+          : inferredDependencies(store, next, current, dependencies, op);
         const sequence = sortMutations(current.outbox).reduce((max, row) => Math.max(max, Number(row.sequence) || 0), 0) + 1;
         const mutation = ownershipGuard.bindNewCommand({
           id: `v2:${mutationId}`,
@@ -871,12 +895,22 @@ export function createSyncV2Engine({
 
   async function markAttempt(mutation) {
     let locked = mutation;
-    await database.applyBatch({ outbox: {} }, {
+    const contextualCreate = mutation.store === 'sessions' && mutation.op === 'create' && mutation.patch?.calendar_context;
+    await database.applyBatch(contextualCreate ? { outbox: {}, years: {} } : { outbox: {} }, {
       prepare(current) {
         const existing = current.outbox.find((row) => row.id === mutation.id);
         if (!existing) return { outbox: operationBatch() };
+        let patch = existing.patch;
+        if (!existing.envelopeLocked && existing.op === 'create' && existing.store === 'sessions' && patch.calendar_context) {
+          const year = current.years.find(row => row.id === patch.calendar_context.yearId);
+          const canonical = year?.serverCanonical ?? year;
+          const revision = normalizeRevision(canonical?.fieldRevisions?.calendar_selection);
+          if (!revision || canonical.calendarPresetId !== patch.calendar_context.presetId || year.deleted)
+            throw new Error('Calendar selection acknowledgement is required.');
+          patch = { ...patch, calendar_context: { ...patch.calendar_context, selectionRevision: revision } };
+        }
         locked = {
-          ...existing,
+          ...existing, patch,
           state: 'pending',
           envelopeLocked: true,
           attemptCount: (existing.attemptCount ?? 0) + 1,
@@ -927,6 +961,12 @@ export function createSyncV2Engine({
   async function reconcileReceipt(mutation, result) {
     const resultMutationId = result?.mutationId;
     if (resultMutationId !== mutation.mutationId) throw new Error('Sync V2 receipt mutationId mismatch');
+    if (['years', 'terms'].includes(mutation.store) && ownershipGuard.getWorkspace()?.type === 'account') {
+      const access = ownershipGuard.cloudAccess({ operation: 'dispatch',
+        authenticatedUserId: currentAuthenticatedUserId(), command: mutation });
+      if (!access.allowed || result.canonical?.owner_id !== mutation.ownerId)
+        throw new Error('Calendar dependency receipt owner mismatch');
+    }
     const canonical = decodeSyncV2Canonical(mutation.store, result.canonical);
     const canonicalId = result.canonicalId || canonical?.id || mutation.serverRecordId;
     const sourceId = mutation.recordId;
@@ -981,7 +1021,7 @@ export function createSyncV2Engine({
 
         const later = pendingForRecord(remappedOutbox, mutation.store, [sourceId, canonicalId]);
         const rebasedOutbox = remappedOutbox.map((row) => {
-          if (!later.some((candidate) => candidate.id === row.id) || row.envelopeLocked || row.op === 'create') return row;
+          if (row.state === 'rejected' || !later.some((candidate) => candidate.id === row.id) || row.envelopeLocked || row.op === 'create') return row;
           return {
             ...row,
             baseRevision: next.serverRevision,
@@ -1197,6 +1237,17 @@ export function createSyncV2Engine({
       if (parent.deleted && !deletingThisSession) return { state: 'rejected', reason: 'dependency-deleted' };
       if (dependency.requiresServerRevision && normalizeRevision(parent.serverRevision) === 0) {
         return { state: 'blocked', reason: 'dependency-not-authoritative' };
+      }
+      // A locked envelope already has its receipt-bound revision. Replaying it
+      // must recover the same native receipt even after a calendar switch.
+      if (dependency.calendarPresetId && !mutation.envelopeLocked) {
+        const selection = rows.find(row => row.store === 'years' &&
+          [row.recordId, row.serverRecordId].includes(dependency.recordId) && hasOwn(row.patch ?? {}, 'calendar_preset_id'));
+        if (selection) return { state: 'blocked', reason: selection.state === 'rejected' ? 'dependency-rejected' :
+          selection.state === 'failed' ? 'dependency-failed' : 'calendar-selection-pending' };
+        const canonical = parent.serverCanonical ?? parent;
+        if (canonical.calendarPresetId !== dependency.calendarPresetId || normalizeRevision(canonical.fieldRevisions?.calendar_selection) === 0)
+          return { state: 'blocked', reason: 'calendar-selection-precondition' };
       }
       const createMutation = rows.find((row) => row.store === dependency.store &&
         (row.recordId === dependency.recordId || row.serverRecordId === dependency.recordId) && row.op === 'create');
@@ -1435,6 +1486,11 @@ export function createSyncV2Engine({
     for (const original of snapshot) {
       if (onlyMutationId && original.mutationId !== onlyMutationId) continue;
       if (result.attempted >= maxMutations) break;
+      if (original.state === 'rejected') {
+        stoppedKeys.add(original.logicalRecordKey);
+        result.blocked++;
+        continue;
+      }
       const ownership = ownershipGuard.cloudAccess({
         operation: 'dispatch',
         authenticatedUserId: currentAuthenticatedUserId(),
@@ -1446,11 +1502,6 @@ export function createSyncV2Engine({
         result.blocked++;
         result.ownershipBlocked = (result.ownershipBlocked ?? 0) + 1;
         result.blockReason ??= ownership.reason;
-        continue;
-      }
-      if (original.state === 'rejected') {
-        stoppedKeys.add(original.logicalRecordKey);
-        result.blocked++;
         continue;
       }
       if (original.op === 'command' && String(original.command ?? '').startsWith('enrollment:') &&
