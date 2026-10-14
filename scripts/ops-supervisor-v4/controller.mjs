@@ -223,6 +223,20 @@ export function validatePublishedEvidence(task, result, reference, productionUrl
   return true;
 }
 
+export function observeUnchangedParity(task,receipt,at) {
+  const failures=receipt?.evidence?.production?.assets?.filter(a=>a.verified===false);
+  if(receipt?.status!=='pending'||receipt.errorCode!=='SOURCE_PARITY_PENDING'||receipt.provider?.conclusion!=='success'
+    ||receipt.provider.headSha!==receipt.publishedSha||receipt.evidence?.immutable?.passed!==true
+    ||receipt.evidence?.production?.passed!==false||!failures?.length)return false;
+  const key=createHash('sha256').update(JSON.stringify([task.candidateSha,receipt.publishedSha,
+    failures.map(a=>[a.repoPath,a.statusCode,a.expectedSha256]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])))])).digest('hex');
+  const previous=task.parityWait, same=previous?.key===key;
+  const observation={at,failedAssets:failures.map(a=>({path:a.repoPath,statusCode:a.statusCode,expectedSha256:a.expectedSha256,observedSha256:a.observedSha256}))};
+  task.parityWait={key,firstAt:same?previous.firstAt:at,count:same?previous.count+1:1,lastAt:at,
+    observations:[...(same?previous.observations??[]:[]),observation].slice(-6)};
+  return task.parityWait.count>=2&&Date.parse(at)-Date.parse(task.parityWait.firstAt)>=60000;
+}
+
 export const RESULT_SCHEMA = {
   type: 'object', additionalProperties: false,
   required: ['taskId', 'runId', 'state', 'candidateSha', 'baseSha', 'worktreePath', 'changedPaths', 'checks', 'summary', 'blockerType', 'blocker', 'nextAction'],
@@ -845,6 +859,10 @@ export class Controller {
     } else if (receipt.status === 'pending' || receipt.retryable) {
       task.nextDeliveryAt = new Date(this.clock() + Math.max(5, Math.min(3600, Number(receipt.retryAfterSeconds) || 30)) * 1000).toISOString();
       task.lastFailure = clean(receipt.errorCode + ': ' + receipt.message);
+      if(observeUnchangedParity(task,receipt,this.now())) {
+        task.status='blocked';task.failureClass='external';task.deliveryOwner=null;task.nextDeliveryAt=null;
+        task.lastFailure='SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.';
+      }
     } else if (['BUILD_FAILED', 'MERGE_CONFLICT'].includes(receipt.errorCode)) {
       await this.failure(task, `${receipt.errorCode}: ${receipt.message}\n${receipt.context ?? ''}`, 'implementation', { delivery: receipt }); return;
     } else { task.status = 'blocked'; task.failureClass = 'external'; task.lastFailure = clean(`${receipt.errorCode}: ${receipt.message}`); task.deliveryOwner = null; }
