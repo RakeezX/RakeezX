@@ -408,7 +408,7 @@ export async function clearAll() {
  * Installs a verified CORE_V1 or CORE_V2 snapshot and a local-only receipt atomically.
  * This is valid only for an unmounted deterministic account database.
  */
-export async function importInitialRestoreSnapshot(snapshot, device) {
+export async function importInitialRestoreSnapshot(snapshot, device, { assertAccess = () => {} } = {}) {
   const coreStores = Object.keys(snapshot ?? {});
   if (!coreStores.length || coreStores.some((name) => !STORES.includes(name) || !Array.isArray(snapshot[name])) ||
       !device?.initialRestoreReceipt ||
@@ -419,15 +419,25 @@ export async function importInitialRestoreSnapshot(snapshot, device) {
   return new Promise((resolve, reject) => {
     const tx = database.transaction(STORES, 'readwrite');
     let failure = null;
-    try {
-      for (const name of STORES) tx.objectStore(name).clear();
-      for (const name of coreStores) {
-        for (const record of snapshot[name]) tx.objectStore(name).put(record);
-      }
-      tx.objectStore('device').put(device);
-    } catch (error) {
-      failure = error;
-      tx.abort();
+    let remaining = STORES.length;
+    // Initial Restore creates an absent/empty workspace. Recheck inside the
+    // import transaction so another tab cannot turn preparation into replacement.
+    for (const name of STORES) {
+      const count = tx.objectStore(name).count();
+      count.onsuccess = () => {
+        if (failure) return;
+        try {
+          assertAccess();
+          if (count.result !== 0) throw Object.assign(new Error('Initial Restore cannot replace existing local rows'), {
+            code: 'RESTORE_DATABASE_CONFLICT',
+          });
+          if (--remaining) return;
+          for (const store of coreStores) {
+            for (const record of snapshot[store]) tx.objectStore(store).put(record);
+          }
+          tx.objectStore('device').put(device);
+        } catch (error) { failure = error; tx.abort(); }
+      };
     }
     tx.oncomplete = () => resolve(device.initialRestoreReceipt);
     tx.onerror = (event) => { failure ??= event.target.error; };
@@ -441,7 +451,7 @@ export async function readInitialRestoreReceipt() {
 }
 
 /** Atomically install a server-verified fresh-account foundation, never replacing existing Product rows. */
-export async function importAccountProvisioningSnapshot(snapshot, device) {
+export async function importAccountProvisioningSnapshot(snapshot, device, { assertAccess = () => {} } = {}) {
   const stores = Object.keys(snapshot ?? {});
   const receipt = device?.accountProvisioningReceipt;
   if (!receipt?.ownerId || receipt.contractVersion !== 1 || !receipt.foundationHash ||
@@ -458,6 +468,7 @@ export async function importAccountProvisioningSnapshot(snapshot, device) {
     };
     const request = tx.objectStore('device').get('device');
     request.onsuccess = () => {
+      try { assertAccess(); } catch (error) { failure = error; tx.abort(); return; }
       const existing = request.result;
       if (existing?.accountProvisioningReceipt) {
         const previous = existing.accountProvisioningReceipt;
@@ -475,6 +486,7 @@ export async function importAccountProvisioningSnapshot(snapshot, device) {
           remaining -= 1;
           if (remaining !== 0) return;
           try {
+            assertAccess();
             for (const store of stores) for (const record of snapshot[store]) tx.objectStore(store).put(record);
             tx.objectStore('device').put(device);
           } catch (error) { failure = error; tx.abort(); }

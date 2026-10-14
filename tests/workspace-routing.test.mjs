@@ -218,7 +218,7 @@ test('Auth B cannot open, render, write, pull, or dispatch A workspace', async (
     readClaimMetadata: async () => { productMetadataReads += 1; throw new Error('must not open'); },
   });
   assert.equal(result.status, 'not_ready');
-  assert.equal(result.reason, 'authenticated-account-workspace-mismatch');
+  assert.equal(result.reason, 'initial-restore-required');
   assert.equal(result.workspace, null);
   assert.equal(productMetadataReads, 0);
   const guard = createSyncOwnershipGuard({ workspace: {

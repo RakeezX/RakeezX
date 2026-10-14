@@ -736,7 +736,7 @@ async function boot() {
     }
     if (import.meta.env?.DEV) window.__workspaceRouting = workspaceRouting;
     if (workspaceRouting.status !== 'ready' && cloud.session && cloud.user &&
-        ['initial-restore-required', 'initial-restore-pending', 'account-provisioning-pending'].includes(workspaceRouting.reason)) {
+        ['initial-restore-required', 'initial-restore-pending', 'account-provisioning-pending', 'initial-restore-recovery-required'].includes(workspaceRouting.reason)) {
       await mountAndRunInitialRestore();
       registerServiceWorker();
       return;
@@ -944,6 +944,7 @@ function renderInitialRestoreState(state, { error = null } = {}) {
 }
 
 function renderFirstAccountProfile(contract) {
+  const ownerId = contract.ownerId;
   const current = contract.profile ?? {};
   let teacherForm = current.teacherForm === 'feminine' ? 'feminine' : 'masculine';
   render(app, html`
@@ -996,12 +997,14 @@ function renderFirstAccountProfile(contract) {
     button.disabled = true;
     error.hidden = true;
     try {
+      if (cloud.user?.id !== ownerId) throw new Error('Profile account changed');
       await completeProfile({ teacherName: form.elements.teacherName.value,
         phone: form.elements.phone.value, teacherForm, schoolName: form.elements.schoolName.value });
+      if (cloud.user?.id !== ownerId) throw new Error('Profile account changed');
       renderInitialRestoreState('PROVISIONING');
       const registry = createWorkspaceRegistry();
       try {
-        const result = await runAccountProvisioning({ expectedOwnerId: cloud.user.id, registry });
+        const result = await runAccountProvisioning({ expectedOwnerId: ownerId, registry });
         if (result.status !== 'ready') throw new Error('Account provisioning did not reach READY');
       } finally { await registry.close(); }
       location.reload();
@@ -1023,10 +1026,16 @@ function renderFirstAccountProfile(contract) {
 async function mountAndRunInitialRestore() {
   const registry = createWorkspaceRegistry();
   initialRestoreAbortController = new AbortController();
+  const controller = initialRestoreAbortController;
+  const ownerId = cloud.user.id;
+  const unsubscribe = cloud.subscribe(() => {
+    if (cloud.user?.id !== ownerId || !cloud.session) controller.abort();
+  });
   try {
     renderInitialRestoreState(navigator.onLine === false ? 'RESTORE_REQUIRES_ONLINE' : 'RESTORE_PREFLIGHT');
     if (navigator.onLine === false) return;
-    const provisioning = await runAccountProvisioning({ expectedOwnerId: cloud.user.id, registry,
+    const provisioning = await runAccountProvisioning({ expectedOwnerId: ownerId, registry,
+      signal: controller.signal,
       onState: (state) => { if (state === 'PROVISIONING') renderInitialRestoreState('PROVISIONING'); },
     });
     if (provisioning.status === 'profile_required') {
@@ -1038,10 +1047,10 @@ async function mountAndRunInitialRestore() {
       return;
     }
     const result = await runInitialRestore({
-      expectedOwnerId: cloud.user.id,
+      expectedOwnerId: ownerId,
       registry,
       onState: (state) => renderInitialRestoreState(state),
-      signal: initialRestoreAbortController.signal,
+      signal: controller.signal,
     });
     if (result.status === 'provisioning_required') {
       renderInitialRestoreState('PROVISIONING_REQUIRED');
@@ -1056,6 +1065,7 @@ async function mountAndRunInitialRestore() {
     console.error('[rakeezx] Initial Restore failed', error);
     renderInitialRestoreState(error?.code === 'RESTORE_REQUIRES_ONLINE' ? 'RESTORE_REQUIRES_ONLINE' : 'RESTORE_FAILED', { error });
   } finally {
+    unsubscribe();
     initialRestoreAbortController = null;
     await registry.close();
   }

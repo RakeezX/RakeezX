@@ -4,7 +4,9 @@ import { decodeSyncV2Canonical, SYNC_V2_SCHEMAS } from './sync-v2.js';
 import {
   accountWorkspaceDatabaseName, createWorkspaceRegistry, detectWorkspaceDatabase,
   normalizeAuthUserId, resolveWorkspace,
+  validRestoreReceipt,
 } from './workspaces.js';
+import { readInitialRestoreMetadata } from './workspace-routing.js';
 import { makeDevice, uid } from '../models.js';
 import { projectSubitemScore, scoreCents, normalizeSubitemDatesAndPoints } from './score-foundation.js';
 
@@ -228,6 +230,10 @@ export async function runInitialRestore({
   signal,
 } = {}) {
   const ownerId = normalizeAuthUserId(expectedOwnerId);
+  const assertOwner = () => {
+    assertNotAborted(signal);
+    if ('user' in cloud && cloud.user?.id !== ownerId) throw fail('RESTORE_OWNER_MISMATCH', 'Active account changed');
+  };
   if (globalThis.navigator?.onLine === false) throw fail('RESTORE_REQUIRES_ONLINE', 'Initial Restore requires a connection');
   onState('RESTORE_PREFLIGHT');
   assertNotAborted(signal);
@@ -249,11 +255,20 @@ export async function runInitialRestore({
   const matches = await registry.findByAuthUserId(ownerId);
   if (matches.length > 1) throw fail('WORKSPACE_REGISTRY_MISMATCH', 'Ambiguous account workspace');
   let pending = matches[0] ?? null;
+  const presence = await detectWorkspaceDatabase(databaseName, { indexedDBFactory });
+  if (presence.status !== 'known') throw fail('RESTORE_DATABASE_PRESENCE_UNKNOWN', 'Cannot prove local workspace presence');
+  let recoveryRecord = null;
   // Finish an older interrupted Initial Restore with its original receipt binding.
   if (pending?.ownershipState === 'restoring' &&
       [CORE_RESTORE_PROTOCOL, SCORE_RESTORE_PROTOCOL].includes(pending.restore?.protocol)) protocol = pending.restore.protocol;
   if (pending?.ownershipState === 'claimed') {
-    return { status: 'ready', workspace: (await resolveWorkspace({ type: 'account', authUserId: ownerId }, { registry, cryptoProvider })).workspace };
+    const resolution = await resolveWorkspace({ type: 'account', authUserId: ownerId }, { registry, cryptoProvider });
+    if (resolution.status !== 'resolved' || pending.databaseName !== databaseName) {
+      throw fail('WORKSPACE_REGISTRY_MISMATCH', 'Claimed workspace ownership mismatch');
+    }
+    if (presence.exists) throw fail('RESTORE_DATABASE_CONFLICT', 'Existing claimed workspace must pass boot receipt checks');
+    recoveryRecord = pending;
+    pending = null;
   }
   if (pending && (pending.ownershipState !== 'restoring' || pending.databaseName !== databaseName ||
       pending.restore?.protocol !== protocol)) {
@@ -264,7 +279,8 @@ export async function runInitialRestore({
     database.selectDatabase(databaseName);
     const receipt = await database.readInitialRestoreReceipt();
     if (receipt) {
-      if (receipt.ownerId !== ownerId || receipt.restoreId !== pending.restore.restoreId ||
+      assertOwner();
+      if (!validRestoreReceipt(receipt, ownerId) || receipt.restoreId !== pending.restore.restoreId ||
           receipt.manifestHash !== pending.restore.manifestHash || receipt.protocol !== protocol) {
         throw fail('RESTORE_RECEIPT_MISMATCH', 'Restore receipt does not match its owner checkpoint');
       }
@@ -274,9 +290,15 @@ export async function runInitialRestore({
       return { status: 'ready', workspace: resolution.workspace, resumed: true };
     }
   } else {
-    const presence = await detectWorkspaceDatabase(databaseName, { indexedDBFactory });
-    if (presence.status !== 'known') throw fail('RESTORE_DATABASE_PRESENCE_UNKNOWN', 'Cannot prove local workspace absence');
-    if (presence.exists) throw fail('RESTORE_DATABASE_CONFLICT', 'Unregistered account database already exists');
+    if (presence.exists) {
+      const metadata = await readInitialRestoreMetadata(databaseName, { indexedDBFactory, databasePresence: presence });
+      const receipt = metadata.receipt;
+      if (!validRestoreReceipt(receipt, ownerId)) throw fail('RESTORE_DATABASE_CONFLICT', 'Unregistered database lacks owner-bound restore evidence');
+      assertOwner();
+      await registry.beginAccountRestore(ownerId, { ...receipt, phase: 'RESTORE_FINALIZING' }, { cryptoProvider });
+      await registry.finalizeAccountRestore(ownerId, receipt, { cryptoProvider });
+      return { status: 'ready', workspace: (await resolveWorkspace({ type: 'account', authUserId: ownerId }, { registry, cryptoProvider })).workspace, resumed: true };
+    }
   }
 
   let acquired;
@@ -298,24 +320,26 @@ export async function runInitialRestore({
     if (legacyHash === pending.restore.manifestHash) { acquired = legacy; manifestHash = legacyHash; portable = false; }
   }
   const restoreId = pending?.restore?.restoreId ?? cryptoProvider?.randomUUID?.() ?? uid();
+  assertOwner();
   pending = pending ?? await registry.beginAccountRestore(ownerId, {
     protocol, restoreId, manifestHash, phase: 'RESTORING',
-  }, { cryptoProvider });
+  }, { cryptoProvider, recoveryRecord });
   if (pending.restore.manifestHash !== manifestHash) {
     throw fail('RESTORE_CHECKPOINT_STALE', 'Pending restore manifest changed; explicit retry is required');
   }
   onState('RESTORING');
-  assertNotAborted(signal);
+  assertOwner();
   await registry.updateAccountRestore(ownerId, restoreId, { phase: 'RESTORING' }, { cryptoProvider });
   database.selectDatabase(databaseName);
+  assertOwner();
   const completedAt = now();
   const receipt = Object.freeze({ protocol, restoreId, ownerId, manifestHash, completedAt });
   const device = makeDevice({
     deviceId: cryptoProvider?.randomUUID?.() ?? uid(), schemaVersion: database.DB_VERSION,
     initialRestoreReceipt: clone(receipt), updatedAt: completedAt,
   });
-  await database.importInitialRestoreSnapshot(acquired.snapshot, device);
-  assertNotAborted(signal);
+  await database.importInitialRestoreSnapshot(acquired.snapshot, device, { assertAccess: assertOwner });
+  assertOwner();
   onState('RESTORE_FINALIZING');
   await registry.updateAccountRestore(ownerId, restoreId, { phase: 'RESTORE_FINALIZING' }, { cryptoProvider });
   await registry.finalizeAccountRestore(ownerId, receipt, { cryptoProvider });
