@@ -1,0 +1,37 @@
+{
+  "taskId": "continuous-n44-live-inapp-center-20261014",
+  "runId": "1e17c449-0207-46e1-8e56-baa2b7d99280",
+  "checks": [
+    {
+      "name": "n44_actual_account_event_generation",
+      "status": "PASS",
+      "evidence": "Actual registered synthetic account boot + runtime ownership guard; 3 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return."
+    }
+  ],
+  "screenshots": [
+    "tests/n44-ui-evidence/center-320.png",
+    "tests/n44-ui-evidence/center-390.png",
+    "tests/n44-ui-evidence/center-1280.png"
+  ],
+  "lease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:50066",
+  "checkpoint": {
+    "owner": "a4400000-0000-4000-8000-000000000001",
+    "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
+    "receipt": {
+      "ownerId": "a4400000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "foundationHash": "n44-synthetic-foundation"
+    },
+    "targets": [
+      "n44-cancelled",
+      "n44-foreign-session",
+      "n44-history-session",
+      "n44-past",
+      "n44-session"
+    ]
+  },
+  "status": "FAIL",
+  "error": "page.evaluate: Error: Cannot switch Product databases while one is mounted\n    at Proxy.selectDatabase (http://127.0.0.1:50066/src/lib/db.js:62:25)\n    at Module.activateWorkspace (http://127.0.0.1:50066/src/store.js:258:6)\n    at Module.prepareAccount (http://127.0.0.1:50066/tests/n44-fixture.mjs:49:9)\n    at async eval (eval at evaluate (:311:30), <anonymous>:1:15)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-live-inapp-center-20261014\\tests\\n44-browser.mjs:106:14",
+  "release": "RELEASED browser"
+}

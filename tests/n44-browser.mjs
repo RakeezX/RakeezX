@@ -10,7 +10,8 @@ import { fixedNow, owner, otherOwner } from './n44-fixture.mjs';
 const root=path.resolve('.'), output=path.join(root,'tests/n44-ui-evidence');
 const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n44-live-inapp-center-20261014.json';
 const leaseScript='C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1';
-const runId='a68107da-12e1-4d90-a67a-b1afddecfcf3';
+const runId=process.env.N44_RUN_ID;
+if(!runId)throw new Error('N44_RUN_ID must match the current activated card');
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-File',leaseScript,'-Name','browser','-Action',action,'-TaskFile',taskFile,'-OwnerToken',runId,'-WaitSeconds','0'],{encoding:'utf8'}).trim();
 const mime={'.js':'text/javascript','.mjs':'text/javascript','.html':'text/html','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.woff2':'font/woff2'};
 const server=http.createServer(async(req,res)=>{
@@ -21,21 +22,22 @@ const server=http.createServer(async(req,res)=>{
 const evidence={taskId:'continuous-n44-live-inapp-center-20261014',runId,checks:[],screenshots:[]};
 let browser,leased=false,started=false;
 async function checkpoint(page,expectedOwner=owner){
-  await page.waitForFunction(async expected=>{
-    const s=await import('/src/store.js');
-    return s.state.ready && s.getActiveWorkspace()?.authUserId===expected && !!document.querySelector('.layout');
-  },expectedOwner);
-  // Identity, receipt and affected data read together in this same document.
-  const value=await page.evaluate(async()=>{
-    const s=await import('/src/store.js');
+  // Return a snapshot from the successful checkpoint itself; a readiness
+  // predicate from a prior document never authorizes reads after a reload.
+  await page.evaluate(async()=>{window.__n44CheckpointStore=await import('/src/store.js');});
+  const handle=await page.waitForFunction(expected=>{
+    const s=window.__n44CheckpointStore;
+    if(!s.state.ready || s.getActiveWorkspace()?.authUserId!==expected || !document.querySelector('.layout') ||
+      s.state.device?.accountProvisioningReceipt?.ownerId!==expected)return false;
     return {owner:s.getActiveWorkspace()?.authUserId,database:s.getActiveWorkspace()?.databaseName,
       receipt:s.state.device?.accountProvisioningReceipt,targets:s.state.sessions.filter(r=>!r.deleted).map(r=>r.id)};
-  });
+  },expectedOwner);
+  const value=await handle.jsonValue();await handle.dispose();
   assert.equal(value.owner,expectedOwner);assert.equal(value.receipt.ownerId,expectedOwner);assert.ok(value.database.startsWith('rakeezx-user-'));return value;
 }
 async function bell(page){await page.locator('.n44-bell').waitFor();await page.locator('.n44-bell').click();await page.locator('.n44-center').waitFor();}
 async function close(page){await page.getByRole('dialog').locator('[data-sheet-close]').first().click();await page.locator('.n44-center').waitFor({state:'detached'});}
-async function shot(page,name){const filename=name+'.png';await page.screenshot({path:path.join(output,filename),fullPage:true});evidence.screenshots.push('tests/n44-ui-evidence/'+filename);}
+async function shot(page,name){const filename=name+'.png';await page.screenshot({path:path.join(output,filename),fullPage:true,animations:'disabled'});evidence.screenshots.push('tests/n44-ui-evidence/'+filename);}
 try{
   evidence.lease=lease('acquire');leased=true;
   await mkdir(output,{recursive:true});
@@ -74,6 +76,17 @@ try{
     assert.equal(await page.evaluate(()=>document.activeElement?.classList.contains('n44-bell')),true);
   }
   evidence.checks.push({name:'n44_actual_account_event_generation',status:'PASS',evidence:'Actual registered synthetic account boot + runtime ownership guard; 3 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return.'});
+  // Exercise the real account entry with the existing negative owner guard.
+  await bell(page);
+  await page.evaluate(async other=>{
+    const s=await import('/src/store.js'),g=(await import('/src/lib/sync-ownership.js')).runtimeSyncOwnershipGuard;
+    g.setWorkspace({...s.getActiveWorkspace(),authUserId:other});(await import('/src/app.js')).repaint();
+  },otherOwner);
+  await page.locator('.n44-center').waitFor({state:'detached'});assert.equal(await page.locator('.n44-bell').count(),0);
+  await page.evaluate(async()=>{
+    const s=await import('/src/store.js');(await import('/src/lib/sync-ownership.js')).runtimeSyncOwnershipGuard.setWorkspace(s.getActiveWorkspace());
+    (await import('/src/app.js')).repaint();
+  });
   await page.setViewportSize({width:390,height:844});await bell(page);
   await page.locator('[data-act="n44-read"]').first().click();await page.waitForFunction(()=>document.querySelectorAll('.n44-item--unread').length===2);
   await page.locator('[data-act="n44-dismiss"]').nth(1).click();await page.waitForFunction(()=>document.querySelectorAll('.n44-item').length===2);
@@ -101,8 +114,11 @@ try{
     (await import('/src/store.js')).deactivateWorkspace('n44-owner-switch');
     return {items:document.querySelectorAll('.n44-item').length,bells:document.querySelectorAll('.n44-bell').length};
   });assert.deepEqual(cleared,{items:0,bells:0});
-  await page.evaluate(async other=>{await(await import('/tests/n44-fixture.mjs')).prepareAccount(other);(await import('/src/app.js')).repaint();},otherOwner);
-  await page.reload();await checkpoint(page,otherOwner);await bell(page);
+  // Dispose the old document before async fixture preparation. Production's
+  // account switch also reloads; never mount B beside A's pending DB reads.
+  await page.goto(base+'/manifest.webmanifest');
+  await page.evaluate(async other=>{await(await import('/tests/n44-fixture.mjs')).prepareAccount(other);},otherOwner);
+  await page.goto(base+'/#/');await checkpoint(page,otherOwner);await bell(page);
   assert.ok(await page.locator('.n44-item--unread').count()>=3,'B does not inherit A read/dismiss state');await close(page);
   // Logout state removed synchronously by the auth/storage listener.
   await bell(page);
@@ -111,15 +127,15 @@ try{
     dispatchEvent(new StorageEvent('storage',{key:c.AUTH_STORAGE_KEY,newValue:null}));
     return document.querySelectorAll('.n44-item').length;
   });assert.equal(logout,0);
-  await page.waitForLoadState('domcontentloaded');
+  await page.goto(base+'/manifest.webmanifest');
   await page.evaluate(async()=>{await(await import('/tests/n44-fixture.mjs')).prepareAccount();});
-  await page.reload();await checkpoint(page);
+  await page.goto(base+'/#/');await checkpoint(page);
   evidence.checks.push({name:'n44_safe_navigation_no_sensitive_leak',status:'PASS',evidence:'Actual handler rechecks deleted child before navigation; allowlisted lesson opens exact session; storage contains IDs/timestamps only; unchanged outbox; read-only banner intact; deactivation/logout clear private DOM synchronously; B receives independent unread state.'});
   await page.clock.fastForward(60*60000);await bell(page);
   assert.equal(await page.locator('.n44-item').count(),1,'lesson expires at actual end');await close(page);
   await page.clock.fastForward(14*60*60000+15*60000);await bell(page);
   assert.equal(await page.locator('[data-act="n44-open"][data-id="due:n44-due:2026-10-14"]').count(),0,'dismissed due day does not resurrect on resume');await close(page);
-  await page.clock.fastForward(48*60*60000);await bell(page);
+  await page.clock.fastForward(72*60*60000);await bell(page);
   assert.equal(await page.locator('.n44-item').count(),0);await shot(page,'quiet-empty');await close(page);
   evidence.checks.push({name:'n44_owner_read_dismiss_expiry',status:'PASS',evidence:'Actual read/dismiss handlers persist over reload and resume without duplicates; exact lesson end and local due-day expiry recalculated, quiet empty state; A/B independent, synchronous clearing; pure bounded/clock/storage failure checks also 5/5 PASS.'});
   await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);

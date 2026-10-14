@@ -1,0 +1,42 @@
+{
+  "taskId": "continuous-n44-live-inapp-center-20261014",
+  "runId": "1e17c449-0207-46e1-8e56-baa2b7d99280",
+  "checks": [
+    {
+      "name": "n44_actual_account_event_generation",
+      "status": "PASS",
+      "evidence": "Actual registered synthetic account boot + runtime ownership guard; 3 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return."
+    },
+    {
+      "name": "n44_safe_navigation_no_sensitive_leak",
+      "status": "PASS",
+      "evidence": "Actual handler rechecks deleted child before navigation; allowlisted lesson opens exact session; storage contains IDs/timestamps only; unchanged outbox; read-only banner intact; deactivation/logout clear private DOM synchronously; B receives independent unread state."
+    }
+  ],
+  "screenshots": [
+    "tests/n44-ui-evidence/center-320.png",
+    "tests/n44-ui-evidence/center-390.png",
+    "tests/n44-ui-evidence/center-1280.png"
+  ],
+  "lease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:50830",
+  "checkpoint": {
+    "owner": "a4400000-0000-4000-8000-000000000001",
+    "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
+    "receipt": {
+      "ownerId": "a4400000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "foundationHash": "n44-synthetic-foundation"
+    },
+    "targets": [
+      "n44-cancelled",
+      "n44-foreign-session",
+      "n44-history-session",
+      "n44-past",
+      "n44-session"
+    ]
+  },
+  "status": "FAIL",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-live-inapp-center-20261014/tests/n44-browser.mjs:128:10",
+  "release": "RELEASED browser"
+}

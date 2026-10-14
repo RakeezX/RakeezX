@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n44-live-inapp-center-20261014",
+  "runId": "1e17c449-0207-46e1-8e56-baa2b7d99280",
+  "checks": [],
+  "screenshots": [],
+  "lease": "ACQUIRED browser",
+  "origin": "http://127.0.0.1:55798",
+  "status": "FAIL",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'a4400000-0000-4000-8000-000000000001'\n\n    at checkpoint (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-live-inapp-center-20261014/tests/n44-browser.mjs:35:10)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:502:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-live-inapp-center-20261014/tests/n44-browser.mjs:58:43",
+  "release": "RELEASED browser"
+}
