@@ -783,8 +783,15 @@ export class Controller {
     if (!task.lastWorkerReap?.exactAbsence || task.lastWorkerReap.runId !== result.runId
       || workerProcesses(task, null, processes).length || task.lastWorkerReap.owners?.some(o => processes.some(p => identityMatches(p, o)))) return false;
     if (!SHA.test(result.candidateSha ?? '') || result.baseSha !== task.baseSha
-      || normalize(result.worktreePath) !== normalize(task.worktreePath)
-      || !result.changedPaths?.every(f => allowed(f, task.allowedPaths))) return false;
+      || normalize(result.worktreePath) !== normalize(task.worktreePath) || !Array.isArray(result.changedPaths)) return false;
+    const inherited=result.changedPaths.filter(f=>!allowed(f,task.allowedPaths));
+    if(inherited.length){
+      if(!SHA.test(task.candidateSha??'') || !inherited.every(f=>typeof f==='string' && !f.startsWith('-') && !f.includes('..')))return false;
+      const ancestor=await this.command('git',['merge-base','--is-ancestor',task.candidateSha,result.candidateSha],{cwd:task.worktreePath});
+      if(ancestor.code!==0)return false;
+      const delta=await this.command('git',['diff','--name-only',task.candidateSha,result.candidateSha,'--',...inherited],{cwd:task.worktreePath});
+      if(delta.code!==0||delta.stdout.trim())return false;
+    }
     const evidence = (result.checks ?? []).map(c => c.evidence).join(' ');
     const ownerMatch = /owned by task ([a-z0-9._-]+) \(token ([a-f0-9-]{36})\)/i.exec(evidence);
     const lease = await readJson(path.join(this.runtime, 'leases', 'browser.json'));
