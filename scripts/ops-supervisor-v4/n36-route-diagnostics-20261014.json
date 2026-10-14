@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -25,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 25,
+      "idleMinutes": 10,
+      "objective": "Resume saved session 01a13461-ef85-7c53-add1-1eba2c19dace and exact candidate 84e03a63f422f455e95debf0b9b48fb71cc554c4. New real user test of private0.3.0: one-start creates the run page then stops UNSAFE_ROUTE, while user is on Madrasati. Source inspection finds UNSAFE_ROUTE is produced by our own navigation.js and selection.js at several indistinguishable stages. selection.js scans/validates all recognized auxiliary links before choosing the teacher route and aborts the entire page for one unsupported optional link. No actual failed URL was provided, so do not guess a new accepted path or weaken the allowlist.\nImplement a bounded private0.3.1 correction: keep the actual starting tabID captured before creating the run page; clearly identify which stage failed (start path, role selection, discovered auxiliary link, navigation/redirect). A rejected optional same-origin auxiliary link is NOT navigated/read: exclude only that route/category, show it as uncollected with concise reason, and permit already independently allowed routes/fields. A rejected mandatory teacher route, ambiguous role, actual origin/login/role change still stops and clears. Do not turn skipped data into a success claim. Keep existing same-origin/GET/no-form/no-grade/no-admin query/path controls byte-equivalent unless an exact narrower categorization bug is proven; no wildcard host or query allowance.\nAdd a user-visible safe diagnostic line for this error only: extension version, failed stage, reason category, normalized route TEMPLATE with identifier segments redacted, and unknown QUERY KEY names only where they are safe simple alphabetic parameter names (never values). Do not include account/school/student names, email, tokens, raw URL, DOM, storage or arbitrary high-entropy path segments. Provide a copy button for this small diagnostic, no automatic sending or telemetry. Stop UI should not blindly tell the user to repeat the same operation; say which data category was not collected and what safe diagnostic can identify a needed exact route. No successful official compatibility is claimed from synthetic tests.\nReproduce both cases using the ACTUAL extension installed in a fresh owned Chromium profile with local multi-page fixtures: (1) permitted homepage/teacher route with one optional edit/logout-shaped link among legitimate roster/timetable links; old version aborts, new version never visits the rejected link and shows accurate partial collection; (2) disallowed starting/mandatory route still stops before private read and shows precise sanitized diagnostic. Test query token/redactedID variants without disclosing values, source-tab vs extension-tab binding, unchanged cancellation/expiry and no wider permissions. Do not run every old category test unless modified.\nPackage only reviewed runtime/license files as0.3.1 with checksum and concise difference; preserve0.3.0 and the user-installed folder unchanged. No user Chrome/official school-page access, personal profile/token access, service/SQL/Auth or public release. Final BLOCKED/external must retain officialDOM and Rakeez metadata/timetable commit gates NOT_RUN; this local correction/diagnostic is useful progress, not full N36 closure. Reuse prior candidate rather than rewrite.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched."
+      ],
+      "releaseAuthority": "Current PO reports a local extension navigation error after installing the reviewed helper. Only private local code/packaging and synthetic extension tests in this phase; no expanded routes or personal browser/account operations. New real user test of private0.3.0: one-start creates the run page then stops UNSAFE_ROUTE, while user is on Madrasati. Source inspection finds UNSAFE_ROUTE is produced by our own navigation.js and selection.js at several indistinguishable stages. selection.js scans/validates all recognized auxiliary links before choosing the teacher route and aborts the entire page for one unsupported optional link. No actual failed URL was provided, so do not guess a new accepted path or weaken the allowlist."
+    }
+  ]
+}
