@@ -1,0 +1,63 @@
+{
+  "taskId": "continuous-n58-fresh-account-calendar-foundation-20261014",
+  "runId": "04bd5016-b21b-43a3-938a-ff2daf13a8f0",
+  "preservedCandidateSha": "8103557323ae7e342d615c4844268e8d48a71465",
+  "baseSha": "a256a1cce6f0368a1a4dbe3dc24ead677cfaf0d5",
+  "productSourceHashes": {
+    "src/store.js": "b1f2b352b4dd5e89bf87cabca4d55070f3a0bb50a7f7ab2fdc65134fee305c46",
+    "src/lib/calendar-runtime.js": "685a5802c775ea45775565ec85d593648b207efbb1d61d800a739c58efe15108",
+    "src/lib/sync-v2.js": "f08ecaf8d032e18157b6e161f215285addf98db7638685aba8fec0149e1594b4",
+    "sw.js": "4aee518d80e264b023072788d8be98f123e01a81a8c14d241edbf76cf91512f4"
+  },
+  "upgradeReceiptSha256": "ac45c547ac52c4d708d4a82efc42434666e60daa9fc409b80e332f36261acac6",
+  "operatorRecordSha256": "4bc3ed2e1647881cb69294272b54f763a039873a7fdcd8b1096dcae136402710",
+  "checks": [
+    {
+      "name": "n58_actual_new_account_first_rejection",
+      "status": "PASS",
+      "evidence": "Reused preserved historical LOCAL HTTP400/22023 N58_EXISTING_TERMS_REQUIRED receipt; saved source hashes verified. No claim about the PO's unknown hosted error or exact65 count. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    },
+    {
+      "name": "n58_foundation_dependencies_local_protocol",
+      "status": "PASS",
+      "evidence": "Saved default/before-Sync/after-Sync, lost-ack and selectionRevision proofs retained. Foundation, selection and dependency sections match saved source; new healthy first-use context guard test passes. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    },
+    {
+      "name": "n58_hold_preserved_and_no_legacy_replay",
+      "status": "PASS",
+      "evidence": "Hold remains true. Actual upgraded DOM/handlers/CSS retain disabled region cards. Missing-term fixture retains exactly65 envelopes and unchanged persisted checkpoints; no reset or resend. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    },
+    {
+      "name": "n58_owner_history_and_current_regressions",
+      "status": "PASS",
+      "evidence": "Three focused native read/write/history tests and existing N101 missing-parent test pass. Historical context/checkpoints unchanged; prior unaffected owner/N90/N98 evidence retained. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    },
+    {
+      "name": "n58_existing_account_upgrade_readonly",
+      "status": "PASS",
+      "evidence": "Three fresh synthetic HTTP account fixtures upgrade from a256 through saved/corrected source without reset. Calendar and teacher mini-hub open; checkpoint hashes match; corrected documents have zero unhandled errors. Original saved projection failures preserved. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    },
+    {
+      "name": "n58_existing_service_identity_binding",
+      "status": "PASS",
+      "evidence": "Operator-record CRLF-normalized body digests for mutation entry, year guard and provisioning match certified LOCAL receipt. Recorded in n58-fresh-account-release-binding.json; no hosted calls or service mutations. Reused unchanged evidence; source/receipt identity verified in run 04bd5016-b21b-43a3-938a-ff2daf13a8f0."
+    }
+  ],
+  "outstandingProductAcceptance": [
+    {
+      "name": "full_n58_hosted_acceptance",
+      "status": "FAIL",
+      "evidence": "Prior hosted A session/A2 restore failure preserved and remains outstanding; outside this limited release."
+    },
+    {
+      "name": "full_n58_remaining_gates",
+      "status": "NOT_RUN",
+      "evidence": "Hosted context/owner/preset/device gates, retained65 recovery, retired-pair scope, switching re-enablement and N58 closure remain outstanding."
+    }
+  ],
+  "previousValidationFailure": "Candidate validation: An affected check must pass and no recorded check may fail",
+  "correction": "Final readiness checks are the six activated limited-release checks. Broader hosted FAIL/NOT_RUN are preserved as OUTSTANDING Product acceptance, not relabeled PASS or included as readiness criteria for this explicitly authorized narrower release.",
+  "validation": "PASS actual controller readiness predicates: at least one affected PASS, no failing in-scope check, all six required names PASS. Controller code/config unchanged.",
+  "reexecution": "NONE: no Product/browser/service/protocol rerun; existing identical source/receipt evidence reused.",
+  "publication": "NONE"
+}
