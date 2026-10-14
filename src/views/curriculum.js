@@ -208,7 +208,7 @@ export default {
               <div class="empty__title">لا وحدات في هذا المنهج</div>
               <div class="empty__text">
                 أضف وحدات ${gradeLabel(grade)} للفصل ${TERM_ORDINALS[termIndex]}،
-                وستكون متاحة لكل شعبك في هذا الصف.
+                وستكون متاحة لكل فصولك في هذا الصف.
               </div>
               <button class="btn btn--primary" data-act="add-unit">${icon('plus')} وحدة جديدة</button>
             </div>

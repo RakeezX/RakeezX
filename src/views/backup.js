@@ -463,7 +463,7 @@ export default {
     const demo = store.getActiveWorkspace()?.type === 'demo';
     const n = (key) => (s[key] ?? []).filter((record) => !record.deleted).length;
     const counts = {
-      'سنوات دراسية': n('years'), 'فصول دراسية': n('terms'), شعب: n('sections'),
+      'سنوات دراسية': n('years'), 'فصول دراسية': n('terms'), 'فصول صفية': n('sections'),
       فصول: n('teachings'), طلاب: n('students'), انتسابات: n('enrollments'),
       حصص: n('sessions'), درجات: n('scores'), 'سجلات حضور': n('attendance'), 'رصدات سريعة': n('logs'),
     };
