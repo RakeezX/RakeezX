@@ -22,3 +22,6 @@ For every new or edited date/time input, reuse src/lib/rakeez-datetime.js and ra
 
 ## Isolated local browser checks
 Local-only synthetic UI checks may use the canonical `isolated-local-browser.mjs` helper without reserving the shared live-browser lease: fresh owned contexts, loopback-only, no credentials/personal profiles/Service Workers and bounded cleanup. Live account/Sync/Service Worker/remote checks retain the existing shared phase lease and exact authority. Read `worker-policy.txt` for the narrow eligibility. Do not confuse a successful isolation proof with Product acceptance.
+
+## Current notes drive continuation
+The sole controller rereads approved open Product notes every60seconds, admits their exact source-linked actions and starts the next eligible one after delivery. No new planner/reviewer or parallel loop. Read the latest row for the assigned Product ID; preserve explicit closure/deferral and actual data/service safeguards. See the direct-notes section of the operating contract.

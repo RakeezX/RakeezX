@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID, createHash } from 'node:crypto';
+import { readApprovedNotes } from './approved-notes.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -304,7 +305,14 @@ export class Controller {
   }
   async importCatalog() {
     const catalog = await readJson(path.join(this.runtime, 'intake-catalog.json'), { tasks: [] });
-    for (const card of catalog.tasks ?? []) {
+    if (!this.noteReadAt || this.clock() - this.noteReadAt >= 60000) {
+      try { this.noteCache = await readApprovedNotes(this.repo,this.config.controller.activationId); }
+      catch(error) { this.noteCache={cards:[],openProducts:[],issues:[{code:'NOTES_READ_FAILED',message:clean(error.message)}]}; }
+      this.noteReadAt=this.clock();
+      await this.event('notes_checked',{openProducts:this.noteCache.openProducts,approvedSources:this.noteCache.cards.length});
+    }
+    this.issues.push(...this.noteCache.issues);
+    for (const card of [...(catalog.tasks ?? []),...this.noteCache.cards]) {
       if (card.activationId !== this.config.controller.activationId || this.jobs.some(t => t.id === card.id)) continue;
       if (!ID.test(card.id ?? '') || !ID.test(card.productId ?? '') || !card.objective || !Array.isArray(card.allowedPaths) || !card.allowedPaths.length) {
         this.issues.push({ code: 'CARD_INVALID', taskId: card.id }); continue;
@@ -317,6 +325,8 @@ export class Controller {
       const task = { ...card, workflowVersion: 5, status: 'pending', implementationFailures: 0, infrastructureRetries: 0, createdAt: this.now(), __file: file };
       await this.save(task); this.jobs.push(task); await this.event('card_admitted', { taskId: task.id });
     }
+    this.unassignedNotes=this.noteCache.openProducts.filter(id=>!this.jobs.some(t=>t.productId===id&&t.status!=='closed'));
+    for(const productId of this.unassignedNotes)this.issues.push({code:'OPEN_NOTE_WITHOUT_EXECUTION',productId,message:'Open note needs an approved actionable source or an explicit decision/access condition.'});
     this.jobs.sort((a, b) => Number(a.priority ?? 100) - Number(b.priority ?? 100) || a.id.localeCompare(b.id));
   }
   async loadRecords() {
@@ -866,6 +876,7 @@ export class Controller {
       blockedCount: this.jobs.filter(t => t.status === 'blocked').length, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
       active: active.map(t => ({ id: t.id, productId: t.productId, status: t.status, runnerPid: t.runnerPid, sessionId: t.sessionId, candidateSha: t.candidateSha })),
       tasks: this.jobs.map(t => ({ id: t.id, productId: t.productId, status: t.status, retryAt: t.retryAt, nextDeliveryAt: t.nextDeliveryAt, lastFailure: t.lastFailure })),
+      notesCheckedAt:this.noteReadAt?new Date(this.noteReadAt).toISOString():null, notesWithoutExecution:this.unassignedNotes??[],
       deliveryInFlight: this.deliveryInFlight, lastDeliveryProgress: this.progress,
       idleReason: paused ? 'PAUSED_BY_MARKER' : !inventoryKnown ? 'PROCESS_INVENTORY_UNAVAILABLE' : active.length ? null : this.jobs.some(t => t.status === 'pending') ? 'PENDING_ELIGIBILITY' : this.jobs.some(t => t.status === 'retry_wait') ? 'WAITING_SAVED_RETRY' : this.jobs.some(t => t.status === 'blocked') ? 'BLOCKED_ACTIVATED_WORK' : 'NO_ACTIVATED_PENDING_CARDS',
       issues: this.issues });
