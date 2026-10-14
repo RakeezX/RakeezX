@@ -1105,7 +1105,7 @@ export const getScoreDistributionCapability = () => distributionRPC('score_distr
 export const planScoreDistribution = (envelope) => distributionRPC('plan_score_distribution', {
   p_plan_id: envelope.planId, p_source: envelope.sourceTeachingId,
   p_targets: envelope.targetTeachingIds, p_remove: envelope.removeItemIds ?? [],
-  ...(envelope.mode === 'preserve-target' ? { p_mode: envelope.mode } : {}),
+  ...(['preserve-target', 'automatic-safe'].includes(envelope.mode) ? { p_mode: envelope.mode } : {}),
 }, 'planScoreDistribution', envelope);
 export const applyScoreDistributionPlan = (envelope) => distributionRPC('apply_score_distribution_plan', {
   p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,

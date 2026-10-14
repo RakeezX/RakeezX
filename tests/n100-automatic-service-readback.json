@@ -1,0 +1,94 @@
+{
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "taskId": "continuous-n100-automatic-safe-copy-20261014",
+  "runId": "520ba35e-2582-4475-914d-a16ce2effa19",
+  "authority": "PO-20261014-N100-automatic-safe-copy",
+  "migrationFile": "supabase/migrations/20261014090000_n100_automatic_safe_copy.sql",
+  "migrationSha256": "42aeb3f90c55924a93e5bd8394a1638a0d8bee99a25576299d3fb126980e09dd",
+  "migrationHistory": {
+    "version": "20261014001558",
+    "name": "n100_automatic_safe_copy"
+  },
+  "priorHistoryRetained": true,
+  "appliedOnce": true,
+  "sourceAclSecurityMatchesNative": true,
+  "capability": {
+    "capability": {
+      "protocol": "N73_D119_V2",
+      "automaticSafeCopyVersion": 1,
+      "distributionApplyVersion": 2,
+      "targetPreservationVersion": 1
+    },
+    "authenticated_builder": false,
+    "anon_planner": false,
+    "authenticated_planner": true
+  },
+  "functions": [
+    {
+      "signature": "rakeezx.apply_score_distribution_plan(text,text,text,text,boolean)",
+      "body_md5": "b25642ed07bc4d2369862a6953cd6c71",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.n73_build_distribution(text,text[],text[],text)",
+      "body_md5": "479be8729717e19a48317c644c142cb6",
+      "acl": "{postgres=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.n73_build_distribution(text,text[],text[])",
+      "body_md5": "8f56076d22eb24ec4b6e483ab47f6496",
+      "acl": "{postgres=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.n73_distribution_state(text,text[])",
+      "body_md5": "b6acbc0a1e59ae6ac54d0832723446dd",
+      "acl": "{postgres=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.plan_score_distribution(text,text,text[],text[],text)",
+      "body_md5": "9b41682160a7e1e809f519e889a35e1b",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.plan_score_distribution(text,text,text[],text[])",
+      "body_md5": "2bc9107e2958a80fa0a5a843e4ca690b",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "signature": "rakeezx.score_distribution_capability()",
+      "body_md5": "8aabdab42d2f871a59fb0ebae1f34b52",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=\"\""
+      ]
+    }
+  ],
+  "realDataReadOrMutated": false,
+  "newAuthIds": 0,
+  "newTables": 0
+}

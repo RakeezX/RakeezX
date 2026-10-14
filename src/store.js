@@ -4010,6 +4010,9 @@ async function requireDistributionAccount(mode = 'definitions') {
   if (capability?.distributionApplyVersion !== 2 || capability?.protocol !== 'N73_D119_V2') {
     throw new Error('خادم نسخ التوزيع يحتاج إلى تحديث. النسخ السابق ما زال متاحًا.');
   }
+  if (mode === 'automatic-safe' && capability?.automaticSafeCopyVersion !== 1) {
+    throw new Error('النسخ الآمن التلقائي يحتاج إلى تحديث الخادم.');
+  }
   if (mode === 'preserve-target' && capability?.targetPreservationVersion !== 1) {
     throw new Error('حفظ سجلات الفصل الهدف يحتاج إلى تحديث الخادم.');
   }
@@ -4029,7 +4032,7 @@ export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds,
     const owner = cloud.user.id, workspace = activeWorkspace.databaseName;
     const plan = await cloud.planScoreDistribution({ planId: uid(), sourceTeachingId, targetTeachingIds, removeItemIds, mode });
     if (cloud.user?.id !== owner || activeWorkspace?.databaseName !== workspace ||
-        plan?.protocol !== 'N73_D119_V2' || (mode === 'preserve-target' && plan.mode !== mode) || !Array.isArray(plan.targets) || !plan.token || !plan.planId) {
+        plan?.protocol !== 'N73_D119_V2' || (mode !== 'definitions' && plan.mode !== mode) || !Array.isArray(plan.targets) || !plan.token || !plan.planId) {
       throw new Error('تعذّر التحقق من مراجعة التوزيع.');
     }
     reviewedDistributions.set(distributionReviewKey(sourceTeachingId, targetTeachingIds, removeItemIds, mode), plan);

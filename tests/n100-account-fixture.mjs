@@ -3,7 +3,7 @@ import * as models from '../src/models.js';
 import {planScoreDistributionCopy,distributionCopyToken} from '../src/lib/score-distribution-copy.js';
 import {encodeSyncV2Patch,decodeSyncV2Canonical,SYNC_V2_SCHEMAS} from '../src/lib/sync-v2.js';
 export {owner,foreignOwner,source,target,second,prepareAccount} from './n73-account-flow-fixture.mjs';
-export const capability={...oldCapability,targetPreservationVersion:1};
+export const capability={...oldCapability,targetPreservationVersion:1,automaticSafeCopyVersion:1};
 export function fixture() {
   const rows=originalFixture(),owned=row=>({...row,ownerId:owner,serverRevision:1});
   rows.items.find(row=>row.id==='n73-target-exam').max=20;
