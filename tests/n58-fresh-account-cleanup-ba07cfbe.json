@@ -1,0 +1,35 @@
+{
+  "runId": "ba07cfbe-1861-4a6b-a4b1-2137ec432a26",
+  "cleanup": [
+    {
+      "kind": "container",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-rest",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-auth",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-mail",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-postgres",
+      "closed": true
+    },
+    {
+      "kind": "volume",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-pgdata",
+      "closed": true
+    },
+    {
+      "kind": "network",
+      "name": "n58-ba07cfbe18614a6ba4b12137ec432a26-net",
+      "closed": true
+    }
+  ]
+}

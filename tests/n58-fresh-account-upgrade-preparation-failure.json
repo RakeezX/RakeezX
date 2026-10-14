@@ -1,0 +1,114 @@
+{
+  "runId": "ef502f1b-29ef-496e-8611-21d74fda045e",
+  "base": "a256a1cce6f0368a1a4dbe3dc24ead677cfaf0d5",
+  "saved": "9603682900001d29ad8ccdb95d7ce26c5357a2f9",
+  "cases": [
+    {
+      "kind": "populated",
+      "savedError": null,
+      "originalPageErrors": [],
+      "reading": {
+        "status": {
+          "ok": true
+        },
+        "ranges": 7,
+        "terms": [
+          "tm:y:1448-1449:1",
+          "tm:y:1448-1449:2"
+        ],
+        "eligible": true,
+        "presentation": [
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "recorded",
+            "calendarContext": {
+              "yearId": "y:1448-1449",
+              "termId": "tm:y:1448-1449:1",
+              "presetId": "sa-general-1448-1449",
+              "selectionRevision": 7,
+              "kind": "remote",
+              "source": "custom",
+              "label": "Recorded earlier"
+            }
+          },
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "unrecorded",
+            "calendarContext": null
+          }
+        ]
+      },
+      "checkpointUnchanged": true,
+      "owner": "a5800000-0000-4000-8000-000000000011",
+      "database": "rakeezx-user-f9ef428f0d90d4760e24da933df526d7",
+      "retainedOutbox": 0
+    },
+    {
+      "kind": "populated-legacy-overlap",
+      "savedError": "Calendar resolution failed: overlapping-term-bounds",
+      "originalPageErrors": [
+        {
+          "documentPhase": "saved",
+          "message": "Calendar date resolution failed: invalid-calendar"
+        }
+      ],
+      "reading": {
+        "status": {
+          "ok": false,
+          "reason": "overlapping-term-bounds",
+          "warning": "بيانات التقويم غير مكتملة؛ المعروض من السجلات المحفوظة، وإنشاء الحصص متوقف حتى التحقق."
+        },
+        "ranges": 7,
+        "terms": [
+          "tm:y:1448-1449:1",
+          "tm:y:1448-1449:2",
+          "legacy:extra"
+        ],
+        "eligible": false,
+        "presentation": [
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "recorded",
+            "calendarContext": {
+              "yearId": "y:1448-1449",
+              "termId": "tm:y:1448-1449:1",
+              "presetId": "sa-general-1448-1449",
+              "selectionRevision": 7,
+              "kind": "remote",
+              "source": "custom",
+              "label": "Recorded earlier"
+            }
+          },
+          {
+            "ok": true,
+            "label": "تمت",
+            "tone": "ok",
+            "counts": true,
+            "reason": "",
+            "provenance": "unrecorded",
+            "calendarContext": null
+          }
+        ]
+      },
+      "checkpointUnchanged": true,
+      "owner": "a5800000-0000-4000-8000-000000000012",
+      "database": "rakeezx-user-b80dd061b17656c605c36dd28378f3c9",
+      "retainedOutbox": 0
+    }
+  ],
+  "scope": "LOCAL synthetic read-only upgrade; no hosted/service acceptance",
+  "status": "FAIL",
+  "error": "page.evaluate: Error: يلزم التحقق من الحساب لاستئناف التعديل. يمكنك العرض والتصدير وتنزيل نسخة احتياطية.\n    at leaseWriteError (http://127.0.0.1:4199/src/lib/offline-lease.js:32:52)\n    at Object.assertWritable (http://127.0.0.1:4199/src/lib/offline-lease.js:115:36)\n    at assertLeaseWritable (http://127.0.0.1:4199/src/store.js:188:25)\n    at checkProductWrite (http://127.0.0.1:4199/src/lib/db.js:54:57)\n    at write (http://127.0.0.1:4199/src/lib/db.js:354:42)\n    at read.onsuccess (http://127.0.0.1:4199/src/lib/db.js:378:32)"
+}

@@ -146,6 +146,7 @@ const SHELL = [
   './src/lib/demo.js',
   './src/lib/demo-workspace.js',
   './src/lib/calendar-presets.js',
+  './src/lib/calendar-runtime.js',
   './src/lib/subject-catalog.js',
   './src/lib/effects.js',
   './src/lib/sound.js',
