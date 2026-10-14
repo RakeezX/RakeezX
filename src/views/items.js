@@ -302,7 +302,7 @@ export default {
     if (isDemo()) return;
     Promise.all([getScoreFoundationCapability(), getScoreDistributionCapability().catch(() => null)]).then(([capability, distribution]) => {
       distributionAvailable = distribution?.distributionApplyVersion === 2 && distribution?.protocol === 'N73_D119_V2';
-      preservationAvailable = distributionAvailable && distribution?.targetPreservationVersion === 1;
+      preservationAvailable = distributionAvailable && distribution?.automaticSafeCopyVersion === 1;
       foundationAvailable = capability?.scoreDomainVersion === 1 &&
         capability?.restoreProtocol === 'CORE_V2' && capability?.backupVersion === 5 &&
         capability?.copyDomainVersion === 1;
@@ -391,19 +391,15 @@ export default {
     },
 
     async copy(el, ev, params) {
-      if (!isDemo() && !distributionAvailable) return legacyCopy(el, ev, params);
+      if (!isDemo() && !preservationAvailable) { toast('النسخ الآمن التلقائي يحتاج إلى تحديث الخادم.', 'warn'); return; }
       if (!supportsFoundation()) { toast('متاح في التجربة حتى اكتمال المزامنة الآمنة.', 'warn'); return; }
       const targets = store.previewScoreDistributionCopy(params.id);
       const source = store.getTeaching(params.id);
       if (!targets.length) { toast('لا توجد فصول مطابقة', 'warn'); return; }
       const selection = await openSheet({
         title: 'نسخ توزيع الدرجات إلى فصول أخرى',
-        desc: 'اختر الفصول ثم راجع الأثر. لا تُنسخ درجات الطلاب أو سجلاتهم.',
-        body: html`<fieldset class="safe-choices"><legend>طريقة النسخ</legend>
-          <label><input type="radio" name="copy-mode" data-copy-mode value="definitions" checked> نسخ التوزيع فقط</label>
-          <label><input type="radio" name="copy-mode" data-copy-mode value="preserve-target" ${isDemo() || preservationAvailable ? '' : 'disabled'}> نسخ مع حفظ سجلات الفصل الهدف</label>
-          <p>${isDemo() || preservationAvailable ? 'درجات المصدر لا تُنسخ. حفظ الهدف متاح للبنود المتطابقة في طريقة الرصد والحد الأعلى وترتيب العناصر ونقاطها، حتى إن اختلفت أسماؤها.' : 'حفظ سجلات الفصل الهدف يحتاج إلى تحديث الخادم. نسخ التوزيع فقط ما زال متاحًا ولا ينسخ درجات المصدر.'}</p>
-        </fieldset><fieldset class="target-list"><legend>الفصول المستهدفة</legend>${targets.map(target => html`
+        desc: 'سجلات الفصول المستهدفة محفوظة، ولا تُنسخ درجات طلاب الفصل المصدر.',
+        body: html`<fieldset class="target-list"><legend>الفصول المستهدفة</legend>${targets.map(target => html`
           <label class="target-class"><input type="checkbox" data-copy-target value="${target.teachingId}">
             <span>${store.sectionLabel(store.getSection(target.sectionId))}</span></label>`)}</fieldset>
           <div data-copy-review aria-live="polite"></div>`,
@@ -412,14 +408,13 @@ export default {
         onMount(root, done) {
           let plan = null;
           let selected = [];
-          let mode = 'definitions';
+          const mode = 'automatic-safe';
           let requestVersion = 0;
           const apply = root.querySelector('[data-copy-apply]');
           const review = root.querySelector('[data-copy-review]');
           const refresh = async () => {
             const version = ++requestVersion;
             selected = [...root.querySelectorAll('[data-copy-target]:checked')].map(input => input.value);
-            mode = root.querySelector('[data-copy-mode]:checked').value;
             const requested = [...selected];
             const requestedMode = mode;
             plan = null; apply.disabled = true;
@@ -428,34 +423,28 @@ export default {
               const incoming = await store.reviewScoreDistributionCopy(params.id, requested, { mode: requestedMode });
               if (version !== requestVersion || !root.isConnected) return;
               plan = incoming;
-              render(review, html`<p>سيُطبّق توزيع ${store.sectionLabel(store.getSection(source.sectionId))}
-                على ${selected.map(id => store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))).join('، ')}.</p>
+              render(review, html`<p>مراجعة النسخ من ${store.sectionLabel(store.getSection(source.sectionId))}
+                إلى ${selected.map(id => store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))).join('، ')}.</p>
                 <p>${plan.changedCount} بنود ستتغيّر. تبقى الفصول مستقلة بعد النسخ.</p>
                 ${plan.targets.map(target => target.beforeTotal != null ? html`<p>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}: المجموع ${target.beforeTotal} ← ${target.afterTotal} درجة.</p>` : '')}
                 ${(plan.excludedTargets ?? []).map(target => html`<p role="alert">${target.reason}
                   <a href="#/teaching/${target.teachingId}/items">فتح توزيع الفصل المستهدف</a> · لن يُطبّق عليه التوزيع.</p>`)}
-                ${plan.requiresConfirmation ? html`<p>${mode === 'preserve-target' ? 'تبقى سجلات الهدف؛ راجع الأسماء والتواريخ المنسوخة قبل التأكيد.' : 'يؤثر هذا التوزيع في درجات أو طريقة رصد محفوظة؛ يلزم تأكيد الأثر قبل التطبيق.'}</p>` : ''}
-                ${plan.targets.some(target => target.extras.length) ? html`<p>${mode === 'preserve-target' ? 'تبقى البنود الإضافية ودرجاتها كما هي.' : 'تبقى البنود الإضافية ودرجاتها؛ يمكنك مراجعة إزالتها في عرض الأثر.'}</p>` : ''}
-                <details><summary style="min-height:44px;cursor:pointer">عرض الأثر</summary>
+                ${plan.targets.some(target => target.extras.length) ? html`<p>تبقى البنود الإضافية ودرجاتها كما هي.</p>` : ''}
+                <div class="copy-impact">
                   ${plan.targets.map(target => html`<section class="target-review"><h3>${store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId))}</h3>
-                    ${target.impact.map(item => html`<p>${item.name}: ${item.created ? 'بند جديد دون درجات الطلاب' : html`الحد الأعلى ${item.beforeMax} ← ${item.max}`}.
-                      ${item.affected ? html`تتغيّر درجات ${item.affected} طلاب. ${item.examples.map(example => html`${example.before ?? 'غير مرصود'} ← ${example.after ?? 'غير مرصود'} `)}` : ''}
-                      ${item.modeChanged ? 'تتغيّر طريقة الرصد؛ القيم اليدوية السابقة لن تحدد الدرجة الآلية، والانتقال إلى اليدوي يبدأ غير مرصود.' : ''}
-                      ${item.removedSubitems ? html`تُزال ${item.removedSubitems} بنود فرعية واختياراتها التابعة.` : ''}
-                      ${mode === 'preserve-target' ? html`تبقى ${item.preservedScores ?? 0} سجلات درجات و${item.preservedCompletions ?? 0} اختيارات للهدف، مع الإضافات اليدوية وتاريخ الإنشاء.` : ''}
-                      ${(item.subitems ?? []).map(sub => html`<span style="display:block">${sub.name} · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi> · ${sub.points} عادي / ${sub.latePoints} متأخر${sub.preserved ? ' · تبقى هوية عنصر الهدف واختياراته' : ' · عنصر جديد غير مرصود'}</span>`)}</p>`)}
-                    ${target.extras.map(extra => html`<p>${extra.name} — غير موجود في الفصل المصدر. سيبقى هذا البند ودرجات طلابه كما هي.</p>
-                      ${mode === 'definitions' ? html`<label class="target-class"><input type="checkbox" data-copy-remove value="${extra.id}">
-                      <span>إزالة هذا البند: ${extra.name} (ودرَجاته واختياراته التابعة)</span></label>` : ''}`)}</section>`)}
-                </details>`);
-              apply.disabled = !plan.targets.length;
+                    ${target.impact.map(item => html`<p>${item.name}: ${item.retained ? html`بقي كما هو — ${item.reason}` : item.unchanged ? 'مطابق؛ تبقى سجلاته كما هي' : item.created ? 'إضافة بند دون درجات الطلاب' : 'تحديث التعريف والأسماء والتواريخ؛ تبقى سجلاته محفوظة'}.
+                      ${!item.retained && item.beforeMax != null && Number(item.beforeMax) !== Number(item.max) ? html`الحد الأعلى ${item.beforeMax} ← ${item.max}.` : ''}
+                      ${(item.subitems ?? []).map(sub => html`<span style="display:block">${sub.name} · البداية <bdi dir="ltr">${sub.startDate ?? 'غير محددة'}</bdi> · الاستحقاق <bdi dir="ltr">${sub.dueDate ?? 'غير محدد'}</bdi></span>`)}</p>`)}
+                    ${target.extras.map(extra => html`<p>${extra.name} — بقي هذا البند ودرجات طلابه كما هي.</p>`)}</section>`)}
+                </div>`);
+              apply.disabled = !plan.targets.length || !plan.changedCount;
             } catch (error) {
               if (version !== requestVersion || !root.isConnected) return;
               render(review, html`<p role="alert">${error.message}</p>
                 ${selected.map(id => html`<a href="#/teaching/${id}/items">فتح توزيع ${store.sectionLabel(store.getSection(store.getTeaching(id).sectionId))}</a>`)}`);
             }
           };
-          root.addEventListener('change', event => { if (event.target.matches('[data-copy-target], [data-copy-mode]')) refresh(); });
+          root.addEventListener('change', event => { if (event.target.matches('[data-copy-target]')) refresh(); });
           apply.addEventListener('click', () => {
             if (!plan) return;
             done({ selected, token: plan.token, mode,
@@ -467,22 +456,15 @@ export default {
       try {
         const review = await store.reviewScoreDistributionCopy(params.id, selection.selected, { removeItemIds: selection.removeItemIds, mode: selection.mode });
         if (review.token !== selection.token) throw new Error('تغيّر التوزيع منذ المراجعة. افتح المراجعة من جديد.');
-        if (review.requiresConfirmation && !await confirmSheet({
+        if (!await confirmSheet({
           title: 'تأكيد أثر التوزيع',
-          desc: selection.mode === 'preserve-target' ? 'تُنسخ الأسماء وتواريخ البداية والاستحقاق المعروضة. تبقى هويات عناصر الهدف ودرجاته واختياراته العادية والمتأخرة والإضافات اليدوية وتاريخ الإنشاء كما هي. لا تُنسخ درجات المصدر، ولا يُحذف أي بند إضافي.' : review.targets.map(target => {
-            const label = store.sectionLabel(store.getSection(store.getTeaching(target.teachingId).sectionId));
-            const affected = target.impact.reduce((sum, item) => sum + item.affected, 0);
-            const removed = target.extras.filter(item => selection.removeItemIds.includes(item.id)).length;
-            return label + ': ' + affected + ' تغييرات درجات، ' + removed + ' بنود إضافية ستُحذف. ' +
-              target.extras.filter(item => selection.removeItemIds.includes(item.id))
-                .map(item => item.name + ' (' + (item.affected ?? 0) + ' درجات طلاب محفوظة)').join('، ');
-          }).join(' ') + ' تُطبّق الحدود وطرق الرصد المعروضة، وتُحذف اختيارات البنود الفرعية المُزالة. لا تُنسخ درجات المصدر.',
+          desc: 'تُطبّق التحديثات والإضافات المعروضة فقط. تبقى البنود المحمية وسجلاتها كما هي، ولا تُنسخ درجات المصدر.',
           confirmLabel: 'تأكيد التطبيق',
         })) return;
         const result = await store.applyReviewedScoreDistribution(params.id, selection.selected, {
           expectedToken: selection.token, removeItemIds: selection.removeItemIds, confirmed: true, mode: selection.mode,
         });
-        toast(result.changedCount ? `طُبّق التوزيع على ${result.targets.length} فصول (${result.changedCount} بنود)` : 'التوزيع مطابق؛ لا تغييرات');
+        toast(result.changedCount ? `طُبّقت التحديثات والإضافات (${result.changedCount} بنود)` : 'لا توجد تحديثات آمنة؛ بقي التوزيع كما هو');
         repaint();
       } catch (error) { toast(error.message || 'تعذر تطبيق التوزيع؛ لم تُحفظ تغييرات', 'danger'); }
     },

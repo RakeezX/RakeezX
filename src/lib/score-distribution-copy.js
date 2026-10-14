@@ -1,6 +1,6 @@
 import { distributionToken, distributionTargets, planAcceptedDistribution } from './score-foundation.js';
 
-export const DISTRIBUTION_MODES = ['definitions', 'preserve-target'];
+export const DISTRIBUTION_MODES = ['definitions', 'preserve-target', 'automatic-safe'];
 const live = rows => (rows ?? []).filter(row => !row.deleted);
 const ordered = rows => [...rows].sort((a,b) => a.order-b.order || a.id.localeCompare(b.id));
 const normalized = name => String(name ?? '').trim().replace(/\s+/g,' ').toLowerCase();
@@ -8,14 +8,21 @@ const representation = row => JSON.stringify([row.scoreMode ?? 'direct',row.auto
   row.perPoint ?? 1,row.penalty ?? 1,row.distributionMode ?? 'auto']);
 const incompatible = message => { throw new Error(message+'؛ سجلات الفصل الهدف ستبقى كما هي.'); };
 export function distributionCopyToken(current,source,targets,mode='definitions') {
-  return mode==='definitions' ? distributionToken(current,source,targets)
-    : JSON.stringify([mode,distributionToken(current,source,targets)]);
+  const token=distributionToken(current,source,targets);
+  if (mode==='definitions') return token;
+  if (mode!=='automatic-safe') return JSON.stringify([mode,token]);
+  const scope=new Set([source,...targets]);
+  const canonical=value=>Array.isArray(value)?value.map(canonical):value && typeof value==='object'
+    ? Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonical(value[key])])):value;
+  return JSON.stringify([mode,token,...['logs','attendance'].map(name=>canonical(ordered(
+    (current[name] ?? []).filter(row=>scope.has(row.teachingId)))))]);
 }
 
 /** Synthetic/Demo counterpart only. Account mappings and marks are owned by PostgreSQL. */
 export function planScoreDistributionCopy(current,source,targetIds,options={}) {
   const mode=options.mode ?? 'definitions';
   if (!DISTRIBUTION_MODES.includes(mode)) throw new Error('Invalid distribution mode');
+  if (mode==='automatic-safe') return planAutomaticCopy(current,source,targetIds,options);
   if (mode==='definitions') return planAcceptedDistribution(current,source,targetIds,options);
   if (options.removeItemIds?.length) throw new Error('Preservation cannot remove target definitions');
   const allowed=new Set(distributionTargets(current,source,options.ownerId ?? null).map(row=>row.id));
@@ -30,7 +37,7 @@ export function planScoreDistributionCopy(current,source,targetIds,options={}) {
       for (const item of incoming) {
         const named=existing.filter(row=>normalized(row.name)===normalized(item.name));
         const origin=existing.filter(row=>row.distributionOriginId===item.id);
-        if (incoming.filter(row=>normalized(row.name)===normalized(item.name)).length!==1 || named.length>1 || origin.length>1) incompatible('اسم البند أو أصل هويته مكرر');
+        if (origin.length>1 || (!origin.length && (incoming.filter(row=>normalized(row.name)===normalized(item.name)).length!==1 || named.length>1))) incompatible('اسم البند أو أصل هويته مكرر');
         const prior=(origin.length ? origin : named)[0];
         if (!prior) {
           metadata.set(item.name,{preservedScores:0,preservedCompletions:0,subitems:ordered(live(current.scoreSubitems)
@@ -38,7 +45,6 @@ export function planScoreDistributionCopy(current,source,targetIds,options={}) {
               dueDate:sub.dueDate ?? null,points:sub.value,latePoints:sub.latePoints ?? sub.value,preserved:false}))});
           continue;
         }
-        if (existing.filter(row=>normalized(row.name)===normalized(prior.name)).length>1) incompatible('اسم بند الهدف مكرر');
         if (used.has(prior.id)) incompatible('المطابقة تستخدم بند الهدف مرتين');
         used.add(prior.id);
         if (representation(prior)!==representation(item)) incompatible('طريقة الرصد أو الحد الأعلى أو الأوزان مختلفة');
@@ -65,6 +71,22 @@ export function planScoreDistributionCopy(current,source,targetIds,options={}) {
       }
       const plan=planAcceptedDistribution(adapted,source,[target],{...options,removeItemIds:[]});
       if (plan.excludedTargets.length) { result.excludedTargets.push(...plan.excludedTargets); continue; }
+      // The adapted origins establish correspondence before the old planner runs.
+      // Persist that correspondence even when the labels/dates already match.
+      for (const prior of adapted.items.filter(row=>row.teachingId===target && used.has(row.id))) {
+        const original=current.items.find(row=>row.id===prior.id);
+        if (prior.distributionOriginId!==original.distributionOriginId && !plan.writes.items.put.some(row=>row.id===prior.id)) {
+          plan.writes.items.put.push({...prior,distributionVersion:(prior.distributionVersion ?? 0)+1});
+          plan.changedCount++;
+        }
+      }
+      for (const sub of adapted.scoreSubitems.filter(row=>used.has(row.itemId))) {
+        const original=current.scoreSubitems.find(row=>row.id===sub.id);
+        if (sub.distributionOriginId!==original.distributionOriginId && !plan.writes.scoreSubitems.put.some(row=>row.id===sub.id)) {
+          plan.writes.scoreSubitems.put.push({...sub,distributionVersion:
+            plan.writes.items.put.find(row=>row.id===sub.itemId)?.distributionVersion ?? sub.distributionVersion});
+        }
+      }
       for (const name of ['items','scoreSubitems']) {
         for (const row of plan.writes[name].put) {
           const original=current[name].find(old=>old.id===row.id);
@@ -85,6 +107,56 @@ export function planScoreDistributionCopy(current,source,targetIds,options={}) {
       if (!error.message.includes('سجلات الفصل الهدف ستبقى')) throw error;
       result.excludedTargets.push({teachingId:target,reason:error.message});
     }
+  }
+  return result;
+}
+
+// Synthetic counterpart only: authenticated decisions are made from locked server state.
+function planAutomaticCopy(current,source,targetIds,options) {
+  if (options.removeItemIds?.length) throw new Error('Automatic copy cannot remove target items');
+  const allowed=new Set(distributionTargets(current,source,options.ownerId ?? null).map(row=>row.id));
+  if (!Array.isArray(targetIds)||!targetIds.length||new Set(targetIds).size!==targetIds.length||targetIds.some(id=>!allowed.has(id))) throw new Error('Choose distinct eligible targets');
+  const result={mode:'automatic-safe',token:distributionCopyToken(current,source,targetIds,'automatic-safe'),targets:[],excludedTargets:[],
+    writes:Object.fromEntries(['items','scoreSubitems','scores','scoreSubitemCompletions'].map(name=>[name,{put:[]}])),requiresConfirmation:true,changedCount:0};
+  const incoming=ordered(live(current.items).filter(row=>row.teachingId===source));
+  let sequence=0;
+  const id=options.id ?? (()=>'preview:auto:'+(++sequence));
+  for (const target of targetIds) {
+    const existing=live(current.items).filter(row=>row.teachingId===target),used=new Set(),impact=[];
+    const beforeTotal=existing.reduce((sum,row)=>sum+Number(row.max),0);
+    let afterTotal=beforeTotal;
+    for (const item of incoming) {
+      const origins=existing.filter(row=>row.distributionOriginId===item.id);
+      const named=existing.filter(row=>normalized(row.name)===normalized(item.name));
+      const matches=origins.length?origins:named,prior=matches[0];
+      const retain=reason=>impact.push({name:item.name,retained:true,reason,created:false,affected:0,examples:[],subitems:[]});
+      if (matches.length>1 || (prior && used.has(prior.id)) || (!origins.length && incoming.filter(row=>normalized(row.name)===normalized(item.name)).length!==1)) {
+        matches.forEach(row=>used.add(row.id));retain('المطابقة مكررة؛ بقي البند وسجلاته كما هي.');continue;
+      }
+      if (prior) used.add(prior.id);
+      const subs=live(current.scoreSubitems).filter(row=>row.itemId===prior?.id),subIds=new Set(subs.map(row=>row.id));
+      const recorded=!!prior && (!!prior.auto || live(current.scores).some(row=>row.itemId===prior.id &&
+        (row.value!=null || row.manualValue!=null || (row.derivedValue ?? 0)!==0)) ||
+        live(current.scoreSubitemCompletions).some(row=>subIds.has(row.subitemId) && (row.checked || row.completionState!=null)));
+      const subset={...current,items:current.items.filter(row=>row.teachingId!==source || row.id===item.id)};
+      let plan=planScoreDistributionCopy(subset,source,[target],{...options,id,mode:'preserve-target'});
+      if (plan.excludedTargets.length && !recorded) {
+        const adapted=structuredClone(subset);
+        if (prior) adapted.items.find(row=>row.id===prior.id).distributionOriginId=item.id;
+        plan=planAcceptedDistribution(adapted,source,[target],{...options,id,removeItemIds:[]});
+      }
+      if (plan.excludedTargets.length) {retain(plan.excludedTargets[0].reason);continue;}
+      for (const [name,writes] of Object.entries(plan.writes)) for (const row of writes.put) {
+        if (!current[name].some(old=>old.id===row.id) && name==='scoreSubitems') row.createdAt=options.stamp ?? Date.now();
+        result.writes[name].put.push(row);
+      }
+      result.changedCount+=plan.changedCount;
+      const detail=plan.targets[0].impact.find(row=>row.name===item.name);
+      impact.push(detail ? {...detail,unchanged:plan.changedCount===0} : {name:item.name,unchanged:true,created:false,affected:0,examples:[],subitems:[]});
+      if (plan.changedCount) afterTotal+=Number(item.max)-Number(prior?.max ?? 0);
+    }
+    result.targets.push({teachingId:target,impact,beforeTotal,afterTotal,
+      extras:existing.filter(row=>!used.has(row.id)).map(row=>({id:row.id,name:row.name}))});
   }
   return result;
 }
