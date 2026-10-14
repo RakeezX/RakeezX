@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v59';
+const VERSION = 'rakeezx-v60';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -107,6 +107,7 @@ const SHELL = [
   './src/lib/sync-v2.js',
   './src/lib/score-foundation.js',
   './src/lib/score-distribution-copy.js',
+  './src/lib/score-distribution-copy.js?n100=automatic-safe-v1',
   './src/lib/subitem-default-name.js',
   './src/lib/sync-ownership.js',
   './src/lib/offline-lease.js',
@@ -184,6 +185,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(VERSION);
+      // The version-bound copy engine is required for the store's import graph.
+      // Never activate a shell that cannot provide its matching offline engine.
+      await cache.add(new Request('./src/lib/score-distribution-copy.js?n100=automatic-safe-v1', { cache: 'reload' }));
       // ملف واحد مفقود يجب ألا يفشل التثبيت كله
       await Promise.all(
         SHELL.map((url) =>
@@ -228,7 +232,7 @@ self.addEventListener('fetch', (event) => {
   };
 
   const cachedFallback = async (key, status = 504) => {
-    const cached = await caches.match(key);
+    const cached = await (await caches.open(VERSION)).match(key);
     return cached || new Response('', { status });
   };
 

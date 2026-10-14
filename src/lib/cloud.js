@@ -1102,11 +1102,15 @@ async function distributionRPC(name, body, mockMethod, envelope) {
 }
 
 export const getScoreDistributionCapability = () => distributionRPC('score_distribution_capability', {}, 'getScoreDistributionCapability', {});
-export const planScoreDistribution = (envelope) => distributionRPC('plan_score_distribution', {
-  p_plan_id: envelope.planId, p_source: envelope.sourceTeachingId,
-  p_targets: envelope.targetTeachingIds, p_remove: envelope.removeItemIds ?? [],
-  ...(['preserve-target', 'automatic-safe'].includes(envelope.mode) ? { p_mode: envelope.mode } : {}),
-}, 'planScoreDistribution', envelope);
+export const planScoreDistribution = (envelope) => {
+  const mode = envelope.mode === undefined ? 'definitions' : envelope.mode;
+  if (!['definitions', 'preserve-target', 'automatic-safe'].includes(mode)) throw new Error('Invalid distribution mode');
+  return distributionRPC('plan_score_distribution', {
+    p_plan_id: envelope.planId, p_source: envelope.sourceTeachingId,
+    p_targets: envelope.targetTeachingIds, p_remove: envelope.removeItemIds ?? [],
+    ...(['preserve-target', 'automatic-safe'].includes(mode) ? { p_mode: mode } : {}),
+  }, 'planScoreDistribution', envelope);
+};
 export const applyScoreDistributionPlan = (envelope) => distributionRPC('apply_score_distribution_plan', {
   p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId,
   p_plan_id: envelope.planId, p_token: envelope.token, p_confirmed: envelope.confirmed === true,
