@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": 5,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 50,
+      "idleMinutes": 10,
+      "objective": "Resume exact session 01a13461-ef85-7c53-add1-1eba2c19dace and candidate c439304f2db72b8a8610d4a7121da2b9e634e115. Current PO installed private0.2.0 and explicitly rejects manual page/column selection. New requested behavior is one user-started run from authenticated homepage, teacher-role/read-only page navigation and final aggregated preview. This supersedes only the earlier no-navigation UI contract for the extension code; it does not authorize the assistant to bypass inaccessible personal-browser tools, read credentials or alter school records.\nImplement one clear ابدأ الاستيراد من مدرستي action in the private helper. Reuse existing validated category readers/CSV/schema/preview. From the user-selected authenticated homepage, discover only unambiguous visible teacher-role and read-only personal-info/teaching-classes/roster/weekly-schedule links; navigate the SAME tab within its authorized official origin and collect allowed fields without asking teacher to select a table column. Offer cancel/progress and one final edit/deselect/confirm preview. No background start on simply opening Chrome. No script runs in a personal tab during this worker implementation; actual browser proof uses local synthetic multi-page app with varied homepage/role/roster/schedule structures.\nUse activeTab+scripting scope across same-origin navigation as Chrome documents. If a bounded MV3 service worker or storage.session is needed for progress while popup closes, confine data to the explicit run/tab/allowed categories; clear on cancel/completion/logout/expiry, no durable school data or broad tabs/cookies permissions. Add no all_urls or uncontrolled host wildcard. A cross-origin transition/role ambiguity/login prompt stops before private read and asks for renewed user action, not grabbing tokens or following guessed privileged links. Preserve title/domain-only diagnostics and permitted field counts; no pageHTML/fullURLs/identity documents. Official current domain must come from the actual authorized start page plus a verified allowed Ministry route, never search-engine spoof assumptions.\nNavigation is read-only bounded: GET links with allowlisted UI labels/known semantically confirmed routes, no submit/save/delete/invite/grade/attendance buttons, no admin-role switch. Cap pages/rows/time, dedupe pagination and detect loops. Do not claim homepage contains a manager's name if not actually visible; missing values stay missing. Use recognized headers/labels automatically, not fuzzy guesses that swap role names. No source marks/IDs/phones exported. Preserve source provenance category only.\nProduce new private0.3.0 ZIP/runtime folder and exact diff/hash. Keep0.2.0 and the installed user folder untouched until explicit final verified package handoff; do not silently hotpatch their running extension or interact with their profile. End with BLOCKED/external for still-unverified actual official DOM and full Rakeez metadata/timetable commit integration, while clearly recording the genuinely implemented one-start local capabilities. No Product/main/public release or repeated old tests except affected compatibility. No reattempt of previously denied UIA/private-browser access or N58 service operations.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed."
+      ],
+      "releaseAuthority": "Current PO installed private0.2.0 and explicitly rejects manual page/column selection. New requested behavior is one user-started run from authenticated homepage, teacher-role/read-only page navigation and final aggregated preview. This supersedes only the earlier no-navigation UI contract for the extension code; it does not authorize the assistant to bypass inaccessible personal-browser tools, read credentials or alter school records. Private implementation/package only in this phase; no teacher account write or public release. Preserve original officialDOM and integration gate."
+    }
+  ]
+}
