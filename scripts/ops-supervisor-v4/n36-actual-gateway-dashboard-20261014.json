@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -20,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "objective": "Resume exact preserved session 01a13461-ef85-7c53-add1-1eba2c19dace from 962002f09320dc72447fc65049589f898c33d36b. PO now supplied two REAL screenshots and route templates: a school card with الدور: معلم and its own الصفحة الرئيسية link, then /Dashboards/Schools showing مرحبا بك [name] with no teacher suffix, actual الجدول الدراسي and بيانات الطلاب links. The current adapter requires a different role/greeting vocabulary and has no school-card gateway model. This is new direct source-shape evidence explaining the all-zero diagnostic, not another blind role retry.\nRead canonical docs/automation-evidence/20261014/N36_ACTUAL_SCREENSHOT_EVIDENCE.md and N36_RECOVERED_REFERENCE_ROLE.md. Implement private0.3.3 as a material real-layout adapter, NOT relaxed arbitrary role guessing. EntryA: bound visible school card with explicit normalized الدور: معلم/معلمة and exactly its observed الصفحة الرئيسية safe anchor; global مدارس الأبناء label and principal-name metadata are not the selected user role. EntryB: same-origin /Dashboards/Schools actual teacher dashboard, identified by several specific shown teacher-workflow landmarks together (قائمة الطلاب, سجلات المتابعة اليومية, الجدول الدراسي, سجلات متابعة الفصول or تقارير المعلم), not a required suffix on مرحبا بك[name]. A name, generic homepage, one lone link or no-admin text alone is insufficient. Preserve explicit active administrator/parent-only/login/OTP stops. Distinguish a principal VALUE/LABEL from an ACTIVE admin role; do not classify a school director metadata field as current user authority.\nThe gateway route supplied is /SchoolManagment/Actions/Teacher/<opaque-id>; never encode the real PO identifier or guess an ID length. Follow actual validated links already present in the selected card/current page and bind sourceTabId before run-page creation. Handle one teacher card automatically; for more than one distinct teacher school, one school-choice UI is allowed instead of arbitrary first-link selection. No repeated manual navigation/column highlighting in the common one-school case. When already on the teacher dashboard, skip redundant role switching. A screenshots-only equivalent fixture must be labeled synthetic, not a captured official DOM.\nExpand only the observed semantic labels needed, especially الجدول الدراسي and بيانات الطلاب; retain existing report-route parsing when valid. Teacher dashboard navigation can reveal an ordinary menu before inspecting its actual safe child link if necessary, but do not execute arbitrary onclick strings, synthesize API/role URLs, issue POSTs or visit grade/attendance/admin/write routes. No new host or broad permission. Existing activeTab+scripting handles same-origin navigation. No competitor source reading from Chrome profile: direct DC package read was Path not allowed. Only manifest metadata was observed; never shell-copy or otherwise route around this denial. If user later uploads code it is separate reference evidence.\nFix scalar extraction for screenshot-shaped label/value school metadata and teacher greeting IF unambiguous and explicitly tied to the selected teacher context: school title, principal labelled value and teacher name only, excluding the displayed email/IDs/totals/adverts. Preserve fields as missing when not observed, do not fill from user screenshot hardcoded names. Student/timetable pages still use supported source schemas; if a schema is new, return a precise bounded structural diagnostic rather than pretend empty means success. No storage/credentials/private source data in diagnostic output.\nTest the actual installed extension against two independent fixtures matching the screenshot structures: old0.3.2 reproduces all-zero failure; correctedgateway→dashboard→permittednames/schedule previews; directdashboard start works without teacher suffix. Test two school cards, nonteacher card beforeteacher, mismatched role/home links, principal label present, hidden/disabled/foreign/home link, teacher markers scattered across unrelated sections, login/cancel/expiry and protected route rejection. Use placeholder names/IDs, no screenshotPII. Retain previous tests/guards, reuse byte-identical old positive cases where unchanged. No new school-page request or personal browser install in this worker.\nBuild separate0.3.3 with exact source/ZIPhash and18-or-explained-runtime members; keep old installed folders intact. Save actual screenshots for gateway/dashboard preview and failures. Avoid another user reinstall request until this complete entry flow is locally proved. No Product/public release, real account read/write, Auth/SQL, personal browser profile or old denied operation. Full current officialDOM and real Rakeezmetadata/timetablecommit stay honestlyNOT_RUN. Return BLOCKED/external solely for those actual remaining gates after useful corrected local work, not an invented whole-ticket success.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_GATEWAY_DASHBOARD.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed",
+        "n36_actual_screenshot_shapes",
+        "n36_gateway_card_binding_and_multischool",
+        "n36_actual_dashboard_labels_no_role_suffix"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched.",
+        "Latest real screenshots supersede the old assumption that an active teacher always has a teacher-suffixed greeting. Normal parent-oriented gateway chrome and principal metadata are not a conflicting ACTIVE role; all true explicit role/login/origin/data restrictions remain. No real identifiers in fixtures."
+      ],
+      "releaseAuthority": "Current PO provides real screenshots and page templates and explicitly requests learning from supplied code to complete the import. This authorizes the narrow local/private0.3.3 adapter and synthetic verification of these newly evidenced layouts, not live portal access, personal-profile reading, new hosts, broad permissions or public deployment. Existing official/integration gates remain open. PO now supplied two REAL screenshots and route templates: a school card with الدور: معلم and its own الصفحة الرئيسية link, then /Dashboards/Schools showing مرحبا بك [name] with no teacher suffix, actual الجدول الدراسي and بيانات الطلاب links. The current adapter requires a different role/greeting vocabulary and has no school-card gateway model. This is new direct source-shape evidence explaining the all-zero diagnostic, not another blind role retry."
+    }
+  ]
+}
