@@ -34,7 +34,7 @@ import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
 import { inspectPristineTeaching, hasTeachingReferences, samePristineRecord, teachingReplacementHash } from './lib/pristine-teaching.js';
-import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, createSyncV2Engine } from './lib/sync-v2.js';
+import { SYNC_V2_SCHEMAS, decodeSyncV2Canonical, encodeSyncV2Patch, calendarDependencies, createSyncV2Engine } from './lib/sync-v2.js';
 import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-ownership.js';
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
@@ -644,11 +644,11 @@ function syncV2Record(storeName, record, { pendingCreate = false } = {}) {
   };
 }
 
-function syncV2Dependencies(storeName, record) {
+function syncV2Dependencies(storeName, record, op) {
   const references = SYNC_V2_SCHEMAS[storeName]?.references ?? {};
-  return Object.entries(references)
+  return [...calendarDependencies(storeName, record, op), ...Object.entries(references)
     .filter(([field]) => record?.[field])
-    .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }));
+    .map(([field, store]) => ({ store, recordId: record[field], requiresServerRevision: true }))];
 }
 
 function syncV2CommandEntry({ store, recordId, command, patch: commandPatch = {}, dependencies = [], priorCommands = [], baseRevision = 0, stamp = now() }) {
@@ -714,7 +714,7 @@ const outboxEntry = (storeName, rec, fields = null, op = 'put', previous = null)
     baseRevision: operation === 'create' ? 0 : Number(rec.serverRevision ?? previous?.serverRevision ?? 0),
     patch, localPatch,
     fields: Object.keys(patch).sort(), groups: [],
-    dependencies: syncV2Dependencies(storeName, rec),
+    dependencies: syncV2Dependencies(storeName, rec, operation),
     sequence: nextSyncV2Sequence(), clientUpdatedAt: stamp, queuedAt: stamp,
     state: 'pending', attemptCount: 0, envelopeLocked: false,
     lastError: null, blockedReason: null,
@@ -903,6 +903,11 @@ export async function save(batch, options = {}) {
   const changes = [];
   const proof = options[TEACHING_CREATION_PROOF];
   const explicitDeletes = options.v2Deletes ?? {};
+  const contextualSessions = options.queue === false ? batch.sessions : batch.sessions?.map(record => {
+    if (state.sessions.some(prior => prior.id === record.id)) return record;
+    const calendarContext = newSessionCalendarContext(record, batch);
+    return calendarContext ? { ...record, calendarContext } : record;
+  });
 
   for (const [storeName, records] of Object.entries(batch)) {
     if (!records?.length) continue;
@@ -914,7 +919,10 @@ export async function save(batch, options = {}) {
         throw new Error('Calendar range delete requires an active local record.');
       }
     }
-    const prepared = records.map((record) => syncV2Record(storeName, record, {
+    // Prepare the entire batch before changing memory: an unknown calendar must
+    // not leave a partial batch or queue a session the native contract rejects.
+    const contextual = storeName === 'sessions' ? contextualSessions : records;
+    const prepared = contextual.map((record) => syncV2Record(storeName, record, {
       pendingCreate: !!SYNC_V2_SCHEMAS[storeName] && !previous.has(record.id),
     }));
     writes[storeName] = prepared;
@@ -1946,6 +1954,39 @@ export function calendarDayForYear(yearId, date) {
   return matching.find(({ calendar }) => calendar.source === 'custom')?.day ?? matching[0]?.day ?? null;
 }
 
+/** Same selected day for eligibility, timing and creation-time provenance. */
+function selectedCalendarDay(year, date) {
+  if (!year) return null;
+  const canonical = year.serverCanonical ?? year;
+  // Exact native legacy exception: genuinely unselected years need no context.
+  // A pending removal of an acknowledged selection is not that exception.
+  if (year.calendarPresetId == null && canonical.calendarPresetId == null) return null;
+  const preset = getCalendarPreset(year.calendarPresetId);
+  if (!preset || preset.id !== year.calendarPresetId || preset.hijriStart !== year.hijriStart ||
+      preset.hijriEnd !== year.hijriEnd) throw new Error('تعذّر تحديد التقويم المعتمد للحصة.');
+  const exceptions = calendarsOf(year.id).filter(c => c.source === 'custom' && c.presetId === preset.id)
+    .flatMap(c => live(state.calendarDays).filter(d => d.calendarId === c.id && d.date === date));
+  if (exceptions.length > 1) throw new Error('تعذّر تحديد يوم التقويم للحصة.');
+  const exception = exceptions[0];
+  const official = preset.holidays.find(d => d.startDate <= date && date <= d.endDate);
+  const kind = exception?.kind ?? official?.kind ?? (isWeekend(date) ? 'holiday' : 'study');
+  const label = exception?.label ?? official?.label ?? '';
+  if (!Object.hasOwn(CALENDAR_KIND, kind) || typeof label !== 'string' || label.length > 500)
+    throw new Error('تعذّر تحديد يوم التقويم للحصة.');
+  return { presetId: preset.id, kind, label,
+    source: exception ? 'custom' : official ? 'official' : 'default' };
+}
+
+/** Creation-only provenance. Revision is added by Sync from the year receipt. */
+function newSessionCalendarContext(session, batch = {}) {
+  const teaching = batch.teachings?.find(row => row.id === session.teachingId) ?? getTeaching(session.teachingId);
+  const term = batch.terms?.find(row => row.id === teaching?.termId) ?? getTerm(teaching?.termId);
+  const year = batch.years?.find(row => row.id === term?.yearId) ?? getYear(term?.yearId);
+  if (!teaching || teaching.deleted || !year || year.deleted || !term || term.deleted) throw new Error('تعذّر تحديد تقويم الحصة.');
+  const day = selectedCalendarDay(year, session.date);
+  return day ? { yearId: year.id, termId: term.id, ...day } : null;
+}
+
 /** Resolve a dated session through its teaching's term and year, including history. */
 export function sessionCalendarDay(session) {
   const teaching = getTeaching(session?.teachingId)
@@ -1956,6 +1997,7 @@ export function sessionCalendarDay(session) {
 }
 
 export function sessionStatusPresentation(session) {
+  if (session.calendarContext != null) return sessionCalendarPresentation(session, session.calendarContext);
   return sessionCalendarPresentation(session, sessionCalendarDay(session));
 }
 
@@ -1963,7 +2005,7 @@ export function sessionStatusPresentation(session) {
 export function isSessionEligibleDate(date, { year = activeYear(), term = activeTerm() } = {}) {
   if (!date || !year || !term || term.yearId !== year.id) return false;
   if (!term.startDate || !term.endDate || date < term.startDate || date > term.endDate) return false;
-  const day = calendarDayForYear(year.id, date);
+  const day = selectedCalendarDay(year, date) ?? calendarDayForYear(year.id, date);
   // التقويم الصريح يغلب عطلة نهاية الأسبوع الافتراضية.
   if (day) return isTeachingDay(day.kind);
   return !isWeekend(date);
@@ -4248,7 +4290,9 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
 
   const tch = getTeaching(tchId);
   const term = getTerm(tch?.termId);
-  const day = term ? calendarDayForYear(term.yearId, date) : calendarDayFor(date);
+  if (getYear(term?.yearId)?.calendarPresetId != null &&
+      (date > todayISO() || term.status === 'closed')) return null;
+  const day = term ? selectedCalendarDay(getYear(term.yearId), date) ?? calendarDayForYear(term.yearId, date) : calendarDayFor(date);
   const holiday = day && !isTeachingDay(day.kind);
 
   // يُطبع وقت الحصة فيها الآن من الملف النشط. تغيير الملف لاحقًا لا يمسّها.
@@ -4271,7 +4315,7 @@ export async function ensureSession(tchId, date, period = 1, extra = {}) {
     ...extra,
   });
   await save({ sessions: [ses] });
-  return ses;
+  return getSession(ses.id);
 }
 
 /** يولّد أغلفة حصص اليوم فقط من الجدول الحالي، من دون لمس الموجود أو tombstone. */
@@ -4286,7 +4330,7 @@ export async function ensureSessionsForDate(date = todayISO(), { signal } = {}) 
   let skipped = 0;
   for (const teaching of teachings(term?.id)) {
     const section = getSection(teaching.sectionId);
-    const calendarDay = calendarDayForYear(year?.id, date);
+    const calendarDay = selectedCalendarDay(year, date) ?? calendarDayForYear(year?.id, date);
     const resolved = resolveProfile(profile, date, calendarDay);
     for (const slot of slotsOf(teaching.id).filter((candidate) => candidate.weekday === weekday(date))) {
       const sameIdentity = state.sessions.find((session) =>
@@ -4381,7 +4425,7 @@ export async function generateSessionsForRange(tchId, startDate, endDate) {
     const matchingSlots = slots.filter((slot) => slot.weekday === weekday(date));
     if (matchingSlots.length) {
       matchedSlotDays++;
-      const calendarDay = calendarDayForYear(year.id, date);
+      const calendarDay = selectedCalendarDay(year, date) ?? calendarDayForYear(year.id, date);
       if (!isSessionEligibleDate(date, { year, term })) {
         holidays++;
         if (calendarDay?.kind === 'suspension') suspensions++;
