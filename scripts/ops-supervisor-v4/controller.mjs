@@ -201,7 +201,7 @@ export function verifiedDeployment(task, receipt, productionUrl = 'https://rakee
     && proof?.production?.origin === new URL(productionUrl).origin && proof?.immutable?.origin === provider.previewUrl
     && [proof?.immutable, proof?.production].every(part => part?.passed === true && Array.isArray(part.assets) && part.assets.length > 0
       && part.assets.every(asset => asset.verified === true && (asset.deleted || /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')
-        && (asset.expectedSha256 === asset.observedSha256 || asset.repoPath === 'index.html' && asset.urlPath === 'index.html' && asset.statusCode === 200
+        && (asset.expectedSha256 === asset.observedSha256 || asset.repoPath === 'index.html' && ['index.html','/'].includes(asset.urlPath) && asset.statusCode === 200
           && (asset.normalization === 'cloudflare-jsd-v1' || asset.normalization === 'cloudflare-observed-tail-v2' && Number.isSafeInteger(asset.removedProviderBytes) && asset.removedProviderBytes > 0 && /^[a-f0-9]{64}$/.test(asset.removedSha256 ?? '') && Array.isArray(asset.providerTransforms) && ['cloudflare-analytics-20261014','cloudflare-jsd-v1,cloudflare-analytics-20261014'].includes(asset.providerTransforms.join(','))) && asset.normalizedSha256 === asset.expectedSha256))));
 }
 

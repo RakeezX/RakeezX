@@ -186,7 +186,7 @@ async function boundedBody(response) {
 
 /** Recognize one exact provider injection; all remaining bytes stay unchanged. */
 export function normalizeCloudflareIndex(bytes, metadata) {
-  if (metadata.repoPath !== 'index.html' || metadata.urlPath !== 'index.html'
+  if (metadata.repoPath !== 'index.html' || !['index.html','/'].includes(metadata.urlPath)
       || metadata.statusCode !== 200 || String(metadata.server).toLowerCase() !== 'cloudflare'
       || !/^text\/html(?:\s*;|$)/i.test(metadata.contentType ?? '')
       || metadata.mitigated === 'challenge') return null;
@@ -238,20 +238,25 @@ async function verifyOrigin(origin, assets, publishedSha, fetcher, signal) {
     const batch = await Promise.all(assets.slice(offset, offset + 4).map(async asset => {
       const timeout = AbortSignal.timeout(20000);
       const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
-      const response = await fetcher(assetUrl(origin, asset.urlPath, publishedSha), {
-        method: 'GET', headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }, redirect: 'follow', signal: combined,
+      const entryDocument = asset.repoPath === 'index.html' && asset.urlPath === 'index.html';
+      const requestPath = entryDocument ? '/' : asset.urlPath;
+      const response = await fetcher(entryDocument ? new URL('/',origin).href : assetUrl(origin,asset.urlPath,publishedSha), {
+        method:'GET',headers:{'Cache-Control':'no-cache','Pragma':'no-cache',...(entryDocument ? {
+          'Accept':'text/html,application/xhtml+xml',
+          'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36'
+        } : {})}, redirect:'follow',signal:combined,
       });
       if (response.url && new URL(response.url).origin !== origin) throw new DeliveryError('UNEXPECTED_REDIRECT', 'Asset verification left its expected deployment origin');
       const bytes = await boundedBody(response), observedSha256 = hash(bytes);
       const normalized = observedSha256 === asset.sha256 ? null : normalizeCloudflareIndex(bytes, {
-        repoPath: asset.repoPath, urlPath: asset.urlPath, statusCode: response.status,
+        repoPath: asset.repoPath, urlPath: requestPath, statusCode: response.status,
         server: response.headers.get('server'), contentType: response.headers.get('content-type'),
         mitigated: response.headers.get('cf-mitigated'),
       });
       const gone = asset.deleted && [404, 410].includes(response.status);
       const fallback = asset.deleted && response.status === 200 && /text\/html/i.test(response.headers.get('content-type') ?? '')
         && assets.some(x => x.repoPath === 'index.html' && !x.deleted && x.sha256 === observedSha256);
-      return { repoPath: asset.repoPath, urlPath: asset.urlPath, statusCode: response.status,
+      return { repoPath: asset.repoPath, urlPath: requestPath, requestProfile: entryDocument ? 'anonymous-browser-entry-chromium154' : 'static-source', statusCode: response.status,
         expectedSha256: asset.sha256 ?? null, observedSha256, bytes: bytes.length,
         deleted: asset.deleted, verified: asset.deleted ? (gone || fallback) : response.status === 200
           && (observedSha256 === asset.sha256 || normalized?.normalizedSha256 === asset.sha256),
@@ -544,18 +549,28 @@ export async function publishCandidate(options, dependencies = {}) {
       await dependencies.afterPush?.(journal); // Test crash point, never configured by the controller.
     }
     if (journal.stage !== 'pushed') throw new DeliveryError('JOURNAL_STAGE_INVALID', 'Unexpected saved delivery stage');
-    // A paused, already-pushed candidate can be an ancestor of a newer real release.
-    // Do not compare today's domain forever against yesterday's parent bytes.
     if (current !== journal.publishedSha) {
       if (!await ancestor(journal.publishedSha,current) || !await ancestor(opts.candidateSha,current))
-        throw new DeliveryError('REMOTE_PUBLICATION_REMOVED','New main lacks the saved candidate/publication');
-      journal.preservedPublications = [...(journal.preservedPublications ?? []), {
-        publishedSha: journal.publishedSha, previousVerificationAttempts: journal.verificationAttempts ?? 0,
-        assets: journal.assets, advancedTo: current, observedAt: now(), reason: 'saved-publication-superseded-on-main'
-      }];
-      journal.stage = 'reprepare'; await writeJson(journalFile,journal);
-      return finish({status:'pending',retryable:true,retryAfterSeconds:1,errorCode:'PUBLISHED_MAIN_ADVANCED',
-        message:'Saved candidate is retained on newer main; rebind exact assets instead of repeating obsolete hashes'});
+        throw new DeliveryError('REMOTE_PUBLICATION_REMOVED','New main lacks saved publication/candidate');
+      const previous = {publishedSha:journal.publishedSha,assets:journal.assets,build:journal.build,
+        previousVerificationAttempts:journal.verificationAttempts??0,advancedTo:current,observedAt:now()};
+      journal.preservedPublications=[...(journal.preservedPublications??[]),previous];
+      let sameProduct=true;
+      for (const asset of journal.assets) {
+        const blob=await git(['show',current+':'+asset.repoPath],opts.cwd,true);
+        if (asset.deleted ? blob.code===0 : blob.code!==0 || hash(Buffer.from(blob.stdout))!==asset.sha256) {sameProduct=false;break;}
+      }
+      if (sameProduct) {
+        journal.publishedSha=current;journal.integrationSha=current;journal.currentMainAtPreparation=current;
+        journal.integrationKind='already-contained-identical-assets';journal.verificationAttempts=0;
+        journal.build={...journal.build,publishedSha:current,kind:'exact-asset-build-reuse',reusedFrom:previous.publishedSha,
+          sourceHashesUnchanged:true,originalBuild:previous.build};
+        await writeJson(journalFile,journal);
+      } else {
+        journal.stage='reprepare';await writeJson(journalFile,journal);
+        return finish({status:'pending',retryable:true,retryAfterSeconds:1,errorCode:'PUBLISHED_MAIN_ADVANCED',
+          message:'Newer main has changed Product assets; retain old evidence and prepare exact current source'});
+      }
     }
     const rawChecks = await checkRuns(journal.publishedSha);
     const checks = rawChecks.map(c => parseProviderCheck(c, { publishedSha: journal.publishedSha, pagesProject: opts.pagesProject, providerAppId: opts.providerAppId }))

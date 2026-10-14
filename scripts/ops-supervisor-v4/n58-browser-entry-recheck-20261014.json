@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-account-calendar-foundation-20261014",
+      "productId": "N58",
+      "activationId": "po-20261012-continuous",
+      "priority": -100,
+      "scopeKey": "n58-fresh-account-foundation-alignment",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "objective": "REUSE the existing completed source, result and publication journal; no new Codex run. The sole publisher verifies the saved candidate with the new observed provider-tail matcher. Original failed receipts remain saved. No public HTML investigation, Cloudflare configuration change or account recovery. Calendar hold remains true and full N58 acceptance is not completed by this source check.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/models.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/calendar-presets.js",
+        "src/lib/calendar-ranges.js",
+        "src/lib/session-provenance.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/initial-restore.js",
+        "tests/n58-fresh-account-*.mjs",
+        "tests/n58-fresh-account-*.json",
+        "docs/automation-evidence/20261014/N58_FRESH_ACCOUNT_FOUNDATION.md",
+        "sw.js",
+        "docs/automation-evidence/20261014/N58_FIRST_USE_RELEASE.md"
+      ],
+      "requiredChecks": [
+        "n58_actual_new_account_first_rejection",
+        "n58_foundation_dependencies_local_protocol",
+        "n58_hold_preserved_and_no_legacy_replay",
+        "n58_owner_history_and_current_regressions",
+        "n58_existing_account_upgrade_readonly",
+        "n58_existing_service_identity_binding"
+      ],
+      "acceptance": [
+        "Scope is the two empty-account first-use failure, not session repair. Preserve all original failed receipts and the broad N58 acceptance record. Existing baseline/candidate default/before-first-sync/after-sync and lost-ack proofs may be reused only when source/dependency hashes still match.",
+        "CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD remains true, UI selection stays disabled and no shipped bypass is added. No existing account year/term IDs/history, rejected65 commands, old5session report or retired6 are deleted, automatically resent, relabeled successful or silently migrated.",
+        "Actual installed existing-account upgrade/read case above passes with unchanged persisted checkpoints and no unhandled Calendar exception. No observer/player-specific fixture to evade true missing-parent guards. Existing current source, N101 recovery, N98 sorting, N90 grades and offline/update machinery remain intact.",
+        "Existing-service metadata identity is bound to the three source digests in the operator record, with CRLF normalization explained. No new migration, trigger/RLS/ACL/Auth or provider account/config mutation. LOCAL test equality is not a hosted write certification.",
+        "After affected verification, normal publisher may integrate/deploy only the saved first-use client correction. Record the exact candidate/merged/provider/served proof independently. No N58 CLOSED or switching re-enabled until the separately outstanding full calendar and recovery acceptance is actually met."
+      ],
+      "releaseAuthority": "Current direct PO demands repairing reproducible empty-account calendar failure and prioritizes N58. Existing delivery delegation plus verified unchanged service identity authorizes this restricted frontend first-use compatibility release while keeping the explicit switching hold. This supersedes only the prior completed LOCAL-phase no-publication endpoint; it does NOT authorize/retry prior denied hosted operations, change live service/data permissions, remove necessary full-feature checks, enable switching or close the N58 umbrella. Latest PO supplied public-source evidence and canceled recovery of both dummy accounts; this independent exact-source verification repair may resume the existing publication through the normal publisher, with no application-byte comparison waived.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "9b0a26e643f7b59efe9de9faf6a5afbd9e5ac2a6",
+        "priorReceiptSha256": "90d0a093a4725dfc1a396f7eea2a5ba185420e81b04566aa73811c3ea8a10c22",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "Publisher metadata now proves Node alternate index response has one JSD and zero Analytics, unlike the supplied browser-root representation. Verify the actual canonical root with explicit anonymous browser request profile and unchanged strict pinned-tail/application parity. Ops-only source-identical main changes reuse the exact prior build, not another unnecessary build."
+      }
+    }
+  ]
+}
