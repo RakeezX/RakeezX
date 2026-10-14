@@ -1,0 +1,15 @@
+.sheet.n36-sheet { width: min(720px, 100%); height: min(760px, calc(var(--visible-viewport-height, 100dvh) - 24px)); }
+.n36-receiver { min-width: 0; overflow-wrap: anywhere; }
+.n36-receiver textarea { width: 100%; resize: vertical; }
+.n36-receiver summary { cursor: pointer; font-weight: 600; margin-block-end: var(--sp-2); }
+.n36-category { margin-block: var(--sp-3); border-top: 1px solid var(--border); padding-block-start: var(--sp-2); }
+.n36-category h3 { font-size: 1rem; }
+.n36-row { min-width: 0; border: 1px solid var(--border); border-radius: var(--r-sm); margin-block: var(--sp-2); padding: var(--sp-2); }
+.n36-field { display: grid; gap: 4px; margin-block: var(--sp-2); }
+.n36-field small { color: var(--text-3); }
+.n36-field .field { margin: 0; min-width: 0; }
+.n36-issues { font-size: .85rem; color: var(--text-3); }
+.n36-issues p { margin-block: 4px; }
+.n36-sheet .sheet__foot { flex-wrap: wrap; }
+.n36-sheet input, .n36-sheet select { max-width: 100%; min-width: 0; }
+@media (max-width: 480px) { .n36-receiver .field-row { display: grid; grid-template-columns: 1fr; } }

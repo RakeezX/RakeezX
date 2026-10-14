@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v61';
+const VERSION = 'rakeezx-v62';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -46,6 +46,7 @@ const SHELL = [
   './assets/micro-mark.svg',
 
   './src/styles/app.css',
+  './src/styles/teacher-setup-import.css',
   './src/styles/notifications.css',
   './src/styles/components.css',
   './src/styles/grades.css',
@@ -66,6 +67,7 @@ const SHELL = [
   './src/repaint.js',
 
   './src/lib/dom.js',
+  './src/lib/teacher-setup-import.js',
   './src/lib/notification-center.js',
   './src/lib/notification-events.js',
   './src/lib/notification-state.js',
@@ -175,6 +177,7 @@ const SHELL = [
   './src/views/calendar.js',
   './src/views/calendar-0417-ui.js',
   './src/views/settings.js',
+  './src/views/teacher-setup-import.js',
   './src/views/backup.js',
   './src/views/support.js',
 
