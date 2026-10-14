@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-live-20261012",
+      "productId": "N58",
+      "scopeKey": "n58-fresh-calendar-runtime-and-authorized-live-ab",
+      "activationId": "po-20261012-continuous",
+      "priority": -50,
+      "dependsOn": [],
+      "riskClass": "CRITICAL",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": "D087",
+      "budgetMinutes": 65,
+      "idleMinutes": 12,
+      "requiredChecks": [
+        "fresh_candidate_scope_and_preview",
+        "n58_targeted_contracts",
+        "n58_live_a_session_and_a2_restore",
+        "n58_live_context_rejection",
+        "n58_live_b_owner_isolation",
+        "n58_live_preset_context_preservation",
+        "d087_retention_and_disarm",
+        "n58_current_source_local_diagnostic",
+        "n58_current_main_actual_app",
+        "n58_current_n101_repair_preserved",
+        "n58_real_local_auth_postgrest_boundary"
+      ],
+      "preparationAuthority": {
+        "kind": "isolated-native-protocol-and-current-source-only",
+        "cloudAccounts": 0,
+        "hostedWrites": 0,
+        "privateRows": 0,
+        "migrations": 0,
+        "realEmail": 0,
+        "sourcePublication": false,
+        "localContainers": "Owned task/run resources only; no global Docker cleanup or personal profiles"
+      },
+      "objective": "CURRENT RESUME INSTRUCTION: resume exact saved session 01a12ff6-5285-71b0-a1c6-9593b6947427 from committed candidate 8dd1de0d8eb3630c3f7b4dda0dafb3f18b1ac779. PO has now updated Docker Desktop. Actual native query14Oct2026 08:28:16.686Z returned ServerVersion29.8.2, DockerDesktop4.95.0, Os=linux, Kernel6.6.87.2-microsoft-standard-WSL2, exit0. This removes the exact missing dockerDesktopLinuxEngine blocker; no OS/policy reset, logs access or permission expansion occurred. Use the already functioning Docker Linux engine and the existing pinned official source/image preparations; do NOT retry the known unsupported Windows GoTrue compilation, reinstall Docker, restart WSL, read denied Docker logs, redo unchanged successful contracts or recreate any old cloud fixture. Execute the missing actual local service experiment and keep the original failed/runtime evidence as history. Bound containers/networks/ports/volumes to this task/run with localhost bindings and deterministic own-resource cleanup. Public pinned artifacts only; no hosted service, school, account, user-token or real-message access. Preserve all original hosted/whole-feature acceptance gates and distinguish local result from release.\n\nPrevious scoped contract retained for source/requirements, but its old runtime-unavailable/startup/candidate facts are superseded above:\nContinue saved session 01a12ff6-5285-71b0-a1c6-9593b6947427 and candidate 4fa6fb8b98415a42dd0a835bfdd7038ab65b8979. Dedicated implementation, not another reviewer. First preserve every original live FAIL/NOT_RUN and the immutable migration/retirement sources. Compare observed current origin/main against the saved candidate and carry only the remaining N58 calendar/preset/runtime/term UI delta onto current source, preserving new N101 selectionRevision dependencies, reviewed repair audit/receipt flow, N98 roster, N100 auto-copy and current N90 grade transfer. Do not wholesale merge older shared store/sync files and do not rerun completed60contracts unless their actual code changed.\nNew acceptance work: actual isolated HTTP app→official pinned local GoTrue/Auth + PostgREST + disposable PostgreSQL rather than a handwritten SQL-to-HTTP adapter. This is NOT another hosted A/B pair. Use disposable local identities/data and local mail sink; block all school/Production/account requests. DockerDesktop is already installed and was started by the operator, WSL2/docker-desktop exists; engine had not yet responded at06:39Z. Check it once; use its already available runtime if ready. Do not install/reconfigure Windows features or reboot; if unavailable use existing native PostgreSQL and official portable PostgREST/GoTrue artifacts if reasonably available, otherwise report the exact runtime condition without faking native proof. Public source/binaries may be fetched with version/hash recorded, no subscriptions/API keys. Own containers/ports/volumes by taskId/runId; no docker prune/kill-all or user process cleanup.\nRun only missing protocol gates against actual services: authenticated A creates eligible today session with acknowledged immutable context, A2 fresh app boot/restore matches; wrong B cannot read/write or obtain receipts; missing/stale context rejects; G/W/G preset changes converge while past session context is unchanged; response loss/retry idempotent; new N101 five-repair audit/blocked legacy entries preserved. Freeze/test date inside fixtures not host OS. Native service version/source and actual requests/receipt identities must be traceable without tokens in logs. Save the reusable local harness so future N58/N101 work does not need disposable cloud accounts simply to discover protocol errors.\nThis local proof does not relabel original HOSTED gates or grant publication. No private account SQL, reactivation of old fixtures, new cloud Auth pair, Supabase migration, real data replay/deletion or cloud verification token operation. Return BLOCKED only for the remaining genuine hosted release gates after the concrete source/native work, or a precise proven runtime obstacle; never claim full N58 complete from a successful native substitute. Final candidate/current base and remaining evidence gap must be exact. User success after clearing browser is new-write evidence, not permission to recreate old rejected operations.",
+      "acceptance": [
+        "Preserve all original N58 Product and live-gate acceptance requirements. This local phase authorizes only scoped diagnostic test/evidence files, not Product or cloud operations.",
+        "Honor current PO synced observations without claiming historical data repair. Preserve prior failed evidence, banned pair and exact session.",
+        "One bounded current-source comparison and only a new concrete synthetic reproduction if warranted; no paid loop repeating old checks. Actual missing live verification remains NOT_RUN/FAIL and must not become PASS.",
+        "Current-source correction must not revert N98 or later delivered service/Sync behavior. Real app/native local scenarios prove repaired code without claiming the denied live gate has passed. Original live requirements remain unfulfilled until independently satisfied."
+      ],
+      "allowedPaths": [
+        "src/store.js",
+        "src/models.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/calendar-presets.js",
+        "src/lib/calendar-ranges.js",
+        "src/lib/session-provenance.js",
+        "src/lib/session-auto-triggers.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/backup-v2.js",
+        "src/views/calendar.js",
+        "tests/n58-*",
+        "docs/automation-evidence/20261014/N58_CURRENT_SOURCE_REPAIR.md",
+        "src/lib/session-recovery.js",
+        "docs/automation-evidence/20261014/N58_NATIVE_HTTP_COMPLETION.md"
+      ],
+      "releaseAuthority": "Current dedicated-finish direction authorizes current-source implementation and missing actual local service protocol verification only. No previously denied hosted/account operation or Product promotion is included; original high-risk acceptance remains explicit.\nThis resumption changes the material local condition/evidence only: PO has now updated Docker Desktop. Actual native query14Oct2026 08:28:16.686Z returned ServerVersion29.8.2, DockerDesktop4.95.0, Os=linux, Kernel6.6.87.2-microsoft-standard-WSL2, exit0. This removes the exact missing dockerDesktopLinuxEngine blocker; no OS/policy reset, logs access or permission expansion occurred. No additional hosted/real-data/messaging authority or release acceptance is granted.",
+      "runtimeDependencies": {
+        "canonicalModule": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\run.mjs",
+        "privateStateRoot": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\capabilities\\d087",
+        "mustExistBeforeProvision": [
+          "fresh committed Product/harness candidate",
+          "verified immutable Preview/source receipt",
+          "current fixed fixture/schema/source bindings",
+          "one deterministic private harness with durable finally/recovery",
+          "both new protected function deployments and cleanup standby probe"
+        ],
+        "actualRemainingWork": "Fresh integration and live harness are deliberately assigned here; no external Auth permission/key acquisition blocker is asserted.",
+        "sourceBindingInput": "The harness author writes candidate-binding.json per canonical README. It records actual current origin/main/candidate/tree/harness Git blobs and preparation receipt SHA256. The module rejects stale base or changed fixed foundation/migration source."
+      },
+      "sourceEvidence": {
+        "historicalCandidate": "4efaf2c7bb9112af931112f72ccf8a6c4a3744f2",
+        "historicalBase": "3970e39",
+        "observedMain": "8e2d4800396996be43868a71057412afccd2150b",
+        "comparison": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-main-comparison.readonly.json",
+        "authority": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\authority.readonly.json",
+        "guard": "C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\capabilities\\d087\\evidence\\n58-current-guard.readonly.json",
+        "liveGateExecuted": false,
+        "nativePrivatePreflight": "docs/automation-evidence/20261012/NIGHT_RECOVERY_20261012.json#n58NativePreflight"
+      },
+      "operationalRecovery": {
+        "at": "2026-10-12T21:26:05.858020Z",
+        "kind": "material-correction-under-existing-authority",
+        "sourceCardFile": "scripts/ops-supervisor-v4/night-recovery-cards-20261012.json",
+        "reason": "Install the missing narrow canonical private-state ignore rule and README/manifest binding; actual unchanged Windows ACL helper passed native preflight. Include only the affected owner-B N49 lease fixture path. Live acceptance remains pending.",
+        "previousRunId": "0338c38c-c28e-41c3-b807-75ea70b28291",
+        "preservedCandidateSha": "4946aac123772a1cf43d01792631743a4fb7413e",
+        "previousResultRemainsHistorical": true,
+        "requiredChecksRemoved": []
+      }
+    },
+    {
+      "id": "continuous-n64-resend-cancel-pending-20261014",
+      "productId": "N64",
+      "activationId": "po-20261012-continuous",
+      "priority": -40,
+      "scopeKey": "n64-explicit-pending-request-controls",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": "PO-20261014-explicit-email-cancel-resend",
+      "budgetMinutes": 60,
+      "idleMinutes": 12,
+      "objective": "CURRENT RESUME INSTRUCTION: resume exact saved session 01a138dc-4527-7812-9758-3347fc64da80 from committed candidate a4b60a45613d04b3a340fc41248954913ec843a4. PO has now updated Docker Desktop. Actual native query14Oct2026 08:28:16.686Z returned ServerVersion29.8.2, DockerDesktop4.95.0, Os=linux, Kernel6.6.87.2-microsoft-standard-WSL2, exit0. This removes the exact missing dockerDesktopLinuxEngine blocker; no OS/policy reset, logs access or permission expansion occurred. Use the already functioning Docker Linux engine and the existing pinned official source/image preparations; do NOT retry the known unsupported Windows GoTrue compilation, reinstall Docker, restart WSL, read denied Docker logs, redo unchanged successful contracts or recreate any old cloud fixture. Execute the missing actual local service experiment and keep the original failed/runtime evidence as history. Bound containers/networks/ports/volumes to this task/run with localhost bindings and deterministic own-resource cleanup. Public pinned artifacts only; no hosted service, school, account, user-token or real-message access. Preserve all original hosted/whole-feature acceptance gates and distinguish local result from release.\n\nPrevious scoped contract retained for source/requirements, but its old runtime-unavailable/startup/candidate facts are superseded above:\nResume same saved session 01a138dc-4527-7812-9758-3347fc64da80 and candidate 81b9da09a16a2dfc2f84024a3df53c8b1d899298. Keep tested resend code unchanged unless an actual new defect is observed; no fresh email/template rewrite or callback/session-URL work. Prior larger callback task was denied and remains excluded.\nImplement a materially new LOCAL cancellation proof, not another planning memo: recreate the exact inferred stale-verifier sequence with official Auth source pinned to ce9a8eee0cc042be8c7a42981a7ddae631e41d91 or its explicitly observed compatible version, real disposable PostgreSQL and local fake inbox. Existing DockerDesktop was started; check readiness once; no Windows feature/ACL changes/reboot. Own local containers/files by task/run. A concurrency test that calls a handwritten permissive verifier is not native proof. Record pause points in the actual verifier and start a native confirmation that read old pending state before cancellation; do not change production source or provider.\nExplore the narrow commit-boundary alternative to the earlier inadequate RPC-only lock: owner-scoped pending-request generation plus cancellation audit, and a LOCAL ONLY guard for native user/token state transitions. It must reject an in-flight old confirmation/first-confirmation restoring cleared tokens after cancel, while allowing a new legitimate request including the same address and unrelated ordinary login/profile/admin updates. A naive permanent email denylist or blanket auth.users trigger is not acceptable. Prove cancel-before/after-read/before-commit, confirmation wins, repeated cancel, old-token retry, same-address later request, resend race, wrong owner and unrelated token-type preservation. No new schema/trigger can be deployed under this local investigation. If exact native transitions cannot distinguish generations safely, supply the reproduced counterexample and smallest provider-level change required, not false success.\nOnce a real local protocol is demonstrated, prepare the small implementation and final deployment prerequisites, preserving the single unused service-migration allowance; do not apply it or invoke a new management/credential path. Backend protocol/authority and hosted-version binding require their real permitted step. Do not send real emails, inspect a real user/token table, process the user-provided verification URL, disable double confirmation, change passwords to clear pending state, or pretend a local banner-clearing button is cancellation. A successful local experiment cannot close N64; current parent remains open for callback/outcome and cancellation service delivery.\nAt final return original required not-yet-hosted gates honestly and save native code/tests/counterexample. This is the single dedicated implementer for the new method, not an ongoing loop of research workers.",
+      "allowedPaths": [
+        "src/lib/cloud.js",
+        "src/lib/email-change-request.js",
+        "src/views/settings.js",
+        "sw.js",
+        "supabase/migrations/*_n64_cancel_pending_email.sql",
+        "tests/n64-request-controls-*.mjs",
+        "docs/automation-evidence/20261014/N64_PENDING_REQUEST_CONTROLS.md",
+        "tests/n64-native-*",
+        "supabase/local-tests/n64-*",
+        "docs/automation-evidence/20261014/N64_NATIVE_CANCEL_PROTOCOL.md"
+      ],
+      "requiredChecks": [
+        "n64_resend_exact_pending_request",
+        "n64_real_cancel_old_email_unchanged",
+        "n64_owner_and_stale_request_races",
+        "n64_current_service_binding",
+        "n64_actual_settings_actions",
+        "n64_real_local_verifier_cancel_interleavings"
+      ],
+      "acceptance": [
+        "Resend button uses existing provider POST/resend type=email_change and authoritative current address only after exact pending request is established; do not create another change or send against arbitrary entered addresses. Respect provider Retry-After/cooldown, single-flight and user-confirmed click; no automatic sends/polling loops. Distinguish request accepted from delivered email. No real mail/account mutation by worker; use synthetic HTTP and public Auth source behavior.",
+        "A cancel button must revoke the pending target and its current/new confirmation tokens server-side, keeping current email/verified status/userUUID/identities/sessions/grades untouched. Research current supported provider operation first. No blind historical2022snippet or assumption clearing one auth.users column suffices: current Auth has one_time_tokens. If no supported endpoint exists, at most one narrowly named owner-only RPC under rakeezx may implement exactly this cancel capability after actual current schema/function metadata and local contract/concurrency proof. Never expose arbitrary Auth user fields or IDs to caller; auth.uid() controls identity, expected current+pending state/sentAt guards reject a different or already-completed request. Return only explicit cancelled/already-cancelled/stale-completed state, no hashes/tokens.",
+        "Least-privilege fixed search_path, grant EXECUTE only to authenticated and reject unauthenticated. No general Auth administrator, role changes, new account, service role in browser, policy/config/SMTP alterations. Cancellation invalidates only email-change token types for that owner; unrelated login/recovery/reauthentication tokens remain valid. No direct modification of actual user requests during installation: publishing a callable operation is not executing it. Do not reintroduce old pending state from an in-flight view response after cancellation; derive the post-action state from real owner-scoped readback, not a success toast alone.",
+        "Prove first-confirmed request cancels without switching address, second-confirmation vs cancel race cannot reinstate a stale pending request or change to an empty address, two cancels idempotent, old confirmation cannot commit after cancellation returns, wrong owner/stale request zero writes. Do not treat a hand-written permissive simulation of provider semantics as actual proof. If native provider ordering/locking cannot be made safe with existing supported interface, save the researched exact limitation and do not deploy a hazardous custom cancellation or cosmetic placeholder. The actual callback-return path remains a separate refused/unimplemented issue, not claimed solved by these controls.",
+        "Before LOCAL_READY, any exact approved service capability used must be applied once and read back through the available permitted Supabase tool; generic publisher does not install it. Maximumone migration, no applied-file rewrite/foreign account reads/backfill/Auth fixture provisioning. Keep old source and original blocked evidence. Test actual settings placement with buttons alongside the pending EMAIL state rather than under access, mobile/keyboard and no duplicate sends. Native/synthetic tests only; no real mail/user callback. If channel unavailable or refuses, keep the implemented candidate and honest blocker, never route around it."
+      ],
+      "preparationAuthority": {
+        "kind": "local-cancellation-native-prototype-only",
+        "hostedSQL": false,
+        "authProviderChanges": false,
+        "realAccounts": 0,
+        "realMessages": 0,
+        "migrationsApplied": 0,
+        "personalLinks": false
+      },
+      "releaseAuthority": "Dedicated local implementation/native concurrency proof authorized by current request; no live Auth trigger/service application or previously refused callback/session operation. Original whole-feature acceptance and existing partial result remain.\nThis resumption changes the material local condition/evidence only: PO has now updated Docker Desktop. Actual native query14Oct2026 08:28:16.686Z returned ServerVersion29.8.2, DockerDesktop4.95.0, Os=linux, Kernel6.6.87.2-microsoft-standard-WSL2, exit0. This removes the exact missing dockerDesktopLinuxEngine blocker; no OS/policy reset, logs access or permission expansion occurred. No additional hosted/real-data/messaging authority or release acceptance is granted."
+    },
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -20,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "objective": "Resume exact saved session 01a13461-ef85-7c53-add1-1eba2c19dace and candidate 2841973bc0a27adfa5d6844e02923367ae1d272c. Latest actual0.4.0 diagnostics from both PO pages still stop BEFORE the source adapter: first teacherGreeting=true, all safeReport/explicitRole/dashboard/card flags0; second allfalse. Code review found structural assumptions not present in screenshot evidence: school card must have a hardcoded .card/.panel/section ancestor, and dashboard navigation+action panels must sit inside one particular wrapper. Actual role/known page evidence should not depend on presentation container class names. No actual new page traversal or private DOM was performed.\nPrior0.4.0 roster/pagination/dynamic-timetable adapter is complete and is NEVER REACHED in these failures. Do not redo it or call its passing tests evidence that entry is fixed. First trace actual popup sourceTab capture and top-frame injection to prove the supplied source tab remains bound; treat wrong tab/frame/async page as hypotheses, not established facts. Preserve navigation/origin/session protections.\nImplement a SMALL presentation-invariant entry classifier based on the two ACTUAL prior screenshots and exact supplied route FORMS: /SchoolManagment/Actions/Teacher/<opaque> gateway with role label+value and its actual visible الصفحة الرئيسية link; /Dashboards/Schools teacher homepage with student/daily-followup navigation and timetable/report actions. No actual ID in fixtures. Resolve school card from bounded lowest shared semantic scope (role-label/value+school information+one allowed homepage href) rather than guessed .card CSS only. Do not infer metadata from allschools, mistakenly treat leader metadata as current admin or conflate repeated nested text. Multiple genuine school choices remain explicit; ambiguous cross-card binding stops.\nFor dashboard recognize the same visible semantic controls even when top nav is a sibling outside the main content/tiles, the content wrappers use generic div classes, Arabic role punctuation has whitespace/bidi controls, or anchor labels contain harmless icon spans. Bind enough independent known teacher-only labels/actual allowed GET routes and the exact observed route form, not a greeting/name alone. A visible teacher user on a known teacher page is not required to have a fictional separate role selector; absence of our selectors is not proof of missing authorization. Server/session/origin and visible explicit contradictory-role/login guards remain. Do not invent hidden URLs, broaden hosts, traverse write links or use raw source IDs in logs.\nReproduce0.4.0 failure with two independently authored screenshot-faithful DOMs that keep nav separate from main and use unrecognized neutral wrappers; assert exact reported false/zero flags where relevant. Then exercise the ACTUAL installed extension0.4.1 starting once on those same pages and reaching actual existing adapter for one representative roster/timetable. Add markup metamorphic cases: neutral wrappers added/removed, sibling nav, split role label/value, bidi/colon spacing, multi-school binding and conflicting-role/login/unsafe links. New structural diagnostics may return only pageKind/readyState/sourceTabMatch and bounded counts of expected semantic markers/iframe count (no href/text/IDs). If an embeddedframe/missingreadiness is genuinely established, preserve it as the next precise observation instead of silently injecting all frames.\nNo personal Chrome profile or real official portal access in worker; no request to send cookies/DOM/tokens, no bypass of earlier denied operation. Keep previous tests and reuse unchanged adapter/package evidence; no new full parser suite. Produce stable-folder-compatible0.4.1 artifacts and manifest; operator will update only matching owned stable files after staging/hash checks, no repeated uninstall design. Do not modify the live user-loaded n36-current folder from worker. Direct Rakeezmetadata/timetableaccountcommit and actual official DOM remain unverified, and Noor/messaging remain unimplemented. Return honest BLOCKED only for those remaining gates, not a new two-line restatement of the same synthetic failure.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_GATEWAY_DASHBOARD.md",
+        "docs/automation-evidence/20261014/N36_SOURCE_ADAPTER_AND_STABLE_PACKAGE.md",
+        "docs/automation-evidence/20261014/N36_PRESENTATION_INVARIANT_ENTRY.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed",
+        "n36_actual_screenshot_shapes",
+        "n36_gateway_card_binding_and_multischool",
+        "n36_actual_dashboard_labels_no_role_suffix",
+        "n36_uploaded_reference_roster_shapes",
+        "n36_complete_pagination_and_dynamic_timetable",
+        "n36_real_failure_markup_reproduction",
+        "n36_entry_markup_invariance"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched.",
+        "Latest real screenshots supersede the old assumption that an active teacher always has a teacher-suffixed greeting. Normal parent-oriented gateway chrome and principal metadata are not a conflicting ACTIVE role; all true explicit role/login/origin/data restrictions remain. No real identifiers in fixtures.",
+        "Entry correction is separately reproduced against the supplied screenshot semantics and latest0.4.0diagnostics; no actual private-page proof from local success. Source capture must be exact and arbitrary layouts must not gain access from a teacher name alone."
+      ],
+      "releaseAuthority": "Current supplied source-study/development instruction permits private local implementation from the new references. No live school data access, foreign app receiver, automatic cloud save, national-ID/guardian expansion or store publication is authorized here. Preserve official integration gaps.\nThis resumption changes the material local condition/evidence only: Latest actual0.4.0 diagnostics from both PO pages still stop BEFORE the source adapter: first teacherGreeting=true, all safeReport/explicitRole/dashboard/card flags0; second allfalse. Code review found structural assumptions not present in screenshot evidence: school card must have a hardcoded .card/.panel/section ancestor, and dashboard navigation+action panels must sit inside one particular wrapper. Actual role/known page evidence should not depend on presentation container class names. No actual new page traversal or private DOM was performed. No additional hosted/real-data/messaging authority or release acceptance is granted."
+    }
+  ]
+}
