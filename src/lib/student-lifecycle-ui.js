@@ -182,7 +182,7 @@ export async function openStudentManagement(studentId) {
     if (!target?.sectionId) return;
     try {
       const moved = await store.transferStudent(studentId, target.sectionId, { note: target.note });
-      toast(moved ? `نُقل ${student.name} إلى ${sectionLabel(store.getSection(target.sectionId))}` : 'تعذّر نقل الطالب بأمان. تحقق من كشف الشعبة ثم أعد المحاولة.', moved ? 'ok' : 'danger');
+      toast(moved ? `نُقل ${student.name} إلى ${sectionLabel(store.getSection(target.sectionId))}` : 'تعذّر نقل الطالب بأمان. تحقق من كشف الفصل ثم أعد المحاولة.', moved ? 'ok' : 'danger');
     } catch { toast('تعذّر نقل الطالب بأمان. حدّث البيانات ثم أعد المحاولة.', 'danger'); }
   }
   return outcome ?? result;

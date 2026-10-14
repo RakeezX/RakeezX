@@ -574,7 +574,7 @@ function emptyState() {
       <div class="empty__icon">${icon('classes')}</div>
       <div class="empty__title">لنبدأ</div>
       <div class="empty__text">
-        أنشئ شعبة وأسند إليها مادتك، ثم الصق كشف الأسماء دفعة واحدة.
+        أنشئ فصلًا وأسند إليه مادتك، ثم الصق كشف الأسماء دفعة واحدة.
       </div>
       <a class="btn btn--primary" href="#/classes">${icon('plus')} إنشاء أول فصل</a>
     </div>

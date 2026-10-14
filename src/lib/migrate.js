@@ -154,7 +154,7 @@ export function migrateLegacyData(legacy) {
     const grade = Number(c.grade ?? 4);
     const label = parseSectionLabel(c.name);
     if (label === String(c.name ?? '').trim()) {
-      warn.push(`اسم الفصل «${c.name}» لم يُفكَّك إلى صف ورمز شعبة — استُعمل الاسم كاملًا رمزًا.`);
+      warn.push(`اسم الفصل «${c.name}» لم يُفكَّك إلى صف ورمز فصل — استُعمل الاسم كاملًا رمزًا.`);
     }
 
     const secId = sectionId(year.id, grade, label);

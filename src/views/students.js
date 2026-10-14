@@ -230,7 +230,7 @@ export function transferSheet(student, fromSectionId) {
             <input class="input" id="tr-note" maxlength="120" placeholder="سبب النقل">
           </label>
         `
-      : html`<p class="t-3 fs-md center">لا توجد شعبة أخرى في هذه السنة. أنشئ شعبة ثانية أولًا.</p>`,
+      : html`<p class="t-3 fs-md center">لا يوجد فصل آخر في هذه السنة. أنشئ فصلًا ثانيًا أولًا.</p>`,
     onMount: (root, done) => {
       const note = root.querySelector('#tr-note');
       root.querySelectorAll('[data-pick]').forEach((b) =>
@@ -285,7 +285,7 @@ export default {
         <div class="management-page students-roster-page">
         <div class="empty management-empty">
           <div class="empty__icon">${icon('student')}</div>
-          <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الشعبة'}</div>
+          <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الفصل'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
           <div class="btn-row" style="justify-content:center">
             <button class="btn btn--ghost" data-act="file-import">${icon('upload')} استيراد ملف</button>
@@ -533,11 +533,11 @@ export default {
         if (!target?.sectionId) return;
         const moved = await store.transferStudent(s.id, target.sectionId, { note: target.note });
         if (!moved) {
-          toast('تعذّر نقل الطالب بأمان. تحقق من كشف الشعبة ثم أعد المحاولة.', 'danger');
+          toast('تعذّر نقل الطالب بأمان. تحقق من كشف الفصل ثم أعد المحاولة.', 'danger');
           return;
         }
         const to = store.getSection(target.sectionId);
-        toast(`نُقل ${s.name} إلى ${to ? store.sectionLabel(to) : 'الشعبة الجديدة'}`);
+        toast(`نُقل ${s.name} إلى ${to ? store.sectionLabel(to) : 'الفصل الجديد'}`);
         return;
       }
 
@@ -552,7 +552,7 @@ export default {
         if (!res.ok) {
           toast(
             res.reason === 'duplicate'
-              ? `رقم الكشف ${data.rollNo} مأخوذ في هذه الشعبة`
+              ? `رقم الكشف ${data.rollNo} مأخوذ في هذا الفصل`
               : 'رقم الكشف خارج النطاق',
             'danger'
           );

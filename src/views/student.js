@@ -461,7 +461,7 @@ export default {
                     </span>
                     <span class="logrow__main">
                       <span>
-                        ${sectionLabel(sec) || 'شعبة محذوفة'}
+                        ${sectionLabel(sec) || 'فصل محذوف'}
                         ${year ? html` · ${year.label}` : ''}
                         <span class="badge ${en.status === 'active' ? 'badge--ok' : ''}">
                           ${ENROLLMENT_STATUS[en.status] ?? en.status}
@@ -603,7 +603,7 @@ export default {
 
       const textParts = [
         `📊 ملخص أداء الطالب: ${s.name}`,
-        section ? `🏫 الشعبة: ${sectionLabel(section)}` : '',
+        section ? `🏫 الفصل: ${sectionLabel(section)}` : '',
         tch ? `📚 المادة: ${store.getSubject(tch.subjectId)?.name ?? ''}` : '',
         '━━━━━━━━━━━━━━━',
         '📈 المستوى والدرجات:',
