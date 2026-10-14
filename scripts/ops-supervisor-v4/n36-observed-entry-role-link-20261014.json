@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -15,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 9,
+      "objective": "Resume same saved session 01a13461-ef85-7c53-add1-1eba2c19dace and candidate 141fee017c8be0b5a8fb66b74db8c02e1ee06256. New actual PO 0.4.1 diagnostics show two different UI states not compatible with our URL-keyed entry assumptions: school-selection UI reports pageKind=teacher-dashboard, roleMarkers1/schoolOptions0/nav0/action0/safeRead0; teacher home reports pageKind=teacher-gateway, role0/nav2/action3/safeRead0. sourceTabMatch=true/readyState=complete/iframe0 in both. Current selection.js ties school-card handling to /SchoolManagment/Actions/Teacher and dashboard confirmation to /Dashboards/Schools plus accepted read links. It also rejects an otherwise readable href solely for an onclick attribute. A semantic role/context decision is being conflated with route-link acceptance; these exact current diagnostics are materially new evidence, not an instruction to remove origin/login/owner safeguards.\nDo not reread all prior source archives or repeat the19 unchanged tests. Inspect current selection.js/navigation.js/source-adapter.js and actual reader invocation binding. First prove on current0.4.1 actual installed extension the TWO submitted diagnostic patterns, with the provided school-card and teacher-home semantics on BOTH previously supplied permitted page paths. The snapshots prove current URL naming cannot alone identify which UI is visible. Make gateway vs already-active teacher recognition depend on coherent visible school-card/role/control relationships, not arbitrarily swapping route names. An existing teacher dashboard with both nav markers and all3teacher action markers is not a missing role merely because read navigation was rejected. Separate safe entry confirmation from discovery of readable GET links and label each stage truthfully. Preserve explicit conflicting role/admin/login/multischool guards, source tab identity and no hidden-frame injection. Do not treat a hostname, a teacher name or three unrelated labels as sufficient proof.\nFor links, inspect ONLY existing DOM href values in the isolated page context. A declarative same-origin read-only href can be read through the existing safe GET/tab navigation mechanism without executing its onclick handler; do not execute JavaScript hrefs, handlers or evaluated text. Require the actual safe known report path and query semantics before using it. Do not follow a form/ChangeUserType/save/edit/send route, synthesize IDs/URLs, grant new host permissions or weaken owner/login/origin constraints. If actual page lacks an observable safe destination, report the specific link-discovery deficiency rather than resetting to role missing. Make sanitized diagnostics bounded counts of href/empty/javascript/query-rejected/inline-handler/read-path classifications, not href strings/query values/HTML/names. No additional public/private API calls or personal Chrome storage.\nReuse byte-identical extraction/pagination/schema/CSV code and proofs, test only changed entry/link paths with exact before/after actual extension and then the existing adapter/preview result. Include multischool ambiguity, parent/admin conflict, external destination, JS-only link, same-origin safe href with harmless inline handler NOT EXECUTED, and role+navigation-path mismatch. If you cannot reproduce the supplied patterns do not ship another guessed version. No demand for another identical user trial as a substitute for this proof.\nPackage0.4.2 only after the focused checks, with a verified update stage binding previous stable runtime0.4.1 hashes to new reviewed files; do not modify n36-current directly. Preserve all failures and current original candidate ancestors. Official DOM still NOT_RUN unless directly observed under a separately allowed user action; real Rakeez metadata/timetable commit still unimplemented. Return BLOCKED/external with completed local result and exact limits rather than whole N36ready. No Product push/hosted publication, school writes or parent messaging. Deferred teacher tools/Tahdiri/portfolio study is archived by PO request, not this worker scope.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md",
+        "docs/automation-evidence/20261014/N36_ACTUAL_GATEWAY_DASHBOARD.md",
+        "docs/automation-evidence/20261014/N36_SOURCE_ADAPTER_AND_STABLE_PACKAGE.md",
+        "docs/automation-evidence/20261014/N36_PRESENTATION_INVARIANT_ENTRY.md",
+        "docs/automation-evidence/20261014/N36_OBSERVED_ENTRY_ROLE_LINK_SPLIT.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed",
+        "n36_actual_screenshot_shapes",
+        "n36_gateway_card_binding_and_multischool",
+        "n36_actual_dashboard_labels_no_role_suffix",
+        "n36_uploaded_reference_roster_shapes",
+        "n36_complete_pagination_and_dynamic_timetable",
+        "n36_real_failure_markup_reproduction",
+        "n36_entry_markup_invariance",
+        "n36_exact_041_observed_entry_failures",
+        "n36_role_not_dependent_on_read_link_classification"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched.",
+        "Latest real screenshots supersede the old assumption that an active teacher always has a teacher-suffixed greeting. Normal parent-oriented gateway chrome and principal metadata are not a conflicting ACTIVE role; all true explicit role/login/origin/data restrictions remain. No real identifiers in fixtures.",
+        "Entry correction is separately reproduced against the supplied screenshot semantics and latest0.4.0diagnostics; no actual private-page proof from local success. Source capture must be exact and arbitrary layouts must not gain access from a teacher name alone."
+      ],
+      "releaseAuthority": "Current PO supplies exact repeated failures and requests continued N36 repair. Scoped private local entry/parser/GET-link compatibility only, same authenticated page action context as before. No new permissions or live school operations, and no execution of previously denied Auth/account tasks. New actual PO 0.4.1 diagnostics show two different UI states not compatible with our URL-keyed entry assumptions: school-selection UI reports pageKind=teacher-dashboard, roleMarkers1/schoolOptions0/nav0/action0/safeRead0; teacher home reports pageKind=teacher-gateway, role0/nav2/action3/safeRead0. sourceTabMatch=true/readyState=complete/iframe0 in both. Current selection.js ties school-card handling to /SchoolManagment/Actions/Teacher and dashboard confirmation to /Dashboards/Schools plus accepted read links. It also rejects an otherwise readable href solely for an onclick attribute. A semantic role/context decision is being conflated with route-link acceptance; these exact current diagnostics are materially new evidence, not an instruction to remove origin/login/owner safeguards."
+    }
+  ]
+}

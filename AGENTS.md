@@ -25,3 +25,6 @@ Local-only synthetic UI checks may use the canonical `isolated-local-browser.mjs
 
 ## Current notes drive continuation
 The sole controller rereads approved open Product notes every60seconds, admits their exact source-linked actions and starts the next eligible one after delivery. No new planner/reviewer or parallel loop. Read the latest row for the assigned Product ID; preserve explicit closure/deferral and actual data/service safeguards. See the direct-notes section of the operating contract.
+
+## Saved future teacher-tools research — PO14October2026
+When asked to resume ideas about Tahdiri, browser teacher tools, weekly lesson preparation, Madrasati parent communication or the annual teacher portfolio, start with [the Arabic deferred-ideas index](docs/automation-evidence/20261014/RAKEEZ_FUTURE_IDEAS_AR.md) and its linked source-grounded study. These are deliberately saved for AFTER the current important open tickets. Do not activate them, open new Product tickets or repeat the competitor study merely because this pointer exists. F01–F11 are idea references, not executable tasks. Product status remains in the ledgers.
