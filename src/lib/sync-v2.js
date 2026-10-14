@@ -275,7 +275,20 @@ function normalizeRevision(value) {
   return Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
 }
 
+export function encodeTermDateOverrides(value) {
+  if (value == null) return value;
+  return Object.fromEntries(Object.entries(value).map(([id, pair]) => [id, {
+    start_date: pair.startDate, end_date: pair.endDate,
+  }]));
+}
+export function decodeTermDateOverrides(value) {
+  if (value == null) return value;
+  return Object.fromEntries(Object.entries(value).map(([id, pair]) => [id, {
+    startDate: pair.start_date, endDate: pair.end_date,
+  }]));
+}
 function encodeFieldValue(store, field, value) {
+  if (store === 'calendars' && field === 'termDateOverrides') return encodeTermDateOverrides(value);
   if (store === 'sessionRosterSnapshots' && field === 'capturedAt' && Number.isFinite(value)) {
     return new Date(value).toISOString();
   }
@@ -292,6 +305,7 @@ function encodeFieldValue(store, field, value) {
 }
 
 function decodeFieldValue(store, field, value, row) {
+  if (store === 'calendars' && field === 'termDateOverrides') return decodeTermDateOverrides(value);
   if (store === 'sessionRosterSnapshots' && field === 'capturedAt') {
     const parsed = Date.parse(value);
     return Number.isFinite(parsed) ? parsed : 0;
@@ -312,6 +326,11 @@ export function encodeSyncV2Patch(store, localPatch = {}) {
   const schema = schemaFor(store);
   const patch = {};
   for (const [localField, serverField] of Object.entries(schema.fields)) {
+    // Released official projections carry a local presetId, but N58 scope
+    // authority belongs only to custom Calendars. Preserve that local metadata
+    // without serializing it as a new server-owned scope during bootstrap.
+    if (store === 'calendars' && hasOwn(localPatch, 'source') && localPatch.source !== 'custom' &&
+        ['presetId', 'termDateOverrides'].includes(localField)) continue;
     if (hasOwn(localPatch, localField)) patch[serverField] = encodeFieldValue(store, localField, localPatch[localField]);
   }
   if (store === 'profile' && !hasOwn(localPatch, 'reportPrincipalName') && hasOwn(localPatch, 'principalName')) {
@@ -382,7 +401,12 @@ function uniqueDependencies(dependencies) {
   });
 }
 
-export function calendarDependencies(store, record, op = 'create') {
+export function calendarDependencies(store, record, op = 'create', terms = []) {
+  if (store === 'years' && op === 'patch' && record.calendarPresetId) {
+    return terms.filter(term => term.yearId === record.id && !term.deleted && [1, 2].includes(term.index))
+      .map(term => ({ store: 'terms', recordId: term.id, requiresServerRevision: true }));
+  }
+  if (store === 'calendars') return Object.keys(record.termDateOverrides ?? {}).map(recordId => ({ store: 'terms', recordId, requiresServerRevision: true }));
   if (store !== 'sessions' || op !== 'create' || !record.calendarContext) return [];
   return [
     { store: 'years', recordId: record.calendarContext.yearId, requiresServerRevision: true,
@@ -393,11 +417,11 @@ export function calendarDependencies(store, record, op = 'create') {
 
 function mutationScope(store) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
-  return [...new Set([store, 'outbox', 'device', ...Object.values(references), ...(store === 'sessions' ? ['years', 'terms'] : [])])];
+  return [...new Set([store, 'outbox', 'device', ...Object.values(references), ...(store === 'years' || store === 'calendars' ? ['terms'] : store === 'sessions' ? ['years', 'terms'] : [])])];
 }
 
 function inferredDependencies(store, record, current, supplied, op = 'create') {
-  const dependencies = [...calendarDependencies(store, record, op), ...(supplied ?? [])];
+  const dependencies = [...calendarDependencies(store, record, op, current.terms), ...(supplied ?? [])];
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   for (const [field, parentStore] of Object.entries(references)) {
     const parentId = record[field];
@@ -543,10 +567,20 @@ function pushUniquePut(batch, record) {
   else batch.put.push(record);
 }
 
+function rewriteCalendarReferences(store, record, targetStore, oldId, newId) {
+  let next = record;
+  if (store === 'calendars' && targetStore === 'terms' && hasOwn(record.termDateOverrides ?? {}, oldId)) {
+    const overrides = { ...record.termDateOverrides, [newId]: clone(record.termDateOverrides[oldId]) };
+    delete overrides[oldId]; next = { ...next, termDateOverrides: overrides };
+  }
+  return next;
+}
 function rewriteReferenceRecord(store, record, targetStore, oldId, newId) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   let changed = false;
-  const next = { ...record };
+  const nested = store === 'calendars' ? rewriteCalendarReferences(store, record, targetStore, oldId, newId) : record;
+  changed = nested !== record;
+  const next = { ...nested };
   const contextField = targetStore === 'years' ? 'yearId' : targetStore === 'terms' ? 'termId' : null;
   if (store === 'sessions' && record.syncCreatePending && contextField && record.calendarContext?.[contextField] === oldId) {
     next.calendarContext = { ...record.calendarContext, [contextField]: newId };
@@ -638,6 +672,17 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
     }
   }
 
+  if (mutation.store === 'calendars') {
+    const nestedLocal = rewriteCalendarReferences('calendars', localPatch, targetStore, oldId, newId);
+    const decodedServer = hasOwn(serverPatch, 'term_date_overrides')
+      ? { termDateOverrides: decodeTermDateOverrides(serverPatch.term_date_overrides) } : {};
+    const nestedServer = rewriteCalendarReferences('calendars', decodedServer, targetStore, oldId, newId);
+    if (nestedLocal !== localPatch || nestedServer !== decodedServer) {
+      if (mutation.envelopeLocked) return { ...mutation, state: 'blocked', blockedReason: 'canonical-reference-remap-after-dispatch' };
+      Object.assign(localPatch, nestedLocal);
+      Object.assign(serverPatch, encodeSyncV2Patch('calendars', nestedServer)); changed = true;
+    }
+  }
   const contextField = targetStore === 'years' ? 'yearId' : targetStore === 'terms' ? 'termId' : null;
   if (mutation.store === 'sessions' && mutation.op === 'create' && contextField) {
     for (const [patch, field] of [[localPatch, 'calendarContext'], [serverPatch, 'calendar_context']]) {
