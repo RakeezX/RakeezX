@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-private-browser-package-20261013",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -20,
+      "scopeKey": "n36-private-extension-popup-check",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "objective": "Resume saved session 01a13461-ef85-7c53-add1-1eba2c19dace and candidate ba2e4dcd978eb19fa2be497b57a7b8892bb00097. User actually tested0.3.1 and reached AMBIGUOUS_OR_MISSING_TEACHER_ROLE. We now recovered the ORIGINAL supplied Bookmarklet (Libraryfile_000000008c7082118edd30aee0cfe9fe/version1), not merely old summaries. It detects a short visible greeting ending with معلم/معلمة and actual TeacherSchedule/MyInfo/Teacher/ClassStudentInfo links, rather than requiring a selected exact المعلم label. Current0.3.1 exact-match role gate misses this documented reference shape. This new evidence justifies a bounded source parser correction, not another identical synthetic retry.\nRead the recovered reference analysis at canonical docs/automation-evidence/20261014/N36_RECOVERED_REFERENCE_ROLE.md (source analysis only; do not execute Bookmarklet). Implement private0.3.2 with explicit semantic role detection: normalize teacher synonyms and harmless duplicate identical role links; allow a unique visible composite greeting ending in معلم/معلمة AND visible same-origin known teacher-report links to establish already-active teacher context. Keep login/OTP/admin/conflicting/ambiguous role checks. A name alone or arbitrary text/URL never proves role. Only actual safe GET hrefs, no synthesized MyInfo path/IDs, no ChangeUserType/admin/attendance/grade links or hidden iframe technique from reference. Preserve navigation.js policy and existing host/query bounds; recognized additional route forms remain subject to the same safeRoute.\nUse actual unpacked extension in owned local profile. Reproduce the 0.3.1 failure on the exact recovered reference-shaped composite greeting/report-link DOM, then prove0.3.2 continues via actual clicked one-start to permitted teacher info/roster/schedule. Cover already-active teacher, same-role duplicate links, extra whitespace/child icons, composite teacher name not accidentally exported as role, explicit admin conflict, multiple distinct teacher destinations with no reliable current-role signal, login/missing-role, external links, rejected optional routes/cancel/expiry. Do not remove required old checks; reuse old byte-identical extraction/package evidence and test only changed behavior.\nImprove the missing-role error to show safe structural booleans/counts (teacher-greeting present, safe teacher-report links count, explicit-role count/ambiguity), not names, href values or raw DOM. Provide an explicit diagnostic copy button for this error, not only UNSAFE_ROUTE. No unsafe falling back to first link.\nPackage separate0.3.2 and exact source/ZIP hashes; preserve0.3.0/0.3.1 and user-loaded folders. No direct install in personal browser, no official source visit, no third-party data receiver, no real account/student read/write, no Product/public deployment or new permissions. Official current DOM remains NOT_RUN until user trial; actual Rakeez metadata/timetable commit still unimplemented, so return BLOCKED/external with local corrected capability and precise remaining condition, not whole-ticket success. Do not access or reattempt the denied N64 auth task or earlier personal-browser operations.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "tests/n36-*.mjs",
+        "docs/automation-evidence/20261014/N36_ONE_START_IMPORT.md",
+        "docs/automation-evidence/20261014/N36_ROUTE_DIAGNOSTICS.md",
+        "docs/automation-evidence/20261014/N36_REFERENCE_ROLE_ADAPTER.md"
+      ],
+      "requiredChecks": [
+        "n36_real_private_extension_popup",
+        "n36_names_only_download_to_n12_preview",
+        "n36_clean_private_package",
+        "n36_official_teacher_surface",
+        "n36_explicit_multi_category_extraction",
+        "n36_actual_popup_category_preview",
+        "n36_no_private_background_capture",
+        "n36_home_role_multi_page_run",
+        "n36_navigation_cancel_origin_guards",
+        "n36_route_stage_and_optional_rejection",
+        "n36_safe_error_diagnostic",
+        "n36_reference_shaped_role_detection",
+        "n36_conflicting_role_fail_closed"
+      ],
+      "acceptance": [
+        "Retain the previous names-only CSV path and source evidence; do not rerun unchanged old tests just to count progress. New category extraction and actual private extension popup are the new acceptance scope.",
+        "Every extracted field is previewed, editable and deselectable. Nothing is committed to Rakeez or exported until an explicit user action; empty/cancel/ambiguous category must not become silent data. Exported structured bundle uses a small versioned allowlisted schema, no raw DOM or credential/user tracking fields.",
+        "No user account data, service/API/Auth/RLS/migration changes, personal profile installation, school navigation or execution of a previously denied official-page operation. All actual execution here uses synthetic pages and owned temporary profiles only.",
+        "Official current teacher DOM and direct Rakeez profile/timetable integration remain genuine later gates and must be reported NOT_RUN. Private local completion is progress but not overall N36 closure or a public Product release.",
+        "Latest explicit user action authorizes implementing bounded same-origin read-only extension navigation, replacing manual page/column selection. The worker still uses owned local synthetic test pages only; prior official/account read denials are not rerouted. Real official compatibility remains unverified until observed.",
+        "Latest UNSAFE_ROUTE feedback is handled without removing origin/path/query or required-role protections. Optional unvisited rejected data is shown uncollected; official page remains unverified and no personal browser is touched."
+      ],
+      "releaseAuthority": "Latest PO real trial and recovered exact supplied reference permit this narrow private local source adapter/package correction only. No additional data/portal/identity permission or personal browser automation. Existing official and integration gates remain, and the worker does not edit queue state. User actually tested0.3.1 and reached AMBIGUOUS_OR_MISSING_TEACHER_ROLE. We now recovered the ORIGINAL supplied Bookmarklet (Libraryfile_000000008c7082118edd30aee0cfe9fe/version1), not merely old summaries. It detects a short visible greeting ending with معلم/معلمة and actual TeacherSchedule/MyInfo/Teacher/ClassStudentInfo links, rather than requiring a selected exact المعلم label. Current0.3.1 exact-match role gate misses this documented reference shape. This new evidence justifies a bounded source parser correction, not another identical synthetic retry."
+    }
+  ]
+}
