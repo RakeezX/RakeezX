@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-fresh-account-calendar-foundation-20261014",
+      "productId": "N58",
+      "activationId": "po-20261012-continuous",
+      "priority": -100,
+      "scopeKey": "n58-fresh-account-foundation-alignment",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "objective": "Resume exact saved session 01a13b1b-8467-7662-b6fd-408b0fb56606 and candidate 9603682900001d29ad8ccdb95d7ce26c5357a2f9. The prior LOCAL implementation is complete. Current PO repeats that TWO empty accounts fail and requests N58 first. Read-only hosted metadata now proves the exact existing year guard, mutation entry and provisioning routine match the LOCAL certified bodies (CRLF-normalized), so no missing/new service migration is needed for this limited client-compatibility release. The previous local-only phase lacked a delivery handoff; use the saved candidate, not another reproduction/rewrite. Full calendar hosted gates and the Production switch hold remain unchanged.\nRead canonical docs/automation-evidence/20261014/N58_CURRENT_SERVICE_AND_RELEASE_SCOPE_1925.md and saved result. All four original required LOCAL checks are PASS. Verify current base/source hashes and reuse them; do not repeat the9protocol/60contract suite or create a planner/reviewer. This phase completes the first-use defect release, not the entire N58 feature.\nUse the existing3routine metadata body digests only as existing-service identity evidence, never as evidence of a live write. Keep Production calendar switching disabled. Validate the materially missing upgrade case: actual current app/store from a256 -> candidate, persisted populated account and malformed rejected-first-use account, no reset. Both can open Calendar/teacher center/read current raw data without an unhandled projection exception; no repair/discard/resend of retained65 envelopes and no reinterpretation of historical session context. A truly missing term stays unresolved, not invented. Known holiday/read data can remain inspectable with an honest warning if incomplete. New-account routine still supplies one year/two terms then server-acknowledged selection.\nUse isolated synthetic current UI/native fixtures only, no personal browser, real accounts, hosted calls, SQL modification or former test pair. Reuse current readback already obtained by the operator; no attempt to fix missing CLI management access is needed here. Add the needed module to the offline shell without weakening the installed-release updater. If narrow client fixes are needed for the upgrade case, keep them within the existing code paths and run only newly affected proofs.\nWhen current-source proof and the limited acceptance below pass, return LOCAL_READY for the normal publisher to deliver THIS FIRST-USE COMPATIBILITY CORRECTION with hold=true. Record full N58 hosted/retired-pair and existing-rejection recovery as OUTSTANDING, never mark them PASS or close N58. Do not edit queue or claim Production yourself. If a real local regression cannot be fixed within these paths, give exact blocker/source/candidate and preserve progress.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/models.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/calendar-presets.js",
+        "src/lib/calendar-ranges.js",
+        "src/lib/session-provenance.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/lib/initial-restore.js",
+        "tests/n58-fresh-account-*.mjs",
+        "tests/n58-fresh-account-*.json",
+        "docs/automation-evidence/20261014/N58_FRESH_ACCOUNT_FOUNDATION.md",
+        "sw.js",
+        "docs/automation-evidence/20261014/N58_FIRST_USE_RELEASE.md"
+      ],
+      "requiredChecks": [
+        "n58_actual_new_account_first_rejection",
+        "n58_foundation_dependencies_local_protocol",
+        "n58_hold_preserved_and_no_legacy_replay",
+        "n58_owner_history_and_current_regressions",
+        "n58_existing_account_upgrade_readonly",
+        "n58_existing_service_identity_binding"
+      ],
+      "acceptance": [
+        "Scope is the two empty-account first-use failure, not session repair. Preserve all original failed receipts and the broad N58 acceptance record. Existing baseline/candidate default/before-first-sync/after-sync and lost-ack proofs may be reused only when source/dependency hashes still match.",
+        "CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD remains true, UI selection stays disabled and no shipped bypass is added. No existing account year/term IDs/history, rejected65 commands, old5session report or retired6 are deleted, automatically resent, relabeled successful or silently migrated.",
+        "Actual installed existing-account upgrade/read case above passes with unchanged persisted checkpoints and no unhandled Calendar exception. No observer/player-specific fixture to evade true missing-parent guards. Existing current source, N101 recovery, N98 sorting, N90 grades and offline/update machinery remain intact.",
+        "Existing-service metadata identity is bound to the three source digests in the operator record, with CRLF normalization explained. No new migration, trigger/RLS/ACL/Auth or provider account/config mutation. LOCAL test equality is not a hosted write certification.",
+        "After affected verification, normal publisher may integrate/deploy only the saved first-use client correction. Record the exact candidate/merged/provider/served proof independently. No N58 CLOSED or switching re-enabled until the separately outstanding full calendar and recovery acceptance is actually met."
+      ],
+      "releaseAuthority": "Current direct PO demands repairing reproducible empty-account calendar failure and prioritizes N58. Existing delivery delegation plus verified unchanged service identity authorizes this restricted frontend first-use compatibility release while keeping the explicit switching hold. This supersedes only the prior completed LOCAL-phase no-publication endpoint; it does NOT authorize/retry prior denied hosted operations, change live service/data permissions, remove necessary full-feature checks, enable switching or close the N58 umbrella."
+    }
+  ]
+}
