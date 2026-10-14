@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n90-unified-import-noor-20261014",
+      "productId": "N90",
+      "activationId": "po-20261012-continuous",
+      "priority": 0,
+      "scopeKey": "n90-unified-student-grade-workflow",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "objective": "Resume exact session 01a1382d-bfe8-7fa0-925e-48edf4744998 and candidate e290f1dd8bcbb5492e361b833d56145c991cd761. Actual GitHub compare432f815..main now has31commits, including current N101 context/selection-revision/session-recovery code in store.js and sync-v2.js, N64 stable settings and new shell. The saved N90 candidate predates these concrete shared-file changes. Its independent missing CLIENT integration must be reconciled before eventual delivery; do not promote its old shared files or run a worker merely to rediscover absent Supabase tooling. The later curriculum/backup wording was already delivered in ef60eff3 and must not be repeated.\nImplement that missing code integration now in the existing owned worktree: preserve old commit, reconcile current remote main and carry only actual N90 additions; retain N101 creation context/acknowledged calendar revision, rejected-session repair, N64 settings state, N100 safe copy and current offline shell. Current integration is not a new feature and not another design/review round. Do not edit src/views/settings.js, app.js or sw.js because the independent N36 receiver owns those files during this phase; read current versions as dependencies. They have no original N90 changes to replay. A declared overlapping dependency is not permission to overwrite an active worker.\nRun only the affected current-app import and Sync adoption checks using exact existing synthetic fixtures/native local service: names-only, names+grades, blank/zero/cap, confirmed enrollment and source-history protection. Original6native migration proofs and unchanged export/parser tests remain reusable. At least prove adding/receiving a normal dated session through the current N101 flow still carries calendarContext and real selection revision after the merge. Do not re-run an old permissive fixture or replace current code to make tests pass.\nThe service migration is still absent and the worker lacks a connected management tool. DO NOT probe/apply Supabase or set up MCP, tokens or helper handoffs; the attempted broader operator setup was refused and is NOT repeated here. No SQL/Auth/real-account/Noor calls, no schema change or public preview. Preserve the original exactly certified SQL from the candidate without changing/reapplying it. No live pair or old denied operation.\nCommit the real reconciled client result and report exact current base/changed paths/proof, then BLOCKED external solely for the unchanged service prerequisite. This new local integration result is not full N90ready, and must not go to the publisher. Preserve useful progress rather than returning only the old missing-tool message or running idle retries. Full Product acceptance conditions remain, including the unapplied service. Once this material integration is done do not rerun it without another changed dependency.",
+      "allowedPaths": [
+        "src/lib/grade-transfer.js",
+        "src/lib/grade-transfer-parsers.js",
+        "src/lib/grade-transfer-export.js",
+        "src/lib/student-import.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/store.js",
+        "src/views/grades.js",
+        "src/views/students.js",
+        "src/views/teaching-hub.js",
+        "src/styles/grades.css",
+        "tests/n90-*",
+        "tests/n12-*",
+        "docs/automation-evidence/20261014/N90_CURRENT_SOURCE_RECONCILIATION.md"
+      ],
+      "requiredChecks": [
+        "n90_shared_names_or_grades_entry_and_empty_class",
+        "n90_blank_template_and_compact_mapping",
+        "n90_explicit_cap_zero_blank_atomicity",
+        "n90_noor_exact_three_column_grouping",
+        "n90_names_grades_owner_retry_invariants",
+        "n90_service_and_shell_binding",
+        "n90_current_main_context_compatibility"
+      ],
+      "acceptance": [
+        "One shared workflow reuses N12/N90 parsers and preview. Names-only keeps existing duplicate prevention; names+grades can show existing matched students and new explicit enrollments before any commit. No writes on file choice, cancel or incomplete review. No fuzzy/ambiguous identity merge or automatic enrollment based only on similar names. Empty class card says الفصل بلا طلاب بعد and offers import plus manual add directly. Do not pretend an empty class can import grades without mapping/creating the displayed students through the confirmed owner-bound path.",
+        "Template: existing names plus appropriate current grade columns, blank mark cells (not zero), unambiguous maximum hints. Explain automatic/subitem columns are not direct writable totals; omit or mark them read-only without confusing grade mapping. CSV with UTF8 BOM acceptable using the existing writer; do not claim Excel XLSX export unless a real audited writer exists. Protect text formula injection. Optional file help is one short meaningful note or inline tooltip, not repeated engineering paragraphs. Alerts near active step with correct severity; cancel is neutral not red failure. Export buttons visibly distinct and not cramped.",
+        "Before confirmation numeric upper excess becomes min(incoming,currentItemMax) and review clearly shows original and proposed capped values and a concise count; zero is valid and blank means unchanged. Negative/nonfinite/text/ambiguous student remains rejected. Never alter item max or silently scale marks. Current authoritative max/revisions revalidated by server; max change after review rejects stale plan rather than silently recomputing. Original upper-invalid tests must be updated to latest PO contract while retaining all other owner/atomic/zero/blank guards.",
+        "Noor export headers exactly: اسم الطالب ; المهام الأدائية والمشاركة والتفاعل (40) ; تقويمات تحريرية وتطبيقات عملية (60). This40/60 is explicitly provided by PO, not a claimed independently verified current Noor upload API. Group existing items only by explicit trusted current mapping or a one-time teacher-confirmed assignment to40/60; suggest known participation/homework/project items versus assessments when unambiguous, never invent grades or silently normalize incompatible totals. Do not double count, rescale missing marks tofull, change deferredN93 period semantics, or hide missing/ambiguous group mapping. Export numeric values within40/60 with unrecorded status preserved; final output exactly3columns. Label for manual Noor entry until official file-upload acceptance proven.",
+        "Names+grades in one confirmation must be truly atomic/consistent. Reuse existing primitives if possible; if no transactional command covers student/enrollment plus item/scores, one narrow additive owner-bound command may compose existing contracts with stable IDs, exact reviewed plan/receipt and all-or-nothing native tests. A failed score batch must not leave hidden half-imported students. No real user/student mutation during testing, newAuth accounts, resurrection of deleted IDs or real Noor writes. Never reuse old deleted student identity by name. Current N101 bootstrap and N100 safe-copy changes must remain intact.",
+        "Actual app file→preview→confirm cases on fresh/filled class with CSV user shape, suggestions/add-more, 7→5,0/blank/cancel, ambiguous IDs, overwritten grades consent, new enrollment, stale revision and retry. Native transaction tests if service changes plus exact apply/readback of required capability before LOCAL_READY. Existing paid-independent proof reused; no full historical suite. The only service change allowed is the one named new N90 unified import command/receipt if strictly necessary, preserving owner/RLS/ACL/scoring/revision locks. New startup dependencies included in current offline shell. Actual frontend publication by sole publisher."
+      ],
+      "preparationAuthority": {
+        "kind": "current-source-reconciliation-only",
+        "serviceOperations": 0,
+        "providerCalls": 0,
+        "realStudentData": 0,
+        "migrations": 0,
+        "publication": false
+      },
+      "releaseAuthority": "Existing N90 implementation plus latest productivity instruction authorizes this specifically observed local shared-source reconciliation. No live service, new access, hosted mutation or publication; original full acceptance remains. Actual GitHub compare432f815..main now has31commits, including current N101 context/selection-revision/session-recovery code in store.js and sync-v2.js, N64 stable settings and new shell. The saved N90 candidate predates these concrete shared-file changes. Its independent missing CLIENT integration must be reconciled before eventual delivery; do not promote its old shared files or run a worker merely to rediscover absent Supabase tooling. The later curriculum/backup wording was already delivered in ef60eff3 and must not be repeated."
+    }
+  ]
+}
