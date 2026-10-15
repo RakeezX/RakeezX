@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n107-central-classes-local-file-import-20261015",
+      "productId": "N107",
+      "activationId": "po-20261012-continuous",
+      "priority": -60,
+      "scopeKey": "n107-new-teacher-central-classes-import-and-toolbar",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261015-N107-USER-CONFIRMED-CLASS-FILE-IMPORT",
+      "dependsOn": [
+        "continuous-n104-restored-account-receipt-access-20261015"
+      ],
+      "objective": "Implement latest PO's missing new-account path and correct Classes toolbar as a single realistic owner-safe, file-based class import flow, NOT fake direct Madrasati/Noor login. Current Production screenshot shows empty Home only 'إنشاء أول فصل' and empty Classes only 'فصل جديد' and 'إضافة فصل تجريبي'; neither offers import, so onboarding incomplete. Add 'استيراد الفصول' as a clear calm secondary green button on Home onboarding state A alongside existing 'إنشاء أول فصل'; if other nonempty onboarding states, do NOT crowd home. Classes page both empty/populated must show a VISIBLE TOP toolbar: leading primary 'استيراد الفصول', adjacent '+ إضافة فصل', and 'استيراد وتصدير الكشوف' central class selector (separate existing direct /teaching/:id/koshoof workspace). Add user-requested 'حذف الفصل' as a small visually quiet red trash ICON with meaningful aria-label and existing two-step deletion, not a destructive one-click. Move 'إضافة فصل تجريبي' to bottom of Classes screen only and keep its current correct owner-scoped delete behavior. Once central selector is actually available, REMOVE the duplicated 'الكشوف' shortcut from each class-card (user expressly requests central instead); keep single class card main clickable and readable. New routes `#/classes/import` and `#/classes/koshoof` (may expose named exports from same small module) with back/focus, account/term/owner/archived safeguards, no giant terms of text and no import side effects from entry. Central class selector lists ONLY current-account active teachings, each class has two explicit choices 'استيراد لهذا الفصل'/'تصدير لهذا الفصل' leading to existing standalone Koshoof route; do not pretend this is already bulk export. For actual class CSV/XLSX import, REUSE the existing vetted readStudentFile parser (1MB, <=300 student rows/50 columns) and safe name validation; DO NOT add remote network, parser dependency or change service RPC. Provide sources 'ملف من الجهاز', 'ملف صادر من نور', 'ملف صادر من مدرستي' as file-upload interpretations ONLY; explicitly do not label them as live connected integrations. Accept a clearly documented simple sheet with 'الصف', 'الفصل', 'المادة', 'اسم الطالب' headers; allow manual mapping for recognized alternative local exported column headers for grade, class label, subject and optional student name. Display preview grouped by explicit grade/section+subject in active year/term, each group's number of unique valid students and duplicate/invalid/new/existing classes. If grade/class/subject not in file, provide safe manual choice on preview; never guess an out-of-domain grade or owner. Use current builtin material Subject catalog/validateSubject if appropriate and existing store.resolveSubjectSelection/reuse existing subjects, and existing store.createSection/store.createTeaching/store.importStudents under their existing owner, lease, term, calendar, default grading and Sync protection. To minimize risk of multiple async nontransactional creates, FIRST RELEASE can permit a user to select & confirm ONE target class group per commit from a multi-group file; show other groups as 'للمراجعة لاحقًا', not automatically create across all classes. On selected class, user reviews grade/label/subject, added students, duplicates and confirms the separate creates; revalidate same immutable owner/workspace/database/cloud session, current year/term and class/source fingerprint immediately before each existing store write and after each await. Never override an existing class or mix students from same name in different classes; existing name collisions need teacher review or reject. Each user-initiated confirmed action can create section and teaching and import only its own names; if any step fails, display EXACT already-created class and pending names (no false atomicity or automatic replay), keep draft and do not hide failed children. User can retry under fresh revalidated current state with duplicate safe matching, no silent duplicate import or repeated outbox/score writes. For file without student names, allow reviewed class creation with zero students. No live teacher/student writes or real browser profiles/test accounts by worker, only synthetic owned environment. Ensure new class context includes default items and safe offline/owner guard; use existing create helpers, NEVER raw IndexedDB writes or bypass ACL. If file lacks grade/subject and UI cannot map, block save with actionable local selection, not arbitrary default. Test with isolated seeded new-account Home and empty/populated Classes 320/390/768/1280, CSV/XLSX variants, two classes same label diff year, duplicate detection, same-name different classes, wrong owner and callback/account change, new-year/term switch, archived sections, offline expired lease, cancel no writes, partial safe receipts after simulated failure, no score generation outside existing item defaults. New JS route must be included in offline shell sw.js after clear proof of startup dependency; do not change N58 calendar policy. Deliver through sole controller/publisher with Cloudflare success, immutable and served exact asset proof. Do NOT claim ready-from-Noor/Madrasati direct login or school/timetable import here; N36 real portal extraction remains OPEN separately. The future multi-class separate ZIP export and printable blank attendance/grade registers should be studied only, not hidden side effects of class import or automatically activated new tickets, because extra save/bulk semantics require dedicated checks. REVIEWED RESUME CONDITION: previous N107 worker saved its committed candidate and all source/mapping/native owner checks, but it twice requested the shared browser during N106 browser phase (BUSY), hence actual UI/offline was explicitly NOT_RUN. Only AFTER N106 actually releases its owned shared browser lease and publisher is idle, resume THIS SAME N107 session and candidate via controller. Run the previously NOT_RUN actual isolated/new-account UI and offline checks instead of repeating successful code/CSV verification. An OPTIONAL existing legacy supplemental subject fixture also yielded OFFLINE_LEASE_LIMITED even on unchanged source base; diagnose exact actual lease contract and fix the FIxture to supply the appropriate valid offline/online lease or expect the correctly documented safe refusal; do not remove the test, alter Product/Auth/lease semantics or turn FAIL to PASS by assertion change without contract proof. Pass original source and owner/term negative tests. All user-triggered actual classroom creates retain strict authorization and partial receipt rules. No new scope, SQL or student data. If the old browser owner is still present, remain blocked without touching its lock.",
+      "allowedPaths": [
+        "src/views/home.js",
+        "src/views/teachings.js",
+        "src/router.js",
+        "src/views/class-import-center.js",
+        "src/lib/class-import-file.js",
+        "src/lib/student-import.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "sw.js",
+        "tests/n107-classes-import-parser.test.mjs",
+        "tests/n107-classes-import-browser.mjs",
+        "tests/n107-classes-import-browser.json",
+        "tests/n107-classes-import-mutation.test.mjs",
+        "tests/n107-central-entry.test.mjs",
+        "tests/n12-student-import.test.mjs",
+        "tests/n104-class-operations.test.mjs",
+        "docs/automation-evidence/20261015/N107_CENTRAL_CLASS_ENTRY_AND_FILE_IMPORT.md",
+        "docs/automation-evidence/20261015/N107_FUTURE_BULK_EXPORT_AND_PRINTABLE_KOSHOOF_STUDY.md"
+      ],
+      "verificationPaths": [
+        "src/views/home.js",
+        "src/views/teachings.js",
+        "src/router.js",
+        "src/views/class-import-center.js",
+        "src/lib/class-import-file.js",
+        "src/store.js",
+        "src/styles/components.css",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n107_home_empty_account_primary_create_secondary_import",
+        "n107_classes_top_toolbar_all_states_demo_bottom_and_trash_unchanged_confirmed",
+        "n107_central_koshoof_selector_correct_owner_term_active_only",
+        "n107_CSV_XLSX_real_file_class_groups_mapping_review",
+        "n107_one_class_owner_bound_explicit_confirm_creation_and_student_safety",
+        "n107_duplicate_names_year_subject_context_retry_and_partial_failure",
+        "n107_mobile_RTL_accessibility_PWA_new_route",
+        "syntax_diff_and_owned_cleanup"
+      ],
+      "acceptance": [
+        "New user sees 'استيراد الفصول' next to create first class on Home; empty/populated Classes have top toolbar with import, central Koshoof, create, calm red trash icon with existing confirmation. 'إضافة فصل تجريبي' is at bottom only, not crowding onboarding, and previously accepted delete remains safe.",
+        "Classes cards no longer have the redundant 'الكشوف' secondary button after a genuine central selector exists, but cards still navigate and retain correct owner isolation. Central selector offers current account class-scoped import/export but does not falsely claim multi-class ZIP.",
+        "Actual CSV and XLSX files up to existing 1MB/300 row bound can be reviewed as grade+section+subject groups and optional names. User maps missing columns explicitly; wrong/mixed school/duplicate/foreign/ambiguous groups not silently created. Source labels Noor/Madrasati mean LOCAL uploaded exported files, never authenticated direct portal connection.",
+        "Only user-triggered explicit final confirmation of ONE selected group leads to existing createSection/createTeaching/importStudents code under same Auth workspace/current year/term/lease. No save at preview, duplicate or cancel; no mismatched owner/term or archived access. A partial failure surfaces exactly what persisted without automatically duplicating or erasing.",
+        "Actual page 320/390/768/1280 RTL dark/light, keyboard/focus, empty and populated home/classes, no overflowing buttons, new route available offline after cached install, and existing grade/N36/N104 functions unaffected.",
+        "Any true full Madrasati direct extraction, school and weekly schedule import, bulk export of multiple separate class files, advanced printable attendance/grade templates remain future scopes, documented and NOT claimed shipped; no changes to reports/print PDF.",
+        "Only exact Cloudflare Production release provider and actual served asset check make card awaiting PO.",
+        "After N106 finishes and browser lease legitimately released, run the previously NOT_RUN real UI/offline acceptance using saved candidate. Correct and rerun supplemental subject fixture according to the original OFFLINE_LEASE_LIMITED safety contract, preserving all unchanged useful tests; no false PASS."
+      ],
+      "preparationAuthority": {
+        "kind": "user-confirmed-existing-class-creation-and-student-import",
+        "serviceOperations": 0,
+        "migrations": 0,
+        "realStudentData": 0,
+        "publication": true,
+        "currentOwnerOnly": true,
+        "oneClassPerExplicitCommit": true
+      },
+      "releaseAuthority": "Latest Product Owner 2026-10-15 explicitly authorizes and requests a prominent centrally located 'استيراد الفصول' from new Home and Classes, existing create/delete relocation and new teacher-imported class/subject/student from local files, with owner/class mapping and explicit teacher selection/confirmation. Release may enable user-confirmed EXISTING createSection/createTeaching/importStudents actions under original Auth/session/lease/Sync permissions, but workers may not actually edit user data or use live credentials. No new remote Noor/Madrasati portals, school/timetable/grades from them, service schema/Auth/RLS/score changes, no automatic bulk creation, no service_role, no unknown student merges, no unverified universal ZIP or printable report changes."
+    }
+  ]
+}
