@@ -32,4 +32,97 @@ export async function createDemoPackage() {
   if(!ok) throw new Error('تعذّر إنشاء الفصل التجريبي.'); return {packageId,section,teaching};
 }
 
-export async function deleteDemoPackage(packageId) { const packages=await demoPackages(); const target=packages.find((p)=>p.packageId===packageId); if(!target) return false; const batch={}; for(const [name,ids] of Object.entries(target.owned)) batch[name]=ids.map((id)=>({...(store.state[name].find((r)=>r.id===id)??{id}),deleted:true,updatedAt:now()})); const manifest={id:META_ID,packages:packages.filter((p)=>p.packageId!==packageId),updatedAt:now()}; return store.save({...batch,meta:[manifest]}); }
+const PACKAGE_STORES = ['sections','teachings','students','enrollments','slots','sessions','attendance','items','scores'];
+const PACKAGE_TYPES = ['section','teaching','student','enrollment','slot','session','attendance','item','score'];
+const packageWarning = () => new Error('تعذّر التحقق من ملكية الحزمة التجريبية أو تغيّرت بياناتها. حدّث قائمة الفصول وأعد التأكيد؛ لم تُحذف أي بيانات.');
+
+function assertPackageContext(workspace) {
+  if (!workspace || workspace !== store.getActiveWorkspace() || workspace.type !== 'account' ||
+      workspace.ownershipState !== 'claimed' || !workspace.authUserId ||
+      workspace.databaseName !== db.getActiveDatabaseName() || !store.state.ready) throw packageWarning();
+  store.assertLeaseWritable();
+}
+
+// Only the exact rows recorded by Add demo class are eligible. Never infer a cascade
+// from a demo reference: ordinary rows can refer to a demo student/class too.
+function packageSnapshot(current, teachingId, workspace) {
+  assertPackageContext(workspace);
+  const manifest = current.meta.find(row => row.id === META_ID && !row.deleted);
+  if (!Array.isArray(manifest?.packages) || manifest.packages.some(pkg =>
+      !pkg || typeof pkg.owned !== 'object' || !pkg.owned || !Array.isArray(pkg.owned.teachings))) throw packageWarning();
+  const matches = manifest.packages.filter(pkg => !pkg.deleted && pkg.owned.teachings.includes(teachingId));
+  if (matches.length !== 1) throw packageWarning();
+  const target = matches[0];
+  if (typeof target.packageId !== 'string' || !/^[a-zA-Z0-9-]+$/.test(target.packageId) ||
+      manifest.packages.filter(pkg => pkg.packageId === target.packageId).length !== 1 ||
+      (target.ownerId != null && target.ownerId !== workspace.authUserId) ||
+      (manifest.ownerId != null && manifest.ownerId !== workspace.authUserId) ||
+      Object.keys(target.owned).sort().join() !== [...PACKAGE_STORES].sort().join()) throw packageWarning();
+  const owned = new Set(); const rows = {};
+  for (const [index, name] of PACKAGE_STORES.entries()) {
+    const ids = target.owned[name];
+    const prefix = `demo:${target.packageId}:${PACKAGE_TYPES[index]}`;
+    if (!Array.isArray(ids) || new Set(ids).size !== ids.length ||
+        ids.some(id => typeof id !== 'string' || !(id === prefix || id.startsWith(prefix+':')))) throw packageWarning();
+    rows[name] = ids.map(id => {
+      const row = current[name].find(record => record.id === id);
+      if (!row || row.deleted || (row.ownerId != null && row.ownerId !== workspace.authUserId)) throw packageWarning();
+      owned.add(id); return row;
+    });
+  }
+  if (rows.sections.length !== 1 || rows.teachings.length !== 1 || rows.teachings[0].id !== teachingId ||
+      rows.teachings[0].sectionId !== rows.sections[0].id) throw packageWarning();
+  for (const pkg of manifest.packages) {
+    if (pkg === target || pkg.deleted) continue;
+    if (Object.values(pkg.owned ?? {}).some(ids => !Array.isArray(ids) || ids.some(id => owned.has(id)))) throw packageWarning();
+  }
+  const references = { sectionId:'sections', teachingId:'teachings', studentId:'students', sessionId:'sessions', itemId:'items', slotId:'slots' };
+  const referencesOwned = value => typeof value === 'string' ? owned.has(value)
+    : !!value && typeof value === 'object' && Object.values(value).some(referencesOwned);
+  for (const name of db.STORES) for (const row of current[name] ?? []) {
+    if (name === 'meta') continue;
+    const inPackage = rows[name]?.some(record => record.id === row.id);
+    // Snapshots/reports and student arrays can retain nested references as well.
+    if (!inPackage && referencesOwned(row)) throw packageWarning();
+    for (const [key, parent] of Object.entries(references)) {
+      if (inPackage && row[key] != null && !target.owned[parent].includes(row[key])) throw packageWarning();
+      // A shared student or extra dependent record makes whole-package deletion unsafe.
+      if (!inPackage && row[key] != null && owned.has(row[key])) throw packageWarning();
+    }
+  }
+  const teaching = rows.teachings[0], section = rows.sections[0];
+  const term = current.terms.find(row => row.id === teaching.termId && !row.deleted);
+  const year = current.years.find(row => row.id === section.yearId && !row.deleted);
+  if (!term || !year || section.status === 'archived' || term.status === 'closed' || year.status === 'archived') throw packageWarning();
+  return { manifest, target, rows, signature: JSON.stringify([manifest, rows]) };
+}
+
+export async function previewDemoPackageDelete(teachingId) {
+  const workspace = store.getActiveWorkspace();
+  assertPackageContext(workspace);
+  const current = Object.fromEntries(await Promise.all(db.STORES.map(async name => [name, await db.getAll(name)])));
+  const snapshot = packageSnapshot(current, teachingId, workspace);
+  return { workspace, teachingId, packageId:snapshot.target.packageId, signature:snapshot.signature,
+    scopeSignature:store.classDeleteScope(teachingId).signature };
+}
+
+export async function deleteDemoPackage(packageId, confirmed) {
+  if (!confirmed || packageId !== confirmed.packageId) throw packageWarning();
+  assertPackageContext(confirmed.workspace);
+  const stamp = now();
+  // save() updates memory before disk and cannot compare the manifest inside its
+  // transaction. Use the existing guarded atomic adapter, then publish committed state.
+  await db.applyBatch(Object.fromEntries(db.STORES.map(name => [name, {}])), {
+    productWrite:true,
+    prepare(current) {
+      const snapshot = packageSnapshot(current, confirmed.teachingId, confirmed.workspace);
+      if (snapshot.signature !== confirmed.signature ||
+          store.classDeleteScope(confirmed.teachingId).signature !== confirmed.scopeSignature) throw packageWarning();
+      return { ...Object.fromEntries(Object.entries(snapshot.rows).map(([name, rows]) =>
+        [name, { put:rows.map(row => ({ ...row, deleted:true, updatedAt:stamp })) }])),
+        meta:{ put:[{ ...snapshot.manifest, packages:snapshot.manifest.packages.filter(pkg => pkg !== snapshot.target), updatedAt:stamp }] } };
+    },
+  });
+  if (store.getActiveWorkspace() === confirmed.workspace) await store.refreshSyncedState();
+  return true;
+}

@@ -7,7 +7,7 @@
  */
 
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
-import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
+import { createDemoPackage, deleteDemoPackage, previewDemoPackageDelete, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
 import { canOpenRoster } from './students.js';
 import {
@@ -333,7 +333,7 @@ function renderClassCard(tch) {
   `;
 }
 
-export default {
+const teachings = {
   title: () => 'الفصول',
   subtitle: () => store.activeTerm()?.name ?? '',
 
@@ -507,15 +507,20 @@ export default {
             if (next) next.disabled = true;
             let scope;
             let plan;
+            let demoPlan;
+            const workspace = store.getActiveWorkspace();
             try {
               scope = store.classDeleteScope(selectedId);
-              if (!isDemo(store.getTeaching(selectedId))) {
+              if (isDemo(store.getTeaching(selectedId)) && workspace?.type === 'account') {
+                demoPlan = await previewDemoPackageDelete(selectedId);
+              } else if (!isDemo(store.getTeaching(selectedId))) {
                 plan = await store.previewDeleteTeaching(selectedId);
                 scope.kind = plan.scope === 'teaching' ? 'subject' : 'class';
               }
             }
             catch (error) { toast(error.message, 'warn'); done(undefined); return; }
             if (!root.isConnected) return;
+            if (workspace !== store.getActiveWorkspace()) { toast('تغيّرت مساحة العمل. أعد فتح قائمة الحذف.', 'warn'); done(undefined); return; }
             if (requestedId !== selectedId) { renderStep2(); return; }
             const selectedTch = store.getTeaching(selectedId);
             const sec = selectedTch ? store.getSection(selectedTch.sectionId) : null;
@@ -565,13 +570,19 @@ export default {
                 if (confirmBtn.disabled) return;
                 confirmBtn.disabled = true;
                 try {
+                  if (workspace !== store.getActiveWorkspace() || selectedId !== requestedId) {
+                    throw new Error('تغيّرت مساحة العمل أو الفصل المحدد. أعد فتح قائمة الحذف.');
+                  }
                   if (store.classDeleteScope(selectedId).signature !== scope.signature) {
                     toast('تغيّرت مواد الفصل. راجع نطاق الحذف وأكّد مجددًا.', 'warn');
                     renderStep2();
                     return;
                   }
-                  if (demo) await store.deleteDemoTeachingScope(selectedId, scope.sectionId, scope.kind === 'subject' ? 'teaching' : 'section');
-                  else await store.deleteTeaching(selectedId, plan);
+                  let result;
+                  if (demoPlan) result = await deleteDemoPackage(demoPlan.packageId, demoPlan);
+                  else if (demo) result = await store.deleteDemoTeachingScope(selectedId, scope.sectionId, scope.kind === 'subject' ? 'teaching' : 'section');
+                  else result = await store.deleteTeaching(selectedId, plan);
+                  if (result === false) throw new Error('تعذّر حذف الفصل. لم يكتمل الحفظ.');
                   done(true);
                   toast(scope.kind === 'subject' ? 'تم حذف المادة من الفصل' : 'تم حذف الفصل');
                   repaint();
@@ -595,11 +606,9 @@ export default {
     },
     async 'delete-demo'(el, ev) {
       ev?.preventDefault(); ev?.stopPropagation();
-      const teaching = store.getTeaching(el.dataset.id);
-      const pkg = (await demoPackages()).find((item) => item.owned.teachings.includes(teaching?.id));
-      if (!pkg || !(await confirmSheet({ title: 'حذف الفصل التجريبي', desc: 'سيُحذف فقط الفصل التجريبي وبياناته المحلية.', confirmLabel: 'حذف الفصل التجريبي', danger: true }))) return;
-      await deleteDemoPackage(pkg.packageId); toast('تم حذف الفصل التجريبي'); repaint();
+      return teachings.actions['delete-class-flow'](el, ev, { id:el.dataset.id });
     },
     async add() { await addSubjectToClass(); }
   },
 };
+export default teachings;

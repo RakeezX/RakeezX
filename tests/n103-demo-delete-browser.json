@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n103-account-demo-class-delete-20261015",
+  "runId": "3fbbbbd3-8561-4d63-85b8-c7bc955310b5",
+  "checks": [
+    {
+      "name": "n103_actual_classes_delete_dialog_synthetic_browser",
+      "status": "NOT_RUN",
+      "evidence": "Shared browser lease acquire returned BUSY browser; subsequent read-only status still records N104 worker PID 21968, birth 2026-10-15T16:03:50.0703420Z, token 890a048f-6666-464b-a89e-84b7fa34191c. No browser or server launched. Card has liveMutation/liveAuthorizationRef, so isolated non-shared helper is ineligible."
+    }
+  ],
+  "retryCondition": "After N104 releases browser lease, resume this exact candidate/session and run node tests/n103-demo-delete-browser.mjs; fix any actual failure before LOCAL_READY."
+}
