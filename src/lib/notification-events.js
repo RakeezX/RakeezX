@@ -49,7 +49,7 @@ export function currentNotificationEvents(store, context, now = Date.now()) {
     if (!value || !owned(session, context) || !store.isSessionEligibleDate(today, value) ||
       ['cancelled', 'cancelled_holiday'].includes(session.status)) continue;
     const start = wallTime(today, session.startTime), end = wallTime(today, session.endTime);
-    if (!(end > start && start - now <= 30 * 60000 && now < end)) continue;
+    if (!(end > start && start - now <= 15 * 60000 && now < end)) continue;
     events.push({ id: eventId('lesson', session.id, `${today}:${session.startTime}:${session.endTime}`), scope,
       kind: 'lesson', expiresAt: end, at: start, teachingId: session.teachingId, targetId: session.id,
       title: now >= start ? 'حصتك الحالية' : 'حصة تبدأ قريبًا',
@@ -63,10 +63,10 @@ export function currentNotificationEvents(store, context, now = Date.now()) {
       let dates;
       try { dates = normalizeSubitemDatesAndPoints(subitem); } catch { continue; }
       const due = dates.dueDate;
-      if (!due || due < today || due > shiftDate(today, 2) || due < value.term.startDate || due > value.term.endDate ||
+      if (!due || due < today || due > shiftDate(today, 3) || due < value.term.startDate || due > value.term.endDate ||
         dates.startDate && dates.startDate > today) continue;
-      const expiresAt = new Date(`${shiftDate(due, 1)}T00:00:00`).getTime();
-      events.push({ id: eventId('due', subitem.id, due), scope, kind: 'due', at: expiresAt, expiresAt,
+      const expiresAt = new Date(`${shiftDate(today, 1)}T00:00:00`).getTime();
+      events.push({ id: eventId('due', subitem.id, `${due}:${today}`), scope, kind: 'due', at: expiresAt, expiresAt,
         teachingId: item.teachingId, targetId: subitem.id, itemId: item.id,
         title: due === today ? 'تسليم اليوم' : 'تسليم قريب',
         body: `${subitem.name || item.name} · ${store.teachingLabel(value.teaching)} · ${due}`, action: 'عرض البنود' });

@@ -4,16 +4,16 @@ import { notificationSnapshot } from '../lib/notification-center.js';
 export function renderNotificationCenter(state, context, now) {
   const { items, unread } = notificationSnapshot(state, context, now);
   return html`<section class="n44-center" dir="rtl" aria-label="إشعارات حسابك">
-    <header class="n44-heading"><span class="n44-count" role="status">غير المقروء: ${unread}</span></header>
-    <p class="muted n44-note">من حصصك وبنودك الحالية. القراءة والإخفاء محفوظان على هذا الجهاز فقط.</p>
+    ${items.length ? html`<header class="n44-heading"><span class="n44-count" role="status">غير المقروء: ${unread}</span></header>
+    <p class="muted n44-note">من حصصك وبنودك الحالية. القراءة والإخفاء محفوظان على هذا الجهاز فقط.</p>` : ''}
     ${items.length ? html`<ul class="n44-list">${items.map(item => html`<li class="n44-item ${item.read ? '' : 'n44-item--unread'}">
       <div class="n44-item-heading"><h2>${item.title}</h2><span class="muted">${item.read ? 'مقروء' : 'جديد'}</span></div>
       <p>${item.body}</p><div class="n44-actions">
         <button class="btn btn--quiet" type="button" data-act="n44-open" data-id="${item.id}">${item.action}</button>
         ${item.read ? '' : html`<button class="btn btn--quiet" type="button" data-act="n44-read" data-id="${item.id}">تمييز كمقروء</button>`}
         <button class="btn btn--quiet" type="button" data-act="n44-dismiss" data-id="${item.id}">إخفاء</button>
-      </div></li>`)}</ul>` : html`<p class="n44-empty" role="status">لا توجد تنبيهات تستدعي انتباهك الآن.</p>`}
-    <p class="muted n44-note">هذه تنبيهات داخل التطبيق أثناء استخدامه. تذكيرات الجهاز والتلقي أثناء إغلاق التطبيق لم تُفعّل بعد.</p>
+      </div></li>`)}</ul>` : html`<div class="n44-empty" role="status"><h2>لا توجد إشعارات حاليًا</h2><p>كل شيء تمام حتى الآن</p></div>`}
+    ${items.length ? html`<p class="muted n44-note">هذه تنبيهات داخل التطبيق أثناء استخدامه. تذكيرات الجهاز والتلقي أثناء إغلاق التطبيق لم تُفعّل بعد.</p>` : ''}
   </section>`;
 }
 export function renderNotificationBell(unread) {

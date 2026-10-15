@@ -19,7 +19,7 @@ const context = () => currentNotificationContext(store, cloud);
 test('actual account store uses teaching date/year instead of stale selected calendar; no writes', async () => {
   const before = await db.getAll('outbox');
   const events = currentNotificationEvents(store, context(), fixedNow);
-  assert.deepEqual(events.map(event => event.targetId), ['n44-session','n44-due','n44-soon']);
+  assert.deepEqual(events.map(event => event.targetId), ['n44-session','n44-due','n44-soon','n44-too-far']);
   assert.match(events[0].title, /قريب/);
   assert.equal(currentNotificationEvents(store, context(), fixedNow+15*60000)[0].title, 'حصتك الحالية');
   assert.equal(currentNotificationEvents(store, context(), fixedNow+60*60000).some(event => event.kind==='lesson'), false);
@@ -49,11 +49,11 @@ test('owner/auth/guard/unknown/demo fail closed', () => {
 test('read/dismiss/dedup/expiry, clock adjustment, bounded private preferences, storage failure', () => {
   const ctx = context(), events = currentNotificationEvents(store, ctx, fixedNow);
   let state = updateNotificationCenter(createNotificationCenter(ctx),ctx,{type:'receive',events:[...events,...events]},fixedNow);
-  assert.equal(notificationSnapshot(state,ctx,fixedNow).unread,3);
+  assert.equal(notificationSnapshot(state,ctx,fixedNow).unread,4);
   state = updateNotificationCenter(state,ctx,{type:'read',id:events[0].id},fixedNow);
   state = updateNotificationCenter(state,ctx,{type:'dismiss',id:events[1].id},fixedNow);
   state = updateNotificationCenter(state,ctx,{type:'receive',events},fixedNow-60000);
-  assert.equal(notificationSnapshot(state,ctx,fixedNow-60000).unread,1);
+  assert.equal(notificationSnapshot(state,ctx,fixedNow-60000).unread,2);
   assert.equal(writeNotificationPreferences(state,ctx,fixedNow),true);
   const saved = readNotificationPreferences(ctx,fixedNow);
   assert.deepEqual(saved,state.preferences);

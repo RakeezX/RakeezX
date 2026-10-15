@@ -29,7 +29,7 @@ import { runInitialRestore } from './lib/initial-restore.js';
 import { runAccountProvisioning } from './lib/account-provisioning.js';
 import { createNotificationCenter, notificationScope, updateNotificationCenter, notificationSnapshot } from './lib/notification-center.js';
 import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './lib/notification-events.js';
-import { readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
+import { readNotificationCategories, notificationCategoryAllowed, readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
 import { renderNotificationCenter, renderNotificationBell } from './views/notifications.js';
 import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
 import {
@@ -77,7 +77,7 @@ function observeNotifications() {
   }
   notificationContext = context;
   notificationState = updateNotificationCenter(notificationState, context,
-    { type: 'receive', events: currentNotificationEvents(store, context, now) }, now);
+    { type: 'receive', events: currentNotificationEvents(store, context, now).filter(event => notificationCategoryAllowed(event, readNotificationCategories(context))) }, now);
   if (notificationSheet?.isConnected) {
     const active = notificationSheet.contains(document.activeElement) ? document.activeElement : null;
     const action = active?.dataset.act, id = active?.dataset.id;
