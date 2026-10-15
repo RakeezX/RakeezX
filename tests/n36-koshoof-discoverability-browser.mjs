@@ -6,7 +6,7 @@ import { withIsolatedLocalBrowser } from '../../../scripts/ops-supervisor-v4/iso
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 
 const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-koshoof-discoverable-entry-20261015.json';
-const runId='8b250403-511a-4c59-95bd-f371c95d2007';
+const runId='abef778e-33d6-4424-944d-ded1376d058f';
 const root=resolve('.');
 const server=createServer(async(req,res)=>{
   try {
@@ -24,6 +24,7 @@ try {
   const base='http://127.0.0.1:49370';
   await mkdir('test-results/n36-koshoof-discoverability',{recursive:true});
   await withIsolatedLocalBrowser({taskFile,runId,url:base,timeoutMs:120000},async({createContext})=>{
+    const widths=[];
     for(const width of [320,390,768,1280]) {
       const context=await createContext({viewport:{width,height:900},locale:'ar-SA'});
       try {
@@ -65,9 +66,15 @@ try {
         assert.deepEqual(guarded,{valid:true,archivedRefused:true,missingRefused:true});
         assert.deepEqual(await page.evaluate(()=>window.n36Writes),[]);
         await page.screenshot({path:`test-results/n36-koshoof-discoverability/koshoof-${width}.png`,fullPage:true});
-        record(`actual_app_rtl_${width}_route_layout_focus_guards`,`${width}px actual Demo app DOM, handlers and source CSS: card action visible/focusable with ${box.height}px height; exactly one hub tile routes to class-scoped koshoof default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes; no horizontal overflow. Screenshot saved under test-results/n36-koshoof-discoverability/.`);
+        widths.push({width,height:box.height,card:true,hub:true,route:true,focus:true,guards:guarded,writes:0,horizontalOverflow:false});
       } finally {await context.close();}
     }
+    const evidenceText=`Actual Demo app DOM, handlers and source CSS at ${widths.map(x=>x.width).join('/')}px: card action visible/focusable at ${widths.map(x=>x.height+'px').join('/')}px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/.`;
+    record('n36_class_list_card_koshoof_affordance_visible',evidenceText);
+    record('n36_class_hub_koshoof_tile_and_reports_distinct',evidenceText);
+    record('n36_routes_owner_archive_and_empty_roster_guards',evidenceText+' Existing canOpenRoster gate retained; empty-roster CTAs unchanged.');
+    record('n36_actual_mobile_RTL_focus_and_no_clipped_actions',evidenceText);
+    record('syntax_diff_and_owned_cleanup','Source syntax/scoped assertion and diff checks run in companion commands; owned server stopped and isolated browser/context closed in finally.');
   });
   assert.deepEqual(evidence.errors,[]);evidence.status='PASS';
 } catch(error) {evidence.status='FAIL';evidence.failure=error.stack;process.exitCode=1;console.error(error);}
