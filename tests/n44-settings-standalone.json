@@ -1,11 +1,16 @@
 {
-  "taskId": "continuous-n44-dedicated-notification-settings-20261015",
-  "runId": "9e4c741f-2f88-4d5f-8320-e82720837c12",
+  "taskId": "continuous-n44-responsive-reminder-grid-20261015",
+  "runId": "f689c4e8-1302-4d19-aa32-c1fcb917bcea",
   "checks": [
     {
-      "name": "n44_responsive_unclipped_ui_and_touch_targets",
+      "name": "n44_zoom_200pct_minimum_touch_geometry",
       "status": "PASS",
-      "evidence": "Actual DOM/source CSS: 12 width/theme combinations, landscape, CSS 200% zoom; all controls >=44px, no overflow/clipping/section overlap or fieldset legends."
+      "evidence": "Actual DOM/source CSS: minute and day controls each >=44x44 CSS px at 200% zoom; auto-fit responsive columns, no overflow/clipping/overlap."
+    },
+    {
+      "name": "n44_320to1280_day_labels_no_overflow",
+      "status": "PASS",
+      "evidence": "Actual DOM/source CSS in light/dark at 320/390/768/1280, landscape, 400% zoom and 220px embedded content: day/minute targets >=44x44px with no overflow or overlap."
     },
     {
       "name": "n44_settings_route_entry_and_back",
@@ -26,26 +31,6 @@
       "name": "n44_other_settings_N64_N36_and_offline_regression",
       "status": "PASS",
       "evidence": "Actual Settings DOM retains N64 profile, N36 import, appearance/audio/visual controls. Offline shell statically includes new module plus unchanged timing and CSS dependencies; SW runtime cache proof is separate."
-    },
-    {
-      "name": "n44_offline_service_worker_route",
-      "status": "PASS",
-      "evidence": "Shared browser phase lease acquired: real SW caches route/module/CSS/state; network-offline deep reload, route/back, preference handler persistence and same-document owner/database/receipt checkpoint pass; existing read-only lease banner remains. Synthetic local fixtures only."
-    },
-    {
-      "name": "n44_settings_row_layout",
-      "status": "PASS",
-      "evidence": "Actual Settings row inspected at 320/390/768/1280: >=44px, no overflow or overlap with neighboring appearance row; link opens dedicated actual page."
-    },
-    {
-      "name": "n44_focused_owner_read_dismiss",
-      "status": "PASS",
-      "evidence": "node --test tests/n44-inapp.test.mjs tests/n44-preferences.test.mjs tests/n44-user-timing.test.mjs: 13/13 passed."
-    },
-    {
-      "name": "syntax_diff_and_owned_cleanup",
-      "status": "PASS",
-      "evidence": "node --check: router, both settings views, sw.js, standalone harness and migrated quiet-UI harness; git diff --check clean. Shared browser lease released, owned browser/contexts/server closed."
     }
   ],
   "layouts": [
@@ -56,16 +41,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
+      "minute": [
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        }
+      ],
       "columns": "56px 56px 56px 56px"
-    },
-    {
-      "label": "light-360",
-      "pageOverflow": false,
-      "localOverflow": false,
-      "bad": [],
-      "overlap": false,
-      "legend": 0,
-      "columns": "66px 66px 66px 66px"
     },
     {
       "label": "light-390",
@@ -74,16 +98,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
+      "minute": [
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        }
+      ],
       "columns": "71.5px 71.5px 71.5px 71.5px"
-    },
-    {
-      "label": "light-480",
-      "pageOverflow": false,
-      "localOverflow": false,
-      "bad": [],
-      "overlap": false,
-      "legend": 0,
-      "columns": "94px 94px 94px 94px"
     },
     {
       "label": "light-768",
@@ -92,7 +155,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px"
+      "minute": [
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        }
+      ],
+      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 0px 0px 0px"
     },
     {
       "label": "light-1280",
@@ -101,7 +212,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px"
+      "minute": [
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        }
+      ],
+      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 0px 0px 0px"
     },
     {
       "label": "dark-320",
@@ -110,16 +269,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
+      "minute": [
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        }
+      ],
       "columns": "56px 56px 56px 56px"
-    },
-    {
-      "label": "dark-360",
-      "pageOverflow": false,
-      "localOverflow": false,
-      "bad": [],
-      "overlap": false,
-      "legend": 0,
-      "columns": "66px 66px 66px 66px"
     },
     {
       "label": "dark-390",
@@ -128,16 +326,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
+      "minute": [
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        },
+        {
+          "width": 71.5,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        },
+        {
+          "width": 98,
+          "height": 44
+        }
+      ],
       "columns": "71.5px 71.5px 71.5px 71.5px"
-    },
-    {
-      "label": "dark-480",
-      "pageOverflow": false,
-      "localOverflow": false,
-      "bad": [],
-      "overlap": false,
-      "legend": 0,
-      "columns": "94px 94px 94px 94px"
     },
     {
       "label": "dark-768",
@@ -146,7 +383,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px"
+      "minute": [
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        }
+      ],
+      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 0px 0px 0px"
     },
     {
       "label": "dark-1280",
@@ -155,7 +440,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px"
+      "minute": [
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        }
+      ],
+      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 0px 0px 0px"
     },
     {
       "label": "landscape",
@@ -164,7 +497,55 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px"
+      "minute": [
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        },
+        {
+          "width": 88.578125,
+          "height": 44
+        },
+        {
+          "width": 88.5625,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        },
+        {
+          "width": 161,
+          "height": 44
+        }
+      ],
+      "columns": "88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 88.5781px 88.5625px 0px 0px 0px"
     },
     {
       "label": "200%-zoom",
@@ -173,37 +554,185 @@
       "bad": [],
       "overlap": false,
       "legend": 0,
-      "columns": "27.4219px 27.4297px 27.4297px 27.4297px 27.4297px 27.4297px 27.4297px"
+      "minute": [
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        },
+        {
+          "width": 149.328125,
+          "height": 88
+        }
+      ],
+      "days": [
+        {
+          "width": 232,
+          "height": 88
+        },
+        {
+          "width": 232,
+          "height": 88
+        },
+        {
+          "width": 232,
+          "height": 88
+        },
+        {
+          "width": 232,
+          "height": 88
+        }
+      ],
+      "columns": "74.6641px 74.6641px 74.6641px"
+    },
+    {
+      "label": "400%-zoom-effective-320-CSS-px",
+      "pageOverflow": false,
+      "localOverflow": false,
+      "bad": [],
+      "overlap": false,
+      "legend": 0,
+      "minute": [
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        },
+        {
+          "width": 56,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        },
+        {
+          "width": 120,
+          "height": 44
+        }
+      ],
+      "columns": "56px 56px 56px 56px"
+    },
+    {
+      "label": "narrow-embed-220",
+      "pageOverflow": false,
+      "localOverflow": false,
+      "bad": [],
+      "overlap": false,
+      "legend": 0,
+      "minute": [
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        },
+        {
+          "width": 80,
+          "height": 44
+        }
+      ],
+      "days": [
+        {
+          "width": 168,
+          "height": 44
+        },
+        {
+          "width": 168,
+          "height": 44
+        },
+        {
+          "width": 168,
+          "height": 44
+        },
+        {
+          "width": 168,
+          "height": 44
+        }
+      ],
+      "columns": "80px 80px"
     }
   ],
   "status": "PASS",
-  "origin": "http://127.0.0.1:53283",
+  "origin": "http://127.0.0.1:49944",
   "checkpoint": {
     "owner": "a4400000-0000-4000-8000-000000000001",
     "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
     "receipt": "a4400000-0000-4000-8000-000000000001"
   },
   "pageErrors": [],
-  "cleanup": "Owned server closed; canonical helper closes disposable contexts/browser in finally.",
-  "browserLease": "ACQUIRED browser",
-  "offlineCheckpoint": {
-    "owner": "a4400000-0000-4000-8000-000000000001",
-    "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",
-    "receipt": "a4400000-0000-4000-8000-000000000001"
-  },
-  "browserLeaseRelease": "RELEASED browser",
   "sourceHashes": {
-    "src/router.js": "8df7c6912ae7c587365d314fb9f523c95843d2a7bf6beb42287b107d66b544f9",
-    "src/views/settings.js": "b99c9f6b3542bb9c6d19df714a5588213e38a5fd9ab732275416fc90f38feb2d",
-    "src/views/notification-settings.js": "267c45c973dca93dfec9871fd41343958663c909c235198d53c2a2dacd558d73",
-    "src/styles/notifications.css": "65e1d6aebe6d1460114428c2236cfe1c17599de06874a8710e204630428e7a29",
-    "sw.js": "b24ec4eda8279a7eb3d800608b54fd5a429a1bd5c90e2bd76aed62f67fd274b8"
+    "src/router.js": "229e78a9777b562a0a651e1d6e6d313ae99b93172c4c5b65323388057879f6df",
+    "src/views/settings.js": "5981a3f36e7d3302cd7e6c6e27955451449952f0b886329b88865cf48c56f0d9",
+    "src/views/notification-settings.js": "487fcbac760f0f1b9751e2bdbb42b6519d8921150844503975696e528ff7d85c",
+    "src/styles/notifications.css": "a902c86b1f4a1355198c566d4ffbdd57d5bb27a9a48f4363f69f19a56ebcbd71",
+    "sw.js": "3ed1165ff59bdf5872f7d53af701f702c342954b439b3d5a53076a67ee8f219c"
   },
-  "resolvedFailures": [
-    {
-      "error": "AssertionError [ERR_ASSERTION]: {\"width\":311.328125,\"overflow\":false,\"height\":134.390625,\"overlap\":true,\"left\":671.671875,\"right\":983}\n\ntrue !== false\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-dedicated-notification-settings-20261015/tests/n44-settings-standalone.mjs:122:81\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-dedicated-notification-settings-20261015/tests/n44-settings-standalone.mjs:110:14",
-      "resolution": "Settings row spans the desktop grid; targeted row check passes after scoped CSS correction."
-    }
-  ],
-  "visualInspection": "Inspected actual rendered dark 390px page, light 320px page and 320px Settings row screenshot. Final row uses same bell SVG as existing center trigger. No legends, clipped labels or inline reminder controls."
+  "cleanup": "Owned server closed; canonical helper closes disposable contexts/browser in finally."
 }

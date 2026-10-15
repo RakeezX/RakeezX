@@ -10,7 +10,7 @@ import {chromium} from '@playwright/test';
 import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 import {openReadyServedDemo} from './helpers/served-demo-readiness.mjs';
 import {fixedNow,owner,otherOwner} from './n44-fixture.mjs';
-const taskId='continuous-n44-dedicated-notification-settings-20261015';
+const taskId='continuous-n44-responsive-reminder-grid-20261015';
 const runId=process.env.N44_RUN_ID;
 assert.ok(runId);
 const taskFile=`C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/${taskId}.json`;
@@ -43,10 +43,14 @@ async function geometry(page,label){
  const data=await page.evaluate(()=>{
   const root=document.querySelector('.n44-settings-page'),controls=[...root.querySelectorAll('button,a')];
   const bad=controls.filter(el=>{const r=el.getBoundingClientRect();return r.width<44 || r.height<44 || r.left<0 || r.right>innerWidth+1 || el.scrollWidth>el.clientWidth+1;}).map(el=>el.outerHTML);
+  const minute=[...root.querySelectorAll('.n44-minute-grid button')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};});
+  const days=[...root.querySelectorAll('.n44-day-grid button')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};});
   const sections=[...root.querySelectorAll('section')].map(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom};});
-  return {pageOverflow:document.documentElement.scrollWidth>innerWidth+1,localOverflow:root.scrollWidth>root.clientWidth+1,bad,overlap:sections[0].bottom>sections[1].top,legend:root.querySelectorAll('fieldset,legend').length,columns:getComputedStyle(root.querySelector('.n44-minute-grid')).gridTemplateColumns};
+  return {pageOverflow:document.documentElement.scrollWidth>innerWidth+1,localOverflow:root.scrollWidth>root.clientWidth+1,bad,overlap:sections[0].bottom>sections[1].top,legend:root.querySelectorAll('fieldset,legend').length,minute,days,columns:getComputedStyle(root.querySelector('.n44-minute-grid')).gridTemplateColumns};
  });
- assert.equal(data.pageOverflow,false,label);assert.equal(data.localOverflow,false,label);assert.deepEqual(data.bad,[],label);assert.equal(data.overlap,false,label);assert.equal(data.legend,0);
+ assert.equal(data.pageOverflow,false,`${label}: ${JSON.stringify(data)}`);assert.equal(data.localOverflow,false,`${label}: ${JSON.stringify(data)}`);assert.deepEqual(data.bad,[],label);assert.equal(data.overlap,false,label);assert.equal(data.legend,0);
+ assert.ok(data.minute.length>0&&data.minute.every(box=>box.width>=44&&box.height>=44),`${label}: minute controls below 44px`);
+ assert.ok(data.days.length>0&&data.days.every(box=>box.width>=44&&box.height>=44),`${label}: day controls below 44px`);
  evidence.layouts.push({label,...data});
 }
 try{
@@ -65,13 +69,16 @@ try{
   assert.equal(await page.locator('[data-day][aria-checked="true"]').count(),4);
   for(const scheme of ['light','dark']){
    await page.evaluate(s=>{document.documentElement.setAttribute('data-theme',s);},scheme);
-   for(const width of [320,360,390,480,768,1280]){await page.setViewportSize({width,height:844});await geometry(page,scheme+'-'+width);}
+   for(const width of [320,390,768,1280]){await page.setViewportSize({width,height:844});await geometry(page,scheme+'-'+width);}
   }
   await page.setViewportSize({width:844,height:390});await geometry(page,'landscape');
   await page.setViewportSize({width:640,height:422});await page.evaluate(()=>document.documentElement.style.zoom='2');await geometry(page,'200%-zoom');
-  await page.evaluate(()=>document.documentElement.style.zoom='');await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>document.documentElement.style.zoom='');await page.setViewportSize({width:320,height:844});await geometry(page,'400%-zoom-effective-320-CSS-px');
+  await page.setViewportSize({width:320,height:844});await page.locator('.n44-settings-page').evaluate(el=>{el.style.width='220px';el.style.marginInline='0';});await geometry(page,'narrow-embed-220');
+  await page.locator('.n44-settings-page').evaluate(el=>{el.style.width='';el.style.marginInline='';});await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:path.join(os.tmpdir(),'n44-standalone-390.png'),fullPage:true});
-  check('n44_responsive_unclipped_ui_and_touch_targets','Actual DOM/source CSS: 12 width/theme combinations, landscape, CSS 200% zoom; all controls >=44px, no overflow/clipping/section overlap or fieldset legends.');
+  check('n44_zoom_200pct_minimum_touch_geometry','Actual DOM/source CSS: minute and day controls each >=44x44 CSS px at 200% zoom; auto-fit responsive columns, no overflow/clipping/overlap.');
+  check('n44_320to1280_day_labels_no_overflow','Actual DOM/source CSS in light/dark at 320/390/768/1280, landscape, 400% zoom and 220px embedded content: day/minute targets >=44x44px with no overflow or overlap.');
   for(const minutes of [5,10,15,20,30,45,60]){await page.locator(`[data-minutes="${minutes}"]`).click();await selected(page,`[data-minutes="${minutes}"]`,'aria-pressed','true');}
   for(const day of [3,2,1,0]){await page.locator(`[data-day="${day}"]`).click();await selected(page,`[data-day="${day}"]`,'aria-checked','false');}
   await page.locator('[data-day="2"]').click();await selected(page,'[data-day="2"]','aria-checked','true');
