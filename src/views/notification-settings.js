@@ -46,7 +46,7 @@ const view = {
           ${categories.due ? html`<div class="n44-timing">
             <h3 id="n44-days-heading">التذكير بموعد التسليم</h3>
             <div class="n44-timing-options n44-day-grid" role="group" aria-labelledby="n44-days-heading">
-              ${DUE_STAGES.map(day => html`<button type="button" class="btn btn--quiet" role="switch"
+              ${[0, 1, 2, 3].map(day => html`<button type="button" class="btn btn--quiet" role="switch"
                 data-act="notification-day" data-day="${day}" data-scope="${scope}"
                 aria-checked="${String(timing.dueDays.includes(day))}" data-fk="n44-day-${day}">${dayLabels[day]}</button>`)}
             </div>

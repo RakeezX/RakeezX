@@ -6,7 +6,7 @@ import { withIsolatedLocalBrowser } from 'file:///C:/Users/Abody/Projects/Rakeez
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 import { fixedNow, owner } from './n44-fixture.mjs';
 
-const taskId = 'continuous-n44-rtl-due-reminder-visual-order-20261015';
+const taskId = 'continuous-n44-due-day-ascending-rtl-20261015';
 const runId = process.env.N44_RUN_ID;
 assert.ok(runId, 'N44_RUN_ID is required');
 const taskFile = `C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/${taskId}.json`;
@@ -32,8 +32,8 @@ try {
     await page.evaluate(async user => { await (await import('/tests/n44-fixture.mjs')).prepareAccount(user); }, owner);
     await page.goto(`${base}/#/settings/notifications`);
     await page.locator('.n44-settings-page').waitFor();
-    const expected = ['3', '2', '1', '0'];
-const labels = ['قبل 3 أيام', 'قبل يومين', 'قبل يوم', 'يوم التسليم'];
+    const expected = ['0', '1', '2', '3'];
+    const labels = ['يوم التسليم', 'قبل يوم', 'قبل يومين', 'قبل 3 أيام'];
     for (const width of [1280, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 900 });
       const layout = await page.locator('.n44-day-grid').evaluate(grid => {
