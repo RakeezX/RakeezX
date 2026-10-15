@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n64-verified-email-result-stable-layout-20261015",
+      "productId": "N64",
+      "activationId": "po-20261012-continuous",
+      "priority": -22,
+      "scopeKey": "n64-verified-email-result-and-settings-stability",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n44-configurable-reminder-intervals-20261015"
+      ],
+      "objective": "On the latest published Rakeez main, correct ONLY verified user-facing email-change feedback and the repeated settings layout jump/shake. Current PO actually completed a successful email address change, so distinguish authoritative pending from completed states. Derive 'تم اعتماد البريد الإلكتروني الجديد' exclusively from current verified cloud user/currentAccountContract email and any owner-scoped prior pending identifier; never infer completion from a clicked one-time link, query string, toast, stale local pending email, or a cloud request response. Clear stale requestedEmailChange after verified account email equals it, and make neutral stable guidance when no trusted completion evidence is available. Prevent the settings profile details from repeatedly auto-opening/collapsing or moving the Access/badge section due to transient pending/account-contract async repaint; preserve manual expansion, input focus, validation, RTL/mobile and profile ownership. Keep any success announcement short, specific and nonpersistent after unrelated reload. Do not change Supabase Auth double confirmation, callback/token parsing/handling, email template, SMTP, RLS/schema, privileges, real accounts/emails or send a new message. No use of the customer's one-time email link. Document separately any genuine Auth callback UX requirement needing a distinct authorized card, but do not block this view-only improvement for it. Scoped baseline mismatch: in tests/account-profile-access.test.mjs an existing report-print branding assertion still expects obsolete text ?????? ??????, while accepted N24 current design shows Rakeez and the user-supplied report title. Update the affected test to validate current meaningful report title and gender/school/signatures without changing report application output. Rerun both the account-profile suite and targeted N64 work; preserve real FAIL until it passes, and never edit protected account/grade functionality.",
+      "allowedPaths": [
+        "src/views/settings.js",
+        "src/lib/settings-profile-ui.js",
+        "src/styles/components.css",
+        "src/app.js",
+        "tests/n64-stability-browser.mjs",
+        "tests/n64-stability-scope.mjs",
+        "tests/n64-confirmed-email-ui.mjs",
+        "tests/n64-confirmed-email-state.test.mjs",
+        "tests/n64-confirmed-email-evidence.json",
+        "docs/automation-evidence/20261015/N64_VERIFIED_EMAIL_STABLE_SETTINGS.md",
+        "tests/account-profile-access.test.mjs"
+      ],
+      "verificationPaths": [
+        "src/views/settings.js",
+        "src/lib/settings-profile-ui.js",
+        "src/styles/components.css"
+      ],
+      "requiredChecks": [
+        "n64_verified_owner_email_pending_and_completed",
+        "n64_settings_no_layout_oscillation",
+        "n64_focus_rtl_and_mobile",
+        "n64_no_auth_token_or_account_mutation",
+        "n64_existing_profile_and_live_site_regressions",
+        "syntax_diff_and_owned_cleanup",
+        "n64_current_report_profile_assertions_reconciled"
+      ],
+      "acceptance": [
+        "User with unchanged old email/new_email pending sees one calm pending explanation, no false success.",
+        "User whose verified Auth profile has switched email sees one clear completion message and refreshed current email; no stale pending label remains.",
+        "Profile accordion and Access row remain visually stable across refreshAuth/account-contract pending-to-ready re-renders and user manual opening, on desktop and Android-width viewports.",
+        "Existing email-change submit/confirmation behavior and single-owner security checks are untouched; no session tokens/callback URLs are consumed, no Auth/admin patch and no messages are sent.",
+        "Production deployment proof binds exact integrated commit and served changed client assets before awaiting_po, while full hosted message template/return contract remains separate and not falsely accepted.",
+        "The current account-profile test checks the approved current report title/teacher identity instead of superseded report branding, and its entire suite passes without modifying report Product implementation."
+      ],
+      "releaseAuthority": "Latest PO 2026-10-15 confirms the actual email change succeeded but specifically reports missing success feedback from the email confirmation links and a persistent settings shake. Authorizes bounded presentation-only cleanup and Production publishing after actual safe tests; no new Auth callback parsing, token/secret retrieval, SQL/RLS, SMTP/provider configuration, user-data mutation or real messaging. Existing broader security-denied tasks remain denied; do not reroute them."
+    }
+  ]
+}
