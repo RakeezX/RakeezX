@@ -1,0 +1,272 @@
+{
+  "taskId": "continuous-n90-grade-import-export-calm-ux-20261015",
+  "runId": "102a28c8-0c17-4512-b316-14b5b32b119d",
+  "baseSha": "c4931b453aca0c9922f1f64639fb447eb2db82fa",
+  "scope": "Local synthetic actual HTTP application, owner-guarded store and disposable native PostgreSQL; no live service/data/Production operations",
+  "sourceSha256": {
+    "src/views/grades.js": "18cbb39f4e94e1f07eb82a70e48bb4ec8ec14d478c2536a3d3ef52562d7333a0",
+    "src/styles/grades.css": "3e1002b729d3303604a797b0d6d438d40f57e5655683027080e80750bccdba71",
+    "src/lib/grade-transfer-export.js": "252de3d0ae6d9426bb387a27398f985c15d95e026f7f0d9eb2c3d855fb31155b",
+    "tests/n90-transfer.test.mjs": "a78a148d90fd1dc61e93d25642b0bb59c2c3f37485bd4cc4c1dcdd624a65f7a4",
+    "tests/n90-unified-native.mjs": "a715b36ee798794eb7faa809601a0cfb0cf263d80938d99927ba6297f5d7bbc7",
+    "tests/n90-grade-ux-standalone.mjs": "44f7cfc36eb7bdb19d2035d1de2ff9c55c093d66cf0d2823e12c997e87c901a3"
+  },
+  "functionalTests": {
+    "command": "node --test tests/n90-transfer.test.mjs",
+    "passed": 10,
+    "failed": 0
+  },
+  "nativeChecks": [
+    {
+      "name": "unified_validation_atomicity",
+      "status": "PASS",
+      "evidence": "Unreviewed upper mark, negative/text, stale max/revision, enrollment consent, duplicate/existing name or identity and wrong section reject before any durable student/enrollment/grade/receipt."
+    },
+    {
+      "name": "unified_late_score_rollback",
+      "status": "PASS",
+      "evidence": "Injected real PostgreSQL score trigger failure after student and enrollment inserts rolls back every row and receipt."
+    },
+    {
+      "name": "unified_owner_exact_retry",
+      "status": "PASS",
+      "evidence": "Authenticated foreign owner cannot read or apply; same envelope/ID returns exact saved canonical student/enrollment/score receipt and never overwrites later score; changed-envelope reuse rejected."
+    },
+    {
+      "name": "unified_blank_and_deleted_identity",
+      "status": "PASS",
+      "evidence": "All blank cells can enroll explicitly without inventing zeros; exact retry preserved. Deleted student ID is refused and never resurrected."
+    },
+    {
+      "name": "unified_student_item_grade_all_or_nothing",
+      "status": "PASS",
+      "evidence": "Combined student/enrollment + explicitly named manual item + two score cells. Injected second-cell failure rolls back even the first score and new item/identity/receipt; success and exact retry retain stable IDs."
+    },
+    {
+      "name": "unified_native_source_ACL",
+      "status": "PASS",
+      "evidence": "Exact additive SQL SHA256 e6ccfeb22b010324152c0c2037648e8c1be6e547487c991d73ccfeb8067906e3; new authenticated-only SECURITY DEFINER/empty search_path functions, existing locks/receipts/grade guards preserved. This is local readback, not remote service application."
+    }
+  ],
+  "browserChecks": [
+    {
+      "name": "separate_panels_routes_empty_class",
+      "status": "PASS",
+      "evidence": "Actual current application: default grade table and empty student CTA unobstructed; ?import=1 / ?export=1 open only requested panel; exactly two import mode buttons, names-only default."
+    },
+    {
+      "name": "n90_export_plain_csv_blank_vs_filled_and_safe_identity",
+      "status": "PASS",
+      "evidence": "Actual downloads have distinct filenames, blank template vs current values, name+5 selected items without metadata; optional ID export is explicit."
+    },
+    {
+      "name": "n90_noor_compact_mapping_exact_40_60_and_three_columns",
+      "status": "PASS",
+      "evidence": "Five short 40/60 menus, visible totals, missing consent blocked; 30/70 rejected after reassignment and consent reset. Exact 40/60 produces precisely three manual-review columns; all-zero student remains 0/0 and missing marks remain blank."
+    },
+    {
+      "name": "n90_import_modes_review_state_cancel",
+      "status": "PASS",
+      "evidence": "Names-only review exposes no grade mapping and sends nothing; explicit grades selection preserves parsed file but resets review/consent. Panel switches and same-workspace route return retain review with fresh unchecked consent. Cancel, disconnected old confirmation and delayed canceled read cause no write."
+    },
+    {
+      "name": "n90_import_mapping_mobile_and_advanced_preview",
+      "status": "PASS",
+      "evidence": "Actual CSV and XLSX handlers exercised; unique matching auto-collapses sound mapping. An unknown column opens only the unresolved card with ignore/error guidance; no fieldsets."
+    },
+    {
+      "name": "n90_rtl_accessibility_and_320_to_1280_render",
+      "status": "PASS",
+      "evidence": "24 matrix light/dark screenshots plus 4 default/empty/review screenshots: actual mapping and Noor export at 320/390/768/1280; zero horizontal page/panel overflow and visible controls >=44px. Keyboard Space selects modes, Tab follows mode buttons, RTL document retained."
+    },
+    {
+      "name": "n90_current_owner_grade_atomicity_and_cancel_preserved",
+      "status": "PASS",
+      "evidence": "Actual synthetic account UI/store: wrong owner, invalid lease, ownerless dispatch and offline confirmation denied before transport. Native stale max rejects whole batch, retains real failure, then explicit retirement and fresh review permit only consented 12→10 / 0; blank preserves existing 0. Existing native suite separately verifies rollback/owner/exact retry."
+    },
+    {
+      "name": "n90_names_only_vs_names_grades_functional_separation",
+      "status": "PASS",
+      "evidence": "One file, two actual mode buttons: names-only confirms a new persisted N12 identity/enrollment with owner-bound outbox and no grade RPC or native grade mutation; grades mode uses unchanged guarded atomic native RPC only after consent."
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "test-results/n90-calm-ui/390-default.png",
+      "sha256": "6da9ae756ddefdcc054967c9b720a586df9f038e5267c5935f9d2a10e39abfb5",
+      "width": 390,
+      "height": 1670
+    },
+    {
+      "path": "test-results/n90-calm-ui/390-empty.png",
+      "sha256": "6814fc69c1baa059f6cae8f8f0c3c1b7f52e0f114aa7092fcf7ce38d03eecb87",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "path": "test-results/n90-calm-ui/390-grades-review.png",
+      "sha256": "cba27b0ec24dac91b603018fe4ae0411446147d971189fe96b5a417ff06f5305",
+      "width": 390,
+      "height": 2693
+    },
+    {
+      "path": "test-results/n90-calm-ui/390-names-review.png",
+      "sha256": "af576b8935a223f0455a7bc9555a0bbd0a3d4000018eed248fb508cb908b7025",
+      "width": 390,
+      "height": 2300
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-1280-export.png",
+      "sha256": "62afabbe6f634e2b485426f9072766eebc6926ec73b68f9b5c3eea4cab8a9289",
+      "width": 1280,
+      "height": 1999
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-1280-mapping.png",
+      "sha256": "269159f883a91d6c9b8572d5d9a2c90431209a071e12dc2eb257ea80f5ec84b9",
+      "width": 1280,
+      "height": 1730
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-1280-names-only.png",
+      "sha256": "867b4354c60234e3f8d63cf0233d6264bb0720fe3a07abca5b7e075ad65d437b",
+      "width": 1280,
+      "height": 1411
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-320-export.png",
+      "sha256": "d2ea5d9efa935067bc68afab481e6e6aaee1d233fcb1b71e8e5fd3b32f4af601",
+      "width": 320,
+      "height": 2932
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-320-mapping.png",
+      "sha256": "7d8e98158e87265da43b790ca42f7806252c95bea44e31cd7e7733b223849e3a",
+      "width": 320,
+      "height": 2693
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-320-names-only.png",
+      "sha256": "1cff851ce6066f6500aad2a7995697d18c6e88d92bb9bba2aa5b7ad279620e86",
+      "width": 320,
+      "height": 2102
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-390-export.png",
+      "sha256": "6efe5e8c89686c332cc3b34508c142eb35d05c1d676e0da5ff350df1ffe79f03",
+      "width": 390,
+      "height": 2912
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-390-mapping.png",
+      "sha256": "60e8f8960154dc665f001d17aced6ff1eac2a7e9f1ba5663b9363a59140dcb2d",
+      "width": 390,
+      "height": 2674
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-390-names-only.png",
+      "sha256": "709b319cf8d6b919615ff1204efbe5760269b8240bfd6c63a720a2b0cf7597bd",
+      "width": 390,
+      "height": 2102
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-768-export.png",
+      "sha256": "bfaed34557b8f7aa6baa35e13b4b2701ec9e260cbeb2dfed5f6d4dfad725bfc6",
+      "width": 768,
+      "height": 2129
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-768-mapping.png",
+      "sha256": "1c503aba54e39d172cb86479f666f440ade4b3e614aeea97b672ac3cc76cdeb3",
+      "width": 768,
+      "height": 1860
+    },
+    {
+      "path": "test-results/n90-calm-ui/dark-768-names-only.png",
+      "sha256": "5ffe0fcaae4c3bf40952f51734f2a788084613bb10a86a4308e12d37bc22afea",
+      "width": 768,
+      "height": 1541
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-1280-export.png",
+      "sha256": "7cf6a14023d9239cea70bf5cc702ea7236fca8df0b579c22b270628645726095",
+      "width": 1280,
+      "height": 1999
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-1280-mapping.png",
+      "sha256": "61195ad546996a60dafedc623ade34fb8e3cf378bbb12539e8b98423a76e83f9",
+      "width": 1280,
+      "height": 1730
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-1280-names-only.png",
+      "sha256": "99bebc3cc6754711d21bbdd90de7328e27a5adcb2174da4cb42277197b8f6972",
+      "width": 1280,
+      "height": 1411
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-320-export.png",
+      "sha256": "10faf6c2b439ab4ee24b67a9261fd59a094d3ee0ab6c0796b8b3e88f6237f0c9",
+      "width": 320,
+      "height": 2932
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-320-mapping.png",
+      "sha256": "99b9d1bb1402d17a179be9045eafecef2d7deb392a6618c119a1dfd60eeec5ff",
+      "width": 320,
+      "height": 2693
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-320-names-only.png",
+      "sha256": "c3f299a41e39978f200a852ccc75050aeca64c352945df5c89f9e2c8263b4704",
+      "width": 320,
+      "height": 2102
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-390-export.png",
+      "sha256": "5910bcc141cfdfee25e27ff5a904269bfd8799fc4beb88049a8bdc4f2f59a1f8",
+      "width": 390,
+      "height": 2912
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-390-mapping.png",
+      "sha256": "c129895457c9d14bb81db94cc3532b3a64fb082323a1ba1ffdda3b092cfc5bfd",
+      "width": 390,
+      "height": 2674
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-390-names-only.png",
+      "sha256": "a12c369f1a0fd64c9b659e8568ac4b0750c6a4599c5c86c02d9a1df8776a083d",
+      "width": 390,
+      "height": 2102
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-768-export.png",
+      "sha256": "ff05a8a00f93e83defb02da5bcd830f9dd82c1ae63a45c37a5f5229435221d5f",
+      "width": 768,
+      "height": 2129
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-768-mapping.png",
+      "sha256": "18b16ad1f2f32f3528c672fa8a75ebff6b7a203c9e5b7fc0b90ffc6e0589ce8b",
+      "width": 768,
+      "height": 1860
+    },
+    {
+      "path": "test-results/n90-calm-ui/light-768-names-only.png",
+      "sha256": "4894caaca9e2b9771d2e1a5f1e6cd2f9ba3e8debe04989c7f23d2c441e6d511c",
+      "width": 768,
+      "height": 1541
+    }
+  ],
+  "pageErrors": [],
+  "cleanup": {
+    "isolatedBrowserFinally": true,
+    "ownedHttpServerStopped": true,
+    "ownedPgServersStopped": true,
+    "ownedPgClustersRemoved": true,
+    "sharedBrowserLeaseUsed": false
+  },
+  "publication": "NOT_RUN; independent controller/publisher owns integration and Cloudflare/provider/immutable/served-asset proof."
+}

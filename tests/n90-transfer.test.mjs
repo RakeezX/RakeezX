@@ -38,8 +38,8 @@ test('CSV local N12 limits and faithful export with formula-safe text and Noor b
   await assert.rejects(()=>readGradeFile({...file('a.csv','x'),size:1024*1024+1}));
   await assert.rejects(()=>readGradeFile(file('a.csv','name,grade\n'+Array(301).fill('A,0').join('\n'))));
   const csv=exportGradeCsv({roster:[{id:'b',name:'=B'},{id:'a',name:'أحمد'}],items:[{id:'i',name:'Exam',max:20}],ctx:{a:{scoresByItem:{i:{value:0}}},b:{scoresByItem:{}}},className:'5/1',subject:'Math',term:'Term',noorReview:false});
-  assert.ok(csv.startsWith('\uFEFF'));assert.match(csv,/'=B/);assert.match(csv,/العظمى 20/);assert.match(csv,/أحمد",0/);assert.match(csv,/كشف درجات ركيز/);
-  const parsed=parseCsv(csv);assert.equal(parsed.find(row=>row[0]==='a')[2],'0');assert.equal(parsed.find(row=>row[0]==='b')[2],'');
+  assert.ok(csv.startsWith('\uFEFF'));assert.match(csv,/'=B/);assert.match(csv,/العظمى 20/);assert.match(csv,/أحمد",0/);assert.doesNotMatch(csv,/معرف الطالب|نوع الملف|الفصل الدراسي/);
+  const parsed=parseCsv(csv);assert.equal(parsed.find(row=>row[0]==='أحمد')[1],'0');assert.equal(parsed.find(row=>row[0].includes('=B'))[1],'');
   const alphabetical=exportGradeCsv({roster:[{id:'b',name:'سعيد'},{id:'a',name:'أحمد'}],items:[],ctx:{a:{},b:{}},className:'5/1',subject:'Math',term:'Term'});
   assert.ok(alphabetical.indexOf('أحمد')<alphabetical.indexOf('سعيد'));
 });
@@ -69,7 +69,7 @@ test('explicit new enrollment identity never uses unknown IDs or ambiguous names
 });
 test('template is blank and direct-only; Noor is exact three columns with explicit compatible 40/60 and missing status',()=>{
  const roster=[{id:'a',name:'أحمد'},{id:'b',name:'=B'}],items=[{id:'p',name:'المهام',max:40},{id:'e',name:'التقويم',max:60}],ctx={a:{scoresByItem:{p:{value:0},e:{value:55}}},b:{scoresByItem:{p:{value:30}}}};
- const blank=parseCsv(exportGradeCsv({roster,items:[...items,{id:'auto',name:'آلي',max:5,auto:'participation'}],ctx,blankTemplate:true}));assert.equal(blank[0].length,8);assert.ok(blank.slice(1).every(r=>r[2]===''&&r[3]===''));assert.ok(!blank[0].some(h=>h.includes('آلي')));
+ const blank=parseCsv(exportGradeCsv({roster,items:[...items,{id:'auto',name:'آلي',max:5,auto:'participation'}],ctx,blankTemplate:true}));assert.equal(blank[0].length,3);assert.ok(blank.slice(1).every(r=>r[1]===''&&r[2]===''));assert.ok(!blank[0].some(h=>h.includes('آلي')));
  const input={roster,items,ctx,noorReview:true,noorGroups:{p:'40',e:'60'},noorConfirmed:true};
  const rows=parseCsv(exportGradeCsv(input));assert.deepEqual(rows[0],['اسم الطالب','المهام الأدائية والمشاركة والتفاعل (40)','تقويمات تحريرية وتطبيقات عملية (60)']);assert.ok(rows.every(row=>row.length===3));assert.deepEqual(rows.find(row=>row[0]==='أحمد'),['أحمد','0','55']);assert.equal(rows.find(row=>row[0].includes('=B'))[2],'');
  for (const change of [x=>x.noorConfirmed=false,x=>x.noorGroups.e='',x=>x.items=[...items,{id:'other',name:'Extra',max:5}],x=>x.items=[{...items[0],max:20},items[1]],x=>x.items=[items[0],items[0],items[1]]]) {const x=structuredClone(input);change(x);assert.throws(()=>exportGradeCsv(x));}
@@ -79,4 +79,18 @@ test('Noor suggestions cover current default item names and still require confir
  for (const name of ['المشاركة والتفاعل','الواجبات','الأنشطة والمشاريع']) assert.equal(suggestNoorGroup({name}),'40');
  for (const name of ['الاختبارات القصيرة','الاختبار النهائي']) assert.equal(suggestNoorGroup({name}),'60');
  assert.equal(suggestNoorGroup({name:'بند غير معروف'}),'');
+});
+
+test('ordinary no-ID CSV roundtrip uses unique names and advanced IDs resolve only explicit identities',()=>{
+ const b=base();const ctx={a:{scoresByItem:{i:{value:0}}},b:{scoresByItem:{}}};
+ const ordinary=parseCsv(exportGradeCsv({roster:b.roster,items:b.items,ctx}));
+ const mapping=suggestGradeMappings(ordinary[0],b.items);
+ assert.equal(mapping.nameColumn,0);assert.equal(mapping.idColumn,-1);
+ assert.deepEqual(ordinary[0],['اسم الطالب','Exam (العظمى 20)']);
+ const r=reviewGradeTransfer({...b,rows:ordinary,...mapping});assert.equal(r.cells[0].value,0);
+ const duplicate={...b,rows:ordinary,...mapping,roster:[...b.roster,{id:'dup',name:b.roster[0].name}]};
+ assert.ok(reviewGradeTransfer(duplicate).rejected.length);
+ const advanced=parseCsv(exportGradeCsv({roster:b.roster,items:b.items,ctx,includeIds:true}));
+ assert.equal(advanced[0][0],'معرف الطالب');
+ assert.equal(reviewGradeTransfer({...duplicate,rows:advanced,...suggestGradeMappings(advanced[0],b.items)}).rejected.length,0);
 });

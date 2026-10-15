@@ -1,0 +1,135 @@
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { resolve, extname, sep } from 'node:path';
+import { decodeSyncV2Canonical } from '../src/lib/sync-v2.js';
+import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
+import { xlsxFixtures } from './n90-xlsx-fixtures.mjs';
+import { parseCsv } from '../src/lib/student-import.js';
+import { withIsolatedLocalBrowser } from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
+export async function browserFlow({q,owner}) {
+ const root=resolve('.'),output='test-results/n90-calm-ui',checks=[],requests=[],screenshots=[];let loss=false;
+ const capability={scoreDomainVersion:1,restoreProtocol:'CORE_V2',backupVersion:5,copyDomainVersion:1,n94SubitemVersion:1};
+ const entities={years:'years',terms:'terms',subjects:'subjects',sections:'sections',teachings:'teachings',students:'students',enrollments:'enrollments',items:'items',scores:'scores'};
+ await mkdir(output,{recursive:true});
+ await q("update rakeezx.scores set value=4 where id='s';delete from rakeezx.items where id='auto';update rakeezx.items set max=10,name='المشاركة والتفاعل' where id='i';insert into rakeezx.students(id,name) values('c','هند خالد'),('du1','ناصر حمد'),('du2','ناصر حمد');insert into rakeezx.enrollments(id,student_id,section_id) values('ec','c','section'),('edu1','du1','section'),('edu2','du2','section');insert into rakeezx.sections(id,year_id,grade,label,name) values('empty-section','y',5,'1','5/1');insert into rakeezx.teachings(id,section_id,subject_id,term_id) values('empty-t','empty-section','subject','term');insert into rakeezx.items(id,teaching_id,name,max) values('empty-i','empty-t','اختبار',5)");
+ const definitions=[['i2','الواجبات',10],['i3','الأنشطة والمشاريع',20],['i4','الاختبارات القصيرة',30],['i5','الاختبار النهائي',30]];
+ for(const [id,name,max] of definitions)await q("insert into rakeezx.items(id,teaching_id,name,max) values($1,'t',$2,$3)",[id,name,max]);
+ for(const [id,,] of definitions)await q("insert into rakeezx.scores(id,student_id,item_id,value) values($1,'a',$2,0)",['s-'+id,id]);
+ for(const id of ['i',...definitions.map(i=>i[0])])await q("insert into rakeezx.scores(id,student_id,item_id,value) values($1,'c',$2,0)",['c-'+id,id]);
+  const server=createServer(async(req,res)=>{
+    try {
+      const pathname=new URL(req.url,'http://127.0.0.1').pathname;
+      if(pathname.startsWith('/__n90/')) {
+        let body='';for await(const c of req)body+=c;const input=JSON.parse(body||'{}'),name=pathname.slice(7);let data;
+        if(name==='auth')data={id:owner,source:'supabase-auth-user',verifiedAt:Date.now()};
+        else if(name==='capability')data=capability;
+        else if(name==='grade-capability')data=(await q('select rakeezx.unified_student_grade_import_capability() result')).rows[0].result;
+        else if(name==='fixture') {
+          data={};for(const [store,table] of Object.entries(entities))data[store]=(await q(`select to_jsonb(t) row from rakeezx.${table} t where owner_id=$1`,[owner])).rows.map(r=>decodeSyncV2Canonical(store,r.row));
+        } else if(name==='apply') {
+          requests.push(structuredClone(input));
+          const rpc=input.batch.newStudents?.length?'apply_unified_student_grade_import':'apply_reviewed_grade_import';
+          data=(await q(`select rakeezx.${rpc}($1,$2,$3) result`,[input.mutationId,input.deviceId,input.batch])).rows[0].result;
+          if(loss){loss=false;throw Object.assign(Error('Synthetic response lost after native commit'),{status:503});}
+        } else throw Error('Unknown endpoint');
+        res.setHeader('Content-Type','application/json');res.end(JSON.stringify(data));return;
+      }
+      const file=resolve(root,pathname==='/'?'index.html':'.'+decodeURIComponent(pathname));if(!file.startsWith(root+sep))throw Error('Outside root');
+      res.setHeader('Content-Type',{'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2','.webmanifest':'application/manifest+json'}[extname(file)]??'application/octet-stream');res.end(await readFile(file));
+    }catch(e){res.writeHead(e.status??(e.code==='PT409'?409:400),{'Content-Type':'application/json'});res.end(JSON.stringify({message:e.message,code:e.code,status:e.status??409}));}
+  });
+ const record=(name,evidence)=>{checks.push({name,status:'PASS',evidence});console.log('PASS '+name);};
+ const state=async()=> (await q("select jsonb_build_object('students',(select jsonb_agg(to_jsonb(s) order by id) from rakeezx.students s),'scores',(select jsonb_agg(to_jsonb(s) order by id) from rakeezx.scores s),'enrollments',(select jsonb_agg(to_jsonb(e) order by id) from rakeezx.enrollments e)) result")).rows[0].result;
+ try {
+  await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
+  await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n90-grade-import-export-calm-ux-20261015.json',runId:'102a28c8-0c17-4512-b316-14b5b32b119d',url:base,timeoutMs:120000},async({createContext})=>{
+   const context=await createContext({viewport:{width:390,height:900},locale:'ar-SA'});
+   await context.addInitScript(()=>sessionStorage.setItem('rakeezx-demo-session-v1','preparing'));
+   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+   await openReadyServedDemo(page,base);
+   const account=await page.evaluate(async()=> (await import('/tests/n90-account-fixture.mjs')).prepareAccount());assert.equal(account.ready,true);assert.equal(account.lease.editable,true);assert.deepEqual(account.outbox,[]);
+   const screenshot=async name=>{await page.evaluate(()=>scrollTo(0,0));await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await page.screenshot({fullPage:true,path:output+'/'+name});screenshots.push(name);};
+   const panel=page.locator('[data-grade-transfer]'),imp=page.locator('[data-grade-import-panel]'),exp=page.locator('[data-grade-export-panel]');
+   const act=name=>page.locator(`[data-act="${name}"]`);
+   const switchPanel=async name=>{await page.locator(`[data-act="grade-panel"][data-panel="${name}"]`).click();await (name==='import'?imp:exp).waitFor();};
+   const setMode=async name=>{const button=imp.locator(`[data-mode="${name}"]`),old=await button.elementHandle();await button.click();await page.waitForFunction(el=>!el.isConnected,old);await old.dispose();};
+   let number=0;
+   const file=async(csv,extension='csv')=>{const name='كشف-'+(++number)+'.'+extension;await page.locator('[data-change="grade-file"]').setInputFiles({name,mimeType:'text/csv',buffer:Buffer.isBuffer(csv)?csv:Buffer.from(csv)});await page.waitForFunction(n=>document.querySelector('[data-grade-file-name]')?.textContent===n,name);};
+   const review=async()=>{await act('grade-review').click();await imp.locator('[data-grade-review]').waitFor();};
+   const cancel=async()=>{await act('grade-cancel').click();await page.locator('[data-change="grade-file"]').waitFor();};
+   const download=async name=>{const event=page.waitForEvent('download');await act(name).click();const d=await event;return {name:d.suggestedFilename(),rows:parseCsv(await readFile(await d.path(),'utf8'))};};
+   const initial=await state();
+   await page.goto(base+'/#/teaching/t/grades');await page.locator('[data-act="grade-panel"][data-panel="import"]').waitFor();assert.equal(await panel.isVisible(),false);await screenshot('390-default.png');
+   await page.goto(base+'/#/teaching/empty-t/grades');await page.getByText('الفصل بلا طلاب بعد',{exact:true}).waitFor();assert.equal(await panel.isVisible(),false);await page.getByRole('link',{name:'كشف الطلاب',exact:true}).waitFor();await screenshot('390-empty.png');
+   await page.goto(base+'/#/teaching/empty-t/grades?import=1');await imp.waitFor();assert.equal(await exp.isVisible(),false);assert.equal(await act('grade-import-mode').count(),2);assert.equal(await imp.locator('[data-mode="names"]').getAttribute('aria-pressed'),'true');assert.equal(await imp.locator('[data-noor-item]:visible').count(),0);
+   await page.goto(base+'/#/teaching/t/grades?export=1');await exp.waitFor();assert.equal(await imp.isVisible(),false);assert.equal(await page.locator('[data-noor-grouping]').getAttribute('open'),null);
+   record('separate_panels_routes_empty_class','Actual current application: default grade table and empty student CTA unobstructed; ?import=1 / ?export=1 open only requested panel; exactly two import mode buttons, names-only default.');
+   const blank=await download('grade-template'),filled=await download('grade-export');
+   assert.notEqual(blank.name,filled.name);assert.equal(blank.rows[0].length,6);assert.ok(blank.rows.slice(1).every(r=>r.slice(1).every(v=>v==='')));assert.equal(filled.rows.find(r=>r[0]==='أحمد سالم')[filled.rows[0].indexOf('المشاركة والتفاعل (العظمى 10)')],'4');assert.doesNotMatch(filled.rows[0].join(','),/معرف الطالب|الفصل|نوع الملف|المادة/);
+   await page.locator('[data-grade-roundtrip] > summary').click();await page.locator('[data-grade-export-ids]').check();const advanced=await download('grade-export');assert.equal(advanced.rows[0][0],'معرف الطالب');await page.locator('[data-grade-export-ids]').uncheck();
+   await page.locator('[data-noor-grouping] > summary').click();assert.match(await page.locator('[data-noor-totals]').innerText(),/40 ← 40 · 60 ← 60/);
+   assert.equal(await page.locator('[data-noor-item]').count(),5);for(const options of await page.locator('[data-noor-item]').evaluateAll(es=>es.map(e=>[...e.options].map(o=>o.textContent))))assert.deepEqual(options,['اختر','40','60']);
+   await act('grade-noor-export').click();await page.locator('[data-noor-alert]:visible').waitFor();assert.match(await page.locator('[data-noor-alert]').innerText(),/أكد/);
+   await page.locator('[data-noor-confirm]').check();const noor=await download('grade-noor-export');assert.ok(noor.rows.every(r=>r.length===3));assert.deepEqual(noor.rows.find(r=>r[0]==='هند خالد'),['هند خالد','0','0']);assert.deepEqual(noor.rows.find(r=>r[0]==='سعيد علي'),['سعيد علي','','']);
+   await page.locator('[data-noor-item="i"]').selectOption('60');assert.equal(await page.locator('[data-noor-confirm]').isChecked(),false);assert.match(await page.locator('[data-noor-totals]').innerText(),/40 ← 30 · 60 ← 70/);await page.locator('[data-noor-confirm]').check();await act('grade-noor-export').click();assert.match(await page.locator('[data-noor-alert]').innerText(),/يساوي 40 و60/);await page.locator('[data-noor-item="i"]').selectOption('40');
+   record('n90_export_plain_csv_blank_vs_filled_and_safe_identity','Actual downloads have distinct filenames, blank template vs current values, name+5 selected items without metadata; optional ID export is explicit.');
+   record('n90_noor_compact_mapping_exact_40_60_and_three_columns','Five short 40/60 menus, visible totals, missing consent blocked; 30/70 rejected after reassignment and consent reset. Exact 40/60 produces precisely three manual-review columns; all-zero student remains 0/0 and missing marks remain blank.');
+   await switchPanel('import');const csv='اسم الطالب,المشاركة والتفاعل (العظمى 10)\nأحمد سالم,12\nسعيد علي,0\nهند خالد,';
+   await file(csv);assert.equal(await imp.locator('[data-grade-column]').count(),0);await review();assert.match(await imp.locator('[data-grade-review]').innerText(),/أسماء جديدة/);assert.equal(requests.length,0);assert.deepEqual(await state(),initial);await screenshot('390-names-review.png');
+   await setMode('grades');assert.equal(await imp.locator('[data-grade-review]').count(),0);assert.equal(await imp.locator('[data-grade-file-name]').count(),1);assert.equal(await imp.locator('[data-grade-mapping-details]').getAttribute('open'),null);await review();assert.match(await imp.innerText(),/12→10/);await screenshot('390-grades-review.png');
+   await page.locator('[data-grade-match-confirm]').check();await page.locator('[data-grade-overwrite-confirm]').check();await page.evaluate(()=>window.oldGradeConfirm=document.querySelector('[data-act="grade-confirm"]'));
+   await switchPanel('export');await switchPanel('import');assert.equal(await page.locator('[data-grade-match-confirm]').isChecked(),false);assert.equal(await imp.locator('[data-grade-review]').count(),1);
+   await page.goto(base+'/#/teaching/t');await page.goto(base+'/#/teaching/t/grades?import=1');await imp.waitFor();assert.equal(await imp.locator('[data-grade-review]').count(),1);assert.equal(await page.locator('[data-grade-match-confirm]').isChecked(),false);
+   await cancel();await page.evaluate(async()=>{const v=(await import('/src/views/grades.js')).default;await v.actions['grade-confirm'](window.oldGradeConfirm);});assert.equal(requests.length,0);assert.deepEqual(await state(),initial);
+   // Real delayed read/cancel: stale completion cannot restore file state.
+   await page.evaluate(()=>{window.pendingRead=import('/src/views/grades.js').then(({default:v})=>v.actions['grade-file']({files:[{name:'late.csv',size:25,arrayBuffer:()=>new Promise(r=>window.releaseRead=()=>r(new TextEncoder().encode('اسم الطالب,درجة\nطالب مؤجل,1').buffer))}]},null,{id:'t'}));});
+   await page.waitForFunction(()=>!!window.releaseRead);await cancel();await page.evaluate(async()=>{window.releaseRead();await window.pendingRead;});assert.equal(await imp.locator('[data-grade-file-name]').count(),0);
+   record('n90_import_modes_review_state_cancel','Names-only review exposes no grade mapping and sends nothing; explicit grades selection preserves parsed file but resets review/consent. Panel switches and same-workspace route return retain review with fresh unchecked consent. Cancel, disconnected old confirmation and delayed canceled read cause no write.');
+   // Actual XLSX reader, generated using the existing local parser package.
+   const xlsx=await xlsxFixtures();
+   await setMode('names');await file(xlsx.valid,'xlsx');await review();assert.match(await imp.locator('[data-grade-review]').innerText(),/طالب إكسل اصطناعي/);
+   await setMode('grades');await imp.locator('[data-grade-column="1"] [data-grade-kind]').selectOption('i');await review();assert.match(await imp.locator('[data-grade-review]').innerText(),/طالب إكسل اصطناعي/);await cancel();
+
+   // Screenshot matrix on source DOM/CSS with the actual responsive controls.
+   for(const theme of ['light','dark'])for(const width of [320,390,768,1280]){
+    await page.setViewportSize({width,height:900});await page.evaluate(theme=>{document.documentElement.dataset.theme=theme;},theme);
+    await setMode('names');await screenshot(`${theme}-${width}-names-only.png`);await setMode('grades');
+    await file('اسم الطالب,المشاركة والتفاعل (العظمى 10),عمود غير معروف\nأحمد سالم,5,3');
+    assert.equal(await imp.locator('fieldset').count(),0);assert.equal(await imp.locator('[data-grade-mapping-details]').getAttribute('open'),'');assert.equal(await imp.locator('[data-grade-column]').count(),1);
+    assert.equal(await panel.evaluate(e=>e.scrollWidth<=e.clientWidth),true);
+    await screenshot(`${theme}-${width}-mapping.png`);
+    const overflow=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,elements:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&& (r.left< -1||r.right>innerWidth+1);}).slice(0,12).map(e=>({tag:e.tagName,class:e.className}))}));assert.ok(overflow.scroll<=overflow.width,JSON.stringify(overflow));
+    const targets=await imp.locator('select:visible,button:visible,input:not([type=checkbox]):visible').evaluateAll(es=>es.map(e=>({h:e.getBoundingClientRect().height,w:e.getBoundingClientRect().width})));assert.ok(targets.every(r=>r.h>=43.9&&r.w>0));
+    await cancel();await switchPanel('export');await page.locator('[data-noor-grouping]').evaluate(e=>e.open=true);assert.equal(await panel.evaluate(e=>e.scrollWidth<=e.clientWidth),true);await screenshot(`${theme}-${width}-export.png`);await switchPanel('import');
+   }
+   await page.setViewportSize({width:390,height:900});await imp.locator('[data-mode="names"]').focus();await page.keyboard.press('Space');await page.waitForFunction(()=>document.querySelector('[data-act="grade-import-mode"][data-mode="names"]')?.getAttribute('aria-pressed')==='true');assert.equal(await imp.locator('[data-mode="grades"]').getAttribute('aria-pressed'),'false');await page.keyboard.press('Tab');assert.equal(await imp.locator('[data-mode="grades"]').evaluate(e=>e===document.activeElement),true);await page.keyboard.press('Space');await page.waitForFunction(()=>document.querySelector('[data-act="grade-import-mode"][data-mode="grades"]')?.getAttribute('aria-pressed')==='true');assert.equal(await imp.locator('[data-mode="names"]').getAttribute('aria-pressed'),'false');assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
+   record('n90_import_mapping_mobile_and_advanced_preview','Actual CSV and XLSX handlers exercised; unique matching auto-collapses sound mapping. An unknown column opens only the unresolved card with ignore/error guidance; no fieldsets.');
+   record('n90_rtl_accessibility_and_320_to_1280_render','24 matrix light/dark screenshots plus 4 default/empty/review screenshots: actual mapping and Noor export at 320/390/768/1280; zero horizontal page/panel overflow and visible controls >=44px. Keyboard Space selects modes, Tab follows mode buttons, RTL document retained.');
+   // Owner/offline/lease and stale guards at the affected actual account store entry.
+   await file('اسم الطالب,المشاركة والتفاعل (العظمى 10)\nناصر حمد,1');await review();assert.match(await imp.locator('[data-grade-review]').innerText(),/اسم ملتبس/);assert.equal(await act('grade-confirm').isDisabled(),true);assert.equal(requests.length,0);await cancel();
+   await file(csv);await review();
+   const negative=await page.evaluate(async()=>{
+    const s=await import('/src/store.js'),c=await import('/src/lib/cloud.js'),g=(await import('/src/lib/sync-ownership.js')).runtimeSyncOwnershipGuard,l=(await import('/src/lib/offline-lease.js')).runtimeOfflineLease();
+    const r=s.reviewGradeImport('t',{rows:[['اسم الطالب','المشاركة والتفاعل'],['أحمد سالم','5']],nameColumn:0,mappings:[{kind:'ignore'},{kind:'existing',itemId:'i'}]});
+    const session=c.session;c.setMockAuth({id:'foreign-owner'},session);let ownerError;try{await s.confirmGradeImport(r,{approved:true,overwriteConfirmed:true});}catch(e){ownerError=e.message;}finally{c.setMockAuth(session.user,session);}
+    const missing=g.cloudAccess({operation:'dispatch',authenticatedUserId:c.user.id});s.getOfflineLeaseStatus();l.invalidate('synthetic');let leaseError;try{await s.confirmGradeImport(r,{approved:true,overwriteConfirmed:true});}catch(e){leaseError=e.message;}await l.renew(async()=>({id:c.user.id,source:'supabase-auth-user',verifiedAt:Date.now()}));return {ownerError,leaseError,missing};
+   });assert.ok(negative.ownerError);assert.ok(negative.leaseError);assert.equal(negative.missing.reason,'command-owner-missing');assert.equal(requests.length,0);
+   await context.setOffline(true);await page.locator('[data-grade-match-confirm]').check();await page.locator('[data-grade-overwrite-confirm]').check();await act('grade-confirm').click();await page.locator('.grade-transfer__message.is-error').waitFor();assert.equal(requests.length,0);await context.setOffline(false);await cancel();
+   await q("update rakeezx.items set max=9 where id='i'");await file(csv);await review();await page.locator('[data-grade-match-confirm]').check();await page.locator('[data-grade-overwrite-confirm]').check();await act('grade-confirm').click();await page.locator('.grade-transfer__message.is-error').waitFor();assert.equal(requests.length,1);assert.deepEqual(await state(),initial);await q("update rakeezx.items set max=10 where id='i'");
+   // Refresh this synthetic account's changed revisions in the same live document.
+   // Boot/offline evidence is unchanged and reused, not re-certified by this UX check.
+   await cancel();const checkpoint=await page.evaluate(async()=>{const result=await (await import('/tests/n90-account-fixture.mjs')).prepareAccount();const s=await import('/src/store.js');return {...result,item:s.state.items.find(i=>i.id==='i'),owner:s.getActiveWorkspace().authUserId};});assert.equal(checkpoint.owner,owner);assert.equal(checkpoint.ready,true);assert.equal(Number(checkpoint.item.max),10);
+   // Keep the real rejection history while using the existing explicit retire action.
+   await page.goto(base+'/#/teaching/t/grades?import=1');await imp.waitFor();await page.locator('[data-grade-retire-confirm]').waitFor();{await page.locator('[data-grade-retire-confirm]').check();await act('grade-retire').click();await act('grade-retire').waitFor({state:'detached'});}
+   await setMode('grades');await file(csv);await review();await act('grade-confirm').click();assert.equal(requests.length,1);await page.locator('[data-grade-match-confirm]').check();await page.locator('[data-grade-overwrite-confirm]').check();await act('grade-confirm').click();await page.getByText(/إيصال الخادم/).waitFor();assert.equal(requests.length,2);
+   const committed=await state();assert.equal(Number(committed.scores.find(s=>s.id==='s').value),10);assert.equal(Number(committed.scores.find(s=>s.student_id==='b'&&s.item_id==='i').value),0);assert.equal(Number(committed.scores.find(s=>s.student_id==='c'&&s.item_id==='i').value),0);
+   record('n90_current_owner_grade_atomicity_and_cancel_preserved','Actual synthetic account UI/store: wrong owner, invalid lease, ownerless dispatch and offline confirmation denied before transport. Native stale max rejects whole batch, retains real failure, then explicit retirement and fresh review permit only consented 12→10 / 0; blank preserves existing 0. Existing native suite separately verifies rollback/owner/exact retry.');
+   await file('اسم الطالب,المشاركة والتفاعل (العظمى 10)\nاسم جديد فقط,9');await setMode('names');await review();const beforeNames=await state(),localScoresBeforeNames=await page.evaluate(async()=> (await import('/src/lib/db.js')).getAll('scores'));await page.locator('[data-grade-match-confirm]').check();await act('grade-confirm').click();await page.getByText('أُضيفت الأسماء الجديدة دون تكرار.',{exact:true}).waitFor();assert.equal(requests.length,2);assert.deepEqual((await state()).scores,beforeNames.scores);
+   const names=await page.evaluate(async()=>{const s=await import('/src/store.js'),d=await import('/src/lib/db.js');return {roster:s.teachingContext('t').roster,outbox:await d.getAll('outbox'),scores:await d.getAll('scores')};});assert.deepEqual(names.scores,localScoresBeforeNames);assert.equal(names.roster.filter(s=>s.name==='اسم جديد فقط').length,1);assert.ok(names.outbox.filter(r=>r.state!=='superseded').every(r=>r.ownerId===owner));
+   record('n90_names_only_vs_names_grades_functional_separation','One file, two actual mode buttons: names-only confirms a new persisted N12 identity/enrollment with owner-bound outbox and no grade RPC or native grade mutation; grades mode uses unchanged guarded atomic native RPC only after consent.');
+   await writeFile(output+'/page-errors.json',JSON.stringify(errors));assert.deepEqual(errors,[]);
+  });
+  return checks;
+ }finally{if(server.listening)await new Promise(r=>server.close(r));await writeFile(output+'/result.json',JSON.stringify({checks,requests,screenshots,ownedServerStopped:true,isolatedBrowserFinally:true},null,2));}
+}
