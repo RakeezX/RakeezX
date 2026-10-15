@@ -1,9 +1,6 @@
 /** الإعدادات: بيانات المعلّم، والسنوات والفصول الدراسية، والمظهر، والبيانات. */
 
 import { html, icon, openSheet, confirmSheet, toast, fmtDateRange } from '../lib/dom.js';
-import { currentNotificationContext } from '../lib/notification-events.js';
-import { notificationScope } from '../lib/notification-center.js';
-import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificationTiming, readNotificationCategories, writeNotificationCategory } from '../lib/notification-state.js';
 import { brandLockup } from '../lib/brand.js';
 import { BUILD_META } from '../lib/build-meta.js';
 import { educationDepartmentComplete, profileAttention, verifiedEmailFeedback } from '../lib/settings-profile-ui.js';
@@ -298,9 +295,6 @@ const settings = {
     const attention = profileAttention({ profile, demo, pendingEmail: emailChangePending, unavailable: accountContractUnavailable, contract: accountContract });
     profileExpanded ??= Boolean(attention);
     const install = currentInstallContext();
-    const notificationContext = currentNotificationContext(store, cloud);
-    const categories = readNotificationCategories(notificationContext);
-    const timing = readNotificationTiming(notificationContext);
 
     return html`
       <div class="management-page settings-page settings-compact">
@@ -417,26 +411,10 @@ const settings = {
       <div class="section settings-section settings-section--experience">
         <div class="section__head"><h2 class="section__title">المظهر والتفاعل</h2></div>
         <div class="settings-preference-surface">
-          ${notificationContext ? html`<section class="n44-settings" aria-label="إشعارات داخل التطبيق">
-            <h3>إشعارات داخل التطبيق</h3>
-            ${[['lesson', 'تذكيرات الحصص'], ['due', 'تذكيرات تسليم البنود']].map(([kind, label]) => html`
-              <div class="settings-preference-row"><span>${label}</span>
-                <button type="button" class="btn btn--quiet" role="switch" aria-label="${label}"
-                  aria-checked="${String(categories[kind])}" data-act="notification-category" data-kind="${kind}"
-                  data-scope="${notificationScope(notificationContext)}">${categories[kind] ? 'مفعّلة' : 'متوقفة'}</button>
-              </div>`)}
-            <fieldset class="n44-timing"><legend>التذكير قبل الحصة بالدقائق</legend>
-              <div class="n44-timing-options" role="group" aria-label="التذكير قبل الحصة بالدقائق">
-                ${LESSON_LEAD_MINUTES.map(minutes => html`<button type="button" class="btn btn--quiet" data-act="notification-minutes" data-minutes="${minutes}" data-scope="${notificationScope(notificationContext)}" aria-pressed="${String(timing.lessonMinutes === minutes)}" data-fk="n44-minutes-${minutes}">${minutes}</button>`)}
-              </div>
-            </fieldset>
-            <fieldset class="n44-timing"><legend>تذكيرات موعد التسليم</legend>
-              <div class="n44-timing-options">
-                ${DUE_STAGES.map(day => html`<button type="button" class="btn btn--quiet" role="switch" data-act="notification-day" data-day="${day}" data-scope="${notificationScope(notificationContext)}" aria-checked="${String(timing.dueDays.includes(day))}" data-fk="n44-day-${day}">${day === 0 ? 'يوم التسليم' : 'قبل التسليم بـ ' + day + ' أيام'}</button>`)}
-              </div>
-            </fieldset>
-            <p class="field__hint">محفوظة لحسابك على هذا الجهاز. تنبيهات حماية البيانات والوصول الضرورية تبقى مفعّلة.</p>
-          </section>` : ''}
+          <a class="settings-preference-row n44-settings-link" href="#/settings/notifications">
+            <span class="n44-settings-link__label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg> <span class="fw-7">الإشعارات</span></span>
+            <span aria-hidden="true">${icon('chev')}</span>
+          </a>
           <div class="settings-preference-row">
             <div class="settings-preference-row__copy">
               <div class="fw-7">المظهر</div>
@@ -939,30 +917,6 @@ const settings = {
     async theme(el) {
       await store.patchDevice({ theme: el.dataset.theme });
       store.applyTheme();
-    },
-
-    'notification-minutes'(el) {
-      const context = currentNotificationContext(store, cloud);
-      if (!context || el.dataset.scope !== notificationScope(context)) return;
-      if (!writeNotificationTiming(context, { lessonMinutes: Number(el.dataset.minutes) })) toast('تعذر حفظ توقيت الإشعارات على هذا الجهاز', 'warn');
-      repaint();
-    },
-    'notification-day'(el) {
-      const context = currentNotificationContext(store, cloud), day = Number(el.dataset.day);
-      if (!context || el.dataset.scope !== notificationScope(context) || !DUE_STAGES.includes(day)) return;
-      const days = readNotificationTiming(context).dueDays;
-      if (!writeNotificationTiming(context, { dueDays: days.includes(day) ? days.filter(value => value !== day) : [...days, day] })) toast('تعذر حفظ توقيت الإشعارات على هذا الجهاز', 'warn');
-      repaint();
-    },
-    'notification-category'(el) {
-      const context = currentNotificationContext(store, cloud);
-      if (!context || el.dataset.scope !== notificationScope(context)) return;
-      const kind = el.dataset.kind;
-      if (!['lesson', 'due'].includes(kind)) return;
-      if (!writeNotificationCategory(context, kind, !readNotificationCategories(context)[kind])) {
-        toast('تعذر حفظ تفضيل الإشعارات على هذا الجهاز', 'warn');
-      }
-      repaint();
     },
 
     sound(el) {

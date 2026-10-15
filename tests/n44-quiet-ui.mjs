@@ -8,7 +8,7 @@ import { chromium } from '@playwright/test';
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 import { fixedNow, owner, otherOwner } from './n44-fixture.mjs';
 const root=path.resolve('.'), output=path.join(root,'tests');
-const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n44-configurable-reminder-intervals-20261015.json';
+const taskFile='C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n44-dedicated-notification-settings-20261015.json';
 const leaseScript='C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1';
 const runId=process.env.N44_RUN_ID;
 if(!runId)throw new Error('N44_RUN_ID must match the current activated card');
@@ -19,7 +19,7 @@ const server=http.createServer(async(req,res)=>{
   if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
   try{res.writeHead(200,{'Content-Type':mime[path.extname(file)]??'application/octet-stream'});res.end(await readFile(file));}catch{res.writeHead(404).end();}
 });
-const evidence={taskId:'continuous-n44-configurable-reminder-intervals-20261015',runId,checks:[],layoutInspections:[]};
+const evidence={taskId:'continuous-n44-dedicated-notification-settings-20261015',runId,checks:[],layoutInspections:[]};
 let browser,leased=false,started=false;
 async function checkpoint(page,expectedOwner=owner){
   // Return a snapshot from the successful checkpoint itself; a readiness
@@ -80,18 +80,18 @@ try{
     assert.equal(await page.evaluate(()=>document.activeElement?.classList.contains('n44-bell')),true);
   }
   evidence.checks.push({name:'n44_actual_account_event_generation',status:'PASS',evidence:'Actual registered synthetic account boot + runtime ownership guard; 4 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return.'});
-  await page.goto(base+'/#/settings');await page.getByRole('switch',{name:'تذكيرات الحصص'}).waitFor();
+  await page.goto(base+'/#/settings/notifications');await page.getByRole('switch',{name:'تذكيرات الحصص'}).waitFor();
   for (const width of [320,390]) {
     await page.setViewportSize({width,height:844});
     // Viewport changes schedule a repaint: inspect a connected current DOM in
     // the same successful checkpoint, never a locator's detached prior node.
     const layout=await page.waitForFunction(()=>{
       const el=document.querySelector('.n44-settings'),options=el?.querySelector('.n44-timing-options');
-      if(!el?.isConnected || !options || getComputedStyle(options).display!=='flex')return false;
+      if(!el?.isConnected || !options || getComputedStyle(options).display!=='grid')return false;
       return {overflow:el.scrollWidth>el.clientWidth+1,page:document.documentElement.scrollWidth>innerWidth+1,display:getComputedStyle(options).display};
     });
     const geometry=await layout.jsonValue();await layout.dispose();
-    assert.deepEqual(geometry,{overflow:false,page:false,display:'flex'});
+    assert.deepEqual(geometry,{overflow:false,page:false,display:'grid'});
     await page.locator('[data-act="notification-minutes"][data-minutes="5"]').click();
     await page.waitForFunction(()=>document.querySelector('[data-minutes="5"]').getAttribute('aria-pressed')==='true');
     await bell(page);assert.equal(await page.locator('.n44-item').count(),3);await close(page);
@@ -201,7 +201,7 @@ try{
   const assets=['src/lib/notification-center.js','src/lib/notification-events.js','src/lib/notification-state.js','src/views/notifications.js','src/styles/notifications.css'];
   await page.waitForFunction(async list=>(await Promise.all(list.map(p=>caches.match(new URL(p,location.origin))))).every(Boolean),assets);
   evidence.cached=await page.evaluate(async list=>Object.fromEntries(await Promise.all(list.map(async p=>[p,!!await caches.match(new URL(p,location.origin))]))),assets);
-  await context.setOffline(true);await page.reload();evidence.offlineCheckpoint=await checkpoint(page);await page.goto(base+'/#/settings');await checkpoint(page);
+  await context.setOffline(true);await page.reload();evidence.offlineCheckpoint=await checkpoint(page);await page.goto(base+'/#/settings/notifications');await checkpoint(page);
   await page.locator('[data-act="notification-minutes"][data-minutes="60"]').click();
   await page.reload();await checkpoint(page);
   assert.equal(await page.locator('[data-minutes="60"]').getAttribute('aria-pressed'),'true');

@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v63';
+const VERSION = 'rakeezx-v64';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -180,6 +180,7 @@ const SHELL = [
   './src/views/calendar.js',
   './src/views/calendar-0417-ui.js',
   './src/views/settings.js',
+  './src/views/notification-settings.js',
   './src/views/teacher-setup-import.js',
   './src/views/backup.js',
   './src/views/support.js',
