@@ -49,7 +49,6 @@ function currentEmailChangeView() {
 }
 let removePhoneInputGuards = () => {};
 let removeDepartmentInteraction = () => {};
-let closeTeacherSetupImport = () => {};
 
 function applyPhoneInsertion(input, rawText, event) {
   const current = normalizeSaudiMobile(input.value);
@@ -466,7 +465,6 @@ const settings = {
       <section class="section settings-section settings-section--destinations">
         <div class="section__head"><h2 class="section__title">البيانات والمساعدة</h2></div>
         <div class="settings-link-group">
-          ${!demo ? html`<button class="row settings-destination" type="button" data-act="teacher-setup-import"><span class="row__icon">${icon('upload')}</span><span class="row__main"><span class="row__title">استيراد بيانات مدرستي</span><span class="row__sub">معاينة البيانات وإعداد خطة مراجَعة — دون حفظ</span></span><span class="row__end">${icon('chev')}</span></button>` : ''}
         <a class="row settings-destination" href="#/settings/backup">
           <span class="row__icon">${icon('download')}</span>
           <span class="row__main">
@@ -675,7 +673,6 @@ const settings = {
   onUnmount() {
     removeEmailVerification();
     if (emailFeedback) emailFeedback.completed = false;
-    closeTeacherSetupImport();
     removeDepartmentInteraction();
     removeProfileAttention();
     profileExpanded = null;
@@ -685,13 +682,6 @@ const settings = {
   },
 
   actions: {
-    async 'teacher-setup-import'() {
-      const workspace = store.getActiveWorkspace();
-      const { openTeacherSetupImport } = await import('./teacher-setup-import.js');
-      if (store.getActiveWorkspace() !== workspace || !location.hash.startsWith('#/settings')) return;
-      closeTeacherSetupImport();
-      closeTeacherSetupImport = openTeacherSetupImport();
-    },
     async 'teacher-form'(el) {
       const teacherForm = el.dataset.val === 'feminine' ? 'feminine' : 'masculine';
       if (await store.patchProfile({ teacherForm })) {

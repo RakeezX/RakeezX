@@ -53,3 +53,8 @@
 .grade-transfer__message.is-error { color:var(--danger); border-inline-start:3px solid var(--danger); }
 .grade-transfer [data-noor-grouping] label { display:block; margin-block:12px; }
 .grade-transfer [data-noor-grouping] select { max-width:100%; }
+
+/* AI-authored N36: secondary reviewed-bundle entry beside file import. */
+.grade-transfer__school { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-block:8px; }
+.grade-transfer__school .btn { flex:none; min-height:44px; }
+.grade-transfer__school .grade-transfer__hint { flex:1 1 180px; min-width:0; }

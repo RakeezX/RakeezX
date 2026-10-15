@@ -1,0 +1,37 @@
+{
+  "runId": "ee2b9354-e23f-43ce-8731-2251203ea73e",
+  "checks": [
+    {
+      "name": "placement_preview_owner_zero_writes_320",
+      "status": "PASS",
+      "evidence": "Actual app RTL grades/settings DOM and source CSS; one secondary entry, JSON parse/map/plan, Escape/cancel focus and back navigation cleanup, CSV review/cancel/export and Noor confirmation guard, same-owner Auth refresh and foreign-owner refusal; database/outbox unchanged, zero IDB writes and zero service calls after setup."
+    },
+    {
+      "name": "workspace_deactivation_cleanup",
+      "status": "PASS",
+      "evidence": "Actual store workspace deactivation removes modal and private controls with zero writes."
+    },
+    {
+      "name": "placement_preview_owner_zero_writes_390",
+      "status": "PASS",
+      "evidence": "Actual app RTL grades/settings DOM and source CSS; one secondary entry, JSON parse/map/plan, Escape/cancel focus and back navigation cleanup, CSV review/cancel/export and Noor confirmation guard, same-owner Auth refresh and foreign-owner refusal; database/outbox unchanged, zero IDB writes and zero service calls after setup."
+    },
+    {
+      "name": "placement_preview_owner_zero_writes_768",
+      "status": "PASS",
+      "evidence": "Actual app RTL grades/settings DOM and source CSS; one secondary entry, JSON parse/map/plan, Escape/cancel focus and back navigation cleanup, CSV review/cancel/export and Noor confirmation guard, same-owner Auth refresh and foreign-owner refusal; database/outbox unchanged, zero IDB writes and zero service calls after setup."
+    },
+    {
+      "name": "placement_preview_owner_zero_writes_1280",
+      "status": "PASS",
+      "evidence": "Actual app RTL grades/settings DOM and source CSS; one secondary entry, JSON parse/map/plan, Escape/cancel focus and back navigation cleanup, CSV review/cancel/export and Noor confirmation guard, same-owner Auth refresh and foreign-owner refusal; database/outbox unchanged, zero IDB writes and zero service calls after setup."
+    },
+    {
+      "name": "lazy_owner_drift",
+      "status": "PASS",
+      "evidence": "Owner switches while real lazy module is held: no receiver opens."
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

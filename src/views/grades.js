@@ -6,6 +6,7 @@
 
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
+import * as cloud from '../lib/cloud.js';
 import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster } from '../models.js';
 import { repaint } from '../repaint.js';
 import * as db from '../lib/db.js';
@@ -28,6 +29,21 @@ let query = '';
 const scoreValidation = new Map();
 let transfer = { rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
 
+let closeTeacherSetupImport = () => {};
+let setupRequest = 0;
+function setupBinding(teachingId) {
+  const workspace = store.getActiveWorkspace(), teaching = store.getTeaching(teachingId);
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'preview', authenticatedUserId: cloud.user?.id });
+  if (!store.state.ready || workspace?.type !== 'account' || !cloud.session ||
+      cloud.session.user?.id !== cloud.user?.id || cloud.authStatus().state !== 'authenticated' ||
+      !access.allowed || access.workspaceOwnerId !== workspace.authUserId ||
+      !teaching || teaching.ownerId !== workspace.authUserId || store.isTeachingArchived(teaching)) throw new Error('يلزم حساب وفصل نشطان لفتح المعاينة.');
+  store.assertLeaseWritable();
+  store.validateTeachingContext(teaching.sectionId, teaching.termId);
+  return JSON.stringify([workspace.authUserId, workspace.id, workspace.databaseName, workspace.leaseGeneration,
+    teaching.id, teaching.sectionId, teaching.termId, teaching.subjectId]);
+}
+
 function transferPanel(teachingId) {
   const { items } = store.teachingContext(teachingId);
   const review = transfer.review;
@@ -40,6 +56,10 @@ function transferPanel(teachingId) {
       </div>`;
   return html`<details class="grade-transfer noprint" data-grade-transfer ${transfer.rows || transfer.message || transfer.recovery.length || new URLSearchParams(location.hash.split('?')[1]).has('import') ? 'open' : ''}>
     <summary>استيراد الأسماء والدرجات وتصديرها</summary>
+    ${store.getActiveWorkspace()?.type === 'account' ? html`<div class="grade-transfer__school">
+      <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
+      <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON مراجَعة فقط · معاينة دون حفظ أو اتصال مباشر بمدرستي</span>
+    </div>` : ''}
     <label>نوع الاستيراد <select class="input" data-change="grade-import-mode" ${transfer.busy ? 'disabled' : ''}><option value="names" ${transfer.importMode === 'names' ? 'selected' : ''}>أسماء فقط</option><option value="grades" ${transfer.importMode !== 'names' ? 'selected' : ''}>أسماء ودرجات</option></select></label>
     ${!transfer.rows ? html`<label>اختر ملف الأسماء أو الدرجات <input class="input" type="file" accept=".csv,.xlsx" data-change="grade-file" ${transfer.busy ? 'disabled' : ''}></label>
       <p class="grade-transfer__hint">حتى 300 طالب · 1 MB</p>
@@ -207,6 +227,12 @@ export default {
     store.gradeImportRecovery().then(rows => { if (transfer === current) { transfer.recovery = rows; repaint(); } });
   },
 
+  onUnmount() {
+    setupRequest++;
+    closeTeacherSetupImport();
+    closeTeacherSetupImport = () => {};
+  },
+
   render(p) {
     const cls = store.getTeaching(p.id);
     if (!cls) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
@@ -359,6 +385,18 @@ export default {
   afterPaint: flushInlineQuickLogEffect,
 
   actions: {
+    async 'teacher-setup-import'(el, ev, params) {
+      const request = ++setupRequest, workspace = store.getActiveWorkspace(), route = location.hash;
+      try {
+        const binding = setupBinding(params.id);
+        const { openTeacherSetupImport } = await import('./teacher-setup-import.js');
+        if (request !== setupRequest || !el.isConnected || location.hash !== route ||
+            store.getActiveWorkspace() !== workspace || setupBinding(params.id) !== binding) return;
+        closeTeacherSetupImport();
+        closeTeacherSetupImport = openTeacherSetupImport({ isContextCurrent: () =>
+          location.hash === route && store.getActiveWorkspace() === workspace && setupBinding(params.id) === binding });
+      } catch (error) { toast(error.message); }
+    },
     async 'grade-file'(el, ev, params) {
       const prior = transfer;
       const file = el.files?.[0];

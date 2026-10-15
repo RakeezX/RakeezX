@@ -25,9 +25,9 @@ function snapshot() {
 }
 const options = (rows, selected = '') => rows.map(row => html`<option value="${row.id}" ${row.id === selected ? 'selected' : ''}>${row.name ?? `${row.hijriStart}-${Number(row.hijriStart) + 1}`}</option>`);
 
-export function openTeacherSetupImport() {
+export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) {
   let binding;
-  try { binding = ownerContext(); } catch (error) { toast(error.message); return () => {}; }
+  try { binding = ownerContext(); if (!isContextCurrent()) throw new Error('تعذّر اعتماد سياق الاستيراد الحالي.'); } catch (error) { toast(error.message); return () => {}; }
   if (!document.querySelector('[data-teacher-setup-style]')) {
     const link = document.createElement('link'); link.rel = 'stylesheet';
     link.href = new URL('../styles/teacher-setup-import.css', import.meta.url).href;
@@ -41,7 +41,7 @@ export function openTeacherSetupImport() {
   const close = () => { if (closed) return; closed = true; revision++; bundle = plan = null; done(); };
   function guard({ checkState = true } = {}) {
     try {
-      if (closed || ownerContext() !== binding || checkState && JSON.stringify(snapshot()) !== baseline || !location.hash.startsWith('#/settings')) throw new Error('STALE');
+      if (closed || ownerContext() !== binding || checkState && JSON.stringify(snapshot()) !== baseline || !isContextCurrent()) throw new Error('STALE');
       return true;
     } catch { close(); return false; }
   }
