@@ -106,7 +106,12 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
   const d = task.deliveryReceipt, proof = update.card.verificationRepair;
   const deliveryRecheck = update.card.completionMode === 'recheck_existing_publication' && result.state === 'LOCAL_READY'
     && e.resultState === 'LOCAL_READY' && !update.card.liveMutation && !update.card.liveAuthorizationRef
-    && d?.errorCode === 'SOURCE_PARITY_PENDING' && d.status === 'pending' && d.candidateSha === e.candidateSha
+    && d?.errorCode === 'SOURCE_PARITY_PENDING'
+    // A terminal source-parity receipt may be rechecked ONLY after a separately reviewed
+    // material verifier repair; all existing provider, immutable, identity and PASS guards remain.
+    && (d.status === 'pending' || (d.status === 'blocked' && d.retryable === false
+      && typeof task.lastFailure === 'string' && task.lastFailure.startsWith('SOURCE_PARITY_PENDING:')))
+    && d.candidateSha === e.candidateSha
     && d.publishedSha === proof?.publishedSha && sha256(bytes(d)) === proof?.priorReceiptSha256
     && SHA256.test(proof?.reviewedFixtureSha256 ?? '') && proof?.reason?.length >= 20
     && d.provider?.conclusion === 'success' && d.provider?.headSha === d.publishedSha && d.evidence?.immutable?.passed === true
