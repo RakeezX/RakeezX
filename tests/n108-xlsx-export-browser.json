@@ -1,0 +1,91 @@
+{
+  "taskId": "continuous-n108-readable-excel-xlsx-koshoof-20261015",
+  "runId": "86ca48c0-56cd-4e8f-8277-62f4c392b4a2",
+  "checks": [
+    {
+      "name": "n108_actual_browser_download_320_390_768_1280",
+      "status": "PASS",
+      "evidence": "Actual owned account Koshoof DOM/CSS: XLSX + CSV, names and grades, 8 size/theme combinations; 300 rows, long Arabic name/title, focus, no horizontal overflow."
+    },
+    {
+      "name": "n108_reader_roundtrip_preserve_zero_blank_and_class_title",
+      "status": "PASS",
+      "evidence": "Both audited file readers parse actual downloaded files; CSV-equivalent labels/values (CSV injection prefix retained), numeric zero distinct from blank."
+    },
+    {
+      "name": "n108_empty_class_back_reload_and_no_writes",
+      "status": "PASS",
+      "evidence": "Empty class names workbook readable; authenticated close/back usable (reload checked separately in offline Demo); exact students/scores/items/outbox checkpoint unchanged through authenticated export entry."
+    },
+    {
+      "name": "n108_string_cell_injection_reader",
+      "status": "PASS",
+      "evidence": "Audited grade reader accepts = + @ - and leading tabs/newlines as string data; raw XML preserves strings and entities with zero formula nodes or XML errors."
+    },
+    {
+      "name": "n108_CSV_and_offline",
+      "status": "PASS",
+      "evidence": "New module and affected source assets precached by actual sw.js; first offline Koshoof visit downloads XLSX, offline reload same-document readiness and export succeed. No cloud/Sync certification claimed."
+    },
+    {
+      "name": "n108_mobile_touch_download",
+      "status": "PASS",
+      "evidence": "Fresh mobile/touch emulation 390px: actual names XLSX and CSV downloads via tap, disposable context."
+    }
+  ],
+  "screenshots": [
+    "test-results/n108/320-light.png",
+    "test-results/n108/320-dark.png",
+    "test-results/n108/390-light.png",
+    "test-results/n108/390-dark.png",
+    "test-results/n108/768-light.png",
+    "test-results/n108/768-dark.png",
+    "test-results/n108/1280-light.png",
+    "test-results/n108/1280-dark.png"
+  ],
+  "errors": [],
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 301\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n108-readable-excel-xlsx-koshoof-20261015/tests/n108-xlsx-export-browser.mjs:84:14",
+    "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(rows.some(r => r[1] === 0))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n108-readable-excel-xlsx-koshoof-20261015/tests/n108-xlsx-export-browser.mjs:86:58",
+    "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(rows.some(r => r[1] === 0))\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n108-readable-excel-xlsx-koshoof-20261015/tests/n108-xlsx-export-browser.mjs:86:58",
+    "locator.click: Error: strict mode violation: locator('[data-act=\"grade-panel-close\"]') resolved to 2 elements:\n    1) <button class=\"btn btn--quiet\" data-act=\"grade-panel-close\">إغلاق</button> aka getByLabel('استيراد الكشوف').getByText('إغلاق')\n    2) <button class=\"btn btn--quiet\" data-act=\"grade-panel-close\">إغلاق</button> aka getByRole('button', { name: 'إغلاق' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-act=\"grade-panel-close\"]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n108-readable-excel-xlsx-koshoof-20261015\\tests\\n108-xlsx-export-browser.mjs:101:56",
+    "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-grade-export-panel]:visible') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n108-readable-excel-xlsx-koshoof-20261015\\tests\\n108-xlsx-export-browser.mjs:106:95"
+  ],
+  "productSha256": {
+    "src/views/grades.js": "4eff7068162c5e06ba616ab2df369a13fe88bc25a182b90446192b803d3e2a2b",
+    "src/styles/grades.css": "fdd7907a2ae633459e53dfc0d450e5a719c54a21c398cfb5f0e2d7162f4ca95e",
+    "src/lib/grade-transfer-export.js": "3a226604f9b73970c05459b5a921ebb6427a44244db7fb8483ea8b1031b768fb",
+    "src/lib/grade-transfer-xlsx.js": "bea9176a7363846c36e118f8ba2691fc34aaef37f351e184e6621faf326f3fbf",
+    "sw.js": "07676a0fcaea25cdb7157dd1de6bc962dae9d64b4a58473abf917bf682a93864"
+  },
+  "sampleRows": [
+    [
+      "اسم الطالب",
+      "تقويمات تحريرية وتطبيقات عملية (العظمى 60)",
+      "عنوان المعلم الطويل لتقييم المهام الأدائية والمشاركة والتفاعل اليومي (العظمى 40)"
+    ],
+    [
+      "=1+1",
+      null,
+      null
+    ],
+    [
+      "أحمد محمد عبدالله عبدالرحمن عبدالعزيز إبراهيم سليمان الحربي الطويل",
+      12.5,
+      0
+    ],
+    [
+      "طالب اصطناعي 10",
+      12.5,
+      0
+    ]
+  ],
+  "offlineCached": {
+    "src/lib/grade-transfer-xlsx.js": true,
+    "src/lib/grade-transfer-export.js": true,
+    "src/views/grades.js": true,
+    "src/styles/grades.css": true
+  },
+  "ownedBrowserClosed": true,
+  "ownedServerStopped": true
+}

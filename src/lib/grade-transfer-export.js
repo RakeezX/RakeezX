@@ -5,14 +5,17 @@ const text = value => {
   if (/^[\s]*[=+@-]|^[\t\r\n]/.test(string)) string = "'" + string;
   return '"' + string.replaceAll('"', '""') + '"';
 };
-export function exportGradeCsv({ roster, items, ctx, className, subject, term, noorReview = false, blankTemplate = false, noorGroups = {}, noorConfirmed = false, includeIds = false }) {
-  if (noorReview) return exportNoorReview({ roster, items, ctx, groups: noorGroups, confirmed: noorConfirmed });
+export function gradeExportRows({ roster, items, ctx, blankTemplate = false, includeIds = false }) {
   if (blankTemplate) items = items.filter(isTransferItem);
   const lines = [[...(includeIds ? ['معرف الطالب'] : []), 'اسم الطالب', ...items.map(i => `${i.name} (العظمى ${i.max})`)]];
   for (const s of [...roster].sort((a,b) => a.name.localeCompare(b.name, 'ar') || a.id.localeCompare(b.id))) {
     lines.push([...(includeIds ? [s.id] : []), s.name, ...items.map(i => blankTemplate ? '' : itemScore(i, ctx[s.id]) ?? '')]);
   }
-  return '\uFEFF' + lines.map(row => row.map(v => typeof v === 'number' ? String(v) : text(v)).join(',')).join('\r\n');
+  return lines;
+}
+export function exportGradeCsv(options) {
+  if (options.noorReview) return exportNoorReview({ ...options, groups: options.noorGroups === undefined ? {} : options.noorGroups, confirmed: options.noorConfirmed });
+  return '\uFEFF' + gradeExportRows(options).map(row => row.map(v => typeof v === 'number' ? String(v) : text(v)).join(',')).join('\r\n');
 }
 // AI-authored N105: class labels only, never student identity or timestamps.
 export function gradeCsvFilename({ className, noorReview = false, namesOnly = false, blankTemplate = false } = {}) {

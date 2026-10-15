@@ -129,3 +129,7 @@
   .topbar__actions > .roster-toolbar-action { flex:1; min-width:0; }
   .topbar__actions .roster-toolbar-action { height:44px; line-height:1.2; }
 }
+
+/* AI-authored N108: compact format control stays inside narrow RTL panels. */
+.grade-transfer__format { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.grade-transfer__format .input { width: auto; max-width: 100%; min-height: 44px; }

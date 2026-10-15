@@ -122,6 +122,7 @@ export async function browserFlow({q,owner}) {
    await page.goto(base+'/#/teaching/t/koshoof?export=1');await exp.waitFor();assert.equal(await imp.isVisible(),false);assert.equal(await page.locator('[data-noor-grouping]').getAttribute('open'),null);
    record('separate_panels_routes_empty_class','Actual current application: default grade table and empty student CTA unobstructed; ?import=1 / ?export=1 open only requested panel; exactly two import mode buttons, names-only default.');
    assert.equal(await exp.locator('[data-act="grade-template"]').count(),0);
+   await page.locator('[data-grade-export-format]').selectOption('csv');
    const filled=await download('grade-export'),namesDownload=await download('grade-names-export');
    assert.equal(namesDownload.rows[0].length,1);assert.ok(namesDownload.rows.length>1);
    assert.equal(namesDownload.name,'كشف أسماء طلاب فصل الرابع الابتدائي 1 - ركيز المعلم.csv');
