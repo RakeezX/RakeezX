@@ -314,9 +314,10 @@ const settings = {
         <details class="settings-profile card" data-settings-profile ${profileExpanded ? 'open' : ''}>
           <summary class="settings-profile-summary">
             <span class="row__icon">${icon('student')}</span>
-            <span class="row__main"><span class="row__title">بياناتك</span><span class="row__sub">${m.teacherName || 'بيانات الحساب والتقارير'}</span><span class="settings-profile-attention" data-profile-attention role="status" ${attention ? '' : 'hidden'}>${attention}</span></span>
+            <span class="row__main"><span class="row__title">بياناتك</span><span class="row__sub" title="${m.teacherName || 'بيانات الحساب والتقارير'}">${m.teacherName || 'بيانات الحساب والتقارير'}</span></span>
             <span class="settings-profile-edit">عرض وتعديل ${icon('chev')}</span>
           </summary>
+          <span class="settings-profile-attention" data-profile-attention role="status" ${attention ? '' : 'hidden'}>${attention}</span>
           <div class="card--pad">
           <form id="me-form" class="management-form settings-identity-form">
             <div class="field-row">
@@ -388,14 +389,12 @@ const settings = {
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-                  <p class="field__hint settings-email-feedback" role="status" data-email-change-feedback>${emailChangePending
-                    ? html`<span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span>`
-                    : emailFeedback.completed ? html`<span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span>`
-                    : 'البريد المعروض هو بريد حسابك الحالي. يتطلب تغيير البريد اكتمال التأكيد.'}</p>
-                  <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
-                    <summary>كيف أكمل تأكيد البريد؟</summary>
-                    <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
-                  </details>
+                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span></div>
+                    <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
+                      <summary>كيف أكمل تأكيد البريد؟</summary>
+                      <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
+                    </details>`
+                    : emailFeedback.completed ? html`<p class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span></p>` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
               </div>`}
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
