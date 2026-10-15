@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n106-koshoof-followup-ux-identity-mapping-20261015",
+      "productId": "N106",
+      "activationId": "po-20261012-continuous",
+      "priority": -61,
+      "scopeKey": "n106-koshoof-names-xlsx-columns-ambiguous-roster-mapping",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261015-N106-ROSTER-REVIEWED-MAP-UX",
+      "dependsOn": [
+        "continuous-n105-koshoof-flow-clarity-and-grade-auto-review-20261015"
+      ],
+      "objective": "User screenshot feedback after N105 accepted: tidy existing single-class Koshoof UI, NO new data/service contract. A. In Import put existing 'تنزيل نموذج أسماء فارغ' as a compact calm muted GREEN action (not oversized). In Export make 'تصدير كشف الأسماء' same green button appearance as adjacent 'تصدير كشف الأسماء والدرجات', retaining accessible distinct names/functionality, named class CSV downloads and Noor controls unchanged. B. In Students page move the ONE existing 'استيراد وتصدير الكشوف' action from content body to actual TOP toolbar with other actions, with one consistent 44px target (not duplicating); relabel separate paste-only shortcut 'إضافة سريعة' and a compact nearby clarification 'نسخ ولصق أسماء الطلاب' where useful, retaining empty-populated roster, keyboard and owner check. C. Fix redundant double disclosures on Import: currently outer 'تعديل المطابقة' then nested 'تعديل عمود الاسم أو المعرّف'; flatten to ONE progressive disclosure with identity field choices shown inside same card as necessary, without losing actual name/ID mapping and refs, and hide unneeded advanced inputs when exact match. D. Restore ability to manually add/map fourth or further grade column from uploaded CSV/XLSX: N105 removed 'grade-add-column' controls although third of three grade headers may be unknown. Show unrecognized columns or a clearly labelled 'إضافة عمود درجة' selector with options for ANY remaining unmapped nonmetadata/nonreadonly column, preserving current selectable manual item/new item with explicit per-item maximum confirmation. An otherwise ignored column never silently posts; show selected/rejected columns summary; typed grade values zero versus blank, owner/current item/term validation remain. E. The visible 'تضمين معرف الطالب الثابت لإعادة الاستيراد عند تشابه الأسماء' checkbox is technical clutter. Replace normal user experience by an explicit **per-ambiguous-student selection UI** at review if duplicate normalized names arise inside CURRENT same owned class, using reviewed candidate roster identities + student display/roll information and a user explicit one-to-one mapping confirmation. Keep unique-name matching automatic. Scope is current self-import only, never cross-class or foreign identity; no hidden auto-link, raw IDs in user UI, or silent writes. Internally reviewer can accept a chosen stable ID (or existing optional stable ID column from old exports) ONLY if exact roster/owner/name/section/revision match, and reject stale account-switch/missing row/tampered duplicate maps. Remove advanced export-ID checkbox ONLY if safe manual-resolution coverage actually works in focus tests; otherwise keep it in collapsed advanced section and state truthful feature limitation rather than weakening matching security. Do not modify service RPC or schema, do not change score atomicity, history, RLS or N58/N101. No real user record mutation in tests; only authenticated owner user-triggered explicit N90 save is enabled with unchanged validation. F. Test actual browser 320/390/768/1280 RTL light/dark, two usable top actions, template/export visual result, ONE disclosure, manual fourth column, ambiguous mapping choice and negative identity, re-review consent, existing N90 native owner/grade regression. Run least necessary real focused tests; no blanket suite. Deliver through sole controller/publisher with provider immutable and Production byte parity. EXACT SCOPED FIX TO SELF-IMPOSED ALLOWLIST: The original recorded legacy test tests/n90-transfer.test.mjs asserts that lowercase Exam should be ignored. N105 already normalized case and allows unique same-name+maximum Exam match, and actual source proved the lowercase match. Correct ONLY this stale casing expectation to source-backed normalization contract, preserving all duplicate aliases, conflicting maxima, readonly and foreign owner refusal cases; run that exact legacy suite and record real PASS, not a skipped check. The saved N106 candidate already passed 8/8 mandatory sensitive checks but the worker mistakenly output LOCAL_READY with an unrelated stale FAIL, and the controller correctly rejected it. Resume its SAME session and previously committed candidate, no alternate executor or rerunning full browser without affected source change.",
+      "allowedPaths": [
+        "src/views/grades.js",
+        "src/views/students.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/grade-transfer-export.js",
+        "src/styles/grades.css",
+        "tests/n106-koshoof-user-polish.mjs",
+        "tests/n106-koshoof-browser.mjs",
+        "tests/n106-koshoof-browser.json",
+        "tests/n106-ambiguous-student-selection.test.mjs",
+        "tests/n106-grade-add-column.test.mjs",
+        "tests/n105-koshoof-ux-browser.mjs",
+        "tests/n105-koshoof-ux-browser.json",
+        "tests/n90-unified-native.mjs",
+        "docs/automation-evidence/20261015/N106_KOSHOOF_FOLLOWUP.md",
+        "tests/n90-transfer.test.mjs"
+      ],
+      "verificationPaths": [
+        "src/views/grades.js",
+        "src/views/students.js",
+        "src/lib/grade-transfer.js",
+        "src/lib/grade-transfer-export.js",
+        "src/styles/grades.css"
+      ],
+      "requiredChecks": [
+        "n106_template_soft_green_and_two_green_export_actions",
+        "n106_roster_toolbar_single_koshoof_and_quick_paste",
+        "n106_flatten_one_grade_mapping_disclosure",
+        "n106_readd_unmapped_fourth_grade_column_manual_selection",
+        "n106_ambiguous_name_choice_confirm_current_class_owner_only",
+        "n106_N90_grade_zero_blank_max_retry_owner_regression",
+        "n106_live_dom_mobile_desktop_no_clipped_select",
+        "syntax_diff_and_owned_cleanup",
+        "n106_legacy_case_normalization_contract"
+      ],
+      "acceptance": [
+        "The names CSV template button in Import is an unobtrusive calm green secondary action; both names-only and populated-grade Export are visually equivalent green, distinct functions, no CSS clipping at small widths.",
+        "Students toolbar shows ONE Koshoof entry on populated/empty class, near explicitly labeled quick Paste/Add, no duplicated body Koshoof row and no missing controls for owner-verified teaching.",
+        "Mapping editing uses ONE disclosure only; all identity, manual scores and unknown columns can be intentionally reviewed. An unrecognized fourth valid grade column can be manually mapped after file load without exposing disabled/blank selectors.",
+        "If multiple real students share normalized name, no guessed match and no global ID exposure; user must map to exactly one current-owned student with verification and explicit approval. A guessed/new foreign/stale student ID cannot be applied. Existing optional legacy ID roundtrip still imports if valid.",
+        "All score/grades/owner validation and explicit new/manual score item consent remain, server RPC unchanged. Changing mode, canceling/closing, choosing file or previewing never writes.",
+        "Actual rendered browser checks for 320/390/768/1280 RTL light/dark and bounded owner/grade fixtures PASS. Exact Cloudflare provider/immutable/Production served revision before technical acceptance.",
+        "The previously failing tests/n90-transfer.test.mjs is run and passes under an explicit source-backed, nonweakening casing fixture correction, while unsafe duplicate aliases, conflicting maxima and readonly columns retain rejection. No FAIL remains on worker result."
+      ],
+      "preparationAuthority": {
+        "kind": "existing-graded-import-explicit-user-review-only",
+        "realStudentData": 0,
+        "migrations": 0,
+        "serviceOperations": 0,
+        "publication": true,
+        "ownerBoundCurrentRosterSelection": true
+      },
+      "releaseAuthority": "Latest PO explicitly requests N105 follow-up on student Koshoof toolbar, green buttons, removing double-disclosure and clumsy ID checkbox, ability to select unmatched grade column, and teacher-reviewed ambiguous same-class identity. Scoped client UI and existing authenticated N90 user-confirmed grades writes with strict current-account owner + score history/ACL/lease protections, focused synthetic testing and Production publish are already delegated. No new service, schema, Admin/Auth/RLS, automatic score write, real account/test data or aggregate all-class behavior."
+    }
+  ]
+}
