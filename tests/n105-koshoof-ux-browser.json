@@ -1,0 +1,178 @@
+{
+  "taskId": "continuous-n105-koshoof-flow-clarity-and-grade-auto-review-20261015",
+  "runId": "71e1872c-acf8-4226-ad4a-f41170f07ab2",
+  "baseSha": "c9c02a234bc3556a4ccea424ff4467e92f5437b5",
+  "status": "PASS",
+  "finalSourceSha256": {
+    "src/views/grades.js": "9c9a3c217d915398ca357b2ffadc972c3dfb82cc5f8f0586b1f15d09f74403f5",
+    "src/views/students.js": "47821f365bd16e4a68bcb316a4691082a8b06c19f28ebb4842ba9cbf141b235c",
+    "src/views/teaching-hub.js": "ec044794aa64737f26ddf873b112c98f361f20e84b3ec75d9b446a42493fab86",
+    "src/lib/grade-transfer.js": "386ef9baa66ec39e9b313164f8b83c6dd0f39fbb291c042fffc50c360a398f42",
+    "src/lib/grade-transfer-export.js": "634e5dbd6f1abd31626eaa421ceedd13e30561814e0111d10df8ade7459feffa",
+    "src/styles/grades.css": "cdfc9dd21314fe7e8124897f6f5fb01db1b7af2356a45ee2ada20f458732fee4"
+  },
+  "checks": [
+    {
+      "name": "n105_single_entrance_roster_grade_and_no_duplicate_hub_buttons",
+      "status": "PASS",
+      "evidence": "Actual account routes: one unified roster/grade entry, one populated hub tile, empty hub paste/add dialogs retained."
+    },
+    {
+      "name": "n105_archived_foreign_owner_navigation",
+      "status": "PASS",
+      "evidence": "Actual account store/UI rejects archived section, foreign Auth and foreign teaching owner before navigation."
+    },
+    {
+      "name": "separate_panels_routes_empty_class",
+      "status": "PASS",
+      "evidence": "Actual current application: default grade table and empty student CTA unobstructed; ?import=1 / ?export=1 open only requested panel; exactly two import mode buttons, names-only default."
+    },
+    {
+      "name": "n105_names_template_and_populated_exports",
+      "status": "PASS",
+      "evidence": "Actual downloads: names-only, names+five populated grade columns, safe actual class label, empty names template inside Import and no template in Export; optional ID is explicit."
+    },
+    {
+      "name": "n90_noor_compact_mapping_exact_40_60_and_three_columns",
+      "status": "PASS",
+      "evidence": "Five short 40/60 menus, visible totals, missing consent blocked; 30/70 rejected after reassignment and consent reset. Exact 40/60 produces precisely three manual-review columns; all-zero student remains 0/0 and missing marks remain blank."
+    },
+    {
+      "name": "n105_exported_rakeez_csv_autolinks",
+      "status": "PASS",
+      "evidence": "Upload actual downloaded populated CSV: all five persisted manual items linked and advanced mapping collapsed; no request."
+    },
+    {
+      "name": "n105_new_item_explicit_confirmation",
+      "status": "PASS",
+      "evidence": "Actual file handler prefills unique new manual name/max, rejects unchecked item, and final unchecked review sends zero RPC."
+    },
+    {
+      "name": "n90_import_modes_review_state_cancel",
+      "status": "PASS",
+      "evidence": "Names-only review exposes no grade mapping and sends nothing; explicit grades selection preserves parsed file but resets review/consent. Panel switches and same-workspace route return retain review with fresh unchecked consent. Cancel, disconnected old confirmation and delayed canceled read cause no write."
+    },
+    {
+      "name": "n90_import_mapping_mobile_and_advanced_preview",
+      "status": "PASS",
+      "evidence": "Actual CSV and XLSX handlers exercised; unique matching auto-collapses sound mapping. An unknown column opens only the unresolved card with ignore/error guidance; no fieldsets."
+    },
+    {
+      "name": "n90_rtl_accessibility_and_320_to_1280_render",
+      "status": "PASS",
+      "evidence": "24 matrix light/dark screenshots plus 4 default/empty/review screenshots: actual mapping and Noor export at 320/390/768/1280; zero horizontal page/panel overflow and visible controls >=44px. Keyboard Space selects modes, Tab follows mode buttons, RTL document retained."
+    },
+    {
+      "name": "n90_current_owner_grade_atomicity_and_cancel_preserved",
+      "status": "PASS",
+      "evidence": "Actual synthetic account UI/store: wrong owner, invalid lease, ownerless dispatch and offline confirmation denied before transport. Native stale max rejects whole batch, retains real failure, then explicit retirement and fresh review permit only consented 12→10 / 0; blank preserves existing 0. Existing native suite separately verifies rollback/owner/exact retry."
+    },
+    {
+      "name": "n90_names_only_vs_names_grades_functional_separation",
+      "status": "PASS",
+      "evidence": "One file, two actual mode buttons: names-only confirms a new persisted N12 identity/enrollment with owner-bound outbox and no grade RPC or native grade mutation; grades mode uses unchanged guarded atomic native RPC only after consent."
+    }
+  ],
+  "requests": [
+    {
+      "mutationId": "3b36daff-faef-4e08-a642-ed5563974f5b",
+      "deviceId": "n90-synthetic-device",
+      "ownerId": "a9000000-0000-4000-8000-000000000001",
+      "batch": {
+        "teachingId": "t",
+        "termId": "term",
+        "teachingRevision": 1,
+        "newItems": [],
+        "cells": [
+          {
+            "studentId": "a",
+            "itemId": "i",
+            "itemRevision": 2,
+            "max": 10,
+            "scoreId": "s",
+            "scoreRevision": 2,
+            "old": 4,
+            "value": 10
+          },
+          {
+            "studentId": "b",
+            "itemId": "i",
+            "itemRevision": 2,
+            "max": 10,
+            "scoreId": null,
+            "scoreRevision": 0,
+            "old": null,
+            "value": 0
+          }
+        ],
+        "overwriteConfirmed": true
+      }
+    },
+    {
+      "mutationId": "f6b41816-019d-441f-859b-c534b07994ae",
+      "deviceId": "n90-synthetic-device",
+      "ownerId": "a9000000-0000-4000-8000-000000000001",
+      "batch": {
+        "teachingId": "t",
+        "termId": "term",
+        "teachingRevision": 1,
+        "newItems": [],
+        "cells": [
+          {
+            "studentId": "a",
+            "itemId": "i",
+            "itemRevision": 4,
+            "max": 10,
+            "scoreId": "s",
+            "scoreRevision": 2,
+            "old": 4,
+            "value": 10
+          },
+          {
+            "studentId": "b",
+            "itemId": "i",
+            "itemRevision": 4,
+            "max": 10,
+            "scoreId": null,
+            "scoreRevision": 0,
+            "old": null,
+            "value": 0
+          }
+        ],
+        "overwriteConfirmed": true
+      }
+    }
+  ],
+  "screenshots": [
+    "390-default.png",
+    "390-empty.png",
+    "390-names-review.png",
+    "390-grades-review.png",
+    "light-320-names-only.png",
+    "light-320-mapping.png",
+    "light-320-export.png",
+    "light-390-names-only.png",
+    "light-390-mapping.png",
+    "light-390-export.png",
+    "light-768-names-only.png",
+    "light-768-mapping.png",
+    "light-768-export.png",
+    "light-1280-names-only.png",
+    "light-1280-mapping.png",
+    "light-1280-export.png",
+    "dark-320-names-only.png",
+    "dark-320-mapping.png",
+    "dark-320-export.png",
+    "dark-390-names-only.png",
+    "dark-390-mapping.png",
+    "dark-390-export.png",
+    "dark-768-names-only.png",
+    "dark-768-mapping.png",
+    "dark-768-export.png",
+    "dark-1280-names-only.png",
+    "dark-1280-mapping.png",
+    "dark-1280-export.png"
+  ],
+  "ownedServerStopped": true,
+  "leasedBrowserFinally": true
+}

@@ -6,7 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
-import studentsView, { canOpenRoster, rosterFileActions } from './students.js';
+import studentsView, { canOpenRoster } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
@@ -111,7 +111,6 @@ export default {
               استورد الأسماء وحدها أو مع درجاتها، أو أضف طالبًا يدويًا.
             </div>
             ${canOpenRoster(p) ? html`<div class="roster-entry-empty">
-              ${rosterFileActions(p)}
               <div class="roster-entry-actions" role="group" aria-label="إضافة أسماء الطلاب">
                 <button class="btn" data-act="paste-names" aria-label="لصق الأسماء">${icon('upload')} لصق الأسماء</button>
                 <button class="btn" data-act="add-student" aria-label="إضافة طالب يدويًا">${icon('plus')} إضافة طالب يدويًا</button>
@@ -133,7 +132,6 @@ export default {
       <div class="class-hub">
       ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
       ${activeGoalIndicator(tch.id, activeGoal)}
-      ${rosterFileActions(p)}
       <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
@@ -252,7 +250,6 @@ export default {
       if (!tch) return;
       const sec = store.getSection(tch.sectionId);
       if (!sec) return;
-      
       const data = await new Promise(resolve => {
         openSheet({
           title: 'تعديل الفصل',
@@ -345,7 +342,6 @@ export default {
           }
         }).then(resolve).catch(() => resolve(null));
       });
-      
       if (!data) return;
       if (data.addSubject) { await addSubjectToClass(sec.id); return; }
       try {

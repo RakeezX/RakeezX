@@ -30,8 +30,7 @@ function requireRoster(params, workspace = store.getActiveWorkspace()) {
 export function rosterFileActions(params) {
   if (!canOpenRoster(params)) return '';
   return html`<div class="roster-entry-actions" role="group" aria-label="استيراد وتصدير الكشوف">
-    <a class="btn btn--sm btn--ghost" data-act="file-import" href="#/teaching/${params.id}/koshoof?import=1" aria-label="استيراد الكشوف">${icon('upload')} استيراد الكشوف</a>
-    <a class="btn btn--sm btn--ghost" data-act="file-export" href="#/teaching/${params.id}/koshoof?export=1" aria-label="تصدير الكشوف">${icon('download')} تصدير الكشوف</a>
+    <a class="btn btn--sm btn--ghost" data-act="file-import" href="#/teaching/${params.id}/koshoof" aria-label="استيراد وتصدير الكشوف">${icon('upload')} استيراد وتصدير الكشوف</a>
   </div>`;
 }
 
@@ -299,7 +298,7 @@ export default {
   actions: {
     'file-import'(el, ev, params) {
       ev?.preventDefault();
-      if (requireRoster(params)) go(`/teaching/${params.id}/koshoof?import=1`);
+      if (requireRoster(params)) go(`/teaching/${params.id}/koshoof`);
     },
     'file-export'(el, ev, params) {
       ev?.preventDefault();

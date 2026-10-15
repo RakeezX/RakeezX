@@ -4,32 +4,44 @@ import { gradeNumber } from './grade-transfer-parsers.js';
 export const gradeNameKey = value => String(value ?? '').normalize('NFC').replace(/[\s\u0640\u064B-\u065F\u0670]/g, '').toLowerCase();
 export const isTransferItem = item => !item.deleted && !item.auto && (item.scoreMode ?? 'direct') === 'direct';
 
-// Suggestions are exact and unique; the final review remains the write boundary.
-export function suggestGradeMappings(headers, items) {
-  const key = value => String(value ?? '').normalize('NFC').trim();
-  const keys = headers.map(key), counts = new Map();
-  keys.forEach(k => counts.set(k, (counts.get(k) ?? 0) + 1));
-  const uniqueColumn = labels => {
-    const found = keys.flatMap((k,c) => labels.includes(k) ? [c] : []);
-    return found.length === 1 && counts.get(keys[found[0]]) === 1 ? found[0] : -1;
+// AI-authored N105: proposals only; no mutation or implicit confirmation.
+export function suggestGradeMappings(headers, items, { teachingId, ownerId } = {}) {
+  const key = value => gradeNameKey(value);
+  const digits = value => value.replace(/[٠-٩۰-۹]/g, c => String('٠١٢٣٤٥٦٧٨٩'.includes(c) ? '٠١٢٣٤٥٦٧٨٩'.indexOf(c) : '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
+  const parsed = headers.map(value => {
+    const label = String(value ?? '').normalize('NFC').trim();
+    const match = label.match(/^(.+?)\s*\(العظمى\s+([0-9٠-٩۰-۹]+(?:[.٫][0-9٠-٩۰-۹]{1,2})?)\)$/u);
+    const max = match ? Number(digits(match[2]).replace('٫','.')) : null;
+    return {label, name:match?.[1].trim(), max, canonical:match && max > 0 && max <= 9999.99 ? key(match[1])+':'+max : key(label)};
+  });
+  const uniqueColumn = label => {
+    const found = parsed.flatMap((h,c) => key(h.label) === key(label) ? [c] : []);
+    return found.length === 1 ? found[0] : -1;
   };
-  const nameColumn = uniqueColumn(['اسم الطالب']), idColumn = uniqueColumn(['معرف الطالب']);
-  const metadata = new Set(['الفصل', 'المادة', 'الفصل الدراسي', 'نوع الملف']);
+  const nameColumn = uniqueColumn('اسم الطالب'), idColumn = uniqueColumn('معرف الطالب');
+  const metadata = new Set(['الفصل', 'المادة', 'الفصل الدراسي', 'نوع الملف'].map(key));
   const reasons = [], targets = [];
-  const live = items.filter(i => !i.deleted && Number(i.serverRevision) > 0);
-  const mappings = keys.map((k,c) => {
+  // Canonical Sync rows use the already owner-bound database; explicit foreign metadata still rejects.
+  const live = items.filter(i => !i.deleted && (!teachingId || i.teachingId === teachingId) && (!ownerId || i.ownerId == null || i.ownerId === ownerId));
+  const mappings = parsed.map((h,c) => {
     if (c === nameColumn || c === idColumn) { reasons[c] = 'identity'; return {kind:'ignore'}; }
-    if (metadata.has(k)) { reasons[c] = 'metadata'; return {kind:'ignore'}; }
-    const matches = live.filter(i => k === key(i.name) || k === key(`${i.name} (العظمى ${i.max})`));
-    if (counts.get(k) === 1 && matches.length === 1) {
-      const item = matches[0];
-      if (!isTransferItem(item)) { reasons[c] = 'readonly'; return {kind:'ignore'}; }
-      targets[c] = item.id;
-      return {kind:'existing',itemId:item.id};
+    if (metadata.has(key(h.label))) { reasons[c] = 'metadata'; return {kind:'ignore'}; }
+    const sameName = live.filter(i => key(i.name) === key(h.name ?? h.label));
+    if (sameName.some(i => !isTransferItem(i)) || !sameName.length && ['المشاركة','المشاركة والتفاعل','الحضور','الغياب','المجموع','النسبة'].some(name => key(name) === key(h.name ?? h.label))) { reasons[c] = 'readonly'; return {kind:'ignore'}; }
+    const unique = parsed.filter(other => other.canonical === h.canonical).length === 1 &&
+      parsed.filter(other => key(other.name ?? other.label) === key(h.name ?? h.label)).length === 1;
+    if (unique && sameName.length === 1 && Number(sameName[0].serverRevision) > 0 &&
+        Number.isFinite(Number(sameName[0].max)) && Number(sameName[0].max) > 0 &&
+        (h.max === null || h.max === Number(sameName[0].max))) {
+      targets[c] = sameName[0].id;
+      return {kind:'existing',itemId:sameName[0].id};
+    }
+    if (unique && !sameName.length && h.name && h.name.length <= 50 && !/[()]/.test(h.name) && h.max > 0 && h.max <= 9999.99) {
+      reasons[c] = 'proposal';
+      return {kind:'new',name:h.name,max:h.max,confirmed:false};
     }
     reasons[c] = 'exception'; return {kind:'ignore'};
   });
-  // Two different headers pointing at one item are ambiguous as well.
   targets.forEach((id,c) => {
     if (targets.filter(t => t === id).length > 1) { mappings[c] = {kind:'ignore'}; reasons[c] = 'exception'; }
   });
