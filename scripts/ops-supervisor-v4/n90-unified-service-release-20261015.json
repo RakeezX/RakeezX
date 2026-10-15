@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n90-unified-import-service-and-release-20261015",
+      "productId": "N90",
+      "activationId": "po-20261012-continuous",
+      "priority": -25,
+      "scopeKey": "n90-unified-import-approved-one-migration-release-20261015",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261015-N90-UNIFIED-MIGRATION-EXACT-SCOPE",
+      "resourceClass": "live-mutation",
+      "budgetMinutes": 65,
+      "idleMinutes": 12,
+      "objective": "Finish CURRENT OPEN N90 unified student+grade import cleanly, using the previously completed source candidate f037d84b92bb5a0ee6cde69f77e008e9a2690641 from worktree .worktrees/continuous-n90-unified-import-noor-20261014 and its proven exact original SQL file supabase/migrations/20261014100000_n90_unified_student_grade_import.sql (preflight bytes SHA256 25162f89546c8792dab8e6ea201eef86abcdf40d84466060ca46fcc78c8112b4). PO newly confirms 2026-10-15 'N90 اعمل اللازم وخلصها لا تنتظر وتعطلنا' for the specifically defined unified import. Reuse all existing 8/8 actual-app/native N90 current-source gates and 4/4 targeted N12/N101 preservation checks unchanged when dependencies unchanged. First inspect CURRENT main, save current N58/N101/N64/N44/N102 (if published) and grade/sync owner protections, and merge only the N90 legitimate code delta in isolated worktree without replacing a complete worktree. Protect source-history outbox, N100 target marks, current year/calendar selection context, offline shell and scoring. The required service operation is one additive migration only, never a rewrite of already-applied code: '20261014100000_n90_unified_student_grade_import.sql' defining exactly schema 'rakeezx' unified_student_grade_import_capability() and apply_unified_student_grade_import(text,text,jsonb), with owner-bound atomic student+enrollment+items/scores mutation and exact journal receipt. The service step MAY only be executed through an existing sanctioned Supabase service channel actually granted to this scoped worker/task, after comparing migration SHA/preconditions, verifying version absent, native transaction + negative owner/ACL tests, and acquiring applicable live-mutation lease. Do NOT try to create new MCP integration, reverse engineer provider tokens, use user profile secrets or repeat a previously rejected operator setup action. If no sanctioned live service capability exists in this worker, preserve reconciled candidate and BLOCKED with a specific tool/capability reason; DO NOT publish a UI that calls an absent RPC or claim service was applied. On success, apply migration once to the linked correct Production project xl rub? The correct project ref is 'xlrubcwjqktzzunrvuns', verify linkage and not another account. Read back migration history, exact function definitions, ACL owner-aware execute, authenticated-only RPC, no broader grants, unchanged old function definition; run safe transactional synthetic fixture only, never real students or uncontrolled test accounts. Then finish integrated current-main UX: one names-only or names+grades review from empty/filled class, blank current-item template, 7→max with explicit review, 0/blank, cancel/consent, 40/60 3-column Noor manual export, frozen item max and idempotent atomic backend apply. Final publication only by existing one publisher with provider/immutable/Production exact source proof. The original separate N90 card is blocked service-external; do not edit/relaunch it, recreate same native tests as paid ritual, invent hidden data corrections, or auto-apply actual marks. If confirmed no service path exists, report exact missing channel with saved progress and do not bypass security. The prior read-only service metadata preflight consumed one of two allowed provider calls. The exact pending migration and mandatory provider readback require one call each, three total; this is a bounded scope correction without additional SQL or permission changes. Do not repeat prior passed native current-main tests unless relevant source changed. Use existing sanctioned connection only and preserve all checked owner/scoring/ACL safeguards.",
+      "allowedPaths": [
+        "src/lib/grade-transfer.js",
+        "src/lib/grade-transfer-parsers.js",
+        "src/lib/grade-transfer-export.js",
+        "src/lib/student-import.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/store.js",
+        "src/views/grades.js",
+        "src/views/students.js",
+        "src/views/teaching-hub.js",
+        "src/styles/grades.css",
+        "supabase/migrations/20261014100000_n90_unified_student_grade_import.sql",
+        "tests/n90-*",
+        "tests/n12-*",
+        "tests/n101-context-local.test.mjs",
+        "docs/automation-evidence/20261015/N90_UNIFIED_SERVICE_RELEASE.md"
+      ],
+      "verificationPaths": [
+        "supabase/migrations/20261014100000_n90_unified_student_grade_import.sql",
+        "src/store.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/views/grades.js"
+      ],
+      "requiredChecks": [
+        "n90_exact_migration_and_owner_permission_preflight",
+        "n90_service_migration_applied_once_and_hosted_readback",
+        "n90_native_owner_grade_atomicity_retry_and_scoring",
+        "n90_current_main_calendar_N101_N100_sync_guards",
+        "n90_actual_ui_preview_zero_blank_cap_noor_and_offline",
+        "syntax_diff_and_owned_cleanup"
+      ],
+      "acceptance": [
+        "The one additive named schema migration is applied exactly once with provider migration record + full definition/ACL readback and no changes to real teacher/student data; or the ticket remains blocked and cannot be falsely delivered.",
+        "Hosted RPC strictly rejects unsigned, wrong-owner, inactive year/term, wrong teaching revision, deleted/student identity reuse, stale item max, forged mutation ID and failed score after enroll (one transaction rollback); native fixtures demonstrate the exact behavior.",
+        "Existing local N90 candidate merged onto latest main without reverting N44/N64/N102 UI, N58 year calendar or N101 owner/session guards; use prepared code and evidence.",
+        "Actual account-synthetic UI includes names-only/combined import, blank/zero/cap and empty-class path, Noor 40/60 exactly 3 columns for manual entry, and no hidden score changes or outbox pollution after cancel.",
+        "Only if backend capability exists and all checks pass does one publisher deploy and verify Cloudflare immutable/Production, then await PO for live function acceptance; never label Noor import file as officially uploadable."
+      ],
+      "preparationAuthority": {
+        "kind": "n90-exact-service-migration-and-client-release",
+        "serviceOperations": 1,
+        "migrations": 1,
+        "providerCalls": 3,
+        "realStudentData": 0,
+        "publication": true,
+        "sqlScope": "supabase/migrations/20261014100000_n90_unified_student_grade_import.sql",
+        "projectRef": "xlrubcwjqktzzunrvuns",
+        "priorSourceSha256": "25162f89546c8792dab8e6ea201eef86abcdf40d84466060ca46fcc78c8112b4",
+        "liveAuthorizationRef": "PO-20261015-N90-UNIFIED-MIGRATION-EXACT-SCOPE"
+      },
+      "releaseAuthority": "Latest PO 2026-10-15 expressly instructs completion of the already approved N90 unified names+grades workflow and any actual technical prerequisite. This grants only the exact previously prepared additive named migration 20261014100000_n90_unified_student_grade_import.sql on verified linked Rakeez Supabase project, contingent on native owner/transaction/regression/ACL proof, sanctioned tool access and live lease. No unrelated migration, Auth/RLS/grants beyond pinned authenticated RPC, bulk existing user data, real student imports, admin access, automatic Noor submission, extra paid service, or force deployment. UI change can be published only AFTER exact backend capability readback."
+    }
+  ]
+}
