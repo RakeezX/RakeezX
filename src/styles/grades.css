@@ -58,3 +58,43 @@
 .grade-transfer__school { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-block:8px; }
 .grade-transfer__school .btn { flex:none; min-height:44px; }
 .grade-transfer__school .grade-transfer__hint { flex:1 1 180px; min-width:0; }
+/* AI-authored N90: separate focused transfer surfaces. */
+.grade-transfer[hidden], .grade-transfer section[hidden] { display:none; }
+.grade-transfer__toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.grade-transfer__toolbar .btn { min-height:44px; }
+.grade-transfer__heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.grade-transfer__heading h2 { font-size:18px; margin:0; }
+.grade-transfer__modes { display:flex; max-width:100%; margin-block:12px; }
+.grade-transfer__modes button { flex:1; min-height:44px; margin:0; }
+.grade-transfer__file, .grade-transfer__field { flex-direction:column; align-items:stretch !important; }
+.grade-transfer__mapping { grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); align-items:start; }
+.grade-transfer__column { min-width:0; padding:12px; border:1px solid var(--border); border-radius:10px; }
+.grade-transfer__column > label { margin-block:0 8px; font-weight:600; }
+.grade-transfer select, .grade-transfer input:not([type=checkbox]), .grade-transfer button { min-height:44px; }
+.grade-transfer__column select, .grade-transfer__field select { width:100%; }
+.grade-transfer__chips { display:flex; flex-wrap:wrap; gap:8px; margin-block:14px; }
+.grade-transfer__chips label { flex:0 1 auto; min-width:0; max-width:100%; min-height:44px; margin:0; padding:8px 12px; border:1px solid var(--border); border-radius:10px; }
+.grade-transfer__chips label span { min-width:0; overflow-wrap:anywhere; }
+.grade-transfer__buttons > div { flex:1 1 220px; min-width:0; }
+.grade-transfer__buttons .btn { width:100%; }
+.grade-transfer details > summary { min-height:44px; padding-block:10px; }
+.grade-transfer [data-noor-grouping] { border-top:1px solid var(--border); margin-top:12px; }
+.grade-transfer__noor-row { display:grid; grid-template-columns:minmax(0,1fr) 88px; gap:12px; align-items:center; padding-block:6px; }
+.grade-transfer [data-noor-grouping] .grade-transfer__noor-row label { margin:0; overflow-wrap:anywhere; }
+.grade-transfer__noor-row select { width:88px; }
+.grade-transfer input[type=checkbox] { flex-shrink:0; }
+.grade-transfer :is(button,select,input,summary):focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+@media(max-width:540px) {
+ .grade-transfer { padding:12px; }
+ .grade-transfer__toolbar { width:100%; }
+ .grade-transfer__toolbar .btn { flex:1 1 130px; }
+ .grade-transfer__modes { width:100%; }
+ .grade-transfer__add > * { width:100%; }
+}
+
+.grade-transfer__mapping { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media(max-width:640px) { .grade-transfer__mapping { grid-template-columns:minmax(0,1fr); } }
+.grades-01c__mode-bar { flex-wrap:wrap; }
+.grades-01c__mode-bar .grade-transfer__toolbar { min-width:0; }
+
+.grade-transfer__noor-row { max-inline-size:560px; }

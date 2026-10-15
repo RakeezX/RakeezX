@@ -14,7 +14,7 @@ import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { playQuickLogPlus, playQuickLogMinus } from '../lib/sound.js';
 import { showScoreFloatEffect } from '../lib/effects.js';
 import { subitemCompletionState, subitemSelectedPoints } from '../lib/score-foundation.js';
-import { detectStudentNameColumn, readStudentFile } from '../lib/student-import.js';
+import { detectStudentNameColumn } from '../lib/student-import.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, suggestNoorGroup } from '../lib/grade-transfer-export.js';
@@ -27,7 +27,9 @@ let bulkSelected = new Set();
 let bulkScoreVal = '';
 let query = '';
 const scoreValidation = new Map();
-let transfer = { rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+let transferBinding = null;
+let transferRoute = null;
+let transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
 
 let closeTeacherSetupImport = () => {};
 let setupRequest = 0;
@@ -46,45 +48,57 @@ function setupBinding(teachingId) {
 
 function transferPanel(teachingId) {
   const { items } = store.teachingContext(teachingId);
+  if (transferRoute !== location.hash) {
+    transferRoute = location.hash;
+    const request = new URLSearchParams(location.hash.split('?')[1]);
+    if (request.get('import') === '1') transfer.panel = 'import';
+    else if (request.get('export') === '1') transfer.panel = 'export';
+  }
+  const selectedItems = items.filter(i => !transfer.exportItems || transfer.exportItems.has(i.id));
+  const groupTotal = group => selectedItems.filter(i => (transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group).reduce((sum,i) => sum + Number(i.max),0);
   const review = transfer.review;
   const opts = transfer.rows?.[0] ?? [];
   const mappingSummary = html`<div data-grade-mapping-summary>
         <p>اسم الطالب: ${opts[transfer.nameColumn] ?? 'يلزم اختيار العمود'}${transfer.idColumn >= 0 ? html` · المعرف: ${opts[transfer.idColumn]}` : ''}</p>
-        <ul>${transfer.mappings.map((m,c) => m.kind !== 'ignore' ? html`<li>${m.kind === 'new' ? m.name : items.find(i => i.id === m.itemId)?.name} (العظمى ${m.kind === 'new' ? m.max : items.find(i => i.id === m.itemId)?.max})</li>` : '')}</ul>
+        ${transfer.importMode !== 'names' ? html`<p class="grade-transfer__hint">بنود مطابقة: ${transfer.mappings.filter(m => m.kind !== 'ignore').length} · الأعمدة الأخرى تُتجاهل ما لم تخترها.</p>` : ''}
         ${transfer.reasons?.includes('metadata') ? html`<p class="grade-transfer__hint">تُتجاهل بيانات الفصل والمادة ونوع الملف.</p>` : ''}
         ${transfer.reasons?.includes('readonly') ? html`<p class="grade-transfer__hint">البنود الآلية والفرعية للقراءة فقط.</p>` : ''}
       </div>`;
-  return html`<details class="grade-transfer noprint" data-grade-transfer ${transfer.rows || transfer.message || transfer.recovery.length || new URLSearchParams(location.hash.split('?')[1]).has('import') ? 'open' : ''}>
-    <summary>استيراد الأسماء والدرجات وتصديرها</summary>
+  return html`<div class="grade-transfer noprint" data-grade-transfer ${!transfer.panel ? 'hidden' : ''}>
+    <section id="grade-import-panel" data-grade-import-panel aria-label="استيراد الكشوف" ${transfer.panel !== 'import' ? 'hidden' : ''}>
+    <div class="grade-transfer__heading"><h2>استيراد الكشوف</h2><button class="btn btn--quiet" data-act="grade-panel-close">إغلاق</button></div>
     ${store.getActiveWorkspace()?.type === 'account' ? html`<div class="grade-transfer__school">
       <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
       <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON مراجَعة فقط · معاينة دون حفظ أو اتصال مباشر بمدرستي</span>
     </div>` : ''}
-    <label>نوع الاستيراد <select class="input" data-change="grade-import-mode" ${transfer.busy ? 'disabled' : ''}><option value="names" ${transfer.importMode === 'names' ? 'selected' : ''}>أسماء فقط</option><option value="grades" ${transfer.importMode !== 'names' ? 'selected' : ''}>أسماء ودرجات</option></select></label>
-    ${!transfer.rows ? html`<label>اختر ملف الأسماء أو الدرجات <input class="input" type="file" accept=".csv,.xlsx" data-change="grade-file" ${transfer.busy ? 'disabled' : ''}></label>
-      <p class="grade-transfer__hint">حتى 300 طالب · 1 MB</p>
-      <p class="grade-transfer__hint">CSV أو XLSX · للأسماء والدرجات: الصف الأول عناوين. الفراغ لا يغيّر الدرجة؛ الصفر يُرصد.</p>` : ''}
+    <div class="segmented grade-transfer__modes" role="group" aria-label="نوع الاستيراد">
+      ${['names','grades'].map(value => html`<button type="button" class="segmented__btn ${transfer.importMode === value ? 'is-on' : ''}" data-act="grade-import-mode" data-mode="${value}" data-fk="grade-import-${value}" aria-pressed="${transfer.importMode === value ? 'true' : 'false'}" ${transfer.busy ? 'disabled' : ''}>${value === 'names' ? 'أسماء فقط' : 'أسماء ودرجات'}</button>`)}
+    </div>
+    ${!transfer.rows ? html`<label class="grade-transfer__file">اختر الكشف <input class="input" type="file" accept=".csv,.xlsx" data-change="grade-file" ${transfer.busy ? 'disabled' : ''}></label>
+      <p class="grade-transfer__hint">CSV أو XLSX بعناوين أعمدة · حتى 300 طالب و1 MB · الفراغ لا يغيّر الدرجة والصفر يُرصد.</p>` : ''}
     ${transfer.busy && !transfer.writing ? html`<button class="btn" data-act="grade-cancel">إلغاء القراءة</button>` : ''}
     ${transfer.rows ? html`<p data-grade-file-name>${transfer.fileName}</p>
       ${review ? html`<details data-grade-reviewed-mapping><summary>مطابقة الأعمدة</summary>${mappingSummary}</details>` : mappingSummary}
-      ${!review ? html`<details data-grade-mapping-details ${transfer.editMapping || transfer.nameColumn < 0 || transfer.reasons?.includes('exception') ? 'open' : ''}>
-      <summary>تعديل المطابقة${transfer.reasons?.includes('exception') ? ' — أعمدة تحتاج مراجعة أو تجاهل' : ''}</summary><div class="grade-transfer__mapping">
-      <label>عمود اسم الطالب <select class="input" data-grade-name data-change="grade-mapping"><option value="-1">اختر العمود</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
-      <label>معرف ركيز الثابت (اختياري) <select class="input" data-grade-id data-change="grade-mapping"><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      ${!review ? html`<details data-grade-mapping-details ${transfer.editMapping || transfer.nameColumn < 0 || transfer.importMode !== 'names' && transfer.reasons?.includes('exception') ? 'open' : ''}>
+      <summary>تعديل المطابقة${transfer.importMode !== 'names' && transfer.reasons?.includes('exception') ? ' — أعمدة تحتاج مراجعة أو تجاهل' : ''}</summary><div class="grade-transfer__mapping">
+      <label class="grade-transfer__field">عمود اسم الطالب <select class="input" data-grade-name data-change="grade-mapping" data-fk="grade-name"><option value="-1">اختر العمود</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      <label class="grade-transfer__field">معرف ركيز الثابت (اختياري) <select class="input" data-grade-id data-change="grade-mapping" data-fk="grade-id"><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
       ${opts.map((v,c) => {
         if (transfer.importMode === 'names' || !transfer.visibleColumns?.has(c)) return '';
         if ([transfer.nameColumn,transfer.idColumn].includes(c) || ['metadata','readonly'].includes(transfer.reasons?.[c])) return '';
         const m = transfer.mappings[c] ?? { kind: 'ignore' };
-        return html`<fieldset data-grade-column="${c}"><legend>${c+1}: ${v}</legend>
-          <select class="input" data-grade-kind data-change="grade-mapping">
+        if (!transfer.editMapping && transfer.reasons?.includes('exception') && m.kind === 'existing') return '';
+        return html`<div class="grade-transfer__column" data-grade-column="${c}"><label for="grade-column-${c}">${c+1}: ${v}</label>
+          ${transfer.reasons?.[c] === 'exception' && m.kind === 'ignore' ? html`<p class="grade-transfer__hint">لم تُطابق هذه الدرجة؛ اختر بندًا أو اتركها للتجاهل.</p>` : ''}
+          <select id="grade-column-${c}" class="input" data-grade-kind data-change="grade-mapping" data-fk="grade-column-${c}">
             <option value="ignore" ${m.kind === 'ignore' ? 'selected' : ''}>تجاهل</option>
             ${items.filter(isTransferItem).map(i => html`<option value="${i.id}" ${m.itemId === i.id ? 'selected' : ''}>${i.name} — العظمى ${i.max}</option>`)}
             <option value="new" ${m.kind === 'new' ? 'selected' : ''}>إنشاء بند يدوي مسمّى صراحة</option>
           </select>
-          ${m.kind === 'new' ? html`<label>اسم البند <input class="input" data-grade-new-name maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
-            <label>العظمى <input class="input" data-grade-new-max inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label>
-            <label><input type="checkbox" data-grade-new-confirm data-change="grade-mapping" ${m.confirmed ? 'checked' : ''}> أؤكد إنشاء هذا البند بهذه العظمى</label>` : ''}
-        </fieldset>`;
+          ${m.kind === 'new' ? html`<label>اسم البند <input class="input" data-grade-new-name data-fk="grade-new-name-${c}" maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
+            <label>العظمى <input class="input" data-grade-new-max data-fk="grade-new-max-${c}" inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label>
+            <label><input type="checkbox" data-grade-new-confirm data-fk="grade-new-confirm-${c}" data-change="grade-mapping" ${m.confirmed ? 'checked' : ''}> أؤكد إنشاء هذا البند بهذه العظمى</label>` : ''}
+        </div>`;
       })}
       ${transfer.importMode !== 'names' ? html`<div class="grade-transfer__add"><select class="input" data-grade-add-choice aria-label="عمود درجة آخر">${opts.map((v,c) => ![transfer.nameColumn,transfer.idColumn].includes(c) && !transfer.visibleColumns?.has(c) && !['metadata','readonly'].includes(transfer.reasons?.[c]) ? html`<option value="${c}">${c+1}: ${v}</option>` : '')}</select><button class="btn" data-act="grade-add-column">إضافة عمود درجة</button></div>` : ''}
       </div></details>` : html`<button class="btn" data-act="grade-edit-mapping" ${transfer.busy ? 'disabled' : ''}>تعديل المطابقة</button>`}
@@ -108,18 +122,24 @@ function transferPanel(teachingId) {
     ${transfer.recovery.map(r => html`<p role="alert">طلب محفوظ: ${r.mutationId} — ${r.state === 'rejected' ? 'مرفوض، يلزم تصحيح سبب الرفض قبل دفعة جديدة' : 'لم يتأكد الإيصال بعد؛ أعد الطلب نفسه فقط'}
       ${r.state !== 'rejected' ? html`<button class="btn" data-act="grade-retry" data-mutation="${r.mutationId}" ${transfer.busy ? 'disabled' : ''}>استعادة إيصال الطلب نفسه</button>`
         : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
-    <details data-grade-export-panel ${transfer.exportOpen ? 'open' : ''}><summary>تصدير الدرجات</summary>
-    <p data-grade-export-alert role="alert" hidden></p><fieldset><legend>بنود التصدير</legend>${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> ${i.name} / ${i.max}</label>`)}</fieldset>
-    <div class="grade-transfer__buttons"><button class="btn btn--primary" data-act="grade-template">تنزيل قالب درجات فارغ (CSV)</button>
-    <button class="btn" data-act="grade-export">تصدير درجات CSV</button>
-    </div><p class="grade-transfer__hint">القالب يحتوي أسماء الفصل وبنود الدرجات اليدوية فقط؛ البنود الآلية والفرعية ليست مجاميع قابلة للإدخال.</p>
-    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تعيين بنود نور إلى 40 / 60</summary>
-    ${items.filter(i => !transfer.exportItems || transfer.exportItems.has(i.id)).map(i => html`<label>${i.name} / ${i.max}<select class="input" data-noor-item="${i.id}" data-change="grade-noor-group"><option value="">اختر مجموعة</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group === '40' ? 'المهام الأدائية والمشاركة والتفاعل (40)' : 'تقويمات تحريرية وتطبيقات عملية (60)'}</option>`)}</select></label>`)}
+    </section>
+    <section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
+    <div class="grade-transfer__heading"><h2>تصدير الكشوف</h2><button class="btn btn--quiet" data-act="grade-panel-close">إغلاق</button></div>
+    <p data-grade-export-alert role="alert" hidden></p>
+    <div class="grade-transfer__chips" role="group" aria-label="بنود التصدير">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item data-fk="grade-export-${i.id}" value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> <span>${i.name} <small> / ${i.max}</small></span></label>`)}</div>
+    <div class="grade-transfer__buttons"><div><button class="btn" data-act="grade-template">تنزيل قالب فارغ</button><p class="grade-transfer__hint">أسماء الطلاب وبنود يدوية مختارة؛ خانات الدرجات فارغة.</p></div>
+    <div><button class="btn btn--primary" data-act="grade-export">تصدير الدرجات</button><p class="grade-transfer__hint">أسماء الطلاب ودرجات البنود المختارة الحالية.</p></div></div>
+    <details data-grade-roundtrip><summary>خيارات ركيز المتقدمة</summary><label><input type="checkbox" data-grade-export-ids> تضمين معرف الطالب الثابت لإعادة الاستيراد في ركيز عند تشابه الأسماء</label><p class="grade-transfer__hint">اختياري لملفات ركيز فقط؛ لا يُضاف إلى كشف نور.</p></details>
+    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تجهيز كشف نور 40/60</summary>
+    <p class="grade-transfer__hint">40: المهام الأدائية والمشاركة والتفاعل.</p><p class="grade-transfer__hint">60: تقويمات تحريرية وتطبيقات عملية.</p>
+    ${selectedItems.map(i => html`<div class="grade-transfer__noor-row"><label for="noor-${i.id}">${i.name} <small> / ${i.max}</small></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group"><option value="">اختر</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group}</option>`)}</select></div>`)}
+    <p data-noor-totals role="status">مجموع العظمى: 40 ← ${groupTotal('40')} · 60 ← ${groupTotal('60')}</p>
     <p data-noor-alert role="alert" hidden></p><label><input type="checkbox" data-noor-confirm> أؤكد تعيين البنود المختارة؛ مجموع العظمى 40 و60 دون تكرار أو تحجيم</label>
-    <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة في الملف.</p>
-    <button class="btn btn--primary" data-act="grade-noor-export">ملف بثلاثة أعمدة للرصد اليدوي في نور</button></details>
-    <p class="grade-transfer__hint">ليس للرفع المباشر.</p></details>
-  </details>`;
+    <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة. ثلاثة أعمدة للرصد اليدوي فقط، ليس للرفع المباشر.</p>
+    <button class="btn btn--primary" data-act="grade-noor-export">تنزيل كشف نور اليدوي</button></details>
+    </section>
+  </div>`;
+
 }
 
 function readTransferMappings(root) {
@@ -169,9 +189,9 @@ function transferExport(el, ev, params) {
   const noorReview = el.dataset.act === 'grade-noor-export';
   const alert = root.querySelector(noorReview ? '[data-noor-alert]' : '[data-grade-export-alert]');
   alert.hidden = true; alert.textContent = '';
-  try { downloadGradeCsv(exportGradeCsv({ ...context, items: blankTemplate ? context.items : context.items.filter(i => selected.has(i.id)), className: store.sectionLabel(store.getSection(teaching.sectionId)),
-    subject: store.state.subjects.find(s => s.id === teaching.subjectId)?.name, term: store.state.terms.find(t => t.id === teaching.termId)?.name, noorReview, blankTemplate,
-    noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem,e.value])), noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), noorReview);
+  try { downloadGradeCsv(exportGradeCsv({ ...context, items: context.items.filter(i => selected.has(i.id)), className: store.sectionLabel(store.getSection(teaching.sectionId)),
+    subject: store.state.subjects.find(s => s.id === teaching.subjectId)?.name, term: store.state.terms.find(t => t.id === teaching.termId)?.name, noorReview, blankTemplate, includeIds: root.querySelector('[data-grade-export-ids]')?.checked,
+    noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem,e.value])), noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview, blankTemplate });
   } catch (error) { alert.textContent = error.message; alert.hidden = false; }
 }
 
@@ -222,7 +242,6 @@ export default {
     bulkScoreVal = '';
     query = '';
     scoreValidation.clear();
-    transfer = { rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
     const current = transfer;
     store.gradeImportRecovery().then(rows => { if (transfer === current) { transfer.recovery = rows; repaint(); } });
   },
@@ -240,11 +259,18 @@ export default {
 
     const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
     const roster = displayRoster(activeRoster);
-    const distributionAction = html`<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a>`;
+    const binding = JSON.stringify([store.getActiveWorkspace(), cls.id]);
+    if (transferBinding !== binding) {
+      transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+      transferBinding = binding;
+      transferRoute = null;
+    }
+    const panels = transferPanel(cls.id);
+    const distributionAction = html`<div class="grade-transfer__toolbar"><button class="btn btn--sm" data-act="grade-panel" data-panel="import" data-fk="grade-panel-import" aria-controls="grade-import-panel" aria-expanded="${transfer.panel === 'import' ? 'true' : 'false'}">${icon('upload')} استيراد الكشوف</button><button class="btn btn--sm btn--quiet" data-act="grade-panel" data-panel="export" data-fk="grade-panel-export" aria-controls="grade-export-panel" aria-expanded="${transfer.panel === 'export' ? 'true' : 'false'}">تصدير الكشوف</button><a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
 
     if (!roster.length) {
       return html`
-        <div class="grades-page-head noprint">${distributionAction}</div>${transferPanel(cls.id)}
+        <div class="grades-page-head noprint">${distributionAction}</div>${panels}
         <div class="empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">الفصل بلا طلاب بعد</div><p>استيراد الأسماء والدرجات يراجع الطلاب الجدد قبل إضافتهم معًا.</p>
@@ -255,7 +281,7 @@ export default {
 
     if (!items.length) {
       return html`
-        <div class="grades-page-head noprint">${distributionAction}</div>${transferPanel(cls.id)}
+        <div class="grades-page-head noprint">${distributionAction}</div>${panels}
         <div class="empty">
           <div class="empty__icon">${icon('note')}</div>
           <div class="empty__title">لا بنود تقييم</div>
@@ -340,7 +366,7 @@ export default {
           الجدول
         </button>
       </div>${distributionAction}</div>
-      ${transferPanel(cls.id)}
+      ${panels}
       ${mode === 'item' ? html`<div class="grades-01c__item-tabs" role="tablist" aria-label="بنود التقييم">
         ${items.map((item) => html`<button class="grades-01c__item-tab ${item.id === activeItemId ? 'is-active' : ''}"
           data-act="pick" data-id="${item.id}" role="tab" aria-selected="${item.id === activeItemId}">
@@ -404,14 +430,14 @@ export default {
       const current = transfer = { ...prior, rows:null, mappings:[], review:null, busy:false, writing:false };
       current.busy = true; current.rows = null; current.review = null; current.message = 'جار قراءة الملف محليًا…'; current.error = false; repaint();
       try {
-        const rows = await (transfer.importMode === 'names' ? readStudentFile(file) : readGradeFile(file));
+        const rows = await readGradeFile(file);
         if (transfer !== current) return;
         transfer.rows = rows; transfer.fileName = file.name; Object.assign(transfer, suggestGradeMappings(rows[0], store.teachingContext(params.id).items));
         if (transfer.nameColumn < 0) transfer.nameColumn = detectStudentNameColumn(rows);
         const suggested = transfer.mappings.flatMap((m,c) => m.kind === 'existing' ? [c] : []);
-        transfer.visibleColumns = new Set(suggested.slice(0,3));
+        transfer.visibleColumns = new Set(suggested.concat(transfer.reasons.flatMap((reason,c) => reason === 'exception' ? [c] : [])));
         transfer.mappings = transfer.mappings.map((m,c) => transfer.visibleColumns.has(c) ? m : {kind:'ignore'});
-        transfer.importMode ??= suggested.length ? 'grades' : 'names';
+        transfer.importMode ??= 'names';
         transfer.editMapping = false; transfer.review = null; transfer.newStudentIds = {}; transfer.message = ''; transfer.error = false;
       } catch (error) { if (transfer === current) { transfer.rows = null; transfer.review = null; transfer.message = 'تعذّر قراءة الملف: ' + error.message; transfer.error = true; } }
       finally { current.busy = false; if (transfer === current) repaint(); }
@@ -435,9 +461,11 @@ export default {
       catch (error) { current.message = error.message; current.error = true; }
       if (transfer === current) { current.recovery = await store.gradeImportRecovery(); repaint(); }
     },
-    'grade-import-mode'(el) { if (transfer.busy) return; transfer.importMode = el.value; transfer.review = null; transfer.message = ''; transfer.error = false; repaint(); },
+    'grade-panel'(el) { if (transfer.writing) return; transfer.panel = transfer.panel === el.dataset.panel ? null : el.dataset.panel; repaint(); },
+    'grade-panel-close'() { if (transfer.writing) return; transfer.panel = null; repaint(); },
+    'grade-import-mode'(el) { if (transfer.busy) return; transfer.importMode = el.dataset.mode; transfer.review = null; transfer.message = ''; transfer.error = false; repaint(); },
     'grade-add-column'(el) { readTransferMappings(el.closest('[data-grade-transfer]')); const choice = el.closest('[data-grade-transfer]').querySelector('[data-grade-add-choice]'); if (!choice?.value) return; transfer.visibleColumns ??= new Set(); transfer.visibleColumns.add(Number(choice.value)); transfer.review = null; transfer.editMapping = true; repaint(); },
-    'grade-noor-group'(el) { transfer.noorGroups ??= {}; transfer.noorGroups[el.dataset.noorItem] = el.value; const confirm = el.closest('[data-grade-transfer]').querySelector('[data-noor-confirm]'); if (confirm) confirm.checked = false; },
+    'grade-noor-group'(el) { transfer.noorGroups ??= {}; transfer.noorGroups[el.dataset.noorItem] = el.value; transfer.noorOpen = true; repaint(); },
     'grade-template': transferExport,
     'grade-export': transferExport,
     'grade-noor-export': transferExport,

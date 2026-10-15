@@ -5,19 +5,18 @@ const text = value => {
   if (/^[\s]*[=+@-]|^[\t\r\n]/.test(string)) string = "'" + string;
   return '"' + string.replaceAll('"', '""') + '"';
 };
-export function exportGradeCsv({ roster, items, ctx, className, subject, term, noorReview = false, blankTemplate = false, noorGroups = {}, noorConfirmed = false }) {
+export function exportGradeCsv({ roster, items, ctx, className, subject, term, noorReview = false, blankTemplate = false, noorGroups = {}, noorConfirmed = false, includeIds = false }) {
   if (noorReview) return exportNoorReview({ roster, items, ctx, groups: noorGroups, confirmed: noorConfirmed });
   if (blankTemplate) items = items.filter(isTransferItem);
-  const title = blankTemplate ? 'قالب درجات فارغ' : 'كشف درجات ركيز';
-  const lines = [['معرف الطالب', 'اسم الطالب', ...items.map(i => `${i.name} (العظمى ${i.max})`), 'الفصل', 'المادة', 'الفصل الدراسي', 'نوع الملف']];
+  const lines = [[...(includeIds ? ['معرف الطالب'] : []), 'اسم الطالب', ...items.map(i => `${i.name} (العظمى ${i.max})`)]];
   for (const s of [...roster].sort((a,b) => a.name.localeCompare(b.name, 'ar') || a.id.localeCompare(b.id))) {
-    lines.push([s.id, s.name, ...items.map(i => blankTemplate ? '' : itemScore(i, ctx[s.id]) ?? ''), className, subject, term, title]);
+    lines.push([...(includeIds ? [s.id] : []), s.name, ...items.map(i => blankTemplate ? '' : itemScore(i, ctx[s.id]) ?? '')]);
   }
   return '\uFEFF' + lines.map(row => row.map(v => typeof v === 'number' ? String(v) : text(v)).join(',')).join('\r\n');
 }
-export function downloadGradeCsv(csv, noorReview = false) {
+export function downloadGradeCsv(csv, { noorReview = false, blankTemplate = false } = {}) {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  const link = document.createElement('a'); link.href = url; link.download = noorReview ? 'مراجعة للرصد في نور.csv' : 'درجات ركيز.csv';
+  const link = document.createElement('a'); link.href = url; link.download = noorReview ? 'مراجعة للرصد في نور.csv' : blankTemplate ? 'قالب ركيز الفارغ.csv' : 'كشف درجات ركيز.csv';
   link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
