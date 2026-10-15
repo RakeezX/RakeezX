@@ -10,7 +10,7 @@ import { withIsolatedLocalBrowser } from '../../../scripts/ops-supervisor-v4/iso
 const baseline = process.argv.includes('--baseline');
 const base = 'b47a0ababa135a10b2e0bcb097b813b156b7063b';
 const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n64-verified-email-result-stable-layout-20261015.json';
-const runId = 'b6290522-31b4-47ea-acf1-b52faf3d095b';
+const runId = process.env.RAKEEZ_RUN_ID || 'f0cc91ed-004e-412c-84b0-d05d917c2423';
 const origin = 'http://127.0.0.1:19864';
 const server = await createServer({ configFile: false, root: process.cwd(), server: { host: '127.0.0.1', port: 19864, strictPort: true, hmr: false } });
 try {

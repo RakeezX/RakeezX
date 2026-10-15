@@ -72,7 +72,9 @@ test('central account presentation covers masculine and feminine labels without 
   assert.match(printable, /معلمة المادة/);
   assert.match(printable, /اسم المديرة/);
   assert.match(printable, /رَكيز/);
-  assert.match(printable, /تقارير المعلم/);
+  assert.match(printable, /<h2 class="printhead__title">اختبار<\/h2>/);
+  assert.match(printable, /<dt>المدرسة<\/dt><dd>مدرسة الاختبار<\/dd>/);
+  assert.match(printable, /<span>معلمة المادة<\/span><strong>نورة<\/strong>/);
 });
 
 test('email is always taken from authenticated identity, never profile payload', () => {

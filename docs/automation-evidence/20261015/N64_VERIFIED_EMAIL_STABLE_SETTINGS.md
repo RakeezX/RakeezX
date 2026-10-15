@@ -40,3 +40,21 @@ The previous LOCAL_READY result was rejected with: `Candidate validation: An aff
 Concrete scope blocker: `tests/account-profile-access.test.mjs` is outside this card's allowedPaths. Its line75 assertion requires `/تقارير المعلم/`, while the unchanged report header emits the Rakeez brand. The current N64 card does not authorize changing that report contract or test. Changing N64 presentation to inject the report phrase, suppressing the failed assertion, or omitting the known failed result would not repair it.
 
 Retry condition: the approved maintenance path must first establish the correct report-branding expectation from its applicable Product contract and, if this is a stale assertion, grant the inactive saved card the exact missing test path `tests/account-profile-access.test.mjs` for that bounded correction. If the assertion reflects an actual report requirement, it needs an appropriately authorized report repair instead. Preserve this candidate, base and all existing evidence; resume this exact session only after the material correction/access decision. No queue, validator, lock or controller policy was changed by this worker. This is a factual BLOCKED result, not another unchanged test retry or a request for routine PM approval.
+
+## Scope repair completed — current run
+
+Run: `f0cc91ed-004e-412c-84b0-d05d917c2423`.
+The updated activated card explicitly adds `tests/account-profile-access.test.mjs` and confirms the accepted N24 report uses Rakeez with the supplied report title. This materially resolves the previously documented scope blocker. The original FAIL and blocked continuation above remain historical evidence; they have not been relabelled.
+
+The obsolete `/تقارير المعلم/` assertion was replaced with assertions for the actual supplied h2 title, school metadata, and the teacher's name in the feminine subject-teacher signature. Existing masculine/feminine presentation, Rakeez branding, profile, validation, and cross-owner assertions remain. No report application output or Product source was changed in this continuation. The N64 scope helper now accepts the newly authorized test and explicitly protects report-print.js and brand.js as unchanged. Browser helpers accept an explicit RAKEEZ_RUN_ID with this run as the default so isolation checks bind the activated attempt.
+
+Current verification:
+
+- `node --test tests/account-profile-access.test.mjs tests/n64-confirmed-email-state.test.mjs tests/settings-0397.test.mjs`: **19/19 PASS**, including the complete corrected account-profile suite (**11/11**). This is new passing execution after the concrete assertion correction, not suppression of the earlier failure.
+- `node tests/n64-confirmed-email-ui.mjs`: **PASS**, actual app synthetic owner contexts at 1280/390px, verified completion and neutral reload, zero Access shift, focus/selection, manual toggle race, RTL/mobile, no Auth mutation requests. Machine evidence now identifies this run.
+- `node tests/n64-stability-browser.mjs`: actual app stability regression rerun under this run's canonical task guard; its result is recorded below after completion.
+- Scoped no-mutation assertions, syntax for the three changed Product JS files, and diff whitespace checks passed. The unchanged original Product-source implementation and earlier evidence remain preserved in commits `46ae6335dbe9b614f4865c89662dccb3483e3026` and `8858337481befcf6b34c62474ce676406af46de1`.
+
+No live account, real email, callback token, provider operation, push or deployment was used. Production verification remains with the independent controller/publisher.
+
+Final current-run stability result: **PASS at 1280 and 390px**, collapsed experience-section shift 0px at both widths; delayed reads, manual state, same-owner notifications, settled paints, modal keyboard/focus/inert behavior and route-return checks passed. All five rejected synthetic outbox rows remained byte-identical. Both owned server ports 19864/19865 were verified without listeners after finally cleanup; isolated contexts/browsers were closed by the canonical helper. The original scope blocker is resolved by the authorized test correction and the new complete passing execution.
