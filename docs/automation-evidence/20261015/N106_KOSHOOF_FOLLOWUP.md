@@ -46,3 +46,13 @@ The original `node tests/n90-unified-native.mjs --n106` invocation also printed 
 - Additional legacy `tests/n90-transfer.test.mjs` run: 9 PASS, 1 FAIL in “suggestions require unique exact headers and current unique manual targets”. Its lowercase `exam` assertion expects ignore, while unchanged base `suggestGradeMappings` matches `Exam` after normalization. Readback of `git show HEAD:src/lib/grade-transfer.js` before candidate commit reproduced `[{"kind":"existing","itemId":"i"}]` for that input. The suggestion function is unchanged; this old assertion was not edited or represented as PASS. Current focused N105 suggestion tests pass.
 
 No Production or PO acceptance claim is made by this local evidence.
+
+## Saved-session continuation — 59ad956f-ace2-4013-98dd-37bce0227c30
+
+Preserved implementation candidate: `0df248db38db80acae5996970a13ae9dc8c75553`. Fresh readback confirmed a clean worktree, the same N106 Product row, and the active continuation card. Existing 17 browser checks/60 screenshots and native proofs remain reusable: Product sources, fixtures and dependencies were not changed in this continuation. No browser/server or live phase was started.
+
+The previous result was rejected with `Candidate validation: An affected check must pass and no recorded check may fail`. The recorded legacy assertion remains a real failed on-disk check; it cannot be silently omitted or relabeled PASS. Its scoped correction needs `tests/n90-transfer.test.mjs`, which is absent from this card's `allowedPaths`. The original test was therefore left untouched.
+
+Read-only preparation verified the concrete correction in memory against the actual current modules: move `['exam']` out of the rejection cases and explicitly assert its existing normalized mapping `{kind:'existing',itemId:'i'}`; replace that negative case with `['Exam extra']` so a genuinely different name still must be ignored. All other duplicate/max/read-only/owner/grade assertions were retained. Running that in-memory version through Node's test runner produced **10 PASS, 0 FAIL**. This validates a proposed test repair, not the unchanged on-disk test. No Product behavior or security guard was weakened.
+
+**Blocked retry condition:** the approved inactive-card maintenance path must add exactly `tests/n90-transfer.test.mjs` to the saved N106 card's allowed scope, preserving the saved session, base and candidate lineage. The controller can then resume this session to apply the above two-assertion correction and run the focused on-disk test. Existing unchanged UI/native evidence should be reused. The worker did not edit queue status, maintenance locks or controller files, and did not launch another executor.
