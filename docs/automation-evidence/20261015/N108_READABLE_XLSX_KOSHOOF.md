@@ -57,3 +57,11 @@ Fresh read-only reconciliation confirms all five Product source hashes still equ
 The exact missing repair path is **`tests/offline-route-graph.test.mjs`**, line 45: its hardcoded route-import expectation is 30 while the existing base router has 33. A bounded repair would correct that stale expectation against the current router and retain the complete executable-graph cache assertion and every routed-view cache assertion. Adding a separate passing N108 check would not repair this recorded failing assertion. Changing Product routes or omitting the failure to satisfy validation would be inappropriate.
 
 This path is outside the activated card's `allowedPaths`; the worker therefore returns BLOCKED rather than changing it. Retry condition: the authorized maintenance procedure corrects the inactive card scope to permit this exact test repair (or records the actual guarded repair), preserving this worktree, candidate chain, base, evidence and saved session; then the controller resumes this session for the targeted correction/check. No maintenance role, queue edit, new worker or deployment was started here.
+
+## Reviewed scope repair completed
+
+Run `f1f43490-e158-4149-8f96-0e8b0cb44108` resumes the same saved session and candidate chain after the activated card explicitly added `tests/offline-route-graph.test.mjs` and authorized the exact count correction. The historical FAIL and blocked result above remain historical evidence; this section records the subsequent correction and observed result.
+
+Only the stale expected route-import count changed from 30 to the source-backed 33. The full SHELL missing-module assertion, minimum visited-module coverage (`>= 59`) and every routed-view cache assertion are unchanged. `node --test tests/offline-route-graph.test.mjs` now reports **1/1 PASS**, zero failures. `git diff --check` also passes.
+
+Fresh reconciliation verifies all five Product source hashes still match the six successful browser checks and their owned cleanup evidence. The earlier 12/12 Node checks and real application DOM/download/reader/offline evidence are reused; no Product source changed, and no browser, server, build, Preview or deployment was repeated. The scope blocker is resolved. Candidate is locally ready for the independent controller/publisher; provider/immutable/Production checks remain unrun by this worker.
