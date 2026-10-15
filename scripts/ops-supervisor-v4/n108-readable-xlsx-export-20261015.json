@@ -1,0 +1,63 @@
+{
+    "version":  1,
+    "activationId":  "po-20261012-continuous",
+    "tasks":  [
+                  {
+                      "id":  "continuous-n108-readable-excel-xlsx-koshoof-20261015",
+                      "productId":  "N108",
+                      "activationId":  "po-20261012-continuous",
+                      "priority":  -28,
+                      "scopeKey":  "n108-koshoof-real-xlsx-readable-width-auto-format",
+                      "riskClass":  "STANDARD",
+                      "validationTier":  "FOCUSED",
+                      "executionMode":  "local",
+                      "liveMutation":  false,
+                      "dependsOn":  [
+                                        "continuous-n106-koshoof-followup-ux-identity-mapping-20261015",
+                                        "continuous-n107-central-classes-local-file-import-20261015"
+                                    ],
+                      "objective":  "Implement PO request: \u0027الكشوف حقت الاكسل، ما تقدر تخلي بشكل تلقائي العامود ياخذ حجمه الكامل عند فتح الملف؟ ما يكون جزء منه مختفي.\u0027 Raw CSV cannot encode Excel column widths, so DO NOT claim editing CSV can auto-size. Preserve existing approved CSV export/import and score semantics (zero vs blank, injection guard, Noor manual 40/60, class filenames). Offer an ACTUAL XLSX download option next to CSV in existing separate Koshoof Export, preferably a compact unobtrusive \u0027Excel (.xlsx) / CSV\u0027 format toggle with XLSX preferred and a clear one-line distinction only when necessary; same user choices of names-only or names+grades and names/class labels still apply, including empty class. Build XLSX entirely client-side using vetted existing ZIP capability if actually supported, or a bounded audited minimal OOXML/ZIP writer with no new npm packages/CDN/API, no macros/external links/formulas or metadata containing student IDs/tokens; include one sheet with correct Arabic RTL, header styled and frozen, column widths sized conservatively (name 42-55 chars, grade headings up to 30-40 chars) and wrap long headers so no visible truncation at first open. Set row heights for wrap; scores stored as numbers, zero is actual 0, missing is blank; header auto filter optional. Use OOXML string cells for names to prevent any formula or DDE injection, including strings starting =+@- or tabs/newlines, and escape XML entities. Download filename extension .xlsx with same sanitized \u0027كشف أسماء طلاب فصل ... - ركيز المعلم.xlsx\u0027 or \u0027كشف درجات طلاب فصل ... - ركيز المعلم.xlsx\u0027; optional Noor XLSX only if established three-column 40/60 exact and manual-use-only; otherwise keep Noor CSV only, not a fake official upload. Cross-test created XLSX with existing audited readStudentFile/readGradeFile parser (not just ZIP decoder), ensure sheet1 parsed rows and labels equivalent to CSV and formulas/links absent. Test with Arabic long 55+ char name, user-provided grade titles, 300 rows, 320/390/768 desktop browser actual one Xlsx download + CSV, no width regression, mobile file support. Verify offline shell when new module added (sw.js) and focus/back/reloading; reuse unchanged N90 owner/scoring tests. Do not change active gradebook scoring, classroom import write semantics, Madrasati/Noor direct service, Auth or SQL/schema. Publish using only existing controller/publisher and exact provider/immutable/Production source proof. REVIEWED RESUME: N107 legitimately expanded the router to 33 entries while the inherited offline-route test still hardcodes 30. Correct only that stale exact count to the source-backed route graph, preserving the complete SHELL-missing-module assertion and minimum visited-module coverage; run this exact test and retain a real PASS before delivery. Resume the same session/candidate; do not rerun unrelated successful XLSX/browser checks unless source changes.",
+                      "allowedPaths":  [
+                                           "src/views/grades.js",
+                                           "src/lib/grade-transfer-export.js",
+                                           "src/lib/grade-transfer-xlsx.js",
+                                           "src/lib/grade-transfer-parsers.js",
+                                           "src/styles/grades.css",
+                                           "sw.js",
+                                           "tests/n108-xlsx-export.test.mjs",
+                                           "tests/n108-xlsx-export-browser.mjs",
+                                           "tests/n108-xlsx-export-browser.json",
+                                           "tests/n106-koshoof-browser.mjs",
+                                           "tests/n106-koshoof-browser.json",
+                                           "docs/automation-evidence/20261015/N108_READABLE_XLSX_KOSHOOF.md",
+                                           "tests/offline-route-graph.test.mjs"
+                                       ],
+                      "verificationPaths":  [
+                                                "src/views/grades.js",
+                                                "src/lib/grade-transfer-export.js",
+                                                "src/lib/grade-transfer-xlsx.js",
+                                                "src/lib/grade-transfer-parsers.js",
+                                                "src/styles/grades.css",
+                                                "sw.js"
+                                            ],
+                      "requiredChecks":  [
+                                             "n108_real_ooXML_xlsx_names_grades_and_widths",
+                                             "n108_excel_RTL_Arabic_long_header_name_and_injection_block",
+                                             "n108_reader_roundtrip_preserve_zero_blank_and_class_title",
+                                             "n108_CSV_and_Noor_unchanged_and_offline",
+                                             "n108_actual_browser_download_320_390_1280_and_cleanup",
+                                             "syntax_diff_and_owned_cleanup",
+                                             "existing_offline_route_graph"
+                                         ],
+                      "acceptance":  [
+                                         "Actual downloaded .xlsx is valid readable OOXML with Arabic RTL sheet, frozen/wrapped header, full student name column width and grade headings width suitable without initial clipped text. No external formula or workbook links; numbers and blanks preserved.",
+                                         "The existing audited XLSX reader can parse downloaded file into the same identity headers and score cells, with 0 distinct from missing grade; long Arabic names and 300 rows do not corrupt, do not output raw students/IDs in filename.",
+                                         "User can select Excel XLSX or CSV from normal Koshoof export with calm format control. Both names only and names-plus-grades downloads have correct safe filename and content. Noor still exact manual 40/60 output, not an official direct upload.",
+                                         "No new packages, external services, Auth/SQL or score writes, no change to owner/grade mapping. Offline cached app can download from newly included local JS module.",
+                                         "Exact Cloudflare provider/immutable/Production revision verified via source parity; PO review remains truthful.",
+                                         "The inherited offline route-graph test is corrected only from the stale 30-entry count to the actual audited 33-entry router graph; complete precache coverage and graph-size assertions remain and the test passes."
+                                     ],
+                      "releaseAuthority":  "PO 2026-10-15 explicitly requests exported Excel sheets show full widths on first opening. Authorizes client-only XLSX export with static formatting and existing CSV alternatives, no real data writes or new payment/dependency, bounded parsing \u0026 browser checks and existing Cloudflare Production deployment. No scores/Auth/schema/cross-class direct bulk export mutation, no Noor official direct upload."
+                  }
+              ]
+}
