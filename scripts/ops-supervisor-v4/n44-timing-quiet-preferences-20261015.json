@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-timing-quiet-preferences-20261015",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -32,
+      "scopeKey": "n44-inapp-timing-quiet-preferences-20261015",
+      "riskClass": "STANDARD",
+      "validationTier": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n44-live-inapp-center-20261014"
+      ],
+      "objective": "Implement the PO's approved in-app notification refinements on current Production main, not on an old branch. Lesson notice eligibility begins 15 minutes before each eligible owned lesson (not 30) and expires at the session end. For each eligible owned scoring subitem dueDate, issue a distinct locally deduplicated stage on dueDate-3 days, dueDate-2 days, dueDate-1 day, and dueDate itself; do not emit missed past reminders on later days, nor duplicate stages on re-render, backward clocks or owner switching. Keep the current reliable private read/dismiss behavior and per-device preference retention. Replace verbose empty bell sheet with the approved compact message 'لا توجد إشعارات حاليًا' and 'كل شيء تمام حتى الآن'; omit unread count 0 and explanatory technical notes only in empty state. Preserve actionable cards, focus behavior, small-screen layout. Add clear per-user in-app category preference toggles for ordinary lesson and due reminders in existing settings UI; default on, local owner/device scoped, no student or private data leakage, and any existing or future critical offline lease/data-protection reminder must be immune to optional suppression. Do not invent a critical alert until reliable eligibility exists. Confirm status of app-closed Push by documenting feasible standard Web Push using current Service Worker + Supabase and operational prerequisites; do not request permission, create Push subscriptions, deploy a push sender, schedule notifications or make new service/schema/Auth/real-send changes in this card.",
+      "allowedPaths": [
+        "src/lib/notification-events.js",
+        "src/lib/notification-center.js",
+        "src/lib/notification-state.js",
+        "src/lib/notification-preferences.js",
+        "src/views/notifications.js",
+        "src/views/settings.js",
+        "src/app.js",
+        "src/styles/notifications.css",
+        "tests/n44-inapp.test.mjs",
+        "tests/n44-reminder-timing.test.mjs",
+        "tests/n44-preferences.test.mjs",
+        "tests/n44-quiet-ui.mjs",
+        "tests/n44-quiet-ui.json",
+        "docs/automation-evidence/20261015/N44_TIMING_QUIET_AND_PUSH_SCOPE.md"
+      ],
+      "requiredChecks": [
+        "n44_15min_lesson_four_due_daily_stages",
+        "n44_dedupe_expiry_and_owner_isolation",
+        "n44_empty_state_and_mobile_render",
+        "n44_preferences_noncritical_and_critical_protection",
+        "n44_previous_inapp_owner_and_offline_regression",
+        "syntax_diff_and_owned_resource_cleanup"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-events.js",
+        "src/lib/notification-center.js",
+        "src/lib/notification-state.js",
+        "src/views/notifications.js",
+        "src/app.js",
+        "src/styles/notifications.css"
+      ],
+      "releaseAuthority": "PO 2026-10-15 explicitly approves: 15 minute lesson pre-notification; graded-item due reminders exactly at 3,2,1,0 days; compact quiet empty UI; opt-in/out per noncritical category; safety/lease warnings remain mandatory. This card authorizes bounded in-app frontend/local preferences only and normal Git/Cloudflare Production deployment after owner/event/date/offline tests. It does NOT authorize new Supabase SQL/RLS/Auth schema, Web Push subscriptions/device permissions, background dispatch, account mutation, real messages, or any attempt to access abandoned test accounts. Existing Cloudflare pinned-tail strict parity must pass.",
+      "acceptance": [
+        "Current mounted verified account sees each lesson upcoming only within the final 15 minutes before start; while active until end; no foreign/archived/cancelled sessions.",
+        "Due date stages have separate identities and safe local dedupe, with dueDate-3, -2, -1, 0 showing only on their intended local day and never on a past date.",
+        "Empty notification sheet shows one calm headline with no 'غير المقروء: 0' or duplicate technical notes; populated state retains read vs dismiss actions and accessibility.",
+        "Owned persisted preference toggles suppress only selected ordinary categories, not mandatory protection alerts, and remain isolated across owner/workspace/device and reload.",
+        "Existing N44 owner, dismiss, expiry, deep links, offline boot regressions pass; no production Push permission or sender is activated.",
+        "Exact Product release is published and verified on rakeezx.com; no claim of user acceptance or app-closed Web Push."
+      ]
+    }
+  ]
+}
