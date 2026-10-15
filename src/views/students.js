@@ -16,6 +16,25 @@ import { go } from '../router.js';
 let query = '';
 let formerOpen = false;
 
+export function canOpenRoster(params) {
+  const teaching = store.getTeaching(params.id);
+  const workspace = store.getActiveWorkspace();
+  if (!teaching || !workspace || store.isTeachingArchived(teaching)) return false;
+  if (workspace.type === 'account' &&
+      (user?.id !== workspace.authUserId || teaching.ownerId !== workspace.authUserId)) return false;
+  try { store.validateTeachingContext(teaching.sectionId, teaching.termId); }
+  catch { return false; }
+  return true;
+}
+
+export function rosterFileActions(params) {
+  if (!canOpenRoster(params)) return '';
+  return html`<div class="roster-entry-actions" role="group" aria-label="استيراد وتصدير الكشوف">
+    <a class="btn btn--sm btn--ghost" data-act="file-import" href="#/teaching/${params.id}/grades?import=1" aria-label="استيراد الكشوف">${icon('upload')} استيراد الكشوف</a>
+    <a class="btn btn--sm btn--ghost" data-act="file-export" href="#/teaching/${params.id}/grades?export=1" aria-label="تصدير الكشوف">${icon('download')} تصدير الكشوف</a>
+  </div>`;
+}
+
 /* ---------- تحليل الأسماء الملصوقة ---------- */
 
 export function parseNames(text) {
@@ -134,8 +153,7 @@ export default {
   },
   back: (p) => `#/teaching/${p.id}`,
 
-  topActions: () => html`
-    <button class="btn btn--ghost" data-act="file-import" aria-label="استيراد الأسماء أو الدرجات">${icon('upload')} استيراد ملف</button>
+  topActions: (p) => !canOpenRoster(p) ? '' : html`
     <button class="iconbtn" data-act="import" aria-label="لصق كشف">${icon('upload')}</button>
     <button class="iconbtn" data-act="add" aria-label="طالب جديد">${icon('plus')}</button>
   `,
@@ -167,12 +185,12 @@ export default {
     if (!roster.length) {
       return html`
         <div class="management-page students-roster-page">
+        ${rosterFileActions(p)}
         <div class="empty management-empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الفصل'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
           <div class="btn-row" style="justify-content:center">
-            <button class="btn btn--ghost" data-act="file-import">${icon('upload')} استيراد ملف</button>
             <button class="btn btn--primary" data-act="import">${icon('upload')} لصق كشف الأسماء</button>
             <button class="btn btn--ghost" data-act="add">${icon('plus')} طالب واحد</button>
           </div>
@@ -192,6 +210,7 @@ export default {
 
     return html`
       <div class="management-page students-roster-page">
+      ${rosterFileActions(p)}
       <div class="management-toolbar roster-toolbar">
       <div class="searchbar roster-search">
         ${icon('search')}
@@ -278,7 +297,14 @@ export default {
   },
 
   actions: {
-    'file-import'(el, ev, params) { go(`/teaching/${params.id}/grades?import=1`); },
+    'file-import'(el, ev, params) {
+      ev?.preventDefault();
+      if (canOpenRoster(params)) go(`/teaching/${params.id}/grades?import=1`);
+    },
+    'file-export'(el, ev, params) {
+      ev?.preventDefault();
+      if (canOpenRoster(params)) go(`/teaching/${params.id}/grades?export=1`);
+    },
     search(el) {
       query = el.value;
       repaint();
@@ -290,6 +316,7 @@ export default {
     },
 
     async import(el, ev, params) {
+      if (!canOpenRoster(params)) return;
       const tch = store.getTeaching(params.id);
       if (!tch) return;
       const names = await importSheet(tch.sectionId);
@@ -303,6 +330,7 @@ export default {
     },
 
     async add(el, ev, params) {
+      if (!canOpenRoster(params)) return;
       const tch = store.getTeaching(params.id);
       if (!tch) return;
 

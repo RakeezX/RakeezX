@@ -1,0 +1,49 @@
+{
+  "runId": "89d274f4-677e-4900-b7dd-274a6a98e36a",
+  "checks": [
+    {
+      "name": "rtl_routes_actions_zero_writes_320",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive N90 panels and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-roster-entries/*-320.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_320",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_390",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive N90 panels and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-roster-entries/*-390.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_390",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_768",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive N90 panels and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-roster-entries/*-768.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_768",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_1280",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive N90 panels and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-roster-entries/*-1280.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_1280",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    }
+  ],
+  "errors": [],
+  "status": "PASS",
+  "ownedServerStopped": true,
+  "ownedBrowserClosed": true
+}

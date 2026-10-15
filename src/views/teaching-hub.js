@@ -6,7 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
-import studentsView from './students.js';
+import studentsView, { canOpenRoster, rosterFileActions } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
@@ -109,7 +109,13 @@ export default {
             <div class="empty__text">
               استورد الأسماء وحدها أو مع درجاتها، أو أضف طالبًا يدويًا.
             </div>
-            <a class="btn btn--primary" href="#/teaching/${tch.id}/grades?import=1">${icon('upload')} استيراد الأسماء أو الدرجات</a><button class="btn" data-act="add-student">${icon('plus')} إضافة طالب يدويًا</button>
+            ${canOpenRoster(p) ? html`<div class="roster-entry-empty">
+              ${rosterFileActions(p)}
+              <div class="roster-entry-actions" role="group" aria-label="إضافة أسماء الطلاب">
+                <button class="btn" data-act="paste-names" aria-label="لصق الأسماء">${icon('upload')} لصق الأسماء</button>
+                <button class="btn" data-act="add-student" aria-label="إضافة طالب يدويًا">${icon('plus')} إضافة طالب يدويًا</button>
+              </div>
+            </div>` : ''}
           </div>
         </div>
       `;
@@ -126,6 +132,7 @@ export default {
       <div class="class-hub">
       ${classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount: roster.length })}
       ${activeGoalIndicator(tch.id, activeGoal)}
+      ${rosterFileActions(p)}
       <div class="section">
         <div class="section__head">
           <div class="section__title">حصص اليوم</div>
@@ -218,6 +225,9 @@ export default {
   },
 
   actions: {
+    'file-import': (el, ev, params) => studentsView.actions['file-import'](el, ev, params),
+    'file-export': (el, ev, params) => studentsView.actions['file-export'](el, ev, params),
+    'paste-names': (el, ev, params) => studentsView.actions.import(el, ev, params),
     'add-student': (el, ev, params) => studentsView.actions.add(el, ev, params),
     'switch-class'(el, ev, params) {
       const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');

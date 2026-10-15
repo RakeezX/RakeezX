@@ -8333,3 +8333,17 @@
 [data-theme="dark"] .n94-completion--late { color: #fde68a; background: #451a03; }
 [data-theme="dark"] .n94-completion--regular { color: #bbf7d0; background: #14532d; }
 .n94-completion:focus-visible { outline: 3px solid var(--action-focus-ring); outline-offset: 3px; }
+.roster-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-end: 16px;
+}
+.roster-entry-actions > .btn {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  white-space: normal;
+}
+.roster-entry-empty { max-inline-size: 100%; }
+.roster-entry-empty .roster-entry-actions { justify-content: center; }
