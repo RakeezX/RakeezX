@@ -1,0 +1,95 @@
+{
+  "taskId": "continuous-n104-restored-account-receipt-access-20261015",
+  "runId": "6b10c314-8168-411e-bc76-e0f66a0dff08",
+  "baseSha": "b49075222a4192128831297d6e5a863027884ded",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "restored_actions_320_initial",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    },
+    {
+      "name": "restored_actions_320_reload",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    },
+    {
+      "name": "restored_actions_390_initial",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    },
+    {
+      "name": "restored_actions_390_reload",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    },
+    {
+      "name": "negative_owner_session_term_lease",
+      "status": "PASS",
+      "evidence": "[{\"name\":\"device-protocol\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"device-restoreId\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"device-manifestHash\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"device-completedAt\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"registry-ownerId\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"registry-protocol\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"registry-restoreId\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"registry-manifestHash\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"registry-completedAt\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-owner\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"deleted\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-session\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-user\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"owner-drift\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-bound-workspace\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-db\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"selected-db-drift\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-term\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"closed-term\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"archived\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-parent\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-session\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"not-ready\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-provenance\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-provenance\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"stale-auth-storage\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"}]; valid offline lease opens sheet; expired lease denies with visible warning; no write."
+    },
+    {
+      "name": "restored_actions_1280_initial",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    },
+    {
+      "name": "restored_actions_1280_reload",
+      "status": "PASS",
+      "evidence": "Real ownerless registry finalizer receipt; actual empty create + preexisting ownerless class. Classes/hub/Students/grades/Koshoof sheets opened by clicks, cancel only; Auth /user refresh and reload preserve owner/DB/receipt/generation. Student/grade/outbox checkpoint unchanged."
+    }
+  ],
+  "measurements": [
+    {
+      "width": 320,
+      "start": {
+        "paints": 5,
+        "x": 11,
+        "y": 150.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 11,
+        "y": 150.796875
+      },
+      "delta": 1
+    },
+    {
+      "width": 390,
+      "start": {
+        "paints": 5,
+        "x": 15,
+        "y": 150.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 15,
+        "y": 150.796875
+      },
+      "delta": 1
+    },
+    {
+      "width": 1280,
+      "start": {
+        "paints": 5,
+        "x": 681,
+        "y": 184.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 681,
+        "y": 184.796875
+      },
+      "delta": 1
+    }
+  ],
+  "errors": [],
+  "authUserReads": 23,
+  "sourceHashes": {
+    "src/app.js": "7820c3f0e1e202b576ed54e1277a7c04b241cd8e8d96e421a7113d544e149a01",
+    "src/store.js": "32519592ee13da061e326daa1ff92b6aef4d546d3072570e071faad3fa8a112e",
+    "src/views/students.js": "7af0777ef8f2aaa717bd3a1b71af2a354380e2aa965e58cc5160f2c7ff7e0d48",
+    "src/views/grades.js": "23c0d414492c85d498c24c561b8c546fec0347ce60c538cd93569a9f853dc411"
+  }
+}

@@ -309,8 +309,12 @@ export function assertClassOperationsAccess(teachingId) {
       const claimed = workspace.workspaceKind === 'legacy-in-place' && workspace.databaseName === LEGACY_WORKSPACE_DB_NAME &&
         claim && marker?.version === 1 && marker.state === 'claimed' && marker.claimId === claim &&
         marker.ownerId === owner && marker.databaseName === workspace.databaseName;
-      const restored = restore && receipt?.ownerId === owner && restore.ownerId === owner &&
-        ['CORE_V1', 'CORE_V2'].includes(receipt.protocol) && receipt.restoreId === restore.restoreId &&
+      // finalizeAccountRestore stores an ownerless registry receipt. The mounted
+      // workspace/Auth/DB binding above supplies its owner; the device must name it.
+      const restored = restore && receipt?.ownerId === owner &&
+        (!Object.hasOwn(restore, 'ownerId') || restore.ownerId === owner) &&
+        ['CORE_V1', 'CORE_V2'].includes(receipt.protocol) && receipt.protocol === restore.protocol &&
+        receipt.restoreId === restore.restoreId &&
         receipt.manifestHash && receipt.manifestHash === restore.manifestHash &&
         Number.isFinite(receipt.completedAt) && receipt.completedAt > 0 && receipt.completedAt === restore.completedAt;
       const provisioned = workspace.workspaceKind === 'account-provisioned' && provision &&
