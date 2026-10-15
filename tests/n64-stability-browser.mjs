@@ -9,10 +9,10 @@ import { withIsolatedLocalBrowser } from '../../../scripts/ops-supervisor-v4/iso
 
 const baseline = process.argv.includes('--baseline');
 const base = 'b47a0ababa135a10b2e0bcb097b813b156b7063b';
-const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n64-stable-settings-layout-20261014.json';
-const runId = 'a307ec98-cdd4-4f57-a80f-76ec440e51e6';
-const origin = 'http://127.0.0.1:19764';
-const server = await createServer({ configFile: false, root: process.cwd(), server: { host: '127.0.0.1', port: 19764, strictPort: true, hmr: false } });
+const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n64-verified-email-result-stable-layout-20261015.json';
+const runId = process.env.RAKEEZ_RUN_ID || 'f0cc91ed-004e-412c-84b0-d05d917c2423';
+const origin = 'http://127.0.0.1:19864';
+const server = await createServer({ configFile: false, root: process.cwd(), server: { host: '127.0.0.1', port: 19864, strictPort: true, hmr: false } });
 try {
   await server.listen();
   await withIsolatedLocalBrowser({ taskFile, runId, url: origin, timeoutMs: 120000 }, async ({ createContext }) => {

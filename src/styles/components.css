@@ -5134,7 +5134,8 @@
 .settings-profile[open] .settings-profile-summary { border-bottom: 1px solid var(--border); }
 .settings-profile[open] .settings-profile-edit .icon { transform: rotate(-90deg); }
 .settings-profile-attention { display: block; font-size: 13px; color: var(--info); margin-top: 4px; }
-.settings-profile-attention[hidden] { display: none; }
+.settings-profile-attention { min-height: 2lh; }
+.settings-profile-attention[hidden] { display: block; visibility: hidden; }
 .settings-education-department { min-width: 0; }
 .settings-education-department__control { position: relative; min-width: 0; }
 .settings-education-department__control .input { width: 100%; min-height: 44px; padding-inline-end: 36px; cursor: pointer; text-overflow: ellipsis; }
@@ -5249,6 +5250,8 @@
 .settings-email-pending {
   color: var(--info);
 }
+
+.settings-email-feedback { min-height: 2lh; }
 
 .settings-email-instructions summary {
   cursor: pointer;
