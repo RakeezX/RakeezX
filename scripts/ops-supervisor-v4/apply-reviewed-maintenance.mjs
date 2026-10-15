@@ -130,6 +130,18 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
   if (e.baseSha && !savedBinding) insist(task.baseSha === e.baseSha, 'Expected base changed');
   return true;
 }
+export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile, expectedSourceSha256) {
+  const previous = catalogTasks.filter(t => t.id === update.card.id);
+  if (previous.length === 1) {
+    insist(previous[0].activationId === update.card.activationId && previous[0].productId === update.card.productId && previous[0].scopeKey === update.card.scopeKey, 'Catalog source identity changed');
+    return { kind: 'catalog', index: catalogTasks.indexOf(previous[0]), baseline: previous[0] };
+  }
+  insist(previous.length === 0, 'Catalog source identity changed');
+  const sourceName = path.win32.basename(sourceCardFile ?? '');
+  insist(task?.approvedNote?.source === sourceName && task.approvedNote.sha256 === expectedSourceSha256, 'Approved-note source identity changed');
+  return { kind: 'approved-note', index: -1, baseline: task };
+}
+
 export function revisedTask(task, update, commit, at) {
   const saved = structuredClone(task);
   const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: update.expected.candidateSha, previousQueuedCandidateSha: task.candidateSha, previousQueuedBaseSha: task.baseSha, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
@@ -195,7 +207,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
   const evidenceRoot = path.join(rt, 'maintenance', payload.taskId, token);
   const receipt = { version: 1, ...owner, status: 'LOCKED', evidenceRoot, steps: [], committed: false, pushed: false, opsWrittenPaths: [], installedPaths: [], catalogUpdated: false, activatedTasks: [], touchedWorkerProcesses: [] };
   let ownStop = false, stopBytes, pausedAt = 0, controller, beforeCatalog;
-  const queueBefore = new Map(), opsPreimageHashes = new Map();
+  const queueBefore = new Map(), sourceBindings = new Map(), opsPreimageHashes = new Map();
   const record = (stage, detail = {}) => { receipt.stage = stage; receipt.steps.push({ at: new Date().toISOString(), stage, ...detail }); replaceGuarded(path.join(evidenceRoot, 'progress.json'), bytes(receipt), sha256(read(path.join(evidenceRoot, 'progress.json')))); };
   const ownsLock = () => read(lockPath)?.equals(ownerBytes) === true;
   const git = (args, cwd = ops, timeout = 45000) => execFileSync(WIN_GIT, ['-c', 'core.longpaths=true', ...args], { cwd, encoding: 'utf8', timeout, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 8 * 1024 * 1024 }).trim();
@@ -260,9 +272,10 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(catalog.currentActivationId === payload.activationId && Array.isArray(catalog.tasks), 'Catalog activation changed');
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
-      const previous = catalog.tasks.filter(t => t.id === update.card.id);
-      insist(previous.length === 1 && previous[0].activationId === payload.activationId && previous[0].productId === update.card.productId && previous[0].scopeKey === update.card.scopeKey, 'Catalog source identity changed');
-      insist((previous[0].requiredChecks ?? []).every(check => update.card.requiredChecks.includes(check)), 'This helper cannot remove required checks');
+      const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
+      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, sourceSpec.expectedCanonicalSha256);
+      sourceBindings.set(update.card.id, binding);
+      insist((binding.baseline.requiredChecks ?? []).every(check => update.card.requiredChecks.includes(check)), 'This helper cannot remove required checks');
     }
     insist(!dirtyPaths().length, 'Ops checkout must be clean before maintenance');
     const common = cwd => path.resolve(cwd, git(['rev-parse', '--git-common-dir'], cwd));
@@ -306,7 +319,11 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     insist(sha256(read(catalogPath)) === sha256(beforeCatalog), 'Catalog changed before activation');
     for (const update of payload.cardUpdates) { const fresh = exactInactive(update); insist(sha256(fresh.raw) === sha256(queueBefore.get(update.card.id).raw), 'Queue changed before activation: ' + update.card.id); }
     const at = new Date().toISOString();
-    for (const update of payload.cardUpdates) { const index = catalog.tasks.findIndex(t => t.id === update.card.id); catalog.tasks[index] = structuredClone(update.card); }
+    for (const update of payload.cardUpdates) {
+      const binding = sourceBindings.get(update.card.id), index = catalog.tasks.findIndex(t => t.id === update.card.id);
+      if (binding.kind === 'catalog') { insist(index === binding.index && index >= 0, 'Catalog source changed before activation'); catalog.tasks[index] = structuredClone(update.card); }
+      else insist(index === -1, 'Approved-note task unexpectedly appeared in catalog');
+    }
     if (payload.cardUpdates.length) {
       catalog.updatedAt = at;
       catalog.followupSources = [...(catalog.followupSources ?? []), { commit, sourceFile: path.join(root, payload.sourceCardFile), sourceSha256: payload.files.find(f => f.repoPath === payload.sourceCardFile).sha256, updatedTaskIds: plan.taskIds, at, maintenanceToken: token }];
