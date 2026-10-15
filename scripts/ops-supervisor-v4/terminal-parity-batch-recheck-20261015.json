@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n24-screen-print-metadata-20261014",
+      "productId": "N24",
+      "activationId": "po-20261012-continuous",
+      "priority": -20,
+      "scopeKey": "n24-screen-print-consistent-metadata",
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "objective": "Implement latest PO report refinements on current source: metadata School/School year/Term/Class/Subject centered and balanced; print timestamp physically LEFT in a quiet existing row without reserving an empty full row; teacher/principal roles and names centered in BOTH on-screen preview and print (prior fix only affected print); bottom Rakeez signature centered and actual clickable https://rakeezx.com/ link retained in saved PDF. Browser-added URL/title/date header/footer is distinct from page content: investigate the actual print route and produce a clean result within existing stack without destructive global browser settings. Do not falsely claim page CSS can always change the user's print-dialog option. Preserve report range date and values, and do not create a full new PDF stack merely for this correction.",
+      "allowedPaths": [
+        "src/lib/report-print.js",
+        "src/views/reports.js",
+        "src/views/execution-report.js",
+        "src/views/cross-class-reports.js",
+        "src/styles/reports.css",
+        "src/styles/components.css",
+        "tests/n24-*",
+        "tests/n23-*",
+        "docs/automation-evidence/20261014/N24_SCREEN_PRINT_METADATA.md"
+      ],
+      "requiredChecks": [
+        "n24_actual_screen_and_print_alignment",
+        "n24_brand_link_pdf_annotation",
+        "n24_browser_header_footer_boundary",
+        "n24_report_values_and_page_geometry"
+      ],
+      "acceptance": [
+        "Test actual report PREVIEW DOM and computed layout, not print CSS only. School/year/term/class/subject group is centered with compact balanced cells; teacher/principal name and role centered inside bottom cards on both screen and print; report title and bottom signature centered. Print timestamp is on left in an existing content line with no empty reserved row. Preserve school/class/subject/range and blank optional fields, not hardcoded PO names.",
+        "Wrap real footer brand in safe constant HTTPS anchor so generated PDF has URI link annotation to https://rakeezx.com/ with no account/class IDs or query. Inspect actual generated PDF annotations and first/last page images; not just finding href in HTML. No external tracker in PDFs or teacher data upload.",
+        "Chrome official docs https://developer.chrome.com/blog/print-margins explain browser auto headers/footers use page margins and can be disabled in print dialog; small/zero margins suppress when no space but affect pagination. Evaluate a minimal tested print-layout fix on multi-page output only if no clipping/overlaps/margin loss; keep fallback instructions explicit where browser settings still control it. Do not set machine policies or manipulate personal browser. A CDP-generated test PDF with displayHeaderFooter:false alone does NOT prove window.print user default is fixed. Record observed vs browser-setting boundary honestly.",
+        "Reuse existing generated actual reports/fixtures and relevant value checks. Inspect short+multi-page grade/detailed reports and390px screen, invariant totals/order/date range, signatures and final row not clipped. No full53page rerun, Auth/schema/grade mutation or pipeline review layer. Same publisher verified served source; parentN23 remains linked without duplicate worker."
+      ],
+      "releaseAuthority": "Current direct PO explicitly requests screen/print metadata alignment, physical-left print time, centered clickable brand and removing browser-generated decoration. Routine report-only UI/CSS/print changes authorized; no device policy/private browser manipulation or unrelated data changes.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "ef1afee281bb362da9502b2bd05b8c6a8a848ab4",
+        "priorReceiptSha256": "2f606d792bea89ea1d85e10418c3e89f860e6f1cc3cd569476cf290ea47f1b3c",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N24: Saved candidate and all required worker checks have passed, provider succeeded, immutable source is correct. The original canonical index.html source comparison exhausted twenty attempts before the pinned Cloudflare JSD/Analytics inter-tag whitespace matcher correction. New verifier (27/27 PASS) and the separately verified narrow exhausted-parity maintenance guard (12/12 PASS) permit this exact source-only recheck. Keep all original receipts, actual account data, rejection history, and unknown/failed checks unchanged. The sole publisher must independently verify the current main, hosted assets and served Production before any acceptance."
+      }
+    },
+    {
+      "id": "continuous-n90-class-terminology-20261014",
+      "productId": "N90",
+      "activationId": "po-20261012-continuous",
+      "priority": 4,
+      "scopeKey": "n90-visible-class-terminology",
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 7,
+      "objective": "Complete the explicit global Arabic UI terminology request alongside N90, without duplicating its import implementation: replace remaining user-visible شعبة/الشعبة/شعب forms with فصل/الفصل/فصول and appropriate grammar. Source grep shows actual remaining messages in src/views/home.js,src/views/student.js,src/views/students.js,src/lib/student-lifecycle-ui.js and migration warning wording. Do NOT rename identifiers, database sections/teachings, historical records, contracts or comments solely for cosmetic consistency. Preserve الفصل الدراسي as term and الصف as grade; they are not interchangeable. Coordinate with main N90 importer and don't overwrite its newer UI.",
+      "allowedPaths": [
+        "src/views/home.js",
+        "src/views/student.js",
+        "src/views/students.js",
+        "src/lib/student-lifecycle-ui.js",
+        "src/lib/migrate.js",
+        "tests/n90-terminology*.mjs",
+        "docs/automation-evidence/20261014/N90_CLASS_TERMS.md"
+      ],
+      "requiredChecks": [
+        "n90_visible_class_terms",
+        "n90_empty_class_and_student_message_render"
+      ],
+      "acceptance": [
+        "Visible home empty-state guidance, student deleted-class/context messages, transfer destination warning and class-empty message all use فصل correctly. Internal variable names and actual data remain unchanged. Existing personal names or source imported school text are never rewritten.",
+        "Inspect affected actual DOM/templates plus focused source assertions and syntax. No data mutation, full build, service checks or rerun of accepted N90 grade transaction. Publisher alone delivers. If another active UI source is found outside this exact list, record the concrete path for scoped followup rather than global blind replacement."
+      ],
+      "releaseAuthority": "Current direct PO explicitly requests consistent فصل terminology throughout Rakeez UI. This is text-only and independent of grade service behavior; no scoring/student identity or data changes.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "5e1ddaf8fa1b2cccc1e5c9b30becae61ffbc663a",
+        "priorReceiptSha256": "3f4ecda0242a4d37268a4cb8d6503db69a61629cbfdcab95d55843f709d5eb64",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N90: Saved candidate and all required worker checks have passed, provider succeeded, immutable source is correct. The original canonical index.html source comparison exhausted twenty attempts before the pinned Cloudflare JSD/Analytics inter-tag whitespace matcher correction. New verifier (27/27 PASS) and the separately verified narrow exhausted-parity maintenance guard (12/12 PASS) permit this exact source-only recheck. Keep all original receipts, actual account data, rejection history, and unknown/failed checks unchanged. The sole publisher must independently verify the current main, hosted assets and served Production before any acceptance."
+      }
+    },
+    {
+      "id": "continuous-n44-live-inapp-center-20261014",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": 5,
+      "scopeKey": "n44-account-local-notifications",
+      "riskClass": "STANDARD",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "objective": "Deliver the useful actual IN-APP slice of N44 now, authorized by PO's 'اللي تشوفه مناسب سويه', instead of another disconnected notification Demo. Reuse current notification center model/renderer from the preserved prototype at .worktrees/v5-n44-demo-current-main-20261012 after verifying its sourceManifest, not its old app branch. Connect a calm bell/notification center to actual current teacher-owned in-app state: upcoming/current lesson and dated subitems due soon, using existing eligibility/date/clock contracts. Support read/unread, dismiss ordinary notices, expiry/dedup and safe in-app deep links. No made-up notification feed. If no actionable current event, show a quiet empty state. No external Push service, WhatsApp/email send, marketing, public/admin publishing or new database schema is enabled in this slice.",
+      "allowedPaths": [
+        "src/lib/notification-center.js",
+        "src/lib/notification-events.js",
+        "src/lib/notification-state.js",
+        "src/views/notifications.js",
+        "src/styles/notifications.css",
+        "src/app.js",
+        "sw.js",
+        "tests/n44-*",
+        "docs/automation-evidence/20261014/N44_INAPP_CENTER.md"
+      ],
+      "requiredChecks": [
+        "n44_actual_account_event_generation",
+        "n44_owner_read_dismiss_expiry",
+        "n44_safe_navigation_no_sensitive_leak",
+        "n44_real_ui_offline_boot"
+      ],
+      "acceptance": [
+        "Actual teacher app bell/center accessible at desktop/mobile, list generated from existing current account workspace only. No fake Demo events in real accounts. Names/text are escaped. A lesson reminder expires when its actual eligible time/day passes, not generated across unrelated terms or from stale selected calendars; due date rules reuse current product logic. App resume/time change recalculates without duplicate unread inflation. Do not replace N97 Sync severity with speculative error notices.",
+        "Read/dismiss state stores only bounded event IDs/timestamps per exact owner/workspace/device in a first-party namespace. Never store source tokens, grade/student lists or use an unauthenticated/global namespace; on logout/owner switch clear rendered state before any asynchronous work. Local read preference is explicitly per-device, not silently advertised as synced. Storage failure is nonblocking. Do not bypass read-only data guards or insert notification records into unknown existing stores. Critical account/data-protection banners elsewhere remain visible and unsuppressible; do not create a misleading global mute.",
+        "Allowlisted internal links only, checked against current live item/class ownership/deletion before navigation. No arbitrary URL from source data. Use existing shell/fonts/icons, simple calm hierarchy and320/390px layout; no extra category toggles until a category actually exists. No unsolicited browser permission prompt. Explain OS-level push/reminders while the app is closed are a later uncompleted N44 slice, never claim this local center sends push.",
+        "Test actual app DOM/store source events, owner switch, deleted target, duplicate/read/dismiss/expiry, no notifications from unknown account or across users, and offline shell/reload. Synthetic local transport only, no live accounts/SQL/provider work. Reuse the old pure model evidence only for byte-identical parts; test new actual integration, not another isolated Demo. Add all new startup dependencies to sw.js and verify they load offline. The complete N44 umbrella remains open for Push and admin publishing; this scope delivers a real useful subset without claiming full completion."
+      ],
+      "releaseAuthority": "Current explicit PO authorizes selecting and implementing a suitable N44 approach. This card limits release to teacher-owned in-app derived events and per-device state, no new cross-account data access, real external messaging, Auth/RLS/schema or paid service. Sole publisher delivers verified frontend; record remaining Push/admin scope honestly.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "24dbfed57644dbed13ecd1b77064dff98ed7b0fe",
+        "priorReceiptSha256": "057fe00922669014be9008de5773e75ba8e1d3575750c1627e3acd550a904462",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N44: Saved candidate and all required worker checks have passed, provider succeeded, immutable source is correct. The original canonical index.html source comparison exhausted twenty attempts before the pinned Cloudflare JSD/Analytics inter-tag whitespace matcher correction. New verifier (27/27 PASS) and the separately verified narrow exhausted-parity maintenance guard (12/12 PASS) permit this exact source-only recheck. Keep all original receipts, actual account data, rejection history, and unknown/failed checks unchanged. The sole publisher must independently verify the current main, hosted assets and served Production before any acceptance."
+      }
+    }
+  ]
+}
