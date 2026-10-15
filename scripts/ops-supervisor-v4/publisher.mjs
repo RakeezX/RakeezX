@@ -195,6 +195,9 @@ export function normalizeCloudflareIndex(bytes, metadata) {
   let end = source.lastIndexOf('</body>');
   if (end < 0 || source.indexOf('</body>') !== end) return null;
   // Keep all original whitespace. Only exact contiguous provider tags are removed.
+  // Locate only ASCII HTML whitespace after pinned Cloudflare tags.
+  // Keep every original suffix byte for exact application SHA-256 verification.
+  while (end > 0 && [9,10,12,13,32].includes(source.charCodeAt(end - 1))) end--;
   const providerEnd = end, providers = [];
   if (source.slice(0,end).endsWith(CF_ANALYTICS_20261014)) {
     if (source.indexOf(analyticsMarker) !== source.lastIndexOf(analyticsMarker)) return null;
