@@ -95,7 +95,7 @@ function observeNotifications() {
 function openNotifications() {
   observeNotifications();
   if (!notificationContext || notificationSheet?.isConnected) return;
-  const promise = openSheet({ title: 'الإشعارات', body: renderNotificationCenter(notificationState, notificationContext, notificationNow(notificationContext)),
+  const promise = openSheet({ title: html`<span>الإشعارات</span><button type="button" class="iconbtn n44-sheet-settings" data-act="n44-settings" aria-label="إعدادات الإشعارات" title="إعدادات الإشعارات">${icon('settings')}</button>`, body: renderNotificationCenter(notificationState, notificationContext, notificationNow(notificationContext)),
     onMount: (root, done) => { notificationSheet = root; notificationSheetDone = done; } });
   const mounted = notificationSheet;
   promise.finally(() => { if (notificationSheet === mounted) { notificationSheet = null; notificationSheetDone = null; } });
@@ -481,7 +481,7 @@ function topbar(v, params) {
         ` : title}${sub ? html`<span class="topbar__sub">${sub}</span>` : ''}
       </h1>
       <div class="topbar__actions">
-        ${notificationContext ? renderNotificationBell(notificationSnapshot(notificationState, notificationContext, Date.now()).unread) : ''}
+        ${isHome && notificationContext ? renderNotificationBell(notificationSnapshot(notificationState, notificationContext, Date.now()).unread) : ''}
         ${actions ?? ''}
         ${!inTeaching ? html`
           <button class="quick-theme" data-act="quick-theme" aria-label="${themeAction}" title="${themeAction}">${icon(dark ? 'sun' : 'moon')}</button>
@@ -1603,6 +1603,10 @@ function mountWorkspaceGate(routing) {
 /** أفعال متاحة في كل الشاشات. */
 const GLOBAL_ACTIONS = {
   'n44-center': openNotifications,
+  'n44-settings': () => {
+    notificationSheetDone?.();
+    go('/settings/notifications');
+  },
   'n44-read': el => actOnNotification(el, 'read'),
   'n44-dismiss': el => actOnNotification(el, 'dismiss'),
   'n44-open': el => actOnNotification(el, 'open'),

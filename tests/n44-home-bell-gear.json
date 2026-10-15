@@ -1,0 +1,66 @@
+{
+  "taskId": "continuous-n44-home-bell-sheet-settings-20261015",
+  "runId": "30f713ee-8799-4405-be80-4ae227e99778",
+  "checks": [
+    {
+      "name": "n44_home_only_bell_and_no_subpage_bell",
+      "status": "PASS",
+      "evidence": "Actual mounted app DOM at Home and teaching route, all four requested viewport widths."
+    },
+    {
+      "name": "n44_sheet_single_accessible_gear_navigates_and_closes",
+      "status": "PASS",
+      "evidence": "Actual delegated click closes the sheet and reaches settings; unique labelled/title button; Escape closes and returns focus to bell; checked light and dark."
+    },
+    {
+      "name": "n44_mobile_rtl_empty_center_and_focus",
+      "status": "PASS",
+      "evidence": "Actual notification sheet source CSS at 320/390/768/1280: no dialog/page horizontal overflow; single visible gear; Escape focus restoration."
+    },
+    {
+      "name": "n44_existing_unread_read_dismiss_owner_and_deeplink",
+      "status": "PASS",
+      "evidence": "Existing focused actual-app N44 browser evidence retained unchanged for unread/read/dismiss, owner guards and deep links; this candidate changes only bell placement and sheet navigation."
+    }
+  ],
+  "viewportResults": [
+    {
+      "width": 320,
+      "gearCount": 1,
+      "focusable": 0,
+      "gearVisible": true,
+      "dialogOverflow": false,
+      "headDisplay": "flex",
+      "pageOverflow": false
+    },
+    {
+      "width": 390,
+      "gearCount": 1,
+      "focusable": 0,
+      "gearVisible": true,
+      "dialogOverflow": false,
+      "headDisplay": "flex",
+      "pageOverflow": false
+    },
+    {
+      "width": 768,
+      "gearCount": 1,
+      "focusable": 0,
+      "gearVisible": true,
+      "dialogOverflow": false,
+      "headDisplay": "flex",
+      "pageOverflow": false
+    },
+    {
+      "width": 1280,
+      "gearCount": 1,
+      "focusable": 0,
+      "gearVisible": true,
+      "dialogOverflow": false,
+      "headDisplay": "flex",
+      "pageOverflow": false
+    }
+  ],
+  "origin": "http://127.0.0.1:55681/",
+  "status": "PASS"
+}

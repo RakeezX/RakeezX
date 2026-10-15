@@ -1,5 +1,7 @@
 /* Calm hierarchy from the manifest-verified prototype, using shell tokens. */
 .n44-center { max-width: 680px; margin: 0 auto; min-width: 0; }
+.sheet__title:has(.n44-sheet-settings) { display: flex; align-items: center; gap: 8px; }
+.n44-sheet-settings { flex: 0 0 40px; width: 40px; min-width: 40px; min-height: 40px; padding: 8px; }
 .n44-heading, .n44-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .n44-count { font-size: 14px; }
 .n44-note { font-size: 13px; line-height: 1.8; margin-block: 12px 18px; }
