@@ -1,0 +1,78 @@
+{
+  "scope": "Actual app DOM, handlers and CSS in isolated synthetic loopback contexts",
+  "results": [
+    {
+      "colorScheme": "light",
+      "widths": [
+        {
+          "viewportWidth": 320,
+          "height": 72.59375,
+          "contentWidth": 298,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 390,
+          "height": 72.59375,
+          "contentWidth": 360,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 768,
+          "height": 72.59375,
+          "contentWidth": 738,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 1280,
+          "height": 72.59375,
+          "contentWidth": 934,
+          "overflow": false
+        }
+      ],
+      "longArabicNameEllipsis": true,
+      "keyboardFocus": true,
+      "ordinaryEmailHintsHidden": true,
+      "n44NotificationsLinkPreserved": true,
+      "n36ImportEntryVisible": true
+    },
+    {
+      "colorScheme": "dark",
+      "widths": [
+        {
+          "viewportWidth": 320,
+          "height": 72.59375,
+          "contentWidth": 298,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 390,
+          "height": 72.59375,
+          "contentWidth": 360,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 768,
+          "height": 72.59375,
+          "contentWidth": 738,
+          "overflow": false
+        },
+        {
+          "viewportWidth": 1280,
+          "height": 72.59375,
+          "contentWidth": 934,
+          "overflow": false
+        }
+      ],
+      "longArabicNameEllipsis": true,
+      "keyboardFocus": true,
+      "ordinaryEmailHintsHidden": true,
+      "n44NotificationsLinkPreserved": true,
+      "n36ImportEntryVisible": true
+    }
+  ],
+  "pendingOnlyGuidance": true,
+  "verifiedSameOwnerCompletion": true,
+  "n36ImportEntryVisible": true,
+  "emptyAccountFixture": true,
+  "ownedServerClosed": true
+}
