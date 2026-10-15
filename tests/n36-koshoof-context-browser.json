@@ -1,0 +1,146 @@
+{
+  "taskId": "continuous-n36-contextual-koshoof-hub-20261015",
+  "runId": "4b93857e-4598-4fe3-abdd-c0e0c0d42b4e",
+  "baseSha": "67e0f71a54b5374cd1fccbb74f4b6d9666944b56",
+  "checks": [
+    {
+      "name": "rtl_routes_actions_zero_writes_light_320",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-320.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_light_320",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_light_320",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_light_390",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-390.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_light_390",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_light_390",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_light_768",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-768.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_light_768",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_light_768",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_light_1280",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-1280.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_light_1280",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_light_1280",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_dark_320",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-320.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_dark_320",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_dark_320",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_dark_390",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-390.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_dark_390",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_dark_390",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_dark_768",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-768.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_dark_768",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_dark_768",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "rtl_routes_actions_zero_writes_dark_1280",
+      "status": "PASS",
+      "evidence": "Actual account app DOM/CSS: empty hub four actions, populated hub and both rosters separate import/export, existing paste/add cancellation, exclusive standalone N90 workspace, review retains across modes with fresh consent, zero/cap review and empty header-only template; 44px labeled entry controls, no overflow, unchanged database/outbox and zero service requests or IDB writes. Screenshots: test-results/n36-koshoof-context/*-1280.png"
+    },
+    {
+      "name": "archive_owner_stale_navigation_dark_1280",
+      "status": "PASS",
+      "evidence": "Actual store archive and Auth drift: entry visibility and direct stale handlers refuse navigation or sheets; DB unchanged."
+    },
+    {
+      "name": "rendered_denials_dark_1280",
+      "status": "PASS",
+      "evidence": "Actual HTTP application paints refusal with no transfer controls for owner/account drift, archived/foreign/unknown teaching and invalid writable lease. No Product writes."
+    },
+    {
+      "name": "offline_route_cached_module_composition",
+      "status": "PASS",
+      "evidence": "New hash route loads the existing precached grades.js named export; all dependencies and changed CSS remain in existing shell. No new runtime module. This is shell coverage, not Service Worker/offline-cache certification."
+    }
+  ],
+  "errors": [],
+  "status": "PASS",
+  "ownedServerStopped": true,
+  "ownedBrowserClosed": true,
+  "sourceSha256": {
+    "src/router.js": "67a3c001d9dd3ef8690902f9af2296d041f4cf007605f43d23ac705841120821",
+    "src/views/grades.js": "c43586896d2d2c61a77bdecae020c0458be5efe14be2d2f392b25d1f055131b1",
+    "src/views/students.js": "84cebf2683320bde5ab413bed9cc6f91d0a731afabd5b22720859793415153cf",
+    "src/views/teachings.js": "39e48b4bc020d6cd4fbf22c36b3bceae1c31bb246c5a477210c4626106af3665",
+    "src/styles/grades.css": "f35921225a8903e0552d698c9e903eb6d02808cead6d19ebe20e37145265b59e",
+    "src/styles/components.css": "8860f4e03d3b3bdc2c08796a1a9066c24cb5dd528388c2023dc401468bdfb52e",
+    "sw.js": "3ed1165ff59bdf5872f7d53af701f702c342954b439b3d5a53076a67ee8f219c",
+    "tests/n36-koshoof-context-browser.mjs": "02c8501b39cc6239f6e63fbb4a57a4f0e0a8acc1149c9e3b99b7393a3f92d900"
+  }
+}

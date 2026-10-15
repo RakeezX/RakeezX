@@ -98,3 +98,12 @@
 .grades-01c__mode-bar .grade-transfer__toolbar { min-width:0; }
 
 .grade-transfer__noor-row { max-inline-size:560px; }
+
+/* AI-authored N36: a class-scoped, focused transfer workspace. */
+.koshoof-workspace { max-inline-size:900px; margin-inline:auto; min-inline-size:0; }
+.koshoof-intro { color:var(--text-3); margin-block:0 16px; }
+.koshoof-modes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-block-end:16px; }
+.koshoof-modes .btn { min-block-size:44px; min-inline-size:0; white-space:normal; text-align:center; }
+.koshoof-modes a:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
+.koshoof-workspace .grade-transfer { background:var(--surface); padding:clamp(12px,3vw,24px); }
+.koshoof-workspace .grade-transfer__school { display:block; border-block-start:1px solid var(--border); margin-block:16px; }

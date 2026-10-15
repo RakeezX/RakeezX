@@ -6,6 +6,8 @@
 
 import { html, icon, toast, fmtNum, fmtPct } from '../lib/dom.js';
 import * as store from '../store.js';
+import { canOpenRoster } from './students.js';
+import { go, backWithinApp, syncNavigationContext } from '../router.js';
 import * as cloud from '../lib/cloud.js';
 import { itemScore, studentTotal, masteryBand, normalizeSearchText, displayRoster } from '../models.js';
 import { repaint } from '../repaint.js';
@@ -67,10 +69,10 @@ function transferPanel(teachingId) {
   return html`<div class="grade-transfer noprint" data-grade-transfer ${!transfer.panel ? 'hidden' : ''}>
     <section id="grade-import-panel" data-grade-import-panel aria-label="استيراد الكشوف" ${transfer.panel !== 'import' ? 'hidden' : ''}>
     <div class="grade-transfer__heading"><h2>استيراد الكشوف</h2><button class="btn btn--quiet" data-act="grade-panel-close">إغلاق</button></div>
-    ${store.getActiveWorkspace()?.type === 'account' ? html`<div class="grade-transfer__school">
+    ${store.getActiveWorkspace()?.type === 'account' ? html`<details class="grade-transfer__school"><summary>خيارات مدرستي المتقدمة</summary>
       <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
       <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON مراجَعة فقط · معاينة دون حفظ أو اتصال مباشر بمدرستي</span>
-    </div>` : ''}
+    </details>` : ''}
     <div class="segmented grade-transfer__modes" role="group" aria-label="نوع الاستيراد">
       ${['names','grades'].map(value => html`<button type="button" class="segmented__btn ${transfer.importMode === value ? 'is-on' : ''}" data-act="grade-import-mode" data-mode="${value}" data-fk="grade-import-${value}" aria-pressed="${transfer.importMode === value ? 'true' : 'false'}" ${transfer.busy ? 'disabled' : ''}>${value === 'names' ? 'أسماء فقط' : 'أسماء ودرجات'}</button>`)}
     </div>
@@ -217,7 +219,7 @@ function refreshScoreProjection(studentId, itemId) {
   if (pctEl) pctEl.textContent = fmtPct(total.pct);
 }
 
-export default {
+const gradesView = {
   title: () => 'كشف الدرجات',
   subtitle: (p) => {
     const teaching = store.getTeaching(p.id);
@@ -259,14 +261,8 @@ export default {
 
     const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
     const roster = displayRoster(activeRoster);
-    const binding = JSON.stringify([store.getActiveWorkspace(), cls.id]);
-    if (transferBinding !== binding) {
-      transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
-      transferBinding = binding;
-      transferRoute = null;
-    }
-    const panels = transferPanel(cls.id);
-    const distributionAction = html`<div class="grade-transfer__toolbar"><button class="btn btn--sm" data-act="grade-panel" data-panel="import" data-fk="grade-panel-import" aria-controls="grade-import-panel" aria-expanded="${transfer.panel === 'import' ? 'true' : 'false'}">${icon('upload')} استيراد الكشوف</button><button class="btn btn--sm btn--quiet" data-act="grade-panel" data-panel="export" data-fk="grade-panel-export" aria-controls="grade-export-panel" aria-expanded="${transfer.panel === 'export' ? 'true' : 'false'}">تصدير الكشوف</button><a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
+    const panels = '';
+    const distributionAction = html`<div class="grade-transfer__toolbar">${canOpenRoster(p) ? html`<a class="btn btn--sm btn--quiet" href="#/teaching/${cls.id}/koshoof?import=1">${icon('upload')} استيراد الكشوف</a><a class="btn btn--sm btn--quiet" href="#/teaching/${cls.id}/koshoof?export=1">${icon('download')} تصدير الكشوف</a>` : ''}<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
 
     if (!roster.length) {
       return html`
@@ -885,3 +881,83 @@ export function flushInlineQuickLogEffect(root) {
   if (button) showScoreFloatEffect(button.closest('.graderow__auto,td'),pulse.delta);
   pulse=null;
 }
+
+
+// One transfer state and the original N90 handlers, composed without the gradebook.
+function bindTransfer(id) {
+  const binding = JSON.stringify([store.getActiveWorkspace(), id]);
+  if (binding === transferBinding) return;
+  transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+  transferBinding = binding;
+  transferRoute = null;
+}
+function canOpenKoshoof(p) {
+  if (!canOpenRoster(p)) return false;
+  try {
+    if (store.getActiveWorkspace()?.type === 'account') setupBinding(p.id);
+    else store.assertLeaseWritable();
+    return true;
+  } catch { return false; }
+}
+let focusedKoshoofRoute = null;
+let koshoofOrigin = null;
+let koshoofTeaching = null;
+export const koshoofView = {
+  title: () => 'الكشوف',
+  subtitle: p => {
+    if (!canOpenKoshoof(p)) return '';
+    const teaching = store.getTeaching(p.id);
+    return [store.sectionLabel(store.getSection(teaching.sectionId)), store.getSubject(teaching.subjectId)?.name].filter(Boolean).join(' · ');
+  },
+  back: p => `#/teaching/${p.id}`,
+  beforeRender(p) {
+    focusedKoshoofRoute = null;
+    koshoofOrigin = syncNavigationContext().previous;
+    koshoofTeaching = p.id;
+  },
+  onMount(root, p) {
+    if (canOpenKoshoof(p)) gradesView.onMount(root, p);
+  },
+  onUnmount() {
+    gradesView.onUnmount();
+    const target = location.hash;
+    if (target.startsWith(`#/teaching/${koshoofTeaching}/koshoof`)) return;
+    const fallback = `#/teaching/${koshoofTeaching}`;
+    if (target !== '#' + koshoofOrigin && target !== fallback) return;
+    const id = koshoofTeaching;
+    requestAnimationFrame(() => {
+      if (location.hash === target && canOpenKoshoof({ id }))
+        document.querySelector(`a[href^="#/teaching/${CSS.escape(id)}/koshoof"]`)?.focus({ preventScroll: true });
+    });
+  },
+  render(p) {
+    if (!canOpenKoshoof(p)) {
+      bindTransfer(null);
+      return html`<div class="empty"><div class="empty__title">الكشوف غير متاحة لهذا الفصل</div><p>اختر فصلًا نشطًا من مساحة حسابك.</p><a class="btn" href="#/classes">العودة للفصول</a></div>`;
+    }
+    bindTransfer(p.id);
+    const panel = p.export === '1' ? 'export' : 'import';
+    if (transferRoute !== location.hash) transfer.panel = panel;
+    return html`<div class="koshoof-workspace">
+      <p class="koshoof-intro">استورد كشفًا للمراجعة، أو جهّز كشفًا للتنزيل.</p>
+      <nav class="koshoof-modes" aria-label="مهام الكشوف">${['import','export'].map(value => html`<a class="btn ${panel === value ? 'btn--primary' : 'btn--quiet'}" href="#/teaching/${p.id}/koshoof?${value}=1" data-act="koshoof-mode" data-panel="${value}" data-fk="koshoof-${value}" aria-current="${panel === value ? 'page' : 'false'}" ${transfer.writing ? 'aria-disabled="true"' : ''}>${icon(value === 'import' ? 'upload' : 'download')} ${value === 'import' ? 'استيراد الكشوف' : 'تصدير الكشوف'}</a>`)}</nav>
+      ${transferPanel(p.id)}
+    </div>`;
+  },
+  afterPaint(root, p) {
+    gradesView.afterPaint?.(root, p);
+    if (focusedKoshoofRoute !== location.hash) {
+      focusedKoshoofRoute = location.hash;
+      root.querySelector('[aria-current="page"]')?.focus({ preventScroll: true });
+    }
+  },
+  actions: Object.fromEntries(Object.entries({
+    ...Object.fromEntries(Object.entries(gradesView.actions).filter(([name]) => name.startsWith('grade-') || name === 'teacher-setup-import')),
+    'koshoof-mode'(el, ev, p) { ev?.preventDefault(); if (!transfer.writing) go(`/teaching/${p.id}/koshoof?${el.dataset.panel}=1`, { replace: true }); },
+    'grade-panel-close'(el, ev, p) { if (!transfer.writing) backWithinApp(`/teaching/${p.id}`); },
+  }).map(([name, action]) => [name, (el, ev, p) => {
+    if (!canOpenKoshoof(p)) { ev?.preventDefault(); bindTransfer(null); repaint(); return; }
+    return action(el, ev, p);
+  }])),
+};
+export default gradesView;

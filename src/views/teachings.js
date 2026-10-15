@@ -9,6 +9,7 @@
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, demoPackages, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
+import { canOpenRoster } from './students.js';
 import {
   GRADES, SECTION_COLORS, autoAssignSectionColor, safeColor, todayISO, sectionLabel, normalizeSectionLabel
 } from '../models.js';
@@ -327,6 +328,7 @@ function renderClassCard(tch) {
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
+      ${canOpenRoster({ id: tch.id }) ? html`<div class="class-card__actions"><a class="btn btn--sm btn--quiet" href="#/teaching/${tch.id}/koshoof" aria-label="الكشوف — ${sectionLabel(sec)} — ${sub?.name ?? ''}">الكشوف</a></div>` : ''}
     </div>
   `;
 }

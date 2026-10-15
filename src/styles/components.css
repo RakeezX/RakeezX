@@ -8347,3 +8347,10 @@
 }
 .roster-entry-empty { max-inline-size: 100%; }
 .roster-entry-empty .roster-entry-actions { justify-content: center; }
+
+/* AI-authored N36: secondary class actions, separate from the main card link. */
+.class-card__actions { display:flex; padding:0 12px 8px; }
+.class-card__actions .btn { min-block-size:44px; min-inline-size:44px; }
+.roster-entry-empty { inline-size:min(100%,480px); margin-inline:auto; display:grid; gap:8px; }
+.roster-entry-empty .roster-entry-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); margin:0; }
+.roster-entry-empty .btn { min-inline-size:0; }
