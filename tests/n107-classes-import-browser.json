@@ -1,20 +1,71 @@
 {
   "taskId": "continuous-n107-central-classes-local-file-import-20261015",
-  "runId": "d3c03b8f-0bdd-4dba-b907-f1643fb52721",
+  "runId": "c61563e2-10f5-4440-887d-4142bce81803",
   "checks": [
     {
-      "name": "actual_app_UI_320_390_768_1280_RTL_light_dark",
-      "status": "NOT_RUN",
-      "evidence": "Canonical browser acquisition returned BUSY twice. Harness prepared but not executed or validated; no rendered UI PASS."
+      "name": "actual_UI_320",
+      "status": "PASS",
+      "evidence": "RTL light/dark empty/populated Home and Classes; toolbar, card navigation, central import/export, deletion step 2 cancel, real CSV one-group confirmation/cancel and actual XLSX manual mapping. No overflow; no scores; one class only. Screenshots test-results/n107/."
+    },
+    {
+      "name": "actual_account_owner_term_archive_expired_offline",
+      "status": "PASS",
+      "evidence": "[{\"name\":\"archived\",\"links\":0},{\"name\":\"foreign-teaching\",\"links\":0},{\"name\":\"wrong-user\",\"links\":0},{\"name\":\"other-term\",\"links\":0},{\"name\":\"wrong-session\",\"links\":0}]; expired offline lease hides import, no writes."
+    },
+    {
+      "name": "actual_UI_390",
+      "status": "PASS",
+      "evidence": "RTL light/dark empty/populated Home and Classes; toolbar, card navigation, central import/export, deletion step 2 cancel, real CSV one-group confirmation/cancel and actual XLSX manual mapping. No overflow; no scores; one class only. Screenshots test-results/n107/."
+    },
+    {
+      "name": "actual_UI_768",
+      "status": "PASS",
+      "evidence": "RTL light/dark empty/populated Home and Classes; toolbar, card navigation, central import/export, deletion step 2 cancel, real CSV one-group confirmation/cancel and actual XLSX manual mapping. No overflow; no scores; one class only. Screenshots test-results/n107/."
+    },
+    {
+      "name": "actual_UI_1280",
+      "status": "PASS",
+      "evidence": "RTL light/dark empty/populated Home and Classes; toolbar, card navigation, central import/export, deletion step 2 cancel, real CSV one-group confirmation/cancel and actual XLSX manual mapping. No overflow; no scores; one class only. Screenshots test-results/n107/."
     },
     {
       "name": "actual_installed_offline_routes",
-      "status": "NOT_RUN",
-      "evidence": "New modules are present in sw.js inventory; installed Service Worker/offline reload certification requires the unavailable shared browser phase."
+      "status": "PASS",
+      "evidence": "sw.js v65 cached both new modules; controlled fresh synthetic Demo reload opens import and central selector while offline."
+    },
+    {
+      "name": "actual_partial_receipt_explicit_retry",
+      "status": "PASS",
+      "evidence": "Actual final-confirm handler: synthetic student transaction failure retains section/teaching IDs, defaults and pending name in rendered receipt; second explicit review imports once with same section/items and no scores. Main card opens real hub."
+    },
+    {
+      "name": "actual_confirmation_session_callback",
+      "status": "PASS",
+      "evidence": "Session changes while final confirmation is visible: actual UI handler rejects with zero writes, retains pending name, then accepts only a fresh explicit same-owner review."
+    },
+    {
+      "name": "actual_term_drift_keyboard_back",
+      "status": "PASS",
+      "evidence": "Changing active term after preview blocks confirmation before any modal/write. Restored term; keyboard Tab reaches controls and app Back returns to the recorded in-app predecessor; draft navigation makes no Product writes."
     }
   ],
-  "blocker": "BUSY browser; the recorded owner must finish or be factually recovered",
-  "observedOwnerTaskId": "continuous-n106-koshoof-followup-ux-identity-mapping-20261015",
-  "observedOwnerToken": "ad277a1f-fc36-4411-99ce-7b7542f8b321",
-  "cleanup": "No browser/server launched; no phase lease acquired; another owner's resource was untouched."
+  "errors": [],
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-central-classes-local-file-import-20261015/tests/n107-classes-import-browser.mjs:69:16",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-central-classes-local-file-import-20261015/tests/n107-classes-import-browser.mjs:94:14",
+    "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#class-delete-confirm-btn') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-central-classes-local-file-import-20261015\\tests\\n107-classes-import-browser.mjs:115:226",
+    "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.classes-page') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-central-classes-local-file-import-20261015\\tests\\n107-classes-import-browser.mjs:122:95"
+  ],
+  "cleanup": "Owned browser contexts, browser and loopback server closed in finally.",
+  "testedProductCommit": "6017d0a344115095461318ecf0b80385eacfc288",
+  "testedProductFilesSha256": {
+    "src/views/home.js": "cc4e6636b6e9a403755d1a964caf5c362115aac34e2221c211ad4fbc5517c45e",
+    "src/views/teachings.js": "67eddca980e619f28ca2e8a9893348a7a35906b84a7aa21360666f0fe1a1e1d0",
+    "src/views/class-import-center.js": "6a3e6ed1981ea2f92bdaf18f10d8f14e0c245d76f62c3592f11ae5639bda33f4",
+    "src/lib/class-import-file.js": "8f7b7c50bea59c158f695f6a9ec1638316c1c1ddac83c09c77818b34051ad9e1",
+    "src/store.js": "a816a9dcf52323c656ce6ab6280e5367d721bdfa699ee34accd53177ec0c793d",
+    "src/router.js": "ef079e253b133453cb9ba66683b532cd988e9c6dc4f3d3eaff88e9f76324d328",
+    "src/styles/components.css": "a0e6ab3c03f786429351b5d61eb79b1812416898523b63569806ae0b6662125a",
+    "sw.js": "4fd29f24322093b7d1c4569d459c48cc4d9a89bbe3084809abde6d4cd107a1f8"
+  },
+  "phaseLease": "Acquired and released for run c61563e2-10f5-4440-887d-4142bce81803; publisher idle and N106 lease absent before acquisition."
 }

@@ -1,4 +1,48 @@
-# N107 — candidate implementation; browser phase BLOCKED
+# N107 — LOCAL_READY after reviewed resume
+
+## Current result — run c61563e2-10f5-4440-887d-4142bce81803
+
+Continued the same saved session/worktree and preserved candidate `6017d0a344115095461318ecf0b80385eacfc288`, based on `2b875721e8cee777489d8e99fb2a253065cdbb4e`. **Product source did not change during this resume.** The final AI commit adds the validated browser harness/evidence and the supplemental lease fixture adapter. Its full candidate SHA is returned in the runner result.
+
+Fresh canonical state showed N106 absent from active workers, no browser lease, `deliveryInFlight: null`, and no publisher process. The canonical phase helper acquired the browser lease for this run. Actual app checks used `http://127.0.0.1:49107`, original application modules/DOM/handlers/CSS, fresh disposable contexts, no user profile/credentials, only synthetic local data, and blocked non-loopback requests. The separate installed-offline context allowed the real Service Worker. Browser, contexts and HTTP server closed in each owned finally; the canonical phase helper returned `RELEASED browser` afterward.
+
+Executed successfully:
+
+```text
+node tests/n107-classes-import-browser.mjs
+node tests/n107-classes-import-browser.mjs --recovery-only
+```
+
+Nine actual browser check records PASS in `tests/n107-classes-import-browser.json`:
+
+- 320, 390, 768 and 1280: RTL, light/dark empty/populated Home and Classes, state-A secondary import only, top toolbar, bottom Demo, central class-scoped import/export, actual CSV preview/cancel/final save of ONE of two groups, actual XLSX explicit missing-context mapping, no horizontal overflow, no score creation. The actual bottom Demo button creates a synthetic account-local package; existing two-step deletion cancels without writes and then deletes only that Demo while preserving the imported real-class-shaped synthetic rows. Pending outbox on the imported class correctly refuses N77 deletion rather than bypassing Sync.
+- Actual account entry rejects archived/foreign teachings, wrong Auth user/session and other term. Expired offline lease hides import and performs no Product writes.
+- Real SW v65 cached both new modules; a controlled Demo document reloads the import route and opens the central selector offline. This is local offline certification, not live account/Sync certification.
+- Actual injected student-transaction failure shows saved section/teaching IDs, zero saved students and the pending name in the rendered receipt. A fresh explicit review/confirmation imports the name once, preserving the same section and default-item count, with no scores. The class card opens its actual hub.
+- Auth session changes while the final modal is visible reject with zero writes and retain pending names. Only a subsequent explicit same-owner review permits continuation.
+- Changing term after preview rejects before confirmation/write. Keyboard Tab reaches controls; app Back follows the actual recorded predecessor (including the class hub), with no navigation-side writes.
+
+Inspected screenshots from the actual app, including 320 light fresh Home, 1280 light fresh Home, 390 dark populated Classes and 390 partial receipt. The screenshot set remains in ignored local artifacts `test-results/n107/`. JSON records SHA-256 of all eight changed Product source files and the tested Product commit; these bytes are unchanged in the final candidate.
+
+The first unvalidated harness exposed four test-assumption failures, preserved verbatim in `previousFailures`: stale old-route/old-paint selectors (fixed by waiting for actual route content and preview paint), expecting real-class deletion to ignore its pending Sync outbox (corrected to assert the original safe refusal and exercise two-step Demo deletion), and assuming Back always means Classes (corrected to the existing observed in-app predecessor contract). No Product guard was weakened or changed to pass these checks. The later recovery-only run reused the already-passed width/offline evidence.
+
+### Supplemental original subject assertions — valid fixture, no Product lease changes
+
+The old helper only mounted the registry account. It omitted `leaseGeneration`, Auth user/session, persisted matching Auth storage, the runtime context update and a verified lease renewal. `workspaceLeaseBinding` and `renew` correctly reject this missing evidence, explaining the historical `OFFLINE_LEASE_LIMITED` on both candidate and base.
+
+The allowed `tests/n12-student-import.test.mjs` is a fixture adapter that imports the **unchanged original** `subject-flexibility.test.mjs` and retains every original assertion. Before each original test it supplies a matching synthetic session/storage, the lower-level claimed-account descriptor with generation `[owner,null,null,null]` used by the existing N12 store fixture, updates the actual runtime lease context, and renews with the existing verified-owner callback contract. It asserts `editable === true` before running assertions. This lower-level subject fixture does not claim UI account provenance; the actual N107 UI checks separately used a provisioned account receipt and the real provenance guard. No Auth/lease/Product implementation or denial assertion was changed.
+
+Executed:
+
+```text
+node --test tests/n107-central-entry.test.mjs tests/n104-class-operations.test.mjs tests/n107-classes-import-mutation.test.mjs tests/n12-student-import.test.mjs
+```
+
+**18/18 PASS**: original source/route inventory, owner/provenance and term/session/DB/cross-tab negatives, partial retry/idempotency, and all six unchanged supplemental subject assertions with the corrected fixture. Historical direct-entry failures below remain historical facts; the supported supplemental invocation now uses the fixture adapter. Unchanged parser (4), original N12 parser/store (9), and section-validation (10) PASS evidence is reused from the saved candidate. No blanket suite/build/Preview was repeated.
+
+Result: **LOCAL_READY**, with no local blocker. Sole controller/publisher still owns integration/build metadata/Cloudflare/provider and exact served asset checks. No push, deploy, service operation, real teacher/student write, queue/status edit or Product acceptance claim was made.
+
+## Previous attempt — historical record, superseded by the current result above
 
 AI-authored implementation and evidence. Task `continuous-n107-central-classes-local-file-import-20261015`, run `d3c03b8f-0bdd-4dba-b907-f1643fb52721`. Base `2b875721e8cee777489d8e99fb2a253065cdbb4e`. Candidate is the commit containing this record; its full identity is returned in the runner result.
 
