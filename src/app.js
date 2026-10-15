@@ -29,7 +29,7 @@ import { runInitialRestore } from './lib/initial-restore.js';
 import { runAccountProvisioning } from './lib/account-provisioning.js';
 import { createNotificationCenter, notificationScope, updateNotificationCenter, notificationSnapshot } from './lib/notification-center.js';
 import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './lib/notification-events.js';
-import { readNotificationCategories, notificationCategoryAllowed, readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
+import { notificationNow, readNotificationCategories, notificationCategoryAllowed, readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_CATEGORY_PREFIX, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
 import { renderNotificationCenter, renderNotificationBell } from './views/notifications.js';
 import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
 import {
@@ -68,8 +68,8 @@ function clearNotificationUI() {
   document.querySelectorAll('.n44-bell').forEach(el => el.remove());
 }
 function observeNotifications() {
-  const now = Date.now();
   const context = currentNotificationContext(store, cloud);
+  const now = notificationNow(context);
   if (notificationScope(context) !== notificationState.scope) {
     clearNotificationUI();
     notificationState = createNotificationCenter(context);
@@ -95,14 +95,14 @@ function observeNotifications() {
 function openNotifications() {
   observeNotifications();
   if (!notificationContext || notificationSheet?.isConnected) return;
-  const promise = openSheet({ title: 'الإشعارات', body: renderNotificationCenter(notificationState, notificationContext, Date.now()),
+  const promise = openSheet({ title: 'الإشعارات', body: renderNotificationCenter(notificationState, notificationContext, notificationNow(notificationContext)),
     onMount: (root, done) => { notificationSheet = root; notificationSheetDone = done; } });
   const mounted = notificationSheet;
   promise.finally(() => { if (notificationSheet === mounted) { notificationSheet = null; notificationSheetDone = null; } });
 }
 function actOnNotification(el, type) {
   observeNotifications();
-  const context = notificationContext, now = Date.now();
+  const context = notificationContext, now = notificationNow(context);
   if (!context) return;
   const destination = type === 'open' ? notificationDestination(store, context, el.dataset.id, now) : null;
   notificationState = updateNotificationCenter(notificationState, context,
@@ -117,11 +117,20 @@ function actOnNotification(el, type) {
 store.onWorkspaceDeactivation(clearNotificationUI);
 cloud.subscribe(() => { if (!currentNotificationContext(store, cloud)) clearNotificationUI(); });
 window.addEventListener('storage', event => {
+  // Clock-only writes must not cause tabs to repaint/write clocks back at each
+  // other. Ordinary preference changes still recompute the actual settings/UI.
+  if (event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX)) {
+    try {
+      const before = JSON.parse(event.oldValue), after = JSON.parse(event.newValue);
+      if (before && after && ['lesson', 'due', 'lessonMinutes', 'dueDays'].every(key =>
+        JSON.stringify(before[key]) === JSON.stringify(after[key]))) return;
+    } catch { /* Corruption/removal must still refresh safe defaults. */ }
+  }
   if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) {
     if (!currentNotificationContext(store, cloud)) clearNotificationUI();
   }
-  if (event.key?.startsWith(NOTIFICATION_STORAGE_PREFIX)) {
-    notificationState.preferences = readNotificationPreferences(currentNotificationContext(store, cloud), Date.now());
+  if (event.key === null || event.key?.startsWith(NOTIFICATION_STORAGE_PREFIX)) {
+    notificationState.preferences = readNotificationPreferences(currentNotificationContext(store, cloud), notificationNow(currentNotificationContext(store, cloud)));
   }
   scheduleRender();
 });

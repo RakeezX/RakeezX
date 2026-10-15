@@ -15,3 +15,9 @@
 .n44-bell-count { position: absolute; inset-block-start: 0; inset-inline-end: -2px; border-radius: 10px; padding: 0 4px; background: var(--action-primary); color: var(--action-on-primary, #fff); font-size: 11px; line-height: 18px; }
 .n44-center :is(button, a):focus-visible, .n44-bell:focus-visible { outline: 3px solid var(--action-primary); outline-offset: 3px; }
 @media (max-width: 480px) { .n44-item { padding: 12px; } .n44-actions { gap: 4px; } }
+
+.n44-timing { min-width: 0; margin-block: 12px; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+.n44-timing-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.n44-timing-options .btn { min-height: 44px; white-space: normal; }
+.n44-timing-options [aria-pressed="true"], .n44-timing-options [aria-checked="true"] { outline: 2px solid var(--action-primary); outline-offset: -2px; }
+.n44-timing-options button:focus-visible { outline: 3px solid var(--action-primary); outline-offset: 3px; }

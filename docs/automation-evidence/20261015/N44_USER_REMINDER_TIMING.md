@@ -1,0 +1,21 @@
+# N44 user-controlled in-app reminder timing — local candidate evidence
+
+- Task: `continuous-n44-configurable-reminder-intervals-20261015`
+- Run: `17f2414d-6a1c-469e-899a-4a1872d7d259`
+- Base: `f0617d52ab0401396e67ef84676d51392a36b4c2`
+- Authority: activated bounded N44 card; canonical current Product row read 2026-10-15. Local implementation only; independent publisher owns integration/provider/Production proof. No whole-N44 closure or customer acceptance.
+
+Settings now offers seven lesson leads (5/10/15/20/30/45/60, default 15) and four independent due-day stages (3/2/1/0, default all). The existing owner/workspace/device category record stores the allowlisted choices and observed clock/date high-water marks. Category changes preserve timing and vice versa. Existing notice IDs and read/dismiss storage remain unchanged; no new startup dependency, SW path, database, Push permission or message sender.
+
+Read-only adapter eligibility uses the selected exact lead and current local due-day stage; it never generates catch-up days. Persisted high-water instant/date prevents rollback or backward timezone dates replaying expired earlier windows. A forward-misconfigured clock can conservatively suppress ordinary reminders until local time catches up. Mandatory safety UI/guards remain independent. Storage exceptions retain safe defaults and report failed explicit preference writes. Clearing browser storage necessarily clears local preferences/history.
+
+## Affected verification
+
+- `node --test tests/n44-inapp.test.mjs tests/n44-preferences.test.mjs tests/n44-reminder-timing.test.mjs tests/n44-user-timing.test.mjs`: **20/20 PASS**, including original five in-app tests; seven precise lesson boundaries/end and a valid school-day lead crossing midnight, independent ISO due stages/no catch-up, owner/workspace/device isolation, storage errors, category preservation, reload/clock dedupe, DST fold and timezone ID stability.
+- `N44_RUN_ID=17f2414d-6a1c-469e-899a-4a1872d7d259 node tests/n44-quiet-ui.mjs`: **PASS**, recorded in `tests/n44-quiet-ui.json`. Actual unbundled application DOM/handlers/source CSS over owned loopback HTTP, fresh synthetic registered accounts and real runtime ownership guard. Settings at 320/390px has no horizontal overflow; 5/30-minute changes immediately alter eligible events; four stage switches persist over reload; a storage event updates actual settings. Existing center checks at 320/390/1280, escaped names, read/dismiss/reload, negative owner guard, stale-child navigation, unchanged outbox, synchronous logout clearing and mandatory LIMITED banner pass. Real SW cache/offline reload passes; 60-minute preference can be changed and survives a second reload offline. No page errors. External network requests blocked, including Supabase; no live data used.
+- `node --check` on changed application JS files and `git diff --check`: **PASS**.
+- Browser lease acquired/released by canonical helper with matching task/run. Browser and owned ephemeral loopback server closed in finally. JSON records `RELEASED browser`.
+
+Initial UI attempt failed at the disabled-stage ARIA assertion (`page.waitForFunction` timeout at then-line 96): template interpolation rendered boolean false as an empty attribute. Corrected to explicit string ARIA values and added stable focus keys. The corrected actual app scenario passed. The later app change ignores clock-only storage events to prevent cross-tab repaint/write feedback; affected UI/storage/offline checks passed on that final source. The added midnight test initially used a Friday fixture and correctly received no event under the existing school-day guard; corrected the fixture to Monday without changing the guard. A later viewport probe captured empty computed display from a node replaced during resize repaint; the harness now captures connected current DOM and applied CSS in one successful document checkpoint, preserving the original failed observation. No tool denial occurred and no live proof phase was consumed.
+
+No push, deploy, queue/status mutation or service operation was performed. Exact candidate is the AI-identified commit containing this evidence; controller records its SHA and any subsequent delivery proof separately.

@@ -1,11 +1,16 @@
 {
-  "taskId": "continuous-n44-timing-quiet-preferences-20261015",
-  "runId": "178cc117-c6e5-4dfc-9178-5f4f1427d16b",
+  "taskId": "continuous-n44-configurable-reminder-intervals-20261015",
+  "runId": "17f2414d-6a1c-469e-899a-4a1872d7d259",
   "checks": [
     {
       "name": "n44_actual_account_event_generation",
       "status": "PASS",
       "evidence": "Actual registered synthetic account boot + runtime ownership guard; 4 real store-derived events at 320/390/1280; past/cancelled/foreign/historical sources absent, stale selected holiday ignored, escaped names, applied source CSS and keyboard focus return."
+    },
+    {
+      "name": "n44_user_timing_actual_settings_mobile",
+      "status": "PASS",
+      "evidence": "Actual authenticated settings handlers, applied flex CSS at 320/390, 5/30 minute immediate event replacement, all four independent stage switches and reload persistence; defaults restored for retained regression."
     },
     {
       "name": "n44_preferences_real_settings_and_quiet_empty",
@@ -73,7 +78,7 @@
     }
   ],
   "lease": "ACQUIRED browser",
-  "origin": "http://127.0.0.1:64999",
+  "origin": "http://127.0.0.1:59820",
   "checkpoint": {
     "owner": "a4400000-0000-4000-8000-000000000001",
     "database": "rakeezx-user-ea6648b2949ca5609a8287419c903833",

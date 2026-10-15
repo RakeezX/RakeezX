@@ -1,4 +1,5 @@
 /** Read-only adapter. No record generation, cloud calls, scores or student reads. */
+import { readNotificationTiming } from './notification-state.js';
 import { todayISO, shiftDate } from '../models.js';
 import { normalizeSubitemDatesAndPoints } from './score-foundation.js';
 import { runtimeSyncOwnershipGuard } from './sync-ownership.js';
@@ -39,21 +40,25 @@ export function currentNotificationEvents(store, context, now = Date.now()) {
   const scope = notificationScope(context);
   if (!scope || !store.state.ready || store.getActiveWorkspace()?.databaseName !== context.workspaceId ||
     store.getActiveWorkspace()?.authUserId !== context.ownerId || !Number.isFinite(now)) return [];
+  const timing = readNotificationTiming(context);
   const today = todayISO(new Date(now)), events = [], contexts = new Map();
+  if (today < timing.observedDate) return [];
   for (const teaching of store.state.teachings) {
     const value = currentTeaching(store, context, teaching.id, today);
     if (value) contexts.set(teaching.id, value);
   }
-  for (const session of store.sessionsOn(today)) {
-    const value = contexts.get(session.teachingId);
-    if (!value || !owned(session, context) || !store.isSessionEligibleDate(today, value) ||
-      ['cancelled', 'cancelled_holiday'].includes(session.status)) continue;
-    const start = wallTime(today, session.startTime), end = wallTime(today, session.endTime);
-    if (!(end > start && start - now <= 15 * 60000 && now < end)) continue;
-    events.push({ id: eventId('lesson', session.id, `${today}:${session.startTime}:${session.endTime}`), scope,
-      kind: 'lesson', expiresAt: end, at: start, teachingId: session.teachingId, targetId: session.id,
-      title: now >= start ? 'حصتك الحالية' : 'حصة تبدأ قريبًا',
-      body: `${store.teachingLabel(value.teaching)} · ${session.startTime}–${session.endTime}`, action: 'عرض الحصة' });
+  for (const lessonDate of [today, shiftDate(today, 1)]) {
+    for (const session of store.sessionsOn(lessonDate)) {
+      const value = currentTeaching(store, context, session.teachingId, lessonDate);
+      if (!value || !owned(session, context) || !store.isSessionEligibleDate(lessonDate, value) ||
+        ['cancelled', 'cancelled_holiday'].includes(session.status)) continue;
+      const start = wallTime(lessonDate, session.startTime), end = wallTime(lessonDate, session.endTime);
+      if (!(end > start && start - now <= timing.lessonMinutes * 60000 && now < end)) continue;
+      events.push({ id: eventId('lesson', session.id, `${lessonDate}:${session.startTime}:${session.endTime}`), scope,
+        kind: 'lesson', expiresAt: end, at: start, teachingId: session.teachingId, targetId: session.id,
+        title: now >= start ? 'حصتك الحالية' : 'حصة تبدأ قريبًا',
+        body: `${store.teachingLabel(value.teaching)} · ${session.startTime}–${session.endTime}`, action: 'عرض الحصة' });
+    }
   }
   for (const item of store.state.items) {
     const value = contexts.get(item.teachingId);
@@ -63,7 +68,7 @@ export function currentNotificationEvents(store, context, now = Date.now()) {
       let dates;
       try { dates = normalizeSubitemDatesAndPoints(subitem); } catch { continue; }
       const due = dates.dueDate;
-      if (!due || due < today || due > shiftDate(today, 3) || due < value.term.startDate || due > value.term.endDate ||
+      if (!timing.dueDays.some(day => due === shiftDate(today, day)) || !due || due < today || due > shiftDate(today, 3) || due < value.term.startDate || due > value.term.endDate ||
         dates.startDate && dates.startDate > today) continue;
       const expiresAt = new Date(`${shiftDate(today, 1)}T00:00:00`).getTime();
       events.push({ id: eventId('due', subitem.id, `${due}:${today}`), scope, kind: 'due', at: expiresAt, expiresAt,
