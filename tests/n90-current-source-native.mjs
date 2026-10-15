@@ -44,6 +44,18 @@ try {
   assert.ok((await q("select pg_get_functiondef('rakeezx.n58_guard_calendar_contract()'::regprocedure) definition")).rows[0].definition.includes('N58_SESSION_CONTEXT_REQUIRED'));
   functions=(await q(`select p.proname,md5(p.prosrc) body_md5,pg_get_functiondef(p.oid) definition,p.proacl::text acl,p.prosecdef,p.proconfig from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='rakeezx' and p.proname in ('reviewed_grade_import_capability','apply_reviewed_grade_import') order by 1`)).rows;
   assert.equal(functions.length,2);for(const f of functions){assert.equal(f.prosecdef,true);assert.ok(!f.acl.includes('anon=')&&!f.acl.includes(',=')&&f.acl.includes('authenticated=X'));}
+  if (process.argv.includes('--service-readback')) {
+    // Local-only provider-history stand-in; validate the exact new verifier before any hosted fixture.
+    await q('create schema supabase_migrations;create table supabase_migrations.schema_migrations(version text,name text,statements text[])');
+    await q('insert into supabase_migrations.schema_migrations values($1,$2,$3)', ['20261014100000','n90_unified_student_grade_import',[await readFile('supabase/migrations/20261014100000_n90_unified_student_grade_import.sql','utf8')]]);
+    const results=await q(await readFile('tests/n90-service-readback.sql','utf8'));
+    const result=results.at(-1).rows[0];
+    assert.equal(result.transactional_proof.fixtureRolledBack,true);
+    assert.equal(result.transactional_proof.checks.length,8);
+    assert.equal(result.functions.length,4);assert.equal(result.migration_records.length,1);
+    await writeFile(path.join(artifact,'service-readback.json'),JSON.stringify(result,null,2));
+    record('n90_complete_hosted_verifier_local_certification','Exact hosted verification SQL passed with eight ACL/owner/atomicity/retry checks and full synthetic rollback on current native schema before service provisioning.');
+  } else {
   await q(`insert into rakeezx.years(id,label,hijri_start,hijri_end) values('y','Synthetic',1448,1449);
     insert into rakeezx.terms(id,year_id,name,"index",status,start_date,end_date) values('term','y','Synthetic',1,'active','2026-08-23','2027-01-07');
     insert into rakeezx.terms(id,year_id,name,"index",status,start_date,end_date) values('term2','y','Upcoming',2,'upcoming','2027-01-17','2027-06-24');
@@ -59,6 +71,7 @@ try {
   const revision=(await q("select revision from rakeezx.years where id='y'")).rows[0].revision;
   await q("select rakeezx.apply_sync_v2_mutation(p_entity=>'years',p_record_id=>'y',p_mutation_id=>'current-select-G',p_device_id=>'native',p_base_revision=>$1,p_operation=>'patch',p_patch=>$2)",[revision,{calendar_preset_id:'sa-general-1448-1449'}]);
   checks.push(...await (await import('./n90-current-source-browser.mjs')).browserFlow({q,owner:OWNER}));
+  }
 } finally {
   await client?.end();if(started)run('pg_ctl',['-D',cluster,'-w','-m','fast','stop']);
   assert.ok(cluster.startsWith(path.resolve('test-results')+path.sep));await rm(cluster,{recursive:true,force:true});
