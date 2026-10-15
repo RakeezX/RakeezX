@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n103-account-demo-class-delete-20261015",
+      "productId": "N103",
+      "activationId": "po-20261012-continuous",
+      "priority": -96,
+      "scopeKey": "n103-account-local-demo-deletion-with-owner-guards",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261015-USER-REQUEST-ACCOUNT-DEMO-DELETE",
+      "dependsOn": [],
+      "objective": "URGENT user-reproduced actual bug on production main 9ea9bc4335b2ebab66fd8b11b99de78f9c41e9c4: inside user's OWN authenticated account, Classes 'إضافة فصل تجريبي' calls createDemoPackage and creates only demo:* local-only section/teaching/student/session/item rows and a local demo:packages manifest in the selected owner account DB. The Classes delete-class-flow treats isDemo(teaching) true and calls store.deleteDemoTeachingScope, which hard-requires workspace.type=demo and rakeezx-demo DB, thus wrongly throws 'حذف الفصل التجريبي متاح في مساحة التجربة فقط'. Make user-confirmed deletion of their OWN locally generated demo package succeed safely from both account and standalone demo workspaces without ever deleting or touching a real class or student. Prefer the already existing bound demoPackages + deleteDemoPackage helpers for exact manifest-owned package IDs when workspace.type=account; preserve original store.deleteDemoTeachingScope for standalone 'demo' workspace if correct. Do NOT relax demo-only database guards generically. If only a local demo prefix but its package manifest is missing, foreign/ambiguous, changed or contains ordinary IDs, FAIL CLOSED with actionable warning and leave data as-is; no guessed cascade, no real student/section deletions, no account-switched owner leak. Recheck current workspace identity, DB name, selected teaching ID, confirmed classDeleteScope signature and exact manifest before and immediately after async confirmation. Ensure the demo package tombstones only its own demo:* rows; real student shares/other classes/grades and other demo packages remain untouched, no sync outbox/live service/delete RPC for demo-only changes, no resurrection after reload and no partial apply if return false. Audit exact local applyBatch/save behavior with synthetic account workspaces and produce focused regressions: account owns demo created through same button then one confirmed delete succeeds; cancel returns no writes; forged real row/different owner/absent manifest/stale selected class prevented; preserved standalone demo delete and existing N77 real deletion flow tests; notify/repaint only on success, no repeated deleting when browsing. Use isolated local synthetic browser/IndexedDB fixture at 320/390 and desktop, not user's real account. Current Product code should not be reset or overwritten. IMPORTANT: PO authorizes deploying narrowly guarded click-initiated local-demo-delete behavior to Production, but never running deletion of actual user data via tooling; do not run real class/data mutations, migrations, service admin, Auth changes or secrets. Check bounded safety tests and publish via ONLY the existing controller/publisher with provider/immutable/served evidence. CONDITIONAL CONTROLLED RESUME AFTER THE SOLE SHARED BROWSER LEASE FROM N104 IS FULLY RELEASED. The prior attempted browser check returned BUSY and NOT_RUN, while the other five required safety checks passed and the original candidate is committed. After verified N104 browser lease absence and publisher idle, resume this exact N103 session/candidate via the sole controller, run the missing original actual synthetic browser UI test and any affected final syntax only, then normal single-path Production proof. Do not replace the user click with an assistant data operation; do not mark the old NOT_RUN PASS without test evidence.",
+      "allowedPaths": [
+        "src/lib/demo.js",
+        "src/views/teachings.js",
+        "tests/n103-demo-account-delete.test.mjs",
+        "tests/n103-demo-delete-browser.mjs",
+        "tests/n103-demo-delete-browser.json",
+        "tests/n77-delete-scope.test.mjs",
+        "docs/automation-evidence/20261015/N103_ACCOUNT_DEMO_DELETE.md"
+      ],
+      "verificationPaths": [
+        "src/lib/demo.js",
+        "src/views/teachings.js"
+      ],
+      "requiredChecks": [
+        "n103_account_demo_manifest_exact_owned_delete",
+        "n103_confirmation_cancel_stale_foreign_and_real_id_denial",
+        "n103_no_live_sync_or_other_class_students_touched",
+        "n103_standalone_demo_and_N77_real_delete_unchanged",
+        "n103_actual_classes_delete_dialog_synthetic_browser",
+        "syntax_diff_and_owned_cleanup"
+      ],
+      "acceptance": [
+        "A locally generated demo class created with 'إضافة فصل تجريبي' inside an authenticated account can be selected in 'حذف فصل' and deleted ONLY after the user's existing explicit two-step confirmation, with no message that it is reserved for standalone demo workspace.",
+        "Deletion matches a unique local demo package manifest, current account DB/owner/selected class and exclusively demo:* owned records; no real records, separate local demo package or Sync outbox affected; missing/foreign/forged manifest fails closed.",
+        "No deletion of ordinary real class or records occurs under the local demo route; the protected existing N77 confirmed/hosted path remains unchanged and maintains its own authorization.",
+        "Local synthetic browser confirms cancel, stale confirmation, archived/read-only safety, and valid UI result; case uses no real students, grades or real account session.",
+        "Exact changed bytes served by Cloudflare and Production verified before technical delivery. PO account test not claimed performed by worker.",
+        "The saved ownerless account demo candidate is resumed exactly once after the N104 browser lease is observed released, and the previously NOT_RUN n103_actual_classes_delete_dialog_synthetic_browser check actually runs to PASS before any deployment."
+      ],
+      "preparationAuthority": {
+        "kind": "user-click-only-local-demo-tombstone",
+        "serviceOperations": 0,
+        "migrations": 0,
+        "realStudentData": 0,
+        "allowUserTriggeredLocalDemoDelete": true,
+        "publication": true
+      },
+      "releaseAuthority": "PO 2026-10-15 explicitly instructs urgent correction of inability to delete a demo class personally created via 'إضافة فصل تجريبي' inside main account. Authorizes client code that allows only his own explicit confirmed local-only demo package delete with existing owner ID, DB and exact stored manifest protections and affected user-facing Production deployment. No assistant-triggered deletion; no real students/classes, Auth/schema/RLS/scoring mutations, no blanket access widening and no unconfirmed demo package purge."
+    }
+  ]
+}
