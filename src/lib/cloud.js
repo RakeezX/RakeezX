@@ -1136,7 +1136,7 @@ export const renameScoreItem = (envelope) => distributionRPC('rename_score_item'
   p_revision: envelope.revision, p_name: envelope.name,
 }, 'renameScoreItem', envelope);
 
-export const getGradeImportCapability = () => distributionRPC('reviewed_grade_import_capability', {}, 'getGradeImportCapability', {});
+export const getGradeImportCapability = () => distributionRPC('unified_student_grade_import_capability', {}, 'getGradeImportCapability', {});
 export async function applyReviewedGradeImport(envelope) {
   const ownerId = envelope.ownerId, databaseName = runtimeSyncOwnershipGuard.getWorkspace().databaseName;
   const assertAccess = () => {
@@ -1150,7 +1150,7 @@ export async function applyReviewedGradeImport(envelope) {
     if (typeof mockBackend.applyReviewedGradeImport !== 'function') throw new Error('Mock backend lacks applyReviewedGradeImport');
     const receipt = await mockBackend.applyReviewedGradeImport(envelope); assertAccess(); return receipt;
   }
-  return request('/rpc/apply_reviewed_grade_import', { method: 'POST',
+  return request(envelope.batch.newStudents?.length ? '/rpc/apply_unified_student_grade_import' : '/rpc/apply_reviewed_grade_import', { method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Profile': 'rakeezx', 'Content-Profile': 'rakeezx' },
     body: JSON.stringify({ p_mutation_id: envelope.mutationId, p_device_id: envelope.deviceId, p_batch: envelope.batch }),
   }, false, { assertAccess });

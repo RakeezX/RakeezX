@@ -11,7 +11,7 @@ import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, s
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
 import { user } from '../lib/cloud.js';
-import { readStudentFile, previewStudentRows, detectStudentNameColumn, isStudentNameHeader, importContext, confirmStudentImport } from '../lib/student-import.js';
+import { go } from '../router.js';
 
 let query = '';
 let formerOpen = false;
@@ -44,122 +44,6 @@ export function parseNames(text) {
 }
 
 /* ---------- اللوحات ---------- */
-
-function fileImportSheet(secId) {
-  let rows = null, preview = null, reading = 0;
-  // A single blank student-name column; Excel opens CSV with UTF-8 BOM correctly.
-  const sampleUrl = `data:text/csv;charset=utf-8,${encodeURIComponent('\uFEFFاسم الطالب\r\n')}`;
-  return openSheet({
-    title: 'استيراد الطلاب',
-    desc: 'اختر ملف Excel أو CSV لمراجعة الأسماء قبل إضافتها.',
-    body: html`
-      <label class="field"><span class="field__label">ملف الطلاب</span>
-        <input class="input" id="student-file" type="file" accept=".csv,.xlsx"></label>
-      <a class="field__hint" href="${sampleUrl}" download="نموذج-أسماء-الطلاب.csv">تنزيل نموذج الأسماء (CSV)</a>
-      <div id="file-options" hidden>
-        <label class="field"><span class="field__label">عمود الأسماء</span><select class="input" id="file-column"></select></label>
-      </div>
-      <p id="file-count" role="status" aria-live="polite">لن تُضاف أسماء قبل تأكيدك.</p>
-      <div id="file-preview" class="list"></div>
-      <p class="field__hint">تُقرأ البيانات على جهازك فقط، ولا تُستورد الدرجات.</p>
-    `,
-    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button>
-      <button class="btn btn--primary" id="file-confirm" disabled hidden>إضافة الطلاب</button>`,
-    onMount(root, done) {
-      const input = root.querySelector('#student-file'), column = root.querySelector('#file-column');
-      const go = root.querySelector('#file-confirm');
-      const count = root.querySelector('#file-count'), list = root.querySelector('#file-preview');
-      const refresh = () => {
-        preview = null;
-        go.disabled = true;
-        go.hidden = true;
-        go.style.display = 'none';
-        list.replaceChildren();
-        if (!rows) return;
-        try {
-          preview = previewStudentRows(rows, Number(column.value), false, store.sectionRoster(secId));
-          const { new: added, existing, invalid, ambiguous } = preview.counts;
-          const exceptions = invalid + ambiguous;
-          count.textContent = !preview.entries.length ? 'لم نجد أسماء طلاب في العمود المحدد. اختر عمود الأسماء.'
-            : [added ? `${added} اسمًا جديدًا` : 'لا توجد أسماء جديدة',
-              existing ? `${existing} موجود مسبقًا` : '',
-              exceptions ? `${exceptions} يحتاج مراجعة` : ''].filter(Boolean).join(' • ');
-          const makeEntry = (entry) => {
-            const el = document.createElement('div');
-            el.className = 'row';
-            el.textContent = entry.name;
-            return el;
-          };
-          const candidates = preview.entries.filter((entry) => entry.status === 'new');
-          if (candidates.length) {
-            const title = document.createElement('strong');
-            title.textContent = 'الأسماء التي ستُضاف';
-            list.append(title, ...candidates.slice(0, 6).map(makeEntry));
-            if (candidates.length > 6) {
-              const details = document.createElement('details'), summary = document.createElement('summary');
-              summary.textContent = `عرض بقية الأسماء (${candidates.length - 6})`;
-              details.append(summary, ...candidates.slice(6).map(makeEntry));
-              list.append(details);
-            }
-          }
-          if (exceptions) {
-            const details = document.createElement('details'), summary = document.createElement('summary');
-            summary.textContent = `أسماء تحتاج مراجعة (${exceptions})`;
-            details.append(summary);
-            for (const entry of preview.entries.filter((item) => item.status === 'invalid' || item.status === 'ambiguous')) {
-              const el = document.createElement('div');
-              el.className = 'row';
-              el.textContent = `صف ${entry.row}: ${entry.name} — ${entry.status === 'invalid' ? 'اسم غير صالح' : 'اسم مكرر أو متشابه'}`;
-              details.append(el);
-            }
-            list.append(details);
-          }
-          go.disabled = !added;
-          go.hidden = !added;
-          go.style.display = added ? '' : 'none';
-          go.textContent = `إضافة ${added} طالبًا`;
-        } catch {
-          count.textContent = 'تعذّر معاينة الأسماء. راجع الملف أو اختر عمودًا آخر.';
-        }
-      };
-      input.addEventListener('change', async () => {
-        const ticket = ++reading;
-        rows = null; refresh();
-        root.querySelector('#file-options').hidden = true;
-        const file = input.files[0];
-        if (!file) { count.textContent = 'اختر ملفًا لمعاينته.'; return; }
-        count.textContent = 'جارٍ قراءة الملف على جهازك…';
-        try {
-          const parsed = await readStudentFile(file);
-          if (ticket !== reading || !root.isConnected) return;
-          rows = parsed;
-          column.replaceChildren();
-          const width = Math.max(...rows.map((row) => row.length));
-          const nameColumn = detectStudentNameColumn(rows);
-          for (let index = 0; index < width; index++) {
-            const option = document.createElement('option');
-            option.value = index;
-            const heading = rows.slice(0, 12).find((row) => isStudentNameHeader(row[index]))?.[index];
-            option.textContent = heading ? `${heading} (العمود ${index + 1})` : `العمود ${index + 1}`;
-            column.append(option);
-          }
-          column.value = String(nameColumn);
-          root.querySelector('#file-options').hidden = width === 1;
-          refresh();
-        } catch {
-          if (ticket !== reading || !root.isConnected) return;
-          count.textContent = 'تعذّر قراءة الملف. استخدم CSV بترميز UTF-8 أو XLSX صالحًا ضمن الحدود، أو الصق الأسماء.';
-        }
-      });
-      column.addEventListener('change', refresh);
-      go.addEventListener('click', () => {
-        if (go.disabled || !preview) return;
-        go.disabled = true;
-        done({ rows, column: Number(column.value), hasHeader: false, preview });
-      });
-    },
-  });
-}
 
 function importSheet(secId) {
   const existing = new Set(store.sectionRoster(secId).map((s) => s.name.replace(/\s/g, '')));
@@ -251,7 +135,7 @@ export default {
   back: (p) => `#/teaching/${p.id}`,
 
   topActions: () => html`
-    <button class="btn btn--ghost" data-act="file-import" aria-label="استيراد ملف الأسماء">${icon('upload')} استيراد ملف</button>
+    <button class="btn btn--ghost" data-act="file-import" aria-label="استيراد الأسماء أو الدرجات">${icon('upload')} استيراد ملف</button>
     <button class="iconbtn" data-act="import" aria-label="لصق كشف">${icon('upload')}</button>
     <button class="iconbtn" data-act="add" aria-label="طالب جديد">${icon('plus')}</button>
   `,
@@ -394,42 +278,7 @@ export default {
   },
 
   actions: {
-    async 'file-import'(el, ev, params) {
-      const teaching = store.getTeaching(params.id);
-      if (!teaching || store.isTeachingArchived(teaching)) return;
-      const expectedContext = importContext(store.getActiveWorkspace(), teaching, user?.id);
-      if (!expectedContext) { toast('تحقق من الحساب قبل الاستيراد.', 'danger'); return; }
-      const data = await fileImportSheet(teaching.sectionId);
-      if (!data) return;
-      const current = store.getTeaching(params.id);
-      const currentContext = current && !store.isTeachingArchived(current) ? importContext(store.getActiveWorkspace(), current, user?.id) : null;
-      if (currentContext !== expectedContext) { toast('تغيّر الحساب أو الفصل. افتح المعاينة من جديد.', 'danger'); return; }
-      try {
-        const currentPreview = previewStudentRows(data.rows, data.column, data.hasHeader, store.sectionRoster(teaching.sectionId));
-        const before = store.sectionRoster(teaching.sectionId).length;
-        const result = await confirmStudentImport({ approved: true, preview: data.preview, currentPreview, expectedContext, currentContext,
-          write: async (names) => {
-            const controller = new AbortController();
-            const stop = store.onWorkspaceDeactivation(() => controller.abort());
-            try {
-              return await store.importStudents(teaching.sectionId, names, { signal: controller.signal, verifyCurrent(snapshot) {
-                const persistedTeaching = snapshot.teachings.find((row) => row.id === teaching.id);
-                if (importContext(store.getActiveWorkspace(), persistedTeaching, user?.id) !== expectedContext) throw new Error('IMPORT_CHANGED');
-                const activeIds = new Set(snapshot.enrollments.filter((row) => row.sectionId === teaching.sectionId && row.status === 'active' && !row.deleted).map((row) => row.studentId));
-                const roster = snapshot.students.filter((row) => activeIds.has(row.id) && !row.deleted);
-                const persistedPreview = previewStudentRows(data.rows, data.column, data.hasHeader, roster);
-                if (JSON.stringify(data.preview.entries) !== JSON.stringify(persistedPreview.entries)) throw new Error('IMPORT_CHANGED');
-              } });
-            } finally { stop(); }
-          } });
-        if (store.sectionRoster(teaching.sectionId).length - before !== result.added) {
-          toast('لم يُحفظ الاستيراد. راجع الكشف ثم أعد المحاولة.', 'danger'); return;
-        }
-        toast(`أُضيف ${result.added} طالبًا. لم تُطبّق درجات.`);
-      } catch {
-        toast('تعذّر الاستيراد بأمان أو تغيّر الكشف. راجع المعاينة من جديد.', 'danger');
-      }
-    },
+    'file-import'(el, ev, params) { go(`/teaching/${params.id}/grades?import=1`); },
     search(el) {
       query = el.value;
       repaint();
@@ -504,7 +353,7 @@ export default {
               <span class="field__label">رقم الكشف</span>
               <input class="input tabular" name="rollNo" type="number" inputmode="numeric"
                      min="1" max="999" value="${en?.rollNo ?? ''}">
-              <span class="field__hint">رقم الكشف يخص انتساب الطالب لهذه الشعبة.</span>
+              <span class="field__hint">رقم الكشف يخص انتساب الطالب لهذا الفصل.</span>
             </label>
 
           </form>

@@ -20,7 +20,7 @@ export async function prepareAccount() {
   const rows=await http('fixture');
   rows.profile=[{...models.makeProfile(),ownerId:owner,serverRevision:1}];
   rows.device=[models.makeDevice({schemaVersion:8,deviceId:'n90-synthetic-device',activeYearId:'y',activeTermId:'term'})];
-  rows.timeProfiles=models.DEFAULT_TIME_PROFILES.map(r=>models.makeTimeProfile(r));
+  rows.timeProfiles ??=models.DEFAULT_TIME_PROFILES.map(r=>models.makeTimeProfile(r));
   for(const [name,records] of Object.entries(rows))if(records.length)await db.putMany(name,records);
   await store.init();return {workspace:store.getActiveWorkspace(),lease:store.getOfflineLeaseStatus(),outbox:await db.getAll('outbox'),ready:store.state.ready};
 }

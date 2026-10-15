@@ -76,7 +76,7 @@ export async function readStudentFile(file) {
 }
 
 const nameKey = (value) => String(value ?? '').normalize('NFC').replace(/[\s\u0640\u064B-\u065F\u0670]/g, '').toLowerCase();
-const validName = (value) => typeof value === 'string' && value.replace(/\s+/g, ' ').trim().length >= 2 && value.replace(/\s+/g, ' ').trim().length <= 80 &&
+export const validStudentImportName = (value) => typeof value === 'string' && value.replace(/\s+/g, ' ').trim().length >= 2 && value.replace(/\s+/g, ' ').trim().length <= 80 &&
   /\p{L}/u.test(value) && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\uFFFD\u200B-\u200F\u202A-\u202E\u2066-\u2069]/.test(value) && !/^[=+@-]/.test(value.trim());
 
 const headerKey = (value) => String(value ?? '').normalize('NFKC')
@@ -110,14 +110,14 @@ export function previewStudentRows(rows, column, hasHeader, roster) {
     return { row: firstDataRow + index + 1, name };
   }).filter((entry) => entry.name && !isStudentNameHeader(entry.name));
   for (const entry of candidates) {
-    if (!validName(entry.name)) continue;
+    if (!validStudentImportName(entry.name)) continue;
     const key = nameKey(entry.name);
     seen.set(key, (seen.get(key) ?? 0) + 1);
   }
   const counts = { new: 0, existing: 0, invalid: 0, ambiguous: 0 };
   const entries = candidates.map((entry) => {
     const key = nameKey(entry.name);
-    const status = !validName(entry.name) ? 'invalid'
+    const status = !validStudentImportName(entry.name) ? 'invalid'
       : (existing.get(key) > 1 || seen.get(key) > 1) ? 'ambiguous'
       : existing.has(key) ? 'existing' : 'new';
     counts[status]++;

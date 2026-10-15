@@ -1,3 +1,4 @@
+import { previewStudentRows, validStudentImportName } from './student-import.js';
 import { gradeNumber } from './grade-transfer-parsers.js';
 
 export const gradeNameKey = value => String(value ?? '').normalize('NFC').replace(/[\s\u0640\u064B-\u065F\u0670]/g, '').toLowerCase();
@@ -36,7 +37,7 @@ export function suggestGradeMappings(headers, items) {
 }
 
 /** Explicit mappings only. Rejected rows block the entire review, never a partial batch. */
-export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings, roster, items, scores, teaching, term, ownerId, databaseName }) {
+export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings, roster, items, scores, teaching, term, ownerId, databaseName, allowNewStudents = false, newStudentIds = {} }) {
   if (!teaching || teaching.deleted || !term || term.deleted || teaching.termId !== term.id || term.status === 'closed' ||
       !rows?.length || rows.length > 301 || !Number.isInteger(nameColumn) || nameColumn < 0 || !(Number(teaching.serverRevision) > 0)) throw new Error('GRADE_CONTEXT_INVALID');
   const columns = rows[0].length;
@@ -47,12 +48,12 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
     let item;
     if (mapping.kind === 'new') {
       const max = gradeNumber(mapping.max), name = String(mapping.name ?? '').trim();
-      if (!mapping.confirmed || !max || !name || name.length > 50 || !mapping.id || items.some(i => i.id === mapping.id)) throw new Error('GRADE_NEW_ITEM_CONFIRM_REQUIRED');
+      if (!mapping.confirmed || !max || max > 9999.99 || !name || name.length > 50 || !mapping.id || items.some(i => i.id === mapping.id)) throw new Error('GRADE_NEW_ITEM_CONFIRM_REQUIRED');
       item = { id: mapping.id, name, max, teachingId: teaching.id, scoreMode: 'direct', auto: null };
       newItems.push({ id: item.id, name, max });
     } else if (mapping.kind === 'existing') {
       item = items.find(i => i.id === mapping.itemId && i.teachingId === teaching.id && isTransferItem(i));
-      if (!item || !(Number(item.serverRevision) > 0)) throw new Error('GRADE_ITEM_UNAVAILABLE');
+      if (!item || !(Number(item.serverRevision) > 0) || !Number.isFinite(Number(item.max)) || Number(item.max) <= 0) throw new Error('GRADE_ITEM_UNAVAILABLE');
     } else throw new Error('GRADE_MAPPING_INVALID');
     if (used.has(item.id)) throw new Error('GRADE_DUPLICATE_ITEM');
     used.add(item.id); selected.push({ column, item });
@@ -63,24 +64,33 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
     ids.set(student.id, student);
     const key = gradeNameKey(student.name); names.set(key, [...(names.get(key) ?? []), student]);
   }
+  const namePreview = previewStudentRows(rows, nameColumn, true, roster);
+  const newStudents = [];
   const resolved = rows.slice(1).map((row, index) => {
     const explicitId = idColumn < 0 ? '' : String(row[idColumn] ?? '').trim();
     const matches = explicitId ? [ids.get(explicitId)].filter(Boolean) : names.get(gradeNameKey(row[nameColumn])) ?? [];
+    const name = String(row[nameColumn] ?? '').replace(/\s+/g, ' ').trim();
+    const candidate = namePreview.entries.find(e => e.row === index + 2);
+    if (allowNewStudents && !explicitId && !matches.length && candidate?.status === 'new' && validStudentImportName(name)) {
+      const identity = newStudentIds[index + 2];
+      if (!identity?.id || !identity?.enrollmentId) throw new Error('GRADE_NEW_STUDENT_REVIEW_REQUIRED');
+      const student = { ...identity, name }; newStudents.push(student); matches.push(student);
+    }
     return { row, index: index + 2, student: matches.length === 1 ? matches[0] : null, reason: matches.length > 1 ? 'اسم ملتبس' : 'طالب غير معروف' };
   });
   const frequencies = new Map();
   for (const r of resolved) if (r.student) frequencies.set(r.student.id, (frequencies.get(r.student.id) ?? 0) + 1);
-  const entries = [], cells = [], rejected = []; let unchanged = 0, additions = 0, overwrites = 0;
+  const entries = [], cells = [], rejected = []; let unchanged = 0, additions = 0, overwrites = 0, capped = 0;
   for (const r of resolved) {
     if (!r.student || frequencies.get(r.student.id) !== 1) { rejected.push({ row: r.index, student: String(r.row[nameColumn] ?? ''), reason: r.student ? 'طالب مكرر في الملف' : r.reason }); continue; }
     for (const { column, item } of selected) {
-      let value;
-      try { value = gradeNumber(r.row[column]); if (value !== null && value > Number(item.max)) throw new Error(); }
-      catch { rejected.push({ row: r.index, student: r.student.name, item: item.name, value: String(r.row[column] ?? ''), max: item.max, reason: 'درجة غير صالحة أو تتجاوز العظمى؛ صحّح الملف أو راجع المطابقة' }); continue; }
+      let value, original;
+      try { original = gradeNumber(r.row[column]); value = original === null ? null : Math.min(original, Number(item.max)); if (original !== value) capped++; }
+      catch { rejected.push({ row: r.index, student: r.student.name, item: item.name, value: String(r.row[column] ?? ''), max: item.max, reason: 'درجة غير صالحة؛ استخدم رقمًا غير سالب' }); continue; }
       const previous = scores.find(s => s.studentId === r.student.id && s.itemId === item.id);
       if (previous?.deleted || previous && !(Number(previous.serverRevision) > 0)) { rejected.push({ row: r.index, student: r.student.name, reason: 'سجل درجة غير متاح: ' + item.name }); continue; }
       const old = previous?.value == null ? null : Number(previous.value);
-      entries.push({ row: r.index, student: r.student.name, studentId: r.student.id, item: item.name, max: item.max, old, value });
+      entries.push({ row: r.index, student: r.student.name, studentId: r.student.id, item: item.name, max: item.max, old, original, capped: original !== value, value });
       if (value === null || value === old) { unchanged++; continue; }
       if (old === null) additions++; else overwrites++;
       cells.push({ studentId: r.student.id, itemId: item.id, itemRevision: item.serverRevision ?? 0, max: Number(item.max),
@@ -88,11 +98,11 @@ export function reviewGradeTransfer({ rows, nameColumn, idColumn = -1, mappings,
     }
   }
   return { ownerId, databaseName, teachingId: teaching.id, termId: term.id, teachingRevision: teaching.serverRevision,
-    entries, rejected, unchanged, additions, overwrites, newItems: newItems.filter(i => cells.some(c => c.itemId === i.id)), cells };
+    entries, rejected, unchanged, additions, overwrites, capped, newStudents, sectionId: teaching.sectionId, newItems: newItems.filter(i => cells.some(c => c.itemId === i.id)), cells };
 }
 
-export function gradeCommand(review, overwriteConfirmed) {
-  if (review.rejected.length || !review.cells.length || review.overwrites && !overwriteConfirmed) throw new Error('GRADE_REVIEW_CONFIRM_REQUIRED');
+export function gradeCommand(review, overwriteConfirmed, enrollmentConfirmed = false) {
+  if (review.newStudents?.length && !enrollmentConfirmed || review.rejected.length || !review.cells.length && !review.newStudents?.length || review.overwrites && !overwriteConfirmed) throw new Error('GRADE_REVIEW_CONFIRM_REQUIRED');
   return { teachingId: review.teachingId, termId: review.termId, teachingRevision: review.teachingRevision,
-    newItems: review.newItems, cells: review.cells, overwriteConfirmed: overwriteConfirmed === true };
+    newItems: review.newItems, cells: review.cells, ...(review.newStudents?.length ? { newStudents: review.newStudents.map(({ id, enrollmentId, name }) => ({ id, enrollmentId, name })), sectionId: review.sectionId, enrollmentConfirmed: true } : {}), overwriteConfirmed: overwriteConfirmed === true };
 }

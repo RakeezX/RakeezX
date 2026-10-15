@@ -32,6 +32,7 @@ import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js'
 // Bind the copy protocol to its module identity. A previous offline/HTTP cache
 // must not supply the two-mode engine to the automatic-safe account entry.
 import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js?n100=automatic-safe-v1';
+import { previewStudentRows, importContext, confirmStudentImport } from './lib/student-import.js';
 import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
 import { deletionScope, visibleClosedTermReport } from './lib/restore-deletion-scope.js';
@@ -4140,21 +4141,48 @@ async function applyReviewedCommand(command, recordId, patch) {
         : 'تعذّر تأكيد التطبيق. طلبك محفوظ للمزامنة وإعادة المحاولة الآمنة.');
   }
   const changes = [];
-  for (const store of ['items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores']) {
+  for (const store of ['students', 'enrollments', 'items', 'scoreSubitems', 'scoreSubitemCompletions', 'scores']) {
     changes.push(...(await db.getAll(store)).map(row => ({ store, id: row.id })));
   }
   await absorb(changes); broadcast(changes);
+}
+
+export function reviewNamesImport(teachingId, input) {
+  const teaching = getTeaching(teachingId);
+  const context = !isTeachingArchived(teaching) && importContext(activeWorkspace, teaching, cloud.user?.id);
+  if (!context) throw new Error('تحقق من الحساب والفصل قبل الاستيراد.');
+  return { ...previewStudentRows(input.rows, input.nameColumn, false, sectionRoster(teaching.sectionId)),
+    context, teachingId, rows: input.rows, column: input.nameColumn };
+}
+export async function confirmNamesImport(review, approved) {
+  const teaching = getTeaching(review.teachingId);
+  const currentContext = !isTeachingArchived(teaching) && importContext(activeWorkspace, teaching, cloud.user?.id);
+  if (approved && currentContext !== review.context) throw new Error('IMPORT_CHANGED');
+  const currentPreview = previewStudentRows(review.rows, review.column, false, sectionRoster(teaching.sectionId));
+  const controller = new AbortController(), stop = onWorkspaceDeactivation(() => controller.abort());
+  try {
+    return await confirmStudentImport({ approved, preview: review, currentPreview, expectedContext: review.context, currentContext,
+      write: names => importStudents(teaching.sectionId, names, { signal: controller.signal, verifyCurrent(snapshot) {
+        const currentTeaching = snapshot.teachings.find(row => row.id === teaching.id);
+        if (importContext(activeWorkspace, currentTeaching, cloud.user?.id) !== review.context || isTeachingArchived(currentTeaching)) throw new Error('IMPORT_CHANGED');
+        const ids = new Set(snapshot.enrollments.filter(row => row.sectionId === teaching.sectionId && row.status === 'active' && !row.deleted).map(row => row.studentId));
+        const roster = snapshot.students.filter(row => ids.has(row.id) && !row.deleted);
+        if (JSON.stringify(previewStudentRows(review.rows, review.column, false, roster).entries) !== JSON.stringify(review.entries)) throw new Error('IMPORT_CHANGED');
+      } }) });
+  } finally { stop(); }
 }
 
 export function reviewGradeImport(teachingId, input) {
   const teaching = getTeaching(teachingId), term = activeTerm();
   if (!teaching || isTeachingArchived(teaching) || teaching.termId !== term?.id || term.status !== 'active') throw new Error('اختر تدريسًا حيًا في الفصل الدراسي الحالي.');
   const { roster, items } = teachingContext(teachingId);
-  return reviewGradeTransfer({ ...input, roster, items, scores: state.scores, teaching, term,
+  input.newStudentIds ??= {};
+  input.rows.slice(1).forEach((row, i) => { input.newStudentIds[i + 2] ??= { id: uid(), enrollmentId: uid() }; });
+  return reviewGradeTransfer({ ...input, allowNewStudents: true, roster, items, scores: state.scores, teaching, term,
     ownerId: activeWorkspace?.authUserId, databaseName: activeWorkspace?.databaseName });
 }
 
-export async function confirmGradeImport(review, { overwriteConfirmed = false, approved = false } = {}) {
+export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false } = {}) {
   if (!approved) return false;
   assertCloudRestoreWritable(); assertLeaseWritable();
   if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
@@ -4163,12 +4191,12 @@ export async function confirmGradeImport(review, { overwriteConfirmed = false, a
     activeTerm()?.id !== review.termId) throw new Error('تأكيد الاستيراد يحتاج حساب المالك واتصالًا ومزامنة نظيفة.');
   const ownership = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'pull', authenticatedUserId: cloud.user.id });
   if (!ownership.allowed) throw new Error('تعذّر التحقق من ملكية مساحة العمل.');
-  const batch = gradeCommand(review, overwriteConfirmed);
+  const batch = gradeCommand(review, overwriteConfirmed, enrollmentConfirmed);
   const capability = await cloud.getGradeImportCapability();
   // Recheck after asynchronous preflight. Dispatch itself guards the bound command.
   assertLeaseWritable();
   if (review.ownerId !== cloud.user?.id || activeWorkspace?.databaseName !== review.databaseName || activeTerm()?.id !== review.termId ||
-    capability?.protocol !== 'N90_REVIEWED_V1' || capability?.version !== 1) throw new Error('قدرة استيراد الدرجات غير متاحة.');
+    (batch.newStudents?.length ? capability?.unifiedProtocol !== 'N90_UNIFIED_V1' || capability?.unifiedVersion !== 1 : capability?.protocol !== 'N90_REVIEWED_V1' || capability?.version !== 1)) throw new Error('قدرة استيراد الدرجات غير متاحة.');
   await applyReviewedCommand('score:grade_import', review.teachingId, { batch });
   return true;
 }
@@ -4198,7 +4226,7 @@ export async function retryGradeImport(mutationId) {
   const result = await engine.dispatchPending({ onlyMutationId: mutationId });
   if (result.acknowledged !== 1) throw new Error('لم يصل الإيصال بعد. الطلب نفسه محفوظ، دون إنشاء دفعة جديدة.');
   const changes = (await db.getAll('scores')).map(row => ({ store: 'scores', id: row.id }));
-  changes.push(...(await db.getAll('items')).map(row => ({ store: 'items', id: row.id })));
+  for (const name of ['items', 'students', 'enrollments']) changes.push(...(await db.getAll(name)).map(row => ({ store: name, id: row.id })));
   await absorb(changes); broadcast(changes);
 }
 

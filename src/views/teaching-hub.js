@@ -6,6 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
+import studentsView from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
@@ -26,7 +27,7 @@ function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCoun
           <span class="class-hub-header__color-bar" style="background:${sec?.color || 'var(--brand)'}" aria-hidden="true"></span>
           <div class="class-hub-header__name-group">
             <button type="button" class="class-name-switcher-btn" data-act="switch-class" aria-label="تبديل الفصل" title="تبديل الفصل">
-              <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الشعبة'}</span>
+              <span class="class-name-switcher-btn__title">${sectionLabel(sec) || 'الفصل'}</span>
               <span class="class-name-switcher-btn__chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
             </button>
             ${sub?.name ? html`<span class="class-hub-header__sep" aria-hidden="true">—</span><span class="class-hub-header__sub">${sub.name}</span>` : ''}
@@ -104,11 +105,11 @@ export default {
           ${activeGoalIndicator(tch.id, activeGoal)}
           <div class="class-hub__empty empty">
             <div class="empty__icon">${icon('student')}</div>
-            <div class="empty__title">الشعبة بلا طلاب بعد</div>
+            <div class="empty__title">الفصل بلا طلاب بعد</div>
             <div class="empty__text">
-              الصق كشف الأسماء دفعة واحدة — سطر لكل طالب — ويرقّمهم رَكيز المعلم تلقائيًا.
+              استورد الأسماء وحدها أو مع درجاتها، أو أضف طالبًا يدويًا.
             </div>
-            <a class="btn btn--primary" href="#/teaching/${tch.id}/students">${icon('plus')} أضف الطلاب</a>
+            <a class="btn btn--primary" href="#/teaching/${tch.id}/grades?import=1">${icon('upload')} استيراد الأسماء أو الدرجات</a><button class="btn" data-act="add-student">${icon('plus')} إضافة طالب يدويًا</button>
           </div>
         </div>
       `;
@@ -217,6 +218,7 @@ export default {
   },
 
   actions: {
+    'add-student': (el, ev, params) => studentsView.actions.add(el, ev, params),
     'switch-class'(el, ev, params) {
       const suffix = location.hash.replace(/^#\/teaching\/[^/]+/, '').replace(/^\?/, '?');
       openSheet({
@@ -225,7 +227,7 @@ export default {
           const candidateSection = store.getSection(candidate.sectionId);
           const candidateSubject = store.getSubject(candidate.subjectId);
           const current = candidate.id === params.id;
-          return html`<a class="class-switcher-option ${current ? 'is-current' : ''}" href="#/teaching/${candidate.id}${suffix}" data-sheet-close ${current ? 'aria-current="page"' : ''}><span class="class-switcher-option__dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="class-switcher-option__main"><span class="class-switcher-option__title">${sectionLabel(candidateSection) || 'الشعبة'}</span><span class="class-switcher-option__sub">${candidateSubject?.name || ''}</span></span>${current ? html`<span class="class-switcher-option__current">${icon('check')} الفصل الحالي</span>` : html`<span class="class-switcher-option__chevron">${icon('chev')}</span>`}</a>`;
+          return html`<a class="class-switcher-option ${current ? 'is-current' : ''}" href="#/teaching/${candidate.id}${suffix}" data-sheet-close ${current ? 'aria-current="page"' : ''}><span class="class-switcher-option__dot" style="background:${candidateSection?.color || 'var(--brand)'}"></span><span class="class-switcher-option__main"><span class="class-switcher-option__title">${sectionLabel(candidateSection) || 'الفصل'}</span><span class="class-switcher-option__sub">${candidateSubject?.name || ''}</span></span>${current ? html`<span class="class-switcher-option__current">${icon('check')} الفصل الحالي</span>` : html`<span class="class-switcher-option__chevron">${icon('chev')}</span>`}</a>`;
         })}</div>`,
         foot: html`<a class="btn btn--quiet" href="#/classes" data-sheet-close>كل الفصول</a>`,
       });
@@ -255,7 +257,7 @@ export default {
                   </select>
                 </label>
                 <label class="field">
-                  <span class="field__label">رمز الشعبة</span>
+                  <span class="field__label">رمز الفصل</span>
                   <input class="input" name="label" value="${sec.label}" required maxlength="8" autocomplete="off">
                 </label>
               </div>

@@ -44,3 +44,12 @@
 .grade-transfer [data-grade-file-name] { font-weight: 700; }
 .grade-transfer button { margin-block: 6px; max-inline-size: 100%; white-space: normal; }
 .grade-transfer td, .grade-transfer th { text-align: start; }
+
+/* AI-authored N90: visible scoped actions and neutral cancellation. */
+.grade-transfer__buttons, .grade-transfer__add { display:flex; flex-wrap:wrap; gap:12px; margin-block:16px; }
+.grade-transfer__buttons .btn { min-height:44px; }
+.grade-transfer__notice { padding:10px; border-inline-start:3px solid var(--brand); }
+.grade-transfer__message { padding:10px; background:var(--surface-2); }
+.grade-transfer__message.is-error { color:var(--danger); border-inline-start:3px solid var(--danger); }
+.grade-transfer [data-noor-grouping] label { display:block; margin-block:12px; }
+.grade-transfer [data-noor-grouping] select { max-width:100%; }

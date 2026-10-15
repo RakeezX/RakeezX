@@ -415,6 +415,17 @@ export function calendarDependencies(store, record, op = 'create', terms = []) {
   ];
 }
 
+// A completed N101 audit is retained history, not outstanding Product work.
+// Pending/failed repairs, foreign audits and every other dirty row still block imports.
+function blocksGradeImport(row, ownerId) {
+  const receipt = row.receipt;
+  const completedOwnRepair = row.protocol === REPAIR_PROTOCOL && row.state === 'verified' && row.ownerId === ownerId &&
+    row.original?.ownerId === ownerId && row.original.state === 'rejected' && receipt?.outcome === 'applied' &&
+    receipt.mutationId === row.replacementMutationId && receipt.canonical?.owner_id === ownerId &&
+    receipt.canonical.id === row.original.recordId;
+  return row.state !== 'superseded' && !completedOwnRepair;
+}
+
 function mutationScope(store) {
   const references = SYNC_V2_SCHEMAS[store]?.references ?? {};
   return [...new Set([store, 'outbox', 'device', ...Object.values(references), ...(store === 'years' || store === 'calendars' ? ['terms'] : store === 'sessions' ? ['years', 'terms'] : [])])];
@@ -916,7 +927,7 @@ export function createSyncV2Engine({
     await database.applyBatch({ outbox: {}, device: {} }, {
       prepare(current) {
         const deviceRecord = current.device.find((record) => record.id === 'device') ?? null;
-        if (command === 'score:grade_import' && current.outbox.some(row => row.state !== 'superseded')) {
+        if (command === 'score:grade_import' && current.outbox.some(row => blocksGradeImport(row, currentAuthenticatedUserId()))) {
           throw new Error('أكمل المزامنة قبل تأكيد استيراد الدرجات.');
         }
         const deviceId = deviceRecord?.deviceId || makeId();
@@ -1589,13 +1600,21 @@ export function createSyncV2Engine({
   async function reconcileDistributionReceipt(mutation, receipt) {
     const entries = [['items', 'items'], ['scoreSubitems', 'score_subitems'],
       ['scoreSubitemCompletions', 'score_subitem_completions'], ['scores', 'scores']];
+    const unified = mutation.command === 'score:grade_import' && mutation.patch.batch.newStudents?.length > 0;
+    if (unified) entries.unshift(['students', 'students'], ['enrollments', 'enrollments']);
     const gradeImport = mutation.command === 'score:grade_import';
     if (receipt?.mutationId !== mutation.mutationId || (gradeImport
-      ? receipt?.protocol !== 'N90_REVIEWED_V1' || receipt?.teachingId !== mutation.patch.batch.teachingId
+      ? receipt?.protocol !== (unified ? 'N90_UNIFIED_V1' : 'N90_REVIEWED_V1') || receipt?.teachingId !== mutation.patch.batch.teachingId
       : receipt?.planId !== mutation.patch.planId || receipt?.protocol !== 'N73_D119_V2')) throw new Error('Distribution receipt binding mismatch');
     const owner = currentAuthenticatedUserId();
     const access = ownershipGuard.cloudAccess({ operation: 'dispatch', authenticatedUserId: owner, command: mutation });
     if (!access.allowed) throw ownershipBlockedError(access);
+    if (unified) {
+      const expected = mutation.patch.batch.newStudents;
+      if (!Array.isArray(receipt.students) || !Array.isArray(receipt.enrollments) || receipt.students.length !== expected.length || receipt.enrollments.length !== expected.length ||
+          expected.some(e => !receipt.students.some(s => s.id === e.id && s.name === e.name && s.deleted_at == null && s.status === 'active') ||
+            !receipt.enrollments.some(r => r.id === e.enrollmentId && r.student_id === e.id && r.section_id === mutation.patch.batch.sectionId && r.status === 'active' && r.deleted_at == null))) throw new Error('Unified import receipt scope mismatch');
+    }
     if (gradeImport) {
       const cells = mutation.patch.batch.cells;
       const itemIds = new Set(cells.map(c => c.itemId));
@@ -1616,7 +1635,7 @@ export function createSyncV2Engine({
           new Set(rows.map(row => row.id)).size !== rows.length) throw new Error('Distribution receipt owner or row mismatch');
       return [store, rows.map(row => decodeSyncV2Canonical(store, row))];
     }));
-    await database.applyBatch({ items: {}, scoreSubitems: {}, scoreSubitemCompletions: {}, scores: {}, outbox: {} }, {
+    await database.applyBatch({ ...Object.fromEntries(entries.map(([name]) => [name, {}])), outbox: {} }, {
       prepare(current) {
         if (owner !== currentAuthenticatedUserId()) throw new Error('Distribution owner changed');
         const result = { outbox: { remove: [mutation.id] } };
@@ -1934,7 +1953,7 @@ export function createSyncV2Engine({
         const liveRows = sortMutations(await database.getAll('outbox'));
         const live = liveRows.find((row) => row.id === original.id);
         if (!live) continue;
-        if (live.command === 'score:grade_import' && liveRows.some(row => row.id !== live.id && row.state !== 'superseded')) {
+        if (live.command === 'score:grade_import' && liveRows.some(row => row.id !== live.id && blocksGradeImport(row, currentAuthenticatedUserId()))) {
           await markDependencyBlock(live, 'grade-import-outbox-not-clean'); result.blocked++; continue;
         }
         const readiness = await dependencyReadiness(live, liveRows.filter((row) => row.id !== live.id));

@@ -37,6 +37,6 @@ export function gradeNumber(value) {
   const text = String(value).trim().replace(/[٠-٩۰-۹]/g, d => d >= '۰' ? d.charCodeAt(0) - 1776 : d.charCodeAt(0) - 1632).replace('٫', '.');
   if (!/^\d+(?:\.\d{1,2})?$/.test(text)) throw new Error('GRADE_NUMBER_INVALID');
   const number = Number(text);
-  if (!Number.isFinite(number) || number > 9999.99) throw new Error('GRADE_NUMBER_INVALID');
+  if (!Number.isFinite(number)) throw new Error('GRADE_NUMBER_INVALID');
   return number;
 }
