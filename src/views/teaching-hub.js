@@ -16,7 +16,8 @@ const TOOLS = (id) => [
   { href: `#/teaching/${id}/groups`, icon: 'groups', title: 'المجموعات', sub: 'تقسيم عشوائي أو متوازن' },
   { href: `#/teaching/${id}/board`, icon: 'board', title: 'لوحة التميز', sub: 'لعرض التميز على البروجكتر' },
   { href: `#/teaching/${id}/sessions`, icon: 'session', title: 'الحصص', sub: 'السجل والحصص السابقة' },
-  { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'كشوف وتصدير وطباعة' },
+  { href: `#/teaching/${id}/koshoof`, icon: 'upload', title: 'الكشوف', sub: 'استيراد وتصدير الكشوف' },
+  { href: `#/teaching/${id}/reports`, icon: 'reports', title: 'التقارير', sub: 'طباعة وتقارير الفصل' },
   { href: `#/teaching/${id}/items`, icon: 'note', title: 'توزيع الدرجات', sub: 'البنود والدرجات العظمى' },
 ];
 function classHubHeader({ tch, sec, sub, targetSession, completeness, markedCount, rosterCount }) {

@@ -328,7 +328,7 @@ function renderClassCard(tch) {
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
-      ${canOpenRoster({ id: tch.id }) ? html`<div class="class-card__actions"><a class="btn btn--sm btn--quiet" href="#/teaching/${tch.id}/koshoof" aria-label="الكشوف — ${sectionLabel(sec)} — ${sub?.name ?? ''}">الكشوف</a></div>` : ''}
+      ${canOpenRoster({ id: tch.id }) ? html`<div class="class-card__actions"><a class="btn btn--quiet class-card__koshoof" href="#/teaching/${tch.id}/koshoof" aria-label="الكشوف — ${sectionLabel(sec)} — ${sub?.name ?? ''}">${icon('upload')}<span>الكشوف</span></a></div>` : ''}
     </div>
   `;
 }

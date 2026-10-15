@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n36-koshoof-discoverable-entry-20261015",
+  "runId": "8b250403-511a-4c59-95bd-f371c95d2007",
+  "checks": [
+    {
+      "name": "actual_app_rtl_320_route_layout_focus_guards",
+      "status": "PASS",
+      "evidence": "320px actual Demo app DOM, handlers and source CSS: card action visible/focusable with 44px height; exactly one hub tile routes to class-scoped koshoof default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes; no horizontal overflow. Screenshot saved under test-results/n36-koshoof-discoverability/."
+    },
+    {
+      "name": "actual_app_rtl_390_route_layout_focus_guards",
+      "status": "PASS",
+      "evidence": "390px actual Demo app DOM, handlers and source CSS: card action visible/focusable with 44px height; exactly one hub tile routes to class-scoped koshoof default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes; no horizontal overflow. Screenshot saved under test-results/n36-koshoof-discoverability/."
+    },
+    {
+      "name": "actual_app_rtl_768_route_layout_focus_guards",
+      "status": "PASS",
+      "evidence": "768px actual Demo app DOM, handlers and source CSS: card action visible/focusable with 44px height; exactly one hub tile routes to class-scoped koshoof default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes; no horizontal overflow. Screenshot saved under test-results/n36-koshoof-discoverability/."
+    },
+    {
+      "name": "actual_app_rtl_1280_route_layout_focus_guards",
+      "status": "PASS",
+      "evidence": "1280px actual Demo app DOM, handlers and source CSS: card action visible/focusable with 44px height; exactly one hub tile routes to class-scoped koshoof default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes; no horizontal overflow. Screenshot saved under test-results/n36-koshoof-discoverability/."
+    }
+  ],
+  "errors": [],
+  "status": "PASS",
+  "ownedServerStopped": true,
+  "ownedBrowserClosed": true
+}

@@ -8348,9 +8348,12 @@
 .roster-entry-empty { max-inline-size: 100%; }
 .roster-entry-empty .roster-entry-actions { justify-content: center; }
 
-/* AI-authored N36: secondary class actions, separate from the main card link. */
-.class-card__actions { display:flex; padding:0 12px 8px; }
-.class-card__actions .btn { min-block-size:44px; min-inline-size:44px; }
+/* N36: a visible secondary roster-file action, separate from the main card link. */
+.class-card__actions { display:flex; flex:0 0 auto; padding:0 12px 8px; }
+.class-card__koshoof { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-block-size:44px; min-inline-size:44px; padding-inline:12px; color:var(--text-2); border:1px solid var(--border); border-radius:var(--r-md); text-decoration:none; }
+.class-card__koshoof svg { inline-size:16px; block-size:16px; }
+.class-card__koshoof:hover { color:var(--brand); background:var(--brand-soft); border-color:var(--brand-border); }
+.class-card__koshoof:focus-visible { outline:3px solid var(--action-focus-ring); outline-offset:2px; }
 .roster-entry-empty { inline-size:min(100%,480px); margin-inline:auto; display:grid; gap:8px; }
 .roster-entry-empty .roster-entry-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); margin:0; }
 .roster-entry-empty .btn { min-inline-size:0; }
