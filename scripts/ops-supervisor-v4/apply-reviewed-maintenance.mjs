@@ -139,7 +139,14 @@ export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile,
   insist(previous.length === 0, 'Catalog source identity changed');
   const sourceName = path.win32.basename(sourceCardFile ?? '');
   insist(task?.approvedNote?.source === sourceName && task.approvedNote.sha256 === expectedSourceSha256, 'Approved-note source identity changed');
-  return { kind: 'approved-note', index: -1, baseline: task };
+  return { kind: 'approved-note', index: -1, baseline: task, approvedNoteSha256: task.approvedNote.sha256 };
+}
+
+export function reviewedSourcePreimageMatches(remoteBytes, opsBytes, canonicalBytes, file, approvedNoteSha256 = null) {
+  if (reviewedPreimageMatches(remoteBytes, canonicalBytes) && reviewedPreimageMatches(opsBytes, canonicalBytes)) return true;
+  return remoteBytes === null && opsBytes === null && canonicalBytes !== null
+    && approvedNoteSha256 === file.expectedCanonicalSha256
+    && sha256(canonicalBytes) === file.expectedCanonicalSha256;
 }
 
 export function revisedTask(task, update, commit, at) {
@@ -290,7 +297,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       const original = read(canonicalFile); insist(sha256(original) === file.expectedCanonicalSha256, 'Canonical hash differs from review: ' + file.repoPath);
       const remoteEntry = gitRaw(['ls-tree', '-z', remoteHead, '--', file.repoPath]);
       const remoteBytes = remoteEntry ? Buffer.from(gitRaw(['show', remoteHead + ':' + file.repoPath]), 'utf8') : null;
-      insist(reviewedPreimageMatches(remoteBytes, original) && reviewedPreimageMatches(read(opFile), original), 'Remote main preimage differs from canonical review: ' + file.repoPath);
+      const approvedBinding = file.repoPath === payload.sourceCardFile ? [...sourceBindings.values()].find(binding => binding.kind === 'approved-note') : null;
+      insist(reviewedSourcePreimageMatches(remoteBytes, read(opFile), original, file, approvedBinding?.approvedNoteSha256 ?? null), 'Remote main preimage differs from canonical review: ' + file.repoPath);
       opsPreimageHashes.set(file.repoPath, sha256(read(opFile)));
       if (original !== null) { const backup = path.join(evidenceRoot, 'before-files', file.repoPath); fs.mkdirSync(path.dirname(backup), { recursive: true }); fs.writeFileSync(backup, original, { flag: 'wx' }); }
     }
