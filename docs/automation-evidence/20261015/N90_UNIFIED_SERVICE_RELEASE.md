@@ -3,16 +3,19 @@
 Task: continuous-n90-unified-import-service-and-release-20261015
 Run: ad0be3b3-c522-4fd7-8602-490ff96ae930
 Session: 01a13e9d-383e-7ce1-b229-33a68b01c3ef
-Base / freshly fetched origin/main: 8ef5304e1aaea82227c36cb52320dab7e2399890
+Original card/start base: 8ef5304e1aaea82227c36cb52320dab7e2399890
+Final integration base / observed origin/main: 61658c5a3fb0b6f5dcaf6a37089c344189201ac4
 Prepared source: f037d84b92bb5a0ee6cde69f77e008e9a2690641
 Worktree: C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n90-unified-import-service-and-release-20261015
 Candidate: the AI-labelled commit containing this report; full SHA returned in worker JSON.
 
 ## Bounded current-main integration
 
-Read the canonical operating contract, activated card, canonical current N90 ledger row and original N90 reports. Fetched origin/main; it remains the supplied base. Applied only the allowed N90 code/test/migration delta from the prepared source against its common ancestor 19242ac34b26b0fba08dc301c92650d02389ebef, using Git's three-way application. All paths merged cleanly. No complete-worktree replacement, unrelated history, old report copy or main reset.
+Read the canonical operating contract, activated card, canonical current N90 ledger row and original N90 reports. Initial fetch matched the supplied base. Applied only the allowed N90 code/test/migration delta from the prepared source against its common ancestor 19242ac34b26b0fba08dc301c92650d02389ebef, using Git's three-way application. All paths merged cleanly. No complete-worktree replacement, old report copy or main reset.
 
-Preserved current N58 effective calendar/year/term projection and selection, N101 context/repair functions and source-history outbox, N100 automatic-safe scoring identity, N64 settings, N44 notifications, N102 teacher setup and sw.js v64. Unchanged module assertions and the small current-base store/Sync diff confirm preservation. The changes in those shared files are confined to N90 review/confirm/receipt adoption and its receipt-bound completed-history predicate. No scoring formula or current calendar policy was changed.
+Before commit, the current-ref assertion detected publisher movement to 61658c5a3fb0b6f5dcaf6a37089c344189201ac4. Inspected both intervening commits: N102 print signature background, its evidence/tests and generated metadata. No store/cloud/Sync/calendar/shell/import overlap. Merged that main normally without conflict, retaining the supplied base and first N90 commit in history. Those upstream changes are inherited, not N90-authored scope. N90 changedPaths are measured against the final integration base; the original card base is preserved above. Signature-only print CSS cannot alter the tested import DOM or handlers, so affected evidence remains reusable without another browser/native cycle. Current N102 print code/styles/metadata equal that observed main.
+
+Preserved current N58 effective calendar/year/term projection and selection, N101 context/repair functions and source-history outbox, N100 automatic-safe scoring identity, N64 settings, N44 notifications, teacher setup, N102 print signature background and sw.js v64. Unchanged module assertions and the small current-base store/Sync diff confirm preservation. The changes in those shared files are confined to N90 review/confirm/receipt adoption and its receipt-bound completed-history predicate. No scoring formula or current calendar policy was changed.
 
 Unified names-only/combined entry, empty-class path, explicit enrollment/overwrite consent, visible 7-to-current-max review, zero/blank semantics, blank template and exactly three manual Noor 40/60 columns are retained from the prepared source. Noor remains a manual-entry aid with teacher-confirmed grouping, not an officially uploadable format. Corrected one inherited grammatical hint to لهذا الفصل. Existing startup modules are already listed in current sw.js; no new dependency file or shell change.
 

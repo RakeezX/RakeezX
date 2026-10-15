@@ -7473,6 +7473,14 @@
   padding: 0 !important;
   background: transparent !important;
 }
+.print-report .gtable tbody tr.report-ending-row:nth-child(even) > td {
+  background: transparent !important;
+}
+@media print {
+  .print-report .gtable tbody.report-table-ending--even > tr:first-child > td {
+    background: #f8faf9 !important;
+  }
+}
 .report-workspace .report-ending-row .report-closing { text-align: start; }
 .report-workspace .report-closing .print-signatures {
   display: grid;

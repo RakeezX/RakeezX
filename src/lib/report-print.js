@@ -149,7 +149,10 @@ export function reportWithClosing(content, options) {
   const row = source.slice(start, rowEnd);
   const columns = (row.match(/<(?:td|th)\b/g) ?? []).length;
   if (!columns) return html`${content}${closing}`;
-  return raw(source.slice(0, start) + '</tbody><tbody class="report-table-ending">' + row
+  const bodyStart = source.lastIndexOf('<tbody', start);
+  const rowIndex = (source.slice(bodyStart, start).match(/<tr\b/g) ?? []).length + 1;
+  const endingClass = rowIndex % 2 === 0 ? ' report-table-ending--even' : '';
+  return raw(source.slice(0, start) + '</tbody><tbody class="report-table-ending' + endingClass + '">' + row
     + String(html`<tr class="report-ending-row print-only"><td colspan="${columns}">${closing}</td></tr>`)
     + source.slice(rowEnd));
 }
