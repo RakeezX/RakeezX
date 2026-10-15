@@ -1,6 +1,25 @@
 import { validateProfileCompletion } from './account-profile.js';
 import { EDUCATION_DEPARTMENTS, isOfficialEducationDepartment } from './education-department-directory.js';
 
+// Only a fresh, owner-checked Auth read may retire a request or announce completion.
+// Keep this evidence in memory: a later unrelated reload must not repeat success.
+export function verifiedEmailFeedback(previous, { ownerId, email, pendingEmail = '', verified = false }) {
+  const normalize = value => String(value || '').trim().toLowerCase();
+  const state = previous && previous.ownerId === ownerId ? { ...previous } : { ownerId, requestedEmailChange: '', completed: false };
+  if (state.completed && normalize(email) !== state.completedEmail) state.completed = false;
+  const pending = normalize(pendingEmail);
+  if (pending && pending !== normalize(email)) {
+    state.requestedEmailChange = pending;
+    state.completed = false;
+  }
+  if (verified && ownerId && normalize(email) && normalize(email) === state.requestedEmailChange) {
+    state.requestedEmailChange = '';
+    state.completed = true;
+    state.completedEmail = normalize(email);
+  }
+  return state;
+}
+
 export function educationDepartmentComplete(profile) {
   return isOfficialEducationDepartment(EDUCATION_DEPARTMENTS, profile?.educationDepartment);
 }

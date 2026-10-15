@@ -6,7 +6,7 @@ import { notificationScope } from '../lib/notification-center.js';
 import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificationTiming, readNotificationCategories, writeNotificationCategory } from '../lib/notification-state.js';
 import { brandLockup } from '../lib/brand.js';
 import { BUILD_META } from '../lib/build-meta.js';
-import { educationDepartmentComplete, profileAttention } from '../lib/settings-profile-ui.js';
+import { educationDepartmentComplete, profileAttention, verifiedEmailFeedback } from '../lib/settings-profile-ui.js';
 import { EDUCATION_DEPARTMENTS, EDUCATION_DEPARTMENT_OPTIONS, isOfficialEducationDepartment, searchEducationDepartments } from '../lib/education-department-directory.js';
 import { currentInstallContext, INSTALL_COPY, openInstallGuide } from '../lib/install-guide-ui.js';
 import * as store from '../store.js';
@@ -36,12 +36,17 @@ let emailInstructionsExpanded = false;
 let removeProfileAttention = () => {};
 let accountContractRequest = 0;
 let accountContractUnavailable = false;
+let emailFeedback = null;
+let removeEmailVerification = () => {};
 // Presentation only: never persisted, and discarded when the rendered owner changes.
 let emailChangeView = { ownerId: null, sending: false, pending: '', error: '', sheetOpen: false };
 function currentEmailChangeView() {
   const ownerId = cloud.user?.id ?? null;
   if (emailChangeView.ownerId !== ownerId) {
     emailChangeView = { ownerId, sending: false, pending: '', error: '', sheetOpen: false };
+    profileExpanded = null;
+    emailInstructionsExpanded = false;
+    emailFeedback = null;
   }
   return emailChangeView;
 }
@@ -279,11 +284,13 @@ const settings = {
     const yrs = store.years();
     const activeY = store.activeYear();
     const activeT = store.activeTerm();
-    const accountContract = currentAccountContract();
-    const accountEmail = accountContract?.email ?? cloud.user?.email ?? '';
     const emailView = currentEmailChangeView();
+    const cachedContract = currentAccountContract();
+    const accountContract = cachedContract?.ownerId === cloud.user?.id ? cachedContract : null;
+    const accountEmail = cloud.user?.email ?? accountContract?.email ?? '';
     const pendingEmail = String(cloud.user?.new_email || emailView.pending || '').trim().toLowerCase();
-    const emailChangePending = Boolean(pendingEmail && pendingEmail !== String(accountEmail).trim().toLowerCase());
+    emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId: cloud.user?.id, email: accountEmail, pendingEmail });
+    const emailChangePending = Boolean(emailFeedback.requestedEmailChange);
     const teacherForm = m.teacherForm === 'feminine' ? 'feminine' : 'masculine';
     const presentation = getAccountPresentation(teacherForm);
     const accessLabel = accountContract?.access?.label ?? BETA_ACCESS_LABEL;
@@ -387,13 +394,14 @@ const settings = {
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-                ${emailChangePending ? html`
-                  <p class="field__hint settings-email-pending" role="status" data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</p>
+                  <p class="field__hint settings-email-feedback" role="status" data-email-change-feedback>${emailChangePending
+                    ? html`<span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span>`
+                    : emailFeedback.completed ? html`<span data-email-change-completed>تم اعتماد البريد الإلكتروني الجديد.</span>`
+                    : 'البريد المعروض هو بريد حسابك الحالي. يتطلب تغيير البريد اكتمال التأكيد.'}</p>
                   <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
                     <summary>كيف أكمل تأكيد البريد؟</summary>
                     <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
                   </details>
-                ` : ''}
                 ${emailView.error ? html`<p class="field__error" role="alert" data-email-change-page-error>${emailView.error}</p>` : ''}
               </div>`}
             ${demo ? '' : html`<div class="settings-access-summary" aria-label="معلومات الوصول">
@@ -620,7 +628,7 @@ const settings = {
         notice.hidden = !initialNotice;
       }
     };
-    const toggle = () => { revealError(); profileExpanded = details.open; };
+    const toggle = () => { if (details.isConnected) { revealError(); profileExpanded = details.open; } };
     details.addEventListener('toggle', toggle);
     const instructions = root.querySelector('[data-email-change-instructions]');
     const toggleInstructions = () => { emailInstructionsExpanded = instructions.open; };
@@ -650,10 +658,29 @@ const settings = {
 
   onMount() {
     const request = ++accountContractRequest;
-    accountContractUnavailable = false;
     if (!cloud.session || !cloud.user) return;
+    const ownerId = cloud.user.id;
+    // Capture the prior pending identifier before the verified read replaces user.
+    const view = currentEmailChangeView();
+    emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email || view.pending });
+    removeEmailVerification();
+    let observedEmail = '';
+    const verifyEmail = () => {
+      if (cloud.user?.id !== ownerId || view.sending) return;
+      const signature = JSON.stringify([cloud.user.email, cloud.user.new_email]);
+      if (signature === observedEmail) return;
+      observedEmail = signature;
+      cloud.verifyCurrentAuthIdentity(ownerId).then(() => {
+        if (request !== accountContractRequest || cloud.user?.id !== ownerId || currentEmailChangeView() !== view || view.sending) return;
+        emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email, verified: true });
+        if (emailFeedback.completed) view.pending = '';
+        repaint();
+      }).catch(() => { /* No verified completion evidence: keep neutral/pending guidance. */ });
+    };
+    removeEmailVerification = cloud.subscribe(verifyEmail);
+    verifyEmail();
     refreshAccountContract()
-      .then(() => { if (request === accountContractRequest) repaint(); })
+      .then(() => { if (request === accountContractRequest) { accountContractUnavailable = false; repaint(); } })
       .catch(() => {
         if (request !== accountContractRequest) return;
         accountContractUnavailable = true;
@@ -661,7 +688,16 @@ const settings = {
       });
   },
 
+  beforePaint(root) {
+    const details = root.querySelector('[data-settings-profile]');
+    if (details) profileExpanded = details.open;
+    const instructions = root.querySelector('[data-email-change-instructions]');
+    if (instructions) emailInstructionsExpanded = instructions.open;
+  },
+
   onUnmount() {
+    removeEmailVerification();
+    if (emailFeedback) emailFeedback.completed = false;
     closeTeacherSetupImport();
     removeDepartmentInteraction();
     removeProfileAttention();

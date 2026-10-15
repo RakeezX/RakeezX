@@ -1,0 +1,30 @@
+{
+  "taskId": "continuous-n64-verified-email-result-stable-layout-20261015",
+  "runId": "b6290522-31b4-47ea-acf1-b52faf3d095b",
+  "scope": "Actual app DOM/handlers/CSS; loopback synthetic owner only; no live service certification",
+  "results": [
+    {
+      "width": 1280,
+      "pending": true,
+      "verifiedCompletion": true,
+      "stalePendingCleared": true,
+      "accessShift": 0,
+      "focusAndSelection": true,
+      "immediateToggleRace": true,
+      "reloadNeutral": true,
+      "authMutations": []
+    },
+    {
+      "width": 390,
+      "pending": true,
+      "verifiedCompletion": true,
+      "stalePendingCleared": true,
+      "accessShift": 0,
+      "focusAndSelection": true,
+      "immediateToggleRace": true,
+      "reloadNeutral": true,
+      "authMutations": []
+    }
+  ],
+  "ownedBrowserAndServerClosed": true
+}

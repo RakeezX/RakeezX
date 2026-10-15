@@ -798,6 +798,7 @@ function paint() {
   if (!view || !ctx || !mainEl) return;
   observeNotifications();
   const snap = captureFocus();
+  view.beforePaint?.(mainEl, ctx.params);
   try {
     const hubEl = document.getElementById('sidebar-mini-hub');
     if (hubEl) {
