@@ -45,3 +45,15 @@ Syntax checks for the changed application modules, `sw.js` and new browser harne
 The actual SW checks used the canonical shared browser lease owned by this task/run. All browser contexts and the owned loopback server close in `finally`. Lease release initially encountered a transient checkpoint file-sharing lock; the subsequent canonical release succeeded (`RELEASED browser`). No unknown process or lease was touched. Browser JSON records owned cleanup.
 
 Local candidate only. No push, integration, Cloudflare Preview/immutable/Production verification or Product acceptance is claimed. The independent controller/publisher owns those subsequent steps.
+
+## Saved-session continuation — validation scope blocker
+
+AI-authored reconciliation for run `f10541c8-3b5c-49e4-8aa0-177a4229d203`, saved session `01a140d4-a22a-7833-9c72-286fabd166a6`.
+
+The implementation commit `008481339b637d1eef92d50b29c6d2591e9319e9` remains intact. The runner rejected the prior result with `Candidate validation: An affected check must pass and no recorded check may fail`, because the reported generic offline-route test failed. That historical failure remains FAIL; no result or queue file was rewritten.
+
+Fresh read-only reconciliation confirms all five Product source hashes still equal the browser evidence, all six recorded browser checks passed, and the recorded owned browser/server cleanup completed. The generic test and router are still byte-identical to the base. No unchanged browser, Preview or failing test was repeated.
+
+The exact missing repair path is **`tests/offline-route-graph.test.mjs`**, line 45: its hardcoded route-import expectation is 30 while the existing base router has 33. A bounded repair would correct that stale expectation against the current router and retain the complete executable-graph cache assertion and every routed-view cache assertion. Adding a separate passing N108 check would not repair this recorded failing assertion. Changing Product routes or omitting the failure to satisfy validation would be inappropriate.
+
+This path is outside the activated card's `allowedPaths`; the worker therefore returns BLOCKED rather than changing it. Retry condition: the authorized maintenance procedure corrects the inactive card scope to permit this exact test repair (or records the actual guarded repair), preserving this worktree, candidate chain, base, evidence and saved session; then the controller resumes this session for the targeted correction/check. No maintenance role, queue edit, new worker or deployment was started here.
