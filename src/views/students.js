@@ -10,21 +10,21 @@ import * as store from '../store.js';
 import { studentTotal, masteryBand, absenceCount, ENROLLMENT_STATUS, todayISO, sectionLabel, normalizeSearchText, displayRoster } from '../models.js';
 import { studentAvatar } from '../lib/avatar.js';
 import { repaint } from '../repaint.js';
-import { user } from '../lib/cloud.js';
 import { go } from '../router.js';
 
 let query = '';
 let formerOpen = false;
 
 export function canOpenRoster(params) {
-  const teaching = store.getTeaching(params.id);
-  const workspace = store.getActiveWorkspace();
-  if (!teaching || !workspace || store.isTeachingArchived(teaching)) return false;
-  if (workspace.type === 'account' &&
-      (user?.id !== workspace.authUserId || teaching.ownerId !== workspace.authUserId)) return false;
-  try { store.validateTeachingContext(teaching.sectionId, teaching.termId); }
+  try { store.assertClassOperationsAccess(params.id); }
   catch { return false; }
   return true;
+}
+
+function requireRoster(params, workspace = store.getActiveWorkspace()) {
+  if (workspace === store.getActiveWorkspace() && canOpenRoster(params)) return true;
+  toast('تعذّر فتح كشف هذا الفصل. تحقق من الحساب والفصل النشط.', 'warn');
+  return false;
 }
 
 export function rosterFileActions(params) {
@@ -299,11 +299,11 @@ export default {
   actions: {
     'file-import'(el, ev, params) {
       ev?.preventDefault();
-      if (canOpenRoster(params)) go(`/teaching/${params.id}/koshoof?import=1`);
+      if (requireRoster(params)) go(`/teaching/${params.id}/koshoof?import=1`);
     },
     'file-export'(el, ev, params) {
       ev?.preventDefault();
-      if (canOpenRoster(params)) go(`/teaching/${params.id}/koshoof?export=1`);
+      if (requireRoster(params)) go(`/teaching/${params.id}/koshoof?export=1`);
     },
     search(el) {
       query = el.value;
@@ -316,11 +316,13 @@ export default {
     },
 
     async import(el, ev, params) {
-      if (!canOpenRoster(params)) return;
+      if (!requireRoster(params)) return;
+      const workspace = store.getActiveWorkspace();
       const tch = store.getTeaching(params.id);
       if (!tch) return;
       const names = await importSheet(tch.sectionId);
       if (!names?.length) return;
+      if (!requireRoster(params, workspace)) return;
       const r = await store.importStudents(tch.sectionId, names);
       const extra = [
         r.skippedInvalid ? `${r.skippedInvalid} اسمًا غير صالح` : '',
@@ -330,7 +332,8 @@ export default {
     },
 
     async add(el, ev, params) {
-      if (!canOpenRoster(params)) return;
+      if (!requireRoster(params)) return;
+      const workspace = store.getActiveWorkspace();
       const tch = store.getTeaching(params.id);
       if (!tch) return;
 
@@ -359,6 +362,7 @@ export default {
       });
 
       if (!data) return;
+      if (!requireRoster(params, workspace)) return;
       const added = await store.addStudent(tch.sectionId, data.name);
       toast(added ? 'أُضيف الطالب' : 'الاسم غير صالح', added ? 'ok' : 'danger');
     },

@@ -1,0 +1,98 @@
+{
+  "taskId": "continuous-n104-account-class-roster-koshoof-liveness-20261015",
+  "runId": "890a048f-6666-464b-a89e-84b7fa34191c",
+  "baseSha": "9ea9bc4335b2ebab66fd8b11b99de78f9c41e9c4",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "actual_account_actions_320",
+      "status": "PASS",
+      "evidence": "Ownerless actual create + ownerless populated legacy + returned owner ACK; hub, Students paste/add cancel, Gradebook and class-list import/export routes; first click during refresh; no student/grade changes; only the exact synthetic teaching ACK consumed its command."
+    },
+    {
+      "name": "actual_account_actions_390",
+      "status": "PASS",
+      "evidence": "Ownerless actual create + ownerless populated legacy + returned owner ACK; hub, Students paste/add cancel, Gradebook and class-list import/export routes; first click during refresh; no student/grade changes; only the exact synthetic teaching ACK consumed its command."
+    },
+    {
+      "name": "negative_owner_session_term_lease",
+      "status": "PASS",
+      "evidence": "[{\"name\":\"foreign-owner\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"deleted\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-session\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-user\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"owner-drift\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-bound-workspace\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-db\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"selected-db-drift\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"wrong-term\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"closed-term\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"archived\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-parent\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-session\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"not-ready\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"foreign-provenance\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"missing-provenance\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"},{\"name\":\"stale-auth-storage\",\"roster\":false,\"panel\":false,\"denial\":\"الكشوف غير متاحة لهذا الفصل\"}]; valid offline lease opens sheet; expired lease denies with visible warning; no write."
+    },
+    {
+      "name": "actual_account_actions_768",
+      "status": "PASS",
+      "evidence": "Ownerless actual create + ownerless populated legacy + returned owner ACK; hub, Students paste/add cancel, Gradebook and class-list import/export routes; first click during refresh; no student/grade changes; only the exact synthetic teaching ACK consumed its command."
+    },
+    {
+      "name": "actual_account_actions_1280",
+      "status": "PASS",
+      "evidence": "Ownerless actual create + ownerless populated legacy + returned owner ACK; hub, Students paste/add cancel, Gradebook and class-list import/export routes; first click during refresh; no student/grade changes; only the exact synthetic teaching ACK consumed its command."
+    }
+  ],
+  "measurements": [
+    {
+      "width": 320,
+      "start": {
+        "paints": 5,
+        "x": 11,
+        "y": 150.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 11,
+        "y": 150.796875
+      },
+      "delta": 1
+    },
+    {
+      "width": 390,
+      "start": {
+        "paints": 5,
+        "x": 15,
+        "y": 150.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 15,
+        "y": 150.796875
+      },
+      "delta": 1
+    },
+    {
+      "width": 768,
+      "start": {
+        "paints": 5,
+        "x": 391,
+        "y": 154.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 391,
+        "y": 154.796875
+      },
+      "delta": 1
+    },
+    {
+      "width": 1280,
+      "start": {
+        "paints": 5,
+        "x": 681,
+        "y": 184.796875
+      },
+      "end": {
+        "paints": 6,
+        "x": 681,
+        "y": 184.796875
+      },
+      "delta": 1
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "src/app.js": "7820c3f0e1e202b576ed54e1277a7c04b241cd8e8d96e421a7113d544e149a01",
+    "src/store.js": "97ba80f827871ae71bbed1ad581cd1b8febb5165f3dea43b8d8066da422b1229",
+    "src/views/students.js": "7af0777ef8f2aaa717bd3a1b71af2a354380e2aa965e58cc5160f2c7ff7e0d48",
+    "src/views/grades.js": "23c0d414492c85d498c24c561b8c546fec0347ce60c538cd93569a9f853dc411"
+  }
+}

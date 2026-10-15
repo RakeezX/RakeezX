@@ -36,12 +36,13 @@ let transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nam
 let closeTeacherSetupImport = () => {};
 let setupRequest = 0;
 function setupBinding(teachingId) {
+  store.assertClassOperationsAccess(teachingId);
   const workspace = store.getActiveWorkspace(), teaching = store.getTeaching(teachingId);
   const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'preview', authenticatedUserId: cloud.user?.id });
   if (!store.state.ready || workspace?.type !== 'account' || !cloud.session ||
       cloud.session.user?.id !== cloud.user?.id || cloud.authStatus().state !== 'authenticated' ||
       !access.allowed || access.workspaceOwnerId !== workspace.authUserId ||
-      !teaching || teaching.ownerId !== workspace.authUserId || store.isTeachingArchived(teaching)) throw new Error('يلزم حساب وفصل نشطان لفتح المعاينة.');
+      !teaching || store.isTeachingArchived(teaching)) throw new Error('يلزم حساب وفصل نشطان لفتح المعاينة.');
   store.assertLeaseWritable();
   store.validateTeachingContext(teaching.sectionId, teaching.termId);
   return JSON.stringify([workspace.authUserId, workspace.id, workspace.databaseName, workspace.leaseGeneration,
@@ -956,7 +957,7 @@ export const koshoofView = {
     'koshoof-mode'(el, ev, p) { ev?.preventDefault(); if (!transfer.writing) go(`/teaching/${p.id}/koshoof?${el.dataset.panel}=1`, { replace: true }); },
     'grade-panel-close'(el, ev, p) { if (!transfer.writing) backWithinApp(`/teaching/${p.id}`); },
   }).map(([name, action]) => [name, (el, ev, p) => {
-    if (!canOpenKoshoof(p)) { ev?.preventDefault(); bindTransfer(null); repaint(); return; }
+    if (!canOpenKoshoof(p)) { ev?.preventDefault(); bindTransfer(null); toast('تعذّر فتح كشف هذا الفصل. تحقق من الحساب والفصل النشط.', 'warn'); repaint(); return; }
     return action(el, ev, p);
   }])),
 };

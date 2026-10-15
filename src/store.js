@@ -42,7 +42,7 @@ import { runtimeSyncOwnershipGuard, setLeaseWriteGuard } from './lib/sync-owners
 import { resolveWorkspaceForBoot } from './lib/workspace-routing.js';
 import { classifyIncomingItem, distributeAutomatically, projectSubitemScore, scoreCents,
   distributionTargets, normalizeSubitemDatesAndPoints, nextSubitemCompletionState } from './lib/score-foundation.js';
-import { LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
+import { LEGACY_WORKSPACE_DB_NAME, LEGACY_BROADCAST_CHANNEL_NAME, openWorkspaceBroadcastChannel, createWorkspaceRegistry } from './lib/workspaces.js';
 import {
   initializeCurriculumSyncGate, isCurriculumOrdinarySyncAllowed, resetCurriculumOrdinarySyncAccess,
 } from './lib/curriculum-bootstrap.js';
@@ -275,6 +275,51 @@ export function activateWorkspace(workspace) {
 
 export function getActiveWorkspace() {
   return activeWorkspace;
+}
+
+/** UI access to existing class operations; never substitutes for write/Sync ACLs.
+ * Local create rows and claimed legacy rows need not have a canonical ownerId.
+ * Their provenance is the mounted, immutable, receipt-bound account database.
+ */
+export function assertClassOperationsAccess(teachingId) {
+  const teaching = getTeaching(teachingId), workspace = activeWorkspace;
+  const denied = () => { throw new Error('تعذّر فتح كشف هذا الفصل. تحقق من الحساب والفصل النشط.'); };
+  if (!state.ready || !workspace || !teaching || teaching.deleted || isTeachingArchived(teaching)) denied();
+  validateTeachingContext(teaching.sectionId, teaching.termId);
+  if (workspace.type === 'account') {
+    const owner = workspace.authUserId, bound = runtimeSyncOwnershipGuard.getWorkspace();
+    const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'preview', authenticatedUserId: cloud.user?.id });
+    if (!cloud.session || cloud.session.user?.id !== owner || cloud.user?.id !== owner ||
+        cloud.authStatus().state !== 'authenticated' || !access.allowed || access.workspaceOwnerId !== owner ||
+        workspace.databaseName !== rawDB.getActiveDatabaseName() || bound.id !== workspace.id ||
+        bound.databaseName !== workspace.databaseName || bound.leaseGeneration !== workspace.leaseGeneration ||
+        teaching.termId !== activeTerm()?.id || getSection(teaching.sectionId)?.yearId !== activeYear()?.id) denied();
+    // Explicit conflicts always win, including parent rows in a mixed-owner cache.
+    for (const row of [teaching, getSection(teaching.sectionId), getTerm(teaching.termId),
+      getYear(getSection(teaching.sectionId)?.yearId), getSubject(teaching.subjectId)]) {
+      if (!row || row.ownerId != null && row.ownerId !== owner) denied();
+    }
+    assertCloudRestoreWritable();
+    assertLeaseWritable(state.device);
+    {
+      const [, claim, restore, provision] = JSON.parse(workspace.leaseGeneration);
+      const marker = state.device?.workspaceClaim;
+      const receipt = state.device?.initialRestoreReceipt;
+      const foundation = state.device?.accountProvisioningReceipt;
+      const claimed = workspace.workspaceKind === 'legacy-in-place' && workspace.databaseName === LEGACY_WORKSPACE_DB_NAME &&
+        claim && marker?.version === 1 && marker.state === 'claimed' && marker.claimId === claim &&
+        marker.ownerId === owner && marker.databaseName === workspace.databaseName;
+      const restored = restore && receipt?.ownerId === owner && restore.ownerId === owner &&
+        ['CORE_V1', 'CORE_V2'].includes(receipt.protocol) && receipt.restoreId === restore.restoreId &&
+        receipt.manifestHash && receipt.manifestHash === restore.manifestHash &&
+        Number.isFinite(receipt.completedAt) && receipt.completedAt > 0 && receipt.completedAt === restore.completedAt;
+      const provisioned = workspace.workspaceKind === 'account-provisioned' && provision &&
+        provision.ownerId === owner && foundation?.ownerId === owner && foundation.contractVersion === 1 &&
+        provision.contractVersion === 1 && foundation.foundationHash && foundation.foundationHash === provision.foundationHash;
+      if (!claimed && !restored && !provisioned) denied();
+    }
+  } else if (!['demo', 'legacy'].includes(workspace.type)) denied();
+  return teaching;
 }
 
 /**

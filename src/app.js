@@ -1012,6 +1012,12 @@ async function boot() {
   store.subscribe((_state, update) => {
     if (update?.render !== false) scheduleRender();
   });
+  // Token refreshes notify subscribers even when visible account state is identical.
+  // Avoid remounting the class DOM between pointerdown and click on such events.
+  const accountPresentationKey = () => JSON.stringify([cloud.user, cloud.session?.user,
+    !!cloud.session, cloud.authStatus().state, store.getActiveWorkspace(),
+    store.getOfflineLeaseStatus().state, store.getOfflineLeaseStatus().reason]);
+  let lastAccountPresentationKey = accountPresentationKey();
   cloud.subscribe(() => {
     const workspace = store.getActiveWorkspace();
     if (workspace?.type === 'account' && workspace.authUserId !== cloud.user?.id) cleanupSessionAutoTriggers();
@@ -1029,8 +1035,12 @@ async function boot() {
       location.reload();
       return;
     }
-    scheduleRender();
-    refreshTeacherMiniHubSheet();
+    const nextPresentationKey = accountPresentationKey();
+    if (nextPresentationKey !== lastAccountPresentationKey) {
+      lastAccountPresentationKey = nextPresentationKey;
+      scheduleRender();
+      refreshTeacherMiniHubSheet();
+    }
   });
   if (syncModule) {
     syncModule.subscribe(() => { void refreshSyncOperationalUI(); });
