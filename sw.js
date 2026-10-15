@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v65';
+const VERSION = 'rakeezx-v66';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -89,6 +89,7 @@ const SHELL = [
   './src/lib/grade-transfer.js',
   './src/lib/grade-transfer-parsers.js',
   './src/lib/grade-transfer-export.js',
+  './src/lib/grade-transfer-xlsx.js',
   './src/lib/rakeez-datetime.js',
   './src/lib/rakeez-datetime-values.js',
   './src/lib/brand.js',

@@ -21,6 +21,8 @@ import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
 
+import { exportGradeXlsx, downloadGradeXlsx } from '../lib/grade-transfer-xlsx.js';
+
 let mode = 'item';        // item | table
 let activeItemId = null;
 let sortKey = 'default';   // default | name | roll | score_desc | score_asc
@@ -139,6 +141,8 @@ function transferPanel(teachingId) {
     </section>
     <section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
     <div class="grade-transfer__heading"><h2>تصدير الكشوف</h2><button class="btn btn--quiet" data-act="grade-panel-close">إغلاق</button></div>
+    <label class="grade-transfer__format">صيغة الملف <select class="input" data-change="grade-export-format" data-grade-export-format data-fk="grade-export-format" aria-label="صيغة الملف"><option value="xlsx" ${transfer.exportFormat !== 'csv' ? 'selected' : ''}>Excel (.xlsx)</option><option value="csv" ${transfer.exportFormat === 'csv' ? 'selected' : ''}>CSV</option></select></label>
+    <p class="grade-transfer__hint">Excel بأعمدة واسعة وعناوين ملتفة؛ CSV للبيانات دون تنسيق. كشف نور اليدوي بصيغة CSV.</p>
     <p data-grade-export-alert role="alert" hidden></p>
     <div class="grade-transfer__chips" role="group" aria-label="بنود التصدير">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item data-fk="grade-export-${i.id}" value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> <span>${i.name} <small> / ${i.max}</small></span></label>`)}</div>
     <div class="grade-transfer__buttons"><div><button class="btn btn--primary" data-act="grade-names-export">تصدير كشف الأسماء</button><p class="grade-transfer__hint">أسماء طلاب الفصل فقط.</p></div>
@@ -210,7 +214,8 @@ function transferExport(el, ev, params) {
   const noorReview = el.dataset.act === 'grade-noor-export';
   const alert = root.querySelector(noorReview ? '[data-noor-alert]' : '[data-grade-export-alert]');
   alert.hidden = true; alert.textContent = '';
-  try { downloadGradeCsv(exportGradeCsv({ ...context, items: namesOnly ? [] : context.items.filter(i => selected.has(i.id)), className,
+  const xlsx = !noorReview && (transfer.exportFormat ?? 'xlsx') === 'xlsx';
+  try { (xlsx ? downloadGradeXlsx : downloadGradeCsv)((xlsx ? exportGradeXlsx : exportGradeCsv)({ ...context, items: namesOnly ? [] : context.items.filter(i => selected.has(i.id)), className,
     subject: store.state.subjects.find(s => s.id === teaching.subjectId)?.name, term: store.state.terms.find(t => t.id === teaching.termId)?.name, noorReview, blankTemplate, includeIds: !namesOnly && root.querySelector('[data-grade-export-ids]')?.checked,
     noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem,e.value])), noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview, blankTemplate, namesOnly, className });
   } catch (error) { alert.textContent = error.message; alert.hidden = false; }
@@ -479,6 +484,7 @@ const gradesView = {
     },
     'grade-mapping'(el) { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = null; transfer.editMapping = true; repaint(); },
     'grade-edit-mapping'() { if (transfer.busy) return; transfer.review = null; transfer.editMapping = true; repaint(); },
+    'grade-export-format'(el) { transfer.exportFormat = el.value === 'csv' ? 'csv' : 'xlsx'; },
     'grade-export-selection'(el) { transfer.exportOpen = true; transfer.noorOpen = el.closest('[data-grade-transfer]').querySelector('[data-noor-grouping]').open; const confirm = el.closest('[data-grade-transfer]').querySelector('[data-noor-confirm]'); if (confirm) confirm.checked = false; transfer.exportItems = new Set([...el.closest('[data-grade-transfer]').querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value)); repaint(); },
     'grade-review'(el, ev, params) {
       try { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = transfer.importMode === 'names' ? store.reviewNamesImport(params.id, transfer) : store.reviewGradeImport(params.id, transfer); transfer.message = ''; transfer.error = false; }
