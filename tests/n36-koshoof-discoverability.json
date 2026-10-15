@@ -5,22 +5,22 @@
     {
       "name": "n36_class_list_card_koshoof_affordance_visible",
       "status": "PASS",
-      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 44px/44px/44px/44pxpx; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
+      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 320px=44px, 390px=44px, 768px=44px, 1280px=44px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
     },
     {
       "name": "n36_class_hub_koshoof_tile_and_reports_distinct",
       "status": "PASS",
-      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 44px/44px/44px/44pxpx; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
+      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 320px=44px, 390px=44px, 768px=44px, 1280px=44px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
     },
     {
       "name": "n36_routes_owner_archive_and_empty_roster_guards",
       "status": "PASS",
-      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 44px/44px/44px/44pxpx; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/. Existing canOpenRoster gate retained; empty-roster CTAs unchanged."
+      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 320px=44px, 390px=44px, 768px=44px, 1280px=44px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/. Existing canOpenRoster gate retained; empty-roster CTAs unchanged."
     },
     {
       "name": "n36_actual_mobile_RTL_focus_and_no_clipped_actions",
       "status": "PASS",
-      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 44px/44px/44px/44pxpx; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
+      "evidence": "Actual Demo app DOM, handlers and source CSS at 320/390/768/1280px: card action visible/focusable at 320px=44px, 390px=44px, 768px=44px, 1280px=44px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/."
     },
     {
       "name": "syntax_diff_and_owned_cleanup",

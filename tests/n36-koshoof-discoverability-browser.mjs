@@ -69,7 +69,7 @@ try {
         widths.push({width,height:box.height,card:true,hub:true,route:true,focus:true,guards:guarded,writes:0,horizontalOverflow:false});
       } finally {await context.close();}
     }
-    const evidenceText=`Actual Demo app DOM, handlers and source CSS at ${widths.map(x=>x.width).join('/')}px: card action visible/focusable at ${widths.map(x=>x.height+'px').join('/')}px; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/.`;
+    const evidenceText=`Actual Demo app DOM, handlers and source CSS at ${widths.map(x=>x.width).join('/')}px: card action visible/focusable at ${widths.map(x=>`${x.width}px=${x.height}px`).join(', ')}; one class-scoped hub tile routes to default import panel; reports subtitle distinct; archived/missing teaching refused; zero IndexedDB writes and no horizontal overflow. Screenshots: test-results/n36-koshoof-discoverability/.`;
     record('n36_class_list_card_koshoof_affordance_visible',evidenceText);
     record('n36_class_hub_koshoof_tile_and_reports_distinct',evidenceText);
     record('n36_routes_owner_archive_and_empty_roster_guards',evidenceText+' Existing canOpenRoster gate retained; empty-roster CTAs unchanged.');
