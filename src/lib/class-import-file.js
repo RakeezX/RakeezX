@@ -1,5 +1,5 @@
 // AI: bounded local-file interpretation; never connects to a school portal.
-import { readStudentFile, previewStudentRows, validateRows } from './student-import.js';
+import { readStudentFile, previewStudentRows, validateRows, isStudentNameHeader, validStudentImportName } from './student-import.js';
 import { GRADES, normalizeSectionLabel } from '../models.js';
 import { normalizeSubjectName, matchBuiltinSubject } from './subject-catalog.js';
 
@@ -22,6 +22,16 @@ export function detectClassColumns(rows) {
     if (score > best) { best = score; header = index; mapping = found; }
   });
   return { header, mapping: { grade: -1, label: -1, subject: -1, name: -1, ...mapping } };
+}
+// Names alone determine file mapping; class metadata always comes from Rakeez controls.
+export function detectClassNameColumn(rows) {
+  for (const [header, row] of rows.slice(0, 12).entries()) {
+    const columns = row.map((cell, i) => isStudentNameHeader(cell) ? i : -1).filter(i => i >= 0);
+    if (columns.length) return { header, mapping: { grade: -1, label: -1, subject: -1, name: columns.length === 1 ? columns[0] : -1 } };
+  }
+  // A one-column names-only file has no header. Preserve its first student.
+  const single = rows.every(row => row.length === 1) && rows.some(row => validStudentImportName(row[0]));
+  return { header: single ? -1 : 0, mapping: { grade: -1, label: -1, subject: -1, name: single ? 0 : -1 } };
 }
 export function classGrade(value) {
   const text = String(value ?? '').trim().replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));

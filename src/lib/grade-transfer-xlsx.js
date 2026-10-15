@@ -2,7 +2,7 @@
 // Fixed entry paths, no formulas, links, IDs, timestamps or document properties.
 import { gradeExportRows, gradeCsvFilename } from './grade-transfer-export.js';
 
-const encode = value => new TextEncoder().encode(value);
+import { zip } from './zip.js';
 const xml = value => String(value ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g, '')
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 const main = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
@@ -13,39 +13,6 @@ function column(index) {
   let result = '';
   for (let n = index + 1; n; n = Math.floor((n - 1) / 26)) result = String.fromCharCode(65 + (n - 1) % 26) + result;
   return result;
-}
-function crc32(bytes) {
-  let crc = 0xffffffff;
-  for (const byte of bytes) {
-    crc ^= byte;
-    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
-  }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-function concat(chunks) {
-  const result = new Uint8Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
-  let offset = 0;
-  for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.length; }
-  return result;
-}
-function zip(files) {
-  const body = [], directory = []; let offset = 0;
-  for (const [path, value] of Object.entries(files)) {
-    const name = encode(path), data = encode(value), crc = crc32(data);
-    const local = new Uint8Array(30), l = new DataView(local.buffer);
-    l.setUint32(0, 0x04034b50, true); l.setUint16(4, 20, true);
-    l.setUint16(12, 33, true); // Fixed valid DOS date: 1980-01-01.
-    l.setUint32(14, crc, true); l.setUint32(18, data.length, true); l.setUint32(22, data.length, true); l.setUint16(26, name.length, true);
-    body.push(local, name, data);
-    const central = new Uint8Array(46), c = new DataView(central.buffer);
-    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(14, 33, true);
-    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, offset, true);
-    directory.push(central, name); offset += local.length + name.length + data.length;
-  }
-  const central = concat(directory), end = new Uint8Array(22), e = new DataView(end.buffer);
-  e.setUint32(0, 0x06054b50, true); e.setUint16(8, Object.keys(files).length, true); e.setUint16(10, Object.keys(files).length, true);
-  e.setUint32(12, central.length, true); e.setUint32(16, offset, true);
-  return concat([...body, central, end]);
 }
 export function exportGradeXlsx(options) {
   // Noor keeps its existing explicit manual-only CSV path.

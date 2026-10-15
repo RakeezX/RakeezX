@@ -1,0 +1,71 @@
+{
+  "taskId": "continuous-n107-unified-koshoof-flow-20261016",
+  "runId": "fe68cc47-4162-4a86-8534-fc32175e9a6d",
+  "checks": [
+    {
+      "name": "actual_partial_failure_and_explicit_retry",
+      "status": "PASS",
+      "evidence": "Actual student transaction failure preserves section/teaching/defaults and human pending names; explicit retry reuses parents, no raw IDs or warning after success."
+    },
+    {
+      "name": "actual_native_import_and_binary_downloads",
+      "status": "PASS",
+      "evidence": "Actual native select enters guarded class import; single XLSX and one ZIP download with separate per-class names and grades, no store changes; ordinary format picker removed, dedicated Noor retained."
+    },
+    {
+      "name": "actual_owner_term_archived_session_and_expired_lease",
+      "status": "PASS",
+      "evidence": "Selection reset on term change; archived/foreign teaching excluded; wrong owner denies hub; session drift during final modal and expired offline lease produce zero writes. [{\"name\":\"archived\",\"count\":1},{\"name\":\"foreign\",\"count\":1},{\"name\":\"wrong-owner\",\"count\":0},{\"name\":\"restored\",\"count\":2}]"
+    },
+    {
+      "name": "actual_UI_390",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-unified/."
+    },
+    {
+      "name": "actual_UI_320",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-unified/."
+    },
+    {
+      "name": "actual_UI_768",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-unified/."
+    },
+    {
+      "name": "actual_UI_1280",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-unified/."
+    },
+    {
+      "name": "cached_offline_actual_routes",
+      "status": "PASS",
+      "evidence": "Fresh controlled Demo cache contains both new dependencies; actual hub and legacy new-class alias reload offline via Service Worker."
+    },
+    {
+      "name": "actual_XLSX_ambiguous_column_existing_duplicate",
+      "status": "PASS",
+      "evidence": "Actual ambiguous-name native select previews only the deliberately chosen column; actual XLSX upload with manual Rakeez metadata creates one class only after confirmation; reimport of existing class is blocked without writes."
+    }
+  ],
+  "errors": [],
+  "previousFailures": [
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-act=\"class-import-reset\"]').first() to be visible\u001b[22m\n\n    at visit (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-unified-koshoof-flow-20261016\\tests\\n107-unified-koshoof-browser.mjs:54:39)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-unified-koshoof-flow-20261016/tests/n107-unified-koshoof-browser.mjs:155:5"
+  ],
+  "testedProductCommit": "66688ecee4f0fe298a1d0de9cd09dd11177bdb60",
+  "testedProductFilesSha256": {
+    "src/views/home.js": "6abc9c7bff459d193bfe2ac26c463857203f6b8788aa4c671d43fccf41a286b1",
+    "src/views/teachings.js": "90621dad9f5e95b0952f6d207057e17c7be841685f2d14cdd368dc5a816ac6bb",
+    "src/views/class-import-center.js": "55887df846b1d6aefc528260a832f16001ad62c270706a128d420af94a4d0927",
+    "src/lib/class-import-file.js": "1998c580fcbd3c51124065d1a1efaabc3530ff0a7470e80134fccbf1ae5bf5a5",
+    "src/lib/class-koshoof-bundle.js": "35530f03ea35584bb630093ddd9abb60f1becc06959879c6af18e0a23dd43479",
+    "src/lib/grade-transfer-xlsx.js": "728e3c59715b52a04b063e38d394138e34472b03d6430628fddccf3996e2805e",
+    "src/lib/zip.js": "5759c09d410b4373e8d238ef6f3f4ea54168b3fc2914dc479aca54340d46bd58",
+    "src/views/grades.js": "f9fa217da8b329681ae7dc35d4307ac25c65c777ee98364715717525199cac26",
+    "src/store.js": "4a040c4fcbf32f26079f78255951de328ac2b53c74ade4fa1d00c3356716d060",
+    "src/router.js": "44f827e1c036ff6991e29c3f59d73e6ed2978a0912c3cfb929aff463fde14b2a",
+    "src/styles/components.css": "9930182c614cb3843d1813aee413c17c4ef04c33932bfc37c69043233522d895",
+    "sw.js": "94fc30bdef58f83f998cfa73b686de43d77db0256b4885a5e6b73e1965170682"
+  },
+  "cleanup": "Owned fresh browser contexts, browser and loopback server closed in finally; shared phase lease released by runner command."
+}

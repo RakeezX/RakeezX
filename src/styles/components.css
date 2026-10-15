@@ -8379,3 +8379,9 @@
   .home-onboarding__actions .btn { flex:1 1 180px; white-space:normal; }
   .classes-toolbar > .btn { flex:1 1 180px; }
 }
+/* AI: compact unified Koshoof sections and accessible wrapping selections. */
+.class-import-page > section { margin-block:16px; min-inline-size:0; overflow-wrap:anywhere; }
+.koshoof-selection { display:grid; gap:8px; margin-block:12px; }
+.koshoof-selection label { display:flex; align-items:center; gap:8px; min-block-size:44px; overflow-wrap:anywhere; }
+.class-import-groups ul { max-block-size:240px; overflow:auto; padding-inline-start:24px; }
+.class-import-page input[type="checkbox"] { flex-shrink:0; inline-size:18px; block-size:18px; }

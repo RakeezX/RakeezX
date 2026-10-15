@@ -333,9 +333,8 @@ function renderClassCard(tch) {
 
 function classesToolbar() {
   return html`<nav class="classes-toolbar" aria-label="إدارة الفصول">
-    <a class="btn btn--primary" href="#/classes/import">${icon('upload')} استيراد الفصول</a>
     <button class="btn btn--quiet" data-act="add">${icon('plus')} إضافة فصل</button>
-    <a class="btn btn--quiet" href="#/classes/koshoof">استيراد وتصدير الكشوف</a>
+    <a class="btn btn--primary" href="#/classes/koshoof">الكشوف</a>
     <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button>
   </nav>`;
 }

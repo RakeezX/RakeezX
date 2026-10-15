@@ -259,7 +259,7 @@ function renderOnboarding(onboarding) {
         <p>${content.text}</p>
       </div>
       <div class="home-onboarding__actions"><a class="btn btn--primary home-onboarding__action" href="${content.href}">${content.action} ${icon('back')}</a>
-      ${onboarding.state === 'A' ? html`<a class="btn class-import-secondary" href="#/classes/import">${icon('upload')} استيراد الفصول</a>` : ''}</div>
+      ${onboarding.state === 'A' ? html`<a class="btn class-import-secondary" href="#/classes/koshoof?new=1">${icon('upload')} استيراد فصل من ملف</a>` : ''}</div>
     </section>
   `;
 }
