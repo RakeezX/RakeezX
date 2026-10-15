@@ -120,8 +120,11 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
-    insist(GIT_SHA.test(e.queuedBaseSha ?? '') && GIT_SHA.test(e.queuedCandidateSha ?? '') && GIT_SHA.test(e.baseSha ?? ''), 'Incomplete reviewed queued/result binding: ' + e.id);
-    insist(task.baseSha === e.queuedBaseSha && task.candidateSha === e.queuedCandidateSha && result.baseSha === e.baseSha, 'Reviewed queued/result preimage changed: ' + e.id);
+    // A blocked worker may have reconciled a newer main base without any queued candidate yet.
+    // Require the explicit null marker AND actual nullish queue state; every other identity guard stays exact.
+    const noQueuedCandidate = e.queuedCandidateSha === null && task.candidateSha == null;
+    insist(GIT_SHA.test(e.queuedBaseSha ?? '') && (noQueuedCandidate || GIT_SHA.test(e.queuedCandidateSha ?? '')) && GIT_SHA.test(e.baseSha ?? ''), 'Incomplete reviewed queued/result binding: ' + e.id);
+    insist(task.baseSha === e.queuedBaseSha && (noQueuedCandidate || task.candidateSha === e.queuedCandidateSha) && result.baseSha === e.baseSha, 'Reviewed queued/result preimage changed: ' + e.id);
   } else {
     insist(result.baseSha === task.baseSha, 'Result base mismatch: ' + e.id);
     insist(task.candidateSha == null || task.candidateSha === e.candidateSha, 'Queue candidate differs from result: ' + e.id);
