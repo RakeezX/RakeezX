@@ -29,3 +29,14 @@ Synthetic harness warnings: Service Workers are deliberately blocked by the appr
 A dedicated hosted Auth-return UX could explain the result on the email-link return surface, but requires its own explicit callback/token-handling card. No callback support, email template, double-confirmation, SMTP, schema or service administration is implemented or accepted here. This view-only result does not close the broader N64 message/return contract.
 
 No push, integration, Preview or Production deployment was performed. The independent controller/publisher must bind the integrated revision and served changed client assets before awaiting_po; local readiness is not Product acceptance.
+
+## Saved-session continuation — validation blocked
+
+Continuation run: `3cf675b5-92c2-4cdc-8b7b-c2c9e20f28e2`.
+Preserved implementation candidate: `46ae6335dbe9b614f4865c89662dccb3483e3026`.
+
+The previous LOCAL_READY result was rejected with: `Candidate validation: An affected check must pass and no recorded check may fail`. The additional account-profile suite's recorded report-branding failure remains FAIL. The N64 checks above passed; they do not erase that failure. This continuation confirmed the saved commit, clean worktree, existing machine evidence and empty base-to-candidate diff for the failed test and its account/report/brand dependencies. No Product source changed, and no successful browser scenario or failed suite was rerun.
+
+Concrete scope blocker: `tests/account-profile-access.test.mjs` is outside this card's allowedPaths. Its line75 assertion requires `/تقارير المعلم/`, while the unchanged report header emits the Rakeez brand. The current N64 card does not authorize changing that report contract or test. Changing N64 presentation to inject the report phrase, suppressing the failed assertion, or omitting the known failed result would not repair it.
+
+Retry condition: the approved maintenance path must first establish the correct report-branding expectation from its applicable Product contract and, if this is a stale assertion, grant the inactive saved card the exact missing test path `tests/account-profile-access.test.mjs` for that bounded correction. If the assertion reflects an actual report requirement, it needs an appropriately authorized report repair instead. Preserve this candidate, base and all existing evidence; resume this exact session only after the material correction/access decision. No queue, validator, lock or controller policy was changed by this worker. This is a factual BLOCKED result, not another unchanged test retry or a request for routine PM approval.
