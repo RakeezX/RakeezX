@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n58-calendar-switch-prevention-finish-20261014",
+      "productId": "N58",
+      "activationId": "po-20261012-continuous",
+      "priority": -110,
+      "scopeKey": "n58-current-calendar-switch-prevention",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "dependsOn": [
+        "continuous-n58-fresh-account-calendar-foundation-20261014"
+      ],
+      "objective": "Latest PO explicitly abandons both dummy damaged accounts and leaves their data untouched. Finish calendar-switch PREVENTION and the correctly bounded release preparation, not recovery of those accounts. Start from the current main containing the accepted first-use correction; do not reintroduce old preset materialization. Read the current N58 row, N58_FRESH_ACCOUNT_FOUNDATION.md/N58_FIRST_USE_RELEASE.md in the saved foundation worktree and current-service metadata binding. Reuse unchanged first-use/native/owner/history proofs rather than rerunning the old9/60 suites. The outstanding delta is a real user click in calendar -> إعدادات التقويم والمنطقة -> التقويم المعتمد on current source with switching enabled in the isolated candidate, Western→General→Western, before-first-sync and after-initial-sync, then reload/second context, with one stable year and two stable terms and no rejected/dependent chain. Use the existing official LOCAL Auth/PostgREST/PG harness and owned synthetic data only, not personal/hosted accounts or the retired pair. Verify delayed acknowledgement, duplicate clicks and retained recorded session context using smallest affected cases; do not turn pending network operations into rejection or wipe history. Scope removal of the temporary hold to this existing preset selection UI+store path only after its actual candidate behavior passes. No new recovery UI, migration, Auth/RLS change, real account action, deleted data or source-page inspection. If the exact current service identity or necessary correctness proof is missing, preserve candidate and state the concrete condition rather than substituting broad old-gate labels. Full original N58 historical failure/NOT_RUN remains in evidence; never relabel it PASS. The PO's forthcoming new-account production trial remains acceptance, not a test the worker may claim to have performed. No whole-ticket closure from local proof. Final report distinguishes prepared release candidate, actual permitted delivery, and PO trial pending.",
+      "allowedPaths": [
+        "src/store.js",
+        "src/views/calendar.js",
+        "src/lib/calendar-runtime.js",
+        "src/lib/sync-v2.js",
+        "src/lib/calendar-presets.js",
+        "sw.js",
+        "tests/n58-switch-prevention-*.mjs",
+        "tests/n58-switch-prevention-*.json",
+        "docs/automation-evidence/20261014/N58_SWITCH_PREVENTION_FINAL.md"
+      ],
+      "requiredChecks": [
+        "n58_current_ui_empty_account_switch_roundtrip",
+        "n58_switch_no_legacy_materialized_mutations",
+        "n58_switch_ack_reload_owner_and_history",
+        "n58_switch_existing_service_and_release_binding"
+      ],
+      "acceptance": [
+        "Actual current application UI is used, with approved picker/labels and stable existing schema; no hand-built substitute. Candidate switch changes selected preset without replacing year/term IDs or sending old official calendar/day create/delete chains. A fresh account can settle to the two acknowledged terms and preset before or after the switch; Western→General→Western remains consistent after reload. Lost response reuses the same immutable mutation, duplicate clicks do not mint duplicate academic identities.",
+        "Preserve all data and rejected history in old workspaces, do not repair/replay the abandoned accounts. Calendar view still opens on malformed historical data with an honest warning, not a crash. Existing session provenance, wrong-owner prevention, grade/import/restore and offline behavior retain their affected evidence. Service digests in the existing read-only operator record must bind to the local protocol definitions; equality is not a claim of live account testing.",
+        "Calendar switch may be enabled in the release candidate only after this exact delta passes. Product release uses the normal publisher after its dependency's verified source receipt. If applicable preexisting live validation is still indispensable for safety, do not hide that missing proof or trigger its denied operation: preserve a safe held candidate and name precisely the remaining check. No new account fixture or operator SQL. N58 stays open awaiting the PO's promised fresh-account trial and remaining real acceptance; never declare the two abandoned accounts recovered.",
+        "Return schema-matched LOCAL_READY only when the specifically authorized existing-behavior correction is safe for its bounded delivery; otherwise BLOCKED with concrete evidence, preserved candidate and exact next action. No queue edits or manual publisher/next worker. No paid review loop or unrelated features."
+      ],
+      "releaseAuthority": "PO's latest instructions explicitly prioritize preventing recurrence and request enabling the calendar change once ready so they can test a new empty account. Routine correction/delivery delegation covers this existing client behavior after affected proof against the unchanged current service. It does not authorize recovering abandoned accounts, bypassing earlier tool refusals, creating another hosted test pair, altering server/Auth/RLS/schema or erasing failed evidence. The switch hold must remain until the safety conditions above are actually established; this is not a blanket permission to ignore full N58 history.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "9ed0295e59a303e8dcf7b2b7d4e4e7982a376b48",
+        "priorReceiptSha256": "00d7c3dacc720b53c854b149c6bf4fe59d693bb50aed368e64645b5d989ad54b",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "The saved N58 prevention release passed every affected LOCAL guard and has a provider-success immutable deployment, but the browser-root HTML used one ASCII whitespace between the two exact pinned Cloudflare JSD/Analytics tags. The first verifier required adjacency; a reviewed ops-only correction has now passed 27/27 focused tests and loaded in verified controller PID32796. Recheck the saved already-published candidate and current served app SHA through the sole publisher, preserving all original failed receipts, unchanged N58 Product source, dummy-account deferral, and strict source comparison."
+      }
+    }
+  ]
+}
