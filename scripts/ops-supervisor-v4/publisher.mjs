@@ -184,7 +184,7 @@ async function boundedBody(response) {
   return Buffer.concat(parts);
 }
 
-/** Recognize one exact provider injection; all remaining bytes stay unchanged. */
+/** Accept only pinned Cloudflare provider tails with exact immutable source parity. */
 export function normalizeCloudflareIndex(bytes, metadata) {
   if (metadata.repoPath !== 'index.html' || !['index.html','/'].includes(metadata.urlPath)
       || metadata.statusCode !== 200 || String(metadata.server).toLowerCase() !== 'cloudflare'
@@ -194,27 +194,52 @@ export function normalizeCloudflareIndex(bytes, metadata) {
   const marker = 'window.__CF$cv$params', analyticsMarker = 'static.cloudflareinsights.com/beacon.min.js';
   let end = source.lastIndexOf('</body>');
   if (end < 0 || source.indexOf('</body>') !== end) return null;
-  // Keep all original whitespace. Only exact contiguous provider tags are removed.
+  // Provider tags are pinned. One optional following whitespace is gated by exact source SHA.
   // Locate only ASCII HTML whitespace after pinned Cloudflare tags.
   // Keep every original suffix byte for exact application SHA-256 verification.
   while (end > 0 && [9,10,12,13,32].includes(source.charCodeAt(end - 1))) end--;
   const providerEnd = end, providers = [];
-  if (source.slice(0,end).endsWith(CF_ANALYTICS_20261014)) {
-    if (source.indexOf(analyticsMarker) !== source.lastIndexOf(analyticsMarker)) return null;
-    end -= CF_ANALYTICS_20261014.length; providers.unshift('cloudflare-analytics-20261014');
-  } else if (source.includes(analyticsMarker)) return null;
-  const match = source.slice(0,end).match(CF_JSD);
-  if (match) {
-    if (source.indexOf(marker) !== source.lastIndexOf(marker) || match.index + match[0].length !== end) return null;
+  // Both observed provider orders are allowed, but each tag must be the exact pinned tag
+  // immediately adjacent to the other, without arbitrary scripts between.
+  for (let n = 0; n < 2; n++) {
+    const prefix = source.slice(0,end);
+    if (prefix.endsWith(CF_ANALYTICS_20261014)) {
+      if (source.indexOf(analyticsMarker) !== source.lastIndexOf(analyticsMarker)) return null;
+      end -= CF_ANALYTICS_20261014.length;
+      providers.unshift('cloudflare-analytics-20261014');
+      continue;
+    }
+    const match = prefix.match(CF_JSD);
+    if (!match || match.index + match[0].length !== end) break;
+    if (source.indexOf(marker) !== source.lastIndexOf(marker)) return null;
     const time = Buffer.from(match[2], 'base64');
     if (!/^[0-9]{10}$/.test(time.toString('ascii')) || time.toString('base64') !== match[2]) return null;
-    end = match.index; providers.unshift('cloudflare-jsd-v1');
-  } else if (source.includes(marker)) return null;
-  if (!providers.length) return null;
-  const removed = raw.subarray(end,providerEnd), normalized = Buffer.concat([raw.subarray(0,end),raw.subarray(providerEnd)]);
-  return { normalization: providers.length === 1 && providers[0] === 'cloudflare-jsd-v1' ? 'cloudflare-jsd-v1' : 'cloudflare-observed-tail-v2',
-    normalizedSha256: hash(normalized), normalizedBytes: normalized.length, removedProviderBytes: removed.length,
-    removedSha256: hash(removed), providerTransforms: providers };
+    end = match.index;
+    providers.unshift('cloudflare-jsd-v1');
+  }
+  if (!providers.length || new Set(providers).size !== providers.length) return null;
+  if (source.includes(analyticsMarker) && !providers.includes('cloudflare-analytics-20261014')) return null;
+  if (source.includes(marker) && !providers.includes('cloudflare-jsd-v1')) return null;
+  const normalized = Buffer.concat([raw.subarray(0,end),raw.subarray(providerEnd)]);
+  const closeAt = source.lastIndexOf('</body>');
+  const suffix = raw.subarray(providerEnd,closeAt);
+  let effective = normalized, providerAddedWhitespaceBytes = 0;
+  // No generic trimming: one ASCII whitespace after the pinned pair can be attributed
+  // to the provider ONLY when deleting it recreates the exact immutable Git blob SHA.
+  if (suffix.length === 1 && [9,10,12,13,32].includes(suffix[0])
+      && typeof metadata.expectedSha256 === 'string' && /^[a-f0-9]{64}$/.test(metadata.expectedSha256)
+      && hash(normalized) !== metadata.expectedSha256) {
+    const candidate = Buffer.concat([raw.subarray(0,end),raw.subarray(providerEnd+1)]);
+    if (hash(candidate) === metadata.expectedSha256) {
+      effective = candidate; providerAddedWhitespaceBytes = 1;
+    }
+  }
+  const removed = raw.subarray(end,providerEnd+providerAddedWhitespaceBytes);
+  return { normalization: providers.length === 1 && providers[0] === 'cloudflare-jsd-v1'
+      ? 'cloudflare-jsd-v1' : 'cloudflare-observed-tail-v2',
+    normalizedSha256: hash(effective), normalizedBytes: effective.length, removedProviderBytes: removed.length,
+    removedSha256: hash(removed), providerTransforms: providers,
+    ...(providerAddedWhitespaceBytes ? { providerAddedWhitespaceBytes } : {}) };
 }
 
 export function describeProviderTailMismatch(bytes) {
@@ -254,7 +279,7 @@ async function verifyOrigin(origin, assets, publishedSha, fetcher, signal) {
       const normalized = observedSha256 === asset.sha256 ? null : normalizeCloudflareIndex(bytes, {
         repoPath: asset.repoPath, urlPath: requestPath, statusCode: response.status,
         server: response.headers.get('server'), contentType: response.headers.get('content-type'),
-        mitigated: response.headers.get('cf-mitigated'),
+        mitigated: response.headers.get('cf-mitigated'), expectedSha256: asset.sha256,
       });
       const gone = asset.deleted && [404, 410].includes(response.status);
       const fallback = asset.deleted && response.status === 200 && /text\/html/i.test(response.headers.get('content-type') ?? '')
