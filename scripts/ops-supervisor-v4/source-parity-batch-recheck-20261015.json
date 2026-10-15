@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n101-account-switch-bootstrap-20261014",
+      "productId": "N101",
+      "activationId": "po-20261012-continuous",
+      "priority": -30,
+      "scopeKey": "n101-owner-isolated-new-device-bootstrap",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 45,
+      "idleMinutes": 10,
+      "objective": "Urgent PO report: after logout of work account A and login of existing test account B in the same Chrome, app shows مساحة العمل غير جاهزة على هذا الجهاز / لم يتم العثور على مساحة عمل محلية مرتبطة بهذا الحساب, with logout only. Existing accounts must work on a new device and switching between accounts must boot B's OWN workspace without reading/reusing A's. Concrete source: resolveWorkspaceForBoot() returns authenticated-account-workspace-mismatch whenever claimedLegacyRecords.length>0 after B has no registered workspace; app boots initial restore only for three other reasons. This protects A but wrongly blocks B's isolated restore/provisioning. Trace actual routing/provisioning/initial restore rather than simply whitelisting every blocked state. Correct this legitimate no-local-workspace path and owner-bound recovery for missing local registry/database, leaving malformed/mismatched ownership fail-closed. Do NOT delete user databases, outboxes, registry or cached tokens to make the error go away.",
+      "allowedPaths": [
+        "src/app.js",
+        "src/lib/workspace-routing.js",
+        "src/lib/workspaces.js",
+        "src/lib/initial-restore.js",
+        "src/lib/account-provisioning.js",
+        "src/lib/account-profile.js",
+        "src/lib/db.js",
+        "tests/n101-*",
+        "tests/workspace-routing.test.mjs",
+        "tests/workspaces.test.mjs",
+        "sw.js",
+        "docs/automation-evidence/20261014/N101_ACCOUNT_SWITCH.md"
+      ],
+      "requiredChecks": [
+        "n101_actual_switch_A_to_B_to_A",
+        "n101_new_device_existing_account_restore",
+        "n101_old_owner_untouched_during_boot",
+        "n101_interrupted_offline_invalid_owner",
+        "n101_app_shell_release"
+      ],
+      "acceptance": [
+        "Reproduce the actual current failure through app boot with A's claimed legacy/account registry and database still present; then B logs in without a local B workspace. After correction B enters normal owner-bound provisioning/initial restore, reaches its own data, then switching back to A preserves every original A row/outbox/history. Actual DOM/handlers and real indexedDB, not only a pure routing unit test. No B read touches A Product database; instrument/assert this boundary rather than weaken it.",
+        "Existing cloud account on fresh browser profile/no local registry loads through current contract and B-bound restore receipt before opening teacher UI. Account with a legitimate old local B entry but absent local database can use safe recovery only when actual metadata evidence permits; ambiguous or corrupt same-owner registry/receipt is not silently trusted or repaired by copying other owners. New truly unprovisioned account still follows profile/provisioning contract, not a fake empty initialized account.",
+        "Use synthetic account HTTP/transport and disposable native source tests as needed; no user account queries, real grade writes, actual Auth account provisioning or denied N58 live/private operations. Online required for first cloud restore: offline fresh account displays actionable connect/retry message, while existing valid cached owner follows approved7/14day lease. Denied network/expired session/user cancel/owner switch midway cannot expose prior owner DOM or write into another account, and retry resumes same safe contract.",
+        "Retain N71 immutable restoration/owner receipts, N49 lease, N98 roster ordering, N100/N90 behavior and N44 notification deactivation. Targeted old→new Service Worker update check if source caching affects boot. This card changes client boot eligibility only, not Auth/RLS/service schema, new data access powers or provider settings. No global bypass of boot guards. Sole publisher verifies served result; no claim PO personally tested."
+      ],
+      "releaseAuthority": "Latest direct PO urgently requests account access from any eligible device and repairing account-switch blocking. Current scoped client routing/provisioning correctness and normal release are authorized; preserve verified auth, existing owner isolation and data. No direct real account mutation, server policy or broader N58 live-test permission is granted.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "4bca911dd3c9ebdb53cdd5524854659f7552108e",
+        "priorReceiptSha256": "1d1a1a3e16f3e7e49d70c5e1a70a5bfd8cae4de8227e0f451ee4664b960d2183",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N101: The saved publication has LOCAL_READY, every affected guard PASSED, Cloudflare provider success and immutable served-source success. Earlier Production index.html parity failed due to exact pinned provider JSD/Analytics scripts and the one inter-tag whitespace. The narrowly corrected operating verifier is now installed and tested 27/27; recheck the unchanged candidate through the sole publisher without rerunning the Product worker, dropping app bytes or changing any real account/data."
+      }
+    },
+    {
+      "id": "continuous-n100-invalid-mode-recovery-20261014",
+      "productId": "N100",
+      "activationId": "po-20261012-continuous",
+      "priority": -25,
+      "scopeKey": "n100-automatic-mode-end-to-end-repair",
+      "riskClass": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 35,
+      "idleMinutes": 10,
+      "objective": "Urgent direct PO report after shipped automatic copy: Invalid distribution mode. Current source claims automatic-safe in DISTRIBUTION_MODES, so do not guess fixed from grep or blame the user. Locate exact throw across UI→store→cloud serialization→Sync command→SQL and old-client Service Worker cache. Reproduce actual fresh/upgraded app including prior cache generation if the mismatch is there; inspect published module hashes and actual allowed capability with safe existing metadata read only. Preserve the no-selector automatic preservation contract. Prior migration20261014001558 is already applied and must NOT be reapplied. Do not weaken mode validation or silently downgrade automatic-safe to definitions.",
+      "allowedPaths": [
+        "src/lib/score-distribution-copy.js",
+        "src/lib/cloud.js",
+        "src/lib/sync-v2.js",
+        "src/views/items.js",
+        "src/store.js",
+        "sw.js",
+        "tests/n100-*",
+        "docs/automation-evidence/20261014/N100_INVALID_MODE_FIX.md"
+      ],
+      "requiredChecks": [
+        "n100_invalid_mode_reproduced_at_actual_boundary",
+        "n100_actual_fresh_and_upgraded_review_apply",
+        "n100_preservation_and_owner_guards_retained"
+      ],
+      "acceptance": [
+        "Identify actual failing layer and exact input. Test actual account UI/store/guard/transport with original automatic mode and existing definitions/preserve-target compatibility; don't just update a lookalike test. If error is mixed cached versions, prove old release→update in actual Service Worker context and get coherent app/module source, without deleting IndexedDB, local user work or outbox. No ask to clear all browser data as the fix.",
+        "Actual review+apply handles a recorded target and empty target; no mode UI reintroduced, TARGET marks/zero/late/completions/identities protected, SOURCE marks never transferred. Invalid unknown mode remains rejected, no implicit destructive fallback, stale plan and owner mismatches remain atomic no-write. Actual old-shell upgrade test uses owned synthetic data only.",
+        "No server schema/Auth/real user queries or new live A/B fixtures. Existing readback evidence and native SQL sources can be reused. If a currently applied routine identity truly differs, record exact metadata mismatch and a bounded proposed change; don't replay a historical migration or label mock service PASS. New service write requires the exact corresponding correction scope, not a blanket access assumption. Sole publisher handles release and verifies latest served assets."
+      ],
+      "releaseAuthority": "Current PO asks fixing the concrete Invalid distribution mode regression in N100. Scope covers client/cache/transport correction preserving the published automatic safe behavior, no arbitrary score transformation, data reset or service permission expansion.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "432f815bc83e2bce4b419bc05b36759be1e2a242",
+        "priorReceiptSha256": "153b4e6b61298fb16e80781ca9f6c4dab3ba1df60c5b997c03ff3ce5a7f18f4d",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N100: The saved publication has LOCAL_READY, every affected guard PASSED, Cloudflare provider success and immutable served-source success. Earlier Production index.html parity failed due to exact pinned provider JSD/Analytics scripts and the one inter-tag whitespace. The narrowly corrected operating verifier is now installed and tested 27/27; recheck the unchanged candidate through the sole publisher without rerunning the Product worker, dropping app bytes or changing any real account/data."
+      }
+    },
+    {
+      "id": "continuous-n99-remove-technical-notice-20261014",
+      "productId": "N99",
+      "activationId": "po-20261012-continuous",
+      "priority": -15,
+      "scopeKey": "n99-technical-copy-removal",
+      "riskClass": "FAST",
+      "validationTier": "FAST",
+      "executionMode": "local",
+      "liveMutation": false,
+      "budgetMinutes": 15,
+      "idleMinutes": 7,
+      "objective": "Current PO expressly asks removing the long قياس الزيارات والخصوصية block from the landing page and not moving this technical wall of text elsewhere. Remove this added user-facing block and any exact repeat of its long Umami-specific notice/link in the app. Do not turn on wider tracking, change UTM/consent gates, delete a site's general privacy policy, or assert absence of provider IP/UA processing. This is presentation removal, not a legal finding that users never need privacy information. Preserve the already accepted campaign_landing/demo_started payload data behavior. Coordinate app.js with the urgent N101 login correction; start after its shared scope releases.",
+      "allowedPaths": [
+        "src/app.js",
+        "src/views/settings.js",
+        "src/lib/marketing-analytics.js",
+        "tests/n99-*",
+        "docs/automation-evidence/20261014/N99_NOTICE_REMOVAL.md"
+      ],
+      "requiredChecks": [
+        "n99_technical_notice_absent_actual_dom",
+        "n99_existing_measurement_guards_unchanged"
+      ],
+      "acceptance": [
+        "Actual anonymous landing and settings do not render the specified long technical notice, its heading, or its dedicated Umami terms link; do not hide it only visually or move it into another modal. Remove now-unused copy imports/exports where appropriate. Preserve unrelated support/general privacy/terms content.",
+        "Do not remove tests that check actual measurement protections merely because a former assertion expected the old notice. Update only obsolete presentation assertions, keep exact two-event/UTM/owner/DNT/GPC/offline/Preview/dedupe/nonblocking protections unchanged. Minimal DOM/source checks, no broad test suite or real analytics spam. No provider/account/service operation. Sole publisher verifies deployed source."
+      ],
+      "releaseAuthority": "Latest direct PO is a new request reopening N99 for removing the specific long technical UI block only. No privacy-law opinion, hidden new tracking, new data category or actual provider configuration change is authorized.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "52da6e9dd03cadf194ca34d1161d49c3762e7b30",
+        "priorReceiptSha256": "a71016723e475ab28e1acb470e36d5fe22552faf7e70f139e8f0a6bf86a9ea6a",
+        "reviewedFixtureSha256": "a618672e2ba06f22dde6b8078de228b67d51f027b8aa1921501851034a905b94",
+        "reason": "N99: The saved publication has LOCAL_READY, every affected guard PASSED, Cloudflare provider success and immutable served-source success. Earlier Production index.html parity failed due to exact pinned provider JSD/Analytics scripts and the one inter-tag whitespace. The narrowly corrected operating verifier is now installed and tested 27/27; recheck the unchanged candidate through the sole publisher without rerunning the Product worker, dropping app bytes or changing any real account/data."
+      }
+    }
+  ]
+}
