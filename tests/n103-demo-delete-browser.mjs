@@ -8,7 +8,7 @@ import { openReadyServedDemo, makeIsolatedDemoContext } from './helpers/served-d
 import { syntheticService } from './n73-account-flow-fixture.mjs';
 const root=resolve('.'), canonical='C:/Users/Abody/Projects/RakeezX';
 const taskFile=canonical+'/artifacts/ops-supervisor-v4/queue/continuous-n103-account-demo-class-delete-20261015.json';
-const runId='3fbbbbd3-8561-4d63-85b8-c7bc955310b5';
+const runId=process.env.N103_RUN_ID ?? 'c2eb3f13-aee7-4181-b634-12cdf1ef88f2';
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-File',canonical+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','browser','-Action',action,'-TaskFile',taskFile,'-OwnerToken',runId,'-WaitSeconds','0'],{encoding:'utf8'}).trim();
 const checks=[]; let browser,server,leased=false;
 let service=syntheticService();
@@ -100,10 +100,16 @@ try {
       }
     }finally{await context.close();}
   }
+} catch(error) {
+  checks.push({name:'browser_scenario_failure',status:'FAIL',evidence:error.stack});
+  throw error;
 } finally {
   if(browser)await browser.close();
   if(server)await new Promise(done=>server.close(done));
-  if(leased)checks.push({name:'owned_phase_cleanup',status:'PASS',evidence:lease('release')+'; owned browser/contexts/server closed'});
+  if(leased) {
+    try { checks.push({name:'owned_phase_cleanup',status:'PASS',evidence:lease('release')+'; owned browser/contexts/server closed'}); }
+    catch(error) { checks.push({name:'owned_phase_cleanup',status:'FAIL',evidence:error.message}); }
+  }
   await writeFile('tests/n103-demo-delete-browser.json',JSON.stringify({taskId:'continuous-n103-account-demo-class-delete-20261015',runId,checks},null,2)+'\n');
 }
 console.log(JSON.stringify(checks,null,2));

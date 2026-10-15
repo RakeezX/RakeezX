@@ -1,12 +1,91 @@
 {
   "taskId": "continuous-n103-account-demo-class-delete-20261015",
-  "runId": "3fbbbbd3-8561-4d63-85b8-c7bc955310b5",
+  "runId": "c2eb3f13-aee7-4181-b634-12cdf1ef88f2",
   "checks": [
     {
-      "name": "n103_actual_classes_delete_dialog_synthetic_browser",
-      "status": "NOT_RUN",
-      "evidence": "Shared browser lease acquire returned BUSY browser; subsequent read-only status still records N104 worker PID 21968, birth 2026-10-15T16:03:50.0703420Z, token 890a048f-6666-464b-a89e-84b7fa34191c. No browser or server launched. Card has liveMutation/liveAuthorizationRef, so isolated non-shared helper is ineligible."
+      "name": "browser_phase_lease",
+      "status": "PASS",
+      "evidence": "ACQUIRED browser"
+    },
+    {
+      "name": "320_actual_dom_cancel_layout",
+      "status": "PASS",
+      "evidence": "Real Classes Add demo button created two account-local packages; two-step dialog and back/cancel preserve every IndexedDB store; confirmation fits viewport."
+    },
+    {
+      "name": "320_stale_confirm_exact_delete_reload",
+      "status": "PASS",
+      "evidence": "Stale manifest rejected with warning and zero changes; fresh confirmation tombstones only exact package, ordinary rows/grades/other package/outbox byte-identical. New-document owner/DB/durable rows checkpoint proves no resurrection."
+    },
+    {
+      "name": "320_archived_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "320_closed_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "390_actual_dom_cancel_layout",
+      "status": "PASS",
+      "evidence": "Real Classes Add demo button created two account-local packages; two-step dialog and back/cancel preserve every IndexedDB store; confirmation fits viewport."
+    },
+    {
+      "name": "390_stale_confirm_exact_delete_reload",
+      "status": "PASS",
+      "evidence": "Stale manifest rejected with warning and zero changes; fresh confirmation tombstones only exact package, ordinary rows/grades/other package/outbox byte-identical. New-document owner/DB/durable rows checkpoint proves no resurrection."
+    },
+    {
+      "name": "390_archived_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "390_closed_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "1280_actual_dom_cancel_layout",
+      "status": "PASS",
+      "evidence": "Real Classes Add demo button created two account-local packages; two-step dialog and back/cancel preserve every IndexedDB store; confirmation fits viewport."
+    },
+    {
+      "name": "1280_stale_confirm_exact_delete_reload",
+      "status": "PASS",
+      "evidence": "Stale manifest rejected with warning and zero changes; fresh confirmation tombstones only exact package, ordinary rows/grades/other package/outbox byte-identical. New-document owner/DB/durable rows checkpoint proves no resurrection."
+    },
+    {
+      "name": "1280_archived_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "1280_closed_readonly",
+      "status": "PASS",
+      "evidence": "Actual delete entry provides no actionable confirmation for protected package and writes no IndexedDB records."
+    },
+    {
+      "name": "owned_phase_cleanup",
+      "status": "PASS",
+      "evidence": "RELEASED browser; owned browser/contexts/server closed"
     }
   ],
-  "retryCondition": "After N104 releases browser lease, resume this exact candidate/session and run node tests/n103-demo-delete-browser.mjs; fix any actual failure before LOCAL_READY."
+  "testedProductCandidate": "1ccc179f9d3c81735b8781c3e6594384add52770",
+  "productSourceSha256": {
+    "src/lib/demo.js": "bebeee875e35432eeefb71a515dd0bc0a4c0f4c353bf9ea0a28864efdfd93da2",
+    "src/views/teachings.js": "ed25bbd9c67922c8b6e313084a432020d41e08e3c3ea44d54f8a550b9a1db480"
+  },
+  "preservedPriorResult": {
+    "runId": "3fbbbbd3-8561-4d63-85b8-c7bc955310b5",
+    "status": "NOT_RUN",
+    "reason": "N104 shared browser lease BUSY; retained in original candidate commit and evidence history."
+  },
+  "resumeFirstAttempt": {
+    "status": "FAIL",
+    "phase": "cleanup",
+    "evidence": "Browser lease release failed with IOException: checkpoint.json was being used by another process. Original scenario outcome was masked by finally exception; no UI PASS inferred. Owned lease subsequently released using canonical helper. Harness now preserves scenario failure before cleanup."
+  }
 }
