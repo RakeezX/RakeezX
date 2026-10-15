@@ -30,7 +30,7 @@ function requireRoster(params, workspace = store.getActiveWorkspace()) {
 export function rosterFileActions(params) {
   if (!canOpenRoster(params)) return '';
   return html`<div class="roster-entry-actions" role="group" aria-label="استيراد وتصدير الكشوف">
-    <a class="btn btn--sm btn--ghost" data-act="file-import" href="#/teaching/${params.id}/koshoof" aria-label="استيراد وتصدير الكشوف">${icon('upload')} استيراد وتصدير الكشوف</a>
+    <a class="btn roster-toolbar-action" data-act="file-import" href="#/teaching/${params.id}/koshoof" aria-label="استيراد وتصدير الكشوف">${icon('upload')} استيراد وتصدير الكشوف</a>
   </div>`;
 }
 
@@ -153,7 +153,8 @@ export default {
   back: (p) => `#/teaching/${p.id}`,
 
   topActions: (p) => !canOpenRoster(p) ? '' : html`
-    <button class="iconbtn" data-act="import" aria-label="لصق كشف">${icon('upload')}</button>
+    ${rosterFileActions(p)}
+    <button class="btn roster-toolbar-action" data-act="import" aria-label="إضافة سريعة" aria-describedby="quick-paste-hint">${icon('upload')} إضافة سريعة</button>
     <button class="iconbtn" data-act="add" aria-label="طالب جديد">${icon('plus')}</button>
   `,
 
@@ -183,14 +184,14 @@ export default {
 
     if (!roster.length) {
       return html`
-        <div class="management-page students-roster-page">
-        ${rosterFileActions(p)}
+        <div class="management-page students-roster-page"><p id="quick-paste-hint" class="grade-transfer__hint">إضافة سريعة: نسخ ولصق أسماء الطلاب</p>
+
         <div class="empty management-empty">
           <div class="empty__icon">${icon('student')}</div>
           <div class="empty__title">لا طلاب في ${sectionLabel(section) || 'الفصل'}</div>
           <div class="empty__text">أسرع طريق: انسخ عمود الأسماء من كشفك والصقه هنا دفعة واحدة.</div>
           <div class="btn-row" style="justify-content:center">
-            <button class="btn btn--primary" data-act="import">${icon('upload')} لصق كشف الأسماء</button>
+            <button class="btn btn--primary" data-act="import">${icon('upload')} إضافة سريعة</button>
             <button class="btn btn--ghost" data-act="add">${icon('plus')} طالب واحد</button>
           </div>
         </div>
@@ -208,8 +209,8 @@ export default {
       .filter((x) => x.s);
 
     return html`
-      <div class="management-page students-roster-page">
-      ${rosterFileActions(p)}
+        <div class="management-page students-roster-page"><p id="quick-paste-hint" class="grade-transfer__hint">إضافة سريعة: نسخ ولصق أسماء الطلاب</p>
+
       <div class="management-toolbar roster-toolbar">
       <div class="searchbar roster-search">
         ${icon('search')}
@@ -290,7 +291,7 @@ export default {
           `
         : ''}
 
-      <button class="fab" data-act="import">${icon('upload')} لصق كشف</button>
+      <button class="fab" data-act="import">${icon('upload')} إضافة سريعة</button>
       </div>
     `;
   },

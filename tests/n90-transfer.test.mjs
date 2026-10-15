@@ -48,7 +48,9 @@ test('suggestions require unique exact headers and current unique manual targets
  const items=[{id:'i',name:'Exam',max:5,serverRevision:1},{id:'auto',name:'Auto',max:5,auto:'attendance',serverRevision:1},{id:'sub',name:'Sub',max:5,scoreMode:'subitems',serverRevision:1}];
  const s=suggestGradeMappings(['اسم الطالب','معرف الطالب','Exam (العظمى 5)','الفصل','المادة','Auto (العظمى 5)','Sub'],items);
  assert.equal(s.nameColumn,0);assert.equal(s.idColumn,1);assert.deepEqual(s.mappings[2],{kind:'existing',itemId:'i'});assert.deepEqual(s.reasons.slice(3),['metadata','metadata','readonly','readonly']);
- for(const headers of [['Exam','Exam'],['Exam','Exam (العظمى 5)'],['exam'],['Exam (العظمى 6)']])assert.ok(suggestGradeMappings(headers,items).mappings.every(m=>m.kind==='ignore'));
+ // AI-authored N106: N105 normalizes casing; a different name remains unmatched.
+ assert.deepEqual(suggestGradeMappings(['exam'],items).mappings[0],{kind:'existing',itemId:'i'});
+ for(const headers of [['Exam','Exam'],['Exam','Exam (العظمى 5)'],['Exam extra'],['Exam (العظمى 6)']])assert.ok(suggestGradeMappings(headers,items).mappings.every(m=>m.kind==='ignore'));
  assert.equal(suggestGradeMappings(['اسم الطالب','اسم الطالب'],items).nameColumn,-1);
  assert.equal(suggestGradeMappings(['Exam'],[...items,{id:'duplicate',name:'Exam',max:5,serverRevision:1}]).mappings[0].kind,'ignore');
  assert.equal(suggestGradeMappings(['Exam'],[{...items[0],serverRevision:0}]).mappings[0].kind,'ignore');
