@@ -202,6 +202,14 @@ export function normalizeCloudflareIndex(bytes, metadata) {
   // Both observed provider orders are allowed, but each tag must be the exact pinned tag
   // immediately adjacent to the other, without arbitrary scripts between.
   for (let n = 0; n < 2; n++) {
+    // One ASCII whitespace can separate two exact pinned Cloudflare scripts.
+    // It is removed only with those scripts and remains subject to exact application SHA parity.
+    if (providers.length === 1 && end > 0 && [9,10,12,13,32].includes(source.charCodeAt(end - 1))) {
+      const before = source.slice(0,end - 1);
+      const priorJsd = before.match(CF_JSD);
+      if (before.endsWith(CF_ANALYTICS_20261014) ||
+          (priorJsd && priorJsd.index + priorJsd[0].length === before.length)) end--;
+    }
     const prefix = source.slice(0,end);
     if (prefix.endsWith(CF_ANALYTICS_20261014)) {
       if (source.indexOf(analyticsMarker) !== source.lastIndexOf(analyticsMarker)) return null;
