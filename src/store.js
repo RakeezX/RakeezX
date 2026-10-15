@@ -2098,9 +2098,10 @@ export function calendarPresetForYear(yearId = activeYear()?.id) {
   return getCalendarPreset(getYear(yearId)?.calendarPresetId);
 }
 
-// N58 temporary containment. Remove only through an explicitly authorized
-// delivery after the calendar/Sync fix is verified; bootstrap/read are separate.
-export const CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD = true;
+// N58 bounded release: selection patches the existing year; official dates are
+// projections. Actual UI/local protocol roundtrips certify this path separately
+// from the outstanding PO fresh-account acceptance.
+export const CALENDAR_PRESET_SWITCH_TEMPORARY_HOLD = false;
 export const CALENDAR_PRESET_SWITCH_HOLD_MESSAGE = 'تغيير التقويم متوقف مؤقتًا لمعالجة المزامنة. يمكنك متابعة العمل بالتقويم الحالي.';
 
 /** Applies a built-in template without replacing existing user calendar data. */

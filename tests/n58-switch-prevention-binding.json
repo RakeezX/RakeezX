@@ -1,0 +1,85 @@
+{
+  "runId": "fa5e0b7c-2b36-49be-8c28-ba15cf905f1f",
+  "baseSha": "a31778a81cc257aa6ca4bb76d5a28ff7fec5b40e",
+  "observedOriginMain": "a31778a81cc257aa6ca4bb76d5a28ff7fec5b40e",
+  "sourceHashes": {
+    "src/store.js": "0744ab2056dcab5625827fcd9e0b983521c0a5a4399f1aa5327ece179d81a323",
+    "src/views/calendar.js": "6fd672d8f55c793a7f6e2fe24bd4ceb82b11ade1d3cb04e22ebc6e626a8d5d66",
+    "src/lib/sync-v2.js": "173f0627f84e019c96ff2f67bd9fe3dd2a09c3999cead690b6639b0ea333e87e",
+    "src/lib/calendar-runtime.js": "685a5802c775ea45775565ec85d593648b207efbb1d61d800a739c58efe15108",
+    "src/lib/calendar-presets.js": "c103057b5eb59c26fb7d7c07cffe6d22a37297e19840311bce86c0406ac62d6a",
+    "sw.js": "683f0802758b7230108a7ff6344d5ab6bbccd4de7bee21ab775c17aeb56ebb35"
+  },
+  "operatorRecord": {
+    "path": "C:/Users/Abody/Projects/RakeezX/docs/automation-evidence/20261014/N58_CURRENT_SERVICE_AND_RELEASE_SCOPE_1925.md",
+    "normalizedSha256": "0c34f199d8767dabba111b8efba8727c60035f0abc6867ea73370c01f21b8ea0",
+    "serviceBodyMd5": {
+      "apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)": "a6284ed21c86f1cafcac2d4d84a5fadc",
+      "n58_guard_calendar_contract()": "6fc9fcdf35f78d0ae295fe61a833f70d",
+      "provision_account_workspace(jsonb)": "a641c556c736f72b63d1e0cb203e1e1e"
+    },
+    "meaning": "Existing routine metadata equality only; no hosted write certification or new service operation."
+  },
+  "dependency": {
+    "path": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n58-fresh-account-calendar-foundation-20261014.json",
+    "candidateSha": "29b812c00f8d417ddc31e432229cdf40b3e03d9d",
+    "publishedSha": "a31778a81cc257aa6ca4bb76d5a28ff7fec5b40e",
+    "verifiedAt": "2026-10-15T03:24:34.603Z",
+    "productionEvidencePassed": true,
+    "deploymentId": "6e51654f-a337-4d05-a93c-3005175756a0",
+    "receiptSha256": "c10c2185e4867a9e9d7d86c48ebbeedd638a00c95ff3e2c3d413f7abc03c1537"
+  },
+  "reused": {
+    "tests/n58-fresh-account-candidate.json": "96ab21fc29b6a13f6e0e4fe290607d9a3fb1e30f9d322cca346c0ddb941d40ca",
+    "tests/n58-fresh-account-verification.json": "6ee8edfcaf105b1efda9f2a23194314f9d20c48d829cc0a11a0bfa1dac36d9f1",
+    "tests/n58-fresh-account-upgrade.json": "ac45c547ac52c4d708d4a82efc42434666e60daa9fc409b80e332f36261acac6",
+    "tests/n58-fresh-account-offline.json": "af647c9e817d3b63bee5268935c17de7da51322b37d0f846778c6ae7a13082b5",
+    "tests/n58-fresh-account-release-binding.json": "273895abd5911fbea52c80b516584e915975193be43a2a071f816ed57a0ea3f3"
+  },
+  "delta": "Only existing preset selection hold flag/comment changed; selection, first-use dependencies, Sync, strict reads, session provenance, grade/import/restore and offline implementation unchanged.",
+  "nativeReadGuards": "3/3 PASS: node --test tests/n58-fresh-account-read-guards.test.mjs",
+  "historicalHosted": {
+    "aSessionAndA2Restore": "FAIL",
+    "contextRejection": "NOT_RUN",
+    "bOwnerIsolation": "NOT_RUN",
+    "presetContextPreservation": "NOT_RUN",
+    "retiredPair": "untouched; not reactivated"
+  },
+  "release": "Prepared candidate only; independent publisher owns integration/provider/served checks; PO fresh-account trial and full N58 acceptance pending.",
+  "newHostedCalls": 0,
+  "newHostedFixtures": 0,
+  "serviceChanges": 0,
+  "cleanup": [
+    {
+      "kind": "container",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-rest",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-auth",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-mail",
+      "closed": true
+    },
+    {
+      "kind": "container",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-postgres",
+      "closed": true
+    },
+    {
+      "kind": "volume",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-pgdata",
+      "closed": true
+    },
+    {
+      "kind": "network",
+      "name": "n58-fa5e0b7c2b3649be8c28ba15cf905f1f-net",
+      "closed": true
+    }
+  ],
+  "status": "PASS"
+}
