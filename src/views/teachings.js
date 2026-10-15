@@ -9,7 +9,6 @@
 import { html, icon, openSheet, confirmSheet, toast } from '../lib/dom.js';
 import { createDemoPackage, deleteDemoPackage, previewDemoPackageDelete, isDemo } from '../lib/demo.js';
 import * as store from '../store.js';
-import { canOpenRoster } from './students.js';
 import {
   GRADES, SECTION_COLORS, autoAssignSectionColor, safeColor, todayISO, sectionLabel, normalizeSectionLabel
 } from '../models.js';
@@ -328,9 +327,20 @@ function renderClassCard(tch) {
           ${demo ? html`<span class="badge badge--info">تجريبي</span>` : ''}
         </div>
       </a>
-      ${canOpenRoster({ id: tch.id }) ? html`<div class="class-card__actions"><a class="btn btn--quiet class-card__koshoof" href="#/teaching/${tch.id}/koshoof" aria-label="الكشوف — ${sectionLabel(sec)} — ${sub?.name ?? ''}">${icon('upload')}<span>الكشوف</span></a></div>` : ''}
     </div>
   `;
+}
+
+function classesToolbar() {
+  return html`<nav class="classes-toolbar" aria-label="إدارة الفصول">
+    <a class="btn btn--primary" href="#/classes/import">${icon('upload')} استيراد الفصول</a>
+    <button class="btn btn--quiet" data-act="add">${icon('plus')} إضافة فصل</button>
+    <a class="btn btn--quiet" href="#/classes/koshoof">استيراد وتصدير الكشوف</a>
+    <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button>
+  </nav>`;
+}
+function demoFooter() {
+  return html`<div class="classes-demo-footer"><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>`;
 }
 
 const teachings = {
@@ -345,6 +355,7 @@ const teachings = {
     if (!list.length) {
       return html`
         <div class="management-page classes-page">
+        ${classesToolbar()}
         <div class="empty management-empty classes-empty">
           <div class="empty__icon">${icon('classes')}</div>
           <div class="empty__title">لا فصول في ${term?.name ?? 'هذا الفصل الدراسي'}</div>
@@ -352,8 +363,8 @@ const teachings = {
           <div class="empty__text">
             أنشئ فصلك الأول واختر مادته، ويأتي معه نموذج بنود تقييم جاهز.
           </div>
-          <div class="stack stack-2"><button class="btn btn--primary" data-act="add">${icon('plus')} فصل جديد</button><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>
         </div>
+        ${demoFooter()}
         </div>
       `;
     }
@@ -362,6 +373,7 @@ const teachings = {
 
     return html`
       <div class="management-page classes-page">
+      ${classesToolbar()}
       ${closed
         ? html`<div class="card card--pad mb-3 banner-closed">
             ${icon('note')} هذا الفصل الدراسي مُغلق — البيانات للعرض فقط.
@@ -381,11 +393,7 @@ const teachings = {
 
       <div class="class-cards-grid" aria-label="قائمة الفصول">${list.map(renderClassCard)}</div>
 
-      <div class="hstack gap-2 wrap mt-3 classes-actions">
-        <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button>
-        <button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button>
-        <button class="btn btn--ghost class-action-delete-btn" data-act="delete-class-flow">${icon('trash')} حذف فصل</button>
-      </div>
+      ${demoFooter()}
       </div>
     `;
   },

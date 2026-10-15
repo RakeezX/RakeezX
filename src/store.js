@@ -32,6 +32,7 @@ import { getScoreFoundationCapability, n77DeleteTeaching } from './lib/cloud.js'
 // Bind the copy protocol to its module identity. A previous offline/HTTP cache
 // must not supply the two-mode engine to the automatic-safe account entry.
 import { DISTRIBUTION_MODES, planScoreDistributionCopy } from './lib/score-distribution-copy.js?n100=automatic-safe-v1';
+import { classGroups } from './lib/class-import-file.js';
 import { previewStudentRows, importContext, confirmStudentImport } from './lib/student-import.js';
 import { reviewGradeTransfer, gradeCommand } from './lib/grade-transfer.js';
 import { DELETE_RETRY_MESSAGE, DELETE_SERVER_UNAVAILABLE_MESSAGE, DELETE_AMBIGUOUS_MESSAGE, DELETE_STALE_MESSAGE, validateDeletePlan, localDeleteWrites } from './lib/n77-delete.js';
@@ -284,8 +285,23 @@ export function getActiveWorkspace() {
 export function assertClassOperationsAccess(teachingId) {
   const teaching = getTeaching(teachingId), workspace = activeWorkspace;
   const denied = () => { throw new Error('تعذّر فتح كشف هذا الفصل. تحقق من الحساب والفصل النشط.'); };
-  if (!state.ready || !workspace || !teaching || teaching.deleted || isTeachingArchived(teaching)) denied();
+  if (!teaching || teaching.deleted || isTeachingArchived(teaching)) denied();
   validateTeachingContext(teaching.sectionId, teaching.termId);
+  assertClassImportAccess();
+  if (workspace.type === 'account') {
+    if (teaching.termId !== activeTerm()?.id || getSection(teaching.sectionId)?.yearId !== activeYear()?.id) denied();
+    for (const row of [teaching, getSection(teaching.sectionId), getSubject(teaching.subjectId)]) {
+      if (!row || row.ownerId != null && row.ownerId !== workspace.authUserId) denied();
+    }
+  }
+
+  return teaching;
+}
+/** Same account/provenance/lease gate for an empty Classes screen. No writes. */
+export function assertClassImportAccess() {
+  const workspace = activeWorkspace;
+  const denied = () => { throw new Error('تعذّر فتح الاستيراد. تحقق من الحساب والسنة والفصل الدراسي وصلاحية العمل دون اتصال.'); };
+  if (!state.ready || !workspace || !activeYear() || !activeTerm() || activeTerm().yearId !== activeYear().id || isTermClosed(activeTerm().id)) denied();
   if (workspace.type === 'account') {
     const owner = workspace.authUserId, bound = runtimeSyncOwnershipGuard.getWorkspace();
     const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'preview', authenticatedUserId: cloud.user?.id });
@@ -293,10 +309,9 @@ export function assertClassOperationsAccess(teachingId) {
         cloud.authStatus().state !== 'authenticated' || !access.allowed || access.workspaceOwnerId !== owner ||
         workspace.databaseName !== rawDB.getActiveDatabaseName() || bound.id !== workspace.id ||
         bound.databaseName !== workspace.databaseName || bound.leaseGeneration !== workspace.leaseGeneration ||
-        teaching.termId !== activeTerm()?.id || getSection(teaching.sectionId)?.yearId !== activeYear()?.id) denied();
+        !activeYear() || !activeTerm() || activeTerm().yearId !== activeYear().id) denied();
     // Explicit conflicts always win, including parent rows in a mixed-owner cache.
-    for (const row of [teaching, getSection(teaching.sectionId), getTerm(teaching.termId),
-      getYear(getSection(teaching.sectionId)?.yearId), getSubject(teaching.subjectId)]) {
+    for (const row of [activeYear(), activeTerm()]) {
       if (!row || row.ownerId != null && row.ownerId !== owner) denied();
     }
     assertCloudRestoreWritable();
@@ -323,8 +338,11 @@ export function assertClassOperationsAccess(teachingId) {
       if (!claimed && !restored && !provisioned) denied();
     }
   } else if (!['demo', 'legacy'].includes(workspace.type)) denied();
-  return teaching;
+  assertCloudRestoreWritable();
+  assertLeaseWritable(state.device);
+  return workspace;
 }
+
 
 /**
  * يُغلق قناة BroadcastChannel.
@@ -1021,7 +1039,13 @@ export async function save(batch, options = {}) {
   notify({ syncReady: false });
 
   try {
-    await db.putAcross(writes, { signal: options.signal });
+    if (options.verifyCurrent) {
+      const guarded = Object.fromEntries([...new Set(['sections','teachings','subjects','students','enrollments','years','terms','device','outbox',...Object.keys(writes)])].map(name => [name, {}]));
+      await db.applyBatch(guarded, { signal: options.signal, prepare(current) {
+        options.verifyCurrent(current);
+        return Object.fromEntries(Object.entries(writes).map(([name, rows]) => [name, { put: rows }]));
+      } });
+    } else await db.putAcross(writes, { signal: options.signal });
     if (options.signal?.aborted) return false;
     broadcast(changes);
     if (outbox.length) notify({ render: false });
@@ -2614,7 +2638,7 @@ export async function createSubject(data) {
  * Resolves a picker token to one durable subject identity. Built-ins are
  * created lazily; equivalent legacy/custom rows are reused rather than copied.
  */
-export async function resolveSubjectSelection({ token, customName = '' } = {}) {
+export async function resolveSubjectSelection({ token, customName = '' } = {}, { verifyCurrent } = {}) {
   const value = String(token ?? '');
   if (value.startsWith('subject:')) {
     const existing = getSubject(value.slice('subject:'.length));
@@ -2634,7 +2658,7 @@ export async function resolveSubjectSelection({ token, customName = '' } = {}) {
     const existing = findPersistedBuiltin(live(state.subjects), definition);
     if (existing) return existing;
     const created = makeSubject({ id: definition.id, name: definition.name, slug: definition.slug });
-    if (!(await save({ subjects: [created] }))) throw new Error('تعذّر حفظ المادة. حاول مرة أخرى.');
+    if (!(await save({ subjects: [created] }, { verifyCurrent }))) throw new Error('تعذّر حفظ المادة. حاول مرة أخرى.');
     return created;
   }
 
@@ -2645,11 +2669,123 @@ export async function resolveSubjectSelection({ token, customName = '' } = {}) {
   const sameNaturalIdentity = live(state.subjects).find((subject) => subject.slug === slug);
   if (sameNaturalIdentity) return sameNaturalIdentity;
   const created = makeSubject({ id: `sub:${uid()}`, name: validated.name, slug });
-  if (!(await save({ subjects: [created] }))) throw new Error('تعذّر حفظ المادة المخصصة. حاول مرة أخرى.');
+  if (!(await save({ subjects: [created] }, { verifyCurrent }))) throw new Error('تعذّر حفظ المادة المخصصة. حاول مرة أخرى.');
   return created;
 }
 
-export async function createSection(data) {
+// AI: private review capabilities bind one file group to one immutable account
+// checkpoint. Partial receipts survive a failed child; they never auto-replay.
+const classImportReviews = new WeakMap();
+let classImportBusy = false;
+export function reviewClassImport(group) {
+  const workspace = assertClassImportAccess();
+  const canonical = classGroups([
+    ['الصف', 'الفصل', 'المادة', 'اسم الطالب'],
+    ...(group.rows.length ? group.rows : [['']]).map(row => [group.grade, group.label, group.subject, row[0]]),
+  ], { mapping: { grade: 0, label: 1, subject: 2, name: 3 } })[0];
+  if (!canonical || canonical.error || canonical.preview.counts.invalid || canonical.preview.counts.ambiguous) {
+    throw Error(canonical?.error || 'صحّح الأسماء غير الصالحة أو المكررة في الملف ثم أعد رفعه.');
+  }
+  const matches = state.sections.filter(row => !row.deleted && row.yearId === activeYear().id &&
+    Number(row.grade) === canonical.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(canonical.label));
+  if (matches.length) throw Error('الفصل موجود مسبقًا أو مؤرشف. راجعه من الفصول والكشوف؛ لن يُدمج طلابه تلقائيًا.');
+  const review = { grade: canonical.grade, label: canonical.label, subject: canonical.subject,
+    names: Object.freeze([...canonical.preview.names]), yearId: activeYear().id, termId: activeTerm().id };
+  classImportReviews.set(review, { workspace, session: cloud.session, source: JSON.stringify(review),
+    year: JSON.stringify(activeYear()), term: JSON.stringify(activeTerm()), section: null, teaching: null,
+    deviceTerm: JSON.stringify([state.device.activeYearId, state.device.activeTermId]),
+    sectionFingerprint: null, teachingFingerprint: null, added: 0, busy: false });
+  return Object.freeze(review);
+}
+function verifyClassImportBinding(review, receipt) {
+  const workspace = assertClassImportAccess();
+  if (workspace !== receipt.workspace || cloud.session !== receipt.session || JSON.stringify(review) !== receipt.source ||
+      JSON.stringify(activeYear()) !== receipt.year || JSON.stringify(activeTerm()) !== receipt.term) {
+    throw Error('تغيّر الحساب أو السنة أو الفصل الدراسي. أعد رفع الملف ومراجعته.');
+  }
+}
+function verifyClassImport(review, receipt) {
+  verifyClassImportBinding(review, receipt);
+  const matches = state.sections.filter(row => !row.deleted && row.yearId === review.yearId &&
+    Number(row.grade) === review.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(review.label));
+  if (receipt.section) {
+    if (matches.length !== 1 || matches[0].id !== receipt.section.id ||
+        JSON.stringify(getSection(receipt.section.id)) !== receipt.sectionFingerprint) throw Error('تغيّر الفصل. راجع المحفوظ قبل المحاولة.');
+    validateTeachingContext(receipt.section.id, review.termId);
+    if (receipt.teaching) {
+      assertClassOperationsAccess(receipt.teaching.id);
+      if (JSON.stringify(getTeaching(receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل. راجع المحفوظ.');
+    }
+    const roster = sectionRoster(receipt.section.id);
+    if (roster.length !== receipt.added || JSON.stringify(roster.map(row => row.name).sort()) !==
+        JSON.stringify((receipt.added ? [...review.names] : []).sort())) throw Error('تغيّرت قائمة الطلاب. راجع الكشوف قبل المحاولة.');
+  } else if (matches.length) throw Error('أُنشئ فصل مطابق أثناء المراجعة. افتح الكشوف لمراجعته.');
+}
+// Snapshot is read inside the existing save/import transaction, before any put.
+// Cross-tab classes/rosters cannot be inferred from this tab's memory.
+function verifyPersistedClassImport(review, receipt, current) {
+  verifyClassImportBinding(review, receipt);
+  const matches = current.sections.filter(row => !row.deleted && row.yearId === review.yearId &&
+    Number(row.grade) === review.grade && normalizeSectionLabel(row.label) === normalizeSectionLabel(review.label));
+  if (receipt.section ? matches.length !== 1 || matches[0].id !== receipt.section.id ||
+      JSON.stringify(matches[0]) !== receipt.sectionFingerprint : matches.length) throw Error('تغيّر الفصل المحفوظ في نافذة أخرى. راجع الكشوف.');
+  if (receipt.teaching && JSON.stringify(current.teachings.find(row => row.id === receipt.teaching.id)) !== receipt.teachingFingerprint) throw Error('تغيّرت مادة الفصل المحفوظة.');
+  if (receipt.section && current.enrollments.some(row => !row.deleted && row.sectionId === receipt.section.id)) throw Error('تغيّر كشف الطلاب المحفوظ. راجعه قبل الاستيراد.');
+  if (current.years && JSON.stringify(current.years.find(row => row.id === review.yearId)) !== receipt.year ||
+      current.terms && JSON.stringify(current.terms.find(row => row.id === review.termId)) !== receipt.term) throw Error('تغيّرت السنة أو الفصل الدراسي المحفوظ.');
+  if (current.device && JSON.stringify([current.device[0]?.activeYearId, current.device[0]?.activeTermId]) !== receipt.deviceTerm) throw Error('تغيّر الفصل الدراسي في نافذة أخرى.');
+}
+export function classImportReceipt(review) {
+  const receipt = classImportReviews.get(review);
+  if (!receipt) return null;
+  // Do not expose a previous account's draft after callback/account drift.
+  if (receipt.workspace !== activeWorkspace || cloud.user?.id !== activeWorkspace.authUserId && activeWorkspace.type === 'account') return null;
+  return { sectionId: receipt.section?.id ?? null, teachingId: receipt.teaching?.id ?? null,
+    added: receipt.added, pendingNames: receipt.added ? [] : [...review.names] };
+}
+// A new explicit review may rebind an expired/refreshed same-owner session.
+// Callback drift during the later confirmation still rejects the write.
+export function refreshClassImportReview(review) {
+  const receipt = classImportReviews.get(review);
+  if (!receipt || receipt.busy) throw Error('أعد مراجعة الملف.');
+  const fresh = { ...receipt, session: cloud.session };
+  verifyClassImport(review, fresh);
+  receipt.session = fresh.session;
+}
+export async function confirmClassImport(review, approved = false) {
+  const receipt = classImportReviews.get(review);
+  if (!approved) return null;
+  if (!receipt || receipt.busy || classImportBusy) throw Error('أعد مراجعة الملف قبل الحفظ.');
+  receipt.busy = classImportBusy = true;
+  try {
+    verifyClassImport(review, receipt);
+    const guard = { verifyCurrent: current => verifyPersistedClassImport(review, receipt, current) };
+    const subject = await resolveSubjectSelection({ token: 'custom', customName: review.subject }, guard);
+    verifyClassImport(review, receipt);
+    if (subject.ownerId != null && subject.ownerId !== activeWorkspace.authUserId) throw Error('المادة لا تخص الحساب الحالي.');
+    if (!receipt.section) {
+      verifyClassImport(review, receipt);
+      receipt.section = await createSection({ yearId: review.yearId, grade: review.grade, label: review.label, name: `${review.grade}/${review.label}` }, guard);
+      receipt.sectionFingerprint = JSON.stringify(getSection(receipt.section.id));
+      verifyClassImport(review, receipt);
+    }
+    if (!receipt.teaching) {
+      verifyClassImport(review, receipt);
+      receipt.teaching = await createTeaching({ sectionId: receipt.section.id, subjectId: subject.id, termId: review.termId }, guard);
+      receipt.teachingFingerprint = JSON.stringify(receipt.teaching);
+      verifyClassImport(review, receipt);
+    }
+    if (!receipt.added && review.names.length) {
+      verifyClassImport(review, receipt);
+      const result = await importStudents(receipt.section.id, review.names, guard);
+      receipt.added = result.added;
+      verifyClassImport(review, receipt);
+    }
+    return classImportReceipt(review);
+  } finally { receipt.busy = classImportBusy = false; }
+}
+
+export async function createSection(data, { verifyCurrent } = {}) {
   const year = activeYear();
   const yearId = data.yearId ?? year?.id;
   if (!yearId || !live(state.years).some((candidate) => candidate.id === yearId)) {
@@ -2663,7 +2799,7 @@ export async function createSection(data) {
   if (existing) throw new Error(`هذا الفصل موجود مسبقًا (${gradeLabel(existing.grade)} / ${existing.label})`);
   
   const s = makeSection({ yearId, order: sections(yearId).length, ...data });
-  if (!(await save({ sections: [s] }))) throw new Error('تعذّر حفظ الفصل. حاول مرة أخرى.');
+  if (!(await save({ sections: [s] }, { verifyCurrent }))) throw new Error('تعذّر حفظ الفصل. حاول مرة أخرى.');
   return s;
 }
 
@@ -2703,7 +2839,7 @@ export function validateTeachingContext(secId, tmId = activeTerm()?.id) {
 const pendingTeachingCreations = new Map();
 
 /** ينشئ إسنادًا تدريسيًا ومعه بنود التقييم الافتراضية. */
-export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }) {
+export async function createTeaching({ sectionId: secId, subjectId: subId, termId: tmId }, { verifyCurrent } = {}) {
   const { term: contextTerm } = validateTeachingContext(secId, tmId);
   const term = contextTerm.id;
   const subject = subId ?? getSubject('sub:digital-skills')?.id ?? subjects()[0]?.id;
@@ -2721,6 +2857,7 @@ export async function createTeaching({ sectionId: secId, subjectId: subId, termI
   });
   const defaults = defaultItemsFor(tch.id);
   const pending = save({ teachings: [tch], items: defaults }, {
+    verifyCurrent,
     [TEACHING_CREATION_PROOF]: { version: 1, teaching: tch, items: defaults },
   }).then((saved) => {
     if (!saved) throw new Error('تعذّر حفظ مادة الفصل. حاول مرة أخرى.');
@@ -3421,7 +3558,7 @@ export async function importStudents(secId, names, { verifyCurrent, signal } = {
     // File import rechecks the confirmed preview against persisted rows inside
     // the same transaction as student/enrollment/outbox creation. Another tab
     // cannot slip a same-name student between the check and the write.
-    const committed = await db.applyBatch({ students: {}, enrollments: {}, sections: {}, teachings: {}, outbox: {} }, {
+    const committed = await db.applyBatch({ students: {}, enrollments: {}, sections: {}, teachings: {}, outbox: {}, years: {}, terms: {}, device: {}, subjects: {} }, {
       signal,
       prepare(current) {
         verifyCurrent(current);

@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n107-central-classes-local-file-import-20261015",
+  "runId": "d3c03b8f-0bdd-4dba-b907-f1643fb52721",
+  "checks": [
+    {
+      "name": "actual_app_UI_320_390_768_1280_RTL_light_dark",
+      "status": "NOT_RUN",
+      "evidence": "Canonical browser acquisition returned BUSY twice. Harness prepared but not executed or validated; no rendered UI PASS."
+    },
+    {
+      "name": "actual_installed_offline_routes",
+      "status": "NOT_RUN",
+      "evidence": "New modules are present in sw.js inventory; installed Service Worker/offline reload certification requires the unavailable shared browser phase."
+    }
+  ],
+  "blocker": "BUSY browser; the recorded owner must finish or be factually recovered",
+  "observedOwnerTaskId": "continuous-n106-koshoof-followup-ux-identity-mapping-20261015",
+  "observedOwnerToken": "ad277a1f-fc36-4411-99ce-7b7542f8b321",
+  "cleanup": "No browser/server launched; no phase lease acquired; another owner's resource was untouched."
+}

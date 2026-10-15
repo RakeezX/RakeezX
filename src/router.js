@@ -2,6 +2,8 @@
 
 const ROUTES = [
   { path: '/',                          load: () => import('./views/home.js') },
+  { path: '/classes/import', load: () => import('./views/class-import-center.js') },
+  { path: '/classes/koshoof', load: () => import('./views/class-import-center.js').then(m => ({ default: m.koshoofCenter })) },
   { path: '/classes',                   load: () => import('./views/teachings.js') },
   { path: '/teaching/:id',              load: () => import('./views/teaching-hub.js') },
   { path: '/teaching/:id/class-rules',  load: () => import('./views/class-rules.js') },
