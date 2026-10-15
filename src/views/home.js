@@ -258,7 +258,8 @@ function renderOnboarding(onboarding) {
         <h2>${content.title}</h2>
         <p>${content.text}</p>
       </div>
-      <a class="btn btn--primary home-onboarding__action" href="${content.href}">${content.action} ${icon('back')}</a>
+      <div class="home-onboarding__actions"><a class="btn btn--primary home-onboarding__action" href="${content.href}">${content.action} ${icon('back')}</a>
+      ${onboarding.state === 'A' ? html`<a class="btn class-import-secondary" href="#/classes/import">${icon('upload')} استيراد الفصول</a>` : ''}</div>
     </section>
   `;
 }

@@ -8357,3 +8357,25 @@
 .roster-entry-empty { inline-size:min(100%,480px); margin-inline:auto; display:grid; gap:8px; }
 .roster-entry-empty .roster-entry-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); margin:0; }
 .roster-entry-empty .btn { min-inline-size:0; }
+/* AI: N107 shared entry, wrapping RTL toolbar and bounded file review. */
+.classes-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block-end:20px; }
+.classes-toolbar .btn { white-space:normal; text-align:center; max-width:100%; }
+.classes-trash { color:var(--danger, #bd4242); margin-inline-start:auto; flex-shrink:0; }
+.classes-demo-footer { margin-block-start:32px; padding-block-start:16px; border-block-start:1px solid var(--border); }
+.home-onboarding__actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; max-width:100%; min-width:0; }
+.class-import-secondary { background:var(--brand-soft); color:var(--brand); border:1px solid currentColor; }
+.class-import-page { max-width:960px; }
+.class-import-page fieldset { min-width:0; border:0; margin:0; padding:0; }
+.class-import-page .field { margin-block:12px; min-width:0; }
+.class-import-page .input, .class-import-page .select { width:100%; min-width:0; max-width:100%; }
+.class-import-groups { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:14px; margin-block:20px; }
+.class-import-groups .card, .class-import-review { overflow-wrap:anywhere; min-width:0; }
+.class-import-manual { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:12px; }
+.class-import-message { overflow-wrap:anywhere; }
+.class-import-review ul { max-height:240px; overflow:auto; }
+@media(max-width:899px) { .home-onboarding__actions { grid-column:1 / -1; width:100%; } }
+@media(max-width:600px) {
+  .home-onboarding__actions { width:100%; }
+  .home-onboarding__actions .btn { flex:1 1 180px; white-space:normal; }
+  .classes-toolbar > .btn { flex:1 1 180px; }
+}
