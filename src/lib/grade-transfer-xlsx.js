@@ -14,15 +14,52 @@ function column(index) {
   for (let n = index + 1; n; n = Math.floor((n - 1) / 26)) result = String.fromCharCode(65 + (n - 1) % 26) + result;
   return result;
 }
+// AI-authored N109. Deterministic Arial 11 estimates in Excel digit-width units.
+// Arabic joining/diacritics and Latin glyphs do not occupy equal widths. Keep a
+// small safety margin, count explicit newlines, and wrap at words (not ceil(length)).
+const textLines = value => String(value ?? '').replace(/\t/g, '    ').split(/\r\n|\r|\n/);
+function glyphWidth(char) {
+  if (/[\p{Mark}\u200b-\u200f\u202a-\u202e\u2060-\u206f]/u.test(char)) return 0;
+  if (char === ' ') return .55;
+  if (/[ilI.,'!:;|]/.test(char)) return .5;
+  if (/[MW@%]/.test(char)) return 1.5;
+  if (/[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff]/u.test(char)) return 1.1;
+  if (char.codePointAt(0) > 0x2e7f) return 2;
+  return 1;
+}
+const textWidth = (text, bold) => [...text].reduce((sum, char) => sum + glyphWidth(char) * (bold ? 1.08 : 1), 0);
+function wrappedLines(value, capacity, bold) {
+  return textLines(value).reduce((total, line) => {
+    let lines = 1, used = 0;
+    for (const token of line.match(/\s+|\S+/gu) ?? []) {
+      const width = textWidth(token, bold);
+      if (used && used + width > capacity) { lines++; used = 0; }
+      // Excel can break an unspaced word wider than a column. Count glyphs so
+      // rounding and wide characters cannot under-estimate the last line.
+      for (const char of token) {
+        const size = textWidth(char, bold);
+        if (used + size > capacity) { lines++; used = 0; }
+        used += size;
+      }
+    }
+    return total + lines;
+  }, 0);
+}
 export function exportGradeXlsx(options) {
   // Noor keeps its existing explicit manual-only CSV path.
   if (options.noorReview || options.includeIds) throw new Error('هذا الكشف مخصص للأسماء والدرجات فقط.');
   const rows = gradeExportRows(options), count = rows[0].length;
   if (count > 16384 || rows.length > 1048576) throw new Error('الكشف يتجاوز حجم ورقة Excel.');
-  const widths = rows[0].map((_, index) => index === 0 ? 55 : 40);
-  const lines = (value, index) => String(value ?? '').split(/\r\n|\r|\n/).reduce((sum, line) => sum + Math.max(1, Math.ceil([...line].length / (widths[index] * .65))), 0);
+  const widths = Array(count).fill(4);
+  rows.forEach((row, r) => row.forEach((value, c) => {
+    for (const line of textLines(value)) {
+      widths[c] = Math.max(widths[c], Math.min(36, Math.ceil((textWidth(line, r === 0) + 2) * 4) / 4));
+    }
+  }));
   const data = rows.map((row, index) => {
-    const height = Math.min(409, Math.max(index === 0 ? 48 : 24, ...row.map((value, c) => lines(value, c) * 20 + 8)));
+    const height = Math.max(18, ...row.map((value, c) => wrappedLines(value, widths[c] - 2, index === 0) * 15 + 3));
+    // Excel cannot display more than 409 points; never silently clip a tall cell.
+    if (height > 409) throw new Error('نص الكشف أطول من مساحة صف Excel؛ اختصر النص ثم أعد التصدير.');
     return `<row r="${index + 1}" ht="${height}" customHeight="1">${row.map((value, c) => {
       const attrs = `r="${column(c)}${index + 1}" s="${index === 0 ? 1 : 0}"`;
       if (value === '' || value == null) return `<c ${attrs}/>`;
@@ -40,7 +77,7 @@ export function exportGradeXlsx(options) {
     'xl/workbook.xml': part(`<workbook xmlns="${main}" xmlns:r="${rel}"><bookViews><workbookView/></bookViews><sheets><sheet name="الكشف" sheetId="1" r:id="rId1"/></sheets></workbook>`),
     'xl/_rels/workbook.xml.rels': part(`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${rel}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="${rel}/styles" Target="styles.xml"/></Relationships>`),
     'xl/styles.xml': part(`<styleSheet xmlns="${main}"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF176B53"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="2"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1" readingOrder="2"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`),
-    'xl/worksheets/sheet1.xml': part(`<worksheet xmlns="${main}"><dimension ref="A1:${column(count - 1)}${rows.length}"/><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="24"/><cols>${widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join('')}</cols><sheetData>${data}</sheetData></worksheet>`)
+    'xl/worksheets/sheet1.xml': part(`<worksheet xmlns="${main}"><dimension ref="A1:${column(count - 1)}${rows.length}"/><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>${widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join('')}</cols><sheetData>${data}</sheetData></worksheet>`)
   });
 }
 export function downloadGradeXlsx(bytes, options = {}) {
