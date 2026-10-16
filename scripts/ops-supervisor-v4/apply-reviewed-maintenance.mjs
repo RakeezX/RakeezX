@@ -71,7 +71,9 @@ export function validatePayload(payload, date = new Date().toISOString().slice(0
     insist(card && expected && ID.test(card.id ?? '') && card.activationId === payload.activationId, 'Invalid activated source card');
     insist(!taskIds.has(card.id) && !allowed.includes(card.id), 'Duplicate or active card update'); taskIds.add(card.id);
     insist(Object.keys(card).every(key => !RUNTIME_KEYS.has(key)), 'Source card contains runtime state: ' + card.id);
-    insist(expected.id === card.id && (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? ''), 'Expected exact blocked session/run/candidate: ' + card.id);
+    const exactAttempt = (expected.status === 'blocked' || expected.status === 'delivery' && card.completionMode === 'deferred_by_po' && card.deferralAuthority === 'PO-20261014-ABANDON-DUMMY-ACCOUNTS') && typeof expected.sessionId === 'string' && ID.test(expected.lastRunId ?? '') && GIT_SHA.test(expected.candidateSha ?? '');
+    const pristinePendingSupersession = expected.status === 'pending' && card.completionMode === 'superseded_by_verified_delivery' && ID.test(card.supersededBy ?? '') && GIT_SHA.test(card.supersedingPublishedSha ?? '') && expected.sessionId === null && expected.lastRunId === null && expected.candidateSha === null && Array.isArray(expected.dependsOn);
+    insist(expected.id === card.id && (exactAttempt || pristinePendingSupersession), 'Expected exact inactive attempt or pristine pending supersession: ' + card.id);
     insist(typeof card.productId === 'string' && typeof card.scopeKey === 'string' && Array.isArray(card.allowedPaths) && Array.isArray(card.requiredChecks) && card.requiredChecks.every(x => typeof x === 'string' && x.length), 'Incomplete source card: ' + card.id);
     insist(typeof materialReason === 'string' && materialReason.trim().length >= 15, 'A concrete material repair is required');
   }
@@ -133,6 +135,24 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
   if (e.baseSha && !savedBinding) insist(task.baseSha === e.baseSha, 'Expected base changed');
   return true;
 }
+
+export function verifyPristinePendingSupersession(task, replacement, update, activationId) {
+  const e = update.expected, card = update.card;
+  insist(task.id === e.id && task.activationId === activationId && task.productId === card.productId && task.scopeKey === card.scopeKey, 'Task identity/scope changed: ' + e.id);
+  insist(task.status === 'pending' && e.status === 'pending' && same(task.dependsOn ?? [], e.dependsOn), 'Pending task state or dependency changed: ' + e.id);
+  const pristine = ['sessionId','attempt','candidateSha','baseSha','worktreePath','resultPath','runnerPid','brokerPid','ownedProcesses'];
+  insist(pristine.every(key => task[key] == null), 'Pending task already owns execution state: ' + e.id);
+  insist(card.completionMode === 'superseded_by_verified_delivery' && card.supersededBy === replacement.id && GIT_SHA.test(card.supersedingPublishedSha ?? ''), 'Invalid verified supersession card: ' + e.id);
+  const receipt = replacement.deliveryReceipt;
+  insist(replacement.productId === task.productId && replacement.status === 'awaiting_po' && replacement.candidateSha === receipt?.candidateSha, 'Replacement is not the exact same-product awaiting-PO delivery: ' + replacement.id);
+  insist(receipt?.taskId === replacement.id && receipt.ticketId === task.productId && receipt.status === 'deployed' && receipt.state === 'DEPLOYED_AWAITING_PO' && receipt.productionDeployed === true && receipt.closed === false, 'Replacement lacks deployed-awaiting-PO receipt: ' + replacement.id);
+  insist(receipt.publishedSha === card.supersedingPublishedSha && receipt.currentMainSha === receipt.publishedSha && receipt.provider?.headSha === receipt.publishedSha && receipt.provider?.conclusion === 'success' && Number.isFinite(Date.parse(receipt.verifiedAt)), 'Replacement publication identity is unverified: ' + replacement.id);
+  insist(receipt.binding?.candidateAncestorOfPublished === true && receipt.binding?.previousMainAncestorOfPublished === true && receipt.binding?.mainContainsPublished === true && receipt.binding?.checkHeadShaMatches === true, 'Replacement publication binding is incomplete: ' + replacement.id);
+  insist(receipt.evidence?.immutable?.passed === true && receipt.evidence?.production?.passed === true, 'Replacement served-source proof is incomplete: ' + replacement.id);
+  for (const group of [receipt.evidence.immutable.assets, receipt.evidence.production.assets]) insist(Array.isArray(group) && group.length > 0 && group.every(asset => asset.verified === true), 'Replacement contains an unverified served asset: ' + replacement.id);
+  return true;
+}
+
 export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile, expectedSourceSha256) {
   const previous = catalogTasks.filter(t => t.id === update.card.id);
   if (previous.length === 1) {
@@ -154,7 +174,8 @@ export function reviewedSourcePreimageMatches(remoteBytes, opsBytes, canonicalBy
 
 export function revisedTask(task, update, commit, at) {
   const saved = structuredClone(task);
-  const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt.runId, sessionId: task.sessionId, preservedCandidateSha: update.expected.candidateSha, previousQueuedCandidateSha: task.candidateSha, previousQueuedBaseSha: task.baseSha, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
+  const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt?.runId ?? null, sessionId: task.sessionId ?? null, preservedCandidateSha: update.expected.candidateSha ?? null, previousQueuedCandidateSha: task.candidateSha ?? null, previousQueuedBaseSha: task.baseSha ?? null, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha ?? null, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
+
   Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, baseSha: update.expected.baseSha ?? task.baseSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
   if (update.card.completionMode === 'recheck_existing_publication') {
     saved.status = 'delivery'; saved.nextDeliveryAt = at; saved.lastFailure = null;
@@ -164,6 +185,13 @@ export function revisedTask(task, update, commit, at) {
   if (update.card.completionMode === 'deferred_by_po') {
     insist(typeof update.card.deferralReason === 'string' && update.card.deferralReason.length >= 20, 'Explicit PO deferral reason required');
     saved.status = 'blocked'; saved.lastFailure = 'DEFERRED_BY_PO: ' + update.card.deferralReason; saved.failureClass = 'external';
+  }
+  if (update.card.completionMode === 'superseded_by_verified_delivery') {
+    saved.status = 'blocked';
+    saved.dependsOn = [];
+    saved.lastFailure = 'SUPERSEDED_BY_VERIFIED_DELIVERY: ' + update.card.supersededBy + ' published as ' + update.card.supersedingPublishedSha;
+    saved.failureClass = 'external';
+    saved.supersessionEvidence = { taskId: update.card.supersededBy, publishedSha: update.card.supersedingPublishedSha, at };
   }
   return saved;
 }
@@ -242,6 +270,12 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
   function exactInactive(update) {
     const file = path.join(rt, 'queue', update.card.id + '.json'); noLinks(file);
     const raw = fs.readFileSync(file), task = parse(raw), run = update.expected.lastRunId;
+    if (update.expected.status === 'pending') {
+      const replacementFile = path.join(rt, 'queue', update.card.supersededBy + '.json'); noLinks(replacementFile);
+      const replacement = json(replacementFile);
+      verifyPristinePendingSupersession(task, replacement, update, payload.activationId);
+      return { file, raw, task, resultSha256: null, candidateSha: null, supersedingPublishedSha: replacement.deliveryReceipt.publishedSha };
+    }
     const resultPath = path.join(rt, 'attempts', update.card.id, run, 'result.json'); noLinks(resultPath);
     insist(equalPath(task.resultPath ?? task.attempt?.outputPath, resultPath), 'Unexpected result path: ' + task.id);
     const resultBytes = fs.readFileSync(resultPath), result = parse(resultBytes);
@@ -307,7 +341,8 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     }
     fs.writeFileSync(path.join(evidenceRoot, 'catalog-before.json'), beforeCatalog, { flag: 'wx' });
     for (const [id, state] of queueBefore) fs.writeFileSync(path.join(evidenceRoot, id + '.before.json'), state.raw, { flag: 'wx' });
-    record('PREFLIGHT_VERIFIED', { candidates: [...queueBefore].map(([id, s]) => ({ id, candidateSha: s.candidateSha, resultSha256: s.resultSha256, sessionId: s.task.sessionId, runId: s.task.attempt.runId })) });
+    record('PREFLIGHT_VERIFIED', { candidates: [...queueBefore].map(([id, s]) => ({ id, candidateSha: s.candidateSha, resultSha256: s.resultSha256, sessionId: s.task.sessionId ?? null, runId: s.task.attempt?.runId ?? null, supersedingPublishedSha: s.supersedingPublishedSha ?? null })) });
+
     for (const file of payload.files) { replaceGuarded(path.join(ops, file.repoPath), Buffer.from(file.content, 'utf8'), opsPreimageHashes.get(file.repoPath)); receipt.opsWrittenPaths.push(file.repoPath); }
     record('OPS_FILES_WRITTEN');
     const permitted = new Set(plan.files), dirty = dirtyPaths(); insist(dirty.every(p => permitted.has(p)), 'Unlisted ops change before staging');
