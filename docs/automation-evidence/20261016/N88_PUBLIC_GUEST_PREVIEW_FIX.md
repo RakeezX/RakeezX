@@ -10,6 +10,6 @@ Checks run:
 
 - `node --test tests/n88-public-invite-preview.test.mjs` — PASS: scoped assertions cover static Arabic RTL page, disclosure, synthetic copy, restrictive CSP, no app imports/storage/auth/network APIs, responsive CSS and focus styling.
 - `node tests/n88-public-invite-preview-browser.mjs` — PASS: direct anonymous HTTP request to `/n88-invite-preview.html` in fresh isolated contexts at 320/390/768/1280 px in light/dark modes. Actual page handlers and CSS passed keyboard mock opening, manual invalid/valid example, reset/back, theme switching, RTL and overflow checks. Each context requested only the one same-origin static document. Owned contexts/browser/server were closed.
-- Full Vite build and `dist/n88-invite-preview.html` output identity are deferred to the publisher's deterministic build step per FAST copy-only scope; no full build was run here.
+- Vite publicDir copy check — PASS: Vite ran with a tiny temporary JS entry (not the full application build), copied the exact source to `dist/n88-invite-preview.html`, and byte comparison passed. Temporary entry was removed. The publisher still performs its deterministic full build and served-asset verification.
 
 Publication and served-asset identity are not claimed by this local evidence.
