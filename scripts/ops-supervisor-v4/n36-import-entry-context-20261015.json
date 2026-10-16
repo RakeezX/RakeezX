@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-import-entry-with-grade-import-20261015",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -29,
+      "scopeKey": "n36-source-preview-entry-next-to-unified-import",
+      "riskClass": "STANDARD",
+      "validationTier": "FOCUSED",
+      "executionMode": "local",
+      "liveMutation": false,
+      "objective": "Reposition the existing safe N36 teacher-school file PREVIEW command from generic Settings → البيانات والمساعدة to the actual student/grade IMPORT surface in teaching grades, as explicitly requested by PO: they ask why 'استيراد بيانات مدرستي — معاينة البيانات وإعداد خطة مراجعة دون حفظ' is shown among Settings and want it with the same import function. On latest main, settings.js has data-act teacher-setup-import under settings-destinations; grades.js has a native grade-transfer import panel containing names/grades CSV/XLSX import. REMOVE only that misplaced settings row and its unused action/cleanup, then add one modest secondary entry 'بيانات مدرستي' adjacent to the grade import panel, visually aligned with existing upload/file controls, not repeated or a new standalone destination under settings. Clicking opens the existing openTeacherSetupImport() owner-bound JSON-only preview modal; do not alter its restricted input schema, 100k file cap, owner guard, preview/export of unapplied plan, or present it as direct authenticated Madrasati portal extraction. The new action captures current account/workspace and ensures current teaching remains valid and known owner before and after lazy load; account switch/cancel clears modal and returns without mutation; avoid installing duplicate listeners or using the user's logged-in personal/dedicated browser. Verify at current 320/390px and desktop, keyboard/back focus, no horizontal overflow, one entry only, no broken backup/other settings; add a focused synthetic UI/navigation test with all student/data writes strictly zero. Preserve the active N90 unified import and N64 revised auth settings, N44 notifications; do not touch grade import confirmation or future official Madrasati extraction. No live accounts, RPC, SQL, Auth, browser profile or real student data. Send through sole publisher after bounded checks and strict served source parity.",
+      "allowedPaths": [
+        "src/views/settings.js",
+        "src/views/grades.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/grades.css",
+        "src/styles/teacher-setup-import.css",
+        "tests/n36-import-location.test.mjs",
+        "tests/n36-import-location-browser.mjs",
+        "tests/n36-import-location.json",
+        "tests/n36-receiver-fixture.mjs",
+        "docs/automation-evidence/20261015/N36_IMPORT_ENTRY_CONTEXT.md"
+      ],
+      "verificationPaths": [
+        "src/views/settings.js",
+        "src/views/grades.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/grades.css"
+      ],
+      "requiredChecks": [
+        "n36_import_settings_row_removed_and_grade_entry_one",
+        "n36_existing_safe_preview_no_account_writes",
+        "n36_owner_switch_cancel_and_current_N90_safety",
+        "n36_mobile_and_desktop_placement_and_accessibility",
+        "syntax_diff_and_owned_cleanup"
+      ],
+      "acceptance": [
+        "Generic Settings 'البيانات والمساعدة' no longer displays redundant 'استيراد بيانات مدرستي'; Backup and other settings remain.",
+        "The real gradebook import panel has one appropriately sized 'بيانات مدرستي' action next to existing CSV/XLSX entry. Button launches currently supported N36 reviewed JSON bundle preview only, clearly not official direct school extraction or automatic save.",
+        "The safe preview modal never mutates data; owner/workspace drift closes it or refuses, including across Auth callback refresh and owner change; no cross-account state exposure.",
+        "Existing N90 import mapping/Noor 40/60/manual export and grades buttons function, with 320/390/768/1280 RTL no ugly overlap.",
+        "Served Production matches exact published frontend candidate; full N36 real portal extraction and account-save remain OPEN separately."
+      ],
+      "releaseAuthority": "PO 2026-10-15 specifically requests moving N36 Madrasati reviewed-data preview entry from Settings beside the established student/grade import function. Bounded client-only navigation, layout and mock UI checks plus usual Cloudflare deployment authorized. This does NOT authorize real Madrasati extraction, personal browser access, changing grades, applying reviewed plan to students/cloud, Auth/RLS or SQL changes.",
+      "completionMode": "superseded_by_verified_delivery",
+      "supersededBy": "continuous-n36-unified-import-entry-independent-20261015",
+      "supersedingPublishedSha": "c4931b453aca0c9922f1f64639fb447eb2db82fa",
+      "supersessionReason": "The identical visible N36 entry relocation was delivered independently, verified on Production, and remains awaiting PO; the older card never launched and its N64 dependency was self-imposed."
+    }
+  ]
+}
