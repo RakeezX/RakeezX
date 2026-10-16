@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "name": "320px_light_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "320px_dark_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "390px_light_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "390px_dark_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "768px_light_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "768px_dark_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "1280px_light_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    },
+    {
+      "name": "1280px_dark_direct_static_preview",
+      "status": "PASS",
+      "evidence": "Direct anonymous HTTP path returned the static document; actual handlers, keyboard, mock/manual/reset/theme controls, RTL and no horizontal overflow passed. Exactly one same-origin document response; no other requests."
+    }
+  ],
+  "requestPaths": [
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html",
+    "/n88-invite-preview.html"
+  ],
+  "resourceCleanup": "Owned local server closed in finally; isolated browser helper closes owned contexts and browser."
+}
