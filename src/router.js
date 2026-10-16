@@ -1,6 +1,7 @@
 /** RAKEEZ X — موجّه على الـ hash، فيعمل من أي مجلد بلا إعداد خادم. */
 
 const ROUTES = [
+  { path: '/n88-invite-lab', load: () => import('./views/n88-student-invite-lab.js') },
   { path: '/',                          load: () => import('./views/home.js') },
   { path: '/classes/import', load: () => import('./views/class-import-center.js') },
   { path: '/classes/koshoof', load: () => import('./views/class-import-center.js').then(m => ({ default: m.koshoofCenter })) },

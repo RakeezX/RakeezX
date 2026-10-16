@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "name": "320_light_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "320_dark_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "390_light_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "390_dark_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "768_light_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "768_dark_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "1280_light_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    },
+    {
+      "name": "1280_dark_actual_app",
+      "status": "PASS",
+      "evidence": "Real Demo route: link/manual/invalid input, keyboard focus, RTL, no overflow, 44px controls, zero action requests or local/session/IndexedDB changes, private-store getter traps, stale-handler guard, offline loaded handlers, back/reset, actual account-workspace denial. SW disabled; no installed-offline certification."
+    }
+  ],
+  "resourceCleanup": "Owned browser contexts/browser and task loopback server closed in finally."
+}

@@ -63,6 +63,8 @@ const SHELL = [
   './src/app.js',
   './src/lib/app-update.js',
   './src/router.js',
+  './src/views/n88-student-invite-lab.js',
+  './src/lib/n88-invite-lab.js',
   './src/store.js',
   './src/models.js',
   './src/repaint.js',

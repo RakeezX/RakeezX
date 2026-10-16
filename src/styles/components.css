@@ -8397,3 +8397,16 @@
 .class-import-page .grade-transfer__scroll { overflow:auto; max-inline-size:100%; }
 .class-import-page .grade-transfer__identity, .class-import-page .grade-transfer__mapping { min-inline-size:0; }
 .class-import-page .input, .class-import-page .select { max-inline-size:100%; }
+
+/* N88: synthetic invite lab, using central theme and control tokens. */
+.n88-lab { display: grid; gap: var(--sp-4); max-width: 960px; margin-inline: auto; overflow-wrap: anywhere; }
+.n88-lab__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.n88-lab .surface { min-width: 0; padding: var(--sp-4); }
+.n88-lab__notice { padding: var(--sp-3); border: 1px solid var(--brand); border-radius: var(--r-md); background: var(--brand-soft); color: var(--text); line-height: 1.8; }
+.n88-lab p, .n88-lab li { line-height: 1.9; }
+.n88-lab form { display: grid; gap: var(--sp-2); }
+.n88-lab .input { width: 100%; min-width: 0; }
+.n88-lab .btn { min-height: 44px; white-space: normal; text-align: center; }
+.n88-lab :is(button, a, input):focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+.n88-lab progress { width: 100%; accent-color: var(--brand); }
+@media (max-width: 640px) { .n88-lab__grid { grid-template-columns: minmax(0, 1fr); } }
