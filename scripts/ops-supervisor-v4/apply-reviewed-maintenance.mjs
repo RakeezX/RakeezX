@@ -118,7 +118,32 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && SHA256.test(proof?.reviewedFixtureSha256 ?? '') && proof?.reason?.length >= 20
     && d.provider?.conclusion === 'success' && d.provider?.headSha === d.publishedSha && d.evidence?.immutable?.passed === true
     && result.checks?.every(x => x.status === 'PASS') && update.card.requiredChecks?.every(name => result.checks.some(x => x.name === name && x.status === 'PASS'));
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || poDeferred) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+
+  // Material contract repair only: a worker finished safe Product checks, but
+  // reported differently named groups. This authorizes another exact-session
+  // worker review; it NEVER converts an absent/failed check into PASS.
+  const nameRepair=update.card.completionMode==='repair_validation_check_names'
+    && e.status==='blocked' && e.resultState==='LOCAL_READY' && result.state==='LOCAL_READY'
+    && task.lastFailure?.startsWith('Candidate validation: Required affected checks have not passed:')
+    && task.implementationFailures>=1 && !task.deliveryReceipt
+    && result.blockerType==='none' && !result.blocker
+    && Array.isArray(result.changedPaths) && result.changedPaths.length>0
+    && result.changedPaths.every(p=>task.allowedPaths.includes(p))
+    && Array.isArray(result.checks) && result.checks.some(c=>c.status==='PASS')
+    && result.checks.every(c=>c.status==='PASS' || c.status==='NOT_RUN' && c.name==='production_publication')
+    && same(update.card.requiredChecks,task.requiredChecks)
+    && same(update.card.allowedPaths,task.allowedPaths)
+    && Object.entries(update.card).every(([key,value])=>
+      ['objective','completionMode','checkNameRepair'].includes(key)||same(value,task[key]))
+    && update.card.requiredChecks.some(name=>!result.checks.some(c=>c.name===name && c.status==='PASS'))
+    && SHA256.test(update.card.checkNameRepair?.previousResultSha256??'')
+    && SHA256.test(update.card.checkNameRepair?.previousFailureSha256??'')
+    && sha256(Buffer.from(JSON.stringify(result)))===update.card.checkNameRepair.previousResultSha256
+    && sha256(Buffer.from(task.lastFailure,'utf8'))===update.card.checkNameRepair.previousFailureSha256
+    && update.card.checkNameRepair.reason?.length>=35
+    && result.candidateSha===e.candidateSha
+    && result.baseSha===e.baseSha;
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
