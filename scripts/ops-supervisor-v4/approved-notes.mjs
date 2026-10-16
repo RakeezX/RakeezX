@@ -9,7 +9,7 @@ export async function readApprovedNotes(repo,activationId) {
   for(const line of text.split(/\r?\n/)){
     const c=line.split('|');if(c.length!==13||!/^N\d+$/.test(c[1]?.trim())||!/^\d{4}-\d\d-\d\d$/.test(c[2]?.trim()))continue;
     const productId=c[1].trim(),status=c[7].trim();
-    if(/\b(CLOSED|DEFERRED|FROZEN|REJECTED|SUPERSEDED)\b/i.test(status))continue;
+    if(/\b(CLOSED|DEFERRED|FROZEN|REJECTED|SUPERSEDED|WAITING_DEPENDENCY)\b/i.test(status))continue;
     openProducts.push(productId);
     const refs=[...c[11].matchAll(/\[\[OPS_TASK:([a-z0-9-]+\.json):([a-f0-9]{64})\]\]/g)];
     for(const m of refs){try{

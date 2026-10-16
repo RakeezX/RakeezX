@@ -223,20 +223,40 @@ export function validatePublishedEvidence(task, result, reference, productionUrl
   return true;
 }
 
-export function observeUnchangedParity(task,receipt,at) {
-  const failures=receipt?.evidence?.production?.assets?.filter(a=>a.verified===false);
-  if(receipt?.status!=='pending'||receipt.errorCode!=='SOURCE_PARITY_PENDING'||receipt.provider?.conclusion!=='success'
-    ||receipt.provider.headSha!==receipt.publishedSha||receipt.evidence?.immutable?.passed!==true
-    ||receipt.evidence?.production?.passed!==false||!failures?.length)return false;
-  const key=createHash('sha256').update(JSON.stringify([task.candidateSha,receipt.publishedSha,
-    failures.map(a=>[a.repoPath,a.statusCode,a.expectedSha256]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])))])).digest('hex');
-  const previous=task.parityWait, same=previous?.key===key;
-  const observation={at,failedAssets:failures.map(a=>({path:a.repoPath,statusCode:a.statusCode,expectedSha256:a.expectedSha256,observedSha256:a.observedSha256}))};
-  task.parityWait={key,firstAt:same?previous.firstAt:at,count:same?previous.count+1:1,lastAt:at,
-    observations:[...(same?previous.observations??[]:[]),observation].slice(-6)};
-  return task.parityWait.count>=2&&Date.parse(at)-Date.parse(task.parityWait.firstAt)>=60000;
+export function isHistoricalBlockedReceipt(task, openProducts = []) {
+  if (task.status !== 'blocked') return false;
+  const reason = String(task.lastFailure ?? '');
+  const historical = /^(?:SUPERSEDED_BY_VERIFIED_DELIVERY:|DEFERRED_BY_PO:|Existing receiver is already integrated with identical modules)/.test(reason);
+  return historical || Array.isArray(openProducts) && openProducts.length > 0 && !openProducts.includes(task.productId);
 }
-
+export function observeUnchangedParity(task, receipt, at) {
+  const immutable = receipt?.evidence?.immutable, production = receipt?.evidence?.production;
+  const parts = [{name:'immutable',item:immutable},{name:'production',item:production}];
+  const failures = parts.flatMap(({name,item}) =>
+    (Array.isArray(item?.assets) ? item.assets : []).filter(asset => asset.verified === false)
+      .map(asset => ({...asset,origin:name})));
+  if (receipt?.status !== 'pending' || receipt.errorCode !== 'SOURCE_PARITY_PENDING'
+      || receipt.provider?.conclusion !== 'success' || receipt.provider.headSha !== receipt.publishedSha
+      || parts.some(({item}) => typeof item?.passed !== 'boolean' || !Array.isArray(item?.assets) || !item.assets.length)
+      || parts.every(({item}) => item.passed === true) || !failures.length
+      || failures.some(asset => typeof asset.repoPath !== 'string' || asset.repoPath.length > 240
+        || !Number.isSafeInteger(asset.statusCode) || asset.statusCode < 200 || asset.statusCode > 599
+        || !/^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? ''))) return false;
+  const signature = failures.map(asset => [asset.origin,asset.repoPath,asset.statusCode,asset.expectedSha256])
+    .sort((a,b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  const key = createHash('sha256').update(JSON.stringify([task.candidateSha,receipt.publishedSha,signature])).digest('hex');
+  const previous = task.parityWait, same = previous?.key === key;
+  task.parityWait = {
+    key, firstAt:same ? previous.firstAt : at, count:same ? previous.count + 1 : 1,lastAt:at,
+    observations:[...(same ? previous.observations ?? [] : []),{
+      at, failedAssets:failures.map(asset => ({
+        origin:asset.origin,path:asset.repoPath,statusCode:asset.statusCode,
+        expectedSha256:asset.expectedSha256,observedSha256:asset.observedSha256
+      }))
+    }].slice(-6)
+  };
+  return task.parityWait.count >= 2 && Date.parse(at) - Date.parse(task.parityWait.firstAt) >= 60000;
+}
 export function pendingPathCorrection(task,patch,activationId,at) {
   if(task?.scopeCorrections?.some(x=>x.id===patch?.id))return null;
   if(!task||task.status!=='pending'||task.attempt||task.sessionId||task.worktreePath||task.candidateSha||task.runnerPid||task.brokerPid)return null;
@@ -927,7 +947,7 @@ export class Controller {
     await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
       maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
-      blockedCount: this.jobs.filter(t => t.status === 'blocked').length, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
+      blockedCount: this.jobs.filter(t => t.status === 'blocked').length, historicalBlockedCount: this.jobs.filter(t => isHistoricalBlockedReceipt(t,this.noteCache?.openProducts)).length, actionableBlockedCount: this.jobs.filter(t => t.status === 'blocked' && !isHistoricalBlockedReceipt(t,this.noteCache?.openProducts)).length, awaitingPOProductCount: new Set(this.jobs.filter(t => t.status === 'awaiting_po').map(t => t.productId)).size, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
       active: active.map(t => ({ id: t.id, productId: t.productId, status: t.status, runnerPid: t.runnerPid, sessionId: t.sessionId, candidateSha: t.candidateSha })),
       tasks: this.jobs.map(t => ({ id: t.id, productId: t.productId, status: t.status, retryAt: t.retryAt, nextDeliveryAt: t.nextDeliveryAt, lastFailure: t.lastFailure })),
       notesCheckedAt:this.noteReadAt?new Date(this.noteReadAt).toISOString():null, notesWithoutExecution:this.unassignedNotes??[],
