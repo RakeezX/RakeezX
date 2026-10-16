@@ -13,7 +13,19 @@ test('separate binary workbooks, UTF8 collision-safe sanitized filenames, zero/b
  assert.ok(names.every(n=>n.endsWith('.xlsx')&&!/[\\/:*?"<>|]/.test(n)));
  const first=sheet(files[0].bytes),second=sheet(files[1].bytes);
  assert.match(first,/طالب الأول/);assert.doesNotMatch(first,/طالب الثاني/);assert.match(second,/طالب الثاني/);assert.doesNotMatch(second,/طالب الأول/);
- for(const xml of [first,second]) {assert.match(xml,/rightToLeft="1"/);assert.match(xml,/width="55"/);assert.match(xml,/<v>0<\/v>/);assert.doesNotMatch(xml,/private-student|secret|token|<f\b/);}
+ // N109 replaced fixed widths with content-sized columns. Retain a layout
+ // assertion here without requiring the superseded 55-character name column.
+ const widths = xml => [...xml.matchAll(/<col\b[^>]*\bwidth="([\d.]+)"/g)].map(m => Number(m[1]));
+ for(const xml of [first,second]) {
+   assert.match(xml,/rightToLeft="1"/);
+   assert.equal(widths(xml).length,2);
+   assert.ok(widths(xml).every(w=>w>=4 && w<=36),'readable bounded content-sized columns');
+   assert.match(xml,/<v>0<\/v>/);assert.doesNotMatch(xml,/private-student|secret|token|<f\b/);
+ }
+ const shortTitle=entry('طالب الأول');shortTitle.items[0].name='أ';
+ const shorter=widths(sheet(classKoshoofBundle([shortTitle],false)[0].bytes));
+ assert.equal(shorter[0],widths(first)[0],'changing item title preserves name-column width');
+ assert.ok(shorter[1]<widths(first)[1],'shorter item title uses a narrower grade column');
  assert.match(second,/<c r="B\d+" s="0"\/>/);assert.match(second,/inlineStr.*=SUM\(A1\)/);
  const namesOnly=classKoshoofBundle([a])[0];assert.ok(namesOnly.filename.endsWith('.xlsx'));assert.doesNotMatch(sheet(namesOnly.bytes),/اختبار طويل عربي|<v>0/);
  assert.throws(()=>classKoshoofBundle([]));

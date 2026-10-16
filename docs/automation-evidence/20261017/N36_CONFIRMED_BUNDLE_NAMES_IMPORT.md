@@ -1,7 +1,8 @@
 # N36 — confirmed names from a validated local bundle
 
 - Task: `continuous-n36-confirmed-bundle-names-import-20261017`
-- Run: `be501ae3-46fa-4b30-91b3-1e3b4bd40b29`
+- Original implementation/browser evidence run: `be501ae3-46fa-4b30-91b3-1e3b4bd40b29`
+- Resumed validation repair run: `1923d6e4-fa0e-4d30-ba79-4ef9280763d3`
 - Base: `eecbe43f240a615d532488011e4e913232fffaf0`
 - Authority: activated N36 card, `PO-20261017-RISKTOLERANT-EXPLICIT-OWNER-BOUND-NAMES-IMPORT`; canonical current N36 ledger note `PO-20261017-N36-OUTCOME-SPRINT`.
 - Candidate: the AI-labelled commit containing this evidence; full SHA returned in worker result. No push, integration, provider operation or Production verification performed by this worker.
@@ -20,6 +21,15 @@ The receipt distinguishes local saving from cloud acknowledgement, shows observe
 
 Preserved diagnostic history: initial browser harness did not have the provisioning receipt required by the real N107 import gate, so the entry was correctly unavailable. `prepareNamesAccount` now reuses the established N107 synthetic provisioning/registry/boot-resolution sequence without weakening any guard. The first multiple-teaching fixture cloned another section; corrected to clone the explicitly named source teaching. These were harness failures, not permission to disable account checks.
 
-An additionally invoked, unchanged `tests/n107-unified-koshoof.test.mjs` returned **1 PASS / 1 FAIL**: its unrelated XLSX assertion expects `width="55"`, while existing output contains widths `13.5` and `32.5`. The test and both `class-koshoof-bundle.js` / `grade-transfer-xlsx.js` are byte-identical Git blobs to the base. This pre-existing export-layout assertion is preserved, not rewritten or marked PASS. No Excel generation was changed by this task.
+In the original attempt, an additionally invoked, unchanged `tests/n107-unified-koshoof.test.mjs` returned **1 PASS / 1 FAIL**: its unrelated XLSX assertion expects `width="55"`, while existing output contains widths `13.5` and `32.5`. The test and both `class-koshoof-bundle.js` / `grade-transfer-xlsx.js` are byte-identical Git blobs to the base. That failure is preserved in original candidate `733ecd70727085a646b86b34c70f9ca3cff99abd` and this history. No Excel generation was changed by this task.
 
 No startup dependency or offline-shell path was added; the existing receiver module/CSS paths already in `sw.js` are retained. Previous official-source/tool restrictions remain binding and untested here. No private school browser/extension, Madrasati extraction, Noor network, real student/teacher data, backend/RLS/schema/Auth/scoring/Delete/Restore operation or queue/status edit occurred. N36 remains OPEN for official-source and broader service integration. Publication and served-asset proof belong to the independent controller/publisher.
+
+
+## Resumed validation repair — 1923d6e4-fa0e-4d30-ba79-4ef9280763d3
+
+The runner rejected the original LOCAL_READY result: `Candidate validation: An affected check must pass and no recorded check may fail`. The concrete correction is limited to the explicitly allowed `tests/n107-unified-koshoof.test.mjs` and this evidence. The old fixed-width assertion contradicted the existing N109 content-fit exporter and its focused `n109-excel-content-fit.test.mjs` contract. Replace it with checks for two bounded readable columns and a relational check: shortening the grade-item title narrows that column while preserving the name column. All original file separation, RTL, zero/blank, formula-safety, identity exclusion and names-only/manual-metadata assertions remain enabled. No Product code was changed to satisfy the test.
+
+Actual resumed command: `node --test tests/n107-unified-koshoof.test.mjs tests/n36-confirmed-bundle-names.test.mjs tests/n36-receiver-limits.test.mjs tests/n12-import-store.test.mjs`: **9/9 PASS**, including both N107 tests. Changed-test syntax and diff whitespace checks PASS. The original failure remains historical evidence, not a retroactively passing run.
+
+The original **19/19** actual-DOM browser checks are reused under their original run ID. Their recorded Product SHA-256 values were revalidated against the current files, and the source/dependency/fixture tree is unchanged from `733ecd70727085a646b86b34c70f9ca3cff99abd`. No repeat browser, Preview, service operation or phase lease was needed for this test-only correction. The existing candidate commit is preserved as the parent of the new AI-labelled repair commit; the supplied base remains unchanged. No push/deploy or queue/status mutation was performed.
