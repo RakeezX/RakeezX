@@ -1,4 +1,4 @@
-// N36 v1 consumer. Source contract: private helper categories.js; no Product writes.
+// N36 v1 validated consumer. Only names may reach the existing confirmed store path.
 import { normalizeDateTimeDigits, validDateTimeValue } from './rakeez-datetime-values.js';
 
 export const CATEGORIES = Object.freeze({
@@ -116,4 +116,23 @@ export function reviewPlan(bundle, selected, context, mappings) {
 export async function stateDigest(state) {
   const bytes = new TextEncoder().encode(JSON.stringify(state));
   return [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// A validated bundle supplies names only; target identities always come from
+// the existing, explicitly mapped current workspace, never from source names.
+export function bundleNamesTargets(bundle, selected, context, mappings) {
+  if (!selected.has('students')) return [];
+  const plan = reviewPlan(bundle, selected, context, mappings);
+  // Existing-name ambiguity must be visible in the store preview, then block
+  // confirmation. It is not an unresolved source/category mapping.
+  if (plan.issues.some(issue => !issue.includes('أكثر من طالب بالاسم نفسه'))) return [];
+  const students = plan.categories.find(c => c.category === 'students');
+  const sources = [...new Set(students.rows.map(r => r.proposed.classroom))];
+  const sections = sources.map(source => mappings.classes[source]);
+  if (new Set(sections).size !== sections.length) return [];
+  return sources.flatMap((source, index) => context.teachings.filter(t =>
+    !t.deleted && t.status !== 'archived' && t.termId === context.termId && t.sectionId === sections[index]
+  ).map(t => ({ id: t.id, sectionId: t.sectionId, source,
+    name: `${source} · ${context.subjects.find(s => s.id === t.subjectId)?.name || 'مادة غير متوفرة'}`,
+    rows: students.rows.filter(r => r.proposed.classroom === source).map(r => [r.proposed.name]) })));
 }

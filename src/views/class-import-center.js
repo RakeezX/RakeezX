@@ -60,7 +60,7 @@ function transferPanel(teachingId) {
     <div class="grade-transfer__heading"><h3>مراجعة الكشف</h3></div>
     ${store.getActiveWorkspace()?.type === 'account' ? html`<details class="grade-transfer__school"><summary>خيارات مدرستي المتقدمة</summary>
       <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
-      <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON مراجَعة فقط · معاينة دون حفظ أو اتصال مباشر بمدرستي</span>
+      <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON محلية · أسماء بتأكيدك لفصل واحد، وبقية الفئات للقراءة · دون اتصال مباشر بمدرستي</span>
     </details>` : ''}
     <div class="segmented grade-transfer__modes" role="group" aria-label="نوع الاستيراد">
       ${['names','grades'].map(value => html`<button type="button" class="segmented__btn ${transfer.importMode === value ? 'is-on' : ''}" data-act="grade-import-mode" data-mode="${value}" data-fk="grade-import-${value}" aria-pressed="${transfer.importMode === value ? 'true' : 'false'}" ${transfer.busy ? 'disabled' : ''}>${value === 'names' ? 'أسماء فقط' : 'أسماء ودرجات'}</button>`)}
