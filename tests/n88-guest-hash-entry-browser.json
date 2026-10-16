@@ -1,0 +1,197 @@
+{
+  "taskId": "continuous-n88-guest-hash-entry-20261017",
+  "runId": "01344bf4-1b58-4920-a310-ca7f888c4d89",
+  "originalReportedURL": "https://rakeezx.com/#/n88-invite-lab",
+  "target": "http://127.0.0.1:52478",
+  "scope": "actual source application on task-owned loopback; no Production claim",
+  "results": [
+    {
+      "name": "guest-320",
+      "status": "PASS",
+      "evidence": {
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "keyboard": true,
+        "manualFallback": true,
+        "privateCalls": "only unchanged head theme read",
+        "requests": [
+          "/",
+          "/src/styles/app.css",
+          "/src/styles/components.css",
+          "/src/styles/schedule-work-integration.css",
+          "/src/styles/calendar-work-0417.css",
+          "/src/styles/rakeez-datetime.css",
+          "/src/styles/work-n82.css",
+          "/src/styles/work-n70.css",
+          "/assets/header-light-standard.svg",
+          "/assets/header-dark-standard.svg",
+          "/src/vendor/flatpickr/flatpickr.min.css",
+          "/src/views/n88-public-guest.js"
+        ]
+      }
+    },
+    {
+      "name": "guest-390",
+      "status": "PASS",
+      "evidence": {
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "keyboard": true,
+        "manualFallback": true,
+        "privateCalls": "only unchanged head theme read",
+        "requests": [
+          "/",
+          "/src/styles/app.css",
+          "/src/styles/components.css",
+          "/src/styles/schedule-work-integration.css",
+          "/src/styles/calendar-work-0417.css",
+          "/src/styles/rakeez-datetime.css",
+          "/src/styles/work-n82.css",
+          "/src/styles/work-n70.css",
+          "/assets/header-light-standard.svg",
+          "/assets/header-dark-standard.svg",
+          "/src/vendor/flatpickr/flatpickr.min.css",
+          "/src/views/n88-public-guest.js"
+        ]
+      }
+    },
+    {
+      "name": "guest-back-link",
+      "status": "PASS",
+      "evidence": "normal visitor application mounted after leaving hash"
+    },
+    {
+      "name": "guest-768",
+      "status": "PASS",
+      "evidence": {
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "keyboard": true,
+        "manualFallback": true,
+        "privateCalls": "only unchanged head theme read",
+        "requests": [
+          "/",
+          "/src/styles/app.css",
+          "/src/styles/components.css",
+          "/src/styles/schedule-work-integration.css",
+          "/src/styles/calendar-work-0417.css",
+          "/src/styles/rakeez-datetime.css",
+          "/src/styles/work-n82.css",
+          "/src/styles/work-n70.css",
+          "/assets/header-light-standard.svg",
+          "/assets/header-dark-standard.svg",
+          "/src/vendor/flatpickr/flatpickr.min.css",
+          "/src/views/n88-public-guest.js"
+        ]
+      }
+    },
+    {
+      "name": "guest-1280",
+      "status": "PASS",
+      "evidence": {
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "keyboard": true,
+        "manualFallback": true,
+        "privateCalls": "only unchanged head theme read",
+        "requests": [
+          "/",
+          "/src/styles/app.css",
+          "/src/styles/components.css",
+          "/src/styles/schedule-work-integration.css",
+          "/src/styles/calendar-work-0417.css",
+          "/src/styles/rakeez-datetime.css",
+          "/src/styles/work-n82.css",
+          "/src/styles/work-n70.css",
+          "/assets/header-light-standard.svg",
+          "/assets/header-dark-standard.svg",
+          "/src/vendor/flatpickr/flatpickr.min.css",
+          "/src/views/n88-public-guest.js"
+        ]
+      }
+    },
+    {
+      "name": "import-failure",
+      "status": "PASS",
+      "evidence": "visible safe fallback and functional back link"
+    },
+    {
+      "name": "visitor-#/",
+      "status": "PASS",
+      "evidence": "actual visitor and login form; full normal module graph, no public mock"
+    },
+    {
+      "name": "visitor-#/classes",
+      "status": "PASS",
+      "evidence": "actual visitor and login form; full normal module graph, no public mock"
+    },
+    {
+      "name": "visitor-#/n88-invite-lab?extra=1",
+      "status": "PASS",
+      "evidence": "actual visitor and login form; full normal module graph, no public mock"
+    },
+    {
+      "name": "visitor-#/n88-invite-lab/",
+      "status": "PASS",
+      "evidence": "actual visitor and login form; full normal module graph, no public mock"
+    },
+    {
+      "name": "demo-other-hash",
+      "status": "PASS",
+      "evidence": {
+        "demo": {
+          "workspace": "demo",
+          "ready": true,
+          "teachings": 8,
+          "students": 184
+        },
+        "resumed": {
+          "type": "demo",
+          "ready": true,
+          "students": 184
+        },
+        "scope": "local persisted Demo; no Service Worker/installed-PWA certification"
+      }
+    },
+    {
+      "name": "synthetic-account-bootstrap",
+      "status": "PASS",
+      "evidence": {
+        "ready": true,
+        "type": "account",
+        "owner": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "database": "rakeezx",
+        "claimOwner": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "teacher": "معلم اصطناعي",
+        "layout": true
+      }
+    },
+    {
+      "name": "visual-accessibility-320",
+      "status": "PASS",
+      "evidence": {
+        "theme": "light",
+        "axeViolations": 0,
+        "screenshot": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-01344bf4-1b58-4920-a310-ca7f888c4d89-320.png"
+      }
+    },
+    {
+      "name": "visual-accessibility-1280",
+      "status": "PASS",
+      "evidence": {
+        "theme": "dark",
+        "axeViolations": 0,
+        "screenshot": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-01344bf4-1b58-4920-a310-ca7f888c4d89-1280.png"
+      }
+    }
+  ],
+  "cleanup": "isolated helper closes owned contexts/browser; server closed in finally"
+}
