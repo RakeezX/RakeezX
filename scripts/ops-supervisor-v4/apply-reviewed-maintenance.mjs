@@ -378,7 +378,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
         insist(pausedIdle(), 'Pause lost during activation');
         const state = queueBefore.get(update.card.id), revised = revisedTask(state.task, update, commit, at);
         replaceGuarded(state.file, bytes(revised), sha256(state.raw));
-        receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId, runId: revised.attempt.runId, candidateSha: revised.candidateSha, reason: update.materialReason }); record('CARD_ACTIVATED');
+        receipt.activatedTasks.push({ id: revised.id, status: revised.status, sessionId: revised.sessionId ?? null, runId: revised.attempt?.runId ?? null, candidateSha: revised.candidateSha ?? null, reason: update.materialReason }); record('CARD_ACTIVATED');
       }
     }
     receipt.activeAfter = json(path.join(rt, 'ACTIVE_TASKS.json')).active;
