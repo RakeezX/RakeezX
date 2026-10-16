@@ -223,11 +223,74 @@ export function validatePublishedEvidence(task, result, reference, productionUrl
   return true;
 }
 
-export function isHistoricalBlockedReceipt(task, openProducts = []) {
-  if (task.status !== 'blocked') return false;
+// A newer successful deployment is not generally evidence that an unrelated blocked
+// attempt was fixed. This exact handoff has an explicit, reviewed relation:
+const VERIFIED_HISTORICAL_HANDOFF = Object.freeze({
+  previousId: 'continuous-n88-public-preview-reachability-20261016',
+  succeedingId: 'continuous-n88-guest-hash-entry-20261017',
+  changedAsset: 'index.html',
+});
+export function isHistoricalBlockedReceipt(task, openProducts = [], jobs = []) {
+  if (task?.status !== 'blocked') return false;
   const reason = String(task.lastFailure ?? '');
-  const historical = /^(?:SUPERSEDED_BY_VERIFIED_DELIVERY:|DEFERRED_BY_PO:|Existing receiver is already integrated with identical modules)/.test(reason);
-  return historical || Array.isArray(openProducts) && openProducts.length > 0 && !openProducts.includes(task.productId);
+  if (/^(?:SUPERSEDED_BY_VERIFIED_DELIVERY:|DEFERRED_BY_PO:|Existing receiver is already integrated with identical modules)/.test(reason)) return true;
+  if (Array.isArray(openProducts) && openProducts.length > 0 && !openProducts.includes(task.productId)) return true;
+  if (task.id !== VERIFIED_HISTORICAL_HANDOFF.previousId
+      || !reason.startsWith('SOURCE_PARITY_PENDING:') || !Array.isArray(jobs)) return false;
+  const successor = jobs.find(t => t.id === VERIFIED_HISTORICAL_HANDOFF.succeedingId);
+  const published = successor?.deliveryReceipt, failed = task.deliveryReceipt;
+  return successor?.productId === task.productId
+    && ['awaiting_po', 'closed'].includes(successor.status)
+    && successor.baseSha === failed?.publishedSha
+    && failed?.status === 'blocked'
+    && published?.status === 'deployed'
+    && published.provider?.conclusion === 'success'
+    && published.provider?.headSha === published.publishedSha
+    && published.evidence?.immutable?.passed === true
+    && published.evidence?.production?.passed === true
+    && published.changedAssets?.includes(VERIFIED_HISTORICAL_HANDOFF.changedAsset)
+    && Number.isFinite(Date.parse(published.verifiedAt))
+    && Date.parse(published.verifiedAt) > Date.parse(task.updatedAt);
+}
+export function summarizeQueueHealth(jobs, openProducts = [], at = new Date().toISOString()) {
+  const blocked = jobs.filter(t => t.status === 'blocked');
+  const unresolved = blocked.filter(t => !isHistoricalBlockedReceipt(t, openProducts, jobs));
+  const grouped = new Map();
+  for (const task of unresolved) {
+    const id = task.productId;
+    if (!/^[A-Z][0-9]{1,4}$/.test(id ?? '')) continue;
+    grouped.set(id, (grouped.get(id) ?? 0) + 1);
+  }
+  const delivered = jobs.filter(task => {
+    const receipt = task.deliveryReceipt;
+    return ['awaiting_po', 'closed'].includes(task.status)
+      && receipt?.status === 'deployed'
+      && receipt.provider?.headSha === receipt.publishedSha
+      && receipt.provider?.conclusion === 'success'
+      && receipt.evidence?.immutable?.passed === true
+      && receipt.evidence?.production?.passed === true
+      && Number.isFinite(Date.parse(receipt.verifiedAt));
+  });
+  const leadTimes = delivered.map(task => (Date.parse(task.deliveryReceipt.verifiedAt) - Date.parse(task.createdAt)) / 60000)
+    .filter(minutes => Number.isFinite(minutes) && minutes >= 0 && minutes <= 60 * 24 * 90)
+    .sort((a, b) => a - b);
+  const medianMinutes = !leadTimes.length ? null : Math.round(leadTimes.length % 2
+    ? leadTimes[(leadTimes.length - 1) / 2]
+    : (leadTimes[leadTimes.length / 2 - 1] + leadTimes[leadTimes.length / 2]) / 2);
+  const lastVerifiedDeliveryAt = delivered.map(t => t.deliveryReceipt.verifiedAt).sort().at(-1) ?? null;
+  return {
+    at,
+    blockedAttempts: blocked.length,
+    historicalBlockedAttempts: blocked.length - unresolved.length,
+    actionableBlockedAttempts: unresolved.length,
+    actionableBlockedProductCount: grouped.size,
+    actionableBlockedByProduct: [...grouped].map(([productId, attempts]) => ({ productId, attempts }))
+      .sort((a, b) => a.productId.localeCompare(b.productId)),
+    verifiedPublicationReceipts: delivered.length,
+    verifiedPublishedProductCount: new Set(delivered.map(t => t.productId)).size,
+    medianMinutesFromCardToVerifiedPublication: medianMinutes,
+    lastVerifiedDeliveryAt,
+  };
 }
 export function observeUnchangedParity(task, receipt, at) {
   const immutable = receipt?.evidence?.immutable, production = receipt?.evidence?.production;
@@ -944,10 +1007,11 @@ export class Controller {
   }
   async snapshot(paused, inventoryKnown = true) {
     const active = this.jobs.filter(t => ['running', 'delivery'].includes(t.status));
+    const health = summarizeQueueHealth(this.jobs, this.noteCache?.openProducts, this.now());
     await this.persistSnapshot({ version: 6, at: this.now(), controllerPid: process.pid, instanceId: this.instanceId,
       activationId: this.config.controller.activationId, controllerAlive: true, processInventoryKnown: inventoryKnown, paused,
       maxWorkers: Number(this.config.maxWorkers), runningCount: this.jobs.filter(t => t.status === 'running').length,
-      blockedCount: this.jobs.filter(t => t.status === 'blocked').length, historicalBlockedCount: this.jobs.filter(t => isHistoricalBlockedReceipt(t,this.noteCache?.openProducts)).length, actionableBlockedCount: this.jobs.filter(t => t.status === 'blocked' && !isHistoricalBlockedReceipt(t,this.noteCache?.openProducts)).length, awaitingPOProductCount: new Set(this.jobs.filter(t => t.status === 'awaiting_po').map(t => t.productId)).size, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
+      blockedCount: health.blockedAttempts, historicalBlockedCount: health.historicalBlockedAttempts, actionableBlockedCount: health.actionableBlockedAttempts, actionableBlockedProductCount: health.actionableBlockedProductCount, actionableBlockedByProduct: health.actionableBlockedByProduct, verifiedPublicationReceipts: health.verifiedPublicationReceipts, verifiedPublishedProductCount: health.verifiedPublishedProductCount, medianMinutesFromCardToVerifiedPublication: health.medianMinutesFromCardToVerifiedPublication, lastVerifiedDeliveryAt: health.lastVerifiedDeliveryAt, awaitingPOProductCount: new Set(this.jobs.filter(t => t.status === 'awaiting_po').map(t => t.productId)).size, pendingCount: this.jobs.filter(t => t.status === 'pending').length, awaitingPOCount: this.jobs.filter(t => t.status === 'awaiting_po').length,
       active: active.map(t => ({ id: t.id, productId: t.productId, status: t.status, runnerPid: t.runnerPid, sessionId: t.sessionId, candidateSha: t.candidateSha })),
       tasks: this.jobs.map(t => ({ id: t.id, productId: t.productId, status: t.status, retryAt: t.retryAt, nextDeliveryAt: t.nextDeliveryAt, lastFailure: t.lastFailure })),
       notesCheckedAt:this.noteReadAt?new Date(this.noteReadAt).toISOString():null, notesWithoutExecution:this.unassignedNotes??[],
