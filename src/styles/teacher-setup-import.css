@@ -13,3 +13,7 @@
 .n36-sheet .sheet__foot { flex-wrap: wrap; }
 .n36-sheet input, .n36-sheet select { max-width: 100%; min-width: 0; }
 @media (max-width: 480px) { .n36-receiver .field-row { display: grid; grid-template-columns: 1fr; } }
+
+.n36-controls { border: 0; padding: 0; margin: 0; min-width: 0; }
+.n36-names, [data-names-receipt] { border: 1px solid var(--border); border-radius: var(--r-sm); padding: var(--sp-3); margin-block: var(--sp-3); }
+.n36-names button { margin-block: var(--sp-2); }

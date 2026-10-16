@@ -1,0 +1,111 @@
+{
+  "runId": "be501ae3-46fa-4b30-91b3-1e3b4bd40b29",
+  "checks": [
+    {
+      "name": "actual_confirm_RTL_390",
+      "status": "PASS",
+      "evidence": "Actual Koshoof app entry, explicit teaching/checkbox, 1 new + 1 existing, read-only plan download, one owner-bound new identity + enrollment/outbox only; receipt and saved queue survive navigation."
+    },
+    {
+      "name": "actual_confirm_RTL_1280",
+      "status": "PASS",
+      "evidence": "Actual Koshoof app entry, explicit teaching/checkbox, 1 new + 1 existing, read-only plan download, one owner-bound new identity + enrollment/outbox only; receipt and saved queue survive navigation."
+    },
+    {
+      "name": "guard_multi",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic multi; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_duplicate",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic duplicate; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_owner",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic owner; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_lease",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic lease; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_route",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic route; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_snapshot",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic snapshot; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_category",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic category; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_contents",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic contents; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_persisted-drift",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic persisted-drift; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_write-failure",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic write-failure; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_uncertain",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic uncertain; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_ambiguous-roster",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic ambiguous-roster; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_enrollment-failure",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic enrollment-failure; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_outbox-failure",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic outbox-failure; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_late-file",
+      "status": "PASS",
+      "evidence": "Actual DOM/store synthetic late-file; stale/invalid confirmation prevented, existing data/outbox retained; no direct replay."
+    },
+    {
+      "name": "guard_route-at-commit",
+      "status": "PASS",
+      "evidence": "Actual transaction preflight sees route change while opening IndexedDB: no student/enrollment/outbox write."
+    },
+    {
+      "name": "guard_plan-at-commit",
+      "status": "PASS",
+      "evidence": "Delayed actual reviewed-plan digest cannot revive export after a names commit starts; confirmed names and outbox saved."
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "productHashes": {
+    "src/lib/teacher-setup-import.js": "0d42121057e263b11d26d0f0970fc92dc67003f02318aecbb1e4908a0565c5c3",
+    "src/views/teacher-setup-import.js": "d877204fb2a1e1a89e20b13db41343349569f0388ffee72508582ee6a3874fbf",
+    "src/views/class-import-center.js": "52109dfa59dc4bf3da06fc2a372a5e97109e534b3b806b2d3dd49838a7908f44",
+    "src/styles/teacher-setup-import.css": "73aed6727e53cf9ab884bdbeee85983ede13533afc276903d9129688e58f2827"
+  },
+  "lease": "ACQUIRED browser",
+  "status": "PASS",
+  "release": "RELEASED browser"
+}
