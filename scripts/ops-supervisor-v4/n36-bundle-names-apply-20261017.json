@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-confirmed-bundle-names-import-20261017",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -88,
+      "scopeKey": "n36-reviewed-bundle-students-current-class-explicit-names-apply",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261017-RISKTOLERANT-EXPLICIT-OWNER-BOUND-NAMES-IMPORT",
+      "dependsOn": [
+        "continuous-n36-unified-import-entry-independent-20261015"
+      ],
+      "objective": "Deliver a REAL END-TO-END useful increment for OPEN N36, NOT another report or helper demo. Current #/classes/koshoof and scoped teaching Koshoof permit reviewed name/grade imports; N36 'بيانات مدرستي' JSON validated bundle currently stops after local preview/plan and NEVER permits saving anything. Connect ONLY the STUDENTS category (selected original 'أسماء الطلاب وفصولهم') in the already-mounted N36 reviewed-bundle modal to existing proven store.reviewNamesImport and store.confirmNamesImport operations, with explicit per-teaching confirmation and safe saved receipt, without direct Madrasati/Noor portal access. Import one current owner-authenticated, writable, non-archived active teaching/section at a time, using the existing selected unique classes map and active-year/term context. Prepare rows from the selected JSON student's name fields only after conservative validated source `parseBundle/validateBundle`; other categories (teacher/school/principal/classes/timetable) remain strictly read-only and cannot apply. Show a compact 'معاينة إضافة الأسماء' button only when N36 modal selected students category and all relevant category mappings are reviewed, then render actual distinct new/existing/invalid/ambiguous counts and a short bounded name list; no implicit write or confirmation from pressing file chooser. Require a deliberate checkbox 'راجعت الأسماء الجديدة لهذا الفصل' plus one clear 'تأكيد إضافة الأسماء' action; use the existing safe store.reviewNamesImport({rows, nameColumn:0}) and confirmNamesImport(review,true) path (confirm API details before coding), not new direct stores, no name-as-student-identity guessing. Guard owner workspace, Auth, lease, active term/teaching, mapping ambiguity, snapshot changes and stale async results at each phase; any account switch/route change/change to selected categories/contents invalidates preview and cancels or prevents confirmation. Recompute preview at commit and block count/entry drift, owner mismatch, duplicate or malformed values; no grade/import from JSON, no profile/schedule mutation, no auto-create class/subject, no school ID, passwords or portal browse. Clear humane partial-commit/queued receipt with current saved/new/existing counts (do not claim atomicity or zero pending without evidence); on backend outcome uncertain preserve idempotent existing recovery semantics and offer reopen/review not blind replay. If one source section has multiple teachings in current term, require explicit teaching choice scoped to that section; never silently choose first. Keep existing N90/N107 Koshoof single-center navigation and current reviewed-plan download; avoid second top-level import page/button. Source filenames/settings unchanged. Local synthetic account + actual DOM tests with one class, multiple teaching ambiguity, duplicates, partial failure, offline lease expiration, owner switch, backward route and stage/refund; zero unconfirmed writes and saved outbox not deleted. Preserve exact N36 official-portal tool denials and avoid retrying personal school browser/private extension. There is NO official direct Madrasati extraction or Noor network; do not claim N36 whole ticket closed. Ship only changed client-side user-confirmed names import via existing single controller and publisher to Production and verify served assets, no new backend/RLS/migration/score logic.\nRECOVERY ADDENDUM — CHECK-NAME CONTRACT CORRECTION ONLY. Previous model-produced LOCAL_READY result retained PASS for 9/9 affected Node tests, 19/19 actual browser cases and the corrected N107 Excel test. But its generic check labels failed to match this card's SIX required acceptance names. Reuse exact saved candidate 01557128f6b9d721701721a39f30b69753be397c and its isolated worktree/sessionId. Do not rewrite Product logic or repeat unchanged browser testing. Inspect saved run results and file hashes, then in final JSON use EXACTLY the six required check names with honest evidence tied to those actual tests. PASS is allowed only when relevant current-hash source and recorded tests genuinely demonstrate the named condition; run a targeted test when evidence is insufficient, otherwise return BLOCKED. Preserve NOT_RUN for independent publisher, no inventing PASS or bypassing owner/term/lease guards, no Git push, SQL/Auth/portal data reads.\n\nCHECK NAME LIST (all six required unchanged):\n1. n36_validated_bundle_students_only_current_owner_year_term_teaching_review\n2. n36_existing_safe_names_import_explicit_confirm_and_human_receipt\n3. n36_no_unconfirmed_writes_duplicate_guessing_or_cross_owner_student_merge\n4. n36_stale_owner_snapshot_offline_lease_partial_failure_and_back_navigation\n5. n36_browser_mobile_desktop_RTL_single_Koshoof_entry_and_one_class_per_confirm\n6. n36_affected_node_syntax_diff_no_Auth_portal_or_other_category_changes",
+      "allowedPaths": [
+        "src/lib/teacher-setup-import.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "sw.js",
+        "tests/n36-receiver-limits.test.mjs",
+        "tests/n36-receiver-browser.mjs",
+        "tests/n36-receiver-fixture.mjs",
+        "tests/n36-confirmed-bundle-names.test.mjs",
+        "tests/n36-confirmed-bundle-names-browser.mjs",
+        "tests/n36-confirmed-bundle-names-browser.json",
+        "tests/n12-student-import.test.mjs",
+        "tests/n107-unified-koshoof.test.mjs",
+        "docs/automation-evidence/20261017/N36_CONFIRMED_BUNDLE_NAMES_IMPORT.md"
+      ],
+      "verificationPaths": [
+        "src/lib/teacher-setup-import.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n36_validated_bundle_students_only_current_owner_year_term_teaching_review",
+        "n36_existing_safe_names_import_explicit_confirm_and_human_receipt",
+        "n36_no_unconfirmed_writes_duplicate_guessing_or_cross_owner_student_merge",
+        "n36_stale_owner_snapshot_offline_lease_partial_failure_and_back_navigation",
+        "n36_browser_mobile_desktop_RTL_single_Koshoof_entry_and_one_class_per_confirm",
+        "n36_affected_node_syntax_diff_no_Auth_portal_or_other_category_changes"
+      ],
+      "acceptance": [
+        "N36 existing checked bundle with students can review names for one existing current owner class/teaching, see exact new/existing/ambiguous counts, and explicitly confirm names through existing safe store import; original reviewed-plan read-only fallback stays. This is a useful new path beyond the prior plan-download-only.",
+        "No automatic writes, no implicit school-to-class mapping, no official portal/Noor access, no roster identity merging by name, no grade/profile/schedule changes, no account/session/lease bypass. Owner switch, stale preview and partial failure preserve prior safety. Mobile and desktop actual app checks PASS and exact Production served publication confirmed by publisher.",
+        "N36 full official external extraction and service apply remain OPEN, receipt says this is partial user-confirmed owner-bound local imported names, not school portal data synced automatically."
+      ],
+      "preparationAuthority": {
+        "kind": "po-existing-confirmed-single-owner-current-class-student-names-import",
+        "serviceOperations": 0,
+        "migrations": 0,
+        "realStudentData": 0,
+        "publication": true,
+        "oneClassPerExplicitCommit": true,
+        "currentOwnerOnly": true,
+        "syntheticTestingOnly": true
+      },
+      "releaseAuthority": "User explicitly directs maximal-speed completion of currently open Product N36, and N107/N12 previously authorized confirmed local class/student names upload. Approve enabling ONLY the user-confirmed existing store.reviewNamesImport/confirmNamesImport path for a validated local N36 JSON bundle's student names mapped to one currently owned active class, retaining exact Auth/lease/owner Sync guards and tests. This is a bounded extension of existing teacher-initiated names import behavior, no SQL/RLS/schema/Auth/scoring/Delete/Restore/service operation, no agent use of any real student data or school browser. Publishes via existing controller/publisher only. Full N36 direct portal and account-wide bundle apply remain unauthorized/out of scope.",
+      "completionMode": "repair_validation_check_names",
+      "checkNameRepair": {
+        "previousResultSha256": "ad89cb43c02f51119191bfdedd6d41f365755d238507cfd4b308bba3d2242a44",
+        "previousFailureSha256": "64987c31b9e5a0c7db646b6d05ad3981f81cc6009f6eb31bf9621aff14036413",
+        "reason": "Two saved LOCAL_READY model summaries used generic check labels although the affected tests passed; resume exact session and candidate to truthfully prove the six unchanged named checks."
+      }
+    }
+  ]
+}
