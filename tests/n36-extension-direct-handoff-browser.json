@@ -1,0 +1,359 @@
+{
+  "taskId": "continuous-n36-extension-direct-handoff-20261017",
+  "runId": "497e1df2-e2b3-41ad-ad35-dcedcd168ae5",
+  "status": "PASS",
+  "scope": "LOCAL synthetic only; no official-account or Production acceptance",
+  "baseSha": "c7b249340a2205564bc9e00b7323bfc323b5cd9b",
+  "inheritedExtensionSha": "0246d892de99ff66c8106d37b77678136cc3cacf",
+  "productHashes": {
+    "src/views/class-import-center.js": "0d9ede5215e681983aff2ab5732a4a620aae13cbbf5f124a302a2a994b6c937c",
+    "src/views/teacher-setup-import.js": "cd041a78027c0623c7674e090aa02cb346cada0eae467f5b18615fe110cb6d6c",
+    "src/lib/n36-extension-handoff.js": "44a8e163b2d7097768e09682fb74fc93269867f14d8fe5c2abb51057dd92e1a0",
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "src/styles/components.css": "ebf06debe623955083c49bcb360a630d2610a0b3476bb4d67baff8639f9ece9d",
+    "src/styles/teacher-setup-import.css": "dca84919cfb0792296f09d2eaf3d8d4374aaab21e7b899efda1b78cc78376fc2",
+    "sw.js": "1f071152f9cb7fa8988aa98321e48436193b685a70f378c100513c121eba478e"
+  },
+  "package": {
+    "file": "rakeez-teacher-import-helper-0.5.0.zip",
+    "sha256": "18a5fa59cb3cb6cdbaed7e89c6428702365f4a9ab1920da949a134f025a8e67d",
+    "bytes": 85049
+  },
+  "checks": [
+    {
+      "name": "madrasati_installed_to_actual_owner_confirm_RTL_320",
+      "status": "PASS",
+      "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+    },
+    {
+      "name": "madrasati_installed_to_actual_owner_confirm_RTL_768",
+      "status": "PASS",
+      "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+    },
+    {
+      "name": "different_unpacked_device_ID",
+      "status": "PASS",
+      "evidence": "New owned unpacked path produces a different runtime ID; full handoff below uses that actual ID without hardcoding."
+    },
+    {
+      "name": "noor_installed_to_actual_owner_confirm_RTL_390",
+      "status": "PASS",
+      "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+    },
+    {
+      "name": "noor_installed_to_actual_owner_confirm_RTL_1280",
+      "status": "PASS",
+      "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+    },
+    {
+      "name": "bridge_foreign-tab",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_expired",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_transport-cancel",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_owner",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_lease",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_snapshot",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_teaching",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "bridge_app-cancel",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "alarm_expiry_without_claim",
+      "status": "PASS",
+      "evidence": "Actual Chrome alarm removes the abandoned private session envelope."
+    },
+    {
+      "name": "bridge_concurrent",
+      "status": "PASS",
+      "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+    },
+    {
+      "name": "actual_offline_shell_reload",
+      "status": "PASS",
+      "evidence": "Real SW cached new startup graph; fresh offline reload boots actual Demo document and imports handoff adapter. No live-account/offline Sync claim."
+    },
+    {
+      "name": "source_currentConflict",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "source_nextConflict",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "source_totalConflict",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "source_repeatResponse",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "source_missingRole",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "source_cancelWait",
+      "status": "PASS",
+      "evidence": "Installed 0.4.5 route/role/settle/pagination guard retained: no unresolved students can transfer."
+    },
+    {
+      "name": "noor_missing_selection",
+      "status": "PASS",
+      "evidence": "Explicit selected visible header is required."
+    },
+    {
+      "name": "noor_missing_role",
+      "status": "PASS",
+      "evidence": "Teacher declaration required before any selected-column read or runner creation."
+    },
+    {
+      "name": "source_tab_route_switch",
+      "status": "PASS",
+      "evidence": "Source binding is rechecked at transfer; same-origin route switch cannot transfer stale selected report."
+    }
+  ],
+  "runs": [
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-positive-madrasati-final.json",
+      "sha256": "4af768474ad9a5dfac84277a67781bb1aabac5a04aea663ad9a03ec54a450b82",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "jcleoehpggapgmplahndhbhleigdhokc",
+      "checks": [
+        {
+          "name": "madrasati_installed_to_actual_owner_confirm_RTL_320",
+          "status": "PASS",
+          "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+        },
+        {
+          "name": "madrasati_installed_to_actual_owner_confirm_RTL_768",
+          "status": "PASS",
+          "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+        }
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-positive-device2.json",
+      "sha256": "0f304ba31b248190b03e156f99f8f36ca0a08b586d5332d59e0b245eeebee145",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "hjhojpalnoidklednmficoelojklaoeh",
+      "checks": [
+        {
+          "name": "different_unpacked_device_ID",
+          "status": "PASS",
+          "evidence": "New owned unpacked path produces a different runtime ID; full handoff below uses that actual ID without hardcoding."
+        },
+        {
+          "name": "noor_installed_to_actual_owner_confirm_RTL_390",
+          "status": "PASS",
+          "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+        }
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-positive-noor1280-final.json",
+      "sha256": "19b09b81160429fec9bb8cfba16ede5def19e9e95a1db7f9d8b616baf2d16a55",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "jcleoehpggapgmplahndhbhleigdhokc",
+      "checks": [
+        {
+          "name": "noor_installed_to_actual_owner_confirm_RTL_1280",
+          "status": "PASS",
+          "evidence": "Real installed popup click, bounded selected names, no URL PII, popup dismissal, same-browser one-time claim, actual account guard + store explicit checkbox/commit, isolated synthetic data/outbox only; RTL no overflow."
+        }
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-guards-bridge.json",
+      "sha256": "b055ce03ccd917a0adbfc741ffc3faa849d3a70a07543421ca974a8d4c1f54d2",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "jcleoehpggapgmplahndhbhleigdhokc",
+      "checks": [
+        {
+          "name": "bridge_foreign-tab",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_expired",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_transport-cancel",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_owner",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_lease",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_snapshot",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_teaching",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "bridge_app-cancel",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        },
+        {
+          "name": "alarm_expiry_without_claim",
+          "status": "PASS",
+          "evidence": "Actual Chrome alarm removes the abandoned private session envelope."
+        }
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-guards-cases-concurrent.json",
+      "sha256": "c926b2dead6f3888842152ed8fe08356a5bf59c3e3fc0c58cfff8f3d1d834d58",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "jcleoehpggapgmplahndhbhleigdhokc",
+      "checks": [
+        {
+          "name": "bridge_concurrent",
+          "status": "PASS",
+          "evidence": "Actual installed transport + app owner/store entry: invalid/cancelled/stale preview cannot write; session envelope removed."
+        }
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/evidence-155.0.8059.80-offline-full.json",
+      "sha256": "b3bcdaf6919ecf75c371d16436dff53bece617b10712a77872041f5d4b060d96",
+      "status": "PASS",
+      "browser": "155.0.8059.80",
+      "extensionId": "jcleoehpggapgmplahndhbhleigdhokc",
+      "checks": [
+        {
+          "name": "actual_offline_shell_reload",
+          "status": "PASS",
+          "evidence": "Real SW cached new startup graph; fresh offline reload boots actual Demo document and imports handoff adapter. No live-account/offline Sync claim."
+        }
+      ]
+    }
+  ],
+  "preservedFailures": [
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191397988.json",
+      "sha256": "62c4a2ed01cce81359d21c5c6a13f37b3ac85b0a60147c234c826b03f2bd01e8",
+      "failure": "browserContext.waitForEvent: Timeout 30000ms exceeded while waiting for event \"page\"\n    at launch (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:54:21)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-extension-direct-handoff-20261017/tests/n36-extension-direct-handoff-browser.mjs:106:72",
+      "passedBeforeFailure": []
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191482686.json",
+      "sha256": "9fe86d127542a4e8fd838aa8c91d2bae07099a232728fce2a7f31d3cfeaa986d",
+      "failure": "browserContext.waitForEvent: Timeout 30000ms exceeded while waiting for event \"page\"\n    at launch (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:55:21)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-extension-direct-handoff-20261017/tests/n36-extension-direct-handoff-browser.mjs:107:72",
+      "passedBeforeFailure": [
+        "madrasati_installed_to_actual_owner_confirm_RTL_320"
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191616940.json",
+      "sha256": "1289868e7c19c1324303bff9d3623a9339d385c246852968dc053b99ac3cdb2d",
+      "failure": "browserContext.waitForEvent: Timeout 30000ms exceeded while waiting for event \"serviceworker\"\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:107:58",
+      "passedBeforeFailure": []
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191663169.json",
+      "sha256": "f018f1092b8b9cb50dd31da3de712fce3bf44241525c9fb213dbe3d75027ff87",
+      "failure": "browserContext.waitForEvent: Timeout 30000ms exceeded while waiting for event \"serviceworker\"\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:107:58",
+      "passedBeforeFailure": []
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191793361.json",
+      "sha256": "07a314e3e3f575d68dbcecb2012c152fa881efb1bf3626f66c5e7d1835f5a903",
+      "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#handoff-status').filter({ hasText: 'تعذّر النقل' }) to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <p role=\"status\" id=\"handoff-status\">تعذّر النقل أو تغيّر المصدر. أعد المراجعة؛ يمكنك …</p>\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:156:285",
+      "passedBeforeFailure": [
+        "source_currentConflict",
+        "source_nextConflict",
+        "source_totalConflict",
+        "source_repeatResponse",
+        "source_missingRole",
+        "source_cancelWait",
+        "noor_missing_selection",
+        "noor_missing_role"
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792191817170.json",
+      "sha256": "a989f499aa47939adca7f6583a1e54a948c9f43de9133dafe8b7b0b10057e064",
+      "failure": "locator.click: Error: strict mode violation: locator('[data-sheet-close]') resolved to 2 elements:\n    1) <button class=\"iconbtn\" aria-label=\"إغلاق\" data-sheet-close=\"\">…</button> aka getByRole('button', { name: 'إغلاق' })\n    2) <button data-sheet-close=\"\" class=\"btn btn--ghost\">إلغاء</button> aka getByRole('button', { name: 'إلغاء' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-sheet-close]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-extension-direct-handoff-20261017\\tests\\n36-extension-direct-handoff-browser.mjs:180:80",
+      "passedBeforeFailure": [
+        "source_tab_route_switch"
+      ]
+    },
+    {
+      "file": "test-results/n36-extension-direct-handoff/failure-1792192153957.json",
+      "sha256": "97063bbc9660f6142949a920f6cf5dc480e015b28248fd99264616b7bb399c7e",
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at mapReview (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-extension-direct-handoff-20261017/tests/n36-extension-direct-handoff-browser.mjs:79:9)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-extension-direct-handoff-20261017/tests/n36-extension-direct-handoff-browser.mjs:126:39",
+      "passedBeforeFailure": [
+        "different_unpacked_device_ID"
+      ]
+    }
+  ],
+  "existingStoreRegression": {
+    "file": "tests/n36-confirmed-bundle-names-browser.json",
+    "status": "PASS",
+    "checks": 19
+  },
+  "cleanup": {
+    "browserLease": "FREE; fresh resource-lease status",
+    "ownedBrowserProcesses": "none; fresh Win32_Process read",
+    "servers": "closed in each harness finally",
+    "retainedSyntheticDirectory": "C:/Users/Abody/AppData/Local/Temp/rakeez-n36-direct-lnk0Wa",
+    "reason": "Combined command containing deletion was rejected before execution: blocked by policy. No retry, alternate surface or policy change. Inactive synthetic profile only; no active owned browser."
+  },
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "productN36": "OPEN"
+}

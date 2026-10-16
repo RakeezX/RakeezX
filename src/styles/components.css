@@ -8410,3 +8410,8 @@
 .n88-lab :is(button, a, input):focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
 .n88-lab progress { width: 100%; accent-color: var(--brand); }
 @media (max-width: 640px) { .n88-lab__grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* AI: primary extension entry stays within narrow RTL layouts. */
+.n36-direct { min-width: 0; overflow-wrap: anywhere; margin-block: var(--sp-3); }
+.n36-direct .btn { max-width: 100%; white-space: normal; }
+[data-n36-advanced] > summary { cursor: pointer; font-weight: 600; padding-block: var(--sp-3); }

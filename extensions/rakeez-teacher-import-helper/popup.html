@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
+<body><main>
+<h1>مساعد إعداد المعلم</h1><p class="notice">إضافة خاصة تجريبية — راجع الأسماء ثم انقلها إلى ركيز دون ملف. توافق الحسابات الرسمية واكتمال كشوفها لم يُتحقق منهما.</p>
+<section id="one-start-controls">
+<p>افتح الصفحة الرئيسية المسجّل دخولك إليها، ثم افتح الإضافة واضغط البدء. يجمع التشغيل بيانات المعلم وفصوله وأسماء الطلاب وجدوله عبر روابط قراءة واضحة في التبويب نفسه. لا تحديد أعمدة ولا تنقّل يدوي.</p>
+<button id="one-start" type="button" disabled>ابدأ الاستيراد من مدرستي</button>
+<button id="run-cancel" type="button" disabled>إلغاء التشغيل ومسح المعاينة</button>
+<p id="run-status" role="status" aria-live="polite">لن تبدأ قراءة بمجرد فتح المتصفح أو الإضافة. لا إضافة تلقائية إلى ركيز.</p>
+<div id="school-choices" hidden aria-label="اختر مدرسة واحدة"></div>
+<p id="entry-state" dir="ltr" aria-label="حالة ربط صفحة المصدر"></p>
+<p id="run-counts"></p><p id="run-missing"></p>
+<p id="run-skipped" role="status"></p>
+<textarea id="route-diagnostic" readonly hidden dir="ltr" rows="3" aria-label="التشخيص الآمن للمسار"></textarea>
+<button id="copy-route-diagnostic" type="button" hidden>نسخ التشخيص الآمن</button><p id="route-copy-status" role="status"></p>
+</section>
+<section id="noor-controls">
+<h2>نور — العمود الظاهر المختار فقط</h2>
+<p>في https://noor.moe.gov.sa/Noor/ حدّد عنوان «اسم الطالب» في تقرير ظاهر. لن تتنقل الإضافة أو تقرأ صفحات أخرى. الكشف جزئي؛ الصفحات والأعمدة الأخرى غير مجمّعة.</p>
+<label>تسمية فصل هذا التقرير <input id="noor-class" type="text" maxlength="80" autocomplete="off"></label>
+<label><input id="noor-role" type="checkbox"> أؤكد أنني المعلم المصرّح له بهذا التقرير وأن الفصل صحيح</label>
+<button id="noor-start" type="button">معاينة عمود نور المختار</button>
+</section>
+<section id="direct-handoff" hidden>
+<h2>نقل الأسماء إلى ركيز</h2><p>ينقل أسماء الطلاب وتسميات فصولهم المختارة فقط. لا ملف ولا حفظ تلقائي. راجع المعاينة أدناه وأكّد المراجعة النهائية ثم اضغط النقل. تنتهي صلاحية النقل بعد دقيقتين.</p>
+<button id="handoff-transfer" type="button" disabled>نقل إلى ركيز</button>
+<button id="handoff-cancel" type="button">إلغاء النقل ومسح البيانات</button><p id="handoff-status" role="status"></p>
+</section>
+<details id="legacy-tools"><summary>خيارات CSV واللصق اليدوي السابقة (اختياري)</summary>
+<div id="manual-controls">
+<label for="category">اختر ما تريد معاينته فقط</label>
+<select id="category">
+<option value="names">أسماء الطلاب فقط — CSV إلى N12</option>
+<option value="teacher">اسم المعلم</option><option value="school">اسم المدرسة</option>
+<option value="principal">اسم المدير</option><option value="classes">الفصول</option>
+<option value="students">أسماء الطلاب وفصولهم</option><option value="timetable">الجدول الأسبوعي</option>
+</select>
+</div>
+<section id="structured-category" hidden>
+<div id="category-source">
+<p>حدّد نص عنوان الفئة في جدول ظاهر، ثم اضغط استخراج. للأشخاص والمدرسة: صف من خليتين، تسمية صريحة ثم القيمة. لا تنقّل ولا قراءة قبل ضغطك.</p>
+<p id="category-help"></p>
+<button id="category-extract" type="button">استخراج المحدد ومعاينته</button>
+<label for="category-table">أو الصق جدولًا ظاهرًا مفصولًا بعلامة Tab</label>
+<p>التسميات المطلوبة كما أعلاه. للجدول: اليوم، الحصة أو الوقت (08:00 أو 08:00-08:45)، الفصل، المادة. استخدم أرقام 0–9. لا تلصق هوية أو اتصالًا أو درجات.</p>
+<textarea id="category-table" rows="4" maxlength="100000" autocomplete="off" spellcheck="false"></textarea>
+<button id="category-paste" type="button">معاينة الفئة الملصوقة</button>
+<p id="category-status" role="status" aria-live="polite">كل شيء محلي ومؤقت؛ لا قراءة تلقائية ولا إضافة إلى ركيز.</p>
+<div id="category-preview" aria-label="معاينة الفئة القابلة للتحرير"></div>
+<label><input id="category-review" type="checkbox" disabled> راجعت الحقول المختارة؛ غير المحسوم يحتاج تصحيحًا</label>
+<button id="category-stage" type="button" disabled>احتفاظ مؤقت: إلحاق الصفوف أو استبدال اسم المعلم/المدرسة/المدير</button>
+<button id="category-cancel" type="button">إلغاء المعاينة</button>
+</div>
+<h2>المعاينة النهائية — تحرير واستبعاد قبل التصدير</h2>
+<p>يمكن تحرير الحقول واستبعاد الصفوف أو الفئات. التكرارات وتعارض الحصص تمنع الاحتفاظ. إغلاق النافذة يمسحها؛ لا تخزين دائم.</p>
+<div id="staged-categories"></div>
+<label><input id="bundle-review" type="checkbox" disabled> راجعت جميع الفئات والحقول المختارة للنقل أو التصدير المحلي</label>
+<details><summary>خيارات متقدمة — ملفات محلية</summary>
+<button id="bundle-download" type="button" disabled>تنزيل JSON للفئات المختارة فقط</button>
+<button id="bundle-csv" type="button" disabled>تنزيل أسماء الطلاب المختارة CSV إلى N12</button>
+</details>
+<button id="bundle-clear" type="button">مسح الكل</button>
+</section>
+<section id="legacy-names">
+<p>افتح بنفسك صفحة مدرستي المصرّح لك بها. حدّد نص عنوان «اسم الطالب» في جدول ظاهر ثم اضغط هنا. لا تُقرأ الصفحة قبل اختيارك.</p>
+<button id="selection" type="button">معاينة عمود الأسماء المحدد</button>
+<label for="table">أو الصق جدولًا من ملف رسمي (أعمدة مفصولة بعلامة Tab، أول صف يتضمن اسم الطالب)</label>
+<p>فضّل نسخ الأسماء فقط. لا تلصق درجات أو هواتف أو أرقام هوية.</p>
+<textarea id="table" rows="5" maxlength="100000" autocomplete="off" spellcheck="false"></textarea>
+<button id="paste" type="button">معاينة الجدول الملصوق</button>
+<p id="status" role="status" aria-live="polite">لا حفظ ولا نقل تلقائي. البيانات مؤقتة حتى إغلاق النافذة.</p>
+<ol id="names" aria-label="الأسماء التي ستُصدّر"></ol>
+<label><input id="review" type="checkbox" disabled> راجعت جميع الأسماء، وأؤكد أن هذا عمود الأسماء فقط</label>
+<button id="download" type="button" disabled>تنزيل CSV للأسماء مرة واحدة</button>
+<button id="cancel" type="button">إلغاء ومسح</button>
+<p>داخل ركيز: افتح الفصل ← الطلاب ← استيراد الطلاب، واختر CSV. راجع المعاينة والتكرارات ثم أكّد الإضافة بنفسك.</p>
+<p>إذا كان الجدول غير واضح، صدّر XLSX رسميًا واستخدم استيراد ركيز مباشرة. لا تستورد الإضافة درجات أو حضورًا، ولا تكتب في حساب ركيز.</p>
+</section>
+</details>
+</main><script type="module" src="popup.js"></script><script type="module" src="categories-popup.js"></script><script type="module" src="run-controller.js"></script></body></html>

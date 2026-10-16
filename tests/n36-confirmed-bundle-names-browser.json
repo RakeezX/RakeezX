@@ -1,5 +1,5 @@
 {
-  "runId": "be501ae3-46fa-4b30-91b3-1e3b4bd40b29",
+  "runId": "497e1df2-e2b3-41ad-ad35-dcedcd168ae5",
   "checks": [
     {
       "name": "actual_confirm_RTL_390",
@@ -100,10 +100,10 @@
   "externalRequests": [],
   "errors": [],
   "productHashes": {
-    "src/lib/teacher-setup-import.js": "0d42121057e263b11d26d0f0970fc92dc67003f02318aecbb1e4908a0565c5c3",
-    "src/views/teacher-setup-import.js": "d877204fb2a1e1a89e20b13db41343349569f0388ffee72508582ee6a3874fbf",
-    "src/views/class-import-center.js": "52109dfa59dc4bf3da06fc2a372a5e97109e534b3b806b2d3dd49838a7908f44",
-    "src/styles/teacher-setup-import.css": "73aed6727e53cf9ab884bdbeee85983ede13533afc276903d9129688e58f2827"
+    "src/lib/teacher-setup-import.js": "4af9b95f25ee3d3d89c1ed010dbe4a85cc32d101d4f9815d18c41e6fb748409c",
+    "src/views/teacher-setup-import.js": "cd041a78027c0623c7674e090aa02cb346cada0eae467f5b18615fe110cb6d6c",
+    "src/views/class-import-center.js": "a57a24e5a35739977e1020331924a6f525956dae16560b9e3987cadb460468a7",
+    "src/styles/teacher-setup-import.css": "a9ecaa7fecdd1f6f4694980dc84a1a14b3174a5286fc6eaa96fe7b2ecff8f82c"
   },
   "lease": "ACQUIRED browser",
   "status": "PASS",

@@ -1,0 +1,25 @@
+:root { font-family: system-ui, sans-serif; color: #183c3a; background: #f7faf9; font-size: 15px; --font: system-ui, sans-serif; --bg-elev: #fff; --text: #183c3a; --border: #648582; --brand: #17645c; --text-3: #52625f; --shadow-3: 0 4px 16px #183c3a33; }
+body { width: 380px; margin: 0; }
+main { padding: 18px; }
+h1 { font-size: 22px; margin-top: 0; }
+p { line-height: 1.7; }
+.notice { background: #fff2cc; padding: 10px; border-radius: 8px; }
+button, textarea { box-sizing: border-box; width: 100%; font: inherit; margin: 8px 0; border: 1px solid #648582; border-radius: 8px; padding: 10px; }
+button { color: #fff; background: #17645c; cursor: pointer; }
+button:disabled { background: #dce5e3; color: #52625f; cursor: default; }
+textarea { background: white; resize: vertical; }
+label { display: block; line-height: 1.6; }
+ol { padding-inline-start: 28px; overflow-wrap: anywhere; }
+:focus-visible { outline: 3px solid #b36c09; outline-offset: 2px; }
+select, input[type="text"] { box-sizing: border-box; width: 100%; font: inherit; padding: 8px; margin: 6px 0; border: 1px solid #648582; border-radius: 6px; background: #fff; }
+fieldset { min-width: 0; margin: 12px 0; border: 1px solid #648582; border-radius: 8px; padding: 10px; }
+legend, h2 { font-size: 16px; font-weight: 600; }
+#staged-categories section { border-block-start: 2px solid #648582; margin-block: 16px; padding-block: 8px; }
+.excluded { opacity: .65; }
+input:disabled { background: #e9eeec; }
+/* Keep the approved picker inside the narrow extension viewport. */
+.flatpickr-calendar.open { left: 18px !important; right: auto !important; max-width: calc(100vw - 36px); }
+.flatpickr-calendar .flatpickr-time input { padding: 0; margin: 0; border: 0; border-radius: 0; }
+.run-page #category-source, .run-page #legacy-names, .run-page #manual-controls, .run-page #legacy-tools > summary { display: none !important; }
+summary { cursor: pointer; padding-block: 12px; }
+#run-missing { color: #784a04; }

@@ -73,6 +73,8 @@ const SHELL = [
   './src/lib/dom.js',
   './src/lib/calendar-recovery.js',
   './src/lib/teacher-setup-import.js',
+  './src/lib/n36-extension-handoff.js',
+  './src/lib/n36-extension-protocol.js',
   './src/lib/notification-center.js',
   './src/lib/notification-events.js',
   './src/lib/notification-state.js',
@@ -206,6 +208,8 @@ self.addEventListener('install', (event) => {
       await Promise.all([
         './src/lib/score-distribution-copy.js?n100=automatic-safe-v1',
         './src/lib/app-update.js',
+        './src/lib/n36-extension-handoff.js',
+        './src/lib/n36-extension-protocol.js',
         './src/views/n88-public-guest.js',
         './src/app.js',
         './src/store.js',

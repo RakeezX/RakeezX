@@ -25,7 +25,8 @@ function snapshot() {
 }
 const options = (rows, selected = '') => rows.map(row => html`<option value="${row.id}" ${row.id === selected ? 'selected' : ''}>${row.name ?? `${row.hijriStart}-${Number(row.hijriStart) + 1}`}</option>`);
 
-export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) {
+export function openTeacherSetupImport({ isContextCurrent = () => false, initialBundle = null, sourceNotice = '', onClose = () => {} } = {}) {
+  const direct = !!initialBundle;
   let binding;
   try { binding = ownerContext(); if (!isContextCurrent()) throw new Error('تعذّر اعتماد سياق الاستيراد الحالي.'); } catch (error) { toast(error.message); return () => {}; }
   if (!document.querySelector('[data-teacher-setup-style]')) {
@@ -147,7 +148,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) 
         ${classNames.map((name, i) => html`<label class="field"><span class="field__label">مطابقة الفصل: ${name}</span><select class="select" data-import-map="classes" data-map-index="${i}"><option value="">غير محسوم — اختر فصلًا فريدًا</option>${options(uniqueOptions(ctx.classes), mappings.classes[name])}</select></label>`)}
         ${subjectNames.map((name, i) => html`<label class="field"><span class="field__label">مطابقة المادة: ${name}</span><select class="select" data-import-map="subjects" data-map-index="${i}"><option value="">غير محسوم — اختر مادة فريدة</option>${options(uniqueOptions(ctx.subjects), mappings.subjects[name])}</select></label>`)}
       </div>
-      ${Object.entries(CATEGORIES).map(([category, spec]) => {
+      ${Object.entries(CATEGORIES).filter(([category]) => !direct || bundle.categories.some(c=>c.category===category)).map(([category, spec]) => {
         const c = bundle.categories.find(c => c.category === category);
         return html`<section class="n36-category"><h3>${c ? html`<label><input type="checkbox" data-import-category="${category}" ${selected.has(category) ? 'checked' : ''}> ${spec.label} (${c.rows.length})</label>` : spec.label}</h3>
           ${!c ? html`<p class="t-3">غير متوفر في الحزمة — لن يُفترض أو يُضاف.</p>` : !selected.has(category) ? html`<p class="t-3">مستبعد من الخطة.</p>` : c.rows.map((row, index) => html`<fieldset class="n36-row"><legend>السجل ${index + 1}</legend>${Object.entries(spec.fields).map(([field, label]) => html`<div class="n36-field"><span>${label}</span><small data-current>الحالي: ${currentValue(category, row, field)}</small><label class="field"><span class="field__label">المقترح${!row[field] ? ' — غير متوفر؛ يلزم مراجعته' : ''}</span>${field === 'time' ? html`<div class="field-row">${['start', 'end'].map((part, i) => html`<label class="field"><span class="field__label">${i ? 'النهاية (اختياري)' : 'البداية'}</span><input class="input" type="time" data-rakeez-datetime="time" data-rakeez-date-scope="session" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="time" data-time-part="${part}" value="${row.time.split('-')[i] || ''}"></label>`)}</div>` : html`<input class="input" maxlength="80" autocomplete="off" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="${field}" value="${row[field]}">`}</label></div>`)}</fieldset>`)}</section>`;
@@ -214,10 +215,10 @@ export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) 
       render();
     }; });
   }
-  const promise = openSheet({ title: 'استيراد بيانات مدرستي',
-    desc: 'راجع الحزمة محليًا. يمكن إضافة أسماء الطلاب لفصل واحد بعد معاينة وتأكيد صريح؛ بقية الفئات للقراءة فقط.',
-    body: html`<div class="n36-receiver"><details data-import-source open><summary>اختيار ملف أو لصق الحزمة</summary><label class="field"><span class="field__label">ملف حزمة ركيز (JSON، الإصدار 1، حتى 100000 بايت)</span><input class="input" type="file" accept=".json,application/json" data-import-file></label><label class="field"><span class="field__label">أو الصق الحزمة</span><textarea class="input" rows="4" maxlength="100000" data-import-paste dir="ltr" autocomplete="off"></textarea></label><button class="btn btn--quiet" type="button" data-import-parse>معاينة البيانات</button></details><p role="status" data-import-status>اختر الحزمة التي صدّرتها وراجعها بنفسك. الاستيراد المعتاد لأسماء الطلاب يبقى من صفحة الفصل.</p><div data-import-review></div></div>`,
-    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" type="button" data-import-plan disabled>إعداد خطة مراجَعة</button><button class="btn btn--quiet" type="button" data-import-export disabled>تنزيل الخطة المحلية (لم تُطبّق)</button>`,
+  const promise = openSheet({ title: initialBundle ? 'مراجعة أسماء الإضافة' : 'استيراد بيانات مدرستي',
+    desc: direct ? 'أسماء فقط دون حفظ تلقائي. طابق فصل المصدر ثم عاين الأسماء وأكّد الإضافة لفصل واحد.' : 'راجع الحزمة محليًا. يمكن إضافة أسماء الطلاب لفصل واحد بعد معاينة وتأكيد صريح؛ بقية الفئات للقراءة فقط.',
+    body: html`<div class="n36-receiver"><details data-import-source open ${direct ? 'hidden' : ''}><summary>اختيار ملف أو لصق الحزمة</summary><label class="field"><span class="field__label">ملف حزمة ركيز (JSON، الإصدار 1، حتى 100000 بايت)</span><input class="input" type="file" accept=".json,application/json" data-import-file></label><label class="field"><span class="field__label">أو الصق الحزمة</span><textarea class="input" rows="4" maxlength="100000" data-import-paste dir="ltr" autocomplete="off"></textarea></label><button class="btn btn--quiet" type="button" data-import-parse>معاينة البيانات</button></details><p role="status" data-import-status>اختر الحزمة التي صدّرتها وراجعها بنفسك. الاستيراد المعتاد لأسماء الطلاب يبقى من صفحة الفصل.</p><div data-import-review></div></div>`,
+    foot: html`<button class="btn btn--ghost" data-sheet-close>إلغاء</button><button class="btn btn--primary" type="button" data-import-plan disabled ${direct ? 'hidden' : ''}>إعداد خطة مراجَعة</button><button class="btn btn--quiet" type="button" data-import-export disabled ${direct ? 'hidden' : ''}>تنزيل الخطة المحلية (لم تُطبّق)</button>`,
     onMount(el, finish) {
       root = el; done = finish; root.querySelector('.sheet').classList.add('n36-sheet');
       function parse(text) {
@@ -263,6 +264,11 @@ export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) 
         const a = document.createElement('a'); a.href = url; a.download = 'rakeez-reviewed-plan-not-applied.json'; a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
+      if (initialBundle) {
+        parse(JSON.stringify(initialBundle)); initialBundle = null;
+        yearId = current.activeYearId; termId = current.activeTermId;
+        render(); message(sourceNotice + ' اختر مطابقة كل فصل ثم التدريس المستهدف صراحةً؛ لا حفظ قبل معاينة الأسماء والتأكيد.');
+      }
     },
   });
   const removeDeactivation = store.onWorkspaceDeactivation(close);
@@ -272,6 +278,6 @@ export function openTeacherSetupImport({ isContextCurrent = () => false } = {}) 
   // check the full binding without repeatedly cloning a teacher's entire roster.
   const timer = setInterval(() => guard({ checkState: false }), 250);
   window.addEventListener('hashchange', close);
-  promise.finally(() => { closed = true; revision++; bundle = plan = namesReview = receipt = null; namesTarget = ''; clearInterval(timer); removeDeactivation(); removeStateSubscription(); removeAuthSubscription(); window.removeEventListener('hashchange', close); });
+  promise.finally(() => { closed = true; revision++; bundle = plan = namesReview = receipt = null; namesTarget = ''; clearInterval(timer); removeDeactivation(); removeStateSubscription(); removeAuthSubscription(); window.removeEventListener('hashchange', close); onClose(); });
   return close;
 }

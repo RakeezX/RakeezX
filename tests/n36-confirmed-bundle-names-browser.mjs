@@ -10,9 +10,9 @@ import { exportedBundle, owner, foreignOwner } from './n36-receiver-fixture.mjs'
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 
 const root = resolve('.'), output = resolve('test-results/n36-confirmed-bundle-names');
-const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-confirmed-bundle-names-import-20261017.json';
+const taskFile = 'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-extension-direct-handoff-20261017.json';
 const leaseScript = 'C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1';
-const runId = 'be501ae3-46fa-4b30-91b3-1e3b4bd40b29';
+const runId = '497e1df2-e2b3-41ad-ad35-dcedcd168ae5';
 let service, serviceCalls = 0;
 function resetService(ambiguous = false) {
   service = syntheticService();
@@ -70,7 +70,7 @@ try {
     return {page,context};
   }
   const checkpoint=page=>page.evaluate(async()=>(await import('/tests/n36-receiver-fixture.mjs')).checkpoint());
-  async function open(page) { await page.locator('.grade-transfer__school summary').click(); await page.locator('[data-act="teacher-setup-import"]').click(); await page.locator('.n36-receiver').waitFor(); await page.waitForFunction(()=>!!document.querySelector('[data-teacher-setup-style]')?.sheet); await page.waitForTimeout(250); }
+  async function open(page) { await page.locator('[data-n36-advanced] > summary').click(); await page.locator('.grade-transfer__school summary').click(); await page.locator('[data-act="teacher-setup-import"]').click(); await page.locator('.n36-receiver').waitFor(); await page.waitForFunction(()=>!!document.querySelector('[data-teacher-setup-style]')?.sheet); await page.waitForTimeout(250); }
   async function paste(page,b=exportedBundle) {
     if (!await page.locator('[data-import-source]').evaluate(el=>el.open)) await page.locator('[data-import-source] summary').click();
     await page.locator('[data-import-paste]').fill(typeof b==='string'?b:JSON.stringify(b)); await page.locator('[data-import-parse]').click();

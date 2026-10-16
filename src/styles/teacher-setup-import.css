@@ -17,3 +17,4 @@
 .n36-controls { border: 0; padding: 0; margin: 0; min-width: 0; }
 .n36-names, [data-names-receipt] { border: 1px solid var(--border); border-radius: var(--r-sm); padding: var(--sp-3); margin-block: var(--sp-3); }
 .n36-names button { margin-block: var(--sp-2); }
+.n36-sheet [hidden] { display: none !important; }

@@ -14,6 +14,7 @@ import { detectStudentNameColumn } from '../lib/student-import.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
+import { handoffRequest, claimHandoff } from '../lib/n36-extension-handoff.js';
 
 
 
@@ -23,6 +24,46 @@ let transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nam
 
 let closeTeacherSetupImport = () => {};
 let setupRequest = 0;
+let extensionPreview = null, extensionOwner = null, extensionBusy = false, extensionMessage = '', extensionTimer;
+function extensionOwnerBinding() {
+  store.assertClassImportAccess();
+  const w = store.getActiveWorkspace(), access = runtimeSyncOwnershipGuard.cloudAccess({operation:'preview',authenticatedUserId:cloud.user?.id});
+  if (!store.state.ready || w?.type !== 'account' || !cloud.session || cloud.session.user?.id !== cloud.user?.id ||
+      cloud.authStatus().state !== 'authenticated' || !access.allowed || access.workspaceOwnerId !== w.authUserId) throw Error('OWNER');
+  store.assertLeaseWritable();
+  return JSON.stringify([w.authUserId,w.id,w.databaseName,w.leaseGeneration]);
+}
+function clearExtensionPreview() { extensionPreview = extensionOwner = null; clearTimeout(extensionTimer); }
+store.onWorkspaceDeactivation(clearExtensionPreview);
+cloud.subscribe(() => {
+  if(!extensionOwner)return;
+  try { if(extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
+});
+function directExtensionEntry() {
+  try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
+  return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد مباشر من إضافة ركيز</h3>
+    <p>افتح إضافة ركيز في تبويب مدرستي أو نور، راجع الأسماء ثم اضغط «نقل إلى ركيز». لا ملف ولا إضافة تلقائية.</p>
+    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.0.zip" download>تنزيل الإضافة الخاصة 0.5.0</a>
+    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.0.manifest.json" download>بصمات الحزمة ومصدرها</a>
+    <p>فك الضغط ثم اختر «تحميل إضافة غير مضغوطة» من صفحة إضافات Chrome في وضع المطوّر. التثبيت بقرارك. نور: العمود الظاهر المختار فقط؛ اكتمال الحسابات الرسمية غير متحقق.</p>
+    ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
+    <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
+  </section>`;
+}
+async function receiveExtension() {
+  let request; try { request=handoffRequest(); } catch { extensionMessage='رابط النقل غير صالح. أعد النقل من الإضافة أو استخدم الخيارات المتقدمة.'; history.replaceState(null,'','#/classes/koshoof?import=1'); repaint(); return; }
+  if(!request || extensionBusy)return;
+  let owner; try { owner=extensionOwnerBinding(); } catch { return; }
+  const route=location.hash;
+  extensionBusy=true; clearExtensionPreview();
+  try {
+    const result=await claimHandoff(request);
+    if(location.hash !== route || extensionOwnerBinding() !== owner) throw Error('OWNER_CHANGED');
+    extensionPreview=result; extensionOwner=owner; extensionMessage='استُلمت المعاينة لمرة واحدة دون حفظ. تنتهي بعد دقيقتين من إرسالها.';
+    extensionTimer=setTimeout(()=>{clearExtensionPreview();extensionMessage='انتهت المعاينة. أعد النقل من الإضافة أو استخدم الخيارات المتقدمة.';repaint();},Math.max(0,result.envelope.expiresAt-Date.now()));
+  } catch { extensionMessage='تعذّر النقل: الإضافة غير متاحة أو انتهت الصلاحية أو تغيّر الحساب. أعد النقل أو استخدم الخيارات المتقدمة.'; }
+  finally { extensionBusy=false;if(location.hash===route)history.replaceState(null,'','#/classes/koshoof?import=1');repaint(); }
+}
 function setupBinding(teachingId) {
   store.assertClassOperationsAccess(teachingId);
   const workspace = store.getActiveWorkspace(), teaching = store.getTeaching(teachingId);
@@ -58,6 +99,7 @@ function transferPanel(teachingId) {
   return html`<div class="grade-transfer noprint" data-grade-transfer ${!transfer.panel ? 'hidden' : ''}>
     ${transfer.panel === 'import' ? html`<section id="grade-import-panel" data-grade-import-panel aria-label="استيراد الكشوف" ${transfer.panel !== 'import' ? 'hidden' : ''}>
     <div class="grade-transfer__heading"><h3>مراجعة الكشف</h3></div>
+    <details data-n36-advanced><summary>خيارات متقدمة — CSV / XLSX / JSON</summary>
     ${store.getActiveWorkspace()?.type === 'account' ? html`<details class="grade-transfer__school"><summary>خيارات مدرستي المتقدمة</summary>
       <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
       <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON محلية · أسماء بتأكيدك لفصل واحد، وبقية الفئات للقراءة · دون اتصال مباشر بمدرستي</span>
@@ -125,7 +167,7 @@ function transferPanel(teachingId) {
     ${transfer.recovery.map(r => html`<p role="alert">طلب محفوظ: ${r.mutationId} — ${r.state === 'rejected' ? 'مرفوض، يلزم تصحيح سبب الرفض قبل دفعة جديدة' : 'لم يتأكد الإيصال بعد؛ أعد الطلب نفسه فقط'}
       ${r.state !== 'rejected' ? html`<button class="btn" data-act="grade-retry" data-mutation="${r.mutationId}" ${transfer.busy ? 'disabled' : ''}>استعادة إيصال الطلب نفسه</button>`
         : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
-    </section>
+    </details></section>
     ` : html`<section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
     <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تجهيز كشف نور 40/60</summary>
     <div class="grade-transfer__chips" role="group" aria-label="بنود كشف نور">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> ${i.name} / ${i.max}</label>`)}</div>
@@ -456,7 +498,7 @@ function existingPane() {
 }
 export const koshoofCenter = {
   title: () => 'الكشوف', back, onMount: focus,
-  onUnmount() { setupRequest++; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; },
+  onUnmount() { setupRequest++; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
   render(p = {}) {
     bind(); const denial = allowed(); if (denial) { bindTransfer(null); return unavailable(denial); }
     contextRoute(p);
@@ -465,8 +507,8 @@ export const koshoofCenter = {
     if (!ids.has(hub.existing)) hub.existing = '';
     return html`<div class="management-page class-import-page"><h2 tabindex="-1">استيراد وتصدير الكشوف</h2>
       ${tabs()}
-      ${hub.tab === 'import' ? html`<label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${locked() ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>استيراد إلى فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل من ملف</option></select></label>
-        ${hub.kind === 'new' ? classImport.render() : html`<label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود" ${locked() ? 'disabled' : ''}><option value="">اختر الفصل</option>${list.map(row => html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${teachingLabel(row)}</option>`)}</select></label>${existingPane()}`}` : html`
+      ${hub.tab === 'import' ? html`${directExtensionEntry()}<label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${locked() ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>استيراد إلى فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل من ملف</option></select></label>
+        ${hub.kind === 'new' ? html`<details data-n36-new-advanced><summary>خيارات متقدمة — إنشاء فصل من CSV / XLSX</summary>${classImport.render()}</details>` : html`<label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود" ${locked() ? 'disabled' : ''}><option value="">اختر الفصل</option>${list.map(row => html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${teachingLabel(row)}</option>`)}</select></label>${existingPane()}`}` : html`
       <section aria-label="تصدير الكشوف">
         <label><input type="checkbox" data-koshoof-all ${list.length && hub.selected.size === list.length ? 'checked' : ''} ${!list.length ? 'disabled' : ''}> تحديد الكل</label>
         <div class="koshoof-selection">${list.map(row => html`<label><input type="checkbox" data-koshoof-class value="${row.id}" ${hub.selected.has(row.id) ? 'checked' : ''}> ${teachingLabel(row)}</label>`)}</div>
@@ -482,6 +524,7 @@ export const koshoofCenter = {
   },
   afterPaint(root) {
     focus(root);
+    if (hub.tab === 'import') void receiveExtension();
     if (hub.tab === 'import' && hub.kind === 'new') classImport.afterPaint(root);
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
     listen('[data-import-kind]', event => { if (!locked()) { hub.kind = event.target.value; repaint(); } });
@@ -498,6 +541,19 @@ export const koshoofCenter = {
       if (!canOpenKoshoof({ id })) { ev?.preventDefault(); bindTransfer(null); repaint(); return; }
       return action(el, ev, { id });
     }])),
+    'n36-extension-cancel'() { clearExtensionPreview(); extensionMessage='أُلغي النقل ومُسحت المعاينة.'; repaint(); },
+    async 'n36-extension-review'() {
+      const pending=extensionPreview,id=hub.existing,route=location.hash;
+      try {
+        const binding=setupBinding(id);
+        if(!pending || extensionOwnerBinding() !== extensionOwner || Date.now() >= pending.envelope.expiresAt) throw Error('STALE');
+        const {openTeacherSetupImport}=await import('./teacher-setup-import.js');
+        if(extensionPreview!==pending || hub.existing!==id || location.hash!==route || setupBinding(id)!==binding) return;
+        closeTeacherSetupImport();
+        closeTeacherSetupImport=openTeacherSetupImport({initialBundle:pending.bundle,onClose:()=>{if(extensionPreview===pending){clearExtensionPreview();repaint();}},sourceNotice:pending.envelope.source==='noor'?'نور: كشف ظاهر جزئي؛ الصفحات والأعمدة الأخرى غير مجمّعة.':'مدرستي: أسماء المعاينة المختارة فقط.',
+          isContextCurrent:()=>extensionPreview===pending && hub.existing===id && location.hash===route && setupBinding(id)===binding && Date.now()<pending.envelope.expiresAt});
+      } catch { clearExtensionPreview();extensionMessage='تغيّر الحساب أو الفصل أو انتهت المعاينة؛ أعد النقل.';repaint(); }
+    },
     'koshoof-tab'(el) { if (!locked()) { hub.tab = el.dataset.tab; repaint(); } },
     'koshoof-export'() {
       bind(); if (allowed()) return;
