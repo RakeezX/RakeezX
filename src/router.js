@@ -10,7 +10,7 @@ const ROUTES = [
   { path: '/teaching/:id/students',     load: () => import('./views/students.js') },
   { path: '/teaching/:id/attendance',   load: () => import('./views/attendance.js') },
   { path: '/teaching/:id/quicklog',     load: () => import('./views/quicklog.js') },
-  { path: '/teaching/:id/koshoof', load: () => import('./views/grades.js').then(m => ({ default: m.koshoofView })) },
+  { path: '/teaching/:id/koshoof', load: () => import('./views/class-import-center.js') },
   { path: '/teaching/:id/grades',       load: () => import('./views/grades.js') },
   { path: '/teaching/:id/items',        load: () => import('./views/items.js') },
   { path: '/teaching/:id/picker',       load: () => import('./views/picker.js') },

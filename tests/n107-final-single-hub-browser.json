@@ -1,0 +1,75 @@
+{
+  "taskId": "continuous-n107-final-single-hub-direct-excel-20261016",
+  "runId": "bcdfed8f-0c1b-426e-8e0f-4fddf30ba80c",
+  "checks": [
+    {
+      "name": "actual_partial_failure_and_explicit_retry",
+      "status": "PASS",
+      "evidence": "Actual student transaction failure preserves section/teaching/defaults and human pending names; explicit retry reuses parents, no raw IDs or warning after success."
+    },
+    {
+      "name": "actual_native_import_and_binary_downloads",
+      "status": "PASS",
+      "evidence": "Actual native select enters guarded class import; independent direct XLSX downloads with separate per-class names and grades; suppressed automatic dispatch keeps truthful individual fallback, no store changes; ordinary format picker removed, dedicated Noor retained."
+    },
+    {
+      "name": "actual_owner_term_archived_session_and_expired_lease",
+      "status": "PASS",
+      "evidence": "Selection reset on term change; archived/foreign teaching excluded; wrong owner denies hub; session drift during final modal and expired offline lease produce zero writes. [{\"name\":\"archived\",\"count\":1},{\"name\":\"foreign\",\"count\":1},{\"name\":\"wrong-owner\",\"count\":0},{\"name\":\"restored\",\"count\":2}]"
+    },
+    {
+      "name": "actual_UI_390",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-final/."
+    },
+    {
+      "name": "actual_UI_320",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-final/."
+    },
+    {
+      "name": "actual_UI_768",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-final/."
+    },
+    {
+      "name": "actual_UI_1280",
+      "status": "PASS",
+      "evidence": "Actual HTTP app DOM/CSS and account handlers: light/dark Home, toolbar, manual name-only CSV preview, dedup/invalid blocking, cancel/no write, one-class success, native select and compact checkbox export; no horizontal overflow. Screenshots test-results/n107-final/."
+    },
+    {
+      "name": "cached_offline_actual_routes",
+      "status": "PASS",
+      "evidence": "Fresh controlled Demo cache contains both new dependencies; actual hub and legacy new-class alias reload offline via Service Worker."
+    },
+    {
+      "name": "actual_XLSX_ambiguous_column_existing_duplicate",
+      "status": "PASS",
+      "evidence": "Actual ambiguous-name native select previews only the deliberately chosen column; actual XLSX upload with manual Rakeez metadata creates one class only after confirmation; reimport of existing class is blocked without writes."
+    }
+  ],
+  "errors": [],
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-final-single-hub-direct-excel-20261016/tests/n107-final-single-hub-browser.mjs:131:12",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('الفصول المحددة: 0', { exact: true }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-final-single-hub-direct-excel-20261016\\tests\\n107-final-single-hub-browser.mjs:183:60",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-grade-review]') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-final-single-hub-direct-excel-20261016\\tests\\n107-final-single-hub-browser.mjs:182:103",
+    "AssertionError [ERR_ASSERTION]: مراجعة الكشف\nخيارات مدرستي المتقدمة\nأسماء فقط\nأسماء ودرجات\n\ngrades.csv\n\nاسم الطالب: اسم الطالب\n\nبنود يدوية مرتبطة: 0 · آلية / قراءة فقط متجاهلة: 0 · تحتاج مراجعة: 1\n\nالأعمدة المختارة: لا شيء · المتجاهلة: الواجبات (العظمى 10)\n\nتعديل المطابقة — أعمدة تحتاج مراجعة أو تجاهل\nعمود اسم الطالب \nاختر العمود\n1: اسم الطالب\n2: الواجبات (العظمى 10)\n معرف ركيز الثابت (اختياري) \nمطابقة الاسم الفريد في الفصل\n1: اسم الطالب\n2: الواجبات (العظمى 10)\n2: الواجبات (العظمى 10)\n\nلم تُطابق هذه الدرجة؛ اختر بندًا أو اتركها للتجاهل.\n\nتجاهل\nالواجبات — العظمى 10\nالأنشطة والمشاريع — العظمى 20\nالاختبارات القصيرة — العظمى 20\nالاختبار النهائي — العظمى 40\nإنشاء بند يدوي مسمّى صراحة\nمراجعة الاستيراد إلغاء\n\nراجع الأعمدة والبنود والعظمى: GRADE_CONTEXT_INVALID\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-final-single-hub-direct-excel-20261016/tests/n107-final-single-hub-browser.mjs:185:12",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#class-delete-confirm-btn') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-final-single-hub-direct-excel-20261016\\tests\\n107-final-single-hub-browser.mjs:204:53"
+  ],
+  "testedProductCommit": "713889200cfa5596cded4044c333eedc911f6f3c",
+  "testedProductFilesSha256": {
+    "src/views/home.js": "7774a18979a151a95c9c272ddf2b93bf4a6ffdc4936f0ea2ca6cb48e1f7e7d8b",
+    "src/views/teachings.js": "550f6087da19d088db88183e4606c7cc6a725eb17617dc873ab0b7c10878fc16",
+    "src/views/class-import-center.js": "9125688d1317e261e145d1485a1b35c07396ae926f65e606a76837e69028ef15",
+    "src/lib/class-import-file.js": "67f4059bcf82936aa07facd1461b1c31417de308abb601f0ef03ea0b8b7295af",
+    "src/lib/class-koshoof-bundle.js": "04286fc0db797463d9e1a05ef88c0fff620c9b95496beb679256f274263aed87",
+    "src/lib/grade-transfer-xlsx.js": "6188bc7234d32726f091fca9a3da18f883b2e41b1e2a73129df3ed3880eaacc0",
+    "src/lib/zip.js": "a1c041a94fd62b87b3e8e7e345a145fee565b0dc270be2309bd7f266f9e9c091",
+    "src/views/grades.js": "4eeb5d30b953255ff723401408179bd96944e57989c8a6540559eeb9714939ea",
+    "src/store.js": "4a040c4fcbf32f26079f78255951de328ac2b53c74ade4fa1d00c3356716d060",
+    "src/router.js": "43e39584162e15f8d9e251e6a3c51f86cae56e76cfbf802c92a985483db37221",
+    "src/styles/components.css": "e24f45c2e599deca60c9738707be240b7681e22d92a7fdd1ce0fcfe773d87d31",
+    "sw.js": "5007078cd3f9ca2b71996f811c84696c6ce0d31468244def03a91b0f768f8b31"
+  },
+  "cleanup": "Owned fresh browser contexts, browser and loopback server closed in finally; shared phase lease released by runner command."
+}

@@ -1,10 +1,303 @@
 // AI: real local-file entry, shared class selector, no portal login or bulk save.
-import { html, confirmSheet } from '../lib/dom.js';
+import { html, confirmSheet, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { readClassFile, detectClassNameColumn, classGroups } from '../lib/class-import-file.js';
 import { GRADES, sectionLabel, normalizeSectionLabel } from '../models.js';
 import { classKoshoofBundle, downloadKoshoofBundle } from '../lib/class-koshoof-bundle.js';
 import { repaint } from '../repaint.js';
+
+import { canOpenRoster } from './students.js';
+import * as cloud from '../lib/cloud.js';
+import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
+import { go } from '../router.js';
+import { detectStudentNameColumn } from '../lib/student-import.js';
+import { readGradeFile } from '../lib/grade-transfer-parsers.js';
+import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding } from '../lib/grade-transfer.js';
+import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
+
+
+
+let transferBinding = null;
+let transferRoute = null;
+let transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+
+let closeTeacherSetupImport = () => {};
+let setupRequest = 0;
+function setupBinding(teachingId) {
+  store.assertClassOperationsAccess(teachingId);
+  const workspace = store.getActiveWorkspace(), teaching = store.getTeaching(teachingId);
+  const access = runtimeSyncOwnershipGuard.cloudAccess({ operation: 'preview', authenticatedUserId: cloud.user?.id });
+  if (!store.state.ready || workspace?.type !== 'account' || !cloud.session ||
+      cloud.session.user?.id !== cloud.user?.id || cloud.authStatus().state !== 'authenticated' ||
+      !access.allowed || access.workspaceOwnerId !== workspace.authUserId ||
+      !teaching || store.isTeachingArchived(teaching)) throw new Error('يلزم حساب وفصل نشطان لفتح المعاينة.');
+  store.assertLeaseWritable();
+  store.validateTeachingContext(teaching.sectionId, teaching.termId);
+  return JSON.stringify([workspace.authUserId, workspace.id, workspace.databaseName, workspace.leaseGeneration,
+    teaching.id, teaching.sectionId, teaching.termId, teaching.subjectId]);
+}
+
+function transferPanel(teachingId) {
+  const { items } = store.teachingContext(teachingId);
+  if (transferRoute !== location.hash) {
+    transferRoute = location.hash;
+    const request = new URLSearchParams(location.hash.split('?')[1]);
+    if (request.get('import') === '1') transfer.panel = 'import';
+    else if (request.get('export') === '1') transfer.panel = 'export';
+  }
+  const selectedItems = items.filter(i => !transfer.exportItems || transfer.exportItems.has(i.id));
+  const groupTotal = group => selectedItems.filter(i => (transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group).reduce((sum,i) => sum + Number(i.max),0);
+  const review = transfer.review;
+  const opts = transfer.rows?.[0] ?? [];
+  const mappingSummary = html`<div data-grade-mapping-summary>
+        <p>اسم الطالب: ${opts[transfer.nameColumn] ?? 'يلزم اختيار العمود'}${transfer.idColumn >= 0 ? html` · المعرف: ${opts[transfer.idColumn]}` : ''}</p>
+        ${transfer.importMode !== 'names' ? html`<p class="grade-transfer__hint">بنود يدوية مرتبطة: ${transfer.mappings.filter(m => m.kind === 'existing').length} · آلية / قراءة فقط متجاهلة: ${transfer.reasons?.filter(r => r === 'readonly').length ?? 0} · تحتاج مراجعة: ${transfer.mappings.filter((m,c) => m.kind === 'new' || transfer.reasons?.[c] === 'exception' && m.kind === 'ignore').length}</p>` : ''}
+        ${transfer.importMode !== 'names' ? html`<p class="grade-transfer__hint">الأعمدة المختارة: ${opts.filter((v,c)=>transfer.mappings[c]?.kind !== 'ignore').join('، ') || 'لا شيء'} · المتجاهلة: ${opts.filter((v,c)=>![transfer.nameColumn,transfer.idColumn].includes(c) && transfer.mappings[c]?.kind === 'ignore').join('، ') || 'لا شيء'}</p>` : ''}
+        ${transfer.reasons?.includes('metadata') ? html`<p class="grade-transfer__hint">تُتجاهل بيانات الفصل والمادة ونوع الملف.</p>` : ''}
+      </div>`;
+  return html`<div class="grade-transfer noprint" data-grade-transfer ${!transfer.panel ? 'hidden' : ''}>
+    ${transfer.panel === 'import' ? html`<section id="grade-import-panel" data-grade-import-panel aria-label="استيراد الكشوف" ${transfer.panel !== 'import' ? 'hidden' : ''}>
+    <div class="grade-transfer__heading"><h3>مراجعة الكشف</h3></div>
+    ${store.getActiveWorkspace()?.type === 'account' ? html`<details class="grade-transfer__school"><summary>خيارات مدرستي المتقدمة</summary>
+      <button class="btn btn--quiet" type="button" data-act="teacher-setup-import" aria-describedby="school-import-hint">${icon('upload')} بيانات مدرستي</button>
+      <span id="school-import-hint" class="grade-transfer__hint">حزمة JSON مراجَعة فقط · معاينة دون حفظ أو اتصال مباشر بمدرستي</span>
+    </details>` : ''}
+    <div class="segmented grade-transfer__modes" role="group" aria-label="نوع الاستيراد">
+      ${['names','grades'].map(value => html`<button type="button" class="segmented__btn ${transfer.importMode === value ? 'is-on' : ''}" data-act="grade-import-mode" data-mode="${value}" data-fk="grade-import-${value}" aria-pressed="${transfer.importMode === value ? 'true' : 'false'}" ${transfer.busy ? 'disabled' : ''}>${value === 'names' ? 'أسماء فقط' : 'أسماء ودرجات'}</button>`)}
+    </div>
+    ${!transfer.rows ? html`<button class="btn grade-transfer__template" data-act="grade-template">تنزيل نموذج أسماء فارغ</button><label class="grade-transfer__file">اختر الكشف <input class="input" type="file" accept=".csv,.xlsx" data-change="grade-file" ${transfer.busy ? 'disabled' : ''}></label>
+      <p class="grade-transfer__hint">CSV أو XLSX بعناوين أعمدة · حتى 300 طالب و1 MB · الفراغ لا يغيّر الدرجة والصفر يُرصد.</p>` : ''}
+    ${transfer.busy && !transfer.writing ? html`<button class="btn" data-act="grade-cancel">إلغاء القراءة</button>` : ''}
+    ${transfer.rows ? html`<p data-grade-file-name>${transfer.fileName}</p>
+      ${review ? html`<details data-grade-reviewed-mapping><summary>مطابقة الأعمدة</summary>${mappingSummary}</details>` : mappingSummary}
+      ${!review ? html`<details data-grade-mapping-details ${transfer.editMapping || transfer.nameColumn < 0 || transfer.importMode !== 'names' && transfer.reasons?.some(r => ['exception','proposal'].includes(r)) ? 'open' : ''}>
+      <summary>تعديل المطابقة${transfer.importMode !== 'names' && transfer.reasons?.some(r => ['exception','proposal'].includes(r)) ? ' — أعمدة تحتاج مراجعة أو تجاهل' : ''}</summary><div class="grade-transfer__mapping">
+      <div class="grade-transfer__identity">
+      <label class="grade-transfer__field">عمود اسم الطالب <select class="input" data-grade-name data-change="grade-mapping" data-fk="grade-name"><option value="-1">اختر العمود</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      <label class="grade-transfer__field">معرف ركيز الثابت (اختياري) <select class="input" data-grade-id data-change="grade-mapping" data-fk="grade-id"><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      </div>
+      ${opts.map((v,c) => {
+        if (transfer.importMode === 'names') return '';
+        if ([transfer.nameColumn,transfer.idColumn].includes(c) || ['metadata','readonly'].includes(transfer.reasons?.[c])) return '';
+        const m = transfer.mappings[c] ?? { kind: 'ignore' };
+
+        return html`<div class="grade-transfer__column" data-grade-column="${c}"><label for="grade-column-${c}">${c+1}: ${v}</label>
+          ${transfer.reasons?.[c] === 'exception' && m.kind === 'ignore' ? html`<p class="grade-transfer__hint">لم تُطابق هذه الدرجة؛ اختر بندًا أو اتركها للتجاهل.</p>` : ''}
+          <select id="grade-column-${c}" class="input" data-grade-kind data-change="grade-mapping" data-fk="grade-column-${c}">
+            <option value="ignore" ${m.kind === 'ignore' ? 'selected' : ''}>تجاهل</option>
+            ${items.filter(isTransferItem).map(i => html`<option value="${i.id}" ${m.itemId === i.id ? 'selected' : ''}>${i.name} — العظمى ${i.max}</option>`)}
+            <option value="new" ${m.kind === 'new' ? 'selected' : ''}>إنشاء بند يدوي مسمّى صراحة</option>
+          </select>
+          ${m.kind === 'new' ? html`<label>اسم البند <input class="input" data-grade-new-name data-fk="grade-new-name-${c}" maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
+            <label>العظمى <input class="input" data-grade-new-max data-fk="grade-new-max-${c}" inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label>
+            <label><input type="checkbox" data-grade-new-confirm data-fk="grade-new-confirm-${c}" data-change="grade-mapping" ${m.confirmed ? 'checked' : ''}> أؤكد إنشاء هذا البند بهذه العظمى</label>` : ''}
+        </div>`;
+      })}
+
+      </div></details>` : html`<button class="btn" data-act="grade-edit-mapping" ${transfer.busy ? 'disabled' : ''}>تعديل المطابقة</button>`}
+      ${!review ? html`<button class="btn btn--primary" data-act="grade-review" ${transfer.busy ? 'disabled' : ''}>مراجعة الاستيراد</button>` : ''}
+      <button class="btn" data-act="grade-cancel" ${transfer.writing ? 'disabled' : ''}>إلغاء</button>
+    ` : ''}
+    ${review && transfer.importMode === 'names' ? html`<div data-grade-review><p>أسماء جديدة ${review.counts.new}، موجودة ${review.counts.existing}، تحتاج مراجعة ${review.counts.invalid + review.counts.ambiguous}.</p><ul>${review.entries.map(e => html`<li>${e.name} — ${e.status === 'new' ? 'إضافة جديدة' : e.status === 'existing' ? 'موجود؛ لن يتكرر' : 'يحتاج مراجعة؛ لن يضاف'}</li>`)}</ul><label><input type="checkbox" data-grade-match-confirm> راجعت الأسماء الجديدة التي ستضاف</label><p class="grade-transfer__notice" data-grade-confirm-alert role="alert" hidden></p><button class="btn btn--primary" data-act="grade-confirm" ${transfer.busy || !review.names.length ? 'disabled' : ''}>تأكيد الأسماء</button></div>` : ''}
+    ${review && transfer.importMode !== 'names' ? html`<div data-grade-review><p>إضافات ${review.additions}، استبدالات ${review.overwrites}، دون تغيير ${review.unchanged}، أخطاء ${review.rejected.length}.</p>
+      ${review.capped ? html`<p class="grade-transfer__notice" role="status">حُدّت ${review.capped} قيمة إلى العظمى الحالية؛ راجع الأصل والمقترح.</p>` : ''}
+      ${review.newStudents.length ? html`<p>سيُضاف ${review.newStudents.length} طالبًا بانتساب جديد إلى هذا الفصل مع الدرجات في دفعة واحدة:</p><ul>${review.newStudents.map(e => html`<li>${e.name} — إضافة جديدة</li>`)}</ul><label><input type="checkbox" data-grade-enroll-confirm> أؤكد إضافة هؤلاء الطلاب الجدد إلى الفصل</label>` : ''}
+      <div class="grade-transfer__scroll"><table><thead><tr><th>صف</th><th>الطالب</th><th>البند / العظمى</th><th>الحالي ← المقترح</th></tr></thead><tbody>
+        ${review.entries.filter(e => e.value !== null && e.value !== e.old).map(e => html`<tr><td>${e.row}</td><td>${e.student}</td><td>${e.item} / ${e.max}</td><td>${e.old ?? 'فارغ'} ← ${e.value}${e.capped ? html` · <b dir="ltr">${e.original}→${e.value}</b> (حُدّت للعظمى)` : ''}</td></tr>`)}
+      </tbody></table></div>
+      ${transfer.rows.slice(1).map((row,index) => {
+        const roster = store.teachingContext(teachingId).roster;
+        const candidates = roster.filter(s => gradeNameKey(s.name) === gradeNameKey(row[transfer.nameColumn]));
+        if (candidates.length < 2 || transfer.idColumn >= 0 && row[transfer.idColumn]) return '';
+        const choice = transfer.studentChoices?.[index+2];
+        return html`<div class="grade-transfer__column"><label>صف ${index+2}: ${row[transfer.nameColumn]} — اختر الطالب في هذا الفصل
+          <select class="input" data-grade-student-row="${index+2}" data-fk="grade-student-${index+2}" data-change="grade-student-choice" ${transfer.busy?'disabled':''}><option value="">اختر الطالب؛ لا مطابقة تلقائية</option>${candidates.map((s,i)=>html`<option value="${i}" ${choice?.studentId===s.id?'selected':''}>${s.name} — رقم الكشف ${s.displayNo ?? roster.indexOf(s)+1}</option>`)}</select></label>
+          <label><input type="checkbox" data-grade-student-confirm="${index+2}" data-fk="grade-student-confirm-${index+2}" data-change="grade-student-choice" ${choice?.confirmed?'checked':''} ${!choice || transfer.busy?'disabled':''}> أؤكد مطابقة هذا الصف مع الطالب المختار</label></div>`;
+      })}
+      ${review.rejected.map(e => html`<p role="alert">صف ${e.row} · ${e.student}${e.item ? html` · ${e.item} · القيمة ${e.value} · العظمى ${e.max}` : ''}: ${e.reason}</p>`)}
+      ${review.unchanged ? html`<details data-grade-unchanged><summary>دون تغيير (${review.unchanged})</summary><ul>${review.entries.filter(e => e.value === null || e.value === e.old).map(e => html`<li>صف ${e.row} · ${e.student} · ${e.item}: ${e.old ?? 'فارغ'} ← ${e.value ?? 'فراغ؛ لا تغيير'}${e.capped ? html` · <b dir="ltr">${e.original}→${e.value}</b> (حُدّت للعظمى)` : ''}</li>`)}</ul></details>` : ''}
+      ${review.rejected.length ? html`<p>صحّح الأخطاء قبل التأكيد؛ لم تتغير أي درجة.</p>` : !review.cells.length && !review.newStudents?.length ? html`<p>لا توجد درجات متغيرة لتأكيدها.</p>` : html`<label><input type="checkbox" data-grade-match-confirm> راجعت هوية الطلاب والمطابقة والدرجات المعروضة</label>
+      ${review.overwrites ? html`<label><input type="checkbox" data-grade-overwrite-confirm> أوافق على استبدال ${review.overwrites} درجة بالقيم المعروضة</label>` : ''}`}
+      <p class="grade-transfer__notice" data-grade-confirm-alert role="alert" hidden></p><button class="btn btn--primary" data-act="grade-confirm" ${transfer.busy || review.rejected.length || !review.cells.length && !review.newStudents?.length ? 'disabled' : ''}>تأكيد الأسماء والدرجات</button>
+    </div>` : ''}
+    ${transfer.message ? html`<p class="grade-transfer__message ${transfer.error ? 'is-error' : ''}" role="${transfer.error ? 'alert' : 'status'}">${transfer.message}</p>` : ''}
+    ${transfer.successTeaching && !transfer.error ? html`<a class="btn btn--quiet" href="#/teaching/${transfer.successTeaching}">فتح الفصل</a>` : ''}
+    ${transfer.recovery.map(r => html`<p role="alert">طلب محفوظ: ${r.mutationId} — ${r.state === 'rejected' ? 'مرفوض، يلزم تصحيح سبب الرفض قبل دفعة جديدة' : 'لم يتأكد الإيصال بعد؛ أعد الطلب نفسه فقط'}
+      ${r.state !== 'rejected' ? html`<button class="btn" data-act="grade-retry" data-mutation="${r.mutationId}" ${transfer.busy ? 'disabled' : ''}>استعادة إيصال الطلب نفسه</button>`
+        : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
+    </section>
+    ` : html`<section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
+    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تجهيز كشف نور 40/60</summary>
+    <div class="grade-transfer__chips" role="group" aria-label="بنود كشف نور">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> ${i.name} / ${i.max}</label>`)}</div>
+    <p class="grade-transfer__hint">40: المهام الأدائية والمشاركة والتفاعل.</p><p class="grade-transfer__hint">60: تقويمات تحريرية وتطبيقات عملية.</p>
+    ${selectedItems.map(i => html`<div class="grade-transfer__noor-row"><label for="noor-${i.id}">${i.name} <small> / ${i.max}</small></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group"><option value="">اختر</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group}</option>`)}</select></div>`)}
+    <p data-noor-totals role="status">مجموع العظمى: 40 ← ${groupTotal('40')} · 60 ← ${groupTotal('60')}</p>
+    <p data-noor-alert role="alert" hidden></p><label><input type="checkbox" data-noor-confirm> أؤكد تعيين البنود المختارة؛ مجموع العظمى 40 و60 دون تكرار أو تحجيم</label>
+    <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة. ثلاثة أعمدة للرصد اليدوي فقط، ليس للرفع المباشر.</p>
+    <button class="btn btn--primary" data-act="grade-noor-export">تنزيل كشف نور اليدوي</button></details>
+    </section>`}
+  </div>`;
+
+}
+
+function readTransferMappings(root) {
+  if (!root.querySelector('[data-grade-name]')) return;
+  transfer.nameColumn = Number(root.querySelector('[data-grade-name]').value);
+  transfer.idColumn = Number(root.querySelector('[data-grade-id]').value);
+  const mappings = transfer.mappings.map(m => ({...m}));
+  for (const el of root.querySelectorAll('[data-grade-column]')) {
+    const c = Number(el.dataset.gradeColumn), value = el.querySelector('[data-grade-kind]').value;
+    if (value === 'ignore') { mappings[c] = {kind:'ignore'}; continue; }
+    if (value !== 'new') { mappings[c] = {kind:'existing',itemId:value}; continue; }
+    const prior = transfer.mappings[c];
+    mappings[c] = {kind:'new',id:prior?.kind === 'new' ? prior.id : crypto.randomUUID(),name:el.querySelector('[data-grade-new-name]')?.value ?? '',
+      max:el.querySelector('[data-grade-new-max]')?.value ?? '',confirmed:el.querySelector('[data-grade-new-confirm]')?.checked ?? false};
+  }
+  [transfer.nameColumn, transfer.idColumn].forEach(c => { if (c >= 0) mappings[c] = {kind:'ignore'}; });
+  transfer.mappings = mappings;
+}
+
+async function transferConfirm(el, retry = false) {
+  const root = el.closest('[data-grade-transfer]');
+  const current = transfer;
+  if (!root?.isConnected || transfer.busy || !retry && (!transfer.review || transfer.review.rejected?.length || !transfer.review.cells?.length && !transfer.review.names?.length && !transfer.review.newStudents?.length)) return;
+  if (!retry && (!root.querySelector('[data-grade-match-confirm]')?.checked || transfer.review?.overwrites && !root.querySelector('[data-grade-overwrite-confirm]')?.checked || transfer.review?.newStudents?.length && !root.querySelector('[data-grade-enroll-confirm]')?.checked)) {
+    const alert = root.querySelector('[data-grade-confirm-alert]');
+    alert.textContent = !root.querySelector('[data-grade-match-confirm]')?.checked ? 'أكد مراجعة هوية الطلاب والقيم المعروضة أولًا.'
+      : transfer.review?.newStudents?.length && !root.querySelector('[data-grade-enroll-confirm]')?.checked ? 'أكد إضافة الطلاب الجدد إلى هذا الفصل أولًا.' : 'أكد الموافقة على استبدال الدرجات المعروضة أولًا.';
+    alert.hidden = false; return;
+  }
+  const overwriteConfirmed = root.querySelector('[data-grade-overwrite-confirm]')?.checked ?? false;
+  const enrollmentConfirmed = root.querySelector('[data-grade-enroll-confirm]')?.checked ?? false;
+  transfer.busy = true; transfer.writing = true; repaint();
+  try {
+    const reviewed = current.review;
+    if (retry) await store.retryGradeImport(el.dataset.mutation);
+    else if (transfer.importMode === 'names') await store.confirmNamesImport(transfer.review, true);
+    else {
+      const fresh = store.reviewGradeImport(transfer.review.teachingId, transfer);
+      if (JSON.stringify(fresh) !== JSON.stringify(transfer.review)) throw new Error('تغيّرت بيانات المراجعة؛ راجع المطابقة من جديد.');
+      await store.confirmGradeImport(transfer.review, { approved: true, overwriteConfirmed, enrollmentConfirmed });
+    }
+    const teaching = store.getTeaching(reviewed?.teachingId);
+    current.rows = null; current.review = null; current.error = false; current.successTeaching = teaching?.id;
+    current.message = teaching ? `${teachingLabel(teaching)} · الأسماء المحفوظة: ${reviewed.names?.length ?? reviewed.newStudents?.length ?? 0} · الأسماء المعلقة: 0${reviewed.cells ? ` · الدرجات المحفوظة: ${reviewed.cells.length}` : ''}` : 'تم تأكيد إيصال الطلب المحفوظ.';
+  } catch (error) { current.message = error.message; current.error = true; }
+  finally { current.busy = false; current.writing = false; if (transfer === current) { current.recovery = await store.gradeImportRecovery(); repaint(); } }
+}
+
+function transferExport(el, ev, params) {
+  if (el.dataset.act === 'grade-template') { downloadGradeCsv(exportNamesTemplate(), { blankTemplate: true }); return; }
+  if (el.dataset.act !== 'grade-noor-export') return;
+  const root = el.closest('[data-grade-transfer]'), alert = root.querySelector('[data-noor-alert]');
+  alert.hidden = true; alert.textContent = '';
+  try {
+    const selected = new Set([...root.querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value));
+    const context = store.teachingContext(params.id), teaching = store.getTeaching(params.id);
+    const className = teachingLabel(teaching);
+    downloadGradeCsv(exportGradeCsv({ ...context, items: context.items.filter(i => selected.has(i.id)), noorReview: true,
+      noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem, e.value])),
+      noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview: true, className });
+  } catch (error) { alert.textContent = error.message; alert.hidden = false; }
+}
+
+function bindTransfer(id) {
+  const binding = JSON.stringify([store.getActiveWorkspace(), store.activeYear()?.id, store.activeTerm()?.id, id]);
+  if (binding === transferBinding) return;
+  transfer = { importMode: 'names', panel: null, rows: null, mappings: [], nameColumn: -1, idColumn: -1, review: null, recovery: [], message: '', busy: false };
+  transferBinding = binding;
+  transferRoute = null;
+  // AI-authored N105: render can rebind after onMount; reload recovery for this exact binding.
+  if (id) {
+    const current = transfer;
+    store.gradeImportRecovery().then(rows => { if (transfer === current) { current.recovery = rows; repaint(); } });
+  }
+}
+function canOpenKoshoof(p) {
+  if (!canOpenRoster(p)) return false;
+  try {
+    if (store.getActiveWorkspace()?.type === 'account') setupBinding(p.id);
+    else store.assertLeaseWritable();
+    return true;
+  } catch { return false; }
+}
+
+const transferActions = {
+    async 'teacher-setup-import'(el, ev, params) {
+      const request = ++setupRequest, workspace = store.getActiveWorkspace(), route = location.hash;
+      try {
+        const binding = setupBinding(params.id);
+        const { openTeacherSetupImport } = await import('./teacher-setup-import.js');
+        if (request !== setupRequest || !el.isConnected || location.hash !== route ||
+            store.getActiveWorkspace() !== workspace || setupBinding(params.id) !== binding) return;
+        closeTeacherSetupImport();
+        closeTeacherSetupImport = openTeacherSetupImport({ isContextCurrent: () =>
+          location.hash === route && store.getActiveWorkspace() === workspace && setupBinding(params.id) === binding });
+      } catch (error) { toast(error.message); }
+    },
+    async 'grade-file'(el, ev, params) {
+      const prior = transfer;
+      const file = el.files?.[0];
+      if (!file || prior.writing) return;
+      const current = transfer = { ...prior, rows:null, mappings:[], review:null, busy:false, writing:false, successTeaching:null };
+      current.busy = true; current.rows = null; current.review = null; current.message = 'جار قراءة الملف محليًا…'; current.error = false; repaint();
+      try {
+        const rows = await readGradeFile(file);
+        if (transfer !== current) return;
+        transfer.rows = rows; transfer.fileName = file.name; Object.assign(transfer, suggestGradeMappings(rows[0], store.teachingContext(params.id).items, {teachingId:params.id,ownerId:store.getActiveWorkspace()?.authUserId}));
+        transfer.mappings = transfer.mappings.map(m => m.kind === 'new' ? {...m,id:crypto.randomUUID()} : m);
+        if (transfer.nameColumn < 0) transfer.nameColumn = detectStudentNameColumn(rows);
+        const suggested = transfer.mappings.flatMap((m,c) => m.kind !== 'ignore' ? [c] : []);
+        transfer.visibleColumns = new Set(suggested.concat(transfer.reasons.flatMap((reason,c) => reason === 'exception' ? [c] : [])));
+        transfer.mappings = transfer.mappings.map((m,c) => transfer.visibleColumns.has(c) ? m : {kind:'ignore'});
+        transfer.importMode ??= 'names';
+        transfer.editMapping = false; transfer.review = null; transfer.newStudentIds = {}; transfer.studentChoices = {}; transfer.message = ''; transfer.error = false;
+      } catch (error) { if (transfer === current) { transfer.rows = null; transfer.review = null; transfer.message = 'تعذّر قراءة الملف: ' + error.message; transfer.error = true; } }
+      finally { current.busy = false; if (transfer === current) repaint(); }
+    },
+    'grade-student-choice'(el, ev, params) {
+      if (transfer.busy || !el.isConnected) return;
+      try {
+        store.assertClassOperationsAccess(params.id);
+        const root = el.closest('[data-grade-transfer]'), row = Number(el.dataset.gradeStudentRow ?? el.dataset.gradeStudentConfirm);
+        const roster = store.teachingContext(params.id).roster, teaching = store.getTeaching(params.id), workspace = store.getActiveWorkspace();
+        const candidates = roster.filter(s => gradeNameKey(s.name) === gradeNameKey(transfer.rows[row-1][transfer.nameColumn]));
+        const selected = root.querySelector(`[data-grade-student-row="${row}"]`).value;
+        transfer.studentChoices ??= {};
+        if (selected === '') delete transfer.studentChoices[row];
+        else transfer.studentChoices[row] = {studentId:candidates[Number(selected)]?.id,
+          confirmed:!!el.dataset.gradeStudentConfirm && root.querySelector(`[data-grade-student-confirm="${row}"]`).checked,
+          binding:rosterChoiceBinding({roster,teaching,ownerId:workspace.authUserId,databaseName:workspace.databaseName})};
+        // Unconfirmed selections remain rejected in review until explicit row approval.
+        const input = {...transfer,studentChoices:Object.fromEntries(Object.entries(transfer.studentChoices).filter(([,c])=>c.confirmed))};
+        transfer.review = store.reviewGradeImport(params.id,input); transfer.message = ''; transfer.error = false;
+      } catch(error) { transfer.review = null; transfer.message = error.message; transfer.error = true; }
+      repaint();
+    },
+    'grade-mapping'(el) { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = null; transfer.editMapping = true; repaint(); },
+    'grade-edit-mapping'() { if (transfer.busy) return; transfer.review = null; transfer.editMapping = true; repaint(); },
+    'grade-export-selection'(el) { transfer.exportOpen = true; transfer.noorOpen = el.closest('[data-grade-transfer]').querySelector('[data-noor-grouping]').open; const confirm = el.closest('[data-grade-transfer]').querySelector('[data-noor-confirm]'); if (confirm) confirm.checked = false; transfer.exportItems = new Set([...el.closest('[data-grade-transfer]').querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value)); repaint(); },
+    'grade-review'(el, ev, params) {
+      try { readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = transfer.importMode === 'names' ? store.reviewNamesImport(params.id, transfer) : store.reviewGradeImport(params.id, transfer); transfer.message = ''; transfer.error = false; }
+      catch (error) { transfer.review = null; transfer.message = error.message === 'GRADE_NEW_ITEM_CONFIRM_REQUIRED' ? 'أكد إنشاء كل بند جديد باسمه وعظماه، أو اختر تجاهله قبل المراجعة.' : 'راجع الأعمدة والبنود والعظمى: ' + error.message; transfer.error = true; }
+      repaint();
+    },
+    'grade-cancel'() { if (transfer.writing) return; transfer = { ...transfer, rows:null, mappings:[], review:null, busy:false, writing:false, message:'أُلغي الاستيراد دون تغيير الأسماء أو الدرجات.', error:false }; repaint(); },
+    'grade-confirm': el => transferConfirm(el),
+    'grade-retry': el => transferConfirm(el, true),
+    async 'grade-retire'(el) {
+      const confirmed = el.closest('[data-grade-transfer]').querySelector('[data-grade-retire-confirm]')?.checked;
+      if (!confirmed) { toast('أكد إلغاء الطلب المرفوض وحفظ سبب الرفض أولًا', 'danger'); return; }
+      const current = transfer;
+      try { await store.retireRejectedGradeImport(el.dataset.mutation, true); current.review = null; current.message = 'حُفظ الرفض وأُلغي الطلب المرفوض. أكمل المزامنة ثم راجع ملفك من جديد.'; }
+      catch (error) { current.message = error.message; current.error = true; }
+      if (transfer === current) { current.recovery = await store.gradeImportRecovery(); repaint(); }
+    },
+    'grade-import-mode'(el) { if (transfer.busy) return; transfer.importMode = el.dataset.mode; transfer.review = null; transfer.message = ''; transfer.error = false; repaint(); },
+    'grade-noor-group'(el) { transfer.noorGroups ??= {}; transfer.noorGroups[el.dataset.noorItem] = el.value; transfer.noorOpen = true; repaint(); },
+    'grade-template': transferExport,
+    'grade-noor-export': transferExport,
+};
 
 let draft = {}, workspace, focusRoute, scope;
 let hub = { selected: new Set(), namesOnly: true };
@@ -133,60 +426,115 @@ const classImport = {
   },
 };
 const accessible = () => store.teachings().filter(row => { try { store.assertClassOperationsAccess(row.id); return true; } catch { return false; } });
-const teachingLabel = row => `${sectionLabel(store.getSection(row.sectionId))} · ${store.getSubject(row.subjectId)?.name ?? ''}`;
-const newPane = () => location.hash.split('?')[0] === '#/classes/import' || new URLSearchParams(location.hash.split('?')[1]).get('new') === '1';
+const teachingLabel = row => `${sectionLabel(store.getSection(row.sectionId))} · ${store.getSubject(row.subjectId)?.name ?? ''} · ${store.getYear(store.getSection(row.sectionId)?.yearId)?.label ?? ''} · ${store.getTerm(row.termId)?.name ?? ''}`;
+// AI: every entry uses this hub; legacy per-teaching URLs only redirect context.
+function contextRoute(p = {}) {
+  const request = new URLSearchParams(location.hash.split('?')[1]);
+  const id = p.id || request.get('teaching');
+  if (p.id) {
+    const query = new URLSearchParams({ teaching: p.id });
+    if (p.export === '1') query.set('tab', 'export');
+    go('/classes/koshoof?' + query, { replace: true });
+  }
+  if (hub.route === location.hash) return;
+  hub.route = location.hash;
+  hub.tab = request.get('tab') === 'export' || p.export === '1' ? 'export' : 'import';
+  hub.kind = location.hash.split('?')[0] === '#/classes/import' || request.get('new') === '1' ? 'new' : 'existing';
+  if (id) {
+    hub.existing = accessible().some(row => row.id === id) ? id : '';
+    hub.selected = new Set(hub.existing ? [hub.existing] : []);
+  }
+}
+const locked = () => draft.busy || transfer.busy || transfer.writing;
+function tabs() {
+  return html`<nav class="koshoof-modes" aria-label="مهام الكشوف">${['import','export'].map(tab => html`<button class="btn ${hub.tab === tab ? 'btn--primary' : 'btn--quiet'}" data-act="koshoof-tab" data-tab="${tab}" aria-pressed="${hub.tab === tab}" ${locked() ? 'disabled' : ''}>${tab === 'import' ? 'استيراد' : 'تصدير'}</button>`)}</nav>`;
+}
+function existingPane() {
+  if (!hub.existing || !canOpenKoshoof({ id: hub.existing })) { bindTransfer(null); return ''; }
+  bindTransfer(hub.existing); transfer.panel = 'import';
+  return transferPanel(hub.existing);
+}
 export const koshoofCenter = {
   title: () => 'الكشوف', back, onMount: focus,
-  render() {
-    bind(); const denial = allowed(); if (denial) return unavailable(denial);
+  onUnmount() { setupRequest++; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; },
+  render(p = {}) {
+    bind(); const denial = allowed(); if (denial) { bindTransfer(null); return unavailable(denial); }
+    contextRoute(p);
     const list = accessible(), ids = new Set(list.map(row => row.id));
     hub.selected = new Set([...hub.selected].filter(id => ids.has(id)));
-    if (newPane()) return html`${draft.complete ? '' : html`<a class="btn btn--quiet" href="#/classes/koshoof">العودة للكشوف</a>`}${classImport.render()}`;
-    return html`<div class="management-page class-import-page"><h2 tabindex="-1">الكشوف</h2>
-      <section class="card card--pad"><h3>استيراد فصل جديد</h3><p>حدد الصف والفصل والمادة، ثم راجع أسماء الطلاب من ملف محلي قبل الحفظ.</p><a class="btn btn--primary" href="#/classes/koshoof?new=1">استيراد فصل جديد من ملف</a></section>
-      <section class="card card--pad"><h3>استيراد لفصل موجود</h3>
-        <label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود"><option value="">اختر الفصل</option>${list.map(row => html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${teachingLabel(row)}</option>`)}</select></label>
-        <button class="btn" data-act="koshoof-existing" ${ids.has(hub.existing) ? '' : 'disabled'}>استيراد الأسماء أو الدرجات</button>
-      </section>
-      <section class="card card--pad"><h3>تصدير الكشوف · Excel</h3>
-        <label><input type="checkbox" data-koshoof-all ${list.length && hub.selected.size === list.length ? 'checked' : ''} ${!list.length ? 'disabled' : ''}> تحديد جميع الفصول المتاحة</label>
+    if (!ids.has(hub.existing)) hub.existing = '';
+    return html`<div class="management-page class-import-page"><h2 tabindex="-1">استيراد وتصدير الكشوف</h2>
+      ${tabs()}
+      ${hub.tab === 'import' ? html`<label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${locked() ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>استيراد إلى فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل من ملف</option></select></label>
+        ${hub.kind === 'new' ? classImport.render() : html`<label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود" ${locked() ? 'disabled' : ''}><option value="">اختر الفصل</option>${list.map(row => html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${teachingLabel(row)}</option>`)}</select></label>${existingPane()}`}` : html`
+      <section aria-label="تصدير الكشوف">
+        <label><input type="checkbox" data-koshoof-all ${list.length && hub.selected.size === list.length ? 'checked' : ''} ${!list.length ? 'disabled' : ''}> تحديد الكل</label>
         <div class="koshoof-selection">${list.map(row => html`<label><input type="checkbox" data-koshoof-class value="${row.id}" ${hub.selected.has(row.id) ? 'checked' : ''}> ${teachingLabel(row)}</label>`)}</div>
         <p role="status">الفصول المحددة: ${hub.selected.size}</p>
-        <label class="field"><span>محتوى الكشوف المحددة</span><select class="select" data-koshoof-content><option value="names" ${hub.namesOnly ? 'selected' : ''}>أسماء فقط</option><option value="grades" ${!hub.namesOnly ? 'selected' : ''}>أسماء ودرجات</option></select></label>
-        <p>فصل واحد: ملف Excel. عدة فصول: ملف ZIP يحتوي كشف Excel مستقلًا لكل فصل ومادة.</p>
+        <label class="field"><span>محتوى الكشوف</span><select class="select" data-koshoof-content><option value="names" ${hub.namesOnly ? 'selected' : ''}>أسماء فقط</option><option value="grades" ${!hub.namesOnly ? 'selected' : ''}>أسماء ودرجات</option></select></label>
+        <p>ملف Excel مستقل لكل فصل. قد يطلب المتصفح السماح بتنزيلات متعددة.</p>
         <button class="btn btn--primary" data-act="koshoof-export" ${hub.selected.size ? '' : 'disabled'}>تنزيل الكشوف المحددة</button>
-        <p role="alert">${hub.message ?? ''}</p>
-      </section>${!list.length ? html`<p>لا توجد فصول نشطة متاحة في حسابك لهذا الفصل الدراسي.</p>` : ''}
+        <p role="status">${hub.message ?? ''}</p>
+        ${hub.files?.length ? html`<section class="koshoof-downloads" aria-label="تنزيل الملفات منفردة"><p>إذا لم يظهر ملف في التنزيلات، نزّله بزرّه أدناه.</p>${hub.files.map((file, index) => html`<button class="btn btn--quiet" data-act="koshoof-file" data-index="${index}">تنزيل ${file.filename}</button>`)}</section>` : ''}
+        ${hub.selected.size === 1 ? noorPane([...hub.selected][0]) : ''}
+      </section>`}
     </div>`;
   },
   afterPaint(root) {
-    if (newPane()) { classImport.afterPaint(root); return; }
     focus(root);
+    if (hub.tab === 'import' && hub.kind === 'new') classImport.afterPaint(root);
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
-    listen('[data-existing-class]', event => { hub.existing = event.target.value; repaint(); });
-    listen('[data-koshoof-class]', event => { event.target.checked ? hub.selected.add(event.target.value) : hub.selected.delete(event.target.value); repaint(); });
-    listen('[data-koshoof-all]', event => { hub.selected = new Set(event.target.checked ? accessible().map(row => row.id) : []); repaint(); });
-    listen('[data-koshoof-content]', event => { hub.namesOnly = event.target.value !== 'grades'; });
+    listen('[data-import-kind]', event => { if (!locked()) { hub.kind = event.target.value; repaint(); } });
+    listen('[data-existing-class]', event => { if (!locked()) { hub.existing = event.target.value; bindTransfer(hub.existing); repaint(); } });
+    const invalidate = () => { hub.files = null; hub.message = ''; };
+    listen('[data-koshoof-class]', event => { event.target.checked ? hub.selected.add(event.target.value) : hub.selected.delete(event.target.value); invalidate(); repaint(); });
+    listen('[data-koshoof-all]', event => { hub.selected = new Set(event.target.checked ? accessible().map(row => row.id) : []); invalidate(); repaint(); });
+    listen('[data-koshoof-content]', event => { hub.namesOnly = event.target.value !== 'grades'; invalidate(); repaint(); });
   },
   actions: {
     ...classImport.actions,
-    'koshoof-existing'() {
-      bind(); if (allowed() || !accessible().some(row => row.id === hub.existing)) return;
-      location.hash = `#/teaching/${hub.existing}/koshoof?import=1`;
-    },
+    ...Object.fromEntries(Object.entries(transferActions).map(([name, action]) => [name, (el, ev) => {
+      const id = hub.tab === 'export' ? [...hub.selected][0] : hub.existing;
+      if (!canOpenKoshoof({ id })) { ev?.preventDefault(); bindTransfer(null); repaint(); return; }
+      return action(el, ev, { id });
+    }])),
+    'koshoof-tab'(el) { if (!locked()) { hub.tab = el.dataset.tab; repaint(); } },
     'koshoof-export'() {
-      // Synchronous snapshot + download; every teaching uses the current owner guard.
       bind(); if (allowed()) return;
       try {
-        const list = accessible();
-        if (!hub.selected.size || [...hub.selected].some(id => !list.some(row => row.id === id))) throw Error('تغيّر الفصل المتاح. أعد الاختيار.');
-        const entries = list.filter(row => hub.selected.has(row.id)).map(row => {
-          store.assertClassOperationsAccess(row.id);
-          return { ...store.teachingContext(row.id), className: teachingLabel(row) };
-        });
-        downloadKoshoofBundle(classKoshoofBundle(entries, hub.namesOnly)); hub.message = '';
-      } catch (error) { hub.message = error.message; repaint(); }
+        const entries = exportEntries();
+        hub.files = classKoshoofBundle(entries, hub.namesOnly);
+        // At most three automatic requests per gesture; every file also has a separate button.
+        let attempted = 0;
+        for (const file of hub.files.slice(0, 3)) { try { downloadKoshoofBundle(file); attempted++; } catch { break; } }
+        hub.message = `جُهّز ${hub.files.length} ملف Excel. طُلب تنزيل ${attempted}؛ تحقق من قائمة تنزيلات المتصفح.`;
+      } catch (error) { hub.files = null; hub.message = error.message; }
+      repaint();
+    },
+    'koshoof-file'(el) {
+      bind(); if (allowed()) return;
+      try {
+        // Rebuild under current owner/term guards, never download a stale snapshot.
+        const files = classKoshoofBundle(exportEntries(), hub.namesOnly), index = Number(el.dataset.index);
+        if (!hub.files?.[index] || files[index]?.filename !== hub.files[index].filename) throw Error('تغيّر الكشف. أعد تجهيز الملفات.');
+        downloadKoshoofBundle(files[index]); hub.message = 'طُلب تنزيل الملف؛ تحقق من تنزيلات المتصفح.';
+      } catch (error) { hub.files = null; hub.message = error.message; }
+      repaint();
     },
   },
 };
+function exportEntries() {
+  const list = accessible();
+  if (!hub.selected.size || [...hub.selected].some(id => !list.some(row => row.id === id))) throw Error('تغيّر الفصل المتاح. أعد الاختيار.');
+  return list.filter(row => hub.selected.has(row.id)).map(row => {
+    store.assertClassOperationsAccess(row.id);
+    return { ...store.teachingContext(row.id), className: teachingLabel(row), subject: store.getSubject(row.subjectId)?.name,
+      term: store.getTerm(row.termId)?.name, year: store.activeYear()?.label };
+  });
+}
+function noorPane(id) {
+  if (!canOpenKoshoof({ id })) return '';
+  bindTransfer(id); transfer.panel = 'export';
+  return transferPanel(id);
+}
 export default koshoofCenter;

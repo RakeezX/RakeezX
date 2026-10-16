@@ -8385,3 +8385,15 @@
 .koshoof-selection label { display:flex; align-items:center; gap:8px; min-block-size:44px; overflow-wrap:anywhere; }
 .class-import-groups ul { max-block-size:240px; overflow:auto; padding-inline-start:24px; }
 .class-import-page input[type="checkbox"] { flex-shrink:0; inline-size:18px; block-size:18px; }
+
+/* AI N107: one focused hub and upper-left secondary tools in RTL. */
+.classes-tools-left { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-inline-start:auto; }
+.classes-tools-left .classes-trash { margin:0; }
+.koshoof-modes { display:flex; gap:8px; margin-block:16px; }
+.koshoof-modes .btn { min-inline-size:100px; }
+.koshoof-downloads { display:grid; gap:10px; }
+.koshoof-downloads .btn { white-space:normal; overflow-wrap:anywhere; text-align:start; }
+.class-import-page .grade-transfer { min-inline-size:0; }
+.class-import-page .grade-transfer__scroll { overflow:auto; max-inline-size:100%; }
+.class-import-page .grade-transfer__identity, .class-import-page .grade-transfer__mapping { min-inline-size:0; }
+.class-import-page .input, .class-import-page .select { max-inline-size:100%; }

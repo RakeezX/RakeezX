@@ -333,15 +333,12 @@ function renderClassCard(tch) {
 
 function classesToolbar() {
   return html`<nav class="classes-toolbar" aria-label="إدارة الفصول">
-    <button class="btn btn--quiet" data-act="add">${icon('plus')} إضافة فصل</button>
-    <a class="btn btn--primary" href="#/classes/koshoof">الكشوف</a>
-    <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button>
+    <button class="btn btn--primary" data-act="add">${icon('plus')} إضافة فصل</button>
+    <a class="btn btn--quiet" href="#/classes/koshoof">استيراد وتصدير الكشوف</a>
+    <div class="classes-tools-left"><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button>
+    <button class="iconbtn classes-trash" data-act="delete-class-flow" aria-label="حذف الفصل" title="حذف الفصل" ${store.teachings().length ? '' : 'disabled'}>${icon('trash')}</button></div>
   </nav>`;
 }
-function demoFooter() {
-  return html`<div class="classes-demo-footer"><button class="btn btn--ghost" data-act="add-demo">${icon('spark')} إضافة فصل تجريبي</button></div>`;
-}
-
 const teachings = {
   title: () => 'الفصول',
   subtitle: () => store.activeTerm()?.name ?? '',
@@ -358,12 +355,12 @@ const teachings = {
         <div class="empty management-empty classes-empty">
           <div class="empty__icon">${icon('classes')}</div>
           <div class="empty__title">لا فصول في ${term?.name ?? 'هذا الفصل الدراسي'}</div>
-          
+
           <div class="empty__text">
             أنشئ فصلك الأول واختر مادته، ويأتي معه نموذج بنود تقييم جاهز.
           </div>
         </div>
-        ${demoFooter()}
+
         </div>
       `;
     }
@@ -392,7 +389,7 @@ const teachings = {
 
       <div class="class-cards-grid" aria-label="قائمة الفصول">${list.map(renderClassCard)}</div>
 
-      ${demoFooter()}
+
       </div>
     `;
   },
