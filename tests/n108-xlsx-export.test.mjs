@@ -19,7 +19,8 @@ test('stored ZIP has valid CRC, fixed bounded parts, no active content and reada
   const files = unzipSync(bytes), sheet = strFromU8(files['xl/worksheets/sheet1.xml']);
   assert.equal(Object.keys(files).length, 6);
   assert.match(sheet, /rightToLeft="1"/); assert.match(sheet, /state="frozen"/);
-  assert.match(sheet, /width="55"/); assert.match(sheet, /width="40"/);
+  const widths = [...sheet.matchAll(/<col [^>]*width="([\d.]+)"/g)].map(m => Number(m[1]));
+  assert.equal(widths.length, 3); assert.ok(widths.every(w => w >= 4 && w <= 36));
   assert.equal((sheet.match(/<row /g) ?? []).length, 301);
   assert.match(sheet, /t="n"><v>0<\/v>/); assert.match(sheet, /<c r="B\d+" s="0"\/>/);
   assert.match(sheet, /t="inlineStr"><is><t xml:space="preserve">=1\+1/);
