@@ -44,3 +44,20 @@ The first candidate browser attempt passed initial 320px then read Auth too earl
 No Preview, real account/student read/write, extension install, official portal control, push, integration, deployment, provider or Production check was performed. Sole controller/publisher owns those delivery steps and exact immutable/served parity. The two unchanged legacy N36 failures remain visible for that decision. The PO's authentic restored-account retest is still outstanding; N104 is not CLOSED.
 
 The shared browser phase lease is acquired with the exact active card/run and released after owned browser/context/server cleanup in finally. Owned loopback port: 49124. No user browser/profile, queue/status, other locks/processes or global config changed.
+
+## Saved-session continuation — validation scope blocker
+
+Continuation run: `ace76421-7c49-4dde-9e96-788e2de1c8c5`.
+Preserved Product candidate: `b02e8cabef131e812f2ebdd9bf55bc98cc3020b5`.
+The prior LOCAL_READY result was rejected: `Candidate validation: An affected check must pass and no recorded check may fail`. Returning LOCAL_READY with those two FAIL records was incorrect. They remain FAIL; the continuation does not suppress, rename or relabel them.
+
+Fresh read-only reconciliation verified a clean worktree at the saved candidate, matching current activated card/run, and exact equality of all five recorded browser application-source SHA256 values. The existing 36 PASS browser records, zero page errors, released browser lease and 14/14 scoped Node result are reused under their original run identity. No test, Preview or browser was repeated, and no new phase resources were acquired.
+
+The concrete repair is a bounded test-harness correction, but the current card omits both necessary paths:
+
+- `tests/n36-extension-direct-handoff.test.mjs`: compare the shipped ZIP entries and manifest hashes against the canonical tracked Git source bytes, with a separate comparison of checkout text allowing only Git's CRLF/LF conversion. Preserve archive hash/size, file-set, version, every file hash and real content-change rejection. Do not normalize or rebuild the shipped archive, modify global Git configuration, or merely drop byte-identity checks. This addresses the evidenced checkout conversion while retaining package provenance.
+- `tests/n36-koshoof-discoverability.test.mjs`: replace the superseded per-class `class-card__koshoof` source expectation with assertions for the existing central Classes → Koshoof entry and the central hub's guarded class selection, retaining the distinct class-hub Koshoof/report tools. The saved actual-DOM checks already exercise current class navigation and owner denial; they are not replaced by a source-text acceptance claim. Do not add obsolete Product links/CSS merely to satisfy the old regex.
+
+These are read-only prepared correction requirements, not applied changes or passing tests. Neither omitted test path is authorized by the fresh card's `allowedPaths`. No extension source/package, Product UI or global configuration needs changing for this repair. The worker cannot expand its own card, alter the validator, omit the failures to pass validation, or invoke a substitute maintenance role.
+
+Result: BLOCKED on the missing test-file scope. Retry only after the approved maintenance helper, during its separately guarded inactive-worker/idle-publisher window, adds these exact two paths to this same card and the controller resumes the saved session. Preserve the Product candidate/base and original evidence; then apply the two narrow test corrections and rerun those affected checks. Reuse unchanged UI evidence. No queue/status/lock changes, push or deployment occurred in this continuation.
