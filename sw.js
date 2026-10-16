@@ -64,6 +64,7 @@ const SHELL = [
   './src/lib/app-update.js',
   './src/router.js',
   './src/views/n88-student-invite-lab.js',
+  './src/views/n88-public-guest.js',
   './src/lib/n88-invite-lab.js',
   './src/store.js',
   './src/models.js',
@@ -205,6 +206,7 @@ self.addEventListener('install', (event) => {
       await Promise.all([
         './src/lib/score-distribution-copy.js?n100=automatic-safe-v1',
         './src/lib/app-update.js',
+        './src/views/n88-public-guest.js',
         './src/app.js',
         './src/store.js',
         './src/views/calendar.js',

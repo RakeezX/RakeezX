@@ -50,6 +50,21 @@
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <div id="modal-root"></div>
 
-  <script type="module" src="src/lib/app-update.js"></script>
+  <script type="module">
+    if (location.hash === '#/n88-invite-lab') {
+      // This public illustration never starts the account/workspace module graph.
+      addEventListener('hashchange', () => location.reload(), { once: true });
+      import('./src/views/n88-public-guest.js').catch(() => {
+        const message = document.createElement('p');
+        message.textContent = 'تعذّر تحميل نموذج الدعوة التجريبي. لا يوجد دخول فعلي أو بيانات طلاب. أعد تحميل الصفحة للمحاولة.';
+        const back = document.createElement('a');
+        back.href = './';
+        back.textContent = 'العودة لرَكيز المعلم';
+        document.getElementById('app').replaceChildren(message, back);
+      });
+    } else {
+      import('./src/lib/app-update.js');
+    }
+  </script>
 </body>
 </html>
