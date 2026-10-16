@@ -21,9 +21,25 @@ export function canOpenRoster(params) {
   return true;
 }
 
+// AI: one contextual status replaces hidden/inert roster actions. No repair or write.
+export function classAccessFeedback(params = {}) {
+  const status = store.classOperationsStatus(params.id);
+  if (!status) return '';
+  const messages = {
+    verification: ['يلزم التحقق من الحساب', 'افتح الإعدادات وتحقق من تسجيل الدخول بالحساب الذي استُعيدت بياناته، ثم عد إلى الفصل.'],
+    lease: ['انتهت صلاحية العمل دون اتصال', 'اتصل بالإنترنت واستخدم «التحقق من الحساب» أعلى الصفحة، ثم افتح الفصل مجددًا.'],
+    archived: ['سياق الفصل مؤرشف أو مغلق', 'عد إلى الفصول واختر فصلًا في السنة والفصل الدراسي النشطين.'],
+    ownership: ['تعذّر مطابقة الفصل مع الحساب النشط', 'عد إلى الفصول واختر فصلًا تابعًا للحساب الحالي. إذا استمرت المشكلة بعد الاستعادة، تحقق من الحساب في الإعدادات.'],
+  };
+  const [title, message] = messages[status];
+  return html`<section class="empty" role="status" data-class-access-status="${status}"><h2 class="empty__title" tabindex="-1">${title}</h2><p class="empty__text">${message}</p><a class="btn btn--quiet" href="#/classes">العودة للفصول</a></section>`;
+}
+
 function requireRoster(params, workspace = store.getActiveWorkspace()) {
   if (workspace === store.getActiveWorkspace() && canOpenRoster(params)) return true;
-  toast('تعذّر فتح كشف هذا الفصل. تحقق من الحساب والفصل النشط.', 'warn');
+  // A click can race a lease/owner refresh. Replace stale controls with the same
+  // contextual feedback as initial render, without opening a sheet or writing.
+  repaint();
   return false;
 }
 
@@ -174,6 +190,8 @@ export default {
   },
 
   render(p) {
+    const feedback = classAccessFeedback(p);
+    if (feedback) return feedback;
     const tch = store.getTeaching(p.id);
     if (!tch) return html`<div class="empty"><div class="empty__title">فصل غير موجود</div></div>`;
     if (store.isTeachingArchived(tch)) return html`<div class="empty"><div class="empty__title">الفصل مؤرشف</div><div class="empty__text">كشف الطلاب محفوظ للعرض التاريخي ولا يقبل تعديلات تشغيلية.</div></div>`;

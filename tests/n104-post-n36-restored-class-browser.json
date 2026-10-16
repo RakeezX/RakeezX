@@ -1,0 +1,334 @@
+{
+  "taskId": "continuous-n104-post-extension-restored-owner-class-journey-20261017",
+  "runId": "578aa07f-9d72-45b2-ba45-1036247a8ca9",
+  "baseSha": "a1e593d4fba7a415155256a2ddb222650cc89237",
+  "baseline": false,
+  "checks": [
+    {
+      "name": "restored_first_click_navigation_320_initial",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "restored_first_click_navigation_320_reload",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "denied_and_recovered_320_foreign-owner",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_320_restore-mismatch",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_320_archived",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_320_closed-term",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_320_wrong-session",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_320_expired-lease",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "direct_extension_entry_unavailable_320",
+      "status": "PASS",
+      "evidence": "Actual handoff entry/afterPaint executes; loopback correctly refuses extension claim, shows safe fallback and clears nonce. Installed MV3 transport and official portals NOT_RUN; unchanged prior N36 transport evidence retained."
+    },
+    {
+      "name": "restored_first_click_navigation_390_initial",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "restored_first_click_navigation_390_reload",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "denied_and_recovered_390_foreign-owner",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_390_restore-mismatch",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_390_archived",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_390_closed-term",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_390_wrong-session",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_390_expired-lease",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "direct_extension_entry_unavailable_390",
+      "status": "PASS",
+      "evidence": "Actual handoff entry/afterPaint executes; loopback correctly refuses extension claim, shows safe fallback and clears nonce. Installed MV3 transport and official portals NOT_RUN; unchanged prior N36 transport evidence retained."
+    },
+    {
+      "name": "restored_first_click_navigation_768_initial",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "restored_first_click_navigation_768_reload",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "denied_and_recovered_768_foreign-owner",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_768_restore-mismatch",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_768_archived",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_768_closed-term",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_768_wrong-session",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_768_expired-lease",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "direct_extension_entry_unavailable_768",
+      "status": "PASS",
+      "evidence": "Actual handoff entry/afterPaint executes; loopback correctly refuses extension claim, shows safe fallback and clears nonce. Installed MV3 transport and official portals NOT_RUN; unchanged prior N36 transport evidence retained."
+    },
+    {
+      "name": "restored_first_click_navigation_1280_initial",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "restored_first_click_navigation_1280_reload",
+      "status": "PASS",
+      "evidence": "Genuine begin/update/finalize receipt; current-document owner/database/device/registry checkpoint; empty+populated hub/Students paste/add, central N36 entry, file input, export/import/back; 12 stable paints and working change handler. No student/score/outbox changes."
+    },
+    {
+      "name": "denied_and_recovered_1280_foreign-owner",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_1280_restore-mismatch",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_1280_archived",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_1280_closed-term",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_1280_wrong-session",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "denied_and_recovered_1280_expired-lease",
+      "status": "PASS",
+      "evidence": "One safe status+next action; no class controls, transport or student/score/outbox writes; original requested class reopens on same route after valid context returns."
+    },
+    {
+      "name": "direct_extension_entry_unavailable_1280",
+      "status": "PASS",
+      "evidence": "Actual handoff entry/afterPaint executes; loopback correctly refuses extension claim, shows safe fallback and clears nonce. Installed MV3 transport and official portals NOT_RUN; unchanged prior N36 transport evidence retained."
+    }
+  ],
+  "measurements": [
+    {
+      "width": 320,
+      "phase": "initial",
+      "start": {
+        "x": 10,
+        "y": 683.859375,
+        "hash": "#/classes/koshoof?teaching=tch:0736e644-3a1b-48e3-aba2-1737a4abbfb0",
+        "paints": 25
+      },
+      "end": {
+        "x": 10,
+        "y": 683.859375,
+        "hash": "#/classes/koshoof?teaching=tch:0736e644-3a1b-48e3-aba2-1737a4abbfb0",
+        "paints": 38
+      }
+    },
+    {
+      "width": 320,
+      "phase": "reload",
+      "start": {
+        "x": 10,
+        "y": 683.859375,
+        "hash": "#/classes/koshoof?teaching=tch:0736e644-3a1b-48e3-aba2-1737a4abbfb0",
+        "paints": 22
+      },
+      "end": {
+        "x": 10,
+        "y": 683.859375,
+        "hash": "#/classes/koshoof?teaching=tch:0736e644-3a1b-48e3-aba2-1737a4abbfb0",
+        "paints": 34
+      }
+    },
+    {
+      "width": 390,
+      "phase": "initial",
+      "start": {
+        "x": 14,
+        "y": 632.671875,
+        "hash": "#/classes/koshoof?teaching=tch:c27c2995-2142-4d15-b822-104db0834d60",
+        "paints": 25
+      },
+      "end": {
+        "x": 14,
+        "y": 632.671875,
+        "hash": "#/classes/koshoof?teaching=tch:c27c2995-2142-4d15-b822-104db0834d60",
+        "paints": 38
+      }
+    },
+    {
+      "width": 390,
+      "phase": "reload",
+      "start": {
+        "x": 14,
+        "y": 632.671875,
+        "hash": "#/classes/koshoof?teaching=tch:c27c2995-2142-4d15-b822-104db0834d60",
+        "paints": 22
+      },
+      "end": {
+        "x": 14,
+        "y": 632.671875,
+        "hash": "#/classes/koshoof?teaching=tch:c27c2995-2142-4d15-b822-104db0834d60",
+        "paints": 34
+      }
+    },
+    {
+      "width": 768,
+      "phase": "initial",
+      "start": {
+        "x": 14,
+        "y": 511.890625,
+        "hash": "#/classes/koshoof?teaching=tch:5d165187-79ed-4506-8762-d92451bd2677",
+        "paints": 25
+      },
+      "end": {
+        "x": 14,
+        "y": 511.890625,
+        "hash": "#/classes/koshoof?teaching=tch:5d165187-79ed-4506-8762-d92451bd2677",
+        "paints": 38
+      }
+    },
+    {
+      "width": 768,
+      "phase": "reload",
+      "start": {
+        "x": 14,
+        "y": 511.890625,
+        "hash": "#/classes/koshoof?teaching=tch:5d165187-79ed-4506-8762-d92451bd2677",
+        "paints": 22
+      },
+      "end": {
+        "x": 14,
+        "y": 511.890625,
+        "hash": "#/classes/koshoof?teaching=tch:5d165187-79ed-4506-8762-d92451bd2677",
+        "paints": 34
+      }
+    },
+    {
+      "width": 1280,
+      "phase": "initial",
+      "start": {
+        "x": 48,
+        "y": 541.890625,
+        "hash": "#/classes/koshoof?teaching=tch:d3f80a42-6bbd-48ce-a80b-6150b9ba3b38",
+        "paints": 25
+      },
+      "end": {
+        "x": 48,
+        "y": 541.890625,
+        "hash": "#/classes/koshoof?teaching=tch:d3f80a42-6bbd-48ce-a80b-6150b9ba3b38",
+        "paints": 38
+      }
+    },
+    {
+      "width": 1280,
+      "phase": "reload",
+      "start": {
+        "x": 48,
+        "y": 541.890625,
+        "hash": "#/classes/koshoof?teaching=tch:d3f80a42-6bbd-48ce-a80b-6150b9ba3b38",
+        "paints": 22
+      },
+      "end": {
+        "x": 48,
+        "y": 541.890625,
+        "hash": "#/classes/koshoof?teaching=tch:d3f80a42-6bbd-48ce-a80b-6150b9ba3b38",
+        "paints": 34
+      }
+    }
+  ],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "currentCase": {
+    "width": 1280,
+    "kind": "expired-lease",
+    "path": "#/classes/koshoof?teaching=tch:d3f80a42-6bbd-48ce-a80b-6150b9ba3b38"
+  },
+  "authUserReads": 4,
+  "release": "RELEASED browser",
+  "sourceHashes": {
+    "src/app.js": "7820c3f0e1e202b576ed54e1277a7c04b241cd8e8d96e421a7113d544e149a01",
+    "src/store.js": "7e19b6a7dc637f2f4d6d4df009938d4600b1a439f574431ab8e57f1c4d21bf92",
+    "src/views/students.js": "7e25725be789a4a6c2d7111f24bf59b59cb198dcadb7398142548f3a85bdcd75",
+    "src/views/teaching-hub.js": "c30324d63f441c0a6590b757173a75aa7708eaf8cd8f16e00ee08e82b13d3e84",
+    "src/views/class-import-center.js": "4acb7efd9ab4ab59b9a220eee2378c3e0902cf147dbca667ed0aa591365b4e6c"
+  }
+}

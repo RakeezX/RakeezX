@@ -6,7 +6,7 @@ import { gradeLabel, todayISO, studentTotal, sectionLabel, ATTENDANCE, GRADES, S
 import { go } from '../router.js';
 import { repaint } from '../repaint.js';
 import { activeGoalSummary, watchActiveGoalTimer } from './class-rules.js';
-import studentsView, { canOpenRoster } from './students.js';
+import studentsView, { canOpenRoster, classAccessFeedback } from './students.js';
 import teachingsView, { addSubjectToClass } from './teachings.js';
 
 const TOOLS = (id) => [
@@ -75,6 +75,8 @@ export default {
   back: () => '#/classes',
 
   render(p) {
+    const feedback = classAccessFeedback(p);
+    if (feedback) return feedback;
     const tch = store.getTeaching(p.id);
     if (!tch) {
       return html`
