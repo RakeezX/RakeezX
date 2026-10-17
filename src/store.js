@@ -2710,7 +2710,7 @@ export function reviewClassImport(group) {
     names: Object.freeze([...canonical.preview.names]), yearId: activeYear().id, termId: activeTerm().id };
   classImportReviews.set(review, { workspace, session: cloud.session, source: JSON.stringify(review),
     year: JSON.stringify(activeYear()), term: JSON.stringify(activeTerm()), section: null, teaching: null,
-    deviceTerm: JSON.stringify([state.device.activeYearId, state.device.activeTermId]),
+    deviceTerm: JSON.stringify([state.device.activeYearId, state.device.activeTermId]), students: [],
     sectionFingerprint: null, teachingFingerprint: null, added: 0, busy: false });
   return Object.freeze(review);
 }
@@ -2758,7 +2758,8 @@ export function classImportReceipt(review) {
   // Do not expose a previous account's draft after callback/account drift.
   if (receipt.workspace !== activeWorkspace || cloud.user?.id !== activeWorkspace.authUserId && activeWorkspace.type === 'account') return null;
   return { sectionId: receipt.section?.id ?? null, teachingId: receipt.teaching?.id ?? null,
-    added: receipt.added, pendingNames: receipt.added ? [] : [...review.names] };
+    added: receipt.added, pendingNames: receipt.added ? [] : [...review.names],
+    students: receipt.students.map(row => ({ ...row })) };
 }
 // A new explicit review may rebind an expired/refreshed same-owner session.
 // Callback drift during the later confirmation still rejects the write.
@@ -2796,6 +2797,7 @@ export async function confirmClassImport(review, approved = false) {
       verifyClassImport(review, receipt);
       const result = await importStudents(receipt.section.id, review.names, guard);
       receipt.added = result.added;
+      receipt.students = result.students;
       verifyClassImport(review, receipt);
     }
     return classImportReceipt(review);
@@ -3618,7 +3620,8 @@ export async function importStudents(secId, names, { verifyCurrent, signal } = {
     });
     applyCommittedPuts(committed);
   }
-  return { added: students.length, skippedInvalid, skippedOverLimit };
+  return { added: students.length, skippedInvalid, skippedOverLimit,
+    students: students.map(({ id, name }) => ({ id, name })) };
 }
 
 /**
