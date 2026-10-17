@@ -1,0 +1,45 @@
+{
+  "taskId": "continuous-n88-complete-runtime-binding-20261018",
+  "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "startedAt": "2026-10-17T22:17:01.747Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+      "status": "PASS",
+      "evidence": "Actual loopback HTTP + existing client + composed runtime + native PG repository; explicit teacher publication/update; same PIN/private entry second term; rotate/revoke. Only identity/source rows/TLS transport fabricated; no UI claim."
+    },
+    {
+      "name": "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight",
+      "status": "PASS",
+      "evidence": "Current Auth user/session vs metadata/foreign owner, stale/ambiguous membership, scoped Secure cookie and duplicate refusal, forwarded/origin refusal, source retraction, JSON/body limits/deadline/concurrency and inactive/missing-port preflight. Native SHARE lock blocks noncooperating source writer (55P03)."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "syntheticIngress": {
+    "hostMatches": true,
+    "directTls": true
+  },
+  "lastHttpStatus": 413,
+  "expectedMissingSourceSqlstate": "42P01",
+  "httpClosed": true,
+  "finishedAt": "2026-10-17T22:17:13.813Z",
+  "sourceSha256": {
+    "drafts/n88-student-portal/runtime.mjs": "957d75615f933b5f229cf926ddf8757f199e6450013f8959027dc696a6d64fd8",
+    "drafts/n88-student-portal/http-adapter.mjs": "d6123cee15284efb0fa301baa1eb6146debb562b9a2a72b655f17dceebdcd3c4",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "dc15e0acaa3418e33195cdf2e027202fb555bb2af1ef73299b13013de4fd77ac",
+    "drafts/n88-student-portal/postgres-repository.mjs": "9c9d32307edac545b6a80a57773ef9970565908bdedad2e0709887488ae8aa3d",
+    "drafts/n88-student-portal/canonical-lock.inactive.sql": "8b225818edea1eaea209fa7f0870aa62bdb9656e67a5d9461510a7016ef1fcfc",
+    "tests/fixtures/n88-runtime-binding/journey.mjs": "d246b53ff81ff026bf661720de129dae1640e02de26d2c90c047bf67c08e1fa1"
+  }
+}

@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 /** AI: INACTIVE trusted-server pilot port. No driver/network/Auth/config defaults.
  * All writers must use this SAME global transaction lock. Small, bounded snapshots
  * serialize even async teacher verification: unsuitable for public production scale.
@@ -12,13 +13,13 @@ const tables = {
   contexts: { sql: 'contexts', pk: ['namespace'], fields: ['namespace','ownerId','active'],
     cols: ['namespace','owner_id','active'] },
   memberships: { sql: 'memberships', pk: ['owner_id','class_id','student_id','enrollment_id'],
-    fields: ['ownerId','classId','studentId','enrollmentId','revision','status','endDate','studentActive','classActive','label'],
-    cols: ['owner_id','class_id','student_id','enrollment_id','revision','status','end_date','student_active','class_active','label','active'] },
+    fields: ['ownerId','classId','studentId','enrollmentId','revision','status','endDate','studentActive','classActive','label','canonicalStamp'],
+    cols: ['owner_id','class_id','student_id','enrollment_id','revision','status','end_date','student_active','class_active','label','canonical_stamp','active'] },
   credentials: { sql: 'credentials', pk: ['id'], fields: ['id','namespace','ownerId','studentId','version','verifier','entryVerifier','revokedAt'],
     cols: ['id','namespace','owner_id','student_id','version','verifier','entry_verifier','revoked_at'] },
   sessions: { sql: 'sessions', pk: ['id'],
-    fields: ['id','credentialId','namespace','ownerId','classId','studentId','enrollmentId','version','membershipRevision','entryVerifier','tokenHash','expiresAt','revokedAt'],
-    cols: ['id','credential_id','namespace','owner_id','class_id','student_id','enrollment_id','version','membership_revision','entry_verifier','token_hash','expires_at','revoked_at'] },
+    fields: ['id','credentialId','namespace','ownerId','classId','studentId','enrollmentId','version','membershipRevision','entryVerifier','tokenHash','expiresAt','revokedAt','canonicalStamp'],
+    cols: ['id','credential_id','namespace','owner_id','class_id','student_id','enrollment_id','version','membership_revision','entry_verifier','token_hash','expires_at','revoked_at','canonical_stamp'] },
   publications: { sql: 'publications', pk: ['id'],
     fields: ['id','ownerId','classId','studentId','enrollmentId','source','title','instruction','deadline','status','published'],
     cols: ['id','owner_id','class_id','student_id','enrollment_id','source_teaching_id','source_item_id','title','instruction','deadline','status','published'] },
@@ -45,6 +46,7 @@ function validate(name, r) {
   if (Object.hasOwn(r,'namespace')) namespace(r.namespace);
   for (const k of ['version','revision','membershipRevision']) if (Object.hasOwn(r,k)) safe(r[k],1);
   for (const k of ['verifier','entryVerifier','tokenHash']) if (Object.hasOwn(r,k)) hex(r[k]);
+  if (Object.hasOwn(r,'canonicalStamp')) hex(r.canonicalStamp);
   if (Object.hasOwn(r,'revokedAt') && r.revokedAt !== null) time(r.revokedAt);
   if (name === 'contexts') bool(r.active);
   if (name === 'memberships') {
@@ -116,6 +118,7 @@ function transitions(before,after) {
   for(const [key,a] of before.sessions) {
     const b=after.sessions.get(key); if(!b) continue;
     must(a.slice(0,12).every((v,i)=>v===b[i])); must(a[12]===null || a[12]===b[12]);
+    must(a[13]===b[13]);
   }
 }
 /** Explicit bounds required, including aggregate row/byte caps. No truncation.
@@ -123,7 +126,8 @@ function transitions(before,after) {
  * Timed-out callbacks own only a detached draft; fences prevent ALL later flushes.
  * Pool must itself bound connections/queue and release(error) must destroy client.
  */
-export function createPostgresRepository({ acquire, limits, timing }) {
+export function createPostgresRepository({ acquire, limits, timing, synchronize = async () => {} }) {
+  must(typeof synchronize === 'function');
   must(typeof acquire==='function'); exact(limits,[...names,'total','bytes','rowBytes']);
   for(const k of names) safe(limits[k],1,10000);
   safe(limits.total,1,50000); safe(limits.bytes,1024,64*1024*1024); safe(limits.rowBytes,128,32768);
@@ -164,7 +168,15 @@ export function createPostgresRepository({ acquire, limits, timing }) {
         bytes+=Buffer.byteLength(JSON.stringify(state[name])); must(bytes<=limits.bytes);
       }
       const original=snapshot(state,limits);
-      const value=await action(state); fence();
+      // Trusted runtime canonical binding participates in THIS transaction/lock and
+      // durable diff. The fenced query capability cannot outlive the transaction.
+      const owners=new Set(),commitGuards=[];
+      const beforeCommit=check=>{fence();must(typeof check==='function' && commitGuards.length<8);commitGuards.push(check);};
+      const synchronizeOwner=async ownerId=>{
+        fence(); uuid(ownerId); if(owners.has(ownerId)) return;
+        await synchronize(state,{query},ownerId); fence(); snapshot(state,limits); owners.add(ownerId);
+      };
+      const value=await action(state,Object.freeze({query,synchronizeOwner,beforeCommit})); fence();
       // Neither the callback's retained references nor its result can alter the flush.
       const final=snapshot(structuredClone(state),limits), result=structuredClone(value);
       transitions(original,final); fence();
@@ -179,6 +191,7 @@ export function createPostgresRepository({ acquire, limits, timing }) {
         for(const [key,row] of final[name]) if(!original[name].has(key))
           must((await query(queries[name].insert,row)).rowCount===1);
       }
+      for(const check of commitGuards){await check();fence();}
       const ack=await query('commit'); must(ack.command==='COMMIT'); committed=true;
       return result; // No response/cookie/PIN until acknowledged durable commit.
     })();

@@ -1,0 +1,131 @@
+# N88 — inactive existing-host activation artifact
+
+AI-authored. This is executable source, not an activated service. Both platform
+artifacts remain disabled. The application, Auth flow, Sync, storage, calendar,
+router and Service Worker do not import these server modules.
+
+## Completed concrete bindings
+
+`supabase/functions/n88-student-portal/index.ts` calls the actual Web Request
+composition in `existing-host.mjs` / `web-entry.mjs`. It uses a bounded `pg` pool,
+verified database TLS and readback of `current_user=n88_backend`. Direct project
+DB and Supavisor role-qualified usernames are supported; no direct TLS Node web
+server, new account or purchased host is required. Importing modules does not
+read config, open a listener or contact a service. Disabled handling reads only
+`N88_ENABLED` and returns a private 503.
+
+`auth-verifier.mjs` uses pinned official `AuthClient.getClaims(token)` for
+cryptographic verification (or the SDK's Auth-server verification for symmetric
+keys), validates verified issuer/audience/role/expiry/iat/nbf/session UUID, locks
+the exact user/session through `auth-session.inactive.sql`, and always calls fresh
+`getUser` with that same bearer. It ignores user_metadata and request owner/session
+claims. No getSession, refresh, email, OAuth callback, decoded-only JWT parser or
+future introspection endpoint is involved. The exact session/user rows stay locked
+through portal commit. A pre-commit guard rechecks JWT/session expiry. Provider
+work has a 2s abort deadline inside the bounded 8s repository/11s entry chain.
+Existing Auth configuration and its issuer/session policies require readback;
+this package changes none of them.
+
+`cloudflare-entry.mjs` is the disabled module Worker for the existing application's
+`/api/n88/*` route. It requires provider `request.cf` TLS metadata and
+CF-Connecting-IP; CF-Worker subrequests are rejected. X-Forwarded-For and arbitrary
+forwarded headers never establish identity. It builds its own allowlist, HMACs a
+canonical source key and signs method, public origin, original private path,
+headers, body digest, timestamp and nonce. Supabase accepts only this signed
+transport, with durable replay consumption under the existing N88 transaction
+lock. The upstream URL is always `/functions/v1/n88-student-portal/dispatch`.
+Private path, PIN, bearer and cookie travel only in its TLS body, including the
+upstream response cookie. Supabase invocation URL/headers contain no raw private
+entry, bearer or cookie. Only the Cloudflare boundary emits the browser cookie.
+No client retry, redirect, cache, fixture fallback or automatic issue replay exists.
+
+## Canonical atomicity and scope
+
+The original bounded global **private N88** snapshot/advisory lock, budget limits,
+credential tombstones and durable commit remain. Canonical synchronization now
+happens only for the verified current owner: after teacher authentication, after
+claim guess debits and matching private entry/PIN, or after resolving an existing
+student session. Invalid guesses do not trigger a global canonical scan.
+
+`lock_canonical_sources(owner,max)` takes FOR UPDATE on ONE auth.users key.
+All seven canonical owner FKs reference that key with immediate validation: new
+rows and transfers into that owner must take conflicting FK KEY SHARE locks.
+Then it locks only that owner's existing rows, including tombstones, in fixed
+order with per-table caps. Updates/restores/deletes cannot slip between projection
+and durable commit. No table SHARE locks and no assumed N88 cooperation by Sync
+writers are used. Another owner's source writes remain possible. Source PK/FK,
+RLS and monotonic revision trigger identities are activation prerequisites.
+Same-owner writers may wait or deadlock; bounded lock/statement/transaction limits
+abort safely without replay. This is still a bounded pilot repository, not a claim
+of unlimited scale or lock-free same-owner Sync.
+
+Memberships retain the actual enrollment revision and add a separate SHA256 lineage
+stamp of enrollment/student/section/year revisions. Sessions bind to both. Observed
+invalid sessions are durably retired; archive/restore between reads also changes
+lineage. Item/teaching/term revision changes produce a new UNPUBLISHED projection,
+so a restored source cannot silently regain publication. Existing teacher-authored
+title/instruction/status survive revision replacement when the previous projection
+is still present; it remains unpublished until explicit approval. Canonical IDs/revisions
+must not be reused/reset by a privileged purge; such a new physical lifecycle needs
+explicit credential/context retirement, not bypassing the canonical contract.
+No source, score, enrollment or grade writes occur in these bindings.
+
+The owner+student credential and private entry remain stable into the second term.
+PIN is random 1000..9999, with 9000 tombstoned lifetime values per owner and explicit
+teacher rotation/revocation. Current membership ambiguity, owner, source and term
+checks continue to gate every read. The response contains only published task
+fields and progress; no student name, class, owner, scores or source IDs.
+
+## Exact external activation inputs / operations — NOT performed
+
+1. Obtain the separate bounded hosted service/schema/private-role authorization.
+   Read actual migration/helper identities first; never reapply a migration by
+   guessing. The proposed FRESH private schema sequence is `schema-proposal.sql`,
+   `postgres-repository-schema.sql`, `canonical-state-schema.inactive.sql`,
+   `canonical-lock.inactive.sql`, `auth-session.inactive.sql`, `ingress.inactive.sql`,
+   then `roles.inactive.sql`. Existing private rows require an explicitly reviewed
+   backfill/session-retirement migration; no default lineage or automatic migration
+   is supplied. Original qualified schema/history remains intact. Keep n88_private
+   unexposed to Data API/GraphQL. Proposed roles are NOLOGIN `n88_guard` and privately
+   provisioned `n88_backend`; no browser membership, canonical writes, Auth scan,
+   BYPASSRLS or service_role credential is granted to the backend. The proposed RLS
+   policies name only those private roles; existing owner/Sync policies are unchanged.
+2. Execute `readback.inactive.sql` using the separately authorized backend/auditor
+   phases. Verify exact column/helper/role/RLS/PK/FK/revision-trigger identities and
+   bounded permissions. Auth sessions must supply id/user_id/not_after, and the
+   exact helper must operate under actual Auth table permissions/RLS. Existing Auth
+   URL, issuer, signing-key/JWKS, audience and session-policy facts must match; no
+   Auth setting or flow changes. Prove these service prerequisites and the targeted
+   owner/lifecycle/session behavior on a separately authorized hosted synthetic
+   fixture before any real student access. Local SQL is not hosted identity proof.
+3. The secret custodian supplies existing project values privately to Edge:
+   `N88_PUBLIC_ORIGIN`, `N88_AUTH_URL`, `N88_AUTH_API_KEY` (existing public Auth API
+   key), `N88_DATABASE_URL` (restricted role, no SSL URL override parameters), and
+   optional `N88_DATABASE_CA_CERT` for the approved DB CA. Supply two DISTINCT
+   32-byte lowercase hex secrets `N88_HMAC_KEY` and `N88_INGRESS_KEY` through private
+   environment custody. HMAC rotation requires credential revocation planning.
+   Cloudflare receives only `N88_PUBLIC_ORIGIN`, `N88_EDGE_URL` (existing Supabase
+   function URL) and the shared ingress key. No value is present in this artifact.
+4. Read back private logging/custody at both providers: no incoming Cloudflare
+   private URL, bearer, cookie, body/PIN or SQL parameter/error DETAIL in request,
+   error, tracing, analytics or Logpush sinks; no upstream body capture. Worker
+   observability is disabled in `wrangler.inactive.toml`; this does not prove zone
+   logging disposition. Confirm external ingress, no Worker subrequests, consistent
+   client IP transformation (including IPv6/Pseudo IPv4), hostname/TLS and secret
+   isolation. The source signature does not prove hosted TLS or provider settings.
+5. After those service proofs, approve the concrete deployment/configuration diff:
+   deploy the Edge entry with its function-local pinned deno.json/deno.lock, merge
+   the inactive TOML fragment with the appropriate function gateway configuration,
+   set `N88_SERVICE_REVISION=n88-existing-host-v1` and explicitly enable the Edge
+   and ONLY the existing application's Cloudflare `/api/n88/*` route. Set
+   `N88_ENABLED=true` on both only after readback. These configuration values are
+   switches, not proof of authorization or service readiness. Context registration
+   (owner/private namespace) is a separate authorized private operation. The generic
+   frontend publisher cannot apply any of these service/configuration operations.
+6. Only after service prerequisites are proven, separately authorize the existing
+   teacher/student UI wiring and hosted app/device/private-handoff checks. Reuse
+   the existing client, DOM/CSS and date adapters. No live student access, real send,
+   real-data mutation, page wiring, provider deploy or PO acceptance occurred here.
+
+Current local evidence and retained original failures are recorded in
+`docs/automation-evidence/20261018/N88_EXISTING_HOST_COMPLETION.md`.

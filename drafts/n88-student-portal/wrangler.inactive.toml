@@ -1,0 +1,12 @@
+# AI: deployable module source for existing Cloudflare infrastructure; no route.
+name = "rakeez-n88-private-ingress"
+main = "cloudflare-entry.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = false
+preview_urls = false
+[vars]
+N88_ENABLED = "false"
+# Separately approved bindings: N88_PUBLIC_ORIGIN, N88_EDGE_URL; secret N88_INGRESS_KEY.
+# Bind ONLY existing application's /api/n88/* after service + private log readbacks.
+[observability]
+enabled = false

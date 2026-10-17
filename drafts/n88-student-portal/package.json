@@ -1,0 +1,7 @@
+{
+  "name": "n88-inactive-server",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "dependencies": { "@supabase/auth-js": "2.118.0", "pg": "8.23.1" }
+}

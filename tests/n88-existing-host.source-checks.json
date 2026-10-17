@@ -1,0 +1,12 @@
+{
+  "taskId": "continuous-n88-existing-host-auth-and-current-state-20261018",
+  "runId": "5c01ec9b-e0cc-478e-8033-515690fc31f0",
+  "checkedAt": "2026-10-17T22:58:17.702Z",
+  "checks": [
+    {
+      "name": "inactive_existing_host_config_pinned_packages_and_syntax",
+      "status": "PASS",
+      "evidence": "Disabled entry reads only N88_ENABLED; malformed/admin/SSL-override/same-key configs rejected; lazy direct/Supavisor compositions close without network. Exact npm/Deno package versions and integrity match; v4 lock; affected 14 module syntax checks; no app/startup/SW/root package change."
+    }
+  ]
+}
