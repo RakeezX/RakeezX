@@ -162,3 +162,35 @@ and worktree; the scoped worker applies the prepared harness correction and runs
 the corrected original 16-case boundary suite once. Do not requeue unchanged,
 omit its failure from a LOCAL_READY result or rerun the completed crypto proof.
 No maintenance task/worker was created, and no queue, STOP or lock was touched.
+
+## Scope repair applied — current local candidate ready
+
+Current run: `84e54815-c67b-4457-9948-ba4d9b74ecc1`; saved session
+`01a14c02-17a2-7960-a0d8-d8eb5a4ab3bb` and candidate
+`0e7596dd9c6e16a04bf684bbcdd71976ecf230d4` preserved.
+The activated card now expressly includes `tests/n44-server-preactivation.test.mjs`.
+Before editing, its bytes matched the approved SHA256
+`779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1`.
+Applied only the preflight's `addImport` and exact four-line replacement.
+All 15 other cases and the forbidden-capability subprocess remain unchanged;
+no Product implementation, permission, key, dependency or guard was changed.
+
+Executed the corrected **original** suite once:
+`node --test --test-reporter=tap tests/n44-server-preactivation.test.mjs`.
+Result: **16 tests, 16 PASS, 0 FAIL**, including the actual no-import/construction
+check. `existing_boundary_suite` is now PASS on that execution; both historical
+FAIL receipts remain untouched. Exact case names, command/exit status, current
+test/helper source hashes and reused-proof provenance are recorded in
+[`tests/n44-crypto-sender.boundary-repair-result.json`](../../../tests/n44-crypto-sender.boundary-repair-result.json).
+
+The prior 18 protocol cases remain reused, not rerun: every recorded source hash
+still matches except the explicitly authorized legacy test, whose replacement
+now has the 16/16 result above. Both required protocol/guard groups retain PASS.
+No crypto, SQL, Preview, app/SW, real account, hosted service, device, provider
+connection or Production check was repeated. No long-lived process/server/browser
+was started and no phase lease was needed. No queue/status or lock was edited.
+
+The self-imposed test-scope blocker is resolved. The current result is
+**LOCAL_READY for inactive source-only integration** by the original publisher.
+The exact existing-host/service/Auth/context/ingress/scheduler/app/SW prerequisites
+documented above still apply; hosted verification stays NOT_RUN and N44 stays open.

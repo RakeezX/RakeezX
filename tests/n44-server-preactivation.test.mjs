@@ -1,3 +1,4 @@
+import { assertNoPrivatePushImports } from './n44-crypto-sender-import-guard.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -255,10 +256,7 @@ test('inactivity/privacy: imports and construction have no capability side effec
     const delivery = await import('./drafts/n44-push/delivery.mjs');
     registration.createRegistrationBoundary({}); delivery.createDeliveryBoundary({});`;
   execFileSync(process.execPath, ['--input-type=module', '-e', code], { cwd: new URL('..', import.meta.url), stdio: 'pipe' });
-  const imports = spawnSync('git', ['grep', '-n', '-E', 'drafts/n44-push|n44-push/(registration|delivery|shared)', '--',
-    'src', 'supabase', 'scripts', 'sw.js', 'index.html'], { encoding: 'utf8', stdio: 'pipe' });
-  assert.equal(imports.status, 1, imports.stdout + imports.stderr); // git's no-match status
-  assert.equal(imports.stdout, '');
+  assertNoPrivatePushImports();
 });
 
 test('gate: documented SQL/live NOT_RUN and concrete remaining activation gates', () => {
