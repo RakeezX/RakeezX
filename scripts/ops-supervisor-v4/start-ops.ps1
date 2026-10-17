@@ -38,7 +38,7 @@ if (-not [IO.File]::Exists([string]$config.controller.codexPath)) {
     if ([IO.File]::ReadAllText($configFile, [Text.Encoding]::UTF8) -cne $configText) {
       throw 'Controller config changed while resolving Codex path'
     }
-    [IO.File]::Replace($temp, $configFile, $null)
+    [IO.File]::Replace($temp, $configFile, [NullString]::Value)
   } finally {
     if ([IO.File]::Exists($temp)) { [IO.File]::Delete($temp) }
   }
