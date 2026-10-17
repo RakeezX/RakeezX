@@ -189,6 +189,26 @@ function allowed(file, patterns) {
     return new RegExp('^' + expression + '(?:/.*)?$').test(normalize(file));
   });
 }
+export function verifiedSourceOnlyPublication(task, receipt) {
+  const authority = task?.preparationAuthority;
+  const changed = receipt?.changedPaths, sourceOnly = receipt?.sourceOnlyPaths;
+  const verificationPaths = task?.verificationPaths, evidence = receipt?.evidence;
+  const servedExactly = (part, wanted) => Array.isArray(part?.assets) && part.assets.some(asset =>
+    normalize(asset.repoPath) === normalize(wanted) && asset.verified === true && asset.deleted !== true
+    && /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')
+    && (asset.observedSha256 === asset.expectedSha256 || asset.normalizedSha256 === asset.expectedSha256));
+  return ['local','synthetic'].includes(task?.executionMode) && task?.liveMutation !== true && !task?.liveAuthorizationRef
+    && authority?.publication === true && /\b(?:inert|inactive)\b/i.test(String(authority.publicationScope ?? ''))
+    && /source-only/i.test(String(task?.releaseAuthority ?? ''))
+    && receipt?.state === 'DEPLOYED_AWAITING_PO' && receipt.productionDeployed === true && receipt.closed === false
+    && receipt.productSourceChangeObserved === false && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length === 0
+    && Array.isArray(changed) && changed.length > 0 && changed.every(file => allowed(file, task.allowedPaths ?? []))
+    && Array.isArray(sourceOnly) && sourceOnly.length > 0 && sourceOnly.every(file => changed.includes(file) && allowed(file, task.allowedPaths ?? []))
+    && Array.isArray(verificationPaths) && verificationPaths.length > 0
+    && verificationPaths.every(file => allowed(file, task.allowedPaths ?? [])
+      && servedExactly(evidence?.immutable, file) && servedExactly(evidence?.production, file));
+}
+
 export function verifiedDeployment(task, receipt, productionUrl = 'https://rakeezx.com') {
   const binding = receipt?.binding, provider = receipt?.provider, proof = receipt?.evidence;
   return receipt?.status === 'deployed' && receipt.taskId === task.id && receipt.ticketId === task.productId
@@ -197,7 +217,8 @@ export function verifiedDeployment(task, receipt, productionUrl = 'https://rakee
     && binding.candidateAncestorOfPublished === true && binding.previousMainAncestorOfPublished === true && binding.mainContainsPublished === true
     && provider?.headSha === receipt.publishedSha && provider.status === 'completed' && provider.conclusion === 'success'
     && receipt.deploymentId === provider.deploymentId && Boolean(receipt.deploymentId)
-    && receipt.productSourceChangeObserved === true && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length > 0
+    && (receipt.productSourceChangeObserved === true && Array.isArray(receipt.changedAssets) && receipt.changedAssets.length > 0
+      || verifiedSourceOnlyPublication(task, receipt))
     && proof?.production?.origin === new URL(productionUrl).origin && proof?.immutable?.origin === provider.previewUrl
     && [proof?.immutable, proof?.production].every(part => part?.passed === true && Array.isArray(part.assets) && part.assets.length > 0
       && part.assets.every(asset => asset.verified === true && (asset.deleted || /^[a-f0-9]{64}$/.test(asset.expectedSha256 ?? '')
