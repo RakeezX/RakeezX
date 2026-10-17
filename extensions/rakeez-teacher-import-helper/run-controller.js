@@ -32,10 +32,38 @@ function armReview(){
 function clearPreview(continuing=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;}
 function stop(code='CANCELLED',diagnostic=null,context=null){
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
- generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
+ cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
  announce(diagnostic?.stage==='link-discovery'&&code==='READ_LINKS_UNAVAILABLE'?`عُرفت معالم صفحة المعلم، لكن لم توجد روابط قراءة مسموحة (${code}). مُسحت المعاينة؛ انسخ التشخيص المحدود لاكتشاف الروابط، وليس طلب اختيار دور جديد.`:diagnostic?`توقف ${stageLabel(diagnostic.stage)} (${code}). لم تُجمع ${kindLabel(diagnostic.category)} ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد ${diagnostic.structure?'بنية الدور الظاهرة دون أسماء أو روابط':'المسار المطلوب'}؛ تكرار المحاولة نفسها لن يغيّر الرفض.`:context?`توقف ${stageLabel(context.stage)} (${code}). لم تُجمع ${kindLabel(context.kind)} ومُسحت المعاينة؛ لا نجاح لهذه الفئة.`:`توقف التشغيل (${code}). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.`);
+}
+// AI: cancel only this run's source-context requests; never navigate to recover a fetch.
+function cancelReports(active){
+ if(!active?.tabId)return;
+ chrome.scripting.executeScript({target:{tabId:active.tabId,frameIds:[0]},world:'ISOLATED',func:()=>{for(const c of globalThis.rakeezReportRequests?.values()??[])c.abort();}}).catch(()=>{});
+ active.fetches?.clear();
+}
+async function readReport(next,ticket,alive){
+ const active=job;await inspect(active.tabId,active.origin,'guard',alive);current(ticket);
+ const source=await chrome.tabs.get(active.tabId),sourceURL=source.url;
+ const reportPath=new URL(next.path,active.origin).pathname;
+ if(active.reportPath&&active.reportPath!==reportPath)throw Error('REPORT_CONTEXT_CHANGED');
+ active.reportPath=reportPath;
+ const pending=[next,...active.routes.filter(r=>r.kind==='students'&&new URL(r.path,active.origin).pathname===reportPath)];
+ for(const r of pending){
+  const key=r.path+'|'+(r.rowOffset??0);if(active.fetches.has(key))continue;
+  if(active.fetches.size>=3)break;
+  safeRoute(active.origin,r.path,active.context);
+  const promise=chrome.scripting.executeScript({target:{tabId:active.tabId,frameIds:[0]},world:'ISOLATED',func:readSourceReportPage,args:['fetch',{...active.context,path:r.path,sourceURL,rowOffset:r.rowOffset??0,requestId:ticket+'|'+key,remainingMs:active.deadline-Date.now()}]})
+   .then(results=>results.length===1&&results[0].frameId===0?results[0].result:{ok:false,code:'SOURCE_BINDING_CHANGED'})
+   .catch(()=>({ok:false,code:'REPORT_FETCH_FAILED'}));
+  active.fetches.set(key,promise);
+ }
+ const key=next.path+'|'+(next.rowOffset??0),value=await active.fetches.get(key);active.fetches.delete(key);
+ current(ticket);await inspect(active.tabId,active.origin,'guard',alive);current(ticket);
+ if((await chrome.tabs.get(active.tabId)).url!==sourceURL)throw Error('SOURCE_CONTEXT_CHANGED');
+ if(!value?.ok){const e=Error(value?.code??'REPORT_FETCH_FAILED');e.incomplete=true;throw e;}
+ return value;
 }
 function current(ticket){if(ticket!==generation||!job)throw Error('CANCELLED');if(Date.now()>=job.deadline)throw Error('TIME_LIMIT');}
 async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadline=job?.gatewaySettleUntil??Date.now()+6000){
@@ -86,7 +114,7 @@ function sourcePageSeen(origin,path){
  const u=new URL(path,origin),keys=['page','pagenumber'];
  const series=job.series.get(u.pathname+'?'+JSON.stringify([...u.searchParams].filter(([k])=>!keys.includes(k.toLowerCase())).sort()));
  const page=Number([...u.searchParams].find(([k])=>keys.includes(k.toLowerCase()))?.[1]??1);
- return !!series&&Number.isSafeInteger(page)&&page<=series.last;
+ return !!series&&Number.isSafeInteger(page)&&series.pages.has(page);
 }
 async function start(tabId){
  if(job||review)stop('NEW_RUN');const ticket=++generation;
@@ -97,7 +125,7 @@ async function start(tabId){
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
-  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0};
+  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),fetches:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0};
   const timeout=setTimeout(()=>{if(ticket===generation&&job)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds);job.timer=timeout;
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
@@ -116,7 +144,10 @@ async function start(tabId){
     const labels={role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'};
     const target=safeRoute(origin,next.path,next.context??job.context);if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(job.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');job.roleSwitchUsed=true;}announce(`التقدم: صفحة ${job.pages}، ${labels[next.kind]}. قراءة فقط داخل ${new URL(origin).hostname}.`);
     job.readOffset=next.rowOffset??0;
-    try{await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+8000;next.page=await inspect(tabId,origin,next.kind,alive);current(ticket);}
+    try{
+     if(next.kind==='students'&&/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(new URL(target).pathname))next.page=await readReport(next,ticket,alive);
+     else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+8000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
+    }
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
      const redundant=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname)&&reportsComplete(job.series)&&job.sourceRows.length>0&&!job.warnings.some(w=>w.category==='students')&&!job.routes.some(r=>r.kind==='students');
      if(e.observedRows)job.studentRowsSeen+=e.observedRows;
@@ -134,10 +165,10 @@ async function start(tabId){
    job.excluded+=(page.excluded??0)+(page.duplicates??0);
    if(page.pagination){
     const p=page.pagination;let series=job.series.get(p.series);
-    if(!series){series={total:p.total,last:0,gap:false,terminal:false};job.series.set(p.series,series);}
-    if(series.total!==null&&p.total!==null&&series.total!==p.total||p.current!==series.last+1){series.gap=true;job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});}
+    if(!series){series={total:p.total,last:0,pages:new Set(),gap:false,terminal:false};job.series.set(p.series,series);}
+    if(series.total!==null&&p.total!==null&&series.total!==p.total||series.pages.has(p.current)){series.gap=true;job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});}
     if(p.total!==null)series.total=p.total;
-    series.last=p.current;series.terminal=p.terminal&&p.current===p.total;
+    series.pages.add(p.current);series.last=Math.max(series.last,p.current);series.terminal ||= p.terminal&&p.current===p.total;
    }
    for(const skipped of page.skipped??[]){showDiagnostic(skipped.diagnostic);job.skipped.push(skipped.kind);}
    if(job.skipped.length)$('run-skipped').textContent=`لم تُجمع بيانات الروابط المستبعدة: ${[...new Set(job.skipped)].map(kindLabel).join('، ')}. عُرض فقط ما جُمع من روابط مستقلة مسموحة؛ سبب الاستبعاد موضح في التشخيص الآمن دون قيم خاصة.`;
@@ -171,6 +202,8 @@ async function start(tabId){
     if(sourcePageSeen(origin,link.path)||job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
     if(link.pagination)job.routes.unshift(link);else job.routes.push(link);
    }
+   // Process actual report hrefs in page order even when responses settle out of order.
+   job.routes.sort((a,b)=>{const page=r=>r.kind==='students'&&/^\/SchoolManagmentReports\//.test(r.path)?Number(new URL(r.path,origin).searchParams.get('page')??1):Infinity;return page(a)-page(b);});
    next=job.routes.shift();if(next)job.visited.add(routeIdentity(origin,next.path));
    if(next&&(job.sourceRows.length>=SOURCE_WINDOW_ROWS||job.windowPages>=RUN_LIMITS.pages))await pauseWindow(ticket,false);
 
@@ -188,8 +221,10 @@ async function start(tabId){
 // AI: bounded ephemeral windows; explicit continuation never silently discards a tail.
 async function pauseWindow(ticket,final){
  const active=job;clearTimeout(active.timer);
+ // Drain bounded speculative readers before the five-minute review starts; retain only settled pages.
+ await Promise.all(active.fetches.values());current(ticket);
  const complete=final&&!active.warnings.some(w=>w.category==='students')&&reportsComplete(active.series);
- review={tabId:active.tabId,origin:active.origin,context:active.context,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
+ review={tabId:active.tabId,origin:active.origin,context:active.context,sourceURL:(await chrome.tabs.get(active.tabId)).url,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
  const warnings=[...new Set(active.warnings.filter(w=>w.category==='students').map(w=>w.code))];
  showDiagnostic({run:{staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
  $('run-counts').textContent=`جمعت ${active.studentRowsSeen} صفًا حتى الآن؛ ${active.sourceRows.length} صالحًا في نافذة المراجعة الحالية؛ غير متاح ${active.excluded} صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها.`;
@@ -198,7 +233,7 @@ async function pauseWindow(ticket,final){
  window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,complete,excluded:active.excluded,hasNext:!final,continuing:active.continuing===true}}));
  announce(complete?'اكتمل الجمع؛ راجع كل فصل وكل دفعة ثم أكّد داخل ركيز.':'جمع غير مكتمل؛ استيراد المتاح فقط بمراجعة وتأكيد إضافي، دون إضافة تلقائية.');
  armReview();
- if(final){job=null;return;}
+ if(final){cancelReports(active);job=null;return;}
  await new Promise((resolve,reject)=>{
   continueReject=reject;
   const go=()=>{if(ticket!==generation||!window.n36CanContinue?.())return;window.removeEventListener('n36:continue',go);continueReject=null;resolve();};
@@ -274,11 +309,12 @@ window.n36BeforeExport=async()=>{
  try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);if(review!==snapshot)throw Error('SOURCE_CHANGED');}catch(e){stop('SOURCE_CHANGED');throw e;}
 };
 window.n36HandoffSource=()=>review&&Date.now()<review.expires?{source:review.source==='noor'?'noor':'madrasati',scope:review.source==='noor'?'selected-visible-partial':'reviewed-run'}:null;
-window.addEventListener('pagehide',()=>{clearTimeout(reviewTimer);clearInterval(reviewClock);if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;}channel.close();});
+window.addEventListener('pagehide',()=>{cancelReports(job??review);clearTimeout(reviewTimer);clearInterval(reviewClock);if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;}channel.close();});
 // Only the explicit run's source is monitored; no all-tab discovery or startup read.
 chrome.tabs.onRemoved.addListener(id=>{if(id===job?.tabId||id===review?.tabId)stop('SOURCE_CLOSED');});
 chrome.tabs.onUpdated.addListener((id,change)=>{
  const target=job??review;if(id!==target?.tabId||!change.url)return;
+ if((review||target.fetches?.size)&&!target.expectedNavigation){stop('SOURCE_CONTEXT_CHANGED');return;}
  if(new URL(change.url).origin!==target.origin||/(?:login|signin|signout|logout|oauth)/i.test(new URL(change.url).pathname))stop('ORIGIN_OR_LOGIN_CHANGED');
 });
 setInterval(async()=>{

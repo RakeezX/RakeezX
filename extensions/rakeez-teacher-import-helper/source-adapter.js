@@ -1,13 +1,46 @@
-// AI-authored closure-free reader. Explicit run, current visible document only; no transport/storage.
-export function readSourceReportPage(mode,runContext=null) {
- const visible=n=>{for(let el=n;el;el=el.parentElement){const s=getComputedStyle(el);if(el.hidden||el.getAttribute('aria-hidden')==='true'||s.display==='none'||s.visibility!=='visible'||Number(s.opacity)===0)return false;}return n.getClientRects().length>0;};
+// AI-authored closure-free reader: live visibility and inert report HTML share one schema/parser.
+export function readSourceReportPage(mode,runContext=null,source=null) {
+ // Transport executes ONLY inside the explicitly authorized source tab, never the extension page.
+ if(mode==='fetch')return (async()=>{
+  const binding=globalThis.location.href,u=new URL(runContext.path,binding);
+  const fail=code=>{throw Error(code);};
+  const check=()=>{
+   if(globalThis.location.href!==runContext.sourceURL)fail('SOURCE_CONTEXT_CHANGED');
+   globalThis.rakeezRoutePolicy(globalThis.location.origin,u.href,runContext);
+   const match=/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
+   if(!match||!runContext.schoolId||match[1].toLowerCase()!==runContext.schoolId.toLowerCase())fail('SCHOOL_CONTEXT_CHANGED');
+   if(!readSourceReportPage('guard').ok)fail('NON_TEACHER_ROLE');
+  };
+  try{check();}catch(e){return {ok:false,code:e.message,incomplete:true};}
+  const controllers=globalThis.rakeezReportRequests??=new Map();
+  if(controllers.size>=3)fail('FETCH_CONCURRENCY');
+  const controller=new AbortController();controllers.set(runContext.requestId,controller);
+  const timer=setTimeout(()=>controller.abort(),Math.min(8000,Math.max(1,runContext.remainingMs??8000)));
+  try{
+   const response=await fetch(u.href,{method:'GET',credentials:'same-origin',redirect:'error',cache:'no-store',signal:controller.signal});
+   check();
+   if(!response.ok||response.redirected||new URL(response.url).href!==u.href)fail('REPORT_RESPONSE_REJECTED');
+   if(!/^text\/html(?:;|$)/i.test(response.headers.get('content-type')??''))fail('REPORT_CONTENT_TYPE');
+   const html=await response.text();check();if(html.length>2000000)fail('REPORT_SIZE');
+   const doc=new DOMParser().parseFromString(html,'text/html');
+   if(doc.querySelector('input[type=password],form[action*="Login" i],meta[http-equiv=refresh i]'))fail('LOGIN_OR_LOGOUT');
+   const guard=readSourceReportPage('guard',runContext,{document:doc,url:u.href});if(!guard.ok)fail(guard.code);
+   const value=readSourceReportPage('students',runContext,{document:doc,url:u.href});
+   if(!value.ok)fail(value.code);
+   if(runContext.schoolName&&value.schoolNames?.some(n=>n!==runContext.schoolName))fail('SCHOOL_CONTEXT_CHANGED');
+   return value;
+  }catch(e){return {ok:false,code:controller.signal.aborted?'FETCH_CANCELLED_OR_TIMEOUT':(/^[A-Z_]+$/.test(e.message)?e.message:'REPORT_FETCH_FAILED'),incomplete:true};}
+  finally{clearTimeout(timer);controllers.delete(runContext.requestId);}
+ })();
+ const document=source?.document??globalThis.document,location=source?new URL(source.url):globalThis.location;
+ const visible=n=>{for(let el=n;el;el=el.parentElement){const s=source?el.style:getComputedStyle(el);if(el.matches('[inert],.hidden,.d-none,.sr-only,[style*=\"display:none\"],[style*=\"display: none\"]')||el.hidden||el.getAttribute('aria-hidden')==='true'||s.display==='none'||(source?s.visibility==='hidden':s.visibility!=='visible')||(s.opacity!==''&&Number(s.opacity)===0))return false;}return source?true:n.getClientRects().length>0;};
  const text=n=>{const out=[];const walk=x=>{if(x.nodeType===3){out.push(x.textContent);return;}if(x.nodeType!==1||!visible(x)||['INPUT','TEXTAREA','SELECT','SCRIPT','STYLE','IFRAME','SVG','IMG'].includes(x.tagName))return;for(const c of x.childNodes)walk(c);};walk(n);return out.join('').trim().replace(/\s+/g,' ');};
  // Negative active-role guard complements the existing origin/school/session guard, including at export.
  // Role badges only: a principal's metadata name never establishes the current user's role.
  if(mode==='guard'){
   const nonTeacher=new Set(['مدير المدرسة','قائد المدرسة','مديرة المدرسة','قائدة المدرسة','مسؤول النظام','المشرف','الإداري','المدير','ولي الأمر','ولي أمر','الطالب','الطالبة']);
   const active=Array.from(document.querySelectorAll('[aria-current]:not([aria-current=false]),[aria-selected=true],option:checked,[role=status],[data-role]')).filter(visible).map(n=>text(n).replace(/^الدور\s*:?\s*/,''));
-  const labelled=Array.from(document.querySelectorAll('p,span,small,div,b,strong,label')).filter(visible).map(text).filter(v=>/^الدور\s*:?\s*/.test(v)).map(v=>v.replace(/^الدور\s*:?\s*/,''));
+  const labelled=Array.from(document.querySelectorAll('p,span,small,div,b,strong,label')).filter(n=>visible(n)&&!n.querySelector('table')).map(text).filter(v=>/^الدور\s*:?\s*/.test(v)).map(v=>v.replace(/^الدور\s*:?\s*/,''));
   return active.concat(labelled).some(v=>nonTeacher.has(v))?{ok:false,code:'NON_TEACHER_ROLE'}:{ok:true};
  }
  const all=Array.from(document.querySelectorAll('table')).filter(visible);
@@ -43,6 +76,7 @@ export function readSourceReportPage(mode,runContext=null) {
   const rows=Array.from(table.rows).filter(visible);if(mode!=='students'&&rows.length>301)return diagnostic('ROW_LIMIT');if(rows.length<2)continue;
   const head=Array.from(rows[0].cells);if(head.length>50||!head.every(visible))continue;
   const titles=head.map(text),find=set=>titles.flatMap((v,i)=>set.has(v)?[i]:[]);
+  if(source&&mode==='students'&&(head.length!==9||!titles.includes('حالة الطالب')||!titles.some(t=>['المدرسة','اسم المدرسة'].includes(t))))continue;
   if(mode==='students'){
    const ni=find(names),ci=find(classes),si=find(new Set(['المدرسة','اسم المدرسة'])),schoolNames=[];if(si.length>1)return diagnostic('AMBIGUOUS_SCHOOL_COLUMN');if(!ni.length){if(table.querySelector('td.project-title'))return diagnostic('UNRESOLVED_SOURCE_HEADERS');continue;}if(ni.length!==1||ci.length>1)return diagnostic('AMBIGUOUS_HEADER');
    let context='';if(!ci.length){const scope=table.closest('section,article,.report')??table;const values=Array.from(scope.querySelectorAll('caption,h1,h2,h3')).filter(visible).map(text).filter(v=>/^الفصل: .{2,80}$/.test(v)).map(v=>v.slice(7));if(new Set(values).size!==1)return diagnostic('UNRESOLVED_CLASSROOM');context=values[0];}
@@ -182,6 +216,8 @@ export function readSourceReportPage(mode,runContext=null) {
    if(m.total===m.current){if(!m.terminal)warnings.push({category:mode,code:'PAGINATION_TERMINAL_UNVERIFIED'});if(m.next)warnings.push({category:mode,code:'PAGINATION_AFTER_END'});}
    else if(!m.next)warnings.push({category:mode,code:'PAGINATION_MISSING_NEXT'});
    else links.push({kind:mode,path:m.next,pagination:true});
+   // Preserve only actual validated hrefs, sorted by page identity (never manufacture missing URLs).
+   for(const path of [...new Set(models.flatMap(m=>m.actual))].sort((a,b)=>pageOf(new URL(a,location.href))-pageOf(new URL(b,location.href))))if(!links.some(l=>l.path===path))links.push({kind:mode,path,pagination:true});
   }else if(mode==='students')warnings.push({category:mode,code:'PAGINATION_UNVERIFIED'});
  }
  if(excluded)warnings.push({category:mode,code:'INVALID_ROWS_EXCLUDED'});

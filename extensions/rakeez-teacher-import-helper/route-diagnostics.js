@@ -12,6 +12,11 @@
   const fail=detail=>{const e=Error(detail==='origin'?'ORIGIN_CHANGED':'UNSAFE_ROUTE');e.routeDetail=detail;throw e;};
   const u=new URL(value,origin);if(u.origin!==origin||u.username||u.password)fail('origin');
   const entries=[...u.searchParams],seen=new Set();for(const [key] of entries){const k=key.toLowerCase();if(seen.has(k))fail('duplicate-key');seen.add(k);}
+  const report=/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
+  if(report){
+   if(context?.schoolId&&report[1].toLowerCase()!==context.schoolId.toLowerCase())fail('school-context');
+   if(entries.some(([k,v])=>k!=='page'||! /^[1-9][0-9]{0,14}$/.test(v)||!Number.isSafeInteger(Number(v))))fail('invalid-allowed-value');
+  }
   const transition=/^\/Dashboards\/Schools\/ChangeUserTypeToTeacherFromParent\/([a-f0-9]{32})\/?$/i.exec(u.pathname);
   const schoolRead=/^\/(?:SchoolManagment\/Actions\/MyStudents|SchoolSchedule\/Schedule\/TeacherSchedule)\/?$/i.test(u.pathname);
   if(transition){

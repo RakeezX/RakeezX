@@ -1,0 +1,247 @@
+{
+  "runId": "435d507d-d423-48ff-bd40-c5ab56358a91",
+  "baseline": false,
+  "checks": [],
+  "externalRequests": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "sourceHashes": {
+    "README.md": "5f78437fca4d3ad758b2f87b853bb75ed3e551c70dc10c51da4d770282bea789",
+    "categories-popup.js": "cb13a303f624744270d7c4e64fc7699c64dba265dcc6337b7ce402dd8fbbbb06",
+    "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+    "core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+    "handoff-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "handoff-worker.js": "06433a19acb59a5890bd50ddd6e8dbf359684e7bc250b91a8a9610647fcc73fb",
+    "lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "lib/rakeez-datetime.css": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+    "lib/rakeez-datetime.js": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+    "manifest.json": "389e3333da23134ddec01bcd4434be9ab930b6fe7497ac914db0e2421c1d0510",
+    "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+    "popup.css": "b8b371eb9dcf8ef333aaa50df4427fdd3b99d3ecbcb6519d237ff4f3cbabdc0d",
+    "popup.html": "a2fd5d5e8e03a59176377113b28083b0bac12b4e8fbdf27ef10cb83e827334b1",
+    "popup.js": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+    "route-diagnostics.js": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+    "run-controller.js": "42a04a87538d0da10858308e7bd38f1a7ab8968c2fbe637043c69576e1cfda1c",
+    "selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+    "source-adapter.js": "63ea388f81ff73f65eae51cbe12bc229f8a07b5f9730854fb9692e26e5e543c4",
+    "source-roster.js": "aaf7c69231365cf27411c1e2878a1264121c1874d7b1ede88a562bd9656057d7"
+  },
+  "scenarios": [
+    {
+      "scenario": "full350",
+      "transferred": 350,
+      "added": 350,
+      "batches": 20,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "auth",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "redirect",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "contentType",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "schema",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "roleChanged",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "unsafe",
+      "partial": true,
+      "counts": "جمعت 50 صفًا حتى الآن؛ 50 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "foreignSchool",
+      "partial": true,
+      "counts": "جمعت 50 صفًا حتى الآن؛ 50 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "unsafeQuery",
+      "partial": true,
+      "counts": "جمعت 50 صفًا حتى الآن؛ 50 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "schoolChanged",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "network",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "cancel",
+      "blocked": true
+    },
+    {
+      "scenario": "context",
+      "blocked": true
+    },
+    {
+      "scenario": "expiry",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "lease",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "retry",
+      "transferred": 30,
+      "added": 30,
+      "batches": 2,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "lostReceipt",
+      "transferred": 30,
+      "added": 30,
+      "batches": 2,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "repeatedPage",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "conflictingTotal",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "timeout",
+      "partial": true,
+      "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها."
+    },
+    {
+      "scenario": "owner",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    }
+  ],
+  "priorFailures": [
+    "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-background-report-fetch-and-save-journey-20261017\\tests\\n36-background-report-fetch-browser.mjs:125:50",
+    "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-background-report-fetch-and-save-journey-20261017\\tests\\n36-background-report-fetch-browser.mjs:126:50",
+    "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-background-report-fetch-and-save-journey-20261017\\tests\\n36-background-report-fetch-browser.mjs:126:50",
+    "AssertionError [ERR_ASSERTION]: bounded parallel source reads\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-background-report-fetch-and-save-journey-20261017/tests/n36-background-report-fetch-browser.mjs:205:48"
+  ],
+  "preservedFailures": [],
+  "appHashes": {
+    "src/views/teacher-setup-import.js": "81a75b5d1f06bb597c3b34fffb3818387aeaec3749b66910c445cf9eb5a2398e",
+    "src/views/class-import-center.js": "ea306f019d23611fa883f5fb0beb7abd5b7d523eb574eb595f28278b675b6897",
+    "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348"
+  },
+  "reusedEvidence": {
+    "archiveSha256": "f62025e1dba00bc9c649d3343ff7243f9ab36de12431ce9be6eab38e548d28d6",
+    "sourceHashes": {
+      "README.md": "5f78437fca4d3ad758b2f87b853bb75ed3e551c70dc10c51da4d770282bea789",
+      "categories-popup.js": "cb13a303f624744270d7c4e64fc7699c64dba265dcc6337b7ce402dd8fbbbb06",
+      "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+      "core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+      "handoff-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+      "handoff-worker.js": "06433a19acb59a5890bd50ddd6e8dbf359684e7bc250b91a8a9610647fcc73fb",
+      "lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "lib/rakeez-datetime.css": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+      "lib/rakeez-datetime.js": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+      "manifest.json": "389e3333da23134ddec01bcd4434be9ab930b6fe7497ac914db0e2421c1d0510",
+      "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+      "popup.css": "8f7aacd4cd83c4e806f13504816a286e1d2805b78991ac0a501fd24f95747c85",
+      "popup.html": "365a5d218c041b9b954bd24b49ead7737c74524912e48154d843d7303b57b354",
+      "popup.js": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+      "route-diagnostics.js": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+      "run-controller.js": "42a04a87538d0da10858308e7bd38f1a7ab8968c2fbe637043c69576e1cfda1c",
+      "selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+      "source-adapter.js": "63ea388f81ff73f65eae51cbe12bc229f8a07b5f9730854fb9692e26e5e543c4",
+      "source-roster.js": "aaf7c69231365cf27411c1e2878a1264121c1874d7b1ede88a562bd9656057d7"
+    },
+    "reason": "Identical JavaScript transport, parser, continuation, receipt and app sources. Only diagnostic HTML placement and redundant-copy CSS changed; current actual DOM inspected in owner scenario."
+  },
+  "archiveSha256": "19fb0cafb0b4ec1867c9d4de7d8833be264df028fcdfcbe46f21c085b1cdc6b7",
+  "stage": "owner",
+  "sourceGets": 32,
+  "sourceEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 0,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 3,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 3
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 3,
+    "schoolOptions": 0
+  },
+  "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "lastSource": {
+    "status": "جمع غير مكتمل؛ استيراد المتاح فقط بمراجعة وتأكيد إضافي، دون إضافة تلقائية.",
+    "counts": "جمعت 300 صفًا حتى الآن؛ 300 صالحًا في نافذة المراجعة الحالية؛ غير متاح 0 صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها.",
+    "diagnostic": "N36 0.5.6 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=0 | commitEvidence=receiver-only | excluded=none"
+  },
+  "extensionLayout": {
+    "rtl": "rtl",
+    "overflow": false
+  },
+  "maxParallel": 3,
+  "reportNavigations": [],
+  "requiredScenarios": [
+    "full350",
+    "auth",
+    "redirect",
+    "contentType",
+    "schema",
+    "roleChanged",
+    "unsafe",
+    "foreignSchool",
+    "unsafeQuery",
+    "schoolChanged",
+    "repeatedPage",
+    "conflictingTotal",
+    "network",
+    "timeout",
+    "cancel",
+    "context",
+    "expiry",
+    "owner",
+    "lease",
+    "retry",
+    "lostReceipt"
+  ],
+  "coverageComplete": true,
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable Chrome/profile and server closed; browser lease released"
+}

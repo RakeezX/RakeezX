@@ -34,3 +34,13 @@ summary { cursor: pointer; padding-block: 12px; }
 
 /* AI: authored display rules must preserve semantic visibility. */
 [hidden] { display: none !important; }
+
+/* AI: compact run summary; technical diagnostics remain copyable when needed. */
+.run-page #entry-state,.run-page #category-help,.run-page #structured-category > p {display:none}
+.run-page #staged-categories:empty {display:none}
+#source-class-names {max-height:12rem;overflow:auto}
+.run-page #run-counts,.run-page #run-missing {margin-block:.4rem}
+
+.run-page:has(#source-class-review) #one-start-controls > p:first-of-type {display:none}
+.run-page #source-coverage {display:none} /* same partial warning remains above and in explicit consent */
+#run-diagnostics {margin-block:.5rem}

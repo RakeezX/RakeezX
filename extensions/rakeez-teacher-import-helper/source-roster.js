@@ -16,7 +16,7 @@ export function appendSourceRows(prior, incoming){
  return next;
 }
 export function reportsComplete(series){
- return series.size>0&&[...series.values()].every(s=>s.terminal&&Number.isSafeInteger(s.total)&&s.total>0&&(s.pages?s.pages.size===s.total&&[...s.pages].every(n=>n>=1&&n<=s.total):!s.gap&&s.last===s.total));
+ return series.size>0&&[...series.values()].every(s=>s.terminal&&Number.isSafeInteger(s.total)&&s.total>0&&(s.pages?!s.gap&&s.pages.size===s.total&&[...s.pages].every(n=>n>=1&&n<=s.total):!s.gap&&s.last===s.total));
 }
 export function sourceClasses(rows){
  const groups=new Map();for(const r of rows){if(!groups.has(r.classroom))groups.set(r.classroom,[]);groups.get(r.classroom).push(r);}

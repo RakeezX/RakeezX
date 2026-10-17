@@ -4,18 +4,20 @@
 <body><main>
 <h1>مساعد إعداد المعلم</h1><p class="notice">إضافة خاصة تجريبية — راجع الأسماء ثم انقلها إلى ركيز دون ملف. توافق الحسابات الرسمية واكتمال كشوفها لم يُتحقق منهما.</p>
 <section id="one-start-controls">
-<p>افتح الصفحة الرئيسية المسجّل دخولك إليها، ثم افتح الإضافة واضغط البدء. يجمع التشغيل بيانات المعلم وفصوله وأسماء الطلاب وجدوله عبر روابط قراءة واضحة في التبويب نفسه. لا تحديد أعمدة ولا تنقّل يدوي.</p>
+<p>افتح الصفحة الرئيسية المسجّل دخولك إليها، ثم افتح الإضافة واضغط البدء. تُقرأ صفحات كشف الطلاب في الخلفية من الروابط المتاحة. اختر الفصل، ثم راجع وأكّد الحفظ داخل ركيز.</p>
 <button id="one-start" type="button" disabled>ابدأ الاستيراد من مدرستي</button>
 <button id="run-cancel" type="button" disabled>إلغاء التشغيل ومسح المعاينة</button>
 <p id="run-status" role="status" aria-live="polite">لن تبدأ قراءة بمجرد فتح المتصفح أو الإضافة. لا إضافة تلقائية إلى ركيز.</p>
 <div id="school-choices" hidden aria-label="اختر مدرسة واحدة"></div>
-<p id="entry-state" dir="ltr" aria-label="حالة ربط صفحة المصدر"></p>
+
 <p id="review-remaining" role="timer" aria-label="الوقت المتبقي للمعاينة"></p>
 <button id="run-reopen" type="button" hidden>بدء معاينة جديدة</button>
 <p id="run-counts"></p><p id="run-missing"></p>
 <p id="run-skipped" role="status"></p>
+<details id="run-diagnostics"><summary>التشخيص الآمن (اختياري)</summary>
+<p id="entry-state" dir="ltr" aria-label="حالة ربط صفحة المصدر"></p>
 <textarea id="route-diagnostic" readonly hidden dir="ltr" rows="3" aria-label="التشخيص الآمن للمسار"></textarea>
-<button id="copy-route-diagnostic" type="button" hidden>نسخ التشخيص الآمن</button><p id="route-copy-status" role="status"></p>
+<button id="copy-route-diagnostic" type="button" hidden>نسخ التشخيص الآمن</button><p id="route-copy-status" role="status"></p></details>
 </section>
 <section id="noor-controls">
 <h2>نور — العمود الظاهر المختار فقط</h2>
@@ -54,10 +56,10 @@
 <button id="category-stage" type="button" disabled>احتفاظ مؤقت: إلحاق الصفوف أو استبدال اسم المعلم/المدرسة/المدير</button>
 <button id="category-cancel" type="button">إلغاء المعاينة</button>
 </div>
-<h2>المعاينة النهائية — تحرير واستبعاد قبل التصدير</h2>
+<h2>اختر الفصل وراجع الدفعة</h2>
 <p>يمكن تحرير الحقول واستبعاد الصفوف أو الفئات. التكرارات وتعارض الحصص تمنع الاحتفاظ. إغلاق النافذة يمسحها؛ لا تخزين دائم.</p>
 <div id="staged-categories"></div>
-<label><input id="bundle-review" type="checkbox" disabled> راجعت جميع الفئات والحقول المختارة للنقل أو التصدير المحلي</label>
+<label><input id="bundle-review" type="checkbox" disabled> راجعت أسماء الفصل المختار للنقل إلى ركيز</label>
 <details><summary>خيارات متقدمة — ملفات محلية</summary>
 <button id="bundle-download" type="button" disabled>تنزيل JSON للفئات المختارة فقط</button>
 <button id="bundle-csv" type="button" disabled>تنزيل أسماء الطلاب المختارة CSV إلى N12</button>
