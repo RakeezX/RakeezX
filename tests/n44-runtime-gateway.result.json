@@ -1,0 +1,99 @@
+{
+  "taskId": "continuous-n44-complete-runtime-gateway-20261018",
+  "runId": "f74393d7-a86f-43b7-8e90-df28b2d007c0",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "startedAt": "2026-10-17T22:17:12.974Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-c57e0e2a-5291-44f0-bb99-ccf85cc22596",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-c57e0e2a-5291-44f0-bb99-ccf85cc22596\\data",
+  "checks": [
+    {
+      "name": "n44_actual_http_registration_and_private_runtime_composition",
+      "status": "PASS",
+      "evidence": "See cases: actual loopback registration/replay + SQL readbacks; private committed-permit sender observation, cleanup and original revoke."
+    },
+    {
+      "name": "n44_ingress_auth_body_commit_failure_and_disabled_preflight",
+      "status": "PASS",
+      "evidence": "See cases: ingress/body/origin/auth/rate/deadline no-acquisition negatives; COMMIT rollback; current context and disabled preflight."
+    },
+    {
+      "name": "n44_owned_runtime_resource_cleanup",
+      "status": "PASS",
+      "evidence": "Owned PID/birth/-D/marker/port and data_directory verified; final exact PID absent and port rebound; stopped checkpoint retained. Inactive source bindings verified; hosted Auth/sender/device NOT_RUN."
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-c57e0e2a-5291-44f0-bb99-ccf85cc22596"
+  },
+  "port": 51931,
+  "ownership": {
+    "pid": 23748,
+    "birth": "2026-10-17T22:17:21.9000160Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-c57e0e2a-5291-44f0-bb99-ccf85cc22596\\data",
+    "port": 51931,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 23748,
+      "birth": "2026-10-17T22:17:21.9000160Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-c57e0e2a-5291-44f0-bb99-ccf85cc22596\\data",
+      "port": 51931,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    11488,
+    2928
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "cases": [
+    {
+      "name": "ingress, route, strict JSON, unverified auth, and deadline reject before repository acquisition",
+      "status": "PASS",
+      "evidence": "Real loopback HTTP, no SQL acquisition or mutation for malformed/oversize/duplicate/origin/auth/rate/deadline failures; late completion drained."
+    },
+    {
+      "name": "actual HTTP registration, SQL commit failure, receipt replay and current context",
+      "status": "PASS",
+      "evidence": "Actual registration boundary and actual PostgreSQL repository commit/readback; failed COMMIT rolled back; same original UUID reconciles to one row; serialized current consent checked."
+    },
+    {
+      "name": "private scheduler committed-permit fence, replay suppression, cleanup and original revoke",
+      "status": "PASS",
+      "evidence": "Actual private delivery entry observed committed sending through independent SQL connection before fake sender; one invocation across replay; cleanup erases sealed material and original UUID cannot resurrect."
+    },
+    {
+      "name": "single disabled preflight and construction cannot activate dependencies",
+      "status": "PASS",
+      "evidence": "No defaults/credentials/network activation; absent required ports produce one explicit disabled preflight; private batch bounded at 100."
+    }
+  ],
+  "http": {
+    "host": "127.0.0.1",
+    "port": 51990,
+    "synthetic": true,
+    "closedAndRebound": true
+  },
+  "sourceHashes": {
+    "drafts/n44-push/runtime-gateway.mjs": "73282ab7e1b1ce2abf8027ae2432a63174c78c0b13b2e51763bef2c06c7f2787",
+    "drafts/n44-push/postgres-repository.mjs": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+    "drafts/n44-push/registration.mjs": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36",
+    "drafts/n44-push/delivery.mjs": "7aba0ca1e24054e2a6373339df736d29eb0e04d4c7490076db056409053b90e9",
+    "tests/n44-runtime-gateway.mjs": "6f5d096471b82de871f57ee3f071dc0033fe45763b8f449c4b8112defbaaa3f7",
+    "tests/fixtures/n44-runtime-gateway/cases.mjs": "e9b57fee5116d6b00092abbe468f5bcf8e4cb92d38e6cf740e673d4cdf4a4500"
+  },
+  "finishedAt": "2026-10-17T22:17:43.202Z",
+  "status": "PASS"
+}

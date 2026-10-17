@@ -1,0 +1,62 @@
+{
+  "taskId": "continuous-n44-complete-runtime-gateway-20261018",
+  "runId": "f74393d7-a86f-43b7-8e90-df28b2d007c0",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "startedAt": "2026-10-17T22:13:49.451Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-77cb6b41-88d3-4bae-b4c3-17dc60b64a10",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-77cb6b41-88d3-4bae-b4c3-17dc60b64a10\\data",
+  "checks": [],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-77cb6b41-88d3-4bae-b4c3-17dc60b64a10"
+  },
+  "port": 56432,
+  "ownership": {
+    "pid": 26928,
+    "birth": "2026-10-17T22:13:58.6887360Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-77cb6b41-88d3-4bae-b4c3-17dc60b64a10\\data",
+    "port": 56432,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 26928,
+      "birth": "2026-10-17T22:13:58.6887360Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-complete-runtime-gateway-20261018\\artifacts\\n44-runtime-gateway-pg-f74393d7-a86f-43b7-8e90-df28b2d007c0-77cb6b41-88d3-4bae-b4c3-17dc60b64a10\\data",
+      "port": 56432,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    30580,
+    32600
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "cases": [],
+  "failure": {
+    "name": "Error",
+    "code": null,
+    "message": "n44_repository_unavailable",
+    "location": "at fail (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-complete-runtime-gateway-20261018/drafts/n44-push/postgres-repository.mjs:14:28)"
+  },
+  "sourceHashes": {
+    "drafts/n44-push/runtime-gateway.mjs": "a4218ec90ae2aeb9f55e3c450e4a1a3d15dfc3fda5d6a25c5ecf81d6d050f991",
+    "drafts/n44-push/postgres-repository.mjs": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+    "drafts/n44-push/registration.mjs": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36",
+    "drafts/n44-push/delivery.mjs": "7aba0ca1e24054e2a6373339df736d29eb0e04d4c7490076db056409053b90e9",
+    "tests/n44-runtime-gateway.mjs": "6f5d096471b82de871f57ee3f071dc0033fe45763b8f449c4b8112defbaaa3f7",
+    "tests/fixtures/n44-runtime-gateway/cases.mjs": "8b90557c3bd5eef564b780155c1f9253a82b6f05332f6037736e757d305cc402"
+  },
+  "finishedAt": "2026-10-17T22:14:03.634Z",
+  "status": "FAIL"
+}

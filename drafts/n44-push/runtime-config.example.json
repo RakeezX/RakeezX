@@ -1,0 +1,7 @@
+{
+  "enabled": false,
+  "deliveryEnabled": false,
+  "applicationOrigins": [],
+  "providerOrigins": [],
+  "requestDeadlineMs": 5000
+}

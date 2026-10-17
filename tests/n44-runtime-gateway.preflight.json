@@ -1,0 +1,19 @@
+{
+  "status": "disabled",
+  "missing": [
+    "runtime_disabled",
+    "application_origins",
+    "provider_origins",
+    "postgres_acquire",
+    "current_session_verifier",
+    "audited_protector",
+    "ingress_limiter",
+    "authoritative_recompute",
+    "private_schedule_batch",
+    "private_cleanup_batch",
+    "resource_close",
+    "serialized_current_state_writers",
+    "delivery_disabled",
+    "audited_sender"
+  ]
+}

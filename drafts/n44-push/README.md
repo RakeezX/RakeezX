@@ -131,6 +131,19 @@ key values). No analytics/user telemetry is added here. Endpoint secrets are
 cleared on revoke, 404/410, context invalidation or expiry; sealed envelopes must
 also be covered by the later backup-retention/deletion decision.
 
+## Runtime gateway (inactive source composition)
+
+`runtime-gateway.mjs` supplies the bounded Node HTTP registration/revoke handler,
+actual PostgreSQL repository composition, private delivery/cleanup capabilities,
+single fixed-code dependency preflight and owned-listener cleanup. Construction
+is disabled by default and requires explicit trusted Auth/limiter/authoritative
+writer/protector/sender/scheduler ports; none is inferred from client state.
+See [exact HTTP/config/deployment contracts and remaining operations](RUNTIME.md)
+and the inert [configuration artifact](runtime-config.example.json).
+Local HTTP qualification is recorded in
+[N44 runtime gateway evidence](../../docs/automation-evidence/20261018/N44_RUNTIME_GATEWAY.md).
+This does not activate hosted service, app/SW integration or real sends.
+
 ## Durable atomic repository contract (inactive SQL port supplied)
 
 `repository.atomic(ownerId, synchronousWork)` must **commit durably before its
