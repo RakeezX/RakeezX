@@ -23,6 +23,11 @@ const CF_JSD = new RegExp(CF_JSD_TEMPLATE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   .replace('CF_RAY_VALUE', '([a-f0-9]{16})').replace('CF_TIME_VALUE', '([A-Za-z0-9+/]{12,24}={0,2})'));
 // Pinned to PO-uploaded public source, not a generic script or provider-host allowlist.
 const CF_ANALYTICS_20261014 = "<script type=\"module\" src=\"https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920\" integrity=\"sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==\" data-cf-beacon='{\"version\":\"2024.11.0\",\"token\":\"29dff8015f9a492385ac7d9826d7acc3\",\"r\":1,\"spa\":2}' crossorigin=\"anonymous\"></script>";
+const CF_ANALYTICS_20261017 = "<script type=\"module\" src=\"https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092\" integrity=\"sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==\" data-cf-beacon='{\"version\":\"2024.11.0\",\"token\":\"29dff8015f9a492385ac7d9826d7acc3\",\"r\":1,\"spa\":2}' crossorigin=\"anonymous\"></script>";
+const CF_ANALYTICS_PINS = [
+  { tag: CF_ANALYTICS_20261014, kind: 'cloudflare-analytics-20261014' },
+  { tag: CF_ANALYTICS_20261017, kind: 'cloudflare-analytics-20261017' },
+];
 const now = () => new Date().toISOString();
 const hash = value => createHash('sha256').update(value).digest('hex');
 const json = text => JSON.parse(String(text).replace(/^\uFEFF/, ''));
@@ -207,14 +212,15 @@ export function normalizeCloudflareIndex(bytes, metadata) {
     if (providers.length === 1 && end > 0 && [9,10,12,13,32].includes(source.charCodeAt(end - 1))) {
       const before = source.slice(0,end - 1);
       const priorJsd = before.match(CF_JSD);
-      if (before.endsWith(CF_ANALYTICS_20261014) ||
+      if (CF_ANALYTICS_PINS.some(pin => before.endsWith(pin.tag)) ||
           (priorJsd && priorJsd.index + priorJsd[0].length === before.length)) end--;
     }
     const prefix = source.slice(0,end);
-    if (prefix.endsWith(CF_ANALYTICS_20261014)) {
+    const pinnedAnalytics = CF_ANALYTICS_PINS.find(pin => prefix.endsWith(pin.tag));
+    if (pinnedAnalytics) {
       if (source.indexOf(analyticsMarker) !== source.lastIndexOf(analyticsMarker)) return null;
-      end -= CF_ANALYTICS_20261014.length;
-      providers.unshift('cloudflare-analytics-20261014');
+      end -= pinnedAnalytics.tag.length;
+      providers.unshift(pinnedAnalytics.kind);
       continue;
     }
     const match = prefix.match(CF_JSD);
@@ -226,7 +232,7 @@ export function normalizeCloudflareIndex(bytes, metadata) {
     providers.unshift('cloudflare-jsd-v1');
   }
   if (!providers.length || new Set(providers).size !== providers.length) return null;
-  if (source.includes(analyticsMarker) && !providers.includes('cloudflare-analytics-20261014')) return null;
+  if (source.includes(analyticsMarker) && !CF_ANALYTICS_PINS.some(pin => providers.includes(pin.kind))) return null;
   if (source.includes(marker) && !providers.includes('cloudflare-jsd-v1')) return null;
   const normalized = Buffer.concat([raw.subarray(0,end),raw.subarray(providerEnd)]);
   const closeAt = source.lastIndexOf('</body>');
