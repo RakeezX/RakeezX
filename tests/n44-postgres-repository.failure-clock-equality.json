@@ -1,0 +1,115 @@
+{
+  "taskId": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+  "runId": "d3379dc5-49cb-4ae5-89a9-ab130cdaed60",
+  "baseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+  "startedAt": "2026-10-17T13:57:36.943Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-2f3e0010-67fa-483f-8a4c-6eab27a4a90c",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-2f3e0010-67fa-483f-8a4c-6eab27a4a90c\\data",
+  "checks": [],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-2f3e0010-67fa-483f-8a4c-6eab27a4a90c"
+  },
+  "port": 51070,
+  "ownership": {
+    "pid": 32460,
+    "birth": "2026-10-17T13:57:47.6270300Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-2f3e0010-67fa-483f-8a4c-6eab27a4a90c\\data",
+    "port": 51070,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 32460,
+      "birth": "2026-10-17T13:57:47.6270300Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-2f3e0010-67fa-483f-8a4c-6eab27a4a90c\\data",
+      "port": 51070,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    1292,
+    25640
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "cases": [
+    {
+      "name": "actual registration, original UUID replay, wrong identity, global claim conflict",
+      "status": "PASS",
+      "evidence": "Actual register/replay succeeded; cross-owner unique loser rolled back generically; foreign read/revoke and RLS owner mismatch preserved original."
+    },
+    {
+      "name": "20 concurrent actual boundary deliveries, commit-before-local-sender and PG wait",
+      "status": "PASS",
+      "evidence": "20 calls, two independent pools; actual lock wait, one committed sending permit, one callback observing it from another connection, 19 duplicates, exact budget debits."
+    },
+    {
+      "name": "current context, preference, consent, expiry, deleted event and owner-clock monotonicity",
+      "status": "FAIL",
+      "sqlstate": "ERR_ASSERTION"
+    }
+  ],
+  "lockObservations": [
+    {
+      "pid": 9404,
+      "application_name": "n44-repository-fixture-1",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid",
+      "blockers": [
+        25640
+      ]
+    },
+    {
+      "pid": 34140,
+      "application_name": "n44-repository-fixture-2",
+      "wait_event_type": "Lock",
+      "wait_event": "tuple",
+      "blockers": [
+        9404
+      ]
+    }
+  ],
+  "fixtureNow": 1792245470455,
+  "repositorySessions": [
+    {
+      "pid": 9404,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    },
+    {
+      "pid": 32844,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ],
+  "lastLockSnapshot": {
+    "root": 25640,
+    "rows": []
+  },
+  "failure": {
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION",
+    "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 1792245473323\n- 1792245473316\n             ^\n",
+    "location": "at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-postgres-repository-boundary-bridge-20261017/tests/fixtures/n44-postgres-repository/cases.mjs:149:12"
+  },
+  "sourceHashes": {
+    "drafts/n44-push/postgres-repository.mjs": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+    "drafts/n44-push/README.md": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+    "tests/n44-postgres-repository.mjs": "af351c27f3070e6fc3f5fc37952b35508959472a5624111948a157240d5e95b9",
+    "tests/fixtures/n44-postgres-repository/cases.mjs": "05c63256f6807fb3e704a7942f66561d4a8083fa20ccba941138e5d4675a106a"
+  },
+  "finishedAt": "2026-10-17T13:57:55.084Z",
+  "status": "FAIL"
+}

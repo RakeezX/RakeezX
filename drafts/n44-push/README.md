@@ -22,6 +22,11 @@ separately gated privileged authorizer; this is no campaign executor.
   attempts. These functions are trusted server capabilities, never public routes
   accepting a caller's ownerId. No admin/user enumeration is implemented.
 - `shared.mjs`: fixed statuses, draft limits, rate and context checks.
+- `postgres-repository.mjs`: inactive trusted-server-only SQL implementation of
+  the synchronous `repository.atomic` port. It imports no driver and connects to
+  nothing by itself. Actual unchanged boundaries are exercised against PostgreSQL
+  by `tests/n44-postgres-repository.mjs`; see the
+  [repository bridge qualification](../../docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md).
 - `schema-proposal.sql`: private typed schema proposal and immutable transition
   constraints. **NOT an applied/generated migration or a production adapter.**
 - `tests/n44-native-postgres-qualification.mjs`: explicitly invoked, synthetic
@@ -126,7 +131,7 @@ key values). No analytics/user telemetry is added here. Endpoint secrets are
 cleared on revoke, 404/410, context invalidation or expiry; sealed envelopes must
 also be covered by the later backup-retention/deletion decision.
 
-## Durable atomic repository contract (not supplied)
+## Durable atomic repository contract (inactive SQL port supplied)
 
 `repository.atomic(ownerId, synchronousWork)` must **commit durably before its
 promise resolves**, roll back on any callback/commit failure, and never resolve an
@@ -136,7 +141,7 @@ owner-scoped: `time(observedMs)`, `context(workspaceId, deviceId)`,
 `releaseEndpoint(fingerprint, uuid)`. Tables are registrations, deliveries and
 budgets; contexts come only from trusted current server state. Mapping camelCase
 objects to SQL snake_case columns, and payload fields to deliveries columns, is
-an explicit future adapter responsibility. Delivery key maps to the four-column
+implemented in the inactive SQL adapter. Delivery key maps to the four-column
 PK `(owner, workspace, device, stable eventID)`, independent of registration UUID.
 
 Use one owner-clock row lock acquired before reading ANY relevant context,
@@ -150,6 +155,65 @@ order, use bounded transaction timeouts, map global fingerprint uniqueness races
 to generic denial. Never read all owners. Resolve/cleanup bounded batches (at most
 100 jobs/owner); implement registered-device and mutation rate limits under lock.
 SQL schema alone does not implement any of these transactions.
+
+### Injected driver and cooperating writer protocol
+
+`createPostgresRepository({ acquire })` requires an externally installed,
+server-owned driver. `await acquire()` returns an **exclusive leased connection**
+with `query(text, values) -> Promise<{ rows }>` and `release(error?)`. A Node `pg`
+Pool adapter is `{ acquire: () => trustedPool.connect() }`; a dedicated connected
+client needs an equivalent exclusive lease, never concurrent sharing. Pool
+acquisition/connection/query deadlines and connection limits belong to this
+trusted injected port. `release(error)` must discard an unsafe connection. There
+are no driver imports, environment reads, default connection settings or memory
+fallback. Configure logging to exclude SQL bind values and exception DETAIL.
+Transaction statements are unnamed and parameterized; table/column SQL comes
+only from module-owned allowlists. Never expose this factory, `atomic` or
+`writeContexts` to request-body owner selection. The verifier remains independent
+and **unimplemented**; neither a pool nor fixture metadata proves Auth.
+
+Each transaction inserts/locks the owner-clock row, then uses READ COMMITTED
+statement snapshots **after** that lock. It loads only that owner's current
+contexts, registrations, deliveries, budgets and endpoint claims. All cooperating
+writers must acquire the same lock first and commit before a later reservation
+can rely on their change. There is no shared JS promise queue. The synchronous
+callback sees detached clones; async/reentrant callbacks and expired transaction
+handles fail closed. DB clock + persisted high-water + safe observed server time
+are monotonic. Server timeouts and synchronous commit are transaction-local.
+
+Snapshots are explicitly bounded: 4,464 registration receipts (six writes/hour
+over thirty registration days plus one receipt day), 4,467 contexts, 100 delivery
+receipts and 8,930 budget rows (two device keys per retained receipt plus register
+and owner-day). They also have a 32 MiB aggregate and 16 KiB per-row ceiling, plus
+the stricter schema secret/preference limits. These are **capacity rejection
+bounds**, not a permission to create extra active devices. Unknown fields,
+malformed canonical keys/preferences/state, oversized data and unsafe integers
+throw a generic unavailable result; no row is dropped or bad state normalized.
+Historical context retirement still needs a canonical bounded writer/scheduler;
+overflow safely stops work rather than authorizing pruning here.
+
+`writeContexts(ownerId, synchronousWork)` is an explicit **trusted writer** hook
+using the identical lock/snapshot/commit path, with the additional `contexts`
+table writable using key `JSON.stringify([workspaceId, deviceId])`. It prepares
+the serialization protocol for context invalidation and preference changes.
+Production canonical identity/context/event mapping and permissions remain
+**NO_IMPLEMENTATION**; a fabricated test writer is not a teacher write API.
+No arbitrary SQL execution capability is exported. Future event writers/resolver
+must join this protocol and add their bounded authoritative reads explicitly;
+this port does not pretend to provide those absent application tables.
+
+Buffered writeback releases claims only for the exact owner/original UUID,
+deletes children before parents, updates tombstones before replacement inserts,
+and preserves SQL immutable-trigger/unique/FK rules. Global claims use plain
+INSERT: a foreign collision visible only at flush aborts the entire transaction,
+including debits, and returns generic `unavailable` through the existing boundary.
+It never reads foreign claims, overwrites a claim or returns a buffered success.
+The result/permit is returned only after acknowledged COMMIT. Only PostgreSQL
+ERROR `40001`/`40P01` followed by successful rollback can retry, at most **two
+total fresh attempts**, rerunning pure synchronous work. Transport loss, query
+timeout, failed rollback or ambiguous COMMIT acknowledgement never retries.
+A persisted `sending` fence survives a lost acknowledgement even if no sender
+callback ran; conservative loss is preferable to replaying an uncertain permit.
 
 `recompute(tx, registration, eventId, now, preferences)` is trusted synchronous
 code within that same transaction. It must independently rederive the current
@@ -271,9 +335,11 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    values and callbacks are fabricated. This proves actual local SQL behavior
    under the explicit test transactions, not hosted Auth/PostgREST, intended
    service-role configuration, a real send or the JS `repository.atomic` port.
-   The complete synchronous repository adapter, authoritative event/preference
-   resolver, all-writer serialization protocol, retention sweep and real ingress
-   limits remain unimplemented and require separate qualification. Historical
+   The new inactive synchronous repository port is separately qualified using
+   actual unchanged boundaries, independent pools, fault/commit fences, current
+   contexts/budgets and controlled restart. Authoritative event/preference
+   mapping, production all-writer adoption, scheduled retention sweep and real
+   ingress limits remain unimplemented. Historical
    Docker/SQL NOT_RUN evidence remains unchanged; the prior 16 simulated tests
    are reused with exact code/fixture/dependency hashes, not rerun as SQL proof.
 3. **Real service gate — NOT_RUN:** separately authorized CLI-generated migration

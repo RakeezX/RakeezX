@@ -1,0 +1,87 @@
+{
+  "taskId": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+  "runId": "d3379dc5-49cb-4ae5-89a9-ab130cdaed60",
+  "baseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+  "startedAt": "2026-10-17T13:56:43.302Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-3e53981f-a11d-4fd0-9423-80b3ba36492a",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-3e53981f-a11d-4fd0-9423-80b3ba36492a\\data",
+  "checks": [],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-3e53981f-a11d-4fd0-9423-80b3ba36492a"
+  },
+  "port": 53789,
+  "ownership": {
+    "pid": 24600,
+    "birth": "2026-10-17T13:56:50.6489700Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-3e53981f-a11d-4fd0-9423-80b3ba36492a\\data",
+    "port": 53789,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 24600,
+      "birth": "2026-10-17T13:56:50.6489700Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-3e53981f-a11d-4fd0-9423-80b3ba36492a\\data",
+      "port": 53789,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    28288,
+    2668
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "cases": [
+    {
+      "name": "actual registration, original UUID replay, wrong identity, global claim conflict",
+      "status": "PASS",
+      "evidence": "Actual register/replay succeeded; cross-owner unique loser rolled back generically; foreign read/revoke and RLS owner mismatch preserved original."
+    },
+    {
+      "name": "20 concurrent actual boundary deliveries, commit-before-local-sender and PG wait",
+      "status": "FAIL",
+      "sqlstate": "ERR_ASSERTION"
+    }
+  ],
+  "lockObservations": [],
+  "fixtureNow": 1792245412997,
+  "repositorySessions": [
+    {
+      "pid": 7912,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    },
+    {
+      "pid": 33472,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ],
+  "failure": {
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION",
+    "message": "two SQL backends did not exhibit the expected lock wait",
+    "location": "at waitForLock (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-postgres-repository-boundary-bridge-20261017/tests/fixtures/n44-postgres-repository/cases.mjs:59:10)"
+  },
+  "sourceHashes": {
+    "drafts/n44-push/postgres-repository.mjs": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+    "drafts/n44-push/README.md": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+    "tests/n44-postgres-repository.mjs": "af351c27f3070e6fc3f5fc37952b35508959472a5624111948a157240d5e95b9",
+    "tests/fixtures/n44-postgres-repository/cases.mjs": "855c0cbd6963fcbffd486e4406512c894331f1917aea301b88a3a8c619a6f226"
+  },
+  "finishedAt": "2026-10-17T13:56:58.933Z",
+  "status": "FAIL"
+}

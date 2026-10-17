@@ -1,0 +1,225 @@
+{
+  "taskId": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+  "runId": "d3379dc5-49cb-4ae5-89a9-ab130cdaed60",
+  "baseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+  "startedAt": "2026-10-17T13:59:06.155Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9\\data",
+  "checks": [
+    {
+      "name": "n44_real_postgres_repository_executes_existing_registration_delivery_boundaries",
+      "status": "PASS",
+      "evidence": "Actual unchanged boundaries + injected new SQL repository; registration/replay/owner/context/budgets/rollback/commit qualification in named cases. Synthetic non-superuser/NOBYPASSRLS role only; no hosted Auth."
+    },
+    {
+      "name": "n44_two_repository_commit_fencing_current_context_budget_and_restart_guards",
+      "status": "PASS",
+      "evidence": "7 targeted cases PASS; 4 SQL wait observations. New pools/repository retained registration, exact budgets and sending fence; same event no callback; cleanup sending→uncertain; revoke erased secrets/released endpoint; tombstone replay did not affect replacement; retention removed rows/budgets. Controlled shutdown/restart, not crash/power-loss durability."
+    },
+    {
+      "name": "n44_owned_sql_cleanup_inactive_source_and_honest_auth_sender_device_limits",
+      "status": "PASS",
+      "evidence": "Owned PID/birth/-D/marker/port and data_directory verified; controlled restart; final exact PID absent and port rebound; stopped checkpoint retained. Inactive source bindings verified; hosted Auth/sender/device NOT_RUN."
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9"
+  },
+  "port": 58941,
+  "ownership": {
+    "pid": 21860,
+    "birth": "2026-10-17T13:59:32.1926840Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9\\data",
+    "port": 58941,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 19544,
+      "birth": "2026-10-17T13:59:15.1763690Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9\\data",
+      "port": 58941,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    },
+    {
+      "pid": 21860,
+      "birth": "2026-10-17T13:59:32.1926840Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-postgres-repository-boundary-bridge-20261017\\artifacts\\n44-repository-pg-d3379dc5-49cb-4ae5-89a9-ab130cdaed60-750ffce6-161c-44f5-9ebf-c095caf378c9\\data",
+      "port": 58941,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    5964,
+    23708
+  ],
+  "schemaSha256": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+  "cases": [
+    {
+      "name": "actual registration, original UUID replay, wrong identity, global claim conflict",
+      "status": "PASS",
+      "evidence": "Actual register/replay succeeded; cross-owner unique loser rolled back generically; foreign read/revoke and RLS owner mismatch preserved original."
+    },
+    {
+      "name": "20 concurrent actual boundary deliveries, commit-before-local-sender and PG wait",
+      "status": "PASS",
+      "evidence": "20 calls, two independent pools; actual lock wait, one committed sending permit, one callback observing it from another connection, 19 duplicates, exact budget debits."
+    },
+    {
+      "name": "current context, preference, consent, expiry, deleted event and owner-clock monotonicity",
+      "status": "PASS",
+      "evidence": "Existing boundaries reloaded committed active/revision/consent/preferences/expiry/quiet/event state and suppressed without a callback; persisted clock never decreased."
+    },
+    {
+      "name": "owner-locked context writer serializes before reservation on another pool",
+      "status": "PASS",
+      "evidence": "Two observed backend lock waits: committed context revocation and preference disable each preceded subsequent reservation; zero sender callbacks."
+    },
+    {
+      "name": "definitive retry, uncertain no replay, real SQL budget ceiling",
+      "status": "PASS",
+      "evidence": "Actual retry/backoff then attempt 2 sent; thrown sender outcome persisted uncertain and never replayed; hour SQL counter capped at 6 and subsequent event limited."
+    },
+    {
+      "name": "faults in begin/read/flush/rollback/commit, explicit bounded retries, ambiguous commit fencing",
+      "status": "PASS",
+      "evidence": "No sender or durable row on begin/read/flush/rollback/pre-COMMIT failures. Real 40001/40P01 aborted tx retries once, repeated failures stop at two attempts. COMMIT-then-lost-ack retains sending; no retry or callback."
+    },
+    {
+      "name": "sync contract, strict decoding, snapshot bounds, deep clones and exact endpoint release",
+      "status": "PASS",
+      "evidence": "Synchronous-only/reentry/expired handle guards; detached clones; fixed tables; unsafe bigint and preference shape fail closed; actual LIMIT+1 overflow rejected; wrong UUID cannot release endpoint."
+    }
+  ],
+  "lockObservations": [
+    {
+      "pid": 29088,
+      "application_name": "n44-repository-fixture-2",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid",
+      "blockers": [
+        23708
+      ]
+    },
+    {
+      "pid": 31304,
+      "application_name": "n44-repository-fixture-1",
+      "wait_event_type": "Lock",
+      "wait_event": "tuple",
+      "blockers": [
+        29088
+      ]
+    },
+    {
+      "pid": 30644,
+      "application_name": "n44-repository-fixture-2",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid",
+      "blockers": [
+        28572
+      ]
+    },
+    {
+      "pid": 30644,
+      "application_name": "n44-repository-fixture-2",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid",
+      "blockers": [
+        28572
+      ]
+    }
+  ],
+  "fixtureNow": 1792245557733,
+  "repositorySessions": [
+    {
+      "pid": 31304,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    },
+    {
+      "pid": 31908,
+      "role": "n44_repository_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ],
+  "lastLockSnapshot": {
+    "root": 28572,
+    "rows": []
+  },
+  "restartEvent": {
+    "id": "lesson:session-300:2026-10-17:12:00:13:00",
+    "kind": "lesson",
+    "expiresAt": 1792252820180,
+    "actionPath": "/teaching/teaching-300/attendance?session=session-300"
+  },
+  "restartRegistration": "10000000-0000-4000-8000-000000000001",
+  "restartBudget": [
+    {
+      "budget_key": "day:device",
+      "bucket": "20743",
+      "count": 9,
+      "expires_at_ms": "1792281600000"
+    },
+    {
+      "budget_key": "hour:device",
+      "bucket": "497847",
+      "count": 1,
+      "expires_at_ms": "1792252800000"
+    },
+    {
+      "budget_key": "owner-day",
+      "bucket": "20743",
+      "count": 9,
+      "expires_at_ms": "1792281600000"
+    },
+    {
+      "budget_key": "register",
+      "bucket": "497845",
+      "count": 1,
+      "expires_at_ms": "1792245600000"
+    }
+  ],
+  "unchangedHashes": {
+    "drafts/n44-push/registration.mjs": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36",
+    "drafts/n44-push/delivery.mjs": "7aba0ca1e24054e2a6373339df736d29eb0e04d4c7490076db056409053b90e9",
+    "drafts/n44-push/shared.mjs": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+    "drafts/n44-push/schema-proposal.sql": "d1d46f9e0e79cfb6c36c4efa74128fd84fd20bd863079c1c8b6939105d51ad5d",
+    "src/lib/notification-push-core.js": "bf00ae3a06df34e603df8f87da20d6035391db798b58f4d5b32a934e20a6476b",
+    "src/lib/notification-state.js": "d3c0d36ab1e40900586a9964f1ff0919e5317df52289afa7ac898ce67f0a4f35",
+    "src/lib/notification-center.js": "cc09773cc6a8092c67cd55e561881fda94b71c1f79310f398a57b08f73b761c3",
+    "tests/n44-native-postgres-qualification.result.json": "b6a05521190bde681a705a611f68795c8d50e4f47f22d2add3301b49b948cabd",
+    "tests/n44-server-preactivation.test.mjs": "779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1",
+    "tests/fixtures/n44-server-preactivation/fakes.mjs": "e16f8b88aef6c42a6709e2899a1982cb1b406013fdfcc2814eb12025bcbe9da5"
+  },
+  "restart": {
+    "stoppedPid": 19544,
+    "stoppedBirth": "2026-10-17T13:59:15.1763690Z",
+    "controlledFastShutdown": true,
+    "newPid": 21860,
+    "newBirth": "2026-10-17T13:59:32.1926840Z",
+    "evidence": "New pools/repository retained registration, exact budgets and sending fence; same event no callback; cleanup sending→uncertain; revoke erased secrets/released endpoint; tombstone replay did not affect replacement; retention removed rows/budgets."
+  },
+  "sourceHashes": {
+    "drafts/n44-push/postgres-repository.mjs": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+    "drafts/n44-push/README.md": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+    "tests/n44-postgres-repository.mjs": "af351c27f3070e6fc3f5fc37952b35508959472a5624111948a157240d5e95b9",
+    "tests/fixtures/n44-postgres-repository/cases.mjs": "3c00fe9d6019e52a07e263a3fc4d0b9a61543adb7067bfcf3152e488aa9540c9"
+  },
+  "finishedAt": "2026-10-17T13:59:35.184Z",
+  "status": "PASS"
+}
