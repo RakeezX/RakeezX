@@ -1,0 +1,38 @@
+{
+  "taskId": "continuous-n88-real-use-readonly-pilot-preparation-20261017",
+  "runId": "3c617c1e-b814-4bb3-beeb-df52b8f77490",
+  "target": "task-owned loopback HTTP with fabricated auth/repository/clock; actual source UI/CSS; no hosted service",
+  "checks": [
+    {
+      "name": "actual-source-ui-320-light",
+      "status": "PASS",
+      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
+    },
+    {
+      "name": "actual-source-ui-390-dark",
+      "status": "PASS",
+      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
+    },
+    {
+      "name": "actual-source-ui-1280-light",
+      "status": "PASS",
+      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
+    },
+    {
+      "name": "actual-source-ui-1280-dark",
+      "status": "PASS",
+      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
+    },
+    {
+      "name": "actual-app-injected-entry-cancel-owner-context-no-writes",
+      "status": "PASS",
+      "evidence": "Existing openReadyServedDemo helper; actual store readiness and every IndexedDB store + local/session storage identical before/after review/cancel/current-auth-refusal/dispose. No production registration."
+    }
+  ],
+  "limits": [
+    "No hosted SQL/RLS or real teacher authentication",
+    "No physical mobile, deployed HTTPS/proxy, Service Worker/offline certification",
+    "Print/clipboard adapter calls injected; no OS printer/clipboard proof"
+  ],
+  "cleanup": "All owned contexts/browser closed by canonical helper; server closed in finally."
+}
