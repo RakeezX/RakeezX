@@ -1,0 +1,62 @@
+{
+  "taskId": "continuous-n107-calm-single-review-import-20261017",
+  "runId": "dbae21a6-10e7-4500-a33e-e8c87a4fb8ec",
+  "checks": [
+    {
+      "name": "actual_existing_names",
+      "status": "PASS",
+      "evidence": "Actual account app UI/store, one final confirmation, no second review. Grades use owner-bound outbox + cloud transport + canonical receipt; 7/0 saved, blank omitted."
+    },
+    {
+      "name": "actual_existing_grades",
+      "status": "PASS",
+      "evidence": "Actual account app UI/store, one final confirmation, no second review. Grades use owner-bound outbox + cloud transport + canonical receipt; 7/0 saved, blank omitted."
+    },
+    {
+      "name": "actual_new_names",
+      "status": "PASS",
+      "evidence": "Actual account app UI/store, one final confirmation, no second review. Grades use owner-bound outbox + cloud transport + canonical receipt; 7/0 saved, blank omitted."
+    },
+    {
+      "name": "actual_new_grades",
+      "status": "PASS",
+      "evidence": "Actual account app UI/store, one final confirmation, no second review. Grades use owner-bound outbox + cloud transport + canonical receipt; 7/0 saved, blank omitted."
+    },
+    {
+      "name": "n107_direct_extension_first_concise_file_entry_no_obsolete_json_or_duplicate_panels",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers: extension 0.5.10 first, one filename, short CSV/XLSX hint, obsolete JSON entry removed; same parsed file retained across destination/mode changes; no write before confirmation."
+    },
+    {
+      "name": "n107_single_compact_preview_28_blank_grade_roster_and_four_modes_responsive",
+      "status": "PASS",
+      "evidence": "Four real app combinations plus both destinations with 28 fabricated names/two all-blank grade columns at 320/390/1280: 10 rows/page, all 28 accessible, one table, no blank-cell UL, no grade request/item creation/false pending. Source CSS overflow + screenshots."
+    },
+    {
+      "name": "n107_one_bound_consent_new_class_grades_ack_progress_and_semantic_drift_refusal",
+      "status": "PASS",
+      "evidence": "Original precise consent continues after delayed acknowledged parents; timeout/capability recovery resumes same plan without reupload/remapping/review. Changed item/max, foreign identity or extra student refuses; cancel/route stops future grade stages."
+    },
+    {
+      "name": "n107_partial_cancel_exact_receipt_retry_no_duplicate_owner_term_lease_preserved",
+      "status": "PASS",
+      "evidence": "Lost receipt retries identical durable mutation/envelope with one canonical receipt; rejected request retained until explicit retirement; no duplicate class/student/score. Actual post-preflight owner/term/lease/session drift refuses in both destinations. Duplicate/ambiguous/foreign-ID/mapping errors remain blocking."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "08e5563e8c38ac4dd52ebec5458ba36a5c74918d74fce9d639091930828eb8da",
+    "src/store.js": "ae721a3cd6eb0e7e54a21341390c7382f4c14e335b73541d473f4abdf706f957",
+    "src/styles/components.css": "a35961b9210aeccee98f7edf7ec4898948ae73a74bd9ebefd78beb626b613fa6"
+  },
+  "previousFailures": [
+    "page.waitForFunction: Timeout 7000ms exceeded.\n    at done (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:121:29)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:155:11\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "page.waitForFunction: Timeout 7000ms exceeded.\n    at done (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:121:40)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:155:11\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "page.waitForFunction: Timeout 7000ms exceeded.\n    at done (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:121:40)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:155:11\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n20 !== 28\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:183:12\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:215:44\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "AssertionError [ERR_ASSERTION]: Values have same structure but are not reference-equal:\n\n{\n  at: 1792237062915,\n  code: 'PT409',\n  message: 'Synthetic reviewed grade rejected',\n  status: 409\n}\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:237:218\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:130:2",
+    "locator.waitFor: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-grade-review]') to be visible\u001b[22m\n\n    at review (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n107-calm-single-review-import-20261017\\tests\\n107-calm-single-review-import-browser.mjs:119:125)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:309:76\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-calm-single-review-import-20261017/tests/n107-calm-single-review-import-browser.mjs:248:2"
+  ],
+  "visualCapture": "Same actual Product source; full-page captures refreshed at document top to avoid a scrolled fixed-header screenshot artifact. Behavior checks reused by exact SHA256."
+}

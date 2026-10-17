@@ -8450,3 +8450,12 @@
   .roster-populated-actions { grid-template-columns:minmax(0,1fr); }
   .roster-populated-actions .roster-entry-actions { grid-column:auto; }
 }
+
+/* AI-authored N107: one calm paged review, scoped to the import hub. */
+.n107-destination > summary { margin-block: .75rem; cursor: pointer; }
+.n107-review { margin-block: 1rem; }
+.n107-review table { width: 100%; border-collapse: collapse; text-align: start; }
+.n107-review th, .n107-review td { padding: .5rem .65rem; border-bottom: 1px solid var(--border); text-align: start; white-space: nowrap; }
+.n107-review thead { background: var(--bg-sunk); }
+.n107-review tbody th { font-weight: 500; }
+.n107-review nav { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-block: .75rem; flex-wrap: wrap; }

@@ -2770,35 +2770,35 @@ export function refreshClassImportReview(review) {
   verifyClassImport(review, fresh);
   receipt.session = fresh.session;
 }
-export async function confirmClassImport(review, approved = false) {
+export async function confirmClassImport(review, approved = false, { verifyCurrent = () => {} } = {}) {
   const receipt = classImportReviews.get(review);
   if (!approved) return null;
   if (!receipt || receipt.busy || classImportBusy) throw Error('أعد مراجعة الملف قبل الحفظ.');
   receipt.busy = classImportBusy = true;
   try {
-    verifyClassImport(review, receipt);
-    const guard = { verifyCurrent: current => verifyPersistedClassImport(review, receipt, current) };
+    verifyCurrent(); verifyClassImport(review, receipt);
+    const guard = { verifyCurrent: current => { verifyCurrent(); verifyPersistedClassImport(review, receipt, current); } };
     const subject = await resolveSubjectSelection({ token: 'custom', customName: review.subject }, guard);
-    verifyClassImport(review, receipt);
+    verifyCurrent(); verifyClassImport(review, receipt);
     if (subject.ownerId != null && subject.ownerId !== activeWorkspace.authUserId) throw Error('المادة لا تخص الحساب الحالي.');
     if (!receipt.section) {
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
       receipt.section = await createSection({ yearId: review.yearId, grade: review.grade, label: review.label, name: `${review.grade}/${review.label}` }, guard);
       receipt.sectionFingerprint = JSON.stringify(getSection(receipt.section.id));
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
     }
     if (!receipt.teaching) {
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
       receipt.teaching = await createTeaching({ sectionId: receipt.section.id, subjectId: subject.id, termId: review.termId }, guard);
       receipt.teachingFingerprint = JSON.stringify(receipt.teaching);
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
     }
     if (!receipt.added && review.names.length) {
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
       const result = await importStudents(receipt.section.id, review.names, guard);
       receipt.added = result.added;
       receipt.students = result.students;
-      verifyClassImport(review, receipt);
+      verifyCurrent(); verifyClassImport(review, receipt);
     }
     return classImportReceipt(review);
   } finally { receipt.busy = classImportBusy = false; }
@@ -4360,10 +4360,12 @@ export function reviewScoreDistributionCopy(sourceTeachingId, targetTeachingIds,
   })();
 }
 
-async function applyReviewedCommand(command, recordId, patch) {
+async function applyReviewedCommand(command, recordId, patch, verifyCurrent = () => {}) {
   const engine = createSyncV2Engine({ ownershipGuard: runtimeSyncOwnershipGuard,
     currentAuthenticatedUserId: () => cloud.user?.id ?? null });
+  verifyCurrent();
   const queued = await engine.queueCommand({ store: 'items', recordId, command, patch });
+  verifyCurrent();
   const result = await engine.dispatchPending({ onlyMutationId: queued.mutationId });
   if (result.acknowledged !== 1) {
     const pending = await db.get('outbox', queued.id);
@@ -4387,7 +4389,8 @@ export function reviewNamesImport(teachingId, input) {
   return { ...previewStudentRows(input.rows, input.nameColumn, false, sectionRoster(teaching.sectionId)),
     context, teachingId, rows: input.rows, column: input.nameColumn };
 }
-export async function confirmNamesImport(review, approved) {
+export async function confirmNamesImport(review, approved, { verifyCurrent = () => {} } = {}) {
+  verifyCurrent();
   const teaching = getTeaching(review.teachingId);
   const currentContext = !isTeachingArchived(teaching) && importContext(activeWorkspace, teaching, cloud.user?.id);
   if (approved && currentContext !== review.context) throw new Error('IMPORT_CHANGED');
@@ -4396,6 +4399,7 @@ export async function confirmNamesImport(review, approved) {
   try {
     return await confirmStudentImport({ approved, preview: review, currentPreview, expectedContext: review.context, currentContext,
       write: names => importStudents(teaching.sectionId, names, { signal: controller.signal, verifyCurrent(snapshot) {
+        verifyCurrent();
         const currentTeaching = snapshot.teachings.find(row => row.id === teaching.id);
         if (importContext(activeWorkspace, currentTeaching, cloud.user?.id) !== review.context || isTeachingArchived(currentTeaching)) throw new Error('IMPORT_CHANGED');
         const ids = new Set(snapshot.enrollments.filter(row => row.sectionId === teaching.sectionId && row.status === 'active' && !row.deleted).map(row => row.studentId));
@@ -4415,8 +4419,9 @@ export function reviewGradeImport(teachingId, input) {
     ownerId: activeWorkspace?.authUserId, databaseName: activeWorkspace?.databaseName });
 }
 
-export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false } = {}) {
+export async function confirmGradeImport(review, { overwriteConfirmed = false, enrollmentConfirmed = false, approved = false, verifyCurrent = () => {} } = {}) {
   if (!approved) return false;
+  verifyCurrent();
   assertCloudRestoreWritable(); assertLeaseWritable();
   if (activeWorkspace?.type !== 'account' || activeWorkspace.ownershipState !== 'claimed' ||
     review.ownerId !== cloud.user?.id || activeWorkspace.authUserId !== review.ownerId ||
@@ -4427,10 +4432,10 @@ export async function confirmGradeImport(review, { overwriteConfirmed = false, e
   const batch = gradeCommand(review, overwriteConfirmed, enrollmentConfirmed);
   const capability = await cloud.getGradeImportCapability();
   // Recheck after asynchronous preflight. Dispatch itself guards the bound command.
-  assertLeaseWritable();
+  verifyCurrent(); assertLeaseWritable();
   if (review.ownerId !== cloud.user?.id || activeWorkspace?.databaseName !== review.databaseName || activeTerm()?.id !== review.termId ||
     (batch.newStudents?.length ? capability?.unifiedProtocol !== 'N90_UNIFIED_V1' || capability?.unifiedVersion !== 1 : capability?.protocol !== 'N90_REVIEWED_V1' || capability?.version !== 1)) throw new Error('قدرة استيراد الدرجات غير متاحة.');
-  await applyReviewedCommand('score:grade_import', review.teachingId, { batch });
+  await applyReviewedCommand('score:grade_import', review.teachingId, { batch }, verifyCurrent);
   return true;
 }
 
