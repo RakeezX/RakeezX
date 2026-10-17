@@ -1,0 +1,143 @@
+{
+  "taskId": "continuous-n36-final-receiver-journey-20261018",
+  "runId": "7f8c82ff-b9cc-4fd1-969e-fc45c94caf5f",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "checks": [
+    {
+      "name": "n36_0511_exact_archive_sources_and_stable_read_only",
+      "status": "PASS",
+      "evidence": {
+        "files": 25,
+        "archive": {
+          "file": "rakeez-teacher-import-helper-0.5.11.zip",
+          "sha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+          "bytes": 105862
+        },
+        "stable": {
+          "version": "0.5.11",
+          "sourceTaskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+          "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543"
+        },
+        "unchangedEvidence": [
+          "tests/n36-popup-width-diagnostics-package.json",
+          "tests/n36-popup-width-diagnostics-browser.json",
+          "tests/n36-terminal-pager-evidence-browser.json"
+        ],
+        "extensionChanged": false
+      }
+    },
+    {
+      "name": "n36_protocol_ttl_duplicate_and_per_transfer_cap",
+      "status": "PASS",
+      "evidence": "Actual shared protocol accepts one selected class, rejects expired/duplicate/303-row single transfer; no total-run cap asserted."
+    },
+    {
+      "name": "n36_actual_controller_303_ten_sorted_class_reviews_no_automatic_save",
+      "status": "PASS",
+      "evidence": {
+        "classes": [
+          "خامس1",
+          "خامس2",
+          "خامس3",
+          "خامس4",
+          "خامس5",
+          "خامس6",
+          "خامس7",
+          "خامس8",
+          "سادس6",
+          "سادس7"
+        ],
+        "counts": [
+          28,
+          28,
+          29,
+          28,
+          30,
+          28,
+          29,
+          31,
+          34,
+          38
+        ],
+        "total": 303,
+        "actualDOM": true,
+        "networkAndChromeOnlyFixtures": true
+      }
+    },
+    {
+      "name": "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+      "status": "FAIL",
+      "evidence": {
+        "type": "environment",
+        "error": "HANDOFF_UNAVAILABLE",
+        "actualOrigin": "http://127.0.0.1:49483",
+        "requiredOrigin": "https://rakeezx.com",
+        "externalClaimCalls": 0,
+        "owner": "a7300000-0000-4000-8000-000000000001",
+        "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+        "lease": {
+          "state": "NORMAL",
+          "editable": true,
+          "reason": null,
+          "age": 693
+        },
+        "status": "تعذّر النقل: الإضافة غير متاحة أو انتهت الصلاحية أو تغيّر الحساب. أعد النقل ثم أعد المحاولة.",
+        "remaining": "Run the unchanged real transport/receiver on an explicitly authorized synthetic HTTPS rakeezx.com origin, with fabricated Chrome/network APIs, or approve a specific origin-injection test seam. The loopback-only helper cannot supply that origin; weakening or replacing the Product origin guard is excluded."
+      }
+    },
+    {
+      "name": "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards",
+      "status": "NOT_RUN",
+      "evidence": "Protocol TTL/duplicate and exact package passed separately. Receiver save/normal Sync ACK, persisted resume, partial and owner-change scenarios cannot be reached after the real origin rejection; no saved receipt fabricated."
+    }
+  ],
+  "errors": [],
+  "sourceRows": 303,
+  "classCounts": {
+    "خامس1": 28,
+    "خامس2": 28,
+    "خامس3": 29,
+    "خامس4": 28,
+    "خامس5": 30,
+    "خامس6": 28,
+    "خامس7": 29,
+    "خامس8": 31,
+    "سادس6": 34,
+    "سادس7": 38
+  },
+  "preservedFailures": [],
+  "package": {
+    "file": "rakeez-teacher-import-helper-0.5.11.zip",
+    "sha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+    "bytes": 105862
+  },
+  "stable": {
+    "version": "0.5.11",
+    "sourceTaskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543"
+  },
+  "blocker": {
+    "type": "environment",
+    "error": "HANDOFF_UNAVAILABLE",
+    "actualOrigin": "http://127.0.0.1:49483",
+    "requiredOrigin": "https://rakeezx.com",
+    "externalClaimCalls": 0,
+    "owner": "a7300000-0000-4000-8000-000000000001",
+    "databaseName": "rakeezx-user-b51e1b326ee7406912c80050ef41b865",
+    "lease": {
+      "state": "NORMAL",
+      "editable": true,
+      "reason": null,
+      "age": 693
+    },
+    "status": "تعذّر النقل: الإضافة غير متاحة أو انتهت الصلاحية أو تغيّر الحساب. أعد النقل ثم أعد المحاولة.",
+    "remaining": "Run the unchanged real transport/receiver on an explicitly authorized synthetic HTTPS rakeezx.com origin, with fabricated Chrome/network APIs, or approve a specific origin-injection test seam. The loopback-only helper cannot supply that origin; weakening or replacing the Product origin guard is excluded."
+  },
+  "noMutation": true,
+  "status": "BLOCKED",
+  "cleanup": "Canonical isolated helper closed owned contexts/browser; owned loopback server closed. No user browser/profile, external navigation, live mutation, shared lease, or updater mutation.",
+  "nativeActionPopup": {
+    "status": "NOT_RUN",
+    "evidence": "HTTP controller execution is not native action-popup/module-error reproduction; prior native limitation preserved."
+  }
+}
