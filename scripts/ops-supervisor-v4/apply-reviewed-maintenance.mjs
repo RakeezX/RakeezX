@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { verifiedDeployment } from './controller.mjs';
 
 const SELF = 'scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs';
 const WIN_PS = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -143,7 +144,19 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && update.card.checkNameRepair.reason?.length>=35
     && result.candidateSha===e.candidateSha
     && result.baseSha===e.baseSha;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  const verifiedReconcile = update.card.completionMode === 'reconcile_verified_publication'
+    && e.status === 'blocked' && e.resultState === 'LOCAL_READY' && result.state === 'LOCAL_READY'
+    && task.lastFailure === 'Publisher returned incomplete or mismatched deployment proof'
+    && !update.card.liveMutation && !update.card.liveAuthorizationRef && !task.liveMutation && !task.liveAuthorizationRef
+    && d?.status === 'deployed' && verifiedDeployment(task, d)
+    && d.publishedSha === proof?.publishedSha && sha256(bytes(d)) === proof?.priorReceiptSha256
+    && SHA256.test(proof?.reviewedFixtureSha256 ?? '') && proof?.reason?.length >= 50
+    && same(update.card.requiredChecks, task.requiredChecks) && same(update.card.allowedPaths, task.allowedPaths)
+    && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
+    && result.checks?.length && result.checks.every(check => check.status === 'PASS')
+    && task.requiredChecks?.every(name => result.checks.some(check => check.name === name && check.status === 'PASS'))
+    && result.blockerType === 'none' && !result.blocker;
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -217,6 +230,13 @@ export function revisedTask(task, update, commit, at) {
     saved.status = 'delivery'; saved.nextDeliveryAt = at; saved.lastFailure = null;
     saved.sourceParityHistory = [...(task.sourceParityHistory ?? []), { at, reason: update.materialReason, receipt: structuredClone(task.deliveryReceipt) }];
     saved.sourceParityState = null;
+  }
+  if (update.card.completionMode === 'reconcile_verified_publication') {
+    insist(task.deliveryReceipt?.status === 'deployed' && verifiedDeployment(task,task.deliveryReceipt), 'Production receipt no longer qualifies for reconciliation');
+    saved.status = 'awaiting_po'; saved.productionVerifiedAt = task.deliveryReceipt.verifiedAt;
+    saved.deliveryOwner = null; saved.nextDeliveryAt = null;
+    saved.publisherReconciliation = { at, commit, publishedSha: task.deliveryReceipt.publishedSha,
+      originalDeliveryReceiptSha256: sha256(bytes(task.deliveryReceipt)), reason: update.materialReason };
   }
   if (update.card.completionMode === 'deferred_by_po') {
     insist(typeof update.card.deferralReason === 'string' && update.card.deferralReason.length >= 20, 'Explicit PO deferral reason required');
