@@ -1,5 +1,13 @@
 # N36 partial available import — 0.5.5 candidate
 
+## Delivery-gate blocker — run d2935897-8860-4e92-88fa-94fbf250f441
+
+The saved AI candidate `1f847633da4f6d2bf269642e3046f0eac54d42da` and its eight passing worker check groups are preserved. Candidate validation rejected the remaining combined check exactly: `Required affected checks have not passed: n36_versioned_package_SHA_and_published_source_parity`. Local version/archive/per-file/source parity already passed; published provider/immutable/served parity remains NOT_RUN and cannot truthfully become PASS before publication.
+
+This is a circular task readiness prerequisite: the worker is explicitly prohibited from pushing/deploying, the independent controller/publisher owns publication and its evidence, but the inactive card/validator requires that evidence before accepting this worker candidate for publication. No Product implementation correction can create that missing publisher receipt. No new Product, browser or service retry was performed, and no queue/status or operating script was edited.
+
+Retry condition: the approved maintenance path, only after this worker is inactive and the publisher idle, must correct the ownership/phase of this card's combined release check (or its readiness validation), preserving the local package/source check and retaining provider/immutable/served parity as a mandatory publisher gate. The exact affected configuration is the `requiredChecks` entry `n36_versioned_package_SHA_and_published_source_parity` in `artifacts/ops-supervisor-v4/queue/continuous-n36-available-partial-class-import-no-total-cap-20261017.json`; that ops path is outside this worker's allowed writes. Do not waive release verification or manufacture a PASS. Resume this same saved candidate/session only after that material correction, with no repeated Chrome/SQL tests while their inputs remain identical. N36 and official PO acceptance remain OPEN. This result is BLOCKED on delivery configuration, not a Product test failure.
+
 ## Required-check mapping — run 835aef31-4d35-449e-a6cc-990a53e6b7c8
 
 Resumed the exact AI candidate `e8c2717d2ee9a5672532a409ee64a16b0b8fc959`. Product/runtime/package bytes are unchanged. The prior generic check labels are replaced by the original required names below; this changes neither test outcomes nor release authority. Prior failures and their separately verified resolutions remain below.
