@@ -11,7 +11,7 @@ export async function readApprovedNotes(repo,activationId) {
     const productId=c[1].trim(),status=c[7].trim();
     if(/\b(CLOSED|DEFERRED|FROZEN|REJECTED|SUPERSEDED|WAITING_DEPENDENCY)\b/i.test(status))continue;
     openProducts.push(productId);
-    const refs=[...c[11].matchAll(/\[\[OPS_TASK:([a-z0-9-]+\.json):([a-f0-9]{64})\]\]/g)];
+    const refs=[...c[11].matchAll(/\[\[OPS_TASK:([a-z0-9-]+\.json):([a-f0-9]{64})\]\]/g)].filter((m,index,all)=>all.findIndex(x=>x[1]===m[1])===index);
     for(const m of refs){try{
       const p=path.join(repo,'scripts','ops-supervisor-v4',m[1]),st=await fs.lstat(p);if(st.isSymbolicLink()||!st.isFile()||st.size>256000)throw Error('Invalid note source file');
       const raw=await fs.readFile(p);if(digest(raw)!==m[2])throw Error('Approved source hash differs');
