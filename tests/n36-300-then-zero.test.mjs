@@ -42,3 +42,32 @@ test('0.5.3 exact ZIP/manifests/checkouts; both published rollback versions immu
  const manifest=JSON.parse(Buffer.from(zip['manifest.json'])),old=JSON.parse(execFileSync('git',['show',base+':'+dir+'manifest.json']));assert.equal(manifest.version,'0.5.3');manifest.version=old.version;assert.deepEqual(manifest,old);
  const view=await fs.readFile('src/views/class-import-center.js','utf8');assert.equal((view.match(/href="\/assets\/extensions\/rakeez-teacher-import-helper-0.5.3.zip"/g)||[]).length,1);
 });
+
+test('saved corrected browser acceptance is source-bound; original fixture failures remain historical',async()=>{
+ const evidence=JSON.parse(await fs.readFile('tests/n36-300-then-zero-browser.json','utf8'));
+ assert.equal(evidence.status,'PASS');assert.deepEqual(evidence.externalRequests,[]);assert.deepEqual(evidence.errors,[]);
+ assert.equal(evidence.release,'RELEASED browser');
+ const expected=['full299','full300','overflow301','overflow350','missingLast','missingPage','repeat','duplicate','ambiguous','empty','schoolChanged','roleChanged','originChanged','sessionChanged','selfKnown'];
+ assert.deepEqual(evidence.scenarios.map(s=>s.scenario).sort(),expected.sort());
+ for(const scenario of evidence.scenarios)assert.equal(scenario.transferAllowed,['full299','full300','selfKnown'].includes(scenario.scenario),scenario.scenario);
+ assert.deepEqual(evidence.ownerPreview,{rows:300,committed:0,ownerSwitchInvalidates:true,databaseUnchanged:true});
+ assert.match(evidence.reusedPartial.counts,/300.*مجمّع.*0 مكتمل/);
+ assert.match(evidence.reusedPartial.diagnostic,/staged=300.*complete=0.*excluded=ROSTER_LINKS_UNAVAILABLE/);
+ assert.deepEqual(evidence.reusedPartial.sourceHashes,evidence.runtimeHashes);
+ const currentManifest=JSON.parse(await fs.readFile(assets+'rakeez-teacher-import-helper-0.5.3.manifest.json','utf8'));
+ const currentArchive=await fs.readFile(assets+currentManifest.archive.file);assert.equal(hash(currentArchive),currentManifest.archive.sha256);
+ const currentZip=unzipSync(currentArchive);
+ for(const [file,sha] of Object.entries(evidence.runtimeHashes)){
+  assert.equal(hash(await fs.readFile(dir+file)),sha,file);assert.equal(hash(currentZip[file]),sha,file);
+  assert.equal(currentManifest.files.find(f=>f.file===file).sha256,sha,file);
+ }
+ const baseline=evidence.baselineEvidence;assert.equal(baseline.status,'PASS');
+ assert.ok(baseline.history.some(s=>/10 صفحات؛ 300 طلاب؛ 323 صف/.test(s)));
+ assert.match(baseline.counts,/11 صفحات؛ 0 طلاب؛ 23 صف/);assert.match(baseline.warning,/EMPTY_OR_LIMIT/);
+ assert.match(baseline.diagnostic,/ROSTER_LINKS_UNAVAILABLE.*relevant=2.*unsupported=0.*iframeCount=3/);
+ const originalZip=unzipSync(await fs.readFile(assets+'rakeez-teacher-import-helper-0.5.1.zip'));
+ for(const [file,sha] of Object.entries(baseline.sourceHashes))assert.equal(hash(originalZip[file]),sha,file);
+ // Do not erase or promote the failed HTTP-redirect fixture into a successful check.
+ assert.ok(evidence.priorFailures.length>0);assert.ok(evidence.priorBlockedExternal.includes('https://vstedu.azureedge.net'));
+ assert.match(evidence.networkPolicy,/No HTTP redirects/);
+});
