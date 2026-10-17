@@ -1,0 +1,8 @@
+{
+  "name": "rakeez-n44-private-push",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.19.0" },
+  "dependencies": { "web-push": "3.6.7", "ipaddr.js": "2.5.0" }
+}

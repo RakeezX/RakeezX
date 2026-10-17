@@ -1,0 +1,160 @@
+{
+  "taskId": "continuous-n44-audited-protector-and-sender-20261018",
+  "runId": "9c9ee4fd-ab29-43ae-b190-84c9dbcb3a6b",
+  "baseSha": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+  "node": "v24.19.0",
+  "startedAt": "2026-10-17T22:49:50.299Z",
+  "cases": [
+    {
+      "name": "actual protection -> authenticated registration -> committed reservation -> audited bytes -> receiver",
+      "status": "PASS"
+    },
+    {
+      "name": "versioned authenticated envelope, independent HMAC domains and strict tamper denial",
+      "status": "PASS"
+    },
+    {
+      "name": "decrypted minimal payload executes existing consumer action handler with current authorization and expiry",
+      "status": "PASS"
+    },
+    {
+      "name": "seal key rotation and unknown/retired keys; fingerprint epoch stable across live bindings",
+      "status": "PASS"
+    },
+    {
+      "name": "OpenSSL curve validation, canonical encodings, exact documented provider and path",
+      "status": "PASS"
+    },
+    {
+      "name": "VAPID rotation retains authenticated per-subscription key ID and denies unknown/retired signing keys",
+      "status": "PASS"
+    },
+    {
+      "name": "uncommitted/serialized/replayed/expired capabilities never decrypt or send",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback before commit denies encryption/send; current owner/session/consent retained",
+      "status": "PASS"
+    },
+    {
+      "name": "sender rechecks sealed binding and current provider policy, with no transport on swaps",
+      "status": "PASS"
+    },
+    {
+      "name": "DNS private/linklocal/metadata/reserved/mapped answers and mixed sets are rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "connection lookup pinned across rebinding, wrong certificate/address fail closed",
+      "status": "PASS"
+    },
+    {
+      "name": "fixed definitive outcomes, no redirect/replay and original-only 404/410 erasure",
+      "status": "PASS"
+    },
+    {
+      "name": "absolute DNS/transport deadline, abort/close and late accepted outcomes stay uncertain",
+      "status": "PASS"
+    },
+    {
+      "name": "late revoke and completion-commit failure preserve uncertain fence and retention deletion",
+      "status": "PASS"
+    },
+    {
+      "name": "disabled by default, key pair mismatch, abort and closed-key failures are private",
+      "status": "PASS"
+    },
+    {
+      "name": "usable inactive host composition binds actual crypto ports; runtime stays disabled without prerequisites",
+      "status": "PASS"
+    },
+    {
+      "name": "actual import/construction has no side effects and app/service executable sources do not import private drafts",
+      "status": "PASS"
+    },
+    {
+      "name": "http_ece key logging mode denied before cryptographic operations",
+      "status": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "name": "n44_actual_audited_subscription_protection_and_sender_protocol",
+      "status": "PASS",
+      "evidence": "tests/n44-crypto-sender.result.json; 18 focused cases; actual OpenSSL/web-push/http_ece, synthetic transaction/DNS/TLS transport; network attempts=0"
+    },
+    {
+      "name": "n44_key_endpoint_dns_commit_timeout_and_uncertain_guards",
+      "status": "PASS",
+      "evidence": "tests/n44-crypto-sender.result.json; 18 focused cases; actual OpenSSL/web-push/http_ece, synthetic transaction/DNS/TLS transport; network attempts=0"
+    },
+    {
+      "name": "hosted_service_app_device_and_production_verification",
+      "status": "NOT_RUN",
+      "evidence": "Inactive source-only authority; no service/app/SW/device or Production operation."
+    }
+  ],
+  "networkAttempts": 0,
+  "sourceHashes": {
+    "drafts/n44-push/provider-policy.mjs": "9b49a7bd40338ccefc69f617a7a1eb535a9071e1a4a9bc26e48913789b0801fb",
+    "drafts/n44-push/subscription-protector.mjs": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6",
+    "drafts/n44-push/audited-sender.mjs": "9972a864baa325edc04c87958d4cadd7c1a0746a42b5c339d74c880ae5b7f6a1",
+    "drafts/n44-push/committed-permit.mjs": "005cbed6901df5816138c2fd3451c480a71a89e2b4143e4371d5f271c404c29c",
+    "drafts/n44-push/delivery.mjs": "9aebe5e65f45556443fa33b7e6814642f3a42f4e4e8d77830e9c8d852267755e",
+    "drafts/n44-push/private-runtime.mjs": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9",
+    "drafts/n44-push/runtime-gateway.mjs": "73282ab7e1b1ce2abf8027ae2432a63174c78c0b13b2e51763bef2c06c7f2787",
+    "drafts/n44-push/registration.mjs": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36",
+    "drafts/n44-push/shared.mjs": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+    "tests/fixtures/n44-server-preactivation/fakes.mjs": "e16f8b88aef6c42a6709e2899a1982cb1b406013fdfcc2814eb12025bcbe9da5",
+    "tests/n44-server-preactivation.test.mjs": "779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1",
+    "src/lib/notification-push-core.js": "bf00ae3a06df34e603df8f87da20d6035391db798b58f4d5b32a934e20a6476b",
+    "src/lib/notification-push-client.js": "a6a193c7fa192387c7733bee41c1056627634f235e27286519288461aec153fe",
+    "drafts/n44-push/package.json": "d0f9d366824874345a0488e21be4a1d9ba28d8143ace6981f7a71bba267ce257",
+    "drafts/n44-push/package-lock.json": "7fe889341d261ef90eb645dc9353a0fef6f0eab6cc95e09bd72a155af2147a09",
+    "tests/n44-crypto-sender.mjs": "32b302f2a33e8a03f7e194584dd092e9048846400aeabe9264d115de0d0a7d85",
+    "tests/fixtures/n44-crypto-sender/fixture.mjs": "943fc96e55c5de1674b9282aa85e0e57a47adc954207814eb0ea081d92d24ba1"
+  },
+  "reusedEvidence": [
+    {
+      "path": "tests/n44-runtime-gateway.result.json",
+      "runId": "f74393d7-a86f-43b7-8e90-df28b2d007c0",
+      "matching": [
+        {
+          "file": "drafts/n44-push/runtime-gateway.mjs",
+          "sha256": "73282ab7e1b1ce2abf8027ae2432a63174c78c0b13b2e51763bef2c06c7f2787"
+        },
+        {
+          "file": "drafts/n44-push/postgres-repository.mjs",
+          "sha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e"
+        },
+        {
+          "file": "drafts/n44-push/registration.mjs",
+          "sha256": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36"
+        },
+        {
+          "file": "tests/fixtures/n44-runtime-gateway/cases.mjs",
+          "sha256": "e9b57fee5116d6b00092abbe468f5bcf8e4cb92d38e6cf740e673d4cdf4a4500"
+        }
+      ],
+      "limitation": "Unchanged files only; prior proof is not new hosted/Auth/network acceptance or qualification of the changed delivery wrapper."
+    },
+    {
+      "path": "tests/n44-postgres-repository.result.json",
+      "runId": "d3379dc5-49cb-4ae5-89a9-ab130cdaed60",
+      "matching": [
+        {
+          "file": "drafts/n44-push/postgres-repository.mjs",
+          "sha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e"
+        },
+        {
+          "file": "tests/fixtures/n44-postgres-repository/cases.mjs",
+          "sha256": "3c00fe9d6019e52a07e263a3fc4d0b9a61543adb7067bfcf3152e488aa9540c9"
+        }
+      ],
+      "limitation": "Unchanged files only; prior proof is not new hosted/Auth/network acceptance or qualification of the changed delivery wrapper."
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-10-17T22:49:51.050Z"
+}

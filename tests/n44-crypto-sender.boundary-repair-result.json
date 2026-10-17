@@ -1,0 +1,117 @@
+{
+  "taskId": "continuous-n44-audited-protector-and-sender-20261018",
+  "runId": "84e54815-c67b-4457-9948-ba4d9b74ecc1",
+  "baseSha": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+  "preservedCandidateSha": "0e7596dd9c6e16a04bf684bbcdd71976ecf230d4",
+  "startedAt": "2026-10-17T23:08:39.403Z",
+  "finishedAt": "2026-10-17T23:08:39.944Z",
+  "command": "node --test --test-reporter=tap tests/n44-server-preactivation.test.mjs",
+  "exitCode": 0,
+  "status": "PASS",
+  "summary": {
+    "tests": 16,
+    "passed": 16,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "name": "registration: independent auth, self-asserted/foreign owner, strict consent and stale contexts",
+      "status": "PASS"
+    },
+    {
+      "name": "registration: endpoint boundary, disabled origins, key sizes and immutable input",
+      "status": "PASS"
+    },
+    {
+      "name": "registration: global endpoint collision, per-context/device ceiling and mutation budgets",
+      "status": "PASS"
+    },
+    {
+      "name": "registration: duplicate races, protected secrets, original-only revoke and no resurrection",
+      "status": "PASS"
+    },
+    {
+      "name": "registration: asynchronous stale/logout/owner/workspace/device switches reject and errors are private",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: concurrent duplicate reservations across independent instances and immutable identity",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: disabled by default, current context/preference/timing/quiet/zone and injected event recomputation",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: due category and recomputed route/expiry/promise mismatches fail closed",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: definitive non-acceptance retry/backoff and bounded attempt ceiling",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: revocation/expiry/preference/deleted event changes before retry prevent sending",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: uncertain exceptions/unknown outcomes/crash reconciliation never retry",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: dead 404/410 removes only original endpoint and cleanup bounds retention",
+      "status": "PASS"
+    },
+    {
+      "name": "delivery: atomic rate limits fail closed and do not evict unexpired idempotency keys",
+      "status": "PASS"
+    },
+    {
+      "name": "cleanup/revoke: commit failure remains retryable, removes only original UUID, late sends stay fenced",
+      "status": "PASS"
+    },
+    {
+      "name": "inactivity/privacy: imports and construction have no capability side effects, no application import",
+      "status": "PASS"
+    },
+    {
+      "name": "gate: documented SQL/live NOT_RUN and concrete remaining activation gates",
+      "status": "PASS"
+    }
+  ],
+  "outputSha256": "ceb107ec94cb22d8020ad0a777299886756ebc0fe9ae9c36677a11e95b0f40d3",
+  "sourceHashes": {
+    "tests/n44-server-preactivation.test.mjs": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4",
+    "tests/n44-crypto-sender-import-guard.mjs": "ce04e90f88811d61255a046483899b64e4d8d6189241c072b1950d5f27911efd"
+  },
+  "reusedProtocolProof": {
+    "runId": "9c9ee4fd-ab29-43ae-b190-84c9dbcb3a6b",
+    "path": "tests/n44-crypto-sender.result.json",
+    "status": "PASS",
+    "cases": 18,
+    "matchingUnchangedSources": [
+      "drafts/n44-push/provider-policy.mjs",
+      "drafts/n44-push/subscription-protector.mjs",
+      "drafts/n44-push/audited-sender.mjs",
+      "drafts/n44-push/committed-permit.mjs",
+      "drafts/n44-push/delivery.mjs",
+      "drafts/n44-push/private-runtime.mjs",
+      "drafts/n44-push/runtime-gateway.mjs",
+      "drafts/n44-push/registration.mjs",
+      "drafts/n44-push/shared.mjs",
+      "tests/fixtures/n44-server-preactivation/fakes.mjs",
+      "src/lib/notification-push-core.js",
+      "src/lib/notification-push-client.js",
+      "drafts/n44-push/package.json",
+      "drafts/n44-push/package-lock.json",
+      "tests/n44-crypto-sender.mjs",
+      "tests/fixtures/n44-crypto-sender/fixture.mjs"
+    ],
+    "networkAttempts": 0,
+    "exception": "Only the explicitly authorized legacy test changed; it has a new 16/16 proof above. Crypto code, protocol cases and dependencies unchanged."
+  },
+  "historicalFailuresPreserved": [
+    "tests/n44-crypto-sender.boundary-regression.json",
+    "tests/n44-crypto-sender.original-failure.json"
+  ]
+}
