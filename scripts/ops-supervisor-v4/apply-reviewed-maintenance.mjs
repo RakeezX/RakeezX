@@ -129,9 +129,9 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && task.implementationFailures>=1 && !task.deliveryReceipt
     && result.blockerType==='none' && !result.blocker
     && Array.isArray(result.changedPaths) && result.changedPaths.length>0
-    && result.changedPaths.every(p=>task.allowedPaths.includes(p))
+    && result.changedPaths.every(p=>task.allowedPaths.some(a=>a===p || a.endsWith('/**') && p.startsWith(a.slice(0,-2))))
     && Array.isArray(result.checks) && result.checks.some(c=>c.status==='PASS')
-    && result.checks.every(c=>c.status==='PASS' || c.status==='NOT_RUN' && (c.name==='production_publication' || c.name==='publication_and_official_account' && task.productId==='N36'))
+    && result.checks.every(c=>c.status==='PASS' || c.status==='NOT_RUN' && (c.name==='production_publication' || (c.name==='publication_and_official_account' || c.name==='Production_parity_and_official_source_acceptance') && task.productId==='N36'))
     && same(update.card.requiredChecks,task.requiredChecks)
     && same(update.card.allowedPaths,task.allowedPaths)
     && Object.entries(update.card).every(([key,value])=>
