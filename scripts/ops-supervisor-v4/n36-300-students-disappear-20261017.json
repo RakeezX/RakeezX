@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-300-students-final-zero-20261017",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -175,
+      "scopeKey": "n36-po-300-students-then-final-zero-live-evidence-20261017",
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n36-madrasati-roster-official-feedback-20261017"
+      ],
+      "objective": "HIGHEST PRIORITY NEW PRODUCT OWNER ACTUAL OBSERVATION 17 October 2026: In user-installed Madrasati extension 0.5.1 the live progress within one teacher-triggered run climbs 0 -> 50 -> 100 -> 200 -> 250 -> 300 STUDENTS, with screenshot/text proof '10 صفحات؛ 300 طلاب؛ 323 صفًا إجمالًا', and on page 11 labelled 'أسماء الطلاب' then mysteriously becomes '11 صفحات؛ 0 طلاب؛ 23 صفًا إجمالًا'; last safe source diagnostic N36 0.5.1 ROSTER_LINKS_UNAVAILABLE, cause=MAIN_FRAME_READ_LINK_ABSENT, relevant=2, unsupported=0, iframeCount=3, and also category warning EMPTY_OR_LIMIT. THIS STRONGLY PROVES SUCCESSFUL INTERMEDIATE STUDENT ROW STAGING then FINAL FILTERING, and refutes the previous narrative that no students were ever found. Do not claim all 300 are unique complete official students or 300 imported, because final source completeness not proven. Read exactly current run-controller.js, categories.js, navigation.js, source-adapter.js, source adapter categories-popup transfer and existing current test fixtures. Confirm precise stages: run-controller loops page.tables, parseCategoryTable+mergePage+validateCategory+bundle, catches errors by pushing {category:'students',code:'EMPTY_OR_LIMIT'} while leaving old job.categories intact; MyStudents run reader 6-second ROSTER_LINKS_PENDING -> ROSTER_LINKS_UNAVAILABLE on page 11 despite 300 prior student rows; `const unresolved=new Set(warnings.map(w=>w.category)); let valid=categories.filter(c=>!unresolved.has(c.category))` discards ALL 300 and shows 0; then job.categories gets cleared and preview only contains 23 other rows. 300 student rows per category maximum is explicitly `validateCategory` and `parseCategoryTable`, whereas RUN_LIMITS.rows=600, bundle total rows <=600, 300 handoff rows maximum. Reproduce this exact 10-page staged 300 -> 11th page missing self/scan links -> 0 final synthetic regression BEFORE fixing code; use synthetic names/classes, no real Madrasati data. Investigate distinct mechanisms independently: (1) traversal/self-link returning to MyStudents after already-collected real report (only skip truly duplicate known route or benign post-complete scan if actual pager evidence says all allowed report pages finished); (2) >300 per-category quota `EMPTY_OR_LIMIT` and its interaction with accumulator. Fix the actual root causes, not only the counter, only after validating route/pagination/teacher owner context and all expected pages. NEVER drop a genuine warning and export an incomplete roster, never silently truncate at 300 or increase transfer cap with unsafe one-time multi-class write. When a source run is genuinely complete with <=300 validated students and stable same-school context, permit those EXACT reviewed names to reach the existing explicit owner-confirmed Rakeez transfer; preserve 300 cap on per-action handoff, N12 preview & source path/owner/lease. When >300 unique names would be valid, implement a bounded user-reviewed safe no-data-loss path only if it can preserve source origin+total/pager certainty and existing receiver 300 cap (e.g., 2 explicitly reviewed 300-row chunks with separate one-time nonce and explicit confirmation per intended owned class) under allowed source/UI scope. Otherwise keep strict caps, show 'جمعت 300 اسمًا لكن الكشف أكبر من الحد/غير مكتمل' with safe allowed aggregate count, no transfer; DO NOT show ZERO or erase evidence about why before user sees it. Mark pending count diagnostics only, never retain real names beyond existing ephemeral review/lease and no new persistent/chrome.sync storage. The ROSTER_LINKS_UNAVAILABLE error after report may be one legitimately missing page; resolve via source-grounded consistency, do not infer complete from 300 or guessed other report route. Avoid rerunning denied real account inspections, no webpage crawling/iframe guessing, real cookies or student data. Keep current 0.5.2 user-popup usability fix in separate already-running card: do not touch or interfere with its worktree, and do not start a second worker with overlapping paths concurrently; controller serializes intersecting source scopes. Build on latest successfully integrated main code, keep Chrome popup RTL and expiry fixes from completed card, and update ONE stable local extension folder ONLY via existing verified update-stable.ps1 operator workflow after Cloudflare provider/Production parity proof and user Chrome Reload, not by worker. Version next compatible extension sequentially (0.5.3 if 0.5.2 is published; if not, retain existing 0.5.2 as tested rollback candidate only if valid), keep previous package rollback; avoid generating useless duplicate ZIP or old 0.5.0 fallback. Perform affected Node tests with 299/300/301/350 synthetic students, page10 to11 links, incomplete pagination, repeated page, duplicate identity, true empty roster, URL/origin/session/role mismatch, HTML/CSV/JSON formula injection, source category guard, plus isolated unpacked MV3 Chromium end-to-end 320/390/768/1280 to Rakeez owner-bound preview on full-only. Record observed student staged count and exclusion reason in safe diagnostic without PII/URLs/IDs; no technical IDs in teacher main message; protected roster partial data never auto-imported. Publish Product via SOLE original controller/publisher with provider immutable and served proof. The N36 entire official direct Madrasati task remains OPEN until the PO reruns and verifies true roster in the real authenticated account.\n\nREVIEWED CHECK-LABEL RECOVERY 2026-10-17: Exact existing candidate c6ffbda62a20e1b0e1ec51983c0483b22736a7d3 contains Product code and full ZIP of extension 0.5.3, with source-bound synthetic Chrome (15 scenarios) and affected Node proof (16 tests). Worker JSON returned actual PASS tests under four generic group names instead of the seven mandatory requiredChecks. It is a reporting contract defect; do not falsify results.\nResume SAVED original sessionId only: inspect current source SHA and saved source-bound fixture proofs; link each of seven REQUIRED groups to real executed tests/evidence. If a relevant hash changed, rerun the affected check. Keep historical genuinely failed baseline fixtures as history, not PASS.\nCheck exact 300-to-zero reproduction, MyStudents post-roster revisit vs genuine missing page, limit 300 vs 301/350 without silent truncation, owner/session/page terminal guards, accurate partial count without leaking names, preserved popup 0.5.2 UX/expiry, and 0.5.3 packaged Chrome/source/manifest SHA integrity.\nKeep NOT_RUN publication_and_official_account truthful; the sole original publisher verifies Production and only the PO can verify authenticated Madrasati source extraction. Return seven exact names PASS only if supported by real proof; if a true required test lacks support return BLOCKED with factual reason. No real school portal use, no new paid review loop, no weakened owner/lease/Supabase/Sync guards.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/navigation.js",
+        "extensions/rakeez-teacher-import-helper/categories.js",
+        "extensions/rakeez-teacher-import-helper/categories-popup.js",
+        "extensions/rakeez-teacher-import-helper/popup.css",
+        "extensions/rakeez-teacher-import-helper/popup.html",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "extensions/rakeez-teacher-import-helper/README.md",
+        "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.2.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.2.manifest.json",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.3.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.3.manifest.json",
+        "src/views/class-import-center.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/n36-extension-handoff.js",
+        "sw.js",
+        "tests/n36-300-then-zero.test.mjs",
+        "tests/n36-300-then-zero-browser.mjs",
+        "tests/n36-300-then-zero-browser.json",
+        "tests/n36-popup-052-real-feedback.test.mjs",
+        "tests/n36-popup-052-real-feedback-browser.mjs",
+        "tests/n36-popup-052-real-feedback-browser.json",
+        "tests/n36-madrasati-roster-current-feedback.test.mjs",
+        "tests/n36-madrasati-roster-current-feedback-browser.mjs",
+        "tests/n36-madrasati-roster-current-feedback-browser.json",
+        "tests/n36-extension-direct-handoff.test.mjs",
+        "tests/n36-extension-direct-handoff-browser.mjs",
+        "tests/n36-extension-direct-handoff-browser.json",
+        "tests/n36-receiver-limits.test.mjs",
+        "docs/automation-evidence/20261017/N36_300_TO_ZERO_CAUSAL_REPAIR.md",
+        "docs/automation-evidence/20261017/N36_053_SAFE_REVIEW_AND_INSTALL.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/categories.js",
+        "extensions/rakeez-teacher-import-helper/navigation.js",
+        "extensions/rakeez-teacher-import-helper/categories-popup.js",
+        "src/views/class-import-center.js",
+        "src/lib/n36-extension-protocol.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n36_300_staged_to_0_final_baseline_exact_reproduction",
+        "n36_post_roster_MyStudents_rescan_redundant_vs_genuine_missing_page",
+        "n36_300_row_category_boundary_and_overflow_301_350_no_false_complete",
+        "n36_only_verified_terminal_pager_origin_school_owner_can_transfer_reviewed_rows",
+        "n36_true_partial_300_staged_count_explained_and_no_hidden_student_PII_or_storage",
+        "n36_existing_MV3_052_popup_expiry_and_complete_roster_safeguards_retain",
+        "n36_next_package_full_SHA_browser_N12_preview_and_prod_release_readiness"
+      ],
+      "acceptance": [
+        "First run current genuine 0.5.1 source on synthetic 10-page staged 300-student, 323-total-row fixture and 11th MyStudents no-report-link transition to reproduce the exact drop to zero and two error codes before changes. Save baseline evidence with the source hashes. Do not read real student data.",
+        "Repair the specific false fatal warning flow and/or needless revisited MyStudents route only when exact safe observed report and pager completeness prove no students remain; a truly incomplete, duplicate or exceeded 300-row dataset never enters Rakeez by accident and keeps explicit in-memory source-seen aggregate number with accurate partial blocking explanation rather than fake 0 students. Distinguish collected, verified/complete, and committed numbers.",
+        "Test both exactly 300 and over-cap 301,350 rows across multiple classes, 50/page, repeated/ambiguous pager, source switching and missing last page, optional safe segmented explicit review if complete >300, with no silent truncation, fake completeness or new persistent student data.",
+        "Ensure new package version and immutable manifest source entries match exact bytes, previous published 0.5.1 and successful 0.5.2 if any retained as rollback, user can update one fixed directory after delivery and Chrome user Reload; no personal Chrome interaction by agent.",
+        "Publish only via single controller/publisher and verify Cloudflare/provider/Preview/Production served exact assets. Keep N36 full OPEN pending PO official Madrasati real accepted import, and send the PO only one newly meaningful safe reproduction when available."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-observed-300-staged-to-zero-direct-roster-correctness",
+        "realStudentReads": 0,
+        "schoolPortalAccess": false,
+        "liveWrites": false,
+        "migrations": 0,
+        "authChanges": false,
+        "ChromePersonalProfile": false,
+        "publication": true
+      },
+      "releaseAuthority": "PO supplied new real Madrasati run proving 300 student rows staged then zero final; code/synthetic correction of unintended entire-category rejection, deterministic warning classification, accurate privacy-safe counts, and existing explicit owner-reviewed names transfer already delegated. No broader official source/iframe access, access-control changes, unconfirmed incomplete import, Auth/RLS/schema/scoring/restore operation, actual student mutation by worker, or direct personal browser interaction. Full official-account completeness and PO acceptance remain separately unverified. Controller handles safe Product merge/deployment and verified in-place extension helper after Production.",
+      "completionMode": "repair_validation_check_names",
+      "checkNameRepair": {
+        "previousResultSha256": "973f384db07cd708c4203ffe7ebdcc69c38e968d676183d0a03d0c1db3219df2",
+        "previousFailureSha256": "4ae7a1be73e87342a3c679f9c46fd71b7d001b128c9ccfbd5738812fd42f1ad4",
+        "reason": "Exact N36 source/browser/Node/package checks passed but worker reported generic headings, not the original seven mandatory acceptance labels. The one NOT_RUN is official account and publisher, which must remain NOT_RUN. Resume specific saved session for truthful, evidence-backed labels only; preserve candidate and all existing guards."
+      }
+    }
+  ]
+}
