@@ -6,7 +6,39 @@ import {openReadyServedDemo} from './helpers/served-demo-readiness.mjs';
 import {unzipSync} from '../src/lib/student-import-parsers.js';
 // Test-only adapter for the older transfer fixture: expose its missing browser storage
 // and protocol-compatible fixture setup; no Product guard is changed.
-if(process.argv.includes('--legacy-transfer')){
+if(process.argv.includes('--observed-schema')){
+ // Narrow rendered source-reader fixture, not an official-source or account proof.
+ const {withIsolatedLocalBrowser}=await import('file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs');
+ const report='/SchoolManagmentReports/StudentInfo/ClassStudentInfo/'+'b'.repeat(32),school='a'.repeat(32);
+ const headers=["\u0627\u0633\u0645 \u0627\u0644\u0637\u0627\u0644\u0628","\u062d\u0627\u0644\u0629 \u0627\u0644\u0637\u0627\u0644\u0628","\u0627\u0644\u0645\u062f\u0631\u0633\u0629","\u0627\u0644\u0641\u0635\u0644","\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a","\u062d\u0633\u0627\u0628 \u0627\u0644\u0637\u0627\u0644\u0628","\u0627\u0644\u062c\u0648\u0627\u0644","\u0648\u0644\u064a \u0627\u0644\u0623\u0645\u0631","\u062c\u0648\u0627\u0644 \u0648\u0644\u064a \u0627\u0644\u0623\u0645\u0631"];
+ const chars="\u0627\u0628\u062a\u062b\u062c\u062d\u062e\u062f\u0630\u0631\u0632\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063a\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u0648\u064a";
+ const rows=Array.from({length:50},(_,i)=>'<tr>'+["\u0637\u0627\u0644\u0628 \u0627\u0635\u0637\u0646\u0627\u0639\u064a "+chars[Math.floor(i/chars.length)]+chars[i%chars.length],"\u0646\u0634\u0637","\u0645\u062f\u0631\u0633\u0629 \u0627\u0635\u0637\u0646\u0627\u0639\u064a\u0629","\u0641\u0635\u0644 \u0623\u0644\u0641",'private@example.invalid','PRIVATE_ACCOUNT','PRIVATE_PHONE','PRIVATE_GUARDIAN','PRIVATE_PHONE'].map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');
+ const index='/SchoolManagment/Actions/MyStudents?SchoolId='+school;
+ const pager=(route,key,pages)=>'<ul class="pagination"><li class="active"><a aria-current="page">1</a></li>'+pages.map(n=>'<li><a href="'+route+'?'+key+'='+n+(key==='PageNumber'?'&schoolId='+school:'')+'">'+n+'</a></li>').join('')+'</ul>';
+ const fixtureServer=http.createServer(async(req,res)=>{try{
+  const u=new URL(req.url,'http://127.0.0.1');
+  if(u.pathname.startsWith('/extension/')){
+   const name=u.pathname.slice('/extension/'.length);if(!['source-adapter.js','route-diagnostics.js'].includes(name)){res.writeHead(404).end();return;}
+   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'});res.end(await fs.readFile('extensions/rakeez-teacher-import-helper/'+name));return;
+  }
+  res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+  res.end('<!doctype html><html dir="rtl"><table><tr><th>Download</th></tr></table>'+(u.pathname===report?'<table><tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows+'</table>'+pager(report,'page',[2,3,4,5,7]):pager('/SchoolManagment/Actions/MyStudents','PageNumber',[2,3,4,5,15]))+'</html>');
+ }catch{res.writeHead(500).end();}});
+ try{
+  await new Promise((resolve,reject)=>{fixtureServer.once('error',reject);fixtureServer.listen(43879,'127.0.0.1',resolve);});
+  await withIsolatedLocalBrowser({taskFile:'C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n36-available-partial-class-import-no-total-cap-20261017.json',runId:'835aef31-4d35-449e-a6cc-990a53e6b7c8',url:'http://127.0.0.1:43879'+report},async({createContext,origin})=>{
+   const context=await createContext(),page=await context.newPage();
+   const read=()=>page.evaluate(async school=>{await import('/extension/route-diagnostics.js');return (await import('/extension/source-adapter.js')).readSourceReportPage('students',{schoolId:school});},school);
+   await page.goto(origin+report);const result=await read();assert.equal(result.ok,true,JSON.stringify(result));assert.equal(result.tables[0].text.split('\n').length,51);assert.equal(result.schoolNames.length,1);
+   assert.equal(result.links[0].path,report+'?page=2');assert.equal(result.pagination.total,null);assert.equal(result.pagination.terminal,false);assert.doesNotMatch(JSON.stringify(result),/PRIVATE_|example.invalid/);
+   await page.goto(origin+index);const missing=await read();assert.equal(missing.ok,false);assert.equal(missing.code,'ROSTER_LINKS_PENDING');assert.equal(missing.incomplete,true);assert.equal(missing.diagnostic.roster.cause,'MAIN_FRAME_READ_LINK_ABSENT');
+   // Discovery returns no raw index text and cannot alter the earlier valid report result.
+   assert.equal(missing.tables,undefined);assert.equal(result.tables[0].text.split('\n').length,51);
+   console.log('PASS observed schema: 9 headers, 50 safe rows, lowercase page=2, unknown total, private columns excluded; MyStudents PageNumber index remains coverage-only with no raw roster.');
+  });
+ }finally{await new Promise(resolve=>fixtureServer.close(resolve));fixtureServer.closeAllConnections();}
+ console.log('RELEASED isolated browser and owned loopback server');
+}else if(process.argv.includes('--legacy-transfer')){
  const values=new Map();globalThis.localStorage={get length(){return values.size;},key:i=>[...values.keys()][i]??null,getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k),clear:()=>values.clear()};
  // Match the legacy transfer fixture to its selected service protocol without
  // suppressing pending mutations or changing any Product serialization/guard.

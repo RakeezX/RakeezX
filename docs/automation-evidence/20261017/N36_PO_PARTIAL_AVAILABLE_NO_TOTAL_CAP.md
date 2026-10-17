@@ -1,5 +1,25 @@
 # N36 partial available import — 0.5.5 candidate
 
+## Required-check mapping — run 835aef31-4d35-449e-a6cc-990a53e6b7c8
+
+Resumed the exact AI candidate `e8c2717d2ee9a5672532a409ee64a16b0b8fc959`. Product/runtime/package bytes are unchanged. The prior generic check labels are replaced by the original required names below; this changes neither test outcomes nor release authority. Prior failures and their separately verified resolutions remain below.
+
+| Original required check | Worker outcome and concrete evidence |
+| --- | --- |
+| `n36_no_product_total_cap_for_50_303_1000_plus_available_rows` | PASS — source-window Node tests cover 50/299/300/301/303/350/1000/1251; unchanged Chrome evidence covers repeated reviewed batches across actual synthetic owned classes. The PO's 1000+ requirement is teacher total across classes, not a new oversized-class prerequisite. |
+| `n36_partial_per_class_warning_and_explicit_import_available_only` | PASS — Chrome nonterminal/missing-page/report cases exercise partial warning, explicit acknowledgement and actual receiver confirmation; no automatic write. |
+| `n36_actual_valid_class_rows_not_discarded_due_missing_next_page` | PASS — Chrome missingLast/missingMiddle/missingReport retain available reviewed rows; additional observed-schema fixture below preserves 50 safe rows with unknown total. |
+| `n36_owner_lease_term_and_row_provenance_guards_still_fail_closed` | PASS — Chrome owner/lease/school/role/session/origin cases plus receiver/protocol Node checks; existing owner-bound N12 entry and atomic context preflight remain active. |
+| `n36_per_batch_receiver_cap_and_safe_multi_batch_own_class_completion` | PASS — <=300 transport/receiver limits and reviewed sequential class batches, including same-class 350; existing nullable overflow proofs also remain valid. |
+| `n36_source_duplicate_receiver_repeat_and_retry_no_double_create` | PASS — Chrome duplicate/retry/lostReceipt plus exact-envelope SQL replay; existing-name review and receipt-gated continuation prevent duplicate creates. |
+| `n36_ephemeral_secure_handoff_expiry_PII_and_no_auto_write` | PASS — Chrome expiry/receipt/explicit-review cases and handoff Node tests; encrypted one-time transport and scrubbing remain unchanged. New nine-column source fixture excludes all private contact/account/guardian markers from reader output. |
+| `n36_MV3_RTL_browser_and_affected_old_regressions_pass` | PASS — reused 31 hash-bound actual MV3/application scenarios, responsive RTL bounds, 23 affected Node tests, 4 store/SQL tests and corrected 4-test transfer/grade/history/Sync fixture. |
+| `n36_versioned_package_SHA_and_published_source_parity` | NOT_RUN as a combined release gate — local 0.5.5 archive/per-file manifest/source binding PASS; Production provider/immutable/served parity has not been performed by this worker. Independent publisher owns it. No official-source acceptance is claimed. |
+
+New narrow check: `node tests/n36-null-roll-overflow-browser.mjs --observed-schema` PASS. It serves synthetic report and index documents over task-owned loopback HTTP port 43879, runs the actual unchanged source reader and route policy in a canonical fresh isolated context, and closes browser/server in finally. The fixture models the anonymized note's nine report headers, 50 rows, same-report lowercase `page=2,3,4,5,7`, and separate `MyStudents` index anchors `PageNumber`/`schoolId` with no labelled roster. It verifies 50 name/class rows, private fields excluded, next page 2, unknown total and no terminal claim. Missing index links remain unresolved coverage and supply no raw index names; the existing hash-bound full flow already proves this does not wipe prior safe rows. This source-reader fixture is not a substitute for actual app/MV3 UI evidence or official-source compatibility. No index pagination or actual school account was navigated.
+
+Harness-only setup failures (Windows absolute-module URL and synthetic Arabic encoding) were corrected before this PASS; no Product source or guard was changed. Existing 31-scenario Product UI evidence is reused only after its current source/application/package hash-binding assertion passes. No new live browser/account/SQL operation, deployment, fixed-runtime update or queue edit occurred. All local phase resources are released. N36 remains OPEN pending independent release verification and voluntary PO authenticated class-level import acceptance.
+
 ## Current validation repair — 2026-10-17
 
 Run `016ab45e-672d-4736-9f7b-d9194e24896e` preserves AI candidate `339c25f2ee8e4c848051e67e29004b976c0aaf20`. Its result was rejected because it recorded an unresolved legacy full-Sync FAIL. The failure below remains historical; it is now resolved in the scoped test adapter, with no Product byte change.
