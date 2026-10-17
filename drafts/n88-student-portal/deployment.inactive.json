@@ -1,0 +1,16 @@
+{
+  "aiAuthored": true,
+  "enabled": false,
+  "entry": "drafts/n88-student-portal/runtime.mjs#composeRuntime",
+  "listener": "none; separately authorized direct TLS Node host must attach handle",
+  "environmentNames": ["N88_PUBLIC_ORIGIN", "N88_DATABASE_URL", "N88_HMAC_KEY", "N88_AUTH_URL", "N88_AUTH_API_KEY"],
+  "requiredTrustedPorts": ["bounded PG pool acquire/release(error)", "independently verified current Auth session resolver"],
+  "requiredReadbacks": ["canonicalReadback", "privateIngressReadback"],
+  "sourceOnly": true,
+  "routes": ["/api/n88/teacher/students", "/api/n88/teacher/issue", "/api/n88/teacher/publish", "/api/n88/teacher/revoke", "/api/n88/s/<private-entry>/claim", "/api/n88/s/<private-entry>/read", "/api/n88/s/<private-entry>/logout"],
+  "limits": {"contexts": 10, "memberships": 2000, "credentials": 10000, "sessions": 3000, "publications": 2000, "rates": 10000, "total": 30000, "bytes": 8388608, "rowBytes": 4096},
+  "timing": {"acquireMs": 1000, "transactionMs": 8000, "cleanupMs": 400, "statementMs": 3000, "lockMs": 1000},
+  "canonicalBounds": {"maxRows": 2000, "maxBytes": 2097152},
+  "pool": {"max": 2, "connectionTimeoutMillis": 1000, "boundedAdmission": true},
+  "privateLogs": {"accessLog": "disabled for private paths", "requestBodies": false, "headers": false, "sqlParameters": false, "sqlErrorDetail": false, "metrics": "fixed operation/status counters only; no owner/student/path/token labels"}
+}

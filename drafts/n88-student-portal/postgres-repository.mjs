@@ -123,7 +123,8 @@ function transitions(before,after) {
  * Timed-out callbacks own only a detached draft; fences prevent ALL later flushes.
  * Pool must itself bound connections/queue and release(error) must destroy client.
  */
-export function createPostgresRepository({ acquire, limits, timing }) {
+export function createPostgresRepository({ acquire, limits, timing, synchronize = async () => {} }) {
+  must(typeof synchronize === 'function');
   must(typeof acquire==='function'); exact(limits,[...names,'total','bytes','rowBytes']);
   for(const k of names) safe(limits[k],1,10000);
   safe(limits.total,1,50000); safe(limits.bytes,1024,64*1024*1024); safe(limits.rowBytes,128,32768);
@@ -164,6 +165,9 @@ export function createPostgresRepository({ acquire, limits, timing }) {
         bytes+=Buffer.byteLength(JSON.stringify(state[name])); must(bytes<=limits.bytes);
       }
       const original=snapshot(state,limits);
+      // Trusted runtime canonical binding participates in THIS transaction/lock and
+      // durable diff. The fenced query capability cannot outlive the transaction.
+      await synchronize(state, { query }); fence(); snapshot(state,limits);
       const value=await action(state); fence();
       // Neither the callback's retained references nor its result can alter the flush.
       const final=snapshot(structuredClone(state),limits), result=structuredClone(value);
