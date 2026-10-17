@@ -21,7 +21,9 @@ function time(value){
  if(minutes.length===2&&minutes[1]<=minutes[0])fail('INVALID_TIME');return v;
 }
 export function validateCategory(category,rows){
- const spec=CATEGORIES[category];if(!spec||!Array.isArray(rows)||!rows.length||rows.length>300)fail('EMPTY_OR_LIMIT');
+ const spec=CATEGORIES[category];if(!spec||!Array.isArray(rows))fail('INVALID_CATEGORY');
+ if(!rows.length)fail('EMPTY_CATEGORY');
+ if(rows.length>300)fail('CATEGORY_ROW_LIMIT');
  if(['teacher','school','principal'].includes(category)&&rows.length!==1)fail('AMBIGUOUS_ROLE');
  const seen=new Set(),slots=new Set();
  return rows.map(row=>{
