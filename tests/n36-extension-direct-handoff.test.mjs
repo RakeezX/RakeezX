@@ -19,18 +19,18 @@ test('package and app use identical protocol; no broader hosts, content scripts,
  assert.equal(m.host_permissions,undefined);assert.equal(m.content_scripts,undefined);
  assert.equal(await readFile(dir+'handoff-protocol.js','utf8'),await readFile('src/lib/n36-extension-protocol.js','utf8'));
  const worker=await readFile(dir+'handoff-worker.js','utf8');assert.doesNotMatch(worker,/fetch\(|XMLHttpRequest|localStorage|storage\.(local|sync)|clipboard|cookies/);
- for(const file of ['navigation.js','source-adapter.js','route-diagnostics.js']){
+ for(const file of ['navigation.js','route-diagnostics.js']){
   const {execFileSync}=await import('node:child_process');const baseline=execFileSync('git',['show','0246d892de99ff66c8106d37b77678136cc3cacf:'+dir+file],{encoding:'utf8'});
   assert.equal((await readFile(dir+file,'utf8')).replace(/\r\n/g,'\n'),baseline.replace(/\r\n/g,'\n'));
  }
  const sw=await readFile('sw.js','utf8');for(const file of ['n36-extension-handoff.js','n36-extension-protocol.js'])assert.ok(sw.includes("'./src/lib/"+file+"'"));
 });
-test('installable ZIP and provenance manifest match every shipped runtime byte',async()=>{
+for(const version of ['0.5.0','0.5.1'])test('installable ZIP '+version+' and provenance manifest match every shipped runtime byte',async()=>{
  const {execFileSync}=await import('node:child_process');
  const {createHash}=await import('node:crypto');const {unzipSync}=await import('../src/lib/student-import-parsers.js');
- const dir='assets/extensions/',m=JSON.parse(await readFile(dir+'rakeez-teacher-import-helper-0.5.0.manifest.json','utf8'));
+ const dir='assets/extensions/',m=JSON.parse(await readFile(dir+'rakeez-teacher-import-helper-'+version+'.manifest.json','utf8'));
  const bytes=await readFile(dir+m.archive.file),hash=b=>createHash('sha256').update(b).digest('hex'),zip=unzipSync(bytes);
- assert.equal(hash(bytes),m.archive.sha256);assert.equal(bytes.length,m.archive.bytes);assert.equal(m.version,'0.5.0');
+ assert.equal(hash(bytes),m.archive.sha256);assert.equal(bytes.length,m.archive.bytes);assert.equal(m.version,version);
  assert.equal(m.inheritedExtensionCommit,'0246d892de99ff66c8106d37b77678136cc3cacf');
  assert.deepEqual(Object.keys(zip).sort(),m.files.map(f=>f.file).sort());
  // AI: inherited packaged files use CRLF while Git stores LF. Check the exact
@@ -45,8 +45,8 @@ test('installable ZIP and provenance manifest match every shipped runtime byte',
  };
  for(const file of m.files){
   const sourcePath='extensions/rakeez-teacher-import-helper/'+file.file;
-  const canonical=execFileSync('git',['show','HEAD:'+sourcePath]);
-  const checkout=await readFile(sourcePath),packaged=Buffer.from(zip[file.file]);
+  const canonical=version==='0.5.0'?execFileSync('git',['show','e2abdfe3c10307f995bd237e9a39d66a6f419082:'+sourcePath]):await readFile(sourcePath);
+  const checkout=version==='0.5.0'?canonical:await readFile(sourcePath),packaged=Buffer.from(zip[file.file]);
   verify(packaged,canonical,checkout,file.sha256,file.file);
   // Keep real content/package/hash tampering rejected by this corrected check.
   assert.throws(()=>verify(packaged,canonical,Buffer.concat([checkout,Buffer.from('tampered')]),file.sha256,file.file));
@@ -55,5 +55,5 @@ test('installable ZIP and provenance manifest match every shipped runtime byte',
   assert.throws(()=>verify(changed,canonical,checkout,hash(changed),file.file));
   assert.throws(()=>verify(packaged,canonical,checkout,'0'.repeat(64),file.file));
  }
- assert.equal(JSON.parse(Buffer.from(zip['manifest.json']).toString()).version,'0.5.0');
+ assert.equal(JSON.parse(Buffer.from(zip['manifest.json']).toString()).version,version);
 });

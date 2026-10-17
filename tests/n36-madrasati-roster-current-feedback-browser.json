@@ -1,0 +1,1229 @@
+{
+  "runId": "6fedd671-7415-414b-82a9-57b0b9dab537",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "051_exact_entry_counters",
+      "status": "PASS",
+      "evidence": "Installed top-frame reader matches every PO-supplied safe entry counter; no iframe document/src read."
+    },
+    {
+      "name": "051_feedback",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_unsupported",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_alternate",
+      "status": "PASS",
+      "evidence": "Previously bypassed labeled table / alternate label now extracts exact source names with complete pager; actual Rakeez owner-bound preview has no automatic write; owner switch invalidates."
+    },
+    {
+      "name": "051_inline",
+      "status": "PASS",
+      "evidence": "Previously bypassed labeled table / alternate label now extracts exact source names with complete pager; actual Rakeez owner-bound preview has no automatic write; owner switch invalidates."
+    },
+    {
+      "name": "051_inlineNoPager",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_pending",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_missingMiddle",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_repeatResponse",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_unsafeReport",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_deniedOrigin",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_deniedQuery",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    },
+    {
+      "name": "051_inlineHandler",
+      "status": "PASS",
+      "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "officialAccount": "NOT_RUN",
+  "production": "NOT_RUN",
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "package": {
+    "schema": "rakeez-private-extension-package",
+    "version": "0.5.1",
+    "applicationBaseSha": "e2abdfe3c10307f995bd237e9a39d66a6f419082",
+    "inheritedExtensionCommit": "0246d892de99ff66c8106d37b77678136cc3cacf",
+    "installation": "Explicit user Load unpacked in a new owned folder only; no personal profile/stable extension modified",
+    "officialAccountVerification": "NOT_RUN",
+    "files": [
+      {
+        "file": "categories-popup.js",
+        "sha256": "7c04643880e5ab2ec1af64251289e599a6ca243f26474770ccdd65f4fd16b485",
+        "bytes": 13809
+      },
+      {
+        "file": "categories.js",
+        "sha256": "d3be1185177b1044a77fdd38bf8147b91aeaa01efce62c04a70b5bbf994bc82a",
+        "bytes": 5760
+      },
+      {
+        "file": "core.js",
+        "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+        "bytes": 2178
+      },
+      {
+        "file": "handoff-protocol.js",
+        "sha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+        "bytes": 2425
+      },
+      {
+        "file": "handoff-worker.js",
+        "sha256": "98353a493f9fe8e82d72b2fcde5fa046649768642d21f716664c4431cd130833",
+        "bytes": 3211
+      },
+      {
+        "file": "lib/rakeez-datetime-values.js",
+        "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+        "bytes": 1806
+      },
+      {
+        "file": "lib/rakeez-datetime.css",
+        "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+        "bytes": 3070
+      },
+      {
+        "file": "lib/rakeez-datetime.js",
+        "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+        "bytes": 7085
+      },
+      {
+        "file": "manifest.json",
+        "sha256": "4005c842f1e94099cbc60333659ad834cfbe15ccab44b457eb2e64d131339ea2",
+        "bytes": 817
+      },
+      {
+        "file": "navigation.js",
+        "sha256": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+        "bytes": 1383
+      },
+      {
+        "file": "popup.css",
+        "sha256": "9c38d9313b276969e37db46941d8b258c99a5276a40f5bc4760ef922c4af8cf1",
+        "bytes": 2026
+      },
+      {
+        "file": "popup.html",
+        "sha256": "bac54fa7680fe60b7535149ed26579d227065d9f8ffca77af1fe437e8c107bce",
+        "bytes": 8580
+      },
+      {
+        "file": "popup.js",
+        "sha256": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+        "bytes": 4468
+      },
+      {
+        "file": "README.md",
+        "sha256": "c9032e87995c3d94e8ebf6ad4d0361fac06415df3b8d1a3de7e721c3a914f720",
+        "bytes": 45571
+      },
+      {
+        "file": "route-diagnostics.js",
+        "sha256": "e2b05edc73d67b9aa214c42541dd8634395de8cfb36006801b3af5d4a8640134",
+        "bytes": 4804
+      },
+      {
+        "file": "run-controller.js",
+        "sha256": "30fc580fe5d2b8dc7b16ce4dcda51cf038a23172ffe0966ae4d11f212ef34a51",
+        "bytes": 28327
+      },
+      {
+        "file": "selection.js",
+        "sha256": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+        "bytes": 31515
+      },
+      {
+        "file": "source-adapter.js",
+        "sha256": "1fe555217ad2b27234e09eb99ee55293c72c8dbf626d3f30eb0605afb8571fdf",
+        "bytes": 18934
+      },
+      {
+        "file": "vendor/flatpickr/ar.js",
+        "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+        "bytes": 1928
+      },
+      {
+        "file": "vendor/flatpickr/flatpickr.min.css",
+        "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754",
+        "bytes": 16166
+      },
+      {
+        "file": "vendor/flatpickr/flatpickr.min.js",
+        "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+        "bytes": 50679
+      },
+      {
+        "file": "vendor/flatpickr/LICENSE.md",
+        "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095",
+        "bytes": 1084
+      }
+    ],
+    "archive": {
+      "file": "rakeez-teacher-import-helper-0.5.1.zip",
+      "sha256": "8fc7a5f68174458673f15c97bf477aa262f581d34a63f69ba85480e383eccf7c",
+      "bytes": 85752
+    }
+  },
+  "load": {
+    "id": "bbakmfbjchkgcifgpinenlhojbnpelpk"
+  },
+  "targets": [
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/"
+    },
+    {
+      "type": "browser_ui",
+      "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html"
+    },
+    {
+      "type": "page",
+      "url": "about:blank"
+    }
+  ],
+  "extensionId": "bbakmfbjchkgcifgpinenlhojbnpelpk",
+  "exactEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 4,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 3,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 3
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 2,
+    "schoolOptions": 0,
+    "sourceTabMatch": true
+  },
+  "stage": "inlineHandler",
+  "baseline": {
+    "runId": "6fedd671-7415-414b-82a9-57b0b9dab537",
+    "synthetic": true,
+    "checks": [
+      {
+        "name": "050_exact_entry_counters",
+        "status": "PASS",
+        "evidence": "Installed top-frame reader matches every PO-supplied safe entry counter; no iframe document/src read."
+      },
+      {
+        "name": "050_feedback",
+        "status": "PASS",
+        "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+      },
+      {
+        "name": "050_alternate",
+        "status": "PASS",
+        "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+      },
+      {
+        "name": "050_inline",
+        "status": "PASS",
+        "evidence": "Installed synthetic run; 0 student rows, transfer disabled; unresolved completeness never accepted."
+      }
+    ],
+    "externalRequests": [],
+    "errors": [],
+    "officialAccount": "NOT_RUN",
+    "production": "NOT_RUN",
+    "lease": "ACQUIRED browser",
+    "browser": "155.0.8059.80",
+    "package": {
+      "schema": "rakeez-private-extension-package",
+      "version": "0.5.0",
+      "inheritedExtensionCommit": "0246d892de99ff66c8106d37b77678136cc3cacf",
+      "applicationBaseSha": "c7b249340a2205564bc9e00b7323bfc323b5cd9b",
+      "installation": "Explicit user Load unpacked in a new owned folder only; no personal profile/stable extension modified",
+      "officialAccountVerification": "NOT_RUN",
+      "files": [
+        {
+          "file": "categories-popup.js",
+          "sha256": "8d190bf628802c87e95647c82363da574ab28e795146d9efb4d1eb5769600ab6",
+          "bytes": 13944
+        },
+        {
+          "file": "categories.js",
+          "sha256": "c34cb33213831317c6c2f70d0ea47d9da5f3a4a6580999322f4a14c3e43e5d69",
+          "bytes": 5845
+        },
+        {
+          "file": "core.js",
+          "sha256": "e1de27a231b34554b8604465492e164d5603b0fb14e38708dcb489f1ce2949a5",
+          "bytes": 2216
+        },
+        {
+          "file": "handoff-protocol.js",
+          "sha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+          "bytes": 2425
+        },
+        {
+          "file": "handoff-worker.js",
+          "sha256": "98353a493f9fe8e82d72b2fcde5fa046649768642d21f716664c4431cd130833",
+          "bytes": 3211
+        },
+        {
+          "file": "lib/rakeez-datetime-values.js",
+          "sha256": "6a98b89fc499c1da72729c29b198da2b2906ef7f2762fb12264fd14425bcce9b",
+          "bytes": 1840
+        },
+        {
+          "file": "lib/rakeez-datetime.css",
+          "sha256": "afc1d15fd5a8c589c5c03882b9c29b3f785d8f76edac1d72469d70ccc5f48c3c",
+          "bytes": 3146
+        },
+        {
+          "file": "lib/rakeez-datetime.js",
+          "sha256": "51048afe74979f2fa21ce5ea5165f04d9615d6d76599d724e8577e887cc9eeba",
+          "bytes": 7250
+        },
+        {
+          "file": "manifest.json",
+          "sha256": "e163823ac8b81028eb8fdb163a0e3adc1566d654e0be265f521bff1064e3c430",
+          "bytes": 817
+        },
+        {
+          "file": "navigation.js",
+          "sha256": "bbed3c27c9515c9ec1f0e5a1ae4e63c1ac6f806f1f05a7fecb43c4f2d7645d46",
+          "bytes": 1404
+        },
+        {
+          "file": "popup.css",
+          "sha256": "d77b2b880cb1efa946071505fd28eb750aca3f424a25cd49bcc3a4faed5d921d",
+          "bytes": 1989
+        },
+        {
+          "file": "popup.html",
+          "sha256": "e2e615f4453ba07c8a9137bd14dc2664b317ded2ad9d4c064a800639c6d05bec",
+          "bytes": 8661
+        },
+        {
+          "file": "popup.js",
+          "sha256": "e7688071e10ac89c55c09b0df02117525c7ecc6476ac84e8628822729de713c0",
+          "bytes": 4532
+        },
+        {
+          "file": "README.md",
+          "sha256": "59ce0300db184d028928617acd35eae34cd6442a6d34df4486167035acc29c79",
+          "bytes": 45785
+        },
+        {
+          "file": "route-diagnostics.js",
+          "sha256": "8bdf3c1d10612fcaaefd3467c9fa98e8c2396814700025f6583321f2a5808b01",
+          "bytes": 4852
+        },
+        {
+          "file": "run-controller.js",
+          "sha256": "41513052e5745dfb51dc5f7d0772a1765d857eca0edb6edd2bccc02058ac4ce9",
+          "bytes": 26928
+        },
+        {
+          "file": "selection.js",
+          "sha256": "239987ac34f947bc0e2105a76d13c522a7e430e52a8e93d2275b82b72f43c0cd",
+          "bytes": 31825
+        },
+        {
+          "file": "source-adapter.js",
+          "sha256": "9de9f7eab24fd59d20c608163f9f55c50e3e3a6d6c5de021d872e482209b21ca",
+          "bytes": 17566
+        },
+        {
+          "file": "vendor/flatpickr/ar.js",
+          "sha256": "bd2f93742a8ea563da9fb00dcc94bdae05853183cb300a5d44f92adaddcb55bb",
+          "bytes": 1990
+        },
+        {
+          "file": "vendor/flatpickr/flatpickr.min.css",
+          "sha256": "a67742a9db92c3f1fba7aad828ca1c55f0a7d35084fc8d2befd315a556d2b83d",
+          "bytes": 16178
+        },
+        {
+          "file": "vendor/flatpickr/flatpickr.min.js",
+          "sha256": "bd04bb4978d38fce197da3095bff68da165f6de18d2fc56ac5f1d7fb61c8e947",
+          "bytes": 50680
+        },
+        {
+          "file": "vendor/flatpickr/LICENSE.md",
+          "sha256": "3bdfcf5a3f395713699944d99bcc3f064e63fb563e8fc265c97d737fd56f87d2",
+          "bytes": 1105
+        }
+      ],
+      "archive": {
+        "file": "rakeez-teacher-import-helper-0.5.0.zip",
+        "sha256": "18a5fa59cb3cb6cdbaed7e89c6428702365f4a9ab1920da949a134f025a8e67d",
+        "bytes": 85049
+      }
+    },
+    "load": {
+      "id": "kbemjbbdlninjhmeebpeedfmkeahliei"
+    },
+    "targets": [
+      {
+        "type": "browser_ui",
+        "url": "chrome://omnibox-popup.top-chrome/"
+      },
+      {
+        "type": "browser_ui",
+        "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html"
+      },
+      {
+        "type": "page",
+        "url": "about:blank"
+      }
+    ],
+    "extensionId": "kbemjbbdlninjhmeebpeedfmkeahliei",
+    "exactEntry": {
+      "actionMarkers": 3,
+      "iframeCount": 4,
+      "linkStats": {
+        "empty": 0,
+        "formRejected": 0,
+        "href": 3,
+        "inlineHandler": 0,
+        "javascript": 0,
+        "originRejected": 0,
+        "queryRejected": 0,
+        "readPath": 3
+      },
+      "navMarkers": 2,
+      "pageKind": "teacher-dashboard",
+      "readyState": "complete",
+      "roleMarkers": 0,
+      "safeReadLinks": 2,
+      "schoolOptions": 0,
+      "sourceTabMatch": true
+    },
+    "stage": "inline",
+    "status": "PASS",
+    "release": "RELEASED browser",
+    "hits": [
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/Dashboards/Schools",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/Dashboards/Schools",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolManagment/Actions/MyStudents",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic0",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic1",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic2",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic3",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic4",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic5",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic6",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/Dashboards/Schools",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolManagment/Actions/MyStudents",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic0",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic1",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic2",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic3",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic4",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic5",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic6",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/Dashboards/Schools",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolManagment/Actions/MyStudents",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic0",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic1",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic2",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic3",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic4",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic5",
+        "method": "GET",
+        "page": 1
+      },
+      {
+        "origin": "https://schools.madrasati.sa",
+        "path": "/TeachersReports/MyInfo/synthetic6",
+        "method": "GET",
+        "page": 1
+      }
+    ],
+    "cleanup": "Owned disposable browser/profile/server closed; browser lease released"
+  },
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "hits": [
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 2
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 3
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 4
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 5
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 6
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 7
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 2
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 3
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 4
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 5
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 6
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagmentReports/StudentInfo/ClassStudentInfo/cccccccccccccccccccccccccccccccc",
+      "method": "GET",
+      "page": 7
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/Dashboards/Schools",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolManagment/Actions/MyStudents",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/SchoolSchedule/Schedule/TeacherSchedule",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic0",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic1",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic2",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic3",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic4",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic5",
+      "method": "GET",
+      "page": 1
+    },
+    {
+      "origin": "https://schools.madrasati.sa",
+      "path": "/TeachersReports/MyInfo/synthetic6",
+      "method": "GET",
+      "page": 1
+    }
+  ],
+  "cleanup": "Owned disposable browser/profile/server closed; browser lease released"
+}

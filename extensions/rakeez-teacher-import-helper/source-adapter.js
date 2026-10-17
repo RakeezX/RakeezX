@@ -3,20 +3,27 @@ export function readSourceReportPage(mode,runContext=null) {
  const visible=n=>{for(let el=n;el;el=el.parentElement){const s=getComputedStyle(el);if(el.hidden||el.getAttribute('aria-hidden')==='true'||s.display==='none'||s.visibility!=='visible'||Number(s.opacity)===0)return false;}return n.getClientRects().length>0;};
  const text=n=>{const out=[];const walk=x=>{if(x.nodeType===3){out.push(x.textContent);return;}if(x.nodeType!==1||!visible(x)||['INPUT','TEXTAREA','SELECT','SCRIPT','STYLE','IFRAME','SVG','IMG'].includes(x.tagName))return;for(const c of x.childNodes)walk(c);};walk(n);return out.join('').trim().replace(/\s+/g,' ');};
  const all=Array.from(document.querySelectorAll('table')).filter(visible);
- const diagnostic=(code,ready=false)=>({ok:false,code,retry:ready,incomplete:true,diagnostic:{version:'0.4.0',stage:'source-schema',reason:code,category:mode,schema:{tables:Math.min(all.length,31),expectedCategory:false,unresolved:true}}});
+ const diagnostic=(code,ready=false)=>({ok:false,code,retry:ready,incomplete:true,diagnostic:{version:'0.5.1',stage:'source-schema',reason:code,category:mode,schema:{tables:Math.min(all.length,31),expectedCategory:false,unresolved:true}}});
+ // A loading/empty table is unresolved, never an empty complete roster.
+ const pending=()=>{const d=diagnostic('SOURCE_PENDING',true);if(mode==='students')d.diagnostic.roster={relevant:0,unsupported:0,iframes:Math.min(document.querySelectorAll('iframe').length,31),cause:'TABLE_AWAITING_DATA'};return d;};
  if(all.length>30)return diagnostic('TABLE_LIMIT');
- if(Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible))return diagnostic('SOURCE_PENDING',true);
- if(mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(location.pathname)){
+ if(Array.from(document.querySelectorAll('[aria-busy=true],.loading,[role=progressbar]')).some(visible))return pending();
+ const rosterLabels=new Set(['بيانات الطلاب','قائمة الطلاب','أسماء الطلاب','طلاب الفصل','قائمة طلاب الفصل','كشف الطلاب']);
+ const visibleRoster=all.some(t=>Array.from(t.querySelectorAll('th')).filter(visible).some(n=>['اسم الطالب','اسم الطالبة','اسم الطالب/ة'].includes(text(n)))&&Array.from((t.closest('section,article,.report')??t).querySelectorAll('caption,h1,h2,h3')).filter(visible).some(n=>rosterLabels.has(text(n))));
+ if(mode==='students'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(location.pathname)&&!visibleRoster){
   try{globalThis.rakeezRoutePolicy(location.origin,location.href,runContext);}catch(e){return {ok:false,code:e.message};}
+  let relevant=0,unsupported=0;
   const links=[];for(const a of Array.from(document.querySelectorAll('a[href]')).filter(visible)){
-   if(!['بيانات الطلاب','قائمة الطلاب'].includes(text(a)))continue;
-   if(a.closest('form,[inert],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get')return diagnostic('UNSAFE_ROSTER_LINK');
+   if(!rosterLabels.has(text(a)))continue;relevant++;
+   // Unknown relevant links are counted, never followed or exposed.
+   try{const u=new URL(a.getAttribute('href'),location.href);if(u.origin===location.origin&&!/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(u.pathname)&&!/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(u.pathname)){unsupported++;continue;}}catch{}
+   if(a.getAttributeNames().some(k=>/^on/i.test(k))||a.closest('form,[inert],[aria-disabled=true],.disabled')||a.hasAttribute('download')||a.getAttribute('data-method')&&a.getAttribute('data-method').toLowerCase()!=='get')return diagnostic('UNSAFE_ROSTER_LINK');
    let u;try{u=new URL(a.getAttribute('href'),location.href);globalThis.rakeezRoutePolicy(location.origin,u.href,runContext);}catch(e){return {ok:false,code:e.message,diagnostic:globalThis.rakeezRouteDiagnostic('link-discovery',e.message,'students',u?.href??a.getAttribute('href'),e.routeDetail)};}
    // A validated menu/self GET is not a roster and is never navigated from this discovery phase.
    if(!/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[a-f0-9]{32}\/?$/i.test(u.pathname))continue;
    const path=u.pathname+u.search;if(!links.some(l=>l.path===path))links.push({kind:'students',path});
   }
-  if(!links.length)return diagnostic('ROSTER_LINKS_PENDING',true);if(links.length>20)return diagnostic('REPORT_LIMIT');
+  if(!links.length){const d=diagnostic('ROSTER_LINKS_PENDING',true);d.diagnostic.roster={relevant:Math.min(relevant,200),unsupported:Math.min(unsupported,200),iframes:Math.min(document.querySelectorAll('iframe').length,31),cause:unsupported?'RELEVANT_LINK_UNSUPPORTED':'MAIN_FRAME_READ_LINK_ABSENT'};return d;}if(links.length>20)return diagnostic('REPORT_LIMIT');
   return {ok:true,tables:[],links,warnings:[],skipped:[],pagination:null,schoolNames:[]};
  }
  const field=v=>v.length>0&&v.length<=80&&!/[\t\r\n@]/.test(v);
@@ -90,7 +97,7 @@ export function readSourceReportPage(mode,runContext=null) {
   }
  }
  if(candidates.length>1)return diagnostic('AMBIGUOUS_TABLE');
- if(!candidates.length)return diagnostic('SOURCE_PENDING',true);
+ if(!candidates.length)return pending();
  const {table,text:tsv,duplicates,schoolNames=[]}=candidates[0],links=[],warnings=[];
  let pagination=null;
  if(mode==='students'){
@@ -164,7 +171,7 @@ export function readSourceReportPage(mode,runContext=null) {
    if(m.total===m.current){if(m.next)warnings.push({category:mode,code:'PAGINATION_AFTER_END'});}
    else if(!m.next)warnings.push({category:mode,code:'PAGINATION_MISSING_NEXT'});
    else links.push({kind:mode,path:m.next,pagination:true});
-  }else if(/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[^/]+\/?$/i.test(location.pathname))warnings.push({category:mode,code:'PAGINATION_UNVERIFIED'});
+  }else if(mode==='students')warnings.push({category:mode,code:'PAGINATION_UNVERIFIED'});
  }
  return {ok:true,tables:[{category:mode,text:tsv}],links,warnings,skipped:[],pagination,duplicates,schoolNames};
 }

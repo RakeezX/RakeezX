@@ -1,5 +1,5 @@
 :root { font-family: system-ui, sans-serif; color: #183c3a; background: #f7faf9; font-size: 15px; --font: system-ui, sans-serif; --bg-elev: #fff; --text: #183c3a; --border: #648582; --brand: #17645c; --text-3: #52625f; --shadow-3: 0 4px 16px #183c3a33; }
-body { width: 380px; margin: 0; }
+body { width: min(380px, 100vw); margin: 0; overflow-wrap: anywhere; }
 main { padding: 18px; }
 h1 { font-size: 22px; margin-top: 0; }
 p { line-height: 1.7; }
