@@ -24,6 +24,10 @@ separately gated privileged authorizer; this is no campaign executor.
 - `shared.mjs`: fixed statuses, draft limits, rate and context checks.
 - `schema-proposal.sql`: private typed schema proposal and immutable transition
   constraints. **NOT an applied/generated migration or a production adapter.**
+- `tests/n44-native-postgres-qualification.mjs`: explicitly invoked, synthetic
+  PostgreSQL 17.6 runner using existing native binaries and Node `pg`. Applies
+  this SQL only to a new owned disposable loopback cluster; never imported by
+  app/deployment code. See [local SQL qualification](../../docs/automation-evidence/20261017/N44_NATIVE_POSTGRES_QUALIFICATION.md).
 - `tests/n44-server-preactivation.test.mjs` and
   `tests/fixtures/n44-server-preactivation/fakes.mjs`: executed fake-port cases;
   their serialized memory repository is not SQL atomicity or hosted RLS evidence.
@@ -250,20 +254,28 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    separate scheduler identity and least-privilege DB role. Prove changed actual
    authenticated UI/store entry with existing ownership guard, negative foreign
    owner and stale revisions. No general admin role/framework; N78 separately.
-2. **SQL runtime/RLS NOT_RUN:** installed Docker command could not reach the local
-   DockerDesktopLinuxEngine named pipe; no container/database was created or
-   inspected, no infrastructure installed. In an authorized owned disposable
-   Postgres/Supabase environment, apply this draft in a fresh DB with fabricated
-   `auth.users`/roles, test exact table constraints and rollback. Test anon/no-JWT,
-   owner A/B SELECT/INSERT/UPDATE/DELETE, missing grants, owner reassignment,
-   endpoint cross-owner race, 20 simultaneous first reservations from two DB
-   connections, rate-boundary races, immutable expiry/attempt/terminal triggers,
-   crash after commit/before send and after send/before receipt, context switch/
-   revoke serialization and cleanup. Assert one committed permit, no expired-key
-   eviction, no raw values in logs. Run both least-privilege authenticated and
-   intended server roles, never mistake table-owner/BYPASSRLS for RLS evidence.
-   Roll back fixtures and remove only the owned container. Map and certify an
-   actual durable adapter before considering these simulated tests durable.
+2. **Local SQL qualification PASS; hosted/runtime adapter NOT_RUN:** on 17 October,
+   the actual draft executed on a newly initialized owned PostgreSQL **17.6**
+   cluster using existing native binaries, without Docker or installation.
+   [Exact results and preserved failures](../../docs/automation-evidence/20261017/N44_NATIVE_POSTGRES_QUALIFICATION.md)
+   cover six forced-RLS tables, 24 owner policies, actual constraints/triggers,
+   DDL rollback, separate grant-denial and non-owner/non-BYPASSRLS owner A/B CRUD,
+   two independent backend connections and observed database lock waits, active
+   context/global endpoint races, 20 first reservations producing one committed
+   permit, rollback/crash fences, budget upserts/clock maximum, original revoke,
+   tombstones and context-switch serialization. Two executed trigger defects
+   were repaired: retry→sending now requires the next attempt; attempt three
+   cannot transition back to retry. All role grants used to exercise RLS were
+   temporary fixture grants rolled back; the draft still denies client access.
+   Auth users/roles/`auth.uid()` are **local stubs**, and all identities, sealed
+   values and callbacks are fabricated. This proves actual local SQL behavior
+   under the explicit test transactions, not hosted Auth/PostgREST, intended
+   service-role configuration, a real send or the JS `repository.atomic` port.
+   The complete synchronous repository adapter, authoritative event/preference
+   resolver, all-writer serialization protocol, retention sweep and real ingress
+   limits remain unimplemented and require separate qualification. Historical
+   Docker/SQL NOT_RUN evidence remains unchanged; the prior 16 simulated tests
+   are reused with exact code/fixture/dependency hashes, not rerun as SQL proof.
 3. **Real service gate — NOT_RUN:** separately authorized CLI-generated migration
    (`supabase migration new`, never invent a filename), fresh protected-schema
    and role plan, applied identity readback, actual repository/verifier/resolver,
@@ -294,7 +306,8 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    exact candidate. Only after those gates may a new bounded Product rollout be
    considered. This plan grants none of those permissions now.
 
-Prepared source and simulated policy evidence are distinct from SQL/runtime,
-hosted service, browser/OS, real-send, Production and PO acceptance. All latter
-gates are **NOT_RUN**. Sole original publisher owns source-only integration and
+Prepared source, historical simulated policy evidence and local native SQL
+qualification are distinct from hosted service/current Auth adapter, real TLS/
+network, app/offline/Service Worker, browser/OS, real-send, Production and PO
+acceptance. Those latter gates remain **NOT_RUN**. Sole original publisher owns source-only integration and
 served-source verification; this worker does not push/deploy or close N44.
