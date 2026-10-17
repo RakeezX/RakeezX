@@ -1,0 +1,357 @@
+{
+  "runId": "042984ce-de8d-4b52-b5bc-05259a349279",
+  "baseline": false,
+  "checks": [],
+  "externalRequests": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "sourceHashes": {
+    "README.md": "eeb094375e6e0fda86b398545191edfbb5a04c3da5265bcfadb43e8ab2f8b4b9",
+    "categories-popup.js": "cb13a303f624744270d7c4e64fc7699c64dba265dcc6337b7ce402dd8fbbbb06",
+    "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+    "core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+    "handoff-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "handoff-worker.js": "06433a19acb59a5890bd50ddd6e8dbf359684e7bc250b91a8a9610647fcc73fb",
+    "lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "lib/rakeez-datetime.css": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+    "lib/rakeez-datetime.js": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+    "manifest.json": "c09c12641f79ea5d7a113226db67666d776d48560d3ba41170676691edb09985",
+    "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+    "popup.css": "70fba41ac22665d2d674e37570ae5216ce9426d174c74d5e8682689068c8cd20",
+    "popup.html": "7721fc154fd6079d2574a5147a1cff72cee5177baee62637a375dca70d8934fe",
+    "popup.js": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+    "route-diagnostics.js": "e2b05edc73d67b9aa214c42541dd8634395de8cfb36006801b3af5d4a8640134",
+    "run-controller.js": "244426f6a58ba68dab25f57147970466090dc4703a6e7a729b6f608fa4fcdb54",
+    "selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+    "source-adapter.js": "34ae8308de62b16545b8cddf3f0113d7a98eb734e8b46b871d9a27c3dbd09dda",
+    "source-roster.js": "5daec02923710cf6aa1ba1564090fafa1dd3285df9221906adfc402248d3c80d"
+  },
+  "scenarios": [
+    {
+      "scenario": "full301",
+      "transferred": 301,
+      "added": 301,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full303",
+      "transferred": 303,
+      "added": 303,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full350",
+      "transferred": 350,
+      "added": 350,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full1000",
+      "transferred": 1000,
+      "added": 1000,
+      "batches": 4,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full1251",
+      "transferred": 1251,
+      "added": 1251,
+      "batches": 5,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single350",
+      "transferred": 350,
+      "added": 350,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "nonterminal",
+      "transferred": 350,
+      "added": 350,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "missingLast",
+      "transferred": 300,
+      "added": 300,
+      "batches": 1,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "missingMiddle",
+      "transferred": 100,
+      "added": 100,
+      "batches": 1,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "duplicate",
+      "transferred": 343,
+      "added": 343,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "invalid",
+      "transferred": 343,
+      "added": 343,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "hidden",
+      "transferred": 343,
+      "added": 343,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "unsafe",
+      "transferred": 50,
+      "added": 50,
+      "batches": 1,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "missingReport",
+      "blocked": true
+    },
+    {
+      "scenario": "schoolChanged",
+      "blocked": true
+    },
+    {
+      "scenario": "roleChanged",
+      "blocked": true
+    },
+    {
+      "scenario": "originChanged",
+      "blocked": true
+    },
+    {
+      "scenario": "sessionChanged",
+      "blocked": true
+    },
+    {
+      "scenario": "expiry",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "sourceClosed",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "full50",
+      "transferred": 50,
+      "added": 50,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full299",
+      "transferred": 299,
+      "added": 299,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "full300",
+      "transferred": 300,
+      "added": 300,
+      "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single998",
+      "transferred": 998,
+      "added": 998,
+      "batches": 4,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single999",
+      "transferred": 999,
+      "added": 999,
+      "batches": 4,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "owner",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "lease",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "retry",
+      "transferred": 350,
+      "added": 350,
+      "batches": 3,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "lostReceipt",
+      "transferred": 350,
+      "added": 350,
+      "batches": 3,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single1251",
+      "transferred": 1251,
+      "added": 1251,
+      "batches": 5,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single1000",
+      "transferred": 1000,
+      "added": 1000,
+      "batches": 4,
+      "stoppedByGuard": false
+    }
+  ],
+  "priorFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-available-partial-class-import-no-total-cap-20261017/tests/n36-partial-class-import-no-total-cap-browser.mjs:110:62",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-available-partial-class-import-no-total-cap-20261017/tests/n36-partial-class-import-no-total-cap-browser.mjs:110:62",
+    "locator.check: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-names-approved]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:136:55",
+    "locator.check: Clicking the checkbox did not change its state\nCall log:\n\u001b[2m  - waiting for locator('#bundle-review')\u001b[22m\n\u001b[2m    - locator resolved to <input type=\"checkbox\" id=\"bundle-review\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - performing click action\u001b[22m\n\u001b[2m    - click action done\u001b[22m\n\u001b[2m    - waiting for scheduled navigations to finish\u001b[22m\n\u001b[2m    - navigations have finished\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:110:47",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-available-partial-class-import-no-total-cap-20261017/tests/n36-partial-class-import-no-total-cap-browser.mjs:110:62",
+    "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#handoff-status').filter({ hasText: 'وصل إيصال ركيز' }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:150:82",
+    "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#handoff-status').filter({ hasText: 'وصل إيصال ركيز' }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:150:86",
+    "browserContext.waitForEvent: Timeout 30000ms exceeded while waiting for event \"page\"\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:121:26"
+  ],
+  "preservedFailures": [
+    {
+      "stage": "single1251",
+      "failure": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#handoff-status').filter({ hasText: 'وصل إيصال ركيز' }) to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-available-partial-class-import-no-total-cap-20261017\\tests\\n36-partial-class-import-no-total-cap-browser.mjs:150:86",
+      "receiptFailure": {
+        "scenario": "single1251",
+        "batches": 3,
+        "count": 300,
+        "receiver": "إيصال إضافة الأسماء\n\nلم تكتمل العملية أو تعذّر التحقق من نتيجتها. جديدة في المعاينة: 300 · موجودة الآن: 0 · جديدة لم تظهر كمحفوظة: 300. افتح الكشوف وأعد المراجعة؛ لا تكرر التأكيد مباشرةً.\n\nاستيراد جزئي لأسماء محلية بتأكيدك لهذا الحساب. راجع الكشوف والمزامنة قبل أي محاولة أخرى؛ الطلبات المحفوظة باقية.\n\nفتح الكشوف للمراجعة",
+        "source": "لم يصل إيصال حفظ مؤكد. لا انتقال للدفعة التالية؛ أعد مراجعة الدفعة نفسها أو ابدأ مجددًا بعد انتهاء المهلة.",
+        "records": {}
+      },
+      "archiveSha256": "70d909637801502e01c61439ddec3b0ea6b33ab42912c89b397c38fadf3cd396"
+    }
+  ],
+  "appHashes": {
+    "src/views/teacher-setup-import.js": "81a75b5d1f06bb597c3b34fffb3818387aeaec3749b66910c445cf9eb5a2398e",
+    "src/views/class-import-center.js": "b0a3b692b848e4fd49c571812d7fbbc44b10963cc738342fedd3d3eaef4760a7",
+    "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "src/store.js": "0d9aca940b3de48c4934e99403bc67fad449ab4f35f3142abddd4fc5cd7749e5"
+  },
+  "reusedEvidence": {
+    "runId": "042984ce-de8d-4b52-b5bc-05259a349279",
+    "candidateSha": null,
+    "appHashes": {
+      "src/views/teacher-setup-import.js": "81a75b5d1f06bb597c3b34fffb3818387aeaec3749b66910c445cf9eb5a2398e",
+      "src/views/class-import-center.js": "b0a3b692b848e4fd49c571812d7fbbc44b10963cc738342fedd3d3eaef4760a7",
+      "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+      "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+      "src/store.js": "081ca8e6b032a7b762c7f93f950a8084ff864d54c6bed00e69327ac7b76965de"
+    },
+    "reason": "Identical extension bytes; existing row/owner/preview handlers retained. New store overflow and owner/lease/retry entry tests run below."
+  },
+  "archiveSha256": "70d909637801502e01c61439ddec3b0ea6b33ab42912c89b397c38fadf3cd396",
+  "stage": "single1000",
+  "sourceGets": 7,
+  "sourceEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 0,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 3,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 3
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 3,
+    "schoolOptions": 0
+  },
+  "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "overflowSafety": {
+    "manual": {
+      "ok": false,
+      "reason": "range"
+    },
+    "renumber": false,
+    "transfer": null,
+    "unchanged": true
+  },
+  "addOwnerGuard": {
+    "denied": true,
+    "unchanged": true
+  },
+  "requiredScenarios": [
+    "full301",
+    "full303",
+    "full350",
+    "full1000",
+    "full1251",
+    "single350",
+    "nonterminal",
+    "missingLast",
+    "missingMiddle",
+    "duplicate",
+    "invalid",
+    "hidden",
+    "unsafe",
+    "missingReport",
+    "schoolChanged",
+    "roleChanged",
+    "originChanged",
+    "sessionChanged",
+    "expiry",
+    "sourceClosed",
+    "full50",
+    "full299",
+    "full300",
+    "single998",
+    "single999",
+    "single1000",
+    "owner",
+    "lease",
+    "retry",
+    "lostReceipt",
+    "single1251"
+  ],
+  "coverageComplete": true,
+  "resolution": {
+    "historicalFailure": "single1251",
+    "status": "PASS",
+    "correction": "D-123 nullable overflow membership; numbering/RPC guards preserved"
+  },
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable Chrome/profile and server closed; browser lease released"
+}

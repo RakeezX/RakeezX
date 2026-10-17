@@ -40,25 +40,25 @@ export function readSourceReportPage(mode,runContext=null) {
  const candidates=[];
  for(const table of all){
   if(table.parentElement.closest('table')||table.querySelector('table'))continue;
-  const rows=Array.from(table.rows).filter(visible);if(rows.length>301)return diagnostic('ROW_LIMIT');if(rows.length<2)continue;
+  const rows=Array.from(table.rows).filter(visible);if(mode!=='students'&&rows.length>301)return diagnostic('ROW_LIMIT');if(rows.length<2)continue;
   const head=Array.from(rows[0].cells);if(head.length>50||!head.every(visible))continue;
   const titles=head.map(text),find=set=>titles.flatMap((v,i)=>set.has(v)?[i]:[]);
   if(mode==='students'){
    const ni=find(names),ci=find(classes),si=find(new Set(['المدرسة','اسم المدرسة'])),schoolNames=[];if(si.length>1)return diagnostic('AMBIGUOUS_SCHOOL_COLUMN');if(!ni.length){if(table.querySelector('td.project-title'))return diagnostic('UNRESOLVED_SOURCE_HEADERS');continue;}if(ni.length!==1||ci.length>1)return diagnostic('AMBIGUOUS_HEADER');
    let context='';if(!ci.length){const scope=table.closest('section,article,.report')??table;const values=Array.from(scope.querySelectorAll('caption,h1,h2,h3')).filter(visible).map(text).filter(v=>/^الفصل: .{2,80}$/.test(v)).map(v=>v.slice(7));if(new Set(values).size!==1)return diagnostic('UNRESOLVED_CLASSROOM');context=values[0];}
-   const output=['اسم الطالب\tالفصل'];
-   for(const row of rows.slice(1)){
-    const cells=Array.from(row.cells);if(cells.length!==head.length||cells.some(c=>c.colSpan!==1||c.rowSpan!==1))return diagnostic('IRREGULAR_TABLE');
+   const output=['اسم الطالب\tالفصل'];let excluded=0;const offset=runContext?.rowOffset??0;if(!Number.isSafeInteger(offset)||offset<0||offset>=rows.length-1)return diagnostic('ROW_OFFSET');
+   for(const row of rows.slice(1+offset,1+offset+300)){
+    const cells=Array.from(row.cells);if(cells.length!==head.length||cells.some(c=>c.colSpan!==1||c.rowSpan!==1)){excluded++;continue;}
     const nameCell=cells[ni[0]],classCell=ci.length?cells[ci[0]]:null;
-    if(!visible(nameCell)||classCell&&!visible(classCell))return diagnostic('HIDDEN_SELECTED_CELL');
+    if(!visible(nameCell)||classCell&&!visible(classCell)){excluded++;continue;}
     const name=text(nameCell),classroom=classCell?text(classCell):context;
-    if(!field(name)||/[0-9٠-٩]/.test(name)||!field(classroom))return diagnostic('INVALID_SELECTED_FIELD');
+    if(name.length<2||classroom.length<2||!field(name)||!field(classroom)||!/[\p{L}]/u.test(classroom)||!/^([\p{L}\p{M}]+)( [\p{L}\p{M}]+)*$/u.test(name)||!/^([\p{L}\p{M}0-9 ()-]+)$/u.test(classroom)){excluded++;continue;}
     if(si.length){const cell=cells[si[0]];if(!visible(cell)||!field(text(cell)))return diagnostic('INVALID_SCHOOL_FIELD');schoolNames.push(text(cell));}
     output.push(name+'\t'+classroom);
    }
-   const unique=[...new Set(output)];if(unique.length<2)return diagnostic('EMPTY_SOURCE',true);
+   const unique=[...new Set(output)];if(unique.length<2&&rows.length<=offset+301)return {...diagnostic('NO_VALID_SOURCE_ROWS'),observedRows:rows.length-1};
    if(new Set(schoolNames).size>1)return {ok:false,code:'SCHOOL_CONTEXT_CHANGED'};
-   candidates.push({table,text:unique.join('\n'),duplicates:output.length-unique.length,schoolNames:[...new Set(schoolNames)]});
+   candidates.push({table,text:unique.join('\n'),duplicates:output.length-unique.length,excluded,rowContinuation:offset+300<rows.length-1?offset+300:null,schoolNames:[...new Set(schoolNames)]});
   }else if(mode==='timetable'){
    const output=['اليوم\tالحصة\tالفصل\tالمادة'];
    const ordinals=['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة','الثامنة','التاسعة','العاشرة'];
@@ -106,11 +106,12 @@ export function readSourceReportPage(mode,runContext=null) {
  }
  if(candidates.length>1)return diagnostic('AMBIGUOUS_TABLE');
  if(!candidates.length)return pending();
- const {table,text:tsv,duplicates,schoolNames=[]}=candidates[0],links=[],warnings=[];
+ const {table,text:tsv,duplicates,excluded=0,rowContinuation=null,schoolNames=[]}=candidates[0],links=[],warnings=[];
+ const coverageError=code=>({ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links:[],warnings:[{category:mode,code}],skipped:[],pagination:null,duplicates,excluded,rowContinuation,schoolNames});
  let pagination=null;
  if(mode==='students'){
   const digits=v=>v.replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
-  const number=v=>/^[0-9]{1,2}$/.test(digits(v))?Number(digits(v)):null;
+  const number=v=>/^[0-9]{1,15}$/.test(digits(v))?Number(digits(v)):null;
   const now=new URL(location.href),pkeys=['page','pagenumber'];
   const pageOf=u=>{const entries=[...u.searchParams].filter(([k])=>pkeys.includes(k.toLowerCase()));return entries.length===1?number(entries[0][1]):entries.length?NaN:null;};
   const stable=u=>JSON.stringify([...u.searchParams].filter(([k])=>!pkeys.includes(k.toLowerCase())).sort());
@@ -124,10 +125,10 @@ export function readSourceReportPage(mode,runContext=null) {
    for(let n=a.parentElement,depth=0;n&&n!==document.body&&depth<4;n=n.parentElement,depth++)if(n.querySelector('[aria-current=page],[role=status],a[rel~=next],a[rel~=last]')){scopes.add(n);break;}
   }
   const pagers=[...scopes].filter(n=>![...scopes].some(c=>c!==n&&n.contains(c)));
-  if(pagers.length>4)return diagnostic('AMBIGUOUS_PAGINATION');
+  if(pagers.length>4)return coverageError('AMBIGUOUS_PAGINATION');
   const models=[];
   for(const pager of pagers){
-   const nodes=Array.from(pager.querySelectorAll('*')).filter(visible);if(nodes.length>150)return diagnostic('PAGINATION_LIMIT');
+   const nodes=Array.from(pager.querySelectorAll('*')).filter(visible);if(nodes.length>150)return coverageError('PAGINATION_LIMIT');
    const active=[...new Set(nodes.filter(n=>n.matches('[aria-current=page],.active')).flatMap(n=>{
     if(n.matches('li.page-item.active')){const child=Array.from(n.children).filter(c=>c.matches('a.page-link')&&visible(c));return child.length===1?[number(text(child[0]))]:[null];}
     return [number(text(n))];
@@ -138,30 +139,30 @@ export function readSourceReportPage(mode,runContext=null) {
    const statuses=[...new Set(nodes.map(text).map(digits).filter(v=>/^الصفحة \d+ من \d+$/.test(v)))];
    const status=statuses.length===1?/^الصفحة (\d+) من (\d+)$/.exec(statuses[0]):null;
    const totals=[...new Set([...(status?[Number(status[2])]:[]),...nodes.concat(pager).filter(n=>n.hasAttribute('data-total-pages')).map(n=>number(n.getAttribute('data-total-pages')))])];
-   if(statuses.length>1||active.length>1||totals.some(n=>n===null))return diagnostic('AMBIGUOUS_PAGINATION');
+   if(statuses.length>1||active.length>1||totals.some(n=>n===null))return coverageError('AMBIGUOUS_PAGINATION');
    const current=active[0]??(status?Number(status[1]):pageOf(now));
-   if(!current||current<1||current>24||pageOf(now)!==null&&pageOf(now)!==current)return diagnostic('PAGINATION_MISMATCH');
+   if(!current||current<1||!Number.isSafeInteger(current)||pageOf(now)!==null&&pageOf(now)!==current)return coverageError('PAGINATION_MISMATCH');
    const actual=[],numbers=new Set([current]);let terminal=!!(last?.matches('.disabled,[aria-disabled=true]')&&lastAnchor&&!lastAnchor.hasAttribute('href'));
    for(const n of nodes){
     const disabled=n.matches('[disabled],[aria-disabled=true],.disabled')||n.closest('[aria-disabled=true],.disabled');
     const next=(observed&&n===lastAnchor)||n.rel?.split(/\s+/).includes('next')||['التالي','الصفحة التالية'].includes(text(n));
     if(disabled&&next)terminal=true;
     if(n.tagName!=='A'||!n.hasAttribute('href')||!isPage(n)||disabled)continue;
-    let u;try{u=new URL(n.getAttribute('href'),location.href);}catch{return diagnostic('UNSAFE_PAGINATION');}
-    if(u.origin!==now.origin||u.username||u.password)return {ok:false,code:'ORIGIN_CHANGED'};
-    if(n.closest('form')||n.hasAttribute('download')||n.getAttribute('data-method')&&n.getAttribute('data-method').toLowerCase()!=='get'||u.pathname!==now.pathname||/(?:delete|grade|admin|edit|attendance|changeusertype)/i.test(u.pathname))return diagnostic('UNSAFE_PAGINATION');
-    const keys=new Set();for(const [key,value] of u.searchParams){if(keys.has(key.toLowerCase())||!/^(?:page|pagenumber|classid|sectionid|id)$/i.test(key)||! /^[A-Za-z0-9_-]{1,80}$/.test(value))return diagnostic('UNSAFE_PAGINATION');keys.add(key.toLowerCase());}
-    const page=pageOf(u);if(page>24)return {...diagnostic('SOURCE_PAGE_LIMIT'),observedRows:tsv.split('\n').length-1};
-    if(!page||stable(u)!==stable(now))return diagnostic('PAGINATION_MISMATCH');
-    const label=number(text(n));if(label!==null&&label!==page||next&&page!==current+1)return diagnostic('PAGINATION_MISMATCH');
+    let u;try{u=new URL(n.getAttribute('href'),location.href);}catch{return coverageError('UNSAFE_PAGINATION');}
+    if(u.origin!==now.origin||u.username||u.password)return coverageError('UNSAFE_PAGINATION');
+    if(n.closest('form')||n.hasAttribute('download')||n.getAttribute('data-method')&&n.getAttribute('data-method').toLowerCase()!=='get'||u.pathname!==now.pathname||/(?:delete|grade|admin|edit|attendance|changeusertype)/i.test(u.pathname))return coverageError('UNSAFE_PAGINATION');
+    const keys=new Set();for(const [key,value] of u.searchParams){if(keys.has(key.toLowerCase())||!/^(?:page|pagenumber|classid|sectionid|id)$/i.test(key)||! /^[A-Za-z0-9_-]{1,80}$/.test(value))return coverageError('UNSAFE_PAGINATION');keys.add(key.toLowerCase());}
+    const page=pageOf(u);
+    if(!page||stable(u)!==stable(now))return coverageError('PAGINATION_MISMATCH');
+    const label=number(text(n));if(label!==null&&label!==page||next&&page!==current+1)return coverageError('PAGINATION_MISMATCH');
     numbers.add(page);if(n.rel.split(/\s+/).includes('last'))totals.push(page);
     actual.push({page,path:u.pathname+u.search});
    }
-   const distinctTotals=[...new Set(totals)];if(distinctTotals.length>1)return diagnostic('PAGINATION_MISMATCH');
+   const distinctTotals=[...new Set(totals)];if(distinctTotals.length>1)return coverageError('PAGINATION_MISMATCH');
    const total=distinctTotals[0]??(terminal?current:null);
-   if(total!==null&&total>24)return {...diagnostic('SOURCE_PAGE_LIMIT'),observedRows:tsv.split('\n').length-1};
-   if(total!==null&&(total<current||[...numbers].some(n=>n>total)))return diagnostic('PAGINATION_MISMATCH');
-   if(terminal&&total!==current)return diagnostic('PAGINATION_MISMATCH');
+   if(total!==null&&!Number.isSafeInteger(total))return coverageError('PAGINATION_MISMATCH');
+   if(total!==null&&(total<current||[...numbers].some(n=>n>total)))return coverageError('PAGINATION_MISMATCH');
+   if(terminal&&total!==current)return coverageError('PAGINATION_MISMATCH');
    const next=[...new Set(actual.filter(a=>a.page===current+1).map(a=>a.path))];
    // Every candidate here has the same validated report/filter/page semantics. Retain an existing href.
 
@@ -171,11 +172,11 @@ export function readSourceReportPage(mode,runContext=null) {
   }
   if(models.length){
    const currents=new Set(models.map(m=>m.current)),totals=new Set(models.map(m=>m.total).filter(n=>n!==null));
-   if(currents.size!==1||totals.size>1)return diagnostic('AMBIGUOUS_PAGINATION');
+   if(currents.size!==1||totals.size>1)return coverageError('AMBIGUOUS_PAGINATION');
    const nexts=models.flatMap(m=>m.next?[m.next]:[]),nextIdentities=new Set(nexts.map(p=>{const u=new URL(p,location.href);return u.pathname+'?'+stable(u)+'#'+pageOf(u);}));
-   if(nextIdentities.size>1)return diagnostic('AMBIGUOUS_PAGINATION');
+   if(nextIdentities.size>1)return coverageError('AMBIGUOUS_PAGINATION');
    const current=[...currents][0],total=totals.size?[...totals][0]:null,terminal=models.some(m=>m.terminal),numbers=new Set(models.flatMap(m=>m.numbers));
-   if(terminal&&nexts.length||total!==null&&(total<current||[...numbers].some(n=>n>total))||terminal&&total!==current)return diagnostic('AMBIGUOUS_PAGINATION');
+   if(terminal&&nexts.length||total!==null&&(total<current||[...numbers].some(n=>n>total))||terminal&&total!==current)return coverageError('AMBIGUOUS_PAGINATION');
    const m={current,total,terminal,next:nexts[0]??null};pagination={current,total,terminal,series:now.pathname+'?'+stable(now)};
 
    if(m.total===m.current){if(!m.terminal)warnings.push({category:mode,code:'PAGINATION_TERMINAL_UNVERIFIED'});if(m.next)warnings.push({category:mode,code:'PAGINATION_AFTER_END'});}
@@ -183,5 +184,7 @@ export function readSourceReportPage(mode,runContext=null) {
    else links.push({kind:mode,path:m.next,pagination:true});
   }else if(mode==='students')warnings.push({category:mode,code:'PAGINATION_UNVERIFIED'});
  }
- return {ok:true,tables:[{category:mode,text:tsv}],links,warnings,skipped:[],pagination,duplicates,schoolNames};
+ if(excluded)warnings.push({category:mode,code:'INVALID_ROWS_EXCLUDED'});
+ if(rowContinuation!==null){links.length=0;pagination=null;}
+ return {ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links,warnings,skipped:[],pagination,duplicates,excluded,rowContinuation,schoolNames};
 }

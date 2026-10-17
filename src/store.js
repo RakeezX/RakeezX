@@ -3269,14 +3269,15 @@ export function rollNoTaken(secId, rollNo, exceptEnrollmentId = null) {
   );
 }
 
-const nextRollNo = (secId) =>
-  enrollmentsIn(secId).reduce((m, e) => Math.max(m, e.rollNo ?? 0), 0) + 1;
+// AI D-123: numbering is optional; membership has no 999-student ceiling.
+const automaticRollNo = ordinal => Number.isSafeInteger(ordinal) && ordinal >= 1 && ordinal <= 999 ? ordinal : null;
+const nextRollNo = (secId) => nextRollNoFrom(state.enrollments, secId);
 
 const validRollNo = (value) => Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 999;
 
 const nextRollNoFrom = (enrollments, secId) =>
   enrollments.filter((e) => e.sectionId === secId && !e.deleted)
-    .reduce((max, e) => Math.max(max, Number(e.rollNo) || 0), 0) + 1;
+    .reduce((max, e) => Math.max(max, validRollNo(e.rollNo) ? Number(e.rollNo) : 0), 0) + 1;
 
 /**
  * Builds the complete final active roster for one section without persisting
@@ -3528,9 +3529,30 @@ export async function addStudent(secId, name, { rollNo = null, note = '' } = {})
     id: uid(), updatedAt: now(), deleted: false,
     name: clean, note: String(note ?? '').slice(0, LIMITS.noteMaxLength), status: 'active',
   };
-  const nextRoll = rollNo ?? nextRollNo(secId);
-  const en = makeEnrollment({ studentId: student.id, sectionId: secId, rollNo: nextRoll });
-  await save({ students: [student], enrollments: [en] });
+  if (rollNo !== null && !validRollNo(rollNo)) return null;
+  let accepted = false;
+  const committed = await db.applyBatch({ students: {}, enrollments: {}, sections: {}, outbox: {} }, {
+    prepare(current) {
+      const section = current.sections.find(row => row.id === secId && !row.deleted && row.status !== 'archived');
+      if (!section) throw Error('IMPORT_CHANGED');
+      const number = rollNo === null ? automaticRollNo(nextRollNoFrom(current.enrollments, secId)) : Number(rollNo);
+      if (number !== null && current.enrollments.some(row => row.sectionId === secId && !row.deleted && row.status === 'active' && row.rollNo === number)) return {};
+      const enrollment = makeEnrollment({ studentId: student.id, sectionId: secId, rollNo: number });
+      assertOperationalWritesAllowed({ students: [student], enrollments: [enrollment] });
+      const st = syncV2Record('students', student, { pendingCreate: true });
+      const en = syncV2Record('enrollments', enrollment, { pendingCreate: true });
+      accepted = true;
+      return { students: { put: [st] }, enrollments: { put: [en] }, outbox: { put: [
+        outboxEntry('students', st, Object.keys(st), 'put', null),
+        // Keep the existing enrollment command for numbered manual additions.
+        // Only a fresh overflow identity uses the same nullable create as N12.
+        en.rollNo === null || current.enrollments.filter(row => row.sectionId === secId && !row.deleted && row.status === 'active').length >= 999
+          ? outboxEntry('enrollments', en, Object.keys(en), 'put', null) : enrollmentCommandEntry('enroll', en),
+      ].filter(Boolean) } };
+    },
+  });
+  if (!accepted) return null;
+  applyCommittedPuts(committed);
   return student;
 }
 
@@ -3568,34 +3590,33 @@ export async function importStudents(secId, names, { verifyCurrent, signal } = {
     const st = { id: uid(), updatedAt: stamp, deleted: false, name, note: '', status: 'active' };
     students.push(st);
     enrollments.push(
-      makeEnrollment({ studentId: st.id, sectionId: secId, rollNo: ++roll, updatedAt: stamp })
+      makeEnrollment({ studentId: st.id, sectionId: secId, rollNo: automaticRollNo(++roll), updatedAt: stamp })
     );
   }
-  if (students.length && verifyCurrent) {
+  if (students.length) {
     // File import rechecks the confirmed preview against persisted rows inside
     // the same transaction as student/enrollment/outbox creation. Another tab
     // cannot slip a same-name student between the check and the write.
     const committed = await db.applyBatch({ students: {}, enrollments: {}, sections: {}, teachings: {}, outbox: {}, years: {}, terms: {}, device: {}, subjects: {} }, {
       signal,
       prepare(current) {
-        verifyCurrent(current);
+        verifyCurrent?.(current);
         assertOperationalWritesAllowed({ students, enrollments });
         const section = current.sections.find((row) => row.id === secId && !row.deleted && row.status !== 'archived');
         if (!section) throw new Error('IMPORT_CHANGED');
         let next = nextRollNoFrom(current.enrollments, secId);
-        if (next + students.length - 1 > 999) throw new Error('IMPORT_LIMIT');
         const nextStudents = students.map((row) => syncV2Record('students', row, { pendingCreate: true }));
-        const nextEnrollments = enrollments.map((row) => syncV2Record('enrollments', { ...row, rollNo: next++ }, { pendingCreate: true }));
+        const nextEnrollments = enrollments.map((row) => syncV2Record('enrollments', { ...row, rollNo: automaticRollNo(next++) }, { pendingCreate: true }));
         const outbox = [
           ...nextStudents.map((row) => outboxEntry('students', row, Object.keys(row), 'put', null)),
-          ...nextEnrollments.map((row) => outboxEntry('enrollments', row, Object.keys(row), 'put', null)),
+          ...nextEnrollments.map((row) => verifyCurrent || row.rollNo === null ||
+            current.enrollments.filter(en => en.sectionId === secId && en.status === 'active' && !en.deleted).length + nextEnrollments.length > 999
+            ? outboxEntry('enrollments', row, Object.keys(row), 'put', null) : enrollmentCommandEntry('enroll', row)),
         ].filter(Boolean);
         return { students: { put: nextStudents }, enrollments: { put: nextEnrollments }, outbox: { put: outbox } };
       },
     });
     applyCommittedPuts(committed);
-  } else if (students.length && !(await save({ students, enrollments }))) {
-    throw new Error('IMPORT_WRITE_FAILED');
   }
   return { added: students.length, skippedInvalid, skippedOverLimit };
 }
@@ -3655,6 +3676,9 @@ export async function transferStudent(studentId, toSectionId, { date = todayISO(
         // This number is private to the in-memory plan. It is replaced by the
         // final sequential destination roster before the IndexedDB transaction
         // commits, so a returned student's old number cannot collide locally.
+        if ([source.sectionId, toSectionId].some(sectionId => current.enrollments.filter(row => row.sectionId === sectionId && row.status === 'active' && !row.deleted).length > 999)) {
+          result = { ok: false, status: 'numbering-capacity-unavailable' };return {};
+        }
         const provisionalRollNo = Number(destination?.rollNo) || nextRollNoFrom(current.enrollments, toSectionId);
 
         const retired = {
@@ -3807,6 +3831,9 @@ export async function renumberRoster(secId) {
           .filter((row) => row.sectionId === secId && row.status === 'active' && !row.deleted)
           .map((row) => ({ enrollment: row, student: studentsById.get(row.studentId) }))
           .filter((row) => row.student);
+        if (active.length > 999) {
+          result = { ok: false, status: 'numbering-capacity-unavailable' };return {};
+        }
         const sorted = sortStudents(active.map(({ enrollment, student }) => ({
           ...student, rollNo: enrollment.rollNo, enrollmentId: enrollment.id,
         })));

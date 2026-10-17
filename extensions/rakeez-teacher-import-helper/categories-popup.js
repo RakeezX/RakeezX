@@ -5,8 +5,10 @@ import {mountDateTimeControl} from './lib/rakeez-datetime.js';
 import {namesCsv} from './core.js';
 import { HANDOFF_TTL, validateHandoff } from './handoff-protocol.js';
 const $=id=>document.getElementById(id);
-let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='';
+let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='',sourceInfo=null,pendingBatch=null,batchProgress=new Map(),classTotals=new Map();
 window.n36HasSourceRoster=()=>!!sourceRoster;
+const sourceBatch=()=>selectedSourceClass(sourceRoster,chosenClass,batchProgress.get(chosenClass)?.offset??0);
+window.n36CanContinue=()=>!!sourceRoster&&!pendingBatch&&sourceClasses(sourceRoster).every(c=>(batchProgress.get(c.classroom)?.offset??0)===c.count);
 const message=value=>{$('category-status').textContent=value;};
 const invalidateExport=()=>{$('bundle-review').checked=false;$('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;};
 function destroyPickers(container){for(const input of container.querySelectorAll('input')){input.value='';input._flatpickr?.destroy();}}
@@ -94,7 +96,7 @@ $('category-cancel').addEventListener('click',()=>{clearDraft();$('category-tabl
 $('bundle-clear').addEventListener('click',()=>{clearDraft();staged=[];$('category-table').value='';renderStaged();message('مُسحت جميع البيانات المؤقتة. لم تُضف بيانات إلى ركيز.');window.dispatchEvent(new Event('n36:discard'));});
 $('bundle-review').addEventListener('change',()=>{
  $('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;if(!$('bundle-review').checked)return;
- try{if(sourceRoster){selectedSourceClass(sourceRoster,chosenClass);$('handoff-transfer').disabled=!window.n36HandoffSource?.();return;}const selected=selectedStaged();bundle(selected);$('bundle-download').disabled=false;$('bundle-csv').disabled=!selected.some(c=>c.category==='students');$('handoff-transfer').disabled=!window.n36HandoffSource?.()||!selected.some(c=>c.category==='students');}catch(e){$('bundle-review').checked=false;message(`غير محسوم (${e.message}). لا يمكن تصدير الحزمة.`);}
+ try{if(sourceRoster){sourceBatch();if(pendingBatch||!sourceInfo.complete&&!$('partial-approval')?.checked)throw Error('PARTIAL_REVIEW_REQUIRED');$('handoff-transfer').disabled=!window.n36HandoffSource?.();return;}const selected=selectedStaged();bundle(selected);$('bundle-download').disabled=false;$('bundle-csv').disabled=!selected.some(c=>c.category==='students');$('handoff-transfer').disabled=!window.n36HandoffSource?.()||!selected.some(c=>c.category==='students');}catch(e){$('bundle-review').checked=false;message(`غير محسوم (${e.message}). لا يمكن تصدير الحزمة.`);}
 });
 $('handoff-transfer').addEventListener('click',async()=>{
  if($('handoff-transfer').disabled||!$('bundle-review').checked)return;
@@ -103,13 +105,13 @@ $('handoff-transfer').addEventListener('click',async()=>{
   await window.n36BeforeExport?.();
   if(!$('bundle-review').checked)throw Error('SOURCE_CHANGED');
   const source=window.n36HandoffSource?.();if(!source)throw Error('SOURCE_CHANGED');
-  const rows=sourceRoster?selectedSourceClass(sourceRoster,chosenClass):selectedStaged().find(c=>c.category==='students')?.rows;
+  const rows=sourceRoster?sourceBatch():selectedStaged().find(c=>c.category==='students')?.rows;
   const createdAt=Date.now();
   const envelope=validateHandoff({schema:'rakeez-extension-names',version:1,...source,createdAt,expiresAt:createdAt+HANDOFF_TTL,rows});
   const result=await chrome.runtime.sendMessage({type:'n36-create',envelope});
   if(!result?.ok)throw Error('HANDOFF_UNAVAILABLE');
   window.dispatchEvent(new Event('n36:exported'));
-  if(sourceRoster)invalidateExport();
+  if(sourceRoster){pendingBatch={actionId:result.actionId,classroom:chosenClass,count:rows.length};invalidateExport();$('source-class-select').disabled=true;$('source-retry').hidden=false;}
   $('direct-handoff').hidden=false;
   $('handoff-status').textContent='فُتح ركيز في المتصفح نفسه. اختر فصلًا مملوكًا وراجع ثم أكّد؛ لم تُحفظ أسماء تلقائيًا. النقل لمرة واحدة ولمدة دقيقتين.';
  } catch { invalidateExport();$('direct-handoff').hidden=false;$('handoff-status').textContent='تعذّر النقل أو تغيّر المصدر. أعد المراجعة؛ يمكنك استخدام الملفات ضمن الخيارات المتقدمة.'; }
@@ -136,27 +138,60 @@ $('bundle-csv').addEventListener('click',async()=>{
  }catch(e){invalidateExport();message(`تعذّر تصدير الأسماء (${/^[A-Z_]+$/.test(e.message)?e.message:'SOURCE_CHANGED'}). لا ملف.`);}
 });
 window.addEventListener('n36:preview',({detail})=>{clearDraft();staged=bundle(detail).categories;renderStaged();const hasStudents=staged.some(c=>c.category==='students'&&c.rows.length);$('legacy-tools').open=hasStudents;$('legacy-tools').querySelector('summary').textContent=hasStudents?'معاينة البيانات ومراجعتها قبل النقل':'تفاصيل البيانات الأخرى (اختياري)';$('structured-category').hidden=false;$('legacy-names').hidden=true;});
-window.addEventListener('n36:clear',()=>{sourceRoster=null;chosenClass='';const approval=$('bundle-review').closest('label');$('staged-categories').after(approval);$('source-class-review')?.remove();clearDraft();staged=[];renderStaged();$('table').value='';$('category-table').value='';$('cancel').click();});
+window.addEventListener('n36:clear',({detail})=>{if(!detail?.continuing)classTotals.clear();sourceRoster=null;sourceInfo=null;pendingBatch=null;batchProgress.clear();chosenClass='';const approval=$('bundle-review').closest('label');$('staged-categories').after(approval);$('source-class-review')?.remove();clearDraft();staged=[];renderStaged();$('table').value='';$('category-table').value='';$('cancel').click();});
 
-// Compact full-source review; only the chosen class becomes a transport category.
+// AI: only one reviewed transport batch materializes; receipt, never send/claim, advances it.
+function renderSourceChoice(){
+ const names=$('source-class-names'),status=$('source-class-status');if(!names||!sourceRoster)return;
+ names.replaceChildren();invalidateExport();if($('partial-approval'))$('partial-approval').checked=false;
+ const progress=batchProgress.get(chosenClass)??{offset:0,added:0,existing:0};
+ const totals=classTotals.get(chosenClass)??{collected:0,added:0,existing:0};
+ const count=sourceRoster.filter(r=>r.classroom===chosenClass).length;
+ const rows=chosenClass&&progress.offset<count?sourceBatch():[];
+ for(const row of rows){const li=document.createElement('li');li.textContent=row.name;names.append(li);}
+ status.textContent=chosenClass?`${chosenClass}: جمعت ${totals.collected} حتى الآن؛ في هذه النافذة ${count}، صالح للمراجعة ${count-progress.offset}، غير متاح: بقية المصدر غير معلومة؛ مستبعد في النافذة ${sourceInfo.excluded}، أضيف بالفعل ${totals.added}، موجود سابقًا ${totals.existing}. الدفعة المختارة ${rows.length}؛ ${sourceInfo.complete?'كشف مكتمل':'استيراد المتاح فقط — قد ينقص طلاب'}.`:`جمعت ${sourceRoster.length} اسمًا صالحًا في هذه النافذة. اختر فصل المصدر؛ لا حفظ تلقائي.`;
+ $('bundle-review').disabled=!rows.length||!!pendingBatch;
+ $('source-continue').disabled=!window.n36CanContinue();
+ $('handoff-transfer').textContent=sourceInfo.complete?'نقل الدفعة للمراجعة في ركيز':'استيراد المتاح فقط';
+}
 window.addEventListener('n36:source-roster',({detail})=>{
- clearDraft();staged=[];sourceRoster=detail;chosenClass='';renderStaged();
+ if(!detail.continuing)classTotals.clear();
+ for(const group of sourceClasses(detail.rows)){const prior=classTotals.get(group.classroom)??{collected:0,added:0,existing:0};classTotals.set(group.classroom,{...prior,collected:prior.collected+group.count});}
+ clearDraft();staged=[];sourceInfo=detail;sourceRoster=detail.rows;chosenClass='';pendingBatch=null;batchProgress.clear();renderStaged();
  $('source-class-review')?.remove();
  const section=document.createElement('section');section.id='source-class-review';
- const label=document.createElement('label');label.textContent='الفصل الكامل المختار للنقل (حتى 300 اسم لكل عملية)';
+ const label=document.createElement('label');label.textContent='اختر فصل المصدر والدفعة (حتى 300 اسم لكل عملية؛ دون حد إجمالي)';
  const select=document.createElement('select');select.id='source-class-select';
- const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='اختر فصلًا ثم راجع أسماءه';select.append(placeholder);
- for(const group of sourceClasses(sourceRoster)){
-  const option=document.createElement('option');option.value=group.classroom;option.textContent=`${group.classroom}: ${group.count} اسمًا${group.available?'':' — النقل غير متاح: يتجاوز 300'}`;option.disabled=!group.available;select.append(option);
- }
- const status=document.createElement('p');status.id='source-class-status';status.textContent=`${sourceRoster.length} اسمًا موثقًا من صفحات المصدر المكتملة. لا إضافة تلقائية.`;
+ const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='اختر فصلًا ثم راجع أسماء الدفعة';select.append(placeholder);
+ for(const group of sourceClasses(sourceRoster)){const option=document.createElement('option');option.value=group.classroom;option.textContent=`${group.classroom}: ${group.count} اسمًا متاحًا في النافذة`;select.append(option);}
+ const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=detail.complete?'كشف مكتمل للصفحات المتحقق منها.':'تعذر التحقق من بقية صفحات الكشف؛ تستطيع استيراد الأسماء الظاهرة فقط مع مراجعتها. قد ينقص طلاب، ولا يُفترض عددهم.';
+ const partial=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.id='partial-approval';partial.append(check,document.createTextNode(' أفهم أن الكشف ناقص أو غير معلوم الاكتمال وأوافق على استيراد المتاح فقط'));partial.hidden=detail.complete;
+ check.addEventListener('change',invalidateExport);
+ const status=document.createElement('p');status.id='source-class-status';
  const names=document.createElement('ol');names.id='source-class-names';
- select.addEventListener('change',()=>{
-  chosenClass=select.value;invalidateExport();names.replaceChildren();
-  if(!chosenClass){$('bundle-review').disabled=true;return;}
-  try{const rows=selectedSourceClass(sourceRoster,chosenClass);for(const row of rows){const li=document.createElement('li');li.textContent=row.name;names.append(li);}status.textContent=`الفصل المختار: ${chosenClass}؛ ${rows.length} اسمًا. راجع القائمة ثم أكّد مراجعة هذا الفصل.`;$('bundle-review').disabled=false;}catch{chosenClass='';$('bundle-review').disabled=true;}
- });
- const approval=$('bundle-review').closest('label');approval.lastChild.textContent=' راجعت جميع أسماء الفصل المختار وأؤكد نقل هذا الفصل فقط';
- label.append(select);section.append(label,status,names,approval);$('direct-handoff').before(section);
- $('bundle-review').disabled=true;$('legacy-tools').open=false;
+ select.addEventListener('change',()=>{chosenClass=select.value;check.checked=false;renderSourceChoice();});
+ const next=document.createElement('button');next.type='button';next.id='source-continue';next.textContent='متابعة صريحة للصفحة أو النافذة التالية';next.hidden=!detail.hasNext;next.disabled=true;
+ next.addEventListener('click',()=>{if(window.n36CanContinue()){next.disabled=true;window.dispatchEvent(new Event('n36:continue'));}});
+ const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent='إعادة مراجعة الدفعة نفسها (لا تجاوز دون إيصال)';
+ retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();$('handoff-status').textContent='لم يُفترض نجاح الدفعة السابقة. أعد النقل والمطابقة؛ يفحص ركيز الأسماء الموجودة قبل أي تأكيد جديد.';});
+ const approval=$('bundle-review').closest('label');approval.lastChild.textContent=' راجعت أسماء هذه الدفعة والفصل؛ سأطابقه بفصل مملوك لي وأؤكد داخل ركيز';
+ label.append(select);section.append(label,coverage,partial,status,names,approval,retry,next);$('direct-handoff').before(section);$('direct-handoff').hidden=false;
+ $('legacy-tools').open=false;renderSourceChoice();
 });
+setInterval(async()=>{
+ const pending=pendingBatch;if(!pending||!sourceRoster)return;
+ try{
+  const result=await chrome.runtime.sendMessage({type:'n36-result',actionId:pending.actionId});
+  if(pendingBatch!==pending||!result?.ok||result.status==='pending')return;
+  if(['saved','existing'].includes(result.status)&&result.total===pending.count&&result.remaining===0&&result.added+result.existing===pending.count){
+   const progress=batchProgress.get(pending.classroom)??{offset:0,added:0,existing:0};
+   batchProgress.set(pending.classroom,{offset:progress.offset+pending.count,added:progress.added+result.added,existing:progress.existing+result.existing});
+   const totals=classTotals.get(pending.classroom);if(totals)classTotals.set(pending.classroom,{...totals,added:totals.added+result.added,existing:totals.existing+result.existing});
+   pendingBatch=null;$('source-class-select').disabled=false;$('source-retry').hidden=true;renderSourceChoice();
+   $('handoff-status').textContent='وصل إيصال ركيز: حُفظت الدفعة محليًا أو تحققت الأسماء الموجودة. لا إثبات مزامنة خادم. راجع وأكّد الدفعة التالية بنفسك.';
+  }else{
+   // Retain exact rows/cursor on unknown, failure, restart or expiry.
+   $('handoff-status').textContent='لم يصل إيصال حفظ مؤكد. لا انتقال للدفعة التالية؛ أعد مراجعة الدفعة نفسها أو ابدأ مجددًا بعد انتهاء المهلة.';
+  }
+ }catch{/* No receipt is not success. */}
+},750);

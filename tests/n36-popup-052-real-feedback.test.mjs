@@ -9,9 +9,9 @@ test('0.5.2 exact ZIP fileset, hashes, checkout bytes and Git LF/CRLF integrity'
  for(const f of m.files){const data=Buffer.from(zip[f.file]),checkout=execFileSync('git',['show','8714bef9f047a5169a5c4ca3eb0d9ef6e3b08199:'+dir+f.file]);assert.equal(hash(data),f.sha256);assert.equal(data.length,f.bytes);assert.equal(data.toString().replace(/\r\n/g,'\n'),checkout.toString().replace(/\r\n/g,'\n'));const git=execFileSync('git',['hash-object','--path='+dir+f.file,'--stdin'],{input:checkout,encoding:'utf8'}).trim();const canonical=Buffer.from(checkout.toString().replace(/\r\n/g,'\n'));assert.equal(git,execFileSync('git',['hash-object','--stdin'],{input:canonical,encoding:'utf8'}).trim());}
  assert.equal(JSON.parse(Buffer.from(zip['manifest.json'])).version,'0.5.2');
 });
-test('0.5.1 rollback archive and manifest untouched; no widened permissions or portal/navigation/protocol changes',async()=>{
+test('0.5.1 rollback archive and manifest untouched; no widened permissions or portal/navigation/protocol changes; receipt worker tested in 0.5.5',async()=>{
  for(const f of ['rakeez-teacher-import-helper-0.5.1.zip','rakeez-teacher-import-helper-0.5.1.manifest.json'])assert.deepEqual(await fs.readFile(assets+f),execFileSync('git',['show',base+':'+assets+f]));
- for(const f of ['selection.js','navigation.js','route-diagnostics.js','handoff-worker.js','handoff-protocol.js'])assert.equal((await fs.readFile(dir+f,'utf8')).replace(/\r\n/g,'\n'),execFileSync('git',['show',base+':'+dir+f],{encoding:'utf8'}).replace(/\r\n/g,'\n'));
+ for(const f of ['selection.js','navigation.js','route-diagnostics.js','handoff-protocol.js'])assert.equal((await fs.readFile(dir+f,'utf8')).replace(/\r\n/g,'\n'),execFileSync('git',['show',base+':'+dir+f],{encoding:'utf8'}).replace(/\r\n/g,'\n'));
  const m=JSON.parse(await fs.readFile(dir+'manifest.json','utf8')),old=JSON.parse(execFileSync('git',['show',base+':'+dir+'manifest.json'],{encoding:'utf8'}));m.version=old.version;assert.deepEqual(m,old);
  const {RUN_LIMITS}=await import('../extensions/rakeez-teacher-import-helper/navigation.js');const {HANDOFF_TTL}=await import('../extensions/rakeez-teacher-import-helper/handoff-protocol.js');assert.equal(RUN_LIMITS.reviewMilliseconds,300000);assert.equal(HANDOFF_TTL,120000);
 });
@@ -23,4 +23,4 @@ test('0.5.2 warning presentation is preserved as historical evidence; 0.5.3 dist
  const {validateCategory}=await import('../extensions/rakeez-teacher-import-helper/categories.js');assert.throws(()=>validateCategory('students',[]),/EMPTY_CATEGORY/);assert.throws(()=>validateCategory('students',Array(301).fill({})),/CATEGORY_ROW_LIMIT/);
 });
 
-test('one Koshoof download entry advances to 0.5.3 while 0.5.2 remains rollback; guarded access entry unchanged',async()=>{const s=await fs.readFile('src/views/class-import-center.js','utf8');assert.equal((s.match(/href="\/assets\/extensions\/rakeez-teacher-import-helper-0.5.3.zip"/g)||[]).length,1);assert.ok(s.includes('تنزيل الإضافة الخاصة 0.5.3'));assert.ok(!s.includes('0.5.1'));});
+test('one Koshoof download entry advances to 0.5.5 while 0.5.2 remains rollback; guarded access entry unchanged',async()=>{const s=await fs.readFile('src/views/class-import-center.js','utf8');assert.equal((s.match(/href="\/assets\/extensions\/rakeez-teacher-import-helper-0.5.5.zip"/g)||[]).length,1);assert.ok(s.includes('تنزيل الإضافة الخاصة 0.5.5'));assert.ok(!s.includes('0.5.1'));});
