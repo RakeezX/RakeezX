@@ -1,0 +1,71 @@
+{
+  "taskId": "continuous-n104-empty-roster-clear-actions-20261017",
+  "runId": "255e13e0-c992-4f29-b579-d5c9d4c7820e",
+  "baseSha": "aa6a1843c5102add77d61d1a3777c7916e376bb7",
+  "checks": [
+    {
+      "name": "empty_hub_320",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "empty_students_320",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "populated_320",
+      "status": "PASS",
+      "evidence": "No quick hint/FAB; top paste/manual/import handlers work on first click, cancel/contextual routing without store writes."
+    },
+    {
+      "name": "empty_hub_390",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "empty_students_390",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "populated_390",
+      "status": "PASS",
+      "evidence": "No quick hint/FAB; top paste/manual/import handlers work on first click, cancel/contextual routing without store writes."
+    },
+    {
+      "name": "empty_hub_1280",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "empty_students_1280",
+      "status": "PASS",
+      "evidence": "Exact title/guidance, ordered separated 44px actions, RTL without overflow; actual paste/manual sheets cancel and contextual Koshoof preselects owned class. No store writes."
+    },
+    {
+      "name": "populated_1280",
+      "status": "PASS",
+      "evidence": "No quick hint/FAB; top paste/manual/import handlers work on first click, cancel/contextual routing without store writes."
+    }
+  ],
+  "screenshots": [
+    "test-results/n104-empty-roster/320-hub.png",
+    "test-results/n104-empty-roster/320-students.png",
+    "test-results/n104-empty-roster/320-populated.png",
+    "test-results/n104-empty-roster/390-hub.png",
+    "test-results/n104-empty-roster/390-students.png",
+    "test-results/n104-empty-roster/390-populated.png",
+    "test-results/n104-empty-roster/1280-hub.png",
+    "test-results/n104-empty-roster/1280-students.png",
+    "test-results/n104-empty-roster/1280-populated.png"
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "src/views/students.js": "79597003b4e173334cfff82e3e0d3fe0488f765db395b8d161b71833c28b5d9a",
+    "src/views/teaching-hub.js": "ecb373feb8f9ad86235eede3213b8beb0cd2e6821b460f0fd1c67f5f70603443",
+    "src/styles/components.css": "5a55f1db581f98dd81bfe44ece8c5c4077b457435876ac447381bc1ba33282b2",
+    "src/store.js": "0d9aca940b3de48c4934e99403bc67fad449ab4f35f3142abddd4fc5cd7749e5"
+  },
+  "resources": "Canonical isolated local browser owns/closes fresh contexts and browser; task-owned HTTP server closed in finally. No shared/live browser used."
+}

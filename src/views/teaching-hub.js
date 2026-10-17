@@ -108,14 +108,15 @@ export default {
           ${activeGoalIndicator(tch.id, activeGoal)}
           <div class="class-hub__empty empty">
             <div class="empty__icon">${icon('student')}</div>
-            <div class="empty__title">الفصل بلا طلاب بعد</div>
+            <div class="empty__title">لا يوجد طلاب في الفصل</div>
             <div class="empty__text">
-              استورد الأسماء وحدها أو مع درجاتها، أو أضف طالبًا يدويًا.
+              الصق الأسماء، أو استورد الطلاب من ملف أو إضافة ركيز، أو أضف طالبًا يدويًا.
             </div>
             ${canOpenRoster(p) ? html`<div class="roster-entry-empty">
               <div class="roster-entry-actions" role="group" aria-label="إضافة أسماء الطلاب">
                 <button class="btn" data-act="paste-names" aria-label="لصق الأسماء">${icon('upload')} لصق الأسماء</button>
                 <button class="btn" data-act="add-student" aria-label="إضافة طالب يدويًا">${icon('plus')} إضافة طالب يدويًا</button>
+                <a class="btn btn--primary" data-act="file-import" href="#/teaching/${p.id}/koshoof">${icon('upload')} استيراد الطلاب</a>
               </div>
             </div>` : ''}
           </div>
