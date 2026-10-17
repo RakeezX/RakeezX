@@ -7,7 +7,8 @@ const $=id=>document.getElementById(id);
 let draft=null,staged=[],generation=0;
 const message=value=>{$('category-status').textContent=value;};
 const invalidateExport=()=>{$('bundle-review').checked=false;$('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;};
-function clearDraft(){generation++;draft=null;$('category-preview').replaceChildren();$('category-review').checked=false;$('category-review').disabled=true;$('category-stage').disabled=true;invalidateExport();}
+function destroyPickers(container){for(const input of container.querySelectorAll('input')){input.value='';input._flatpickr?.destroy();}}
+function clearDraft(){destroyPickers($('category-preview'));generation++;draft=null;$('category-preview').replaceChildren();$('category-review').checked=false;$('category-review').disabled=true;$('category-stage').disabled=true;invalidateExport();}
 function error(e){clearDraft();message(`غير محسوم (${e.message}). صحّح التسميات أو الحقول وأعد المعاينة؛ لا تصدير لهذه البيانات.`);}
 function edits(container,category,rows,onEdit){
  for(const [index,row] of rows.entries()){
@@ -47,7 +48,7 @@ function show(category,rows,source){
  $('category-review').disabled=false;message(`${CATEGORIES[category].label}: ${rows.length} صف للمراجعة، دون حفظ أو تصدير.`);
 }
 function renderStaged(){
- $('staged-categories').replaceChildren();invalidateExport();
+ destroyPickers($('staged-categories'));$('staged-categories').replaceChildren();invalidateExport();
  for(const item of staged){
   const group=document.createElement('section');group.dataset.category=item.category;
   const label=document.createElement('label'),included=document.createElement('input');included.type='checkbox';included.checked=true;included.className='include-category';label.append(included,document.createTextNode(CATEGORIES[item.category].label));group.append(label);
@@ -131,5 +132,5 @@ $('bundle-csv').addEventListener('click',async()=>{
   invalidateExport();window.dispatchEvent(new Event('n36:exported'));
  }catch(e){invalidateExport();message(`تعذّر تصدير الأسماء (${/^[A-Z_]+$/.test(e.message)?e.message:'SOURCE_CHANGED'}). لا ملف.`);}
 });
-window.addEventListener('n36:preview',({detail})=>{clearDraft();staged=bundle(detail).categories;renderStaged();$('legacy-tools').open=true;$('structured-category').hidden=false;$('legacy-names').hidden=true;});
+window.addEventListener('n36:preview',({detail})=>{clearDraft();staged=bundle(detail).categories;renderStaged();const hasStudents=staged.some(c=>c.category==='students'&&c.rows.length);$('legacy-tools').open=hasStudents;$('legacy-tools').querySelector('summary').textContent=hasStudents?'معاينة البيانات ومراجعتها قبل النقل':'تفاصيل البيانات الأخرى (اختياري)';$('structured-category').hidden=false;$('legacy-names').hidden=true;});
 window.addEventListener('n36:clear',()=>{clearDraft();staged=[];renderStaged();$('table').value='';$('category-table').value='';$('cancel').click();});

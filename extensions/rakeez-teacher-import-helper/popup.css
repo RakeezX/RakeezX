@@ -1,5 +1,9 @@
 :root { font-family: system-ui, sans-serif; color: #183c3a; background: #f7faf9; font-size: 15px; --font: system-ui, sans-serif; --bg-elev: #fff; --text: #183c3a; --border: #648582; --brand: #17645c; --text-3: #52625f; --shadow-3: 0 4px 16px #183c3a33; }
-body { width: min(380px, 100vw); margin: 0; overflow-wrap: anywhere; }
+html { width: 430px; max-height: 600px; overflow-y: auto; }
+html:has(body.run-page) { width: auto; max-height: none; }
+body { margin: 0; overflow-wrap: anywhere; }
+body.run-page { width: auto; max-width: 840px; max-height: none; margin-inline: auto; }
+* { box-sizing: border-box; }
 main { padding: 18px; }
 h1 { font-size: 22px; margin-top: 0; }
 p { line-height: 1.7; }
@@ -20,6 +24,6 @@ input:disabled { background: #e9eeec; }
 /* Keep the approved picker inside the narrow extension viewport. */
 .flatpickr-calendar.open { left: 18px !important; right: auto !important; max-width: calc(100vw - 36px); }
 .flatpickr-calendar .flatpickr-time input { padding: 0; margin: 0; border: 0; border-radius: 0; }
-.run-page #category-source, .run-page #legacy-names, .run-page #manual-controls, .run-page #legacy-tools > summary { display: none !important; }
+.run-page #category-source, .run-page #legacy-names, .run-page #manual-controls { display: none !important; }
 summary { cursor: pointer; padding-block: 12px; }
 #run-missing { color: #784a04; }

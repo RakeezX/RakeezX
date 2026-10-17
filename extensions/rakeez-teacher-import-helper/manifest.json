@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ركيز — مساعد إعداد المعلم التجريبي الخاص",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "أسماء مختارة بمراجعة المعلم من مدرستي أو عمود نور الظاهر؛ نقل مؤقت إلى ركيز دون ملف أو حفظ تلقائي.",
   "permissions": ["activeTab", "scripting", "storage", "alarms"],
   "background": { "service_worker": "handoff-worker.js", "type": "module" },

@@ -45,8 +45,8 @@ for(const version of ['0.5.0','0.5.1'])test('installable ZIP '+version+' and pro
  };
  for(const file of m.files){
   const sourcePath='extensions/rakeez-teacher-import-helper/'+file.file;
-  const canonical=version==='0.5.0'?execFileSync('git',['show','e2abdfe3c10307f995bd237e9a39d66a6f419082:'+sourcePath]):await readFile(sourcePath);
-  const checkout=version==='0.5.0'?canonical:await readFile(sourcePath),packaged=Buffer.from(zip[file.file]);
+  const canonical=execFileSync('git',['show',(version==='0.5.0'?'e2abdfe3c10307f995bd237e9a39d66a6f419082':'668fc444bd7a470349048b416883afeab43c31f2')+':'+sourcePath]);
+  const checkout=canonical,packaged=Buffer.from(zip[file.file]);
   verify(packaged,canonical,checkout,file.sha256,file.file);
   // Keep real content/package/hash tampering rejected by this corrected check.
   assert.throws(()=>verify(packaged,canonical,Buffer.concat([checkout,Buffer.from('tampered')]),file.sha256,file.file));

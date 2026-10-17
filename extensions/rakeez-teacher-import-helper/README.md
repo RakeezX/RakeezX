@@ -1,3 +1,16 @@
+## Private 0.5.2 — Chrome popup and review usability (AI implementation)
+
+The action popup now has a definite 430px CSS width; the separate RTL run page fits small screens and grows to 840px. A missing verified student roster keeps transfer disabled and the other categories collapsed under «تفاصيل البيانات الأخرى (اختياري)». Zero preview students does not prove an empty class, and iframe presence does not prove roster location. No source parsing/routes/permissions changed.
+
+The review lasts exactly 300 seconds with a remaining-time display. Expiry removes staged values and date/time picker DOM, explains the deletion in Arabic, and offers guidance to voluntarily reopen the toolbar popup from the source tab. The independent transfer token still lasts only two minutes after explicit transfer. Student rows, when present, remain visible for explicit review; edits invalidate confirmation.
+
+Download 0.5.2 from Rakeez Koshoof. Initial installation: unzip into one dedicated folder and use Chrome → Extensions → Developer mode → Load unpacked. Keep one helper enabled. The existing guarded updater may update the stable folder only after a separate verified Production receipt; this worker never modifies or reloads a personal extension. Keep the untouched 0.5.1 ZIP and manifest for rollback.
+
+Evidence is synthetic installed Chrome only. Real teacher Chrome retest and full direct Madrasati roster compatibility remain OPEN. Noor remains the second phase; JSON remains advanced. No account/owner/Sync/grade or portal operations changed.
+
+---
+Historical version notes follow; installation instructions below are historical.
+
 ## Private 0.5.0 — teacher-reviewed direct names handoff (AI implementation)
 
 Built from the committed 0.4.5 extension at `0246d892de99ff66c8106d37b77678136cc3cacf`. The route policy, source report reader, pagination, MyStudents skip, teacher settle, 90-second run and source-origin/role bounds remain unchanged. The sections below are historical version notes, not current installation instructions.

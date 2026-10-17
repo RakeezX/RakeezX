@@ -6,7 +6,7 @@ import {RUN_LIMITS,startOrigin,safeRoute,mergePage} from './navigation.js';
 import './route-diagnostics.js';
 const $=id=>document.getElementById(id),runToken=new URL(location.href).searchParams.get('run');
 const channel=new BroadcastChannel('rakeez-private-one-start');
-let generation=0,job=null,review=null,reviewTimer=null,guardBusy=false,choiceReject=null;
+let generation=0,job=null,review=null,reviewTimer=null,reviewClock=null,guardBusy=false,choiceReject=null;
 const kindLabel=kind=>({start:'صفحة البداية',role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'}[kind]??'الفئة');
 const stageLabel=stage=>({'start-path':'مسار البداية','role-selection':'اختيار دور المعلم','auxiliary-link':'رابط اختياري','navigation-redirect':'التنقل أو التحويل','source-schema':'بنية صفحة البيانات','link-discovery':'اكتشاف روابط القراءة'}[stage]??'التحقق');
 let diagnosticLines=[];
@@ -24,10 +24,15 @@ function showDiagnostic(d){
 function routeError(e,stage,kind,path){if(!e.diagnostic&&['UNSAFE_ROUTE','UNSAFE_LINK','ORIGIN_CHANGED'].includes(e.message))e.diagnostic=globalThis.rakeezRouteDiagnostic(stage,e.message,kind,path);return e;}
 channel.addEventListener('message',({data})=>{const active=job??review;if(data?.type==='probe'&&active?.tabId===data.tabId)channel.postMessage({type:'busy',token:data.token});});
 function announce(text){$('run-status').textContent=text;}
-function clearPreview(){window.dispatchEvent(new Event('n36:clear'));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;}
+function armReview(){
+ const tick=()=>{$('review-remaining').textContent=review?`الوقت المتبقي للمعاينة: ${Math.max(0,Math.ceil((review.expires-Date.now())/1000))} ثانية (5 دقائق؛ النقل له مهلة مستقلة مدتها دقيقتان).`:'';};
+ tick();reviewClock=setInterval(tick,1000);reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
+}
+function clearPreview(){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new Event('n36:clear'));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;}
 function stop(code='CANCELLED',diagnostic=null,context=null){
  generation++;if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
+ if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
  announce(diagnostic?.stage==='link-discovery'&&code==='READ_LINKS_UNAVAILABLE'?`عُرفت معالم صفحة المعلم، لكن لم توجد روابط قراءة مسموحة (${code}). مُسحت المعاينة؛ انسخ التشخيص المحدود لاكتشاف الروابط، وليس طلب اختيار دور جديد.`:diagnostic?`توقف ${stageLabel(diagnostic.stage)} (${code}). لم تُجمع ${kindLabel(diagnostic.category)} ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد ${diagnostic.structure?'بنية الدور الظاهرة دون أسماء أو روابط':'المسار المطلوب'}؛ تكرار المحاولة نفسها لن يغيّر الرفض.`:context?`توقف ${stageLabel(context.stage)} (${code}). لم تُجمع ${kindLabel(context.kind)} ومُسحت المعاينة؛ لا نجاح لهذه الفئة.`:`توقف التشغيل (${code}). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.`);
 }
 function current(ticket){if(ticket!==generation||!job)throw Error('CANCELLED');if(Date.now()>=job.deadline)throw Error('TIME_LIMIT');}
@@ -143,15 +148,17 @@ async function start(tabId){
   const contextSnapshot=job.context;clearTimeout(job.timer);job.routes.length=0;job.categories=[];job=null;
   review={tabId,origin,context:contextSnapshot,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
   $('direct-handoff').hidden=false;
-  if(warnings.length)$('run-skipped').textContent='فئات غير مكتملة ومستبعدة من التصدير: '+[...new Set(warnings.map(w=>kindLabel(w.category)+' ('+w.code+')'))].join('، ')+'. راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة.';
+  const displayWarnings=warnings.filter(w=>!(w.category==='students'&&w.code==='EMPTY_OR_LIMIT'&&warnings.some(x=>x.category==='students'&&x.code==='ROSTER_LINKS_UNAVAILABLE')));
+  if(displayWarnings.length)$('run-skipped').textContent='فئات غير مكتملة ومستبعدة من التصدير: '+[...new Set(displayWarnings.map(w=>kindLabel(w.category)+' ('+w.code+')'))].join('، ')+'. راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة.';
   const missing=['teacher','school','principal','classes','students','timetable'].filter(c=>!valid.some(v=>v.category===c));
   const studentCause=!missing.includes('students')?'':diagnosticLines.some(l=>l.includes('RELEVANT_LINK_UNSUPPORTED'))?'ظهر رابط ذو تسمية طلاب، لكن مساره غير مدعوم؛ لم يُفتح.':diagnosticLines.some(l=>l.includes('MAIN_FRAME_READ_LINK_ABSENT'))?'لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف.':missing.includes('students')?'لم يثبت اكتمال كشف الطلاب من المصدر الظاهر.':'';
+  $('handoff-status').textContent=studentCause?'النقل غير جاهز: لم يتوفر كشف طلاب مؤكّد. 0 طلاب في المعاينة لا يعني أن الفصل فارغ.':'';
   if(studentCause)$('run-skipped').textContent+=' '+studentCause+' نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.';
   $('run-missing').textContent=missing.length?`غير ظاهر أو غير محسوم: ${missing.map(c=>CATEGORIES[c].label).join('، ')}. لم تُخمن قيم ناقصة.`:'ظهرت الفئات الست للمراجعة.';
   $('run-counts').textContent=`${pages} صفحات؛ ${valid.find(c=>c.category==='students')?.rows.length??0} طلاب؛ ${valid.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ ${loops} روابط صفحات مكررة جرى تجاوزها.`;
   window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));
   announce(warnings.length?`جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.`:`${diagnosticLines.length?'الجمع جزئي؛ بعض الروابط لم تُجمع بياناتها. ':''}اكتمل الجمع من ${pages} صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.`);
-  reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),RUN_LIMITS.reviewMilliseconds);
+  armReview();
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
 }
 async function noorRead(tabId) {
@@ -171,7 +178,7 @@ async function startNoor(tabId,classroom,role) {
   $('direct-handoff').hidden=false;
   window.dispatchEvent(new CustomEvent('n36:preview',{detail:[{category:'students',provenance:['selected-visible'],rows:selected.names.map(name=>({name,classroom}))}]}));
   announce('نور: عمود ظاهر مختار فقط — كشف جزئي. لم تُجمع صفحات أخرى أو أعمدة أخرى، ولم يُتحقق من اكتمال قائمة الفصل. راجع ثم انقل الأسماء بتأكيدك.');
-  reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),RUN_LIMITS.reviewMilliseconds);
+  armReview();
  }catch(e){if(ticket===generation)stop(/^[A-Z_]+$/.test(e.message)?e.message:'NOOR_READ_FAILED');}
 }
 // Progress lives only in this explicit extension run page; transport alone uses short-lived session storage.
@@ -207,6 +214,7 @@ if(runToken){
  $('one-start').addEventListener('click',()=>launch());
  $('noor-start').addEventListener('click',()=>launch('noor'));
 }
+$('run-reopen').addEventListener('click',()=>{announce('افتح بنفسك تبويب مدرستي المصرّح ثم اضغط زر الإضافة وابدأ؛ لا قراءة قبل اختيارك.');$('run-reopen').hidden=true;});
 $('run-cancel').addEventListener('click',()=>stop());
 window.addEventListener('n36:discard',()=>{if(runToken)stop();});
 window.addEventListener('n36:exported',()=>{if(!runToken)return;generation++;clearPreview();$('run-cancel').disabled=true;announce('اكتمل التصدير الصريح ومُسحت المعاينة المؤقتة. لم تُضف بيانات إلى ركيز.');});
@@ -215,7 +223,7 @@ window.n36BeforeExport=async()=>{
  try{if(snapshot.source==='noor'){const fresh=await noorRead(snapshot.tabId);if(fresh.url!==snapshot.url||JSON.stringify(fresh.names)!==snapshot.names)throw Error('SOURCE_CHANGED');}else await inspect(snapshot.tabId,snapshot.origin,'guard',()=>review===snapshot);if(review!==snapshot)throw Error('SOURCE_CHANGED');}catch(e){stop('SOURCE_CHANGED');throw e;}
 };
 window.n36HandoffSource=()=>review&&Date.now()<review.expires?{source:review.source==='noor'?'noor':'madrasati',scope:review.source==='noor'?'selected-visible-partial':'reviewed-run'}:null;
-window.addEventListener('pagehide',()=>{clearTimeout(reviewTimer);if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;}channel.close();});
+window.addEventListener('pagehide',()=>{clearTimeout(reviewTimer);clearInterval(reviewClock);if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;}channel.close();});
 // Only the explicit run's source is monitored; no all-tab discovery or startup read.
 chrome.tabs.onRemoved.addListener(id=>{if(id===job?.tabId||id===review?.tabId)stop('SOURCE_CLOSED');});
 chrome.tabs.onUpdated.addListener((id,change)=>{

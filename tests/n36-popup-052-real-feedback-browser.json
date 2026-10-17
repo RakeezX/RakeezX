@@ -1,0 +1,143 @@
+{
+  "runId": "76096272-1655-4c14-8650-af6b87e19381",
+  "baseline": {
+    "runId": "76096272-1655-4c14-8650-af6b87e19381",
+    "baseline": true,
+    "checks": [
+      "actual toolbar action sizing",
+      "11-page/23-other-rows missing roster",
+      "RTL 320/390/768/1280 actual DOM/CSS",
+      "300000ms expiry at -1ms/0ms",
+      "no persistent envelope/external requests"
+    ],
+    "externalRequests": [],
+    "errors": [],
+    "lease": "ACQUIRED browser",
+    "browser": "155.0.8059.80",
+    "sourceEntry": {
+      "actionMarkers": 3,
+      "iframeCount": 1,
+      "linkStats": {
+        "empty": 0,
+        "formRejected": 0,
+        "href": 10,
+        "inlineHandler": 0,
+        "javascript": 0,
+        "originRejected": 0,
+        "queryRejected": 0,
+        "readPath": 10
+      },
+      "navMarkers": 2,
+      "pageKind": "teacher-dashboard",
+      "readyState": "complete",
+      "roleMarkers": 0,
+      "safeReadLinks": 2,
+      "schoolOptions": 0
+    },
+    "popup": "{\"width\":70,\"body\":70,\"scroll\":70,\"height\":510}",
+    "initialEntry": "",
+    "counts": "11 صفحات؛ 0 طلاب؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+    "warning": "فئات غير مكتملة ومستبعدة من التصدير: أسماء الطلاب (ROSTER_LINKS_UNAVAILABLE). راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة. لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف. نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.",
+    "entry": "pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0",
+    "layouts": [
+      {
+        "viewport": 320,
+        "body": 320,
+        "scroll": 320,
+        "rtl": "rtl"
+      },
+      {
+        "viewport": 390,
+        "body": 380,
+        "scroll": 390,
+        "rtl": "rtl"
+      },
+      {
+        "viewport": 768,
+        "body": 380,
+        "scroll": 768,
+        "rtl": "rtl"
+      },
+      {
+        "viewport": 1280,
+        "body": 380,
+        "scroll": 1280,
+        "rtl": "rtl"
+      }
+    ],
+    "deadlineMilliseconds": 300000,
+    "expiry": "Values present at deadline - 1ms; scrubbed at deadline, including picker DOM; transfer rejected",
+    "status": "PASS",
+    "release": "RELEASED browser",
+    "cleanup": "Owned disposable Chrome/profile closed; shared browser lease released"
+  },
+  "checks": [
+    "actual toolbar action sizing",
+    "11-page/23-other-rows missing roster",
+    "RTL 320/390/768/1280 actual DOM/CSS",
+    "300000ms expiry at -1ms/0ms",
+    "no persistent envelope/external requests",
+    "explicit student review/edit invalidation"
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "sourceEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 1,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 10,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 10
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 2,
+    "schoolOptions": 0
+  },
+  "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "initialEntry": "",
+  "counts": "11 صفحات؛ 0 طلاب؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+  "warning": "فئات غير مكتملة ومستبعدة من التصدير: أسماء الطلاب (ROSTER_LINKS_UNAVAILABLE). راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة. لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف. نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.",
+  "entry": "pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0",
+  "layouts": [
+    {
+      "viewport": 320,
+      "body": 320,
+      "scroll": 320,
+      "rtl": "rtl"
+    },
+    {
+      "viewport": 390,
+      "body": 390,
+      "scroll": 390,
+      "rtl": "rtl"
+    },
+    {
+      "viewport": 768,
+      "body": 768,
+      "scroll": 768,
+      "rtl": "rtl"
+    },
+    {
+      "viewport": 1280,
+      "body": 840,
+      "scroll": 1280,
+      "rtl": "rtl"
+    }
+  ],
+  "deadlineMilliseconds": 300000,
+  "expiry": "Values present at deadline - 1ms; scrubbed at deadline, including picker DOM; transfer rejected",
+  "studentReview": "Actual inline complete one-page roster visible; explicit confirmation gates transfer; editing invalidates; expiry scrubs student names",
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable Chrome/profile closed; shared browser lease released"
+}
