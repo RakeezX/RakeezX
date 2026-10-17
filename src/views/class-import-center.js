@@ -4,7 +4,7 @@ import { html, confirmSheet, icon, toast } from '../lib/dom.js';
 import * as store from '../store.js';
 import { isDemo } from '../lib/demo.js';
 import { readClassFile, detectClassNameColumn, classGroups } from '../lib/class-import-file.js';
-import { GRADES, sectionLabel, normalizeSectionLabel } from '../models.js';
+import { GRADES, gradeLabel, sectionLabel, normalizeSectionLabel } from '../models.js';
 import { classKoshoofBundle, downloadKoshoofBundle } from '../lib/class-koshoof-bundle.js';
 import { repaint } from '../repaint.js';
 
@@ -43,8 +43,8 @@ cloud.subscribe(() => {
 });
 function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
-  return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب بإضافة ركيز</h3>
-    <p>افتح الإضافة في صفحة مصدر الأسماء، ثم راجع الطلاب وانقلهم إلى ركيز.</p>
+  return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم</h3>
+    <p>ثبّت الإضافة لمتصفح كروم، وسجّل دخولك إلى منصة مدرستي، ثم شغّل الإضافة لجلب أسماء الطلاب وبيانات فصولهم المتاحة. راجع البيانات وأكّد حفظها في ركيز.</p>
     <a class="btn btn--primary" href="/assets/extensions/rakeez-teacher-import-helper-0.5.9.zip" download>تنزيل إضافة ركيز 0.5.9</a>
     <details><summary>طريقة التثبيت</summary><ol>
       <li>فك ضغط الحزمة في مجلد واحد مخصص للإضافة.</li>
@@ -174,14 +174,14 @@ function transferPanel(teachingId) {
         : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
     </details></section>
     ` : html`<section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
-    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تجهيز كشف نور 40/60</summary>
+    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تصدير كشف نور <bdi dir="ltr">40 / 60</bdi></summary>
     <div class="grade-transfer__chips" role="group" aria-label="بنود كشف نور">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> ${i.name} / ${i.max}</label>`)}</div>
     <p class="grade-transfer__hint">40: المهام الأدائية والمشاركة والتفاعل.</p><p class="grade-transfer__hint">60: تقويمات تحريرية وتطبيقات عملية.</p>
     ${selectedItems.map(i => html`<div class="grade-transfer__noor-row"><label for="noor-${i.id}">${i.name} <small> / ${i.max}</small></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group"><option value="">اختر</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group}</option>`)}</select></div>`)}
     <p data-noor-totals role="status">مجموع العظمى: 40 ← ${groupTotal('40')} · 60 ← ${groupTotal('60')}</p>
     <p data-noor-alert role="alert" hidden></p><label><input type="checkbox" data-noor-confirm> أؤكد تعيين البنود المختارة؛ مجموع العظمى 40 و60 دون تكرار أو تحجيم</label>
     <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة. ثلاثة أعمدة للرصد اليدوي فقط، ليس للرفع المباشر.</p>
-    <button class="btn btn--primary" data-act="grade-noor-export">تنزيل كشف نور اليدوي</button></details>
+    <button class="btn btn--primary" data-act="grade-noor-export">تصدير كشف نور</button></details>
     </section>`}
   </div>`;
 
@@ -244,7 +244,7 @@ function transferExport(el, ev, params) {
     const className = teachingLabel(teaching);
     downloadGradeCsv(exportGradeCsv({ ...context, items: context.items.filter(i => selected.has(i.id)), noorReview: true,
       noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem, e.value])),
-      noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview: true, className });
+      noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview: true, className, filenameClassName: filenameTeachingLabel(teaching) });
   } catch (error) { alert.textContent = error.message; alert.hidden = false; }
 }
 
@@ -474,6 +474,12 @@ const classImport = {
 };
 const accessible = () => store.teachings().filter(row => { try { store.assertClassOperationsAccess(row.id); return true; } catch { return false; } }).sort((a,b) => Number(isDemo(a)) - Number(isDemo(b)) || compareAcademicClasses(store.getSection(a.sectionId),store.getSection(b.sectionId)));
 const teachingLabel = row => `${sectionLabel(store.getSection(row.sectionId))} · ${store.getSubject(row.subjectId)?.name ?? ''} · ${store.getYear(store.getSection(row.sectionId)?.yearId)?.label ?? ''} · ${store.getTerm(row.termId)?.name ?? ''}`;
+// Presentation only: full teachingLabel remains in the workbook export context.
+const shortTeachingLabel = row => `${sectionLabel(store.getSection(row.sectionId))} · ${store.getSubject(row.subjectId)?.name ?? ''}`;
+const filenameTeachingLabel = row => {
+  const section = store.getSection(row.sectionId);
+  return `${gradeLabel(section?.grade)} ${section?.label ?? ''} · ${store.getSubject(row.subjectId)?.name ?? ''}`;
+};
 // AI: every entry uses this hub; legacy per-teaching URLs only redirect context.
 function contextRoute(p = {}) {
   const request = new URLSearchParams(location.hash.split('?')[1]);
@@ -517,16 +523,17 @@ export const koshoofCenter = {
     return html`<div class="management-page class-import-page"><h2 tabindex="-1">استيراد وتصدير الكشوف</h2>
       ${tabs()}
       ${hub.tab === 'import' ? html`${directExtensionEntry()}<label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${locked() ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>استيراد إلى فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل من ملف</option></select></label>
+        <p class="grade-transfer__hint">${hub.kind === 'new' ? 'ملف جديد: ينشئ فصلًا ومادة بعد المراجعة، بالأسماء فقط؛ يُرفض الفصل المكرر.' : 'فصل موجود: يضيف أو يطابق الأسماء، أو يستورد درجات مراجَعة إلى الفصل المحدد؛ لا ينشئ فصلًا جديدًا.'}</p>
         ${hub.kind === 'new' ? html`<details data-n36-new-advanced><summary>خيارات متقدمة — إنشاء فصل من CSV / XLSX</summary>${classImport.render()}</details>` : html`<label class="field"><span>الفصل والمادة</span><select class="select" data-existing-class aria-label="الفصل الموجود" ${locked() ? 'disabled' : ''}><option value="">اختر الفصل</option>${list.map(row => html`<option value="${row.id}" ${hub.existing === row.id ? 'selected' : ''}>${teachingLabel(row)}</option>`)}</select></label>${existingPane()}`}` : html`
       <section aria-label="تصدير الكشوف">
         <label><input type="checkbox" data-koshoof-all ${list.length && hub.selected.size === list.length ? 'checked' : ''} ${!list.length ? 'disabled' : ''}> تحديد الكل</label>
-        <div class="koshoof-selection">${list.map(row => html`<label><input type="checkbox" data-koshoof-class value="${row.id}" ${hub.selected.has(row.id) ? 'checked' : ''}> ${teachingLabel(row)}</label>`)}</div>
+        <div class="koshoof-selection">${list.map(row => html`<label><input type="checkbox" data-koshoof-class value="${row.id}" ${hub.selected.has(row.id) ? 'checked' : ''}> ${shortTeachingLabel(row)}</label>`)}</div>
         <p role="status">الفصول المحددة: ${hub.selected.size}</p>
         <label class="field"><span>محتوى الكشوف</span><select class="select" data-koshoof-content><option value="names" ${hub.namesOnly ? 'selected' : ''}>أسماء فقط</option><option value="grades" ${!hub.namesOnly ? 'selected' : ''}>أسماء ودرجات</option></select></label>
         <p>ملف Excel مستقل لكل فصل. قد يطلب المتصفح السماح بتنزيلات متعددة.</p>
         <button class="btn btn--primary" data-act="koshoof-export" ${hub.selected.size ? '' : 'disabled'}>تنزيل الكشوف المحددة</button>
         <p role="status">${hub.message ?? ''}</p>
-        ${hub.files?.length ? html`<section class="koshoof-downloads" aria-label="تنزيل الملفات منفردة"><p>إذا لم يظهر ملف في التنزيلات، نزّله بزرّه أدناه.</p>${hub.files.map((file, index) => html`<button class="btn btn--quiet" data-act="koshoof-file" data-index="${index}">تنزيل ${file.filename}</button>`)}</section>` : ''}
+
         ${hub.selected.size === 1 ? noorPane([...hub.selected][0]) : ''}
       </section>`}
     </div>`;
@@ -539,7 +546,7 @@ export const koshoofCenter = {
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });
     listen('[data-import-kind]', event => { if (!locked()) { hub.kind = event.target.value; repaint(); } });
     listen('[data-existing-class]', event => { if (!locked()) { hub.existing = event.target.value; bindTransfer(hub.existing); repaint(); } });
-    const invalidate = () => { hub.files = null; hub.message = ''; };
+    const invalidate = () => { hub.message = ''; };
     listen('[data-koshoof-class]', event => { event.target.checked ? hub.selected.add(event.target.value) : hub.selected.delete(event.target.value); invalidate(); repaint(); });
     listen('[data-koshoof-all]', event => { hub.selected = new Set(event.target.checked ? accessible().map(row => row.id) : []); invalidate(); repaint(); });
     listen('[data-koshoof-content]', event => { hub.namesOnly = event.target.value !== 'grades'; invalidate(); repaint(); });
@@ -569,24 +576,17 @@ export const koshoofCenter = {
       bind(); if (allowed()) return;
       try {
         const entries = exportEntries();
-        hub.files = classKoshoofBundle(entries, hub.namesOnly);
-        // At most three automatic requests per gesture; every file also has a separate button.
-        let attempted = 0;
-        for (const file of hub.files.slice(0, 3)) { try { downloadKoshoofBundle(file); attempted++; } catch { break; } }
-        hub.message = `جُهّز ${hub.files.length} ملف Excel. طُلب تنزيل ${attempted}؛ تحقق من قائمة تنزيلات المتصفح.`;
-      } catch (error) { hub.files = null; hub.message = error.message; }
+        const files = classKoshoofBundle(entries, hub.namesOnly);
+        let attempted = 0, failed = 0;
+        // Fresh guarded snapshot; request every selected independent XLSX in this gesture.
+        for (const file of files) {
+          try { downloadKoshoofBundle(file); attempted++; } catch { failed++; }
+        }
+        hub.message = `طُلب تنزيل ${attempted} من ${files.length} ملف Excel${failed ? `؛ تعذّر طلب ${failed}` : ''}. تحقق من تنزيلات المتصفح؛ لا يمكن تأكيد حفظ الملفات.`;
+      } catch (error) { hub.message = error.message; }
       repaint();
     },
-    'koshoof-file'(el) {
-      bind(); if (allowed()) return;
-      try {
-        // Rebuild under current owner/term guards, never download a stale snapshot.
-        const files = classKoshoofBundle(exportEntries(), hub.namesOnly), index = Number(el.dataset.index);
-        if (!hub.files?.[index] || files[index]?.filename !== hub.files[index].filename) throw Error('تغيّر الكشف. أعد تجهيز الملفات.');
-        downloadKoshoofBundle(files[index]); hub.message = 'طُلب تنزيل الملف؛ تحقق من تنزيلات المتصفح.';
-      } catch (error) { hub.files = null; hub.message = error.message; }
-      repaint();
-    },
+
   },
 };
 function exportEntries() {
@@ -594,7 +594,7 @@ function exportEntries() {
   if (!hub.selected.size || [...hub.selected].some(id => !list.some(row => row.id === id))) throw Error('تغيّر الفصل المتاح. أعد الاختيار.');
   return list.filter(row => hub.selected.has(row.id)).map(row => {
     store.assertClassOperationsAccess(row.id);
-    return { ...store.teachingContext(row.id), className: teachingLabel(row), subject: store.getSubject(row.subjectId)?.name,
+    return { ...store.teachingContext(row.id), className: teachingLabel(row), filenameClassName: filenameTeachingLabel(row), subject: store.getSubject(row.subjectId)?.name,
       term: store.getTerm(row.termId)?.name, year: store.activeYear()?.label };
   });
 }

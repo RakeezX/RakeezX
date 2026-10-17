@@ -172,7 +172,7 @@ export default {
     <div class="roster-populated-actions">
     ${rosterFileActions(p)}
     <button class="btn roster-toolbar-action" data-act="import">${icon('upload')} لصق الأسماء</button>
-    <button class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب يدويًا</button>
+    <button class="btn roster-toolbar-action" data-act="add">${icon('plus')} إضافة طالب</button>
     </div>
   `,
 
@@ -212,7 +212,7 @@ export default {
           <div class="empty__text">الصق الأسماء، أو استورد الطلاب من ملف أو إضافة ركيز، أو أضف طالبًا يدويًا.</div>
           <div class="roster-entry-empty"><div class="roster-entry-actions" role="group" aria-label="إضافة الطلاب">
             <button class="btn" data-act="import">${icon('upload')} لصق الأسماء</button>
-            <button class="btn" data-act="add">${icon('plus')} إضافة طالب يدويًا</button>
+            <button class="btn" data-act="add">${icon('plus')} إضافة طالب</button>
             <a class="btn btn--primary" data-act="file-import" href="#/teaching/${p.id}/koshoof">${icon('upload')} استيراد الطلاب</a>
           </div></div>
         </div>

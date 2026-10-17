@@ -115,7 +115,7 @@ export default {
             ${canOpenRoster(p) ? html`<div class="roster-entry-empty">
               <div class="roster-entry-actions" role="group" aria-label="إضافة أسماء الطلاب">
                 <button class="btn" data-act="paste-names" aria-label="لصق الأسماء">${icon('upload')} لصق الأسماء</button>
-                <button class="btn" data-act="add-student" aria-label="إضافة طالب يدويًا">${icon('plus')} إضافة طالب يدويًا</button>
+                <button class="btn" data-act="add-student" aria-label="إضافة طالب">${icon('plus')} إضافة طالب</button>
                 <a class="btn btn--primary" data-act="file-import" href="#/teaching/${p.id}/koshoof">${icon('upload')} استيراد الطلاب</a>
               </div>
             </div>` : ''}

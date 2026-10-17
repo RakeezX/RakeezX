@@ -10,9 +10,9 @@ import { createHash } from 'node:crypto';
 import { withIsolatedLocalBrowser } from '../../../scripts/ops-supervisor-v4/isolated-local-browser.mjs';
 import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 
-const baseSha = 'aa6a1843c5102add77d61d1a3777c7916e376bb7';
-const taskId = 'continuous-n36-concise-import-panel-20261017';
-const runId = '5dd3a7f5-8e42-4522-ba1d-178089675017';
+const baseSha = '7fb1bd31eab8f1838db71f16e37fc9a57aceae1b';
+const taskId = 'continuous-n104-responsive-toolbar-compact-export-20261017';
+const runId = 'fb2b433b-da40-4f0a-9493-99221d33d6c4';
 const root = resolve('.'), origin = 'http://127.0.0.1:49447';
 
 test('concise card in actual app retains download binding and all surrounding review/owner controls', async () => {
@@ -21,7 +21,8 @@ test('concise card in actual app retains download binding and all surrounding re
   const before = execFileSync('git', ['show', baseSha + ':' + file], { encoding: 'utf8' });
   // Only the static introductory copy/actions may differ; preserve the entire
   // preview, partial-source notice, ownership, lease, review and receipt code.
-  const omitCopy = s => s.replace(/\r\n/g, '\n').replace(/  return html`<section class="card card--pad n36-direct"[\s\S]*?(?=    \$\{extensionPreview)/, '');
+  // Broader shared-hub data/guard equality is checked in n104-responsive-export.test.mjs.
+  const omitCopy = s => s.slice(s.indexOf('function directExtensionEntry()'), s.indexOf('async function receiveExtension()')).replace(/\r\n/g, '\n').replace(/  return html`<section class="card card--pad n36-direct"[\s\S]*?(?=    \$\{extensionPreview)/, '');
   assert.equal(omitCopy(current), omitCopy(before));
   for (const ext of ['zip', 'manifest.json']) {
     const p = 'assets/extensions/rakeez-teacher-import-helper-0.5.9.' + ext;
@@ -48,8 +49,8 @@ test('concise card in actual app retains download binding and all surrounding re
       await page.evaluate(() => { location.hash = '#/classes/koshoof?import=1'; });
       const card = page.locator('[data-n36-direct]');
       await card.waitFor();
-      assert.equal(await card.locator('h3').innerText(), 'استيراد الطلاب بإضافة ركيز');
-      assert.equal(await card.locator('p').first().innerText(), 'افتح الإضافة في صفحة مصدر الأسماء، ثم راجع الطلاب وانقلهم إلى ركيز.');
+      assert.equal(await card.locator('h3').innerText(), 'استيراد الطلاب والفصول بشكل مباشر من مدرستي بإضافة مساعد ركيز المعلم');
+      assert.equal(await card.locator('p').first().innerText(), 'ثبّت الإضافة لمتصفح كروم، وسجّل دخولك إلى منصة مدرستي، ثم شغّل الإضافة لجلب أسماء الطلاب وبيانات فصولهم المتاحة. راجع البيانات وأكّد حفظها في ركيز.');
       assert.equal(await card.locator('a').count(), 1);
       const link = card.locator('a[download]');
       assert.equal(await link.getAttribute('href'), '/assets/extensions/rakeez-teacher-import-helper-0.5.9.zip');

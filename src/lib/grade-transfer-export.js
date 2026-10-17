@@ -18,10 +18,10 @@ export function exportGradeCsv(options) {
   return '\uFEFF' + gradeExportRows(options).map(row => row.map(v => typeof v === 'number' ? String(v) : text(v)).join(',')).join('\r\n');
 }
 // AI-authored N105: class labels only, never student identity or timestamps.
-export function gradeCsvFilename({ className, noorReview = false, namesOnly = false, blankTemplate = false } = {}) {
+export function gradeCsvFilename({ className, filenameClassName, noorReview = false, namesOnly = false, blankTemplate = false } = {}) {
   if (blankTemplate) return 'نموذج أسماء الطلاب - ركيز المعلم.csv';
-  const label = String(className ?? '').normalize('NFC').replace(/[\\/:*?"<>|\x00-\x1f\x7f-\x9f\u200b-\u200f\u202a-\u202e\u2060-\u206f]/g,' ').replace(/\s+/g,' ').trim().slice(0,80).trim().replace(/[. ]+$/g,'') || 'غير مسمى';
-  return `كشف ${noorReview ? 'رصد نور' : namesOnly ? 'أسماء طلاب' : 'درجات طلاب'} فصل ${label} - ركيز المعلم.csv`;
+  const label = String(filenameClassName ?? className ?? '').normalize('NFC').replace(/[\\/:*?"<>|\x00-\x1f\x7f-\x9f\u200b-\u200f\u202a-\u202e\u2060-\u206f]/g,' ').replace(/\s+/g,' ').trim().slice(0,80).trim().replace(/[. ]+$/g,'') || 'غير مسمى';
+  return `كشف ${noorReview ? 'رصد نور' : namesOnly ? 'أسماء طلاب' : 'درجات طلاب'} ${filenameClassName == null ? 'فصل ' : ''}${label} - ركيز المعلم.csv`;
 }
 export function exportNamesTemplate() { return '\uFEFF"اسم الطالب"\r\n""\r\n""\r\n""'; }
 export function downloadGradeCsv(csv, options = {}) {

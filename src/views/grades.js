@@ -79,7 +79,7 @@ const gradesView = {
     const { roster: activeRoster, items, ctx } = store.teachingContext(cls.id);
     const roster = displayRoster(activeRoster);
     const panels = '';
-    const distributionAction = html`<div class="grade-transfer__toolbar">${canOpenRoster(p) ? html`<a class="btn btn--sm btn--quiet" href="#/teaching/${cls.id}/koshoof">${icon('upload')} استيراد وتصدير الكشوف</a>` : ''}<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
+    const distributionAction = html`<div class="grade-transfer__toolbar">${canOpenRoster(p) ? html`<a class="btn btn--sm btn--quiet" href="#/teaching/${cls.id}/koshoof">${icon('upload')} استيراد وتصدير الدرجات</a>` : ''}<a class="btn btn--sm grades-distribution-action" href="#/teaching/${cls.id}/items" aria-label="توزيع الدرجات">${icon('note')} <span>توزيع الدرجات</span></a></div>`;
 
     if (!roster.length) {
       return html`

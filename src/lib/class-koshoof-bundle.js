@@ -5,7 +5,7 @@ export function classKoshoofBundle(classes, namesOnly = true) {
   if (!classes.length) throw Error('اختر فصلًا واحدًا على الأقل.');
   const files = [], used = new Set();
   for (const entry of classes) {
-    const base = gradeCsvFilename({ className: entry.className, namesOnly }).replace(/\.csv$/, '');
+    const base = gradeCsvFilename({ className: entry.className, filenameClassName: entry.filenameClassName, namesOnly }).replace(/\.csv$/, '');
     let name = base + '.xlsx', index = 2;
     while (used.has(name.toLocaleLowerCase())) name = `${base} (${index++}).xlsx`;
     used.add(name.toLocaleLowerCase());

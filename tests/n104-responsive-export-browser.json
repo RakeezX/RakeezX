@@ -1,0 +1,78 @@
+{
+  "taskId": "continuous-n104-responsive-toolbar-compact-export-20261017",
+  "runId": "fb2b433b-da40-4f0a-9493-99221d33d6c4",
+  "baseSha": "7fb1bd31eab8f1838db71f16e37fc9a57aceae1b",
+  "checks": [
+    {
+      "name": "five_workbooks_320",
+      "status": "PASS",
+      "evidence": "كشف درجات طلاب الرابع الابتدائي 4 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الرابع الابتدائي 5 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 1 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 2 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 3 · المهارات الرقمية - ركيز المعلم.xlsx"
+    },
+    {
+      "name": "actual_UI_320",
+      "status": "PASS",
+      "evidence": "Empty/populated Students/Classes, actual paste/add cancel, Grades same context, N36 details/destination help, compact five-class selection; five unique XLSX download events with source student/score binding, one request error requests remaining four; clear selection and stale-term negative; Noor disclosure, zero DB writes and no overflow/overlap."
+    },
+    {
+      "name": "five_workbooks_390",
+      "status": "PASS",
+      "evidence": "كشف درجات طلاب الرابع الابتدائي 4 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الرابع الابتدائي 5 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 1 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 2 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 3 · المهارات الرقمية - ركيز المعلم.xlsx"
+    },
+    {
+      "name": "actual_UI_390",
+      "status": "PASS",
+      "evidence": "Empty/populated Students/Classes, actual paste/add cancel, Grades same context, N36 details/destination help, compact five-class selection; five unique XLSX download events with source student/score binding, one request error requests remaining four; clear selection and stale-term negative; Noor disclosure, zero DB writes and no overflow/overlap."
+    },
+    {
+      "name": "five_workbooks_1280",
+      "status": "PASS",
+      "evidence": "كشف درجات طلاب الرابع الابتدائي 4 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الرابع الابتدائي 5 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 1 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 2 · المهارات الرقمية - ركيز المعلم.xlsx | كشف درجات طلاب الخامس الابتدائي 3 · المهارات الرقمية - ركيز المعلم.xlsx"
+    },
+    {
+      "name": "actual_UI_1280",
+      "status": "PASS",
+      "evidence": "Empty/populated Students/Classes, actual paste/add cancel, Grades same context, N36 details/destination help, compact five-class selection; five unique XLSX download events with source student/score binding, one request error requests remaining four; clear selection and stale-term negative; Noor disclosure, zero DB writes and no overflow/overlap."
+    }
+  ],
+  "screenshots": [
+    "test-results/n104-responsive/320-hub-empty.png",
+    "test-results/n104-responsive/320-students-empty.png",
+    "test-results/n104-responsive/320-students-populated.png",
+    "test-results/n104-responsive/320-import.png",
+    "test-results/n104-responsive/320-grades.png",
+    "test-results/n104-responsive/320-classes-populated.png",
+    "test-results/n104-responsive/320-classes-empty.png",
+    "test-results/n104-responsive/320-export.png",
+    "test-results/n104-responsive/320-noor.png",
+    "test-results/n104-responsive/390-hub-empty.png",
+    "test-results/n104-responsive/390-students-empty.png",
+    "test-results/n104-responsive/390-students-populated.png",
+    "test-results/n104-responsive/390-import.png",
+    "test-results/n104-responsive/390-grades.png",
+    "test-results/n104-responsive/390-classes-populated.png",
+    "test-results/n104-responsive/390-classes-empty.png",
+    "test-results/n104-responsive/390-export.png",
+    "test-results/n104-responsive/390-noor.png",
+    "test-results/n104-responsive/1280-hub-empty.png",
+    "test-results/n104-responsive/1280-students-empty.png",
+    "test-results/n104-responsive/1280-students-populated.png",
+    "test-results/n104-responsive/1280-import.png",
+    "test-results/n104-responsive/1280-grades.png",
+    "test-results/n104-responsive/1280-classes-populated.png",
+    "test-results/n104-responsive/1280-classes-empty.png",
+    "test-results/n104-responsive/1280-export.png",
+    "test-results/n104-responsive/1280-noor.png"
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "src/views/grades.js": "b7c234beffda6977809a76c3c462c149692d7acc0d253e67d1826ca5027196ec",
+    "src/views/students.js": "22ce5ffa3564a0b0e9b404810c15ccf0cf97f88956fe1bdca26c8b0f580e2ad4",
+    "src/views/teaching-hub.js": "24ad5318b427eb59ca45ccfbfdae28ac0e083f6d01a839b34857c6e52460fa10",
+    "src/views/class-import-center.js": "c93955154ab190822fde598e11b0fd94e9c3a9f8a355fcda08a8eafae64ea9f5",
+    "src/lib/class-koshoof-bundle.js": "15db5c3580f726def0ad0bbab4f642613dc204ddba41b2645ab3b5079d7a0ed1",
+    "src/lib/grade-transfer-export.js": "96371ce73390d9206d1448bf6c1f794d4e229a3a947755d236bafbfaef36e63b",
+    "src/styles/components.css": "36e7d809f590b87d778b3083a3f559573c5c0c70c3926da54a18437a2d18b56a",
+    "src/store.js": "0d9aca940b3de48c4934e99403bc67fad449ab4f35f3142abddd4fc5cd7749e5"
+  },
+  "resources": "Canonical isolated browser closed owned fresh contexts/browser; task HTTP server closed in finally. No shared/live browser."
+}
