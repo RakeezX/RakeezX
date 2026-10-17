@@ -1,0 +1,266 @@
+{
+  "taskId": "continuous-n88-native-postgres-qualification-20261017",
+  "sessionId": "01a14a12-abae-70f1-a612-a8b30cafa657",
+  "runId": "f114bf86-e397-4064-9ca8-44e6b8384cc4",
+  "candidateSha": "4f8aa052a0ed4a71e274a276defa82306f36ea7a",
+  "baseSha": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+  "receipt": {
+    "version": 1,
+    "ticketId": "N88",
+    "taskId": "continuous-n88-native-postgres-qualification-20261017",
+    "candidateSha": "4f8aa052a0ed4a71e274a276defa82306f36ea7a",
+    "baseSha": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+    "publishedSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-17T13:46:41.866Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-17T13:46:41.865Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "233d5f21-8dfe-41cc-8811-a9171891c627",
+    "previewUrl": "https://233d5f21.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117411393340",
+      "headSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-17T13:46:13Z",
+      "completedAt": "2026-10-17T13:46:13Z",
+      "headBranch": null,
+      "deploymentId": "233d5f21-8dfe-41cc-8811-a9171891c627",
+      "previewUrl": "https://233d5f21.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/233d5f21-8dfe-41cc-8811-a9171891c627"
+    },
+    "currentMainSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+    "binding": {
+      "candidateSha": "4f8aa052a0ed4a71e274a276defa82306f36ea7a",
+      "declaredBaseSha": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+      "mainAtPreparation": "a5dbf1a8dd9327b380de661fa6bed87a831dc64e",
+      "integrationSha": "2cb69a7c035c753f6ef74b9c84deed7cadc82d4f",
+      "publishedSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "merge"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-17T13:45:45.394Z",
+      "completedAt": "2026-10-17T13:45:49.202Z",
+      "integrationSha": "2cb69a7c035c753f6ef74b9c84deed7cadc82d4f",
+      "publishedSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md",
+      "drafts/n88-student-portal/schema-proposal.sql",
+      "tests/fixtures/n88-native-postgres-qualification/cases.mjs",
+      "tests/fixtures/n88-native-postgres-qualification/create-session.sql",
+      "tests/fixtures/n88-native-postgres-qualification/protocol.mjs",
+      "tests/fixtures/n88-native-postgres-qualification/read-scope.sql",
+      "tests/n88-native-postgres-qualification.initial-fixture-failure.json",
+      "tests/n88-native-postgres-qualification.mjs",
+      "tests/n88-native-postgres-qualification.result.json"
+    ],
+    "sourceOnlyPaths": [
+      "tests/fixtures/n88-native-postgres-qualification/cases.mjs",
+      "tests/fixtures/n88-native-postgres-qualification/create-session.sql",
+      "tests/fixtures/n88-native-postgres-qualification/protocol.mjs",
+      "tests/fixtures/n88-native-postgres-qualification/read-scope.sql",
+      "tests/n88-native-postgres-qualification.initial-fixture-failure.json",
+      "tests/n88-native-postgres-qualification.mjs",
+      "tests/n88-native-postgres-qualification.result.json"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://233d5f21.rakeezx.pages.dev",
+        "checkedAt": "2026-10-17T13:46:37.313Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "fb438815fc8097d321eef66d58af05f09dd524b473f1c73be722b9c664a8a2fd",
+            "observedSha256": "fb438815fc8097d321eef66d58af05f09dd524b473f1c73be722b9c664a8a2fd",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/schema-proposal.sql",
+            "urlPath": "drafts/n88-student-portal/schema-proposal.sql",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+            "observedSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+            "bytes": 8260,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md",
+            "urlPath": "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "8ef6c7c3b40dcbab6fd50e01e15d347f5e9092915614c937f5b3ef9c0070d245",
+            "observedSha256": "8ef6c7c3b40dcbab6fd50e01e15d347f5e9092915614c937f5b3ef9c0070d245",
+            "bytes": 11517,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-17T13:46:38.004Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8dedf6d20e6b029b014ae11ad225cf428a03ae41dae2428b12df04815f32d415",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "f6b91d897fbd1b8f8da95beed09d251ceabd877d3df4262a70fc58e512d9a6f4",
+            "providerTransforms": [
+              "cloudflare-jsd-v1",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "fb438815fc8097d321eef66d58af05f09dd524b473f1c73be722b9c664a8a2fd",
+            "observedSha256": "fb438815fc8097d321eef66d58af05f09dd524b473f1c73be722b9c664a8a2fd",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/schema-proposal.sql",
+            "urlPath": "drafts/n88-student-portal/schema-proposal.sql",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+            "observedSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+            "bytes": 8260,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md",
+            "urlPath": "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "8ef6c7c3b40dcbab6fd50e01e15d347f5e9092915614c937f5b3ef9c0070d245",
+            "observedSha256": "8ef6c7c3b40dcbab6fd50e01e15d347f5e9092915614c937f5b3ef9c0070d245",
+            "bytes": 11517,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n88-native-postgres-qualification-20261017\\integration-4f8aa052a0ed-1-c14be2c3",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  },
+  "requiredChecks": [
+    {
+      "name": "n88_actual_owned_postgres_schema_constraints_private_grants_and_cleanup",
+      "status": "PASS",
+      "evidence": "Actual PG17.6: transactional DDL, 26 constraints, 16 indexes, private-role 42501 denials. Owned cluster stopped; exact PID absent and port free. Checkpoints retained."
+    },
+    {
+      "name": "n88_real_two_connection_code_uniqueness_budget_atomicity_and_term_session_protocol",
+      "status": "PASS",
+      "evidence": "Two SQL backends; three observed lock waits; competing reservation loses with 23505. Budget counters, stable second-term credential, scoped sessions, atomic rotation/revoke and clean-restart persistence passed."
+    },
+    {
+      "name": "n88_inactive_source_honest_sql_adapter_limits_and_unchanged_final_pin_proof",
+      "status": "PASS",
+      "evidence": "15 unchanged evidence/source bindings verified; prior PIN/UI proofs reused. App/router/SW unchanged. Production adapter and hosted activation limits documented."
+    },
+    {
+      "name": "scoped_syntax_commit_and_source_integrity",
+      "status": "PASS",
+      "evidence": "Syntax and diff checks passed. Nine allowed committed paths; candidate parent matches base and committed executed-source hashes match evidence."
+    }
+  ],
+  "canonicalVerifiedSourceOnly": true,
+  "reason": "Live original controller26340 cached its source-only validator before the source-only publication gate was installed. Current canonical exact validator accepts original complete source-only receipt; no Product rewrite, no redeploy or repeat SQL needed."
+}

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n88-approved-pin-stable-term-identity-20261017"
+      ],
+      "id": "continuous-n88-native-postgres-qualification-20261017",
+      "productId": "N88",
+      "priority": -364,
+      "scopeKey": "n88-owned-local-postgres-private-code-schema-qualification",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "objective": "CurrentN88final4digit1000..9999/stablecode-to-secondterm correction is sourcepublished676b12c, localmemoryandUIproofsPASS, actual SQL constraints/transactions/sharedlimits stillNOT_RUN. ExistingPG17.6binaries+Nodepgclient are verifiedavailable fromN44 actualnativequalification. UnderstandingPOstandingcontinuousOPENwork andexplicit14:46independentworkerrequest, PMselects this ONEconcrete nextlocalpreparationstep whileN107view/CSSworkerisdisjoint. ActualDDL/designreliability is missing, not morecopy/review. No hostedactivation. Workfreshorigin/main/currentcanonicalN88row. FinalPINrulesandstableowner/student identitymustnotregress.\nAUTHORIZEDTHISNEWCARDONLY: execute CURRENTdrafts/n88-student-portal/schema-proposal.sql in a NEWOWNEDDISPOSABLE fabricatedLOCALPostgres cluster. Its old DESIGNONLY/neverapply-on-that-card comment was forpriorpreparation; do NOT applyanymigration/hostedSQL/realcanonicalDB. Thisis qualification of unapplieddraft, notmigrationexecutionauthority. Reuse read-only nativebins C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/{initdb.exe,postgres.exe,pg_ctl.exe}, existingNodepgclient ../client/node_modules/pg. psql.exe isNOTavailable; useNodepg. ReadN44runnerownership/startup/shutdown helpers andalreadyobservedpitfalls, do NOT rerunN44tests or reuseoldcluster/checkpoint/ports/data/config. Noinstall/download/npm/Docker/services/globalconfig/envcredentialdiscovery. .env/.mcp/pgpass/PGdefaults/hostedURLs/realteacherdata areOUTOFSCOPE. Use explicitinjectedconnection/minimalenv.\nCreateexclusive directory underNEWtaskartifacts/n88-native-pg-<run>-<random>/ withownedmarker/token, newdataDir and OSassignedloopbackport, boundedtimeouts/connections/memory, noSQL/bindsecretlogs. EphemeralLOCALpassword solelyforthisnewdatabase, neverprintit. CheckexactPID/birth/executable/-D path/port/marker then serverreadback data_directory/address/version BEFORE anySQL. Use at least2realPGconnections whereconcurrencyasserted; noJSmutex-as-SQLproof. Everyfinally closesownclients andstopsONLY exactownedcluster with pg_ctl fast -w, verifiesPIDabsence andportfree. Preserve alltaskownedsyntheticdirectories asSTOPPEDcheckpoints: previousN44optionalrecursivecleanupwasactuallytoolrejected, DO NOT attemptrecursiveRemove-Item/rm orreroutecleanup. No otherprocess/worker/browser/lock STOP/controlleroperations. No memory-resourcedaemonleft running. Ifownershiporactualtoolpolicydenial thenSTOPsafely/nameblocker, notrename/retrythroughotherroute.\nFOCUSED SQL qualification: (A) actualschemaDDL inrollbackabletransaction, catalog PK/FK/unique/check/index/RLSenable/privategrants readback. Newnamespace/owner/student/enrollment/session/PINHMACfixturesonly. Exactnonempty1000/9999/privateentrycontext/owner scope remainservicepolicy; do notpretendSQLhashedverifier enforcesPINlength itself. Verifydifferentowner/namespace/credential/version/entry/foreignmembershipcrossbinding FKrejections, activecredentialuniqueness(owner,student), namespace+PINverifieruniquenessincltombstones andglobalentry/sessionhashuniqueness. RawPIN/privatebookmarkNOTstored. Samecodeverifier acrossdistinctowners allowed onlydifferentnamespace; collisions/exhaustionmustneveroverwrite. (B) at least2connections actuallyblockoncompetingreservation/uniqueconstraint, onecommit+one23505, losingtransactionrollbackpreservesfirstcredential. Durablebudgetcounteratomicreservation fromactualguess_budgets withSQLlock/DBtime/consistentkeyorder andboundedmixedvalid/invalid attempts, fail counterscommit despitewrongPIN as testadapterprotocol; qualify what is actually executed. DO NOT claimfutureproductionadapterimplemented from SQL testqueries. (C) sameSTABLEcredential+PINverifier+entry acrossoldtermmembershipended/newtermmembershipadded; oldprecisesession scope refusesunder queryprotocol, newscopedsession/exactcurrentpublication readable; endedmembershipwithoutreplacement/crossowner/nameclone/ambiguouscurrentmemberships failclosed. ActualSQLconstraintsalone doNOTimplementserviceprojection/auth; distinguishinresults. Rotate/revokeallscopedsessionsatomic transaction, rollbacks retainprior; concurrentlogin/revoke if covered followconsistentlockorder anddocumenttestadapteronly. (D) effectivePRIVATEdenial: PUBLIC-only/anon/authenticatednonownerNOBYPASSroles no schemausage/tableprivilege/RPC; actual42501 negativeSQL. Do nottemporarilygrantthemrealprivateaccessjusttogreen. RLS enabled is notpolicy/executionorserviceAuthproof, reportprecisely. If anymissingdraftconstraint violates declared invariant, preservetheinitialfactualfailure then makeonlyminimalscopedUNAPPLIEDdraftfixandretestaffectedpart. No newpublicpolicy/grants/SQLfunction/api to resolvefailure.\nWhere practical sameOWNEDcluster cleanstop/restart +readback persistscredentials/budgets/revocations; thisis controlledrestart, NOT crash/powerlossdurability. If omittedrecordNOT_RUNwithoutinventingPASS. Testadapterqueriesunder tests/fixtures only; doNOTimplementproductionasyncDBadapterorchangeactualservice/memoryrepository/client/UI inthiscard. This narrowsSQLgapbutrealteacherAuth/currentcanonicalmembershipadapter/sharedserviceingress remains separatelyunimplemented. Readtheactualschema/design first; when claimedbehaviorlivesONLYservice, do not invent databaseguardsorweakenclaims. No blanket17UIorall9,000memorycases rerun; reusefinalPIN/term/testsourcehashesforunchangedcode. No browserneeded. RequiredchecksactualSQL/cleanup/privileges+honestinertboundariesonly.\nDeliver usefulinertsource result: newrunner/SQLfixture+machineJSON bindingactualschema+unchangedservicetestsourcehashes, conciseevidencedoc andschema-proposalcommentupdatedtoqualifylocalproof(genuineconstraintsfixonlyifneeded). Keep normalapp/router/SW/importgraph unchanged (check bindings notgrepanydocumentarymention), nohostedmigrations/Auth/RLS/functions/service/VAPID/send/secretreads orstudentaccess. Source-onlypublication via ORIGINALpublisher permitted underpreparationAuthority; verificationPaths evidence+schemaproposal mustserveexactsourceonly, noProductactivation/publicdemochange. Do notclaimN88CLOSED/live. AllrequiredchecknamesmustreturnPASSONLYifactuallypassed; otherhostedNOT_RUN boundarieswrittenindoc, no artificialoptionalfailedcheck requiringnewmaintenance. Ifrealblocker preserveexactcandidate/base/session/ownedcheckpoints andmatchingresult. No extra workers/reviewers.\nPUBLICATION PROOF RECONCILIATION ONLY: original source-only receipt is provider+immutable+Production verified, all required checks PASS. Original long-lived controller uses older cached source-only validator. Use guarded helper AFTER no active workers and idlepublisher; preserve exact original session/run/candidate/base. Do not rerun SQL, touch active N44, restart controller or redeploy Product.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/schema-proposal.sql",
+        "tests/n88-native-postgres-qualification*.mjs",
+        "tests/n88-native-postgres-qualification*.json",
+        "tests/fixtures/n88-native-postgres-qualification/**",
+        "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/schema-proposal.sql",
+        "docs/automation-evidence/20261017/N88_NATIVE_POSTGRES_QUALIFICATION.md"
+      ],
+      "requiredChecks": [
+        "n88_actual_owned_postgres_schema_constraints_private_grants_and_cleanup",
+        "n88_real_two_connection_code_uniqueness_budget_atomicity_and_term_session_protocol",
+        "n88_inactive_source_honest_sql_adapter_limits_and_unchanged_final_pin_proof"
+      ],
+      "acceptance": [
+        "ActualnewownedPG17executesunappliedN88draft; catalog/constraints/privateaccess/transactionresults factual andownclusterstoppedverified.",
+        "RealSQLconnections qualifyuniqueness/atomicbudget/term-sessionprotocol; sourcehashesevidencekeepmemorymockvsSQLvsfuturebackendclear.",
+        "Inertsource-onlycandidate canpublish; N88realstudentactivation/SQLAuthcanonicaladapter/hostingstillnotaccepted, no otherworkerorProductscope touched."
+      ],
+      "preparationAuthority": {
+        "kind": "standing-po-independent-open-work-pm-selected-N88-local-synthetic-sql-qualification",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert unapplied private draft SQL qualification tests and evidence only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "StandingPOcontinuoususefulOPENwork and14:46explicitindependentworkerrequest delegate PMselection of bounded reversiblelocalpreparation. NewownedfabricatedlocalPostgreSQLqualification +originalpublisherinertsource-onlyrelease authorized; no real/hostedSQL/Auth/RLS/service/studentactivation, noinstallation/paidservice/destructivecleanup. Thisis PMselected preparationstep, NOT a claim POexplicitlyrequested realstudentactivation.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+        "priorReceiptSha256": "427f898baa67738a0c294617cf9d400a6c1c4d477c9d8bf344b3e0a17e4f6d19",
+        "reviewedFixtureSha256": "b236ff3bf33c1ef43bbbcb6627c9c259e378838a32416980d0a9b438cf59c034",
+        "reason": "Live original controller26340 cached its source-only validator before the source-only publication gate was installed. Current canonical exact validator accepts original complete source-only receipt; no Product rewrite, no redeploy or repeat SQL needed."
+      }
+    }
+  ]
+}
