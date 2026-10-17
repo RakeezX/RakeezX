@@ -5,15 +5,31 @@ import {syntheticService} from './n73-account-flow-fixture.mjs';
 import {openReadyServedDemo} from './helpers/served-demo-readiness.mjs';
 import {unzipSync} from '../src/lib/student-import-parsers.js';
 // Test-only adapter for the older transfer fixture: expose its missing browser storage
-// only; the old SQL fixture keeps its actual unsupported capability. No Product guard is changed.
+// and protocol-compatible fixture setup; no Product guard is changed.
 if(process.argv.includes('--legacy-transfer')){
  const values=new Map();globalThis.localStorage={get length(){return values.size;},key:i=>[...values.keys()][i]??null,getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k),clear:()=>values.clear()};
- // The old SQL fixture advertises no score-foundation capability; retain that truthful null response.
- if(process.argv.includes('--baseline-store')){
-  const {registerHooks}=await import('node:module');
-  const source=execFileSync('git',['show','9d12083affab1d709a5bb6df10b71b1d9dbc55a5:src/store.js'],{encoding:'utf8'});
-  registerHooks({load(url,context,next){return url.endsWith('/src/store.js')?{format:'module',source,shortCircuit:true}:next(url,context);}});
- }
+ // Match the legacy transfer fixture to its selected service protocol without
+ // suppressing pending mutations or changing any Product serialization/guard.
+ // N03 is real repository SQL. A retained year tombstone avoids invoking the
+ // unrelated newer first-boot calendar selection, absent from this fixture SQL.
+ // The original test still creates/syncs its actual live year and transfer data.
+ const {registerHooks}=await import('node:module');
+ const readSource=(await import('node:fs')).readFileSync;
+ const baselineSource=process.argv.includes('--baseline-store')?execFileSync('git',['show','9d12083affab1d709a5bb6df10b71b1d9dbc55a5:src/store.js'],{encoding:'utf8'}):null;
+ registerHooks({load(url,context,next){
+  if(baselineSource&&url.endsWith('/src/store.js'))return {format:'module',source:baselineSource,shortCircuit:true};
+  if(url.endsWith('/student-transfer-roll-safety.test.mjs')){
+   const source=readSource(new URL(url),'utf8'),needle='  await store.init();';
+   assert.equal(source.split(needle).length,3,'expected fixture init and reload entry');
+   return {format:'module',shortCircuit:true,source:source.replace("assert.equal((await db.getAll('outbox')).length, 0);", "assert.equal((await db.getAll('outbox')).length, 0, JSON.stringify((await db.getAll('outbox')).map(e=>({store:e.store,recordId:e.recordId,state:e.state,lastError:e.lastError,blockedReason:e.blockedReason}))));").replace(needle,"  await db.put('years', { ...makeYear({ id: 'transfer:retained-year', hijriStart: 1440 }), deleted: true });\n"+needle)};
+  }
+  if(url.endsWith('/helpers/student-lifecycle-server.mjs')){
+   const source=readSource(new URL(url),'utf8'),needle='  await installLifecycleServer(pg, options);';
+   assert.equal(source.split(needle).length,2);
+   return {format:'module',shortCircuit:true,source:source.replace(needle,needle+"\n  await pg.exec(await readFile(new URL('../../supabase/migrations/20261003000000_n03_education_department.sql', import.meta.url), 'utf8')); ")};
+  }
+  return next(url,context);
+ }});
  await import('./student-transfer-roll-safety.test.mjs');
 }else{
 const root=process.cwd(),out=path.resolve('test-results/n36-null-roll-overflow');

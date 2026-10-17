@@ -1,5 +1,17 @@
 # N36 partial available import — 0.5.5 candidate
 
+## Current validation repair — 2026-10-17
+
+Run `016ab45e-672d-4736-9f7b-d9194e24896e` preserves AI candidate `339c25f2ee8e4c848051e67e29004b976c0aaf20`. Its result was rejected because it recorded an unresolved legacy full-Sync FAIL. The failure below remains historical; it is now resolved in the scoped test adapter, with no Product byte change.
+
+Inspection identified the exact two rejected bootstrap mutations: profile `education_department` and year `calendar_preset_id`, both unsupported by the legacy transfer fixture's selected SQL. The allowed `tests/n36-null-roll-overflow-browser.mjs --legacy-transfer` adapter now loads the original N03 education-department migration into disposable PGlite and seeds a retained deleted year before initialization. The transfer fixture then creates and syncs its actual live custom year normally, without invoking unrelated first-boot calendar selection. An initial attempt seeded that same live year without a server revision and correctly produced dependency-not-authoritative blocks; the retained-tombstone correction avoids that invalid fixture dependency. No outbox record is removed, rejection suppressed, assertion weakened, receipt fabricated or production module modified. Existing source assertions and all transfer/grade/attendance/remote-roll assertions remain active. Diagnostic assertion details contain only synthetic record keys/status/errors.
+
+- PASS: `node tests/n36-null-roll-overflow-browser.mjs --legacy-transfer` — **4 passed, 0 failed**, including full V2 transfer convergence, empty acknowledged outbox, ordered atomic transfer RPCs, no generic enrollment upserts, unique remote active rolls, and unchanged local grade/attendance/history.
+- PASS: syntax and whitespace checks for the changed adapter/documentation.
+- Reused unchanged Product evidence: **4** nullable-overflow store/SQL tests, **23** source/package/protected tests and **31** synthetic Chrome scenario results, bound to the same Product source/package hashes. No browser, server or live service phase was entered for this test-only repair; disposable PGlite is closed by the original test cleanup.
+
+This result is source-local ready. Controller publication/provider/immutable/served parity and the voluntary official-source PO import test remain NOT RUN here. N36 remains OPEN.
+
 ## Latest D-123 numbering resolution — 2026-10-17
 
 Run `042984ce-de8d-4b52-b5bc-05259a349279` resumes candidate `9d12083affab1d709a5bb6df10b71b1d9dbc55a5`. The activated card now explicitly scopes `src/store.js` and permits nullable overflow membership under the existing SQL contract. The earlier blocked checkpoints below remain historical facts.
