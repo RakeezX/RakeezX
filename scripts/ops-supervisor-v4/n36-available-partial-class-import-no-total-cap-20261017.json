@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n36-available-partial-class-import-no-total-cap-20261017",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -210,
+      "scopeKey": "n36-po-partial-available-class-names-without-total-student-cap-20261017",
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n36-300-students-final-zero-20261017"
+      ],
+      "objective": "LATEST MATERIAL PO PRODUCT DECISION — 2026-10-17 AFTER prior N36 full-complete-only card started: Teacher may have 50 or 1,000+ Madrasati students. NO arbitrary product-wide total student cap (300 or 1200), and an incomplete or partially unsupported roster must NOT block teacher importing trustworthy visible, correctly class-attributed AVAILABLE names. Show precise reason/incompleteness and permit teacher-initiated explicit import of available selected rows into each actual owned class, clearly marked 'استيراد المتاح فقط' versus 'كشف مكتمل'. This overrides the earlier N36-054 blocked-on-any-incomplete and global 1200 cap acceptance, not privacy/ownership/bad-name/cross-account guards. Current v0.5.3 PO-run proved staged300, >=303 observed, completed0 due CATEGORY_ROW_LIMIT and ROSTER_LINKS_UNAVAILABLE. Existing parallel/single controller card continuous-n36-madrasati-complete-class-batches-20261017 was already RUNNING before this new decision; DO NOT cancel or write its worktree. The controller must take this NEW independent followup after prior active work drains and use CURRENT origin/main, reusing any validated v0.5.4 source code and tests; do not replay old work or create another supervisor. First inspect the existing class import protocol/readers and N12 class owner context on the current integrated source. REQUIRE a data-quality split: (A) per-row name & source class identification valid and authorized (or explicitly re-mapped by teacher ONLY into own verified class with concrete review); (B) coverage/completeness of class report maybe incomplete/unknown. A missing later page or absent MyStudents listing warns of coverage only, not automatic dismissal of already safe rows. (C) any row with invalid/missing source identity, unsupported path, ambiguous teacher/owner class, foreign account, malicious link or unknown provenance remains excluded until teacher safely verifies/corrects; never invent a student or source class. Allow partial teacher-confirmed transfer for category (B), including an otherwise valid class that has unfinished total/pager or source navigation error, while NEVER calling that class complete. No automatic silent partial/full commit. Show per-class counts 'جمعت N، صالح للمراجعة X، غير متاح Y، أضيف بالفعل Z' grounded in actual receiver receipts; indicate exact source coverage status, e.g. 'تعذر التحقق من بقية صفحات الكشف؛ تستطيع استيراد الأسماء الظاهرة فقط مع مراجعتها'. Retain original source ordering and explain possible missing students; no false zero or false completion. A teacher with >300 rows total must be able to eventually import all source-available names regardless of global count, grouped by true class and split into multiple user-confirmed chunks as needed (e.g. existing <=300 N12 receiver per action technical limit), with no arbitrary total cap. If one class itself has >300 names, split into sequential reviewed actions preserving exact class, deduplicated action resume and no silent tail loss. Bound resource use per in-memory window, auto offer non-destructive explicit Continue for next page/batch and keep truthful count/status, do not discard remaining names or impose finite product-wide 'max users' in UI. Never turn lack of provider paging terminal proof into permission to declare a complete roster, but allow vetted rows with prominent partial warning and additional teacher confirmation. Import uses existing user-initiated ephemeral Chrome MV3 handoff, existing Rakeez names preview, owner/Auth/lease/year/term checks, one-time receipts, no cross-class duplicate if not contractually allowed; all writes occur solely on authenticated teacher explicit review inside own Rakeez account (no agent real-data writes). Reconcile source IDs and duplicates in source class and Rakeez before each batch; retry may not re-add prior confirmed students or lose remaining batches. Address current 5-minute ephemeral lease: if expired scrub data; teacher can explicitly continue/restart safely, never retain names in persistent storage. Keep same installed Chrome stable runtime path C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\private-tools\\n36-current\\runtime updated only by verified operator after Production; no personal Chrome tab/control, no denied school browser inspection retries, no credential/cookie/hidden/iframe scraping, no Noor-first or JSON primary. Use versioned next package (0.5.5 after 0.5.4 if published; if active prior task did not publish, choose truthful next tested nonconflicting version), keep previous packages and per-file manifest SHA. Tests synthetically model 50, 299, 300, 301, 303, 350, 1,000, >1200 teacher-visible names distributed 2+ classes; a per-class incomplete final page, missing MyStudents index link, mixed confirmed/unconfirmed classes, invalid individual row, duplicates, 300+ same class, session/account switch, manually corrected class mapping to authorized owned class, expiring review, repeated/failed batch, no PII in diagnostics/URL/storage, explicit preview and NO write without user confirmation. Preserve responsive Chrome popup and central N12+ownership validation; no weakening of RLS/Auth/scoring/restore/offline. If a specific technical network/session policy prevents reading future page, show safe number and enable import of the subset already verified without granting access to unsafe pages; distinguish omitted rows and never fabricate total. The ONLY valid Product evidence of official-source end-to-end success remains new voluntary PO user-run test; local browser PASS proves synthetic functionality only. Sole controller integrates/publishes with provider immutable and served parity; prior verified outcome awaiting_po liberates capacity, and full N36 remains OPEN until PO accepts actual import.\n\nSCOPED RECEIVER VIEW REPAIR — PO 2026-10-17: The already shipped receiver implementation is actually src/views/teacher-setup-import.js, not only src/views/class-import-center.js. Previous two attempts correctly reported BLOCKED because the receiver confirmation callback has no structured saved/failed receipt. Allow ONLY this additional existing owner-guarded view to implement safe explicit partial available source class review, batch receipt/count hook and continuation on the user-facing teacher-owned import flow. Preserve store.assertClassOperationsAccess, ownerContext, active term/year, reviewNamesImport, confirmNamesImport, context recheck, no duplicate write and failed/unknown persisted receipt semantics. Do NOT mark a failed network/storage operation as saved or proceed with the next batch on uncertain confirmation; never expand source pages or personal browser permissions. Reuse the preserved AI-labelled candidate/worktree/session, do not re-run unchanged tests just to burn quota. Inspect the original failed card_scope_correction outcome and rerun the affected source tests and actual synthetic Chrome reception with per-class partial 50/303/1000+ where relevant. No official account access by worker. Existing PO D-123 authorizes partial teacher-confirmed names, NOT weakening ownership. Publication only after real PASS via the original controller/publisher.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.4.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.4.manifest.json",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.5.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.5.manifest.json",
+        "src/views/class-import-center.js",
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/names-import.js",
+        "src/lib/import-names.js",
+        "src/styles/components.css",
+        "sw.js",
+        "tests/n36-partial-class-import-no-total-cap.test.mjs",
+        "tests/n36-partial-class-import-no-total-cap-browser.mjs",
+        "tests/n36-partial-class-import-no-total-cap-browser.json",
+        "tests/n36-madrasati-complete-classes.test.mjs",
+        "tests/n36-madrasati-complete-classes-browser.mjs",
+        "tests/n36-madrasati-complete-classes-browser.json",
+        "tests/n36-300-then-zero.test.mjs",
+        "tests/n36-300-then-zero-browser.mjs",
+        "tests/n36-300-then-zero-browser.json",
+        "tests/n36-extension-direct-handoff.test.mjs",
+        "tests/n36-extension-direct-handoff-browser.mjs",
+        "tests/n36-extension-direct-handoff-browser.json",
+        "tests/n36-receiver-limits.test.mjs",
+        "tests/n36-popup-052-real-feedback.test.mjs",
+        "docs/automation-evidence/20261017/N36_PO_PARTIAL_AVAILABLE_NO_TOTAL_CAP.md",
+        "docs/automation-evidence/20261017/N36_NEXT_EXTENSION_PARTIAL_USER_TRIAL.md",
+        "src/views/teacher-setup-import.js"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/source-adapter.js",
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "extensions/rakeez-teacher-import-helper/categories-popup.js",
+        "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+        "src/views/class-import-center.js",
+        "src/lib/n36-extension-handoff.js",
+        "sw.js",
+        "src/views/teacher-setup-import.js"
+      ],
+      "requiredChecks": [
+        "n36_no_product_total_cap_for_50_303_1000_plus_available_rows",
+        "n36_partial_per_class_warning_and_explicit_import_available_only",
+        "n36_actual_valid_class_rows_not_discarded_due_missing_next_page",
+        "n36_owner_lease_term_and_row_provenance_guards_still_fail_closed",
+        "n36_per_batch_receiver_cap_and_safe_multi_batch_own_class_completion",
+        "n36_source_duplicate_receiver_repeat_and_retry_no_double_create",
+        "n36_ephemeral_secure_handoff_expiry_PII_and_no_auto_write",
+        "n36_MV3_RTL_browser_and_affected_old_regressions_pass",
+        "n36_versioned_package_SHA_and_published_source_parity"
+      ],
+      "acceptance": [
+        "No hard-coded total student cap (300/1200 or similar arbitrary overall gate). Realistic 50, 303, 350, 1000 and >1200 synthetic source-visible rows are individually actionable through repeated bounded teacher-confirmed class-safe batches, with never missing silently or falsely claiming complete.",
+        "Partially verified teacher-visible and class-attributable roster rows may be imported by explicit teacher approval 'استيراد المتاح فقط' even when source pagination ends prematurely, roster index is missing or per-class complete status is unknown; visible numerical summary states known rows, missing/unknown completeness and per-class selected count. True invalid/foreign/anonymous rows are not silently accepted or mapped.",
+        "Teacher explicitly reviews and confirms every selected Rakeez-owned class and each technical transfer batch (<= existing receiver cap); repeated or failed batch cannot duplicate prior imported students, and do not mutate scoring, Sync, Auth, ownership or restore behavior.",
+        "Exhaustive affected synthetic Chrome and Node tests including wrong owner/source, unsafe URL, invalid name, hidden field, duplicate, missing pages, expiry, partial and valid complete, total >300 and one class >300; no school-source real credentials/data or personal browser automation.",
+        "Packaged nonconflicting current next version exact manifest+ZIP hashes and Cloudflare provider/immutable/served Production parity; operator may update fixed Chrome extension directory only after verified release and teacher Reload. No claim of official Madrasati successful import until PO voluntary test; N36 remains OPEN."
+      ],
+      "preparationAuthority": {
+        "kind": "po_20261017_authorized_partial_teacher_reviewed_source_names_import",
+        "schoolPortalReadByAgent": false,
+        "realStudentDataReadByAgent": false,
+        "realStudentMutationByAgent": false,
+        "AuthRLSChange": false,
+        "scoringChange": false,
+        "syntheticTesting": true,
+        "publication": true
+      },
+      "releaseAuthority": "PO latest explicit N36 Product behavior decision 2026-10-17: no arbitrary total number of students and partial/incomplete teacher-visible class roster must be selectable for explicit reviewed import, with clear warning and ability to import available names, each pupil mapped to owned teacher class. This supersedes older N36-054 complete-only blocking/school-total cap. Authorizes bounded source-local, transient, user-initiated extension + existing Rakeez authenticated teacher-confirmed N12 names import path; does not authorize agent reading or writing actual students, bypassing previous school-browser security refusals, arbitrary new RLS/Auth/schema/scoring, hidden iframe data or background scraping. Existing per-action 300-row technical limit may be used internally with multiple confirmed batches but NEVER as Product total. Single canonical publisher releases client functionality after actual targeted protected checks and served proof."
+    }
+  ]
+}
