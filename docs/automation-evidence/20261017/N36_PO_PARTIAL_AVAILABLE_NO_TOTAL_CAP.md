@@ -1,5 +1,15 @@
 # N36 partial available import — 0.5.5 candidate
 
+## Current local readiness — run 04a3085b-a42e-43d5-93a3-1d5241095c76
+
+The activated card now replaces the circular combined worker gate with `n36_versioned_package_SHA_and_local_source_binding`. This resolves the documented delivery-configuration blocker below without waiving publisher verification. Saved candidate `62b8c45ff6a33dc096ec774c78559a57ba4e6d4f` is preserved; only this documentation changes during the resumption.
+
+PASS — `n36_versioned_package_SHA_and_local_source_binding`: reuse the exact already-executed 0.5.5 ZIP/per-file-manifest/source-byte binding check and current application/extension evidence-binding assertions. Archive SHA-256 is `70d909637801502e01c61439ddec3b0ea6b33ab42912c89b397c38fadf3cd396`; manifest SHA-256 is `6593d771baab918e16583c712757a544a94687ea443a3c6b24370a640faeeaa2`. Package and Product inputs remain identical. The other eight required names retain their concrete PASS mappings in the preserved table below. The prior combined check remains historical NOT_RUN, not relabelled PASS.
+
+No unchanged Product/browser/SQL tests were rerun. The 31-scenario actual synthetic MV3/application evidence, affected Node/store/SQL proofs, corrected four-test transfer/Sync evidence and nine-header 50-row source-reader fixture are reused unchanged. No browser/server phase was entered and no owned phase resources were created. Whitespace validation covers this documentation-only edit. The worker is LOCAL_READY under the repaired validation contract.
+
+Provider/immutable/served Production parity remains NOT_RUN by this worker and mandatory in the independent publisher receipt before awaiting_po or fixed-runtime update. No push, deployment, queue/status edit or official account operation occurred. N36 remains OPEN pending that release verification and voluntary PO authenticated class-level import acceptance.
+
 ## Delivery-gate blocker — run d2935897-8860-4e92-88fa-94fbf250f441
 
 The saved AI candidate `1f847633da4f6d2bf269642e3046f0eac54d42da` and its eight passing worker check groups are preserved. Candidate validation rejected the remaining combined check exactly: `Required affected checks have not passed: n36_versioned_package_SHA_and_published_source_parity`. Local version/archive/per-file/source parity already passed; published provider/immutable/served parity remains NOT_RUN and cannot truthfully become PASS before publication.
