@@ -1,0 +1,14 @@
+{
+  "command": "node --test tests/n44-server-preactivation.test.mjs",
+  "status": "FAIL",
+  "passed": 15,
+  "failed": 1,
+  "failure": {
+    "name": "inactivity/privacy: imports and construction have no capability side effects, no application import",
+    "location": "tests/n44-server-preactivation.test.mjs:260",
+    "actual": 0,
+    "expected": 1,
+    "cause": "Unchanged broad git grep includes scripts JSON task/evidence fixtures and source-only publication tests mentioning drafts/n44-push as data; their presence returns match status 0. Import/construction subprocess itself passed. No application import was observed."
+  },
+  "disposition": "Preserve original failure; old harness path is outside this card. Reuse its 15 unchanged successful behavioral cases and add an executable-file import check plus actual new module construction checks in tests/n44-crypto-sender.mjs. No old test or Product guard disabled."
+}

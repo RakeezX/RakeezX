@@ -1,10 +1,11 @@
 # N44 server preactivation contract — INACTIVE DRAFT
 
 Prepared source only. Nothing here is imported by the app, Service Worker,
-Supabase functions or deployment scripts. No server entry point, SDK, credentials,
-provider configuration, network implementation, permission prompt, VAPID key or
-crypto implementation exists here. Default sender and provider-origin list are
-disabled/empty. **N44 stays OPEN**; accepted in-app UI is unchanged. N78 remains a
+Supabase functions or deployment scripts. The private HTTP composition, OpenSSL
+subscription protector and pinned `web-push` sender are implemented as inactive
+source. No listener, real credentials/provider configuration, permission prompt,
+hosted operation or send is activated. Default sender and provider-origin list
+remain disabled/empty. **N44 stays OPEN**; accepted in-app UI is unchanged. N78 remains a
 separately gated privileged authorizer; this is no campaign executor.
 
 ## Architecture and executable boundary
@@ -22,6 +23,11 @@ separately gated privileged authorizer; this is no campaign executor.
   attempts. These functions are trusted server capabilities, never public routes
   accepting a caller's ownerId. No admin/user enumeration is implemented.
 - `shared.mjs`: fixed statuses, draft limits, rate and context checks.
+- `subscription-protector.mjs`, `audited-sender.mjs`, `provider-policy.mjs` and
+  `committed-permit.mjs`: concrete private crypto/transport ports. See
+  [key custody, protocol and exact inactive host binding](CRYPTO_SENDER.md).
+- `private-runtime.mjs`: `createPrivateRuntime(config,ports,material)` binds both
+  concrete ports to the existing runtime without starting it or reading env.
 - `postgres-repository.mjs`: inactive trusted-server-only SQL implementation of
   the synchronous `repository.atomic` port. It imports no driver and connects to
   nothing by itself. Actual unchanged boundaries are exercised against PostgreSQL
@@ -86,10 +92,10 @@ an otherwise active binding fails closed until original authenticated cleanup or
 session expiry/sweep; do not allocate another UUID to evade it. Browser receipt
 storage and reconciliation UI are unimplemented integration gates.
 
-Future HTTP adapter must enforce authenticated POST, same-origin/CSRF protection
-for cookie auth, CORS allowlist, JSON-only bounded streaming body (4 KiB), reject
-duplicate JSON keys and non-JSON/accessor records, normalize exceptions to fixed
-codes, and apply ingress rate limits before expensive work. No token/body in
+The existing inactive HTTP adapter enforces authenticated POST, exact Origin,
+bearer auth, JSON-only bounded streaming body (12 KiB), and rejects
+duplicate JSON keys and non-JSON/accessor records, normalizes exceptions to fixed
+codes, and requires ingress rate limits before expensive work. No token/body in
 URLs, responses or logs. Browser opt-in still requires real explicit gesture and
 permission; the server cannot prove OS permission from a client claim. Consent
 records must come from the separately reviewed device-consent protocol, not a
@@ -100,26 +106,30 @@ self-asserted request. No permission operation is executed here.
 `validateSubscription` requires canonical HTTPS, no userinfo/fragment/custom port,
 maximum 2048-character endpoint, exact preapproved origin and bounded canonical
 base64url keys (65-byte uncompressed P-256 point and 16-byte auth secret).
-No real provider origin is guessed or configured. The synthetic `.test` origin
-exists only in fixtures. `protect(subscription)` must validate the actual curve
-point with an audited implementation, encrypt the full endpoint/keys with an
-authenticated versioned envelope and produce a server-keyed HMAC endpoint
+No real provider origin is configured. Recognized provider paths are source-linked
+in `provider-policy.mjs`; only explicit approved origins enable them. `.test` is
+not an approved provider. `protect(subscription)` now validates the actual curve
+point with OpenSSL, encrypts the full endpoint/keys with an
+authenticated versioned envelope and produces a server-keyed HMAC endpoint
 `fingerprint` plus a separate HMAC `bindingFingerprint` of canonical endpoint and
-both keys. The latter rejects key changes under an existing UUID even if endpoint
-is unchanged. The draft stores only that sealed envelope and fingerprints. No new cryptography
-or keys are created. Cross-owner claims must return a generic failure. New
+both keys and the authenticated VAPID key ID. The latter rejects key changes under
+an existing UUID even if endpoint is unchanged. The draft stores only that sealed
+envelope and fingerprints. It uses standard Node crypto primitives; only synthetic
+test keys were generated in memory. Cross-owner claims return a generic failure. Real
 protection keys, rotation/re-encryption and deletion/backup policies require the
 privacy/security gate; fingerprint keys and envelope keys stay outside the DB.
 
-A future audited Web Push sender decrypts only a committed permit, revalidates
+The concrete private Web Push sender decrypts only a committed permit, revalidates
 the approved origin and curve/key shape, uses the correct encryption and VAPID
-protocol, sets TTL no greater than remaining immutable expiry, and emits generic
-privacy-reviewed lock-screen text. Never fetch an arbitrary supplied URL. Require
+protocol and sets TTL no greater than remaining immutable expiry. Its encrypted
+payload is exactly the reviewed four-field app consumer contract above, with no
+display text or personal data. Future SW display must use generic static copy.
+It never fetches an arbitrary supplied URL and enforces
 reviewed exact origins, canonical endpoint/path policy, DNS resolution and egress
 enforcement rejecting loopback, private, link-local, metadata, reserved and
 IPv4-mapped/IPv6 destinations at connection time (including DNS rebinding).
 Disable redirects entirely; never forward authorization or retry at a redirected
-origin. Unknown origin/provider or unavailable audited encryption means disabled,
+origin. Unknown origin/provider or unavailable cryptographic configuration means disabled,
 not a fallback sender. Syntax validation alone is NOT an SSRF proof.
 
 No raw payload, endpoints, keys, userIDs, exceptions, bearer tokens or device
@@ -354,7 +364,10 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    mapping, production all-writer adoption, scheduled retention sweep and real
    ingress limits remain unimplemented. Historical
    Docker/SQL NOT_RUN evidence remains unchanged; the prior 16 simulated tests
-   are reused with exact code/fixture/dependency hashes, not rerun as SQL proof.
+   were reused in that earlier SQL phase, not rerun as SQL proof. The present
+   delivery change has a new focused crypto/boundary qualification; its original
+   legacy import-scan failure and corrected scoped assertion are preserved in
+   [the new evidence](../../docs/automation-evidence/20261018/N44_CRYPTO_SENDER.md).
 3. **Real service gate — NOT_RUN:** separately authorized CLI-generated migration
    (`supabase migration new`, never invent a filename), fresh protected-schema
    and role plan, applied identity readback, actual repository/verifier/resolver,

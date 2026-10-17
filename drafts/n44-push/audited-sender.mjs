@@ -1,0 +1,137 @@
+/** INACTIVE private sender. web-push generates encryption/VAPID bytes; Node HTTPS
+ * owns exactly one nonredirecting, address-pinned TLS request. No internal retry. */
+import webpush from 'web-push';
+import { createECDH, timingSafeEqual } from 'node:crypto';
+import { lookup } from 'node:dns/promises';
+import { request } from 'node:https';
+import { checkServerIdentity } from 'node:tls';
+import { performance } from 'node:perf_hooks';
+import { normalizePushPayload } from '../../src/lib/notification-push-core.js';
+import { approvedProviderOrigins, trustedSubscription, publicAddress, decode64, validatePoint } from './provider-policy.mjs';
+import { consumeCommittedPermit } from './committed-permit.mjs';
+
+const fail = () => { throw Error('n44_sender_unavailable'); };
+// http_ece deliberately has a diagnostic key logger. Never run it in that mode;
+// remember import-time state as well because the library captures it on load.
+const unsafeKeyLogAtImport = process.env.ECE_KEYLOG === '1';
+const unsafeDiagnostics = () => unsafeKeyLogAtImport || process.env.ECE_KEYLOG === '1' ||
+  process.execArgv.some(s=>s.startsWith('--tls-keylog')) || /(?:^|\s)--tls-keylog(?:[=\s]|$)/.test(process.env.NODE_OPTIONS??'');
+export function createAuditedSender({ enabled = false, providerOrigins = [], protector,
+  vapidKeys, clock = Date.now, resolve = lookup, httpsRequest = request } = {}) {
+  const origins = approvedProviderOrigins(providerOrigins);
+  if (enabled !== true) return Object.freeze({send:async()=> 'uncertain',close(){}});
+  const credentials=new Map();
+  try {
+    if (unsafeDiagnostics()) fail();
+    if (!origins.length || typeof protector?.open !== 'function' || typeof clock !== 'function' ||
+        typeof resolve !== 'function' || typeof httpsRequest !== 'function') fail();
+    if (!(vapidKeys instanceof Map) || vapidKeys.size<1 || vapidKeys.size>8) fail();
+    for (const [keyId,vapid] of vapidKeys) {
+      if (typeof keyId!=='string' || !/^[A-Za-z0-9_-]{1,40}$/.test(keyId)) fail();
+      validatePoint(vapid?.publicKey);
+      const secret = decode64(vapid?.privateKey,32), pair = createECDH('prime256v1');
+      try {
+        pair.setPrivateKey(secret);
+        if (!timingSafeEqual(pair.getPublicKey(),decode64(vapid.publicKey,65))) fail();
+      } finally { secret.fill(0); }
+      // A real, reviewed contact is injected later. No localhost or arbitrary schemes.
+      const subject = new URL(vapid.subject);
+      if (vapid.subject.length>512 || !['mailto:','https:'].includes(subject.protocol) ||
+          subject.username || subject.password || subject.hash || subject.hostname==='localhost' ||
+          (subject.protocol==='mailto:' && !/^[^\s?]+@[^\s?]+$/.test(subject.pathname))) fail();
+      credentials.set(keyId,Object.freeze({subject:vapid.subject,publicKey:vapid.publicKey,privateKey:vapid.privateKey}));
+    }
+  } catch { fail(); }
+  const active = new Set(); let closed = false;
+  return Object.freeze({
+    async send(permit,{signal,deadlineMs=10000}={}) {
+      // Consumed once, even on validation failure; a JSON/lookalike/replayed permit
+      // cannot cause decryption. Issuer is used solely after the boundary commit.
+      if (!consumeCommittedPermit(permit)) return 'uncertain';
+      const controller=new AbortController(); active.add(controller);
+      let timer, req, res, done=false;
+      const start=performance.now();
+      const abort=()=>controller.abort();
+      try {
+        if (closed || unsafeDiagnostics() || signal?.aborted || !Number.isInteger(deadlineMs) || deadlineMs<1 || deadlineMs>10000) return 'uncertain';
+        const payload=normalizePushPayload(permit.payload,clock());
+        if (!payload) return 'uncertain';
+        const milliseconds=Math.min(deadlineMs,payload.expiresAt-clock());
+        timer=setTimeout(abort,milliseconds);
+        signal?.addEventListener('abort',abort,{once:true});
+        const check=()=>{if(closed || controller.signal.aborted || performance.now()-start>=milliseconds || clock()>=payload.expiresAt) fail();};
+        check();
+        const opened=protector.open(permit.sealed,permit,{signal:controller.signal});
+        const signing=credentials.get(opened?.vapidKeyId);
+        if(!signing)fail();
+        const sub=trustedSubscription(opened.subscription,origins);
+        const url=new URL(sub.endpoint);
+        const cancel=new Promise((_,reject)=>controller.signal.addEventListener('abort',()=>reject(Error('n44_sender_unavailable')),{once:true}));
+        const answers=await Promise.race([Promise.resolve().then(()=>resolve(url.hostname,{all:true,verbatim:true})),cancel]);
+        check();
+        // Reject a mixed public/private answer set, malformed answers and overflow.
+        if (!Array.isArray(answers) || answers.length<1 || answers.length>16 ||
+            answers.some(a=>!publicAddress(a.address,a.family))) fail();
+        const pinned=Object.freeze({address:answers[0].address,family:answers[0].family});
+        const ttl=Math.floor((payload.expiresAt-clock())/1000);
+        if (ttl<1) fail();
+        // Minimal existing consumer schema ONLY. Future SW must supply generic
+        // lock-screen copy. No teacher/student names, subject, marks or event text.
+        const details=webpush.generateRequestDetails(sub,JSON.stringify(payload),{
+          vapidDetails:signing,TTL:ttl,contentEncoding:'aes128gcm',urgency:'normal',
+        });
+        if (details.endpoint!==sub.endpoint || details.method!=='POST' || !Buffer.isBuffer(details.body)) fail();
+        check();
+        // Recompute TTL after encryption too; it never outlives immutable expiry.
+        details.headers.TTL=Math.min(ttl,Math.floor((payload.expiresAt-clock())/1000));
+        if(details.headers.TTL<1) fail();
+        return await new Promise(resolveOutcome=>{
+          const finish=outcome=>{
+            if(done) return; done=true;
+            controller.signal.removeEventListener('abort',stop);
+            resolveOutcome(outcome);
+            // Ignore bodies/Location/exception details; bound response processing.
+            res?.destroy(); req?.destroy();
+          };
+          const stop=()=>finish('uncertain');
+          controller.signal.addEventListener('abort',stop,{once:true});
+          if(controller.signal.aborted){stop();return;}
+          try {
+            const options={protocol:'https:',hostname:url.hostname,port:443,
+              path:url.pathname,method:'POST',headers:details.headers,
+              servername:url.hostname,rejectUnauthorized:true,checkServerIdentity,
+              minVersion:'TLSv1.2',agent:false,autoSelectFamily:false,family:pinned.family,
+              maxHeaderSize:8192,signal:controller.signal,
+              // The actual connection never performs a second DNS resolution.
+              lookup(host,opts,callback){
+                if(host!==url.hostname || controller.signal.aborted || !publicAddress(pinned.address,pinned.family)) {
+                  callback(Error('n44_sender_unavailable'));return;
+                }
+                if(opts?.all) callback(null,[{...pinned}]); else callback(null,pinned.address,pinned.family);
+              },
+            };
+            req=httpsRequest(options,response=>{
+              res=response;
+              try {check();} catch {finish('uncertain');return;}
+              const code=response.statusCode;
+              // Only a definitive service rejection is retryable. 5xx, redirects,
+              // malformed, truncated and all unknown-after-send remain uncertain.
+              finish([201,202].includes(code)?'accepted':code===404||code===410?code:
+                code===429?'not_accepted_retryable':'uncertain');
+            });
+            req.on('error',()=>finish('uncertain'));
+            req.on('socket',socket=>socket.once('secureConnect',()=>{
+              if(socket.authorized!==true || socket.remoteAddress!==pinned.address) finish('uncertain');
+            }));
+            check(); req.end(details.body);
+          } catch {finish('uncertain');}
+        });
+      } catch {return 'uncertain';}
+      finally {
+        clearTimeout(timer); signal?.removeEventListener('abort',abort);
+        controller.abort(); req?.destroy(); res?.destroy(); active.delete(controller);
+      }
+    },
+    close(){closed=true; for(const c of active)c.abort(); credentials.clear();},
+  });
+}

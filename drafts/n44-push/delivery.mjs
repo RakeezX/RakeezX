@@ -1,6 +1,7 @@
 import { normalizePushPayload } from '../../src/lib/notification-push-core.js';
 import { notificationCategoryAllowed, LESSON_LEAD_MINUTES, DUE_STAGES } from '../../src/lib/notification-state.js';
 import { LIMITS, result, id, deliveryKey, current, rate } from './shared.mjs';
+import { issueCommittedPermit } from './committed-permit.mjs';
 
 // Server must use the teacher's authoritative IANA zone; never server-local time.
 // Existing app has no persisted quiet-window schema. This is an explicit draft
@@ -80,11 +81,13 @@ export function createDeliveryBoundary({ repository, clock, recompute, sender = 
             payload, expiresAt: payload.expiresAt, attempts: (job?.attempts ?? 0) + 1,
             state: 'sending', startedAt: now, nextAt: now };
           tx.set('deliveries', key, job);
-          return { key, attempt: job.attempts, sealed: r.sealed, payload };
+          return { key, attempt: job.attempts, sealed: r.sealed, payload,
+            fingerprint: r.fingerprint, bindingFingerprint: r.bindingFingerprint };
         });
         if (permit.status) return permit;
         let outcome;
-        try { outcome = await sender.send(Object.freeze({ sealed: permit.sealed, payload: permit.payload })); }
+        try { outcome = await sender.send(issueCommittedPermit({ sealed: permit.sealed, payload: permit.payload,
+          fingerprint: permit.fingerprint, bindingFingerprint: permit.bindingFingerprint })); }
         catch { outcome = 'uncertain'; }
         return await repository.atomic(ownerId, tx => {
           const now = tx.time(clock()), job = tx.get('deliveries', permit.key);

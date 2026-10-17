@@ -4,8 +4,10 @@ This is a source-only server composition, unimported by the app and Service Work
 No command here installs dependencies, creates hosted tables, configures origins,
 reads credentials, requests notification permission or activates a sender.
 Use a maintained Node runtime supporting `node:http`, `structuredClone`,
-`AbortController`, `TextDecoder` and `server.closeAllConnections` (Node 22+ target).
-No new package dependency is introduced. Native HTTP is behind a separately
+`AbortController`, `TextDecoder` and `server.closeAllConnections`. The gateway has
+no driver dependency; the private crypto composition targets the existing Node
+24.19+ engine and pins dependencies solely in this directory's lockfile.
+Native HTTP is behind a separately
 approved TLS ingress; this module does not terminate public TLS.
 
 ## Construction and dependency preflight
@@ -27,7 +29,7 @@ Required server-owned ports (never construct these from request JSON):
 | --- | --- |
 | `acquire()` | Exclusive pg-compatible leased connection `{query(text,values),release(error?)}` to the exact already-applied schema; bounded pool acquisition/connection (at most 4s), per-query/transport timeout (at most 8s), finite pool and disposal on unsafe release. No SQL values/DETAIL logging. Repository transaction-local lock/statement timeouts and commit rules remain unchanged. |
 | `verifySession(authorization,{signal})` | Independently contact trusted current-session authority, enforce expiry/revocation and derive `{ownerId,sessionId,sessionRevision,expiresAt}`. An opaque bearer alone, decoded JWT, editable metadata, browser verified flag or cached principal is insufficient. Honor signal and bounded transport; no bearer logging. |
-| `protect(subscription,{signal})` | Audited curve validation, endpoint HMAC/binding fingerprint and authenticated sealed envelope with server-held keys; returns existing boundary contract. Honor signal. No crypto implementation or key custody is supplied. |
+| `protect(subscription,{signal})` | Concrete OpenSSL curve validation, independent endpoint/binding HMAC keys and authenticated versioned envelope are supplied by `subscription-protector.mjs`. Real server key custody/configuration remains a deployment input; abort denies. |
 | `ingress.take({kind,key,limit,windowMs,signal})` | Atomic bounded distributed limiter returning exactly `true` to admit. Peer: 60/min/direct socket peer; verified owner: 30/min. Persist limits across processes; avoid unbounded key cardinality/retention and body logging. Exceptions/timeouts deny. |
 | `authoritative.serializedWriters === true` | Explicit adopter assertion: every context/session/logout/switch/consent/preference/event writer participates in repository owner-clock serialization. This flag is a wiring requirement, never independent proof of adoption. |
 | `authoritative.recompute(tx,registration,eventId,now,preferences)` | Pure synchronous authoritative minimal-event derivation inside the same SQL lock; use real current owned parent/child deletion dependencies, lifecycle, dates, stages and IANA timezone. Return minimal payload or null. No client cache or async resolver. |
@@ -166,9 +168,11 @@ Concrete remaining operations, all **NOT_RUN** and outside this source-only card
 2. Separately authorize exact hosted migration/role/service wiring and read back
    applied identities before enabling runtime. Existing SQL proposal/qualification
    does not authorize hosted application. Generic frontend publisher cannot do this.
-3. Supply audited protector and Web Push sender with real key custody, reviewed
-   exact origins, connection-time egress/DNS policy and deadline/receipt behavior.
-   No audited sender/config currently exists here, so none is enabled.
+3. Bind the now-implemented protector and `web-push` sender using
+   `createPrivateRuntime` from `private-runtime.mjs`; supply real key custody and
+   explicitly reviewed origins only under a later activation. Follow the exact
+   [key/configuration and existing-host plan](CRYPTO_SENDER.md). No placeholder
+   protector/sender implementation remains; all checked-in configuration is disabled.
 4. Supply distributed ingress limits, private paginated schedule/cleanup sources,
    reviewed TLS bind/proxy/log policy, shutdown integration, retention/backup/cost
    decisions and kill switch. Then separately qualify app/SW/client original-UUID
