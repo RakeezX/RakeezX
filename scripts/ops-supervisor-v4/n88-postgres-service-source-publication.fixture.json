@@ -1,0 +1,261 @@
+{
+  "taskId": "continuous-n88-postgres-service-repository-20261017",
+  "sessionId": "01a14a42-22e7-7243-83c9-50b557f8ff39",
+  "runId": "d80c7450-1db7-4c65-8945-1007808c042b",
+  "candidateSha": "0ee44a161c691475d95832b52fd29fdb75b36fb3",
+  "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+  "receipt": {
+    "version": 1,
+    "ticketId": "N88",
+    "taskId": "continuous-n88-postgres-service-repository-20261017",
+    "candidateSha": "0ee44a161c691475d95832b52fd29fdb75b36fb3",
+    "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+    "publishedSha": "71f7230e18a7a0210a890430da37d9a32984f404",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-17T14:43:27.004Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-17T14:43:27.004Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "542e7a30-92f5-4567-887f-8300c4a15fbf",
+    "previewUrl": "https://542e7a30.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117423001018",
+      "headSha": "71f7230e18a7a0210a890430da37d9a32984f404",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-17T14:43:02Z",
+      "completedAt": "2026-10-17T14:43:02Z",
+      "headBranch": null,
+      "deploymentId": "542e7a30-92f5-4567-887f-8300c4a15fbf",
+      "previewUrl": "https://542e7a30.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/542e7a30-92f5-4567-887f-8300c4a15fbf"
+    },
+    "currentMainSha": "71f7230e18a7a0210a890430da37d9a32984f404",
+    "binding": {
+      "candidateSha": "0ee44a161c691475d95832b52fd29fdb75b36fb3",
+      "declaredBaseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+      "mainAtPreparation": "7df8564653fffbb422ce8d9024814da7473df688",
+      "integrationSha": "634dafa1d9ac4a3cd81640125a9489832679da49",
+      "publishedSha": "71f7230e18a7a0210a890430da37d9a32984f404",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "merge"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-17T14:42:30.576Z",
+      "completedAt": "2026-10-17T14:42:33.863Z",
+      "integrationSha": "634dafa1d9ac4a3cd81640125a9489832679da49",
+      "publishedSha": "71f7230e18a7a0210a890430da37d9a32984f404",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md",
+      "drafts/n88-student-portal/postgres-repository-schema.sql",
+      "drafts/n88-student-portal/postgres-repository.mjs",
+      "tests/fixtures/n88-postgres-service-repository/cases.mjs",
+      "tests/n88-postgres-service-repository.initial-blocked.json",
+      "tests/n88-postgres-service-repository.lease-policy-denial.json",
+      "tests/n88-postgres-service-repository.mjs",
+      "tests/n88-postgres-service-repository.result.json",
+      "tests/n88-postgres-service-repository.source-checks.json"
+    ],
+    "sourceOnlyPaths": [
+      "drafts/n88-student-portal/postgres-repository-schema.sql",
+      "tests/fixtures/n88-postgres-service-repository/cases.mjs",
+      "tests/n88-postgres-service-repository.initial-blocked.json",
+      "tests/n88-postgres-service-repository.lease-policy-denial.json",
+      "tests/n88-postgres-service-repository.mjs",
+      "tests/n88-postgres-service-repository.result.json",
+      "tests/n88-postgres-service-repository.source-checks.json"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://542e7a30.rakeezx.pages.dev",
+        "checkedAt": "2026-10-17T14:43:22.730Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+            "observedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "9240cd07866df90081bfd4b009b47aeccc63675d28337648a1cb9fd846432fd8",
+            "observedSha256": "9240cd07866df90081bfd4b009b47aeccc63675d28337648a1cb9fd846432fd8",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/postgres-repository.mjs",
+            "urlPath": "drafts/n88-student-portal/postgres-repository.mjs",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+            "observedSha256": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+            "bytes": 14202,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md",
+            "urlPath": "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "78d911f6d972078f3bdbb489205733a47739f99fdbda615df21f561ccc9abe1d",
+            "observedSha256": "78d911f6d972078f3bdbb489205733a47739f99fdbda615df21f561ccc9abe1d",
+            "bytes": 10312,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-17T14:43:23.245Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "1060baca172bf6480b837ff112af5cd1b6e709c3a40caa4fccc161dff16d58e2",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "1c13cd9e9a5a4cf47f8e1e3ebcb62692321724cd5228e9aeb664de04ec86477c",
+            "providerTransforms": [
+              "cloudflare-jsd-v1",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+            "observedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "9240cd07866df90081bfd4b009b47aeccc63675d28337648a1cb9fd846432fd8",
+            "observedSha256": "9240cd07866df90081bfd4b009b47aeccc63675d28337648a1cb9fd846432fd8",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/postgres-repository.mjs",
+            "urlPath": "drafts/n88-student-portal/postgres-repository.mjs",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+            "observedSha256": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+            "bytes": 14202,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md",
+            "urlPath": "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "78d911f6d972078f3bdbb489205733a47739f99fdbda615df21f561ccc9abe1d",
+            "observedSha256": "78d911f6d972078f3bdbb489205733a47739f99fdbda615df21f561ccc9abe1d",
+            "bytes": 10312,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n88-postgres-service-repository-20261017\\integration-0ee44a161c69-1-81ecd3ce",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  },
+  "requiredChecks": [
+    {
+      "name": "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
+      "status": "PASS",
+      "evidence": "Actual portal service on PostgreSQL 17.6 passed issue/claim/read/publish/rotate/revoke, private projection and commit-acknowledgement fencing."
+    },
+    {
+      "name": "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
+      "status": "PASS",
+      "evidence": "Independent pools observed SQL advisory-lock contention; budgets, isolation, stable second-term credentials, rollback/uncertain-commit/deadline faults and fresh-service reads after controlled restart passed."
+    },
+    {
+      "name": "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits",
+      "status": "PASS",
+      "evidence": "Capacity/type/retention safeguards passed. Owned cluster stopped, exact PID absent, port rebound/released and integration lease released. Original denial preserved; source hashes, syntax and scoped Git checks passed."
+    }
+  ],
+  "canonicalVerifiedSourceOnly": true,
+  "reason": "Live original controller26340 cached its source-only validator before the source-only publication gate was installed. Current canonical exact validator accepts the original complete source-only receipt; no Product rewrite, redeploy or repeat PostgreSQL run is needed."
+}
