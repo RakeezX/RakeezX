@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { verifiedDeployment } from './controller.mjs';
+import { verifiedDeployment, verifiedSourceOnlyPublication } from './controller.mjs';
 
 const SELF = 'scripts/ops-supervisor-v4/apply-reviewed-maintenance.mjs';
 const WIN_PS = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -99,6 +99,18 @@ export function reviewedPreimageMatches(actual, reviewed) {
   const normalized = value => value.toString('utf8').replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
   return normalized(actual) === normalized(reviewed);
 }
+const SOURCE_ONLY_OPTIONAL_NOT_RUN = new Set([
+  'optional_checkpoint_directory_removal',
+  'hosted_service_app_device_and_production_verification'
+]);
+export function reconcilableCheckOutcomes(task, result, receipt) {
+  if (!Array.isArray(result?.checks) || !result.checks.length
+    || !task.requiredChecks?.every(name => result.checks.some(check => check.name === name && check.status === 'PASS'))) return false;
+  const sourceOnly = verifiedSourceOnlyPublication(task, receipt);
+  return result.checks.every(check => check.status === 'PASS'
+    || sourceOnly && check.status === 'NOT_RUN' && SOURCE_ONLY_OPTIONAL_NOT_RUN.has(check.name));
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -153,8 +165,7 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && SHA256.test(proof?.reviewedFixtureSha256 ?? '') && proof?.reason?.length >= 50
     && same(update.card.requiredChecks, task.requiredChecks) && same(update.card.allowedPaths, task.allowedPaths)
     && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
-    && result.checks?.length && result.checks.every(check => check.status === 'PASS')
-    && task.requiredChecks?.every(name => result.checks.some(check => check.name === name && check.status === 'PASS'))
+    && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
   insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
