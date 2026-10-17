@@ -1,0 +1,40 @@
+{
+  "taskId": "continuous-n88-personal-four-digit-student-code-20261017",
+  "runId": "47828d23-b2bd-4dea-8b83-a1fbedc80d7a",
+  "baseSha": "5ce42fd71ed23408bde4b48be40c06b17f1ab273",
+  "teacherUrl": "http://127.0.0.1:52461/teacher",
+  "ownedPid": 14220,
+  "startedAt": "2026-10-17T11:17:48.876Z",
+  "checks": [
+    {
+      "name": "four-digit-private-entry-320-light",
+      "status": "PASS",
+      "evidence": "Actual source DOM/CSS and teacher handlers; one four-digit field, Arabic digits, distinct private links, both cross-student PIN refusals, exact profile/progress, scoped secure cookie, reusable bookmark after logout/8h expiry, reload, rotated old link/PIN/session refused, revoke, no PIN URL/storage/log leak, no overflow. Empty-form screenshot inspected."
+    },
+    {
+      "name": "four-digit-private-entry-1280-dark",
+      "status": "PASS",
+      "evidence": "Actual source DOM/CSS and teacher handlers; one four-digit field, Arabic digits, distinct private links, both cross-student PIN refusals, exact profile/progress, scoped secure cookie, reusable bookmark after logout/8h expiry, reload, rotated old link/PIN/session refused, revoke, no PIN URL/storage/log leak, no overflow. Empty-form screenshot inspected."
+    }
+  ],
+  "failures": [],
+  "privateLink": "Intentionally NOT recorded: private bookmark path is a credential.",
+  "priorEvidence": "tests/n88-real-pilot-browser.json at bdb1e2bf7cfbd6a04f11bda5c9a3154652550358; unchanged CSS/repository and unaffected publication/print/async generation behavior reused.",
+  "limits": "Synthetic single-process memory only. Durable repository/limits, SQL/RLS, real Auth/proxy/TLS/log redaction, real devices and hosted private access NOT_RUN.",
+  "testedSourceSha256": {
+    "src/lib/student-portal-client.js": "599a81b28db49959aede0290475738e8035423a982d6fb19329edcf2bfb83e57",
+    "src/views/student-portal.js": "0ea5af8f29bb9e92e08fd506e8d25dba2d642786810d34deeeaffccfc8848c57",
+    "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "drafts/n88-student-portal/service.mjs": "6cac58890d5acbef82b0246d2fc40caea25917e7e600c141e1241d49c698f9d2",
+    "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+    "drafts/n88-student-portal/teacher-controller.js": "96511521119bd16959694bf76bf365dc85ebf2b4c3f3d395616bdd7ccaad3a84",
+    "drafts/n88-student-portal/portal.css": "2e1a2bd96915af6a8cd891f837e999519f7dac2e9afc0b6420f5ef3a36f82e14",
+    "tests/fixtures/n88-real-pilot/entry.js": "5e2888183dc5a646213efc3280f379cb3af4a820d3b21c21b488bab6b51be2e9",
+    "tests/fixtures/n88-real-pilot/server.mjs": "560186aa2995177aac8f15cea0e8d95179aa39b1e07d09e4c5082ef1e347a3be",
+    "tests/fixtures/n88-real-pilot/index.html": "e45add23d3d7cd8c2b3c67d327ec1a3ebb0b8f62c56e47f3d4fdedac3f1bed37",
+    "tests/fixtures/n88-real-pilot/fixture.mjs": "e13c1ed22b6e7adf304e0a50c8122099dab36d608be468c74b2281e798bbf0d6",
+    "tests/n88-real-pilot-four-digit-browser.mjs": "ce56c856107ec5f9d34d9bbb634e5e918844ec798c31f7701a44210f5d1d7a25",
+    "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270"
+  },
+  "cleanup": "Owned fresh browser/contexts closed by canonical helper; unique loopback server closed in finally."
+}

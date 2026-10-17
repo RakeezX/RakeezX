@@ -1,6 +1,6 @@
 /** AI: inert same-origin injectable client. No import-time network or storage. */
 export function createStudentPortalClient({ fetch: send, base = '/api/n88' } = {}) {
-  if (typeof send !== 'function' || !/^\/api\/n88(?:\/s\/[A-Za-z0-9_-]{24,64})?$/.test(base)) throw Error('Scoped same-origin transport required');
+  if (typeof send !== 'function' || !/^\/api\/n88(?:\/s\/[A-Za-z0-9_-]{43})?$/.test(base)) throw Error('Scoped same-origin transport required');
   async function call(path, body) {
     const response = await send(base + path, { method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
       redirect: 'error', referrerPolicy: 'no-referrer', headers: body ? { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' } : {},

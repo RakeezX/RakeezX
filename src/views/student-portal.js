@@ -1,5 +1,6 @@
 /** AI: actual read-only student DOM/handlers, deliberately unregistered/unimported by app. */
 import { clearEntryUrl } from '../lib/student-portal-client.js';
+import { normalizeDateTimeDigits } from '../lib/rakeez-datetime-values.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const status = { done: 'مكتمل', working: 'قيد العمل', todo: 'لم يبدأ' };
 
@@ -13,7 +14,7 @@ export function mountStudentPortal(root, { client, location = window.location, h
     root.querySelector('h1')?.focus();
   }
   function entry(error = false, message = '') {
-    paint(`<section class="n88-panel"><h1 tabindex="-1">مساحتي مع معلمي</h1><p>احفظ رابط معلمك للعودة، وأدخل رمزك الشخصي المكوّن من 6 أرقام. يبقى رمزك صالحًا حتى يغيّره المعلم أو يلغي الوصول.</p><form data-claim><label for="n88-secret">رمزي الشخصي</label><input id="n88-secret" name="code" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="n88-error"><p id="n88-error" role="status">${error ? 'تعذّر فتح المساحة. تحقق من الرابط والرمز أو حاول لاحقًا مع معلمك.' : escape(message)}</p><button type="submit">فتح مساحتي</button></form></section>`);
+    paint(`<section class="n88-panel"><h1 tabindex="-1">مساحتي مع معلمي</h1><p>احفظ رابطك الخاص للعودة ولا تشاركه، وأدخل رمزك الشخصي المكوّن من 4 أرقام. يبقى الرابط والرمز صالحين حتى يغيّرهما المعلم أو يلغي الوصول.</p><form data-claim><label for="n88-secret">رمزي الشخصي</label><input id="n88-secret" name="code" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="n88-error"><p id="n88-error" role="status">${error ? 'تعذّر فتح المساحة. تحقق من الرابط والرمز أو حاول لاحقًا مع معلمك.' : escape(message)}</p><button type="submit">فتح مساحتي</button></form></section>`);
   }
   function show(data) {
     const next = data.tasks.find(t => t.status !== 'done');
@@ -33,7 +34,7 @@ export function mountStudentPortal(root, { client, location = window.location, h
   const onSubmit = e => {
     if (!e.target.matches('[data-claim]')) return;
     e.preventDefault();
-    let value = root.querySelector('input').value;
+    let value = normalizeDateTimeDigits(root.querySelector('input').value);
     root.querySelector('input').value = '';
     void run(async () => { const pending = client.claim(value); value = ''; await pending; return client.read(); });
   };
@@ -41,11 +42,12 @@ export function mountStudentPortal(root, { client, location = window.location, h
     if (e.target.closest('[data-refresh]')) void run(() => client.read());
     if (e.target.closest('[data-logout]')) void run(async () => { await client.logout(); return null; });
   };
+  const onInput = e => { if (e.target.matches('[data-claim] input')) e.target.value = normalizeDateTimeDigits(e.target.value); };
   const clear = () => { generation++; busy = false; entry(); };
   const onHashChange = () => { clearEntryUrl(location, history); clear(); };
   const onPageShow = e => { if (e.persisted) void run(() => client.read()); };
   const onVisible = () => { if (root.ownerDocument.visibilityState === 'visible') void run(() => client.read()); };
-  root.addEventListener('submit', onSubmit); root.addEventListener('click', onClick);
+  root.addEventListener('submit', onSubmit); root.addEventListener('click', onClick); root.addEventListener('input', onInput);
   root.ownerDocument.defaultView.addEventListener('pagehide', clear);
   root.ownerDocument.defaultView.addEventListener('hashchange', onHashChange);
   root.ownerDocument.defaultView.addEventListener('pageshow', onPageShow);
@@ -53,7 +55,7 @@ export function mountStudentPortal(root, { client, location = window.location, h
   const ready = run(() => client.read(), true);
   return { ready, clear, dispose() {
     disposed = true; generation++; root.replaceChildren();
-    root.removeEventListener('submit', onSubmit); root.removeEventListener('click', onClick);
+    root.removeEventListener('submit', onSubmit); root.removeEventListener('click', onClick); root.removeEventListener('input', onInput);
     root.ownerDocument.defaultView.removeEventListener('pagehide', clear);
     root.ownerDocument.defaultView.removeEventListener('hashchange', onHashChange);
     root.ownerDocument.defaultView.removeEventListener('pageshow', onPageShow);

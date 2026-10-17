@@ -21,7 +21,7 @@ export function createFixture(origin = 'https://pilot.invalid', options = {}) {
     { ...task, ...foreign, id: 'other-owner', title: 'OTHER_OWNER' },
     { ...task, id: 'unpublished-a', title: 'UNPUBLISHED', published: false }], credentials: [], sessions: [], rates: [] });
   const ingress = new WeakMap();
-  const service = createPortalService({ repository: repo, origin, now: () => time, secretKey: randomBytes(32),
+  const service = createPortalService({ repository: repo, origin, now: () => time, secretKey: options.secretKey || randomBytes(32),
     ...(options.newCode ? { newCode: options.newCode } : {}), verifyIngress: req => ingress.get(req),
     verifyTeacher: async req => auth.get(req.headers?.['x-fixture-teacher']) ?? null });
   const dispatch = (envelope, clientKey) => { ingress.set(envelope, { clientKey }); return service(envelope); };

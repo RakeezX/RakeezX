@@ -9,6 +9,6 @@ if (location.pathname === '/teacher') {
   window.pilot = await mountTeacherInvitations(root, { client,
     copy: async text => { window.fabricatedCopy = text; }, print: () => { window.fabricatedPrint = true; } });
 } else {
-  const namespace = /^\/s\/([A-Za-z0-9_-]{24,64})$/.exec(location.pathname)?.[1];
+  const namespace = /^\/s\/([A-Za-z0-9_-]{43})$/.exec(location.pathname)?.[1];
   window.pilot = mountStudentPortal(root, { client: createStudentPortalClient({ base: '/api/n88/s/' + namespace, fetch: window.fetch.bind(window) }) });
 }
