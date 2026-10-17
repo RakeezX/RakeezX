@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-17T22:57:11.889Z",
+  "id": "continuous-n44-audited-protector-and-sender-20261018",
+  "sessionId": "01a14c02-17a2-7960-a0d8-d8eb5a4ab3bb",
+  "candidate": "0e7596dd9c6e16a04bf684bbcdd71976ecf230d4",
+  "originalFailure": "allowedPaths omits tests/n44-server-preactivation.test.mjs. Its failing import-scan assertion must be corrected before candidate validation can accept LOCAL_READY; the failure remains unchanged.",
+  "scopeAdded": "tests/n44-server-preactivation.test.mjs",
+  "proof": {
+    "taskId": "continuous-n44-audited-protector-and-sender-20261018",
+    "runId": "a656377b-7e73-4477-a733-2a0030874a6e",
+    "baseSha": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+    "preservedCandidateSha": "b0a95b7bd9fe90222bbba08e0212379e299f2738",
+    "recordedAt": "2026-10-17T22:54:02.077Z",
+    "reusedProof": {
+      "runId": "9c9ee4fd-ab29-43ae-b190-84c9dbcb3a6b",
+      "path": "tests/n44-crypto-sender.result.json",
+      "status": "PASS",
+      "cases": 18,
+      "sourceHashesMatch": true,
+      "networkAttempts": 0
+    },
+    "repairCheck": {
+      "status": "PASS",
+      "positiveImportForms": 8,
+      "nonImportForms": 4,
+      "scanned": 230,
+      "legacyRawPathMatches": [
+        "scripts/ops-supervisor-v4/n36-popup-html-parity.guard.fixture.json",
+        "scripts/ops-supervisor-v4/n44-complete-runtime-gateway-20261018.json",
+        "scripts/ops-supervisor-v4/n44-native-postgres-qualification-20261017.json",
+        "scripts/ops-supervisor-v4/n44-postgres-repository-boundary-bridge-20261017.json",
+        "scripts/ops-supervisor-v4/n44-repository-source-publication.fixture.json",
+        "scripts/ops-supervisor-v4/n44-runtime-original-source-proof.fixture.json",
+        "scripts/ops-supervisor-v4/n44-server-preactivation-package-20261017.json",
+        "scripts/ops-supervisor-v4/source-only-publisher-verification.test.mjs"
+      ]
+    },
+    "requiredMissingPath": "tests/n44-server-preactivation.test.mjs",
+    "targetSha256": "779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1",
+    "proposedCorrection": {
+      "addImport": "import { assertNoPrivatePushImports } from './n44-crypto-sender-import-guard.mjs';",
+      "replaceExactBlock": "  const imports = spawnSync('git', ['grep', '-n', '-E', 'drafts/n44-push|n44-push/(registration|delivery|shared)', '--',\n    'src', 'supabase', 'scripts', 'sw.js', 'index.html'], { encoding: 'utf8', stdio: 'pipe' });\n  assert.equal(imports.status, 1, imports.stdout + imports.stderr); // git's no-match status\n  assert.equal(imports.stdout, '');",
+      "replacement": "  assertNoPrivatePushImports();",
+      "preserved": "Keep the original forbidden-capability subprocess and all 15 other tests unchanged; run the corrected existing 16-case suite once after path authorization."
+    },
+    "disposition": "BLOCKED: existing boundary check remains FAIL. Its required edit path is outside allowedPaths. No test status changed, no old check removed, no queue mutation and no unchanged full-suite retry."
+  },
+  "preservesRequiredChecks": true,
+  "preservesAllDataAndPrivateImportGates": true
+}

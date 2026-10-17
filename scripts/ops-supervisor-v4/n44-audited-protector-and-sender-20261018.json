@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-audited-protector-and-sender-20261018",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -492,
+      "scopeKey": "n44-private-audited-web-push-crypto-egress",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n44-complete-runtime-gateway-20261018"
+      ],
+      "objective": "Current PO18Oct01:04 asks FINISH N44/N88, own independent worker until genuinely ready for review/closure. Continue actual missing implementation, not another pilot explanation or repeated SQL qualification. Read current canonical Product row/AGENTS/opscontract and affected code, verify current official primary docs for libraries and Supabase (changelog first), pin packages and lockfiles, existing Pro/Standard; no paid service/newaccount/API/privilege or reviewworker. Current existing live app, auth, storage, Sync, calendar hold unchanged. No real send/student changes/hosted schema/Auth/RLS/secret discovery or earlier real denied operation. Source-only INACTIVE artifact authorized, but MUST finish actual missing code in this bounded stage; list physical environment/deployment inputs honestly, do not leave a known local logic port as “someone later supplies it” when it can be implemented here. Original controller/publisher only. Return exact current run JSON/real checks, commit, owncleanup, no queue/status mutation. N44 gateway now implemented/qualified/publishedf98af083, source-only receipt reconciled; do not redo it. Actual missing protect(subscription) and sender.send(permit) ports are NOT_IMPLEMENTED. Implement concrete private modules using maintained audited Web Push library/standard Node crypto, not a new encryption protocol or fake sender as Product implementation. First inventory existing installed dependencies and official current Web Push library docs/source; use existing approved library if present, otherwise pinned package+lock ONLY inside drafts/n44-push with ignored owned node_modules (no root/global dependency install/paid service). Inject keys and origins as named server env/config inputs; never discover/read/export actual secrets, generate/log real VAPID keys or send a network Push. Realistic synthetic cryptographic keys can be generated in memory for tests only, no plaintext proof logs. Implement valid P-256 point validation, authenticated versioned sealed envelope and independent server-keyed HMAC endpoint/binding fingerprints; use audited/library primitives, no custom AES/ECDH algorithm. Define rotation/key-id lookup/unknown-key denial and retention/deletion contract executable where applicable, normal strict failure behavior. Sender decrypts ONLY committed permit, rechecks exact trusted provider origin/path/key shape, audited encryption+VAPID, TTL no greater than immutableexpiry, generic privacy-reviewed payload compatible with actual app push consumer. Resolve DNS and pin validated public addresses at actual connection with standard HTTPS hostname/certificate verification; reject localhost/private/linklocal/metadata/reserved/mappedIPv6, redirects, arbitrary origins/ports/credentials, DNS rebinding. Exact provider origin policy derived from official provider docs, empty/unapproved remainsdisabled; do not guess a live provider from fabricated .test endpoint. No directnetwork egress in tests: inject bounded fake DNS/transport while executing actual validation/encryption/request code; verify audit-library request bytes/headers privately and receiver fixture decrypts where library supports. Reuse existing registration/delivery/PG/runtime proof unchanged. Strict timeout/abort and fixed outcome mapping preserve unknown-after-send uncertain/no internal replay, 404/410 gone, definitive retry distinction. Full focused integration actual protector->existing registration/runtime boundary->committed permit->actual auditedsender code->fabricatedtransport; no Product fake ports for the newly implemented crypto/sender. Failure/keyrotation/invalidcurve/endpoint swaps/bind mismatch/expiredpermit/late outcome/dns changes/redirect tests relevant only. Keep app/SW off until service/Auth/currentcontext/scheduler prerequisites proven. Provide concrete remaining existinghost binding plan, no new Node hosting/subscription assumption. Avoid asking user for more work while actual local code remains implementable. Exactchecks below; optional hosted check only named hosted_service_app_device_and_production_verification=NOT_RUN.\nMATERIAL TEST-SCOPE REPAIR 2026-10-18: Concrete self-imposed card scope omitted the existing n44-server-preactivation test. Its raw string grep matched inert JSON/evidence rather than actual imports. Saved eight-positive/four-negative import-form preflight proves targeted replacement. Add only this exact test path so the original saved worker applies its already prepared correction, retains original failure and runs corrected 16-case boundary once. No Product guard or live permission waived. Reuse tests/n44-crypto-sender.repair-preflight.json with exact target SHA 779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1. Apply only proposed addImport and replaceExactBlock. Preserve all 15 other cases and forbidden-capability subprocess, do not suppress real imports or change Product implementation to fit a false string scan. Prior 18 protocol cases/source hashes unchanged; reuse their evidence. Required PASS group names unchanged; failing existing_boundary_suite becomes PASS only after actual corrected run. Preserve candidate 0e7596dd9c6e16a04bf684bbcdd71976ecf230d4 and exact session 01a14c02-17a2-7960-a0d8-d8eb5a4ab3bb. Continue sole publisher inactive source-only delivery, hosted operations still NOT_RUN.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-crypto-sender*.mjs",
+        "tests/n44-crypto-sender*.json",
+        "tests/fixtures/n44-crypto-sender/**",
+        "docs/automation-evidence/20261018/N44_CRYPTO_SENDER.md",
+        "tests/n44-server-preactivation.test.mjs"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/README.md",
+        "docs/automation-evidence/20261018/N44_CRYPTO_SENDER.md"
+      ],
+      "requiredChecks": [
+        "n44_actual_audited_subscription_protection_and_sender_protocol",
+        "n44_key_endpoint_dns_commit_timeout_and_uncertain_guards"
+      ],
+      "acceptance": [
+        "Concrete missing protector and auditedsender ports implemented and exercised without actual sends/secrets, existing boundary behavior retained.",
+        "Only true deployment/environment/Auth/context/scheduler prerequisites remain, exact next usable activation artifact supplied."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-explicit-finish-N44-local-missing-sender",
+        "publication": true,
+        "publicationScope": "inert inactive private cryptographic and sender source only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "PO18Oct01:04 explicitfinishN44 plus standing continuous implementation authority permits complete missing private source, pinned local dependency and fabricated tests, originalpublisher source-only inactive release. No real keys/configuration/subscription/devicepermission/hosted operation/send.",
+      "harnessRepair": {
+        "kind": "missing-exact-existing-test-scope",
+        "previousCandidate": "0e7596dd9c6e16a04bf684bbcdd71976ecf230d4",
+        "preparedPatch": "tests/n44-crypto-sender.repair-preflight.json",
+        "targetSha256": "779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1",
+        "reason": "Concrete self-imposed card scope omitted the existing n44-server-preactivation test. Its raw string grep matched inert JSON/evidence rather than actual imports. Saved eight-positive/four-negative import-form preflight proves targeted replacement. Add only this exact test path so the original saved worker applies its already prepared correction, retains original failure and runs corrected 16-case boundary once. No Product guard or live permission waived."
+      }
+    }
+  ]
+}
