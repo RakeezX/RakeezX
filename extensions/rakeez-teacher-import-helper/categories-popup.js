@@ -9,7 +9,15 @@ let draft=null,staged=[],generation=0,sourceRoster=null,chosenClass='',sourceInf
 window.n36HasSourceRoster=()=>!!sourceRoster;
 const sourceBatch=()=>selectedSourceClass(sourceRoster,chosenClass,batchProgress.get(chosenClass)?.offset??0);
 const message=value=>{$('category-status').textContent=value;};
-const invalidateExport=()=>{$('bundle-review').checked=false;$('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;};
+let sourceView=null,exportRevision=0;
+const invalidateExport=()=>{exportRevision++;$('bundle-review').checked=false;$('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;};
+// AI: the visible class/batch is bound in module state, never by a spoofable checkbox.
+function sourceTransferReady(){
+ return !!(sourceView&&sourceRoster===sourceView.roster&&chosenClass===sourceView.classroom&&
+  (batchProgress.get(chosenClass)?.offset??0)===sourceView.offset&&sourceView.rows.length&&!pendingBatch&&
+  window.n36HandoffSource?.()&&(sourceInfo.complete||$('partial-approval')?.checked));
+}
+function refreshSourceTransfer(){if(sourceRoster)$('handoff-transfer').disabled=!sourceTransferReady();}
 function destroyPickers(container){for(const input of container.querySelectorAll('input')){input.value='';input._flatpickr?.destroy();}}
 function clearDraft(){destroyPickers($('category-preview'));generation++;draft=null;$('category-preview').replaceChildren();$('category-review').checked=false;$('category-review').disabled=true;$('category-stage').disabled=true;invalidateExport();}
 function error(e){clearDraft();message(`غير محسوم (${e.message}). صحّح التسميات أو الحقول وأعد المعاينة؛ لا تصدير لهذه البيانات.`);}
@@ -95,25 +103,29 @@ $('category-cancel').addEventListener('click',()=>{clearDraft();$('category-tabl
 $('bundle-clear').addEventListener('click',()=>{clearDraft();staged=[];$('category-table').value='';renderStaged();message('مُسحت جميع البيانات المؤقتة. لم تُضف بيانات إلى ركيز.');window.dispatchEvent(new Event('n36:discard'));});
 $('bundle-review').addEventListener('change',()=>{
  $('bundle-download').disabled=true;$('bundle-csv').disabled=true;$('handoff-transfer').disabled=true;if(!$('bundle-review').checked)return;
- try{if(sourceRoster){sourceBatch();if(pendingBatch||!sourceInfo.complete&&!$('partial-approval')?.checked)throw Error('PARTIAL_REVIEW_REQUIRED');$('handoff-transfer').disabled=!window.n36HandoffSource?.();return;}const selected=selectedStaged();bundle(selected);$('bundle-download').disabled=false;$('bundle-csv').disabled=!selected.some(c=>c.category==='students');$('handoff-transfer').disabled=!window.n36HandoffSource?.()||!selected.some(c=>c.category==='students');}catch(e){$('bundle-review').checked=false;message(`غير محسوم (${e.message}). لا يمكن تصدير الحزمة.`);}
+ try{if(sourceRoster){refreshSourceTransfer();return;}const selected=selectedStaged();bundle(selected);$('bundle-download').disabled=false;$('bundle-csv').disabled=!selected.some(c=>c.category==='students');$('handoff-transfer').disabled=!window.n36HandoffSource?.()||!selected.some(c=>c.category==='students');}catch(e){$('bundle-review').checked=false;message(`غير محسوم (${e.message}). لا يمكن تصدير الحزمة.`);}
 });
 $('handoff-transfer').addEventListener('click',async()=>{
- if($('handoff-transfer').disabled||!$('bundle-review').checked)return;
+ if($('handoff-transfer').disabled||(sourceRoster?!sourceTransferReady():!$('bundle-review').checked))return;
+ const view=sourceView,revision=exportRevision,sourceMode=!!sourceRoster;
  $('handoff-transfer').disabled=true;
  try {
   await window.n36BeforeExport?.();
-  if(!$('bundle-review').checked)throw Error('SOURCE_CHANGED');
+  if(sourceMode?(revision!==exportRevision||view!==sourceView||!sourceTransferReady()):!$('bundle-review').checked)throw Error('SOURCE_CHANGED');
   const source=window.n36HandoffSource?.();if(!source)throw Error('SOURCE_CHANGED');
-  const rows=sourceRoster?sourceBatch():selectedStaged().find(c=>c.category==='students')?.rows;
+  const rows=sourceMode?view.rows:selectedStaged().find(c=>c.category==='students')?.rows;
   const createdAt=Date.now();
   const envelope=validateHandoff({schema:'rakeez-extension-names',version:1,...source,createdAt,expiresAt:createdAt+HANDOFF_TTL,rows});
+  if(sourceMode){$('source-class-select').disabled=true;$('partial-approval').disabled=true;}
   const result=await chrome.runtime.sendMessage({type:'n36-create',envelope});
+  // Cancellation/expiry already queued transport erasure; a late reply cannot revive its UI.
+  if(sourceMode&&(revision!==exportRevision||view!==sourceView||!window.n36HandoffSource?.()))return;
   if(!result?.ok)throw Error('HANDOFF_UNAVAILABLE');
   window.dispatchEvent(new Event('n36:exported'));
   if(sourceRoster){pendingBatch={actionId:result.actionId,classroom:chosenClass,count:rows.length};invalidateExport();$('source-class-select').disabled=true;$('source-retry').hidden=false;}
   $('direct-handoff').hidden=false;
   $('handoff-status').textContent='فُتح ركيز في المتصفح نفسه. اختر فصلًا مملوكًا وراجع ثم أكّد؛ لم تُحفظ أسماء تلقائيًا. النقل لمرة واحدة ولمدة دقيقتين.';
- } catch { invalidateExport();$('direct-handoff').hidden=false;$('handoff-status').textContent='تعذّر النقل أو تغيّر المصدر. أعد المراجعة؛ يمكنك استخدام الملفات ضمن الخيارات المتقدمة.'; }
+ } catch { if(sourceMode&&(!sourceRoster||view.roster!==sourceRoster))return;if(sourceMode){$('source-class-select').disabled=false;$('partial-approval').disabled=false;}invalidateExport();$('direct-handoff').hidden=false;$('handoff-status').textContent='تعذّر النقل أو تغيّر المصدر. أعد المراجعة؛ يمكنك استخدام الملفات ضمن الخيارات المتقدمة.'; }
 });
 $('handoff-cancel').addEventListener('click',()=>{chrome.runtime.sendMessage({type:'n36-cancel'});$('bundle-clear').click();$('direct-handoff').hidden=false;$('handoff-status').textContent='مُسحت البيانات وأُلغي أي نقل معلّق.';});
 $('bundle-download').addEventListener('click',async()=>{
@@ -137,7 +149,7 @@ $('bundle-csv').addEventListener('click',async()=>{
  }catch(e){invalidateExport();message(`تعذّر تصدير الأسماء (${/^[A-Z_]+$/.test(e.message)?e.message:'SOURCE_CHANGED'}). لا ملف.`);}
 });
 window.addEventListener('n36:preview',({detail})=>{clearDraft();staged=bundle(detail).categories;renderStaged();const hasStudents=staged.some(c=>c.category==='students'&&c.rows.length);$('legacy-tools').open=hasStudents;$('legacy-tools').querySelector('summary').textContent=hasStudents?'معاينة البيانات ومراجعتها قبل النقل':'تفاصيل البيانات الأخرى (اختياري)';$('structured-category').hidden=false;$('legacy-names').hidden=true;});
-window.addEventListener('n36:clear',({detail})=>{if(!detail?.continuing)classTotals.clear();sourceRoster=null;sourceInfo=null;pendingBatch=null;batchProgress.clear();chosenClass='';const approval=$('bundle-review').closest('label');$('staged-categories').after(approval);$('source-class-review')?.remove();clearDraft();staged=[];renderStaged();$('table').value='';$('category-table').value='';$('cancel').click();});
+window.addEventListener('n36:clear',({detail})=>{if(!detail?.continuing)classTotals.clear();if(sourceView){sourceView.roster=null;sourceView.rows.length=0;}sourceView=null;$('bundle-review').closest('label').hidden=false;sourceRoster=null;sourceInfo=null;pendingBatch=null;batchProgress.clear();chosenClass='';const approval=$('bundle-review').closest('label');$('staged-categories').after(approval);$('source-class-review')?.remove();clearDraft();staged=[];renderStaged();$('table').value='';$('category-table').value='';$('cancel').click();});
 
 // AI: only one reviewed transport batch materializes; receipt, never send/claim, advances it.
 function renderSourceChoice(){
@@ -147,10 +159,13 @@ function renderSourceChoice(){
  const totals=classTotals.get(chosenClass)??{collected:0,added:0,existing:0};
  const count=sourceRoster.filter(r=>r.classroom===chosenClass).length;
  const rows=chosenClass&&progress.offset<count?sourceBatch():[];names.hidden=!rows.length;
+ if($('partial-approval'))$('partial-approval').disabled=!!pendingBatch;
+ sourceView={roster:sourceRoster,classroom:chosenClass,offset:progress.offset,rows};
  for(const row of rows){const li=document.createElement('li');li.textContent=row.name;names.append(li);}
- status.textContent=chosenClass?`${chosenClass}: ${count} اسمًا جُمع؛ ${count-progress.offset} بانتظار المراجعة. الدفعة ${rows.length}؛ أضيف محليًا ${totals.added}، موجود سابقًا ${totals.existing}.`:`اختر فصلًا لمراجعة أسماء الدفعة؛ لا حفظ تلقائي.`;
+ status.textContent=chosenClass?`${rows.length} اسمًا للمراجعة${count>300?' — من أصل '+count+' في الفصل':''}${totals.added||totals.existing?'؛ أضيف محليًا '+totals.added+'، موجود سابقًا '+totals.existing:''}.`:'اختر الفصل لعرض أسمائه.';
  $('bundle-review').disabled=!rows.length||!!pendingBatch;
- $('handoff-transfer').textContent=sourceInfo.complete?'نقل الدفعة للمراجعة في ركيز':'استيراد المتاح فقط';
+ $('handoff-transfer').textContent='راجعت الأسماء — نقل الفصل إلى ركيز';
+ refreshSourceTransfer();
 }
 window.addEventListener('n36:source-roster',({detail})=>{
  if(!detail.continuing)classTotals.clear();
@@ -158,20 +173,20 @@ window.addEventListener('n36:source-roster',({detail})=>{
  clearDraft();staged=[];sourceInfo=detail;sourceRoster=detail.rows;chosenClass='';pendingBatch=null;batchProgress.clear();renderStaged();
  $('source-class-review')?.remove();
  const section=document.createElement('section');section.id='source-class-review';
- const label=document.createElement('label');label.textContent='اختر فصل المصدر والدفعة (حتى 300 اسم لكل عملية؛ دون حد إجمالي)';
+ const label=document.createElement('label');label.textContent='اختر الفصل';
  const select=document.createElement('select');select.id='source-class-select';
  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='اختر فصلًا ثم راجع أسماء الدفعة';select.append(placeholder);
  for(const group of sourceClasses(sourceRoster)){const option=document.createElement('option');option.value=group.classroom;option.textContent=`${group.classroom}: ${group.count} اسمًا متاحًا في الكشف`;select.append(option);}
- const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=coverageMessage(detail);
+ const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=detail.complete?'':coverageMessage(detail);
  const partial=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.id='partial-approval';partial.append(check,document.createTextNode(' أفهم أن الكشف ناقص أو غير معلوم الاكتمال وأوافق على استيراد المتاح فقط'));partial.hidden=detail.complete;
- check.addEventListener('change',invalidateExport);
+ check.addEventListener('change',()=>{invalidateExport();refreshSourceTransfer();});
  const status=document.createElement('p');status.id='source-class-status';
  const names=document.createElement('ol');names.id='source-class-names';
  select.addEventListener('change',()=>{chosenClass=select.value;check.checked=false;renderSourceChoice();});
  const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent='إعادة مراجعة الدفعة نفسها (لا تجاوز دون إيصال)';
  retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();$('handoff-status').textContent='لم يُفترض نجاح الدفعة السابقة. أعد النقل والمطابقة؛ يفحص ركيز الأسماء الموجودة قبل أي تأكيد جديد.';});
- const approval=$('bundle-review').closest('label');approval.lastChild.textContent=' راجعت أسماء هذه الدفعة والفصل؛ سأطابقه بفصل مملوك لي وأؤكد داخل ركيز';
- const summary=document.createElement('p');summary.id='source-class-summary';summary.textContent=`${sourceRoster.length} اسمًا في ${sourceClasses(sourceRoster).length} فصول؛ ${detail.processedReportPages} صفحات؛ ${detail.complete?'نهاية مثبتة':detail.coverage==='partial'?'تغطية جزئية':'اكتمال غير معلوم'}.`;label.append(select);section.append(summary,label,coverage,partial,status,names,approval,retry);$('direct-handoff').before(section);$('direct-handoff').hidden=false;
+ const approval=$('bundle-review').closest('label');approval.hidden=true;approval.lastChild.textContent=' راجعت أسماء هذه الدفعة والفصل؛ سأطابقه بفصل مملوك لي وأؤكد داخل ركيز';
+ const summary=document.createElement('p');summary.id='source-class-summary';summary.textContent=`جُمعت ${sourceRoster.length} أسماء / ${sourceClasses(sourceRoster).length} فصول`;label.append(select);section.append(summary,coverage,label,status,names,partial,approval,retry);$('direct-handoff').before(section);$('direct-handoff').hidden=false;
  $('legacy-tools').open=false;renderSourceChoice();
 });
 setInterval(async()=>{
