@@ -1,0 +1,45 @@
+{
+  "taskId": "continuous-n88-postgres-service-repository-20261017",
+  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+  "observedOriginMain": "197a1750ab1e7da57906a68886449a9de32669f8",
+  "observedAt": "2026-10-17T14:36:11.827Z",
+  "checks": [
+    {
+      "name": "scoped_node_syntax",
+      "status": "PASS",
+      "evidence": "node --check: repository, runner, case fixture"
+    },
+    {
+      "name": "unchanged_current_service_schema_and_prior_proof_bindings",
+      "status": "PASS",
+      "evidence": "Seven normalized-LF SHA256 bindings match worktree, activated base and freshly fetched origin main; prior native result PASS and final policy browser checks PASS. Reused proofs do not certify new repository."
+    },
+    {
+      "name": "inactive_scope",
+      "status": "PASS",
+      "evidence": "No changes under src/public/sw.js/index.html/scripts/supabase; no new runtime import references."
+    },
+    {
+      "name": "no_owned_runtime_started",
+      "status": "PASS",
+      "evidence": "Exclusive directory contains only owner.json; data directory absent; lease failed before bind/initdb/connect. No alternate execution host or retry."
+    },
+    {
+      "name": "staged_allowed_scope_and_whitespace",
+      "status": "PASS",
+      "evidence": "Eight explicitly staged files match activated allowedPaths; git diff --cached --check passed. Ownership artifact retained untracked."
+    }
+  ],
+  "bindings": {
+    "drafts/n88-student-portal/service.mjs": "71b57c93802a7f5bd1c83bb914ec95e69c029ef4df4bcfd0f5ab2e87dfacae74",
+    "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+    "drafts/n88-student-portal/schema-proposal.sql": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+    "tests/n88-native-postgres-qualification.result.json": "2cd2ef799d2e074c291b58f9bac0f22a473deeeebc469b8b4b6f02959780ea59",
+    "tests/n88-real-pilot.test.mjs": "3fa9cfc6fa158fa349869b5ac2077332a3ce40c87c1ffcf2245861c46f5e650c",
+    "tests/n88-real-pilot-final-policy-browser.json": "8d4dda1553367432e94df723437e0875ee66b8af62d0ab697dfa5b411c4572ed",
+    "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md": "d3a347f57a086858f986ce1f0bde40c663fe697002d31a5d8f2fb8f192c0c796"
+  },
+  "qualifiedSql": false,
+  "originalDenial": "tests/n88-postgres-service-repository.lease-policy-denial.json"
+}

@@ -1,0 +1,73 @@
+{
+  "taskId": "continuous-n88-postgres-service-repository-20261017",
+  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+  "startedAt": "2026-10-17T14:32:27.999Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165\\data",
+  "checks": [
+    {
+      "name": "owned_cleanup_and_inactive_limits",
+      "status": "FAIL",
+      "evidence": {
+        "stopped": false,
+        "integrationLeaseReleased": false,
+        "noBrowserOrAppChanges": true,
+        "hostedAuth": "NOT_RUN",
+        "canonicalMembershipResolver": "NOT_RUN",
+        "ingress": "NOT_RUN",
+        "hosting": "NOT_RUN",
+        "keyCustody": "NOT_RUN",
+        "studentAccess": "NOT_RUN"
+      }
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": false
+  },
+  "failure": {
+    "name": "Error",
+    "code": null,
+    "message": "Harness/repository operation failed (details redacted)",
+    "location": "at command (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-postgres-service-repository-20261017/tests/n88-postgres-service-repository.mjs:23:50)"
+  },
+  "sourceHashes": {
+    "drafts/n88-student-portal/postgres-repository.mjs": "610a0234ffe5981b5bec106df1df7bed7fab26a657865708ae8e358021934b89",
+    "drafts/n88-student-portal/postgres-repository-schema.sql": "23dd853d712c85630aa242a0f187c85d366f5a3db2634eddb0a03e9819534697",
+    "tests/n88-postgres-service-repository.mjs": "78b3e9ed45ed381bda90ab035f014ab427c56568aadb59f5a3a31743cc0b0bb0",
+    "tests/fixtures/n88-postgres-service-repository/cases.mjs": "4312b8e81daa0e2fd9c1b0b0fb8b30dc3d555a0b33248eaae99bc468609c06e8"
+  },
+  "requiredChecks": [
+    {
+      "name": "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
+      "status": "NOT_RUN",
+      "dependencies": [
+        "actual_service_issue_claim_read_publish_rotate_revoke_and_projection"
+      ]
+    },
+    {
+      "name": "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
+      "status": "NOT_RUN",
+      "dependencies": [
+        "two_independent_pools_actual_advisory_wait_collision_and_unique_credentials",
+        "actual_global_source_context_failure_debits_and_mixed_concurrent_limits",
+        "actual_owner_entry_namespace_session_version_and_membership_guards",
+        "actual_term_transition_and_login_rotate_revoke_serialization",
+        "async_callback_deadline_detachment_acquisition_flush_rollback_commit_faults",
+        "new_pool_service_after_controlled_stop_restart_persistence"
+      ]
+    },
+    {
+      "name": "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits",
+      "status": "FAIL",
+      "dependencies": [
+        "bounded_snapshot_strict_mapping_retention_and_inactive_bindings",
+        "owned_cleanup_and_inactive_limits"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-17T14:32:28.442Z",
+  "status": "FAIL"
+}
