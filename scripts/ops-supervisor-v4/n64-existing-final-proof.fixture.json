@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-17T22:55:26.312Z",
+  "pendingTask": "continuous-n64-final-integrated-email-journey-20261018",
+  "verifiedTask": "continuous-n64-pending-server-status-check-20261017",
+  "publication": "197a1750ab1e7da57906a68886449a9de32669f8",
+  "verifiedAt": "2026-10-17T14:33:11.966Z",
+  "runtime": [
+    {
+      "path": "src/lib/cloud.js",
+      "verifiedBlob": "f88450d7109f8bdfc6d500f108edb7d7616e6bc9",
+      "currentBlob": "f88450d7109f8bdfc6d500f108edb7d7616e6bc9"
+    },
+    {
+      "path": "src/views/settings.js",
+      "verifiedBlob": "df3280873d94dc9f28b97d8e0d2d9b99e808fa65",
+      "currentBlob": "df3280873d94dc9f28b97d8e0d2d9b99e808fa65"
+    }
+  ],
+  "existingActualIntegratedProof": "tests/n64-pending-status-browser.mjs + tests/n64-pending-status-evidence.json",
+  "verificationImplementationReplaced": false,
+  "networkOnlyFabricated": true,
+  "checks": [
+    {
+      "name": "n64_pending_manual_and_focus_server_check_fresh_completion_without_callback_handling",
+      "status": "PASS",
+      "evidence": "Actual application at 1280/320: manual and visibility checks retain pending; focus and manual fresh GET completion update email in the original document. Evidence: tests/n64-pending-status-evidence.json."
+    },
+    {
+      "name": "n64_pending_failure_owner_cooldown_dialog_and_real_responsive_ui",
+      "status": "PASS",
+      "evidence": "Both widths: dialog guidance/Close, failure retry, busy/disabled controls, request joining, cooldown, owner rejection, no-session neutrality and listener cleanup passed. Zero added fanout versus existing app listeners. Screenshots inspected; syntax and diff checks passed; owned browser/server closed. Initial failures preserved."
+    }
+  ],
+  "priorLivenessProof": "tests/n64-bounded-verification-evidence.json",
+  "reason": "Existing published actual cloud/settings integrated provider-firstpending/secondcomplete manual/focus, owner switch and same-account guard already passed. No affected runtime change since. Avoid another duplicate verification worker; preserve real user email trial NOT_RUN and older true resend/cancel/denials unresolved."
+}

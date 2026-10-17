@@ -1,0 +1,600 @@
+{
+  "at": "2026-10-17T22:56:16.759Z",
+  "task": {
+    "activationId": "po-20261012-continuous",
+    "riskClass": "SENSITIVE",
+    "validationTier": "SENSITIVE",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "id": "continuous-n36-final-receiver-journey-20261018",
+    "productId": "N36",
+    "priority": -510,
+    "scopeKey": "n36-final-extension-to-receiver-journey",
+    "dependsOn": [
+      "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017"
+    ],
+    "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N36 .11 extracted actual303names/10classes/7pages and user confirmed count. Remaining useful work is COMPLETE transfer-to-persisted-receiver journey, not more collection heuristics. Inspect exact shipped extension protocol/background/review and actual app Koshoof receiver/create-or-existing-class path. Produce and run ONE real application synthetic end-to-end journey from actual extension controller selected-class payload through real handoff receiver, owner-scoped class selection/creation, explicit confirmation and normal Sync ACK/receipt; fabricate only source rosters/network/Chrome APIs, do not replace Product engines. 303 fabricated names with the user-reported10class counts, ascending class order; process all required selected class/batches (300 is per transfer, not total), ensure no dropped/unselected names, no automatic save, real acknowledged receipt each operation, resume/TTL/duplicate/owner change/partial coverage safe. Use existing isolated-loopback helper, never refused real Chrome actions. Reuse unchanged extraction/package/module proof. Fix concrete receiver/extension defects found in same worker; concise usable UI no extra technical text. Native action-popup/original Chrome module error remain NOT_RUN unless genuinely reproduced using permitted isolated technique, never infer from HTTP/run-tab. Top diagnostics button already exists, do not redo it. Check deterministic .11 package/current stable updater read-only; no personal Chrome reload or manual duplicate update. Only if extension code changes, increment patch once, build/verify packaged linked files and let existing verified-minute updater sync after publisher receipt. Keep N107 accepted copy/layout intact except a proven receiver defect. Deliver concise final user path plus machine receipt/evidence; source-code/test readiness and actual personal-account final save are separate. No fake total-complete/parser hardcode303.\nMATERIAL HARNESS REPAIR: prior run correctly stopped HANDOFF_UNAVAILABLE because strict Product origin https://rakeezx.com differs from task-owned loopback. This is a local fixture mismatch, not Product defect or tool rejection. Canonical helper now supports ONLY this exact N36 task + source-authorized syntheticAppOrigin=https://rakeezx.com. Call withIsolatedLocalBrowser({same taskFile,CURRENT runId,url:OWNEDloopbackbase,syntheticAppOrigin:\"https://rakeezx.com\",...},check), navigate fresh owned headless context to https://rakeezx.com/. Helper fulfills that visual origin exclusively from local GET/HEAD bytes, strict source origin, no redirects/credentials, bounded reads, externalHTTP abort, WebSockets/SW blocked, DNS failclosed. Product origin checks stay byte-unchanged. Original real browser/portal refusal stays binding: NO actual remote requests, Madrasati/Noor/Chromeprofile/MV3 invocation or personal tabs. Reuse actual extension-controller/worker VM fabricatedChrome transport plus actual app fixture/network only. This is a fabricated origin facade for actual JS origin guard, not deployed/nativeChrome proof. Preserve original BLOCKED evidence as initial; resume SAME saved session/candidate using CURRENT runId, run missing actual receiver/normalACK save and negative guards once, fix only observed Product defects. No repeated extraction/package checks unchanged. Required check names unchanged. No helper override or remote route fallback if failure. Original publisher delivers real fixes; native popup/error and real account save remain NOT_RUN.",
+    "allowedPaths": [
+      "src/lib/n36-extension-handoff.js",
+      "src/lib/n36-extension-protocol.js",
+      "src/lib/class-koshoof-bundle.js",
+      "tools/teacher-import-helper/**",
+      "tools/extensions/**",
+      "extensions/**",
+      "public/assets/extensions/**",
+      "assets/extensions/**",
+      "scripts/build-teacher-import-helper.mjs",
+      "sw.js",
+      "tests/n36-final-journey*.mjs",
+      "tests/n36-final-journey*.json",
+      "tests/fixtures/n36-final-journey/**",
+      "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+      "src/lib/teacher-setup-import.js",
+      "src/views/teacher-setup-import.js",
+      "src/styles/teacher-setup-import.css",
+      "src/views/class-import-center.js"
+    ],
+    "verificationPaths": [
+      "src/lib/n36-extension-handoff.js",
+      "src/lib/n36-extension-protocol.js",
+      "sw.js",
+      "src/views/class-import-center.js",
+      "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md"
+    ],
+    "requiredChecks": [
+      "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+      "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards"
+    ],
+    "acceptance": [
+      "Actual shipped Product engines complete full fabricated303/10class transfer/explicit save/normal acknowledgement with no loss or total cap.",
+      "Only observed changed behavior patched, focused negative guards pass; no real school/account mutation or native-popup proof fabricated."
+    ],
+    "releaseAuthority": "Latest PO18Oct01:04 explicitly finishes N36; existing delegated extension/client receiver fixes and package delivery authorized through sole publisher. Actual personal account/school actions and denied browser operations excluded. If the actual final journey finds no Product defect, source-only inert proof/test publication is authorized; do not invent a Product fix or claim an unobserved live account save.",
+    "approvedNote": {
+      "productId": "N36",
+      "source": "n36-final-receiver-journey-20261018.json",
+      "sha256": "1da3a651412121320a99d3e77a2f2f8d9f7e5cb387f198abe806c648d1ce94cc"
+    },
+    "workflowVersion": 5,
+    "status": "blocked",
+    "implementationFailures": 0,
+    "infrastructureRetries": 0,
+    "createdAt": "2026-10-17T22:10:44.076Z",
+    "updatedAt": "2026-10-17T22:40:31.342Z",
+    "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018",
+    "worktreePrepared": true,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018",
+    "attempt": {
+      "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+      "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\attempt.json",
+      "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\result.json",
+      "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\events.jsonl",
+      "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\stderr.txt",
+      "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\checkpoint.json",
+      "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\wrapper.stdout.txt",
+      "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\wrapper.stderr.txt",
+      "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\wrapper-launch.json",
+      "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\broker.stdout.txt",
+      "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\broker.stderr.txt",
+      "startedAt": "2026-10-17T22:32:55.128Z"
+    },
+    "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-final-receiver-journey-20261018\\006e830c-a452-47e6-8a89-358ca35024b8\\result.json",
+    "runnerPid": null,
+    "runnerCreatedAt": null,
+    "brokerPid": null,
+    "brokerCreatedAt": null,
+    "probingClass": null,
+    "retryAt": null,
+    "lastModelError": null,
+    "ownedProcesses": [],
+    "watchdogIncident": null,
+    "eventLogIssue": null,
+    "checkpointIssue": null,
+    "wrapperExit": null,
+    "lastProgressScanAt": "2026-10-17T22:39:08.792Z",
+    "lastFileProgressAt": "2026-10-17T22:39:09.009Z",
+    "lastEventAt": "2026-10-17T22:39:11.220Z",
+    "progressFingerprint": "886d03df2eb1b0623c90c3049c717971b525c9d2c77282528fe2787c0baee492",
+    "productRecordKey": "po-20261012-continuous:blocked:c69cbaa7d250250436a3fd573a59a5fd4883a185:55bc032b49cea2a27e38c97170b870de64098b0a:Publisher returned incomplete or mismatched deployment proof",
+    "sessionId": "01a14bea-f66b-7710-b245-b5f8d4294d7d",
+    "heartbeatAt": "2026-10-17T22:39:07.1529318Z",
+    "lastTurnCompletedAt": "2026-10-17T22:39:15.147Z",
+    "lastWorkerReap": {
+      "activationId": "po-20261012-continuous",
+      "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+      "verifiedAbsentAt": "2026-10-17T22:39:15.147Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 14088,
+          "createdAt": "2026-10-17T22:32:55.1359440Z"
+        },
+        {
+          "pid": 32808,
+          "createdAt": "2026-10-17T22:32:55.2229080Z"
+        },
+        {
+          "pid": 27644,
+          "createdAt": "2026-10-17T22:32:56.0310810Z"
+        },
+        {
+          "pid": 26892,
+          "createdAt": "2026-10-17T22:32:55.2402800Z",
+          "name": "conhost.exe",
+          "parentPid": 32808,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 20716,
+          "createdAt": "2026-10-17T22:32:56.0387600Z",
+          "name": "conhost.exe",
+          "parentPid": 27644,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 31916,
+          "createdAt": "2026-10-17T22:32:56.5203910Z",
+          "name": "node_repl.exe",
+          "parentPid": 27644,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 21608,
+          "createdAt": "2026-10-17T22:32:56.5275680Z",
+          "name": "node.exe",
+          "parentPid": 27644,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 8024,
+          "createdAt": "2026-10-17T22:32:56.5294930Z",
+          "name": "conhost.exe",
+          "parentPid": 31916,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 6088,
+          "createdAt": "2026-10-17T22:32:56.5364700Z",
+          "name": "conhost.exe",
+          "parentPid": 21608,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 23664,
+          "createdAt": "2026-10-17T22:32:56.6578240Z",
+          "name": "node_repl.exe",
+          "parentPid": 21608,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 32596,
+          "createdAt": "2026-10-17T22:33:05.0378650Z",
+          "name": "codex-code-mode-host.exe",
+          "parentPid": 27644,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        },
+        {
+          "pid": 25016,
+          "createdAt": "2026-10-17T22:33:05.0479220Z",
+          "name": "conhost.exe",
+          "parentPid": 32596,
+          "observedAt": "2026-10-17T22:39:08.792Z"
+        }
+      ]
+    },
+    "failureClass": "environment",
+    "lastFailure": "Publisher returned incomplete or mismatched deployment proof",
+    "lastFailureAt": "2026-10-17T22:14:49.267Z",
+    "syntheticBrowserFixtureOrigin": "https://rakeezx.com",
+    "harnessRepair": {
+      "kind": "strict-local-byte-synthetic-app-origin",
+      "previousResultSha256": "1860fb90f8b62292e0e1cbb73dd6ef14bebce25394a4e08197fb1f6a30836c97",
+      "previousHelperSha256": "c054944ce4da586a0db31aa3502449b680d020b4088bd690e0e6f3d8558698dc",
+      "reason": "Strict Product app origin was incompatible with loopback-only context; a local-byte facade proves the receiver without weakening Product origin or enabling remote network."
+    },
+    "preparationAuthority": {
+      "kind": "existing-PO-final-journey-inactive-proof",
+      "publication": true,
+      "publicationScope": "inert inactive synthetic journey source and evidence only when no Product code changes",
+      "realData": false,
+      "hostedSchemaChange": false,
+      "AuthRLSChange": false,
+      "realSend": false
+    },
+    "candidateSha": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+    "nextDeliveryAt": "2026-10-17T22:40:06.597Z",
+    "recoveryHistory": [
+      {
+        "at": "2026-10-17T22:32:47.965Z",
+        "commit": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+        "kind": "reviewed-material-maintenance",
+        "reason": "Strict Product app origin was incompatible with loopback-only context; a local-byte facade proves the receiver without weakening Product origin or enabling remote network.",
+        "previousRunId": "7f8c82ff-b9cc-4fd1-969e-fc45c94caf5f",
+        "sessionId": "01a14bea-f66b-7710-b245-b5f8d4294d7d",
+        "preservedCandidateSha": "0fc763d349038222876ec71b2b2954c8a6b272af",
+        "previousQueuedCandidateSha": null,
+        "previousQueuedBaseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+        "preservedResultBaseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+        "previousFailure": "The required loopback-only helper cannot provide https://rakeezx.com, which the actual app transport, extension worker and manifest require. The real application rejected the first transfer.",
+        "previousImplementationFailures": 0,
+        "previousInfrastructureRetries": 0
+      }
+    ],
+    "validationReceipt": {
+      "taskId": "continuous-n36-final-receiver-journey-20261018",
+      "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+      "state": "LOCAL_READY",
+      "candidateSha": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+      "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018",
+      "changedPaths": [
+        "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+        "tests/fixtures/n36-final-journey/account.mjs",
+        "tests/n36-final-journey-browser.json",
+        "tests/n36-final-journey-browser.mjs",
+        "tests/n36-final-journey-evidence.json",
+        "tests/n36-final-journey-evidence.mjs",
+        "tests/n36-final-journey-resumed.json",
+        "tests/n36-final-journey-resumed.mjs"
+      ],
+      "checks": [
+        {
+          "name": "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+          "status": "PASS",
+          "evidence": "Actual controller, worker, receiver UI, store and Sync engine completed 303 synthetic students across ten existing owned classes. Reconciled 606 canonical network-fixture ACKs; Outbox empty; exact names/memberships matched; other stores unchanged. Evidence: tests/n36-final-journey-resumed.json."
+        },
+        {
+          "name": "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards",
+          "status": "PASS",
+          "evidence": "Owner change and TTL erased previews without writes; duplicate, expired, replay and wrong-tab claims rejected. Partial approval required per class. Lost-outcome retry returned existing names without duplicate writes. Unchanged 0.5.11 package proof reused."
+        },
+        {
+          "name": "source_evidence_and_syntax",
+          "status": "PASS",
+          "evidence": "Affected Product sources identical to observed origin/main faa3cd5c32895148d5220ec9b34dd3f07a82cb5e. Original BLOCKED evidence and corrected harness failures preserved. Scoped syntax and staged diff checks passed; worktree clean."
+        },
+        {
+          "name": "native_popup_and_personal_account_save",
+          "status": "NOT_RUN",
+          "evidence": "Synthetic HTTPS facade and worker VM provide no native Chrome or personal-account save proof."
+        }
+      ],
+      "summary": "اكتملت الرحلة الاصطناعية: 303 طلاب، 10 فصول، و606 إيصالات Sync. المرشح اختبارات وأدلة فقط؛ كود المنتج unchanged. الموارد أُغلقت، ولم يُنفّذ push أو نشر.",
+      "blockerType": "none",
+      "blocker": null,
+      "nextAction": "Independent controller/publisher delivers the authorized inert candidate and records delivery evidence.",
+      "hostValidatedAt": "2026-10-17T22:39:15.422Z",
+      "baseAdvance": null
+    },
+    "deliveryQueuedAt": "2026-10-17T22:39:15.422Z",
+    "deliveryOwner": {
+      "pid": 26340,
+      "instanceId": "33e093c7-96a5-4db3-b243-944ce9b8f8c9",
+      "createdAt": "2026-10-17T01:04:00.9437030Z"
+    },
+    "deliveryStartedAt": "2026-10-17T22:39:15.836Z",
+    "deliveryReceipt": {
+      "version": 1,
+      "ticketId": "N36",
+      "taskId": "continuous-n36-final-receiver-journey-20261018",
+      "candidateSha": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+      "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "publishedSha": "55bc032b49cea2a27e38c97170b870de64098b0a",
+      "productionUrl": "https://rakeezx.com",
+      "at": "2026-10-17T22:40:22.975Z",
+      "status": "deployed",
+      "retryable": false,
+      "state": "DEPLOYED_AWAITING_PO",
+      "productionDeployed": true,
+      "verifiedAt": "2026-10-17T22:40:22.975Z",
+      "repository": "RakeezX/RakeezX",
+      "targetBranch": "main",
+      "deploymentId": "02a0ed04-3398-4179-8ccb-ddcaeb1420fc",
+      "previewUrl": "https://02a0ed04.rakeezx.pages.dev",
+      "providerStatus": "SUCCESS",
+      "provider": {
+        "checkRunId": "117523129984",
+        "headSha": "55bc032b49cea2a27e38c97170b870de64098b0a",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-17T22:39:54Z",
+        "completedAt": "2026-10-17T22:39:54Z",
+        "headBranch": null,
+        "deploymentId": "02a0ed04-3398-4179-8ccb-ddcaeb1420fc",
+        "previewUrl": "https://02a0ed04.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/02a0ed04-3398-4179-8ccb-ddcaeb1420fc"
+      },
+      "currentMainSha": "55bc032b49cea2a27e38c97170b870de64098b0a",
+      "binding": {
+        "candidateSha": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+        "declaredBaseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+        "mainAtPreparation": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+        "integrationSha": "f5be7cc1d50a7677558db6559e59611b7fdc46d8",
+        "publishedSha": "55bc032b49cea2a27e38c97170b870de64098b0a",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "merge"
+      },
+      "build": {
+        "status": "passed",
+        "startedAt": "2026-10-17T22:39:23.662Z",
+        "completedAt": "2026-10-17T22:39:27.169Z",
+        "integrationSha": "f5be7cc1d50a7677558db6559e59611b7fdc46d8",
+        "publishedSha": "55bc032b49cea2a27e38c97170b870de64098b0a",
+        "kind": "standard-build",
+        "validationTier": "STANDARD",
+        "reusedVerifiedBuildSha": null,
+        "generatedPathsChanged": [
+          "src/generated/build-meta.generated.js"
+        ],
+        "commands": [
+          {
+            "command": "node.exe",
+            "args": [
+              "scripts/generate-build-meta.mjs"
+            ]
+          },
+          {
+            "command": "node.exe",
+            "args": [
+              "node_modules/vite/bin/vite.js",
+              "build"
+            ]
+          }
+        ]
+      },
+      "changedPaths": [
+        "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+        "tests/fixtures/n36-final-journey/account.mjs",
+        "tests/n36-final-journey-browser.json",
+        "tests/n36-final-journey-browser.mjs",
+        "tests/n36-final-journey-evidence.json",
+        "tests/n36-final-journey-evidence.mjs",
+        "tests/n36-final-journey-resumed.json",
+        "tests/n36-final-journey-resumed.mjs"
+      ],
+      "sourceOnlyPaths": [
+        "tests/fixtures/n36-final-journey/account.mjs",
+        "tests/n36-final-journey-browser.json",
+        "tests/n36-final-journey-browser.mjs",
+        "tests/n36-final-journey-evidence.json",
+        "tests/n36-final-journey-evidence.mjs",
+        "tests/n36-final-journey-resumed.json",
+        "tests/n36-final-journey-resumed.mjs"
+      ],
+      "changedAssets": [],
+      "productSourceChangeObserved": false,
+      "evidence": {
+        "immutable": {
+          "origin": "https://02a0ed04.rakeezx.pages.dev",
+          "checkedAt": "2026-10-17T22:40:18.497Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "bytes": 3952,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+              "observedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "0da0ded878f18dc9d52cb148d71e91e196c656dba9f59b6c6c4074cc6ad92955",
+              "observedSha256": "0da0ded878f18dc9d52cb148d71e91e196c656dba9f59b6c6c4074cc6ad92955",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/lib/n36-extension-handoff.js",
+              "urlPath": "src/lib/n36-extension-handoff.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+              "observedSha256": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+              "bytes": 1753,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/lib/n36-extension-protocol.js",
+              "urlPath": "src/lib/n36-extension-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "fa6d885852b0c7682ee104714ced08be1213bf2feb0543d59cb166b57e9732d8",
+              "observedSha256": "fa6d885852b0c7682ee104714ced08be1213bf2feb0543d59cb166b57e9732d8",
+              "bytes": 66125,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+              "urlPath": "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "d57c96b117ce9c16a5ffb53eebe2efc347ec6ba7d80967310d8aef3d611e2384",
+              "observedSha256": "d57c96b117ce9c16a5ffb53eebe2efc347ec6ba7d80967310d8aef3d611e2384",
+              "bytes": 6983,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        },
+        "production": {
+          "origin": "https://rakeezx.com",
+          "checkedAt": "2026-10-17T22:40:19.043Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "9d4d30066dd4415d4a3e15129f4eee263b7d58a558ebec68af5d45c1671f6969",
+              "bytes": 5257,
+              "deleted": false,
+              "verified": true,
+              "normalization": "cloudflare-observed-tail-v2",
+              "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "normalizedBytes": 3952,
+              "removedProviderBytes": 1305,
+              "removedSha256": "d9207aa6ce071b81a2148c0aad2603ab9f8a21f97232945dbebe5dfd2a866e9f",
+              "providerTransforms": [
+                "cloudflare-analytics-20261017",
+                "cloudflare-jsd-v1"
+              ]
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+              "observedSha256": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "0da0ded878f18dc9d52cb148d71e91e196c656dba9f59b6c6c4074cc6ad92955",
+              "observedSha256": "0da0ded878f18dc9d52cb148d71e91e196c656dba9f59b6c6c4074cc6ad92955",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/lib/n36-extension-handoff.js",
+              "urlPath": "src/lib/n36-extension-handoff.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+              "observedSha256": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+              "bytes": 1753,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/lib/n36-extension-protocol.js",
+              "urlPath": "src/lib/n36-extension-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "fa6d885852b0c7682ee104714ced08be1213bf2feb0543d59cb166b57e9732d8",
+              "observedSha256": "fa6d885852b0c7682ee104714ced08be1213bf2feb0543d59cb166b57e9732d8",
+              "bytes": 66125,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+              "urlPath": "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "d57c96b117ce9c16a5ffb53eebe2efc347ec6ba7d80967310d8aef3d611e2384",
+              "observedSha256": "d57c96b117ce9c16a5ffb53eebe2efc347ec6ba7d80967310d8aef3d611e2384",
+              "bytes": 6983,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        }
+      },
+      "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-final-receiver-journey-20261018\\integration-c69cbaa7d250-1-4d4ff481",
+      "pushRecovered": false,
+      "poPersonallyTested": false,
+      "closed": false
+    }
+  },
+  "result": {
+    "taskId": "continuous-n36-final-receiver-journey-20261018",
+    "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+    "state": "LOCAL_READY",
+    "candidateSha": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+    "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018",
+    "changedPaths": [
+      "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+      "tests/fixtures/n36-final-journey/account.mjs",
+      "tests/n36-final-journey-browser.json",
+      "tests/n36-final-journey-browser.mjs",
+      "tests/n36-final-journey-evidence.json",
+      "tests/n36-final-journey-evidence.mjs",
+      "tests/n36-final-journey-resumed.json",
+      "tests/n36-final-journey-resumed.mjs"
+    ],
+    "checks": [
+      {
+        "name": "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+        "status": "PASS",
+        "evidence": "Actual controller, worker, receiver UI, store and Sync engine completed 303 synthetic students across ten existing owned classes. Reconciled 606 canonical network-fixture ACKs; Outbox empty; exact names/memberships matched; other stores unchanged. Evidence: tests/n36-final-journey-resumed.json."
+      },
+      {
+        "name": "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards",
+        "status": "PASS",
+        "evidence": "Owner change and TTL erased previews without writes; duplicate, expired, replay and wrong-tab claims rejected. Partial approval required per class. Lost-outcome retry returned existing names without duplicate writes. Unchanged 0.5.11 package proof reused."
+      },
+      {
+        "name": "source_evidence_and_syntax",
+        "status": "PASS",
+        "evidence": "Affected Product sources identical to observed origin/main faa3cd5c32895148d5220ec9b34dd3f07a82cb5e. Original BLOCKED evidence and corrected harness failures preserved. Scoped syntax and staged diff checks passed; worktree clean."
+      },
+      {
+        "name": "native_popup_and_personal_account_save",
+        "status": "NOT_RUN",
+        "evidence": "Synthetic HTTPS facade and worker VM provide no native Chrome or personal-account save proof."
+      }
+    ],
+    "summary": "اكتملت الرحلة الاصطناعية: 303 طلاب، 10 فصول، و606 إيصالات Sync. المرشح اختبارات وأدلة فقط؛ كود المنتج unchanged. الموارد أُغلقت، ولم يُنفّذ push أو نشر.",
+    "blockerType": "none",
+    "blocker": null,
+    "nextAction": "Independent controller/publisher delivers the authorized inert candidate and records delivery evidence."
+  },
+  "why": "The exact original N36 inert test/evidence candidate already passed provider and all immutable/Production source hashes. The long-lived controller rejected its receipt, while current verifiedDeployment returns true. Retain required PASS and genuine native popup/personal account NOT_RUN. This bounded optional name is not a source/save PASS."
+}

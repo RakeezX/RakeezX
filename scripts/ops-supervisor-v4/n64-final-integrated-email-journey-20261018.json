@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "id": "continuous-n64-final-integrated-email-journey-20261018",
+      "productId": "N64",
+      "priority": -495,
+      "scopeKey": "n64-final-actual-cloud-settings-email-journey",
+      "dependsOn": [
+        "continuous-n64-pending-server-status-check-20261017",
+        "continuous-n36-final-receiver-journey-20261018"
+      ],
+      "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N64 client fixes already published0009e4e and197a175. Finish actual missing integrated acceptance between REAL cloud.js network/auth refresh/deadline and REAL settings UI, not another isolated mocked verify function or review pass. Read existing focused evidence and identify exact combined proof gap. Exercise existing app mounted settings + actual cloud auth code through fabricated provider HTTP only: request change, provider first-confirm pending, provider completed actualGET newemail, original-window manual/focus fresh read, rendered email/pendingclear; unchanged session/same owner/classes/data identity, hung body/sharedrefresh bounded deadline/retry, owner switch/stale completion no notification/storage/Sync amplification. Reuse unchanged focused20profile/40calls proofs; only run new combined cases necessary to catch integration, no real emails/accounts/tokens/callback URL. If existing final evidence ALREADY proves exact combined chain, return NO_CHANGE with precise evidence hashes, do not invent work or rewrite tests for same implementation. Fix a concrete allowed integrated settings/cloud defect if found; retain timeout/owner gates, no new auth flow/SDK. Older callback/token/redirect/resend/truecancel and denied doc operations are forbidden and stay accurately recorded; no bypass or “cancel” label for a no-op. Current provider standard confirmation operates outside client, do not recreate refused processing. Build final concise PO checklist from verified current code and real remaining facts, specify core full user test ready now versus denied optional/umbrella acceptance; do not declare real email trial passed. No docs at refused path. Return exact checks/real candidate or NO_CHANGE, not indefinitewaiting. Original publisher verifies permitted Product fixes. No additional Product scope, app/router/URL parsing/hosted configuration/storageintent/real send.\nREAD-ONLY FINAL PROOF REVIEW: existing published tests/n64-pending-status-browser.mjs already imports actual cloud.js and settings.js, fabricating ONLY fetch, not verifyCurrentAuthIdentity. First pending/second complete/manual/focus/owner/same-account cases already PASS, bounded fullchain proof reused. Gitblob identities of both current runtime modules exactly match197a175 Production. Therefore this never-started duplicate verification is superseded by exact verified delivery, no new worker/tests or fake PASS. Real PO two-email trial and genuine older denied resend/cancel remain notexecuted/unimplemented; umbrellaN64notCLOSED.",
+      "allowedPaths": [
+        "src/lib/cloud.js",
+        "src/views/settings.js",
+        "sw.js",
+        "tests/n64-final-integrated*.mjs",
+        "tests/n64-final-integrated*.json",
+        "tests/fixtures/n64-final-integrated/**",
+        "docs/automation-evidence/20261018/N64_FINAL_INTEGRATED_JOURNEY.md"
+      ],
+      "verificationPaths": [
+        "src/lib/cloud.js",
+        "src/views/settings.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n64_real_cloud_and_settings_combined_provider_confirmation_journey",
+        "n64_integrated_deadline_owner_identity_and_no_amplification"
+      ],
+      "acceptance": [
+        "Actual cloud+settings chain proved without replacing Product verification implementation, or exact unchanged existing proof bound and NO_CHANGE.",
+        "Allowed defects fixed; no real provider/mail trial or denied scope falsely completed."
+      ],
+      "releaseAuthority": "PO18Oct01:04 asks simplest immediatefinishN64; focused actual client integrated completion and permitted existing cloud/settings defect fixes plus solepublisher delivery authorized. No real send/providerAuthconfiguration/callback/token/denied operation.",
+      "completionMode": "superseded_by_verified_delivery",
+      "supersededBy": "continuous-n64-pending-server-status-check-20261017",
+      "supersedingPublishedSha": "197a1750ab1e7da57906a68886449a9de32669f8",
+      "supersessionReason": "Existing published actual cloud/settings integrated provider-firstpending/secondcomplete manual/focus, owner switch and same-account guard already passed. No affected runtime change since. Avoid another duplicate verification worker; preserve real user email trial NOT_RUN and older true resend/cancel/denials unresolved."
+    }
+  ]
+}
