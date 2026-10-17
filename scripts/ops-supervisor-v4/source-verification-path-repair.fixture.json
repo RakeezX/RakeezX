@@ -1,0 +1,375 @@
+{
+  "task": {
+    "activationId": "po-20261012-continuous",
+    "riskClass": "SENSITIVE",
+    "validationTier": "SENSITIVE",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "id": "continuous-n88-complete-runtime-binding-20261018",
+    "productId": "N88",
+    "priority": -500,
+    "scopeKey": "n88-runtime-http-authoritative-binding",
+    "dependsOn": [
+      "continuous-n88-postgres-service-repository-20261017"
+    ],
+    "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N88 actual service+PG repository passed and published71f7230 on17Oct17:43. Current user needs useful real page, not more pilot or SQL proofs. Implement concrete missing runtime HTTP/service assembly and authoritative canonical teacher/student membership/publication binding using CURRENT project server data contracts, with source-only inactive deployment artifact. Read service/PG repository, actual student page/client/teacher-controller, existing sync schema/server APIs before deciding mapping. Keep4randomdigits1000..9999 stable owner/student into second term until rotate/revoke. Implement trusted canonical adapter with exact owner/current-membership/revision/active class/student mapping and minimal published projection from real existing stores; do not invent a new identity from name, route, or client sent owner/class. Runtime teacher verification uses independently verified existing Auth user/current session, never decodedJWT/user_metadata; ingress from trusted socket/adapter only, no arbitrary forwarded headers. Supply actual HTTP adapter with bounded streaming/json/cookie/origin/private no-store/error/deadline handling around createPortalService+PG repository, durable transaction writer integration and fail-closed deployment preflight for missing authoritative sources/keys. No fixture/memory fallback in runtime. Keep4digit code behind existing private entry/context/guess budgets. Test ONE complete actualHTTP-service-adapter synthetic teacher issue/student login/current published view/teacher update/second-term persistence/rotate/revoke journey through real components; fabricate only identity/canonical datasource and network transport, clearly isolate synthetic adapter. Use current trusted lock/revision protocol; noncooperating authoritative writers must be named accurately. Reuse previous SQL/rate/9000/UI proofs, do not rerun them wholesale. Provide ready-to-review deploy config/environment names/private-log handling/exact bounded activation diff; no secrets or config values captured, no hosted apply/Auth/RLS, no real student access or sends. No new app/SW/student production page wiring until service prerequisite proven. If actual canonical store architecture lacks atomic authoritative read/write port, implement concrete adapter against known schema/protocol and explicit readback plan, do not claim guessed staleness solved. End with exact remaining hosted actions and final manual acceptance path. No broad review loop, no new expiring invitation concept.",
+    "allowedPaths": [
+      "drafts/n88-student-portal/**",
+      "tests/n88-runtime-binding*.mjs",
+      "tests/n88-runtime-binding*.json",
+      "tests/fixtures/n88-runtime-binding/**",
+      "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+    ],
+    "verificationPaths": [
+      "drafts/n88-student-portal/runtime-http.mjs",
+      "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+    ],
+    "requiredChecks": [
+      "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+      "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight"
+    ],
+    "acceptance": [
+      "Runtime HTTP and canonical mapping ports are concrete executable code tied to actual project schema, with full focused journey.",
+      "Stable4digit/current-student-only/rotate/revoke/owner/privacy remain intact, exact hosted prerequisite artifact supplied, no live readiness invented."
+    ],
+    "preparationAuthority": {
+      "kind": "PO-explicit-finish-N88",
+      "publication": true,
+      "publicationScope": "inert inactive student portal runtime composition and canonical adapter only",
+      "realData": false,
+      "hostedSchemaChange": false,
+      "AuthRLSChange": false,
+      "realSend": false,
+      "liveStudentAccessActivation": false
+    },
+    "releaseAuthority": "LatestPO18Oct01:04 explicitly asks finishN88; permits reversible runtime binding implementation, own fabricated local journey and originalpublisher source-only inactive release. Hosted schema/Auth/private student access activation and secrets remain separately bounded.",
+    "approvedNote": {
+      "productId": "N88",
+      "source": "n88-complete-runtime-binding-20261018.json",
+      "sha256": "69e5ce358396f2ec19fb0f0b4224bb53bd95803594f308f706c806eb309f01d5"
+    },
+    "workflowVersion": 5,
+    "status": "blocked",
+    "implementationFailures": 0,
+    "infrastructureRetries": 0,
+    "createdAt": "2026-10-17T22:10:44.094Z",
+    "updatedAt": "2026-10-17T22:21:16.353Z",
+    "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-complete-runtime-binding-20261018",
+    "worktreePrepared": true,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-complete-runtime-binding-20261018",
+    "attempt": {
+      "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+      "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\attempt.json",
+      "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\result.json",
+      "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\events.jsonl",
+      "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\stderr.txt",
+      "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\checkpoint.json",
+      "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\wrapper.stdout.txt",
+      "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\wrapper.stderr.txt",
+      "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\wrapper-launch.json",
+      "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\broker.stdout.txt",
+      "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\broker.stderr.txt",
+      "startedAt": "2026-10-17T22:11:02.125Z"
+    },
+    "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-complete-runtime-binding-20261018\\3813f899-434f-4b6f-b989-dd20fdbdb698\\result.json",
+    "runnerPid": null,
+    "runnerCreatedAt": null,
+    "brokerPid": null,
+    "brokerCreatedAt": null,
+    "probingClass": null,
+    "retryAt": null,
+    "lastModelError": null,
+    "ownedProcesses": [],
+    "watchdogIncident": null,
+    "eventLogIssue": null,
+    "checkpointIssue": null,
+    "wrapperExit": null,
+    "lastProgressScanAt": "2026-10-17T22:19:15.947Z",
+    "lastFileProgressAt": "2026-10-17T22:18:57.382Z",
+    "lastEventAt": "2026-10-17T22:19:30.375Z",
+    "progressFingerprint": "93aca2cdbeed3a932e511a256aabac4baa93d8bd9eb5f270d39168043a1d3dbc",
+    "productRecordKey": "po-20261012-continuous:blocked:51f2c62e53dd710cde755acba03b8d409794f43b:9251f326658728d7cb22073a6e4c46ee71f1ab35:VERIFICATION_ASSET_MISSING: Required source asset is missing: drafts/n88-student-portal/runtime-http.mjs",
+    "sessionId": "01a14beb-21c2-7cd0-b42d-ed8a4441c24f",
+    "heartbeatAt": "2026-10-17T22:19:28.3076157Z",
+    "lastTurnCompletedAt": "2026-10-17T22:19:35.096Z",
+    "lastWorkerReap": {
+      "activationId": "po-20261012-continuous",
+      "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+      "verifiedAbsentAt": "2026-10-17T22:19:35.096Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 25516,
+          "createdAt": "2026-10-17T22:11:02.1329950Z"
+        },
+        {
+          "pid": 30760,
+          "createdAt": "2026-10-17T22:11:02.2071660Z"
+        },
+        {
+          "pid": 11004,
+          "createdAt": "2026-10-17T22:11:02.9817350Z"
+        },
+        {
+          "pid": 6548,
+          "createdAt": "2026-10-17T22:11:02.2212970Z",
+          "name": "conhost.exe",
+          "parentPid": 30760,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 4240,
+          "createdAt": "2026-10-17T22:11:02.9889640Z",
+          "name": "conhost.exe",
+          "parentPid": 11004,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 9680,
+          "createdAt": "2026-10-17T22:11:03.5864960Z",
+          "name": "node_repl.exe",
+          "parentPid": 11004,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 24812,
+          "createdAt": "2026-10-17T22:11:03.5981970Z",
+          "name": "node.exe",
+          "parentPid": 11004,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 24132,
+          "createdAt": "2026-10-17T22:11:03.5993760Z",
+          "name": "conhost.exe",
+          "parentPid": 9680,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 14388,
+          "createdAt": "2026-10-17T22:11:03.6099660Z",
+          "name": "conhost.exe",
+          "parentPid": 24812,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 29392,
+          "createdAt": "2026-10-17T22:11:03.7677840Z",
+          "name": "node_repl.exe",
+          "parentPid": 24812,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 28232,
+          "createdAt": "2026-10-17T22:11:10.7566240Z",
+          "name": "codex-code-mode-host.exe",
+          "parentPid": 11004,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        },
+        {
+          "pid": 32856,
+          "createdAt": "2026-10-17T22:11:10.7640440Z",
+          "name": "conhost.exe",
+          "parentPid": 28232,
+          "observedAt": "2026-10-17T22:19:28.850Z"
+        }
+      ]
+    },
+    "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+    "validationReceipt": {
+      "taskId": "continuous-n88-complete-runtime-binding-20261018",
+      "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+      "state": "LOCAL_READY",
+      "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+      "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-complete-runtime-binding-20261018",
+      "changedPaths": [
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md",
+        "drafts/n88-student-portal/ACTIVATION.md",
+        "drafts/n88-student-portal/canonical-adapter.mjs",
+        "drafts/n88-student-portal/canonical-lock.inactive.sql",
+        "drafts/n88-student-portal/deployment.inactive.json",
+        "drafts/n88-student-portal/http-adapter.mjs",
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "drafts/n88-student-portal/readback.inactive.sql",
+        "drafts/n88-student-portal/runtime.mjs",
+        "tests/fixtures/n88-runtime-binding/.gitignore",
+        "tests/fixtures/n88-runtime-binding/canonical.sql",
+        "tests/fixtures/n88-runtime-binding/journey.mjs",
+        "tests/n88-runtime-binding.initial-failure.json",
+        "tests/n88-runtime-binding.mjs",
+        "tests/n88-runtime-binding.result.json",
+        "tests/n88-runtime-binding.transport-diagnostic.json"
+      ],
+      "checks": [
+        {
+          "name": "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+          "status": "PASS",
+          "evidence": "Actual HTTP/client/runtime/native PostgreSQL journey passed: issue, login, publication/update, same-code second-term persistence, rotate and revoke. tests/n88-runtime-binding.result.json"
+        },
+        {
+          "name": "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight",
+          "status": "PASS",
+          "evidence": "Owner/current-session, canonical lifecycle/revision, ambiguous membership, cookie, ingress/origin, source-loss, body/deadline/concurrency and activation guards passed. SHARE lock blocked a noncooperating writer."
+        },
+        {
+          "name": "affected_syntax_source_hashes_scope_and_cleanup",
+          "status": "PASS",
+          "evidence": "Six syntax checks, executed-source hashes and Git diff checks passed. Worktree clean; owned HTTP/PG stopped and integration lease released. Initial transport failure preserved."
+        },
+        {
+          "name": "hosted_service_auth_tls_and_student_activation",
+          "status": "NOT_RUN",
+          "evidence": "Inactive source only. No hosted SQL/Auth changes, deployment, real student access or app/SW wiring. Exact prerequisites and manual acceptance path recorded in ACTIVATION.md."
+        }
+      ],
+      "summary": "Committed AI-labelled inactive HTTP/runtime and canonical PG binding. Focused synthetic journey passed; no push or deployment.",
+      "blockerType": "none",
+      "blocker": null,
+      "nextAction": "Controller/publisher may publish inactive source. Before activation, separately authorize and verify hosted schema/grants, independent current Auth session resolver, TLS/private logging and context registration as specified in drafts/n88-student-portal/ACTIVATION.md.",
+      "hostValidatedAt": "2026-10-17T22:19:35.394Z",
+      "baseAdvance": null
+    },
+    "deliveryQueuedAt": "2026-10-17T22:19:35.394Z",
+    "nextDeliveryAt": "2026-10-17T22:19:35.394Z",
+    "failureClass": "external",
+    "lastFailure": "VERIFICATION_ASSET_MISSING: Required source asset is missing: drafts/n88-student-portal/runtime-http.mjs",
+    "deliveryOwner": null,
+    "deliveryStartedAt": "2026-10-17T22:20:56.006Z",
+    "deliveryReceipt": {
+      "version": 1,
+      "ticketId": "N88",
+      "taskId": "continuous-n88-complete-runtime-binding-20261018",
+      "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+      "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "publishedSha": "9251f326658728d7cb22073a6e4c46ee71f1ab35",
+      "productionUrl": "https://rakeezx.com",
+      "at": "2026-10-17T22:21:08.856Z",
+      "status": "blocked",
+      "retryable": false,
+      "errorCode": "VERIFICATION_ASSET_MISSING",
+      "message": "Required source asset is missing: drafts/n88-student-portal/runtime-http.mjs",
+      "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n88-complete-runtime-binding-20261018\\integration-51f2c62e53dd-1-c81af2ed"
+    }
+  },
+  "result": {
+    "taskId": "continuous-n88-complete-runtime-binding-20261018",
+    "runId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+    "state": "LOCAL_READY",
+    "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+    "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-complete-runtime-binding-20261018",
+    "changedPaths": [
+      "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md",
+      "drafts/n88-student-portal/ACTIVATION.md",
+      "drafts/n88-student-portal/canonical-adapter.mjs",
+      "drafts/n88-student-portal/canonical-lock.inactive.sql",
+      "drafts/n88-student-portal/deployment.inactive.json",
+      "drafts/n88-student-portal/http-adapter.mjs",
+      "drafts/n88-student-portal/postgres-repository.mjs",
+      "drafts/n88-student-portal/readback.inactive.sql",
+      "drafts/n88-student-portal/runtime.mjs",
+      "tests/fixtures/n88-runtime-binding/.gitignore",
+      "tests/fixtures/n88-runtime-binding/canonical.sql",
+      "tests/fixtures/n88-runtime-binding/journey.mjs",
+      "tests/n88-runtime-binding.initial-failure.json",
+      "tests/n88-runtime-binding.mjs",
+      "tests/n88-runtime-binding.result.json",
+      "tests/n88-runtime-binding.transport-diagnostic.json"
+    ],
+    "checks": [
+      {
+        "name": "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+        "status": "PASS",
+        "evidence": "Actual HTTP/client/runtime/native PostgreSQL journey passed: issue, login, publication/update, same-code second-term persistence, rotate and revoke. tests/n88-runtime-binding.result.json"
+      },
+      {
+        "name": "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight",
+        "status": "PASS",
+        "evidence": "Owner/current-session, canonical lifecycle/revision, ambiguous membership, cookie, ingress/origin, source-loss, body/deadline/concurrency and activation guards passed. SHARE lock blocked a noncooperating writer."
+      },
+      {
+        "name": "affected_syntax_source_hashes_scope_and_cleanup",
+        "status": "PASS",
+        "evidence": "Six syntax checks, executed-source hashes and Git diff checks passed. Worktree clean; owned HTTP/PG stopped and integration lease released. Initial transport failure preserved."
+      },
+      {
+        "name": "hosted_service_auth_tls_and_student_activation",
+        "status": "NOT_RUN",
+        "evidence": "Inactive source only. No hosted SQL/Auth changes, deployment, real student access or app/SW wiring. Exact prerequisites and manual acceptance path recorded in ACTIVATION.md."
+      }
+    ],
+    "summary": "Committed AI-labelled inactive HTTP/runtime and canonical PG binding. Focused synthetic journey passed; no push or deployment.",
+    "blockerType": "none",
+    "blocker": null,
+    "nextAction": "Controller/publisher may publish inactive source. Before activation, separately authorize and verify hosted schema/grants, independent current Auth session resolver, TLS/private logging and context registration as specified in drafts/n88-student-portal/ACTIVATION.md."
+  },
+  "update": {
+    "card": {
+      "activationId": "po-20261012-continuous",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "id": "continuous-n88-complete-runtime-binding-20261018",
+      "productId": "N88",
+      "priority": -500,
+      "scopeKey": "n88-runtime-http-authoritative-binding",
+      "dependsOn": [
+        "continuous-n88-postgres-service-repository-20261017"
+      ],
+      "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N88 actual service+PG repository passed and published71f7230 on17Oct17:43. Current user needs useful real page, not more pilot or SQL proofs. Implement concrete missing runtime HTTP/service assembly and authoritative canonical teacher/student membership/publication binding using CURRENT project server data contracts, with source-only inactive deployment artifact. Read service/PG repository, actual student page/client/teacher-controller, existing sync schema/server APIs before deciding mapping. Keep4randomdigits1000..9999 stable owner/student into second term until rotate/revoke. Implement trusted canonical adapter with exact owner/current-membership/revision/active class/student mapping and minimal published projection from real existing stores; do not invent a new identity from name, route, or client sent owner/class. Runtime teacher verification uses independently verified existing Auth user/current session, never decodedJWT/user_metadata; ingress from trusted socket/adapter only, no arbitrary forwarded headers. Supply actual HTTP adapter with bounded streaming/json/cookie/origin/private no-store/error/deadline handling around createPortalService+PG repository, durable transaction writer integration and fail-closed deployment preflight for missing authoritative sources/keys. No fixture/memory fallback in runtime. Keep4digit code behind existing private entry/context/guess budgets. Test ONE complete actualHTTP-service-adapter synthetic teacher issue/student login/current published view/teacher update/second-term persistence/rotate/revoke journey through real components; fabricate only identity/canonical datasource and network transport, clearly isolate synthetic adapter. Use current trusted lock/revision protocol; noncooperating authoritative writers must be named accurately. Reuse previous SQL/rate/9000/UI proofs, do not rerun them wholesale. Provide ready-to-review deploy config/environment names/private-log handling/exact bounded activation diff; no secrets or config values captured, no hosted apply/Auth/RLS, no real student access or sends. No new app/SW/student production page wiring until service prerequisite proven. If actual canonical store architecture lacks atomic authoritative read/write port, implement concrete adapter against known schema/protocol and explicit readback plan, do not claim guessed staleness solved. End with exact remaining hosted actions and final manual acceptance path. No broad review loop, no new expiring invitation concept.\nMaterial verification contract correction: PM named runtime-http.mjs before implementation; worker delivered actual runtime.mjs + http-adapter.mjs, both allowed and exercised. Correct only served proof paths to actual candidate modules. Existing required checks remain PASS; hosted Auth/service/student activation stays NOT_RUN. Same candidate/session and original publisher, no Product/SQL retest or optional check renamed PASS.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/**",
+        "tests/n88-runtime-binding*.mjs",
+        "tests/n88-runtime-binding*.json",
+        "tests/fixtures/n88-runtime-binding/**",
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/runtime.mjs",
+        "drafts/n88-student-portal/http-adapter.mjs",
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+      ],
+      "requiredChecks": [
+        "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+        "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight"
+      ],
+      "acceptance": [
+        "Runtime HTTP and canonical mapping ports are concrete executable code tied to actual project schema, with full focused journey.",
+        "Stable4digit/current-student-only/rotate/revoke/owner/privacy remain intact, exact hosted prerequisite artifact supplied, no live readiness invented."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-explicit-finish-N88",
+        "publication": true,
+        "publicationScope": "inert inactive student portal runtime composition and canonical adapter only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false
+      },
+      "releaseAuthority": "LatestPO18Oct01:04 explicitly asks finishN88; permits reversible runtime binding implementation, own fabricated local journey and originalpublisher source-only inactive release. Hosted schema/Auth/private student access activation and secrets remain separately bounded.",
+      "completionMode": "repair_source_verification_paths",
+      "verificationPathRepair": {
+        "previousResultSha256": "68580c11d22fdc02d6ac664a3d4b2817ea30aa388182662c933948a0ea3e3ace",
+        "previousPathsSha256": "e8778ce1e17fe8e0e123ca0101dbb7e7be69ebbc1d0b780396d2084ff790b1b6",
+        "reviewedFixtureSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "reason": "PM sourcecard guessed a module filename before implementation. The candidate has tested runtime.mjs and http-adapter.mjs in the original allowed scope; correct only verification metadata, preserving checks, source, session, candidate and publisher."
+      }
+    },
+    "expected": {
+      "id": "continuous-n88-complete-runtime-binding-20261018",
+      "status": "blocked",
+      "sessionId": "01a14beb-21c2-7cd0-b42d-ed8a4441c24f",
+      "lastRunId": "3813f899-434f-4b6f-b989-dd20fdbdb698",
+      "candidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+      "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "queuedBaseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+      "queuedCandidateSha": "51f2c62e53dd710cde755acba03b8d409794f43b",
+      "resultState": "LOCAL_READY"
+    },
+    "materialReason": "PM sourcecard guessed a module filename before implementation. The candidate has tested runtime.mjs and http-adapter.mjs in the original allowed scope; correct only verification metadata, preserving checks, source, session, candidate and publisher."
+  }
+}

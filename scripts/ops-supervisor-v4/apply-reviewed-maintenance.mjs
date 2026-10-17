@@ -100,6 +100,8 @@ export function reviewedPreimageMatches(actual, reviewed) {
   return normalized(actual) === normalized(reviewed);
 }
 const SOURCE_ONLY_OPTIONAL_NOT_RUN = new Set([
+  'hosted_activation_and_real_push',
+  'hosted_service_auth_tls_and_student_activation',
   'optional_checkpoint_directory_removal',
   'hosted_service_app_device_and_production_verification'
 ]);
@@ -138,6 +140,25 @@ export function verifiedObservedRepair(task, result, update) {
     && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
     && Object.entries(card).every(([k,v])=>['objective','completionMode','verificationRepair'].includes(k)||same(v,task[k]))
     && result.blockerType==='none' && !result.blocker;
+}
+
+
+export function verifiedSourcePathRepair(task,result,update) {
+ const card=update.card,p=card.verificationPathRepair,old=['drafts/n88-student-portal/runtime-http.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'],actual=['drafts/n88-student-portal/runtime.mjs','drafts/n88-student-portal/http-adapter.mjs','docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md'];
+ return card.completionMode==='repair_source_verification_paths'
+  && task.id==='continuous-n88-complete-runtime-binding-20261018' && task.status==='blocked'
+  && result.state==='LOCAL_READY' && update.expected.resultState==='LOCAL_READY'
+  && task.deliveryReceipt?.errorCode==='VERIFICATION_ASSET_MISSING'
+  && !task.liveMutation && !task.liveAuthorizationRef && !card.liveMutation && !card.liveAuthorizationRef
+  && same(task.verificationPaths,old) && same(card.verificationPaths,actual)
+  && actual.every(path=>result.changedPaths?.includes(path) && task.allowedPaths.some(a=>a===path||a.endsWith('/**')&&path.startsWith(a.slice(0,-2))))
+  && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
+  && task.requiredChecks.every(name=>result.checks?.some(c=>c.name===name&&c.status==='PASS'))
+  && result.checks.every(c=>c.status==='PASS'||c.status==='NOT_RUN'&&c.name==='hosted_service_auth_tls_and_student_activation')
+  && result.blockerType==='none' && !result.blocker
+  && sha256(bytes(result))===p?.previousResultSha256 && sha256(bytes(task.verificationPaths))===p?.previousPathsSha256
+  && SHA256.test(p?.reviewedFixtureSha256??'') && p?.reason?.length>=50
+  && Object.entries(card).every(([k,v])=>['objective','completionMode','verificationPaths','verificationPathRepair'].includes(k)||same(v,task[k]));
 }
 
 export function verifyInactiveIdentity(task, result, update, activationId) {
@@ -196,7 +217,7 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || verifiedSourcePathRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -266,6 +287,11 @@ export function revisedTask(task, update, commit, at) {
   const event = { at, commit, kind: 'reviewed-material-maintenance', reason: update.materialReason, previousRunId: task.attempt?.runId ?? null, sessionId: task.sessionId ?? null, preservedCandidateSha: update.expected.candidateSha ?? null, previousQueuedCandidateSha: task.candidateSha ?? null, previousQueuedBaseSha: task.baseSha ?? null, preservedResultBaseSha: update.expected.baseSha ?? task.baseSha ?? null, previousFailure: task.lastFailure ?? null, previousImplementationFailures: task.implementationFailures ?? 0, previousInfrastructureRetries: task.infrastructureRetries ?? 0 };
 
   Object.assign(saved, structuredClone(update.card), { status: 'pending', candidateSha: update.expected.candidateSha, baseSha: update.expected.baseSha ?? task.baseSha, implementationFailures: 0, infrastructureRetries: 0, failureClass: null, lastFailure: null, retryAt: null, nextDeliveryAt: null, probingClass: null, lastModelError: null, productRecordKey: null, updatedAt: at, recoveryHistory: [...(task.recoveryHistory ?? []), event] });
+  if (update.card.completionMode === 'repair_source_verification_paths') {
+    insist(verifiedSourcePathRepair(task, json(task.resultPath), update), 'Source verification-path repair no longer qualifies');
+    saved.status='delivery'; saved.nextDeliveryAt=at; saved.deliveryOwner=null;
+    saved.sourceParityHistory=[...(task.sourceParityHistory??[]),{at,reason:update.materialReason,receipt:structuredClone(task.deliveryReceipt)}];
+  }
   if (update.card.completionMode === 'recheck_existing_publication') {
     saved.status = 'delivery'; saved.nextDeliveryAt = at; saved.lastFailure = null;
     saved.sourceParityHistory = [...(task.sourceParityHistory ?? []), { at, reason: update.materialReason, receipt: structuredClone(task.deliveryReceipt) }];
