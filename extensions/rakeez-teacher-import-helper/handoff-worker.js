@@ -8,6 +8,19 @@ async function clearAll() {
   const entries = await chrome.storage.session.get(null);
   for (const k of Object.keys(entries).filter(k=>k.startsWith('handoff:'))) await erase(k.slice(8));
 }
+// AES-GCM at rest in the extension-only session area. The transient key shares
+// that private boundary; this does not claim protection from a compromised browser.
+async function seal(envelope) {
+  const raw=crypto.getRandomValues(new Uint8Array(32)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const secret=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt']);
+  const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv},secret,new TextEncoder().encode(JSON.stringify(envelope)));
+  return {raw:[...raw],iv:[...iv],ciphertext:[...new Uint8Array(ciphertext)]};
+}
+async function open(record) {
+  const secret=await crypto.subtle.importKey('raw',new Uint8Array(record.raw),'AES-GCM',false,['decrypt']);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(record.iv)},secret,new Uint8Array(record.ciphertext));
+  return validateHandoff(JSON.parse(new TextDecoder().decode(plain)));
+}
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id || !sender.url || new URL(sender.url).origin !== new URL(chrome.runtime.getURL('popup.html')).origin || new URL(sender.url).pathname !== '/popup.html') return;
   enqueue(async()=>{
@@ -20,7 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     // Bind the claim to the exact newly created app tab, before navigating it.
     const tab = await chrome.tabs.create({url:'about:blank',active:false,windowId:sender.tab?.windowId});
     try {
-      await chrome.storage.session.set({[key(nonce)]:{envelope,tabId:tab.id,url}});
+      await chrome.storage.session.set({[key(nonce)]:{...await seal(envelope),tabId:tab.id,url}});
       await chrome.alarms.create(key(nonce), {when:Math.min(Date.now()+HANDOFF_TTL,envelope.expiresAt)});
       await chrome.tabs.update(tab.id,{url,active:true});
     } catch (error) { await erase(nonce); await chrome.tabs.remove(tab.id); throw error; }
@@ -36,7 +49,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender, reply) => {
     // Delete before reply; serialized claims cannot replay, even across worker wakeups.
     await erase(message.nonce);
     if (message.type === 'n36-cancel') return {ok:true};
-    return {ok:true,envelope:validateHandoff(record.envelope)};
+    return {ok:true,envelope:await open(record)};
   }).then(reply,()=>reply({ok:false,code:'HANDOFF_EXPIRED_OR_DENIED'}));
   return true;
 });

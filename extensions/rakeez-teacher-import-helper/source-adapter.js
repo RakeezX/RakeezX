@@ -151,14 +151,16 @@ export function readSourceReportPage(mode,runContext=null) {
     if(u.origin!==now.origin||u.username||u.password)return {ok:false,code:'ORIGIN_CHANGED'};
     if(n.closest('form')||n.hasAttribute('download')||n.getAttribute('data-method')&&n.getAttribute('data-method').toLowerCase()!=='get'||u.pathname!==now.pathname||/(?:delete|grade|admin|edit|attendance|changeusertype)/i.test(u.pathname))return diagnostic('UNSAFE_PAGINATION');
     const keys=new Set();for(const [key,value] of u.searchParams){if(keys.has(key.toLowerCase())||!/^(?:page|pagenumber|classid|sectionid|id)$/i.test(key)||! /^[A-Za-z0-9_-]{1,80}$/.test(value))return diagnostic('UNSAFE_PAGINATION');keys.add(key.toLowerCase());}
-    const page=pageOf(u);if(!page||page>24||stable(u)!==stable(now))return diagnostic('PAGINATION_MISMATCH');
+    const page=pageOf(u);if(page>24)return {...diagnostic('SOURCE_PAGE_LIMIT'),observedRows:tsv.split('\n').length-1};
+    if(!page||stable(u)!==stable(now))return diagnostic('PAGINATION_MISMATCH');
     const label=number(text(n));if(label!==null&&label!==page||next&&page!==current+1)return diagnostic('PAGINATION_MISMATCH');
     numbers.add(page);if(n.rel.split(/\s+/).includes('last'))totals.push(page);
     actual.push({page,path:u.pathname+u.search});
    }
    const distinctTotals=[...new Set(totals)];if(distinctTotals.length>1)return diagnostic('PAGINATION_MISMATCH');
    const total=distinctTotals[0]??(terminal?current:null);
-   if(total!==null&&(total<current||total>24||[...numbers].some(n=>n>total)))return diagnostic('PAGINATION_MISMATCH');
+   if(total!==null&&total>24)return {...diagnostic('SOURCE_PAGE_LIMIT'),observedRows:tsv.split('\n').length-1};
+   if(total!==null&&(total<current||[...numbers].some(n=>n>total)))return diagnostic('PAGINATION_MISMATCH');
    if(terminal&&total!==current)return diagnostic('PAGINATION_MISMATCH');
    const next=[...new Set(actual.filter(a=>a.page===current+1).map(a=>a.path))];
    // Every candidate here has the same validated report/filter/page semantics. Retain an existing href.

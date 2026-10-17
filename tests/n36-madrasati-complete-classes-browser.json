@@ -1,0 +1,260 @@
+{
+  "runId": "b249261d-12d5-4295-895f-284258f16903",
+  "baseline": false,
+  "checks": [],
+  "externalRequests": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "sourceHashes": {
+    "README.md": "f2617908a5d8b78c1c2410b00bfa22965405663f2206cf96f629c679904afb9e",
+    "categories-popup.js": "2a7ce628646250ae481f423fa1987d1005ea9eee88d62502e25d66a8e46d1f2d",
+    "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+    "core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+    "handoff-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "handoff-worker.js": "aa38ae4df6eb93fb48fc6597e23823ecaf747776d00b09ea92b3c45b61a026f1",
+    "lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "lib/rakeez-datetime.css": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+    "lib/rakeez-datetime.js": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+    "manifest.json": "eb7f2dd2e13c649964549b3326c7463ebee2f5824a8c337051c8a5d0ce11ed86",
+    "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+    "popup.css": "8b550cfbd6c430f313316ee66703b42674fc8194fb2aafa6d4ad8e5cf5786a55",
+    "popup.html": "7721fc154fd6079d2574a5147a1cff72cee5177baee62637a375dca70d8934fe",
+    "popup.js": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+    "route-diagnostics.js": "e2b05edc73d67b9aa214c42541dd8634395de8cfb36006801b3af5d4a8640134",
+    "run-controller.js": "a8df6cbf18327e7db71c232f84e909fe7da93fae9753fe8d0fc4a3faa7f16aea",
+    "selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+    "source-adapter.js": "56e4b79f107585cd24c6dd776eb6e20e6379017cb588ee9f6344c6d7f4d31d49",
+    "source-roster.js": "b46e03a4acb860153eb9fb1c6f71fbcf4b0c5ab59fcd5b51b3505f6965bd86b4"
+  },
+  "scenarios": [
+    {
+      "scenario": "full303",
+      "allowed": true,
+      "counts": "10 صفحات؛ 303 اسمًا مجمّعًا؛ 303 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=303 | observedRowsLowerBound=303 | complete=303 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "full350",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "full600",
+      "allowed": true,
+      "counts": "15 صفحات؛ 600 اسمًا مجمّعًا؛ 600 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=600 | observedRowsLowerBound=600 | complete=600 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "full601",
+      "allowed": true,
+      "counts": "16 صفحات؛ 601 اسمًا مجمّعًا؛ 601 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 5 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=601 | observedRowsLowerBound=601 | complete=601 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "full1200",
+      "allowed": true,
+      "counts": "27 صفحات؛ 1200 اسمًا مجمّعًا؛ 1200 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 6 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=1200 | observedRowsLowerBound=1200 | complete=1200 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "full1201",
+      "allowed": false,
+      "counts": "4 صفحات؛ 0 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_PAGE_LIMIT | category=students | tables=1 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=0 | observedRowsLowerBound=50 | complete=0 | committed=0 | excluded=SOURCE_PAGE_LIMIT,ROSTER_LINKS_UNAVAILABLE"
+    },
+    {
+      "scenario": "full301",
+      "allowed": true,
+      "counts": "10 صفحات؛ 301 اسمًا مجمّعًا؛ 301 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=301 | observedRowsLowerBound=301 | complete=301 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "class301",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "sameNames",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "nonterminal",
+      "allowed": false,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=0 | committed=0 | excluded=PAGINATION_TERMINAL_UNVERIFIED,ROSTER_LINKS_UNAVAILABLE,PAGINATION_INCOMPLETE"
+    },
+    {
+      "scenario": "missingLast",
+      "allowed": false,
+      "counts": "9 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=0 | committed=0 | excluded=PAGINATION_MISSING_NEXT,ROSTER_LINKS_UNAVAILABLE,PAGINATION_INCOMPLETE"
+    },
+    {
+      "scenario": "missingMiddle",
+      "allowed": false,
+      "counts": "5 صفحات؛ 100 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=100 | observedRowsLowerBound=100 | complete=0 | committed=0 | excluded=PAGINATION_MISSING_NEXT,ROSTER_LINKS_UNAVAILABLE,PAGINATION_INCOMPLETE"
+    },
+    {
+      "scenario": "repeat",
+      "allowed": false,
+      "counts": "10 صفحات؛ 50 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=50 | observedRowsLowerBound=350 | complete=0 | committed=0 | excluded=PAGINATION_REPEAT_OR_CHANGED,DUPLICATE_STUDENT_IDENTITY,ROSTER_LINKS_UNAVAILABLE"
+    },
+    {
+      "scenario": "duplicate",
+      "allowed": false,
+      "counts": "10 صفحات؛ 343 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=343 | observedRowsLowerBound=343 | complete=0 | committed=0 | excluded=DUPLICATE_STUDENT_IDENTITY,ROSTER_LINKS_UNAVAILABLE"
+    },
+    {
+      "scenario": "drift",
+      "allowed": false,
+      "counts": "5 صفحات؛ 50 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=PAGINATION_MISMATCH | category=students | tables=1 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=50 | observedRowsLowerBound=50 | complete=0 | committed=0 | excluded=PAGINATION_MISMATCH,ROSTER_LINKS_UNAVAILABLE,PAGINATION_INCOMPLETE"
+    },
+    {
+      "scenario": "missingReport",
+      "allowed": false,
+      "counts": "3 صفحات؛ 0 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 2 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=0 | observedRowsLowerBound=0 | complete=0 | committed=0 | excluded=ROSTER_LINKS_UNAVAILABLE"
+    },
+    {
+      "scenario": "schoolChanged",
+      "allowed": false,
+      "counts": "2 صفحات؛ 50 طلاب؛ 2 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "status": "توقف اختيار دور المعلم (SCHOOL_CONTEXT_CHANGED). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "diagnostic": "N36 0.5.4 | stage=role-selection | reason=SCHOOL_CONTEXT_CHANGED | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0"
+    },
+    {
+      "scenario": "roleChanged",
+      "allowed": false,
+      "counts": "2 صفحات؛ 50 طلاب؛ 2 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "status": "توقف اختيار دور المعلم (NON_TEACHER_ROLE). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "diagnostic": "N36 0.5.4 | stage=role-selection | reason=NON_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0"
+    },
+    {
+      "scenario": "sourceClosed",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "windowClosed",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "cancelled",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "alarmExpired",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "corrupt",
+      "allowed": true,
+      "counts": "10 صفحات؛ 350 اسمًا مجمّعًا؛ 350 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | committed=0 | excluded=none"
+    },
+    {
+      "scenario": "originChanged",
+      "allowed": false,
+      "counts": "2 صفحات؛ 50 طلاب؛ 2 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "status": "توقف التنقل أو التحويل (ORIGIN_CHANGED). لم تُجمع أسماء الطلاب ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "diagnostic": "N36 0.5.4 | stage=navigation-redirect | reason=ORIGIN_CHANGED | category=students | route=/schoolmanagmentreports/studentinfo/classstudentinfo/:id | queryKeys=page | unknownKeys=0 | routeReason=unexpected-path"
+    },
+    {
+      "scenario": "sessionChanged",
+      "allowed": false,
+      "counts": "2 صفحات؛ 50 طلاب؛ 2 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "status": "توقف التشغيل (ORIGIN_OR_LOGIN_CHANGED). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.",
+      "diagnostic": ""
+    },
+    {
+      "scenario": "multi303",
+      "allowed": true,
+      "counts": "10 صفحات؛ 303 اسمًا مجمّعًا؛ 303 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 4 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.4 | stage=source-schema | reason=SOURCE_TIMEOUT | category=timetable | tables=0 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.4 | stage=run-summary | staged=303 | observedRowsLowerBound=303 | complete=303 | committed=0 | excluded=none"
+    }
+  ],
+  "priorFailures": [
+    "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /303 اسمًا مجمّعًا؛ 303 مكتملًا/. Input:\n\n''\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:93:11",
+    "AssertionError [ERR_ASSERTION]: توقف اختيار دور المعلم (AMBIGUOUS_OR_MISSING_TEACHER_ROLE). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض. | N36 0.5.4 | stage=role-selection | reason=AMBIGUOUS_OR_MISSING_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=1 | actionMarkers=2 | safeReadLinks=1 | iframeCount=0 | empty=0 | formRejected=0 | href=2 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=2\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:93:11",
+    "AssertionError [ERR_ASSERTION]: توقف اختيار دور المعلم (AMBIGUOUS_OR_MISSING_TEACHER_ROLE). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض. | N36 0.5.4 | stage=role-selection | reason=AMBIGUOUS_OR_MISSING_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=1 | actionMarkers=3 | safeReadLinks=2 | iframeCount=0 | empty=0 | formRejected=0 | href=3 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=3\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:93:11",
+    "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-act=\"n36-extension-review\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled class=\"btn btn--primary\" data-act=\"n36-extension-review\">مراجعة أسماء الإضافة</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at mapReview (C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-madrasati-complete-class-batches-20261017\\tests\\n36-madrasati-complete-classes-browser.mjs:57:58)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:111:140",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:100:12",
+    "AssertionError [ERR_ASSERTION]: [{\"disabled\":false,\"text\":\"اختر فصلًا ثم راجع أسماءه\"},{\"disabled\":true,\"text\":\"خامس ألف: 301 اسمًا — النقل غير متاح: يتجاوز 300\"},{\"disabled\":false,\"text\":\"خامس باء: 49 اسمًا\"}]\n\nfalse !== true\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-madrasati-complete-class-batches-20261017/tests/n36-madrasati-complete-classes-browser.mjs:102:12"
+  ],
+  "ownerPreview": {
+    "rows": 300,
+    "committed": 0,
+    "ownerSwitchInvalidates": true,
+    "databaseUnchanged": true
+  },
+  "secondClass": "50 exact rows; concurrent replay rejected",
+  "expiry": "300000ms clears full roster, selected names and transfer",
+  "reusedSourceProof": true,
+  "archiveSha256": "41c24b282c043b5447863fb2bb08c4b94286be34b7aa06287e011c7dec4a6cce",
+  "sourceGets": 17,
+  "sourceEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 0,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 9,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 9
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 9,
+    "schoolOptions": 0
+  },
+  "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "blockedExternal": [
+    "https://unvisited.invalid"
+  ],
+  "status": "PASS",
+  "release": "RELEASED browser",
+  "cleanup": "Owned disposable Chrome/profile and server closed; browser lease released"
+}

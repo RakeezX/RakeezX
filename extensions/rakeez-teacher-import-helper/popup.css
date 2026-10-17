@@ -27,3 +27,7 @@ input:disabled { background: #e9eeec; }
 .run-page #category-source, .run-page #legacy-names, .run-page #manual-controls { display: none !important; }
 summary { cursor: pointer; padding-block: 12px; }
 #run-missing { color: #784a04; }
+
+/* Full source model stays in memory; at most one <=300 class is rendered. */
+#source-class-names { max-height: 320px; overflow-y: auto; }
+#source-class-review { border: 1px solid #648582; border-radius: 8px; padding: 12px; }
