@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-existing-host-auth-and-current-state-20261018",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -491,
+      "scopeKey": "n88-existing-host-real-auth-and-owner-scoped-canonical-state",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n88-postgres-service-repository-20261017"
+      ],
+      "objective": "Current PO18Oct01:04 asks FINISH N44/N88, own independent worker until genuinely ready for review/closure. Continue actual missing implementation, not another pilot explanation or repeated SQL qualification. Read current canonical Product row/AGENTS/opscontract and affected code, verify current official primary docs for libraries and Supabase (changelog first), pin packages and lockfiles, existing Pro/Standard; no paid service/newaccount/API/privilege or reviewworker. Current existing live app, auth, storage, Sync, calendar hold unchanged. No real send/student changes/hosted schema/Auth/RLS/secret discovery or earlier real denied operation. Source-only INACTIVE artifact authorized, but MUST finish actual missing code in this bounded stage; list physical environment/deployment inputs honestly, do not leave a known local logic port as “someone later supplies it” when it can be implemented here. Original controller/publisher only. Return exact current run JSON/real checks, commit, owncleanup, no queue/status mutation. Continue missing actual N88 server Auth/currentstate/existinghost bindings, not repeat prior runtime journey. IMPORTANT prior exact candidate51f2c62e53dd710cde755acba03b8d409794f43b contains finished runtime.mjs/http-adapter.mjs/canonical-adapter/SQL/design and two requiredPASS, but has NOT been published: PM initially guessed runtime-http.mjs; metadata corrected, original publisher retains immutable terminal pre-push journal VERIFICATION_ASSET_MISSING. Do NOT retry same terminaljournal/changequeue/restartcontroller/create meaningless commit/alias solelytoinvalidatecache. In NEWisolated worktree preserve and MERGE that exact saved candidate ancestry plus currentmain before actual new implementation. This task supplies real MISSING functionality and a new meaningful candidate, allowing original publisher normal new-candidate delivery. Oldfailedreceipt/history preserved, no claim51f2wasdeployed. Include priorchangedpaths within allowedbelow; do not redo oldHTTP/SQLtests unchanged.\\nA. Implement actual current-session verifier instead of unimplemented injected verifyCurrentSession port. Use supported official verified Auth/claims API with issuer/audience/expiry/signature validation and fresh server user verification, plus minimally scoped current auth.sessions lookup where required; never trust decoded-onlyJWT, user_metadata/bodyowner/session, stale localstorage or booleanflag. AuthgetUser alone does not invent current session_id. VERIFIED claims can be used after cryptographic/server verification; do not invent unaudited JWT parser. Bind exact same token/user/session, bounded fullchain/timeouts/ownerguards, no new Auth flow/email/token callback/config changes, no N64 denied operation recreated. Supply concrete private minimal SQL/helper/role readback proposal for current session checks rather than unknown future introspection endpoint. Local fabricated signed/provider/session records only, no real Auth/account/keys/session rows.\\nB. Current canonical-lock.inactive.sql takes SHARE on7 ENTIRE source tables, blocking unrelatedowner Sync writes; this is bounded pilot evidence, not acceptable final integration. Replace with bounded targeted row/key locking/revalidation consistent with actual canonical FK/Sync/lifecycle contracts. Preserve new enrollment/restore phantom safety, currentowner/student membership, publication source and term invariants. Do not merely remove lock/TTLcache or assume Sync writers take N88 advisorylock. Prove real localPG unrelatedowner writer remains usable while targetowner portal transaction holds its needed locks, while same-student membership/source deletion/transfer cannot leak revoked view or resurrect oldsession; use existing nativecluster ownership proof/lease and retained STOPPED directories. Small service/repository interface refinement is allowed onlywhere needed to synchronize current canonical OWNER after trusted ingress/guess debits and identity resolution, without full global canonical scans or weakening prelookup budgets. Keep PIN1000..9999/9000/stable intosecondterm/rotation/revocation/privateentry unchanged. Reuse prior constraint/globalbudget/PGrepository proof unless affected.\\nC. Complete a DEPLOYABLE entry/config artifact for existing project infrastructure (Supabase Edge/actual available supported host), not a requirement to buy/maintain a new directTLSNode server. Verify actual official runtime/DB/crypto/ingress capabilities first; inspect existing project deployment patterns read-only, no secret discovery. Implement actual WebRequest/platform entry adapter and trusted ingress if supported with explicit guarantees; never trust arbitrary forwardedIPheaders or claim HTTP-only localtest proves hostedTLS. All local implementable ports finished; external configuration/migration/private log/secret custody actions precisely enumerated once. No actual hosted apply/accessactivation or studentpage wiring before service prerequisites proven. Existing own source artifact can remain disabled until exact private config supplied; no fixture fallback. Provide focused actualAuth/currentstate+newentry test and previoussamePINjourney reused through new actual verifier with only provider/DB/network fixtures. Requiredchecknames below; optional hostedcheck ONLY hosted_service_app_device_and_production_verification=NOT_RUN. Commit actual useful feature code, no fake publication/closure.\nVERIFIED EXISTING PUBLICATION RECONCILIATION: Actual original inactive N88 existing-host source candidate passed all required local checks and provider plus immutable/Production source proof. Current verifiedDeployment confirms the exact receipt; long-lived controller incorrectly rejected its source-only metadata. Reconcile unchanged proof without Product rerun, redeployment, hosted activation or false student readiness.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/**",
+        "supabase/functions/n88-student-portal/**",
+        "tests/n88-runtime-binding*.mjs",
+        "tests/n88-runtime-binding*.json",
+        "tests/fixtures/n88-runtime-binding/**",
+        "tests/n88-existing-host*.mjs",
+        "tests/n88-existing-host*.json",
+        "tests/fixtures/n88-existing-host/**",
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md",
+        "docs/automation-evidence/20261018/N88_EXISTING_HOST_COMPLETION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/runtime.mjs",
+        "docs/automation-evidence/20261018/N88_EXISTING_HOST_COMPLETION.md"
+      ],
+      "requiredChecks": [
+        "n88_concrete_current_session_verifier_and_existing_host_entry",
+        "n88_targeted_canonical_lifecycle_guards_without_unrelated_owner_write_blocking"
+      ],
+      "acceptance": [
+        "Actual currently absent Auth verifier/platformentry code implemented; no unknown future introspection dependency or paid/newNodehost assumption.",
+        "Targeted canonical currentstate integrity holds and unrelatedowner normalwrites do not block under portal source locks.",
+        "Prior runtime candidate preserved within meaningful new candidate; no terminal journal retry, old failedproof retained, hosted/live not falselyclaimed."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-explicit-finish-N88-missing-real-bindings",
+        "publication": true,
+        "publicationScope": "inert inactive existing-host Auth and canonical bindings source only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false
+      },
+      "releaseAuthority": "PO18Oct01:04 explicitfinishN88 authorizes completion of missing actual server bindings, meaningful priorcandidate integration and owned local synthetic verification with originalpublisher source-only inactive release. Hosted private schema/Auth/access activation and actual data remain excluded until exact prerequisite operation is concretely reviewable.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "45755a18ce514a2af4322463d6606338fc4dd129",
+        "priorReceiptSha256": "d45b015f58bcadc7fdd5f1980908087036465b3a711aee5db70edb895918baf6",
+        "reviewedFixtureSha256": "87fb7a1137bae2e6fbaf1a3fd5fe477f5d80c21a2981d235995fcbef0d26b842",
+        "reason": "Actual original inactive N88 existing-host source candidate passed all required local checks and provider plus immutable/Production source proof. Current verifiedDeployment confirms the exact receipt; long-lived controller incorrectly rejected its source-only metadata. Reconcile unchanged proof without Product rerun, redeployment, hosted activation or false student readiness."
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "continuous-n88-existing-host-auth-and-current-state-20261018",
+  "at": "2026-10-17T23:04:57.540Z",
+  "candidate": "ad9b6b16adc74972a561823e79a44a8f3bd149c4",
+  "session": "01a14c02-2de7-7200-be15-36add5accccb",
+  "published": "45755a18ce514a2af4322463d6606338fc4dd129",
+  "receiptSha256": "d45b015f58bcadc7fdd5f1980908087036465b3a711aee5db70edb895918baf6",
+  "checks": [
+    {
+      "name": "n88_concrete_current_session_verifier_and_existing_host_entry",
+      "status": "PASS",
+      "evidence": "tests/n88-existing-host.result.json: official AuthClient verification, fresh user/current-session guards, signed Web entry, same-PIN second-term journey, rotation/revocation and ingress negatives."
+    },
+    {
+      "name": "n88_targeted_canonical_lifecycle_guards_without_unrelated_owner_write_blocking",
+      "status": "PASS",
+      "evidence": "Native PG17.6: unrelated-owner writes committed during actual portal transaction; ten target lifecycle/session operations blocked with 55P03. Restore, lineage, publication and missing-source guards passed."
+    },
+    {
+      "name": "deno_existing_host_runtime_crypto_and_pg",
+      "status": "PASS",
+      "evidence": "tests/n88-existing-host.deno.result.json: actual Deno Web entry, AuthClient/WebCrypto, restricted PG/RLS, publish/issue/claim/read."
+    },
+    {
+      "name": "inactive_existing_host_config_pinned_packages_and_syntax",
+      "status": "PASS",
+      "evidence": "tests/n88-existing-host.source-checks.json; exact npm/Deno integrity pins, configuration negatives and affected syntax passed. Frozen Deno entry check also exited 0 after commit."
+    },
+    {
+      "name": "candidate_ancestry_scope_and_cleanup",
+      "status": "PASS",
+      "evidence": "AI merge commit preserves exact saved 51f2c62e53dd710cde755acba03b8d409794f43b ancestry. All 52 paths allowed; clean worktree. Owned PG phases stopped and integration leases released; original failures retained."
+    },
+    {
+      "name": "hosted_service_app_device_and_production_verification",
+      "status": "NOT_RUN",
+      "evidence": "Artifact remains inactive. No hosted apply, deployment, real Auth/data operation, student activation or Production claim."
+    }
+  ],
+  "reason": "Actual original inactive N88 existing-host source candidate passed all required local checks and provider plus immutable/Production source proof. Current verifiedDeployment confirms the exact receipt; long-lived controller incorrectly rejected its source-only metadata. Reconcile unchanged proof without Product rerun, redeployment, hosted activation or false student readiness."
+}
