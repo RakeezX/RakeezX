@@ -117,3 +117,48 @@ and real service/Production activation require their specific later authority.
 No real DNS/TLS/Push/service/Auth/device acceptance, Production result, PO
 acceptance or N44 closure is claimed. The original publisher alone owns source-only
 integration and delivery evidence; this worker creates the exact local AI commit.
+
+## Saved-session continuation — candidate validation blocked
+
+Current run: `a656377b-7e73-4477-a733-2a0030874a6e`.
+The completed implementation candidate
+`b0a95b7bd9fe90222bbba08e0212379e299f2738` is preserved. The controller rejected
+the preceding result with `Candidate validation: An affected check must pass and
+no recorded check may fail`. The legacy 15/16 boundary-suite result remains FAIL;
+the passing replacement check does not make the existing failed check pass.
+This continuation therefore reports **BLOCKED**, not LOCAL_READY.
+
+Prepared a concrete correction inside the allowed paths:
+
+- `tests/n44-crypto-sender-import-guard.mjs` supplies the literal executable-import
+  guard for the original test, covering static import/export, side-effect import,
+  dynamic import, require and HTML script src, including alternate path separators.
+  Its qualification detects eight positive import forms, rejects four non-import
+  receipt/JSON forms, and checks 230 existing executable app/service/script files.
+- `tests/n44-crypto-sender-repair-preflight.mjs` verifies every saved proof source
+  hash and the exact original failing harness block, then records the proposed
+  import and replacement in `tests/n44-crypto-sender.repair-preflight.json`.
+  It confirms the original raw-path grep mismatch read-only. It does not execute
+  a transformed/copy suite, remove a check or edit an out-of-scope target.
+
+`node tests/n44-crypto-sender-repair-preflight.mjs` PASS; both new modules pass
+syntax checks. The 18-case cryptographic proof is reused from its original run
+with all source hashes matching and zero network attempts. No cryptographic,
+SQL, browser, Preview, dependency-install or service check was repeated.
+
+**Exact missing write path:** `tests/n44-server-preactivation.test.mjs`.
+The current card permits only `tests/n44-crypto-sender*.mjs` and its named fixture
+directory, so the original failing assertion at line 260 cannot be repaired here.
+The proposed patch adds the new helper import and replaces only the four-line
+raw-path grep/assert block with `assertNoPrivatePushImports()`. It keeps the
+forbidden-capability construction subprocess and all 15 behavioral tests intact.
+The target's source hash and exact old/replacement block are in the preflight
+receipt. Historical FAIL receipts are unchanged.
+
+Retry condition: the existing guarded maintenance helper, once this worker is
+inactive and publisher idle, adds that exact path to this same card without
+changing Product/data authority. The controller resumes this exact saved session
+and worktree; the scoped worker applies the prepared harness correction and runs
+the corrected original 16-case boundary suite once. Do not requeue unchanged,
+omit its failure from a LOCAL_READY result or rerun the completed crypto proof.
+No maintenance task/worker was created, and no queue, STOP or lock was touched.
