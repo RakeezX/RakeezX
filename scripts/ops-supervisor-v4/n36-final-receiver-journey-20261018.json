@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "id": "continuous-n36-final-receiver-journey-20261018",
+      "productId": "N36",
+      "priority": -510,
+      "scopeKey": "n36-final-extension-to-receiver-journey",
+      "dependsOn": [
+        "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017"
+      ],
+      "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N36 .11 extracted actual303names/10classes/7pages and user confirmed count. Remaining useful work is COMPLETE transfer-to-persisted-receiver journey, not more collection heuristics. Inspect exact shipped extension protocol/background/review and actual app Koshoof receiver/create-or-existing-class path. Produce and run ONE real application synthetic end-to-end journey from actual extension controller selected-class payload through real handoff receiver, owner-scoped class selection/creation, explicit confirmation and normal Sync ACK/receipt; fabricate only source rosters/network/Chrome APIs, do not replace Product engines. 303 fabricated names with the user-reported10class counts, ascending class order; process all required selected class/batches (300 is per transfer, not total), ensure no dropped/unselected names, no automatic save, real acknowledged receipt each operation, resume/TTL/duplicate/owner change/partial coverage safe. Use existing isolated-loopback helper, never refused real Chrome actions. Reuse unchanged extraction/package/module proof. Fix concrete receiver/extension defects found in same worker; concise usable UI no extra technical text. Native action-popup/original Chrome module error remain NOT_RUN unless genuinely reproduced using permitted isolated technique, never infer from HTTP/run-tab. Top diagnostics button already exists, do not redo it. Check deterministic .11 package/current stable updater read-only; no personal Chrome reload or manual duplicate update. Only if extension code changes, increment patch once, build/verify packaged linked files and let existing verified-minute updater sync after publisher receipt. Keep N107 accepted copy/layout intact except a proven receiver defect. Deliver concise final user path plus machine receipt/evidence; source-code/test readiness and actual personal-account final save are separate. No fake total-complete/parser hardcode303.\nMATERIAL HARNESS REPAIR: prior run correctly stopped HANDOFF_UNAVAILABLE because strict Product origin https://rakeezx.com differs from task-owned loopback. This is a local fixture mismatch, not Product defect or tool rejection. Canonical helper now supports ONLY this exact N36 task + source-authorized syntheticAppOrigin=https://rakeezx.com. Call withIsolatedLocalBrowser({same taskFile,CURRENT runId,url:OWNEDloopbackbase,syntheticAppOrigin:\"https://rakeezx.com\",...},check), navigate fresh owned headless context to https://rakeezx.com/. Helper fulfills that visual origin exclusively from local GET/HEAD bytes, strict source origin, no redirects/credentials, bounded reads, externalHTTP abort, WebSockets/SW blocked, DNS failclosed. Product origin checks stay byte-unchanged. Original real browser/portal refusal stays binding: NO actual remote requests, Madrasati/Noor/Chromeprofile/MV3 invocation or personal tabs. Reuse actual extension-controller/worker VM fabricatedChrome transport plus actual app fixture/network only. This is a fabricated origin facade for actual JS origin guard, not deployed/nativeChrome proof. Preserve original BLOCKED evidence as initial; resume SAME saved session/candidate using CURRENT runId, run missing actual receiver/normalACK save and negative guards once, fix only observed Product defects. No repeated extraction/package checks unchanged. Required check names unchanged. No helper override or remote route fallback if failure. Original publisher delivers real fixes; native popup/error and real account save remain NOT_RUN.",
+      "allowedPaths": [
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "src/lib/class-koshoof-bundle.js",
+        "tools/teacher-import-helper/**",
+        "tools/extensions/**",
+        "extensions/**",
+        "public/assets/extensions/**",
+        "assets/extensions/**",
+        "scripts/build-teacher-import-helper.mjs",
+        "sw.js",
+        "tests/n36-final-journey*.mjs",
+        "tests/n36-final-journey*.json",
+        "tests/fixtures/n36-final-journey/**",
+        "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md",
+        "src/lib/teacher-setup-import.js",
+        "src/views/teacher-setup-import.js",
+        "src/styles/teacher-setup-import.css",
+        "src/views/class-import-center.js"
+      ],
+      "verificationPaths": [
+        "src/lib/n36-extension-handoff.js",
+        "src/lib/n36-extension-protocol.js",
+        "sw.js",
+        "src/views/class-import-center.js",
+        "docs/automation-evidence/20261018/N36_FINAL_RECEIVER_JOURNEY.md"
+      ],
+      "requiredChecks": [
+        "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+        "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards"
+      ],
+      "acceptance": [
+        "Actual shipped Product engines complete full fabricated303/10class transfer/explicit save/normal acknowledgement with no loss or total cap.",
+        "Only observed changed behavior patched, focused negative guards pass; no real school/account mutation or native-popup proof fabricated."
+      ],
+      "releaseAuthority": "Latest PO18Oct01:04 explicitly finishes N36; existing delegated extension/client receiver fixes and package delivery authorized through sole publisher. Actual personal account/school actions and denied browser operations excluded. If the actual final journey finds no Product defect, source-only inert proof/test publication is authorized; do not invent a Product fix or claim an unobserved live account save.",
+      "syntheticBrowserFixtureOrigin": "https://rakeezx.com",
+      "harnessRepair": {
+        "kind": "strict-local-byte-synthetic-app-origin",
+        "previousResultSha256": "1860fb90f8b62292e0e1cbb73dd6ef14bebce25394a4e08197fb1f6a30836c97",
+        "previousHelperSha256": "c054944ce4da586a0db31aa3502449b680d020b4088bd690e0e6f3d8558698dc",
+        "reason": "Strict Product app origin was incompatible with loopback-only context; a local-byte facade proves the receiver without weakening Product origin or enabling remote network."
+      },
+      "preparationAuthority": {
+        "kind": "existing-PO-final-journey-inactive-proof",
+        "publication": true,
+        "publicationScope": "inert inactive synthetic journey source and evidence only when no Product code changes",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      }
+    }
+  ]
+}
