@@ -1,0 +1,13 @@
+{
+  "taskId": "continuous-n36-final-receiver-journey-20261018",
+  "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+  "status": "PASS",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "observedOriginMain": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+  "affectedSourceIdentical": true,
+  "originalBlockerPreserved": true,
+  "packageProofReused": true,
+  "nativeActionPopup": "NOT_RUN",
+  "personalAccountSave": "NOT_RUN",
+  "scope": "Synthetic existing-owned-class journey; actual app/controller/worker/store/Sync, fabricated source/network/Chrome APIs. No Product or package changes."
+}

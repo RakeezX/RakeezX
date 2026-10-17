@@ -1,0 +1,22 @@
+// AI: compact read-only source/evidence reconciliation; no browser/package rerun.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+const original=JSON.parse(await fs.readFile('tests/n36-final-journey-browser.json','utf8'));
+const latest=JSON.parse(await fs.readFile('tests/n36-final-journey-resumed.json','utf8'));
+assert.equal(original.status,'BLOCKED');
+assert.equal(original.checks.find(c=>c.name==='n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack').status,'FAIL');
+assert.equal(latest.status,'PASS');assert.equal(latest.runId,'006e830c-a452-47e6-8a89-358ca35024b8');
+for(const name of ['n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack','n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards'])assert.equal(latest.checks.find(c=>c.name===name).status,'PASS');
+assert.equal(latest.operations.length,10);assert.equal(latest.operations.reduce((n,o)=>n+o.added,0),303);assert.equal(latest.operations.reduce((n,o)=>n+o.acknowledged,0),606);
+assert.equal(latest.final.networkReceipts,606);assert.equal(latest.final.dbOutboxEmpty,true);assert.equal(latest.final.otherStoresUnchanged,true);
+assert.equal(latest.preservedFailures.length,3,'Preserve the three corrected harness assertions/timeouts');
+const paths=['src/lib/n36-extension-handoff.js','src/lib/n36-extension-protocol.js','src/lib/teacher-setup-import.js','src/views/class-import-center.js','src/views/teacher-setup-import.js','src/styles/teacher-setup-import.css','src/store.js','src/lib/sync-v2.js','extensions/rakeez-teacher-import-helper'];
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const currentMain=git('rev-parse','refs/remotes/origin/main');
+assert.equal(git('diff','--name-only',latest.baseSha,'refs/remotes/origin/main','--',...paths),'','Affected Product source unchanged on observed current main');
+assert.equal(git('diff','--name-only',latest.baseSha,'--',...paths),'','No Product change in this candidate');
+for(const [file,expected] of Object.entries(latest.sourceHashes))assert.equal(createHash('sha256').update(await fs.readFile(file)).digest('hex'),expected);
+const result={taskId:latest.taskId,runId:latest.runId,status:'PASS',baseSha:latest.baseSha,observedOriginMain:currentMain,affectedSourceIdentical:true,originalBlockerPreserved:true,packageProofReused:true,nativeActionPopup:'NOT_RUN',personalAccountSave:'NOT_RUN',scope:'Synthetic existing-owned-class journey; actual app/controller/worker/store/Sync, fabricated source/network/Chrome APIs. No Product or package changes.'};
+await fs.writeFile('tests/n36-final-journey-evidence.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

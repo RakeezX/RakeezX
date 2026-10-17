@@ -1,0 +1,315 @@
+{
+  "taskId": "continuous-n36-final-receiver-journey-20261018",
+  "runId": "006e830c-a452-47e6-8a89-358ca35024b8",
+  "baseSha": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "checks": [
+    {
+      "name": "n36_lost_receipt_exact_batch_existing_retry",
+      "status": "PASS",
+      "evidence": "Actual local save + normal Sync ACK followed by dropped extension outcome; controller retained batch, explicit same-batch retry returned existing without DB/outbox mutation."
+    },
+    {
+      "name": "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+      "status": "PASS",
+      "evidence": {
+        "total": 303,
+        "classes": 10,
+        "operations": [
+          {
+            "classroom": "خامس1",
+            "selected": 28,
+            "added": 28,
+            "acknowledged": 56,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس2",
+            "selected": 28,
+            "added": 28,
+            "acknowledged": 56,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس3",
+            "selected": 29,
+            "added": 29,
+            "acknowledged": 58,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس4",
+            "selected": 28,
+            "added": 28,
+            "acknowledged": 56,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس5",
+            "selected": 30,
+            "added": 30,
+            "acknowledged": 60,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس6",
+            "selected": 28,
+            "added": 28,
+            "acknowledged": 56,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس7",
+            "selected": 29,
+            "added": 29,
+            "acknowledged": 58,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "خامس8",
+            "selected": 31,
+            "added": 31,
+            "acknowledged": 62,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "سادس6",
+            "selected": 34,
+            "added": 34,
+            "acknowledged": 68,
+            "remaining": 0,
+            "normalSync": true
+          },
+          {
+            "classroom": "سادس7",
+            "selected": 38,
+            "added": 38,
+            "acknowledged": 76,
+            "remaining": 0,
+            "normalSync": true
+          }
+        ],
+        "scope": "Actual controller/worker, exact origin-bound app receiver, explicit existing owned destination/mapping/confirmation, actual persisted DB + normal Sync engine canonical ACKs. Fabricated network only; no personal save claim."
+      }
+    },
+    {
+      "name": "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards",
+      "status": "PASS",
+      "evidence": "Actual receiver TTL/owner change erase preview without writes; worker duplicate/expired/wrong-tab/replay denied. All ten partial transfers required fresh approval. Lost receipt retained exact batch. Unchanged 0.5.11 package evidence reused from initial run."
+    }
+  ],
+  "operations": [
+    {
+      "classroom": "خامس1",
+      "selected": 28,
+      "added": 28,
+      "acknowledged": 56,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس2",
+      "selected": 28,
+      "added": 28,
+      "acknowledged": 56,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس3",
+      "selected": 29,
+      "added": 29,
+      "acknowledged": 58,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس4",
+      "selected": 28,
+      "added": 28,
+      "acknowledged": 56,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس5",
+      "selected": 30,
+      "added": 30,
+      "acknowledged": 60,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس6",
+      "selected": 28,
+      "added": 28,
+      "acknowledged": 56,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس7",
+      "selected": 29,
+      "added": 29,
+      "acknowledged": 58,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "خامس8",
+      "selected": 31,
+      "added": 31,
+      "acknowledged": 62,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "سادس6",
+      "selected": 34,
+      "added": 34,
+      "acknowledged": 68,
+      "remaining": 0,
+      "normalSync": true
+    },
+    {
+      "classroom": "سادس7",
+      "selected": 38,
+      "added": 38,
+      "acknowledged": 76,
+      "remaining": 0,
+      "normalSync": true
+    }
+  ],
+  "errors": [],
+  "initialEvidence": "tests/n36-final-journey-browser.json",
+  "preservedFailures": [
+    {
+      "phase": "class-0",
+      "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(s.ownerId===owner&&s.serverRevision>0&&!s.syncCreatePending)\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-final-receiver-journey-20261018/tests/n36-final-journey-resumed.mjs:124:67\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-final-receiver-journey-20261018/tests/n36-final-journey-resumed.mjs:61:2",
+      "operations": [],
+      "correction": "Local student records carry ownership through the workspace/database and durable command, not an ownerId field. Assert actual workspace identity, durable owner guard, canonical network receipt owner and positive reconciled revision instead. Product guard unchanged."
+    },
+    {
+      "phase": "class-0",
+      "failure": "locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-sheet-close]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018\\tests\\n36-final-journey-resumed.mjs:129:46\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-final-receiver-journey-20261018/tests/n36-final-journey-resumed.mjs:61:2",
+      "operations": [
+        {
+          "classroom": "خامس1",
+          "selected": 28,
+          "added": 28,
+          "acknowledged": 56,
+          "remaining": 0,
+          "normalSync": true
+        }
+      ],
+      "correction": null
+    },
+    {
+      "phase": "class-0",
+      "failure": "locator.click: Error: strict mode violation: locator('[data-sheet-close]') resolved to 2 elements:\n    1) <button class=\"iconbtn\" aria-label=\"إغلاق\" data-sheet-close=\"\">…</button> aka getByRole('button', { name: 'إغلاق' })\n    2) <button disabled data-sheet-close=\"\" class=\"btn btn--ghost\">إلغاء</button> aka getByRole('button', { name: 'إلغاء' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-sheet-close]')\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-final-receiver-journey-20261018\\tests\\n36-final-journey-resumed.mjs:139:47\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:19:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-final-receiver-journey-20261018/tests/n36-final-journey-resumed.mjs:61:2",
+      "operations": [
+        {
+          "classroom": "خامس1",
+          "selected": 28,
+          "added": 28,
+          "acknowledged": 56,
+          "remaining": 0,
+          "normalSync": true
+        }
+      ],
+      "correction": null
+    }
+  ],
+  "facade": "Canonical helper GET/HEAD-only local-byte HTTPS origin; DNS failclosed, external HTTP/WebSockets/SW blocked; no remote/native proof",
+  "reusedChecks": [
+    {
+      "name": "n36_0511_exact_archive_sources_and_stable_read_only",
+      "status": "PASS",
+      "evidence": {
+        "files": 25,
+        "archive": {
+          "file": "rakeez-teacher-import-helper-0.5.11.zip",
+          "sha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+          "bytes": 105862
+        },
+        "stable": {
+          "version": "0.5.11",
+          "sourceTaskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+          "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543"
+        },
+        "unchangedEvidence": [
+          "tests/n36-popup-width-diagnostics-package.json",
+          "tests/n36-popup-width-diagnostics-browser.json",
+          "tests/n36-terminal-pager-evidence-browser.json"
+        ],
+        "extensionChanged": false
+      }
+    },
+    {
+      "name": "n36_protocol_ttl_duplicate_and_per_transfer_cap",
+      "status": "PASS",
+      "evidence": "Actual shared protocol accepts one selected class, rejects expired/duplicate/303-row single transfer; no total-run cap asserted."
+    },
+    {
+      "name": "n36_actual_controller_303_ten_sorted_class_reviews_no_automatic_save",
+      "status": "PASS",
+      "evidence": {
+        "classes": [
+          "خامس1",
+          "خامس2",
+          "خامس3",
+          "خامس4",
+          "خامس5",
+          "خامس6",
+          "خامس7",
+          "خامس8",
+          "سادس6",
+          "سادس7"
+        ],
+        "counts": [
+          28,
+          28,
+          29,
+          28,
+          30,
+          28,
+          29,
+          31,
+          34,
+          38
+        ],
+        "total": 303,
+        "actualDOM": true,
+        "networkAndChromeOnlyFixtures": true
+      }
+    }
+  ],
+  "final": {
+    "studentsAdded": 303,
+    "enrollmentsAdded": 303,
+    "networkReceipts": 606,
+    "dbOutboxEmpty": true,
+    "otherStoresUnchanged": true
+  },
+  "status": "PASS",
+  "cleanup": "Canonical helper closed disposable contexts/browser; task-owned server closed; no live lease, user profile, remote request, updater invocation, or Product policy change.",
+  "nativeActionPopup": {
+    "status": "NOT_RUN",
+    "evidence": "Origin facade/HTTP and worker VM are not native extension proof."
+  },
+  "sourceHashes": {
+    "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "src/views/class-import-center.js": "fa6d885852b0c7682ee104714ced08be1213bf2feb0543d59cb166b57e9732d8",
+    "src/views/teacher-setup-import.js": "667fa83df72cb45c0b0e20902147cac66e11891777111314ebc08dddb5e37a89",
+    "extensions/rakeez-teacher-import-helper/categories-popup.js": "c10dfdf359de08c0c940a56e8e8178a66fdb87ee25ef7b1561369d87c6a1eace",
+    "extensions/rakeez-teacher-import-helper/handoff-worker.js": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6"
+  }
+}
