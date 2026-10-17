@@ -35,6 +35,7 @@ let accountContractRequest = 0;
 let accountContractUnavailable = false;
 let emailFeedback = null;
 let removeEmailVerification = () => {};
+let removeEmailReturnCheck = () => {};
 let emailVerificationInFlight = null;
 let verifiedEmailContext = '';
 let retryEmailVerification = () => {};
@@ -117,7 +118,7 @@ function emailChangeSheet(currentEmail, submit) {
       if (!root.isConnected) return;
       if (!message) {
         const status = root.querySelector('[data-email-change-sending]');
-        status.textContent = 'أُرسل طلب التغيير. أكّد الطلب من البريدين الحالي والجديد، وتحقق من البريد غير المرغوب فيه. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيدان.';
+        status.textContent = 'أُرسل طلب التغيير. بعد تأكيد الرسالتين، ارجع إلى هذه النافذة للتحقق من التغيير.';
         button.remove();
         root.querySelector('.sheet__foot [data-sheet-close]').focus({ preventScroll: true });
         return;
@@ -397,9 +398,9 @@ const settings = {
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
-                ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification">إعادة المحاولة</button></p>` : ''}
+                ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" aria-busy="${emailView.verifying ? 'true' : 'false'}" ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'إعادة المحاولة'}</button></p>` : ''}
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
-                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span></div>
+                  ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span> <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification" data-email-change-check aria-busy="${emailView.verifying ? 'true' : 'false'}" ${emailView.verifying ? 'disabled' : ''}>${emailView.verifying ? 'جارٍ التحقق…' : 'تحقق من التغيير'}</button></div>
                     <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
                       <summary>كيف أكمل تأكيد البريد؟</summary>
                       <p class="field__hint">أكمل التأكيد من بريدك الحالي والجديد، وتحقق من مجلد الرسائل غير المرغوب فيها. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيد.</p>
@@ -651,31 +652,52 @@ const settings = {
     emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email || view.pending });
     removeEmailVerification();
     const context = () => JSON.stringify([cloud.user?.id, cloud.user?.email, cloud.user?.new_email, view.pending, cloud.session?.access_token]);
-    const verifyEmail = () => {
-      if (cloud.user?.id !== ownerId || view.sending || emailVerificationInFlight || context() === verifiedEmailContext) return;
-      const beforeFeedback = JSON.stringify(emailFeedback);
-      const hadError = Boolean(view.verificationError);
+    const active = () => request === accountContractRequest && cloud.user?.id === ownerId && Boolean(cloud.session) && currentEmailChangeView() === view;
+    const pending = () => Boolean(cloud.user?.new_email || view.pending || emailFeedback?.requestedEmailChange);
+    const verifyEmail = (force = false) => {
+      if (!active() || view.sending) return;
+      if (emailVerificationInFlight) return emailVerificationInFlight;
+      if (!force && context() === verifiedEmailContext) return;
+      const before = JSON.stringify([emailFeedback, cloud.user.email, view.verificationError]);
+      const showBusy = pending() || Boolean(view.verificationError);
       const flight = cloud.verifyCurrentAuthIdentity(ownerId);
       emailVerificationInFlight = flight;
+      view.verifying = true;
+      if (showBusy) repaint();
       flight.then(() => {
-        if (request !== accountContractRequest || cloud.user?.id !== ownerId || currentEmailChangeView() !== view || view.sending) return;
-        emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email, verified: true });
+        if (!active() || view.sending) return;
+        // Completion additionally requires the provider's pending value to be gone.
+        emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email, verified: !cloud.user.new_email });
         if (emailFeedback.completed) view.pending = '';
         verifiedEmailContext = context();
         view.verificationError = '';
-        if (hadError || JSON.stringify(emailFeedback) !== beforeFeedback) repaint();
       }).catch(() => {
-        if (request !== accountContractRequest || cloud.user?.id !== ownerId) return;
+        if (!active()) return;
         // Failure is neutral, never evidence of completion or grounds to clear data.
         view.verificationError = 'تعذر التحقق من البريد. أعد المحاولة.';
-        repaint();
       }).finally(() => {
         if (emailVerificationInFlight === flight) emailVerificationInFlight = null;
+        view.verifying = false;
+        if (active() && (showBusy || JSON.stringify([emailFeedback, cloud.user.email, view.verificationError]) !== before)) repaint();
         if (request !== accountContractRequest) retryEmailVerification();
       });
+      return flight;
     };
-    retryEmailVerification = () => { verifiedEmailContext = ''; verifyEmail(); };
-    removeEmailVerification = cloud.subscribe(verifyEmail);
+    retryEmailVerification = () => verifyEmail(true);
+    removeEmailVerification = cloud.subscribe(() => verifyEmail());
+    removeEmailReturnCheck();
+    let lastReturnCheck = -Infinity;
+    const checkOnReturn = () => {
+      if (!active() || !pending() || view.sending || document.visibilityState !== 'visible' || emailVerificationInFlight || Date.now() - lastReturnCheck < 30000) return;
+      lastReturnCheck = Date.now();
+      verifyEmail(true);
+    };
+    window.addEventListener('focus', checkOnReturn);
+    document.addEventListener('visibilitychange', checkOnReturn);
+    removeEmailReturnCheck = () => {
+      window.removeEventListener('focus', checkOnReturn);
+      document.removeEventListener('visibilitychange', checkOnReturn);
+    };
     verifyEmail();
     refreshAccountContract()
       .then(() => { if (request === accountContractRequest) { accountContractUnavailable = false; repaint(); } })
@@ -695,6 +717,7 @@ const settings = {
 
   onUnmount() {
     removeEmailVerification();
+    removeEmailReturnCheck();
     retryEmailVerification = () => {};
     verifiedEmailContext = '';
     if (emailFeedback) emailFeedback.completed = false;
@@ -717,7 +740,7 @@ const settings = {
     },
 
     async 'change-email'() {
-      const currentEmail = currentAccountContract()?.email ?? cloud.user?.email ?? '';
+      const currentEmail = cloud.user?.email ?? currentAccountContract()?.email ?? '';
       if (!currentEmail || !cloud.user?.id) return;
       const view = currentEmailChangeView();
       if (view.sending || view.sheetOpen) return;

@@ -1,0 +1,90 @@
+{
+  "taskId": "continuous-n64-pending-server-status-check-20261017",
+  "runId": "43666eba-56cf-4f83-8da3-57af4b39f015",
+  "status": "PASS",
+  "results": [
+    {
+      "width": 1280,
+      "originalDocumentManualAndFocusCompletion": true,
+      "pendingFirstConfirmation": true,
+      "dialogCloseGuidance": true,
+      "failureImmediateRetry": true,
+      "inFlightJoin": true,
+      "cooldown": {
+        "gets": 0,
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "unchangedAppEventBaseline": {
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "ownerSwitchRejected": true,
+      "wrongOwnerRejected": true,
+      "noSessionNeutral": true,
+      "unmountCleanupAndReopenPending": true,
+      "responsiveNoOverflow": true,
+      "realAccountStoreEntry": true
+    },
+    {
+      "width": 320,
+      "originalDocumentManualAndFocusCompletion": true,
+      "pendingFirstConfirmation": true,
+      "dialogCloseGuidance": true,
+      "failureImmediateRetry": true,
+      "inFlightJoin": true,
+      "cooldown": {
+        "gets": 0,
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "unchangedAppEventBaseline": {
+        "writes": 0,
+        "paints": 1,
+        "sync": 20
+      },
+      "ownerSwitchRejected": true,
+      "wrongOwnerRejected": true,
+      "noSessionNeutral": true,
+      "unmountCleanupAndReopenPending": true,
+      "responsiveNoOverflow": true,
+      "realAccountStoreEntry": true
+    }
+  ],
+  "sourceSha256": {
+    "src/views/settings.js": "7b64c7d727364b41ffd297857560e89843e72b791ba396ae0cc488abd24489da",
+    "src/lib/cloud.js": "df9fc3d3cf8305bb91e3abacbf52a9f7166f3aa6d19a93a121cee4a42399ae84",
+    "sw.js": "c6be982fbfdd08ebd50a8fc0e3c27b8aa6c797db9f0613bf446479bdd4ceda50"
+  },
+  "reusedCloudCRLFSha256": "992bf9d6d26cdb49b582088275f4df7e5d7df99715ebebeedd2b28744948d08f",
+  "preservedInitialFailures": [
+    "Initial evidence writer compared LF checkout bytes with prior CRLF evidence hash and failed after browser phase; fixed explicit line-ending normalization, retained exact Git blob identity f88450d7109f8bdfc6d500f108edb7d7616e6bc9.",
+    "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  locator('[data-email-change-check]')\nExpected: \"true\"\nReceived: \"\\\"true\\\"\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.attribute.value\" with timeout 5000ms\n  - waiting for locator('[data-email-change-check]')\n    14 × locator resolved to <button disabled type=\"button\" aria-busy=\"\"true\"\" data-email-change-check=\"\" class=\"btn btn--quiet btn--sm\" data-act=\"retry-email-verification\">جارٍ التحقق…</button>\n       - unexpected value \"\"true\"\"\n\n    at captureRawStack (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright-core\\lib\\coreBundle.js:9681:17)\n    at callMatcherAsStep (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright\\lib\\matchers\\expect.js:13310:57)\n    at Object.toHaveAttribute (C:\\Users\\Abody\\Projects\\RakeezX\\node_modules\\playwright\\lib\\matchers\\expect.js:13300:23)\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n64-pending-server-status-check-20261017\\tests\\n64-pending-status-browser.mjs:81:81\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-pending-server-status-check-20261017/tests/n64-pending-status-browser.mjs:20:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    gets: 0,\n+   paints: 1,\n+   sync: 20,\n-   paints: 0,\n-   sync: 0,\n    writes: 0\n  }\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-pending-server-status-check-20261017/tests/n64-pending-status-browser.mjs:96:11\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n64-pending-server-status-check-20261017/tests/n64-pending-status-browser.mjs:20:2"
+  ],
+  "reusedEvidence": "tests/n64-bounded-verification-evidence.json: exact unchanged cloud.js SHA; existing 12s deadline/late response and refresh checks. No live certification.",
+  "scope": "Actual application DOM/handlers/CSS; canonical isolated loopback synthetic Auth; external requests and Service Workers blocked. Existing helper Sync fixture limitations retained; unchanged-event scheduling measured, no whole-Sync claim.",
+  "ownedBrowserAndServerClosed": true,
+  "checks": [
+    {
+      "name": "n64_pending_manual_and_focus_server_check_fresh_completion_without_callback_handling",
+      "status": "PASS",
+      "evidence": "Both 1280 and 320: same-document manual first-confirmation pending, visibility return pending, focus fresh completion/new email, then independent manual completion; actual owner-bound app/store. No callback/URL/token implementation changed."
+    },
+    {
+      "name": "n64_pending_failure_owner_cooldown_dialog_and_real_responsive_ui",
+      "status": "PASS",
+      "evidence": "Both widths: send dialog guidance/Close, failed-read immediate retry, disabled/busy read + event/click joins, 30s cooldown, wrong-owner and switched-owner rejection, no-session neutrality, listener cleanup and Auth pending recovery; rendered DOM/CSS screenshots inspected. Cooldown adds zero reads/writes/paints/Sync schedules versus unchanged app listeners (existing baseline 20 visibility Sync schedules/1 paint)."
+    }
+  ],
+  "visualInspection": [
+    "pending-320.png and pending-1280.png: real pending action readable and usable, no overflow",
+    "dialog-320.png: concise return guidance and Close remain visible",
+    "completed-320.png: fresh new email and success, normal settings controls visible"
+  ],
+  "cleanup": "Canonical isolated helper closed owned contexts/browser in finally; Vite server closed in finally; port 20664 has no listening process after completion.",
+  "remainingScope": "Publisher must verify served settings/SW. N64 remains OPEN: actual PO two-owned-email test and previously blocked resend/cancel/callback/hosted scope are not completed or re-created."
+}
