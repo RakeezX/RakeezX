@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n44-server-preactivation-package-20261017",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -250,
+      "scopeKey": "n44-inactive-server-registration-delivery-preactivation",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [],
+      "objective": "PO17October2026 11:56Asia/Riyadh explicitly requests keeping execution useful on OPEN tickets towards finishing or closure-readiness; previous08:37 requests an independent second worker. N44 accepted in-app UI and latest unimported Push primitives are DONE, do not repeat them or rebrand inactive code as real WebPush. Prepare the concrete missing SERVER registration/idempotent delivery boundary and its preactivation architecture gate as INACTIVE LOCAL SOURCE, independent from activeN36. This is code preparation under reversible-work delegation, not a rollout, live migration or provider authority.\n\nRead current canonical N44 row, D107/D108, docs/automation-evidence/20261017/N44_INACTIVE_PUSH_PRIMITIVES_PREPARATION.md and actual notification center/event/preferences/client/core contracts from fresh origin/main. Current owner explicitly rejects NEW PAID notification subscriptions/services. No new paid plan/provider/API, no key creation or cost assumption. Use existing intended infrastructure only as an unconfigured target. Do not read secrets/.env/service-role/project credentials or probe any connected instance. Do not touch N34 support-notification-worker, N64 Auth email flow, existing applied migrations, app/bootstrap/SW/teacher UI. No live school/student/account access. Preserve current dirty canonical docs and acceptedUI.\n\nDeliver a SMALL self-contained inactive package under drafts/n44-push/** OUTSIDE auto-run supabase migrations/functions paths: strict owner-authenticated registration/revoke handler boundary with injected authenticated-server verifier and protected repository, plus durable idempotency/delivery-policy boundary using an atomic repository interface; define a concrete schema-proposal.sql and registration/service contract if needed (a DRAFT, not an applied/generated migration). No environment network sender is wired, no real outboundPush or permission request. No module is imported by application/functions/deploy scripts. Prefer a few cohesive files to a framework. Reuse stable eventIDs, expiry, minimal payload from current core, preferences/quiet/timezone conventions. Server derives owner from an independently verified session, never client ownerId/user_metadata/verified:true. Define stale-session/logout/owner/workspace/device switch and crash reconciliation, only original registration removal, private endpoint/key handling, no diagnostics with raw payload/endpoint/keys/userIDs. Treat endpoint delivery as an outbound-network boundary: no arbitrary URL fetching or trusting client endpoints; explicitly constrain future actual provider origins/redirect/private-address handling and keyformat/size without guessing a new live endpoint. The actual sender may remain a disabled injected port if encryption/provider capability is absent; do not implement insecure homegrown crypto.\n\nThe local durable policy contract must support atomic event/owner/workspace/device reservation, immutable expiry, bounded attempts, retry/backoff, uncertain outcomes without duplicate noisy fan-out, dead endpoint404/410, revoked/expired/context-ineligible suppression, current preference/quiet/timezone and event/ownership recomputation immediately before a potential send. Use deterministic fake repository/clock/auth/sender for meaningful tests, but do not pretend memory maps prove SQL atomicity or hostedRLS. If schema draft is necessary, private/unexposed store, least privilege, no PUBLIC function execution, authenticated row ownership, indexes/uniqueness aligned with predicates, bounded retention/rate policies and non-logged secret material. No broad admin/marketing campaign executor here; N78 privileged authorizer stays separately gated. Do not add global RLS/Admin-role frameworks.\n\nBefore any Supabase-specific schema/handler decision consult current primary docs: https://supabase.com/changelog.md then relevant security/RLS/Edge-auth docs. The parent has read Supabase and postgres-best-practices skills: verify current APIs; never authorize via user_metadata; service-role stays server-only; explicit ownership USING/WITH CHECK; views security_invoker; security-definer only genuinely needed with restricted schema/search_path/execute; index owner predicates. New real migration filenames later must be generated with CLI migration new, not invented here. This task only writes schema-proposal.sql as a draft and does not invoke any hosted SQL/advisor/CLI project operation. If already available, an OWNED isolated disposable local Postgres container may test the draft atomically with fabricated identities and rollback/cleanup; no installing infrastructure or touching another container/DB. If unavailable, mark schema-runtime/RLS certification NOT_RUN and provide exact later verification—do not downgrade that toPASS or block all useful source preparation. Local source tests must actually execute handler/policy branches, not just grep for strings.\n\nProduce one concrete preactivation review document: architecture/independent authorization/privacy and retention/abuse noise/rate limits/cost and device compatibility decisions, small bounded pilot rollout plan, exact source paths and missing actual-schema/server/app/SW/real-device gates. Propose numeric resource limits with reason and explicitly label them draft technical defaults pending the gate; never promise that no new subscription means zero existing infrastructure usage/cost. Distinguish prepared source, simulated behavior, any genuinely disposableSQL evidence, and liveNOT_RUN. No real permission, hosted migration/function deployment/Auth/RLS/providerconfig/VAPID/campaign/real send or Production activation is authorized. No request for repeated permission for source preparation. Do not closeN44.\n\nFOCUSED verification: unauthenticated/self-asserted/foreign-owner/stale context rejected; consent/revoke/idempotency/retry/expiry/quiet/dead-endpoint/cleanup branches with fakes; concurrent duplicate reservations through actual atomic interface semantics, privacy-safe results/logging and import inactivity. If SQL can be tested locally use actual rows/constraints and policy checks; otherwise retainNOT_RUN. No acceptedN44 UI/browser retest or broad build except publisher's ordinary source-only publication. Exact taskId/runId/candidate/base/changedpaths/fourcheck mapping in finalJSON. Only original publisher may merge unimported drafts/tests/evidence with provider/served source proof. This is useful closure-preparation for the existing remaining service requirement, not activation, extra reviewer/planner or repeated primitive-only work.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-server-preactivation.test.mjs",
+        "tests/n44-server-preactivation-sql.mjs",
+        "tests/fixtures/n44-server-preactivation/**",
+        "docs/automation-evidence/20261017/N44_SERVER_PREACTIVATION_PACKAGE.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/README.md"
+      ],
+      "requiredChecks": [
+        "n44_server_registration_verified_owner_consent_revoke",
+        "n44_delivery_atomic_idempotency_expiry_quiet_retry_and_dead_endpoint",
+        "n44_private_inactive_package_no_live_calls_or_app_imports",
+        "n44_preactivation_gate_current_docs_schema_evidence_and_remaining_limits"
+      ],
+      "acceptance": [
+        "Executable inactive registration and delivery-policy source addresses missing server boundaries with meaningful synthetic cases; reuses preparedcore, no duplicatedUI or real activation.",
+        "Independently verified serverowner, protectedsecret/endpoint store, atomicidempotency/retention/rate and stalecontext/revocation contracts are concrete; realSQL/service verification remains honest.",
+        "No hosted operation, environmentsecrets, paid service, VAPIDcreation, adminprovider or app/SW/real data/send activation. Allpackagepaths outside auto deploy/run scopes.",
+        "Concrete reviewable architecture/privacy/abuse/cost/device preactivation gate and source candidate delivered for future bounded activation; wholeN44 staysOPEN."
+      ],
+      "preparationAuthority": {
+        "kind": "PO1156-independent-open-N44-service-source-preparation",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert draft server package tests evidence only",
+        "realData": false,
+        "livePushActivation": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "Latest PO17October11:56 instructs continuous useful existingOPEN work and closure-preparation. Existing reversible code/synthetic authority permits this explicitlyINACTIVE server/source package and architecture preactivation review. D107/D108 expressly gate live schema/RLS/Auth/provider/service-role/VAPID/Admin/mass-send and rollout: ALL remain forbidden here. Drafts are outside any auto-run service paths and unimported. Publication is source-only via sole publisher; no paid subscription/new provider or actual account access.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "96de9f4b3e8b1a0818f08415f03133af3c9aee25",
+        "priorReceiptSha256": "c6a2e3a065b3230746746867aaa087a6124e8e1da23bea0787e0135cd910a325",
+        "reviewedFixtureSha256": "3968ef07bb21e7eecadce1abba034fe51308dbffa573b4596247b603fc683897",
+        "reason": "The sole publisher proved provider success plus exact immutable and Production bytes for the explicitly inert source-only verification path; the generic Product-asset gate misclassified that authorized non-runtime publication."
+      }
+    }
+  ]
+}
