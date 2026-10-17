@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n88-postgres-service-repository-20261017",
+  "sessionId": "01a14a42-22e7-7243-83c9-50b557f8ff39",
+  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "candidateSha": "65364b2926d81fa9b50c687fa7c62b3a9ea36994",
+  "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+  "previousResultSha256": "84f719c391356b7c7fa37b95a376c03e8f778d4e97393c8e014b476b43787e90",
+  "approvedCanonicalExcerpt": [
+    "  async lease(task, name, action, token = null) {",
+    "    const result = await this.command(this.config.controller.powershellPath ?? POWERSHELL,",
+    "      ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'RemoteSigned', '-File', path.join(this.scripts, 'resource-lease.ps1'), '-Name', name, '-Action', action,",
+    "        '-TaskFile', task.__file, '-RuntimeRoot', this.runtime, '-WaitSeconds', '0', ...(token ? ['-OwnerToken', token] : [])]);",
+    "    if (result.code === 3) return false;",
+    "    if (result.code !== 0) throw new Error('Resource lease: ' + clean(result.stderr || result.stdout));",
+    "    return action === 'acquire' ? { name, token: this.identity.instanceId, taskId: task.id } : true;",
+    "  }"
+  ],
+  "initialLeaseArgs": [
+    "const leaseArgs=action=>['-NoProfile','-NonInteractive','-File','C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1',",
+    "  '-RuntimeRoot','C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId];"
+  ],
+  "policyReadOnly": {
+    "MachinePolicy": "Undefined",
+    "UserPolicy": "Undefined",
+    "CurrentUser": "Undefined",
+    "LocalMachine": "Undefined",
+    "parentProcess": "Bypass; not inherited or requested"
+  },
+  "reason": "The new isolated test sanitized childEnv and omitted the canonical controller lease launcher process argument -ExecutionPolicy RemoteSigned (controller.mjs lease method). Read-only policy inventory found MachinePolicy/UserPolicy/CurrentUser/LocalMachine all Undefined; parent Process=Bypass is NOT to be inherited. This is a missing APPROVED per-process launcher setting, not a managed tool denial or authority waiver. Restore ONLY canonical RemoteSigned invocation for SAME resource-lease.ps1; retain normal lease, signature checks and all global policies.",
+  "microsoftDocumentation": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1",
+  "mutationPerformed": false
+}

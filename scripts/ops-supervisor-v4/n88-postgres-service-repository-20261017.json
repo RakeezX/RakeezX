@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-postgres-service-repository-20261017",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -405,
+      "scopeKey": "n88-inactive-postgres-transaction-service-port",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n88-native-postgres-qualification-20261017"
+      ],
+      "objective": "PO17October17:21asksremainingticketstatus; standingcontinuousOPENwork and prior explicit independentworker allowance authorize PMselecting actualmissingN88durable repository implementation, NOT anotherexplanation/SQLconstraintretest. PriorN88nativeDDL/2connection protocol passed and sourcepublished68e8262,reconciled499f082. Current service.mjs calls repository.transaction(async db=>...) but ONLY memory-repository exists; implement INACTIVE PostgreSQL repository port faithfully and exercise actual createPortalService with it. Read current canonicalN88row, service/memory/schema/design/nativeSQLreport; currentorigin/main, finalPIN1000..9999/stablestudentcredentialtosecondterm untouched. N64worker editssettings/SW independently; do not touchthosepaths orbrowser/resources. NO actualstudent/pageactivation/hostedSQL/Auth/RLS/serviceconfiguration/secret discovery/realteacher access. Source-onlydraft remainsunimported.\\nSMALLEST FAITHFUL PORT: existingservice callback includes GLOBAL guessing budgets and lacks a pre-resolved owner context, so do not pretend a per-owner query port can preserve it. A conservativelyserialized shared private transaction is acceptable for this bounded INACTIVE pilot draft: real PG transaction-owned global advisorylock/fixed trusted namespace, real DBstate read/write, 2independentpools proveSQLserialization. Explicit injected per-table/global snapshot bounds, LIMITbound+1 and failclosed oversize/invalid values, no unbounded historicalscan. Clearlydocument scalability/transactionduration limit; do notclaimpublicproduction-scalable/privateAuthready. Do not infer trustedowner/source from request metadata; actual service verifyTeacher/verifyIngress remain explicit injected ports and are mocked only locally. No frontendprivate schema/grants/publicRPC. Preserve service.mjs ideally BYTEunchanged; tinyportchange onlyif actualfaithfulcontract impossible, recordpreciseinitialfailure. Do not silentlyrewrite credential/security/rate/PIN/termpolicy to fit storage. Existing asynccallback mustexecute inside actual private transaction; bound COMPLETEcallback+flush+commit lifecycle, detach per-operation snapshot and prevent timedout/latecallback fromflushing/mutating anysubsequentoperation. SETLOCAL query/locktimeouts alone do notboundasyncJSauthwait. Boundedpoolconnection lifecycle/rollback/release, SQLparameterized/fixedtable names, strict safe integer/bigint/time/UUID/null/json mapping. Commit ACK before returningservice200/cookie/code; failflush/query/commit => no success. NEVERretry uncertaincommit or automaticallyreissue secretcredentials. Snapshotdiff/write ordering preserves FK/currentnamespace/entry/PINtombstones/sessionversion/revocations. DeniedwrongPIN MUSTcommit sharedguessdebits because service returns401 (notthrow); callbackexceptions rollback. Expiredrate/sessioncleanup retention matches existing service, no cleanup of tombstones that wouldrecyclecodes. No new broad SQLexecuteexport or memoryfallback.\\nKNOWN LOCALPG native17.6 binaries existingartifacts/n77-native-pg17/package/native/bin andclient/node_modules/pg, noinstallation/npm/psql/Docker/service. Newexclusiveownedtaskartifactdir/marker/data +OSassignedloopbackport, strictminimalenv/explicitconnection, ownPID/birth/exe/-D+serverdata_directory readback beforeSQL. Read N88/N44native helpers, useownedboundedconnections/resources, no oldcluster/data/ports. Allfakeidentities/ingress/teacherAuth/PIN/crypto fixtures; rawcodes/privateentry/sessiontokens never printed/logged (even synthetic proofshouldbe summaries/hashes only). Finally closeownpools/clients, exactownedpg_ctlfast-w stop, PIDabsence+portfree, preserveSTOPPEDdir. Existing recursivecleanup actualtoolrejection persists: NO rm/Remove-Item orsubstitutedeletion. N64worker/resources/controller/STOP/personalbrowseruntouched.\\nACTUALSERVICE integration cases, notrawSQL pretendingport: instantiate createPortalService withNEWPGrepo andexplicitfakeverifyTeacher/Ingress/newCode/serverkey; namespace/authoritativecurrentmembership/publications fabricated throughownedfixturewriter usingSAME transactionlock. Issue/login/read/publish/revoke/rotate actualservice results, PINboundary and same stablecredential across secondterm queryreuse unchangedproofs. Two serviceinstances/independentPGconnections actuallockwait concurrent codecollision/uniquecredentials, invalidguessesdebit global/source/context budgets BEFORE sensitive lookup; concurrentvalid/invalid attempts obeylimits without overwritten counters. Wrongowner/namespace/entry/session/version/publishedscope deny no studentPII leak. Rotate/revoke vslogin/canonicalmembership transition serializes; oldsessionclosed/newcurrentmemberuses sameunchangedPIN/entry per finalpolicy (no autonumberreset). Forcecallbackerror/flushfail/knownrollback/uncertaincommit as bounded localfaultports prove no falselyreturned credentials/cookie200 and no silentreplay. Controlledownedstop/restart thennewpool/service verifies codeverifier/budget/revocation persistence and actualread behavior; no crash/powerlossclaim. Do notrerunall9000memoryissuances/17UI proofs oroldrawDDLsuite, bindunchanged service/schema/proof hashes instead. Any new sourcefix => only affected retest.\\nDeliver newdraft module/testfixture/runner/machineJSON andconciseactualintegrationdoc. Three exactrequiredchecknames below; hostedAuth/currentcanonicalmembershipresolver/ingress/hosting/keycustody/appwiring/studentaccess remainNOT_RUN in doc, notfakeoptionalFAIL requiringanotheropsrepair. Originalpublisher source-only INERTrelease permitted, verificationPaths realnewmodule/design/evidence; no appassetsfakechanged. Known long-livedcontroller maycachedreject completepure-source receipt: workerdoesnotpatchqueue/restart; preserveexactallPASSresult andoriginalpublisherreceipt for alreadyapprovedguardedproofreconciliation later (noSQLrerun). N88notCLOSED/live. No extra reviewworkers orpaidservices.\nMATERIAL LOCAL TEST LAUNCHER CORRECTION — 17October17:36: original run stopped before DB creation because leaseArgs omitted existing canonical controller invocation. Fix ONLY owned tests/n88-postgres-service-repository.mjs leaseArgs for BOTH acquire/release to exact canonical [-NoProfile,-NonInteractive,-ExecutionPolicy,RemoteSigned,-File,<same canonical resource-lease.ps1>,...same guarded lease arguments]. Canonical controller.mjs lease() already uses RemoteSigned. Fresh read-only global policy scopes are Undefined; childEnv strips inherited Process preference and currently falls back to Restricted. This restores the approved per-process setting; NO Set-ExecutionPolicy, registry/User/Machine/GroupPolicy/ACL/ZoneIdentifier changes, NO Bypass/Unrestricted, alternate host, skipped/manual lease or direct SQL without owned lease. If canonical RemoteSigned still rejects policy/signature/managed tooling, STOP and preserve exact reason, no further alternate. Keep previous PSSecurityException/NOT_RUN report unchanged as initial evidence, do not mark it PASS. Resume SAME saved candidate/session, reconcile currentmain onlyifneeded, use CURRENT supplied runId and NEW exclusivelyowned local phase, leave prior emptyowned directory intact. Run the originally missing actual service/SQL/restart checks once with the repaired launcher; original lease failure happened BEFORE DB/server/connection and consumed no actual DB proof. No Product policy/schema activation changes or unrelated reruns. Originalthree requiredchecks/scope/releaseauthority unchanged. Return exact real checks and clean only owned resource handles; no policy/config mutation. This is a test-harness correction, not permission to retry any N64/N36 tool-denied operation.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/**",
+        "tests/n88-postgres-service-repository*.mjs",
+        "tests/n88-postgres-service-repository*.json",
+        "tests/fixtures/n88-postgres-service-repository/**",
+        "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/postgres-repository.mjs",
+        "docs/automation-evidence/20261017/N88_POSTGRES_SERVICE_REPOSITORY.md"
+      ],
+      "requiredChecks": [
+        "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
+        "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
+        "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits"
+      ],
+      "acceptance": [
+        "Actual durabletransaction adapter executes current portalservice againstlocalSQL, boundedsharedstate and commits before returned success.",
+        "Twoindependentserviceconnections qualify actualglobalbudgets/credential/session isolation/term/revocation/rollback/restart behavior; no fakeAuth or memoryproof described as hosting.",
+        "Ownedclusterstoppedverified, usefulinactive source-onlypublished; live student/Auth/hosting integration staysunimplemented and actual prior denials preserved."
+      ],
+      "preparationAuthority": {
+        "kind": "standing-po-open-N88-local-durable-runtime-preparation",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert inactive student portal database repository and local integration only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "StandingPOcontinuoususefulOPENwork +explicitindependentworker allowance +17:21remainingreadiness discussion authorize PM-selected reversible localmissingrepository implementation/ownedsyntheticSQLproof and originalpublisher source-only inert release. No real/hostedAuth/schema/RLS/service/privateaccessactivation, secrets, sends, policy/ACL ordestructivecleanup.",
+      "harnessRepair": {
+        "kind": "restore-canonical-lease-child-process-configuration",
+        "previousResultSha256": "84f719c391356b7c7fa37b95a376c03e8f778d4e97393c8e014b476b43787e90",
+        "canonicalPolicyArgument": "RemoteSigned",
+        "canonicalControllerSha256": "3e9de4b4c83105ad9c31a7ce056cca46b9cc7008e6cc5d84095150c287c25b9b",
+        "initialTestSha256": "7aef45195e7127e5eac05b5de36b16ed1f78155c36f89afd2515e9faec3be9ad",
+        "managedPolicyScopesObserved": "MachinePolicy=Undefined;UserPolicy=Undefined",
+        "reason": "The new isolated test sanitized childEnv and omitted the canonical controller lease launcher process argument -ExecutionPolicy RemoteSigned (controller.mjs lease method). Read-only policy inventory found MachinePolicy/UserPolicy/CurrentUser/LocalMachine all Undefined; parent Process=Bypass is NOT to be inherited. This is a missing APPROVED per-process launcher setting, not a managed tool denial or authority waiver. Restore ONLY canonical RemoteSigned invocation for SAME resource-lease.ps1; retain normal lease, signature checks and all global policies."
+      }
+    }
+  ]
+}
