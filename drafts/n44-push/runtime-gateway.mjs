@@ -47,8 +47,8 @@ export function preflight(config = {}, ports = {}) {
 // Parse JSON grammar AND decoded member uniqueness, including escaped aliases and
 // nested objects. Bounded bytes/depth prevent adversarial parser work. JSON.parse
 // alone accepts duplicate names and would silently replace registration identity.
-export function parseBody(text) {
-  if (typeof text !== 'string' || Buffer.byteLength(text) > 12288) fail();
+export function parseBody(text, maxBytes = 12288) {
+  if (typeof text !== 'string' || Buffer.byteLength(text) > maxBytes) fail();
   let i = 0;
   const ws = () => { while (/[\x20\x09\x0a\x0d]/.test(text[i] ?? 'x')) i++; };
   function string() {

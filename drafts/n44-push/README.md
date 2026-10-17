@@ -1,4 +1,10 @@
-# N44 server preactivation contract — INACTIVE DRAFT
+> Current N44 continuation: the concrete inactive Supabase Edge/Cloudflare Auth,
+> context/event and private scheduler composition is implemented in
+> [ACTIVATION.md](ACTIVATION.md). It supersedes future-port/host statements below.
+> No hosted activation or browser/SW wiring occurred. The historical stage and its
+> evidence remain below; the portable P256 validator is qualified separately.
+
+# N44 server preactivation contract â€” INACTIVE DRAFT
 
 Prepared source only. Nothing here is imported by the app, Service Worker,
 Supabase functions or deployment scripts. The private HTTP composition, OpenSSL
@@ -63,7 +69,7 @@ client workspace ownership. No SDK/auth adapter is supplied. The protected
 repository must independently map that subject to current workspace/device,
 session revision and persisted consent. Recheck those in the commit transaction
 after asynchronous authentication/protection. Revisions change on every logout,
-login, A→B→A, workspace/device switch and consent change; never reuse a revision.
+login, Aâ†’Bâ†’A, workspace/device switch and consent change; never reuse a revision.
 
 Register body has exactly `{ registrationId, workspaceId, deviceId,
 sessionRevision, consent: { revision, push: true }, subscription: { endpoint,
@@ -351,7 +357,7 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    context/global endpoint races, 20 first reservations producing one committed
    permit, rollback/crash fences, budget upserts/clock maximum, original revoke,
    tombstones and context-switch serialization. Two executed trigger defects
-   were repaired: retry→sending now requires the next attempt; attempt three
+   were repaired: retryâ†’sending now requires the next attempt; attempt three
    cannot transition back to retry. All role grants used to exercise RLS were
    temporary fixture grants rolled back; the draft still denies client access.
    Auth users/roles/`auth.uid()` are **local stubs**, and all identities, sealed
@@ -368,24 +374,24 @@ an SDK or weaken `verify_jwt`. Actual runtime APIs must be reverified at wiring.
    delivery change has a new focused crypto/boundary qualification; its original
    legacy import-scan failure and corrected scoped assertion are preserved in
    [the new evidence](../../docs/automation-evidence/20261018/N44_CRYPTO_SENDER.md).
-3. **Real service gate — NOT_RUN:** separately authorized CLI-generated migration
+3. **Real service gate â€” NOT_RUN:** separately authorized CLI-generated migration
    (`supabase migration new`, never invent a filename), fresh protected-schema
    and role plan, applied identity readback, actual repository/verifier/resolver,
    provider origin/egress/redirect/DNS policy, audited encryption, server-only
    VAPID custody/rotation and rate/cleanup configuration. Generic frontend
    publisher cannot apply this service work. No hosted operations here.
-4. **Privacy/abuse/cost/device gate — NOT_RUN:** approve generic lock-screen copy,
+4. **Privacy/abuse/cost/device gate â€” NOT_RUN:** approve generic lock-screen copy,
    consent/retention/backup deletion, request-log suppression, concrete quotas and
    kill switch before pilot. Reconcile subscription state after crash with the
    original private UUID. Lost auth erases browser binding and server sweep
    revokes stale context; no automatic opt-in or reactivation.
-5. **App/SW and real device gate — NOT_RUN:** separately wire prepared client,
+5. **App/SW and real device gate â€” NOT_RUN:** separately wire prepared client,
    actual owner guard and lifecycle callbacks, gateway's original-registration
    cleanup, service worker push/click, current event authorization on click,
    approved offline shell paths. Verify installed iOS/iPadOS Safari (supported
    Home Screen setup), Android Chrome and desktop Chrome/Edge support matrix,
    user gesture/denial/revoke, background/app-closed receipt, click, expiry,
-   logout/A→B→A/workspace/device switch, delayed/reload state, timezone/DST,
+   logout/Aâ†’Bâ†’A/workspace/device switch, delayed/reload state, timezone/DST,
    offline/reconnect. Browser/OS delivery is best effort; no exact timing promise.
 6. **Separately approved pilot:** at most two consenting synthetic operator
    accounts and three owned supported devices for 48 hours, operational lesson/

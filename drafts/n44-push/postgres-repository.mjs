@@ -117,7 +117,7 @@ function keyValues(table,key,row) {
 }
 // A synchronous work callback cannot recursively acquire this OR another repository.
 let inWork = false;
-export function createPostgresRepository({ acquire }) {
+export function createPostgresRepository({ acquire, prepare = async () => ({}) }) {
   must(typeof acquire === 'function');
   function run(ownerId, work, writer) {
     must(!inWork && ownerUUID(ownerId) && typeof work==='function' && work.constructor?.name!=='AsyncFunction');
@@ -161,11 +161,13 @@ export function createPostgresRepository({ acquire }) {
         }
         for(const r of state.registrations.values()) if(r.state==='active') must(claims.get(r.fingerprint)===r.registrationId);
         const oldClaims=clone(claims);
+        const extension=await prepare(c,ownerId,state);
         let open=true;
         const guard=()=>must(open);
         const tableMap=table=>{ guard(); must(Object.hasOwn(fields,table) && (writer || table!=='contexts')); return state[table]; };
         const tx=Object.freeze({
           time(now) {guard(); highWater=Math.max(highWater,integer(now)); return highWater;},
+          sourceEvent(...args) {guard(); return clone(extension.sourceEvent?.(...args) ?? null);},
           context(w,d) {guard(); must(id(w)&&id(d)); return clone(state.contexts.get(ctxKey(w,d)) ?? null);},
           get(table,key) {return clone(tableMap(table).get(key));},
           rows(table) {return clone([...tableMap(table).values()]);},
@@ -185,6 +187,7 @@ export function createPostgresRepository({ acquire }) {
           value=clone(value);
         }
         finally { inWork=false; open=false; }
+        await extension.beforeCommit?.();
         // Validate the complete buffered state, even if work caught a tx error.
         bytes=0;
         for(const table of Object.keys(columns)) {

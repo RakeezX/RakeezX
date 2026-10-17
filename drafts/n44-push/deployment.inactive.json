@@ -1,0 +1,13 @@
+{
+  "aiAuthored": true,
+  "enabled": false,
+  "deliveryEnabled": false,
+  "sourceOnly": true,
+  "serviceRevision": "n44-existing-host-v1",
+  "entry": "supabase/functions/n44-notifications/index.ts",
+  "requiredTrustedPorts": [],
+  "ingress": "drafts/n44-push/cloudflare-entry.mjs",
+  "scheduler": "drafts/n44-push/scheduler-entry.mjs",
+  "triggers": [],
+  "routes": []
+}

@@ -1,0 +1,46 @@
+{
+  "taskId": "continuous-n44-existing-host-auth-context-and-scheduler-20261018",
+  "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+  "baseSha": "7537657e8351fb7cb314a53ac4027c0976b3cf45",
+  "startedAt": "2026-10-17T23:24:52.684Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "exactPidAbsent": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-17T23:25:05.584Z",
+  "sourceSha256": {
+    "drafts/n44-push/auth-verifier.mjs": "b7ba8d208b7149e45fd5fe06450deafae536d4b47c12035cd6ff542d55f6f231",
+    "drafts/n44-push/backend.mjs": "ad2acd40e751e6425b757b1c580816f9c467ffc3bf27e41e6a7f23a0863d0eba",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "f2be25a0a9b55ade49d1e5f28e03261ea962ae0eb6c7c76289b4cde6f6a82dea",
+    "drafts/n44-push/web-protocol.mjs": "77f2e84fe2984067c4d672e7ea6f8523e26cdd6c3897510855149e17ee1a1a16",
+    "drafts/n44-push/cloudflare-entry.mjs": "bdadbcad71deef12ff404aad96f4d8442e2b0a1846bf521367a942377a5ac6b9",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "6654a0aaf40656cb88e1961e9de30a728926aa47977d688b6ff51c4da5e2c1f5",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "7dc517d1f00ea7ce8112039d54c8732856686892dece45e6123f92c4b65a06d8",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "b93bc6bb3e41c0941e8aeaeb4f084be72a665aabba91d3909826c22f9bcfaba3",
+    "drafts/n44-push/package-lock.json": "ff47b1ef32ae10014a52ccf3ed77b230905f74cb0b06d0a247e3948d7497f613",
+    "tests/fixtures/n44-existing-host/journey.mjs": "93c94145a21727c04c0fda83d6984ac42a12de469504e0d481c204e7c1ad7c66",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c"
+  }
+}

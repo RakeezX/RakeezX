@@ -1,0 +1,4 @@
+# AI: NOT active configuration. Later merge into project config only under explicit authority.
+[functions.n44-notifications]
+verify_jwt = false # the private entry independently verifies signed ingress AND SDK Auth
+entrypoint = "./functions/n44-notifications/index.ts"

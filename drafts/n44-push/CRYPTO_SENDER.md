@@ -1,4 +1,10 @@
-# Private subscription protection and Web Push transport — inactive
+> Current N44 continuation: the concrete inactive Supabase Edge/Cloudflare Auth,
+> context/event and private scheduler composition is implemented in
+> [ACTIVATION.md](ACTIVATION.md). It supersedes future-port/host statements below.
+> No hosted activation or browser/SW wiring occurred. The historical stage and its
+> evidence remain below; the portable P256 validator is qualified separately.
+
+# Private subscription protection and Web Push transport â€” inactive
 
 The two previously missing local ports are implemented. `private-runtime.mjs`
 provides the exact next composition entry; it neither listens nor schedules.

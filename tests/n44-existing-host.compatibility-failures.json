@@ -1,0 +1,11 @@
+{
+  "taskId": "continuous-n44-existing-host-auth-context-and-scheduler-20261018",
+  "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+  "runtime": "existing Deno 2.2.12",
+  "preserved": [
+    {"report": "tests/n44-existing-host.failure-1792279448330.json", "observed": "createPrivatePushPorts rejected sender initialization; direct isolated diagnostic returned Not implemented: crypto.ECDH.prototype.convertKey", "disposition": "adapted existing-host validator; no new host or global API patch"},
+    {"report": "tests/n44-existing-host.failure-1792279505596.json", "observed": "Intermediate native invalid-point ECDH guard: thread main panicked at ext\\node\\ops\\crypto\\mod.rs:808:12", "disposition": "replaced intermediate guard with pinned noble P256 canonical-point validation before native sender ECDH"}
+  ],
+  "otherOriginalFailures": "Timestamped n44-existing-host.failure-*.json preserve route mismatch, missing row-lock RLS applicability and busy publisher lease failures. No historical FAIL was edited to PASS.",
+  "finalEvidence": "tests/n44-existing-host.result.json and tests/n44-existing-host.deno.result.json; same final 12-case composition, new private role and owned local PostgreSQL only"
+}
