@@ -1,0 +1,9 @@
+# AI: inactive preparation. NO routes and NO triggers installed.
+name = "n44-notifications-ingress"
+main = "cloudflare-entry.mjs"
+compatibility_date = "2026-10-13"
+workers_dev = false
+[vars]
+N44_ENABLED = "false"
+# Separate scheduler deployment uses scheduler-entry.mjs, no public route.
+# Neither deployment has a cron trigger until separate live authorization.

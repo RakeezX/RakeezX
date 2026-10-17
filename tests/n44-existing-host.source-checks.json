@@ -1,0 +1,105 @@
+{
+  "taskId": "continuous-n44-existing-host-auth-context-and-scheduler-20261018",
+  "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+  "checkedAt": "2026-10-17T23:33:14.227Z",
+  "checks": [
+    {
+      "name": "n44_inactive_config_pins_and_scoped_syntax",
+      "status": "PASS",
+      "evidence": "Disabled host reads only flag; admin DB/SSL override/key reuse/malformed origin/revision rejected; direct and Supavisor lazy pools close without network; npm/Deno integrity matches; existing crypto transitive integrity unchanged; affected syntax checked. Browser/root packages/N88 unchanged."
+    }
+  ],
+  "reuse": {
+    "crypto18": {
+      "path": "tests/n44-crypto-sender.result.json",
+      "runId": "9c9ee4fd-ab29-43ae-b190-84c9dbcb3a6b",
+      "matching": [
+        {
+          "file": "drafts/n44-push/subscription-protector.mjs",
+          "sha256": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6"
+        },
+        {
+          "file": "drafts/n44-push/audited-sender.mjs",
+          "sha256": "9972a864baa325edc04c87958d4cadd7c1a0746a42b5c339d74c880ae5b7f6a1"
+        },
+        {
+          "file": "drafts/n44-push/committed-permit.mjs",
+          "sha256": "005cbed6901df5816138c2fd3451c480a71a89e2b4143e4371d5f271c404c29c"
+        },
+        {
+          "file": "drafts/n44-push/delivery.mjs",
+          "sha256": "9aebe5e65f45556443fa33b7e6814642f3a42f4e4e8d77830e9c8d852267755e"
+        },
+        {
+          "file": "drafts/n44-push/private-runtime.mjs",
+          "sha256": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9"
+        },
+        {
+          "file": "drafts/n44-push/registration.mjs",
+          "sha256": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36"
+        },
+        {
+          "file": "drafts/n44-push/shared.mjs",
+          "sha256": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d"
+        },
+        {
+          "file": "tests/fixtures/n44-server-preactivation/fakes.mjs",
+          "sha256": "e16f8b88aef6c42a6709e2899a1982cb1b406013fdfcc2814eb12025bcbe9da5"
+        },
+        {
+          "file": "src/lib/notification-push-core.js",
+          "sha256": "bf00ae3a06df34e603df8f87da20d6035391db798b58f4d5b32a934e20a6476b"
+        },
+        {
+          "file": "src/lib/notification-push-client.js",
+          "sha256": "a6a193c7fa192387c7733bee41c1056627634f235e27286519288461aec153fe"
+        },
+        {
+          "file": "tests/n44-crypto-sender.mjs",
+          "sha256": "32b302f2a33e8a03f7e194584dd092e9048846400aeabe9264d115de0d0a7d85"
+        },
+        {
+          "file": "tests/fixtures/n44-crypto-sender/fixture.mjs",
+          "sha256": "943fc96e55c5de1674b9282aa85e0e57a47adc954207814eb0ea081d92d24ba1"
+        }
+      ],
+      "changed": [
+        {
+          "file": "drafts/n44-push/provider-policy.mjs",
+          "sha256": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8"
+        },
+        {
+          "file": "drafts/n44-push/runtime-gateway.mjs",
+          "sha256": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917"
+        },
+        {
+          "file": "tests/n44-server-preactivation.test.mjs",
+          "sha256": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4"
+        },
+        {
+          "file": "drafts/n44-push/package.json",
+          "sha256": "d7c66a4eae59ed9ad60b03b4ab368304d9c3e67eb31e5d659d4f7f6ea8f7960a"
+        },
+        {
+          "file": "drafts/n44-push/package-lock.json",
+          "sha256": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe"
+        }
+      ],
+      "scope": "Reuse only matching component/protocol evidence; portable curve validator, PG hooks and WebRequest composition qualified by new 12-case Node/Deno journeys. Package additions do not replace prior crypto dependencies."
+    },
+    "corrected16": {
+      "path": "tests/n44-crypto-sender.boundary-repair-result.json",
+      "runId": "84e54815-c67b-4457-9948-ba4d9b74ecc1",
+      "summary": {
+        "tests": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "matchingTestHashes": {
+        "tests/n44-server-preactivation.test.mjs": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4",
+        "tests/n44-crypto-sender-import-guard.mjs": "ce04e90f88811d61255a046483899b64e4d8d6189241c072b1950d5f27911efd"
+      },
+      "scope": "Unchanged registration/delivery/shared/consumer core and corrected boundary fixtures; no blanket replay."
+    }
+  }
+}

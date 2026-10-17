@@ -1,5 +1,5 @@
 /** INACTIVE. Recognized is not approved: every host still needs explicit config. */
-import { ECDH } from 'node:crypto';
+import { p256 } from '@noble/curves/nist.js';
 import { isIP } from 'node:net';
 import ipaddr from 'ipaddr.js';
 import { validateSubscription } from './registration.mjs';
@@ -25,8 +25,11 @@ export function decode64(s, length) {
 export function validatePoint(s) {
   const point = decode64(s, 65);
   if (point[0] !== 4) fail();
-  // OpenSSL validates the actual curve point, not just its encoding/length.
-  if (!ECDH.convertKey(point, 'prime256v1', undefined, undefined, 'uncompressed').equals(point)) fail();
+  // Deno 2.2 has no ECDH.convertKey and native invalid-point ECDH panics.
+  // Pinned audited noble validator checks field bounds, curve equation and
+  // subgroup/infinity before any native sender ECDH. No custom curve parser.
+  const parsed=p256.Point.fromHex(point);parsed.assertValidity();
+  if(!Buffer.from(parsed.toBytes(false)).equals(point))fail();
   return point;
 }
 export function trustedSubscription(raw, origins) {

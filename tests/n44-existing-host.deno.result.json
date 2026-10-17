@@ -1,0 +1,108 @@
+{
+  "taskId": "continuous-n44-existing-host-auth-context-and-scheduler-20261018",
+  "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+  "baseSha": "7537657e8351fb7cb314a53ac4027c0976b3cf45",
+  "startedAt": "2026-10-17T23:29:50.393Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "n44_concrete_existing_host_verified_auth_context_and_runtime",
+      "status": "PASS",
+      "evidence": "Actual Cloudflare/WebRequest/AuthClient ES256/JWKS/fresh-user + private SQL/context/CAS/register/events/lesson chain; fabricated provider only."
+    },
+    {
+      "name": "n44_durable_bounded_scheduler_owner_revocation_and_failure_guards",
+      "status": "PASS",
+      "evidence": "Restricted owned native PG: committed audited encrypted bytes, concurrent duplicate scheduling, stale/foreign/source-parent/revoked rejection, keyset pagination, timeout uncertainty/no replay, cleanup and least privilege."
+    },
+    {
+      "name": "deno_existing_host_runtime_crypto_and_pg",
+      "status": "PASS",
+      "evidence": "Deno 2.2.12: same 12 cases PASS; actual AuthClient/WebCrypto, portable P256, pg and audited encrypted sender; external network denied, sanitized environment, owned PG fixture only."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "exactPidAbsent": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "cases": [
+    {
+      "name": "portable vetted P256 validator rejects off-curve, compressed and noncanonical keys",
+      "status": "PASS"
+    },
+    {
+      "name": "signed Auth + fresh user + exact session -> teacher context/CAS/registration",
+      "status": "PASS"
+    },
+    {
+      "name": "forged signature/issuer/audience/role/expiry/owner metadata and fresh provider denial",
+      "status": "PASS"
+    },
+    {
+      "name": "canonical current source registration, no caller payload authority; bounded due + concurrent dedupe",
+      "status": "PASS"
+    },
+    {
+      "name": "actual lesson/date/calendar projection and context-specific timing",
+      "status": "PASS"
+    },
+    {
+      "name": "source revision/delete/restore and parent deletion reject stale projection",
+      "status": "PASS"
+    },
+    {
+      "name": "actual private scheduler auth, ingress signature, replay, source limits and bounded pagination",
+      "status": "PASS"
+    },
+    {
+      "name": "timeout after committed send becomes durable uncertain, never automatic retry",
+      "status": "PASS"
+    },
+    {
+      "name": "consent/session change revokes original binding; cleanup and retired auth reject",
+      "status": "PASS"
+    },
+    {
+      "name": "bounded Auth timeout and disabled scheduled driver; no implicit external work",
+      "status": "PASS"
+    },
+    {
+      "name": "private least-privilege role denies Auth/canonical writes and anonymous private reads",
+      "status": "PASS"
+    },
+    {
+      "name": "distributed peer limit and cardinality cap preserve private cleanup capacity",
+      "status": "PASS"
+    }
+  ],
+  "fabricatedPushAttempts": 6,
+  "finishedAt": "2026-10-17T23:30:07.825Z",
+  "sourceSha256": {
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/auth-verifier.mjs": "b7ba8d208b7149e45fd5fe06450deafae536d4b47c12035cd6ff542d55f6f231",
+    "drafts/n44-push/backend.mjs": "d04429f01764389284b6b5335051ce7b2c673a4943184eae2cebd817a4b34a00",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/web-protocol.mjs": "77f2e84fe2984067c4d672e7ea6f8523e26cdd6c3897510855149e17ee1a1a16",
+    "drafts/n44-push/cloudflare-entry.mjs": "09133cfb0124214090e82afff68b223ca36eca6a87e75c23d0159e7ffc0a3be1",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "d6e28269d26e818b99428f48aa1210b9148dfcc1e0e2876f42a40353078f7b07",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "78879dab070d35e8489e0a2ac70c8a8d13b9bd1144111961177f7500798d9072",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "7f254054d48d0055bf5ed3e1ae0022988eaaec06471467fc6508d026be730062",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "tests/fixtures/n44-existing-host/journey.mjs": "c3379617ddf8639608b7c598f1e892ae5201480ff3a7a9e5e00b40228be3db60",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c"
+  }
+}

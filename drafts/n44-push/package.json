@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.19.0" },
-  "dependencies": { "web-push": "3.6.7", "ipaddr.js": "2.5.0" }
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "dependencies": {
+    "web-push": "3.6.7",
+    "ipaddr.js": "2.5.0",
+    "@supabase/auth-js": "2.118.0",
+    "pg": "8.23.1",
+    "@noble/curves": "1.9.7"
+  }
 }

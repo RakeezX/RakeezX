@@ -1,0 +1,15 @@
+{
+  "taskId": "continuous-n44-existing-host-auth-context-and-scheduler-20261018",
+  "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+  "beforeSha256": "7f254054d48d0055bf5ed3e1ae0022988eaaec06471467fc6508d026be730062",
+  "npmGraphSha256": "faafe4b9184f56133a099b9df74469894eeb7cce6a154961e7e8afc88cde3e03",
+  "change": "Deno 2.2 check requests @types/node wildcard alias even with explicit compiler types. Lock alias to the same 22.12.0 package already installed; no runtime dependency/integrity change.",
+  "afterSha256": "156c6cd6c2eeba5940158b7267757afc72b143feff65780f804f523f96f3496b",
+  "afterNpmGraphSha256": "faafe4b9184f56133a099b9df74469894eeb7cce6a154961e7e8afc88cde3e03",
+  "sourceFormattingOnly": {
+    "file": "drafts/n44-push/cloudflare-entry.mjs",
+    "beforeSha256": "cc8aa56f9f2200eca90ef4e30a92687d2d4e31870e689ec18f0e859bf19d416d",
+    "afterSha256": "9781316c09868762f44f6099ef0fc017a076fc49b380587b61c4568a5ef657f2",
+    "change": "Remove one blank EOF line for git diff --check; all source bytes before trailing whitespace are identical. Existing runtime evidence reused."
+  }
+}
