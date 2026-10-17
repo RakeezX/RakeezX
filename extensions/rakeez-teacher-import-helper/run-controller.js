@@ -1,4 +1,4 @@
-import {appendSourceRows,reportsComplete} from './source-roster.js';
+import {appendSourceRows,reportsComplete,SOURCE_WINDOW_ROWS} from './source-roster.js';
 import {readSourceReportPage} from './source-adapter.js';
 import {readAutomaticTeacherPage,readSelectedNameColumn} from './selection.js';
 import {reviewNames} from './core.js';
@@ -7,14 +7,14 @@ import {RUN_LIMITS,startOrigin,safeRoute,mergePage} from './navigation.js';
 import './route-diagnostics.js';
 const $=id=>document.getElementById(id),runToken=new URL(location.href).searchParams.get('run');
 const channel=new BroadcastChannel('rakeez-private-one-start');
-let generation=0,job=null,review=null,reviewTimer=null,reviewClock=null,guardBusy=false,choiceReject=null;
+let generation=0,job=null,review=null,reviewTimer=null,reviewClock=null,guardBusy=false,choiceReject=null,continueReject=null;
 const kindLabel=kind=>({start:'صفحة البداية',role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'}[kind]??'الفئة');
 const stageLabel=stage=>({'start-path':'مسار البداية','role-selection':'اختيار دور المعلم','auxiliary-link':'رابط اختياري','navigation-redirect':'التنقل أو التحويل','source-schema':'بنية صفحة البيانات','link-discovery':'اكتشاف روابط القراءة'}[stage]??'التحقق');
 let diagnosticLines=[];
 const entryText=e=>`pageKind=${e.pageKind} | readyState=${e.readyState} | sourceTabMatch=${(e.sourceTabMatch===true?'true':e.sourceTabMatch===false?'false':'unknown')} | roleMarkers=${e.roleMarkers} | schoolOptions=${e.schoolOptions} | navMarkers=${e.navMarkers} | actionMarkers=${e.actionMarkers} | safeReadLinks=${e.safeReadLinks} | iframeCount=${e.iframeCount}${e.linkStats?' | '+Object.entries(e.linkStats).map(([key,value])=>key+'='+value).join(' | '):''}`;
 function showDiagnostic(d){
  if(!d)return;
- let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | committed=0 | excluded=${d.run.excluded||'none'}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
+ let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | commitEvidence=receiver-only | excluded=${d.run.excluded||'none'}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
  if(d.roster)line+=` | cause=${d.roster.cause} | relevant=${d.roster.relevant} | unsupported=${d.roster.unsupported} | iframeCount=${d.roster.iframes} | frameReport=unconfirmed`;
  if(d.sourceTabMatch===true)line+=' | sourceTabMatch=true';
  if(d.template)line+=` | route=${d.template} | queryKeys=${d.keys?.join(',')||'-'} | unknownKeys=${d.unknownKeys??0} | routeReason=${d.detail??'unexpected-path'}`;
@@ -29,10 +29,10 @@ function armReview(){
  const tick=()=>{$('review-remaining').textContent=review?`الوقت المتبقي للمعاينة: ${Math.max(0,Math.ceil((review.expires-Date.now())/1000))} ثانية (5 دقائق؛ النقل له مهلة مستقلة مدتها دقيقتان).`:'';};
  tick();reviewClock=setInterval(tick,1000);reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
-function clearPreview(){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new Event('n36:clear'));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;}
+function clearPreview(continuing=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;}
 function stop(code='CANCELLED',diagnostic=null,context=null){
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
- generation++;if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
+ generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
  announce(diagnostic?.stage==='link-discovery'&&code==='READ_LINKS_UNAVAILABLE'?`عُرفت معالم صفحة المعلم، لكن لم توجد روابط قراءة مسموحة (${code}). مُسحت المعاينة؛ انسخ التشخيص المحدود لاكتشاف الروابط، وليس طلب اختيار دور جديد.`:diagnostic?`توقف ${stageLabel(diagnostic.stage)} (${code}). لم تُجمع ${kindLabel(diagnostic.category)} ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد ${diagnostic.structure?'بنية الدور الظاهرة دون أسماء أو روابط':'المسار المطلوب'}؛ تكرار المحاولة نفسها لن يغيّر الرفض.`:context?`توقف ${stageLabel(context.stage)} (${code}). لم تُجمع ${kindLabel(context.kind)} ومُسحت المعاينة؛ لا نجاح لهذه الفئة.`:`توقف التشغيل (${code}). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.`);
@@ -47,7 +47,7 @@ async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadlin
   const until=Date.now()+6000;
   while(true){
    await inspect(tabId,origin,'guard',alive);if(!alive())throw Error('CANCELLED');
-   const values=await chrome.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',func:readSourceReportPage,args:[mode,(job??review)?.context??null]});
+   const values=await chrome.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',func:readSourceReportPage,args:[mode,{...((job??review)?.context??{}),rowOffset:job?.readOffset??0}]});
    if(!alive())throw Error('CANCELLED');const value=values[0]?.result;
    if(tab.id!==tabId||values.length!==1||values[0].frameId!==0)throw Error('SOURCE_BINDING_CHANGED');
    if(value?.diagnostic)value.diagnostic.sourceTabMatch=true;
@@ -82,6 +82,12 @@ async function ready(tabId,origin,ticket){
  current(ticket);throw Error('PAGE_TIMEOUT');
 }
 function routeIdentity(origin,path){const u=new URL(path,origin);let entries=[...u.searchParams];if(/^\/SchoolManagmentReports\/StudentInfo\/ClassStudentInfo\/[^/]+\/?$/i.test(u.pathname)){const pages=entries.filter(([k])=>['page','pagenumber'].includes(k.toLowerCase()));if(pages.length===1&&/^(?:0*1)$/.test(pages[0][1]))entries=entries.filter(([k])=>!['page','pagenumber'].includes(k.toLowerCase()));}return u.pathname+'?'+JSON.stringify(entries.sort());}
+function sourcePageSeen(origin,path){
+ const u=new URL(path,origin),keys=['page','pagenumber'];
+ const series=job.series.get(u.pathname+'?'+JSON.stringify([...u.searchParams].filter(([k])=>!keys.includes(k.toLowerCase())).sort()));
+ const page=Number([...u.searchParams].find(([k])=>keys.includes(k.toLowerCase()))?.[1]??1);
+ return !!series&&Number.isSafeInteger(page)&&page<=series.last;
+}
 async function start(tabId){
  if(job||review)stop('NEW_RUN');const ticket=++generation;
  clearPreview();$('legacy-names').hidden=true;$('structured-category').hidden=false;$('manual-controls').hidden=true;$('run-cancel').disabled=false;
@@ -91,7 +97,7 @@ async function start(tabId){
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
-  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0};
+  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0,sourceRows:[],reportPages:0,excluded:0,windowPages:0};
   const timeout=setTimeout(()=>{if(ticket===generation&&job)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds);job.timer=timeout;
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
@@ -104,11 +110,12 @@ async function start(tabId){
   job.visited.add(routeIdentity(origin,tab.url));
   let next={kind:'home',page};
   while(next){
-   current(ticket);if(++job.pages>RUN_LIMITS.pages+24)throw Error('PAGE_LIMIT');
+   current(ticket);job.pages++;job.windowPages++;
    if(!next.page){
     stage=next.kind==='role'?'role-selection':'navigation-redirect';kind=next.kind;path=next.path;
     const labels={role:'دور المعلم',gateway:'مدخل المدرسة',metadata:'بيانات المعلم',classes:'الفصول',students:'أسماء الطلاب',timetable:'الجدول الأسبوعي'};
     const target=safeRoute(origin,next.path,next.context??job.context);if(/\/ChangeUserTypeToTeacherFromParent\//i.test(new URL(target).pathname)){if(job.roleSwitchUsed)throw Error('ROLE_SWITCH_REPEATED');job.roleSwitchUsed=true;}announce(`التقدم: صفحة ${job.pages}، ${labels[next.kind]}. قراءة فقط داخل ${new URL(origin).hostname}.`);
+    job.readOffset=next.rowOffset??0;
     try{await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+8000;next.page=await inspect(tabId,origin,next.kind,alive);current(ticket);}
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
      const redundant=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname)&&reportsComplete(job.series)&&job.sourceRows.length>0&&!job.warnings.some(w=>w.category==='students')&&!job.routes.some(r=>r.kind==='students');
@@ -122,16 +129,15 @@ async function start(tabId){
    for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
    if(next.kind==='home'&&page.links.some(l=>l.kind==='gateway'&&l.context?.kind==='selected-teacher-card')){job.pendingSchoolTables=page.tables;page={...page,tables:[]};}
    if(next.kind==='gateway'&&job.pendingSchoolTables.length){page={...page,tables:[...job.pendingSchoolTables,...page.tables]};job.pendingSchoolTables=[];job.gatewaySettleUntil=null;}
-   job.warnings.push(...page.warnings);
+   job.warnings.push(...page.warnings);job.warnings=[...new Map(job.warnings.map(w=>[w.category+'|'+w.code,w])).values()];
    if(next.kind==='students'&&page.duplicates)job.warnings.push({category:'students',code:'DUPLICATE_STUDENT_IDENTITY'});
+   job.excluded+=(page.excluded??0)+(page.duplicates??0);
    if(page.pagination){
-    if(++job.reportPages>24)job.warnings.push({category:'students',code:'SOURCE_PAGE_LIMIT'});
-    const p=page.pagination;let series=job.series.get(p.series);if(!series){series={total:p.total,pages:new Set(),fingerprints:new Set(),terminal:false};job.series.set(p.series,series);}
-    const fingerprint=page.tables.find(t=>t.category==='students')?.text;
-    if(series.total!==null&&p.total!==null&&series.total!==p.total||series.pages.has(p.current)||series.fingerprints.has(fingerprint))job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});
+    const p=page.pagination;let series=job.series.get(p.series);
+    if(!series){series={total:p.total,last:0,gap:false,terminal:false};job.series.set(p.series,series);}
+    if(series.total!==null&&p.total!==null&&series.total!==p.total||p.current!==series.last+1){series.gap=true;job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});}
     if(p.total!==null)series.total=p.total;
-    if(p.terminal&&p.current===p.total)series.terminal=true;
-    series.pages.add(p.current);series.fingerprints.add(fingerprint);
+    series.last=p.current;series.terminal=p.terminal&&p.current===p.total;
    }
    for(const skipped of page.skipped??[]){showDiagnostic(skipped.diagnostic);job.skipped.push(skipped.kind);}
    if(job.skipped.length)$('run-skipped').textContent=`لم تُجمع بيانات الروابط المستبعدة: ${[...new Set(job.skipped)].map(kindLabel).join('، ')}. عُرض فقط ما جُمع من روابط مستقلة مسموحة؛ سبب الاستبعاد موضح في التشخيص الآمن دون قيم خاصة.`;
@@ -139,14 +145,18 @@ async function start(tabId){
     // Student data is admitted only through the safeguarded report/pager reader.
     if(table.category==='students'&&next.kind!=='students')continue;
     try{
-     const rows=parseCategoryTable(table.category,table.text);
+     let rows;
+     if(table.category==='students'){
+      const [header,...lines]=table.text.split('\n');rows=[];
+      for(const line of lines){try{rows.push(...parseCategoryTable('students',header+'\n'+line));}catch{job.excluded++;job.warnings.push({category:'students',code:'INVALID_ROWS_EXCLUDED'});}}
+     }else rows=parseCategoryTable(table.category,table.text);
      if(table.category==='school'){
       if(job.context?.schoolName&&job.context.schoolName!==rows[0].name)throw Error('SCHOOL_CONTEXT_CHANGED');
       job.context={...job.context,schoolName:rows[0].name};
      }
      if(table.category==='students'){
       job.studentRowsSeen+=rows.length;
-      job.sourceRows=appendSourceRows(job.sourceRows,rows);
+      for(const row of rows){try{job.sourceRows=appendSourceRows(job.sourceRows,[row]);}catch(e){job.excluded++;job.warnings.push({category:'students',code:e.message});}}
      }else{
       const merged=mergePage(job.categories,table.category,rows);
       for(const c of merged)validateCategory(c.category,c.rows);bundle(merged);job.categories=merged;
@@ -155,47 +165,52 @@ async function start(tabId){
     catch(e){if(e.message==='SCHOOL_CONTEXT_CHANGED')throw e;job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
    }
    $('run-counts').textContent=`${job.pages} صفحات؛ ${job.sourceRows.length} طلاب؛ ${job.categories.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.`;
+   if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,rowOffset:page.rowContinuation});
    for(const link of page.links){
     try{safeRoute(origin,link.path,link.context??job.context);}catch(e){throw routeError(e,link.kind==='role'?'role-selection':'navigation-redirect',link.kind,link.path);}
-    if(job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
+    if(sourcePageSeen(origin,link.path)||job.visited.has(routeIdentity(origin,link.path))||job.routes.some(r=>routeIdentity(origin,r.path)===routeIdentity(origin,link.path))){if(link.pagination)job.loops++;continue;}
     if(link.pagination)job.routes.unshift(link);else job.routes.push(link);
    }
    next=job.routes.shift();if(next)job.visited.add(routeIdentity(origin,next.path));
+   if(next&&(job.sourceRows.length>=SOURCE_WINDOW_ROWS||job.windowPages>=RUN_LIMITS.pages))await pauseWindow(ticket,false);
+
   }
   current(ticket);await inspect(tabId,origin,'guard',alive);current(ticket);
-  for(const series of job.series.values())if(!series.terminal||series.total===null||series.pages.size!==series.total||!Array.from({length:series.total},(_,i)=>i+1).every(n=>series.pages.has(n)))job.warnings.push({category:'students',code:'PAGINATION_INCOMPLETE'});
-  const categories=job.categories,warnings=job.warnings,pages=job.pages,loops=job.loops;
-  const sourceRows=job.sourceRows;
-  const stagedStudents=sourceRows.length,observedStudents=job.studentRowsSeen;
-  // An ambiguous category is unresolved as a whole, never silently keep its first value.
-  const unresolved=new Set(warnings.map(w=>w.category));let valid=categories.filter(c=>!unresolved.has(c.category));
-  const completeStudents=!unresolved.has('students')&&reportsComplete(job.series)&&sourceRows.length?{rows:sourceRows}:null;
-  if(completeStudents){
-   if(!valid.some(c=>c.category==='classes')&&!unresolved.has('classes'))valid=mergePage(valid,'classes',validateCategory('classes',[...new Set(completeStudents.rows.map(r=>r.classroom))].map(classroom=>({classroom}))));
-   if(!valid.some(c=>c.category==='school')&&job.rosterSchools.size===1&&!unresolved.has('school'))valid=mergePage(valid,'school',validateCategory('school',[{name:[...job.rosterSchools][0]}]));
+  if(job.sourceRows.length)await pauseWindow(ticket,true);
+  else {
+   const valid=job.categories.filter(c=>!job.warnings.some(w=>w.category===c.category));
+   clearTimeout(job.timer);const context=job.context;job=null;
+   if(valid.length){review={tabId,origin,context,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));armReview();}
+   announce('انتهى جمع الصفحات المتاحة؛ لا أسماء أخرى صالحة في هذه النافذة. لا ادعاء باكتمال الكشف.');
   }
-  if(valid.length)bundle(valid);
-  const completeCount=completeStudents?.rows.length??0;
-  const studentWarnings=[...new Set(warnings.filter(w=>w.category==='students').map(w=>w.code))];
-  showDiagnostic({run:{staged:stagedStudents,observed:observedStudents,complete:completeCount,excluded:studentWarnings.filter(c=>/^[A-Z_]+$/.test(c)).join(',')}});
-  const contextSnapshot=job.context;clearTimeout(job.timer);job.routes.length=0;job.categories=[];job=null;
-  review={tabId,origin,context:contextSnapshot,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
-  $('direct-handoff').hidden=!valid.length&&!completeCount;
-  const displayWarnings=warnings;
-  if(displayWarnings.length)$('run-skipped').textContent='فئات غير مكتملة ومستبعدة من التصدير: '+[...new Set(displayWarnings.map(w=>kindLabel(w.category)))].join('، ')+'. راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة.';
-  const missing=['teacher','school','principal','classes','students','timetable'].filter(c=>c==='students'?!completeCount:!valid.some(v=>v.category===c));
-  const studentCause=!missing.includes('students')?'':diagnosticLines.some(l=>l.includes('RELEVANT_LINK_UNSUPPORTED'))?'ظهر رابط ذو تسمية طلاب، لكن مساره غير مدعوم؛ لم يُفتح.':diagnosticLines.some(l=>l.includes('MAIN_FRAME_READ_LINK_ABSENT'))?'لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف.':missing.includes('students')?'لم يثبت اكتمال كشف الطلاب من المصدر الظاهر.':'';
-  const rosterExplanation=studentWarnings.includes('CATEGORY_ROW_LIMIT')?`جمعت ${stagedStudents} اسمًا، لكن الكشف أكبر من الحد المسموح للنقل (300)؛ رُصد ما لا يقل عن ${observedStudents} صفًا، وليس عددًا مؤكدًا لطلاب فريدين. لا نقل جزئي ولا اقتطاع للأسماء.`:studentCause?`جمعت ${stagedStudents} اسمًا، لكن الكشف غير مكتمل؛ تعذر التحقق من كل صفحات المصدر. نقل الطلاب معطّل.`:'';
-  $('handoff-status').textContent=rosterExplanation;
-  if(studentCause)$('run-skipped').textContent+=' '+rosterExplanation+' '+studentCause+' نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.';
-  $('run-missing').textContent=missing.length?`غير ظاهر أو غير محسوم: ${missing.map(c=>CATEGORIES[c].label).join('، ')}. لم تُخمن قيم ناقصة.`:'ظهرت الفئات الست للمراجعة.';
-  $('run-counts').textContent=`${pages} صفحات؛ ${stagedStudents} اسمًا مجمّعًا؛ ${completeCount} مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ ${valid.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ ${loops} روابط صفحات مكررة جرى تجاوزها.`;
-  if(completeCount)window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:sourceRows}));
-  else if(valid.length)window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));
-  else {clearPreview();$('run-cancel').disabled=true;announce(rosterExplanation||'لم يثبت اكتمال البيانات؛ لا نقل إلى ركيز.');return;}
-  announce(warnings.length?`جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.`:`${diagnosticLines.some(l=>!l.includes('stage=run-summary'))?'الجمع جزئي؛ بعض الروابط لم تُجمع بياناتها. ':''}اكتمل الجمع من ${pages} صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.`);
-  armReview();
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
+}
+// AI: bounded ephemeral windows; explicit continuation never silently discards a tail.
+async function pauseWindow(ticket,final){
+ const active=job;clearTimeout(active.timer);
+ const complete=final&&!active.warnings.some(w=>w.category==='students')&&reportsComplete(active.series);
+ review={tabId:active.tabId,origin:active.origin,context:active.context,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
+ const warnings=[...new Set(active.warnings.filter(w=>w.category==='students').map(w=>w.code))];
+ showDiagnostic({run:{staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
+ $('run-counts').textContent=`جمعت ${active.studentRowsSeen} صفًا حتى الآن؛ ${active.sourceRows.length} صالحًا في نافذة المراجعة الحالية؛ غير متاح ${active.excluded} صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها.`;
+ $('run-missing').textContent=complete?'كشف مكتمل للصفحات التي ثبت تسلسلها ونهايتها.':'تعذر التحقق من بقية صفحات الكشف؛ تستطيع استيراد الأسماء الظاهرة فقط مع مراجعتها. قد ينقص طلاب؛ لا عدد إجمالي مفترض.';
+ $('run-skipped').textContent=warnings.length?'أسباب نقص التغطية أو الاستبعاد: '+warnings.join('، '):'';
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,complete,excluded:active.excluded,hasNext:!final,continuing:active.continuing===true}}));
+ announce(complete?'اكتمل الجمع؛ راجع كل فصل وكل دفعة ثم أكّد داخل ركيز.':'جمع غير مكتمل؛ استيراد المتاح فقط بمراجعة وتأكيد إضافي، دون إضافة تلقائية.');
+ armReview();
+ if(final){job=null;return;}
+ await new Promise((resolve,reject)=>{
+  continueReject=reject;
+  const go=()=>{if(ticket!==generation||!window.n36CanContinue?.())return;window.removeEventListener('n36:continue',go);continueReject=null;resolve();};
+  window.addEventListener('n36:continue',go);
+  const original=continueReject;continueReject=e=>{window.removeEventListener('n36:continue',go);original(e);};
+ });
+ active.deadline=Date.now()+RUN_LIMITS.milliseconds;current(ticket);await inspect(active.tabId,active.origin,'guard',()=>job===active);current(ticket);
+ clearPreview(true);active.continuing=true;active.sourceRows=[];active.excluded=0;active.windowPages=0;
+ // No names/fingerprints from previous windows are retained. Receiver rechecks duplicates.
+ active.visited=new Set(active.routes.filter(r=>r.kind!=='students').map(r=>routeIdentity(active.origin,r.path)));
+ active.deadline=Date.now()+RUN_LIMITS.milliseconds;
+ active.timer=setTimeout(()=>{if(job===active)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds);
 }
 async function noorRead(tabId) {
  const tab=await chrome.tabs.get(tabId),u=new URL(tab.url??'');

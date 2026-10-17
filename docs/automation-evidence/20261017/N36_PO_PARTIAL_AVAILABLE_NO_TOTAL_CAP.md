@@ -1,4 +1,37 @@
-# N36 partial available import — preserved scope blocker
+# N36 partial available import — 0.5.5 candidate
+
+## Scope correction and implementation — current run
+
+Run `f6a46781-46ef-419d-ba71-457ab0ba7c2f` resumes the exact saved worktree and AI-labelled checkpoint below. The activated PO repair explicitly adds `src/views/teacher-setup-import.js`; the original `card_scope_correction` failure is preserved below rather than relabelled PASS. No queue/status file was changed.
+
+### Current blocker: actual same-class receiver roll-number boundary
+
+The real synthetic Chrome/account/store test successfully transfers 1251 students distributed across owned classes and 350 students in one owned class. An additional same-class 1251-row continuation reaches 900 confirmed names, then the actual store rejects the fourth reviewed 300-row action. The receiver reports 300 new names still unsaved, and the extension correctly retains that exact batch rather than advancing. This failure was preserved and reproduced only to capture its real receiver outcome; it is not a browser transport success or a completed import.
+
+Concrete source: **`src/store.js:3586`** throws `IMPORT_LIMIT` when `next + students.length - 1 > 999`. The same existing file also defines related roll-number validity/count constraints at lines 3275, 3287 and 3311. This file remains outside the repaired card's allowed paths. Changing only the extension, shrinking a batch, suppressing the failure, assigning the tail to a different class or bypassing the receiver guard cannot provide eventual same-class completion beyond that boundary.
+
+The original missing receiver-view path is resolved. The new blocker is the actual store's per-class numbering representation, not an arbitrary source-wide roster gate. The candidate removes the source total gate and works through verified owned-class batches, but unrestricted same-class completion is **not certified**. Do not publish or update the fixed runtime from this blocked checkpoint. A scoped correction must include the actual `src/store.js` numbering/import path and its affected safeguards/contract review before retrying the same-class boundary. No store, Sync, Auth/RLS/schema or real-data change was made here. Preserve this candidate and the exact failed receiver evidence; a new run ID alone is not a correction.
+
+The candidate separates row validity from report coverage. Missing index/next-page/terminal evidence warns about incomplete coverage while vetted visible name/class rows remain reviewable. Unsafe paging links are not followed; invalid or hidden individual rows are excluded. Source collection pauses at a bounded window, and a large visible table is read in sequential slices. There is no product-wide total or page-count gate. Only one exact class batch of at most 300 rows is rendered/transferred at a time; source order and its untransferred tail remain available.
+
+The teacher explicitly acknowledges partial coverage, reviews each batch, chooses an owned class in the actual Rakeez modal and confirms there. Existing owner/Auth/lease/year/term/context guards remain in the same receiver/store entry. A new structured count-only outcome comes from the actual confirmation/readback. Send/claim does not advance a cursor. Failed, unknown, expired or missing receipts leave the same rows pending. Explicit retry invokes a fresh existing-name review; an all-existing acknowledgement performs no new write. The extension binds receipt return to the original receiver tab/nonce and only consumes a successful outcome once. Counts distinguish locally added and previously existing names; neither is server Sync proof.
+
+Continue requires settled receipts for all valid rows in the current window and a fresh source guard. Names are transient; the five-minute window deadline scrubs source rows, selected DOM, cursors and pending transport. Two-minute encrypted one-time handoff remains unchanged in duration. Counts across explicitly continued windows contain no student names; no names are written to durable storage, diagnostics or URLs. No new startup module or offline-shell dependency was introduced.
+
+Local package: `assets/extensions/rakeez-teacher-import-helper-0.5.5.zip`, with per-file hashes in the adjacent manifest. Prior packages are preserved. The installed fixed runtime was not touched. Provider/immutable/served Production parity belongs to the independent controller/publisher and has not been run by this worker. Official-source success requires a new voluntary PO test; N36 remains OPEN.
+
+### Verification record
+
+- Node: 22 affected tests passed across the new partial suite, receiver limits, direct handoff, historical package/popup and complete-class regressions. Earlier total-cap expectations were updated to the superseding PO decision; historical packages are checked against their recorded immutable Git source rather than the new checkout. Owner/protocol/transport limits remain asserted.
+- Final Chrome evidence: **27 scenarios passed; same-class 1251 continuation remains FAIL**. The evidence deliberately retains overall `status: FAIL` and the actual receiver failure. Passed cases include all required source sizes distributed across classes, same-class 350, partial/missing pages, duplicates, invalid/hidden fields, unsafe links, absent reports, school/role/session/owner/lease changes, expiry, storage failure/retry, lost receipt/replay and source closure. Unchanged cases were reused only with identical package and application hashes.
+- Chrome: current run uses the existing installed-MV3/CDP harness, disposable owned profile, browser phase lease, intercepted synthetic school pages and actual Rakeez HTML/modules/CSS over HTTPS backed by an owned loopback server. Final case status, source/application hashes, retained prior failures and resource release are recorded in `tests/n36-partial-class-import-no-total-cap-browser.json`; no source-text assertion is presented as rendered UI evidence.
+- Original exploratory failures are retained in that evidence: semantic hidden presentation was fixed in source CSS; a foreign-tab harness originally cleared synthetic Auth and correctly triggered the ownership guard, then moved before account setup; negative partial-approval clicks were corrected to account for the handler deliberately unchecking the box. No guard was disabled.
+- The expiry fixture also left browser document clocks five minutes ahead of the real extension worker and caused a subsequent transport timeout. The harness now resets/resumes its clock after proving expiry. The remaining retry/lost-receipt/source-closure cases passed in a fresh owned context. The original timeout remains in `priorFailures`; it does not replace or erase the independent store-numbering failure in `preservedFailures`.
+- Rendered RTL screenshots were inspected at 390px for the actual extension review and Rakeez modal; source widths 320/390/768/1280 and modal horizontal bounds were asserted. These are synthetic UI results, not official school verification.
+- ZIP SHA-256: `70d909637801502e01c61439ddec3b0ea6b33ab42912c89b397c38fadf3cd396`; manifest SHA-256: `6593d771baab918e16583c712757a544a94687ea443a3c6b24370a640faeeaa2`.
+- Final browser lease is `RELEASED browser`; the owned disposable Chrome/profile and loopback server are closed. Syntax and `git diff --check` passed. No push, deployment, installed-runtime update or real-data access occurred. The candidate is BLOCKED, not LOCAL_READY.
+
+## Historical blocked checkpoint (unchanged facts)
 
 AI-authored checkpoint, 2026-10-17. Product remains OPEN. No Product implementation or release is claimed by this checkpoint.
 

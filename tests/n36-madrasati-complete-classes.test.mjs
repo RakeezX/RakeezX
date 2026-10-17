@@ -17,10 +17,10 @@ if(process.argv.includes('--package')){
 }
 const alphabet='ابتثجحخدذرزسشصضطظعغفقكلمنهوي',word=n=>[Math.floor(n/(alphabet.length**2)),Math.floor(n/alphabet.length)%alphabet.length,n%alphabet.length].map(i=>alphabet[i]).join('');
 const rows=n=>Array.from({length:n},(_,i)=>({name:'طالب اصطناعي '+word(i),classroom:'فصل '+Math.floor(i/300)}));
-test('full review retains 303/350/600/601/1200; only one complete <=300 class materializes',()=>{
+test('full review retains 303/350/600/601/1200; only one <=300 class batch materializes (PO partial decision supersedes total cap)',()=>{
  for(const n of [303,350,600,601,1200]){let r=[];for(let i=0;i<n;i+=50)r=appendSourceRows(r,rows(n).slice(i,i+50));assert.equal(r.length,n);assert.equal(sourceClasses(r).reduce((sum,c)=>sum+c.count,0),n);assert.equal(selectedSourceClass(r,'فصل 0').length,300);}
- assert.throws(()=>appendSourceRows(rows(1200),rows(1201).slice(1200)),/SOURCE_ROSTER_LIMIT/);
- const oversized=rows(301).map(r=>({...r,classroom:'فصل واحد'}));assert.equal(sourceClasses(oversized)[0].available,false);assert.throws(()=>selectedSourceClass(oversized,'فصل واحد'),/CATEGORY_ROW_LIMIT/);
+ assert.equal(appendSourceRows(rows(1200),rows(1201).slice(1200)).length,1201);
+ const oversized=rows(301).map(r=>({...r,classroom:'فصل واحد'}));assert.equal(sourceClasses(oversized)[0].available,true);assert.equal(selectedSourceClass(oversized,'فصل واحد').length,300);assert.equal(selectedSourceClass(oversized,'فصل واحد',300).length,1);
  assert.throws(()=>validateCategory('students',rows(301)),/CATEGORY_ROW_LIMIT/);
  const now=Date.now();assert.throws(()=>validateHandoff({schema:'rakeez-extension-names',version:1,source:'madrasati',scope:'reviewed-run',createdAt:now,expiresAt:now+HANDOFF_TTL,rows:rows(301)}));
 });
@@ -41,9 +41,9 @@ test('reuse immutable 0.5.3 actual MV3 reproduction of two independent failures'
  assert.ok(e.scenarios.some(s=>s.scenario==='overflow350'&&s.diagnostic.includes('CATEGORY_ROW_LIMIT')));
  assert.ok(e.scenarios.some(s=>s.scenario==='full300'&&s.transferAllowed));
 });
-test('0.5.4 package matches all source bytes; rollback and route/receiver guards unchanged',async()=>{
+test('immutable 0.5.4 package matches its recorded Git source bytes; rollback and route/receiver guards unchanged',async()=>{
  const m=JSON.parse(await fs.readFile(assets+'rakeez-teacher-import-helper-0.5.4.manifest.json','utf8')),b=await fs.readFile(assets+m.archive.file),zip=unzipSync(b);assert.equal(hash(b),m.archive.sha256);assert.deepEqual(Object.keys(zip).sort(),m.files.map(f=>f.file).sort());
- for(const f of m.files){assert.equal(hash(zip[f.file]),f.sha256);assert.deepEqual(Buffer.from(zip[f.file]),await fs.readFile(dir+f.file));}
+ for(const f of m.files){assert.equal(hash(zip[f.file]),f.sha256);assert.deepEqual(Buffer.from(zip[f.file]),execFileSync('git',['show','eda13b5ec13266d8b0ca114dd7666bad9c87db6e:'+dir+f.file]));}
  for(const v of ['0.5.1','0.5.3'])for(const ext of ['zip','manifest.json']){const f=assets+'rakeez-teacher-import-helper-'+v+'.'+ext;assert.deepEqual(await fs.readFile(f),execFileSync('git',['show',base+':'+f]));}
  for(const f of ['navigation.js','route-diagnostics.js','categories.js','selection.js','handoff-protocol.js'])assert.equal((await fs.readFile(dir+f,'utf8')).replace(/\r\n/g,'\n'),execFileSync('git',['show',base+':'+dir+f],{encoding:'utf8'}).replace(/\r\n/g,'\n'));
  const manifest=JSON.parse(Buffer.from(zip['manifest.json'])),old=JSON.parse(execFileSync('git',['show',base+':'+dir+'manifest.json']));assert.equal(manifest.version,'0.5.4');manifest.version=old.version;assert.deepEqual(manifest,old);

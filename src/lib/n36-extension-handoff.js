@@ -19,5 +19,11 @@ export async function claimHandoff(request) {
     });
   });
   const envelope=validateHandoff(response.envelope);
-  return {envelope,bundle:handoffBundle(envelope)};
+  return {envelope,bundle:handoffBundle(envelope),request};
+}
+
+// AI: counts only, bound by the extension to the original receiver tab and nonce.
+export async function reportHandoffOutcome(request,outcome){
+ if(location.origin!==APP_ORIGIN||!request)return false;
+ return new Promise(resolve=>{const timer=setTimeout(()=>resolve(false),1500);chrome.runtime.sendMessage(request.extensionId,{type:'n36-outcome',nonce:request.nonce,outcome},r=>{clearTimeout(timer);resolve(!chrome.runtime.lastError&&r?.ok===true);});});
 }

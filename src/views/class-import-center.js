@@ -14,7 +14,7 @@ import { detectStudentNameColumn } from '../lib/student-import.js';
 import { readGradeFile } from '../lib/grade-transfer-parsers.js';
 import { isTransferItem, suggestGradeMappings, gradeNameKey, rosterChoiceBinding } from '../lib/grade-transfer.js';
 import { exportGradeCsv, downloadGradeCsv, exportNamesTemplate, suggestNoorGroup } from '../lib/grade-transfer-export.js';
-import { handoffRequest, claimHandoff } from '../lib/n36-extension-handoff.js';
+import { handoffRequest, claimHandoff, reportHandoffOutcome } from '../lib/n36-extension-handoff.js';
 
 
 
@@ -43,9 +43,9 @@ function directExtensionEntry() {
   try { if(extensionOwner && extensionOwnerBinding() !== extensionOwner) clearExtensionPreview(); } catch { clearExtensionPreview(); }
   return html`<section class="card card--pad n36-direct" data-n36-direct><h3>استيراد مباشر من إضافة ركيز</h3>
     <p>افتح إضافة ركيز في تبويب مدرستي أو نور، راجع الأسماء ثم اضغط «نقل إلى ركيز». لا ملف ولا إضافة تلقائية.</p>
-    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.4.zip" download>تنزيل الإضافة الخاصة 0.5.4</a>
-    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.4.manifest.json" download>بصمات الحزمة ومصدرها</a>
-    <p>فك الضغط ثم اختر «تحميل إضافة غير مضغوطة» من صفحة إضافات Chrome في وضع المطوّر. للتثبيت الأول استخدم مجلدًا واحدًا مخصصًا. تحديث المجلد الثابت يتم بالمحدّث المعتمد بعد التحقق من النسخة المنشورة؛ لا تشغّل نسختين. مدرستي: راجع عدد الأسماء المجمّعة والمكتملة؛ الكشف الناقص لا يُنقل. راجع فصلًا كاملًا واختره لكل عملية؛ حد النقل 300 اسم للفصل الواحد، وحد المراجعة المؤقتة 1200 اسم من صفحات مكتملة. إجمالي صفوف الفئات ليس عدد الطلاب. التثبيت اختياري؛ لا تثبيت بنقرة واحدة قبل توفر رابط متجر معتمد. نور: العمود الظاهر المختار فقط؛ اكتمال الحسابات الرسمية غير متحقق.</p>
+    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.5.zip" download>تنزيل الإضافة الخاصة 0.5.5</a>
+    <a class="btn btn--quiet" href="/assets/extensions/rakeez-teacher-import-helper-0.5.5.manifest.json" download>بصمات الحزمة ومصدرها</a>
+    <p>فك الضغط ثم اختر «تحميل إضافة غير مضغوطة» من صفحة إضافات Chrome في وضع المطوّر. للتثبيت الأول استخدم مجلدًا واحدًا مخصصًا. تحديث المجلد الثابت يتم بالمحدّث المعتمد بعد التحقق من النسخة المنشورة؛ لا تشغّل نسختين. مدرستي: يمكنك استيراد المتاح فقط من كشف ناقص مع مراجعة التحذير. راجع فصلًا ودفعة في كل عملية (حتى 300 اسم للنقل، دون حد إجمالي للطلاب). تابع النافذة التالية صراحةً بعد إيصالات الدفعات؛ عند انتهاء المهلة تُمسح الأسماء ويمكنك البدء مجددًا مع فحص التكرارات. إجمالي صفوف الفئات ليس عدد الطلاب. التثبيت اختياري؛ لا تثبيت بنقرة واحدة قبل توفر رابط متجر معتمد. نور: العمود الظاهر المختار فقط؛ اكتمال الحسابات الرسمية غير متحقق.</p>
     ${extensionPreview ? html`<p role="status">${extensionPreview.envelope.source === 'noor' ? 'نور — عمود ظاهر مختار؛ صفحات وأعمدة أخرى غير مجمّعة' : 'مدرستي — الأسماء التي راجعتها في الإضافة فقط'} · ${extensionPreview.envelope.rows.length} اسمًا. اختر الفصل والمادة أدناه.</p><button class="btn btn--primary" data-act="n36-extension-review" ${!hub.existing ? 'disabled' : ''}>مراجعة أسماء الإضافة</button><button class="btn btn--quiet" data-act="n36-extension-cancel">إلغاء ومسح النقل</button>` : ''}
     <p role="status" data-n36-handoff-status>${extensionBusy ? 'جار استلام المعاينة المؤقتة…' : extensionMessage}</p>
   </section>`;
@@ -555,7 +555,7 @@ export const koshoofCenter = {
         const {openTeacherSetupImport}=await import('./teacher-setup-import.js');
         if(extensionPreview!==pending || hub.existing!==id || location.hash!==route || setupBinding(id)!==binding) return;
         closeTeacherSetupImport();
-        closeTeacherSetupImport=openTeacherSetupImport({initialBundle:pending.bundle,onClose:()=>{if(extensionPreview===pending){clearExtensionPreview();repaint();}},sourceNotice:pending.envelope.source==='noor'?'نور: كشف ظاهر جزئي؛ الصفحات والأعمدة الأخرى غير مجمّعة.':'مدرستي: أسماء المعاينة المختارة فقط.',
+        closeTeacherSetupImport=openTeacherSetupImport({initialBundle:pending.bundle,onOutcome:outcome=>reportHandoffOutcome(pending.request,outcome),onClose:()=>{if(extensionPreview===pending){clearExtensionPreview();repaint();}},sourceNotice:pending.envelope.source==='noor'?'نور: كشف ظاهر جزئي؛ الصفحات والأعمدة الأخرى غير مجمّعة.':'مدرستي: استيراد المتاح فقط؛ قد يكون الكشف ناقصًا ولا يثبت نقل هذه الدفعة اكتماله. طابق فصل المصدر بفصلك المملوك وراجع الأسماء.',
           isContextCurrent:()=>extensionPreview===pending && hub.existing===id && location.hash===route && setupBinding(id)===binding && Date.now()<pending.envelope.expiresAt});
       } catch { clearExtensionPreview();extensionMessage='تغيّر الحساب أو الفصل أو انتهت المعاينة؛ أعد النقل.';repaint(); }
     },

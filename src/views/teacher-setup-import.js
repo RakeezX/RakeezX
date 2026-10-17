@@ -25,7 +25,7 @@ function snapshot() {
 }
 const options = (rows, selected = '') => rows.map(row => html`<option value="${row.id}" ${row.id === selected ? 'selected' : ''}>${row.name ?? `${row.hijriStart}-${Number(row.hijriStart) + 1}`}</option>`);
 
-export function openTeacherSetupImport({ isContextCurrent = () => false, initialBundle = null, sourceNotice = '', onClose = () => {} } = {}) {
+export function openTeacherSetupImport({ isContextCurrent = () => false, initialBundle = null, sourceNotice = '', onOutcome = () => {}, onClose = () => {} } = {}) {
   const direct = !!initialBundle;
   let binding;
   try { binding = ownerContext(); if (!isContextCurrent()) throw new Error('تعذّر اعتماد سياق الاستيراد الحالي.'); } catch (error) { toast(error.message); return () => {}; }
@@ -89,7 +89,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     return review;
   }
   function canConfirm() {
-    return namesReview && namesReview.counts.new > 0 && !namesReview.counts.invalid && !namesReview.counts.ambiguous && !writing && !receipt;
+    return namesReview && (namesReview.counts.new > 0 || direct && namesReview.counts.existing > 0) && !namesReview.counts.invalid && !namesReview.counts.ambiguous && !writing && !receipt;
   }
   async function confirmNames() {
     if (!guard() || !canConfirm() || !root.querySelector('[data-names-approved]')?.checked) return;
@@ -110,7 +110,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     const commitReview = { ...reviewed, get context() {
       return guard({ checkState: false }) && generation === revision && JSON.stringify(snapshot()) === baseline ? reviewed.context : null;
     } };
-    try { saved = await store.confirmNamesImport(commitReview, true); }
+    try { saved = reviewed.counts.new ? await store.confirmNamesImport(commitReview, true) : {added:0}; }
     catch { failed = true; }
     finally { writing = false; }
     if (closed || generation !== revision || !guard({ checkState: false })) return;
@@ -122,6 +122,10 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     receipt = failed
       ? `لم تكتمل العملية أو تعذّر التحقق من نتيجتها. جديدة في المعاينة: ${reviewed.counts.new} · موجودة الآن: ${after.counts.existing} · جديدة لم تظهر كمحفوظة: ${remaining}. افتح الكشوف وأعد المراجعة؛ لا تكرر التأكيد مباشرةً.`
       : `حُفظ محليًا: ${saved.added} اسم جديد · موجودة سابقًا: ${reviewed.counts.existing} · جديدة لم تظهر كمحفوظة: ${remaining}. قد تبقى طلبات مزامنة؛ هذا ليس إثبات حفظ على الخادم.`;
+    // A failed/uncertain transaction never advances an extension batch, even if readback sees rows.
+    const total=reviewed.entries.length;
+    const outcome={status:failed||remaining?'unknown':reviewed.counts.new?'saved':'existing',added:failed?0:saved.added,existing:reviewed.counts.existing,remaining,total};
+    try { await onOutcome(outcome); } catch { /* Local receipt remains visible; continuation fails closed. */ }
     namesReview = plan = null; render();
     root.querySelector('[data-import-export]').disabled = true;
     root.querySelector('[data-import-plan]').disabled = true;
@@ -151,7 +155,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
       ${Object.entries(CATEGORIES).filter(([category]) => !direct || bundle.categories.some(c=>c.category===category)).map(([category, spec]) => {
         const c = bundle.categories.find(c => c.category === category);
         return html`<section class="n36-category"><h3>${c ? html`<label><input type="checkbox" data-import-category="${category}" ${selected.has(category) ? 'checked' : ''}> ${spec.label} (${c.rows.length})</label>` : spec.label}</h3>
-          ${!c ? html`<p class="t-3">غير متوفر في الحزمة — لن يُفترض أو يُضاف.</p>` : !selected.has(category) ? html`<p class="t-3">مستبعد من الخطة.</p>` : c.rows.map((row, index) => html`<fieldset class="n36-row"><legend>السجل ${index + 1}</legend>${Object.entries(spec.fields).map(([field, label]) => html`<div class="n36-field"><span>${label}</span><small data-current>الحالي: ${currentValue(category, row, field)}</small><label class="field"><span class="field__label">المقترح${!row[field] ? ' — غير متوفر؛ يلزم مراجعته' : ''}</span>${field === 'time' ? html`<div class="field-row">${['start', 'end'].map((part, i) => html`<label class="field"><span class="field__label">${i ? 'النهاية (اختياري)' : 'البداية'}</span><input class="input" type="time" data-rakeez-datetime="time" data-rakeez-date-scope="session" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="time" data-time-part="${part}" value="${row.time.split('-')[i] || ''}"></label>`)}</div>` : html`<input class="input" maxlength="80" autocomplete="off" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="${field}" value="${row[field]}">`}</label></div>`)}</fieldset>`)}</section>`;
+          ${!c ? html`<p class="t-3">غير متوفر في الحزمة — لن يُفترض أو يُضاف.</p>` : !selected.has(category) ? html`<p class="t-3">مستبعد من الخطة.</p>` : c.rows.map((row, index) => html`<fieldset class="n36-row"><legend>السجل ${index + 1}</legend>${Object.entries(spec.fields).map(([field, label]) => html`<div class="n36-field"><span>${label}</span><small data-current>الحالي: ${currentValue(category, row, field)}</small><label class="field"><span class="field__label">المقترح${!row[field] ? ' — غير متوفر؛ يلزم مراجعته' : ''}</span>${field === 'time' ? html`<div class="field-row">${['start', 'end'].map((part, i) => html`<label class="field"><span class="field__label">${i ? 'النهاية (اختياري)' : 'البداية'}</span><input class="input" type="time" data-rakeez-datetime="time" data-rakeez-date-scope="session" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="time" data-time-part="${part}" value="${row.time.split('-')[i] || ''}"></label>`)}</div>` : html`<input class="input" maxlength="80" autocomplete="off" data-edit-category="${category}" data-edit-row="${index}" data-edit-field="${field}" ${direct && category === 'students' ? 'disabled' : ''} value="${row[field]}">`}</label></div>`)}</fieldset>`)}</section>`;
       })}
       </fieldset>
       ${targets.length ? html`<section class="n36-names" aria-label="إضافة الأسماء">
