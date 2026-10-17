@@ -6,7 +6,7 @@ import { GRADES, sectionLabel, normalizeSectionLabel } from '../models.js';
 import { classKoshoofBundle, downloadKoshoofBundle } from '../lib/class-koshoof-bundle.js';
 import { repaint } from '../repaint.js';
 
-import { canOpenRoster } from './students.js';
+import { canOpenRoster, classAccessFeedback } from './students.js';
 import * as cloud from '../lib/cloud.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { go } from '../router.js';
@@ -482,10 +482,11 @@ function contextRoute(p = {}) {
   hub.route = location.hash;
   hub.tab = request.get('tab') === 'export' || p.export === '1' ? 'export' : 'import';
   hub.kind = location.hash.split('?')[0] === '#/classes/import' || request.get('new') === '1' ? 'new' : 'existing';
-  if (id) {
-    hub.existing = accessible().some(row => row.id === id) ? id : '';
-    hub.selected = new Set(hub.existing ? [hub.existing] : []);
-  }
+  // Preserve an explicit request through temporary denial; a new context-free
+  // entry must not inherit a stale class from a previous visit.
+  // Rendering and handlers still require the original access guard.
+  hub.existing = id || '';
+  hub.selected = new Set(hub.existing ? [hub.existing] : []);
 }
 const locked = () => draft.busy || transfer.busy || transfer.writing;
 function tabs() {
@@ -498,13 +499,16 @@ function existingPane() {
 }
 export const koshoofCenter = {
   title: () => 'الكشوف', back, onMount: focus,
-  onUnmount() { setupRequest++; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
+  onUnmount() { hub.route = null; setupRequest++; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
   render(p = {}) {
-    bind(); const denial = allowed(); if (denial) { bindTransfer(null); return unavailable(denial); }
+    bind(); const denial = allowed(); if (denial) { bindTransfer(null); return classAccessFeedback(p.id ? p : {}) || unavailable(denial); }
     contextRoute(p);
     const list = accessible(), ids = new Set(list.map(row => row.id));
     hub.selected = new Set([...hub.selected].filter(id => ids.has(id)));
-    if (!ids.has(hub.existing)) hub.existing = '';
+    if (hub.existing && !ids.has(hub.existing)) {
+      bindTransfer(null);
+      return classAccessFeedback({ id: hub.existing });
+    }
     return html`<div class="management-page class-import-page"><h2 tabindex="-1">استيراد وتصدير الكشوف</h2>
       ${tabs()}
       ${hub.tab === 'import' ? html`${directExtensionEntry()}<label class="field"><span>وجهة الاستيراد</span><select class="select" data-import-kind ${locked() ? 'disabled' : ''}><option value="existing" ${hub.kind === 'existing' ? 'selected' : ''}>استيراد إلى فصل موجود</option><option value="new" ${hub.kind === 'new' ? 'selected' : ''}>إنشاء فصل من ملف</option></select></label>
@@ -524,6 +528,7 @@ export const koshoofCenter = {
   },
   afterPaint(root) {
     focus(root);
+    if (root.querySelector('[data-class-access-status]')) return;
     if (hub.tab === 'import') void receiveExtension();
     if (hub.tab === 'import' && hub.kind === 'new') classImport.afterPaint(root);
     const listen = (selector, handler) => root.querySelectorAll(selector).forEach(el => { if (el.dataset.bound) return; el.dataset.bound = 'true'; el.addEventListener('change', handler); });

@@ -297,6 +297,23 @@ export function assertClassOperationsAccess(teachingId) {
 
   return teaching;
 }
+/** AI: read-only presentation of a failed gate. Never authorizes an operation or
+ * exposes the underlying identity, database, receipt or exception text. */
+export function classOperationsStatus(teachingId) {
+  try {
+    if (teachingId) assertClassOperationsAccess(teachingId);
+    else assertClassImportAccess();
+    return null;
+  } catch {
+    const teaching = getTeaching(teachingId);
+    if ((teaching && (teaching.deleted || isTeachingArchived(teaching))) ||
+        (activeTerm() && isTermClosed(activeTerm().id))) return 'archived';
+    if (!state.ready || !activeWorkspace || !cloud.session ||
+        cloud.session.user?.id !== cloud.user?.id || cloud.authStatus().state !== 'authenticated') return 'verification';
+    if (getOfflineLeaseStatus().reason === 'expired') return 'lease';
+    return 'ownership';
+  }
+}
 /** Same account/provenance/lease gate for an empty Classes screen. No writes. */
 export function assertClassImportAccess() {
   const workspace = activeWorkspace;
