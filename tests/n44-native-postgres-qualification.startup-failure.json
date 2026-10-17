@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n44-native-postgres-qualification-20261017",
+  "runId": "d8da6fc9-441f-4a47-b777-d46b7ed18acf",
+  "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+  "startedAt": "2026-10-17T11:56:11.974Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-524d9aac-b08b-42cc-b5d7-4660ad375618",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-524d9aac-b08b-42cc-b5d7-4660ad375618\\data",
+  "checks": [],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "stopped": true,
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "recovery": "Manual ownership-matched pg_ctl fast stop after normalized directory/PID/birth/executable proof; no SQL connection made"
+  },
+  "port": 60312,
+  "failure": {
+    "name": "Error",
+    "code": "ETIMEDOUT",
+    "message": "SQL operation failed; see named check and SQLSTATE"
+  },
+  "finishedAt": "2026-10-17T11:56:54.066Z",
+  "status": "FAIL"
+}

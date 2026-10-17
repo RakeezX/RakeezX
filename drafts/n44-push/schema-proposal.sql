@@ -118,6 +118,8 @@ begin
          old.kind,old.action_path,old.expires_at_ms)
      or new.attempts < old.attempts or new.attempts > old.attempts + 1
      or (new.attempts > old.attempts and not (old.state = 'retry' and new.state = 'sending'))
+     or (old.state = 'retry' and new.state = 'sending' and new.attempts <> old.attempts + 1)
+     or (new.state = 'retry' and new.attempts >= 3)
      or (old.state in ('sent','uncertain','suppressed','dead') and new is distinct from old)
      or (old.state = 'sending' and new.state = 'sending' and new is distinct from old)
      or (old.state = 'retry' and new.state not in ('retry','sending','suppressed')) then

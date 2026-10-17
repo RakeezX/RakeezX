@@ -1,0 +1,500 @@
+{
+  "taskId": "continuous-n44-native-postgres-qualification-20261017",
+  "runId": "d8da6fc9-441f-4a47-b777-d46b7ed18acf",
+  "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+  "startedAt": "2026-10-17T11:58:27.422Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-d2569c34-c659-44c0-8d1b-9f8069c047e0",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-d2569c34-c659-44c0-8d1b-9f8069c047e0\\data",
+  "checks": [
+    {
+      "name": "actual_schema_apply_catalog_and_ddl_rollback",
+      "status": "PASS",
+      "evidence": {
+        "tables": 6,
+        "forcedRls": 6,
+        "ownerPolicies": 24,
+        "invokerFunctions": 2,
+        "rollbackSqlstate": "42704",
+        "indexes": 12,
+        "constraints": 39
+      }
+    },
+    {
+      "name": "real_registration_and_delivery_constraints_and_triggers",
+      "status": "FAIL",
+      "sqlstate": "ERR_ASSERTION"
+    }
+  ],
+  "negativeSqlstates": [
+    {
+      "label": "registration immutable expiry",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable registration_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable workspace_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable device_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable session_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable session_revision",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable consent_revision",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable sealed",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable fingerprint",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "registration immutable binding_fingerprint",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "one active context unique index",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "revoked secret must be null",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "revoked tombstone cannot reactivate",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable expires_at_ms",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable action_path",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable registration_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable event_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable kind",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable workspace_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable device_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "delivery immutable owner_id",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "sending cannot increment attempts",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "negative-attempt",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "four-attempts",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "zero-sending",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "suppressed terminal cannot restart",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "retry to sending requires attempt increment",
+      "expected": "P0001",
+      "actual": "P0001"
+    },
+    {
+      "label": "third attempt cannot re-enter retry",
+      "expected": "P0001",
+      "actual": "NO_ERROR"
+    }
+  ],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-d2569c34-c659-44c0-8d1b-9f8069c047e0"
+  },
+  "port": 59343,
+  "ownership": {
+    "pid": 10888,
+    "birth": "2026-10-17T11:58:37.6860380Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n44-native-postgres-qualification-20261017\\artifacts\\n44-native-pg-d8da6fc9-441f-4a47-b777-d46b7ed18acf-d2569c34-c659-44c0-8d1b-9f8069c047e0\\data",
+    "port": 59343,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    24120,
+    9920
+  ],
+  "schemaSha256": "f79dc12d99e3750ba4e1b051aa69fa0fd219f4fbfdac8ee7b223dfd4681f899c",
+  "catalog": {
+    "tables": [
+      {
+        "relname": "budgets",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "contexts",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "deliveries",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "endpoint_claims",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "owner_clock",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "relname": "registrations",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      }
+    ],
+    "policies": 24,
+    "triggers": [
+      {
+        "proname": "immutable_delivery",
+        "prosecdef": false,
+        "proconfig": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "proname": "immutable_registration",
+        "prosecdef": false,
+        "proconfig": [
+          "search_path=\"\""
+        ]
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "budgets_pkey",
+        "indexdef": "CREATE UNIQUE INDEX budgets_pkey ON n44_push_draft.budgets USING btree (owner_id, budget_key)"
+      },
+      {
+        "indexname": "contexts_pkey",
+        "indexdef": "CREATE UNIQUE INDEX contexts_pkey ON n44_push_draft.contexts USING btree (owner_id, workspace_id, device_id)"
+      },
+      {
+        "indexname": "deliveries_pkey",
+        "indexdef": "CREATE UNIQUE INDEX deliveries_pkey ON n44_push_draft.deliveries USING btree (owner_id, workspace_id, device_id, event_id)"
+      },
+      {
+        "indexname": "delivery_retention",
+        "indexdef": "CREATE INDEX delivery_retention ON n44_push_draft.deliveries USING btree (owner_id, expires_at_ms)"
+      },
+      {
+        "indexname": "endpoint_claims_owner_id_registration_id_key",
+        "indexdef": "CREATE UNIQUE INDEX endpoint_claims_owner_id_registration_id_key ON n44_push_draft.endpoint_claims USING btree (owner_id, registration_id)"
+      },
+      {
+        "indexname": "endpoint_claims_pkey",
+        "indexdef": "CREATE UNIQUE INDEX endpoint_claims_pkey ON n44_push_draft.endpoint_claims USING btree (fingerprint)"
+      },
+      {
+        "indexname": "endpoint_owner",
+        "indexdef": "CREATE INDEX endpoint_owner ON n44_push_draft.endpoint_claims USING btree (owner_id)"
+      },
+      {
+        "indexname": "one_active_context",
+        "indexdef": "CREATE UNIQUE INDEX one_active_context ON n44_push_draft.registrations USING btree (owner_id, workspace_id, device_id) WHERE (state = 'active'::text)"
+      },
+      {
+        "indexname": "owner_clock_pkey",
+        "indexdef": "CREATE UNIQUE INDEX owner_clock_pkey ON n44_push_draft.owner_clock USING btree (owner_id)"
+      },
+      {
+        "indexname": "registration_expiry",
+        "indexdef": "CREATE INDEX registration_expiry ON n44_push_draft.registrations USING btree (owner_id, expires_at_ms)"
+      },
+      {
+        "indexname": "registrations_pkey",
+        "indexdef": "CREATE UNIQUE INDEX registrations_pkey ON n44_push_draft.registrations USING btree (owner_id, registration_id)"
+      },
+      {
+        "indexname": "retry_due",
+        "indexdef": "CREATE INDEX retry_due ON n44_push_draft.deliveries USING btree (owner_id, next_at_ms) WHERE (state = 'retry'::text)"
+      }
+    ],
+    "constraints": [
+      {
+        "conname": "budgets_bucket_check",
+        "contype": "c",
+        "definition": "CHECK ((bucket >= 0))"
+      },
+      {
+        "conname": "budgets_budget_key_check",
+        "contype": "c",
+        "definition": "CHECK (((length(budget_key) >= 1) AND (length(budget_key) <= 200)))"
+      },
+      {
+        "conname": "budgets_count_check",
+        "contype": "c",
+        "definition": "CHECK (((count >= 1) AND (count <= 40)))"
+      },
+      {
+        "conname": "budgets_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "conname": "budgets_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, budget_key)"
+      },
+      {
+        "conname": "contexts_consent_revision_check",
+        "contype": "c",
+        "definition": "CHECK (((length(consent_revision) >= 1) AND (length(consent_revision) <= 180)))"
+      },
+      {
+        "conname": "contexts_device_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(device_id) >= 1) AND (length(device_id) <= 180)))"
+      },
+      {
+        "conname": "contexts_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "conname": "contexts_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, workspace_id, device_id)"
+      },
+      {
+        "conname": "contexts_preferences_check",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof(preferences) = 'object'::text) AND (octet_length((preferences)::text) <= 2048)))"
+      },
+      {
+        "conname": "contexts_session_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(session_id) >= 1) AND (length(session_id) <= 180)))"
+      },
+      {
+        "conname": "contexts_session_revision_check",
+        "contype": "c",
+        "definition": "CHECK (((length(session_revision) >= 1) AND (length(session_revision) <= 180)))"
+      },
+      {
+        "conname": "contexts_workspace_id_check",
+        "contype": "c",
+        "definition": "CHECK (((length(workspace_id) >= 1) AND (length(workspace_id) <= 180)))"
+      },
+      {
+        "conname": "deliveries_action_path_check",
+        "contype": "c",
+        "definition": "CHECK (((length(action_path) >= 1) AND (length(action_path) <= 800)))"
+      },
+      {
+        "conname": "deliveries_attempts_check",
+        "contype": "c",
+        "definition": "CHECK (((attempts >= 0) AND (attempts <= 3)))"
+      },
+      {
+        "conname": "deliveries_check",
+        "contype": "c",
+        "definition": "CHECK (((attempts > 0) OR (state = 'suppressed'::text)))"
+      },
+      {
+        "conname": "deliveries_check1",
+        "contype": "c",
+        "definition": "CHECK ((started_at_ms < expires_at_ms))"
+      },
+      {
+        "conname": "deliveries_event_id_check",
+        "contype": "c",
+        "definition": "CHECK ((event_id ~ '^[a-zA-Z0-9_:%.-]{1,240}$'::text))"
+      },
+      {
+        "conname": "deliveries_expires_at_ms_check",
+        "contype": "c",
+        "definition": "CHECK ((expires_at_ms >= 0))"
+      },
+      {
+        "conname": "deliveries_kind_check",
+        "contype": "c",
+        "definition": "CHECK ((kind = ANY (ARRAY['lesson'::text, 'due'::text])))"
+      },
+      {
+        "conname": "deliveries_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "conname": "deliveries_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, workspace_id, device_id, event_id)"
+      },
+      {
+        "conname": "deliveries_state_check",
+        "contype": "c",
+        "definition": "CHECK ((state = ANY (ARRAY['sending'::text, 'retry'::text, 'sent'::text, 'uncertain'::text, 'suppressed'::text, 'dead'::text])))"
+      },
+      {
+        "conname": "endpoint_claims_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((fingerprint ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "conname": "endpoint_claims_owner_id_registration_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id, registration_id) REFERENCES n44_push_draft.registrations(owner_id, registration_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED"
+      },
+      {
+        "conname": "endpoint_claims_owner_id_registration_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (owner_id, registration_id)"
+      },
+      {
+        "conname": "endpoint_claims_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (fingerprint)"
+      },
+      {
+        "conname": "owner_clock_high_water_ms_check",
+        "contype": "c",
+        "definition": "CHECK ((high_water_ms >= 0))"
+      },
+      {
+        "conname": "owner_clock_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "conname": "owner_clock_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id)"
+      },
+      {
+        "conname": "registrations_binding_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((binding_fingerprint ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "conname": "registrations_check",
+        "contype": "c",
+        "definition": "CHECK ((((state = 'active'::text) AND (sealed IS NOT NULL) AND (fingerprint IS NOT NULL) AND (binding_fingerprint IS NOT NULL)) OR ((state <> 'active'::text) AND (sealed IS NULL) AND (fingerprint IS NULL) AND (binding_fingerprint IS NULL))))"
+      },
+      {
+        "conname": "registrations_expires_at_ms_check",
+        "contype": "c",
+        "definition": "CHECK ((expires_at_ms >= 0))"
+      },
+      {
+        "conname": "registrations_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((fingerprint ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "conname": "registrations_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "conname": "registrations_owner_id_workspace_id_device_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id, workspace_id, device_id) REFERENCES n44_push_draft.contexts(owner_id, workspace_id, device_id)"
+      },
+      {
+        "conname": "registrations_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, registration_id)"
+      },
+      {
+        "conname": "registrations_sealed_check",
+        "contype": "c",
+        "definition": "CHECK (((octet_length(sealed) >= 1) AND (octet_length(sealed) <= 8192)))"
+      },
+      {
+        "conname": "registrations_state_check",
+        "contype": "c",
+        "definition": "CHECK ((state = ANY (ARRAY['active'::text, 'revoked'::text, 'dead'::text])))"
+      }
+    ]
+  },
+  "failure": {
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION",
+    "message": "third attempt cannot re-enter retry\n+ actual - expected\n\n+ undefined\n- 'P0001'\n",
+    "location": "at negative (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-native-postgres-qualification-20261017/tests/fixtures/n44-native-postgres-qualification/cases.mjs:26:12)"
+  },
+  "finishedAt": "2026-10-17T11:58:41.877Z",
+  "status": "FAIL"
+}
