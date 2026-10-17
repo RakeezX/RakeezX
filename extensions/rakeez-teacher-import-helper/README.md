@@ -1,3 +1,15 @@
+## Current private 0.5.7 — academic order and honest report coverage (AI)
+
+Class choices compare grade 1–12, then natural section numbers (1, 2, 10), without renaming or changing identities, membership, within-class student order or persisted record order. The comparator is copied byte-for-byte from src/lib/class-order.js and its equality is checked by tests/n36-academic-class-order.test.mjs; no model/store runtime is bundled.
+
+A 300-row review window is a pause, not an overall roster cap. When validated report routes remain, the teacher must review and explicitly confirm every current batch in Rakeez and wait for its receipts before continuing. A missing receipt never advances or discards an unsent tail. A network/schema failure remains partial; missing terminal/gaps/unknown totals cannot prove completion. A proved terminal report series is complete even at exactly 300 rows or with only optional MyStudents/metadata work remaining. Missing child links on optional MyStudents cannot negate independently proved report coverage. Local receipts are not server-save/Sync proof.
+
+Download 0.5.7 from Koshoof; previous packages remain untouched. The independent publisher verifies publication; only then may the separately authorized stable-folder updater run. This worker does not install or reload Chrome. Official full-source collection and saved import acceptance remain voluntary PO checks; N36 is OPEN.
+
+## Historical release notes below
+
+Earlier limits and package references below describe historical versions, not the current contract.
+
 # Current 0.5.5 — PO partial available decision, 2026-10-17
 
 This section supersedes the historical complete-only and total-cap descriptions below. There is no product-wide maximum number of students. Source rows are reviewed in bounded transient windows (pause at 300 valid rows, at most 599 valid rows when a page crosses the boundary). A source table larger than 300 is read in sequential visible row slices. Each exact class is split into <=300-row transfers, preserving source order. The teacher explicitly confirms partial coverage and every batch, maps the source class to a verified owned class, and confirms names inside Rakeez. Missing index links, unknown terminal or a missing later page warn about coverage; they do not invalidate independently vetted visible name/class rows. Invalid, hidden and ambiguous rows stay excluded, with bounded reasons and no invented missing count.

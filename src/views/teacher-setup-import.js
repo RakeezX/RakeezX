@@ -1,5 +1,7 @@
+import { compareAcademicClasses } from '../lib/class-order.js';
 import { html, openSheet, toast } from '../lib/dom.js';
 import * as store from '../store.js';
+import { isDemo } from '../lib/demo.js';
 import * as cloud from '../lib/cloud.js';
 import { runtimeSyncOwnershipGuard } from '../lib/sync-ownership.js';
 import { mountDateTimeControls } from '../lib/rakeez-datetime.js';
@@ -48,7 +50,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     } catch { close(); return false; }
   }
   function context() {
-    return { yearId, termId, years: current.years, terms: current.terms, classes: current.sections.filter(s => s.yearId === yearId && s.status !== 'archived'),
+    return { yearId, termId, years: current.years, terms: current.terms, classes: current.sections.filter(s => s.yearId === yearId && s.status !== 'archived').sort((a,b) => Number(isDemo(a))-Number(isDemo(b)) || compareAcademicClasses(a,b)),
       subjects: current.subjects, teachings: current.teachings, students: current.students, enrollments: current.enrollments };
   }
   const message = text => { root.querySelector('[data-import-status]').textContent = text; };
@@ -140,7 +142,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     const scrollBody = root.querySelector('.sheet__body'), scrollTop = scrollBody.scrollTop;
     if (!bundle) { target.replaceChildren(); return; }
     const ctx = context();
-    const classNames = [...new Set(bundle.categories.filter(c => selected.has(c.category)).flatMap(c => c.rows.map(r => r.classroom).filter(Boolean)))];
+    const classNames = [...new Set(bundle.categories.filter(c => selected.has(c.category)).flatMap(c => c.rows.map(r => r.classroom).filter(Boolean)))].sort(compareAcademicClasses);
     const subjectNames = [...new Set(bundle.categories.filter(c => selected.has(c.category)).flatMap(c => c.rows.map(r => r.subject).filter(Boolean)))];
     const result = reviewPlan(bundle, selected, ctx, mappings);
     const targets = namesTargets();

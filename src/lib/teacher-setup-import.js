@@ -1,3 +1,4 @@
+import { compareAcademicClasses } from './class-order.js';
 // N36 v1 validated consumer. Only names may reach the existing confirmed store path.
 import { normalizeDateTimeDigits, validDateTimeValue } from './rakeez-datetime-values.js';
 
@@ -127,7 +128,7 @@ export function bundleNamesTargets(bundle, selected, context, mappings) {
   // confirmation. It is not an unresolved source/category mapping.
   if (plan.issues.some(issue => !issue.includes('أكثر من طالب بالاسم نفسه'))) return [];
   const students = plan.categories.find(c => c.category === 'students');
-  const sources = [...new Set(students.rows.map(r => r.proposed.classroom))];
+  const sources = [...new Set(students.rows.map(r => r.proposed.classroom))].sort(compareAcademicClasses);
   const sections = sources.map(source => mappings.classes[source]);
   if (new Set(sections).size !== sections.length) return [];
   return sources.flatMap((source, index) => context.teachings.filter(t =>

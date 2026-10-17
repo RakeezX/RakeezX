@@ -1,3 +1,4 @@
+import { compareAcademicClasses } from '../lib/class-order.js';
 /**
  * الفصول — قائمة الإسنادات التدريسية في الفصل الدراسي الحالي.
  *
@@ -344,7 +345,7 @@ const teachings = {
   subtitle: () => store.activeTerm()?.name ?? '',
 
   render() {
-    const list = store.teachings();
+    const list = store.teachings().slice().sort((a,b) => Number(isDemo(a))-Number(isDemo(b)) || compareAcademicClasses(store.getSection(a.sectionId),store.getSection(b.sectionId)));
     const term = store.activeTerm();
     const closed = term ? store.isTermClosed(term.id) : false;
 

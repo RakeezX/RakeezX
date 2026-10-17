@@ -1,4 +1,4 @@
-import {appendSourceRows,reportsComplete,SOURCE_WINDOW_ROWS} from './source-roster.js';
+import {appendSourceRows,reportsComplete,sourceCoverage,coverageMessage,SOURCE_WINDOW_ROWS} from './source-roster.js';
 import {readSourceReportPage} from './source-adapter.js';
 import {readAutomaticTeacherPage,readSelectedNameColumn} from './selection.js';
 import {reviewNames} from './core.js';
@@ -14,7 +14,7 @@ let diagnosticLines=[];
 const entryText=e=>`pageKind=${e.pageKind} | readyState=${e.readyState} | sourceTabMatch=${(e.sourceTabMatch===true?'true':e.sourceTabMatch===false?'false':'unknown')} | roleMarkers=${e.roleMarkers} | schoolOptions=${e.schoolOptions} | navMarkers=${e.navMarkers} | actionMarkers=${e.actionMarkers} | safeReadLinks=${e.safeReadLinks} | iframeCount=${e.iframeCount}${e.linkStats?' | '+Object.entries(e.linkStats).map(([key,value])=>key+'='+value).join(' | '):''}`;
 function showDiagnostic(d){
  if(!d)return;
- let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | commitEvidence=receiver-only | excluded=${d.run.excluded||'none'}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
+ let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | commitEvidence=receiver-only | excluded=${d.run.excluded||'none'} | coverage=${d.run.coverage} | hasNextReport=${d.run.hasNextReport} | processedReportPages=${d.run.processedReportPages} | reviewWindow=${d.run.reviewWindow}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
  if(d.roster)line+=` | cause=${d.roster.cause} | relevant=${d.roster.relevant} | unsupported=${d.roster.unsupported} | iframeCount=${d.roster.iframes} | frameReport=unconfirmed`;
  if(d.sourceTabMatch===true)line+=' | sourceTabMatch=true';
  if(d.template)line+=` | route=${d.template} | queryKeys=${d.keys?.join(',')||'-'} | unknownKeys=${d.unknownKeys??0} | routeReason=${d.detail??'unexpected-path'}`;
@@ -149,10 +149,11 @@ async function start(tabId){
      else {await chrome.tabs.update(tabId,{url:target});await ready(tabId,origin,ticket);if(next.kind==='gateway'&&next.context?.kind==='selected-teacher-card'&&job.roleSwitchUsed)job.gatewaySettleUntil=Date.now()+8000;next.page=await inspect(tabId,origin,next.kind,alive);}current(ticket);
     }
     catch(e){if(!['students','timetable'].includes(next.kind)||!e.incomplete&&e.message!=='PAGE_TIMEOUT')throw e;current(ticket);
-     const redundant=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname)&&reportsComplete(job.series)&&job.sourceRows.length>0&&!job.warnings.some(w=>w.category==='students')&&!job.routes.some(r=>r.kind==='students');
+     const optional=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname);
+     const redundant=e.message==='ROSTER_LINKS_UNAVAILABLE'&&e.diagnostic?.roster?.cause==='MAIN_FRAME_READ_LINK_ABSENT'&&/^\/SchoolManagment\/Actions\/MyStudents\/?$/i.test(new URL(target).pathname)&&reportsComplete(job.series)&&job.sourceRows.length>0&&!job.warnings.some(w=>w.category==='students')&&!job.routes.some(r=>r.kind==='students'&&/^\/SchoolManagmentReports\//i.test(r.path));
      if(e.observedRows)job.studentRowsSeen+=e.observedRows;
      if(!redundant)showDiagnostic(e.diagnostic);
-     next.page={tables:[],links:[],warnings:redundant?[]:[{category:next.kind,code:e.message}],skipped:[]};
+     next.page={tables:[],links:[],warnings:redundant?[]:[{category:next.kind,code:e.message,optional}],skipped:[]};
     }
 
    }
@@ -205,7 +206,7 @@ async function start(tabId){
    // Process actual report hrefs in page order even when responses settle out of order.
    job.routes.sort((a,b)=>{const page=r=>r.kind==='students'&&/^\/SchoolManagmentReports\//.test(r.path)?Number(new URL(r.path,origin).searchParams.get('page')??1):Infinity;return page(a)-page(b);});
    next=job.routes.shift();if(next)job.visited.add(routeIdentity(origin,next.path));
-   if(next&&(job.sourceRows.length>=SOURCE_WINDOW_ROWS||job.windowPages>=RUN_LIMITS.pages))await pauseWindow(ticket,false);
+   if(next&&(job.sourceRows.length>=SOURCE_WINDOW_ROWS||job.windowPages>=RUN_LIMITS.pages))await pauseWindow(ticket,false,next);
 
   }
   current(ticket);await inspect(tabId,origin,'guard',alive);current(ticket);
@@ -219,19 +220,20 @@ async function start(tabId){
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
 }
 // AI: bounded ephemeral windows; explicit continuation never silently discards a tail.
-async function pauseWindow(ticket,final){
+async function pauseWindow(ticket,final,next=null){
  const active=job;clearTimeout(active.timer);
  // Drain bounded speculative readers before the five-minute review starts; retain only settled pages.
  await Promise.all(active.fetches.values());current(ticket);
- const complete=final&&!active.warnings.some(w=>w.category==='students')&&reportsComplete(active.series);
+ const pendingReportPages=[next,...active.routes].filter(r=>r?.kind==='students'&&/^\/SchoolManagmentReports\//i.test(r.path)).length;
+ const coverage=sourceCoverage({series:active.series,warnings:active.warnings,pendingReportPages,reviewWindow:!final}),{complete}=coverage;
  review={tabId:active.tabId,origin:active.origin,context:active.context,sourceURL:(await chrome.tabs.get(active.tabId)).url,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
- const warnings=[...new Set(active.warnings.filter(w=>w.category==='students').map(w=>w.code))];
- showDiagnostic({run:{staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
- $('run-counts').textContent=`جمعت ${active.studentRowsSeen} صفًا حتى الآن؛ ${active.sourceRows.length} صالحًا في نافذة المراجعة الحالية؛ غير متاح ${active.excluded} صفًا مرصودًا. بقية المصدر غير معلومة حتى التحقق منها.`;
- $('run-missing').textContent=complete?'كشف مكتمل للصفحات التي ثبت تسلسلها ونهايتها.':'تعذر التحقق من بقية صفحات الكشف؛ تستطيع استيراد الأسماء الظاهرة فقط مع مراجعتها. قد ينقص طلاب؛ لا عدد إجمالي مفترض.';
+ const warnings=[...new Set(active.warnings.filter(w=>w.category==='students'&&!(w.optional&&complete)).map(w=>w.code))];
+ showDiagnostic({run:{...coverage,staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
+ $('run-counts').textContent=`جمعت ${active.studentRowsSeen} صفًا حتى الآن؛ ${active.sourceRows.length} صالحًا في نافذة المراجعة الحالية؛ غير متاح ${active.excluded} صفًا مرصودًا. ${complete?'ثبت تسلسل الكشف ونهايته.':'بقية المصدر غير معلومة حتى التحقق منها.'}`;
+ $('run-missing').textContent=coverageMessage(coverage);
  $('run-skipped').textContent=warnings.length?'أسباب نقص التغطية أو الاستبعاد: '+warnings.join('، '):'';
- window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,complete,excluded:active.excluded,hasNext:!final,continuing:active.continuing===true}}));
- announce(complete?'اكتمل الجمع؛ راجع كل فصل وكل دفعة ثم أكّد داخل ركيز.':'جمع غير مكتمل؛ استيراد المتاح فقط بمراجعة وتأكيد إضافي، دون إضافة تلقائية.');
+ window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,...coverage,excluded:active.excluded,hasNext:!final,continuing:active.continuing===true}}));
+ announce(coverageMessage(coverage));
  armReview();
  if(final){cancelReports(active);job=null;return;}
  await new Promise((resolve,reject)=>{

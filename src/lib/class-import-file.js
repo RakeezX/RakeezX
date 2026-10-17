@@ -1,3 +1,4 @@
+import { compareAcademicClasses } from './class-order.js';
 // AI: bounded local-file interpretation; never connects to a school portal.
 import { readStudentFile, previewStudentRows, validateRows, isStudentNameHeader, validStudentImportName } from './student-import.js';
 import { GRADES, normalizeSectionLabel } from '../models.js';
@@ -58,7 +59,7 @@ export function classGroups(rows, { header = 0, mapping, manual = {}, schoolName
     if (!groups.has(id)) groups.set(id, { id, grade, rawGrade, label, subject, rows: [] });
     groups.get(id).rows.push([mapping.name >= 0 ? read('name') : '', header + index + 2]);
   }
-  return [...groups.values()].map(group => {
+  return [...groups.values()].sort(compareAcademicClasses).map(group => {
     const preview = previewStudentRows(group.rows.map(row => [row[0]]), 0, false, []);
     const error = !group.grade ? 'اختر صفًا معتمدًا؛ لا يمكن تخمين الصف.'
       : !group.label || group.label.length > 8 || !/^[\p{L}\p{N} ._-]+$/u.test(group.label) ? 'رمز الفصل مطلوب (حتى 8 أحرف أو أرقام).'

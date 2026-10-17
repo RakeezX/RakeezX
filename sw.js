@@ -68,6 +68,7 @@ const SHELL = [
   './src/lib/n88-invite-lab.js',
   './src/store.js',
   './src/models.js',
+  './src/lib/class-order.js',
   './src/repaint.js',
 
   './src/lib/dom.js',
@@ -208,6 +209,7 @@ self.addEventListener('install', (event) => {
       await Promise.all([
         './src/lib/score-distribution-copy.js?n100=automatic-safe-v1',
         './src/lib/app-update.js',
+        './src/lib/class-order.js',
         './src/lib/n36-extension-handoff.js',
         './src/lib/n36-extension-protocol.js',
         './src/views/n88-public-guest.js',

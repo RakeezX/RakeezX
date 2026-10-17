@@ -1,0 +1,200 @@
+{
+  "taskId": "continuous-n36-ascending-class-order-and-coverage-status-20261017",
+  "runId": "f8b69a07-fc03-4447-8dd9-dbb3e06a0b1b",
+  "baseSha": "1e265c9ac4552f9503ad2871c39c1ad19cd5d244",
+  "checks": [
+    {
+      "name": "controller-paused",
+      "status": "PASS",
+      "evidence": {
+        "initial": "توقف الجمع مؤقتًا لمراجعة النافذة الحالية؛ توجد صفحات كشف أخرى. راجع وانقل وأكّد جميع دفعات النافذة في ركيز وانتظر إيصالاتها، ثم اضغط متابعة. لا تُحذف الأسماء غير المنقولة للمتابعة.",
+        "final": "ثبت اكتمال تسلسل صفحات الكشف ونهايته؛ راجع كل فصل ودفعة ثم أكّد داخل ركيز. قد تبقى بيانات اختيارية لا تضيف صفحات طلاب.",
+        "receiptGate": true,
+        "sentClasses": [
+          "خامس2",
+          "خامس1",
+          "خامس3",
+          "خامس4",
+          "خامس5",
+          "خامس6",
+          "خامس7",
+          "خامس8",
+          "سادس6",
+          "سادس7"
+        ],
+        "continuations": 1
+      }
+    },
+    {
+      "name": "controller-network",
+      "status": "PASS",
+      "evidence": {
+        "initial": "توقف الجمع مؤقتًا لمراجعة النافذة الحالية؛ توجد صفحات كشف أخرى. راجع وانقل وأكّد جميع دفعات النافذة في ركيز وانتظر إيصالاتها، ثم اضغط متابعة. لا تُحذف الأسماء غير المنقولة للمتابعة.",
+        "final": "تغطية الكشف جزئية: فشلت قراءة صفحة أو لم يثبت تسلسل الصفحات ونهايتها. راجع التشخيص المتاح؛ يمكنك استيراد المتاح بتأكيد إضافي، وقد ينقص طلاب.",
+        "receiptGate": true,
+        "sentClasses": [
+          "خامس2",
+          "خامس1",
+          "خامس3",
+          "خامس4",
+          "خامس5",
+          "خامس6",
+          "خامس7",
+          "خامس8",
+          "سادس6",
+          "سادس7"
+        ],
+        "continuations": 1
+      }
+    },
+    {
+      "name": "controller-schema",
+      "status": "PASS",
+      "evidence": {
+        "initial": "توقف الجمع مؤقتًا لمراجعة النافذة الحالية؛ توجد صفحات كشف أخرى. راجع وانقل وأكّد جميع دفعات النافذة في ركيز وانتظر إيصالاتها، ثم اضغط متابعة. لا تُحذف الأسماء غير المنقولة للمتابعة.",
+        "final": "تغطية الكشف جزئية: فشلت قراءة صفحة أو لم يثبت تسلسل الصفحات ونهايتها. راجع التشخيص المتاح؛ يمكنك استيراد المتاح بتأكيد إضافي، وقد ينقص طلاب.",
+        "receiptGate": true,
+        "sentClasses": [
+          "خامس2",
+          "خامس1",
+          "خامس3",
+          "خامس4",
+          "خامس5",
+          "خامس6",
+          "خامس7",
+          "خامس8",
+          "سادس6",
+          "سادس7"
+        ],
+        "continuations": 1
+      }
+    },
+    {
+      "name": "proved-terminal-300-with-optional-task",
+      "status": "PASS",
+      "evidence": "ثبت اكتمال تسلسل صفحات الكشف ونهايته؛ راجع كل فصل ودفعة ثم أكّد داخل ركيز. قد تبقى بيانات اختيارية لا تضيف صفحات طلاب."
+    },
+    {
+      "name": "unproved-unknown",
+      "status": "PASS",
+      "evidence": "اكتمال الكشف غير معلوم: لم يثبت تسلسل الصفحات ونهايتها. يمكنك مراجعة المتاح فقط بتأكيد إضافي؛ لا عدد إجمالي مفترض."
+    },
+    {
+      "name": "unproved-gap",
+      "status": "PASS",
+      "evidence": "تغطية الكشف جزئية: فشلت قراءة صفحة أو لم يثبت تسلسل الصفحات ونهايتها. راجع التشخيص المتاح؛ يمكنك استيراد المتاح بتأكيد إضافي، وقد ينقص طلاب."
+    },
+    {
+      "name": "actual-account-class-list-import-options-and-mapping",
+      "status": "PASS",
+      "evidence": {
+        "classOrder": [
+          "#/teaching/n36-teaching-3",
+          "#/teaching/n36-teaching-7",
+          "#/teaching/n36-teaching-2",
+          "#/teaching/n36-teaching-6",
+          "#/teaching/n36-teaching-9",
+          "#/teaching/n36-teaching-8",
+          "#/teaching/n36-teaching-5",
+          "#/teaching/n36-teaching-1",
+          "#/teaching/n36-teaching-4",
+          "#/teaching/n36-teaching-0",
+          "#/teaching/demo:n36-teaching"
+        ],
+        "ids": [
+          "n36-teaching-3",
+          "n36-teaching-7",
+          "n36-teaching-2",
+          "n36-teaching-6",
+          "n36-teaching-9",
+          "n36-teaching-8",
+          "n36-teaching-5",
+          "n36-teaching-1",
+          "n36-teaching-4",
+          "n36-teaching-0",
+          "demo:n36-teaching"
+        ],
+        "target": {
+          "id": "n36-teaching-7",
+          "sectionId": "n36-section-7",
+          "owner": "a7300000-0000-4000-8000-000000000001",
+          "students": [
+            "n73-student1"
+          ]
+        },
+        "sourceOrder": [
+          "خامس2",
+          "سادس7"
+        ],
+        "databaseUnchanged": true,
+        "serviceCallsUnchanged": true
+      }
+    },
+    {
+      "name": "expired-lease-ui-entry-rejected",
+      "status": "PASS",
+      "evidence": "Actual receiver entry rejected an invalidated synthetic lease"
+    },
+    {
+      "name": "foreign-owner-ui-entry-rejected",
+      "status": "PASS",
+      "evidence": "Ownership change removed the actual guarded import entry and no receiver opened"
+    },
+    {
+      "name": "actual-service-worker-offline-shell",
+      "status": "PASS",
+      "evidence": "New module cached with exact source bytes; real app reloaded offline and rendered class cards; comparator imported offline"
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "preservedFailures": [
+    {
+      "status": "FAIL",
+      "stage": "immediate-next-page network fixture",
+      "observed": "page.waitForFunction: Timeout 10000ms exceeded at browser test line 88",
+      "correction": "After all prior rows were receipted, immediate page failure left zero new rows. Corrected fixture supplies a valid new page before a third-page network/schema failure; no Product guard changed."
+    },
+    {
+      "status": "FAIL",
+      "stage": "terminal300 optional-route fixture",
+      "observed": "locator.waitFor: Timeout 10000ms exceeded waiting for #source-class-select at line 70",
+      "correction": "Supplied matching synthetic school-bound runContext required by the unchanged MyStudents route guard."
+    },
+    {
+      "status": "FAIL",
+      "stage": "account UI navigation",
+      "observed": "locator.click: Timeout 10000ms exceeded at line 121; teacher-setup-import button was not visible",
+      "correction": "Opened both existing advanced details using actual summary controls."
+    },
+    {
+      "status": "FAIL",
+      "stage": "foreign-owner UI expectation",
+      "observed": "locator.click: Timeout 10000ms exceeded at line 144 waiting for teacher-setup-import",
+      "correction": "Ownership change correctly removed the guarded UI entry. Corrected assertion verifies removal and absence of a receiver."
+    },
+    {
+      "status": "FAIL",
+      "stage": "final artifact-binding assertion before archive field was written",
+      "observed": "AssertionError: archiveSha256 undefined; expected add774f05b969b06aa02a14e4c687e6c45e4d0437e44c52b78c6885fae2c9f38",
+      "correction": "Artifact finalization script had stopped on the invalid Python encoding name utf8-sig. Corrected to utf-8-sig and copied the actual verified manifest archive hash. Browser results and source hashes remain unchanged."
+    }
+  ],
+  "offlineLease": "ACQUIRED browser",
+  "offlineRelease": "RELEASED browser",
+  "status": "PASS",
+  "cleanup": "Owned loopback server and disposable contexts/browser closed in finally; isolated helper for local UI; separate offline SW browser phase lease released",
+  "sourceHashes": {
+    "extensions/rakeez-teacher-import-helper/run-controller.js": "2a116a26ae4094c5d639e4a9b78f1d8a8b94d85be39b43eaefd4f4eb7f3b3822",
+    "extensions/rakeez-teacher-import-helper/categories-popup.js": "ce6954cf7a62dd2b19275cdf09cde65a4f0b02bca2a2355dbdb93d38b0152ba2",
+    "extensions/rakeez-teacher-import-helper/source-roster.js": "441e1fc3940ab8e23fb52b72ca38b703d519476a3e7b2960823a4554a9e6d47e",
+    "src/lib/class-order.js": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+    "src/lib/teacher-setup-import.js": "0d8e538f3077c430bdde86b9de4ab353f2b18158b094f83ec8f922f47de13ab6",
+    "src/lib/class-import-file.js": "b07f71335e2dc47f6e973112d88cbd4179163fef5d554f1674eba63d89e6b7e4",
+    "src/views/teachings.js": "a4c28a785cb6c694aeae944af9142cadbb26a3c8fac2a0baea1af19025cf9102",
+    "src/views/class-import-center.js": "5b260ecf1af7ce57c257f15a7a1766881ef53406293e0e94c329a41d3fae6f5d",
+    "src/views/teacher-setup-import.js": "667fa83df72cb45c0b0e20902147cac66e11891777111314ebc08dddb5e37a89",
+    "sw.js": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366"
+  },
+  "archiveSha256": "2403bf1c989f3292f8dab12f69d6932cfc1338dc6cc3f1471116cd9822c42308"
+}

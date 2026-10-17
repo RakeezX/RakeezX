@@ -1,4 +1,4 @@
-import {sourceClasses,selectedSourceClass} from './source-roster.js';
+import {sourceClasses,selectedSourceClass,coverageMessage} from './source-roster.js';
 import {CATEGORIES,parseCategoryTable,validateCategory,stageCategory,bundle} from './categories.js';
 import {readSelectedCategoryTable} from './selection.js';
 import {mountDateTimeControl} from './lib/rakeez-datetime.js';
@@ -149,7 +149,7 @@ function renderSourceChoice(){
  const count=sourceRoster.filter(r=>r.classroom===chosenClass).length;
  const rows=chosenClass&&progress.offset<count?sourceBatch():[];
  for(const row of rows){const li=document.createElement('li');li.textContent=row.name;names.append(li);}
- status.textContent=chosenClass?`${chosenClass}: جمعت ${totals.collected} حتى الآن؛ في هذه النافذة ${count}، صالح للمراجعة ${count-progress.offset}، غير متاح: بقية المصدر غير معلومة؛ مستبعد في النافذة ${sourceInfo.excluded}، أضيف بالفعل ${totals.added}، موجود سابقًا ${totals.existing}. الدفعة المختارة ${rows.length}؛ ${sourceInfo.complete?'كشف مكتمل':'استيراد المتاح فقط — قد ينقص طلاب'}.`:`جمعت ${sourceRoster.length} اسمًا صالحًا في هذه النافذة. اختر فصل المصدر؛ لا حفظ تلقائي.`;
+ status.textContent=chosenClass?`${chosenClass}: جمعت ${totals.collected} حتى الآن؛ في هذه النافذة ${count}، صالح للمراجعة ${count-progress.offset}، ${sourceInfo.complete?'ثبت اكتمال الكشف':'بقية المصدر غير معلومة'}؛ مستبعد في النافذة ${sourceInfo.excluded}، أضيف بالفعل ${totals.added}، موجود سابقًا ${totals.existing}. الدفعة المختارة ${rows.length}؛ ${sourceInfo.complete?'كشف مكتمل':sourceInfo.coverage==='paused'?'نافذة مراجعة مؤقتة — بقيت صفحات كشف':'استيراد المتاح فقط — قد ينقص طلاب'}.`:`جمعت ${sourceRoster.length} اسمًا صالحًا في هذه النافذة. اختر فصل المصدر؛ لا حفظ تلقائي.`;
  $('bundle-review').disabled=!rows.length||!!pendingBatch;
  $('source-continue').disabled=!window.n36CanContinue();
  $('handoff-transfer').textContent=sourceInfo.complete?'نقل الدفعة للمراجعة في ركيز':'استيراد المتاح فقط';
@@ -164,13 +164,13 @@ window.addEventListener('n36:source-roster',({detail})=>{
  const select=document.createElement('select');select.id='source-class-select';
  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='اختر فصلًا ثم راجع أسماء الدفعة';select.append(placeholder);
  for(const group of sourceClasses(sourceRoster)){const option=document.createElement('option');option.value=group.classroom;option.textContent=`${group.classroom}: ${group.count} اسمًا متاحًا في النافذة`;select.append(option);}
- const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=detail.complete?'كشف مكتمل للصفحات المتحقق منها.':'تعذر التحقق من بقية صفحات الكشف؛ تستطيع استيراد الأسماء الظاهرة فقط مع مراجعتها. قد ينقص طلاب، ولا يُفترض عددهم.';
+ const coverage=document.createElement('p');coverage.id='source-coverage';coverage.textContent=coverageMessage(detail);
  const partial=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.id='partial-approval';partial.append(check,document.createTextNode(' أفهم أن الكشف ناقص أو غير معلوم الاكتمال وأوافق على استيراد المتاح فقط'));partial.hidden=detail.complete;
  check.addEventListener('change',invalidateExport);
  const status=document.createElement('p');status.id='source-class-status';
  const names=document.createElement('ol');names.id='source-class-names';
  select.addEventListener('change',()=>{chosenClass=select.value;check.checked=false;renderSourceChoice();});
- const next=document.createElement('button');next.type='button';next.id='source-continue';next.textContent='متابعة صريحة للصفحة أو النافذة التالية';next.hidden=!detail.hasNext;next.disabled=true;
+ const next=document.createElement('button');next.type='button';next.id='source-continue';next.textContent=detail.complete&&!detail.hasNextReport?'متابعة البيانات الاختيارية بعد مراجعة الدفعات':'متابعة صريحة للصفحة أو النافذة التالية';next.hidden=!detail.hasNext;next.disabled=true;
  next.addEventListener('click',()=>{if(window.n36CanContinue()){next.disabled=true;window.dispatchEvent(new Event('n36:continue'));}});
  const retry=document.createElement('button');retry.id='source-retry';retry.type='button';retry.hidden=true;retry.textContent='إعادة مراجعة الدفعة نفسها (لا تجاوز دون إيصال)';
  retry.addEventListener('click',()=>{pendingBatch=null;select.disabled=false;retry.hidden=true;renderSourceChoice();$('handoff-status').textContent='لم يُفترض نجاح الدفعة السابقة. أعد النقل والمطابقة؛ يفحص ركيز الأسماء الموجودة قبل أي تأكيد جديد.';});
