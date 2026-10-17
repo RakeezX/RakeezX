@@ -47,7 +47,8 @@ if(process.env.N36_BROWSER_PROOF==='1')test('final synthetic MV3/application pro
  const e=JSON.parse(await fs.readFile('tests/n36-partial-class-import-no-total-cap-browser.json','utf8'));
  const m=JSON.parse(await fs.readFile(assets+'rakeez-teacher-import-helper-0.5.5.manifest.json','utf8'));
  assert.equal(e.status,'PASS');assert.equal(e.archiveSha256,m.archive.sha256);
- assert.equal(e.runId,'f6a46781-46ef-419d-ba71-457ab0ba7c2f');
+ assert.equal(e.runId,'042984ce-de8d-4b52-b5bc-05259a349279');
+ assert.equal(e.resolution?.status,'PASS');assert.ok(e.preservedFailures.some(f=>f.stage==='single1251'));
  for(const name of ['full50','full299','full300','full301','full303','full350','full1000','full1251','single350','single1251','nonterminal','missingLast','missingMiddle','duplicate','invalid','hidden','unsafe','missingReport','schoolChanged','roleChanged','originChanged','sessionChanged','owner','lease','expiry','retry','lostReceipt','sourceClosed'])assert.ok(e.scenarios.some(s=>s.scenario===name),name);
  for(const [file,sha] of Object.entries(e.sourceHashes))assert.equal(m.files.find(f=>f.file===file)?.sha256,sha,file);
  for(const [file,sha] of Object.entries(e.appHashes))assert.equal(hash(await fs.readFile(file)),sha,file);

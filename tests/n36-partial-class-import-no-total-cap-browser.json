@@ -1,5 +1,5 @@
 {
-  "runId": "f6a46781-46ef-419d-ba71-457ab0ba7c2f",
+  "runId": "042984ce-de8d-4b52-b5bc-05259a349279",
   "baseline": false,
   "checks": [],
   "externalRequests": [],
@@ -140,39 +140,11 @@
       "blocked": true
     },
     {
-      "scenario": "owner",
-      "transferred": 0,
-      "added": 0,
-      "batches": 0,
-      "stoppedByGuard": true
-    },
-    {
-      "scenario": "lease",
-      "transferred": 0,
-      "added": 0,
-      "batches": 0,
-      "stoppedByGuard": true
-    },
-    {
       "scenario": "expiry",
       "transferred": 0,
       "added": 0,
       "batches": 0,
       "stoppedByGuard": true
-    },
-    {
-      "scenario": "retry",
-      "transferred": 350,
-      "added": 350,
-      "batches": 3,
-      "stoppedByGuard": false
-    },
-    {
-      "scenario": "lostReceipt",
-      "transferred": 350,
-      "added": 350,
-      "batches": 3,
-      "stoppedByGuard": false
     },
     {
       "scenario": "sourceClosed",
@@ -200,6 +172,62 @@
       "transferred": 300,
       "added": 300,
       "batches": 2,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single998",
+      "transferred": 998,
+      "added": 998,
+      "batches": 4,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single999",
+      "transferred": 999,
+      "added": 999,
+      "batches": 4,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "owner",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "lease",
+      "transferred": 0,
+      "added": 0,
+      "batches": 0,
+      "stoppedByGuard": true
+    },
+    {
+      "scenario": "retry",
+      "transferred": 350,
+      "added": 350,
+      "batches": 3,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "lostReceipt",
+      "transferred": 350,
+      "added": 350,
+      "batches": 3,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single1251",
+      "transferred": 1251,
+      "added": 1251,
+      "batches": 5,
+      "stoppedByGuard": false
+    },
+    {
+      "scenario": "single1000",
+      "transferred": 1000,
+      "added": 1000,
+      "batches": 4,
       "stoppedByGuard": false
     }
   ],
@@ -229,14 +257,27 @@
     }
   ],
   "appHashes": {
-    "src/views/teacher-setup-import.js": "0d704859d1b2495b208010b6856ad65159b927a3ef2bb5a17ab61c8d94c41956",
+    "src/views/teacher-setup-import.js": "81a75b5d1f06bb597c3b34fffb3818387aeaec3749b66910c445cf9eb5a2398e",
     "src/views/class-import-center.js": "b0a3b692b848e4fd49c571812d7fbbc44b10963cc738342fedd3d3eaef4760a7",
     "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
-    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348"
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "src/store.js": "0d9aca940b3de48c4934e99403bc67fad449ab4f35f3142abddd4fc5cd7749e5"
+  },
+  "reusedEvidence": {
+    "runId": "042984ce-de8d-4b52-b5bc-05259a349279",
+    "candidateSha": null,
+    "appHashes": {
+      "src/views/teacher-setup-import.js": "81a75b5d1f06bb597c3b34fffb3818387aeaec3749b66910c445cf9eb5a2398e",
+      "src/views/class-import-center.js": "b0a3b692b848e4fd49c571812d7fbbc44b10963cc738342fedd3d3eaef4760a7",
+      "src/lib/n36-extension-handoff.js": "00c7271dfc9d623fd34d4dd030e9d3eecdefc215b4bca6600849cf5154dd5c5b",
+      "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+      "src/store.js": "081ca8e6b032a7b762c7f93f950a8084ff864d54c6bed00e69327ac7b76965de"
+    },
+    "reason": "Identical extension bytes; existing row/owner/preview handlers retained. New store overflow and owner/lease/retry entry tests run below."
   },
   "archiveSha256": "70d909637801502e01c61439ddec3b0ea6b33ab42912c89b397c38fadf3cd396",
-  "stage": "full300",
-  "sourceGets": 22,
+  "stage": "single1000",
+  "sourceGets": 7,
   "sourceEntry": {
     "actionMarkers": 3,
     "iframeCount": 0,
@@ -258,17 +299,26 @@
     "schoolOptions": 0
   },
   "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "overflowSafety": {
+    "manual": {
+      "ok": false,
+      "reason": "range"
+    },
+    "renumber": false,
+    "transfer": null,
+    "unchanged": true
+  },
+  "addOwnerGuard": {
+    "denied": true,
+    "unchanged": true
+  },
   "requiredScenarios": [
-    "full50",
-    "full299",
-    "full300",
     "full301",
     "full303",
     "full350",
     "full1000",
     "full1251",
     "single350",
-    "single1251",
     "nonterminal",
     "missingLast",
     "missingMiddle",
@@ -281,15 +331,27 @@
     "roleChanged",
     "originChanged",
     "sessionChanged",
+    "expiry",
+    "sourceClosed",
+    "full50",
+    "full299",
+    "full300",
+    "single998",
+    "single999",
+    "single1000",
     "owner",
     "lease",
-    "expiry",
     "retry",
     "lostReceipt",
-    "sourceClosed"
+    "single1251"
   ],
-  "coverageComplete": false,
-  "status": "FAIL",
+  "coverageComplete": true,
+  "resolution": {
+    "historicalFailure": "single1251",
+    "status": "PASS",
+    "correction": "D-123 nullable overflow membership; numbering/RPC guards preserved"
+  },
+  "status": "PASS",
   "release": "RELEASED browser",
   "cleanup": "Owned disposable Chrome/profile and server closed; browser lease released"
 }

@@ -119,9 +119,10 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
     try { store.assertClassOperationsAccess(reviewed.teachingId); after = store.reviewNamesImport(reviewed.teachingId, { rows: reviewed.rows, nameColumn: 0 }); }
     catch { close(); return; }
     const remaining = after.entries.filter(e => e.status === 'new').length;
+    const unnumbered = store.sectionRoster(store.getTeaching(reviewed.teachingId).sectionId).filter(row => row.rollNo == null).length;
     receipt = failed
       ? `لم تكتمل العملية أو تعذّر التحقق من نتيجتها. جديدة في المعاينة: ${reviewed.counts.new} · موجودة الآن: ${after.counts.existing} · جديدة لم تظهر كمحفوظة: ${remaining}. افتح الكشوف وأعد المراجعة؛ لا تكرر التأكيد مباشرةً.`
-      : `حُفظ محليًا: ${saved.added} اسم جديد · موجودة سابقًا: ${reviewed.counts.existing} · جديدة لم تظهر كمحفوظة: ${remaining}. قد تبقى طلبات مزامنة؛ هذا ليس إثبات حفظ على الخادم.`;
+      : `حُفظ محليًا: ${saved.added} اسم جديد · موجودة سابقًا: ${reviewed.counts.existing} · جديدة لم تظهر كمحفوظة: ${remaining}. قد تبقى طلبات مزامنة؛ هذا ليس إثبات حفظ على الخادم. انتسابات بلا رقم كشف محفوظ في الفصل: ${unnumbered}. ترتيب العرض مستقل عن رقم الكشف المحفوظ.`;
     // A failed/uncertain transaction never advances an extension batch, even if readback sees rows.
     const total=reviewed.entries.length;
     const outcome={status:failed||remaining?'unknown':reviewed.counts.new?'saved':'existing',added:failed?0:saved.added,existing:reviewed.counts.existing,remaining,total};
@@ -160,7 +161,7 @@ export function openTeacherSetupImport({ isContextCurrent = () => false, initial
       </fieldset>
       ${targets.length ? html`<section class="n36-names" aria-label="إضافة الأسماء">
         <h3>إضافة الأسماء لفصل واحد</h3>
-        <p>الأسماء فقط بتأكيدك؛ بقية الفئات للقراءة. لا توجد مزامنة تلقائية مع مدرستي أو نور.</p>
+        <p>الأسماء فقط بتأكيدك؛ بقية الفئات للقراءة. بعد 999 رقم كشف محفوظ تبقى الأسماء الإضافية منتسبة للفصل بلا رقم محفوظ؛ لا تُرفض العضوية بسبب الترقيم. لا توجد مزامنة تلقائية مع مدرستي أو نور.</p>
         <label class="field"><span class="field__label">الفصل والمادة المستهدفان</span><select class="select" data-names-target ${writing || receipt ? 'disabled' : ''}><option value="">اختر التدريس صراحةً</option>${options(targets, namesTarget)}</select></label>
         <button class="btn btn--quiet" type="button" data-names-review ${!namesTarget || writing || receipt ? 'disabled' : ''}>معاينة إضافة الأسماء</button>
         ${namesReview ? html`<div data-names-preview role="status"><p>جديدة: ${namesReview.counts.new} · موجودة: ${namesReview.counts.existing} · غير صالحة: ${namesReview.counts.invalid} · ملتبسة: ${namesReview.counts.ambiguous}</p><ul>${namesReview.entries.slice(0, 12).map(e => html`<li>${e.name} — ${{new:'جديد',existing:'موجود؛ لن يُدمج أو يُضاف',invalid:'غير صالح',ambiguous:'ملتبس'}[e.status]}</li>`)}</ul>${namesReview.entries.length > 12 ? html`<p>تُعرض أول 12 من ${namesReview.entries.length} اسمًا.</p>` : ''}
