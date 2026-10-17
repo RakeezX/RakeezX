@@ -178,7 +178,7 @@ export function verifyPristinePendingSupersession(task, replacement, update, act
   return true;
 }
 
-export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile, expectedSourceSha256) {
+export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile, expectedSourceSha256, followupSources = []) {
   const previous = catalogTasks.filter(t => t.id === update.card.id);
   if (previous.length === 1) {
     insist(previous[0].activationId === update.card.activationId && previous[0].productId === update.card.productId && previous[0].scopeKey === update.card.scopeKey, 'Catalog source identity changed');
@@ -186,7 +186,18 @@ export function catalogSourceBinding(catalogTasks, task, update, sourceCardFile,
   }
   insist(previous.length === 0, 'Catalog source identity changed');
   const sourceName = path.win32.basename(sourceCardFile ?? '');
-  insist(task?.approvedNote?.source === sourceName && task.approvedNote.sha256 === expectedSourceSha256, 'Approved-note source identity changed');
+  insist(task?.approvedNote?.source === sourceName && SHA256.test(task.approvedNote.sha256 ?? ''), 'Approved-note source identity changed');
+  if (task.approvedNote.sha256 !== expectedSourceSha256) {
+    // A previous OWNED reviewed maintenance committed a new source hash after
+    // the initial approved-note admission. Bind only the latest exact chain.
+    const history = followupSources.filter(x => Array.isArray(x.updatedTaskIds) && x.updatedTaskIds.includes(task.id));
+    const latest = history.at(-1), wanted = '\\' + win(sourceCardFile).replaceAll('/', '\\');
+    insist(latest && latest.sourceSha256 === expectedSourceSha256 && GIT_SHA.test(latest.commit ?? '')
+      && win(latest.sourceFile ?? '').replaceAll('/', '\\').endsWith(wanted)
+      && task.recoveryHistory?.some(event => event.kind === 'reviewed-material-maintenance'
+        && event.commit === latest.commit && event.sessionId === task.sessionId),
+      'Approved-note source is not the latest reviewed owned maintenance chain');
+  }
   return { kind: 'approved-note', index: -1, baseline: task, approvedNoteSha256: task.approvedNote.sha256 };
 }
 
@@ -342,7 +353,7 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
     for (const update of payload.cardUpdates) {
       const state = exactInactive(update); queueBefore.set(update.card.id, state);
       const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
-      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, sourceSpec.expectedCanonicalSha256);
+      const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, sourceSpec.expectedCanonicalSha256, catalog.followupSources ?? []);
       sourceBindings.set(update.card.id, binding);
       insist((binding.baseline.requiredChecks ?? []).every(check => update.card.requiredChecks.includes(check)), 'This helper cannot remove required checks');
     }
