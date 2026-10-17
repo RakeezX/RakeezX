@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [],
+      "id": "continuous-n44-native-postgres-qualification-20261017",
+      "productId": "N44",
+      "priority": -359,
+      "scopeKey": "n44-local-native-postgres-durable-constraints-qualification",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "objective": "PO17October2026 14:46 asks independentusefulworkers oncurrentOPENtickets. N44in-appaccepted+serverdraftsourceprepared16tests alreadyDONE; don'treplaythememoryfakeandcallnewprogress. ActualremainingSQLruntime/RLS/concurrency wasNOT_RUN becauseDockerdaemonunavailable. Materialnewfact: EXISTINGnativePostgreSQL17.6 binariesalreadyonuserPC under C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin; pg_ctl.exe --versionactuallyverified17.6, initdb.exe/postgres.exeexists. ReusableexistingNodepgclientlibrary C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/client/node_modules/pg/package.json exists. psql.exeisNOTatnativebin, don'trepeatexecutableguess; usereadonlyexistingNodepgdriveroractualclientpathonlyifpresent. No infrastructureinstall/Dockerstart/download/npmplan. Concreteadvance: EXECUTEtheinactiveN44schema-proposal.sql andcriticaldurabletransaction/privilegecases in a NEWOWNEDDISPOSABLELOCALclusterwithfabricatedidentities, fixactualdraftdefects andpublishsourcequalificationevidence. IndependentN36extension/N88files MUSTremainuntouched.\n\nReadcurrentN44row/draftREADME, drafts/n44-push/schema-proposal.sql, registration/delivery/shared andtests/fixtures/n44-server-preactivation/fakes.mjs. Prior16fakechecks remainusefulevidence butnotSQLproof. ConsultSupabaseskill/currentchangeloghttps://supabase.com/changelog.md plusprimaryRLS/grants/Postgres17docs BEFOREspecificschema decisions; parentreadskills. Webreaderchangelogcontent-typeerrorisnotsecurityrefusal; ordinarypublicHTTPSfetchmayreadsameindex withnotrustedenvheaders. Neverread.env/.mcp/projectconfig/authkeys/liveDBorSupabase endpoints. ThiscardNOhostedSQL/migration/Auth/RLS/Edge/provider/realSend/device permissions orserviceactivation. Sourceunder drafts OUTSIDEautodeploy and UNIMPORTED. N64actualtoolsecurityrefusalsremainbinding; don'ttouchN64/retryitsoperation.\n\nLOCALCLUSTER: readonlyreuseknownbinaries, createuniqueNEWdatadir underOWNtaskworktree artifacts/n44-native-pg-<run>/data, initdbONLYthisnewemptydir, chooseunusedloopbackport viaownedbinding, configure127.0.0.1/listenonlystatement/locktimeout andsmallmemory/loglimits. ConnectONLYto exactcluster thisinvocationinitializedafterPID/birth/datadirownershipproof; no defaultPGenv/localhost5432/oldN77cluster/data dirs/Windowsservice, neverreuse/probeexistingDB. Neverstart/stop/readanotherdatadir. All usersUUID/datafabricated, evenauth.users/auth.uid helper/anon/authenticatedrolefixtures explicitlylocalstubnotrealGoTrue/Authcertification. TestserverscanuseephemeralLOCALcredentialsifneeded don'tcommit/logactualcredentials, noenvironmentsecretread. In finally closeclients/pool, pg_ctl -D exactowneddir boundednormalshutdown, verifyownPID/portabsent; removeonlyunchangedownedtemporarytestdirifappropriateorleavecleancheckpointnotliveprocess. Nounboundedwait, unknownprocesskill, ACL/service/Dockerchange orportfallback toexistingDB. If actualstartupfails, stopaftermaterialdiagnosiswithoutloop; truthfulblocker notfakePASS.\n\nCriticalqualification usingREALqueriesandatleast2INDEPENDENTconnections:\n1) ApplyactualdraftwithsyntheticminimalprerequisiteAuthschema/roles, inspectactualconstraints/indexes/RLSflags/grants/triggerfunctions. StatementrollbackonDDLfail documented; fixdraftonlygenuinedefect. No migrationfilenameinvented/auto-deploypath.\n2) Realtransaction duplicateactivecontext andglobalendpointclaim concurrency/acrossowners, uniqueconstraints; rollbacks releaseonlyownedclaims andoriginalregistration; simultaneousreservationssameowner/workspace/device/event yieldONCE withlocks+PK, no crossownerauthority. Demonstrateactualrowlockblocking/serializationbounded ratherthanPromisequeuefake. If SQLrepositoryhelperneeded implementSMALLinactiveownedadapterunder drafts with actualatomicportorboundedtestadapter usingexplicitSQL; don't inventa fullpushservice. Documentwhichportassumptionsstillnotimplemented. No network sender needed: countlocalrecordedfakecallbacks onlyafterDBcommitted reservation, no externalendpoint.\n3) Immutableoriginalexpiry/action/registrationbinding, attempts0..3/validstateflow, invalidtransition/terminalmutationrejected; revoked/deadsecretcolumns null, originalregistrationrevocation andtombstone replay unaffected; crash/uncertainreconciliationmustnotrestartalreadysent sideeffect. Testrealtriggerbodies notmerelystringregex.\n4) anon/authenticated PUBLIC cannotuseprivateschema/tables/functions evenwithowner-lookingclaims; test actual42501/grantsfail AND separately exercise ownerpolicyrowisolationunderexplicitTEMPORARYTESTONLYleastprivilegerole/grants asneeded so grant-denialnotmisrepresented asRLSproof. Positiveowner vsforeignownerSELECT/INSERT/UPDATE WITHCHECK reassign/DELETEtested asnon-owner/non-BYPASSRLS, tableowner/superuserneverproof. Auth.uid fixture useslocalset_config forfabricatedidentityONLY; doNOTclaimuntrustedclientcanassertthatinhostedAuth. NoPUBLICexecute/unnecessarySECURITYDEFINER/views/grantssafety. Alltemporarytestgrants infixturetransactionrolledback, NEVERaddedtodraftforconvenience. SQLRLSlocalproofnotGoTrue/PostgREST/hostedgrantscertification.\n5) Boundedbudgets/upsert underconcurrency andownerclockmonotonicrowlock; indexesalignedactualpredicates; no benchmarkingframework/largefuzzsuite. Showafterrestartownedcluster optionalcriticaldurableidempotencypersists ifeasy, withoutnewrealSend. No acceptedUI/browser/OS/devicechecks repeated.\n\nDraftchangesonlywhereactualSQLfindsconcretedefect; retainprotect/privateendpointnotplaintext, no realPush endpoint/key/sender/VAPIDcreation/unrelatednotifyworker/admin. Testsusefabricated HMAC/sealedvaluesno actualservices. Ifappadapterisstillabsent, clearlyretainremaininggate; SQLqualification doesn'tmakePushenabledorwholeN44complete. NOT_RUNhosted/currentcanonicalAuthadapter/realTLS/network/device/offlineapp allremain.\nOnefocused evidence docs/automation-evidence/20261017/N44_NATIVE_POSTGRES_QUALIFICATION.md actualPGversion/ownedclusterproof/sourceSHA/queriedassertions/concurrentconnectionresults/startstopandnegativeSQLstates. ReadmeupdatesSQLNOT_RUNhistorical -> LOCALSQLtestactualresults ONLY, don'toverwriteoldhistoricalevidence asifpreviouslyran. Reuseunchanged16mocktests byexacthashunlesscodechanged. Returnmatchingtask/run/base/candidate/checks, exactremainingcapabilities. OriginalsolepublisherSOURCE-ONLYinactivepackageevidence viaexistingverifiedSourceOnlyPublicationgate: preparationAuthority.publication=true, publicationScope containsinert/inactive, releaseAuthority containsliteral source-only, verificationPathsupdatedREADME/doc exactservedbindings. Never wireintoapp/SW/service oraddservedProductassetjusttocheatgate.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-native-postgres-qualification*.mjs",
+        "tests/n44-native-postgres-qualification*.json",
+        "tests/fixtures/n44-native-postgres-qualification/**",
+        "docs/automation-evidence/20261017/N44_NATIVE_POSTGRES_QUALIFICATION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/README.md",
+        "docs/automation-evidence/20261017/N44_NATIVE_POSTGRES_QUALIFICATION.md"
+      ],
+      "requiredChecks": [
+        "n44_real_owned_pg_schema_constraints_triggers_and_cleanup",
+        "n44_two_connection_atomic_uniqueness_idempotency_clock_budget_and_rollback",
+        "n44_actual_no_public_grants_and_nonbypass_owner_rls_isolation",
+        "n44_inactive_source_only_proof_honest_hosted_limits_and_evidence_reuse"
+      ],
+      "acceptance": [
+        "ExistingdraftgenuinelyexecutesonnewdisposableownedPG17cluster; realconstraints/transactions/policies assertions actualresults.",
+        "No genericmemoryfake asdurabilityproof; no local/hostedexistingDB/config/secrets orrealSend touched; ownclusterstoppedverified.",
+        "Usefulsource-onlycandidate/readme/evidence distinguisheslocalSQLqualification fromstillINACTIVEPush/hostedNOT_RUN."
+      ],
+      "preparationAuthority": {
+        "kind": "PO1446-independent-open-N44-real-local-synthetic-sql-qualification",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert draft server SQL qualification source tests evidence only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "livePushActivation": false,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "PO14:46explicitlyasksindependentworkersoncurrentOPENtickets, existingN44preparationauthoritypermitsavailableowneddisposablelocalPostgres syntheticchecks. Thisis source-only publication of inert/inactive drafts/tests/evidence throughsolepublisher, NOT hostedSQL/Auth/RLS/service/provider/VAPID/admin/send or app/SW activation. No newpaidservice/installation/secrets.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "9fe377dc3966d5c56c3df7a831e9132f9aae455f",
+        "priorReceiptSha256": "6a45a879178b78e22d4d8f49b14a566d6b7161d83502c5e36d8611f1620ab44f",
+        "reviewedFixtureSha256": "725ac135f00a63e6cae6c1c8b2ab8701d7596999c585a59e82c5d8b61cd68abe",
+        "reason": "The canonical source-only verifier proves exact provider, immutable and Production bindings. Required PostgreSQL checks passed; two explicitly optional or hosted activation checks remain honestly NOT_RUN and cannot invalidate the authorized inert source publication."
+      }
+    }
+  ]
+}
