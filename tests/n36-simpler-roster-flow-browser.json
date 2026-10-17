@@ -1,0 +1,149 @@
+{
+  "taskId": "continuous-n36-simpler-reviewed-roster-flow-0510-20261017",
+  "runId": "e1a6a4b5-41dd-4733-9627-1c8fe012cd34",
+  "baseSha": "91b4adc8736f79c663512a2829eb3b57ec54998f",
+  "checks": [
+    {
+      "name": "actual-complete-320-390-1280",
+      "status": "PASS",
+      "evidence": {
+        "singleExplicitAction": true,
+        "sortedClasses": true,
+        "onlySelectedNames": true,
+        "partialAcknowledgement": false
+      }
+    },
+    {
+      "name": "actual-unknown-320-390-1280",
+      "status": "PASS",
+      "evidence": {
+        "singleExplicitAction": true,
+        "sortedClasses": true,
+        "onlySelectedNames": true,
+        "partialAcknowledgement": true
+      }
+    },
+    {
+      "name": "actual-partial-320-390-1280",
+      "status": "PASS",
+      "evidence": {
+        "singleExplicitAction": true,
+        "sortedClasses": true,
+        "onlySelectedNames": true,
+        "partialAcknowledgement": true
+      }
+    },
+    {
+      "name": "cancel-erases-preview",
+      "status": "PASS",
+      "evidence": "No names, source authorization or enabled send after invalidation"
+    },
+    {
+      "name": "expiry-erases-preview",
+      "status": "PASS",
+      "evidence": "No names, source authorization or enabled send after invalidation"
+    },
+    {
+      "name": "context-erases-preview",
+      "status": "PASS",
+      "evidence": "No names, source authorization or enabled send after invalidation"
+    },
+    {
+      "name": "class-change-during-preflight-rejected",
+      "status": "PASS",
+      "evidence": "No send for the previous or replacement class; explicit new review action required"
+    },
+    {
+      "name": "failed-transport-disabled",
+      "status": "PASS",
+      "evidence": "Failure does not claim saving, advance cursor or enable send"
+    },
+    {
+      "name": "receipt-only-advancement",
+      "status": "PASS",
+      "evidence": "Pending keeps exact batch; saved/existing receipt advances only that class"
+    },
+    {
+      "name": "send-cancel-late-reply-ignored",
+      "status": "PASS",
+      "evidence": "Only consented names sent before invalidation; late reply does not restore names, status, selector or send"
+    },
+    {
+      "name": "send-expiry-late-reply-ignored",
+      "status": "PASS",
+      "evidence": "Only consented names sent before invalidation; late reply does not restore names, status, selector or send"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    {
+      "scenario": "complete",
+      "width": 320,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\complete-320.png",
+      "sha256": "3f9a99c88ff848697da8b286dbcbedc2e6ade1e76ad074a20874deb871b9ec5f"
+    },
+    {
+      "scenario": "complete",
+      "width": 390,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\complete-390.png",
+      "sha256": "6cbc72f26ebf02ac29e77f3d1f39e27a0f13c51635d4c2fb9d088322b9c2f760"
+    },
+    {
+      "scenario": "complete",
+      "width": 1280,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\complete-1280.png",
+      "sha256": "2703514088ac5e3a11b1d6f4d87432f09cc8ef7ca4b19a995572f012058144a4"
+    },
+    {
+      "scenario": "unknown",
+      "width": 320,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\unknown-320.png",
+      "sha256": "6c2e7c60dd67723d6c8c5b74b570947bcf2f7394ab6b47115b93de1d51acd70d"
+    },
+    {
+      "scenario": "unknown",
+      "width": 390,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\unknown-390.png",
+      "sha256": "8a31235f629b65ba88c8ffebc4b8a4ed05f0cf9d458c09378a31a981405a43a4"
+    },
+    {
+      "scenario": "unknown",
+      "width": 1280,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\unknown-1280.png",
+      "sha256": "4ea532711e9bfce41635a0d9e48ddf1fae39df8981d5b0c015bfd6ede0f00380"
+    },
+    {
+      "scenario": "partial",
+      "width": 320,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\partial-320.png",
+      "sha256": "3652bf8de1335a1382a2f89d62edddede2e9e5a4cb925344cd3a3b71ac71c332"
+    },
+    {
+      "scenario": "partial",
+      "width": 390,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\partial-390.png",
+      "sha256": "fa5015d631172889745ef1e300d3263838ff86a08624ba7484f9bed8ec4c50b5"
+    },
+    {
+      "scenario": "partial",
+      "width": 1280,
+      "path": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-simpler-reviewed-roster-flow-0510-20261017\\test-results\\n36-simpler-roster-flow\\partial-1280.png",
+      "sha256": "3d7f4baf783b67fbe7f9ef7c2fb5096d8f58c54930c275bf0ad4e9f87b674c9c"
+    }
+  ],
+  "preservedFailures": [
+    {
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'جُمعت 203 أسماء / 10 فصول'\n- 'جُمعت 303 أسماء / 10 فصول'\n         ^\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-simpler-reviewed-roster-flow-0510-20261017/tests/n36-simpler-roster-flow-browser.mjs:49:12\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-simpler-reviewed-roster-flow-0510-20261017/tests/n36-simpler-roster-flow-browser.mjs:22:2",
+      "correction": "Synthetic fixture name suffix used sequential Unicode points including Arabic marks; replaced with explicit Arabic letter alphabet. Production validation unchanged."
+    }
+  ],
+  "status": "PASS",
+  "cleanup": "Owned loopback server closed; canonical isolated helper closed disposable contexts and its browser in finally; no shared live-browser phase used",
+  "sourceHashes": {
+    "popup.html": "8adf50c4cfa55d0b66b460fd100d924e5bfd7ff14dc6f001551564427f8770af",
+    "popup.css": "5daa9c988e5f73515863147ce09eb8f9d3ffa72784db1834b30b6aa1a67775be",
+    "categories-popup.js": "03907b52a34d015fff2891c95d4c3b91f599fc21407b000e675834ce801489d4",
+    "run-controller.js": "ac5935ea7156eb36aba0355a2095ee2676c44bcf41c2a3aaec6c83bd99633280",
+    "source-roster.js": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067"
+  }
+}

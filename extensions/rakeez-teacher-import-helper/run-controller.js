@@ -28,7 +28,7 @@ function routeError(e,stage,kind,path){if(!e.diagnostic&&['UNSAFE_ROUTE','UNSAFE
 channel.addEventListener('message',({data})=>{const active=job??review;if(data?.type==='probe'&&active?.tabId===data.tabId)channel.postMessage({type:'busy',token:data.token});});
 function announce(text){$('run-status').textContent=text;}
 function armReview(){
- const tick=()=>{$('review-remaining').textContent=review?`الوقت المتبقي للمعاينة: ${Math.max(0,Math.ceil((review.expires-Date.now())/1000))} ثانية (5 دقائق؛ النقل له مهلة مستقلة مدتها دقيقتان).`:'';};
+ const tick=()=>{$('review-remaining').textContent=review?`المعاينة: ${Math.max(0,Math.ceil((review.expires-Date.now())/1000))} ثانية متبقية من 5 دقائق.`:'';};
  tick();reviewClock=setInterval(tick,1000);reviewTimer=setTimeout(()=>stop('REVIEW_EXPIRED'),Math.max(0,review.expires-Date.now()));
 }
 function clearPreview(continuing=false){clearInterval(reviewClock);$('review-remaining').textContent='';window.dispatchEvent(new CustomEvent('n36:clear',{detail:{continuing}}));review=null;clearTimeout(reviewTimer);$('direct-handoff').hidden=true;$('collection-continue').hidden=true;}
@@ -37,7 +37,8 @@ function stop(code='CANCELLED',diagnostic=null,context=null){
  cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
- announce(diagnostic?.stage==='link-discovery'&&code==='READ_LINKS_UNAVAILABLE'?`عُرفت معالم صفحة المعلم، لكن لم توجد روابط قراءة مسموحة (${code}). مُسحت المعاينة؛ انسخ التشخيص المحدود لاكتشاف الروابط، وليس طلب اختيار دور جديد.`:diagnostic?`توقف ${stageLabel(diagnostic.stage)} (${code}). لم تُجمع ${kindLabel(diagnostic.category)} ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد ${diagnostic.structure?'بنية الدور الظاهرة دون أسماء أو روابط':'المسار المطلوب'}؛ تكرار المحاولة نفسها لن يغيّر الرفض.`:context?`توقف ${stageLabel(context.stage)} (${code}). لم تُجمع ${kindLabel(context.kind)} ومُسحت المعاينة؛ لا نجاح لهذه الفئة.`:`توقف التشغيل (${code}). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.`);
+ showDiagnostic(diagnostic??{stage:context?.stage??'run',reason:code,category:context?.kind??'students'});
+ announce(code==='CANCELLED'?'أُلغيت المعاينة ومُسحت الأسماء.':code==='SOURCE_CHANGED'||/CONTEXT|ORIGIN|LOGIN|CLOSED/.test(code)?'تغيّرت صفحة المصدر؛ مُسحت المعاينة. ابدأ مجددًا من الصفحة المصرّح بها.':'تعذّرت القراءة؛ مُسحت المعاينة. التفاصيل في التشخيص الاختياري.');
 }
 // AI: cancel only this run's source-context requests; never navigate to recover a fetch.
 function cancelReports(active){
@@ -257,11 +258,11 @@ async function finishCollection(ticket){
  clearTimeout(active.expiryTimer);
  const warnings=[...new Set(active.warnings.filter(w=>w.category==='students'&&!(w.optional&&complete)).map(w=>w.code))];
  showDiagnostic({run:{...coverage,staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
- $('run-counts').textContent=`جُمعت ${active.sourceRows.length} أسماء صالحة؛ رُصد ${active.studentRowsSeen} صفًا؛ استُبعد ${active.excluded}. قُرئت ${coverage.processedReportPages} صفحات كشف. لا حفظ تلقائي.`;
- $('run-missing').textContent='';$('run-skipped').textContent=warnings.length?'أسباب نقص التغطية أو الاستبعاد: '+warnings.join('، '):'';
+ $('run-counts').textContent='';
+ $('run-missing').textContent='';$('run-skipped').textContent=warnings.length||active.excluded?`تعذّر جمع بعض الصفوف أو الصفحات؛ استُبعد ${active.excluded} صفًا. التفاصيل في التشخيص الاختياري.`:'';
  cancelReports(active);job=null;
  window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,...coverage,excluded:active.excluded,hasNext:false}}));
- announce('انتهت قراءة الصفحات المتاحة. اختر فصلًا وراجع الدفعة ثم أكّد داخل ركيز.');armReview();
+ announce('انتهت قراءة الصفحات المتاحة. اختر الفصل أدناه.');armReview();
 }
 async function noorRead(tabId) {
  const tab=await chrome.tabs.get(tabId),u=new URL(tab.url??'');
@@ -310,7 +311,7 @@ if(runToken){
    channel.onmessage=({data})=>{if(data?.token===token&&data.type==='ready'){channel.postMessage({type:'launch',token,tabId:sourceTabId,mode,classroom,role});}if(data?.token===token&&data.type==='launched')resolveReady();};
    const runner=await chrome.tabs.create({url:chrome.runtime.getURL('popup.html')+'?run='+token,active:false});
    try{await readyPromise;await chrome.tabs.update(runner.id,{active:true});}finally{clearTimeout(timer);channel.onmessage=null;}
-  }catch(e){announce(`تعذّر البدء (${/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE'}). لا بيانات مقروءة. افتح زر الإضافة من تبويب البداية المصرّح.`);}
+  }catch(e){showDiagnostic({stage:'start',reason:/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',category:'students'});announce('تعذّر البدء؛ افتح الإضافة من صفحة المصدر المصرّح بها. التفاصيل في التشخيص الاختياري.');}
   finally{$('one-start').disabled=false;}
  };
  $('one-start').addEventListener('click',()=>launch());

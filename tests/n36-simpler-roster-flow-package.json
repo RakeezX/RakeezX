@@ -1,0 +1,158 @@
+{
+  "taskId": "continuous-n36-simpler-reviewed-roster-flow-0510-20261017",
+  "runId": "e1a6a4b5-41dd-4733-9627-1c8fe012cd34",
+  "baseSha": "91b4adc8736f79c663512a2829eb3b57ec54998f",
+  "status": "PASS",
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.10.zip",
+    "sha256": "fbc596a2250a9cc5cabc178ec429d9c86bf2f824c31c3438f76075987bca6b76",
+    "bytes": 101152
+  },
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "912ba3ca80369eb62ce73ce1eae2ff84d56a48c4c6591be5554ba8f41f0d8761",
+      "bytes": 58052
+    },
+    {
+      "file": "categories-popup.js",
+      "sha256": "03907b52a34d015fff2891c95d4c3b91f599fc21407b000e675834ce801489d4",
+      "bytes": 22692
+    },
+    {
+      "file": "categories.js",
+      "sha256": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+      "bytes": 5820
+    },
+    {
+      "file": "class-order.js",
+      "sha256": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+      "bytes": 2269
+    },
+    {
+      "file": "core.js",
+      "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+      "bytes": 2178
+    },
+    {
+      "file": "handoff-protocol.js",
+      "sha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+      "bytes": 2425
+    },
+    {
+      "file": "handoff-worker.js",
+      "sha256": "06433a19acb59a5890bd50ddd6e8dbf359684e7bc250b91a8a9610647fcc73fb",
+      "bytes": 6325
+    },
+    {
+      "file": "lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "bytes": 1806
+    },
+    {
+      "file": "lib/rakeez-datetime.css",
+      "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+      "bytes": 3070
+    },
+    {
+      "file": "lib/rakeez-datetime.js",
+      "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+      "bytes": 7085
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "41a5b020c6453ba42baf7605e12afe39b72c32de5b866c58216c04ec716a565b",
+      "bytes": 807
+    },
+    {
+      "file": "navigation.js",
+      "sha256": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+      "bytes": 1398
+    },
+    {
+      "file": "popup.css",
+      "sha256": "5daa9c988e5f73515863147ce09eb8f9d3ffa72784db1834b30b6aa1a67775be",
+      "bytes": 3407
+    },
+    {
+      "file": "popup.html",
+      "sha256": "8adf50c4cfa55d0b66b460fd100d924e5bfd7ff14dc6f001551564427f8770af",
+      "bytes": 8299
+    },
+    {
+      "file": "popup.js",
+      "sha256": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+      "bytes": 4468
+    },
+    {
+      "file": "route-diagnostics.js",
+      "sha256": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a",
+      "bytes": 5178
+    },
+    {
+      "file": "run-controller.js",
+      "sha256": "ac5935ea7156eb36aba0355a2095ee2676c44bcf41c2a3aaec6c83bd99633280",
+      "bytes": 36538
+    },
+    {
+      "file": "selection.js",
+      "sha256": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+      "bytes": 31515
+    },
+    {
+      "file": "source-adapter.js",
+      "sha256": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+      "bytes": 25742
+    },
+    {
+      "file": "source-roster.js",
+      "sha256": "2bc76e92e5996ca3ad6579bd064cc33dbd0feca797929bd88fc05e02c998a067",
+      "bytes": 3508
+    },
+    {
+      "file": "vendor/flatpickr/LICENSE.md",
+      "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095",
+      "bytes": 1084
+    },
+    {
+      "file": "vendor/flatpickr/ar.js",
+      "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+      "bytes": 1928
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.css",
+      "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754",
+      "bytes": 16166
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.js",
+      "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+      "bytes": 50679
+    }
+  ],
+  "reusedHashes": {
+    "selection.js": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+    "source-adapter.js": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+    "navigation.js": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+    "class-order.js": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+    "core.js": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+    "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+    "handoff-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "handoff-worker.js": "06433a19acb59a5890bd50ddd6e8dbf359684e7bc250b91a8a9610647fcc73fb",
+    "popup.js": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+    "route-diagnostics.js": "8a37207837252e27d410a11d2d0b867368a2319077d055405a4e2e62da953e9a"
+  },
+  "checks": [
+    "Exact ZIP/source/per-file/size/SHA256 and base binding",
+    "0.5.9 archive and manifest preserved",
+    "Unchanged permissions, parser, class order, protocol, transport worker, receiver and offline shell",
+    "Source coverage algorithm and collection/continuation functions unchanged; 350/1000 and parser evidence reused",
+    "Central application differs only in download version, preserving N107/owner/lease/save logic",
+    "Changed JS syntax and no new persistent storage/network primitives"
+  ],
+  "delivery": {
+    "provider": "NOT_RUN — independent publisher",
+    "production": "NOT_RUN — independent publisher",
+    "stableLocalUpdate": "NOT_RUN — requires publication, then natural scheduled update and disk receipt; no manual updater or Chrome control"
+  }
+}

@@ -42,5 +42,13 @@ summary { cursor: pointer; padding-block: 12px; }
 .run-page #run-counts,.run-page #run-missing {margin-block:.4rem}
 
 .run-page:has(#source-class-review) #one-start-controls > p:first-of-type {display:none}
-.run-page #source-coverage {display:none} /* same partial warning remains above and in explicit consent */
+#source-coverage:empty {display:none}
 #run-diagnostics {margin-block:.5rem}
+
+/* AI: one normal review card and one cancel; optional categories stay collapsed. */
+#source-class-summary {font-size:1.15rem;font-weight:700;margin-top:0}
+#review-remaining {font-size:.85rem;color:var(--text-3)}
+#source-class-names {background:white;border-radius:6px;padding-block:8px}
+html {max-width:100vw}
+
+#run-cancel {background:transparent;color:var(--brand)}
