@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "id": "continuous-n88-complete-runtime-binding-20261018",
+      "productId": "N88",
+      "priority": -500,
+      "scopeKey": "n88-runtime-http-authoritative-binding",
+      "dependsOn": [
+        "continuous-n88-postgres-service-repository-20261017"
+      ],
+      "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N88 actual service+PG repository passed and published71f7230 on17Oct17:43. Current user needs useful real page, not more pilot or SQL proofs. Implement concrete missing runtime HTTP/service assembly and authoritative canonical teacher/student membership/publication binding using CURRENT project server data contracts, with source-only inactive deployment artifact. Read service/PG repository, actual student page/client/teacher-controller, existing sync schema/server APIs before deciding mapping. Keep4randomdigits1000..9999 stable owner/student into second term until rotate/revoke. Implement trusted canonical adapter with exact owner/current-membership/revision/active class/student mapping and minimal published projection from real existing stores; do not invent a new identity from name, route, or client sent owner/class. Runtime teacher verification uses independently verified existing Auth user/current session, never decodedJWT/user_metadata; ingress from trusted socket/adapter only, no arbitrary forwarded headers. Supply actual HTTP adapter with bounded streaming/json/cookie/origin/private no-store/error/deadline handling around createPortalService+PG repository, durable transaction writer integration and fail-closed deployment preflight for missing authoritative sources/keys. No fixture/memory fallback in runtime. Keep4digit code behind existing private entry/context/guess budgets. Test ONE complete actualHTTP-service-adapter synthetic teacher issue/student login/current published view/teacher update/second-term persistence/rotate/revoke journey through real components; fabricate only identity/canonical datasource and network transport, clearly isolate synthetic adapter. Use current trusted lock/revision protocol; noncooperating authoritative writers must be named accurately. Reuse previous SQL/rate/9000/UI proofs, do not rerun them wholesale. Provide ready-to-review deploy config/environment names/private-log handling/exact bounded activation diff; no secrets or config values captured, no hosted apply/Auth/RLS, no real student access or sends. No new app/SW/student production page wiring until service prerequisite proven. If actual canonical store architecture lacks atomic authoritative read/write port, implement concrete adapter against known schema/protocol and explicit readback plan, do not claim guessed staleness solved. End with exact remaining hosted actions and final manual acceptance path. No broad review loop, no new expiring invitation concept.\nMaterial verification contract correction: PM named runtime-http.mjs before implementation; worker delivered actual runtime.mjs + http-adapter.mjs, both allowed and exercised. Correct only served proof paths to actual candidate modules. Existing required checks remain PASS; hosted Auth/service/student activation stays NOT_RUN. Same candidate/session and original publisher, no Product/SQL retest or optional check renamed PASS.",
+      "allowedPaths": [
+        "drafts/n88-student-portal/**",
+        "tests/n88-runtime-binding*.mjs",
+        "tests/n88-runtime-binding*.json",
+        "tests/fixtures/n88-runtime-binding/**",
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/runtime.mjs",
+        "drafts/n88-student-portal/http-adapter.mjs",
+        "docs/automation-evidence/20261018/N88_RUNTIME_BINDING.md"
+      ],
+      "requiredChecks": [
+        "n88_actual_http_service_repository_and_authoritative_mapping_journey",
+        "n88_owner_membership_cookie_ingress_rotation_and_activation_preflight"
+      ],
+      "acceptance": [
+        "Runtime HTTP and canonical mapping ports are concrete executable code tied to actual project schema, with full focused journey.",
+        "Stable4digit/current-student-only/rotate/revoke/owner/privacy remain intact, exact hosted prerequisite artifact supplied, no live readiness invented."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-explicit-finish-N88",
+        "publication": true,
+        "publicationScope": "inert inactive student portal runtime composition and canonical adapter only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "liveStudentAccessActivation": false
+      },
+      "releaseAuthority": "LatestPO18Oct01:04 explicitly asks finishN88; permits reversible runtime binding implementation, own fabricated local journey and originalpublisher source-only inactive release. Hosted schema/Auth/private student access activation and secrets remain separately bounded.",
+      "completionMode": "repair_source_verification_paths",
+      "verificationPathRepair": {
+        "previousResultSha256": "68580c11d22fdc02d6ac664a3d4b2817ea30aa388182662c933948a0ea3e3ace",
+        "previousPathsSha256": "e8778ce1e17fe8e0e123ca0101dbb7e7be69ebbc1d0b780396d2084ff790b1b6",
+        "reviewedFixtureSha256": "2e507e34adec981dcf7bc2d9bb59ad83eecd9a61e98a35def1824068174ea116",
+        "reason": "PM sourcecard guessed a module filename before implementation. The candidate has tested runtime.mjs and http-adapter.mjs in the original allowed scope; correct only verification metadata, preserving checks, source, session, candidate and publisher."
+      }
+    }
+  ]
+}
