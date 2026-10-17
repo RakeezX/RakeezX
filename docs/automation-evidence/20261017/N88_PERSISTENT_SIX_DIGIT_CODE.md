@@ -1,6 +1,8 @@
-# N88 — persistent six-digit student code, inactive functional source pilot
+# N88 — historical persistent-code pilot evidence (superseded)
 
-AI-authored implementation/evidence. Task `continuous-n88-persistent-six-digit-student-code-20261017`, run `fdce40ca-318e-4da2-a925-9a87c6f091b5`.
+**Superseded by PO17October2026 14:06 Saudi:** the current contract is [N88_PERSONAL_FOUR_DIGIT_CODE.md](N88_PERSONAL_FOUR_DIGIT_CODE.md). Use four digits plus a private individual entry link. The teacher-public-link + six-digit behavior, commands, counts, URLs, risk calculations and source hashes below are HISTORICAL evidence of candidate `bdb1e2bf7cfbd6a04f11bda5c9a3154652550358`, not current requirements or current acceptance. Unchanged CSS/repository, publication/print and generation-cleanup evidence may be reused as explained in the current document. No previous private-link or hosted security proof is implied.
+
+AI-authored historical implementation/evidence. Task `continuous-n88-persistent-six-digit-student-code-20261017`, run `fdce40ca-318e-4da2-a925-9a87c6f091b5`.
 Base: `21ee4587c5e69be05720fd4818eb19a8f0e8f57f`. Worktree: `C:\Users\Abody\Projects\RakeezX\.worktrees\continuous-n88-persistent-six-digit-student-code-20261017`.
 The exact candidate is the Git commit containing this document, returned with its full SHA in the worker result. `tests/n88-real-pilot-browser.json` binds the exercised source, CSS, service, fixtures and browser harness by normalized-LF SHA-256. No source publication, push, integration, provider verification, hosted activation, Product closure or real-student readiness is claimed.
 

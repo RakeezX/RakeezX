@@ -17,7 +17,7 @@ export async function startPilotServer() {
         res.writeHead(result.status, { ...result.headers, 'Content-Type': 'application/json' });
         res.end(JSON.stringify(result.body)); return;
       }
-      const route = pathname === '/teacher' || /^\/s\/[A-Za-z0-9_-]{24,64}$/.test(pathname) ? '/tests/fixtures/n88-real-pilot/index.html' : pathname === '/' ? '/index.html' : pathname;
+      const route = pathname === '/teacher' || /^\/s\/[A-Za-z0-9_-]{43}$/.test(pathname) ? '/tests/fixtures/n88-real-pilot/index.html' : pathname === '/' ? '/index.html' : pathname;
       if (!/^\/(src\/|assets\/|drafts\/n88-student-portal\/portal.css$|drafts\/n88-student-portal\/teacher-controller.js$|tests\/fixtures\/n88-real-pilot\/(index.html|entry.js)$|index.html$|build-meta.json$)/.test(route) || route.includes('..')) throw Error('not served');
       const file = resolve(root, '.' + route);
       if (!file.startsWith(root + sep)) throw Error('not served');

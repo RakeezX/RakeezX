@@ -18,12 +18,13 @@ create table n88_private.credentials (
   id uuid primary key, namespace text not null, owner_id uuid not null,
   class_id text not null, student_id text not null, enrollment_id text not null,
   membership_revision bigint not null, version bigint not null check(version >= 1),
-  verifier text not null check(verifier ~ '^[a-f0-9]{64}$'), revoked_at timestamptz,
+  verifier text not null check(verifier ~ '^[a-f0-9]{64}$'),
+  entry_verifier text not null unique check(entry_verifier ~ '^[a-f0-9]{64}$'), revoked_at timestamptz,
   foreign key(namespace,owner_id) references n88_private.contexts(namespace,owner_id),
   foreign key(owner_id,class_id,student_id,enrollment_id)
     references n88_private.memberships(owner_id,class_id,student_id,enrollment_id),
   unique(namespace,verifier), -- tombstones prevent reactivation of old codes
-  unique(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision)
+  unique(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
 );
 create unique index n88_current_credential on n88_private.credentials
   (owner_id,class_id,student_id,enrollment_id) where revoked_at is null;
@@ -31,10 +32,11 @@ create table n88_private.sessions (
   id uuid primary key, credential_id uuid not null, namespace text not null,
   owner_id uuid not null, class_id text not null, student_id text not null,
   enrollment_id text not null, version bigint not null, membership_revision bigint not null,
+  entry_verifier text not null,
   token_hash text not null unique check(token_hash ~ '^[a-f0-9]{64}$'),
   expires_at timestamptz not null, revoked_at timestamptz,
-  foreign key(credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision)
-    references n88_private.credentials(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision)
+  foreign key(credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
+    references n88_private.credentials(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
 ); -- many sessions per credential; NO credential expiry/consumption
 create index n88_session_credential on n88_private.sessions(credential_id);
 create index n88_session_retention on n88_private.sessions(expires_at);
@@ -67,23 +69,32 @@ revoke all on all tables in schema n88_private from public;
 -- 2. Lock a bounded shared budget keyspace in sorted order, BEFORE any context/code
 --    lookup. Atomic all-attempt reservations: source 6/context 30/global 100 per 15m;
 --    failed-attempt counters context 60/global 500 per 24h checked BEFORE lookup.
---    Unknown namespace/code uses identical status/body; failures must COMMIT counters.
+--    Unknown private entry/code uses identical status/body; failures must COMMIT counters.
 --    Never roll counters back just because credentials failed. Max 10000 keys;
 --    expiry cleanup + fail-closed admission; no reset on restart or instance switch.
 -- 3. Lock context -> canonical membership -> credentials -> sessions in consistent
 --    order for issue/rotate/revoke/login/read/publication/lifecycle. Read current
 --    enrollment/student/class status and revision; this illustrative membership
 --    table is NOT permission to use stale snapshot copies in a hosted adapter.
--- 4. Generate randomInt server-side; HMAC-SHA256(JSON array n88-v2/code/namespace/code)
---    using injected secret in server secret storage, NEVER plain SHA of six digits.
---    Under locks retry uniqueness collisions without losing previous credential.
+-- 4. Generate String(randomInt(10000)).padStart(4,'0') server-side; HMAC-SHA256(JSON array n88-v2/code/namespace/code)
+--    using injected secret in server secret storage, NEVER plain SHA of four digits.
+--    Reserve namespace/verifier atomically, including tombstones (10,000 lifetime
+--    values per owner). Max 128 random retries; exhaustion is generic/rollback.
+--    Create a separate 256-bit private bookmarkable /s/<secret> per credential.
+--    Store ONLY server-HMAC entry verifier, never raw link/PIN in DB or logs.
+--    Resolve exact entry verifier BEFORE comparing its PIN; NO teacher-wide PIN lookup.
 --    Rotate/revoke old credential + ALL sessions atomically; rollback exceptions.
--- 5. Login creates a NEW 256-bit session, bound to namespace/all four membership keys,
+--    Rotation replaces BOTH private link and PIN; all prior links/sessions fail.
+-- 5. Login creates a NEW 256-bit session, bound to entry verifier/namespace/all four membership keys,
 --    credential ID/version/revision, expires after 8h; code remains reusable.
 -- 6. Every read rechecks current context/membership/credential/version/session and
---    published=true within same transaction. Return explicit title/instruction/
+--    published=true within same transaction. Require exact private entry verifier too. Return explicit title/instruction/
 --    deadline/status + progress derived from same snapshot. No SELECT * response.
 -- 7. Publish validates owner/member + canonical source item. No browser-selected
 --    owner, no definer bypass or public service-role endpoint. Commit updates atomically.
--- 8. Durable rate-limit/proxy, transaction races, roles/RLS and canonical lifecycle
+-- 8. HTTPS-only private route/cookie; no-referrer/noindex/no-store, no analytics.
+--    Disable/redact path/cookie/body logging at EVERY ingress/edge/error trace.
+--    Private path intentionally persists for bookmarks/history; never log raw URL.
+--    Public teacher namespace/student ID is NOT an entry credential.
+-- 9. Durable rate-limit/proxy, transaction races, roles/RLS and canonical lifecycle
 --    tests are REQUIRED before hosting. This draft deliberately grants no service role.

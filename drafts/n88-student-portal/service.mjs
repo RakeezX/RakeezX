@@ -1,10 +1,10 @@
 /** AI: INACTIVE server proposal. Explicit adapters; never imported by Production. */
-import { randomBytes, randomUUID, randomInt, createHash, createHmac } from 'node:crypto';
+import { randomBytes, randomUUID, randomInt, createHash, createHmac, timingSafeEqual } from 'node:crypto';
 export const POLICY = Object.freeze({ sessionMs: 8 * 60 * 60_000, rateWindowMs: 15 * 60_000,
   sourceAttempts: 6, contextAttempts: 30, globalAttempts: 100,
   failureWindowMs: 86_400_000, contextFailures: 60, globalFailures: 500, maxRateKeys: 10_000 });
 export const hash = value => createHash('sha256').update(value).digest('hex'); // high entropy sessions ONLY
-export const generateCode = () => String(randomInt(0, 1_000_000)).padStart(6, '0');
+export const generateCode = () => String(randomInt(10_000)).padStart(4, '0');
 const secret = () => randomBytes(32).toString('base64url');
 const denied = () => ({ status: 401, body: { error: 'unavailable' } });
 export const PRIVATE_HEADERS = Object.freeze({ 'Cache-Control': 'no-store, private', 'Referrer-Policy': 'no-referrer',
@@ -60,10 +60,12 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           const member = members.find(m => m.enrollmentId === body.enrollmentId && m.revision === body.revision);
           if (!member) return denied();
           if (method === 'POST' && path === '/teacher/issue') {
-            // Reserve before revocation: old values never become active again, even on rotation.
+            // Serializable repository reservation BEFORE revocation. Tombstones reserve old
+            // values too: at most 10,000 lifetime issuances/owner, possibly earlier refusal
+            // after 128 random collisions. Never scan/fallback or overwrite a student.
             let code, verifier;
             for (let attempt = 0; attempt < 128; attempt++) {
-              code = newCode(); if (!/^[0-9]{6}$/.test(code)) throw Error('Invalid generator');
+              code = newCode(); if (typeof code !== 'string' || !/^[0-9]{4}$/.test(code)) throw Error('Invalid generator');
               verifier = digest('code', context.namespace, code);
               if (!db.credentials.some(c => c.namespace === context.namespace && c.verifier === verifier)) break;
               code = null;
@@ -71,10 +73,12 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
             if (!code) throw Error('Collision budget');
             for (const c of db.credentials) if (bound(c, member) && c.revokedAt == null) revoke(db, c, time);
             const version = Math.max(0, ...db.credentials.filter(c => bound(c, member)).map(c => c.version)) + 1;
+            const entrySecret = secret(), entryVerifier = digest('entry', entrySecret);
+            if (db.credentials.some(c => c.entryVerifier === entryVerifier)) throw Error('Entry collision');
             db.credentials.push({ id: randomUUID(), ownerId: member.ownerId, classId: member.classId, studentId: member.studentId,
               enrollmentId: member.enrollmentId, membershipRevision: member.revision, namespace: context.namespace,
-              verifier, version, revokedAt: null });
-            return { status: 200, body: { code, namespace: context.namespace } }; // once, never retrievable
+              verifier, entryVerifier, version, revokedAt: null });
+            return { status: 200, body: { code, entrySecret, namespace: context.namespace } }; // once, never retrievable
           }
           if (method === 'POST' && path === '/teacher/revoke') {
             for (const c of db.credentials) if (bound(c, member)) revoke(db, c, time);
@@ -89,43 +93,47 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           }
           return denied();
         }
-        const route = /^\/s\/([A-Za-z0-9_-]{24,64})\/(claim|read|logout)$/.exec(path);
+        const route = /^\/s\/([A-Za-z0-9_-]{43})\/(claim|read|logout)$/.exec(path);
         if (!route) return denied();
-        const [, namespace, action] = route;
+        const [, entrySecret, action] = route;
+        // Private bookmarkable route is a 256-bit credential, NOT teacher/public ID.
+        // Only its server-keyed verifier is retained in repository/session/rate state.
+        const entryVerifier = digest('entry', entrySecret);
         const token = /(?:^|;\s*)__Secure-n88=([A-Za-z0-9_-]{43})(?:;|$)/.exec(headers.cookie || '')?.[1];
-        const clearDenied = () => ({ ...denied(), cookie: cookie(namespace, '', 0) });
+        const clearDenied = () => ({ ...denied(), cookie: cookie(entrySecret, '', 0) });
         if (method === 'POST' && action === 'claim') {
           // ALL guesses: budgets BEFORE context/credential lookup. No supplied-code buckets.
           const attempts = [[digest('source', ingress.clientKey), POLICY.sourceAttempts],
-            [digest('context', namespace), POLICY.contextAttempts], ['global', POLICY.globalAttempts]]
+            [digest('context', entryVerifier), POLICY.contextAttempts], ['global', POLICY.globalAttempts]]
             .map(([key, max]) => ({ b: bucket(db, key, time, POLICY.rateWindowMs), max }));
-          const failures = [[digest('context-failure', namespace), POLICY.contextFailures], ['global-failure', POLICY.globalFailures]]
+          const failures = [[digest('context-failure', entryVerifier), POLICY.contextFailures], ['global-failure', POLICY.globalFailures]]
             .map(([key, max]) => ({ b: bucket(db, key, time, POLICY.failureWindowMs), max }));
           const blocked = [...attempts, ...failures].some(({ b, max }) => !b || b.count >= max);
-          if (token) for (const s of db.sessions) if (s.namespace === namespace && s.tokenHash === hash(token)) s.revokedAt = time;
+          if (token) for (const s of db.sessions) if (s.entryVerifier === entryVerifier && s.tokenHash === hash(token)) s.revokedAt = time;
           if (blocked) return clearDenied();
           attempts.forEach(({ b }) => b.count++);
           const fail = () => { failures.forEach(({ b }) => b.count++); return clearDenied(); };
-          if (typeof body.code !== 'string' || !/^[0-9]{6}$/.test(body.code)) return fail();
-          const verifier = digest('code', namespace, body.code);
-          const context = db.contexts.find(c => c.namespace === namespace && c.active);
-          const credential = db.credentials.find(c => c.namespace === namespace && c.verifier === verifier && c.revokedAt == null);
+          if (typeof body.code !== 'string' || !/^[0-9]{4}$/.test(body.code)) return fail();
+          const credential = db.credentials.find(c => c.entryVerifier === entryVerifier && c.revokedAt == null);
+          const context = credential && db.contexts.find(c => c.namespace === credential.namespace && c.active);
+          const verifier = digest('code', credential?.namespace || '', body.code);
           const member = credential && db.memberships.find(m => bound(m, credential));
-          if (!context || !credential || context.ownerId !== credential.ownerId || !active(member) || member.revision !== credential.membershipRevision) return fail();
+          const matches = timingSafeEqual(Buffer.from(credential?.verifier || '0'.repeat(64), 'hex'), Buffer.from(verifier, 'hex'));
+          if (!context || !credential || !matches || context.ownerId !== credential.ownerId || !active(member) || member.revision !== credential.membershipRevision) return fail();
           const sessionToken = secret();
           db.sessions.push({ ...Object.fromEntries(['ownerId','classId','studentId','enrollmentId'].map(k => [k, member[k]])),
             id: randomUUID(), credentialId: credential.id, version: credential.version, membershipRevision: member.revision,
-            namespace, tokenHash: hash(sessionToken), expiresAt: time + POLICY.sessionMs, revokedAt: null });
-          return { status: 200, body: { claimed: true }, cookie: cookie(namespace, sessionToken, POLICY.sessionMs / 1000) };
+            namespace: credential.namespace, entryVerifier, tokenHash: hash(sessionToken), expiresAt: time + POLICY.sessionMs, revokedAt: null });
+          return { status: 200, body: { claimed: true }, cookie: cookie(entrySecret, sessionToken, POLICY.sessionMs / 1000) };
         }
-        const s = token && db.sessions.find(s => s.namespace === namespace && s.tokenHash === hash(token));
+        const s = token && db.sessions.find(s => s.entryVerifier === entryVerifier && s.tokenHash === hash(token));
         if (method === 'POST' && action === 'logout') {
           if (s) s.revokedAt = time;
-          return { status: 200, body: { loggedOut: true }, cookie: cookie(namespace, '', 0) };
+          return { status: 200, body: { loggedOut: true }, cookie: cookie(entrySecret, '', 0) };
         }
-        const c = s && db.credentials.find(c => c.id === s.credentialId && bound(c, s) && c.namespace === namespace);
+        const c = s && db.credentials.find(c => c.id === s.credentialId && bound(c, s) && c.entryVerifier === entryVerifier && c.namespace === s.namespace);
         const member = s && db.memberships.find(m => bound(m, s));
-        const context = db.contexts.find(c => c.namespace === namespace && c.active);
+        const context = s && db.contexts.find(c => c.namespace === s.namespace && c.active);
         if (!s || s.revokedAt != null || s.expiresAt <= time || !c || c.revokedAt != null || c.version !== s.version ||
             !context || context.ownerId !== s.ownerId || !active(member) || member.revision !== s.membershipRevision) return clearDenied();
         if (method === 'GET' && action === 'read') return { status: 200, body: projection(db, s) };

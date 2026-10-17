@@ -5,7 +5,7 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
   root.classList.add('n88-portal'); root.dir = 'rtl';
   function show(message = '') {
     if (disposed) return;
-    root.innerHTML = `<header><span class="n88-brand">رَكيز المعلم</span><span>متابعة الطالب</span></header><main><h1>رمز الطالب الشخصي</h1><p>اختر الطالب المسجّل وتحقق من هويته قبل تسليم رمزه. الرمز دائم حتى تغييره أو إلغائه؛ لا يُرسل تلقائيًا.</p><form data-select><label for="n88-member">الطالب المسجّل حاليًا</label><select id="n88-member" required><option value="">اختر الطالب</option>${members.map(m => `<option value="${escape(m.enrollmentId)}">${escape(m.label)}</option>`).join('')}</select><button type="submit">إدارة وصول الطالب</button></form><div data-review></div><p role="status">${escape(message)}</p></main>`;
+    root.innerHTML = `<header><span class="n88-brand">رَكيز المعلم</span><span>متابعة الطالب</span></header><main><h1>رمز الطالب الشخصي</h1><p>اختر الطالب المسجّل وتحقق من هويته قبل تسليم رمزه ورابطه الخاص. الرمز دائم حتى تغييره أو إلغائه؛ لا يُرسل تلقائيًا.</p><form data-select><label for="n88-member">الطالب المسجّل حاليًا</label><select id="n88-member" required><option value="">اختر الطالب</option>${members.map(m => `<option value="${escape(m.enrollmentId)}">${escape(m.label)}</option>`).join('')}</select><button type="submit">إدارة وصول الطالب</button></form><div data-review></div><p role="status">${escape(message)}</p></main>`;
   }
   async function refresh() {
     const id = ++generation; selected = null;
@@ -13,7 +13,7 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
     catch { if (!disposed && id === generation) { members = []; namespace = ''; show('تعذّر التحقق من الحساب أو العضوية.'); } }
   }
   function review() {
-    root.querySelector('[data-review]').innerHTML = `<section class="n88-panel"><h2>${escape(selected.label)}</h2><p>إنشاء رمز جديد يلغي الرمز القديم وجميع جلساته فورًا. إذا نُسي الرمز، أنشئ بديلًا؛ لا يمكن استرجاع القديم.</p><button data-issue type="button">إنشاء / تغيير الرمز</button><button data-revoke type="button">إلغاء وصول الطالب</button><button data-cancel type="button">إغلاق</button><form data-publish><h3>تحديث نشاط الطالب</h3><label for="n88-title">عنوان النشاط المنشور</label><input id="n88-title" name="title" maxlength="160" required><label for="n88-status">الحالة</label><select id="n88-status" name="status"><option value="working">قيد العمل</option><option value="done">مكتمل</option><option value="todo">لم يبدأ</option></select><label><input name="published" type="checkbox" checked> نشر للطالب</label><button type="submit">حفظ متابعة الطالب</button></form></section>`;
+    root.querySelector('[data-review]').innerHTML = `<section class="n88-panel"><h2>${escape(selected.label)}</h2><p>إنشاء رمز جديد يلغي الرمز والرابط القديمين وجميع جلساته فورًا. إذا نُسي الرمز، أنشئ بديلًا؛ لا يمكن استرجاع القديم.</p><button data-issue type="button">إنشاء / تغيير الرمز</button><button data-revoke type="button">إلغاء وصول الطالب</button><button data-cancel type="button">إغلاق</button><form data-publish><h3>تحديث نشاط الطالب</h3><label for="n88-title">عنوان النشاط المنشور</label><input id="n88-title" name="title" maxlength="160" required><label for="n88-status">الحالة</label><select id="n88-status" name="status"><option value="working">قيد العمل</option><option value="done">مكتمل</option><option value="todo">لم يبدأ</option></select><label><input name="published" type="checkbox" checked> نشر للطالب</label><button type="submit">حفظ متابعة الطالب</button></form></section>`;
     const form = root.querySelector('[data-publish]');
     const label = root.ownerDocument.createElement('label'); label.htmlFor = 'n88-publication'; label.textContent = 'النشاط';
     const select = root.ownerDocument.createElement('select'); select.id = 'n88-publication'; select.name = 'publication';
@@ -56,10 +56,10 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
       const result = await client[action](member);
       if (disposed || id !== generation) return;
       if (action === 'revoke') { show('أُلغي الوصول والرمز وجميع الجلسات.'); return; }
-      if (result.namespace !== namespace || !/^[A-Za-z0-9_-]{24,64}$/.test(namespace) || !/^[0-9]{6}$/.test(result.code)) throw Error('invalid');
-      root.querySelector('[data-review]').innerHTML = `<section class="n88-panel"><h2>رمز ${escape(member.label)}</h2><p>يُعرض الآن فقط. سلّمه لهذا الطالب وحده بعد التحقق منه، ثم أغلق العرض. يحتفظ الطالب بالرابط ويستخدم الرمز نفسه في كل زيارة.</p><label for="n88-code">الرمز الشخصي</label><input data-code id="n88-code" dir="ltr" readonly autocomplete="off"><label for="n88-entry">رابط معلمك للطلاب</label><input data-entry id="n88-entry" dir="ltr" readonly><button data-copy type="button">نسخ الرمز والرابط</button><button data-print type="button">طباعة</button><button data-cancel type="button">إغلاق ومسح الرمز</button></section>`;
+      if (result.namespace !== namespace || !/^[A-Za-z0-9_-]{24,64}$/.test(namespace) || !/^[0-9]{4}$/.test(result.code) || !/^[A-Za-z0-9_-]{43}$/.test(result.entrySecret)) throw Error('invalid');
+      root.querySelector('[data-review]').innerHTML = `<section class="n88-panel"><h2>رمز ${escape(member.label)}</h2><p>يُعرض الآن فقط. سلّمه لهذا الطالب وحده بعد التحقق منه، ثم أغلق العرض. يحتفظ الطالب بهذا الرابط الخاص ولا يشاركه، ويستخدم الرمز نفسه في كل زيارة. الرابط سرّي مثل الرمز.</p><label for="n88-code">الرمز الشخصي</label><input data-code id="n88-code" dir="ltr" readonly autocomplete="off"><label for="n88-entry">رابط هذا الطالب الخاص</label><input data-entry id="n88-entry" dir="ltr" readonly><button data-copy type="button">نسخ الرمز والرابط</button><button data-print type="button">طباعة</button><button data-cancel type="button">إغلاق ومسح الرمز</button></section>`;
       root.querySelector('[data-code]').value = result.code;
-      root.querySelector('[data-entry]').value = root.ownerDocument.location.origin + '/s/' + namespace;
+      root.querySelector('[data-entry]').value = root.ownerDocument.location.origin + '/s/' + result.entrySecret;
       root.querySelector('[data-code]').focus();
     } catch { if (!disposed && id === generation) show('تعذّر الإنشاء أو الإلغاء. أعد التحقق من العضوية والحساب.'); }
     finally { busy = false; }
