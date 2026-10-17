@@ -1,0 +1,36 @@
+{
+  "id": "continuous-n36-final-receiver-journey-20261018",
+  "at": "2026-10-17T22:57:31.110Z",
+  "candidate": "c69cbaa7d250250436a3fd573a59a5fd4883a185",
+  "session": "01a14bea-f66b-7710-b245-b5f8d4294d7d",
+  "base": "f2395c4841db30fb29e5908fe30e6154a925116a",
+  "published": "55bc032b49cea2a27e38c97170b870de64098b0a",
+  "receiptSha256": "cd5d67e699077c173b2e981ed9f3a89d4118efbf82712713d510a0798a16abee",
+  "requiredChecks": [
+    "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+    "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards"
+  ],
+  "checks": [
+    {
+      "name": "n36_actual_extension_to_actual_receiver_full_roster_explicit_save_and_ack",
+      "status": "PASS",
+      "evidence": "Actual controller, worker, receiver UI, store and Sync engine completed 303 synthetic students across ten existing owned classes. Reconciled 606 canonical network-fixture ACKs; Outbox empty; exact names/memberships matched; other stores unchanged. Evidence: tests/n36-final-journey-resumed.json."
+    },
+    {
+      "name": "n36_receiver_owner_ttl_duplicate_partial_and_final_package_guards",
+      "status": "PASS",
+      "evidence": "Owner change and TTL erased previews without writes; duplicate, expired, replay and wrong-tab claims rejected. Partial approval required per class. Lost-outcome retry returned existing names without duplicate writes. Unchanged 0.5.11 package proof reused."
+    },
+    {
+      "name": "source_evidence_and_syntax",
+      "status": "PASS",
+      "evidence": "Affected Product sources identical to observed origin/main faa3cd5c32895148d5220ec9b34dd3f07a82cb5e. Original BLOCKED evidence and corrected harness failures preserved. Scoped syntax and staged diff checks passed; worktree clean."
+    },
+    {
+      "name": "native_popup_and_personal_account_save",
+      "status": "NOT_RUN",
+      "evidence": "Synthetic HTTPS facade and worker VM provide no native Chrome or personal-account save proof."
+    }
+  ],
+  "why": "Current exact verifiedDeployment predicate is true for original provider/immutable/Production receipt; only controller bookkeeping rejected it. Retain unchanged candidate, all real test outcomes and NOT_RUN native/account trial. No redeployment or Product rerun."
+}
