@@ -100,6 +100,7 @@ export function reviewedPreimageMatches(actual, reviewed) {
   return normalized(actual) === normalized(reviewed);
 }
 const SOURCE_ONLY_OPTIONAL_NOT_RUN = new Set([
+  'native_action_popup',
   'hosted_activation_and_real_push',
   'hosted_service_auth_tls_and_student_activation',
   'optional_checkpoint_directory_removal',

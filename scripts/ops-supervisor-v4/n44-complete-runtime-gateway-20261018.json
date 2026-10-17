@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "id": "continuous-n44-complete-runtime-gateway-20261018",
+      "productId": "N44",
+      "priority": -505,
+      "scopeKey": "n44-server-runtime-http-composition",
+      "dependsOn": [
+        "continuous-n44-postgres-repository-boundary-bridge-20261017"
+      ],
+      "objective": "Read canonical AGENTS.md, docs/RAKEEZ_OPS_CONTRACT.md, current Product row and only affected current-main sources. Latest PO18Oct01:04Saudi explicitly asks FINISH each independent ticket with its own worker, persist through useful implementation, affected verification, exact candidate and authorized publisher delivery, ready for review/closure. Do not stop at another explanation, plan or routine PM handoff. Preserve existing real tool/managed denials; never retry/rephrase/reroute them, no user browser/profile/foreground or credential collection, no real sends/student writes/hosted SQL/Auth/RLS/secret extraction/paid services. Only original controller dispatches, publisher releases. Use current runId/JSON schema, owned resource cleanup, preserve genuine initial failures. No extra review worker or broad retest; reuse unchanged evidence. If actual activation needs a concrete undelegated operation, prepare complete reviewable code/config artifact and state exact remaining operation, not a vague gate. Do not claim ready/live from a draft. N44 real PostgreSQL port and registration/delivery boundaries are already implemented/qualified. DO NOT repeat SQL tests or report their completion as Push completion. Implement missing concrete server runtime/HTTP composition using those actual boundaries. Read drafts/n44-push/README and actual browser push client contracts. Supply deployable bounded HTTP handler and scheduler/cleanup entry composition, exact route/method/body/JSON/deadline/ingress/origin/auth failure behavior, dependency/config preflight and disabled-by-default construction. Auth must independently verify current session via trusted server port, never body/user_metadata/decodedJWT; current context/consent/events under same SQL serialization, no stale client cache. Owner cannot be passed from a public delivery route; no public scheduler API. Reuse actual current-context mapper/writer if present; implement missing narrowly scoped canonical adapter from real existing authoritative store contracts when possible, not another fake protocol. Preserve crash originalUUID receipt/reconcile semantics. Keep provider network sending disabled unless audited existing sender/config is genuinely available; do not invent crypto, configure origins/keys or activate hosted service. Compose injectable audited protect/send ports as strict requirements and make unavailable dependencies a single precise preflight result. No secrets/default connection fallback/production log bodies. Demonstrate actual loopback HTTP->actual registration boundary->real repository port (reuse owned localPG fixture only if necessary to prove new boundary, do not rerun priorSQL suite); malformed/oversize/duplicateJSON keys/origin/unverified auth/rate/deadline fail before mutation; opaque fixed-code responses and lifecycle cleanup; actual delivery entry reuses committed-permit fence. Make source/config/deployment instructions concrete enough to review and name exact remaining real sender/Auth/writer operations, not just “Push off”. Source-only inactive delivery allowed. No new subscriptions or notification permission prompts. Do not touch shared app/SW/N88/N64/N36 paths.\nPUBLICATION RECONCILIATION ONLY: exact original provider/immutable/Production source-only receipt already verified. Fresh canonical validator accepts it. Preserve optional hosted_activation_and_real_push NOT_RUN, all required PASS and saved identity; no Product replay, SQL rerun, redeploy or real send activation.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-runtime-gateway*.mjs",
+        "tests/n44-runtime-gateway*.json",
+        "tests/fixtures/n44-runtime-gateway/**",
+        "docs/automation-evidence/20261018/N44_RUNTIME_GATEWAY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/runtime-gateway.mjs",
+        "docs/automation-evidence/20261018/N44_RUNTIME_GATEWAY.md"
+      ],
+      "requiredChecks": [
+        "n44_actual_http_registration_and_private_runtime_composition",
+        "n44_ingress_auth_body_commit_failure_and_disabled_preflight"
+      ],
+      "acceptance": [
+        "Missing usable runtime gateway/entry composition implemented over actual existing boundary and repository contracts; exact deployment preflight artifact provided.",
+        "New HTTP/auth/failure invariants exercised; no real send/hosted activation represented as done."
+      ],
+      "preparationAuthority": {
+        "kind": "PO-explicit-finish-N44",
+        "publication": true,
+        "publicationScope": "inert inactive server runtime gateway and local qualification only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false
+      },
+      "releaseAuthority": "LatestPO18Oct01:04 asks finishN44; reversible server runtime implementation and owned synthetic qualification plus originalpublisher source-only inactive release authorized. No hosted schema/Auth/private-access/send activation or denied cleanup.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "f98af0835f6b894bde66f0134674f70c30b783c9",
+        "priorReceiptSha256": "b5708199699bffe86cf5e9ab43701bfc5eaaf5718ab9fda0098ab931d5000439",
+        "reviewedFixtureSha256": "143e6fddb263d104bd8f8ef1049bfda9522b1d4557a1382ecbd1b90dc0fb04c9",
+        "reason": "Original long-lived controller cached pre-source-only validator and misclassified a complete provider/immutable/Production inactive source receipt. All required checks passed; optional real hosted Push remains NOT_RUN. Reconcile exact original receipt only."
+      }
+    }
+  ]
+}

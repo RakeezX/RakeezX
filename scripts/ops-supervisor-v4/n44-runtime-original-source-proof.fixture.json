@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-17T22:24:14.959Z",
+  "task": "continuous-n44-complete-runtime-gateway-20261018",
+  "session": "01a14beb-0c37-77f2-babf-a9c54d9e1c64",
+  "run": "f74393d7-a86f-43b7-8e90-df28b2d007c0",
+  "candidate": "6af2298bcbb4ae44ec4340e72b35c02a27c3a79d",
+  "published": "f98af0835f6b894bde66f0134674f70c30b783c9",
+  "verifiedDeployment": true,
+  "verifiedSourceOnlyPublication": true,
+  "requiredChecks": [
+    {
+      "name": "n44_actual_http_registration_and_private_runtime_composition",
+      "status": "PASS",
+      "evidence": "Actual loopback HTTP registration through existing boundary and PostgreSQL repository; UUID reconciliation, commit rollback, current consent, private committed-permit fence, uncertain-send suppression and cleanup. See tests/n44-runtime-gateway.result.json."
+    },
+    {
+      "name": "n44_ingress_auth_body_commit_failure_and_disabled_preflight",
+      "status": "PASS",
+      "evidence": "Malformed/oversize/duplicate JSON, invalid UTF-8, duplicate headers, origin, unverified Auth, rate and deadline negatives; late Auth/protect completion cannot acquire repository. Disabled dependency preflight and bounded private batches verified."
+    },
+    {
+      "name": "syntax_and_evidence_integrity",
+      "status": "PASS",
+      "evidence": "node --check passed for runtime and scoped harness files; git diff --cached --check passed; executed evidence hashes match candidate sources."
+    },
+    {
+      "name": "owned_resource_cleanup",
+      "status": "PASS",
+      "evidence": "HTTP and PostgreSQL ports rebound after shutdown; owned PG PID absent; runtime close idempotent; phase lease released. Stopped synthetic checkpoints retained outside candidate."
+    },
+    {
+      "name": "hosted_activation_and_real_push",
+      "status": "NOT_RUN",
+      "evidence": "Inactive source only. No hosted changes, real Auth/crypto/sender activation, push or deployment. Exact remaining operations documented in drafts/n44-push/RUNTIME.md."
+    }
+  ],
+  "receiptSha256": "b5708199699bffe86cf5e9ab43701bfc5eaaf5718ab9fda0098ab931d5000439",
+  "noRerun": true
+}
