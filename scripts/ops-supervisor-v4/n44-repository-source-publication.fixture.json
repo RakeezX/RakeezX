@@ -1,0 +1,291 @@
+{
+  "taskId": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+  "sessionId": "01a14a1c-f696-74c0-b6bb-3255ccca6924",
+  "runId": "d3379dc5-49cb-4ae5-89a9-ab130cdaed60",
+  "candidateSha": "8dee9be0d800160c2b5d81760cd3b0a43dba941d",
+  "baseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+  "receipt": {
+    "version": 1,
+    "ticketId": "N44",
+    "taskId": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+    "candidateSha": "8dee9be0d800160c2b5d81760cd3b0a43dba941d",
+    "baseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+    "publishedSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-17T14:04:49.702Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-17T14:04:49.702Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "80e1256b-a1e2-4668-b899-30820206be16",
+    "previewUrl": "https://80e1256b.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117415010342",
+      "headSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-17T14:04:19Z",
+      "completedAt": "2026-10-17T14:04:19Z",
+      "headBranch": null,
+      "deploymentId": "80e1256b-a1e2-4668-b899-30820206be16",
+      "previewUrl": "https://80e1256b.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/80e1256b-a1e2-4668-b899-30820206be16"
+    },
+    "currentMainSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+    "binding": {
+      "candidateSha": "8dee9be0d800160c2b5d81760cd3b0a43dba941d",
+      "declaredBaseSha": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+      "mainAtPreparation": "68e8262f4cc34c5fc1b19d9085e9e98c18b9af85",
+      "integrationSha": "8dee9be0d800160c2b5d81760cd3b0a43dba941d",
+      "publishedSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "candidate-fast-forward"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-17T14:03:52.083Z",
+      "completedAt": "2026-10-17T14:03:56.379Z",
+      "integrationSha": "8dee9be0d800160c2b5d81760cd3b0a43dba941d",
+      "publishedSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md",
+      "drafts/n44-push/README.md",
+      "drafts/n44-push/postgres-repository.mjs",
+      "tests/fixtures/n44-postgres-repository/cases.mjs",
+      "tests/n44-postgres-repository.failure-clock-equality.json",
+      "tests/n44-postgres-repository.failure-lock-cold-pool.json",
+      "tests/n44-postgres-repository.failure-lock-direct-blocker.json",
+      "tests/n44-postgres-repository.failure-lock-observer.json",
+      "tests/n44-postgres-repository.failure-retry-clock.json",
+      "tests/n44-postgres-repository.mjs",
+      "tests/n44-postgres-repository.result.json"
+    ],
+    "sourceOnlyPaths": [
+      "tests/fixtures/n44-postgres-repository/cases.mjs",
+      "tests/n44-postgres-repository.failure-clock-equality.json",
+      "tests/n44-postgres-repository.failure-lock-cold-pool.json",
+      "tests/n44-postgres-repository.failure-lock-direct-blocker.json",
+      "tests/n44-postgres-repository.failure-lock-observer.json",
+      "tests/n44-postgres-repository.failure-retry-clock.json",
+      "tests/n44-postgres-repository.mjs",
+      "tests/n44-postgres-repository.result.json"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://80e1256b.rakeezx.pages.dev",
+        "checkedAt": "2026-10-17T14:04:45.273Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "05294a1b336eeee3473cc651f45f3e53e1b900e2fbc13332c7b26423ef74bcdd",
+            "observedSha256": "05294a1b336eeee3473cc651f45f3e53e1b900e2fbc13332c7b26423ef74bcdd",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/postgres-repository.mjs",
+            "urlPath": "drafts/n44-push/postgres-repository.mjs",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+            "observedSha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+            "bytes": 17424,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/README.md",
+            "urlPath": "drafts/n44-push/README.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+            "observedSha256": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+            "bytes": 26910,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md",
+            "urlPath": "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2f8bd11d50af3b9834ce855e11be0af8c387d1c699c79558454e5d114d4cc3a1",
+            "observedSha256": "2f8bd11d50af3b9834ce855e11be0af8c387d1c699c79558454e5d114d4cc3a1",
+            "bytes": 13924,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-17T14:04:45.853Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "fe96c0cb5635f7c55f5c8d20f41f1b6f594e02b5f93bca8c38fb6cf30503a295",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "8d95356354211561954300626adfbe0eab7e7265234e21c543ce71261807926e",
+            "providerTransforms": [
+              "cloudflare-jsd-v1",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "05294a1b336eeee3473cc651f45f3e53e1b900e2fbc13332c7b26423ef74bcdd",
+            "observedSha256": "05294a1b336eeee3473cc651f45f3e53e1b900e2fbc13332c7b26423ef74bcdd",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/postgres-repository.mjs",
+            "urlPath": "drafts/n44-push/postgres-repository.mjs",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+            "observedSha256": "a083d2faa400eb7e038ed80a495a224c319da87046a3d8963c98715666d52e2e",
+            "bytes": 17424,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n44-push/README.md",
+            "urlPath": "drafts/n44-push/README.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+            "observedSha256": "5bef56ef6a2b0325a6bc69874fbd8ac009fcee5e4bf4c2e34ccced077657bc7b",
+            "bytes": 26910,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md",
+            "urlPath": "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2f8bd11d50af3b9834ce855e11be0af8c387d1c699c79558454e5d114d4cc3a1",
+            "observedSha256": "2f8bd11d50af3b9834ce855e11be0af8c387d1c699c79558454e5d114d4cc3a1",
+            "bytes": 13924,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n44-postgres-repository-boundary-bridge-20261017\\integration-8dee9be0d800-1-aefd0a89",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  },
+  "requiredChecks": [
+    {
+      "name": "n44_real_postgres_repository_executes_existing_registration_delivery_boundaries",
+      "status": "PASS",
+      "evidence": "Actual unchanged boundaries executed through the new PostgreSQL repository; 7 targeted cases passed. Details: tests/n44-postgres-repository.result.json."
+    },
+    {
+      "name": "n44_two_repository_commit_fencing_current_context_budget_and_restart_guards",
+      "status": "PASS",
+      "evidence": "20 concurrent deliveries across independent pools: one committed permit, one LOCAL sender callback, 19 duplicates. SQL lock chains, current contexts, budgets, rollback/ambiguous-commit fences and controlled restart passed."
+    },
+    {
+      "name": "n44_owned_sql_cleanup_inactive_source_and_honest_auth_sender_device_limits",
+      "status": "PASS",
+      "evidence": "Owned cluster stopped; exact PID absent and port rebound/released. Seven stopped checkpoints retained. Inactive import checks passed; hosted Auth, real sender and device gates remain NOT_RUN."
+    },
+    {
+      "name": "syntax_documentation_and_candidate_scope",
+      "status": "PASS",
+      "evidence": "Three syntax checks, selected README gate 1/1, staged diff check, source/index content binding and allowed-path assertions passed."
+    }
+  ],
+  "canonicalVerifiedSourceOnly": true,
+  "reason": "Live original controller26340 cached its source-only validator before the source-only publication gate was installed. Current canonical exact validator accepts original complete source-only receipt; no Product rewrite, no redeploy or repeat SQL needed."
+}

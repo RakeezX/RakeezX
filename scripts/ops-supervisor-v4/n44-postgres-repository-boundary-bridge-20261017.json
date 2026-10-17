@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "activationId": "po-20261012-continuous",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n44-native-postgres-qualification-20261017"
+      ],
+      "id": "continuous-n44-postgres-repository-boundary-bridge-20261017",
+      "productId": "N44",
+      "priority": -365,
+      "scopeKey": "n44-real-postgres-repository-bridge-inactive-source",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "objective": "LatestPO17October16:41asksN44NEXT after actualSQL10/10qualified. ImplementmissingrealDATABASErepositoryport between EXISTINGcreateRegistrationBoundary/createDeliveryBoundary and the alreadyqualifiedUNAPPLIEDn44_push_draftschema, exerciseactualboundariesagainstSQL. Thisisactualmissinglocalruntimecode, notanotherrawconstrainttestorplan. N88nativeSQLworkerisindependentunderitsownN88paths/cluster; leaveitsfiles/ports/PIDsuntouched. ReadcanonicalN44row, drafts/n44-push/README, registration/delivery/shared/schema andpriornativeSQLreport. Freshorigin/main. Existingportrepository.atomic(ownerId,synchronous tx=>result) iscurrentlyonlyfake; buildINACTIVEreusablePostgresimplementation with injectedtrustedclient/pool andBOUNDEDownertxsnapshot+writebuffer ifneeded. Keepactualregister/deliver signatures/results andCSVs? noCSVscope. Actual serviceAuth/canonicalevent/contextwriter/ingress/Crypto/VAPID remainsunimplemented, dontclaimlivePush.\nSOURCEONLY newdrafts/n44-push/postgres-repository.mjs plusfocusedfixture/runner/readme/evidence. Preferexisting3boundarymodulesBYTEunchanged; tinyfixonly actualreproducedcontractbug withoriginalfailure. NoAPP/router/SW/store/offline/publicUI/wiring/hosting/SQLmigration/auth/provider/sendactivation. NoSQLschema/RLS/grantschangesunless provenexistingdraftbugrequiresminimalunappliedfix, neverbroadenfrontendprivilege. No secrets/config/env/PGdefaults/authcredentials/actualpushendpoint. WorkerreadSupabaseskill/changelogcurrentdocs andPG17transactionsemantics; parentconsulted20261017 https://supabase.com/changelog.md (publicHTTPSworks, webreaderunsupportedmarkdown), https://supabase.com/docs/guides/database/connecting-to-postgres, https://www.postgresql.org/docs/17/transaction-iso.html. No hostedprojectneeded. UseexistingNodepgclientinjectednotimportmissingproductionpackage ornpminstall; documentexternaldriverportinterface. No newpaidservice/subscription/upgrade.\nPORT: retain synchronouswork(tx) contract soauditedexistingboundarylogicactuallyexecutesunchanged; rejectasync/reentrantwork, nofallbackmemoryrepo. InsideeachDBtransaction checkboundedvalidUUIDowner, lockowner_clockrowfirst andreadCURRENTowner-onlycontexts,registrations,deliveries,budgets boundedbyactualmodulelimits; buffer/get/set/rows/entries/delete/context/time/claimEndpoint/releaseEndpointdeepclone shapescorrectcamelCase<->snakeCase. Do not load/enumerateforeignendpointsorowners. Endpointclaim mustenforceglobalunique atSQLcommit; crossownerconflictrollsbackandfailsgenericwithoutforeignexistenceleak, no buffered false-success. Matchexactoriginalregistrationforrelease. Usesparameterizedqueries/fixedtableallowlist, no dynamicSQLfromuntrustedlabels, strictsafeinteger/bigint/jsonkeyparsing. Anyunknownoroversizedsnapshot/row/state/unsafeintegerfailclosed, not silentlydroprows/normalizebadstate. dbtime+persistedownerhighwater protectsmonotonicclock; locksameowneracross2independentrepositories/pools, noJSpromisequeue substitute. Currentcontexts/preferencesreadinsideownerlock; no cachedpreferenceauthority. FactoryisTRUSTEDSERVER-ONLYINJECTEDport, neverfrombodyowner; registerverifySessionstillauthoritativeandliveverifierNOTimplemented.\nAtomicwriteback mustrespectFK/immutabletrigger/order constraints, globalclaimsdeferrableFK/rollbacks, durablepermitCOMMITBEFORErepository.atomicresolves andBEFOREsendercallback. tx result onlyreturnedafteracknowledgedcommit; failbegin/query/flush/commit yieldsunavailable/no unintendedsend. Ambiguouscommitcannotretryasifnoeffect; persistedsendingfencemustpreventduplicatepermit. Retryonlyexplicitknownrolledbackserialization/deadlock failurebeforeanyexternalaction,boundedatmost2freshattempts, rerunPUREsyncworkfromfreshlockedstate; doNOTretryunclassifiedlostcommitack. Documentconservativegenericconflictoutcome ifglobalclaimcanonlyconflictatflush. Supportexistingdelivery.cleanupdelete methods; do notinventunboundedworker/scheduler. Provideoneexplicitowner-locked writertransaction hook/protocolforfuturecontextrevoke/preferenceupdates so sameadaptertestcanproveallcooperatingwritersserialize, but productioncanonicalcontextmapping/notclientwrite remainsNOIMPLEMENTATION. No arbitrarySQLexecute APIexport, caller cannotassertAuthfrommetadata.\nACTUALNATIVEQUALIFICATION: knownexistingPG17.6read-onlybins atC:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/{initdb.exe,postgres.exe,pg_ctl.exe}; driver../client/node_modules/pg. NewexclusiveOWNEDn44-repository-pg-<run>-<random>/data andmarker, OSassignedloopbackport, minimalallowlistenv/explicitinjectedlocalconnection, boundedmemory/connections/timeouts, noquery/bindsecretslogs. Nopsqlguess/noinstall/npm/Docker/services/oldN77datadir/default5432/personalbrowser. VerifyOWNexactPID/birth/executable/-D marker+portandserverdata_directory beforeSQL. NeverconnectexistingDB. ReuseN44nativeownershiplessons/readhelper, notrerunold10cases. SinceN88mayrunanothernewcluster, no sharedfixedports/processscansbroadcleanup. Finallycloseownclients/pools, exactownedpg_ctlfastboundedshutdown andPIDabsence+portfreeproof. PreserveSTOPPEDsyntheticdirs: previousN44recursivecleanupactuallytoolrejected; DO NOTretrydeletionunderanytool/name/worker. Nodirectoryrm/Remove-Item. NOkillingunknownprocess/STOP/controllerlease changes.\nTests should USEactualimportedcreateRegistrationBoundary/createDeliveryBoundary+NEWpostgresrepo, localAuth/protect/recompute/senderfabricatedportsonly. No rawSQLtestadapterpretendingactualport now. Exercise onevalidregister+replay(originalUUID)/revoke/tombstone+endpointrelease; concurrenttworepository20sameeventdeliveries producesONEcommittedpermit/ONErecordedLOCALsendercallback. Observeactual2backendPGlockwait/inflightnotJSqueue, state rowscorrect; rejection/wrongowner/stalerevision/consent/expiry/quiet/deletedevent failclosed usingexistingrealboundaries. Actualcounterdebits withnativeSQL budgetlimit, boundedretrydefinitivenonacceptancevsuncertain/no-replay, flush/rollback/commitfailure(no send) andcachedstatechangesreloaded. Sameownercontextrevocation/prefswitchcommitsunderownerlockbeforesubsequentreservation suppresses; no apparentatomicityfromsingleconnection. Differentownerscannotreadmutateeachother; globalendpointuniquenessloserdoesntoverwritefirstowner orleakclaimdetails. RunnewadapterunderTEMPORARYleastprivilegeLOCALtestrole/trustedowneridentityfixture wherepossible; superuserexecutionisnotRLSproof, reuseunchangedactualRLS/grant10/10sourcehashesinsteadclaimingnewhostedAuth. Contextwriter isfabricatedauthoritativefixture, notrealuserwritepermission. Fakeprotectorhasclearlyfakecurvematerial, no realcrypto/sendercertification.\nControlledOWNEDclusterstop/restart/reconnect usingexplicitownershipproof thennewpool/adapter: persistedregistration, budget andsending/uncertainreceipt survives, sameeventneverresends. ControlledrestartNOTpowerloss/crashdurability. No broadUI/browser/OS/realdevice/actualnetwork needed. No extraN44memory16testsrerununlessactualboundarychanged; sourcehashreuseunchangedguardproofs. Threeexactrequiredchecksbelow, returnPASSonlyactualpass; recordallhostedAuth/ingress/runtimeeventmapping/crypto/VAPID/send/app/SW/deviceNOT_RUNindoc notfakeoptionalFAILthatcreatesopswork. If realtechnicalconstraint preventsfaithfulsyncport, implementconcretecheckpoint/honestblocker notfakeportorweakeningguards; preservecandidate/session/ownedcheckpoints. Allnewsource remainsINACTIVEoutsideautodeployunimported. OriginalpublisherSOURCE-ONLYrelease permittedpreparationAuthority; verificationPathsactualdraftmodule/readme/evidencedoc no servedProductassetfakegate. N44notCLOSED/notPushenabled; originalcontrollerdispatchonly/noqueuechangesorotherworkers.\nPUBLICATION PROOF RECONCILIATION ONLY: original source-only receipt is provider+immutable+Production verified, all required checks PASS. Original long-lived controller uses older cached source-only validator. Use guarded helper AFTER no active workers and idlepublisher; preserve exact original session/run/candidate/base. Do not rerun SQL, touch active N64, restart controller or redeploy Product.",
+      "allowedPaths": [
+        "drafts/n44-push/**",
+        "tests/n44-postgres-repository*.mjs",
+        "tests/n44-postgres-repository*.json",
+        "tests/fixtures/n44-postgres-repository/**",
+        "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/postgres-repository.mjs",
+        "drafts/n44-push/README.md",
+        "docs/automation-evidence/20261017/N44_POSTGRES_REPOSITORY_BOUNDARY_BRIDGE.md"
+      ],
+      "requiredChecks": [
+        "n44_real_postgres_repository_executes_existing_registration_delivery_boundaries",
+        "n44_two_repository_commit_fencing_current_context_budget_and_restart_guards",
+        "n44_owned_sql_cleanup_inactive_source_and_honest_auth_sender_device_limits"
+      ],
+      "acceptance": [
+        "ActualSQL-backedrepositoryportimplementsauditedsyncboundarycallbackswithatomiccommitbeforepermit; no memoryfallback.",
+        "Twoindependentrepositories/PGconnectionsqualifyregistration/delivery/revoke/rollback/budget/currentcontext/restartbehaviorusingactualexistingboundaries.",
+        "Ownedclusterstoppedverifiedandcheckpointpreserved; usefulinactiveadaptercode source-onlypublished, no actualservicePushactivation."
+      ],
+      "preparationAuthority": {
+        "kind": "PO1641-next-N44-local-runtime-repository-preparation",
+        "syntheticTesting": true,
+        "publication": true,
+        "publicationScope": "inert inactive database repository draft and local SQL qualification only",
+        "realData": false,
+        "hostedSchemaChange": false,
+        "AuthRLSChange": false,
+        "realSend": false,
+        "livePushActivation": false,
+        "sharedBrowserRequired": false
+      },
+      "releaseAuthority": "PO17October16:41asksN44next; standingcontinuousOPENwork andindependentworkerallowance authorize concreteboundedreversiblelocalruntimeDBadapterpreparation andactualownedsyntheticSQLproof. Originalpublisher source-only inert/inactive draftrelease; NO real/hostedAuth/schema/RLS/service/sender/provider/appSW/deviceactivation orpaidservice/destructivecleanup.",
+      "completionMode": "reconcile_verified_publication",
+      "verificationRepair": {
+        "publishedSha": "dcafb2c5eda86b1df48d201e81881dac6bba0b76",
+        "priorReceiptSha256": "5f9e7ffc4ac7952cf9f83d1aec39f977e637a79d30b1a34f64d7134e4ced2af9",
+        "reviewedFixtureSha256": "30bd8001d9bbd971ed871e8579fc96a82ad74ea1d122797a0979b12b867066da",
+        "reason": "Live original controller26340 cached its source-only validator before the source-only publication gate was installed. Current canonical exact validator accepts original complete source-only receipt; no Product rewrite, no redeploy or repeat SQL needed."
+      }
+    }
+  ]
+}
