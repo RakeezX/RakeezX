@@ -191,7 +191,8 @@ async function boundedBody(response) {
 
 /** Accept only pinned Cloudflare provider tails with exact immutable source parity. */
 export function normalizeCloudflareIndex(bytes, metadata) {
-  if (metadata.repoPath !== 'index.html' || !['index.html','/'].includes(metadata.urlPath)
+  if (!(metadata.repoPath === 'index.html' && ['index.html','/'].includes(metadata.urlPath)
+      || metadata.repoPath === 'extensions/rakeez-teacher-import-helper/popup.html' && metadata.urlPath === metadata.repoPath)
       || metadata.statusCode !== 200 || String(metadata.server).toLowerCase() !== 'cloudflare'
       || !/^text\/html(?:\s*;|$)/i.test(metadata.contentType ?? '')
       || metadata.mitigated === 'challenge') return null;

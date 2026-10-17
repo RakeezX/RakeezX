@@ -1,0 +1,1497 @@
+{
+  "task": {
+    "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "productId": "N36",
+    "activationId": "po-20261012-continuous",
+    "priority": -355,
+    "scopeKey": "n36-actual-popup-intrinsic-width-independent-safe-diagnostics",
+    "riskClass": "SENSITIVE",
+    "validationTier": "STANDARD",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "dependsOn": [
+      "continuous-n107-calm-single-review-import-20261017"
+    ],
+    "objective": "Latest ACTUAL PO17October2026 14:37Saudi confirms0.5.10reload,303names/10classes/7pages samepartialterminal, and reports (1) clicking Chromeextension opens abnormallyNARROW/TALL nativepopup; (2) wants top «نسخ معلومات التشخيص» button collecting neededdevelopmentdiagnostics; (3) ChromeExtensions error «Failed to load the script unexpectedly», context handoff-protocol.js:0. Address these EXACT defects in0.5.11, not repeatcoverageparser or ask same303question. Sourceverbatimerror is user-supplied, not automaticallyinspected browser. Stable0.5.10disk24/24 previouslyverified; protocolfileexists. Failedloadrootcause currentlyUNKNOWN, do not assert missingfile/syntaxfixed withoutreproduction. Ownaccount303fullcount accepted, genericterminal current7 endpointnone stillunproven, actualRakeezsavedreceiptsunproven. Neverpersistrealroster/PII or copy suppliedstudentnames. CurrentN107calmimport workerownscentralhub, awaitdependencydelivery then startcurrentorigin/main preserveitsnewone-reviewflow; don't touch active/frozenworktree.\n\nA. NATIVE POPUP width: current popup.css starts html width430px, ends html max-width:100vw; body.run-page/ html:has(body.run-page) adjusttabflow. This trailingviewport-boundconstraint is CODEHYPOTHESIS for intrinsicpopup shrinkfeedback, notprovenactualrootcause. Prior tests servedpopupasHTTPpageat320/390/1280, notactualChromeactionintrinsicpopup. Establish regression with shrink-sized contentviewport/nativeextension ifavailable. Make normalactionpopup explicitcomfortablefixedinlinewidth (around430CSSpx, chosenwithinChrome25..800pxwidth/25..600pxheight bounds), stablemin width independentofitsowninitialviewport and readablecontrols; body/main/root sizingmustagree. Avoid min/max/100vw selfconstraint collapse, forcedtallnarrowcolumn or unintendedoverflow. Run/importTAB version mustremainresponsive320/390/1280 withmax840 andnormalverticalscroll, don't givefulltabfixed430 or globalminwidth causingmobileoverflow. Keepcompactsummary/review/one-transfer. Styleheader/copysecondarybutton professionallyRTL withwrap whenneeded. ReadCURRENT primaryChromeaction popup docs https://developer.chrome.com/docs/extensions/reference/api/action (popupautosizescontent), scriptingdocs onlyifneeded; no externalrandomblogs.\n\nActualverification: if an ALREADYAVAILABLE disposable owned headlessChromium supports realMV3 load+popup open withoutvisibleUI, usefresh emptyprofile andLOCALFABRICATED/noportal context, verifyactualextensionmodulegraph/backgroundload and popupintrinsicdimensions. This authorization ONLY isolatedheadlessownprocess, no personalChrome/profile/foregroundUI/realaccount/history/OSmouse/credential/copyclipboardreads. Do not installnewbrowser/dependencies, bypassdenial/reusepersonalCDP or openheadedwindow todemonstrate. Readexistingisolatedhelper constraints; genuineheadlessnativepopup unavailable => recordNATIVE_ACTION_POPUP_NOT_RUN and do meaningfulintrinsicshrinkCSS/boundedHTTPregression, neverclaimordinaryHTTPfixedviewport provesnativepopup. One focusedbefore/after andrun-tabresponsivecheck, not oldwholeN36suite.\n\nB. TOP COPY REPORT: visible secondary «نسخ معلومات التشخيص» atTOPbothpopup/runpage immediatelyreachable. User-clickonly clipboardWRITE no clipboardread, no automaticupload/network/monitoring, no newpermission. MuststillworkifmainESM/runcontroller/handoffprotocol importfails: tinyindependent firstloaded externalclassicbootstrap or equivalent self-contained failresilientloader withvalidMV3CSP (noinline/eval/remote). Avoid addingcopyhandlerdeepinsidetheveryfailingmodule. Existing route diagnostics canreusebut topcopycontains one cohesive plainJSON/textreport withreport-schema/version, extensionmanifestversion; contextenum popup/run-tab; browserfamily+major/platformenum whenreliable (no rawUA, devicesIDs, precisehardware); safecurrentinner/client/scrollwidth,height,devicePixelRatio/zoomlayoutindicators/computedroot/body/mainwidth; module/bootstrap/backgroundhealth status; collectionstage, valid/staged/observed/excludedcounts, classCOUNT, processedpageCOUNT, coverage/hasNext/terminal diagnostic fixedenums/booleans; transferstate enum/receiptstatus withNOtokens/nonce/rawIDs/roster; lastfew sanitizedknownmodule-load/runtimeerrorcodes and ALLOWLISTED bundledassetbasename. Keepboundedfieldset/length/no wholeDOM or innerText scrape/HTML, no sourceURL/query/pathIDs/currenttabsIDs/extensionID/routehash/session/credential/cookie/tokens/teacher/school/studentnames/classlabels/grades/rawstack/error.message arbitrarystrings. Counts useful; identity labels neverneeded. Collectaggregates fromexplicitly sanitized sharedstateprovider/current-safe-diagnosticpipeline, notreturnactivejob/envelope/state wholesale. Prototype/unexpectedkey/unknownreason/sentineltests ensure noPII. Unknownvalues explicitunknown/notavailable, notfakePASS. Capturewindowresourceerror/unhandledrejection into smallmemoryring usingfixedclassificationandallowedbasenameONLY, without savingrawmessage/reason anywhere. No permanentstorage/newlogs. Clearappropriateephemeralrunstate oncancel/expiry/contextchange, preserveonlynon-sensitivebootstatus; don'tclearor mutatecollection whilecopying.\n\nReportmustbeavailable beforestartrun, aftersuccessful303summarysynthetic, duringpartial/expiry/error, andwhenmainmodulemissingfailed. Clipboardwritepermissionfailure showsselectable safe-reporttextarea/manualcopyfallback and honeststatus, no silentusercopy-successclaim. Existinghiddennestedroutecopy mayberemoved/moved/reused toavoidduplicatedbuttons butsafeadvanceddeveloperdiagnostics remainavailable. TopbuttonmustnotexpandlegacyJSONstudentdataexport or automaticallycopyallnames. Avoid expensiveper-rowdiagnostics orfetchownfilesblockedbyconnect-srcnone.\n\nC. HANDOFF-PROTOCOL LOAD ERROR: validateexactZIP/manifest/resourcecase/references andESMgraph(Categoriespopup/handoffworker bothimportprotocol), JSparse/lifecycle/startupCSP. Use syntheticMV3integration ifavailable toload actualmodules/serviceworker andinvokeNO-PAYLOADhealth roundtriponly, neveractualschoolbrowser. Treatmissing/stale/updated-extensioncontext/import/reload failure asdifferentfixedcodes ifdistinguishable; notallHANDOFF_REQUEST. Optional diagnostichealth message canbeadded toworker withEXISTINGstrictsenderorigin/path/IDchecking, exactrequestallowlist, no storage/envelope/nonce/roster disclosure, no clearAll or transportcreation sideeffects. Deadlineboundedtimeout/failedworker status; no permission/CSP or externally_connectable widening, no scriptsinjectedoutsidepreviousactiveTabflow, no inline/eval/remote fallback. Allprotocol handoffTTL120s/singleclaim/receiveridentity/senderchecks/sanitizednames/max300 remainunchanged; don't circumventerrorbyremovingguards. If cause concretelyreproduced, fixandbefore/aftertest; ifnot, honestunresolvedrootcause with independentlyworkingdiagnostics andvalidatedpackaging, not suppressconsole/clearChromeerrorhistory/falselysayChromeerrorgone. Independenttopreporthelpsuserfuturevoluntarycopy, don'trequestmoreactualschoolreadnow.\n\nPackage0.5.11 withsource/perfile/ZIP/manifest exactbindings, priorarchivespreserved. CentralKoshoofdownloadversion updateonly to0.5.11, preserveN107nowdirectextensionFIRST/onepreview/nooldJSON. No otherwebchanges/sw redesign. Existingstableminuteupdater handlesverifiedpackage aftersolepublisher provider+immutable+Production; then readitshealthandactualdiskmanifest/perfileproof naturallyafterrun, nevermanualunchangedupdate/ChromeReload/control. UserdoesoneReloadafteractualready. No newAIautomation/service/paidfeatures.\nChecksfocused: widthregressionbefore/afterandrun-tabresponsive; independenttopcopybeforemain/summary/failedESM +clipboardfailfallback +privacy-sentinel/fixederrorallowlist; actualmodulegraph/backgroundhealth importandstrictnosideeffectsenderchecks; packagingandtransportguardhashreuse. Synthetic303/10/7aggregate only, don't rerunold300fix/350/1000stress/parserwholecases. ValidateCSS/newbootstrapCSP compatibility; ifnamedchecks requireonlylocalready, actualChromeerrorrootcause/nativewindow limits documented honestly, notFAIL/NOT_RUN->PASS. Record latestactualPOobservation and concise evidence/resolution/remaininglimits docs. Returnexacttask/run/candidate/base/changedpaths/checks, nowholeN36CLOSED or actualschoolsaveclaim.",
+    "allowedPaths": [
+      "extensions/rakeez-teacher-import-helper/**",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+      "src/views/class-import-center.js",
+      "tests/n36-popup-width-diagnostics*.mjs",
+      "tests/n36-popup-width-diagnostics*.json",
+      "tests/fixtures/n36-popup-width-diagnostics/**",
+      "tests/n36-concise-import-panel.test.mjs",
+      "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md"
+    ],
+    "verificationPaths": [
+      "extensions/rakeez-teacher-import-helper/popup.css",
+      "extensions/rakeez-teacher-import-helper/popup.html",
+      "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+      "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+      "extensions/rakeez-teacher-import-helper/manifest.json",
+      "src/views/class-import-center.js"
+    ],
+    "requiredChecks": [
+      "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+      "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+      "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+      "n36_0511_source_package_binding_and_unchanged_transport_guards"
+    ],
+    "acceptance": [
+      "Comfortablefixednativepopup sizing regression addressed, responsivefullrunpage retained; nativeChromevalidation honestlydistinguished fromHTTP.",
+      "Topcopy worksindependentlyofmainESM andcollectsusefulbounds/enums/counts/errorassetinfo withNOnames/IDs/tokens/URLs/rawstacks ornewpermissions.",
+      "Moduleloadcauseinvestigated honestly; reproducedfixifpossible, safecodes/unknownotherwise, nofalseChromeerrorsresolvedclaim.",
+      "0.5.11package/site/stablelocalcoherent afterverifiedsolepublisher, N107newUXpreserved and noChromecontrol."
+    ],
+    "preparationAuthority": {
+      "kind": "PO1437-popup-bug-top-safe-diagnostics-protocol-load-investigation",
+      "syntheticTesting": true,
+      "publication": true,
+      "realStudentData": false,
+      "schoolPortalReadByAgent": false,
+      "personalBrowserAccess": false,
+      "isolatedHeadlessFabricatedExtensionTestOnly": true
+    },
+    "releaseAuthority": "PO17October14:37 explicitly reportsnativepopupwidth/Chromehandoff-protocol loadfailure and requests topcopy diagnostics fordevelopment. Reversibleextensioncode/privacy-safeuserclickcopy/syntheticisolatedheadlesstests andsolepublisher0.5.11releaseauthorized. No actualschool/personalbrowser/foregroundUI/agentread, realdatawrite, newpermissions/CSPrelaxation/AuthSQL/service orrefusalbypass.",
+    "approvedNote": {
+      "productId": "N36",
+      "source": "n36-popup-width-top-diagnostics-0511-20261017.json",
+      "sha256": "dc21c32a049cefbe39ec6f12a0d27a4eebe7884e178af58315558af7a4c327a5"
+    },
+    "workflowVersion": 5,
+    "status": "blocked",
+    "implementationFailures": 0,
+    "infrastructureRetries": 0,
+    "createdAt": "2026-10-17T11:41:12.392Z",
+    "updatedAt": "2026-10-17T11:58:52.919Z",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "worktreePrepared": true,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "attempt": {
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\attempt.json",
+      "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\result.json",
+      "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\events.jsonl",
+      "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\stderr.txt",
+      "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\checkpoint.json",
+      "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper.stdout.txt",
+      "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper.stderr.txt",
+      "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper-launch.json",
+      "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\broker.stdout.txt",
+      "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\broker.stderr.txt",
+      "startedAt": "2026-10-17T11:47:53.785Z"
+    },
+    "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\result.json",
+    "runnerPid": null,
+    "runnerCreatedAt": null,
+    "brokerPid": null,
+    "brokerCreatedAt": null,
+    "probingClass": null,
+    "retryAt": null,
+    "lastModelError": null,
+    "ownedProcesses": [],
+    "watchdogIncident": null,
+    "eventLogIssue": null,
+    "checkpointIssue": null,
+    "wrapperExit": null,
+    "lastProgressScanAt": "2026-10-17T11:56:07.890Z",
+    "lastFileProgressAt": "2026-10-17T11:56:08.042Z",
+    "lastEventAt": "2026-10-17T11:56:19.734Z",
+    "progressFingerprint": "99746947f6dd55b820c5601aedebf067203e49ca22218591d1b3c6d8b784763d",
+    "productRecordKey": "po-20261012-continuous:blocked:fbb3ea39d73596088b10e8fb138433d07b8cb827:29d78769fb49d2617839ea4f2b35c993d833fc69:SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+    "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+    "heartbeatAt": "2026-10-17T11:56:13.6629421Z",
+    "lastTurnCompletedAt": "2026-10-17T11:56:21.536Z",
+    "lastWorkerReap": {
+      "activationId": "po-20261012-continuous",
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "verifiedAbsentAt": "2026-10-17T11:56:21.537Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 6152,
+          "createdAt": "2026-10-17T11:47:53.8010610Z"
+        },
+        {
+          "pid": 18896,
+          "createdAt": "2026-10-17T11:47:53.8754430Z"
+        },
+        {
+          "pid": 31528,
+          "createdAt": "2026-10-17T11:47:54.6370220Z"
+        },
+        {
+          "pid": 33724,
+          "createdAt": "2026-10-17T11:47:53.8881430Z",
+          "name": "conhost.exe",
+          "parentPid": 18896,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 31052,
+          "createdAt": "2026-10-17T11:47:54.6439630Z",
+          "name": "conhost.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 8784,
+          "createdAt": "2026-10-17T11:47:55.2022650Z",
+          "name": "node_repl.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 32476,
+          "createdAt": "2026-10-17T11:47:55.2073020Z",
+          "name": "node.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 6088,
+          "createdAt": "2026-10-17T11:47:55.2088550Z",
+          "name": "conhost.exe",
+          "parentPid": 8784,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 9420,
+          "createdAt": "2026-10-17T11:47:55.2154300Z",
+          "name": "conhost.exe",
+          "parentPid": 32476,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 12612,
+          "createdAt": "2026-10-17T11:47:55.3099950Z",
+          "name": "node_repl.exe",
+          "parentPid": 32476,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 30232,
+          "createdAt": "2026-10-17T11:48:03.3886420Z",
+          "name": "codex-code-mode-host.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 2496,
+          "createdAt": "2026-10-17T11:48:03.3970830Z",
+          "name": "conhost.exe",
+          "parentPid": 30232,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        }
+      ]
+    },
+    "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+    "validationReceipt": {
+      "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "state": "LOCAL_READY",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "changedPaths": [
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+        "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+        "extensions/rakeez-teacher-import-helper/README.md",
+        "extensions/rakeez-teacher-import-helper/categories-popup.js",
+        "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "extensions/rakeez-teacher-import-helper/popup.css",
+        "extensions/rakeez-teacher-import-helper/popup.html",
+        "extensions/rakeez-teacher-import-helper/popup.js",
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "src/views/class-import-center.js",
+        "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+        "tests/n36-concise-import-panel.test.mjs",
+        "tests/n36-popup-width-diagnostics-browser.json",
+        "tests/n36-popup-width-diagnostics-browser.mjs",
+        "tests/n36-popup-width-diagnostics-native.json",
+        "tests/n36-popup-width-diagnostics-native.mjs",
+        "tests/n36-popup-width-diagnostics-package.json",
+        "tests/n36-popup-width-diagnostics-package.mjs"
+      ],
+      "checks": [
+        {
+          "name": "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+          "status": "PASS",
+          "evidence": "Actual HTTP DOM/CSS: shrink regression 30px before, 430px after; responsive run tabs at 320/390/1280 without horizontal overflow. Evidence: tests/n36-popup-width-diagnostics-browser.json."
+        },
+        {
+          "name": "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+          "status": "PASS",
+          "evidence": "Actual top-button handlers cover synthetic 303/10/7 summary, failed ESM/protocol import, expiry cleanup, clipboard fallback, health timeout/context invalidation and privacy sentinels."
+        },
+        {
+          "name": "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+          "status": "PASS",
+          "evidence": "Fresh installed headless Chromium loaded actual MV3 worker and page modules under unchanged CSP. Strict health tests observed zero storage/tab/alarm effects; 18 reachable JS files parsed with exact-case imports."
+        },
+        {
+          "name": "n36_0511_source_package_binding_and_unchanged_transport_guards",
+          "status": "PASS",
+          "evidence": "25 ZIP files match source, staged Git bytes and manifest hashes/sizes. Prior archive, protocol, parser, receiver and offline shell preserved; N107 site change is version-only."
+        },
+        {
+          "name": "scoped_assertion_and_commit_hygiene",
+          "status": "PASS",
+          "evidence": "Scoped concise-import test passed; staged diff whitespace check passed; AI-identified candidate committed; worktree clean. Owned browser/server resources closed and browser lease released."
+        },
+        {
+          "name": "NATIVE_ACTION_POPUP",
+          "status": "NOT_RUN",
+          "evidence": "Owned headless Chromium did not expose a native action-popup page. HTTP and extension-tab evidence are not native-window certification."
+        },
+        {
+          "name": "original_chrome_error_resolution",
+          "status": "NOT_RUN",
+          "evidence": "User-reported handoff-protocol.js load failure was not reproduced. Root cause remains UNKNOWN; no claim that the user's Chrome error disappeared."
+        },
+        {
+          "name": "publisher_production_and_stable_update",
+          "status": "NOT_RUN",
+          "evidence": "No push, deployment, manual updater or personal-browser control performed."
+        }
+      ],
+      "summary": "Committed 0.5.11 with stable popup sizing, independent privacy-safe top diagnostics and validated packaging. Native-popup measurement and original Chrome-error cause remain explicitly unresolved.",
+      "blockerType": "none",
+      "blocker": null,
+      "nextAction": "Independent controller/publisher integrates the candidate, verifies delivery and checks the subsequent natural stable-folder update.",
+      "hostValidatedAt": "2026-10-17T11:56:21.789Z",
+      "baseAdvance": null
+    },
+    "deliveryQueuedAt": "2026-10-17T11:56:21.789Z",
+    "nextDeliveryAt": null,
+    "failureClass": "external",
+    "lastFailure": "SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+    "deliveryOwner": null,
+    "deliveryStartedAt": "2026-10-17T11:56:21.891Z",
+    "deliveryReceipt": {
+      "version": 1,
+      "ticketId": "N36",
+      "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "publishedSha": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+      "productionUrl": "https://rakeezx.com",
+      "at": "2026-10-17T11:58:44.408Z",
+      "status": "pending",
+      "retryable": true,
+      "retryAfterSeconds": 20,
+      "errorCode": "SOURCE_PARITY_PENDING",
+      "message": "Provider succeeded but exact served-source verification has not passed",
+      "provider": {
+        "checkRunId": "117390164189",
+        "headSha": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-17T11:57:03Z",
+        "completedAt": "2026-10-17T11:57:03Z",
+        "headBranch": null,
+        "deploymentId": "4391a0a7-044e-407f-9fd1-d2c4f3fc3610",
+        "previewUrl": "https://4391a0a7.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/4391a0a7-044e-407f-9fd1-d2c4f3fc3610"
+      },
+      "evidence": {
+        "immutable": {
+          "origin": "https://4391a0a7.rakeezx.pages.dev",
+          "checkedAt": "2026-10-17T11:58:38.873Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "bytes": 4208,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "bytes": 105862,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "bytes": 64669,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "bytes": 3952,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+              "observedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "bytes": 4061,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "bytes": 8691,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "bytes": 6593,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "bytes": 807,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        },
+        "production": {
+          "origin": "https://rakeezx.com",
+          "checkedAt": "2026-10-17T11:58:39.906Z",
+          "passed": false,
+          "assets": [
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "bytes": 4208,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "bytes": 105862,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "bytes": 64669,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "d949c6a538217ea8c078e3be7ddb5ecd84807df87960538e2b2d26e1b6bb1abd",
+              "bytes": 5257,
+              "deleted": false,
+              "verified": true,
+              "normalization": "cloudflare-observed-tail-v2",
+              "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "normalizedBytes": 3952,
+              "removedProviderBytes": 1305,
+              "removedSha256": "b8ed8b63849facbff77647e32030fcc26d3a1cf9a51a2f6174b513367a4541f7",
+              "providerTransforms": [
+                "cloudflare-analytics-20261017",
+                "cloudflare-jsd-v1"
+              ]
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+              "observedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "bytes": 4061,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "f21707fcf863371dadd5212edab3e2b8e3e5a8440b83ba5013461aab56c5f525",
+              "bytes": 9629,
+              "deleted": false,
+              "verified": false
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "bytes": 6593,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "bytes": 807,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        }
+      },
+      "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\integration-fbb3ea39d735-1-01381edf"
+    },
+    "parityWait": {
+      "key": "dcf5571224abec7a05882e694c76d7886d4adb9cda8e6dfa03fc94a7963882a9",
+      "firstAt": "2026-10-17T11:57:28.564Z",
+      "count": 3,
+      "lastAt": "2026-10-17T11:58:51.393Z",
+      "observations": [
+        {
+          "at": "2026-10-17T11:57:28.564Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "bea9cf2b74cef2d9d485e88ae6fbbb0179e62067eca2c9674affda368aae8bfa"
+            }
+          ]
+        },
+        {
+          "at": "2026-10-17T11:58:09.988Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "d7d90ec6bbcc3ce0bf06b706ac339f025a478239c0f15ead1c45ae276797fc44"
+            }
+          ]
+        },
+        {
+          "at": "2026-10-17T11:58:51.393Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "f21707fcf863371dadd5212edab3e2b8e3e5a8440b83ba5013461aab56c5f525"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "result": {
+    "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+    "state": "LOCAL_READY",
+    "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "changedPaths": [
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+      "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+      "extensions/rakeez-teacher-import-helper/README.md",
+      "extensions/rakeez-teacher-import-helper/categories-popup.js",
+      "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+      "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+      "extensions/rakeez-teacher-import-helper/manifest.json",
+      "extensions/rakeez-teacher-import-helper/popup.css",
+      "extensions/rakeez-teacher-import-helper/popup.html",
+      "extensions/rakeez-teacher-import-helper/popup.js",
+      "extensions/rakeez-teacher-import-helper/run-controller.js",
+      "src/views/class-import-center.js",
+      "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+      "tests/n36-concise-import-panel.test.mjs",
+      "tests/n36-popup-width-diagnostics-browser.json",
+      "tests/n36-popup-width-diagnostics-browser.mjs",
+      "tests/n36-popup-width-diagnostics-native.json",
+      "tests/n36-popup-width-diagnostics-native.mjs",
+      "tests/n36-popup-width-diagnostics-package.json",
+      "tests/n36-popup-width-diagnostics-package.mjs"
+    ],
+    "checks": [
+      {
+        "name": "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+        "status": "PASS",
+        "evidence": "Actual HTTP DOM/CSS: shrink regression 30px before, 430px after; responsive run tabs at 320/390/1280 without horizontal overflow. Evidence: tests/n36-popup-width-diagnostics-browser.json."
+      },
+      {
+        "name": "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+        "status": "PASS",
+        "evidence": "Actual top-button handlers cover synthetic 303/10/7 summary, failed ESM/protocol import, expiry cleanup, clipboard fallback, health timeout/context invalidation and privacy sentinels."
+      },
+      {
+        "name": "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+        "status": "PASS",
+        "evidence": "Fresh installed headless Chromium loaded actual MV3 worker and page modules under unchanged CSP. Strict health tests observed zero storage/tab/alarm effects; 18 reachable JS files parsed with exact-case imports."
+      },
+      {
+        "name": "n36_0511_source_package_binding_and_unchanged_transport_guards",
+        "status": "PASS",
+        "evidence": "25 ZIP files match source, staged Git bytes and manifest hashes/sizes. Prior archive, protocol, parser, receiver and offline shell preserved; N107 site change is version-only."
+      },
+      {
+        "name": "scoped_assertion_and_commit_hygiene",
+        "status": "PASS",
+        "evidence": "Scoped concise-import test passed; staged diff whitespace check passed; AI-identified candidate committed; worktree clean. Owned browser/server resources closed and browser lease released."
+      },
+      {
+        "name": "NATIVE_ACTION_POPUP",
+        "status": "NOT_RUN",
+        "evidence": "Owned headless Chromium did not expose a native action-popup page. HTTP and extension-tab evidence are not native-window certification."
+      },
+      {
+        "name": "original_chrome_error_resolution",
+        "status": "NOT_RUN",
+        "evidence": "User-reported handoff-protocol.js load failure was not reproduced. Root cause remains UNKNOWN; no claim that the user's Chrome error disappeared."
+      },
+      {
+        "name": "publisher_production_and_stable_update",
+        "status": "NOT_RUN",
+        "evidence": "No push, deployment, manual updater or personal-browser control performed."
+      }
+    ],
+    "summary": "Committed 0.5.11 with stable popup sizing, independent privacy-safe top diagnostics and validated packaging. Native-popup measurement and original Chrome-error cause remain explicitly unresolved.",
+    "blockerType": "none",
+    "blocker": null,
+    "nextAction": "Independent controller/publisher integrates the candidate, verifies delivery and checks the subsequent natural stable-folder update."
+  },
+  "update": {
+    "card": {
+      "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -355,
+      "scopeKey": "n36-actual-popup-intrinsic-width-independent-safe-diagnostics",
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n107-calm-single-review-import-20261017"
+      ],
+      "objective": "Latest ACTUAL PO17October2026 14:37Saudi confirms0.5.10reload,303names/10classes/7pages samepartialterminal, and reports (1) clicking Chromeextension opens abnormallyNARROW/TALL nativepopup; (2) wants top «نسخ معلومات التشخيص» button collecting neededdevelopmentdiagnostics; (3) ChromeExtensions error «Failed to load the script unexpectedly», context handoff-protocol.js:0. Address these EXACT defects in0.5.11, not repeatcoverageparser or ask same303question. Sourceverbatimerror is user-supplied, not automaticallyinspected browser. Stable0.5.10disk24/24 previouslyverified; protocolfileexists. Failedloadrootcause currentlyUNKNOWN, do not assert missingfile/syntaxfixed withoutreproduction. Ownaccount303fullcount accepted, genericterminal current7 endpointnone stillunproven, actualRakeezsavedreceiptsunproven. Neverpersistrealroster/PII or copy suppliedstudentnames. CurrentN107calmimport workerownscentralhub, awaitdependencydelivery then startcurrentorigin/main preserveitsnewone-reviewflow; don't touch active/frozenworktree.\n\nA. NATIVE POPUP width: current popup.css starts html width430px, ends html max-width:100vw; body.run-page/ html:has(body.run-page) adjusttabflow. This trailingviewport-boundconstraint is CODEHYPOTHESIS for intrinsicpopup shrinkfeedback, notprovenactualrootcause. Prior tests servedpopupasHTTPpageat320/390/1280, notactualChromeactionintrinsicpopup. Establish regression with shrink-sized contentviewport/nativeextension ifavailable. Make normalactionpopup explicitcomfortablefixedinlinewidth (around430CSSpx, chosenwithinChrome25..800pxwidth/25..600pxheight bounds), stablemin width independentofitsowninitialviewport and readablecontrols; body/main/root sizingmustagree. Avoid min/max/100vw selfconstraint collapse, forcedtallnarrowcolumn or unintendedoverflow. Run/importTAB version mustremainresponsive320/390/1280 withmax840 andnormalverticalscroll, don't givefulltabfixed430 or globalminwidth causingmobileoverflow. Keepcompactsummary/review/one-transfer. Styleheader/copysecondarybutton professionallyRTL withwrap whenneeded. ReadCURRENT primaryChromeaction popup docs https://developer.chrome.com/docs/extensions/reference/api/action (popupautosizescontent), scriptingdocs onlyifneeded; no externalrandomblogs.\n\nActualverification: if an ALREADYAVAILABLE disposable owned headlessChromium supports realMV3 load+popup open withoutvisibleUI, usefresh emptyprofile andLOCALFABRICATED/noportal context, verifyactualextensionmodulegraph/backgroundload and popupintrinsicdimensions. This authorization ONLY isolatedheadlessownprocess, no personalChrome/profile/foregroundUI/realaccount/history/OSmouse/credential/copyclipboardreads. Do not installnewbrowser/dependencies, bypassdenial/reusepersonalCDP or openheadedwindow todemonstrate. Readexistingisolatedhelper constraints; genuineheadlessnativepopup unavailable => recordNATIVE_ACTION_POPUP_NOT_RUN and do meaningfulintrinsicshrinkCSS/boundedHTTPregression, neverclaimordinaryHTTPfixedviewport provesnativepopup. One focusedbefore/after andrun-tabresponsivecheck, not oldwholeN36suite.\n\nB. TOP COPY REPORT: visible secondary «نسخ معلومات التشخيص» atTOPbothpopup/runpage immediatelyreachable. User-clickonly clipboardWRITE no clipboardread, no automaticupload/network/monitoring, no newpermission. MuststillworkifmainESM/runcontroller/handoffprotocol importfails: tinyindependent firstloaded externalclassicbootstrap or equivalent self-contained failresilientloader withvalidMV3CSP (noinline/eval/remote). Avoid addingcopyhandlerdeepinsidetheveryfailingmodule. Existing route diagnostics canreusebut topcopycontains one cohesive plainJSON/textreport withreport-schema/version, extensionmanifestversion; contextenum popup/run-tab; browserfamily+major/platformenum whenreliable (no rawUA, devicesIDs, precisehardware); safecurrentinner/client/scrollwidth,height,devicePixelRatio/zoomlayoutindicators/computedroot/body/mainwidth; module/bootstrap/backgroundhealth status; collectionstage, valid/staged/observed/excludedcounts, classCOUNT, processedpageCOUNT, coverage/hasNext/terminal diagnostic fixedenums/booleans; transferstate enum/receiptstatus withNOtokens/nonce/rawIDs/roster; lastfew sanitizedknownmodule-load/runtimeerrorcodes and ALLOWLISTED bundledassetbasename. Keepboundedfieldset/length/no wholeDOM or innerText scrape/HTML, no sourceURL/query/pathIDs/currenttabsIDs/extensionID/routehash/session/credential/cookie/tokens/teacher/school/studentnames/classlabels/grades/rawstack/error.message arbitrarystrings. Counts useful; identity labels neverneeded. Collectaggregates fromexplicitly sanitized sharedstateprovider/current-safe-diagnosticpipeline, notreturnactivejob/envelope/state wholesale. Prototype/unexpectedkey/unknownreason/sentineltests ensure noPII. Unknownvalues explicitunknown/notavailable, notfakePASS. Capturewindowresourceerror/unhandledrejection into smallmemoryring usingfixedclassificationandallowedbasenameONLY, without savingrawmessage/reason anywhere. No permanentstorage/newlogs. Clearappropriateephemeralrunstate oncancel/expiry/contextchange, preserveonlynon-sensitivebootstatus; don'tclearor mutatecollection whilecopying.\n\nReportmustbeavailable beforestartrun, aftersuccessful303summarysynthetic, duringpartial/expiry/error, andwhenmainmodulemissingfailed. Clipboardwritepermissionfailure showsselectable safe-reporttextarea/manualcopyfallback and honeststatus, no silentusercopy-successclaim. Existinghiddennestedroutecopy mayberemoved/moved/reused toavoidduplicatedbuttons butsafeadvanceddeveloperdiagnostics remainavailable. TopbuttonmustnotexpandlegacyJSONstudentdataexport or automaticallycopyallnames. Avoid expensiveper-rowdiagnostics orfetchownfilesblockedbyconnect-srcnone.\n\nC. HANDOFF-PROTOCOL LOAD ERROR: validateexactZIP/manifest/resourcecase/references andESMgraph(Categoriespopup/handoffworker bothimportprotocol), JSparse/lifecycle/startupCSP. Use syntheticMV3integration ifavailable toload actualmodules/serviceworker andinvokeNO-PAYLOADhealth roundtriponly, neveractualschoolbrowser. Treatmissing/stale/updated-extensioncontext/import/reload failure asdifferentfixedcodes ifdistinguishable; notallHANDOFF_REQUEST. Optional diagnostichealth message canbeadded toworker withEXISTINGstrictsenderorigin/path/IDchecking, exactrequestallowlist, no storage/envelope/nonce/roster disclosure, no clearAll or transportcreation sideeffects. Deadlineboundedtimeout/failedworker status; no permission/CSP or externally_connectable widening, no scriptsinjectedoutsidepreviousactiveTabflow, no inline/eval/remote fallback. Allprotocol handoffTTL120s/singleclaim/receiveridentity/senderchecks/sanitizednames/max300 remainunchanged; don't circumventerrorbyremovingguards. If cause concretelyreproduced, fixandbefore/aftertest; ifnot, honestunresolvedrootcause with independentlyworkingdiagnostics andvalidatedpackaging, not suppressconsole/clearChromeerrorhistory/falselysayChromeerrorgone. Independenttopreporthelpsuserfuturevoluntarycopy, don'trequestmoreactualschoolreadnow.\n\nPackage0.5.11 withsource/perfile/ZIP/manifest exactbindings, priorarchivespreserved. CentralKoshoofdownloadversion updateonly to0.5.11, preserveN107nowdirectextensionFIRST/onepreview/nooldJSON. No otherwebchanges/sw redesign. Existingstableminuteupdater handlesverifiedpackage aftersolepublisher provider+immutable+Production; then readitshealthandactualdiskmanifest/perfileproof naturallyafterrun, nevermanualunchangedupdate/ChromeReload/control. UserdoesoneReloadafteractualready. No newAIautomation/service/paidfeatures.\nChecksfocused: widthregressionbefore/afterandrun-tabresponsive; independenttopcopybeforemain/summary/failedESM +clipboardfailfallback +privacy-sentinel/fixederrorallowlist; actualmodulegraph/backgroundhealth importandstrictnosideeffectsenderchecks; packagingandtransportguardhashreuse. Synthetic303/10/7aggregate only, don't rerunold300fix/350/1000stress/parserwholecases. ValidateCSS/newbootstrapCSP compatibility; ifnamedchecks requireonlylocalready, actualChromeerrorrootcause/nativewindow limits documented honestly, notFAIL/NOT_RUN->PASS. Record latestactualPOobservation and concise evidence/resolution/remaininglimits docs. Returnexacttask/run/candidate/base/changedpaths/checks, nowholeN36CLOSED or actualschoolsaveclaim.\n\nMATERIAL VERIFIER REPAIR17October15:10: public technical popup.html has only pinned Cloudflare analytics tail; ZIP/manifest/source alreadyexact. Allow strict same observed pinned HTML normalization ONLY for exact popup.html repo/url pair in addition toindex, preserve allotherbytes/sourceSHA. Nativepopup/originalerror optionalNOT_RUN remaintruthful andnotrequired localchecks; publisherrechecks retainedcandidate after testedguardrepair, noProductreimplementation orbypass.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+        "src/views/class-import-center.js",
+        "tests/n36-popup-width-diagnostics*.mjs",
+        "tests/n36-popup-width-diagnostics*.json",
+        "tests/fixtures/n36-popup-width-diagnostics/**",
+        "tests/n36-concise-import-panel.test.mjs",
+        "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/popup.css",
+        "extensions/rakeez-teacher-import-helper/popup.html",
+        "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+        "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+        "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+        "n36_0511_source_package_binding_and_unchanged_transport_guards"
+      ],
+      "acceptance": [
+        "Comfortablefixednativepopup sizing regression addressed, responsivefullrunpage retained; nativeChromevalidation honestlydistinguished fromHTTP.",
+        "Topcopy worksindependentlyofmainESM andcollectsusefulbounds/enums/counts/errorassetinfo withNOnames/IDs/tokens/URLs/rawstacks ornewpermissions.",
+        "Moduleloadcauseinvestigated honestly; reproducedfixifpossible, safecodes/unknownotherwise, nofalseChromeerrorsresolvedclaim.",
+        "0.5.11package/site/stablelocalcoherent afterverifiedsolepublisher, N107newUXpreserved and noChromecontrol."
+      ],
+      "preparationAuthority": {
+        "kind": "PO1437-popup-bug-top-safe-diagnostics-protocol-load-investigation",
+        "syntheticTesting": true,
+        "publication": true,
+        "realStudentData": false,
+        "schoolPortalReadByAgent": false,
+        "personalBrowserAccess": false,
+        "isolatedHeadlessFabricatedExtensionTestOnly": true
+      },
+      "releaseAuthority": "PO17October14:37 explicitly reportsnativepopupwidth/Chromehandoff-protocol loadfailure and requests topcopy diagnostics fordevelopment. Reversibleextensioncode/privacy-safeuserclickcopy/syntheticisolatedheadlesstests andsolepublisher0.5.11releaseauthorized. No actualschool/personalbrowser/foregroundUI/agentread, realdatawrite, newpermissions/CSPrelaxation/AuthSQL/service orrefusalbypass.",
+      "completionMode": "recheck_existing_publication",
+      "verificationRepair": {
+        "publishedSha": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+        "priorReceiptSha256": "42ac28d8eb15bd6267b9244c6c7127922d4717d9a87b3ead6b72736969f7e3c0",
+        "reviewedFixtureSha256": "5a6700785aa71c6dcb359b6433b38022b4191a85feb62affe8766fcae2866173",
+        "reason": "Actual Production popup.html has exactly pinned provider analytics injection; immutable source and downloaded ZIP/manifest match. The strict verifier only allowed index.html normalization. Preserve candidate/base/session and optional NOT_RUN native-window and original-error limitations; recheck exact publication through original publisher after explicit path-scoped repair."
+      }
+    },
+    "expected": {
+      "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "status": "blocked",
+      "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+      "lastRunId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "resultState": "LOCAL_READY"
+    },
+    "materialReason": "Fix reproduced strict public-popup HTML normalization path mismatch, preserve required PASS and optional NOT_RUN; recheck saved publication without repeating Product worker."
+  },
+  "knownTask": {
+    "activationId": "po-20261012-continuous",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "dependsOn": [],
+    "id": "continuous-n88-approved-pin-stable-term-identity-20261017",
+    "productId": "N88",
+    "priority": -360,
+    "scopeKey": "n88-final-approved-nonzero-four-digit-stable-term-identity",
+    "riskClass": "CRITICAL",
+    "validationTier": "SENSITIVE",
+    "objective": "PO17October2026 14:46 explicitly asks usingfreeworkers on independentcurrentOPEN work. CurrentN36popup0511 workerowns extension/class-import-center ONLY; this N88 correction is DISJOINT and concrete, not repeatedpilot/refinementforfiller. PMreadCURRENTorigin/main service7: generateCode()=>String(randomInt(10000)).padStart(4,'0'), docN88_PERSONAL_FOUR_DIGIT_CODE.md stillpermits0000/0007 and10,000capacity; bound() tiescredentialtoenrollmentId/class and membershipRevision, which mayinvalidateontermtransition. Thus lastN88source DOESNOTimplement explicitPO14:11 andFINAL14:16approvedpolicy. Fix theseactualmissingrequirements now, notanother6digit/leadingzero demo. N88notclosed/notlive; userwaspromisedlatestdirection, do nothidecurrentgap. Readlatestcanonical N88row at C:/Users/Abody/Projects/RakeezX/docs/PRODUCT_LEDGER.md aswellasisolatedsource; operatornotesnotcommittedintoisolatedcheckout maybenewer. This card explicitlycontainsALLfinalrules so nostale6digit/leadingzero interpretation.\n\nFINALapprovedspec: cryptographicallyrandomFOURASCII digits1000..9999, FIRSTDIGIT1..9, exactly9,000theoreticalcodes, activecodesuniqueamongoneverifiedteacher'sstudents. Repeateddigitsinsidecodeallowed, no requestedpatternblocklist. Generate String(randomInt(1000,10000)); doNOTpadmissingdigits/accept3digitsorleading0, reject0007/0074/0000/10000 butaccept1000/9999 andArabicdigitnormalization equivalent. Teacher-controlledrotate/revoke. SAMEpersonalcodeandprivatebookmarkentry stayswithSAMEstableowner+student acrossfirst->SECONDacademicterm; NO automaticterm/yearreset/credentialrotation/newcode forsimplemembershiprevision/termadvance. Sessionsfinite; expire/rescopeoldsessionswithoutinvalidatingstablecode whenverifiednewtermenrollmentlegitimatelyexists. No silentstudentenrollment/rosterwrites orautopublish.\n\nRetainprivatehighentropyindividualentrycontext+ONE4digitinput, currentserververifiedownerauth, HMAC/hashonlystore, prelookupratebudgets/CSRF/cookie/logprivacy/rotationrevokesoldlinksandallsessions, no teacherwidepublicPINlookup. Stablecredential bindsverifiedowner+durablestudentID independentofoldterm enrollmentID. Everyclaim/read stillresolvesCURRENTvalidserver-ownedmembership andallowedpublishedscope; oldmembershiptermination withoutnewverifiedmembership deniesread. A verifiedtransitiontonewterm forsamestudent/owner mayretaincredential; oldsessionsboundoldscopemustdeny/relogin/rescope safely, no historicalscores/privatefields/oldclass/otherowner exposure. Ifmultiplecurrentmemberships ambiguous, explicitserver-authorizedpublishedcontext/failclosed ratherthanfirstmatch/unionallstudentdata. Student/name guessesneverresolveidentity. Switchingowner/newstudentrequiresseparateverifiedrelationship, notcodecarryoverbyname. Keepno grades/attendance/notes/classmates default. No lifetimePINreservationre-designunlessgenuinelyneededtoenforcefinalrule; accuratelydocumentactual9,000capacityandboundedcollisionbehavior.\n\nUpdate generator/clientpattern/inputhint/servicevalidation/schema-proposal/fixtures/currentreviewdoc in ONEcohesivecorrection; removeallauthoritativeleadingzero acceptance/10,000currentcapacity fromcurrentdocs (oldhistoricalevidencepreservedasold). Clarify past0allowedintermediate nowSUPERSEDED, no needrewriteunchangedhistoricJSONproofs. Currentlatestlocal-preview mustexercise FINALpolicy, notstill0007. Test meaningful boundaries: forcedgenerator1000/9999, rejection0first/3/5digits, acceptedArabicfourdigitsnonzero; activeowneruniqueness/collisionbounded/exhaustionnooverwrite; legitimatefirst->secondtermnewenrollmentIDs/revision/currentpublishedtasks samecode+bookmark works afteroldsessionexpiry; endingmembershipno replacement denies; anotherstudent/nameclone/crossowner/oldscope refused; rotate/revokeallsessionsandcorrectgenericerrors/rateprivacyunchanged. RealDOMmobile320/desktop1280 onlyaffected4digitform andsamebookmarknewtermjourneyagainstimplementedfakehandlers. Nofullrepeat20otherUIcases/realstudentaccess/extra workers. Existingmemoryfake proveslocalfunctionalbehavior only, neverdurableSQL/RLS/hosting. FutureSQLstillNOT_RUNunlessalreadyexistinglocaltests genuinelyrun, no needstartPGfor thiscard(N44ownsindependentdisposablecluster).\nAllsource remainsINACTIVE/unimported, draftsoutsideautodeploy, no normalapp/router/SW/Auth/hostedSQL/functions/service/config/env/secret reads/noemails/realinvites/actualschool/personalChrome. No productionstudentaccessenabled; solepublishermaypublishinertsource, no realactivation. Keepacceptedpublicdemo intact. Returnmatchingtask/run/base/candidate/changedpaths/fourchecks; conciseevidencefinalapprovedpolicyandhonestremaininggates. Do notclaimN88fullclosed or readyforrealstudents.",
+    "allowedPaths": [
+      "drafts/n88-student-portal/**",
+      "src/lib/student-portal-client.js",
+      "src/views/student-portal.js",
+      "tests/n88-real-pilot*.mjs",
+      "tests/n88-real-pilot*.json",
+      "tests/fixtures/n88-real-pilot/**",
+      "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+      "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md"
+    ],
+    "verificationPaths": [
+      "src/lib/student-portal-client.js",
+      "src/views/student-portal.js"
+    ],
+    "requiredChecks": [
+      "n88_final_1000_9999_generation_validation_no_padding_and_active_uniqueness",
+      "n88_same_stable_student_code_private_link_second_term_verified_membership",
+      "n88_old_scope_ended_membership_foreign_owner_rotation_session_privacy_guards",
+      "n88_actual_responsive_final_policy_pilot_and_inert_source_boundaries"
+    ],
+    "acceptance": [
+      "Currentcode/client/docsactuallymatchexplicit4digitsNOleading0,9,000capacity; no cosmeticnoteonly.",
+      "Stablecode survivesverifiedsame-ownerstudentsecondtermmembership whileoldsession/scope/endedmembership remainsguarded.",
+      "Meaningfulfunctionalnegative/browsercheckswithfabricateddata; no liveauth/schema/privateaccessorwholeN88claim."
+    ],
+    "preparationAuthority": {
+      "kind": "PO1446-independent-open-N88-final-approved-requirement-correction",
+      "syntheticTesting": true,
+      "publication": true,
+      "publicationScope": "inactive unimported frontend and inert draft source only",
+      "realData": false,
+      "hostedSchemaChange": false,
+      "AuthRLSChange": false,
+      "productionPrivateAccess": false,
+      "realSend": false
+    },
+    "releaseAuthority": "PO14:11 andFINAL14:16 explicitlyapprove4digitswithoutleadingzeroandcarryintosecondterm. PO14:46asksindependentworkers. Correctmissinglocalimplementationandpublishinactiveunimportedsource throughsolepublisher; no realstudentaccess/Auth/schema/service/send activation.",
+    "approvedNote": {
+      "productId": "N88",
+      "source": "n88-final-approved-pin-term-identity-20261017.json",
+      "sha256": "55744c11b789bb9b74379995d058c4d9355c42f075439691827275afba1a5142"
+    },
+    "workflowVersion": 5,
+    "status": "awaiting_po",
+    "implementationFailures": 0,
+    "infrastructureRetries": 0,
+    "createdAt": "2026-10-17T11:51:48.780Z",
+    "updatedAt": "2026-10-17T12:00:12.085Z",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-approved-pin-stable-term-identity-20261017",
+    "worktreePrepared": true,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-approved-pin-stable-term-identity-20261017",
+    "attempt": {
+      "runId": "c9477105-48a2-4092-ac12-237eaacc6d8e",
+      "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\attempt.json",
+      "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\result.json",
+      "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\events.jsonl",
+      "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\stderr.txt",
+      "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\checkpoint.json",
+      "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\wrapper.stdout.txt",
+      "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\wrapper.stderr.txt",
+      "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\wrapper-launch.json",
+      "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\broker.stdout.txt",
+      "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\broker.stderr.txt",
+      "startedAt": "2026-10-17T11:51:55.488Z"
+    },
+    "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n88-approved-pin-stable-term-identity-20261017\\c9477105-48a2-4092-ac12-237eaacc6d8e\\result.json",
+    "runnerPid": null,
+    "runnerCreatedAt": null,
+    "brokerPid": null,
+    "brokerCreatedAt": null,
+    "probingClass": null,
+    "retryAt": null,
+    "lastModelError": null,
+    "ownedProcesses": [],
+    "watchdogIncident": null,
+    "eventLogIssue": null,
+    "checkpointIssue": null,
+    "wrapperExit": null,
+    "lastProgressScanAt": "2026-10-17T11:58:10.819Z",
+    "lastFileProgressAt": "2026-10-17T11:58:10.947Z",
+    "lastEventAt": "2026-10-17T11:58:16.224Z",
+    "progressFingerprint": "db673222c5de35aa29c966bfa6f4a915f25dbe4e16877edd4e2336f1e87d5a49",
+    "productRecordKey": "po-20261012-continuous:awaiting_po:b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5:676b12cd1c8774668326941b4a15875dd30e2287:",
+    "sessionId": "01a149b4-53c0-7320-9dd8-8b8b314238be",
+    "heartbeatAt": "2026-10-17T11:58:16.2245146Z",
+    "lastTurnCompletedAt": "2026-10-17T11:58:17.529Z",
+    "lastWorkerReap": {
+      "activationId": "po-20261012-continuous",
+      "runId": "c9477105-48a2-4092-ac12-237eaacc6d8e",
+      "verifiedAbsentAt": "2026-10-17T11:58:24.098Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 6544,
+          "createdAt": "2026-10-17T11:51:55.5019470Z"
+        },
+        {
+          "pid": 33976,
+          "createdAt": "2026-10-17T11:51:55.6193850Z"
+        },
+        {
+          "pid": 9488,
+          "createdAt": "2026-10-17T11:51:56.8023070Z"
+        },
+        {
+          "pid": 31304,
+          "createdAt": "2026-10-17T11:51:55.6422080Z",
+          "name": "conhost.exe",
+          "parentPid": 33976,
+          "observedAt": "2026-10-17T11:58:17.530Z"
+        },
+        {
+          "pid": 11884,
+          "createdAt": "2026-10-17T11:51:56.8112750Z",
+          "name": "conhost.exe",
+          "parentPid": 9488,
+          "observedAt": "2026-10-17T11:58:17.530Z"
+        }
+      ]
+    },
+    "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+    "validationReceipt": {
+      "taskId": "continuous-n88-approved-pin-stable-term-identity-20261017",
+      "runId": "c9477105-48a2-4092-ac12-237eaacc6d8e",
+      "state": "LOCAL_READY",
+      "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-approved-pin-stable-term-identity-20261017",
+      "changedPaths": [
+        "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md",
+        "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+        "drafts/n88-student-portal/local-preview.mjs",
+        "drafts/n88-student-portal/schema-proposal.sql",
+        "drafts/n88-student-portal/service.mjs",
+        "drafts/n88-student-portal/teacher-controller.js",
+        "src/lib/student-portal-client.js",
+        "src/views/student-portal.js",
+        "tests/fixtures/n88-real-pilot/final-form-1280.png",
+        "tests/fixtures/n88-real-pilot/final-form-320.png",
+        "tests/fixtures/n88-real-pilot/final-term2-1280.png",
+        "tests/fixtures/n88-real-pilot/final-term2-320.png",
+        "tests/fixtures/n88-real-pilot/fixture.mjs",
+        "tests/fixtures/n88-real-pilot/server.mjs",
+        "tests/n88-real-pilot-browser.mjs",
+        "tests/n88-real-pilot-final-policy-browser.json",
+        "tests/n88-real-pilot-final-policy-browser.mjs",
+        "tests/n88-real-pilot.test.mjs"
+      ],
+      "checks": [
+        {
+          "name": "n88_final_1000_9999_generation_validation_no_padding_and_active_uniqueness",
+          "status": "PASS",
+          "evidence": "17 Node tests passed: forced 1000/9999, Arabic/Persian normalization, invalid formats, owner uniqueness, bounded collisions and 9,000-value exhaustion with rollback."
+        },
+        {
+          "name": "n88_same_stable_student_code_private_link_second_term_verified_membership",
+          "status": "PASS",
+          "evidence": "Functional and actual-DOM checks verified unchanged credential/code/bookmark across new enrollment/class/revision, session expiry and reload; only current-term published tasks returned."
+        },
+        {
+          "name": "n88_old_scope_ended_membership_foreign_owner_rotation_session_privacy_guards",
+          "status": "PASS",
+          "evidence": "Old scope, ended/ambiguous membership, name clones and foreign owners denied. New-term rotation/revoke invalidated all unexpired sessions across both terms. Existing rate, CSRF, ownership and privacy checks passed."
+        },
+        {
+          "name": "n88_actual_responsive_final_policy_pilot_and_inert_source_boundaries",
+          "status": "PASS",
+          "evidence": "Actual HTTP application DOM/handlers/CSS passed at 320 and 1280; four screenshots inspected. Inert graph, 10 syntax checks, source hashes and diff checks passed. Owned browser/server closed; retired port refused connection."
+        }
+      ],
+      "summary": "Created AI-identified candidate commit; worktree clean. Implemented nonzero four-digit PINs and stable student identity across terms. No push, deployment or live activation. SQL/RLS, real Auth and hosted private access remain NOT_RUN; N88 remains open.",
+      "blockerType": "none",
+      "blocker": null,
+      "nextAction": "Controller may integrate and publish this inactive source candidate through the independent publisher.",
+      "hostValidatedAt": "2026-10-17T11:58:24.397Z",
+      "baseAdvance": null
+    },
+    "deliveryQueuedAt": "2026-10-17T11:58:24.398Z",
+    "nextDeliveryAt": "2026-10-17T11:59:50.939Z",
+    "failureClass": null,
+    "lastFailure": null,
+    "deliveryOwner": null,
+    "deliveryStartedAt": "2026-10-17T11:58:52.891Z",
+    "deliveryReceipt": {
+      "version": 1,
+      "ticketId": "N88",
+      "taskId": "continuous-n88-approved-pin-stable-term-identity-20261017",
+      "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+      "productionUrl": "https://rakeezx.com",
+      "at": "2026-10-17T12:00:04.233Z",
+      "status": "deployed",
+      "retryable": false,
+      "state": "DEPLOYED_AWAITING_PO",
+      "productionDeployed": true,
+      "verifiedAt": "2026-10-17T12:00:04.233Z",
+      "repository": "RakeezX/RakeezX",
+      "targetBranch": "main",
+      "deploymentId": "a45e415a-ace1-4ce9-a708-3cf49bd6d602",
+      "previewUrl": "https://a45e415a.rakeezx.pages.dev",
+      "providerStatus": "SUCCESS",
+      "provider": {
+        "checkRunId": "117390599043",
+        "headSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-17T11:59:31Z",
+        "completedAt": "2026-10-17T11:59:31Z",
+        "headBranch": null,
+        "deploymentId": "a45e415a-ace1-4ce9-a708-3cf49bd6d602",
+        "previewUrl": "https://a45e415a.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/a45e415a-ace1-4ce9-a708-3cf49bd6d602"
+      },
+      "currentMainSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+      "binding": {
+        "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+        "declaredBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+        "mainAtPreparation": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+        "integrationSha": "626e75051535f52500e8916931d0ce4c3227a7a8",
+        "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+        "candidateAncestorOfPublished": true,
+        "previousMainAncestorOfPublished": true,
+        "mainContainsPublished": true,
+        "checkHeadShaMatches": true,
+        "kind": "merge"
+      },
+      "build": {
+        "status": "passed",
+        "startedAt": "2026-10-17T11:59:02.914Z",
+        "completedAt": "2026-10-17T11:59:07.661Z",
+        "integrationSha": "626e75051535f52500e8916931d0ce4c3227a7a8",
+        "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+        "kind": "standard-build",
+        "validationTier": "STANDARD",
+        "reusedVerifiedBuildSha": null,
+        "generatedPathsChanged": [
+          "src/generated/build-meta.generated.js"
+        ],
+        "commands": [
+          {
+            "command": "node.exe",
+            "args": [
+              "scripts/generate-build-meta.mjs"
+            ]
+          },
+          {
+            "command": "node.exe",
+            "args": [
+              "node_modules/vite/bin/vite.js",
+              "build"
+            ]
+          }
+        ]
+      },
+      "changedPaths": [
+        "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md",
+        "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+        "drafts/n88-student-portal/local-preview.mjs",
+        "drafts/n88-student-portal/schema-proposal.sql",
+        "drafts/n88-student-portal/service.mjs",
+        "drafts/n88-student-portal/teacher-controller.js",
+        "src/lib/student-portal-client.js",
+        "src/views/student-portal.js",
+        "tests/fixtures/n88-real-pilot/final-form-1280.png",
+        "tests/fixtures/n88-real-pilot/final-form-320.png",
+        "tests/fixtures/n88-real-pilot/final-term2-1280.png",
+        "tests/fixtures/n88-real-pilot/final-term2-320.png",
+        "tests/fixtures/n88-real-pilot/fixture.mjs",
+        "tests/fixtures/n88-real-pilot/server.mjs",
+        "tests/n88-real-pilot-browser.mjs",
+        "tests/n88-real-pilot-final-policy-browser.json",
+        "tests/n88-real-pilot-final-policy-browser.mjs",
+        "tests/n88-real-pilot.test.mjs"
+      ],
+      "sourceOnlyPaths": [
+        "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md",
+        "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+        "drafts/n88-student-portal/local-preview.mjs",
+        "drafts/n88-student-portal/schema-proposal.sql",
+        "drafts/n88-student-portal/service.mjs",
+        "drafts/n88-student-portal/teacher-controller.js",
+        "tests/fixtures/n88-real-pilot/final-form-1280.png",
+        "tests/fixtures/n88-real-pilot/final-form-320.png",
+        "tests/fixtures/n88-real-pilot/final-term2-1280.png",
+        "tests/fixtures/n88-real-pilot/final-term2-320.png",
+        "tests/fixtures/n88-real-pilot/fixture.mjs",
+        "tests/fixtures/n88-real-pilot/server.mjs",
+        "tests/n88-real-pilot-browser.mjs",
+        "tests/n88-real-pilot-final-policy-browser.json",
+        "tests/n88-real-pilot-final-policy-browser.mjs",
+        "tests/n88-real-pilot.test.mjs"
+      ],
+      "changedAssets": [
+        "src/lib/student-portal-client.js",
+        "src/views/student-portal.js"
+      ],
+      "productSourceChangeObserved": true,
+      "evidence": {
+        "immutable": {
+          "origin": "https://a45e415a.rakeezx.pages.dev",
+          "checkedAt": "2026-10-17T11:59:59.262Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "src/lib/student-portal-client.js",
+              "urlPath": "src/lib/student-portal-client.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+              "observedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+              "bytes": 1570,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/student-portal.js",
+              "urlPath": "src/views/student-portal.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+              "observedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+              "bytes": 6008,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "bytes": 3952,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+              "observedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        },
+        "production": {
+          "origin": "https://rakeezx.com",
+          "checkedAt": "2026-10-17T11:59:59.712Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "src/lib/student-portal-client.js",
+              "urlPath": "src/lib/student-portal-client.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+              "observedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+              "bytes": 1570,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/student-portal.js",
+              "urlPath": "src/views/student-portal.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+              "observedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+              "bytes": 6008,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "3d6bb8612739395a71a26f70bb319c6f6f82ce20e343e7ee1b02235814e1f0d9",
+              "bytes": 5257,
+              "deleted": false,
+              "verified": true,
+              "normalization": "cloudflare-observed-tail-v2",
+              "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "normalizedBytes": 3952,
+              "removedProviderBytes": 1305,
+              "removedSha256": "67319fe73d37937e2e8b45c5df1c09030cb75f5fd93a14a0d04c8e3e9f88c0f7",
+              "providerTransforms": [
+                "cloudflare-jsd-v1",
+                "cloudflare-analytics-20261017"
+              ],
+              "providerAddedWhitespaceBytes": 1
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+              "observedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        }
+      },
+      "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n88-approved-pin-stable-term-identity-20261017\\integration-b52a34383e28-1-1bcdd248",
+      "pushRecovered": false,
+      "poPersonallyTested": false,
+      "closed": false
+    },
+    "productionVerifiedAt": "2026-10-17T12:00:04.233Z"
+  },
+  "proof": {
+    "version": 1,
+    "ticketId": "N88",
+    "taskId": "continuous-n88-approved-pin-stable-term-identity-20261017",
+    "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+    "productionUrl": "https://rakeezx.com",
+    "at": "2026-10-17T12:00:04.233Z",
+    "status": "deployed",
+    "retryable": false,
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-17T12:00:04.233Z",
+    "repository": "RakeezX/RakeezX",
+    "targetBranch": "main",
+    "deploymentId": "a45e415a-ace1-4ce9-a708-3cf49bd6d602",
+    "previewUrl": "https://a45e415a.rakeezx.pages.dev",
+    "providerStatus": "SUCCESS",
+    "provider": {
+      "checkRunId": "117390599043",
+      "headSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-17T11:59:31Z",
+      "completedAt": "2026-10-17T11:59:31Z",
+      "headBranch": null,
+      "deploymentId": "a45e415a-ace1-4ce9-a708-3cf49bd6d602",
+      "previewUrl": "https://a45e415a.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/a45e415a-ace1-4ce9-a708-3cf49bd6d602"
+    },
+    "currentMainSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+    "binding": {
+      "candidateSha": "b52a34383e28a19d21aa1dcc1c8f2f57a8762cc5",
+      "declaredBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "mainAtPreparation": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+      "integrationSha": "626e75051535f52500e8916931d0ce4c3227a7a8",
+      "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "merge"
+    },
+    "build": {
+      "status": "passed",
+      "startedAt": "2026-10-17T11:59:02.914Z",
+      "completedAt": "2026-10-17T11:59:07.661Z",
+      "integrationSha": "626e75051535f52500e8916931d0ce4c3227a7a8",
+      "publishedSha": "676b12cd1c8774668326941b4a15875dd30e2287",
+      "kind": "standard-build",
+      "validationTier": "STANDARD",
+      "reusedVerifiedBuildSha": null,
+      "generatedPathsChanged": [
+        "src/generated/build-meta.generated.js"
+      ],
+      "commands": [
+        {
+          "command": "node.exe",
+          "args": [
+            "scripts/generate-build-meta.mjs"
+          ]
+        },
+        {
+          "command": "node.exe",
+          "args": [
+            "node_modules/vite/bin/vite.js",
+            "build"
+          ]
+        }
+      ]
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md",
+      "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+      "drafts/n88-student-portal/local-preview.mjs",
+      "drafts/n88-student-portal/schema-proposal.sql",
+      "drafts/n88-student-portal/service.mjs",
+      "drafts/n88-student-portal/teacher-controller.js",
+      "src/lib/student-portal-client.js",
+      "src/views/student-portal.js",
+      "tests/fixtures/n88-real-pilot/final-form-1280.png",
+      "tests/fixtures/n88-real-pilot/final-form-320.png",
+      "tests/fixtures/n88-real-pilot/final-term2-1280.png",
+      "tests/fixtures/n88-real-pilot/final-term2-320.png",
+      "tests/fixtures/n88-real-pilot/fixture.mjs",
+      "tests/fixtures/n88-real-pilot/server.mjs",
+      "tests/n88-real-pilot-browser.mjs",
+      "tests/n88-real-pilot-final-policy-browser.json",
+      "tests/n88-real-pilot-final-policy-browser.mjs",
+      "tests/n88-real-pilot.test.mjs"
+    ],
+    "sourceOnlyPaths": [
+      "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md",
+      "docs/automation-evidence/20261017/N88_PERSONAL_FOUR_DIGIT_CODE.md",
+      "drafts/n88-student-portal/local-preview.mjs",
+      "drafts/n88-student-portal/schema-proposal.sql",
+      "drafts/n88-student-portal/service.mjs",
+      "drafts/n88-student-portal/teacher-controller.js",
+      "tests/fixtures/n88-real-pilot/final-form-1280.png",
+      "tests/fixtures/n88-real-pilot/final-form-320.png",
+      "tests/fixtures/n88-real-pilot/final-term2-1280.png",
+      "tests/fixtures/n88-real-pilot/final-term2-320.png",
+      "tests/fixtures/n88-real-pilot/fixture.mjs",
+      "tests/fixtures/n88-real-pilot/server.mjs",
+      "tests/n88-real-pilot-browser.mjs",
+      "tests/n88-real-pilot-final-policy-browser.json",
+      "tests/n88-real-pilot-final-policy-browser.mjs",
+      "tests/n88-real-pilot.test.mjs"
+    ],
+    "changedAssets": [
+      "src/lib/student-portal-client.js",
+      "src/views/student-portal.js"
+    ],
+    "productSourceChangeObserved": true,
+    "evidence": {
+      "immutable": {
+        "origin": "https://a45e415a.rakeezx.pages.dev",
+        "checkedAt": "2026-10-17T11:59:59.262Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "src/lib/student-portal-client.js",
+            "urlPath": "src/lib/student-portal-client.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+            "observedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+            "bytes": 1570,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/views/student-portal.js",
+            "urlPath": "src/views/student-portal.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+            "observedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+            "bytes": 6008,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "bytes": 3952,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+            "observedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-17T11:59:59.712Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "src/lib/student-portal-client.js",
+            "urlPath": "src/lib/student-portal-client.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+            "observedSha256": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+            "bytes": 1570,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/views/student-portal.js",
+            "urlPath": "src/views/student-portal.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+            "observedSha256": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+            "bytes": 6008,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "observedSha256": "3d6bb8612739395a71a26f70bb319c6f6f82ce20e343e7ee1b02235814e1f0d9",
+            "bytes": 5257,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+            "normalizedBytes": 3952,
+            "removedProviderBytes": 1305,
+            "removedSha256": "67319fe73d37937e2e8b45c5df1c09030cb75f5fd93a14a0d04c8e3e9f88c0f7",
+            "providerTransforms": [
+              "cloudflare-jsd-v1",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+            "bytes": 12175,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+            "observedSha256": "63f95166890d6fbf3eec37760db3af09e5f6ec1bfda74c0ffb24862527779112",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+            "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+            "observedSha256": "f21707fcf863371dadd5212edab3e2b8e3e5a8440b83ba5013461aab56c5f525",
+            "bytes": 9629,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-jsd-v1",
+            "normalizedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+            "normalizedBytes": 8691,
+            "removedProviderBytes": 938,
+            "removedSha256": "82371107f848cd6f01f59cbdda3d56bbefac02a968cbd52b1ad41d8e6f4b6658",
+            "providerTransforms": [
+              "cloudflare-jsd-v1"
+            ]
+          }
+        ]
+      }
+    },
+    "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n88-approved-pin-stable-term-identity-20261017\\integration-b52a34383e28-1-1bcdd248",
+    "pushRecovered": false,
+    "poPersonallyTested": false,
+    "closed": false
+  }
+}
