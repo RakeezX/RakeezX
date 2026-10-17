@@ -1,0 +1,82 @@
+{
+  "taskId": "continuous-n88-postgres-service-repository-20261017",
+  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
+  "startedAt": "2026-10-17T14:32:27.999Z",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165\\data",
+  "checks": [
+    {
+      "name": "integration_lease_prerequisite",
+      "status": "FAIL",
+      "evidence": "Exact stderr: running scripts is disabled on this system; SecurityError; FullyQualifiedErrorId: UnauthorizedAccess. No alternate host, policy change or repeat attempted."
+    },
+    {
+      "name": "no_owned_resources_started",
+      "status": "PASS",
+      "evidence": "Lease failed before bind/initdb/start/connect. Read-only inspection confirms data directory absent; only exclusive phase directory/owner.json retained."
+    },
+    {
+      "name": "scoped_node_syntax",
+      "status": "PASS",
+      "evidence": "node --check passed for new repository, runner and case fixture after final source changes. This is syntax only; SQL and service acceptance NOT_RUN."
+    }
+  ],
+  "negativeSqlstates": [],
+  "cleanup": {
+    "notStarted": true,
+    "dataDirectoryAbsent": true,
+    "noServerOrSqlConnectionsOpened": true,
+    "noLeaseAcquired": true,
+    "retainedOwnershipMarker": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165"
+  },
+  "failure": {
+    "name": "Error",
+    "code": null,
+    "message": "Harness/repository operation failed (details redacted)",
+    "location": "at command (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-postgres-service-repository-20261017/tests/n88-postgres-service-repository.mjs:23:50)"
+  },
+  "sourceHashes": {
+    "drafts/n88-student-portal/postgres-repository.mjs": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+    "drafts/n88-student-portal/postgres-repository-schema.sql": "23dd853d712c85630aa242a0f187c85d366f5a3db2634eddb0a03e9819534697",
+    "tests/n88-postgres-service-repository.mjs": "7aef45195e7127e5eac05b5de36b16ed1f78155c36f89afd2515e9faec3be9ad",
+    "tests/fixtures/n88-postgres-service-repository/cases.mjs": "f65e4db0b686df2a947a31dc7a9f1d2e3ae9cebf47043fdd10dde34ea25acda2"
+  },
+  "requiredChecks": [
+    {
+      "name": "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
+      "status": "NOT_RUN",
+      "dependencies": [
+        "actual_service_issue_claim_read_publish_rotate_revoke_and_projection"
+      ]
+    },
+    {
+      "name": "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
+      "status": "NOT_RUN",
+      "dependencies": [
+        "two_independent_pools_actual_advisory_wait_collision_and_unique_credentials",
+        "actual_global_source_context_failure_debits_and_mixed_concurrent_limits",
+        "actual_owner_entry_namespace_session_version_and_membership_guards",
+        "actual_term_transition_and_login_rotate_revoke_serialization",
+        "async_callback_deadline_detachment_acquisition_flush_rollback_commit_faults",
+        "new_pool_service_after_controlled_stop_restart_persistence"
+      ]
+    },
+    {
+      "name": "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits",
+      "status": "NOT_RUN",
+      "dependencies": [
+        "bounded_snapshot_strict_mapping_retention_and_inactive_bindings",
+        "owned_cleanup_and_inactive_limits"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-17T14:32:28.442Z",
+  "status": "BLOCKED",
+  "originalAttempt": "tests/n88-postgres-service-repository.lease-policy-denial.json",
+  "blockerType": "environment",
+  "blocker": "Windows PowerShell refused the canonical resource-lease.ps1 before lease acquisition: running scripts is disabled on this system; SecurityError / UnauthorizedAccess.",
+  "assessmentAt": "2026-10-17T14:36:11.825Z",
+  "nextAction": "Establish an approved canonical integration-lease execution route under existing policy, then resume this exact candidate for actual SQL qualification. Do not bypass execution policy or reuse prior clusters."
+}

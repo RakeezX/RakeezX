@@ -12,7 +12,7 @@ import { qualify } from './fixtures/n88-postgres-service-repository/cases.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 assert.equal(path.resolve(process.cwd()), root, 'run from task worktree');
-const runId = 'ae391bc2-7990-43ad-aab2-b7726a562e8a';
+const runId = 'd80c7450-1db7-4c65-8945-1007808c042b';
 const bin = 'C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin';
 const clientPath = 'C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/client/node_modules/pg';
 const { Client, Pool } = createRequire(import.meta.url)(clientPath);
@@ -43,7 +43,7 @@ const marker = { runId, token: randomUUID(), runnerPid: process.pid, phase, data
 await writeFile(path.join(phase, 'owner.json'), JSON.stringify(marker), { flag: 'wx' });
 const reportPath = path.join(root, 'tests/n88-postgres-service-repository.result.json');
 const report = { taskId: 'continuous-n88-postgres-service-repository-20261017', runId,
-  baseSha: command('git', ['rev-parse', 'HEAD']).trim(), startedAt: new Date().toISOString(),
+  baseSha: '98d8e7ab2905a2786461745af970f0b8f4fb9288', sourceHead:command('git', ['rev-parse', 'HEAD']).trim(), startedAt: new Date().toISOString(),
   version: command(path.join(bin, 'pg_ctl.exe'), ['--version']).trim(),
   phase, data, checks: [], negativeSqlstates: [], cleanup: { stopped: false } };
 const password = randomBytes(32).toString('hex'); // Only this disposable cluster.
@@ -51,7 +51,7 @@ const passwordFile = path.join(phase, 'password.tmp');
 const clients = new Set();
 const pools = new Set();
 let leaseOwned=false;
-const leaseArgs=action=>['-NoProfile','-NonInteractive','-File','C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1',
+const leaseArgs=action=>['-NoProfile','-NonInteractive','-ExecutionPolicy','RemoteSigned','-File','C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1',
   '-Name','integration','-Action',action,'-TaskFile','C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/continuous-n88-postgres-service-repository-20261017.json',
   '-RuntimeRoot','C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId];
 let reservation, port, started = false, identity;

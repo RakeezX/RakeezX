@@ -1,59 +1,232 @@
 {
   "taskId": "continuous-n88-postgres-service-repository-20261017",
-  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "runId": "d80c7450-1db7-4c65-8945-1007808c042b",
   "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
-  "startedAt": "2026-10-17T14:32:27.999Z",
+  "sourceHead": "65364b2926d81fa9b50c687fa7c62b3a9ea36994",
+  "startedAt": "2026-10-17T14:39:16.510Z",
   "version": "pg_ctl (PostgreSQL) 17.6",
-  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165",
-  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165\\data",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef\\data",
   "checks": [
     {
       "name": "integration_lease_prerequisite",
-      "status": "FAIL",
-      "evidence": "Exact stderr: running scripts is disabled on this system; SecurityError; FullyQualifiedErrorId: UnauthorizedAccess. No alternate host, policy change or repeat attempted."
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
     },
     {
-      "name": "no_owned_resources_started",
+      "name": "actual_service_issue_claim_read_publish_rotate_revoke_and_projection",
       "status": "PASS",
-      "evidence": "Lease failed before bind/initdb/start/connect. Read-only inspection confirms data directory absent; only exclusive phase directory/owner.json retained."
+      "evidence": {
+        "commitAckFenceObserved": true,
+        "storedOnlyVerifiers": true,
+        "exactPublishedProjection": true,
+        "rotationAndRevocation": true,
+        "tombstones": 2
+      }
     },
     {
-      "name": "scoped_node_syntax",
+      "name": "two_independent_pools_actual_advisory_wait_collision_and_unique_credentials",
       "status": "PASS",
-      "evidence": "node --check passed for new repository, runner and case fixture after final source changes. This is syntax only; SQL and service acceptance NOT_RUN."
+      "evidence": {
+        "observedLockWait": true,
+        "distinctBackends": true,
+        "collisionRetries": 2,
+        "tombstoneReserved": true
+      }
+    },
+    {
+      "name": "actual_global_source_context_failure_debits_and_mixed_concurrent_limits",
+      "status": "PASS",
+      "evidence": {
+        "unknownDebitsCommitted": true,
+        "beforeSensitiveLookup": true,
+        "mixedConcurrent": 12,
+        "admitted": 6,
+        "contextCap": 30,
+        "globalCap": 100,
+        "dailyFailureCap": 500
+      }
+    },
+    {
+      "name": "actual_owner_entry_namespace_session_version_and_membership_guards",
+      "status": "PASS",
+      "evidence": {
+        "wrongOwnerAndAuth": true,
+        "foreignEntryCookie": true,
+        "inactiveContextStudentClass": true,
+        "versionFkRollback": true,
+        "ambiguousMembershipDenied": true,
+        "noPrivateProjectionOnDenial": true
+      }
+    },
+    {
+      "name": "actual_term_transition_and_login_rotate_revoke_serialization",
+      "status": "PASS",
+      "evidence": {
+        "stableCredentialId": true,
+        "unchangedPinAndEntryAcrossTerm": true,
+        "oldSessionDenied": true,
+        "currentScopeOnly": true,
+        "revokeBeforeLogin": true,
+        "loginBeforeRotate": true
+      }
+    },
+    {
+      "name": "async_callback_deadline_detachment_acquisition_flush_rollback_commit_faults",
+      "status": "PASS",
+      "evidence": {
+        "callbackExceptionRollback": true,
+        "realFlushFailure": true,
+        "rollbackCommitTagDenied": true,
+        "uncertainCommitNoReplay": 1,
+        "asyncTimeoutDetached": true,
+        "lateCallbackCannotFlush": true,
+        "lateAcquisitionDestroyed": true,
+        "commitAckDeadline": true
+      }
+    },
+    {
+      "name": "bounded_snapshot_strict_mapping_retention_and_inactive_bindings",
+      "status": "PASS",
+      "evidence": {
+        "perTableAndGlobalAndByteFailClosed": true,
+        "invalidValues": 11,
+        "unsafeSqlBigintRejected": true,
+        "expiredRatesSessionsCleaned": true,
+        "credentialTombstonesRetained": true,
+        "unchangedEvidenceBindings": 7,
+        "inactive": true
+      }
+    },
+    {
+      "name": "new_pool_service_after_controlled_stop_restart_persistence",
+      "status": "PASS",
+      "evidence": {
+        "sameDatabaseState": true,
+        "actualRead200": true,
+        "budgetContinuesAt": 3,
+        "revocationPersists": true,
+        "newPoolAndService": true,
+        "controlledRestartOnly": true
+      }
+    },
+    {
+      "name": "owned_cleanup_and_inactive_limits",
+      "status": "PASS",
+      "evidence": {
+        "stopped": true,
+        "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+        "exactPidAbsent": true,
+        "exactPortReboundAndReleased": true,
+        "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef",
+        "integrationLeaseReleased": true,
+        "noBrowserOrAppChanges": true,
+        "hostedAuth": "NOT_RUN",
+        "canonicalMembershipResolver": "NOT_RUN",
+        "ingress": "NOT_RUN",
+        "hosting": "NOT_RUN",
+        "keyCustody": "NOT_RUN",
+        "studentAccess": "NOT_RUN"
+      }
     }
   ],
   "negativeSqlstates": [],
   "cleanup": {
-    "notStarted": true,
-    "dataDirectoryAbsent": true,
-    "noServerOrSqlConnectionsOpened": true,
-    "noLeaseAcquired": true,
-    "retainedOwnershipMarker": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165"
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef"
   },
-  "failure": {
-    "name": "Error",
-    "code": null,
-    "message": "Harness/repository operation failed (details redacted)",
-    "location": "at command (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-postgres-service-repository-20261017/tests/n88-postgres-service-repository.mjs:23:50)"
+  "integrationLeaseAcquire": "ACQUIRED integration",
+  "port": 52670,
+  "ownership": {
+    "pid": 28892,
+    "birth": "2026-10-17T14:39:48.5081480Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef\\data",
+    "port": 52670,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipHistory": [
+    {
+      "pid": 26536,
+      "birth": "2026-10-17T14:39:26.2516250Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef\\data",
+      "port": 52670,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    },
+    {
+      "pid": 28892,
+      "birth": "2026-10-17T14:39:48.5081480Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-postgres-service-repository-20261017\\artifacts\\n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef\\data",
+      "port": 52670,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    29784,
+    34360
+  ],
+  "schemaSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+  "blocking": {
+    "pid": 31216,
+    "blockers": [
+      5792
+    ],
+    "wait_event_type": "Lock",
+    "wait_event": "advisory",
+    "independentPools": [
+      "n88-repository-fixture-1",
+      "n88-repository-fixture-2"
+    ]
+  },
+  "reusedBindings": {
+    "drafts/n88-student-portal/service.mjs": "71b57c93802a7f5bd1c83bb914ec95e69c029ef4df4bcfd0f5ab2e87dfacae74",
+    "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+    "drafts/n88-student-portal/schema-proposal.sql": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+    "tests/n88-native-postgres-qualification.result.json": "2cd2ef799d2e074c291b58f9bac0f22a473deeeebc469b8b4b6f02959780ea59",
+    "tests/n88-real-pilot.test.mjs": "3fa9cfc6fa158fa349869b5ac2077332a3ce40c87c1ffcf2245861c46f5e650c",
+    "tests/n88-real-pilot-final-policy-browser.json": "8d4dda1553367432e94df723437e0875ee66b8af62d0ab697dfa5b411c4572ed",
+    "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md": "d3a347f57a086858f986ce1f0bde40c663fe697002d31a5d8f2fb8f192c0c796"
+  },
+  "persistence": {
+    "stateSha256": "ef10cd16426c72552481330910fbb9c5dcd02894654b3db97705d909150e4921",
+    "credentialVerifierCount": 14,
+    "revokedCount": 10,
+    "globalCount": 2
+  },
+  "restart": {
+    "stoppedPid": 26536,
+    "stoppedBirth": "2026-10-17T14:39:26.2516250Z",
+    "controlledFastShutdown": true,
+    "newPid": 28892,
+    "newBirth": "2026-10-17T14:39:48.5081480Z"
   },
   "sourceHashes": {
     "drafts/n88-student-portal/postgres-repository.mjs": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
     "drafts/n88-student-portal/postgres-repository-schema.sql": "23dd853d712c85630aa242a0f187c85d366f5a3db2634eddb0a03e9819534697",
-    "tests/n88-postgres-service-repository.mjs": "7aef45195e7127e5eac05b5de36b16ed1f78155c36f89afd2515e9faec3be9ad",
+    "tests/n88-postgres-service-repository.mjs": "927b54882330adba33ce817eaad59c643f641d860643076ab8e63e363f0c7ff2",
     "tests/fixtures/n88-postgres-service-repository/cases.mjs": "f65e4db0b686df2a947a31dc7a9f1d2e3ae9cebf47043fdd10dde34ea25acda2"
   },
+  "integrationLeaseRelease": "RELEASED integration",
   "requiredChecks": [
     {
       "name": "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "dependencies": [
         "actual_service_issue_claim_read_publish_rotate_revoke_and_projection"
       ]
     },
     {
       "name": "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "dependencies": [
         "two_independent_pools_actual_advisory_wait_collision_and_unique_credentials",
         "actual_global_source_context_failure_debits_and_mixed_concurrent_limits",
@@ -65,18 +238,13 @@
     },
     {
       "name": "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "dependencies": [
         "bounded_snapshot_strict_mapping_retention_and_inactive_bindings",
         "owned_cleanup_and_inactive_limits"
       ]
     }
   ],
-  "finishedAt": "2026-10-17T14:32:28.442Z",
-  "status": "BLOCKED",
-  "originalAttempt": "tests/n88-postgres-service-repository.lease-policy-denial.json",
-  "blockerType": "environment",
-  "blocker": "Windows PowerShell refused the canonical resource-lease.ps1 before lease acquisition: running scripts is disabled on this system; SecurityError / UnauthorizedAccess.",
-  "assessmentAt": "2026-10-17T14:36:11.825Z",
-  "nextAction": "Establish an approved canonical integration-lease execution route under existing policy, then resume this exact candidate for actual SQL qualification. Do not bypass execution policy or reuse prior clusters."
+  "finishedAt": "2026-10-17T14:39:52.167Z",
+  "status": "PASS"
 }

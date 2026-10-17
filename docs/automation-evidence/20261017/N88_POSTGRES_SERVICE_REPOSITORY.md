@@ -1,142 +1,147 @@
-# N88 — inactive PostgreSQL service repository draft (BLOCKED)
+# N88 — inactive PostgreSQL repository: local service qualification
 
-AI-authored. Task `continuous-n88-postgres-service-repository-20261017`; run
-`ae391bc2-7990-43ad-aab2-b7726a562e8a`.
-Base `98d8e7ab2905a2786461745af970f0b8f4fb9288`. Candidate is the commit containing
-this document, identified by full SHA in the worker result. No push/deploy.
+AI-authored. Task `continuous-n88-postgres-service-repository-20261017`; current run
+`d80c7450-1db7-4c65-8945-1007808c042b`. Base
+`98d8e7ab2905a2786461745af970f0b8f4fb9288`; preserved draft candidate
+`65364b2926d81fa9b50c687fa7c62b3a9ea36994`. Final candidate is the commit containing
+this report, returned by full SHA. **LOCAL qualification only; no push/deploy,
+app import, hosted service, real student access or N88 closure.**
 
-**Not SQL-qualified.** The canonical integration-lease helper was refused before
-bind/initdb/start/connect by Windows PowerShell:
+## Actual result
 
-> running scripts is disabled on this system
+`node tests/n88-postgres-service-repository.mjs` completed once with PostgreSQL
+17.6: **10 named checks PASS, all three required checks PASS**, recorded in the
+[machine result](../../../tests/n88-postgres-service-repository.result.json).
+Existing `createPortalService`, memory repository and original schema remain
+byte-unchanged; actual service handlers ran against the new durable adapter.
+Teacher Auth, ingress, canonical memberships and source publications were explicit
+fabricated ports/fixtures; no request metadata became trusted identity.
 
-`SecurityError`, `FullyQualifiedErrorId: UnauthorizedAccess`, loading
-`C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/resource-lease.ps1`.
-No alternate host, execution-policy change, inline replacement, lease-file write,
-or unchanged retry was attempted. The current worker shell's read-only policy
-inspection reports RemoteSigned; that does not establish permission to reroute
-the refused child-host action. No controller/queue/STOP/config/ACL change.
-
-[Original attempt](../../../tests/n88-postgres-service-repository.lease-policy-denial.json)
-is preserved verbatim, including its original FAIL and unrun gates.
-[Current factual assessment](../../../tests/n88-postgres-service-repository.result.json)
-records the denial, subsequent source hashes/syntax checks and actual resource
-disposition. Its cleanup assessment does not relabel the original run PASS.
-
-## Prepared source and intended contract
-
-`drafts/n88-student-portal/postgres-repository.mjs` implements the existing async
-`repository.transaction(callback)` interface without editing `service.mjs`.
-It requires an explicitly injected exclusive pg-compatible acquire/release port,
-per-table/aggregate row and byte limits, and lifecycle/acquisition/cleanup/query/
-lock deadlines. It has no driver import, connection default, SQL execution API,
-credential discovery, memory fallback, automatic retry or app import.
-
-A fixed two-integer transaction-owned global advisory lock precedes snapshot
-reads. All cooperating writers, including fabricated membership/publication
-writers, must take that same lock. This deliberately serializes **all owners and
-global guessing budgets**, including the existing asynchronous teacher-auth wait.
-It is a bounded private pilot design, unsuitable for public production scale;
-the global throughput bottleneck, snapshot cost and lock-held auth latency require
-a different service contract before scaling. Noncooperating writers are outside
-its guarantees. No owner/source is inferred from request metadata.
-
-Each read uses `LIMIT bound+1`, explicit columns and aggregate remaining row
-capacity. Server-side JSON/text-size sentinels bound row/remaining-byte transfer;
-oversize is rejected rather than truncated into a successful snapshot. Strict
-mapping covers canonical UUIDs, booleans, safe positive bigint versions/revisions,
-nonnegative exact millisecond timestamps (1970 through year 9999), nulls, ISO
-dates, bounded strings and exact source JSON fields. Limits apply to the complete
-snapshot, including historical credential tombstones; filling it denies admission,
-never recycles old PINs. SQL is parameterized with fixed internal identifiers.
-
-The callback receives a separate operation-local draft. A wall-clock deadline
-covers acquisition, callback, diff/flush and commit acknowledgement. Fences and
-detachment are intended to prevent late callbacks from flushing into a later
-operation; failure runs bounded rollback and destroys the affected pool client.
-Late-acquired leases are destroyed. Callbacks must cooperate with the Node event
-loop: an in-process deadline cannot interrupt CPU-blocking trusted code. The pool
-must independently bound physical connections/queue and implement synchronous
-`release(error)` destruction. These contracts still need the actual SQL tests.
-
-Diff ordering removes dependent sessions/publications before parents; inserts
-parents before children and revokes old credentials before replacements. Existing
-credential keys/verifiers/versions cannot be changed or deleted/unrevoked.
-Session scope/version cannot be changed in place. Callback exceptions roll back;
-ordinary 401 return values commit guessing debits. Success requires an acknowledged
-`COMMIT` command, including rejecting a PostgreSQL `ROLLBACK` command tag.
-Lost acknowledgement is generic failure with **no replay or credential reissue**;
-the database may already have committed. Such a result needs independent bounded
-disposition before a human issues another credential.
-
-`postgres-repository-schema.sql` is a separate **unapplied local supplement** to
-the unchanged previously qualified `schema-proposal.sql`. It stores every guard
-already used by the service: membership status, end date, student/class active
-flags and label, with consistency against the original active projection.
-It is not a hosted migration, canonical membership resolver, grant or RLS policy.
-
-## Prepared qualification, not executed acceptance
-
-`tests/n88-postgres-service-repository.mjs` reuses the native N88/N44 ownership
-protocol and existing PG17.6/Node pg binaries read-only. It prepares a new exclusive
-owned directory, strict minimal child environment, OS-assigned loopback port,
-PID/birth/executable/exact `-D` checks, server data-directory readback and bounded
-connections. Its finally closes owned pools/clients, uses owned `pg_ctl fast -w`,
-checks PID absence/port rebound and releases the acquired integration lease.
-Those cluster/cleanup steps were **NOT_RUN**, because acquisition failed first.
-No HTTP/browser resources are needed for this repository-only change.
-
-`tests/fixtures/n88-postgres-service-repository/cases.mjs` instantiates the actual
-unchanged `createPortalService` with the new adapter and explicit fabricated
-teacher/ingress/crypto/time ports. Prepared cases cover issue/claim/read/publish/
-rotate/revoke and commit fences; observed advisory contention between independent
-pools; collision/tombstone reservation; source/context/global attempt/failure
-budgets and debit-before-sensitive-lookup; exact owner/entry/session/version/
-membership/projection denial; second-term identity and lifecycle races; callback,
-flush, aborted-commit, uncertain-commit and delayed-callback/acquisition/commit
-faults; capacity/type/retention checks; controlled stop/restart with new pool and
-actual persisted reads. **None of these is reported PASS.**
-
-| Required check | Actual status |
+| Required check | Actual evidence |
 | --- | --- |
-| `n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke` | NOT_RUN — lease prerequisite refused |
-| `n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart` | NOT_RUN — no SQL connections |
-| `n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits` | NOT_RUN — no cluster qualification |
+| `n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke` | PASS: issue/claim/read/publish/unpublish/rotate/revoke; exact published projection; HMAC verifiers only; held COMMIT proves no response before acknowledgement; retained tombstones. |
+| `n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart` | PASS: independent pools/backends with observed PostgreSQL advisory wait; credential collision retry; source/context/global and failure budgets; scope denial; stable second-term credential; lifecycle races; callback/flush/commit/deadline faults; fresh pool/service reads after controlled restart. |
+| `n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits` | PASS: per-table/global/byte admission fails closed, 11 invalid-value mutations and unsafe SQL bigint rejected; expired rate/session cleanup; credential tombstones retained; unchanged source bindings; owned server stopped/PID absent/port free and integration lease released. |
 
-`node --check` passed for repository, runner and fixture. Scoped source/evidence
-binding checks and staged whitespace/path checks are recorded separately. They
-are not SQL, rendered-UI, Auth or hosting acceptance. No broad build, old DDL
-suite, all-9,000 memory issuances, repeated UI or Preview was run.
+The mixed race submitted 12 actual valid/invalid service claims through two pools:
+exactly six attempts were admitted for the shared source, with persisted failure
+counts matching denied admitted attempts. Distinct-source context attempts capped
+at 30; a near-limit global race stopped at 100, and global daily failures at 500
+blocked further admission. Wrong-PIN/unknown-entry 401 results **committed** debits.
+A snapshot access probe verified attempt debits before the unchanged service
+accessed sensitive credential/context/membership collections. No sensitive lookup
+SQL preceded the fixed lock. The adapter conservatively loads its bounded private
+snapshot under that lock; the prelookup claim is about service access/order, not
+an assertion that rows are never materialized internally.
 
-[Scoped source checks](../../../tests/n88-postgres-service-repository.source-checks.json)
-record seven unchanged normalized-LF SHA256 bindings against both the activated
-base and freshly fetched origin main `197a1750ab1e7da57906a68886449a9de32669f8`.
-The prior native result and final-policy browser checks remain PASS for their
-original scope. These checks also confirm the new module has no normal runtime
-import and the owned phase directory contains only `owner.json`.
+Owner/auth/current-context/student/class/entry/cookie and ambiguous-membership
+negatives returned generic denial. Published projections excluded other students,
+owners and unpublished tasks. Illegal session-version mutation was rejected by
+the adapter before flush (the result's historical `versionFkRollback` label names
+this rejection; it does not establish that PostgreSQL FK enforcement was reached).
+Existing FK qualification remains in the unchanged prior native proof.
 
-The service, original schema and memory adapter remain unchanged. Existing final
-1000..9999/stable-second-term policy and the prior native SQL/browser evidence
-are retained; their different implementations do not certify this new port.
-No normal app/router/SW/schema deployment import was added.
+A locked fabricated canonical transition ended the first membership and added a
+verified second-term membership/publication. Concurrent login waited, retained the
+identical stored credential/PIN/private entry and read only second-term tasks;
+the old session denied. Revoke-before-login and login-before-rotation serialized
+and retired prior sessions. No automatic code reset, enrollment or publication.
+The final 1000..9999/9,000-value boundary and UI proofs were hash-bound and reused,
+not rerun as 9,000 issuances or a new browser claim.
 
-## Resource disposition and retry condition
+Fault cases covered callback exceptions, actual PostgreSQL flush constraint failure,
+an aborted transaction returning a ROLLBACK command tag at COMMIT, simulated loss
+of acknowledgement **after real COMMIT**, delayed asynchronous teacher Auth,
+late pool acquisition and a withheld COMMIT acknowledgement. Failure returned
+503 without a code/cookie; uncertain COMMIT was attempted once, with no replay.
+A timed-out callback resumed after a later operation committed and could not
+flush/change its state. Database effects may already exist after lost COMMIT ACK;
+this is a generic unavailable result, not proof of rollback or permission to
+reissue credentials automatically.
 
-Retained ownership-only directory:
-`artifacts/n88-repository-pg-ae391bc2-7990-43ad-aab2-b7726a562e8a-63ca5879-67ce-488c-ac6a-bba1a260b165/`.
-Read-only inspection confirms its data directory is absent. No server/port/client/
-pool or lease was acquired, so no PostgreSQL stop or PID-absence test applies.
-No recursive deletion was attempted. Prior recursive-cleanup refusals remain
-binding; no old cluster/data/port or another worker's resources were touched.
+## Port and bounded design
 
-Retry only after an **approved canonical integration-lease execution route under
-existing policy** is established. Resume this exact candidate/session and qualify
-the port on a new owned synthetic cluster; preserve the original refusal. Do not
-change execution policy or bypass a tool denial to obtain a PASS.
+`drafts/n88-student-portal/postgres-repository.mjs` requires an injected exclusive
+pg-compatible connection port and explicit row/byte/time bounds. No driver,
+connection/Auth/config defaults, broad SQL execution export, retry or memory
+fallback. A fixed trusted transaction-owned advisory lock serializes all owners,
+global guessing budgets and every cooperating canonical fixture writer. Query
+identifiers are fixed; values are parameterized. Noncooperating writers are outside
+the protocol. The asynchronous callback executes inside the real transaction.
+
+Reads use LIMIT bound+1, aggregate remaining row capacity, explicit columns and
+server-side JSON/byte sentinels; oversize is rejected rather than truncated into a
+successful snapshot. Strict mappings reject unsafe bigint/version/revision/time,
+UUID/boolean/null/date/source-JSON/string values. Timestamps use exact nonnegative
+milliseconds through year 9999. Callback snapshots and returned values are detached;
+whole-operation deadlines fence acquisition/callback/flush/commit, with bounded
+rollback and destruction of broken/late clients. Pool queue/connection limits are
+also required. Trusted callbacks must cooperate with the Node event loop; timers
+cannot interrupt blocking CPU loops.
+
+Child-first deletions, parent-first writes and old-credential revocations before
+replacement insert preserve FK and active uniqueness. Credential verifiers/keys
+cannot be rekeyed, deleted or unrevoked; session scope cannot be rewritten. The
+adapter never purges PIN/entry tombstones. Capacity exhaustion fails closed,
+including history; service cleanup of expired/revoked sessions and expired budgets
+is retained. No new service/security/PIN/term policy was introduced.
+
+The separate `postgres-repository-schema.sql` supplement represents all existing
+membership guards (status/end date/student and class activity/label) and checks
+the original active projection. It was applied only to the new owned fabricated
+cluster, not to any hosted database or migration history. No new grants/RPC/policy.
+
+**Scale limit:** global serialization and bounded full snapshots intentionally suit
+only a small inactive pilot. Lock-held async Auth, snapshot transfer, operation
+latency and historical capacity prevent a public-production scalability claim.
+Independent current canonical resolution, real Auth and ingress still need
+separate implementation/authorization before any activation.
+
+## Original refusal, correction and owned resources
+
+The [original refusal](../../../tests/n88-postgres-service-repository.lease-policy-denial.json)
+and [initial BLOCKED assessment](../../../tests/n88-postgres-service-repository.initial-blocked.json)
+retain their original FAIL/NOT_RUN: Windows PowerShell refused to load
+`resource-lease.ps1` because “running scripts is disabled on this system”
+(`SecurityError / UnauthorizedAccess`), before any DB/port/lease existed.
+The prior empty ownership directory was left intact.
+
+The activated 17:36 correction explicitly restored the canonical controller's
+existing per-process invocation for BOTH acquire/release:
+`-NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File <same helper>`.
+Current run ID and source/base bookkeeping were updated. No Set-ExecutionPolicy,
+registry/User/Machine/GroupPolicy/ACL/ZoneIdentifier change, Bypass/Unrestricted,
+alternative host, manual/skipped lease or refused N64/N36 operation occurred.
+The original refusal was not rewritten to PASS. No product module fix was needed
+after the first real SQL run; only documentation/source receipt work followed.
+
+New exclusive owned phase:
+`artifacts/n88-repository-pg-d80c7450-1db7-4c65-8945-1007808c042b-91ef1233-a3dc-4f2f-b895-eab41311b9ef/`.
+Loopback port 52670; master PID 26536/birth `2026-10-17T14:39:26.2516250Z`, then
+28892/birth `2026-10-17T14:39:48.5081480Z` after controlled fast shutdown/restart.
+Marker, PID/birth, executable, exact -D, PID-file directory/port and SQL
+`data_directory`/host/port were verified. Only installed native binaries/pg client
+were reused read-only; no old dataDir, default PG configuration or service.
+
+All owned clients/pools closed. Owned `pg_ctl fast -w -t 20` stopped each server;
+final exact PID absent and exact port rebound/released, integration lease released.
+STOPPED checkpoint retained; no recursive deletion or substitute cleanup. Minimal
+allowlisted child environment, SCRAM, query/lock/idle deadlines, fsync/synchronous
+commit/full-page writes; SQL/error-statement/bind logging suppressed. Raw PINs,
+private entries, session tokens and ephemeral keys/passwords were not printed.
+No browser, HTTP server, personal profile, controller/queue/STOP or other worker
+resource was touched. Restart proof is **controlled clean restart**, not crash or
+power-loss durability.
+
+[Scoped source receipt](../../../tests/n88-postgres-service-repository.source-checks.json)
+binds the executed source hashes and unchanged current-main policy evidence,
+syntax, inactive app scope and staged path/whitespace checks. Unchanged SQL/UI
+proofs are reused, with no full Vite build, broad audit, UI/Preview rerun or old DDL
+suite. Independent publisher alone owns source-only integration/publication.
 
 **NOT_IMPLEMENTED / NOT_RUN:** hosted teacher Auth, current canonical membership/
-publication resolver, trusted ingress, hosting/service deployment, key custody,
-frontend wiring, HTTPS/private-path log redaction, real student access, public
-scale and crash/power-loss recovery. No hosted SQL/Auth/RLS, real identity/data,
-messages, subscriptions or access activation. The independent controller alone
-owns source publication; N88 remains OPEN and is not ready for real students.
+publication resolver, trusted ingress, hosting/service deployment, server key
+custody, frontend wiring, HTTPS/private-path/CDN log redaction, real devices,
+real student access, public scale and crash/power-loss recovery. No hosted
+SQL/Auth/RLS, real data/messages, subscriptions or access activation. N88 remains
+OPEN; this local adapter qualification is not Product acceptance or live readiness.

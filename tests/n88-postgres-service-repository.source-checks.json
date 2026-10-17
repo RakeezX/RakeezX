@@ -1,36 +1,49 @@
 {
   "taskId": "continuous-n88-postgres-service-repository-20261017",
-  "runId": "ae391bc2-7990-43ad-aab2-b7726a562e8a",
+  "runId": "d80c7450-1db7-4c65-8945-1007808c042b",
   "baseSha": "98d8e7ab2905a2786461745af970f0b8f4fb9288",
-  "observedOriginMain": "197a1750ab1e7da57906a68886449a9de32669f8",
-  "observedAt": "2026-10-17T14:36:11.827Z",
+  "preservedCandidate": "65364b2926d81fa9b50c687fa7c62b3a9ea36994",
+  "observedOriginMain": "7df8564653fffbb422ce8d9024814da7473df688",
+  "observedAt": "2026-10-17T14:41:42.242Z",
+  "qualifiedSql": true,
   "checks": [
     {
-      "name": "scoped_node_syntax",
+      "name": "executed_candidate_source_hashes",
       "status": "PASS",
-      "evidence": "node --check: repository, runner, case fixture"
+      "evidence": "All four actual execution source hashes still match current files; no code changes after SQL PASS."
     },
     {
       "name": "unchanged_current_service_schema_and_prior_proof_bindings",
       "status": "PASS",
-      "evidence": "Seven normalized-LF SHA256 bindings match worktree, activated base and freshly fetched origin main; prior native result PASS and final policy browser checks PASS. Reused proofs do not certify new repository."
+      "evidence": "Seven normalized-LF bindings match worktree, activated base and freshly fetched origin/main. Prior PIN/term/browser/native SQL evidence reused."
     },
     {
-      "name": "inactive_scope",
+      "name": "preserved_initial_denial_and_blocked_report",
       "status": "PASS",
-      "evidence": "No changes under src/public/sw.js/index.html/scripts/supabase; no new runtime import references."
+      "evidence": "Original denial and initial BLOCKED assessment match saved candidate verbatim after line-ending normalization."
     },
     {
-      "name": "no_owned_runtime_started",
+      "name": "scoped_syntax_and_inactive_source",
       "status": "PASS",
-      "evidence": "Exclusive directory contains only owner.json; data directory absent; lease failed before bind/initdb/connect. No alternate execution host or retry."
+      "evidence": "node --check passed for three modules; src/public/sw.js/index.html/scripts/supabase unchanged; no new runtime import."
     },
     {
-      "name": "staged_allowed_scope_and_whitespace",
+      "name": "owned_resource_disposition",
       "status": "PASS",
-      "evidence": "Eight explicitly staged files match activated allowedPaths; git diff --cached --check passed. Ownership artifact retained untracked."
+      "evidence": "Actual runner recorded owned fast shutdown, PID absence, exact port rebound/release, all pools/clients closed and guarded integration lease release."
+    },
+    {
+      "name": "staged_scope_and_whitespace",
+      "status": "PASS",
+      "evidence": "Nine cumulative candidate files match activated allowedPaths; staged diff whitespace check passed. Only owned retained artifacts remain untracked."
     }
   ],
+  "executedSourceHashes": {
+    "drafts/n88-student-portal/postgres-repository.mjs": "aaadcc9daaa8bc0a5024de1e0169a89b806ce5b655493bdb5b4e2e65916504fa",
+    "drafts/n88-student-portal/postgres-repository-schema.sql": "23dd853d712c85630aa242a0f187c85d366f5a3db2634eddb0a03e9819534697",
+    "tests/n88-postgres-service-repository.mjs": "927b54882330adba33ce817eaad59c643f641d860643076ab8e63e363f0c7ff2",
+    "tests/fixtures/n88-postgres-service-repository/cases.mjs": "f65e4db0b686df2a947a31dc7a9f1d2e3ae9cebf47043fdd10dde34ea25acda2"
+  },
   "bindings": {
     "drafts/n88-student-portal/service.mjs": "71b57c93802a7f5bd1c83bb914ec95e69c029ef4df4bcfd0f5ab2e87dfacae74",
     "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
@@ -40,6 +53,35 @@
     "tests/n88-real-pilot-final-policy-browser.json": "8d4dda1553367432e94df723437e0875ee66b8af62d0ab697dfa5b411c4572ed",
     "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md": "d3a347f57a086858f986ce1f0bde40c663fe697002d31a5d8f2fb8f192c0c796"
   },
-  "qualifiedSql": false,
-  "originalDenial": "tests/n88-postgres-service-repository.lease-policy-denial.json"
+  "requiredChecks": [
+    {
+      "name": "n88_real_postgres_repository_runs_actual_portal_issue_claim_read_publish_revoke",
+      "status": "PASS",
+      "dependencies": [
+        "actual_service_issue_claim_read_publish_rotate_revoke_and_projection"
+      ]
+    },
+    {
+      "name": "n88_two_service_sql_budget_serialization_term_identity_rollback_and_restart",
+      "status": "PASS",
+      "dependencies": [
+        "two_independent_pools_actual_advisory_wait_collision_and_unique_credentials",
+        "actual_global_source_context_failure_debits_and_mixed_concurrent_limits",
+        "actual_owner_entry_namespace_session_version_and_membership_guards",
+        "actual_term_transition_and_login_rotate_revoke_serialization",
+        "async_callback_deadline_detachment_acquisition_flush_rollback_commit_faults",
+        "new_pool_service_after_controlled_stop_restart_persistence"
+      ]
+    },
+    {
+      "name": "n88_owned_cleanup_bounded_inactive_port_honest_hosted_auth_and_privacy_limits",
+      "status": "PASS",
+      "dependencies": [
+        "bounded_snapshot_strict_mapping_retention_and_inactive_bindings",
+        "owned_cleanup_and_inactive_limits"
+      ]
+    }
+  ],
+  "originalDenial": "tests/n88-postgres-service-repository.lease-policy-denial.json",
+  "initialBlocked": "tests/n88-postgres-service-repository.initial-blocked.json"
 }
