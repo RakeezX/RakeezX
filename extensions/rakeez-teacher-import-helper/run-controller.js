@@ -14,6 +14,8 @@ let diagnosticLines=[];
 const entryText=e=>`pageKind=${e.pageKind} | readyState=${e.readyState} | sourceTabMatch=${(e.sourceTabMatch===true?'true':e.sourceTabMatch===false?'false':'unknown')} | roleMarkers=${e.roleMarkers} | schoolOptions=${e.schoolOptions} | navMarkers=${e.navMarkers} | actionMarkers=${e.actionMarkers} | safeReadLinks=${e.safeReadLinks} | iframeCount=${e.iframeCount}${e.linkStats?' | '+Object.entries(e.linkStats).map(([key,value])=>key+'='+value).join(' | '):''}`;
 function showDiagnostic(d){
  if(!d)return;
+ if(d.pager)window.n36Diagnostics?.publish({terminal:d.pager.terminalEvidence,endpoint:d.pager.endpointKind,currentPage:d.pager.currentPage,disabledNext:d.pager.disabledNext});
+ if(d.run)window.n36Diagnostics?.publish({stage:d.run.coverage==='partial'?'partial':'review',valid:d.run.staged,staged:d.run.staged,observed:d.run.observed,coverage:d.run.coverage,hasNext:d.run.hasNextReport,processedPages:d.run.processedReportPages});
  let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | commitEvidence=receiver-only | excluded=${d.run.excluded||'none'} | coverage=${d.run.coverage} | hasNextReport=${d.run.hasNextReport} | processedReportPages=${d.run.processedReportPages} | reviewWindow=${d.run.reviewWindow}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
  if(d.pager)line+=' | '+['pagerCount','currentPage','endpointKind','disabledNext','terminalEvidence'].map(k=>k+'='+d.pager[k]).join(' | ');
  if(d.roster)line+=` | cause=${d.roster.cause} | relevant=${d.roster.relevant} | unsupported=${d.roster.unsupported} | iframeCount=${d.roster.iframes} | frameReport=unconfirmed`;
@@ -35,6 +37,7 @@ function clearPreview(continuing=false){clearInterval(reviewClock);$('review-rem
 function stop(code='CANCELLED',diagnostic=null,context=null){
  chrome.runtime.sendMessage({type:'n36-cancel'}).catch(()=>{});
  cancelReports(job??review);generation++;if(continueReject){continueReject(Error('CANCELLED'));continueReject=null;}if(choiceReject){choiceReject(Error('CANCELLED'));choiceReject=null;}$('school-choices').replaceChildren();$('school-choices').hidden=true;if(job){clearTimeout(job.timer);clearTimeout(job.expiryTimer);job.sourceRows.length=0;job.fetches.clear();job.routes.length=0;job.categories.length=0;job=null;}clearPreview();
+ window.n36Diagnostics?.publish({stage:code==='CANCELLED'?'cancelled':code==='REVIEW_EXPIRED'?'expired':'error'});
  showDiagnostic(diagnostic);$('run-cancel').disabled=true;
  if(code==='REVIEW_EXPIRED'){$('run-counts').textContent='';$('run-missing').textContent='';$('run-skipped').textContent='';$('run-reopen').hidden=false;announce('انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا.');return;}
  showDiagnostic(diagnostic??{stage:context?.stage??'run',reason:code,category:context?.kind??'students'});
@@ -123,6 +126,7 @@ async function start(tabId){
  if(job||review)stop('NEW_RUN');const ticket=++generation;
  clearPreview();$('legacy-names').hidden=true;$('structured-category').hidden=false;$('manual-controls').hidden=true;$('run-cancel').disabled=false;
  diagnosticLines=[];$('entry-state').textContent='';$('route-diagnostic').hidden=true;$('copy-route-diagnostic').hidden=true;$('run-skipped').textContent='';
+ window.n36Diagnostics?.publish({stage:'collecting'});
  let stage='start-path',kind='start',path='';
  try{
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
@@ -210,6 +214,7 @@ async function start(tabId){
     }
     catch(e){if(e.message==='SCHOOL_CONTEXT_CHANGED')throw e;job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
    }
+   window.n36Diagnostics?.publish({stage:'collecting',staged:job.sourceRows.length,observed:job.studentRowsSeen,excluded:job.excluded,processedPages:job.reportPages});
    $('run-counts').textContent=`${job.pages} صفحات؛ ${job.sourceRows.length} طلاب؛ ${job.categories.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.`;
    if(page.rowContinuation!==null&&page.rowContinuation!==undefined)job.routes.unshift({kind:'students',path:next.path,rowOffset:page.rowContinuation});
    for(const link of page.links){
@@ -236,6 +241,7 @@ async function start(tabId){
 // AI: resource-only read continuation, independent of all class receipts.
 async function pauseCollection(ticket){
  const active=job;
+ window.n36Diagnostics?.publish({stage:'paused'});
  await Promise.all(active.fetches.values());current(ticket);
  review={tabId:active.tabId,origin:active.origin,context:active.context,expires:active.expires??Date.now()+RUN_LIMITS.reviewMilliseconds};
  // A pre-roster discovery pause still owns one fixed privacy lease.
@@ -260,6 +266,7 @@ async function finishCollection(ticket){
  showDiagnostic({run:{...coverage,staged:active.sourceRows.length,observed:active.studentRowsSeen,complete:complete?active.sourceRows.length:0,excluded:warnings.join(',')}});
  $('run-counts').textContent='';
  $('run-missing').textContent='';$('run-skipped').textContent=warnings.length||active.excluded?`تعذّر جمع بعض الصفوف أو الصفحات؛ استُبعد ${active.excluded} صفًا. التفاصيل في التشخيص الاختياري.`:'';
+ window.n36Diagnostics?.publish({excluded:active.excluded});
  cancelReports(active);job=null;
  window.dispatchEvent(new CustomEvent('n36:source-roster',{detail:{rows:active.sourceRows,...coverage,excluded:active.excluded,hasNext:false}}));
  announce('انتهت قراءة الصفحات المتاحة. اختر الفصل أدناه.');armReview();
@@ -340,3 +347,6 @@ setInterval(async()=>{
 },3000);
 if(!runToken)$('one-start').disabled=false;
 $('copy-route-diagnostic').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('route-diagnostic').value);$('route-copy-status').textContent='نُسخ التشخيص الآمن فقط. لم يُرسل إلى أي جهة.';}catch{$('route-copy-status').textContent='حدّد سطر التشخيص الآمن وانسخه يدويًا؛ لم يُرسل شيء.';}});
+
+// AI: reached only after the actual ESM graph and entry handlers initialized.
+window.n36Diagnostics?.moduleReady("run-controller.js");

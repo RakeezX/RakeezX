@@ -19,7 +19,7 @@ test('N36 copy/download and surrounding owner/review controls preserved; N107 ow
     assert.deepEqual(await fs.readFile(p), execFileSync('git', ['show', baseSha + ':' + p]));
   }
   // Current N107 actual-app browser evidence checks extension-first placement,
-  // unchanged 0.5.10 download, responsive layout and tabs under the activated card.
-  assert.match(current, /rakeez-teacher-import-helper-0\.5\.10\.zip/);
+  // unchanged 0.5.11 download, responsive layout and tabs under the activated card.
+  assert.match(current, /rakeez-teacher-import-helper-0\.5\.11\.zip/);
   assert.ok(current.indexOf('${directExtensionEntry()}${rosterFilePane(list)}') > 0);
 });

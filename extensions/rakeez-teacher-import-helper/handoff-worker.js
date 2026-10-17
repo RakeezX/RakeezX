@@ -23,6 +23,11 @@ async function open(record) {
 }
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id || !sender.url || new URL(sender.url).origin !== new URL(chrome.runtime.getURL('popup.html')).origin || new URL(sender.url).pathname !== '/popup.html') return;
+  // AI: health has an exact no-payload schema, after the existing sender guard.
+  if(message?.type==='n36-health'){
+    if(Object.getPrototypeOf(message)!==Object.prototype||Object.keys(message).join()!=='type')return;
+    reply({ok:true,health:'ready'});return;
+  }
   enqueue(async()=>{
     if (message?.type === 'n36-cancel') { await clearAll(); return {ok:true}; }
     if(message?.type==='n36-result'){

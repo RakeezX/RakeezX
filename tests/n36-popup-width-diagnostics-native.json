@@ -1,0 +1,11 @@
+{
+  "nativeActionPopup": {
+    "status": "NOT_RUN",
+    "code": "NATIVE_ACTION_POPUP_NOT_RUN",
+    "evidence": "Owned headless engine did not expose a native action popup page; ordinary extension tab is not native-popup proof."
+  },
+  "moduleGraph": {
+    "status": "PASS",
+    "evidence": "Installed Chromium actual MV3 worker/protocol + popup/category/run ESM initialized; no-payload health returned ready under manifest CSP."
+  }
+}

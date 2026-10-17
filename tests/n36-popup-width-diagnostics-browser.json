@@ -1,0 +1,74 @@
+{
+  "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+  "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+  "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+      "status": "PASS",
+      "evidence": {
+        "before": 30,
+        "after": {
+          "root": 430,
+          "body": 430,
+          "main": 430,
+          "scroll": 430
+        },
+        "responsive": [
+          {
+            "viewport": 320,
+            "scroll": 320,
+            "body": 320,
+            "button": {
+              "x": 149.109375,
+              "y": 68,
+              "width": 152.890625,
+              "height": 39,
+              "top": 68,
+              "right": 302,
+              "bottom": 107,
+              "left": 149.109375
+            }
+          },
+          {
+            "viewport": 390,
+            "scroll": 390,
+            "body": 390,
+            "button": {
+              "x": 18,
+              "y": 26,
+              "width": 152.890625,
+              "height": 39,
+              "top": 26,
+              "right": 170.890625,
+              "bottom": 65,
+              "left": 18
+            }
+          },
+          {
+            "viewport": 1280,
+            "scroll": 1280,
+            "body": 840,
+            "button": {
+              "x": 238,
+              "y": 26,
+              "width": 152.890625,
+              "height": 39,
+              "top": 26,
+              "right": 390.890625,
+              "bottom": 65,
+              "left": 238
+            }
+          }
+        ],
+        "native": "See native.json; HTTP shrink viewport is not native action proof."
+      }
+    },
+    {
+      "name": "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+      "status": "PASS",
+      "evidence": "Real DOM top button before run, synthetic 303/10/7 partial summary/review handler, actual pre-export expiry/clear handler, health timeout/context invalidation, failed entry ESM, failed protocol import, write failure selectable fallback; prototype/accessor/unknown/sentinel/error allowlists; no collection mutation on copy."
+    }
+  ]
+}

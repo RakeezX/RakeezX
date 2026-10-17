@@ -62,3 +62,6 @@ $('download').addEventListener('click', () => {
   $('status').textContent = 'طُلب تنزيل ملف واحد. افتحه عبر استيراد الطلاب في ركيز وراجع المعاينة قبل تأكيد الإضافة.';
 });
 $('cancel').addEventListener('click', () => { clear(); $('table').value = ''; $('status').textContent = 'أُلغيت المعاينة ومُسحت الأسماء. لم تُضف بيانات إلى ركيز.'; });
+
+// AI: reached only after the actual ESM graph and entry handlers initialized.
+window.n36Diagnostics?.moduleReady("popup.js");

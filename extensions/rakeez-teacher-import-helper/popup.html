@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
+<head><meta charset="utf-8"><script src="diagnostics-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>مساعد إعداد المعلم</title><link rel="stylesheet" href="lib/rakeez-datetime.css"><link rel="stylesheet" href="popup.css"></head>
 <body><main>
-<h1>مساعد إعداد المعلم</h1><p class="notice">راجع أسماء الفصل ثم انقلها إلى ركيز؛ الحفظ بتأكيدك داخل ركيز.</p>
+<header class="popup-header"><h1>مساعد إعداد المعلم</h1><button id="copy-safe-report" type="button">نسخ معلومات التشخيص</button></header><p id="safe-report-status" role="status" aria-live="polite"></p><textarea id="safe-report" readonly hidden dir="ltr" rows="8" aria-label="معلومات التشخيص الآمنة للنسخ اليدوي"></textarea><p class="notice">راجع أسماء الفصل ثم انقلها إلى ركيز؛ الحفظ بتأكيدك داخل ركيز.</p>
 <section id="one-start-controls">
 <p>افتح صفحة مدرستي المصرّح لك بها واضغط البدء، ثم اختر الفصل وراجع أسماءه.</p>
 <button id="one-start" type="button" disabled>ابدأ الاستيراد من مدرستي</button>
