@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v68';
+const VERSION = 'rakeezx-v69';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -63,6 +63,11 @@ const SHELL = [
   './src/app.js',
   './src/lib/app-update.js',
   './src/router.js',
+  './src/lib/student-portal-client.js',
+  './src/lib/student-portal-runtime.js',
+  './src/views/student-portal.js',
+  './src/views/student-portal-teacher.js',
+  './src/styles/student-portal.css',
   './src/views/n88-student-invite-lab.js',
   './src/views/n88-public-guest.js',
   './src/lib/n88-invite-lab.js',
@@ -246,6 +251,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   // Do not cache API/Supabase requests or anything cross-origin
   if (url.origin !== self.location.origin) return;
+  // Private service responses and private entry navigation never enter any shell cache.
+  if (/^\/(?:api\/n88(?:\/|$)|s\/)/.test(url.pathname)) return;
   // Ignore non-http(s) requests like chrome-extension://
   if (!url.protocol.startsWith('http')) return;
 

@@ -1,0 +1,37 @@
+{
+  "taskId": "continuous-n88-actual-client-service-bindings-20261018",
+  "runId": "56295855-e4bb-4826-b632-ce4ae5589a81",
+  "baseSha": "7537657e8351fb7cb314a53ac4027c0976b3cf45",
+  "startedAt": "2026-10-17T23:17:16.404Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "httpClosed": true,
+    "isolatedBrowserClosed": true,
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-17T23:18:02.968Z",
+  "sourceSha256": {
+    "src/lib/student-portal-runtime.js": "6e3cf3debaadddc009e0e5ca8804d4f9d3dc0267631514c9e8c9467e84811115",
+    "src/lib/student-portal-client.js": "09b3ece32f811bf179ebf45d1806c03273b1b850b9b0038d1603b27303f59b3a",
+    "src/views/student-portal-teacher.js": "f72c0ebe7c787158cbab5e447ba5f42c074494efd95552c7ad76205337143195",
+    "src/views/student-portal.js": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+    "src/styles/student-portal.css": "2e1a2bd96915af6a8cd891f837e999519f7dac2e9afc0b6420f5ef3a36f82e14",
+    "src/router.js": "de8c4606ed6f545dcc466ab9bef778677ae84303e1967257bd310ae2b6f62d8a",
+    "sw.js": "52cb750ada019847276d7391fa1278728edda1025619dcc93320404d3f99cc47",
+    "tests/fixtures/n88-client-binding/journey.mjs": "f3a493b40ed7f72dac9c679767813db818202381f87a34ac63c756909c0574b7"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "taskId": "continuous-n88-actual-client-service-bindings-20261018",
+  "runId": "56295855-e4bb-4826-b632-ce4ae5589a81",
+  "baseSha": "7537657e8351fb7cb314a53ac4027c0976b3cf45",
+  "startedAt": "2026-10-17T23:20:33.789Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "n88_actual_teacher_student_client_server_contract_journey",
+      "status": "PASS",
+      "evidence": "390/1280 actual app modules + source CSS over loopback HTTP; bearer client -> actual Cloudflare signer/Web entry/verified Auth/restricted native PG. Deliberate publish/issue; no unpublished view; fresh update; identical PIN/private entry in term2; logout/expiry/rotation/revoke deny. Screenshots retained without credentials."
+    },
+    {
+      "name": "n88_client_owner_stale_revocation_default_off_and_offline_guards",
+      "status": "PASS",
+      "evidence": "Both default-OFF mounts have no controls or API calls; actual owner command guard/lease rejection before transport; held roster after owner switch and held student read after clear cannot render; enabled client against unavailable service exposes no controls; malformed ACK never succeeds. Offline shell check below; backend qualification reused unchanged."
+    },
+    {
+      "name": "n88_offline_shell_dependencies_and_private_cache_exclusion",
+      "status": "PASS",
+      "evidence": "Executed actual sw.js fetch handler: /api/n88 and /s bypass cache entirely; offline runtime JS uses cached shell response; all shell files exist and new runtime/view/style dependencies are listed. Synthetic VM only, not live SW certification."
+    }
+  ],
+  "cleanup": {
+    "httpClosed": true,
+    "isolatedBrowserClosed": true,
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-17T23:20:54.434Z",
+  "sourceSha256": {
+    "src/lib/student-portal-runtime.js": "6254919c509267765caffe9866451e4e4a1f0d1d014e1c881804ce459c666565",
+    "src/lib/student-portal-client.js": "09b3ece32f811bf179ebf45d1806c03273b1b850b9b0038d1603b27303f59b3a",
+    "src/views/student-portal-teacher.js": "f72c0ebe7c787158cbab5e447ba5f42c074494efd95552c7ad76205337143195",
+    "src/views/student-portal.js": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+    "src/styles/student-portal.css": "57a837d0503dbe4d684a39ba944e3cb023369895a93dd73d8231ffbaf64a0e0d",
+    "src/router.js": "de8c4606ed6f545dcc466ab9bef778677ae84303e1967257bd310ae2b6f62d8a",
+    "sw.js": "52cb750ada019847276d7391fa1278728edda1025619dcc93320404d3f99cc47",
+    "tests/fixtures/n88-client-binding/journey.mjs": "7f9f9333b6a834ec8e81e1c21afe81b0521220bce0d5159c9660a9c6002d26d2"
+  }
+}

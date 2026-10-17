@@ -1,13 +1,16 @@
 /** AI: inert same-origin injectable client. No import-time network or storage. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
-export function createStudentPortalClient({ fetch: send, base = '/api/n88' } = {}) {
+export function createStudentPortalClient({ fetch: send, base = '/api/n88', authorize = () => null } = {}) {
   if (typeof send !== 'function' || !/^\/api\/n88(?:\/s\/[A-Za-z0-9_-]{43})?$/.test(base)) throw Error('Scoped same-origin transport required');
   async function call(path, body) {
+    const authorization = await authorize(!!body);
     const response = await send(base + path, { method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
-      redirect: 'error', referrerPolicy: 'no-referrer', headers: body ? { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' } : {},
+      redirect: 'error', referrerPolicy: 'no-referrer', headers: { ...(body ? { 'Content-Type': 'application/json', 'X-N88-CSRF': '1' } : {}), ...(authorization ? { Authorization: 'Bearer ' + authorization } : {}) },
       ...(body ? { body: JSON.stringify(body) } : {}) });
     if (!response.ok) throw Error('unavailable');
-    return response.json();
+    const data = await response.json();
+    if (path === '/teacher/publish' && data?.updated !== true || path === '/teacher/revoke' && data?.revoked !== true || path === '/claim' && data?.claimed !== true || path === '/logout' && data?.loggedOut !== true) throw Error('unavailable');
+    return data;
   }
   return Object.freeze({ claim: code => call('/claim', { code: typeof code === 'string' ? normalizeDateTimeDigits(code) : code }), read: () => call('/read'), logout: () => call('/logout', {}),
     students: () => call('/teacher/students'),
