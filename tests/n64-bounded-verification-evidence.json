@@ -1,0 +1,79 @@
+{
+  "taskId": "continuous-n64-bounded-settings-verification-20261017",
+  "runId": "7e124420-8ef8-46c6-8252-3d77157380ea",
+  "scope": "Actual app DOM/handlers/CSS, isolated loopback synthetic fetch only; no live certification",
+  "preservedInitialFailures": [
+    "Rendered screenshot showed .btn CSS overriding hidden after success; corrected by removing the completed submit control.",
+    "Browser first and second runs: retry button defaulted to form submit and navigated the document, losing test bindings. Actual implementation defect fixed with explicit type=button; same-document retry now asserted.",
+    "Unit initial fixtures: fresh session did not wait on refresh; follow-up refreshed fixture remained expired and hung until owned test process was stopped. Corrected expired-before/fresh-after fixture."
+  ],
+  "results": [
+    {
+      "userTimeout": "12s; aborted; late result ignored; UI retry succeeds"
+    },
+    {
+      "refresh": {
+        "calls": 1,
+        "codes": [
+          "AUTH_TIMEOUT",
+          "AUTH_TIMEOUT",
+          "AUTH_TIMEOUT"
+        ],
+        "elapsed": 12011.29999999702,
+        "aborted": true,
+        "unchanged": true,
+        "retryToken": "retried-token"
+      }
+    },
+    {
+      "width": 1280,
+      "unchanged": {
+        "requests": 5,
+        "notifications": 0,
+        "storageWrites": 0,
+        "schedules": 0,
+        "paints": 0
+      },
+      "changed": {
+        "afterChange": 1,
+        "afterEquivalent": 1
+      },
+      "dialogRetryPendingCloseFocus": true,
+      "freshSameOwnerCompletionOnly": true,
+      "accountStoreOwner": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 320,
+      "unchanged": {
+        "requests": 5,
+        "notifications": 0,
+        "storageWrites": 0,
+        "schedules": 0,
+        "paints": 0
+      },
+      "changed": {
+        "afterChange": 1,
+        "afterEquivalent": 1
+      },
+      "dialogRetryPendingCloseFocus": true,
+      "freshSameOwnerCompletionOnly": true,
+      "accountStoreOwner": true,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "ownedBrowserAndServerClosed": true,
+  "fixtureLimitations": [
+    "Service Workers/external requests blocked. Existing synthetic helper returns incomplete Sync read fixtures; baseline automatic Sync warnings are expected, not a whole-Sync PASS. Measured unchanged-event scheduling delta is zero."
+  ],
+  "reusedUnchangedCloudTimeoutEvidence": true,
+  "sourceSha256": {
+    "src/lib/cloud.js": "992bf9d6d26cdb49b582088275f4df7e5d7df99715ebebeedd2b28744948d08f",
+    "src/views/settings.js": "191a5b313bb4a22d4800feb3532e1803125e2ba64e5fb9e05ebf40b276f1c29e",
+    "sw.js": "7bc69e20567b6df3cf773b275ecf268b00d4309cf1b90f6bc01cb4c4d828e140"
+  },
+  "visualInspection": [
+    "sent-320.png: readable RTL guidance and explicit Close, no stale sending submit button",
+    "sent-1280.png: centered actual application sheet, guidance and focus/Close assertions"
+  ]
+}

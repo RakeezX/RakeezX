@@ -18,6 +18,38 @@ export let session = null;
 export let user = null;
 let authRequired = false;
 let refreshInFlight = null;
+const verificationInFlight = new Map();
+const AUTH_REQUEST_TIMEOUT_MS = 12000;
+
+// Own the deadline as well as fetch cancellation: even a stalled response body or
+// a transport ignoring abort cannot commit after this operation has settled.
+function boundedAuthRequest(operation) {
+  const controller = new AbortController();
+  let active = true, timer;
+  const assertActive = () => {
+    if (!active) throw Object.assign(new Error('تعذر الاتصال بخدمة الحساب. أعد المحاولة.'), { code: 'AUTH_TIMEOUT' });
+  };
+  const deadline = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      active = false;
+      reject(Object.assign(new Error('انتهت مهلة الاتصال بخدمة الحساب. أعد المحاولة.'), { code: 'AUTH_TIMEOUT' }));
+      controller.abort();
+    }, AUTH_REQUEST_TIMEOUT_MS);
+  });
+  return Promise.race([operation(controller.signal, assertActive), deadline])
+    .finally(() => { active = false; clearTimeout(timer); controller.abort(); });
+}
+
+// Auth payloads are JSON. Compare every field, including nested metadata and
+// tokens, independently of object-key order; do not silence genuine changes.
+function authSnapshot(value) {
+  if (Array.isArray(value)) return value.map(authSnapshot);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, authSnapshot(value[key])]));
+  return value;
+}
+function authSignature() {
+  return JSON.stringify(authSnapshot({ session, user, authRequired }));
+}
 let authContextGeneration = 0;
 
 let mockBackend = null;
@@ -129,6 +161,7 @@ function persistedAuthOwner() {
 }
 
 function saveSession(data, { required = true } = {}) {
+  const priorSignature = authSignature();
   const nextUserId = data?.access_token ? (data.user?.id ?? user?.id) : null;
   const priorPersistedOwner = persistedAuthOwner();
   if (priorPersistedOwner && priorPersistedOwner !== nextUserId) {
@@ -153,13 +186,16 @@ function saveSession(data, { required = true } = {}) {
     user = data.user ?? priorUser ?? null;
     if (user && !session.user) session.user = user;
     authRequired = false;
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
   }
-  notify();
+  if (authSignature() !== priorSignature) {
+    if (session) localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+    notify();
+  }
 }
 
 export async function refreshSession() {
-  if (refreshInFlight) return refreshInFlight;
+  const refreshKey = JSON.stringify([authContextGeneration, user?.id, session?.access_token, session?.refresh_token]);
+  if (refreshInFlight?.key === refreshKey) return refreshInFlight.promise;
   if (!session?.refresh_token) {
     saveSession(null);
     throw authError('No refresh token is available');
@@ -169,15 +205,16 @@ export async function refreshSession() {
   const expectedOwnerId = user?.id;
   const contextGeneration = authContextGeneration;
   const assertRefreshContext = () => {
-    if (authContextGeneration !== contextGeneration || persistedAuthOwner() !== expectedOwnerId) {
+    if (authContextGeneration !== contextGeneration || persistedAuthOwner() !== expectedOwnerId || user?.id !== expectedOwnerId || session?.access_token !== previous.access_token || session?.refresh_token !== refreshToken) {
       throw Object.assign(new Error('Authentication changed during refresh'), { code: 'AUTH_CONTEXT_CHANGED' });
     }
   };
-  refreshInFlight = (async () => {
+  const flight = { key: refreshKey };
+  flight.promise = boundedAuthRequest(async (signal, assertActive) => {
     let response;
     try {
       response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-        method: 'POST',
+        method: 'POST', signal,
         headers: { apikey: PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
@@ -185,9 +222,11 @@ export async function refreshSession() {
       error.code ??= 'AUTH_NETWORK';
       throw error;
     }
+    assertActive();
     assertRefreshContext();
     if (!response.ok) {
       const failure = await responseFailure(response);
+      assertActive();
       assertRefreshContext();
       if ([400, 401, 403].includes(response.status)) {
         saveSession(null);
@@ -196,11 +235,14 @@ export async function refreshSession() {
       throw failure;
     }
     const refreshed = await response.json();
+    assertActive();
     assertRefreshContext();
+    if (refreshed.user?.id && refreshed.user.id !== expectedOwnerId) throw Object.assign(new Error('Refresh owner mismatch'), { code: 'AUTH_OWNER_MISMATCH' });
     saveSession({ ...previous, ...refreshed, user: refreshed.user ?? previous.user ?? user });
     return session;
-  })().finally(() => { refreshInFlight = null; });
-  return refreshInFlight;
+  }).finally(() => { if (refreshInFlight === flight) refreshInFlight = null; });
+  refreshInFlight = flight;
+  return flight.promise;
 }
 
 async function ensureFreshSession() {
@@ -328,35 +370,54 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(expected)) {
     throw Object.assign(new Error('A valid expected Auth user ID is required'), { code: 'INVALID_AUTH_USER_ID' });
   }
-  await ensureFreshSession();
-  if (!session?.access_token) throw authError('Authentication required');
-  let verified;
-  try {
-    verified = await request('/user', { method: 'GET' }, true);
-  } catch (error) {
-    if ([401, 403].includes(error?.status) && contextGeneration === authContextGeneration && user?.id === expected && persistedAuthOwner() === expected) {
-      saveSession(null);
+  const key = JSON.stringify([contextGeneration, expected, session?.access_token]);
+  if (verificationInFlight.has(key)) return verificationInFlight.get(key);
+  const verification = boundedAuthRequest(async (signal, assertActive) => {
+    const assertContext = () => {
+      assertActive();
+      if (contextGeneration !== authContextGeneration || user?.id !== expected || persistedAuthOwner() !== expected) {
+        throw Object.assign(new Error('Authentication changed during owner verification'), { code: 'AUTH_CONTEXT_CHANGED' });
+      }
+    };
+    assertContext();
+    // This deadline never aborts the independently bounded shared refresh.
+    await ensureFreshSession();
+    assertContext();
+    const attemptedToken = session?.access_token;
+    if (!session?.access_token) throw authError('Authentication required');
+    let verified;
+    try {
+      verified = await request('/user', { method: 'GET', signal }, true);
+    } catch (error) {
+      assertContext();
+      if (session?.access_token === attemptedToken && [401, 403].includes(error?.status) && contextGeneration === authContextGeneration && user?.id === expected && persistedAuthOwner() === expected) {
+        saveSession(null);
+      }
+      throw error;
     }
-    throw error;
-  }
-  const persistedOwner = persistedAuthOwner();
-  if (contextGeneration !== authContextGeneration || user?.id !== expected || !session?.access_token || persistedOwner !== expected) {
-    throw Object.assign(new Error('Authentication changed during owner verification'), { code: 'AUTH_CONTEXT_CHANGED' });
-  }
-  const actual = String(verified?.id ?? '').trim().toLowerCase();
-  if (actual !== expected) {
-    revokeOwnerLeases(expected);
-    revokeScoreCapabilities(expected);
-    throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
-      code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
+    assertContext();
+    if (session?.access_token !== attemptedToken) throw Object.assign(new Error('Authentication token changed during verification'), { code: 'AUTH_CONTEXT_CHANGED' });
+    const persistedOwner = persistedAuthOwner();
+    if (contextGeneration !== authContextGeneration || user?.id !== expected || !session?.access_token || persistedOwner !== expected) {
+      throw Object.assign(new Error('Authentication changed during owner verification'), { code: 'AUTH_CONTEXT_CHANGED' });
+    }
+    const actual = String(verified?.id ?? '').trim().toLowerCase();
+    if (actual !== expected) {
+      revokeOwnerLeases(expected);
+      revokeScoreCapabilities(expected);
+      throw Object.assign(new Error('Verified Auth user does not match the expected workspace owner'), {
+        code: 'AUTH_OWNER_MISMATCH', expectedOwnerId: expected, verifiedOwnerId: actual || null,
+      });
+    }
+    saveSession({ ...session, user: verified });
+    return Object.freeze({
+      id: actual,
+      verifiedAt: Date.now(),
+      source: 'supabase-auth-user',
     });
-  }
-  saveSession({ ...session, user: verified });
-  return Object.freeze({
-    id: actual,
-    verifiedAt: Date.now(),
-    source: 'supabase-auth-user',
-  });
+  }).finally(() => { if (verificationInFlight.get(key) === verification) verificationInFlight.delete(key); });
+  verificationInFlight.set(key, verification);
+  return verification;
 }
 
 /**
@@ -364,22 +425,37 @@ export async function verifyCurrentAuthIdentity(expectedOwnerId) {
  * Supabase keeps the current email authoritative until both confirmations finish.
  */
 export async function updateCurrentUserEmail(email) {
-  await ensureFreshSession();
-  if (!session?.access_token || !user?.id) throw authError('Authentication required');
-  const expectedOwnerId = String(user.id).trim().toLowerCase();
-  const updated = await request('/user', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  }, true);
-  const actualOwnerId = String(updated?.id ?? '').trim().toLowerCase();
-  if (actualOwnerId !== expectedOwnerId) {
-    throw Object.assign(new Error('Updated Auth user does not match the active workspace owner'), {
-      code: 'AUTH_OWNER_MISMATCH', expectedOwnerId, verifiedOwnerId: actualOwnerId || null,
-    });
-  }
-  saveSession({ ...session, user: { ...user, ...updated, id: expectedOwnerId } });
-  return user;
+  const contextGeneration = authContextGeneration;
+  const initialOwner = user?.id;
+  return boundedAuthRequest(async (signal, assertActive) => {
+    const assertContext = () => {
+      assertActive();
+      if (authContextGeneration !== contextGeneration || user?.id !== initialOwner || persistedAuthOwner() !== initialOwner) {
+        throw Object.assign(new Error('Authentication changed during email request'), { code: 'AUTH_CONTEXT_CHANGED' });
+      }
+    };
+    assertContext();
+    await ensureFreshSession();
+    assertContext();
+    const attemptedToken = session?.access_token;
+    if (!session?.access_token || !user?.id) throw authError('Authentication required');
+    const expectedOwnerId = String(user.id).trim().toLowerCase();
+    const updated = await request('/user', {
+      method: 'PUT', signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }, true);
+    assertContext();
+    if (session?.access_token !== attemptedToken) throw Object.assign(new Error('Authentication token changed during email request'), { code: 'AUTH_CONTEXT_CHANGED' });
+    const actualOwnerId = String(updated?.id ?? '').trim().toLowerCase();
+    if (actualOwnerId !== expectedOwnerId) {
+      throw Object.assign(new Error('Updated Auth user does not match the active workspace owner'), {
+        code: 'AUTH_OWNER_MISMATCH', expectedOwnerId, verifiedOwnerId: actualOwnerId || null,
+      });
+    }
+    saveSession({ ...session, user: { ...user, ...updated, id: expectedOwnerId } });
+    return user;
+  });
 }
 
 export async function signOut() {

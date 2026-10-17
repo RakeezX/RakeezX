@@ -35,6 +35,9 @@ let accountContractRequest = 0;
 let accountContractUnavailable = false;
 let emailFeedback = null;
 let removeEmailVerification = () => {};
+let emailVerificationInFlight = null;
+let verifiedEmailContext = '';
+let retryEmailVerification = () => {};
 // Presentation only: never persisted, and discarded when the rendered owner changes.
 let emailChangeView = { ownerId: null, sending: false, pending: '', error: '', sheetOpen: false };
 function currentEmailChangeView() {
@@ -85,7 +88,7 @@ function emailChangeSheet(currentEmail, submit) {
       </form>
     `,
     foot: html`
-      <button class="btn btn--ghost" data-sheet-close>إلغاء</button>
+      <button class="btn btn--ghost" data-sheet-close>إغلاق</button>
       <button class="btn btn--primary" type="submit" form="email-change-form">تأكيد التغيير</button>
     `,
     onMount: (root, done) => root.querySelector('#email-change-form')?.addEventListener('submit', async (event) => {
@@ -111,7 +114,14 @@ function emailChangeSheet(currentEmail, submit) {
       button.textContent = 'جارٍ الإرسال…';
       root.querySelector('[data-email-change-sending]').hidden = false;
       const message = await submit(result.email);
-      if (!message) { done(result.email); return; }
+      if (!root.isConnected) return;
+      if (!message) {
+        const status = root.querySelector('[data-email-change-sending]');
+        status.textContent = 'أُرسل طلب التغيير. أكّد الطلب من البريدين الحالي والجديد، وتحقق من البريد غير المرغوب فيه. يبقى بريدك الحالي معتمدًا حتى يكتمل التأكيدان.';
+        button.remove();
+        root.querySelector('.sheet__foot [data-sheet-close]').focus({ preventScroll: true });
+        return;
+      }
       error.textContent = message;
       error.hidden = false;
       root.querySelector('[data-email-change-sending]').hidden = true;
@@ -387,6 +397,7 @@ const settings = {
                   <bdi class="settings-account-summary__value" dir="ltr" data-account-email>${accountEmail || 'غير مسجل الدخول'}</bdi>
                   ${accountEmail && cloud.user ? html`<button class="btn btn--quiet btn--sm settings-email-edit" type="button" data-act="change-email" ${emailView.sending ? 'disabled' : ''}>${emailView.sending ? 'جارٍ الإرسال…' : 'تعديل'}</button>` : ''}
                 </div>
+                ${emailView.verificationError ? html`<p class="field__hint" role="status">${emailView.verificationError} <button class="btn btn--quiet btn--sm" type="button" data-act="retry-email-verification">إعادة المحاولة</button></p>` : ''}
                 ${emailView.sending ? html`<p class="field__hint" role="status" data-email-change-page-sending>جارٍ إرسال طلب تغيير البريد… يمكنك متابعة استخدام الإعدادات.</p>` : ''}
                   ${emailChangePending ? html`<div class="field__hint settings-email-feedback" role="status" data-email-change-feedback><span data-email-change-pending>تغيير البريد قيد التأكيد. بريدك الحالي ما زال معتمدًا.</span></div>
                     <details class="settings-email-instructions" data-email-change-instructions ${emailInstructionsExpanded ? 'open' : ''}>
@@ -639,19 +650,31 @@ const settings = {
     const view = currentEmailChangeView();
     emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email || view.pending });
     removeEmailVerification();
-    let observedEmail = '';
+    const context = () => JSON.stringify([cloud.user?.id, cloud.user?.email, cloud.user?.new_email, view.pending, cloud.session?.access_token]);
     const verifyEmail = () => {
-      if (cloud.user?.id !== ownerId || view.sending) return;
-      const signature = JSON.stringify([cloud.user.email, cloud.user.new_email]);
-      if (signature === observedEmail) return;
-      observedEmail = signature;
-      cloud.verifyCurrentAuthIdentity(ownerId).then(() => {
+      if (cloud.user?.id !== ownerId || view.sending || emailVerificationInFlight || context() === verifiedEmailContext) return;
+      const beforeFeedback = JSON.stringify(emailFeedback);
+      const hadError = Boolean(view.verificationError);
+      const flight = cloud.verifyCurrentAuthIdentity(ownerId);
+      emailVerificationInFlight = flight;
+      flight.then(() => {
         if (request !== accountContractRequest || cloud.user?.id !== ownerId || currentEmailChangeView() !== view || view.sending) return;
         emailFeedback = verifiedEmailFeedback(emailFeedback, { ownerId, email: cloud.user.email, pendingEmail: cloud.user.new_email, verified: true });
         if (emailFeedback.completed) view.pending = '';
+        verifiedEmailContext = context();
+        view.verificationError = '';
+        if (hadError || JSON.stringify(emailFeedback) !== beforeFeedback) repaint();
+      }).catch(() => {
+        if (request !== accountContractRequest || cloud.user?.id !== ownerId) return;
+        // Failure is neutral, never evidence of completion or grounds to clear data.
+        view.verificationError = 'تعذر التحقق من البريد. أعد المحاولة.';
         repaint();
-      }).catch(() => { /* No verified completion evidence: keep neutral/pending guidance. */ });
+      }).finally(() => {
+        if (emailVerificationInFlight === flight) emailVerificationInFlight = null;
+        if (request !== accountContractRequest) retryEmailVerification();
+      });
     };
+    retryEmailVerification = () => { verifiedEmailContext = ''; verifyEmail(); };
     removeEmailVerification = cloud.subscribe(verifyEmail);
     verifyEmail();
     refreshAccountContract()
@@ -672,6 +695,8 @@ const settings = {
 
   onUnmount() {
     removeEmailVerification();
+    retryEmailVerification = () => {};
+    verifiedEmailContext = '';
     if (emailFeedback) emailFeedback.completed = false;
     removeDepartmentInteraction();
     removeProfileAttention();
@@ -682,6 +707,7 @@ const settings = {
   },
 
   actions: {
+    'retry-email-verification'() { retryEmailVerification(); },
     async 'teacher-form'(el) {
       const teacherForm = el.dataset.val === 'feminine' ? 'feminine' : 'masculine';
       if (await store.patchProfile({ teacherForm })) {
