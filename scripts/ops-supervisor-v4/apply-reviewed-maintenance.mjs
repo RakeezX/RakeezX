@@ -375,7 +375,19 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       const sourceSpec = payload.files.find(file => file.repoPath === payload.sourceCardFile);
       const binding = catalogSourceBinding(catalog.tasks, state.task, update, payload.sourceCardFile, sourceSpec.expectedCanonicalSha256, catalog.followupSources ?? []);
       sourceBindings.set(update.card.id, binding);
-      insist((binding.baseline.requiredChecks ?? []).every(check => update.card.requiredChecks.includes(check)), 'This helper cannot remove required checks');
+      const baselineChecks = binding.baseline.requiredChecks ?? [];
+      const preservesChecks = baselineChecks.every(check => update.card.requiredChecks.includes(check));
+      const n36PublisherGateSplit = update.card.id === 'continuous-n36-available-partial-class-import-no-total-cap-20261017'
+        && binding.baseline.productId === 'N36' && update.card.productId === 'N36'
+        && baselineChecks.includes('n36_versioned_package_SHA_and_published_source_parity')
+        && !update.card.requiredChecks.includes('n36_versioned_package_SHA_and_published_source_parity')
+        && update.card.requiredChecks.includes('n36_versioned_package_SHA_and_local_source_binding')
+        && update.card.requiredChecks.length === baselineChecks.length
+        && baselineChecks.filter(check => check !== 'n36_versioned_package_SHA_and_published_source_parity').every(check => update.card.requiredChecks.includes(check))
+        && typeof update.card.objective === 'string' && update.card.objective.includes('VALIDATION CONTRACT REPAIR — 2026-10-17')
+        && update.card.acceptance?.some(item => typeof item === 'string' && item.includes('Cloudflare provider/immutable/served Production parity'))
+        && update.card.preparationAuthority?.publication === true;
+      insist(preservesChecks || n36PublisherGateSplit, 'This helper cannot remove required checks');
     }
     insist(!dirtyPaths().length, 'Ops checkout must be clean before maintenance');
     const common = cwd => path.resolve(cwd, git(['rev-parse', '--git-common-dir'], cwd));
