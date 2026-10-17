@@ -1,0 +1,2140 @@
+{
+  "q": {
+    "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "productId": "N36",
+    "activationId": "po-20261012-continuous",
+    "priority": -355,
+    "scopeKey": "n36-actual-popup-intrinsic-width-independent-safe-diagnostics",
+    "riskClass": "SENSITIVE",
+    "validationTier": "STANDARD",
+    "executionMode": "synthetic",
+    "liveMutation": false,
+    "dependsOn": [
+      "continuous-n107-calm-single-review-import-20261017"
+    ],
+    "objective": "Latest ACTUAL PO17October2026 14:37Saudi confirms0.5.10reload,303names/10classes/7pages samepartialterminal, and reports (1) clicking Chromeextension opens abnormallyNARROW/TALL nativepopup; (2) wants top «نسخ معلومات التشخيص» button collecting neededdevelopmentdiagnostics; (3) ChromeExtensions error «Failed to load the script unexpectedly», context handoff-protocol.js:0. Address these EXACT defects in0.5.11, not repeatcoverageparser or ask same303question. Sourceverbatimerror is user-supplied, not automaticallyinspected browser. Stable0.5.10disk24/24 previouslyverified; protocolfileexists. Failedloadrootcause currentlyUNKNOWN, do not assert missingfile/syntaxfixed withoutreproduction. Ownaccount303fullcount accepted, genericterminal current7 endpointnone stillunproven, actualRakeezsavedreceiptsunproven. Neverpersistrealroster/PII or copy suppliedstudentnames. CurrentN107calmimport workerownscentralhub, awaitdependencydelivery then startcurrentorigin/main preserveitsnewone-reviewflow; don't touch active/frozenworktree.\n\nA. NATIVE POPUP width: current popup.css starts html width430px, ends html max-width:100vw; body.run-page/ html:has(body.run-page) adjusttabflow. This trailingviewport-boundconstraint is CODEHYPOTHESIS for intrinsicpopup shrinkfeedback, notprovenactualrootcause. Prior tests servedpopupasHTTPpageat320/390/1280, notactualChromeactionintrinsicpopup. Establish regression with shrink-sized contentviewport/nativeextension ifavailable. Make normalactionpopup explicitcomfortablefixedinlinewidth (around430CSSpx, chosenwithinChrome25..800pxwidth/25..600pxheight bounds), stablemin width independentofitsowninitialviewport and readablecontrols; body/main/root sizingmustagree. Avoid min/max/100vw selfconstraint collapse, forcedtallnarrowcolumn or unintendedoverflow. Run/importTAB version mustremainresponsive320/390/1280 withmax840 andnormalverticalscroll, don't givefulltabfixed430 or globalminwidth causingmobileoverflow. Keepcompactsummary/review/one-transfer. Styleheader/copysecondarybutton professionallyRTL withwrap whenneeded. ReadCURRENT primaryChromeaction popup docs https://developer.chrome.com/docs/extensions/reference/api/action (popupautosizescontent), scriptingdocs onlyifneeded; no externalrandomblogs.\n\nActualverification: if an ALREADYAVAILABLE disposable owned headlessChromium supports realMV3 load+popup open withoutvisibleUI, usefresh emptyprofile andLOCALFABRICATED/noportal context, verifyactualextensionmodulegraph/backgroundload and popupintrinsicdimensions. This authorization ONLY isolatedheadlessownprocess, no personalChrome/profile/foregroundUI/realaccount/history/OSmouse/credential/copyclipboardreads. Do not installnewbrowser/dependencies, bypassdenial/reusepersonalCDP or openheadedwindow todemonstrate. Readexistingisolatedhelper constraints; genuineheadlessnativepopup unavailable => recordNATIVE_ACTION_POPUP_NOT_RUN and do meaningfulintrinsicshrinkCSS/boundedHTTPregression, neverclaimordinaryHTTPfixedviewport provesnativepopup. One focusedbefore/after andrun-tabresponsivecheck, not oldwholeN36suite.\n\nB. TOP COPY REPORT: visible secondary «نسخ معلومات التشخيص» atTOPbothpopup/runpage immediatelyreachable. User-clickonly clipboardWRITE no clipboardread, no automaticupload/network/monitoring, no newpermission. MuststillworkifmainESM/runcontroller/handoffprotocol importfails: tinyindependent firstloaded externalclassicbootstrap or equivalent self-contained failresilientloader withvalidMV3CSP (noinline/eval/remote). Avoid addingcopyhandlerdeepinsidetheveryfailingmodule. Existing route diagnostics canreusebut topcopycontains one cohesive plainJSON/textreport withreport-schema/version, extensionmanifestversion; contextenum popup/run-tab; browserfamily+major/platformenum whenreliable (no rawUA, devicesIDs, precisehardware); safecurrentinner/client/scrollwidth,height,devicePixelRatio/zoomlayoutindicators/computedroot/body/mainwidth; module/bootstrap/backgroundhealth status; collectionstage, valid/staged/observed/excludedcounts, classCOUNT, processedpageCOUNT, coverage/hasNext/terminal diagnostic fixedenums/booleans; transferstate enum/receiptstatus withNOtokens/nonce/rawIDs/roster; lastfew sanitizedknownmodule-load/runtimeerrorcodes and ALLOWLISTED bundledassetbasename. Keepboundedfieldset/length/no wholeDOM or innerText scrape/HTML, no sourceURL/query/pathIDs/currenttabsIDs/extensionID/routehash/session/credential/cookie/tokens/teacher/school/studentnames/classlabels/grades/rawstack/error.message arbitrarystrings. Counts useful; identity labels neverneeded. Collectaggregates fromexplicitly sanitized sharedstateprovider/current-safe-diagnosticpipeline, notreturnactivejob/envelope/state wholesale. Prototype/unexpectedkey/unknownreason/sentineltests ensure noPII. Unknownvalues explicitunknown/notavailable, notfakePASS. Capturewindowresourceerror/unhandledrejection into smallmemoryring usingfixedclassificationandallowedbasenameONLY, without savingrawmessage/reason anywhere. No permanentstorage/newlogs. Clearappropriateephemeralrunstate oncancel/expiry/contextchange, preserveonlynon-sensitivebootstatus; don'tclearor mutatecollection whilecopying.\n\nReportmustbeavailable beforestartrun, aftersuccessful303summarysynthetic, duringpartial/expiry/error, andwhenmainmodulemissingfailed. Clipboardwritepermissionfailure showsselectable safe-reporttextarea/manualcopyfallback and honeststatus, no silentusercopy-successclaim. Existinghiddennestedroutecopy mayberemoved/moved/reused toavoidduplicatedbuttons butsafeadvanceddeveloperdiagnostics remainavailable. TopbuttonmustnotexpandlegacyJSONstudentdataexport or automaticallycopyallnames. Avoid expensiveper-rowdiagnostics orfetchownfilesblockedbyconnect-srcnone.\n\nC. HANDOFF-PROTOCOL LOAD ERROR: validateexactZIP/manifest/resourcecase/references andESMgraph(Categoriespopup/handoffworker bothimportprotocol), JSparse/lifecycle/startupCSP. Use syntheticMV3integration ifavailable toload actualmodules/serviceworker andinvokeNO-PAYLOADhealth roundtriponly, neveractualschoolbrowser. Treatmissing/stale/updated-extensioncontext/import/reload failure asdifferentfixedcodes ifdistinguishable; notallHANDOFF_REQUEST. Optional diagnostichealth message canbeadded toworker withEXISTINGstrictsenderorigin/path/IDchecking, exactrequestallowlist, no storage/envelope/nonce/roster disclosure, no clearAll or transportcreation sideeffects. Deadlineboundedtimeout/failedworker status; no permission/CSP or externally_connectable widening, no scriptsinjectedoutsidepreviousactiveTabflow, no inline/eval/remote fallback. Allprotocol handoffTTL120s/singleclaim/receiveridentity/senderchecks/sanitizednames/max300 remainunchanged; don't circumventerrorbyremovingguards. If cause concretelyreproduced, fixandbefore/aftertest; ifnot, honestunresolvedrootcause with independentlyworkingdiagnostics andvalidatedpackaging, not suppressconsole/clearChromeerrorhistory/falselysayChromeerrorgone. Independenttopreporthelpsuserfuturevoluntarycopy, don'trequestmoreactualschoolreadnow.\n\nPackage0.5.11 withsource/perfile/ZIP/manifest exactbindings, priorarchivespreserved. CentralKoshoofdownloadversion updateonly to0.5.11, preserveN107nowdirectextensionFIRST/onepreview/nooldJSON. No otherwebchanges/sw redesign. Existingstableminuteupdater handlesverifiedpackage aftersolepublisher provider+immutable+Production; then readitshealthandactualdiskmanifest/perfileproof naturallyafterrun, nevermanualunchangedupdate/ChromeReload/control. UserdoesoneReloadafteractualready. No newAIautomation/service/paidfeatures.\nChecksfocused: widthregressionbefore/afterandrun-tabresponsive; independenttopcopybeforemain/summary/failedESM +clipboardfailfallback +privacy-sentinel/fixederrorallowlist; actualmodulegraph/backgroundhealth importandstrictnosideeffectsenderchecks; packagingandtransportguardhashreuse. Synthetic303/10/7aggregate only, don't rerunold300fix/350/1000stress/parserwholecases. ValidateCSS/newbootstrapCSP compatibility; ifnamedchecks requireonlylocalready, actualChromeerrorrootcause/nativewindow limits documented honestly, notFAIL/NOT_RUN->PASS. Record latestactualPOobservation and concise evidence/resolution/remaininglimits docs. Returnexacttask/run/candidate/base/changedpaths/checks, nowholeN36CLOSED or actualschoolsaveclaim.\n\nMATERIAL VERIFIER REPAIR17October15:10: public technical popup.html has only pinned Cloudflare analytics tail; ZIP/manifest/source alreadyexact. Allow strict same observed pinned HTML normalization ONLY for exact popup.html repo/url pair in addition toindex, preserve allotherbytes/sourceSHA. Nativepopup/originalerror optionalNOT_RUN remaintruthful andnotrequired localchecks; publisherrechecks retainedcandidate after testedguardrepair, noProductreimplementation orbypass.\n\nMATERIAL VERIFIER REPAIR17October15:10: public technical popup.html has only pinned Cloudflare analytics tail; ZIP/manifest/source alreadyexact. Allow strict same observed pinned HTML normalization ONLY for exact popup.html repo/url pair in addition toindex, preserve allotherbytes/sourceSHA. Nativepopup/originalerror optionalNOT_RUN remaintruthful andnotrequired localchecks; publisherrechecks retainedcandidate after testedguardrepair, noProductreimplementation orbypass.",
+    "allowedPaths": [
+      "extensions/rakeez-teacher-import-helper/**",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+      "src/views/class-import-center.js",
+      "tests/n36-popup-width-diagnostics*.mjs",
+      "tests/n36-popup-width-diagnostics*.json",
+      "tests/fixtures/n36-popup-width-diagnostics/**",
+      "tests/n36-concise-import-panel.test.mjs",
+      "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md"
+    ],
+    "verificationPaths": [
+      "extensions/rakeez-teacher-import-helper/popup.css",
+      "extensions/rakeez-teacher-import-helper/popup.html",
+      "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+      "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+      "extensions/rakeez-teacher-import-helper/manifest.json",
+      "src/views/class-import-center.js"
+    ],
+    "requiredChecks": [
+      "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+      "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+      "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+      "n36_0511_source_package_binding_and_unchanged_transport_guards"
+    ],
+    "acceptance": [
+      "Comfortablefixednativepopup sizing regression addressed, responsivefullrunpage retained; nativeChromevalidation honestlydistinguished fromHTTP.",
+      "Topcopy worksindependentlyofmainESM andcollectsusefulbounds/enums/counts/errorassetinfo withNOnames/IDs/tokens/URLs/rawstacks ornewpermissions.",
+      "Moduleloadcauseinvestigated honestly; reproducedfixifpossible, safecodes/unknownotherwise, nofalseChromeerrorsresolvedclaim.",
+      "0.5.11package/site/stablelocalcoherent afterverifiedsolepublisher, N107newUXpreserved and noChromecontrol."
+    ],
+    "preparationAuthority": {
+      "kind": "PO1437-popup-bug-top-safe-diagnostics-protocol-load-investigation",
+      "syntheticTesting": true,
+      "publication": true,
+      "realStudentData": false,
+      "schoolPortalReadByAgent": false,
+      "personalBrowserAccess": false,
+      "isolatedHeadlessFabricatedExtensionTestOnly": true
+    },
+    "releaseAuthority": "PO17October14:37 explicitly reportsnativepopupwidth/Chromehandoff-protocol loadfailure and requests topcopy diagnostics fordevelopment. Reversibleextensioncode/privacy-safeuserclickcopy/syntheticisolatedheadlesstests andsolepublisher0.5.11releaseauthorized. No actualschool/personalbrowser/foregroundUI/agentread, realdatawrite, newpermissions/CSPrelaxation/AuthSQL/service orrefusalbypass.",
+    "approvedNote": {
+      "productId": "N36",
+      "source": "n36-popup-width-top-diagnostics-0511-20261017.json",
+      "sha256": "dc21c32a049cefbe39ec6f12a0d27a4eebe7884e178af58315558af7a4c327a5"
+    },
+    "workflowVersion": 5,
+    "status": "blocked",
+    "implementationFailures": 0,
+    "infrastructureRetries": 0,
+    "createdAt": "2026-10-17T11:41:12.392Z",
+    "updatedAt": "2026-10-17T12:21:03.220Z",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "worktreePrepared": true,
+    "cwd": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "attempt": {
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "specPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\attempt.json",
+      "outputPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\result.json",
+      "jsonlPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\events.jsonl",
+      "stderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\stderr.txt",
+      "checkpointPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\checkpoint.json",
+      "wrapperStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper.stdout.txt",
+      "wrapperStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper.stderr.txt",
+      "wrapperLaunchPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\wrapper-launch.json",
+      "brokerStdoutPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\broker.stdout.txt",
+      "brokerStderrPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\broker.stderr.txt",
+      "startedAt": "2026-10-17T11:47:53.785Z"
+    },
+    "resultPath": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\attempts\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\b2e99f0f-39a6-4e33-8cad-39697097e090\\result.json",
+    "runnerPid": null,
+    "runnerCreatedAt": null,
+    "brokerPid": null,
+    "brokerCreatedAt": null,
+    "probingClass": null,
+    "retryAt": null,
+    "lastModelError": null,
+    "ownedProcesses": [],
+    "watchdogIncident": null,
+    "eventLogIssue": null,
+    "checkpointIssue": null,
+    "wrapperExit": null,
+    "lastProgressScanAt": "2026-10-17T11:56:07.890Z",
+    "lastFileProgressAt": "2026-10-17T11:56:08.042Z",
+    "lastEventAt": "2026-10-17T11:56:19.734Z",
+    "progressFingerprint": "99746947f6dd55b820c5601aedebf067203e49ca22218591d1b3c6d8b784763d",
+    "productRecordKey": "po-20261012-continuous:blocked:fbb3ea39d73596088b10e8fb138433d07b8cb827:2159da1b7d11ccdc16772085f2ad4228c78e5543:SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+    "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+    "heartbeatAt": "2026-10-17T11:56:13.6629421Z",
+    "lastTurnCompletedAt": "2026-10-17T11:56:21.536Z",
+    "lastWorkerReap": {
+      "activationId": "po-20261012-continuous",
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "verifiedAbsentAt": "2026-10-17T11:56:21.537Z",
+      "exactAbsence": true,
+      "owners": [
+        {
+          "pid": 6152,
+          "createdAt": "2026-10-17T11:47:53.8010610Z"
+        },
+        {
+          "pid": 18896,
+          "createdAt": "2026-10-17T11:47:53.8754430Z"
+        },
+        {
+          "pid": 31528,
+          "createdAt": "2026-10-17T11:47:54.6370220Z"
+        },
+        {
+          "pid": 33724,
+          "createdAt": "2026-10-17T11:47:53.8881430Z",
+          "name": "conhost.exe",
+          "parentPid": 18896,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 31052,
+          "createdAt": "2026-10-17T11:47:54.6439630Z",
+          "name": "conhost.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 8784,
+          "createdAt": "2026-10-17T11:47:55.2022650Z",
+          "name": "node_repl.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 32476,
+          "createdAt": "2026-10-17T11:47:55.2073020Z",
+          "name": "node.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 6088,
+          "createdAt": "2026-10-17T11:47:55.2088550Z",
+          "name": "conhost.exe",
+          "parentPid": 8784,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 9420,
+          "createdAt": "2026-10-17T11:47:55.2154300Z",
+          "name": "conhost.exe",
+          "parentPid": 32476,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 12612,
+          "createdAt": "2026-10-17T11:47:55.3099950Z",
+          "name": "node_repl.exe",
+          "parentPid": 32476,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 30232,
+          "createdAt": "2026-10-17T11:48:03.3886420Z",
+          "name": "codex-code-mode-host.exe",
+          "parentPid": 31528,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        },
+        {
+          "pid": 2496,
+          "createdAt": "2026-10-17T11:48:03.3970830Z",
+          "name": "conhost.exe",
+          "parentPid": 30232,
+          "observedAt": "2026-10-17T11:56:15.038Z"
+        }
+      ]
+    },
+    "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+    "validationReceipt": {
+      "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "state": "LOCAL_READY",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "changedPaths": [
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+        "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+        "extensions/rakeez-teacher-import-helper/README.md",
+        "extensions/rakeez-teacher-import-helper/categories-popup.js",
+        "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "extensions/rakeez-teacher-import-helper/popup.css",
+        "extensions/rakeez-teacher-import-helper/popup.html",
+        "extensions/rakeez-teacher-import-helper/popup.js",
+        "extensions/rakeez-teacher-import-helper/run-controller.js",
+        "src/views/class-import-center.js",
+        "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+        "tests/n36-concise-import-panel.test.mjs",
+        "tests/n36-popup-width-diagnostics-browser.json",
+        "tests/n36-popup-width-diagnostics-browser.mjs",
+        "tests/n36-popup-width-diagnostics-native.json",
+        "tests/n36-popup-width-diagnostics-native.mjs",
+        "tests/n36-popup-width-diagnostics-package.json",
+        "tests/n36-popup-width-diagnostics-package.mjs"
+      ],
+      "checks": [
+        {
+          "name": "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+          "status": "PASS",
+          "evidence": "Actual HTTP DOM/CSS: shrink regression 30px before, 430px after; responsive run tabs at 320/390/1280 without horizontal overflow. Evidence: tests/n36-popup-width-diagnostics-browser.json."
+        },
+        {
+          "name": "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+          "status": "PASS",
+          "evidence": "Actual top-button handlers cover synthetic 303/10/7 summary, failed ESM/protocol import, expiry cleanup, clipboard fallback, health timeout/context invalidation and privacy sentinels."
+        },
+        {
+          "name": "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+          "status": "PASS",
+          "evidence": "Fresh installed headless Chromium loaded actual MV3 worker and page modules under unchanged CSP. Strict health tests observed zero storage/tab/alarm effects; 18 reachable JS files parsed with exact-case imports."
+        },
+        {
+          "name": "n36_0511_source_package_binding_and_unchanged_transport_guards",
+          "status": "PASS",
+          "evidence": "25 ZIP files match source, staged Git bytes and manifest hashes/sizes. Prior archive, protocol, parser, receiver and offline shell preserved; N107 site change is version-only."
+        },
+        {
+          "name": "scoped_assertion_and_commit_hygiene",
+          "status": "PASS",
+          "evidence": "Scoped concise-import test passed; staged diff whitespace check passed; AI-identified candidate committed; worktree clean. Owned browser/server resources closed and browser lease released."
+        },
+        {
+          "name": "NATIVE_ACTION_POPUP",
+          "status": "NOT_RUN",
+          "evidence": "Owned headless Chromium did not expose a native action-popup page. HTTP and extension-tab evidence are not native-window certification."
+        },
+        {
+          "name": "original_chrome_error_resolution",
+          "status": "NOT_RUN",
+          "evidence": "User-reported handoff-protocol.js load failure was not reproduced. Root cause remains UNKNOWN; no claim that the user's Chrome error disappeared."
+        },
+        {
+          "name": "publisher_production_and_stable_update",
+          "status": "NOT_RUN",
+          "evidence": "No push, deployment, manual updater or personal-browser control performed."
+        }
+      ],
+      "summary": "Committed 0.5.11 with stable popup sizing, independent privacy-safe top diagnostics and validated packaging. Native-popup measurement and original Chrome-error cause remain explicitly unresolved.",
+      "blockerType": "none",
+      "blocker": null,
+      "nextAction": "Independent controller/publisher integrates the candidate, verifies delivery and checks the subsequent natural stable-folder update.",
+      "hostValidatedAt": "2026-10-17T11:56:21.789Z",
+      "baseAdvance": null
+    },
+    "deliveryQueuedAt": "2026-10-17T11:56:21.789Z",
+    "nextDeliveryAt": null,
+    "failureClass": "external",
+    "lastFailure": "SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+    "deliveryOwner": null,
+    "deliveryStartedAt": "2026-10-17T11:56:21.891Z",
+    "deliveryReceipt": {
+      "version": 1,
+      "ticketId": "N36",
+      "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+      "productionUrl": "https://rakeezx.com",
+      "at": "2026-10-17T12:20:56.154Z",
+      "status": "pending",
+      "retryable": true,
+      "retryAfterSeconds": 20,
+      "errorCode": "SOURCE_PARITY_PENDING",
+      "message": "Provider succeeded but exact served-source verification has not passed",
+      "provider": {
+        "checkRunId": "117394274215",
+        "headSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-17T12:18:54Z",
+        "completedAt": "2026-10-17T12:18:54Z",
+        "headBranch": null,
+        "deploymentId": "6ac4abdf-e629-45ba-befa-cb762f1e837a",
+        "previewUrl": "https://6ac4abdf.rakeezx.pages.dev",
+        "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/6ac4abdf-e629-45ba-befa-cb762f1e837a"
+      },
+      "evidence": {
+        "immutable": {
+          "origin": "https://6ac4abdf.rakeezx.pages.dev",
+          "checkedAt": "2026-10-17T12:20:51.565Z",
+          "passed": true,
+          "assets": [
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "bytes": 4208,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "bytes": 105862,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "bytes": 64669,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "bytes": 3952,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+              "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "bytes": 4061,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "bytes": 8691,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "bytes": 6593,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "bytes": 807,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        },
+        "production": {
+          "origin": "https://rakeezx.com",
+          "checkedAt": "2026-10-17T12:20:52.460Z",
+          "passed": false,
+          "assets": [
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+              "bytes": 4208,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+              "bytes": 105862,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/views/class-import-center.js",
+              "urlPath": "src/views/class-import-center.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+              "bytes": 64669,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "index.html",
+              "urlPath": "/",
+              "requestProfile": "anonymous-browser-entry-chromium154",
+              "statusCode": 200,
+              "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "observedSha256": "d63480334fa1307f1c4d751ed00639fda7d45d3acda066d79bb83df23176519e",
+              "bytes": 5257,
+              "deleted": false,
+              "verified": true,
+              "normalization": "cloudflare-observed-tail-v2",
+              "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+              "normalizedBytes": 3952,
+              "removedProviderBytes": 1305,
+              "removedSha256": "ea127cc3ffa5be67ea0ad48d516e2f98e5bd77c6b61cb0724413a49e8a4ff669",
+              "providerTransforms": [
+                "cloudflare-jsd-v1",
+                "cloudflare-analytics-20261017"
+              ],
+              "providerAddedWhitespaceBytes": 1
+            },
+            {
+              "repoPath": "sw.js",
+              "urlPath": "sw.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+              "bytes": 12175,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "src/generated/build-meta.generated.js",
+              "urlPath": "src/generated/build-meta.generated.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+              "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+              "bytes": 358,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+              "bytes": 4061,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "6eb49aa54ae99dc655ee6852ff47cdd8cc73f86a187b3e0af673270d5418d9e6",
+              "bytes": 9164,
+              "deleted": false,
+              "verified": false
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+              "bytes": 2425,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+              "bytes": 6593,
+              "deleted": false,
+              "verified": true
+            },
+            {
+              "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+              "requestProfile": "static-source",
+              "statusCode": 200,
+              "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+              "bytes": 807,
+              "deleted": false,
+              "verified": true
+            }
+          ]
+        }
+      },
+      "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\integration-fbb3ea39d735-2-7732bfbf"
+    },
+    "parityWait": {
+      "key": "6e294a25cafcff37c20621cdc78c98db70137b0613e9150ab9a70f3180ff096d",
+      "firstAt": "2026-10-17T12:19:39.158Z",
+      "count": 3,
+      "lastAt": "2026-10-17T12:21:02.503Z",
+      "observations": [
+        {
+          "at": "2026-10-17T12:19:39.158Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "a402d7f00e58a27be6f5d4b7c0d70c681557dda3dc1844b621137fe9f1d92010"
+            }
+          ]
+        },
+        {
+          "at": "2026-10-17T12:20:20.980Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "b3038d2ef424bc0b7ea057b87f01f60f91cb6eedc8d094c39aea37a940a88d6d"
+            }
+          ]
+        },
+        {
+          "at": "2026-10-17T12:21:02.503Z",
+          "failedAssets": [
+            {
+              "origin": "production",
+              "path": "extensions/rakeez-teacher-import-helper/popup.html",
+              "statusCode": 200,
+              "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+              "observedSha256": "6eb49aa54ae99dc655ee6852ff47cdd8cc73f86a187b3e0af673270d5418d9e6"
+            }
+          ]
+        }
+      ]
+    },
+    "completionMode": "recheck_existing_publication",
+    "verificationRepair": {
+      "publishedSha": "b9b5eea6846b998af8aad31d1cd061fc25384300",
+      "priorReceiptSha256": "2ffd012cb1189b9a1f9c40e81bba86381d895795441390e64bb108c8f094afb7",
+      "reviewedFixtureSha256": "4d1e3aefce673fab726def08838b449c9da5fc56360ff766d93a0481b8cdf464",
+      "reason": "Actual Production popup.html has exactly pinned provider analytics injection; immutable source and downloaded ZIP/manifest match. The strict verifier only allowed index.html normalization. Preserve candidate/base/session and optional NOT_RUN native-window and original-error limitations; recheck exact publication through original publisher after explicit path-scoped repair."
+    },
+    "recoveryHistory": [
+      {
+        "at": "2026-10-17T12:11:15.783Z",
+        "commit": "1d514f547ee124d1a1fec04aa388bfb640d24efd",
+        "kind": "reviewed-material-maintenance",
+        "reason": "Fix reproduced strict public-popup HTML normalization path mismatch, preserve required PASS and optional NOT_RUN; recheck saved publication without repeating Product worker.",
+        "previousRunId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+        "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+        "preservedCandidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+        "previousQueuedCandidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+        "previousQueuedBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+        "preservedResultBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+        "previousFailure": "SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+        "previousImplementationFailures": 0,
+        "previousInfrastructureRetries": 0
+      },
+      {
+        "at": "2026-10-17T12:18:42.258Z",
+        "commit": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+        "kind": "reviewed-material-maintenance",
+        "reason": "Fix reproduced strict public-popup HTML normalization path mismatch, preserve required PASS and optional NOT_RUN; recheck saved publication without repeating Product worker.",
+        "previousRunId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+        "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+        "preservedCandidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+        "previousQueuedCandidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+        "previousQueuedBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+        "preservedResultBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+        "previousFailure": "SOURCE_PARITY_PENDING: repeated unchanged failing asset set after provider/immutable success. Preserve candidate and failed proof; diagnose exact mismatch before another delivery attempt. No Production acceptance.",
+        "previousImplementationFailures": 0,
+        "previousInfrastructureRetries": 0
+      }
+    ],
+    "sourceParityHistory": [
+      {
+        "at": "2026-10-17T12:11:15.783Z",
+        "reason": "Fix reproduced strict public-popup HTML normalization path mismatch, preserve required PASS and optional NOT_RUN; recheck saved publication without repeating Product worker.",
+        "receipt": {
+          "version": 1,
+          "ticketId": "N36",
+          "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+          "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+          "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+          "publishedSha": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+          "productionUrl": "https://rakeezx.com",
+          "at": "2026-10-17T11:58:44.408Z",
+          "status": "pending",
+          "retryable": true,
+          "retryAfterSeconds": 20,
+          "errorCode": "SOURCE_PARITY_PENDING",
+          "message": "Provider succeeded but exact served-source verification has not passed",
+          "provider": {
+            "checkRunId": "117390164189",
+            "headSha": "29d78769fb49d2617839ea4f2b35c993d833fc69",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-17T11:57:03Z",
+            "completedAt": "2026-10-17T11:57:03Z",
+            "headBranch": null,
+            "deploymentId": "4391a0a7-044e-407f-9fd1-d2c4f3fc3610",
+            "previewUrl": "https://4391a0a7.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/4391a0a7-044e-407f-9fd1-d2c4f3fc3610"
+          },
+          "evidence": {
+            "immutable": {
+              "origin": "https://4391a0a7.rakeezx.pages.dev",
+              "checkedAt": "2026-10-17T11:58:38.873Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "bytes": 3952,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+                  "observedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "bytes": 8691,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-17T11:58:39.906Z",
+              "passed": false,
+              "assets": [
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "d949c6a538217ea8c078e3be7ddb5ecd84807df87960538e2b2d26e1b6bb1abd",
+                  "bytes": 5257,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "normalizedBytes": 3952,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "b8ed8b63849facbff77647e32030fcc26d3a1cf9a51a2f6174b513367a4541f7",
+                  "providerTransforms": [
+                    "cloudflare-analytics-20261017",
+                    "cloudflare-jsd-v1"
+                  ]
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+                  "observedSha256": "764d8f2fc7dde885f83de12cfaef0e43854103afa1a74b000f3e1c5395cee547",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "f21707fcf863371dadd5212edab3e2b8e3e5a8440b83ba5013461aab56c5f525",
+                  "bytes": 9629,
+                  "deleted": false,
+                  "verified": false
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            }
+          },
+          "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\integration-fbb3ea39d735-1-01381edf"
+        }
+      },
+      {
+        "at": "2026-10-17T12:18:42.258Z",
+        "reason": "Fix reproduced strict public-popup HTML normalization path mismatch, preserve required PASS and optional NOT_RUN; recheck saved publication without repeating Product worker.",
+        "receipt": {
+          "version": 1,
+          "ticketId": "N36",
+          "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+          "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+          "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+          "publishedSha": "b9b5eea6846b998af8aad31d1cd061fc25384300",
+          "productionUrl": "https://rakeezx.com",
+          "at": "2026-10-17T12:14:00.556Z",
+          "status": "pending",
+          "retryable": true,
+          "retryAfterSeconds": 20,
+          "errorCode": "SOURCE_PARITY_PENDING",
+          "message": "Provider succeeded but exact served-source verification has not passed",
+          "provider": {
+            "checkRunId": "117392963153",
+            "headSha": "b9b5eea6846b998af8aad31d1cd061fc25384300",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-17T12:12:07Z",
+            "completedAt": "2026-10-17T12:12:07Z",
+            "headBranch": null,
+            "deploymentId": "5aa8b1f8-b6b3-4c75-b845-9fe0c6cbc1ce",
+            "previewUrl": "https://5aa8b1f8.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/5aa8b1f8-b6b3-4c75-b845-9fe0c6cbc1ce"
+          },
+          "evidence": {
+            "immutable": {
+              "origin": "https://5aa8b1f8.rakeezx.pages.dev",
+              "checkedAt": "2026-10-17T12:13:55.299Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "bytes": 3952,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "bytes": 8691,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-17T12:13:56.684Z",
+              "passed": false,
+              "assets": [
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "0e22784f0c9a8c0d09f7ea2893859784983baafc1b4e1f49d803b51dc9bc971d",
+                  "bytes": 5257,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "normalizedBytes": 3952,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "a34fc47a656022902e1e3dc7b5605e7d288aca2de1dd738361906b3fc7075428",
+                  "providerTransforms": [
+                    "cloudflare-jsd-v1",
+                    "cloudflare-analytics-20261017"
+                  ],
+                  "providerAddedWhitespaceBytes": 1
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "61099828ef659fa98c9696bbd39a65d5d1bd7eddf69cb56ef129c383fc6cf4c3",
+                  "bytes": 9164,
+                  "deleted": false,
+                  "verified": false
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            }
+          },
+          "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\integration-fbb3ea39d735-2-7732bfbf"
+        }
+      }
+    ],
+    "sourceParityState": null
+  },
+  "result": {
+    "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "runId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+    "state": "LOCAL_READY",
+    "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+    "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+    "worktreePath": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+    "changedPaths": [
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+      "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+      "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+      "extensions/rakeez-teacher-import-helper/README.md",
+      "extensions/rakeez-teacher-import-helper/categories-popup.js",
+      "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+      "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+      "extensions/rakeez-teacher-import-helper/manifest.json",
+      "extensions/rakeez-teacher-import-helper/popup.css",
+      "extensions/rakeez-teacher-import-helper/popup.html",
+      "extensions/rakeez-teacher-import-helper/popup.js",
+      "extensions/rakeez-teacher-import-helper/run-controller.js",
+      "src/views/class-import-center.js",
+      "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+      "tests/n36-concise-import-panel.test.mjs",
+      "tests/n36-popup-width-diagnostics-browser.json",
+      "tests/n36-popup-width-diagnostics-browser.mjs",
+      "tests/n36-popup-width-diagnostics-native.json",
+      "tests/n36-popup-width-diagnostics-native.mjs",
+      "tests/n36-popup-width-diagnostics-package.json",
+      "tests/n36-popup-width-diagnostics-package.mjs"
+    ],
+    "checks": [
+      {
+        "name": "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+        "status": "PASS",
+        "evidence": "Actual HTTP DOM/CSS: shrink regression 30px before, 430px after; responsive run tabs at 320/390/1280 without horizontal overflow. Evidence: tests/n36-popup-width-diagnostics-browser.json."
+      },
+      {
+        "name": "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+        "status": "PASS",
+        "evidence": "Actual top-button handlers cover synthetic 303/10/7 summary, failed ESM/protocol import, expiry cleanup, clipboard fallback, health timeout/context invalidation and privacy sentinels."
+      },
+      {
+        "name": "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+        "status": "PASS",
+        "evidence": "Fresh installed headless Chromium loaded actual MV3 worker and page modules under unchanged CSP. Strict health tests observed zero storage/tab/alarm effects; 18 reachable JS files parsed with exact-case imports."
+      },
+      {
+        "name": "n36_0511_source_package_binding_and_unchanged_transport_guards",
+        "status": "PASS",
+        "evidence": "25 ZIP files match source, staged Git bytes and manifest hashes/sizes. Prior archive, protocol, parser, receiver and offline shell preserved; N107 site change is version-only."
+      },
+      {
+        "name": "scoped_assertion_and_commit_hygiene",
+        "status": "PASS",
+        "evidence": "Scoped concise-import test passed; staged diff whitespace check passed; AI-identified candidate committed; worktree clean. Owned browser/server resources closed and browser lease released."
+      },
+      {
+        "name": "NATIVE_ACTION_POPUP",
+        "status": "NOT_RUN",
+        "evidence": "Owned headless Chromium did not expose a native action-popup page. HTTP and extension-tab evidence are not native-window certification."
+      },
+      {
+        "name": "original_chrome_error_resolution",
+        "status": "NOT_RUN",
+        "evidence": "User-reported handoff-protocol.js load failure was not reproduced. Root cause remains UNKNOWN; no claim that the user's Chrome error disappeared."
+      },
+      {
+        "name": "publisher_production_and_stable_update",
+        "status": "NOT_RUN",
+        "evidence": "No push, deployment, manual updater or personal-browser control performed."
+      }
+    ],
+    "summary": "Committed 0.5.11 with stable popup sizing, independent privacy-safe top diagnostics and validated packaging. Native-popup measurement and original Chrome-error cause remain explicitly unresolved.",
+    "blockerType": "none",
+    "blocker": null,
+    "nextAction": "Independent controller/publisher integrates the candidate, verifies delivery and checks the subsequent natural stable-folder update."
+  },
+  "update": {
+    "card": {
+      "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "productId": "N36",
+      "activationId": "po-20261012-continuous",
+      "priority": -355,
+      "scopeKey": "n36-actual-popup-intrinsic-width-independent-safe-diagnostics",
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n107-calm-single-review-import-20261017"
+      ],
+      "objective": "Latest ACTUAL PO17October2026 14:37Saudi confirms0.5.10reload,303names/10classes/7pages samepartialterminal, and reports (1) clicking Chromeextension opens abnormallyNARROW/TALL nativepopup; (2) wants top «نسخ معلومات التشخيص» button collecting neededdevelopmentdiagnostics; (3) ChromeExtensions error «Failed to load the script unexpectedly», context handoff-protocol.js:0. Address these EXACT defects in0.5.11, not repeatcoverageparser or ask same303question. Sourceverbatimerror is user-supplied, not automaticallyinspected browser. Stable0.5.10disk24/24 previouslyverified; protocolfileexists. Failedloadrootcause currentlyUNKNOWN, do not assert missingfile/syntaxfixed withoutreproduction. Ownaccount303fullcount accepted, genericterminal current7 endpointnone stillunproven, actualRakeezsavedreceiptsunproven. Neverpersistrealroster/PII or copy suppliedstudentnames. CurrentN107calmimport workerownscentralhub, awaitdependencydelivery then startcurrentorigin/main preserveitsnewone-reviewflow; don't touch active/frozenworktree.\n\nA. NATIVE POPUP width: current popup.css starts html width430px, ends html max-width:100vw; body.run-page/ html:has(body.run-page) adjusttabflow. This trailingviewport-boundconstraint is CODEHYPOTHESIS for intrinsicpopup shrinkfeedback, notprovenactualrootcause. Prior tests servedpopupasHTTPpageat320/390/1280, notactualChromeactionintrinsicpopup. Establish regression with shrink-sized contentviewport/nativeextension ifavailable. Make normalactionpopup explicitcomfortablefixedinlinewidth (around430CSSpx, chosenwithinChrome25..800pxwidth/25..600pxheight bounds), stablemin width independentofitsowninitialviewport and readablecontrols; body/main/root sizingmustagree. Avoid min/max/100vw selfconstraint collapse, forcedtallnarrowcolumn or unintendedoverflow. Run/importTAB version mustremainresponsive320/390/1280 withmax840 andnormalverticalscroll, don't givefulltabfixed430 or globalminwidth causingmobileoverflow. Keepcompactsummary/review/one-transfer. Styleheader/copysecondarybutton professionallyRTL withwrap whenneeded. ReadCURRENT primaryChromeaction popup docs https://developer.chrome.com/docs/extensions/reference/api/action (popupautosizescontent), scriptingdocs onlyifneeded; no externalrandomblogs.\n\nActualverification: if an ALREADYAVAILABLE disposable owned headlessChromium supports realMV3 load+popup open withoutvisibleUI, usefresh emptyprofile andLOCALFABRICATED/noportal context, verifyactualextensionmodulegraph/backgroundload and popupintrinsicdimensions. This authorization ONLY isolatedheadlessownprocess, no personalChrome/profile/foregroundUI/realaccount/history/OSmouse/credential/copyclipboardreads. Do not installnewbrowser/dependencies, bypassdenial/reusepersonalCDP or openheadedwindow todemonstrate. Readexistingisolatedhelper constraints; genuineheadlessnativepopup unavailable => recordNATIVE_ACTION_POPUP_NOT_RUN and do meaningfulintrinsicshrinkCSS/boundedHTTPregression, neverclaimordinaryHTTPfixedviewport provesnativepopup. One focusedbefore/after andrun-tabresponsivecheck, not oldwholeN36suite.\n\nB. TOP COPY REPORT: visible secondary «نسخ معلومات التشخيص» atTOPbothpopup/runpage immediatelyreachable. User-clickonly clipboardWRITE no clipboardread, no automaticupload/network/monitoring, no newpermission. MuststillworkifmainESM/runcontroller/handoffprotocol importfails: tinyindependent firstloaded externalclassicbootstrap or equivalent self-contained failresilientloader withvalidMV3CSP (noinline/eval/remote). Avoid addingcopyhandlerdeepinsidetheveryfailingmodule. Existing route diagnostics canreusebut topcopycontains one cohesive plainJSON/textreport withreport-schema/version, extensionmanifestversion; contextenum popup/run-tab; browserfamily+major/platformenum whenreliable (no rawUA, devicesIDs, precisehardware); safecurrentinner/client/scrollwidth,height,devicePixelRatio/zoomlayoutindicators/computedroot/body/mainwidth; module/bootstrap/backgroundhealth status; collectionstage, valid/staged/observed/excludedcounts, classCOUNT, processedpageCOUNT, coverage/hasNext/terminal diagnostic fixedenums/booleans; transferstate enum/receiptstatus withNOtokens/nonce/rawIDs/roster; lastfew sanitizedknownmodule-load/runtimeerrorcodes and ALLOWLISTED bundledassetbasename. Keepboundedfieldset/length/no wholeDOM or innerText scrape/HTML, no sourceURL/query/pathIDs/currenttabsIDs/extensionID/routehash/session/credential/cookie/tokens/teacher/school/studentnames/classlabels/grades/rawstack/error.message arbitrarystrings. Counts useful; identity labels neverneeded. Collectaggregates fromexplicitly sanitized sharedstateprovider/current-safe-diagnosticpipeline, notreturnactivejob/envelope/state wholesale. Prototype/unexpectedkey/unknownreason/sentineltests ensure noPII. Unknownvalues explicitunknown/notavailable, notfakePASS. Capturewindowresourceerror/unhandledrejection into smallmemoryring usingfixedclassificationandallowedbasenameONLY, without savingrawmessage/reason anywhere. No permanentstorage/newlogs. Clearappropriateephemeralrunstate oncancel/expiry/contextchange, preserveonlynon-sensitivebootstatus; don'tclearor mutatecollection whilecopying.\n\nReportmustbeavailable beforestartrun, aftersuccessful303summarysynthetic, duringpartial/expiry/error, andwhenmainmodulemissingfailed. Clipboardwritepermissionfailure showsselectable safe-reporttextarea/manualcopyfallback and honeststatus, no silentusercopy-successclaim. Existinghiddennestedroutecopy mayberemoved/moved/reused toavoidduplicatedbuttons butsafeadvanceddeveloperdiagnostics remainavailable. TopbuttonmustnotexpandlegacyJSONstudentdataexport or automaticallycopyallnames. Avoid expensiveper-rowdiagnostics orfetchownfilesblockedbyconnect-srcnone.\n\nC. HANDOFF-PROTOCOL LOAD ERROR: validateexactZIP/manifest/resourcecase/references andESMgraph(Categoriespopup/handoffworker bothimportprotocol), JSparse/lifecycle/startupCSP. Use syntheticMV3integration ifavailable toload actualmodules/serviceworker andinvokeNO-PAYLOADhealth roundtriponly, neveractualschoolbrowser. Treatmissing/stale/updated-extensioncontext/import/reload failure asdifferentfixedcodes ifdistinguishable; notallHANDOFF_REQUEST. Optional diagnostichealth message canbeadded toworker withEXISTINGstrictsenderorigin/path/IDchecking, exactrequestallowlist, no storage/envelope/nonce/roster disclosure, no clearAll or transportcreation sideeffects. Deadlineboundedtimeout/failedworker status; no permission/CSP or externally_connectable widening, no scriptsinjectedoutsidepreviousactiveTabflow, no inline/eval/remote fallback. Allprotocol handoffTTL120s/singleclaim/receiveridentity/senderchecks/sanitizednames/max300 remainunchanged; don't circumventerrorbyremovingguards. If cause concretelyreproduced, fixandbefore/aftertest; ifnot, honestunresolvedrootcause with independentlyworkingdiagnostics andvalidatedpackaging, not suppressconsole/clearChromeerrorhistory/falselysayChromeerrorgone. Independenttopreporthelpsuserfuturevoluntarycopy, don'trequestmoreactualschoolreadnow.\n\nPackage0.5.11 withsource/perfile/ZIP/manifest exactbindings, priorarchivespreserved. CentralKoshoofdownloadversion updateonly to0.5.11, preserveN107nowdirectextensionFIRST/onepreview/nooldJSON. No otherwebchanges/sw redesign. Existingstableminuteupdater handlesverifiedpackage aftersolepublisher provider+immutable+Production; then readitshealthandactualdiskmanifest/perfileproof naturallyafterrun, nevermanualunchangedupdate/ChromeReload/control. UserdoesoneReloadafteractualready. No newAIautomation/service/paidfeatures.\nChecksfocused: widthregressionbefore/afterandrun-tabresponsive; independenttopcopybeforemain/summary/failedESM +clipboardfailfallback +privacy-sentinel/fixederrorallowlist; actualmodulegraph/backgroundhealth importandstrictnosideeffectsenderchecks; packagingandtransportguardhashreuse. Synthetic303/10/7aggregate only, don't rerunold300fix/350/1000stress/parserwholecases. ValidateCSS/newbootstrapCSP compatibility; ifnamedchecks requireonlylocalready, actualChromeerrorrootcause/nativewindow limits documented honestly, notFAIL/NOT_RUN->PASS. Record latestactualPOobservation and concise evidence/resolution/remaininglimits docs. Returnexacttask/run/candidate/base/changedpaths/checks, nowholeN36CLOSED or actualschoolsaveclaim.\n\nMATERIAL VERIFIER REPAIR17October15:10: public technical popup.html has only pinned Cloudflare analytics tail; ZIP/manifest/source alreadyexact. Allow strict same observed pinned HTML normalization ONLY for exact popup.html repo/url pair in addition toindex, preserve allotherbytes/sourceSHA. Nativepopup/originalerror optionalNOT_RUN remaintruthful andnotrequired localchecks; publisherrechecks retainedcandidate after testedguardrepair, noProductreimplementation orbypass.\n\nMATERIAL VERIFIER REPAIR17October15:10: public technical popup.html has only pinned Cloudflare analytics tail; ZIP/manifest/source alreadyexact. Allow strict same observed pinned HTML normalization ONLY for exact popup.html repo/url pair in addition toindex, preserve allotherbytes/sourceSHA. Nativepopup/originalerror optionalNOT_RUN remaintruthful andnotrequired localchecks; publisherrechecks retainedcandidate after testedguardrepair, noProductreimplementation orbypass.\nOBSERVED PROOF RECONCILIATION: Preserve original candidate/session and optional NOT_RUN checks. Fresh read-only exact asset proof supersedes only the cached verifier failure; no Product publication or additional implementation.",
+      "allowedPaths": [
+        "extensions/rakeez-teacher-import-helper/**",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+        "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+        "src/views/class-import-center.js",
+        "tests/n36-popup-width-diagnostics*.mjs",
+        "tests/n36-popup-width-diagnostics*.json",
+        "tests/fixtures/n36-popup-width-diagnostics/**",
+        "tests/n36-concise-import-panel.test.mjs",
+        "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md"
+      ],
+      "verificationPaths": [
+        "extensions/rakeez-teacher-import-helper/popup.css",
+        "extensions/rakeez-teacher-import-helper/popup.html",
+        "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+        "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+        "extensions/rakeez-teacher-import-helper/manifest.json",
+        "src/views/class-import-center.js"
+      ],
+      "requiredChecks": [
+        "n36_popup_intrinsic_width_regression_and_responsive_run_page",
+        "n36_top_diagnostics_independent_main_failure_clipboard_fallback_and_privacy",
+        "n36_protocol_module_graph_packaging_and_bounded_strict_health_no_sideeffects",
+        "n36_0511_source_package_binding_and_unchanged_transport_guards"
+      ],
+      "acceptance": [
+        "Comfortablefixednativepopup sizing regression addressed, responsivefullrunpage retained; nativeChromevalidation honestlydistinguished fromHTTP.",
+        "Topcopy worksindependentlyofmainESM andcollectsusefulbounds/enums/counts/errorassetinfo withNOnames/IDs/tokens/URLs/rawstacks ornewpermissions.",
+        "Moduleloadcauseinvestigated honestly; reproducedfixifpossible, safecodes/unknownotherwise, nofalseChromeerrorsresolvedclaim.",
+        "0.5.11package/site/stablelocalcoherent afterverifiedsolepublisher, N107newUXpreserved and noChromecontrol."
+      ],
+      "preparationAuthority": {
+        "kind": "PO1437-popup-bug-top-safe-diagnostics-protocol-load-investigation",
+        "syntheticTesting": true,
+        "publication": true,
+        "realStudentData": false,
+        "schoolPortalReadByAgent": false,
+        "personalBrowserAccess": false,
+        "isolatedHeadlessFabricatedExtensionTestOnly": true
+      },
+      "releaseAuthority": "PO17October14:37 explicitly reportsnativepopupwidth/Chromehandoff-protocol loadfailure and requests topcopy diagnostics fordevelopment. Reversibleextensioncode/privacy-safeuserclickcopy/syntheticisolatedheadlesstests andsolepublisher0.5.11releaseauthorized. No actualschool/personalbrowser/foregroundUI/agentread, realdatawrite, newpermissions/CSPrelaxation/AuthSQL/service orrefusalbypass.",
+      "completionMode": "reconcile_observed_publication",
+      "verificationRepair": {
+        "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+        "priorReceiptSha256": "9a5a531d1f25e406fc0c48cf91adddcb706065b24a2d251c40e4282e01afc0f7",
+        "reviewedFixtureSha256": "4d1e3aefce673fab726def08838b449c9da5fc56360ff766d93a0481b8cdf464",
+        "reason": "The original controller cached its publisher before the reviewed popup-only Cloudflare transform fix. Fresh read-only provider, immutable and Production observation verifies every original Product asset without publishing, relaunching workers or changing checks.",
+        "observation": {
+          "version": 1,
+          "readOnly": true,
+          "status": "verified",
+          "repository": "RakeezX/RakeezX",
+          "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+          "currentMainSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+          "productionUrl": "https://rakeezx.com",
+          "previewUrl": "https://6ac4abdf.rakeezx.pages.dev",
+          "deploymentId": "6ac4abdf-e629-45ba-befa-cb762f1e837a",
+          "provider": {
+            "checkRunId": "117394274215",
+            "headSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-17T12:18:54Z",
+            "completedAt": "2026-10-17T12:18:54Z",
+            "headBranch": null,
+            "deploymentId": "6ac4abdf-e629-45ba-befa-cb762f1e837a",
+            "previewUrl": "https://6ac4abdf.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/6ac4abdf-e629-45ba-befa-cb762f1e837a"
+          },
+          "evidence": {
+            "immutable": {
+              "origin": "https://6ac4abdf.rakeezx.pages.dev",
+              "checkedAt": "2026-10-17T12:24:57.342Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "bytes": 3952,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "bytes": 8691,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-17T12:24:58.225Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "72259b9d0f58cfd54bd7a3a2f80dafc9222804394e957ad1bd741c43a18d8446",
+                  "bytes": 5257,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "normalizedBytes": 3952,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "c579475a64e6707f5100066f55d6f88f28dea6b8469dcf98e5e6fe03307e0e8f",
+                  "providerTransforms": [
+                    "cloudflare-jsd-v1",
+                    "cloudflare-analytics-20261017"
+                  ],
+                  "providerAddedWhitespaceBytes": 1
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "ba2cc867c63655d4e69e9b4fbc9ea33161b64872e15f5f623501f6d62630ea82",
+                  "bytes": 9164,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "normalizedBytes": 8691,
+                  "removedProviderBytes": 473,
+                  "removedSha256": "c699e08226cb629899fd9d6186b1b4ad6d683c387c542c09977f6e34666511c3",
+                  "providerTransforms": [
+                    "cloudflare-precursor-popup-v1"
+                  ]
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            }
+          },
+          "verifiedAt": "2026-10-17T12:24:59.882Z"
+        },
+        "observationSha256": "ebe24b1b04e7675c64057d0d452b3b21849f2ac7fe41628d2c1f9eb360481cbe",
+        "observedReceipt": {
+          "version": 1,
+          "ticketId": "N36",
+          "taskId": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+          "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+          "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+          "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+          "productionUrl": "https://rakeezx.com",
+          "at": "2026-10-17T12:24:59.882Z",
+          "status": "deployed",
+          "retryable": false,
+          "state": "DEPLOYED_AWAITING_PO",
+          "productionDeployed": true,
+          "verifiedAt": "2026-10-17T12:24:59.882Z",
+          "repository": "RakeezX/RakeezX",
+          "targetBranch": "main",
+          "deploymentId": "6ac4abdf-e629-45ba-befa-cb762f1e837a",
+          "previewUrl": "https://6ac4abdf.rakeezx.pages.dev",
+          "providerStatus": "SUCCESS",
+          "provider": {
+            "checkRunId": "117394274215",
+            "headSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-17T12:18:54Z",
+            "completedAt": "2026-10-17T12:18:54Z",
+            "headBranch": null,
+            "deploymentId": "6ac4abdf-e629-45ba-befa-cb762f1e837a",
+            "previewUrl": "https://6ac4abdf.rakeezx.pages.dev",
+            "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/6ac4abdf-e629-45ba-befa-cb762f1e837a"
+          },
+          "currentMainSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+          "binding": {
+            "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+            "declaredBaseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+            "mainAtPreparation": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "integrationSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "candidateAncestorOfPublished": true,
+            "previousMainAncestorOfPublished": true,
+            "mainContainsPublished": true,
+            "checkHeadShaMatches": true,
+            "kind": "already-contained-identical-assets"
+          },
+          "build": {
+            "status": "passed",
+            "startedAt": "2026-10-17T12:11:44.340Z",
+            "completedAt": "2026-10-17T12:11:47.475Z",
+            "integrationSha": "1d514f547ee124d1a1fec04aa388bfb640d24efd",
+            "publishedSha": "2159da1b7d11ccdc16772085f2ad4228c78e5543",
+            "kind": "exact-asset-build-reuse",
+            "validationTier": "STANDARD",
+            "reusedVerifiedBuildSha": null,
+            "generatedPathsChanged": [
+              "src/generated/build-meta.generated.js"
+            ],
+            "commands": [
+              {
+                "command": "node.exe",
+                "args": [
+                  "scripts/generate-build-meta.mjs"
+                ]
+              },
+              {
+                "command": "node.exe",
+                "args": [
+                  "node_modules/vite/bin/vite.js",
+                  "build"
+                ]
+              }
+            ],
+            "reusedFrom": "b9b5eea6846b998af8aad31d1cd061fc25384300",
+            "sourceHashesUnchanged": true,
+            "originalBuild": {
+              "status": "passed",
+              "startedAt": "2026-10-17T12:11:44.340Z",
+              "completedAt": "2026-10-17T12:11:47.475Z",
+              "integrationSha": "1d514f547ee124d1a1fec04aa388bfb640d24efd",
+              "publishedSha": "b9b5eea6846b998af8aad31d1cd061fc25384300",
+              "kind": "standard-build",
+              "validationTier": "STANDARD",
+              "reusedVerifiedBuildSha": null,
+              "generatedPathsChanged": [
+                "src/generated/build-meta.generated.js"
+              ],
+              "commands": [
+                {
+                  "command": "node.exe",
+                  "args": [
+                    "scripts/generate-build-meta.mjs"
+                  ]
+                },
+                {
+                  "command": "node.exe",
+                  "args": [
+                    "node_modules/vite/bin/vite.js",
+                    "build"
+                  ]
+                }
+              ]
+            }
+          },
+          "changedPaths": [
+            "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+            "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+            "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+            "extensions/rakeez-teacher-import-helper/README.md",
+            "extensions/rakeez-teacher-import-helper/categories-popup.js",
+            "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+            "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+            "extensions/rakeez-teacher-import-helper/manifest.json",
+            "extensions/rakeez-teacher-import-helper/popup.css",
+            "extensions/rakeez-teacher-import-helper/popup.html",
+            "extensions/rakeez-teacher-import-helper/popup.js",
+            "extensions/rakeez-teacher-import-helper/run-controller.js",
+            "src/views/class-import-center.js",
+            "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+            "tests/n36-concise-import-panel.test.mjs",
+            "tests/n36-popup-width-diagnostics-browser.json",
+            "tests/n36-popup-width-diagnostics-browser.mjs",
+            "tests/n36-popup-width-diagnostics-native.json",
+            "tests/n36-popup-width-diagnostics-native.mjs",
+            "tests/n36-popup-width-diagnostics-package.json",
+            "tests/n36-popup-width-diagnostics-package.mjs"
+          ],
+          "sourceOnlyPaths": [
+            "docs/automation-evidence/20261017/N36_POPUP_WIDTH_TOP_DIAGNOSTICS_0511.md",
+            "extensions/rakeez-teacher-import-helper/README.md",
+            "extensions/rakeez-teacher-import-helper/categories-popup.js",
+            "extensions/rakeez-teacher-import-helper/diagnostics-bootstrap.js",
+            "extensions/rakeez-teacher-import-helper/popup.js",
+            "extensions/rakeez-teacher-import-helper/run-controller.js",
+            "tests/fixtures/n36-popup-width-diagnostics/run-summary.png",
+            "tests/n36-concise-import-panel.test.mjs",
+            "tests/n36-popup-width-diagnostics-browser.json",
+            "tests/n36-popup-width-diagnostics-browser.mjs",
+            "tests/n36-popup-width-diagnostics-native.json",
+            "tests/n36-popup-width-diagnostics-native.mjs",
+            "tests/n36-popup-width-diagnostics-package.json",
+            "tests/n36-popup-width-diagnostics-package.mjs"
+          ],
+          "changedAssets": [
+            "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+            "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+            "src/views/class-import-center.js"
+          ],
+          "productSourceChangeObserved": true,
+          "evidence": {
+            "immutable": {
+              "origin": "https://6ac4abdf.rakeezx.pages.dev",
+              "checkedAt": "2026-10-17T12:24:57.342Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "bytes": 3952,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "bytes": 8691,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            },
+            "production": {
+              "origin": "https://rakeezx.com",
+              "checkedAt": "2026-10-17T12:24:58.225Z",
+              "passed": true,
+              "assets": [
+                {
+                  "repoPath": "index.html",
+                  "urlPath": "/",
+                  "requestProfile": "anonymous-browser-entry-chromium154",
+                  "statusCode": 200,
+                  "expectedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "observedSha256": "72259b9d0f58cfd54bd7a3a2f80dafc9222804394e957ad1bd741c43a18d8446",
+                  "bytes": 5257,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
+                  "normalizedBytes": 3952,
+                  "removedProviderBytes": 1305,
+                  "removedSha256": "c579475a64e6707f5100066f55d6f88f28dea6b8469dcf98e5e6fe03307e0e8f",
+                  "providerTransforms": [
+                    "cloudflare-jsd-v1",
+                    "cloudflare-analytics-20261017"
+                  ],
+                  "providerAddedWhitespaceBytes": 1
+                },
+                {
+                  "repoPath": "sw.js",
+                  "urlPath": "sw.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "observedSha256": "2c4f7272943e7daecb78be6f0a8b386f08117b8d0f33add59c24c238e3476366",
+                  "bytes": 12175,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/generated/build-meta.generated.js",
+                  "urlPath": "src/generated/build-meta.generated.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "observedSha256": "a2b2ac59abc5b142332a8eacde7a47d6f48c1ba1d0b29b75b2e16246c62d3edf",
+                  "bytes": 358,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "observedSha256": "ffebcc244e1e996adaa6245ffc5405ab3f38f996948efb761e0cfa7ab47f39b7",
+                  "bytes": 4208,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "urlPath": "assets/extensions/rakeez-teacher-import-helper-0.5.11.zip",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "observedSha256": "7b9a286073834e3d01df49410f102ece86caa8bdffaa71771ee11fdaafbaa79d",
+                  "bytes": 105862,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "src/views/class-import-center.js",
+                  "urlPath": "src/views/class-import-center.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "observedSha256": "b7d336e9b11c29500145c22eb1a171ace524d5f907b504426251d6bcc606f7a7",
+                  "bytes": 64669,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.css",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "observedSha256": "62342e2fe48315d0e4a45b9c516e474095d95f2c2ae1be84586b5f7dd1f83e3d",
+                  "bytes": 4061,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/popup.html",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "observedSha256": "ba2cc867c63655d4e69e9b4fbc9ea33161b64872e15f5f623501f6d62630ea82",
+                  "bytes": 9164,
+                  "deleted": false,
+                  "verified": true,
+                  "normalization": "cloudflare-observed-tail-v2",
+                  "normalizedSha256": "aded4c1da8ffe31db7256ec7fdf0ba4cde019dcea4f6c2259ca2ddf85a96dfce",
+                  "normalizedBytes": 8691,
+                  "removedProviderBytes": 473,
+                  "removedSha256": "c699e08226cb629899fd9d6186b1b4ad6d683c387c542c09977f6e34666511c3",
+                  "providerTransforms": [
+                    "cloudflare-precursor-popup-v1"
+                  ]
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-protocol.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "observedSha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+                  "bytes": 2425,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/handoff-worker.js",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "observedSha256": "4e4e2cf2d90c6832d8901925aeaf02c3e30a0163fb650d73e5083c0aa284f6e6",
+                  "bytes": 6593,
+                  "deleted": false,
+                  "verified": true
+                },
+                {
+                  "repoPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "urlPath": "extensions/rakeez-teacher-import-helper/manifest.json",
+                  "requestProfile": "static-source",
+                  "statusCode": 200,
+                  "expectedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "observedSha256": "37efcda4eed79fdd2add474a7dd44dd08c3b6e9bb7590f9367e22a102d2bbee0",
+                  "bytes": 807,
+                  "deleted": false,
+                  "verified": true
+                }
+              ]
+            }
+          },
+          "integrationWorktree": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\delivery\\continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017\\integration-fbb3ea39d735-2-7732bfbf",
+          "pushRecovered": false,
+          "poPersonallyTested": false,
+          "closed": false
+        },
+        "observedReceiptSha256": "b1a79ae24118189ca62a0c2b750577847d70c380e48f0049a5be7a1931181435"
+      }
+    },
+    "expected": {
+      "id": "continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017",
+      "status": "blocked",
+      "sessionId": "01a149b0-a188-7840-982b-e09b5b76f346",
+      "lastRunId": "b2e99f0f-39a6-4e33-8cad-39697097e090",
+      "candidateSha": "fbb3ea39d73596088b10e8fb138433d07b8cb827",
+      "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+      "resultState": "LOCAL_READY"
+    },
+    "materialReason": "Reconcile exact already-published candidate using fresh read-only evidence after pinned verifier repair."
+  }
+}

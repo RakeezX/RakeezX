@@ -113,6 +113,33 @@ export function reconcilableCheckOutcomes(task, result, receipt) {
     || n36 && check.status === 'NOT_RUN' && ['NATIVE_ACTION_POPUP','original_chrome_error_resolution','publisher_production_and_stable_update'].includes(check.name));
 }
 
+
+// Fresh proof only for the already-integrated N36 .11 candidate; no Product publication.
+export function verifiedObservedRepair(task, result, update) {
+  const card=update.card, p=card.verificationRepair, old=task.deliveryReceipt, o=p?.observation, d=p?.observedReceipt;
+  return card.completionMode==='reconcile_observed_publication'
+    && task.id==='continuous-n36-popup-width-top-diagnostics-module-load-0511-20261017'
+    && task.status==='blocked' && task.lastFailure?.startsWith('SOURCE_PARITY_PENDING:')
+    && result.state==='LOCAL_READY' && update.expected.resultState==='LOCAL_READY'
+    && !task.liveMutation && !task.liveAuthorizationRef && !card.liveMutation && !card.liveAuthorizationRef
+    && old?.errorCode==='SOURCE_PARITY_PENDING' && old.candidateSha===task.candidateSha
+    && sha256(bytes(old))===p.priorReceiptSha256
+    && old.provider?.conclusion==='success' && old.evidence?.immutable?.passed===true
+    && o?.readOnly===true && o.status==='verified' && o.publishedSha===old.publishedSha
+    && o.currentMainSha===o.publishedSha && d?.publishedSha===o.publishedSha
+    && same(d.provider,o.provider) && same(d.evidence,o.evidence) && d.verifiedAt===o.verifiedAt
+    && sha256(bytes(o))===p.observationSha256 && sha256(bytes(d))===p.observedReceiptSha256
+    && Number.isFinite(Date.parse(o.verifiedAt)) && Date.parse(o.verifiedAt)<=Date.now()+1000
+    && Date.now()-Date.parse(o.verifiedAt)<15*60*1000
+    && p.reason?.length>=50 && SHA256.test(p.reviewedFixtureSha256??'')
+    && verifiedDeployment(task,d) && reconcilableCheckOutcomes(task,result,d)
+    && old.evidence.production.assets.length===o.evidence.production.assets.length
+    && old.evidence.production.assets.every(a=>o.evidence.production.assets.some(b=>a.repoPath===b.repoPath && a.urlPath===b.urlPath && a.expectedSha256===b.expectedSha256 && b.verified===true))
+    && same(card.requiredChecks,task.requiredChecks) && same(card.allowedPaths,task.allowedPaths)
+    && Object.entries(card).every(([k,v])=>['objective','completionMode','verificationRepair'].includes(k)||same(v,task[k]))
+    && result.blockerType==='none' && !result.blocker;
+}
+
 export function verifyInactiveIdentity(task, result, update, activationId) {
   const e = update.expected;
   insist(task.id === e.id && task.activationId === activationId && task.productId === update.card.productId && task.scopeKey === update.card.scopeKey, 'Task identity/scope changed: ' + e.id);
@@ -169,7 +196,7 @@ export function verifyInactiveIdentity(task, result, update, activationId) {
     && Object.entries(update.card).every(([key,value]) => ['objective','completionMode','verificationRepair'].includes(key) || same(value,task[key]))
     && reconcilableCheckOutcomes(task, result, d)
     && result.blockerType === 'none' && !result.blocker;
-  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
+  insist(result.taskId === e.id && result.runId === e.lastRunId && (result.state === 'BLOCKED' || evidenceOnly || deliveryRecheck || verifiedReconcile || verifiedObservedRepair(task,result,update) || poDeferred || nameRepair) && result.candidateSha === e.candidateSha, 'Worker result identity changed: ' + e.id);
   insist(equalPath(result.worktreePath, task.worktreePath), 'Result worktree mismatch: ' + e.id);
   const savedBinding = e.queuedBaseSha !== undefined || e.queuedCandidateSha !== undefined;
   if (savedBinding) {
@@ -251,6 +278,16 @@ export function revisedTask(task, update, commit, at) {
     saved.publisherReconciliation = { at, commit, publishedSha: task.deliveryReceipt.publishedSha,
       originalDeliveryReceiptSha256: sha256(bytes(task.deliveryReceipt)), reason: update.materialReason };
   }
+
+  if (update.card.completionMode==='reconcile_observed_publication') {
+    const d=update.card.verificationRepair.observedReceipt;
+    insist(verifiedDeployment(task,d),'Observed Production receipt no longer qualifies');
+    saved.sourceParityHistory=[...(task.sourceParityHistory??[]),{at,reason:update.materialReason,receipt:structuredClone(task.deliveryReceipt)}];
+    saved.deliveryReceipt=structuredClone(d); saved.status='awaiting_po';saved.productionVerifiedAt=d.verifiedAt;
+    saved.deliveryOwner=null;saved.nextDeliveryAt=null;
+    saved.publisherReconciliation={at,commit,publishedSha:d.publishedSha,originalDeliveryReceiptSha256:sha256(bytes(task.deliveryReceipt)),observationSha256:update.card.verificationRepair.observationSha256,reason:update.materialReason};
+  }
+
   if (update.card.completionMode === 'deferred_by_po') {
     insist(typeof update.card.deferralReason === 'string' && update.card.deferralReason.length >= 20, 'Explicit PO deferral reason required');
     saved.status = 'blocked'; saved.lastFailure = 'DEFERRED_BY_PO: ' + update.card.deferralReason; saved.failureClass = 'external';
@@ -360,6 +397,18 @@ export async function applyReviewedMaintenance(payload, payloadHash) {
       git(['merge-base', '--is-ancestor', result.baseSha, remoteMain], task.worktreePath);
       git(['merge-base', '--is-ancestor', result.baseSha, result.candidateSha], task.worktreePath);
     }
+
+    if(update.card.completionMode==='reconcile_observed_publication') {
+      const o=update.card.verificationRepair.observation;
+      const head=git(['ls-remote','--heads','origin','refs/heads/main']).split(/\s+/)[0];
+      insist(head===o.publishedSha || receipt.pushed && head===receipt.commit,'Main changed since read-only verification');
+      for(const ancestor of [task.candidateSha,task.baseSha,o.publishedSha])git(['merge-base','--is-ancestor',ancestor,head],task.worktreePath);
+      for(const asset of o.evidence.production.assets) {
+        const raw=execFileSync(WIN_GIT,['show',head+':'+asset.repoPath],{cwd:task.worktreePath,maxBuffer:16*1024*1024,windowsHide:true});
+        insist(sha256(raw)===asset.expectedSha256,'Observed Product asset changed: '+asset.repoPath);
+      }
+    }
+
     const owners = task.lastWorkerReap.owners, alive = inventory(owners.map(p => p.pid));
     for (const saved of owners) insist(!alive.some(p => p.pid === saved.pid && utcTicks(p.createdAt) === utcTicks(saved.createdAt)), 'An owned worker process remains alive: ' + task.id);
     return { file, raw, task, resultSha256: sha256(resultBytes), candidateSha: result.candidateSha };
