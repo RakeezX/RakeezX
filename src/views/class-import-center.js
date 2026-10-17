@@ -148,7 +148,7 @@ function transferPanel(teachingId) {
   const groupTotal = group => selectedItems.filter(i => (transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group).reduce((sum,i) => sum + Number(i.max),0);
   const review = transfer.review;
   const opts = transfer.rows?.[0] ?? [];
-  const mappingSummary = html`<p data-grade-mapping-summary>الأسماء: ${opts[transfer.nameColumn] ?? 'اختر العمود'}${transfer.importMode === 'grades' ? html` · ${transfer.mappings.filter(m=>m.kind !== 'ignore').length} عمود درجات` : ''}</p>`;
+  const mappingSummary = html`<p data-grade-mapping-summary>${transfer.importMode === 'grades' ? html`أعمدة الدرجات المختارة: ${transfer.mappings.filter((m,c)=>m.kind !== 'ignore' && ![transfer.nameColumn,transfer.idColumn].includes(c)).length}` : html`عمود الأسماء: ${opts[transfer.nameColumn] ?? 'اختر العمود'}`}</p>`;
   return html`<div class="grade-transfer noprint" data-grade-transfer ${!transfer.panel ? 'hidden' : ''}>
     ${transfer.panel === 'import' ? html`<section id="grade-import-panel" data-grade-import-panel aria-label="استيراد الكشوف" ${transfer.panel !== 'import' ? 'hidden' : ''}>
     <div data-roster-review-controls>
@@ -159,27 +159,34 @@ function transferPanel(teachingId) {
       <p class="grade-transfer__hint">CSV أو XLSX بعناوين أعمدة · حتى 300 طالب و1 MB · الفراغ لا يغيّر الدرجة والصفر يُرصد.</p>` : ''}
     ${transfer.busy && !transfer.writing ? html`<button class="btn" data-act="grade-cancel">إلغاء القراءة</button>` : ''}
     ${transfer.rows ? html`
-      ${review || draft.review ? html`<details data-grade-reviewed-mapping><summary>مطابقة الأعمدة</summary>${mappingSummary}</details>` : mappingSummary}
+      ${review || draft.review ? html`<details data-grade-reviewed-mapping><summary>مطابقة الأعمدة</summary>${mappingSummary}</details>` : ''}
       ${!review && !draft.review && (!transfer.created || transfer.needsReview && !transfer.plan) ? html`<details data-grade-mapping-details ${transfer.editMapping || transfer.nameColumn < 0 || transfer.importMode !== 'names' && transfer.reasons?.some(r => r === 'exception') ? 'open' : ''}>
-      <summary>تعديل المطابقة${transfer.importMode !== 'names' && transfer.reasons?.some(r => r === 'exception') ? ' — أعمدة تحتاج مراجعة أو تجاهل' : ''}</summary><div class="grade-transfer__mapping">
+      <summary>مطابقة الأعمدة</summary><div class="grade-transfer__mapping">
       <div class="grade-transfer__identity">
-      <label class="grade-transfer__field">عمود اسم الطالب <select class="input" data-grade-name data-change="grade-mapping" data-fk="grade-name"><option value="-1">اختر العمود</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
-      <details data-grade-identity-optional ${transfer.idColumn >= 0 ? 'open' : ''}><summary>معرف ركيز (اختياري)</summary><label class="grade-transfer__field">معرف ركيز الثابت (اختياري) <select class="input" data-grade-id data-change="grade-mapping" data-fk="grade-id" ${transfer.created ? 'disabled' : ''}><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label></details>
+      <label class="grade-transfer__field">اسم الطالب <select class="input" data-grade-name data-change="grade-mapping" data-fk="grade-name"><option value="-1">اختر العمود</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.nameColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label>
+      <details data-grade-identity-optional ${transfer.idColumn >= 0 ? 'open' : ''}><summary>معرف ركيز (اختياري)</summary><label class="grade-transfer__field"><select aria-label="عمود معرف ركيز" class="input" data-grade-id data-change="grade-mapping" data-fk="grade-id" ${transfer.created ? 'disabled' : ''}><option value="-1">مطابقة الاسم الفريد في الفصل</option>${opts.map((v,c) => html`<option value="${c}" ${transfer.idColumn === c ? 'selected' : ''}>${c+1}: ${v}</option>`)}</select></label></details>
       </div>
+      ${transfer.importMode === 'grades' ? html`<div class="n107-mapping-head" aria-hidden="true"><span>عمود الملف</span><span>الوجهة في ركيز</span><span>الحالة</span></div>` : ''}
       ${opts.map((v,c) => {
         if (transfer.importMode === 'names') return '';
-        if ([transfer.nameColumn,transfer.idColumn].includes(c) || ['metadata','readonly'].includes(transfer.reasons?.[c])) return '';
+        if ([transfer.nameColumn,transfer.idColumn].includes(c)) return '';
+        if (['metadata','readonly'].includes(transfer.reasons?.[c])) return html`<div class="n107-mapping-row" data-grade-ignored="${c}"><strong>${v}</strong><span>لا يُستورد</span><small>${transfer.reasons[c] === 'readonly' ? 'بند محسوب تلقائيًا أو للقراءة فقط' : 'بيانات وصفية وليست درجات'}</small></div>`;
         const m = transfer.mappings[c] ?? { kind: 'ignore' };
+        const source = suggestGradeMappings([v], []).mappings[0];
+        const sameName = source.kind === 'new' ? items.filter(i=>gradeNameKey(i.name) === gradeNameKey(source.name) && isTransferItem(i)) : [];
+        const destination = m.kind === 'existing' ? items.find(i=>i.id === m.itemId) : sameName.length === 1 ? sameName[0] : null;
+        const mismatch = source.kind === 'new' && destination && Number(source.max) !== Number(destination.max);
+        const status = mismatch ? `العظمى مختلفة: الملف ${source.max}، البند ${destination.max}؛ اختر الوجهة صراحة أو تجاهل العمود` : m.kind === 'existing' ? 'بند محدد' : m.kind === 'new' ? 'سيُنشأ بعد تأكيد المراجعة' : transfer.reasons?.[c] === 'exception' ? 'اختر الوجهة أو تجاهل العمود' : 'لن يُستورد';
 
-        return html`<div class="grade-transfer__column" data-grade-column="${c}"><label for="grade-column-${c}">${c+1}: ${v}</label>
-          ${transfer.reasons?.[c] === 'exception' && m.kind === 'ignore' ? html`<p class="grade-transfer__hint">لم تُطابق هذه الدرجة؛ اختر بندًا أو اتركها للتجاهل.</p>` : ''}
+        return html`<div class="grade-transfer__column n107-mapping-row" data-grade-column="${c}"><label for="grade-column-${c}">${c+1}: ${v}</label>
           <select id="grade-column-${c}" class="input" data-grade-kind data-change="grade-mapping" data-fk="grade-column-${c}">
-            <option value="ignore" ${m.kind === 'ignore' ? 'selected' : ''}>تجاهل</option>
+            <option value="ignore" ${m.kind === 'ignore' ? 'selected' : ''}>عدم استيراد العمود</option>
             ${items.filter(isTransferItem).map(i => html`<option value="${i.id}" ${m.itemId === i.id ? 'selected' : ''}>${i.name} — العظمى ${i.max}</option>`)}
-            <option value="new" ${m.kind === 'new' ? 'selected' : ''}>إنشاء بند يدوي مسمّى صراحة</option>
+            <option value="new" ${m.kind === 'new' ? 'selected' : ''}>إنشاء بند جديد</option>
           </select>
-          ${m.kind === 'new' ? html`<label>اسم البند <input class="input" data-grade-new-name data-fk="grade-new-name-${c}" maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
-            <label>العظمى <input class="input" data-grade-new-max data-fk="grade-new-max-${c}" inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label>
+          <small data-mapping-state>${status}</small>
+          ${m.kind === 'new' ? html`<div class="n107-new-fields"><label>اسم البند <input class="input" data-grade-new-name data-fk="grade-new-name-${c}" maxlength="50" value="${m.name ?? ''}" data-change="grade-mapping"></label>
+            <label>الدرجة العظمى <input class="input" data-grade-new-max data-fk="grade-new-max-${c}" inputmode="decimal" value="${m.max ?? ''}" data-change="grade-mapping"></label></div>
 ` : ''}
         </div>`;
       })}
@@ -217,10 +224,12 @@ function transferPanel(teachingId) {
     </div></section>
     ` : html`<section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
     <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تصدير كشف نور <bdi dir="ltr">40 / 60</bdi></summary>
-    <div class="grade-transfer__chips" role="group" aria-label="بنود كشف نور">${items.map(i => html`<label><input type="checkbox" data-change="grade-export-selection" data-grade-export-item value="${i.id}" ${!transfer.exportItems || transfer.exportItems.has(i.id) ? 'checked' : ''}> ${i.name} / ${i.max}</label>`)}</div>
-    <p class="grade-transfer__hint">40: المهام الأدائية والمشاركة والتفاعل.</p><p class="grade-transfer__hint">60: تقويمات تحريرية وتطبيقات عملية.</p>
-    ${selectedItems.map(i => html`<div class="grade-transfer__noor-row"><label for="noor-${i.id}">${i.name} <small> / ${i.max}</small></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group"><option value="">اختر</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group}</option>`)}</select></div>`)}
-    <p data-noor-totals role="status">مجموع العظمى: 40 ← ${groupTotal('40')} · 60 ← ${groupTotal('60')}</p>
+    <div class="n107-noor-items" role="group" aria-label="بنود كشف نور">${items.map(i => {
+      const included = !transfer.exportItems || transfer.exportItems.has(i.id);
+      return html`<div class="n107-noor-row"><label><input type="checkbox" data-change="grade-export-selection" data-fk="grade-export-${i.id}" data-grade-export-item value="${i.id}" ${included ? 'checked' : ''}> <span>${i.name}<small>العظمى ${i.max}</small></span></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group" ${included ? '' : 'disabled'}><option value="">اختر المجموعة</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>مجموعة ${group}</option>`)}</select></div>`;
+    })}</div>
+    <div class="n107-noor-totals" data-noor-totals role="status">${['40','60'].map(group=>html`<span>مجموعة ${group}: <bdi dir="ltr">${groupTotal(group)}/${group}</bdi></span>`)}</div>
+    ${selectedItems.some(i=>!['40','60'].includes(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i))) || groupTotal('40') !== 40 || groupTotal('60') !== 60 ? html`<p class="grade-transfer__hint" data-noor-invalid>عيّن مجموعة لكل بند مختار؛ يجب أن يساوي المجموع <bdi dir="ltr">40/40</bdi> و<bdi dir="ltr">60/60</bdi>.</p>` : ''}
     <p data-noor-alert role="alert" hidden></p><label><input type="checkbox" data-noor-confirm> أؤكد تعيين البنود المختارة؛ مجموع العظمى 40 و60 دون تكرار أو تحجيم</label>
     <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة. ثلاثة أعمدة للرصد اليدوي فقط، ليس للرفع المباشر.</p>
     <button class="btn btn--primary" data-act="grade-noor-export">تصدير كشف نور</button></details>
@@ -239,8 +248,9 @@ function readTransferMappings(root) {
     if (value === 'ignore') { mappings[c] = {kind:'ignore'}; continue; }
     if (value !== 'new') { mappings[c] = {kind:'existing',itemId:value}; continue; }
     const prior = transfer.mappings[c];
-    mappings[c] = {kind:'new',id:prior?.kind === 'new' ? prior.id : crypto.randomUUID(),name:el.querySelector('[data-grade-new-name]')?.value ?? '',
-      max:el.querySelector('[data-grade-new-max]')?.value ?? '',confirmed:true};
+    const proposal = prior?.kind === 'new' ? prior : suggestGradeMappings([transfer.rows[0][c]], []).mappings[0];
+    mappings[c] = {kind:'new',id:prior?.kind === 'new' ? prior.id : crypto.randomUUID(),name:el.querySelector('[data-grade-new-name]')?.value ?? (proposal.kind === 'new' ? proposal.name : ''),
+      max:el.querySelector('[data-grade-new-max]')?.value ?? (proposal.kind === 'new' ? proposal.max : ''),confirmed:true};
   }
   [transfer.nameColumn, transfer.idColumn].forEach(c => { if (c >= 0) mappings[c] = {kind:'ignore'}; });
   transfer.mappings = mappings;
@@ -395,7 +405,7 @@ function allowed() { try { store.assertClassImportAccess(); return ''; } catch (
 const unavailable = message => html`<div class="empty"><h2>الاستيراد غير متاح الآن</h2><p>${message}</p><a class="btn" href="#/classes">العودة للفصول</a></div>`;
 const back = () => '#/classes';
 function focus(root) {
-  if (focusRoute !== location.hash) { focusRoute = location.hash; root.querySelector('h2')?.focus({ preventScroll: true }); }
+  if (focusRoute !== location.hash) { focusRoute = location.hash; root.querySelector('.class-import-page, [data-class-access-status], h2')?.focus({ preventScroll: true }); }
 }
 // AI-authored N107: one immutable semantic approval, bounded foreground continuation.
 const importChanged = () => Error('تغيّر أثر الاستيراد أو سياقه؛ يلزم مراجعة جديدة قبل حفظ درجات إضافية.');
@@ -560,7 +570,7 @@ function existingPane() {
   return transferPanel(hub.existing);
 }
 export const koshoofCenter = {
-  title: () => 'الكشوف', back, onMount: focus,
+  title: () => 'استيراد وتصدير الكشوف', back, onMount: focus,
   onUnmount() { transfer.cancelled=true;transfer.stopWait?.();hub.route = null; closeTeacherSetupImport(); closeTeacherSetupImport = () => {}; clearExtensionPreview(); },
   render(p = {}) {
     bind(); const denial = allowed(); if (denial) { bindTransfer(null); return classAccessFeedback(p.id ? p : {}) || unavailable(denial); }
@@ -571,7 +581,7 @@ export const koshoofCenter = {
       bindTransfer(null);
       return classAccessFeedback({ id: hub.existing });
     }
-    return html`<div class="management-page class-import-page"><h2 tabindex="-1">استيراد وتصدير الكشوف</h2>
+    return html`<div class="management-page class-import-page" role="region" aria-label="استيراد وتصدير الكشوف" tabindex="-1">
       ${tabs()}
       ${hub.tab === 'import' ? html`${directExtensionEntry()}${rosterFilePane(list)}` : html`
       <section aria-label="تصدير الكشوف">

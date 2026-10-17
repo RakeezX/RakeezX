@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n107-readable-mapping-noor-responsive-tabs-20261017",
+  "runId": "77244486-2720-4d11-a881-16eae1cb396f",
+  "checks": [
+    {
+      "name": "unchanged_core_and_single_consent_evidence_reused",
+      "status": "PASS",
+      "evidence": "Exact base comparison: review/plan/owner/term/lease/receipt and compact-preview functions plus core mapping, Noor CSV, XLSX and store are unchanged; prior negative and blank-versus-zero evidence retained. Extension remains 0.5.11."
+    },
+    {
+      "name": "n107_readable_mapping_true_status_new_item_optional_id_and_same_payload_guards",
+      "status": "PASS",
+      "evidence": "Real account app at 320/390/1280: fabricated six headers, readonly visible/ignored, 20-v-10 explicit mismatch, matched stable ID, proposed name/max, optional ID collapsed once, new/existing repaint/focus retained, duplicate destination refused, no pre-confirm writes."
+    },
+    {
+      "name": "n107_one_noor_item_list_actual_group_selection_totals_confirmation_and_export",
+      "status": "PASS",
+      "evidence": "Real checkbox/select handlers: five items once, exact 40/40 and 60/60; deselect disables group and resets approval, unassigned/over/wrong totals refuse actual export, corrected selection requests actual CSV Blob; swapping the two 20-point groups changes actual 60-group value from 7 to 0 while preserving blank 40-group marks and headers."
+    },
+    {
+      "name": "n107_responsive_tabs_and_single_actual_appbar_title_mobile_desktop",
+      "status": "PASS",
+      "evidence": "Source CSS and real app DOM screenshots at 320/390/1280, equal >=44px tabs, one actual appbar heading with no clipping/page overflow, file retained on resize; existing tab reset behavior preserved."
+    },
+    {
+      "name": "n107_accepted_single_review_extension_export_score_semantics_preserved",
+      "status": "PASS",
+      "evidence": "Changed mapping UI -> real account store -> owner-bound durable command -> synthetic canonical receipt: only 7 and 0 persisted after one precise consent; blank omitted. Unknown max remains blank and refuses review. Core import/export/plan guard hashes compared with base separately; prior negative evidence reused."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "860aa34bf0aae742bba1732ee07e92892f2489a9cba09d0bdb97d062c61ab099",
+    "src/styles/components.css": "6c2df5833f8f6c16ec1218b5049e177577602763fdc48412ccdaa46f3175bfdf",
+    "src/lib/grade-transfer.js": "1111b142cc220b3a6d7660f7c716cc282ef52ac4a58933d851a46636451619ca",
+    "src/lib/grade-transfer-export.js": "2ada95ab60a3eea23a84ead40cb8d0ce9f52ab8caea1ce940cf64ed2e7cfe0c9",
+    "src/store.js": "b25bc6cd885b7ce852d6b4a2ab0926e4c758db2c66abc0b6cf4d55e7c7f06f82"
+  },
+  "previousFailures": [
+    "Initial development check found an unclosed new-item fields div (fixed), then a clipped 320px appbar title (scoped CSS fixed). Harness waits were corrected for asynchronous repaint, focus was explicitly placed before selection, and unknown-max error expectation matched the preserved engine error. Original prior-task failures remain in tests/n107-calm-single-review-import-browser.json."
+  ],
+  "reusedFunctions": {
+    "function reviewNewRoster()": "7d5e8a803a3927bc4561af1883e11540654878da54dba6c9a82a595837f78043",
+    "async function transferConfirm(": "8c246eaa37e892443777bd59e20f2d74196241f73e8fa2846308f1bc27224340",
+    "function transferExport(": "c9ea85c1bff7402711fd8f872c33e67bfb8a229b2b42a63c4ff64294c3d8b980",
+    "const importChanged =": "f6578d353ecff22ccb4ea5a33e4c7ccca195b0b2359596f308065de45ebe1a8f",
+    "function directExtensionEntry()": "670b7428255d05348bd130826097d9a6906f70c55dd3a60bc0ca01144b68ebb2"
+  }
+}
