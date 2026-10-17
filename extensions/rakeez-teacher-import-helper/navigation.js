@@ -1,7 +1,7 @@
 import './route-diagnostics.js';
 // No host wildcard: Ministry-published route + actual user-invoked start origin.
 // Public Ministry report: https://www.moe.gov.sa/ar/education/studies/Documents/NDLP.pdf
-export const RUN_LIMITS=Object.freeze({pages:24,rows:600,milliseconds:90000,reviewMilliseconds:300000});
+export const RUN_LIMITS=Object.freeze({pages:24,sourceBytes:8*1024*1024,milliseconds:90000,reviewMilliseconds:300000});
 export function startOrigin(value){
  const u=new URL(value);
  const official=u.protocol==='https:'&&!u.port&&u.hostname==='schools.madrasati.sa';

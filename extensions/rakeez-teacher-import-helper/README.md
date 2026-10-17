@@ -1,3 +1,11 @@
+## 0.5.8 — AI-authored collection-before-review correction (17 October 2026)
+
+One explicit read run accumulates validated observed report pages before class selection. Normal 350/1000 multi-class runs no longer stop at 300 names. Transport remains at most 300 names from one selected source class; authenticated N12 review and explicit confirmation remain required. Reading never proves saving or Sync.
+
+Resource slices: 24 processed pages or 90 seconds, at most three report requests, eight-second request timeout, 2,000,000 response bytes before parsing, and an 8 MiB accounted source-memory budget (UTF-8 row bytes plus 256 bytes per row allowance). A resource-only “جمع المزيد” continuation retains all prior vetted rows, series, counters and identity; no class receipt is required. The earliest ephemeral expiry remains five minutes from the first retained names (or an earlier resource pause), across every continuation. Transport retains its independent two-minute ceiling. Memory exhaustion produces a truthful partial subset, never an estimated total or complete coverage. Cancel, expiry and unsafe context changes erase names and abort owned requests. No persistent source names/fingerprints.
+
+The final ordered class selector shows actual class counts, gathered total and proved/partial/unknown coverage. Optional metadata discovery cannot delay review after a proved report terminal. The accepted 0.5.7 comparator and encrypted one-time owner/term/lease-safe receiver remain unchanged. Official source/save acceptance remains voluntary and NOT_RUN by this synthetic worker; N36 remains OPEN.
+
 ## Current private 0.5.7 — academic order and honest report coverage (AI)
 
 Class choices compare grade 1–12, then natural section numbers (1, 2, 10), without renaming or changing identities, membership, within-class student order or persisted record order. The comparator is copied byte-for-byte from src/lib/class-order.js and its equality is checked by tests/n36-academic-class-order.test.mjs; no model/store runtime is bundled.

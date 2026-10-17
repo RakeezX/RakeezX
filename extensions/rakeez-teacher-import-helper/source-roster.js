@@ -1,8 +1,7 @@
 // AI: transient source review only. Never widen the category/receiver transport cap.
 import {compareAcademicClasses} from './class-order.js';
 import {validateCategory} from './categories.js';
-// A window is bounded by the controller, not a product-wide roster maximum.
-export const SOURCE_WINDOW_ROWS=300;
+// Source memory is bounded separately from the unchanged 300-row transport.
 const identity=v=>v.replace(/[\s\u0640\u064B-\u065F\u0670]/g,'').toLowerCase();
 export function appendSourceRows(prior, incoming){
  const seen=new Set(prior.map(r=>identity(r.classroom)+'|'+identity(r.name)));
@@ -41,7 +40,7 @@ export function sourceCoverage({series,warnings=[],pendingReportPages=0,reviewWi
 }
 export function coverageMessage(info){
  if(info.complete)return 'ثبت اكتمال تسلسل صفحات الكشف ونهايته؛ راجع كل فصل ودفعة ثم أكّد داخل ركيز. قد تبقى بيانات اختيارية لا تضيف صفحات طلاب.';
- if(info.coverage==='paused')return 'توقف الجمع مؤقتًا لمراجعة النافذة الحالية؛ توجد صفحات كشف أخرى. راجع وانقل وأكّد جميع دفعات النافذة في ركيز وانتظر إيصالاتها، ثم اضغط متابعة. لا تُحذف الأسماء غير المنقولة للمتابعة.';
+ if(info.coverage==='paused')return 'توقف الجمع لميزانية القراءة؛ توجد روابط كشف أخرى. جمع المزيد لا يتطلب نقلًا أو حفظًا، وتبقى الأسماء والمهلة الأصلية.';
  if(info.coverage==='partial')return 'تغطية الكشف جزئية: فشلت قراءة صفحة أو لم يثبت تسلسل الصفحات ونهايتها. راجع التشخيص المتاح؛ يمكنك استيراد المتاح بتأكيد إضافي، وقد ينقص طلاب.';
  return 'اكتمال الكشف غير معلوم: لم يثبت تسلسل الصفحات ونهايتها. يمكنك مراجعة المتاح فقط بتأكيد إضافي؛ لا عدد إجمالي مفترض.';
 }

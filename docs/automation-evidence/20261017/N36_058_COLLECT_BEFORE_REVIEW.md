@@ -1,0 +1,37 @@
+# N36 0.5.8 — collect reachable reports before class review
+
+AI-authored, 17 October 2026. Task `continuous-n36-collect-all-report-pages-before-review-20261017`; run `77757f26-80d2-4392-9609-0dd419355bbc`.
+Base/current origin main observed with `git ls-remote`: `b2604781812dd092841a1b20feda2288296d7c0e`.
+
+Read current canonical operating contract, activated card, latest canonical N36 row, D-123/later D-124 authority, two-real-tabs structural evidence and 14-Oct uploaded-source review. Scope remains explicit user-triggered read, actual observed exact-report links, synthetic checks and local candidate preparation. No real school/account access, service changes, queue updates, push, deploy, stable-folder update or Chrome installation occurred. N36 remains OPEN; the accepted 0.5.7 extension order is preserved.
+
+## Result and bounds
+
+Removed the 300-source-row review pause and receiver-receipt continuation dependency. Source rows, identity, visited pages, coverage series and observed/excluded totals accumulate in memory across read-only resource continuations. Only after traversal does the ordered class selector expose reviewed transfer batches. Each selectedSourceClass/category/envelope stays <=300; the encrypted one-time handoff worker, receiver/store ownership/year/term/offline guards, explicit confirmation and receipt advancement are unchanged.
+
+24 processed pages / 90 seconds per read slice; at most three concurrent requests and eight-second request timeout. A 2,000,000-byte streamed response guard bounds input before DOMParser. The source budget is 8 MiB of actual UTF-8 row bytes plus 256 bytes per retained row allowance, separate from transport. Memory exhaustion retains a labelled safe partial subset; hasNextReport comes only from actual retained report links. No estimated unseen student total. The five-minute privacy expiry starts at the first retained names (or an earlier resource pause), survives all resumes unchanged and is reused for final review; no indefinite renewal. Cancel/expiry/unsafe role, login or context changes scrub names and abort owned requests. No source names or fingerprints are written to persistent extension storage, files, logs or URLs.
+
+A proved report terminal is independent of optional metadata/MyStudents discovery. Known gaps, missing terminal, ordinary later-page/network/size failures or invalid rows stay explicit partial/unknown with additional “استيراد المتاح فقط” consent. Reading, sending, local saved receipts and Sync remain distinct. Final summary is compact RTL with academic class counts, total, known pages and coverage; empty numbered lists and obsolete review-window continuation controls were removed.
+
+## Actual checks
+
+| Required check | Result / evidence |
+| --- | --- |
+| `n36_collects_350_and_1000_across_classes_before_any_import` | PASS: actual HTTP-served extension/controller and source reader fetched 350/7 pages/10 classes and 1000/20 pages/30 classes to proved terminals, zero imports before review, correct class totals/sort and max concurrency 3. |
+| `n36_resource_collection_resume_retains_unsaved_rows_without_receipt_gate` | PASS: actual 90-second boundary and small page-budget fixture (production navigation module constant substituted from 24 to 3 only) resume with zero saved classes, retain all 350 identities/7 pages and cumulative totals, no duplication/loss; original privacy expiry retained. Separate 30,000-byte fixture exercises the unchanged production byte-accounting branch with a valid partial subset. |
+| `n36_context_expiry_cancel_partial_and_chunk_receiver_safety` | PASS: later 503 and oversized streamed page preserve 300 vetted names; unknown/gapped terminal, actual terminal 300, optional discovery and unsafe login tested; in-flight cancel empties actual source request registry; cancel, expiry and context clear review. Actual selected 35-name envelope enters owner-bound N12 UI/store: preview writes zero, explicit confirmation adds 35, pending receipt cannot advance, saved receipt advances. Unchanged encrypted/one-time and failed/unknown/repeat safeguards are reused from 0.5.6 proof with exact protected file and receipt-loop checks, plus 0.5.7 current receiver hash/ordering-only delta binding. |
+| `n36_058_ordered_compact_RTL_and_exact_local_package_binding` | PASS: actual source DOM/handlers/CSS over loopback HTTP, fresh isolated contexts at 390px, RTL/no overflow and screenshots inspected. Five focused Node tests PASS including archive/per-file/source binding, 300 transport rejection, academic comparator/permissions unchanged and old packages preserved. |
+
+Commands: `node tests/n36-collect-before-review-browser.mjs`; `N36_BROWSER_PROOF=1 node tests/n36-collect-before-review.test.mjs`; `node --check` for controller/reader/category UI/central download; `git diff --check`. Browser JSON records 17 successful scenarios, source hashes, original failures and finally cleanup. Source-normalization records prove CRLF-to-LF-only finalization without repeating equivalent browser checks. Test-result screenshots are ignored local artifacts under `test-results/n36-collect-before-review/`.
+
+The source fixture uses actual nine-header report HTML and observed links; actual closure-free reader performs same-origin GET and parser/route guards in a separate synthetic source document. Only browser APIs and account service are adapters. The local selected-envelope bridge exercises actual owner-guarded N12 UI/store; it does not claim to be an installed MV3 runtime re-certification. Existing encrypted runtime/negative receipt proof is reused as described above; the 21 unchanged transport negatives and oversized-single-class stress were not rerun.
+
+Preserved failures: initial synthetic harness Unicode encoding caused missing teacher markers; fixed without changing role guards. An editing pass accidentally broke the expiry message branch (`warnings is not defined`); the original branch was restored and expiry/cancel/context were rerun successfully. A proof-reuse assertion initially compared the pre-0.5.7 whole receiver hash and then newline bytes; corrected by checking the recorded immutable old view, the exact current 0.5.7 view and only its already-tested sorting delta, with line-ending normalization for unchanged receipt logic. No genuine service/tool rejection was bypassed or relabelled.
+
+Owned loopback port49438 server, disposable contexts/browser and requests closed in finally through canonical withIsolatedLocalBrowser. Local-only synthetic exemption applies; no shared live-browser/account/Sync/SW certification was attempted. No new app startup dependency; existing offline shell unchanged, so sw.js was not edited.
+
+## Package and remaining gates
+
+ZIP SHA256: `35df9c111fbb090dfe259cfb8fde8345a997c39d093d70705a786dfc14057a25`; bytes: 100087. `assets/extensions/rakeez-teacher-import-helper-0.5.8.manifest.json` binds every shipped file and exact application base; central Koshoof link points to 0.5.8. Older packages remain byte-identical. Candidate commit is returned in runner JSON; this document does not claim publication.
+
+Independent publisher provider/build/immutable/Production parity: NOT_RUN by worker. Official full-source traversal and actual voluntary Rakeez save acceptance: NOT_RUN. The original PO 0.5.7 observation remains 300 rows/6 pages/paused/hasNextReport=true/complete=0 with unknown tail count and no saved proof. No Product CLOSED or PO acceptance is claimed.

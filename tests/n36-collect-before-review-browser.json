@@ -1,0 +1,284 @@
+{
+  "taskId": "continuous-n36-collect-all-report-pages-before-review-20261017",
+  "runId": "77757f26-80d2-4392-9609-0dd419355bbc",
+  "checks": [
+    {
+      "name": "owned-explicit-selected-class-receipt",
+      "status": "PASS",
+      "evidence": {
+        "selected": 35,
+        "added": 35,
+        "previewWrites": 0,
+        "pendingAdvancement": false
+      }
+    },
+    {
+      "name": "collect-350",
+      "status": "PASS",
+      "evidence": {
+        "total": 350,
+        "classes": 10,
+        "coverage": "complete",
+        "pages": 7,
+        "requestsBeforeReview": 7,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-1000",
+      "status": "PASS",
+      "evidence": {
+        "total": 1000,
+        "classes": 30,
+        "coverage": "complete",
+        "pages": 20,
+        "requestsBeforeReview": 20,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-resume",
+      "status": "PASS",
+      "evidence": {
+        "total": 350,
+        "classes": 10,
+        "coverage": "complete",
+        "pages": 7,
+        "requestsBeforeReview": 7,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": true,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-request-resume",
+      "status": "PASS",
+      "evidence": {
+        "total": 350,
+        "classes": 10,
+        "coverage": "complete",
+        "pages": 7,
+        "requestsBeforeReview": 7,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": true,
+        "requestBudget": "Fixture substitutes pages:3 in the actual navigation module; controller/parser/DOM/CSS unchanged"
+      }
+    },
+    {
+      "name": "collect-network",
+      "status": "PASS",
+      "evidence": {
+        "total": 300,
+        "classes": 10,
+        "coverage": "partial",
+        "pages": 6,
+        "requestsBeforeReview": 7,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-oversized",
+      "status": "PASS",
+      "evidence": {
+        "total": 300,
+        "classes": 10,
+        "coverage": "partial",
+        "pages": 6,
+        "requestsBeforeReview": 7,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-memory",
+      "status": "PASS",
+      "evidence": {
+        "total": 93,
+        "classes": 10,
+        "coverage": "partial",
+        "pages": 2,
+        "requestsBeforeReview": 4,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-unknown",
+      "status": "PASS",
+      "evidence": {
+        "total": 50,
+        "classes": 10,
+        "coverage": "partial",
+        "pages": 1,
+        "requestsBeforeReview": 1,
+        "maxParallel": 1,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-gap",
+      "status": "PASS",
+      "evidence": {
+        "total": 50,
+        "classes": 10,
+        "coverage": "partial",
+        "pages": 0,
+        "requestsBeforeReview": 1,
+        "maxParallel": 1,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-terminal300",
+      "status": "PASS",
+      "evidence": {
+        "total": 300,
+        "classes": 10,
+        "coverage": "complete",
+        "pages": 6,
+        "requestsBeforeReview": 6,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "collect-optional",
+      "status": "PASS",
+      "evidence": {
+        "total": 300,
+        "classes": 10,
+        "coverage": "complete",
+        "pages": 6,
+        "requestsBeforeReview": 6,
+        "maxParallel": 3,
+        "importsBeforeReview": 0,
+        "retainedLease": false,
+        "requestBudget": "production24"
+      }
+    },
+    {
+      "name": "inflightcancel-scrub",
+      "status": "PASS",
+      "evidence": {
+        "requests": 1,
+        "registryEmpty": true
+      }
+    },
+    {
+      "name": "cancel-scrub",
+      "status": "PASS",
+      "evidence": {
+        "sent": 0,
+        "status": "توقف التشغيل (CANCELLED). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز."
+      }
+    },
+    {
+      "name": "expiry-scrub",
+      "status": "PASS",
+      "evidence": {
+        "sent": 0,
+        "status": "انتهت مهلة معاينة البيانات ومسحت لحمايتك؛ لا توجد أسماء محفوظة. لبدء معاينة جديدة افتح تبويب المصدر ثم اضغط زر الإضافة طوعًا."
+      }
+    },
+    {
+      "name": "context-scrub",
+      "status": "PASS",
+      "evidence": {
+        "sent": 0,
+        "status": "توقف التشغيل (SOURCE_CONTEXT_CHANGED). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز."
+      }
+    },
+    {
+      "name": "unsafe-scrub",
+      "status": "PASS",
+      "evidence": {
+        "sent": 0
+      }
+    }
+  ],
+  "errors": [],
+  "preservedFailures": [
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-collect-all-report-pages-before-review-20261017\\tests\\n36-collect-before-review-browser.mjs:84:49\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-collect-all-report-pages-before-review-20261017\\tests\\n36-collect-before-review-browser.mjs:84:49\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-collect-all-report-pages-before-review-20261017\\tests\\n36-collect-before-review-browser.mjs:84:49\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2\nDETAIL locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n | ط¨ط§ظ†طھط¸ط§ط± ط·ظ„ط¨ ط§ظ„ط¨ط¯ط، ط§ظ„طµط±ظٹط­ط› ظپطھط­ ظ‡ط°ظ‡ ط§ظ„طµظپط­ط© ظˆط­ط¯ظ‡ ظ„ط§ ظٹط¨ط¯ط£ ظ‚ط±ط§ط،ط©. | N36 0.5.8 | stage=role-selection | reason=AMBIGUOUS_OR_MISSING_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | href=1 | empty=0 | javascript=0 | queryRejected=0 | inlineHandler=0 | readPath=1 | originRejected=0 | formRejected=0",
+    "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-collect-all-report-pages-before-review-20261017\\tests\\n36-collect-before-review-browser.mjs:84:49\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2\nDETAIL locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#source-class-select') to be visible\u001b[22m\n | بانتظار طلب البدء الصريح؛ فتح هذه الصفحة وحده لا يبدأ قراءة. | N36 0.5.8 | stage=role-selection | reason=AMBIGUOUS_OR_MISSING_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | href=1 | empty=0 | javascript=0 | queryRejected=0 | inlineHandler=0 | readPath=1 | originRejected=0 | formRejected=0",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:99:109\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2\nDETAIL Expected values to be strictly equal:\n\n0 !== 1\n | انتهت قراءة الصفحات المتاحة. اختر فصلًا وراجع الدفعة ثم أكّد داخل ركيز. | N36 0.5.8 | stage=run-summary | staged=350 | observedRowsLowerBound=350 | complete=350 | commitEvidence=receiver-only | excluded=none | coverage=complete | hasNextReport=false | processedReportPages=7 | reviewWindow=false",
+    "clock.fastForward: ReferenceError: warnings is not defined\n    at stop (http://127.0.0.1:49438/extensions/rakeez-teacher-import-helper/run-controller.js:37:63)\n    at http://127.0.0.1:49438/extensions/rakeez-teacher-import-helper/run-controller.js:195:134\n    at ClockController._callFirstTimer (eval at evaluate (:311:30), <anonymous>:284:20)\n    at ClockController._runTo (eval at evaluate (:311:30), <anonymous>:119:33)\n    at async ClockController._innerFastForwardTo (eval at evaluate (:311:30), <anonymous>:206:5)\n    at async eval (eval at evaluate (:311:30), <anonymous>:196:7)\n    at async ClockController._runWithDisabledRealTimeSync (eval at evaluate (:311:30), <anonymous>:188:7)\n    at async ClockController.fastForward (eval at evaluate (:311:30), <anonymous>:195:5)\n    at async <anonymous>:337:30\n    at C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n36-collect-all-report-pages-before-review-20261017\\tests\\n36-collect-before-review-browser.mjs:75:47\n    at async withIsolatedLocalBrowser (C:\\Users\\Abody\\Projects\\RakeezX\\scripts\\ops-supervisor-v4\\isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-collect-all-report-pages-before-review-20261017/tests/n36-collect-before-review-browser.mjs:42:2\nDETAIL clock.fastForward: ReferenceError: warnings is not defined\n    at stop (http://127.0.0.1:49438/extensions/rakeez-teacher-import-helper/run-controller.js:37:63)\n    at http://127.0.0.1:49438/extensions/rakeez-teacher-import-helper/run-controller.js:195:134\n    at ClockController._callFirstTimer (eval at evaluate (:311:30), <anonymous>:284:20)\n    at ClockController._runTo (eval at evaluate (:311:30), <anonymous>:119:33)\n    at async ClockController._innerFastForwardTo (eval at evaluate (:311:30), <anonymous>:206:5)\n    at async eval (eval at evaluate (:311:30), <anonymous>:196:7)\n    at async ClockController._runWithDisabledRealTimeSync (eval at evaluate (:311:30), <anonymous>:188:7)\n    at async ClockController.fastForward (eval at evaluate (:311:30), <anonymous>:195:5)\n    at async <anonymous>:337:30 | بلغت القراءة ميزانية الصفحات أو الوقت؛ جُمعت 100 أسماء مؤقتًا. جمع المزيد للقراءة فقط، دون نقل أو حفظ. تبقى المهلة الأصلية. | "
+  ],
+  "status": "PASS",
+  "cleanup": "Owned loopback server closed; isolated helper closed fresh contexts and owned browser in finally; no shared lease required for local synthetic phase.",
+  "sourceHashes": {
+    "extensions/rakeez-teacher-import-helper/run-controller.js": "d6da1ce33ddb289921668663196c5790b9547d7bd7bffeec5990b5eeaa1299e0",
+    "extensions/rakeez-teacher-import-helper/source-adapter.js": "72f509dc5438249e173d181ec211c4548039d7a107267fea2934a0594d725956",
+    "extensions/rakeez-teacher-import-helper/source-roster.js": "abda381a5b4bd8d18801c1f538153b6086d5ff66de1ce658ddd29cee66dc61ad",
+    "extensions/rakeez-teacher-import-helper/categories-popup.js": "179ba55f1111eeb1eb678f11405b8b178d5f2894108c21cd22444b570a7efac7",
+    "extensions/rakeez-teacher-import-helper/class-order.js": "bc1d3397204a35ed6a8c5a49d4a9c7d05a89326e6eebeb2c74f4ed2985cf0b87",
+    "extensions/rakeez-teacher-import-helper/navigation.js": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+    "extensions/rakeez-teacher-import-helper/popup.html": "2f248ac7dba847844da990f1d56187b4e928d2f03fab3518a019df471825b882",
+    "extensions/rakeez-teacher-import-helper/popup.css": "b8b371eb9dcf8ef333aaa50df4427fdd3b99d3ecbcb6519d237ff4f3cbabdc0d",
+    "src/views/class-import-center.js": "e8b1ea23027220604525538fe20edea9383c961c0d9305b2f7ff85abbfff69af",
+    "src/views/teacher-setup-import.js": "667fa83df72cb45c0b0e20902147cac66e11891777111314ebc08dddb5e37a89",
+    "src/lib/n36-extension-protocol.js": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+    "src/store.js": "0d9aca940b3de48c4934e99403bc67fad449ab4f35f3142abddd4fc5cd7749e5"
+  },
+  "sourceNormalization": [
+    {
+      "file": "extensions/rakeez-teacher-import-helper/run-controller.js",
+      "testedSha256": "b09848af6ba4fc02068724444051bb22a2cd90a52cd838e3b959007385d90b0e",
+      "finalSha256": "d6da1ce33ddb289921668663196c5790b9547d7bd7bffeec5990b5eeaa1299e0",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/source-adapter.js",
+      "testedSha256": "e36cabe08338b485e0f887af6f78826e61ea5937f6a56d2e374cc31809d8d2e3",
+      "finalSha256": "72f509dc5438249e173d181ec211c4548039d7a107267fea2934a0594d725956",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/source-roster.js",
+      "testedSha256": "1f9e4a474b3fcfe0a3cc8d2bb81864a450172fc8d88f7f26fbe03ff04bebfb31",
+      "finalSha256": "abda381a5b4bd8d18801c1f538153b6086d5ff66de1ce658ddd29cee66dc61ad",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/categories-popup.js",
+      "testedSha256": "1a344a8d2efc1b6179b5f53084cc9b1afd179ffb9ce45ef0d2cf824ba38a3ea6",
+      "finalSha256": "179ba55f1111eeb1eb678f11405b8b178d5f2894108c21cd22444b570a7efac7",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/navigation.js",
+      "testedSha256": "f0e7ef47ace712f7c8d2728553c052702c8c79570673c3eb5e65a83992a80c15",
+      "finalSha256": "6a766d1590fdc7713b090e6bb1ec15468de1d4426e7dd6da2847ee6f57dcafb4",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    },
+    {
+      "file": "extensions/rakeez-teacher-import-helper/popup.html",
+      "testedSha256": "d4a654d2deea119482507eb78de1323c6754e577ca6cc8e9bca459eff0489d84",
+      "finalSha256": "2f248ac7dba847844da990f1d56187b4e928d2f03fab3518a019df471825b882",
+      "change": "CRLF to LF only; same DOM, JavaScript and CSS inputs"
+    }
+  ],
+  "archiveSha256": "35df9c111fbb090dfe259cfb8fde8345a997c39d093d70705a786dfc14057a25"
+}

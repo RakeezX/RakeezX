@@ -21,7 +21,12 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    check();
    if(!response.ok||response.redirected||new URL(response.url).href!==u.href)fail('REPORT_RESPONSE_REJECTED');
    if(!/^text\/html(?:;|$)/i.test(response.headers.get('content-type')??''))fail('REPORT_CONTENT_TYPE');
-   const html=await response.text();check();if(html.length>2000000)fail('REPORT_SIZE');
+   // Bound decoded input before constructing an inert document, including chunked responses.
+   if(Number(response.headers.get('content-length'))>2000000)fail('REPORT_SIZE');
+   const reader=response.body.getReader(),decoder=new TextDecoder();let html='',bytes=0;
+   try{while(true){const {done,value}=await reader.read();check();if(done)break;bytes+=value.byteLength;if(bytes>2000000)fail('REPORT_SIZE');html+=decoder.decode(value,{stream:true});}html+=decoder.decode();}
+   finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+   check();
    const doc=new DOMParser().parseFromString(html,'text/html');
    if(doc.querySelector('input[type=password],form[action*="Login" i],meta[http-equiv=refresh i]'))fail('LOGIN_OR_LOGOUT');
    const guard=readSourceReportPage('guard',runContext,{document:doc,url:u.href});if(!guard.ok)fail(guard.code);
