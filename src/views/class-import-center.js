@@ -223,15 +223,14 @@ function transferPanel(teachingId) {
         : html`<label><input type="checkbox" data-grade-retire-confirm> أفهم أن الدفعة رُفضت بالكامل وأريد إلغاء هذا الطلب المرفوض مع حفظ سببه</label><button class="btn" data-act="grade-retire" data-mutation="${r.mutationId}">إلغاء الطلب المرفوض وحفظ الرفض</button>`}</p>`)}
     </div></section>
     ` : html`<section id="grade-export-panel" data-grade-export-panel aria-label="تصدير الكشوف" ${transfer.panel !== 'export' ? 'hidden' : ''}>
-    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تصدير كشف نور <bdi dir="ltr">40 / 60</bdi></summary>
+    <details data-noor-grouping ${transfer.noorOpen ? 'open' : ''}><summary>تصدير كشف نور درجات أعمال السنة (40) والاختبارات (60)</summary>
     <div class="n107-noor-items" role="group" aria-label="بنود كشف نور">${items.map(i => {
       const included = !transfer.exportItems || transfer.exportItems.has(i.id);
-      return html`<div class="n107-noor-row"><label><input type="checkbox" data-change="grade-export-selection" data-fk="grade-export-${i.id}" data-grade-export-item value="${i.id}" ${included ? 'checked' : ''}> <span>${i.name}<small>العظمى ${i.max}</small></span></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group" ${included ? '' : 'disabled'}><option value="">اختر المجموعة</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>مجموعة ${group}</option>`)}</select></div>`;
+      return html`<div class="n107-noor-row"><label><input type="checkbox" data-change="grade-export-selection" data-fk="grade-export-${i.id}" data-grade-export-item value="${i.id}" ${included ? 'checked' : ''}> <span>${i.name} <small>· العظمى ${i.max}</small></span></label><select id="noor-${i.id}" class="input" aria-label="مجموعة ${i.name}" data-noor-item="${i.id}" data-fk="grade-noor-${i.id}" data-change="grade-noor-group" ${included ? '' : 'disabled'}><option value="">اختر المجموعة</option>${['40','60'].map(group => html`<option value="${group}" ${(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i)) === group ? 'selected' : ''}>${group === '40' ? 'درجات أعمال السنة (40)' : 'درجات الاختبارات (60)'}</option>`)}</select></div>`;
     })}</div>
-    <div class="n107-noor-totals" data-noor-totals role="status">${['40','60'].map(group=>html`<span>مجموعة ${group}: <bdi dir="ltr">${groupTotal(group)}/${group}</bdi></span>`)}</div>
+    <div class="n107-noor-totals" data-noor-totals role="status">${['40','60'].map(group=>html`<span>${group === '40' ? 'درجات أعمال السنة (40)' : 'درجات الاختبارات (60)'}: <bdi dir="ltr">${groupTotal(group)}/${group}</bdi></span>`)}</div>
     ${selectedItems.some(i=>!['40','60'].includes(transfer.noorGroups?.[i.id] ?? suggestNoorGroup(i))) || groupTotal('40') !== 40 || groupTotal('60') !== 60 ? html`<p class="grade-transfer__hint" data-noor-invalid>عيّن مجموعة لكل بند مختار؛ يجب أن يساوي المجموع <bdi dir="ltr">40/40</bdi> و<bdi dir="ltr">60/60</bdi>.</p>` : ''}
-    <p data-noor-alert role="alert" hidden></p><label><input type="checkbox" data-noor-confirm> أؤكد تعيين البنود المختارة؛ مجموع العظمى 40 و60 دون تكرار أو تحجيم</label>
-    <p class="grade-transfer__hint">أي مجموعة فيها درجة غير مسجلة تبقى فارغة. ثلاثة أعمدة للرصد اليدوي فقط، ليس للرفع المباشر.</p>
+    <p data-noor-alert role="alert" hidden></p>
     <button class="btn btn--primary" data-act="grade-noor-export">تصدير كشف نور</button></details>
     </section>`}
   </div>`;
@@ -298,7 +297,7 @@ function transferExport(el, ev, params) {
     const className = teachingLabel(teaching);
     downloadGradeCsv(exportGradeCsv({ ...context, items: context.items.filter(i => selected.has(i.id)), noorReview: true,
       noorGroups: Object.fromEntries([...root.querySelectorAll('[data-noor-item]')].map(e => [e.dataset.noorItem, e.value])),
-      noorConfirmed: root.querySelector('[data-noor-confirm]')?.checked }), { noorReview: true, className, filenameClassName: filenameTeachingLabel(teaching) });
+      noorConfirmed: true }), { noorReview: true, className, filenameClassName: filenameTeachingLabel(teaching) });
   } catch (error) { alert.textContent = error.message; alert.hidden = false; }
 }
 
@@ -370,7 +369,7 @@ const transferActions = {
     },
     'grade-mapping'(el) { if (draft.review && !transfer.created || transfer.recovery.length) return; readTransferMappings(el.closest('[data-grade-transfer]')); transfer.review = null; transfer.editMapping = true; repaint(); },
     'grade-edit-mapping'() { if (transfer.busy || transfer.created && (!transfer.needsReview || transfer.plan)) return; draft={manual:draft.manual};transfer.plan=null;transfer.page=0;transfer.review = null; transfer.editMapping = true; repaint(); },
-    'grade-export-selection'(el) { transfer.exportOpen = true; transfer.noorOpen = el.closest('[data-grade-transfer]').querySelector('[data-noor-grouping]').open; const confirm = el.closest('[data-grade-transfer]').querySelector('[data-noor-confirm]'); if (confirm) confirm.checked = false; transfer.exportItems = new Set([...el.closest('[data-grade-transfer]').querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value)); repaint(); },
+    'grade-export-selection'(el) { transfer.exportOpen = true; transfer.noorOpen = el.closest('[data-grade-transfer]').querySelector('[data-noor-grouping]').open; transfer.exportItems = new Set([...el.closest('[data-grade-transfer]').querySelectorAll('[data-grade-export-item]:checked')].map(e => e.value)); repaint(); },
     'grade-review'(el, ev, params) {
       try { assertFileCurrent(); readTransferMappings(el.closest('[data-grade-transfer]')); transfer.mappings=transfer.mappings.map(m=>m.kind==='new'?{...m,confirmed:true}:m); transfer.page=0; if (hub.kind === 'new') { reviewNewRoster(); repaint(); return; } transfer.review = transfer.importMode === 'names' ? store.reviewNamesImport(params.id, transfer) : store.reviewGradeImport(params.id, transfer); transfer.message = ''; transfer.error = false; }
       catch (error) { transfer.review = null; transfer.message = error.message === 'GRADE_NEW_ITEM_CONFIRM_REQUIRED' ? 'أكد إنشاء كل بند جديد باسمه وعظماه، أو اختر تجاهله قبل المراجعة.' : error.message === 'GRADE_CONTEXT_INVALID' ? 'بيانات الفصل لم تتأكد بالمزامنة بعد. أكمل المزامنة ثم أعد المراجعة؛ الملف والأعمدة محفوظة.' : error.message === 'GRADE_DUPLICATE_ITEM' ? 'اختر بندًا مختلفًا لكل عمود درجات؛ لا يمكن ربط عمودين بالبند نفسه.' : 'راجع الأعمدة والبنود والعظمى: ' + error.message; transfer.error = true; }
@@ -562,7 +561,7 @@ function contextRoute(p = {}) {
 }
 const locked = () => draft.busy || transfer.busy || transfer.writing;
 function tabs() {
-  return html`<nav class="koshoof-modes" aria-label="مهام الكشوف">${['import','export'].map(tab => html`<button class="btn ${hub.tab === tab ? 'btn--primary' : 'btn--quiet'}" data-act="koshoof-tab" data-tab="${tab}" aria-pressed="${hub.tab === tab}" ${locked() ? 'disabled' : ''}>${tab === 'import' ? 'استيراد' : 'تصدير'}</button>`)}</nav>`;
+  return html`<nav class="koshoof-modes" aria-label="مهام الكشوف">${['import','export'].map(tab => html`<button class="btn ${hub.tab === tab ? 'btn--primary' : 'btn--quiet'}" data-act="koshoof-tab" data-tab="${tab}" aria-pressed="${hub.tab === tab ? 'true' : 'false'}" ${locked() ? 'disabled' : ''}>${tab === 'import' ? 'استيراد' : 'تصدير'}</button>`)}</nav>`;
 }
 function existingPane() {
   if (!hub.existing || !canOpenKoshoof({ id: hub.existing })) { return ''; }

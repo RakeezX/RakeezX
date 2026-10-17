@@ -1,0 +1,109 @@
+{
+  "taskId": "continuous-n107-noor-yearwork-labels-direct-export-tabs-20261017",
+  "runId": "027e8234-1194-46ab-acdb-c3b6385fc289",
+  "checks": [
+    {
+      "name": "n107_noor_exact_yearwork_exam_labels_inline_max_and_visible_responsive_tabs",
+      "status": "PASS",
+      "evidence": "Actual served account fixture/source CSS: 320/390/1280 screenshots, exact summary/options/dynamic totals, one inline item/max list, removed checkbox/help, no overflow, balanced >=44px tabs and visible inactive surface/border in light and dark plus focus. Prior mapping/import/blank0/core guard evidence reused by exact source hashes."
+    },
+    {
+      "name": "n107_noor_direct_explicit_export_current_payload_and_invalid_totals_refusal",
+      "status": "PASS",
+      "evidence": "Actual explicit export produced three browser CSV downloads: initial 40/60; restored selection; changed 20-point groups changed CSV value 7 to 0. Deselect/disabled group, missing group and wrong/over totals refused with alert and no download; selections alone never downloaded. No store changes or service grade writes."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "4379b35c77378545310b3fbac75e29b84131865d657a50e95ae202b5aee2ff16",
+    "src/styles/components.css": "9960f0ec2b28bfa17fd80ec604984913428a42f98fbb308a54b65981a02d8eea",
+    "src/lib/grade-transfer.js": "1111b142cc220b3a6d7660f7c716cc282ef52ac4a58933d851a46636451619ca",
+    "src/lib/grade-transfer-export.js": "2ada95ab60a3eea23a84ead40cb8d0ce9f52ab8caea1ce940cf64ed2e7cfe0c9",
+    "src/store.js": "b25bc6cd885b7ce852d6b4a2ab0926e4c758db2c66abc0b6cf4d55e7c7f06f82"
+  },
+  "developmentFailures": [
+    "Initial rendered check caught empty inactive aria-pressed from boolean template interpolation, so the false selector had no surface. Fixed tab output to explicit true/false strings; unchanged core evidence retained."
+  ],
+  "reusedEvidence": {
+    "source": "tests/n107-readable-mapping-noor-browser.json",
+    "sha256": "c22696673e6a0b611777763d9a389d80926bc2290c1be1f5bb37908f181c76ac",
+    "functions": {
+      "function reviewNewRoster()": "7d5e8a803a3927bc4561af1883e11540654878da54dba6c9a82a595837f78043",
+      "async function transferConfirm(": "8c246eaa37e892443777bd59e20f2d74196241f73e8fa2846308f1bc27224340",
+      "const importChanged =": "f6578d353ecff22ccb4ea5a33e4c7ccca195b0b2359596f308065de45ebe1a8f",
+      "function directExtensionEntry()": "670b7428255d05348bd130826097d9a6906f70c55dd3a60bc0ca01144b68ebb2"
+    }
+  },
+  "lightTabs320": [
+    {
+      "w": 146,
+      "h": 44,
+      "bg": "rgb(237, 243, 239)",
+      "border": "solid",
+      "color": "rgb(21, 37, 61)",
+      "pressed": "false"
+    },
+    {
+      "w": 146,
+      "h": 44,
+      "bg": "rgb(26, 170, 122)",
+      "border": "solid",
+      "color": "rgb(6, 35, 31)",
+      "pressed": "true"
+    }
+  ],
+  "lightTabs390": [
+    {
+      "w": 177,
+      "h": 44,
+      "bg": "rgb(237, 243, 239)",
+      "border": "solid",
+      "color": "rgb(21, 37, 61)",
+      "pressed": "false"
+    },
+    {
+      "w": 177,
+      "h": 44,
+      "bg": "rgb(26, 170, 122)",
+      "border": "solid",
+      "color": "rgb(6, 35, 31)",
+      "pressed": "true"
+    }
+  ],
+  "darkTabs390": [
+    {
+      "w": 177,
+      "h": 44,
+      "bg": "rgb(237, 243, 239)",
+      "border": "solid",
+      "color": "rgb(21, 37, 61)",
+      "pressed": "false"
+    },
+    {
+      "w": 177,
+      "h": 44,
+      "bg": "rgb(24, 168, 120)",
+      "border": "solid",
+      "color": "rgb(6, 35, 31)",
+      "pressed": "true"
+    }
+  ],
+  "lightTabs1280": [
+    {
+      "w": 464,
+      "h": 44,
+      "bg": "rgb(237, 243, 239)",
+      "border": "solid",
+      "color": "rgb(21, 37, 61)",
+      "pressed": "false"
+    },
+    {
+      "w": 464,
+      "h": 44,
+      "bg": "rgb(26, 170, 122)",
+      "border": "solid",
+      "color": "rgb(6, 35, 31)",
+      "pressed": "true"
+    }
+  ]
+}

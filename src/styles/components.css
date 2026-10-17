@@ -8463,6 +8463,10 @@
 /* AI N107: a single mapping grid and Noor selector, sharing controls at every width. */
 .class-import-page .koshoof-modes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
 .class-import-page .koshoof-modes .btn { min-inline-size:0; min-block-size:44px; height:auto; white-space:normal; }
+/* AI N107: visible inactive surfaces, preserving branded active buttons and focus. */
+.class-import-page .koshoof-modes .btn[aria-pressed="false"] { background:var(--bg-sunk); border:1px solid var(--border); color:var(--text); }
+.class-import-page .koshoof-modes .btn[aria-pressed="false"]:hover { background:var(--bg-hover, var(--bg)); border-color:var(--text-2); }
+.class-import-page .koshoof-modes .btn:focus-visible { outline:2px solid var(--brand); outline-offset:3px; }
 .class-import-page .grade-transfer__mapping { display:block; margin-block:var(--sp-3); }
 .class-import-page .grade-transfer__identity { display:grid; gap:var(--sp-3); margin-block:var(--sp-3); }
 .class-import-page .grade-transfer__identity select { display:block; inline-size:100%; }
@@ -8478,7 +8482,9 @@
 .class-import-page .n107-noor-items { margin-block:var(--sp-3); }
 .class-import-page .n107-noor-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(110px,.45fr); gap:var(--sp-3); align-items:center; padding-block:var(--sp-2); border-block-end:1px solid var(--border); }
 .class-import-page .n107-noor-row label { display:flex; align-items:center; gap:var(--sp-2); min-block-size:44px; min-inline-size:0; overflow-wrap:anywhere; }
-.class-import-page .n107-noor-row small { display:block; color:var(--text-2); }
+.class-import-page .n107-noor-row small { display:inline; white-space:nowrap; color:var(--text-2); }
+.class-import-page .n107-noor-row label > span { min-inline-size:0; }
+.class-import-page .n107-noor-row input { flex-shrink:0; }
 .class-import-page .n107-noor-row select { min-inline-size:0; inline-size:100%; min-block-size:44px; }
 .class-import-page .n107-noor-row:has(input:not(:checked)) { color:var(--text-2); }
 .class-import-page .n107-noor-totals { display:flex; flex-wrap:wrap; gap:var(--sp-3); margin-block:var(--sp-3); }
