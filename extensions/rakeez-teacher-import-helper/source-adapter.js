@@ -146,7 +146,10 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  if(candidates.length>1)return diagnostic('AMBIGUOUS_TABLE');
  if(!candidates.length)return pending();
  const {table,text:tsv,duplicates,excluded=0,rowContinuation=null,schoolNames=[]}=candidates[0],links=[],warnings=[];
- const coverageError=code=>({ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links:[],warnings:[{category:mode,code}],skipped:[],pagination:null,duplicates,excluded,rowContinuation,schoolNames});
+ // Fixed structural allowlist only: no source strings, hrefs or row data.
+ const pagerEvidence={pagerCount:0,currentPage:null,endpointKind:'none',disabledNext:false,terminalEvidence:'unproven'};
+ const pagerDiagnostic=reason=>({stage:'report-pagination',reason,category:'students',pager:{...pagerEvidence}});
+ const coverageError=code=>({ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links:[],warnings:[{category:mode,code}],skipped:[],pagination:null,diagnostic:pagerDiagnostic(code),duplicates,excluded,rowContinuation,schoolNames});
  let pagination=null;
  if(mode==='students'){
   const digits=v=>v.replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
@@ -164,28 +167,36 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
    for(let n=a.parentElement,depth=0;n&&n!==document.body&&depth<4;n=n.parentElement,depth++)if(n.querySelector('[aria-current=page],[role=status],a[rel~=next],a[rel~=last]')){scopes.add(n);break;}
   }
   const pagers=[...scopes].filter(n=>![...scopes].some(c=>c!==n&&n.contains(c)));
+  pagerEvidence.pagerCount=Math.min(pagers.length,5);
   if(pagers.length>4)return coverageError('AMBIGUOUS_PAGINATION');
   const models=[];
   for(const pager of pagers){
    const nodes=Array.from(pager.querySelectorAll('*')).filter(visible);if(nodes.length>150)return coverageError('PAGINATION_LIMIT');
    const active=[...new Set(nodes.filter(n=>n.matches('[aria-current=page],.active')).flatMap(n=>{
-    if(n.matches('li.page-item.active')){const child=Array.from(n.children).filter(c=>c.matches('a.page-link')&&visible(c));return child.length===1?[number(text(child[0]))]:[null];}
+    if(n.matches('li.page-item.active')){const child=Array.from(n.children).filter(c=>c.matches('a.page-link,span.page-link')&&visible(c));return child.length===1?[number(text(child[0]))]:[null];}
     return [number(text(n))];
    }).filter(n=>n!==null))];
    // Observed Bootstrap endpoint ownership: first disabled arrow is Previous, final is Next.
    const items=Array.from(pager.children),observed=pager.matches('ul.pagination')&&items.length>=3&&items.every(n=>n.matches('li.page-item'))&&items[0].querySelector('svg')&&items.at(-1).querySelector('svg');
-   const last=observed?items.at(-1):null,lastAnchor=last?.querySelector('a.page-link');
+   const last=observed?items.at(-1):null;
+   const controls=last?Array.from(last.children).filter(n=>n.matches('a.page-link,span.page-link')&&visible(n)):[];
+   const lastAnchor=controls.length===1?controls[0]:null;
+   const explicitNext=n=>n.rel?.split(/\s+/).includes('next')||['التالي','الصفحة التالية','Next','next'].includes(n.getAttribute('aria-label'))||['التالي','الصفحة التالية'].includes(text(n));
+   pagerEvidence.endpointKind=lastAnchor?(lastAnchor.tagName==='A'?'anchor':'span'):observed?'ambiguous':'none';
    const statuses=[...new Set(nodes.map(text).map(digits).filter(v=>/^الصفحة \d+ من \d+$/.test(v)))];
    const status=statuses.length===1?/^الصفحة (\d+) من (\d+)$/.exec(statuses[0]):null;
    const totals=[...new Set([...(status?[Number(status[2])]:[]),...nodes.concat(pager).filter(n=>n.hasAttribute('data-total-pages')).map(n=>number(n.getAttribute('data-total-pages')))])];
    if(statuses.length>1||active.length>1||totals.some(n=>n===null))return coverageError('AMBIGUOUS_PAGINATION');
    const current=active[0]??(status?Number(status[1]):pageOf(now));
    if(!current||current<1||!Number.isSafeInteger(current)||pageOf(now)!==null&&pageOf(now)!==current)return coverageError('PAGINATION_MISMATCH');
-   const actual=[],numbers=new Set([current]);let terminal=!!(last?.matches('.disabled,[aria-disabled=true]')&&lastAnchor&&!lastAnchor.hasAttribute('href'));
+   pagerEvidence.currentPage=current<=1000000?current:null;
+   const actual=[],numbers=new Set([current]);let terminal=false;
    for(const n of nodes){
     const disabled=n.matches('[disabled],[aria-disabled=true],.disabled')||n.closest('[aria-disabled=true],.disabled');
-    const next=(observed&&n===lastAnchor)||n.rel?.split(/\s+/).includes('next')||['التالي','الصفحة التالية'].includes(text(n));
-    if(disabled&&next)terminal=true;
+    const observedNext=observed&&n===lastAnchor&&n.tagName==='A';
+    const next=observedNext||explicitNext(n);
+    if(next&&n.matches('a,span,button')&&pagerEvidence.endpointKind==='none')pagerEvidence.endpointKind=n.tagName==='A'?'anchor':n.tagName==='SPAN'?'span':'other';
+    if(disabled&&next){terminal=true;pagerEvidence.disabledNext=true;pagerEvidence.terminalEvidence=observedNext?'observed-anchor':'explicit-next';}
     if(n.tagName!=='A'||!n.hasAttribute('href')||!isPage(n)||disabled)continue;
     let u;try{u=new URL(n.getAttribute('href'),location.href);}catch{return coverageError('UNSAFE_PAGINATION');}
     if(u.origin!==now.origin||u.username||u.password)return coverageError('UNSAFE_PAGINATION');
@@ -227,5 +238,5 @@ export function readSourceReportPage(mode,runContext=null,source=null) {
  }
  if(excluded)warnings.push({category:mode,code:'INVALID_ROWS_EXCLUDED'});
  if(rowContinuation!==null){links.length=0;pagination=null;}
- return {ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links,warnings,skipped:[],pagination,duplicates,excluded,rowContinuation,schoolNames};
+ return {ok:true,tables:tsv.includes('\n')?[{category:mode,text:tsv}]:[],links,warnings,skipped:[],pagination,diagnostic:mode==='students'?pagerDiagnostic(warnings[0]?.code??'PAGINATION_PARSED'):null,duplicates,excluded,rowContinuation,schoolNames};
 }

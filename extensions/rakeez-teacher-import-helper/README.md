@@ -1,3 +1,7 @@
+## 0.5.9 — AI-authored explicit terminal compatibility (17 October 2026)
+
+Supports an active `span.page-link` and an explicitly labelled disabled Next span in the bounded report pager. Preserves the observed anchor/SVG/sr-only/ellipsis baseline. Unknown or contradictory ends remain partial; neither 303 rows nor seven visible pages proves an official total. Safe optional pagination diagnostics contain fixed counts, booleans and enums only. No school/account trial or save is certified by this synthetic correction.
+
 ## 0.5.8 — AI-authored collection-before-review correction (17 October 2026)
 
 One explicit read run accumulates validated observed report pages before class selection. Normal 350/1000 multi-class runs no longer stop at 300 names. Transport remains at most 300 names from one selected source class; authenticated N12 review and explicit confirmation remain required. Reading never proves saving or Sync.

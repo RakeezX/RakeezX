@@ -1,0 +1,67 @@
+{
+  "taskId": "continuous-n36-terminal-pager-evidence-and-repair-20261017",
+  "runId": "0c942757-630e-4aa9-b7e8-46b112d8f7fe",
+  "checks": [
+    {
+      "name": "actual-reader-before-after-observed-baseline-and-negative-privacy",
+      "status": "PASS",
+      "evidence": {
+        "before": [
+          {
+            "category": "students",
+            "code": "PAGINATION_MISSING_NEXT"
+          }
+        ],
+        "span": {
+          "stage": "report-pagination",
+          "reason": "PAGINATION_PARSED",
+          "category": "students",
+          "pager": {
+            "pagerCount": 1,
+            "currentPage": 7,
+            "endpointKind": "span",
+            "disabledNext": true,
+            "terminalEvidence": "explicit-next"
+          }
+        },
+        "baselineLinks": 6,
+        "negativeCases": 7
+      }
+    },
+    {
+      "name": "controller-303-partial",
+      "status": "PASS",
+      "evidence": {
+        "rows": 303,
+        "coverage": "partial",
+        "complete": false,
+        "pages": 7,
+        "requests": 7,
+        "diagnostics": "N36 0.5.9 | stage=report-pagination | reason=PAGINATION_MISSING_NEXT | category=students | pagerCount=1 | currentPage=7 | endpointKind=none | disabledNext=false | terminalEvidence=unproven\nN36 0.5.9 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=0 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.9 | stage=run-summary | staged=303 | observedRowsLowerBound=303 | complete=0 | commitEvidence=receiver-only | excluded=PAGINATION_MISSING_NEXT,ROSTER_LINKS_UNAVAILABLE | coverage=partial | hasNextReport=false | processedReportPages=7 | reviewWindow=false"
+      }
+    },
+    {
+      "name": "controller-303-terminal",
+      "status": "PASS",
+      "evidence": {
+        "rows": 303,
+        "coverage": "complete",
+        "complete": true,
+        "pages": 7,
+        "requests": 7,
+        "diagnostics": "N36 0.5.9 | stage=report-pagination | reason=PAGINATION_PARSED | category=students | pagerCount=1 | currentPage=7 | endpointKind=span | disabledNext=true | terminalEvidence=explicit-next\nN36 0.5.9 | stage=run-summary | staged=303 | observedRowsLowerBound=303 | complete=303 | commitEvidence=receiver-only | excluded=none | coverage=complete | hasNextReport=false | processedReportPages=7 | reviewWindow=false"
+      }
+    }
+  ],
+  "errors": [],
+  "preservedFailures": [],
+  "status": "PASS",
+  "cleanup": "Owned loopback server and isolated contexts/browser closed in finally; no shared browser lease required.",
+  "sourceHashes": {
+    "source-adapter.js": "d78773bba91bfcfb2620038d78f43823dfb7ba3cebf6cc7184e1ab8345585e9c",
+    "run-controller.js": "6412f1352d8d1d6f4aee78509360b8bc7ae5f0afb1cca69ac5f24585ab91c3ae",
+    "source-roster.js": "abda381a5b4bd8d18801c1f538153b6086d5ff66de1ce658ddd29cee66dc61ad",
+    "popup.html": "2f248ac7dba847844da990f1d56187b4e928d2f03fab3518a019df471825b882",
+    "popup.css": "b8b371eb9dcf8ef333aaa50df4427fdd3b99d3ecbcb6519d237ff4f3cbabdc0d"
+  }
+}

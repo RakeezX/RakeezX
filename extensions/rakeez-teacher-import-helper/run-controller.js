@@ -15,9 +15,11 @@ const entryText=e=>`pageKind=${e.pageKind} | readyState=${e.readyState} | source
 function showDiagnostic(d){
  if(!d)return;
  let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | commitEvidence=receiver-only | excluded=${d.run.excluded||'none'} | coverage=${d.run.coverage} | hasNextReport=${d.run.hasNextReport} | processedReportPages=${d.run.processedReportPages} | reviewWindow=${d.run.reviewWindow}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
+ if(d.pager)line+=' | '+['pagerCount','currentPage','endpointKind','disabledNext','terminalEvidence'].map(k=>k+'='+d.pager[k]).join(' | ');
  if(d.roster)line+=` | cause=${d.roster.cause} | relevant=${d.roster.relevant} | unsupported=${d.roster.unsupported} | iframeCount=${d.roster.iframes} | frameReport=unconfirmed`;
  if(d.sourceTabMatch===true)line+=' | sourceTabMatch=true';
  if(d.template)line+=` | route=${d.template} | queryKeys=${d.keys?.join(',')||'-'} | unknownKeys=${d.unknownKeys??0} | routeReason=${d.detail??'unexpected-path'}`;
+ if(d.run&&diagnosticLines.length>=8)diagnosticLines.shift();
  if(!diagnosticLines.includes(line)&&diagnosticLines.length<8)diagnosticLines.push(line);
  $('route-diagnostic').value=diagnosticLines.join('\n');$('route-diagnostic').hidden=false;$('copy-route-diagnostic').hidden=false;
  for(const related of d.related??[])showDiagnostic(related);
@@ -165,6 +167,7 @@ async function start(tabId){
    for(const school of page.schoolNames??[]){if(job.context?.schoolName&&job.context.schoolName!==school)throw Error('SCHOOL_CONTEXT_CHANGED');job.rosterSchools.add(school);if(job.rosterSchools.size>1)throw Error('SCHOOL_CONTEXT_CHANGED');}
    if(next.kind==='home'&&page.links.some(l=>l.kind==='gateway'&&l.context?.kind==='selected-teacher-card')){job.pendingSchoolTables=page.tables;page={...page,tables:[]};}
    if(next.kind==='gateway'&&job.pendingSchoolTables.length){page={...page,tables:[...job.pendingSchoolTables,...page.tables]};job.pendingSchoolTables=[];job.gatewaySettleUntil=null;}
+   if(page.diagnostic&&(page.warnings.length||page.pagination?.terminal))showDiagnostic(page.diagnostic);
    job.warnings.push(...page.warnings);job.warnings=[...new Map(job.warnings.map(w=>[w.category+'|'+w.code,w])).values()];
    if(next.kind==='students'&&page.duplicates)job.warnings.push({category:'students',code:'DUPLICATE_STUDENT_IDENTITY'});
    job.excluded+=(page.excluded??0)+(page.duplicates??0);
