@@ -1,0 +1,163 @@
+{
+  "taskId": "continuous-n88-branded-teacher-student-journey-20261017",
+  "runId": "bbb04581-90eb-4340-a8d7-e7c9ccc9abbe",
+  "baseSha": "aa6a1843c5102add77d61d1a3777c7916e376bb7",
+  "sourceSha256": "d554f9f5d986158de143f71390a76487f6901b512e5e01bc0509c7f588eabf64",
+  "scope": "Actual application source over owned loopback; isolated helper; server/browser finally cleanup; synthetic only",
+  "results": [
+    {
+      "name": "n88_teacher_invitation_to_student_preview_is_clear_and_interactive",
+      "status": "PASS",
+      "evidence": "Four actual-app contexts: invitation opens student activities, statuses, 1/3 progress and success; reset restores teacher."
+    },
+    {
+      "name": "n88_actual_Rakeez_brand_RTL_mobile_desktop_visuals",
+      "status": "PASS",
+      "evidence": "390/1280 light/dark before/teacher/student screenshots; shipped theme logos, --font and tokens; zero axe violations and no overflow."
+    },
+    {
+      "name": "n88_compact_synthetic_notice_manual_reset_keyboard_and_isolation",
+      "status": "PASS",
+      "evidence": "Enter/Tab primary/manual/error/reset, correct focus, single notice; App only reads unchanged head theme; two axe scans read existing flatpickr CSS; no service/account/data calls."
+    }
+  ],
+  "visuals": [
+    {
+      "width": 390,
+      "theme": "light",
+      "style": {
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "token": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "bg": "rgb(244, 247, 245)",
+        "dir": "rtl"
+      },
+      "screenshots": {
+        "before": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-light-before.png",
+        "teacher": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-light-teacher.png",
+        "student": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-light-student.png"
+      },
+      "axeViolations": 0,
+      "overflow": false,
+      "keyboard": true,
+      "manual": true,
+      "reset": true,
+      "requests": [
+        "/",
+        "/src/styles/app.css",
+        "/src/styles/components.css",
+        "/src/styles/schedule-work-integration.css",
+        "/src/styles/calendar-work-0417.css",
+        "/src/styles/rakeez-datetime.css",
+        "/src/styles/work-n82.css",
+        "/src/styles/work-n70.css",
+        "/assets/header-light-standard.svg",
+        "/assets/header-dark-standard.svg",
+        "/src/vendor/flatpickr/flatpickr.min.css",
+        "/src/views/n88-public-guest.js"
+      ]
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "style": {
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "token": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "bg": "rgb(13, 21, 17)",
+        "dir": "rtl"
+      },
+      "screenshots": {
+        "before": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-dark-before.png",
+        "teacher": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-dark-teacher.png",
+        "student": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-390-dark-student.png"
+      },
+      "axeViolations": 0,
+      "overflow": false,
+      "keyboard": true,
+      "manual": true,
+      "reset": true,
+      "requests": [
+        "/",
+        "/src/styles/app.css",
+        "/src/styles/components.css",
+        "/src/styles/schedule-work-integration.css",
+        "/src/styles/calendar-work-0417.css",
+        "/src/styles/rakeez-datetime.css",
+        "/src/styles/work-n82.css",
+        "/src/styles/work-n70.css",
+        "/assets/header-light-standard.svg",
+        "/assets/header-dark-standard.svg",
+        "/src/vendor/flatpickr/flatpickr.min.css",
+        "/src/views/n88-public-guest.js"
+      ]
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "style": {
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "token": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "bg": "rgb(244, 247, 245)",
+        "dir": "rtl"
+      },
+      "screenshots": {
+        "before": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-light-before.png",
+        "teacher": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-light-teacher.png",
+        "student": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-light-student.png"
+      },
+      "axeViolations": 0,
+      "overflow": false,
+      "keyboard": true,
+      "manual": true,
+      "reset": true,
+      "requests": [
+        "/",
+        "/src/styles/app.css",
+        "/src/styles/components.css",
+        "/src/styles/schedule-work-integration.css",
+        "/src/styles/calendar-work-0417.css",
+        "/src/styles/rakeez-datetime.css",
+        "/src/styles/work-n82.css",
+        "/src/styles/work-n70.css",
+        "/assets/header-light-standard.svg",
+        "/assets/header-dark-standard.svg",
+        "/src/vendor/flatpickr/flatpickr.min.css",
+        "/src/views/n88-public-guest.js"
+      ]
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "style": {
+        "font": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "token": "\"Thmanyah Sans\", \"IBM Plex Sans Arabic\", \"Noto Sans Arabic\", \"Segoe UI\", Tahoma, Arial, sans-serif",
+        "bg": "rgb(13, 21, 17)",
+        "dir": "rtl"
+      },
+      "screenshots": {
+        "before": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-dark-before.png",
+        "teacher": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-dark-teacher.png",
+        "student": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-branded-bbb04581-90eb-4340-a8d7-e7c9ccc9abbe-1280-dark-student.png"
+      },
+      "axeViolations": 0,
+      "overflow": false,
+      "keyboard": true,
+      "manual": true,
+      "reset": true,
+      "requests": [
+        "/",
+        "/src/styles/app.css",
+        "/src/styles/components.css",
+        "/src/styles/schedule-work-integration.css",
+        "/src/styles/calendar-work-0417.css",
+        "/src/styles/rakeez-datetime.css",
+        "/src/styles/work-n82.css",
+        "/src/styles/work-n70.css",
+        "/assets/header-light-standard.svg",
+        "/assets/header-dark-standard.svg",
+        "/src/vendor/flatpickr/flatpickr.min.css",
+        "/src/views/n88-public-guest.js"
+      ]
+    }
+  ],
+  "evidenceReuse": "Only trailing blank line removed after screenshots; behavior/CSS unchanged."
+}

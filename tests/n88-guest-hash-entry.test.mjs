@@ -14,7 +14,7 @@ test('only module entry changes in index; exact hash selects standalone module',
  const guest=await read('src/views/n88-public-guest.js');
  assert.doesNotMatch(guest,/\b(import|fetch|XMLHttpRequest|WebSocket|localStorage|sessionStorage|indexedDB|sendBeacon|dispatch|serviceWorker)\b/);
  assert.doesNotMatch(guest,/https?:|ownerId|authUserId|access_token|\.value\s*\}/);
- assert.match(guest,/نموذج تجريبي دون بيانات طلاب أو دخول فعلي/);
+ assert.match(guest,/بيانات تجريبية/);
 });
 test('actual offline worker returns shell and isolated new startup dependency',async()=>{
  const worker=await read('sw.js'),handlers={},origin='http://127.0.0.1:48888/';
