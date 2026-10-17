@@ -6,8 +6,9 @@ const root = document.getElementById('pilot');
 if (location.pathname === '/teacher') {
   const client = createStudentPortalClient({ fetch: (url, options) => fetch(url, { ...options,
     headers: { ...options.headers, 'X-Fixture-Teacher': 'fabricated-teacher-a' } }) });
-  window.pilot = await mountTeacherInvitations(root, { client, studentUrl: location.origin + '/student',
+  window.pilot = await mountTeacherInvitations(root, { client,
     copy: async text => { window.fabricatedCopy = text; }, print: () => { window.fabricatedPrint = true; } });
 } else {
-  window.pilot = mountStudentPortal(root, { client: createStudentPortalClient({ fetch: window.fetch.bind(window) }) });
+  const namespace = /^\/s\/([A-Za-z0-9_-]{24,64})$/.exec(location.pathname)?.[1];
+  window.pilot = mountStudentPortal(root, { client: createStudentPortalClient({ base: '/api/n88/s/' + namespace, fetch: window.fetch.bind(window) }) });
 }

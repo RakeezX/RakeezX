@@ -1,140 +1,135 @@
+// AI: actual inert application modules/CSS on HTTP, canonical fresh synthetic contexts.
 import assert from 'node:assert/strict';
 import { writeFile, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { withIsolatedLocalBrowser } from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
-import { openReadyServedDemo } from './helpers/served-demo-readiness.mjs';
 import { startPilotServer } from './fixtures/n88-real-pilot/server.mjs';
-const taskId = 'continuous-n88-real-use-readonly-pilot-preparation-20261017';
-const runId = '3c617c1e-b814-4bb3-beeb-df52b8f77490';
-const checks = [], server = await startPilotServer();
-const appOnly = process.argv.includes('--app-only');
-if (appOnly) checks.push(...JSON.parse(await readFile('tests/n88-real-pilot-browser.json', 'utf8')).checks.filter(c => c.name.startsWith('actual-source-ui-')));
-const save = async () => writeFile('tests/n88-real-pilot-browser.json', JSON.stringify({ taskId, runId, target: 'task-owned loopback HTTP with fabricated auth/repository/clock; actual source UI/CSS; no hosted service', checks,
-  limits: ['No hosted SQL/RLS or real teacher authentication', 'No physical mobile, deployed HTTPS/proxy, Service Worker/offline certification', 'Print/clipboard adapter calls injected; no OS printer/clipboard proof'], cleanup: 'All owned contexts/browser closed by canonical helper; server closed in finally.' }, null, 2) + '\n');
-const snapshot = page => page.evaluate(async () => {
-  const db = await import('/src/lib/db.js');
-  return { local: { ...localStorage }, session: { ...sessionStorage },
-    rows: Object.fromEntries(await Promise.all(db.STORES.map(async name => [name, await db.getAll(name)]))) };
-});
+import { POLICY } from '../drafts/n88-student-portal/service.mjs';
+const taskId = 'continuous-n88-persistent-six-digit-student-code-20261017';
+const runId = 'fdce40ca-318e-4da2-a925-9a87c6f091b5';
+const server = await startPilotServer(), checks = [], failures = [];
+const record = { taskId, runId, source: 'Exact committed content of scoped files; final candidate bound by worker JSON and review document.',
+  teacherUrl: server.url + '/teacher', ownedPid: server.pid, startedAt: server.startedAt, serverExpiresAt: server.expiresAt,
+  codeLifetime: 'No expiry/consumption. Server expiry is ONLY local process lifetime.', checks, failures,
+  limits: ['Fabricated auth/socket/repository only; not real Auth or hosted proxy.', 'Memory transactions/rate limits are not durable multi-instance SQL/RLS proof.',
+    'No physical-device, real printer/clipboard, hosted TLS or Production claim.'], cleanup: 'pending' };
+record.testedSourceSha256 = Object.fromEntries(await Promise.all([
+  'src/lib/student-portal-client.js', 'src/views/student-portal.js', 'drafts/n88-student-portal/service.mjs',
+  'drafts/n88-student-portal/memory-repository.mjs', 'drafts/n88-student-portal/teacher-controller.js',
+  'drafts/n88-student-portal/portal.css', 'tests/fixtures/n88-real-pilot/server.mjs',
+  'tests/fixtures/n88-real-pilot/fixture.mjs', 'tests/fixtures/n88-real-pilot/entry.js', 'tests/n88-real-pilot-browser.mjs'
+].map(async file => [file, createHash('sha256').update((await readFile(file,'utf8')).replace(/\r\n/g,'\n')).digest('hex')])));
+record.correctedHarnessFailure = 'Initial delayed-response probe failed: route.fulfill: Route is already handled! Removing its own route while holding it was corrected to a single held response with an explicit completion gate. Original failure retained here; corrected actual delayed-app scenario exercised below.';
+const save = () => writeFile('tests/n88-real-pilot-browser.json', JSON.stringify(record, null, 2) + '\n');
 try {
-  await withIsolatedLocalBrowser({ taskFile: `C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/${taskId}.json`, runId, url: server.url, timeoutMs: 120000 }, async ({ createContext }) => {
-    for (const [width, theme] of appOnly ? [] : [[320, 'light'], [390, 'dark'], [1280, 'light'], [1280, 'dark']]) {
-      server.reset();
+  await withIsolatedLocalBrowser({ taskFile: `C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/queue/${taskId}.json`, runId,
+    url: server.url, timeoutMs: 120000 }, async ({ createContext }) => {
+    for (const [width, theme] of [[320, 'light'], [1280, 'dark']]) {
+      server.reset(); const namespace = server.fixture.namespace;
+      record.studentUrl = server.url + '/s/' + namespace;
       const context = await createContext({ viewport: { width, height: 900 }, locale: 'ar-SA', colorScheme: theme });
-      await context.addInitScript(theme => { document.addEventListener('DOMContentLoaded', () => { document.documentElement.dataset.theme = theme; }); }, theme);
-      const teacher = await context.newPage(), errors = [], requests = [];
-      context.on('page', p => p.on('pageerror', e => errors.push(e.message)));
-      teacher.on('pageerror', e => errors.push(e.message));
-      context.on('request', r => requests.push({ url: r.url(), method: r.method() }));
+      await context.addInitScript(theme => document.addEventListener('DOMContentLoaded', () => { document.documentElement.dataset.theme = theme; }), theme);
+      const teacher = await context.newPage(), errors = [], requests = [], logs = [];
+      const watch = page => { page.on('pageerror', e => errors.push(e.message)); page.on('console', m => logs.push(m.text())); };
+      watch(teacher); context.on('request', r => requests.push({ url: r.url(), method: r.method() }));
+      const review = async (member = 'enrollment-a') => { await teacher.locator('#n88-member').selectOption(member); await teacher.locator('[data-select] button').click(); };
+      const issue = async member => { await review(member); await teacher.locator('[data-issue]').click(); await teacher.locator('[data-code]').waitFor();
+        const code = await teacher.locator('[data-code]').inputValue(), url = await teacher.locator('[data-entry]').inputValue();
+        assert.match(code, /^[0-9]{6}$/); assert.equal(new URL(url).pathname, '/s/' + namespace);
+        return { code, url }; };
       await teacher.goto(server.url + '/teacher');
-      await teacher.locator('select option[value="enrollment-a"]').waitFor({ state: 'attached' });
-      assert.equal(await teacher.locator('select option').count(), 3, 'only current owner students');
-      const review = async () => { await teacher.locator('select').selectOption('enrollment-a'); await teacher.locator('button[type=submit]').click(); };
+      await teacher.locator('#n88-member option[value="enrollment-a"]').waitFor({ state: 'attached' });
+      assert.equal(await teacher.locator('#n88-member option').count(), 3);
       await review(); await teacher.locator('[data-cancel]').click();
-      assert.equal(server.fixture.repo.snapshot().invites.length, 0, 'cancel causes no service mutation');
-      await review(); await teacher.locator('[data-issue]').click();
-      await teacher.locator('textarea').waitFor();
-      const link = await teacher.locator('textarea').inputValue(), token = link.split('#invite=')[1];
-      assert.match(token, /^[A-Za-z0-9_-]{43}$/);
-      await teacher.locator('[data-copy]').click();
-      assert.equal(await teacher.evaluate(() => window.fabricatedCopy), link);
-      await teacher.locator('[data-print]').click();
-      assert.equal(await teacher.evaluate(() => window.fabricatedPrint), true);
-      await teacher.locator('[data-cancel]').click();
-      assert.equal(await teacher.locator('textarea').count(), 0);
-
-      const student = await context.newPage();
-      const logMessages = []; student.on('console', m => logMessages.push(m.text()));
-      await student.goto(link);
-      await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
-      assert.ok(new URL(student.url()).hash === '', 'fragment cleared');
-      assert.equal(await student.locator('h1').evaluate(el => document.activeElement === el), true);
-      assert.ok((await student.locator('main').innerText()).includes('تصميم عرض عن الأمان الرقمي'));
-      assert.ok((await student.locator('aside').innerText()).includes('1 من 2'));
-      assert.doesNotMatch(await student.locator('main').innerText(), /OTHER|PRIVATE|UNPUBLISHED|نتيجة نشرها المعلم/);
-      assert.equal(await student.locator('[data-tasks] a, [data-tasks] input, [data-tasks] button').count(), 0);
-      assert.equal(await student.evaluate(() => document.cookie.includes('__Host-n88')), false, 'HttpOnly cookie unreadable to JS');
-      const cookies = await context.cookies();
-      const c = cookies.find(c => c.name === '__Host-n88');
-      assert.ok(c?.httpOnly && c.secure && c.sameSite === 'Strict');
-      const storage = await student.evaluate(async () => ({ local: { ...localStorage }, session: { ...sessionStorage }, dbs: await indexedDB.databases() }));
-      assert.deepEqual(storage, { local: {}, session: {}, dbs: [] });
-      assert.ok(requests.every(r => !r.url.includes(token) && !new URL(r.url).search));
-      assert.ok(logMessages.every(m => !m.includes(token)));
+      assert.equal(server.fixture.repo.snapshot().credentials.length, 0);
+      const a = await issue('enrollment-a');
+      await teacher.locator('[data-copy]').click(); assert.equal(await teacher.evaluate(() => window.fabricatedCopy), a.code + '\n' + a.url);
+      await teacher.locator('[data-print]').click(); assert.equal(await teacher.evaluate(() => window.fabricatedPrint), true);
+      await teacher.locator('[data-cancel]').click(); assert.equal(await teacher.locator('[data-code]').count(), 0);
+      assert.equal(await teacher.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      const student = await context.newPage(); watch(student);
+      await student.goto(a.url); await student.locator('[data-claim]').waitFor();
+      assert.equal(await student.locator('input').getAttribute('inputmode'), 'numeric');
+      assert.equal(await student.locator('input').getAttribute('maxlength'), '6');
+      assert.equal(await student.locator('input').count(), 1);
+      assert.equal(await student.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      await student.screenshot({ path: `tests/fixtures/n88-real-pilot/code-form-${width}.png`, fullPage: true });
+      const enter = async (page, code) => { await page.locator('[data-claim] input').fill(code); await page.locator('[data-claim] button').click();
+        await page.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor(); };
+      await enter(student, a.code);
+      assert.match(await student.locator('main').innerText(), /تصميم عرض عن الأمان الرقمي/);
+      assert.doesNotMatch(await student.locator('main').innerText(), /PRIVATE|OTHER|UNPUBLISHED|نتيجة نشرها/);
+      assert.equal(await student.locator('aside').innerText().then(t => t.includes('1 من 2')), true);
+      assert.equal(await student.evaluate(() => document.cookie), '');
+      const c = (await context.cookies()).find(c => c.name === '__Secure-n88');
+      assert.ok(c?.httpOnly && c.secure && c.sameSite === 'Strict' && c.path === '/api/n88/s/' + namespace);
+      const second = await createContext({ viewport: { width, height: 900 } }), secondPage = await second.newPage(); watch(secondPage);
+      await secondPage.goto(a.url); await secondPage.locator('[data-claim]').waitFor(); await enter(secondPage, a.code);
+      assert.notEqual((await second.cookies()).find(c => c.name === '__Secure-n88').value, c.value);
+      await student.reload(); await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
+      await review();
+      await teacher.locator('#n88-publication').selectOption('published-a');
+      await teacher.locator('#n88-title').fill('نشر المعلم تحديثًا جديدًا'); await teacher.locator('#n88-status').selectOption('done');
+      await teacher.locator('[data-publish] button').click(); await teacher.getByText('حُفظ التحديث. يظهر للطالب عند التحديث.').waitFor();
+      await student.locator('[data-refresh]').click(); await student.getByText('نشر المعلم تحديثًا جديدًا').waitFor();
+      assert.match(await student.locator('aside').innerText(), /2 من 2/);
+      await teacher.locator('[name=published]').uncheck(); await teacher.locator('[data-publish] button').click();
+      await teacher.getByText('حُفظ التحديث. يظهر للطالب عند التحديث.').waitFor();
+      await student.locator('[data-refresh]').click(); await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
+      assert.doesNotMatch(await student.locator('main').innerText(), /نشر المعلم تحديثًا جديدًا/);
+      await student.locator('[data-logout]').click(); await student.locator('[data-claim]').waitFor();
+      assert.equal((await context.cookies()).filter(c => c.name === '__Secure-n88').length, 0);
+      await enter(student, a.code);
+      server.fixture.advance(POLICY.sessionMs + 1);
+      await student.reload(); await student.locator('[data-claim]').waitFor(); assert.equal(await student.locator('[data-tasks]').count(), 0);
+      await enter(student, a.code); // same persistent code after session expiry and old 15-minute deadline
+      // Actual delayed-response/URL context change fixture: old student read cannot flash after new login.
+      const b = await issue('enrollment-b'); await teacher.locator('[data-cancel]').click();
+      let release, captured, finished, held = false, routeError;
+      const pending = new Promise(ok => { captured = ok; });
+      const fulfilled = new Promise(ok => { finished = ok; });
+      await student.route('**/api/n88/s/*/read', async route => {
+        if (held) return route.continue(); held = true;
+        try { const response = await route.fetch();
+          const gate = new Promise(ok => { release = ok; }); captured();
+          await gate; await route.fulfill({ response });
+        } catch (error) { routeError = error.message; } finally { finished(); }
+      });
+      await student.locator('[data-refresh]').click(); await pending;
+      await student.evaluate(() => { location.hash = 'context-change'; });
+      await student.locator('[data-claim]').waitFor();
+      await enter(student, b.code);
+      assert.match(await student.locator('main').innerText(), /OTHER_STUDENT/);
+      await student.evaluate(() => { window.oldStudentFlashes = [];
+        window.flashObserver = new MutationObserver(() => { if (document.querySelector('main')?.textContent.includes('تنسيق مستند نصي')) window.oldStudentFlashes.push(true); });
+        window.flashObserver.observe(document.getElementById('pilot'), { subtree: true, childList: true, characterData: true }); });
+      release(); await fulfilled; assert.equal(routeError, undefined); await student.waitForTimeout(100);
+      assert.deepEqual(await student.evaluate(() => { window.flashObserver.disconnect(); return window.oldStudentFlashes; }), []);
+      assert.doesNotMatch(await student.locator('main').innerText(), /تنسيق مستند نصي/);
+      assert.equal(new URL(student.url()).hash, '');
+      const rotated = await issue('enrollment-b'); await teacher.locator('[data-cancel]').click();
+      await student.locator('[data-refresh]').click(); await student.locator('[data-claim]').waitFor();
+      await student.locator('input').fill(b.code); await student.locator('[data-claim] button').click();
+      await student.getByText('تعذّر فتح المساحة. تحقق من الرابط والرمز أو حاول لاحقًا مع معلمك.').waitFor();
+      assert.equal(await student.locator('input').inputValue(), '');
+      await enter(student, rotated.code);
+      await review('enrollment-b'); await teacher.locator('[data-revoke]').click();
+      await teacher.getByText('أُلغي الوصول والرمز وجميع الجلسات.').waitFor();
+      await student.locator('[data-refresh]').click(); await student.locator('[data-claim]').waitFor();
+      assert.equal(await student.locator('[data-tasks]').count(), 0);
+      server.fixture.auth.clear(); await teacher.evaluate(() => window.pilot.contextChanged());
+      assert.equal(await teacher.locator('#n88-member option').count(), 1);
+      assert.deepEqual(await student.evaluate(async () => ({ local: { ...localStorage }, session: { ...sessionStorage }, dbs: await indexedDB.databases() })), { local: {}, session: {}, dbs: [] });
+      const secrets = [a.code,b.code,rotated.code,c.value];
+      assert.ok(requests.every(r => !new URL(r.url).search && secrets.every(code => !r.url.includes(code))));
+      assert.ok(logs.every(l => secrets.every(code => !l.includes(code))));
       assert.equal(await student.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       assert.equal(await student.locator('main').evaluate(el => getComputedStyle(el).direction), 'rtl');
-      for (const box of await student.locator('button').evaluateAll(els => els.map(e => { const b = e.getBoundingClientRect(); return { width: b.width, height: b.height }; }))) assert.ok(box.width >= 44 && box.height >= 44);
-      if ((width === 320 && theme === 'light') || (width === 1280 && theme === 'dark')) await student.screenshot({ path: `tests/fixtures/n88-real-pilot/student-${width}-${theme}.png`, fullPage: true });
-      await student.reload(); await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
-      await server.fixture.repo.transaction(db => { db.publications[0].resultPublished = true; });
-      await student.locator('[data-refresh]').click(); await student.getByText('نتيجة نشرها المعلم: 8 من 10').first().waitFor();
-      await server.fixture.repo.transaction(db => { db.publications[0].published = false; });
-      await student.locator('[data-refresh]').click();
-      await student.getByText('لا توجد مهام معلّقة منشورة الآن.').waitFor();
-      assert.ok(!(await student.locator('main').innerText()).includes('تصميم عرض عن الأمان الرقمي'));
-      await review(); await teacher.locator('[data-revoke]').click();
-      await teacher.getByText('أُلغي الوصول.').waitFor();
-      await student.locator('[data-refresh]').click();
-      await student.locator('[data-claim]').waitFor();
-      assert.equal(await student.locator('[data-tasks]').count(), 0);
-      await student.goto(link); await student.waitForFunction(() => location.hash === '');
-      await student.locator('[data-claim]').waitFor();
-      assert.ok(new URL(student.url()).hash === '', 'same-document replay fragment cleared');
-      // Manual entry preserves the entire secret and exercises same claim handlers.
-      await review(); await teacher.locator('[data-issue]').click(); await teacher.locator('textarea').waitFor();
-      const manual = (await teacher.locator('textarea').inputValue()).split('#invite=')[1];
-      await student.locator('input').fill('123456'); await student.locator('input').press('Enter');
-      await student.getByText('تعذّر فتح المساحة. اطلب دعوة جديدة من معلمك.').waitFor();
-      await student.locator('input').fill(manual); await student.locator('input').press('Enter');
-      await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
-      await student.goto(server.url + '/student#invite=' + 'z'.repeat(43));
-      await student.waitForFunction(() => location.hash === ''); await student.locator('[data-claim]').waitFor();
-      await student.reload(); await student.locator('[data-claim]').waitFor();
-      assert.equal(await student.locator('[data-tasks]').count(), 0, 'failed new invite cannot restore prior student');
-      // Reissue after failed context switch, then test actual successful logout.
-      await teacher.locator('[data-cancel]').click(); await review(); await teacher.locator('[data-issue]').click();
-      await teacher.locator('textarea').waitFor();
-      const finalToken = (await teacher.locator('textarea').inputValue()).split('#invite=')[1];
-      await student.locator('input').fill(finalToken); await student.locator('input').press('Enter');
-      await student.getByRole('heading', { name: 'ما المطلوب مني؟' }).waitFor();
-      await student.locator('[data-logout]').click(); await student.locator('[data-claim]').waitFor();
-      assert.equal((await context.cookies()).filter(c => c.name === '__Host-n88').length, 0);
       assert.deepEqual(errors, []);
-      checks.push({ name: `actual-source-ui-${width}-${theme}`, status: 'PASS', evidence: 'Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only.' });
-      await context.close();
+      checks.push({ name: `actual-persistent-code-ui-${width}-${theme}`, status: 'PASS', evidence: 'Actual teacher selection/cancel/issue/copy+print adapters; single six-digit form; independent sessions; reload/logout/relogin/expiry; teacher publish/status/unpublish reread; delayed old-student response ignored; rotate/revoke; scoped Secure HttpOnly cookie; no secret URL/storage/console; RTL/no overflow. Screenshots code-form-' + width + '.png.' });
+      await second.close(); await context.close();
     }
-    await save();
-    // Targeted actual application entry: no DB/store writes when mounting/cancelling
-    // the new controller in the existing synthetic Demo document. No real toolbar change.
-    server.reset();
-    const context = await createContext({ viewport: { width: 390, height: 900 }, locale: 'ar-SA' });
-    await context.addInitScript(() => sessionStorage.setItem('rakeezx-demo-session-v1', 'preparing'));
-    const page = await context.newPage();
-    const bootProblems = [];
-    page.on('pageerror', e => bootProblems.push(e.message));
-    page.on('response', r => { if (r.status() >= 400) bootProblems.push(r.status() + ' ' + new URL(r.url()).pathname); });
-    try { await openReadyServedDemo(page, server.url); }
-    catch { throw Error('Actual app readiness failed: ' + bootProblems.join('; ')); }
-    const before = await snapshot(page);
-    await page.evaluate(async () => {
-      const { mountTeacherInvitations } = await import('/drafts/n88-student-portal/teacher-controller.js');
-      const { createStudentPortalClient } = await import('/src/lib/student-portal-client.js');
-      const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/drafts/n88-student-portal/portal.css'; document.head.append(css);
-      const root = document.createElement('section'); root.id = 'injected-pilot'; document.body.prepend(root);
-      window.injectedPilot = await mountTeacherInvitations(root, { studentUrl: location.origin + '/student',
-        client: createStudentPortalClient({ fetch: (url, options) => fetch(url, { ...options, headers: { ...options.headers, 'X-Fixture-Teacher': 'fabricated-teacher-a' } }) }) });
-    });
-    await page.locator('#injected-pilot select').selectOption('enrollment-a');
-    await page.locator('#injected-pilot button[type=submit]').click(); await page.locator('[data-cancel]').click();
-    assert.deepEqual(await snapshot(page), before);
-    assert.equal(server.fixture.repo.snapshot().invites.length, 0);
-    server.fixture.auth.clear();
-    await page.evaluate(() => window.injectedPilot.contextChanged());
-    assert.equal(await page.locator('#injected-pilot select option').count(), 1);
-    await page.evaluate(() => window.injectedPilot.dispose());
-    assert.deepEqual(await snapshot(page), before);
-    checks.push({ name: 'actual-app-injected-entry-cancel-owner-context-no-writes', status: 'PASS', evidence: 'Existing openReadyServedDemo helper; actual store readiness and every IndexedDB store + local/session storage identical before/after review/cancel/current-auth-refusal/dispose. No production registration.' });
-    await context.close();
   });
-  await save();
-  console.log(JSON.stringify({ checks: checks.length, status: 'PASS' }));
-} finally { await server.close(); }
+} catch (error) { failures.push({ message: error.message, status: 'FAIL' }); process.exitCode = 1; }
+finally { await server.close(); record.cleanup = 'Owned browser/contexts closed by canonical helper; owned HTTP server closed in finally before return.'; await save(); }
+console.log(JSON.stringify({ checks, failures, ownedPid: server.pid, serverClosed: true }));

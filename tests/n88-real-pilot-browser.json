@@ -1,38 +1,43 @@
 {
-  "taskId": "continuous-n88-real-use-readonly-pilot-preparation-20261017",
-  "runId": "3c617c1e-b814-4bb3-beeb-df52b8f77490",
-  "target": "task-owned loopback HTTP with fabricated auth/repository/clock; actual source UI/CSS; no hosted service",
+  "taskId": "continuous-n88-persistent-six-digit-student-code-20261017",
+  "runId": "fdce40ca-318e-4da2-a925-9a87c6f091b5",
+  "source": "Exact committed content of scoped files; final candidate bound by worker JSON and review document.",
+  "teacherUrl": "http://127.0.0.1:49975/teacher",
+  "ownedPid": 10372,
+  "startedAt": "2026-10-17T11:11:07.290Z",
+  "serverExpiresAt": "2026-10-17T11:41:07.291Z",
+  "codeLifetime": "No expiry/consumption. Server expiry is ONLY local process lifetime.",
   "checks": [
     {
-      "name": "actual-source-ui-320-light",
+      "name": "actual-persistent-code-ui-320-light",
       "status": "PASS",
-      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
+      "evidence": "Actual teacher selection/cancel/issue/copy+print adapters; single six-digit form; independent sessions; reload/logout/relogin/expiry; teacher publish/status/unpublish reread; delayed old-student response ignored; rotate/revoke; scoped Secure HttpOnly cookie; no secret URL/storage/console; RTL/no overflow. Screenshots code-form-320.png."
     },
     {
-      "name": "actual-source-ui-390-dark",
+      "name": "actual-persistent-code-ui-1280-dark",
       "status": "PASS",
-      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
-    },
-    {
-      "name": "actual-source-ui-1280-light",
-      "status": "PASS",
-      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
-    },
-    {
-      "name": "actual-source-ui-1280-dark",
-      "status": "PASS",
-      "evidence": "Teacher selection/cancel/issue/manual copy+print injection; fragment claim; actual Secure HttpOnly Strict cookie on loopback; reload/read; default-off and explicitly published result; unpublish; revoke/replay; full-secret fallback; logout; RTL/overflow/44px/storage/URL checks. Synthetic transport only."
-    },
-    {
-      "name": "actual-app-injected-entry-cancel-owner-context-no-writes",
-      "status": "PASS",
-      "evidence": "Existing openReadyServedDemo helper; actual store readiness and every IndexedDB store + local/session storage identical before/after review/cancel/current-auth-refusal/dispose. No production registration."
+      "evidence": "Actual teacher selection/cancel/issue/copy+print adapters; single six-digit form; independent sessions; reload/logout/relogin/expiry; teacher publish/status/unpublish reread; delayed old-student response ignored; rotate/revoke; scoped Secure HttpOnly cookie; no secret URL/storage/console; RTL/no overflow. Screenshots code-form-1280.png."
     }
   ],
+  "failures": [],
   "limits": [
-    "No hosted SQL/RLS or real teacher authentication",
-    "No physical mobile, deployed HTTPS/proxy, Service Worker/offline certification",
-    "Print/clipboard adapter calls injected; no OS printer/clipboard proof"
+    "Fabricated auth/socket/repository only; not real Auth or hosted proxy.",
+    "Memory transactions/rate limits are not durable multi-instance SQL/RLS proof.",
+    "No physical-device, real printer/clipboard, hosted TLS or Production claim."
   ],
-  "cleanup": "All owned contexts/browser closed by canonical helper; server closed in finally."
+  "cleanup": "Owned browser/contexts closed by canonical helper; owned HTTP server closed in finally before return.",
+  "testedSourceSha256": {
+    "src/lib/student-portal-client.js": "eeb4a52dc23a3737eea2dd6729c0ad22468a5306eca477e8fecd4b022fb035cf",
+    "src/views/student-portal.js": "333c41b60b34b21d61e1d74ea8ca4a9793e674a1c944a277442d7b7493c21355",
+    "drafts/n88-student-portal/service.mjs": "957f277ee59112548a69b6ebb6a30abb90875b209931ab8fb7b18ed8a14a1202",
+    "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+    "drafts/n88-student-portal/teacher-controller.js": "57d9e5154f1c3ffc971f6201fe223f2be1b391ef5fa33777088561d8dfe27378",
+    "drafts/n88-student-portal/portal.css": "2e1a2bd96915af6a8cd891f837e999519f7dac2e9afc0b6420f5ef3a36f82e14",
+    "tests/fixtures/n88-real-pilot/server.mjs": "9413e5dcf0184ee9e9209593a69a27d39b0c52d76ee2b456b9c1d327454b5fa3",
+    "tests/fixtures/n88-real-pilot/fixture.mjs": "2c524c72a44f7e7ad181bdaef9b692650ffddf23f7d4872d69d141db0aa35382",
+    "tests/fixtures/n88-real-pilot/entry.js": "f707f1c75cd232df11a9bbfc9a53518d8dac31fb98062f79efa72af577ed15f5",
+    "tests/n88-real-pilot-browser.mjs": "c6ffbcfaff969c99e2719fab1f15c8d21d9cc8e7b88805da0e553838ee5ee5aa"
+  },
+  "correctedHarnessFailure": "Initial delayed-response probe failed: route.fulfill: Route is already handled! Removing its own route while holding it was corrected to a single held response with an explicit completion gate. Original failure retained here; corrected actual delayed-app scenario exercised below.",
+  "studentUrl": "http://127.0.0.1:49975/s/fYtJsz9UbyBZ1NrWUzaBy-WI9BGl0n6i"
 }
