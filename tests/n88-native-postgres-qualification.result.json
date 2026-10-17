@@ -1,0 +1,835 @@
+{
+  "taskId": "continuous-n88-native-postgres-qualification-20261017",
+  "runId": "f114bf86-e397-4064-9ca8-44e6b8384cc4",
+  "baseSha": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+  "sourceHead": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+  "startedAt": "2026-10-17T13:42:06.663Z",
+  "initialTaskOriginMain": "cced9c6f4b6db4ed0de4a63ba3dcc30359407767",
+  "version": "pg_ctl (PostgreSQL) 17.6",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313",
+  "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313\\data",
+  "checks": [
+    {
+      "name": "inactive_source_bindings_and_reused_final_pin_term_evidence",
+      "status": "PASS",
+      "evidence": {
+        "sourceFiles": 15,
+        "priorFinalPinTermSourceHashesMatch": true,
+        "normalAppRouterSwUnchanged": true,
+        "appServiceBindings": 0,
+        "hostedAndProductionGatesExplicit": true
+      }
+    },
+    {
+      "name": "actual_draft_transaction_rollback_catalog_pk_fk_unique_checks_indexes_rls",
+      "status": "PASS",
+      "evidence": {
+        "rollbackLeavesNoNamespace": true,
+        "tables": 6,
+        "primaryKeys": 6,
+        "foreignKeys": 4,
+        "constraints": 26,
+        "indexes": 16,
+        "rlsEnabled": 6,
+        "forcedRls": 0,
+        "policies": 0,
+        "functions": 0
+      }
+    },
+    {
+      "name": "actual_crossbinding_and_code_entry_session_uniqueness_constraints",
+      "status": "PASS",
+      "evidence": {
+        "samePinAcrossOwnersNamespaceBound": true,
+        "equalVerifierBytesOnlyAcrossDifferentNamespaces": true,
+        "tombstonesReserved": true,
+        "rawCredentialColumns": 0,
+        "collisionProbes": 3,
+        "boundary": "SQL shape/unique/FK constraints; PIN length/generator, 128 draws and 9,000 exhaustion remain unchanged service/memory evidence, not SQL guards"
+      }
+    },
+    {
+      "name": "private_public_only_anon_authenticated_nobypass_roles_denied_without_grants",
+      "status": "PASS",
+      "evidence": {
+        "roles": 3,
+        "forbiddenTablePrivileges": 126,
+        "schemaUsage": false,
+        "privateFunctions": 0,
+        "negativeSelects": 18,
+        "sqlstate": "42501",
+        "temporaryGrants": 0,
+        "boundary": "effective ACL denial; ENABLE RLS with no policies, not positive owner RLS or real Auth proof"
+      }
+    },
+    {
+      "name": "two_real_backends_unique_reservation_wait_commit_23505_and_loser_rollback",
+      "status": "PASS",
+      "evidence": {
+        "distinctBackendPids": [
+          29424,
+          24428
+        ],
+        "observedSqlLockWait": true,
+        "winnerCommits": 1,
+        "loserSqlstate": "23505",
+        "loserPriorWritesRolledBack": true,
+        "winnerPreserved": true
+      }
+    },
+    {
+      "name": "actual_sql_budget_sorted_locks_db_clock_mixed_attempts_failures_commit_limits",
+      "status": "PASS",
+      "evidence": {
+        "requests": 12,
+        "reservations": 6,
+        "rejectedBeforeLookup": 6,
+        "committedWrongPinFailures": 3,
+        "thresholds": [
+          6,
+          30,
+          100,
+          60,
+          500
+        ],
+        "expiryRollover": true,
+        "lockOrder": "key ASC, then DB clock; budget-only HMAC lookup probe",
+        "fixedPreprovisionedKeys": 5,
+        "dynamicKeyCapAndPurge": "NOT_RUN; no production adapter claim"
+      }
+    },
+    {
+      "name": "stable_credential_second_term_exact_session_scope_and_fail_closed_protocol",
+      "status": "PASS",
+      "evidence": {
+        "stableIdPinVerifierEntryVersionUnchanged": true,
+        "oldUnexpiredSessionDenied": true,
+        "newScopePublicationIds": [
+          "10000000-0000-4000-8000-000000000230"
+        ],
+        "exactProjection": true,
+        "denies": [
+          "ended membership",
+          "different student ID/name clone",
+          "cross-owner/entry",
+          "ambiguous active memberships",
+          "revision change",
+          "inactive context"
+        ],
+        "unpublishRechecked": true,
+        "boundary": "SQL test query protocol only; no canonical membership, teacher Auth, labels or service projection automatically implemented by constraints"
+      }
+    },
+    {
+      "name": "atomic_rotation_revoke_all_term_sessions_rollback_and_concurrent_login_revoke",
+      "status": "PASS",
+      "evidence": {
+        "oldAndNewTermSessionsRevoked": 3,
+        "replacementSessionRevoked": 1,
+        "rotationRollbackRetainsOriginalCredentialAndSessions": true,
+        "concurrentRevokeThenLogin": "observed context lock wait; zero post-revoke session",
+        "lockOrder": "context → memberships → credentials → sessions",
+        "testAdapterOnly": true
+      }
+    },
+    {
+      "name": "controlled_clean_restart_persists_credentials_budgets_and_revocations",
+      "status": "PASS",
+      "evidence": {
+        "stateSha256": "6b03cea13069481916b75c53ce574375bb9e6f45687aa15ad36e2dad076b415d",
+        "credentialsBudgetsRevocationsPersist": true,
+        "oldSessionStillDenied": true,
+        "boundary": "controlled clean stop/restart only; NOT crash/power-loss durability"
+      }
+    },
+    {
+      "name": "owned_cluster_final_cleanup",
+      "status": "PASS",
+      "evidence": {
+        "stopped": true,
+        "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+        "exactPidAbsent": true,
+        "exactPortReboundAndReleased": true,
+        "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313"
+      }
+    }
+  ],
+  "negativeSqlstates": [
+    {
+      "label": "namespace PK",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "one namespace per owner",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "namespace check",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "credential namespace-owner crossbinding",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "active owner-student uniqueness",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "same namespace-PIN verifier collision",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "namespace-PIN tombstone remains reserved",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "global entry verifier including tombstone",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "session composite FK namespace",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK owner_id",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK credential_id",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK student_id",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK version",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK entry_verifier",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK class_id",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "session composite FK enrollment_id",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "global session token hash",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "publication foreign membership",
+      "expected": "23503",
+      "actual": "23503"
+    },
+    {
+      "label": "membership positive revision",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "credential positive version",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "HMAC verifier shape",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "entry HMAC shape",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "session hash shape",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "nonempty publication title",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "publication title bound",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "instruction bound",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "publication status allowlist",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "nonnegative budget",
+      "expected": "23514",
+      "actual": "23514"
+    },
+    {
+      "label": "bounded repeated collision 1",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "bounded repeated collision 2",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "bounded repeated collision 3",
+      "expected": "23505",
+      "actual": "23505"
+    },
+    {
+      "label": "n88_public_probe denied contexts",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "n88_public_probe denied credentials",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "n88_public_probe denied guess_budgets",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "n88_public_probe denied memberships",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "n88_public_probe denied publications",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "n88_public_probe denied sessions",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied contexts",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied credentials",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied guess_budgets",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied memberships",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied publications",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "anon denied sessions",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied contexts",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied credentials",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied guess_budgets",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied memberships",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied publications",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "authenticated denied sessions",
+      "expected": "42501",
+      "actual": "42501"
+    },
+    {
+      "label": "real concurrent namespace verifier",
+      "expected": "23505",
+      "actual": "23505"
+    }
+  ],
+  "cleanup": {
+    "stopped": true,
+    "shutdown": "pg_ctl fast/wait 20s; no immediate kill",
+    "exactPidAbsent": true,
+    "exactPortReboundAndReleased": true,
+    "retainedStoppedCheckpoint": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313"
+  },
+  "reusedEvidence": {
+    "normalizedLfSha256": {
+      "src/lib/student-portal-client.js": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+      "src/views/student-portal.js": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+      "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "drafts/n88-student-portal/service.mjs": "71b57c93802a7f5bd1c83bb914ec95e69c029ef4df4bcfd0f5ab2e87dfacae74",
+      "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+      "drafts/n88-student-portal/teacher-controller.js": "9faced95dbc44c016344a462cc05e64be76d655c11e3df3727e9d92ea576a5b4",
+      "drafts/n88-student-portal/portal.css": "2e1a2bd96915af6a8cd891f837e999519f7dac2e9afc0b6420f5ef3a36f82e14",
+      "tests/fixtures/n88-real-pilot/entry.js": "5e2888183dc5a646213efc3280f379cb3af4a820d3b21c21b488bab6b51be2e9",
+      "tests/fixtures/n88-real-pilot/server.mjs": "11c7f773cf601d7d9b704f16b07e9c6a3d95ab11ecac6934b50036437d2f7d6a",
+      "tests/fixtures/n88-real-pilot/index.html": "e45add23d3d7cd8c2b3c67d327ec1a3ebb0b8f62c56e47f3d4fdedac3f1bed37",
+      "tests/fixtures/n88-real-pilot/fixture.mjs": "5849c9e639700be9b9ff038f608ca8c85fa1bf1986fd3023ae9d7516de1a1646",
+      "tests/n88-real-pilot-final-policy-browser.mjs": "9349f957d07ae0492a001be5862614c72157178778136909f8b71081bf729dd1",
+      "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270",
+      "tests/n88-real-pilot.test.mjs": "3fa9cfc6fa158fa349869b5ac2077332a3ce40c87c1ffcf2245861c46f5e650c",
+      "docs/automation-evidence/20261017/N88_FINAL_APPROVED_PIN_AND_TERM_IDENTITY.md": "d3a347f57a086858f986ce1f0bde40c663fe697002d31a5d8f2fb8f192c0c796"
+    },
+    "priorNode": "17/17 memory/service checks per unchanged final-policy document, NOT rerun",
+    "priorBrowser": "2/2 final policy actual-app HTTP checks, NOT rerun",
+    "appServiceBindings": 0,
+    "normalAppRouterSwChangedPaths": []
+  },
+  "boundaries": {
+    "productionAsyncSqlAdapter": "NOT_IMPLEMENTED",
+    "canonicalTeacherAuthMembershipAdapter": "NOT_IMPLEMENTED",
+    "hostedSqlAuthRlsService": "NOT_RUN",
+    "realStudentAccess": "NOT_ACTIVATED",
+    "hostedIngressTlsLogsDevices": "NOT_RUN",
+    "crashPowerLossDurability": "NOT_RUN",
+    "productionDynamicBudgetKeyAdmissionPurge": "NOT_RUN"
+  },
+  "executedSourceSha256": {
+    "drafts/n88-student-portal/schema-proposal.sql": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+    "tests/n88-native-postgres-qualification.mjs": "829a1e5f2d3866e446cc1f392607a6e48d7577c5be3124d509a3973444e2c511",
+    "tests/fixtures/n88-native-postgres-qualification/cases.mjs": "10e6c9a9a64063a2423c934d85547159e3db7081012f88fc29696e875a30b522",
+    "tests/fixtures/n88-native-postgres-qualification/protocol.mjs": "7f956afa7179c899d5dbbd2392951adad8b5bd72c5677157db007a470d54834e",
+    "tests/fixtures/n88-native-postgres-qualification/read-scope.sql": "062ca86feb1573548cbc2917970f9ecc72a66f63b4ccd7843ecc6f688b89b1fa",
+    "tests/fixtures/n88-native-postgres-qualification/create-session.sql": "3a6f90e920a9d64fa4ee2b245387af00966df8cf148f76ebae539ebf4c6fb7da"
+  },
+  "port": 55400,
+  "ownership": {
+    "pid": 24520,
+    "birth": "2026-10-17T13:42:20.4953130Z",
+    "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313\\data",
+    "port": 55400,
+    "pidFileDirectoryMatches": true,
+    "executableMatches": true,
+    "commandLineDirectoryMatches": true
+  },
+  "ownershipEpochs": [
+    {
+      "pid": 17916,
+      "birth": "2026-10-17T13:42:16.5753900Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313\\data",
+      "port": 55400,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    },
+    {
+      "pid": 24520,
+      "birth": "2026-10-17T13:42:20.4953130Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-native-postgres-qualification-20261017\\artifacts\\n88-native-pg-f114bf86-e397-4064-9ca8-44e6b8384cc4-486f70fb-b867-4d3f-ab45-bb0bf1666313\\data",
+      "port": 55400,
+      "pidFileDirectoryMatches": true,
+      "executableMatches": true,
+      "commandLineDirectoryMatches": true
+    }
+  ],
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "connections": [
+    29424,
+    24428
+  ],
+  "schemaSha256": "6fbad579413038ba19065210dbb48dceecf92d0b801e9be66dff59cd1a9a66ea",
+  "catalog": {
+    "tables": [
+      {
+        "relname": "contexts",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "credentials",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "guess_budgets",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "memberships",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "publications",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      },
+      {
+        "relname": "sessions",
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    ],
+    "constraints": [
+      {
+        "relname": "contexts",
+        "conname": "contexts_namespace_check",
+        "contype": "c",
+        "definition": "CHECK ((namespace ~ '^[A-Za-z0-9_-]{24,64}$'::text))"
+      },
+      {
+        "relname": "contexts",
+        "conname": "contexts_namespace_owner_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (namespace, owner_id)"
+      },
+      {
+        "relname": "contexts",
+        "conname": "contexts_owner_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (owner_id)"
+      },
+      {
+        "relname": "contexts",
+        "conname": "contexts_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (namespace)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_entry_verifier_check",
+        "contype": "c",
+        "definition": "CHECK ((entry_verifier ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_entry_verifier_key",
+        "contype": "u",
+        "definition": "UNIQUE (entry_verifier)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_id_namespace_owner_id_student_id_version_entry__key",
+        "contype": "u",
+        "definition": "UNIQUE (id, namespace, owner_id, student_id, version, entry_verifier)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_namespace_owner_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (namespace, owner_id) REFERENCES n88_private.contexts(namespace, owner_id)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_namespace_verifier_key",
+        "contype": "u",
+        "definition": "UNIQUE (namespace, verifier)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_verifier_check",
+        "contype": "c",
+        "definition": "CHECK ((verifier ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "relname": "credentials",
+        "conname": "credentials_version_check",
+        "contype": "c",
+        "definition": "CHECK ((version >= 1))"
+      },
+      {
+        "relname": "guess_budgets",
+        "conname": "guess_budgets_count_check",
+        "contype": "c",
+        "definition": "CHECK ((count >= 0))"
+      },
+      {
+        "relname": "guess_budgets",
+        "conname": "guess_budgets_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (key)"
+      },
+      {
+        "relname": "memberships",
+        "conname": "memberships_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (owner_id, class_id, student_id, enrollment_id)"
+      },
+      {
+        "relname": "memberships",
+        "conname": "memberships_revision_check",
+        "contype": "c",
+        "definition": "CHECK ((revision >= 1))"
+      },
+      {
+        "relname": "publications",
+        "conname": "publications_instruction_check",
+        "contype": "c",
+        "definition": "CHECK ((length(instruction) <= 500))"
+      },
+      {
+        "relname": "publications",
+        "conname": "publications_owner_id_class_id_student_id_enrollment_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id, class_id, student_id, enrollment_id) REFERENCES n88_private.memberships(owner_id, class_id, student_id, enrollment_id)"
+      },
+      {
+        "relname": "publications",
+        "conname": "publications_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "relname": "publications",
+        "conname": "publications_status_check",
+        "contype": "c",
+        "definition": "CHECK ((status = ANY (ARRAY['todo'::text, 'working'::text, 'done'::text])))"
+      },
+      {
+        "relname": "publications",
+        "conname": "publications_title_check",
+        "contype": "c",
+        "definition": "CHECK (((length(title) >= 1) AND (length(title) <= 160)))"
+      },
+      {
+        "relname": "sessions",
+        "conname": "sessions_credential_id_namespace_owner_id_student_id_versi_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (credential_id, namespace, owner_id, student_id, version, entry_verifier) REFERENCES n88_private.credentials(id, namespace, owner_id, student_id, version, entry_verifier)"
+      },
+      {
+        "relname": "sessions",
+        "conname": "sessions_owner_id_class_id_student_id_enrollment_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (owner_id, class_id, student_id, enrollment_id) REFERENCES n88_private.memberships(owner_id, class_id, student_id, enrollment_id)"
+      },
+      {
+        "relname": "sessions",
+        "conname": "sessions_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "relname": "sessions",
+        "conname": "sessions_token_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((token_hash ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "relname": "sessions",
+        "conname": "sessions_token_hash_key",
+        "contype": "u",
+        "definition": "UNIQUE (token_hash)"
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "contexts_namespace_owner_id_key",
+        "indexdef": "CREATE UNIQUE INDEX contexts_namespace_owner_id_key ON n88_private.contexts USING btree (namespace, owner_id)"
+      },
+      {
+        "indexname": "contexts_owner_id_key",
+        "indexdef": "CREATE UNIQUE INDEX contexts_owner_id_key ON n88_private.contexts USING btree (owner_id)"
+      },
+      {
+        "indexname": "contexts_pkey",
+        "indexdef": "CREATE UNIQUE INDEX contexts_pkey ON n88_private.contexts USING btree (namespace)"
+      },
+      {
+        "indexname": "credentials_entry_verifier_key",
+        "indexdef": "CREATE UNIQUE INDEX credentials_entry_verifier_key ON n88_private.credentials USING btree (entry_verifier)"
+      },
+      {
+        "indexname": "credentials_id_namespace_owner_id_student_id_version_entry__key",
+        "indexdef": "CREATE UNIQUE INDEX credentials_id_namespace_owner_id_student_id_version_entry__key ON n88_private.credentials USING btree (id, namespace, owner_id, student_id, version, entry_verifier)"
+      },
+      {
+        "indexname": "credentials_namespace_verifier_key",
+        "indexdef": "CREATE UNIQUE INDEX credentials_namespace_verifier_key ON n88_private.credentials USING btree (namespace, verifier)"
+      },
+      {
+        "indexname": "credentials_pkey",
+        "indexdef": "CREATE UNIQUE INDEX credentials_pkey ON n88_private.credentials USING btree (id)"
+      },
+      {
+        "indexname": "guess_budgets_pkey",
+        "indexdef": "CREATE UNIQUE INDEX guess_budgets_pkey ON n88_private.guess_budgets USING btree (key)"
+      },
+      {
+        "indexname": "memberships_pkey",
+        "indexdef": "CREATE UNIQUE INDEX memberships_pkey ON n88_private.memberships USING btree (owner_id, class_id, student_id, enrollment_id)"
+      },
+      {
+        "indexname": "n88_current_credential",
+        "indexdef": "CREATE UNIQUE INDEX n88_current_credential ON n88_private.credentials USING btree (owner_id, student_id) WHERE (revoked_at IS NULL)"
+      },
+      {
+        "indexname": "n88_published_student",
+        "indexdef": "CREATE INDEX n88_published_student ON n88_private.publications USING btree (owner_id, class_id, student_id, enrollment_id) WHERE published"
+      },
+      {
+        "indexname": "n88_session_credential",
+        "indexdef": "CREATE INDEX n88_session_credential ON n88_private.sessions USING btree (credential_id)"
+      },
+      {
+        "indexname": "n88_session_retention",
+        "indexdef": "CREATE INDEX n88_session_retention ON n88_private.sessions USING btree (expires_at)"
+      },
+      {
+        "indexname": "publications_pkey",
+        "indexdef": "CREATE UNIQUE INDEX publications_pkey ON n88_private.publications USING btree (id)"
+      },
+      {
+        "indexname": "sessions_pkey",
+        "indexdef": "CREATE UNIQUE INDEX sessions_pkey ON n88_private.sessions USING btree (id)"
+      },
+      {
+        "indexname": "sessions_token_hash_key",
+        "indexdef": "CREATE UNIQUE INDEX sessions_token_hash_key ON n88_private.sessions USING btree (token_hash)"
+      }
+    ],
+    "functions": 0,
+    "policies": 0
+  },
+  "privateRoles": [
+    {
+      "role": "n88_public_probe",
+      "rolsuper": false,
+      "rolbypassrls": false
+    },
+    {
+      "role": "anon",
+      "rolsuper": false,
+      "rolbypassrls": false
+    },
+    {
+      "role": "authenticated",
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ],
+  "blocking": [
+    {
+      "label": "namespace + verifier reservation",
+      "blockers": [
+        29424
+      ],
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid"
+    },
+    {
+      "label": "sorted five-key budget reservation",
+      "blockers": [
+        29424
+      ],
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid"
+    },
+    {
+      "label": "revoke before concurrent login",
+      "blockers": [
+        29424
+      ],
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid"
+    }
+  ],
+  "restartExpectedSha256": "6b03cea13069481916b75c53ce574375bb9e6f45687aa15ad36e2dad076b415d",
+  "controlledRestart": {
+    "priorPid": 17916,
+    "priorBirth": "2026-10-17T13:42:16.5753900Z",
+    "priorPidAbsent": true,
+    "portFreeBeforeRestart": true,
+    "newPid": 24520,
+    "newBirth": "2026-10-17T13:42:20.4953130Z"
+  },
+  "finishedAt": "2026-10-17T13:42:22.752Z",
+  "status": "PASS",
+  "requiredChecks": [
+    {
+      "name": "n88_actual_owned_postgres_schema_constraints_private_grants_and_cleanup",
+      "status": "PASS",
+      "dependencies": [
+        "actual_draft_transaction_rollback_catalog_pk_fk_unique_checks_indexes_rls",
+        "actual_crossbinding_and_code_entry_session_uniqueness_constraints",
+        "private_public_only_anon_authenticated_nobypass_roles_denied_without_grants",
+        "owned_cluster_final_cleanup"
+      ]
+    },
+    {
+      "name": "n88_real_two_connection_code_uniqueness_budget_atomicity_and_term_session_protocol",
+      "status": "PASS",
+      "dependencies": [
+        "two_real_backends_unique_reservation_wait_commit_23505_and_loser_rollback",
+        "actual_sql_budget_sorted_locks_db_clock_mixed_attempts_failures_commit_limits",
+        "stable_credential_second_term_exact_session_scope_and_fail_closed_protocol",
+        "atomic_rotation_revoke_all_term_sessions_rollback_and_concurrent_login_revoke"
+      ]
+    },
+    {
+      "name": "n88_inactive_source_honest_sql_adapter_limits_and_unchanged_final_pin_proof",
+      "status": "PASS",
+      "dependencies": [
+        "inactive_source_bindings_and_reused_final_pin_term_evidence"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,7 @@
--- AI: DESIGN ONLY, INACTIVE, outside migrations/functions. Never apply on this card.
+-- AI: INACTIVE, UNAPPLIED private design, outside hosted migrations/functions.
+-- N88 native qualification card permits this draft ONLY in a new owned fabricated
+-- local PG17 cluster. See N88_NATIVE_POSTGRES_QUALIFICATION.md for actual evidence;
+-- test-adapter protocols are not a production adapter or hosted activation grant.
 -- NOT an adapter to the current canonical enrollment model. No hosted grants/RPCs.
 -- Separately authorized migration must be CLI-generated and verified on disposable PG.
 create schema n88_private;
