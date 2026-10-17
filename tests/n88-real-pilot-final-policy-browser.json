@@ -1,0 +1,41 @@
+{
+  "taskId": "continuous-n88-approved-pin-stable-term-identity-20261017",
+  "runId": "c9477105-48a2-4092-ac12-237eaacc6d8e",
+  "baseSha": "e1950472da7abd53bd520dad2beac791146b298f",
+  "teacherUrl": "http://127.0.0.1:61465/teacher",
+  "ownedPid": 5480,
+  "startedAt": "2026-10-17T11:55:19.355Z",
+  "checks": [
+    {
+      "name": "final-policy-same-bookmark-second-term-320-light",
+      "status": "PASS",
+      "evidence": "Actual source DOM/CSS/teacher+student handlers over HTTP. Forced 1000/9999; one numeric password field; 0-first/3/5 digits rejected without request or truncation; Arabic accepted. Unexpired old scope refused, same bookmark/PIN after expiry and reload shows ONLY new-term tasks; unchanged stable credential; new-term teacher revoke refuses read/login; scoped cookie, generic errors, no storage/log leak or overflow. Screenshots visually inspected."
+    },
+    {
+      "name": "final-policy-same-bookmark-second-term-1280-dark",
+      "status": "PASS",
+      "evidence": "Actual source DOM/CSS/teacher+student handlers over HTTP. Forced 1000/9999; one numeric password field; 0-first/3/5 digits rejected without request or truncation; Arabic accepted. Unexpired old scope refused, same bookmark/PIN after expiry and reload shows ONLY new-term tasks; unchanged stable credential; new-term teacher revoke refuses read/login; scoped cookie, generic errors, no storage/log leak or overflow. Screenshots visually inspected."
+    }
+  ],
+  "failures": [],
+  "privateLink": "Credential URLs/cookies/bodies intentionally omitted.",
+  "reusedEvidence": "Prior JSON/screenshots are historical (leading-zero policy SUPERSEDED). Unchanged teacher publication/print/async cleanup and CSS evidence retained; final entry/term behavior freshly tested here.",
+  "limits": "Synthetic single-process memory, desktop/mobile viewport emulation only. Durable SQL/RLS, real Auth/lifecycle, HTTPS/ingress/log redaction, real devices and hosted private access NOT_RUN; no activation.",
+  "testedSourceSha256": {
+    "src/lib/student-portal-client.js": "0bcfb1f090f963bff1c91750d7bab6ad944d4cdd106b36deeb9f7ebc387e9900",
+    "src/views/student-portal.js": "e1a98e607e00d7000a31495ffc90f3f529dd6dec1678d33f5017ec3c49a4779b",
+    "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "drafts/n88-student-portal/service.mjs": "71b57c93802a7f5bd1c83bb914ec95e69c029ef4df4bcfd0f5ab2e87dfacae74",
+    "drafts/n88-student-portal/memory-repository.mjs": "c8977e5fc039503168bab0d5e4ce4e0119846856059c371ee6c33b345904f196",
+    "drafts/n88-student-portal/teacher-controller.js": "9faced95dbc44c016344a462cc05e64be76d655c11e3df3727e9d92ea576a5b4",
+    "drafts/n88-student-portal/portal.css": "2e1a2bd96915af6a8cd891f837e999519f7dac2e9afc0b6420f5ef3a36f82e14",
+    "tests/fixtures/n88-real-pilot/entry.js": "5e2888183dc5a646213efc3280f379cb3af4a820d3b21c21b488bab6b51be2e9",
+    "tests/fixtures/n88-real-pilot/server.mjs": "11c7f773cf601d7d9b704f16b07e9c6a3d95ab11ecac6934b50036437d2f7d6a",
+    "tests/fixtures/n88-real-pilot/index.html": "e45add23d3d7cd8c2b3c67d327ec1a3ebb0b8f62c56e47f3d4fdedac3f1bed37",
+    "tests/fixtures/n88-real-pilot/fixture.mjs": "5849c9e639700be9b9ff038f608ca8c85fa1bf1986fd3023ae9d7516de1a1646",
+    "tests/n88-real-pilot-final-policy-browser.mjs": "9349f957d07ae0492a001be5862614c72157178778136909f8b71081bf729dd1",
+    "src/styles/app.css": "96c386d6b301c7d0ccc6bf87139c03944cf987853a1d6d008fcf6d9f718c0270"
+  },
+  "cleanup": "Canonical helper closed owned fresh browser/contexts; unique loopback server closed in finally.",
+  "cleanupCheck": "PASS: retired loopback server refuses connection"
+}

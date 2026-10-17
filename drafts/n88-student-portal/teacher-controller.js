@@ -5,7 +5,7 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
   root.classList.add('n88-portal'); root.dir = 'rtl';
   function show(message = '') {
     if (disposed) return;
-    root.innerHTML = `<header><span class="n88-brand">رَكيز المعلم</span><span>متابعة الطالب</span></header><main><h1>رمز الطالب الشخصي</h1><p>اختر الطالب المسجّل وتحقق من هويته قبل تسليم رمزه ورابطه الخاص. الرمز دائم حتى تغييره أو إلغائه؛ لا يُرسل تلقائيًا.</p><form data-select><label for="n88-member">الطالب المسجّل حاليًا</label><select id="n88-member" required><option value="">اختر الطالب</option>${members.map(m => `<option value="${escape(m.enrollmentId)}">${escape(m.label)}</option>`).join('')}</select><button type="submit">إدارة وصول الطالب</button></form><div data-review></div><p role="status">${escape(message)}</p></main>`;
+    root.innerHTML = `<header><span class="n88-brand">رَكيز المعلم</span><span>متابعة الطالب</span></header><main><h1>رمز الطالب الشخصي</h1><p>اختر الطالب المسجّل وتحقق من هويته قبل تسليم رمزه ورابطه الخاص. الرمز من 4 أرقام لا تبدأ بصفر، ويبقى للطالب نفسه في الفصل الدراسي التالي حتى تغييره أو إلغائه؛ لا يُرسل تلقائيًا.</p><form data-select><label for="n88-member">الطالب المسجّل حاليًا</label><select id="n88-member" required><option value="">اختر الطالب</option>${members.map(m => `<option value="${escape(m.enrollmentId)}">${escape(m.label)}</option>`).join('')}</select><button type="submit">إدارة وصول الطالب</button></form><div data-review></div><p role="status">${escape(message)}</p></main>`;
   }
   async function refresh() {
     const id = ++generation; selected = null;
@@ -56,7 +56,7 @@ export async function mountTeacherInvitations(root, { client, copy = text => nav
       const result = await client[action](member);
       if (disposed || id !== generation) return;
       if (action === 'revoke') { show('أُلغي الوصول والرمز وجميع الجلسات.'); return; }
-      if (result.namespace !== namespace || !/^[A-Za-z0-9_-]{24,64}$/.test(namespace) || !/^[0-9]{4}$/.test(result.code) || !/^[A-Za-z0-9_-]{43}$/.test(result.entrySecret)) throw Error('invalid');
+      if (result.namespace !== namespace || !/^[A-Za-z0-9_-]{24,64}$/.test(namespace) || !/^[1-9][0-9]{3}$/.test(result.code) || !/^[A-Za-z0-9_-]{43}$/.test(result.entrySecret)) throw Error('invalid');
       root.querySelector('[data-review]').innerHTML = `<section class="n88-panel"><h2>رمز ${escape(member.label)}</h2><p>يُعرض الآن فقط. سلّمه لهذا الطالب وحده بعد التحقق منه، ثم أغلق العرض. يحتفظ الطالب بهذا الرابط الخاص ولا يشاركه، ويستخدم الرمز نفسه في كل زيارة. الرابط سرّي مثل الرمز.</p><label for="n88-code">الرمز الشخصي</label><input data-code id="n88-code" dir="ltr" readonly autocomplete="off"><label for="n88-entry">رابط هذا الطالب الخاص</label><input data-entry id="n88-entry" dir="ltr" readonly><button data-copy type="button">نسخ الرمز والرابط</button><button data-print type="button">طباعة</button><button data-cancel type="button">إغلاق ومسح الرمز</button></section>`;
       root.querySelector('[data-code]').value = result.code;
       root.querySelector('[data-entry]').value = root.ownerDocument.location.origin + '/s/' + result.entrySecret;

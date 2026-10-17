@@ -16,18 +16,17 @@ create table n88_private.memberships (
 );
 create table n88_private.credentials (
   id uuid primary key, namespace text not null, owner_id uuid not null,
-  class_id text not null, student_id text not null, enrollment_id text not null,
-  membership_revision bigint not null, version bigint not null check(version >= 1),
+  student_id text not null, version bigint not null check(version >= 1),
   verifier text not null check(verifier ~ '^[a-f0-9]{64}$'),
   entry_verifier text not null unique check(entry_verifier ~ '^[a-f0-9]{64}$'), revoked_at timestamptz,
   foreign key(namespace,owner_id) references n88_private.contexts(namespace,owner_id),
-  foreign key(owner_id,class_id,student_id,enrollment_id)
-    references n88_private.memberships(owner_id,class_id,student_id,enrollment_id),
+  -- Stable owner + durable student identity; NOT an old-term enrollment FK.
+  -- Future adapter must verify this relationship against the canonical student store.
   unique(namespace,verifier), -- tombstones prevent reactivation of old codes
-  unique(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
+  unique(id,namespace,owner_id,student_id,version,entry_verifier)
 );
 create unique index n88_current_credential on n88_private.credentials
-  (owner_id,class_id,student_id,enrollment_id) where revoked_at is null;
+  (owner_id,student_id) where revoked_at is null;
 create table n88_private.sessions (
   id uuid primary key, credential_id uuid not null, namespace text not null,
   owner_id uuid not null, class_id text not null, student_id text not null,
@@ -35,8 +34,10 @@ create table n88_private.sessions (
   entry_verifier text not null,
   token_hash text not null unique check(token_hash ~ '^[a-f0-9]{64}$'),
   expires_at timestamptz not null, revoked_at timestamptz,
-  foreign key(credential_id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
-    references n88_private.credentials(id,namespace,owner_id,class_id,student_id,enrollment_id,version,membership_revision,entry_verifier)
+  foreign key(credential_id,namespace,owner_id,student_id,version,entry_verifier)
+    references n88_private.credentials(id,namespace,owner_id,student_id,version,entry_verifier),
+  foreign key(owner_id,class_id,student_id,enrollment_id)
+    references n88_private.memberships(owner_id,class_id,student_id,enrollment_id)
 ); -- many sessions per credential; NO credential expiry/consumption
 create index n88_session_credential on n88_private.sessions(credential_id);
 create index n88_session_retention on n88_private.sessions(expires_at);
@@ -76,17 +77,28 @@ revoke all on all tables in schema n88_private from public;
 --    order for issue/rotate/revoke/login/read/publication/lifecycle. Read current
 --    enrollment/student/class status and revision; this illustrative membership
 --    table is NOT permission to use stale snapshot copies in a hosted adapter.
--- 4. Generate String(randomInt(10000)).padStart(4,'0') server-side; HMAC-SHA256(JSON array n88-v2/code/namespace/code)
+-- 4. Generate String(randomInt(1000,10000)) server-side; HMAC-SHA256(JSON array n88-v2/code/namespace/code)
+--    Validate ^[1-9][0-9]{3}$ after Arabic/Persian digit normalization; never pad.
+--    Exactly 9,000 possible codes, repeated digits permitted.
 --    using injected secret in server secret storage, NEVER plain SHA of four digits.
---    Reserve namespace/verifier atomically, including tombstones (10,000 lifetime
+--    Reserve namespace/verifier atomically, including tombstones (9,000 lifetime
 --    values per owner). Max 128 random retries; exhaustion is generic/rollback.
 --    Create a separate 256-bit private bookmarkable /s/<secret> per credential.
 --    Store ONLY server-HMAC entry verifier, never raw link/PIN in DB or logs.
 --    Resolve exact entry verifier BEFORE comparing its PIN; NO teacher-wide PIN lookup.
 --    Rotate/revoke old credential + ALL sessions atomically; rollback exceptions.
 --    Rotation replaces BOTH private link and PIN; all prior links/sessions fail.
--- 5. Login creates a NEW 256-bit session, bound to entry verifier/namespace/all four membership keys,
---    credential ID/version/revision, expires after 8h; code remains reusable.
+-- 5. Credentials bind ONLY stable verified owner + durable student ID. No automatic
+--    term/year/revision code or private bookmark reset. Every claim/read resolves
+--    exactly ONE current active server-owned membership for that identity, otherwise
+--    fail closed (never first-match or union). Term advancement requires independently
+--    verified new membership; never enroll/publish as a side effect of login.
+--    Login creates a NEW 256-bit session, bound to entry verifier/namespace/all four membership keys,
+--    credential ID/version and CURRENT membership revision, expires after 8h.
+--    Reads require that same scope/revision still be the unique current membership;
+--    old sessions deny on change, relogin with unchanged link/code binds the new term.
+--    Rotate/revoke through ANY current membership revokes the stable credential
+--    and ALL its sessions, including old-term sessions.
 -- 6. Every read rechecks current context/membership/credential/version/session and
 --    published=true within same transaction. Require exact private entry verifier too. Return explicit title/instruction/
 --    deadline/status + progress derived from same snapshot. No SELECT * response.

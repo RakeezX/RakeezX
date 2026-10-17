@@ -1,16 +1,24 @@
 /** AI: INACTIVE server proposal. Explicit adapters; never imported by Production. */
 import { randomBytes, randomUUID, randomInt, createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { normalizeDateTimeDigits } from '../../src/lib/rakeez-datetime-values.js';
 export const POLICY = Object.freeze({ sessionMs: 8 * 60 * 60_000, rateWindowMs: 15 * 60_000,
   sourceAttempts: 6, contextAttempts: 30, globalAttempts: 100,
   failureWindowMs: 86_400_000, contextFailures: 60, globalFailures: 500, maxRateKeys: 10_000 });
 export const hash = value => createHash('sha256').update(value).digest('hex'); // high entropy sessions ONLY
-export const generateCode = () => String(randomInt(10_000)).padStart(4, '0');
+// Default is cryptographic; injection permits deterministic boundary checks only.
+export const generateCode = (draw = randomInt) => String(draw(1000, 10000));
 const secret = () => randomBytes(32).toString('base64url');
 const denied = () => ({ status: 401, body: { error: 'unavailable' } });
 export const PRIVATE_HEADERS = Object.freeze({ 'Cache-Control': 'no-store, private', 'Referrer-Policy': 'no-referrer',
   'X-Robots-Tag': 'noindex, nofollow, noarchive', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie' });
 const active = m => m && m.status === 'active' && !m.endDate && m.studentActive && m.classActive;
 const bound = (a, b) => a.ownerId === b.ownerId && a.classId === b.classId && a.studentId === b.studentId && a.enrollmentId === b.enrollmentId;
+const identity = (a, b) => a.ownerId === b.ownerId && a.studentId === b.studentId;
+// Canonical server adapter supplies CURRENT memberships. Never select first/union scopes.
+const currentMember = (db, credential) => {
+  const members = db.memberships.filter(m => identity(m, credential) && active(m));
+  return members.length === 1 ? members[0] : null;
+};
 const revoke = (db, c, time) => { c.revokedAt = time; for (const s of db.sessions) if (s.credentialId === c.id) s.revokedAt = time; };
 function bucket(db, key, time, window) {
   let b = db.rates.find(r => r.key === key);
@@ -61,27 +69,26 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           if (!member) return denied();
           if (method === 'POST' && path === '/teacher/issue') {
             // Serializable repository reservation BEFORE revocation. Tombstones reserve old
-            // values too: at most 10,000 lifetime issuances/owner, possibly earlier refusal
+            // values too: at most 9,000 lifetime issuances/owner, possibly earlier refusal
             // after 128 random collisions. Never scan/fallback or overwrite a student.
             let code, verifier;
             for (let attempt = 0; attempt < 128; attempt++) {
-              code = newCode(); if (typeof code !== 'string' || !/^[0-9]{4}$/.test(code)) throw Error('Invalid generator');
+              code = newCode(); if (typeof code !== 'string' || !/^[1-9][0-9]{3}$/.test(code)) throw Error('Invalid generator');
               verifier = digest('code', context.namespace, code);
               if (!db.credentials.some(c => c.namespace === context.namespace && c.verifier === verifier)) break;
               code = null;
             }
             if (!code) throw Error('Collision budget');
-            for (const c of db.credentials) if (bound(c, member) && c.revokedAt == null) revoke(db, c, time);
-            const version = Math.max(0, ...db.credentials.filter(c => bound(c, member)).map(c => c.version)) + 1;
+            for (const c of db.credentials) if (identity(c, member) && c.revokedAt == null) revoke(db, c, time);
+            const version = Math.max(0, ...db.credentials.filter(c => identity(c, member)).map(c => c.version)) + 1;
             const entrySecret = secret(), entryVerifier = digest('entry', entrySecret);
             if (db.credentials.some(c => c.entryVerifier === entryVerifier)) throw Error('Entry collision');
-            db.credentials.push({ id: randomUUID(), ownerId: member.ownerId, classId: member.classId, studentId: member.studentId,
-              enrollmentId: member.enrollmentId, membershipRevision: member.revision, namespace: context.namespace,
+            db.credentials.push({ id: randomUUID(), ownerId: member.ownerId, studentId: member.studentId, namespace: context.namespace,
               verifier, entryVerifier, version, revokedAt: null });
             return { status: 200, body: { code, entrySecret, namespace: context.namespace } }; // once, never retrievable
           }
           if (method === 'POST' && path === '/teacher/revoke') {
-            for (const c of db.credentials) if (bound(c, member)) revoke(db, c, time);
+            for (const c of db.credentials) if (identity(c, member)) revoke(db, c, time);
             return { status: 200, body: { revoked: true } };
           }
           if (method === 'POST' && path === '/teacher/publish') {
@@ -113,13 +120,15 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           if (blocked) return clearDenied();
           attempts.forEach(({ b }) => b.count++);
           const fail = () => { failures.forEach(({ b }) => b.count++); return clearDenied(); };
-          if (typeof body.code !== 'string' || !/^[0-9]{4}$/.test(body.code)) return fail();
+          if (typeof body.code !== 'string') return fail();
+          const code = normalizeDateTimeDigits(body.code);
+          if (!/^[1-9][0-9]{3}$/.test(code)) return fail();
           const credential = db.credentials.find(c => c.entryVerifier === entryVerifier && c.revokedAt == null);
           const context = credential && db.contexts.find(c => c.namespace === credential.namespace && c.active);
-          const verifier = digest('code', credential?.namespace || '', body.code);
-          const member = credential && db.memberships.find(m => bound(m, credential));
+          const verifier = digest('code', credential?.namespace || '', code);
+          const member = credential && currentMember(db, credential);
           const matches = timingSafeEqual(Buffer.from(credential?.verifier || '0'.repeat(64), 'hex'), Buffer.from(verifier, 'hex'));
-          if (!context || !credential || !matches || context.ownerId !== credential.ownerId || !active(member) || member.revision !== credential.membershipRevision) return fail();
+          if (!context || !credential || !matches || context.ownerId !== credential.ownerId || !member) return fail();
           const sessionToken = secret();
           db.sessions.push({ ...Object.fromEntries(['ownerId','classId','studentId','enrollmentId'].map(k => [k, member[k]])),
             id: randomUUID(), credentialId: credential.id, version: credential.version, membershipRevision: member.revision,
@@ -131,11 +140,11 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           if (s) s.revokedAt = time;
           return { status: 200, body: { loggedOut: true }, cookie: cookie(entrySecret, '', 0) };
         }
-        const c = s && db.credentials.find(c => c.id === s.credentialId && bound(c, s) && c.entryVerifier === entryVerifier && c.namespace === s.namespace);
-        const member = s && db.memberships.find(m => bound(m, s));
+        const c = s && db.credentials.find(c => c.id === s.credentialId && identity(c, s) && c.entryVerifier === entryVerifier && c.namespace === s.namespace);
+        const member = c && currentMember(db, c);
         const context = s && db.contexts.find(c => c.namespace === s.namespace && c.active);
         if (!s || s.revokedAt != null || s.expiresAt <= time || !c || c.revokedAt != null || c.version !== s.version ||
-            !context || context.ownerId !== s.ownerId || !active(member) || member.revision !== s.membershipRevision) return clearDenied();
+            !context || context.ownerId !== s.ownerId || !member || !bound(member, s) || member.revision !== s.membershipRevision) return clearDenied();
         if (method === 'GET' && action === 'read') return { status: 200, body: projection(db, s) };
         return denied();
       });

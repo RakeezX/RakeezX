@@ -16,8 +16,101 @@ const login = (f, code, extra = {}) => f.request('/s/' + (extra.entrySecret || e
 const read = (f, cookie, extra = {}) => f.request('/s/' + (extra.entrySecret || entry(f)) + '/read', { method: 'GET', cookie, ...extra });
 const session = r => r.headers['Set-Cookie'].split(';')[0];
 const deny = r => { assert.equal(r.status, 401); assert.deepEqual(r.body, { error: 'unavailable' }); };
+
+test('final generator boundaries, no padding, invalid formats and Arabic/Persian equivalents', async () => {
+  for (const boundary of [1000, 9999]) {
+    assert.equal(generateCode((min, max) => { assert.equal(min, 1000); assert.equal(max, 10000); return boundary; }), String(boundary));
+    const f = createFixture(undefined, { newCode: () => generateCode(() => boundary) });
+    const issued = await issue(f); assert.equal(issued.body.code, String(boundary));
+    for (const alphabet of ['٠١٢٣٤٥٦٧٨٩', '۰۱۲۳۴۵۶۷۸۹'])
+      assert.equal((await login(f, String(boundary).replace(/[0-9]/g, d => alphabet[Number(d)]))).status, 200);
+  }
+  for (const code of ['0007','0074','0000','999','10000',' 1000','1000 ',1000,'٠٠٠٧']) {
+    const f = createFixture(undefined, { newCode: () => '1000' }); await issue(f);
+    deny(await login(f, code));
+    assert.equal(f.repo.snapshot().sessions.length, 0);
+    const g = createFixture(undefined, { newCode: () => code });
+    assert.equal((await issue(g)).status, 503); assert.equal(g.repo.snapshot().credentials.length, 0);
+  }
+  // No requested pattern exclusions; repeated digits are legitimate.
+  const f = createFixture(undefined, { newCode: () => '1111' });
+  assert.equal((await issue(f)).body.code, '1111');
+});
+
+test('stable owner/student code and private bookmark survive verified second term; old scope never follows', async () => {
+  const f = createFixture(), issued = await issue(f), code = issued.body.code, bookmark = issued.body.entrySecret;
+  const old = session(await login(f, code)), oldSecond = session(await login(f, code));
+  const credential = f.repo.snapshot().credentials[0];
+  const next = await f.advanceToSecondTerm();
+  deny(await read(f, old)); // still unexpired, but scope no longer current
+  assert.deepEqual(f.repo.snapshot().credentials[0], credential);
+  assert.equal(entry(f), bookmark);
+  const fresh = session(await login(f, code));
+  const data = (await read(f, fresh)).body;
+  assert.deepEqual(data.tasks.map(t => t.id), ['term2-a']);
+  assert.deepEqual(data.progress, { completed: 0, total: 1 });
+  assert.doesNotMatch(JSON.stringify(data), /الأمان|PRIVATE|OTHER|UNPUBLISHED|result|attendance|studentId/);
+  f.advance(POLICY.sessionMs + 1); deny(await read(f, fresh));
+  const renewed = session(await login(f, code)); assert.equal((await read(f, renewed)).status, 200);
+  // Simple revision update invalidates session only, never rotates the credential.
+  await f.repo.transaction(db => { db.memberships.find(m => m.enrollmentId === next.enrollmentId).revision++; });
+  deny(await read(f, renewed)); assert.equal((await login(f, code)).status, 200);
+  assert.deepEqual(f.repo.snapshot().credentials[0], credential);
+  next.revision++;
+  // Teacher authority on NEW enrollment rotates stable credential and all old-term sessions.
+  const rotated = await issue(f, next);
+  assert.equal(rotated.status, 200); assert.notEqual(rotated.body.entrySecret, bookmark);
+  assert.ok(f.repo.snapshot().sessions.every(s => s.credentialId !== credential.id || s.revokedAt != null));
+  deny(await read(f, oldSecond, { entrySecret: bookmark }));
+  deny(await login(f, rotated.body.code, { entrySecret: bookmark }));
+  deny(await login(f, code, { entrySecret: rotated.body.entrySecret }));
+  const current = session(await login(f, rotated.body.code, { entrySecret: rotated.body.entrySecret }));
+  assert.equal((await f.request('/teacher/revoke', { body: next })).status, 200);
+  deny(await read(f, current, { entrySecret: rotated.body.entrySecret }));
+});
+
+test('new-term teacher rotate/revoke retires every unexpired session across both term scopes', async () => {
+  for (const action of ['issue', 'revoke']) {
+    const codes = ['1000','1001'], f = createFixture(undefined, { newCode: () => codes.shift() });
+    const issued = await issue(f), oldEntry = issued.body.entrySecret;
+    const oldSessions = [session(await login(f, issued.body.code)), session(await login(f, issued.body.code))];
+    const next = await f.advanceToSecondTerm();
+    oldSessions.push(session(await login(f, issued.body.code)));
+    assert.equal(f.repo.snapshot().sessions.length, 3);
+    assert.ok(f.repo.snapshot().sessions.every(s => s.expiresAt > f.now() && s.revokedAt == null));
+    const result = action === 'issue' ? await issue(f, next) : await f.request('/teacher/revoke', { body: next });
+    assert.equal(result.status, 200);
+    assert.equal(f.repo.snapshot().sessions.length, 3);
+    assert.ok(f.repo.snapshot().sessions.every(s => s.revokedAt === f.now()));
+    for (const cookie of oldSessions) deny(await read(f, cookie, { entrySecret: oldEntry }));
+    deny(await login(f, issued.body.code, { entrySecret: oldEntry }));
+  }
+});
+
+test('ended, ambiguous, name-clone/new-student/foreign-owner membership cannot carry identity', async () => {
+  for (const mutation of [
+    db => { db.memberships[0].status = 'ended'; },
+    db => { db.memberships.push({ ...db.memberships[0], enrollmentId: 'second-active', classId: 'ambiguous' }); },
+    db => { db.memberships[0].status = 'ended'; db.memberships.push({ ...db.memberships[1], studentId: 'name-clone', enrollmentId: 'name-clone-enrollment', label: db.memberships[0].label }); },
+    db => { db.memberships[0].status = 'ended'; db.memberships.push({ ...db.memberships[0], status: 'active', ownerId: 'owner-b' }); },
+    db => { db.memberships[0].studentId = 'replacement-with-same-name'; }
+  ]) {
+    const f = createFixture(), code = (await issue(f)).body.code, cookie = session(await login(f, code));
+    await f.repo.transaction(mutation);
+    const before = f.repo.snapshot();
+    deny(await read(f, cookie)); deny(await login(f, code));
+    assert.deepEqual(f.repo.snapshot().memberships, before.memberships);
+    assert.deepEqual(f.repo.snapshot().publications, before.publications);
+    assert.deepEqual(f.repo.snapshot().credentials, before.credentials);
+  }
+  // Ambiguity after a verified new-term session also denies; never union publications.
+  const f = createFixture(), code = (await issue(f)).body.code;
+  const next = await f.advanceToSecondTerm(), cookie = session(await login(f, code));
+  await f.repo.transaction(db => db.memberships.push({ ...next, enrollmentId: 'ambiguous-term2' }));
+  deny(await read(f, cookie)); deny(await login(f, code));
+});
 test('private individual entry never resolves another valid student PIN or public teacher context', async () => {
-  const values = ['0007','0008','0009'];
+  const values = ['1007','1008','1009'];
   const f = createFixture(undefined, { newCode: () => values.shift() });
   const a = await issue(f), b = await issue(f, f.other);
   assert.notEqual(a.body.entrySecret, b.body.entrySecret);
@@ -42,46 +135,46 @@ test('private individual entry never resolves another valid student PIN or publi
   const listing = JSON.stringify((await f.request('/teacher/students', { method: 'GET' })).body);
   for (const r of [a,b,rotated]) assert.ok(!listing.includes(r.body.entrySecret));
 });
-test('atomic same-owner collision retry, 128-attempt rollback, full 10000-value exhaustion', async () => {
+test('atomic same-owner collision retry, 128-attempt rollback, full 9000-value exhaustion', async () => {
   let calls = 0;
-  const f = createFixture(undefined, { newCode: () => ++calls <= 2 ? '0007' : '0008' });
+  const f = createFixture(undefined, { newCode: () => ++calls <= 2 ? '1007' : '1008' });
   const [a,b] = await Promise.all([issue(f), issue(f, f.other)]);
-  assert.equal(calls, 3); assert.equal(a.body.code, '0007'); assert.equal(b.body.code, '0008');
+  assert.equal(calls, 3); assert.equal(a.body.code, '1007'); assert.equal(b.body.code, '1008');
   let tries = 0;
   const secretKey = Buffer.alloc(32, 23); // fabricated test key, never a hosting key
-  const g = createFixture(undefined, { secretKey, newCode: () => { tries++; return '0000'; } });
-  const first = await issue(g); assert.equal(first.body.code, '0000');
+  const g = createFixture(undefined, { secretKey, newCode: () => { tries++; return '1000'; } });
+  const first = await issue(g); assert.equal(first.body.code, '1000');
   const cookie = session(await login(g, first.body.code));
   let before = g.repo.snapshot(); tries = 0;
   const collision = await issue(g); assert.equal(collision.status, 503); assert.deepEqual(collision.body, { error: 'unavailable' });
   assert.equal(tries, 128); assert.deepEqual(g.repo.snapshot(), before);
   assert.equal((await read(g, cookie)).status, 200);
-  await g.repo.transaction(db => { for (let n = 1; n < 10000; n++) db.credentials.push({
-    namespace: g.namespace, verifier: createHmac('sha256', secretKey).update(JSON.stringify(['n88-v2','code',g.namespace,String(n).padStart(4,'0')])).digest('hex'),
+  await g.repo.transaction(db => { for (let n = 1001; n < 10000; n++) db.credentials.push({
+    namespace: g.namespace, verifier: createHmac('sha256', secretKey).update(JSON.stringify(['n88-v2','code',g.namespace,String(n)])).digest('hex'),
     revokedAt: 1, version: 1, id: 'reserved-' + n }); });
   before = g.repo.snapshot(); tries = 0;
   const exhausted = await issue(g, g.other); assert.equal(exhausted.status, 503); assert.deepEqual(exhausted.body, collision.body);
   assert.equal(tries, 128); assert.deepEqual(g.repo.snapshot(), before);
   assert.equal((await login(g, first.body.code)).status, 200);
 });
-test('persistent four ASCII digits, leading zero, collision retry, atomic rotation, hashed-only', async () => {
-  for (let n = 0; n < 100; n++) assert.match(generateCode(), /^[0-9]{4}$/);
-  const values = ['0007', '0007', '0008', '0007', '0008', '0009'];
+test('persistent four ASCII digits, no leading zero, collision retry, atomic rotation, hashed-only', async () => {
+  for (let n = 0; n < 100; n++) assert.match(generateCode(), /^[1-9][0-9]{3}$/);
+  const values = ['1007', '1007', '1008', '1007', '1008', '1009'];
   const f = createFixture(undefined, { newCode: () => values.shift() });
   const a = await issue(f), b = await issue(f, f.other), rotated = await issue(f);
-  assert.equal(a.body.code, '0007'); assert.equal(b.body.code, '0008'); assert.equal(rotated.body.code, '0009');
+  assert.equal(a.body.code, '1007'); assert.equal(b.body.code, '1008'); assert.equal(rotated.body.code, '1009');
   assert.equal(f.repo.snapshot().credentials.filter(c => c.revokedAt == null).length, 2);
   const state = JSON.stringify(f.repo.snapshot());
   for (const r of [a,b,rotated]) { assert.match(r.body.entrySecret, /^[A-Za-z0-9_-]{43}$/); assert.ok(!state.includes(r.body.entrySecret)); }
   for (const c of f.repo.snapshot().credentials) {
-    assert.deepEqual(Object.keys(c).sort(), ['id','ownerId','classId','studentId','enrollmentId','membershipRevision','namespace','verifier','entryVerifier','version','revokedAt'].sort());
+    assert.deepEqual(Object.keys(c).sort(), ['id','ownerId','studentId','namespace','verifier','entryVerifier','version','revokedAt'].sort());
     assert.match(c.verifier, /^[a-f0-9]{64}$/); assert.match(c.entryVerifier, /^[a-f0-9]{64}$/);
   }
   // A random HMAC can coincidentally contain a four-character PIN substring;
   // verify the stored schema and cryptographic verifier, not substring absence.
-  for (const value of ['0007','0008','0009']) assert.ok(!state.includes(hash(value)));
+  for (const value of ['1007','1008','1009']) assert.ok(!state.includes(hash(value)));
   assert.ok(!state.includes('expiresAt')); assert.ok(!state.includes('consumedAt'));
-  assert.ok(!JSON.stringify((await f.request('/teacher/students', { method: 'GET' })).body).includes('0009'));
+  assert.ok(!JSON.stringify((await f.request('/teacher/students', { method: 'GET' })).body).includes('1009'));
 });
 test('same code separate sessions, beyond old 15m, expired session relogin, logout preserves code', async () => {
   const f = createFixture(), code = (await issue(f)).body.code;
@@ -110,7 +203,7 @@ test('rotate/revoke immediately refuse old code AND every existing session; race
   assert.deepEqual(f.repo.snapshot(), before);
 });
 test('same PIN other teacher only resolves scoped student; owner/member/version and no PII', async () => {
-  const f = createFixture(undefined, { newCode: () => '0123' });
+  const f = createFixture(undefined, { newCode: () => '1123' });
   const code = (await issue(f)).body.code;
   assert.equal((await issue(f, f.foreign, { teacher: 'fabricated-teacher-b' })).status, 200);
   const a = await login(f, code), b = await login(f, code, { entrySecret: entry(f, f.foreign) });
