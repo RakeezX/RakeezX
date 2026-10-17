@@ -1,0 +1,34 @@
+{
+  "taskId": "continuous-n107-madrasati-primary-onboarding-20261018",
+  "runId": "6e080d21-4b28-465c-9860-8d96990dbdb0",
+  "origin": "http://127.0.0.1:49807",
+  "baseline": false,
+  "checks": [
+    {
+      "width": 390,
+      "home": "خطوتك الأولى\nابدأ بفصولك وطلابك\n\nاستورد فصولك وطلابك من مدرستي، أو أنشئ فصلًا يدويًا ثم أضف طلابه ومواعيد حصصه.\n\nاستيراد الفصول من مدرستي\nإنشاء أول فصل"
+    },
+    {
+      "width": 390,
+      "status": "PASS",
+      "detail": "Primary/secondary order, exact copy/hrefs, existing import file/extension, current term, create form open/cancel, no data changes, no overflow."
+    },
+    {
+      "width": 1280,
+      "home": "خطوتك الأولى\nابدأ بفصولك وطلابك\n\nاستورد فصولك وطلابك من مدرستي، أو أنشئ فصلًا يدويًا ثم أضف طلابه ومواعيد حصصه.\n\nاستيراد الفصول من مدرستي\nإنشاء أول فصل"
+    },
+    {
+      "width": 1280,
+      "status": "PASS",
+      "detail": "Primary/secondary order, exact copy/hrefs, existing import file/extension, current term, create form open/cancel, no data changes, no overflow."
+    }
+  ],
+  "errors": [],
+  "files": {
+    "src/views/home.js": "88a247bcbdac0f8ee08c50ed3a7545a2a9afb987e2df18b4e614edb9fb20d766",
+    "src/views/teachings.js": "e04bcecead2ccaee8e785ecbcfea9c1eafc64242caf6d17ebaaa39b33997bf34",
+    "src/styles/components.css": "43beaed5cc0c95f30779c174b4cbbda95a0639247d8aa9c5908dd8872d5a2ad0"
+  },
+  "status": "PASS",
+  "ownedServerClosed": true
+}

@@ -8435,7 +8435,7 @@
 .classes-toolbar > .btn, .classes-tools-left .btn,
 .roster-populated-actions .btn { min-block-size:44px; height:auto; white-space:normal; gap:var(--sp-2); }
 .roster-populated-actions { align-items:stretch; }
-.roster-populated-actions .btn, .classes-toolbar > a.btn { background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--r-md); }
+.roster-populated-actions .btn, .classes-toolbar > a.btn:not(.btn--primary) { background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--r-md); }
 .roster-populated-actions > .roster-entry-actions { display:flex; }
 .classes-tools-left { padding-inline-start:var(--sp-3); border-inline-start:1px solid var(--border); }
 .class-import-page .koshoof-selection { grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:var(--sp-2); }

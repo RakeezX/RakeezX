@@ -1,0 +1,20 @@
+{
+  "taskId": "continuous-n107-madrasati-primary-onboarding-20261018",
+  "runId": "6e080d21-4b28-465c-9860-8d96990dbdb0",
+  "origin": "http://127.0.0.1:49807",
+  "baseline": true,
+  "checks": [
+    {
+      "width": 390,
+      "home": "خطوتك الأولى\nأنشئ فصلك الأول\n\nابدأ بفصل واحد، ثم أضف طلابه ومواعيد حصصه عندما تكون جاهزًا.\n\nإنشاء أول فصل\nاستيراد فصل من ملف"
+    }
+  ],
+  "errors": [],
+  "files": {
+    "src/views/home.js": "7774a18979a151a95c9c272ddf2b93bf4a6ffdc4936f0ea2ca6cb48e1f7e7d8b",
+    "src/views/teachings.js": "a4c28a785cb6c694aeae944af9142cadbb26a3c8fac2a0baea1af19025cf9102",
+    "src/styles/components.css": "3619ce1cdea02eedd4f2e8a33c5c5cf9aab3177b7332b6305cc2beef3a61f50d"
+  },
+  "status": "PASS",
+  "ownedServerClosed": true
+}

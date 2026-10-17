@@ -235,9 +235,9 @@ function renderOnboarding(onboarding) {
   if (onboarding.state === 'D') return '';
   const content = {
     A: {
-      kicker: 'خطوتك الأولى', title: 'أنشئ فصلك الأول',
-      text: 'ابدأ بفصل واحد، ثم أضف طلابه ومواعيد حصصه عندما تكون جاهزًا.',
-      action: 'إنشاء أول فصل', href: '#/classes', iconName: 'classes',
+      kicker: 'خطوتك الأولى', title: 'ابدأ بفصولك وطلابك',
+      text: 'استورد فصولك وطلابك من مدرستي، أو أنشئ فصلًا يدويًا ثم أضف طلابه ومواعيد حصصه.',
+      action: 'استيراد الفصول من مدرستي', href: '#/classes/koshoof?new=1', iconName: 'upload',
     },
     B: {
       kicker: 'الخطوة التالية', title: 'أضف طلابك',
@@ -259,7 +259,7 @@ function renderOnboarding(onboarding) {
         <p>${content.text}</p>
       </div>
       <div class="home-onboarding__actions"><a class="btn btn--primary home-onboarding__action" href="${content.href}">${content.action} ${icon('back')}</a>
-      ${onboarding.state === 'A' ? html`<a class="btn class-import-secondary" href="#/classes/koshoof?new=1">${icon('upload')} استيراد فصل من ملف</a>` : ''}</div>
+      ${onboarding.state === 'A' ? html`<a class="btn btn--quiet" href="#/classes">${icon('plus')} إنشاء أول فصل</a>` : ''}</div>
     </section>
   `;
 }
@@ -420,7 +420,7 @@ export default {
               <div class="home-sessions__empty empty-day">
                 <span class="empty-day__icon" aria-hidden="true">${icon('classes')}</span>
                 <h3>لا توجد حصص بعد</h3>
-                <p>بعد إنشاء الفصل وإضافة الجدول، ستظهر هنا حصص يومك تلقائيًا.</p>
+                <p>بعد إضافة فصولك وجدولك، ستظهر هنا حصص يومك تلقائيًا.</p>
               </div>
             `
           : remainingSessions.length
@@ -497,7 +497,7 @@ export default {
       </section>
 
       ${onboarding.state === 'A'
-        ? html`<section class="section home-summary home-workspace-note" aria-label="إرشاد البدء"><p>ابدأ بفصلك الأول، وستتكوّن مؤشراتك اليومية تدريجيًا دون إعدادات معقدة.</p></section>`
+        ? html`<section class="section home-summary home-workspace-note" aria-label="إرشاد البدء"><p>ستتكوّن مؤشراتك اليومية تدريجيًا مع إضافة فصولك وطلابك وحصصك.</p></section>`
         : summary(list, cal)}
         </aside>
       </div>
