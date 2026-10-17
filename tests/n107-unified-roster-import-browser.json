@@ -1,0 +1,40 @@
+{
+  "taskId": "continuous-n107-unified-roster-file-import-20261017",
+  "runId": "936544bd-4d73-4e9b-bd07-7e599e75672f",
+  "checks": [
+    {
+      "name": "n107_single_file_four_destination_mode_combinations_actual_ui",
+      "status": "PASS",
+      "evidence": "12 actual app account UI combinations at 320/390/1280; one file retained through destination/mode changes, contextual class, explicit review/confirmation/cancel; database unchanged before consent."
+    },
+    {
+      "name": "n107_new_class_grades_reviewed_binding_zero_blank_and_existing_service_reuse",
+      "status": "PASS",
+      "evidence": "Actual creation receipt supplies fixed saved IDs; unsynced class blocks score review honestly. Synthetic acknowledged prerequisites then real reviewGradeImport/confirmGradeImport, cloud ownership guard and Sync durable dispatch/receipt adopt 7 and 0, blank omitted; existing path uses N90_UNIFIED_V1, created path N90_REVIEWED_V1. No service deployment claim."
+    },
+    {
+      "name": "n107_partial_receipt_exact_retry_duplicate_owner_term_lease_and_cancel",
+      "status": "PASS",
+      "evidence": "Created class/names remain saved when grade receipt is lost or rejected; retained file, separate pending notice, fresh confirm blocked. Lost receipt restores identical mutation/envelope without duplicate class/student/score; rejected request requires explicit retirement and preserves rejection. Actual UI also blocks owner/term/lease/session drift, duplicate/ambiguous/unknown-ID rows and duplicate item mapping without writes; unavailable capability keeps file/creation receipt. XLSX 7/0/blank and headerless CSV reach real parsers and handlers."
+    },
+    {
+      "name": "n107_responsive_contextual_hub_accepted_export_and_extension_preserved",
+      "status": "PASS",
+      "evidence": "Actual source CSS/DOM and handlers, 320/390/1280 no overflow, contextual preselect; unchanged accepted export/Noor engines, direct extension card/download/handoff and export handler byte comparisons against base reuse prior evidence."
+    }
+  ],
+  "failures": [],
+  "testedFiles": {
+    "src/views/class-import-center.js": "874c91865298da55f480c86e81ae152b30b9c2820faa8b08cdbc171556519b43",
+    "src/store.js": "290149777963ab9abf971d449819d5edf48496499f6106c8f9d783e048fb07ef",
+    "src/lib/class-koshoof-bundle.js": "f7393231497269fcb664095f03003091059e899ef3129533793588a0d3962a54",
+    "src/lib/grade-transfer-export.js": "2ada95ab60a3eea23a84ead40cb8d0ce9f52ab8caea1ce940cf64ed2e7cfe0c9",
+    "src/lib/grade-transfer-xlsx.js": "5c76ea7959f75ba10e21450ad3d3cfbb4545ccde6ab527c607c2bb4a1fc0123c",
+    "src/styles/components.css": "2560e76792321be04878a527e395546347983e689819a5199b56d366bc17319e",
+    "assets/extensions/rakeez-teacher-import-helper-0.5.9.zip": "562caeb53f91b670d6d8db743046892006c0360fe9f5c2a4ca6b7af66be25d79"
+  },
+  "previousFailures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-unified-roster-file-import-20261017/tests/n107-unified-roster-import-browser.mjs:232:69\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-unified-roster-file-import-20261017/tests/n107-unified-roster-import-browser.mjs:130:2",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   0,\n    7,\n-   0\n  ]\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-unified-roster-file-import-20261017/tests/n107-unified-roster-import-browser.mjs:245:138\n    at async withIsolatedLocalBrowser (file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs:18:10)\n    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n107-unified-roster-file-import-20261017/tests/n107-unified-roster-import-browser.mjs:131:2"
+  ]
+}

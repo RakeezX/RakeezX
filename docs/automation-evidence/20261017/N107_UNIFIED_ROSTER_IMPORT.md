@@ -1,0 +1,42 @@
+# N107 — one retained roster file
+
+AI-authored local candidate for task `continuous-n107-unified-roster-file-import-20261017`, run `936544bd-4d73-4e9b-bd07-7e599e75672f`.
+
+Base: `21ee4587c5e69be05720fd4818eb19a8f0e8f57f`, which matched observed `origin/main` at entry. Later observed `origin/main` was `5ce42fd71ed23408bde4b48be40c06b17f1ab273`; its N88 and generated metadata changes do not intersect either affected Product file. This worker did not integrate, push, deploy, edit queue state or touch N88/extension package files. Final runner JSON identifies the candidate commit.
+
+## Behavior and boundaries
+
+- The ordinary import tab exposes **استيراد كشف طلاب** first. Read one CSV/XLSX, choose an existing owned class or create one, then names or names+grades. Contextual entries preselect their class. Destination changes retain parsed rows and discard destination-specific reviews, student choices and item mappings. Mode changes retain the file and mappings. Only creation shows grade/section/subject fields. Unknown or ambiguous column headers require a choice. Names-only one-column files retain their first student.
+- Existing destinations reuse `reviewNamesImport`/`confirmNamesImport` and `reviewGradeImport`/`confirmGradeImport`. No SQL, new server protocol or alternate importer was introduced.
+- New destinations reuse `classGroups`/`reviewClassImport`/`confirmClassImport`. A names+grades proposal shows manual item names/maxima and values (including zero, blank and capped values), alongside the explicit class/subject/names review. The first confirmation saves only class, subject and names. The creation receipt now returns the actual newly created student IDs. The same retained rows receive those exact IDs; they are not rediscovered by searching a later roster.
+- Newly created teaching/roster dependencies need normal Sync acknowledgments and a clean outbox before the existing score service can accept them. The UI states that class/names are saved and grades remain pending, retains chosen columns, and requires a second grade review/confirmation. Unsynced context or unavailable capability produces an explicit pending/error state, not success. Existing N90 owner, lease, revisions, maxima, overwrite/enrollment consent, history, receipt validation and dirty-outbox rules remain exact.
+- Lost grade acknowledgment exposes recovery of the same durable mutation/envelope. Reconfirmation is disabled while a request needs disposition. Rejected requests retain their reason until explicit retirement. Closing a file review retains recovery of an outstanding durable request; it does not cancel a possibly accepted batch. Successful completion releases the file input for another import.
+- File read/review is bound to the account workspace, year/term, session and lease generation. Async read callbacks discard stale contexts. Creation rechecks its original guarded receipt after final confirmation. Grade confirmation still dispatches through the actual owner-bound cloud/Sync command path.
+- Direct Madrasati extension remains a distinct source card, with its original download, handoff, expiry and owner checks. This file flow does not add extension grades or extension class creation. Its review action is disabled/refused for a new-class destination; a received handoff can choose an existing class without uploading a file.
+
+## Affected evidence
+
+`node tests/n107-unified-roster-import-browser.mjs` serves the actual application and source CSS on task-owned `http://127.0.0.1:49517`, using the canonical `withIsolatedLocalBrowser` helper, fresh disposable account contexts, blocked external requests and Service Workers. Synthetic account preparation reuses the existing served-app/N73 fixture helpers and preserves the actual ownership guard. Browser/context cleanup is bounded by the helper; the server closes its connections in `finally`. This eligible synthetic phase does not acquire the shared live-browser lease.
+
+The four named results and tested source SHA-256 values are in [the browser manifest](../../../tests/n107-unified-roster-import-browser.json). Screenshots are in `tests/fixtures/n107-unified-roster-import/`.
+
+| Required check | Evidence |
+| --- | --- |
+| `n107_single_file_four_destination_mode_combinations_actual_ui` | Existing/new × names/grades at 320, 390 and 1280: 12 actual UI flows; contextual selection, same file through destination/mode changes, no DB/outbox/transport writes before consent, canceled creation confirmation does not write. |
+| `n107_new_class_grades_reviewed_binding_zero_blank_and_existing_service_reuse` | Created receipts bind saved IDs. Unsynced class refuses review. Fixture acknowledgment of prerequisites then actual store/cloud/Sync dispatch and receipt reconciliation saves 7 and 0 and omits blank. Existing new enrollments use `N90_UNIFIED_V1`; created roster uses `N90_REVIEWED_V1`. Actual XLSX import also reaches that path; exported alphabetical ordering is respected. |
+| `n107_partial_receipt_exact_retry_duplicate_owner_term_lease_and_cancel` | Class/names saved + lost/rejected/unavailable grade capability; truthful state and retained file; exact lost-receipt retry (including after closing file review), no duplicate class/student/score; rejected request requires explicit disposition. Actual UI owner/term/lease/session drift, duplicate and ambiguous names, unknown fixed ID and duplicate item mappings all block writes. Headerless names keep both students. |
+| `n107_responsive_contextual_hub_accepted_export_and_extension_preserved` | Source DOM/CSS inspection and screenshots, no horizontal overflow at 320/390/1280. Accepted export render/actions, ALL-selected downloads, Noor/math engines and extension package remain unchanged against base. Handoff implementation remains exact; the new-destination button guard is the only direct-card constraint change. |
+
+`node --test tests/n107-classes-import-mutation.test.mjs tests/n90-transfer.test.mjs tests/n90-current-source-sync.test.mjs tests/n107-unified-roster-import-preservation.test.mjs`: **20/20 PASS**. Covers class creation partial writes/retry/cross-tab drift, original negative owner and revision checks, score parsing/mapping/overwrites, dirty-outbox and receipt history. Injected transaction failures are expected negative tests, not production errors. `node --check` for both edited Product JS files and `git diff --check`: PASS.
+
+Unchanged accepted export evidence is reused by exact source comparisons, including the export rendering/action blocks and engines, rather than rerunning export downloads or the old stress suite. `sw.js` and startup module paths are unchanged; no new offline dependency was added. Prior offline shell evidence is retained. No full Vite build or new Preview was necessary; the publisher owns its deterministic build/provider/immutable/Production checks.
+
+## Original failures and corrections
+
+Local harness development initially used a nonexistent `makeScore` export, a nonexistent `db.del`, and read the DOM before scheduled repaint; those were corrected to a plain synthetic canonical score, existing batch API and a DOM readiness predicate. Negative UI assertions initially expected an absent confirmation button instead of the existing **disabled** button. XLSX expected CSV row order although the unchanged exporter sorts names; the assertion now checks values against the actual student identities. A scoped source assertion initially searched an end marker before its start; it now uses bounded markers. These are harness defects, not waived Product gates; retained browser failure stacks are in `previousFailures`.
+
+Visual inspection also found the inherited CSS made a `hidden` segmented group visible; the duplicate group is now omitted. Success now clears completed creation state so another upload is possible. Cancel retains outstanding recovery. Those Product corrections are covered by the final affected UI run.
+
+## What this does not prove
+
+The synthetic transport checks the actual owner-bound request and supplies bound canonical receipts; it is not hosted SQL/service certification. Creation acknowledgment is an explicit fixture step, not a claim that live Sync ran. No hosted capability, teacher/student data, Auth/RLS/schema, migration or real account was read or mutated. No Production evidence or PO acceptance is claimed. N104 stays closed; N36 official-source/full integration remains its own scope. Routine publication and Production verification remain with the independent controller/publisher.
