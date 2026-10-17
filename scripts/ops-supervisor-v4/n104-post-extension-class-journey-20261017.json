@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n104-post-extension-restored-owner-class-journey-20261017",
+      "productId": "N104",
+      "activationId": "po-20261012-continuous",
+      "priority": -95,
+      "scopeKey": "n104-auth-restored-owner-class-journey-followup-after-n36",
+      "riskClass": "SENSITIVE",
+      "validationTier": "STANDARD",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "dependsOn": [
+        "continuous-n36-extension-direct-handoff-20261017"
+      ],
+      "objective": "PO reports recurrent silent inability to open a class, use an empty-class Paste Names/Add Student button or Koshoof after legitimately restoring their existing authenticated Rakeez account; original N104 was twice incorrectly declared locally PASS because its synthetic receipt had an invented ownerId and eventual source-only registry-fidelity fix c9c02a was verified in Production but NOT genuinely retested by PO. IMPORTANT: latest independent N36 direct browser-extension import c7b249 and a1e593 changed class-import-center and shared class route after the N104 fix; ensure N104's legitimate restored-account class actions are not broken again. Deliver an observable USER-LEVEL correction, not documentation or re-running unchanged old suite as work. First read N104 Product Ledger row and last c9c02a candidate/evidence, N36 class import flow and actual source of restored owner binding. Construct a focused synthetic restored-account fixture using real begin/update/finalize restore receipt shape (registry receipt intentionally has NO ownerId, device restore receipt MUST have ownerId) and current integrated a1e593 class/koshoof first-use flow. Trace actual route initial render, action click, afterPaint listeners and re-render after async owner/session/lease refresh. Reproduce at least one genuinely distinct post-N36 issue (for example when an expired lease or mismatched restore causes controls disappear silently, stale render attempts cause jitter, or an already-owned valid account is incorrectly denied), then correct narrowly; do NOT invent a bug or weaken ownership guards. Independently of a reproducible access mismatch, enhance the existing N104 denied/empty state into ONE small helpful accessible owner-safe reason/status and next action rather than invisible/inert buttons and generic toast: show safe coarse categories only (needs account verification, lease expired, context archived, ownership mismatch); never reveal private owner IDs/URLs/DB identifiers, never recommend bypass, never grant access to foreign account, and do not create or mutate data from a diagnostic view. If there is NO safe actionable fix and prior N104 issue is not reproduced with a faithful fixture, return honest NO_CHANGE or BLOCKED and retain previous certified work; do not publish ornamental churn or fabricate results. Preserve old `assertClassOperationsAccess` and actual strict cloud Auth session, owner/restore/provenance/device DB binding, lease validity, term checks and explicit foreign-owner denial. Do NOT add a rescue method or repair student data in place, fake an Auth JWT, touch Supabase RLS/schema/migrations, disable offline calendar switching hold, or use user's actual main account/student data. Test actual isolated browser DOM (320/390/768/1280) for first click into restored existing and new empty classes, Add Student, Paste Names, N36 direct extension handoff entry, import navigation and back/reload; when denied, checks that no privileged buttons or network/data mutation occurs and that a human-readable next step is displayed; stress bounded re-renders for visual jitter/unchanged route. Run existing N104 owner-negative and N36 exporter/import regression tests that are genuinely affected, preserve true FAIL/NOT_RUN. Deliver through sole controller/publisher with exact Cloudflare immutable and served Production proof, only if a real change passes; N104 whole issue remains OPEN for PO's authentic restored-account retest.",
+      "allowedPaths": [
+        "src/views/students.js",
+        "src/views/teaching-hub.js",
+        "src/views/grades.js",
+        "src/views/class-import-center.js",
+        "src/views/teachings.js",
+        "src/store.js",
+        "src/app.js",
+        "src/repaint.js",
+        "src/styles/components.css",
+        "src/styles/students.css",
+        "sw.js",
+        "tests/n104-class-operations.test.mjs",
+        "tests/n104-class-liveness-browser.mjs",
+        "tests/n104-class-liveness-browser.json",
+        "tests/n104-restored-account-regression.test.mjs",
+        "tests/n104-restored-account-regression-browser.mjs",
+        "tests/n104-restored-account-regression.json",
+        "tests/n104-post-n36-restored-class.test.mjs",
+        "tests/n104-post-n36-restored-class-browser.mjs",
+        "tests/n104-post-n36-restored-class-browser.json",
+        "tests/n36-extension-direct-handoff-browser.mjs",
+        "tests/n36-extension-direct-handoff-browser.json",
+        "docs/automation-evidence/20261017/N104_RESTORED_CLASS_UX_FOLLOWUP.md",
+        "tests/n36-extension-direct-handoff.test.mjs",
+        "tests/n36-koshoof-discoverability.test.mjs"
+      ],
+      "verificationPaths": [
+        "src/views/students.js",
+        "src/views/teaching-hub.js",
+        "src/views/grades.js",
+        "src/views/class-import-center.js",
+        "src/views/teachings.js",
+        "src/store.js",
+        "src/app.js",
+        "src/styles/components.css",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n104_real_registry_ownerless_restore_receipt_device_owner_verified",
+        "n104_actual_restored_account_empty_and_populated_classes_open_N36_hub",
+        "n104_unavailable_or_denied_actions_have_safe_clear_user_feedback",
+        "n104_actual_route_click_paste_add_navigation_without_jitter_or_stale_listener",
+        "n104_foreign_owner_auth_mismatch_bad_lease_archived_term_rejected_without_writes",
+        "n104_affected_test_reuse_syntax_diff_clean_and_no_personal_data"
+      ],
+      "acceptance": [
+        "A legitimate owner-authenticated restored-account fixture with actual registry ownerless restoreReceipt and matching true device owner receipt opens both empty and populated current teaching contexts and the N36 import hub, with Paste Names and Add Student working on actual first click, no repeated viewport shaking. Existing strict owner/Auth/term/lease guards stay binding.",
+        "Denied owner, invalid lease or other non-ready contexts show a single contextual human action/feedback without revealing any student/owner account IDs, disabling guard, accessing foreign classes or writing data. Existing independent local N104 security-negative suite passes.",
+        "Source-fidelity synthetic actual DOM at 320/390/768/1280 and change-scoped Node tests; no security/Sync/score/DB migration, no live account read or mutation. True standalone NO_CHANGE/BLOCKED reported if no distinct defect/effective UX improvement is demonstrated.",
+        "Successful actual standalone candidate merged/published through sole controller/publisher with provider immutable/served parity. N104 not CLOSED until real PO account retest or fully truthful matching acceptance."
+      ],
+      "preparationAuthority": {
+        "kind": "restored-account-local-owner-UI-observability-guarded",
+        "serviceOperations": 0,
+        "migrations": 0,
+        "realStudentData": 0,
+        "publication": true,
+        "noNewWrites": true
+      },
+      "releaseAuthority": "PO explicitly escalated completing existing OPEN real functional tickets without another repetitive status report. N104 already authorized restoration of existing class actions after Auth restore. This follow-up is bounded to source-fidelity synthetic reproductions and UI/guard corrections that DO NOT change Auth, RLS, DB, schema, real student data, scores, Delete/Restore or session mutation; maintaining and exercising existing authorized user-triggered class actions only. No personal account inspection. Standard targeted tests and sole original publisher authorization for safe client-only change."
+    }
+  ]
+}
