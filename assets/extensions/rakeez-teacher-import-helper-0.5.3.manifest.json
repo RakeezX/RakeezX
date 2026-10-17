@@ -1,0 +1,123 @@
+{
+  "schema": "rakeez-private-extension-package",
+  "version": "0.5.3",
+  "applicationBaseSha": "8714bef9f047a5169a5c4ca3eb0d9ef6e3b08199",
+  "officialAccountVerification": "NOT_RUN",
+  "files": [
+    {
+      "file": "categories-popup.js",
+      "sha256": "e9d31c2458b55f723879599122d2ce80b90b124472c1f3ae095793df5516dd40",
+      "bytes": 14301
+    },
+    {
+      "file": "categories.js",
+      "sha256": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+      "bytes": 5820
+    },
+    {
+      "file": "core.js",
+      "sha256": "daa2d6bef258e1aaf1f1fafe61050dc7d6e0083ee74e03743f38ac8594ad4907",
+      "bytes": 2178
+    },
+    {
+      "file": "handoff-protocol.js",
+      "sha256": "46eb3033c2b70a7beaeaa82679fd79d6d155483ef8913fcb5e77a58bfa9e0348",
+      "bytes": 2425
+    },
+    {
+      "file": "handoff-worker.js",
+      "sha256": "98353a493f9fe8e82d72b2fcde5fa046649768642d21f716664c4431cd130833",
+      "bytes": 3211
+    },
+    {
+      "file": "lib/rakeez-datetime-values.js",
+      "sha256": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+      "bytes": 1806
+    },
+    {
+      "file": "lib/rakeez-datetime.css",
+      "sha256": "8f5ea710d5b0a4e038cb5a0ea3cc6ed9ea3bc26f0857ba2e33e23fa4e5399fa0",
+      "bytes": 3070
+    },
+    {
+      "file": "lib/rakeez-datetime.js",
+      "sha256": "5cfb97ae94021fd0fdcfc36e118eb7f7a2d32ced599b19b709839e0b6bdbbef2",
+      "bytes": 7085
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "88889ec7ef34193cf0a995d23622d6446049e26e901c02124bd48046e1ef9113",
+      "bytes": 806
+    },
+    {
+      "file": "navigation.js",
+      "sha256": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+      "bytes": 1383
+    },
+    {
+      "file": "popup.css",
+      "sha256": "16578bc03efebe9ab2da17eda82550072f7756140ed9574bcc70da675af7c4db",
+      "bytes": 2177
+    },
+    {
+      "file": "popup.html",
+      "sha256": "7721fc154fd6079d2574a5147a1cff72cee5177baee62637a375dca70d8934fe",
+      "bytes": 8764
+    },
+    {
+      "file": "popup.js",
+      "sha256": "1b0213b47dfbd1c1595b368a209dafdd33bd8343d350f9aafdb81eaa3400b80f",
+      "bytes": 4468
+    },
+    {
+      "file": "README.md",
+      "sha256": "f2617908a5d8b78c1c2410b00bfa22965405663f2206cf96f629c679904afb9e",
+      "bytes": 49307
+    },
+    {
+      "file": "route-diagnostics.js",
+      "sha256": "e2b05edc73d67b9aa214c42541dd8634395de8cfb36006801b3af5d4a8640134",
+      "bytes": 4804
+    },
+    {
+      "file": "run-controller.js",
+      "sha256": "3e92f11317b6daa954b64712296f718d827077a0d72c78bb6ea02748e951a6a7",
+      "bytes": 32149
+    },
+    {
+      "file": "selection.js",
+      "sha256": "fb026b7bb1b945a86b8198c61424c824da550c1c4a1a13ef8494bb2df52b7dd5",
+      "bytes": 31515
+    },
+    {
+      "file": "source-adapter.js",
+      "sha256": "8d2b838a514cf912f28ee17847eeda2c36d55c8072bd9ada45a796eb4ebcb750",
+      "bytes": 19887
+    },
+    {
+      "file": "vendor/flatpickr/ar.js",
+      "sha256": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+      "bytes": 1928
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.css",
+      "sha256": "1b34a42552c96f10e4dfaaa4a367276b03868aacff63c1ac42ffe331352bc754",
+      "bytes": 16166
+    },
+    {
+      "file": "vendor/flatpickr/flatpickr.min.js",
+      "sha256": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+      "bytes": 50679
+    },
+    {
+      "file": "vendor/flatpickr/LICENSE.md",
+      "sha256": "5fd57afc3905651175947ae44818e91ffcf5b605e4c88fac42d9700243bd9095",
+      "bytes": 1084
+    }
+  ],
+  "archive": {
+    "file": "rakeez-teacher-import-helper-0.5.3.zip",
+    "sha256": "e6c9194319c298e0cd95b164dd7a44c2f685b0b76095c1e26937486df525efa6",
+    "bytes": 88675
+  }
+}

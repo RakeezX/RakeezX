@@ -2,6 +2,14 @@
 export function readSourceReportPage(mode,runContext=null) {
  const visible=n=>{for(let el=n;el;el=el.parentElement){const s=getComputedStyle(el);if(el.hidden||el.getAttribute('aria-hidden')==='true'||s.display==='none'||s.visibility!=='visible'||Number(s.opacity)===0)return false;}return n.getClientRects().length>0;};
  const text=n=>{const out=[];const walk=x=>{if(x.nodeType===3){out.push(x.textContent);return;}if(x.nodeType!==1||!visible(x)||['INPUT','TEXTAREA','SELECT','SCRIPT','STYLE','IFRAME','SVG','IMG'].includes(x.tagName))return;for(const c of x.childNodes)walk(c);};walk(n);return out.join('').trim().replace(/\s+/g,' ');};
+ // Negative active-role guard complements the existing origin/school/session guard, including at export.
+ // Role badges only: a principal's metadata name never establishes the current user's role.
+ if(mode==='guard'){
+  const nonTeacher=new Set(['مدير المدرسة','قائد المدرسة','مديرة المدرسة','قائدة المدرسة','مسؤول النظام','المشرف','الإداري','المدير','ولي الأمر','ولي أمر','الطالب','الطالبة']);
+  const active=Array.from(document.querySelectorAll('[aria-current]:not([aria-current=false]),[aria-selected=true],option:checked,[role=status],[data-role]')).filter(visible).map(n=>text(n).replace(/^الدور\s*:?\s*/,''));
+  const labelled=Array.from(document.querySelectorAll('p,span,small,div,b,strong,label')).filter(visible).map(text).filter(v=>/^الدور\s*:?\s*/.test(v)).map(v=>v.replace(/^الدور\s*:?\s*/,''));
+  return active.concat(labelled).some(v=>nonTeacher.has(v))?{ok:false,code:'NON_TEACHER_ROLE'}:{ok:true};
+ }
  const all=Array.from(document.querySelectorAll('table')).filter(visible);
  const diagnostic=(code,ready=false)=>({ok:false,code,retry:ready,incomplete:true,diagnostic:{version:'0.5.1',stage:'source-schema',reason:code,category:mode,schema:{tables:Math.min(all.length,31),expectedCategory:false,unresolved:true}}});
  // A loading/empty table is unresolved, never an empty complete roster.
@@ -166,9 +174,9 @@ export function readSourceReportPage(mode,runContext=null) {
    if(nextIdentities.size>1)return diagnostic('AMBIGUOUS_PAGINATION');
    const current=[...currents][0],total=totals.size?[...totals][0]:null,terminal=models.some(m=>m.terminal),numbers=new Set(models.flatMap(m=>m.numbers));
    if(terminal&&nexts.length||total!==null&&(total<current||[...numbers].some(n=>n>total))||terminal&&total!==current)return diagnostic('AMBIGUOUS_PAGINATION');
-   const m={current,total,terminal,next:nexts[0]??null};pagination={current,total,series:now.pathname+'?'+stable(now)};
+   const m={current,total,terminal,next:nexts[0]??null};pagination={current,total,terminal,series:now.pathname+'?'+stable(now)};
 
-   if(m.total===m.current){if(m.next)warnings.push({category:mode,code:'PAGINATION_AFTER_END'});}
+   if(m.total===m.current){if(!m.terminal)warnings.push({category:mode,code:'PAGINATION_TERMINAL_UNVERIFIED'});if(m.next)warnings.push({category:mode,code:'PAGINATION_AFTER_END'});}
    else if(!m.next)warnings.push({category:mode,code:'PAGINATION_MISSING_NEXT'});
    else links.push({kind:mode,path:m.next,pagination:true});
   }else if(mode==='students')warnings.push({category:mode,code:'PAGINATION_UNVERIFIED'});

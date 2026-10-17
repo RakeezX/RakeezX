@@ -1,0 +1,263 @@
+{
+  "runId": "caf47a23-74be-4246-9c28-be2a91d8a2b4",
+  "baseline": false,
+  "checks": [
+    "actual toolbar action 10-page staged300 to page11 missing links",
+    "11-page/23-other-rows missing roster",
+    "RTL 320/390/768/1280 actual DOM/CSS",
+    "300000ms expiry at -1ms/0ms",
+    "no persistent envelope; new navigation fixture has no external network",
+    "complete 300 owner-bound Preview; no writes; owner-switch invalidation"
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "lease": "ACQUIRED browser",
+  "browser": "155.0.8059.80",
+  "reusedPartial": {
+    "counts": "11 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+    "diagnostic": "N36 0.5.3 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=3 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=0 | committed=0 | excluded=ROSTER_LINKS_UNAVAILABLE",
+    "history": [
+      "",
+      "1 صفحات؛ 0 طلاب؛ 3 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "2 صفحات؛ 50 طلاب؛ 53 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "3 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "4 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "5 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "6 صفحات؛ 100 طلاب؛ 123 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "7 صفحات؛ 150 طلاب؛ 173 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "8 صفحات؛ 200 طلاب؛ 223 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "9 صفحات؛ 250 طلاب؛ 273 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "10 صفحات؛ 300 طلاب؛ 323 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "11 صفحات؛ 300 طلاب؛ 323 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "11 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها."
+    ],
+    "expiry": "Values present at deadline - 1ms; scrubbed at deadline, including picker DOM; transfer rejected",
+    "sourceHashes": {
+      "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+      "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+      "run-controller.js": "3e92f11317b6daa954b64712296f718d827077a0d72c78bb6ea02748e951a6a7",
+      "source-adapter.js": "8d2b838a514cf912f28ee17847eeda2c36d55c8072bd9ada45a796eb4ebcb750"
+    }
+  },
+  "scenarios": [
+    {
+      "scenario": "overflow301",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "9 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=301 | complete=0 | committed=0 | excluded=CATEGORY_ROW_LIMIT",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "overflow350",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "9 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=350 | complete=0 | committed=0 | excluded=CATEGORY_ROW_LIMIT",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "missingLast",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "8 صفحات؛ 300 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=0 | committed=0 | excluded=PAGINATION_TERMINAL_UNVERIFIED,PAGINATION_INCOMPLETE",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "repeat",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "8 صفحات؛ 50 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=50 | observedRowsLowerBound=50 | complete=0 | committed=0 | excluded=PAGINATION_REPEAT_OR_CHANGED,DUPLICATE_STUDENT_IDENTITY",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "duplicate",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "8 صفحات؛ 294 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=294 | observedRowsLowerBound=294 | complete=0 | committed=0 | excluded=DUPLICATE_STUDENT_IDENTITY",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "ambiguous",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "3 صفحات؛ 0 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=source-schema | reason=PAGINATION_MISMATCH | category=students | tables=1 | expectedCategory=false | unresolved=true | sourceTabMatch=true\nN36 0.5.3 | stage=run-summary | staged=0 | observedRowsLowerBound=0 | complete=0 | committed=0 | excluded=PAGINATION_MISMATCH",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "empty",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "3 صفحات؛ 0 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=source-schema | reason=SOURCE_TIMEOUT | category=students | tables=1 | expectedCategory=false | unresolved=true | cause=TABLE_AWAITING_DATA | relevant=0 | unsupported=0 | iframeCount=0 | frameReport=unconfirmed | sourceTabMatch=true\nN36 0.5.3 | stage=run-summary | staged=0 | observedRowsLowerBound=0 | complete=0 | committed=0 | excluded=SOURCE_TIMEOUT",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "schoolChanged",
+      "status": "توقف اختيار دور المعلم (SCHOOL_CONTEXT_CHANGED). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "counts": "3 صفحات؛ 50 طلاب؛ 72 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.3 | stage=role-selection | reason=SCHOOL_CONTEXT_CHANGED | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "roleChanged",
+      "status": "توقف اختيار دور المعلم (NON_TEACHER_ROLE). لم تُجمع دور المعلم ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "counts": "3 صفحات؛ 50 طلاب؛ 72 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.3 | stage=role-selection | reason=NON_TEACHER_ROLE | pageKind=unresolved-entry | readyState=complete | sourceTabMatch=true | roleMarkers=0 | schoolOptions=0 | navMarkers=0 | actionMarkers=0 | safeReadLinks=0 | iframeCount=0 | empty=0 | formRejected=0 | href=0 | inlineHandler=0 | javascript=0 | originRejected=0 | queryRejected=0 | readPath=0",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "missingPage",
+      "status": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+      "counts": "7 صفحات؛ 250 اسمًا مجمّعًا؛ 0 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 22 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=250 | observedRowsLowerBound=250 | complete=0 | committed=0 | excluded=PAGINATION_MISSING_NEXT,PAGINATION_INCOMPLETE",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "originChanged",
+      "status": "توقف التنقل أو التحويل (ORIGIN_CHANGED). لم تُجمع أسماء الطلاب ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.",
+      "counts": "3 صفحات؛ 50 طلاب؛ 72 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "diagnostic": "N36 0.5.3 | stage=navigation-redirect | reason=ORIGIN_CHANGED | category=students | route=/schoolmanagmentreports/studentinfo/classstudentinfo/:id | queryKeys=page | unknownKeys=0 | routeReason=unexpected-path",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "sessionChanged",
+      "status": "توقف التشغيل (ORIGIN_OR_LOGIN_CHANGED). مُسحت البيانات المؤقتة. لم تُضف بيانات إلى ركيز.",
+      "counts": "3 صفحات؛ 50 طلاب؛ 72 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "diagnostic": "",
+      "transferAllowed": false
+    },
+    {
+      "scenario": "selfKnown",
+      "status": "اكتمل الجمع من 9 صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.",
+      "counts": "9 صفحات؛ 300 اسمًا مجمّعًا؛ 300 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 324 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=300 | committed=0 | excluded=none",
+      "transferAllowed": true
+    },
+    {
+      "scenario": "full299",
+      "status": "اكتمل الجمع من 8 صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.",
+      "counts": "8 صفحات؛ 299 اسمًا مجمّعًا؛ 299 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 323 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=299 | observedRowsLowerBound=299 | complete=299 | committed=0 | excluded=none",
+      "transferAllowed": true
+    },
+    {
+      "scenario": "full300",
+      "status": "اكتمل الجمع من 8 صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.",
+      "counts": "8 صفحات؛ 300 اسمًا مجمّعًا؛ 300 مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ 324 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+      "diagnostic": "N36 0.5.3 | stage=run-summary | staged=300 | observedRowsLowerBound=300 | complete=300 | committed=0 | excluded=none",
+      "transferAllowed": true
+    }
+  ],
+  "ownerPreview": {
+    "rows": 300,
+    "committed": 0,
+    "ownerSwitchInvalidates": true,
+    "databaseUnchanged": true
+  },
+  "priorBlockedExternal": [
+    "https://vstedu.azureedge.net",
+    "https://www.googletagmanager.com",
+    "https://muneer.cx"
+  ],
+  "priorFailures": [
+    "AssertionError [ERR_ASSERTION]: اكتمل الجمع من 8 صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.\n\n300 !== 0\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-300-students-final-zero-20261017/tests/n36-300-then-zero-browser.mjs:142:18",
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://www.googletagmanager.com',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://muneer.cx',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net',\n+   'https://vstedu.azureedge.net'\n+ ]\n- []\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-300-students-final-zero-20261017/tests/n36-300-then-zero-browser.mjs:146:169",
+    "AssertionError [ERR_ASSERTION]: توقف مسار البداية (UNSAFE_ROUTE). لم تُجمع صفحة البداية ومُسحت المعاينة. انسخ التشخيص الآمن لتحديد المسار المطلوب؛ تكرار المحاولة نفسها لن يغيّر الرفض.\n\n0 !== 300\n\n    at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n36-300-students-final-zero-20261017/tests/n36-300-then-zero-browser.mjs:136:20"
+  ],
+  "sourceEntry": {
+    "actionMarkers": 3,
+    "iframeCount": 0,
+    "linkStats": {
+      "empty": 0,
+      "formRejected": 0,
+      "href": 2,
+      "inlineHandler": 0,
+      "javascript": 0,
+      "originRejected": 0,
+      "queryRejected": 0,
+      "readPath": 2
+    },
+    "navMarkers": 2,
+    "pageKind": "teacher-dashboard",
+    "readyState": "complete",
+    "roleMarkers": 0,
+    "safeReadLinks": 2,
+    "schoolOptions": 0
+  },
+  "popup": "{\"width\":445,\"body\":430,\"scroll\":445,\"height\":510}",
+  "status": "PASS",
+  "runtimeHashes": {
+    "categories.js": "424389ccef161489e731b80883e008518ad6ff4442edb0b18f32db84775c22f1",
+    "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+    "run-controller.js": "3e92f11317b6daa954b64712296f718d827077a0d72c78bb6ea02748e951a6a7",
+    "source-adapter.js": "8d2b838a514cf912f28ee17847eeda2c36d55c8072bd9ada45a796eb4ebcb750"
+  },
+  "networkPolicy": "All school/app documents synthetic or loopback. No HTTP redirects. Every other request aborted. Prior redirect fixture failure retained separately.",
+  "release": "RELEASED browser",
+  "baselineEvidence": {
+    "runId": "caf47a23-74be-4246-9c28-be2a91d8a2b4",
+    "baseline": true,
+    "checks": [
+      "actual toolbar action 10-page staged300 to page11 missing links",
+      "11-page/23-other-rows missing roster",
+      "RTL 320/390/768/1280 actual DOM/CSS",
+      "300000ms expiry at -1ms/0ms",
+      "no persistent envelope/external requests"
+    ],
+    "externalRequests": [],
+    "errors": [],
+    "lease": "ACQUIRED browser",
+    "browser": "155.0.8059.80",
+    "sourceEntry": {
+      "actionMarkers": 3,
+      "iframeCount": 0,
+      "linkStats": {
+        "empty": 0,
+        "formRejected": 0,
+        "href": 11,
+        "inlineHandler": 0,
+        "javascript": 0,
+        "originRejected": 0,
+        "queryRejected": 0,
+        "readPath": 11
+      },
+      "navMarkers": 2,
+      "pageKind": "teacher-dashboard",
+      "readyState": "complete",
+      "roleMarkers": 0,
+      "safeReadLinks": 3,
+      "schoolOptions": 0
+    },
+    "popup": "{\"width\":70,\"body\":70,\"scroll\":70,\"height\":510}",
+    "initialEntry": "",
+    "actualStatus": "جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.",
+    "counts": "11 صفحات؛ 0 طلاب؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها.",
+    "warning": "فئات غير مكتملة ومستبعدة من التصدير: الفصول (EMPTY_OR_LIMIT)، أسماء الطلاب (ROSTER_LINKS_UNAVAILABLE). راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة. لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف. نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.",
+    "history": [
+      "",
+      "1 صفحات؛ 0 طلاب؛ 3 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "2 صفحات؛ 50 طلاب؛ 53 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "3 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "4 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "5 صفحات؛ 50 طلاب؛ 73 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "6 صفحات؛ 100 طلاب؛ 123 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "7 صفحات؛ 150 طلاب؛ 173 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "8 صفحات؛ 200 طلاب؛ 223 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "9 صفحات؛ 250 طلاب؛ 273 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "10 صفحات؛ 300 طلاب؛ 323 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "11 صفحات؛ 300 طلاب؛ 323 صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.",
+      "11 صفحات؛ 0 طلاب؛ 23 صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ 0 روابط صفحات مكررة جرى تجاوزها."
+    ],
+    "diagnostic": "N36 0.5.1 | stage=source-schema | reason=ROSTER_LINKS_UNAVAILABLE | category=students | tables=0 | expectedCategory=false | unresolved=true | cause=MAIN_FRAME_READ_LINK_ABSENT | relevant=2 | unsupported=0 | iframeCount=3 | frameReport=unconfirmed | sourceTabMatch=true",
+    "sourceHashes": {
+      "categories.js": "d3be1185177b1044a77fdd38bf8147b91aeaa01efce62c04a70b5bbf994bc82a",
+      "navigation.js": "ed70df0c5f643e1a2dd4196eafbd3558245f94856f7b657858de7d2db410110c",
+      "run-controller.js": "30fc580fe5d2b8dc7b16ce4dcda51cf038a23172ffe0966ae4d11f212ef34a51",
+      "source-adapter.js": "1fe555217ad2b27234e09eb99ee55293c72c8dbf626d3f30eb0605afb8571fdf"
+    },
+    "deadlineMilliseconds": 300000,
+    "expiry": "Values present at deadline - 1ms; scrubbed at deadline, including picker DOM; transfer rejected",
+    "status": "PASS",
+    "release": "RELEASED browser",
+    "cleanup": "Owned disposable Chrome/profile closed; shared browser lease released"
+  },
+  "cleanup": "Owned disposable Chrome/profile closed; shared browser lease released"
+}

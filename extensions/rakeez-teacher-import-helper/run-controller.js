@@ -13,7 +13,7 @@ let diagnosticLines=[];
 const entryText=e=>`pageKind=${e.pageKind} | readyState=${e.readyState} | sourceTabMatch=${(e.sourceTabMatch===true?'true':e.sourceTabMatch===false?'false':'unknown')} | roleMarkers=${e.roleMarkers} | schoolOptions=${e.schoolOptions} | navMarkers=${e.navMarkers} | actionMarkers=${e.actionMarkers} | safeReadLinks=${e.safeReadLinks} | iframeCount=${e.iframeCount}${e.linkStats?' | '+Object.entries(e.linkStats).map(([key,value])=>key+'='+value).join(' | '):''}`;
 function showDiagnostic(d){
  if(!d)return;
- let line=d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
+ let line=d.run?`N36 ${chrome.runtime.getManifest().version} | stage=run-summary | staged=${d.run.staged} | observedRowsLowerBound=${d.run.observed} | complete=${d.run.complete} | committed=0 | excluded=${d.run.excluded||'none'}`:d.entry?`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | ${entryText(d.entry)}`:d.schema?`N36 ${chrome.runtime.getManifest().version} | stage=source-schema | reason=${d.reason} | category=${d.category} | tables=${d.schema.tables} | expectedCategory=${d.schema.expectedCategory} | unresolved=${d.schema.unresolved}`:d.structure?`N36 ${chrome.runtime.getManifest().version} | stage=role-selection | reason=${d.reason} | teacherGreeting=${d.structure.teacherGreeting} | greetingAmbiguous=${d.structure.greetingAmbiguous} | safeTeacherReports=${d.structure.safeTeacherReports} | explicitRoleDestinations=${d.structure.explicitRoles} | explicitAmbiguous=${d.structure.explicitAmbiguous} | activeTeacher=${d.structure.activeTeacher} | dashboard=${d.structure.dashboard??false} | teacherCards=${d.structure.teacherCards??0} | gatewayRejected=${d.structure.gatewayRejected??0}`:`N36 ${chrome.runtime.getManifest().version} | stage=${d.stage} | reason=${d.reason} | category=${d.category}`;
  if(d.roster)line+=` | cause=${d.roster.cause} | relevant=${d.roster.relevant} | unsupported=${d.roster.unsupported} | iframeCount=${d.roster.iframes} | frameReport=unconfirmed`;
  if(d.sourceTabMatch===true)line+=' | sourceTabMatch=true';
  if(d.template)line+=` | route=${d.template} | queryKeys=${d.keys?.join(',')||'-'} | unknownKeys=${d.unknownKeys??0} | routeReason=${d.detail??'unexpected-path'}`;
@@ -67,6 +67,11 @@ async function inspect(tabId,origin,mode,alive=()=>true,school=null,entryDeadlin
  const settling=mode==='gateway'&&job?.roleSwitchUsed&&job?.gatewaySettleUntil&&job.context?.kind==='selected-teacher-card'&&result[0].result?.code==='UNCONFIRMED_TEACHER_ROLE';
  if(mode==='gateway'&&(result[0].result?.retry||settling)&&Date.now()<entryDeadline){announce('انتظار اكتمال صفحة المعلم بعد انتقال الدور؛ لن يعاد إرسال الانتقال.');await new Promise(r=>setTimeout(r,200));return inspect(tabId,origin,mode,alive,school,entryDeadline);}
  if(settling){result[0].result.code='TEACHER_TRANSITION_UNRESOLVED';if(result[0].result.diagnostic)result[0].result.diagnostic.reason='TEACHER_TRANSITION_UNRESOLVED';}
+ if(mode==='guard'&&result[0]?.result?.ok){
+  const guard=await chrome.scripting.executeScript({target:{tabId,frameIds:[0]},world:'ISOLATED',func:readSourceReportPage,args:['guard']});
+  if(!alive())throw Error('CANCELLED');
+  if(guard.length!==1||guard[0].frameId!==0||!guard[0].result?.ok)throw Error(guard[0]?.result?.code??'SOURCE_BINDING_CHANGED');
+ }
  if(result.length!==1||!result[0].result?.ok){const e=Error(result[0]?.result?.code??'PAGE_UNAVAILABLE');e.diagnostic=result[0]?.result?.diagnostic;throw e;}return result[0].result;
 }
 async function ready(tabId,origin,ticket){
@@ -84,7 +89,7 @@ async function start(tabId){
   const tab=await chrome.tabs.get(tabId),origin=startOrigin(tab.url??'');
   path=new URL(tab.url).pathname+new URL(tab.url).search;
   safeRoute(origin,new URL(tab.url).pathname+new URL(tab.url).search);
-  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[]};
+  job={tabId,origin,deadline:Date.now()+RUN_LIMITS.milliseconds,routes:[],categories:[],visited:new Set(),warnings:[],skipped:[],pages:0,loops:0,series:new Map(),context:null,rosterSchools:new Set(),roleSwitchUsed:false,gatewaySettleUntil:null,pendingSchoolTables:[],studentRowsSeen:0};
   const timeout=setTimeout(()=>{if(ticket===generation&&job)stop('TIME_LIMIT');},RUN_LIMITS.milliseconds);job.timer=timeout;
   const alive=()=>ticket===generation&&!!job;
   stage='role-selection';kind='role';await ready(tabId,origin,ticket);let page=await inspect(tabId,origin,'home',alive);current(ticket);
@@ -111,11 +116,13 @@ async function start(tabId){
    if(next.kind==='home'&&page.links.some(l=>l.kind==='gateway'&&l.context?.kind==='selected-teacher-card')){job.pendingSchoolTables=page.tables;page={...page,tables:[]};}
    if(next.kind==='gateway'&&job.pendingSchoolTables.length){page={...page,tables:[...job.pendingSchoolTables,...page.tables]};job.pendingSchoolTables=[];job.gatewaySettleUntil=null;}
    job.warnings.push(...page.warnings);
+   if(next.kind==='students'&&page.duplicates)job.warnings.push({category:'students',code:'DUPLICATE_STUDENT_IDENTITY'});
    if(page.pagination){
-    const p=page.pagination;let series=job.series.get(p.series);if(!series){series={total:p.total,pages:new Set(),fingerprints:new Set()};job.series.set(p.series,series);}
+    const p=page.pagination;let series=job.series.get(p.series);if(!series){series={total:p.total,pages:new Set(),fingerprints:new Set(),terminal:false};job.series.set(p.series,series);}
     const fingerprint=page.tables.find(t=>t.category==='students')?.text;
     if(series.total!==null&&p.total!==null&&series.total!==p.total||series.pages.has(p.current)||series.fingerprints.has(fingerprint))job.warnings.push({category:'students',code:'PAGINATION_REPEAT_OR_CHANGED'});
     if(p.total!==null)series.total=p.total;
+    if(p.terminal&&p.current===p.total)series.terminal=true;
     series.pages.add(p.current);series.fingerprints.add(fingerprint);
    }
    for(const skipped of page.skipped??[]){showDiagnostic(skipped.diagnostic);job.skipped.push(skipped.kind);}
@@ -123,8 +130,23 @@ async function start(tabId){
    for(const table of page.tables){
     // Student data is admitted only through the safeguarded report/pager reader.
     if(table.category==='students'&&next.kind!=='students')continue;
-    try{const rows=parseCategoryTable(table.category,table.text),merged=mergePage(job.categories,table.category,rows);for(const c of merged)validateCategory(c.category,c.rows);bundle(merged);job.categories=merged;}
-    catch(e){job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
+    try{
+     const rows=parseCategoryTable(table.category,table.text);
+     if(table.category==='school'){
+      if(job.context?.schoolName&&job.context.schoolName!==rows[0].name)throw Error('SCHOOL_CONTEXT_CHANGED');
+      job.context={...job.context,schoolName:rows[0].name};
+     }
+     const merged=mergePage(job.categories,table.category,rows);
+     if(table.category==='students'){
+      const prior=job.categories.find(c=>c.category==='students')?.rows??[];
+      if(rows.some(r=>prior.some(p=>JSON.stringify(p)===JSON.stringify(r))))job.warnings.push({category:'students',code:'DUPLICATE_STUDENT_IDENTITY'});
+      // A bounded lower bound of observed rows, never an assertion of unique/complete students.
+      // No rejected overflow names are retained in job.categories.
+      job.studentRowsSeen=Math.max(job.studentRowsSeen,merged.find(c=>c.category==='students').rows.length);
+     }
+     for(const c of merged)validateCategory(c.category,c.rows);bundle(merged);job.categories=merged;
+    }
+    catch(e){if(e.message==='SCHOOL_CONTEXT_CHANGED')throw e;job.warnings.push({category:table.category,code:/^[A-Z_]+$/.test(e.message)?e.message:'UNRESOLVED_CATEGORY'});}
    }
    $('run-counts').textContent=`${job.pages} صفحات؛ ${job.categories.find(c=>c.category==='students')?.rows.length??0} طلاب؛ ${job.categories.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا من فئات مختلفة. لا تصدير ولا إضافة إلى ركيز.`;
    for(const link of page.links){
@@ -135,8 +157,9 @@ async function start(tabId){
    next=job.routes.shift();if(next)job.visited.add(routeIdentity(origin,next.path));
   }
   current(ticket);await inspect(tabId,origin,'guard',alive);current(ticket);
-  for(const series of job.series.values())if(series.total===null||series.pages.size!==series.total||!Array.from({length:series.total},(_,i)=>i+1).every(n=>series.pages.has(n)))job.warnings.push({category:'students',code:'PAGINATION_INCOMPLETE'});
+  for(const series of job.series.values())if(!series.terminal||series.total===null||series.pages.size!==series.total||!Array.from({length:series.total},(_,i)=>i+1).every(n=>series.pages.has(n)))job.warnings.push({category:'students',code:'PAGINATION_INCOMPLETE'});
   const categories=job.categories,warnings=job.warnings,pages=job.pages,loops=job.loops;
+  const stagedStudents=categories.find(c=>c.category==='students')?.rows.length??0,observedStudents=job.studentRowsSeen;
   // An ambiguous category is unresolved as a whole, never silently keep its first value.
   const unresolved=new Set(warnings.map(w=>w.category));let valid=categories.filter(c=>!unresolved.has(c.category));
   const completeStudents=valid.find(c=>c.category==='students');
@@ -144,20 +167,25 @@ async function start(tabId){
    if(!valid.some(c=>c.category==='classes')&&!unresolved.has('classes'))valid=mergePage(valid,'classes',validateCategory('classes',[...new Set(completeStudents.rows.map(r=>r.classroom))].map(classroom=>({classroom}))));
    if(!valid.some(c=>c.category==='school')&&job.rosterSchools.size===1&&!unresolved.has('school'))valid=mergePage(valid,'school',validateCategory('school',[{name:[...job.rosterSchools][0]}]));
   }
-  if(!valid.length)throw Error('NO_ALLOWED_DATA');bundle(valid);
+  if(valid.length)bundle(valid);
+  const completeCount=valid.find(c=>c.category==='students')?.rows.length??0;
+  const studentWarnings=[...new Set(warnings.filter(w=>w.category==='students').map(w=>w.code))];
+  showDiagnostic({run:{staged:stagedStudents,observed:observedStudents,complete:completeCount,excluded:studentWarnings.filter(c=>/^[A-Z_]+$/.test(c)).join(',')}});
   const contextSnapshot=job.context;clearTimeout(job.timer);job.routes.length=0;job.categories=[];job=null;
   review={tabId,origin,context:contextSnapshot,expires:Date.now()+RUN_LIMITS.reviewMilliseconds};
-  $('direct-handoff').hidden=false;
-  const displayWarnings=warnings.filter(w=>!(w.category==='students'&&w.code==='EMPTY_OR_LIMIT'&&warnings.some(x=>x.category==='students'&&x.code==='ROSTER_LINKS_UNAVAILABLE')));
-  if(displayWarnings.length)$('run-skipped').textContent='فئات غير مكتملة ومستبعدة من التصدير: '+[...new Set(displayWarnings.map(w=>kindLabel(w.category)+' ('+w.code+')'))].join('، ')+'. راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة.';
+  $('direct-handoff').hidden=!valid.length;
+  const displayWarnings=warnings;
+  if(displayWarnings.length)$('run-skipped').textContent='فئات غير مكتملة ومستبعدة من التصدير: '+[...new Set(displayWarnings.map(w=>kindLabel(w.category)))].join('، ')+'. راجع الفئات المكتملة فقط؛ لا ادعاء باكتمال الفئة المستبعدة.';
   const missing=['teacher','school','principal','classes','students','timetable'].filter(c=>!valid.some(v=>v.category===c));
   const studentCause=!missing.includes('students')?'':diagnosticLines.some(l=>l.includes('RELEVANT_LINK_UNSUPPORTED'))?'ظهر رابط ذو تسمية طلاب، لكن مساره غير مدعوم؛ لم يُفتح.':diagnosticLines.some(l=>l.includes('MAIN_FRAME_READ_LINK_ABSENT'))?'لم يظهر رابط كشف طلاب مسموح في الإطار الرئيسي. وجود إطارات لا يثبت أنها تحتوي الكشف.':missing.includes('students')?'لم يثبت اكتمال كشف الطلاب من المصدر الظاهر.':'';
-  $('handoff-status').textContent=studentCause?'النقل غير جاهز: لم يتوفر كشف طلاب مؤكّد. 0 طلاب في المعاينة لا يعني أن الفصل فارغ.':'';
-  if(studentCause)$('run-skipped').textContent+=' '+studentCause+' نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.';
+  const rosterExplanation=studentWarnings.includes('CATEGORY_ROW_LIMIT')?`جمعت ${stagedStudents} اسمًا، لكن الكشف أكبر من الحد المسموح للنقل (300)؛ رُصد ما لا يقل عن ${observedStudents} صفًا، وليس عددًا مؤكدًا لطلاب فريدين. لا نقل جزئي ولا اقتطاع للأسماء.`:studentCause?`جمعت ${stagedStudents} اسمًا، لكن الكشف غير مكتمل؛ تعذر التحقق من كل صفحات المصدر. نقل الطلاب معطّل.`:'';
+  $('handoff-status').textContent=rosterExplanation;
+  if(studentCause)$('run-skipped').textContent+=' '+rosterExplanation+' '+studentCause+' نقل الطلاب معطّل. بعد التحديث يمكنك تشغيل الإضافة مرة واحدة طوعًا ومشاركة التشخيص الآمن فقط؛ لا ترسل أسماء أو روابط.';
   $('run-missing').textContent=missing.length?`غير ظاهر أو غير محسوم: ${missing.map(c=>CATEGORIES[c].label).join('، ')}. لم تُخمن قيم ناقصة.`:'ظهرت الفئات الست للمراجعة.';
-  $('run-counts').textContent=`${pages} صفحات؛ ${valid.find(c=>c.category==='students')?.rows.length??0} طلاب؛ ${valid.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ ${loops} روابط صفحات مكررة جرى تجاوزها.`;
-  window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));
-  announce(warnings.length?`جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.`:`${diagnosticLines.length?'الجمع جزئي؛ بعض الروابط لم تُجمع بياناتها. ':''}اكتمل الجمع من ${pages} صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.`);
+  $('run-counts').textContent=`${pages} صفحات؛ ${stagedStudents} اسمًا مجمّعًا؛ ${completeCount} مكتملًا للمراجعة؛ 0 أُضيف إلى ركيز؛ ${valid.reduce((n,c)=>n+c.rows.length,0)} صفًا إجمالًا في معاينة الفئات (ليست عدد الطلاب)؛ ${loops} روابط صفحات مكررة جرى تجاوزها.`;
+  if(valid.length)window.dispatchEvent(new CustomEvent('n36:preview',{detail:valid}));
+  else {clearPreview();$('run-cancel').disabled=true;announce(rosterExplanation||'لم يثبت اكتمال البيانات؛ لا نقل إلى ركيز.');return;}
+  announce(warnings.length?`جمع جزئي غير مكتمل؛ استُبعدت الفئات غير المكتملة من التصدير. راجع الفئات المكتملة فقط. لا إضافة إلى ركيز.`:`${diagnosticLines.some(l=>!l.includes('stage=run-summary'))?'الجمع جزئي؛ بعض الروابط لم تُجمع بياناتها. ':''}اكتمل الجمع من ${pages} صفحات للبيانات المسموحة فقط. عدّل واستبعد ثم راجع المعاينة النهائية. لا إضافة إلى ركيز.`);
   armReview();
  }catch(e){if(ticket===generation){routeError(e,stage,kind,path);stop(/^[A-Z_]+$/.test(e.message)?e.message:'ACCESS_OR_PAGE_UNAVAILABLE',e.diagnostic,{stage,kind});}}
 }

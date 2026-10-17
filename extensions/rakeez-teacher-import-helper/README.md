@@ -1,3 +1,15 @@
+## Private 0.5.3 — staged roster evidence and strict completeness (AI implementation)
+
+A run distinguishes names accumulated in memory, complete names available for review, and names committed to Rakeez (zero in this helper). A later missing source page never turns 300 accumulated names into a claim of an empty roster. Excluded names are discarded; only bounded aggregate counts and safe exclusion codes remain in the diagnostic. No names, URLs, school identifiers or source HTML are added to storage or diagnostics.
+
+A complete roster needs every page in each observed report series and an explicit terminal pager, stable source origin/school/teacher context, no repeated page or student identity, and at most 300 validated student rows. Known visited routes are skipped; an unvisited MyStudents discovery page is still checked because it may contain another report. Completion of one report or reaching 300 is never proof that the whole source is complete.
+
+Overflow keeps the 300-row category and per-action transfer caps. The helper blocks the entire student transfer and explains the observed lower-bound row count, without claiming it is a count of unique students. No automatic truncation, segmented import or new storage is implemented. A complete <=300 roster still requires explicit review, the existing one-time two-minute handoff, and Rakeez owner/class matching and confirmation. Active non-teacher role changes also block reads and export.
+
+The current package is 0.5.3. Keep both published 0.5.1 and 0.5.2 packages as rollback; no old fallback is regenerated. The sole publisher first verifies provider and Production asset parity. Only the existing verified update-stable.ps1 operator workflow then updates the ONE stable folder; the user explicitly clicks Chrome Reload. This worker does not update a personal folder/profile or deploy. The official N36 task remains OPEN until the PO verifies a real authenticated roster/import.
+
+The older sections below document previous versions and are historical; follow this section for the current update.
+
 ## Private 0.5.2 — Chrome popup and review usability (AI implementation)
 
 The action popup now has a definite 430px CSS width; the separate RTL run page fits small screens and grows to 840px. A missing verified student roster keeps transfer disabled and the other categories collapsed under «تفاصيل البيانات الأخرى (اختياري)». Zero preview students does not prove an empty class, and iframe presence does not prove roster location. No source parsing/routes/permissions changed.
