@@ -1,0 +1,8 @@
+# AI: proposed fragment ONLY, not the project's active config.
+# Signed private Cloudflare ingress is enforced by application before DB lookup.
+# Teacher bearer JWT is verified with the official Auth SDK + current session row.
+# Student requests are not Supabase users; default JWT gateway would reject them.
+[functions.n88-student-portal]
+enabled = false
+verify_jwt = false
+entrypoint = "./functions/n88-student-portal/index.ts"

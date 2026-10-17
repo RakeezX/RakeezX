@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 /** AI: INACTIVE server proposal. Explicit adapters; never imported by Production. */
 import { randomBytes, randomUUID, randomInt, createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { normalizeDateTimeDigits } from '../../src/lib/rakeez-datetime-values.js';
@@ -48,19 +49,20 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
   return async request => {
     let result;
     try {
-      const ingress = await verifyIngress(request);
-      if (!ingress?.clientKey) return { ...denied(), headers: PRIVATE_HEADERS };
-      result = await repository.transaction(async db => {
+      result = await repository.transaction(async (db,ports) => {
+        const ingress = await verifyIngress(request,ports);
+        if (!ingress?.clientKey) return denied();
         const time = now(); db.rates = db.rates.filter(r => r.until > time);
         db.sessions = db.sessions.filter(s => s.expiresAt > time && s.revokedAt == null);
         const { path, method, headers = {}, body = {} } = request;
         if (headers['sec-fetch-site'] && headers['sec-fetch-site'] !== 'same-origin') return denied();
         if (method === 'POST' && (headers.origin !== origin || headers['x-n88-csrf'] !== '1' || headers['content-type'] !== 'application/json')) return denied();
         if (path.startsWith('/teacher/')) {
-          const auth = await verifyTeacher(request);
+          const auth = await verifyTeacher(request,ports);
           if (!auth?.ownerId || !auth.sessionId || auth.current !== true) return denied();
           const context = db.contexts.find(c => c.ownerId === auth.ownerId && c.active);
           if (!context) return denied();
+          await ports?.synchronizeOwner?.(auth.ownerId);
           const members = db.memberships.filter(m => m.ownerId === auth.ownerId && active(m));
           if (method === 'GET' && path === '/teacher/students') return { status: 200, body: { namespace: context.namespace,
             students: members.map(m => ({ enrollmentId: m.enrollmentId, revision: m.revision, label: m.label,
@@ -126,12 +128,13 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           const credential = db.credentials.find(c => c.entryVerifier === entryVerifier && c.revokedAt == null);
           const context = credential && db.contexts.find(c => c.namespace === credential.namespace && c.active);
           const verifier = digest('code', credential?.namespace || '', code);
-          const member = credential && currentMember(db, credential);
           const matches = timingSafeEqual(Buffer.from(credential?.verifier || '0'.repeat(64), 'hex'), Buffer.from(verifier, 'hex'));
+          if(context && credential && matches && context.ownerId===credential.ownerId) await ports?.synchronizeOwner?.(credential.ownerId);
+          const member = credential && currentMember(db, credential);
           if (!context || !credential || !matches || context.ownerId !== credential.ownerId || !member) return fail();
           const sessionToken = secret();
           db.sessions.push({ ...Object.fromEntries(['ownerId','classId','studentId','enrollmentId'].map(k => [k, member[k]])),
-            id: randomUUID(), credentialId: credential.id, version: credential.version, membershipRevision: member.revision,
+            id: randomUUID(), credentialId: credential.id, version: credential.version, membershipRevision: member.revision, canonicalStamp: member.canonicalStamp,
             namespace: credential.namespace, entryVerifier, tokenHash: hash(sessionToken), expiresAt: time + POLICY.sessionMs, revokedAt: null });
           return { status: 200, body: { claimed: true }, cookie: cookie(entrySecret, sessionToken, POLICY.sessionMs / 1000) };
         }
@@ -141,10 +144,11 @@ export function createPortalService({ repository, verifyTeacher, verifyIngress, 
           return { status: 200, body: { loggedOut: true }, cookie: cookie(entrySecret, '', 0) };
         }
         const c = s && db.credentials.find(c => c.id === s.credentialId && identity(c, s) && c.entryVerifier === entryVerifier && c.namespace === s.namespace);
+        if(c && c.revokedAt==null && s.revokedAt==null && s.expiresAt>time) await ports?.synchronizeOwner?.(c.ownerId);
         const member = c && currentMember(db, c);
         const context = s && db.contexts.find(c => c.namespace === s.namespace && c.active);
         if (!s || s.revokedAt != null || s.expiresAt <= time || !c || c.revokedAt != null || c.version !== s.version ||
-            !context || context.ownerId !== s.ownerId || !member || !bound(member, s) || member.revision !== s.membershipRevision) return clearDenied();
+            !context || context.ownerId !== s.ownerId || !member || !bound(member, s) || member.revision !== s.membershipRevision || member.canonicalStamp !== s.canonicalStamp) return clearDenied();
         if (method === 'GET' && action === 'read') return { status: 200, body: projection(db, s) };
         return denied();
       });

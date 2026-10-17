@@ -1,0 +1,78 @@
+{
+  "aiAuthored": true,
+  "enabled": false,
+  "entry": "supabase/functions/n88-student-portal/index.ts",
+  "listener": "Deno.serve Web Request; disabled without N88_ENABLED=true",
+  "environmentNames": [
+    "N88_ENABLED",
+    "N88_PUBLIC_ORIGIN",
+    "N88_DATABASE_URL",
+    "N88_HMAC_KEY",
+    "N88_AUTH_URL",
+    "N88_AUTH_API_KEY",
+    "N88_INGRESS_KEY",
+    "N88_SERVICE_REVISION"
+  ],
+  "requiredTrustedPorts": [],
+  "requiredReadbacks": [
+    "private SQL/helper identities + ACL/FKs",
+    "existing Auth issuer/JWKS/user/session",
+    "Cloudflare external ingress + log custody + TLS"
+  ],
+  "sourceOnly": true,
+  "routes": [
+    "/api/n88/teacher/students",
+    "/api/n88/teacher/issue",
+    "/api/n88/teacher/publish",
+    "/api/n88/teacher/revoke",
+    "/api/n88/s/<private-entry>/claim",
+    "/api/n88/s/<private-entry>/read",
+    "/api/n88/s/<private-entry>/logout"
+  ],
+  "limits": {
+    "contexts": 10,
+    "memberships": 2000,
+    "credentials": 10000,
+    "sessions": 3000,
+    "publications": 2000,
+    "rates": 10000,
+    "total": 30000,
+    "bytes": 8388608,
+    "rowBytes": 4096
+  },
+  "timing": {
+    "acquireMs": 1000,
+    "transactionMs": 8000,
+    "cleanupMs": 400,
+    "statementMs": 3000,
+    "lockMs": 1000
+  },
+  "canonicalBounds": {
+    "maxRows": 2000,
+    "maxBytes": 2097152
+  },
+  "pool": {
+    "max": 2,
+    "connectionTimeoutMillis": 1000,
+    "boundedAdmission": true
+  },
+  "privateLogs": {
+    "accessLog": "disabled for private paths",
+    "requestBodies": false,
+    "headers": false,
+    "sqlParameters": false,
+    "sqlErrorDetail": false,
+    "metrics": "fixed operation/status counters only; no owner/student/path/token labels"
+  },
+  "serviceRevision": "n88-existing-host-v1",
+  "ingress": {
+    "entry": "drafts/n88-student-portal/cloudflare-entry.mjs",
+    "environmentNames": [
+      "N88_ENABLED",
+      "N88_PUBLIC_ORIGIN",
+      "N88_EDGE_URL",
+      "N88_INGRESS_KEY"
+    ],
+    "trust": "Cloudflare external HTTPS cf metadata; deny CF-Worker; signed allowlist/body/source/time/nonce; durable replay receipt"
+  }
+}

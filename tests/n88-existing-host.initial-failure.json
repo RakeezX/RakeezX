@@ -1,0 +1,44 @@
+{
+  "taskId": "continuous-n88-existing-host-auth-and-current-state-20261018",
+  "runId": "5c01ec9b-e0cc-478e-8033-515690fc31f0",
+  "baseSha": "faa3cd5c32895148d5220ec9b34dd3f07a82cb5e",
+  "startedAt": "2026-10-17T22:44:06.503Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "authEvidence": "Official AuthClient ES256 signature/JWKS + HS256 server verification, exact issuer/audience/expiry/nbf/role/user/session; fresh getUser; wrong signature/foreign/banned/missing/expired/revoked sessions deny; 40ms full provider deadline; no real Auth call.",
+  "finishedAt": "2026-10-17T22:44:24.858Z",
+  "sourceSha256": {
+    "drafts/n88-student-portal/runtime.mjs": "d5c647a030e699c9be78a0c37bb0033b96190d0b321ba4db25e6bad717d045c9",
+    "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "eecf1c5186c6ab15287bbc0c637e01b6913ec3609c1ad575029696c048a1ea49",
+    "drafts/n88-student-portal/postgres-repository.mjs": "3ed324fdb1a69e3551f54658455ac6f6bf0f3aede8791d71b20b7ab4ea3acad6",
+    "drafts/n88-student-portal/canonical-lock.inactive.sql": "51166efd19d71b8da373a6aaee05109917237f10db7a7eff675363ace00c0119",
+    "tests/fixtures/n88-existing-host/journey.mjs": "bbb91015183ad29261a612f13c59b1510192e8a5c8fcb11dfa0a0fc7b3685337",
+    "drafts/n88-student-portal/auth-verifier.mjs": "fc0e37c42e176f1ce6c2fca9024a88f4a94dd36e6e821bf63d46209b66f3deae",
+    "drafts/n88-student-portal/web-entry.mjs": "00c59428e4a8e7ef3150e40422da9f93299d822907e489a53aa8eba337ebbab5",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "b2ca5669ccda9ecd3560c6e86616bf29879a53e9c23fd9a3fa783e4f8efd245d",
+    "drafts/n88-student-portal/service.mjs": "a8fc5c8179611e1c0588bbd3d77f1535084455a00285f9d30cd6eaba81c5c6c5",
+    "drafts/n88-student-portal/canonical-state-schema.inactive.sql": "ec8e7fd3fccb8f36672a127f55bebcc3a1d0005d41bc00ccd972b3c9d76a661d",
+    "drafts/n88-student-portal/auth-session.inactive.sql": "a681605e1df72468a99e83d5e8e59c165d753b19ec6833463864ae1ff408793c",
+    "drafts/n88-student-portal/ingress.inactive.sql": "3015057196fb5dbb09cc1ec00d52fb743f27ee3d97c58b79b5612ea3bb66cc12",
+    "supabase/functions/n88-student-portal/index.ts": "591d1fae83050d391db2300cb6026eca7f41e61787cce677bee499c0bbacf7b6",
+    "supabase/functions/n88-student-portal/deno.lock": "a1c456d38ab8fcc3960f89c61e41acf19e146240107e6da083de8ac6383565a9",
+    "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
+  }
+}
