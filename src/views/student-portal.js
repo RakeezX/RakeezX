@@ -14,7 +14,7 @@ export function mountStudentPortal(root, { client, location = window.location, h
     root.querySelector('h1')?.focus();
   }
   function entry(error = false, message = '') {
-    paint(`<section class="n88-panel"><h1 tabindex="-1">مساحتي مع معلمي</h1><p>احفظ رابطك الخاص للعودة ولا تشاركه، وأدخل رمزك الشخصي المكوّن من 4 أرقام. يبقى الرابط والرمز صالحين حتى يغيّرهما المعلم أو يلغي الوصول.</p><form data-claim><label for="n88-secret">رمزي الشخصي</label><input id="n88-secret" name="code" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="n88-error"><p id="n88-error" role="status">${error ? 'تعذّر فتح المساحة. تحقق من الرابط والرمز أو حاول لاحقًا مع معلمك.' : escape(message)}</p><button type="submit">فتح مساحتي</button></form></section>`);
+    paint(`<section class="n88-panel"><h1 tabindex="-1">مساحتي مع معلمي</h1><p>احفظ رابطك الخاص للعودة ولا تشاركه، وأدخل رمزك الشخصي المكوّن من 4 أرقام، أولها من 1 إلى 9. يبقى الرابط والرمز صالحين عند انتقالك للفصل الدراسي التالي ما دمت مسجّلًا لدى المعلم نفسه، حتى يغيّرهما المعلم أو يلغي الوصول.</p><form data-claim><label for="n88-secret">رمزي الشخصي</label><input id="n88-secret" name="code" type="password" inputmode="numeric" pattern="[1-9][0-9]{3}" minlength="4" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="n88-error"><p id="n88-error" role="status">${error ? 'تعذّر فتح المساحة. تحقق من الرابط والرمز أو حاول لاحقًا مع معلمك.' : escape(message)}</p><button type="submit">فتح مساحتي</button></form></section>`);
   }
   function show(data) {
     const next = data.tasks.find(t => t.status !== 'done');

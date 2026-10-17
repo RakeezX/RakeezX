@@ -28,6 +28,18 @@ export function createFixture(origin = 'https://pilot.invalid', options = {}) {
   return { repo, service, auth, origin, namespace, foreignNamespace, advance: ms => { time += ms; }, now: () => time,
     handleHttp(req, envelope) { return dispatch(envelope, req.socket.remoteAddress); },
     member, other, foreign,
+    // Explicit test-only canonical lifecycle setup, NEVER a claim/read side effect.
+    async advanceToSecondTerm() {
+      const next = { ...member, classId: 'class-a-term2', enrollmentId: 'enrollment-a-term2', revision: 8 };
+      await repo.transaction(db => {
+        const old = db.memberships.find(m => m.enrollmentId === member.enrollmentId && m.ownerId === member.ownerId);
+        old.status = 'ended'; old.endDate = '2027-01-01'; old.revision++;
+        db.memberships.push(next);
+        db.publications.push({ ...task, ...next, id: 'term2-a', title: 'نشاط الفصل الدراسي الثاني', status: 'todo', deadline: '2027-01-12' },
+          { ...task, ...next, id: 'term2-private', title: 'UNPUBLISHED_TERM2', published: false });
+      });
+      return next;
+    },
     request(path, { method = 'POST', body = {}, cookie = '', teacher = 'fabricated-teacher-a', sourceKey = 'fabricated-source', headers = {} } = {}) {
       return dispatch({ path, method, body, headers: { origin, 'x-n88-csrf': '1',
         'content-type': 'application/json', 'x-fixture-teacher': teacher, cookie, ...headers } }, sourceKey);

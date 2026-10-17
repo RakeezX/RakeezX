@@ -1,4 +1,5 @@
 /** AI: inert same-origin injectable client. No import-time network or storage. */
+import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
 export function createStudentPortalClient({ fetch: send, base = '/api/n88' } = {}) {
   if (typeof send !== 'function' || !/^\/api\/n88(?:\/s\/[A-Za-z0-9_-]{43})?$/.test(base)) throw Error('Scoped same-origin transport required');
   async function call(path, body) {
@@ -8,7 +9,7 @@ export function createStudentPortalClient({ fetch: send, base = '/api/n88' } = {
     if (!response.ok) throw Error('unavailable');
     return response.json();
   }
-  return Object.freeze({ claim: code => call('/claim', { code }), read: () => call('/read'), logout: () => call('/logout', {}),
+  return Object.freeze({ claim: code => call('/claim', { code: typeof code === 'string' ? normalizeDateTimeDigits(code) : code }), read: () => call('/read'), logout: () => call('/logout', {}),
     students: () => call('/teacher/students'),
     issue: member => call('/teacher/issue', { enrollmentId: member.enrollmentId, revision: member.revision }),
     revoke: member => call('/teacher/revoke', { enrollmentId: member.enrollmentId, revision: member.revision }),
