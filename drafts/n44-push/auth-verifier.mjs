@@ -42,7 +42,7 @@ export function createTeacherVerifier({authUrl,apiKey,fetch:send=globalThis.fetc
         c.nbf!==undefined && (!Number.isSafeInteger(c.nbf) || c.nbf>sec)) return null;
       // Lock exact user/session before fresh getUser, so a concurrent ban/logout
       // cannot commit between that provider checkpoint and our portal commit.
-      const current=await query('select user_id,session_id from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]); fence();
+      const current=await query('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]); fence();
       const matches=result=>result.rows.length===1 && result.rows[0].user_id===c.sub && result.rows[0].session_id===c.session_id;
       if(!matches(current))return null;
       // Always a fresh server user lookup for the EXACT same bearer, even with JWKS.
@@ -55,10 +55,13 @@ export function createTeacherVerifier({authUrl,apiKey,fetch:send=globalThis.fetc
       if(c.exp<=Math.floor(now()/1000)) return null;
       beforeCommit?.(async()=>{
         if(c.exp<=Math.floor(now()/1000))throw Error('n44_auth_expired');
-        const result=await query('select user_id,session_id from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]);
+        const result=await query('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[c.sub,c.session_id]);
         if(!matches(result))throw Error('n44_auth_expired');
       });
-      return Object.freeze({ownerId:c.sub,sessionId:c.session_id,sessionRevision:c.session_id,expiresAt:c.exp*1000});
+      const notAfter=current.rows[0].not_after_ms===null?Infinity:Number(current.rows[0].not_after_ms);
+      if(notAfter!==Infinity&&!Number.isSafeInteger(notAfter))return null;
+      return Object.freeze({ownerId:c.sub,sessionId:c.session_id,sessionRevision:c.session_id,expiresAt:c.exp*1000,
+        backgroundExpiresAt:Math.min(now()+30*86400000,notAfter)});
     } catch {return null;}
     finally {clearTimeout(timer);abort.abort();parentSignal?.removeEventListener('abort',cancel);}
   };

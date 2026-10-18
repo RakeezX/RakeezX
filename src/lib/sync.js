@@ -536,6 +536,7 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
   autoTimer = null;
   autoRunning = true;
   const presentationToken = bindPresentationContext();
+  const acknowledgedContext = { workspace: store.getActiveWorkspace(), session: cloud.session };
   let presentationErrors = null;
   remoteSync.beginSync();
   suppressAutoSchedule = true;
@@ -606,6 +607,13 @@ export async function syncAll({ full = true, remote = false, forRestore = false 
     cacheOperationalSummary(v2Status, presentationToken);
     if (remoteCapture) remoteSync.afterFullSync(remoteCapture, true);
     if (remoteSync.diagnostics().pending) setState({ status: 'pending' });
+    // Observers cannot alter Sync success or acquire an ACK from a failed run.
+    if (pushed.acknowledged > 0 && !pushed.failed && acknowledgedContext.workspace === store.getActiveWorkspace() &&
+        acknowledgedContext.session === cloud.session && cloudOwnershipAccess('pull').allowed) {
+      for (const observer of acknowledgedListeners) {
+        try { Promise.resolve(observer(Object.freeze(acknowledgedContext))).catch(() => {}); } catch { /* isolated observer */ }
+      }
+    }
     return true;
   } catch (err) {
     if (remoteCapture) remoteSync.afterFullSync(remoteCapture, false);
@@ -839,6 +847,8 @@ async function syncV2Category(name) {
   return ok;
 }
 
+const acknowledgedListeners = new Set();
+export function subscribeAcknowledged(fn) { acknowledgedListeners.add(fn); return () => acknowledgedListeners.delete(fn); }
 const listeners = new Set();
 export function subscribe(fn) {
   listeners.add(fn);

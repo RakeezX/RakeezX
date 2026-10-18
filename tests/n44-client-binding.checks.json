@@ -1,0 +1,355 @@
+{
+  "taskId": "continuous-n44-actual-browser-service-integration-20261018",
+  "runId": "9bb93382-ce73-4221-9f3e-8ff1b3f5f594",
+  "baseSha": "ddddd901b321acd432c54426faa3f09873c1987f",
+  "startedAt": "2026-10-18T04:39:22.749Z",
+  "checks": [
+    {
+      "name": "n44_actual_browser_service_journey",
+      "status": "PASS",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "tests/n44-client-binding.mjs"
+      ],
+      "evidence": "N44 client binding PASS; owned HTTP/PG/lease closed."
+    },
+    {
+      "name": "n44_client_binding_units",
+      "status": "PASS",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--test",
+        "tests/n44-client-binding.unit.mjs"
+      ],
+      "evidence": "✔ original cleanup identity cannot revoke or erase a newer tab registration (5.9386ms)\n✔ HTTP 200 with failed server ACK never becomes register/revoke success; cleanup survives failed ACK (1.7778ms)\n✔ backend revision and expired context fail closed before permission eligibility (0.9407ms)\n✔ legacy audited cipher and committed-delivery path remain compatible (26.3574ms)\n✔ opaque envelope has exact public fields; expired binding cannot cause DNS/decrypt/send (1.1584ms)\n✔ activation-bound policy has no daily operator cutoff; unknown, retired or unsupported stays OFF (0.6455ms)\n✔ existing host requires exact source revision and policy approval before DB/key access (1.6079ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 297.7762"
+    },
+    {
+      "name": "n44_affected_client_owner_and_action_regressions",
+      "status": "PASS",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--test",
+        "--test-name-pattern=payload|dedupe|consent|owner/workspace|cleanup failures|action independently|inactive_import",
+        "tests/n44-push-preparation.test.mjs"
+      ],
+      "evidence": "✔ n44_push_payload_expiry_dedupe_and_safe_action_contract (5.1057ms)\n✔ n44_push_explicit_consent_owner_context_revoke_with_fake_gateway (1.37ms)\n✔ owner/workspace/device/session switches at each async boundary and logout reject stale work (1.4258ms)\n✔ cleanup failures stay retryable, private and block later subscription (0.4133ms)\n✔ action independently authorized and re-derived with current owner, expiry and destination (0.5691ms)\n✔ n44_inactive_import_no_network_permission_SW_or_existing_UI_changes (58.813ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 164.5705"
+    },
+    {
+      "name": "n44_affected_registration_and_delivery_regressions",
+      "status": "PASS",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--test",
+        "--test-name-pattern=registration:|delivery: concurrent|delivery: disabled|delivery: revocation",
+        "tests/n44-server-preactivation.test.mjs"
+      ],
+      "evidence": "✔ registration: independent auth, self-asserted/foreign owner, strict consent and stale contexts (4.3299ms)\n✔ registration: endpoint boundary, disabled origins, key sizes and immutable input (0.9623ms)\n✔ registration: global endpoint collision, per-context/device ceiling and mutation budgets (1.3884ms)\n✔ registration: duplicate races, protected secrets, original-only revoke and no resurrection (3.6689ms)\n✔ registration: asynchronous stale/logout/owner/workspace/device switches reject and errors are private (0.8764ms)\n✔ delivery: concurrent duplicate reservations across independent instances and immutable identity (22.8844ms)\n✔ delivery: disabled by default, current context/preference/timing/quiet/zone and injected event recomputation (5.3632ms)\n✔ delivery: revocation/expiry/preference/deleted event changes before retry prevent sending (3.8771ms)\nℹ tests 8\nℹ suites 0\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 149.0292"
+    },
+    {
+      "name": "n44_actual_browser_service_consent_sync_and_subscription_journey",
+      "status": "PASS",
+      "evidence": "Actual app DOM/handlers + native adapter over fabricated browser facilities, relative HTTP transport, Cloudflare/WebRequest/AuthClient and owned PG: gesture/defaultOFF, real ACK/source/Sync, cleanup/retry, preference and new-session CAS, A-B-A/lease checks pass at 390/1280."
+    },
+    {
+      "name": "n44_client_sw_owner_stale_click_default_off_and_offline_guards",
+      "status": "PASS",
+      "evidence": "Actual sw.js VM, explicit one-constant synthetic activation: real encrypted/decrypted sender envelope displays GENERIC notification with ZERO open clients; durable restart dedupe; fixed public-root boot then current page/server click authorization; deleted/restored source, logout, A-B-A binding and expiry rejection; default OFF and offline/private route guards."
+    },
+    {
+      "name": "affected_syntax",
+      "status": "PASS",
+      "evidence": "33 affected JS/module files parsed; journey hashes compared to current exact source."
+    },
+    {
+      "name": "git_diff_check",
+      "status": "PASS",
+      "evidence": "No whitespace errors"
+    },
+    {
+      "name": "unchanged_evidence_reuse",
+      "status": "PASS",
+      "evidence": "18 crypto / corrected16 boundary / 12 existing-host historical records compared by actual source hashes; matching components only reused, changed scopes explicitly listed."
+    },
+    {
+      "name": "owned_phase_cleanup",
+      "status": "PASS",
+      "evidence": "{\"httpClosed\":true,\"browserClosed\":true,\"postgresStopped\":true,\"exactPidAbsent\":true,\"leaseRelease\":\"RELEASED integration\",\"clusterFilesRetained\":true}"
+    },
+    {
+      "name": "synthetic_cluster_file_removal",
+      "status": "NOT_RUN",
+      "evidence": "Ownership-checked PowerShell recursive removal rejected: blocked by policy. Stopped task-owned cluster files retained untracked/outside candidate; no alternate deletion operation."
+    },
+    {
+      "name": "hosted_policy_service_device_production",
+      "status": "NOT_RUN",
+      "evidence": "Inactive source-only authority. Actual Auth policy readback and all hosted service/provider/OS/Production activation and verification remain separate exact gates."
+    }
+  ],
+  "reuse": [
+    {
+      "path": "tests/n44-crypto-sender.result.json",
+      "runId": "9c9ee4fd-ab29-43ae-b190-84c9dbcb3a6b",
+      "historicalCases": 18,
+      "matching": [
+        {
+          "source": "drafts/n44-push/subscription-protector.mjs",
+          "sha256": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6",
+          "priorSha256": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6"
+        },
+        {
+          "source": "drafts/n44-push/private-runtime.mjs",
+          "sha256": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9",
+          "priorSha256": "c7d0739284cbf5c6af9dff93d2b0517df66c2de4578a102df47bea28e840ffe9"
+        },
+        {
+          "source": "drafts/n44-push/shared.mjs",
+          "sha256": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+          "priorSha256": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d"
+        },
+        {
+          "source": "tests/fixtures/n44-server-preactivation/fakes.mjs",
+          "sha256": "e16f8b88aef6c42a6709e2899a1982cb1b406013fdfcc2814eb12025bcbe9da5",
+          "priorSha256": "e16f8b88aef6c42a6709e2899a1982cb1b406013fdfcc2814eb12025bcbe9da5"
+        },
+        {
+          "source": "tests/n44-crypto-sender.mjs",
+          "sha256": "32b302f2a33e8a03f7e194584dd092e9048846400aeabe9264d115de0d0a7d85",
+          "priorSha256": "32b302f2a33e8a03f7e194584dd092e9048846400aeabe9264d115de0d0a7d85"
+        },
+        {
+          "source": "tests/fixtures/n44-crypto-sender/fixture.mjs",
+          "sha256": "943fc96e55c5de1674b9282aa85e0e57a47adc954207814eb0ea081d92d24ba1",
+          "priorSha256": "943fc96e55c5de1674b9282aa85e0e57a47adc954207814eb0ea081d92d24ba1"
+        }
+      ],
+      "changed": [
+        {
+          "source": "drafts/n44-push/provider-policy.mjs",
+          "sha256": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+          "priorSha256": "9b49a7bd40338ccefc69f617a7a1eb535a9071e1a4a9bc26e48913789b0801fb"
+        },
+        {
+          "source": "drafts/n44-push/audited-sender.mjs",
+          "sha256": "e890933c9287a4d9e0812caa40f96fb899d8b3c74d15dd0fbdfab9840d77ae69",
+          "priorSha256": "9972a864baa325edc04c87958d4cadd7c1a0746a42b5c339d74c880ae5b7f6a1"
+        },
+        {
+          "source": "drafts/n44-push/committed-permit.mjs",
+          "sha256": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+          "priorSha256": "005cbed6901df5816138c2fd3451c480a71a89e2b4143e4371d5f271c404c29c"
+        },
+        {
+          "source": "drafts/n44-push/delivery.mjs",
+          "sha256": "45ef62bd567641e06477240b69c75983f56251cfc5be4e53f2956060527fd2f5",
+          "priorSha256": "9aebe5e65f45556443fa33b7e6814642f3a42f4e4e8d77830e9c8d852267755e"
+        },
+        {
+          "source": "drafts/n44-push/runtime-gateway.mjs",
+          "sha256": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+          "priorSha256": "73282ab7e1b1ce2abf8027ae2432a63174c78c0b13b2e51763bef2c06c7f2787"
+        },
+        {
+          "source": "drafts/n44-push/registration.mjs",
+          "sha256": "464f60c2419d31560ed781c4dcb406fc60611879b7514361faf77a928a64c2ad",
+          "priorSha256": "f90c1a3fb767ba7fa45a76aafd6a7c18896f5477c06c0e51bb05ffaa3a703c36"
+        },
+        {
+          "source": "tests/n44-server-preactivation.test.mjs",
+          "sha256": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4",
+          "priorSha256": "779fe3aad25e79f2af2df595e05ad00020c49ba6d1679940c023332e04ef61f1"
+        },
+        {
+          "source": "src/lib/notification-push-core.js",
+          "sha256": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+          "priorSha256": "bf00ae3a06df34e603df8f87da20d6035391db798b58f4d5b32a934e20a6476b"
+        },
+        {
+          "source": "src/lib/notification-push-client.js",
+          "sha256": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+          "priorSha256": "a6a193c7fa192387c7733bee41c1056627634f235e27286519288461aec153fe"
+        },
+        {
+          "source": "drafts/n44-push/package.json",
+          "sha256": "d7c66a4eae59ed9ad60b03b4ab368304d9c3e67eb31e5d659d4f7f6ea8f7960a",
+          "priorSha256": "d0f9d366824874345a0488e21be4a1d9ba28d8143ace6981f7a71bba267ce257"
+        },
+        {
+          "source": "drafts/n44-push/package-lock.json",
+          "sha256": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+          "priorSha256": "7fe889341d261ef90eb645dc9353a0fef6f0eab6cc95e09bd72a155af2147a09"
+        }
+      ],
+      "scope": "Component evidence only. Changed client/envelope/lease/helper/policy/server paths use new affected checks; historical total is not a new whole-suite result."
+    },
+    {
+      "path": "tests/n44-crypto-sender.boundary-repair-result.json",
+      "runId": "84e54815-c67b-4457-9948-ba4d9b74ecc1",
+      "historicalCases": 16,
+      "matching": [
+        {
+          "source": "tests/n44-server-preactivation.test.mjs",
+          "sha256": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4",
+          "priorSha256": "0ce9b65a7039d07394d401e7572d9e7d15c52fbfb747e7c04ae58c3c1f386cc4"
+        },
+        {
+          "source": "tests/n44-crypto-sender-import-guard.mjs",
+          "sha256": "ce04e90f88811d61255a046483899b64e4d8d6189241c072b1950d5f27911efd",
+          "priorSha256": "ce04e90f88811d61255a046483899b64e4d8d6189241c072b1950d5f27911efd"
+        }
+      ],
+      "changed": [],
+      "scope": "Component evidence only. Changed client/envelope/lease/helper/policy/server paths use new affected checks; historical total is not a new whole-suite result."
+    },
+    {
+      "path": "tests/n44-existing-host.result.json",
+      "runId": "a7060142-87f7-4876-af30-bcb92ca2796b",
+      "historicalCases": 12,
+      "matching": [
+        {
+          "source": "drafts/n44-push/provider-policy.mjs",
+          "sha256": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+          "priorSha256": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8"
+        },
+        {
+          "source": "drafts/n44-push/canonical-source.mjs",
+          "sha256": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+          "priorSha256": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355"
+        },
+        {
+          "source": "drafts/n44-push/web-entry.mjs",
+          "sha256": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+          "priorSha256": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828"
+        },
+        {
+          "source": "drafts/n44-push/scheduler-entry.mjs",
+          "sha256": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+          "priorSha256": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709"
+        },
+        {
+          "source": "drafts/n44-push/node-globals.mjs",
+          "sha256": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+          "priorSha256": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0"
+        },
+        {
+          "source": "drafts/n44-push/postgres-repository.mjs",
+          "sha256": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+          "priorSha256": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd"
+        },
+        {
+          "source": "drafts/n44-push/runtime-gateway.mjs",
+          "sha256": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+          "priorSha256": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917"
+        },
+        {
+          "source": "drafts/n44-push/canonical-source.inactive.sql",
+          "sha256": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+          "priorSha256": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46"
+        },
+        {
+          "source": "supabase/functions/n44-notifications/index.ts",
+          "sha256": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+          "priorSha256": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822"
+        },
+        {
+          "source": "drafts/n44-push/package-lock.json",
+          "sha256": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+          "priorSha256": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe"
+        },
+        {
+          "source": "tests/fixtures/n44-existing-host/journey.mjs",
+          "sha256": "c3379617ddf8639608b7c598f1e892ae5201480ff3a7a9e5e00b40228be3db60",
+          "priorSha256": "c3379617ddf8639608b7c598f1e892ae5201480ff3a7a9e5e00b40228be3db60"
+        },
+        {
+          "source": "tests/fixtures/n44-existing-host/canonical.sql",
+          "sha256": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c",
+          "priorSha256": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c"
+        }
+      ],
+      "changed": [
+        {
+          "source": "drafts/n44-push/auth-verifier.mjs",
+          "sha256": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+          "priorSha256": "b7ba8d208b7149e45fd5fe06450deafae536d4b47c12035cd6ff542d55f6f231"
+        },
+        {
+          "source": "drafts/n44-push/backend.mjs",
+          "sha256": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2",
+          "priorSha256": "d04429f01764389284b6b5335051ce7b2c673a4943184eae2cebd817a4b34a00"
+        },
+        {
+          "source": "drafts/n44-push/web-protocol.mjs",
+          "sha256": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+          "priorSha256": "77f2e84fe2984067c4d672e7ea6f8523e26cdd6c3897510855149e17ee1a1a16"
+        },
+        {
+          "source": "drafts/n44-push/cloudflare-entry.mjs",
+          "sha256": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+          "priorSha256": "09133cfb0124214090e82afff68b223ca36eca6a87e75c23d0159e7ffc0a3be1"
+        },
+        {
+          "source": "drafts/n44-push/existing-host.mjs",
+          "sha256": "dfcec5cb52845ce9db31d3fee4419d9ec6402c7ac3bb836d25a0a110d41902bb",
+          "priorSha256": "d6e28269d26e818b99428f48aa1210b9148dfcc1e0e2876f42a40353078f7b07"
+        },
+        {
+          "source": "drafts/n44-push/existing-host.inactive.sql",
+          "sha256": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
+          "priorSha256": "78879dab070d35e8489e0a2ac70c8a8d13b9bd1144111961177f7500798d9072"
+        },
+        {
+          "source": "supabase/functions/n44-notifications/deno.lock",
+          "sha256": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+          "priorSha256": "7f254054d48d0055bf5ed3e1ae0022988eaaec06471467fc6508d026be730062"
+        }
+      ],
+      "scope": "Component evidence only. Changed client/envelope/lease/helper/policy/server paths use new affected checks; historical total is not a new whole-suite result."
+    }
+  ],
+  "sourceSha256": {
+    "drafts/n44-push/session-policy.mjs": "475274a6947fa63972c469c7e713be589b3eb9680b7ba0a9183d78e36afbbb4e",
+    "drafts/n44-push/audited-sender.mjs": "e890933c9287a4d9e0812caa40f96fb899d8b3c74d15dd0fbdfab9840d77ae69",
+    "drafts/n44-push/subscription-protector.mjs": "e386e3d82e5cf41ab29499a8f94ea2f93c5e7d880ae59789be07c358739451a6",
+    "drafts/n44-push/registration.mjs": "464f60c2419d31560ed781c4dcb406fc60611879b7514361faf77a928a64c2ad",
+    "drafts/n44-push/delivery.mjs": "45ef62bd567641e06477240b69c75983f56251cfc5be4e53f2956060527fd2f5",
+    "drafts/n44-push/committed-permit.mjs": "6cc549a645edd1ebcad0edfd46163b4ebea23c8c48e3524f574eb35f609ea961",
+    "drafts/n44-push/shared.mjs": "8d2c4c31e239563e1ef7b96d6c971c0ebdb5c9551e8e52cdf1f5d6c40393428d",
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "drafts/n44-push/backend.mjs": "eb63b4cb6461f960ac99c13c7c747d3f4a1cd1df64bb6c05a798bbac32711ad2",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "dfcec5cb52845ce9db31d3fee4419d9ec6402c7ac3bb836d25a0a110d41902bb",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "tests/fixtures/n44-client-binding/journey.mjs": "60822d12d0c166c3a993d0603292590122774ba9f62bcdcbb76be6486e9b6017",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c",
+    "tests/fixtures/n44-client-binding/service.mjs": "746bb8a6c543c152a138f93ea02a4051565d8be06a1b032d04f72fa612c48969",
+    "tests/n44-client-binding.unit.mjs": "1613e74cd10b7bf3cf795d0a1e3cc695134095a77c82b43b479a5a269e0bacba",
+    "tests/n44-client-binding.mjs": "db8a99ca1588d5dbb01d5686f8de8666d760de379a8b667a0ce735388b963575",
+    "drafts/n44-push/deployment.inactive.json": "89866dd757f3ff5f79abc5c250de649049348194997a28a339c8a4aa25c2737c",
+    "src/lib/notification-push-runtime.js": "6c07a91b22fbffd267a0d0a6df915cd5c808b776527563263cffac105e3f13f9",
+    "src/lib/notification-push-browser.js": "7c526515bbf724fa06d9ff4b85babb4b3cd047540e6a6713f4795762547e3151",
+    "src/lib/notification-push-gateway.js": "5a12863533dc372c63085f4f00b266a88ffa9ee7ceb9a362f2934abbf800328b",
+    "src/lib/notification-push-client.js": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+    "src/lib/sync.js": "82b20757759730cf40bbf817bc65c5e5a387edfd1af0ef5008c1125d5b320a03",
+    "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
+    "src/views/notification-settings.js": "c3bc76720bfc92598c89fdd03f9288b4fe8d4adeda314f754ae5a8e8670a9fed",
+    "src/lib/notification-push-core.js": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+    "tests/fixtures/n44-client-binding/managed-auth.sql": "8ce3598bde368158d7c21798e88e40534a931cefa8eb605543570efd426a88ab",
+    "sw.js": "8007acc684d94a8a8abeafe7c09d40938e01538a33ccfec12bc39d5cad9b61d6",
+    "tests/n44-client-binding.verify.mjs": "8869b3e72e35bfa97eb29a066b7e3e1fd0baada9be1abb989b6edac9cd3da3ad"
+  },
+  "state": "PASS",
+  "finishedAt": "2026-10-18T04:39:42.761Z"
+}

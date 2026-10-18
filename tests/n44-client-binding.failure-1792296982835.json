@@ -1,0 +1,60 @@
+{
+  "taskId": "continuous-n44-actual-browser-service-integration-20261018",
+  "runId": "9bb93382-ce73-4221-9f3e-8ff1b3f5f594",
+  "baseSha": "ddddd901b321acd432c54426faa3f09873c1987f",
+  "startedAt": "2026-10-18T04:16:11.311Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "exactPidAbsent": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "cases": [],
+  "finishedAt": "2026-10-18T04:16:22.742Z",
+  "sourceSha256": {
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "drafts/n44-push/backend.mjs": "3f745f59cf04949a297647df7edc0b8152f17c3a0b2ab7c6d46dcd04e3f5fc97",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "d6e28269d26e818b99428f48aa1210b9148dfcc1e0e2876f42a40353078f7b07",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "tests/fixtures/n44-client-binding/journey.mjs": "b3cb5178e2918bf36d36a2e8588c1d361dc255e0c0691f11c434421536b9f04a",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c",
+    "tests/fixtures/n44-client-binding/service.mjs": "4f4c51a9d5fd89eb0b20810709e39bbc6a29ba06bda3d6c3863af3be21506a92",
+    "tests/n44-client-binding.unit.mjs": "46c61bcac91ccf353b9abd48d786e4cce3d0b949a2b549ef2b18b1b77763a775",
+    "src/lib/notification-push-runtime.js": "145264341319fb197cf8b1b60d1037e5768e3e756bf792f8e06c4ee09a3bccb0",
+    "src/lib/notification-push-browser.js": "bba203b80d34268d7e8dcbaa354f2daa6deab767d47e0202eb4abde29300cbe1",
+    "src/lib/notification-push-gateway.js": "9a0b5c18f51c3ec489be05be829652da67e31e2896d5d1bf7d5f9df6d43d6339",
+    "src/lib/notification-push-client.js": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+    "src/lib/sync.js": "82b20757759730cf40bbf817bc65c5e5a387edfd1af0ef5008c1125d5b320a03",
+    "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
+    "src/views/notification-settings.js": "c3bc76720bfc92598c89fdd03f9288b4fe8d4adeda314f754ae5a8e8670a9fed",
+    "src/lib/notification-push-core.js": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+    "tests/fixtures/n44-client-binding/managed-auth.sql": "23c2ada7cc1add0acce7bece1195e4fa44a53548bb835a722535bbad64a0f4f5",
+    "sw.js": "0b1b422da0da47e8a471c2940ad878488a3d2e8e989397b54777fdedb083e798"
+  }
+}

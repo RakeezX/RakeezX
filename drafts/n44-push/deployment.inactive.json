@@ -3,11 +3,56 @@
   "enabled": false,
   "deliveryEnabled": false,
   "sourceOnly": true,
-  "serviceRevision": "n44-existing-host-v1",
+  "serviceRevision": "n44-browser-service-v2",
   "entry": "supabase/functions/n44-notifications/index.ts",
   "requiredTrustedPorts": [],
   "ingress": "drafts/n44-push/cloudflare-entry.mjs",
   "scheduler": "drafts/n44-push/scheduler-entry.mjs",
   "triggers": [],
-  "routes": []
+  "routes": [],
+  "browserProtocol": "n44-browser-v2",
+  "browserEnabled": false,
+  "serviceWorkerEnabled": false,
+  "sessionPolicyReadback": {
+    "required": true,
+    "status": "NOT_RUN",
+    "actualProfile": null,
+    "trustedEnvironmentField": "N44_SESSION_POLICY_JSON",
+    "supportedProfile": {
+      "timeboxSeconds": null,
+      "inactivityTimeoutSeconds": null,
+      "singleSessionPerUser": false
+    },
+    "unknownOrUnsupported": "KEEP_OFF",
+    "freshnessAtActivationMaximumMs": 86400000,
+    "dailyOperatorRenewal": false,
+    "serviceSourceShaEnvironmentField": "N44_SERVICE_SOURCE_SHA",
+    "approvalIdentity": [
+      "approvalId",
+      "approvalState",
+      "serviceRevision",
+      "serviceSourceSha",
+      "metadataSha256",
+      "observedAt",
+      "activatedAt"
+    ],
+    "authPolicyChangeContract": [
+      "disable N44 ingress/delivery/scheduler first",
+      "drain original runtime before Auth policy change",
+      "retire approval and previous device/context bindings",
+      "fresh readonly profile and NEW approval ID before separately authorized reactivation"
+    ]
+  },
+  "managedAuthHelper": {
+    "owner": "postgres",
+    "existingBYPASSRLS": true,
+    "newBYPASSRLSGrant": false,
+    "authRLS": "enabled, not forced, zero policies",
+    "activationReadback": [
+      "current postgres management capability",
+      "exact column SELECT/UPDATE and Auth schema USAGE privileges",
+      "private helper owner, definition hash and execute ACL",
+      "fresh actual session policy profile and supported semantics"
+    ]
+  }
 }

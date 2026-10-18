@@ -1,19 +1,23 @@
 /** AI: concrete private DB/Auth/context/events/delivery composition. No hosted operation. */
+import {supportedSessionPolicy,policySessionRevision} from './session-policy.mjs';
 import {randomUUID,createHmac} from 'node:crypto';
 import {createTeacherVerifier} from './auth-verifier.mjs';
 import {createPostgresRepository} from './postgres-repository.mjs';
 import {createRegistrationBoundary} from './registration.mjs';
-import {createDeliveryBoundary} from './delivery.mjs';
+import {createDeliveryBoundary,quietNow} from './delivery.mjs';
+import {normalizePushPayload} from '../../src/lib/notification-push-core.js';
 import {readSource,sourcePayload} from './canonical-source.mjs';
-import {id,record} from './shared.mjs';
+import {id,record,uuid,LIMITS} from './shared.mjs';
 const fail=()=>{throw Error('n44_unavailable');};
 const exact=(v,keys)=>{if(!record(v,keys))fail();};
-export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,now=Date.now}) {
+export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,crypto,rateKey,deliveryEnabled=false,sessionPolicy,serviceSourceSha,now=Date.now}) {
+ if(!supportedSessionPolicy(sessionPolicy,now(),serviceSourceSha))fail();
+ const policy=Object.freeze(structuredClone(sessionPolicy));
  const verify=createTeacherVerifier({authUrl,apiKey,fetch,now});
  async function transaction(work,signal) {
   const c=await acquire();let committed=false;
   const until=now()+12000,guards=[];
-  const fence=()=>{if(signal?.aborted || now()>=until)fail();};
+  const fence=()=>{if(signal?.aborted || now()>=until || !supportedSessionPolicy(policy,now(),serviceSourceSha))fail();};
   const query=async(...args)=>{fence();const r=await c.query(...args);fence();return r;};
   try {
    await query('begin');await query("set local statement_timeout='3000ms'");await query("set local lock_timeout='1000ms'");
@@ -25,8 +29,9 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
  async function prepare(c,owner,state,signal) {
   const q=async(...args)=>{if(signal?.aborted)fail();const r=await c.query(...args);if(signal?.aborted)fail();return r;},events=new Map();
   for(const ctx of state.contexts.values())if(ctx.active){
-   const live=await q('select user_id,session_id from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);
-   if(live.rows.length!==1 || ctx.sessionExpiresAt<=now())ctx.active=false;
+   const live=await q('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);
+   if(live.rows.length!==1 || ctx.sessionExpiresAt<=now() || ctx.sessionRevision!==policySessionRevision(ctx.sessionId,policy))ctx.active=false;
+   else if(live.rows[0].not_after_ms!==null)ctx.sessionExpiresAt=Math.min(ctx.sessionExpiresAt,Number(live.rows[0].not_after_ms));
   }
   const stored=await q('select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101',[owner]);
   if(stored.rows.length>100)fail();
@@ -39,13 +44,13 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
   return {sourceEvent(r,eventId,time){return sourcePayload(events.get(JSON.stringify([r.workspaceId,r.deviceId,eventId])),time);},
    async beforeCommit(){for(const ctx of state.contexts.values())if(ctx.active){
     if(ctx.sessionExpiresAt<=now())fail();
-    const live=await q('select user_id,session_id from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);if(live.rows.length!==1)fail();
+    const live=await q('select user_id,session_id,not_after_ms from n44_push_draft.lock_current_session($1::uuid,$2::uuid)',[owner,ctx.sessionId]);if(live.rows.length!==1)fail();
    }}};
  }
  const makeDelivery=signal=>{
-  const fence=()=>{if(signal?.aborted)fail();};
+  const fence=()=>{if(signal?.aborted||!supportedSessionPolicy(policy,now(),serviceSourceSha))fail();};
   const repository=createPostgresRepository({acquire,prepare:async(...args)=>{fence();const extension=await prepare(...args,signal);fence();return {...extension,async beforeCommit(){await extension.beforeCommit?.();fence();}};}});
-  return createDeliveryBoundary({repository,clock:now,recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted)return 'uncertain';return crypto.sender.send(permit,{signal});}}});
+  return createDeliveryBoundary({repository,clock:now,envelope:true,recompute:(tx,r,event,time)=>tx.sourceEvent(r,event,time),sender:{send(permit){if(signal?.aborted)return 'uncertain';return crypto.sender.send(permit,{signal});}}});
  };
  // Both roles use a shared durable atomic upsert; raw IP/owner never used as rate keys.
  async function take(query,kind,key,limit) {
@@ -73,7 +78,8 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
  async teacher(path,authorization,body,signal) {
   // Debit authenticated owner separately so rejected work cannot roll back its rate.
   return transaction(async(ports,c)=>{
-   const auth=await verify(authorization,signal,ports);if(!auth)return {status:'rejected'};
+   const verified=await verify(authorization,signal,ports);if(!verified)return {status:'rejected'};
+   const auth={...verified,sessionRevision:policySessionRevision(verified.sessionId,policy)};
    const allowed=await transaction(({query})=>take(query,'owner',auth.ownerId,30),signal);if(!allowed)return {status:'limited'};
    // Existing repository commits a SAVEPOINT; outer Auth locks survive until durable response.
    const local=createPostgresRepository({acquire:async()=>({
@@ -81,12 +87,22 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
    })});
    const scope=b=>{if(!id(b.workspaceId)||!id(b.deviceId))fail();};
    if(path.startsWith('/push/')) {
-    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins});
+    if(path==='/push/revoke') {
+     exact(body,['registrationId','workspaceId','deviceId']);scope(body);if(!uuid(body.registrationId))fail();
+     // A fresh session may acknowledge an already retired ORIGINAL identity,
+     // never remove an active registration belonging to another session.
+     const retired=await local.atomic(auth.ownerId,tx=>{const r=tx.get('registrations',body.registrationId);
+      return r && r.workspaceId===body.workspaceId&&r.deviceId===body.deviceId&&r.state!=='active';});
+     if(retired)return {status:'revoked'};
+    }
+    const registration=createRegistrationBoundary({verifySession:async()=>auth,repository:local,protect:crypto.protect,clock:now,approvedOrigins:providerOrigins,receipt:true});
     return registration[path.endsWith('/register')?'register':'revoke'](null,body);
    }
    if(path==='/context/read'){
     exact(body,['workspaceId','deviceId']);scope(body);
-    return local.atomic(auth.ownerId,tx=>{const ctx=tx.context(body.workspaceId,body.deviceId);return ctx?.sessionId===auth.sessionId && ctx.active && ctx.sessionExpiresAt>now()?{status:'current',context:ctx}:{status:'absent'};});
+    return local.atomic(auth.ownerId,tx=>{const ctx=tx.context(body.workspaceId,body.deviceId);if(ctx?.sessionId!==auth.sessionId||ctx.sessionRevision!==auth.sessionRevision||!ctx.active||ctx.sessionExpiresAt<=now())return {status:'absent',protocol:'n44-browser-v2',expectedRevision:ctx?.consentRevision??null};
+     const r=tx.rows('registrations').find(r=>r.workspaceId===body.workspaceId&&r.deviceId===body.deviceId&&r.sessionRevision===auth.sessionRevision&&r.consentRevision===ctx.consentRevision&&r.state==='active'&&r.expiresAt>now());
+     return {status:'current',protocol:'n44-browser-v2',context:ctx,registration:r?{registrationId:r.registrationId,expiresAt:r.expiresAt}:null};});
    }
    if(path==='/context/update'){
     exact(body,['workspaceId','deviceId','expectedRevision','preferences','pushConsent']);scope(body);if(typeof body.pushConsent!=='boolean')fail();
@@ -94,7 +110,7 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
      const previous=tx.context(body.workspaceId,body.deviceId);
      if((previous?.consentRevision??null)!==body.expectedRevision)return {status:'stale'};
      const ctx={workspaceId:body.workspaceId,deviceId:body.deviceId,active:true,sessionId:auth.sessionId,sessionRevision:auth.sessionRevision,
-      sessionExpiresAt:auth.expiresAt,consentRevision:randomUUID(),pushConsent:body.pushConsent,preferences:body.preferences};
+      sessionExpiresAt:Math.min(now()+LIMITS.registrationMs,auth.backgroundExpiresAt),consentRevision:randomUUID(),pushConsent:body.pushConsent,preferences:body.preferences};
      // Existing repository validates the complete approved timing/quiet schema.
      tx.set('contexts',JSON.stringify([body.workspaceId,body.deviceId]),ctx);
      // Context changes retire subscriptions immediately, even across A -> B -> A.
@@ -103,14 +119,33 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
      return {status:'updated',context:ctx};
     });
    }
+   if(path==='/events/authorize') {
+    exact(body,['workspaceId','deviceId','consentRevision','registrationId','event']);scope(body);
+    const event=normalizePushPayload(body.event,now());if(!event)return {status:'rejected'};
+    let context;
+    await local.atomic(auth.ownerId,tx=>{
+     const ctx=tx.context(body.workspaceId,body.deviceId);
+     if(!ctx?.active||ctx.sessionId!==auth.sessionId||ctx.sessionRevision!==auth.sessionRevision||ctx.sessionExpiresAt<=now()||
+       !ctx.pushConsent||ctx.consentRevision!==body.consentRevision||ctx.preferences[event.kind]!==true||quietNow(ctx.preferences,now())!==false)fail();
+     if(!tx.rows('registrations').some(r=>r.registrationId===body.registrationId&&r.workspaceId===body.workspaceId&&r.deviceId===body.deviceId&&r.sessionId===auth.sessionId&&
+       r.sessionRevision===auth.sessionRevision&&r.consentRevision===ctx.consentRevision&&r.state==='active'&&r.expiresAt>now()))fail();
+     context=ctx;
+    });
+    const stored=await ports.query('select * from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and event_id=$4',
+      [auth.ownerId,body.workspaceId,body.deviceId,event.id]);
+    const row=stored.rows[0];if(!row)return {status:'rejected'};
+    const fresh=await readSource(ports.query,auth.ownerId,row.source_kind,row.source_id,context.preferences);
+    const payload=sourcePayload(fresh?.stamp===row.source_stamp?fresh.events.find(e=>e.id===event.id):null,now());
+    return {status:payload&&['id','kind','expiresAt','actionPath'].every(k=>payload[k]===event[k])?'authorized':'rejected'};
+   }
    if(path==='/events/update') {
     exact(body,['workspaceId','deviceId','kind','sourceId','expectedStamp']);scope(body);if(!['lesson','due'].includes(body.kind)||!id(body.sourceId)||body.expectedStamp!==null&&!/^[a-f0-9]{64}$/.test(body.expectedStamp))fail();
     let context;
-    await local.atomic(auth.ownerId,tx=>{const ctx=tx.context(body.workspaceId,body.deviceId);if(!ctx?.active||ctx.sessionId!==auth.sessionId||ctx.sessionExpiresAt<=now())fail();context=ctx;});
+    await local.atomic(auth.ownerId,tx=>{const ctx=tx.context(body.workspaceId,body.deviceId);if(!ctx?.active||ctx.sessionId!==auth.sessionId||ctx.sessionRevision!==auth.sessionRevision||ctx.sessionExpiresAt<=now())fail();context=ctx;});
     // Owner row remains locked by outer transaction; canonical keys lock through commit.
     const q=ports.query,source=await readSource(q,auth.ownerId,body.kind,body.sourceId,context.preferences);
     const old=await q('select distinct source_stamp from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5',[auth.ownerId,body.workspaceId,body.deviceId,body.kind,body.sourceId]);
-    if(old.rows.length && old.rows.some(r=>r.source_stamp!==body.expectedStamp))return {status:'stale'};
+    if(old.rows.length && old.rows.some(r=>r.source_stamp!==body.expectedStamp))return {status:'stale',sourceStamp:old.rows.length===1?old.rows[0].source_stamp:null};
     if(!old.rows.length&&body.expectedStamp!==null)return {status:'stale'};
     await q('delete from n44_push_draft.events where owner_id=$1 and workspace_id=$2 and device_id=$3 and source_kind=$4 and source_id=$5',[auth.ownerId,body.workspaceId,body.deviceId,body.kind,body.sourceId]);
     for(const e of source?.events??[]){if(e.expiresAt<=now())continue;

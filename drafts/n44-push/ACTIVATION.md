@@ -3,7 +3,9 @@
 AI-authored, scoped source preparation for N44. This package is deployable source;
 no hosted schema, Auth, configuration, account access, push or cron was activated.
 `N44_ENABLED` is absent/false and delivery defaults false. There is no demo fallback.
-The browser/app/SW/root packages and N88 sources are unchanged.
+The browser/app/SW now have staged bindings, with both source feature flags OFF.
+Root packages and N88 sources remain unchanged. Current affected proof and exact
+remaining activation gates: [N44_ACTUAL_CLIENT_BINDINGS.md](../../docs/automation-evidence/20261018/N44_ACTUAL_CLIENT_BINDINGS.md).
 
 ## Concrete composition
 
@@ -24,15 +26,23 @@ The browser/app/SW/root packages and N88 sources are unchanged.
   transaction; expiry/current-session is rechecked before commit. Only the
   read-only Auth JWKS/user paths are permitted, with 2s abort/deadline. No JWT
   implementation, getSession, refresh, email, callbacks or token administration.
-  Session revision is the verified immutable Auth session UUID. Context expiry
-  is bounded by the verified token expiry, requiring later explicit renewal.
+  Session identity is the verified immutable Auth session UUID; request/context revision additionally binds the exact active policy approval ID. Teacher API
+  requests still require an unexpired verified JWT. Background consent uses a
+  separate lease capped at 30 days and original Auth session `not_after`; every
+  scheduled attempt locks/rechecks that original session, ban, consent and source.
+  `session-policy.mjs` additionally requires an activation-bound exact source/approval identity with fresh readonly policy evidence at that activation.
+  Only an explicitly verified profile without refresh-enforced timebox/inactivity/
+  single-session restrictions is currently supported; unknown/unsupported profiles
+  keep readiness OFF. Normal work has no daily human renewal. Any Auth policy change first disables/drains N44, retires approval and old device bindings, then requalifies a new ID. No background Auth refresh token or bearer is retained.
 - `/context/read`, `/context/update`: verified owner-only private record, target
   workspace/device labels, CAS against the last consent revision. Server creates
   the revision/session binding and validates the existing timing/quiet schema.
   Every context update retires prior registrations; A -> B -> A cannot restore
   the old binding. These endpoints establish a new explicit notification consent
-  context, not proof that a browser has mounted an owner database. Later app
-  wiring MUST apply the existing mounted-workspace ownership guard first.
+  context. The staged app composition applies the real mounted-workspace,
+  account, persisted-auth and offline-lease guards before transport or consent.
+  `/events/authorize` independently rechecks the current original registration,
+  session, source stamp, parent/child eligibility and preferences before clicks.
 - `/events/update`: accepts only target kind/source ID and expected projection
   stamp, NEVER a payload/timestamp/owner assertion. Derives current parent/child
   data using `canonical-source.inactive.sql` and `canonical-source.mjs`. Exact
@@ -134,14 +144,20 @@ no controller/STOP/configuration edits or unknown-process cleanup occurred.
    concrete migration proposal, NOT an applied migration. Provision a privately
    held LOGIN for `n44_backend` using the approved vault/DB operator; do not grant
    role membership to browser/authenticated/anon/service_role. `n44_guard` stays
-   NOLOGIN/NOBYPASSRLS and owns only the two narrowly bounded helpers.
+   NOLOGIN/NOBYPASSRLS and owns only the canonical-source helper. The exact Auth
+   status/lock helper uses the existing management owner `postgres`, whose
+   already-existing non-superuser BYPASSRLS capability is documented. Verify its
+   existing exact column SELECT/UPDATE and Auth schema USAGE rights first. Do not
+   create Auth policies, change managed Auth ownership, grant new BYPASSRLS, or
+   assume membership in `supabase_auth_admin`. Managed Auth RLS remains enabled,
+   not forced, with zero policies. The owned local fixture mirrors this condition.
 3. Run `readback.inactive.sql`; compare function definitions/ACL/RLS/constraints/
    FKs/indexes and package source hashes to this candidate. Verify negative
    access and exact helper results using separately authorized synthetic hosted
    fixtures BEFORE any real access. No live verification pair is granted here.
 4. Set ONLY server/worker secrets through the existing approved secret store.
    Edge names: `N44_ENABLED=false`, `N44_DELIVERY_ENABLED=false`,
-   `N44_SERVICE_REVISION=n44-existing-host-v1`, `N44_AUTH_URL`,
+   `N44_SERVICE_REVISION=n44-browser-service-v2`, `N44_SERVICE_SOURCE_SHA`, `N44_SESSION_POLICY_JSON`, `N44_AUTH_URL`,
    `N44_AUTH_API_KEY` (public provider API key), `N44_PUBLIC_ORIGIN`,
    `N44_DATABASE_URL` (n44_backend direct/Supavisor role; verified TLS), optional
    `N44_DATABASE_CA_CERT`, `N44_PROVIDER_ORIGINS_JSON` (only explicitly reviewed
@@ -174,14 +190,17 @@ no controller/STOP/configuration edits or unknown-process cleanup occurred.
    a bounded existing-platform cron (e.g. once/minute after explicit approval).
    No new Node/TLS host, Auth/context/scheduler implementation, subscription or
    outside executor is needed. A real provider refusal remains binding.
-8. LATER app wiring is a separate affected scope: existing current workspace and
-   ownership guard -> `/context/read`/CAS `/context/update` consent/preferences;
-   after canonical Sync commit -> `/events/update` per changed source with its
-   saved stamp; source cancellation/deletion -> same endpoint to retire projection.
-   Renew the context at token/session expiry without reviving old registration
-   UUIDs. Register/revoke with the original owner/device/session consent revision,
-   approved public VAPID key and per-device UUID. Map registered/revoked to the
-   existing push client's literal success contract. Wire generic private push/SW
-   consumption and offline shell only with their explicit paths/authority and
-   targeted owner/Sync/offline/browser checks. No service/HMAC/VAPID-private/DB
-   key may enter browser assets. N78 admin/campaign activation is still separate.
+8. Browser composition is now implemented and locally qualified, inactive. There
+   is no future browser/transport/SW implementation port. Actual register ACKs carry
+   the original UUID and expiry. The exact encrypted envelope is
+   `{v:1,binding:registrationId,expiresAt,event:{id,kind,expiresAt,actionPath}}`.
+   The SW persists only the noncredential binding/expiry and bounded dedupe IDs,
+   shows generic copy with zero open clients, and opens only the fixed public app
+   root when a click needs boot. A current authenticated page validates source and
+   original registration before private router navigation. Logout/context/permission/
+   subscription changes retire bindings; close alone preserves background consent.
+   Activation still requires the existing approved PUBLIC VAPID key, exact service
+   revision/protocol/readback, supported fresh actual Auth policy profile, both
+   source flags, and separately authorized hosted/device proof. No private service,
+   HMAC, VAPID, database or Auth refresh/bearer material enters SW/cache/diagnostics.
+   N78 admin/campaign activation remains separate.

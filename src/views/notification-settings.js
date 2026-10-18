@@ -5,6 +5,7 @@ import * as cloud from '../lib/cloud.js';
 import { repaint } from '../repaint.js';
 import { currentNotificationContext } from '../lib/notification-events.js';
 import { notificationScope } from '../lib/notification-center.js';
+import { getPushRuntime, readPushQuiet, writePushQuiet } from '../lib/notification-push-runtime.js';
 import { LESSON_LEAD_MINUTES, DUE_STAGES, readNotificationTiming, writeNotificationTiming, readNotificationCategories, writeNotificationCategory } from '../lib/notification-state.js';
 
 let cleanup = () => {};
@@ -16,10 +17,18 @@ const view = {
     const scope = notificationScope(context);
     const categories = readNotificationCategories(context);
     const timing = readNotificationTiming(context);
+    const push = getPushRuntime()?.snapshot();
+    const quiet = readPushQuiet(context);
     return html`<div class="n44-settings-page">
       <a class="btn btn--quiet n44-settings-back" href="#/settings">${icon('back')} الإعدادات</a>
       <div class="n44-settings" data-notification-scope="${scope ?? ''}">
       ${context ? html`
+        ${push?.available ? html`<section class="n44-preference card card--pad" aria-label="تذكيرات الجهاز">
+          <h2>تذكيرات الجهاز</h2>
+          <button type="button" class="btn btn--quiet" data-act="notification-push" data-scope="${scope}">${push.status === 'subscribed' ? 'إيقاف تذكيرات الجهاز' : push.status === 'cleanup_pending' ? 'إعادة محاولة الإيقاف' : 'تفعيل تذكيرات الجهاز'}</button>
+          <p role="status">${push.status === 'subscribed' ? 'مفعّلة على هذا الجهاز' : push.status === 'unsubscribed' ? 'غير مفعّلة' : 'لم يكتمل التفعيل'}</p>
+          <button type="button" class="btn btn--quiet" role="switch" aria-checked="${String(!!quiet)}" data-act="notification-push-quiet" data-scope="${scope}">هدوء من 10 مساءً إلى 7 صباحًا</button>
+        </section>` : ''}
         <section class="n44-preference card card--pad" aria-labelledby="n44-lesson-heading">
           <div class="n44-preference-heading">
             <h2 id="n44-lesson-heading">تذكيرات الحصص</h2>
@@ -73,10 +82,25 @@ const view = {
   },
   onUnmount() { cleanup(); cleanup = () => {}; },
   actions: {
+    async 'notification-push'(el) {
+      if (el.dataset.scope !== notificationScope(currentNotificationContext(store, cloud))) return;
+      const runtime = getPushRuntime();
+      if (!runtime?.snapshot().available) return;
+      const result = await (['subscribed', 'cleanup_pending'].includes(runtime.snapshot().status) ? runtime.disable() : runtime.optIn());
+      if (!['subscribed', 'revoked'].includes(result?.status)) toast('تعذر تفعيل تذكيرات الجهاز', 'warn');
+      repaint();
+    },
+    async 'notification-push-quiet'(el) {
+      const context = currentNotificationContext(store, cloud);
+      if (!context || el.dataset.scope !== notificationScope(context) || !getPushRuntime()?.snapshot().available) return;
+      if (writePushQuiet(context, readPushQuiet(context) ? null : { start: 1320, end: 420 })) await getPushRuntime().preferencesChanged();
+      repaint();
+    },
     'notification-minutes'(el) {
       const context = currentNotificationContext(store, cloud);
       if (!context || el.dataset.scope !== notificationScope(context)) return;
       if (!writeNotificationTiming(context, { lessonMinutes: Number(el.dataset.minutes) })) toast('تعذر حفظ توقيت الإشعارات على هذا الجهاز', 'warn');
+      void getPushRuntime()?.preferencesChanged();
       repaint();
     },
     'notification-day'(el) {
@@ -84,6 +108,7 @@ const view = {
       if (!context || el.dataset.scope !== notificationScope(context) || !DUE_STAGES.includes(day)) return;
       const days = readNotificationTiming(context).dueDays;
       if (!writeNotificationTiming(context, { dueDays: days.includes(day) ? days.filter(value => value !== day) : [...days, day] })) toast('تعذر حفظ توقيت الإشعارات على هذا الجهاز', 'warn');
+      void getPushRuntime()?.preferencesChanged();
       repaint();
     },
     'notification-category'(el) {
@@ -94,6 +119,7 @@ const view = {
       if (!writeNotificationCategory(context, kind, !readNotificationCategories(context)[kind])) {
         toast('تعذر حفظ تفضيل الإشعارات على هذا الجهاز', 'warn');
       }
+      void getPushRuntime()?.preferencesChanged();
       repaint();
     },
 

@@ -21,22 +21,22 @@ create index ingress_scope on n44_push_draft.ingress_nonces(scope);
 create table n44_push_draft.ingress_rates(key text primary key,kind text not null,bucket bigint not null,count integer not null,expires_at_ms bigint not null);
 create index ingress_kind on n44_push_draft.ingress_rates(kind);
 create index ingress_rate_expiry on n44_push_draft.ingress_rates(expires_at_ms);
--- Dedicated helper role can only lock exact Auth rows; no tokens, passwords, scans or writes.
-grant usage on schema auth to n44_guard;
-grant select(id,banned_until) on auth.users to n44_guard;
-grant update(id) on auth.users to n44_guard;
-grant select(id,user_id,not_after) on auth.sessions to n44_guard;
-grant update(id) on auth.sessions to n44_guard;
+-- Managed Auth RLS is enabled with zero policies. Its existing management
+-- owner postgres already has BYPASSRLS (not superuser); no new bypass role,
+-- Auth policy, Auth schema object or Auth ownership change is proposed.
+-- Activation must read back postgres's exact column SELECT/UPDATE privileges.
+-- Only the private helper uses those existing rights, and returns no tokens.
+grant usage on schema n44_push_draft to postgres;
 create function n44_push_draft.lock_current_session(p_user uuid,p_session uuid)
-returns table(user_id uuid,session_id uuid) language plpgsql security definer set search_path=pg_catalog as $$
+returns table(user_id uuid,session_id uuid,not_after_ms bigint) language plpgsql security definer set search_path=pg_catalog as $$
 begin
  perform u.id from auth.users u where u.id=p_user and (u.banned_until is null or u.banned_until<=clock_timestamp()) for share;
  if not found then return; end if;
- return query select s.user_id,s.id from auth.sessions s where s.user_id=p_user and s.id=p_session
+ return query select s.user_id,s.id,(extract(epoch from s.not_after)*1000)::bigint from auth.sessions s where s.user_id=p_user and s.id=p_session
  and (s.not_after is null or s.not_after>clock_timestamp()) for share of s;
 end $$;
-alter function n44_push_draft.lock_current_session(uuid,uuid) owner to n44_guard;
-revoke all on function n44_push_draft.lock_current_session(uuid,uuid) from public;
+alter function n44_push_draft.lock_current_session(uuid,uuid) owner to postgres;
+revoke all on function n44_push_draft.lock_current_session(uuid,uuid) from public,anon,authenticated,n44_guard;
 grant execute on function n44_push_draft.lock_current_session(uuid,uuid) to n44_backend;
 -- RLS private backend only. No authenticated membership or exposed private schema.
 do $$ declare t text; begin

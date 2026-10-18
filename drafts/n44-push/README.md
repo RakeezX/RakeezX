@@ -1,8 +1,10 @@
 > Current N44 continuation: the concrete inactive Supabase Edge/Cloudflare Auth,
 > context/event and private scheduler composition is implemented in
 > [ACTIVATION.md](ACTIVATION.md). It supersedes future-port/host statements below.
-> No hosted activation or browser/SW wiring occurred. The historical stage and its
-> evidence remain below; the portable P256 validator is qualified separately.
+> Browser/SW composition is now staged default-OFF; current proof and activation
+> gates are in [N44_ACTUAL_CLIENT_BINDINGS.md](../../docs/automation-evidence/20261018/N44_ACTUAL_CLIENT_BINDINGS.md).
+> No hosted activation occurred. The primitive-stage description and its evidence
+> below are historical; its future-client statements are superseded by that proof.
 
 # N44 server preactivation contract â€” INACTIVE DRAFT
 

@@ -51,3 +51,13 @@ export function createPushDedupe() {
     },
   });
 }
+
+// Public, noncredential device binding. Inner event allowlist stays unchanged.
+export function normalizePushEnvelope(value, now) {
+  if (!value || Object.getPrototypeOf(value) !== Object.prototype ||
+    Object.keys(value).sort().join(',') !== 'binding,event,expiresAt,v' || value.v !== 1 ||
+    typeof value.binding !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value.binding) ||
+    !Number.isSafeInteger(value.expiresAt) || value.expiresAt <= now || value.expiresAt > now + 30 * 86400000) return null;
+  const event = normalizePushPayload(value.event, now);
+  return event ? Object.freeze({ v: 1, binding: value.binding, expiresAt: value.expiresAt, event }) : null;
+}

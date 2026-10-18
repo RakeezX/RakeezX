@@ -1,0 +1,77 @@
+{
+  "taskId": "continuous-n44-actual-browser-service-integration-20261018",
+  "runId": "9bb93382-ce73-4221-9f3e-8ff1b3f5f594",
+  "baseSha": "ddddd901b321acd432c54426faa3f09873c1987f",
+  "startedAt": "2026-10-18T03:52:22.834Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "default_off_actual_app",
+      "status": "PASS",
+      "evidence": "Actual authenticated mounted app/ownership guard, real settings DOM/CSS over loopback HTTP: no N44 API call, permission prompt, subscription or external control on boot/reload."
+    },
+    {
+      "name": "gesture_consent_transport_and_layout",
+      "status": "PASS",
+      "evidence": "Actual settings handler: unavailable service hidden, source-enabled fabricated VAPID test binding requires user gesture; permission once, committed context CAS/register ACK; native adapter options exercised; 390/1280 DOM geometry >=44px and no overflow."
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "httpClosed": true,
+    "browserClosed": true,
+    "postgresStopped": true,
+    "exactPidAbsent": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "cases": [],
+  "transport": [
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "absent"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    }
+  ],
+  "finishedAt": "2026-10-18T03:52:38.697Z",
+  "sourceSha256": {
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/auth-verifier.mjs": "b7ba8d208b7149e45fd5fe06450deafae536d4b47c12035cd6ff542d55f6f231",
+    "drafts/n44-push/backend.mjs": "fb15fb57aaa396a10fe49951954755c10e863a02906e46a803eab4f8f099fdda",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "d6e28269d26e818b99428f48aa1210b9148dfcc1e0e2876f42a40353078f7b07",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "78879dab070d35e8489e0a2ac70c8a8d13b9bd1144111961177f7500798d9072",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "tests/fixtures/n44-client-binding/journey.mjs": "cfa740080a4b0d01995a9dccf9e509d36cd5e88f26a3e2a98a7de98f3e6f33bc",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c"
+  }
+}
