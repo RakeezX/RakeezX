@@ -353,3 +353,40 @@ SCRAM verifier enters role DDL; raw password/keys never enter tool arguments or
 SQL. CLI diagnostics are suppressed and temporary SQL/env inputs removed in
 finally. An attempted LOGIN change is consumed even on ambiguous failure; no
 automatic password reset/replay. Seven source/ACL readbacks must pass first.
+
+## Actual hosted continuation — 2026-10-18, run 4ddd5df2
+
+The expressly authorized eighth source is the membership repair
+20261018195100_n88_guard_membership_inherit_staged.sql. Its placement is AFTER
+already-applied M1 and BEFORE M2, regardless of filename order. Local actual PG17
+proof reproduced both grantors and changed only the postgres-granted guard
+INHERIT true to false; missing/altered/unexpected baselines fail atomically.
+The original expected identity and all six original SQL sources remain unchanged.
+Original local fixture failures and hosted membership mismatch remain historical.
+
+All eight source-bound hosted migrations now exist exactly once. Provider history
+versions differ from filename timestamps; compare exact names and stored SQL
+SHA256, never forge versions or replay. Read hosted-activation-outcome.json and
+hosted-boundary-readback.json: every staged identity comparison passed, including
+76 boundary routines' source/ACL/signature/invoker/owner identities and preservation
+of previous helpers/grants/roles/Auth/RLS metadata.
+
+The own N88 credential was installed as a client-derived verifier through the
+protected official CLI file while NOLOGIN. Public salt/iteration challenge and
+protected client-derived comparison returned both stored/server equality booleans
+true; no raw verifier/password/key left custody. Actual pre-auth metadata confirmed
+LOGIN, NOINHERIT, restricted flags, no membership/expiry/cap and existing CONNECT.
+No CONNECT/TEMP/CREATE/global grants were changed.
+
+The single authorized n88_backend.PROJECT SESSION5432 attempt with pinned CA and
+hostname verification returned 28P01. Its cause is unknown. The helper immediately
+disarmed only n88_backend LOGIN; fresh provider metadata confirms NOLOGIN and all
+other flags/options unchanged. Authentication is consumed; no alternate role,
+endpoint/proxy, rotation, unchanged retry or inferred provider-cache diagnosis.
+No restricted private query or actual runtime capture guard could run.
+
+Readiness remains OFF. No Edge/Worker/route deployment, provider secret installation,
+student-code issuance, fixture mutation or message occurred. Own original versioned
+material remains solely in protected CurrentUser DPAPI recovery; transient SQL files
+were removed. N44 credentials/roles/recovery were untouched. Resume requires a
+materially evidenced resolution and separately authorized proof attempt.

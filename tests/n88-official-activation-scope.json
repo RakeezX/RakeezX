@@ -1,14 +1,14 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n88-official-student-portal-activation-20261018",
-  "runId": "6085920e-db53-474e-9ba9-d2e1efa73012",
+  "runId": "4ddd5df2-933f-4754-8d04-0d27be47bcff",
   "baseSha": "5046e82968cb0055db7a99aea41d65dcb71b2a60",
-  "at": "2026-10-18T19:42:11.740Z",
+  "at": "2026-10-18T20:43:34.913Z",
   "checks": [
     {
       "name": "exact_inert_graph_and_preserved_migrations",
       "status": "PASS",
-      "evidence": "All source/output/binary hashes verified; original six migrations unchanged from base; one exact seventh boundary migration pinned before apply. Only Edge graph changed; provider/config/private UI outputs unchanged; activation OFF."
+      "evidence": "All source/output/binary hashes verified; original six migrations unchanged from base; exact boundary and membership repair sources pinned before their hosted applies. Only Edge graph changed; provider/config/private UI outputs unchanged; activation OFF."
     },
     {
       "name": "exact_card_migration_bytes",

@@ -21,11 +21,16 @@ const absolute={name:'actual-app-absolute-imports',setup(build){build.onResolve(
 const boundary=JSON.parse(await readFile(dir+'error-boundary-contract.json','utf8'));
 const membershipRepair='supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql';
 manifest.privateMembershipCorrection={source:membershipRepair,sha256:await textHash(membershipRepair),placement:'after source-bound M1, before M2',role:'n88_guard',member:'postgres',grantor:'postgres',inheritBefore:true,inheritAfter:false,adminUnchanged:false,setUnchanged:false,allOtherEdgesAndFlagsUnchanged:true,originalExpectedIdentityUnchanged:true,localEvidence:'tests/n88-official-activation-membership.json',hostedApplied:false};
+const hostedOutcomePath=dir+'hosted-activation-outcome.json';
+const hostedOutcome=JSON.parse(await readFile(hostedOutcomePath,'utf8'));
+manifest.hostedActivationOutcome={path:hostedOutcomePath,sha256:await textHash(hostedOutcomePath),state:hostedOutcome.state,appliedHistory:hostedOutcome.history,readiness:false,restrictedSession:hostedOutcome.connection.result,sqlstate:hostedOutcome.connection.sqlstate,loginDisarmed:hostedOutcome.finalDisposition.roles.every(r=>!r.login)};
+manifest.privateMembershipCorrection.hostedApplied=hostedOutcome.history.some(h=>h.sha256===manifest.privateMembershipCorrection.sha256);
 for(const file of [membershipRepair,'tests/n88-official-activation-membership.mjs','tests/n88-official-activation-membership.json'])manifest.sources[file]=await textHash(file);
 manifest.privateErrorBoundary={revision:'typed-private-boundary-v1',migration:boundary.migration,
   routines:boundary.operations.length,contractSha256:await textHash(dir+'error-boundary-contract.json'),
   identitiesSha256:await textHash(dir+'error-boundary-identities.json'),security:'INVOKER',executeGrantee:'n88_backend',
   hostedApplied:false,readbackRequiredBeforePrivateQuery:true,localEvidence:'tests/n88-official-activation-error-boundary.json'};
+manifest.privateErrorBoundary.hostedApplied=hostedOutcome.history.some(h=>h.sha256===boundary.migration.sha256);
 for(const file of [boundary.migration.path,dir+'build-error-boundary.mjs',dir+'error-boundary-contract.json',dir+'error-boundary-identities.json',dir+'private-error-boundary.mjs',
   'tests/n88-official-activation-error-boundary.mjs','tests/n88-official-activation-error-boundary.json'])manifest.sources[file]=await textHash(file);
 manifest.privateDatabaseTransport={projectId:'xlrubcwjqktzzunrvuns',host:'aws-0-ap-south-1.pooler.supabase.com',port:5432,mode:'session',role:'n88_backend',tls:{verifyHostname:true,rejectUnauthorized:true,minVersion:'TLSv1.2',ca:JSON.parse(await readFile(dir+'ca/provenance.json','utf8'))},preAuthenticationEvidence:'tests/n88-official-activation-session-pooler.json',restrictedSessionReadbackRequired:true};

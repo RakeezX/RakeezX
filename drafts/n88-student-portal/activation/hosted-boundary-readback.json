@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "runId": "4ddd5df2-933f-4754-8d04-0d27be47bcff",
+  "privateQueriesAllowed": false,
+  "routines": 76,
+  "exactSourceAclOwnerInvokerAndSignatureComparison": "hosted-boundary-identities-comparison.json",
+  "preservedOriginalIdentityComparison": "hosted-m7-preserved-identities-comparison.json",
+  "membershipCorrection": {
+    "originalExpectedIdentityMatched": true,
+    "onlyTargetInheritChanged": true,
+    "sourceSha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de"
+  },
+  "history": [
+    {
+      "version": "20261018194329",
+      "name": "n88_exact_activation_staged_20261018034356",
+      "sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+    },
+    {
+      "version": "20261018203630",
+      "name": "n88_guard_membership_inherit_staged_20261018195100",
+      "sha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de"
+    },
+    {
+      "version": "20261018203704",
+      "name": "n88_integrated_class_staged_20261018102843",
+      "sha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c"
+    },
+    {
+      "version": "20261018203805",
+      "name": "n88_six_digit_staged_20261018110713",
+      "sha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff"
+    },
+    {
+      "version": "20261018203837",
+      "name": "n88_shared_network_budget_staged_20261018114113",
+      "sha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd"
+    },
+    {
+      "version": "20261018203858",
+      "name": "n88_code_recovery_staged_20261018115648",
+      "sha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5"
+    },
+    {
+      "version": "20261018203919",
+      "name": "n88_task_guidance_staged_20261018125611",
+      "sha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060"
+    },
+    {
+      "version": "20261018203939",
+      "name": "n88_private_error_boundary_staged_20261018185300",
+      "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+    }
+  ]
+}

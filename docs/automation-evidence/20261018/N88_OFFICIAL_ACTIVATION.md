@@ -310,3 +310,25 @@ The earlier rejected fixture cleanup remains untouched. See
 activation/hosted-phase1-membership-mismatch.json for exact provider disposition.
 Resume requires a separately scoped approved resolution of this membership
 contract mismatch, then skip the already-applied source-bound first migration.
+
+Current continuation (run 4ddd5df2): the newly scoped exact membership repair
+passed real PG17 positive and five negative preimage cases, was committed before
+hosted apply, then restored the ORIGINAL expected false identity. Its actual
+provider version is 20261018203630. M1 was skipped; M2-M6 and the unchanged typed
+boundary were each applied once with exact stage readbacks. All eight provider
+history rows match immutable source SHA256. Original failures remain preserved.
+
+Own N88 stored/server SCRAM key equality passed through protected CLI input with
+boolean-only results. Actual CONNECT/LOGIN/NOINHERIT/restricted flags/no membership/
+no expiry/no cap preconditions passed, with pinned SESSION host/port/CA. The ONE
+own initial connection returned 28P01 before any private query. The helper disarmed
+only n88_backend; provider readback confirms NOLOGIN. Cause remains unknown.
+No auth retry, credential rotation, alternate role/endpoint/proxy or N44 access.
+
+Actual state and source/history mapping: activation/hosted-activation-outcome.json.
+Boundary identities: activation/hosted-boundary-identities-comparison.json.
+No provider secrets, service/Worker/routes/readiness or hosted fixture activation.
+Encrypted original version material retained in its current-user protected owned
+custody directory; only owner.json/recovery.dpapi remain, no transient SQL/env.
+This is external BLOCKED pending a materially evidenced authentication resolution
+and separately authorized proof attempt; it is not Product readiness or closure.

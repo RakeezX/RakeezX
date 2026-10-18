@@ -110,7 +110,7 @@
     "drafts/n88-student-portal/activation/private-error-boundary.mjs": "c17ed676799033cda3b4bd2d39ee185d298c256d62c8878fb595b8a69cf96f99",
     "tests/n88-official-activation-error-boundary.mjs": "0b84f13aae427302e8bb2712ed60a9c84fc433c0dfec8f00764488fa02fef1ed",
     "tests/n88-official-activation-error-boundary.json": "96a1e5e792b0ebf42bb3281130f5c84b7a7cba78a6b851be1672720301587510",
-    "drafts/n88-student-portal/official-activation.mjs": "1d38bb6a8a9a7fde0a76b0067075094d52265f9316f243ab489778d0e552f532",
+    "drafts/n88-student-portal/official-activation.mjs": "c0987451e18fc9f89edd926bf1190d28e71aac815795cbbcad37bbe5c1412e3a",
     "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
     "drafts/n88-student-portal/activation/ca/provenance.json": "82cbea55c25279317503a264d455ccb33d5be54952b072e088ba5e6cd6f582d4",
     "tests/n88-official-activation-session-pooler.mjs": "9f38a6b6a81efddcd68f7aa6a96c09be9b3a372c9626e54159e387070499b26c",
@@ -211,13 +211,13 @@
     "tests/n88-six-digit-shared-launcher.mjs": "2a8eeac80819c70141ea078b651293f271520c25bfd4ab184825c561f056633b",
     "tests/n88-six-digit-shared-artifacts.mjs": "3449115e5db6f2db91dd7e121eef72e1b437fcdba5c6b26f5475e09ed793a0a7",
     "tests/n88-six-digit-shared-flood-window.mjs": "76246587b972b7610ee36b48018d465476c17ba5abb822e1c813fb232a99b971",
-    "drafts/n88-student-portal/ACTIVATION.md": "bdfbcf8587432f5fddeae21ef98e29536fed4ca3af327234ee884396e7edf0d5",
+    "drafts/n88-student-portal/ACTIVATION.md": "5448c9efb59aa3a93ebf588847d7dc8de0ddad52c1176e9bd9541600e04ba998",
     "drafts/n88-student-portal/six-digit-schema.inactive.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff",
-    "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "79eeb73999a6edcc81e2683a5ccb64feb58ecd73a26ca924e3391ccf72ec4417",
+    "drafts/n88-student-portal/activation/six-digit-preflight.inactive.sql": "fe271ff549148e777511327963637c391b52ea13eddc2d7c3bf01615f79e5715",
     "tests/n88-six-digit-redaction.mjs": "7e31c4634798898cf157a06f51c84585efce246da6b559fdf0343bfda294bbbe",
     "tests/n88-six-digit-security.mjs": "27b802cd8fd7d47cdcc34f514d8849361dc07d81f9c72479c09e1b94542c45e1",
-    "drafts/n88-student-portal/integrated-bundle.mjs": "c566f820387a8da0e18b0c42d81b1f731ce652003d87f37c8521a9f51d24e2a1",
+    "drafts/n88-student-portal/integrated-bundle.mjs": "9b33ed2265bbd840aba40d52a7a54ff3f7450c05874d8fa12ede1b066e14640c",
     "drafts/n88-student-portal/integrated-schema.inactive.sql": "483910719135c3296cde691922c22281994fbc8da1afeab8385b9f0889c0a40e",
     "index.html": "8412633eaace66a1623cc8528ebdf878e2811f6e62dba85b3c0505d64407231a",
     "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
@@ -247,7 +247,7 @@
     "drafts/n88-student-portal/activation/identities.inactive.sql": "5a3776447c46e564aa51b8a96c10ab53cb97623edb80a3d6b9a82e16ef4dffb5",
     "drafts/n88-student-portal/activation/expected-identities.json": "7b1419ee45af220bb09c010c6b969a184d7555f0cf67545115f2559b6ef59101",
     "drafts/n88-student-portal/activation/wrangler.staged.toml": "c0971a26d2f54ef6d8527288b2f7ba969cbd2a3700094d829e96bc8db49bcab9",
-    "drafts/n88-student-portal/activation/deploy.staged.json": "e6202077ac1699dbab9a289074a0599145c241f222341cf5efc5a80ddc1bd7d5",
+    "drafts/n88-student-portal/activation/deploy.staged.json": "3b54fceeeacdab98cc34bc845f216781e8ea3e00edd2b261707b0f3ee69924dd",
     "drafts/n88-student-portal/activation/toolchain.json": "da359433d928d06cbd3a4159cb48485cef13efa5d91ddc584bdabd23cda1e01a",
     "drafts/n88-student-portal/activation/.gitattributes": "7ac62fb784f0fdf2758169a38d178c300913aa2a94087ffbe6ea1a310ef3e8a8",
     "drafts/n88-student-portal/activation/metadata-contract.json": "76bb288adccb6398855db5d2769e7690308869d232babc3061fc22d75c529504",
@@ -521,7 +521,58 @@
     "allOtherEdgesAndFlagsUnchanged": true,
     "originalExpectedIdentityUnchanged": true,
     "localEvidence": "tests/n88-official-activation-membership.json",
-    "hostedApplied": false
+    "hostedApplied": true
+  },
+  "hostedActivationOutcome": {
+    "path": "drafts/n88-student-portal/activation/hosted-activation-outcome.json",
+    "sha256": "ed2bbdc72a9a312f5e1025e4e4fb0bd188fd34df85743a0e64676f93cc5df2fe",
+    "state": "BLOCKED",
+    "appliedHistory": [
+      {
+        "version": "20261018194329",
+        "name": "n88_exact_activation_staged_20261018034356",
+        "sha256": "e28df02973c8b1e65a61b00f4f2931fde38ab15eedfac6fd43f06e5e888ed09c"
+      },
+      {
+        "version": "20261018203630",
+        "name": "n88_guard_membership_inherit_staged_20261018195100",
+        "sha256": "4c5434dcff9a0bbef25187149c0238054bb26c8c46c7d2127b16b24b2112f4de"
+      },
+      {
+        "version": "20261018203704",
+        "name": "n88_integrated_class_staged_20261018102843",
+        "sha256": "49d88c05c1b85d6caa6fa507c30a6acbc5d07102b3f4446105dc995e173fc88c"
+      },
+      {
+        "version": "20261018203805",
+        "name": "n88_six_digit_staged_20261018110713",
+        "sha256": "5d44e4a727c3e3f07c5aadeb243b161b9dc9ecb8b70b728a4f74abaa773af7ff"
+      },
+      {
+        "version": "20261018203837",
+        "name": "n88_shared_network_budget_staged_20261018114113",
+        "sha256": "62d6f85b755f3eb270983f2abcee2f5034e7d3bc3dea84fe4fb63464078057cd"
+      },
+      {
+        "version": "20261018203858",
+        "name": "n88_code_recovery_staged_20261018115648",
+        "sha256": "1a5b2f597bcb05d68653d3c5f943695b0ede95848d3aedcce9f587ff6357cec5"
+      },
+      {
+        "version": "20261018203919",
+        "name": "n88_task_guidance_staged_20261018125611",
+        "sha256": "d8de3ae8f3d70d732205a324376a095fd27bf8ed8c0afa85f216ec15c0876060"
+      },
+      {
+        "version": "20261018203939",
+        "name": "n88_private_error_boundary_staged_20261018185300",
+        "sha256": "8c98bd3267364d80c9feb6dd527c19dd11064ede64b66ca01ed83fb221b6de76"
+      }
+    ],
+    "readiness": false,
+    "restrictedSession": "FAIL",
+    "sqlstate": "28P01",
+    "loginDisarmed": true
   },
   "privateErrorBoundary": {
     "revision": "typed-private-boundary-v1",
@@ -534,7 +585,7 @@
     "identitiesSha256": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
     "security": "INVOKER",
     "executeGrantee": "n88_backend",
-    "hostedApplied": false,
+    "hostedApplied": true,
     "readbackRequiredBeforePrivateQuery": true,
     "localEvidence": "tests/n88-official-activation-error-boundary.json"
   },

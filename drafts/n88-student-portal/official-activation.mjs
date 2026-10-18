@@ -9,7 +9,7 @@ import {readFile,writeFile,mkdir,unlink,readdir,rmdir} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
-const project='xlrubcwjqktzzunrvuns',run='1b9971f9-e3ae-4e07-9d05-52923064dd91';
+const project='xlrubcwjqktzzunrvuns',run='4ddd5df2-933f-4754-8d04-0d27be47bcff';
 const root=process.cwd(),base=path.resolve('drafts/n88-student-portal/activation'),phase=path.join(base,'owned-custody-'+run+'.tmp');
 const marker={run,project,phase,purpose:'N88 restricted service custody and immutable recovery'};
 const cli='C:/Users/Abody/AppData/Local/npm-cache/_npx/0e23c24576954b26/node_modules/supabase/dist/supabase.js';
@@ -80,14 +80,39 @@ async function execute(action,value){
   const meta=await sqlFile("select rolcanlogin,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole,rolreplication from pg_roles where rolname='n88_backend';");
   if(meta?.rows?.length!==1||Object.values(meta.rows[0]).some(Boolean))fail('n88_existing_role_not_fresh_restricted');
   state.loginAttempted=true;await save(state);
-  await sqlFile(`alter role n88_backend login password '${deriveScram(state.password)}';`);
-  state.loginAcknowledged=true;await save(state);return {loginAcknowledged:true,verifierValuesReturned:false};
+  await sqlFile(`alter role n88_backend nologin password '${deriveScram(state.password)}';`);
+  state.passwordAcknowledged=true;await save(state);return {passwordAcknowledged:true,loginEnabled:false,verifierValuesReturned:false};
+ }
+ if(action==='--verify-credential'){
+  if(!state.passwordAcknowledged||state.authenticationAttempted)fail('n88_credential_verification_gate');
+  const ownedRole="rolname='n88_backend' and not rolcanlogin and not rolinherit and not rolsuper and not rolcreatedb and not rolcreaterole and not rolreplication and not rolbypassrls and rolconnlimit=-1 and rolvaliduntil is null and not exists(select 1 from pg_auth_members where member=pg_authid.oid)";
+  const challenge=await sqlFile("select split_part(split_part(rolpassword,'$',2),':',2) as salt,split_part(split_part(rolpassword,'$',2),':',1) as iterations from pg_authid where "+ownedRole+" and split_part(rolpassword,'$',1)='SCRAM-SHA-256';");
+  const c=challenge?.rows?.[0];
+  if(challenge?.rows?.length!==1||c.iterations!=='16384'||!/^[A-Za-z0-9+/]{22}==$/.test(c.salt))fail('n88_public_challenge_shape');
+  const salted=pbkdf2Sync(state.password,Buffer.from(c.salt,'base64'),16384,32,'sha256');
+  const client=createHmac('sha256',salted).update('Client Key').digest();
+  const stored=createHash('sha256').update(client).digest(),server=createHmac('sha256',salted).update('Server Key').digest();
+  try{
+   const comparison=await sqlFile(`select split_part(split_part(rolpassword,'$',2),':',2)='${c.salt}' as challenge_matches,split_part(split_part(rolpassword,'$',3),':',1)='${stored.toString('base64')}' as stored_matches,split_part(split_part(rolpassword,'$',3),':',2)='${server.toString('base64')}' as server_matches from pg_authid where ${ownedRole};`);
+   if(comparison?.rows?.length!==1||Object.values(comparison.rows[0]).some(v=>v!==true))fail('n88_credential_equality_failed');
+   state.credentialVerified=true;await save(state);
+   return {storedKeyMatchesOriginalCredential:true,serverKeyMatchesOriginalCredential:true,loginEnabled:false,authenticationAttempts:0,secretValuesReturned:false};
+  }finally{salted.fill(0);client.fill(0);stored.fill(0);server.fill(0);}
+ }
+ if(action==='--arm-login'){
+  if(!state.credentialVerified||state.authenticationAttempted||state.loginAcknowledged)fail('n88_login_arm_gate');
+  const result=await sqlFile("select rolcanlogin,rolinherit,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole,rolreplication,rolconnlimit,rolvaliduntil,rolconfig,has_database_privilege('n88_backend','postgres','CONNECT') as database_connect,(select count(*)::int from pg_auth_members where member=pg_roles.oid) as memberships from pg_roles where rolname='n88_backend';");
+  const r=result?.rows?.[0];
+  if(result?.rows?.length!==1||!r||['rolcanlogin','rolinherit','rolsuper','rolbypassrls','rolcreatedb','rolcreaterole','rolreplication'].some(k=>r[k]!==false)||r.rolconnlimit!==-1||r.rolvaliduntil!==null||r.rolconfig!==null||r.memberships!==0||r.database_connect!==true)fail('n88_login_preconditions_failed');
+  await sqlFile('alter role n88_backend login;');
+  state.loginAcknowledged=true;await save(state);return {loginAcknowledged:true,connectPermission:true,noMemberships:true,authenticationAttempts:0};
  }
  if(action==='--check-session'){
-  if(!state.loginAttempted)fail('n88_login_not_attempted');
+  if(!state.loginAcknowledged||!state.credentialVerified||state.authenticationAttempted)fail('n88_initial_authentication_gate');
   const {Client}=createRequire(import.meta.url)('C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/client/node_modules/pg');
   const ca=await readFile(path.join(base,'ca/supabase-prod-ca-2021.crt'),'utf8');
   const client=new Client({host:'aws-0-ap-south-1.pooler.supabase.com',port:5432,user:'n88_backend.'+project,password:state.password,database:'postgres',ssl:{ca,rejectUnauthorized:true,servername:'aws-0-ap-south-1.pooler.supabase.com',minVersion:'TLSv1.2'},connectionTimeoutMillis:5000,statement_timeout:3000,query_timeout:4000,application_name:'n88-private-server'});
+  state.authenticationAttempted=true;await save(state);
   try{
    await client.connect();
    const session=(await client.query('select current_user as role,session_user as login,pg_backend_pid() as pid,(select ssl from pg_stat_ssl where pid=pg_backend_pid()) as upstream_ssl')).rows[0];
@@ -101,6 +126,13 @@ async function execute(action,value){
    const {assertPrivateDatabaseSession}=await import('data:text/javascript;base64,'+Buffer.from(bundled.outputFiles[0].contents).toString('base64'));
    await assertPrivateDatabaseSession(client);state.loginVerified=true;await save(state);
    return {restrictedRoleVerified:true,sessionModeVerified:true,frontendTls:client.connection.stream.getProtocol(),upstreamSsl:session.upstream_ssl,actualSourceBoundaryAndCaptureGuard:true};
+  }catch(e){
+   state.initialConnectionFailure=/^[0-9A-Z]{5}$/.test(e.code??'')?e.code:'SOURCE_OR_TRANSPORT';
+   await save(state);
+   await sqlFile('alter role n88_backend nologin;');
+   state.loginDisarmed=true;await save(state);
+   await writeFile(path.join(base,'hosted-initial-session.json'),JSON.stringify({status:'FAIL',runId:run,projectId:project,sqlstate:state.initialConnectionFailure,authenticationAttempts:1,credentialEqualityPassed:true,loginDisarmed:true,retryForbidden:true,privateQueriesExecuted:false})+'\n');
+   fail('n88_initial_session_'+state.initialConnectionFailure);
   }finally{await client.end().catch(()=>{});}
  }
  if(action==='--install-env'){

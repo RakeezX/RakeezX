@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "actualPath": "drafts/n88-student-portal/activation/hosted-m4-identities.json",
+  "expectedPath": "drafts/n88-student-portal/activation/prior-recovery-integrated-expected-identities.json",
+  "differences": []
+}

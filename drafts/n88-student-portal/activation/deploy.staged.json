@@ -83,6 +83,7 @@
   "n44Changes": false,
   "migrations": [
     "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+    "supabase/migrations/20261018195100_n88_guard_membership_inherit_staged.sql",
     "supabase/migrations/20261018102843_n88_integrated_class_staged.sql",
     "supabase/migrations/20261018110713_n88_six_digit_staged.sql",
     "supabase/migrations/20261018114113_n88_shared_network_budget_staged.sql",
@@ -91,6 +92,7 @@
     "supabase/migrations/20261018185300_n88_private_error_boundary_staged.sql"
   ],
   "requiredPreflight": [
+    "Exact existing postgres-granted n88_guard membership correction after source-bound M1 and before M2; original expected baseline unchanged. Actual eight-version readback: hosted-activation-outcome.json. Never replay.",
     "prior-20261018-preflight.inactive.sql (before fresh baseline only)",
     "integrated-preflight.inactive.sql (after baseline, before extension)",
     "fresh full projection consumed-column/type/PK/FK/RLS/revision metadata; the 03:39 capture does not include all score families",
