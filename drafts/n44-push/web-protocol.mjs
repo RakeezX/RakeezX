@@ -1,6 +1,6 @@
 /** AI: shared pure Web API protocol. No app/SDK imports or environment defaults. */
 export const PREFIX='/api/n44';
-export const ROUTE=/^\/api\/n44\/(?:context\/(?:read|update)|events\/update|push\/(?:register|revoke))$/;
+export const ROUTE=/^\/api\/n44\/(?:context\/(?:read|update)|events\/(?:update|authorize)|push\/(?:register|revoke))$/;
 export const FORWARDED=Object.freeze(['authorization','origin','content-type','x-n44-csrf','sec-fetch-site']);
 export const encodeBytes=bytes=>btoa(String.fromCharCode(...bytes));
 export const decodeBytes=value=>{

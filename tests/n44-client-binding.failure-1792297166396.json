@@ -1,0 +1,349 @@
+{
+  "taskId": "continuous-n44-actual-browser-service-integration-20261018",
+  "runId": "9bb93382-ce73-4221-9f3e-8ff1b3f5f594",
+  "baseSha": "ddddd901b321acd432c54426faa3f09873c1987f",
+  "startedAt": "2026-10-18T04:19:11.378Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "managed_auth_rls_private_helper",
+      "status": "PASS",
+      "evidence": "Pinned read-only metadata inputs; owned PG mirrors managed Auth owner supabase_auth_admin, enabled/non-FORCED RLS, ZERO policies and seven named constraints. Existing-style postgres management role is non-superuser/BYPASSRLS with only required column locks; helper returns exact owner/session/not_after only. Backend/guard/anon/authenticated cannot read Auth tables; wrong owner/session yields no row. No managed Auth policy/ownership/bypass change proposed."
+    },
+    {
+      "name": "default_off_actual_app",
+      "status": "PASS",
+      "evidence": "Actual authenticated mounted app/ownership guard, real settings DOM/CSS over loopback HTTP: no N44 API call, permission prompt, subscription or external control on boot/reload."
+    },
+    {
+      "name": "gesture_consent_transport_and_layout",
+      "status": "PASS",
+      "evidence": "Actual settings handler: unavailable service hidden, source-enabled fabricated VAPID test binding requires user gesture; permission once, committed context CAS/register ACK; native adapter options exercised; 390/1280 DOM geometry >=44px and no overflow."
+    },
+    {
+      "name": "normal_sync_ack_projection",
+      "status": "PASS",
+      "evidence": "Actual syncAll orchestration + existing GenericV2Backend fabricated receipt: no projection before ACK, then actual events/update HTTP/canonical PG source projection; failed normal Sync ACK produces no new projection."
+    },
+    {
+      "name": "n44_client_sw_owner_stale_click_default_off_and_offline_guards",
+      "status": "PASS",
+      "evidence": "Actual sw.js VM, explicit one-constant synthetic activation: real encrypted/decrypted sender envelope displays GENERIC notification with ZERO open clients; durable restart dedupe; fixed public-root boot then current page/server click authorization; deleted/restored source, logout, A-B-A binding and expiry rejection; default OFF and offline/private route guards."
+    },
+    {
+      "name": "lost_register_revoke_ack_persisted_cleanup",
+      "status": "PASS",
+      "evidence": "Actual server commits register/revoke while transport loses both ACKs: no subscribed success, cleanup_pending and only registration identity persisted. Recreated runtime reconciles idempotent original-owner revoke ACK before enabling a fresh gesture; no prompt/subscription during recovery."
+    },
+    {
+      "name": "preferences_quiet_timing_context_cas",
+      "status": "PASS",
+      "evidence": "Actual mounted settings handlers bind quiet/timing to context CAS; changing preference immediately invalidates/revokes original registration, readback has pushConsent false, quiet 22:00–07:00 and 30-minute lead. In-app local preferences remain functional."
+    },
+    {
+      "name": "new_session_cas_and_original_cleanup",
+      "status": "PASS",
+      "evidence": "Retired original Auth session in owned PG: new verified same-owner session cannot directly revoke active original registration (HTTP400). Observed context revision permits CAS retirement, then real inactive-original ACK reconciles persisted cleanup; new session remains unsubscribed until a new gesture."
+    },
+    {
+      "name": "actual_runtime_aba_and_lease_guards",
+      "status": "PASS",
+      "evidence": "Pending native subscription released after A-B-A is cleaned and never registered/resumed; original session objects cannot defeat epoch. Actual offline lease invalidation hides readiness and blocks consent/transport. No ownership or lease guard disabled."
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Assertion failed; inspect local test stack (no private values retained)."
+    }
+  ],
+  "cleanup": {
+    "httpClosed": true,
+    "browserClosed": true,
+    "postgresStopped": true,
+    "exactPidAbsent": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "cases": [],
+  "metadataInputs": [
+    {
+      "path": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-0636-service-preflight/management-capabilities.json",
+      "sha256": "49a4e708b7e86001f62222600880591483bac2110b32415270cc54b44410e5c1"
+    },
+    {
+      "path": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-0636-service-preflight/metadata-addendum.json",
+      "sha256": "e1f5276131ada32af32eb7ba467b74a4f84a993a3cdc265445873c95131b9e09"
+    }
+  ],
+  "transport": [
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "absent"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/events/authorize",
+      "http": 200,
+      "status": "authorized"
+    },
+    {
+      "path": "/api/n44/events/authorize",
+      "http": 200,
+      "status": "authorized"
+    },
+    {
+      "path": "/api/n44/events/authorize",
+      "http": 400,
+      "status": "rejected"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 400,
+      "status": "rejected"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 400,
+      "status": "rejected"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "absent"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 400,
+      "status": "rejected"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/push/revoke",
+      "http": 200,
+      "status": "revoked"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/context/read",
+      "http": 200,
+      "status": "current"
+    },
+    {
+      "path": "/api/n44/context/update",
+      "http": 200,
+      "status": "updated"
+    },
+    {
+      "path": "/api/n44/push/register",
+      "http": 200,
+      "status": "registered"
+    }
+  ],
+  "finishedAt": "2026-10-18T04:19:26.362Z",
+  "sourceSha256": {
+    "drafts/n44-push/provider-policy.mjs": "4a9b4b7f94c67b440272ac5dc00a30de15335cc75e9405d3e93465f4841110f8",
+    "drafts/n44-push/auth-verifier.mjs": "929daab85fdb140afcb52e65e3b443e91341b8ef477f807f6278b807b63d364b",
+    "drafts/n44-push/backend.mjs": "3f745f59cf04949a297647df7edc0b8152f17c3a0b2ab7c6d46dcd04e3f5fc97",
+    "drafts/n44-push/canonical-source.mjs": "97866ec71f64a16402824088c9714c066037422d84a186005307138250820355",
+    "drafts/n44-push/web-entry.mjs": "5c39cd760cc3ce33e74d39e49e1510f176ec2a12247728845855c88b59d1a828",
+    "drafts/n44-push/web-protocol.mjs": "96c7c55dcf941db0880c650b0ebec2d107edff57f6eabdb6719c46ebaeb6941f",
+    "drafts/n44-push/cloudflare-entry.mjs": "ae6307290a37956ce3c5795bd2610d0fe488b985364ffcfc157289f15760cc09",
+    "drafts/n44-push/scheduler-entry.mjs": "b10a358bdbd1e8d289115f22aad61eeff1514ecfe5f31b890120b2f4200e3709",
+    "drafts/n44-push/existing-host.mjs": "d6e28269d26e818b99428f48aa1210b9148dfcc1e0e2876f42a40353078f7b07",
+    "drafts/n44-push/node-globals.mjs": "a6fdb3ae27d811ccae3ca7574b28736013a2f5398a77e3e3eca4c0cd713b8fe0",
+    "drafts/n44-push/postgres-repository.mjs": "37cb45217b9528d73b0e80f3e2dcb7b59eb903430156cc79705afc9d04c380bd",
+    "drafts/n44-push/runtime-gateway.mjs": "15e112ad867ea0c05e6faa7e0bee70adbdfeb27585180d60a497badfebeb3917",
+    "drafts/n44-push/existing-host.inactive.sql": "f5b534520db93b0a09e58ab22099652b3c4dcd351015394553c0753917290c2e",
+    "drafts/n44-push/canonical-source.inactive.sql": "24f61c1177163268b5f3336062d8c74ecad19ba65aca06d3cb1789f4110e6d46",
+    "supabase/functions/n44-notifications/index.ts": "f3f94ee4143fb4c75284f0e53e18ee8d6ff265b1d2489d90cc828a30d2418822",
+    "supabase/functions/n44-notifications/deno.lock": "6178e3a49d7a893e1a0ae97906f4d581ca359fdb01e349f6e00cb0e17734be85",
+    "drafts/n44-push/package-lock.json": "900b16e50e8ad4ea645c9d4d6d7674e53911c4da8b69ac090753fd5d9105b0fe",
+    "tests/fixtures/n44-client-binding/journey.mjs": "9aae4071cd371a248d64c8364d627893548370e79da83a3e9280ee6778ebfd6a",
+    "tests/fixtures/n44-existing-host/canonical.sql": "596400e77dc0dc5aab115c8367ee9d48a6816692fb98d9759898213afeb2b05c",
+    "tests/fixtures/n44-client-binding/service.mjs": "ac8b6a9fd68d921ec781d049ba12fdafd4f725e2d089d5c4ed50becec2bab189",
+    "tests/n44-client-binding.unit.mjs": "46c61bcac91ccf353b9abd48d786e4cce3d0b949a2b549ef2b18b1b77763a775",
+    "src/lib/notification-push-runtime.js": "145264341319fb197cf8b1b60d1037e5768e3e756bf792f8e06c4ee09a3bccb0",
+    "src/lib/notification-push-browser.js": "bba203b80d34268d7e8dcbaa354f2daa6deab767d47e0202eb4abde29300cbe1",
+    "src/lib/notification-push-gateway.js": "9a0b5c18f51c3ec489be05be829652da67e31e2896d5d1bf7d5f9df6d43d6339",
+    "src/lib/notification-push-client.js": "04a8ad9b44ffb23d1de7524d70916ee2f91edfa8db239b0698f0aaf1603ae9c8",
+    "src/lib/sync.js": "82b20757759730cf40bbf817bc65c5e5a387edfd1af0ef5008c1125d5b320a03",
+    "src/app.js": "fc569d65cd5796f9b199b7c0803ea5725a8052b244a58abd84d0152405604538",
+    "src/views/notification-settings.js": "c3bc76720bfc92598c89fdd03f9288b4fe8d4adeda314f754ae5a8e8670a9fed",
+    "src/lib/notification-push-core.js": "ba629449219a65f7b4c97cc707b4ef8e0623ceb59fc784ba2566ac0733fbb28e",
+    "tests/fixtures/n44-client-binding/managed-auth.sql": "8ce3598bde368158d7c21798e88e40534a931cefa8eb605543570efd426a88ab",
+    "sw.js": "0b1b422da0da47e8a471c2940ad878488a3d2e8e989397b54777fdedb083e798"
+  }
+}

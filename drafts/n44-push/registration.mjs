@@ -24,7 +24,7 @@ export function validateSubscription(raw, approvedOrigins = []) {
  * protect validates curve material, seals secrets and HMACs endpoint server-side.
  * repository.atomic commits before resolving; no memory fallback is supplied. */
 export function createRegistrationBoundary({ verifySession, repository, protect, clock,
-  approvedOrigins = [] }) {
+  approvedOrigins = [], receipt = false }) {
   const origins = Object.freeze([...approvedOrigins]);
   return Object.freeze({
     async register(transport, body) {
@@ -47,11 +47,12 @@ export function createRegistrationBoundary({ verifySession, repository, protect,
           if (!principal(auth, now) || !current(ctx, auth, now) || ctx.consentRevision !== body.consent.revision ||
               ctx.pushConsent !== true) return result('rejected');
           const previous = tx.get('registrations', body.registrationId);
-          if (previous) return result(previous.state === 'active' && previous.expiresAt > now &&
+          const acknowledged = r => receipt ? Object.freeze({status:'registered',registrationId:r.registrationId,expiresAt:r.expiresAt}) : result('registered');
+          if (previous) return previous.state === 'active' && previous.expiresAt > now &&
             previous.workspaceId === body.workspaceId && previous.deviceId === body.deviceId &&
             previous.sessionId === auth.sessionId && previous.sessionRevision === auth.sessionRevision &&
             previous.consentRevision === ctx.consentRevision && previous.fingerprint === secret.fingerprint &&
-            previous.bindingFingerprint === secret.bindingFingerprint ? 'registered' : 'rejected');
+            previous.bindingFingerprint === secret.bindingFingerprint ? acknowledged(previous) : result('rejected');
           const live = tx.rows('registrations').filter(r => r.state === 'active' && r.expiresAt > now);
           if (live.length >= LIMITS.devices || live.some(r => r.deviceId === body.deviceId && r.workspaceId === body.workspaceId) ||
               !rate(tx, 'register', now, 3600_000, LIMITS.registrationWritesPerHour)) return result('limited');
@@ -60,9 +61,9 @@ export function createRegistrationBoundary({ verifySession, repository, protect,
           tx.set('registrations', body.registrationId, { registrationId: body.registrationId,
             workspaceId: body.workspaceId, deviceId: body.deviceId, sessionId: auth.sessionId,
             sessionRevision: auth.sessionRevision, consentRevision: ctx.consentRevision,
-            state: 'active', expiresAt: Math.min(now + LIMITS.registrationMs, auth.expiresAt),
+            state: 'active', expiresAt: Math.min(now + LIMITS.registrationMs, ctx.sessionExpiresAt, auth.backgroundExpiresAt ?? auth.expiresAt),
             fingerprint: secret.fingerprint, bindingFingerprint: secret.bindingFingerprint, sealed: secret.sealed });
-          return result('registered');
+          return acknowledged(tx.get('registrations', body.registrationId));
         });
       } catch { return result('unavailable'); }
     },

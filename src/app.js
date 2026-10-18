@@ -30,6 +30,8 @@ import { runAccountProvisioning } from './lib/account-provisioning.js';
 import { createNotificationCenter, notificationScope, updateNotificationCenter, notificationSnapshot } from './lib/notification-center.js';
 import { currentNotificationContext, currentNotificationEvents, notificationDestination } from './lib/notification-events.js';
 import { notificationNow, readNotificationCategories, notificationCategoryAllowed, readNotificationPreferences, writeNotificationPreferences, NOTIFICATION_CATEGORY_PREFIX, NOTIFICATION_STORAGE_PREFIX } from './lib/notification-state.js';
+import { createPushRuntime, setPushRuntime } from './lib/notification-push-runtime.js';
+import { subscribeAcknowledged } from './lib/sync.js';
 import { renderNotificationCenter, renderNotificationBell } from './views/notifications.js';
 import { completeProfile, getAccountPresentation, normalizeSaudiMobile } from './lib/account-profile.js';
 import {
@@ -50,6 +52,17 @@ notificationStyles.rel = 'stylesheet';
 notificationStyles.href = new URL('./styles/notifications.css', import.meta.url).href;
 document.head.append(notificationStyles);
 
+const notificationPush = createPushRuntime({ store, cloud, navigate: go, changed: () => scheduleRender() });
+setPushRuntime(notificationPush);
+store.onWorkspaceDeactivation(() => notificationPush.invalidate());
+cloud.subscribe(() => { void notificationPush.refresh(); });
+store.subscribe(() => { void notificationPush.refresh(); });
+subscribeAcknowledged(checkpoint => notificationPush.afterSyncAck(checkpoint));
+window.addEventListener('storage', event => {
+  if (event.key === cloud.AUTH_STORAGE_KEY || event.key === null) notificationPush.invalidate();
+  if (event.key?.startsWith('rakeezx-n44-') || event.key?.startsWith(NOTIFICATION_CATEGORY_PREFIX) || event.key?.startsWith(LEASE_STORAGE_PREFIX)) void notificationPush.refresh();
+});
+window.addEventListener('pageshow', () => { void notificationPush.refresh(); });
 let notificationContext = null;
 let notificationState = createNotificationCenter(null);
 let notificationSheet = null;

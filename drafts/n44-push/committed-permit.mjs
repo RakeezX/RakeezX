@@ -3,7 +3,7 @@
 const permits = new WeakSet();
 export function issueCommittedPermit(value) {
   const copy = structuredClone(value);
-  Object.freeze(copy.payload); Object.freeze(copy);
+  Object.freeze(copy.payload); if(copy.binding)Object.freeze(copy.binding); Object.freeze(copy);
   permits.add(copy); return copy;
 }
 export function consumeCommittedPermit(value) {

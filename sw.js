@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v69';
+const VERSION = 'rakeezx-v71';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -82,6 +82,11 @@ const SHELL = [
   './src/lib/n36-extension-handoff.js',
   './src/lib/n36-extension-protocol.js',
   './src/lib/notification-center.js',
+  './src/lib/notification-push-core.js',
+  './src/lib/notification-push-client.js',
+  './src/lib/notification-push-browser.js',
+  './src/lib/notification-push-gateway.js',
+  './src/lib/notification-push-runtime.js',
   './src/lib/notification-events.js',
   './src/lib/notification-state.js',
   './src/lib/visible-numerals.js',
@@ -219,6 +224,11 @@ self.addEventListener('install', (event) => {
         './src/lib/n36-extension-protocol.js',
         './src/views/n88-public-guest.js',
         './src/app.js',
+        './src/lib/notification-push-runtime.js',
+        './src/lib/notification-push-browser.js',
+        './src/lib/notification-push-gateway.js',
+        './src/lib/notification-push-client.js',
+        './src/lib/notification-push-core.js',
         './src/store.js',
         './src/views/calendar.js',
       ].map(url => cache.add(new Request(url, { cache: 'reload' }))));
@@ -252,7 +262,7 @@ self.addEventListener('fetch', (event) => {
   // Do not cache API/Supabase requests or anything cross-origin
   if (url.origin !== self.location.origin) return;
   // Private service responses and private entry navigation never enter any shell cache.
-  if (/^\/(?:api\/n88(?:\/|$)|s\/)/.test(url.pathname)) return;
+  if (/^\/(?:api\/(?:n88|n44)(?:\/|$)|s\/)/.test(url.pathname) || url.pathname === '/__n44_device_consent') return;
   // Ignore non-http(s) requests like chrome-extension://
   if (!url.protocol.startsWith('http')) return;
 
@@ -360,4 +370,144 @@ self.addEventListener('fetch', (event) => {
       }
     })()
   );
+});
+
+
+// AI: source-controlled activation; opaque binding is NOT an Auth credential.
+const N44_PUSH_ENABLED = false;
+const N44_CONSENT_CACHE = 'rakeezx-n44-consent-v1';
+const N44_CONSENT_KEY = '/__n44_device_consent';
+let n44Epoch = 0, n44Writes = Promise.resolve();
+const n44Uuid = s => typeof s === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(s);
+const n44AppClient = client => {
+  try { const u = new URL(client.url); return client.type === 'window' && u.origin === self.location.origin && u.pathname === '/'; } catch { return false; }
+};
+function n44Payload(raw) {
+  const now = Date.now();
+  if (!raw || Object.keys(raw).sort().join(',') !== 'actionPath,expiresAt,id,kind' ||
+      typeof raw.id !== 'string' || !/^[a-zA-Z0-9_:%.-]{1,240}$/.test(raw.id) ||
+      !['lesson', 'due'].includes(raw.kind) || !Number.isSafeInteger(raw.expiresAt) ||
+      raw.expiresAt <= now || raw.expiresAt > now + 604800000 ||
+      typeof raw.actionPath !== 'string' || raw.actionPath.length > 800) return null;
+  const match = /^\/teaching\/([^/?#]+)\/(items|attendance\?session=([^/?#]+))$/.exec(raw.actionPath);
+  if (!match || (raw.kind === 'lesson') !== !!match[3]) return null;
+  for (const segment of [match[1], match[3]].filter(Boolean)) {
+    try { const d = decodeURIComponent(segment);
+      if (!d || d.length > 180 || /[\s/\\?#%\u0000-\u001f\u007f]/u.test(d) || ['.', '..'].includes(d) || encodeURIComponent(d) !== segment) return null;
+    } catch { return null; }
+  }
+  return { id: raw.id, kind: raw.kind, expiresAt: raw.expiresAt, actionPath: raw.actionPath };
+}
+function n44Envelope(raw) {
+  if (!raw || Object.keys(raw).sort().join(',') !== 'binding,event,expiresAt,v' || raw.v !== 1 || !n44Uuid(raw.binding) ||
+    !Number.isSafeInteger(raw.expiresAt) || raw.expiresAt <= Date.now() || raw.expiresAt > Date.now()+2592000000) return null;
+  const event = n44Payload(raw.event);
+  return event ? { v: 1, binding: raw.binding, expiresAt: raw.expiresAt, event } : null;
+}
+async function n44Read() {
+  try {
+    const response = await (await caches.open(N44_CONSENT_CACHE)).match(N44_CONSENT_KEY);
+    const raw = response && await response.text(); if (!raw || raw.length > 40000) return null;
+    const value = JSON.parse(raw);
+    if (Object.keys(value).sort().join(',') !== 'binding,expiresAt,seen' || !n44Uuid(value.binding) || !Number.isSafeInteger(value.expiresAt) ||
+      value.expiresAt <= Date.now() || value.expiresAt > Date.now()+2592000000 || !Array.isArray(value.seen) || value.seen.length > 100 ||
+      value.seen.some(e => Object.keys(e).sort().join(',') !== 'expiresAt,id' || typeof e.id !== 'string' || !/^[a-zA-Z0-9_:%.-]{1,240}$/.test(e.id) || !Number.isSafeInteger(e.expiresAt))) return null;
+    return value;
+  } catch { return null; }
+}
+async function n44Write(value) {
+  await (await caches.open(N44_CONSENT_CACHE)).put(N44_CONSENT_KEY,new Response(JSON.stringify(value),{headers:{'content-type':'application/json','cache-control':'no-store'}}));
+}
+async function n44Close() {
+  for (const n of await self.registration.getNotifications()) if (String(n.tag).startsWith('n44:')) n.close();
+}
+self.addEventListener('message', event => {
+  if (!n44AppClient(event.source) || !event.ports?.[0]) return;
+  const data = event.data, port = event.ports[0];
+  if (!['n44-consent-status','n44-consent-bind','n44-consent-clear'].includes(data?.type)) return;
+  const epoch = data.type === 'n44-consent-status' ? n44Epoch : ++n44Epoch;
+  const work = async () => {
+    let ok = false, answered = false;
+    try {
+      if (data.type === 'n44-consent-status') {
+        const current = await n44Read();answered=true;port.postMessage({ok:true,enabled:N44_PUSH_ENABLED,binding:current?.binding??null,expiresAt:current?.expiresAt??0});return;
+      }
+      if (epoch !== n44Epoch) return;
+      if (data.type === 'n44-consent-clear' && Object.keys(data).sort().join(',') === 'binding,type' && (data.binding === null || n44Uuid(data.binding))) {
+        const current = await n44Read();
+        if (!current || data.binding === null || current.binding === data.binding) { await n44Write(null); await n44Close(); }
+        ok = true;
+      } else if (N44_PUSH_ENABLED && data.type === 'n44-consent-bind' && Object.keys(data).sort().join(',') === 'binding,expiresAt,type' && n44Uuid(data.binding) &&
+        Number.isSafeInteger(data.expiresAt) && data.expiresAt > Date.now() && data.expiresAt <= Date.now()+2592000000) {
+        const previous = await n44Read();
+        if (epoch !== n44Epoch) return;
+        await n44Write({binding:data.binding,expiresAt:data.expiresAt,seen:previous?.binding===data.binding?previous.seen:[]});
+        ok = epoch === n44Epoch;
+        if (!ok) await n44Write(null);
+      }
+    } finally { if(!answered)port.postMessage({ok,enabled:N44_PUSH_ENABLED});port.close(); }
+  };
+  n44Writes = n44Writes.catch(()=>{}).then(work);
+  event.waitUntil(n44Writes);
+});
+async function n44Ask(client, envelope) {
+  return new Promise(resolve => {
+    const channel = new MessageChannel();
+    const finish = ok => { clearTimeout(timer); channel.port1.close(); channel.port2.close(); resolve(ok); };
+    const timer = setTimeout(() => finish(false),1500);
+    channel.port1.onmessage = message => finish(message.data?.ok === true);
+    try { client.postMessage({type:'n44-push-click',event:envelope},[channel.port2]); } catch { finish(false); }
+  });
+}
+const n44Clients = async () => (await self.clients.matchAll({type:'window',includeUncontrolled:false})).filter(n44AppClient);
+self.addEventListener('push', event => {
+  if (!N44_PUSH_ENABLED) return;
+  event.waitUntil((async () => {
+    let raw;try { const text = event.data?.text();if (!text || text.length>2300) return;raw=JSON.parse(text); } catch { return; }
+    const envelope = n44Envelope(raw);if (!envelope) return;
+    const epoch = n44Epoch;
+    // Serialize durable dedupe with consent mutations, including SW restarts.
+    const work = async () => {
+      const state = await n44Read();
+      if (epoch!==n44Epoch || !state || state.binding!==envelope.binding || envelope.expiresAt>state.expiresAt) return;
+      state.seen=state.seen.filter(e=>e.expiresAt>Date.now());
+      if (state.seen.some(e=>e.id===envelope.event.id) || state.seen.length>=100) return;
+      state.seen.push({id:envelope.event.id,expiresAt:Math.min(envelope.event.expiresAt,envelope.expiresAt)});
+      await n44Write(state);
+      if (epoch!==n44Epoch || !n44Envelope(envelope)) return;
+      await self.registration.showNotification('\u0631\u064e\u0643\u064a\u0632 \u0627\u0644\u0645\u0639\u0644\u0645',{
+        body:'\u0644\u062f\u064a\u0643 \u062a\u0630\u0643\u064a\u0631 \u062c\u062f\u064a\u062f. \u0627\u0641\u062a\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0644\u0639\u0631\u0636\u0647.',
+        tag:'n44:'+envelope.binding+':'+envelope.event.id,data:envelope,icon:'/assets/icon-192.png',renotify:false,
+      });
+      if (epoch!==n44Epoch) await n44Close();
+    };
+    n44Writes=n44Writes.catch(()=>{}).then(work);await n44Writes;
+  })());
+});
+self.addEventListener('notificationclick', event => {
+  if (!String(event.notification.tag).startsWith('n44:')) return;
+  event.notification.close();
+  if (!N44_PUSH_ENABLED) return;
+  event.waitUntil((async () => {
+    const envelope=n44Envelope(event.notification.data),state=await n44Read();
+    if (!envelope || state?.binding!==envelope.binding || state.expiresAt<envelope.expiresAt) return;
+    const epoch=n44Epoch,clients=await n44Clients();
+    for (const client of clients) if (await n44Ask(client,envelope) && epoch===n44Epoch) { await client.focus();return; }
+    if (clients.length || epoch!==n44Epoch) return;
+    // Fixed public application root ONLY. Private destination is never opened by
+    // the SW: the booted page must authenticate and authorize it afresh.
+    const client=await self.clients.openWindow(self.location.origin+'/');
+    for (let attempt=0;client&&attempt<6&&epoch===n44Epoch;attempt++) {
+      if (await n44Ask(client,envelope)) { await client.focus();return; }
+      await new Promise(resolve=>setTimeout(resolve,250));
+    }
+  })());
+});
+self.addEventListener('pushsubscriptionchange', event => {
+  ++n44Epoch;
+  n44Writes = n44Writes.catch(()=>{}).then(async () => {
+    await n44Write(null);await n44Close();
+    for (const client of await n44Clients()) client.postMessage({type:'n44-subscription-stale'});
+  });
+  event.waitUntil(n44Writes);
 });

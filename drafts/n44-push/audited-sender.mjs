@@ -6,7 +6,7 @@ import { lookup } from 'node:dns/promises';
 import { request } from 'node:https';
 import { checkServerIdentity } from 'node:tls';
 import { performance } from 'node:perf_hooks';
-import { normalizePushPayload } from '../../src/lib/notification-push-core.js';
+import { normalizePushPayload, normalizePushEnvelope } from '../../src/lib/notification-push-core.js';
 import { approvedProviderOrigins, trustedSubscription, publicAddress, decode64, validatePoint } from './provider-policy.mjs';
 import { consumeCommittedPermit } from './committed-permit.mjs';
 
@@ -56,10 +56,12 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         if (closed || unsafeDiagnostics() || signal?.aborted || !Number.isInteger(deadlineMs) || deadlineMs<1 || deadlineMs>10000) return 'uncertain';
         const payload=normalizePushPayload(permit.payload,clock());
         if (!payload) return 'uncertain';
-        const milliseconds=Math.min(deadlineMs,payload.expiresAt-clock());
+        const allowedExpiry=Math.min(payload.expiresAt,permit.binding?.expiresAt??Infinity);
+        const milliseconds=Math.min(deadlineMs,allowedExpiry-clock());
+        if(milliseconds<1)return 'uncertain';
         timer=setTimeout(abort,milliseconds);
         signal?.addEventListener('abort',abort,{once:true});
-        const check=()=>{if(closed || controller.signal.aborted || performance.now()-start>=milliseconds || clock()>=payload.expiresAt) fail();};
+        const check=()=>{if(closed || controller.signal.aborted || performance.now()-start>=milliseconds || clock()>=allowedExpiry) fail();};
         check();
         const opened=protector.open(permit.sealed,permit,{signal:controller.signal});
         const signing=credentials.get(opened?.vapidKeyId);
@@ -73,17 +75,19 @@ export function createAuditedSender({ enabled = false, providerOrigins = [], pro
         if (!Array.isArray(answers) || answers.length<1 || answers.length>16 ||
             answers.some(a=>!publicAddress(a.address,a.family))) fail();
         const pinned=Object.freeze({address:answers[0].address,family:answers[0].family});
-        const ttl=Math.floor((payload.expiresAt-clock())/1000);
+        const ttl=Math.floor((allowedExpiry-clock())/1000);
         if (ttl<1) fail();
-        // Minimal existing consumer schema ONLY. Future SW must supply generic
-        // lock-screen copy. No teacher/student names, subject, marks or event text.
-        const details=webpush.generateRequestDetails(sub,JSON.stringify(payload),{
+        // Inner consumer schema stays allowlisted. The optional public binding
+        // envelope carries no credential or private teacher/student content.
+        const wire=permit.binding?normalizePushEnvelope({v:1,binding:permit.binding.id,expiresAt:permit.binding.expiresAt,event:payload},clock()):payload;
+        if(!wire)fail();
+        const details=webpush.generateRequestDetails(sub,JSON.stringify(wire),{
           vapidDetails:signing,TTL:ttl,contentEncoding:'aes128gcm',urgency:'normal',
         });
         if (details.endpoint!==sub.endpoint || details.method!=='POST' || !Buffer.isBuffer(details.body)) fail();
         check();
         // Recompute TTL after encryption too; it never outlives immutable expiry.
-        details.headers.TTL=Math.min(ttl,Math.floor((payload.expiresAt-clock())/1000));
+        details.headers.TTL=Math.min(ttl,Math.floor((allowedExpiry-clock())/1000));
         if(details.headers.TTL<1) fail();
         return await new Promise(resolveOutcome=>{
           const finish=outcome=>{

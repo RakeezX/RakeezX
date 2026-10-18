@@ -1,15 +1,11 @@
-/** INACTIVE dependency-injected lifecycle, deliberately unimported by the app.
- * getVerifiedContext must use the real ownership guard, with a changing authRevision.
- * gateway is a future independently authenticated/authorized server boundary;
- * a caller's verified:true/owner label is NEVER server authorization.
- * Only synthetic implementations are exercised today. No subscription is returned.
- */
+/** AI: epoch-fenced browser lifecycle; concrete same-origin gateway supplies committed ACKs. */
 import { notificationScope } from './notification-center.js';
 import { normalizePushPayload } from './notification-push-core.js';
 
 export function createPushClient({ browser, gateway, getVerifiedContext, clock, resolveAction, diagnostic = () => {} }) {
   let epoch = 0, busy = false, active = null;
   const pending = new Set();
+  let drained = Promise.resolve(), finishDrain;
   const report = status => {
     // Fixed codes only: never include exceptions, context, endpoint or key material.
     try { diagnostic(status); } catch { /* diagnostics cannot change lifecycle */ }
@@ -41,10 +37,11 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
     if (ok) pending.delete(record); else pending.add(record);
     return ok;
   }
-  async function revoke() {
+  async function revoke({ wait = false } = {}) {
     ++epoch; // invalidate pending consent/subscription/action work immediately
     if (active) pending.add(active);
     active = null;
+    if (wait) await drained;
     const results = await Promise.all([...pending].map(clean));
     return report(results.every(Boolean) ? 'revoked' : 'cleanup_pending');
   }
@@ -52,9 +49,24 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
     // Caller MUST invoke on logout, context switch, permission revocation and
     // before replacing the ownership guard; await cleanup before later opt-in.
     revoke,
+    settled: () => drained,
+    async restore(subscription) {
+      if (busy || !subscription || browser.permission() !== 'granted') return report('unsubscribed');
+      busy = true; drained = new Promise(resolve => { finishDrain = resolve; });
+      const snapshot = context(), token = epoch;
+      const record = { subscription, context: snapshot, registerAttempted: true };
+      try {
+        if (!snapshot || await gateway.restore(snapshot, subscription) !== true || !current(snapshot, token) || browser.permission() !== 'granted') {
+          return report(await clean(record) ? 'unsubscribed' : 'cleanup_pending');
+        }
+        active = record; return report('subscribed');
+      } catch { return report(await clean(record) ? 'unsubscribed' : 'cleanup_pending'); }
+      finally { busy = false; finishDrain(); }
+    },
     async optIn() {
       if (busy) return report('busy');
       busy = true;
+      drained = new Promise(resolve => { finishDrain = resolve; });
       let record;
       try {
         if (!browser.supported()) return report('unsupported');
@@ -63,12 +75,12 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
         if (!snapshot) return report('unverified');
         if (pending.size) return report('cleanup_pending');
         if (active && !same(active.context, snapshot)) {
-          const result = await revoke();
+          const result = await revoke({ wait: false });
           return result.status === 'revoked' ? report('stale_context') : result;
         }
         if (active) {
           if (browser.permission() === 'granted') return report('subscribed');
-          return await revoke();
+          return await revoke({ wait: false });
         }
         const permission = await browser.requestPermission();
         if (!current(snapshot, token)) return report('stale_context');
@@ -91,7 +103,7 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
         return report('subscribed');
       } catch {
         return report(record && !await clean(record) ? 'cleanup_pending' : 'unavailable');
-      } finally { busy = false; }
+      } finally { busy = false; finishDrain(); }
     },
     async applyAction(raw) {
       try {
@@ -100,7 +112,7 @@ export function createPushClient({ browser, gateway, getVerifiedContext, clock, 
         if (!snapshot || !event) return report('action_rejected');
         if (await gateway.authorizeEvent(snapshot, event) !== true || !current(snapshot, token)) return report('action_rejected');
         // Re-derive eligibility, ownership and deleted-parent/child safety from
-        // the current store using notificationDestination at future integration.
+        // the current store using the mounted notificationDestination resolver.
         const destination = resolveAction(snapshot, event.id, clock());
         if (!current(snapshot, token) || !normalizePushPayload(event, clock()) || destination !== event.actionPath) return report('action_rejected');
         // Synchronous application prevents an async navigation/context race.
