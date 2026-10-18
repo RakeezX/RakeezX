@@ -1,0 +1,222 @@
+{
+  "taskId": "continuous-n88-unified-student-entry-view-20261018",
+  "runId": "5cd15d10-5ebc-4063-8333-ab41fae20236",
+  "baseSha": "8ff59100ead8802dec7ebb7f7d4f4d41c2c89f8c",
+  "hashes": {
+    "src/lib/student-portal-unified-client.js": "88f77c432a57c32827c1059c959d623962fe9a13014f395c878ab3a69396a92d",
+    "src/views/student-portal-login.js": "ece8b84462d1fa9329852a3e3dc3c099f48e6a9430ab729170d07b25e34ebcfa",
+    "src/styles/student-portal-login.css": "d10f36bc56bda208443cf34b9cf3713f9fe602ac85bd39e01e68f3a6cdf44fed"
+  },
+  "checks": [
+    {
+      "name": "n88_unified_numeric_entry_actual_student_ui_and_allowed_projection",
+      "status": "PASS",
+      "evidence": "Actual module DOM/handlers/source CSS at 390/1280: one numeric field, Arabic normalization, exact prefix/length, own A/B projections, omitted sections, null versus zero, RTL/responsive layout, readiness OFF."
+    },
+    {
+      "name": "n88_unified_client_session_failure_revocation_and_private_credential_boundaries",
+      "status": "PASS",
+      "evidence": "Fixed claim/read/end methods and body keys; stale body-parse and pending UI invalidation; current session, logout, revoked, 429 cooldown/retry, 503, pagehide/dispose; zero storage writes; no secret/payload diagnostics or query. Synthetic HTTP only; owned browser/server finally cleanup."
+    }
+  ],
+  "visual": [
+    {
+      "width": 390,
+      "rtl": true,
+      "overflow": false,
+      "sourceCSS": true,
+      "entryScreenshot": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-unified-5cd15d10-5ebc-4063-8333-ab41fae20236-390-empty-entry.png",
+      "privateDataScreenshots": false,
+      "storageWrites": 0
+    },
+    {
+      "width": 1280,
+      "rtl": true,
+      "overflow": false,
+      "sourceCSS": true,
+      "entryScreenshot": "C:\\Users\\Abody\\AppData\\Local\\Temp\\n88-unified-5cd15d10-5ebc-4063-8333-ab41fae20236-1280-empty-entry.png",
+      "privateDataScreenshots": false,
+      "storageWrites": 0
+    }
+  ],
+  "requestSummary": [
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/end",
+      "method": "POST",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/end",
+      "method": "POST",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "method": "POST",
+      "bodyKeys": [
+        "code"
+      ],
+      "validCode": true,
+      "csrf": true
+    },
+    {
+      "path": "/api/n88/student/read",
+      "method": "GET",
+      "bodyKeys": [],
+      "validCode": null,
+      "csrf": false
+    }
+  ]
+}

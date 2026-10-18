@@ -1,0 +1,5 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>دخول الطالب — رَكيز</title></head><body style="margin:0"><div id="portal"></div><script type="module">
+import {createUnifiedStudentPortalClient} from '/src/lib/student-portal-unified-client.js';
+import {mountUnifiedStudentPortal} from '/src/views/student-portal-login.js';
+window.portal = mountUnifiedStudentPortal(document.querySelector('#portal'), {client:createUnifiedStudentPortalClient(),readiness:{enabled:!location.pathname.endsWith('/off')}});
+</script></body></html>
