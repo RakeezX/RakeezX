@@ -24,7 +24,9 @@ export async function readCanonical(ports,ownerId) {
   await ports.query('select n88_private.lock_projection_sources($1::uuid,$2::integer)',[ownerId,2000]);
   const canonical={};let bytes=0;
   for(const table of CANONICAL_PROJECTION_REQUIREMENTS.tables) {
-    const r=await ports.query(`select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select ${columns[table]} from rakeezx.${sqlNames[table]||table} where owner_id=$1::uuid order by id limit $2) x) bounded`,[ownerId,2001,2*1024*1024-bytes]);
+    // PG bigint revisions must never round through a JavaScript JSON number.
+    const selected=columns[table].replace(/\brevision\b/g,'revision::text as revision');
+    const r=await ports.query(`select case when octet_length(payload)<= $3 and sum(octet_length(payload)) over (rows unbounded preceding)<= $3 then payload else null end as payload from (select row_to_json(x)::text as payload from (select ${selected} from rakeezx.${sqlNames[table]||table} where owner_id=$1::uuid order by id limit $2) x) bounded`,[ownerId,2001,2*1024*1024-bytes]);
     if(r.rows.length>2000)throw Error('n88_projection_bound');
     canonical[table]=r.rows.map(({payload})=>{
       if(typeof payload!=='string' || (bytes+=Buffer.byteLength(payload))>2*1024*1024)throw Error('n88_projection_bound');

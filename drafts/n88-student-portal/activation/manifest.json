@@ -49,7 +49,7 @@
     "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
     "drafts/n88-student-portal/visibility-policy.mjs": "2ec1640819029af319bf0ccbefdddd29dd7566f43229937224470a2dd13c73e4",
     "drafts/n88-student-portal/student-projection.mjs": "f71864cec1b966b2084fbe92d3a41444df215e0b5dc436e0d4a751c3df986342",
-    "drafts/n88-student-portal/integrated-service.mjs": "b45674c54422cbb8b3edcdf6d8fb4dba70b0b81ec07842f7ce0a4211a9652078",
+    "drafts/n88-student-portal/integrated-service.mjs": "29dd9057154d19eccbfd8a0f04a01f783d78978ee9d40f445fd6dbd4664f4e0e",
     "drafts/n88-student-portal/postgres-repository.mjs": "7f352d2f8c74721dae4fd4527de8c2a3b1ca096d962508ae4d99722baf4995fd",
     "drafts/n88-student-portal/canonical-adapter.mjs": "8adcb9958f559b26d9d090bccab7d070308b8b649eff97ebbe49fdc00b87b458",
     "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
@@ -150,7 +150,7 @@
     "drafts/n88-student-portal/package-lock.json": "014b58d8a27a30c8e9d13cf0211f0ef12d90007c41e295cfa330d95d0459d88a"
   },
   "outputs": {
-    "edge/index.mjs": "f2986d17435d4373b7a81b234ec4a0d3943ce0f7670b7534f526018a7b103a01",
+    "edge/index.mjs": "9bb32c1ec730c024e4a0ddd5636b97a435a7cc16e4440b7398775a92f6dbf0a0",
     "cloudflare/worker.mjs": "2aef087d94a07677002f1a96c9ac0da697f2c0bb6d800d89196c36e5bd4a88d7",
     "private/assets/student.mjs": "b06ad0aafc48fdc5d81bc15bfa059275f007a115badf91a154943c8dad94845a",
     "edge/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",

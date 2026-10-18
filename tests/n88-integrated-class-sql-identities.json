@@ -6,6 +6,11 @@
       "name": "exact_extended_private_constraints_indexes_and_triggers",
       "status": "PASS",
       "evidence": "Actual native PG catalog exports all private constraints/indexes/noninternal triggers plus existing helpers/roles/grants/policies. Global reservation UNIQUE, one-active-owner/student partial index and credential/receipt immutability triggers present and enabled. No hosted metadata or personal-row claim."
+    },
+    {
+      "name": "canonical_bigint_revision_precision",
+      "status": "PASS",
+      "evidence": "Restricted native PG canonical reader preserves revision 9007199254740993 as exact text; adjacent source revisions cannot collapse through JavaScript numeric rounding."
     }
   ],
   "cleanup": {
