@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n88-service-activation-candidate-20261018",
+  "runId": "d05b1d5b-3c34-4b95-abea-1f3b4609600c",
+  "baseSha": "ddddd901b321acd432c54426faa3f09873c1987f",
+  "startedAt": "2026-10-18T03:56:38.592Z",
+  "checks": [
+    {
+      "name": "owned_integration_phase",
+      "status": "PASS",
+      "evidence": "ACQUIRED integration"
+    },
+    {
+      "name": "runtime_journey_execution",
+      "status": "FAIL",
+      "evidence": "Phase operation failed; no alternative invocation or live retry."
+    }
+  ],
+  "cleanup": {
+    "postgresStopped": true,
+    "leaseRelease": "RELEASED integration",
+    "clusterFilesRetained": true
+  },
+  "database": "owned native PostgreSQL 17.6; synthetic source rows only",
+  "finishedAt": "2026-10-18T03:56:50.372Z"
+}

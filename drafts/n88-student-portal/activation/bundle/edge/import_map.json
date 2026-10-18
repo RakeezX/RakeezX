@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@supabase/auth-js": "npm:@supabase/auth-js@2.118.0",
+    "pg": "npm:pg@8.23.1"
+  }
+}

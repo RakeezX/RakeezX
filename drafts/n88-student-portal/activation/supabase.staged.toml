@@ -1,0 +1,7 @@
+# AI: inactive merge fragment relative to the existing project's supabase/config.toml.
+# Never overwrite the project's config with this fragment; exact diff needs approval.
+[functions.n88-student-portal]
+enabled = false
+verify_jwt = false
+entrypoint = "../drafts/n88-student-portal/activation/bundle/edge/index.mjs"
+import_map = "../drafts/n88-student-portal/activation/bundle/edge/import_map.json"

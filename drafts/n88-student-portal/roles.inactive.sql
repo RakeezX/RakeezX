@@ -4,9 +4,10 @@ create role n88_guard nologin noinherit;
 -- Provision n88_backend LOGIN/password by the approved secret custodian, never SQL evidence.
 -- No new subscription/account. n88_backend must be a narrowly scoped DB role,
 -- not service_role/postgres. This script assumes that approved role exists.
-grant usage on schema auth,rakeezx,n88_private to n88_guard;
-grant select(id),update(id) on auth.users to n88_guard;
-grant select(id,user_id,not_after),update(id) on auth.sessions to n88_guard;
+grant usage on schema rakeezx,n88_private to n88_guard;
+-- Existing postgres owner alone operates Auth exact-key locks under managed RLS.
+-- Never create Auth policies, change its ownership or grant guard/backend bypass.
+grant execute on function n88_private.lock_owner_key(uuid) to n88_guard;
 grant select(owner_id,id),update(id) on rakeezx.years,rakeezx.terms,rakeezx.sections,
   rakeezx.students,rakeezx.enrollments,rakeezx.teachings,rakeezx.items to n88_guard;
 grant select,insert,delete on n88_private.ingress_receipts to n88_guard;
@@ -36,13 +37,19 @@ do $$ declare t text;begin
   end loop;
 end $$;
 -- Helper ownership is NOT a login membership or a grant to browser roles.
-grant create on schema n88_private to n88_guard;
-alter function n88_private.lock_canonical_sources(uuid,integer) owner to n88_guard;
-alter function n88_private.lock_current_session(uuid,uuid) owner to n88_guard;
-alter function n88_private.consume_ingress(uuid,bigint) owner to n88_guard;
-revoke create on schema n88_private from n88_guard;
+-- Grant while existing postgres still owns the functions. Ownership transfer
+-- rewrites the grantor for guard-owned helpers without requiring superuser.
 grant execute on function n88_private.lock_canonical_sources(uuid,integer),
   n88_private.lock_current_session(uuid,uuid),n88_private.consume_ingress(uuid,bigint) to n88_backend;
+grant create on schema n88_private to n88_guard;
+-- PG17 CREATEROLE grants creator ADMIN but does not imply SET. Temporarily allow
+-- ONLY existing postgres to transfer these two newly created private helpers.
+grant n88_guard to postgres with set true;
+alter function n88_private.lock_canonical_sources(uuid,integer) owner to n88_guard;
+-- lock_owner_key and lock_current_session retain EXISTING postgres ownership.
+alter function n88_private.consume_ingress(uuid,bigint) owner to n88_guard;
+grant n88_guard to postgres with set false;
+revoke create on schema n88_private from n88_guard;
 -- Keep schema unexposed, no anon/authenticated grants. Backend has NO canonical
 -- write/Auth/session-table access and no membership in n88_guard. Revoke inherited
 -- privileges if existing role readback finds any; never silently broaden a role.

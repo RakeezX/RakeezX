@@ -1,0 +1,9 @@
+{
+  "taskId": "continuous-n88-service-activation-candidate-20261018",
+  "runId": "d05b1d5b-3c34-4b95-abea-1f3b4609600c",
+  "status": "FAIL",
+  "command": "Deno 2.9.6 check --cached-only --frozen --config bundle/edge/deno.json bundle/edge/index.ts",
+  "evidence": "Generated esbuild JavaScript had been named index.ts. Source TypeScript check passed, but generated file produced 212 TypeScript inference/implicit-any errors (TS7006/TS7031/TS7034/TS7005 and related inferred types).",
+  "retainedArtifact": "tests/fixtures/n88-activation/edge-initial-generated-typescript.txt",
+  "correction": "Name the actual generated JavaScript index.mjs, with original typed index.ts unchanged. Preserve dependency lock; do not disable checks or insert ts-nocheck."
+}

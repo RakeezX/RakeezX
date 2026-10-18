@@ -1,0 +1,5 @@
+# AI: exact output hashes must survive source-only publication on Windows.
+bundle/** text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+*.toml text eol=lf

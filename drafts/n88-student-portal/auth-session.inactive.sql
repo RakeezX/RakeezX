@@ -1,12 +1,13 @@
 -- AI: PROPOSAL ONLY. Never applied to hosted Auth. No tokens or user enumeration.
--- Proposed controlled NOLOGIN helper owner: n88_guard. Backend: n88_backend.
--- n88_guard needs schema USAGE, SELECT(id,user_id,not_after) on auth.sessions,
--- UPDATE(id) solely for row locking. It must not be granted to a login/frontend.
+-- Existing supported management owner postgres (BYPASSRLS, NOT superuser) only.
+-- Managed Auth tables retain their owner/RLS/zero policies. No new bypass grant.
+-- Backend gets only exact-session helper EXECUTE, no Auth schema/table privileges.
 create function n88_private.lock_current_session(p_user uuid,p_session uuid)
 returns table(user_id uuid,session_id uuid)
 language plpgsql security definer set search_path=pg_catalog as $$
 begin
-  perform u.id from auth.users u where u.id=p_user for share;
+  perform u.id from auth.users u where u.id=p_user
+    and (u.banned_until is null or u.banned_until<=clock_timestamp()) for share;
   if not found then return; end if;
   return query select s.user_id,s.id from auth.sessions s
     where s.id=p_session and s.user_id=p_user
@@ -14,5 +15,5 @@ begin
 end;
 $$;
 revoke all on function n88_private.lock_current_session(uuid,uuid) from public;
--- Separate approval must set owner to n88_guard and grant EXECUTE to n88_backend.
+-- Migration must retain owner postgres; private EXECUTE only to n88_backend.
 -- No refresh_tokens lookup, session writes, Auth setting or RLS change.

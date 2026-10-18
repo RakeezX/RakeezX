@@ -1,0 +1,11 @@
+# AI: generated inactive config; existing zone only, no route or preview.
+name = "rakeez-n88-private-ingress"
+main = "bundle/cloudflare/worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = false
+preview_urls = false
+routes = []
+[vars]
+N88_ENABLED = "false"
+[observability]
+enabled = false

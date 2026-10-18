@@ -1,0 +1,22 @@
+{
+  "taskId": "continuous-n88-service-activation-candidate-20261018",
+  "runId": "d05b1d5b-3c34-4b95-abea-1f3b4609600c",
+  "scope": "Inactive source-only activation preparation; no hosted/service/PO acceptance claim",
+  "checks": [
+    {
+      "name": "n88_real_metadata_bound_fresh_activation_migration_and_private_role_guards",
+      "status": "PASS",
+      "evidence": "All three metadata/capability SHA256 inputs verified. Captured consumed columns/types/nullability, composite PK/FK, canonical FORCE RLS, managed Auth owner/RLS/zero policies and canonical trigger-function identities matched. Exact CLI-created migration executes as non-superuser postgres in owned PG17.6; backend/guard/Auth/frontend/current-session/owner-FK/collision checks pass. See tests/n88-activation-postgres.result.json and activation/metadata-contract.json."
+    },
+    {
+      "name": "n88_exact_inactive_deploy_bundle_readback_and_activation_manifest",
+      "status": "PASS",
+      "evidence": "Offline esbuild 0.28.1 Edge/Cloudflare/actual private document bundles, exact source/output/tool identities, lock/import-map integrity, namespace separation, metadata-only readback negative tests, syntax and default-OFF checks pass. Actual generated Edge index.mjs Deno2.9.6 cached-only/frozen dependency check passes. See tests/n88-activation-artifacts.result.json and activation/manifest.json."
+    },
+    {
+      "name": "hosted_migration_private_grants_function_route_secret_fixture_device_activation",
+      "status": "NOT_RUN",
+      "evidence": "Excluded by current preparation authority. One exact Arabic operation checklist in docs/automation-evidence/20261018/N88_EXACT_ACTIVATION_CANDIDATE.md; no schema/Auth/role/secret/service/route/device/live-student action executed."
+    }
+  ]
+}

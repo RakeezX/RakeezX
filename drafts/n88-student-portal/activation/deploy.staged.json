@@ -1,0 +1,54 @@
+{
+  "aiAuthored": true,
+  "enabled": false,
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "migration": "supabase/migrations/20261018034356_n88_exact_activation_staged.sql",
+  "function": {
+    "name": "n88-student-portal",
+    "entry": "bundle/edge/index.mjs",
+    "config": "bundle/edge/deno.json",
+    "lock": "bundle/edge/deno.lock",
+    "importMap": "bundle/edge/import_map.json",
+    "stagedProjectConfigFragment": "supabase.staged.toml",
+    "gatewayVerifyJwt": false,
+    "enabled": false,
+    "revision": "n88-existing-host-v1"
+  },
+  "cloudflare": {
+    "config": "wrangler.staged.toml",
+    "routes": [],
+    "workersDev": false,
+    "previewUrls": false,
+    "proposedExistingOriginApiPath": "/api/n88/*"
+  },
+  "privateDocument": {
+    "enabled": false,
+    "liveRewrites": [],
+    "proposedExistingOriginPathPattern": "^/s/[A-Za-z0-9_-]{43}$",
+    "document": "bundle/private/student.html",
+    "assetMount": "/n88-private/",
+    "assetDirectory": "bundle/private/",
+    "assetAllowlist": ["assets/student.mjs", "styles/app.css", "styles/student-portal.css"],
+    "fallbackToAccountApp": false,
+    "headers": {
+      "Cache-Control": "private, no-store",
+      "Referrer-Policy": "no-referrer",
+      "X-Robots-Tag": "noindex, nofollow, noarchive",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    },
+    "serviceWorker": false,
+    "browserReadiness": false
+  },
+  "secretCustody": {
+    "edgeOnly": ["N88_DATABASE_URL", "N88_DATABASE_CA_CERT", "N88_HMAC_KEY"],
+    "sharedEdgeAndCloudflare": ["N88_INGRESS_KEY"],
+    "edgeExistingPublicBindings": ["N88_PUBLIC_ORIGIN", "N88_AUTH_URL", "N88_AUTH_API_KEY", "N88_SERVICE_REVISION"],
+    "cloudflareExistingBindings": ["N88_PUBLIC_ORIGIN", "N88_EDGE_URL"],
+    "valuesIncluded": false,
+    "databaseRole": "n88_backend",
+    "provisionLoginOnlyAfterSeparateApproval": true
+  },
+  "cron": [],
+  "n44Changes": false
+}

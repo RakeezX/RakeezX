@@ -1,0 +1,27 @@
+{
+  "taskId": "continuous-n88-service-activation-candidate-20261018",
+  "runId": "d05b1d5b-3c34-4b95-abea-1f3b4609600c",
+  "checkedAt": "2026-10-18T04:02:14.687Z",
+  "checks": [
+    {
+      "name": "exact_offline_bundle_graph_hashes",
+      "status": "PASS",
+      "evidence": "78 source identities and 9 exact output hashes match. Edge local imports bundled; exact pg/Auth SDK remain lock-pinned externals. Cloudflare/browser have zero external imports; actual app document/CSS bundled, no fabricated UI."
+    },
+    {
+      "name": "inactive_namespace_runtime_config_and_dependency_integrity",
+      "status": "PASS",
+      "evidence": "Pinned esbuild 0.28.1; actual Cloudflare bundle default-OFF returns 503 reading only N88_ENABLED. No routes/cron/preview, browser readiness false, dedicated /n88-private assets resolve, no N44 graph, package integrity agrees with npm/Deno locks. Existing Deno2.2 runtime qualification reused; auxiliary Deno2.9 type-check passed."
+    },
+    {
+      "name": "metadata_only_readback_collision_and_tamper_guards",
+      "status": "PASS",
+      "evidence": "Actual local PG helper/ACL/grant/policy identities exported. Offline readback verifier accepts fabricated matching envelope and rejects changed helper, BYPASSRLS, project and enabled flag. No hosted readback performed."
+    },
+    {
+      "name": "affected_syntax_and_shared_scope_unchanged",
+      "status": "PASS",
+      "evidence": "Six affected modules syntax-check. No src/public/SW/N44 changes; no startup dependency, offline shell unchanged. No browser/server phase needed for packaging; no UI acceptance claimed."
+    }
+  ]
+}

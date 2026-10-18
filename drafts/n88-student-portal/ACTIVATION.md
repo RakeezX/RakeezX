@@ -1,5 +1,22 @@
 # N88 — inactive existing-host activation artifact
 
+**18 October exact preparation:** the CLI-created fresh proposal is now
+`supabase/migrations/20261018034356_n88_exact_activation_staged.sql`.
+Use `activation/preflight.inactive.sql`, `activation/deploy.staged.json`,
+`activation/manifest.json` and the single checklist in
+`docs/automation-evidence/20261018/N88_EXACT_ACTIVATION_CANDIDATE.md`.
+The old sequence below records its source components, not a second apply path.
+The latest Product-row addendum captures Auth PK/FK/RLS and canonical trigger
+function bodies. Its hash and the management-capability snapshot are verified.
+Managed Auth has RLS enabled, zero policies, owner supabase_auth_admin. The exact
+owner/session helpers therefore retain the EXISTING postgres management owner
+(BYPASSRLS, NOT superuser), with private EXECUTE ACLs. n88_guard/n88_backend gain
+no Auth privileges, membership, policies or bypass. Fresh preflight still gates
+a later separately authorized hosted application.
+No hosted migration, secret provisioning, service/route deployment or UI readiness
+activation was performed. Browser bindings already exist, default OFF; the older
+future-wiring step below is historical and does not authorize another implementation.
+
 AI-authored. This is executable source, not an activated service. Both platform
 artifacts remain disabled. The application, Auth flow, Sync, storage, calendar,
 router and Service Worker do not import these server modules.
