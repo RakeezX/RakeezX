@@ -83,7 +83,7 @@
     "six-digit-preflight.inactive.sql (after integrated extension, before six-v1 amendment)"
   ],
   "qualification": {
-    "state": "BLOCKED",
+    "state": "LOCAL_READY",
     "scope": "inactive source-only local application/service/PG preparation",
     "actualAppJourney": "tests/n88-six-digit-journey.json",
     "changedServiceBoundaries": "tests/n88-six-digit-security.json",
@@ -94,11 +94,12 @@
     "activationPermitted": false,
     "unchangedProjectionEvidence": "tests/n88-integrated-class-final-service.json",
     "sixDigitAmendment": {
-      "sourceReady": false,
+      "sourceReady": true,
       "liveActivation": false,
       "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
       "evidence": "docs/automation-evidence/20261018/N88_SIX_DIGIT_UNIFIED_CODE.md",
-      "blocker": "Extended historical-reservation fixture failed twice at duplicate seed owner context; exact seed correction saved, not rerun under second-unchanged-blocker rule."
+      "verifiedRunId": "f6931c38-05f6-4d7d-bf8c-0a9e3ba95681",
+      "reusedUiEvidenceRunId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45"
     }
   },
   "credentialContract": {

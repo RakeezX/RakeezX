@@ -8,7 +8,7 @@ import {normalizeStudentCode,validStudentCode} from '../src/lib/student-portal-u
 import {startIntegratedReview} from '../drafts/n88-student-portal/integrated-review.mjs';
 import {redactN88,diagnosticError} from './n88-six-digit-redaction.mjs';
 import {A,B,SESSION} from './fixtures/n88-existing-host/provider.mjs';
-const taskId='continuous-n88-six-digit-unified-student-code-20261018',runId='5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45';
+const taskId='continuous-n88-six-digit-unified-student-code-20261018',runId='f6931c38-05f6-4d7d-bf8c-0a9e3ba95681';
 const root='C:/Users/Abody/Projects/RakeezX',taskFile=root+'/artifacts/ops-supervisor-v4/queue/'+taskId+'.json';
 const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',root+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',root+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
 const report={taskId,runId,checks:[],cleanup:{},namespace:'six-v1'};let review,owned=false,failed;

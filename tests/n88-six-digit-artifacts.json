@@ -1,11 +1,11 @@
 {
   "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
-  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "runId": "f6931c38-05f6-4d7d-bf8c-0a9e3ba95681",
   "checks": [
     {
       "name": "n88_current_inactive_bundle_hashes_and_private_student_graph",
       "status": "PASS",
-      "evidence": "114 current LF source hashes and 9 output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Static format/artifact qualification only; current extended security fixture remains BLOCKED and live activation OFF."
+      "evidence": "114 current LF source hashes and 9 output hashes verified. Private student graph excludes account/Auth/store/analytics/Sync, no external imports. Generated gateway default OFF reads only N88_ENABLED. Static format/artifact qualification; current extended security proof passed separately and live activation remains OFF."
     },
     {
       "name": "n88_offline_shell_dependencies_and_private_cache_exclusion",

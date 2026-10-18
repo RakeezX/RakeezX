@@ -1,8 +1,8 @@
 # N88 — six-digit universal credential amendment
 
 AI-authored. Task `continuous-n88-six-digit-unified-student-code-20261018`, run
-`5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45`; base
-`df94a3c43681a4ee1842ac938e025a51cf8920e7`. Local synthetic source preparation; current result BLOCKED.
+`f6931c38-05f6-4d7d-bf8c-0a9e3ba95681`; base
+`df94a3c43681a4ee1842ac938e025a51cf8920e7`. Local synthetic source preparation; current result LOCAL_READY.
 No push/deploy, hosted SQL/Auth/RLS/secret/route operation, real-data read/mutation,
 real message or live student activation. N88 remains open; all published switches
 and browser readiness remain OFF.
@@ -38,32 +38,36 @@ consume them). Trusted identity remains the provider/HMAC boundary, never body o
 forwarded headers. Uniform 401/unavailable, existing availability caps, private
 cookies, no plaintext storage and secret-free responses/diagnostics remain.
 
-## Actual evidence and current blocker
+## Actual evidence
 
 | Check | Actual result / evidence |
 | --- | --- |
 | Actual class → teacher delivery → two universal student entries | PASS — `tests/n88-six-digit-journey.json`; actual app shell/store/owner guard/source CSS, batch/missing-only, six-digit copy validation, selective rotation/revocation, other-student isolation, reload, visibility and lease rejection. 390/1280 screenshots under `tests/fixtures/n88-six-digit/`; secrets closed before capture |
 | Current launcher and input boundaries | PASS — `tests/n88-six-digit-launcher.json`; actual PowerShell start/six-v1 receipt, catalog-only amendment preflight, actual universal DOM/handlers/CSS, five-digit rejection, no seven-digit native truncation, Arabic paste normalization. Owned stop closes HTTP/PG/removes receipt. Blank login screenshot inspected |
-| Issuer and whole-report redaction | PASS — prefix of latest `tests/n88-six-digit-security.json`; boundaries/invalid types and lengths, bounded collision, controlled capacity metadata and historical namespace distinction; fabricated locator/message/nested log/page error/stack scrubbed before persistence/console |
-| Earlier focused actual security execution | PASS, limited reuse — two earlier executions of `node tests/n88-six-digit-security.mjs` completed exit 0 before the added historical native fixture/two-instance extension. They exercised actual signed gateway/current Auth/restricted PG, failed-session rollback debit, malformed/unknown/revoked uniform denial, concurrency, service/PG restart, source/global exhaustion, and actual SQL full six-v1 metadata capacity. Later current runs replaced that generated report; terminal completion is retained in the session. This does not certify the subsequently extended fixture or multi-instance scenario |
-| CURRENT extended native historical + two-instance security scenario | FAIL at fixture setup — `tests/n88-six-digit-security.json` and `tests/n88-six-digit-initial-history-fixture-failure.json`: duplicate `contexts_owner_id_key` at native helper's execution of `seed.sql`. Authentication/security assertions in this current extension were NOT_RUN. The first attempted owner-insert correction did not address the later seed insert; no false PASS |
+| Issuer and whole-report redaction | PASS — current `tests/n88-six-digit-security.json`; boundaries/invalid types and lengths, bounded collision, controlled capacity metadata and historical namespace distinction; fabricated locator/message/nested log/page error/stack scrubbed before persistence/console |
+| Actual durable attempts across two service instances | PASS — `tests/n88-six-digit-security.json`, current resumed run; actual signed gateway/current Auth/restricted PG, concurrent malformed/unknown/revoked failures, independent source and global budgets, source/header/body-spoof isolation, failed-session-write rollback preserves committed debit, service AND native PG restart preserve limits |
+| Actual global reservation, historical precision and full namespace | PASS — same current report; a cross-owner duplicate of a revoked six-v1 reservation rejects on the exact global unique constraint; alternate namespace, tombstone deletion/rewrite reject. Controlled metadata inserts reach exactly 100000 retained six-v1 records PLUS one unchanged absent-format historical record; the next unique reservation fails without changing either count/history. No brute-force claims or sequential credential allocation |
 | Inactive artifact graph / SW | PASS — `tests/n88-six-digit-artifacts.json`; fresh source/output identities and six-v1 contract, default OFF, private student graph excludes account/Auth/store; shell/private-route exclusions preserved. Static proof only |
 | Hosted/provider/device/Production/PO acceptance | NOT_RUN — outside this inert source-only amendment |
 
-The actual failed insert is `tests/fixtures/n88-integrated-class/seed.sql`'s
-existing unconditional context insert. The historical fixture first creates that
-same owner's context before the new migration, so the later seed duplicates it.
-The saved material correction makes only that synthetic context insert
-`ON CONFLICT(owner_id) DO NOTHING` and uses the exact canonical fixture namespace
-in both places. No constraint or owner guard was disabled. At the second same-cause
-failure the worker stopped dynamic retries. The corrected current scenario is
-NOT_RUN; it must be resumed through the existing controller and run once against
-this saved candidate. Current inactive qualification stays BLOCKED and live OFF.
+The previous attempt stopped after two fixture setup failures at the unconditional
+owner-context insert in `tests/fixtures/n88-integrated-class/seed.sql`. Candidate
+`84906bea64dd102319d5f574fa8314ac26e37f8f` saved a different concrete correction:
+only that synthetic context insert now uses `ON CONFLICT(owner_id) DO NOTHING`,
+and both fixture phases use its exact canonical namespace. This resumed run
+verified that saved correction with the complete focused security scenario once;
+no constraint or ownership guard was weakened and no dynamic retry was needed.
 
-Original transient lease failure is retained in
-`tests/n88-six-digit-initial-lease-failure.json`; a fresh readable checkpoint
-preceded the successful affected journey. Both later historical-fixture failures
-are preserved separately; no rule/ACL/lease bypass ran.
+Original failures remain in `tests/n88-six-digit-initial-history-fixture-failure.json`
+and `tests/n88-six-digit-prior-attempt-security.json`; their failed/unrun results
+are historical, not edited into PASS. Original transient lease failure remains in
+`tests/n88-six-digit-initial-lease-failure.json`. Current successful security proof
+is a fresh report with this run ID. Actual app journey/input/launcher and screenshots
+are reused unchanged from run `5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45`; this resumption
+changes test/report identities and inactive qualification metadata, not the
+certified Product JS/CSS, service, issuer or form behavior. The seed correction
+has no effect on a fresh ordinary UI fixture with no preexisting context; its
+new historical-reservation branch is exercised by the current security proof.
 
 Earlier integrated scoring/projection/teacher-model/Auth/owner/CAS/lost-ACK proofs
 at the supplied base are reused for unchanged implementations. Current journey
@@ -84,11 +88,11 @@ its twin is `drafts/n88-student-portal/six-digit-schema.inactive.sql`.
 `activation/six-digit-preflight.inactive.sql` checks the prior catalog/history and
 collision, before this amendment. Full prior metadata identity comparison and
 fresh project/privilege/service/secret custody checks remain required at any
-separately authorized hosted operation. Earlier successful native readback updated the exact current
+separately authorized hosted operation. Current successful native readback verified the exact current
 `integrated-expected-identities.json` to the three-version chain. Generic frontend
 publishing does not apply migrations or deploy the service.
 
-Use the existing command for a fresh fabricated six-v1 review after the blocked check is resolved and source
+Use the existing command for a fresh fabricated six-v1 review after source
 integration:
 
 ```powershell

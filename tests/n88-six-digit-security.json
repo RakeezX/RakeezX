@@ -1,6 +1,6 @@
 {
   "taskId": "continuous-n88-six-digit-unified-student-code-20261018",
-  "runId": "5c861ddc-e8ec-4325-8be2-ef9c8ba7ca45",
+  "runId": "f6931c38-05f6-4d7d-bf8c-0a9e3ba95681",
   "checks": [
     {
       "name": "six_digit_crypto_string_boundaries_collision_tombstones_capacity_namespace",
@@ -11,21 +11,31 @@
       "name": "whole_report_locator_stack_call_log_redaction",
       "status": "PASS",
       "evidence": "Bounded synthetic failure sanitizes six-digit secret in message, locator/call log, nested report, page error and stack before persistence/console. Fabricated secret never recorded."
+    },
+    {
+      "name": "actual_pg_prelookup_debit_survives_auth_rollback_concurrency_service_pg_restart",
+      "status": "PASS",
+      "evidence": "Actual signed provider gateway/current Auth/restricted PG: session insert failure rolls back authentication while source/global attempt debit remains committed. Malformed/unknown claims return same 401/body. Service AND native PG restart retain counters; four concurrent failures across two actual service instances serialize, source saturates at six, valid code denied. Body/IP/forwarded spoof cannot choose source."
+    },
+    {
+      "name": "real_global_budget_source_isolation_revocation_uniform_denial",
+      "status": "PASS",
+      "evidence": "Independent trusted synthetic source can authenticate while exhausted original source cannot. Revoked code has identical 401/body and debits. Bounded malformed attempts across independent verified sources reach exactly global100; another valid student code is denied before lookup, also after service/PG restart. No plaintext in durable credential rows."
+    },
+    {
+      "name": "actual_pg_full_six_namespace_no_tombstone_reuse",
+      "status": "PASS",
+      "evidence": "Bounded native-PG fabricated reservation metadata inserts reach exactly [REDACTED] retained six-v1 records; no credential search or claim enumeration. Exact statement trigger rejects the next unique reservation and leaves count unchanged. A separate fabricated pre-amendment absent-format tombstone stays byte-equivalent and does not count toward six-v1 occupancy; total retained records include that additional history. Cross-owner duplicate of a revoked six-v1 reservation rejects on the global unique constraint."
+    },
+    {
+      "name": "actual_additive_pg_constraints_readback",
+      "status": "PASS",
+      "evidence": "Fresh CLI-generated third migration applied only to owned native PG. Exact private constraints/indexes/triggers/helper identities read back. Alternate namespace, duplicate global reservation, historical rewrite and tombstone deletion reject; preserved earlier migrations unchanged."
     }
   ],
   "cleanup": {
     "ownedHttpAndNativePgClosed": true,
     "lease": "RELEASED integration"
   },
-  "namespace": "six-v1",
-  "failure": {
-    "message": "duplicate key value violates unique constraint \"contexts_owner_id_key\"",
-    "stack": [
-      "    at C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\client\\node_modules\\pg\\lib\\client.js:545:17",
-      "    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
-      "    at async startNativePg (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/tests/fixtures/n88-integrated-class/native-pg.mjs:72:5)",
-      "    at async startIntegratedReview (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/drafts/n88-student-portal/integrated-review.mjs:15:12)",
-      "    at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-six-digit-unified-student-code-20261018/tests/n88-six-digit-security.mjs:45:10"
-    ]
-  }
+  "namespace": "six-v1"
 }
